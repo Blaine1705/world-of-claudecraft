@@ -111,6 +111,7 @@ const NPC_IDS = [
   'smith_haldren',
   'fisherman_brandt',
   'foreman_odell',
+  'stablemaster_marla', // the stablemaster: sells the horse reins (Eastbrook, zone 1)
   'warden_fenwick',
   'brother_aldric_fen',
   'provisioner_hale',

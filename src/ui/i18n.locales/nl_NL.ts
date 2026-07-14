@@ -2513,6 +2513,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Houd je zwaard dichtbij, {className}. Het Dal is niet meer wat het was.',
   'entities.npcs.marshal_redbrook.name': 'Maarschalk Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Stalmeesteres',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Elke ruiter komt op twee benen binnen. Goud vooraf, het zadel als je erin kunt blijven zitten.',
   'entities.npcs.marshal_redbrook.title': 'Stadsmaarschalk',
   'entities.npcs.provisioner_hale.greeting':
     'Droge laarzen, droog brood, droog kruit, bij Fenbridge krijg je er op een goede dag twee van de drie.',
@@ -4973,6 +4977,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Verbruiksartikelen',
   'hudChrome.bags.filterGroupAria': 'Tassen filteren op categorie',
   'hudChrome.bags.filterMaterial': 'Materialen',
+  'hudChrome.bags.filterMount': 'Rijdieren',
   'hudChrome.bags.filterQuest': 'Quest',
   'hudChrome.bags.filterWeapon': 'Wapens',
   'hudChrome.bags.noMatch': 'Geen items komen overeen met je filters.',
@@ -6652,6 +6657,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Deze herstellink is ongeldig of verlopen. Vraag een nieuwe aan.',
   'entities.items.chunk_of_ore.name': 'Brok erts',
   'entities.items.reins_grag_bear.name': 'Teugels van de Goliath Grag-beer',
+  'entities.items.reins_valorsteed.name': 'Teugels van de Valorsteed',
   'entities.items.reins_stalkglider_snail.name': 'Teugels van de mosschelp-steelglijder',
   'entities.items.reins_aether_hover_cycle.name': 'Contactsleutel: zweefcykel van de Etherkamper',
   'entities.items.reins_shadowjump_toad.name': 'Teugels van Kama-Kage de schaduwsprongpad',

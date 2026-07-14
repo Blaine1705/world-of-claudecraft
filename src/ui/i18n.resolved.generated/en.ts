@@ -428,6 +428,7 @@ export const en: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
+      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const en: EnTranslations = {
       "filterConsumable": "Consumables",
       "filterMaterial": "Materials",
       "filterQuest": "Quest",
+      "filterMount": "Mounts",
       "sortAria": "Sort bag items",
       "sortRecent": "Recent",
       "sortQuality": "Quality",
@@ -7084,6 +7086,9 @@ export const en: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Galecall Waistguard"
       },
+      "reins_valorsteed": {
+        "name": "Reins of the Valorsteed"
+      },
       "reins_grag_bear": {
         "name": "Reins of the Goliath Grag-Bear"
       },
@@ -7487,6 +7492,11 @@ export const en: EnTranslations = {
         "name": "Foreman Odell",
         "title": "Mine Foreman",
         "greeting": "Whole dig's crawling with those dirt-caked vermin!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stablemaster",
+        "greeting": "Every rider walks in on two legs. Gold up front, saddle when you can sit it."
       },
       "warden_fenwick": {
         "name": "Warden Fenwick",

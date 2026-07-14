@@ -197,6 +197,7 @@ import {
   ownedMounts as ownedMountsImpl,
   selectMount as selectMountImpl,
   toggleMount as toggleMountImpl,
+  updateMountTransition,
 } from './mounts';
 import {
   findPlayerPath,
@@ -3426,6 +3427,11 @@ export class Sim {
         updateRegen(this.ctx, p, meta);
         updateRested(p, meta);
         drainGatheringGrants(meta);
+        // Mount summon/dismount transition: decrement the timer, cancel a summon
+        // on combat/swim, complete a mount/dismount, and force-dismount a mounted
+        // swimmer. Live players only (a dead player is already force-dismounted by
+        // handleDeath). Draws no rng, so the tick-phase draw order is unchanged.
+        updateMountTransition(this.ctx, p, this.isSwimming(p));
         lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not

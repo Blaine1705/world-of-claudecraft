@@ -155,6 +155,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     skinCatalog: 'class',
     skin: 0,
     mountKey: '',
+    mountCastRemaining: 0,
+    mountCastKey: '',
     mainhandItemId: null,
     equippedItems: {},
     equippedInstances: {},

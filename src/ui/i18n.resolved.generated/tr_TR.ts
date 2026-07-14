@@ -428,6 +428,7 @@ export const tr_TR: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
+      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const tr_TR: EnTranslations = {
       "filterConsumable": "Sarf Malzemeleri",
       "filterMaterial": "Malzemeler",
       "filterQuest": "Görev",
+      "filterMount": "Binekler",
       "sortAria": "Çanta ögelerini sırala",
       "sortRecent": "En son",
       "sortQuality": "Kalite",
@@ -7084,6 +7086,9 @@ export const tr_TR: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Fırtınaçağıranın Bel Koruyucusu"
       },
+      "reins_valorsteed": {
+        "name": "Valorsteed Dizginleri"
+      },
       "reins_grag_bear": {
         "name": "Golyat Grag-Ayısının Dizginleri"
       },
@@ -7487,6 +7492,11 @@ export const tr_TR: EnTranslations = {
         "name": "Ustabaşı Odell",
         "title": "Maden Ustabaşısı",
         "greeting": "Bütün kazı şu toprağa bulanmış haşaratla kaynıyor!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Ahır Ustası",
+        "greeting": "Her binici buraya iki ayağıyla gelir. Altın peşin, eyer ise ona oturabildiğinde."
       },
       "warden_fenwick": {
         "name": "Muhafız Fenwick",

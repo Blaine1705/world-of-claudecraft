@@ -798,6 +798,13 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     out.castTot = round2(e.castTotal);
     if (e.channeling) out.chan = 1;
   }
+  // Mount summon/dismount transition, so every client can time the summon FX / call
+  // pose and the self-extrapolator can root the local player in lockstep. Volatile
+  // (rides the per-tick dynamic fields, not identity): mcr omitted when idle (0), mck
+  // omitted while dismounting or idle (''). The sim reads mountCastRemaining (movement
+  // root), so it is actionable and always rides when non-zero.
+  if (e.mountCastRemaining) out.mcr = round2(e.mountCastRemaining);
+  if (e.mountCastKey) out.mck = e.mountCastKey;
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.tappedById !== null) out.tap = e.tappedById;

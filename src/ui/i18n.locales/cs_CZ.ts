@@ -2484,6 +2484,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Spotřební',
   'hudChrome.bags.filterGroupAria': 'Filtrovat batohy podle kategorie',
   'hudChrome.bags.filterMaterial': 'Materiály',
+  'hudChrome.bags.filterMount': 'Jezdecká zvířata',
   'hudChrome.bags.filterQuest': 'Úkolové',
   'hudChrome.bags.filterWeapon': 'Zbraně',
   'hudChrome.bags.noMatch': 'Tvým filtrům neodpovídají žádné předměty.',
@@ -4645,6 +4646,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Měj čepel po ruce, {className}. Údolí už není, co bývalo.',
   'entities.npcs.marshal_redbrook.name': 'Maršál Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Správkyně stájí',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Každý jezdec sem přijde po svých. Zlato předem, sedlo, až se v něm udržíš.',
   'entities.npcs.marshal_redbrook.title': 'Městský maršál',
   'entities.npcs.provisioner_hale.greeting':
     'Suché boty, suchý chléb, suchý prach: ve Fenbridge máš v dobrý den dvě ze tří.',
@@ -6494,6 +6499,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový.',
   'entities.items.chunk_of_ore.name': 'Kus rudy',
   'entities.items.reins_grag_bear.name': 'Otěže Goliáše Grag-medvěda',
+  'entities.items.reins_valorsteed.name': 'Otěže Valorsteeda',
   'entities.items.reins_stalkglider_snail.name': 'Otěže mechokrunýřového plachtíka',
   'entities.items.reins_aether_hover_cycle.name': 'Startovací klíč: Éterové vznášecí kolo',
   'entities.items.reins_shadowjump_toad.name': 'Otěže Kama-Kageho, ropuchy stínového skoku',

@@ -25,10 +25,19 @@ import {
   normalizeSelectedMount,
 } from '../src/sim/content/mounts';
 import { ITEMS, MOBS } from '../src/sim/data';
-import { mountItemId, mountOwned, ownedMounts, selectMount, toggleMount } from '../src/sim/mounts';
+import {
+  MOUNT_DISMOUNT_SECONDS,
+  MOUNT_SUMMON_SECONDS,
+  mountItemId,
+  mountOwned,
+  ownedMounts,
+  selectMount,
+  toggleMount,
+  updateMountTransition,
+} from '../src/sim/mounts';
 import { moveSpeedMult } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
-import type { MountItemDef, SimEvent } from '../src/sim/types';
+import { DT, type MountItemDef, type SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -47,6 +56,24 @@ function errorTexts(events: SimEvent[]): string[] {
     .map((e) => e.text);
 }
 
+// Drive the mount summon/dismount channel to completion by hand. The tick-loop
+// integration (updateMountTransition wired into sim.tick) is covered in
+// tests/mount_transition.test.ts; here we call the transition directly with
+// swimming=false so these unit tests do not depend on that wiring landing.
+function finishTransition(sim: Sim, pid: number, swimming = false): void {
+  const e = sim.entities.get(pid)!;
+  const steps = Math.ceil(MOUNT_SUMMON_SECONDS / DT) + 2;
+  for (let i = 0; i < steps && (e.mountCastRemaining ?? 0) > 0; i++) {
+    updateMountTransition(sim.ctx, e, swimming);
+  }
+}
+
+// Toggle to mount and drive the summon channel to completion.
+function ride(sim: Sim, pid: number): void {
+  toggleMount(sim.ctx, pid);
+  finishTransition(sim, pid);
+}
+
 describe('mount catalog (the six ground mounts from the cards)', () => {
   it('has exactly the six mounts with the horse first (the base mount)', () => {
     expect(MOUNT_KEYS).toHaveLength(6);
@@ -54,17 +81,17 @@ describe('mount catalog (the six ground mounts from the cards)', () => {
     expect(DEFAULT_MOUNT).toBe('valorsteed');
   });
 
-  it('pins each card: level gate, rarity, and specialty numbers', () => {
+  it('pins each card: level gate, rarity, and specialty numbers (60% base, tiered above)', () => {
     const spec = (k: string) => {
       const d = MOUNTS[k as keyof typeof MOUNTS];
       return [d.level, d.rarity, d.moveSpeedPct, d.meleeBlockPct, d.critPct];
     };
-    expect(spec('valorsteed')).toEqual([10, 'common', 0.4, 0, 0]);
-    expect(spec('grag_bear')).toEqual([10, 'common', 0.4, 0, 0]);
-    expect(spec('stalkglider_snail')).toEqual([10, 'common', 0.4, 0, 0]);
-    expect(spec('aether_hover_cycle')).toEqual([15, 'rare', 0.5, 0.05, 0]);
-    expect(spec('shadowjump_toad')).toEqual([15, 'rare', 0.5, 0.05, 0]);
-    expect(spec('stormfeather_griffin')).toEqual([20, 'epic', 0.65, 0.05, 0.05]);
+    expect(spec('valorsteed')).toEqual([20, 'common', 0.6, 0, 0]);
+    expect(spec('grag_bear')).toEqual([10, 'common', 0.7, 0.05, 0]);
+    expect(spec('stalkglider_snail')).toEqual([10, 'common', 0.7, 0.05, 0]);
+    expect(spec('aether_hover_cycle')).toEqual([15, 'rare', 0.75, 0.05, 0.03]);
+    expect(spec('shadowjump_toad')).toEqual([15, 'rare', 0.75, 0.05, 0.03]);
+    expect(spec('stormfeather_griffin')).toEqual([20, 'epic', 0.8, 0.08, 0.05]);
   });
 
   it('normalizeMountKey coerces unknown or absent keys to "" (unmounted)', () => {
@@ -82,37 +109,46 @@ describe('mount catalog (the six ground mounts from the cards)', () => {
     expect(normalizeSelectedMount(null)).toBe('valorsteed');
     expect(normalizeSelectedMount('')).toBe('valorsteed');
   });
+
+  it('pins the summon and dismount channel durations', () => {
+    expect(MOUNT_SUMMON_SECONDS).toBe(1.5);
+    expect(MOUNT_DISMOUNT_SECONDS).toBe(0.8);
+  });
 });
 
 describe('mount reins items (the collection: owning the item is owning the mount)', () => {
   const reinsFor = (key: string) =>
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
-  it('every mount except the horse has exactly one soulbound reins item', () => {
+  it('every mount has exactly one soulbound reins item (the horse now included)', () => {
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
-      if (key === DEFAULT_MOUNT) {
-        expect(items).toHaveLength(0); // the horse is never an item
-        expect(mountItemId(key)).toBeNull();
-      } else {
-        expect(items).toHaveLength(1);
-        const item = items[0];
-        expect(mountItemId(key)).toBe(item.id);
-        expect(item.soulbound).toBe(true); // never traded, mailed, listed, or destroyed
-        expect(item.sellValue).toBe(0);
-        // The item's name color matches the card's rarity tier.
-        expect(item.quality).toBe(MOUNTS[key].rarity);
-      }
+      expect(items).toHaveLength(1);
+      const item = items[0];
+      expect(mountItemId(key)).toBe(item.id);
+      expect(item.soulbound).toBe(true); // never traded, mailed, listed, or destroyed
+      expect(item.sellValue).toBe(0);
+      // The item's name color matches the card's rarity tier.
+      expect(item.quality).toBe(MOUNTS[key].rarity);
     }
   });
 
-  it('pins each reins item to its boss drop (an independent draw, no roll group)', () => {
+  it('only the horse reins is purchasable, for 100 gold; the rest are loot-only', () => {
+    const horse = reinsFor('valorsteed')[0];
+    expect(horse.id).toBe('reins_valorsteed');
+    expect(horse.buyValue).toBe(1_000_000); // 100 gold in copper
+    for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed')) {
+      expect(reinsFor(key)[0].buyValue).toBeUndefined();
+    }
+  });
+
+  it('pins each reins item to its boss drop (a sub-1% independent draw, no roll group)', () => {
     const drops: Array<[string, string, number]> = [
-      ['morthen', 'reins_grag_bear', 0.15],
-      ['vael_the_mistcaller', 'reins_stalkglider_snail', 0.15],
-      ['ysolei', 'reins_aether_hover_cycle', 0.1],
-      ['korzul_the_gravewyrm', 'reins_shadowjump_toad', 0.1],
-      ['nythraxis_scourge_of_thornpeak', 'reins_stormfeather_griffin', 0.05],
+      ['morthen', 'reins_grag_bear', 0.009],
+      ['vael_the_mistcaller', 'reins_stalkglider_snail', 0.009],
+      ['ysolei', 'reins_aether_hover_cycle', 0.005],
+      ['korzul_the_gravewyrm', 'reins_shadowjump_toad', 0.005],
+      ['nythraxis_scourge_of_thornpeak', 'reins_stormfeather_griffin', 0.002],
     ];
     for (const [mobId, itemId, chance] of drops) {
       const entry = MOBS[mobId].loot.find((l) => l.itemId === itemId);
@@ -123,17 +159,20 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it('ownership: the horse always; others only while the reins item is held', () => {
+  it('ownership: a fresh player owns nothing; a mount only while its reins is held', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
     const meta = sim.players.get(pid)!;
-    expect(mountOwned(meta, 'valorsteed')).toBe(true);
+    expect(ownedMounts(meta)).toEqual([]);
+    expect(mountOwned(meta, 'valorsteed')).toBe(false);
     expect(mountOwned(meta, 'grag_bear')).toBe(false);
     expect(mountOwned(meta, 'flying_carpet')).toBe(false);
+
+    sim.addItem('reins_valorsteed', 1, pid);
+    expect(mountOwned(meta, 'valorsteed')).toBe(true);
     expect(ownedMounts(meta)).toEqual(['valorsteed']);
 
     sim.addItem('reins_grag_bear', 1, pid);
-    expect(mountOwned(meta, 'grag_bear')).toBe(true);
     expect(ownedMounts(meta)).toEqual(['valorsteed', 'grag_bear']); // catalog order
 
     // A reins item parked in the bank still counts (bags OR bank).
@@ -142,18 +181,79 @@ describe('mount reins items (the collection: owning the item is owning the mount
     expect(ownedMounts(meta)).toContain('stormfeather_griffin');
   });
 
-  it('exposes the collection on the IWorld facade (ownedMounts)', () => {
+  it('exposes the collection on the IWorld facade (ownedMounts), empty for a fresh player', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
-    expect(sim.ownedMounts()).toEqual(['valorsteed']);
+    expect(sim.ownedMounts()).toEqual([]);
     sim.addItem('reins_shadowjump_toad', 1, pid);
-    expect(sim.ownedMounts()).toEqual(['valorsteed', 'shadowjump_toad']);
-    expect(sim.ownedMountsFor(pid)).toEqual(['valorsteed', 'shadowjump_toad']);
+    expect(sim.ownedMounts()).toEqual(['shadowjump_toad']);
+    expect(sim.ownedMountsFor(pid)).toEqual(['shadowjump_toad']);
+  });
+});
+
+describe('mount purchase (the stablemaster)', () => {
+  const stablemaster = (sim: Sim) =>
+    [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
+    )!;
+
+  // Stand the player on the stablemaster so the vendor range check passes.
+  function standAtStable(sim: Sim, pid: number): number {
+    const npc = stablemaster(sim);
+    const e = sim.entities.get(pid)!;
+    e.pos.x = npc.pos.x;
+    e.pos.z = npc.pos.z;
+    return npc.id;
+  }
+
+  it('spawns the stablemaster in town, stocking only the horse reins', () => {
+    const sim = makeWorld();
+    join(sim, 20);
+    const npc = stablemaster(sim);
+    expect(npc).toBeDefined();
+    expect(npc.vendorItems).toEqual(['reins_valorsteed']);
+  });
+
+  it('sells the horse reins for 100 gold, debiting copper and landing the item', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const meta = sim.players.get(pid)!;
+    meta.copper = 2_000_000;
+    const npcId = standAtStable(sim, pid);
+    sim.buyItem(npcId, 'reins_valorsteed', pid);
+    expect(meta.copper).toBe(1_000_000); // 2,000,000 - 100 gold
+    expect(sim.countItem('reins_valorsteed', pid)).toBe(1);
+    expect(mountOwned(meta, 'valorsteed')).toBe(true);
+  });
+
+  it('refuses the purchase below level 20 (no charge, no item)', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 10);
+    const meta = sim.players.get(pid)!;
+    meta.copper = 2_000_000;
+    const npcId = standAtStable(sim, pid);
+    sim.buyItem(npcId, 'reins_valorsteed', pid);
+    expect(errorTexts(sim.tick())).toContain('You must be level 20 to buy a mount.');
+    expect(meta.copper).toBe(2_000_000);
+    expect(sim.countItem('reins_valorsteed', pid)).toBe(0);
+  });
+
+  it('refuses a second purchase of an already-owned mount', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const meta = sim.players.get(pid)!;
+    meta.copper = 3_000_000;
+    const npcId = standAtStable(sim, pid);
+    sim.buyItem(npcId, 'reins_valorsteed', pid);
+    expect(mountOwned(meta, 'valorsteed')).toBe(true);
+    sim.buyItem(npcId, 'reins_valorsteed', pid);
+    expect(errorTexts(sim.tick())).toContain('You already own that mount.');
+    expect(sim.countItem('reins_valorsteed', pid)).toBe(1); // still just the one
   });
 });
 
 describe('mount selection', () => {
-  it('defaults to the horse: every player starts with it, nothing to pick first', () => {
+  it('defaults to the horse: the pick every unknown/legacy value falls back to', () => {
     const sim = makeWorld();
     const pid = join(sim, 1);
     expect(sim.selectedMount()).toBe('valorsteed');
@@ -181,9 +281,10 @@ describe('mount selection', () => {
   it('level-gates the pick and emits the mountLevel error', () => {
     const sim = makeWorld();
     const pid = join(sim, 1);
+    sim.addItem('reins_valorsteed', 1, pid);
     expect(selectMount(sim.ctx, pid, 'valorsteed')).toBe(false);
-    expect(errorTexts(sim.tick())).toContain('You must be level 10 to ride that mount.');
-    sim.setPlayerLevel(10, pid);
+    expect(errorTexts(sim.tick())).toContain('You must be level 20 to ride that mount.');
+    sim.setPlayerLevel(20, pid);
     expect(selectMount(sim.ctx, pid, 'valorsteed')).toBe(true);
     expect(sim.selectedMount()).toBe('valorsteed');
   });
@@ -192,9 +293,10 @@ describe('mount selection', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
     const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
     sim.addItem('reins_stormfeather_griffin', 1, pid);
     selectMount(sim.ctx, pid, 'valorsteed');
-    toggleMount(sim.ctx, pid);
+    ride(sim, pid);
     expect(e.mountKey).toBe('valorsteed');
     selectMount(sim.ctx, pid, 'stormfeather_griffin');
     expect(e.mountKey).toBe('stormfeather_griffin');
@@ -206,9 +308,10 @@ describe('mount selection', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
     const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
     sim.addItem('reins_stormfeather_griffin', 1, pid);
     selectMount(sim.ctx, pid, 'valorsteed');
-    toggleMount(sim.ctx, pid);
+    ride(sim, pid);
     e.inCombat = true;
     expect(selectMount(sim.ctx, pid, 'stormfeather_griffin')).toBe(true);
     expect(e.mountKey).toBe('valorsteed');
@@ -249,59 +352,80 @@ describe('mount selection', () => {
 });
 
 describe('mount and dismount rules', () => {
-  it('mounts the default horse out of combat and dismounts on a second toggle', () => {
+  it('mounts the pick out of combat and dismounts on a second toggle', () => {
     const sim = makeWorld();
-    const pid = join(sim, 10);
+    const pid = join(sim, 20);
     const e = sim.entities.get(pid)!;
-    expect(toggleMount(sim.ctx, pid)).toBe(true); // no pick needed: the horse is the default
+    sim.addItem('reins_valorsteed', 1, pid);
+    expect(toggleMount(sim.ctx, pid)).toBe(true); // starts the summon channel
+    expect(e.mountKey).toBe(''); // not mounted until the channel completes
+    finishTransition(sim, pid);
     expect(e.mountKey).toBe('valorsteed');
-    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    expect(toggleMount(sim.ctx, pid)).toBe(true); // starts the dismount channel
+    finishTransition(sim, pid);
+    expect(e.mountKey).toBe('');
+  });
+
+  it('refuses to ride when nothing is owned, with the no-mount error', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    expect(ownedMounts(sim.players.get(pid)!)).toEqual([]);
+    expect(toggleMount(sim.ctx, pid)).toBe(false);
+    expect(errorTexts(sim.tick())).toContain("You don't have a mount yet.");
     expect(e.mountKey).toBe('');
   });
 
   it('level-gates the toggle below the horse gate (the Z error toast)', () => {
     const sim = makeWorld();
     const pid = join(sim, 1);
+    sim.addItem('reins_valorsteed', 1, pid);
     expect(toggleMount(sim.ctx, pid)).toBe(false);
-    expect(errorTexts(sim.tick())).toContain('You must be level 10 to ride that mount.');
+    expect(errorTexts(sim.tick())).toContain('You must be level 20 to ride that mount.');
     expect(sim.entities.get(pid)?.mountKey).toBe('');
   });
 
-  it('falls back to the horse when the picked mount is no longer owned', () => {
+  it('falls back to the first owned mount when the pick is no longer owned', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
     const meta = sim.players.get(pid)!;
     const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
     sim.addItem('reins_stormfeather_griffin', 1, pid);
     selectMount(sim.ctx, pid, 'stormfeather_griffin');
     // The reins item vanishes (content change / admin removal): the toggle must
-    // not dead-end. It re-picks the horse and rides that.
+    // not dead-end. It re-picks the first owned mount (the horse) and rides it.
     meta.inventory = meta.inventory.filter((s) => s.itemId !== 'reins_stormfeather_griffin');
     expect(toggleMount(sim.ctx, pid)).toBe(true);
+    finishTransition(sim, pid);
     expect(e.mountKey).toBe('valorsteed');
     expect(meta.selectedMount).toBe('valorsteed');
   });
 
   it('refuses to mount in combat but always allows dismounting', () => {
     const sim = makeWorld();
-    const pid = join(sim, 10);
+    const pid = join(sim, 20);
     const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
     selectMount(sim.ctx, pid, 'valorsteed');
     e.inCombat = true;
     expect(toggleMount(sim.ctx, pid)).toBe(false);
     expect(errorTexts(sim.tick())).toContain("You can't do that while in combat.");
     expect(e.mountKey).toBe('');
     e.inCombat = false;
-    toggleMount(sim.ctx, pid);
+    ride(sim, pid);
+    expect(e.mountKey).toBe('valorsteed');
     e.inCombat = true;
     expect(toggleMount(sim.ctx, pid)).toBe(true); // dismount is never gated
+    finishTransition(sim, pid);
     expect(e.mountKey).toBe('');
   });
 
   it('refuses to mount while dead or a released spirit', () => {
     const sim = makeWorld();
-    const pid = join(sim, 10);
+    const pid = join(sim, 20);
     const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
     selectMount(sim.ctx, pid, 'valorsteed');
     e.dead = true;
     expect(toggleMount(sim.ctx, pid)).toBe(false);
@@ -313,15 +437,99 @@ describe('mount and dismount rules', () => {
 
   it('force-dismounts on death and keeps the pick for remounting', () => {
     const sim = makeWorld();
-    const pid = join(sim, 10);
+    const pid = join(sim, 20);
     const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
     selectMount(sim.ctx, pid, 'valorsteed');
-    toggleMount(sim.ctx, pid);
+    ride(sim, pid);
     expect(e.mountKey).toBe('valorsteed');
     sim.ctx.dealDamage(null, e, e.hp + 100, false, 'physical', null, 'hit');
     expect(e.dead).toBe(true);
     expect(e.mountKey).toBe('');
     expect(sim.players.get(pid)?.selectedMount).toBe('valorsteed');
+  });
+});
+
+describe('mount summon/dismount channel (updateMountTransition)', () => {
+  it('mounts only after the summon channel completes, not on the toggle', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    toggleMount(sim.ctx, pid);
+    expect(e.mountCastRemaining).toBeCloseTo(MOUNT_SUMMON_SECONDS, 10);
+    expect(e.mountKey).toBe('');
+    const steps = Math.round(MOUNT_SUMMON_SECONDS / DT);
+    for (let i = 0; i < steps - 1; i++) updateMountTransition(sim.ctx, e, false);
+    expect(e.mountKey).toBe(''); // still channeling one tick short
+    finishTransition(sim, pid);
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.mountCastRemaining).toBe(0);
+  });
+
+  it('ignores a toggle while a channel is in progress', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    toggleMount(sim.ctx, pid);
+    expect(toggleMount(sim.ctx, pid)).toBe(false); // ignored mid-channel
+    finishTransition(sim, pid);
+    expect(e.mountKey).toBe('valorsteed');
+  });
+
+  it('cancels an in-flight summon when combat starts (no mount, no error)', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    toggleMount(sim.ctx, pid);
+    e.inCombat = true;
+    updateMountTransition(sim.ctx, e, false);
+    expect(e.mountKey).toBe('');
+    expect(e.mountCastRemaining).toBe(0);
+    expect(e.mountCastKey).toBe('');
+    expect(errorTexts(sim.tick())).not.toContain("You can't do that while in combat.");
+  });
+
+  it('force-dismounts instantly in water', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    ride(sim, pid);
+    expect(e.mountKey).toBe('valorsteed');
+    updateMountTransition(sim.ctx, e, true); // swimming
+    expect(e.mountKey).toBe('');
+  });
+
+  it('cancels an in-flight summon in water', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    toggleMount(sim.ctx, pid);
+    updateMountTransition(sim.ctx, e, true);
+    expect(e.mountKey).toBe('');
+    expect(e.mountCastRemaining).toBe(0);
+  });
+
+  it('leaves the player unmounted if the reins vanish mid-summon', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const meta = sim.players.get(pid)!;
+    const e = sim.entities.get(pid)!;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    toggleMount(sim.ctx, pid);
+    meta.inventory = meta.inventory.filter((s) => s.itemId !== 'reins_valorsteed');
+    finishTransition(sim, pid);
+    expect(e.mountKey).toBe('');
   });
 });
 
@@ -331,12 +539,13 @@ describe('mount specialty stats', () => {
     const pid = join(sim, 20);
     const e = sim.entities.get(pid)!;
     expect(moveSpeedMult(e)).toBe(1);
+    sim.addItem('reins_valorsteed', 1, pid);
     sim.addItem('reins_stormfeather_griffin', 1, pid);
     selectMount(sim.ctx, pid, 'valorsteed');
-    toggleMount(sim.ctx, pid);
-    expect(moveSpeedMult(e)).toBeCloseTo(1.4, 10);
+    ride(sim, pid);
+    expect(moveSpeedMult(e)).toBeCloseTo(1.6, 10);
     selectMount(sim.ctx, pid, 'stormfeather_griffin');
-    expect(moveSpeedMult(e)).toBeCloseTo(1.65, 10);
+    expect(moveSpeedMult(e)).toBeCloseTo(1.8, 10);
     e.auras.push({
       id: 'slow_test',
       name: 'slow',
@@ -347,7 +556,7 @@ describe('mount specialty stats', () => {
       sourceId: 0,
       school: 'physical',
     });
-    expect(moveSpeedMult(e)).toBeCloseTo(0.825, 10);
+    expect(moveSpeedMult(e)).toBeCloseTo(0.9, 10);
   });
 
   it('grants the epic crit bonus while mounted and removes it on dismount', () => {
@@ -357,16 +566,18 @@ describe('mount specialty stats', () => {
     const base = e.critChance;
     sim.addItem('reins_stormfeather_griffin', 1, pid);
     selectMount(sim.ctx, pid, 'stormfeather_griffin');
-    toggleMount(sim.ctx, pid);
+    ride(sim, pid);
     expect(e.critChance).toBeCloseTo(base + 0.05, 10);
     toggleMount(sim.ctx, pid);
+    finishTransition(sim, pid);
     expect(e.critChance).toBeCloseTo(base, 10);
   });
 
-  it('commons carry no crit or block; rare and epic block 5% of melee', () => {
+  it('the horse blocks no melee; commons and specials block 5%, the epic 8%', () => {
     expect(mountMeleeBlockPct('valorsteed')).toBe(0);
+    expect(mountMeleeBlockPct('grag_bear')).toBe(0.05);
     expect(mountMeleeBlockPct('aether_hover_cycle')).toBe(0.05);
-    expect(mountMeleeBlockPct('stormfeather_griffin')).toBe(0.05);
+    expect(mountMeleeBlockPct('stormfeather_griffin')).toBe(0.08);
     expect(mountMeleeBlockPct('')).toBe(0);
   });
 
@@ -384,7 +595,7 @@ describe('mount specialty stats', () => {
       if (mounted) {
         sim.addItem('reins_shadowjump_toad', 1, target);
         selectMount(sim.ctx, target, 'shadowjump_toad');
-        toggleMount(sim.ctx, target);
+        ride(sim, target);
         expect(te.mountKey).toBe('shadowjump_toad');
       }
       const hpBefore = te.hp;
@@ -403,11 +614,12 @@ describe('mount wire mirror', () => {
   it('rides the entity identity fields like skin', async () => {
     const { wireEntity } = await import('../server/game');
     const sim = makeWorld();
-    const pid = join(sim, 10);
+    const pid = join(sim, 20);
     const e = sim.entities.get(pid)!;
     expect(wireEntity(e)).not.toHaveProperty('mnt');
+    sim.addItem('reins_valorsteed', 1, pid);
     selectMount(sim.ctx, pid, 'valorsteed');
-    toggleMount(sim.ctx, pid);
+    ride(sim, pid);
     expect(wireEntity(e).mnt).toBe('valorsteed');
   });
 });

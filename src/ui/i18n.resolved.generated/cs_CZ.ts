@@ -428,6 +428,7 @@ export const cs_CZ: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
+      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const cs_CZ: EnTranslations = {
       "filterConsumable": "Spotřební",
       "filterMaterial": "Materiály",
       "filterQuest": "Úkolové",
+      "filterMount": "Jezdecká zvířata",
       "sortAria": "Řadit předměty v batozích",
       "sortRecent": "Nedávné",
       "sortQuality": "Kvalita",
@@ -7084,6 +7086,9 @@ export const cs_CZ: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Pás volajícího bouři"
       },
+      "reins_valorsteed": {
+        "name": "Otěže Valorsteeda"
+      },
       "reins_grag_bear": {
         "name": "Otěže Goliáše Grag-medvěda"
       },
@@ -7487,6 +7492,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Předák Odell",
         "title": "Důlní předák",
         "greeting": "Celý výkop se hemží tou špínou obalenou havětí!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Správkyně stájí",
+        "greeting": "Každý jezdec sem přijde po svých. Zlato předem, sedlo, až se v něm udržíš."
       },
       "warden_fenwick": {
         "name": "Strážce Fenwick",

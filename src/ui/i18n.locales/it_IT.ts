@@ -3554,6 +3554,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Benvenuto al Mercato Mondiale, {className}. Compra dagli avventurieri del reame o vendi le tue merci.',
   'entities.npcs.marshal_redbrook.name': 'Maresciallo Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Stalliera capo',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Ogni cavaliere arriva sulle proprie gambe. Prima l’oro, la sella quando saprai restarci in groppa.',
   'entities.npcs.marshal_redbrook.title': 'Maresciallo cittadino',
   'entities.npcs.marshal_redbrook.greeting':
     'Tieni la lama vicina, {className}. La Valle non è più quella di una volta.',
@@ -4637,6 +4641,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Armatura',
   'hudChrome.bags.filterConsumable': 'Consumabili',
   'hudChrome.bags.filterMaterial': 'Materiali',
+  'hudChrome.bags.filterMount': 'Cavalcature',
   'hudChrome.bags.filterQuest': 'Missione',
   'hudChrome.bags.sortAria': 'Ordina gli oggetti della borsa',
   'hudChrome.bags.sortRecent': 'Recenti',
@@ -6697,6 +6702,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_shard.name': 'Frammento Arcano',
   'entities.items.chunk_of_ore.name': 'Pezzo di Minerale',
   'entities.items.reins_grag_bear.name': 'Redini dell’Orso Grag Golia',
+  'entities.items.reins_valorsteed.name': 'Redini del Destriero del Valore',
   'entities.items.reins_stalkglider_snail.name': 'Redini dell’Aliante dal Guscio Muschioso',
   'entities.items.reins_aether_hover_cycle.name':
     'Chiave di accensione: Aerociclo del Giostratore d’Etere',
@@ -6772,6 +6778,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.',
   'hudChrome.mounts.notCollected': 'Non ottenuta',
+  'hudChrome.mounts.stableHint': 'Venduta dallo stalliere nella Valle di Eastbrook.',
   'hudChrome.mounts.dropHint': 'Bottino dei boss di spedizione e incursione.',
   'hudChrome.mounts.clickManage': 'Clicca per scegliere la tua cavalcatura',
 };

@@ -3563,6 +3563,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Bienvenido al Mercado Mundial, {className}. Compra a aventureros de cada rincón del reino o vende tus propias mercancías.',
   'entities.npcs.marshal_redbrook.name': 'Mariscal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Caballeriza mayor',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Cada jinete llega a pie. El oro por delante; la silla, cuando puedas montarla.',
   'entities.npcs.marshal_redbrook.title': 'Mariscal de la ciudad',
   'entities.npcs.marshal_redbrook.greeting':
     'Ten la hoja cerca, {className}. El Valle ya no es lo que era.',
@@ -4638,6 +4642,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Armadura',
   'hudChrome.bags.filterConsumable': 'Consumibles',
   'hudChrome.bags.filterMaterial': 'Materiales',
+  'hudChrome.bags.filterMount': 'Monturas',
   'hudChrome.bags.filterQuest': 'Misión',
   'hudChrome.bags.sortAria': 'Ordenar objetos de la bolsa',
   'hudChrome.bags.sortRecent': 'Recientes',
@@ -6712,6 +6717,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_shard.name': 'Fragmento arcano',
   'entities.items.chunk_of_ore.name': 'Trozo de mineral',
   'entities.items.reins_grag_bear.name': 'Riendas del Oso Grag Goliat',
+  'entities.items.reins_valorsteed.name': 'Riendas del Corcel del Valor',
   'entities.items.reins_stalkglider_snail.name': 'Riendas del Deslizador de Caparazón Musgoso',
   'entities.items.reins_aether_hover_cycle.name':
     'Llave de encendido: Aerocicleta Justadora del Éter',
@@ -6787,6 +6793,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.',
   'hudChrome.mounts.notCollected': 'Sin coleccionar',
+  'hudChrome.mounts.stableHint': 'La vende el establero en el Valle de Eastbrook.',
   'hudChrome.mounts.dropHint': 'Lo sueltan los jefes de mazmorras y bandas.',
   'hudChrome.mounts.clickManage': 'Haz clic para elegir tu montura',
 };

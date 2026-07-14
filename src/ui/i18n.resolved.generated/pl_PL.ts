@@ -428,6 +428,7 @@ export const pl_PL: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
+      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const pl_PL: EnTranslations = {
       "filterConsumable": "Konsumpcyjne",
       "filterMaterial": "Surowce",
       "filterQuest": "Zadania",
+      "filterMount": "Wierzchowce",
       "sortAria": "Sortuj przedmioty w torbie",
       "sortRecent": "Ostatnie",
       "sortQuality": "Jakość",
@@ -7084,6 +7086,9 @@ export const pl_PL: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Ochraniacz pasa przywoływacza burz"
       },
+      "reins_valorsteed": {
+        "name": "Wodze Valorsteeda"
+      },
       "reins_grag_bear": {
         "name": "Wodze Goliata Grag-niedźwiedzia"
       },
@@ -7487,6 +7492,11 @@ export const pl_PL: EnTranslations = {
         "name": "Sztygar Odell",
         "title": "Sztygar Kopalni",
         "greeting": "Cały wykop roi się od tego oblepionego błotem robactwa!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Zarządczyni stajni",
+        "greeting": "Każdy jeździec przychodzi na dwóch nogach. Złoto z góry, siodło, gdy zdołasz w nim usiedzieć."
       },
       "warden_fenwick": {
         "name": "Strażnik Fenwick",

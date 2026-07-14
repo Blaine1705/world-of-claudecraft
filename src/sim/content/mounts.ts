@@ -28,7 +28,7 @@ export interface MountDef {
   rarity: MountRarity;
   /** Required player level to select or ride (the card's "Mount Level"). */
   level: number;
-  /** Additive move-speed fraction while mounted (0.4 = +40% extra mobility). */
+  /** Additive move-speed fraction while mounted (0.6 = +60% extra mobility). */
   moveSpeedPct: number;
   /** Fraction of incoming melee swing damage blocked while mounted (0.05 = 5%). */
   meleeBlockPct: number;
@@ -36,14 +36,20 @@ export interface MountDef {
   critPct: number;
 }
 
+// Speed/stat tiers (design directive): the purchasable horse is the 60% base;
+// the loot-only specials tier above it (70% commons, 75% rares with a little
+// crit, the 80% epic griffin with the most block and crit). The horse's level
+// gate (20) matches the stablemaster's buy gate; the loot commons ride earlier
+// (10), the rares at 15, the epic at 20.
 export const MOUNTS: Record<MountKey, MountDef> = {
-  // The base mount: first in the catalog, the natural default pick.
+  // The base mount: first in the catalog, the natural default pick, sold by the
+  // stablemaster (the only purchasable mount). Level 20 to match the buy gate.
   valorsteed: {
     key: 'valorsteed',
     name: 'Valorsteed',
     rarity: 'common',
-    level: 10,
-    moveSpeedPct: 0.4,
+    level: 20,
+    moveSpeedPct: 0.6,
     meleeBlockPct: 0,
     critPct: 0,
   },
@@ -52,8 +58,8 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     name: 'Goliath Grag-Bear',
     rarity: 'common',
     level: 10,
-    moveSpeedPct: 0.4,
-    meleeBlockPct: 0,
+    moveSpeedPct: 0.7,
+    meleeBlockPct: 0.05,
     critPct: 0,
   },
   stalkglider_snail: {
@@ -61,8 +67,8 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     name: 'Moss-Shell Stalk-Glider',
     rarity: 'common',
     level: 10,
-    moveSpeedPct: 0.4,
-    meleeBlockPct: 0,
+    moveSpeedPct: 0.7,
+    meleeBlockPct: 0.05,
     critPct: 0,
   },
   aether_hover_cycle: {
@@ -70,26 +76,26 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     name: 'Aether-Jouster Hover-Cycle',
     rarity: 'rare',
     level: 15,
-    moveSpeedPct: 0.5,
+    moveSpeedPct: 0.75,
     meleeBlockPct: 0.05,
-    critPct: 0,
+    critPct: 0.03,
   },
   shadowjump_toad: {
     key: 'shadowjump_toad',
     name: 'Kama-Kage the Shadow-Jump Toad',
     rarity: 'rare',
     level: 15,
-    moveSpeedPct: 0.5,
+    moveSpeedPct: 0.75,
     meleeBlockPct: 0.05,
-    critPct: 0,
+    critPct: 0.03,
   },
   stormfeather_griffin: {
     key: 'stormfeather_griffin',
     name: 'Sky-Reach Stormfeather',
     rarity: 'epic',
     level: 20,
-    moveSpeedPct: 0.65,
-    meleeBlockPct: 0.05,
+    moveSpeedPct: 0.8,
+    meleeBlockPct: 0.08,
     critPct: 0.05,
   },
 };
@@ -97,8 +103,11 @@ export const MOUNTS: Record<MountKey, MountDef> = {
 /** Catalog order for the mount picker: level tier, then declaration order. */
 export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
 
-/** The horse: every player starts with it and always owns it (no item). It is
- *  also the pick every unknown/legacy persisted value falls back to. */
+/** The horse: the default stable pick and the fallback for every unknown/legacy
+ *  persisted value. It is no longer free (a fresh player owns nothing): owning
+ *  it means holding its reins item (reins_valorsteed), sold by the stablemaster.
+ *  A persisted pick may name a mount the player does not own, which is harmless:
+ *  toggleMount falls back to the first owned mount. */
 export const DEFAULT_MOUNT: MountKey = 'valorsteed';
 
 export function mountDef(key: string): MountDef | null {

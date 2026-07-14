@@ -64,8 +64,27 @@ describe('buildMountPickerView', () => {
   it('exposes the display percents as integers (the card spec line)', () => {
     const view = buildMountPickerView(20, 'valorsteed', '', ['stormfeather_griffin']);
     const griffin = row(view, 'stormfeather_griffin');
-    expect([griffin.speedPct, griffin.blockPct, griffin.critPct]).toEqual([65, 5, 5]);
+    expect([griffin.speedPct, griffin.blockPct, griffin.critPct]).toEqual([80, 8, 5]);
     const horse = row(view, 'valorsteed');
-    expect([horse.speedPct, horse.blockPct, horse.critPct]).toEqual([40, 0, 0]);
+    expect([horse.speedPct, horse.blockPct, horse.critPct]).toEqual([60, 0, 0]);
+  });
+
+  it('marks only the horse purchasable (bought from the stablemaster); the rest are loot', () => {
+    const view = buildMountPickerView(20, 'valorsteed', '', []);
+    expect(row(view, 'valorsteed').purchasable).toBe(true);
+    for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed')) {
+      expect(row(view, key).purchasable).toBe(false);
+    }
+  });
+
+  it('keeps a locked owned pick selected (the painter drops the Selected chip)', () => {
+    // Own and select the epic below its level gate: the pure view still reports
+    // it as the pick, but selected + locked together let the painter's stateChip
+    // suppress the Selected chip so the card never co-renders a contradiction.
+    const view = buildMountPickerView(12, 'stormfeather_griffin', '', ['stormfeather_griffin']);
+    const griffin = row(view, 'stormfeather_griffin');
+    expect(griffin.selected).toBe(true);
+    expect(griffin.owned).toBe(true);
+    expect(griffin.locked).toBe(true);
   });
 });

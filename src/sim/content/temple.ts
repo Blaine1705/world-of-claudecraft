@@ -272,8 +272,8 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'moonshroud_breastplate', chance: 0.34, rollGroup: 'ysolei_blue' },
       { itemId: 'moonshroud_robe', chance: 0.33, rollGroup: 'ysolei_blue' },
       { itemId: 'moonshroud_tunic', chance: 0.33, rollGroup: 'ysolei_blue' },
-      // Collectible mount: an independent draw, never inside a roll group.
-      { itemId: 'reins_aether_hover_cycle', chance: 0.1 },
+      // Collectible mount: a rare (sub-1%) independent draw, never in a roll group.
+      { itemId: 'reins_aether_hover_cycle', chance: 0.005 },
     ],
     scale: 1.65,
     color: 0xbcd2ec,

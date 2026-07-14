@@ -2515,6 +2515,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     '歡迎來到世界市場，{className}。向王國各地的冒險者購買，或出售你自己的貨物。',
   'entities.npcs.marshal_redbrook.name': '雷德布魯克元帥',
+  'entities.npcs.stablemaster_marla.name': '瑪拉·希琴',
+  'entities.npcs.stablemaster_marla.title': '馬廄總管',
+  'entities.npcs.stablemaster_marla.greeting':
+    '每個騎手都是兩條腿走進來的。先付金子，等你坐得穩了再上鞍。',
   'entities.npcs.marshal_redbrook.title': '城鎮元帥',
   'entities.npcs.marshal_redbrook.greeting': '刀別離手，{className}。山谷已經不是從前的山谷了。',
   'entities.npcs.trader_wilkes.name': '威爾克斯商人',
@@ -3693,6 +3697,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': '護甲',
   'hudChrome.bags.filterConsumable': '消耗品',
   'hudChrome.bags.filterMaterial': '材料',
+  'hudChrome.bags.filterMount': '坐騎',
   'hudChrome.bags.filterQuest': '任務',
   'hudChrome.bags.sortAria': '排序背包物品',
   'hudChrome.bags.sortRecent': '最近',
@@ -5648,6 +5653,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.sister_nhalia_choir_plate.name': '娜哈莉亞修女的唱詩鍛甲',
   'entities.items.drowned_choir_fang.name': '溺水唱詩獠牙',
   'entities.items.reins_grag_bear.name': '歌利亞格拉格巨熊的韁繩',
+  'entities.items.reins_valorsteed.name': '英勇戰馬的韁繩',
   'entities.items.reins_stalkglider_snail.name': '苔殼滑行蝸牛的韁繩',
   'entities.items.reins_aether_hover_cycle.name': '點火鑰匙：乙太騎士懸浮機車',
   'entities.items.reins_shadowjump_toad.name': '影躍蟾蜍卡瑪影的韁繩',
@@ -6217,6 +6223,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     '一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。',
   'hudChrome.mounts.notCollected': '未收集',
+  'hudChrome.mounts.stableHint': '由東溪谷的馬廄管理員出售。',
   'hudChrome.mounts.dropHint': '由地城和團隊副本首領掉落。',
   'hudChrome.mounts.clickManage': '點擊選擇坐騎',
 };

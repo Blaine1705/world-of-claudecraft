@@ -428,6 +428,7 @@ export const en_XA: EnTranslations = {
       "keybindHint": "[Þŕéšš ţĥé Ɱóúñţ / Ðíšɱóúñţ ķéý (ðéƒáúļţ Ž) ţó ŕíðé.]",
       "notCollected": "[Ñóţ çóļļéçţéð]",
       "dropHint": "[Ðŕóþš ƒŕóɱ ðúñĝéóñ áñð ŕáíð ƀóššéš.]",
+      "stableHint": "[Šóļð ƀý ţĥé šţáƀļéɱášţéŕ íñ Éášţƀŕóóķ Ʋáļé.]",
       "clickManage": "[Çļíçķ ţó çĥóóšé ýóúŕ ɱóúñţ]",
       "rarity_common": "[Çóɱɱóñ]",
       "rarity_rare": "[Ŕáŕé]",
@@ -1011,6 +1012,7 @@ export const en_XA: EnTranslations = {
       "filterConsumable": "[Çóñšúɱáƀļéš]",
       "filterMaterial": "[Ɱáţéŕíáļš]",
       "filterQuest": "[Ɋúéšţ]",
+      "filterMount": "[Ɱóúñţš]",
       "sortAria": "[Šóŕţ ƀáĝ íţéɱš]",
       "sortRecent": "[Ŕéçéñţ]",
       "sortQuality": "[Ɋúáļíţý]",
@@ -7084,6 +7086,9 @@ export const en_XA: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "[Ĝáļéçáļļ Ŵáíšţĝúáŕð]"
       },
+      "reins_valorsteed": {
+        "name": "[Ŕéíñš óƒ ţĥé Ʋáļóŕšţééð]"
+      },
       "reins_grag_bear": {
         "name": "[Ŕéíñš óƒ ţĥé Ĝóļíáţĥ Ĝŕáĝ-Ɓéáŕ]"
       },
@@ -7487,6 +7492,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ƒóŕéɱáñ Óðéļļ]",
         "title": "[Ɱíñé Ƒóŕéɱáñ]",
         "greeting": "[Ŵĥóļé ðíĝ'š çŕáŵļíñĝ ŵíţĥ ţĥóšé ðíŕţ-çáķéð ʋéŕɱíñ!]"
+      },
+      "stablemaster_marla": {
+        "name": "[Ɱáŕļá Ĥíţçĥéñ]",
+        "title": "[Šţáƀļéɱášţéŕ]",
+        "greeting": "[Éʋéŕý ŕíðéŕ ŵáļķš íñ óñ ţŵó ļéĝš. Ĝóļð úþ ƒŕóñţ, šáððļé ŵĥéñ ýóú çáñ šíţ íţ.]"
       },
       "warden_fenwick": {
         "name": "[Ŵáŕðéñ Ƒéñŵíçķ]",

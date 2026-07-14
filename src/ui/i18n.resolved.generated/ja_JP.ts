@@ -428,6 +428,7 @@ export const ja_JP: EnTranslations = {
       "keybindHint": "騎乗 / 降車キー(初期設定Z)で騎乗します。",
       "notCollected": "未入手",
       "dropHint": "ダンジョンやレイドのボスがドロップします。",
+      "stableHint": "イーストブルック渓谷の厩舎番から購入できます。",
       "clickManage": "クリックしてマウントを選択",
       "rarity_common": "コモン",
       "rarity_rare": "レア",
@@ -1011,6 +1012,7 @@ export const ja_JP: EnTranslations = {
       "filterConsumable": "消耗品",
       "filterMaterial": "素材",
       "filterQuest": "クエスト",
+      "filterMount": "マウント",
       "sortAria": "バッグのアイテムを並べ替える",
       "sortRecent": "最近",
       "sortQuality": "品質",
@@ -7084,6 +7086,9 @@ export const ja_JP: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "嵐呼びの腰当て"
       },
+      "reins_valorsteed": {
+        "name": "ヴァロースティードの手綱"
+      },
       "reins_grag_bear": {
         "name": "ゴリアテ・グラグベアの手綱"
       },
@@ -7487,6 +7492,11 @@ export const ja_JP: EnTranslations = {
         "name": "監督官オデル",
         "title": "鉱山監督",
         "greeting": "坑道全体が泥まみれの害虫どもでうごめいています！"
+      },
+      "stablemaster_marla": {
+        "name": "マーラ・ヒッチェン",
+        "title": "厩舎長",
+        "greeting": "騎手はみな二本足で歩いてくる。金は先払い、鞍にまたがれるようになったら乗せてやろう。"
       },
       "warden_fenwick": {
         "name": "番人フェンウィック",

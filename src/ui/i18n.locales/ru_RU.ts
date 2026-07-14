@@ -2649,6 +2649,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Добро пожаловать на Мировой рынок, {className}. Покупайте у искателей приключений всего королевства или выставляйте свои товары.',
   'entities.npcs.marshal_redbrook.name': 'Маршал Редбрук',
+  'entities.npcs.stablemaster_marla.name': 'Марла Хитчен',
+  'entities.npcs.stablemaster_marla.title': 'Старшая конюшая',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Каждый всадник приходит на своих двоих. Золото вперёд, седло — когда сможешь в нём усидеть.',
   'entities.npcs.marshal_redbrook.title': 'Городской маршал',
   'entities.npcs.marshal_redbrook.greeting':
     'Держите клинок рядом, {className}. Долина уже не та, что прежде.',
@@ -3901,6 +3905,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Броня',
   'hudChrome.bags.filterConsumable': 'Расходники',
   'hudChrome.bags.filterMaterial': 'Материалы',
+  'hudChrome.bags.filterMount': 'Транспорт',
   'hudChrome.bags.filterQuest': 'Задания',
   'hudChrome.bags.sortAria': 'Сортировать предметы в сумках',
   'hudChrome.bags.sortRecent': 'Недавние',
@@ -6076,6 +6081,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.sister_nhalia_choir_plate.name': 'Хоровая Кованая Броня Сестры Нхалии',
   'entities.items.drowned_choir_fang.name': 'Клык Утопшего Хора',
   'entities.items.reins_grag_bear.name': 'Поводья Голиафа Граг-медведя',
+  'entities.items.reins_valorsteed.name': 'Поводья Доблестного скакуна',
   'entities.items.reins_stalkglider_snail.name': 'Поводья мохопанцирного скользня',
   'entities.items.reins_aether_hover_cycle.name':
     'Ключ зажигания: эфирный ховерцикл турнирного бойца',
@@ -6694,6 +6700,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
   'hudChrome.mounts.notCollected': 'Не получено',
+  'hudChrome.mounts.stableHint': 'Продаётся конюхом в Истврукской долине.',
   'hudChrome.mounts.dropHint': 'Добывается с боссов подземелий и рейдов.',
   'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
 };

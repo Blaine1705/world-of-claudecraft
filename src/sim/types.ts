@@ -571,11 +571,11 @@ export interface OtherItemDef extends BaseItemDef {
   armorType?: never;
 }
 
-// A collectible mount item (boss drop). Owning the item IS owning the mount:
-// while it sits in the player's bags or bank, the catalog mount it names is
-// selectable and ridable (src/sim/mounts.ts mountOwned). Always soulbound, so
-// ownership can never transfer; the horse (DEFAULT_MOUNT) is the one mount
-// every player owns without an item.
+// A collectible mount item. Owning the item IS owning the mount: while it sits
+// in the player's bags or bank, the catalog mount it names is selectable and
+// ridable (src/sim/mounts.ts mountOwned). Always soulbound, so ownership can
+// never transfer. Every catalog mount has one, the horse included: five are
+// sub-1% boss drops, the horse's reins comes from the stablemaster.
 export interface MountItemDef extends BaseItemDef {
   kind: 'mount';
   mount: MountKey;
@@ -1965,6 +1965,18 @@ export interface Entity {
   // online self-extrapolator predicts mounted speed in lockstep. The persisted
   // selection lives on PlayerMeta.selectedMount (src/sim/content/mounts.ts).
   mountKey: string;
+  // Mount summon/dismount transition (players only; 0 = idle). Seconds left in the
+  // call-the-mount summon or the dismount, driven per tick by updateMountTransition
+  // (src/sim/mounts.ts). The sim READS it: player_motion.stepPlayerMotion roots the
+  // player (no walk/strafe/jump) while it is > 0, so it must sync on the wire like
+  // mountKey (terse `mcr`) for the online self-extrapolator to root in lockstep and
+  // for other clients to time the summon FX. handleDeath clears it.
+  mountCastRemaining: number;
+  // The catalog key being summoned during a mount transition ('' while dismounting or
+  // idle). Render-only (the summon-FX / call-pose the client draws); the sim never
+  // reads it. Syncs on the wire (terse `mck`) alongside mountCastRemaining, and
+  // handleDeath clears it.
+  mountCastKey: string;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.

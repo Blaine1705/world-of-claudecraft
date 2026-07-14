@@ -2,37 +2,47 @@
 // sibling sim system behind the SimContext seam (module-first; sim.ts keeps
 // thin delegates).
 //
-// Collection model: every player always owns the horse (DEFAULT_MOUNT, never
-// an item); every other catalog mount is owned while its soulbound reins item
-// (ItemDef kind 'mount', boss drops) sits in the player's bags or bank.
-// PlayerMeta.selectedMount is the persisted stable pick (always a valid key,
-// horse by default); the live "riding X right now" state is Entity.mountKey
+// Collection model: EVERY catalog mount is owned while its soulbound reins item
+// (ItemDef kind 'mount') sits in the player's bags or bank. The horse
+// (DEFAULT_MOUNT) is no longer free: it has its own reins item too, sold by the
+// stablemaster, so a fresh player owns nothing until they buy or loot a mount.
+// PlayerMeta.selectedMount is the persisted stable pick (horse by default, and
+// may name an unowned mount, which is harmless: the toggle falls back to the
+// first owned mount). The live "riding X right now" state is Entity.mountKey
 // ('' dismounted), which the wire mirrors like `skin` so every host (renderer,
 // other clients, the online self extrapolator) reads the same field the
 // speed/crit/block hooks use.
 //
-// Rules: selecting requires owning the mount and meeting its level gate;
-// mounting re-validates ownership (falling back to the horse when the pick's
-// item is gone) and is blocked while in combat, dead, or a released spirit;
-// dismounting is always allowed; death force-dismounts (combat/damage.ts
-// handleDeath). Every mount is a ground mount, no flying: nothing here touches
-// the vertical axis.
+// Summoning is not instant: mounting channels a short summon and dismounting a
+// quicker put-away (updateMountTransition, driven per tick and interruptible by
+// combat or water). Rules: selecting requires owning the mount and meeting its
+// level gate; starting a mount re-validates ownership, and is blocked while in
+// combat, dead, or a released spirit; dismounting is always allowed; death and
+// water force-dismount instantly. Every mount is a ground mount, no flying:
+// nothing here touches the vertical axis.
 //
 // `src/sim`-pure and rng-free.
 
-import { DEFAULT_MOUNT, MOUNT_KEYS, type MountKey, mountDef } from './content/mounts';
+import { MOUNT_KEYS, type MountKey, mountDef, normalizeSelectedMount } from './content/mounts';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import type { Entity } from './types';
+import { DT, type Entity } from './types';
+
+// Summon/dismount channel durations (seconds). Mounting is a short cast the
+// player can interrupt by moving into combat or water; dismounting is quicker.
+export const MOUNT_SUMMON_SECONDS = 1.5;
+export const MOUNT_DISMOUNT_SECONDS = 0.8;
 
 // The reins itemId per catalog mount, derived once from the merged ITEMS table
 // (single source: the item record declares `mount`, nothing re-lists the map).
 // Static content, so the lazy module-level cache is multi-Sim safe.
 let mountItemIds: Map<string, string> | null = null;
 
-/** The collectible item that owns `key` (null for the horse, which has none). */
+/** The collectible item that owns `key` (null for an unknown key, or a catalog
+ *  mount with no reins item). Every catalog mount now has one, the horse
+ *  included (reins_valorsteed). */
 export function mountItemId(key: string): string | null {
   if (!mountItemIds) {
     mountItemIds = new Map();
@@ -43,11 +53,10 @@ export function mountItemId(key: string): string | null {
   return mountItemIds.get(key) ?? null;
 }
 
-/** Whether the player owns the mount: the horse always; any other catalog
- *  mount while its reins item sits in bags or bank (soulbound, so ownership
- *  never transfers). Unknown keys are never owned. */
+/** Whether the player owns the mount: any catalog mount (the horse included)
+ *  while its reins item sits in bags or bank (soulbound, so ownership never
+ *  transfers). Unknown keys are never owned. A fresh player owns nothing. */
 export function mountOwned(meta: PlayerMeta, key: string): boolean {
-  if (key === DEFAULT_MOUNT) return true;
   if (!mountDef(key)) return false;
   const itemId = mountItemId(key);
   if (!itemId) return false;
@@ -57,11 +66,11 @@ export function mountOwned(meta: PlayerMeta, key: string): boolean {
   );
 }
 
-/** The owned subset of the catalog, in catalog order (the horse always).
+/** The owned subset of the catalog, in catalog order. Empty for a fresh player.
  *  Single pass over bags + bank: the server rebuilds this per snapshot, so it
  *  never scans the containers once per catalog mount. */
 export function ownedMounts(meta: PlayerMeta): MountKey[] {
-  const owned = new Set<string>([DEFAULT_MOUNT]);
+  const owned = new Set<string>();
   const collect = (slots: readonly { itemId: string }[]): void => {
     for (const s of slots) {
       const def = ITEMS[s.itemId];
@@ -109,21 +118,39 @@ export function selectMount(ctx: SimContext, pid: number, key: string): boolean 
   return true;
 }
 
-/** Mount the selected mount, or dismount when riding. Returns true when the
- *  mounted state changed. Ownership is re-validated here: a pick whose reins
- *  item is gone silently falls back to the horse (the pick every player owns),
- *  so the toggle never dead-ends on a stale selection. */
+/** Toggle riding: start a summon channel when dismounted, or a dismount channel
+ *  when riding. Returns true when a transition was started (or completed for
+ *  dismount), false on a failed gate or an ignored mid-transition toggle. The
+ *  live mount state does NOT flip here: updateMountTransition applies it when
+ *  the channel finishes. Ownership is resolved here: the stable pick when owned,
+ *  else the first owned mount in catalog order; with nothing owned there is
+ *  nothing to ride. */
 export function toggleMount(ctx: SimContext, pid: number): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
+  // A toggle while a summon/dismount is already channeling is ignored.
+  if ((e.mountCastRemaining ?? 0) > 0) return false;
   if (e.mountKey) {
-    e.mountKey = '';
-    recalcFor(ctx, e, meta);
+    // Start the dismount channel (never gated: dismounting is always allowed).
+    e.mountCastRemaining = MOUNT_DISMOUNT_SECONDS;
+    e.mountCastKey = '';
     return true;
   }
-  if (!mountOwned(meta, meta.selectedMount)) meta.selectedMount = DEFAULT_MOUNT;
-  const def = mountDef(meta.selectedMount);
+  // Resolve which mount to summon: the stable pick if owned, else fall back to
+  // the first owned mount in catalog order (and adopt it as the new pick).
+  let key: MountKey | '' = '';
+  if (mountOwned(meta, meta.selectedMount)) {
+    key = normalizeSelectedMount(meta.selectedMount);
+  } else {
+    key = ownedMounts(meta)[0] ?? '';
+    if (key) meta.selectedMount = key;
+  }
+  if (!key) {
+    ctx.error(pid, "You don't have a mount yet.");
+    return false;
+  }
+  const def = mountDef(key);
   if (!def) return false;
   if (e.dead || e.ghost) return false;
   if (e.level < def.level) {
@@ -134,7 +161,49 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     ctx.error(pid, "You can't do that while in combat.");
     return false;
   }
-  e.mountKey = def.key;
-  recalcFor(ctx, e, meta);
+  // Start the summon channel. mountKey stays '' until the channel completes.
+  e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
+  e.mountCastKey = def.key;
   return true;
+}
+
+/** Per-tick driver for the mount summon/dismount channel (called from the
+ *  coordinator's per-player loop). `swimming` is whether the entity is in
+ *  fishable/deep water this tick. Water and death force an instant dismount;
+ *  a summon channel cancels on entering combat or water; a finished channel
+ *  applies the mount (re-validating ownership) or the dismount. */
+export function updateMountTransition(ctx: SimContext, e: Entity, swimming: boolean): void {
+  const meta = ctx.players.get(e.id);
+  // (a) Water force-dismounts instantly: no ground mount swims. Also clears any
+  // in-flight channel so a re-mount starts clean once back on land.
+  if (swimming && e.mountKey) {
+    e.mountKey = '';
+    e.mountCastRemaining = 0;
+    e.mountCastKey = '';
+    if (meta) recalcFor(ctx, e, meta);
+    return;
+  }
+  // (b) Advance an in-flight summon/dismount channel.
+  if ((e.mountCastRemaining ?? 0) > 0) {
+    // A summon (mountCastKey names a mount) cancels on entering combat or water,
+    // with no error toast. A dismount (mountCastKey === '') always proceeds.
+    if (e.mountCastKey !== '' && (e.inCombat || swimming)) {
+      e.mountCastRemaining = 0;
+      e.mountCastKey = '';
+      return;
+    }
+    e.mountCastRemaining -= DT;
+    if (e.mountCastRemaining <= 0) {
+      const target = e.mountCastKey;
+      if (target === '') {
+        e.mountKey = '';
+      } else if (mountDef(target) && meta && mountOwned(meta, target)) {
+        e.mountKey = target;
+      }
+      // A summon whose reins vanished mid-channel leaves the player unmounted.
+      e.mountCastRemaining = 0;
+      e.mountCastKey = '';
+      if (meta) recalcFor(ctx, e, meta);
+    }
+  }
 }

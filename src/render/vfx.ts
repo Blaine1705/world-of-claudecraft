@@ -587,6 +587,34 @@ export class Vfx {
     }
   }
 
+  /** A quick yellow-orange shimmer ringing a rider as a mount is summoned (and on
+   *  a dismount/live swap): tighter and shorter-lived than levelUpPillar so it
+   *  reads as a conjure sparkle, not a level-up. Fired on the mountKey-change edge. */
+  mountSummonGlow(targetId: number): void {
+    const at = this.anchor(targetId, 0);
+    if (!at) return;
+    const cream = new THREE.Color(0xffe0a0).multiplyScalar(hdr(1.8));
+    const amber = new THREE.Color(0xffb347).multiplyScalar(hdr(1.8));
+    const ember = new THREE.Color(0xff9a3c).multiplyScalar(hdr(1.8));
+    for (let i = 0; i < this.scaledCount(34); i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.25 + Math.random() * 0.6;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 0.25,
+        at.z + Math.cos(a) * r,
+        0,
+        3.0 + Math.random() * 2.2,
+        0,
+        i % 3 === 0 ? ember : i % 3 === 1 ? amber : cream,
+        0.36,
+        0.75 + Math.random() * 0.3,
+        -1,
+        i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+  }
+
   // Vale Cup celebration: one team-colored firework shell (per-particle colors,
   // the levelUpPillar/burst pattern). The renderer staggers several calls per
   // goal to read as a volley; colors alternate through the scoring nation's

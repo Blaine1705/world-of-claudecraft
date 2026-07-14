@@ -63,6 +63,7 @@ await page.evaluate(() => {
   const sim = window.__game.sim;
   sim.setPlayerLevel(20, sim.playerId);
   for (const id of [
+    'reins_valorsteed',
     'reins_grag_bear',
     'reins_stalkglider_snail',
     'reins_aether_hover_cycle',

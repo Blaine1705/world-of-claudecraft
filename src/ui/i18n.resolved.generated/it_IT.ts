@@ -428,6 +428,7 @@ export const it_IT: EnTranslations = {
       "keybindHint": "Premi il tasto Monta / Smonta (Z predefinito) per cavalcare.",
       "notCollected": "Non ottenuta",
       "dropHint": "Bottino dei boss di spedizione e incursione.",
+      "stableHint": "Venduta dallo stalliere nella Valle di Eastbrook.",
       "clickManage": "Clicca per scegliere la tua cavalcatura",
       "rarity_common": "Comune",
       "rarity_rare": "Rara",
@@ -1011,6 +1012,7 @@ export const it_IT: EnTranslations = {
       "filterConsumable": "Consumabili",
       "filterMaterial": "Materiali",
       "filterQuest": "Missione",
+      "filterMount": "Cavalcature",
       "sortAria": "Ordina gli oggetti della borsa",
       "sortRecent": "Recenti",
       "sortQuality": "Qualità",
@@ -7084,6 +7086,9 @@ export const it_IT: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Guardacintura del Chiamatempeste"
       },
+      "reins_valorsteed": {
+        "name": "Redini del Destriero del Valore"
+      },
       "reins_grag_bear": {
         "name": "Redini dell’Orso Grag Golia"
       },
@@ -7487,6 +7492,11 @@ export const it_IT: EnTranslations = {
         "name": "Caposquadra Odell",
         "title": "Caposquadra della miniera",
         "greeting": "Tutta la galleria brulica di quei parassiti incrostati di fango!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stalliera capo",
+        "greeting": "Ogni cavaliere arriva sulle proprie gambe. Prima l’oro, la sella quando saprai restarci in groppa."
       },
       "warden_fenwick": {
         "name": "Custode Fenwick",

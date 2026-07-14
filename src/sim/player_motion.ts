@@ -146,7 +146,11 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Standing on unwalkably steep ground: no control, no jump, slide downhill.
   const steepGround =
     p.onGround && !swimming && terrainSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
-  const moving = hasMoveInput && !isRooted(p) && !steepGround;
+  // A mount summon/dismount transition holds the player in place: walk, strafe, and
+  // both jumps are blocked while mountCastRemaining > 0 (keyboard turning stays, above).
+  // The field syncs on the wire, so the online self-extrapolator roots in lockstep.
+  const mountLocked = p.mountCastRemaining > 0;
+  const moving = hasMoveInput && !isRooted(p) && !steepGround && !mountLocked;
   let wishX = 0,
     wishZ = 0,
     wishSpeed = 0;
@@ -220,6 +224,25 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         }
       }
     }
+    // While mounted the deep-water line is a wall: a ground mount will not step
+    // off dry land into swimming depth. Wading stays allowed (the gate keys on
+    // swim depth, not water presence), and a player who is ALREADY swimming is
+    // force-dismounted by updateMountTransition, so this only bites the entry
+    // from land. Reset the candidate to the current pose (and kill horizontal
+    // velocity when airborne, matching the steep-wall airborne gate) so the body
+    // stops at the shore instead of clipping into the water.
+    if (
+      p.mountKey &&
+      !swimming &&
+      groundHeight(nx, nz, deps.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH
+    ) {
+      nx = p.pos.x;
+      nz = p.pos.z;
+      if (!p.onGround) {
+        p.vx = 0;
+        p.vz = 0;
+      }
+    }
     // Slide along buildings, trees, crypt walls; but while airborne from a
     // jump, pass through fences for the whole arc. Keying off the jump itself
     // (not a height threshold) makes this independent of slope: an uphill
@@ -246,7 +269,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     p.onGround = true;
     p.jumping = false;
     p.fallStartY = p.pos.y;
-    if (inp.jump && !isRooted(p)) {
+    if (inp.jump && !isRooted(p) && !mountLocked) {
       // small hop to climb onto shores and docks
       p.vy = JUMP_VELOCITY * 0.7 * jumpMult(p);
       p.vx = wishX * wishSpeed;
@@ -256,7 +279,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     }
     return;
   }
-  if (inp.jump && p.onGround && !isRooted(p) && !steepGround) {
+  if (inp.jump && p.onGround && !isRooted(p) && !steepGround && !mountLocked) {
     p.vy = JUMP_VELOCITY * jumpMult(p);
     p.vx = wishX * wishSpeed;
     p.vz = wishZ * wishSpeed;

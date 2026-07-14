@@ -2401,6 +2401,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.ysols_pearl_greaves.name': 'Giáp Ống Quyển Ngọc Trai của Ysolei',
   'entities.items.zealotsbane_blade.name': 'Kiếm Diệt Cuồng Tín',
   'entities.items.reins_grag_bear.name': 'Dây cương Gấu Grag Goliath',
+  'entities.items.reins_valorsteed.name': 'Dây cương Valorsteed',
   'entities.items.reins_stalkglider_snail.name': 'Dây cương Ốc Lướt Vỏ Rêu',
   'entities.items.reins_aether_hover_cycle.name': 'Chìa khóa khởi động: Xe Bay Kỵ Sĩ Aether',
   'entities.items.reins_shadowjump_toad.name': 'Dây cương Kama-Kage, Cóc Nhảy Bóng',
@@ -2554,6 +2555,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Giữ chặt lưỡi kiếm, {className}. Thung Lũng không còn như xưa nữa.',
   'entities.npcs.marshal_redbrook.name': 'Cảnh Trưởng Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Quản Mã',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Kỵ sĩ nào cũng bước vào bằng hai chân. Vàng trả trước, yên ngựa khi nào ngồi vững thì trao.',
   'entities.npcs.marshal_redbrook.title': 'Cảnh Trưởng Thị Trấn',
   'entities.npcs.provisioner_hale.greeting':
     'Giày khô, bánh khô, thuốc súng khô, ở Fenbridge ngày đẹp trời lắm thì được hai trong ba.',
@@ -5005,6 +5010,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Vật phẩm tiêu hao',
   'hudChrome.bags.filterGroupAria': 'Lọc túi đồ theo danh mục',
   'hudChrome.bags.filterMaterial': 'Nguyên liệu',
+  'hudChrome.bags.filterMount': 'Vật cưỡi',
   'hudChrome.bags.filterQuest': 'Nhiệm vụ',
   'hudChrome.bags.filterWeapon': 'Vũ khí',
   'hudChrome.bags.noMatch': 'Không có vật phẩm nào khớp với bộ lọc của bạn.',

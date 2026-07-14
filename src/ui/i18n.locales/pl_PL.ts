@@ -2482,6 +2482,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Trzymaj broń przy boku, {className}. Dolina nie jest już tym, czym była.',
   'entities.npcs.marshal_redbrook.name': 'Marszałek Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Zarządczyni stajni',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Każdy jeździec przychodzi na dwóch nogach. Złoto z góry, siodło, gdy zdołasz w nim usiedzieć.',
   'entities.npcs.marshal_redbrook.title': 'Marszałek Miasta',
   'entities.npcs.provisioner_hale.greeting':
     'Suche buty, suchy chleb, suchy proch - w Fenbridge w dobry dzień dostaniesz dwa z trzech.',
@@ -4927,6 +4931,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Konsumpcyjne',
   'hudChrome.bags.filterGroupAria': 'Filtruj torby według kategorii',
   'hudChrome.bags.filterMaterial': 'Surowce',
+  'hudChrome.bags.filterMount': 'Wierzchowce',
   'hudChrome.bags.filterQuest': 'Zadania',
   'hudChrome.bags.filterWeapon': 'Bronie',
   'hudChrome.bags.noMatch': 'Żaden przedmiot nie pasuje do filtrów.',
@@ -6604,6 +6609,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ten link do resetowania jest nieprawidłowy lub wygasł. Poproś o nowy.',
   'entities.items.chunk_of_ore.name': 'Kawałek rudy',
   'entities.items.reins_grag_bear.name': 'Wodze Goliata Grag-niedźwiedzia',
+  'entities.items.reins_valorsteed.name': 'Wodze Valorsteeda',
   'entities.items.reins_stalkglider_snail.name': 'Wodze mchoskorupego szybownika',
   'entities.items.reins_aether_hover_cycle.name': 'Kluczyk zapłonu: eterowy ścigacz kopijnika',
   'entities.items.reins_shadowjump_toad.name': 'Wodze Kama-Kage, ropuchy cienioskoku',

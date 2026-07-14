@@ -428,6 +428,7 @@ export const vi_VN: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
+      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const vi_VN: EnTranslations = {
       "filterConsumable": "Vật phẩm tiêu hao",
       "filterMaterial": "Nguyên liệu",
       "filterQuest": "Nhiệm vụ",
+      "filterMount": "Vật cưỡi",
       "sortAria": "Sắp xếp vật phẩm trong túi",
       "sortRecent": "Gần đây",
       "sortQuality": "Phẩm chất",
@@ -7084,6 +7086,9 @@ export const vi_VN: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Hộ Yêu của Triệu Bão Sư"
       },
+      "reins_valorsteed": {
+        "name": "Dây cương Valorsteed"
+      },
       "reins_grag_bear": {
         "name": "Dây cương Gấu Grag Goliath"
       },
@@ -7487,6 +7492,11 @@ export const vi_VN: EnTranslations = {
         "name": "Quản Đốc Odell",
         "title": "Quản Đốc Hầm Mỏ",
         "greeting": "Cả khu khai quật bò lúc nhúc lũ sâu bọ bám đầy bùn đất đó!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Quản Mã",
+        "greeting": "Kỵ sĩ nào cũng bước vào bằng hai chân. Vàng trả trước, yên ngựa khi nào ngồi vững thì trao."
       },
       "warden_fenwick": {
         "name": "Vệ Quan Fenwick",

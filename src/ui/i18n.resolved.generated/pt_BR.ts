@@ -428,6 +428,7 @@ export const pt_BR: EnTranslations = {
       "keybindHint": "Pressione a tecla Montar / Desmontar (Z por padrão) para montar.",
       "notCollected": "Não coletada",
       "dropHint": "Obtida de chefes de masmorra e raide.",
+      "stableHint": "Vendida pelo estribeiro no Vale de Eastbrook.",
       "clickManage": "Clique para escolher sua montaria",
       "rarity_common": "Comum",
       "rarity_rare": "Rara",
@@ -1011,6 +1012,7 @@ export const pt_BR: EnTranslations = {
       "filterConsumable": "Consumíveis",
       "filterMaterial": "Materiais",
       "filterQuest": "Missão",
+      "filterMount": "Montarias",
       "sortAria": "Ordenar itens da bolsa",
       "sortRecent": "Recentes",
       "sortQuality": "Qualidade",
@@ -7084,6 +7086,9 @@ export const pt_BR: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Guarda-cintura do Chamatormentas"
       },
+      "reins_valorsteed": {
+        "name": "Rédeas do Corcel do Valor"
+      },
       "reins_grag_bear": {
         "name": "Rédeas do Urso Grag Golias"
       },
@@ -7487,6 +7492,11 @@ export const pt_BR: EnTranslations = {
         "name": "Capataz Odell",
         "title": "Capataz da mina",
         "greeting": "A galeria inteira está fervilhando desses vermes cobertos de terra!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Cavalariça-mor",
+        "greeting": "Cada cavaleiro chega a pé. Ouro adiantado; a sela, quando você puder montá-la."
       },
       "warden_fenwick": {
         "name": "Guardião Fenwick",

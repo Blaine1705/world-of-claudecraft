@@ -428,6 +428,7 @@ export const id_ID: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
+      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const id_ID: EnTranslations = {
       "filterConsumable": "Konsumsi",
       "filterMaterial": "Bahan",
       "filterQuest": "Misi",
+      "filterMount": "Tunggangan",
       "sortAria": "Urutkan barang tas",
       "sortRecent": "Terbaru",
       "sortQuality": "Kualitas",
@@ -7084,6 +7086,9 @@ export const id_ID: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Pelindung Pinggang Pemanggil Badai"
       },
+      "reins_valorsteed": {
+        "name": "Tali Kekang Valorsteed"
+      },
       "reins_grag_bear": {
         "name": "Tali Kekang Beruang Grag Goliat"
       },
@@ -7487,6 +7492,11 @@ export const id_ID: EnTranslations = {
         "name": "Mandor Odell",
         "title": "Mandor Tambang",
         "greeting": "Seluruh galian dipenuhi hama berlumur tanah itu!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Kepala Kandang",
+        "greeting": "Setiap penunggang datang dengan dua kaki. Emas di muka, pelana saat kau sanggup menungganginya."
       },
       "warden_fenwick": {
         "name": "Penjaga Fenwick",

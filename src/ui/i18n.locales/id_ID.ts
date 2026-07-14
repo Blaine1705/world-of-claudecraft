@@ -2429,6 +2429,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.ysols_pearl_greaves.name': 'Pelindung Betis Mutiara Ysolei',
   'entities.items.zealotsbane_blade.name': 'Bilah Petaka Zelot',
   'entities.items.reins_grag_bear.name': 'Tali Kekang Beruang Grag Goliat',
+  'entities.items.reins_valorsteed.name': 'Tali Kekang Valorsteed',
   'entities.items.reins_stalkglider_snail.name': 'Tali Kekang Siput Peluncur Cangkang Lumut',
   'entities.items.reins_aether_hover_cycle.name': 'Kunci Kontak: Sepeda Layang Penunggang Eter',
   'entities.items.reins_shadowjump_toad.name': 'Tali Kekang Kama-Kage si Kodok Lompat Bayangan',
@@ -2580,6 +2581,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Jaga pedangmu tetap dekat, {className}. Lembah ini sudah tak seperti dulu.',
   'entities.npcs.marshal_redbrook.name': 'Marsekal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Kepala Kandang',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Setiap penunggang datang dengan dua kaki. Emas di muka, pelana saat kau sanggup menungganginya.',
   'entities.npcs.marshal_redbrook.title': 'Marsekal Kota',
   'entities.npcs.provisioner_hale.greeting':
     'Sepatu kering, roti kering, bubuk mesiu kering - di Fenbridge kau dapat dua dari tiga di hari yang baik.',
@@ -5038,6 +5043,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Konsumsi',
   'hudChrome.bags.filterGroupAria': 'Saring tas menurut kategori',
   'hudChrome.bags.filterMaterial': 'Bahan',
+  'hudChrome.bags.filterMount': 'Tunggangan',
   'hudChrome.bags.filterQuest': 'Misi',
   'hudChrome.bags.filterWeapon': 'Senjata',
   'hudChrome.bags.noMatch': 'Tidak ada barang yang cocok dengan saringanmu.',

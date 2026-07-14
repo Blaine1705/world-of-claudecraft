@@ -3541,6 +3541,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Bem-vindo ao Mercado Mundial, {className}. Compre de aventureiros do reino ou venda suas próprias mercadorias.',
   'entities.npcs.marshal_redbrook.name': 'Marechal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Cavalariça-mor',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Cada cavaleiro chega a pé. Ouro adiantado; a sela, quando você puder montá-la.',
   'entities.npcs.marshal_redbrook.title': 'Marechal da cidade',
   'entities.npcs.marshal_redbrook.greeting':
     'Mantenha a lâmina por perto, {className}. O Vale já não é o mesmo.',
@@ -4623,6 +4627,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Armadura',
   'hudChrome.bags.filterConsumable': 'Consumíveis',
   'hudChrome.bags.filterMaterial': 'Materiais',
+  'hudChrome.bags.filterMount': 'Montarias',
   'hudChrome.bags.filterQuest': 'Missão',
   'hudChrome.bags.sortAria': 'Ordenar itens da bolsa',
   'hudChrome.bags.sortRecent': 'Recentes',
@@ -6670,6 +6675,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_shard.name': 'Fragmento Arcano',
   'entities.items.chunk_of_ore.name': 'Pedaço de Minério',
   'entities.items.reins_grag_bear.name': 'Rédeas do Urso Grag Golias',
+  'entities.items.reins_valorsteed.name': 'Rédeas do Corcel do Valor',
   'entities.items.reins_stalkglider_snail.name': 'Rédeas do Planador de Casco Musgoso',
   'entities.items.reins_aether_hover_cycle.name': 'Chave de ignição: Aerociclo do Justador do Éter',
   'entities.items.reins_shadowjump_toad.name': 'Rédeas de Kama-Kage, o Sapo Salta-Sombras',
@@ -6745,6 +6751,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.',
   'hudChrome.mounts.notCollected': 'Não coletada',
+  'hudChrome.mounts.stableHint': 'Vendida pelo estribeiro no Vale de Eastbrook.',
   'hudChrome.mounts.dropHint': 'Obtida de chefes de masmorra e raide.',
   'hudChrome.mounts.clickManage': 'Clique para escolher sua montaria',
 };

@@ -30,6 +30,9 @@ export interface MountPickerRow {
   active: boolean;
   /** Pickable right now (owned, unlocked, and not already the pick). */
   pickable: boolean;
+  /** Bought from the stablemaster (only the horse) rather than looted, so the
+   *  painter shows the stable hint instead of the boss-drop hint when unowned. */
+  purchasable: boolean;
   /** Display percents (integers: 40 / 50 / 65, 0 / 5). */
   speedPct: number;
   blockPct: number;
@@ -63,6 +66,7 @@ export function buildMountPickerView(
       selected: key === selected,
       active: key === activeKey,
       pickable: isOwned && !locked && key !== selected,
+      purchasable: key === DEFAULT_MOUNT,
       speedPct: Math.round(def.moveSpeedPct * 100),
       blockPct: Math.round(def.meleeBlockPct * 100),
       critPct: Math.round(def.critPct * 100),

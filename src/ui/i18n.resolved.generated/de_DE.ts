@@ -428,6 +428,7 @@ export const de_DE: EnTranslations = {
       "keybindHint": "Drückt die Aufsitzen-/Absitzen-Taste (Standard Z), um zu reiten.",
       "notCollected": "Nicht gesammelt",
       "dropHint": "Wird von Dungeon- und Schlachtzugsbossen fallen gelassen.",
+      "stableHint": "Wird vom Stallmeister im Eastbrook-Tal verkauft.",
       "clickManage": "Anklicken, um Euer Reittier zu wählen",
       "rarity_common": "Verbreitet",
       "rarity_rare": "Selten",
@@ -1011,6 +1012,7 @@ export const de_DE: EnTranslations = {
       "filterConsumable": "Verbrauchbares",
       "filterMaterial": "Materialien",
       "filterQuest": "Quest",
+      "filterMount": "Reittiere",
       "sortAria": "Taschengegenstände sortieren",
       "sortRecent": "Neueste",
       "sortQuality": "Qualität",
@@ -7084,6 +7086,9 @@ export const de_DE: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Gürtelschutz des Sturmrufers"
       },
+      "reins_valorsteed": {
+        "name": "Zügel des Valorross"
+      },
       "reins_grag_bear": {
         "name": "Zügel des Goliath-Gragbären"
       },
@@ -7487,6 +7492,11 @@ export const de_DE: EnTranslations = {
         "name": "Vorarbeiter Odell",
         "title": "Minenvorarbeiter",
         "greeting": "Der ganze Stollen wimmelt von diesem schlammverkrusteten Ungeziefer!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stallmeisterin",
+        "greeting": "Jeder Reiter kommt auf zwei Beinen herein. Gold im Voraus, den Sattel, wenn Ihr ihn halten könnt."
       },
       "warden_fenwick": {
         "name": "Wärter Fenwick",

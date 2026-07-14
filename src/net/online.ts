@@ -999,6 +999,8 @@ function blankEntity(id: number): Entity {
     skinCatalog: 'class',
     skin: 0,
     mountKey: '',
+    mountCastRemaining: 0,
+    mountCastKey: '',
     mainhandItemId: null,
     equippedItems: {},
     equippedInstances: {},
@@ -1740,6 +1742,11 @@ export class ClientWorld implements IWorld {
       e.castRemaining = w.castRem ?? 0;
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
+      // Mount summon/dismount transition (volatile): absent decodes to idle. Feeds
+      // the summon FX / call pose and (for the local player) the self-extrapolator's
+      // movement root, which reads mountCastRemaining.
+      e.mountCastRemaining = w.mcr ?? 0;
+      e.mountCastKey = w.mck ?? '';
       e.sitting = !!w.sit;
       e.aggroTargetId = w.aggro ?? null;
       e.tappedById = w.tap ?? null;
@@ -1930,13 +1937,15 @@ export class ClientWorld implements IWorld {
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       // IWorldMounts self-decode: mnt/mntOwn are delta-guarded (omitted keeps
-      // the prior mirror; an unknown or null pick falls back to the horse).
+      // the prior mirror; an unknown or null pick falls back to the horse). The
+      // owned collection is mirrored VERBATIM (no horse prepend): the horse is no
+      // longer auto-owned, so an empty owned list is legal and the server is the
+      // sole authority on what is collected.
       if (s.mnt !== undefined) this.selfSelectedMount = normalizeSelectedMount(s.mnt);
       if (Array.isArray(s.mntOwn)) {
-        const owned = (s.mntOwn as unknown[])
+        this.selfOwnedMounts = (s.mntOwn as unknown[])
           .map((k) => normalizeMountKey(typeof k === 'string' ? k : ''))
           .filter((k): k is MountKey => k !== '');
-        this.selfOwnedMounts = owned.includes(DEFAULT_MOUNT) ? owned : [DEFAULT_MOUNT, ...owned];
       }
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
@@ -2620,8 +2629,10 @@ export class ClientWorld implements IWorld {
   private selfLockouts: Record<string, number> = {};
   // The persisted mount pick, mirrored from the snapshot `s.mnt` (IWorldMounts).
   private selfSelectedMount: MountKey = DEFAULT_MOUNT;
-  // The owned collection, mirrored from `s.mntOwn` (the horse always owned).
-  private selfOwnedMounts: MountKey[] = [DEFAULT_MOUNT];
+  // The owned collection, mirrored from `s.mntOwn`. Starts empty: nothing is owned
+  // until the server says so (the horse is no longer auto-granted), so an empty list
+  // is the correct pre-snapshot state.
+  private selfOwnedMounts: MountKey[] = [];
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};

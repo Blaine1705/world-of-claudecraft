@@ -2623,6 +2623,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     '世界市場へようこそ、{className}。王国中の冒険者から買うことも、自分の品を売ることもできます。',
   'entities.npcs.marshal_redbrook.name': 'レッドブルック元帥',
+  'entities.npcs.stablemaster_marla.name': 'マーラ・ヒッチェン',
+  'entities.npcs.stablemaster_marla.title': '厩舎長',
+  'entities.npcs.stablemaster_marla.greeting':
+    '騎手はみな二本足で歩いてくる。金は先払い、鞍にまたがれるようになったら乗せてやろう。',
   'entities.npcs.marshal_redbrook.title': '町の元帥',
   'entities.npcs.marshal_redbrook.greeting':
     '刃を近くに置いておきなさい、{className}。谷はもう昔のままではありません。',
@@ -3857,6 +3861,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': '防具',
   'hudChrome.bags.filterConsumable': '消耗品',
   'hudChrome.bags.filterMaterial': '素材',
+  'hudChrome.bags.filterMount': 'マウント',
   'hudChrome.bags.filterQuest': 'クエスト',
   'hudChrome.bags.sortAria': 'バッグのアイテムを並べ替える',
   'hudChrome.bags.sortRecent': '最近',
@@ -5963,6 +5968,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.sister_nhalia_choir_plate.name': 'ナリア修道女の聖歌鍛造鎧',
   'entities.items.drowned_choir_fang.name': '溺れた聖歌の牙',
   'entities.items.reins_grag_bear.name': 'ゴリアテ・グラグベアの手綱',
+  'entities.items.reins_valorsteed.name': 'ヴァロースティードの手綱',
   'entities.items.reins_stalkglider_snail.name': 'モスシェル・ストークグライダーの手綱',
   'entities.items.reins_aether_hover_cycle.name': '起動キー：エーテルジャウスター・ホバーサイクル',
   'entities.items.reins_shadowjump_toad.name': '影跳びのカマカゲの手綱',
@@ -6561,6 +6567,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。',
   'hudChrome.mounts.notCollected': '未入手',
+  'hudChrome.mounts.stableHint': 'イーストブルック渓谷の厩舎番から購入できます。',
   'hudChrome.mounts.dropHint': 'ダンジョンやレイドのボスがドロップします。',
   'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
 };

@@ -2606,6 +2606,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     '세계 시장에 오신 것을 환영합니다, {className}. 왕국의 모험가들에게서 물건을 사거나 자신의 물건을 내놓으십시오.',
   'entities.npcs.marshal_redbrook.name': '레드브룩 원수',
+  'entities.npcs.stablemaster_marla.name': '마를라 히첸',
+  'entities.npcs.stablemaster_marla.title': '마구간지기',
+  'entities.npcs.stablemaster_marla.greeting':
+    '기수는 누구나 두 발로 걸어 들어오지. 금은 선불, 안장은 네가 앉을 수 있을 때 내주마.',
   'entities.npcs.marshal_redbrook.title': '마을 원수',
   'entities.npcs.marshal_redbrook.greeting':
     '검을 가까이 두십시오, {className}. 계곡은 더 이상 예전 같지 않습니다.',
@@ -3849,6 +3853,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': '방어구',
   'hudChrome.bags.filterConsumable': '소모품',
   'hudChrome.bags.filterMaterial': '재료',
+  'hudChrome.bags.filterMount': '탈것',
   'hudChrome.bags.filterQuest': '퀘스트',
   'hudChrome.bags.sortAria': '가방 아이템 정렬',
   'hudChrome.bags.sortRecent': '최근',
@@ -5948,6 +5953,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sister_nhalia_choir_plate.name': '나할리아 수녀의 성가 단조 판금',
   'entities.items.drowned_choir_fang.name': '익사한 성가대의 송곳니',
   'entities.items.reins_grag_bear.name': '골리앗 그라그곰의 고삐',
+  'entities.items.reins_valorsteed.name': '발러스티드의 고삐',
   'entities.items.reins_stalkglider_snail.name': '이끼껍질 활공달팽이의 고삐',
   'entities.items.reins_aether_hover_cycle.name': '시동 열쇠: 에테르 기사 호버사이클',
   'entities.items.reins_shadowjump_toad.name': '그림자 도약 두꺼비 카마카게의 고삐',
@@ -6546,6 +6552,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
   'hudChrome.mounts.notCollected': '미보유',
+  'hudChrome.mounts.stableHint': '이스트브룩 골짜기의 마구간지기가 판매합니다.',
   'hudChrome.mounts.dropHint': '던전 및 공격대 우두머리가 떨어뜨립니다.',
   'hudChrome.mounts.clickManage': '클릭하여 탈것 선택',
 };

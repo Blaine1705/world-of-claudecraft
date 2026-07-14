@@ -3591,6 +3591,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Bienvenue au Marché mondial, {className}. Achetez aux aventuriers du royaume ou proposez vos propres marchandises.',
   'entities.npcs.marshal_redbrook.name': 'Maréchal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Maîtresse d’écurie',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Tout cavalier arrive sur ses deux jambes. L’or d’abord, la selle quand tu sauras t’y tenir.',
   'entities.npcs.marshal_redbrook.title': 'Maréchal de la ville',
   'entities.npcs.marshal_redbrook.greeting':
     "Gardez votre lame près de vous, {className}. Le Val n'est plus ce qu'il était.",
@@ -4686,6 +4690,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Armure',
   'hudChrome.bags.filterConsumable': 'Consommables',
   'hudChrome.bags.filterMaterial': 'Matériaux',
+  'hudChrome.bags.filterMount': 'Montures',
   'hudChrome.bags.filterQuest': 'Quête',
   'hudChrome.bags.sortAria': 'Trier les objets du sac',
   'hudChrome.bags.sortRecent': 'Récents',
@@ -6762,6 +6767,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_shard.name': 'Éclat arcanique',
   'entities.items.chunk_of_ore.name': 'Morceau de minerai',
   'entities.items.reins_grag_bear.name': 'Rênes de l’Ours-Grag Goliath',
+  'entities.items.reins_valorsteed.name': 'Rênes du Destrier de Bravoure',
   'entities.items.reins_stalkglider_snail.name': 'Rênes du Glisseur à Coquille Moussue',
   'entities.items.reins_aether_hover_cycle.name': 'Clé de contact : Aérocycle du Jouteur d’Éther',
   'entities.items.reins_shadowjump_toad.name': 'Rênes de Kama-Kage, le Crapaud Saute-Ombre',
@@ -6838,6 +6844,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
   'hudChrome.mounts.notCollected': 'Non collectée',
+  'hudChrome.mounts.stableHint': 'Vendue par le maître d’écurie au Val d’Eastbrook.',
   'hudChrome.mounts.dropHint': 'Butin des boss de donjon et de raid.',
   'hudChrome.mounts.clickManage': 'Cliquez pour choisir votre monture',
 };

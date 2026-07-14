@@ -2393,6 +2393,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ysols_pearl_greaves.name': "Ysolei'nin İnci Dizlikleri",
   'entities.items.zealotsbane_blade.name': 'Bağnazbelası Kılıcı',
   'entities.items.reins_grag_bear.name': 'Golyat Grag-Ayısının Dizginleri',
+  'entities.items.reins_valorsteed.name': 'Valorsteed Dizginleri',
   'entities.items.reins_stalkglider_snail.name': 'Yosun Kabuklu Sap Süzülgeninin Dizginleri',
   'entities.items.reins_aether_hover_cycle.name':
     'Kontak Anahtarı: Eter Şövalyesinin Uçan Motosikleti',
@@ -2544,6 +2545,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Kılıcını yakın tut, {className}. Vadi eskisi gibi değil.',
   'entities.npcs.marshal_redbrook.name': 'Mareşal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Ahır Ustası',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Her binici buraya iki ayağıyla gelir. Altın peşin, eyer ise ona oturabildiğinde.',
   'entities.npcs.marshal_redbrook.title': 'Kasaba Mareşali',
   'entities.npcs.provisioner_hale.greeting':
     "Kuru çizme, kuru ekmek, kuru barut, Fenbridge'de iyi bir günde üçünden ikisini bulursun.",
@@ -4969,6 +4974,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Sarf Malzemeleri',
   'hudChrome.bags.filterGroupAria': 'Çantaları kategoriye göre filtrele',
   'hudChrome.bags.filterMaterial': 'Malzemeler',
+  'hudChrome.bags.filterMount': 'Binekler',
   'hudChrome.bags.filterQuest': 'Görev',
   'hudChrome.bags.filterWeapon': 'Silahlar',
   'hudChrome.bags.noMatch': 'Filtrelerinizle eşleşen öge yok.',

@@ -428,6 +428,7 @@ export const fr_FR: EnTranslations = {
       "keybindHint": "Appuyez sur la touche Monter / Descendre (Z par défaut) pour chevaucher.",
       "notCollected": "Non collectée",
       "dropHint": "Butin des boss de donjon et de raid.",
+      "stableHint": "Vendue par le maître d’écurie au Val d’Eastbrook.",
       "clickManage": "Cliquez pour choisir votre monture",
       "rarity_common": "Commune",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const fr_FR: EnTranslations = {
       "filterConsumable": "Consommables",
       "filterMaterial": "Matériaux",
       "filterQuest": "Quête",
+      "filterMount": "Montures",
       "sortAria": "Trier les objets du sac",
       "sortRecent": "Récents",
       "sortQuality": "Qualité",
@@ -7084,6 +7086,9 @@ export const fr_FR: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Protège-taille d'Appel-tempête"
       },
+      "reins_valorsteed": {
+        "name": "Rênes du Destrier de Bravoure"
+      },
       "reins_grag_bear": {
         "name": "Rênes de l’Ours-Grag Goliath"
       },
@@ -7487,6 +7492,11 @@ export const fr_FR: EnTranslations = {
         "name": "Contremaître Odell",
         "title": "Contremaître de la mine",
         "greeting": "Toute la mine grouille de ces vermines couvertes de terre !"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Maîtresse d’écurie",
+        "greeting": "Tout cavalier arrive sur ses deux jambes. L’or d’abord, la selle quand tu sauras t’y tenir."
       },
       "warden_fenwick": {
         "name": "Gardien Fenwick",

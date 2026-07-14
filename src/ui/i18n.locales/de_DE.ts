@@ -3568,6 +3568,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Willkommen auf dem Weltmarkt, {className}. Kaufe von Abenteurern aus dem ganzen Reich oder biete deine eigenen Waren an.',
   'entities.npcs.marshal_redbrook.name': 'Marschall Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Stallmeisterin',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Jeder Reiter kommt auf zwei Beinen herein. Gold im Voraus, den Sattel, wenn Ihr ihn halten könnt.',
   'entities.npcs.marshal_redbrook.title': 'Stadtmarschall',
   'entities.npcs.marshal_redbrook.greeting':
     'Halte deine Klinge nah, {className}. Das Tal ist nicht mehr, was es war.',
@@ -4665,6 +4669,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Rüstung',
   'hudChrome.bags.filterConsumable': 'Verbrauchbares',
   'hudChrome.bags.filterMaterial': 'Materialien',
+  'hudChrome.bags.filterMount': 'Reittiere',
   'hudChrome.bags.filterQuest': 'Quest',
   'hudChrome.bags.sortAria': 'Taschengegenstände sortieren',
   'hudChrome.bags.sortRecent': 'Neueste',
@@ -6717,6 +6722,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_shard.name': 'Arkansplitter',
   'entities.items.chunk_of_ore.name': 'Erzbrocken',
   'entities.items.reins_grag_bear.name': 'Zügel des Goliath-Gragbären',
+  'entities.items.reins_valorsteed.name': 'Zügel des Valorross',
   'entities.items.reins_stalkglider_snail.name': 'Zügel des Moosschalen-Stielgleiters',
   'entities.items.reins_aether_hover_cycle.name': 'Zündschlüssel: Ätherlanzen-Schwebrad',
   'entities.items.reins_shadowjump_toad.name': 'Zügel von Kama-Kage der Schattensprungkröte',
@@ -6809,6 +6815,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.',
   'hudChrome.mounts.notCollected': 'Nicht gesammelt',
+  'hudChrome.mounts.stableHint': 'Wird vom Stallmeister im Eastbrook-Tal verkauft.',
   'hudChrome.mounts.dropHint': 'Wird von Dungeon- und Schlachtzugsbossen fallen gelassen.',
   'hudChrome.mounts.clickManage': 'Anklicken, um Euer Reittier zu wählen',
 };

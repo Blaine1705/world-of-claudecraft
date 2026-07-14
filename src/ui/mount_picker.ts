@@ -12,7 +12,7 @@
 import { MOUNTS } from '../sim/content/mounts';
 import { esc } from './esc';
 import { type TranslationKey, t } from './i18n';
-import { QUALITY_COLOR } from './icons';
+import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { MountPickerRow, MountPickerView } from './mount_picker_view';
 
 export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
@@ -58,10 +58,21 @@ export function mountSpecLines(row: {
   return parts;
 }
 
+// The unowned-card acquisition hint: the horse is bought from the stablemaster,
+// every other mount drops from a boss. Keyed off the pure view's purchasable
+// flag so the key selection is not hardcoded in two places.
+function acquireHint(row: MountPickerRow): string {
+  return t(row.purchasable ? 'hudChrome.mounts.stableHint' : 'hudChrome.mounts.dropHint');
+}
+
+// The state chip never co-renders a contradiction: the "Riding" chip only when
+// actually riding, the "Selected" chip only for an owned, unlocked pick (a
+// locked or unowned card shows its requirement / acquisition line instead).
 function stateChip(row: MountPickerRow): string {
   if (row.active)
     return `<span class="mp-state mp-riding">${esc(t('hudChrome.mounts.riding'))}</span>`;
-  if (row.selected) return `<span class="mp-state">${esc(t('hudChrome.mounts.selected'))}</span>`;
+  if (row.selected && row.owned && !row.locked)
+    return `<span class="mp-state">${esc(t('hudChrome.mounts.selected'))}</span>`;
   return '';
 }
 
@@ -72,8 +83,12 @@ function cardHtml(row: MountPickerRow, highlightKey: string): string {
   if (row.locked) classes.push('mp-locked');
   if (row.selected) classes.push('mp-selected');
   if (row.key === highlightKey) classes.push('mp-highlight');
+  // Unowned: the "Not collected" state plus how to acquire it (stable vs boss
+  // drop). Locked-but-owned: only the level requirement (never a Selected chip).
+  // Owned and unlocked: the specialty lines.
   const sub = !row.owned
-    ? `<div class="mp-sub">${esc(t('hudChrome.mounts.notCollected'))}</div>`
+    ? `<div class="mp-sub">${esc(t('hudChrome.mounts.notCollected'))}</div>` +
+      `<div class="mp-sub mp-acquire">${esc(acquireHint(row))}</div>`
     : row.locked
       ? `<div class="mp-sub mp-lock">${esc(t('hudChrome.mounts.requiresLevel', { level: row.level }))}</div>`
       : `<div class="mp-sub">${mountSpecLines(row)
@@ -84,12 +99,16 @@ function cardHtml(row: MountPickerRow, highlightKey: string): string {
   // actionable cards.
   const tag = row.pickable ? 'button' : 'div';
   const typeAttr = row.pickable ? ' type="button"' : '';
+  // The rendered 3D face icon (the reins item's image; every catalog mount has
+  // a reins item, so the id is always resolvable through the item-icon seam).
+  const face = `<img class="mp-face" src="${iconDataUrl('item', `reins_${row.key}`)}" alt="" draggable="false">`;
   return (
     `<${tag}${typeAttr} class="${classes.join(' ')}" data-mount-key="${esc(row.key)}"` +
     `${row.selected ? ' aria-current="true"' : ''}>` +
-    `<div class="mp-name" style="color:${color}">${esc(mountDisplayName(row.key))}${stateChip(row)}</div>` +
+    face +
+    `<div class="mp-info"><div class="mp-name" style="color:${color}">${esc(mountDisplayName(row.key))}${stateChip(row)}</div>` +
     sub +
-    `</${tag}>`
+    `</div></${tag}>`
   );
 }
 
@@ -114,7 +133,7 @@ export function mountTooltipHtml(row: MountPickerRow): string {
   for (const line of mountSpecLines(row)) html += `<div class="tt-green">${esc(line)}</div>`;
   if (!row.owned) {
     html += `<div class="tt-sub">${esc(t('hudChrome.mounts.notCollected'))}</div>`;
-    html += `<div class="tt-sub">${esc(t('hudChrome.mounts.dropHint'))}</div>`;
+    html += `<div class="tt-sub">${esc(acquireHint(row))}</div>`;
   } else if (row.locked) {
     html += `<div class="tt-sub mp-lock">${esc(t('hudChrome.mounts.requiresLevel', { level: row.level }))}</div>`;
   }

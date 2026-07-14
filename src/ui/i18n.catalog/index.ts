@@ -1153,6 +1153,8 @@ export const en = {
       soulflame_cord: { name: 'Wraithfire Cord' },
       stormcallers_waistguard: { name: 'Galecall Waistguard' },
       // Collectible mount reins (boss drops; src/sim/mounts.ts mountOwned).
+      // reins_valorsteed is the one bought from the stablemaster, not looted.
+      reins_valorsteed: { name: 'Reins of the Valorsteed' },
       reins_grag_bear: { name: 'Reins of the Goliath Grag-Bear' },
       reins_stalkglider_snail: { name: 'Reins of the Moss-Shell Stalk-Glider' },
       reins_aether_hover_cycle: { name: 'Ignition Key: Aether-Jouster Hover-Cycle' },

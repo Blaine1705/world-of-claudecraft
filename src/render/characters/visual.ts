@@ -306,6 +306,19 @@ export class CharacterVisual {
     this.playOneShot(clip, spec?.timeScale ?? 1, spec?.repeats ?? 1, id);
   }
 
+  /** The summon gesture: the rider throws an arm up as a mount is called. A thin
+   *  wrapper over the Spellcast_Raise one-shot, time-scaled so the single raise
+   *  roughly fills the transition window (clamped so a very short or long window
+   *  still reads as a deliberate pose). No-ops on rigs without the clip. */
+  playCallPose(durationSeconds: number): void {
+    if (this.deadLock) return;
+    const a = this.action('Spellcast_Raise');
+    if (!a) return;
+    const window = Math.max(0.2, durationSeconds);
+    const timeScale = Math.min(2, Math.max(0.5, a.getClip().duration / window));
+    this.playOneShot('Spellcast_Raise', timeScale);
+  }
+
   // -------------------------------------------------------------------------
   // Static posing (player-card capture). poseFreeze() locks the rig on a chosen
   // clip's frame so an offscreen render captures a deliberate pose instead of

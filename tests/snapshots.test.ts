@@ -2256,9 +2256,10 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.raidLockouts().map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
     // mnt -> selfSelectedMount (private), via the selectedMount() accessor
     expect(client.selectedMount()).toBe('grag_bear');
-    // mntOwn -> selfOwnedMounts (private), via the ownedMounts() accessor: the
-    // horse always, plus the reins item sitting in the seeded inventory.
-    expect(client.ownedMounts()).toEqual(['valorsteed', 'grag_bear']);
+    // mntOwn -> selfOwnedMounts (private), via the ownedMounts() accessor. The
+    // horse is no longer auto-owned, so the collection is exactly what the reins
+    // item in the seeded inventory grants (server ownedMountsFor -> wire -> mirror).
+    expect(client.ownedMounts()).toEqual(['grag_bear']);
     expect(client.partyInfo).not.toBeNull(); // party -> partyInfo
     expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
     expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()

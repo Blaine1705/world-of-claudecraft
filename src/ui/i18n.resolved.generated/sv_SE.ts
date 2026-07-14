@@ -428,6 +428,7 @@ export const sv_SE: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
+      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const sv_SE: EnTranslations = {
       "filterConsumable": "Förbrukningsvaror",
       "filterMaterial": "Material",
       "filterQuest": "Uppdrag",
+      "filterMount": "Riddjur",
       "sortAria": "Sortera väskföremål",
       "sortRecent": "Senaste",
       "sortQuality": "Kvalitet",
@@ -7084,6 +7086,9 @@ export const sv_SE: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Stormkallarens midjeskydd"
       },
+      "reins_valorsteed": {
+        "name": "Tyglar till Valorsteed"
+      },
       "reins_grag_bear": {
         "name": "Tyglar till Goliat Grag-björnen"
       },
@@ -7487,6 +7492,11 @@ export const sv_SE: EnTranslations = {
         "name": "Förman Odell",
         "title": "Gruvförman",
         "greeting": "Hela utgrävningen kryllar av de där lerinkrustade skadedjuren!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stallmästare",
+        "greeting": "Varje ryttare kommer in på två ben. Guld i förskott, sadeln när du kan sitta kvar i den."
       },
       "warden_fenwick": {
         "name": "Väktaren Fenwick",

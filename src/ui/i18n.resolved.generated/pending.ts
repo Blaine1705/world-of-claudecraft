@@ -55,6 +55,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
+    "hudChrome.mounts.stableHint",
     "hudChrome.mounts.title",
     "itemUi.kind.mount"
   ],
@@ -91,6 +92,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
+    "hudChrome.mounts.stableHint",
     "hudChrome.mounts.title",
     "itemUi.kind.mount"
   ],
@@ -127,6 +129,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
+    "hudChrome.mounts.stableHint",
     "hudChrome.mounts.title",
     "itemUi.kind.mount"
   ],
@@ -163,6 +166,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
+    "hudChrome.mounts.stableHint",
     "hudChrome.mounts.title",
     "itemUi.kind.mount"
   ],
@@ -199,6 +203,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
+    "hudChrome.mounts.stableHint",
     "hudChrome.mounts.title",
     "itemUi.kind.mount"
   ],
@@ -235,6 +240,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
+    "hudChrome.mounts.stableHint",
     "hudChrome.mounts.title",
     "itemUi.kind.mount"
   ],
@@ -271,6 +277,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
+    "hudChrome.mounts.stableHint",
     "hudChrome.mounts.title",
     "itemUi.kind.mount"
   ],
@@ -307,6 +314,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
+    "hudChrome.mounts.stableHint",
     "hudChrome.mounts.title",
     "itemUi.kind.mount"
   ]

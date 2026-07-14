@@ -2469,6 +2469,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Håll ditt svärd nära, {className}. Dalen är inte vad den en gång var.',
   'entities.npcs.marshal_redbrook.name': 'Marskalk Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Stallmästare',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Varje ryttare kommer in på två ben. Guld i förskott, sadeln när du kan sitta kvar i den.',
   'entities.npcs.marshal_redbrook.title': 'Stadsmarskalk',
   'entities.npcs.provisioner_hale.greeting':
     'Torra stövlar, torrt bröd, torrt krut - vid Kärrbron får du två av tre en bra dag.',
@@ -4906,6 +4910,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Förbrukningsvaror',
   'hudChrome.bags.filterGroupAria': 'Filtrera väskor efter kategori',
   'hudChrome.bags.filterMaterial': 'Material',
+  'hudChrome.bags.filterMount': 'Riddjur',
   'hudChrome.bags.filterQuest': 'Uppdrag',
   'hudChrome.bags.filterWeapon': 'Vapen',
   'hudChrome.bags.noMatch': 'Inga föremål matchar dina filter.',
@@ -6566,6 +6571,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Den här återställningslänken är ogiltig eller har gått ut. Begär en ny.',
   'entities.items.chunk_of_ore.name': 'Malmklump',
   'entities.items.reins_grag_bear.name': 'Tyglar till Goliat Grag-björnen',
+  'entities.items.reins_valorsteed.name': 'Tyglar till Valorsteed',
   'entities.items.reins_stalkglider_snail.name': 'Tyglar till mosskal-stjälkglidaren',
   'entities.items.reins_aether_hover_cycle.name': 'Tändningsnyckel: eterriddarens svävarcykel',
   'entities.items.reins_shadowjump_toad.name': 'Tyglar till Kama-Kage, skuggsprångspaddan',

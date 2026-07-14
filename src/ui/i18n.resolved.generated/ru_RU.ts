@@ -428,6 +428,7 @@ export const ru_RU: EnTranslations = {
       "keybindHint": "Нажмите клавишу «Сесть / Спешиться» (по умолчанию Z), чтобы поехать.",
       "notCollected": "Не получено",
       "dropHint": "Добывается с боссов подземелий и рейдов.",
+      "stableHint": "Продаётся конюхом в Истврукской долине.",
       "clickManage": "Нажмите, чтобы выбрать транспорт",
       "rarity_common": "Обычный",
       "rarity_rare": "Редкий",
@@ -1011,6 +1012,7 @@ export const ru_RU: EnTranslations = {
       "filterConsumable": "Расходники",
       "filterMaterial": "Материалы",
       "filterQuest": "Задания",
+      "filterMount": "Транспорт",
       "sortAria": "Сортировать предметы в сумках",
       "sortRecent": "Недавние",
       "sortQuality": "Качество",
@@ -7084,6 +7086,9 @@ export const ru_RU: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Поясная защита призывателя бурь"
       },
+      "reins_valorsteed": {
+        "name": "Поводья Доблестного скакуна"
+      },
       "reins_grag_bear": {
         "name": "Поводья Голиафа Граг-медведя"
       },
@@ -7487,6 +7492,11 @@ export const ru_RU: EnTranslations = {
         "name": "Прораб Оделл",
         "title": "Горный прораб",
         "greeting": "Вся выработка кишит этими покрытыми коркой грязи паразитами!"
+      },
+      "stablemaster_marla": {
+        "name": "Марла Хитчен",
+        "title": "Старшая конюшая",
+        "greeting": "Каждый всадник приходит на своих двоих. Золото вперёд, седло — когда сможешь в нём усидеть."
       },
       "warden_fenwick": {
         "name": "Страж Фенвик",

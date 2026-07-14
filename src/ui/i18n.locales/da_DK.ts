@@ -2462,6 +2462,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Hold din klinge nær, {className}. Dalen er ikke hvad den var.',
   'entities.npcs.marshal_redbrook.name': 'Marskal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Staldmester',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Enhver rytter kommer ind på to ben. Guld på forhånd, saddel når du kan sidde den.',
   'entities.npcs.marshal_redbrook.title': 'Bymarskal',
   'entities.npcs.provisioner_hale.greeting':
     'Tørre støvler, tørt brød, tørt krudt - i Fenbridge får du to ud af tre på en god dag.',
@@ -4893,6 +4897,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Forbrugsvarer',
   'hudChrome.bags.filterGroupAria': 'Filtrér tasker efter kategori',
   'hudChrome.bags.filterMaterial': 'Materialer',
+  'hudChrome.bags.filterMount': 'Ridedyr',
   'hudChrome.bags.filterQuest': 'Quest',
   'hudChrome.bags.filterWeapon': 'Våben',
   'hudChrome.bags.noMatch': 'Ingen genstande matcher dine filtre.',
@@ -6549,6 +6554,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Dette nulstillingslink er ugyldigt eller udløbet. Anmod om et nyt.',
   'entities.items.chunk_of_ore.name': 'Malmklump',
   'entities.items.reins_grag_bear.name': 'Tøjler til Goliat Grag-bjørnen',
+  'entities.items.reins_valorsteed.name': 'Tøjler til Valorsteed',
   'entities.items.reins_stalkglider_snail.name': 'Tøjler til mosskal-stilkglideren',
   'entities.items.reins_aether_hover_cycle.name': 'Tændingsnøgle: Æterridderens svævecykel',
   'entities.items.reins_shadowjump_toad.name': 'Tøjler til Kama-Kage, skyggespringstudsen',

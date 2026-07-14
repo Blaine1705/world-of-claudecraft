@@ -428,6 +428,7 @@ export const nl_NL: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
+      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const nl_NL: EnTranslations = {
       "filterConsumable": "Verbruiksartikelen",
       "filterMaterial": "Materialen",
       "filterQuest": "Quest",
+      "filterMount": "Rijdieren",
       "sortAria": "Tasitems sorteren",
       "sortRecent": "Recent",
       "sortQuality": "Kwaliteit",
@@ -7084,6 +7086,9 @@ export const nl_NL: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Lendenbescherming van de Stormroeper"
       },
+      "reins_valorsteed": {
+        "name": "Teugels van de Valorsteed"
+      },
       "reins_grag_bear": {
         "name": "Teugels van de Goliath Grag-beer"
       },
@@ -7487,6 +7492,11 @@ export const nl_NL: EnTranslations = {
         "name": "Voorman Odell",
         "title": "Mijnvoorman",
         "greeting": "De hele opgraving krioelt van dat modderbesmeurde ongedierte!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stalmeesteres",
+        "greeting": "Elke ruiter komt op twee benen binnen. Goud vooraf, het zadel als je erin kunt blijven zitten."
       },
       "warden_fenwick": {
         "name": "Wachter Fenwick",

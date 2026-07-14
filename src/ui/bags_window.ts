@@ -85,6 +85,7 @@ const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   consumable: 'hudChrome.bags.filterConsumable',
   material: 'hudChrome.bags.filterMaterial',
   quest: 'hudChrome.bags.filterQuest',
+  mount: 'hudChrome.bags.filterMount',
 };
 const BAG_SORT_LABEL_KEYS: Record<BagSort, TranslationKey> = {
   recent: 'hudChrome.bags.sortRecent',

@@ -428,6 +428,7 @@ export const ko_KR: EnTranslations = {
       "keybindHint": "탑승 / 하차 키(기본 Z)를 눌러 탑승합니다.",
       "notCollected": "미보유",
       "dropHint": "던전 및 공격대 우두머리가 떨어뜨립니다.",
+      "stableHint": "이스트브룩 골짜기의 마구간지기가 판매합니다.",
       "clickManage": "클릭하여 탈것 선택",
       "rarity_common": "일반",
       "rarity_rare": "희귀",
@@ -1011,6 +1012,7 @@ export const ko_KR: EnTranslations = {
       "filterConsumable": "소모품",
       "filterMaterial": "재료",
       "filterQuest": "퀘스트",
+      "filterMount": "탈것",
       "sortAria": "가방 아이템 정렬",
       "sortRecent": "최근",
       "sortQuality": "품질",
@@ -7084,6 +7086,9 @@ export const ko_KR: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "폭풍소환사의 허리보호구"
       },
+      "reins_valorsteed": {
+        "name": "발러스티드의 고삐"
+      },
       "reins_grag_bear": {
         "name": "골리앗 그라그곰의 고삐"
       },
@@ -7487,6 +7492,11 @@ export const ko_KR: EnTranslations = {
         "name": "감독관 오델",
         "title": "광산 감독관",
         "greeting": "갱도 전체가 저 흙범벅이 된 해충들로 들끓고 있습니다!"
+      },
+      "stablemaster_marla": {
+        "name": "마를라 히첸",
+        "title": "마구간지기",
+        "greeting": "기수는 누구나 두 발로 걸어 들어오지. 금은 선불, 안장은 네가 앉을 수 있을 때 내주마."
       },
       "warden_fenwick": {
         "name": "감시관 펜윅",

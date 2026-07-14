@@ -428,6 +428,7 @@ export const zh_TW: EnTranslations = {
       "keybindHint": "按下騎乘 / 下騎鍵(預設 Z)即可騎乘。",
       "notCollected": "未收集",
       "dropHint": "由地城和團隊副本首領掉落。",
+      "stableHint": "由東溪谷的馬廄管理員出售。",
       "clickManage": "點擊選擇坐騎",
       "rarity_common": "普通",
       "rarity_rare": "稀有",
@@ -1011,6 +1012,7 @@ export const zh_TW: EnTranslations = {
       "filterConsumable": "消耗品",
       "filterMaterial": "材料",
       "filterQuest": "任務",
+      "filterMount": "坐騎",
       "sortAria": "排序背包物品",
       "sortRecent": "最近",
       "sortQuality": "品質",
@@ -7084,6 +7086,9 @@ export const zh_TW: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "喚雷者腰甲"
       },
+      "reins_valorsteed": {
+        "name": "英勇戰馬的韁繩"
+      },
       "reins_grag_bear": {
         "name": "歌利亞格拉格巨熊的韁繩"
       },
@@ -7487,6 +7492,11 @@ export const zh_TW: EnTranslations = {
         "name": "奧德爾工頭",
         "title": "礦井工頭",
         "greeting": "整條礦道都爬滿了那些滿身泥垢的害蟲！"
+      },
+      "stablemaster_marla": {
+        "name": "瑪拉·希琴",
+        "title": "馬廄總管",
+        "greeting": "每個騎手都是兩條腿走進來的。先付金子，等你坐得穩了再上鞍。"
       },
       "warden_fenwick": {
         "name": "芬威克守望者",

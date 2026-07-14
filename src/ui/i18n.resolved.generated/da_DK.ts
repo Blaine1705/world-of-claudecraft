@@ -428,6 +428,7 @@ export const da_DK: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
+      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -1011,6 +1012,7 @@ export const da_DK: EnTranslations = {
       "filterConsumable": "Forbrugsvarer",
       "filterMaterial": "Materialer",
       "filterQuest": "Quest",
+      "filterMount": "Ridedyr",
       "sortAria": "Sortér taskegenstande",
       "sortRecent": "Nyeste",
       "sortQuality": "Kvalitet",
@@ -7084,6 +7086,9 @@ export const da_DK: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Stormkalderens Livværn"
       },
+      "reins_valorsteed": {
+        "name": "Tøjler til Valorsteed"
+      },
       "reins_grag_bear": {
         "name": "Tøjler til Goliat Grag-bjørnen"
       },
@@ -7487,6 +7492,11 @@ export const da_DK: EnTranslations = {
         "name": "Formand Odell",
         "title": "Mineformand",
         "greeting": "Hele udgravningen vrimler med de jordklistrede skadedyr!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Staldmester",
+        "greeting": "Enhver rytter kommer ind på to ben. Guld på forhånd, saddel når du kan sidde den."
       },
       "warden_fenwick": {
         "name": "Vogter Fenwick",
