@@ -29,7 +29,9 @@ describe('Chronomancy clock audio', () => {
     expect(rewind).toContain("fx: 'temporalRewindNova'");
     expect(rewind).not.toContain("fx: 'nova'");
     expect(hud).toContain("if (ev.fx === 'temporalClock')");
-    expect(hud.match(/this\.combat\('temporal_clock'/g)).toHaveLength(2);
+    expect(hud.match(/'temporal_clock'/g)).toHaveLength(2);
+    expect(hud).toContain('const TEMPORAL_CLOCK_GAIN = 0.72;');
+    expect(hud.match(/TEMPORAL_CLOCK_GAIN/g)).toHaveLength(3);
     expect(hud).toContain('ev.name === ABILITIES.temporal_hourglass.name && ev.gained');
   });
 });
