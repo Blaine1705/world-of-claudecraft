@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "cf0725c0",
+      "state": "b9ca3c5e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,9 +73,16 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -138,8 +145,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 412,
-      "state": "3031d9cd",
-      "events": "cf372b7d",
+      "state": "ac0888d1",
+      "events": "a94a564c",
       "rng": {
         "draws": 9,
         "digest": "381f4473"
@@ -149,7 +156,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 412,
-      "state": "70bf368a",
+      "state": "7972c3ac",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -160,8 +167,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 412,
-      "state": "c42828f9",
-      "events": "87420e23",
+      "state": "87923f15",
+      "events": "e0219742",
       "rng": {
         "draws": 100,
         "digest": "a2f9eb23"
@@ -171,7 +178,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 412,
-      "state": "0f20b776",
+      "state": "51763950",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -182,8 +189,8 @@
       "tick": 100,
       "time": 5,
       "nextId": 412,
-      "state": "47bc65e9",
-      "events": "74d0780d",
+      "state": "e454a3e5",
+      "events": "6e3eeae0",
       "rng": {
         "draws": 298,
         "digest": "dea1e796"
@@ -193,7 +200,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 412,
-      "state": "e73b3caa",
+      "state": "c108840c",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -204,7 +211,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 412,
-      "state": "e73b3caa",
+      "state": "c108840c",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -286,9 +293,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 20,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }

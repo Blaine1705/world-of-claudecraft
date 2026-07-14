@@ -31,8 +31,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 413,
-      "state": "8d29397c",
-      "events": "175dd707",
+      "state": "cc9c248a",
+      "events": "53db9196",
       "rng": {
         "draws": 5,
         "digest": "ca7bbe9c"
@@ -91,9 +91,16 @@
           "lifetimeXp": 84,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 84
@@ -384,8 +391,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 414,
-      "state": "6b1f6c44",
-      "events": "cf7825de",
+      "state": "4d2a7b9e",
+      "events": "ab547a87",
       "rng": {
         "draws": 8,
         "digest": "cac7cfb2"
@@ -451,9 +458,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 10,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 198
@@ -797,8 +811,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 414,
-      "state": "621f5e22",
-      "events": "01d10828",
+      "state": "fd7d9838",
+      "events": "2778df03",
       "rng": {
         "draws": 9,
         "digest": "88aac2f9"
@@ -865,9 +879,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 10,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 198
@@ -1212,8 +1233,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "e1b7affa",
-      "events": "3af2aed7",
+      "state": "942bc1ac",
+      "events": "fa8763ea",
       "rng": {
         "draws": 15,
         "digest": "ca70052b"
@@ -1280,9 +1301,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 10,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 282
@@ -1670,8 +1698,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 417,
-      "state": "69d03988",
-      "events": "c0537c14",
+      "state": "e12228ac",
+      "events": "d1417671",
       "rng": {
         "draws": 20,
         "digest": "e612091c"
@@ -1742,9 +1770,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 15,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 366
@@ -2193,7 +2228,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 417,
-      "state": "69d03988",
+      "state": "e12228ac",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2265,9 +2300,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 15,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 366

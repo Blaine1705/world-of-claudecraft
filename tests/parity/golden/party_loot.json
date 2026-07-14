@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 411,
-      "state": "8901545f",
+      "state": "92ffff5b",
       "events": "ff0b9497",
       "rng": {
         "draws": 2,
@@ -94,9 +94,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 5,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -158,9 +165,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 5,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }

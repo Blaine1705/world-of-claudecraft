@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 415,
-      "state": "22664e02",
+      "state": "e3acac38",
       "events": "e4df5441",
       "rng": {
         "draws": 2,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 415,
-      "state": "0c45ea60",
+      "state": "93321636",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 415,
-      "state": "cc3f727a",
+      "state": "3b36a270",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 415,
-      "state": "ab7698e4",
+      "state": "f6b3e034",
       "events": "5da14ae8",
       "rng": {
         "draws": 2,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 415,
-      "state": "575653cd",
+      "state": "fc7fd4d5",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 415,
-      "state": "da8be052",
+      "state": "a00e349a",
       "events": "fc043d31",
       "rng": {
         "draws": 2,
@@ -101,7 +101,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 415,
-      "state": "a61edd81",
+      "state": "f87873a9",
       "events": "96532acf",
       "rng": {
         "draws": 4,
@@ -181,9 +181,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -264,9 +271,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -345,9 +359,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -431,9 +452,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -514,9 +542,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -597,9 +632,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -987,7 +1029,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 415,
-      "state": "bdc8c2af",
+      "state": "79a976af",
       "events": "fb804d0a",
       "rng": {
         "draws": 4,
@@ -998,7 +1040,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 415,
-      "state": "982be893",
+      "state": "25365a33",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1009,7 +1051,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 415,
-      "state": "af5b4bc9",
+      "state": "0cff8c71",
       "events": "741638a5",
       "rng": {
         "draws": 36,
@@ -1020,7 +1062,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 415,
-      "state": "1c8097f0",
+      "state": "1447cc70",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -1031,7 +1073,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 415,
-      "state": "08bcfa2e",
+      "state": "b3273b16",
       "events": "741638a5",
       "rng": {
         "draws": 66,
@@ -1042,7 +1084,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 415,
-      "state": "595fcd5b",
+      "state": "03a2b5bb",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -1053,7 +1095,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 415,
-      "state": "a50d924c",
+      "state": "20d8f9fc",
       "events": "741638a5",
       "rng": {
         "draws": 101,
@@ -1064,7 +1106,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 415,
-      "state": "9dc3998f",
+      "state": "68b6ca0f",
       "events": "741638a5",
       "rng": {
         "draws": 127,
@@ -1075,7 +1117,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 415,
-      "state": "2c2c1a26",
+      "state": "d2ac5bae",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -1086,7 +1128,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 415,
-      "state": "3f7b96cb",
+      "state": "b88339ab",
       "events": "741638a5",
       "rng": {
         "draws": 174,
@@ -1097,7 +1139,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 415,
-      "state": "06c427e9",
+      "state": "807c2391",
       "events": "741638a5",
       "rng": {
         "draws": 203,
@@ -1108,7 +1150,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 415,
-      "state": "b2a86076",
+      "state": "10ee7cbe",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -1119,7 +1161,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 415,
-      "state": "3df4ac4c",
+      "state": "0db783fc",
       "events": "741638a5",
       "rng": {
         "draws": 253,
@@ -1130,7 +1172,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 415,
-      "state": "ee3cef47",
+      "state": "14abddc7",
       "events": "741638a5",
       "rng": {
         "draws": 276,
@@ -1141,7 +1183,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 415,
-      "state": "2b2859f6",
+      "state": "baba9a3e",
       "events": "741638a5",
       "rng": {
         "draws": 304,
@@ -1152,7 +1194,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 415,
-      "state": "a9dd4e54",
+      "state": "17d2bbe4",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -1163,7 +1205,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 415,
-      "state": "686ff83d",
+      "state": "0d3c3a05",
       "events": "741638a5",
       "rng": {
         "draws": 360,
@@ -1174,7 +1216,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 415,
-      "state": "5200085e",
+      "state": "1ebf39c6",
       "events": "741638a5",
       "rng": {
         "draws": 388,
@@ -1185,7 +1227,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 415,
-      "state": "758d6781",
+      "state": "de48eda9",
       "events": "741638a5",
       "rng": {
         "draws": 408,
@@ -1196,7 +1238,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 415,
-      "state": "a776f322",
+      "state": "c695eeea",
       "events": "741638a5",
       "rng": {
         "draws": 435,
@@ -1207,7 +1249,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 416,
-      "state": "ec2e72bd",
+      "state": "f2437085",
       "events": "61c649c3",
       "rng": {
         "draws": 445,
@@ -1287,9 +1329,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1370,9 +1419,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1451,9 +1507,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1537,9 +1600,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1620,9 +1690,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1703,9 +1780,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -2093,7 +2177,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 417,
-      "state": "72d18ea3",
+      "state": "cfbaf183",
       "events": "134c7356",
       "rng": {
         "draws": 446,
@@ -2173,9 +2257,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2256,9 +2347,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2337,9 +2435,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2423,9 +2528,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2506,9 +2618,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2589,9 +2708,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -3048,8 +3174,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 419,
-      "state": "b5739963",
-      "events": "a0add570",
+      "state": "dbdcb809",
+      "events": "678c3f27",
       "rng": {
         "draws": 448,
         "digest": "7a0cf6db"
@@ -3128,9 +3254,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -3215,9 +3348,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -3296,9 +3437,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -3382,9 +3530,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -3465,9 +3620,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -3548,9 +3710,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -3617,14 +3786,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 409,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -3635,7 +3804,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -4115,8 +4284,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 420,
-      "state": "e387cd3e",
-      "events": "8f581585",
+      "state": "858dfec4",
+      "events": "5a85d3d9",
       "rng": {
         "draws": 453,
         "digest": "7e3f8a61"
@@ -4195,9 +4364,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -4282,9 +4458,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -4367,9 +4551,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -4453,9 +4644,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -4536,9 +4734,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -4619,9 +4824,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -4688,14 +4900,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 409,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -4706,7 +4918,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -5259,8 +5471,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 421,
-      "state": "97453e1d",
-      "events": "6c53b9fc",
+      "state": "b40e0e0f",
+      "events": "56b9b8eb",
       "rng": {
         "draws": 454,
         "digest": "b431b368"
@@ -5339,9 +5551,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -5426,9 +5645,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -5511,9 +5738,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -5601,9 +5835,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -5684,9 +5925,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -5767,9 +6015,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -5836,14 +6091,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 409,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -5854,7 +6109,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -6483,7 +6738,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 422,
-      "state": "c34369e3",
+      "state": "5dbb294b",
       "events": "0d619ac6",
       "rng": {
         "draws": 454,
@@ -6563,9 +6818,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -6650,9 +6912,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -6735,9 +7005,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -6825,9 +7102,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -6908,9 +7192,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -6991,9 +7282,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -7060,14 +7358,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 409,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -7078,7 +7376,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -7761,7 +8059,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 422,
-      "state": "c34369e3",
+      "state": "5dbb294b",
       "events": "741638a5",
       "rng": {
         "draws": 454,
@@ -7841,9 +8139,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -7928,9 +8233,17 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -8013,9 +8326,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -8103,9 +8423,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -8186,9 +8513,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -8269,9 +8603,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 55,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -8338,14 +8679,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 409,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -8356,7 +8697,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,

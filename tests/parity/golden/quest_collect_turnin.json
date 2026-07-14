@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "7bae8020",
+      "state": "2a03c4fe",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -68,9 +68,16 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -131,7 +138,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "2ce1b790",
+      "state": "d3f901ce",
       "events": "11e0c53a",
       "rng": {
         "draws": 0,
@@ -195,9 +202,16 @@
               }
             ]
           ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -258,7 +272,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "cc655682",
+      "state": "b9452a54",
       "events": "ddaa436f",
       "rng": {
         "draws": 0,
@@ -329,9 +343,16 @@
               }
             ]
           ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -392,7 +413,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "9a18562b",
+      "state": "758f55f3",
       "events": "6a2eee27",
       "rng": {
         "draws": 0,
@@ -463,9 +484,16 @@
               }
             ]
           ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -526,7 +554,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "b68e5541",
+      "state": "d331ff6d",
       "events": "82536917",
       "rng": {
         "draws": 0,
@@ -597,9 +625,16 @@
               }
             ]
           ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -660,7 +695,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "b2e82dc2",
+      "state": "6485f938",
       "events": "dcefb227",
       "rng": {
         "draws": 0,
@@ -722,9 +757,16 @@
           "questsDone": [
             "q_boars"
           ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 350
@@ -786,7 +828,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 409,
-      "state": "b3dc7428",
+      "state": "bd22141a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -848,9 +890,16 @@
           "questsDone": [
             "q_boars"
           ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 350

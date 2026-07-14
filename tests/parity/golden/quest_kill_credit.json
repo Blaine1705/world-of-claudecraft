@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "6bd4c62d",
+      "state": "aa3144f1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -69,9 +69,16 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -132,7 +139,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "071e6604",
+      "state": "3fbbf99a",
       "events": "89f30ebf",
       "rng": {
         "draws": 0,
@@ -198,9 +205,16 @@
               }
             ]
           ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -261,8 +275,8 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 417,
-      "state": "9ef81b67",
-      "events": "dcf84fee",
+      "state": "02702aa7",
+      "events": "a87072c4",
       "rng": {
         "draws": 40,
         "digest": "0e96c13c"
@@ -357,9 +371,16 @@
             ]
           ],
           "renown": 30,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -421,7 +442,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 417,
-      "state": "46b3dede",
+      "state": "1eec29da",
       "events": "d35319ab",
       "rng": {
         "draws": 40,
@@ -511,9 +532,16 @@
             "q_wolves"
           ],
           "renown": 30,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 250
@@ -576,7 +604,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 417,
-      "state": "e48b1366",
+      "state": "cf71dd32",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -666,9 +694,16 @@
             "q_wolves"
           ],
           "renown": 30,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 250
