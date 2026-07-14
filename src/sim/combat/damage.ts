@@ -104,12 +104,7 @@ export function dealDamage(
   // Dev "smite" mode: a flagged player's hit one-shots any mob (overrides the
   // rolled amount before mitigation, so armor/absorb can't save the target). Only
   // the player's own damage, only vs mobs; never touches players/NPCs/PvP.
-  if (
-    source?.oneShot &&
-    source.kind === 'player' &&
-    target.kind === 'mob' &&
-    ctx.devCommands
-  ) {
+  if (source?.oneShot && source.kind === 'player' && target.kind === 'mob' && ctx.devCommands) {
     amount = target.maxHp * 1000 + 1_000_000;
   }
 
