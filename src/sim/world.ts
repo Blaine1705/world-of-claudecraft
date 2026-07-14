@@ -2409,7 +2409,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
 // Steepest local rise/run of the walkable heightfield at (x, z), independent of
 // travel direction. Movement gates on this (not just the slope along the step)
 // so a diagonal switchback approach cannot beat the straight-line climb limit.
-const STEEPNESS_SAMPLE = 0.35; // yards; about one movement tick of run
+export const STEEPNESS_SAMPLE = 0.35; // yards; about one movement tick of run
 export function terrainSteepness(x: number, z: number, seed: number): number {
   const e = STEEPNESS_SAMPLE;
   const hx = (groundHeight(x + e, z, seed) - groundHeight(x - e, z, seed)) / (2 * e);

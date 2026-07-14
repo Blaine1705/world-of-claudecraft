@@ -1,4 +1,5 @@
 import { isBlocked, pathCrossesFence, resolvePosition } from './colliders';
+import { rideHeight as rideOverWater } from './ride_height';
 import { groundHeight, waterLevelAt } from './world';
 
 // Local A* over a 1-yard grid, used for short forced moves (warrior Charge).
@@ -33,10 +34,10 @@ function minGroundAt(o: PathOpts, x: number, z: number): number {
 
 // Height the mover's body actually rides at a cell: the water surface when
 // swimming over submerged ground, the ground itself otherwise. Used only for
-// slope/climb gating so an uneven lake bed doesn't read as a cliff.
+// slope/climb gating so an uneven lake bed doesn't read as a cliff. The clamp
+// itself is shared with the movement kernel (ride_height.ts).
 function rideHeight(x: number, z: number, h: number, swim: boolean | undefined): number {
-  const wl = waterLevelAt(x, z);
-  return swim && h < wl ? wl : h;
+  return swim ? rideOverWater(x, z, h) : h;
 }
 
 const CELL = 1; // yards

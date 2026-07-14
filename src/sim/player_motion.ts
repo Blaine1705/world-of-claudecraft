@@ -19,15 +19,10 @@
 
 import { isRooted, isStunned } from './combat/cc';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
+import { isSubmergedAt, rideHeightAt, rideSteepnessAt, shoreStepOut } from './ride_height';
 import { GHOST_RUN_MULT } from './spirit';
 import { DT, type Entity, type MoveInput, normAngle, RUN_SPEED, TURN_SPEED } from './types';
-import {
-  groundHeight,
-  terrainDownhill,
-  terrainSteepnessAt,
-  terrainWallStandoff,
-  waterLevelAt,
-} from './world';
+import { groundHeight, terrainDownhill, terrainWallStandoff, waterLevelAt } from './world';
 
 export const BACKPEDAL_MULT = 0.65;
 export const GRAVITY = 16;
@@ -138,8 +133,11 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   const hasMoveInput = mx !== 0 || mz !== 0;
   const swimming = isSwimming(p, deps.seed);
   // Standing on unwalkably steep ground: no control, no jump, slide downhill.
+  // Steepness is of the RIDDEN surface (submerged ground clamps to the
+  // waterline), so an uneven lake bed never strips control from a wader and
+  // slides it back into deep water.
   const steepGround =
-    p.onGround && !swimming && terrainSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
+    p.onGround && !swimming && rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
   const moving = hasMoveInput && !isRooted(p) && !steepGround;
   let wishX = 0,
     wishZ = 0,
@@ -179,16 +177,21 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     // cliffs, steep mountainsides, and the world rim are walls, not ramps:
     // an uphill step is blocked when the step itself is too steep OR when it
     // lands on ground whose true gradient is unwalkable (so approaching at an
-    // angle cannot cheat the limit)
+    // angle cannot cheat the limit). Heights and gradients are of the RIDDEN
+    // surface (ride_height.ts: submerged ground clamps to the waterline), so a
+    // bumpy lake bed is never a wall and the climb out of water measures the
+    // real waterline-to-bank rise; a too-steep bank still yields to the shore
+    // step-out onto a low standable lip.
     if (p.onGround && !swimming) {
-      const h0 = groundHeight(p.pos.x, p.pos.z, deps.seed);
-      const h1 = groundHeight(nx, nz, deps.seed);
+      const h0 = rideHeightAt(p.pos.x, p.pos.z, deps.seed);
+      const h1 = rideHeightAt(nx, nz, deps.seed);
       const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
       if (
         h1 > h0 &&
         run > 1e-5 &&
         ((h1 - h0) / run > MAX_CLIMB_SLOPE ||
-          terrainSteepnessAt(nx, nz, deps.seed) > MAX_CLIMB_SLOPE)
+          rideSteepnessAt(nx, nz, deps.seed) > MAX_CLIMB_SLOPE) &&
+        !shoreStepOut(p.pos.x, p.pos.z, nx, nz, deps.seed, MAX_CLIMB_SLOPE)
       ) {
         nx = p.pos.x;
         nz = p.pos.z;
@@ -196,16 +199,20 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     } else if (!p.onGround) {
       // Airborne, the same wall rule applies: terrain rising above the body
       // that could not be walked up cannot be jumped into either. The player
-      // drops at the base of the face instead of beaching partway up it.
+      // drops at the base of the face instead of beaching partway up it. The
+      // shore step-out also applies, so the swim-surface hop can land on the
+      // same low banks a wading step can reach.
       const h1 = groundHeight(nx, nz, deps.seed);
       if (h1 > p.pos.y) {
-        const h0 = groundHeight(p.pos.x, p.pos.z, deps.seed);
+        const r0 = rideHeightAt(p.pos.x, p.pos.z, deps.seed);
+        const r1 = rideHeightAt(nx, nz, deps.seed);
         const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
         if (
-          h1 > h0 &&
+          r1 > r0 &&
           run > 1e-5 &&
-          ((h1 - h0) / run > MAX_CLIMB_SLOPE ||
-            terrainSteepnessAt(nx, nz, deps.seed) > MAX_CLIMB_SLOPE)
+          ((r1 - r0) / run > MAX_CLIMB_SLOPE ||
+            rideSteepnessAt(nx, nz, deps.seed) > MAX_CLIMB_SLOPE) &&
+          !shoreStepOut(p.pos.x, p.pos.z, nx, nz, deps.seed, MAX_CLIMB_SLOPE)
         ) {
           nx = p.pos.x;
           nz = p.pos.z;
@@ -317,8 +324,10 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // and never onto ground steeper than the climb limit (a rare terrace corner:
   // a tick's clip beats being shoved onto a wall). Lives in the kernel so the
   // server Sim and the client self-predictor apply it identically; no-op on open
-  // ground and on flat instanced floors.
-  if (p.onGround && !isSwimming(p, deps.seed)) {
+  // ground and on flat instanced floors. Skipped whenever the feet are under a
+  // waterline (not just while swimming): the ridden surface is flat there, so
+  // a submerged bed bump must not shove the body around or fight a shore exit.
+  if (p.onGround && !isSubmergedAt(p.pos.x, p.pos.z, deps.seed)) {
     const s = terrainWallStandoff(p.pos.x, p.pos.z, deps.seed, BODY_RADIUS, MAX_CLIMB_SLOPE);
     if (s.x !== p.pos.x || s.z !== p.pos.z) {
       const resolved = deps.resolveMove(p.pos.x, p.pos.z, s.x, s.z, BODY_RADIUS, p, false);
@@ -353,7 +362,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
           standZ = slide.z;
         }
       }
-      if (terrainSteepnessAt(standX, standZ, deps.seed) <= MAX_CLIMB_SLOPE) {
+      if (rideSteepnessAt(standX, standZ, deps.seed) <= MAX_CLIMB_SLOPE) {
         p.pos.x = standX;
         p.pos.z = standZ;
         p.pos.y = groundHeight(standX, standZ, deps.seed);
