@@ -32,11 +32,13 @@ function singlePass(x: number, z: number): { x: number; z: number } {
 
 // A band of probe points near each of the playable rectangle's four
 // corners, where the x-rim and z-rim walls press in from two directions at
-// once: the most reliable genuinely concave pocket on this world. One exact
-// pin (found by sweeping this band) reproduces a large single-pass shortfall
-// that iteration closes; the rest of the band is swept generically as a
-// no-regression net.
-const PIN = { x: -176.5, z: 894 }; // steepOnce ~3.66, steepIterated ~0.37 at SEED 20061
+// once: a reliable genuinely concave pocket on this world, used below as a
+// generic no-regression net. PIN itself is a separate exact point (found by
+// a full-world sweep, not necessarily near a rim corner) that reproduces a
+// large single-pass shortfall that iteration closes; this world's terrain
+// generation is content-driven and shifts pockets around, so this pin is
+// re-derived whenever terrain content changes invalidate the previous one.
+const PIN = { x: -159, z: 1841 }; // steepOnce ~15.13, steepIterated ~1.31 at SEED 20061
 const CORNER_ORIGINS = [
   { x: WORLD_MAX_X, z: WORLD_MIN_Z, sx: -1, sz: 1 },
   { x: WORLD_MAX_X, z: WORLD_MAX_Z, sx: -1, sz: -1 },
