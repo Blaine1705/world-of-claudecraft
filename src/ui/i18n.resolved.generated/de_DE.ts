@@ -450,15 +450,14 @@ export const de_DE: EnTranslations = {
       "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "Der Talpokal",
@@ -8438,7 +8437,7 @@ export const de_DE: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Reitstunden",
-        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe. Steigt in den Sattel, wenn ich das Wort gebe, und reitet dann den abgesteckten Parcours um meine Koppel, durch jedes Tor der Reihe nach. Verliert Ihr den Sattel oder verlasst den Hof, fangen wir von vorn an.",
+        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe. Steigt in den Sattel, wenn ich das Wort gebe, reitet hinab in meinen Parcours und nehmt jedes Hindernis der Reihe nach, bevor der Sand durch das Glas gelaufen ist. Verliert Ihr den Sattel oder verlasst den Hof, fangen wir von vorn an.",
         "completion": "So, ja. Kein einziges Mal nach dem Zaun gegriffen, die ganze Runde über. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.",
         "objectives": {
           "0": {

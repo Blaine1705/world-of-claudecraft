@@ -1,7 +1,8 @@
-// The relocated Highwatch Stables: the riding-course geometry contract and the
-// ambient stable horses (purely decorative, wander the paddock, never fightable).
+// The relocated Highwatch Stables: the timed show-jumping course geometry contract
+// and the ambient stable horses (purely decorative, wander the NORTH pasture only,
+// never cross the divider into the course arena, never fightable).
 import { describe, expect, it } from 'vitest';
-import { RIDING_COURSE, STABLE_PADDOCK } from '../src/sim/content/mounts';
+import { RIDING_COURSE } from '../src/sim/content/mounts';
 import { ZONE3_PROPS } from '../src/sim/content/zone3';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -10,6 +11,10 @@ const STABLE_HORSE = 'stable_horse';
 // The live world seed (src/main.ts). The stable yard sits on open ground west of
 // Highwatch at these heights (verified terrain facts in the task brief).
 const WORLD_SEED = 20061;
+
+const PADDOCK = RIDING_COURSE.paddock;
+const DIVIDER = RIDING_COURSE.divider;
+const COURSE = RIDING_COURSE.courseSection;
 
 // Distance from point (px,pz) to the segment (x1,z1)-(x2,z2), in the xz plane.
 function distToSegment(
@@ -29,77 +34,97 @@ function distToSegment(
   return Math.hypot(px - cx, pz - cz);
 }
 
-// The paddock fence runs (the perimeter), isolated from the town south-gate runs
-// by their endpoints lying on the paddock rectangle.
-const paddockFences = ZONE3_PROPS.fences.filter(
-  (f) =>
-    f.x1 >= STABLE_PADDOCK.xMin - 1 &&
-    f.x1 <= STABLE_PADDOCK.xMax + 1 &&
-    f.z1 >= STABLE_PADDOCK.zMin - 1 &&
-    f.z1 <= STABLE_PADDOCK.zMax + 1 &&
-    f.x2 >= STABLE_PADDOCK.xMin - 1 &&
-    f.x2 <= STABLE_PADDOCK.xMax + 1 &&
-    f.z2 >= STABLE_PADDOCK.zMin - 1 &&
-    f.z2 <= STABLE_PADDOCK.zMax + 1,
+// The stable fence runs (paddock perimeter + interior divider), isolated from the
+// town south-gate runs by their endpoints lying on/inside the paddock rectangle.
+const inPaddockRect = (x: number, z: number): boolean =>
+  x >= PADDOCK.x1 - 1 && x <= PADDOCK.x2 + 1 && z >= PADDOCK.z1 - 1 && z <= PADDOCK.z2 + 1;
+const stableFences = ZONE3_PROPS.fences.filter(
+  (f) => inPaddockRect(f.x1, f.z1) && inPaddockRect(f.x2, f.z2),
 );
 
-const inPaddock = (x: number, z: number): boolean =>
-  x >= STABLE_PADDOCK.xMin &&
-  x <= STABLE_PADDOCK.xMax &&
-  z >= STABLE_PADDOCK.zMin &&
-  z <= STABLE_PADDOCK.zMax;
+const inCourseSection = (x: number, z: number): boolean =>
+  x >= COURSE.x1 && x <= COURSE.x2 && z >= COURSE.z1 && z <= COURSE.z2;
+
+// The north pasture: inside the paddock and NORTH of (i.e. at or beyond) the divider.
+const inNorthSection = (x: number, z: number): boolean =>
+  x >= PADDOCK.x1 && x <= PADDOCK.x2 && z >= DIVIDER.z && z <= PADDOCK.z2;
 
 function horses(sim: Sim): Entity[] {
   return [...sim.entities.values()].filter((e) => e.templateId === STABLE_HORSE);
 }
 
 describe('RIDING_COURSE geometry contract', () => {
-  it('has 8 gates in a single loop with the documented centre/radii', () => {
-    expect(RIDING_COURSE.gates).toHaveLength(8);
-    expect(RIDING_COURSE.center).toEqual({ x: 100, z: 685 });
-    expect(RIDING_COURSE.gateRadius).toBe(4);
-    expect(RIDING_COURSE.boundsRadius).toBe(40);
+  it('documents the paddock, divider, course arena, and 6-jump course', () => {
+    expect(PADDOCK).toEqual({ x1: 78, x2: 126, z1: 668, z2: 706, opening: { x1: 88, x2: 94 } });
+    expect(DIVIDER).toEqual({ z: 688, opening: { x1: 98, x2: 106 } });
+    expect(COURSE).toEqual({ x1: 78, x2: 126, z1: 668, z2: 688 });
+    expect(RIDING_COURSE.center).toEqual({ x: 102, z: 678 });
+    expect(RIDING_COURSE.jumpRadius).toBe(4);
+    expect(RIDING_COURSE.boundsRadius).toBe(50);
+    expect(RIDING_COURSE.timeLimitSeconds).toBe(45);
+    expect(RIDING_COURSE.jumps).toHaveLength(6);
   });
 
-  it('every gate sits inside the paddock rectangle', () => {
-    for (const g of RIDING_COURSE.gates) {
-      expect(inPaddock(g.x, g.z), `gate ${g.x},${g.z} inside paddock`).toBe(true);
+  it('every jump sits inside the south course arena', () => {
+    for (const j of RIDING_COURSE.jumps) {
+      expect(inCourseSection(j.x, j.z), `jump ${j.x},${j.z} inside course arena`).toBe(true);
     }
   });
 
-  it('every gate clears each paddock fence run by at least gateRadius', () => {
-    // Four full sides worth of runs (north split around the opening) must all be
-    // present so the clearance check is meaningful.
-    expect(paddockFences.length).toBeGreaterThanOrEqual(5);
-    for (const g of RIDING_COURSE.gates) {
-      for (const f of paddockFences) {
-        const d = distToSegment(g.x, g.z, f.x1, f.z1, f.x2, f.z2);
+  it('every jump clears each stable fence run (perimeter AND divider) by at least jumpRadius', () => {
+    // The 5 perimeter runs (north split around the opening) plus the 2 divider runs.
+    expect(stableFences.length).toBe(7);
+    for (const j of RIDING_COURSE.jumps) {
+      for (const f of stableFences) {
+        const d = distToSegment(j.x, j.z, f.x1, f.z1, f.x2, f.z2);
         expect(
           d,
-          `gate ${g.x},${g.z} vs fence ${f.x1},${f.z1}-${f.x2},${f.z2}`,
-        ).toBeGreaterThanOrEqual(RIDING_COURSE.gateRadius);
+          `jump ${j.x},${j.z} vs fence ${f.x1},${f.z1}-${f.x2},${f.z2}`,
+        ).toBeGreaterThanOrEqual(RIDING_COURSE.jumpRadius);
       }
     }
   });
 
-  it('a course-flag prop marks every gate (no drift from the data)', () => {
-    const flags = ZONE3_PROPS.courseFlags ?? [];
-    expect(flags).toHaveLength(RIDING_COURSE.gates.length);
-    for (const g of RIDING_COURSE.gates) {
-      expect(flags.some((fl) => fl.x === g.x && fl.z === g.z)).toBe(true);
+  it('each jump crossbar points radially out from the course centre', () => {
+    for (const j of RIDING_COURSE.jumps) {
+      const expected = Math.atan2(j.x - RIDING_COURSE.center.x, j.z - RIDING_COURSE.center.z);
+      expect(j.rot).toBeCloseTo(expected, 6);
     }
+  });
+
+  it('a jump prop marks every jump point with its rotation (no drift from the data)', () => {
+    const props = ZONE3_PROPS.courseJumps ?? [];
+    expect(props).toHaveLength(RIDING_COURSE.jumps.length);
+    for (const j of RIDING_COURSE.jumps) {
+      expect(props.some((p) => p.x === j.x && p.z === j.z && p.rot === j.rot)).toBe(true);
+    }
+  });
+
+  it('has a real divider fence split into two runs around the rider gap', () => {
+    const dividerRuns = stableFences.filter((f) => f.z1 === DIVIDER.z && f.z2 === DIVIDER.z);
+    expect(dividerRuns).toHaveLength(2);
+    // The two runs together cover the paddock width except the opening gap.
+    const west = dividerRuns.find((f) => f.x1 === PADDOCK.x1);
+    const east = dividerRuns.find((f) => f.x2 === PADDOCK.x2);
+    expect(west).toBeDefined();
+    expect(east).toBeDefined();
+    expect(west!.x2).toBe(DIVIDER.opening.x1);
+    expect(east!.x1).toBe(DIVIDER.opening.x2);
   });
 });
 
 describe('ambient stable horses', () => {
-  it('spawns exactly three, all inside the paddock', () => {
+  it('spawns exactly three, all in the north pasture (never in the course arena)', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
     const hs = horses(sim);
     expect(hs).toHaveLength(3);
-    for (const h of hs) expect(inPaddock(h.pos.x, h.pos.z)).toBe(true);
+    for (const h of hs) {
+      expect(inNorthSection(h.pos.x, h.pos.z), `horse spawn ${h.pos.x},${h.pos.z}`).toBe(true);
+      expect(inCourseSection(h.pos.x, h.pos.z)).toBe(false);
+    }
   });
 
-  it('stays non-hostile, idle, and inside the paddock over a long run, and wanders', () => {
+  it('stays non-hostile, idle, and in the north pasture over a long run, and wanders', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
     const hs = horses(sim);
     const spawns = hs.map((h) => ({ x: h.pos.x, z: h.pos.z }));
@@ -111,9 +136,15 @@ describe('ambient stable horses', () => {
         expect(h.inCombat, 'horse never in combat').toBe(false);
         expect(h.aiState, 'horse stays idle').toBe('idle');
         expect(h.dead, 'horse never dies').toBe(false);
-        expect(inPaddock(h.pos.x, h.pos.z), `horse ${i} in paddock at ${h.pos.x},${h.pos.z}`).toBe(
-          true,
-        );
+        // Never cross the divider south into the course arena.
+        expect(
+          h.pos.z,
+          `horse ${i} stays north of the divider at ${h.pos.x},${h.pos.z}`,
+        ).toBeGreaterThanOrEqual(DIVIDER.z);
+        expect(
+          inNorthSection(h.pos.x, h.pos.z),
+          `horse ${i} in pasture at ${h.pos.x},${h.pos.z}`,
+        ).toBe(true);
         maxDisplacement = Math.max(
           maxDisplacement,
           Math.hypot(h.pos.x - spawns[i].x, h.pos.z - spawns[i].z),

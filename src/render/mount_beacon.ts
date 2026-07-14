@@ -1,12 +1,12 @@
-// Riding-lesson next-gate beacon: a pulsing light pillar + ground ring the renderer
-// parks at the gate the player must ride to next, so the active gate is easy to find
-// on the flagged course. Cosmetic only: it is driven entirely from
-// IWorld.mountTrainingView() (phase 'ride' + nextGate) and conveys nothing the HUD
-// panel does not already show. It reads no governor/tier state.
+// Riding-lesson next-jump beacon: a pulsing light pillar + ground ring the renderer
+// parks at the jump the player must clear next, so the active jump is easy to find on
+// the timed course. Cosmetic only: it is driven entirely from
+// IWorld.mountTrainingView() (phase 'course' + nextJump) and conveys nothing the HUD
+// progress strip does not already show. It reads no governor/tier state.
 //
 // Reuses the yellow-orange summon-glow palette (vfx.mountSummonGlow) for visual
-// consistency with the mount summon. A gate-advance edge kicks a brief flash so a
-// cleared gate reads as progress; the whole thing hides the moment the view goes null.
+// consistency with the mount summon. A jump-advance edge kicks a brief flash so a
+// cleared jump reads as progress; the whole thing hides the moment the view goes null.
 
 import * as THREE from 'three';
 import type { MountTrainingView } from '../world_api';
@@ -23,7 +23,7 @@ export class MountBeacon {
   private readonly ringMat: THREE.MeshBasicMaterial;
   private readonly ring: THREE.Mesh;
   private lastSessionId = '';
-  private lastGate = -1;
+  private lastJump = -1;
   private flash = 0;
 
   constructor(
@@ -63,24 +63,24 @@ export class MountBeacon {
   }
 
   /** Per-frame update from the authoritative view. Positions the beacon at the next
-   *  gate while riding, pulses it, and hides it otherwise. `time` is the renderer's
-   *  shared clock (seconds); `dt` the frame delta. */
+   *  jump during the timed course, pulses it, and hides it otherwise. `time` is the
+   *  renderer's shared clock (seconds); `dt` the frame delta. */
   update(view: MountTrainingView | null, time: number, dt: number): void {
-    const gate = view && view.phase === 'ride' ? view.nextGate : null;
-    if (!view || !gate) {
+    const jump = view && view.phase === 'course' ? view.nextJump : null;
+    if (!view || !jump) {
       this.group.visible = false;
       this.lastSessionId = '';
-      this.lastGate = -1;
+      this.lastJump = -1;
       this.flash = 0;
       return;
     }
-    // Gate-advance edge (same session, higher gate index): kick a brief flash.
-    if (view.sessionId === this.lastSessionId && view.gate > this.lastGate) this.flash = 1;
+    // Jump-advance edge (same session, higher jump index): kick a brief flash.
+    if (view.sessionId === this.lastSessionId && view.jump > this.lastJump) this.flash = 1;
     this.lastSessionId = view.sessionId;
-    this.lastGate = view.gate;
+    this.lastJump = view.jump;
     this.flash = Math.max(0, this.flash - dt * 2.6);
 
-    this.group.position.set(gate.x, this.groundAt(gate.x, gate.z), gate.z);
+    this.group.position.set(jump.x, this.groundAt(jump.x, jump.z), jump.z);
     this.group.visible = true;
     // Continuous breathing pulse plus the fading advance flash.
     const pulse = 0.5 + 0.5 * Math.sin(time * 3.4);

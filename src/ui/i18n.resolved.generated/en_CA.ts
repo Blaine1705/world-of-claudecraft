@@ -450,15 +450,14 @@ export const en_CA: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "The Vale Cup",
@@ -8438,7 +8437,7 @@ export const en_CA: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Riding Lessons",
-        "text": "Every rider walks in on two legs, {playerName}, same as I told you the day we met. The sitting is what I teach, not what I sell. Climb into the saddle when I give the word, then ride the flagged course around my paddock, every gate in order. Lose the saddle or leave the yard and we start again.",
+        "text": "Every rider walks in on two legs, {playerName}, same as I told you the day we met. The sitting is what I teach, not what I sell. Climb into the saddle when I give the word, ride down into my course, and take every jump in order before the sand runs out of the glass. Lose the saddle or leave the yard and we start again.",
         "completion": "There, now. Not one grab at the fence rail the whole run through. The Valorsteed is yours, {playerName}: saddle, reins, and the standing of a rider who earned the seat instead of buying it.",
         "objectives": {
           "0": {

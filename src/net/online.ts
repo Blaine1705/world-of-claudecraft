@@ -56,6 +56,7 @@ import {
   type RiteIntensity,
   type SimEvent,
   type SportRole,
+  TICK_RATE,
   type VcBracket,
   type VcNationId,
 } from '../sim/types';
@@ -837,6 +838,10 @@ function copyPos(
 // graveyard release). Those are snapped, not interpolated — see applyWire.
 const TELEPORT_SNAP_DIST_SQ = 40 * 40;
 
+// The riding-lesson course countdown budget in sim ticks, derived from the shared
+// RIDING_COURSE data (the run-start event also carries the authoritative value).
+const COURSE_TIME_LIMIT_TICKS = Math.round(RIDING_COURSE.timeLimitSeconds * TICK_RATE);
+
 // Despawn grace (anti-flicker, entity-map churn). The server keeps known
 // entities in interest out to a drop radius (100yd players / 130yd npcs) that is
 // wider than the add radius, but a wandering entity riding that boundary — or a
@@ -1099,9 +1104,19 @@ export class ClientWorld implements IWorld {
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
-  // Riding-lesson (mount-training) minigame: rebuilt from the mountTrain*
-  // events (there is no snapshot field), the lockpickState precedent.
-  private mountTrainingMirror: MountTrainingView | null = null;
+  // Riding-lesson (mount-training) minigame: rebuilt from the mountTrain* events
+  // (there is no snapshot field), the lockpickState precedent. Internal shape carries
+  // a wall-clock deadline anchor (performance.now scale, render-interpolation timing
+  // only) captured at run-start so mountTrainingView() can count the timer down; the
+  // server stays authoritative on the actual timeout (its soft-reset event corrects us).
+  private mountTrainingMirror: {
+    sessionId: string;
+    phase: 'mount' | 'staging' | 'course';
+    jump: number;
+    jumpsTotal: number;
+    timeLimitTicks: number;
+    deadlineMs: number | null;
+  } | null = null;
   delveMarks = 0;
   companionUpgrades: Record<string, number> = {};
   // Flat per-craft skill tracking (#1126). NOT yet mirrored over the wire: this
@@ -2306,7 +2321,25 @@ export class ClientWorld implements IWorld {
   // no optimistic local nudge (unlike selectMount above). mountTrainingMirror
   // is rebuilt from the mountTrain* events by applyMountTrainingEvent. ---
   mountTrainingView(): MountTrainingView | null {
-    return this.mountTrainingMirror;
+    const s = this.mountTrainingMirror;
+    if (!s) return null;
+    const jumps = RIDING_COURSE.jumps;
+    const onCourse = s.phase === 'course';
+    const next = onCourse && s.jump < jumps.length ? jumps[s.jump] : null;
+    let ticksLeft: number | null = null;
+    if (onCourse && s.deadlineMs != null) {
+      const remMs = Math.max(0, s.deadlineMs - performance.now());
+      ticksLeft = Math.round((remMs / 1000) * TICK_RATE);
+    }
+    return {
+      sessionId: s.sessionId,
+      phase: s.phase,
+      jump: s.jump,
+      jumpsTotal: jumps.length,
+      nextJump: next ? { x: next.x, z: next.z } : null,
+      ticksLeft,
+      timeLimitTicks: s.timeLimitTicks,
+    };
   }
   mountTrainBegin(): void {
     this.cmd({ cmd: 'mount_train_begin' });
@@ -2752,32 +2785,37 @@ export class ClientWorld implements IWorld {
       if (this.lockpickState?.sessionId === ev.sessionId) this.lockpickState = null;
     }
   }
-  // Mirror the authoritative riding-lesson lifecycle into mountTrainingMirror.
-  // Gate positions never ride the wire: the client derives nextGate from the shared
-  // RIDING_COURSE content by the gate index. The events still flow to the HUD
+  // Mirror the authoritative riding-lesson lifecycle into mountTrainingMirror. Jump
+  // positions never ride the wire: mountTrainingView() derives nextJump from the shared
+  // RIDING_COURSE content by the jump index. The events still flow to the HUD
   // (drainEvents) for transient feedback.
   private applyMountTrainingEvent(ev: SimEvent): void {
-    const gates = RIDING_COURSE.gates;
-    const nextGate = (phase: 'mount' | 'ride', gate: number): { x: number; z: number } | null => {
-      const g = phase === 'ride' && gate < gates.length ? gates[gate] : null;
-      return g ? { x: g.x, z: g.z } : null;
-    };
+    const jumpsTotal = RIDING_COURSE.jumps.length;
     if (ev.type === 'mountTrainSession') {
-      // Opens phase 'mount', or (re-emitted) flips the session to 'ride'. Either way
-      // gate resets to 0: in 'ride' the next gate to clear is gates[0].
+      // phase 'mount' opens a fresh mirror; phase 'staging' (mount->staging, or a
+      // timed-out soft reset) stops the countdown and clears jump progress.
       this.mountTrainingMirror = {
         sessionId: ev.sessionId,
         phase: ev.phase,
-        gate: 0,
-        gatesTotal: gates.length,
-        nextGate: nextGate(ev.phase, 0),
+        jump: 0,
+        jumpsTotal,
+        timeLimitTicks: COURSE_TIME_LIMIT_TICKS,
+        deadlineMs: null,
       };
-    } else if (ev.type === 'mountTrainGate') {
+    } else if (ev.type === 'mountTrainRunStart') {
       const s = this.mountTrainingMirror;
       if (s && s.sessionId === ev.sessionId) {
-        s.gate = ev.gate;
-        s.gatesTotal = ev.gatesTotal;
-        s.nextGate = nextGate('ride', ev.gate);
+        s.phase = 'course';
+        s.jump = 0;
+        s.timeLimitTicks = ev.timeLimitTicks;
+        // Anchor the display countdown; the server's deadlineTick stays authoritative.
+        s.deadlineMs = performance.now() + (ev.timeLimitTicks / TICK_RATE) * 1000;
+      }
+    } else if (ev.type === 'mountTrainJump') {
+      const s = this.mountTrainingMirror;
+      if (s && s.sessionId === ev.sessionId) {
+        s.jump = ev.jump;
+        s.jumpsTotal = ev.jumpsTotal;
       }
     } else if (ev.type === 'mountTrainEnd') {
       if (this.mountTrainingMirror?.sessionId === ev.sessionId) this.mountTrainingMirror = null;

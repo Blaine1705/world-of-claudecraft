@@ -5,10 +5,12 @@ import type { MountTrainingView } from '../src/world_api';
 function view(overrides: Partial<MountTrainingView> = {}): MountTrainingView {
   return {
     sessionId: 's1',
-    phase: 'ride',
-    gate: 0,
-    gatesTotal: 8,
-    nextGate: { x: 91, z: 691 },
+    phase: 'course',
+    jump: 0,
+    jumpsTotal: 6,
+    nextJump: { x: 110, z: 683 },
+    ticksLeft: 900,
+    timeLimitTicks: 900,
     ...overrides,
   };
 }
@@ -19,51 +21,70 @@ describe('mountTrainingRenderModel', () => {
     expect(m.active).toBe(false);
     expect(m.phase).toBeNull();
     expect(m.progress).toBeNull();
+    expect(m.secondsLeft).toBeNull();
+    expect(m.timeFraction).toBeNull();
   });
 
   it('returns the SAME idle instance every time (allocation-light)', () => {
     expect(mountTrainingRenderModel(null)).toBe(mountTrainingRenderModel(null));
   });
 
-  it('maps a phase-mount view to an active model with no ride progress', () => {
-    const m = mountTrainingRenderModel(view({ phase: 'mount', gate: 0, nextGate: null }));
-    expect(m.active).toBe(true);
-    expect(m.phase).toBe('mount');
-    expect(m.progress).toBeNull();
+  it('maps phase mount/staging to an active model with no progress or countdown', () => {
+    for (const phase of ['mount', 'staging'] as const) {
+      const m = mountTrainingRenderModel(view({ phase, nextJump: null, ticksLeft: null }));
+      expect(m.active).toBe(true);
+      expect(m.phase).toBe(phase);
+      expect(m.progress).toBeNull();
+      expect(m.secondsLeft).toBeNull();
+      expect(m.timeFraction).toBeNull();
+    }
   });
 
-  it('maps a phase-ride view to progress "Gate n+1 of total"', () => {
-    expect(mountTrainingRenderModel(view({ gate: 0, gatesTotal: 8 })).progress).toEqual({
-      n: 1,
-      total: 8,
-    });
-    expect(mountTrainingRenderModel(view({ gate: 5, gatesTotal: 8 })).progress).toEqual({
-      n: 6,
-      total: 8,
-    });
+  it('maps phase course to "Jump n+1 of total" progress plus a countdown', () => {
+    const m = mountTrainingRenderModel(
+      view({ jump: 2, jumpsTotal: 6, ticksLeft: 450, timeLimitTicks: 900 }),
+    );
+    expect(m.progress).toEqual({ n: 3, total: 6 });
+    expect(m.secondsLeft).toBe(23); // ceil(450/20)
+    expect(m.timeFraction).toBeCloseTo(0.5, 6);
   });
 
-  it('drops progress once the last gate is cleared (gate === gatesTotal)', () => {
-    const m = mountTrainingRenderModel(view({ gate: 8, gatesTotal: 8, nextGate: null }));
+  it('reads secondsLeft as a ceil so it shows 1 until the timer truly hits 0', () => {
+    expect(mountTrainingRenderModel(view({ ticksLeft: 1 })).secondsLeft).toBe(1);
+    expect(mountTrainingRenderModel(view({ ticksLeft: 0 })).secondsLeft).toBe(0);
+    expect(mountTrainingRenderModel(view({ ticksLeft: 20 })).secondsLeft).toBe(1);
+    expect(mountTrainingRenderModel(view({ ticksLeft: 21 })).secondsLeft).toBe(2);
+  });
+
+  it('drops progress once the last jump is cleared (jump === jumpsTotal)', () => {
+    const m = mountTrainingRenderModel(view({ jump: 6, jumpsTotal: 6, nextJump: null }));
     expect(m.active).toBe(true);
-    expect(m.phase).toBe('ride');
+    expect(m.phase).toBe('course');
     expect(m.progress).toBeNull();
   });
 
   it('is a pure projection: identical input yields identical structure', () => {
-    const a = mountTrainingRenderModel(view({ gate: 3 }));
-    const b = mountTrainingRenderModel(view({ gate: 3 }));
+    const a = mountTrainingRenderModel(view({ jump: 3, ticksLeft: 300 }));
+    const b = mountTrainingRenderModel(view({ jump: 3, ticksLeft: 300 }));
     expect(a).toEqual(b);
   });
 });
 
 describe('mountTrainingRenderSig', () => {
-  it('changes when any painted dependency changes', () => {
+  it('changes when the session, phase, jump, total, or whole-second bucket changes', () => {
     const base = mountTrainingRenderSig(view());
-    expect(mountTrainingRenderSig(view({ phase: 'mount' }))).not.toBe(base);
-    expect(mountTrainingRenderSig(view({ gate: 2 }))).not.toBe(base);
-    expect(mountTrainingRenderSig(view({ gatesTotal: 6 }))).not.toBe(base);
     expect(mountTrainingRenderSig(view({ sessionId: 's2' }))).not.toBe(base);
+    expect(mountTrainingRenderSig(view({ phase: 'staging' }))).not.toBe(base);
+    expect(mountTrainingRenderSig(view({ jump: 1 }))).not.toBe(base);
+    expect(mountTrainingRenderSig(view({ jumpsTotal: 8 }))).not.toBe(base);
+    expect(mountTrainingRenderSig(view({ ticksLeft: 880 }))).not.toBe(base); // crosses a second
+  });
+
+  it('buckets the countdown to whole seconds (sub-second drift does not repaint)', () => {
+    // 900 and 890 ticks both ceil to 45 s -> same bucket -> same sig.
+    expect(mountTrainingRenderSig(view({ ticksLeft: 900 }))).toBe(
+      mountTrainingRenderSig(view({ ticksLeft: 890 })),
+    );
   });
 
   it('stays identical for identical state (same-input-same-output)', () => {

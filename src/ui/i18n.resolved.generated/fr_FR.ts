@@ -450,15 +450,14 @@ export const fr_FR: EnTranslations = {
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "La Coupe du Val",
@@ -8438,7 +8437,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Leçons d’équitation",
-        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Monte en selle quand j’en donne l’ordre, puis parcours le tracé balisé autour de mon pré, chaque porte dans l’ordre. Perds la selle ou quitte l’enclos, et l’on recommence.",
+        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Monte en selle quand j’en donne l’ordre, descends sur mon parcours et franchis chaque obstacle dans l’ordre avant que le sable ne s’écoule du verre. Perds la selle ou quitte l’enclos, et l’on recommence.",
         "completion": "Voilà. Pas une seule fois agrippé à la barrière, du début à la fin. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.",
         "objectives": {
           "0": {

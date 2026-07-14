@@ -311,7 +311,7 @@ import {
 } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_picker';
-import { MountTrainingWindow } from './mount_training_window';
+import { MountTrainingStrip } from './mount_training_strip';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -1170,17 +1170,16 @@ export class Hud {
     onAbort: () => this.submitLockpickAbort(),
     onClose: () => this.closeLockpick(),
   });
-  private mountTrainTrap: FocusTrapHandle | null = null;
-  private mountTrainKeyHandler: ((e: KeyboardEvent) => void) | null = null;
-  // Stablemaster Marla's "Riding Lessons" minigame: paints from the
-  // authoritative world.mountTrainingView() (never a cached copy), the same
-  // split as the lockpick board above. hud.ts keeps only session routing, focus
-  // restore, and keybinds.
-  private readonly mountTrainWindow = new MountTrainingWindow({
+  // Stablemaster Marla's "Riding Lessons" minigame: a slim, non-interactive bottom
+  // strip painted from the authoritative world.mountTrainingView() (never a cached
+  // copy). hud.ts keeps only the session routing, the transient toasts, and show/hide.
+  private readonly mountTrainStrip = new MountTrainingStrip({
     getState: () => this.sim.mountTrainingView(),
-    onAbort: () => this.submitMountTrainAbort(),
     mountKeyLabel: () => this.keybinds.primaryLabel('mount'),
   });
+  // Last phase seen for a live lesson, so the "press to dismount" toast fires only on
+  // the mount -> staging transition (not on a timed-out course -> staging soft reset).
+  private mountTrainPhase: 'mount' | 'staging' | 'course' | null = null;
   // Drowned Reliquary Rite difficulty popup. Opened on the delveRiteChoosePrompt
   // cue (approaching the risen reliquary), closed once playback starts.
   private riteTrap: FocusTrapHandle | null = null;
@@ -1607,7 +1606,6 @@ export class Hud {
       '#delve-board',
       '#lockpick-panel',
       '#delve-rite-panel',
-      '#mount-training-panel',
       '#map-window',
       '#bank-window',
       '#bags',
@@ -6541,7 +6539,7 @@ export class Hud {
     }
     this.meters.update();
     this.lockpickWindow.repaintIfChanged();
-    this.mountTrainWindow.repaintIfChanged();
+    this.mountTrainStrip.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
     this.reconcileLootRollStatus(now);
@@ -7648,11 +7646,12 @@ export class Hud {
   }
 
   // ---------------------------------------------------------------------------
-  // "Riding Lessons": Stablemaster Marla's story riding-lesson minigame. Begin
-  // Lesson (her gossip dialog) starts a server-authoritative ridden course: mount a
-  // training Valorsteed with the Mount/Dismount keybind, then ride the flagged gates
-  // in order. Driven by the mountTrainSession/Gate/End events, mirroring the lockpick
-  // minigame above. Player text renders through the hudChrome.mountTraining.* t() keys.
+  // "Riding Lessons": Stablemaster Marla's timed show-jumping minigame. Begin Lesson
+  // (her gossip dialog, gated on the quest being accepted) starts a server-authoritative
+  // course: mount a training Valorsteed with the Mount/Dismount keybind, ride into the
+  // course arena to arm a countdown, then jump the obstacles in order. Driven by the
+  // mountTrainSession/RunStart/Jump/End events; the guidance is a bottom progress strip
+  // plus two transient toasts. Player text renders through hudChrome.mountTraining.*.
   // ---------------------------------------------------------------------------
 
   private beginMountTraining(): void {
@@ -7660,22 +7659,37 @@ export class Hud {
     this.flushMountTrainEvents();
   }
 
-  // A mountTrainSession event means the authoritative lesson is live in
-  // world.mountTrainingView(); show the panel and let the window paint from it. The
-  // event also re-fires when the phase flips to 'ride', which just repaints in place.
+  private mountKey(): string {
+    // The live Mount/Dismount binding label (a physical keycap, shown verbatim), or
+    // the default 'Z' when unbound.
+    return this.keybinds.primaryLabel('mount') || 'Z';
+  }
+
+  // A mountTrainSession event announces a phase change. 'mount' (a fresh attempt)
+  // shows the strip and toasts the mount hint; 'staging' reached FROM mount (the
+  // player just climbed aboard) toasts the dismount hint. A timed-out course -> staging
+  // soft reset (the sim posts its own "too slow" notice) fires no toast.
+  private onMountTrainSession(phase: 'mount' | 'staging'): void {
+    if (phase === 'mount') {
+      this.openMountTraining();
+      this.showBanner(t('hudChrome.mountTraining.mountPrompt', { key: this.mountKey() }));
+    } else if (phase === 'staging' && this.mountTrainPhase === 'mount') {
+      this.showBanner(t('hudChrome.mountTraining.dismountPrompt', { key: this.mountKey() }));
+    }
+    this.mountTrainPhase = phase;
+    this.mountTrainStrip.repaintIfChanged();
+  }
+
+  // Show the bottom-anchored, non-interactive progress strip; the painter paints from
+  // world.mountTrainingView().
   private openMountTraining(): void {
-    const el = $('#mount-training-panel');
-    if (el.style.display !== 'block')
-      this.mountTrainTrap = this.focusManager.open({ root: () => $('#mount-training-panel') });
-    el.style.display = 'block';
-    this.bindMountTrainKeys();
-    this.mountTrainWindow.open();
-    this.mountTrainTrap?.focusFirst('.mt-giveup');
+    $('#mount-training-strip').style.display = 'flex';
+    this.mountTrainStrip.show();
   }
 
   private endMountTraining(outcome: 'success' | 'thrown' | 'abandoned'): void {
-    // Abandoning is always the player's own Give Up / close click: they already
-    // know they stopped, so (like a dropped party invite) it gets no banner.
+    // Abandoning is the player's own dismount / leaving (the sim posts its own
+    // notice), so it gets no banner; success and a throw get a banner + log line.
     if (outcome !== 'abandoned') {
       const summary =
         outcome === 'success'
@@ -7687,22 +7701,9 @@ export class Hud {
     this.closeMountTraining();
   }
 
-  private bindMountTrainKeys(): void {
-    if (this.mountTrainKeyHandler) return;
-    const handler = (e: KeyboardEvent): void => {
-      if ($('#mount-training-panel').style.display !== 'block') return;
-      if (e.key !== 'Escape') return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      this.submitMountTrainAbort();
-    };
-    this.mountTrainKeyHandler = handler;
-    window.addEventListener('keydown', handler, true); // capture: beats game input
-  }
-
-  /** Offline sim queues its events until the 20 Hz tick; flush them now so the
-   * session open / phase flip reacts immediately. Online has no drainEvents and
-   * reacts to the normal event stream instead. */
+  /** Offline sim queues its events until the 20 Hz tick; flush them now so the strip
+   * and toasts react immediately. Online has no drainEvents and reacts to the normal
+   * event stream instead. */
   flushMountTrainEvents(): void {
     const drain = (this.sim as { drainEvents?: () => SimEvent[] }).drainEvents;
     if (!drain) return;
@@ -7710,21 +7711,10 @@ export class Hud {
     if (events.length > 0) this.handleEvents(events);
   }
 
-  submitMountTrainAbort(): void {
-    this.sim.mountTrainAbort();
-    this.flushMountTrainEvents();
-  }
-
-  private closeMountTraining(restoreFocus = true): void {
-    $('#mount-training-panel').style.display = 'none';
-    this.mountTrainWindow.close();
-    this.hideTooltip();
-    if (this.mountTrainKeyHandler) {
-      window.removeEventListener('keydown', this.mountTrainKeyHandler, true);
-      this.mountTrainKeyHandler = null;
-    }
-    this.mountTrainTrap?.release(restoreFocus);
-    this.mountTrainTrap = null;
+  private closeMountTraining(): void {
+    $('#mount-training-strip').style.display = 'none';
+    this.mountTrainStrip.hide();
+    this.mountTrainPhase = null;
   }
 
   // Drowned Reliquary Rite: the difficulty popup opens when a player interacts
@@ -9533,10 +9523,14 @@ export class Hud {
           break;
         }
         case 'mountTrainSession':
-          this.openMountTraining();
+          this.onMountTrainSession(ev.phase);
           break;
-        case 'mountTrainGate':
-          this.mountTrainWindow.onGate();
+        case 'mountTrainRunStart':
+          this.mountTrainPhase = 'course';
+          this.mountTrainStrip.repaintIfChanged();
+          break;
+        case 'mountTrainJump':
+          this.mountTrainStrip.repaintIfChanged();
           break;
         case 'mountTrainEnd':
           this.endMountTraining(ev.outcome);
@@ -10706,10 +10700,14 @@ export class Hud {
     if (npc.templateId === 'groundskeeper_bram') {
       html += `<button type="button" class="qd-list-item" data-vcup="1" aria-label="${esc(t('hudChrome.vcup.gossipOpenAria'))}"><span class="gold">${svgIcon('ball')}</span> ${esc(t('hudChrome.vcup.gossipOpen'))}</button>`;
     }
-    // Stablemaster Marla's story riding lesson ("Riding Lessons"): her gossip
-    // menu offers a Begin Lesson action alongside her stable goods (same
-    // templateId-keyed precedent as Bram's Vale Cup button above).
-    if (npc.templateId === 'stablemaster_marla') {
+    // Stablemaster Marla's story riding lesson ("Riding Lessons"): her gossip menu
+    // offers a Begin Lesson action, but only once the player has ACCEPTED
+    // q_riding_lessons and not yet completed its objective (state 'active'). The Sim
+    // re-gates on begin regardless (defense in depth); this just hides a dead button.
+    if (
+      npc.templateId === 'stablemaster_marla' &&
+      this.sim.questState('q_riding_lessons') === 'active'
+    ) {
       html += `<button type="button" class="qd-list-item" data-mount-training="1" aria-label="${esc(t('hudChrome.mountTraining.begin'))}"><span class="gold">${svgIcon('mount')}</span> ${esc(t('hudChrome.mountTraining.begin'))}</button>`;
     }
     el.innerHTML = html;

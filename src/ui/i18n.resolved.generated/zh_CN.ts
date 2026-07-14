@@ -450,15 +450,14 @@ export const zh_CN: EnTranslations = {
       "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。"
     },
     "mountTraining": {
-      "title": "骑乘课",
-      "mountPrompt": "上马吧：按 {key} 键骑上训练用英勇战马。",
-      "ridePrompt": "沿着插旗的赛道骑行，按顺序穿过每一道门。",
-      "progress": "第 {n} 道门，共 {total} 道",
+      "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
+      "dismountPrompt": "再次按 {key} 键下马。",
+      "stagingPrompt": "骑入赛道场地即可开始计时。",
+      "progress": "第 {n} 个障碍，共 {total} 个",
+      "timeLeft": "{seconds}s",
       "begin": "开始课程",
-      "abort": "Give Up",
       "thrown": "你被甩下马了。稳住，再试一次。",
-      "success": "你已经驯服了英勇战马。",
-      "close": "关闭"
+      "success": "你已经驯服了英勇战马。"
     },
     "vcup": {
       "title": "溪谷杯",

@@ -6580,14 +6580,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyDropHint':
     'より希少なマウントはダンジョンやレイドのボスがドロップします。',
   'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
-  'hudChrome.mountTraining.title': '乗馬レッスン',
-  'hudChrome.mountTraining.mountPrompt':
-    '乗り込もう: {key} キーを押して訓練用ヴァロースティードに騎乗する。',
-  'hudChrome.mountTraining.ridePrompt':
-    '旗の立てられたコースを、すべてのゲートを順番に走り抜けよう。',
-  'hudChrome.mountTraining.progress': '{total} 門中 {n} 門目',
+  'hudChrome.mountTraining.mountPrompt': '{key} キーを押して訓練用ヴァロースティードに騎乗する。',
+  'hudChrome.mountTraining.dismountPrompt': 'もう一度 {key} キーを押して降りる。',
+  'hudChrome.mountTraining.stagingPrompt': 'コースの馬場に乗り入れてタイマーを開始しよう。',
+  'hudChrome.mountTraining.progress': '{total} 障害中 {n} 番目',
   'hudChrome.mountTraining.begin': 'レッスン開始',
   'hudChrome.mountTraining.thrown': '振り落とされた。落ち着いてもう一度挑戦しよう。',
   'hudChrome.mountTraining.success': 'ヴァロースティードを乗りこなした。',
-  'hudChrome.mountTraining.close': '閉じる',
 };

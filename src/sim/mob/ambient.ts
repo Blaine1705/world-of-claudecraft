@@ -19,7 +19,7 @@
 // Ambient mobs also spawn RNG-free (Sim's camp loop, gated on template.ambient).
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now (tests/architecture.test.ts).
 
-import { STABLE_PADDOCK } from '../content/mounts';
+import { STABLE_PASTURE } from '../content/mounts';
 import { MOBS } from '../data';
 import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
@@ -28,9 +28,6 @@ import { DT, type Entity } from '../types';
 
 /** Max wander radius (world units) around a horse's spawn point. */
 const WANDER_RADIUS = 8;
-/** Keep a wander target this far inside the fence line (rough body clearance) so
- *  a horse never noses through a rail. */
-const PADDOCK_INSET = 1.5;
 /** Slow amble: the same fraction of moveSpeed the idle-wander path uses. */
 const WANDER_SPEED_MULT = 0.35;
 
@@ -41,26 +38,21 @@ export function isAmbientMob(mob: Entity): boolean {
 }
 
 /** A fresh deterministic sub-stream for THIS mob on THIS tick, reproducible from
- *  the sim clock + the mob's stable id alone (the mounts_training precedent), so
- *  the wander never touches the shared ctx.rng and perturbs no golden/seed test. */
+ *  the sim clock + the mob's stable id alone, so the wander never touches the shared
+ *  ctx.rng and perturbs no golden/seed test. */
 function ambientRng(ctx: SimContext, mob: Entity): Rng {
   const seed = (((ctx.tickCount * 0x9e3779b1) >>> 0) ^ ((mob.id * 0x85ebca6b) >>> 0)) >>> 0;
   return new Rng(seed);
 }
 
-/** Clamp a point into the paddock interior (inset for body clearance). The
- *  paddock is convex, so moving toward an in-bounds target from an in-bounds
- *  position keeps the horse in-bounds every step. */
-function clampToPaddock(x: number, z: number): { x: number; z: number } {
+/** Clamp a point into the north pasture (STABLE_PASTURE, already inset for body
+ *  clearance and kept NORTH of the divider so a horse can never cross into the
+ *  course arena). The pasture is convex, so moving toward an in-bounds target from an
+ *  in-bounds position keeps the horse in-bounds every step. */
+function clampToPasture(x: number, z: number): { x: number; z: number } {
   return {
-    x: Math.min(
-      STABLE_PADDOCK.xMax - PADDOCK_INSET,
-      Math.max(STABLE_PADDOCK.xMin + PADDOCK_INSET, x),
-    ),
-    z: Math.min(
-      STABLE_PADDOCK.zMax - PADDOCK_INSET,
-      Math.max(STABLE_PADDOCK.zMin + PADDOCK_INSET, z),
-    ),
+    x: Math.min(STABLE_PASTURE.xMax, Math.max(STABLE_PASTURE.xMin, x)),
+    z: Math.min(STABLE_PASTURE.zMax, Math.max(STABLE_PASTURE.zMin, z)),
   };
 }
 
@@ -87,7 +79,7 @@ export function updateAmbientMob(ctx: SimContext, mob: Entity): void {
     } else {
       const ang = rng.range(0, Math.PI * 2);
       const r = rng.range(2, WANDER_RADIUS);
-      const t = clampToPaddock(
+      const t = clampToPasture(
         mob.spawnPos.x + Math.sin(ang) * r,
         mob.spawnPos.z + Math.cos(ang) * r,
       );

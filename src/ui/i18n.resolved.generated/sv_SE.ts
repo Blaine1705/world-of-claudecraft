@@ -450,15 +450,14 @@ export const sv_SE: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "Dalcupen",
@@ -8438,7 +8437,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Ridlektioner",
-        "text": "Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer. Kliv upp i sadeln när jag ger tecken, och rid sedan den flaggade banan runt min hage, genom varje grind i tur och ordning. Tappar du sadeln eller lämnar inhägnaden börjar vi om.",
+        "text": "Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer. Kliv upp i sadeln när jag ger tecken, rid ner på min bana och ta varje hinder i tur och ordning innan sanden runnit ut ur glaset. Tappar du sadeln eller lämnar inhägnaden börjar vi om.",
         "completion": "Så där ja. Inte en enda gång tog du tag i stängslet under hela ridturen. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.",
         "objectives": {
           "0": {

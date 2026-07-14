@@ -6712,14 +6712,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
   'hudChrome.mounts.emptyDropHint': 'Более редких скакунов выбивают боссы подземелий и рейдов.',
   'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
-  'hudChrome.mountTraining.title': 'Урок верховой езды',
   'hudChrome.mountTraining.mountPrompt':
-    'Садись в седло: нажми {key}, чтобы оседлать учебного Доблестного скакуна.',
-  'hudChrome.mountTraining.ridePrompt':
-    'Проезжай размеченную флажками трассу, через все ворота по порядку.',
-  'hudChrome.mountTraining.progress': 'Ворота {n} из {total}',
+    'Нажми {key}, чтобы оседлать учебного Доблестного скакуна.',
+  'hudChrome.mountTraining.dismountPrompt': 'Нажми {key} ещё раз, чтобы спешиться.',
+  'hudChrome.mountTraining.stagingPrompt': 'Заезжай на арену трассы, чтобы запустить таймер.',
+  'hudChrome.mountTraining.progress': 'Барьер {n} из {total}',
   'hudChrome.mountTraining.begin': 'Начать урок',
   'hudChrome.mountTraining.thrown': 'Тебя сбросили. Успокойся и попробуй снова.',
   'hudChrome.mountTraining.success': 'Ты приручил Доблестного скакуна.',
-  'hudChrome.mountTraining.close': 'Закрыть',
 };

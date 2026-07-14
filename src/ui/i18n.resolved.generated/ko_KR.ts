@@ -450,15 +450,14 @@ export const ko_KR: EnTranslations = {
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다."
     },
     "mountTraining": {
-      "title": "승마 수업",
-      "mountPrompt": "올라타자: {key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
-      "ridePrompt": "깃발이 세워진 코스를 모든 관문을 순서대로 통과하며 달려라.",
-      "progress": "{total} 관문 중 {n} 관문",
+      "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
+      "dismountPrompt": "{key} 키를 다시 눌러 내린다.",
+      "stagingPrompt": "코스 경기장으로 들어가 타이머를 시작하라.",
+      "progress": "{total} 장애물 중 {n} 번째",
+      "timeLeft": "{seconds}s",
       "begin": "수업 시작",
-      "abort": "Give Up",
       "thrown": "낙마했다. 침착하게 다시 시도하라.",
-      "success": "발러스티드를 길들였다.",
-      "close": "닫기"
+      "success": "발러스티드를 길들였다."
     },
     "vcup": {
       "title": "베일 컵",

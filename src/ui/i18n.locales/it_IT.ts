@@ -3560,7 +3560,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ogni cavaliere arriva sulle proprie gambe, {className}. Non ti darò le redini finché non saprai restare in sella al Destriero del Valore senza baciare il fango, e a Highwatch non abbondano i guaritori per le ossa rotte.',
   'entities.quests.q_riding_lessons.title': 'Lezioni di equitazione',
   'entities.quests.q_riding_lessons.text':
-    'Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Sali in sella quando te lo dico, poi percorri il tracciato segnalato attorno al mio maneggio, attraversando ogni cancello in ordine. Perdi la sella o esci dal recinto, e si ricomincia.',
+    'Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Sali in sella quando te lo dico, scendi nel mio percorso e affronta ogni ostacolo in ordine prima che la sabbia scenda tutta nella clessidra. Perdi la sella o esci dal recinto, e si ricomincia.',
   'entities.quests.q_riding_lessons.completion':
     'Ecco, così. Non ti sei aggrappato alla staccionata nemmeno una volta, per tutto il giro. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Doma il Destriero del Valore',

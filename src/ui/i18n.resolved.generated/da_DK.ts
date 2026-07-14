@@ -450,15 +450,14 @@ export const da_DK: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "Dalpokalen",
@@ -8438,7 +8437,7 @@ export const da_DK: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Ridelektioner",
-        "text": "Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger. Kravl op i sadlen, når jeg giver ordet, og rid så den afmærkede bane rundt om min fold, gennem hver port i rækkefølge. Mister du sadlen eller forlader indhegningen, starter vi forfra.",
+        "text": "Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger. Kravl op i sadlen, når jeg giver ordet, rid ned i min bane, og tag hvert spring i rækkefølge, før sandet løber ud af timeglasset. Mister du sadlen eller forlader indhegningen, starter vi forfra.",
         "completion": "Sådan, ja. Ikke én eneste gang greb du fat i hegnet hele vejen igennem. Valorsteed er din, {playerName}: sadel, tøjler og ry som en rytter, der har fortjent sædet i stedet for at købe det.",
         "objectives": {
           "0": {

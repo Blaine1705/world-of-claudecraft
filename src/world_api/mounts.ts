@@ -20,10 +20,10 @@ export interface IWorldMounts {
   toggleMounted(): void;
   /** The riding-lesson (mount-training) minigame gating reins_valorsteed's
    *  q_riding_lessons quest reward: mount a training Valorsteed at the stablemaster
-   *  (the Mount/Dismount keybind tutorial), then ride one lap through the flagged
-   *  gates in order. Server-authoritative; rules live in src/sim/mounts_training.ts.
-   *  Rebuilt client-side from the mountTrain* events (no snapshot field), the
-   *  lockpickState precedent. */
+   *  (the Mount/Dismount keybind tutorial), then ride into the course arena to arm the
+   *  timer and jump the obstacles in order before it expires. Server-authoritative;
+   *  rules live in src/sim/mounts_training.ts. Rebuilt client-side from the mountTrain*
+   *  events (no snapshot field), the lockpickState precedent. */
   mountTrainingView(): MountTrainingView | null;
   /** Start a lesson attempt (charges the one-time 100g fee on first success). */
   mountTrainBegin(): void;
@@ -36,15 +36,19 @@ export interface IWorldMounts {
   mountTrainAbort(): void;
 }
 
-// Render-safe projection of an active riding-lesson attempt. phase 'mount' means the
-// player has yet to summon the training steed (nextGate null); phase 'ride' exposes
-// the gated course: `gate` gates cleared so far (0-based next-gate index),
-// `gatesTotal` the full lap, and `nextGate` the world position of the gate to ride to
-// (null once the last gate is cleared).
+// Render-safe projection of an active riding-lesson attempt. phase 'mount' = the
+// player has yet to summon the training steed; 'staging' = mounted, awaiting entry
+// into the course arena (timer not running); 'course' = the timed run. `jump` is
+// jumps cleared so far (0-based next-jump index), `jumpsTotal` the whole course, and
+// `nextJump` the world position of the jump to clear (null outside 'course' and once
+// the last jump is cleared). `ticksLeft` is the countdown remaining in sim ticks
+// (null outside 'course'); `timeLimitTicks` is the full budget (for a bar fill).
 export interface MountTrainingView {
   sessionId: string;
-  phase: 'mount' | 'ride';
-  gate: number;
-  gatesTotal: number;
-  nextGate: { x: number; z: number } | null;
+  phase: 'mount' | 'staging' | 'course';
+  jump: number;
+  jumpsTotal: number;
+  nextJump: { x: number; z: number } | null;
+  ticksLeft: number | null;
+  timeLimitTicks: number;
 }

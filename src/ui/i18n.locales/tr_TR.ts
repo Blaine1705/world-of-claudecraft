@@ -2552,7 +2552,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Her binici buraya iki ayağıyla gelir, {className}. Çamura yüz üstü düşmeden Valorsteed'e oturana dek dizginleri sana vermem, çünkü Highwatch'ta kırık kemiklere bakacak fazladan şifacı yok.",
   'entities.quests.q_riding_lessons.title': 'Binicilik Dersleri',
   'entities.quests.q_riding_lessons.text':
-    'Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. İşaret verdiğimde eyere çık, sonra padoğumun etrafındaki bayraklı parkuru sürüp her kapıdan sırayla geç. Eyeri kaybedersen ya da avludan çıkarsan baştan başlarız.',
+    'Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. İşaret verdiğimde eyere çık, parkuruma in ve kum saatindeki kum bitmeden her engeli sırayla aş. Eyeri kaybedersen ya da avludan çıkarsan baştan başlarız.',
   'entities.quests.q_riding_lessons.completion':
     'İşte böyle. Bütün tur boyunca bir kere bile çite tutunmadın. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.',
   'entities.quests.q_riding_lessons.objectives.0.label': "Valorsteed'i evcilleştir",

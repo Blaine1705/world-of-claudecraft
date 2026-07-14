@@ -450,15 +450,14 @@ export const es_ES: EnTranslations = {
       "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "La Copa del Valle",
@@ -8438,7 +8437,7 @@ export const es_ES: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lecciones de equitación",
-        "text": "Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo. Sube a la silla cuando te dé la orden, y luego recorre el trazado señalado alrededor de mi picadero, cruzando cada puerta en orden. Pierde la silla o sal del cercado y empezamos de nuevo.",
+        "text": "Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo. Sube a la silla cuando te dé la orden, baja al recorrido y salta cada obstáculo en orden antes de que se agote la arena del reloj. Pierde la silla o sal del cercado y empezamos de nuevo.",
         "completion": "Así, muy bien. Ni una sola vez te agarraste a la cerca en toda la vuelta. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.",
         "objectives": {
           "0": {

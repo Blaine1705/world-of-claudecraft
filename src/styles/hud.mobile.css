@@ -470,6 +470,12 @@
      re-tuned per layout tier (see the tiers section); --btn-scale
      (actionButtonScale) and --touch-opacity (touchOpacity) are reused
      directly, not forked. */
+  /* The riding-lesson progress strip sits higher on touch so it clears the mobile
+     controls at the bottom of the screen (the desktop 150px anchor would overlap the
+     action ring). Still bottom-anchored and pointer-events none. */
+  body.mobile-touch #mount-training-strip {
+    bottom: 26vh;
+  }
   body.mobile-touch #mobile-action-ring {
     /* Chrome-scale folded into every ring size var (the arc offsets below are
        expressed in these vars, so the whole cluster shrinks proportionally and keeps

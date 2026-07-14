@@ -3547,7 +3547,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Cada cavaleiro chega a pé, {className}. Só entrego as rédeas quando você conseguir montar o Corcel do Valor sem beijar a lama, e Highwatch não tem curandeiros de sobra para ossos quebrados.',
   'entities.quests.q_riding_lessons.title': 'Aulas de Equitação',
   'entities.quests.q_riding_lessons.text':
-    'Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo. Suba na sela quando eu der o sinal, e então percorra o trajeto sinalizado ao redor do meu picadeiro, passando por cada portão em ordem. Perca a sela ou saia do cercado e começamos de novo.',
+    'Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo. Suba na sela quando eu der o sinal, desça até o meu percurso e salte cada obstáculo em ordem antes que a areia se esgote na ampulheta. Perca a sela ou saia do cercado e começamos de novo.',
   'entities.quests.q_riding_lessons.completion':
     'Pronto, assim mesmo. Nem uma vez você se segurou na cerca durante toda a volta. O Corcel do Valor é seu, {playerName}: sela, rédeas, e a reputação de um cavaleiro que conquistou o assento em vez de comprá-lo.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Domar o Corcel do Valor',

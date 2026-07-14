@@ -450,15 +450,14 @@ export const vi_VN: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "Cúp Thung Lũng",
@@ -8438,7 +8437,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Bài Học Cưỡi Ngựa",
-        "text": "Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán. Leo lên yên khi ta ra hiệu, rồi phi theo đường đua cắm cờ quanh bãi quây của ta, qua từng cổng theo thứ tự. Rời khỏi yên hoặc ra khỏi khoảnh sân thì ta bắt đầu lại từ đầu.",
+        "text": "Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán. Leo lên yên khi ta ra hiệu, phi xuống đường đua của ta, và vượt từng chướng ngại theo thứ tự trước khi cát trong đồng hồ cạn. Rời khỏi yên hoặc ra khỏi khoảnh sân thì ta bắt đầu lại từ đầu.",
         "completion": "Đấy, được rồi. Suốt cả vòng chạy, ngươi chẳng một lần bám vào hàng rào. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.",
         "objectives": {
           "0": {

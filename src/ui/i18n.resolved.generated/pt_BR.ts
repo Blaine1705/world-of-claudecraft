@@ -450,15 +450,14 @@ export const pt_BR: EnTranslations = {
       "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "A Copa do Vale",
@@ -8438,7 +8437,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Aulas de Equitação",
-        "text": "Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo. Suba na sela quando eu der o sinal, e então percorra o trajeto sinalizado ao redor do meu picadeiro, passando por cada portão em ordem. Perca a sela ou saia do cercado e começamos de novo.",
+        "text": "Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo. Suba na sela quando eu der o sinal, desça até o meu percurso e salte cada obstáculo em ordem antes que a areia se esgote na ampulheta. Perca a sela ou saia do cercado e começamos de novo.",
         "completion": "Pronto, assim mesmo. Nem uma vez você se segurou na cerca durante toda a volta. O Corcel do Valor é seu, {playerName}: sela, rédeas, e a reputação de um cavaleiro que conquistou o assento em vez de comprá-lo.",
         "objectives": {
           "0": {

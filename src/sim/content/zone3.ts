@@ -13,7 +13,7 @@ import type {
   ZoneDef,
   ZonePropsDef,
 } from '../types';
-import { RIDING_COURSE, STABLE_HORSE_TEMPLATE_ID, STABLE_PADDOCK } from './mounts';
+import { RIDING_COURSE, STABLE_HORSE_TEMPLATE_ID } from './mounts';
 
 export const ZONE3_ZONE: ZoneDef = {
   id: 'thornpeak_heights',
@@ -36,7 +36,7 @@ export const ZONE3_ZONE: ZoneDef = {
     { x: 55, z: 820, label: 'Wyrmcult Tents' },
     { x: -40, z: 830, label: 'Revenant Fields' },
     { x: 0, z: 880, label: 'Gravewyrm Sanctum' },
-    { x: 100, z: 686, label: 'Highwatch Stables' },
+    { x: 102, z: 690, label: 'Highwatch Stables' },
   ],
   welcome: 'Captain Thessaly holds the wall at Highwatch — barely.',
 };
@@ -66,9 +66,9 @@ export const ZONE3_ROADS: { x: number; z: number }[][] = [
   ], // -> Sanctum Approach
   [
     { x: 70, z: 720 },
-    { x: 82, z: 708 },
-    { x: 90, z: 700 },
-  ], // Stormcrag road -> Highwatch Stables (Marla's gate)
+    { x: 79, z: 714 },
+    { x: 91, z: 709 },
+  ], // Stormcrag road -> Highwatch Stables (Marla's yard)
 ];
 
 // ---------------------------------------------------------------------------
@@ -1189,14 +1189,13 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
   },
   // Relocated from Eastbrook Vale (zone 1): Marla moved her stable up to
   // Highwatch, where the mountain roads finally justified teaching riding
-  // lessons instead of just selling reins over a fence. Stands at the paddock
-  // opening of the Highwatch Stables, on the open ground west of Highwatch,
-  // facing the yard (STABLE_PADDOCK, content/mounts.ts).
+  // lessons instead of just selling reins over a fence. Stands in the yard just
+  // north of the paddock opening, facing the yard (RIDING_COURSE, content/mounts.ts).
   stablemaster_marla: {
     id: 'stablemaster_marla',
     name: 'Marla Hitchen',
     title: 'Stablemaster',
-    pos: { x: 90, z: 701 },
+    pos: { x: 91, z: 708 },
     facing: Math.PI, // face -z, into the paddock opening
     color: 0x8b5a2b,
     questIds: ['q_riding_lessons'],
@@ -1867,7 +1866,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Riding Lessons',
     giverNpcId: 'stablemaster_marla',
     turnInNpcId: 'stablemaster_marla',
-    text: 'Every rider walks in on two legs, $N, same as I told you the day we met. The sitting is what I teach, not what I sell. Climb into the saddle when I give the word, then ride the flagged course around my paddock, every gate in order. Lose the saddle or leave the yard and we start again.',
+    text: 'Every rider walks in on two legs, $N, same as I told you the day we met. The sitting is what I teach, not what I sell. Climb into the saddle when I give the word, ride down into my course, and take every jump in order before the sand runs out of the glass. Lose the saddle or leave the yard and we start again.',
     completionText:
       'There, now. Not one grab at the fence rail the whole run through. The Valorsteed is yours, $N: saddle, reins, and the standing of a rider who earned the seat instead of buying it.',
     objectives: [
@@ -1970,11 +1969,13 @@ export const ZONE3_CAMPS: CampDef[] = [
   // with two zealot drakebinders posted to keep their captive on its chain.
   { mobId: 'voskar_emberwing', center: { x: 80, z: 845 }, radius: 4, count: 1 },
   { mobId: 'wyrmcult_zealot', center: { x: 80, z: 845 }, radius: 7, count: 2 },
-  // Ambient stable horses inside the Highwatch Stables paddock. radius 0 (exact
-  // spawn, no scatter draw); the ambient wander keeps them inside the fences.
-  { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 96, z: 682 }, radius: 0, count: 1 },
-  { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 105, z: 688 }, radius: 0, count: 1 },
-  { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 99, z: 690 }, radius: 0, count: 1 },
+  // Ambient stable horses in the NORTH pasture of the Highwatch Stables paddock
+  // (north of the divider rail). radius 0 (exact spawn, no scatter draw); the ambient
+  // wander (clamped to STABLE_PASTURE) keeps them north of the divider, so they never
+  // enter the south course arena.
+  { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 96, z: 694 }, radius: 0, count: 1 },
+  { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 106, z: 698 }, radius: 0, count: 1 },
+  { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 88, z: 700 }, radius: 0, count: 1 },
 ];
 
 export const ZONE3_OBJECTS: GroundObjectDef[] = [
@@ -3241,19 +3242,19 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { kind: 'house', x: 18, z: 660, w: 6, d: 5, rot: 1.2 },
     { kind: 'inn', x: -15, z: 666, w: 6, d: 7, rot: 0.6 },
     { kind: 'chapel', x: -16, z: 650, w: 5, d: 7, rot: 0.9 },
-    // Highwatch Stables barn (Stablemaster Marla): on the open ground west of
-    // Highwatch, just north of the paddock opening. Reuses the 'inn' building
-    // kind for a larger, barn-like footprint, angled to face the paddock gate.
-    { kind: 'inn', x: 86, z: 706, w: 10, d: 8, rot: 2.7 },
+    // Highwatch Stables barn (Stablemaster Marla): on the open ground north of the
+    // enlarged paddock. Reuses the 'inn' building kind for a larger, barn-like
+    // footprint, angled to face the paddock opening.
+    { kind: 'inn', x: 84, z: 712, w: 10, d: 8, rot: 2.7 },
   ],
   wells: [
     { x: 0, z: 662, r: 1.5 },
-    { x: 94, z: 704, r: 1.5 }, // stables water trough (outside the paddock, by the gate)
+    { x: 97, z: 709, r: 1.5 }, // stables water trough (north of the paddock, by the yard)
   ],
   stalls: [
     { x: -7.5, z: 667, rot: Math.PI / 2, r: 1.7 }, // Quartermaster Bree
     { x: -4.5, z: 673.5, rot: -0.6, r: 1.7 }, // Armorer Hode
-    { x: 81, z: 702, rot: 1.2, r: 1.6 }, // stables feed stall (by the barn)
+    { x: 80, z: 710, rot: 1.2, r: 1.6 }, // stables feed stall (by the barn)
   ],
   mines: [
     { x: 88, z: 612, rot: -2.0 }, // Deeprock Burrows
@@ -3271,7 +3272,7 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { x: 60, z: 812, rot: 2.2, scale: 1 },
     { x: 28, z: 848, rot: 1.5, scale: 1 },
     // Stables: a tack tent beside the barn
-    { x: 79, z: 708, rot: 2.2, scale: 1 },
+    { x: 77, z: 714, rot: 2.2, scale: 1 },
   ],
   crates: [
     [-118, 728],
@@ -3299,39 +3300,53 @@ export const ZONE3_PROPS: ZonePropsDef = {
   fences: [
     { x1: -14, z1: 649, x2: -4, z2: 647 }, // town south gate, east run
     { x1: 4, z1: 647, x2: 14, z2: 649 }, // town south gate, west run
-    // Highwatch Stables paddock (STABLE_PADDOCK, content/mounts.ts): full west,
-    // south, and east runs; the north run splits around the 4-unit opening Marla
-    // stands at. The ambient horses' wander bound reads the same rectangle.
+    // Highwatch Stables paddock (RIDING_COURSE.paddock, content/mounts.ts): full
+    // west, south, and east runs; the north run splits around the opening. The
+    // interior divider rail (RIDING_COURSE.divider) splits the yard into the north
+    // pasture and the south course arena, itself split around the rider's gap. The
+    // horses' wander bound and the lesson's course read the same source.
     {
-      x1: STABLE_PADDOCK.xMin,
-      z1: STABLE_PADDOCK.zMin,
-      x2: STABLE_PADDOCK.xMin,
-      z2: STABLE_PADDOCK.zMax,
+      x1: RIDING_COURSE.paddock.x1,
+      z1: RIDING_COURSE.paddock.z1,
+      x2: RIDING_COURSE.paddock.x1,
+      z2: RIDING_COURSE.paddock.z2,
     }, // west
     {
-      x1: STABLE_PADDOCK.xMin,
-      z1: STABLE_PADDOCK.zMin,
-      x2: STABLE_PADDOCK.xMax,
-      z2: STABLE_PADDOCK.zMin,
+      x1: RIDING_COURSE.paddock.x1,
+      z1: RIDING_COURSE.paddock.z1,
+      x2: RIDING_COURSE.paddock.x2,
+      z2: RIDING_COURSE.paddock.z1,
     }, // south
     {
-      x1: STABLE_PADDOCK.xMax,
-      z1: STABLE_PADDOCK.zMin,
-      x2: STABLE_PADDOCK.xMax,
-      z2: STABLE_PADDOCK.zMax,
+      x1: RIDING_COURSE.paddock.x2,
+      z1: RIDING_COURSE.paddock.z1,
+      x2: RIDING_COURSE.paddock.x2,
+      z2: RIDING_COURSE.paddock.z2,
     }, // east
     {
-      x1: STABLE_PADDOCK.xMin,
-      z1: STABLE_PADDOCK.zMax,
-      x2: STABLE_PADDOCK.openingXMin,
-      z2: STABLE_PADDOCK.zMax,
+      x1: RIDING_COURSE.paddock.x1,
+      z1: RIDING_COURSE.paddock.z2,
+      x2: RIDING_COURSE.paddock.opening.x1,
+      z2: RIDING_COURSE.paddock.z2,
     }, // north, west of opening
     {
-      x1: STABLE_PADDOCK.openingXMax,
-      z1: STABLE_PADDOCK.zMax,
-      x2: STABLE_PADDOCK.xMax,
-      z2: STABLE_PADDOCK.zMax,
+      x1: RIDING_COURSE.paddock.opening.x2,
+      z1: RIDING_COURSE.paddock.z2,
+      x2: RIDING_COURSE.paddock.x2,
+      z2: RIDING_COURSE.paddock.z2,
     }, // north, east of opening
+    {
+      x1: RIDING_COURSE.paddock.x1,
+      z1: RIDING_COURSE.divider.z,
+      x2: RIDING_COURSE.divider.opening.x1,
+      z2: RIDING_COURSE.divider.z,
+    }, // divider, west of the rider's gap
+    {
+      x1: RIDING_COURSE.divider.opening.x2,
+      z1: RIDING_COURSE.divider.z,
+      x2: RIDING_COURSE.paddock.x2,
+      z2: RIDING_COURSE.divider.z,
+    }, // divider, east of the rider's gap
   ],
   graveyards: [
     { x: 15, z: 645 },
@@ -3340,8 +3355,9 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { x: -139, z: 787 },
   ],
   delveMarkers: [{ x: -95, z: 505, delveId: 'drowned_litany' }],
-  // A marker pennant at each riding-course gate (RIDING_COURSE, content/mounts.ts),
-  // so the props can never drift from the lesson route. Collision-free (colliders
-  // does not read courseFlags) so they never obstruct the riding line.
-  courseFlags: RIDING_COURSE.gates.map((g) => ({ x: g.x, z: g.z })),
+  // A show-jumping obstacle at each riding-course jump point (RIDING_COURSE.jumps,
+  // content/mounts.ts), so the props can never drift from the course. Collision-free
+  // (colliders.ts does not read courseJumps) so a grounded ride-through is physically
+  // possible but clearing a jump (jumping over it) is decided by game logic.
+  courseJumps: RIDING_COURSE.jumps.map((j) => ({ x: j.x, z: j.z, rot: j.rot })),
 };

@@ -450,15 +450,14 @@ export const cs_CZ: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -8438,7 +8437,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Jezdecké lekce",
-        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám. Vylez do sedla, až dám pokyn, a pak projeď vyznačenou trať kolem mého výběhu, každou branou popořadě. Ztratíš sedlo nebo opustíš ohradu a začínáme znovu.",
+        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám. Vylez do sedla, až dám pokyn, sjeď dolů do mé parkurové dráhy a zdolej každou překážku popořadě, než v přesýpacích hodinách doteče písek. Ztratíš sedlo nebo opustíš ohradu a začínáme znovu.",
         "completion": "Tak. Ani jednou ses nechytil plotu celou tu dobu. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.",
         "objectives": {
           "0": {

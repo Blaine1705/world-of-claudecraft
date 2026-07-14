@@ -450,15 +450,14 @@ export const it_IT: EnTranslations = {
       "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "La Coppa della Valle",
@@ -8438,7 +8437,7 @@ export const it_IT: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lezioni di equitazione",
-        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Sali in sella quando te lo dico, poi percorri il tracciato segnalato attorno al mio maneggio, attraversando ogni cancello in ordine. Perdi la sella o esci dal recinto, e si ricomincia.",
+        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Sali in sella quando te lo dico, scendi nel mio percorso e affronta ogni ostacolo in ordine prima che la sabbia scenda tutta nella clessidra. Perdi la sella o esci dal recinto, e si ricomincia.",
         "completion": "Ecco, così. Non ti sei aggrappato alla staccionata nemmeno una volta, per tutto il giro. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.",
         "objectives": {
           "0": {

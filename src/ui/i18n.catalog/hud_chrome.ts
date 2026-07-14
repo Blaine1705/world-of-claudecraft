@@ -474,19 +474,20 @@ export const hudChromeStrings = {
   },
   // The riding-lesson minigame at the Highwatch stables (q_riding_lessons):
   // Stablemaster Marla has the player mount a training Valorsteed with the
-  // Mount/Dismount keybind, then ride the flagged course around her paddock, every
-  // gate in order. Sim-side gameplay lives in src/sim/mounts_training.ts; these are
-  // the panel/prompt strings for its UI. {key} is the live Mount/Dismount keycap.
+  // Mount/Dismount keybind, ride into the course arena to arm the timer, then jump the
+  // obstacles in order before it expires. Sim-side gameplay lives in
+  // src/sim/mounts_training.ts. mountPrompt/dismountPrompt are the two transient
+  // toasts; stagingPrompt/progress/timeLeft are the bottom strip. {key} is the live
+  // Mount/Dismount keycap; {seconds} the countdown.
   mountTraining: {
-    title: 'Riding Lesson',
-    mountPrompt: 'Climb aboard: press {key} to mount the training Valorsteed.',
-    ridePrompt: 'Ride the flagged course, every gate in order.',
-    progress: 'Gate {n} of {total}',
+    mountPrompt: 'Press {key} to mount the training Valorsteed.',
+    dismountPrompt: 'Press {key} again to dismount.',
+    stagingPrompt: 'Ride into the course arena to start the timer.',
+    progress: 'Jump {n} of {total}',
+    timeLeft: '{seconds}s',
     begin: 'Begin Lesson',
-    abort: 'Give Up',
     thrown: 'You were thrown. Steady up and try again.',
     success: 'You have tamed the Valorsteed.',
-    close: 'Close',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
   // the persistent indicator button, the in-match score strip, and the event

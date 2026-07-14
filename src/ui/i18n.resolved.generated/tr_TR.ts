@@ -450,15 +450,14 @@ export const tr_TR: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "Vadi Kupası",
@@ -8438,7 +8437,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Binicilik Dersleri",
-        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. İşaret verdiğimde eyere çık, sonra padoğumun etrafındaki bayraklı parkuru sürüp her kapıdan sırayla geç. Eyeri kaybedersen ya da avludan çıkarsan baştan başlarız.",
+        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. İşaret verdiğimde eyere çık, parkuruma in ve kum saatindeki kum bitmeden her engeli sırayla aş. Eyeri kaybedersen ya da avludan çıkarsan baştan başlarız.",
         "completion": "İşte böyle. Bütün tur boyunca bir kere bile çite tutunmadın. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.",
         "objectives": {
           "0": {

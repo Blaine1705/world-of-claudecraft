@@ -450,15 +450,14 @@ export const zh_TW: EnTranslations = {
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。"
     },
     "mountTraining": {
-      "title": "騎乘課",
-      "mountPrompt": "上馬吧：按 {key} 鍵騎上訓練用英勇戰馬。",
-      "ridePrompt": "沿著插旗的賽道騎行，依序穿過每一道門。",
-      "progress": "第 {n} 道門，共 {total} 道",
+      "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
+      "dismountPrompt": "再次按 {key} 鍵下馬。",
+      "stagingPrompt": "騎入賽道場地即可開始計時。",
+      "progress": "第 {n} 個障礙，共 {total} 個",
+      "timeLeft": "{seconds}s",
       "begin": "開始課程",
-      "abort": "Give Up",
       "thrown": "你被甩下馬了。穩住，再試一次。",
-      "success": "你已經馴服了英勇戰馬。",
-      "close": "關閉"
+      "success": "你已經馴服了英勇戰馬。"
     },
     "vcup": {
       "title": "溪谷盃",

@@ -450,15 +450,14 @@ export const pl_PL: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "Puchar Doliny",
@@ -8438,7 +8437,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lekcje jazdy konnej",
-        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Wsiądź do siodła, gdy dam znak, a potem przejedź oflagowaną trasę wokół mojego wybiegu, przez każdą bramkę po kolei. Stracisz siodło albo opuścisz zagrodę i zaczynamy od nowa.",
+        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Wsiądź do siodła, gdy dam znak, zjedź na mój parkur i pokonaj każdą przeszkodę po kolei, zanim piasek przesypie się w klepsydrze. Stracisz siodło albo opuścisz zagrodę i zaczynamy od nowa.",
         "completion": "No, właśnie tak. Ani razu nie złapałeś się ogrodzenia przez całą przejażdżkę. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.",
         "objectives": {
           "0": {

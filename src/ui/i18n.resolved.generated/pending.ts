@@ -10,110 +10,102 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "es_ES": [
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "fr_FR": [
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "fr_CA": [
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "de_DE": [
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "zh_CN": [
-    "hudChrome.mountTraining.abort"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "zh_TW": [
-    "hudChrome.mountTraining.abort"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "ko_KR": [
-    "hudChrome.mountTraining.abort"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "ja_JP": [
-    "hudChrome.mountTraining.abort"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "pt_BR": [
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "ru_RU": [
-    "hudChrome.mountTraining.abort"
+    "hudChrome.mountTraining.timeLeft"
   ],
   "cs_CZ": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title",
+    "hudChrome.mountTraining.timeLeft",
     "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
@@ -151,15 +143,14 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title",
+    "hudChrome.mountTraining.timeLeft",
     "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
@@ -197,15 +188,14 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title",
+    "hudChrome.mountTraining.timeLeft",
     "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
@@ -243,15 +233,14 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title",
+    "hudChrome.mountTraining.timeLeft",
     "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
@@ -289,15 +278,14 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title",
+    "hudChrome.mountTraining.timeLeft",
     "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
@@ -335,15 +323,14 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title",
+    "hudChrome.mountTraining.timeLeft",
     "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
@@ -381,15 +368,14 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title",
+    "hudChrome.mountTraining.timeLeft",
     "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
@@ -427,15 +413,14 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
-    "hudChrome.mountTraining.abort",
     "hudChrome.mountTraining.begin",
-    "hudChrome.mountTraining.close",
+    "hudChrome.mountTraining.dismountPrompt",
     "hudChrome.mountTraining.mountPrompt",
     "hudChrome.mountTraining.progress",
-    "hudChrome.mountTraining.ridePrompt",
+    "hudChrome.mountTraining.stagingPrompt",
     "hudChrome.mountTraining.success",
     "hudChrome.mountTraining.thrown",
-    "hudChrome.mountTraining.title",
+    "hudChrome.mountTraining.timeLeft",
     "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",

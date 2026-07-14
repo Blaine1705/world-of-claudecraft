@@ -6564,13 +6564,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
   'hudChrome.mounts.emptyDropHint': '더 희귀한 탈것은 던전과 공격대 우두머리가 떨어뜨립니다.',
   'hudChrome.mounts.clickManage': '클릭하여 탈것 선택',
-  'hudChrome.mountTraining.title': '승마 수업',
-  'hudChrome.mountTraining.mountPrompt': '올라타자: {key} 키를 눌러 훈련용 발러스티드에 탑승한다.',
-  'hudChrome.mountTraining.ridePrompt':
-    '깃발이 세워진 코스를 모든 관문을 순서대로 통과하며 달려라.',
-  'hudChrome.mountTraining.progress': '{total} 관문 중 {n} 관문',
+  'hudChrome.mountTraining.mountPrompt': '{key} 키를 눌러 훈련용 발러스티드에 탑승한다.',
+  'hudChrome.mountTraining.dismountPrompt': '{key} 키를 다시 눌러 내린다.',
+  'hudChrome.mountTraining.stagingPrompt': '코스 경기장으로 들어가 타이머를 시작하라.',
+  'hudChrome.mountTraining.progress': '{total} 장애물 중 {n} 번째',
   'hudChrome.mountTraining.begin': '수업 시작',
   'hudChrome.mountTraining.thrown': '낙마했다. 침착하게 다시 시도하라.',
   'hudChrome.mountTraining.success': '발러스티드를 길들였다.',
-  'hudChrome.mountTraining.close': '닫기',
 };

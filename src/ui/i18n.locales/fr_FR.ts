@@ -3597,7 +3597,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Tout cavalier arrive sur ses deux jambes, {className}. Je ne te donnerai les rênes que lorsque tu sauras tenir en selle sur le Destrier de Bravoure sans mordre la boue, et Highwatch n’a pas de guérisseurs de trop pour les os brisés.',
   'entities.quests.q_riding_lessons.title': 'Leçons d’équitation',
   'entities.quests.q_riding_lessons.text':
-    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Monte en selle quand j’en donne l’ordre, puis parcours le tracé balisé autour de mon pré, chaque porte dans l’ordre. Perds la selle ou quitte l’enclos, et l’on recommence.',
+    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Monte en selle quand j’en donne l’ordre, descends sur mon parcours et franchis chaque obstacle dans l’ordre avant que le sable ne s’écoule du verre. Perds la selle ou quitte l’enclos, et l’on recommence.',
   'entities.quests.q_riding_lessons.completion':
     'Voilà. Pas une seule fois agrippé à la barrière, du début à la fin. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Dompter le Destrier de Bravoure',

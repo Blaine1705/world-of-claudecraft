@@ -450,15 +450,14 @@ export const ja_JP: EnTranslations = {
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。"
     },
     "mountTraining": {
-      "title": "乗馬レッスン",
-      "mountPrompt": "乗り込もう: {key} キーを押して訓練用ヴァロースティードに騎乗する。",
-      "ridePrompt": "旗の立てられたコースを、すべてのゲートを順番に走り抜けよう。",
-      "progress": "{total} 門中 {n} 門目",
+      "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
+      "dismountPrompt": "もう一度 {key} キーを押して降りる。",
+      "stagingPrompt": "コースの馬場に乗り入れてタイマーを開始しよう。",
+      "progress": "{total} 障害中 {n} 番目",
+      "timeLeft": "{seconds}s",
       "begin": "レッスン開始",
-      "abort": "Give Up",
       "thrown": "振り落とされた。落ち着いてもう一度挑戦しよう。",
-      "success": "ヴァロースティードを乗りこなした。",
-      "close": "閉じる"
+      "success": "ヴァロースティードを乗りこなした。"
     },
     "vcup": {
       "title": "ヴェイルカップ",

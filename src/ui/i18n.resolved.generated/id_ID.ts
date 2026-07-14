@@ -450,15 +450,14 @@ export const id_ID: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
     },
     "mountTraining": {
-      "title": "Riding Lesson",
-      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
-      "ridePrompt": "Ride the flagged course, every gate in order.",
-      "progress": "Gate {n} of {total}",
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "dismountPrompt": "Press {key} again to dismount.",
+      "stagingPrompt": "Ride into the course arena to start the timer.",
+      "progress": "Jump {n} of {total}",
+      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "abort": "Give Up",
       "thrown": "You were thrown. Steady up and try again.",
-      "success": "You have tamed the Valorsteed.",
-      "close": "Close"
+      "success": "You have tamed the Valorsteed."
     },
     "vcup": {
       "title": "Piala Lembah",
@@ -8438,7 +8437,7 @@ export const id_ID: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Pelajaran Menunggang Kuda",
-        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Naiklah ke pelana saat kuberi aba-aba, lalu tempuh lintasan berbendera mengelilingi padangku, lewati setiap gerbang berurutan. Terlepas dari pelana atau keluar dari pekarangan, dan kita mulai lagi dari awal.",
+        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Naiklah ke pelana saat kuberi aba-aba, berkudalah menuruni lintasanku, dan lompati setiap rintangan berurutan sebelum pasir di jam pasir habis. Terlepas dari pelana atau keluar dari pekarangan, dan kita mulai lagi dari awal.",
         "completion": "Nah, begitu. Tak sekali pun kau memegang pagar sepanjang putaran itu. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.",
         "objectives": {
           "0": {
