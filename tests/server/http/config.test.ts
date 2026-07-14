@@ -194,6 +194,19 @@ describe('loadConfig', () => {
     );
   });
 
+  it('parses COMMUNITY_TEST_RIFTS strictly and defaults it off', () => {
+    expect(loadConfig({ ...MIN_ENV }).communityTestRifts).toBe(false);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '1' }).communityTestRifts).toBe(true);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'true' }).communityTestRifts).toBe(true);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '0' }).communityTestRifts).toBe(false);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'FALSE' }).communityTestRifts).toBe(
+      false,
+    );
+    expect(() => loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'yes' })).toThrow(
+      /COMMUNITY_TEST_RIFTS/,
+    );
+  });
+
   it('reads the numeric and string overrides', () => {
     const cfg = loadConfig({
       ...MIN_ENV,
