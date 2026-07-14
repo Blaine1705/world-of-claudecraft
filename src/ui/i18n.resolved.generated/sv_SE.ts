@@ -451,12 +451,7 @@ export const sv_SE: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "dismountPrompt": "Press {key} again to dismount.",
-      "stagingPrompt": "Ride into the course arena to start the timer.",
-      "progress": "Jump {n} of {total}",
-      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed."
     },
     "vcup": {
@@ -8437,8 +8432,8 @@ export const sv_SE: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Ridlektioner",
-        "text": "Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer. Kliv upp i sadeln när jag ger tecken, rid ner på min bana och ta varje hinder i tur och ordning innan sanden runnit ut ur glaset. Tappar du sadeln eller lämnar inhägnaden börjar vi om.",
-        "completion": "Så där ja. Inte en enda gång tog du tag i stängslet under hela ridturen. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.",
+        "text": "Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer. Betala avgiften, och när jag ger tecken kallar du till dig övnings-Valorsteeden och kliver upp i sadeln. Stanna hos mig på gården under tiden; vandrar du iväg börjar vi om.",
+        "completion": "Så där ja. Upp i en enda mjuk rörelse och stadigt sittande där uppe. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.",
         "objectives": {
           "0": {
             "label": "Tämj Valorsteed"

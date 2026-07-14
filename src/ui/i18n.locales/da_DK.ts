@@ -2469,9 +2469,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Enhver rytter kommer ind på to ben, {className}. Du får ikke tøjlerne, før du kan sidde Valorsteed uden at kysse jorden, og Highwatch har ingen healere til overs til brækkede knogler.',
   'entities.quests.q_riding_lessons.title': 'Ridelektioner',
   'entities.quests.q_riding_lessons.text':
-    'Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger. Kravl op i sadlen, når jeg giver ordet, rid ned i min bane, og tag hvert spring i rækkefølge, før sandet løber ud af timeglasset. Mister du sadlen eller forlader indhegningen, starter vi forfra.',
+    'Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger. Betal gebyret, og når jeg giver ordet, så kald trænings-Valorsteeden til dig og kravl op i sadlen. Bliv hos mig på gårdspladsen imens; vandrer du væk, starter vi forfra.',
   'entities.quests.q_riding_lessons.completion':
-    'Sådan, ja. Ikke én eneste gang greb du fat i hegnet hele vejen igennem. Valorsteed er din, {playerName}: sadel, tøjler og ry som en rytter, der har fortjent sædet i stedet for at købe det.',
+    'Sådan, ja. Op i én glidende bevægelse og et roligt sæde deroppe. Valorsteed er din, {playerName}: sadel, tøjler og ry som en rytter, der har fortjent sædet i stedet for at købe det.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Tæm Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Bymarskal',
   'entities.npcs.provisioner_hale.greeting':

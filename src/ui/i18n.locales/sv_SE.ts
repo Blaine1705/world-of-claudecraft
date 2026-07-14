@@ -2476,9 +2476,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Varje ryttare kommer in på två ben, {className}. Tyglarna får du inte förrän du kan sitta kvar på Valorsteed utan att kyssa leran, och Highwatch har inga läkare att avvara för brutna ben.',
   'entities.quests.q_riding_lessons.title': 'Ridlektioner',
   'entities.quests.q_riding_lessons.text':
-    'Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer. Kliv upp i sadeln när jag ger tecken, rid ner på min bana och ta varje hinder i tur och ordning innan sanden runnit ut ur glaset. Tappar du sadeln eller lämnar inhägnaden börjar vi om.',
+    'Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer. Betala avgiften, och när jag ger tecken kallar du till dig övnings-Valorsteeden och kliver upp i sadeln. Stanna hos mig på gården under tiden; vandrar du iväg börjar vi om.',
   'entities.quests.q_riding_lessons.completion':
-    'Så där ja. Inte en enda gång tog du tag i stängslet under hela ridturen. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.',
+    'Så där ja. Upp i en enda mjuk rörelse och stadigt sittande där uppe. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Tämj Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Stadsmarskalk',
   'entities.npcs.provisioner_hale.greeting':

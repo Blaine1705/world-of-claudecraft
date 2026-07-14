@@ -451,12 +451,7 @@ export const id_ID: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "dismountPrompt": "Press {key} again to dismount.",
-      "stagingPrompt": "Ride into the course arena to start the timer.",
-      "progress": "Jump {n} of {total}",
-      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed."
     },
     "vcup": {
@@ -8437,8 +8432,8 @@ export const id_ID: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Pelajaran Menunggang Kuda",
-        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Naiklah ke pelana saat kuberi aba-aba, berkudalah menuruni lintasanku, dan lompati setiap rintangan berurutan sebelum pasir di jam pasir habis. Terlepas dari pelana atau keluar dari pekarangan, dan kita mulai lagi dari awal.",
-        "completion": "Nah, begitu. Tak sekali pun kau memegang pagar sepanjang putaran itu. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.",
+        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Bayar biayanya, dan saat kuberi aba-aba, panggil Valorsteed latihan itu dan naiklah ke pelana. Tetaplah bersamaku di pekarangan selagi melakukannya; kalau kau pergi menjauh, kita mulai lagi dari awal.",
+        "completion": "Nah, begitu. Naik dengan satu gerakan mulus dan duduk mantap di atas. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.",
         "objectives": {
           "0": {
             "label": "Jinakkan Valorsteed"

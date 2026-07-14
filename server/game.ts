@@ -3319,17 +3319,19 @@ export class GameServer {
       case 'mount_toggle':
         sim.toggleMountFor(pid);
         break;
-      // Riding-lesson (mount-training) minigame: the Sim re-validates
-      // everything (level, range, quest state, fee, session state).
+      // Riding lesson: the Sim re-validates everything (level, range, quest
+      // state, fee, session state).
       case 'mount_train_begin':
         sim.mountTrainBeginFor(pid);
         break;
       case 'mount_train_answer':
-        // Deprecated no-op: the lesson is a ridden course now, not a lean-cue
-        // reaction. The token stays in COMMAND_NAMES (append-only); the server
-        // ignores it and a modern client never sends a meaningful payload.
+        // Deprecated no-op (the removed lean-cue lesson's answer command). The
+        // token stays in COMMAND_NAMES (append-only, dispatch-only); the server
+        // ignores it and a modern client never sends it.
         break;
       case 'mount_train_abort':
+        // Dispatch-only (no HUD sends it anymore): abandons an active lesson,
+        // the fee stays paid.
         sim.mountTrainAbortFor(pid);
         break;
       // Skin-select event lock-in. The Sim re-validates the skin against the

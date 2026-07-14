@@ -1,38 +1,36 @@
-// Riding-lesson minigame ("mount training"), server-authoritative, a sibling
-// system behind SimContext. The lesson is a TIMED SHOW-JUMPING course: the player
-// begins at Stablemaster Marla, mounts a training Valorsteed by pressing the
-// Mount/Dismount hotkey (deliberately a tutorial for the Z keybind), rides down into
-// the fenced course arena, which arms a countdown, then jumps the obstacles of
-// RIDING_COURSE in order before the timer expires. Clearing the last jump in time
-// credits the quest objective; turning in q_riding_lessons at Marla grants
-// reins_valorsteed as before.
+// The riding lesson ("mount training"), server-authoritative, a sibling system
+// behind SimContext. The lesson is the Mount/Dismount keybind tutorial gating the
+// first mount: the player begins at Stablemaster Marla (paying the one-time 100g
+// fee), then climbs onto a training Valorsteed by pressing the Mount/Dismount
+// hotkey. Being in the saddle IS the lesson: it credits the quest objective at
+// once, Marla takes the steed back (an instant force-dismount; the player never
+// keeps the unowned mount), and turning in q_riding_lessons at her grants
+// reins_valorsteed.
 //
-// The session lives directly on PlayerMeta.mountTraining and moves through three
-// phases: 'mount' (begun, not on the steed) -> 'staging' (mounted, timer not running)
-// -> 'course' (timer running). The NPC (stablemaster_marla) and the quest
-// (q_riding_lessons, one 'interact' objective keyed on the sentinel targetObjectItemId
-// 'train_valorsteed') are content-slice data; this module resolves them by id/string.
-// On success it credits that objective directly (see creditRidingLessonObjective)
-// rather than reusing interactObjectForQuests, which keys off a live
-// Entity.objectItemId (there is no such entity here).
+// The session lives directly on PlayerMeta.mountTraining. The NPC
+// (stablemaster_marla) and the quest (q_riding_lessons, one 'interact' objective
+// keyed on the sentinel targetObjectItemId 'train_valorsteed') are content-slice
+// data; this module resolves them by id/string. On success it credits that
+// objective directly (see creditRidingLessonObjective) rather than reusing
+// interactObjectForQuests, which keys off a live Entity.objectItemId (there is no
+// such entity here).
 //
-// Determinism: the course is a STATIC shape (RIDING_COURSE, the single source of
-// truth in content/mounts.ts) and the timer is driven off the deterministic sim clock
-// (ctx.tickCount), so this system draws NO rng and perturbs no draw order.
-// `src/sim`-pure: no DOM/Three, no Math.random/Date.now/performance.now (enforced by
-// tests/architecture.test.ts).
+// Determinism: the lesson is driven off live player state only, so this system
+// draws NO rng and perturbs no draw order. `src/sim`-pure: no DOM/Three, no
+// Math.random/Date.now/performance.now (enforced by tests/architecture.test.ts).
 
-import type { MountTrainingView } from '../world_api';
-import { RIDING_COURSE, TRAINING_MOUNT_KEY } from './content/mounts';
+import { TRAINING_MOUNT_KEY } from './content/mounts';
 import { QUESTS } from './data';
 import { forceDismount } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type MountTrainingSession, TICK_RATE } from './types';
+import { dist2d, type Entity, INTERACT_RANGE, type MountTrainingSession } from './types';
 
 // --- tuning (change numbers here, not inline) -------------------------------
 export const MOUNT_TRAIN_MIN_LEVEL = 20;
 export const MOUNT_TRAIN_FEE_COPPER = 10000; // 100 gold, charged once, ever
+/** Distance from Marla beyond which an in-progress lesson counts as abandoned. */
+export const MOUNT_TRAIN_LEAVE_RADIUS = 50;
 
 // The stablemaster NPC + her quest, resolved by id (content-slice data; this
 // module never imports src/sim/content/* records directly, matching the seam).
@@ -44,29 +42,17 @@ export const RIDING_LESSONS_QUEST_ID = 'q_riding_lessons';
 // real interactable object.
 export const TRAIN_SENTINEL_ITEM_ID = 'train_valorsteed';
 
-/** The countdown budget in sim ticks (the run deadline is `tickCount + this`). */
-export const MOUNT_TRAIN_TIME_LIMIT_TICKS = Math.round(RIDING_COURSE.timeLimitSeconds * TICK_RATE);
-
 // Player notices (English at the emit site; localized client-side by sim_i18n's
 // EXACT matcher, S3-guarded). Placeholder-free, so they auto-register.
 const NOTICE_SUCCESS = "Marla takes the Valorsteed's reins. Well ridden.";
-const NOTICE_THROWN = 'The Valorsteed throws you. Marla waves you back to try again.';
 const NOTICE_LEFT_YARD =
   'You leave the paddock and the lesson ends. Come back to Marla to try again.';
-const NOTICE_TOO_SLOW = 'Too slow. Ride out of the course and try again.';
 
 function findStablemaster(ctx: SimContext): Entity | null {
   for (const e of ctx.entities.values()) {
     if (e.kind === 'npc' && e.templateId === STABLEMASTER_NPC_ID) return e;
   }
   return null;
-}
-
-/** Whether the entity is inside the south course arena (RIDING_COURSE.courseSection).
- *  A mounted player crossing from outside to inside this arms the timer. */
-function insideCourseSection(e: Entity): boolean {
-  const c = RIDING_COURSE.courseSection;
-  return e.pos.x >= c.x1 && e.pos.x <= c.x2 && e.pos.z >= c.z1 && e.pos.z <= c.z2;
 }
 
 /** Credit the q_riding_lessons 'interact' objective (sentinel targetObjectItemId
@@ -100,9 +86,8 @@ function creditRidingLessonObjective(ctx: SimContext, meta: PlayerMeta): void {
 /** Start a riding lesson. Refuses (via ctx.error) unless alive, level 20+, standing
  *  at the stablemaster, actively on q_riding_lessons with its objective not yet
  *  complete, and no session already IN_PROGRESS; charges the one-time 100g fee on the
- *  first-ever successful begin (retries after a throw are free: the fee stays paid).
- *  The lesson starts in phase 'mount': the player next climbs aboard with the
- *  Mount/Dismount hotkey. */
+ *  first-ever successful begin (later attempts are free: the fee stays paid). The
+ *  player then climbs aboard with the Mount/Dismount hotkey. */
 export function mountTrainBegin(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -140,120 +125,45 @@ export function mountTrainBegin(ctx: SimContext, pid?: number): void {
   const session: MountTrainingSession = {
     sessionId: `mt_${meta.entityId}_${ctx.tickCount}`,
     ownerId: meta.entityId,
-    phase: 'mount',
-    jump: 0,
-    deadlineTick: 0,
-    insideCourse: false,
+    anchor: { x: marla.pos.x, z: marla.pos.z },
     state: 'IN_PROGRESS',
   };
   meta.mountTraining = session;
   ctx.emit({
     type: 'mountTrainSession',
     sessionId: session.sessionId,
-    phase: 'mount',
     pid: meta.entityId,
   });
 }
 
-/** Server-authoritative per-tick driver, run every tick for every player (called from
- *  the same per-player tick site as the old driver). Advances the mount -> staging ->
- *  course flow and the timed jumping, and ends the lesson on death, a lost steed, or
- *  straying out of the paddock. Draws no rng. */
+/** Server-authoritative per-tick driver, run every tick for every player. Succeeds
+ *  the lesson the moment the player is in the training steed's saddle, and ends it
+ *  on death or on straying from Marla's yard. Draws no rng. */
 export function tickMountTraining(ctx: SimContext, meta: PlayerMeta): void {
   const session = meta.mountTraining;
   if (session?.state !== 'IN_PROGRESS') return;
   const e = ctx.entities.get(meta.entityId);
   if (!e) return;
 
-  // Death ends the lesson as a throw (handleDeath already force-dismounted the
-  // steed, so throwRider's force-dismount is a no-op here).
+  // Death ends the lesson (handleDeath already force-dismounted any steed). The
+  // quest stays active, so the player just begins again at Marla, fee still paid.
   if (e.dead) {
-    throwRider(ctx, meta, session, e);
+    abandonMountTraining(ctx, meta);
     return;
   }
-  // Straying beyond boundsRadius from the course centre (any phase) abandons. The
-  // course points are {x,z} (no y), so measure the ground-plane distance directly.
-  const { center, boundsRadius, jumpRadius, jumps } = RIDING_COURSE;
-  if (Math.hypot(e.pos.x - center.x, e.pos.z - center.z) > boundsRadius) {
+  // Straying from the stablemaster's yard abandons. The anchor is Marla's
+  // position captured at begin (she never moves), so this draws no entity scan.
+  if (
+    Math.hypot(e.pos.x - session.anchor.x, e.pos.z - session.anchor.z) > MOUNT_TRAIN_LEAVE_RADIUS
+  ) {
     ctx.notice(meta.entityId, NOTICE_LEFT_YARD);
     abandonMountTraining(ctx, meta);
     return;
   }
 
-  if (session.phase === 'mount') {
-    // The player climbed aboard the training steed (the Z-keybind tutorial): move to
-    // staging and seed the course edge-detect (they mount up north, outside the arena).
-    if (e.mountKey === TRAINING_MOUNT_KEY) {
-      session.phase = 'staging';
-      session.insideCourse = insideCourseSection(e);
-      ctx.emit({
-        type: 'mountTrainSession',
-        sessionId: session.sessionId,
-        phase: 'staging',
-        pid: session.ownerId,
-      });
-    }
-    return;
-  }
-
-  // staging or course: losing the steed (dismounted by Z, water, or anything) throws.
-  if (e.mountKey !== TRAINING_MOUNT_KEY) {
-    throwRider(ctx, meta, session, e);
-    return;
-  }
-
-  const inside = insideCourseSection(e);
-
-  if (session.phase === 'staging') {
-    // Arm the timer on a fresh outside -> inside transition into the course arena.
-    if (inside && !session.insideCourse) {
-      session.phase = 'course';
-      session.jump = 0;
-      session.deadlineTick = ctx.tickCount + MOUNT_TRAIN_TIME_LIMIT_TICKS;
-      ctx.emit({
-        type: 'mountTrainRunStart',
-        sessionId: session.sessionId,
-        timeLimitTicks: MOUNT_TRAIN_TIME_LIMIT_TICKS,
-        pid: session.ownerId,
-      });
-    }
-    session.insideCourse = inside;
-    return;
-  }
-
-  // phase 'course'.
-  session.insideCourse = inside;
-  // Timeout: soft reset to staging (jump progress cleared). The next run arms only on
-  // a FRESH outside -> inside transition; insideCourse stays as-is (true, since they
-  // are in the arena), so standing here does not instantly re-arm.
-  if (ctx.tickCount >= session.deadlineTick) {
-    session.phase = 'staging';
-    session.jump = 0;
-    session.deadlineTick = 0;
-    ctx.notice(meta.entityId, NOTICE_TOO_SLOW);
-    ctx.emit({
-      type: 'mountTrainSession',
-      sessionId: session.sessionId,
-      phase: 'staging',
-      pid: session.ownerId,
-    });
-    return;
-  }
-  // Jump advance: the rider must be AIRBORNE from a deliberate jump (Entity.jumping,
-  // set by the shared player_motion kernel before this driver runs) within jumpRadius
-  // of the next jump, in order (a grounded pass-through does nothing).
-  const next = jumps[session.jump];
-  if (next && e.jumping && Math.hypot(e.pos.x - next.x, e.pos.z - next.z) <= jumpRadius) {
-    session.jump += 1;
-    ctx.emit({
-      type: 'mountTrainJump',
-      sessionId: session.sessionId,
-      jump: session.jump,
-      jumpsTotal: jumps.length,
-      pid: session.ownerId,
-    });
-    if (session.jump >= jumps.length) succeed(ctx, meta, session, e);
-  }
+  // In the saddle: the lesson is passed (the whole point was pressing the
+  // Mount/Dismount key). Credit the quest objective and hand the steed back.
+  if (e.mountKey === TRAINING_MOUNT_KEY) succeed(ctx, meta, session, e);
 }
 
 function succeed(
@@ -277,28 +187,10 @@ function succeed(
   meta.mountTraining = null;
 }
 
-function throwRider(
-  ctx: SimContext,
-  meta: PlayerMeta,
-  session: MountTrainingSession,
-  e: Entity,
-): void {
-  session.state = 'THROWN';
-  forceDismount(ctx, e); // a no-op when the throw was itself a dismount/death
-  ctx.notice(meta.entityId, NOTICE_THROWN);
-  ctx.emit({
-    type: 'mountTrainEnd',
-    sessionId: session.sessionId,
-    outcome: 'thrown',
-    pid: session.ownerId,
-  });
-  meta.mountTraining = null;
-}
-
 /** Tear down an active riding-lesson session, preserving the fee (paid stays paid)
- *  and force-dismounting the unowned training steed if the player is still riding it.
- *  Shared by the player-initiated abort, the leave/disconnect path, and the
- *  strayed-out-of-the-paddock driver branch. */
+ *  and force-dismounting the unowned training steed if the player is riding it (or
+ *  mid-summon). Shared by the wire abort, the leave/disconnect path, and the
+ *  death/strayed driver branches. */
 export function abandonMountTraining(ctx: SimContext, meta: PlayerMeta): void {
   const session = meta.mountTraining;
   if (session?.state !== 'IN_PROGRESS') return;
@@ -314,34 +206,10 @@ export function abandonMountTraining(ctx: SimContext, meta: PlayerMeta): void {
   meta.mountTraining = null;
 }
 
-/** Player-initiated abort (mount_train_abort): resolves the acting pid, then shares
- *  abandonMountTraining's body with the leave-path caller. */
+/** Wire-initiated abort (the append-only mount_train_abort command): resolves the
+ *  acting pid, then shares abandonMountTraining's body with the leave-path caller. */
 export function mountTrainAbort(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   abandonMountTraining(ctx, r.meta);
-}
-
-/** Read-only projection of the active riding lesson for IWorld (offline). nextJump is
- *  the world position of the jump to clear (null outside phase 'course' and after the
- *  last jump); ticksLeft is the authoritative remaining countdown. The client derives
- *  the same nextJump from RIDING_COURSE by index and mirrors ticksLeft from the
- *  run-start event. */
-export function mountTrainingViewFor(ctx: SimContext, pid?: number): MountTrainingView | null {
-  const r = ctx.resolve(pid);
-  if (!r) return null;
-  const s = r.meta.mountTraining;
-  if (s?.state !== 'IN_PROGRESS') return null;
-  const jumps = RIDING_COURSE.jumps;
-  const onCourse = s.phase === 'course';
-  const next = onCourse && s.jump < jumps.length ? jumps[s.jump] : null;
-  return {
-    sessionId: s.sessionId,
-    phase: s.phase,
-    jump: s.jump,
-    jumpsTotal: jumps.length,
-    nextJump: next ? { x: next.x, z: next.z } : null,
-    ticksLeft: onCourse ? Math.max(0, s.deadlineTick - ctx.tickCount) : null,
-    timeLimitTicks: MOUNT_TRAIN_TIME_LIMIT_TICKS,
-  };
 }

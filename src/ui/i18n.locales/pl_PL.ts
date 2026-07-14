@@ -2489,9 +2489,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Każdy jeździec przychodzi na dwóch nogach, {className}. Wodzy nie dostaniesz, dopóki nie utrzymasz się na Valorsteedzie bez całowania błota, a Highwatch nie ma zbyt wielu uzdrowicieli na złamane kości.',
   'entities.quests.q_riding_lessons.title': 'Lekcje jazdy konnej',
   'entities.quests.q_riding_lessons.text':
-    'Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Wsiądź do siodła, gdy dam znak, zjedź na mój parkur i pokonaj każdą przeszkodę po kolei, zanim piasek przesypie się w klepsydrze. Stracisz siodło albo opuścisz zagrodę i zaczynamy od nowa.',
+    'Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Zapłać opłatę, a gdy dam znak, przywołaj treningowego Valorsteeda i wsiądź do siodła. Zostań przy mnie na dziedzińcu, póki tego nie zrobisz; oddalisz się i zaczynamy od nowa.',
   'entities.quests.q_riding_lessons.completion':
-    'No, właśnie tak. Ani razu nie złapałeś się ogrodzenia przez całą przejażdżkę. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.',
+    'No, właśnie tak. W siodle za jednym płynnym ruchem i pewnie usadzony. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Ujeżdżenie Valorsteeda',
   'entities.npcs.marshal_redbrook.title': 'Marszałek Miasta',
   'entities.npcs.provisioner_hale.greeting':

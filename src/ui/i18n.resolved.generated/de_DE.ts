@@ -451,12 +451,7 @@ export const de_DE: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "dismountPrompt": "Press {key} again to dismount.",
-      "stagingPrompt": "Ride into the course arena to start the timer.",
-      "progress": "Jump {n} of {total}",
-      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed."
     },
     "vcup": {
@@ -8437,8 +8432,8 @@ export const de_DE: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Reitstunden",
-        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe. Steigt in den Sattel, wenn ich das Wort gebe, reitet hinab in meinen Parcours und nehmt jedes Hindernis der Reihe nach, bevor der Sand durch das Glas gelaufen ist. Verliert Ihr den Sattel oder verlasst den Hof, fangen wir von vorn an.",
-        "completion": "So, ja. Kein einziges Mal nach dem Zaun gegriffen, die ganze Runde über. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.",
+        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe. Zahlt die Gebühr, und wenn ich das Wort gebe, ruft das Übungs-Valorross zu Euch und steigt in den Sattel. Bleibt dabei bei mir im Hof; entfernt Ihr Euch, fangen wir von vorn an.",
+        "completion": "So, ja. In einer einzigen sauberen Bewegung hinauf und oben ruhig gesessen. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.",
         "objectives": {
           "0": {
             "label": "Bezähmt den Valorross"

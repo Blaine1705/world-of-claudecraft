@@ -311,7 +311,6 @@ import {
 } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_picker';
-import { MountTrainingStrip } from './mount_training_strip';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -1170,16 +1169,6 @@ export class Hud {
     onAbort: () => this.submitLockpickAbort(),
     onClose: () => this.closeLockpick(),
   });
-  // Stablemaster Marla's "Riding Lessons" minigame: a slim, non-interactive bottom
-  // strip painted from the authoritative world.mountTrainingView() (never a cached
-  // copy). hud.ts keeps only the session routing, the transient toasts, and show/hide.
-  private readonly mountTrainStrip = new MountTrainingStrip({
-    getState: () => this.sim.mountTrainingView(),
-    mountKeyLabel: () => this.keybinds.primaryLabel('mount'),
-  });
-  // Last phase seen for a live lesson, so the "press to dismount" toast fires only on
-  // the mount -> staging transition (not on a timed-out course -> staging soft reset).
-  private mountTrainPhase: 'mount' | 'staging' | 'course' | null = null;
   // Drowned Reliquary Rite difficulty popup. Opened on the delveRiteChoosePrompt
   // cue (approaching the risen reliquary), closed once playback starts.
   private riteTrap: FocusTrapHandle | null = null;
@@ -1595,7 +1584,7 @@ export class Hud {
         this.questlogWindow.openWithQuest(row.dataset.quest);
       }
     });
-    // The delve board, lockpick panel, mount-training panel, map window, and the
+    // The delve board, lockpick panel, map window, and the
     // bank + bags cluster are non-modal overlays, so canUseGameKeys() stays true
     // and the global jump (Space) / chat (Enter) binds would otherwise hijack
     // those keys on a focused panel button (the map's Quests toggle, a bank grid
@@ -6539,7 +6528,6 @@ export class Hud {
     }
     this.meters.update();
     this.lockpickWindow.repaintIfChanged();
-    this.mountTrainStrip.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
     this.reconcileLootRollStatus(now);
@@ -7646,12 +7634,12 @@ export class Hud {
   }
 
   // ---------------------------------------------------------------------------
-  // "Riding Lessons": Stablemaster Marla's timed show-jumping minigame. Begin Lesson
-  // (her gossip dialog, gated on the quest being accepted) starts a server-authoritative
-  // course: mount a training Valorsteed with the Mount/Dismount keybind, ride into the
-  // course arena to arm a countdown, then jump the obstacles in order. Driven by the
-  // mountTrainSession/RunStart/Jump/End events; the guidance is a bottom progress strip
-  // plus two transient toasts. Player text renders through hudChrome.mountTraining.*.
+  // "Riding Lessons": Stablemaster Marla's Mount/Dismount keybind tutorial. Begin
+  // Lesson (her gossip dialog, gated on the quest being accepted) opens a
+  // server-authoritative session; climbing onto the training Valorsteed with the
+  // Mount/Dismount keybind succeeds it and credits the quest. Driven by the
+  // mountTrainSession/End events; the guidance is two transient toasts. Player
+  // text renders through hudChrome.mountTraining.*.
   // ---------------------------------------------------------------------------
 
   private beginMountTraining(): void {
@@ -7665,56 +7653,29 @@ export class Hud {
     return this.keybinds.primaryLabel('mount') || 'Z';
   }
 
-  // A mountTrainSession event announces a phase change. 'mount' (a fresh attempt)
-  // shows the strip and toasts the mount hint; 'staging' reached FROM mount (the
-  // player just climbed aboard) toasts the dismount hint. A timed-out course -> staging
-  // soft reset (the sim posts its own "too slow" notice) fires no toast.
-  private onMountTrainSession(phase: 'mount' | 'staging'): void {
-    if (phase === 'mount') {
-      this.openMountTraining();
-      this.showBanner(t('hudChrome.mountTraining.mountPrompt', { key: this.mountKey() }));
-    } else if (phase === 'staging' && this.mountTrainPhase === 'mount') {
-      this.showBanner(t('hudChrome.mountTraining.dismountPrompt', { key: this.mountKey() }));
-    }
-    this.mountTrainPhase = phase;
-    this.mountTrainStrip.repaintIfChanged();
+  // A mountTrainSession event announces a fresh attempt: toast the mount hint.
+  private onMountTrainSession(): void {
+    this.showBanner(t('hudChrome.mountTraining.mountPrompt', { key: this.mountKey() }));
   }
 
-  // Show the bottom-anchored, non-interactive progress strip; the painter paints from
-  // world.mountTrainingView().
-  private openMountTraining(): void {
-    $('#mount-training-strip').style.display = 'flex';
-    this.mountTrainStrip.show();
-  }
-
-  private endMountTraining(outcome: 'success' | 'thrown' | 'abandoned'): void {
-    // Abandoning is the player's own dismount / leaving (the sim posts its own
-    // notice), so it gets no banner; success and a throw get a banner + log line.
-    if (outcome !== 'abandoned') {
-      const summary =
-        outcome === 'success'
-          ? t('hudChrome.mountTraining.success')
-          : t('hudChrome.mountTraining.thrown');
+  private endMountTraining(outcome: 'success' | 'abandoned'): void {
+    // Abandoning is the player's own doing (the sim posts its own notice where one
+    // helps), so it gets no banner; success gets a banner + log line.
+    if (outcome === 'success') {
+      const summary = t('hudChrome.mountTraining.success');
       this.showBanner(summary);
-      this.log(summary, outcome === 'success' ? '#7fdc4f' : '#ff7a6a');
+      this.log(summary, '#7fdc4f');
     }
-    this.closeMountTraining();
   }
 
-  /** Offline sim queues its events until the 20 Hz tick; flush them now so the strip
-   * and toasts react immediately. Online has no drainEvents and reacts to the normal
+  /** Offline sim queues its events until the 20 Hz tick; flush them now so the
+   * toasts react immediately. Online has no drainEvents and reacts to the normal
    * event stream instead. */
   flushMountTrainEvents(): void {
     const drain = (this.sim as { drainEvents?: () => SimEvent[] }).drainEvents;
     if (!drain) return;
     const events = drain.call(this.sim);
     if (events.length > 0) this.handleEvents(events);
-  }
-
-  private closeMountTraining(): void {
-    $('#mount-training-strip').style.display = 'none';
-    this.mountTrainStrip.hide();
-    this.mountTrainPhase = null;
   }
 
   // Drowned Reliquary Rite: the difficulty popup opens when a player interacts
@@ -9523,14 +9484,7 @@ export class Hud {
           break;
         }
         case 'mountTrainSession':
-          this.onMountTrainSession(ev.phase);
-          break;
-        case 'mountTrainRunStart':
-          this.mountTrainPhase = 'course';
-          this.mountTrainStrip.repaintIfChanged();
-          break;
-        case 'mountTrainJump':
-          this.mountTrainStrip.repaintIfChanged();
+          this.onMountTrainSession();
           break;
         case 'mountTrainEnd':
           this.endMountTraining(ev.outcome);

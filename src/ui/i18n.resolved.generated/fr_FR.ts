@@ -451,12 +451,7 @@ export const fr_FR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "dismountPrompt": "Press {key} again to dismount.",
-      "stagingPrompt": "Ride into the course arena to start the timer.",
-      "progress": "Jump {n} of {total}",
-      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed."
     },
     "vcup": {
@@ -8437,8 +8432,8 @@ export const fr_FR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Leçons d’équitation",
-        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Monte en selle quand j’en donne l’ordre, descends sur mon parcours et franchis chaque obstacle dans l’ordre avant que le sable ne s’écoule du verre. Perds la selle ou quitte l’enclos, et l’on recommence.",
-        "completion": "Voilà. Pas une seule fois agrippé à la barrière, du début à la fin. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.",
+        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Paie les frais, et quand j’en donne l’ordre, appelle à toi le Destrier de Bravoure d’entraînement et monte en selle. Reste près de moi dans la cour pendant ce temps; si tu t’éloignes, on recommence.",
+        "completion": "Voilà. En selle d’un seul mouvement, et bien stable une fois là-haut. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.",
         "objectives": {
           "0": {
             "label": "Dompter le Destrier de Bravoure"

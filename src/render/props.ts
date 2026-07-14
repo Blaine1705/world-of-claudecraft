@@ -1478,43 +1478,6 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     group.add(face);
   }
 
-  // ---- riding-course show-jumping obstacles (Highwatch Stables) ------------
-  // A collision-free jump at each RIDING_COURSE jump point (courseJumps): two upright
-  // posts and a low horizontal crossbar clearly reading as jumpable. The crossbar's
-  // long axis runs along `rot` (radial from the course centre, perpendicular to the
-  // line of travel), so the rider leaps it face-on. NO collider is registered
-  // (colliders.ts does not read courseJumps), so a grounded ride-through is possible
-  // but clearing the jump is game logic (mounts_training.ts). Merged static.
-  const courseJumps = getActiveWorldContent().props.courseJumps ?? [];
-  if (courseJumps.length > 0) {
-    const postMat = surfaceMat({ color: 0x6b4a2b, roughness: 1 });
-    const railMat = surfaceMat({ color: 0xe6dcc4, roughness: 0.85 });
-    const HALF_W = 1.5; // half the crossbar width (posts sit at +/- this)
-    const POST_H = 1.4;
-    const BAR_Y = 0.85; // crossbar height: low enough to read as jumpable
-    const postGeo = new THREE.CylinderGeometry(0.09, 0.11, POST_H, 6);
-    const barGeo = new THREE.BoxGeometry(HALF_W * 2, 0.12, 0.12);
-    for (const j of courseJumps) {
-      // Unit vector along the crossbar's long axis (the game heading convention:
-      // heading h points at (sin h, cos h) in x/z).
-      const dx = Math.sin(j.rot);
-      const dz = Math.cos(j.rot);
-      const g = new THREE.Group();
-      for (const s of [-1, 1]) {
-        const post = new THREE.Mesh(postGeo, postMat);
-        post.position.set(HALF_W * s * dx, POST_H / 2, HALF_W * s * dz);
-        g.add(post);
-      }
-      const bar = new THREE.Mesh(barGeo, railMat);
-      bar.position.y = BAR_Y;
-      // Orient the local-X bar so its length runs along (dx,dz).
-      bar.rotation.y = Math.atan2(-dz, dx);
-      g.add(bar);
-      g.position.set(j.x, ground(j.x, j.z), j.z);
-      group.add(shadowed(g));
-    }
-  }
-
   // ---- flush instanced batches ---------------------------------------------
   const cullables: PropCullable[] = [];
   for (const batch of instanceBatches.values()) {

@@ -50,19 +50,17 @@ const baseEnTable = {
   'error.noMountYet': "You don't have a mount yet.",
   'error.mountBuyLevel': 'You must be level 20 to buy a mount.',
   'error.mountAlreadyOwned': 'You already own that mount.',
-  // Riding-lesson (mount-training) minigame (src/sim/mounts_training.ts). The
-  // shared "Too far away." / "Not enough money." / "You can't do that while
-  // dead." refusals are reused verbatim and already registered above.
+  // Riding lesson (src/sim/mounts_training.ts). The shared "Too far away." /
+  // "Not enough money." / "You can't do that while dead." refusals are reused
+  // verbatim and already registered above.
   'error.mountTrainLevel': 'You must be level 20 to take riding lessons.',
   'error.mountTrainNeedsQuest': 'You need to accept the riding lesson quest first.',
   'error.mountTrainInProgress': 'A riding lesson is already in progress.',
-  // Riding-lesson course notices (log-type), emitted from the course driver.
+  // Riding-lesson notices (log-type), emitted from the per-tick driver.
   // Placeholder-free, so they register in the EXACT matcher automatically.
   'log.mountTrainSuccess': "Marla takes the Valorsteed's reins. Well ridden.",
-  'log.mountTrainThrown': 'The Valorsteed throws you. Marla waves you back to try again.',
   'log.mountTrainLeftYard':
     'You leave the paddock and the lesson ends. Come back to Marla to try again.',
-  'log.mountTrainTooSlow': 'Too slow. Ride out of the course and try again.',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
   'error.maxLoadouts': 'You can save at most {count} loadouts.',

@@ -3569,9 +3569,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cada jinete llega a pie, {className}. No te daré las riendas hasta que puedas montar al Corcel del Valor sin besar el barro, y en Highwatch no sobran sanadores para huesos rotos.',
   'entities.quests.q_riding_lessons.title': 'Lecciones de equitación',
   'entities.quests.q_riding_lessons.text':
-    'Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo. Sube a la silla cuando te dé la orden, baja al recorrido y salta cada obstáculo en orden antes de que se agote la arena del reloj. Pierde la silla o sal del cercado y empezamos de nuevo.',
+    'Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo. Paga la cuota y, cuando te dé la orden, llama al Corcel del Valor de entrenamiento y sube a la silla. Quédate conmigo en el patio mientras tanto; si te alejas, empezamos de nuevo.',
   'entities.quests.q_riding_lessons.completion':
-    'Así, muy bien. Ni una sola vez te agarraste a la cerca en toda la vuelta. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.',
+    'Así, muy bien. Arriba de un solo impulso y bien firme en la silla. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Doma al Corcel del Valor',
   'entities.npcs.marshal_redbrook.title': 'Mariscal de la ciudad',
   'entities.npcs.marshal_redbrook.greeting':

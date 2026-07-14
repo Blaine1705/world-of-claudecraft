@@ -472,21 +472,15 @@ export const hudChromeStrings = {
     desc_stormfeather_griffin:
       'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
   },
-  // The riding-lesson minigame at the Highwatch stables (q_riding_lessons):
-  // Stablemaster Marla has the player mount a training Valorsteed with the
-  // Mount/Dismount keybind, ride into the course arena to arm the timer, then jump the
-  // obstacles in order before it expires. Sim-side gameplay lives in
-  // src/sim/mounts_training.ts. mountPrompt/dismountPrompt are the two transient
-  // toasts; stagingPrompt/progress/timeLeft are the bottom strip. {key} is the live
-  // Mount/Dismount keycap; {seconds} the countdown.
+  // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
+  // Marla has the player climb onto a training Valorsteed with the Mount/Dismount
+  // keybind, which succeeds the lesson. Sim-side gameplay lives in
+  // src/sim/mounts_training.ts. begin is her gossip-dialog button; mountPrompt the
+  // transient toast ({key} is the live Mount/Dismount keycap); success the
+  // lesson-passed banner.
   mountTraining: {
     mountPrompt: 'Press {key} to mount the training Valorsteed.',
-    dismountPrompt: 'Press {key} again to dismount.',
-    stagingPrompt: 'Ride into the course arena to start the timer.',
-    progress: 'Jump {n} of {total}',
-    timeLeft: '{seconds}s',
     begin: 'Begin Lesson',
-    thrown: 'You were thrown. Steady up and try again.',
     success: 'You have tamed the Valorsteed.',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,

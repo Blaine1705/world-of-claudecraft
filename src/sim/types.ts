@@ -1654,11 +1654,6 @@ export interface ZonePropsDef {
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
   delveMarkers?: { x: number; z: number; delveId: string }[];
-  // Show-jumping obstacles at the riding-course jumps (the Highwatch Stables).
-  // Collision-free by design (colliders.ts does NOT read this field), so a grounded
-  // ride-through is physically possible but clearing a jump is game logic. `rot` is
-  // the crossbar's long-axis angle. Placed from content/mounts RIDING_COURSE.jumps.
-  courseJumps?: { x: number; z: number; rot: number }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {
@@ -2114,31 +2109,20 @@ export interface ReadyCheck {
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
 }
 
-// Mount-training minigame ("riding lessons"): a timed show-jumping course. The
-// player mounts a training Valorsteed at Marla ('mount'), rides into the course arena
-// which arms the timer ('staging' -> 'course'), then jumps the obstacles in order
-// before the deadline. `TrainingLean` is retained only for the deprecated no-op
-// IWorld.mountTrainAnswer member (the old lean-cue command); nothing reads it now.
-export type TrainingLean = 'left' | 'right' | 'steady';
-
 // A player's active riding-lesson attempt (src/sim/mounts_training.ts), kept on
 // PlayerMeta.mountTraining. Session-only: never persisted/serialized (unlike the
 // one-time mountTrainingFeePaid flag also on PlayerMeta), so a save/load never
-// resumes a half-finished lesson. Phases: 'mount' (begun, not on the steed) ->
-// 'staging' (mounted, timer not running) -> 'course' (timer running). `jump` is how
-// many jumps have been cleared, which is also the 0-based index of the next jump in
-// RIDING_COURSE.jumps. `deadlineTick` is the sim tick the run times out (valid in
-// 'course'). `insideCourse` is the last-known "inside the course arena" state, so the
-// timer arms only on a fresh outside->inside transition. No rng: the course is a
-// static shape, so installing this system perturbs no draw order.
+// resumes a half-finished lesson. The lesson is the Mount/Dismount keybind
+// tutorial: begin at Marla, then climb onto the training Valorsteed with that
+// key, which succeeds the lesson and credits the quest objective. No rng, so
+// installing this system perturbs no draw order.
 export interface MountTrainingSession {
   sessionId: string;
   ownerId: number;
-  phase: 'mount' | 'staging' | 'course';
-  jump: number;
-  deadlineTick: number;
-  insideCourse: boolean;
-  state: 'IN_PROGRESS' | 'SUCCESS' | 'THROWN' | 'ABANDONED';
+  /** Marla's position captured at begin (she is stationary), so the per-tick
+   *  stray check never rescans the entity map for her. */
+  anchor: { x: number; z: number };
+  state: 'IN_PROGRESS' | 'SUCCESS' | 'ABANDONED';
 }
 
 // `pid` (when present) marks a personal event that should only be delivered to
@@ -2497,36 +2481,18 @@ export type SimEvent = { pid?: number } & (
         | 'throttled'
         | 'not_at_hub';
     }
-  // Mount-training minigame ("riding lessons", src/sim/mounts_training.ts). All
-  // personal (pid-scoped). mountTrainSession announces a phase change to 'mount' (a
-  // fresh attempt) or 'staging' (mounted, or a timed-out soft reset); mountTrainRunStart
-  // arms the timer (staging -> course) and carries the countdown budget so the client
-  // can display it; mountTrainJump reports one jump cleared; mountTrainEnd reports the
-  // terminal outcome. Jump positions are NOT on the wire: the client derives them from
-  // the shared RIDING_COURSE content by the jump index.
+  // Riding lesson (src/sim/mounts_training.ts). Both personal (pid-scoped).
+  // mountTrainSession announces a fresh attempt (the client toasts the
+  // Mount/Dismount hint); mountTrainEnd reports the terminal outcome.
   | {
       type: 'mountTrainSession';
       sessionId: string;
-      phase: 'mount' | 'staging';
-      pid: number;
-    }
-  | {
-      type: 'mountTrainRunStart';
-      sessionId: string;
-      timeLimitTicks: number;
-      pid: number;
-    }
-  | {
-      type: 'mountTrainJump';
-      sessionId: string;
-      jump: number;
-      jumpsTotal: number;
       pid: number;
     }
   | {
       type: 'mountTrainEnd';
       sessionId: string;
-      outcome: 'success' | 'thrown' | 'abandoned';
+      outcome: 'success' | 'abandoned';
       pid: number;
     }
 );

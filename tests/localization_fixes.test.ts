@@ -912,8 +912,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
-    // Riding-lesson (mount-training) minigame: the mount_train_begin/answer
-    // guard refusals (level/range/quest/in-progress/no-session literals).
+    // Riding lesson: the mount_train_begin guard refusals and the driver's
+    // notices (level/range/quest/in-progress/success/left-yard literals).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts_training.ts'), 'utf8'),
     socialSrc,
   ].join('\n');

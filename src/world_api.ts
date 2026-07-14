@@ -93,7 +93,6 @@ export type {
   ArenaFormat,
   ArenaStanding,
   OverheadEmoteId,
-  TrainingLean,
 } from './sim/types';
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
@@ -130,7 +129,6 @@ export type {
 export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
-export type { MountTrainingView } from './world_api/mounts';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
 export type {
@@ -379,6 +377,13 @@ export const DISPATCH_ONLY_COMMANDS = [
   'leave_crypt',
   'social_refresh',
   'targetNearest',
+  // Riding-lesson leftovers: 'mount_train_answer' (the removed lean-cue arm) and
+  // 'mount_train_abort' (the removed course minigame's cancel) no longer have a
+  // ClientWorld sender, but the wire strings ARE the protocol (append-only), so
+  // the server keeps dispatching them: answer as a no-op, abort as a session
+  // abandon.
+  'mount_train_answer',
+  'mount_train_abort',
 ] as const satisfies readonly CommandName[];
 
 export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];
@@ -578,12 +583,9 @@ export const COMMAND_FACETS = {
   vcup_practice: 'IWorldValeCup',
   // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
   // selectedMount is a self-snapshot read (terse `mnt`, no send, untagged).
-  // mount_train_* is the riding-lesson minigame; mountTrainingView rebuilds
-  // client-side from the mountTrain* events (no snapshot field, untagged),
-  // the lockpickState precedent.
+  // mount_train_begin starts the riding lesson (the Mount/Dismount keybind
+  // tutorial); its feedback rides the mountTrain* events (no snapshot field).
   mount_select: 'IWorldMounts',
   mount_toggle: 'IWorldMounts',
   mount_train_begin: 'IWorldMounts',
-  mount_train_answer: 'IWorldMounts',
-  mount_train_abort: 'IWorldMounts',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

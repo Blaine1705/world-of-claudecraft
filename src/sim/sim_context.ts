@@ -538,13 +538,12 @@ export interface SimContextCallbacks {
   tickLockpickTimeout(run: DelveRun): void;
   startDelveRaiseDeadChannel(run: DelveRun, boss: Entity, mobId: string, count: number): boolean;
 
-  // Riding-lesson (mount-training) minigame (src/sim/mounts_training.ts): a ridden
-  // course session that lives directly on PlayerMeta rather than a shared DelveRun.
-  // tickMountTraining is the per-tick course driver (called next to
-  // updateMountTransition in the coordinator's per-player loop: the mount -> ride
-  // phase flip and the gated ride); abandonMountTraining tears down a leaving
-  // player's IN_PROGRESS session (called from the removePlayer leave path,
-  // mirroring abandonLockpick).
+  // Riding lesson (src/sim/mounts_training.ts): a session that lives directly on
+  // PlayerMeta rather than a shared DelveRun. tickMountTraining is the per-tick
+  // driver (called next to updateMountTransition in the coordinator's per-player
+  // loop: it succeeds the lesson once the player is in the training steed's
+  // saddle); abandonMountTraining tears down a leaving player's IN_PROGRESS
+  // session (called from the removePlayer leave path, mirroring abandonLockpick).
   tickMountTraining(meta: PlayerMeta): void;
   abandonMountTraining(meta: PlayerMeta): void;
 

@@ -2562,9 +2562,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Kỵ sĩ nào cũng bước vào bằng hai chân, {className}. Ta chỉ trao dây cương khi nào ngươi ngồi vững trên lưng Valorsteed mà không lăn xuống bùn, vì Highwatch chẳng dư thầy thuốc để chữa xương gãy.',
   'entities.quests.q_riding_lessons.title': 'Bài Học Cưỡi Ngựa',
   'entities.quests.q_riding_lessons.text':
-    'Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán. Leo lên yên khi ta ra hiệu, phi xuống đường đua của ta, và vượt từng chướng ngại theo thứ tự trước khi cát trong đồng hồ cạn. Rời khỏi yên hoặc ra khỏi khoảnh sân thì ta bắt đầu lại từ đầu.',
+    'Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán. Trả lệ phí, rồi khi ta ra hiệu, hãy gọi con Valorsteed huấn luyện đến và leo lên yên. Trong lúc đó hãy ở lại sân cùng ta; đi xa là ta bắt đầu lại từ đầu.',
   'entities.quests.q_riding_lessons.completion':
-    'Đấy, được rồi. Suốt cả vòng chạy, ngươi chẳng một lần bám vào hàng rào. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.',
+    'Đấy, được rồi. Lên yên bằng một động tác gọn gàng và ngồi thật vững. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Thuần Hóa Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Cảnh Trưởng Thị Trấn',
   'entities.npcs.provisioner_hale.greeting':

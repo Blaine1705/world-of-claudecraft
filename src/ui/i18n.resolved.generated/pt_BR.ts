@@ -451,12 +451,7 @@ export const pt_BR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "dismountPrompt": "Press {key} again to dismount.",
-      "stagingPrompt": "Ride into the course arena to start the timer.",
-      "progress": "Jump {n} of {total}",
-      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed."
     },
     "vcup": {
@@ -8437,8 +8432,8 @@ export const pt_BR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Aulas de Equitação",
-        "text": "Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo. Suba na sela quando eu der o sinal, desça até o meu percurso e salte cada obstáculo em ordem antes que a areia se esgote na ampulheta. Perca a sela ou saia do cercado e começamos de novo.",
-        "completion": "Pronto, assim mesmo. Nem uma vez você se segurou na cerca durante toda a volta. O Corcel do Valor é seu, {playerName}: sela, rédeas, e a reputação de um cavaleiro que conquistou o assento em vez de comprá-lo.",
+        "text": "Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo. Pague a taxa e, quando eu der o sinal, chame o Corcel do Valor de treinamento e suba na sela. Fique comigo no pátio enquanto isso; se você se afastar, começamos de novo.",
+        "completion": "Pronto, assim mesmo. Subiu num movimento só e ficou firme lá em cima. O Corcel do Valor é seu, {playerName}: sela, rédeas, e a reputação de um cavaleiro que conquistou o assento em vez de comprá-lo.",
         "objectives": {
           "0": {
             "label": "Domar o Corcel do Valor"

@@ -451,12 +451,7 @@ export const nl_NL: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "dismountPrompt": "Press {key} again to dismount.",
-      "stagingPrompt": "Ride into the course arena to start the timer.",
-      "progress": "Jump {n} of {total}",
-      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed."
     },
     "vcup": {
@@ -8437,8 +8432,8 @@ export const nl_NL: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Rijlessen",
-        "text": "Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Blijven zitten is wat ik leer, niet wat ik verkoop. Klim in het zadel als ik het teken geef, rijd omlaag mijn parcours in en neem elke hindernis op volgorde voordat het zand uit het glas is gelopen. Verlies het zadel of verlaat het erf, en we beginnen opnieuw.",
-        "completion": "Zo, ja. Geen één keer greep je naar het hek, de hele rit door. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.",
+        "text": "Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Blijven zitten is wat ik leer, niet wat ik verkoop. Betaal het lesgeld, en als ik het teken geef, roep je de oefen-Valorsteed bij je en klim je in het zadel. Blijf ondertussen bij mij op het erf; dwaal je weg, dan beginnen we opnieuw.",
+        "completion": "Zo, ja. In één vloeiende beweging omhoog en daarboven rustig blijven zitten. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.",
         "objectives": {
           "0": {
             "label": "Tem de Valorsteed"

@@ -188,7 +188,6 @@ const UI_PURE_CORES = [
   'src/ui/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
   'src/ui/mount_picker_view.ts',
-  'src/ui/mount_training_view.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
 ].map((rel) => join(repoRoot, rel));

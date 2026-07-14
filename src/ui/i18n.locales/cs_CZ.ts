@@ -4653,9 +4653,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každý jezdec sem přijde po svých, {className}. Otěže nedostaneš, dokud neusedneš na Valorsteeda, aniž bys skončil v blátě, a Highwatch nemá ranhojiče nazbyt pro zlomené kosti.',
   'entities.quests.q_riding_lessons.title': 'Jezdecké lekce',
   'entities.quests.q_riding_lessons.text':
-    'Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám. Vylez do sedla, až dám pokyn, sjeď dolů do mé parkurové dráhy a zdolej každou překážku popořadě, než v přesýpacích hodinách doteče písek. Ztratíš sedlo nebo opustíš ohradu a začínáme znovu.',
+    'Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám. Zaplať poplatek, a až dám pokyn, přivolej cvičného Valorsteeda a vylez do sedla. Zůstaň přitom u mě na dvoře; když se zatouláš, začínáme znovu.',
   'entities.quests.q_riding_lessons.completion':
-    'Tak. Ani jednou ses nechytil plotu celou tu dobu. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.',
+    'Tak. Nahoru jedním plynulým pohybem a v sedle pevně jako skála. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Zkroť Valorsteeda',
   'entities.npcs.marshal_redbrook.title': 'Městský maršál',
   'entities.npcs.provisioner_hale.greeting':

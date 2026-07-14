@@ -3574,9 +3574,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Jeder Reiter kommt auf zwei Beinen herein, {className}. Die Zügel gebe ich erst, wenn Ihr den Valorross reiten könnt, ohne im Dreck zu landen, und Highwatch hat keine Heiler für gebrochene Knochen übrig.',
   'entities.quests.q_riding_lessons.title': 'Reitstunden',
   'entities.quests.q_riding_lessons.text':
-    'Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe. Steigt in den Sattel, wenn ich das Wort gebe, reitet hinab in meinen Parcours und nehmt jedes Hindernis der Reihe nach, bevor der Sand durch das Glas gelaufen ist. Verliert Ihr den Sattel oder verlasst den Hof, fangen wir von vorn an.',
+    'Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe. Zahlt die Gebühr, und wenn ich das Wort gebe, ruft das Übungs-Valorross zu Euch und steigt in den Sattel. Bleibt dabei bei mir im Hof; entfernt Ihr Euch, fangen wir von vorn an.',
   'entities.quests.q_riding_lessons.completion':
-    'So, ja. Kein einziges Mal nach dem Zaun gegriffen, die ganze Runde über. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.',
+    'So, ja. In einer einzigen sauberen Bewegung hinauf und oben ruhig gesessen. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Bezähmt den Valorross',
   'entities.npcs.marshal_redbrook.title': 'Stadtmarschall',
   'entities.npcs.marshal_redbrook.greeting':

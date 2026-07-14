@@ -2588,9 +2588,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Setiap penunggang datang dengan dua kaki, {className}. Kendali baru kuberikan setelah kau sanggup menunggangi Valorsteed tanpa jatuh tersungkur, dan Highwatch tak punya tabib lebih untuk tulang yang patah.',
   'entities.quests.q_riding_lessons.title': 'Pelajaran Menunggang Kuda',
   'entities.quests.q_riding_lessons.text':
-    'Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Naiklah ke pelana saat kuberi aba-aba, berkudalah menuruni lintasanku, dan lompati setiap rintangan berurutan sebelum pasir di jam pasir habis. Terlepas dari pelana atau keluar dari pekarangan, dan kita mulai lagi dari awal.',
+    'Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Bayar biayanya, dan saat kuberi aba-aba, panggil Valorsteed latihan itu dan naiklah ke pelana. Tetaplah bersamaku di pekarangan selagi melakukannya; kalau kau pergi menjauh, kita mulai lagi dari awal.',
   'entities.quests.q_riding_lessons.completion':
-    'Nah, begitu. Tak sekali pun kau memegang pagar sepanjang putaran itu. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.',
+    'Nah, begitu. Naik dengan satu gerakan mulus dan duduk mantap di atas. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Jinakkan Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Marsekal Kota',
   'entities.npcs.provisioner_hale.greeting':

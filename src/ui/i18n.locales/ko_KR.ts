@@ -2612,9 +2612,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '기수는 누구나 두 발로 걸어 들어오지, {className}. 발러스티드 위에서 진흙에 처박히지 않고 버틸 수 있을 때까지는 고삐를 내주지 않아. 하이워치엔 부러진 뼈를 봐줄 치료사도 넉넉지 않으니까.',
   'entities.quests.q_riding_lessons.title': '승마 수업',
   'entities.quests.q_riding_lessons.text':
-    '기수는 누구나 두 발로 걸어 들어오지, {playerName}, 우리가 처음 만난 날 말했던 그대로다. 내가 가르치는 건 자리에 앉는 법이지 파는 물건이 아니야. 내가 신호를 주면 안장에 올라타서, 울타리 안 깃발이 세워진 코스를 모든 관문을 순서대로 달려라. 안장에서 떨어지거나 마당을 벗어나면 처음부터 다시 시작이다.',
+    '기수는 누구나 두 발로 걸어 들어오지, {playerName}, 우리가 처음 만난 날 말했던 그대로다. 내가 가르치는 건 자리에 앉는 법이지 파는 물건이 아니야. 수업료를 내고, 내가 신호를 주면 훈련용 발러스티드를 불러 안장에 올라타라. 그동안은 내 곁 마당에 머물러라. 멀리 벗어나면 처음부터 다시 시작이다.',
   'entities.quests.q_riding_lessons.completion':
-    '그래, 됐다. 도는 내내 울타리를 한 번도 붙잡지 않았구나. 발러스티드는 이제 네 것이다, {playerName}: 안장도 고삐도, 그리고 값을 치른 게 아니라 스스로 얻어낸 기수의 자리도.',
+    '그래, 됐다. 한 번에 매끄럽게 올라타서 흔들림 없이 앉았구나. 발러스티드는 이제 네 것이다, {playerName}: 안장도 고삐도, 그리고 값을 치른 게 아니라 스스로 얻어낸 기수의 자리도.',
   'entities.quests.q_riding_lessons.objectives.0.label': '발러스티드 길들이기',
   'entities.npcs.marshal_redbrook.title': '마을 원수',
   'entities.npcs.marshal_redbrook.greeting':
@@ -6565,10 +6565,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyDropHint': '더 희귀한 탈것은 던전과 공격대 우두머리가 떨어뜨립니다.',
   'hudChrome.mounts.clickManage': '클릭하여 탈것 선택',
   'hudChrome.mountTraining.mountPrompt': '{key} 키를 눌러 훈련용 발러스티드에 탑승한다.',
-  'hudChrome.mountTraining.dismountPrompt': '{key} 키를 다시 눌러 내린다.',
-  'hudChrome.mountTraining.stagingPrompt': '코스 경기장으로 들어가 타이머를 시작하라.',
-  'hudChrome.mountTraining.progress': '{total} 장애물 중 {n} 번째',
   'hudChrome.mountTraining.begin': '수업 시작',
-  'hudChrome.mountTraining.thrown': '낙마했다. 침착하게 다시 시도하라.',
   'hudChrome.mountTraining.success': '발러스티드를 길들였다.',
 };

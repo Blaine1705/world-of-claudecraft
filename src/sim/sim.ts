@@ -8,7 +8,6 @@ import type {
   DelveCompanionInfo,
   DelveRunInfo,
   LockpickView,
-  MountTrainingView,
   PlayerProfessionsView,
 } from '../world_api';
 import * as bagsMod from './bags';
@@ -204,7 +203,6 @@ import {
   abandonMountTraining as abandonMountTrainingImpl,
   mountTrainAbort as mountTrainAbortImpl,
   mountTrainBegin as mountTrainBeginImpl,
-  mountTrainingViewFor as mountTrainingViewForImpl,
   tickMountTraining as tickMountTrainingImpl,
 } from './mounts_training';
 import {
@@ -439,7 +437,6 @@ import {
   SUNDER_ARMOR_PCT_PER_STACK,
   steadyAngleTo,
   swingMissChance,
-  type TrainingLean,
   type VcBracket,
   type VcNationId,
   type Vec3,
@@ -823,10 +820,10 @@ export interface PlayerMeta {
   // now" state is Entity.mountKey, which starts '' on login and clears on
   // death. Collection + rules live in src/sim/mounts.ts.
   selectedMount: MountKey;
-  // The active riding-lesson (mount-training minigame) attempt, or null. Session
-  // state, never persisted: src/sim/mounts_training.ts owns the rules; this is
-  // the same optional-plus-null shape as other transient session fields below
-  // (e.g. `away`), initialized to null in createPlayer.
+  // The active riding-lesson attempt, or null. Session state, never persisted:
+  // src/sim/mounts_training.ts owns the rules; this is the same
+  // optional-plus-null shape as other transient session fields below (e.g.
+  // `away`), initialized to null in createPlayer.
   mountTraining?: MountTrainingSession | null;
   // One-time riding-lesson fee (100g), charged at the first successful
   // mount_train_begin. Optional so absent === false (pre-feature saves and a
@@ -2402,36 +2399,20 @@ export class Sim {
     this.toggleMountFor(this.primaryId);
   }
 
-  /** Per-pid riding-lesson (mount-training minigame) command surface (the server
-   *  path); the IWorld members below ride primaryId. Rules live in
-   *  src/sim/mounts_training.ts. */
+  /** Per-pid riding-lesson command surface (the server path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/mounts_training.ts.
+   *  mountTrainAbortFor stays server-reachable (the append-only wire token
+   *  mount_train_abort) even though no HUD surface sends it anymore. */
   mountTrainBeginFor(pid: number): void {
     mountTrainBeginImpl(this.ctx, pid);
   }
-  // Deprecated no-op: the riding lesson is a ridden course now, not a lean-cue
-  // reaction. Kept only so the IWorld member (pinned by world_api_parity) still
-  // exists; the wire command 'mount_train_answer' stays registered but does nothing.
-  mountTrainAnswerFor(_pid: number, _lean: TrainingLean): void {}
   mountTrainAbortFor(pid: number): void {
     mountTrainAbortImpl(this.ctx, pid);
   }
-  /** Read-only projection of a player's active riding-lesson attempt. */
-  mountTrainingViewFor(pid?: number): MountTrainingView | null {
-    return mountTrainingViewForImpl(this.ctx, pid);
-  }
 
-  // --- IWorldMounts: riding-lesson (mount-training) minigame ---
-  mountTrainingView(): MountTrainingView | null {
-    return this.mountTrainingViewFor(this.primaryId);
-  }
+  // --- IWorldMounts: the riding lesson ---
   mountTrainBegin(): void {
     this.mountTrainBeginFor(this.primaryId);
-  }
-  mountTrainAnswer(lean: TrainingLean): void {
-    this.mountTrainAnswerFor(this.primaryId, lean);
-  }
-  mountTrainAbort(): void {
-    this.mountTrainAbortFor(this.primaryId);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and
@@ -3513,11 +3494,11 @@ export class Sim {
         this.updateDoorTriggers(p);
         lap?.('p.move');
       }
-      // Riding-lesson (mount-training) course driver: server-authoritative; advances
-      // the mount -> ride phase flip and the gated ride for a live player, and ends a
-      // dead/ghost player's IN_PROGRESS lesson as a throw (the driver's first check),
-      // so death never strands the session. Draws no rng, so the tick-phase draw
-      // order is unchanged.
+      // Riding-lesson driver: server-authoritative; succeeds the lesson once the
+      // live player is in the training steed's saddle, and ends a dead/ghost
+      // player's IN_PROGRESS lesson (the driver's first check), so death never
+      // strands the session. Draws no rng, so the tick-phase draw order is
+      // unchanged.
       this.ctx.tickMountTraining(meta);
       updateTimers(p);
       updateComboExpiry(this.ctx, p);

@@ -451,12 +451,7 @@ export const pl_PL: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "dismountPrompt": "Press {key} again to dismount.",
-      "stagingPrompt": "Ride into the course arena to start the timer.",
-      "progress": "Jump {n} of {total}",
-      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed."
     },
     "vcup": {
@@ -8437,8 +8432,8 @@ export const pl_PL: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lekcje jazdy konnej",
-        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Wsiądź do siodła, gdy dam znak, zjedź na mój parkur i pokonaj każdą przeszkodę po kolei, zanim piasek przesypie się w klepsydrze. Stracisz siodło albo opuścisz zagrodę i zaczynamy od nowa.",
-        "completion": "No, właśnie tak. Ani razu nie złapałeś się ogrodzenia przez całą przejażdżkę. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.",
+        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Zapłać opłatę, a gdy dam znak, przywołaj treningowego Valorsteeda i wsiądź do siodła. Zostań przy mnie na dziedzińcu, póki tego nie zrobisz; oddalisz się i zaczynamy od nowa.",
+        "completion": "No, właśnie tak. W siodle za jednym płynnym ruchem i pewnie usadzony. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.",
         "objectives": {
           "0": {
             "label": "Ujeżdżenie Valorsteeda"

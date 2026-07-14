@@ -2629,9 +2629,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '騎手はみな二本足で歩いてくる、{className}よ。ヴァロースティードにまたがって泥にまみれずにいられるようになるまで、手綱は渡さない。ハイウォッチには骨折を治せる者もそう余っていないのでね。',
   'entities.quests.q_riding_lessons.title': '乗馬の稽古',
   'entities.quests.q_riding_lessons.text':
-    '騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。わたしが合図したら鞍にまたがり、囲い場の旗の立ったコースを、すべてのゲートを順番に走り抜けるのだ。鞍から落ちるか、囲いを出れば、また最初からやり直しだ。',
+    '騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。謝礼を払い、わたしが合図したら、調教用のヴァロースティードを呼び寄せて鞍にまたがるのだ。その間はわたしのそばの庭にいろ。離れれば、また最初からやり直しだ。',
   'entities.quests.q_riding_lessons.completion':
-    'よし、それでいい。ひとっ走りの間、柵に一度もしがみつかなかったな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。',
+    'よし、それでいい。ひと息にまたがり、上でも堂々と座っていたな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。',
   'entities.quests.q_riding_lessons.objectives.0.label': 'ヴァロースティードを乗りこなす',
   'entities.npcs.marshal_redbrook.title': '町の元帥',
   'entities.npcs.marshal_redbrook.greeting':
@@ -6581,10 +6581,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'より希少なマウントはダンジョンやレイドのボスがドロップします。',
   'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
   'hudChrome.mountTraining.mountPrompt': '{key} キーを押して訓練用ヴァロースティードに騎乗する。',
-  'hudChrome.mountTraining.dismountPrompt': 'もう一度 {key} キーを押して降りる。',
-  'hudChrome.mountTraining.stagingPrompt': 'コースの馬場に乗り入れてタイマーを開始しよう。',
-  'hudChrome.mountTraining.progress': '{total} 障害中 {n} 番目',
   'hudChrome.mountTraining.begin': 'レッスン開始',
-  'hudChrome.mountTraining.thrown': '振り落とされた。落ち着いてもう一度挑戦しよう。',
   'hudChrome.mountTraining.success': 'ヴァロースティードを乗りこなした。',
 };

@@ -2519,9 +2519,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '每个骑手都是两条腿走进来的，{className}。你能骑稳英勇战马、不摔进泥里之前，我是不会把缰绳交给你的，高望这儿可没有多余的医者去治断骨。',
   'entities.quests.q_riding_lessons.title': '骑术课',
   'entities.quests.q_riding_lessons.text':
-    '每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。我教的是怎么坐稳，不是拿来卖的东西。等我发话就翻身上鞍，沿着我围场里插旗的赛道，按顺序穿过每一道门。要是从鞍上摔下来，或者跑出了院子，我们就从头再来。',
+    '每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。我教的是怎么坐稳，不是拿来卖的东西。交上学费，等我发话，就把训练用的英勇战马唤到身边，翻身上鞍。这期间待在院子里别走远；跑远了，我们就从头再来。',
   'entities.quests.q_riding_lessons.completion':
-    '好了，就是这样。整趟下来你一次都没抓过栅栏。英勇战马现在是你的了，{playerName}：马鞍、缰绳，还有靠本事挣来而不是买来的骑手身份。',
+    '好了，就是这样。一个利落的动作上了鞍，坐得稳稳当当。英勇战马现在是你的了，{playerName}：马鞍、缰绳，还有靠本事挣来而不是买来的骑手身份。',
   'entities.quests.q_riding_lessons.objectives.0.label': '驯服英勇战马',
   'entities.npcs.marshal_redbrook.title': '城镇元帅',
   'entities.npcs.marshal_redbrook.greeting': '刀别离手，{className}。山谷已经不是从前的山谷了。',
@@ -6235,10 +6235,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyDropHint': '较稀有的坐骑由地下城和团队副本首领掉落。',
   'hudChrome.mounts.clickManage': '点击选择坐骑',
   'hudChrome.mountTraining.mountPrompt': '按 {key} 键骑上训练用英勇战马。',
-  'hudChrome.mountTraining.dismountPrompt': '再次按 {key} 键下马。',
-  'hudChrome.mountTraining.stagingPrompt': '骑入赛道场地即可开始计时。',
-  'hudChrome.mountTraining.progress': '第 {n} 个障碍，共 {total} 个',
   'hudChrome.mountTraining.begin': '开始课程',
-  'hudChrome.mountTraining.thrown': '你被甩下马了。稳住，再试一次。',
   'hudChrome.mountTraining.success': '你已经驯服了英勇战马。',
 };

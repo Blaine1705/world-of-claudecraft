@@ -1,5 +1,4 @@
 import type { MountKey } from '../sim/content/mounts';
-import type { TrainingLean } from '../sim/types';
 
 // Rideable ground mounts: the collection + selection surface behind the
 // character sheet's mount picker and the mount keybind. The catalog itself is
@@ -18,37 +17,11 @@ export interface IWorldMounts {
   selectMount(key: MountKey): void;
   /** Mount the selected mount, or dismount while riding. */
   toggleMounted(): void;
-  /** The riding-lesson (mount-training) minigame gating reins_valorsteed's
-   *  q_riding_lessons quest reward: mount a training Valorsteed at the stablemaster
-   *  (the Mount/Dismount keybind tutorial), then ride into the course arena to arm the
-   *  timer and jump the obstacles in order before it expires. Server-authoritative;
-   *  rules live in src/sim/mounts_training.ts. Rebuilt client-side from the mountTrain*
-   *  events (no snapshot field), the lockpickState precedent. */
-  mountTrainingView(): MountTrainingView | null;
-  /** Start a lesson attempt (charges the one-time 100g fee on first success). */
+  /** Start a riding-lesson attempt at Stablemaster Marla, gating
+   *  reins_valorsteed's q_riding_lessons quest reward (charges the one-time 100g
+   *  fee on first success). The lesson is the Mount/Dismount keybind tutorial:
+   *  climbing onto the training Valorsteed with that key succeeds it and credits
+   *  the quest objective. Server-authoritative; rules live in
+   *  src/sim/mounts_training.ts, feedback rides the mountTrain* events. */
   mountTrainBegin(): void;
-  /** @deprecated No-op. The lesson is a ridden course now, not a lean-cue
-   *  reaction; this member is retained only because removing it would break the
-   *  pinned IWorld member list. The wire command 'mount_train_answer' stays
-   *  registered (append-only) but does nothing. */
-  mountTrainAnswer(lean: TrainingLean): void;
-  /** Abandon the active attempt (the fee, once paid, stays paid). */
-  mountTrainAbort(): void;
-}
-
-// Render-safe projection of an active riding-lesson attempt. phase 'mount' = the
-// player has yet to summon the training steed; 'staging' = mounted, awaiting entry
-// into the course arena (timer not running); 'course' = the timed run. `jump` is
-// jumps cleared so far (0-based next-jump index), `jumpsTotal` the whole course, and
-// `nextJump` the world position of the jump to clear (null outside 'course' and once
-// the last jump is cleared). `ticksLeft` is the countdown remaining in sim ticks
-// (null outside 'course'); `timeLimitTicks` is the full budget (for a bar fill).
-export interface MountTrainingView {
-  sessionId: string;
-  phase: 'mount' | 'staging' | 'course';
-  jump: number;
-  jumpsTotal: number;
-  nextJump: { x: number; z: number } | null;
-  ticksLeft: number | null;
-  timeLimitTicks: number;
 }

@@ -451,12 +451,7 @@ export const tr_TR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "dismountPrompt": "Press {key} again to dismount.",
-      "stagingPrompt": "Ride into the course arena to start the timer.",
-      "progress": "Jump {n} of {total}",
-      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed."
     },
     "vcup": {
@@ -8437,8 +8432,8 @@ export const tr_TR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Binicilik Dersleri",
-        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. İşaret verdiğimde eyere çık, parkuruma in ve kum saatindeki kum bitmeden her engeli sırayla aş. Eyeri kaybedersen ya da avludan çıkarsan baştan başlarız.",
-        "completion": "İşte böyle. Bütün tur boyunca bir kere bile çite tutunmadın. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.",
+        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. Ücreti öde, işaret verdiğimde eğitim Valorsteed'ini yanına çağır ve eyere çık. Bu sırada avluda yanımda kal; uzaklaşırsan baştan başlarız.",
+        "completion": "İşte böyle. Tek hamlede eyere çıktın ve yukarıda dimdik oturdun. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.",
         "objectives": {
           "0": {
             "label": "Valorsteed'i evcilleştir"

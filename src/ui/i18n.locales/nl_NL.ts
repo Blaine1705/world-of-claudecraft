@@ -2520,9 +2520,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Elke ruiter komt op twee benen binnen, {className}. De teugels krijg je pas als je op de Valorsteed kunt blijven zitten zonder in de modder te belanden, en Highwatch heeft geen genezers over voor gebroken botten.',
   'entities.quests.q_riding_lessons.title': 'Rijlessen',
   'entities.quests.q_riding_lessons.text':
-    'Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Blijven zitten is wat ik leer, niet wat ik verkoop. Klim in het zadel als ik het teken geef, rijd omlaag mijn parcours in en neem elke hindernis op volgorde voordat het zand uit het glas is gelopen. Verlies het zadel of verlaat het erf, en we beginnen opnieuw.',
+    'Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Blijven zitten is wat ik leer, niet wat ik verkoop. Betaal het lesgeld, en als ik het teken geef, roep je de oefen-Valorsteed bij je en klim je in het zadel. Blijf ondertussen bij mij op het erf; dwaal je weg, dan beginnen we opnieuw.',
   'entities.quests.q_riding_lessons.completion':
-    'Zo, ja. Geen één keer greep je naar het hek, de hele rit door. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.',
+    'Zo, ja. In één vloeiende beweging omhoog en daarboven rustig blijven zitten. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Tem de Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Stadsmaarschalk',
   'entities.npcs.provisioner_hale.greeting':

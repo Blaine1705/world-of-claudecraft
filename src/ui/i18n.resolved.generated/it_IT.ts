@@ -451,12 +451,7 @@ export const it_IT: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "dismountPrompt": "Press {key} again to dismount.",
-      "stagingPrompt": "Ride into the course arena to start the timer.",
-      "progress": "Jump {n} of {total}",
-      "timeLeft": "{seconds}s",
       "begin": "Begin Lesson",
-      "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed."
     },
     "vcup": {
@@ -8437,8 +8432,8 @@ export const it_IT: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lezioni di equitazione",
-        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Sali in sella quando te lo dico, scendi nel mio percorso e affronta ogni ostacolo in ordine prima che la sabbia scenda tutta nella clessidra. Perdi la sella o esci dal recinto, e si ricomincia.",
-        "completion": "Ecco, così. Non ti sei aggrappato alla staccionata nemmeno una volta, per tutto il giro. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.",
+        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Paga la quota e, quando te lo dico, chiama a te il Destriero del Valore da addestramento e sali in sella. Resta con me nel cortile mentre lo fai; se ti allontani, si ricomincia.",
+        "completion": "Ecco, così. Su con un solo movimento pulito e ben saldo in sella. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.",
         "objectives": {
           "0": {
             "label": "Doma il Destriero del Valore"
