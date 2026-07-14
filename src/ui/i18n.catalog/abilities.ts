@@ -1748,6 +1748,11 @@ const classAbilityNamesEn = {
         'Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)',
       ],
       [
+        'temporal_hourglass',
+        'Hourglass of Suspension',
+        'Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for {duration} sec and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for {duration} sec, prevents damage and actions, restores {healing}% of maximum health, and makes cooldowns recover {cooldownRecovery}% faster. The beneficial aura can be removed manually.',
+      ],
+      [
         'temporal_acceleration',
         'Temporal Acceleration',
         'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)',

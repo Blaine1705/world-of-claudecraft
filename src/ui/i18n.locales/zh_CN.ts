@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.temporal_hourglass.name': '悬停沙漏',
+  'entities.abilities.temporal_hourglass.description':
+    '在选定位置放置一个时间沙漏。置于敌人脚下时，使其悬停 {duration} 秒且无法行动；受到任何伤害都会解除效果。置于自己或队伍盟友脚下时，进入 {duration} 秒的停滞，免疫伤害且无法行动，恢复 {healing}% 最大生命值，并使冷却恢复速度提高 {cooldownRecovery}%。增益光环可手动移除。',
+  'hudChrome.auraEffect.temporalHourglass':
+    '免疫伤害且无法行动；恢复生命并加速冷却。右键点击可取消。',
   'hudChrome.auth.appleLoginCta': '通过 Apple 继续',
   'hudChrome.auth.appleError': '无法通过 Apple 登录。请重试。',
   'hudChrome.auth.appleChoiceIntro': '创建新帐户，或将 Apple 关联到现有帐户。',

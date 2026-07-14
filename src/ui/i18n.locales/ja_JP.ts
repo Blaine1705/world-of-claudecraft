@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.temporal_hourglass.name': '停止の砂時計',
+  'entities.abilities.temporal_hourglass.description':
+    '選択地点に時の砂時計を置きます。敵の足元では {duration} 秒間停止させて行動不能にし、ダメージを受けると解除されます。自分またはパーティの味方の足元では {duration} 秒間の停滞となり、ダメージを受けず行動不能になり、最大体力の {healing}% を回復し、クールダウンの回復速度が {cooldownRecovery}% 上昇します。強化効果は手動で解除できます。',
+  'hudChrome.auraEffect.temporalHourglass':
+    'ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。',
   'hudChrome.auth.appleLoginCta': 'Appleで続ける',
   'hudChrome.auth.appleError': 'Appleでサインインできませんでした。もう一度お試しください。',
   'hudChrome.auth.appleChoiceIntro':

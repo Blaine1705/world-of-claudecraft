@@ -1254,6 +1254,8 @@ export const hudChromeStrings = {
     attackSpeedSlow: 'Slows attack speed by {pct}%',
     attackSpeedFast: 'Increases attack speed by {pct}%',
     haste: 'Increases attack and casting speed by {pct}%',
+    temporalHourglass:
+      'Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.',
     tongues: 'Increases casting time by {pct}%',
     combustionCrit: 'Your Fire spells always critically strike',
     overloadNext: 'Your next spell is amplified by {pct}% but costs 50% more mana',

@@ -7,6 +7,7 @@ const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS = new Set([
   'devotion_aura',
   'mark_of_the_wild',
   'power_word_fortitude',
+  'temporal_hourglass',
 ]);
 
 export function auraReplacementConflicts(auras: readonly Aura[], aura: Aura): number[] {

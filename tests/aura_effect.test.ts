@@ -4,6 +4,13 @@ import { type AuraEffectInput, auraEffectDescriptor } from '../src/ui/aura_effec
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
 describe('auraEffectDescriptor', () => {
+  it('describes the cancelable protective Hourglass aura', () => {
+    expect(desc({ id: 'temporal_hourglass', kind: 'stasis', value: 1.5 })).toEqual({
+      key: 'hudChrome.auraEffect.temporalHourglass',
+      nums: {},
+    });
+  });
+
   it('describes a damage-over-time with value, school and interval', () => {
     expect(desc({ kind: 'dot', value: 15, tickInterval: 3, school: 'shadow' })).toEqual({
       key: 'hudChrome.auraEffect.dot',

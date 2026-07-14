@@ -41,6 +41,7 @@ import {
 } from '../types';
 import { isStunned } from './cc';
 import { onHotExpired, tickProcState } from './talent_procs';
+import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
 
 // Friendly NPCs reject hostile control / debuff auras: any aura of these kinds is
@@ -138,7 +139,7 @@ export function updateTimers(p: Entity): void {
   p.fiveSecondRule += DT;
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
-    const nv = v - DT;
+    const nv = v - temporalHourglassCooldownDelta(p, k);
     if (nv <= 0) {
       p.cooldowns.delete(k);
       // Charge-limited abilities (Double Charge): an expired timer is one
@@ -154,7 +155,7 @@ export function updateTimers(p: Entity): void {
   if (p.abilityCharges) {
     for (const [abilityId, state] of Object.entries(p.abilityCharges)) {
       if (state.charges >= state.maxCharges) continue;
-      state.recharge -= DT;
+      state.recharge -= temporalHourglassCooldownDelta(p, abilityId);
       if (state.recharge > 0) {
         if (state.charges <= 0) p.cooldowns.set(abilityId, state.recharge);
         continue;
@@ -209,7 +210,9 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
-        if (a.kind === 'dot') {
+        if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
+          tickTemporalHourglassHealing(ctx, e, a);
+        } else if (a.kind === 'dot') {
           let tickDamage = a.value;
           if (a.school === 'physical') {
             let bleedAmp = 0;

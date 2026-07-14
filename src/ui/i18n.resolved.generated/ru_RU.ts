@@ -1030,6 +1030,7 @@ export const ru_RU: EnTranslations = {
       "attackSpeedSlow": "Замедляет скорость атаки на {pct}%",
       "attackSpeedFast": "Повышает скорость атаки на {pct}%",
       "haste": "Повышает скорость атаки и произнесения заклинаний на {pct}%",
+      "temporalHourglass": "Невосприимчивость к урону и невозможность действовать; восстанавливает здоровье и ускоряет способности. Щелкните правой кнопкой, чтобы отменить.",
       "tongues": "Увеличивает время произнесения заклинаний на {pct}%",
       "combustionCrit": "Ваши заклинания огня всегда наносят критический удар",
       "overloadNext": "Следующее заклинание усилено на {pct}%, но стоит на 50% больше маны",
@@ -6229,6 +6230,10 @@ export const ru_RU: EnTranslations = {
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_hourglass": {
+        "name": "Песочные часы остановки",
+        "description": "Помещает временные песочные часы в выбранную точку. Под врагом они останавливают его на {duration} сек. и не дают действовать; любой урон снимает эффект. Под вами или союзником из группы они создают стазис на {duration} сек., защищают от урона, запрещают действовать, восстанавливают {healing}% максимального здоровья и ускоряют восстановление способностей на {cooldownRecovery}%. Положительный эффект можно снять вручную."
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",

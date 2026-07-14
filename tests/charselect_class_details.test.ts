@@ -52,8 +52,18 @@ describe('mage specialization card metadata', () => {
       expect(card.primaryStat).toBe('int');
       expect(card.examples.length).toBeGreaterThanOrEqual(3);
       for (const abilityId of card.examples) {
-        expect(ABILITIES[abilityId], `ability "${abilityId}" does not exist`).toBeTruthy();
+        const ability = ABILITIES[abilityId];
+        expect(ability, `ability "${abilityId}" does not exist`).toBeTruthy();
+        expect(
+          ability.specs === undefined || ability.specs.includes(id),
+          `ability "${abilityId}" is not offered by ${id}`,
+        ).toBe(true);
       }
     }
+  });
+
+  it('showcases the Hourglass as Chronomancy identity instead of Perfect Moment', () => {
+    expect(SPEC_CARD_INFO.arcane.examples).toContain('temporal_hourglass');
+    expect(SPEC_CARD_INFO.arcane.examples).not.toContain('perfect_moment');
   });
 });

@@ -177,3 +177,15 @@ export function abilityDurationValue(res: ResolvedAbility): number | null {
   }
   return null;
 }
+
+/** Dynamic percentages for the Hourglass tooltip, read from the resolved effect. */
+export function abilityTemporalHourglassValues(
+  res: ResolvedAbility,
+): { healing: number; cooldownRecovery: number } | null {
+  const effect = res.effects.find((candidate) => candidate.type === 'temporalHourglass');
+  if (effect?.type !== 'temporalHourglass') return null;
+  return {
+    healing: effect.healMaxHpPct * 100,
+    cooldownRecovery: (effect.cooldownRate - 1) * 100,
+  };
+}

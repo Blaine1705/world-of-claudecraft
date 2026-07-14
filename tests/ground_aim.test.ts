@@ -53,6 +53,23 @@ describe('ground_aim', () => {
     expect(abilityAoeRadius(ABILITIES.meteor)).toBe(8);
   });
 
+  it('uses the Hourglass capture radius for its compact ground reticle', () => {
+    expect(
+      abilityAoeRadius({
+        effects: [
+          {
+            type: 'temporalHourglass',
+            duration: 5,
+            selfRadius: 1.5,
+            captureRadius: 1.75,
+            healMaxHpPct: 0.3,
+            cooldownRate: 1.5,
+          },
+        ],
+      }),
+    ).toBe(1.75);
+  });
+
   it('transitions enter to cancel to commit', () => {
     const idle = createGroundAimState();
     const active = enterGroundAim(idle, 'flamestrike', 11);

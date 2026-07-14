@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import {
   abilityScalingPower,
   channelTickBonus,
@@ -9,7 +10,11 @@ import {
   hotTickBonus,
 } from '../src/sim/spell_scaling';
 import { MAX_LEVEL } from '../src/sim/types';
-import { type AbilityScaling, abilityDamageBonus } from '../src/ui/ability_damage';
+import {
+  type AbilityScaling,
+  abilityDamageBonus,
+  abilityTemporalHourglassValues,
+} from '../src/ui/ability_damage';
 
 function known(cls: Parameters<typeof abilitiesKnownAt>[0], id: string) {
   return abilitiesKnownAt(cls, MAX_LEVEL).find((k) => k.def.id === id)!;
@@ -18,6 +23,22 @@ function known(cls: Parameters<typeof abilitiesKnownAt>[0], id: string) {
 const SC: AbilityScaling = { spellPower: 80, rangedPower: 200, attackPower: 140 };
 
 describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
+  it('reads Hourglass healing and cooldown percentages from the resolved effect', () => {
+    const mods = computeTalentModifiers('mage', {
+      ...emptyAllocation(),
+      spec: 'arcane',
+    } as never);
+    const hourglass = abilitiesKnownAt('mage', MAX_LEVEL, mods).find(
+      (ability) => ability.def.id === 'temporal_hourglass',
+    );
+    expect(hourglass).toBeDefined();
+    if (!hourglass) return;
+    expect(abilityTemporalHourglassValues(hourglass)).toEqual({
+      healing: 30,
+      cooldownRecovery: 50,
+    });
+  });
+
   it('a direct nuke folds Spell Power with the rank-resolved cast time', () => {
     const fb = known('mage', 'frostbolt');
     const eff = fb.effects.find((e) => e.type === 'directDamage')!;

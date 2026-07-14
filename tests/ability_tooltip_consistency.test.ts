@@ -24,6 +24,7 @@ import {
   abilityOverTimeEffect,
   abilityPrimaryEffect,
   abilitySecondaryEffect,
+  abilityTemporalHourglassValues,
 } from '../src/ui/ability_damage';
 
 // Numbers in prose this guard cannot derive from data, each with its source of
@@ -130,12 +131,12 @@ function proseNumbers(description: string): number[] {
 }
 
 const PLACEHOLDERS = /\$([a-zA-Z])/g;
-const SUPPORTED = new Set(['d', 'o', 'b', 't']);
+const SUPPORTED = new Set(['d', 'o', 'b', 't', 'h', 'c']);
 
 describe('ability descriptions match their resolved effects', () => {
   const classes = Object.keys(CLASSES) as PlayerClass[];
 
-  it('uses only the supported placeholders ($d, $o, $b, $t)', () => {
+  it('uses only supported dynamic placeholders', () => {
     for (const a of Object.values(ABILITIES)) {
       for (const m of a.description.matchAll(PLACEHOLDERS)) {
         expect(SUPPORTED.has(m[1]), `${a.id}: unknown placeholder $${m[1]}`).toBe(true);
@@ -168,6 +169,12 @@ describe('ability descriptions match their resolved effects', () => {
           }
           if (desc.includes('$t')) {
             expect(abilityDurationValue(known), `${at}: $t has no timed effect`).not.toBeNull();
+          }
+          if (desc.includes('$h') || desc.includes('$c')) {
+            expect(
+              abilityTemporalHourglassValues(known),
+              `${at}: Hourglass placeholders have no temporalHourglass effect`,
+            ).not.toBeNull();
           }
         }
       }

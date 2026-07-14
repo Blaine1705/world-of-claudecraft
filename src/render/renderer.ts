@@ -123,6 +123,11 @@ import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
 import { shouldRenderStealthGhost } from './stealth';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
+import {
+  syncTemporalHourglassVisual,
+  type TemporalHourglassMode,
+  type TemporalHourglassVisual,
+} from './temporal_hourglass_visual';
 import { buildTerrain, type TerrainView } from './terrain';
 import { sparkleTexture } from './textures';
 import { targetIntensity } from './travel_speed_fx';
@@ -629,6 +634,7 @@ export interface EntityView {
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   iceBlockVisual: IceBlockVisual | null; // Ice Block shell, built lazily on first stasis
+  temporalHourglassVisual: TemporalHourglassVisual | null;
   frostNovaRootVisual: FrostNovaRootVisual | null; // Atadura de Hielo restraint at the feet
   mageBarrierVisual: MageBarrierVisual | null; // personal mage absorb shell, built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
@@ -3840,6 +3846,7 @@ export class Renderer {
       catVisual: null,
       travelVisual: null,
       iceBlockVisual: null,
+      temporalHourglassVisual: null,
       frostNovaRootVisual: null,
       mageBarrierVisual: null,
       height,
@@ -4377,6 +4384,7 @@ export class Renderer {
       }
     }
     v.iceBlockVisual?.dispose();
+    v.temporalHourglassVisual?.dispose();
     v.frostNovaRootVisual?.dispose();
     v.mageBarrierVisual?.dispose();
     this.views.delete(id);
@@ -4568,7 +4576,8 @@ export class Renderer {
       let hasShadowform = false;
       let hasMoonkin = false;
       let hasMetamorph = false;
-      let hasStasis = false;
+      let hasIceBlock = false;
+      let temporalHourglassMode: TemporalHourglassMode | null = null;
       let hasFrostNovaRoot = false;
       let mageBarrierState: MageBarrierState | null = null;
       for (const a of e.auras) {
@@ -4581,7 +4590,11 @@ export class Renderer {
         if (a.kind === 'form_shadow') hasShadowform = true;
         if (a.kind === 'form_moonkin') hasMoonkin = true;
         if (a.kind === 'form_metamorph') hasMetamorph = true;
-        if (a.kind === 'stasis') hasStasis = true;
+        if (a.id === 'ice_block' && a.kind === 'stasis') hasIceBlock = true;
+        if (a.id === 'temporal_hourglass') {
+          if (a.kind === 'stasis') temporalHourglassMode = 'protective';
+          if (a.kind === 'incapacitate') temporalHourglassMode = 'hostile';
+        }
         if (isFrostNovaRootAura(a)) hasFrostNovaRoot = true;
         mageBarrierState ??= mageBarrierStateForAura(a, this.mageBarrierStateScratch);
       }
@@ -4742,7 +4755,13 @@ export class Renderer {
         continue;
       }
       if (!v.visual) continue;
-      v.iceBlockVisual = syncIceBlockVisual(v.iceBlockVisual, v.group, v.height, hasStasis, dt);
+      v.iceBlockVisual = syncIceBlockVisual(v.iceBlockVisual, v.group, v.height, hasIceBlock, dt);
+      v.temporalHourglassVisual = syncTemporalHourglassVisual(
+        v.temporalHourglassVisual,
+        v.group,
+        temporalHourglassMode,
+        dt,
+      );
       v.frostNovaRootVisual = syncFrostNovaRootVisual(
         v.frostNovaRootVisual,
         v.group,

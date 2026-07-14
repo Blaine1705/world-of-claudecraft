@@ -1030,6 +1030,7 @@ export const nl_NL: EnTranslations = {
       "attackSpeedSlow": "Verlangsamt Angriffstempo um {pct}%",
       "attackSpeedFast": "Erhöht Angriffstempo um {pct}%",
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
+      "temporalHourglass": "Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.",
       "tongues": "Erhöht Zauberzeit um {pct}%",
       "combustionCrit": "Your Fire spells always critically strike",
       "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",
@@ -6229,6 +6230,10 @@ export const nl_NL: EnTranslations = {
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_hourglass": {
+        "name": "Hourglass of Suspension",
+        "description": "Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for {duration} sec and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for {duration} sec, prevents damage and actions, restores {healing}% of maximum health, and makes cooldowns recover {cooldownRecovery}% faster. The beneficial aura can be removed manually."
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",

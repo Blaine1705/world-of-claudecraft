@@ -1030,6 +1030,7 @@ export const zh_TW: EnTranslations = {
       "attackSpeedSlow": "攻擊速度減慢 {pct}%",
       "attackSpeedFast": "攻擊速度提高 {pct}%",
       "haste": "攻擊與施法速度提高 {pct}%",
+      "temporalHourglass": "免疫傷害且無法行動；恢復生命並加速冷卻。按右鍵可取消。",
       "tongues": "施法時間增加 {pct}%",
       "combustionCrit": "你的火焰法術必定造成致命一擊",
       "overloadNext": "下一個法術效果提高{pct}%，但法力消耗增加50%",
@@ -6229,6 +6230,10 @@ export const zh_TW: EnTranslations = {
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_hourglass": {
+        "name": "懸停沙漏",
+        "description": "在選定位置放置一個時間沙漏。置於敵人腳下時，使其懸停 {duration} 秒且無法行動；受到任何傷害都會解除效果。置於自己或隊伍盟友腳下時，進入 {duration} 秒的停滯，免疫傷害且無法行動，恢復 {healing}% 最大生命值，並使冷卻恢復速度提高 {cooldownRecovery}%。增益光環可手動移除。"
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",

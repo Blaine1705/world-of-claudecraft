@@ -1087,8 +1087,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Rewind"
       },
       {
+        "id": "temporal_hourglass",
+        "name": "Hourglass of Suspension"
+      },
+      {
         "id": "temporal_acceleration",
         "name": "Temporal Acceleration"
+      },
+      {
+        "id": "perfect_moment",
+        "name": "Perfect Moment"
       }
     ],
     "model": "player_mage",

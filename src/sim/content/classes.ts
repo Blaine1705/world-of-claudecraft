@@ -1,4 +1,16 @@
-import type { AbilityDef, AbilityEffect, AuraKind, PlayerClass, Stats, WeaponInfo } from '../types';
+import {
+  type AbilityDef,
+  type AbilityEffect,
+  type AuraKind,
+  type PlayerClass,
+  type Stats,
+  TEMPORAL_HOURGLASS_CAPTURE_RADIUS,
+  TEMPORAL_HOURGLASS_COOLDOWN_RATE,
+  TEMPORAL_HOURGLASS_DURATION,
+  TEMPORAL_HOURGLASS_HEAL_FRACTION,
+  TEMPORAL_HOURGLASS_SELF_RADIUS,
+  type WeaponInfo,
+} from '../types';
 import type { TalentModifiers } from './talents';
 import { SPORT_ABILITIES } from './vale_cup';
 
@@ -180,6 +192,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'temporal_reversal',
       // "Correct" pillar raid cooldown: restore recent group/raid damage (Rewind).
       'temporal_rewind',
+      'temporal_hourglass',
       // Group haste cooldown (the Chronomancer's Bloodlust): +30% full haste, shares
       // the Bloodlust exhaustion.
       'temporal_acceleration',
@@ -2230,6 +2243,37 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'rewind', fraction: 0.3, maxHpFraction: 0.35, windowSec: 5, radius: 40 }],
     description:
       'Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)',
+  },
+  // Hourglass of Suspension: a ground-targeted Chronomancy control and rescue
+  // tool. All tuning below is PLAYTEST-provisional. A point at the caster's feet
+  // selects self, then a living party or raid ally is preferred over one hostile
+  // in the small capture radius. The shared combat module owns exact behavior.
+  temporal_hourglass: {
+    id: 'temporal_hourglass',
+    name: 'Hourglass of Suspension',
+    class: 'mage',
+    learnLevel: 18,
+    specs: ['arcane'],
+    cost: 110,
+    castTime: 0,
+    cooldown: 50,
+    range: 28,
+    school: 'arcane',
+    requiresTarget: false,
+    targetMode: 'position',
+    projectile: false,
+    effects: [
+      {
+        type: 'temporalHourglass',
+        duration: TEMPORAL_HOURGLASS_DURATION,
+        selfRadius: TEMPORAL_HOURGLASS_SELF_RADIUS,
+        captureRadius: TEMPORAL_HOURGLASS_CAPTURE_RADIUS,
+        healMaxHpPct: TEMPORAL_HOURGLASS_HEAL_FRACTION,
+        cooldownRate: TEMPORAL_HOURGLASS_COOLDOWN_RATE,
+      },
+    ],
+    description:
+      'Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for $t sec and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for $t sec, prevents damage and actions, restores $h% of maximum health, and makes cooldowns recover $c% faster. The beneficial aura can be removed manually.',
   },
   // ---- Chronomancy (healer) group haste cooldown: Temporal Acceleration, the
   // Chronomancer's equivalent of the Shaman's Bloodlust. A BASE ability (owner

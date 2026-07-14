@@ -2069,6 +2069,54 @@ const PRIMITIVES = {
     ctx.arc(0, 0, 2.2, 0, TAU);
     ctx.fill();
   },
+  hourglass(ctx, pal) {
+    ctx.save();
+    ctx.strokeStyle = '#e9bd53';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-20, -29);
+    ctx.lineTo(20, -29);
+    ctx.moveTo(-20, 29);
+    ctx.lineTo(20, 29);
+    ctx.moveTo(-16, -25);
+    ctx.lineTo(-16, 25);
+    ctx.moveTo(16, -25);
+    ctx.lineTo(16, 25);
+    ctx.stroke();
+
+    ctx.fillStyle = withAlpha(pal.light, 0.42);
+    ctx.strokeStyle = pal.accent;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-13, -23);
+    ctx.bezierCurveTo(-12, -8, -4, -5, 0, 0);
+    ctx.bezierCurveTo(-4, 5, -12, 8, -13, 23);
+    ctx.lineTo(13, 23);
+    ctx.bezierCurveTo(12, 8, 4, 5, 0, 0);
+    ctx.bezierCurveTo(4, -5, 12, -8, 13, -23);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffd86b';
+    ctx.beginPath();
+    ctx.moveTo(-10, -18);
+    ctx.lineTo(10, -18);
+    ctx.lineTo(2, -4);
+    ctx.lineTo(-2, -4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(0, -3);
+    ctx.lineTo(1.5, 15);
+    ctx.lineTo(10, 20);
+    ctx.lineTo(-10, 20);
+    ctx.lineTo(-1.5, 15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  },
 } satisfies Record<string, Painter>;
 type PrimitiveName = keyof typeof PRIMITIVES;
 
@@ -2574,6 +2622,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   ),
   temporal_reversal: r('arcane', 'arcanePink', ['cross', { p: 'moon', ...TR }], ['glow']),
   temporal_rewind: r('arcane', 'arcanePink', [{ p: 'moon', s: 1.1 }], ['arcs', 'glow']),
+  temporal_hourglass: r('arcane', 'gold', [{ p: 'hourglass', s: 1.05 }], ['glow', 'sparkle']),
   temporal_acceleration: r('arcane', 'arcanePink', ['boot', { p: 'moon', ...TR }], ['motion']),
   // Perfect Moment: the loaded-bird offensive window (gem = the held charges).
   perfect_moment: r(

@@ -5,6 +5,13 @@ import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from 
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
+// Hourglass of Suspension tuning is PLAYTEST-provisional. Keep these values
+// centralized so simulation, content, tooltips, and tests cannot drift apart.
+export const TEMPORAL_HOURGLASS_DURATION = 5;
+export const TEMPORAL_HOURGLASS_SELF_RADIUS = 1.5;
+export const TEMPORAL_HOURGLASS_CAPTURE_RADIUS = 1.75;
+export const TEMPORAL_HOURGLASS_HEAL_FRACTION = 0.3;
+export const TEMPORAL_HOURGLASS_COOLDOWN_RATE = 1.5;
 export const RUN_SPEED = 7; // yards/sec, classic run speed
 export const TURN_SPEED = Math.PI; // rad/sec keyboard turning
 export const MELEE_RANGE = 5; // yards
@@ -475,6 +482,11 @@ export interface Aura {
   // offline), so they never need to ride the wire.
   echoGroup?: boolean;
   echoConvertRate?: number;
+  // Hourglass protective-stasis bookkeeping. The total heal is snapshotted on
+  // application and divided deterministically over the remaining whole-second
+  // ticks. These fields are simulation-only and need not ride the wire.
+  temporalHealRemaining?: number;
+  temporalHealTicksRemaining?: number;
 }
 
 export type CrowdControlDrCategory =
@@ -1657,6 +1669,16 @@ export type AbilityEffect =
   // Chronomancer offensive cooldown (Perfect Moment): slam the caster to full
   // Arcane Charges and open the no-consume window (combat/chronomancy.ts).
   | { type: 'perfectMoment' }
+  // Chronomancy ground-targeted Hourglass of Suspension. The aim selects self,
+  // a living group ally, or one hostile in that priority order.
+  | {
+      type: 'temporalHourglass';
+      duration: number;
+      selfRadius: number;
+      captureRadius: number;
+      healMaxHpPct: number;
+      cooldownRate: number;
+    }
   // Chronomancy raid cooldown (Rewind / Rebobinar): instant, no target, centered on
   // the caster. Restores `fraction` of the REAL damage each living group/raid member
   // within `radius` took in the last `windowSec` seconds, capped per target at

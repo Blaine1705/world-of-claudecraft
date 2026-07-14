@@ -1030,6 +1030,7 @@ export const ko_KR: EnTranslations = {
       "attackSpeedSlow": "공격 속도를 {pct}% 늦춥니다",
       "attackSpeedFast": "공격 속도를 {pct}% 증가시킵니다",
       "haste": "공격 속도와 시전 속도를 {pct}% 증가시킵니다",
+      "temporalHourglass": "피해에 면역이고 행동할 수 없습니다. 생명력을 회복하고 재사용 대기시간을 가속합니다. 우클릭으로 취소할 수 있습니다.",
       "tongues": "시전 시간을 {pct}% 증가시킵니다",
       "combustionCrit": "화염 주문이 항상 치명타로 적중합니다",
       "overloadNext": "다음 주문이 {pct}% 강화되지만 마나 소모가 50% 증가합니다",
@@ -6229,6 +6230,10 @@ export const ko_KR: EnTranslations = {
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_hourglass": {
+        "name": "정지의 모래시계",
+        "description": "선택한 위치에 시간의 모래시계를 놓습니다. 적의 발밑에서는 {duration}초 동안 정지시켜 행동하지 못하게 하며, 피해를 받으면 효과가 해제됩니다. 자신이나 파티 아군의 발밑에서는 {duration}초 동안 정지 상태가 되어 피해에 면역이고 행동할 수 없으며, 최대 생명력의 {healing}%를 회복하고 재사용 대기시간 회복 속도가 {cooldownRecovery}% 증가합니다. 이로운 효과는 직접 해제할 수 있습니다."
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",

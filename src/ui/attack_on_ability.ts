@@ -56,6 +56,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   massTemporalEcho: 'other',
   resurrectAlly: 'other',
   perfectMoment: 'other',
+  temporalHourglass: 'breakCC',
   rewind: 'other',
   chainHeal: 'other',
   feralCharge: 'other',

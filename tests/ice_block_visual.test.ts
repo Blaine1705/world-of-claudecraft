@@ -100,7 +100,7 @@ describe('Ice Block visual', () => {
     const rendererPath = fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url));
     const renderer = readFileSync(rendererPath, 'utf8');
 
-    expect(renderer).toContain("if (a.kind === 'stasis') hasStasis = true");
+    expect(renderer).toContain("if (a.id === 'ice_block' && a.kind === 'stasis')");
     expect(renderer).toContain('v.iceBlockVisual = syncIceBlockVisual(');
     expect(renderer).toContain("if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1)");
     expect(renderer).toContain('v.iceBlockVisual?.dispose()');

@@ -86,6 +86,7 @@ import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
+import { applyTemporalHourglass } from './temporal_hourglass';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 // repositionToAim sweep tuning (harvested from PR #1348): the leap walks the
@@ -322,6 +323,10 @@ export function runEffects(
 
   for (const eff of res.effects) {
     switch (eff.type) {
+      case 'temporalHourglass': {
+        applyTemporalHourglass(ctx, p, p.castAim ?? p.pos, eff, ability.name);
+        break;
+      }
       case 'weaponStrike': {
         if (!target) break;
         const strikeTarget = target;

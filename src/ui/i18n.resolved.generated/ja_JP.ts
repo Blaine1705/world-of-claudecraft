@@ -1030,6 +1030,7 @@ export const ja_JP: EnTranslations = {
       "attackSpeedSlow": "攻撃速度を{pct}%低下させる",
       "attackSpeedFast": "攻撃速度を{pct}%上昇させる",
       "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
+      "temporalHourglass": "ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。",
       "tongues": "詠唱時間を{pct}%増加させる",
       "combustionCrit": "火炎呪文が必ずクリティカルになる",
       "overloadNext": "次の呪文の効果が{pct}%増加するが、マナ消費が50%増える",
@@ -6229,6 +6230,10 @@ export const ja_JP: EnTranslations = {
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_hourglass": {
+        "name": "停止の砂時計",
+        "description": "選択地点に時の砂時計を置きます。敵の足元では {duration} 秒間停止させて行動不能にし、ダメージを受けると解除されます。自分またはパーティの味方の足元では {duration} 秒間の停滞となり、ダメージを受けず行動不能になり、最大体力の {healing}% を回復し、クールダウンの回復速度が {cooldownRecovery}% 上昇します。強化効果は手動で解除できます。"
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",

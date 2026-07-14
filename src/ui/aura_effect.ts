@@ -43,6 +43,7 @@ export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | '
 // Structural subset of Aura the descriptor needs; keeps this module decoupled from
 // the full sim Aura shape so a Vitest can drive it with plain literals.
 export interface AuraEffectInput {
+  id?: string;
   kind: AuraKind;
   value: number;
   value2?: number;
@@ -80,6 +81,9 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
  * one-line summary (the tooltip then falls back to name + remaining time only).
  */
 export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+  if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
+    return { key: `${KEY}.temporalHourglass`, nums: {} };
+  }
   switch (a.kind) {
     case 'dot':
       return {

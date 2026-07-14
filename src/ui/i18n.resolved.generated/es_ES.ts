@@ -1030,6 +1030,7 @@ export const es_ES: EnTranslations = {
       "attackSpeedSlow": "Disminuye la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Incrementa la velocidad de ataque un {pct}%",
       "haste": "Incrementa la velocidad de ataque y lanzamiento un {pct}%",
+      "temporalHourglass": "Inmune e incapaz de actuar; recupera salud y acelera los tiempos de reutilización. Haz clic derecho para cancelar.",
       "tongues": "Incrementa el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Tus hechizos de Fuego siempre golpean de crítico",
       "overloadNext": "Tu siguiente hechizo se potencia un {pct}% pero cuesta un 50% más de maná",
@@ -6229,6 +6230,10 @@ export const es_ES: EnTranslations = {
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_hourglass": {
+        "name": "Reloj de suspensión",
+        "description": "Coloca un reloj de arena temporal en la ubicación seleccionada. Bajo un enemigo, lo suspende durante {duration} s e impide que actúe; cualquier daño rompe el efecto. Sobre tus propios pies o bajo un aliado del grupo, concede estasis durante {duration} s, impide recibir daño y actuar, recupera un {healing}% de la salud máxima y hace que los tiempos de reutilización se recuperen un {cooldownRecovery}% más rápido. El aura beneficiosa puede eliminarse manualmente."
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",

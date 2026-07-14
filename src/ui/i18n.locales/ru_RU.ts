@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.temporal_hourglass.name': 'Песочные часы остановки',
+  'entities.abilities.temporal_hourglass.description':
+    'Помещает временные песочные часы в выбранную точку. Под врагом они останавливают его на {duration} сек. и не дают действовать; любой урон снимает эффект. Под вами или союзником из группы они создают стазис на {duration} сек., защищают от урона, запрещают действовать, восстанавливают {healing}% максимального здоровья и ускоряют восстановление способностей на {cooldownRecovery}%. Положительный эффект можно снять вручную.',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Невосприимчивость к урону и невозможность действовать; восстанавливает здоровье и ускоряет способности. Щелкните правой кнопкой, чтобы отменить.',
   'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',
   'hudChrome.auth.appleError': 'Не удалось войти через Apple. Попробуйте ещё раз.',
   'hudChrome.auth.appleChoiceIntro':
