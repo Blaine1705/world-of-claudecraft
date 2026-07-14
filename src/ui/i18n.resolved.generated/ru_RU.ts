@@ -1307,7 +1307,10 @@ export const ru_RU: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Этот предмет нельзя уничтожить.",
-      "rightClickDestroy": "Shift+правый клик, чтобы уничтожить",
+      "rightClickDestroy": "Правый клик, чтобы уничтожить",
+      "dragEquipHint": "Перетащите на персонажа, чтобы надеть",
+      "dragDestroyHint": "Перетащите в мир, чтобы уничтожить",
+      "reorderNeedsRecent": "Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",

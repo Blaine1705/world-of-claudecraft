@@ -23,8 +23,8 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; never trust stale prose).
-const EXPECTED_SEND_COUNT = 151; // +Rift item progression, unstuck, weapon stow, and Dungeon Finder
-const EXPECTED_DISPATCH_COUNT = 160; // client commands plus the 9 dispatch-only commands
+const EXPECTED_SEND_COUNT = 152; // +Rift progression, unstuck, weapon stow, Dungeon Finder, and inv_move
+const EXPECTED_DISPATCH_COUNT = 161; // client commands plus the 9 dispatch-only commands
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch
