@@ -238,7 +238,7 @@ describe('shared conform command', () => {
           '-c:a',
           'aac',
           '-b:a',
-          `${TARGET_BITRATE + 4}k`,
+          `${TARGET_BITRATE}k`,
           inputFile,
         ],
         { stdio: 'ignore' },
