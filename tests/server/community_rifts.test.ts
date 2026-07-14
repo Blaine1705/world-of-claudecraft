@@ -42,7 +42,12 @@ vi.mock('../../server/db', () => ({
 
 import { GameServer } from '../../server/game';
 import { riftInstanceOrigin, riftOriginAt } from '../../src/sim/data';
-import { closeNaturalRiftPortal, updateRiftPortals } from '../../src/sim/rift/portals';
+import { serializeRiftWorldState } from '../../src/sim/rift/persistence';
+import {
+  closeNaturalRiftPortal,
+  spawnNaturalRiftPortal,
+  updateRiftPortals,
+} from '../../src/sim/rift/portals';
 import { Sim } from '../../src/sim/sim';
 
 type GameServerOptions = { communityTestRifts?: boolean };
@@ -77,6 +82,9 @@ describe('community Rift boot and persistence', () => {
     }
     expect(server.sim.riftPortalSpawnCount).toBe(8);
     expect(riftDb.save).toHaveBeenCalledTimes(1);
+    expect(riftDb.load.mock.invocationCallOrder[0]).toBeLessThan(
+      riftDb.save.mock.invocationCallOrder[0],
+    );
     expect(riftDb.save.mock.calls[0][0]).toEqual(
       expect.objectContaining({
         version: 1,
@@ -86,25 +94,55 @@ describe('community Rift boot and persistence', () => {
     );
   });
 
-  it('waits sixty seconds after a close, then restores exactly one missing portal', async () => {
+  it('preserves overlapping persisted events while filling eight distinct regions', async () => {
+    const source = new Sim({
+      seed: 20061,
+      playerClass: 'warrior',
+      noPlayer: true,
+      riftPortals: true,
+    });
+    expect(spawnNaturalRiftPortal(source.ctx, 0)).toBe(true);
+    const persistedEventId = source.riftEvents[0].eventId;
+    const saved = serializeRiftWorldState(source.ctx, Date.now());
+    const duplicate = structuredClone(saved.events[0]);
+    duplicate.eventId = `${persistedEventId}-dupe`;
+    duplicate.ordinal = 1;
+    saved.events.push(duplicate);
+    saved.spawnCount = 2;
+    riftDb.load.mockResolvedValueOnce(saved);
+
     const server = makeServer(true);
     await server.loadRifts();
-    const closed = server.sim.naturalRiftPortals[0];
-    expect(closed).toBeDefined();
-    if (!closed) return;
 
-    closeNaturalRiftPortal(server.sim.ctx, closed.id, 'sealed');
-    expect(server.sim.naturalRiftPortals).toHaveLength(7);
+    expect(server.sim.naturalRiftPortals).toHaveLength(9);
+    expect(new Set(server.sim.naturalRiftPortals.map((portal) => portal.zoneId))).toHaveLength(8);
+    expect(server.sim.riftEvents.some((event) => event.eventId === persistedEventId)).toBe(true);
+    expect(server.sim.riftEvents.some((event) => event.eventId === duplicate.eventId)).toBe(true);
+  });
+
+  it('waits sixty seconds and restores only one missing portal per interval', async () => {
+    const server = makeServer(true);
+    await server.loadRifts();
+    const closed = server.sim.naturalRiftPortals.slice(0, 2);
+    expect(closed).toHaveLength(2);
+
+    for (const portal of closed) closeNaturalRiftPortal(server.sim.ctx, portal.id, 'sealed');
+    expect(server.sim.naturalRiftPortals).toHaveLength(6);
 
     server.sim.time += 59;
     runPortalScheduler(server.sim);
-    expect(server.sim.naturalRiftPortals).toHaveLength(7);
+    expect(server.sim.naturalRiftPortals).toHaveLength(6);
 
     server.sim.time += 1;
     runPortalScheduler(server.sim);
+    expect(server.sim.naturalRiftPortals).toHaveLength(7);
+    expect(server.sim.riftPortalSpawnCount).toBe(9);
+
+    server.sim.time += 60;
+    runPortalScheduler(server.sim);
     expect(server.sim.naturalRiftPortals).toHaveLength(8);
     expect(new Set(server.sim.naturalRiftPortals.map((portal) => portal.zoneId))).toHaveLength(8);
-    expect(server.sim.riftPortalSpawnCount).toBe(9);
+    expect(server.sim.riftPortalSpawnCount).toBe(10);
   });
 
   it('does not consume the shared simulation RNG while filling the community population', async () => {
@@ -126,6 +164,15 @@ describe('community Rift boot and persistence', () => {
     const saveFailure = new Error('rift db write unavailable');
     riftDb.save.mockRejectedValueOnce(saveFailure);
     await expect(makeServer(true).loadRifts()).rejects.toBe(saveFailure);
+  });
+
+  it('rejects unsupported persisted state without replacing it', async () => {
+    riftDb.load.mockResolvedValueOnce({ version: 99, events: [] });
+
+    await expect(makeServer(true).loadRifts()).rejects.toThrow(
+      'unsupported or malformed shared Rift state',
+    );
+    expect(riftDb.save).not.toHaveBeenCalled();
   });
 
   it('keeps production failure handling and capacity unchanged when the flag is off', async () => {

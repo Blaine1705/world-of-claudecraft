@@ -107,6 +107,7 @@ import {
   abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
+  COMMUNITY_RIFT_SLOT_COUNT,
   DEEPFEN_SHALLOWS_LAKE,
   DELVE_COMPANIONS,
   DELVE_LIST,
@@ -1483,6 +1484,7 @@ export class Sim {
       devCommands: this.devCommands,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
+      communityRifts: cfg.communityRifts ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
@@ -1744,8 +1746,10 @@ export class Sim {
       }
     }
 
-    // Procedural rift instance pool (dev-spawned; empty until a portal is entered).
-    for (let i = 0; i < RIFT_SLOT_COUNT; i++) {
+    // Procedural rift instance pool (empty until a portal is entered). Public
+    // test realms opt into a larger pool without changing the normal host cap.
+    const riftSlotCount = this.cfg.communityRifts ? COMMUNITY_RIFT_SLOT_COUNT : RIFT_SLOT_COUNT;
+    for (let i = 0; i < riftSlotCount; i++) {
       this.riftInstances.push({
         slot: i,
         instanceId: 0,

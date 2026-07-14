@@ -197,6 +197,10 @@ For off-box safety, sync the directory to S3 occasionally:
   URL instead.
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the
   level/teleport cheats used by the test bots.
+- **Community Rift testing**: set `COMMUNITY_TEST_RIFTS=1` only on a public test
+  realm that needs dense Rift coverage. The game container restores persisted
+  events before filling the map, then maintains eight portals with 24 concurrent
+  group slots. The flag is off by default and does not enable dev commands.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
   (`server/bot_detector/stub.ts`). Detection hooks are wired in, but they observe
   nothing and never act. To bundle the real behavioral detector, clone the private

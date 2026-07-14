@@ -435,7 +435,10 @@ export function enterRift(
       }
     }
     inst.returnPos = ret;
-    inst.tier = portal?.riftTier ?? null;
+    // Dev portals keep a cosmetic rank on the gate, but only a persisted natural
+    // event is reward-ranked. This keeps the reward guard authoritative for the
+    // real /dev portal path instead of paying Marks for a visual-only badge.
+    inst.tier = eventId === null ? null : (portal?.riftTier ?? null);
     inst.portalId = portal?.id ?? null;
     inst.rewarded = false;
     markRiftEventActive(ctx, eventId);
