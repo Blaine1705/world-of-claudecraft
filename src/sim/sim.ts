@@ -309,6 +309,7 @@ import {
   revivePlayerAt,
   spawnOverworldSpiritHealers,
 } from './spirit';
+import * as unstuckMod from './unstuck';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
   scaleWorldBossHp,
@@ -993,6 +994,9 @@ export interface PlayerMeta {
   // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
   // cannot farm the area alone.
   lastActiveTick: number;
+  // Runtime-only local recovery attempt. The owning system lives in unstuck.ts;
+  // only its anti-relog cooldown is persisted through Entity.cooldowns.
+  pendingUnstuck: unstuckMod.PendingUnstuck | null;
   // Ashen Coliseum standings. Legacy arenaRating/Wins/Losses are the 1v1
   // bracket; 2v2 is fully independent and persisted alongside them.
   arenaRating: number;
@@ -2014,6 +2018,7 @@ export class Sim {
       joinedAt: this.time,
       totalPlayedSeconds: Math.max(0, savedState?.totalPlayedSeconds ?? 0),
       lastActiveTick: this.tickCount,
+      pendingUnstuck: null,
       arenaRating: savedArena1v1.rating,
       arenaWins: savedArena1v1.wins,
       arenaLosses: savedArena1v1.losses,
@@ -2340,6 +2345,11 @@ export class Sim {
   removePlayer(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
+    // Offline/headless removals have no GameServer lifecycle hook. End an
+    // accepted recovery explicitly so every accepted attempt has one terminal
+    // event; the online server calls the same delegate earlier so it can attach
+    // durable account/character identity before removing the session.
+    this.cancelUnstuckForDisconnect(pid);
     // If the leaver owns a live lockpick session, abandon it (preserves
     // attemptAvailable so a remaining party member can still pick the chest).
     // Must run before party removal / dropEntity, since delveRunForPlayer
@@ -3530,6 +3540,7 @@ export class Sim {
       swingIntervalMult: sim.swingIntervalMult.bind(sim),
       mobCanSwim: sim.mobCanSwim.bind(sim),
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
+      resolvePlayerMove: sim.resolveMove.bind(sim),
       // P1a pet AI lives in src/sim/pet/pet_ai.ts; locomotion.updateMob reaches it
       // through this seam binding (late-bound arrow so sim.ctx resolves at call time).
       updatePet: (pet) => petAi.updatePet(sim.ctx, pet),
@@ -4027,6 +4038,10 @@ export class Sim {
     lap?.('trades');
     this.updateLootRolls();
     lap?.('lootRolls');
+    // Recovery resolves after this tick's movement/combat and before instance
+    // lift/trigger passes. It draws no rng and its swept candidate search cannot
+    // change phase ordering for players without an active attempt.
+    unstuckMod.updateUnstuck(this.ctx);
     this.updateInstances();
     this.updateRiftInstances();
     advanceRiftRollersImpl(this.ctx); // 20 Hz: smooth rolling-boulder motion
@@ -6610,6 +6625,19 @@ export class Sim {
 
   chat(text: string, pid?: number): SentChat | null {
     return chatMod.chat(this.ctx, text, pid);
+  }
+
+  // Local recovery lives in unstuck.ts. Both the slash command and the direct
+  // Settings wire action enter through the same authoritative system.
+  unstuck(pid?: number): boolean {
+    return unstuckMod.requestUnstuck(this.ctx, pid);
+  }
+
+  cancelUnstuckForDisconnect(
+    pid: number,
+    emitEvent = true,
+  ): unstuckMod.CancelledUnstuckEvent | null {
+    return unstuckMod.cancelPendingUnstuckForDisconnect(this.ctx, pid, emitEvent);
   }
 
   // PUBLIC (IWorld + server) overhead-emote entry; body moved to social/chat.ts (G2).

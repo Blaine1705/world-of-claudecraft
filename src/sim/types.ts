@@ -2370,6 +2370,80 @@ export interface ReadyCheck {
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
 }
 
+// Structured, player-safe recovery telemetry. The sim captures both raw world
+// coordinates and content-local coordinates at invocation time so operators can
+// group repeated problem spots across separate instance slots. Stable codes only:
+// player-facing prose is assembled by the client i18n catalog.
+export type UnstuckAreaKind = 'overworld' | 'dungeon' | 'delve' | 'rift';
+
+export interface UnstuckArea {
+  kind: UnstuckAreaKind;
+  id: string;
+  instanceId?: string;
+  slot?: number;
+}
+
+export interface UnstuckPosition extends Vec3 {
+  localX: number;
+  localZ: number;
+}
+
+export type UnstuckBlockedReason =
+  | 'already_active'
+  | 'already_safe'
+  | 'cooldown'
+  | 'dead'
+  | 'ghost'
+  | 'jailed'
+  | 'combat'
+  | 'controlled'
+  | 'falling'
+  | 'moving'
+  | 'busy'
+  | 'spectating'
+  | 'competitive'
+  | 'trading'
+  | 'invalid_area';
+
+export type UnstuckCancelReason =
+  | 'moved'
+  | 'damaged'
+  | 'combat'
+  | 'busy'
+  | 'state_changed'
+  | 'disconnected';
+
+export type UnstuckEvent =
+  | { type: 'unstuck'; phase: 'started'; seconds: number }
+  | { type: 'unstuck'; phase: 'countdown'; seconds: number }
+  | { type: 'unstuck'; phase: 'blocked'; reason: UnstuckBlockedReason; seconds?: number }
+  | {
+      type: 'unstuck';
+      phase: 'cancelled';
+      reason: UnstuckCancelReason;
+      area: UnstuckArea;
+      origin: UnstuckPosition;
+      duration: number;
+    }
+  | {
+      type: 'unstuck';
+      phase: 'failed';
+      reason: 'no_safe_position';
+      area: UnstuckArea;
+      origin: UnstuckPosition;
+      duration: number;
+    }
+  | {
+      type: 'unstuck';
+      phase: 'completed';
+      reason: 'nearest_safe_position';
+      area: UnstuckArea;
+      origin: UnstuckPosition;
+      destination: UnstuckPosition;
+      duration: number;
+      distance: number;
+    };
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -2430,6 +2504,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'comboPoint'; points: number }
   | { type: 'playerDeath' }
   | { type: 'respawn' }
+  | UnstuckEvent
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
   | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId?: string }

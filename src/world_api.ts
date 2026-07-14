@@ -373,6 +373,8 @@ export const COMMAND_NAMES = [
   // (An admin "mute" is a moderation action, not a wire command.)
   'ignore_add',
   'ignore_remove',
+  // Local geometry recovery. Appended because wire tokens are never reordered.
+  'unstuck',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -450,6 +452,7 @@ export const COMMAND_FACETS = {
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
   release: 'IWorldCombat',
+  unstuck: 'IWorldCombat',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',

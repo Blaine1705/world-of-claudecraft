@@ -7840,4 +7840,29 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     'Несколько повседневных команд стоит запомнить: /w Имя отправляет шёпот, а /r отвечает на последний полученный, /invite приглашает кого-то в вашу группу, /follow пристраивает вас следом за другом, /roll бросает кости на виду у группы, /who показывает, кто в сети, а /afk отмечает вас отошедшим. Введите /help в игре, чтобы увидеть полный список.',
   'guide.social.slashHeading': 'Удобные команды с косой чертой',
+  // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.menuButton': 'Выбраться',
+  'hudChrome.unstuck.help':
+    'Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.',
+  'hudChrome.unstuck.started':
+    'Перемещение из ловушки через {seconds} сек. Движение, бой, получение урона или другое действие отменят его.',
+  'hudChrome.unstuck.countdown': 'Выбраться: {seconds}',
+  'hudChrome.unstuck.completed': 'Вы перемещены в ближайшее доступное безопасное место.',
+  'hudChrome.unstuck.cancelledMoved': 'Перемещение отменено, потому что вы сдвинулись с места.',
+  'hudChrome.unstuck.cancelledDamaged': 'Перемещение отменено, потому что вы получили урон.',
+  'hudChrome.unstuck.cancelledCombat': 'Перемещение отменено, потому что вы вступили в бой.',
+  'hudChrome.unstuck.cancelledBusy': 'Перемещение отменено, потому что вы начали другое действие.',
+  'hudChrome.unstuck.cancelledState': 'Перемещение отменено из-за изменения вашего состояния.',
+  'hudChrome.unstuck.cancelledDisconnected': 'Перемещение отменено из-за отключения.',
+  'hudChrome.unstuck.noSafePosition':
+    'Поблизости нет доступного безопасного места. Вы остались на месте.',
+  'hudChrome.unstuck.alreadyActive': 'Отсчёт перемещения уже идёт.',
+  'hudChrome.unstuck.alreadySafe': 'Вы уже находитесь в безопасном доступном месте.',
+  'hudChrome.unstuck.cooldown': 'Перемещение будет доступно через {seconds} сек.',
+  'hudChrome.unstuck.dead': 'Нельзя выбраться, пока вы мертвы или находитесь в облике духа.',
+  'hudChrome.unstuck.combat': 'Нельзя выбраться во время боя.',
+  'hudChrome.unstuck.controlled': 'Нельзя выбраться, пока ваше движение ограничено.',
+  'hudChrome.unstuck.standStill': 'Остановитесь на твёрдой земле, прежде чем выбираться.',
+  'hudChrome.unstuck.busy': 'Завершите текущее действие, прежде чем выбираться.',
+  'hudChrome.unstuck.unavailable': 'В текущем состоянии выбраться нельзя.',
 };

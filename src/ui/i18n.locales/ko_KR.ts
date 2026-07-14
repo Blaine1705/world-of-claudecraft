@@ -7692,4 +7692,29 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '몇 가지 자주 쓰는 명령어는 외워 둘 만합니다. /w 이름은 귓속말을 보내고, /r은 마지막으로 받은 귓속말에 답하며, /invite는 상대를 파티로 초대하고, /follow는 친구 뒤를 따라 걷게 하며, /roll은 파티가 함께 볼 주사위를 굴리고, /who는 접속 중인 사람을 보여주며, /afk는 자리 비움으로 표시합니다. 전체 목록은 게임에서 /help를 입력해 확인하세요.',
   'guide.social.slashHeading': '유용한 슬래시 명령어',
+  // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.menuButton': '갇힘 탈출',
+  'hudChrome.unstuck.help':
+    '탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.',
+  'hudChrome.unstuck.started':
+    '{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.',
+  'hudChrome.unstuck.countdown': '갇힘 탈출: {seconds}',
+  'hudChrome.unstuck.completed': '도달할 수 있는 가장 가까운 안전한 위치로 이동했습니다.',
+  'hudChrome.unstuck.cancelledMoved': '이동해서 갇힘 탈출이 취소되었습니다.',
+  'hudChrome.unstuck.cancelledDamaged': '피해를 받아 갇힘 탈출이 취소되었습니다.',
+  'hudChrome.unstuck.cancelledCombat': '전투에 진입해 갇힘 탈출이 취소되었습니다.',
+  'hudChrome.unstuck.cancelledBusy': '다른 행동을 시작해 갇힘 탈출이 취소되었습니다.',
+  'hudChrome.unstuck.cancelledState': '상태가 바뀌어 갇힘 탈출이 취소되었습니다.',
+  'hudChrome.unstuck.cancelledDisconnected': '연결이 끊겨서 갇힘 탈출이 취소되었습니다.',
+  'hudChrome.unstuck.noSafePosition':
+    '주변에 도달할 수 있는 안전한 위치가 없습니다. 이동하지 않았습니다.',
+  'hudChrome.unstuck.alreadyActive': '갇힘 탈출 카운트다운이 이미 진행 중입니다.',
+  'hudChrome.unstuck.alreadySafe': '이미 안전하고 접근 가능한 위치에 있습니다.',
+  'hudChrome.unstuck.cooldown': '{seconds}초 후 갇힘 탈출을 다시 사용할 수 있습니다.',
+  'hudChrome.unstuck.dead': '죽었거나 영혼 상태일 때는 갇힘 탈출을 사용할 수 없습니다.',
+  'hudChrome.unstuck.combat': '전투 중에는 갇힘 탈출을 사용할 수 없습니다.',
+  'hudChrome.unstuck.controlled': '이동이 제한된 동안에는 갇힘 탈출을 사용할 수 없습니다.',
+  'hudChrome.unstuck.standStill': '단단한 지면에 멈춰 선 뒤 갇힘 탈출을 사용하세요.',
+  'hudChrome.unstuck.busy': '현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.',
+  'hudChrome.unstuck.unavailable': '현재 상태에서는 갇힘 탈출을 사용할 수 없습니다.',
 };

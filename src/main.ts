@@ -123,7 +123,10 @@ import { installWebGLContextRelease } from './render/context_release';
 import { setDayNightPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
-import type { SelfMotionFrame } from './render/self_motion';
+import {
+  hasAuthoritativeSelfPositionDiscontinuity,
+  type SelfMotionFrame,
+} from './render/self_motion';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
 import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
@@ -2965,6 +2968,10 @@ async function startGame(
     }
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
     const drainedEvents = net.drainEvents();
+    const selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
+      drainedEvents,
+      net.playerId,
+    );
     perf.time('events', () =>
       perf.trace('hud.handleEvents', () => hud.handleEvents(drainedEvents), {
         mode: 'online',
@@ -3038,6 +3045,7 @@ async function startGame(
             net.spectating === null ? onlineRenderFacing : null,
             adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
             selfMotion,
+            selfAuthoritativeDiscontinuity,
           ),
         {
           mode: 'online',

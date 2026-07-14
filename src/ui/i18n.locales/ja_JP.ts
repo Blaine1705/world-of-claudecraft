@@ -7704,4 +7704,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '日々使う便利なコマンドをいくつか覚えておくとよいでしょう。/w 名前 でウィスパーを送り、/r で最後に受け取ったウィスパーに返信します。/invite で誰かをパーティに誘い、/follow で仲間の後ろについて歩き、/roll でグループの全員に見えるサイコロを振り、/who でオンラインの相手を確認し、/afk で離席中を示します。全一覧はゲーム内で /help と打てば見られます。',
   'guide.social.slashHeading': '便利なスラッシュコマンド',
+  // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.menuButton': 'スタック解除',
+  'hudChrome.unstuck.help':
+    '復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。',
+  'hudChrome.unstuck.started':
+    '{seconds}秒後にスタックを解除します。移動、戦闘、被ダメージ、別の行動を始めるとキャンセルされます。',
+  'hudChrome.unstuck.countdown': 'スタック解除：{seconds}',
+  'hudChrome.unstuck.completed': '到達可能な最寄りの安全な場所へ移動しました。',
+  'hudChrome.unstuck.cancelledMoved': '移動したため、スタック解除をキャンセルしました。',
+  'hudChrome.unstuck.cancelledDamaged': 'ダメージを受けたため、スタック解除をキャンセルしました。',
+  'hudChrome.unstuck.cancelledCombat': '戦闘に入ったため、スタック解除をキャンセルしました。',
+  'hudChrome.unstuck.cancelledBusy': '別の行動を始めたため、スタック解除をキャンセルしました。',
+  'hudChrome.unstuck.cancelledState': '状態が変化したため、スタック解除をキャンセルしました。',
+  'hudChrome.unstuck.cancelledDisconnected': '接続が切れたため、スタック解除をキャンセルしました。',
+  'hudChrome.unstuck.noSafePosition':
+    '近くに到達可能な安全な場所がありません。移動は行われませんでした。',
+  'hudChrome.unstuck.alreadyActive': 'スタック解除のカウントダウンはすでに進行中です。',
+  'hudChrome.unstuck.alreadySafe': 'すでに安全で到達可能な場所にいます。',
+  'hudChrome.unstuck.cooldown': 'スタック解除はあと{seconds}秒で使用できます。',
+  'hudChrome.unstuck.dead': '死亡中または霊体中はスタック解除を使用できません。',
+  'hudChrome.unstuck.combat': '戦闘中はスタック解除を使用できません。',
+  'hudChrome.unstuck.controlled': '移動を妨げられている間はスタック解除を使用できません。',
+  'hudChrome.unstuck.standStill': '安定した地面で静止してからスタック解除を使用してください。',
+  'hudChrome.unstuck.busy': '現在の行動を終えてからスタック解除を使用してください。',
+  'hudChrome.unstuck.unavailable': '現在の状態ではスタック解除を使用できません。',
 };

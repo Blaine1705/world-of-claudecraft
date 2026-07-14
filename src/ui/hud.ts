@@ -468,6 +468,7 @@ import { type UnitFrameDescriptor, unitFrameView } from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
 import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
+import { unstuckFeedback } from './unstuck_feedback';
 import { ValeCupBetting } from './vale_cup_betting';
 import { buildVcupBettingView } from './vale_cup_betting_view';
 import { ValeCupBriefing } from './vale_cup_briefing';
@@ -1102,6 +1103,7 @@ export class Hud {
   private errorTimer: number | undefined;
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
+  private bannerSource: 'unstuck' | null = null;
   private pfLevelEl = $('#pf-level');
   private pfHpEl = $('#pf-hp');
   private pfHpTextEl = $('#pf-hp-text');
@@ -10452,6 +10454,21 @@ export class Hud {
         case 'respawn':
           this.log(t('hud.system.respawn'), '#7fdc4f');
           break;
+        case 'unstuck': {
+          const feedback = unstuckFeedback(ev);
+          const text = t(feedback.key, feedback.values);
+          if (feedback.clearBanner) this.clearUnstuckBanner();
+          if (feedback.kind === 'error') {
+            this.showError(text);
+            break;
+          }
+          if (feedback.banner) {
+            const bannerText = t(feedback.bannerKey ?? feedback.key, feedback.values);
+            this.showBanner(bannerText, feedback.kind === 'progress' ? 'unstuck' : null);
+          }
+          if (feedback.log) this.log(text, feedback.kind === 'success' ? '#7fdc4f' : '#ffd100');
+          break;
+        }
         case 'castStart':
           break; // cast-loop SFX is spatial now (see playEventSfx)
         case 'castStop':
@@ -10755,6 +10772,8 @@ export class Hud {
       'You mutter to yourself. Nobody hears it.': 'hud.errors.whisperSelf',
       'You are not in a party.': 'hud.errors.notInParty',
       'You must be in a party to start a ready check.': 'hudChrome.readyCheck.notInPartyError',
+      'Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.':
+        'hudChrome.unstuck.help',
       'A ready check is already in progress.': 'hudChrome.readyCheck.inProgressError',
       'Only the party leader can change the loot method.': 'hudChrome.masterLoot.leaderOnly',
       'Only the party leader may invite.': 'hud.errors.partyLeaderInvite',
@@ -11180,12 +11199,23 @@ export class Hud {
     }
   }
 
-  showBanner(text: string): void {
+  private clearUnstuckBanner(): void {
+    if (this.bannerSource !== 'unstuck') return;
+    clearTimeout(this.bannerTimer);
+    this.bannerTimer = undefined;
+    this.bannerSource = null;
+    this.bannerEl.textContent = '';
+    this.bannerEl.style.opacity = '0';
+  }
+
+  showBanner(text: string, source: 'unstuck' | null = null): void {
     this.bannerEl.textContent = text;
     this.bannerEl.style.opacity = '1';
+    this.bannerSource = source;
     clearTimeout(this.bannerTimer);
     this.bannerTimer = window.setTimeout(() => {
       this.bannerEl.style.opacity = '0';
+      this.bannerSource = null;
     }, 2600);
   }
 

@@ -142,7 +142,7 @@ import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { buildRiftRankBadge } from './rift_rank';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
-import { type SelfMotionFrame, SelfMotionPredictor } from './self_motion';
+import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import { buildClouds, buildSky, ensureSkyAssetsAt, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
@@ -294,8 +294,6 @@ const CAMERA_PULL_OUT_RATE = 6;
 const CAMERA_SOFT_PULL_WEIGHT = 0.45;
 const CAMERA_BASE_FOV = 60;
 const CAMERA_MAX_COMP_FOV = 98;
-const SELF_RENDER_SMOOTH_RATE = 30;
-const SELF_RENDER_SNAP_DIST_SQ = 6 * 6;
 // Decay rate of the one-time offset captured when the self-motion predictor
 // takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
 const SELF_MOTION_HANDOFF_RATE = 15;
@@ -5125,6 +5123,7 @@ export class Renderer {
     renderFacingOverride: number | null,
     selfAlphaLead = 0,
     selfMotion: SelfMotionFrame | null = null,
+    selfAuthoritativeDiscontinuity = false,
   ): void {
     const totalStart = performance.now();
     let phaseStart = totalStart;
@@ -5169,7 +5168,13 @@ export class Renderer {
       this.selfMotionOffset.set(0, 0, 0);
     }
     const now = performance.now();
-    const selfPos = this.updateSelfRenderPosition(alpha, dt, selfAlphaLead, selfMotion);
+    const selfPos = this.updateSelfRenderPosition(
+      alpha,
+      dt,
+      selfAlphaLead,
+      selfMotion,
+      selfAuthoritativeDiscontinuity,
+    );
     markPhase('setup');
 
     // dynamic worlds: create nearby views lazily and drop views for leavers or
@@ -6241,6 +6246,7 @@ export class Renderer {
     dt: number,
     selfAlphaLead: number,
     selfMotion: SelfMotionFrame | null = null,
+    authoritativeDiscontinuity = false,
   ): THREE.Vector3 {
     const p = this.sim.player;
     // Online intent-driven extrapolation: when active it owns the position and
@@ -6251,14 +6257,16 @@ export class Renderer {
       if (!this.selfMotionPredictor) {
         this.selfMotionPredictor = new SelfMotionPredictor(this.sim.cfg.seed);
       }
-      const predicted = this.selfMotionPredictor.step(p, selfMotion);
+      const predicted = this.selfMotionPredictor.step(p, selfMotion, authoritativeDiscontinuity);
       if (predicted) {
         // Follow the predictor output exactly (it is already continuous;
         // smoothing it again would re-add the display lag this exists to
         // remove). The only discontinuity is the handoff frame from the
         // lead-smoothing path below: capture that gap once as an offset and
         // decay it, so the camera glides instead of stepping.
-        if (this.selfRenderPositionReady && !this.selfMotionActive) {
+        if (authoritativeDiscontinuity) {
+          this.selfMotionOffset.set(0, 0, 0);
+        } else if (this.selfRenderPositionReady && !this.selfMotionActive) {
           this.selfMotionOffset.set(
             this.selfRenderPosition.x - predicted.x,
             this.selfRenderPosition.y - predicted.y,
@@ -6281,23 +6289,17 @@ export class Renderer {
     const px = p.prevPos.x + (p.pos.x - p.prevPos.x) * playerAlpha;
     const py = p.prevPos.y + (p.pos.y - p.prevPos.y) * playerAlpha;
     const pz = p.prevPos.z + (p.pos.z - p.prevPos.z) * playerAlpha;
-    if (selfAlphaLead > 0) {
-      const dx = px - this.selfRenderPosition.x;
-      const dy = py - this.selfRenderPosition.y;
-      const dz = pz - this.selfRenderPosition.z;
-      if (!this.selfRenderPositionReady || dx * dx + dy * dy + dz * dz > SELF_RENDER_SNAP_DIST_SQ) {
-        this.selfRenderPosition.set(px, py, pz);
-        this.selfRenderPositionReady = true;
-      } else {
-        const t = 1 - Math.exp(-SELF_RENDER_SMOOTH_RATE * Math.max(0, dt));
-        this.selfRenderPosition.x += dx * t;
-        this.selfRenderPosition.y += dy * t;
-        this.selfRenderPosition.z += dz * t;
-      }
-    } else {
-      this.selfRenderPosition.set(px, py, pz);
-      this.selfRenderPositionReady = true;
-    }
+    updateSelfRenderFallback(
+      this.selfRenderPosition,
+      px,
+      py,
+      pz,
+      this.selfRenderPositionReady,
+      dt,
+      selfAlphaLead > 0,
+      authoritativeDiscontinuity,
+    );
+    this.selfRenderPositionReady = true;
     return this.selfRenderPosition;
   }
 

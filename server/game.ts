@@ -59,6 +59,7 @@ import {
   RUN_SPEED,
   type SimEvent,
   type SportRole,
+  type UnstuckBlockedReason,
   type VcBracket,
   type VcNationId,
 } from '../src/sim/types';
@@ -161,6 +162,7 @@ import { PgSocialDb } from './social_db';
 import { reconcileOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
+import { recordUnstuckEvent } from './unstuck_records';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -456,6 +458,7 @@ const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'enter_delve',
   'duel_req',
   'duel_accept',
+  'unstuck',
 ]);
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
@@ -1075,6 +1078,7 @@ export class GameServer {
   private wireCache = new Map<number, EntityWireCache>();
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
+  private draining = false;
   private holderTierInterval: NodeJS.Timeout | null = null;
   private keepaliveInterval: NodeJS.Timeout | null = null;
   private holderTierRefreshing = false; // overlap guard for the refresh cycle
@@ -1839,6 +1843,21 @@ export class GameServer {
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
     if (this.dailyRewardActivityInterval) clearInterval(this.dailyRewardActivityInterval);
     if (this.keepaliveInterval) clearInterval(this.keepaliveInterval);
+  }
+
+  /**
+   * Freeze inbound gameplay before the shutdown snapshot and terminally record
+   * every accepted recovery attempt while its session identity is still live.
+   * Synchronous flagging and cancellation make repeated calls idempotent and
+   * leave no window for a buffered /unstuck command to start after the sweep.
+   */
+  beginShutdown(): number {
+    this.draining = true;
+    let cancelled = 0;
+    for (const session of this.clients.values()) {
+      if (this.cancelAndRecordUnstuck(session)) cancelled++;
+    }
+    return cancelled;
   }
 
   // Grant playtime reward points to each online account that has been ACTIVE (gave
@@ -2661,6 +2680,7 @@ export class GameServer {
     if (session.left || session.linkdead || !this.clients.has(session.pid)) return false;
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
+    this.cancelAndRecordUnstuck(session);
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
@@ -2741,6 +2761,7 @@ export class GameServer {
     if (session.left || !this.clients.has(session.pid)) return;
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
+    this.cancelAndRecordUnstuck(session);
     session.left = true;
     this.clients.delete(session.pid);
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
@@ -3504,6 +3525,10 @@ export class GameServer {
     // session and starts the awaited persistence flush. Never let that stale
     // authority mutate live state after the character snapshot was captured.
     if (session.left || this.clients.get(session.pid) !== session) return;
+    // beginShutdown flips this before its cancellation sweep. Buffered frames
+    // must not mutate gameplay after that point or create an unstuck attempt
+    // that can neither tick nor be included in the shutdown snapshot.
+    if (this.draining) return;
     gameMetricsCounters().wsMessage('in');
     const receivedAtMs = Date.now();
     const verdict = consumeMsgToken(session.msgRate, receivedAtMs / 1000);
@@ -3597,10 +3622,18 @@ export class GameServer {
       return;
     }
     if (session.spectating) {
+      if (msg.cmd === 'unstuck') {
+        this.sendUnstuckBlocked(session, 'spectating');
+        return;
+      }
       if (msg.cmd !== 'chat' || typeof msg.text !== 'string') return;
       const text = msg.text.trim();
       if (canAttemptModerationCommands(session) && this.moderation.handleChatCommand(session, text))
         return;
+      if (/^\/unstuck\s*$/i.test(text)) {
+        this.sendUnstuckBlocked(session, 'spectating');
+        return;
+      }
       if (this.isSpectateLocalChat(session, text)) {
         this.sendChatNotice(session, 'Local chat is unavailable while spectating.');
         return;
@@ -3624,7 +3657,8 @@ export class GameServer {
     // instance entry would teleport it out of the cage and the jail enforcement
     // straight back, ruining the match for everyone else in it.
     if (session.jailed && typeof msg.cmd === 'string' && JAILED_BLOCKED_COMMANDS.has(msg.cmd)) {
-      this.sendChatNotice(session, 'You cannot do that while jailed.');
+      if (msg.cmd === 'unstuck') this.sendUnstuckBlocked(session, 'jailed');
+      else this.sendChatNotice(session, 'You cannot do that while jailed.');
       return;
     }
     // A command that can change a heavy self field forces the next snapshot to
@@ -3855,6 +3889,9 @@ export class GameServer {
       case 'release':
         sim.releaseSpirit(pid);
         break;
+      case 'unstuck':
+        sim.unstuck(pid);
+        break;
       case 'resurrect_corpse':
         sim.resurrectAtCorpse(pid);
         break;
@@ -3874,6 +3911,13 @@ export class GameServer {
           this.moderation.handleChatCommand(session, text)
         )
           break;
+        // Recovery is a gameplay command, not broadcast chat. Keep it usable
+        // while muted and outside the chat token bucket, then route through the
+        // same authoritative system as the dedicated Settings action.
+        if (/^\/unstuck\s*$/i.test(text)) {
+          sim.unstuck(pid);
+          break;
+        }
         // The player's own ignore/block commands. Deliberately BEFORE isChatMuted
         // and the rate limiter: a GM-silenced player must still be able to manage
         // their own lists, and a list readout must not burn a chat token toward
@@ -5107,6 +5151,19 @@ export class GameServer {
     // inline.
     const deedUnlocks = new Map<ClientSession, string[]>();
     for (const ev of events) {
+      if (ev.type === 'unstuck' && ev.pid !== undefined) {
+        const session = this.clients.get(ev.pid);
+        if (session) {
+          recordUnstuckEvent(
+            {
+              realm: REALM,
+              accountId: session.accountId,
+              characterId: session.characterId,
+            },
+            ev,
+          );
+        }
+      }
       if (ev.type === 'deedUnlocked' && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (s) {
@@ -5654,6 +5711,26 @@ export class GameServer {
   // client already renders for rate-limit / cooldown messages).
   private sendChatNotice(session: ClientSession, text: string): void {
     this.send(session, { t: 'events', list: [{ type: 'error', text }] });
+  }
+
+  private sendUnstuckBlocked(session: ClientSession, reason: UnstuckBlockedReason): void {
+    this.send(session, { t: 'events', list: [{ type: 'unstuck', phase: 'blocked', reason }] });
+  }
+
+  private cancelAndRecordUnstuck(session: ClientSession): boolean {
+    // Do not enqueue this event on the sim bus: linkdead sessions remain in the
+    // client map, where detectActivity would otherwise record it a second time.
+    const event = this.sim.cancelUnstuckForDisconnect(session.pid, false);
+    if (!event) return false;
+    recordUnstuckEvent(
+      {
+        realm: REALM,
+        accountId: session.accountId,
+        characterId: session.characterId,
+      },
+      event,
+    );
+    return true;
   }
 
   private sendSystemNotice(session: ClientSession, text: string): void {

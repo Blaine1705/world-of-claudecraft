@@ -241,6 +241,7 @@ describe('chat channels', () => {
     expect(help.length).toBeGreaterThan(0);
     const text = help.map((e) => e.text).join('\n');
     expect(text).toContain('/w <name> <message>');
+    expect(text).toContain('/unstuck');
     expect(text).toContain('/who');
   });
 
@@ -1133,8 +1134,8 @@ describe('chat module (direct, no Sim)', () => {
     const line = chatMod.inspectReadout(target, e);
     expect(line).toContain('Bet: Level 7');
     expect(line).toContain('50%');
-    // 8 lines: the 7 original groups plus the ignore/block line
-    expect(chatMod.helpLines().length).toBe(8);
+    // 9 lines: the original groups plus ignore/block and localized recovery help.
+    expect(chatMod.helpLines().length).toBe(9);
     expect(chatMod.helpLines().join('\n')).toContain('/ignore <name>');
   });
 

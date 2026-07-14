@@ -7338,4 +7338,27 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '有几条日常命令值得记住：/w 名字 发送密语，/r 回复你最近收到的一条，/invite 邀请某人加入你的小队，/follow 跟随一位好友的脚步，/roll 为全队掷骰，/who 显示谁在线，/afk 将你标记为离开。在游戏中输入 /help 可查看完整列表。',
   'guide.social.slashHeading': '实用的斜杠命令',
+  // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.menuButton': '脱困',
+  'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
+  'hudChrome.unstuck.started':
+    '将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。',
+  'hudChrome.unstuck.countdown': '脱困：{seconds}',
+  'hudChrome.unstuck.completed': '已移动到最近且可到达的安全位置。',
+  'hudChrome.unstuck.cancelledMoved': '你进行了移动，脱困已取消。',
+  'hudChrome.unstuck.cancelledDamaged': '你受到了伤害，脱困已取消。',
+  'hudChrome.unstuck.cancelledCombat': '你进入了战斗，脱困已取消。',
+  'hudChrome.unstuck.cancelledBusy': '你开始了其他动作，脱困已取消。',
+  'hudChrome.unstuck.cancelledState': '你的状态发生变化，脱困已取消。',
+  'hudChrome.unstuck.cancelledDisconnected': '由于连接断开，脱困已取消。',
+  'hudChrome.unstuck.noSafePosition': '附近没有可到达的安全位置。你没有被移动。',
+  'hudChrome.unstuck.alreadyActive': '脱困倒计时已在进行。',
+  'hudChrome.unstuck.alreadySafe': '你已经处于安全且可到达的位置。',
+  'hudChrome.unstuck.cooldown': '脱困将在 {seconds} 秒后可用。',
+  'hudChrome.unstuck.dead': '死亡或灵魂状态下无法使用脱困。',
+  'hudChrome.unstuck.combat': '战斗中无法使用脱困。',
+  'hudChrome.unstuck.controlled': '移动受限时无法使用脱困。',
+  'hudChrome.unstuck.standStill': '请在坚实地面上站稳后再使用脱困。',
+  'hudChrome.unstuck.busy': '请先完成当前动作再使用脱困。',
+  'hudChrome.unstuck.unavailable': '当前状态下无法使用脱困。',
 };

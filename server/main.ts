@@ -260,6 +260,8 @@ import {
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
 import { passesTurnstile } from './turnstile';
+import { pruneUnstuckReports, UNSTUCK_REPORT_RETENTION_DAYS } from './unstuck_db';
+import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
   assetBytesCore,
@@ -2594,6 +2596,11 @@ export async function startServer(): Promise<http.Server> {
     console.log(
       `pruned ${prunedPerfReports} client perf report row(s) older than ${config.perfReportRetentionDays} days`,
     );
+  const prunedUnstuckReports = await pruneUnstuckReports(pool);
+  if (prunedUnstuckReports > 0)
+    console.log(
+      `pruned ${prunedUnstuckReports} unstuck report row(s) older than ${UNSTUCK_REPORT_RETENTION_DAYS} days`,
+    );
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
@@ -2610,6 +2617,9 @@ export async function startServer(): Promise<http.Server> {
     );
     void pruneClientPerfReports(config.perfReportRetentionDays).catch((err) =>
       console.error('perf report prune failed:', err),
+    );
+    void pruneUnstuckReports(pool).catch((err) =>
+      console.error('unstuck report prune failed:', err),
     );
     void pruneExpiredOAuthGrants(pool).catch((err) =>
       console.error('oauth grant prune failed:', err),
@@ -2758,6 +2768,7 @@ export async function startServer(): Promise<http.Server> {
     // fire before pool.end()).
     businessMetrics.stop();
     clientPerfMetrics.stop();
+    game.beginShutdown();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
@@ -2778,6 +2789,11 @@ export async function startServer(): Promise<http.Server> {
     // go missing until that character's next login (the join reconcile is the
     // only heal). Rejections log inside the writer, so the drain never throws.
     await deedRecordsIdle();
+    // Stop accepted /unstuck report intake and drain only to a finite deadline.
+    // Per-query timeouts bound an active write; deadline expiry aborts retry
+    // delays and drops queued telemetry before the shared pool closes.
+    const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);
+    if (!unstuckReportsDrained) console.warn('unstuck report drain deadline reached');
     // Stop and drain the Steam mirror's in-memory push FIFO too (right after the
     // deeds records it observes): an unlock still queued here would be lost on
     // pool.end(), and the next reconcile (on link or on login) is its only

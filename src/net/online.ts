@@ -1646,6 +1646,7 @@ export class ClientWorld implements IWorld {
         this.applyCraftResultEvent(ev as SimEvent);
         this.applyRiftStateEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
+        this.applyUnstuckEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
       return;
@@ -2288,6 +2289,9 @@ export class ClientWorld implements IWorld {
   }
   stopAutoAttack(): void {
     this.cmd({ cmd: 'stopattack' });
+  }
+  unstuck(): void {
+    this.cmd({ cmd: 'unstuck' });
   }
   releaseSpirit(): void {
     this.cmd({ cmd: 'release' });
@@ -2988,6 +2992,24 @@ export class ClientWorld implements IWorld {
       quality: ev.quality as MaterialRarity | undefined,
       reason: ev.reason,
     };
+  }
+
+  // A successful recovery is intentionally shorter than the normal large-delta
+  // snapshot snap threshold. Mirror its authoritative event immediately so an
+  // eight-yard correction never spends a frame interpolating back into the wall.
+  private applyUnstuckEvent(ev: SimEvent): void {
+    if (ev.type !== 'unstuck' || ev.phase !== 'completed') return;
+    const p = this.entities.get(ev.pid ?? this.playerId);
+    if (!p) return;
+    p.pos = {
+      x: ev.destination.x,
+      y: ev.destination.y,
+      z: ev.destination.z,
+    };
+    p.prevPos = { ...p.pos };
+    p.vx = 0;
+    p.vy = 0;
+    p.vz = 0;
   }
   delveRiteChoose(intensity: RiteIntensity): void {
     this.cmd({ cmd: 'delve_rite_choose', intensity });
