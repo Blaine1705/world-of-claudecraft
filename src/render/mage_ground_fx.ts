@@ -23,7 +23,9 @@ const METEOR_FLAME_COUNT = 18;
 const METEOR_EMBER_COUNT = 28;
 const METEOR_SCORCH_LINGER = 2.2; // central fire left behind after impact
 const RUNE_FADE = 0.8; // seconds of fade at the rune's end of life
-const RUNE_SPIN = 0.5; // rad/s, lazy inscription rotation
+const RUNE_SPIN = 0.5; // rad/s, lazy mote rotation
+const RUNE_GROUND_LIFT = 0.08; // avoids z-fighting after terrain sampling
+const RUNE_SEGMENTS = 48;
 
 export interface MeteorFallSpawn {
   x: number;
@@ -78,7 +80,9 @@ interface MeteorFx {
 
 interface RuneFx {
   group: THREE.Group;
+  orbit: THREE.Group;
   mats: THREE.Material[];
+  ownedGeometries: THREE.BufferGeometry[];
   duration: number;
   elapsed: number;
   baseOpacities: number[];
@@ -498,15 +502,16 @@ export class MageGroundFx {
   }
 
   spawnRune(opts: RuneCircleSpawn): void {
-    this.runeRingGeo ??= new THREE.RingGeometry(0.82, 1, 48);
     const arcane = new THREE.Color(SCHOOL_COLORS.arcane);
     const group = new THREE.Group();
+    group.name = 'mage-rune-power';
     const mats: THREE.Material[] = [];
+    const ownedGeometries: THREE.BufferGeometry[] = [];
     const baseOpacities: number[] = [];
     // Outer ring at the zone edge, inner ring at half, both additive.
-    for (const [scale, opacity] of [
-      [opts.radius, 0.75],
-      [opts.radius * 0.55, 0.45],
+    for (const [name, radius, opacity] of [
+      ['mage-rune-power-outer-ring', opts.radius, 0.75],
+      ['mage-rune-power-inner-ring', opts.radius * 0.55, 0.45],
     ] as const) {
       const mat = new THREE.MeshBasicMaterial({
         color: arcane.clone().multiplyScalar(1.6),
@@ -516,15 +521,16 @@ export class MageGroundFx {
         depthWrite: false,
         side: THREE.DoubleSide,
       });
-      const ring = new THREE.Mesh(this.runeRingGeo, mat);
-      ring.rotation.x = -Math.PI / 2;
-      ring.scale.setScalar(scale);
+      const ringGeo = this.createTerrainRing(opts.x, opts.z, radius * 0.82, radius);
+      const ring = new THREE.Mesh(ringGeo, mat);
+      ring.name = name;
+      ring.renderOrder = 7;
       group.add(ring);
       mats.push(mat);
+      ownedGeometries.push(ringGeo);
       baseOpacities.push(opacity);
     }
     // Four spokes so the circle reads as an inscribed rune, not a plain ring.
-    const spokeGeo = new THREE.PlaneGeometry(0.12, opts.radius * 0.9);
     for (let i = 0; i < 4; i++) {
       const mat = new THREE.MeshBasicMaterial({
         color: arcane.clone().multiplyScalar(1.3),
@@ -534,17 +540,24 @@ export class MageGroundFx {
         depthWrite: false,
         side: THREE.DoubleSide,
       });
+      const spokeGeo = this.createTerrainSpoke(
+        opts.x,
+        opts.z,
+        0.12,
+        opts.radius * 0.9,
+        (i / 4) * Math.PI,
+      );
       const spoke = new THREE.Mesh(spokeGeo, mat);
-      spoke.rotation.x = -Math.PI / 2;
-      spoke.rotation.z = (i / 4) * Math.PI;
-      spoke.position.y = 0.01;
+      spoke.name = `mage-rune-power-spoke-${i}`;
+      spoke.renderOrder = 7;
       group.add(spoke);
       mats.push(mat);
+      ownedGeometries.push(spokeGeo);
       baseOpacities.push(0.4);
     }
     // A soft filled glow at the center plus a ring of orbiting motes: the
     // inscription reads as living magic, not a chalk outline (owner playtest).
-    const glowGeo = new THREE.CircleGeometry(opts.radius * 0.5, 32);
+    const glowGeo = this.createTerrainDisc(opts.x, opts.z, opts.radius * 0.5, 32);
     const glowMat = new THREE.MeshBasicMaterial({
       color: arcane.clone().multiplyScalar(0.9),
       transparent: true,
@@ -554,12 +567,18 @@ export class MageGroundFx {
       side: THREE.DoubleSide,
     });
     const glow = new THREE.Mesh(glowGeo, glowMat);
-    glow.rotation.x = -Math.PI / 2;
-    glow.position.y = 0.005;
+    glow.name = 'mage-rune-power-glow';
+    glow.renderOrder = 6;
     group.add(glow);
     mats.push(glowMat);
+    ownedGeometries.push(glowGeo);
     baseOpacities.push(0.18);
+
+    const orbit = new THREE.Group();
+    orbit.name = 'mage-rune-power-motes';
+    orbit.position.set(opts.x, this.groundY(opts.x, opts.z), opts.z);
     const moteGeo = new THREE.SphereGeometry(0.12, 8, 6);
+    ownedGeometries.push(moteGeo);
     for (let i = 0; i < 6; i++) {
       const moteMat = new THREE.MeshBasicMaterial({
         color: arcane.clone().multiplyScalar(1.9),
@@ -571,13 +590,111 @@ export class MageGroundFx {
       const mote = new THREE.Mesh(moteGeo, moteMat);
       const a = (i / 6) * Math.PI * 2;
       mote.position.set(Math.cos(a) * opts.radius * 0.8, 0.5, Math.sin(a) * opts.radius * 0.8);
-      group.add(mote);
+      orbit.add(mote);
       mats.push(moteMat);
       baseOpacities.push(0.85);
     }
-    group.position.set(opts.x, this.groundY(opts.x, opts.z) + 0.15, opts.z);
+    group.add(orbit);
     this.scene.add(group);
-    this.runes.push({ group, mats, duration: opts.duration, elapsed: 0, baseOpacities });
+    this.runes.push({
+      group,
+      orbit,
+      mats,
+      ownedGeometries,
+      duration: opts.duration,
+      elapsed: 0,
+      baseOpacities,
+    });
+  }
+
+  private createTerrainRing(
+    x: number,
+    z: number,
+    innerRadius: number,
+    outerRadius: number,
+  ): THREE.BufferGeometry {
+    const vertices: number[] = [];
+    const indices: number[] = [];
+    for (let segment = 0; segment <= RUNE_SEGMENTS; segment++) {
+      const angle = (segment / RUNE_SEGMENTS) * Math.PI * 2;
+      for (const radius of [innerRadius, outerRadius]) {
+        const sampleX = x + Math.cos(angle) * radius;
+        const sampleZ = z + Math.sin(angle) * radius;
+        vertices.push(sampleX, this.groundY(sampleX, sampleZ) + RUNE_GROUND_LIFT, sampleZ);
+      }
+      if (segment < RUNE_SEGMENTS) {
+        const inner = segment * 2;
+        indices.push(inner, inner + 1, inner + 2, inner + 1, inner + 3, inner + 2);
+      }
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    return geometry;
+  }
+
+  private createTerrainSpoke(
+    x: number,
+    z: number,
+    width: number,
+    length: number,
+    angle: number,
+  ): THREE.BufferGeometry {
+    const segments = 12;
+    const vertices: number[] = [];
+    const indices: number[] = [];
+    const alongX = Math.cos(angle);
+    const alongZ = Math.sin(angle);
+    const acrossX = -alongZ;
+    const acrossZ = alongX;
+    for (let segment = 0; segment <= segments; segment++) {
+      const distance = -length / 2 + (length * segment) / segments;
+      for (const side of [-1, 1]) {
+        const sampleX = x + alongX * distance + acrossX * width * 0.5 * side;
+        const sampleZ = z + alongZ * distance + acrossZ * width * 0.5 * side;
+        vertices.push(sampleX, this.groundY(sampleX, sampleZ) + RUNE_GROUND_LIFT, sampleZ);
+      }
+      if (segment < segments) {
+        const left = segment * 2;
+        indices.push(left, left + 1, left + 2, left + 1, left + 3, left + 2);
+      }
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    return geometry;
+  }
+
+  private createTerrainDisc(
+    x: number,
+    z: number,
+    radius: number,
+    segments: number,
+  ): THREE.BufferGeometry {
+    const vertices = [x, this.groundY(x, z) + RUNE_GROUND_LIFT, z];
+    const indices: number[] = [];
+    const radialSegments = 8;
+    for (let ring = 1; ring <= radialSegments; ring++) {
+      const sampleRadius = (radius * ring) / radialSegments;
+      for (let segment = 0; segment <= segments; segment++) {
+        const angle = (segment / segments) * Math.PI * 2;
+        const sampleX = x + Math.cos(angle) * sampleRadius;
+        const sampleZ = z + Math.sin(angle) * sampleRadius;
+        vertices.push(sampleX, this.groundY(sampleX, sampleZ) + RUNE_GROUND_LIFT, sampleZ);
+        if (segment >= segments) continue;
+        const current = 1 + (ring - 1) * (segments + 1) + segment;
+        if (ring === 1) {
+          indices.push(0, current, current + 1);
+        } else {
+          const previous = current - (segments + 1);
+          indices.push(previous, current, previous + 1, current, current + 1, previous + 1);
+        }
+      }
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    return geometry;
   }
 
   spawnSnow(opts: SnowZoneSpawn): void {
@@ -713,14 +830,11 @@ export class MageGroundFx {
       if (r.elapsed >= r.duration) {
         this.scene.remove(r.group);
         for (const mat of r.mats) mat.dispose();
-        r.group.children.forEach((c) => {
-          const mesh = c as THREE.Mesh;
-          if (mesh.geometry !== this.runeRingGeo) mesh.geometry.dispose();
-        });
+        for (const geometry of r.ownedGeometries) geometry.dispose();
         this.runes.splice(i, 1);
         continue;
       }
-      r.group.rotation.y += RUNE_SPIN * dt;
+      r.orbit.rotation.y += RUNE_SPIN * dt;
       // Steady glow with a soft breath; fade out over the last moments.
       const fade = Math.min(1, (r.duration - r.elapsed) / RUNE_FADE);
       const breath = 0.85 + 0.15 * Math.sin(r.elapsed * 2.4);

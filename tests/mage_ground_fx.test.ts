@@ -168,4 +168,35 @@ describe('Mage meteor visual', () => {
     fx.update(0.01);
     expect(scene.getObjectByName('mage-blizzard-boundary')).toBeUndefined();
   });
+
+  it('drapes Rune of Power over uneven terrain instead of clipping through it', () => {
+    const scene = new THREE.Scene();
+    const heightAt = (x: number, z: number): number => x * 0.08 + Math.sin(z * 0.4) * 0.7;
+    const fx = new MageGroundFx(scene, heightAt, vi.fn());
+
+    fx.spawnRune({ x: 10, z: 20, radius: 6, duration: 12 });
+
+    const rune = scene.getObjectByName('mage-rune-power') as THREE.Group;
+    expect(rune).toBeInstanceOf(THREE.Group);
+    const surfaces = [
+      'mage-rune-power-outer-ring',
+      'mage-rune-power-inner-ring',
+      'mage-rune-power-glow',
+      ...Array.from({ length: 4 }, (_, index) => `mage-rune-power-spoke-${index}`),
+    ];
+    for (const name of surfaces) {
+      const surface = rune.getObjectByName(name) as THREE.Mesh;
+      expect(surface).toBeInstanceOf(THREE.Mesh);
+      const positions = surface.geometry.getAttribute('position') as THREE.BufferAttribute;
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        const z = positions.getZ(i);
+        expect(y).toBeCloseTo(heightAt(x, z) + 0.08, 4);
+      }
+    }
+
+    fx.update(12);
+    expect(scene.getObjectByName('mage-rune-power')).toBeUndefined();
+  });
 });
