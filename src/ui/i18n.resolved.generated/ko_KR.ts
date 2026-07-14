@@ -6227,6 +6227,10 @@ export const ko_KR: EnTranslations = {
         "name": "Temporal Reversal",
         "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
       },
+      "collective_reversal": {
+        "name": "집단 역행",
+        "description": "그룹 또는 공격대에서 사망한 모든 구성원의 시간선을 되돌려 시체 옆에서 생명력과 마나가 가득 찬 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)"
+      },
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"

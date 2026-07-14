@@ -29,6 +29,7 @@ const baseEnTable = {
   'error.lineOfSight': 'Line of sight.',
   'error.notInGroup': 'That ally is not in your group.',
   'error.noDeadAlly': 'You must target a dead ally in your group.',
+  'error.noDeadGroupMembers': 'There are no dead group members to resurrect.',
   'error.bagsFull': 'Your bags are full.',
   'error.bagSocketsFull': 'All your bag slots are full.',
   'error.bagSwapTooManyItems': 'You have too many items to swap to that bag.',
@@ -568,6 +569,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.resurrectionSickness': "The Keeper's Toll",
   },
   es: {
+    'error.noDeadGroupMembers': 'No hay miembros muertos en el grupo que resucitar.',
     'error.heroicMarksNeeded': 'Necesitas {marks} Marcas Heroicas para comprar {name}.',
     'aura.enraged': 'Enfurecido',
     'aura.fingersOfFrost': 'Dedos de Escarcha',

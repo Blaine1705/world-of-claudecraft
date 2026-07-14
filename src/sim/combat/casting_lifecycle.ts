@@ -75,6 +75,7 @@ import {
   frostMageChannelStart,
 } from './frost_mage';
 import { empoweredCastProgress, empoweredStageForProgress } from './glacial_front';
+import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
 import {
   hasCastShield,
   noteSpellHit,
@@ -182,6 +183,19 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
   if (isStunned(p)) {
     cancelCast(ctx, p);
     return;
+  }
+  const activeCast = ctx.resolvedAbility(p.castingAbility, p.id);
+  if (activeCast && isMassResurrectionAbility(activeCast.def)) {
+    if (p.inCombat) {
+      cancelCast(ctx, p);
+      ctx.error(p.id, "You can't do that while in combat.");
+      return;
+    }
+    if (!hasDeadGroupMember(ctx, p)) {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'There are no dead group members to resurrect.');
+      return;
+    }
   }
   // a silence breaks an in-progress spell, but never the fishing cast or a
   // physical channel (e.g. an aimed-shot kind) — those aren't spells.
@@ -567,6 +581,10 @@ export function castAbility(
   }
   if (ability.requiresOutOfCombat && p.inCombat) {
     ctx.error(p.id, "You can't do that while in combat.");
+    return;
+  }
+  if (isMassResurrectionAbility(ability) && !hasDeadGroupMember(ctx, p)) {
+    ctx.error(p.id, 'There are no dead group members to resurrect.');
     return;
   }
 
@@ -1255,6 +1273,16 @@ function applyAbility(
   // passes nothing). Cleared here so it can never leak into a later cast.
   const castTarget = castTargetId ?? p.castTargetId;
   p.castTargetId = null;
+  if (isMassResurrectionAbility(res.def)) {
+    if (p.inCombat) {
+      ctx.error(p.id, "You can't do that while in combat.");
+      return;
+    }
+    if (!hasDeadGroupMember(ctx, p)) {
+      ctx.error(p.id, 'There are no dead group members to resurrect.');
+      return;
+    }
+  }
   // Overload (mage choice row): the armed amplifier bakes the next MANA spell
   // 40% stronger and 50% costlier into a scaled COPY of the resolved ability
   // before cost and effects resolve (channels are exempt: they bill in the

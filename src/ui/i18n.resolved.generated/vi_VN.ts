@@ -6227,6 +6227,10 @@ export const vi_VN: EnTranslations = {
         "name": "Temporal Reversal",
         "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
       },
+      "collective_reversal": {
+        "name": "Đảo ngược tập thể",
+        "description": "Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với đầy máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)"
+      },
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"

@@ -6227,6 +6227,10 @@ export const nl_NL: EnTranslations = {
         "name": "Temporal Reversal",
         "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
       },
+      "collective_reversal": {
+        "name": "Collectieve omkering",
+        "description": "Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid terug en brengt hen bij hun lichaam tot leven met volledige gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)"
+      },
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"

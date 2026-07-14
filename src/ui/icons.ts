@@ -2621,6 +2621,15 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['arcs'],
   ),
   temporal_reversal: r('arcane', 'arcanePink', ['cross', { p: 'moon', ...TR }], ['glow']),
+  collective_reversal: r(
+    'arcane',
+    'gold',
+    [
+      { p: 'cross', s: 0.9 },
+      { p: 'sunburst', ...TR },
+    ],
+    ['arcs', 'sparkle'],
+  ),
   temporal_rewind: r('arcane', 'arcanePink', [{ p: 'moon', s: 1.1 }], ['arcs', 'glow']),
   temporal_hourglass: r('arcane', 'gold', [{ p: 'hourglass', s: 1.05 }], ['glow', 'sparkle']),
   temporal_acceleration: r('arcane', 'arcanePink', ['boot', { p: 'moon', ...TR }], ['motion']),

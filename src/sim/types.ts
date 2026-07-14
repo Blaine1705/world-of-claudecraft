@@ -1670,6 +1670,9 @@ export type AbilityEffect =
   // Chronomancy combat resurrection (Temporal Reversal): rewind a DEAD group/raid
   // member back to life at their corpse with `hpFrac` of their pools, no sickness.
   | { type: 'resurrectAlly'; hpFrac: number }
+  // Chronomancy out-of-combat mass resurrection: revive every dead member of the
+  // caster's current group or raid at their body with `hpFrac` of their pools.
+  | { type: 'massResurrectGroup'; hpFrac: number }
   // Chronomancer offensive cooldown (Perfect Moment): slam the caster to full
   // Arcane Charges and open the no-consume window (combat/chronomancy.ts).
   | { type: 'perfectMoment' }

@@ -14,6 +14,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.collective_reversal.name': 'Коллективный откат',
+  'entities.abilities.collective_reversal.description':
+    'Отматывает линию времени каждого погибшего участника группы или рейда и возвращает его к жизни у тела с полным запасом здоровья и маны. Нельзя применять в бою. (Хрономантия)',
   'entities.abilities.temporal_hourglass.name': 'Песочные часы остановки',
   'entities.abilities.temporal_hourglass.description':
     'Помещает временные песочные часы в выбранную точку. Под врагом они останавливают его на {hostilePveDuration} сек. в PvE или на {hostilePvpDuration} сек. в PvP; любой урон снимает эффект. Под вами или союзником из группы они создают стазис на {duration} сек., защищают от урона, запрещают действовать и восстанавливают {healing}% максимального здоровья. Ваши способности восстанавливаются на {selfCooldownRecovery}% быстрее, а способности союзника на {allyCooldownRecovery}% быстрее. На пустой земле часы ждут {groundDuration} сек. и воздействуют на первую допустимую цель, которая на них наступит. Положительный эффект можно снять вручную.',

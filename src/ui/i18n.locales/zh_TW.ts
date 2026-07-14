@@ -14,6 +14,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.collective_reversal.name': '集體逆轉',
+  'entities.abilities.collective_reversal.description':
+    '倒轉隊伍或團隊中每位陣亡成員的時間線，使其在遺體旁以滿生命值和滿法力值復活。無法在戰鬥中施放。（時空魔法）',
   'entities.abilities.temporal_hourglass.name': '懸停沙漏',
   'entities.abilities.temporal_hourglass.description':
     '在選定位置放置一個時間沙漏。置於敵人腳下時，在 PvE 中使其懸停 {hostilePveDuration} 秒，在 PvP 中懸停 {hostilePvpDuration} 秒；受到任何傷害都會解除效果。置於自己或隊伍盟友腳下時，進入 {duration} 秒的停滯，免疫傷害且無法行動，恢復 {healing}% 最大生命值，並使自己的冷卻恢復速度提高 {selfCooldownRecovery}%，盟友提高 {allyCooldownRecovery}%。若位置為空，沙漏會等待 {groundDuration} 秒並影響第一個踩上去的有效單位。增益光環可手動移除。',

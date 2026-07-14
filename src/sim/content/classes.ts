@@ -194,6 +194,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'temporal_cascade',
       // Combat resurrection: rewind a dead group/raid member back to life.
       'temporal_reversal',
+      // Out-of-combat mass resurrection for the whole group or raid.
+      'collective_reversal',
       // "Correct" pillar raid cooldown: restore recent group/raid damage (Rewind).
       'temporal_rewind',
       'temporal_hourglass',
@@ -2224,6 +2226,27 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
     description:
       "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+  },
+  // ---- Chronomancy out-of-combat mass resurrection. The base seven-second cast
+  // and mana cost are provisional playtest values. It has no target and rewinds all
+  // dead members on the authoritative group or raid roster at cast completion.
+  collective_reversal: {
+    id: 'collective_reversal',
+    name: 'Collective Reversal',
+    class: 'mage',
+    learnLevel: 20,
+    specs: ['arcane'],
+    cost: 250,
+    castTime: 7,
+    cooldown: 0,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    requiresOutOfCombat: true,
+    projectile: false,
+    effects: [{ type: 'massResurrectGroup', hpFrac: 1 }],
+    description:
+      'Rewinds every fallen member of your group or raid, returning them to life at their body with full health and mana. Cannot be cast in combat. (Chronomancy)',
   },
   // ---- Chronomancy (healer) "Correct" pillar: Rewind (Rebobinar), the raid
   // cooldown. docs/prd/mage-chronomancy.md. Instant, no target, self-centered 40 yd

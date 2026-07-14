@@ -6227,6 +6227,10 @@ export const ja_JP: EnTranslations = {
         "name": "Temporal Reversal",
         "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
       },
+      "collective_reversal": {
+        "name": "集団逆行",
+        "description": "グループまたはレイドの死亡した全メンバーの時間軸を巻き戻し、遺体のそばで体力とマナが最大の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）"
+      },
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
