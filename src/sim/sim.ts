@@ -107,6 +107,7 @@ import {
   abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
+  COMMUNITY_RIFT_SLOT_COUNT,
   DEEPFEN_SHALLOWS_LAKE,
   DELVE_COMPANIONS,
   DELVE_LIST,
@@ -436,6 +437,7 @@ import {
   angleTo,
   armorReduction,
   type CrowdControlDrCategory,
+  type CrowdControlDrState,
   cloneInvSlot,
   cloneItemInstancePayload,
   DELVE_COMPANION_HEAL_INTERVAL,
@@ -710,6 +712,17 @@ export interface ArenaQueueUnit {
 // slot; `returns` remembers where each was standing so the match can put them
 // back when it ends. Ratings are snapshotted at the start purely for the
 // result message — the authoritative values live on each PlayerMeta.
+// Per-fighter recovery pools snapshotted at match formation (before the arena
+// clean-slate reset) so returnFromArena can restore them instead of full-healing.
+// This is what stops an arena bout being abused as a free, instant full restore
+// of HP, resource, and cooldowns (issue #1600).
+export interface ArenaReturnPools {
+  hp: number;
+  resource: number;
+  cooldowns: Map<string, number>;
+  ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
+}
+
 export interface ArenaMatch {
   id: number;
   format: ArenaFormat;
@@ -719,6 +732,10 @@ export interface ArenaMatch {
   state: 'countdown' | 'active' | 'over';
   timer: number; // countdown remaining, then elapsed once active, then return countdown
   returns: Map<number, { x: number; z: number; facing: number }>;
+  // Pre-match HP/resource/cooldown/CC DR pools keyed by pid, restored on return
+  // so no arena format can be farmed as a free full-restore (issue #1600).
+  // Optional only for compatibility with synthetic/legacy ArenaMatch fixtures.
+  preMatchPools?: Map<number, ArenaReturnPools>;
   ratingA: number; // team avg at start
   ratingB: number;
   defeated: Set<number>;
@@ -1467,6 +1484,7 @@ export class Sim {
       devCommands: this.devCommands,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
+      communityRifts: cfg.communityRifts ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
@@ -1728,8 +1746,10 @@ export class Sim {
       }
     }
 
-    // Procedural rift instance pool (dev-spawned; empty until a portal is entered).
-    for (let i = 0; i < RIFT_SLOT_COUNT; i++) {
+    // Procedural rift instance pool (empty until a portal is entered). Public
+    // test realms opt into a larger pool without changing the normal host cap.
+    const riftSlotCount = this.cfg.communityRifts ? COMMUNITY_RIFT_SLOT_COUNT : RIFT_SLOT_COUNT;
+    for (let i = 0; i < riftSlotCount; i++) {
       this.riftInstances.push({
         slot: i,
         instanceId: 0,
@@ -3887,6 +3907,8 @@ export class Sim {
     // time since its previous mark to the named phase. Undefined offline/headless, so
     // this is a no-op there; it draws no rng and mutates nothing either way, keeping
     // the tick deterministic. The server injects it for its on-demand tick profiler.
+    // The mob loop additionally passes the mob it just updated as a sub-phase tag so
+    // the host can split mob.update per zone; every other call omits it.
     const lap = this.cfg.perfLap;
     this.updatePendingMobRespawns();
     lap?.('respawns');
@@ -3949,7 +3971,10 @@ export class Sim {
     for (const e of this.entities.values()) {
       if (e.kind === 'mob') {
         this.updateMob(e);
-        lap?.('mob.update');
+        // Tag the mob.update lap with the mob so the host can attribute this slice
+        // of the phase cost to its zone/group. The sim reads nothing
+        // from it and allocates nothing, so this stays behavior- and parity-inert.
+        lap?.('mob.update', e);
         updateAuras(this.ctx, e);
         lap?.('mob.auras');
       } else if (e.kind === 'npc') {
@@ -5045,8 +5070,13 @@ export class Sim {
   // moved fully (no delegate). The corpse-loot helpers (distributeLootCopper/
   // awardSharedLootItem/lootSlotVisibleTo/pruneCorpseLoot) had their sole Sim caller
   // (lootCorpse) moved to interaction.ts (W3), which now imports them directly.
-  private rollLoot(mob: Entity, meta: PlayerMeta, eligible: PlayerMeta[] = [meta]): void {
-    rollLootImpl(this.ctx, mob, meta, eligible);
+  private rollLoot(
+    mob: Entity,
+    meta: PlayerMeta,
+    eligible: PlayerMeta[] = [meta],
+    contributors?: PlayerMeta[],
+  ): void {
+    rollLootImpl(this.ctx, mob, meta, eligible, contributors);
   }
 
   // World-boss personal loot: an independent roll per contributor, once per day.

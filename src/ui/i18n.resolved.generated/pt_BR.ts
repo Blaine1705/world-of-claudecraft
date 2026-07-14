@@ -617,6 +617,15 @@ export const pt_BR: EnTranslations = {
       "notNow": "Agora não",
       "update": "Atualizar"
     },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
+    },
     "castBar": {
       "playerAria": "Sua barra de conjuração",
       "targetAria": "Barra de conjuração do alvo"
@@ -1263,7 +1272,7 @@ export const pt_BR: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Este item não pode ser destruído.",
-      "rightClickDestroy": "Clique com o botão direito para destruir",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
       "filterWeapon": "Armas",
@@ -1466,7 +1475,8 @@ export const pt_BR: EnTranslations = {
         "connecting": "Abrindo o Discord...",
         "benefits": "Vincule seu Discord para ganhar pontos jogando e participando da comunidade, e suba pelos níveis de status.",
         "error": "Não foi possível vincular o Discord. Tente novamente.",
-        "success": "Discord vinculado."
+        "success": "Discord vinculado.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Continuar com o Discord",
@@ -2564,6 +2574,10 @@ export const pt_BR: EnTranslations = {
       "dragonkin": {
         "name": "Dracônicos",
         "desc": "Criaturas escamosas e serpentinas das antigas profundezas. Raras, orgulhosas e muito mais fortes do que aparentam."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       },
       "murloc": {
         "name": "Croakfins",

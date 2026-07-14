@@ -617,6 +617,15 @@ export const cs_CZ: EnTranslations = {
       "notNow": "Teď ne",
       "update": "Aktualizovat"
     },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
+    },
     "castBar": {
       "playerAria": "Tvoje lišta sesílání",
       "targetAria": "Lišta sesílání jednotky"
@@ -1263,7 +1272,7 @@ export const cs_CZ: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Tento předmět nelze zničit.",
-      "rightClickDestroy": "Zničíš pravým kliknutím",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -1466,7 +1475,8 @@ export const cs_CZ: EnTranslations = {
         "connecting": "Otevírá se Discord...",
         "benefits": "Propoj Discord, získávej body za hraní a komunitní aktivitu a stoupej ve statusových stupních.",
         "error": "Discord se nepodařilo propojit. Zkus to prosím znovu.",
-        "success": "Discord propojen."
+        "success": "Discord propojen.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Pokračovat přes Discord",
@@ -2564,6 +2574,10 @@ export const cs_CZ: EnTranslations = {
       "dragonkin": {
         "name": "Dračí plémě",
         "desc": "Šupinaté, hadovité věci ze starých hlubin. Vzácné, hrdé a mnohem silnější, než vypadají."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       },
       "murloc": {
         "name": "Croakfins",

@@ -828,21 +828,31 @@ describe('spell visuals', () => {
     expect(events.some((e) => e.type === 'castStart' && e.ability === 'fireball')).toBe(true);
   });
 
-  it('a LOW prop (campfire) no longer blocks spell line of sight, buildings still do', () => {
+  it('a LOW fence no longer blocks spell line of sight, tall walls still do (#1668)', () => {
     const sim = makeSim('mage');
     const seed = sim.cfg.seed;
-    // Straddle a world campfire: its collider sits on the ray (it still blocks
-    // MOVEMENT below), but its visual top (1.45) is under the eye line (1.6),
-    // so the cast sees straight over it.
-    const [cx, cz] = PROPS.campfires[0];
-    expect(isBlocked(seed, cx, cz, 0.5)).toBe(true); // movement still collides
-    expect(lineOfSightClear(seed, { x: cx - 3, z: cz }, { x: cx + 3, z: cz })).toBe(true);
-    // A building straddled through its center still blocks (top far above eyes).
-    const b = PROPS.buildings[0];
-    const span = b.w + b.d;
-    expect(lineOfSightClear(seed, { x: b.x - span, z: b.z }, { x: b.x + span, z: b.z })).toBe(
-      false,
-    );
+    const fence = PROPS.fences[0];
+    const mx = (fence.x1 + fence.x2) / 2;
+    const mz = (fence.z1 + fence.z2) / 2;
+    const dx = fence.x2 - fence.x1;
+    const dz = fence.z2 - fence.z1;
+    const len = Math.hypot(dx, dz);
+    const nx = -dz / len;
+    const nz = dx / len;
+    const a = { x: mx + nx * 3, z: mz + nz * 3 };
+    const b = { x: mx - nx * 3, z: mz - nz * 3 };
+    expect(isBlocked(seed, mx, mz, 0.5)).toBe(true);
+    expect(lineOfSightClear(seed, a, b)).toBe(true);
+
+    const building = PROPS.buildings[0];
+    const span = building.w + building.d;
+    expect(
+      lineOfSightClear(
+        seed,
+        { x: building.x - span, z: building.z },
+        { x: building.x + span, z: building.z },
+      ),
+    ).toBe(false);
   });
 
   it('ranged auto shot does not fire through dungeon walls', () => {

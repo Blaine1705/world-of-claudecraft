@@ -1081,21 +1081,6 @@ export function handleDevChat(
     });
     return null;
   }
-  // [dev] Toggle one-shot ("smite") mode: this player's every hit deletes any mob
-  // it lands on (see dealDamage). Handy for blasting through the giga-boss rifts.
-  if (/^\/(?:dev\s+(?:smite|oneshot|nuke)|devsmite)\s*$/i.test(raw)) {
-    const e = ctx.entities.get(pid);
-    if (e) {
-      e.oneShot = !e.oneShot;
-      ctx.emit({
-        type: 'log',
-        text: e.oneShot ? '[dev] Smite mode ON (one-shot everything).' : '[dev] Smite mode OFF.',
-        color: '#b9f',
-        pid,
-      });
-    }
-    return null;
-  }
   if (/^\/(?:dev\s+attune|devattune)\s*$/i.test(raw)) {
     // [dev] Mark every quest complete so all attunement / requiresQuest gates open.
     completeAllQuestsForDev(ctx, pid);
@@ -1117,6 +1102,21 @@ export function handleDevChat(
     ctx.setDungeonDifficulty(difficulty, pid);
     enterDungeon(ctx, 'nythraxis_boss_arena', pid, true);
     ctx.emit({ type: 'log', text: `[dev] Entering Nythraxis raid (${difficulty}).`, pid });
+    return null;
+  }
+  // [dev] Toggle one-shot ("smite") mode: this player's every hit deletes any mob
+  // it lands on (see dealDamage). Handy for blasting through the giga-boss rifts.
+  if (/^\/(?:dev\s+(?:smite|oneshot|nuke)|devsmite)\s*$/i.test(raw)) {
+    const e = ctx.entities.get(pid);
+    if (e) {
+      e.oneShot = !e.oneShot;
+      ctx.emit({
+        type: 'log',
+        text: e.oneShot ? '[dev] Smite mode ON (one-shot everything).' : '[dev] Smite mode OFF.',
+        color: '#b9f',
+        pid,
+      });
+    }
     return null;
   }
   if (/^\/(?:dev\s+god|devgod)\s*$/i.test(raw)) {
@@ -1146,7 +1146,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev attune, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev portal [seed] [level], /dev god, /dev smite, /dev raid [heroic|normal|reset], /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev attune, /dev gather professionId [amount], /dev bot name, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev vendor, /dev god, /dev smite, /dev raid [heroic|normal|reset], /dev kill',
     );
     return null;
   }

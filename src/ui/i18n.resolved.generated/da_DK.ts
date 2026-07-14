@@ -617,6 +617,15 @@ export const da_DK: EnTranslations = {
       "notNow": "Ikke nu",
       "update": "Opdater"
     },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
+    },
     "castBar": {
       "playerAria": "Din castbjælke",
       "targetAria": "Enhedens castbjælke"
@@ -1263,7 +1272,7 @@ export const da_DK: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Denne genstand kan ikke ødelægges.",
-      "rightClickDestroy": "Højreklik for at ødelægge",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -1466,7 +1475,8 @@ export const da_DK: EnTranslations = {
         "connecting": "Åbner Discord...",
         "benefits": "Forbind din Discord for at optjene point fra spil og fællesskabsaktivitet og stige i statusrangene.",
         "error": "Kunne ikke forbinde Discord. Prøv igen.",
-        "success": "Discord forbundet."
+        "success": "Discord forbundet.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Fortsæt med Discord",
@@ -2564,6 +2574,10 @@ export const da_DK: EnTranslations = {
       "dragonkin": {
         "name": "Drageæt",
         "desc": "Skældækkede, slangeagtige væsner fra de gamle dyb. Sjældne, stolte og langt stærkere, end de ser ud."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       },
       "murloc": {
         "name": "Croakfins",

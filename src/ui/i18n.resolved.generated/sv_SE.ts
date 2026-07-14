@@ -617,6 +617,15 @@ export const sv_SE: EnTranslations = {
       "notNow": "Inte nu",
       "update": "Uppdatera"
     },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
+    },
     "castBar": {
       "playerAria": "Din besvärjelsemätare",
       "targetAria": "Enhetens besvärjelsemätare"
@@ -1263,7 +1272,7 @@ export const sv_SE: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Det här föremålet kan inte förstöras.",
-      "rightClickDestroy": "Högerklicka för att förstöra",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -1466,7 +1475,8 @@ export const sv_SE: EnTranslations = {
         "connecting": "Öppnar Discord...",
         "benefits": "Länka ditt Discord för att tjäna poäng från spel och gemenskapsaktivitet, och klättra på statusnivåerna.",
         "error": "Det gick inte att länka Discord. Försök igen.",
-        "success": "Discord länkat."
+        "success": "Discord länkat.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Fortsätt med Discord",
@@ -2564,6 +2574,10 @@ export const sv_SE: EnTranslations = {
       "dragonkin": {
         "name": "Drakätt",
         "desc": "Fjälliga, ormlika ting från de gamla djupen. Sällsynta, stolta och långt starkare än de ser ut."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       },
       "murloc": {
         "name": "Croakfins",

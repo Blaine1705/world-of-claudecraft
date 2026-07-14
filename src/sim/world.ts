@@ -16,6 +16,7 @@ import {
   worldXBoundsAt,
   ZONES,
 } from './data';
+import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { fbm2, hash2, noise2 } from './rng';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
@@ -1963,6 +1964,24 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
+// Pure pass mask used by border ridges. Exported for the performance invariant
+// test: a zero mask makes the skipped crest-noise contribution exactly +0.
+export function ridgePassWeight(distanceFromPass: number): number {
+  return smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(distanceFromPass));
+}
+
+// North-rim profile for the multi-row world. The rim can wander at most 23yd
+// south of its nominal onset, so every point at or below this bound is provably
+// outside it. Returning before the two fbm2 calls preserves the exact +0 result.
+export function northRimWeight(x: number, z: number): number {
+  if (z <= WORLD_MAX_Z - 53) return 0;
+  const wobble = (fbm2(x * 0.008, 60.1, 9207, 2) - 0.5) * 46;
+  return (
+    smoothstep(WORLD_MAX_Z - 30 + wobble, WORLD_MAX_Z + wobble, z) *
+    (0.32 + 0.68 * fbm2(x * 0.013, 60.2, 9209, 2))
+  );
+}
+
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
@@ -2199,8 +2218,22 @@ export function sowfieldFlattenWeight(x: number, z: number): number {
   return 1 - smoothstep(0, 1, d / f.falloff);
 }
 
+// The renderer seats each dock section relative to its shore anchor, then uses
+// the plank top as a raised walkable surface. Return the matching absolute
+// surface height, or -Infinity outside every deck footprint.
+function dockSurfaceHeight(x: number, z: number, seed: number): number {
+  let surface = -Infinity;
+  for (const dock of getActiveWorldContent().props.docks) {
+    const local = dockLocalPoint(dock, x, z);
+    if (dockSectionAtLocal(local.x, local.z) < 0) continue;
+    const line = dockSurfaceLine(dock, (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed));
+    surface = Math.max(surface, dockSurfaceYAt(line, local.z));
+  }
+  return surface;
+}
+
 // Ground height including instanced dungeon floors (flat, far off-world), the
-// walkable Vale Cup grandstand lift, and the custom-map sculpt edits.
+// walkable Vale Cup grandstand lift, raised docks, and custom-map sculpt edits.
 export function groundHeight(x: number, z: number, seed: number): number {
   if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
   // The Vale Cup grandstands are walkable: the ground steps up in seated tiers so
@@ -2210,7 +2243,8 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // ramp just raises where the player stands. Zero outside the stand footprints,
   // so the pitch stays flat. (The custom-map edit layer is applied inside
   // terrainHeight, so it never touches the flat instance/rift floor above.)
-  return terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  const terrain = terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  return Math.max(terrain, dockSurfaceHeight(x, z, seed));
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
@@ -2243,9 +2277,10 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     if (dPerp < sigma * 3) {
       const along = edge.kind === 'h' ? x : z;
       let profile = Math.exp(-(dPerp * dPerp) / (2 * sigma * sigma));
-      const pass = edge.sealed
-        ? 1
-        : smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(along - edge.passAt));
+      const pass = edge.sealed ? 1 : ridgePassWeight(along - edge.passAt);
+      // Inside a road pass, the final wall term is exactly +0. Skip the crest
+      // noise and shaping work while keeping the heightfield bit-identical.
+      if (pass === 0) continue;
       // jagged crest so the wall reads as mountains, not a berm
       // Thornpeak's edges carry real peaks: the mountain realm's borders
       // are taller and craggier than the rest of the grid's low ranges
@@ -2381,10 +2416,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // horizontal wall: its onset line meanders +-23yd in z with low-frequency
   // noise along x, and its height swells and drops to near-nothing over long
   // runs (broken massifs and passes, not a uniform berm).
-  const rimNWob = (fbm2(x * 0.008, 60.1, 9207, 2) - 0.5) * 46;
-  let rimN =
-    smoothstep(WORLD_MAX_Z - 30 + rimNWob, WORLD_MAX_Z + rimNWob, z) *
-    (0.32 + 0.68 * fbm2(x * 0.013, 60.2, 9209, 2));
+  let rimN = northRimWeight(x, z);
   // the southern realms end in open coast, not a rim range: the vale, the
   // Farshore, the fen, the headlands, the jungle, and the lawns all meet
   // the sea at their outer edges, and swim fatigue does the containment
