@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { ZONES } from '../src/sim/data';
 import {
   RIFT_MIN_LEVEL,
@@ -270,9 +271,13 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     const boss = clearRiftToBossKill(sim, inst);
     tickSeconds(sim, 1.2);
     expect(inst.rewarded).toBe(true);
-    expect((boss.loot?.items ?? []).filter((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toEqual(
-      [],
-    );
+    const rewardItems = boss.loot?.items ?? [];
+    expect(rewardItems.filter((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toEqual([]);
+    expect(rewardItems.some((item) => item.itemId === RIFT_ESSENCE_ITEM_ID)).toBe(false);
+    expect(
+      rewardItems.some((item) => (RIFT_GEM_IDS as readonly string[]).includes(item.itemId)),
+    ).toBe(false);
+    expect(rewardItems.some((item) => item.instance?.rift !== undefined)).toBe(false);
     expect(sim.players.get(sim.player.id)?.heroicDaily.marked.size).toBe(0);
   });
 });

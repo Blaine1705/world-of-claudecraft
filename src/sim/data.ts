@@ -933,7 +933,9 @@ export const RIFT_BAND_X_MIN = RIFT_X_MIN - 40;
 // only RIFT_REGION_HALF_X wide either side; 1000u of headroom keeps it clear of the
 // relocated Protect Yumi maze band (YUMI_BAND_X_MIN) that now sits past it.
 export const RIFT_BAND_X_MAX = RIFT_X_MIN + 1000;
-export const RIFT_SLOT_COUNT = 8; // concurrent rifts the world can host
+export const RIFT_SLOT_COUNT = 8; // normal concurrent-rift capacity
+export const COMMUNITY_RIFT_SLOT_COUNT = 24; // opt-in public-test capacity
+const RIFT_LAYOUT_SLOT_COUNT = COMMUNITY_RIFT_SLOT_COUNT;
 export const RIFT_MAX_FLOORS = 6; // matches rift_gen MAX_FLOORS
 const RIFT_Z0 = -1250;
 // Each FLOOR gets its own z-stacked origin within a slot, so descending builds a
@@ -962,7 +964,10 @@ export function isRiftPos(x: number): boolean {
 // uses it to place the generated interior at the same origin the sim spawned it.
 export function riftOriginAt(z: number): { x: number; z: number } {
   const off = z - RIFT_Z0;
-  const slot = Math.max(0, Math.min(RIFT_SLOT_COUNT - 1, Math.floor(off / RIFT_SLOT_SPACING)));
+  const slot = Math.max(
+    0,
+    Math.min(RIFT_LAYOUT_SLOT_COUNT - 1, Math.floor(off / RIFT_SLOT_SPACING)),
+  );
   const withinSlot = off - slot * RIFT_SLOT_SPACING;
   const floor = Math.max(
     0,
