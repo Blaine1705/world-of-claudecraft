@@ -43,12 +43,12 @@ export const WRAITHWOOD_ZONE: ZoneDef = {
     { x: 452, z: 1444, radius: 11 }, // the Drowned Coppice
   ],
   pois: [
-    { x: 360, z: 1430, label: 'Gallowmere' },
-    { x: 390, z: 1292, label: 'The Crowgate' },
-    { x: 280, z: 1484, label: "Widow's Thicket" },
-    { x: 440, z: 1530, label: 'The Hanging Glade' },
-    { x: 300, z: 1620, label: 'The Mournstone Chapel' },
-    { x: 380, z: 1680, label: "The Huntsman's Clearing" },
+    { x: 360, z: 1430, label: 'Gallowmere', id: 'gallowmere' },
+    { x: 390, z: 1292, label: 'The Crowgate', id: 'the_crowgate' },
+    { x: 280, z: 1484, label: "Widow's Thicket", id: 'widows_thicket' },
+    { x: 440, z: 1530, label: 'The Hanging Glade', id: 'the_hanging_glade' },
+    { x: 300, z: 1620, label: 'The Mournstone Chapel', id: 'the_mournstone_chapel' },
+    { x: 380, z: 1680, label: "The Huntsman's Clearing", id: 'the_huntsmans_clearing' },
   ],
   welcome:
     'The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.',

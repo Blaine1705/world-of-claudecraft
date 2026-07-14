@@ -44,13 +44,13 @@ export const EVERGARDEN_ZONE: ZoneDef = {
     { x: 340, z: 1170, radius: 10 }, // the Lily Basin
   ],
   pois: [
-    { x: 320, z: 810, label: 'Hedgewick' },
-    { x: 410, z: 732, label: 'The Garden Gate' },
-    { x: 360, z: 875, label: 'The Statuary Walk' },
-    { x: 270, z: 910, label: 'The Rose Wilds' },
-    { x: 440, z: 850, label: 'The Petal Pond' },
-    { x: 360, z: 946, label: 'The Great Maze' },
-    { x: 360, z: 1016, label: 'The Fountain Court' },
+    { x: 320, z: 810, label: 'Hedgewick', id: 'hedgewick' },
+    { x: 410, z: 732, label: 'The Garden Gate', id: 'the_garden_gate' },
+    { x: 360, z: 875, label: 'The Statuary Walk', id: 'the_statuary_walk' },
+    { x: 270, z: 910, label: 'The Rose Wilds', id: 'the_rose_wilds' },
+    { x: 440, z: 850, label: 'The Petal Pond', id: 'the_petal_pond' },
+    { x: 360, z: 946, label: 'The Great Maze', id: 'the_great_maze' },
+    { x: 360, z: 1016, label: 'The Fountain Court', id: 'the_fountain_court' },
   ],
   welcome:
     'Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.',

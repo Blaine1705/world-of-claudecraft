@@ -119,7 +119,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 22, max: 36, speed: 1.8 },
+    weapon: { min: 22, max: 36, speed: 1.8, dagger: true },
     stats: { agi: 13, sta: 9 },
     sellValue: 15000,
     requiredClass: AGILE,

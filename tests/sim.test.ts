@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
+  type Aura,
   dist2d,
   MAX_LEVEL,
   meleeMissChance,
@@ -447,6 +448,19 @@ describe('combat', () => {
   it('mage casts fireball with a cast time and applies its dot', () => {
     const sim = makeScopedSim(COMBAT_TEST_WORLD, 'mage');
     const wolf = nearestMob(sim, 'forest_wolf');
+    // Spell resistance has dedicated coverage. Force only this bolt's hit roll
+    // to land while leaving crits, procs, and ambient combat on the seeded RNG.
+    const realChance = sim.rng.chance.bind(sim.rng);
+    const fireballHitChance = spellHitChance(sim.player.level, wolf.level);
+    let forcedFireballHit = false;
+    sim.rng.chance = (p) => {
+      if (!forcedFireballHit && p === fireballHitChance) {
+        realChance(p); // preserve the seeded draw order while overriding this outcome
+        forcedFireballHit = true;
+        return true;
+      }
+      return realChance(p);
+    };
     teleportTo(sim, wolf.pos.x + 15, wolf.pos.z);
     sim.targetEntity(wolf.id);
     facePlayerAt(sim, wolf);
@@ -454,7 +468,9 @@ describe('combat', () => {
     sim.castAbility('fireball');
     expect(sim.player.castingAbility).toBe('fireball');
     for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(forcedFireballHit).toBe(true);
     expect(wolf.hp).toBeLessThan(hpBefore);
+    expect(wolf.auras.some((a: Aura) => a.id === 'fireball' && a.kind === 'dot')).toBe(true);
   });
 
   it('tags a cast on a dead target with reason target_dead (and not on a live one)', () => {

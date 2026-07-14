@@ -63,12 +63,12 @@ export const WILLOWFEN_ZONE: ZoneDef = {
     { x: -444, z: 478, radius: 10 },
   ],
   pois: [
-    { x: -360, z: 362, label: 'Bridgemere' },
-    { x: -380, z: 208, label: 'The Amberfen Steps' },
-    { x: -444, z: 308, label: 'The Lilymoors' },
-    { x: -286, z: 292, label: 'Bogshine Pools' },
-    { x: -430, z: 466, label: 'Willowweep' },
-    { x: -320, z: 496, label: 'The Drowsy Flats' },
+    { x: -360, z: 362, label: 'Bridgemere', id: 'bridgemere' },
+    { x: -380, z: 208, label: 'The Amberfen Steps', id: 'the_amberfen_steps' },
+    { x: -444, z: 308, label: 'The Lilymoors', id: 'the_lilymoors' },
+    { x: -286, z: 292, label: 'Bogshine Pools', id: 'bogshine_pools' },
+    { x: -430, z: 466, label: 'Willowweep', id: 'willowweep' },
+    { x: -320, z: 496, label: 'The Drowsy Flats', id: 'the_drowsy_flats' },
   ],
   welcome:
     'The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.',
