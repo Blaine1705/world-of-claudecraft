@@ -6218,7 +6218,7 @@ export class Sim {
     this.addItem(caught, 1, meta.entityId);
     // Book of Deeds: a real fish (never weeds or boots) from this zone's
     // waters feeds the per-zone first-cast mark.
-    deedsMod.onFishCaughtForDeeds(this.ctx, meta, zoneAt(p.pos.z).id, caught);
+    deedsMod.onFishCaughtForDeeds(this.ctx, meta, zoneAt(p.pos.x, p.pos.z).id, caught);
   }
 
   useItem(itemId: string, pid?: number): ItemUseResult | undefined {
