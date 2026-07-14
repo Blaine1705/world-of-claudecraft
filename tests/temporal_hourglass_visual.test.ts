@@ -4,12 +4,13 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   syncTemporalHourglassVisual,
+  TemporalHourglassGroundVisuals,
   TemporalHourglassVisual,
 } from '../src/render/temporal_hourglass_visual';
 
 describe('Temporal Hourglass visual', () => {
   it('builds a small original physical hourglass on the ground', () => {
-    const visual = new TemporalHourglassVisual();
+    const visual = new TemporalHourglassVisual(false);
     visual.update('protective', 1);
 
     expect(visual.group.visible).toBe(true);
@@ -21,6 +22,31 @@ describe('Temporal Hourglass visual', () => {
     const bounds = new THREE.Box3().setFromObject(visual.group);
     expect(bounds.min.y).toBeGreaterThanOrEqual(0);
     expect(bounds.max.y).toBeLessThan(1);
+  });
+
+  it('shows a rotating clock over the affected unit until cleanup', () => {
+    const visual = new TemporalHourglassVisual();
+    visual.update('hostile', 0.25, 2);
+    const clock = visual.group.getObjectByName('temporal-hourglass-overhead-clock');
+    expect(clock).toBeInstanceOf(THREE.Sprite);
+    expect(clock?.position.y).toBeCloseTo(2.65);
+    const rotation = (clock as THREE.Sprite).material.rotation;
+
+    visual.update('hostile', 0.25, 2);
+    expect((clock as THREE.Sprite).material.rotation).not.toBe(rotation);
+    visual.update(null, 0.1, 2);
+    expect(visual.group.visible).toBe(false);
+  });
+
+  it('mirrors and immediately removes persistent ground hourglasses', () => {
+    const scene = new THREE.Scene();
+    const visuals = new TemporalHourglassGroundVisuals(scene, () => 4);
+    visuals.sync([{ id: '1:2', x: 3, z: 5, radius: 1.75, duration: 30, remaining: 30 }]);
+    const hourglass = scene.getObjectByName('temporal-hourglass-visual');
+    expect(hourglass?.position).toMatchObject({ x: 3, y: 4.04, z: 5 });
+
+    visuals.sync([]);
+    expect(scene.getObjectByName('temporal-hourglass-visual')).toBeUndefined();
   });
 
   it('distinguishes protective and hostile modes and hides immediately on cleanup', () => {

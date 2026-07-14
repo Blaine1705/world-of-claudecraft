@@ -330,4 +330,13 @@ describe('Rewind: rules', () => {
     };
     expect(run()).toBe(run());
   });
+
+  it('emits one short temporal clock sound event per cast', () => {
+    const { sim } = chronoMage();
+    sim.castAbility(REWIND);
+    const events = sim.tick() as SimEvent[];
+    expect(
+      events.filter((event) => event.type === 'spellfx' && event.fx === 'temporalClock'),
+    ).toHaveLength(1);
+  });
 });

@@ -179,13 +179,22 @@ export function abilityDurationValue(res: ResolvedAbility): number | null {
 }
 
 /** Dynamic percentages for the Hourglass tooltip, read from the resolved effect. */
-export function abilityTemporalHourglassValues(
-  res: ResolvedAbility,
-): { healing: number; cooldownRecovery: number } | null {
+export function abilityTemporalHourglassValues(res: ResolvedAbility): {
+  healing: number;
+  selfCooldownRecovery: number;
+  allyCooldownRecovery: number;
+  hostilePveDuration: number;
+  hostilePvpDuration: number;
+  groundDuration: number;
+} | null {
   const effect = res.effects.find((candidate) => candidate.type === 'temporalHourglass');
   if (effect?.type !== 'temporalHourglass') return null;
   return {
     healing: effect.healMaxHpPct * 100,
-    cooldownRecovery: (effect.cooldownRate - 1) * 100,
+    selfCooldownRecovery: (effect.selfCooldownRate - 1) * 100,
+    allyCooldownRecovery: (effect.allyCooldownRate - 1) * 100,
+    hostilePveDuration: effect.hostilePveDuration,
+    hostilePvpDuration: effect.hostilePvpDuration,
+    groundDuration: effect.groundDuration,
   };
 }

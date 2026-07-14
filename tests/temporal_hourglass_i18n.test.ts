@@ -7,14 +7,21 @@ describe('Hourglass localization', () => {
     expect(en.entities.abilities.temporal_hourglass.description).toContain('{duration}');
     expect(en.entities.abilities.temporal_hourglass.description).toContain('{healing}%');
     expect(en.entities.abilities.temporal_hourglass.description).toContain(
-      '{cooldownRecovery}% faster',
+      '{selfCooldownRecovery}% faster',
     );
+    expect(en.entities.abilities.temporal_hourglass.description).toContain(
+      '{allyCooldownRecovery}% faster',
+    );
+    expect(en.entities.abilities.temporal_hourglass.description).toContain('{groundDuration} sec');
 
     expect(es.entities.abilities.temporal_hourglass.name).toBe('Reloj de suspensión');
     expect(es.entities.abilities.temporal_hourglass.description).toContain('{duration} s');
     expect(es.entities.abilities.temporal_hourglass.description).toContain('{healing}%');
     expect(es.entities.abilities.temporal_hourglass.description).toContain(
-      '{cooldownRecovery}% más rápido',
+      '{selfCooldownRecovery}% más rápido para ti',
+    );
+    expect(es.entities.abilities.temporal_hourglass.description).toContain(
+      '{allyCooldownRecovery}% más rápido para un aliado',
     );
   });
 

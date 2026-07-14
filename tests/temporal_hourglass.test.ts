@@ -9,7 +9,6 @@ import { Sim } from '../src/sim/sim';
 import {
   type Aura,
   type Entity,
-  TEMPORAL_HOURGLASS_COOLDOWN_RATE,
   TEMPORAL_HOURGLASS_DURATION,
   TEMPORAL_HOURGLASS_HEAL_FRACTION,
 } from '../src/sim/types';
@@ -91,7 +90,7 @@ describe('Hourglass of Suspension content', () => {
 });
 
 describe('Hourglass of Suspension hostile mode', () => {
-  it('suspends one valid enemy for five seconds without dealing damage', () => {
+  it('suspends one valid PvE enemy for sixty seconds without dealing damage', () => {
     const { sim, mage } = makeChronomancer();
     const enemy = addHostile(sim, FLAT_X + 8);
     const second = addHostile(sim, FLAT_X + 8.5);
@@ -101,13 +100,42 @@ describe('Hourglass of Suspension hostile mode', () => {
 
     expect(hourglassAura(enemy)).toMatchObject({
       kind: 'incapacitate',
-      remaining: TEMPORAL_HOURGLASS_DURATION,
-      duration: TEMPORAL_HOURGLASS_DURATION,
+      remaining: 60,
+      duration: 60,
       breaksOnDamage: true,
     });
     expect(hourglassAura(second)).toBeUndefined();
     expect(enemy.hp).toBe(hp);
     expect(isStunned(enemy)).toBe(true);
+  });
+
+  it('limits suspension against a PvP opponent to ten seconds', () => {
+    const { sim, mage } = makeChronomancer();
+    const opponent = addAlly(sim, mage, FLAT_X + 8, false);
+    sim.duelRequest(opponent.id, mage.id);
+    sim.duelAccept(opponent.id);
+    for (let tick = 0; tick < 80; tick++) sim.tick();
+
+    castAt(sim, mage, opponent.pos.x);
+
+    expect(hourglassAura(opponent)).toMatchObject({
+      kind: 'incapacitate',
+      duration: 10,
+      remaining: 10,
+      breaksOnDamage: true,
+    });
+  });
+
+  it('uses hostile PvP mode for a dueling party member', () => {
+    const { sim, mage } = makeChronomancer();
+    const opponent = addAlly(sim, mage, FLAT_X + 8);
+    sim.duelRequest(opponent.id, mage.id);
+    sim.duelAccept(opponent.id);
+    for (let tick = 0; tick < 80; tick++) sim.tick();
+
+    castAt(sim, mage, opponent.pos.x);
+
+    expect(hourglassAura(opponent)).toMatchObject({ kind: 'incapacitate', duration: 10 });
   });
 
   it('prevents movement, attacks, and ability casts through canonical control predicates', () => {
@@ -239,7 +267,7 @@ describe('Hourglass of Suspension protective modes', () => {
     expect(mage.hp).toBe(mage.maxHp);
   });
 
-  it('advances other cooldowns at 1.5x but excludes the hourglass itself', () => {
+  it('advances the caster cooldowns at 2x but excludes the hourglass itself', () => {
     const { sim, mage } = makeChronomancer();
     mage.cooldowns.set('blink', 20);
     castAt(sim, mage, mage.pos.x);
@@ -247,10 +275,7 @@ describe('Hourglass of Suspension protective modes', () => {
     expect(ownStart).toBe(50);
     advance(sim, TEMPORAL_HOURGLASS_DURATION);
 
-    expect(mage.cooldowns.get('blink')).toBeCloseTo(
-      20 - TEMPORAL_HOURGLASS_DURATION * TEMPORAL_HOURGLASS_COOLDOWN_RATE,
-      5,
-    );
+    expect(mage.cooldowns.get('blink')).toBeCloseTo(20 - TEMPORAL_HOURGLASS_DURATION * 2, 5);
     expect(mage.cooldowns.get('temporal_hourglass')).toBeCloseTo(
       ownStart - TEMPORAL_HOURGLASS_DURATION,
       5,
@@ -272,7 +297,116 @@ describe('Hourglass of Suspension protective modes', () => {
     expect(aura && isCancelableAura(aura)).toBe(true);
     advance(sim, TEMPORAL_HOURGLASS_DURATION);
     expect(ally.hp).toBe(Math.floor(ally.maxHp * 0.4) + Math.round(ally.maxHp * 0.3));
-    expect(ally.cooldowns.get('charge')).toBeCloseTo(12.5, 5);
+    expect(ally.cooldowns.get('charge')).toBeCloseTo(11.25, 5);
+  });
+
+  it('leaves a single-use hourglass on empty ground for thirty seconds', () => {
+    const { sim, mage } = makeChronomancer();
+
+    castAt(sim, mage, FLAT_X + 8);
+
+    expect(sim.activeTemporalHourglasses).toEqual([
+      expect.objectContaining({
+        x: FLAT_X + 8,
+        z: 0,
+        duration: 30,
+        remaining: 30,
+      }),
+    ]);
+  });
+
+  it('consumes an empty-ground hourglass when a valid ally crosses it', () => {
+    const { sim, mage } = makeChronomancer();
+    const ally = addAlly(sim, mage, FLAT_X + 11);
+    castAt(sim, mage, FLAT_X + 8);
+    ally.prevPos = sim.groundPos(FLAT_X + 11, 0);
+    ally.pos = sim.groundPos(FLAT_X + 8, 0);
+
+    sim.tick();
+
+    expect(hourglassAura(ally)?.kind).toBe('stasis');
+    expect(sim.activeTemporalHourglasses).toEqual([]);
+  });
+
+  it('applies the correct protective mode when the caster steps on the ground hourglass', () => {
+    const { sim, mage } = makeChronomancer();
+    castAt(sim, mage, FLAT_X + 8);
+    mage.prevPos = sim.groundPos(FLAT_X + 11, 0);
+    mage.pos = sim.groundPos(FLAT_X + 8, 0);
+
+    sim.tick();
+
+    expect(hourglassAura(mage)).toMatchObject({ kind: 'stasis', value: 2, duration: 5 });
+    expect(sim.activeTemporalHourglasses).toEqual([]);
+  });
+
+  it('applies the PvE hostile mode when an enemy steps on the ground hourglass', () => {
+    const { sim, mage } = makeChronomancer();
+    const enemy = addHostile(sim, FLAT_X + 11);
+    castAt(sim, mage, FLAT_X + 8);
+    enemy.prevPos = sim.groundPos(FLAT_X + 11, 0);
+    enemy.pos = sim.groundPos(FLAT_X + 8, 0);
+
+    sim.tick();
+
+    expect(hourglassAura(enemy)).toMatchObject({ kind: 'incapacitate', duration: 60 });
+    expect(sim.activeTemporalHourglasses).toEqual([]);
+  });
+
+  it('does not consume the ground hourglass for an invalid outsider', () => {
+    const { sim, mage } = makeChronomancer();
+    const outsider = addAlly(sim, mage, FLAT_X + 11, false);
+    castAt(sim, mage, FLAT_X + 8);
+    outsider.prevPos = sim.groundPos(FLAT_X + 11, 0);
+    outsider.pos = sim.groundPos(FLAT_X + 8, 0);
+
+    sim.tick();
+
+    expect(hourglassAura(outsider)).toBeUndefined();
+    expect(sim.activeTemporalHourglasses).toHaveLength(1);
+  });
+
+  it('expires an unused ground hourglass after thirty seconds', () => {
+    const { sim, mage } = makeChronomancer();
+    castAt(sim, mage, FLAT_X + 8);
+
+    advance(sim, 30);
+
+    expect(sim.activeTemporalHourglasses).toEqual([]);
+  });
+
+  it('does not retroactively trigger from movement completed before placement', () => {
+    const { sim, mage } = makeChronomancer();
+    const enemy = addHostile(sim, FLAT_X + 11);
+    enemy.prevPos = sim.groundPos(FLAT_X + 7, 0);
+    enemy.pos = sim.groundPos(FLAT_X + 11, 0);
+    castAt(sim, mage, FLAT_X + 8);
+
+    sim.tick();
+
+    expect(hourglassAura(enemy)).toBeUndefined();
+    expect(sim.activeTemporalHourglasses).toHaveLength(1);
+  });
+
+  it('removes the ground hourglass when its caster dies', () => {
+    const { sim, mage } = makeChronomancer();
+    castAt(sim, mage, FLAT_X + 8);
+    mage.dead = true;
+    mage.hp = 0;
+
+    sim.tick();
+
+    expect(sim.activeTemporalHourglasses).toEqual([]);
+  });
+
+  it('removes the ground hourglass when its caster changes region', () => {
+    const { sim, mage } = makeChronomancer();
+    castAt(sim, mage, FLAT_X + 8);
+    mage.pos = sim.groundPos(FLAT_X, 1000);
+
+    sim.tick();
+
+    expect(sim.activeTemporalHourglasses).toEqual([]);
   });
 
   it('manual cancellation immediately stops immunity, healing, and acceleration', () => {

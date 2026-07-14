@@ -54,6 +54,7 @@ import {
 import {
   type AccountCosmetics,
   type ActiveFrostRing,
+  type ActiveTemporalHourglass,
   type ArenaInfo,
   type BankInfo,
   type CharacterSearchResult,
@@ -1213,6 +1214,7 @@ export class ClientWorld implements IWorld {
   private readonly clientSeed: string;
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
+  activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -1632,6 +1634,32 @@ export class ClientWorld implements IWorld {
               innerRadius: ring.i as number,
               duration: ring.dur as number,
               remaining: Math.min(ring.rem as number, ring.dur as number),
+            },
+          ];
+        })
+      : [];
+    this.activeTemporalHourglasses = Array.isArray(snap.hourglasses)
+      ? snap.hourglasses.flatMap((value: unknown): ActiveTemporalHourglass[] => {
+          if (!value || typeof value !== 'object') return [];
+          const hourglass = value as Record<string, unknown>;
+          if (
+            typeof hourglass.id !== 'string' ||
+            ![hourglass.x, hourglass.z, hourglass.r, hourglass.dur, hourglass.rem].every(
+              (entry) => typeof entry === 'number' && Number.isFinite(entry),
+            ) ||
+            (hourglass.r as number) <= 0 ||
+            (hourglass.dur as number) <= 0 ||
+            (hourglass.rem as number) <= 0
+          )
+            return [];
+          return [
+            {
+              id: hourglass.id,
+              x: hourglass.x as number,
+              z: hourglass.z as number,
+              radius: hourglass.r as number,
+              duration: hourglass.dur as number,
+              remaining: Math.min(hourglass.rem as number, hourglass.dur as number),
             },
           ];
         })

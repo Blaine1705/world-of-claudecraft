@@ -2925,3 +2925,56 @@ describe('Ring of Frost snapshot parity', () => {
     ]);
   });
 });
+
+describe('Temporal Hourglass snapshot parity', () => {
+  it('mirrors authoritative ground hourglasses and clears missing traps', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      hourglasses: [{ id: '1:20', x: 3, z: 5, r: 1.75, dur: 30, rem: 21.5 }],
+    });
+    expect(client.activeTemporalHourglasses).toEqual([
+      { id: '1:20', x: 3, z: 5, radius: 1.75, duration: 30, remaining: 21.5 },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeTemporalHourglasses).toEqual([]);
+  });
+
+  it('interest-scopes ground hourglasses with server-authored lifetime', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Timewire', 'mage');
+    const caster = server.sim.entities.get(session.pid)!;
+    (server.sim as any).groundAoEs.push({
+      sourceId: caster.id,
+      pos: { x: caster.pos.x + 4, y: caster.pos.y, z: caster.pos.z },
+      radius: 1.75,
+      min: 0,
+      max: 0,
+      remaining: 21.5,
+      interval: 30,
+      tickTimer: 30,
+      school: 'arcane',
+      ability: 'Hourglass of Suspension',
+      temporalHourglass: {
+        id: `${caster.id}:10`,
+        abilityId: 'temporal_hourglass',
+        protectiveDuration: 5,
+        hostilePveDuration: 60,
+        hostilePvpDuration: 10,
+        groundDuration: 30,
+        healMaxHpPct: 0.3,
+        selfCooldownRate: 2,
+        allyCooldownRate: 1.75,
+      },
+    });
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).hourglasses).toEqual([
+      expect.objectContaining({ id: `${caster.id}:10`, r: 1.75, dur: 30, rem: 21.5 }),
+    ]);
+  });
+});

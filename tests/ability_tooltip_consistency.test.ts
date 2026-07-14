@@ -131,7 +131,7 @@ function proseNumbers(description: string): number[] {
 }
 
 const PLACEHOLDERS = /\$([a-zA-Z])/g;
-const SUPPORTED = new Set(['d', 'o', 'b', 't', 'h', 'c']);
+const SUPPORTED = new Set(['d', 'o', 'b', 't', 'h', 'e', 'p', 'g', 's', 'a']);
 
 describe('ability descriptions match their resolved effects', () => {
   const classes = Object.keys(CLASSES) as PlayerClass[];
@@ -170,7 +170,7 @@ describe('ability descriptions match their resolved effects', () => {
           if (desc.includes('$t')) {
             expect(abilityDurationValue(known), `${at}: $t has no timed effect`).not.toBeNull();
           }
-          if (desc.includes('$h') || desc.includes('$c')) {
+          if (/\$(?:h|e|p|g|s|a)/.test(desc)) {
             expect(
               abilityTemporalHourglassValues(known),
               `${at}: Hourglass placeholders have no temporalHourglass effect`,

@@ -16,7 +16,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': '정지의 모래시계',
   'entities.abilities.temporal_hourglass.description':
-    '선택한 위치에 시간의 모래시계를 놓습니다. 적의 발밑에서는 {duration}초 동안 정지시켜 행동하지 못하게 하며, 피해를 받으면 효과가 해제됩니다. 자신이나 파티 아군의 발밑에서는 {duration}초 동안 정지 상태가 되어 피해에 면역이고 행동할 수 없으며, 최대 생명력의 {healing}%를 회복하고 재사용 대기시간 회복 속도가 {cooldownRecovery}% 증가합니다. 이로운 효과는 직접 해제할 수 있습니다.',
+    '선택한 위치에 시간의 모래시계를 놓습니다. 적의 발밑에서는 PvE에서 {hostilePveDuration}초, PvP에서 {hostilePvpDuration}초 동안 정지시키며 피해를 받으면 해제됩니다. 자신이나 파티 아군의 발밑에서는 {duration}초 동안 정지 상태가 되어 피해에 면역이고 행동할 수 없으며, 최대 생명력의 {healing}%를 회복합니다. 자신의 재사용 대기시간은 {selfCooldownRecovery}%, 아군의 재사용 대기시간은 {allyCooldownRecovery}% 더 빠르게 회복됩니다. 빈 지면에 놓으면 {groundDuration}초 동안 유지되며 처음 밟은 유효한 대상에게 적용됩니다. 이로운 효과는 직접 해제할 수 있습니다.',
   'hudChrome.auraEffect.temporalHourglass':
     '피해에 면역이고 행동할 수 없습니다. 생명력을 회복하고 재사용 대기시간을 가속합니다. 우클릭으로 취소할 수 있습니다.',
   'hudChrome.auth.appleLoginCta': 'Apple로 계속하기',

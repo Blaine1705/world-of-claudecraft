@@ -6233,7 +6233,7 @@ export const es: EnTranslations = {
       },
       "temporal_hourglass": {
         "name": "Reloj de suspensión",
-        "description": "Coloca un reloj de arena temporal en la ubicación seleccionada. Bajo un enemigo, lo suspende durante {duration} s e impide que actúe; cualquier daño rompe el efecto. Sobre tus propios pies o bajo un aliado del grupo, concede estasis durante {duration} s, impide recibir daño y actuar, recupera un {healing}% de la salud máxima y hace que los tiempos de reutilización se recuperen un {cooldownRecovery}% más rápido. El aura beneficiosa puede eliminarse manualmente."
+        "description": "Coloca un reloj de arena temporal en la ubicación seleccionada. Bajo un enemigo, lo suspende {hostilePveDuration} s en JcE o {hostilePvpDuration} s en JcJ e impide que actúe; cualquier daño rompe el efecto. Sobre tus pies o bajo un aliado del grupo, concede estasis durante {duration} s, impide recibir daño y actuar, recupera un {healing}% de la salud máxima y hace que los tiempos de reutilización se recuperen un {selfCooldownRecovery}% más rápido para ti o un {allyCooldownRecovery}% más rápido para un aliado. Si la ubicación está vacía, espera {groundDuration} s y afecta a la primera unidad válida que lo pise. El aura beneficiosa puede eliminarse manualmente."
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",

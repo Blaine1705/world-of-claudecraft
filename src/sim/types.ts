@@ -8,10 +8,14 @@ export const DT = 1 / TICK_RATE;
 // Hourglass of Suspension tuning is PLAYTEST-provisional. Keep these values
 // centralized so simulation, content, tooltips, and tests cannot drift apart.
 export const TEMPORAL_HOURGLASS_DURATION = 5;
-export const TEMPORAL_HOURGLASS_SELF_RADIUS = 1.5;
+export const TEMPORAL_HOURGLASS_HOSTILE_PVE_DURATION = 60;
+export const TEMPORAL_HOURGLASS_HOSTILE_PVP_DURATION = 10;
+export const TEMPORAL_HOURGLASS_GROUND_DURATION = 30;
+export const TEMPORAL_HOURGLASS_SELF_RADIUS = 1.75;
 export const TEMPORAL_HOURGLASS_CAPTURE_RADIUS = 1.75;
 export const TEMPORAL_HOURGLASS_HEAL_FRACTION = 0.3;
-export const TEMPORAL_HOURGLASS_COOLDOWN_RATE = 1.5;
+export const TEMPORAL_HOURGLASS_SELF_COOLDOWN_RATE = 2;
+export const TEMPORAL_HOURGLASS_ALLY_COOLDOWN_RATE = 1.75;
 export const RUN_SPEED = 7; // yards/sec, classic run speed
 export const TURN_SPEED = Math.PI; // rad/sec keyboard turning
 export const MELEE_RANGE = 5; // yards
@@ -1674,10 +1678,14 @@ export type AbilityEffect =
   | {
       type: 'temporalHourglass';
       duration: number;
+      hostilePveDuration: number;
+      hostilePvpDuration: number;
+      groundDuration: number;
       selfRadius: number;
       captureRadius: number;
       healMaxHpPct: number;
-      cooldownRate: number;
+      selfCooldownRate: number;
+      allyCooldownRate: number;
     }
   // Chronomancy raid cooldown (Rewind / Rebobinar): instant, no target, centered on
   // the caster. Restores `fraction` of the REAL damage each living group/raid member
@@ -3065,6 +3073,7 @@ export type SimEvent = { pid?: number } & (
         // a brief temporal glyph blooming directly OVER the marked ally on apply.
         // Target-anchored, no projectile travels to the ally. Visual-only.
         | 'temporalGlyph'
+        | 'temporalClock'
         | 'frostCone'
         | 'fireCone'
         // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the

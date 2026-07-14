@@ -147997,21 +147997,25 @@
     },
     "main:entities.abilities.temporal_hourglass.description": {
       "scope": "main",
-      "enHash": "427933b1a426ec84",
+      "enHash": "103e091073020d08",
       "placeholders": [
-        "cooldownRecovery",
+        "allyCooldownRecovery",
         "duration",
-        "healing"
+        "groundDuration",
+        "healing",
+        "hostilePveDuration",
+        "hostilePvpDuration",
+        "selfCooldownRecovery"
       ],
       "locales": {
         "es": {
           "state": "translated",
-          "srcHash": "427933b1a426ec84",
+          "srcHash": "103e091073020d08",
           "by": "human"
         },
         "es_ES": {
           "state": "translated",
-          "srcHash": "427933b1a426ec84",
+          "srcHash": "103e091073020d08",
           "by": "human"
         },
         "fr_FR": {
@@ -148022,7 +148026,7 @@
         },
         "en_CA": {
           "state": "translated",
-          "srcHash": "427933b1a426ec84",
+          "srcHash": "103e091073020d08",
           "by": "human"
         },
         "it_IT": {
@@ -148033,22 +148037,22 @@
         },
         "zh_CN": {
           "state": "translated",
-          "srcHash": "427933b1a426ec84",
+          "srcHash": "103e091073020d08",
           "by": "human"
         },
         "zh_TW": {
           "state": "translated",
-          "srcHash": "427933b1a426ec84",
+          "srcHash": "103e091073020d08",
           "by": "human"
         },
         "ko_KR": {
           "state": "translated",
-          "srcHash": "427933b1a426ec84",
+          "srcHash": "103e091073020d08",
           "by": "human"
         },
         "ja_JP": {
           "state": "translated",
-          "srcHash": "427933b1a426ec84",
+          "srcHash": "103e091073020d08",
           "by": "human"
         },
         "pt_BR": {
@@ -148056,7 +148060,7 @@
         },
         "ru_RU": {
           "state": "translated",
-          "srcHash": "427933b1a426ec84",
+          "srcHash": "103e091073020d08",
           "by": "human"
         },
         "cs_CZ": {

@@ -6233,7 +6233,7 @@ export const zh_CN: EnTranslations = {
       },
       "temporal_hourglass": {
         "name": "悬停沙漏",
-        "description": "在选定位置放置一个时间沙漏。置于敌人脚下时，使其悬停 {duration} 秒且无法行动；受到任何伤害都会解除效果。置于自己或队伍盟友脚下时，进入 {duration} 秒的停滞，免疫伤害且无法行动，恢复 {healing}% 最大生命值，并使冷却恢复速度提高 {cooldownRecovery}%。增益光环可手动移除。"
+        "description": "在选定位置放置一个时间沙漏。置于敌人脚下时，在 PvE 中使其悬停 {hostilePveDuration} 秒，在 PvP 中悬停 {hostilePvpDuration} 秒；受到任何伤害都会解除效果。置于自己或队伍盟友脚下时，进入 {duration} 秒的停滞，免疫伤害且无法行动，恢复 {healing}% 最大生命值，并使自己的冷却恢复速度提高 {selfCooldownRecovery}%，盟友提高 {allyCooldownRecovery}%。若位置为空，沙漏会等待 {groundDuration} 秒并影响第一个踩上去的有效单位。增益光环可手动移除。"
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",

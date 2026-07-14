@@ -4,10 +4,14 @@ import {
   type AuraKind,
   type PlayerClass,
   type Stats,
+  TEMPORAL_HOURGLASS_ALLY_COOLDOWN_RATE,
   TEMPORAL_HOURGLASS_CAPTURE_RADIUS,
-  TEMPORAL_HOURGLASS_COOLDOWN_RATE,
   TEMPORAL_HOURGLASS_DURATION,
+  TEMPORAL_HOURGLASS_GROUND_DURATION,
   TEMPORAL_HOURGLASS_HEAL_FRACTION,
+  TEMPORAL_HOURGLASS_HOSTILE_PVE_DURATION,
+  TEMPORAL_HOURGLASS_HOSTILE_PVP_DURATION,
+  TEMPORAL_HOURGLASS_SELF_COOLDOWN_RATE,
   TEMPORAL_HOURGLASS_SELF_RADIUS,
   type WeaponInfo,
 } from '../types';
@@ -2266,14 +2270,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         type: 'temporalHourglass',
         duration: TEMPORAL_HOURGLASS_DURATION,
+        hostilePveDuration: TEMPORAL_HOURGLASS_HOSTILE_PVE_DURATION,
+        hostilePvpDuration: TEMPORAL_HOURGLASS_HOSTILE_PVP_DURATION,
+        groundDuration: TEMPORAL_HOURGLASS_GROUND_DURATION,
         selfRadius: TEMPORAL_HOURGLASS_SELF_RADIUS,
         captureRadius: TEMPORAL_HOURGLASS_CAPTURE_RADIUS,
         healMaxHpPct: TEMPORAL_HOURGLASS_HEAL_FRACTION,
-        cooldownRate: TEMPORAL_HOURGLASS_COOLDOWN_RATE,
+        selfCooldownRate: TEMPORAL_HOURGLASS_SELF_COOLDOWN_RATE,
+        allyCooldownRate: TEMPORAL_HOURGLASS_ALLY_COOLDOWN_RATE,
       },
     ],
     description:
-      'Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for $t sec and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for $t sec, prevents damage and actions, restores $h% of maximum health, and makes cooldowns recover $c% faster. The beneficial aura can be removed manually.',
+      'Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for $e sec in PvE or $p sec in PvP and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for $t sec, prevents damage and actions, restores $h% of maximum health, and makes cooldowns recover $s% faster for you or $a% faster for an ally. On empty ground, the hourglass waits for $g sec and affects the first valid unit to step on it. The beneficial aura can be removed manually.',
   },
   // ---- Chronomancy (healer) group haste cooldown: Temporal Acceleration, the
   // Chronomancer's equivalent of the Shaman's Bloodlust. A BASE ability (owner

@@ -31,6 +31,28 @@ function place(server: GameServer, entity: Entity, x: number): void {
 }
 
 describe('Hourglass allied cancellation online', () => {
+  it('accepts castAt through the authoritative command path and creates an empty-ground trap', () => {
+    const server = new GameServer();
+    const session = server.join(fakeWs(), 1, 1, 'Chrona', 'mage', null);
+    if ('error' in session) throw new Error('join failed');
+    server.sim.setPlayerLevel(20, session.pid);
+    expect(server.sim.setSpec('arcane', session.pid)).toBe(true);
+    server.sim.tick();
+    const mage = server.sim.entities.get(session.pid);
+    if (!mage) throw new Error('mage missing');
+    place(server, mage, 700);
+    mage.resource = mage.maxResource;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'castAt', ability: 'temporal_hourglass', x: 708, z: 0 }),
+    );
+
+    expect(server.sim.activeTemporalHourglasses).toEqual([
+      expect.objectContaining({ x: 708, z: 0, duration: 30, remaining: 30 }),
+    ]);
+  });
+
   it('routes cancel_aura to the authoritative simulation and stops every benefit', () => {
     const server = new GameServer();
     const mageSession = server.join(fakeWs(), 1, 1, 'Chrona', 'mage', null);

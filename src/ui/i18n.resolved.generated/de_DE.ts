@@ -6233,7 +6233,7 @@ export const de_DE: EnTranslations = {
       },
       "temporal_hourglass": {
         "name": "Hourglass of Suspension",
-        "description": "Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for {duration} sec and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for {duration} sec, prevents damage and actions, restores {healing}% of maximum health, and makes cooldowns recover {cooldownRecovery}% faster. The beneficial aura can be removed manually."
+        "description": "Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for {hostilePveDuration} sec in PvE or {hostilePvpDuration} sec in PvP and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for {duration} sec, prevents damage and actions, restores {healing}% of maximum health, and makes cooldowns recover {selfCooldownRecovery}% faster for you or {allyCooldownRecovery}% faster for an ally. On empty ground, the hourglass waits for {groundDuration} sec and affects the first valid unit to step on it. The beneficial aura can be removed manually."
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",

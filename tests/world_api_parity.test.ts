@@ -101,6 +101,7 @@ export const IWORLD_MEMBERS = [
   { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
   { name: 'activeFrostRings', kind: 'data' },
+  { name: 'activeTemporalHourglasses', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
@@ -405,8 +406,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
   it('pins total / data / method counts', () => {
     // Merged: upstream v0.23's surface plus the warrior branch's additions
     // (castAbilityOn, pickRowTalent, rowPicks, ..., petWaterJet) yields 208/55/153.
-    expect(IWORLD_MEMBERS.length).toBe(211);
-    expect(DATA_MEMBERS.length).toBe(56);
+    expect(IWORLD_MEMBERS.length).toBe(212);
+    expect(DATA_MEMBERS.length).toBe(57);
     expect(METHOD_MEMBERS.length).toBe(155);
   });
   it('has no duplicate member names', () => {
@@ -428,6 +429,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeFrostRings',
       'activeLoadout',
       'activeLootRolls',
+      'activeTemporalHourglasses',
       'advanceAmendsProgress',
       'applyTalents',
       'archetypeAmendsProgress',
@@ -638,6 +640,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeArchetype',
       'activeFrostRings',
       'activeLoadout',
+      'activeTemporalHourglasses',
       'archetypeAmendsProgress',
       'archetypeAmendsRequired',
       'archetypeSwitchCount',
@@ -922,6 +925,7 @@ type _ExhaustEntityRoster = AssertNever<
 const FACET_COMBAT = [
   'known',
   'activeFrostRings',
+  'activeTemporalHourglasses',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1294,8 +1298,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 25 fa
 
   it('the union of the 25 facets equals the pinned 211-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(211);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(211);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(212);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(212);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

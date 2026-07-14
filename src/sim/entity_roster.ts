@@ -21,7 +21,8 @@
 // (enforced by tests/architecture.test.ts).
 
 import { tickRingOfFrost } from './combat/ring_of_frost';
-import { DELVES, dungeonAt, zoneAt } from './data';
+import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
+import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
 import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
 import { aurasSurvivingDeath } from './resurrection';
@@ -71,6 +72,20 @@ export type GroundAoE = {
     freezeDuration: number;
     innerRadius: number;
     triggeredIds: Set<number>;
+  };
+  temporalHourglass?: {
+    id: string;
+    abilityId: string;
+    protectiveDuration: number;
+    hostilePveDuration: number;
+    hostilePvpDuration: number;
+    groundDuration: number;
+    healMaxHpPct: number;
+    selfCooldownRate: number;
+    allyCooldownRate: number;
+    createdTick: number;
+    sourceOrigin: Vec3;
+    sourceZoneId: string;
   };
 };
 
@@ -167,13 +182,36 @@ export function drainDelayedEvents(ctx: SimContext): void {
 export function tickGroundAoEs(ctx: SimContext): void {
   for (let i = ctx.groundAoEs.length - 1; i >= 0; i--) {
     const effect = ctx.groundAoEs[i];
-    if (effect.frostRing && !ctx.entities.has(effect.sourceId)) {
+    const persistentSource = ctx.entities.get(effect.sourceId);
+    const hourglassChangedRegion = Boolean(
+      effect.temporalHourglass &&
+        persistentSource &&
+        ((effect.temporalHourglass.sourceOrigin.x <= DUNGEON_X_THRESHOLD &&
+          persistentSource.pos.x <= DUNGEON_X_THRESHOLD &&
+          effect.temporalHourglass.sourceZoneId !== zoneAt(persistentSource.pos.z).id) ||
+          (persistentSource.pos.x - effect.temporalHourglass.sourceOrigin.x) ** 2 +
+            (persistentSource.pos.z - effect.temporalHourglass.sourceOrigin.z) ** 2 >
+            300 ** 2),
+    );
+    if (
+      (effect.frostRing && !persistentSource) ||
+      (effect.temporalHourglass && (!persistentSource || persistentSource.dead)) ||
+      hourglassChangedRegion
+    ) {
       ctx.groundAoEs.splice(i, 1);
       continue;
     }
     effect.remaining -= DT;
     if (effect.frostRing) {
       if (effect.remaining > CAST_COMPLETE_EPS) tickRingOfFrost(ctx, effect);
+      if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
+      continue;
+    }
+    if (effect.temporalHourglass) {
+      if (effect.remaining > CAST_COMPLETE_EPS && tickTemporalHourglassGround(ctx, effect)) {
+        ctx.groundAoEs.splice(i, 1);
+        continue;
+      }
       if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
       continue;
     }

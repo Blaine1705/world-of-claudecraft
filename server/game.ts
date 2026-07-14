@@ -4105,6 +4105,7 @@ export class GameServer {
     }
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
     const activeFrostRings = this.sim.activeFrostRings;
+    const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
     // Guard each session: a throw while building one player's snapshot must not
     // starve every other session of its snapshot this tick (server/CLAUDE.md).
     forEachGuarded(
@@ -4211,11 +4212,23 @@ export class GameServer {
             (ring) =>
               `{"id":${JSON.stringify(ring.id)},"x":${round2(ring.x)},"z":${round2(ring.z)},"r":${round2(ring.radius)},"i":${round2(ring.innerRadius)},"dur":${round2(ring.duration)},"rem":${round2(ring.remaining)}}`,
           );
-        const frostRingsJson =
-          frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
+        const frostRingsJson = frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
+        const temporalHourglasses = activeTemporalHourglasses
+          .filter((hourglass) => {
+            const dx = hourglass.x - anchorEntity.pos.x;
+            const dz = hourglass.z - anchorEntity.pos.z;
+            const limit = INTEREST_QUERY_RADIUS + hourglass.radius;
+            return dx * dx + dz * dz <= limit * limit;
+          })
+          .map(
+            (hourglass) =>
+              `{"id":${JSON.stringify(hourglass.id)},"x":${round2(hourglass.x)},"z":${round2(hourglass.z)},"r":${round2(hourglass.radius)},"dur":${round2(hourglass.duration)},"rem":${round2(hourglass.remaining)}}`,
+          );
+        const temporalHourglassesJson =
+          temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
         this.sendRaw(
           session,
-          `${head},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${keepJson}}`,
+          `${head},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
         );
       },
       (err, session) =>

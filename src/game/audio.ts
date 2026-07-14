@@ -176,6 +176,16 @@ export class GameAudio {
     this.tone(620, 0.4, 0.13, 'sawtooth', 0, 520);
   }
 
+  temporalClock(seconds = 1.6): void {
+    const ticks = Math.max(1, Math.min(10, Math.round(seconds * 4)));
+    for (let index = 0; index < ticks; index++) {
+      const delay = index * 0.25;
+      const high = index % 2 === 0;
+      this.tone(high ? 1760 : 1320, 0.075, 0.08, 'square', delay, high ? 1480 : 1120);
+      this.tone(high ? 880 : 660, 0.11, 0.04, 'triangle', delay + 0.015);
+    }
+  }
+
   bagOpen(): void {
     // leather flap + soft clasp
     this.noise(0.09, 1400, 0.16, 0.7);

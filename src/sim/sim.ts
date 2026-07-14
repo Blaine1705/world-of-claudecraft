@@ -1,6 +1,7 @@
 import type {
   AccountCosmetics,
   ActiveFrostRing,
+  ActiveTemporalHourglass,
   BankBonusSource,
   DailyRewardHistory,
   DailyRewardLeaderboardPage,
@@ -1344,6 +1345,22 @@ export class Sim {
       });
     }
     return rings;
+  }
+  get activeTemporalHourglasses(): ActiveTemporalHourglass[] {
+    const hourglasses: ActiveTemporalHourglass[] = [];
+    for (const effect of this.groundAoEs) {
+      const hourglass = effect.temporalHourglass;
+      if (!hourglass || effect.remaining <= 0) continue;
+      hourglasses.push({
+        id: hourglass.id,
+        x: effect.pos.x,
+        z: effect.pos.z,
+        radius: effect.radius,
+        duration: hourglass.groundDuration,
+        remaining: effect.remaining,
+      });
+    }
+    return hourglasses;
   }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.

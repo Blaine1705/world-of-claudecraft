@@ -75,6 +75,13 @@ export function applyRewind(
     school: 'arcane',
     fx: 'nova',
   });
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: caster.id,
+    targetId: caster.id,
+    school: 'arcane',
+    fx: 'temporalClock',
+  });
   let totalHealed = 0;
   for (const ally of selectRewindTargets(ctx, caster, p.radius)) {
     const heal = rewindHealFor(ctx, ally, p);

@@ -91,7 +91,7 @@ export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
 export type { BankBonusSource, BankInfo } from './world_api/bank';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
-export type { ActiveFrostRing } from './world_api/combat';
+export type { ActiveFrostRing, ActiveTemporalHourglass } from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {
   DailyRewardEligibilityView,
