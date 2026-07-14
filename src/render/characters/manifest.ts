@@ -693,6 +693,12 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 1.9,
     clips: animal(['Attack_Headbutt', 'Attack_Kick']),
   },
+  // the does: the same rig with the antler mesh removed and a softer coat
+  mob_veiled_doe: {
+    url: `${CREATURES}/veiled_doe.glb`,
+    height: 1.6,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
   // Aurelhorn keeps the bull's bulk (height) but joins the herd's species:
   // the same repainted stag rig in the patriarch's gold
   mob_aurelhorn: {
@@ -1257,6 +1263,7 @@ const MOB_KEYS: Record<string, string> = {
   // spirits, mushroom folk, and treants get realm-only rigs (ghost, glub,
   // yeti) that appear nowhere in the outer three zones
   veiled_stag: 'mob_veiled_stag',
+  veiled_doe: 'mob_veiled_doe',
   gleamstag: 'mob_gleamstag',
   gilded_stag: 'mob_stag',
   gloam_fox: 'mob_fox',

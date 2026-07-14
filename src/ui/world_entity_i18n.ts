@@ -131,6 +131,7 @@ const MOB_IDS = [
   'glimmerwisp',
   'duskwisp',
   'veiled_stag',
+  'veiled_doe',
   'gleamstag',
   'sporeling_gatherer',
   'corrupted_sporeling',

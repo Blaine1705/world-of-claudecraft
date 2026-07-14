@@ -7474,6 +7474,9 @@ export const ko_KR: EnTranslations = {
       "veiled_stag": {
         "name": "장막 수사슴"
       },
+      "veiled_doe": {
+        "name": "장막 암사슴"
+      },
       "gleamstag": {
         "name": "빛나는 수사슴"
       },
@@ -7484,7 +7487,7 @@ export const ko_KR: EnTranslations = {
         "name": "타락한 포자꾼"
       },
       "mushroom_pixie": {
-        "name": "Gleamfolk Pixie"
+        "name": "글림포크 픽시"
       },
       "treant_elder": {
         "name": "나무정령 원로"

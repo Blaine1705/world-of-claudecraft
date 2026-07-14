@@ -7474,6 +7474,9 @@ export const es: EnTranslations = {
       "veiled_stag": {
         "name": "Veiled Stag"
       },
+      "veiled_doe": {
+        "name": "Veiled Doe"
+      },
       "gleamstag": {
         "name": "The Gleamstag"
       },

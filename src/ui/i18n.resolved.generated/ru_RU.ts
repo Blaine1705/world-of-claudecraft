@@ -7474,6 +7474,9 @@ export const ru_RU: EnTranslations = {
       "veiled_stag": {
         "name": "Скрытый олень"
       },
+      "veiled_doe": {
+        "name": "Скрытая олениха"
+      },
       "gleamstag": {
         "name": "Сияющий олень"
       },
@@ -7484,7 +7487,7 @@ export const ru_RU: EnTranslations = {
         "name": "Осквернённый спорёныш"
       },
       "mushroom_pixie": {
-        "name": "Gleamfolk Pixie"
+        "name": "Пикси сияющего народца"
       },
       "treant_elder": {
         "name": "Древень-старейшина"

@@ -7474,6 +7474,9 @@ export const zh_CN: EnTranslations = {
       "veiled_stag": {
         "name": "帷纱雄鹿"
       },
+      "veiled_doe": {
+        "name": "帷纱雌鹿"
+      },
       "gleamstag": {
         "name": "辉光雄鹿"
       },
@@ -7484,7 +7487,7 @@ export const zh_CN: EnTranslations = {
         "name": "堕落的孢子人"
       },
       "mushroom_pixie": {
-        "name": "Gleamfolk Pixie"
+        "name": "辉光族小精灵"
       },
       "treant_elder": {
         "name": "树人长者"

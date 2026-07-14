@@ -7474,6 +7474,9 @@ export const en_XA: EnTranslations = {
       "veiled_stag": {
         "name": "[Ʋéíļéð Šţáĝ]"
       },
+      "veiled_doe": {
+        "name": "[Ʋéíļéð Ðóé]"
+      },
       "gleamstag": {
         "name": "[Ţĥé Ĝļéáɱšţáĝ]"
       },

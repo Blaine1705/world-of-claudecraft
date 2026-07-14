@@ -7474,6 +7474,9 @@ export const ja_JP: EnTranslations = {
       "veiled_stag": {
         "name": "ヴェールの牡鹿"
       },
+      "veiled_doe": {
+        "name": "ヴェールの雌鹿"
+      },
       "gleamstag": {
         "name": "グリームスタッグ"
       },
@@ -7484,7 +7487,7 @@ export const ja_JP: EnTranslations = {
         "name": "堕落したスポアリング"
       },
       "mushroom_pixie": {
-        "name": "Gleamfolk Pixie"
+        "name": "グリームフォーク・ピクシー"
       },
       "treant_elder": {
         "name": "トレントの長老"
