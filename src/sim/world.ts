@@ -1964,6 +1964,24 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
+// Pure pass mask used by border ridges. Exported for the performance invariant
+// test: a zero mask makes the skipped crest-noise contribution exactly +0.
+export function ridgePassWeight(distanceFromPass: number): number {
+  return smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(distanceFromPass));
+}
+
+// North-rim profile for the multi-row world. The rim can wander at most 23yd
+// south of its nominal onset, so every point at or below this bound is provably
+// outside it. Returning before the two fbm2 calls preserves the exact +0 result.
+export function northRimWeight(x: number, z: number): number {
+  if (z <= WORLD_MAX_Z - 53) return 0;
+  const wobble = (fbm2(x * 0.008, 60.1, 9207, 2) - 0.5) * 46;
+  return (
+    smoothstep(WORLD_MAX_Z - 30 + wobble, WORLD_MAX_Z + wobble, z) *
+    (0.32 + 0.68 * fbm2(x * 0.013, 60.2, 9209, 2))
+  );
+}
+
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
@@ -2259,9 +2277,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     if (dPerp < sigma * 3) {
       const along = edge.kind === 'h' ? x : z;
       let profile = Math.exp(-(dPerp * dPerp) / (2 * sigma * sigma));
-      const pass = edge.sealed
-        ? 1
-        : smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(along - edge.passAt));
+      const pass = edge.sealed ? 1 : ridgePassWeight(along - edge.passAt);
       // Inside a road pass, the final wall term is exactly +0. Skip the crest
       // noise and shaping work while keeping the heightfield bit-identical.
       if (pass === 0) continue;
@@ -2400,10 +2416,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // horizontal wall: its onset line meanders +-23yd in z with low-frequency
   // noise along x, and its height swells and drops to near-nothing over long
   // runs (broken massifs and passes, not a uniform berm).
-  const rimNWob = (fbm2(x * 0.008, 60.1, 9207, 2) - 0.5) * 46;
-  let rimN =
-    smoothstep(WORLD_MAX_Z - 30 + rimNWob, WORLD_MAX_Z + rimNWob, z) *
-    (0.32 + 0.68 * fbm2(x * 0.013, 60.2, 9209, 2));
+  let rimN = northRimWeight(x, z);
   // the southern realms end in open coast, not a rim range: the vale, the
   // Farshore, the fen, the headlands, the jungle, and the lawns all meet
   // the sea at their outer edges, and swim fatigue does the containment

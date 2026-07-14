@@ -303,7 +303,7 @@ export const SIM_MOB_ZONE_PHASES = [
 // (a cheap zoneAt band scan plus a Map lookup of an interned string).
 export function mobZonePhase(mob: Entity): string {
   if (mob.pos.x > DUNGEON_X_THRESHOLD) return MOB_ZONE_PHASE_INSTANCE;
-  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
+  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.x, mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
 }
 
 const ARENA_WIRE_HZ = 0.1;
