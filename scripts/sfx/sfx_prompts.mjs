@@ -447,10 +447,11 @@ export const SFX = [
     prompt: 'A soft muffled snowy wind, quiet and cold. Seamless loop, no music.',
   },
 
-  // --- Quest events (custom recordings, not ElevenLabs) --------------------
+  // --- Custom recordings (not ElevenLabs) ----------------------------------
   { key: 'quest_accept', custom: true },
   { key: 'quest_ready', custom: true },
   { key: 'quest_complete', custom: true },
+  { key: 'temporal_clock', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

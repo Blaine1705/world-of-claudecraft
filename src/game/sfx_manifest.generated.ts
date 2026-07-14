@@ -385,5 +385,9 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
   "spell_nova": {
     "url": "/audio/sfx/spell_nova.mp3",
     "loop": false
+  },
+  "temporal_clock": {
+    "url": "/audio/sfx/temporal_clock.mp3",
+    "loop": false
   }
 } as const;

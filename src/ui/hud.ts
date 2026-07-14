@@ -8758,12 +8758,13 @@ export class Hud {
     y: number,
     z: number,
     gain: number,
-    opts?: { rate?: number; cooldown?: number },
+    opts?: { rate?: number; cooldown?: number; jitter?: boolean },
   ): void {
     sfx.playAt(key, x, y, z, {
       gain: gain * COMBAT_GAIN,
       rate: opts?.rate,
       cooldown: opts?.cooldown,
+      jitter: opts?.jitter,
     });
   }
 
@@ -8832,7 +8833,11 @@ export class Hud {
         return;
       case 'spellfx': {
         if (ev.fx === 'temporalClock') {
-          audio.temporalClock(2);
+          const source = sim.entities.get(ev.sourceId) ?? sim.entities.get(ev.targetId);
+          if (source)
+            this.combat('temporal_clock', source.pos.x, source.pos.y, source.pos.z, 0.65, {
+              jitter: false,
+            });
           return;
         }
         if (ev.fx === 'projectile' || ev.fx === 'heavyBolt') {
@@ -10045,7 +10050,8 @@ export class Hud {
           const tgt = sim.entities.get(ev.targetId);
           const auraName = auraDisplayNameFromSource(ev.name);
           if (ev.name === 'Polymorph' && ev.gained) audio.sheep();
-          if (ev.name === ABILITIES.temporal_hourglass.name && ev.gained) audio.temporalClock();
+          if (ev.name === ABILITIES.temporal_hourglass.name && ev.gained && tgt)
+            this.combat('temporal_clock', tgt.pos.x, tgt.pos.y, tgt.pos.z, 0.65, { jitter: false });
           if (ev.targetId === sim.playerId) {
             if (ev.gained) this.noteProcAuraGain(ev.name);
             else this.noteProcAuraConsume(ev.auraKind);

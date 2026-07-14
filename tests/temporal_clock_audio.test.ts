@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
@@ -7,16 +7,21 @@ function source(relative: string): string {
 }
 
 describe('Chronomancy clock audio', () => {
-  it('uses a bounded procedural tick sequence for Hourglass activation', () => {
+  it('ships the user-provided clock recording as a short custom SFX clip', () => {
+    const clip = fileURLToPath(new URL('../public/audio/sfx/temporal_clock.mp3', import.meta.url));
+    const catalog = source('../scripts/sfx/sfx_prompts.mjs');
+    const manifest = source('../src/game/sfx_manifest.generated.ts');
     const audio = source('../src/game/audio.ts');
-    const hud = source('../src/ui/hud.ts');
 
-    expect(audio).toContain('temporalClock(seconds = 1.6)');
-    expect(audio).toContain('Math.min(10, Math.round(seconds * 4))');
-    expect(hud).toContain('ev.name === ABILITIES.temporal_hourglass.name && ev.gained');
+    expect(statSync(clip).size).toBeGreaterThan(1_000);
+    expect(statSync(clip).size).toBeLessThan(100_000);
+    expect(catalog).toContain("{ key: 'temporal_clock', custom: true }");
+    expect(manifest).toContain('"temporal_clock"');
+    expect(manifest).toContain('"url": "/audio/sfx/temporal_clock.mp3"');
+    expect(audio).not.toContain('temporalClock(');
   });
 
-  it('routes Rewind through the same short clock cue once per cast', () => {
+  it('routes Rewind and Hourglass through the same clock clip', () => {
     const rewind = source('../src/sim/combat/rewind.ts');
     const hud = source('../src/ui/hud.ts');
 
@@ -24,6 +29,7 @@ describe('Chronomancy clock audio', () => {
     expect(rewind).toContain("fx: 'temporalRewindNova'");
     expect(rewind).not.toContain("fx: 'nova'");
     expect(hud).toContain("if (ev.fx === 'temporalClock')");
-    expect(hud).toContain('audio.temporalClock(2)');
+    expect(hud.match(/this\.combat\('temporal_clock'/g)).toHaveLength(2);
+    expect(hud).toContain('ev.name === ABILITIES.temporal_hourglass.name && ev.gained');
   });
 });
