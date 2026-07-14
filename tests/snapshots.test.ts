@@ -512,7 +512,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade/bank); all 42 of them
+    // first snapshot (even the null-valued ones like party/trade/bank); all 44 of them
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -2485,9 +2485,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 43 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 45 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 44th unregistered delta key reddens this gate.
+// 46th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'atitle',
@@ -2502,6 +2502,8 @@ const ALL_DELTA_KEYS = [
   'dcompanion',
   'deeds',
   'delveDaily',
+  'df',
+  'dfb',
   'dmarks',
   'drun',
   'dstats',
@@ -2553,6 +2555,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
   deeds: 'deedsEarned',
+  df: 'dungeonFinderInfo',
+  dfb: 'dungeonFinderBoard',
   dmarks: 'delveMarks',
   drun: 'delveRun',
   dstats: 'deedStats',
@@ -2887,9 +2891,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 43 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(43);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(43);
+  it('ALL_DELTA_KEYS contains exactly 45 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(45);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(45);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2901,7 +2905,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(43);
+    expect(scraped.size).toBe(45);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

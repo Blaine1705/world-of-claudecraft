@@ -1323,6 +1323,9 @@ async function startGame(
           case 'arena':
             hud.toggleArena();
             break;
+          case 'dungeonFinder':
+            hud.toggleDungeonFinder();
+            break;
           case 'valecup':
             hud.toggleValeCup();
             break;
@@ -1338,6 +1341,17 @@ async function startGame(
           case 'deeds':
             hud.toggleDeeds();
             break;
+          case 'sheathe': {
+            // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
+            // combat auto-unsheathe); play the cue only when the state moved.
+            const wasStowed = world.player.weaponStowed;
+            world.toggleWeaponStow();
+            if (world.player.weaponStowed !== wasStowed) {
+              if (world.player.weaponStowed) audio.weaponSheathe();
+              else audio.weaponUnsheathe();
+            }
+            break;
+          }
           case 'chat':
             openChat();
             break;
@@ -1382,6 +1396,7 @@ async function startGame(
     onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
+    onDungeonFinder: () => hud.toggleDungeonFinder(),
     onValeCup: () => hud.toggleValeCup(),
     onQuestLog: () => hud.toggleQuestLog(),
     onCharacter: () => hud.toggleChar(),
