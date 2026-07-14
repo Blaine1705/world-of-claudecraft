@@ -426,9 +426,9 @@ export const de_DE: EnTranslations = {
       "requiresLevel": "Benötigt Stufe {level}",
       "pickFirst": "Wählt ein Reittier zum Reiten.",
       "keybindHint": "Drückt die Aufsitzen-/Absitzen-Taste (Standard Z), um zu reiten.",
-      "notCollected": "Nicht gesammelt",
-      "dropHint": "Wird von Dungeon- und Schlachtzugsbossen fallen gelassen.",
-      "stableHint": "Lernt das Reiten in den Ställen vor Thornpeak.",
+      "emptyTitle": "Keine Reittiere gesammelt",
+      "emptyStableHint": "Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.",
+      "emptyDropHint": "Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.",
       "clickManage": "Anklicken, um Euer Reittier zu wählen",
       "rarity_common": "Verbreitet",
       "rarity_rare": "Selten",
@@ -451,17 +451,11 @@ export const de_DE: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const de_DE: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Geweckter Sturmling"
       },
+      "stable_horse": {
+        "name": "Stallpferd"
+      },
       "ironvein_foreman": {
         "name": "Eisenader-Vorarbeiter"
       },
@@ -8441,7 +8438,7 @@ export const de_DE: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Reitstunden",
-        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe, und das lernt man nicht an einem Nachmittag. Steigt auf, achtet auf meine Hände an den Zügeln, und gleicht Euch der Neigung des Valorross an, bevor er entscheidet, Ihr seid die Mühe nicht wert.",
+        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe. Steigt in den Sattel, wenn ich das Wort gebe, und reitet dann den abgesteckten Parcours um meine Koppel, durch jedes Tor der Reihe nach. Verliert Ihr den Sattel oder verlasst den Hof, fangen wir von vorn an.",
         "completion": "So, ja. Kein einziges Mal nach dem Zaun gegriffen, die ganze Runde über. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const de_DE: EnTranslations = {
           },
           "9": {
             "label": "Gravewyrm-Heiligtum"
+          },
+          "10": {
+            "label": "Highwatch-Stallungen"
           }
         }
       }

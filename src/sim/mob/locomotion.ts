@@ -50,6 +50,7 @@ import {
   type Vec3,
 } from '../types';
 import { groundHeight, waterLevelAt } from '../world';
+import { isAmbientMob, updateAmbientMob } from './ambient';
 import { updateMobCombatProfile } from './combat_profile';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
@@ -162,6 +163,16 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.inCombat = false;
     mob.aggroTargetId = null;
     clearThreat(mob);
+    return;
+  }
+
+  // Ambient decorative mobs (the Highwatch stable horses): never hostile and
+  // never in combat, but unlike the inert arms above they DO wander (a bounded
+  // idle amble inside the paddock, off a private Rng sub-stream, never ctx.rng, so
+  // the shared draw order is untouched). This arm returns before the leaked-mob
+  // safety net so the horses stay non-hostile.
+  if (isAmbientMob(mob)) {
+    updateAmbientMob(ctx, mob);
     return;
   }
 

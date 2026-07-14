@@ -56,7 +56,12 @@ const baseEnTable = {
   'error.mountTrainLevel': 'You must be level 20 to take riding lessons.',
   'error.mountTrainNeedsQuest': 'You need to accept the riding lesson quest first.',
   'error.mountTrainInProgress': 'A riding lesson is already in progress.',
-  'error.mountTrainNoSession': 'No riding lesson in progress.',
+  // Riding-lesson course outcome notices (log-type), emitted from the ride driver.
+  // Placeholder-free, so they register in the EXACT matcher automatically.
+  'log.mountTrainSuccess': "Marla takes the Valorsteed's reins. Well ridden.",
+  'log.mountTrainThrown': 'The Valorsteed throws you. Marla waves you back to try again.',
+  'log.mountTrainLeftYard':
+    'You leave the paddock and the lesson ends. Come back to Marla to try again.',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
   'error.maxLoadouts': 'You can save at most {count} loadouts.',

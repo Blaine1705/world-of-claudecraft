@@ -3569,7 +3569,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cada jinete llega a pie, {className}. No te daré las riendas hasta que puedas montar al Corcel del Valor sin besar el barro, y en Highwatch no sobran sanadores para huesos rotos.',
   'entities.quests.q_riding_lessons.title': 'Lecciones de equitación',
   'entities.quests.q_riding_lessons.text':
-    'Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo, y eso no se aprende en una tarde. Sube, atiende a mis manos en las riendas, y sigue el vaivén del Corcel del Valor antes de que decida que no vales la pena.',
+    'Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo. Sube a la silla cuando te dé la orden, y luego recorre el trazado señalado alrededor de mi picadero, cruzando cada puerta en orden. Pierde la silla o sal del cercado y empezamos de nuevo.',
   'entities.quests.q_riding_lessons.completion':
     'Así, muy bien. Ni una sola vez te agarraste a la cerca en toda la vuelta. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Doma al Corcel del Valor',
@@ -4117,6 +4117,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Tiendas del Culto del Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Campos de aparecidos',
   'entities.zones.thornpeak_heights.pois.9.label': 'Santuario del Gravewyrm',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Establos de Highwatch',
   'entities.dungeons.hollow_crypt.name': 'La Cripta Hueca',
   'entities.dungeons.hollow_crypt.enterText': 'Desciendes a la Cripta Hueca...',
   'entities.dungeons.hollow_crypt.leaveText': 'Vuelves a subir a la luz del día.',
@@ -4577,6 +4578,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Guardacintura del Invocatormentas',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, el Pico Despierto',
   'entities.mobs.thunzharr_stormling.name': 'Elemental de tormenta despierto',
+  'entities.mobs.stable_horse.name': 'Caballo de establo',
   'hudChrome.worldBoss.spawn': '¡{name} se alza sobre las Alturas de Thornpeak!',
   'entities.items.stormcallers_spaulders.name': 'Bufas de Galecall',
   'hud.chat.context.convertToRaid': 'Convertir en banda',
@@ -6798,8 +6800,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.',
-  'hudChrome.mounts.notCollected': 'Sin coleccionar',
-  'hudChrome.mounts.stableHint': 'Aprende a montar en los establos, a las afueras de Thornpeak.',
-  'hudChrome.mounts.dropHint': 'Lo sueltan los jefes de mazmorras y bandas.',
+  'hudChrome.mounts.emptyTitle': 'Ninguna montura obtenida',
+  'hudChrome.mounts.emptyStableHint':
+    'Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.',
+  'hudChrome.mounts.emptyDropHint':
+    'Las monturas más raras las sueltan los jefes de mazmorras y bandas.',
   'hudChrome.mounts.clickManage': 'Haz clic para elegir tu montura',
 };

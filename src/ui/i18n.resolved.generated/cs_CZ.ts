@@ -426,9 +426,9 @@ export const cs_CZ: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
-      "notCollected": "Not collected",
-      "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Learn to ride at the stables outside Thornpeak.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -451,17 +451,11 @@ export const cs_CZ: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const cs_CZ: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Probuzený bouřník"
       },
+      "stable_horse": {
+        "name": "Stájový kůň"
+      },
       "ironvein_foreman": {
         "name": "Předák Železné žíly"
       },
@@ -8441,7 +8438,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Jezdecké lekce",
-        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám, a to se nenaučíš za jedno odpoledne. Vylez nahoru, dávej pozor na mé ruce na otěžích a přizpůsob se náklonu Valorsteeda, než usoudí, že s tebou není žádná námaha.",
+        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám. Vylez do sedla, až dám pokyn, a pak projeď vyznačenou trať kolem mého výběhu, každou branou popořadě. Ztratíš sedlo nebo opustíš ohradu a začínáme znovu.",
         "completion": "Tak. Ani jednou ses nechytil plotu celou tu dobu. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const cs_CZ: EnTranslations = {
           },
           "9": {
             "label": "Svatyně Hrobodraka"
+          },
+          "10": {
+            "label": "Stáje Highwatch"
           }
         }
       }

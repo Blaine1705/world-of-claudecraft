@@ -890,6 +890,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Spinnen-Eierzak',
   'entities.mobs.sump_troll_devourer.name': 'Zomptrol-Verslinder',
   'entities.mobs.thunzharr_stormling.name': 'Gewekte Stormling',
+  'entities.mobs.stable_horse.name': 'Stalpaard',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, de Ontwakende Piek',
   'entities.mobs.tolling_bell.name': 'Luidende Klok',
   'entities.mobs.vale_cup_ball.name': 'Zwijnenbal',
@@ -2519,7 +2520,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Elke ruiter komt op twee benen binnen, {className}. De teugels krijg je pas als je op de Valorsteed kunt blijven zitten zonder in de modder te belanden, en Highwatch heeft geen genezers over voor gebroken botten.',
   'entities.quests.q_riding_lessons.title': 'Rijlessen',
   'entities.quests.q_riding_lessons.text':
-    'Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Blijven zitten is wat ik leer, niet wat ik verkoop, en dat leer je niet op één middag. Klim erop, let op mijn handen aan de teugels, en volg de helling van de Valorsteed voordat hij besluit dat je de moeite niet waard bent.',
+    'Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Blijven zitten is wat ik leer, niet wat ik verkoop. Klim in het zadel als ik het teken geef, en rijd dan het uitgevlagde parcours rond mijn paddock, door elke poort op volgorde. Verlies het zadel of verlaat het erf, en we beginnen opnieuw.',
   'entities.quests.q_riding_lessons.completion':
     'Zo, ja. Geen één keer greep je naar het hek, de hele rit door. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Tem de Valorsteed',
@@ -3075,6 +3076,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Wyrmcultus-Tenten',
   'entities.zones.thornpeak_heights.pois.8.label': 'Revenantenvelden',
   'entities.zones.thornpeak_heights.pois.9.label': 'Grafwurm-Heiligdom',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Stallen van Highwatch',
   'entities.zones.thornpeak_heights.welcome':
     'Kapitein Thessaly houdt de muur bij Hoogwacht, ternauwernood.',
   'errors.api.accountBanned': 'Dit account is verbannen.',

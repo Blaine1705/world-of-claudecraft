@@ -426,9 +426,9 @@ export const pl_PL: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
-      "notCollected": "Not collected",
-      "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Learn to ride at the stables outside Thornpeak.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -451,17 +451,11 @@ export const pl_PL: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const pl_PL: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Zbudzony Burzowiec"
       },
+      "stable_horse": {
+        "name": "Koń stajenny"
+      },
       "ironvein_foreman": {
         "name": "Sztygar z Żelaznej Żyły"
       },
@@ -8441,7 +8438,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lekcje jazdy konnej",
-        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję, a tego nie nauczysz się w jedno popołudnie. Wsiadaj, patrz na moje ręce na wodzach i dopasuj się do przechyłów Valorsteeda, zanim uzna, że nie jesteś wart zachodu.",
+        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Wsiądź do siodła, gdy dam znak, a potem przejedź oflagowaną trasę wokół mojego wybiegu, przez każdą bramkę po kolei. Stracisz siodło albo opuścisz zagrodę i zaczynamy od nowa.",
         "completion": "No, właśnie tak. Ani razu nie złapałeś się ogrodzenia przez całą przejażdżkę. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const pl_PL: EnTranslations = {
           },
           "9": {
             "label": "Sanktuarium Grobowego Żmija"
+          },
+          "10": {
+            "label": "Stajnie Highwatch"
           }
         }
       }

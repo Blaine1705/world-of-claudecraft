@@ -3560,7 +3560,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ogni cavaliere arriva sulle proprie gambe, {className}. Non ti darò le redini finché non saprai restare in sella al Destriero del Valore senza baciare il fango, e a Highwatch non abbondano i guaritori per le ossa rotte.',
   'entities.quests.q_riding_lessons.title': 'Lezioni di equitazione',
   'entities.quests.q_riding_lessons.text':
-    'Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo, e non si impara in un pomeriggio. Sali, presta attenzione alle mie mani sulle redini, e segui il movimento del Destriero del Valore prima che decida che non vali la pena.',
+    'Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Sali in sella quando te lo dico, poi percorri il tracciato segnalato attorno al mio maneggio, attraversando ogni cancello in ordine. Perdi la sella o esci dal recinto, e si ricomincia.',
   'entities.quests.q_riding_lessons.completion':
     'Ecco, così. Non ti sei aggrappato alla staccionata nemmeno una volta, per tutto il giro. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Doma il Destriero del Valore',
@@ -4106,6 +4106,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Tende del Culto del Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Campi dei revenant',
   'entities.zones.thornpeak_heights.pois.9.label': 'Santuario del Gravewyrm',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Stalle di Highwatch',
   'entities.dungeons.hollow_crypt.name': 'La Cripta Vuota',
   'entities.dungeons.hollow_crypt.enterText': 'Scendi nella Cripta Vuota...',
   'entities.dungeons.hollow_crypt.leaveText': 'Risali alla luce del giorno.',
@@ -4572,6 +4573,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Guardacintura del Chiamatempeste',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, il Picco Risvegliato',
   'entities.mobs.thunzharr_stormling.name': 'Elementale di tempesta ridestato',
+  'entities.mobs.stable_horse.name': 'Cavallo da stalla',
   'hudChrome.worldBoss.spawn': '{name} si erge sulle Alture di Thornpeak!',
   'entities.items.stormcallers_spaulders.name': 'Spallacci Galecall',
   'hud.chat.context.convertToRaid': 'Converti in incursione',
@@ -6783,8 +6785,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.',
-  'hudChrome.mounts.notCollected': 'Non ottenuta',
-  'hudChrome.mounts.stableHint': 'Impara a cavalcare nelle stalle fuori Thornpeak.',
-  'hudChrome.mounts.dropHint': 'Bottino dei boss di spedizione e incursione.',
+  'hudChrome.mounts.emptyTitle': 'Nessuna cavalcatura ottenuta',
+  'hudChrome.mounts.emptyStableHint':
+    'Raggiungi il livello 20 e prendi lezioni di equitazione dalla Stalliera capo Marla alle stalle a ovest di Highwatch.',
+  'hudChrome.mounts.emptyDropHint':
+    'Le cavalcature più rare sono bottino dei boss di spedizione e incursione.',
   'hudChrome.mounts.clickManage': 'Clicca per scegliere la tua cavalcatura',
 };

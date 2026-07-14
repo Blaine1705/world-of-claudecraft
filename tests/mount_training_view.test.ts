@@ -1,21 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import {
-  MOUNT_TRAINING_LEAN_OPTIONS,
-  mountTrainingRenderModel,
-  mountTrainingRenderSig,
-  mountTrainingTimerKey,
-} from '../src/ui/mount_training_view';
+import { mountTrainingRenderModel, mountTrainingRenderSig } from '../src/ui/mount_training_view';
 import type { MountTrainingView } from '../src/world_api';
 
 function view(overrides: Partial<MountTrainingView> = {}): MountTrainingView {
   return {
     sessionId: 's1',
-    round: 1,
-    roundsTotal: 8,
-    misses: 0,
-    missCap: 3,
-    cue: 'left',
-    windowMs: 1500,
+    phase: 'ride',
+    gate: 0,
+    gatesTotal: 8,
+    nextGate: { x: 91, z: 691 },
     ...overrides,
   };
 }
@@ -24,66 +17,56 @@ describe('mountTrainingRenderModel', () => {
   it('reports idle (inactive, all-null) for a null view', () => {
     const m = mountTrainingRenderModel(null);
     expect(m.active).toBe(false);
-    expect(m.cueSuffix).toBeNull();
-    expect(m.round).toBeNull();
-    expect(m.misses).toBeNull();
-    expect(m.windowMs).toBeNull();
+    expect(m.phase).toBeNull();
+    expect(m.progress).toBeNull();
   });
 
   it('returns the SAME idle instance every time (allocation-light)', () => {
     expect(mountTrainingRenderModel(null)).toBe(mountTrainingRenderModel(null));
   });
 
-  it('maps a live view to an active model with round/miss readout args', () => {
-    const m = mountTrainingRenderModel(view({ round: 3, roundsTotal: 8, misses: 1, missCap: 3 }));
+  it('maps a phase-mount view to an active model with no ride progress', () => {
+    const m = mountTrainingRenderModel(view({ phase: 'mount', gate: 0, nextGate: null }));
     expect(m.active).toBe(true);
-    expect(m.round).toEqual({ n: 3, total: 8 });
-    expect(m.misses).toEqual({ n: 1, cap: 3 });
-    expect(m.windowMs).toBe(1500);
+    expect(m.phase).toBe('mount');
+    expect(m.progress).toBeNull();
   });
 
-  it.each([
-    ['left', 'cueLeft'],
-    ['right', 'cueRight'],
-    ['steady', 'cueSteady'],
-  ] as const)('maps cue %s to suffix %s', (cue, suffix) => {
-    expect(mountTrainingRenderModel(view({ cue })).cueSuffix).toBe(suffix);
+  it('maps a phase-ride view to progress "Gate n+1 of total"', () => {
+    expect(mountTrainingRenderModel(view({ gate: 0, gatesTotal: 8 })).progress).toEqual({
+      n: 1,
+      total: 8,
+    });
+    expect(mountTrainingRenderModel(view({ gate: 5, gatesTotal: 8 })).progress).toEqual({
+      n: 6,
+      total: 8,
+    });
   });
 
-  it('always exposes the three lean options in left/steady/right order', () => {
-    const m = mountTrainingRenderModel(view());
-    expect(m.leanOptions.map((o) => o.lean)).toEqual(['left', 'steady', 'right']);
-    expect(m.leanOptions.map((o) => o.labelSuffix)).toEqual(['leanLeft', 'steady', 'leanRight']);
-    expect(m.leanOptions).toBe(MOUNT_TRAINING_LEAN_OPTIONS);
+  it('drops progress once the last gate is cleared (gate === gatesTotal)', () => {
+    const m = mountTrainingRenderModel(view({ gate: 8, gatesTotal: 8, nextGate: null }));
+    expect(m.active).toBe(true);
+    expect(m.phase).toBe('ride');
+    expect(m.progress).toBeNull();
   });
 
   it('is a pure projection: identical input yields identical structure', () => {
-    const a = mountTrainingRenderModel(view({ round: 4, misses: 2 }));
-    const b = mountTrainingRenderModel(view({ round: 4, misses: 2 }));
+    const a = mountTrainingRenderModel(view({ gate: 3 }));
+    const b = mountTrainingRenderModel(view({ gate: 3 }));
     expect(a).toEqual(b);
   });
 });
 
 describe('mountTrainingRenderSig', () => {
-  it('changes when any dependency changes', () => {
+  it('changes when any painted dependency changes', () => {
     const base = mountTrainingRenderSig(view());
-    expect(mountTrainingRenderSig(view({ round: 2 }))).not.toBe(base);
-    expect(mountTrainingRenderSig(view({ misses: 1 }))).not.toBe(base);
-    expect(mountTrainingRenderSig(view({ cue: 'right' }))).not.toBe(base);
+    expect(mountTrainingRenderSig(view({ phase: 'mount' }))).not.toBe(base);
+    expect(mountTrainingRenderSig(view({ gate: 2 }))).not.toBe(base);
+    expect(mountTrainingRenderSig(view({ gatesTotal: 6 }))).not.toBe(base);
     expect(mountTrainingRenderSig(view({ sessionId: 's2' }))).not.toBe(base);
   });
 
   it('stays identical for identical state (same-input-same-output)', () => {
     expect(mountTrainingRenderSig(view())).toBe(mountTrainingRenderSig(view()));
-  });
-});
-
-describe('mountTrainingTimerKey', () => {
-  it('changes on a new round or a new session, not on anything else', () => {
-    const base = mountTrainingTimerKey(view());
-    expect(mountTrainingTimerKey(view({ round: 2 }))).not.toBe(base);
-    expect(mountTrainingTimerKey(view({ sessionId: 's2' }))).not.toBe(base);
-    // Misses/cue changing mid-round must NOT refill the clock.
-    expect(mountTrainingTimerKey(view({ misses: 1, cue: 'right' }))).toBe(base);
   });
 });

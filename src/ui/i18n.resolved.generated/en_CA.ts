@@ -426,9 +426,9 @@ export const en_CA: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
-      "notCollected": "Not collected",
-      "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Learn to ride at the stables outside Thornpeak.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -451,17 +451,11 @@ export const en_CA: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const en_CA: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Roused Stormling"
       },
+      "stable_horse": {
+        "name": "Stable Horse"
+      },
       "ironvein_foreman": {
         "name": "Ironvein Foreman"
       },
@@ -8441,7 +8438,7 @@ export const en_CA: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Riding Lessons",
-        "text": "Every rider walks in on two legs, {playerName}, same as I told you the day we met. The sitting is what I teach, not what I sell, and I do not teach it in one afternoon. Climb up, mind my hands on the reins, and match the Valorsteed's lean before it decides you are not worth the trouble.",
+        "text": "Every rider walks in on two legs, {playerName}, same as I told you the day we met. The sitting is what I teach, not what I sell. Climb into the saddle when I give the word, then ride the flagged course around my paddock, every gate in order. Lose the saddle or leave the yard and we start again.",
         "completion": "There, now. Not one grab at the fence rail the whole run through. The Valorsteed is yours, {playerName}: saddle, reins, and the standing of a rider who earned the seat instead of buying it.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const en_CA: EnTranslations = {
           },
           "9": {
             "label": "Gravewyrm Sanctum"
+          },
+          "10": {
+            "label": "Highwatch Stables"
           }
         }
       }

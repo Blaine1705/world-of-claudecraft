@@ -3597,7 +3597,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Tout cavalier arrive sur ses deux jambes, {className}. Je ne te donnerai les rênes que lorsque tu sauras tenir en selle sur le Destrier de Bravoure sans mordre la boue, et Highwatch n’a pas de guérisseurs de trop pour les os brisés.',
   'entities.quests.q_riding_lessons.title': 'Leçons d’équitation',
   'entities.quests.q_riding_lessons.text':
-    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends, et cela ne s’apprend pas en une après-midi. Monte, surveille mes mains sur les rênes, et suis le balancement du Destrier de Bravoure avant qu’il ne décide que tu n’en vaux pas la peine.',
+    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Monte en selle quand j’en donne l’ordre, puis parcours le tracé balisé autour de mon pré, chaque porte dans l’ordre. Perds la selle ou quitte l’enclos, et l’on recommence.',
   'entities.quests.q_riding_lessons.completion':
     'Voilà. Pas une seule fois agrippé à la barrière, du début à la fin. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Dompter le Destrier de Bravoure',
@@ -4148,6 +4148,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Tentes du Culte du Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Champs des revenants',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanctuaire du Gravewyrm',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Écuries de Highwatch',
   'entities.dungeons.hollow_crypt.name': 'La Crypte creuse',
   'entities.dungeons.hollow_crypt.enterText': 'Vous descendez dans la Crypte creuse...',
   'entities.dungeons.hollow_crypt.leaveText': 'Vous remontez à la lumière du jour.',
@@ -4623,6 +4624,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': "Protège-taille d'Appel-tempête",
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, le Pic Éveillé',
   'entities.mobs.thunzharr_stormling.name': 'Élémentaire de tempête éveillé',
+  'entities.mobs.stable_horse.name': "Cheval d'écurie",
   'hudChrome.worldBoss.spawn': '{name} se dresse sur les Hauteurs de Thornpeak !',
   'entities.items.stormcallers_spaulders.name': 'Spallières de Galecall',
   'hud.chat.context.convertToRaid': 'Convertir en raid',
@@ -6849,8 +6851,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
-  'hudChrome.mounts.notCollected': 'Non collectée',
-  'hudChrome.mounts.stableHint': 'Apprenez à monter aux écuries, aux abords de Thornpeak.',
-  'hudChrome.mounts.dropHint': 'Butin des boss de donjon et de raid.',
+  'hudChrome.mounts.emptyTitle': 'Aucune monture collectée',
+  'hudChrome.mounts.emptyStableHint':
+    'Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.',
+  'hudChrome.mounts.emptyDropHint':
+    'Les montures plus rares sont lâchées par les boss de donjon et de raid.',
   'hudChrome.mounts.clickManage': 'Cliquez pour choisir votre monture',
 };

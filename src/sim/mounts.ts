@@ -23,7 +23,13 @@
 //
 // `src/sim`-pure and rng-free.
 
-import { MOUNT_KEYS, type MountKey, mountDef, normalizeSelectedMount } from './content/mounts';
+import {
+  MOUNT_KEYS,
+  type MountKey,
+  mountDef,
+  normalizeSelectedMount,
+  TRAINING_MOUNT_KEY,
+} from './content/mounts';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import type { PlayerMeta } from './sim';
@@ -88,6 +94,31 @@ function recalcFor(ctx: SimContext, e: Entity, meta: PlayerMeta): void {
   recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
 }
 
+/** The riding lesson lets the player ride the training Valorsteed before they own
+ *  it: the ONE place an unowned mount is allowed to summon and apply. True only
+ *  while a lesson is IN_PROGRESS in phase 'mount' and the target is the training
+ *  steed (src/sim/mounts_training.ts). */
+function trainingSummon(meta: PlayerMeta | undefined, key: string): boolean {
+  return (
+    key === TRAINING_MOUNT_KEY &&
+    meta?.mountTraining?.state === 'IN_PROGRESS' &&
+    meta.mountTraining.phase === 'mount'
+  );
+}
+
+/** Force an instant dismount with no put-away channel: clears the live mount and
+ *  any in-flight summon/dismount channel, then recomputes stats (the mount
+ *  crit/block bonus rides Entity via recalcPlayerStats). Used by the riding lesson
+ *  to take the unowned training steed back the moment the lesson ends. */
+export function forceDismount(ctx: SimContext, e: Entity): void {
+  if (!e.mountKey && (e.mountCastRemaining ?? 0) <= 0 && e.mountCastKey === '') return;
+  e.mountKey = '';
+  e.mountCastRemaining = 0;
+  e.mountCastKey = '';
+  const meta = ctx.players.get(e.id);
+  if (meta) recalcFor(ctx, e, meta);
+}
+
 /** Pick the player's stable mount (persisted). Ownership- and level-gated;
  *  swaps the live mount in place when already riding. Returns false on an
  *  unknown key or a failed gate (an error event carries the reason). */
@@ -135,6 +166,21 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     // Start the dismount channel (never gated: dismounting is always allowed).
     e.mountCastRemaining = MOUNT_DISMOUNT_SECONDS;
     e.mountCastKey = '';
+    return true;
+  }
+  // Riding-lesson tutorial: while a lesson is in phase 'mount' the Mount/Dismount
+  // toggle summons the training Valorsteed even though it is UNOWNED (teaching the
+  // Z keybind is the whole point). Runs the normal summon channel; it never touches
+  // the persisted pick and skips the ownership/level gates (begin already required
+  // level 20). Combat/water still cancel the channel via updateMountTransition.
+  if (meta.mountTraining?.state === 'IN_PROGRESS' && meta.mountTraining.phase === 'mount') {
+    if (e.dead || e.ghost) return false;
+    if (e.inCombat) {
+      ctx.error(pid, "You can't do that while in combat.");
+      return false;
+    }
+    e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
+    e.mountCastKey = TRAINING_MOUNT_KEY;
     return true;
   }
   // Resolve which mount to summon: the stable pick if owned, else fall back to
@@ -197,7 +243,11 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
       const target = e.mountCastKey;
       if (target === '') {
         e.mountKey = '';
-      } else if (mountDef(target) && meta && mountOwned(meta, target)) {
+      } else if (
+        mountDef(target) &&
+        meta &&
+        (mountOwned(meta, target) || trainingSummon(meta, target))
+      ) {
         e.mountKey = target;
       }
       // A summon whose reins vanished mid-channel leaves the player unmounted.

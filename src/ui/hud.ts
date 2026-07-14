@@ -115,7 +115,6 @@ import {
   OVERHEAD_EMOTES,
   type OverheadEmoteId,
   type PartyInfo,
-  type TrainingLean,
 } from '../world_api';
 import {
   type AbilityScaling,
@@ -1179,8 +1178,8 @@ export class Hud {
   // restore, and keybinds.
   private readonly mountTrainWindow = new MountTrainingWindow({
     getState: () => this.sim.mountTrainingView(),
-    onAnswer: (lean) => this.submitMountTrainAnswer(lean),
     onAbort: () => this.submitMountTrainAbort(),
+    mountKeyLabel: () => this.keybinds.primaryLabel('mount'),
   });
   // Drowned Reliquary Rite difficulty popup. Opened on the delveRiteChoosePrompt
   // cue (approaching the risen reliquary), closed once playback starts.
@@ -7650,10 +7649,10 @@ export class Hud {
 
   // ---------------------------------------------------------------------------
   // "Riding Lessons": Stablemaster Marla's story riding-lesson minigame. Begin
-  // Lesson (her gossip dialog) starts a server-authoritative lean-with-the-horse
-  // reaction game driven entirely by mountTrainSession/Round/End events, mirroring
-  // the lockpick minigame above. Player text renders through the
-  // hudChrome.mountTraining.* t() keys.
+  // Lesson (her gossip dialog) starts a server-authoritative ridden course: mount a
+  // training Valorsteed with the Mount/Dismount keybind, then ride the flagged gates
+  // in order. Driven by the mountTrainSession/Gate/End events, mirroring the lockpick
+  // minigame above. Player text renders through the hudChrome.mountTraining.* t() keys.
   // ---------------------------------------------------------------------------
 
   private beginMountTraining(): void {
@@ -7662,7 +7661,8 @@ export class Hud {
   }
 
   // A mountTrainSession event means the authoritative lesson is live in
-  // world.mountTrainingView(); show the panel and let the window paint from it.
+  // world.mountTrainingView(); show the panel and let the window paint from it. The
+  // event also re-fires when the phase flips to 'ride', which just repaints in place.
   private openMountTraining(): void {
     const el = $('#mount-training-panel');
     if (el.style.display !== 'block')
@@ -7670,7 +7670,7 @@ export class Hud {
     el.style.display = 'block';
     this.bindMountTrainKeys();
     this.mountTrainWindow.open();
-    this.mountTrainTrap?.focusFirst('.mt-lean-btn');
+    this.mountTrainTrap?.focusFirst('.mt-giveup');
   }
 
   private endMountTraining(outcome: 'success' | 'thrown' | 'abandoned'): void {
@@ -7701,8 +7701,8 @@ export class Hud {
   }
 
   /** Offline sim queues its events until the 20 Hz tick; flush them now so the
-   * next cue/round readout and the cosmetic clock react immediately. Online has
-   * no drainEvents and reacts to the normal event stream instead. */
+   * session open / phase flip reacts immediately. Online has no drainEvents and
+   * reacts to the normal event stream instead. */
   flushMountTrainEvents(): void {
     const drain = (this.sim as { drainEvents?: () => SimEvent[] }).drainEvents;
     if (!drain) return;
@@ -7710,16 +7710,7 @@ export class Hud {
     if (events.length > 0) this.handleEvents(events);
   }
 
-  submitMountTrainAnswer(lean: TrainingLean): void {
-    this.sim.mountTrainAnswer(lean);
-    this.flushMountTrainEvents();
-    // Safety net for any path that didn't emit a round event (e.g. a rejected
-    // answer): realign the panel to the authoritative state.
-    this.mountTrainWindow.repaintIfChanged();
-  }
-
   submitMountTrainAbort(): void {
-    this.mountTrainWindow.stopTimer();
     this.sim.mountTrainAbort();
     this.flushMountTrainEvents();
   }
@@ -9544,8 +9535,8 @@ export class Hud {
         case 'mountTrainSession':
           this.openMountTraining();
           break;
-        case 'mountTrainRound':
-          this.mountTrainWindow.onRound();
+        case 'mountTrainGate':
+          this.mountTrainWindow.onGate();
           break;
         case 'mountTrainEnd':
           this.endMountTraining(ev.outcome);

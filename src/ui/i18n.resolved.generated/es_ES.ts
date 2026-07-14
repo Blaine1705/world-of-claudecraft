@@ -426,9 +426,9 @@ export const es_ES: EnTranslations = {
       "requiresLevel": "Requiere nivel {level}",
       "pickFirst": "Elige una montura para montar.",
       "keybindHint": "Pulsa la tecla Montar / Desmontar (Z por defecto) para montar.",
-      "notCollected": "Sin coleccionar",
-      "dropHint": "Lo sueltan los jefes de mazmorras y bandas.",
-      "stableHint": "Aprende a montar en los establos, a las afueras de Thornpeak.",
+      "emptyTitle": "Ninguna montura obtenida",
+      "emptyStableHint": "Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.",
+      "emptyDropHint": "Las monturas más raras las sueltan los jefes de mazmorras y bandas.",
       "clickManage": "Haz clic para elegir tu montura",
       "rarity_common": "Común",
       "rarity_rare": "Rara",
@@ -451,17 +451,11 @@ export const es_ES: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const es_ES: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Elemental de tormenta despierto"
       },
+      "stable_horse": {
+        "name": "Caballo de establo"
+      },
       "ironvein_foreman": {
         "name": "Capataz Vena de Hierro"
       },
@@ -8441,7 +8438,7 @@ export const es_ES: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lecciones de equitación",
-        "text": "Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo, y eso no se aprende en una tarde. Sube, atiende a mis manos en las riendas, y sigue el vaivén del Corcel del Valor antes de que decida que no vales la pena.",
+        "text": "Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo. Sube a la silla cuando te dé la orden, y luego recorre el trazado señalado alrededor de mi picadero, cruzando cada puerta en orden. Pierde la silla o sal del cercado y empezamos de nuevo.",
         "completion": "Así, muy bien. Ni una sola vez te agarraste a la cerca en toda la vuelta. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const es_ES: EnTranslations = {
           },
           "9": {
             "label": "Santuario del Gravewyrm"
+          },
+          "10": {
+            "label": "Establos de Highwatch"
           }
         }
       }

@@ -44,7 +44,6 @@ import {
   RUN_SPEED,
   type SimEvent,
   type SportRole,
-  type TrainingLean,
   type VcBracket,
   type VcNationId,
 } from '../src/sim/types';
@@ -336,11 +335,6 @@ function talentAllocationFromWire(value: unknown): TalentAllocation | null {
 
 function isPickAction(value: unknown): value is PickAction {
   return typeof value === 'string' && LOCKPICK_ACTIONS.has(value as PickAction);
-}
-
-const TRAINING_LEANS = new Set<TrainingLean>(['left', 'right', 'steady']);
-function isTrainingLean(value: unknown): value is TrainingLean {
-  return typeof value === 'string' && TRAINING_LEANS.has(value as TrainingLean);
 }
 
 // Vale Cup wire validation (anti-cheat: every field type-checked against the
@@ -3331,7 +3325,9 @@ export class GameServer {
         sim.mountTrainBeginFor(pid);
         break;
       case 'mount_train_answer':
-        if (isTrainingLean(msg.lean)) sim.mountTrainAnswerFor(pid, msg.lean);
+        // Deprecated no-op: the lesson is a ridden course now, not a lean-cue
+        // reaction. The token stays in COMMAND_NAMES (append-only); the server
+        // ignores it and a modern client never sends a meaningful payload.
         break;
       case 'mount_train_abort':
         sim.mountTrainAbortFor(pid);

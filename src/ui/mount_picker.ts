@@ -1,10 +1,11 @@
 // The character sheet's mount picker: a thin DOM section builder over the pure
 // mount_picker_view core (the gatheringHtml shape: the CharWindow composes the
 // HTML and wires the section after each innerHTML rebuild). Replaces the
-// retired Mounts window: the whole catalog renders as cards (owned ones
-// pickable, unowned ones dimmed as "Not collected"), the pick is written
+// retired Mounts window: it renders ONLY the mounts the player owns as pickable
+// cards (a level-locked one shown dimmed, not pickable), the pick is written
 // through IWorldMounts.selectMount (re-validated server-side), and riding is
-// the Z keybind's job, never a button here.
+// the Z keybind's job, never a button here. A player who owns no mount yet sees
+// an empty state telling them how to earn a first one.
 //
 // Also the shared home of the mount name/description i18n key maps (the bag
 // tooltip for reins items reuses them).
@@ -58,20 +59,13 @@ export function mountSpecLines(row: {
   return parts;
 }
 
-// The unowned-card acquisition hint: the horse is bought from the stablemaster,
-// every other mount drops from a boss. Keyed off the pure view's purchasable
-// flag so the key selection is not hardcoded in two places.
-function acquireHint(row: MountPickerRow): string {
-  return t(row.purchasable ? 'hudChrome.mounts.stableHint' : 'hudChrome.mounts.dropHint');
-}
-
 // The state chip never co-renders a contradiction: the "Riding" chip only when
-// actually riding, the "Selected" chip only for an owned, unlocked pick (a
-// locked or unowned card shows its requirement / acquisition line instead).
+// actually riding, the "Selected" chip only for an unlocked pick (a level-locked
+// card shows its requirement line instead). Every rendered row is owned.
 function stateChip(row: MountPickerRow): string {
   if (row.active)
     return `<span class="mp-state mp-riding">${esc(t('hudChrome.mounts.riding'))}</span>`;
-  if (row.selected && row.owned && !row.locked)
+  if (row.selected && !row.locked)
     return `<span class="mp-state">${esc(t('hudChrome.mounts.selected'))}</span>`;
   return '';
 }
@@ -79,21 +73,16 @@ function stateChip(row: MountPickerRow): string {
 function cardHtml(row: MountPickerRow, highlightKey: string): string {
   const color = QUALITY_COLOR[row.rarity] ?? 'var(--color-quality-default)';
   const classes = ['mp-card'];
-  if (!row.owned) classes.push('mp-unowned');
   if (row.locked) classes.push('mp-locked');
   if (row.selected) classes.push('mp-selected');
   if (row.key === highlightKey) classes.push('mp-highlight');
-  // Unowned: the "Not collected" state plus how to acquire it (stable vs boss
-  // drop). Locked-but-owned: only the level requirement (never a Selected chip).
-  // Owned and unlocked: the specialty lines.
-  const sub = !row.owned
-    ? `<div class="mp-sub">${esc(t('hudChrome.mounts.notCollected'))}</div>` +
-      `<div class="mp-sub mp-acquire">${esc(acquireHint(row))}</div>`
-    : row.locked
-      ? `<div class="mp-sub mp-lock">${esc(t('hudChrome.mounts.requiresLevel', { level: row.level }))}</div>`
-      : `<div class="mp-sub">${mountSpecLines(row)
-          .map((p) => `<span class="mp-spec">${esc(p)}</span>`)
-          .join('')}</div>`;
+  // Level-locked (owned but under the gate): only the level requirement (never a
+  // Selected chip). Otherwise the specialty lines.
+  const sub = row.locked
+    ? `<div class="mp-sub mp-lock">${esc(t('hudChrome.mounts.requiresLevel', { level: row.level }))}</div>`
+    : `<div class="mp-sub">${mountSpecLines(row)
+        .map((p) => `<span class="mp-spec">${esc(p)}</span>`)
+        .join('')}</div>`;
   // A pickable card is a real button (its own role, no list semantics layered
   // on top); the rest stay inert divs so the keyboard order only visits
   // actionable cards.
@@ -112,15 +101,30 @@ function cardHtml(row: MountPickerRow, highlightKey: string): string {
   );
 }
 
-/** The whole section: a titled card row in the character sheet's progression
- *  style, plus the Z-keybind hint. */
-export function mountPickerHtml(view: MountPickerView, highlightKey = ''): string {
-  const cards = view.rows.map((row) => cardHtml(row, highlightKey)).join('');
+// The empty state (no owned mount): a short heading plus how to earn a first
+// mount. Non-interactive text only (no buttons), so the keybind hint and the
+// card grid are both suppressed until the player owns something.
+function emptyStateHtml(): string {
   return (
-    `<div class="char-progression mount-picker"><div class="cp-title">${esc(t('hudChrome.mounts.title'))}</div>` +
-    `<div class="mp-cards">${cards}</div>` +
-    `<div class="mp-hint">${esc(t('hudChrome.mounts.keybindHint'))}</div></div>`
+    `<div class="mp-empty">` +
+    `<div class="mp-name">${esc(t('hudChrome.mounts.emptyTitle'))}</div>` +
+    `<div class="mp-hint">${esc(t('hudChrome.mounts.emptyStableHint'))}</div>` +
+    `<div class="mp-hint">${esc(t('hudChrome.mounts.emptyDropHint'))}</div>` +
+    `</div>`
   );
+}
+
+/** The whole section: a titled card row of the OWNED mounts in the character
+ *  sheet's progression style plus the Z-keybind hint, or the empty state when
+ *  the player owns none. */
+export function mountPickerHtml(view: MountPickerView, highlightKey = ''): string {
+  const title = `<div class="cp-title">${esc(t('hudChrome.mounts.title'))}</div>`;
+  const body =
+    view.rows.length === 0
+      ? emptyStateHtml()
+      : `<div class="mp-cards">${view.rows.map((row) => cardHtml(row, highlightKey)).join('')}</div>` +
+        `<div class="mp-hint">${esc(t('hudChrome.mounts.keybindHint'))}</div>`;
+  return `<div class="char-progression mount-picker">${title}${body}</div>`;
 }
 
 /** The hover/focus tooltip for one catalog mount (cards + the reins bag item). */
@@ -131,10 +135,8 @@ export function mountTooltipHtml(row: MountPickerRow): string {
   const descKey = MOUNT_DESC_KEYS[row.key];
   if (descKey) html += `<div class="tt-desc">${esc(t(descKey))}</div>`;
   for (const line of mountSpecLines(row)) html += `<div class="tt-green">${esc(line)}</div>`;
-  if (!row.owned) {
-    html += `<div class="tt-sub">${esc(t('hudChrome.mounts.notCollected'))}</div>`;
-    html += `<div class="tt-sub">${esc(acquireHint(row))}</div>`;
-  } else if (row.locked) {
+  // Every rendered mount is owned; a level-locked one shows its ride-level gate.
+  if (row.locked) {
     html += `<div class="tt-sub mp-lock">${esc(t('hudChrome.mounts.requiresLevel', { level: row.level }))}</div>`;
   }
   return html;

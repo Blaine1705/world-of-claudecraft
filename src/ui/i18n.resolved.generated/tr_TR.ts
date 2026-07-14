@@ -426,9 +426,9 @@ export const tr_TR: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
-      "notCollected": "Not collected",
-      "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Learn to ride at the stables outside Thornpeak.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -451,17 +451,11 @@ export const tr_TR: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const tr_TR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Uyanmış Fırtına Dölü"
       },
+      "stable_horse": {
+        "name": "Ahır Atı"
+      },
       "ironvein_foreman": {
         "name": "Demirdamar Ustabaşı"
       },
@@ -8441,7 +8438,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Binicilik Dersleri",
-        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil, ve bu bir öğleden sonrada öğrenilmez. Bin, dizginlerdeki ellerime dikkat et ve seni fazla zahmetli bulup atmadan önce Valorsteed'in yatışına ayak uydur.",
+        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. İşaret verdiğimde eyere çık, sonra padoğumun etrafındaki bayraklı parkuru sürüp her kapıdan sırayla geç. Eyeri kaybedersen ya da avludan çıkarsan baştan başlarız.",
         "completion": "İşte böyle. Bütün tur boyunca bir kere bile çite tutunmadın. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const tr_TR: EnTranslations = {
           },
           "9": {
             "label": "Mezarejderi Mabedi"
+          },
+          "10": {
+            "label": "Highwatch Ahırları"
           }
         }
       }

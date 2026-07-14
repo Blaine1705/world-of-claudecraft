@@ -203,10 +203,9 @@ import {
 import {
   abandonMountTraining as abandonMountTrainingImpl,
   mountTrainAbort as mountTrainAbortImpl,
-  mountTrainAnswer as mountTrainAnswerImpl,
   mountTrainBegin as mountTrainBeginImpl,
   mountTrainingViewFor as mountTrainingViewForImpl,
-  tickMountTrainingTimeout as tickMountTrainingTimeoutImpl,
+  tickMountTraining as tickMountTrainingImpl,
 } from './mounts_training';
 import {
   findPlayerPath,
@@ -1435,10 +1434,12 @@ export class Sim {
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
       for (let i = 0; i < camp.count; i++) {
-        if (template.dummy) {
-          // A practice dummy is a fixed, deterministic prop (no scatter, fixed level,
-          // never wanders): spawn it WITHOUT drawing any RNG so adding one never
-          // perturbs the world's seed-stable spawns and rolls.
+        if (template.dummy || template.ambient) {
+          // A practice dummy or an ambient decoration (the stable horses) is a
+          // fixed, deterministic prop (no scatter, fixed level): spawn it WITHOUT
+          // drawing any RNG so adding one never perturbs the world's seed-stable
+          // spawns and rolls. (The horses do wander, but off a PRIVATE Rng
+          // sub-stream in mob/ambient.ts, never the shared ctx.rng.)
           const safe = this.findSafePos(camp.center.x, camp.center.z, minHeight);
           const mob = createMob(
             this.nextId++,
@@ -2407,9 +2408,10 @@ export class Sim {
   mountTrainBeginFor(pid: number): void {
     mountTrainBeginImpl(this.ctx, pid);
   }
-  mountTrainAnswerFor(pid: number, lean: TrainingLean): void {
-    mountTrainAnswerImpl(this.ctx, lean, pid);
-  }
+  // Deprecated no-op: the riding lesson is a ridden course now, not a lean-cue
+  // reaction. Kept only so the IWorld member (pinned by world_api_parity) still
+  // exists; the wire command 'mount_train_answer' stays registered but does nothing.
+  mountTrainAnswerFor(_pid: number, _lean: TrainingLean): void {}
   mountTrainAbortFor(pid: number): void {
     mountTrainAbortImpl(this.ctx, pid);
   }
@@ -3197,7 +3199,7 @@ export class Sim {
       maybeCompanionBark: (run, pid, barkId) => sim.maybeCompanionBark(run, pid, barkId),
       abandonLockpick: (run) => lockpickMod.abandonLockpick(sim.ctx, run),
       tickLockpickTimeout: (run) => lockpickMod.tickLockpickTimeout(sim.ctx, run),
-      tickMountTrainingTimeout: (meta) => tickMountTrainingTimeoutImpl(sim.ctx, meta),
+      tickMountTraining: (meta) => tickMountTrainingImpl(sim.ctx, meta),
       abandonMountTraining: (meta) => abandonMountTrainingImpl(sim.ctx, meta),
       delveRunForMob: (mobId) => sim.delveRunForMob(mobId),
       onDelveBossDefeated: (run) => sim.onDelveBossDefeated(run),
@@ -3501,9 +3503,6 @@ export class Sim {
         // swimmer. Live players only (a dead player is already force-dismounted by
         // handleDeath). Draws no rng, so the tick-phase draw order is unchanged.
         updateMountTransition(this.ctx, p, this.isSwimming(p));
-        // Riding-lesson (mount-training) per-round deadline: server-authoritative,
-        // times a round out as a miss when its window elapses. Draws no rng.
-        this.ctx.tickMountTrainingTimeout(meta);
         lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not
@@ -3514,6 +3513,12 @@ export class Sim {
         this.updateDoorTriggers(p);
         lap?.('p.move');
       }
+      // Riding-lesson (mount-training) course driver: server-authoritative; advances
+      // the mount -> ride phase flip and the gated ride for a live player, and ends a
+      // dead/ghost player's IN_PROGRESS lesson as a throw (the driver's first check),
+      // so death never strands the session. Draws no rng, so the tick-phase draw
+      // order is unchanged.
+      this.ctx.tickMountTraining(meta);
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);

@@ -793,6 +793,12 @@ export interface MobTemplate {
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
   dummy?: boolean;
+  // Purely-ambient decoration (the Highwatch stable horses): never hostile,
+  // never aggros/fights, un-attackable and un-tameable, but wanders a bounded
+  // patch. Spawned RNG-free (like the dummy) so it never perturbs the shared
+  // seed stream, and driven by the ambient arm (mob/ambient.ts) whose wander
+  // draws a private Rng sub-stream, not ctx.rng. See src/sim/mob/ambient.ts.
+  ambient?: boolean;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
     min: number;
@@ -1648,6 +1654,10 @@ export interface ZonePropsDef {
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
   delveMarkers?: { x: number; z: number; delveId: string }[];
+  // Riding-course marker pennants (the Highwatch Stables). Collision-free by
+  // design (colliders.ts does NOT read this field), so the flags mark the riding
+  // line without ever obstructing it. Placed from content/mounts RIDING_COURSE.
+  courseFlags?: { x: number; z: number }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {
@@ -2103,27 +2113,26 @@ export interface ReadyCheck {
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
 }
 
-// Mount-training minigame ("riding lessons"): the player leans the matching
-// direction for a cue within a shrinking window. Re-exported from world_api so
-// render/ui consume it there instead of reaching into sim/ (see mounts_training.ts).
+// Mount-training minigame ("riding lessons"): a ridden equestrian course. The
+// player mounts a training Valorsteed at Stablemaster Marla, then rides one lap
+// through the flagged gates in order. `TrainingLean` is retained only for the
+// deprecated no-op IWorld.mountTrainAnswer member (the old lean-cue command);
+// nothing in the new course flow reads it.
 export type TrainingLean = 'left' | 'right' | 'steady';
 
 // A player's active riding-lesson attempt (src/sim/mounts_training.ts), kept on
 // PlayerMeta.mountTraining. Session-only: never persisted/serialized (unlike the
 // one-time mountTrainingFeePaid flag also on PlayerMeta), so a save/load never
-// resumes a half-finished lesson. `seed` plus the (round, misses) counters are
-// enough to deterministically rederive every cue the session has drawn or will
-// draw, from a per-module Rng sub-stream (never the shared ctx.rng).
+// resumes a half-finished lesson. `phase` is 'mount' until the player has summoned
+// the training steed (the tutorial for the Mount/Dismount hotkey), then 'ride' for
+// the course. `gate` is how many gates have been passed so far, which is also the
+// 0-based index of the next gate to ride to in RIDING_COURSE.gates. No rng: the
+// course is a static shape, so installing this system perturbs no draw order.
 export interface MountTrainingSession {
   sessionId: string;
   ownerId: number;
-  round: number; // 1-based: the Nth cue the player must still clear
-  roundsTotal: number;
-  misses: number;
-  missCap: number;
-  cue: TrainingLean;
-  seed: number;
-  deadlineTick: number;
+  phase: 'mount' | 'ride';
+  gate: number;
   state: 'IN_PROGRESS' | 'SUCCESS' | 'THROWN' | 'ABANDONED';
 }
 
@@ -2484,30 +2493,22 @@ export type SimEvent = { pid?: number } & (
         | 'not_at_hub';
     }
   // Mount-training minigame ("riding lessons", src/sim/mounts_training.ts). All
-  // personal (pid-scoped). mountTrainSession opens a fresh attempt; mountTrainRound
-  // reports one answered/timed-out cue (and carries the NEXT cue to react to,
-  // unless the session just ended); mountTrainEnd reports the terminal outcome.
+  // personal (pid-scoped). mountTrainSession opens a fresh attempt and is re-emitted
+  // when the phase flips from 'mount' to 'ride' (the client rebuilds the view from
+  // it); mountTrainGate reports one gate cleared during the ride; mountTrainEnd
+  // reports the terminal outcome. Gate positions are NOT on the wire: the client
+  // derives them from the shared RIDING_COURSE content by the gate index.
   | {
       type: 'mountTrainSession';
       sessionId: string;
-      round: number;
-      roundsTotal: number;
-      misses: number;
-      missCap: number;
-      cue: TrainingLean;
-      windowMs: number;
+      phase: 'mount' | 'ride';
       pid: number;
     }
   | {
-      type: 'mountTrainRound';
+      type: 'mountTrainGate';
       sessionId: string;
-      round: number;
-      roundsTotal: number;
-      misses: number;
-      missCap: number;
-      result: 'good' | 'miss';
-      cue: TrainingLean;
-      windowMs: number;
+      gate: number;
+      gatesTotal: number;
       pid: number;
     }
   | {

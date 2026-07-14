@@ -110,6 +110,12 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  toggleMount falls back to the first owned mount. */
 export const DEFAULT_MOUNT: MountKey = 'valorsteed';
 
+/** The steed the riding-lesson minigame lends the player for the course. It is the
+ *  same catalog mount reins_valorsteed eventually grants, ridden UNOWNED during the
+ *  lesson (the one sanctioned unowned mount; see src/sim/mounts.ts). Shared by
+ *  src/sim/mounts.ts (the summon special-case) and src/sim/mounts_training.ts. */
+export const TRAINING_MOUNT_KEY: MountKey = 'valorsteed';
+
 export function mountDef(key: string): MountDef | null {
   return (MOUNTS as Record<string, MountDef | undefined>)[key] ?? null;
 }
@@ -142,3 +148,61 @@ export function mountMeleeBlockPct(mountKey: string): number {
 export function mountMoveSpeedPct(mountKey: string): number {
   return mountKey ? (mountDef(mountKey)?.moveSpeedPct ?? 0) : 0;
 }
+
+// ---------------------------------------------------------------------------
+// The Highwatch Stables (zone 3): the fenced paddock, the marked riding course,
+// and the ambient stable horses. These consts are the SINGLE SOURCE OF TRUTH for
+// the stable-yard geometry: zone3 content (content/zone3.ts) places its fences,
+// course-flag props, and horse spawns from them, and the riding-lesson minigame
+// (src/sim/mounts_training.ts) reads the course. Keep this file the one place
+// the numbers live so the props, the horses, and the lesson can never drift.
+// ---------------------------------------------------------------------------
+
+/** Axis-aligned paddock rectangle (world x/z). The fence perimeter, the ambient
+ *  horse wander bound, and the riding-course containment check all read this. */
+export const STABLE_PADDOCK = {
+  xMin: 82,
+  xMax: 118,
+  zMin: 672,
+  zMax: 698,
+  /** The 4-unit gap in the north fence run (the paddock opening) the rider and
+   *  the horses pass through; Marla stands just outside it. */
+  openingXMin: 88,
+  openingXMax: 92,
+} as const;
+
+export interface RidingCourseDef {
+  /** Paddock centre; the lesson recentres a strayed rider on this. */
+  center: { x: number; z: number };
+  /** How near a rider must pass a gate to clear it (world units). */
+  gateRadius: number;
+  /** Distance from `center` beyond which an in-progress lesson counts as
+   *  abandoned (the follow-up riding minigame consumes this). */
+  boundsRadius: number;
+  /** The gates in riding order: one counterclockwise loop starting nearest the
+   *  paddock opening. content/zone3 plants a course-flag prop at each. */
+  gates: readonly { x: number; z: number }[];
+}
+
+/** The marked riding course inside the paddock (see STABLE_PADDOCK). Consumed by
+ *  content/zone3 (a flag prop per gate) and src/sim/mounts_training.ts (the lesson
+ *  route) as the single source of truth; do not duplicate these coordinates. */
+export const RIDING_COURSE: RidingCourseDef = {
+  center: { x: 100, z: 685 },
+  gateRadius: 4,
+  boundsRadius: 40,
+  gates: [
+    { x: 91, z: 691 },
+    { x: 87, z: 685 },
+    { x: 91, z: 679 },
+    { x: 100, z: 677 },
+    { x: 109, z: 679 },
+    { x: 113, z: 685 },
+    { x: 109, z: 691 },
+    { x: 100, z: 693 },
+  ],
+};
+
+/** Template id of the ambient Highwatch stable horse (content/zone3 mob def). The
+ *  locomotion dispatcher's ambient arm (src/sim/mob/ambient.ts) routes on it. */
+export const STABLE_HORSE_TEMPLATE_ID = 'stable_horse';

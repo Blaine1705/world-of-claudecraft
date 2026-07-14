@@ -559,8 +559,8 @@
 
   /* ---------- mount training minigame ("Riding Lessons") ---------- */
   /* Stablemaster Marla's story riding lesson: a small centered popup (the
-     lockpick-panel / delve-rite-panel precedent) with a cue prompt, a round /
-     slip readout, a cosmetic reaction-window bar, and three big lean buttons. */
+     lockpick-panel / delve-rite-panel precedent) with an instruction line and,
+     during the ride, a "Gate N of 8" progress readout plus a Give Up button. */
   #mount-training-panel {
     width: 380px;
     max-width: 92vw;
@@ -571,85 +571,33 @@
     position: fixed;
   }
   #mount-training-panel .mt-prompt {
-    font-size: 12px;
+    font-size: 13px;
     color: #e8e0c8;
-    line-height: 1.4;
+    line-height: 1.45;
     margin: 8px 0 10px;
     text-align: center;
   }
   #mount-training-panel .mt-status {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    font-size: 12px;
-    color: #c9b27a;
     margin: 0 0 8px;
   }
-  #mount-training-panel .mt-timer {
-    margin: 0 0 10px;
-  }
-  #mount-training-panel .mt-timer-track {
-    height: 6px;
-    background: #1c160e;
-    border: 1px solid #3a2e1a;
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  #mount-training-panel .mt-timer-bar {
-    height: 100%;
-    background: var(--gold);
-    border-radius: 3px;
-    transition: width 0.1s linear;
-  }
-  #mount-training-panel .mt-cue {
+  #mount-training-panel .mt-progress {
     font-family: var(--title-font);
-    font-size: 20px;
+    font-size: 18px;
     text-align: center;
     color: var(--gold);
     background: linear-gradient(#0d0a07, #161009);
     border: 1px solid #463a1c;
     border-radius: 5px;
-    padding: 14px 8px;
-    margin: 0 0 12px;
-  }
-  #mount-training-panel .mt-lean-row {
-    display: flex;
-    gap: 8px;
-  }
-  #mount-training-panel .mt-lean-btn {
-    flex: 1;
-    min-height: 56px;
-    min-width: 44px;
-    padding: 6px 4px;
-    font-family: var(--title-font);
-    font-size: 13px;
-    background: #1a1410;
-    border: 1px solid #463a1c;
-    border-radius: 4px;
-    color: var(--gold);
-    cursor: pointer;
-  }
-  #mount-training-panel .mt-lean-btn:hover,
-  #mount-training-panel .mt-lean-btn:focus-visible {
-    border-color: var(--gold);
-    background: #2a2010;
-  }
-  #mount-training-panel .mt-lean-btn:focus-visible {
-    outline: 3px solid var(--color-border-focus);
-    outline-offset: 2px;
+    padding: 10px 16px;
   }
   #mount-training-panel .mt-giveup {
     width: 100%;
     min-height: 40px;
     margin-top: 10px;
     box-sizing: border-box;
-  }
-  /* Reduced motion: drop the bar's width-tween (a purely cosmetic clock; the
-     sim, not this bar, is authoritative on whether an answer landed in time). */
-  @media (prefers-reduced-motion: reduce) {
-    #mount-training-panel .mt-timer-bar {
-      transition: none;
-    }
   }
 
   /* ---------- windows ---------- */
@@ -1693,7 +1641,6 @@
     border-color: #cc9a3c;
     background: #ffe27a12;
   }
-  .mp-card.mp-unowned,
   .mp-card.mp-locked {
     opacity: 0.55;
   }

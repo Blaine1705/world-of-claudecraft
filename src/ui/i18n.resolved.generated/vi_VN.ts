@@ -426,9 +426,9 @@ export const vi_VN: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
-      "notCollected": "Not collected",
-      "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Learn to ride at the stables outside Thornpeak.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -451,17 +451,11 @@ export const vi_VN: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const vi_VN: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Tinh Linh Bão Trỗi Dậy"
       },
+      "stable_horse": {
+        "name": "Ngựa chuồng"
+      },
       "ironvein_foreman": {
         "name": "Quản Đốc Mạch Sắt"
       },
@@ -8441,7 +8438,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Bài Học Cưỡi Ngựa",
-        "text": "Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán, và chẳng ai học được điều đó trong một buổi chiều. Leo lên, để ý đôi tay ta trên dây cương, và theo nhịp nghiêng của Valorsteed trước khi nó quyết định ngươi không đáng để bận tâm.",
+        "text": "Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán. Leo lên yên khi ta ra hiệu, rồi phi theo đường đua cắm cờ quanh bãi quây của ta, qua từng cổng theo thứ tự. Rời khỏi yên hoặc ra khỏi khoảnh sân thì ta bắt đầu lại từ đầu.",
         "completion": "Đấy, được rồi. Suốt cả vòng chạy, ngươi chẳng một lần bám vào hàng rào. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const vi_VN: EnTranslations = {
           },
           "9": {
             "label": "Thánh Đường Mộ Long"
+          },
+          "10": {
+            "label": "Chuồng ngựa Highwatch"
           }
         }
       }

@@ -426,9 +426,9 @@ export const zh_TW: EnTranslations = {
       "requiresLevel": "需要等級 {level}",
       "pickFirst": "選擇一隻要騎乘的坐騎。",
       "keybindHint": "按下騎乘 / 下騎鍵(預設 Z)即可騎乘。",
-      "notCollected": "未收集",
-      "dropHint": "由地城和團隊副本首領掉落。",
-      "stableHint": "在荊峰郊外的馬廄學習騎術。",
+      "emptyTitle": "尚未收集坐騎",
+      "emptyStableHint": "升到 20 級，前往高望以西的馬廄，向馬廄總管瑪拉學習騎術。",
+      "emptyDropHint": "較稀有的坐騎由地城和團隊副本首領掉落。",
       "clickManage": "點擊選擇坐騎",
       "rarity_common": "普通",
       "rarity_rare": "稀有",
@@ -451,17 +451,11 @@ export const zh_TW: EnTranslations = {
     },
     "mountTraining": {
       "title": "騎乘課",
-      "prompt": "在馬把你甩下去之前，跟上牠的傾斜方向。",
-      "leanLeft": "Lean Left",
-      "leanRight": "向右傾",
-      "steady": "保持穩定",
-      "cueLeft": "馬向左傾。",
-      "cueRight": "馬向右傾。",
-      "cueSteady": "馬站穩了。",
+      "mountPrompt": "上馬吧：按 {key} 鍵騎上訓練用英勇戰馬。",
+      "ridePrompt": "沿著插旗的賽道騎行，依序穿過每一道門。",
+      "progress": "第 {n} 道門，共 {total} 道",
       "begin": "開始課程",
       "abort": "Give Up",
-      "round": "第 {n} 輪，共 {total} 輪",
-      "misses": "失誤 {n}/{cap}",
       "thrown": "你被甩下馬了。穩住，再試一次。",
       "success": "你已經馴服了英勇戰馬。",
       "close": "關閉"
@@ -7360,6 +7354,9 @@ export const zh_TW: EnTranslations = {
       "thunzharr_stormling": {
         "name": "被驚醒的風暴元素"
       },
+      "stable_horse": {
+        "name": "廄馬"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },
@@ -8441,7 +8438,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "騎術課",
-        "text": "每個騎手都是兩條腿走進來的，{playerName}，就像我們初次見面那天我說的那樣。我教的是怎麼坐穩，不是拿來賣的東西，這也不是一個下午就能學會的。上馬吧，盯緊我握著韁繩的手，在英勇戰馬決定你不值得費這個勁之前，跟上牠傾身的節奏。",
+        "text": "每個騎手都是兩條腿走進來的，{playerName}，就像我們初次見面那天我說的那樣。我教的是怎麼坐穩，不是拿來賣的東西。等我發話就翻身上鞍，沿著我圍場裡插旗的賽道，依序穿過每一道門。要是從鞍上摔下來，或者跑出了院子，我們就從頭再來。",
         "completion": "好了，就是這樣。整趟下來你一次都沒抓過柵欄。英勇戰馬現在是你的了，{playerName}：馬鞍、韁繩，還有靠本事掙來而不是買來的騎手身份。",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const zh_TW: EnTranslations = {
           },
           "9": {
             "label": "墓龍聖所"
+          },
+          "10": {
+            "label": "高望馬廄"
           }
         }
       }

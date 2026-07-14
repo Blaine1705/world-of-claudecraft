@@ -442,9 +442,13 @@ export const hudChromeStrings = {
     requiresLevel: 'Requires level {level}',
     pickFirst: 'Pick a mount to ride.',
     keybindHint: 'Press the Mount / Dismount key (default Z) to ride.',
-    notCollected: 'Not collected',
-    dropHint: 'Drops from dungeon and raid bosses.',
-    stableHint: 'Learn to ride at the stables outside Thornpeak.',
+    // The empty state, shown when the player owns no mount yet: a heading plus
+    // how to earn a first one (the stablemaster's riding lessons) and the rarer
+    // boss-drop mounts.
+    emptyTitle: 'No mounts collected',
+    emptyStableHint:
+      'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
+    emptyDropHint: 'Rarer mounts drop from dungeon and raid bosses.',
     clickManage: 'Click to choose your mount',
     rarity_common: 'Common',
     rarity_rare: 'Rare',
@@ -469,22 +473,17 @@ export const hudChromeStrings = {
       'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
   },
   // The riding-lesson minigame at the Highwatch stables (q_riding_lessons):
-  // Stablemaster Marla walks the player through matching the Valorsteed's lean
-  // before it throws them. Sim-side gameplay lives in src/sim/mounts_training.ts;
-  // these are the panel/prompt/cue strings for its UI.
+  // Stablemaster Marla has the player mount a training Valorsteed with the
+  // Mount/Dismount keybind, then ride the flagged course around her paddock, every
+  // gate in order. Sim-side gameplay lives in src/sim/mounts_training.ts; these are
+  // the panel/prompt strings for its UI. {key} is the live Mount/Dismount keycap.
   mountTraining: {
     title: 'Riding Lesson',
-    prompt: "Match the horse's lean before it throws you.",
-    leanLeft: 'Lean Left',
-    leanRight: 'Lean Right',
-    steady: 'Hold Steady',
-    cueLeft: 'The horse pitches left.',
-    cueRight: 'The horse pitches right.',
-    cueSteady: 'The horse steadies.',
+    mountPrompt: 'Climb aboard: press {key} to mount the training Valorsteed.',
+    ridePrompt: 'Ride the flagged course, every gate in order.',
+    progress: 'Gate {n} of {total}',
     begin: 'Begin Lesson',
     abort: 'Give Up',
-    round: 'Round {n} of {total}',
-    misses: 'Slips {n} of {cap}',
     thrown: 'You were thrown. Steady up and try again.',
     success: 'You have tamed the Valorsteed.',
     close: 'Close',

@@ -13,6 +13,7 @@ import type {
   ZoneDef,
   ZonePropsDef,
 } from '../types';
+import { RIDING_COURSE, STABLE_HORSE_TEMPLATE_ID, STABLE_PADDOCK } from './mounts';
 
 export const ZONE3_ZONE: ZoneDef = {
   id: 'thornpeak_heights',
@@ -35,6 +36,7 @@ export const ZONE3_ZONE: ZoneDef = {
     { x: 55, z: 820, label: 'Wyrmcult Tents' },
     { x: -40, z: 830, label: 'Revenant Fields' },
     { x: 0, z: 880, label: 'Gravewyrm Sanctum' },
+    { x: 100, z: 686, label: 'Highwatch Stables' },
   ],
   welcome: 'Captain Thessaly holds the wall at Highwatch — barely.',
 };
@@ -62,6 +64,11 @@ export const ZONE3_ROADS: { x: number; z: number }[][] = [
     { x: 0, z: 780 },
     { x: 0, z: 860 },
   ], // -> Sanctum Approach
+  [
+    { x: 70, z: 720 },
+    { x: 82, z: 708 },
+    { x: 90, z: 700 },
+  ], // Stormcrag road -> Highwatch Stables (Marla's gate)
 ];
 
 // ---------------------------------------------------------------------------
@@ -987,6 +994,31 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     scale: 0.95,
     color: 0x9fb3c8,
   },
+  // Ambient stable horses at the Highwatch Stables: pure decoration. Held
+  // non-hostile every tick and driven by the ambient locomotion arm (never
+  // aggro/combat/evade, un-attackable, un-tameable since taming needs a hostile
+  // target), but they DO amble within the paddock (src/sim/mob/ambient.ts). No
+  // loot, no xp. aggroRadius 0 and moveSpeed a slow walk. Rendered as the
+  // Valorsteed horse model via MOB_KEYS in src/render/characters/manifest.ts.
+  [STABLE_HORSE_TEMPLATE_ID]: {
+    id: STABLE_HORSE_TEMPLATE_ID,
+    name: 'Stable Horse',
+    minLevel: 1,
+    maxLevel: 1,
+    family: 'beast',
+    ambient: true,
+    hpBase: 42,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 2.0,
+    armorPerLevel: 0,
+    moveSpeed: 3.0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1.0,
+    color: 0x8b6b4a,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -1157,14 +1189,15 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
   },
   // Relocated from Eastbrook Vale (zone 1): Marla moved her stable up to
   // Highwatch, where the mountain roads finally justified teaching riding
-  // lessons instead of just selling reins over a fence. Stands at the gate of
-  // the stable yard, a short walk down the slope southwest of the south gate.
+  // lessons instead of just selling reins over a fence. Stands at the paddock
+  // opening of the Highwatch Stables, on the open ground west of Highwatch,
+  // facing the yard (STABLE_PADDOCK, content/mounts.ts).
   stablemaster_marla: {
     id: 'stablemaster_marla',
     name: 'Marla Hitchen',
     title: 'Stablemaster',
-    pos: { x: -18, z: 626 },
-    facing: -1.7,
+    pos: { x: 90, z: 701 },
+    facing: Math.PI, // face -z, into the paddock opening
     color: 0x8b5a2b,
     questIds: ['q_riding_lessons'],
     greeting:
@@ -1834,7 +1867,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Riding Lessons',
     giverNpcId: 'stablemaster_marla',
     turnInNpcId: 'stablemaster_marla',
-    text: "Every rider walks in on two legs, $N, same as I told you the day we met. The sitting is what I teach, not what I sell, and I do not teach it in one afternoon. Climb up, mind my hands on the reins, and match the Valorsteed's lean before it decides you are not worth the trouble.",
+    text: 'Every rider walks in on two legs, $N, same as I told you the day we met. The sitting is what I teach, not what I sell. Climb into the saddle when I give the word, then ride the flagged course around my paddock, every gate in order. Lose the saddle or leave the yard and we start again.',
     completionText:
       'There, now. Not one grab at the fence rail the whole run through. The Valorsteed is yours, $N: saddle, reins, and the standing of a rider who earned the seat instead of buying it.',
     objectives: [
@@ -1937,6 +1970,11 @@ export const ZONE3_CAMPS: CampDef[] = [
   // with two zealot drakebinders posted to keep their captive on its chain.
   { mobId: 'voskar_emberwing', center: { x: 80, z: 845 }, radius: 4, count: 1 },
   { mobId: 'wyrmcult_zealot', center: { x: 80, z: 845 }, radius: 7, count: 2 },
+  // Ambient stable horses inside the Highwatch Stables paddock. radius 0 (exact
+  // spawn, no scatter draw); the ambient wander keeps them inside the fences.
+  { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 96, z: 682 }, radius: 0, count: 1 },
+  { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 105, z: 688 }, radius: 0, count: 1 },
+  { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 99, z: 690 }, radius: 0, count: 1 },
 ];
 
 export const ZONE3_OBJECTS: GroundObjectDef[] = [
@@ -3203,19 +3241,19 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { kind: 'house', x: 18, z: 660, w: 6, d: 5, rot: 1.2 },
     { kind: 'inn', x: -15, z: 666, w: 6, d: 7, rot: 0.6 },
     { kind: 'chapel', x: -16, z: 650, w: 5, d: 7, rot: 0.9 },
-    // Stable yard (Stablemaster Marla): a short walk down the slope southwest of
-    // the south gate, clear of the ridge_stalker/training_dummy camps. The barn
-    // reuses the 'inn' building kind for a larger, barn-like footprint.
-    { kind: 'inn', x: -20, z: 630, w: 9, d: 7, rot: -0.3 },
+    // Highwatch Stables barn (Stablemaster Marla): on the open ground west of
+    // Highwatch, just north of the paddock opening. Reuses the 'inn' building
+    // kind for a larger, barn-like footprint, angled to face the paddock gate.
+    { kind: 'inn', x: 86, z: 706, w: 10, d: 8, rot: 2.7 },
   ],
   wells: [
     { x: 0, z: 662, r: 1.5 },
-    { x: -19, z: 620, r: 1.3 }, // stable yard water trough
+    { x: 94, z: 704, r: 1.5 }, // stables water trough (outside the paddock, by the gate)
   ],
   stalls: [
     { x: -7.5, z: 667, rot: Math.PI / 2, r: 1.7 }, // Quartermaster Bree
     { x: -4.5, z: 673.5, rot: -0.6, r: 1.7 }, // Armorer Hode
-    { x: -11, z: 633, rot: 1.0, r: 1.6 }, // stable yard feed stall
+    { x: 81, z: 702, rot: 1.2, r: 1.6 }, // stables feed stall (by the barn)
   ],
   mines: [
     { x: 88, z: 612, rot: -2.0 }, // Deeprock Burrows
@@ -3232,8 +3270,8 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { x: 58, z: 823, rot: -0.5, scale: 1 },
     { x: 60, z: 812, rot: 2.2, scale: 1 },
     { x: 28, z: 848, rot: 1.5, scale: 1 },
-    // Stable yard: a tack tent beside the barn
-    { x: -10, z: 628, rot: 2.0, scale: 1 },
+    // Stables: a tack tent beside the barn
+    { x: 79, z: 708, rot: 2.2, scale: 1 },
   ],
   crates: [
     [-118, 728],
@@ -3259,12 +3297,41 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { x: 12, z: 858, ringR: 6, columns: 5 },
   ],
   fences: [
-    { x1: -14, z1: 649, x2: -4, z2: 647 }, // south gate, east run
-    { x1: 4, z1: 647, x2: 14, z2: 649 }, // south gate, west run
-    // Stable yard corral: three fenced sides open north toward the barn door
-    { x1: -25, z1: 614, x2: -25, z2: 626 }, // corral, west run
-    { x1: -25, z1: 614, x2: -13, z2: 614 }, // corral, south run
-    { x1: -13, z1: 614, x2: -13, z2: 626 }, // corral, east run
+    { x1: -14, z1: 649, x2: -4, z2: 647 }, // town south gate, east run
+    { x1: 4, z1: 647, x2: 14, z2: 649 }, // town south gate, west run
+    // Highwatch Stables paddock (STABLE_PADDOCK, content/mounts.ts): full west,
+    // south, and east runs; the north run splits around the 4-unit opening Marla
+    // stands at. The ambient horses' wander bound reads the same rectangle.
+    {
+      x1: STABLE_PADDOCK.xMin,
+      z1: STABLE_PADDOCK.zMin,
+      x2: STABLE_PADDOCK.xMin,
+      z2: STABLE_PADDOCK.zMax,
+    }, // west
+    {
+      x1: STABLE_PADDOCK.xMin,
+      z1: STABLE_PADDOCK.zMin,
+      x2: STABLE_PADDOCK.xMax,
+      z2: STABLE_PADDOCK.zMin,
+    }, // south
+    {
+      x1: STABLE_PADDOCK.xMax,
+      z1: STABLE_PADDOCK.zMin,
+      x2: STABLE_PADDOCK.xMax,
+      z2: STABLE_PADDOCK.zMax,
+    }, // east
+    {
+      x1: STABLE_PADDOCK.xMin,
+      z1: STABLE_PADDOCK.zMax,
+      x2: STABLE_PADDOCK.openingXMin,
+      z2: STABLE_PADDOCK.zMax,
+    }, // north, west of opening
+    {
+      x1: STABLE_PADDOCK.openingXMax,
+      z1: STABLE_PADDOCK.zMax,
+      x2: STABLE_PADDOCK.xMax,
+      z2: STABLE_PADDOCK.zMax,
+    }, // north, east of opening
   ],
   graveyards: [
     { x: 15, z: 645 },
@@ -3273,4 +3340,8 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { x: -139, z: 787 },
   ],
   delveMarkers: [{ x: -95, z: 505, delveId: 'drowned_litany' }],
+  // A marker pennant at each riding-course gate (RIDING_COURSE, content/mounts.ts),
+  // so the props can never drift from the lesson route. Collision-free (colliders
+  // does not read courseFlags) so they never obstruct the riding line.
+  courseFlags: RIDING_COURSE.gates.map((g) => ({ x: g.x, z: g.z })),
 };

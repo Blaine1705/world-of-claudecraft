@@ -920,6 +920,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Örümcek Yumurta Kesesi',
   'entities.mobs.sump_troll_devourer.name': 'Obur Batak Trolü',
   'entities.mobs.thunzharr_stormling.name': 'Uyanmış Fırtına Dölü',
+  'entities.mobs.stable_horse.name': 'Ahır Atı',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Uyanan Zirve',
   'entities.mobs.tolling_bell.name': 'Çalan Çan',
   'entities.mobs.vale_cup_ball.name': 'Yaban Domuzu Topu',
@@ -2551,7 +2552,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Her binici buraya iki ayağıyla gelir, {className}. Çamura yüz üstü düşmeden Valorsteed'e oturana dek dizginleri sana vermem, çünkü Highwatch'ta kırık kemiklere bakacak fazladan şifacı yok.",
   'entities.quests.q_riding_lessons.title': 'Binicilik Dersleri',
   'entities.quests.q_riding_lessons.text':
-    "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil, ve bu bir öğleden sonrada öğrenilmez. Bin, dizginlerdeki ellerime dikkat et ve seni fazla zahmetli bulup atmadan önce Valorsteed'in yatışına ayak uydur.",
+    'Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. İşaret verdiğimde eyere çık, sonra padoğumun etrafındaki bayraklı parkuru sürüp her kapıdan sırayla geç. Eyeri kaybedersen ya da avludan çıkarsan baştan başlarız.',
   'entities.quests.q_riding_lessons.completion':
     'İşte böyle. Bütün tur boyunca bir kere bile çite tutunmadın. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.',
   'entities.quests.q_riding_lessons.objectives.0.label': "Valorsteed'i evcilleştir",
@@ -3098,6 +3099,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Ejder Tarikatı Çadırları',
   'entities.zones.thornpeak_heights.pois.8.label': 'Hortlak Tarlaları',
   'entities.zones.thornpeak_heights.pois.9.label': 'Mezarejderi Mabedi',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Highwatch Ahırları',
   'entities.zones.thornpeak_heights.welcome':
     "Yüzbaşı Thessaly, Yüksek Gözcü'deki duvarı tutuyor, zar zor.",
   'errors.api.accountBanned': 'Bu hesap yasaklandı.',

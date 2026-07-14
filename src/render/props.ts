@@ -1478,6 +1478,48 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     group.add(face);
   }
 
+  // ---- riding-course marker pennants (Highwatch Stables) -------------------
+  // A collision-free flag post at each RIDING_COURSE gate (courseFlags): a wooden
+  // pole with a bright triangular pennant so the riding line reads on the ground.
+  // No collider is registered for these (colliders.ts does not read courseFlags),
+  // so they never obstruct the riding line. Merged static, like the other props.
+  const courseFlags = getActiveWorldContent().props.courseFlags ?? [];
+  if (courseFlags.length > 0) {
+    const poleMat = surfaceMat({ color: 0x6b4a2b, roughness: 1 });
+    const pennantMat = surfaceMat({ color: 0xc23b2e, roughness: 0.85 });
+    const poleH = 2.6;
+    // A two-faced triangle (front + reversed back) so a single-sided material
+    // shows the pennant from both sides; a flat uv keeps it merge-compatible.
+    const pennantGeo = new THREE.BufferGeometry();
+    pennantGeo.setAttribute(
+      'position',
+      new THREE.BufferAttribute(
+        new Float32Array([
+          0, 0, 0, 0, -0.55, 0, 0.95, -0.28, 0, 0, 0, 0, 0.95, -0.28, 0, 0, -0.55, 0,
+        ]),
+        3,
+      ),
+    );
+    pennantGeo.setAttribute(
+      'uv',
+      new THREE.BufferAttribute(new Float32Array([0, 1, 0, 0, 1, 0.5, 0, 1, 1, 0.5, 0, 0]), 2),
+    );
+    pennantGeo.computeVertexNormals();
+    for (const f of courseFlags) {
+      const y = ground(f.x, f.z);
+      const g = new THREE.Group();
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, poleH, 6), poleMat);
+      pole.position.y = poleH / 2;
+      g.add(pole);
+      const flag = new THREE.Mesh(pennantGeo, pennantMat);
+      flag.position.y = poleH - 0.15;
+      flag.rotation.y = propRand(f.x, f.z, 9) * Math.PI * 2;
+      g.add(flag);
+      g.position.set(f.x, y, f.z);
+      group.add(shadowed(g));
+    }
+  }
+
   // ---- flush instanced batches ---------------------------------------------
   const cullables: PropCullable[] = [];
   for (const batch of instanceBatches.values()) {

@@ -1,41 +1,49 @@
 // Direct + facade tests for the riding-lesson (mount-training) minigame
-// (src/sim/mounts_training.ts), modeled on tests/lockpick_session.test.ts and
-// tests/lockpick_timeout.test.ts: drives the module through the Sim facade
-// (mountTrainBegin/mountTrainAnswer/mountTrainAbort/mountTrainingView), the
-// same surface the server command dispatch and the online client use.
-//
-// q_riding_lessons (giver/turnIn stablemaster_marla, minLevel 20, one
-// 'interact' objective keyed on the sentinel targetObjectItemId
-// 'train_valorsteed') and the stablemaster_marla NPC are real content (landed
-// by the parallel content slice); this file drives them as-is rather than
-// faking a quest, so it stays correct regardless of exactly where Marla's
-// stable sits.
+// (src/sim/mounts_training.ts): a ridden equestrian course. Drives the module
+// through the Sim facade (mountTrainBegin / toggleMounted / mountTrainAbort /
+// mountTrainingView), the same surface the server command dispatch and the online
+// client use. q_riding_lessons (giver/turnIn stablemaster_marla, minLevel 20, one
+// 'interact' objective keyed on the sentinel targetObjectItemId 'train_valorsteed')
+// and the stablemaster_marla NPC are real content; this file drives them as-is.
 
 import { describe, expect, it } from 'vitest';
+import { RIDING_COURSE } from '../src/sim/content/mounts';
 import { QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { TrainingLean } from '../src/sim/types';
-import { terrainHeight } from '../src/sim/world';
+import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const RIDING_LESSONS_QUEST_ID = 'q_riding_lessons';
 const MOUNT_TRAIN_FEE_COPPER = 10000;
+const GATES = RIDING_COURSE.gates;
 
 const makeSim = (seed = 1) => new Sim({ seed, playerClass: 'warrior', autoEquip: true });
 
-/** Stand the player at the stablemaster, level 20, actively on the riding-lesson
- * quest with its objective not yet complete. Leaves copper untouched (a fresh
- * character starts at 0, which is exactly the "cannot afford" fixture); pass
- * `copper` to fund the lesson. */
-function setupAtMarla(sim: Sim, opts: { copper?: number } = {}): void {
-  sim.setPlayerLevel(20);
+function marlaOf(sim: Sim) {
   const marla = [...sim.entities.values()].find(
     (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
-  )!;
+  );
   expect(marla, 'stablemaster_marla must be a live NPC entity').toBeDefined();
-  sim.player.pos.x = marla.pos.x;
-  sim.player.pos.z = marla.pos.z;
-  sim.player.pos.y = terrainHeight(marla.pos.x, marla.pos.z, sim.cfg.seed);
+  return marla!;
+}
+
+function teleport(sim: Sim, x: number, z: number): void {
+  sim.player.pos.x = x;
+  sim.player.pos.z = z;
+  sim.player.pos.y = terrainHeight(x, z, sim.cfg.seed);
   sim.player.prevPos = { ...sim.player.pos };
+}
+
+function standAtMarla(sim: Sim): void {
+  const marla = marlaOf(sim);
+  teleport(sim, marla.pos.x, marla.pos.z);
+}
+
+/** Stand the player at the stablemaster, level 20, actively on the riding-lesson
+ * quest with its objective not yet complete. Leaves copper at the fresh default (0),
+ * the "cannot afford" fixture; pass `copper` to fund the lesson. */
+function setupAtMarla(sim: Sim, opts: { copper?: number } = {}): void {
+  sim.setPlayerLevel(20);
+  standAtMarla(sim);
   const meta = sim.players.get(sim.playerId)!;
   meta.questLog.set(RIDING_LESSONS_QUEST_ID, {
     questId: RIDING_LESSONS_QUEST_ID,
@@ -45,18 +53,48 @@ function setupAtMarla(sim: Sim, opts: { copper?: number } = {}): void {
   if (opts.copper !== undefined) meta.copper = opts.copper;
 }
 
-/** The current live view's cue, or throws if there is none. */
-function currentCue(sim: Sim): TrainingLean {
-  const view = sim.mountTrainingView();
-  expect(view, 'expected an active riding-lesson session').not.toBeNull();
-  return view!.cue;
+/** Begin a lesson: the session opens in phase 'mount' (a session exists but the
+ * player has not summoned the training steed yet). */
+function beginLesson(sim: Sim): void {
+  sim.mountTrainBegin();
+  sim.tick();
 }
 
-const WRONG: Record<TrainingLean, TrainingLean> = {
-  left: 'right',
-  right: 'left',
-  steady: 'left',
-};
+/** Summon the training Valorsteed via the Mount/Dismount toggle and run the summon
+ * channel to completion, flipping the session to phase 'ride'. Returns the phase-flip
+ * mountTrainSession event, if any. */
+function mountTrainingSteed(sim: Sim) {
+  sim.toggleMounted();
+  let flip: unknown = null;
+  for (let i = 0; i < 60 && sim.player.mountKey !== 'valorsteed'; i++) {
+    const evs = sim.tick();
+    const f = evs.find((e) => e.type === 'mountTrainSession' && (e as any).phase === 'ride');
+    if (f) flip = f;
+  }
+  return flip;
+}
+
+/** Teleport onto a gate and tick, so the driver registers the pass. */
+function rideThroughGate(sim: Sim, g: { x: number; z: number }) {
+  teleport(sim, g.x, g.z);
+  return sim.tick();
+}
+
+// The whole course must sit on dry mountain ground, or a teleported mounted rider
+// would swim and be dismounted before the gate check ever runs. Assert it once.
+describe('mount-training course geometry is rideable', () => {
+  it('the paddock centre and every gate are above water', () => {
+    const seed = makeSim().cfg.seed;
+    expect(terrainHeight(RIDING_COURSE.center.x, RIDING_COURSE.center.z, seed)).toBeGreaterThan(
+      WATER_LEVEL,
+    );
+    for (const g of GATES) {
+      expect(terrainHeight(g.x, g.z, seed), `gate ${g.x},${g.z} above water`).toBeGreaterThan(
+        WATER_LEVEL,
+      );
+    }
+  });
+});
 
 describe('mount-training minigame, begin gates', () => {
   it('refuses an underlevel player (no session started)', () => {
@@ -75,9 +113,7 @@ describe('mount-training minigame, begin gates', () => {
   it('refuses when too far from the stablemaster', () => {
     const sim = makeSim();
     sim.setPlayerLevel(20);
-    sim.player.pos.x = -9999;
-    sim.player.pos.z = -9999;
-    sim.player.prevPos = { ...sim.player.pos };
+    teleport(sim, -9999, -9999);
     sim.mountTrainBegin();
     const events = sim.tick();
     expect(
@@ -89,13 +125,7 @@ describe('mount-training minigame, begin gates', () => {
   it('refuses when not actively on q_riding_lessons', () => {
     const sim = makeSim();
     sim.setPlayerLevel(20);
-    const marla = [...sim.entities.values()].find(
-      (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
-    )!;
-    sim.player.pos.x = marla.pos.x;
-    sim.player.pos.z = marla.pos.z;
-    sim.player.pos.y = terrainHeight(marla.pos.x, marla.pos.z, sim.cfg.seed);
-    sim.player.prevPos = { ...sim.player.pos };
+    standAtMarla(sim);
     sim.mountTrainBegin();
     const events = sim.tick();
     expect(
@@ -125,8 +155,7 @@ describe('mount-training minigame, begin gates', () => {
   it('refuses starting a second session while one is already in progress', () => {
     const sim = makeSim();
     setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
-    sim.mountTrainBegin();
-    sim.tick();
+    beginLesson(sim);
     const firstSessionId = sim.mountTrainingView()!.sessionId;
     sim.mountTrainBegin(); // ignored: a session is already IN_PROGRESS
     const events = sim.tick();
@@ -139,99 +168,60 @@ describe('mount-training minigame, begin gates', () => {
   });
 });
 
-describe('mount-training minigame, fee (100g, charged once)', () => {
-  it('charges the fee exactly once on the first successful begin; a retry after a throw is free', () => {
+describe('mount-training minigame, mounting the training steed', () => {
+  it('Z in phase mount summons the UNOWNED Valorsteed via the channel, leaving the persisted pick alone', () => {
     const sim = makeSim();
-    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER + 500 });
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
     const meta = sim.players.get(sim.playerId)!;
+    meta.selectedMount = 'grag_bear'; // an unowned, non-default pick to prove it is untouched
+    beginLesson(sim);
+    expect(sim.mountTrainingView()!.phase).toBe('mount');
+    expect(meta.inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(false);
 
-    sim.mountTrainBegin();
-    const opened = sim.tick();
-    expect(opened.find((e) => e.type === 'mountTrainSession')).toBeDefined();
-    expect(meta.copper).toBe(500);
-    expect(meta.mountTrainingFeePaid).toBe(true);
-    const firstSessionId = sim.mountTrainingView()!.sessionId;
+    sim.toggleMounted(); // starts the training summon channel
+    expect(sim.player.mountCastKey).toBe('valorsteed');
+    for (let i = 0; i < 60 && sim.player.mountKey !== 'valorsteed'; i++) sim.tick();
 
-    // Two wrong answers in a row (missCap = 2) throws the rider.
-    sim.mountTrainAnswer(WRONG[currentCue(sim)]);
-    sim.tick();
-    sim.mountTrainAnswer(WRONG[currentCue(sim)]);
-    const thrownEvents = sim.tick();
-    expect(
-      thrownEvents.find((e) => e.type === 'mountTrainEnd' && (e as any).outcome === 'thrown'),
-    ).toBeDefined();
-    expect(sim.mountTrainingView()).toBeNull();
-    expect(meta.copper).toBe(500); // no second charge, no refund
+    expect(sim.player.mountKey).toBe('valorsteed'); // riding the unowned training steed
+    expect(meta.selectedMount).toBe('grag_bear'); // persisted pick untouched by the lesson
+  });
 
-    // Retry: no copper left to pay a second fee, yet it starts (the fee stayed paid).
-    sim.mountTrainBegin();
-    const retryEvents = sim.tick();
-    expect(retryEvents.find((e) => e.type === 'error')).toBeUndefined();
-    const retrySession = retryEvents.find((e) => e.type === 'mountTrainSession') as any;
-    expect(retrySession).toBeDefined();
-    expect(retrySession.sessionId).not.toBe(firstSessionId);
-    expect(meta.copper).toBe(500); // still unchanged: the retry was free
+  it('flips to phase ride when the summon completes, re-emitting the session', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
+    beginLesson(sim);
+    const flip = mountTrainingSteed(sim);
+    expect(flip).toBeDefined();
+    const view = sim.mountTrainingView()!;
+    expect(view.phase).toBe('ride');
+    expect(view.gate).toBe(0);
+    expect(view.nextGate).toEqual({ x: GATES[0].x, z: GATES[0].z });
   });
 });
 
-describe('mount-training minigame, rounds', () => {
-  it('a wrong answer counts a miss without advancing the round', () => {
+describe('mount-training minigame, riding the course', () => {
+  it('gates must be passed in order (standing at a later gate while an earlier one is next does nothing)', () => {
     const sim = makeSim();
     setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
-    sim.mountTrainBegin();
-    sim.tick();
-    const before = sim.mountTrainingView()!;
-    expect(before.round).toBe(1);
-    expect(before.misses).toBe(0);
+    beginLesson(sim);
+    mountTrainingSteed(sim);
 
-    sim.mountTrainAnswer(WRONG[before.cue]);
-    const events = sim.tick();
-    const roundEv = events.find((e) => e.type === 'mountTrainRound') as any;
-    expect(roundEv).toBeDefined();
-    expect(roundEv.result).toBe('miss');
-    expect(roundEv.round).toBe(1); // a miss retries the SAME round with a fresh cue
-    expect(roundEv.misses).toBe(1);
-    expect(sim.mountTrainingView()!.round).toBe(1);
-    expect(sim.mountTrainingView()!.misses).toBe(1);
+    // Stand on the third gate while gate 1 is still the next required gate.
+    teleport(sim, GATES[2].x, GATES[2].z);
+    sim.tick();
+    expect(sim.mountTrainingView()!.gate).toBe(0);
+
+    // Now pass the actual next gate (gate 0).
+    const evs = rideThroughGate(sim, GATES[0]);
+    const gateEv = evs.find((e) => e.type === 'mountTrainGate') as any;
+    expect(gateEv).toBeDefined();
+    expect(gateEv.gate).toBe(1);
+    expect(gateEv.gatesTotal).toBe(GATES.length);
+    expect(sim.mountTrainingView()!.gate).toBe(1);
+    expect(sim.mountTrainingView()!.nextGate).toEqual({ x: GATES[1].x, z: GATES[1].z });
   });
 
-  it('a timeout counts a miss exactly like a wrong answer', () => {
-    const sim = makeSim(7);
-    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
-    sim.mountTrainBegin();
-    sim.tick();
-    expect(sim.mountTrainingView()!.misses).toBe(0);
-
-    // Idle past the round's deadline: the sim, not the client, times it out.
-    let sawMiss = false;
-    for (let i = 0; i < 400 && sim.mountTrainingView() && !sawMiss; i++) {
-      const events = sim.tick();
-      const roundEv = events.find((e) => e.type === 'mountTrainRound') as any;
-      if (roundEv?.result === 'miss') sawMiss = true;
-    }
-    expect(sawMiss).toBe(true);
-    expect(sim.mountTrainingView()!.misses).toBe(1);
-  });
-
-  it('two misses (wrong answer or timeout) throws the rider; the session clears', () => {
-    const sim = makeSim();
-    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
-    sim.mountTrainBegin();
-    sim.tick();
-
-    sim.mountTrainAnswer(WRONG[currentCue(sim)]);
-    sim.tick();
-    expect(sim.mountTrainingView()!.misses).toBe(1);
-
-    sim.mountTrainAnswer(WRONG[currentCue(sim)]);
-    const events = sim.tick();
-    const end = events.find((e) => e.type === 'mountTrainEnd') as any;
-    expect(end).toBeDefined();
-    expect(end.outcome).toBe('thrown');
-    expect(sim.mountTrainingView()).toBeNull();
-  });
-
-  it('six correct answers succeed: quest credit is granted exactly once, reins are never granted directly', () => {
+  it('a full lap credits the objective once, force-dismounts, and clears the session; reins are never granted directly', () => {
     const sim = makeSim();
     setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
     const meta = sim.players.get(sim.playerId)!;
@@ -241,35 +231,131 @@ describe('mount-training minigame, rounds', () => {
     );
     expect(objIndex).toBeGreaterThanOrEqual(0);
 
-    sim.mountTrainBegin();
-    sim.tick();
+    beginLesson(sim);
+    mountTrainingSteed(sim);
 
-    let successEvent: any = null;
-    for (let round = 1; round <= 6 && !successEvent; round++) {
-      const cue = currentCue(sim);
-      sim.mountTrainAnswer(cue);
-      const events = sim.tick();
-      successEvent = events.find((e) => e.type === 'mountTrainEnd') ?? null;
+    let endEv: any = null;
+    for (const g of GATES) {
+      const evs = rideThroughGate(sim, g);
+      endEv = evs.find((e) => e.type === 'mountTrainEnd') ?? endEv;
     }
-    expect(successEvent).not.toBeNull();
-    expect(successEvent.outcome).toBe('success');
+    expect(endEv).not.toBeNull();
+    expect(endEv.outcome).toBe('success');
     expect(sim.mountTrainingView()).toBeNull();
+    expect(sim.player.mountKey).toBe(''); // the unowned steed is taken back instantly
 
     const qp = meta.questLog.get(RIDING_LESSONS_QUEST_ID)!;
     expect(qp.counts[objIndex]).toBe(1); // credited exactly once
     expect(qp.state).toBe('ready'); // ready to turn in at Marla for reins_valorsteed
-    expect(meta.inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(false); // never granted directly
+    expect(meta.inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(false);
     expect(meta.copper).toBe(0); // the fee was charged once, nothing more
+  });
+
+  it('turning the quest in at Marla grants reins_valorsteed', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
+    const meta = sim.players.get(sim.playerId)!;
+    beginLesson(sim);
+    mountTrainingSteed(sim);
+    for (const g of GATES) rideThroughGate(sim, g);
+    expect(meta.questLog.get(RIDING_LESSONS_QUEST_ID)!.state).toBe('ready');
+
+    standAtMarla(sim); // walk back to the stablemaster to hand in
+    sim.turnInQuest(RIDING_LESSONS_QUEST_ID);
+    sim.tick();
+    expect(meta.inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(true);
+  });
+});
+
+describe('mount-training minigame, failure and retry', () => {
+  it('dismounting mid-ride throws the rider and clears the session; an immediate free retry works', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
+    const meta = sim.players.get(sim.playerId)!;
+    beginLesson(sim);
+    mountTrainingSteed(sim); // mounted at Marla, never rode away
+
+    sim.toggleMounted(); // start the dismount channel
+    let thrown: any = null;
+    for (let i = 0; i < 40 && !thrown; i++) {
+      thrown = sim
+        .tick()
+        .find((e) => e.type === 'mountTrainEnd' && (e as any).outcome === 'thrown');
+    }
+    expect(thrown).toBeDefined();
+    expect(sim.mountTrainingView()).toBeNull();
+    expect(sim.player.mountKey).toBe('');
+
+    // Retry: still at Marla, no copper needed (the fee stayed paid).
+    sim.mountTrainBegin();
+    const retry = sim.tick();
+    expect(retry.find((e) => e.type === 'error')).toBeUndefined();
+    expect(retry.find((e) => e.type === 'mountTrainSession')).toBeDefined();
+    expect(meta.copper).toBe(0);
+  });
+
+  it('charges the fee exactly once; a retry after a throw is free', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER + 500 });
+    const meta = sim.players.get(sim.playerId)!;
+
+    beginLesson(sim);
+    expect(meta.copper).toBe(500);
+    expect(meta.mountTrainingFeePaid).toBe(true);
+    const firstSessionId = sim.mountTrainingView()!.sessionId;
+
+    mountTrainingSteed(sim);
+    sim.toggleMounted(); // dismount to throw
+    for (let i = 0; i < 40 && sim.mountTrainingView(); i++) sim.tick();
+    expect(sim.mountTrainingView()).toBeNull();
+    expect(meta.copper).toBe(500); // no second charge, no refund
+
+    sim.mountTrainBegin();
+    const retryEvents = sim.tick();
+    expect(retryEvents.find((e) => e.type === 'error')).toBeUndefined();
+    const retrySession = retryEvents.find((e) => e.type === 'mountTrainSession') as any;
+    expect(retrySession).toBeDefined();
+    expect(retrySession.sessionId).not.toBe(firstSessionId);
+    expect(meta.copper).toBe(500); // still unchanged: the retry was free
+  });
+
+  it('leaving the paddock (beyond boundsRadius) abandons the lesson and force-dismounts', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
+    beginLesson(sim);
+    mountTrainingSteed(sim);
+
+    teleport(sim, RIDING_COURSE.center.x + RIDING_COURSE.boundsRadius + 15, RIDING_COURSE.center.z);
+    const evs = sim.tick();
+    expect(
+      evs.find((e) => e.type === 'mountTrainEnd' && (e as any).outcome === 'abandoned'),
+    ).toBeDefined();
+    expect(sim.mountTrainingView()).toBeNull();
+    expect(sim.player.mountKey).toBe('');
+  });
+
+  it('death ends the session as a throw and clears it', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
+    beginLesson(sim);
+    mountTrainingSteed(sim);
+
+    sim.player.dead = true;
+    sim.player.hp = 0;
+    const evs = sim.tick();
+    expect(
+      evs.find((e) => e.type === 'mountTrainEnd' && (e as any).outcome === 'thrown'),
+    ).toBeDefined();
+    expect(sim.mountTrainingView()).toBeNull();
   });
 });
 
 describe('mount-training minigame, abort / abandon', () => {
-  it('mountTrainAbort ends the session as abandoned (fee stays paid)', () => {
+  it('mountTrainAbort in phase mount ends the session as abandoned (fee stays paid)', () => {
     const sim = makeSim();
     setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
     const meta = sim.players.get(sim.playerId)!;
-    sim.mountTrainBegin();
-    sim.tick();
+    beginLesson(sim);
     sim.mountTrainAbort();
     const events = sim.tick();
     expect(
@@ -279,11 +365,26 @@ describe('mount-training minigame, abort / abandon', () => {
     expect(meta.mountTrainingFeePaid).toBe(true);
   });
 
+  it('mountTrainAbort while riding force-dismounts the unowned steed', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
+    beginLesson(sim);
+    mountTrainingSteed(sim);
+    expect(sim.player.mountKey).toBe('valorsteed');
+
+    sim.mountTrainAbort();
+    const events = sim.tick();
+    expect(
+      events.find((e) => e.type === 'mountTrainEnd' && (e as any).outcome === 'abandoned'),
+    ).toBeDefined();
+    expect(sim.mountTrainingView()).toBeNull();
+    expect(sim.player.mountKey).toBe('');
+  });
+
   it('leaving mid-session abandons it (removePlayer teardown)', () => {
     const sim = makeSim();
     setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
-    sim.mountTrainBegin();
-    sim.tick();
+    beginLesson(sim);
     const meta = sim.players.get(sim.playerId)!;
     expect(meta.mountTraining?.state).toBe('IN_PROGRESS');
     sim.removePlayer(sim.playerId);
@@ -291,26 +392,41 @@ describe('mount-training minigame, abort / abandon', () => {
   });
 });
 
-describe('mount-training minigame, determinism', () => {
-  it('the cue sequence is reproducible from the seed (same seed + same setup => identical cues)', () => {
-    function driveAndCaptureCues(): string[] {
-      const sim = makeSim(42);
-      setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
-      sim.mountTrainBegin();
-      const cues: string[] = [sim.mountTrainingView()!.cue];
-      for (let round = 1; round <= 6; round++) {
-        const view = sim.mountTrainingView();
-        if (!view) break;
-        sim.mountTrainAnswer(view.cue); // always correct: walks every round exactly once
-        sim.tick();
-        const next = sim.mountTrainingView();
-        if (next) cues.push(next.cue);
-      }
-      return cues;
-    }
-    const runA = driveAndCaptureCues();
-    const runB = driveAndCaptureCues();
-    expect(runA.length).toBeGreaterThan(1);
-    expect(runA).toEqual(runB);
+describe('mount-training minigame, deprecated answer command', () => {
+  it('mountTrainAnswer is a no-op that neither errors nor mutates the session', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
+    beginLesson(sim);
+    const before = sim.mountTrainingView();
+    sim.mountTrainAnswer('left');
+    const evs = sim.tick();
+    expect(evs.find((e) => e.type === 'error')).toBeUndefined();
+    expect(sim.mountTrainingView()).toEqual(before);
+  });
+});
+
+describe('mount-training minigame, view projection', () => {
+  it('projects phase mount (null nextGate) then ride (nextGate advancing with the gate)', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
+    beginLesson(sim);
+    expect(sim.mountTrainingView()).toMatchObject({
+      phase: 'mount',
+      gate: 0,
+      gatesTotal: GATES.length,
+      nextGate: null,
+    });
+
+    mountTrainingSteed(sim);
+    expect(sim.mountTrainingView()).toMatchObject({
+      phase: 'ride',
+      gate: 0,
+      nextGate: { x: GATES[0].x, z: GATES[0].z },
+    });
+
+    rideThroughGate(sim, GATES[0]);
+    const v = sim.mountTrainingView()!;
+    expect(v.gate).toBe(1);
+    expect(v.nextGate).toEqual({ x: GATES[1].x, z: GATES[1].z });
   });
 });

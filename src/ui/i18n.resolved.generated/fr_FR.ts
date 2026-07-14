@@ -426,9 +426,9 @@ export const fr_FR: EnTranslations = {
       "requiresLevel": "Niveau {level} requis",
       "pickFirst": "Choisissez une monture à chevaucher.",
       "keybindHint": "Appuyez sur la touche Monter / Descendre (Z par défaut) pour chevaucher.",
-      "notCollected": "Non collectée",
-      "dropHint": "Butin des boss de donjon et de raid.",
-      "stableHint": "Apprenez à monter aux écuries, aux abords de Thornpeak.",
+      "emptyTitle": "Aucune monture collectée",
+      "emptyStableHint": "Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.",
+      "emptyDropHint": "Les montures plus rares sont lâchées par les boss de donjon et de raid.",
       "clickManage": "Cliquez pour choisir votre monture",
       "rarity_common": "Commune",
       "rarity_rare": "Rare",
@@ -451,17 +451,11 @@ export const fr_FR: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const fr_FR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Élémentaire de tempête éveillé"
       },
+      "stable_horse": {
+        "name": "Cheval d'écurie"
+      },
       "ironvein_foreman": {
         "name": "Contremaître Veinefer"
       },
@@ -8441,7 +8438,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Leçons d’équitation",
-        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends, et cela ne s’apprend pas en une après-midi. Monte, surveille mes mains sur les rênes, et suis le balancement du Destrier de Bravoure avant qu’il ne décide que tu n’en vaux pas la peine.",
+        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Monte en selle quand j’en donne l’ordre, puis parcours le tracé balisé autour de mon pré, chaque porte dans l’ordre. Perds la selle ou quitte l’enclos, et l’on recommence.",
         "completion": "Voilà. Pas une seule fois agrippé à la barrière, du début à la fin. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const fr_FR: EnTranslations = {
           },
           "9": {
             "label": "Sanctuaire du Gravewyrm"
+          },
+          "10": {
+            "label": "Écuries de Highwatch"
           }
         }
       }

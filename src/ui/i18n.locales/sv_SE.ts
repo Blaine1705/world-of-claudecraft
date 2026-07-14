@@ -871,6 +871,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Spindeläggsäck',
   'entities.mobs.sump_troll_devourer.name': 'Slukande sumptroll',
   'entities.mobs.thunzharr_stormling.name': 'Väckt stormyngel',
+  'entities.mobs.stable_horse.name': 'Stallhäst',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, den vaknande toppen',
   'entities.mobs.tolling_bell.name': 'Klämtande klocka',
   'entities.mobs.vale_cup_ball.name': 'Vildsvinsboll',
@@ -2475,7 +2476,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Varje ryttare kommer in på två ben, {className}. Tyglarna får du inte förrän du kan sitta kvar på Valorsteed utan att kyssa leran, och Highwatch har inga läkare att avvara för brutna ben.',
   'entities.quests.q_riding_lessons.title': 'Ridlektioner',
   'entities.quests.q_riding_lessons.text':
-    'Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer, och det lär man sig inte på en eftermiddag. Kliv upp, lägg märke till mina händer på tyglarna, och följ Valorsteeds lutning innan den bestämmer att du inte är besväret värd.',
+    'Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer. Kliv upp i sadeln när jag ger tecken, och rid sedan den flaggade banan runt min hage, genom varje grind i tur och ordning. Tappar du sadeln eller lämnar inhägnaden börjar vi om.',
   'entities.quests.q_riding_lessons.completion':
     'Så där ja. Inte en enda gång tog du tag i stängslet under hela ridturen. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Tämj Valorsteed',
@@ -3025,6 +3026,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Lindormskultens tält',
   'entities.zones.thornpeak_heights.pois.8.label': 'Gengångarfälten',
   'entities.zones.thornpeak_heights.pois.9.label': 'Gravlindormens helgedom',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Highwatchs stall',
   'entities.zones.thornpeak_heights.welcome':
     'Kapten Thessaly håller muren vid Högvakten - knappt.',
   'errors.api.accountBanned': 'Detta konto har bannlysts.',

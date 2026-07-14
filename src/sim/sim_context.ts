@@ -538,14 +538,14 @@ export interface SimContextCallbacks {
   tickLockpickTimeout(run: DelveRun): void;
   startDelveRaiseDeadChannel(run: DelveRun, boss: Entity, mobId: string, count: number): boolean;
 
-  // Riding-lesson (mount-training) minigame (src/sim/mounts_training.ts), the
-  // I2b lockpick controller's abandon/timeout precedent applied to a session
-  // that lives directly on PlayerMeta rather than a shared DelveRun.
-  // tickMountTrainingTimeout is the per-tick round-deadline driver (called next
-  // to updateMountTransition in the coordinator's per-player loop);
-  // abandonMountTraining tears down a leaving player's IN_PROGRESS session
-  // (called from the removePlayer leave path, mirroring abandonLockpick).
-  tickMountTrainingTimeout(meta: PlayerMeta): void;
+  // Riding-lesson (mount-training) minigame (src/sim/mounts_training.ts): a ridden
+  // course session that lives directly on PlayerMeta rather than a shared DelveRun.
+  // tickMountTraining is the per-tick course driver (called next to
+  // updateMountTransition in the coordinator's per-player loop: the mount -> ride
+  // phase flip and the gated ride); abandonMountTraining tears down a leaving
+  // player's IN_PROGRESS session (called from the removePlayer leave path,
+  // mirroring abandonLockpick).
+  tickMountTraining(meta: PlayerMeta): void;
   abandonMountTraining(meta: PlayerMeta): void;
 
   // C4a casting lifecycle (src/sim/combat/casting_lifecycle.ts) consumes these; all
@@ -1016,7 +1016,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     abandonLockpick: host.abandonLockpick,
     tickLockpickTimeout: host.tickLockpickTimeout,
     startDelveRaiseDeadChannel: host.startDelveRaiseDeadChannel,
-    tickMountTrainingTimeout: host.tickMountTrainingTimeout,
+    tickMountTraining: host.tickMountTraining,
     abandonMountTraining: host.abandonMountTraining,
     resolvedAbility: host.resolvedAbility,
     playerGcdFor: host.playerGcdFor,

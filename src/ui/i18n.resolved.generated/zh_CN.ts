@@ -426,9 +426,9 @@ export const zh_CN: EnTranslations = {
       "requiresLevel": "需要等级{level}",
       "pickFirst": "选择一个要骑乘的坐骑。",
       "keybindHint": "按下骑乘 / 下骑键(默认Z)即可骑乘。",
-      "notCollected": "未收集",
-      "dropHint": "由地下城和团队副本首领掉落。",
-      "stableHint": "在荆峰郊外的马厩学习骑术。",
+      "emptyTitle": "尚未收集坐骑",
+      "emptyStableHint": "升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。",
+      "emptyDropHint": "较稀有的坐骑由地下城和团队副本首领掉落。",
       "clickManage": "点击选择坐骑",
       "rarity_common": "普通",
       "rarity_rare": "稀有",
@@ -451,17 +451,11 @@ export const zh_CN: EnTranslations = {
     },
     "mountTraining": {
       "title": "骑乘课",
-      "prompt": "在马把你甩下去之前，跟上它的倾斜方向。",
-      "leanLeft": "Lean Left",
-      "leanRight": "向右倾",
-      "steady": "保持稳定",
-      "cueLeft": "马向左倾。",
-      "cueRight": "马向右倾。",
-      "cueSteady": "马站稳了。",
+      "mountPrompt": "上马吧：按 {key} 键骑上训练用英勇战马。",
+      "ridePrompt": "沿着插旗的赛道骑行，按顺序穿过每一道门。",
+      "progress": "第 {n} 道门，共 {total} 道",
       "begin": "开始课程",
       "abort": "Give Up",
-      "round": "第 {n} 轮，共 {total} 轮",
-      "misses": "失误 {n}/{cap}",
       "thrown": "你被甩下马了。稳住，再试一次。",
       "success": "你已经驯服了英勇战马。",
       "close": "关闭"
@@ -7360,6 +7354,9 @@ export const zh_CN: EnTranslations = {
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
       },
+      "stable_horse": {
+        "name": "厩马"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -8441,7 +8438,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "骑术课",
-        "text": "每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。我教的是怎么坐稳，不是拿来卖的东西，这也不是一个下午就能学会的。上马吧，盯紧我握着缰绳的手，在英勇战马决定你不值得费这个劲之前，跟上它倾身的节奏。",
+        "text": "每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。我教的是怎么坐稳，不是拿来卖的东西。等我发话就翻身上鞍，沿着我围场里插旗的赛道，按顺序穿过每一道门。要是从鞍上摔下来，或者跑出了院子，我们就从头再来。",
         "completion": "好了，就是这样。整趟下来你一次都没抓过栅栏。英勇战马现在是你的了，{playerName}：马鞍、缰绳，还有靠本事挣来而不是买来的骑手身份。",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const zh_CN: EnTranslations = {
           },
           "9": {
             "label": "墓龙圣所"
+          },
+          "10": {
+            "label": "高望马厩"
           }
         }
       }

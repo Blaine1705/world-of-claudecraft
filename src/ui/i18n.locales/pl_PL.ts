@@ -877,6 +877,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Pajęczy Kokon Jaj',
   'entities.mobs.sump_troll_devourer.name': 'Troll Pożeracz z Topieli',
   'entities.mobs.thunzharr_stormling.name': 'Zbudzony Burzowiec',
+  'entities.mobs.stable_horse.name': 'Koń stajenny',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Budzący się Szczyt',
   'entities.mobs.tolling_bell.name': 'Bijący Dzwon',
   'entities.mobs.vale_cup_ball.name': 'Dziczy Balon',
@@ -2488,7 +2489,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Każdy jeździec przychodzi na dwóch nogach, {className}. Wodzy nie dostaniesz, dopóki nie utrzymasz się na Valorsteedzie bez całowania błota, a Highwatch nie ma zbyt wielu uzdrowicieli na złamane kości.',
   'entities.quests.q_riding_lessons.title': 'Lekcje jazdy konnej',
   'entities.quests.q_riding_lessons.text':
-    'Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję, a tego nie nauczysz się w jedno popołudnie. Wsiadaj, patrz na moje ręce na wodzach i dopasuj się do przechyłów Valorsteeda, zanim uzna, że nie jesteś wart zachodu.',
+    'Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Wsiądź do siodła, gdy dam znak, a potem przejedź oflagowaną trasę wokół mojego wybiegu, przez każdą bramkę po kolei. Stracisz siodło albo opuścisz zagrodę i zaczynamy od nowa.',
   'entities.quests.q_riding_lessons.completion':
     'No, właśnie tak. Ani razu nie złapałeś się ogrodzenia przez całą przejażdżkę. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Ujeżdżenie Valorsteeda',
@@ -3039,6 +3040,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Namioty Kultu Żmija',
   'entities.zones.thornpeak_heights.pois.8.label': 'Pola Upiorów',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanktuarium Grobowego Żmija',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Stajnie Highwatch',
   'entities.zones.thornpeak_heights.welcome':
     'Kapitan Thessaly utrzymuje mur w Wysokiej Strażnicy, ledwie.',
   'errors.api.accountBanned': 'To konto zostało zbanowane.',

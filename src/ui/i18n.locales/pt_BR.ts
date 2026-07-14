@@ -3547,7 +3547,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Cada cavaleiro chega a pé, {className}. Só entrego as rédeas quando você conseguir montar o Corcel do Valor sem beijar a lama, e Highwatch não tem curandeiros de sobra para ossos quebrados.',
   'entities.quests.q_riding_lessons.title': 'Aulas de Equitação',
   'entities.quests.q_riding_lessons.text':
-    'Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo, e isso não se aprende em uma tarde. Suba, preste atenção nas minhas mãos nas rédeas, e acompanhe a inclinação do Corcel do Valor antes que ele decida que você não vale o esforço.',
+    'Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo. Suba na sela quando eu der o sinal, e então percorra o trajeto sinalizado ao redor do meu picadeiro, passando por cada portão em ordem. Perca a sela ou saia do cercado e começamos de novo.',
   'entities.quests.q_riding_lessons.completion':
     'Pronto, assim mesmo. Nem uma vez você se segurou na cerca durante toda a volta. O Corcel do Valor é seu, {playerName}: sela, rédeas, e a reputação de um cavaleiro que conquistou o assento em vez de comprá-lo.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Domar o Corcel do Valor',
@@ -4093,6 +4093,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Tendas do Culto do Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Campos de revenantes',
   'entities.zones.thornpeak_heights.pois.9.label': 'Santuário do Gravewyrm',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Estábulos de Highwatch',
   'entities.dungeons.hollow_crypt.name': 'A Cripta Vazia',
   'entities.dungeons.hollow_crypt.enterText': 'Você desce para a Cripta Vazia...',
   'entities.dungeons.hollow_crypt.leaveText': 'Você volta à luz do dia.',
@@ -4560,6 +4561,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Guarda-cintura do Chamatormentas',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, o Pico Desperto',
   'entities.mobs.thunzharr_stormling.name': 'Elemental de tormenta desperto',
+  'entities.mobs.stable_horse.name': 'Cavalo de estábulo',
   'hudChrome.worldBoss.spawn': '{name} ergue-se sobre as Alturas de Thornpeak!',
   'entities.items.stormcallers_spaulders.name': 'Espaldares Galecall',
   'hud.chat.context.convertToRaid': 'Converter em raide',
@@ -6756,8 +6758,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.',
-  'hudChrome.mounts.notCollected': 'Não coletada',
-  'hudChrome.mounts.stableHint': 'Aprenda a montar nos estábulos nos arredores de Thornpeak.',
-  'hudChrome.mounts.dropHint': 'Obtida de chefes de masmorra e raide.',
+  'hudChrome.mounts.emptyTitle': 'Nenhuma montaria coletada',
+  'hudChrome.mounts.emptyStableHint':
+    'Alcance o nível 20 e faça aulas de montaria com a Cavalariça-mor Marla nos estábulos a oeste de Highwatch.',
+  'hudChrome.mounts.emptyDropHint': 'Montarias mais raras caem de chefes de masmorra e raide.',
   'hudChrome.mounts.clickManage': 'Clique para escolher sua montaria',
 };

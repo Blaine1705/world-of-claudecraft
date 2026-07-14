@@ -4546,6 +4546,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Stany kultu draka',
   'entities.zones.thornpeak_heights.pois.8.label': 'Pole revenantů',
   'entities.zones.thornpeak_heights.pois.9.label': 'Svatyně Hrobodraka',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Stáje Highwatch',
   'entities.zones.thornpeak_heights.welcome':
     'Kapitánka Thessaly drží zeď u Highwatche, ale sotva.',
   'entities.dungeons.drowned_temple.enterText':
@@ -4652,7 +4653,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každý jezdec sem přijde po svých, {className}. Otěže nedostaneš, dokud neusedneš na Valorsteeda, aniž bys skončil v blátě, a Highwatch nemá ranhojiče nazbyt pro zlomené kosti.',
   'entities.quests.q_riding_lessons.title': 'Jezdecké lekce',
   'entities.quests.q_riding_lessons.text':
-    'Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám, a to se nenaučíš za jedno odpoledne. Vylez nahoru, dávej pozor na mé ruce na otěžích a přizpůsob se náklonu Valorsteeda, než usoudí, že s tebou není žádná námaha.',
+    'Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám. Vylez do sedla, až dám pokyn, a pak projeď vyznačenou trať kolem mého výběhu, každou branou popořadě. Ztratíš sedlo nebo opustíš ohradu a začínáme znovu.',
   'entities.quests.q_riding_lessons.completion':
     'Tak. Ani jednou ses nechytil plotu celou tu dobu. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Zkroť Valorsteeda',
@@ -4787,6 +4788,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sump_troll_devourer.name': 'Trollí požírač z jímky',
   'entities.mobs.thornpeak_ogre.name': 'Thornpeakský zlobr',
   'entities.mobs.thunzharr_stormling.name': 'Probuzený bouřník',
+  'entities.mobs.stable_horse.name': 'Stájový kůň',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, probouzející se štít',
   'entities.mobs.tidebound_acolyte.name': 'Přílivem spoutaný akolyta',
   'entities.mobs.tolling_bell.name': 'Zvonící zvon',

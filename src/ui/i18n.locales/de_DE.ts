@@ -3574,7 +3574,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Jeder Reiter kommt auf zwei Beinen herein, {className}. Die Zügel gebe ich erst, wenn Ihr den Valorross reiten könnt, ohne im Dreck zu landen, und Highwatch hat keine Heiler für gebrochene Knochen übrig.',
   'entities.quests.q_riding_lessons.title': 'Reitstunden',
   'entities.quests.q_riding_lessons.text':
-    'Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe, und das lernt man nicht an einem Nachmittag. Steigt auf, achtet auf meine Hände an den Zügeln, und gleicht Euch der Neigung des Valorross an, bevor er entscheidet, Ihr seid die Mühe nicht wert.',
+    'Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe. Steigt in den Sattel, wenn ich das Wort gebe, und reitet dann den abgesteckten Parcours um meine Koppel, durch jedes Tor der Reihe nach. Verliert Ihr den Sattel oder verlasst den Hof, fangen wir von vorn an.',
   'entities.quests.q_riding_lessons.completion':
     'So, ja. Kein einziges Mal nach dem Zaun gegriffen, die ganze Runde über. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Bezähmt den Valorross',
@@ -4126,6 +4126,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Wyrmkult-Zelte',
   'entities.zones.thornpeak_heights.pois.8.label': 'Wiedergängerfelder',
   'entities.zones.thornpeak_heights.pois.9.label': 'Gravewyrm-Heiligtum',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Highwatch-Stallungen',
   'entities.dungeons.hollow_crypt.name': 'Die Hohle Gruft',
   'entities.dungeons.hollow_crypt.enterText': 'Du steigst in die Hohle Gruft hinab...',
   'entities.dungeons.hollow_crypt.leaveText': 'Du kletterst zurück ins Tageslicht.',
@@ -4599,6 +4600,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Gürtelschutz des Sturmrufers',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, der Erwachende Gipfel',
   'entities.mobs.thunzharr_stormling.name': 'Geweckter Sturmling',
+  'entities.mobs.stable_horse.name': 'Stallpferd',
   'hudChrome.worldBoss.spawn': '{name} erhebt sich über den Thornpeak-Höhen!',
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schulterplatten',
   'hud.chat.context.convertToRaid': 'In Schlachtzug umwandeln',
@@ -6820,8 +6822,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.',
-  'hudChrome.mounts.notCollected': 'Nicht gesammelt',
-  'hudChrome.mounts.stableHint': 'Lernt das Reiten in den Ställen vor Thornpeak.',
-  'hudChrome.mounts.dropHint': 'Wird von Dungeon- und Schlachtzugsbossen fallen gelassen.',
+  'hudChrome.mounts.emptyTitle': 'Keine Reittiere gesammelt',
+  'hudChrome.mounts.emptyStableHint':
+    'Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.',
+  'hudChrome.mounts.emptyDropHint':
+    'Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.',
   'hudChrome.mounts.clickManage': 'Anklicken, um Euer Reittier zu wählen',
 };

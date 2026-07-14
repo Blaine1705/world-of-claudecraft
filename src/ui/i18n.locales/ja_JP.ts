@@ -2629,7 +2629,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '騎手はみな二本足で歩いてくる、{className}よ。ヴァロースティードにまたがって泥にまみれずにいられるようになるまで、手綱は渡さない。ハイウォッチには骨折を治せる者もそう余っていないのでね。',
   'entities.quests.q_riding_lessons.title': '乗馬の稽古',
   'entities.quests.q_riding_lessons.text':
-    '騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。そしてそれは一日の午後だけでは身につかない。上に乗って、手綱を握るわたしの手をよく見て、振り落とされる前にヴァロースティードの傾きに合わせるのだ。',
+    '騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。わたしが合図したら鞍にまたがり、囲い場の旗の立ったコースを、すべてのゲートを順番に走り抜けるのだ。鞍から落ちるか、囲いを出れば、また最初からやり直しだ。',
   'entities.quests.q_riding_lessons.completion':
     'よし、それでいい。ひとっ走りの間、柵に一度もしがみつかなかったな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。',
   'entities.quests.q_riding_lessons.objectives.0.label': 'ヴァロースティードを乗りこなす',
@@ -3210,6 +3210,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'ワーム教団の天幕',
   'entities.zones.thornpeak_heights.pois.8.label': '亡霊の野',
   'entities.zones.thornpeak_heights.pois.9.label': '墓ワームの聖所',
+  'entities.zones.thornpeak_heights.pois.10.label': 'ハイウォッチの厩舎',
   'entities.dungeons.hollow_crypt.name': '虚ろの墓所',
   'entities.dungeons.hollow_crypt.enterText': '虚ろの墓所へ降りていきます...',
   'entities.dungeons.hollow_crypt.leaveText': '日の光の下へ戻ります。',
@@ -3753,6 +3754,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': '嵐呼びの腰当て',
   'entities.mobs.thunzharr_waking_peak.name': 'サンザール、目覚めし峰',
   'entities.mobs.thunzharr_stormling.name': '目覚めた嵐の精',
+  'entities.mobs.stable_horse.name': '厩舎の馬',
   'hudChrome.worldBoss.spawn': '{name}がソーンピーク高地に立ち上がった！',
   'entities.items.stormcallers_spaulders.name': 'ゲイルコールの肩当て',
   'hud.chat.context.convertToRaid': 'レイドに変換',
@@ -6572,20 +6574,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。',
-  'hudChrome.mounts.notCollected': '未入手',
-  'hudChrome.mounts.stableHint': 'ソーンピーク郊外の厩舎で乗馬を学べます。',
-  'hudChrome.mounts.dropHint': 'ダンジョンやレイドのボスがドロップします。',
+  'hudChrome.mounts.emptyTitle': 'マウントは未入手',
+  'hudChrome.mounts.emptyStableHint':
+    'レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。',
+  'hudChrome.mounts.emptyDropHint':
+    'より希少なマウントはダンジョンやレイドのボスがドロップします。',
   'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
   'hudChrome.mountTraining.title': '乗馬レッスン',
-  'hudChrome.mountTraining.prompt': '振り落とされる前に、馬の傾きに合わせよう。',
-  'hudChrome.mountTraining.leanRight': '右に傾ける',
-  'hudChrome.mountTraining.steady': '姿勢を保つ',
-  'hudChrome.mountTraining.cueLeft': '馬が左に傾く。',
-  'hudChrome.mountTraining.cueRight': '馬が右に傾く。',
-  'hudChrome.mountTraining.cueSteady': '馬が落ち着く。',
+  'hudChrome.mountTraining.mountPrompt':
+    '乗り込もう: {key} キーを押して訓練用ヴァロースティードに騎乗する。',
+  'hudChrome.mountTraining.ridePrompt':
+    '旗の立てられたコースを、すべてのゲートを順番に走り抜けよう。',
+  'hudChrome.mountTraining.progress': '{total} 門中 {n} 門目',
   'hudChrome.mountTraining.begin': 'レッスン開始',
-  'hudChrome.mountTraining.round': '{total} ラウンド中 {n} 回目',
-  'hudChrome.mountTraining.misses': '失敗 {n}/{cap}',
   'hudChrome.mountTraining.thrown': '振り落とされた。落ち着いてもう一度挑戦しよう。',
   'hudChrome.mountTraining.success': 'ヴァロースティードを乗りこなした。',
   'hudChrome.mountTraining.close': '閉じる',

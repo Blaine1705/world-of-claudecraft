@@ -19,26 +19,32 @@ export interface IWorldMounts {
   /** Mount the selected mount, or dismount while riding. */
   toggleMounted(): void;
   /** The riding-lesson (mount-training) minigame gating reins_valorsteed's
-   *  q_riding_lessons quest reward: a short reaction-cue attempt at the
-   *  stablemaster. Server-authoritative; rules live in
-   *  src/sim/mounts_training.ts. Rebuilt client-side from the mountTrain*
-   *  events (no snapshot field), the lockpickState precedent. */
+   *  q_riding_lessons quest reward: mount a training Valorsteed at the stablemaster
+   *  (the Mount/Dismount keybind tutorial), then ride one lap through the flagged
+   *  gates in order. Server-authoritative; rules live in src/sim/mounts_training.ts.
+   *  Rebuilt client-side from the mountTrain* events (no snapshot field), the
+   *  lockpickState precedent. */
   mountTrainingView(): MountTrainingView | null;
   /** Start a lesson attempt (charges the one-time 100g fee on first success). */
   mountTrainBegin(): void;
-  /** Answer the active round's cue. */
+  /** @deprecated No-op. The lesson is a ridden course now, not a lean-cue
+   *  reaction; this member is retained only because removing it would break the
+   *  pinned IWorld member list. The wire command 'mount_train_answer' stays
+   *  registered (append-only) but does nothing. */
   mountTrainAnswer(lean: TrainingLean): void;
   /** Abandon the active attempt (the fee, once paid, stays paid). */
   mountTrainAbort(): void;
 }
 
-// Render-safe projection of an active riding-lesson attempt.
+// Render-safe projection of an active riding-lesson attempt. phase 'mount' means the
+// player has yet to summon the training steed (nextGate null); phase 'ride' exposes
+// the gated course: `gate` gates cleared so far (0-based next-gate index),
+// `gatesTotal` the full lap, and `nextGate` the world position of the gate to ride to
+// (null once the last gate is cleared).
 export interface MountTrainingView {
   sessionId: string;
-  round: number;
-  roundsTotal: number;
-  misses: number;
-  missCap: number;
-  cue: TrainingLean;
-  windowMs: number;
+  phase: 'mount' | 'ride';
+  gate: number;
+  gatesTotal: number;
+  nextGate: { x: number; z: number } | null;
 }

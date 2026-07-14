@@ -9,39 +9,57 @@ const row = (view: ReturnType<typeof buildMountPickerView>, key: string): MountP
 };
 
 describe('buildMountPickerView', () => {
-  it('renders the whole catalog in order, whatever is owned', () => {
-    const view = buildMountPickerView(20, 'valorsteed', '', []);
-    expect(view.rows.map((r) => r.key)).toEqual([...MOUNT_KEYS]);
-    expect(view.rows[0].key).toBe('valorsteed');
+  it('renders ONLY the owned mounts, in catalog order (not the whole catalog)', () => {
+    // Owned out of catalog order: the view still sorts by MOUNT_KEYS.
+    const view = buildMountPickerView(20, 'valorsteed', '', ['stormfeather_griffin', 'grag_bear']);
+    expect(view.rows.map((r) => r.key)).toEqual(['grag_bear', 'stormfeather_griffin']);
   });
 
-  it('the horse is always owned, even with an empty collection', () => {
+  it('owns nothing: zero rows and no free default mount (the horse is not prepended)', () => {
     const view = buildMountPickerView(20, 'valorsteed', '', []);
-    expect(row(view, 'valorsteed').owned).toBe(true);
-    for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed')) {
-      expect(row(view, key).owned).toBe(false);
-      expect(row(view, key).pickable).toBe(false);
-    }
+    expect(view.rows).toEqual([]);
+    // The pick is still resolved (the picker header needs it), but nothing renders.
+    expect(view.selectedKey).toBe('valorsteed');
+    expect(view.mounted).toBe(false);
+  });
+
+  it('owns the whole catalog: every mount renders in catalog order', () => {
+    const view = buildMountPickerView(20, 'valorsteed', '', [...MOUNT_KEYS]);
+    expect(view.rows.map((r) => r.key)).toEqual([...MOUNT_KEYS]);
   });
 
   it('an owned, unlocked, non-selected mount is pickable', () => {
     const view = buildMountPickerView(20, 'valorsteed', '', ['grag_bear']);
     const bear = row(view, 'grag_bear');
-    expect(bear.owned).toBe(true);
     expect(bear.locked).toBe(false);
     expect(bear.pickable).toBe(true);
-    // The current pick is owned but never pickable (nothing to change).
-    expect(row(view, 'valorsteed').pickable).toBe(false);
+  });
+
+  it('the current pick is owned but never pickable (nothing to change)', () => {
+    const view = buildMountPickerView(20, 'grag_bear', '', ['grag_bear']);
+    expect(row(view, 'grag_bear').selected).toBe(true);
+    expect(row(view, 'grag_bear').pickable).toBe(false);
+  });
+
+  it('a selected mount the player does not own is the selectedKey but renders no row', () => {
+    // Pick defaults to the horse, which the player has not earned yet.
+    const view = buildMountPickerView(20, 'valorsteed', '', ['grag_bear']);
+    expect(view.selectedKey).toBe('valorsteed');
+    expect(view.rows.map((r) => r.key)).toEqual(['grag_bear']);
+    // The one owned mount is pickable precisely because it is not the current pick.
+    expect(row(view, 'grag_bear').pickable).toBe(true);
   });
 
   it('level-locks an owned mount below its gate (locked, not pickable)', () => {
     const view = buildMountPickerView(12, 'valorsteed', '', ['stormfeather_griffin']);
     const griffin = row(view, 'stormfeather_griffin');
-    expect(griffin.owned).toBe(true);
     expect(griffin.locked).toBe(true);
     expect(griffin.pickable).toBe(false);
-    // An UNOWNED mount is never marked locked (the "Not collected" state wins).
-    expect(row(view, 'shadowjump_toad').locked).toBe(false);
+  });
+
+  it('an owned mount at or above its gate is unlocked', () => {
+    const view = buildMountPickerView(10, 'valorsteed', '', ['grag_bear']);
+    expect(row(view, 'grag_bear').locked).toBe(false);
   });
 
   it('marks the pick and the ridden mount, and the mounted flag', () => {
@@ -55,26 +73,18 @@ describe('buildMountPickerView', () => {
     expect(row(dismounted, 'grag_bear').active).toBe(false);
   });
 
-  it('coerces an unknown pick to the horse (the default every player owns)', () => {
+  it('coerces an unknown pick to the horse (the default the header falls back to)', () => {
     const view = buildMountPickerView(20, 'flying_carpet', '', []);
     expect(view.selectedKey).toBe('valorsteed');
-    expect(row(view, 'valorsteed').selected).toBe(true);
+    expect(view.rows).toEqual([]);
   });
 
   it('exposes the display percents as integers (the card spec line)', () => {
-    const view = buildMountPickerView(20, 'valorsteed', '', ['stormfeather_griffin']);
+    const view = buildMountPickerView(20, 'valorsteed', '', ['valorsteed', 'stormfeather_griffin']);
     const griffin = row(view, 'stormfeather_griffin');
     expect([griffin.speedPct, griffin.blockPct, griffin.critPct]).toEqual([80, 8, 5]);
     const horse = row(view, 'valorsteed');
     expect([horse.speedPct, horse.blockPct, horse.critPct]).toEqual([60, 0, 0]);
-  });
-
-  it('marks only the horse purchasable (bought from the stablemaster); the rest are loot', () => {
-    const view = buildMountPickerView(20, 'valorsteed', '', []);
-    expect(row(view, 'valorsteed').purchasable).toBe(true);
-    for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed')) {
-      expect(row(view, key).purchasable).toBe(false);
-    }
   });
 
   it('keeps a locked owned pick selected (the painter drops the Selected chip)', () => {
@@ -84,7 +94,7 @@ describe('buildMountPickerView', () => {
     const view = buildMountPickerView(12, 'stormfeather_griffin', '', ['stormfeather_griffin']);
     const griffin = row(view, 'stormfeather_griffin');
     expect(griffin.selected).toBe(true);
-    expect(griffin.owned).toBe(true);
     expect(griffin.locked).toBe(true);
+    expect(griffin.pickable).toBe(false);
   });
 });

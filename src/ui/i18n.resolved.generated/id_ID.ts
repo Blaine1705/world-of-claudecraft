@@ -426,9 +426,9 @@ export const id_ID: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
-      "notCollected": "Not collected",
-      "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Learn to ride at the stables outside Thornpeak.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -451,17 +451,11 @@ export const id_ID: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const id_ID: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Anak Badai Terjaga"
       },
+      "stable_horse": {
+        "name": "Kuda Kandang"
+      },
       "ironvein_foreman": {
         "name": "Mandor Ironvein"
       },
@@ -8441,7 +8438,7 @@ export const id_ID: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Pelajaran Menunggang Kuda",
-        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual, dan itu tak bisa dipelajari dalam satu sore saja. Naiklah, perhatikan tanganku pada kendali, dan ikuti gerak condong Valorsteed sebelum ia memutuskan kau tak layak direpotkan.",
+        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Naiklah ke pelana saat kuberi aba-aba, lalu tempuh lintasan berbendera mengelilingi padangku, lewati setiap gerbang berurutan. Terlepas dari pelana atau keluar dari pekarangan, dan kita mulai lagi dari awal.",
         "completion": "Nah, begitu. Tak sekali pun kau memegang pagar sepanjang putaran itu. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const id_ID: EnTranslations = {
           },
           "9": {
             "label": "Sanktum Gravewyrm"
+          },
+          "10": {
+            "label": "Kandang Kuda Highwatch"
           }
         }
       }

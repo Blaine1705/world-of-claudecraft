@@ -237,6 +237,7 @@ for (const [id, m] of Object.entries({
   ...TEMPLE_MOBS,
 })) {
   if (m.elite || m.boss) continue;
+  if (m.ambient) continue; // ambient decoration (stable horses), not a wild creature to fight
   if (id.startsWith('warlock_')) continue; // summoned pets, not wild creatures
   if (!campedMobIds.has(id)) continue; // summon-only encounter adds, never met in the open
   if (/vision/i.test(id) || /^Vision\b/.test(m.name)) continue; // cinematic apparitions, not creatures

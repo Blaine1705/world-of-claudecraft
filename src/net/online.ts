@@ -14,6 +14,7 @@ import {
   mountDef,
   normalizeMountKey,
   normalizeSelectedMount,
+  RIDING_COURSE,
 } from '../sim/content/mounts';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -2310,8 +2311,10 @@ export class ClientWorld implements IWorld {
   mountTrainBegin(): void {
     this.cmd({ cmd: 'mount_train_begin' });
   }
-  mountTrainAnswer(lean: TrainingLean): void {
-    this.cmd({ cmd: 'mount_train_answer', lean });
+  // Deprecated no-op (the lesson is a ridden course now). The HUD never calls this;
+  // the wire token stays registered (append-only) and the server ignores it.
+  mountTrainAnswer(_lean: TrainingLean): void {
+    this.cmd({ cmd: 'mount_train_answer' });
   }
   mountTrainAbort(): void {
     this.cmd({ cmd: 'mount_train_abort' });
@@ -2750,27 +2753,31 @@ export class ClientWorld implements IWorld {
     }
   }
   // Mirror the authoritative riding-lesson lifecycle into mountTrainingMirror.
-  // The events still flow to the HUD (drainEvents) for transient feedback.
+  // Gate positions never ride the wire: the client derives nextGate from the shared
+  // RIDING_COURSE content by the gate index. The events still flow to the HUD
+  // (drainEvents) for transient feedback.
   private applyMountTrainingEvent(ev: SimEvent): void {
+    const gates = RIDING_COURSE.gates;
+    const nextGate = (phase: 'mount' | 'ride', gate: number): { x: number; z: number } | null => {
+      const g = phase === 'ride' && gate < gates.length ? gates[gate] : null;
+      return g ? { x: g.x, z: g.z } : null;
+    };
     if (ev.type === 'mountTrainSession') {
+      // Opens phase 'mount', or (re-emitted) flips the session to 'ride'. Either way
+      // gate resets to 0: in 'ride' the next gate to clear is gates[0].
       this.mountTrainingMirror = {
         sessionId: ev.sessionId,
-        round: ev.round,
-        roundsTotal: ev.roundsTotal,
-        misses: ev.misses,
-        missCap: ev.missCap,
-        cue: ev.cue,
-        windowMs: ev.windowMs,
+        phase: ev.phase,
+        gate: 0,
+        gatesTotal: gates.length,
+        nextGate: nextGate(ev.phase, 0),
       };
-    } else if (ev.type === 'mountTrainRound') {
+    } else if (ev.type === 'mountTrainGate') {
       const s = this.mountTrainingMirror;
       if (s && s.sessionId === ev.sessionId) {
-        s.round = ev.round;
-        s.roundsTotal = ev.roundsTotal;
-        s.misses = ev.misses;
-        s.missCap = ev.missCap;
-        s.cue = ev.cue;
-        s.windowMs = ev.windowMs;
+        s.gate = ev.gate;
+        s.gatesTotal = ev.gatesTotal;
+        s.nextGate = nextGate('ride', ev.gate);
       }
     } else if (ev.type === 'mountTrainEnd') {
       if (this.mountTrainingMirror?.sessionId === ev.sessionId) this.mountTrainingMirror = null;

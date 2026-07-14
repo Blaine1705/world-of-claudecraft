@@ -426,9 +426,9 @@ export const da_DK: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
-      "notCollected": "Not collected",
-      "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Learn to ride at the stables outside Thornpeak.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -451,17 +451,11 @@ export const da_DK: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const da_DK: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Vækket Stormling"
       },
+      "stable_horse": {
+        "name": "Staldhest"
+      },
       "ironvein_foreman": {
         "name": "Jernåre-Formand"
       },
@@ -8441,7 +8438,7 @@ export const da_DK: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Ridelektioner",
-        "text": "Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger, og det lærer man ikke på én eftermiddag. Kravl op, hold øje med mine hænder på tøjlerne, og følg Valorsteeds vægtforskydning, før den beslutter, at du ikke er besværet værd.",
+        "text": "Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger. Kravl op i sadlen, når jeg giver ordet, og rid så den afmærkede bane rundt om min fold, gennem hver port i rækkefølge. Mister du sadlen eller forlader indhegningen, starter vi forfra.",
         "completion": "Sådan, ja. Ikke én eneste gang greb du fat i hegnet hele vejen igennem. Valorsteed er din, {playerName}: sadel, tøjler og ry som en rytter, der har fortjent sædet i stedet for at købe det.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const da_DK: EnTranslations = {
           },
           "9": {
             "label": "Gravormens Helligdom"
+          },
+          "10": {
+            "label": "Highwatch-stalden"
           }
         }
       }

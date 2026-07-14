@@ -929,6 +929,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Kantung Telur Laba-laba',
   'entities.mobs.sump_troll_devourer.name': 'Troll Kubangan Pelahap',
   'entities.mobs.thunzharr_stormling.name': 'Anak Badai Terjaga',
+  'entities.mobs.stable_horse.name': 'Kuda Kandang',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Puncak yang Terjaga',
   'entities.mobs.tolling_bell.name': 'Lonceng Berdentang',
   'entities.mobs.vale_cup_ball.name': 'Bola Babi Hutan',
@@ -2587,7 +2588,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Setiap penunggang datang dengan dua kaki, {className}. Kendali baru kuberikan setelah kau sanggup menunggangi Valorsteed tanpa jatuh tersungkur, dan Highwatch tak punya tabib lebih untuk tulang yang patah.',
   'entities.quests.q_riding_lessons.title': 'Pelajaran Menunggang Kuda',
   'entities.quests.q_riding_lessons.text':
-    'Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual, dan itu tak bisa dipelajari dalam satu sore saja. Naiklah, perhatikan tanganku pada kendali, dan ikuti gerak condong Valorsteed sebelum ia memutuskan kau tak layak direpotkan.',
+    'Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Naiklah ke pelana saat kuberi aba-aba, lalu tempuh lintasan berbendera mengelilingi padangku, lewati setiap gerbang berurutan. Terlepas dari pelana atau keluar dari pekarangan, dan kita mulai lagi dari awal.',
   'entities.quests.q_riding_lessons.completion':
     'Nah, begitu. Tak sekali pun kau memegang pagar sepanjang putaran itu. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Jinakkan Valorsteed',
@@ -3141,6 +3142,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Tenda Wyrmcult',
   'entities.zones.thornpeak_heights.pois.8.label': 'Padang Arwah Gentayangan',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanktum Gravewyrm',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Kandang Kuda Highwatch',
   'entities.zones.thornpeak_heights.welcome':
     'Kapten Thessaly mempertahankan tembok di Menara Pengawas, nyaris saja.',
   'errors.api.accountBanned': 'Akun ini telah diblokir.',

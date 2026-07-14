@@ -865,6 +865,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Edderkoppe-Ægsæk',
   'entities.mobs.sump_troll_devourer.name': 'Sumptrold-Fortærer',
   'entities.mobs.thunzharr_stormling.name': 'Vækket Stormling',
+  'entities.mobs.stable_horse.name': 'Staldhest',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, den Vågnende Tinde',
   'entities.mobs.tolling_bell.name': 'Klemtende Klokke',
   'entities.mobs.vale_cup_ball.name': 'Vildsvinebold',
@@ -2468,7 +2469,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Enhver rytter kommer ind på to ben, {className}. Du får ikke tøjlerne, før du kan sidde Valorsteed uden at kysse jorden, og Highwatch har ingen healere til overs til brækkede knogler.',
   'entities.quests.q_riding_lessons.title': 'Ridelektioner',
   'entities.quests.q_riding_lessons.text':
-    'Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger, og det lærer man ikke på én eftermiddag. Kravl op, hold øje med mine hænder på tøjlerne, og følg Valorsteeds vægtforskydning, før den beslutter, at du ikke er besværet værd.',
+    'Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger. Kravl op i sadlen, når jeg giver ordet, og rid så den afmærkede bane rundt om min fold, gennem hver port i rækkefølge. Mister du sadlen eller forlader indhegningen, starter vi forfra.',
   'entities.quests.q_riding_lessons.completion':
     'Sådan, ja. Ikke én eneste gang greb du fat i hegnet hele vejen igennem. Valorsteed er din, {playerName}: sadel, tøjler og ry som en rytter, der har fortjent sædet i stedet for at købe det.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Tæm Valorsteed',
@@ -3017,6 +3018,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Ormekultens Telte',
   'entities.zones.thornpeak_heights.pois.8.label': 'Genfærdsmarkerne',
   'entities.zones.thornpeak_heights.pois.9.label': 'Gravormens Helligdom',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Highwatch-stalden',
   'entities.zones.thornpeak_heights.welcome':
     'Kaptajn Thessaly holder muren ved Højvagten, knap nok.',
   'errors.api.accountBanned': 'Denne konto er blevet udelukket.',

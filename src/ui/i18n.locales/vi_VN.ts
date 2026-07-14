@@ -922,6 +922,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Bọc Trứng Nhện',
   'entities.mobs.sump_troll_devourer.name': 'Troll Vũng Lầy Háu Ăn',
   'entities.mobs.thunzharr_stormling.name': 'Tinh Linh Bão Trỗi Dậy',
+  'entities.mobs.stable_horse.name': 'Ngựa chuồng',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Đỉnh Núi Thức Giấc',
   'entities.mobs.tolling_bell.name': 'Chuông Ngân Vang',
   'entities.mobs.vale_cup_ball.name': 'Bóng Da Heo Rừng',
@@ -2561,7 +2562,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Kỵ sĩ nào cũng bước vào bằng hai chân, {className}. Ta chỉ trao dây cương khi nào ngươi ngồi vững trên lưng Valorsteed mà không lăn xuống bùn, vì Highwatch chẳng dư thầy thuốc để chữa xương gãy.',
   'entities.quests.q_riding_lessons.title': 'Bài Học Cưỡi Ngựa',
   'entities.quests.q_riding_lessons.text':
-    'Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán, và chẳng ai học được điều đó trong một buổi chiều. Leo lên, để ý đôi tay ta trên dây cương, và theo nhịp nghiêng của Valorsteed trước khi nó quyết định ngươi không đáng để bận tâm.',
+    'Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán. Leo lên yên khi ta ra hiệu, rồi phi theo đường đua cắm cờ quanh bãi quây của ta, qua từng cổng theo thứ tự. Rời khỏi yên hoặc ra khỏi khoảnh sân thì ta bắt đầu lại từ đầu.',
   'entities.quests.q_riding_lessons.completion':
     'Đấy, được rồi. Suốt cả vòng chạy, ngươi chẳng một lần bám vào hàng rào. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Thuần Hóa Valorsteed',
@@ -3119,6 +3120,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Lều Giáo Phái Cuồng Long',
   'entities.zones.thornpeak_heights.pois.8.label': 'Cánh Đồng Vong Linh',
   'entities.zones.thornpeak_heights.pois.9.label': 'Thánh Đường Mộ Long',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Chuồng ngựa Highwatch',
   'entities.zones.thornpeak_heights.welcome':
     'Đội Trưởng Thessaly đang trấn giữ bức tường ở Vọng Đài Cao, vất vả lắm mới giữ nổi.',
   'errors.api.accountBanned': 'Tài khoản này đã bị cấm.',

@@ -426,9 +426,9 @@ export const it_IT: EnTranslations = {
       "requiresLevel": "Richiede livello {level}",
       "pickFirst": "Scegli una cavalcatura da cavalcare.",
       "keybindHint": "Premi il tasto Monta / Smonta (Z predefinito) per cavalcare.",
-      "notCollected": "Non ottenuta",
-      "dropHint": "Bottino dei boss di spedizione e incursione.",
-      "stableHint": "Impara a cavalcare nelle stalle fuori Thornpeak.",
+      "emptyTitle": "Nessuna cavalcatura ottenuta",
+      "emptyStableHint": "Raggiungi il livello 20 e prendi lezioni di equitazione dalla Stalliera capo Marla alle stalle a ovest di Highwatch.",
+      "emptyDropHint": "Le cavalcature più rare sono bottino dei boss di spedizione e incursione.",
       "clickManage": "Clicca per scegliere la tua cavalcatura",
       "rarity_common": "Comune",
       "rarity_rare": "Rara",
@@ -451,17 +451,11 @@ export const it_IT: EnTranslations = {
     },
     "mountTraining": {
       "title": "Riding Lesson",
-      "prompt": "Match the horse's lean before it throws you.",
-      "leanLeft": "Lean Left",
-      "leanRight": "Lean Right",
-      "steady": "Hold Steady",
-      "cueLeft": "The horse pitches left.",
-      "cueRight": "The horse pitches right.",
-      "cueSteady": "The horse steadies.",
+      "mountPrompt": "Climb aboard: press {key} to mount the training Valorsteed.",
+      "ridePrompt": "Ride the flagged course, every gate in order.",
+      "progress": "Gate {n} of {total}",
       "begin": "Begin Lesson",
       "abort": "Give Up",
-      "round": "Round {n} of {total}",
-      "misses": "Slips {n} of {cap}",
       "thrown": "You were thrown. Steady up and try again.",
       "success": "You have tamed the Valorsteed.",
       "close": "Close"
@@ -7360,6 +7354,9 @@ export const it_IT: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Elementale di tempesta ridestato"
       },
+      "stable_horse": {
+        "name": "Cavallo da stalla"
+      },
       "ironvein_foreman": {
         "name": "Caposquadra Venaferrata"
       },
@@ -8441,7 +8438,7 @@ export const it_IT: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lezioni di equitazione",
-        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo, e non si impara in un pomeriggio. Sali, presta attenzione alle mie mani sulle redini, e segui il movimento del Destriero del Valore prima che decida che non vali la pena.",
+        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Sali in sella quando te lo dico, poi percorri il tracciato segnalato attorno al mio maneggio, attraversando ogni cancello in ordine. Perdi la sella o esci dal recinto, e si ricomincia.",
         "completion": "Ecco, così. Non ti sei aggrappato alla staccionata nemmeno una volta, per tutto il giro. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const it_IT: EnTranslations = {
           },
           "9": {
             "label": "Santuario del Gravewyrm"
+          },
+          "10": {
+            "label": "Stalle di Highwatch"
           }
         }
       }

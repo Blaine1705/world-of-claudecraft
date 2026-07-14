@@ -616,6 +616,21 @@ export const VISUALS: Record<string, VisualDef> = {
     lazyPreload: true,
   },
 
+  // Ambient Highwatch stable horse (sim mob 'stable_horse', MOB_KEYS below). Reuses
+  // the Valorsteed GLB + baked gait clips so it renders and ambles as a real horse
+  // through the STANDARD mob-visual path, never a humanoid capsule. Unlike the
+  // rider mounts this is NOT lazyPreload: a mob body is built synchronously by
+  // createCharacterVisual (which throws on a not-yet-fetched asset), so it must be
+  // in the boot sweep. Shorter than the imposing 3.8 ridden Valorsteed so loose
+  // paddock horses read at a natural size; no tint (authored Tripo colours).
+  mob_stable_horse: {
+    url: `${MOUNTS_DIR}/valorsteed.glb`,
+    height: 2.9,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
+  },
+
   // -- mob families --------------------------------------------------------
   mob_wolf: {
     // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton
@@ -1081,6 +1096,9 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
+  // above) so it renders as an animated horse, not a humanoid.
+  stable_horse: 'mob_stable_horse',
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',

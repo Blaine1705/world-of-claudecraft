@@ -426,9 +426,9 @@ export const ja_JP: EnTranslations = {
       "requiresLevel": "レベル{level}が必要",
       "pickFirst": "騎乗するマウントを選んでください。",
       "keybindHint": "騎乗 / 降車キー(初期設定Z)で騎乗します。",
-      "notCollected": "未入手",
-      "dropHint": "ダンジョンやレイドのボスがドロップします。",
-      "stableHint": "ソーンピーク郊外の厩舎で乗馬を学べます。",
+      "emptyTitle": "マウントは未入手",
+      "emptyStableHint": "レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。",
+      "emptyDropHint": "より希少なマウントはダンジョンやレイドのボスがドロップします。",
       "clickManage": "クリックしてマウントを選択",
       "rarity_common": "コモン",
       "rarity_rare": "レア",
@@ -451,17 +451,11 @@ export const ja_JP: EnTranslations = {
     },
     "mountTraining": {
       "title": "乗馬レッスン",
-      "prompt": "振り落とされる前に、馬の傾きに合わせよう。",
-      "leanLeft": "Lean Left",
-      "leanRight": "右に傾ける",
-      "steady": "姿勢を保つ",
-      "cueLeft": "馬が左に傾く。",
-      "cueRight": "馬が右に傾く。",
-      "cueSteady": "馬が落ち着く。",
+      "mountPrompt": "乗り込もう: {key} キーを押して訓練用ヴァロースティードに騎乗する。",
+      "ridePrompt": "旗の立てられたコースを、すべてのゲートを順番に走り抜けよう。",
+      "progress": "{total} 門中 {n} 門目",
       "begin": "レッスン開始",
       "abort": "Give Up",
-      "round": "{total} ラウンド中 {n} 回目",
-      "misses": "失敗 {n}/{cap}",
       "thrown": "振り落とされた。落ち着いてもう一度挑戦しよう。",
       "success": "ヴァロースティードを乗りこなした。",
       "close": "閉じる"
@@ -7360,6 +7354,9 @@ export const ja_JP: EnTranslations = {
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
       },
+      "stable_horse": {
+        "name": "厩舎の馬"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },
@@ -8441,7 +8438,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "乗馬の稽古",
-        "text": "騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。そしてそれは一日の午後だけでは身につかない。上に乗って、手綱を握るわたしの手をよく見て、振り落とされる前にヴァロースティードの傾きに合わせるのだ。",
+        "text": "騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。わたしが合図したら鞍にまたがり、囲い場の旗の立ったコースを、すべてのゲートを順番に走り抜けるのだ。鞍から落ちるか、囲いを出れば、また最初からやり直しだ。",
         "completion": "よし、それでいい。ひとっ走りの間、柵に一度もしがみつかなかったな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const ja_JP: EnTranslations = {
           },
           "9": {
             "label": "墓ワームの聖所"
+          },
+          "10": {
+            "label": "ハイウォッチの厩舎"
           }
         }
       }

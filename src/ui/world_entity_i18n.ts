@@ -100,6 +100,8 @@ const MOB_IDS = [
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
   'thunzharr_stormling',
+  // Ambient Highwatch Stables horse (zone 3)
+  'stable_horse',
 ] as const;
 
 const NPC_IDS = [

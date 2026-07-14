@@ -426,9 +426,9 @@ export const ko_KR: EnTranslations = {
       "requiresLevel": "{level}레벨 필요",
       "pickFirst": "탈 탈것을 선택하세요.",
       "keybindHint": "탑승 / 하차 키(기본 Z)를 눌러 탑승합니다.",
-      "notCollected": "미보유",
-      "dropHint": "던전 및 공격대 우두머리가 떨어뜨립니다.",
-      "stableHint": "쏜피크 외곽의 마구간에서 승마를 배우세요.",
+      "emptyTitle": "보유한 탈것 없음",
+      "emptyStableHint": "20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.",
+      "emptyDropHint": "더 희귀한 탈것은 던전과 공격대 우두머리가 떨어뜨립니다.",
       "clickManage": "클릭하여 탈것 선택",
       "rarity_common": "일반",
       "rarity_rare": "희귀",
@@ -451,17 +451,11 @@ export const ko_KR: EnTranslations = {
     },
     "mountTraining": {
       "title": "승마 수업",
-      "prompt": "말이 널 내던지기 전에 기울임에 맞춰라.",
-      "leanLeft": "Lean Left",
-      "leanRight": "오른쪽으로 기울이기",
-      "steady": "자세 유지",
-      "cueLeft": "말이 왼쪽으로 기운다.",
-      "cueRight": "말이 오른쪽으로 기운다.",
-      "cueSteady": "말이 균형을 잡는다.",
+      "mountPrompt": "올라타자: {key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
+      "ridePrompt": "깃발이 세워진 코스를 모든 관문을 순서대로 통과하며 달려라.",
+      "progress": "{total} 관문 중 {n} 관문",
       "begin": "수업 시작",
       "abort": "Give Up",
-      "round": "{total} 라운드 중 {n}회",
-      "misses": "실수 {n}/{cap}",
       "thrown": "낙마했다. 침착하게 다시 시도하라.",
       "success": "발러스티드를 길들였다.",
       "close": "닫기"
@@ -7360,6 +7354,9 @@ export const ko_KR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"
       },
+      "stable_horse": {
+        "name": "마구간 말"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -8441,7 +8438,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "승마 수업",
-        "text": "기수는 누구나 두 발로 걸어 들어오지, {playerName}, 우리가 처음 만난 날 말했던 그대로다. 내가 가르치는 건 자리에 앉는 법이지 파는 물건이 아니야, 그리고 그건 한나절 만에 배울 수 있는 게 아니지. 올라타서 고삐를 쥔 내 손을 잘 보고, 발러스티드가 널 내던지기 전에 그 기울임에 맞춰봐라.",
+        "text": "기수는 누구나 두 발로 걸어 들어오지, {playerName}, 우리가 처음 만난 날 말했던 그대로다. 내가 가르치는 건 자리에 앉는 법이지 파는 물건이 아니야. 내가 신호를 주면 안장에 올라타서, 울타리 안 깃발이 세워진 코스를 모든 관문을 순서대로 달려라. 안장에서 떨어지거나 마당을 벗어나면 처음부터 다시 시작이다.",
         "completion": "그래, 됐다. 도는 내내 울타리를 한 번도 붙잡지 않았구나. 발러스티드는 이제 네 것이다, {playerName}: 안장도 고삐도, 그리고 값을 치른 게 아니라 스스로 얻어낸 기수의 자리도.",
         "objectives": {
           "0": {
@@ -8616,6 +8613,9 @@ export const ko_KR: EnTranslations = {
           },
           "9": {
             "label": "무덤고룡 성소"
+          },
+          "10": {
+            "label": "하이워치 마구간"
           }
         }
       }
