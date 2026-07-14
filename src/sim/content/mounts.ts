@@ -94,8 +94,12 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   },
 };
 
-/** Catalog order for the Mounts window: level tier, then declaration order. */
+/** Catalog order for the mount picker: level tier, then declaration order. */
 export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
+
+/** The horse: every player starts with it and always owns it (no item). It is
+ *  also the pick every unknown/legacy persisted value falls back to. */
+export const DEFAULT_MOUNT: MountKey = 'valorsteed';
 
 export function mountDef(key: string): MountDef | null {
   return (MOUNTS as Record<string, MountDef | undefined>)[key] ?? null;
@@ -105,6 +109,14 @@ export function mountDef(key: string): MountDef | null {
  *  so a save from a build that removed a mount loads cleanly unmounted). */
 export function normalizeMountKey(key: string | undefined | null): MountKey | '' {
   return key && mountDef(key) ? (key as MountKey) : '';
+}
+
+/** Coerce a persisted/wire SELECTION to a valid catalog key. Unlike the live
+ *  riding state (normalizeMountKey, where '' means dismounted), the stable pick
+ *  always names a mount: absent/unknown values fall back to the horse. */
+export function normalizeSelectedMount(key: string | undefined | null): MountKey {
+  const normalized = normalizeMountKey(key);
+  return normalized === '' ? DEFAULT_MOUNT : normalized;
 }
 
 /** Additive crit fraction the active mount grants ('' or non-carrier: 0). */

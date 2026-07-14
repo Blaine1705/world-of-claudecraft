@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "2b1be8b0",
+      "state": "3bc7fc09",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,6 +59,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -122,7 +123,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "02071020",
+      "state": "e16d9eb9",
       "events": "7e8c4b86",
       "rng": {
         "draws": 0,
@@ -177,6 +178,7 @@
               }
             ]
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -240,7 +242,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "071fa40d",
+      "state": "285918b2",
       "events": "7ac4ab6b",
       "rng": {
         "draws": 0,
@@ -301,6 +303,7 @@
               }
             ]
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -364,7 +367,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "3e091e92",
+      "state": "456a892b",
       "events": "55670d1a",
       "rng": {
         "draws": 0,
@@ -425,6 +428,7 @@
               }
             ]
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -488,7 +492,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "e07155ca",
+      "state": "576b9a13",
       "events": "68e6784f",
       "rng": {
         "draws": 0,
@@ -549,6 +553,7 @@
               }
             ]
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -612,7 +617,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "8fb1cd81",
+      "state": "2e25fed8",
       "events": "92b1ed86",
       "rng": {
         "draws": 0,
@@ -664,6 +669,7 @@
           "questsDone": [
             "q_boars"
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -728,7 +734,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 406,
-      "state": "fa5d873f",
+      "state": "85b27866",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -780,6 +786,7 @@
           "questsDone": [
             "q_boars"
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}

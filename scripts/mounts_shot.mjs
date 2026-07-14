@@ -1,7 +1,9 @@
-// Visual proof of the rideable mounts feature: boots the offline game, levels
-// to 20 via the dev sim handle, opens the Mounts window (the stable), picks a
-// mount, and screenshots the window plus mounted riders in the world (the
-// rigged Valorsteed and the clipless hover cycle).
+// Visual proof of the collectible-mounts feature: boots the offline game,
+// levels to 20 via the dev sim handle, grants every reins item, screenshots
+// the bags (the collection), the character sheet's mount picker, and mounted
+// riders in the world (the rigged Valorsteed, the epic griffin, and the
+// clipless hover cycle). Z rides the pick directly; the pick changes in the
+// character sheet's picker (the old Mounts window is retired).
 //   node scripts/mounts_shot.mjs    (needs `npm run dev`; GAME_URL overrides :5173)
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
@@ -49,35 +51,53 @@ await page.evaluate(() => {
 });
 await sleep(400);
 
-// Level past every mount gate, then open the stable (Z with no pick opens it).
+// The HUD container reveals a beat after the tutorial dismissal; wait for it so
+// the window shots include the chrome (bags/minimap/hotbar), not a bare world.
+await page.waitForFunction(
+  () => getComputedStyle(document.querySelector('#ui')).display !== 'none',
+  { timeout: 20000, polling: 250 },
+);
+
+// Level past every mount gate and collect every reins item (the boss drops).
 await page.evaluate(() => {
   const sim = window.__game.sim;
   sim.setPlayerLevel(20, sim.playerId);
+  for (const id of [
+    'reins_grag_bear',
+    'reins_stalkglider_snail',
+    'reins_aether_hover_cycle',
+    'reins_shadowjump_toad',
+    'reins_stormfeather_griffin',
+  ])
+    sim.addItem(id, 1);
 });
 await sleep(300);
-// Z with nothing picked opens the stable (the real keybind path).
-await page.waitForFunction(
-  () => {
-    if (document.querySelector('#mounts-window')?.style.display !== 'block') {
-      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyZ', key: 'z', bubbles: true }));
-    }
-    return document.querySelector('#mounts-window')?.style.display === 'block';
-  },
-  { timeout: 10000, polling: 250 },
-);
-await sleep(600);
-await page.screenshot({ path: 'tmp/mounts_window.png' });
-console.log('mounts window: tmp/mounts_window.png');
 
-// Pick the base horse and ride it (Z now toggles the mount).
+// The collection in the bags: reins items with their rarity colors + tooltip hint.
+await page.evaluate(() => window.__game.hud.toggleBags());
+await sleep(600);
+await page.screenshot({ path: 'tmp/mounts_bag_items.png' });
+console.log('bag items: tmp/mounts_bag_items.png');
+await page.evaluate(() => window.__game.hud.toggleBags());
+await sleep(300);
+
+// The character sheet's mount picker (a bag click on a reins item opens this
+// too, highlighting that mount's card).
+await page.evaluate(() => {
+  window.__game.hud.openCharacterWithMount('stormfeather_griffin');
+});
+await sleep(800);
+await page.screenshot({ path: 'tmp/mounts_char_picker.png' });
+console.log('character-sheet picker: tmp/mounts_char_picker.png');
+
+// Pick the base horse in the picker, close the sheet.
 await page.evaluate(() => {
   window.__game.sim.selectMount('valorsteed');
 });
 await sleep(300);
-// Close the stable (synthetic Escape; retry until the window actually hides).
 await page.waitForFunction(
   () => {
-    const win = document.querySelector('#mounts-window');
+    const win = document.querySelector('#char-window');
     if (win?.style.display === 'block') {
       window.dispatchEvent(
         new KeyboardEvent('keydown', { code: 'Escape', key: 'Escape', bubbles: true }),
@@ -89,7 +109,8 @@ await page.waitForFunction(
 );
 await sleep(400);
 // Ride via the real Z keybind (synthetic KeyboardEvent through the live input
-// handler); retry until the sim reports mounted, then let the GLB lazy-load.
+// handler): Z now mounts the pick immediately, no window in between; retry
+// until the sim reports mounted, then let the GLB lazy-load.
 await page.waitForFunction(
   () => {
     const sim = window.__game.sim;
@@ -118,6 +139,7 @@ console.log(
     const sim = window.__game.sim;
     return {
       selected: sim.selectedMount(),
+      owned: sim.ownedMounts(),
       mountKey: sim.player.mountKey,
       speedMult: Math.round(sim.moveSpeedMult(sim.player) * 100) / 100,
     };

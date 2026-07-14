@@ -426,6 +426,9 @@ export const it_IT: EnTranslations = {
       "requiresLevel": "Richiede livello {level}",
       "pickFirst": "Scegli una cavalcatura da cavalcare.",
       "keybindHint": "Premi il tasto Monta / Smonta (Z predefinito) per cavalcare.",
+      "notCollected": "Non ottenuta",
+      "dropHint": "Bottino dei boss di spedizione e incursione.",
+      "clickManage": "Clicca per scegliere la tua cavalcatura",
       "rarity_common": "Comune",
       "rarity_rare": "Rara",
       "rarity_epic": "Epica",
@@ -4908,7 +4911,8 @@ export const it_IT: EnTranslations = {
       "tool": "Strumento",
       "potion": "Pozione",
       "elixir": "Elisir",
-      "bag": "Borsa"
+      "bag": "Borsa",
+      "mount": "Cavalcatura"
     },
     "stats": {
       "armor": "Armatura",
@@ -7079,6 +7083,21 @@ export const it_IT: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guardacintura del Chiamatempeste"
+      },
+      "reins_grag_bear": {
+        "name": "Redini dell’Orso Grag Golia"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Redini dell’Aliante dal Guscio Muschioso"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Chiave di accensione: Aerociclo del Giostratore d’Etere"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Redini di Kama-Kage, il Rospo Saltombra"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Redini del Piumatempesta Toccacielo"
       }
     },
     "mobs": {

@@ -426,6 +426,9 @@ export const da_DK: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
+      "notCollected": "Not collected",
+      "dropHint": "Drops from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
@@ -4908,7 +4911,8 @@ export const da_DK: EnTranslations = {
       "tool": "Værktøj",
       "potion": "Eliksir",
       "elixir": "Eliksir",
-      "bag": "Taske"
+      "bag": "Taske",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Rustning",
@@ -7079,6 +7083,21 @@ export const da_DK: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Stormkalderens Livværn"
+      },
+      "reins_grag_bear": {
+        "name": "Tøjler til Goliat Grag-bjørnen"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Tøjler til mosskal-stilkglideren"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Tændingsnøgle: Æterridderens svævecykel"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Tøjler til Kama-Kage, skyggespringstudsen"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Tøjler til den himmelrækkende Stormfjer"
       }
     },
     "mobs": {

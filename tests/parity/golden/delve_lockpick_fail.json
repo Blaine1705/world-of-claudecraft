@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "7301c7f4",
+      "state": "77ae032d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,6 +60,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -125,7 +126,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 417,
-      "state": "389dc174",
+      "state": "85d0a4ab",
       "events": "2758fde1",
       "rng": {
         "draws": 3,
@@ -136,7 +137,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 417,
-      "state": "9af029d4",
+      "state": "d54c2f4b",
       "events": "9cfda0e2",
       "rng": {
         "draws": 3,
@@ -147,7 +148,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 417,
-      "state": "d966255a",
+      "state": "f787f8d9",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -158,7 +159,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 417,
-      "state": "8a6566e4",
+      "state": "8f25abdb",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -169,7 +170,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 417,
-      "state": "ef2279e6",
+      "state": "7ddbd645",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -180,7 +181,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 417,
-      "state": "537c4848",
+      "state": "34b2ba3f",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -191,7 +192,7 @@
       "tick": 69,
       "time": 3.45,
       "nextId": 418,
-      "state": "ac1c4f5a",
+      "state": "2d1d36d9",
       "events": "b6936edd",
       "rng": {
         "draws": 3,
@@ -240,6 +241,7 @@
           "lifetimeXp": 11398,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -343,7 +345,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 418,
-      "state": "8028038a",
+      "state": "db6eb809",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -354,7 +356,7 @@
       "tick": 71,
       "time": 3.55,
       "nextId": 418,
-      "state": "d54969a6",
+      "state": "2aefd305",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -403,6 +405,7 @@
           "lifetimeXp": 11398,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}

@@ -2468,6 +2468,24 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['sparkle'],
   ),
+  // Collectible mount reins (boss drops; see src/sim/mounts.ts mountOwned).
+  // Each reads as its mount: bear paw, snail leaf-and-slime, arcane bolt for
+  // the hover-cycle, shadowed eye for the toad, storm wing for the griffin.
+  reins_grag_bear: r('earth', 'earthBrown', [{ p: 'paw', pal: 'earthBrown', s: 1.05 }]),
+  reins_stalkglider_snail: r('nature', 'leafGreen', ['leaf', { p: 'droplet', ...BR }], ['drips']),
+  reins_aether_hover_cycle: r('arcane', 'sky', [{ p: 'lightning', pal: 'sky' }], ['glow']),
+  reins_shadowjump_toad: r(
+    'shadow',
+    'shadowPurple',
+    [{ p: 'eye', pal: 'shadowPurple' }],
+    ['motion'],
+  ),
+  reins_stormfeather_griffin: r(
+    'storm',
+    'silverWhite',
+    ['wing', { p: 'lightning', ...TR }],
+    ['sparkle'],
+  ),
   worn_sword: r('steel', 'steel', ['sword']),
   gnarled_staff: r('wood', 'earthBrown', [{ p: 'staff', pal: 'earthBrown' }]),
   rusty_dagger: r('steel', 'earthBrown', [{ p: 'dagger', pal: 'earthBrown' }]),

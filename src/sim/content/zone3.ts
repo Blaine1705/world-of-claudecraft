@@ -2867,6 +2867,27 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
       },
     ],
   },
+  // Collectible mounts (src/sim/mounts.ts mountOwned): soulbound reins items;
+  // owning the item is owning the mount. The toad drops from Korzul the
+  // Gravewyrm, the griffin from Nythraxis (the raid pinnacle drop).
+  reins_shadowjump_toad: {
+    id: 'reins_shadowjump_toad',
+    name: 'Reins of Kama-Kage the Shadow-Jump Toad',
+    kind: 'mount',
+    mount: 'shadowjump_toad',
+    quality: 'rare',
+    soulbound: true,
+    sellValue: 0,
+  },
+  reins_stormfeather_griffin: {
+    id: 'reins_stormfeather_griffin',
+    name: 'Reins of the Sky-Reach Stormfeather',
+    kind: 'mount',
+    mount: 'stormfeather_griffin',
+    quality: 'epic',
+    soulbound: true,
+    sellValue: 0,
+  },
   crownforged_dreadhelm: {
     id: 'crownforged_dreadhelm',
     set: 'crownforged',

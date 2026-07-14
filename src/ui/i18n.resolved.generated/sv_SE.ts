@@ -426,6 +426,9 @@ export const sv_SE: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
+      "notCollected": "Not collected",
+      "dropHint": "Drops from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
@@ -4908,7 +4911,8 @@ export const sv_SE: EnTranslations = {
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir",
-      "bag": "Väska"
+      "bag": "Väska",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Rustning",
@@ -7079,6 +7083,21 @@ export const sv_SE: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Stormkallarens midjeskydd"
+      },
+      "reins_grag_bear": {
+        "name": "Tyglar till Goliat Grag-björnen"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Tyglar till mosskal-stjälkglidaren"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Tändningsnyckel: eterriddarens svävarcykel"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Tyglar till Kama-Kage, skuggsprångspaddan"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Tyglar till den himlanående Stormfjädern"
       }
     },
     "mobs": {

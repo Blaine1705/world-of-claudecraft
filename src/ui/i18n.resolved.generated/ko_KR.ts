@@ -426,6 +426,9 @@ export const ko_KR: EnTranslations = {
       "requiresLevel": "{level}레벨 필요",
       "pickFirst": "탈 탈것을 선택하세요.",
       "keybindHint": "탑승 / 하차 키(기본 Z)를 눌러 탑승합니다.",
+      "notCollected": "미보유",
+      "dropHint": "던전 및 공격대 우두머리가 떨어뜨립니다.",
+      "clickManage": "클릭하여 탈것 선택",
       "rarity_common": "일반",
       "rarity_rare": "희귀",
       "rarity_epic": "서사",
@@ -4908,7 +4911,8 @@ export const ko_KR: EnTranslations = {
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약",
-      "bag": "가방"
+      "bag": "가방",
+      "mount": "탈것"
     },
     "stats": {
       "armor": "방어도",
@@ -7079,6 +7083,21 @@ export const ko_KR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "폭풍소환사의 허리보호구"
+      },
+      "reins_grag_bear": {
+        "name": "골리앗 그라그곰의 고삐"
+      },
+      "reins_stalkglider_snail": {
+        "name": "이끼껍질 활공달팽이의 고삐"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "시동 열쇠: 에테르 기사 호버사이클"
+      },
+      "reins_shadowjump_toad": {
+        "name": "그림자 도약 두꺼비 카마카게의 고삐"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "하늘닿이 폭풍깃의 고삐"
       }
     },
     "mobs": {

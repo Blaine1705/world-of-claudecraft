@@ -6651,6 +6651,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Deze herstellink is ongeldig of verlopen. Vraag een nieuwe aan.',
   'entities.items.chunk_of_ore.name': 'Brok erts',
+  'entities.items.reins_grag_bear.name': 'Teugels van de Goliath Grag-beer',
+  'entities.items.reins_stalkglider_snail.name': 'Teugels van de mosschelp-steelglijder',
+  'entities.items.reins_aether_hover_cycle.name': 'Contactsleutel: zweefcykel van de Etherkamper',
+  'entities.items.reins_shadowjump_toad.name': 'Teugels van Kama-Kage de schaduwsprongpad',
+  'entities.items.reins_stormfeather_griffin.name': 'Teugels van de hemelreikende Stormveder',
   'entities.quests.q_prof_intro.completion':
     'Zie je? Erts in je tas en eelt op je handen. Blijf mijnen, houthakken en kruiden plukken terwijl je over de wegen reist. Wanneer je terug in de stad bent, kijk dan naar het bord met de Stadsfocus bij de markt en de werkbank ernaast. Er valt met alles een eerlijke boterham te verdienen, als je dat wilt.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Brok erts',

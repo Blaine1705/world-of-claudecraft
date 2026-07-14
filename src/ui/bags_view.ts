@@ -27,6 +27,8 @@ export interface BagItemInfo {
   noDiscard?: boolean;
   /** Bound to its owner: cannot be destroyed, traded, mailed, listed, or sold. */
   soulbound?: boolean;
+  /** The catalog mount a kind:'mount' reins item owns (see MountItemDef). */
+  mount?: string;
 }
 
 /** The open-window modes that change what a bag click does. At most one is the
@@ -62,6 +64,7 @@ export type BagAction =
   | 'petFeedBlocked'
   | 'discardQuest'
   | 'equipBag'
+  | 'openMountPicker'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -75,6 +78,7 @@ export type BagTooltipHintKey =
   | 'hudChrome.bank.depositHint'
   | 'hudChrome.bank.cannotDeposit'
   | 'itemUi.tooltip.clickDestroy'
+  | 'hudChrome.mounts.clickManage'
   | 'itemUi.tooltip.clickEquip'
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
@@ -107,6 +111,9 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
   if (item.kind === 'quest') return 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
+  // A collected reins item: the click opens the character sheet's mount picker
+  // on this mount (the pick itself happens there, and riding is the Z key).
+  if (item.kind === 'mount') return 'openMountPicker';
   return 'use';
 }
 
@@ -212,6 +219,7 @@ export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipH
   if (mode.bankDeposit)
     return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';
+  if (item.kind === 'mount') return 'hudChrome.mounts.clickManage';
   if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'bag')
     return 'itemUi.tooltip.clickEquip';
   if (item.kind === 'food' || item.kind === 'drink') return 'itemUi.tooltip.clickConsume';

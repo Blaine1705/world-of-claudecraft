@@ -2592,6 +2592,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Werkzeug',
   'itemUi.kind.potion': 'Trank',
   'itemUi.kind.elixir': 'Elixier',
+  'itemUi.kind.mount': 'Reittier',
   'itemUi.stats.armor': 'Rüstung',
   'itemUi.stats.str': 'Stärke',
   'itemUi.stats.agi': 'Beweglichkeit',
@@ -6715,6 +6716,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Arkanessenz',
   'entities.items.arcane_shard.name': 'Arkansplitter',
   'entities.items.chunk_of_ore.name': 'Erzbrocken',
+  'entities.items.reins_grag_bear.name': 'Zügel des Goliath-Gragbären',
+  'entities.items.reins_stalkglider_snail.name': 'Zügel des Moosschalen-Stielgleiters',
+  'entities.items.reins_aether_hover_cycle.name': 'Zündschlüssel: Ätherlanzen-Schwebrad',
+  'entities.items.reins_shadowjump_toad.name': 'Zügel von Kama-Kage der Schattensprungkröte',
+  'entities.items.reins_stormfeather_griffin.name': 'Zügel des Himmelsgreifs Sturmfeder',
   'entities.quests.q_prof_intro.completion':
     'Siehst du? Erz in deinem Rucksack und Schwielen an deinen Händen. Bleib beim Bergbau, Holzfällen und Kräutersammeln, während du die Straßen bereist. Wenn du wieder in der Stadt bist, wirf einen Blick auf die Stadtfokus-Tafel am Markt und die Werkbank in der Nähe. In all dem wartet ein ehrlicher Verdienst, wenn du ihn willst.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Erzbrocken',
@@ -6802,4 +6808,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.',
+  'hudChrome.mounts.notCollected': 'Nicht gesammelt',
+  'hudChrome.mounts.dropHint': 'Wird von Dungeon- und Schlachtzugsbossen fallen gelassen.',
+  'hudChrome.mounts.clickManage': 'Anklicken, um Euer Reittier zu wählen',
 };

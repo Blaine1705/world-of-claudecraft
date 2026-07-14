@@ -426,6 +426,9 @@ export const en_CA: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
+      "notCollected": "Not collected",
+      "dropHint": "Drops from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
@@ -4908,7 +4911,8 @@ export const en_CA: EnTranslations = {
       "tool": "Tool",
       "potion": "Potion",
       "elixir": "Elixir",
-      "bag": "Bag"
+      "bag": "Bag",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Armour",
@@ -7079,6 +7083,21 @@ export const en_CA: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Galecall Waistguard"
+      },
+      "reins_grag_bear": {
+        "name": "Reins of the Goliath Grag-Bear"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Reins of the Moss-Shell Stalk-Glider"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Ignition Key: Aether-Jouster Hover-Cycle"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Reins of Kama-Kage the Shadow-Jump Toad"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Reins of the Sky-Reach Stormfeather"
       }
     },
     "mobs": {

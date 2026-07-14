@@ -71,8 +71,7 @@ export interface InputCallbacks {
       | 'calendar'
       | 'discord'
       | 'crafting'
-      | 'mount'
-      | 'mounts',
+      | 'mount',
   ): void;
   onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
@@ -845,9 +844,6 @@ export class Input {
         return;
       case 'mount':
         this.cb.onUiKey('mount');
-        return;
-      case 'mounts':
-        this.cb.onUiKey('mounts');
         return;
       case 'valecup':
         this.cb.onUiKey('valecup');

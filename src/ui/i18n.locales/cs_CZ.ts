@@ -6493,6 +6493,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový.',
   'entities.items.chunk_of_ore.name': 'Kus rudy',
+  'entities.items.reins_grag_bear.name': 'Otěže Goliáše Grag-medvěda',
+  'entities.items.reins_stalkglider_snail.name': 'Otěže mechokrunýřového plachtíka',
+  'entities.items.reins_aether_hover_cycle.name': 'Startovací klíč: Éterové vznášecí kolo',
+  'entities.items.reins_shadowjump_toad.name': 'Otěže Kama-Kageho, ropuchy stínového skoku',
+  'entities.items.reins_stormfeather_griffin.name': 'Otěže Bouřopera Nebedosahujícího',
   'entities.quests.q_prof_intro.completion':
     'Vidíš? Rudu v batohu a mozoly na rukou. Pokračuj v těžbě, kácení dřeva a sběru bylin, když cestuješ po cestách, a až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a řemeslnický ponk poblíž. V tom všem čeká poctivé živobytí, pokud o něj stojíš.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Kus rudy',

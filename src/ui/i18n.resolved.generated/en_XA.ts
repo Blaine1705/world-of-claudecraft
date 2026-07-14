@@ -426,6 +426,9 @@ export const en_XA: EnTranslations = {
       "requiresLevel": "[Ŕéɋúíŕéš ļéʋéļ {level}]",
       "pickFirst": "[Þíçķ á ɱóúñţ ţó ŕíðé.]",
       "keybindHint": "[Þŕéšš ţĥé Ɱóúñţ / Ðíšɱóúñţ ķéý (ðéƒáúļţ Ž) ţó ŕíðé.]",
+      "notCollected": "[Ñóţ çóļļéçţéð]",
+      "dropHint": "[Ðŕóþš ƒŕóɱ ðúñĝéóñ áñð ŕáíð ƀóššéš.]",
+      "clickManage": "[Çļíçķ ţó çĥóóšé ýóúŕ ɱóúñţ]",
       "rarity_common": "[Çóɱɱóñ]",
       "rarity_rare": "[Ŕáŕé]",
       "rarity_epic": "[Éþíç]",
@@ -4908,7 +4911,8 @@ export const en_XA: EnTranslations = {
       "tool": "[Ţóóļ]",
       "potion": "[Þóţíóñ]",
       "elixir": "[Éļíẋíŕ]",
-      "bag": "[Ɓáĝ]"
+      "bag": "[Ɓáĝ]",
+      "mount": "[Ɱóúñţ]"
     },
     "stats": {
       "armor": "[Áŕɱóŕ]",
@@ -7079,6 +7083,21 @@ export const en_XA: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "[Ĝáļéçáļļ Ŵáíšţĝúáŕð]"
+      },
+      "reins_grag_bear": {
+        "name": "[Ŕéíñš óƒ ţĥé Ĝóļíáţĥ Ĝŕáĝ-Ɓéáŕ]"
+      },
+      "reins_stalkglider_snail": {
+        "name": "[Ŕéíñš óƒ ţĥé Ɱóšš-Šĥéļļ Šţáļķ-Ĝļíðéŕ]"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "[Íĝñíţíóñ Ķéý: Áéţĥéŕ-Ĵóúšţéŕ Ĥóʋéŕ-Çýçļé]"
+      },
+      "reins_shadowjump_toad": {
+        "name": "[Ŕéíñš óƒ Ķáɱá-Ķáĝé ţĥé Šĥáðóŵ-Ĵúɱþ Ţóáð]"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "[Ŕéíñš óƒ ţĥé Šķý-Ŕéáçĥ Šţóŕɱƒéáţĥéŕ]"
       }
     },
     "mobs": {

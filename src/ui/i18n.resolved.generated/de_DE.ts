@@ -426,6 +426,9 @@ export const de_DE: EnTranslations = {
       "requiresLevel": "Benötigt Stufe {level}",
       "pickFirst": "Wählt ein Reittier zum Reiten.",
       "keybindHint": "Drückt die Aufsitzen-/Absitzen-Taste (Standard Z), um zu reiten.",
+      "notCollected": "Nicht gesammelt",
+      "dropHint": "Wird von Dungeon- und Schlachtzugsbossen fallen gelassen.",
+      "clickManage": "Anklicken, um Euer Reittier zu wählen",
       "rarity_common": "Verbreitet",
       "rarity_rare": "Selten",
       "rarity_epic": "Episch",
@@ -4908,7 +4911,8 @@ export const de_DE: EnTranslations = {
       "tool": "Werkzeug",
       "potion": "Trank",
       "elixir": "Elixier",
-      "bag": "Tasche"
+      "bag": "Tasche",
+      "mount": "Reittier"
     },
     "stats": {
       "armor": "Rüstung",
@@ -7079,6 +7083,21 @@ export const de_DE: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Gürtelschutz des Sturmrufers"
+      },
+      "reins_grag_bear": {
+        "name": "Zügel des Goliath-Gragbären"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Zügel des Moosschalen-Stielgleiters"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Zündschlüssel: Ätherlanzen-Schwebrad"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Zügel von Kama-Kage der Schattensprungkröte"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Zügel des Himmelsgreifs Sturmfeder"
       }
     },
     "mobs": {

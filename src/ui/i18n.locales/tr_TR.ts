@@ -2392,6 +2392,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmshadow_treads.name': 'Nightfang Postalları',
   'entities.items.ysols_pearl_greaves.name': "Ysolei'nin İnci Dizlikleri",
   'entities.items.zealotsbane_blade.name': 'Bağnazbelası Kılıcı',
+  'entities.items.reins_grag_bear.name': 'Golyat Grag-Ayısının Dizginleri',
+  'entities.items.reins_stalkglider_snail.name': 'Yosun Kabuklu Sap Süzülgeninin Dizginleri',
+  'entities.items.reins_aether_hover_cycle.name':
+    'Kontak Anahtarı: Eter Şövalyesinin Uçan Motosikleti',
+  'entities.items.reins_shadowjump_toad.name': 'Gölge Sıçrayışlı Kurbağa Kama-Kage’nin Dizginleri',
+  'entities.items.reins_stormfeather_griffin.name': 'Göğe Uzanan Fırtına Tüyünün Dizginleri',
   'entities.mobs.acolyte_tessa.name': 'Çömez Tessa',
   'entities.mobs.bastion_revenant.name': 'Kale Hortlağı',
   'entities.mobs.bog_bloat.name': 'Bataklık Şişkini',

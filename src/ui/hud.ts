@@ -28,6 +28,7 @@ import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
+import { MOUNTS } from '../sim/content/mounts';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -309,7 +310,7 @@ import {
   sourceSlotForMobileButton,
 } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
-import { MountsWindow } from './mounts_window';
+import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_picker';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -658,6 +659,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
   bag: 'itemUi.kind.bag',
+  mount: 'itemUi.kind.mount',
 };
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
   armor: 'itemUi.stats.armor',
@@ -2243,9 +2245,6 @@ export class Hud {
       case 'daily-rewards-window':
         this.dailyRewardsWindow.close();
         break;
-      case 'mounts-window':
-        this.mountsWindow.close();
-        break;
       case 'emote-editor':
         this.closeEmoteEditor();
         break;
@@ -3576,6 +3575,7 @@ export class Hud {
     stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
     stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
+    openMountPicker: (mountKey) => this.openCharacterWithMount(mountKey),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {
       this.pendingPetFeed = active;
@@ -3845,15 +3845,6 @@ export class Hud {
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
-    onVisibilityChange: () => this.syncAnyWindowOpenState(),
-  });
-  // Mounts window (mounts_view.ts core + mounts_window.ts painter): pick the
-  // stable ground mount and mount/dismount (the Z keybind's window half).
-  private readonly mountsWindow = new MountsWindow({
-    root: () => $('#mounts-window'),
-    world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#mounts-window'),
-    ...this.windowFocus('#mounts-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
@@ -4352,6 +4343,23 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
+    // Collectible mount reins: the mount's flavor + specialty numbers + its
+    // ride-level gate (red below the gate, like gear's requires-level line).
+    if (item.kind === 'mount') {
+      const mountDef = MOUNTS[item.mount];
+      if (mountDef) {
+        const descKey = MOUNT_DESC_KEYS[mountDef.key];
+        if (descKey) html += `<div class="tt-desc">${esc(t(descKey))}</div>`;
+        for (const line of mountSpecLines({
+          speedPct: Math.round(mountDef.moveSpeedPct * 100),
+          blockPct: Math.round(mountDef.meleeBlockPct * 100),
+          critPct: Math.round(mountDef.critPct * 100),
+        }))
+          html += `<div class="tt-green">${esc(line)}</div>`;
+        const meets = this.sim.player.level >= mountDef.level;
+        html += `<div class="${meets ? 'tt-sub' : 'tt-red'}">${esc(t('hudChrome.mounts.requiresLevel', { level: mountDef.level }))}</div>`;
+      }
+    }
     if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
     }
@@ -11678,6 +11686,12 @@ export class Hud {
     this.charWindow.toggle();
   }
 
+  /** Open the character sheet with one mount picker card highlighted (the bag
+   *  click on a collected reins item routes here). */
+  openCharacterWithMount(key: string): void {
+    this.charWindow.openHighlightingMount(key);
+  }
+
   private renderCharPreview(): void {
     const container = $('#char-model-preview') as HTMLElement | null;
     if (!container) return;
@@ -13053,10 +13067,6 @@ export class Hud {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.toggle();
     this.refreshDailyRewardsLauncher(true);
-  }
-
-  toggleMounts(): void {
-    this.mountsWindow.toggle();
   }
 
   // -------------------------------------------------------------------------

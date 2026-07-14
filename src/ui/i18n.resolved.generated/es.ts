@@ -426,6 +426,9 @@ export const es: EnTranslations = {
       "requiresLevel": "Requiere nivel {level}",
       "pickFirst": "Elige una montura para montar.",
       "keybindHint": "Pulsa la tecla Montar / Desmontar (Z por defecto) para montar.",
+      "notCollected": "Sin coleccionar",
+      "dropHint": "Lo sueltan los jefes de mazmorras y bandas.",
+      "clickManage": "Haz clic para elegir tu montura",
       "rarity_common": "Común",
       "rarity_rare": "Rara",
       "rarity_epic": "Épica",
@@ -4908,7 +4911,8 @@ export const es: EnTranslations = {
       "tool": "Herramienta",
       "potion": "Poción",
       "elixir": "Elixir",
-      "bag": "Bolsa"
+      "bag": "Bolsa",
+      "mount": "Montura"
     },
     "stats": {
       "armor": "Armadura",
@@ -7079,6 +7083,21 @@ export const es: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guardacintura del Invocatormentas"
+      },
+      "reins_grag_bear": {
+        "name": "Riendas del Oso Grag Goliat"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Riendas del Deslizador de Caparazón Musgoso"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Llave de encendido: Aerocicleta Justadora del Éter"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Riendas de Kama-Kage, el Sapo Saltasombras"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Riendas del Plumatormenta Alcanzacielos"
       }
     },
     "mobs": {

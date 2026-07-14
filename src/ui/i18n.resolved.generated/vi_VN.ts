@@ -426,6 +426,9 @@ export const vi_VN: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
+      "notCollected": "Not collected",
+      "dropHint": "Drops from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
@@ -4908,7 +4911,8 @@ export const vi_VN: EnTranslations = {
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược",
-      "bag": "Túi"
+      "bag": "Túi",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Giáp",
@@ -7079,6 +7083,21 @@ export const vi_VN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Hộ Yêu của Triệu Bão Sư"
+      },
+      "reins_grag_bear": {
+        "name": "Dây cương Gấu Grag Goliath"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Dây cương Ốc Lướt Vỏ Rêu"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Chìa khóa khởi động: Xe Bay Kỵ Sĩ Aether"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Dây cương Kama-Kage, Cóc Nhảy Bóng"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Dây cương Vũ Bão Vươn Trời"
       }
     },
     "mobs": {

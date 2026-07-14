@@ -536,7 +536,7 @@ function mobileCallbacks() {
     onMap: noop,
     onLeaderboard: noop,
     onDailyRewards: noop,
-    onMounts: noop,
+    onMountToggle: noop,
     onNameplates: () => false,
     onMusic: () => true,
     onRecenterCamera: noop,

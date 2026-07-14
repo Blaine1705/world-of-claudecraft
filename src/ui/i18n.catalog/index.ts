@@ -1152,6 +1152,12 @@ export const en = {
       nighttalon_waistband: { name: 'Direfang Waistband' },
       soulflame_cord: { name: 'Wraithfire Cord' },
       stormcallers_waistguard: { name: 'Galecall Waistguard' },
+      // Collectible mount reins (boss drops; src/sim/mounts.ts mountOwned).
+      reins_grag_bear: { name: 'Reins of the Goliath Grag-Bear' },
+      reins_stalkglider_snail: { name: 'Reins of the Moss-Shell Stalk-Glider' },
+      reins_aether_hover_cycle: { name: 'Ignition Key: Aether-Jouster Hover-Cycle' },
+      reins_shadowjump_toad: { name: 'Reins of Kama-Kage the Shadow-Jump Toad' },
+      reins_stormfeather_griffin: { name: 'Reins of the Sky-Reach Stormfeather' },
     },
     itemSets: itemSetEntityText,
     mobs: { ...worldNames.en.entities.mobs, ...mergeEntities.en.mobs, ...mergeExtra.en.mobs },

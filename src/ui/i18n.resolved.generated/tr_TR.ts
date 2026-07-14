@@ -426,6 +426,9 @@ export const tr_TR: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
+      "notCollected": "Not collected",
+      "dropHint": "Drops from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
@@ -4908,7 +4911,8 @@ export const tr_TR: EnTranslations = {
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir",
-      "bag": "Çanta"
+      "bag": "Çanta",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Zırh",
@@ -7079,6 +7083,21 @@ export const tr_TR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Fırtınaçağıranın Bel Koruyucusu"
+      },
+      "reins_grag_bear": {
+        "name": "Golyat Grag-Ayısının Dizginleri"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Yosun Kabuklu Sap Süzülgeninin Dizginleri"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Kontak Anahtarı: Eter Şövalyesinin Uçan Motosikleti"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Gölge Sıçrayışlı Kurbağa Kama-Kage’nin Dizginleri"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Göğe Uzanan Fırtına Tüyünün Dizginleri"
       }
     },
     "mobs": {

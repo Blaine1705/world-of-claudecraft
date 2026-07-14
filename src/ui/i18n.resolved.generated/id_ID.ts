@@ -426,6 +426,9 @@ export const id_ID: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
+      "notCollected": "Not collected",
+      "dropHint": "Drops from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
@@ -4908,7 +4911,8 @@ export const id_ID: EnTranslations = {
       "tool": "Perkakas",
       "potion": "Ramuan",
       "elixir": "Eliksir",
-      "bag": "Tas"
+      "bag": "Tas",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Zirah",
@@ -7079,6 +7083,21 @@ export const id_ID: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Pelindung Pinggang Pemanggil Badai"
+      },
+      "reins_grag_bear": {
+        "name": "Tali Kekang Beruang Grag Goliat"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Tali Kekang Siput Peluncur Cangkang Lumut"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Kunci Kontak: Sepeda Layang Penunggang Eter"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Tali Kekang Kama-Kage si Kodok Lompat Bayangan"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Tali Kekang Bulu Badai Penggapai Langit"
       }
     },
     "mobs": {

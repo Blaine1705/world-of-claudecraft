@@ -2578,6 +2578,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Strumento',
   'itemUi.kind.potion': 'Pozione',
   'itemUi.kind.elixir': 'Elisir',
+  'itemUi.kind.mount': 'Cavalcatura',
   'itemUi.stats.armor': 'Armatura',
   'itemUi.stats.str': 'Forza',
   'itemUi.stats.agi': 'Agilità',
@@ -6695,6 +6696,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Essenza Arcana',
   'entities.items.arcane_shard.name': 'Frammento Arcano',
   'entities.items.chunk_of_ore.name': 'Pezzo di Minerale',
+  'entities.items.reins_grag_bear.name': 'Redini dell’Orso Grag Golia',
+  'entities.items.reins_stalkglider_snail.name': 'Redini dell’Aliante dal Guscio Muschioso',
+  'entities.items.reins_aether_hover_cycle.name':
+    'Chiave di accensione: Aerociclo del Giostratore d’Etere',
+  'entities.items.reins_shadowjump_toad.name': 'Redini di Kama-Kage, il Rospo Saltombra',
+  'entities.items.reins_stormfeather_griffin.name': 'Redini del Piumatempesta Toccacielo',
   'entities.quests.q_prof_intro.completion':
     'Vedi? Minerale nello zaino e calli sulle mani. Continua a estrarre minerali, tagliare legna e raccogliere erbe mentre percorri le strade. Quando torni in città, tieni d’occhio il tabellone delle Priorità della città vicino al mercato e il banco da lavoro lì accanto. C’è un mestiere onesto in tutto questo, se ti interessa.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Pezzo di Minerale',
@@ -6764,4 +6771,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.',
+  'hudChrome.mounts.notCollected': 'Non ottenuta',
+  'hudChrome.mounts.dropHint': 'Bottino dei boss di spedizione e incursione.',
+  'hudChrome.mounts.clickManage': 'Clicca per scegliere la tua cavalcatura',
 };

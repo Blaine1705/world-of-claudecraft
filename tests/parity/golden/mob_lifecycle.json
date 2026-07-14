@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "d6ab9a46",
+      "state": "b5137863",
       "events": "70235950",
       "rng": {
         "draws": 5,
@@ -79,6 +79,7 @@
           "lifetimeXp": 84,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -372,7 +373,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "10117966",
+      "state": "9a72e4c5",
       "events": "f12cc41d",
       "rng": {
         "draws": 8,
@@ -420,6 +421,7 @@
           "lifetimeXp": 198,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -766,7 +768,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "c20a27f2",
+      "state": "d93bb1e1",
       "events": "7bbdb84b",
       "rng": {
         "draws": 9,
@@ -815,6 +817,7 @@
           "lifetimeXp": 198,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1162,7 +1165,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 413,
-      "state": "7b83d79b",
+      "state": "7365e4ce",
       "events": "533e3bec",
       "rng": {
         "draws": 15,
@@ -1211,6 +1214,7 @@
           "lifetimeXp": 282,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1601,7 +1605,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 414,
-      "state": "970ed4fc",
+      "state": "8502655d",
       "events": "cd900bf4",
       "rng": {
         "draws": 20,
@@ -1650,6 +1654,7 @@
           "lifetimeXp": 366,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2101,7 +2106,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 414,
-      "state": "970ed4fc",
+      "state": "8502655d",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2150,6 +2155,7 @@
           "lifetimeXp": 366,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}

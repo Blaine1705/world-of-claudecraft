@@ -323,6 +323,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 36, sta: 2 },
     sellValue: 140,
   },
+  // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the
+  // reins item IS owning the mount (src/sim/mounts.ts mountOwned): soulbound,
+  // so ownership never transfers, and it stays valid from the bank too.
+  reins_grag_bear: {
+    id: 'reins_grag_bear',
+    name: 'Reins of the Goliath Grag-Bear',
+    kind: 'mount',
+    mount: 'grag_bear',
+    quality: 'common',
+    soulbound: true,
+    sellValue: 0,
+  },
   mistveil_cord: {
     id: 'mistveil_cord',
     name: 'Mistveil Cord',

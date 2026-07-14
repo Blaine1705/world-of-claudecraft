@@ -171,7 +171,6 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   calendar: 'hudChrome.calendar.keybindLabel',
   crafting: 'hudChrome.crafting.title',
   mount: 'hudChrome.keybinds.mount',
-  mounts: 'hudChrome.mounts.title',
 };
 
 /**

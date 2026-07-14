@@ -1199,12 +1199,9 @@ async function startGame(
             hud.toggleValeCup();
             break;
           case 'mount':
-            // Ride the pick, or open the stable when nothing is picked yet.
-            if (world.selectedMount()) world.toggleMounted();
-            else hud.toggleMounts();
-            break;
-          case 'mounts':
-            hud.toggleMounts();
+            // Ride the pick immediately (every player always has one; the
+            // character sheet's picker is where the pick changes).
+            world.toggleMounted();
             break;
           case 'leaderboard':
             hud.toggleLeaderboard();
@@ -1270,7 +1267,7 @@ async function startGame(
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
-    onMounts: () => hud.toggleMounts(),
+    onMountToggle: () => world.toggleMounted(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
       music.setEnabled(!music.enabled);
@@ -1360,11 +1357,7 @@ async function startGame(
         hud.toggleValeCup();
         break;
       case 'mount':
-        if (world.selectedMount()) world.toggleMounted();
-        else hud.toggleMounts();
-        break;
-      case 'mounts':
-        hud.toggleMounts();
+        world.toggleMounted();
         break;
       case 'leaderboard':
         hud.toggleLeaderboard();

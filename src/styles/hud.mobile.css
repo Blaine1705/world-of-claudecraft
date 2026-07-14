@@ -2239,8 +2239,7 @@
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
   body.mobile-touch #loot-settings-window,
-  body.mobile-touch #town-focus-window,
-  body.mobile-touch #mounts-window {
+  body.mobile-touch #town-focus-window {
     left: 10px;
     right: 10px;
     top: 10px;
@@ -2248,14 +2247,6 @@
     transform: none;
     box-sizing: border-box;
     overflow-y: auto;
-  }
-  /* The mounts list is a short single column; cap the sheet so the stable does
-     not stretch the full landscape height, and let the row list scroll inside. */
-  body.mobile-touch #mounts-window {
-    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
-  }
-  body.mobile-touch #mounts-window .mw-body {
-    max-height: none;
   }
   body.mobile-touch #vendor-window {
     max-height: calc(58vh - 20px);

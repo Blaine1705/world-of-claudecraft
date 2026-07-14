@@ -426,6 +426,9 @@ export const zh_TW: EnTranslations = {
       "requiresLevel": "需要等級 {level}",
       "pickFirst": "選擇一隻要騎乘的坐騎。",
       "keybindHint": "按下騎乘 / 下騎鍵(預設 Z)即可騎乘。",
+      "notCollected": "未收集",
+      "dropHint": "由地城和團隊副本首領掉落。",
+      "clickManage": "點擊選擇坐騎",
       "rarity_common": "普通",
       "rarity_rare": "稀有",
       "rarity_epic": "史詩",
@@ -4908,7 +4911,8 @@ export const zh_TW: EnTranslations = {
       "tool": "工具",
       "potion": "藥水",
       "elixir": "藥劑",
-      "bag": "背包"
+      "bag": "背包",
+      "mount": "坐騎"
     },
     "stats": {
       "armor": "護甲",
@@ -7079,6 +7083,21 @@ export const zh_TW: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "喚雷者腰甲"
+      },
+      "reins_grag_bear": {
+        "name": "歌利亞格拉格巨熊的韁繩"
+      },
+      "reins_stalkglider_snail": {
+        "name": "苔殼滑行蝸牛的韁繩"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "點火鑰匙：乙太騎士懸浮機車"
+      },
+      "reins_shadowjump_toad": {
+        "name": "影躍蟾蜍卡瑪影的韁繩"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "凌天風暴之羽的韁繩"
       }
     },
     "mobs": {

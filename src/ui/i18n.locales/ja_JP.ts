@@ -1644,6 +1644,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': '道具',
   'itemUi.kind.potion': 'ポーション',
   'itemUi.kind.elixir': 'エリクサー',
+  'itemUi.kind.mount': 'マウント',
   'itemUi.stats.armor': '防御力',
   'itemUi.stats.str': '筋力',
   'itemUi.stats.agi': '敏捷性',
@@ -5961,6 +5962,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': '聖遺物狩人の溺れずきん',
   'entities.items.sister_nhalia_choir_plate.name': 'ナリア修道女の聖歌鍛造鎧',
   'entities.items.drowned_choir_fang.name': '溺れた聖歌の牙',
+  'entities.items.reins_grag_bear.name': 'ゴリアテ・グラグベアの手綱',
+  'entities.items.reins_stalkglider_snail.name': 'モスシェル・ストークグライダーの手綱',
+  'entities.items.reins_aether_hover_cycle.name': '起動キー：エーテルジャウスター・ホバーサイクル',
+  'entities.items.reins_shadowjump_toad.name': '影跳びのカマカゲの手綱',
+  'entities.items.reins_stormfeather_griffin.name': 'スカイリーチ・ストームフェザーの手綱',
   'entities.mobs.drowned_cantor.name': '溺れた聖歌者',
   'entities.mobs.reedbound_acolyte.name': '葦縛りの信徒',
   'entities.mobs.deepfen_spearjaw.name': '深淵沼の槍顎',
@@ -6554,4 +6560,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。',
+  'hudChrome.mounts.notCollected': '未入手',
+  'hudChrome.mounts.dropHint': 'ダンジョンやレイドのボスがドロップします。',
+  'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
 };

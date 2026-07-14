@@ -6603,6 +6603,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Ten link do resetowania jest nieprawidłowy lub wygasł. Poproś o nowy.',
   'entities.items.chunk_of_ore.name': 'Kawałek rudy',
+  'entities.items.reins_grag_bear.name': 'Wodze Goliata Grag-niedźwiedzia',
+  'entities.items.reins_stalkglider_snail.name': 'Wodze mchoskorupego szybownika',
+  'entities.items.reins_aether_hover_cycle.name': 'Kluczyk zapłonu: eterowy ścigacz kopijnika',
+  'entities.items.reins_shadowjump_toad.name': 'Wodze Kama-Kage, ropuchy cienioskoku',
+  'entities.items.reins_stormfeather_griffin.name': 'Wodze Burzopióra Podniebnego',
   'entities.quests.q_prof_intro.completion':
     'Widzisz? Ruda w torbie i odciski na dłoniach. Dalej zajmuj się górnictwem, wyrębem i zielarstwem podczas wędrówek, a gdy wrócisz do miasta, pamiętaj o tablicy Priorytetów miasta przy targu i pobliskim stole rzemieślniczym. Na tym wszystkim można uczciwie zarobić, jeśli zechcesz.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Kawałek rudy',

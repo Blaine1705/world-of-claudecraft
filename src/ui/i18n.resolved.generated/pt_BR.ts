@@ -426,6 +426,9 @@ export const pt_BR: EnTranslations = {
       "requiresLevel": "Requer nível {level}",
       "pickFirst": "Escolha uma montaria para montar.",
       "keybindHint": "Pressione a tecla Montar / Desmontar (Z por padrão) para montar.",
+      "notCollected": "Não coletada",
+      "dropHint": "Obtida de chefes de masmorra e raide.",
+      "clickManage": "Clique para escolher sua montaria",
       "rarity_common": "Comum",
       "rarity_rare": "Rara",
       "rarity_epic": "Épica",
@@ -4908,7 +4911,8 @@ export const pt_BR: EnTranslations = {
       "tool": "Ferramenta",
       "potion": "Poção",
       "elixir": "Elixir",
-      "bag": "Bolsa"
+      "bag": "Bolsa",
+      "mount": "Montaria"
     },
     "stats": {
       "armor": "Armadura",
@@ -7079,6 +7083,21 @@ export const pt_BR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guarda-cintura do Chamatormentas"
+      },
+      "reins_grag_bear": {
+        "name": "Rédeas do Urso Grag Golias"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Rédeas do Planador de Casco Musgoso"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Chave de ignição: Aerociclo do Justador do Éter"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Rédeas de Kama-Kage, o Sapo Salta-Sombras"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Rédeas do Pluma-Tormenta Alcança-Céu"
       }
     },
     "mobs": {

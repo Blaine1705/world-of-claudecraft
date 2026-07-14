@@ -426,6 +426,9 @@ export const ja_JP: EnTranslations = {
       "requiresLevel": "レベル{level}が必要",
       "pickFirst": "騎乗するマウントを選んでください。",
       "keybindHint": "騎乗 / 降車キー(初期設定Z)で騎乗します。",
+      "notCollected": "未入手",
+      "dropHint": "ダンジョンやレイドのボスがドロップします。",
+      "clickManage": "クリックしてマウントを選択",
       "rarity_common": "コモン",
       "rarity_rare": "レア",
       "rarity_epic": "エピック",
@@ -4908,7 +4911,8 @@ export const ja_JP: EnTranslations = {
       "tool": "道具",
       "potion": "ポーション",
       "elixir": "エリクサー",
-      "bag": "バッグ"
+      "bag": "バッグ",
+      "mount": "マウント"
     },
     "stats": {
       "armor": "防御力",
@@ -7079,6 +7083,21 @@ export const ja_JP: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "嵐呼びの腰当て"
+      },
+      "reins_grag_bear": {
+        "name": "ゴリアテ・グラグベアの手綱"
+      },
+      "reins_stalkglider_snail": {
+        "name": "モスシェル・ストークグライダーの手綱"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "起動キー：エーテルジャウスター・ホバーサイクル"
+      },
+      "reins_shadowjump_toad": {
+        "name": "影跳びのカマカゲの手綱"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "スカイリーチ・ストームフェザーの手綱"
       }
     },
     "mobs": {

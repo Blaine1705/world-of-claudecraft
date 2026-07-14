@@ -6548,6 +6548,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Dette nulstillingslink er ugyldigt eller udløbet. Anmod om et nyt.',
   'entities.items.chunk_of_ore.name': 'Malmklump',
+  'entities.items.reins_grag_bear.name': 'Tøjler til Goliat Grag-bjørnen',
+  'entities.items.reins_stalkglider_snail.name': 'Tøjler til mosskal-stilkglideren',
+  'entities.items.reins_aether_hover_cycle.name': 'Tændingsnøgle: Æterridderens svævecykel',
+  'entities.items.reins_shadowjump_toad.name': 'Tøjler til Kama-Kage, skyggespringstudsen',
+  'entities.items.reins_stormfeather_griffin.name': 'Tøjler til den himmelrækkende Stormfjer',
   'entities.quests.q_prof_intro.completion':
     'Kan du se? Malm i din taske og hård hud på dine hænder. Fortsæt med minedrift, skovhugst og urtesamling, mens du rejser ad vejene. Når du er tilbage i byen, så husk Byfokus-tavlen ved markedet og arbejdsbænken i nærheden. Der er et hæderligt levebrød i det alt sammen, hvis du ønsker det.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmklump',

@@ -426,6 +426,9 @@ export const nl_NL: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
+      "notCollected": "Not collected",
+      "dropHint": "Drops from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
@@ -4908,7 +4911,8 @@ export const nl_NL: EnTranslations = {
       "tool": "Gereedschap",
       "potion": "Toverdrank",
       "elixir": "Elixer",
-      "bag": "Tas"
+      "bag": "Tas",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Pantser",
@@ -7079,6 +7083,21 @@ export const nl_NL: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Lendenbescherming van de Stormroeper"
+      },
+      "reins_grag_bear": {
+        "name": "Teugels van de Goliath Grag-beer"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Teugels van de mosschelp-steelglijder"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Contactsleutel: zweefcykel van de Etherkamper"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Teugels van Kama-Kage de schaduwsprongpad"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Teugels van de hemelreikende Stormveder"
       }
     },
     "mobs": {

@@ -2587,6 +2587,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Herramienta',
   'itemUi.kind.potion': 'Poción',
   'itemUi.kind.elixir': 'Elixir',
+  'itemUi.kind.mount': 'Montura',
   'itemUi.stats.armor': 'Armadura',
   'itemUi.stats.str': 'Fuerza',
   'itemUi.stats.agi': 'Agilidad',
@@ -6710,6 +6711,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Esencia arcana',
   'entities.items.arcane_shard.name': 'Fragmento arcano',
   'entities.items.chunk_of_ore.name': 'Trozo de mineral',
+  'entities.items.reins_grag_bear.name': 'Riendas del Oso Grag Goliat',
+  'entities.items.reins_stalkglider_snail.name': 'Riendas del Deslizador de Caparazón Musgoso',
+  'entities.items.reins_aether_hover_cycle.name':
+    'Llave de encendido: Aerocicleta Justadora del Éter',
+  'entities.items.reins_shadowjump_toad.name': 'Riendas de Kama-Kage, el Sapo Saltasombras',
+  'entities.items.reins_stormfeather_griffin.name': 'Riendas del Plumatormenta Alcanzacielos',
   'entities.quests.q_prof_intro.completion':
     '¿Lo ves? Mineral en la mochila y callos en las manos. Sigue minando, talando y recogiendo hierbas mientras recorres los caminos. Cuando vuelvas al pueblo, no pierdas de vista el tablón de Enfoque del pueblo junto al mercado ni el banco de artesanía cercano. En esos oficios te espera una vida honrada, si la quieres.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Trozo de mineral',
@@ -6779,4 +6786,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.',
+  'hudChrome.mounts.notCollected': 'Sin coleccionar',
+  'hudChrome.mounts.dropHint': 'Lo sueltan los jefes de mazmorras y bandas.',
+  'hudChrome.mounts.clickManage': 'Haz clic para elegir tu montura',
 };

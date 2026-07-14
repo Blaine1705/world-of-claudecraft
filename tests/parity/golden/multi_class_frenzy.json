@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "2266ab10",
+      "state": "e09c386b",
       "events": "a6bdb9f3",
       "rng": {
         "draws": 3,
@@ -75,6 +75,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -122,6 +123,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -165,6 +167,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -403,7 +406,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "b7bb6f57",
+      "state": "9f95ebf0",
       "events": "ea631a91",
       "rng": {
         "draws": 6,
@@ -448,6 +451,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -495,6 +499,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -538,6 +543,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -776,7 +782,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "0b24cf4b",
+      "state": "ac8a804a",
       "events": "ea631a91",
       "rng": {
         "draws": 9,
@@ -821,6 +827,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -868,6 +875,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -911,6 +919,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1149,7 +1158,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "fe40b04a",
+      "state": "94f85f1f",
       "events": "ea631a91",
       "rng": {
         "draws": 12,
@@ -1194,6 +1203,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1241,6 +1251,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1284,6 +1295,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1522,7 +1534,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 409,
-      "state": "0d1500b0",
+      "state": "e6a62a95",
       "events": "0085b1fd",
       "rng": {
         "draws": 15,
@@ -1533,7 +1545,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "f0a6c37f",
+      "state": "1524d3d4",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1544,7 +1556,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "f0a6c37f",
+      "state": "1524d3d4",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1590,6 +1602,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1637,6 +1650,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1680,6 +1694,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}

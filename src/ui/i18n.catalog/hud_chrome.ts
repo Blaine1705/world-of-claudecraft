@@ -426,10 +426,11 @@ export const hudChromeStrings = {
     // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
     mount: 'Mount / Dismount',
   },
-  // The Mounts window (the stable): pick the stable ground mount, see each
-  // card's level gate + specialty numbers, and mount/dismount. Names and
-  // descriptions come from the reference cards (src/sim/content/mounts.ts
-  // carries the canonical English names for the sim side).
+  // The character sheet's mount picker (mount_picker.ts; the old Mounts window
+  // is retired, its keys stay per the retired-but-translated chrome precedent).
+  // Names and descriptions come from the reference cards
+  // (src/sim/content/mounts.ts carries the canonical English names for the sim
+  // side); clickManage is the bag tooltip hint on a collected reins item.
   mounts: {
     title: 'Mounts',
     close: 'Close',
@@ -441,6 +442,9 @@ export const hudChromeStrings = {
     requiresLevel: 'Requires level {level}',
     pickFirst: 'Pick a mount to ride.',
     keybindHint: 'Press the Mount / Dismount key (default Z) to ride.',
+    notCollected: 'Not collected',
+    dropHint: 'Drops from dungeon and raid bosses.',
+    clickManage: 'Click to choose your mount',
     rarity_common: 'Common',
     rarity_rare: 'Rare',
     rarity_epic: 'Epic',

@@ -6565,6 +6565,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Den här återställningslänken är ogiltig eller har gått ut. Begär en ny.',
   'entities.items.chunk_of_ore.name': 'Malmklump',
+  'entities.items.reins_grag_bear.name': 'Tyglar till Goliat Grag-björnen',
+  'entities.items.reins_stalkglider_snail.name': 'Tyglar till mosskal-stjälkglidaren',
+  'entities.items.reins_aether_hover_cycle.name': 'Tändningsnyckel: eterriddarens svävarcykel',
+  'entities.items.reins_shadowjump_toad.name': 'Tyglar till Kama-Kage, skuggsprångspaddan',
+  'entities.items.reins_stormfeather_griffin.name': 'Tyglar till den himlanående Stormfjädern',
   'entities.quests.q_prof_intro.completion':
     'Ser du? Malm i packningen och valkar på händerna. Fortsätt med gruvdrift, skogsavverkning och örtplockning medan du färdas längs vägarna. När du är tillbaka i staden, kom ihåg Stadsfokus-tavlan vid marknaden och arbetsbänken i närheten. Det går att försörja sig hederligt på alltihop, om du vill.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmklump',

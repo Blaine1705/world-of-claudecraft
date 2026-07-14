@@ -2570,6 +2570,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Ferramenta',
   'itemUi.kind.potion': 'Poção',
   'itemUi.kind.elixir': 'Elixir',
+  'itemUi.kind.mount': 'Montaria',
   'itemUi.stats.armor': 'Armadura',
   'itemUi.stats.str': 'Força',
   'itemUi.stats.agi': 'Agilidade',
@@ -6668,6 +6669,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Essência Arcana',
   'entities.items.arcane_shard.name': 'Fragmento Arcano',
   'entities.items.chunk_of_ore.name': 'Pedaço de Minério',
+  'entities.items.reins_grag_bear.name': 'Rédeas do Urso Grag Golias',
+  'entities.items.reins_stalkglider_snail.name': 'Rédeas do Planador de Casco Musgoso',
+  'entities.items.reins_aether_hover_cycle.name': 'Chave de ignição: Aerociclo do Justador do Éter',
+  'entities.items.reins_shadowjump_toad.name': 'Rédeas de Kama-Kage, o Sapo Salta-Sombras',
+  'entities.items.reins_stormfeather_griffin.name': 'Rédeas do Pluma-Tormenta Alcança-Céu',
   'entities.quests.q_prof_intro.completion':
     'Viu só? Minério na mochila e calos nas mãos. Continue minerando, cortando madeira e colhendo ervas enquanto percorre as estradas. Quando voltar à cidade, preste atenção no quadro do Foco da Cidade perto do mercado e na bancada de criação ali ao lado. Dá para ganhar a vida honestamente com tudo isso, se você quiser.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Pedaço de Minério',
@@ -6738,4 +6744,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.',
+  'hudChrome.mounts.notCollected': 'Não coletada',
+  'hudChrome.mounts.dropHint': 'Obtida de chefes de masmorra e raide.',
+  'hudChrome.mounts.clickManage': 'Clique para escolher sua montaria',
 };

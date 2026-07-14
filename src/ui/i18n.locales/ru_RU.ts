@@ -1666,6 +1666,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Инструмент',
   'itemUi.kind.potion': 'Зелье',
   'itemUi.kind.elixir': 'Эликсир',
+  'itemUi.kind.mount': 'Транспорт',
   'itemUi.stats.armor': 'Броня',
   'itemUi.stats.str': 'Сила',
   'itemUi.stats.agi': 'Ловкость',
@@ -6074,6 +6075,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': 'Капюшон Утопшего Реликвария',
   'entities.items.sister_nhalia_choir_plate.name': 'Хоровая Кованая Броня Сестры Нхалии',
   'entities.items.drowned_choir_fang.name': 'Клык Утопшего Хора',
+  'entities.items.reins_grag_bear.name': 'Поводья Голиафа Граг-медведя',
+  'entities.items.reins_stalkglider_snail.name': 'Поводья мохопанцирного скользня',
+  'entities.items.reins_aether_hover_cycle.name':
+    'Ключ зажигания: эфирный ховерцикл турнирного бойца',
+  'entities.items.reins_shadowjump_toad.name': 'Поводья Кама-Кагэ, жабы теневых прыжков',
+  'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -6686,4 +6693,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Огромная устойчивая жаба, обученная молниеносным теневым прыжкам по любой местности.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
+  'hudChrome.mounts.notCollected': 'Не получено',
+  'hudChrome.mounts.dropHint': 'Добывается с боссов подземелий и рейдов.',
+  'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
 };

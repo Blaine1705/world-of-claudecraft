@@ -1629,6 +1629,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': '도구',
   'itemUi.kind.potion': '물약',
   'itemUi.kind.elixir': '비약',
+  'itemUi.kind.mount': '탈것',
   'itemUi.stats.armor': '방어도',
   'itemUi.stats.str': '힘',
   'itemUi.stats.agi': '민첩성',
@@ -5946,6 +5947,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': '성물사냥꾼의 익사 두건',
   'entities.items.sister_nhalia_choir_plate.name': '나할리아 수녀의 성가 단조 판금',
   'entities.items.drowned_choir_fang.name': '익사한 성가대의 송곳니',
+  'entities.items.reins_grag_bear.name': '골리앗 그라그곰의 고삐',
+  'entities.items.reins_stalkglider_snail.name': '이끼껍질 활공달팽이의 고삐',
+  'entities.items.reins_aether_hover_cycle.name': '시동 열쇠: 에테르 기사 호버사이클',
+  'entities.items.reins_shadowjump_toad.name': '그림자 도약 두꺼비 카마카게의 고삐',
+  'entities.items.reins_stormfeather_griffin.name': '하늘닿이 폭풍깃의 고삐',
   'entities.mobs.drowned_cantor.name': '익사한 영창자',
   'entities.mobs.reedbound_acolyte.name': '갈대에 묶인 신도',
   'entities.mobs.deepfen_spearjaw.name': '깊은늪 창턱',
@@ -6539,4 +6545,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
+  'hudChrome.mounts.notCollected': '미보유',
+  'hudChrome.mounts.dropHint': '던전 및 공격대 우두머리가 떨어뜨립니다.',
+  'hudChrome.mounts.clickManage': '클릭하여 탈것 선택',
 };

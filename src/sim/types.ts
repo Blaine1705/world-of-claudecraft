@@ -1,5 +1,6 @@
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
+import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 
@@ -370,7 +371,8 @@ type ItemKind =
   | 'tool'
   | 'potion'
   | 'elixir'
-  | 'bag';
+  | 'bag'
+  | 'mount';
 
 interface BaseItemDef {
   id: string;
@@ -565,11 +567,23 @@ export interface WeaponProc {
 }
 
 export interface OtherItemDef extends BaseItemDef {
-  kind: Exclude<ItemKind, 'armor' | 'weapon'>;
+  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'mount'>;
   armorType?: never;
 }
 
-export type ItemDef = ArmorItemDef | WeaponItemDef | JewelryItemDef | OtherItemDef;
+// A collectible mount item (boss drop). Owning the item IS owning the mount:
+// while it sits in the player's bags or bank, the catalog mount it names is
+// selectable and ridable (src/sim/mounts.ts mountOwned). Always soulbound, so
+// ownership can never transfer; the horse (DEFAULT_MOUNT) is the one mount
+// every player owns without an item.
+export interface MountItemDef extends BaseItemDef {
+  kind: 'mount';
+  mount: MountKey;
+  armorType?: never;
+  weapon?: never;
+}
+
+export type ItemDef = ArmorItemDef | WeaponItemDef | JewelryItemDef | OtherItemDef | MountItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot

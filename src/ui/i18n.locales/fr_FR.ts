@@ -2612,6 +2612,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Outil',
   'itemUi.kind.potion': 'Potion',
   'itemUi.kind.elixir': 'Élixir',
+  'itemUi.kind.mount': 'Monture',
   'itemUi.stats.armor': 'Armure',
   'itemUi.stats.str': 'Force',
   'itemUi.stats.agi': 'Agilité',
@@ -6760,6 +6761,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Essence arcanique',
   'entities.items.arcane_shard.name': 'Éclat arcanique',
   'entities.items.chunk_of_ore.name': 'Morceau de minerai',
+  'entities.items.reins_grag_bear.name': 'Rênes de l’Ours-Grag Goliath',
+  'entities.items.reins_stalkglider_snail.name': 'Rênes du Glisseur à Coquille Moussue',
+  'entities.items.reins_aether_hover_cycle.name': 'Clé de contact : Aérocycle du Jouteur d’Éther',
+  'entities.items.reins_shadowjump_toad.name': 'Rênes de Kama-Kage, le Crapaud Saute-Ombre',
+  'entities.items.reins_stormfeather_griffin.name': 'Rênes du Plume-d’Orage Toise-Ciel',
   'entities.quests.q_prof_intro.completion':
     'Vous voyez ? Du minerai dans votre sac et des cals aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l’établi d’artisanat juste à côté. Tout cela peut vous offrir un gagne-pain honorable, si le cœur vous en dit.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Morceau de minerai',
@@ -6831,4 +6837,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
+  'hudChrome.mounts.notCollected': 'Non collectée',
+  'hudChrome.mounts.dropHint': 'Butin des boss de donjon et de raid.',
+  'hudChrome.mounts.clickManage': 'Cliquez pour choisir votre monture',
 };

@@ -4383,11 +4383,16 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
-    // The persisted mount pick (IWorldMounts.selectedMount; '' rides as null).
-    // Kept per-tick like the other small scalars: one short string, negligible
-    // diff. Wire key `mnt`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in
-    // tests/snapshots.test.ts.
-    maybe('mnt', meta.selectedMount || null);
+    // The persisted mount pick (IWorldMounts.selectedMount; always a valid
+    // catalog key, the horse by default). Kept per-tick like the other small
+    // scalars: one short string, negligible diff. Wire key `mnt`; see
+    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
+    maybe('mnt', meta.selectedMount);
+    // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
+    // every mount whose reins item sits in bags or bank. A handful of short
+    // strings whose serialized form only changes on a loot/bank move, so the
+    // per-tick diff is negligible. Wire key `mntOwn`.
+    maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety

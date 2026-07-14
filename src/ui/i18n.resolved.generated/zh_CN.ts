@@ -426,6 +426,9 @@ export const zh_CN: EnTranslations = {
       "requiresLevel": "需要等级{level}",
       "pickFirst": "选择一个要骑乘的坐骑。",
       "keybindHint": "按下骑乘 / 下骑键(默认Z)即可骑乘。",
+      "notCollected": "未收集",
+      "dropHint": "由地下城和团队副本首领掉落。",
+      "clickManage": "点击选择坐骑",
       "rarity_common": "普通",
       "rarity_rare": "稀有",
       "rarity_epic": "史诗",
@@ -4908,7 +4911,8 @@ export const zh_CN: EnTranslations = {
       "tool": "工具",
       "potion": "药水",
       "elixir": "药剂",
-      "bag": "背包"
+      "bag": "背包",
+      "mount": "坐骑"
     },
     "stats": {
       "armor": "护甲",
@@ -7079,6 +7083,21 @@ export const zh_CN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "唤雷者腰甲"
+      },
+      "reins_grag_bear": {
+        "name": "歌利亚格拉格巨熊的缰绳"
+      },
+      "reins_stalkglider_snail": {
+        "name": "苔壳滑行蜗牛的缰绳"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "点火钥匙：以太骑士悬浮机车"
+      },
+      "reins_shadowjump_toad": {
+        "name": "影跃蟾蜍卡玛影的缰绳"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "凌天风暴之羽的缰绳"
       }
     },
     "mobs": {

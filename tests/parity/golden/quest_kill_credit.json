@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "6e73f95b",
+      "state": "94cb9b10",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,6 +60,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -123,7 +124,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "96f05380",
+      "state": "93c23ed9",
       "events": "18f7db7d",
       "rng": {
         "draws": 0,
@@ -180,6 +181,7 @@
               }
             ]
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -243,7 +245,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 414,
-      "state": "682a8d8d",
+      "state": "72fea532",
       "events": "babdb250",
       "rng": {
         "draws": 40,
@@ -304,6 +306,7 @@
               }
             ]
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -368,7 +371,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 414,
-      "state": "eea48748",
+      "state": "e1a821f9",
       "events": "3c24f53f",
       "rng": {
         "draws": 40,
@@ -423,6 +426,7 @@
           "questsDone": [
             "q_wolves"
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -488,7 +492,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 414,
-      "state": "4b2b3070",
+      "state": "09758a51",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -543,6 +547,7 @@
           "questsDone": [
             "q_wolves"
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}

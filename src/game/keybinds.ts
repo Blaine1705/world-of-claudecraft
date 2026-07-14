@@ -187,20 +187,14 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyY'],
   },
-  // Mount / dismount toggle; opens the Mounts window while nothing is picked.
+  // Mount / dismount toggle: rides the pick immediately (every player always
+  // has one, the horse by default; swap it in the character sheet's picker).
   {
     id: 'mount',
     label: 'Mount / Dismount',
     category: 'Interface',
     kind: 'edge',
     defaults: ['KeyZ'],
-  },
-  {
-    id: 'mounts',
-    label: 'Mounts',
-    category: 'Interface',
-    kind: 'edge',
-    defaults: ['Shift+KeyZ'],
   },
   {
     id: 'leaderboard',

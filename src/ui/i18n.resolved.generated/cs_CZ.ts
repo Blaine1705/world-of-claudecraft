@@ -426,6 +426,9 @@ export const cs_CZ: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
+      "notCollected": "Not collected",
+      "dropHint": "Drops from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
@@ -4908,7 +4911,8 @@ export const cs_CZ: EnTranslations = {
       "tool": "Nástroj",
       "potion": "Lektvar",
       "elixir": "Elixír",
-      "bag": "Batoh"
+      "bag": "Batoh",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Brnění",
@@ -7079,6 +7083,21 @@ export const cs_CZ: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Pás volajícího bouři"
+      },
+      "reins_grag_bear": {
+        "name": "Otěže Goliáše Grag-medvěda"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Otěže mechokrunýřového plachtíka"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Startovací klíč: Éterové vznášecí kolo"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Otěže Kama-Kageho, ropuchy stínového skoku"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Otěže Bouřopera Nebedosahujícího"
       }
     },
     "mobs": {

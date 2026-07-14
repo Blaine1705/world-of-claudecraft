@@ -25,6 +25,7 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
+    "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
     "hudChrome.mounts.desc_grag_bear",
@@ -33,6 +34,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stormfeather_griffin",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.dismount",
+    "hudChrome.mounts.dropHint",
     "hudChrome.mounts.keybindHint",
     "hudChrome.mounts.mount",
     "hudChrome.mounts.name_aether_hover_cycle",
@@ -41,6 +43,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_stalkglider_snail",
     "hudChrome.mounts.name_stormfeather_griffin",
     "hudChrome.mounts.name_valorsteed",
+    "hudChrome.mounts.notCollected",
     "hudChrome.mounts.pickFirst",
     "hudChrome.mounts.rarity_common",
     "hudChrome.mounts.rarity_epic",
@@ -52,11 +55,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
-    "hudChrome.mounts.title"
+    "hudChrome.mounts.title",
+    "itemUi.kind.mount"
   ],
   "nl_NL": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
+    "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
     "hudChrome.mounts.desc_grag_bear",
@@ -65,6 +70,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stormfeather_griffin",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.dismount",
+    "hudChrome.mounts.dropHint",
     "hudChrome.mounts.keybindHint",
     "hudChrome.mounts.mount",
     "hudChrome.mounts.name_aether_hover_cycle",
@@ -73,6 +79,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_stalkglider_snail",
     "hudChrome.mounts.name_stormfeather_griffin",
     "hudChrome.mounts.name_valorsteed",
+    "hudChrome.mounts.notCollected",
     "hudChrome.mounts.pickFirst",
     "hudChrome.mounts.rarity_common",
     "hudChrome.mounts.rarity_epic",
@@ -84,11 +91,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
-    "hudChrome.mounts.title"
+    "hudChrome.mounts.title",
+    "itemUi.kind.mount"
   ],
   "pl_PL": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
+    "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
     "hudChrome.mounts.desc_grag_bear",
@@ -97,6 +106,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stormfeather_griffin",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.dismount",
+    "hudChrome.mounts.dropHint",
     "hudChrome.mounts.keybindHint",
     "hudChrome.mounts.mount",
     "hudChrome.mounts.name_aether_hover_cycle",
@@ -105,6 +115,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_stalkglider_snail",
     "hudChrome.mounts.name_stormfeather_griffin",
     "hudChrome.mounts.name_valorsteed",
+    "hudChrome.mounts.notCollected",
     "hudChrome.mounts.pickFirst",
     "hudChrome.mounts.rarity_common",
     "hudChrome.mounts.rarity_epic",
@@ -116,11 +127,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
-    "hudChrome.mounts.title"
+    "hudChrome.mounts.title",
+    "itemUi.kind.mount"
   ],
   "id_ID": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
+    "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
     "hudChrome.mounts.desc_grag_bear",
@@ -129,6 +142,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stormfeather_griffin",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.dismount",
+    "hudChrome.mounts.dropHint",
     "hudChrome.mounts.keybindHint",
     "hudChrome.mounts.mount",
     "hudChrome.mounts.name_aether_hover_cycle",
@@ -137,6 +151,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_stalkglider_snail",
     "hudChrome.mounts.name_stormfeather_griffin",
     "hudChrome.mounts.name_valorsteed",
+    "hudChrome.mounts.notCollected",
     "hudChrome.mounts.pickFirst",
     "hudChrome.mounts.rarity_common",
     "hudChrome.mounts.rarity_epic",
@@ -148,11 +163,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
-    "hudChrome.mounts.title"
+    "hudChrome.mounts.title",
+    "itemUi.kind.mount"
   ],
   "tr_TR": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
+    "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
     "hudChrome.mounts.desc_grag_bear",
@@ -161,6 +178,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stormfeather_griffin",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.dismount",
+    "hudChrome.mounts.dropHint",
     "hudChrome.mounts.keybindHint",
     "hudChrome.mounts.mount",
     "hudChrome.mounts.name_aether_hover_cycle",
@@ -169,6 +187,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_stalkglider_snail",
     "hudChrome.mounts.name_stormfeather_griffin",
     "hudChrome.mounts.name_valorsteed",
+    "hudChrome.mounts.notCollected",
     "hudChrome.mounts.pickFirst",
     "hudChrome.mounts.rarity_common",
     "hudChrome.mounts.rarity_epic",
@@ -180,11 +199,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
-    "hudChrome.mounts.title"
+    "hudChrome.mounts.title",
+    "itemUi.kind.mount"
   ],
   "sv_SE": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
+    "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
     "hudChrome.mounts.desc_grag_bear",
@@ -193,6 +214,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stormfeather_griffin",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.dismount",
+    "hudChrome.mounts.dropHint",
     "hudChrome.mounts.keybindHint",
     "hudChrome.mounts.mount",
     "hudChrome.mounts.name_aether_hover_cycle",
@@ -201,6 +223,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_stalkglider_snail",
     "hudChrome.mounts.name_stormfeather_griffin",
     "hudChrome.mounts.name_valorsteed",
+    "hudChrome.mounts.notCollected",
     "hudChrome.mounts.pickFirst",
     "hudChrome.mounts.rarity_common",
     "hudChrome.mounts.rarity_epic",
@@ -212,11 +235,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
-    "hudChrome.mounts.title"
+    "hudChrome.mounts.title",
+    "itemUi.kind.mount"
   ],
   "vi_VN": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
+    "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
     "hudChrome.mounts.desc_grag_bear",
@@ -225,6 +250,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stormfeather_griffin",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.dismount",
+    "hudChrome.mounts.dropHint",
     "hudChrome.mounts.keybindHint",
     "hudChrome.mounts.mount",
     "hudChrome.mounts.name_aether_hover_cycle",
@@ -233,6 +259,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_stalkglider_snail",
     "hudChrome.mounts.name_stormfeather_griffin",
     "hudChrome.mounts.name_valorsteed",
+    "hudChrome.mounts.notCollected",
     "hudChrome.mounts.pickFirst",
     "hudChrome.mounts.rarity_common",
     "hudChrome.mounts.rarity_epic",
@@ -244,11 +271,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
-    "hudChrome.mounts.title"
+    "hudChrome.mounts.title",
+    "itemUi.kind.mount"
   ],
   "da_DK": [
     "hudChrome.keybinds.mount",
     "hudChrome.mobile.mounts",
+    "hudChrome.mounts.clickManage",
     "hudChrome.mounts.close",
     "hudChrome.mounts.desc_aether_hover_cycle",
     "hudChrome.mounts.desc_grag_bear",
@@ -257,6 +286,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stormfeather_griffin",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.dismount",
+    "hudChrome.mounts.dropHint",
     "hudChrome.mounts.keybindHint",
     "hudChrome.mounts.mount",
     "hudChrome.mounts.name_aether_hover_cycle",
@@ -265,6 +295,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_stalkglider_snail",
     "hudChrome.mounts.name_stormfeather_griffin",
     "hudChrome.mounts.name_valorsteed",
+    "hudChrome.mounts.notCollected",
     "hudChrome.mounts.pickFirst",
     "hudChrome.mounts.rarity_common",
     "hudChrome.mounts.rarity_epic",
@@ -276,6 +307,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.spec_block",
     "hudChrome.mounts.spec_crit",
     "hudChrome.mounts.spec_speed",
-    "hudChrome.mounts.title"
+    "hudChrome.mounts.title",
+    "itemUi.kind.mount"
   ]
 };

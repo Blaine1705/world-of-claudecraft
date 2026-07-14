@@ -426,6 +426,9 @@ export const pl_PL: EnTranslations = {
       "requiresLevel": "Requires level {level}",
       "pickFirst": "Pick a mount to ride.",
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
+      "notCollected": "Not collected",
+      "dropHint": "Drops from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
@@ -4908,7 +4911,8 @@ export const pl_PL: EnTranslations = {
       "tool": "Narzędzie",
       "potion": "Mikstura",
       "elixir": "Eliksir",
-      "bag": "Torba"
+      "bag": "Torba",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Pancerz",
@@ -7079,6 +7083,21 @@ export const pl_PL: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Ochraniacz pasa przywoływacza burz"
+      },
+      "reins_grag_bear": {
+        "name": "Wodze Goliata Grag-niedźwiedzia"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Wodze mchoskorupego szybownika"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Kluczyk zapłonu: eterowy ścigacz kopijnika"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Wodze Kama-Kage, ropuchy cienioskoku"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Wodze Burzopióra Podniebnego"
       }
     },
     "mobs": {

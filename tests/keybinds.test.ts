@@ -103,9 +103,10 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyT')).toBe('crafting');
     expect(kb.actionForCode('KeyY')).toBe('valecup');
     // The mount toggle claimed KeyZ (the last free letter); Backquote is the
-    // suite's unbound probe key now.
+    // suite's unbound probe key now. Shift+KeyZ is free again: the Mounts
+    // window is retired (the picker lives in the character sheet).
     expect(kb.actionForCode('KeyZ')).toBe('mount');
-    expect(kb.edgeActionForCombo('Shift+KeyZ')).toBe('mounts');
+    expect(kb.edgeActionForCombo('Shift+KeyZ')).toBe(null);
     expect(kb.actionForCode('Backquote')).toBe(null);
   });
 

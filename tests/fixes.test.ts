@@ -699,8 +699,12 @@ describe('boss loot and encounter resets', () => {
       for (let i = 0; i < 300; i++) {
         mob.loot = null;
         (sim as any).rollLoot(mob, meta);
+        // Gear only: a collectible mount reins (kind 'mount') rides its own
+        // independent drop and is exempt from the bonus-gear caps.
         const gear = (lootOf(mob)?.items ?? []).filter((s) => {
-          const q = ITEMS[s.itemId]?.quality;
+          const def = ITEMS[s.itemId];
+          if (def?.kind === 'mount') return false;
+          const q = def?.quality;
           return q === 'uncommon' || q === 'rare' || q === 'epic';
         });
         const uncommon = gear.filter((s) => ITEMS[s.itemId]?.quality === 'uncommon');

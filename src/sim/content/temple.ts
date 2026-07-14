@@ -272,6 +272,8 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'moonshroud_breastplate', chance: 0.34, rollGroup: 'ysolei_blue' },
       { itemId: 'moonshroud_robe', chance: 0.33, rollGroup: 'ysolei_blue' },
       { itemId: 'moonshroud_tunic', chance: 0.33, rollGroup: 'ysolei_blue' },
+      // Collectible mount: an independent draw, never inside a roll group.
+      { itemId: 'reins_aether_hover_cycle', chance: 0.1 },
     ],
     scale: 1.65,
     color: 0xbcd2ec,
@@ -644,6 +646,17 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 200, sta: 7, str: 4 },
     sellValue: 2400,
     requiredClass: WAR,
+  },
+  // Collectible mount (Ysolei, Avatar of the Drowned Moon). Soulbound; owning
+  // the ignition key item is owning the mount (src/sim/mounts.ts mountOwned).
+  reins_aether_hover_cycle: {
+    id: 'reins_aether_hover_cycle',
+    name: 'Ignition Key: Aether-Jouster Hover-Cycle',
+    kind: 'mount',
+    mount: 'aether_hover_cycle',
+    quality: 'rare',
+    soulbound: true,
+    sellValue: 0,
   },
   moonshroud_robe: {
     id: 'moonshroud_robe',

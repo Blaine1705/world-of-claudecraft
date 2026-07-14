@@ -426,6 +426,9 @@ export const ru_RU: EnTranslations = {
       "requiresLevel": "Требуется {level} уровень",
       "pickFirst": "Выберите транспорт для езды.",
       "keybindHint": "Нажмите клавишу «Сесть / Спешиться» (по умолчанию Z), чтобы поехать.",
+      "notCollected": "Не получено",
+      "dropHint": "Добывается с боссов подземелий и рейдов.",
+      "clickManage": "Нажмите, чтобы выбрать транспорт",
       "rarity_common": "Обычный",
       "rarity_rare": "Редкий",
       "rarity_epic": "Эпический",
@@ -4908,7 +4911,8 @@ export const ru_RU: EnTranslations = {
       "tool": "Инструмент",
       "potion": "Зелье",
       "elixir": "Эликсир",
-      "bag": "Сумка"
+      "bag": "Сумка",
+      "mount": "Транспорт"
     },
     "stats": {
       "armor": "Броня",
@@ -7079,6 +7083,21 @@ export const ru_RU: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Поясная защита призывателя бурь"
+      },
+      "reins_grag_bear": {
+        "name": "Поводья Голиафа Граг-медведя"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Поводья мохопанцирного скользня"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Ключ зажигания: эфирный ховерцикл турнирного бойца"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Поводья Кама-Кагэ, жабы теневых прыжков"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Поводья Штормокрыла Поднебесного"
       }
     },
     "mobs": {

@@ -1569,6 +1569,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': '工具',
   'itemUi.kind.potion': '药水',
   'itemUi.kind.elixir': '药剂',
+  'itemUi.kind.mount': '坐骑',
   'itemUi.stats.armor': '护甲',
   'itemUi.stats.str': '力量',
   'itemUi.stats.agi': '敏捷',
@@ -5645,6 +5646,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': '圣物猎人的溺兜',
   'entities.items.sister_nhalia_choir_plate.name': '娜哈莉亚修女的唱诗锻甲',
   'entities.items.drowned_choir_fang.name': '溺水唱诗獠牙',
+  'entities.items.reins_grag_bear.name': '歌利亚格拉格巨熊的缰绳',
+  'entities.items.reins_stalkglider_snail.name': '苔壳滑行蜗牛的缰绳',
+  'entities.items.reins_aether_hover_cycle.name': '点火钥匙：以太骑士悬浮机车',
+  'entities.items.reins_shadowjump_toad.name': '影跃蟾蜍卡玛影的缰绳',
+  'entities.items.reins_stormfeather_griffin.name': '凌天风暴之羽的缰绳',
   'entities.mobs.drowned_cantor.name': '溺亡诵经者',
   'entities.mobs.reedbound_acolyte.name': '芦苇缚信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼枪颚兽',
@@ -6210,4 +6216,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一只体型庞大、步伐稳健的巨蟾，受训于闪电般的暗影跳跃，可跨越任何地形。',
   'hudChrome.mounts.desc_stormfeather_griffin':
     '一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。',
+  'hudChrome.mounts.notCollected': '未收集',
+  'hudChrome.mounts.dropHint': '由地下城和团队副本首领掉落。',
+  'hudChrome.mounts.clickManage': '点击选择坐骑',
 };

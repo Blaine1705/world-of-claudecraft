@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "7301c7f4",
+      "state": "77ae032d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,6 +60,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -125,7 +126,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 419,
-      "state": "a9c85adb",
+      "state": "c1be8f90",
       "events": "d9e43221",
       "rng": {
         "draws": 4,
@@ -136,7 +137,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 419,
-      "state": "4d44f076",
+      "state": "40d65fdf",
       "events": "9cfda0e2",
       "rng": {
         "draws": 4,
@@ -147,7 +148,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 419,
-      "state": "042b6799",
+      "state": "4424fc3e",
       "events": "356a26ae",
       "rng": {
         "draws": 5,
@@ -158,7 +159,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 421,
-      "state": "02f67e7f",
+      "state": "bc068014",
       "events": "13255c68",
       "rng": {
         "draws": 8,
@@ -219,6 +220,7 @@
           "lifetimeXp": 12098,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -423,7 +425,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 421,
-      "state": "adb1e9aa",
+      "state": "13b1812b",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -434,7 +436,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 421,
-      "state": "adb1e9aa",
+      "state": "13b1812b",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -495,6 +497,7 @@
           "lifetimeXp": 12098,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}

@@ -1978,7 +1978,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 
 // The pinned set of the 36 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 37th unregistered delta key reddens this gate.
+// 38th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'bags',
@@ -2006,6 +2006,7 @@ const ALL_DELTA_KEYS = [
   'marks',
   'milestones',
   'mnt',
+  'mntOwn',
   'party',
   'prof',
   'qdone',
@@ -2052,6 +2053,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   marks: 'markers',
   milestones: 'unlockedMilestones',
   mnt: 'selectedMount',
+  mntOwn: 'ownedMounts',
   mres: 'maxResource',
   party: 'partyInfo',
   prk: 'prestigeRank',
@@ -2131,7 +2133,13 @@ function dirtyEveryDeltaField(): {
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
 
   // Direct PlayerMeta fields.
-  meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
+  // The reins item both dirties `inv` further and flips `mntOwn` (the owned
+  // mount collection) to a non-default value, which is what lets the pick
+  // below land on a non-horse mount.
+  meta.inventory = [
+    { itemId: 'baked_bread', count: 3 },
+    { itemId: 'reins_grag_bear', count: 1 },
+  ];
   meta.vendorBuyback = [{ itemId: 'apprentice_staff', count: 1 }];
   meta.equipment = { ...meta.equipment, mainhand: 'zealotsbane_blade' };
   meta.questLog.set('q_widows', { questId: 'q_widows', counts: [10, 0], state: 'active' });
@@ -2147,7 +2155,7 @@ function dirtyEveryDeltaField(): {
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
-  meta.selectedMount = 'valorsteed';
+  meta.selectedMount = 'grag_bear';
   // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
   meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
@@ -2227,7 +2235,10 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.prestigeRank).toBe(3); // prk -> prestigeRank
 
     // --- fields that decode onto the client ---
-    expect(client.inventory).toEqual([{ itemId: 'baked_bread', count: 3 }]); // inv -> inventory
+    expect(client.inventory).toEqual([
+      { itemId: 'baked_bread', count: 3 },
+      { itemId: 'reins_grag_bear', count: 1 },
+    ]); // inv -> inventory
     expect(client.vendorBuyback).toEqual([{ itemId: 'apprentice_staff', count: 1 }]); // buyback -> vendorBuyback
     expect(client.equipment).toMatchObject({ mainhand: 'zealotsbane_blade' }); // equip -> equipment
     // cosmetics -> accountCosmetics, asserted against the normalized shape (the input
@@ -2244,7 +2255,10 @@ describe('full self-state snapshot delta fixture', () => {
     // lockouts -> selfLockouts (private), via the raidLockouts() accessor
     expect(client.raidLockouts().map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
     // mnt -> selfSelectedMount (private), via the selectedMount() accessor
-    expect(client.selectedMount()).toBe('valorsteed');
+    expect(client.selectedMount()).toBe('grag_bear');
+    // mntOwn -> selfOwnedMounts (private), via the ownedMounts() accessor: the
+    // horse always, plus the reins item sitting in the seeded inventory.
+    expect(client.ownedMounts()).toEqual(['valorsteed', 'grag_bear']);
     expect(client.partyInfo).not.toBeNull(); // party -> partyInfo
     expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
     expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()
@@ -2328,9 +2342,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 37 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(37);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(37);
+  it('ALL_DELTA_KEYS contains exactly 38 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(38);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(38);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2342,7 +2356,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(37);
+    expect(scraped.size).toBe(38);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

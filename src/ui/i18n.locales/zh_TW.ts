@@ -1571,6 +1571,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': '工具',
   'itemUi.kind.potion': '藥水',
   'itemUi.kind.elixir': '藥劑',
+  'itemUi.kind.mount': '坐騎',
   'itemUi.stats.armor': '護甲',
   'itemUi.stats.str': '力量',
   'itemUi.stats.agi': '敏捷',
@@ -5646,6 +5647,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': '聖物獵人的溺兜',
   'entities.items.sister_nhalia_choir_plate.name': '娜哈莉亞修女的唱詩鍛甲',
   'entities.items.drowned_choir_fang.name': '溺水唱詩獠牙',
+  'entities.items.reins_grag_bear.name': '歌利亞格拉格巨熊的韁繩',
+  'entities.items.reins_stalkglider_snail.name': '苔殼滑行蝸牛的韁繩',
+  'entities.items.reins_aether_hover_cycle.name': '點火鑰匙：乙太騎士懸浮機車',
+  'entities.items.reins_shadowjump_toad.name': '影躍蟾蜍卡瑪影的韁繩',
+  'entities.items.reins_stormfeather_griffin.name': '凌天風暴之羽的韁繩',
   'entities.mobs.drowned_cantor.name': '溺亡誦經者',
   'entities.mobs.reedbound_acolyte.name': '蘆葦縛信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼槍顎獸',
@@ -6210,4 +6216,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。',
   'hudChrome.mounts.desc_stormfeather_griffin':
     '一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。',
+  'hudChrome.mounts.notCollected': '未收集',
+  'hudChrome.mounts.dropHint': '由地城和團隊副本首領掉落。',
+  'hudChrome.mounts.clickManage': '點擊選擇坐騎',
 };

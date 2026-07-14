@@ -426,6 +426,9 @@ export const fr_CA: EnTranslations = {
       "requiresLevel": "Niveau {level} requis",
       "pickFirst": "Choisissez une monture à chevaucher.",
       "keybindHint": "Appuyez sur la touche Monter / Descendre (Z par défaut) pour chevaucher.",
+      "notCollected": "Non collectée",
+      "dropHint": "Butin des boss de donjon et de raid.",
+      "clickManage": "Cliquez pour choisir votre monture",
       "rarity_common": "Commune",
       "rarity_rare": "Rare",
       "rarity_epic": "Épique",
@@ -4908,7 +4911,8 @@ export const fr_CA: EnTranslations = {
       "tool": "Outil",
       "potion": "Potion",
       "elixir": "Élixir",
-      "bag": "Sac"
+      "bag": "Sac",
+      "mount": "Monture"
     },
     "stats": {
       "armor": "Armure",
@@ -7079,6 +7083,21 @@ export const fr_CA: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Protège-taille d'Appel-tempête"
+      },
+      "reins_grag_bear": {
+        "name": "Rênes de l’Ours-Grag Goliath"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Rênes du Glisseur à Coquille Moussue"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Clé de contact : Aérocycle du Jouteur d’Éther"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Rênes de Kama-Kage, le Crapaud Saute-Ombre"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Rênes du Plume-d’Orage Toise-Ciel"
       }
     },
     "mobs": {
