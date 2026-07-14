@@ -799,14 +799,7 @@ describe('delta snapshots', () => {
     broadcast(mageServer);
 
     const snap = lastSnap(mageFc.sent);
-    expect(snap.self.tal.rowPicks).toEqual([
-      'mag_r5_ice_floes',
-      null,
-      null,
-      null,
-      null,
-      null,
-    ]);
+    expect(snap.self.tal.rowPicks).toEqual(['mag_r5_ice_floes', null, null, null, null, null]);
     (client as any).applySnapshot(snap);
     expect(client.rowPicks).toEqual(['mag_r5_ice_floes', null, null, null, null, null]);
   });

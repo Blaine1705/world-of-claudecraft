@@ -25,9 +25,9 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged
 // in Node, the browser, and the headless RL env.
 
+import { CHOICE_ROW_LEVELS } from './content/choice_rows';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
-import { CHOICE_ROW_LEVELS } from './content/choice_rows';
 import { rowsPicked } from './content/talents';
 import { ITEMS, MOBS, ZONES, zoneAt } from './data';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
