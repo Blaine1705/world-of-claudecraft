@@ -7340,10 +7340,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Trượng',
   'hudChrome.wocStore.wtype.sword': 'Gươm',
   'hudChrome.wocStore.wtype.wand': 'Đũa phép',
-  'entities.items.deathless_warguard_legmail.name': 'Giáp Chân Lưới Vệ Chiến Bất Tử',
-  'entities.items.scourgehide_carapace.name': 'Giáp Mai Da Tai Ương',
-  'entities.items.soulforged_warplate.name': 'Chiến Giáp Rèn Hồn',
-  'entities.items.soulrend_diadem.name': 'Vương Miện Xé Hồn',
   'hudChrome.bags.rightClickDestroy': 'Nhấp phải để phá hủy',
   'entities.abilities.aura_surge.name': 'Sóng Hào Quang',
   'entities.abilities.aura_surge.description':
@@ -7507,4 +7503,43 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Lựa chọn',
   'game.talents.rowUnlockToast': 'Đã mở khóa một lựa chọn tài năng mới!',
   'game.talents.rowUnlocks': 'Mở khóa ở cấp {level}',
+  'entities.abilities.blazing_barrier.name': 'Lá Chắn Rực Lửa',
+  'entities.abilities.blazing_barrier.description':
+    'Bao bọc bản thân trong lửa, hấp thụ 130 sát thương trong 60 giây. (Lửa)',
+  'entities.abilities.cold_snap.name': 'Cú Lạnh Đột Ngột',
+  'entities.abilities.cold_snap.description':
+    'Hoàn tất thời gian hồi của Bước Chớp, Màn Sương Giá và Tàng Hình Cao Cấp. (tài năng pháp sư)',
+  'entities.abilities.greater_invisibility.name': 'Tàng Hình Cao Cấp',
+  'entities.abilities.greater_invisibility.description':
+    'Biến mất trong 20 giây: xóa 2 hiệu ứng sát thương theo thời gian và bạn nhận ít hơn 90% sát thương khi đang tàng hình và trong chốc lát sau đó. (tài năng pháp sư)',
+  'entities.abilities.hot_streak.name': 'Chuỗi Nóng',
+  'entities.abilities.hot_streak.description':
+    'Nội tại: hai đòn chí mạng liên tiếp bằng phép Lửa của bạn (Tia Tàn Lửa, Mưa Tàn Lửa, Bỏng Rát, Thương Liệt Hỏa hoặc Cú Đánh Lửa) khiến Thương Liệt Hỏa hoặc Cú Đánh Lửa tiếp theo được thi triển tức thì và miễn phí. Phép tiêu hao được tính cho chuỗi TIẾP THEO, kể cả lần thi triển miễn phí; một Cú Đánh Lửa chỉ được tính một lần dù trúng bao nhiêu kẻ địch, và chỉ cú va chạm đầu tiên được tính. (Lửa)',
+  'entities.abilities.ice_floes.name': 'Băng Trôi',
+  'entities.abilities.ice_floes.description':
+    'Hai phép tiếp theo có thời gian niệm có thể được thi triển khi đang di chuyển. Kéo dài 15 giây. (tài năng pháp sư)',
+  'entities.abilities.ignition.name': 'Bốc Cháy',
+  'entities.abilities.ignition.description':
+    'Nội tại: đòn chí mạng từ phép của bạn đốt mục tiêu với 40% sát thương đã gây ra trong 6 giây và có thể cộng dồn. (tinh thông Lửa)',
+  'entities.abilities.mass_barrier.name': 'Lá Chắn Hàng Loạt',
+  'entities.abilities.mass_barrier.description':
+    'Che chắn cho bạn và tối đa 4 đồng minh ở gần trong phạm vi 30 m; mỗi lá chắn hấp thụ 130 sát thương trong 60 giây. (tài năng pháp sư)',
+  'entities.abilities.overload.name': 'Quá Tải',
+  'entities.abilities.overload.description':
+    'Phép tiếp theo của bạn được khuếch đại 40% nhưng tốn thêm 50% mana. Kéo dài 10 giây. (tài năng pháp sư)',
+  'entities.abilities.power_echo.name': 'Vọng Âm Sức Mạnh',
+  'entities.abilities.power_echo.description':
+    'Phép trực tiếp tiếp theo của bạn lặp lại với 50% sức mạnh trên cùng mục tiêu. Kéo dài 10 giây. (tài năng pháp sư)',
+  'entities.abilities.rings_of_frost.name': 'Vòng Băng Giá',
+  'entities.abilities.rings_of_frost.description':
+    'Triệu hồi một vòng tròn trong 10 giây. Kẻ địch vượt qua rìa vòng bị đóng băng trong 4 giây. (tài năng pháp sư)',
+  'entities.abilities.rune_of_power.name': 'Ấn Sức Mạnh',
+  'entities.abilities.rune_of_power.description':
+    'Khắc một ấn sức mạnh dưới chân trong 15 giây: đồng minh đứng trong phạm vi 8 m gây thêm 10% sát thương. (tài năng pháp sư)',
+  'entities.abilities.summon_water_elemental.name': 'Triệu Hồi Nguyên Tố Nước',
+  'entities.abilities.summon_water_elemental.description':
+    'Triệu hồi một Nguyên Tố Nước chiến đấu bên bạn, phóng Tên Nước vào mục tiêu và vận phép Tia Nước. (Băng Giá)',
+  'entities.mobs.water_elemental.name': 'Nguyên Tố Nước',
+  'entities.items.conjured_bread4.name': 'Bánh Đại Tiệc Được Tạo Phép',
+  'entities.items.conjured_water4.name': 'Nước Suối Được Tạo Phép',
 };

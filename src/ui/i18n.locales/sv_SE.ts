@@ -7314,10 +7314,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Stav',
   'hudChrome.wocStore.wtype.sword': 'Svärd',
   'hudChrome.wocStore.wtype.wand': 'Trollstav',
-  'entities.items.deathless_warguard_legmail.name': 'Odödlig krigsvakts benbrynja',
-  'entities.items.scourgehide_carapace.name': 'Gisselhudspansar',
-  'entities.items.soulforged_warplate.name': 'Själssmidd krigsplåt',
-  'entities.items.soulrend_diadem.name': 'Själsrivardiadem',
   'hudChrome.bags.rightClickDestroy': 'Högerklicka för att förstöra',
   'entities.abilities.aura_surge.name': 'Strålande Svall',
   'entities.abilities.aura_surge.description':
@@ -7479,4 +7475,43 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Val',
   'game.talents.rowUnlockToast': 'Ett nytt talangval har låsts upp!',
   'game.talents.rowUnlocks': 'Låses upp på nivå {level}',
+  'entities.abilities.blazing_barrier.name': 'Flammande barriär',
+  'entities.abilities.blazing_barrier.description':
+    'Svep in dig i lågor och absorbera 130 skada i 60 sek. (Eld)',
+  'entities.abilities.cold_snap.name': 'Köldknäpp',
+  'entities.abilities.cold_snap.description':
+    'Avslutar nedkylningen för Flimmersteg, Frostslöja och Förbättrad osynlighet. (magikertalang)',
+  'entities.abilities.greater_invisibility.name': 'Förbättrad osynlighet',
+  'entities.abilities.greater_invisibility.description':
+    'Försvinn i 20 sek.: tar bort 2 skadeeffekter över tid och du tar 90% mindre skada medan du är osynlig och en kort stund efteråt. (magikertalang)',
+  'entities.abilities.hot_streak.name': 'Het svit',
+  'entities.abilities.hot_streak.description':
+    'Passiv: två kritiska träffar i rad med dina Eldbesvärjelser (Glödbult, Glödfall, Skålla, Pyrolans eller Flamslag) gör nästa Pyrolans eller Flamslag omedelbar och kostnadsfri. Förbrukarna räknas till NÄSTA svit, även kostnadsfria kast; ett Flamslag räknas en gång oavsett hur många fiender det träffar, och endast den första träffen kan räknas. (Eld)',
+  'entities.abilities.ice_floes.name': 'Isflak',
+  'entities.abilities.ice_floes.description':
+    'Dina nästa två besvärjelser med kasttid kan kastas medan du rör dig. Varar i 15 sek. (magikertalang)',
+  'entities.abilities.ignition.name': 'Antändning',
+  'entities.abilities.ignition.description':
+    'Passiv: kritiska träffar med dina besvärjelser bränner målet för 40% av den utdelade skadan under 6 sek. och kan staplas. (Eldmästerskap)',
+  'entities.abilities.mass_barrier.name': 'Massbarriär',
+  'entities.abilities.mass_barrier.description':
+    'Skyddar dig och upp till 4 närliggande allierade inom 30 m; varje barriär absorberar 130 skada i 60 sek. (magikertalang)',
+  'entities.abilities.overload.name': 'Överbelastning',
+  'entities.abilities.overload.description':
+    'Din nästa besvärjelse förstärks med 40% men kostar 50% mer mana. Varar i 10 sek. (magikertalang)',
+  'entities.abilities.power_echo.name': 'Krafteko',
+  'entities.abilities.power_echo.description':
+    'Din nästa direkta besvärjelse upprepas med 50% kraft på samma mål. Varar i 10 sek. (magikertalang)',
+  'entities.abilities.rings_of_frost.name': 'Frostring',
+  'entities.abilities.rings_of_frost.description':
+    'Åkallar en ring i 10 sek. Fiender som korsar dess kant fryses i 4 sek. (magikertalang)',
+  'entities.abilities.rune_of_power.name': 'Kraftruna',
+  'entities.abilities.rune_of_power.description':
+    'Rista en kraftruna vid dina fötter i 15 sek.: allierade som står inom 8 m gör 10% mer skada. (magikertalang)',
+  'entities.abilities.summon_water_elemental.name': 'Åkalla vattenelementar',
+  'entities.abilities.summon_water_elemental.description':
+    'Åkalla en vattenelementar som strider vid din sida, slungar Vattenprojektiler mot ditt mål och kanaliserar Vattenstråle. (Frost)',
+  'entities.mobs.water_elemental.name': 'Vattenelementar',
+  'entities.items.conjured_bread4.name': 'Frambesvärjt festbröd',
+  'entities.items.conjured_water4.name': 'Frambesvärjt källvatten',
 };

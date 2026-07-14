@@ -31,7 +31,7 @@ import {
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../../src/sim/content/heroic_vendor';
 import { ITEMS } from '../../src/sim/data';
-import { canEquipItem, canEquipItemInSlot } from '../../src/sim/equipment_rules';
+import { canEquipItem } from '../../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
 import type { CharacterState } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
@@ -154,27 +154,6 @@ describe('nonHeroicBisKit', () => {
       expect(weapon?.kind, `${cls} mainhand`).toBe('weapon');
       expect(weapon?.weapon, `${cls} mainhand dps`).toBeDefined();
     }
-  });
-
-  it('fills the offhand legally: never beside a two-hander, always slot-equippable', () => {
-    for (const cls of BOOST_CLASSES) {
-      const kit = nonHeroicBisKit(cls);
-      if (!kit.offhand) continue;
-      const main = ITEMS[kit.mainhand as string];
-      expect(main.kind === 'weapon' && main.hand === 'twohand', `${cls} 2H+offhand`).toBe(false);
-      const off = ITEMS[kit.offhand];
-      expect(canEquipItemInSlot(cls, off, 'offhand', null), `${cls} offhand ${off.id}`).toBe(true);
-      expect(kit.offhand).not.toBe(kit.mainhand);
-    }
-    // Concrete pins for today's content: the shield classes raise the
-    // Wallshield (including the elemental shaman), the rogue dual-wields a
-    // second real weapon, and cloth casters (no shield, no held offhand
-    // content yet, no dual wield) keep both hands on the staff.
-    expect(nonHeroicBisKit('warrior').offhand).toBe('highwatch_wallshield');
-    expect(nonHeroicBisKit('paladin').offhand).toBe('highwatch_wallshield');
-    expect(nonHeroicBisKit('shaman').offhand).toBe('highwatch_wallshield');
-    const rogue = nonHeroicBisKit('rogue');
-    expect(ITEMS[rogue.offhand as string]?.kind).toBe('weapon');
   });
 });
 

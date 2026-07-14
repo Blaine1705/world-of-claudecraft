@@ -2830,6 +2830,42 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': 'Lancia di Brina',
   'entities.abilities.frostbolt.description':
     'Lancia un dardo di gelo, infliggendo {damage} danni da Gelo e rallentando il movimento del 40%.',
+  'entities.abilities.blazing_barrier.name': 'Barriera ardente',
+  'entities.abilities.blazing_barrier.description':
+    'Ti avvolge nelle fiamme, assorbendo 130 danni per 60 s. (Fuoco)',
+  'entities.abilities.cold_snap.name': 'Colpo di freddo',
+  'entities.abilities.cold_snap.description':
+    'Termina il tempo di recupero di Passo fulmineo, Velo di Gelo e Invisibilità superiore. (Talento del mago)',
+  'entities.abilities.greater_invisibility.name': 'Invisibilità superiore',
+  'entities.abilities.greater_invisibility.description':
+    'Svanisci per 20 s: rimuove 2 effetti di danno periodico e riduce i danni subiti del 90% mentre sei invisibile e per breve tempo dopo. (Talento del mago)',
+  'entities.abilities.hot_streak.name': 'Vampata',
+  'entities.abilities.hot_streak.description':
+    "Passivo: due colpi critici consecutivi con le tue magie di Fuoco (Palla di Fuoco, Esplosione di Fuoco, Bruciatura, Pirosfera o Colonna di Fuoco) rendono la tua prossima Pirosfera o Colonna di Fuoco istantanea e gratuita. Le magie che consumano l'effetto contano per la serie SUCCESSIVA, inclusi i lanci gratuiti; Colonna di Fuoco conta una sola volta, indipendentemente dal numero di nemici colpiti, e può contare solo l'impatto iniziale. (Fuoco)",
+  'entities.abilities.ice_floes.name': 'Banchi di ghiaccio',
+  'entities.abilities.ice_floes.description':
+    'Le tue prossime due magie con tempo di lancio possono essere lanciate in movimento. Dura 15 s. (Talento del mago)',
+  'entities.abilities.ignition.name': 'Ignizione',
+  'entities.abilities.ignition.description':
+    "Passivo: i colpi critici delle tue magie incendiano il bersaglio, infliggendo il 40% dei danni causati nell'arco di 6 s; si accumula. (Maestria del Fuoco)",
+  'entities.abilities.mass_barrier.name': 'Barriera di massa',
+  'entities.abilities.mass_barrier.description':
+    'Protegge te e fino a 4 alleati vicini entro 30 m; ogni scudo assorbe 130 danni per 60 s. (Talento del mago)',
+  'entities.abilities.overload.name': 'Sovraccarico',
+  'entities.abilities.overload.description':
+    'La tua prossima magia viene amplificata del 40%, ma costa il 50% di mana in più. Dura 10 s. (Talento del mago)',
+  'entities.abilities.power_echo.name': 'Eco di potere',
+  'entities.abilities.power_echo.description':
+    'La tua prossima magia diretta si ripete con il 50% della potenza sullo stesso bersaglio. Dura 10 s. (Talento del mago)',
+  'entities.abilities.rings_of_frost.name': 'Anello di gelo',
+  'entities.abilities.rings_of_frost.description':
+    'Evoca un anello per 10 s. I nemici che ne attraversano il perimetro restano congelati per 4 s. (Talento del mago)',
+  'entities.abilities.rune_of_power.name': 'Runa del potere',
+  'entities.abilities.rune_of_power.description':
+    'Incide una runa del potere ai tuoi piedi per 15 s: gli alleati entro 8 m infliggono il 10% di danni in più. (Talento del mago)',
+  'entities.abilities.summon_water_elemental.name': "Evoca Elementale dell'Acqua",
+  'entities.abilities.summon_water_elemental.description':
+    "Evoca un Elementale dell'Acqua che combatte al tuo fianco, scaglia Dardi d'Acqua sul tuo bersaglio e canalizza Getto d'Acqua. (Gelo)",
   'entities.abilities.conjure_water.name': "Vincolo dell'Acqua",
   'entities.abilities.conjure_water.description':
     "Evoca 2 bottiglie d'acqua che ripristinano mana quando bevute. I ranghi superiori evocano acqua più pura.",
@@ -3327,6 +3363,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_water.name': 'Acqua piovana evocata',
   'entities.items.conjured_water2.name': 'Acqua di pozzo evocata',
   'entities.items.conjured_water3.name': 'Acqua limpida evocata',
+  'entities.items.conjured_water4.name': 'Acqua sorgiva evocata',
   'entities.items.eastbrook_arming_sword.name': "Spada d'arme di Eastbrook",
   'entities.items.bronzework_mace.name': 'Mazza bronzata',
   'entities.items.vale_carving_knife.name': 'Coltello da intaglio della Valle',
@@ -4305,6 +4342,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread.name': "Focaccia d'avena evocata",
   'entities.items.conjured_bread2.name': 'Pagnotta nera evocata',
   'entities.items.conjured_bread3.name': 'Dolce al miele evocato',
+  'entities.items.conjured_bread4.name': 'Pane da banchetto evocato',
   'entities.items.glimmerfin_koi.name': 'Koi dalle pinne scintillanti',
   'entities.items.raw_bog_eel.name': 'Anguilla di palude cruda',
   'entities.items.raw_frostgill_trout.name': 'Trota dalle branchie gelide cruda',
@@ -6698,6 +6736,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Lacera l'armatura del bersaglio, riducendola del {damage}% per applicazione. Si accumula fino a 5 volte. Genera una grande quantità di minaccia.",
   'entities.mobs.training_dummy.name': "Manichino d'allenamento",
   'entities.mobs.yumi_cat.name': 'Yumi',
+  'entities.mobs.water_elemental.name': "Elementale dell'Acqua",
   'guide.arenaPage.yumiBody':
     'Proteggi Yumi è una modalità a obiettivi di squadra che si gioca in un labirinto: ogni fazione protegge il proprio famiglio felino mentre dà la caccia a quello avversario. Di tanto in tanto entrambi i gatti si teletrasportano in nuovi angoli del labirinto, così lo scontro oscilla tra difesa, caccia e corsa per ritrovarli. Mettiti in coda in tre contro tre o cinque contro cinque; cadere in battaglia ti tiene in panchina solo per un momento.',
   'guide.arenaPage.yumiHeading': 'Proteggi Yumi',
@@ -7435,11 +7474,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Personale',
   'hudChrome.wocStore.wtype.sword': 'Spada',
   'hudChrome.wocStore.wtype.wand': 'Bacchetta',
-  'entities.items.deathless_warguard_legmail.name':
-    'Cosciali di maglia del guardiaguerra senza morte',
-  'entities.items.scourgehide_carapace.name': 'Carapace di pelle del flagello',
-  'entities.items.soulforged_warplate.name': 'Corazza da guerra forgianima',
-  'entities.items.soulrend_diadem.name': 'Diadema straccianima',
   'hudChrome.bags.rightClickDestroy': 'Clic destro per distruggere',
   'game.talents.choicesTab': 'Scelte',
   'game.talents.rowUnlockToast': 'Nuova scelta di talento disponibile!',

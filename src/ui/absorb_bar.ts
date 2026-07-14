@@ -13,7 +13,9 @@ import type { Aura } from '../sim/types';
 export interface AbsorbBarInput {
   hp: number;
   maxHp: number;
-  auras: Aura[];
+  auras?: Aura[];
+  /** Compact pre-summed value used by party snapshots, which do not carry full auras. */
+  total?: number;
 }
 
 export interface AbsorbBarView {
@@ -33,7 +35,7 @@ export function absorbTotal(auras: Aura[]): number {
 export function absorbBarView(input: AbsorbBarInput): AbsorbBarView {
   const max = Math.max(1, input.maxHp);
   const hp = Math.max(0, input.hp);
-  const total = absorbTotal(input.auras);
+  const total = Math.max(0, input.total ?? absorbTotal(input.auras ?? []));
   const fillFrac = clamp01((hp + total) / max);
   const overshield = total > 0 && hp + total >= max;
   return { total, fillFrac, overshield };

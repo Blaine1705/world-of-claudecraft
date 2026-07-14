@@ -646,43 +646,6 @@ export function updateNythraxisDreadCurse(
   });
 }
 
-export function updateNythraxisDreadCurse(
-  ctx: SimContext,
-  boss: Entity,
-  st: NonNullable<Entity['nythraxis']>,
-): void {
-  if (!isHeroicNythraxis(ctx, boss)) return;
-  const target = boss.aggroTargetId !== null ? ctx.entities.get(boss.aggroTargetId) : null;
-  if (!target || target.dead || target.kind !== 'player') return;
-  if (st.dreadCurseTargetId !== target.id) {
-    st.dreadCurseTargetId = target.id;
-    st.dreadCurseStacks = 0;
-  }
-  st.dreadCurseTimer = (st.dreadCurseTimer ?? NYTHRAXIS_DREAD_CURSE_EVERY) - DT;
-  if (st.dreadCurseTimer > 0) return;
-  st.dreadCurseTimer = NYTHRAXIS_DREAD_CURSE_EVERY;
-  st.dreadCurseStacks = Math.min(NYTHRAXIS_DREAD_CURSE_MAX_STACKS, (st.dreadCurseStacks ?? 0) + 1);
-  const value = Math.min(1, st.dreadCurseStacks * NYTHRAXIS_DREAD_CURSE_PER_STACK);
-  ctx.applyAura(target, {
-    id: 'nythraxis_dread_curse',
-    name: 'Dread Curse',
-    kind: 'vulnerability',
-    remaining: NYTHRAXIS_DREAD_CURSE_DURATION,
-    duration: NYTHRAXIS_DREAD_CURSE_DURATION,
-    value,
-    stacks: st.dreadCurseStacks,
-    sourceId: boss.id,
-    school: 'shadow',
-  });
-  ctx.emit({
-    type: 'spellfx',
-    sourceId: boss.id,
-    targetId: target.id,
-    school: 'shadow',
-    fx: 'projectile',
-  });
-}
-
 // ----- phase-one mechanics --------------------------------------------------------
 
 export function updateNythraxisGravebreaker(

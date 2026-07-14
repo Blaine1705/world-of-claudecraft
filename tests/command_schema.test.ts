@@ -25,8 +25,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Verified counts on the current tree (re-derived below; never trust stale prose).
 // Merged: release v0.26 (Season 1 Armory skin, ignore_add/ignore_remove, and the
 // rest of the upstream wire commands) plus the mage/warrior branch's new commands.
-const EXPECTED_SEND_COUNT = 139;
-const EXPECTED_DISPATCH_COUNT = 148;
+const EXPECTED_SEND_COUNT = 140;
+const EXPECTED_DISPATCH_COUNT = 149;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

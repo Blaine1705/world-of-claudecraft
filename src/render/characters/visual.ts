@@ -387,12 +387,12 @@ export class CharacterVisual {
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
   }
 
-  playEmote(id: OverheadEmoteId): void {
+  playEmote(id: OverheadEmoteId, repeatsOverride?: number): void {
     if (this.deadLock) return;
     const spec = this.def.clips.emote?.[id];
     const clip = firstLoadedEmoteClip(spec, (name) => this.action(name));
     if (!clip) return;
-    this.playOneShot(clip, spec?.timeScale ?? 1, spec?.repeats ?? 1, id);
+    this.playOneShot(clip, spec?.timeScale ?? 1, repeatsOverride ?? spec?.repeats ?? 1, id);
   }
 
   // -------------------------------------------------------------------------
@@ -490,24 +490,6 @@ export class CharacterVisual {
   setSoulRend(on: boolean): void {
     if (on === this.soulRend) return;
     this.soulRend = on;
-    this.applyVisualMaterials();
-  }
-
-  setShadowform(on: boolean): void {
-    if (on === this.shadowform) return;
-    this.shadowform = on;
-    this.applyVisualMaterials();
-  }
-
-  setMoonkin(on: boolean): void {
-    if (on === this.moonkin) return;
-    this.moonkin = on;
-    this.applyVisualMaterials();
-  }
-
-  setMetamorph(on: boolean): void {
-    if (on === this.metamorph) return;
-    this.metamorph = on;
     this.applyVisualMaterials();
   }
 
@@ -844,69 +826,6 @@ export class CharacterVisual {
       withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.35);
     }
     this.soulRendMaterials.set(material, marked);
-    return marked;
-  }
-
-  private shadowformMaterial(material: THREE.Material): THREE.Material {
-    const cached = this.shadowformMaterials.get(material);
-    if (cached) return cached;
-    const marked = material.clone();
-    marked.transparent = true;
-    marked.opacity = SHADOWFORM_OPACITY;
-    marked.depthWrite = true;
-    const withColor = marked as THREE.Material & {
-      color?: THREE.Color;
-      emissive?: THREE.Color;
-      emissiveIntensity?: number;
-    };
-    if (withColor.color) withColor.color.copy(SHADOWFORM_TINT);
-    if (withColor.emissive) {
-      withColor.emissive.setHex(0x2a0a4a);
-      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.4);
-    }
-    this.shadowformMaterials.set(material, marked);
-    return marked;
-  }
-
-  private moonkinMaterial(material: THREE.Material): THREE.Material {
-    const cached = this.moonkinMaterials.get(material);
-    if (cached) return cached;
-    const marked = material.clone();
-    marked.transparent = true;
-    marked.opacity = MOONKIN_OPACITY;
-    marked.depthWrite = true;
-    const withColor = marked as THREE.Material & {
-      color?: THREE.Color;
-      emissive?: THREE.Color;
-      emissiveIntensity?: number;
-    };
-    if (withColor.color) withColor.color.copy(MOONKIN_TINT);
-    if (withColor.emissive) {
-      withColor.emissive.setHex(0x6a3fd0);
-      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.55);
-    }
-    this.moonkinMaterials.set(material, marked);
-    return marked;
-  }
-
-  private metamorphMaterial(material: THREE.Material): THREE.Material {
-    const cached = this.metamorphMaterials.get(material);
-    if (cached) return cached;
-    const marked = material.clone();
-    const withColor = marked as THREE.Material & {
-      color?: THREE.Color;
-      emissive?: THREE.Color;
-      emissiveIntensity?: number;
-    };
-    if (withColor.color) withColor.color.copy(METAMORPH_TINT);
-    if (withColor.emissive) {
-      withColor.emissive.setHex(0x7a1abf);
-      // Set, don't floor: the source materials ship emissiveIntensity 1 (with a
-      // black emissive color), so a Math.max floor keeps full-strength glow and
-      // the body renders as flat neon, drowning the fire aura and all shading.
-      withColor.emissiveIntensity = 0.35;
-    }
-    this.metamorphMaterials.set(material, marked);
     return marked;
   }
 

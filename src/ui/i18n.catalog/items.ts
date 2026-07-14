@@ -2040,6 +2040,14 @@ function itemTranslations(names: readonly string[]): ItemEntityTranslations {
   return translations;
 }
 
+function itemTranslationsEn(names: readonly string[]) {
+  return {
+    ...itemTranslations(names),
+    conjured_water4: { name: 'Conjured Springwater' },
+    conjured_bread4: { name: 'Conjured Feastloaf' },
+  };
+}
+
 const itemNamesEn = {
   itemUi: {
     ...itemStrings.en.itemUi,
@@ -2058,7 +2066,7 @@ const itemNamesEn = {
   },
   entities: {
     ...classAbilityNamesEn.entities,
-    items: itemTranslations([
+    items: itemTranslationsEn([
       'Pitted Shortsword',
       'Bogoak Staff',
       'Rusty Dagger',
@@ -5007,5 +5015,5 @@ export const itemNames = {
   },
 };
 
-itemNames.es_ES = itemNames.es;
-itemNames.fr_CA = itemNames.fr_FR;
+itemNames.es_ES = itemNames.es as unknown as typeof itemNames.es_ES;
+itemNames.fr_CA = itemNames.fr_FR as unknown as typeof itemNames.fr_CA;

@@ -871,7 +871,6 @@ export const fr_CA: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
       "showAttackButton": "Show Attack Button",
-      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",
       "mobileLeftHanded": "Disposition pour gaucher"
@@ -5818,6 +5817,54 @@ export const fr_CA: EnTranslations = {
         "name": "Rimelance",
         "description": "Lance un éclair de givre, inflige {damage} points de dégâts de Givre et ralentit le déplacement de 40%."
       },
+      "blazing_barrier": {
+        "name": "Bouclier ardent",
+        "description": "Entoure-toi de feu et absorbe 130 points de dégâts pendant 60 s. (Feu)"
+      },
+      "cold_snap": {
+        "name": "Vague de froid",
+        "description": "Réinitialise la recharge de Pas scintillant, Voile de givre et Invisibilité accrue. (Talent de mage)"
+      },
+      "greater_invisibility": {
+        "name": "Invisibilité accrue",
+        "description": "Disparais pendant 20 s : enlève 2 effets de dégâts périodiques et réduit de 90% les dégâts que tu subis tant que tu es invisible et pour un court moment après. (Talent de mage)"
+      },
+      "hot_streak": {
+        "name": "Suite flamboyante",
+        "description": "Passif : deux coups critiques de suite avec tes sorts de Feu (Boule de feu, Trait de feu, Brûlure, Explosion pyrotechnique ou Choc de flammes) rendent ta prochaine Explosion pyrotechnique ou ton prochain Choc de flammes instantané et gratuit. Les sorts qui dépensent cet effet comptent pour la suite SUIVANTE, même les incantations gratuites; Choc de flammes ne compte qu'une fois, peu importe le nombre d'ennemis touchés, et seul le premier impact peut compter. (Feu)"
+      },
+      "ice_floes": {
+        "name": "Glaces flottantes",
+        "description": "Tes deux prochains sorts qui ont un temps d'incantation peuvent être lancés en mouvement. Dure 15 s. (Talent de mage)"
+      },
+      "ignition": {
+        "name": "Embrasement",
+        "description": "Passif : les coups critiques de tes sorts enflamment la cible et lui infligent 40% des dégâts causés sur 6 s; cet effet se cumule. (Maîtrise du Feu)"
+      },
+      "mass_barrier": {
+        "name": "Bouclier collectif",
+        "description": "Pose un bouclier sur toi et sur un maximum de 4 alliés proches dans un rayon de 30 m; chacun absorbe 130 points de dégâts pendant 60 s. (Talent de mage)"
+      },
+      "overload": {
+        "name": "Surpuissance",
+        "description": "Ton prochain sort gagne 40% de puissance, mais coûte 50% de mana de plus. Dure 10 s. (Talent de mage)"
+      },
+      "power_echo": {
+        "name": "Écho de pouvoir",
+        "description": "Ton prochain sort direct se produit de nouveau à 50% de sa puissance sur la même cible. Dure 10 s. (Talent de mage)"
+      },
+      "rings_of_frost": {
+        "name": "Cercle de givre",
+        "description": "Fait apparaître un cercle pendant 10 s. Les ennemis qui traversent son contour sont gelés pendant 4 s. (Talent de mage)"
+      },
+      "rune_of_power": {
+        "name": "Rune de pouvoir",
+        "description": "Trace une rune de pouvoir sous tes pieds pendant 15 s : les alliés qui restent à moins de 8 m infligent 10% plus de dégâts. (Talent de mage)"
+      },
+      "summon_water_elemental": {
+        "name": "Invoquer un élémentaire d'eau",
+        "description": "Invoque un élémentaire d'eau qui se bat à tes côtés, lance des Éclairs d'eau sur ta cible et canalise Jet d'eau. (Givre)"
+      },
       "ice_lance": {
         "name": "Ice Lance",
         "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
@@ -6422,9 +6469,21 @@ export const fr_CA: EnTranslations = {
         "name": "Maîtrise élémentaire",
         "description": "Fait appel à la maîtrise élémentaire, rendant votre prochain sort instantané. (signature Élémentaire)"
       },
+      "shamanistic_rage": {
+        "name": "Shamanistic Rage",
+        "description": "Releases shamanistic rage, restoring 160 mana. (Enhancement signature)"
+      },
+      "natures_swiftness": {
+        "name": "Nature's Swiftness",
+        "description": "Calls on nature to make your next spell instant. (Restoration signature)"
+      },
       "siphon_life": {
         "name": "Siphon de vie",
         "description": "Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)"
+      },
+      "fel_domination": {
+        "name": "Fel Domination",
+        "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
       },
       "conflagrate": {
         "name": "Conflagration",
@@ -7517,6 +7576,12 @@ export const fr_CA: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Bâton de guerre de verre ardent"
       },
+      "conjured_water4": {
+        "name": "Eau de source conjurée"
+      },
+      "conjured_bread4": {
+        "name": "Miche de festin conjurée"
+      },
       "bristleback_maul": {
         "name": "Marteau Gallowglass"
       },
@@ -8230,18 +8295,6 @@ export const fr_CA: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Protège-taille d'Appel-tempête"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Cotte de jambes de la garde immortelle"
-      },
-      "scourgehide_carapace": {
-        "name": "Carapace en peau de Fléau"
-      },
-      "soulforged_warplate": {
-        "name": "Harnois de guerre forgé dans les âmes"
-      },
-      "soulrend_diadem": {
-        "name": "Diadème Déchire-âme"
       }
     },
     "mobs": {
@@ -8598,6 +8651,9 @@ export const fr_CA: EnTranslations = {
       },
       "ysolei": {
         "name": "Ysolei, avatar de la Lune noyée"
+      },
+      "water_elemental": {
+        "name": "Élémentaire des eaux"
       }
     },
     "npcs": {

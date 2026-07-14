@@ -160,7 +160,7 @@ export function abilityOverTimeEffect(
 export function abilityBuffValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
     if (eff.type === 'selfBuff' || eff.type === 'buffTarget') return eff.value;
-    if (eff.type === 'aoeAttackPower') return eff.amount;
+    if (eff.type === 'aoeAttackPower') return eff.amount ?? null;
   }
   return null;
 }

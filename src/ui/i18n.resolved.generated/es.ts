@@ -871,7 +871,6 @@ export const es: EnTranslations = {
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
       "showAttackButton": "Show Attack Button",
-      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
       "mobileLeftHanded": "Diseño para zurdos"
@@ -5818,6 +5817,54 @@ export const es: EnTranslations = {
         "name": "Lanza de Escarcha",
         "description": "Lanza una descarga de escarcha que causa {damage} de daño de Escarcha y reduce la velocidad de movimiento un 40%."
       },
+      "blazing_barrier": {
+        "name": "Barrera llameante",
+        "description": "Te envuelve en llamas y absorbe 130 de daño durante 60 s. (Fuego)"
+      },
+      "cold_snap": {
+        "name": "Ola de frío",
+        "description": "Finaliza el tiempo de reutilización de Paso centelleante, Velo de Escarcha e Invisibilidad superior. (Talento de mago)"
+      },
+      "greater_invisibility": {
+        "name": "Invisibilidad superior",
+        "description": "Desaparece durante 20 s: elimina 2 efectos de daño en el tiempo y recibes un 90% menos de daño mientras eres invisible y poco después. (Talento de mago)"
+      },
+      "hot_streak": {
+        "name": "Buena racha",
+        "description": "Pasivo: dos golpes críticos seguidos con tus hechizos de Fuego (Bola de Fuego, Explosión de Fuego, Agostar, Piroexplosión o Fogonazo) hacen que tu próxima Piroexplosión o Fogonazo sea instantánea y gratuita. Los hechizos que consumen el efecto cuentan para la SIGUIENTE racha, incluidos los lanzamientos gratuitos; Fogonazo cuenta una sola vez sin importar a cuántos enemigos golpee, y solo el impacto inicial puede contar. (Fuego)"
+      },
+      "ice_floes": {
+        "name": "Témpanos de hielo",
+        "description": "Tus próximos dos hechizos con tiempo de lanzamiento pueden lanzarse en movimiento. Dura 15 s. (Talento de mago)"
+      },
+      "ignition": {
+        "name": "Ignición",
+        "description": "Pasivo: tus golpes críticos con hechizos queman al objetivo e infligen un 40% del daño causado durante 6 s; se acumula. (Maestría de Fuego)"
+      },
+      "mass_barrier": {
+        "name": "Barrera masiva",
+        "description": "Protege a ti y hasta a 4 aliados cercanos en un radio de 30 m; cada escudo absorbe 130 de daño durante 60 s. (Talento de mago)"
+      },
+      "overload": {
+        "name": "Sobrecarga",
+        "description": "Tu próximo hechizo se amplifica un 40%, pero cuesta un 50% más de maná. Dura 10 s. (Talento de mago)"
+      },
+      "power_echo": {
+        "name": "Eco de poder",
+        "description": "Tu próximo hechizo directo se repite con un 50% de potencia sobre el mismo objetivo. Dura 10 s. (Talento de mago)"
+      },
+      "rings_of_frost": {
+        "name": "Anillo de Escarcha",
+        "description": "Invoca un anillo durante 10 s. Los enemigos que cruzan su perímetro quedan congelados durante 4 s. (Talento de mago)"
+      },
+      "rune_of_power": {
+        "name": "Runa de poder",
+        "description": "Inscribe una runa de poder a tus pies durante 15 s: los aliados que permanecen a menos de 8 m infligen un 10% más de daño. (Talento de mago)"
+      },
+      "summon_water_elemental": {
+        "name": "Invocar elemental de agua",
+        "description": "Invoca un elemental de agua para que luche a tu lado, lance Descargas de Agua a tu objetivo y canalice Chorro de Agua. (Escarcha)"
+      },
       "ice_lance": {
         "name": "Ice Lance",
         "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
@@ -6422,9 +6469,21 @@ export const es: EnTranslations = {
         "name": "Maestría elemental",
         "description": "Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)"
       },
+      "shamanistic_rage": {
+        "name": "Shamanistic Rage",
+        "description": "Releases shamanistic rage, restoring 160 mana. (Enhancement signature)"
+      },
+      "natures_swiftness": {
+        "name": "Nature's Swiftness",
+        "description": "Calls on nature to make your next spell instant. (Restoration signature)"
+      },
       "siphon_life": {
         "name": "Succionar vida",
         "description": "Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)"
+      },
+      "fel_domination": {
+        "name": "Fel Domination",
+        "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
       },
       "conflagrate": {
         "name": "Conflagrar",
@@ -7517,6 +7576,12 @@ export const es: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Bastón de guerra de cristal de ascuas"
       },
+      "conjured_water4": {
+        "name": "Agua de Manantial Conjurada"
+      },
+      "conjured_bread4": {
+        "name": "Pan de Festín Conjurado"
+      },
       "bristleback_maul": {
         "name": "Martillo Gallowglass"
       },
@@ -8230,18 +8295,6 @@ export const es: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guardacintura del Invocatormentas"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Malla de piernas del Guardián Imperecedero"
-      },
-      "scourgehide_carapace": {
-        "name": "Caparazón de piel de Azote"
-      },
-      "soulforged_warplate": {
-        "name": "Coraza de guerra forjada en almas"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema Desgarralmas"
       }
     },
     "mobs": {
@@ -8598,6 +8651,9 @@ export const es: EnTranslations = {
       },
       "ysolei": {
         "name": "Ysolei, Avatar de la Luna Ahogada"
+      },
+      "water_elemental": {
+        "name": "Elemental de agua"
       }
     },
     "npcs": {

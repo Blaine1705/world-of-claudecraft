@@ -7402,10 +7402,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Tongkat',
   'hudChrome.wocStore.wtype.sword': 'Pedang',
   'hudChrome.wocStore.wtype.wand': 'Tongkat sihir',
-  'entities.items.deathless_warguard_legmail.name': 'Zirah Kaki Garda Perang Nirmaut',
-  'entities.items.scourgehide_carapace.name': 'Karapas Kulit Sampar',
-  'entities.items.soulforged_warplate.name': 'Zirah Perang Tempaan Jiwa',
-  'entities.items.soulrend_diadem.name': 'Diadem Pengoyak Jiwa',
   'hudChrome.bags.rightClickDestroy': 'Klik kanan untuk menghancurkan',
   'entities.abilities.aura_surge.name': 'Gelombang Cemerlang',
   'entities.abilities.aura_surge.description':
@@ -7567,4 +7563,43 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Pilihan',
   'game.talents.rowUnlockToast': 'Pilihan talenta baru terbuka!',
   'game.talents.rowUnlocks': 'Terbuka pada level {level}',
+  'entities.abilities.blazing_barrier.name': 'Penghalang Membara',
+  'entities.abilities.blazing_barrier.description':
+    'Selimuti dirimu dengan api untuk menyerap 130 kerusakan selama 60 dtk. (Api)',
+  'entities.abilities.cold_snap.name': 'Hentakan Dingin',
+  'entities.abilities.cold_snap.description':
+    'Mengakhiri waktu pemulihan Langkah Kedip, Selubung Beku, dan Ketaklihatan Agung. (talenta mage)',
+  'entities.abilities.greater_invisibility.name': 'Ketaklihatan Agung',
+  'entities.abilities.greater_invisibility.description':
+    'Menghilang selama 20 dtk.: menghapus 2 efek kerusakan berkala dan kamu menerima 90% lebih sedikit kerusakan saat tak terlihat dan sesaat setelahnya. (talenta mage)',
+  'entities.abilities.hot_streak.name': 'Rentetan Membara',
+  'entities.abilities.hot_streak.description':
+    'Pasif: dua serangan kritis berturut-turut dengan mantra Api milikmu (Cinderbolt, Cinderfall, Lepuh, Pyrelance, atau Hantaman Api) membuat Pyrelance atau Hantaman Api berikutnya seketika dan gratis. Mantra penghabis dihitung untuk rentetan BERIKUTNYA, termasuk penggunaan gratis; Hantaman Api dihitung sekali berapa pun musuh yang terkena, dan hanya benturan awal yang dapat dihitung. (Api)',
+  'entities.abilities.ice_floes.name': 'Bongkahan Es',
+  'entities.abilities.ice_floes.description':
+    'Dua mantra berikutnya yang memiliki waktu perapalan dapat dirapal sambil bergerak. Berlangsung 15 dtk. (talenta mage)',
+  'entities.abilities.ignition.name': 'Penyalaan',
+  'entities.abilities.ignition.description':
+    'Pasif: serangan kritis mantramu membakar target sebesar 40% kerusakan yang ditimbulkan selama 6 dtk. dan dapat bertumpuk. (penguasaan Api)',
+  'entities.abilities.mass_barrier.name': 'Penghalang Massal',
+  'entities.abilities.mass_barrier.description':
+    'Melindungi dirimu dan hingga 4 sekutu di dekatmu dalam jarak 30 m; masing-masing menyerap 130 kerusakan selama 60 dtk. (talenta mage)',
+  'entities.abilities.overload.name': 'Beban Berlebih',
+  'entities.abilities.overload.description':
+    'Mantra berikutnya diperkuat sebesar 40%, tetapi membutuhkan 50% lebih banyak mana. Berlangsung 10 dtk. (talenta mage)',
+  'entities.abilities.power_echo.name': 'Gema Kekuatan',
+  'entities.abilities.power_echo.description':
+    'Mantra langsung berikutnya terulang dengan 50% kekuatan pada target yang sama. Berlangsung 10 dtk. (talenta mage)',
+  'entities.abilities.rings_of_frost.name': 'Cincin Embun Beku',
+  'entities.abilities.rings_of_frost.description':
+    'Memanggil cincin selama 10 dtk. Musuh yang melintasi tepinya membeku selama 4 dtk. (talenta mage)',
+  'entities.abilities.rune_of_power.name': 'Rune Kekuatan',
+  'entities.abilities.rune_of_power.description':
+    'Goreskan rune kekuatan di bawah kakimu selama 15 dtk.: sekutu yang berdiri dalam jarak 8 m menimbulkan 10% lebih banyak kerusakan. (talenta mage)',
+  'entities.abilities.summon_water_elemental.name': 'Panggil Elemental Air',
+  'entities.abilities.summon_water_elemental.description':
+    'Panggil Elemental Air untuk bertarung di sisimu, melontarkan Peluru Air ke targetmu dan menyalurkan Semburan Air. (Es)',
+  'entities.mobs.water_elemental.name': 'Elemental Air',
+  'entities.items.conjured_bread4.name': 'Roti Perjamuan Sihir',
+  'entities.items.conjured_water4.name': 'Air Mata Air Sihir',
 };

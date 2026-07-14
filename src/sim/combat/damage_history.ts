@@ -23,7 +23,8 @@ export const REWIND_WINDOW_TICKS = REWIND_WINDOW_SEC * 20;
 // never reach here). Prunes anything older than the window so the ring stays small.
 export function recordDamageTaken(target: Entity, amount: number, tick: number): void {
   if (amount <= 0) return;
-  const history = target.damageHistory ?? (target.damageHistory = []);
+  if (!target.damageHistory) target.damageHistory = [];
+  const history = target.damageHistory;
   history.push({ tick, amount });
   pruneDamageHistory(history, tick);
 }

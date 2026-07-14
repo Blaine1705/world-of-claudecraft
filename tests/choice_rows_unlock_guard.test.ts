@@ -6,6 +6,9 @@ import type { PlayerClass } from '../src/sim/types';
 // Priest, Shaman, and Paladin rows are being redesigned. Empty this skip list
 // when those rows land so this guard covers every class.
 const ROW_REDESIGN_SKIP: ReadonlySet<PlayerClass> = new Set([]);
+// Double Blink is deliberately offered before Flickerstep enters the base kit:
+// the pick is banked at level 5 and starts modifying Blink when it is learned at 10.
+const FUTURE_ABILITY_EXCEPTIONS = new Set(['mag_r5_double_blink:blink']);
 
 describe('choice row unlock ability guards', () => {
   it('does not modify abilities learned after the row unlocks', () => {
@@ -24,7 +27,10 @@ describe('choice row unlock ability guards', () => {
               );
               continue;
             }
-            if (ability.learnLevel > row.level) {
+            if (
+              ability.learnLevel > row.level &&
+              !FUTURE_ABILITY_EXCEPTIONS.has(`${option.id}:${mod.ability}`)
+            ) {
               failures.push(
                 `${cls} row ${row.level} option ${option.id} modifies ${mod.ability}: ability learnLevel ${ability.learnLevel} > row unlock ${row.level}`,
               );

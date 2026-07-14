@@ -321,3 +321,14 @@ export function createPartyRowsWrapper(doc: Document): HTMLElement {
   el.className = PARTY_ROWS_CLASS;
   return el;
 }
+
+/** Build the persistent "Leave Party" button (created once, its click listener
+ *  attached once). The pool keeps it last in the container and re-localizes its label
+ *  through the elided setText each rebuild. */
+export function createLeaveButton(doc: Document, onLeave: () => void): HTMLButtonElement {
+  const btn = doc.createElement('button');
+  btn.className = 'btn';
+  btn.id = 'party-leave';
+  btn.addEventListener('click', onLeave);
+  return btn;
+}

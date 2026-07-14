@@ -20,12 +20,7 @@ import { BAG_SOCKETS } from '../src/sim/bags';
 import { HEROIC_ITEMS } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { ITEMS } from '../src/sim/data';
-import {
-  canDualWield,
-  canEquipItem,
-  canEquipItemInSlot,
-  weaponHand,
-} from '../src/sim/equipment_rules';
+import { canEquipItem } from '../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../src/sim/item_level_req';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import type { EquipSlot, ItemDef, PlayerClass } from '../src/sim/types';
@@ -239,14 +234,7 @@ export function classItemScore(cls: PlayerClass, item: ItemDef): number {
 
 function eligibleForBoost(cls: PlayerClass, item: ItemDef): boolean {
   if (!item.slot) return false;
-  if (
-    item.kind !== 'weapon' &&
-    item.kind !== 'armor' &&
-    item.kind !== 'shield' &&
-    item.kind !== 'held_offhand'
-  ) {
-    return false;
-  }
+  if (item.kind !== 'weapon' && item.kind !== 'armor') return false;
   if (item.heroic || item.heroicOf) return false;
   if (item.id in HEROIC_ITEMS) return false;
   if (HEROIC_VENDOR_IDS.has(item.id)) return false;
@@ -257,12 +245,9 @@ function eligibleForBoost(cls: PlayerClass, item: ItemDef): boolean {
   return meetsLevelRequirement(BOOST_LEVEL, item);
 }
 
-/** The slot order the kit is equipped in: mainhand before offhand (a shield or
- *  a rogue's second weapon routes to the offhand once the mainhand is filled);
- *  rings resolve ring1 then ring2. */
+/** The slot order the kit is equipped in; rings resolve ring1 then ring2. */
 const KIT_SLOTS: readonly EquipSlot[] = [
   'mainhand',
-  'offhand',
   'helmet',
   'neck',
   'shoulder',
@@ -281,19 +266,18 @@ export function bisKitForRole(
 ): Partial<Record<EquipSlot, string>> {
   const bestBySlot = new Map<string, { id: string; score: number }>();
   const rings: { id: string; score: number }[] = [];
-  const weapons: { id: string; score: number; twoHand: boolean }[] = [];
+  const weapons: { id: string; score: number }[] = [];
   for (const item of Object.values(ITEMS)) {
     if (!eligibleForBoost(cls, item)) continue;
     const score = roleItemScore(role, item);
     if (item.kind === 'weapon') {
-      weapons.push({ id: item.id, score, twoHand: weaponHand(item) === 'twohand' });
+      weapons.push({ id: item.id, score });
       continue;
     }
     if (item.slot === 'ring') {
       rings.push({ id: item.id, score });
       continue;
     }
-    // Shields and held offhands declare slot 'offhand' and land in that bucket.
     const slot = item.slot as string;
     const best = bestBySlot.get(slot);
     if (!best || score > best.score) bestBySlot.set(slot, { id: item.id, score });
@@ -302,7 +286,7 @@ export function bisKitForRole(
   weapons.sort((a, b) => b.score - a.score);
   const kit: Partial<Record<EquipSlot, string>> = {};
   for (const slot of KIT_SLOTS) {
-    if (slot === 'mainhand' || slot === 'offhand' || slot === 'ring1' || slot === 'ring2') {
+    if (slot === 'mainhand' || slot === 'ring1' || slot === 'ring2') {
       continue;
     }
     const best = bestBySlot.get(slot);
@@ -310,25 +294,6 @@ export function bisKitForRole(
   }
   const mainhand = weapons[0];
   if (mainhand) kit.mainhand = mainhand.id;
-  // A two-handed mainhand occupies both hands (equipping any offhand would
-  // displace it, src/sim/items.ts equipItem); otherwise the offhand takes the
-  // best of a shield / held offhand, or, for a dual-wielder (rogue at spawn:
-  // no spec is chosen yet), the second-best one-hand weapon.
-  if (mainhand && !mainhand.twoHand) {
-    const held = bestBySlot.get('offhand');
-    // The second weapon must be offhand-legal (canEquipItemInSlot excludes
-    // two-handers and mainhand-only weapons for a spec-less dual-wielder);
-    // anything else would displace the mainhand pick on equip.
-    const second = canDualWield(cls, null)
-      ? weapons.find(
-          (w) => w.id !== mainhand.id && canEquipItemInSlot(cls, ITEMS[w.id], 'offhand', null),
-        )
-      : undefined;
-    const off = [held, second]
-      .filter((c): c is { id: string; score: number } => c !== undefined)
-      .sort((a, b) => b.score - a.score)[0];
-    if (off) kit.offhand = off.id;
-  }
   if (rings[0]) kit.ring1 = rings[0].id;
   if (rings[1]) kit.ring2 = rings[1].id;
   return kit;
@@ -381,12 +346,9 @@ export function buildBoostedCharacterState(
   const [primary, ...altRoles] = CLASS_ROLES[cls];
   const kit = bisKitForRole(cls, primary);
   const equipped = new Set(Object.values(kit));
-  // Fresh characters spawn holding a starter weapon: clear both hands first so
-  // the kit weapons route to their intended slots (with the mainhand occupied,
-  // a one-hand upgrade would auto-route to a dual-wielder's empty OFFHAND and
-  // the starter would keep the strong hand).
+  // Fresh characters spawn holding a starter weapon: clear it before equipping
+  // the selected mainhand upgrade.
   sim.unequipItem('mainhand', pid);
-  sim.unequipItem('offhand', pid);
   for (const slot of KIT_SLOTS) {
     const itemId = kit[slot];
     if (!itemId) continue;

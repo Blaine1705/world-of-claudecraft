@@ -2477,66 +2477,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   mortal_strike: r('blood', 'blood', ['sword', { p: 'claw_slash', ...BR }]),
   bloodthirst: r('blood', 'blood', ['heart', { p: 'dagger', ...BR }], ['drips']),
   shield_slam: r('steel', 'steel', ['shield', { p: 'mace', ...BR }]),
-  // Bladed Gyre (whirlwind): a spin, so a sweeping slash-arc rings the blade,
-  // distinct from heroic_strike's bare sword + glow.
-  whirlwind: r('fury', 'steel', ['sword', { p: 'claw_slash', ...BIG }], ['motion']),
-  // Berserker Rage: a fist wreathed in flame (enrage), distinct from taunt's
-  // bare fist + arcs on the same fury/blood palette.
-  berserker_rage: r('fury', 'blood', ['fist', { p: 'flame', ...TR }], ['glow']),
-  // Enrage (Fury passive): a raging flame engulfing a fist, glow + motion to read
-  // as an active fury state; distinct from Berserker Rage's small TR flame.
-  enrage_passive: r('fury', 'blood', ['flame', { p: 'fist', ...BIG }], ['glow', 'motion']),
-  // fury-only kit: Twinstrike = two crossed blades mid-swing; Red Harvest = a
-  // blood-soaked axe with a falling droplet (distinct from execute's bare axe)
-  raging_gale: r('fury', 'steel', ['sword', { p: 'sword', rot: Math.PI / 2 }], ['motion']),
-  red_harvest: r('blood', 'blood', ['axe', { p: 'droplet', ...BR }], ['drips']),
-  // fury support cooldowns: Emboldening Roar = a golden shout bursting into
-  // guaranteed crits (distinct from rallying_cry's roar+heart and
-  // intimidating_shout's roar+skull); Furious Mending = a heart shedding a
-  // blood droplet on a gold palette (distinct from life_tap's purple pair and
-  // sanguine_aura's droplet-first layout)
-  emboldening_roar: r('fury', 'gold', ['roar', { p: 'sunburst', ...TR }], ['glow']),
-  furious_mending: r('blood', 'gold', ['heart', { p: 'droplet', ...BR }], ['glow']),
-  // prot kit: Raised Guard = a braced shield doubled by a small second shield
-  // (distinct from defensive_stance's bare shield + arcs and shield_slam's
-  // shield + mace); Iron Resolve = a shield guarding a heart on steel/gold
-  // (distinct from aura_buff_dr's blood bg and die_by_sword's shield + sword);
-  // Faultline = an earthen shock cracking the ground (distinct from
-  // heroic_leap's boot and earth_shock's lightning); Defiant Bellow = a shout
-  // raising a shield (distinct from rallying_cry's roar + heart and
-  // piercing_howl's roar + boot)
-  raised_guard: r('steel', 'steel', ['shield', { p: 'shield', ...TR }], ['glow']),
-  iron_resolve: r('steel', 'gold', ['shield', { p: 'heart', ...TR }], ['glow']),
-  faultline: r('earth', 'earthBrown', [{ p: 'sunburst', ...BIG }, 'fist'], ['crack']),
-  defiant_bellow: r('steel', 'steel', ['roar', { p: 'shield', ...TR }], ['arcs']),
-  // arms kit: Breachmaker = a sword biting a cracked guard on earthen steel
-  // (distinct from whirlwind's sword+arcs and faultline's sunburst+fist);
-  // Measured Fury = a calm steel helm shielding a steady heart (a passive; a
-  // composed steel look distinct from iron_resolve's shield+heart)
-  breachmaker: r('fury', 'gold', ['sword', { p: 'sunburst', ...BIG }], ['crack', 'glow']),
-  measured_fury: r('steel', 'steel', ['helm', { p: 'heart', ...BR }], ['glow']),
-  // Arms restructure 2026-07-08: Sweeping Strikes = a wide arcing slash (hitting
-  // an extra target); Deep Wounds = a bleeding gash on blood.
-  sweeping_strikes: r('fury', 'steel', ['claw_slash', { p: 'sword', ...BR }], ['arcs', 'motion']),
-  deep_wounds: r('blood', 'blood', ['claw_slash', { p: 'droplet', ...BR }], ['drips']),
-  // Warrior passives 2026-07-09. Each hints its mechanic with a distinct combo:
-  // Seasoned Soldier = a veteran's helm and mailed fist on steel/gold (a rage
-  // economy passive; distinct from measured_fury's steel/steel helm+heart);
-  // Sudden Death = a skull crowning a bared blade (a free Execute proc; distinct
-  // from intimidating_shout's roar+skull and recklessness's axe+sunburst);
-  // Diabolical Twinstrike = crossed twin daggers on shadow/blood (an Enrage
-  // damage passive; distinct from any single-blade warrior recipe); Cleaving
-  // Blows = twin axes in motion (a Twinstrike refund; distinct from cleave and
-  // recklessness's single axe).
-  seasoned_soldier: r('steel', 'gold', ['helm', { p: 'fist', ...BR }], ['glow']),
-  sudden_death: r('shadow', 'bone', ['skull', { p: 'sword', ...BR }], ['glow']),
-  diabolical_twinstrike: r('shadow', 'blood', ['dagger', { p: 'dagger', ...TR }], ['glow']),
-  cleaving_blows: r('blood', 'steel', ['axe', { p: 'axe', ...BR }], ['arcs', 'motion']),
+  whirlwind: r('fury', 'steel', ['sword'], ['arcs']),
+  berserker_rage: r('fury', 'blood', ['fist'], ['glow']),
   // warrior (Talents 2.0 rows): each hints the mechanic with an existing primitive combo
   pummel: r('steel', 'steel', ['fist', { p: 'bolt', ...BR }], ['arcs']), // fist smashing a cast
-  heroic_leap: r('earth', 'steel', [{ p: 'sunburst', ...BIG }, 'boot'], ['crack']), // downward impact
   rallying_cry: r('fury', 'gold', ['roar', { p: 'heart', ...BR }], ['arcs']), // shout granting health
-  storm_bolt: r('storm', 'steel', ['mace', { p: 'lightning', ...TR }], ['motion']), // thrown hammer
   intimidating_shout: r('shadow', 'blood', ['roar', { p: 'skull', ...TR }], ['arcs']), // fear shout
   // Bladestorm: a whole STORM of blades, so a storm-blue background sets it apart
   // from raging_gale's fury-red crossed swords on the action bar.
@@ -2546,12 +2491,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['sword', { p: 'sword', rot: Math.PI * 0.5 }],
     ['arcs', 'motion'],
   ),
-  victory_rush: r('fury', 'gold', ['sword', { p: 'heart', ...BR }], ['glow']), // strike that heals
-  piercing_howl: r('storm', 'steel', ['roar', { p: 'boot', ...BR }], ['arcs']), // howl slowing feet
-  die_by_sword: r('steel', 'gold', ['shield', { p: 'sword', ...TR }], ['glow', 'arcs']), // defensive parry
-  recklessness: r('fury', 'blood', ['axe', { p: 'sunburst', ...TL }], ['glow']), // berserk crits
   avatar: r('earth', 'earthBrown', ['helm', { p: 'fist', ...BR }], ['crack', 'glow']), // stone colossus
-  sanguine_aura: r('blood', 'blood', ['droplet', { p: 'heart', ...TL }], ['arcs', 'glow']),
   // PTR (v0.24.0) additions kept alongside the overhaul kit above.
   razor_howl: r('fury', 'steel', ['roar', { p: 'claw_slash', ...BR }], ['arcs']),
   stormthrow: r('storm', 'sky', ['axe', { p: 'lightning', ...TR }], ['motion']),
@@ -2997,21 +2937,9 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_overload: r('arcane', 'pink', ['bolt', { p: 'sunburst', ...TR }], ['glow']),
   aura_power_echo: r('fire', 'ember', ['bolt'], ['motion']),
   aura_ice_floes: r('frost', 'ice', ['boot', { p: 'snowflake', ...TR }], ['motion']),
-  // Bladed Echo (whirlwind's armed area-echo buff, aura id 'bladed_echo')
-  aura_aoe_echo: r('fury', 'steel', ['sword'], ['motion']),
-  // Emboldened (Emboldening Roar's armed guaranteed-crit buff, aura id
-  // 'emboldening_roar_crit')
-  aura_sure_crit: r('fury', 'gold', ['sunburst'], ['glow']),
   // Parameterized damage-reduction buffs (Furious Mending's 20% cut, aura id
   // 'furious_mending_dr')
   aura_buff_dr: r('blood', 'gold', ['shield', { p: 'heart', ...TR }], ['glow']),
-  // Physical-only damage-reduction buffs (Raised Guard's 50% cut, aura id
-  // 'raised_guard_dr'), mirroring aura_buff_dr on the steel palette
-  aura_buff_dr_phys: r('steel', 'steel', ['shield', { p: 'heart', ...TR }], ['glow']),
-  // Breachmaker's source-scoped vulnerability debuff (aura id 'breachmaker_vuln',
-  // kind 'vuln_source'), shown on the target's debuff frame: a cracked guard
-  // struck by a blade on a blood palette
-  aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive
@@ -3693,25 +3621,16 @@ export function abilityImageUrl(id: string): string | null {
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
   const cls =
     ABILITIES[id]?.class ??
-    (id === 'bloodbath' ||
-    id === 'colossal_might' ||
-    id === 'second_wind' ||
-    id === 'pursuit' ||
-    id === 'lingering_dread' ||
-    id === 'anger_management' ||
-    id === 'battle_rhythm' ||
-    id === 'attack'
-      ? 'warrior'
-      : id === 'double_blink' ||
-          id === 'blink_while_casting' ||
-          id === 'warded' ||
-          id === 'temporal_rift' ||
-          id === 'snap_polymorph' ||
-          id === 'twin_frost_nova' ||
-          id === 'elemental_convergence' ||
-          id === 'overflowing_power'
-        ? 'mage'
-        : null);
+    (id === 'double_blink' ||
+    id === 'blink_while_casting' ||
+    id === 'warded' ||
+    id === 'temporal_rift' ||
+    id === 'snap_polymorph' ||
+    id === 'twin_frost_nova' ||
+    id === 'elemental_convergence' ||
+    id === 'overflowing_power'
+      ? 'mage'
+      : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 

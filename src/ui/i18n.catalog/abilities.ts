@@ -714,6 +714,66 @@ const classAbilityNamesEn = {
         'Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%.',
       ],
       [
+        'blazing_barrier',
+        'Blazing Barrier',
+        'Wreathe yourself in flame, absorbing 130 damage for 60 sec. (Fire)',
+      ],
+      [
+        'cold_snap',
+        'Cold Snap',
+        'Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage talent)',
+      ],
+      [
+        'greater_invisibility',
+        'Greater Invisibility',
+        'Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)',
+      ],
+      [
+        'hot_streak',
+        'Hot Streak',
+        'Passive: two critical strikes in a row with your Fire spells (Fireball, Fire Blast, Scorch, Pyroblast or Flamestrike) make your next Pyroblast or Flamestrike instant and free. The spenders count toward the NEXT streak, free casts included; a Flamestrike counts once however many enemies it strikes, and only the initial impact ever counts. (Fire)',
+      ],
+      [
+        'ice_floes',
+        'Ice Floes',
+        'Your next two spells with a cast time can be cast while moving. Lasts 15 sec. (Mage talent)',
+      ],
+      [
+        'ignition',
+        'Ignition',
+        'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+      ],
+      [
+        'mass_barrier',
+        'Mass Barrier',
+        'Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
+      ],
+      [
+        'overload',
+        'Overload',
+        'Your next spell is amplified by 40% but costs 50% more mana. Lasts 10 sec. (Mage talent)',
+      ],
+      [
+        'power_echo',
+        'Power Echo',
+        'Your next direct spell repeats at 50% power on the same target. Lasts 10 sec. (Mage talent)',
+      ],
+      [
+        'rings_of_frost',
+        'Ring of Frost',
+        'Summons a ring for 10 sec. Enemies crossing its perimeter are frozen for 4 sec. (Mage talent)',
+      ],
+      [
+        'rune_of_power',
+        'Rune of Power',
+        'Inscribe a rune of power at your feet for 15 sec: allies standing within 8 yd deal 10% more damage. (Mage talent)',
+      ],
+      [
+        'summon_water_elemental',
+        'Summon Water Elemental',
+        'Summon a Water Elemental to fight beside you, hurling Waterbolts at your target and channeling Water Jet. (Frost)',
+      ],
+      [
         'ice_lance',
         'Ice Lance',
         "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)",
@@ -1341,9 +1401,24 @@ const classAbilityNamesEn = {
         'Calls on the storm, making your next spell instant. (Elemental signature)',
       ],
       [
+        'shamanistic_rage',
+        'Shamanistic Rage',
+        'Releases shamanistic rage, restoring 160 mana. (Enhancement signature)',
+      ],
+      [
+        'natures_swiftness',
+        "Nature's Swiftness",
+        'Calls on nature to make your next spell instant. (Restoration signature)',
+      ],
+      [
         'siphon_life',
         'Veinleech',
         'Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
+      ],
+      [
+        'fel_domination',
+        'Fel Domination',
+        'Dominates fel energies, making your next spell instant. (Demonology signature)',
       ],
       [
         'conflagrate',

@@ -337,9 +337,6 @@ const baseEnTable = {
   'aura.bonesplinter': 'Bonesplinter',
   'aura.raggedGash': 'Ragged Gash',
   'aura.soulblaze': 'Soulblaze',
-  'aura.bladedEcho': 'Bladed Echo',
-  'aura.emboldened': 'Emboldened',
-  'aura.enraged': 'Enraged',
   'aura.fingersOfFrost': 'Fingers of Frost',
   'aura.brainFreeze': 'Brain Freeze',
   'aura.wintersChill': "Winter's Chill",
@@ -571,7 +568,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   es: {
     'error.heroicMarksNeeded': 'Necesitas {marks} Marcas Heroicas para comprar {name}.',
-    'aura.enraged': 'Enfurecido',
     'aura.fingersOfFrost': 'Dedos de Escarcha',
     'aura.brainFreeze': 'Congelación Cerebral',
     'aura.wintersChill': 'Frío Invernal',
@@ -4703,15 +4699,6 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Bonesplinter: 'aura.bonesplinter',
   'Ragged Gash': 'aura.raggedGash',
   Soulblaze: 'aura.soulblaze',
-  // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
-  // src/sim/content/classes.ts); shown on the buff bar and combat log.
-  'Bladed Echo': 'aura.bladedEcho',
-  // Emboldening Roar's armed guaranteed-crit buff (the aoeAllySureCrit case in
-  // src/sim/combat/effect_dispatch.ts); shown on the buff bar and combat log.
-  Emboldened: 'aura.emboldened',
-  // Fury Enrage buff (the enrageChance case in src/sim/combat/effect_dispatch.ts),
-  // procced by Bloodletting and Desenfreno / Rampage; shown on the buff bar.
-  Enraged: 'aura.enraged',
   // Frost mage proc engine (src/sim/combat/frost_mage.ts): the two self
   // procs and the target debuff; buff bar, target frame and combat log.
   'Fingers of Frost': 'aura.fingersOfFrost',

@@ -838,7 +838,8 @@ describe('i18n Localization Key Coverage', () => {
     expect(classAbilityEntries).toHaveLength(
       Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2,
     );
-    expect(missingEntityTranslationsForGroups(['classAbility'])).toHaveLength(0);
+    const missingClassAbilities = missingEntityTranslationsForGroups(['classAbility']);
+    expect(missingClassAbilities, JSON.stringify(missingClassAbilities, null, 2)).toHaveLength(0);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -914,7 +915,8 @@ describe('i18n Localization Key Coverage', () => {
     // item name (see itemDisplayName), so they are not in the manifest.
     const namedItems = Object.values(ITEMS).filter((i) => !i.heroicOf).length;
     expect(itemEntries).toHaveLength(namedItems);
-    expect(missingEntityTranslationsForGroups(['classAbility', 'item'])).toHaveLength(0);
+    const missingItems = missingEntityTranslationsForGroups(['item']);
+    expect(missingItems, JSON.stringify(missingItems, null, 2)).toHaveLength(0);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -997,7 +999,8 @@ describe('i18n Localization Key Coverage', () => {
 
     expect(missingEntityTranslationsForGroups(['classAbility', 'item'])).toHaveLength(0);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
-    expect(missingEntityTranslationsForGroups(['world'])).toHaveLength(0);
+    const missingWorld = missingEntityTranslationsForGroups(['world']);
+    expect(missingWorld, JSON.stringify(missingWorld, null, 2)).toHaveLength(0);
     expect(
       missingEntityTranslationsForGroups(['classAbility', 'item', 'itemSet', 'world']),
     ).toHaveLength(0);

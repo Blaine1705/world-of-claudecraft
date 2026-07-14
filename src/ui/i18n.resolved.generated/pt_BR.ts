@@ -871,7 +871,6 @@ export const pt_BR: EnTranslations = {
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
       "showAttackButton": "Show Attack Button",
-      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
       "mobileCameraJoystick": "Joystick da câmera",
       "mobileLeftHanded": "Layout para canhotos"
@@ -5818,6 +5817,54 @@ export const pt_BR: EnTranslations = {
         "name": "Lança de Geada",
         "description": "Lança uma seta de gelo, causando {damage} de dano de Gelo e reduzindo a velocidade de movimento em 40%."
       },
+      "blazing_barrier": {
+        "name": "Barreira Flamejante",
+        "description": "Envolve você em chamas, absorvendo 130 de dano por 60 s. (Fogo)"
+      },
+      "cold_snap": {
+        "name": "Estalo Gélido",
+        "description": "Encerra o tempo de recarga de Passo Cintilante, Véu de Gelo e Invisibilidade Maior. (Talento de mago)"
+      },
+      "greater_invisibility": {
+        "name": "Invisibilidade Maior",
+        "description": "Desaparece por 20 s: remove 2 efeitos de dano periódico e reduz o dano recebido em 90% enquanto você está invisível e por pouco tempo depois. (Talento de mago)"
+      },
+      "hot_streak": {
+        "name": "Embalo Ardente",
+        "description": "Passivo: dois acertos críticos seguidos com suas magias de Fogo (Bola de Fogo, Impacto de Fogo, Calcinar, Piroexplosão ou Coluna de Chamas) tornam sua próxima Piroexplosão ou Coluna de Chamas instantânea e gratuita. As magias que consomem o efeito contam para o PRÓXIMO embalo, inclusive lançamentos gratuitos; Coluna de Chamas conta uma vez, não importa quantos inimigos atinja, e apenas o impacto inicial pode contar. (Fogo)"
+      },
+      "ice_floes": {
+        "name": "Bancos de Gelo",
+        "description": "Suas próximas duas magias com tempo de lançamento podem ser lançadas em movimento. Dura 15 s. (Talento de mago)"
+      },
+      "ignition": {
+        "name": "Ignição",
+        "description": "Passivo: os acertos críticos das suas magias queimam o alvo, causando 40% do dano provocado ao longo de 6 s; acumula. (Maestria de Fogo)"
+      },
+      "mass_barrier": {
+        "name": "Barreira em Massa",
+        "description": "Protege você e até 4 aliados próximos em um raio de 30 m; cada escudo absorve 130 de dano por 60 s. (Talento de mago)"
+      },
+      "overload": {
+        "name": "Sobrecarga",
+        "description": "Sua próxima magia é amplificada em 40%, mas custa 50% mais mana. Dura 10 s. (Talento de mago)"
+      },
+      "power_echo": {
+        "name": "Eco de Poder",
+        "description": "Sua próxima magia direta se repete com 50% de poder no mesmo alvo. Dura 10 s. (Talento de mago)"
+      },
+      "rings_of_frost": {
+        "name": "Anel de Gelo",
+        "description": "Evoca um anel por 10 s. Inimigos que atravessam seu perímetro ficam congelados por 4 s. (Talento de mago)"
+      },
+      "rune_of_power": {
+        "name": "Runa de Poder",
+        "description": "Inscreve uma runa de poder sob seus pés por 15 s: aliados em um raio de 8 m causam 10% mais dano. (Talento de mago)"
+      },
+      "summon_water_elemental": {
+        "name": "Evocar Elemental da Água",
+        "description": "Evoca um Elemental da Água para lutar ao seu lado, lançar Setas d'Água no seu alvo e canalizar Jato d'Água. (Gelo)"
+      },
       "ice_lance": {
         "name": "Ice Lance",
         "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
@@ -6422,9 +6469,21 @@ export const pt_BR: EnTranslations = {
         "name": "Maestria Elemental",
         "description": "Invoca maestria elemental, tornando seu próximo feitiço instantâneo. (assinatura Elemental)"
       },
+      "shamanistic_rage": {
+        "name": "Shamanistic Rage",
+        "description": "Releases shamanistic rage, restoring 160 mana. (Enhancement signature)"
+      },
+      "natures_swiftness": {
+        "name": "Nature's Swiftness",
+        "description": "Calls on nature to make your next spell instant. (Restoration signature)"
+      },
       "siphon_life": {
         "name": "Sifão de Vida",
         "description": "Suga vida do inimigo, causando {damage} de dano de Sombra ao longo de 30 s e curando você pelo dano causado. (assinatura Suplício)"
+      },
+      "fel_domination": {
+        "name": "Fel Domination",
+        "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
       },
       "conflagrate": {
         "name": "Conflagrar",
@@ -7517,6 +7576,12 @@ export const pt_BR: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Cajado de Guerra de Vidro de Brasa"
       },
+      "conjured_water4": {
+        "name": "Água de Nascente Conjurada"
+      },
+      "conjured_bread4": {
+        "name": "Pão de Banquete Conjurado"
+      },
       "bristleback_maul": {
         "name": "Martelo Gallowglass"
       },
@@ -8230,18 +8295,6 @@ export const pt_BR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guarda-cintura do Chamatormentas"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Malha de Pernas Imortal da Guarda de Guerra"
-      },
-      "scourgehide_carapace": {
-        "name": "Carapaça de Couro do Flagelo"
-      },
-      "soulforged_warplate": {
-        "name": "Placa de Guerra Forjada na Alma"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema Dilacera-Almas"
       }
     },
     "mobs": {
@@ -8598,6 +8651,9 @@ export const pt_BR: EnTranslations = {
       },
       "ysolei": {
         "name": "Ysolei, Avatar da Lua Afogada"
+      },
+      "water_elemental": {
+        "name": "Elemental da Água"
       }
     },
     "npcs": {

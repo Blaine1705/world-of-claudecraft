@@ -1,6 +1,6 @@
-import { ABILITIES } from '../sim/data';
 import type { TalentChoiceOption, TalentEffect, TalentNode } from '../sim/content/talents';
-import { iconDataUrl, type IconKind } from './icons';
+import { ABILITIES } from '../sim/data';
+import { type IconKind, iconDataUrl } from './icons';
 
 export interface TalentIconRef {
   kind: Extract<IconKind, 'ability' | 'crest'>;
@@ -50,7 +50,8 @@ export function talentEffectIconRef(
   const stat = effect?.stats ? Object.keys(effect.stats)[0] : undefined;
   if (stat) return { kind: 'crest', id: TALENT_STAT_CREST[stat] ?? 'talent_generic' };
 
-  if (effect?.global) return { kind: 'crest', id: effect.global.threatPct ? 'talent_armor' : 'talent_crit' };
+  if (effect?.global)
+    return { kind: 'crest', id: effect.global.threatPct ? 'talent_armor' : 'talent_crit' };
   return { kind: 'crest', id: kind === 'choice' ? 'talent_choice' : 'talent_generic' };
 }
 

@@ -870,12 +870,10 @@ export const ru_RU: EnTranslations = {
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
-      "showAttackButton": "Show Attack Button",
-      "showTargetOfTarget": "Показывать цель цели",
+      "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",
-      "mobileLeftHanded": "Раскладка для левшей",
-      "mouseoverCast": "Применение по наведению на рамки группы"
+      "mobileLeftHanded": "Раскладка для левшей"
     },
     "talentRows": {
       "tab": "Выбор",
@@ -1004,9 +1002,7 @@ export const ru_RU: EnTranslations = {
         "spellPower": "Сила заклинаний",
         "critRating": "Рейтинг крит. удара",
         "hasteRating": "Рейтинг ускорения",
-        "warfare": "Боевая мощь",
-        "haste": "Скорость",
-        "parry": "Парирование"
+        "warfare": "Боевая мощь"
       },
       "warfareValue": "+{increase}% к урону / -{reduction}% получаемого",
       "desc": {
@@ -1023,9 +1019,7 @@ export const ru_RU: EnTranslations = {
         "dodge": "Ваш шанс полностью уклониться от входящей атаки в ближнем бою, не получив урона.",
         "critRating": "Рейтинг критического удара от снаряжения и бонусов комплекта повышает шанс критического удара. Примерно 10 рейтинга дают 1% крит. удара.",
         "hasteRating": "Рейтинг ускорения от снаряжения и бонусов комплекта ускоряет ваши атаки и заклинания. Примерно 10 рейтинга дают 1% ускорения.",
-        "warfare": "Увеличивает урон по игрокам на {increase}% и снижает получаемый от игроков урон на {reduction}%.",
-        "haste": "Ускоряет взмахи вашего оружия и произнесение заклинаний. Не снижает общее время восстановления.",
-        "parry": "Ваш шанс полностью парировать фронтальную атаку в ближнем бою и не получить урона. Удар со спины парировать нельзя."
+        "warfare": "Увеличивает урон по игрокам на {increase}% и снижает получаемый от игроков урон на {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} к силе атаки",
@@ -1144,8 +1138,7 @@ export const ru_RU: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Снять {item}",
-      "unequipHint": "Нажмите ×, ПКМ или перетащите в сумку, чтобы снять",
-      "offhand": "Левая рука"
+      "unequipHint": "Нажмите ×, ПКМ или перетащите в сумку, чтобы снять"
     },
     "account": {
       "title": "Аккаунт",
@@ -1427,22 +1420,7 @@ export const ru_RU: EnTranslations = {
         "shadow": "Тьма",
         "holy": "Свет",
         "nature": "Природа"
-      },
-      "battleStance": "Боевая стойка: на 10% больше создания ярости",
-      "berserkerStance": "Стойка берсерка: крит. удары на 3% чаще и на 3% сильнее",
-      "dmgDone": "Повышает наносимый урон на {pct}%",
-      "dmgDoneReduce": "Снижает наносимый урон на {pct}%",
-      "crit": "Повышает шанс критического удара на {pct}%",
-      "rageGen": "Повышает создание ярости на {pct}%",
-      "reckless": "Повышает шанс критического удара на {pct}% и создание ярости на {ragePct}%",
-      "avatar": "Колосс: наносимый урон повышен на {pct}%",
-      "bloodbath": "Повышает шанс критического удара и наносимый урон на {pct}%",
-      "dieBySword": "Снижает получаемый урон на {pct}% ({lowPct}% при здоровье ниже {hpPct}%)",
-      "sanguine": "Повышает скорость атаки на {hastePct}% и наносимый урон на {dmgPct}%",
-      "battleTrance": "Ваш следующий Удар разорителя или Грубый замах не потребует ярости",
-      "revengeFree": "Ваша следующая Месть не потребует ярости",
-      "victoryRush": "«Порыв победы» готов",
-      "maxHpPct": "Повышает максимальное здоровье на {pct}%"
+      }
     },
     "worldBoss": {
       "spawn": "{name} поднимается над Терновыми высотами!"
@@ -1494,31 +1472,31 @@ export const ru_RU: EnTranslations = {
       "lock": "Закрепить рамку игрока"
     },
     "partyFrames": {
-      "section": "Party and Raid Frames",
-      "unlock": "Move party and raid frames",
-      "lock": "Lock party and raid frames",
-      "style": "Frame Style",
-      "styleAutomatic": "Automatic",
-      "styleClassic": "Classic Party Frames",
-      "styleRaid": "Raid Frames",
-      "scale": "Frame Scale",
-      "width": "Frame Width",
-      "height": "Frame Height",
-      "spacing": "Frame Spacing",
-      "columns": "Raid Columns",
-      "healthText": "Health Text",
+      "section": "Рамки группы и рейда",
+      "unlock": "Перемещать рамки группы и рейда",
+      "lock": "Закрепить рамки группы и рейда",
+      "style": "Стиль рамок",
+      "styleAutomatic": "Автоматически",
+      "styleClassic": "Классические рамки группы",
+      "styleRaid": "Рамки рейда",
+      "scale": "Масштаб рамок",
+      "width": "Ширина рамки",
+      "height": "Высота рамки",
+      "spacing": "Расстояние между рамками",
+      "columns": "Столбцы рейда",
+      "healthText": "Текст здоровья",
       "healthNone": "None",
-      "healthPercent": "Percent",
-      "healthCurrent": "Current",
-      "healthCurrentMax": "Current / Max",
-      "sort": "Sort Players",
-      "sortGroup": "Group",
+      "healthPercent": "Проценты",
+      "healthCurrent": "Текущее",
+      "healthCurrentMax": "Текущее / максимальное",
+      "sort": "Сортировка игроков",
+      "sortGroup": "Группа",
       "sortRole": "Role",
       "sortName": "Name",
-      "showResource": "Show Mana, Rage, and Energy",
-      "showAbsorbs": "Show Absorb Shields",
-      "showAuras": "Show Buffs and Debuffs",
-      "showSelf": "Show Your Frame"
+      "showResource": "Показывать ману, ярость и энергию",
+      "showAbsorbs": "Показывать поглощающие щиты",
+      "showAuras": "Показывать усиления и ослабления",
+      "showSelf": "Показывать свою рамку"
     },
     "frameReset": {
       "label": "Сбросить положение рамок"
@@ -2573,14 +2551,14 @@ export const ru_RU: EnTranslations = {
       "frost_armor": "Длительное усиление на себя, которое укрепляет броню перед боем.",
       "arcane_intellect": "Повышает интеллект, увеличивая запас маны союзника. Накладывайте перед началом боя.",
       "frostbolt": "Бьет с дистанции и замедляет цель, чтобы она не смогла к вам приблизиться.",
-      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
-      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
-      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
-      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
-      "shatter": "Your spells crit far more often against frozen targets.",
-      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
-      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
-      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
+      "ice_lance": "Мгновенный осколок, расходующий ледяные эффекты и наносящий намного больше урона замороженной цели.",
+      "flurry": "Три быстрых ледяных снаряда охлаждают цель, и следующие ледяные атаки считают её замороженной.",
+      "fingers_of_frost": "Ледяные стрелы иногда усиливают «Ледяное копьё», позволяя ему считать цель замороженной.",
+      "brain_freeze": "Ледяные стрелы иногда делают следующую «Череду» мгновенной и более мощной.",
+      "shatter": "Заклинания гораздо чаще наносят критический урон замороженным целям.",
+      "frozen_orb": "Медленная ледяная сфера проходит сквозь группу врагов, охлаждает всех вокруг и вызывает ледяные эффекты.",
+      "blizzard": "Покрывает область льдом, нанося урон целой группе врагов и замедляя её.",
+      "blink": "Переносит вас на небольшое расстояние вперёд и снимает эффекты обездвиживания.",
       "conjure_water": "Создает напитки, восстанавливающие ману, чтобы вы могли пополнить ее между боями.",
       "conjure_food": "Создает пищу, которая восстанавливает здоровье, когда вы садитесь поесть.",
       "shadow_bolt": "Стрела тьмы, которую вы запускаете в цель, ваш основной удар.",
@@ -2594,9 +2572,7 @@ export const ru_RU: EnTranslations = {
       "mark_of_the_wild": "Длительное благословение, которое вы накладываете на себя или союзника перед боем.",
       "moonfire": "Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.",
       "rejuvenation": "Накладывается мгновенно и лечит союзника со временем, так что вы можете продолжать действовать.",
-      "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе.",
-      "revenge": "Размашистая контратака, бьющая по всем перед вами, и обходится дешевле сразу после того, как вы отбили удар.",
-      "hamstring": "Рассекает ноги цели, замедляя ее, чтобы она не могла вас настичь."
+      "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе."
     },
     "petHook": {
       "emberkin": "Дальнобойный демон с огненными стрелами, который понемногу бьет врагов с безопасного расстояния.",
@@ -5059,9 +5035,7 @@ export const ru_RU: EnTranslations = {
       "death": "{name} умирает.",
       "auraGain": "Вы получаете {name}.",
       "auraFade": "{name} спадает с вас.",
-      "auraAfflicted": "{target} поражен эффектом {name}.",
-      "floatingParry": "Парировано",
-      "parried": "{target} парирует ваш {ability}."
+      "auraAfflicted": "{target} поражен эффектом {name}."
     },
     "system": {
       "playerDeath": "Вы погибли.",
@@ -5147,9 +5121,7 @@ export const ru_RU: EnTranslations = {
       "tradeInProgress": "Обмен уже идет.",
       "tradeTooFar": "Цель слишком далеко для обмена.",
       "tradeExpired": "Запрос обмена истек.",
-      "tradeFailed": "Обмен не удался: предметы или деньги больше недоступны.",
-      "nothingToConsume": "Нечего поглощать.",
-      "needShield": "Необходимо снарядить щит."
+      "tradeFailed": "Обмен не удался: предметы или деньги больше недоступны."
     },
     "logs": {
       "standUp": "Вы встаете.",
@@ -5215,7 +5187,7 @@ export const ru_RU: EnTranslations = {
     },
     "pet": {
       "attack": "Атаковать",
-      "waterJet": "Water Jet",
+      "waterJet": "Струя воды",
       "taunt": "Провокация",
       "healDemon": "Исцелить демона",
       "healPet": "Исцелить питомца",
@@ -5224,8 +5196,8 @@ export const ru_RU: EnTranslations = {
       "aggressive": "Агрессивный",
       "petAttackTitle": "Атака питомца",
       "petAttackDesc": "Прикажите питомцу атаковать вашу текущую враждебную цель.",
-      "waterJetTitle": "Water Jet",
-      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
+      "waterJetTitle": "Струя воды",
+      "waterJetDesc": "Приказывает элементалю воды в течение 3 сек. поддерживать замедляющий поток. Восстановление: 8 сек. Щёлкните правой кнопкой, чтобы он применял способность автоматически, когда она готова.",
       "petTauntTitle": "Провокация питомца",
       "petTauntDesc": "Прикажите питомцу вступить в бой и применить Рык в радиусе действия. Восстановление 10 секунд.",
       "healDemonDesc": "Потратьте ману, чтобы направлять исцеление в демона 5 секунд.",
@@ -5348,7 +5320,7 @@ export const ru_RU: EnTranslations = {
     "actionBar": {
       "attackName": "Атака",
       "attackTooltip": "Включает или выключает автоатаку по вашей цели. Щелчок правой кнопкой по врагу также начинает атаку.",
-      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
+      "attackRemoveHint": "Щёлкните правой кнопкой, чтобы убрать её с панели и освободить ячейку.",
       "emptySlot": "Пустая ячейка",
       "slotAria": "Ячейка действия {slot}: {ability}",
       "emptySlotAria": "Ячейка действия {slot}: пусто",
@@ -5500,8 +5472,7 @@ export const ru_RU: EnTranslations = {
       "legs": "Ноги",
       "gloves": "Кисти рук",
       "feet": "Ступни",
-      "ring": "Палец",
-      "twoHand": "Двуручное"
+      "ring": "Палец"
     },
     "quality": {
       "poor": "Низкое",
@@ -5846,45 +5817,93 @@ export const ru_RU: EnTranslations = {
         "name": "Копьё изморози",
         "description": "Выпускает ледяную стрелу, наносящую {damage} ед. урона от магии льда и замедляющую передвижение на 40%."
       },
+      "blazing_barrier": {
+        "name": "Пылающая преграда",
+        "description": "Окутывает вас пламенем, поглощая 130 ед. урона в течение 60 сек. (ветка «Огонь»)"
+      },
+      "cold_snap": {
+        "name": "Холодная хватка",
+        "description": "Мгновенно завершает восстановление «Мерцающего шага», «Морозной завесы» и «Великой невидимости». (талант мага)"
+      },
+      "greater_invisibility": {
+        "name": "Великая невидимость",
+        "description": "Вы исчезаете на 20 сек.: снимает 2 эффекта периодического урона, а получаемый урон снижается на 90% во время невидимости и ненадолго после неё. (талант мага)"
+      },
+      "hot_streak": {
+        "name": "Полоса везения",
+        "description": "Пассивно: два критических попадания подряд огненными заклинаниями («Огненный шар», «Огненный взрыв», «Ожог», «Огненная глыба» или «Огненный столб») делают следующую «Огненную глыбу» или «Огненный столб» мгновенными и бесплатными. Расходующие эффект заклинания, включая бесплатные, учитываются для следующей серии. «Огненный столб» учитывается один раз независимо от числа поражённых врагов, и только его первый удар может быть засчитан. (ветка «Огонь»)"
+      },
+      "ice_floes": {
+        "name": "Плавучая льдина",
+        "description": "Следующие два заклинания со временем произнесения можно применять в движении. Время действия: 15 сек. (талант мага)"
+      },
+      "ignition": {
+        "name": "Воспламенение",
+        "description": "Пассивно: критические эффекты ваших заклинаний поджигают цель, нанося 40% от причинённого урона за 6 сек. Эффект суммируется. (искусность ветки «Огонь»)"
+      },
+      "mass_barrier": {
+        "name": "Массовый барьер",
+        "description": "Окружает щитами вас и до 4 ближайших союзников в радиусе 30 м. Каждый щит поглощает 130 ед. урона в течение 60 сек. (талант мага)"
+      },
+      "overload": {
+        "name": "Перегрузка",
+        "description": "Следующее заклинание усиливается на 40%, но расходует на 50% больше маны. Время действия: 10 сек. (талант мага)"
+      },
+      "power_echo": {
+        "name": "Эхо силы",
+        "description": "Следующее заклинание прямого действия повторяется с 50% силы на той же цели. Время действия: 10 сек. (талант мага)"
+      },
+      "rings_of_frost": {
+        "name": "Кольцо мороза",
+        "description": "Создаёт кольцо на 10 сек. Пересекающие его границу враги замораживаются на 4 сек. (талант мага)"
+      },
+      "rune_of_power": {
+        "name": "Руна мощи",
+        "description": "Начерчивает у ваших ног руну мощи на 15 сек. Союзники, стоящие в радиусе 8 м, наносят на 10% больше урона. (талант мага)"
+      },
+      "summon_water_elemental": {
+        "name": "Призыв элементаля воды",
+        "description": "Призывает элементаля воды, который сражается рядом с вами, бросает в вашу цель стрелы воды и поддерживает «Струю воды». (ветка «Лёд»)"
+      },
       "ice_lance": {
-        "name": "Ice Lance",
-        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+        "name": "Ледяное копьё",
+        "description": "Бросает ледяное копьё, наносящее {damage} ед. урона от магии льда, втрое больше по замороженной цели. Расходует «Ледяные пальцы» или заряд «Зимней стужи», чтобы считать цель замороженной. (ветка «Лёд»)"
       },
       "flurry": {
-        "name": "Flurry",
-        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+        "name": "Череда",
+        "description": "Выпускает три ледяных снаряда, каждый из которых наносит {damage} ед. урона от магии льда, и накладывает на цель «Зимнюю стужу»: следующие 2 подходящих заклинания считают её замороженной. «Заморозка мозгов» делает «Череду» мгновенной, усиливает на 30% и позволяет игнорировать время восстановления. (ветка «Лёд»)"
       },
       "frozen_orb": {
-        "name": "Frozen Orb",
-        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+        "name": "Ледяной шар",
+        "description": "Выпускает вихревой ледяной шар, который движется вперёд 8 сек., ежесекундно наносит ближайшим противникам {damage} ед. урона от магии льда и замедляет их на 30%. Попадания создают «Ледяные пальцы». (ветка «Лёд»)"
       },
       "blizzard": {
-        "name": "Blizzard",
-        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+        "name": "Снежная буря",
+        "description": "Обрушивает на выбранную область ледяную бурю на 6 сек., ежесекундно нанося {damage} ед. урона от магии льда и замедляя врагов на 40%. Каждый поражённый враг сокращает восстановление «Ледяного шара» на 0,5 сек., но не более чем на 3 сек. за одно применение. (ветка «Лёд»)"
       },
       "glacial_spike": {
-        "name": "Glacial Spike",
-        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+        "name": "Ледяной шип",
+        "description": "Создаёт огромный ледяной шип, расходуя 5 сосулек, чтобы нанести {damage} ед. урона от магии льда и приморозить цель к месту на 4 сек. (ветка «Лёд»)"
       },
       "glacial_front": {
-        "name": "Glacial Front",
-        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+        "name": "Ледниковый фронт",
+        "description": "Удерживайте, чтобы накопить расширяющийся фронт холода, затем выпустите его конусом. Чем дольше зарядка, тем больше дальность и урон. Все поражённые враги замедляются на 50% на 4 сек.; при полной зарядке они также обездвиживаются на 1 сек. (ветка «Лёд»)"
       },
       "dragons_breath": {
-        "name": "Dragon's Breath",
-        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+        "name": "Дыхание дракона",
+        "description": "Удерживайте, чтобы накопить расширяющееся огненное дыхание, затем выпустите его конусом. Чем дольше зарядка, тем больше дальность и урон. Поражённые враги дезориентированы, пока урон не снимет эффект; при полной зарядке атака всегда критическая и один раз учитывается для «Полосы везения». (ветка «Огонь»)"
       },
       "fingers_of_frost": {
-        "name": "Fingers of Frost",
-        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+        "name": "Ледяные пальцы",
+        "description": "«Копьё инея» с вероятностью 15% даёт заряд «Ледяных пальцев», вплоть до 2 зарядов: следующее «Ледяное копьё» считает цель замороженной. (ветка «Лёд»)"
       },
       "brain_freeze": {
-        "name": "Brain Freeze",
-        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+        "name": "Заморозка мозгов",
+        "description": "«Копьё инея» с вероятностью 20% делает следующую «Череду» мгновенной, усиливает её на 30% и позволяет игнорировать время восстановления. (ветка «Лёд»)"
       },
       "shatter": {
-        "name": "Shatter",
-        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
+        "name": "Обледенение",
+        "description": "Вероятность критического эффекта ваших заклинаний против замороженных целей повышается на 50%, а урон таких критических ударов — на 20%. «Ледяные пальцы» и «Зимняя стужа» также позволяют считать цель замороженной. (ветка «Лёд»)"
       },
       "conjure_water": {
         "name": "Сотворение воды",
@@ -6450,9 +6469,21 @@ export const ru_RU: EnTranslations = {
         "name": "Покорение стихий",
         "description": "Призывает покорение стихий, делая следующее заклинание мгновенным. (знаковое умение Стихий)"
       },
+      "shamanistic_rage": {
+        "name": "Шаманская ярость",
+        "description": "Высвобождает шаманскую ярость, восстанавливая 160 ед. маны. (ключевая способность ветки «Совершенствование»)"
+      },
+      "natures_swiftness": {
+        "name": "Быстрота природы",
+        "description": "Призывает природу, делая ваше следующее заклинание мгновенным. (ключевая способность ветки «Исцеление»)"
+      },
       "siphon_life": {
         "name": "Вытягивание жизни",
         "description": "Вытягивает жизнь из врага, нанося {damage} ед. урона от темной магии за 30 сек. и исцеляя вас на величину нанесенного урона. (знаковое умение Колдовства)"
+      },
+      "fel_domination": {
+        "name": "Власть Скверны",
+        "description": "Подчиняет энергии Скверны, делая ваше следующее заклинание мгновенным. (ключевая способность ветки «Демонология»)"
       },
       "conflagrate": {
         "name": "Поджигание",
@@ -6699,28 +6730,28 @@ export const ru_RU: EnTranslations = {
         "description": "Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек часть наносимого вами урона от тайной магии возвращается через эхо, исцеляя его."
       },
       "temporal_cascade": {
-        "name": "Temporal Cascade",
-        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+        "name": "Временной каскад",
+        "description": "Пускает эхо по группе: мгновенно исцеляет цель и до четырёх ближайших к ней союзников и отмечает каждого на {duration} сек. Часть наносимого вами урона от тайной магии возвращается через эхо и исцеляет отмеченных союзников. (хрономантия)"
       },
       "temporal_reversal": {
-        "name": "Temporal Reversal",
-        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+        "name": "Обращение времени",
+        "description": "Обращает ход времени погибшего союзника, возвращая его к жизни рядом с телом с частью здоровья и маны даже во время боя. (хрономантия)"
       },
       "temporal_rewind": {
-        "name": "Rewind",
-        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+        "name": "Перемотка времени",
+        "description": "Посылает по группе или рейду волну тайной магии, отматывая время и восстанавливая каждому союзнику в радиусе 40 м 30% урона, полученного за последние 5 сек. (не более 35% максимального запаса здоровья). Эффект не может быть критическим. (хрономантия)"
       },
       "temporal_acceleration": {
-        "name": "Temporal Acceleration",
-        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+        "name": "Ускорение времени",
+        "description": "Ускоряет течение времени для группы или рейда, повышая скорость атак, произнесения и поддержания заклинаний на 30% на 15 сек. Союзники, недавно испытавшие «Ускорение времени» или «Жажду крови», слишком утомлены, чтобы получить эффект. (хрономантия)"
       },
       "perfect_moment": {
-        "name": "Perfect Moment",
-        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+        "name": "Идеальный миг",
+        "description": "Ловит идеальный миг: вы мгновенно получаете 4 чародейских заряда, и в течение 10 сек. «Эфирные стрелы» не расходуют их. (хрономантия)"
       },
       "arcane_surge": {
-        "name": "Aether Surge",
-        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+        "name": "Эфирный всплеск",
+        "description": "Направляет в противника поток чистой тайной энергии, нанося {damage} ед. урона. Каждое применение оставляет чародейский заряд, повышающий урон и скорость произнесения следующего «Эфирного всплеска» (на 5% за заряд), но резко увеличивающий расход маны. Суммируется до 4 раз; «Эфирные стрелы» расходуют заряды. Применение также может подготовить «Эфирный рывок», и следующий «Эфирный всплеск» не потребует маны и будет произнесён вдвое быстрее."
       },
       "mind_sear": {
         "name": "Выжигание мыслей",
@@ -6801,98 +6832,6 @@ export const ru_RU: EnTranslations = {
       "revive_pet": {
         "name": "Оживление питомца",
         "description": "Оживляет вашего павшего питомца и возвращает его к вам."
-      },
-      "revenge": {
-        "name": "Месть",
-        "description": "Атака широкой дугой, наносящая физический урон всем врагам перед вами. При более чем 5 целях урон снижается. При уклонении или парировании ваша следующая Месть может не потребовать ярости."
-      },
-      "battle_stance": {
-        "name": "Боевая стойка",
-        "description": "Агрессивная боевая стойка: вы создаете на 10% больше ярости. Стандартная стойка для веток «Оружие» и «Защита»."
-      },
-      "berserker_stance": {
-        "name": "Стойка берсерка",
-        "description": "Безрассудная боевая стойка: ваши критические удары проходят на 3% чаще и бьют на 3% сильнее. Воин ветки «Неистовство» всегда сражается в этой стойке."
-      },
-      "sweeping_strikes": {
-        "name": "Расширяющаяся дуга",
-        "description": "В течение 12 сек ваши атаки по одной цели также поражают 1 ближайшего врага на 75% урона. (ветка «Оружие»)"
-      },
-      "deep_wounds": {
-        "name": "Зияющие раны",
-        "description": "Пассивно: ваш Калечащий удар оставляет на цели кровотечение, нанося физический урон за 6 сек. (ветка «Оружие»)"
-      },
-      "enrage_passive": {
-        "name": "Буйство",
-        "description": "Пассивно: пока вы в Бешенстве, вы наносите на 11% больше урона, атакуете на 25% быстрее и двигаетесь на 10% быстрее в течение 4 сек. Кровопускание с вероятностью 30% приводит вас в Бешенство; Кровавая жатва делает это всегда. (ветка «Неистовство»)"
-      },
-      "raging_gale": {
-        "name": "Двойной удар",
-        "description": "Мгновенно бьет оружием дважды, каждый удар наносит 60% урона оружием плюс {damage}, и создает {rage} ярости. Хранит до 2 зарядов. (ветка «Неистовство»)"
-      },
-      "red_harvest": {
-        "name": "Кровавая жатва",
-        "description": "Отдайте все: наносит три удара в исступлении, каждый на урон оружием плюс {damage}. (ветка «Неистовство»)"
-      },
-      "furious_mending": {
-        "name": "Яростное исцеление",
-        "description": "В течение 10 сек вы получаете на 20% меньше урона, и пока эффект длится, ваше Кровопускание исцеляет вас на 20% от максимального здоровья. (ветка «Неистовство»)"
-      },
-      "emboldening_roar": {
-        "name": "Ободряющий рев",
-        "description": "Издает ободряющий рев: вы и дружественные игроки в пределах 40 м воодушевлены, а ваши следующие 3 способности гарантированно станут критическими ударами. (ветка «Неистовство»)"
-      },
-      "raised_guard": {
-        "name": "Заслон щитом",
-        "description": "Прикрывается щитом: вы получаете на 50% меньше физического урона в течение 6 сек. Хранит до 2 зарядов. (ветка «Защита»)"
-      },
-      "iron_resolve": {
-        "name": "Железная решимость",
-        "description": "Стиснуть зубы и не замечать боли: расходует всю вашу ярость (минимум 20), поглощая 4 ед. урона за каждую потраченную единицу ярости, до 10 сек. (ветка «Защита»)"
-      },
-      "faultline": {
-        "name": "Разлом",
-        "description": "Посылает ударную волну по земле: враги перед вами в пределах 8 м получают {damage} ед. урона и оглушаются на 3 сек. (ветка «Защита»)"
-      },
-      "defiant_bellow": {
-        "name": "Дерзкий рев",
-        "description": "Дерзкий рев: каждый враг в пределах 10 м провоцируется и вынужден атаковать вас 3 сек. (ветка «Защита»)"
-      },
-      "breachmaker": {
-        "name": "Брешь",
-        "description": "Обрушивается на цель на урон оружием плюс {damage} и ломает ее защиту: ваши собственные атаки по ней наносят на 20% больше урона в течение 8 сек. (ветка «Оружие»)"
-      },
-      "measured_fury": {
-        "name": "Размеренная ярость",
-        "description": "Ваша размеренная ярость оттачивает расход: ваши способности стоят на 10% меньше ярости. (ветка «Оружие»)"
-      },
-      "seasoned_soldier": {
-        "name": "Бывалый солдат",
-        "description": "Ваши критические автоатаки создают на 10% больше ярости. (ветка «Оружие»)"
-      },
-      "diabolical_twinstrike": {
-        "name": "Дьявольский двойной удар",
-        "description": "Пока вы в Бешенстве, ваш Двойной удар наносит на 15% больше урона. (ветка «Неистовство»)"
-      },
-      "cleaving_blows": {
-        "name": "Рассекающие удары",
-        "description": "Кровавая жатва всегда возвращает заряд Двойного удара. (ветка «Неистовство»)"
-      },
-      "sudden_death": {
-        "name": "Внезапная смерть",
-        "description": "Ваши автоатаки могут позволить применить Раннюю могилу к цели с любым запасом здоровья, не потратив ярости. (ветка «Оружие»)"
-      },
-      "shamanistic_rage": {
-        "name": "Шаманская ярость",
-        "description": "Высвобождает шаманскую ярость, восстанавливая 160 ед. маны. (ключевая способность ветки «Совершенствование»)"
-      },
-      "natures_swiftness": {
-        "name": "Быстрота природы",
-        "description": "Призывает природу, делая ваше следующее заклинание мгновенным. (ключевая способность ветки «Исцеление»)"
-      },
-      "fel_domination": {
-        "name": "Власть Скверны",
-        "description": "Подчиняет энергии Скверны, делая ваше следующее заклинание мгновенным. (ключевая способность ветки «Демонология»)"
       }
     },
     "items": {
@@ -7637,6 +7576,12 @@ export const ru_RU: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Боевой посох из огненного стекла"
       },
+      "conjured_water4": {
+        "name": "Сотворённая родниковая вода"
+      },
+      "conjured_bread4": {
+        "name": "Сотворённый хлеб для пира"
+      },
       "bristleback_maul": {
         "name": "Молот Гэллоугласа"
       },
@@ -8350,30 +8295,6 @@ export const ru_RU: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Поясная защита призывателя бурь"
-      },
-      "eastbrook_buckler": {
-        "name": "Истврукский баклер"
-      },
-      "eastbrook_greatsword": {
-        "name": "Истврукский двуручный меч"
-      },
-      "highwatch_wallshield": {
-        "name": "Стенной щит Хайвотча"
-      },
-      "highwatch_greatsword": {
-        "name": "Двуручный меч Хайвотча"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Ножные латы бессмертного стража"
-      },
-      "soulrend_diadem": {
-        "name": "Диадема разрыва души"
-      },
-      "scourgehide_carapace": {
-        "name": "Панцирь бичевой шкуры"
-      },
-      "soulforged_warplate": {
-        "name": "Душекованый боевой доспех"
       }
     },
     "mobs": {
@@ -8730,6 +8651,9 @@ export const ru_RU: EnTranslations = {
       },
       "ysolei": {
         "name": "Изолея, Воплощение Утонувшей луны"
+      },
+      "water_elemental": {
+        "name": "Элементаль воды"
       }
     },
     "npcs": {

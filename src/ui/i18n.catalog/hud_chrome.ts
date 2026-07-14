@@ -829,10 +829,6 @@ export const hudChromeStrings = {
     // slot (on by default). Off frees that slot for a normal action (drag one in;
     // its key then casts it). Right-clicking the Attack button flips this off too.
     showAttackButton: 'Show Attack Button',
-    // Interface panel toggle for the classic "target of target" mini-frame (off by
-    // default): a small unit frame under the target frame showing who your target
-    // is targeting.
-    showTargetOfTarget: 'Show Target of Target',
     showDailyRewardsChest: 'Show Daily Rewards Chest',
     // Touch-only Graphics panel toggles (mobile combat HUD rework, phase 2).
     // Camera joystick: hidden and off by default, swipe-look on open gameplay

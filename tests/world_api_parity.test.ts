@@ -306,10 +306,12 @@ export const IWORLD_MEMBERS = [
   { name: 'talentRole', kind: 'data' },
   { name: 'loadouts', kind: 'data' },
   { name: 'activeLoadout', kind: 'data' },
+  { name: 'rowPicks', kind: 'data' },
   { name: 'talentPoints', kind: 'method' }, // read-returning (6/6)
   { name: 'applyTalents', kind: 'method' },
   { name: 'respec', kind: 'method' },
   { name: 'setSpec', kind: 'method' },
+  { name: 'pickRowTalent', kind: 'method' },
   { name: 'saveLoadout', kind: 'method' },
   { name: 'switchLoadout', kind: 'method' },
   { name: 'deleteLoadout', kind: 'method' },
@@ -425,10 +427,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
   it('pins total / data / method counts', () => {
     // Merged: release v0.26.0's surface plus the mage line's additions
     // (castAbilityOn, releaseEmpoweredAbility, petWaterJet, pickRowTalent, rowPicks)
-    // yields 224/61/163.
-    expect(IWORLD_MEMBERS.length).toBe(224);
-    expect(DATA_MEMBERS.length).toBe(61);
-    expect(METHOD_MEMBERS.length).toBe(163);
+    // yields 226/62/164.
+    expect(IWORLD_MEMBERS.length).toBe(226);
+    expect(DATA_MEMBERS.length).toBe(62);
+    expect(METHOD_MEMBERS.length).toBe(164);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -437,7 +439,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   // Sorted-name `toEqual` snapshots: a dropped, renamed, or kind-flipped member reddens
   // these deliberately, forcing a reviewed edit. NOT length-only.
-  it('the full sorted member set is exactly the pinned 224', () => {
+  it('the full sorted member set is exactly the pinned 226', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -478,6 +480,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'castAbility',
       'castAbilityAt',
       'castAbilityBySlot',
+      'castAbilityOn',
       'cfg',
       'changeSkin',
       'changeWeaponSkin',
@@ -615,6 +618,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
+      'rowPicks',
       'saveLoadout',
       'searchCharacters',
       'sellAllJunk',
@@ -666,7 +670,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted data-kind set is exactly the pinned 61', () => {
+  it('the sorted data-kind set is exactly the pinned 62', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountCosmetics',
       'activeArchetype',
@@ -720,6 +724,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'renown',
       'restedXp',
+      'rowPicks',
       'socialInfo',
       'talentRole',
       'talentSpec',
@@ -732,7 +737,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted method-kind set is exactly the pinned 163', () => {
+  it('the sorted method-kind set is exactly the pinned 164', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -760,6 +765,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'castAbility',
       'castAbilityAt',
       'castAbilityBySlot',
+      'castAbilityOn',
       'changeSkin',
       'changeWeaponSkin',
       'characterProfile',
@@ -1080,10 +1086,12 @@ const FACET_TALENTS = [
   'talentRole',
   'loadouts',
   'activeLoadout',
+  'rowPicks',
   'talentPoints',
   'applyTalents',
   'respec',
   'setSpec',
+  'pickRowTalent',
   'saveLoadout',
   'switchLoadout',
   'deleteLoadout',
@@ -1357,10 +1365,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 26 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 26 facets equals the pinned 224-member IWORLD_MEMBERS set', () => {
+  it('the union of the 26 facets equals the pinned 226-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(224);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(224);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(226);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(226);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

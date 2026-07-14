@@ -27,7 +27,8 @@
 
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
-import { pointsSpent, talentsFor } from './content/talents';
+import { CHOICE_ROW_LEVELS } from './content/choice_rows';
+import { rowsPicked } from './content/talents';
 import { ITEMS, MOBS, ZONES, zoneAt } from './data';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
@@ -645,23 +646,13 @@ function deedListForKeys(keys: ReadonlySet<string>): readonly string[] {
   return ids;
 }
 
-// pointsGate-8 node ids per class (the bottom row of every tree), computed
-// once from the static talent registry so prog_deep_roots never walks the
-// tree per evaluation.
-const capstoneNodeCache = new Map<PlayerClass, ReadonlySet<string>>();
-function capstoneNodes(cls: PlayerClass): ReadonlySet<string> {
-  let set = capstoneNodeCache.get(cls);
-  if (!set) {
-    const tree = talentsFor(cls);
-    set = new Set((tree?.nodes ?? []).filter((n) => n.pointsGate === 8).map((n) => n.id));
-    capstoneNodeCache.set(cls, set);
-  }
-  return set;
-}
+// The final (deepest) choice row unlocks at the last row level. A pick there is
+// the choice-row analog of a point-tree capstone (prog_deep_roots).
+const FINAL_ROW_LEVEL = CHOICE_ROW_LEVELS[CHOICE_ROW_LEVELS.length - 1];
 
 const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   prestigeRank: (m) => m.prestigeRank,
-  talentPoints: (m) => pointsSpent(m.talents),
+  talentPoints: (m) => rowsPicked(m.talents),
   arenaRankedMatches: (m) => m.arenaWins + m.arenaLosses + m.arena2v2Wins + m.arena2v2Losses,
   arenaRankedWins: (m) => m.arenaWins + m.arena2v2Wins,
   vcupWins: (m) => m.vcupWins,
@@ -694,14 +685,7 @@ const MARK_CIRCUIT_DUNGEONS = [
 
 const FLAGS: Record<DeedFlagId, (meta: PlayerMeta, e: Entity) => boolean> = {
   talentSpecChosen: (m) => m.talents.spec !== null,
-  talentCapstone: (m) => {
-    const nodes = capstoneNodes(m.cls);
-    // Allocation-free walk (tick-tail predicate: no Object.entries tuples).
-    for (const nodeId in m.talents.ranks) {
-      if (m.talents.ranks[nodeId] > 0 && nodes.has(nodeId)) return true;
-    }
-    return false;
-  },
+  talentCapstone: (m) => m.talents.rows?.[FINAL_ROW_LEVEL] != null,
   hasRestedXp: (m) => m.restedXp > 0,
   // Guild membership is server-stamped onto the entity; offline it stays ''
   // (never satisfiable there, matching the offline-sandbox model).

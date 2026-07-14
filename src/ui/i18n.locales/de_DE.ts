@@ -2850,6 +2850,42 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': 'Rimelance',
   'entities.abilities.frostbolt.description':
     'Schleudert einen Frostblitz, verursacht {damage} Frostschaden und verlangsamt die Bewegung um 40%.',
+  'entities.abilities.blazing_barrier.name': 'Flammende Barriere',
+  'entities.abilities.blazing_barrier.description':
+    'Hüllt Euch in Flammen und absorbiert 60 Sek. lang 130 Schaden. (Feuer)',
+  'entities.abilities.cold_snap.name': 'Kälteeinbruch',
+  'entities.abilities.cold_snap.description':
+    'Beendet die Abklingzeit von Flimmerschritt, Frostschleier und Großer Unsichtbarkeit. (Magiertalent)',
+  'entities.abilities.greater_invisibility.name': 'Große Unsichtbarkeit',
+  'entities.abilities.greater_invisibility.description':
+    'Ihr verschwindet 20 Sek. lang: Entfernt 2 Effekte mit regelmäßigem Schaden und verringert Euren erlittenen Schaden während der Unsichtbarkeit und kurz danach um 90%. (Magiertalent)',
+  'entities.abilities.hot_streak.name': 'Heiße Serie',
+  'entities.abilities.hot_streak.description':
+    'Passiv: Zwei aufeinanderfolgende kritische Treffer mit Euren Feuerzaubern (Feuerball, Feuerschlag, Versengen, Pyroschlag oder Flammenstoß) machen Euren nächsten Pyroschlag oder Flammenstoß zu einem kostenlosen Spontanzauber. Die verbrauchenden Zauber zählen für die NÄCHSTE Serie, auch kostenlose Einsätze; Flammenstoß zählt unabhängig von der Zahl getroffener Gegner nur einmal, und nur der erste Einschlag kann zählen. (Feuer)',
+  'entities.abilities.ice_floes.name': 'Eisschollen',
+  'entities.abilities.ice_floes.description':
+    'Eure nächsten zwei Zauber mit Zauberzeit können aus der Bewegung gewirkt werden. Hält 15 Sek. lang an. (Magiertalent)',
+  'entities.abilities.ignition.name': 'Entzündung',
+  'entities.abilities.ignition.description':
+    'Passiv: Kritische Treffer Eurer Zauber verbrennen das Ziel und verursachen im Verlauf von 6 Sek. 40% des verursachten Schadens; stapelbar. (Feuermeisterschaft)',
+  'entities.abilities.mass_barrier.name': 'Massenbarriere',
+  'entities.abilities.mass_barrier.description':
+    'Schützt Euch und bis zu 4 Verbündete im Umkreis von 30 m; jeder Schild absorbiert 60 Sek. lang 130 Schaden. (Magiertalent)',
+  'entities.abilities.overload.name': 'Überladung',
+  'entities.abilities.overload.description':
+    'Euer nächster Zauber wird um 40% verstärkt, kostet aber 50% mehr Mana. Hält 10 Sek. lang an. (Magiertalent)',
+  'entities.abilities.power_echo.name': 'Machtecho',
+  'entities.abilities.power_echo.description':
+    'Euer nächster direkter Zauber wiederholt sich mit 50% seiner Stärke auf demselben Ziel. Hält 10 Sek. lang an. (Magiertalent)',
+  'entities.abilities.rings_of_frost.name': 'Frostring',
+  'entities.abilities.rings_of_frost.description':
+    'Beschwört 10 Sek. lang einen Ring. Gegner, die seinen Rand überqueren, werden 4 Sek. lang eingefroren. (Magiertalent)',
+  'entities.abilities.rune_of_power.name': 'Rune der Macht',
+  'entities.abilities.rune_of_power.description':
+    'Schreibt 15 Sek. lang eine Rune der Macht zu Euren Füßen: Verbündete im Umkreis von 8 m verursachen 10% mehr Schaden. (Magiertalent)',
+  'entities.abilities.summon_water_elemental.name': 'Wasserelementar beschwören',
+  'entities.abilities.summon_water_elemental.description':
+    'Beschwört einen Wasserelementar, der an Eurer Seite kämpft, Wasserblitze auf Euer Ziel schleudert und Wasserstrahl kanalisiert. (Frost)',
   'entities.abilities.conjure_water.name': 'Waterbind',
   'entities.abilities.conjure_water.description':
     'Beschwört 2 Flaschen Wasser, die beim Trinken Mana wiederherstellen. Höhere Ränge beschwören reineres Wasser.',
@@ -3342,6 +3378,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_water.name': 'Herbeigezaubertes Regenwasser',
   'entities.items.conjured_water2.name': 'Herbeigezaubertes Brunnenwasser',
   'entities.items.conjured_water3.name': 'Herbeigezaubertes Klarwasser',
+  'entities.items.conjured_water4.name': 'Herbeigezaubertes Quellwasser',
   'entities.items.eastbrook_arming_sword.name': 'Eastbrook-Wehrschwert',
   'entities.items.bronzework_mace.name': 'Bronzewerkstreitkolben',
   'entities.items.vale_carving_knife.name': 'Talschnitzmesser',
@@ -4328,6 +4365,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread.name': 'Herbeigezauberter Haferkuchen',
   'entities.items.conjured_bread2.name': 'Herbeigezaubertes Schwarzbrot',
   'entities.items.conjured_bread3.name': 'Herbeigezauberter Honigkuchen',
+  'entities.items.conjured_bread4.name': 'Herbeigezauberter Festschmauslaib',
   'entities.items.glimmerfin_koi.name': 'Schimmerflossen-Koi',
   'entities.items.raw_bog_eel.name': 'Roher Mooraal',
   'entities.items.raw_frostgill_trout.name': 'Rohe Frostkiemen-Forelle',
@@ -6732,6 +6770,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Spaltet die Rüstung des Ziels und verringert sie pro Anwendung um {damage}%. Stapelt sich bis zu 5-mal. Erzeugt sehr viel Bedrohung.',
   'entities.mobs.training_dummy.name': 'Trainingspuppe',
   'entities.mobs.yumi_cat.name': 'Yumi',
+  'entities.mobs.water_elemental.name': 'Wasserelementar',
   'guide.arenaPage.yumiBody':
     'Yumi beschützen ist ein Team-Zielmodus, der in einem Labyrinth ausgetragen wird: Jede Seite bewacht ihren eigenen Katzenbegleiter und jagt zugleich den der Gegner. Immer wieder blinzeln beide Katzen in neue Ecken des Labyrinths, sodass der Kampf zwischen Verteidigen, Jagen und dem Wettlauf, sie erneut aufzuspüren, hin und her schwingt. Melde dich als drei gegen drei oder fünf gegen fünf an; wer im Kampf fällt, muss nur einen Moment pausieren.',
   'guide.arenaPage.yumiHeading': 'Yumi beschützen',
@@ -7476,10 +7515,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Stab',
   'hudChrome.wocStore.wtype.sword': 'Schwert',
   'hudChrome.wocStore.wtype.wand': 'Zauberstab',
-  'entities.items.deathless_warguard_legmail.name': 'Todlose Beinkette der Kriegswache',
-  'entities.items.scourgehide_carapace.name': 'Geißelhaut-Panzer',
-  'entities.items.soulforged_warplate.name': 'Seelengeschmiedete Kriegsplatte',
-  'entities.items.soulrend_diadem.name': 'Seelenriss-Diadem',
   'hudChrome.bags.rightClickDestroy': 'Rechtsklick zum Zerstören',
   'game.talents.choicesTab': 'Entscheidungen',
   'game.talents.rowUnlockToast': 'Neue Talentwahl verfügbar!',

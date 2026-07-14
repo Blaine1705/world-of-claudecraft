@@ -3223,6 +3223,42 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': 'Rimelance',
   'entities.abilities.frostbolt.description':
     'Lance un éclair de givre, inflige {damage} points de dégâts de Givre et ralentit le déplacement de 40%.',
+  'entities.abilities.blazing_barrier.name': 'Barrière flamboyante',
+  'entities.abilities.blazing_barrier.description':
+    'Vous enveloppe de flammes et absorbe 130 points de dégâts pendant 60 s. (Feu)',
+  'entities.abilities.cold_snap.name': 'Morsure du froid',
+  'entities.abilities.cold_snap.description':
+    'Met fin au temps de recharge de Pas scintillant, Voile de givre et Invisibilité supérieure. (Talent de mage)',
+  'entities.abilities.greater_invisibility.name': 'Invisibilité supérieure',
+  'entities.abilities.greater_invisibility.description':
+    'Vous disparaissez pendant 20 s : dissipe 2 effets de dégâts sur la durée et réduit les dégâts subis de 90% tant que vous êtes invisible et peu après. (Talent de mage)',
+  'entities.abilities.hot_streak.name': 'Bonne série',
+  'entities.abilities.hot_streak.description':
+    "Passif : deux coups critiques consécutifs avec vos sorts de Feu (Boule de feu, Trait de feu, Brûlure, Explosion pyrotechnique ou Choc de flammes) rendent votre prochaine Explosion pyrotechnique ou votre prochain Choc de flammes instantané et gratuit. Les sorts qui consomment cet effet comptent pour la série SUIVANTE, y compris les incantations gratuites ; Choc de flammes ne compte qu'une fois, quel que soit le nombre d'ennemis touchés, et seul l'impact initial peut compter. (Feu)",
+  'entities.abilities.ice_floes.name': 'Floes de glace',
+  'entities.abilities.ice_floes.description':
+    "Vos deux prochains sorts avec un temps d'incantation peuvent être lancés en vous déplaçant. Dure 15 s. (Talent de mage)",
+  'entities.abilities.ignition.name': 'Ignition',
+  'entities.abilities.ignition.description':
+    'Passif : les coups critiques de vos sorts brûlent la cible et infligent 40% des dégâts causés en 6 s, avec cumul. (Maîtrise du Feu)',
+  'entities.abilities.mass_barrier.name': 'Barrière de masse',
+  'entities.abilities.mass_barrier.description':
+    "Vous protège ainsi que jusqu'à 4 alliés proches dans un rayon de 30 m, chaque bouclier absorbant 130 points de dégâts pendant 60 s. (Talent de mage)",
+  'entities.abilities.overload.name': 'Surcharge',
+  'entities.abilities.overload.description':
+    'Votre prochain sort est amplifié de 40%, mais coûte 50% de mana supplémentaire. Dure 10 s. (Talent de mage)',
+  'entities.abilities.power_echo.name': 'Écho de puissance',
+  'entities.abilities.power_echo.description':
+    'Votre prochain sort direct se répète avec 50% de puissance sur la même cible. Dure 10 s. (Talent de mage)',
+  'entities.abilities.rings_of_frost.name': 'Anneau de givre',
+  'entities.abilities.rings_of_frost.description':
+    'Invoque un anneau pendant 10 s. Les ennemis qui en franchissent le périmètre sont gelés pendant 4 s. (Talent de mage)',
+  'entities.abilities.rune_of_power.name': 'Rune de puissance',
+  'entities.abilities.rune_of_power.description':
+    'Inscrit une rune de puissance à vos pieds pendant 15 s : les alliés se tenant dans un rayon de 8 m infligent 10% de dégâts supplémentaires. (Talent de mage)',
+  'entities.abilities.summon_water_elemental.name': "Invocation d'un élémentaire d'eau",
+  'entities.abilities.summon_water_elemental.description':
+    "Invoque un élémentaire d'eau qui combat à vos côtés, lance des Traits d'eau sur votre cible et canalise Jet d'eau. (Givre)",
   'entities.abilities.conjure_water.name': 'Waterbind',
   'entities.abilities.conjure_water.description':
     "Invoque 2 bouteilles d'eau qui restaurent du mana une fois bues. Les rangs supérieurs invoquent une eau plus pure.",
@@ -3719,6 +3755,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_water.name': 'Eau de pluie invoquée',
   'entities.items.conjured_water2.name': 'Eau de puits invoquée',
   'entities.items.conjured_water3.name': 'Eau claire invoquée',
+  'entities.items.conjured_water4.name': 'Eau de source invoquée',
   'entities.items.eastbrook_arming_sword.name': "Épée d'armes d'Eastbrook",
   'entities.items.bronzework_mace.name': 'Masse ouvragée en bronze',
   'entities.items.vale_carving_knife.name': 'Couteau à découper du Val',
@@ -4700,6 +4737,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread.name': "Galette d'avoine invoquée",
   'entities.items.conjured_bread2.name': 'Pain noir invoqué',
   'entities.items.conjured_bread3.name': 'Gâteau au miel invoqué',
+  'entities.items.conjured_bread4.name': 'Pain de festin invoqué',
   'entities.items.glimmerfin_koi.name': 'Koï aux nageoires scintillantes',
   'entities.items.raw_bog_eel.name': 'Anguille des marais crue',
   'entities.items.raw_frostgill_trout.name': 'Truite aux ouïes givrées crue',
@@ -7118,6 +7156,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Cisaille l'armure de la cible, la réduisant de {damage}% par application. Cumulable jusqu'à 5 fois. Génère beaucoup de menace.",
   'entities.mobs.training_dummy.name': "Mannequin d'entraînement",
   'entities.mobs.yumi_cat.name': 'Yumi',
+  'entities.mobs.water_elemental.name': "Élémentaire d'eau",
   'guide.arenaPage.yumiBody':
     "Protégez Yumi est un mode d'objectif en équipe qui se joue dans un labyrinthe : chaque camp garde son propre familier félin tout en traquant celui de l'adversaire. De temps à autre, les deux chats se téléportent vers de nouveaux recoins du labyrinthe, si bien que le combat oscille entre défense, chasse et course pour les retrouver. Mettez-vous en file en trois contre trois ou cinq contre cinq ; tomber au combat ne vous met sur la touche qu'un instant.",
   'guide.arenaPage.yumiHeading': 'Protégez Yumi',
@@ -7506,10 +7545,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     "Tout là-haut sur Thornpeak, la tempête au-dessus de Stormcrag prend parfois forme. Thunzharr, le Pic éveillé s'y dresse à un rythme régulier, un élémentaire de la puissance d'un raid affronté en monde ouvert par quiconque répond à l'appel, et il devient d'autant plus redoutable que les prétendants se dressent nombreux contre lui. Chacun de ceux qui rejoignent le combat gagne son propre tirage de son butin, honoré selon les règles de verrouillage de raid, et sa chute s'attarde assez longtemps pour que les tombés reviennent en courant réclamer leur dû. Rassemblez plus d'épées que vous ne le pensez nécessaire.",
   'guide.worldPage.worldBossTitle': "Quand le pic s'éveille : le boss de monde",
-  'entities.items.deathless_warguard_legmail.name': 'Cotte de jambes de la garde immortelle',
-  'entities.items.scourgehide_carapace.name': 'Carapace en peau de Fléau',
-  'entities.items.soulforged_warplate.name': 'Harnois de guerre forgé dans les âmes',
-  'entities.items.soulrend_diadem.name': 'Diadème Déchire-âme',
   'hudChrome.bags.rightClickDestroy': 'Clic droit pour détruire',
   'game.talents.choicesTab': 'Choix',
   'game.talents.rowUnlockToast': 'Nouveau choix de talent disponible !',

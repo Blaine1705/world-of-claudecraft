@@ -101,6 +101,7 @@ function idleWorld(): ActionBarWorldInput {
       potionCdRemaining: 0,
       queuedOnSwing: null,
       stealthed: false,
+      auras: [],
       pos: { x: 0, y: 0, z: 0 },
     },
     target: null,

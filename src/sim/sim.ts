@@ -289,6 +289,7 @@ import {
 import {
   applyTalentAllocation,
   deleteTalentLoadout,
+  pickChoiceRowTalent,
   respecTalents,
   saveTalentLoadout,
   setTalentSpec,
@@ -3499,6 +3500,7 @@ export class Sim {
       applyKnockback: sim.applyKnockback.bind(sim),
       diminishedCrowdControlDuration: sim.diminishedCrowdControlDuration.bind(sim),
       hostilesInRadius: sim.hostilesInRadius.bind(sim),
+      friendliesInRadius: sim.friendliesInRadius.bind(sim),
       breakStealth: sim.breakStealth.bind(sim),
       applyTaunt: sim.applyTaunt.bind(sim),
       summonPet: sim.summonPet.bind(sim),
@@ -3897,6 +3899,12 @@ export class Sim {
   // tree's points (they belonged to that tree); the class tree is untouched.
   setSpec(specId: string | null, pid?: number): boolean {
     return this.markTalentDeeds(setTalentSpec(this.ctx, specId, pid), pid);
+  }
+
+  // Choose or clear one option in a level-gated choice row. The progression
+  // module validates row membership, level, and the combat lock.
+  pickRowTalent(rowIndex: number, optionId: string | null, pid?: number): boolean {
+    return pickChoiceRowTalent(this.ctx, rowIndex, optionId, pid);
   }
 
   // Free respec (out of combat): wipe all talent points. Spec is retained.
@@ -4934,6 +4942,14 @@ export class Sim {
     const out: Entity[] = [];
     this.grid.forEachInRadius(pos.x, pos.z, radius, (e) => {
       if (e.id !== source.id && !e.dead && this.isHostileTo(source, e)) out.push(e);
+    });
+    return out;
+  }
+
+  private friendliesInRadius(source: Entity, pos: Vec3, radius: number): Entity[] {
+    const out: Entity[] = [];
+    this.grid.forEachInRadius(pos.x, pos.z, radius, (e) => {
+      if (!e.dead && (e.id === source.id || this.isFriendlyTo(source, e))) out.push(e);
     });
     return out;
   }
@@ -7793,6 +7809,10 @@ export class Sim {
                 level: e.level,
                 hp: e.hp,
                 mhp: e.maxHp,
+                absorb: e.auras.reduce(
+                  (sum, aura) => sum + (aura.kind === 'absorb' ? Math.max(0, aura.value) : 0),
+                  0,
+                ),
                 res: Math.round(e.resource),
                 mres: e.maxResource,
                 rtype: e.resourceType,

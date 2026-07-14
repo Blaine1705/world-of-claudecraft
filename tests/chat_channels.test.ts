@@ -7,7 +7,6 @@ import {
   chatInputTint,
   chatOpenTabLabelKey,
   composeChatLine,
-  composeChatTabLine,
   composeWhisperReply,
   isChatOpenTab,
   isChatTabChannel,
@@ -66,24 +65,6 @@ describe('chat channel tabs — pure model', () => {
     it('trims and drops empty input', () => {
       expect(composeChatLine('world', '   ')).toBe('');
       expect(composeChatLine('world', '  ping  ')).toBe('/world ping');
-    });
-  });
-
-  describe('composeChatTabLine', () => {
-    it('follows each newly selected channel tab instead of retaining the previous channel', () => {
-      expect(composeChatTabLine('party', 'pull on 3')).toBe('/p pull on 3');
-      expect(composeChatTabLine('world', 'need one healer')).toBe('/world need one healer');
-      expect(composeChatTabLine('guild', 'hello guild')).toBe('/gu hello guild');
-    });
-
-    it('keeps built-in views unbound and the whisper tab reply-scoped', () => {
-      expect(composeChatTabLine('all', 'hello there')).toBe('/s hello there');
-      expect(composeChatTabLine('combat', 'hello there')).toBe('/s hello there');
-      expect(composeChatTabLine(WHISPER_TAB, 'on my way')).toBe('/r on my way');
-    });
-
-    it('lets an explicit command override the selected tab', () => {
-      expect(composeChatTabLine('world', '/p inc')).toBe('/p inc');
     });
   });
 

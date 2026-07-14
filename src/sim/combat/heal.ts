@@ -100,7 +100,7 @@ export function applyHeal(
   const crit = canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
   let healed = Math.round(
     amount *
-      (crit ? 1.5 + source.critDmgHealBonus + source.critDmgBonus : 1) *
+      (crit ? 1.5 + source.critDmgHealBonus : 1) *
       hexOutputMult(ctx, source) *
       healingTakenMult(ctx, target),
   );

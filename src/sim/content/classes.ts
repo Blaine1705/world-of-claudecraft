@@ -4304,216 +4304,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast.',
   },
-  heroic_leap: {
-    id: 'heroic_leap',
-    name: 'Heroic Leap',
-    class: 'warrior',
-    learnLevel: 6,
-    cost: 0,
-    castTime: 0,
-    cooldown: 20,
-    range: 30,
-    school: 'physical',
-    requiresTarget: false,
-    targetMode: 'position',
-    effects: [{ type: 'repositionToAim', landingAoe: { min: 24, max: 32, radius: 6 } }],
-    description: 'Leap to the target area, dealing $d damage to nearby enemies on landing.',
-  },
-  rallying_cry: {
-    id: 'rallying_cry',
-    castFx: 'shout',
-    name: 'Rallying Cry',
-    class: 'warrior',
-    learnLevel: 18,
-    cost: 0,
-    castTime: 0,
-    cooldown: 180,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    // Owner rework: the WoW-style defensive raid horn (+20% temporary maximum
-    // health), 40yd (the classic raid-buff reach).
-    effects: [{ type: 'aoeAllyMaxHp', pct: 0.2, duration: 10, radius: 40 }],
-    description:
-      'Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration.',
-  },
-  // ------ Choice-row talents (warrior_rows.ts grants; numbers are the owner's
-  // design draft, tune VALUE not SHAPE) ------
-  storm_bolt: {
-    id: 'storm_bolt',
-    name: 'Storm Bolt',
-    class: 'warrior',
-    learnLevel: 11,
-    cost: 10,
-    castTime: 0,
-    cooldown: 30,
-    range: 20,
-    school: 'physical',
-    requiresTarget: true,
-    projectile: true,
-    effects: [
-      { type: 'directDamage', min: 18, max: 26 },
-      { type: 'stun', duration: 3 },
-    ],
-    description: 'Hurl your weapon at the target for $d, stunning it for 3 sec.',
-  },
-  intimidating_shout: {
-    id: 'intimidating_shout',
-    castFx: 'shout',
-    name: 'Intimidating Shout',
-    class: 'warrior',
-    learnLevel: 14,
-    // Free in every spec (owner 2026-07-08): the panic/CC horn should never be
-    // gated behind rage you may not have when you need to break off.
-    cost: 0,
-    castTime: 0,
-    cooldown: 120,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    // Classic-era shape (25 rage / 3 min / 5 targets / 8 yd / 8 sec) scaled to
-    // the 1-20 band: cost and cooldown tuned down, the fear itself unchanged.
-    effects: [{ type: 'aoeFear', duration: 8, radius: 8, maxTargets: 5 }],
-    description:
-      'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect.',
-  },
-  bladestorm: {
-    id: 'bladestorm',
-    name: 'Steel Cyclone',
-    class: 'warrior',
-    learnLevel: 20,
-    cost: 25,
-    castTime: 0,
-    cooldown: 90,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    // A self-centered position channel: each tick pulses the aoeDamage at the
-    // caster's LIVE position (no ground-aim reticle), so the storm moves with
-    // you for its full duration. Owner ruling: the channel runs its FULL 4s
-    // no matter what, so it ignores pushback (uninterruptible) and survives
-    // the caster's own movement (you spin while running, like WoW).
-    targetMode: 'position',
-    selfCentered: true,
-    uninterruptible: true,
-    castWhileMoving: true,
-    channel: { duration: 4, ticks: 4 },
-    effects: [{ type: 'aoeDamage', min: 16, max: 22, radius: 8 }],
-    description:
-      'Become a whirling storm of steel, striking all enemies within 8 yards for $d every second for 4 sec.',
-  },
-  victory_rush: {
-    id: 'victory_rush',
-    name: 'Victory Rush',
-    class: 'warrior',
-    learnLevel: 8,
-    cost: 0,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: true,
-    // Usable only inside the on-kill window aura handleDeath opens; the cast
-    // consumes it (runEffects), so one kill funds one strike.
-    requiresAuraKind: 'victory_rush',
-    effects: [
-      { type: 'weaponStrike', bonus: 10 },
-      { type: 'selfHealPctMax', pct: 0.2 },
-    ],
-    description:
-      'Strike for weapon damage plus $d and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy.',
-  },
-  piercing_howl: {
-    id: 'piercing_howl',
-    name: 'Piercing Howl',
-    class: 'warrior',
-    learnLevel: 11,
-    cost: 10,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    // Slow shortened 15s to 8s after the owner's playtest (a near-permanent
-    // AoE snare on a no-cooldown shout was too strong).
-    effects: [{ type: 'aoeSlow', mult: 0.5, duration: 8, radius: 15 }],
-    description: 'A piercing shout that slows all enemies within 15 yards by 50% for 8 sec.',
-  },
-  die_by_sword: {
-    id: 'die_by_sword',
-    name: 'Die by the Sword',
-    class: 'warrior',
-    learnLevel: 8,
-    // Arms base-kit defensive cooldown (owner restructure 2026-07-08): Arms had
-    // no defensive of its own. Also still reachable as a choice-row grant. No
-    // shield gate: the "sword" IS the defense (Arms wields a two-hander).
-    specs: ['arms'],
-    cost: 0,
-    castTime: 0,
-    cooldown: 120,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'die_by_sword', value: 0.3, duration: 8 }],
-    description:
-      'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
-  },
-  recklessness: {
-    id: 'recklessness',
-    name: 'Recklessness',
-    class: 'warrior',
-    learnLevel: 17,
-    cost: 0,
-    castTime: 0,
-    cooldown: 180,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'buff_reckless', value: 0.2, duration: 12 }],
-    description:
-      'Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec.',
-  },
-  avatar: {
-    id: 'avatar',
-    name: 'Colossus',
-    class: 'warrior',
-    learnLevel: 17,
-    cost: 0,
-    castTime: 0,
-    cooldown: 180,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    effects: [
-      { type: 'breakControl' },
-      // ONE aura for both halves (value = damage amp; the body scale is the
-      // fixed AVATAR_SCALE): two selfBuffs would overwrite each other, since
-      // applyAura replaces by aura id and both would be 'avatar'.
-      { type: 'selfBuff', kind: 'buff_avatar', value: 0.2, duration: 20 },
-    ],
-    description:
-      'Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%.',
-  },
-  sanguine_aura: {
-    id: 'sanguine_aura',
-    castFx: 'weaponAura',
-    name: 'Sanguine Aura',
-    class: 'warrior',
-    learnLevel: 20,
-    cost: 0,
-    castTime: 0,
-    cooldown: 180,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [{ type: 'partyMeleeBuff', attackSpeedMult: 1 / 1.1, dmgPct: 0.1, duration: 20 }],
-    description:
-      'Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec.',
-  },
-
   // ============== TALENT-GRANTED (Classic specs) ==============
   // Not in CLASSES.*.abilities. Unlocked only via spec grants.
   crusader_strike: {
@@ -5055,6 +4845,45 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)',
   },
+  avatar: {
+    id: 'avatar',
+    name: 'Colossus',
+    class: 'warrior',
+    learnLevel: 17,
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      { type: 'breakControl' },
+      { type: 'selfBuff', kind: 'buff_avatar', value: 0.2, duration: 20 },
+    ],
+    description:
+      'Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%.',
+  },
+  bladestorm: {
+    id: 'bladestorm',
+    name: 'Steel Cyclone',
+    class: 'warrior',
+    learnLevel: 20,
+    cost: 25,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    targetMode: 'position',
+    selfCentered: true,
+    uninterruptible: true,
+    castWhileMoving: true,
+    channel: { duration: 4, ticks: 4 },
+    effects: [{ type: 'aoeDamage', min: 16, max: 22, radius: 8 }],
+    description:
+      'Become a whirling storm of steel, striking all enemies within 8 yards for $d every second for 4 sec.',
+  },
   red_banner: {
     id: 'red_banner',
     name: 'Red Banner',
@@ -5511,21 +5340,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)',
   },
-  last_stand: {
-    id: 'last_stand',
-    name: 'Eleventh Hour',
-    class: 'warrior',
-    learnLevel: 10,
-    cost: 0,
-    castTime: 0,
-    cooldown: 180,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 18, duration: 15 }],
-    description:
-      'Temporarily increases Stamina for 15 sec, increasing maximum health. (Warrior talent)',
-  },
   mend_pet: {
     id: 'mend_pet',
     name: 'Patch Up',
@@ -5921,21 +5735,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'blinkForward', distance: 24 }],
     description: 'Steps through the shadows toward your target. (Rogue talent)',
   },
-  shield_wall: {
-    id: 'shield_wall',
-    name: 'Bulwark',
-    class: 'warrior',
-    learnLevel: 10,
-    cost: 0,
-    castTime: 0,
-    cooldown: 180,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 1200, duration: 10 }],
-    description:
-      'Raise an unbreakable bulwark, greatly increasing armor for 10 sec. (Warrior talent)',
-  },
   silence: {
     id: 'silence',
     name: 'Silent Treatment',
@@ -6141,8 +5940,7 @@ function scaleEffect(
         eff.kind === 'buff_spellhaste' ||
         eff.kind === 'buff_scale' ||
         eff.kind === 'buff_jump' ||
-        eff.kind === 'mortal_wound' ||
-        eff.kind === 'vuln_source'
+        eff.kind === 'mortal_wound'
       ) {
         return eff;
       }
@@ -6198,7 +5996,10 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     // charge-limited (maxCharges, already resolved onto entry.charges); the
     // combat gate + recharge live in casting_lifecycle / updateTimers, keyed
     // off this resolved max.
-    if (am.bonusCharges) entry.charges = (entry.charges ?? 1) + am.bonusCharges;
+    if (am.bonusCharges) {
+      entry.charges = (entry.charges ?? 1) + am.bonusCharges;
+      entry.bonusCharges = (entry.bonusCharges ?? 0) + am.bonusCharges;
+    }
     // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
     // giving more armor. Only the buff effects scale; damage on the same ability does not.
     // Multiplier-shaped values (buff_haste/scale/jump/mortal_wound) are exempt like in
@@ -6295,7 +6096,10 @@ export function abilitiesKnownAt(
     // exactly like the Double Charge talent's, so casting_lifecycle's charge
     // gate + updateTimers' recharge refund need no new path. Talent
     // bonusCharges (applyTalentMods) stacks on top of this base.
-    if (def.maxCharges !== undefined) entry.charges = def.maxCharges;
+    if (def.maxCharges !== undefined) {
+      entry.charges = def.maxCharges;
+      entry.bonusCharges = Math.max(0, def.maxCharges - 1);
+    }
     // Frost mages carry a SECOND Ice Block charge (owner 2026-07-13: "doble cubo"),
     // on the abilityCharges recharge model. Resolved HERE (the shared known-list
     // builder) so BOTH worlds see it: the offline Sim's meta.known and the

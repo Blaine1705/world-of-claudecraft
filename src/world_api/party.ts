@@ -28,6 +28,8 @@ export interface PartyMemberInfo {
   level: number;
   hp: number;
   mhp: number;
+  /** Summed remaining damage absorption across active shields. Older snapshots omit it. */
+  absorb?: number;
   res: number;
   mres: number;
   rtype: ResourceType | null;

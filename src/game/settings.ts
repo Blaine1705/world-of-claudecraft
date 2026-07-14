@@ -281,12 +281,6 @@ export const BOOL_SETTINGS = {
   // back on in Options restores Attack. Auto-attack itself is unaffected: right-click
   // on enemies and startAttackOnAbilityUse (read at cast time) keep working.
   showAttackButton: { def: true },
-  // off by default: the classic "target of target" mini-frame. When on, and you have
-  // a target, a small unit frame under the target frame shows who YOUR target is
-  // targeting (a mob's aggro target, a player's selected target). Purely a display
-  // preference read by the HUD's target-frame update; the id it reads already rides
-  // the wire, and the frame hides itself when the target-of-target is unknown.
-  showTargetOfTarget: { def: false },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },

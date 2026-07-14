@@ -32,7 +32,15 @@ function addTargetMob(sim: Sim, dist = 8): Entity {
 function dealDamage(sim: Sim, target: Entity, amount: number, school = 'physical'): void {
   (
     sim as unknown as {
-      dealDamage(s: Entity | null, t: Entity, n: number, c: boolean, sc: string, a: string | null, k: string): void;
+      dealDamage(
+        s: Entity | null,
+        t: Entity,
+        n: number,
+        c: boolean,
+        sc: string,
+        a: string | null,
+        k: string,
+      ): void;
     }
   ).dealDamage(null, target, amount, false, school, null, 'hit');
 }

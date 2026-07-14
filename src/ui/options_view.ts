@@ -416,7 +416,6 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
     boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar'),
     boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
-    boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
     boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
   ];
 }

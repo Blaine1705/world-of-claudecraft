@@ -43,7 +43,6 @@ import {
   type Entity,
   FISHING_CAST_ID,
   MELEE_ARC,
-  MELEE_CLASSES,
   meleeMissChance,
   normAngle,
 } from '../types';
@@ -77,19 +76,12 @@ import { spawnRingOfFrost } from './ring_of_frost';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
-// repositionToAim sweep tuning (harvested from PR #1348): the leap walks the
-// straight line in small steps, stopping at the last legal point before a
-// collider, an unclimbable rise, or deep water, so it can never tunnel
-// through a wall or land somewhere movement could not reach.
+// Swept teleport tuning: Blink walks the straight line in small steps,
+// stopping at the last legal point before a collider, an unclimbable rise,
+// or deep water, so it can never tunnel through a wall.
 const TELEPORT_SWEEP_STEP = 0.5;
 const TELEPORT_MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 const TELEPORT_MIN_GROUND = WATER_LEVEL - PLAYER_SWIM_DEPTH;
-// Heroic Leap flight (owner 2026-07-09): the caster ARCS to the landing over this
-// long instead of teleporting, cresting LEAP_APEX yards up at the midpoint, so it
-// reads as a real jump. updateLeapMovement (sim.ts) drives it and fires the AoE on
-// touchdown.
-const LEAP_DURATION = 0.6;
-const LEAP_APEX = 3.2;
 
 function isStealthToggle(ability: AbilityDef): boolean {
   return ability.effects.some((e) => e.type === 'selfBuff' && e.kind === 'stealth');
@@ -123,7 +115,7 @@ function removeRootAuras(ctx: SimContext, p: Entity): void {
   }
 }
 
-// Swept relocation (Heroic Leap / blink): step toward the destination, resolving
+// Swept relocation (Blink): step toward the destination, resolving
 // each step against the colliders and bailing at cliffs/deep water, then return
 // the last safe point. Adapted from PR #1348's sweptReposition onto our
 // point-resolution seam (resolveMovePoint).
@@ -170,9 +162,8 @@ function computeSweptLanding(
   return { x: safeX, z: safeZ };
 }
 
-// Plain swept teleport (repositionToAim without an arc, blinkForward): resolve the
-// landing through computeSweptLanding, then PLACE the caster there this tick (no
-// arc/flight). Folds in the final-placement PTR sweptReposition performed.
+// Resolve the landing through computeSweptLanding, then place the caster there
+// this tick. Folds in the final-placement PTR sweptReposition performed.
 function sweptRelocate(ctx: SimContext, p: Entity, destX: number, destZ: number): void {
   const landing = computeSweptLanding(ctx, p, destX, destZ);
   p.pos.x = landing.x;
@@ -310,7 +301,6 @@ export function runEffects(
           dmg *=
             (isSpell ? 1.5 : 2) +
             (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus) +
-            p.critDmgBonus +
             // Shatter: crits against a frozen-counting target hit harder.
             (isSpell && frozen.treatAsFrozen ? SHATTER_CRIT_DMG_BONUS : 0);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
@@ -401,7 +391,7 @@ export function runEffects(
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) ||
           fireGuaranteedCrit(ctx, p, ability.id, ability.school, target ?? null);
-        if (crit) dmg *= 2 + p.critDmgPhysBonus + p.critDmgBonus;
+        if (crit) dmg *= 2 + p.critDmgPhysBonus;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
           p,
@@ -701,7 +691,7 @@ export function runEffects(
           (eff.flat ?? 0) +
           directHitBonus(p.spellPower, ability, res.castTime);
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
-        if (crit) dmg *= 1.5 + p.critDmgSpellBonus + p.critDmgBonus;
+        if (crit) dmg *= 1.5 + p.critDmgSpellBonus;
         ctx.dealDamage(
           p,
           target,
@@ -903,32 +893,6 @@ export function runEffects(
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }
-        }
-        break;
-      }
-      case 'repositionToAim': {
-        // With a landingAoe (Heroic Leap): resolve the (server-clamped) aimed point
-        // through the swept resolver, then ARM the arc. updateLeapMovement (sim.ts)
-        // flies the caster there over LEAP_DURATION and fires the landing AoE on
-        // touchdown, so it reads as a real jump. Without a landingAoe: a plain swept
-        // teleport relocates the caster to the landing this tick.
-        if (eff.breakRoots) removeRootAuras(ctx, p);
-        const aim = p.castAim ?? p.pos;
-        if (eff.landingAoe) {
-          const landing = computeSweptLanding(ctx, p, aim.x, aim.z);
-          p.chargeTargetId = null;
-          p.chargePath = [];
-          p.leap = {
-            from: { x: p.pos.x, y: p.pos.y, z: p.pos.z },
-            to: { x: landing.x, y: groundHeight(landing.x, landing.z, ctx.cfg.seed), z: landing.z },
-            elapsed: 0,
-            dur: LEAP_DURATION,
-            apex: LEAP_APEX,
-            aoe: eff.landingAoe ?? null,
-            ability: ability.name,
-          };
-        } else {
-          sweptRelocate(ctx, p, aim.x, aim.z);
         }
         break;
       }
@@ -1235,10 +1199,7 @@ export function runEffects(
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           if (aoeCrit)
-            dmg *=
-              (isSpell ? 1.5 : 2) +
-              (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus) +
-              p.critDmgBonus;
+            dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
@@ -1591,7 +1552,7 @@ export function runEffects(
             (eff.guaranteedCritLevel !== undefined && level === eff.guaranteedCritLevel);
           let damage = ctx.rng.range(stage.min, stage.max) + spellPower;
           damage *= spellDamageMultFromAuras(p);
-          if (crit) damage *= 1.5 + p.critDmgSpellBonus + p.critDmgBonus;
+          if (crit) damage *= 1.5 + p.critDmgSpellBonus;
           ctx.dealDamage(p, m, Math.round(damage), crit, ability.school, ability.name, 'hit');
           if (eff.hotStreakOnce) {
             hotStreakHit = true;
@@ -1808,96 +1769,6 @@ export function runEffects(
         }
         break;
       }
-      case 'selfHotPctMax': {
-        // Furious Mending's healing half: a plain self 'hot' aura (the same
-        // kind Renew applies, ticked by combat/auras.ts) whose total is a
-        // fraction of the caster's MAXIMUM health. No spell-power rider: the
-        // pct already scales with the caster.
-        const ticks = Math.max(1, Math.round(eff.duration / eff.interval));
-        ctx.applyAura(p, {
-          id: ability.id,
-          name: ability.name,
-          kind: 'hot',
-          remaining: eff.duration,
-          duration: eff.duration,
-          value: Math.max(1, Math.round((p.maxHp * eff.pct) / ticks)),
-          tickInterval: eff.interval,
-          tickTimer: eff.interval,
-          sourceId: p.id,
-          school: ability.school,
-        });
-        break;
-      }
-      case 'aoeAllyMaxHp': {
-        // Rallying Cry (owner rework): a temporary maximum-health fraction on
-        // the caster and party members within radius. buff_maxhp_pct folds in
-        // recalcPlayerStats, whose hp-fraction restore raises current health
-        // with the buff and drops it back (never overflowing) on expiry.
-        const rallyParty = ctx.partyOf(p.id);
-        const rallyIds = rallyParty ? rallyParty.members : [p.id];
-        // Protection reinforces the horn (owner 2026-07-08): on top of the temp
-        // max-health, a committed Protection warrior's Rallying Cry also grants
-        // every affected ally a 5% damage-taken reduction (buff_dr) for the same
-        // duration. Arms / Fury / no-spec give the health buff only.
-        const rallyProt = ctx.playerMods(meta).spec === 'prot';
-        for (const pid of rallyIds) {
-          const mE = ctx.entities.get(pid);
-          if (!mE || mE.dead) continue;
-          if (pid !== p.id && dist2d(mE.pos, p.pos) > eff.radius) continue;
-          ctx.applyAura(mE, {
-            id: `${ability.id}_hp`,
-            name: ability.name,
-            kind: 'buff_maxhp_pct',
-            remaining: eff.duration,
-            duration: eff.duration,
-            value: eff.pct,
-            sourceId: p.id,
-            school: ability.school,
-          });
-          if (rallyProt) {
-            ctx.applyAura(mE, {
-              id: `${ability.id}_dr`,
-              name: ability.name,
-              kind: 'buff_dr',
-              remaining: eff.duration,
-              duration: eff.duration,
-              value: 0.05,
-              sourceId: p.id,
-              school: ability.school,
-            });
-          }
-        }
-        break;
-      }
-      case 'partyMeleeBuff': {
-        // Sanguine Aura: the caster plus every MELEE party member (class-level
-        // filter, MELEE_CLASSES) gains an attack-speed multiplier and a
-        // damage-done amp. Solo casters just buff themselves; members are
-        // buffed regardless of distance (a war-leader shout, not an aura zone).
-        const party = ctx.partyOf(p.id);
-        const memberIds = party ? party.members : [p.id];
-        for (const pid of memberIds) {
-          const mMeta = ctx.players.get(pid);
-          const mE = ctx.entities.get(pid);
-          if (!mMeta || !mE || mE.dead) continue;
-          if (!MELEE_CLASSES.has(mMeta.cls)) continue;
-          // ONE composite aura (kind 'sanguine') instead of a haste+damage
-          // pair: the buff frame shows a single icon whose tooltip lists both
-          // halves (two same-named icons read as a missing effect in playtest).
-          ctx.applyAura(mE, {
-            id: ability.id,
-            name: ability.name,
-            kind: 'sanguine',
-            remaining: eff.duration,
-            duration: eff.duration,
-            value: eff.attackSpeedMult,
-            value2: eff.dmgPct,
-            sourceId: p.id,
-            school: ability.school,
-          });
-        }
-        break;
-      }
       case 'aoeRoot': {
         // A ground-targeted cast (Ring of Frost) roots where it was AIMED; the
         // self-centered novas (Frost Nova, Gripping Earth) keep the caster
@@ -1988,10 +1859,7 @@ export function runEffects(
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
           if (crit)
-            dmg *=
-              (isSpell ? 1.5 : 2) +
-              (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus) +
-              p.critDmgBonus;
+            dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
           if (isSpell) noteSpellHit(ctx, p, crit, ability.id);
           ctx.dealDamage(

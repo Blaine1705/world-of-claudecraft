@@ -179,7 +179,8 @@ import {
   chatChannelColor,
   chatInputTint,
   chatOpenTabLabelKey,
-  composeChatTabLine,
+  composeChatLine,
+  composeWhisperReply,
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
@@ -310,6 +311,7 @@ import {
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
+  getLanguage,
   moneyParts,
   type SupportedLanguage,
   type TranslationKey,
@@ -3799,8 +3801,6 @@ export class Hud {
     switchLoadout: (i) => this.sim.switchLoadout(i),
     deleteLoadout: (i) => this.sim.deleteLoadout(i),
     applyLoadoutBar: (bar) => this.applyLoadoutBar(bar),
-    buildDropdown: (options, current, onChange, placeholder, a11y) =>
-      this.buildDropdown(options, current, onChange, placeholder, a11y),
     inputDialog: (opts) => this.inputDialog(opts),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
@@ -7523,7 +7523,6 @@ export class Hud {
     // below (desktop bar, mobile ring, consumables quick bar).
     const abPlayer = { ...p, stealthed: playerStealthed(p.auras) };
     this.renderPetBar();
-    this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
     this.actionBarPainter.paint(
@@ -9292,12 +9291,7 @@ export class Hud {
                 now,
               );
           }
-          if (
-            ev.kind === 'miss' ||
-            ev.kind === 'dodge' ||
-            ev.kind === 'resist' ||
-            ev.kind === 'parry'
-          ) {
+          if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
             // self vs other (carried on the shape's isSelf) drives the avoidance colour
             // token (#bbb vs #fff); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,

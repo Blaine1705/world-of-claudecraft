@@ -2841,6 +2841,42 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': 'Lanza de Escarcha',
   'entities.abilities.frostbolt.description':
     'Lanza una descarga de escarcha que causa {damage} de daño de Escarcha y reduce la velocidad de movimiento un 40%.',
+  'entities.abilities.blazing_barrier.name': 'Barrera llameante',
+  'entities.abilities.blazing_barrier.description':
+    'Te envuelve en llamas y absorbe 130 de daño durante 60 s. (Fuego)',
+  'entities.abilities.cold_snap.name': 'Ola de frío',
+  'entities.abilities.cold_snap.description':
+    'Finaliza el tiempo de reutilización de Paso centelleante, Velo de Escarcha e Invisibilidad superior. (Talento de mago)',
+  'entities.abilities.greater_invisibility.name': 'Invisibilidad superior',
+  'entities.abilities.greater_invisibility.description':
+    'Desaparece durante 20 s: elimina 2 efectos de daño en el tiempo y recibes un 90% menos de daño mientras eres invisible y poco después. (Talento de mago)',
+  'entities.abilities.hot_streak.name': 'Buena racha',
+  'entities.abilities.hot_streak.description':
+    'Pasivo: dos golpes críticos seguidos con tus hechizos de Fuego (Bola de Fuego, Explosión de Fuego, Agostar, Piroexplosión o Fogonazo) hacen que tu próxima Piroexplosión o Fogonazo sea instantánea y gratuita. Los hechizos que consumen el efecto cuentan para la SIGUIENTE racha, incluidos los lanzamientos gratuitos; Fogonazo cuenta una sola vez sin importar a cuántos enemigos golpee, y solo el impacto inicial puede contar. (Fuego)',
+  'entities.abilities.ice_floes.name': 'Témpanos de hielo',
+  'entities.abilities.ice_floes.description':
+    'Tus próximos dos hechizos con tiempo de lanzamiento pueden lanzarse en movimiento. Dura 15 s. (Talento de mago)',
+  'entities.abilities.ignition.name': 'Ignición',
+  'entities.abilities.ignition.description':
+    'Pasivo: tus golpes críticos con hechizos queman al objetivo e infligen un 40% del daño causado durante 6 s; se acumula. (Maestría de Fuego)',
+  'entities.abilities.mass_barrier.name': 'Barrera masiva',
+  'entities.abilities.mass_barrier.description':
+    'Protege a ti y hasta a 4 aliados cercanos en un radio de 30 m; cada escudo absorbe 130 de daño durante 60 s. (Talento de mago)',
+  'entities.abilities.overload.name': 'Sobrecarga',
+  'entities.abilities.overload.description':
+    'Tu próximo hechizo se amplifica un 40%, pero cuesta un 50% más de maná. Dura 10 s. (Talento de mago)',
+  'entities.abilities.power_echo.name': 'Eco de poder',
+  'entities.abilities.power_echo.description':
+    'Tu próximo hechizo directo se repite con un 50% de potencia sobre el mismo objetivo. Dura 10 s. (Talento de mago)',
+  'entities.abilities.rings_of_frost.name': 'Anillo de Escarcha',
+  'entities.abilities.rings_of_frost.description':
+    'Invoca un anillo durante 10 s. Los enemigos que cruzan su perímetro quedan congelados durante 4 s. (Talento de mago)',
+  'entities.abilities.rune_of_power.name': 'Runa de poder',
+  'entities.abilities.rune_of_power.description':
+    'Inscribe una runa de poder a tus pies durante 15 s: los aliados que permanecen a menos de 8 m infligen un 10% más de daño. (Talento de mago)',
+  'entities.abilities.summon_water_elemental.name': 'Invocar elemental de agua',
+  'entities.abilities.summon_water_elemental.description':
+    'Invoca un elemental de agua para que luche a tu lado, lance Descargas de Agua a tu objetivo y canalice Chorro de Agua. (Escarcha)',
   'entities.abilities.conjure_water.name': 'Conjurar Agua',
   'entities.abilities.conjure_water.description':
     'Crea 2 botellas de agua que restauran maná al beberlas. Los rangos superiores crean agua más pura.',
@@ -3337,6 +3373,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_water.name': 'Agua de Lluvia Conjurada',
   'entities.items.conjured_water2.name': 'Agua de Pozo Conjurada',
   'entities.items.conjured_water3.name': 'Agua Clara Conjurada',
+  'entities.items.conjured_water4.name': 'Agua de Manantial Conjurada',
   'entities.items.eastbrook_arming_sword.name': 'Espada de armar de Eastbrook',
   'entities.items.bronzework_mace.name': 'Maza de broncista',
   'entities.items.vale_carving_knife.name': 'Cuchillo de trinchar del Valle',
@@ -4317,6 +4354,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread.name': 'Torta de Avena Conjurada',
   'entities.items.conjured_bread2.name': 'Hogaza Negra Conjurada',
   'entities.items.conjured_bread3.name': 'Pastel de Miel Conjurado',
+  'entities.items.conjured_bread4.name': 'Pan de Festín Conjurado',
   'entities.items.glimmerfin_koi.name': 'Koi de aletas brillantes',
   'entities.items.raw_bog_eel.name': 'Anguila de ciénaga cruda',
   'entities.items.raw_frostgill_trout.name': 'Trucha de agallas gélidas cruda',
@@ -6714,6 +6752,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cizalla la armadura del objetivo y la reduce un {damage}% por aplicación. Se acumula hasta 5 veces. Genera una gran cantidad de amenaza.',
   'entities.mobs.training_dummy.name': 'Muñeco de entrenamiento',
   'entities.mobs.yumi_cat.name': 'Yumi',
+  'entities.mobs.water_elemental.name': 'Elemental de agua',
   'guide.arenaPage.yumiBody':
     'Protege a Yumi es un modo de objetivos por equipos que se juega en un laberinto: cada bando protege a su propio familiar felino mientras da caza al del rival. Cada cierto tiempo ambos gatos se teletransportan a nuevos rincones del laberinto, así que el combate oscila entre defender, cazar y correr para volver a encontrarlos. Entra en cola como tres contra tres o cinco contra cinco; caer en batalla solo te deja en el banquillo un instante.',
   'guide.arenaPage.yumiHeading': 'Protege a Yumi',
@@ -7454,10 +7493,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Bastón',
   'hudChrome.wocStore.wtype.sword': 'Espada',
   'hudChrome.wocStore.wtype.wand': 'Varita',
-  'entities.items.deathless_warguard_legmail.name': 'Malla de piernas del Guardián Imperecedero',
-  'entities.items.scourgehide_carapace.name': 'Caparazón de piel de Azote',
-  'entities.items.soulforged_warplate.name': 'Coraza de guerra forjada en almas',
-  'entities.items.soulrend_diadem.name': 'Diadema Desgarralmas',
   'hudChrome.bags.rightClickDestroy': 'Clic derecho para destruir',
   'hudChrome.partyFrames.section': 'Marcos de grupo y banda',
   'hudChrome.partyFrames.unlock': 'Mover marcos de grupo y banda',

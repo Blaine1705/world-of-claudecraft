@@ -15,6 +15,7 @@ const member = (pid: number, group: 1 | 2, x = 0, z = 0): PartyMemberInfo => ({
   level: 20,
   hp: 100,
   mhp: 100,
+  absorb: 0,
   res: 100,
   mres: 100,
   rtype: 'mana',
@@ -36,13 +37,11 @@ describe('party frame style resolution', () => {
 
 describe('party frame aura relevance', () => {
   it('hides passive maintenance buffs but keeps healer effects and harmful auras', () => {
-    expect(partyFrameAuraIsRelevant({ id: 'battle_stance', kind: 'battle_stance' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'arcane_intellect', kind: 'buff_int_pct' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'temporal_echo', kind: 'temporal_echo' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'renew', kind: 'hot' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'power_word_shield', kind: 'absorb' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'ice_block', kind: 'stasis' })).toBe(true);
-    expect(partyFrameAuraIsRelevant({ id: 'die_by_sword', kind: 'die_by_sword' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'evasion', kind: 'buff_dodge' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'aspect_of_the_monkey', kind: 'buff_dodge' })).toBe(
       false,

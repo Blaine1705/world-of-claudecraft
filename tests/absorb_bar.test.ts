@@ -38,6 +38,13 @@ describe('absorb_bar view', () => {
     expect(v.overshield).toBe(true);
   });
 
+  it('accepts a compact shield total for party snapshots', () => {
+    const v = absorbBarView({ hp: 80, maxHp: 100, total: 15 });
+    expect(v.total).toBe(15);
+    expect(v.fillFrac).toBeCloseTo(0.95);
+    expect(v.overshield).toBe(false);
+  });
+
   it('ignores spent shields (value <= 0)', () => {
     expect(absorbTotal([shield(0), shield(-5), shield(15)])).toBe(15);
   });

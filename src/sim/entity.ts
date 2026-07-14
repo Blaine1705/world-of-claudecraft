@@ -67,7 +67,6 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
-    critDmgBonus: 0,
     critDmgSpellBonus: 0,
     critDmgPhysBonus: 0,
     critDmgHealBonus: 0,
@@ -497,10 +496,9 @@ export function recalcPlayerStats(
     setEff.crit +
     critFractionFromRating(e.critRating);
   // Extra crit damage from a spec mastery, per output channel (e.g. Fire mage: SPELL
-  // crits deal more; Holy paladin: HEAL crits; Subtlety/Arms: PHYSICAL crits). The
-  // generic critDmgBonus (from a mastery's critDmgPct) applies to every channel and is
-  // added on top of the per-channel bonus at each crit site.
-  e.critDmgBonus = mods?.global.critDmgPct ?? 0;
+  // crits deal more; Holy paladin: HEAL crits; Subtlety/Arms: PHYSICAL crits). Each
+  // channel bonus is added at its matching crit site (spell base 1.5, phys base 2,
+  // heal base 1.5).
   e.critDmgSpellBonus = mods?.global.critDmgSpellPct ?? 0;
   e.critDmgPhysBonus = mods?.global.critDmgPhysPct ?? 0;
   e.critDmgHealBonus = mods?.global.critDmgHealPct ?? 0;

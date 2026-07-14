@@ -506,7 +506,7 @@ export function castAbility(
   }
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
-  const canCastFree = res.cost > 0 && hasNextCastFree(p);
+  const canCastFree = res.cost > 0 && hasNextCastFree(p, ability.id);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(
       p.id,
@@ -1191,7 +1191,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         // A channeled spell tick (Arcane Missiles) is a spell crit, so it takes the
         // spell crit-damage channel of the mastery (plus the generic bonus) like
         // every other spell crit.
-        if (crit) dmg *= 1.5 + src.critDmgSpellBonus + src.critDmgBonus;
+        if (crit) dmg *= 1.5 + src.critDmgSpellBonus;
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
         noteSpellHit(ctx, src, crit, res.def.id);
       } else if (eff.type === 'drainTick') {
@@ -1343,7 +1343,7 @@ function applyAbility(
       return;
     }
   }
-  const canCastFree = res.cost > 0 && hasNextCastFree(p);
+  const canCastFree = res.cost > 0 && hasNextCastFree(p, ability.id);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;

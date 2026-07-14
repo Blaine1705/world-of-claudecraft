@@ -298,7 +298,6 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'showItemLevel',
       'showSecondaryActionBar',
       'showAttackButton',
-      'showTargetOfTarget',
       'showDailyRewardsChest',
     ]);
     expect(find(controls, 'partyFrameStyle')).toMatchObject({

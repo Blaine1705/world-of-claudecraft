@@ -30,13 +30,13 @@ import {
   type PowerupDef,
   tierForWave,
 } from '../content/augments';
+import { computeModifiersWithRows } from '../content/talent_rows';
 import {
   cloneAllocation,
   computeTalentModifiers,
   defaultBuild,
   type TalentModifiers,
 } from '../content/talents';
-import { computeModifiersWithRows } from '../content/talent_rows';
 import { abilitiesKnownAt, arenaOrigin } from '../data';
 import * as deedsMod from '../deeds';
 import { ARENA_SPAWNS_A_2v2, ARENA_SPAWNS_B_2v2 } from '../dungeon_layout';
@@ -157,10 +157,11 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
           flatDmg: 0,
           costPct: 0,
           cooldownPct: 0,
-      cooldownFlat: 0,
+          cooldownFlat: 0,
           castPct: 0,
           buffPct: 0,
           castWhileMoving: false,
+          bonusCharges: 0,
           addEffects: [],
         };
       }

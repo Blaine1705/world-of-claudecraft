@@ -7246,7 +7246,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': 'レベル{level}で解放',
   'hudChrome.fct.absorbed': '{amount} 吸収',
   'hudChrome.fct.cheap': '低コスト!',
-  'itemUi.slots.twoHand': '両手',
   'entities.abilities.temporal_mend.name': '時の繕い',
   'entities.abilities.temporal_mend.description':
     '味方を一瞬だけ未来へ進め、より健やかな未来の体に馴染む間に体力を{damage}回復する。(クロノマンシーの特性)',
@@ -7385,14 +7384,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tranquility.name': '木立の歌',
   'entities.abilities.tranquility.description':
     '回復の力を注ぎ、毎秒周囲の味方を回復する。（ドルイドタレント）',
-  'entities.items.eastbrook_buckler.name': 'イーストブルックのバックラー',
-  'entities.items.eastbrook_greatsword.name': 'イーストブルックの大剣',
-  'entities.items.highwatch_wallshield.name': 'ハイウォッチの壁盾',
-  'entities.items.highwatch_greatsword.name': 'ハイウォッチの大剣',
-  'entities.items.deathless_warguard_legmail.name': '不死の戦衛レッグメイル',
-  'entities.items.soulrend_diadem.name': 'ソウルレンドの宝冠',
-  'entities.items.scourgehide_carapace.name': 'スカージハイドの甲殻',
-  'entities.items.soulforged_warplate.name': '魂鍛の戦甲',
   'entities.items.deathless_heartwood_heroic.name': '不死王冠の心材',
   'entities.items.kingsbane_last_oath_heroic.name': 'スロウンベイン、ソーンピーク最後の誓い',
   'entities.items.crownforged_dreadhelm_heroic.name': 'ボーンロートの恐怖兜',
@@ -7411,8 +7402,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.instantCast': '次の詠唱時間のある呪文が即時発動になる',
   'hudChrome.auraEffect.cheapCast': '次の呪文のコストが{pct}%減少する',
   'hudChrome.auraEffect.increase.sp': '呪文の威力を{value}上昇させる',
-  'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
-  'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
   'hudChrome.talentRows.tab': '選択',
   'hudChrome.talentRows.defaultLoadout': 'デフォルト構成',
   'hudChrome.talentRows.comingSoon': '近日公開',
@@ -7423,98 +7412,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.viewTalents': 'タレントを見る',
   'hudChrome.specPanel.specUnlockBanner': 'スペシャライゼーション解放！',
   'hudChrome.specPanel.specUnlockHint': 'Nキーを押してスペシャライゼーションを選択してください。',
-  'hudChrome.statInfo.names.haste': 'ヘイスト',
-  'hudChrome.statInfo.names.parry': '受け流し',
-  'hudChrome.statInfo.desc.haste':
-    'あなたの武器攻撃と呪文詠唱の速度を上げます。グローバルクールダウンは短縮しません。',
-  'hudChrome.statInfo.desc.parry':
-    '前方からの近接攻撃を完全に受け流し、ダメージを受けない確率です。背後からの一撃は受け流せません。',
-  'hudChrome.paperdoll.offhand': 'オフハンド',
-  'hudChrome.auraEffect.battleStance': 'バトルスタンス: 怒りの生成量が10%増加',
-  'hudChrome.auraEffect.berserkerStance':
-    'バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加',
-  'hudChrome.auraEffect.dmgDone': '与えるダメージを{pct}%上昇させる',
-  'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージを{pct}%低下させる',
-  'hudChrome.auraEffect.crit': 'クリティカル率を{pct}%上昇させる',
-  'hudChrome.auraEffect.rageGen': '怒りの生成量を{pct}%上昇させる',
-  'hudChrome.auraEffect.reckless': 'クリティカル率を{pct}%、怒りの生成量を{ragePct}%上昇させる',
-  'hudChrome.auraEffect.avatar': 'コロッサス: 与えるダメージが{pct}%増加',
-  'hudChrome.auraEffect.bloodbath': 'クリティカル率と与えるダメージを{pct}%上昇させる',
-  'hudChrome.auraEffect.dieBySword':
-    '受けるダメージを{pct}%軽減する（体力{hpPct}%未満では{lowPct}%）',
-  'hudChrome.auraEffect.sanguine': '攻撃速度を{hastePct}%、与えるダメージを{dmgPct}%上昇させる',
-  'hudChrome.auraEffect.battleTrance':
-    '次のレイヴァーストライクまたはブルートスイングの怒りコストが0になる',
-  'hudChrome.auraEffect.revengeFree': '次の意趣返しの怒りコストが0になる',
-  'hudChrome.auraEffect.victoryRush': '勝利の追撃が使用可能',
-  'hudChrome.auraEffect.maxHpPct': '最大体力を{pct}%上昇させる',
-  'guide.abilityHook.revenge':
-    '前方のすべてを薙ぎ払う反撃で、一撃を受け流した直後はより安く使えます。',
-  'guide.abilityHook.hamstring': '対象の脚を斬りつけて減速させ、追いつかれないようにします。',
-  'hud.combat.floatingParry': '受け流し',
-  'hud.combat.parried': '{target}は{ability}を受け流しました。',
-  'hud.errors.nothingToConsume': '消費できるものがありません。',
-  'hud.errors.needShield': '盾を装備している必要があります。',
-  'entities.abilities.revenge.name': '意趣返し',
-  'entities.abilities.revenge.description':
-    '大きく弧を描いて攻撃し、前方のすべての敵に物理ダメージを与えます。対象が5体を超えるとダメージが減少します。回避または受け流しに成功すると、次の意趣返しの怒りコストが0になることがあります。',
-  'entities.abilities.battle_stance.name': 'バトルスタンス',
-  'entities.abilities.battle_stance.description':
-    '攻撃的な戦闘スタンスです。怒りの生成量が10%増加します。武器と防御の基本スタンスです。',
-  'entities.abilities.berserker_stance.name': 'バーサーカースタンス',
-  'entities.abilities.berserker_stance.description':
-    '無謀な戦闘スタンスです。クリティカルの発生率が3%上昇し、ダメージが3%増加します。狂怒ウォリアーは常にこのスタンスで戦います。',
-  'entities.abilities.sweeping_strikes.name': '広がる弧',
-  'entities.abilities.sweeping_strikes.description':
-    '12秒間、単体攻撃が近くの敵1体にも75%のダメージで命中します。（武器）',
-  'entities.abilities.deep_wounds.name': '抉れた傷',
-  'entities.abilities.deep_wounds.description':
-    'パッシブ: あなたの重傷の一撃が対象に出血を残し、6秒かけて物理ダメージを与えます。（武器）',
-  'entities.abilities.enrage_passive.name': '狂乱',
-  'entities.abilities.enrage_passive.description':
-    'パッシブ: 激昂している間、与えるダメージが11%増加し、攻撃速度が25%、移動速度が10%上昇します（4秒間）。瀉血には30%の確率で激昂させる効果があり、赤い収穫は必ず激昂させます。（狂怒）',
-  'entities.abilities.raging_gale.name': '双撃',
-  'entities.abilities.raging_gale.description':
-    '武器で即座に2回攻撃し、それぞれ武器ダメージの60%に{damage}を加えたダメージを与え、怒りを{rage}生成します。最大2チャージまで蓄積します。（狂怒）',
-  'entities.abilities.red_harvest.name': '赤い収穫',
-  'entities.abilities.red_harvest.description':
-    'すべてを注ぎ込み、狂乱のうちに3回攻撃し、それぞれ武器ダメージに{damage}を加えたダメージを与えます。（狂怒）',
-  'entities.abilities.furious_mending.name': '憤怒の癒し',
-  'entities.abilities.furious_mending.description':
-    '10秒間、受けるダメージが20%減少し、効果中は瀉血が最大体力の20%を回復します。（狂怒）',
-  'entities.abilities.emboldening_roar.name': '奮起の咆哮',
-  'entities.abilities.emboldening_roar.description':
-    '奮い立たせる咆哮を上げ、40yd以内の自分と味方プレイヤーを鼓舞します。次の3回のアビリティが必ずクリティカルになります。（狂怒）',
-  'entities.abilities.raised_guard.name': '守りの構え',
-  'entities.abilities.raised_guard.description':
-    '盾の陰に身を構え、6秒間、受ける物理ダメージが50%減少します。最大2チャージまで蓄積します。（防御）',
-  'entities.abilities.iron_resolve.name': '鉄の決意',
-  'entities.abilities.iron_resolve.description':
-    '歯を食いしばって痛みを堪え、怒りをすべて消費し（最低20）、消費した怒り1につき4のダメージを吸収します。最大10秒間持続します。（防御）',
-  'entities.abilities.faultline.name': '断層',
-  'entities.abilities.faultline.description':
-    '地面に衝撃波を走らせ、前方8yd以内の敵に{damage}のダメージを与え、3秒間スタンさせます。（防御）',
-  'entities.abilities.defiant_bellow.name': '不屈の雄叫び',
-  'entities.abilities.defiant_bellow.description':
-    '不屈の雄叫びを上げ、10yd以内のすべての敵を挑発し、3秒間あなたを攻撃するよう強制します。（防御）',
-  'entities.abilities.breachmaker.name': '崩し手',
-  'entities.abilities.breachmaker.description':
-    '対象を打ち据えて武器ダメージに{damage}を加えたダメージを与え、その守りを崩します。8秒間、あなたがその対象に与えるダメージが20%増加します。（武器）',
-  'entities.abilities.measured_fury.name': '制御された怒り',
-  'entities.abilities.measured_fury.description':
-    '制御された怒りが効率を高め、アビリティの怒りコストが10%減少します。（武器）',
-  'entities.abilities.seasoned_soldier.name': '歴戦の兵',
-  'entities.abilities.seasoned_soldier.description':
-    'クリティカルの通常攻撃が生成する怒りが10%増加します。（武器）',
-  'entities.abilities.diabolical_twinstrike.name': '極悪の双撃',
-  'entities.abilities.diabolical_twinstrike.description':
-    '激昂している間、双撃のダメージが15%増加します。（狂怒）',
-  'entities.abilities.cleaving_blows.name': '切り裂く連撃',
-  'entities.abilities.cleaving_blows.description':
-    '赤い収穫は必ず双撃のチャージを1つ回復します。（狂怒）',
-  'entities.abilities.sudden_death.name': '突然死',
-  'entities.abilities.sudden_death.description':
-    '通常攻撃に、体力に関係なく早すぎる墓を怒りコストなしで使用できるようになる確率があります。（武器）',
   'entities.abilities.repentance.name': '悔悛',
   'entities.abilities.repentance.description':
     '敵を最大6秒間、瞑想状態にします。ダメージを受けると効果が解除されます。（報復シグネチャー）',
@@ -7562,4 +7459,133 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rallying_cry.name': '結束の雄叫び',
   'entities.abilities.rallying_cry.description':
     '結束の雄叫びを上げ、40yd以内の自分とパーティメンバーの最大体力を10秒間、20%増加させます。',
+  'hudChrome.options.showAttackButton': '攻撃ボタンを表示',
+  'hudChrome.partyFrames.section': 'パーティ／レイドフレーム',
+  'hudChrome.partyFrames.unlock': 'パーティ／レイドフレームを移動',
+  'hudChrome.partyFrames.lock': 'パーティ／レイドフレームを固定',
+  'hudChrome.partyFrames.style': 'フレームのスタイル',
+  'hudChrome.partyFrames.styleAutomatic': '自動',
+  'hudChrome.partyFrames.styleClassic': 'クラシック・パーティフレーム',
+  'hudChrome.partyFrames.styleRaid': 'レイドフレーム',
+  'hudChrome.partyFrames.scale': 'フレームの拡大率',
+  'hudChrome.partyFrames.width': 'フレームの幅',
+  'hudChrome.partyFrames.height': 'フレームの高さ',
+  'hudChrome.partyFrames.spacing': 'フレームの間隔',
+  'hudChrome.partyFrames.columns': 'レイドの列数',
+  'hudChrome.partyFrames.healthText': '体力表示',
+  'hudChrome.partyFrames.healthPercent': '割合',
+  'hudChrome.partyFrames.healthCurrent': '現在値',
+  'hudChrome.partyFrames.healthCurrentMax': '現在値 / 最大値',
+  'hudChrome.partyFrames.sort': 'プレイヤーを並べ替え',
+  'hudChrome.partyFrames.sortGroup': 'グループ',
+  'hudChrome.partyFrames.showResource': 'マナ、怒り、エネルギーを表示',
+  'hudChrome.partyFrames.showAbsorbs': '吸収シールドを表示',
+  'hudChrome.partyFrames.showAuras': 'バフとデバフを表示',
+  'hudChrome.partyFrames.showSelf': '自分のフレームを表示',
+  'guide.abilityHook.ice_lance':
+    '氷の効果を消費する即時発動の氷片。凍結した対象には大幅に高いダメージを与えます。',
+  'guide.abilityHook.flurry':
+    '3発の氷弾を素早く放ち、次の氷系攻撃が対象を凍結状態として扱うようにします。',
+  'guide.abilityHook.fingers_of_frost':
+    '氷の矢が、ときどき次のアイスランスに対象を凍結状態として扱う力を与えます。',
+  'guide.abilityHook.brain_freeze':
+    '氷の矢が、ときどき次のフルーリーを即時発動にして威力を高めます。',
+  'guide.abilityHook.shatter': '凍結した対象に対する呪文のクリティカル率が大幅に上昇します。',
+  'guide.abilityHook.frozen_orb':
+    'ゆっくり進む氷球を敵の群れへ放ち、周囲を冷やして氷の効果を発生させます。',
+  'guide.abilityHook.blizzard':
+    '一帯を氷で覆い、敵の群れにダメージを与えながら移動速度を低下させます。',
+  'guide.abilityHook.blink': '短い距離を前方へ瞬間移動し、移動不能効果を解除します。',
+  'hud.pet.waterJet': 'ウォータージェット',
+  'hud.pet.waterJetTitle': 'ウォータージェット',
+  'hud.pet.waterJetDesc':
+    'ウォーターエレメンタルに、3秒間敵を減速させる水流を放つよう命令します。クールダウン8秒。右クリックすると、使用可能になるたびに自動で発動します。',
+  'abilityUi.actionBar.attackRemoveHint': '右クリックするとバーから外してスロットを空けます。',
+  'entities.abilities.ice_lance.name': 'アイスランス',
+  'entities.abilities.ice_lance.description':
+    '氷の槍を投げ、{damage}の氷ダメージを与えます。凍結した対象には3倍のダメージを与えます。フィンガーズ・オブ・フロストまたはウィンターズ・チルを1チャージ消費すると、対象を凍結状態として扱います。（氷）',
+  'entities.abilities.flurry.name': 'フルーリー',
+  'entities.abilities.flurry.description':
+    '3発の氷弾を放ち、それぞれ{damage}の氷ダメージを与え、対象にウィンターズ・チルを付与します。次に命中する対応呪文2回は対象を凍結状態として扱います。ブレインフリーズ発動時は即時発動となり、威力が30%上昇してクールダウンを無視します。（氷）',
+  'entities.abilities.frozen_orb.name': 'フローズンオーブ',
+  'entities.abilities.frozen_orb.description':
+    '渦巻く氷球を放ち、8秒間前方へ漂わせます。周囲の敵に毎秒{damage}の氷ダメージを与え、移動速度を30%低下させます。命中するとフィンガーズ・オブ・フロストを生成します。（氷）',
+  'entities.abilities.blizzard.name': 'ブリザード',
+  'entities.abilities.blizzard.description':
+    '対象地点に6秒間吹雪を呼び、毎秒{damage}の氷ダメージを与えて敵の移動速度を40%低下させます。敵1体に命中するたび、フローズンオーブのクールダウンを0.5秒、1回の発動につき最大3秒短縮します。（氷）',
+  'entities.abilities.glacial_spike.name': 'グレイシャルスパイク',
+  'entities.abilities.glacial_spike.description':
+    '巨大な氷の槍を作り、アイシクルを5個消費して{damage}の氷ダメージを与え、対象を4秒間その場で凍結させます。（氷）',
+  'entities.abilities.glacial_front.name': '氷河の前線',
+  'entities.abilities.glacial_front.description':
+    '長押しして広がる冷気を蓄え、円錐状に放出します。チャージが長いほど遠くまで届き、ダメージが増加します。命中したすべての敵の移動速度を4秒間50%低下させ、最大チャージ時はさらに1秒間移動不能にします。（氷）',
+  'entities.abilities.dragons_breath.name': 'ドラゴンズブレス',
+  'entities.abilities.dragons_breath.description':
+    '長押しして広がる炎の息を蓄え、円錐状に放出します。チャージが長いほど遠くまで届き、ダメージが増加します。命中した敵は混乱し、ダメージを受けると効果が解除されます。最大チャージ時は必ずクリティカルとなり、ホットストリークの条件に1回分加算されます。（火）',
+  'entities.abilities.fingers_of_frost.name': 'フィンガーズ・オブ・フロスト',
+  'entities.abilities.fingers_of_frost.description':
+    'ライムランスが15%の確率でフィンガーズ・オブ・フロストを1チャージ付与します（最大2チャージ）。次のアイスランスは対象を凍結状態として扱います。（氷）',
+  'entities.abilities.brain_freeze.name': 'ブレインフリーズ',
+  'entities.abilities.brain_freeze.description':
+    'ライムランスが20%の確率で、次のフルーリーを即時発動にし、威力を30%上昇させ、クールダウンを無視させます。（氷）',
+  'entities.abilities.shatter.name': '粉砕',
+  'entities.abilities.shatter.description':
+    '凍結した対象に対する呪文のクリティカル率が50%上昇し、そのクリティカルダメージが20%上昇します。フィンガーズ・オブ・フロストとウィンターズ・チルも対象を凍結状態として扱います。（氷）',
+  'entities.abilities.temporal_cascade.name': '時の連鎖',
+  'entities.abilities.temporal_cascade.description':
+    '時の残響をパーティ内に連鎖させ、対象と最も近い味方最大4人を即座に回復し、それぞれに{duration}秒間印を付けます。あなたが与えた秘術ダメージの一部が残響を通じて戻り、印のついた味方を回復します。（クロノマンシー）',
+  'entities.abilities.temporal_reversal.name': '時の逆転',
+  'entities.abilities.temporal_reversal.description':
+    '倒れた味方の時間軸を巻き戻し、戦闘中でも、その遺体の場所で体力とマナの一部を持った状態で蘇生します。（クロノマンシー）',
+  'entities.abilities.temporal_rewind.name': '巻き戻し',
+  'entities.abilities.temporal_rewind.description':
+    'パーティまたはレイドに秘術の波を送り、時間を巻き戻します。40ヤード以内の各味方が過去5秒間に受けたダメージの30%を回復します（最大体力の35%まで）。この効果はクリティカルになりません。（クロノマンシー）',
+  'entities.abilities.temporal_acceleration.name': '時間加速',
+  'entities.abilities.temporal_acceleration.description':
+    'パーティまたはレイドの時間の流れを加速し、15秒間、攻撃、詠唱、チャネリング速度を30%上昇させます。直近に時間加速またはブラッドラストの影響を受けた味方は疲労しており、効果を得られません。（クロノマンシー）',
+  'entities.abilities.perfect_moment.name': '完璧な瞬間',
+  'entities.abilities.perfect_moment.description':
+    '完璧な瞬間をつかみ、秘術チャージを即座に4つ獲得します。10秒間、エーテルダーツはチャージを消費しません。（クロノマンシー）',
+  'entities.abilities.arcane_surge.name': 'エーテルサージ',
+  'entities.abilities.arcane_surge.description':
+    '生の秘術エネルギーを敵に流し込み、{damage}のダメージを与えます。発動するたびに秘術チャージが残り、次のエーテルサージのダメージと詠唱速度が上昇します（1つにつき5%高速化）が、マナ消費も大幅に増えます。最大4チャージ。エーテルダーツはチャージを消費します。また発動時にエーテルラッシュが準備されることがあり、次のエーテルサージのマナ消費がなくなり、詠唱速度が2倍になります。',
+  'entities.items.conjured_bread4.name': '魔法の祝宴パン',
+  'entities.items.conjured_water4.name': '魔法の湧き水',
+  'entities.abilities.blazing_barrier.name': 'ブレイジングバリア',
+  'entities.abilities.blazing_barrier.description':
+    '自身を炎で包み、130ダメージを吸収します。60秒間持続します。（火）',
+  'entities.abilities.cold_snap.name': 'コールドスナップ',
+  'entities.abilities.cold_snap.description':
+    'フリッカーステップ、フロストヴェール、グレーターインビジビリティのクールダウンを完了させます。（メイジタレント）',
+  'entities.abilities.greater_invisibility.name': 'グレーターインビジビリティ',
+  'entities.abilities.greater_invisibility.description':
+    '20秒間姿を消します。継続ダメージ効果を2個解除し、透明状態の間と解除直後は受けるダメージが90%減少します。（メイジタレント）',
+  'entities.abilities.hot_streak.name': 'ホットストリーク',
+  'entities.abilities.hot_streak.description':
+    'パッシブ：火系呪文（ファイアボール、ファイアブラスト、スコーチ、パイロブラスト、フレイムストライク）で2回連続してクリティカルを出すと、次のパイロブラストまたはフレイムストライクが即時発動となり、コストがなくなります。消費呪文は無料発動も含めて次の連続判定に加算されます。フレイムストライクは命中した敵の数にかかわらず1回のみ加算され、最初の着弾だけが判定されます。（火）',
+  'entities.abilities.ice_floes.name': 'アイスフロー',
+  'entities.abilities.ice_floes.description':
+    '次の詠唱時間のある呪文2回を移動しながら発動できます。15秒間持続します。（メイジタレント）',
+  'entities.abilities.ignition.name': 'イグニッション',
+  'entities.abilities.ignition.description':
+    'パッシブ：呪文のクリティカルが対象を燃焼させ、与えたダメージの40%を6秒かけて与えます。効果は累積します。（火のマスタリー）',
+  'entities.abilities.mass_barrier.name': 'マスバリア',
+  'entities.abilities.mass_barrier.description':
+    '自身と30メートル以内にいる近くの味方最大4人に、それぞれ130ダメージを吸収するシールドを60秒間付与します。（メイジタレント）',
+  'entities.abilities.overload.name': 'オーバーロード',
+  'entities.abilities.overload.description':
+    '次の呪文の効果が40%増幅されますが、マナ消費が50%増加します。10秒間持続します。（メイジタレント）',
+  'entities.abilities.power_echo.name': 'パワーエコー',
+  'entities.abilities.power_echo.description':
+    '次の直接呪文が同じ対象に50%の威力でもう一度発動します。10秒間持続します。（メイジタレント）',
+  'entities.abilities.rings_of_frost.name': 'リング・オブ・フロスト',
+  'entities.abilities.rings_of_frost.description':
+    '10秒間持続する氷の輪を召喚します。輪の境界を越えた敵は4秒間凍結します。（メイジタレント）',
+  'entities.abilities.rune_of_power.name': 'ルーン・オブ・パワー',
+  'entities.abilities.rune_of_power.description':
+    '足元に15秒間持続する力のルーンを刻みます。8メートル以内に立つ味方が与えるダメージが10%増加します。（メイジタレント）',
+  'entities.abilities.summon_water_elemental.name': 'ウォーターエレメンタル召喚',
+  'entities.abilities.summon_water_elemental.description':
+    '共に戦うウォーターエレメンタルを召喚します。対象へウォーターボルトを投げ、ウォータージェットを放ちます。（氷）',
+  'entities.mobs.water_elemental.name': 'ウォーターエレメンタル',
 };

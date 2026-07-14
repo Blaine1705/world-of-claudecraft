@@ -7408,10 +7408,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Staf',
   'hudChrome.wocStore.wtype.sword': 'Zwaard',
   'hudChrome.wocStore.wtype.wand': 'Toverstaf',
-  'entities.items.deathless_warguard_legmail.name': 'Doodloze Krijgswacht-Beenmalie',
-  'entities.items.scourgehide_carapace.name': 'Geselhuid-Pantser',
-  'entities.items.soulforged_warplate.name': 'Zielgesmede Krijgsplaat',
-  'entities.items.soulrend_diadem.name': 'Zielscheur-Diadeem',
   'hudChrome.bags.rightClickDestroy': 'Rechtsklik om te vernietigen',
   'entities.abilities.aura_surge.name': 'Stralende Golf',
   'entities.abilities.aura_surge.description':
@@ -7573,4 +7569,43 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Keuzes',
   'game.talents.rowUnlockToast': 'Een nieuwe talentkeuze is ontgrendeld!',
   'game.talents.rowUnlocks': 'Wordt ontgrendeld op niveau {level}',
+  'entities.abilities.blazing_barrier.name': 'Vlammende barrière',
+  'entities.abilities.blazing_barrier.description':
+    'Omhul jezelf met vlammen en absorbeer 130 schade gedurende 60 sec. (Vuur)',
+  'entities.abilities.cold_snap.name': 'Koudegolf',
+  'entities.abilities.cold_snap.description':
+    'Voltooit de afkoeltijd van Flitsstap, Vorstsluier en Grotere onzichtbaarheid. (magiërstalent)',
+  'entities.abilities.greater_invisibility.name': 'Grotere onzichtbaarheid',
+  'entities.abilities.greater_invisibility.description':
+    'Verdwijn gedurende 20 sec.: verwijdert 2 effecten met schade over tijd en je loopt 90% minder schade op terwijl je onzichtbaar bent en kort daarna. (magiërstalent)',
+  'entities.abilities.hot_streak.name': 'Hete reeks',
+  'entities.abilities.hot_streak.description':
+    'Passief: twee kritieke treffers achter elkaar met je Vuurspreuken (Sintelbout, Sintelval, Blakeren, Pyrelans of Vlammenslag) maken je volgende Pyrelans of Vlammenslag onmiddellijk en gratis. De verbruikers tellen mee voor de VOLGENDE reeks, inclusief gratis spreuken; Vlammenslag telt één keer, hoeveel vijanden hij ook raakt, en alleen de eerste inslag telt ooit mee. (Vuur)',
+  'entities.abilities.ice_floes.name': 'IJsschotsen',
+  'entities.abilities.ice_floes.description':
+    'Je volgende twee spreuken met een casttijd kunnen tijdens het bewegen worden uitgesproken. Duurt 15 sec. (magiërstalent)',
+  'entities.abilities.ignition.name': 'Ontbranding',
+  'entities.abilities.ignition.description':
+    'Passief: kritieke treffers van je spreuken verbranden het doelwit voor 40% van de toegebrachte schade gedurende 6 sec. en stapelen. (Vuurmeesterschap)',
+  'entities.abilities.mass_barrier.name': 'Massabarrière',
+  'entities.abilities.mass_barrier.description':
+    'Beschermt jou en maximaal 4 nabije bondgenoten binnen 30 m; elke barrière absorbeert 130 schade gedurende 60 sec. (magiërstalent)',
+  'entities.abilities.overload.name': 'Overbelasting',
+  'entities.abilities.overload.description':
+    'Je volgende spreuk wordt met 40% versterkt, maar kost 50% meer mana. Duurt 10 sec. (magiërstalent)',
+  'entities.abilities.power_echo.name': 'Krachtsecho',
+  'entities.abilities.power_echo.description':
+    'Je volgende directe spreuk herhaalt zich met 50% kracht op hetzelfde doelwit. Duurt 10 sec. (magiërstalent)',
+  'entities.abilities.rings_of_frost.name': 'Ring van vorst',
+  'entities.abilities.rings_of_frost.description':
+    'Roept gedurende 10 sec. een ring op. Vijanden die de rand oversteken, worden 4 sec. bevroren. (magiërstalent)',
+  'entities.abilities.rune_of_power.name': 'Krachtrune',
+  'entities.abilities.rune_of_power.description':
+    'Teken gedurende 15 sec. een krachtrune aan je voeten: bondgenoten binnen 8 m brengen 10% meer schade toe. (magiërstalent)',
+  'entities.abilities.summon_water_elemental.name': 'Waterelementaal oproepen',
+  'entities.abilities.summon_water_elemental.description':
+    'Roep een Waterelementaal op om naast je te vechten, Waterbouten naar je doelwit te slingeren en Waterstraal te kanaliseren. (Vorst)',
+  'entities.mobs.water_elemental.name': 'Waterelementaal',
+  'entities.items.conjured_bread4.name': 'Getoverd feestbrood',
+  'entities.items.conjured_water4.name': 'Getoverd bronwater',
 };

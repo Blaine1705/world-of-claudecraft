@@ -51,10 +51,8 @@ const PARTY_FRAME_HELPFUL_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'cast_shield',
   'heal_echo',
   'buff_dr',
-  'buff_dr_phys',
   'buff_maxhp_pct',
   'stasis',
-  'die_by_sword',
 ]);
 
 // Evasion and Deterrence share buff_dodge with long-lived maintenance buffs, so

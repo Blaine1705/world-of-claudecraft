@@ -118,6 +118,10 @@ function aura(kind: Aura['kind'], value = 1): Aura {
 describe('combat SFX policy', () => {
   it('routes the Water Elemental away from the generic elemental growls', () => {
     expect(mobVoiceFamily('water_elemental')).toBe('water_elemental');
+    expect(mobVoiceCue('water_elemental', 'aggro')).toBe('mob_water_elemental_aggro');
+    expect(mobVoiceCue('water_elemental', 'attack')).toBe('mob_water_elemental_attack');
+    expect(mobVoiceCue('water_elemental', 'death')).toBe('mob_water_elemental_death');
+    expect(mobVoiceCue('water_elemental', 'hurt')).toBe('mob_water_elemental_attack');
     expect(mobVoiceFamily('stormcrag_elemental')).toBe('elemental');
   });
   it('suppresses crit stingers for boss targets only', () => {
@@ -327,7 +331,6 @@ describe('combat SFX policy', () => {
     const warrior = target('player', 'warrior');
     expect(playerSwingCueForDamage(damage({ kind: 'miss' }), warrior)).toBe('melee_swing_blade');
     expect(playerSwingCueForDamage(damage({ kind: 'dodge' }), warrior)).toBe('melee_swing_blade');
-    expect(playerSwingCueForDamage(damage({ kind: 'parry' }), warrior)).toBe('melee_swing_blade');
     expect(playerSwingCueForDamage(damage({ school: 'fire' }), warrior)).toBeNull();
     expect(playerSwingCueForDamage(damage({ ability: 'Auto Shot' }), warrior)).toBeNull();
   });

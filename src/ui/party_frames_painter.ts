@@ -28,6 +28,7 @@ import type { PainterHostWriters } from './painter_host';
 import { createPartyChip, type PartyChip } from './party_chip';
 import { partyChipState } from './party_collapse';
 import {
+  createLeaveButton,
   createPartyRow,
   createPartyRowsWrapper,
   PARTY_CREST_KEY_PREFIX,
@@ -110,6 +111,7 @@ export class PartyFramesPainter {
   // Built lazily on the first sync, then kept in the DOM (detached only by clear(), where
   // it is retained for reuse); reconcileOrder re-parents rows into it without node churn.
   private rowsWrapper: HTMLElement | null = null;
+  private leaveBtn: HTMLButtonElement | null = null;
   // The mobile collapse chip, built lazily on the first mobile update and then kept
   // in the DOM (first child of the container) while in a party on mobile. Off mobile
   // it is never built (desktop party frames are unchanged). Its click toggles the
@@ -121,7 +123,7 @@ export class PartyFramesPainter {
   private chipShown = false;
   // The leader-only master-loot control, owned by the Hud (built on its own
   // low-frequency footer signature) and handed to the pool for placement. It sits
-  // after the member rows, and persists across member-frame
+  // between the member rows and the leave button, and persists across member-frame
   // rebuilds so its checkbox / dropdowns are never churned under the cursor.
   private masterControl: HTMLElement | null = null;
   // The last synced raid flag, so relocalize() can re-emit each pooled row's group
@@ -201,7 +203,11 @@ export class PartyFramesPainter {
     if (this.masterControl === el) return;
     if (this.masterControl) this.masterControl.remove();
     this.masterControl = el;
-    if (el) this.container.appendChild(el);
+    if (el) {
+      const leave = this.leaveBtn;
+      if (leave && leave.parentNode === this.container) this.container.insertBefore(el, leave);
+      else this.container.appendChild(el);
+    }
   }
 
   /** Reconcile the pool to `members` and repaint each in place. Called only when the
@@ -253,7 +259,9 @@ export class PartyFramesPainter {
     // insertBefore/appendChild blurs it when it is the active element, which is why
     // the quest tracker re-focuses manually after a rebuild; re-appending every row
     // each frame would yank focus off a party row on every combat tick.)
-    this.reconcileOrder(ordered);
+    const leave = this.ensureLeaveButton();
+    this.reconcileOrder(ordered, leave);
+    this.writers.setText(leave, this.deps.leaveLabel());
   }
 
   private ensureRowsWrapper(): HTMLElement {
@@ -273,10 +281,10 @@ export class PartyFramesPainter {
   // so no member frame ever flows beside the container-level chip), then (2) order the
   // container's own direct children: the mobile chip first (when present, the collapse
   // header above the stack), the rows wrapper, the leader-only master-loot control, and
-  // the master-loot control last. On desktop the chip is null and the wrapper is
-  // display:contents, so the sequence renders as wrapper's rows, [master], exactly
+  // the leave button last. On desktop the chip is null and the wrapper is
+  // display:contents, so the sequence renders as wrapper's rows, [master], leave, exactly
   // the pre-wrapper order. A steady-state rebuild moves nothing in EITHER pass.
-  private reconcileOrder(rows: PartyRow[]): void {
+  private reconcileOrder(rows: PartyRow[], leave: HTMLButtonElement): void {
     const wrapper = this.ensureRowsWrapper();
     let rowRef: ChildNode | null = wrapper.firstChild;
     const placeRow = (node: ChildNode): void => {
@@ -299,6 +307,7 @@ export class PartyFramesPainter {
     if (this.chip && this.chip.el.parentNode === this.container) place(this.chip.el);
     place(wrapper);
     if (this.masterControl) place(this.masterControl);
+    place(leave);
   }
 
   /** Re-localize every pooled and free row (the badge tooltips)
@@ -314,6 +323,7 @@ export class PartyFramesPainter {
       this.writers.setText(row.group, this.groupLabel(row.slot.member, this.lastRaid));
     }
     for (const row of this.free) row.relocalize();
+    if (this.leaveBtn) this.writers.setText(this.leaveBtn, this.deps.leaveLabel());
     // Re-emit the chip caption in the new language while it is shown (a language
     // switch does not flip the collapse state, so the Hud never re-drives
     // setCollapse for it, exactly like the pooled group labels above).
@@ -322,7 +332,7 @@ export class PartyFramesPainter {
     }
   }
 
-  /** Empty the frames (no party): detach every row + the chip.
+  /** Empty the frames (no party): detach every row + the leave button + the chip.
    *  Keeps the detached rows in the free list so a re-formed party reuses them. */
   clear(): void {
     for (const [pid, row] of this.pool) {
@@ -330,6 +340,7 @@ export class PartyFramesPainter {
       this.free.push(row);
       this.pool.delete(pid);
     }
+    this.leaveBtn?.remove();
     this.masterControl?.remove();
     this.masterControl = null;
     // Detach the (now empty) rows wrapper too, so a no-party container is truly empty and
@@ -380,7 +391,8 @@ export class PartyFramesPainter {
         levelText: String(m.level),
         name: m.name,
         portraitKey: `${PARTY_CREST_KEY_PREFIX}${m.cls}`,
-        absorb: config?.showAbsorbs === false ? null : { hp: m.hp, maxHp: m.mhp, total: m.absorb },
+        absorb:
+          config?.showAbsorbs === false ? null : { hp: m.hp, maxHp: m.mhp, total: m.absorb ?? 0 },
         dead: !!m.dead,
         outOfRange: m.oor,
       }),
@@ -420,5 +432,10 @@ export class PartyFramesPainter {
           n: formatNumber(m.group, { maximumFractionDigits: 0 }),
         })
       : '';
+  }
+
+  private ensureLeaveButton(): HTMLButtonElement {
+    if (!this.leaveBtn) this.leaveBtn = createLeaveButton(this.doc, this.deps.onLeave);
+    return this.leaveBtn;
   }
 }

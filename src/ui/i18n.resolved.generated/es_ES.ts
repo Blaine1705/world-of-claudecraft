@@ -871,7 +871,6 @@ export const es_ES: EnTranslations = {
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
       "showAttackButton": "Show Attack Button",
-      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
       "mobileLeftHanded": "Diseño para zurdos"
@@ -5818,6 +5817,54 @@ export const es_ES: EnTranslations = {
         "name": "Lanza de Escarcha",
         "description": "Lanza una descarga de escarcha que causa {damage} de daño de Escarcha y reduce la velocidad de movimiento un 40%."
       },
+      "blazing_barrier": {
+        "name": "Barrera ardiente",
+        "description": "Rodéate de fuego para absorber 130 de daño durante 60 s. (Fuego)"
+      },
+      "cold_snap": {
+        "name": "Frío súbito",
+        "description": "Restablece el tiempo de reutilización de Paso centelleante, Velo de Escarcha e Invisibilidad mejorada. (Talento de mago)"
+      },
+      "greater_invisibility": {
+        "name": "Invisibilidad mejorada",
+        "description": "Te esfumas durante 20 s: suprime 2 efectos de daño periódico y reduce el daño recibido un 90% mientras sigues invisible y durante un breve periodo posterior. (Talento de mago)"
+      },
+      "hot_streak": {
+        "name": "Racha ardiente",
+        "description": "Pasivo: dos críticos consecutivos de tus hechizos de Fuego (Bola de Fuego, Explosión de Fuego, Agostar, Piroexplosión o Fogonazo) convierten tu siguiente Piroexplosión o Fogonazo en un lanzamiento instantáneo y sin coste. Los hechizos que gastan el efecto aportan a la racha SIGUIENTE, también si son gratuitos; Fogonazo aporta una sola vez, aunque alcance a varios enemigos, y únicamente puede aportar el primer impacto. (Fuego)"
+      },
+      "ice_floes": {
+        "name": "Hielos flotantes",
+        "description": "Puedes lanzar en movimiento tus dos siguientes hechizos que tengan tiempo de lanzamiento. Permanece 15 s. (Talento de mago)"
+      },
+      "ignition": {
+        "name": "Combustión",
+        "description": "Pasivo: los críticos de tus hechizos prenden al objetivo y le infligen un 40% del daño causado a lo largo de 6 s; el efecto se acumula. (Maestría de Fuego)"
+      },
+      "mass_barrier": {
+        "name": "Barrera colectiva",
+        "description": "Otorga un escudo a ti y a un máximo de 4 aliados cercanos en 30 m; cada uno absorbe 130 de daño durante 60 s. (Talento de mago)"
+      },
+      "overload": {
+        "name": "Potenciación",
+        "description": "Potencia tu siguiente hechizo un 40%, pero aumenta su coste de maná un 50%. Permanece 10 s. (Talento de mago)"
+      },
+      "power_echo": {
+        "name": "Eco de potencia",
+        "description": "Tu siguiente hechizo directo vuelve a actuar con un 50% de potencia sobre el mismo objetivo. Permanece 10 s. (Talento de mago)"
+      },
+      "rings_of_frost": {
+        "name": "Círculo de Escarcha",
+        "description": "Crea un círculo durante 10 s. Los enemigos que atraviesan el borde quedan congelados durante 4 s. (Talento de mago)"
+      },
+      "rune_of_power": {
+        "name": "Runa de potencia",
+        "description": "Traza una runa de potencia bajo tus pies durante 15 s: los aliados situados a menos de 8 m infligen un 10% más de daño. (Talento de mago)"
+      },
+      "summon_water_elemental": {
+        "name": "Invocar a un elemental de agua",
+        "description": "Invoca a un elemental de agua que combate junto a ti, dispara Descargas de Agua contra tu objetivo y canaliza Chorro de Agua. (Escarcha)"
+      },
       "ice_lance": {
         "name": "Ice Lance",
         "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
@@ -6422,9 +6469,21 @@ export const es_ES: EnTranslations = {
         "name": "Maestría elemental",
         "description": "Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)"
       },
+      "shamanistic_rage": {
+        "name": "Shamanistic Rage",
+        "description": "Releases shamanistic rage, restoring 160 mana. (Enhancement signature)"
+      },
+      "natures_swiftness": {
+        "name": "Nature's Swiftness",
+        "description": "Calls on nature to make your next spell instant. (Restoration signature)"
+      },
       "siphon_life": {
         "name": "Succionar vida",
         "description": "Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)"
+      },
+      "fel_domination": {
+        "name": "Fel Domination",
+        "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
       },
       "conflagrate": {
         "name": "Conflagrar",
@@ -7517,6 +7576,12 @@ export const es_ES: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Bastón de guerra de cristal de ascuas"
       },
+      "conjured_water4": {
+        "name": "Agua de Manantial Invocada"
+      },
+      "conjured_bread4": {
+        "name": "Hogaza de Festín Invocada"
+      },
       "bristleback_maul": {
         "name": "Martillo Gallowglass"
       },
@@ -8230,18 +8295,6 @@ export const es_ES: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guardacintura del Invocatormentas"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Malla de piernas del Guardián Imperecedero"
-      },
-      "scourgehide_carapace": {
-        "name": "Caparazón de piel de Azote"
-      },
-      "soulforged_warplate": {
-        "name": "Coraza de guerra forjada en almas"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema Desgarralmas"
       }
     },
     "mobs": {
@@ -8598,6 +8651,9 @@ export const es_ES: EnTranslations = {
       },
       "ysolei": {
         "name": "Ysolei, Avatar de la Luna Ahogada"
+      },
+      "water_elemental": {
+        "name": "Elemental acuático"
       }
     },
     "npcs": {

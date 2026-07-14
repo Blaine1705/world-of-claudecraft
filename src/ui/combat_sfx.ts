@@ -105,7 +105,7 @@ export const MOB_VOICE_CUES = {
   },
 } as const satisfies Record<string, Record<MobVoiceAction, SfxId>>;
 
-type MobVoiceFamily = keyof typeof MOB_VOICE_CUES;
+type MobVoiceFamily = keyof typeof MOB_VOICE_CUES | 'water_elemental';
 const NO_CUE = (): boolean => false;
 
 // Templates that should share one recorded subfamily voice instead of each
@@ -192,6 +192,7 @@ export function playerSwingCueForDamage(event: DamageEvent, source: Entity | nul
 }
 
 export function mobVoiceFamily(templateId: string): MobVoiceFamily | null {
+  if (templateId === 'water_elemental') return 'water_elemental';
   if (templateId === 'wild_boar' || templateId === 'elder_bristleback') return 'boar';
   const family = MOBS[templateId]?.family;
   return family && family in MOB_VOICE_CUES ? (family as MobVoiceFamily) : null;
@@ -204,6 +205,9 @@ export function mobVoiceCue(
 ): string | null {
   const family = mobVoiceFamily(templateId);
   if (!family) return null;
+  if (family === 'water_elemental') {
+    return `mob_water_elemental_${action === 'hurt' ? 'attack' : action}`;
+  }
   const subfamily = SUBFAMILY_ALIAS[templateId] ?? templateId;
   const specific = `mob_${family}_${subfamily}_${action}`;
   return hasCue(specific) ? specific : MOB_VOICE_CUES[family][action];
@@ -254,26 +258,4 @@ export function shouldPlayMobVoiceSfxForEntity(entity: Entity): boolean {
     entity.templateId !== 'nythraxis_scourge_of_thornpeak' &&
     entity.templateId !== 'nythraxis_skeleton_warrior'
   );
-}
-
-const SFX_MOB_FAMILIES = new Set([
-  'beast',
-  'spider',
-  'mudfin',
-  'burrower',
-  'humanoid',
-  'undead',
-  'troll',
-  'ogre',
-  'elemental',
-  'dragonkin',
-  'demon',
-]);
-
-/** Creature-voice key family, with bespoke summoned-creature overrides. */
-export function mobVoiceFamily(templateId: string): string | null {
-  if (templateId === 'water_elemental') return 'water_elemental';
-  if (templateId === 'wild_boar' || templateId === 'elder_bristleback') return 'boar';
-  const family = MOBS[templateId]?.family;
-  return family && SFX_MOB_FAMILIES.has(family) ? family : null;
 }

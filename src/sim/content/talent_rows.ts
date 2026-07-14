@@ -25,7 +25,6 @@ import {
   type TalentEffect,
   type TalentModifiers,
 } from './talents';
-import { WARRIOR_ROWS } from './warrior_rows';
 
 /** The character level at which each row (tier) unlocks. One row per level. */
 export const ROW_LEVELS = [5, 8, 11, 14, 17, 20] as const;
@@ -159,18 +158,21 @@ export function computeModifiersWithRows(
 // rowTreeFor(), can render and pick it. Same option ids, names, descriptions
 // and effects; only the icon field (unused here) is dropped. A sync guard in
 // tests/mage_choice_rows.test.ts pins the two registries together.
-const MAGE_ROWS: RowTree = MAGE_CHOICE_ROWS.rows.map((row) => ({
-  level: row.level,
-  options: row.options.map(({ id, name, description, effect }) => ({
-    id,
-    name,
-    description,
-    effect,
-  })),
-}));
+function choiceRowsToTree(rows: typeof MAGE_CHOICE_ROWS): RowTree {
+  return rows.rows.map((row) => ({
+    level: row.level,
+    options: row.options.map(({ id, name, description, effect }) => ({
+      id,
+      name,
+      description,
+      effect,
+    })),
+  }));
+}
+
+const MAGE_ROWS: RowTree = choiceRowsToTree(MAGE_CHOICE_ROWS);
 
 export const ROW_TREES: Partial<Record<PlayerClass, RowTree>> = {
-  warrior: WARRIOR_ROWS,
   mage: MAGE_ROWS,
 };
 

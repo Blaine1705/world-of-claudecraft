@@ -6891,7 +6891,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': '在 {level} 级解锁',
   'hudChrome.fct.absorbed': '吸收 {amount}',
   'hudChrome.fct.cheap': '费用降低!',
-  'itemUi.slots.twoHand': '双手',
   'entities.abilities.temporal_mend.name': '时光缝合',
   'entities.abilities.temporal_mend.description':
     '将盟友向前拉动一瞬，在身体安定于更健康的未来形态时治疗{damage}点生命值。(时光术特色技能)',
@@ -7021,14 +7020,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.silence.description': '沉默目标，持续 4 秒。（牧师天赋）',
   'entities.abilities.tranquility.name': '林地之歌',
   'entities.abilities.tranquility.description': '引导恢复之力，每秒治疗附近的盟友。（德鲁伊天赋）',
-  'entities.items.eastbrook_buckler.name': '东溪小圆盾',
-  'entities.items.eastbrook_greatsword.name': '东溪巨剑',
-  'entities.items.highwatch_wallshield.name': '高望壁盾',
-  'entities.items.highwatch_greatsword.name': '高望巨剑',
-  'entities.items.deathless_warguard_legmail.name': '不死战卫腿甲',
-  'entities.items.soulrend_diadem.name': '裂魂冠冕',
-  'entities.items.scourgehide_carapace.name': '灾祸之皮甲壳',
-  'entities.items.soulforged_warplate.name': '铸魂战甲',
   'entities.items.deathless_heartwood_heroic.name': '不朽王冠之心木',
   'entities.items.kingsbane_last_oath_heroic.name': '弑座者，荆峰的最后誓言',
   'entities.items.crownforged_dreadhelm_heroic.name': '骨铸恐惧头盔',
@@ -7047,8 +7038,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.instantCast': '下一个有施法时间的法术变为瞬发',
   'hudChrome.auraEffect.cheapCast': '下一个法术消耗降低{pct}%',
   'hudChrome.auraEffect.increase.sp': '法术强度提高 {value}',
-  'hudChrome.options.mouseoverCast': '队伍头像上鼠标悬停施法',
-  'hudChrome.options.showTargetOfTarget': '显示目标的目标',
   'hudChrome.talentRows.tab': '抉择',
   'hudChrome.talentRows.defaultLoadout': '默认配置',
   'hudChrome.talentRows.comingSoon': '敬请期待',
@@ -7059,93 +7048,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.viewTalents': '查看天赋',
   'hudChrome.specPanel.specUnlockBanner': '专精已解锁！',
   'hudChrome.specPanel.specUnlockHint': '按 N 键选择你的专精。',
-  'hudChrome.statInfo.names.haste': '急速',
-  'hudChrome.statInfo.names.parry': '招架',
-  'hudChrome.statInfo.desc.haste': '加快你的武器挥击和法术施放。它不会缩短全局冷却时间。',
-  'hudChrome.statInfo.desc.parry':
-    '你完全招架来自正面近战攻击、不受任何伤害的几率。来自背后的攻击无法被招架。',
-  'hudChrome.paperdoll.offhand': '副手',
-  'hudChrome.auraEffect.battleStance': '战斗姿态：怒气产生提高 10%',
-  'hudChrome.auraEffect.berserkerStance': '狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%',
-  'hudChrome.auraEffect.dmgDone': '造成的伤害提高 {pct}%',
-  'hudChrome.auraEffect.dmgDoneReduce': '造成的伤害降低 {pct}%',
-  'hudChrome.auraEffect.crit': '暴击几率提高 {pct}%',
-  'hudChrome.auraEffect.rageGen': '怒气产生提高 {pct}%',
-  'hudChrome.auraEffect.reckless': '暴击几率提高 {pct}%，怒气产生提高 {ragePct}%',
-  'hudChrome.auraEffect.avatar': '巨像：造成的伤害提高 {pct}%',
-  'hudChrome.auraEffect.bloodbath': '暴击几率和造成的伤害提高 {pct}%',
-  'hudChrome.auraEffect.dieBySword': '受到的伤害降低 {pct}%（生命值低于 {hpPct}% 时为 {lowPct}%）',
-  'hudChrome.auraEffect.sanguine': '攻击速度提高 {hastePct}%，造成的伤害提高 {dmgPct}%',
-  'hudChrome.auraEffect.battleTrance': '你的下一次劫掠打击或蛮力挥击不消耗怒气',
-  'hudChrome.auraEffect.revengeFree': '你的下一次复仇不消耗怒气',
-  'hudChrome.auraEffect.victoryRush': '乘胜追击已就绪',
-  'hudChrome.auraEffect.maxHpPct': '最大生命值提高 {pct}%',
-  'guide.abilityHook.revenge':
-    '一次横扫反击，命中你前方的所有目标；在你架开一击后紧接着施放会更省怒气。',
-  'guide.abilityHook.hamstring': '划伤目标的双腿使其减速，让它无法追上你。',
-  'hud.combat.floatingParry': '招架',
-  'hud.combat.parried': '{target}招架了你的{ability}。',
-  'hud.errors.nothingToConsume': '没有可消耗的效果。',
-  'hud.errors.needShield': '你必须装备盾牌。',
-  'entities.abilities.revenge.name': '复仇',
-  'entities.abilities.revenge.description':
-    '以宽阔的弧线攻击，对你前方所有敌人造成物理伤害。目标超过 5 个时伤害降低。当你躲闪或招架时，你的下一次复仇可能不消耗怒气。',
-  'entities.abilities.battle_stance.name': '战斗姿态',
-  'entities.abilities.battle_stance.description':
-    '一种具有侵略性的战斗姿态：你产生的怒气提高 10%。武器和防护专精的默认姿态。',
-  'entities.abilities.berserker_stance.name': '狂暴姿态',
-  'entities.abilities.berserker_stance.description':
-    '一种鲁莽的战斗姿态：你的暴击几率提高 3%，暴击伤害提高 3%。狂怒战士始终以此姿态作战。',
-  'entities.abilities.sweeping_strikes.name': '扩弧斩',
-  'entities.abilities.sweeping_strikes.description':
-    '持续 12 秒，你的单体攻击还会以 75% 的伤害额外打击 1 个附近的敌人。（武器）',
-  'entities.abilities.deep_wounds.name': '裂创',
-  'entities.abilities.deep_wounds.description':
-    '被动：你的致残打击会使目标流血，在 6 秒内造成物理伤害。（武器）',
-  'entities.abilities.enrage_passive.name': '暴乱',
-  'entities.abilities.enrage_passive.description':
-    '被动：处于激怒状态时，你造成的伤害提高 11%，攻击速度提高 25%，移动速度提高 10%，持续 4 秒。放血有 30% 几率使你激怒；血色收割则必定触发。（狂怒）',
-  'entities.abilities.raging_gale.name': '双重打击',
-  'entities.abilities.raging_gale.description':
-    '立即用武器攻击两次，每次命中造成 60% 武器伤害加 {damage}，并产生 {rage} 点怒气。最多储存 2 次充能。（狂怒）',
-  'entities.abilities.red_harvest.name': '血色收割',
-  'entities.abilities.red_harvest.description':
-    '倾尽所有：在狂乱中攻击三次，每次造成武器伤害加 {damage}。（狂怒）',
-  'entities.abilities.furious_mending.name': '狂怒愈合',
-  'entities.abilities.furious_mending.description':
-    '持续 10 秒，你受到的伤害降低 20%，并且在此期间你的放血会为你治疗相当于最大生命值 20% 的生命。（狂怒）',
-  'entities.abilities.emboldening_roar.name': '鼓舞怒吼',
-  'entities.abilities.emboldening_roar.description':
-    '发出一声鼓舞的怒吼：你和 40 码内的友方玩家获得鼓舞，你接下来的 3 个技能必定暴击。（狂怒）',
-  'entities.abilities.raised_guard.name': '举盾格挡',
-  'entities.abilities.raised_guard.description':
-    '举盾防身：你受到的物理伤害降低 50%，持续 6 秒。最多储存 2 次充能。（防护）',
-  'entities.abilities.iron_resolve.name': '钢铁意志',
-  'entities.abilities.iron_resolve.description':
-    '咬紧牙关无视疼痛：消耗你的全部怒气（至少 20 点），每消耗 1 点怒气吸收 4 点伤害，最多持续 10 秒。（防护）',
-  'entities.abilities.faultline.name': '地裂',
-  'entities.abilities.faultline.description':
-    '沿地面发出一道冲击波：你前方 8 码内的敌人受到 {damage} 点伤害，并昏迷 3 秒。（防护）',
-  'entities.abilities.defiant_bellow.name': '挑衅怒吼',
-  'entities.abilities.defiant_bellow.description':
-    '一声挑衅的怒吼：10 码内的每个敌人都被嘲讽，被迫攻击你 3 秒。（防护）',
-  'entities.abilities.breachmaker.name': '破防者',
-  'entities.abilities.breachmaker.description':
-    '重击目标，造成武器伤害加 {damage}，并破开其防御：你对它的攻击造成的伤害提高 20%，持续 8 秒。（武器）',
-  'entities.abilities.measured_fury.name': '蓄怒',
-  'entities.abilities.measured_fury.description':
-    '你收放自如的怒火让消耗更精打细算：你的技能怒气消耗降低 10%。（武器）',
-  'entities.abilities.seasoned_soldier.name': '沙场老兵',
-  'entities.abilities.seasoned_soldier.description':
-    '你的自动攻击暴击时产生的怒气提高 10%。（武器）',
-  'entities.abilities.diabolical_twinstrike.name': '邪恶双重打击',
-  'entities.abilities.diabolical_twinstrike.description':
-    '处于激怒状态时，你的双重打击造成的伤害提高 15%。（狂怒）',
-  'entities.abilities.cleaving_blows.name': '顺劈打击',
-  'entities.abilities.cleaving_blows.description': '血色收割必定返还一次双重打击的充能。（狂怒）',
-  'entities.abilities.sudden_death.name': '骤死',
-  'entities.abilities.sudden_death.description':
-    '你的自动攻击有几率让你对任意生命值的目标施放早赴黄泉，且不消耗怒气。（武器）',
   'entities.abilities.repentance.name': '忏悔',
   'entities.abilities.repentance.description':
     '使敌人陷入冥想状态，最多持续 6 秒。任何伤害都会打破效果。（惩戒专精标志技能）',
@@ -7192,4 +7094,128 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rallying_cry.name': '集结呐喊',
   'entities.abilities.rallying_cry.description':
     '发出一声集结呐喊，使你和 40 码内的队伍成员获得 20% 的额外最大生命值，持续 10 秒。',
+  'hudChrome.options.showAttackButton': '显示攻击按钮',
+  'hudChrome.partyFrames.section': '队伍和团队框架',
+  'hudChrome.partyFrames.unlock': '移动队伍和团队框架',
+  'hudChrome.partyFrames.lock': '锁定队伍和团队框架',
+  'hudChrome.partyFrames.style': '框架样式',
+  'hudChrome.partyFrames.styleAutomatic': '自动',
+  'hudChrome.partyFrames.styleClassic': '经典队伍框架',
+  'hudChrome.partyFrames.styleRaid': '团队框架',
+  'hudChrome.partyFrames.scale': '框架缩放',
+  'hudChrome.partyFrames.width': '框架宽度',
+  'hudChrome.partyFrames.height': '框架高度',
+  'hudChrome.partyFrames.spacing': '框架间距',
+  'hudChrome.partyFrames.columns': '团队列数',
+  'hudChrome.partyFrames.healthText': '生命值文字',
+  'hudChrome.partyFrames.healthPercent': '百分比',
+  'hudChrome.partyFrames.healthCurrent': '当前值',
+  'hudChrome.partyFrames.healthCurrentMax': '当前值 / 最大值',
+  'hudChrome.partyFrames.sort': '玩家排序',
+  'hudChrome.partyFrames.sortGroup': '小队',
+  'hudChrome.partyFrames.showResource': '显示法力、怒气和能量',
+  'hudChrome.partyFrames.showAbsorbs': '显示吸收护盾',
+  'hudChrome.partyFrames.showAuras': '显示增益和减益',
+  'hudChrome.partyFrames.showSelf': '显示自己的框架',
+  'guide.abilityHook.ice_lance': '用来消耗冰霜触发效果的瞬发冰刺，对冻结目标造成的伤害大幅提高。',
+  'guide.abilityHook.flurry': '快速射出三枚冰弹，使目标寒冷，让你接下来的冰霜法术视其为已冻结。',
+  'guide.abilityHook.fingers_of_frost':
+    '你的冰霜箭有时会强化一次冰枪术，使其命中时视目标为已冻结。',
+  'guide.abilityHook.brain_freeze': '你的冰霜箭有时会使下一次冰风暴瞬发且造成更高伤害。',
+  'guide.abilityHook.shatter': '你的法术对冻结目标的暴击几率大幅提高。',
+  'guide.abilityHook.frozen_orb': '让一颗缓慢的冰球穿过敌群，冻结沿途一切并触发你的冰霜效果。',
+  'guide.abilityHook.blizzard': '以冰雪覆盖一片区域，持续伤害并减速整群敌人。',
+  'guide.abilityHook.blink': '向前瞬移一小段距离，并在离开时解除定身。',
+  'hud.pet.waterJet': '水流喷射',
+  'hud.pet.waterJetTitle': '水流喷射',
+  'hud.pet.waterJetDesc':
+    '命令你的水元素引导减速水流，持续 3 秒。冷却时间 8 秒。右键点击可在冷却结束后自动施放。',
+  'abilityUi.actionBar.attackRemoveHint': '右键点击可将其从动作条移除并空出栏位。',
+  'entities.abilities.ice_lance.name': '冰枪术',
+  'entities.abilities.ice_lance.description':
+    '投掷一枚冰刺，造成 {damage} 点冰霜伤害；对冻结目标造成三倍伤害。消耗寒冰指或一层凛冬之寒，使目标视为已冻结。（冰霜）',
+  'entities.abilities.flurry.name': '冰风暴',
+  'entities.abilities.flurry.description':
+    '连续射出三枚冰弹，每枚造成 {damage} 点冰霜伤害，并对目标施加凛冬之寒：接下来 2 个兼容法术会将其视为已冻结。思维冻结会使冰风暴瞬发、伤害提高 30%，并无视冷却时间。（冰霜）',
+  'entities.abilities.frozen_orb.name': '寒冰宝珠',
+  'entities.abilities.frozen_orb.description':
+    '释放一颗旋转的寒冰宝珠，向前漂移 8 秒，每秒对附近敌人造成 {damage} 点冰霜伤害并使其减速 30%。宝珠命中时会产生寒冰指。（冰霜）',
+  'entities.abilities.blizzard.name': '暴风雪',
+  'entities.abilities.blizzard.description':
+    '在目标区域召唤持续 6 秒的冰风暴，每秒造成 {damage} 点冰霜伤害并使敌人减速 40%。每命中一个敌人，寒冰宝珠的冷却时间缩短 0.5 秒，每次施法最多缩短 3 秒。（冰霜）',
+  'entities.abilities.glacial_spike.name': '冰川尖刺',
+  'entities.abilities.glacial_spike.description':
+    '凝聚一根巨大的冰刺，消耗 5 枚冰刺，造成 {damage} 点冰霜伤害，并将目标冻结在原地 4 秒。（冰霜）',
+  'entities.abilities.glacial_front.name': '冰川锋线',
+  'entities.abilities.glacial_front.description':
+    '按住以积聚逐渐扩大的冰霜锋线，随后以锥形释放。蓄力越久，距离越远、伤害越高。所有命中的敌人减速 50%，持续 4 秒；蓄力至最大还会将其定身 1 秒。（冰霜）',
+  'entities.abilities.dragons_breath.name': '龙息术',
+  'entities.abilities.dragons_breath.description':
+    '按住以积聚逐渐扩大的烈焰吐息，随后以锥形释放。蓄力越久，距离越远、伤害越高。命中的敌人会迷惑，受到伤害时效果解除；蓄力至最大必定暴击，并计为一次炽热连击。（火焰）',
+  'entities.abilities.fingers_of_frost.name': '寒冰指',
+  'entities.abilities.fingers_of_frost.description':
+    '霜缘之矛有 15% 几率赋予寒冰指，最多 2 层：你的下一次冰枪术会将目标视为已冻结。（冰霜）',
+  'entities.abilities.brain_freeze.name': '思维冻结',
+  'entities.abilities.brain_freeze.description':
+    '霜缘之矛有 20% 几率使你的下一次冰风暴变为瞬发、伤害提高 30%，并且不受冷却时间限制。（冰霜）',
+  'entities.abilities.shatter.name': '碎冰',
+  'entities.abilities.shatter.description':
+    '你的法术对冻结目标的暴击几率提高 50%，这些暴击造成的伤害提高 20%。寒冰指和凛冬之寒会将目标视为已冻结。（冰霜）',
+  'entities.abilities.temporal_cascade.name': '时光奔流',
+  'entities.abilities.temporal_cascade.description':
+    '让一道回响在队伍中奔流：立即治疗目标及其至多四名最近的盟友，并为每人施加持续 {duration} 秒的印记；你造成的部分奥术伤害会通过回响转化为对他们的治疗。（时光术）',
+  'entities.abilities.temporal_reversal.name': '时光逆转',
+  'entities.abilities.temporal_reversal.description':
+    '倒转一名阵亡盟友的时间线，使其在遗体处以部分生命值和法力值复活，即使正在激烈战斗中也可使用。（时光术）',
+  'entities.abilities.temporal_rewind.name': '回溯',
+  'entities.abilities.temporal_rewind.description':
+    '向队伍或团队发出一道奥术波，回溯时间，为 40 码内每名盟友恢复其过去 5 秒所受伤害的 30%（最多为其最大生命值的 35%）。此效果无法暴击。（时光术）',
+  'entities.abilities.temporal_acceleration.name': '时间加速',
+  'entities.abilities.temporal_acceleration.description':
+    '加快队伍或团队的时间流速，使攻击、施法和引导速度提高 30%，持续 15 秒。近期受到时间加速或嗜血影响的盟友过于疲惫，无法再次受益。（时光术）',
+  'entities.abilities.perfect_moment.name': '完美时刻',
+  'entities.abilities.perfect_moment.description':
+    '抓住完美时刻：立即获得 4 层奥术充能，并且在 10 秒内，以太飞矢不会消耗这些充能。（时光术）',
+  'entities.abilities.arcane_surge.name': '以太涌动',
+  'entities.abilities.arcane_surge.description':
+    '以原始奥术能量冲击敌人，造成 {damage} 点伤害。每次施放都会留下奥术充能，使你的下一次以太涌动伤害提高、施法加快（每层快 5%），但法力消耗也会急剧提高，最多叠加 4 层；以太飞矢会消耗这些充能。每次施放还有机会触发以太奔流，使你的下一次以太涌动不消耗法力且施法速度翻倍。',
+  'entities.items.conjured_bread4.name': '魔法盛宴面包',
+  'entities.items.conjured_water4.name': '魔法泉水',
+  'entities.abilities.blazing_barrier.name': '炽热屏障',
+  'entities.abilities.blazing_barrier.description':
+    '以烈焰环绕自身，吸收 130 点伤害，持续 60 秒。（火焰）',
+  'entities.abilities.cold_snap.name': '急速冷却',
+  'entities.abilities.cold_snap.description':
+    '立即结束闪烁步、霜幕和强效隐形术的冷却时间。（法师天赋）',
+  'entities.abilities.greater_invisibility.name': '强效隐形术',
+  'entities.abilities.greater_invisibility.description':
+    '消失 20 秒：移除 2 个持续伤害效果，并使你在隐形期间及结束后短时间内受到的伤害降低 90%。（法师天赋）',
+  'entities.abilities.hot_streak.name': '炽热连击',
+  'entities.abilities.hot_streak.description':
+    '被动：你的火焰法术（火球术、火焰冲击、灼烧、炎爆术或烈焰风暴）连续造成两次暴击后，下一次炎爆术或烈焰风暴变为瞬发且不消耗法力。消耗技能会计入下一次连击，包括免费施法；烈焰风暴无论命中多少敌人都只计一次，且只有首次冲击会被计入。（火焰）',
+  'entities.abilities.ice_floes.name': '浮冰',
+  'entities.abilities.ice_floes.description':
+    '你接下来两个有施法时间的法术可以在移动中施放。持续 15 秒。（法师天赋）',
+  'entities.abilities.ignition.name': '点燃',
+  'entities.abilities.ignition.description':
+    '被动：你的法术暴击会灼烧目标，在 6 秒内造成相当于该次伤害 40% 的伤害，可叠加。（火焰精通）',
+  'entities.abilities.mass_barrier.name': '群体屏障',
+  'entities.abilities.mass_barrier.description':
+    '为你和 30 米内至多 4 名附近盟友施加护盾，每个护盾吸收 130 点伤害，持续 60 秒。（法师天赋）',
+  'entities.abilities.overload.name': '超载',
+  'entities.abilities.overload.description':
+    '你的下一个法术效果提高 40%，但法力消耗提高 50%。持续 10 秒。（法师天赋）',
+  'entities.abilities.power_echo.name': '力量回响',
+  'entities.abilities.power_echo.description':
+    '你的下一个直接法术会以 50% 的威力对同一目标重复施放。持续 10 秒。（法师天赋）',
+  'entities.abilities.rings_of_frost.name': '冰霜之环',
+  'entities.abilities.rings_of_frost.description':
+    '召唤一个持续 10 秒的冰霜之环。穿过边缘的敌人会被冻结 4 秒。（法师天赋）',
+  'entities.abilities.rune_of_power.name': '能量符文',
+  'entities.abilities.rune_of_power.description':
+    '在脚下铭刻一个持续 15 秒的能量符文：站在 8 米范围内的盟友造成的伤害提高 10%。（法师天赋）',
+  'entities.abilities.summon_water_elemental.name': '召唤水元素',
+  'entities.abilities.summon_water_elemental.description':
+    '召唤一个水元素与你并肩作战，向你的目标投掷水箭并引导水流喷射。（冰霜）',
+  'entities.mobs.water_elemental.name': '水元素',
 };

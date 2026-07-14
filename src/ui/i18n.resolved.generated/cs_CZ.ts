@@ -871,7 +871,6 @@ export const cs_CZ: EnTranslations = {
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
       "showAttackButton": "Show Attack Button",
-      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
       "mobileLeftHanded": "Rozvržení pro leváky"
@@ -5818,6 +5817,54 @@ export const cs_CZ: EnTranslations = {
         "name": "Kopí jinovatky",
         "description": "Vypustí mrazivý šíp, způsobí {damage} mrazového poškození a zpomalí pohyb o 40 %."
       },
+      "blazing_barrier": {
+        "name": "Ohnivá bariéra",
+        "description": "Obklopíš se plameny a pohltíš 130 bodů poškození po dobu 60 s. (Oheň)"
+      },
+      "cold_snap": {
+        "name": "Ledové sevření",
+        "description": "Okamžitě dokončí dobu obnovení Mžikového kroku, Mrazivého závoje a Dokonalé neviditelnosti. (mágovský talent)"
+      },
+      "greater_invisibility": {
+        "name": "Dokonalá neviditelnost",
+        "description": "Na 20 s zmizíš: odstraní 2 efekty průběžného poškození a během neviditelnosti i krátce po ní utrpíš o 90 % méně poškození. (mágovský talent)"
+      },
+      "hot_streak": {
+        "name": "Žhavá série",
+        "description": "Pasivní: dva kritické zásahy v řadě ohnivými kouzly (Škvárový šíp, Pád škváry, Opaření, Žárové kopí nebo Plamenný úder) učiní tvé příští Žárové kopí nebo Plamenný úder okamžitým a bez nákladů. Spotřebovávající kouzla se započítávají do DALŠÍ série, včetně bezplatných seslání; Plamenný úder se započítá jen jednou bez ohledu na počet zasažených nepřátel a vždy se počítá pouze úvodní zásah. (Oheň)"
+      },
+      "ice_floes": {
+        "name": "Ledové kry",
+        "description": "Tvoje příští dvě kouzla s dobou sesílání lze seslat za pohybu. Trvá 15 s. (mágovský talent)"
+      },
+      "ignition": {
+        "name": "Vznícení",
+        "description": "Pasivní: kritické zásahy tvých kouzel spalují cíl za 40 % způsobeného poškození během 6 s a účinek se sčítá. (mistrovství Ohně)"
+      },
+      "mass_barrier": {
+        "name": "Hromadná bariéra",
+        "description": "Ochrání tebe a až 4 blízké spojence v dosahu 30 m; každá bariéra pohltí 130 bodů poškození po dobu 60 s. (mágovský talent)"
+      },
+      "overload": {
+        "name": "Přetížení",
+        "description": "Tvoje příští kouzlo je posíleno o 40 %, ale stojí o 50 % více many. Trvá 10 s. (mágovský talent)"
+      },
+      "power_echo": {
+        "name": "Ozvěna moci",
+        "description": "Tvoje příští přímé kouzlo se na stejném cíli zopakuje s 50 % síly. Trvá 10 s. (mágovský talent)"
+      },
+      "rings_of_frost": {
+        "name": "Kruh mrazu",
+        "description": "Vyvolá na 10 s kruh. Nepřátelé, kteří překročí jeho okraj, budou na 4 s zmrazeni. (mágovský talent)"
+      },
+      "rune_of_power": {
+        "name": "Runa moci",
+        "description": "Na 15 s si pod nohy vryješ runu moci: spojenci stojící v dosahu 8 m způsobují o 10 % více poškození. (mágovský talent)"
+      },
+      "summon_water_elemental": {
+        "name": "Vyvolat vodního elementála",
+        "description": "Vyvolá vodního elementála, který bojuje po tvém boku, vrhá na tvůj cíl Vodní střely a usměrňuje Vodní proud. (Mráz)"
+      },
       "ice_lance": {
         "name": "Ice Lance",
         "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
@@ -6422,9 +6469,21 @@ export const cs_CZ: EnTranslations = {
         "name": "Prvotní mistrovství",
         "description": "Povolá bouři a tvé příští kouzlo sešle okamžitě. (klíčová schopnost Živlů)"
       },
+      "shamanistic_rage": {
+        "name": "Shamanistic Rage",
+        "description": "Releases shamanistic rage, restoring 160 mana. (Enhancement signature)"
+      },
+      "natures_swiftness": {
+        "name": "Nature's Swiftness",
+        "description": "Calls on nature to make your next spell instant. (Restoration signature)"
+      },
       "siphon_life": {
         "name": "Žilopijec",
         "description": "Vysává život nepřítele, způsobí mu {damage} stínového poškození během 30 s a vyléčí tě za způsobené poškození. (klíčová schopnost Utrpení)"
+      },
+      "fel_domination": {
+        "name": "Fel Domination",
+        "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
       },
       "conflagrate": {
         "name": "Vzplanutí",
@@ -7517,6 +7576,12 @@ export const cs_CZ: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Bojová hůl z uhlíkového skla"
       },
+      "conjured_water4": {
+        "name": "Vyčarovaná pramenitá voda"
+      },
+      "conjured_bread4": {
+        "name": "Vyčarovaný hodovní bochník"
+      },
       "bristleback_maul": {
         "name": "Gallowglassské kladivo"
       },
@@ -8586,6 +8651,9 @@ export const cs_CZ: EnTranslations = {
       },
       "ysolei": {
         "name": "Ysolei, avatar utopeného měsíce"
+      },
+      "water_elemental": {
+        "name": "Vodní elementál"
       }
     },
     "npcs": {

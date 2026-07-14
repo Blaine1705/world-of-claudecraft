@@ -74,7 +74,7 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
     roleType: 'hybrid',
     armorKey: 'classDetails.armor.leatherCloth',
     weaponsKey: 'classDetails.weapons.staves',
-  }
+  },
 };
 
 // Three curated "signature" abilities per class, shown on the select screen.

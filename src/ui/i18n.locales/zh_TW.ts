@@ -6891,7 +6891,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': '在 {level} 級解鎖',
   'hudChrome.fct.absorbed': '吸收 {amount}',
   'hudChrome.fct.cheap': '費用降低!',
-  'itemUi.slots.twoHand': '雙手',
   'entities.abilities.temporal_mend.name': '時光縫合',
   'entities.abilities.temporal_mend.description':
     '將盟友向前拉動一瞬，在身體安定於更健康的未來形態時治療{damage}點生命值。(時光術特色技能)',
@@ -7021,14 +7020,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.silence.description': '沉默目標，持續 4 秒。（牧師天賦）',
   'entities.abilities.tranquility.name': '林地之歌',
   'entities.abilities.tranquility.description': '引導恢復之力，每秒治療附近的盟友。（德魯伊天賦）',
-  'entities.items.eastbrook_buckler.name': '東溪小圓盾',
-  'entities.items.eastbrook_greatsword.name': '東溪巨劍',
-  'entities.items.highwatch_wallshield.name': '高望壁盾',
-  'entities.items.highwatch_greatsword.name': '高望巨劍',
-  'entities.items.deathless_warguard_legmail.name': '不死戰衛腿甲',
-  'entities.items.soulrend_diadem.name': '裂魂冠冕',
-  'entities.items.scourgehide_carapace.name': '災禍之皮甲殼',
-  'entities.items.soulforged_warplate.name': '鑄魂戰甲',
   'entities.items.deathless_heartwood_heroic.name': '不朽王冠之心木',
   'entities.items.kingsbane_last_oath_heroic.name': '弒座者，荊峰的最後誓言',
   'entities.items.crownforged_dreadhelm_heroic.name': '骨鑄恐懼頭盔',
@@ -7047,8 +7038,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.instantCast': '下一個有施法時間的法術變為瞬發',
   'hudChrome.auraEffect.cheapCast': '下一個法術消耗降低{pct}%',
   'hudChrome.auraEffect.increase.sp': '法術強度提高 {value}',
-  'hudChrome.options.mouseoverCast': '對隊伍框架滑鼠指向施法',
-  'hudChrome.options.showTargetOfTarget': '顯示目標的目標',
   'hudChrome.talentRows.tab': '抉擇',
   'hudChrome.talentRows.defaultLoadout': '預設配置',
   'hudChrome.talentRows.comingSoon': '敬請期待',
@@ -7059,92 +7048,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.viewTalents': '檢視天賦',
   'hudChrome.specPanel.specUnlockBanner': '專精已解鎖！',
   'hudChrome.specPanel.specUnlockHint': '按 N 選擇你的專精。',
-  'hudChrome.statInfo.names.haste': '急速',
-  'hudChrome.statInfo.names.parry': '招架',
-  'hudChrome.statInfo.desc.haste': '加快你的武器揮擊與法術施放。它不會縮短全域冷卻時間。',
-  'hudChrome.statInfo.desc.parry':
-    '你招架正面近戰攻擊、完全不受傷害的機率。來自背後的攻擊無法招架。',
-  'hudChrome.paperdoll.offhand': '副手',
-  'hudChrome.auraEffect.battleStance': '戰鬥姿態：怒氣產生提高 10%',
-  'hudChrome.auraEffect.berserkerStance': '狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%',
-  'hudChrome.auraEffect.dmgDone': '造成的傷害提高 {pct}%',
-  'hudChrome.auraEffect.dmgDoneReduce': '造成的傷害降低 {pct}%',
-  'hudChrome.auraEffect.crit': '暴擊機率提高 {pct}%',
-  'hudChrome.auraEffect.rageGen': '怒氣產生提高 {pct}%',
-  'hudChrome.auraEffect.reckless': '暴擊機率提高 {pct}%，怒氣產生提高 {ragePct}%',
-  'hudChrome.auraEffect.avatar': '巨像：造成的傷害提高 {pct}%',
-  'hudChrome.auraEffect.bloodbath': '暴擊機率與造成的傷害提高 {pct}%',
-  'hudChrome.auraEffect.dieBySword': '受到的傷害降低 {pct}%（生命值低於 {hpPct}% 時為 {lowPct}%）',
-  'hudChrome.auraEffect.sanguine': '攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%',
-  'hudChrome.auraEffect.battleTrance': '你的下一次劫掠打擊或蠻力揮擊不消耗怒氣',
-  'hudChrome.auraEffect.revengeFree': '你的下一次復仇不消耗怒氣',
-  'hudChrome.auraEffect.victoryRush': '乘勝追擊已就緒',
-  'hudChrome.auraEffect.maxHpPct': '最大生命值提高 {pct}%',
-  'guide.abilityHook.revenge': '一記橫掃你正面所有敵人的反擊，在你格開一記攻擊之後施放會更省怒氣。',
-  'guide.abilityHook.hamstring': '砍向目標的雙腿使其減速，讓它無法追上你。',
-  'hud.combat.floatingParry': '招架',
-  'hud.combat.parried': '你的{ability}被{target}招架了。',
-  'hud.errors.nothingToConsume': '沒有可供消耗的效果。',
-  'hud.errors.needShield': '你必須裝備盾牌。',
-  'entities.abilities.revenge.name': '復仇',
-  'entities.abilities.revenge.description':
-    '以大幅弧線攻擊，對你正面的所有敵人造成物理傷害。超過 5 個目標時傷害會降低。當你閃躲或招架時，你的下一次復仇可能不消耗怒氣。',
-  'entities.abilities.battle_stance.name': '戰鬥姿態',
-  'entities.abilities.battle_stance.description':
-    '一種進攻性的戰鬥姿態：你產生的怒氣提高 10%。這是武器與防護的預設姿態。',
-  'entities.abilities.berserker_stance.name': '狂暴姿態',
-  'entities.abilities.berserker_stance.description':
-    '一種魯莽的戰鬥姿態：你的暴擊機率提高 3%，暴擊傷害提高 3%。狂怒戰士總是以這個姿態作戰。',
-  'entities.abilities.sweeping_strikes.name': '擴弧斬',
-  'entities.abilities.sweeping_strikes.description':
-    '持續 12 秒，你的單體攻擊還會以 75% 傷害額外打擊 1 名附近的敵人。（武器）',
-  'entities.abilities.deep_wounds.name': '撕裂創傷',
-  'entities.abilities.deep_wounds.description':
-    '被動：你的致殘打擊使目標在 6 秒內流血並受到物理傷害。（武器）',
-  'entities.abilities.enrage_passive.name': '狂亂',
-  'entities.abilities.enrage_passive.description':
-    '被動：處於激怒狀態時，你造成的傷害提高 11%、攻擊速度提高 25%、移動速度提高 10%，持續 4 秒。深切裂傷有 30% 機率使你激怒；血色收割則必定使你激怒。（狂怒）',
-  'entities.abilities.raging_gale.name': '雙擊',
-  'entities.abilities.raging_gale.description':
-    '立即以武器攻擊兩次，每擊造成 60% 武器傷害外加 {damage}，並產生 {rage} 點怒氣。最多儲存 2 次充能。（狂怒）',
-  'entities.abilities.red_harvest.name': '血色收割',
-  'entities.abilities.red_harvest.description':
-    '傾盡所有：在狂亂中攻擊三次，每擊造成武器傷害外加 {damage}。（狂怒）',
-  'entities.abilities.furious_mending.name': '狂怒療傷',
-  'entities.abilities.furious_mending.description':
-    '持續 10 秒，你受到的傷害降低 20%，且在效果持續期間，你的深切裂傷會治療你 20% 的最大生命值。（狂怒）',
-  'entities.abilities.emboldening_roar.name': '壯膽怒吼',
-  'entities.abilities.emboldening_roar.description':
-    '發出壯膽的怒吼：你與 40 碼內的友方玩家獲得壯膽效果，且你接下來的 3 個技能必定是暴擊。（狂怒）',
-  'entities.abilities.raised_guard.name': '舉盾防禦',
-  'entities.abilities.raised_guard.description':
-    '舉盾防禦：你受到的物理傷害降低 50%，持續 6 秒。最多儲存 2 次充能。（防護）',
-  'entities.abilities.iron_resolve.name': '鋼鐵意志',
-  'entities.abilities.iron_resolve.description':
-    '咬緊牙關無視痛楚：消耗你所有的怒氣（最低 20 點），每消耗 1 點怒氣便吸收 4 點傷害，最多持續 10 秒。（防護）',
-  'entities.abilities.faultline.name': '斷層',
-  'entities.abilities.faultline.description':
-    '沿地面送出一道衝擊波：你正面 8 碼內的敵人受到 {damage} 點傷害並昏迷 3 秒。（防護）',
-  'entities.abilities.defiant_bellow.name': '挑釁怒吼',
-  'entities.abilities.defiant_bellow.description':
-    '一聲挑釁的怒吼：10 碼內的每個敵人都被嘲諷，被迫攻擊你 3 秒。（防護）',
-  'entities.abilities.breachmaker.name': '破防者',
-  'entities.abilities.breachmaker.description':
-    '重擊目標，造成武器傷害外加 {damage}，並破開它的防禦：你對它的攻擊在 8 秒內造成的傷害提高 20%。（武器）',
-  'entities.abilities.measured_fury.name': '節制之怒',
-  'entities.abilities.measured_fury.description':
-    '你節制的怒火磨利了你的資源運用：你的技能消耗的怒氣降低 10%。（武器）',
-  'entities.abilities.seasoned_soldier.name': '沙場老兵',
-  'entities.abilities.seasoned_soldier.description':
-    '你的自動攻擊暴擊時多產生 10% 的怒氣。（武器）',
-  'entities.abilities.diabolical_twinstrike.name': '邪惡雙擊',
-  'entities.abilities.diabolical_twinstrike.description':
-    '處於激怒狀態時，你的雙擊造成的傷害提高 15%。（狂怒）',
-  'entities.abilities.cleaving_blows.name': '順劈連擊',
-  'entities.abilities.cleaving_blows.description': '血色收割必定返還一次雙擊的充能。（狂怒）',
-  'entities.abilities.sudden_death.name': '猝死',
-  'entities.abilities.sudden_death.description':
-    '你的自動攻擊有機率讓你能對任何生命值的目標施放提早入土，且不消耗怒氣。（武器）',
   'entities.abilities.repentance.name': '懺悔',
   'entities.abilities.repentance.description':
     '使敵人陷入冥想狀態，最多持續 6 秒。任何傷害都會打破效果。（懲戒專精標誌技能）',
@@ -7191,4 +7094,128 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rallying_cry.name': '團結號令',
   'entities.abilities.rallying_cry.description':
     '發出一聲團結的號令，使你與 40 碼內的隊伍成員最大生命值提高 20%，持續 10 秒。',
+  'hudChrome.options.showAttackButton': '顯示攻擊按鈕',
+  'hudChrome.partyFrames.section': '隊伍與團隊框架',
+  'hudChrome.partyFrames.unlock': '移動隊伍與團隊框架',
+  'hudChrome.partyFrames.lock': '鎖定隊伍與團隊框架',
+  'hudChrome.partyFrames.style': '框架樣式',
+  'hudChrome.partyFrames.styleAutomatic': '自動',
+  'hudChrome.partyFrames.styleClassic': '經典隊伍框架',
+  'hudChrome.partyFrames.styleRaid': '團隊框架',
+  'hudChrome.partyFrames.scale': '框架縮放',
+  'hudChrome.partyFrames.width': '框架寬度',
+  'hudChrome.partyFrames.height': '框架高度',
+  'hudChrome.partyFrames.spacing': '框架間距',
+  'hudChrome.partyFrames.columns': '團隊欄數',
+  'hudChrome.partyFrames.healthText': '生命值文字',
+  'hudChrome.partyFrames.healthPercent': '百分比',
+  'hudChrome.partyFrames.healthCurrent': '目前值',
+  'hudChrome.partyFrames.healthCurrentMax': '目前值 / 最大值',
+  'hudChrome.partyFrames.sort': '玩家排序',
+  'hudChrome.partyFrames.sortGroup': '小隊',
+  'hudChrome.partyFrames.showResource': '顯示法力、怒氣與能量',
+  'hudChrome.partyFrames.showAbsorbs': '顯示吸收護盾',
+  'hudChrome.partyFrames.showAuras': '顯示增益與減益',
+  'hudChrome.partyFrames.showSelf': '顯示自己的框架',
+  'guide.abilityHook.ice_lance': '用來消耗冰霜觸發效果的瞬發冰刺，對凍結目標造成的傷害大幅提高。',
+  'guide.abilityHook.flurry': '快速射出三枚冰彈，使目標寒冷，讓你接下來的冰霜法術視其為已凍結。',
+  'guide.abilityHook.fingers_of_frost':
+    '你的冰霜箭有時會強化一次冰槍術，使其命中時將目標視為已凍結。',
+  'guide.abilityHook.brain_freeze': '你的冰霜箭有時會使下一次冰風暴瞬發且造成更高傷害。',
+  'guide.abilityHook.shatter': '你的法術對凍結目標的致命一擊機率大幅提高。',
+  'guide.abilityHook.frozen_orb': '讓一顆緩慢的冰球穿過敵群，冰凍沿途的一切並觸發你的冰霜效果。',
+  'guide.abilityHook.blizzard': '以冰雪覆蓋一片區域，持續傷害並緩速整群敵人。',
+  'guide.abilityHook.blink': '向前瞬移一小段距離，並在離開時解除定身。',
+  'hud.pet.waterJet': '水流噴射',
+  'hud.pet.waterJetTitle': '水流噴射',
+  'hud.pet.waterJetDesc':
+    '命令你的水元素引導緩速水流，持續 3 秒。冷卻時間 8 秒。按右鍵可在冷卻結束後自動施放。',
+  'abilityUi.actionBar.attackRemoveHint': '按右鍵可將其從快捷列移除並空出欄位。',
+  'entities.abilities.ice_lance.name': '冰槍術',
+  'entities.abilities.ice_lance.description':
+    '投擲一枚冰刺，造成 {damage} 點冰霜傷害；對凍結目標造成三倍傷害。消耗寒冰指或一層凜冬之寒，使目標視為已凍結。（冰霜）',
+  'entities.abilities.flurry.name': '冰風暴',
+  'entities.abilities.flurry.description':
+    '連續射出三枚冰彈，每枚造成 {damage} 點冰霜傷害，並對目標施加凜冬之寒：接下來 2 個相容法術會將其視為已凍結。思維凍結會使冰風暴瞬發、傷害提高 30%，並跳過冷卻時間。（冰霜）',
+  'entities.abilities.frozen_orb.name': '寒冰寶珠',
+  'entities.abilities.frozen_orb.description':
+    '釋放一顆旋轉的寒冰寶珠，向前飄移 8 秒，每秒對附近敵人造成 {damage} 點冰霜傷害並使其緩速 30%。寶珠命中時會產生寒冰指。（冰霜）',
+  'entities.abilities.blizzard.name': '暴風雪',
+  'entities.abilities.blizzard.description':
+    '在目標區域召喚持續 6 秒的冰風暴，每秒造成 {damage} 點冰霜傷害並使敵人緩速 40%。每命中一名敵人，寒冰寶珠的冷卻時間縮短 0.5 秒，每次施法最多縮短 3 秒。（冰霜）',
+  'entities.abilities.glacial_spike.name': '冰川尖刺',
+  'entities.abilities.glacial_spike.description':
+    '凝聚一根巨大的冰刺，消耗 5 枚冰柱，造成 {damage} 點冰霜傷害，並將目標凍結在原地 4 秒。（冰霜）',
+  'entities.abilities.glacial_front.name': '冰川鋒線',
+  'entities.abilities.glacial_front.description':
+    '按住以積聚逐漸擴大的冰霜鋒線，隨後以錐形釋放。蓄力越久，距離越遠、傷害越高。所有命中的敵人緩速 50%，持續 4 秒；蓄力至最大還會將其定身 1 秒。（冰霜）',
+  'entities.abilities.dragons_breath.name': '龍之吐息',
+  'entities.abilities.dragons_breath.description':
+    '按住以積聚逐漸擴大的烈焰吐息，隨後以錐形釋放。蓄力越久，距離越遠、傷害越高。命中的敵人會迷惑，受到傷害時效果解除；蓄力至最大必定造成致命一擊，並計為一次熾熱連擊。（火焰）',
+  'entities.abilities.fingers_of_frost.name': '寒冰指',
+  'entities.abilities.fingers_of_frost.description':
+    '霜緣之矛有 15% 機率賦予寒冰指，最多 2 層：你的下一次冰槍術會將目標視為已凍結。（冰霜）',
+  'entities.abilities.brain_freeze.name': '思維凍結',
+  'entities.abilities.brain_freeze.description':
+    '霜緣之矛有 20% 機率使你的下一次冰風暴變為瞬發、傷害提高 30%，並且不受冷卻時間限制。（冰霜）',
+  'entities.abilities.shatter.name': '碎冰',
+  'entities.abilities.shatter.description':
+    '你的法術對凍結目標的致命一擊機率提高 50%，這些致命一擊造成的傷害提高 20%。寒冰指和凜冬之寒會將目標視為已凍結。（冰霜）',
+  'entities.abilities.temporal_cascade.name': '時光奔流',
+  'entities.abilities.temporal_cascade.description':
+    '讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。（時光術）',
+  'entities.abilities.temporal_reversal.name': '時光逆轉',
+  'entities.abilities.temporal_reversal.description':
+    '倒轉一名陣亡盟友的時間線，使其在遺體處以部分生命值與法力值復活，即使正在激烈戰鬥中也能使用。（時光術）',
+  'entities.abilities.temporal_rewind.name': '回溯',
+  'entities.abilities.temporal_rewind.description':
+    '向隊伍或團隊發出一道秘法波，回溯時間，為 40 碼內每名盟友恢復其過去 5 秒所受傷害的 30%（最多為其最大生命值的 35%）。此效果無法造成致命一擊。（時光術）',
+  'entities.abilities.temporal_acceleration.name': '時間加速',
+  'entities.abilities.temporal_acceleration.description':
+    '加快隊伍或團隊的時間流速，使攻擊、施法與引導速度提高 30%，持續 15 秒。近期受到時間加速或嗜血影響的盟友過於疲憊，無法再次受益。（時光術）',
+  'entities.abilities.perfect_moment.name': '完美時刻',
+  'entities.abilities.perfect_moment.description':
+    '抓住完美時刻：立即獲得 4 層秘法充能，並且在 10 秒內，以太飛矢不會消耗這些充能。（時光術）',
+  'entities.abilities.arcane_surge.name': '以太湧動',
+  'entities.abilities.arcane_surge.description':
+    '以原始秘法能量衝擊敵人，造成 {damage} 點傷害。每次施放都會留下秘法充能，使你的下一次以太湧動傷害提高、施法加快（每層快 5%），但法力消耗也會急遽提高，最多堆疊 4 層；以太飛矢會消耗這些充能。每次施放還有機會觸發以太奔流，使你的下一次以太湧動不消耗法力且施法速度加倍。',
+  'entities.items.conjured_bread4.name': '魔法盛宴麵包',
+  'entities.items.conjured_water4.name': '魔法泉水',
+  'entities.abilities.blazing_barrier.name': '烈焰屏障',
+  'entities.abilities.blazing_barrier.description':
+    '以烈焰環繞自身，吸收 130 點傷害，持續 60 秒。（火焰）',
+  'entities.abilities.cold_snap.name': '急速冷卻',
+  'entities.abilities.cold_snap.description':
+    '立即結束閃爍步、霜幕與強效隱形術的冷卻時間。（法師天賦）',
+  'entities.abilities.greater_invisibility.name': '強效隱形術',
+  'entities.abilities.greater_invisibility.description':
+    '消失 20 秒：移除 2 個持續傷害效果，並使你在隱形期間及結束後短時間內受到的傷害降低 90%。（法師天賦）',
+  'entities.abilities.hot_streak.name': '熾熱連擊',
+  'entities.abilities.hot_streak.description':
+    '被動：你的火焰法術（火球術、火焰衝擊、灼燒、炎爆術或烈焰風暴）連續造成兩次致命一擊後，下一次炎爆術或烈焰風暴變為瞬發且不消耗法力。消耗技能會計入下一次連擊，包括免費施法；烈焰風暴無論命中多少敵人都只計一次，且只有首次衝擊會被計入。（火焰）',
+  'entities.abilities.ice_floes.name': '浮冰',
+  'entities.abilities.ice_floes.description':
+    '你接下來兩個有施法時間的法術可以在移動中施放。持續 15 秒。（法師天賦）',
+  'entities.abilities.ignition.name': '點燃',
+  'entities.abilities.ignition.description':
+    '被動：你的法術致命一擊會灼燒目標，在 6 秒內造成相當於該次傷害 40% 的傷害，可堆疊。（火焰精通）',
+  'entities.abilities.mass_barrier.name': '群體屏障',
+  'entities.abilities.mass_barrier.description':
+    '為你與 30 公尺內至多 4 名附近盟友施加護盾，每個護盾吸收 130 點傷害，持續 60 秒。（法師天賦）',
+  'entities.abilities.overload.name': '超載',
+  'entities.abilities.overload.description':
+    '你的下一個法術效果提高 40%，但法力消耗提高 50%。持續 10 秒。（法師天賦）',
+  'entities.abilities.power_echo.name': '力量回音',
+  'entities.abilities.power_echo.description':
+    '你的下一個直接法術會以 50% 的威力對同一目標重複施放。持續 10 秒。（法師天賦）',
+  'entities.abilities.rings_of_frost.name': '冰霜之環',
+  'entities.abilities.rings_of_frost.description':
+    '召喚一個持續 10 秒的冰霜之環。穿過邊緣的敵人會被凍結 4 秒。（法師天賦）',
+  'entities.abilities.rune_of_power.name': '能量符文',
+  'entities.abilities.rune_of_power.description':
+    '在腳下銘刻一個持續 15 秒的能量符文：站在 8 公尺範圍內的盟友造成的傷害提高 10%。（法師天賦）',
+  'entities.abilities.summon_water_elemental.name': '召喚水元素',
+  'entities.abilities.summon_water_elemental.description':
+    '召喚一個水元素與你並肩作戰，向你的目標投擲水箭並引導水流噴射。（冰霜）',
+  'entities.mobs.water_elemental.name': '水元素',
 };

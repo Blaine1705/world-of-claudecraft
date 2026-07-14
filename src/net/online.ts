@@ -11,9 +11,9 @@ import {
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
+import { computeModifiersWithRows, emptyRowPicks, type RowPicks } from '../sim/content/talent_rows';
 import {
   cloneAllocation,
-  computeTalentModifiers,
   emptyAllocation,
   type Role,
   rowsPicked,
@@ -1124,6 +1124,7 @@ export class ClientWorld implements IWorld {
   talentRole: Role | null = null;
   loadouts: SavedLoadout[] = [];
   activeLoadout = -1;
+  rowPicks: RowPicks = emptyRowPicks();
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
   // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
@@ -2145,8 +2146,10 @@ export class ClientWorld implements IWorld {
         this.talentRole = s.tal.role ?? null;
         this.loadouts = s.tal.loadouts ?? [];
         this.activeLoadout = typeof s.tal.activeLoadout === 'number' ? s.tal.activeLoadout : -1;
+        this.rowPicks = Array.isArray(s.tal.rowPicks) ? s.tal.rowPicks : emptyRowPicks();
       }
       if (!this.talents) this.talents = emptyAllocation();
+      if (!this.rowPicks) this.rowPicks = emptyRowPicks();
       const talents = this.talents;
       // IWorldValeCup sport-kit swap (the wire trap, docs/prd/vale-cup.md): a
       // server-side meta.known swap is invisible to this derived rebuild, so
@@ -2160,7 +2163,7 @@ export class ClientWorld implements IWorld {
         : abilitiesKnownAt(
             this.cfg.playerClass,
             e.level,
-            computeTalentModifiers(this.cfg.playerClass, talents, e.level),
+            computeModifiersWithRows(this.cfg.playerClass, talents, this.rowPicks, e.level),
           );
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
@@ -3261,6 +3264,9 @@ export class ClientWorld implements IWorld {
   setSpec(specId: string | null): void {
     this.cmd({ cmd: 'setSpec', spec: specId });
   }
+  pickRowTalent(rowIndex: number, optionId: string | null): void {
+    this.cmd({ cmd: 'pickRowTalent', row: rowIndex, option: optionId });
+  }
   saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void {
     this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
     if (alloc) {
@@ -3281,7 +3287,12 @@ export class ClientWorld implements IWorld {
       this.known = abilitiesKnownAt(
         this.cfg.playerClass,
         this.player.level,
-        computeTalentModifiers(this.cfg.playerClass, this.talents, this.player.level),
+        computeModifiersWithRows(
+          this.cfg.playerClass,
+          this.talents,
+          this.rowPicks,
+          this.player.level,
+        ),
       );
     }
   }
@@ -3302,7 +3313,12 @@ export class ClientWorld implements IWorld {
         this.known = abilitiesKnownAt(
           this.cfg.playerClass,
           this.player.level,
-          computeTalentModifiers(this.cfg.playerClass, this.talents, this.player.level),
+          computeModifiersWithRows(
+            this.cfg.playerClass,
+            this.talents,
+            this.rowPicks,
+            this.player.level,
+          ),
         );
       }
     } else if (this.activeLoadout > index) this.activeLoadout -= 1;

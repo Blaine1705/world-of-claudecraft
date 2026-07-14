@@ -34,7 +34,15 @@ function enemy(sim: Sim): Entity {
 function hit(sim: Sim, source: Entity | null, target: Entity, amount: number): void {
   (
     sim as unknown as {
-      dealDamage(s: Entity | null, t: Entity, n: number, c: boolean, sc: string, a: string | null, k: string): void;
+      dealDamage(
+        s: Entity | null,
+        t: Entity,
+        n: number,
+        c: boolean,
+        sc: string,
+        a: string | null,
+        k: string,
+      ): void;
     }
   ).dealDamage(source, target, amount, false, 'physical', null, 'hit');
 }
@@ -89,7 +97,12 @@ describe('Cauterize', () => {
     // The fatigue is one of the few auras that SURVIVES death (resurrection.ts).
     expect(p.auras.some((a) => a.kind === 'cauterize_fatigue')).toBe(true);
     // Revive and take another killing blow inside the window: no save.
-    revivePlayerAt((sim as unknown as { ctx: Parameters<typeof revivePlayerAt>[0] }).ctx, p.id, p.pos, 1);
+    revivePlayerAt(
+      (sim as unknown as { ctx: Parameters<typeof revivePlayerAt>[0] }).ctx,
+      p.id,
+      p.pos,
+      1,
+    );
     expect(p.dead).toBe(false);
     expect(p.auras.some((a) => a.kind === 'cauterize_fatigue')).toBe(true); // still worn
     hit(sim, mob, p, 999_999);
@@ -102,9 +115,7 @@ describe('Cauterize', () => {
     hit(sim, mob, p, 999_999);
     expect(p.dead).toBe(false);
     // Simulate the 5 minutes elapsing: drop the fatigue (and the burn), heal up.
-    p.auras = p.auras.filter(
-      (a) => a.kind !== 'cauterize_fatigue' && a.id !== 'cauterizing',
-    );
+    p.auras = p.auras.filter((a) => a.kind !== 'cauterize_fatigue' && a.id !== 'cauterizing');
     p.hp = p.maxHp;
     hit(sim, mob, p, 999_999); // fatigue gone: Cauterize saves again
     expect(p.dead).toBe(false);

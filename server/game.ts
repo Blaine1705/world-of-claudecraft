@@ -4169,6 +4169,15 @@ export class GameServer {
       case 'setSpec':
         sim.setSpec(typeof msg.spec === 'string' ? msg.spec : null, pid);
         break;
+      case 'pickRowTalent': {
+        const row = typeof msg.row === 'number' ? msg.row | 0 : -1;
+        const option =
+          typeof msg.option === 'string' && msg.option.length <= 64 ? msg.option : null;
+        if (row >= 0 && (option !== null || msg.option === null)) {
+          sim.pickRowTalent(row, option, pid);
+        }
+        break;
+      }
       case 'saveLoadout': {
         const alloc = talentAllocationFromWire(msg.alloc) ?? undefined;
         if (typeof msg.name === 'string')
@@ -4675,8 +4684,7 @@ export class GameServer {
             (ring) =>
               `{"id":${JSON.stringify(ring.id)},"x":${round2(ring.x)},"z":${round2(ring.z)},"r":${round2(ring.radius)},"i":${round2(ring.innerRadius)},"dur":${round2(ring.duration)},"rem":${round2(ring.remaining)}}`,
           );
-        const frostRingsJson =
-          frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
+        const frostRingsJson = frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
         this.sendRaw(
           session,
           `${head},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${keepJson}}`,
@@ -4982,6 +4990,10 @@ export class GameServer {
                 level: e.level,
                 hp: e.hp,
                 mhp: e.maxHp,
+                absorb: e.auras.reduce(
+                  (sum, aura) => sum + (aura.kind === 'absorb' ? Math.max(0, aura.value) : 0),
+                  0,
+                ),
                 res: Math.round(e.resource),
                 mres: e.maxResource,
                 rtype: e.resourceType,

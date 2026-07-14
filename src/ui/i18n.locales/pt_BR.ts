@@ -2823,6 +2823,42 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': 'Lança de Geada',
   'entities.abilities.frostbolt.description':
     'Lança uma seta de gelo, causando {damage} de dano de Gelo e reduzindo a velocidade de movimento em 40%.',
+  'entities.abilities.blazing_barrier.name': 'Barreira Flamejante',
+  'entities.abilities.blazing_barrier.description':
+    'Envolve você em chamas, absorvendo 130 de dano por 60 s. (Fogo)',
+  'entities.abilities.cold_snap.name': 'Estalo Gélido',
+  'entities.abilities.cold_snap.description':
+    'Encerra o tempo de recarga de Passo Cintilante, Véu de Gelo e Invisibilidade Maior. (Talento de mago)',
+  'entities.abilities.greater_invisibility.name': 'Invisibilidade Maior',
+  'entities.abilities.greater_invisibility.description':
+    'Desaparece por 20 s: remove 2 efeitos de dano periódico e reduz o dano recebido em 90% enquanto você está invisível e por pouco tempo depois. (Talento de mago)',
+  'entities.abilities.hot_streak.name': 'Embalo Ardente',
+  'entities.abilities.hot_streak.description':
+    'Passivo: dois acertos críticos seguidos com suas magias de Fogo (Bola de Fogo, Impacto de Fogo, Calcinar, Piroexplosão ou Coluna de Chamas) tornam sua próxima Piroexplosão ou Coluna de Chamas instantânea e gratuita. As magias que consomem o efeito contam para o PRÓXIMO embalo, inclusive lançamentos gratuitos; Coluna de Chamas conta uma vez, não importa quantos inimigos atinja, e apenas o impacto inicial pode contar. (Fogo)',
+  'entities.abilities.ice_floes.name': 'Bancos de Gelo',
+  'entities.abilities.ice_floes.description':
+    'Suas próximas duas magias com tempo de lançamento podem ser lançadas em movimento. Dura 15 s. (Talento de mago)',
+  'entities.abilities.ignition.name': 'Ignição',
+  'entities.abilities.ignition.description':
+    'Passivo: os acertos críticos das suas magias queimam o alvo, causando 40% do dano provocado ao longo de 6 s; acumula. (Maestria de Fogo)',
+  'entities.abilities.mass_barrier.name': 'Barreira em Massa',
+  'entities.abilities.mass_barrier.description':
+    'Protege você e até 4 aliados próximos em um raio de 30 m; cada escudo absorve 130 de dano por 60 s. (Talento de mago)',
+  'entities.abilities.overload.name': 'Sobrecarga',
+  'entities.abilities.overload.description':
+    'Sua próxima magia é amplificada em 40%, mas custa 50% mais mana. Dura 10 s. (Talento de mago)',
+  'entities.abilities.power_echo.name': 'Eco de Poder',
+  'entities.abilities.power_echo.description':
+    'Sua próxima magia direta se repete com 50% de poder no mesmo alvo. Dura 10 s. (Talento de mago)',
+  'entities.abilities.rings_of_frost.name': 'Anel de Gelo',
+  'entities.abilities.rings_of_frost.description':
+    'Evoca um anel por 10 s. Inimigos que atravessam seu perímetro ficam congelados por 4 s. (Talento de mago)',
+  'entities.abilities.rune_of_power.name': 'Runa de Poder',
+  'entities.abilities.rune_of_power.description':
+    'Inscreve uma runa de poder sob seus pés por 15 s: aliados em um raio de 8 m causam 10% mais dano. (Talento de mago)',
+  'entities.abilities.summon_water_elemental.name': 'Evocar Elemental da Água',
+  'entities.abilities.summon_water_elemental.description':
+    "Evoca um Elemental da Água para lutar ao seu lado, lançar Setas d'Água no seu alvo e canalizar Jato d'Água. (Gelo)",
   'entities.abilities.conjure_water.name': 'Vínculo de Água',
   'entities.abilities.conjure_water.description':
     'Conjura 2 garrafas de água que restauram mana quando bebidas. Graus superiores conjuram água mais pura.',
@@ -3315,6 +3351,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_water.name': 'Água da Chuva Conjurada',
   'entities.items.conjured_water2.name': 'Água de Poço Conjurada',
   'entities.items.conjured_water3.name': 'Água Clara Conjurada',
+  'entities.items.conjured_water4.name': 'Água de Nascente Conjurada',
   'entities.items.eastbrook_arming_sword.name': 'Espada de armas de Eastbrook',
   'entities.items.bronzework_mace.name': 'Maça de bronzeiro',
   'entities.items.vale_carving_knife.name': 'Faca de entalhe do Vale',
@@ -4293,6 +4330,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread.name': 'Bolo de Aveia Conjurado',
   'entities.items.conjured_bread2.name': 'Pão Preto Conjurado',
   'entities.items.conjured_bread3.name': 'Bolo de Mel Conjurado',
+  'entities.items.conjured_bread4.name': 'Pão de Banquete Conjurado',
   'entities.items.glimmerfin_koi.name': 'Koi de nadadeiras cintilantes',
   'entities.items.raw_bog_eel.name': 'Enguia de brejo crua',
   'entities.items.raw_frostgill_trout.name': 'Truta de guelras gélidas crua',
@@ -6672,6 +6710,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Retalha a armadura do alvo, reduzindo-a em {damage}% por aplicação. Acumula até 5 vezes. Gera uma grande quantidade de ameaça.',
   'entities.mobs.training_dummy.name': 'Boneco de Treino',
   'entities.mobs.yumi_cat.name': 'Yumi',
+  'entities.mobs.water_elemental.name': 'Elemental da Água',
   'guide.arenaPage.yumiBody':
     'Proteja a Yumi é um modo de objetivo em equipe disputado em um labirinto: cada lado protege a própria gata familiar enquanto caça a do inimigo. De tempos em tempos, as duas gatas saltam para novos cantos do labirinto, então a luta alterna entre defender, caçar e correr para reencontrá-las. Entre na fila em três contra três ou cinco contra cinco; cair em combate só o afasta por um instante.',
   'guide.arenaPage.yumiHeading': 'Proteja a Yumi',
@@ -7410,10 +7449,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Cajado',
   'hudChrome.wocStore.wtype.sword': 'Espada',
   'hudChrome.wocStore.wtype.wand': 'Varinha',
-  'entities.items.deathless_warguard_legmail.name': 'Malha de Pernas Imortal da Guarda de Guerra',
-  'entities.items.scourgehide_carapace.name': 'Carapaça de Couro do Flagelo',
-  'entities.items.soulforged_warplate.name': 'Placa de Guerra Forjada na Alma',
-  'entities.items.soulrend_diadem.name': 'Diadema Dilacera-Almas',
   'hudChrome.bags.rightClickDestroy': 'Clique com o botão direito para destruir',
   'game.talents.choicesTab': 'Escolhas',
   'game.talents.rowUnlockToast': 'Nova escolha de talento disponível!',

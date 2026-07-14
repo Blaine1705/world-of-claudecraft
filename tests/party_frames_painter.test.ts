@@ -397,7 +397,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
         member({
           pid: 2,
           auras: [
-            { id: 'battle_stance', kind: 'battle_stance' },
+            { id: 'arcane_intellect', kind: 'buff_int_pct' },
             { id: 'temporal_exhaustion', kind: 'sated' },
             { id: 'power_word_shield', kind: 'absorb' },
             { id: 'rend', kind: 'dot' },
@@ -491,14 +491,14 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(reordered[0]).toBe(r4);
     expect(reordered[1]).toBe(r2);
     expect(reordered[2]).toBe(r3);
-    expect(container.childNodes).toHaveLength(1);
+    expect(container.childNodes[container.childNodes.length - 1].tagName).toBe('BUTTON');
     // The middle member (pid 2) leaves: the remaining two keep their order.
     painter.sync([member({ pid: 4 }), member({ pid: 3 })], 1, false);
     const trimmed = rows();
     expect(trimmed).toHaveLength(2);
     expect(trimmed[0]).toBe(r4);
     expect(trimmed[1]).toBe(r3);
-    expect(container.childNodes).toHaveLength(1);
+    expect(container.childNodes[container.childNodes.length - 1].tagName).toBe('BUTTON');
   });
 
   it('a steady-state rebuild (same members + order) moves no node, so a focused row keeps its place', () => {
@@ -669,20 +669,20 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(toggles).toBe(1);
   });
 
-  it('keeps the chip first even after a member sync (chip, then rows wrapper)', () => {
+  it('keeps the chip first even after a member sync (chip, then rows wrapper, leave last)', () => {
     painter.setCollapse(true, true, false, false);
     painter.sync([member({ pid: 2 }), member({ pid: 3 })], 1, false);
     const kids = container.childNodes;
     expect(kids[0].id).toBe(chipId);
     expect(rows()).toHaveLength(2); // the two member rows live inside the wrapper
-    expect(kids[kids.length - 1]).toBe(wrapperOf());
+    expect(kids[kids.length - 1].tagName).toBe('BUTTON');
   });
 
   it('F1: an expanded party seats the chip alone on its line, no member frame beside it', () => {
     // The pre-restructure grid put the chip in column 1 and auto-flowed a member frame
     // into the cell beside it (column 2 row 1). With the rows nested in the .party-rows
     // wrapper, the chip is a lone container child: its ONLY direct-child siblings are the
-    // wrapper, and every member frame sits INSIDE the wrapper.
+    // wrapper and the Leave button, and every member frame sits INSIDE the wrapper.
     painter.setCollapse(true, true, false, false); // mobile, expanded
     painter.sync([member({ pid: 2 }), member({ pid: 3 }), member({ pid: 4 })], 1, false);
     const kids = container.childNodes;
@@ -696,7 +696,8 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     // All three member rows nest inside the wrapper; the chip is not among them.
     expect(rows()).toHaveLength(3);
     expect(wrap.childNodes.some((c) => c.id === chipId)).toBe(false);
-    expect(kids[kids.length - 1]).toBe(wrap);
+    expect(kids[kids.length - 1].tagName).toBe('BUTTON');
+    expect(container.childNodes.indexOf(wrap)).toBeLessThan(kids.length - 1);
   });
 
   it('yields entirely while mobile chat is open: chip removed, no expanded class', () => {

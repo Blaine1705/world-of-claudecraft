@@ -2983,12 +2983,11 @@ export class Renderer {
     switch (ev.type) {
       case 'spellfx':
         if (ev.fx === 'blinkStep') {
-          // A teleport step (Flickerstep / Shadowstep): SNAP the self body to
-          // the new spot instead of letting the reposition heuristic read the
-          // jump as a leap and play an arc. A short pulse sells the pop.
+          // A teleport step (Flickerstep / Shadowstep): reset the cached self
+          // position so the body snaps to the authoritative destination. A
+          // short pulse sells the pop.
           if (ev.sourceId === this.sim.player.id) {
             this.selfRenderPositionReady = false;
-            this.selfLeapArc = null;
           }
           this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
           break;
@@ -3006,7 +3005,7 @@ export class Renderer {
               ev.angle ?? 70,
               ev.fx,
             );
-            this.triggerAttack(ev.sourceId, 'glacial_front');
+            this.triggerAttack(ev.sourceId);
           }
           break;
         }
@@ -3023,7 +3022,7 @@ export class Renderer {
               ev.angle ?? 55,
               ev.fx,
             );
-            this.triggerAttack(ev.sourceId, 'dragons_breath');
+            this.triggerAttack(ev.sourceId);
           }
           break;
         }
@@ -4965,14 +4964,6 @@ export class Renderer {
       }
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
-      }
-      // Shapeshift-form particle auras riding the tints above: metamorph fire,
-      // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
-      // (the auras themselves drop, but a corpse must not smolder for a frame).
-      if (!e.dead) {
-        if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
-        else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
-        else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
       }
       // Shapeshift-form particle auras riding the tints above: metamorph fire,
       // moonkin star motes, shadowform gloom wisps. Suppressed for the dead

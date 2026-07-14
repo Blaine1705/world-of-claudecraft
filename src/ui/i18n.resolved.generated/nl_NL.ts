@@ -871,7 +871,6 @@ export const nl_NL: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showAttackButton": "Show Attack Button",
-      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
       "mobileLeftHanded": "Linkshandige indeling"
@@ -5818,6 +5817,54 @@ export const nl_NL: EnTranslations = {
         "name": "Rijplans",
         "description": "Lanceert een bout van vorst die {damage} Vorstschade toebrengt en de beweging met 40% vertraagt."
       },
+      "blazing_barrier": {
+        "name": "Vlammende barrière",
+        "description": "Omhul jezelf met vlammen en absorbeer 130 schade gedurende 60 sec. (Vuur)"
+      },
+      "cold_snap": {
+        "name": "Koudegolf",
+        "description": "Voltooit de afkoeltijd van Flitsstap, Vorstsluier en Grotere onzichtbaarheid. (magiërstalent)"
+      },
+      "greater_invisibility": {
+        "name": "Grotere onzichtbaarheid",
+        "description": "Verdwijn gedurende 20 sec.: verwijdert 2 effecten met schade over tijd en je loopt 90% minder schade op terwijl je onzichtbaar bent en kort daarna. (magiërstalent)"
+      },
+      "hot_streak": {
+        "name": "Hete reeks",
+        "description": "Passief: twee kritieke treffers achter elkaar met je Vuurspreuken (Sintelbout, Sintelval, Blakeren, Pyrelans of Vlammenslag) maken je volgende Pyrelans of Vlammenslag onmiddellijk en gratis. De verbruikers tellen mee voor de VOLGENDE reeks, inclusief gratis spreuken; Vlammenslag telt één keer, hoeveel vijanden hij ook raakt, en alleen de eerste inslag telt ooit mee. (Vuur)"
+      },
+      "ice_floes": {
+        "name": "IJsschotsen",
+        "description": "Je volgende twee spreuken met een casttijd kunnen tijdens het bewegen worden uitgesproken. Duurt 15 sec. (magiërstalent)"
+      },
+      "ignition": {
+        "name": "Ontbranding",
+        "description": "Passief: kritieke treffers van je spreuken verbranden het doelwit voor 40% van de toegebrachte schade gedurende 6 sec. en stapelen. (Vuurmeesterschap)"
+      },
+      "mass_barrier": {
+        "name": "Massabarrière",
+        "description": "Beschermt jou en maximaal 4 nabije bondgenoten binnen 30 m; elke barrière absorbeert 130 schade gedurende 60 sec. (magiërstalent)"
+      },
+      "overload": {
+        "name": "Overbelasting",
+        "description": "Je volgende spreuk wordt met 40% versterkt, maar kost 50% meer mana. Duurt 10 sec. (magiërstalent)"
+      },
+      "power_echo": {
+        "name": "Krachtsecho",
+        "description": "Je volgende directe spreuk herhaalt zich met 50% kracht op hetzelfde doelwit. Duurt 10 sec. (magiërstalent)"
+      },
+      "rings_of_frost": {
+        "name": "Ring van vorst",
+        "description": "Roept gedurende 10 sec. een ring op. Vijanden die de rand oversteken, worden 4 sec. bevroren. (magiërstalent)"
+      },
+      "rune_of_power": {
+        "name": "Krachtrune",
+        "description": "Teken gedurende 15 sec. een krachtrune aan je voeten: bondgenoten binnen 8 m brengen 10% meer schade toe. (magiërstalent)"
+      },
+      "summon_water_elemental": {
+        "name": "Waterelementaal oproepen",
+        "description": "Roep een Waterelementaal op om naast je te vechten, Waterbouten naar je doelwit te slingeren en Waterstraal te kanaliseren. (Vorst)"
+      },
       "ice_lance": {
         "name": "Ice Lance",
         "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
@@ -6422,9 +6469,21 @@ export const nl_NL: EnTranslations = {
         "name": "Elementaire meesterschap",
         "description": "Roept elementaire meesterschap aan, waardoor je volgende spreuk onmiddellijk is. (Elementair signatuur)"
       },
+      "shamanistic_rage": {
+        "name": "Shamanistic Rage",
+        "description": "Releases shamanistic rage, restoring 160 mana. (Enhancement signature)"
+      },
+      "natures_swiftness": {
+        "name": "Nature's Swiftness",
+        "description": "Calls on nature to make your next spell instant. (Restoration signature)"
+      },
       "siphon_life": {
         "name": "Levenshevel",
         "description": "Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)"
+      },
+      "fel_domination": {
+        "name": "Fel Domination",
+        "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
       },
       "conflagrate": {
         "name": "Ontvlamming",
@@ -7517,6 +7576,12 @@ export const nl_NL: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Sintelglazen Oorlogsstaf"
       },
+      "conjured_water4": {
+        "name": "Getoverd bronwater"
+      },
+      "conjured_bread4": {
+        "name": "Getoverd feestbrood"
+      },
       "bristleback_maul": {
         "name": "Gallowglass-Hamer"
       },
@@ -8230,18 +8295,6 @@ export const nl_NL: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Lendenbescherming van de Stormroeper"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Doodloze Krijgswacht-Beenmalie"
-      },
-      "scourgehide_carapace": {
-        "name": "Geselhuid-Pantser"
-      },
-      "soulforged_warplate": {
-        "name": "Zielgesmede Krijgsplaat"
-      },
-      "soulrend_diadem": {
-        "name": "Zielscheur-Diadeem"
       }
     },
     "mobs": {
@@ -8598,6 +8651,9 @@ export const nl_NL: EnTranslations = {
       },
       "ysolei": {
         "name": "Ysolei, Avatar van de Verdronken Maan"
+      },
+      "water_elemental": {
+        "name": "Waterelementaal"
       }
     },
     "npcs": {

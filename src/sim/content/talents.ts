@@ -286,6 +286,12 @@ export function hasTalents(cls: PlayerClass): boolean {
 
 export const FIRST_TALENT_LEVEL = 10;
 
+// Spec identity (the signature ability + mastery + spec-gated kit) unlocks EARLIER
+// than talent POINTS: a specialization may be committed from SPEC_UNLOCK_LEVEL, but
+// points still accrue from FIRST_TALENT_LEVEL (talentPointsAtLevel is unchanged), so
+// the talent tree and point economy are untouched. A spec below this level is illegal.
+export const SPEC_UNLOCK_LEVEL = 5;
+
 export function talentPointsAtLevel(level: number): number {
   return Math.max(0, Math.min(level, MAX_LEVEL) - (FIRST_TALENT_LEVEL - 1));
 }

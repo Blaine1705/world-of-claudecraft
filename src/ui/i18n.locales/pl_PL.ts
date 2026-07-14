@@ -7354,10 +7354,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Kostur',
   'hudChrome.wocStore.wtype.sword': 'Miecz',
   'hudChrome.wocStore.wtype.wand': 'Różdżka',
-  'entities.items.deathless_warguard_legmail.name': 'Nieśmiertelne nogawice wojennej straży',
-  'entities.items.scourgehide_carapace.name': 'Pancerz ze skóry plagi',
-  'entities.items.soulforged_warplate.name': 'Bojowa zbroja kuta z duszy',
-  'entities.items.soulrend_diadem.name': 'Diadem rozdarcia dusz',
   'hudChrome.bags.rightClickDestroy': 'Kliknij prawym, aby zniszczyć',
   'entities.abilities.aura_surge.name': 'Promienna Fala',
   'entities.abilities.aura_surge.description':
@@ -7520,4 +7516,43 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Wybory',
   'game.talents.rowUnlockToast': 'Odblokowano nowy wybór talentu!',
   'game.talents.rowUnlocks': 'Odblokowuje się na poziomie {level}',
+  'entities.abilities.blazing_barrier.name': 'Płonąca bariera',
+  'entities.abilities.blazing_barrier.description':
+    'Otaczasz się płomieniami, pochłaniając 130 obrażeń przez 60 sek. (Ogień)',
+  'entities.abilities.cold_snap.name': 'Nagły chłód',
+  'entities.abilities.cold_snap.description':
+    'Kończy czas odnowienia Migotliwego kroku, Mroźnej zasłony i Większej niewidzialności. (talent maga)',
+  'entities.abilities.greater_invisibility.name': 'Większa niewidzialność',
+  'entities.abilities.greater_invisibility.description':
+    'Znikasz na 20 sek.: usuwa 2 efekty obrażeń rozłożonych w czasie, a podczas niewidzialności i krótko po niej otrzymujesz o 90% mniej obrażeń. (talent maga)',
+  'entities.abilities.hot_streak.name': 'Gorąca seria',
+  'entities.abilities.hot_streak.description':
+    'Bierne: dwa trafienia krytyczne z rzędu twoimi zaklęciami Ognia (Żarowy pocisk, Deszcz żaru, Poparzenie, Ognista lanca lub Ognista nawała) sprawiają, że twoja następna Ognista lanca lub Ognista nawała jest natychmiastowa i darmowa. Zaklęcia zużywające efekt liczą się do NASTĘPNEJ serii, również darmowe użycia; Ognista nawała liczy się raz bez względu na liczbę trafionych wrogów i zawsze liczy się tylko pierwsze uderzenie. (Ogień)',
+  'entities.abilities.ice_floes.name': 'Kry lodowe',
+  'entities.abilities.ice_floes.description':
+    'Następne dwa zaklęcia z czasem rzucania możesz rzucić w ruchu. Trwa 15 sek. (talent maga)',
+  'entities.abilities.ignition.name': 'Zapłon',
+  'entities.abilities.ignition.description':
+    'Bierne: trafienia krytyczne twoich zaklęć podpalają cel, zadając 40% zadanych obrażeń przez 6 sek.; efekt się kumuluje. (mistrzostwo Ognia)',
+  'entities.abilities.mass_barrier.name': 'Masowa bariera',
+  'entities.abilities.mass_barrier.description':
+    'Osłania ciebie i maksymalnie 4 pobliskich sojuszników w promieniu 30 m; każda bariera pochłania 130 obrażeń przez 60 sek. (talent maga)',
+  'entities.abilities.overload.name': 'Przeciążenie',
+  'entities.abilities.overload.description':
+    'Twoje następne zaklęcie jest wzmocnione o 40%, ale kosztuje o 50% więcej many. Trwa 10 sek. (talent maga)',
+  'entities.abilities.power_echo.name': 'Echo mocy',
+  'entities.abilities.power_echo.description':
+    'Twoje następne bezpośrednie zaklęcie powtarza się na tym samym celu z 50% mocy. Trwa 10 sek. (talent maga)',
+  'entities.abilities.rings_of_frost.name': 'Pierścień mrozu',
+  'entities.abilities.rings_of_frost.description':
+    'Przywołuje pierścień na 10 sek. Wrogowie przekraczający jego obwód zostają zamrożeni na 4 sek. (talent maga)',
+  'entities.abilities.rune_of_power.name': 'Runa mocy',
+  'entities.abilities.rune_of_power.description':
+    'Kreślisz u swych stóp runę mocy na 15 sek.: sojusznicy stojący w promieniu 8 m zadają o 10% więcej obrażeń. (talent maga)',
+  'entities.abilities.summon_water_elemental.name': 'Przywołanie żywiołaka wody',
+  'entities.abilities.summon_water_elemental.description':
+    'Przywołuje Żywiołaka Wody, który walczy u twego boku, miota Pociski Wody w twój cel i podtrzymuje Strumień Wody. (Mróz)',
+  'entities.mobs.water_elemental.name': 'Żywiołak wody',
+  'entities.items.conjured_bread4.name': 'Wyczarowany bochen biesiadny',
+  'entities.items.conjured_water4.name': 'Wyczarowana woda źródlana',
 };
