@@ -85,6 +85,9 @@ export const ja_JP: EnTranslations = {
       "title": "タレント",
       "classTab": "クラス",
       "specTab": "専門化",
+      "choicesTab": "選択",
+      "rowUnlockToast": "新しいタレント選択が解放されました!",
+      "rowUnlocks": "レベル{level}で解放",
       "available": "使用可能",
       "spent": "使用済み",
       "pointSource": "レベル{first}から{cap}まで、レベルごとにタレントポイントを1獲得します。さらにポイントを得るにはレベルを上げてください。",
@@ -143,6 +146,7 @@ export const ja_JP: EnTranslations = {
         "noTree": "あなたのクラスにはまだタレントツリーがありません。",
         "locked": "タレントはまだ解除されていません——レベル{level}から始まります。",
         "noSpec": "専門化なし",
+        "rowsSummary": "タレント: {head}、選択済み行 {picked}/{unlocked}。",
         "summary": "タレント: {head}——{spent}/{total} ポイント使用済み（{breakdown}）。",
         "breakdownClass": "クラス {classPts}",
         "breakdownSpec": "クラス {classPts}、{spec} {specPts}",
@@ -166,6 +170,10 @@ export const ja_JP: EnTranslations = {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
       "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。"
+    },
+    "fct": {
+      "absorbed": "{amount} 吸収",
+      "cheap": "低コスト!"
     },
     "emotes": {
       "wave": "手を振る",
@@ -862,9 +870,28 @@ export const ja_JP: EnTranslations = {
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "ターゲットのターゲットを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
-      "mobileLeftHanded": "左利き用レイアウト"
+      "mobileLeftHanded": "左利き用レイアウト",
+      "mouseoverCast": "パーティフレームでマウスオーバーキャスト"
+    },
+    "talentRows": {
+      "tab": "選択",
+      "defaultLoadout": "デフォルト構成",
+      "comingSoon": "近日公開"
+    },
+    "specPanel": {
+      "primaryAttr": "主要能力値",
+      "complexity": "複雑さ",
+      "complexityLow": "Low",
+      "complexityMedium": "中",
+      "complexityHigh": "High",
+      "exampleAbilities": "代表的なアビリティ",
+      "viewTalents": "タレントを見る",
+      "specUnlockBanner": "スペシャライゼーション解放！",
+      "specUnlockHint": "Nキーを押してスペシャライゼーションを選択してください。"
     },
     "controller": {
       "title": "コントローラー",
@@ -977,7 +1004,9 @@ export const ja_JP: EnTranslations = {
         "spellPower": "呪文威力",
         "critRating": "クリティカルレーティング",
         "hasteRating": "ヘイストレーティング",
-        "warfare": "ウォーフェア"
+        "warfare": "ウォーフェア",
+        "haste": "ヘイスト",
+        "parry": "受け流し"
       },
       "warfareValue": "与ダメージ +{increase}% / 被ダメージ -{reduction}%",
       "desc": {
@@ -994,7 +1023,9 @@ export const ja_JP: EnTranslations = {
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
         "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
-        "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
+        "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。",
+        "haste": "あなたの武器攻撃と呪文詠唱の速度を上げます。グローバルクールダウンは短縮しません。",
+        "parry": "前方からの近接攻撃を完全に受け流し、ダメージを受けない確率です。背後からの一撃は受け流せません。"
       },
       "effects": {
         "attackPower": "攻撃力 +{value}",
@@ -1113,7 +1144,8 @@ export const ja_JP: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item}を外す",
-      "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す"
+      "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す",
+      "offhand": "オフハンド"
     },
     "account": {
       "title": "アカウント",
@@ -1322,8 +1354,16 @@ export const ja_JP: EnTranslations = {
       "attackSpeedFast": "攻撃速度を{pct}%上昇させる",
       "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
       "tongues": "詠唱時間を{pct}%増加させる",
+      "combustionCrit": "火炎呪文が必ずクリティカルになる",
+      "overloadNext": "次の呪文の効果が{pct}%増加するが、マナ消費が50%増える",
+      "powerEchoNext": "次の直接呪文が同じ対象に{pct}%の威力で再発動する",
+      "iceFloesCasts": "次の{n}回の詠唱呪文を移動しながら唱えられる",
+      "freeCast": "次の詠唱のコストがゼロになる",
+      "instantCast": "次の詠唱時間のある呪文が即時発動になる",
+      "cheapCast": "次の呪文のコストが{pct}%減少する",
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
+        "sp": "呪文の威力を{value}上昇させる",
         "armor": "防御力を{value}上昇させる",
         "int": "知力を{value}上昇させる",
         "agi": "敏捷性を{value}上昇させる",
@@ -1387,7 +1427,22 @@ export const ja_JP: EnTranslations = {
         "shadow": "影",
         "holy": "神聖",
         "nature": "自然"
-      }
+      },
+      "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
+      "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
+      "dmgDone": "与えるダメージを{pct}%上昇させる",
+      "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
+      "crit": "クリティカル率を{pct}%上昇させる",
+      "rageGen": "怒りの生成量を{pct}%上昇させる",
+      "reckless": "クリティカル率を{pct}%、怒りの生成量を{ragePct}%上昇させる",
+      "avatar": "コロッサス: 与えるダメージが{pct}%増加",
+      "bloodbath": "クリティカル率と与えるダメージを{pct}%上昇させる",
+      "dieBySword": "受けるダメージを{pct}%軽減する（体力{hpPct}%未満では{lowPct}%）",
+      "sanguine": "攻撃速度を{hastePct}%、与えるダメージを{dmgPct}%上昇させる",
+      "battleTrance": "次のレイヴァーストライクまたはブルートスイングの怒りコストが0になる",
+      "revengeFree": "次の意趣返しの怒りコストが0になる",
+      "victoryRush": "勝利の追撃が使用可能",
+      "maxHpPct": "最大体力を{pct}%上昇させる"
     },
     "worldBoss": {
       "spawn": "{name}がソーンピーク高地に立ち上がった！"
@@ -1437,6 +1492,33 @@ export const ja_JP: EnTranslations = {
     "playerFrame": {
       "unlock": "プレイヤーフレームを移動",
       "lock": "プレイヤーフレームを固定"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "フレーム位置をリセット"
@@ -2491,6 +2573,14 @@ export const ja_JP: EnTranslations = {
       "frost_armor": "戦闘の前にアーマーを固める、持続する自己強化です。",
       "arcane_intellect": "知力を上げて仲間のマナ総量を増やします。プルの前に唱えておきましょう。",
       "frostbolt": "遠距離から攻撃し、標的を減速させて近づけなくします。",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "マナを回復する飲み物を作り出し、プルの合間に補充できます。",
       "conjure_food": "座って食べると体力を回復する食料を作り出します。",
       "shadow_bolt": "標的に放つシャドウのボルト。主力の火力です。",
@@ -2504,7 +2594,9 @@ export const ja_JP: EnTranslations = {
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
       "moonfire": "即座に当たり標的を燃焼させるため、移動中にも向いています。",
       "rejuvenation": "即座に唱えられ、味方を継続的に回復するので、行動を続けられます。",
-      "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。"
+      "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。",
+      "revenge": "前方のすべてを薙ぎ払う反撃で、一撃を受け流した直後はより安く使えます。",
+      "hamstring": "対象の脚を斬りつけて減速させ、追いつかれないようにします。"
     },
     "petHook": {
       "emberkin": "安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。",
@@ -4967,7 +5059,9 @@ export const ja_JP: EnTranslations = {
       "death": "{name}は死亡しました。",
       "auraGain": "{name}を得ました。",
       "auraFade": "{name}が自分から消えました。",
-      "auraAfflicted": "{target}は{name}を受けています。"
+      "auraAfflicted": "{target}は{name}を受けています。",
+      "floatingParry": "受け流し",
+      "parried": "{target}は{ability}を受け流しました。"
     },
     "system": {
       "playerDeath": "死亡しました。",
@@ -5053,7 +5147,9 @@ export const ja_JP: EnTranslations = {
       "tradeInProgress": "すでに取引が進行中です。",
       "tradeTooFar": "対象が遠すぎて取引できません。",
       "tradeExpired": "取引リクエストは期限切れです。",
-      "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。"
+      "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。",
+      "nothingToConsume": "消費できるものがありません。",
+      "needShield": "盾を装備している必要があります。"
     },
     "logs": {
       "standUp": "立ち上がりました。",
@@ -5119,6 +5215,7 @@ export const ja_JP: EnTranslations = {
     },
     "pet": {
       "attack": "攻撃",
+      "waterJet": "Water Jet",
       "taunt": "挑発",
       "healDemon": "悪魔を治癒",
       "healPet": "ペットを治癒",
@@ -5127,6 +5224,8 @@ export const ja_JP: EnTranslations = {
       "aggressive": "攻撃",
       "petAttackTitle": "ペット攻撃",
       "petAttackDesc": "現在の敵対対象を攻撃するようペットに命令します。",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "ペット挑発",
       "petTauntDesc": "ペットに交戦を命じ、射程内でグロウルを使わせます。クールダウン10秒。",
       "healDemonDesc": "マナを消費し、5秒かけて悪魔へ治癒をチャネルします。",
@@ -5249,6 +5348,7 @@ export const ja_JP: EnTranslations = {
     "actionBar": {
       "attackName": "攻撃",
       "attackTooltip": "対象への自動攻撃を切り替えます。敵を右クリックしても攻撃します。",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "空きスロット",
       "slotAria": "アクションスロット {slot}: {ability}",
       "emptySlotAria": "アクションスロット {slot}: 空き",
@@ -5400,7 +5500,8 @@ export const ja_JP: EnTranslations = {
       "legs": "脚",
       "gloves": "手",
       "feet": "足",
-      "ring": "指"
+      "ring": "指",
+      "twoHand": "両手"
     },
     "quality": {
       "poor": "粗悪",
@@ -5744,6 +5845,46 @@ export const ja_JP: EnTranslations = {
       "frostbolt": {
         "name": "霧氷の槍",
         "description": "氷の矢を放ち、{damage} の冷気ダメージを与え、移動速度を40%低下させます。"
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Flurry",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Shatter",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "水の召喚",
@@ -6245,9 +6386,17 @@ export const ja_JP: EnTranslations = {
         "name": "ホーリーショック",
         "description": "聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）"
       },
+      "aura_surge": {
+        "name": "光輝の高まり",
+        "description": "オーラを過負荷させ、10秒間160の防御力で身を固める。(パラディンの才能)"
+      },
       "holy_shield": {
         "name": "ホーリーシールド",
         "description": "10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）"
+      },
+      "repentance": {
+        "name": "悔悛",
+        "description": "敵を最大6秒間、瞑想状態にします。ダメージを受けると効果が解除されます。（報復シグネチャー）"
       },
       "bestial_wrath": {
         "name": "野獣の怒り",
@@ -6321,6 +6470,34 @@ export const ja_JP: EnTranslations = {
         "name": "スウィフトメンド",
         "description": "味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）"
       },
+      "storm_bolt": {
+        "name": "嵐の一投",
+        "description": "武器を対象に投げつけて{damage}のダメージを与え、3秒間スタンさせます。"
+      },
+      "piercing_howl": {
+        "name": "貫く咆哮",
+        "description": "劈くような叫びを上げ、15yd以内のすべての敵の移動速度を8秒間、50%低下させます。"
+      },
+      "die_by_sword": {
+        "name": "剣に死す",
+        "description": "防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。"
+      },
+      "recklessness": {
+        "name": "無謀",
+        "description": "激昂。12秒間、怒りの生成量が50%、クリティカル率が20%増加します。"
+      },
+      "sanguine_aura": {
+        "name": "血のオーラ",
+        "description": "武器に敵の血を宿し、20秒間、自分と近接の味方の攻撃速度が10%、ダメージが10%増加します。"
+      },
+      "victory_rush": {
+        "name": "勝利の追撃",
+        "description": "武器ダメージに{damage}を加えたダメージを与え、最大体力の20%を回復します。敵を倒してから20秒以内にのみ使用できます。"
+      },
+      "intimidating_shout": {
+        "name": "威圧の雄叫び",
+        "description": "恐ろしい叫びを上げ、8yd以内の最大5体の敵を8秒間、恐怖で逃げ惑わせます。ダメージを受けると効果が解除されることがあります。"
+      },
       "summon_imp": {
         "name": "エンバーキンの召喚",
         "description": "ウォーロックの命令に従うエンバーキンを召喚します。エンバーキンは遠くから敵にアッシュボルトを放ちます。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
@@ -6349,6 +6526,146 @@ export const ja_JP: EnTranslations = {
         "name": "レイスボーンの召喚",
         "description": "レイスボーンを意のままに束縛します。遠方から強力なシャドウダメージを降らせるエリート悪魔です。長い再使用時間がその破壊的な力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
       },
+      "aspect_of_the_wild": {
+        "name": "野牙の装い",
+        "description": "野生の力で周囲の味方を鼓舞し、攻撃力を高める。効果時間 5 分。（ハンタータレント）"
+      },
+      "avatar": {
+        "name": "化身",
+        "description": "20秒間コロッサスに変身し、あらゆる行動妨害を解除し、与えるダメージが20%増加します。"
+      },
+      "avenging_wrath": {
+        "name": "復讐の翼",
+        "description": "報復の力を呼び降ろし、攻撃力と呪文能力を高める。効果時間 20 秒。（パラディンタレント）"
+      },
+      "berserk": {
+        "name": "赤き霞",
+        "description": "攻撃力を高める。効果時間 15 秒。（ドルイドタレント）"
+      },
+      "bladestorm": {
+        "name": "剣の嵐",
+        "description": "鋼の嵐と化し、4秒間、8yd以内のすべての敵に毎秒{damage}のダメージを与えます。"
+      },
+      "razor_howl": {
+        "name": "刃の咆哮",
+        "description": "15メートル以内の敵を8秒間50%遅くします。（ウォリアータレント）"
+      },
+      "stormthrow": {
+        "name": "嵐投げ",
+        "description": "武器を投げ、対象を3秒間スタンさせます。（ウォリアータレント）"
+      },
+      "reckless_vow": {
+        "name": "無謀の誓い",
+        "description": "12秒間、怒り生成が50%、クリティカル率が20%増加します。（ウォリアータレント）"
+      },
+      "red_banner": {
+        "name": "赤旗",
+        "description": "20秒間、自分と周囲の味方の攻撃速度とダメージがそれぞれ10%増加します。（ウォリアータレント）"
+      },
+      "blink": {
+        "name": "瞬き歩み",
+        "description": "前方 15 ヤードに瞬間移動し、移動不能効果を解除する。（メイジタレント）"
+      },
+      "bloodlust": {
+        "name": "戦の太鼓",
+        "description": "周囲の味方を狂乱させ、攻撃速度を高める。効果時間 15 秒。（シャーマンタレント）"
+      },
+      "chain_lightning": {
+        "name": "枝分かれの稲妻",
+        "description": "対象地点に稲妻を放ち、周囲の敵に {damage} のダメージを与える。（シャーマンタレント）"
+      },
+      "chaos_bolt": {
+        "name": "破滅の矢",
+        "description": "混沌の炎の矢を放ち、{damage} の火炎ダメージを与える。（ウォーロックタレント）"
+      },
+      "cloak_of_shadows": {
+        "name": "影まとい",
+        "description": "影で身を包み、ダメージを吸収する。効果時間 5 秒。（ローグタレント）"
+      },
+      "cone_of_cold": {
+        "name": "霜払い",
+        "description": "周囲の敵を冷気で撃ち、{damage}の氷ダメージを与えます。（氷シグネチャー）"
+      },
+      "counterspell": {
+        "name": "スペルブレイク",
+        "description": "対象の呪文を打ち消し、6秒間その系統の呪文を封じる。"
+      },
+      "curse_of_exhaustion": {
+        "name": "鉛の呪い",
+        "description": "対象を呪い、移動速度を 30% 低下させる。効果時間 12 秒。（ウォーロックタレント）"
+      },
+      "death_coil": {
+        "name": "墓所の螺旋",
+        "description": "敵に {damage} の暗影ダメージを与え、その後 3 秒間恐怖させる。この呪文は詠唱者を回復しない。（ウォーロックタレント）"
+      },
+      "deep_freeze": {
+        "name": "死霜",
+        "description": "対象を深く凍らせ、{damage} の冷気ダメージを与えて 4 秒間気絶させる。（メイジタレント）"
+      },
+      "desperate_prayer": {
+        "name": "最後の祈り",
+        "description": "自身を即座に {damage} 回復する。（プリーストタレント）"
+      },
+      "deterrence": {
+        "name": "針毛の守り",
+        "description": "回避率を 50% 高める。効果時間 10 秒。（ハンタータレント）"
+      },
+      "divine_shield": {
+        "name": "光の護り",
+        "description": "聖なる力で身を守り、大量のダメージを吸収する。効果時間 8 秒。（パラディンタレント）"
+      },
+      "earthbind": {
+        "name": "大地の縛り",
+        "description": "周囲の敵を大地に縛り付け、2 秒間移動不能にする。（シャーマンタレント）"
+      },
+      "evocation": {
+        "name": "エーテルの井戸",
+        "description": "マナを急速に回復する。（メイジタレント）"
+      },
+      "frenzied_regeneration": {
+        "name": "野生の癒し",
+        "description": "10 秒かけて体力を回復する。ブルーインフォーム限定。（ドルイドタレント）"
+      },
+      "frost_trap": {
+        "name": "霧氷の罠",
+        "description": "対象地点の敵を 3 秒間その場に凍結させる。（ハンタータレント）"
+      },
+      "ghostly_strike": {
+        "name": "亡霊の一撃",
+        "description": "敵に武器ダメージに加え {damage} のダメージを与え、短時間回避率を高める。コンボポイントを 1 獲得する。（ローグタレント）"
+      },
+      "hammer_of_wrath": {
+        "name": "鐘鳴りの槌",
+        "description": "傷ついた敵に聖なる鎚を投げ、{damage} の神聖ダメージを与える。体力が 20% 未満の対象にのみ使用可能。（パラディンタレント）"
+      },
+      "healing_stream": {
+        "name": "湧き水",
+        "description": "12 秒かけて味方一人を回復する。（シャーマンタレント）"
+      },
+      "heroic_leap": {
+        "name": "英雄的跳躍",
+        "description": "対象地点へ跳躍し、周囲の敵に{damage}のダメージを与えます。"
+      },
+      "holy_wrath": {
+        "name": "聖者の怒り",
+        "description": "聖なる力を解き放ち、周囲の敵に {damage} のダメージを与える。（パラディンタレント）"
+      },
+      "howl_of_terror": {
+        "name": "恐怖の遠吠え",
+        "description": "周囲の敵を最大 3 秒間恐怖させる。ダメージで効果が解ける場合がある。（ウォーロックタレント）"
+      },
+      "ice_block": {
+        "name": "冷たき棺",
+        "description": "自身を氷に封じ、大量のダメージを吸収する。効果時間 8 秒。（メイジタレント）"
+      },
+      "inner_focus": {
+        "name": "静まる心",
+        "description": "次の呪文のコストを無料にする。効果時間 60 秒。（プリーストタレント）"
+      },
+      "innervate": {
+        "name": "生命の樹液",
+        "description": "生命の樹液が10秒間あふれ、現在のリソースを波状に20ずつ回復する。マナ、怒り、エナジーのいずれにも作用し、変身しても途切れない。(ドルイドの才能)"
+      },
       "pummel": {
         "name": "顎砕き",
         "description": "対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。"
@@ -6357,9 +6674,81 @@ export const ja_JP: EnTranslations = {
         "name": "ブーツ",
         "description": "対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。"
       },
-      "counterspell": {
-        "name": "スペルブレイク",
-        "description": "対象の呪文を打ち消し、6秒間その系統の呪文を封じる。"
+      "last_stand": {
+        "name": "第十一刻",
+        "description": "一時的にスタミナを高め、最大体力を増加させる。効果時間 15 秒。（ウォリアータレント）"
+      },
+      "mend_pet": {
+        "name": "手当て",
+        "description": "15 秒かけて味方対象を {damage} 回復する。（ハンタータレント）"
+      },
+      "meteor": {
+        "name": "天の石",
+        "description": "対象地点に隕石を呼び降ろし、{damage} の火炎ダメージを与えて地面を燃やす。（メイジタレント）"
+      },
+      "temporal_mend": {
+        "name": "時の繕い",
+        "description": "味方を一瞬だけ未来へ進め、より健やかな未来の体に馴染む間に体力を{damage}回復する。(クロノマンシーの特性)"
+      },
+      "temporal_barrier": {
+        "name": "時の障壁",
+        "description": "対象を現在から一拍だけずらし、時の殻が10秒間、{damage}のダメージを吸収してから時間軸が元に戻る。"
+      },
+      "temporal_echo": {
+        "name": "時の残響",
+        "description": "より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。"
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "思念焼き",
+        "description": "対象地点に暗影の力を注ぎ、毎秒周囲の敵に {damage} のダメージを与える。（プリーストタレント）"
+      },
+      "multi_shot": {
+        "name": "分裂射撃",
+        "description": "複数の矢を放ち、周囲の敵に {damage} のダメージを与える。（ハンタータレント）"
+      },
+      "prayer_of_healing": {
+        "name": "聖歌の癒し",
+        "description": "周囲の味方を {damage} 回復する。（プリーストタレント）"
+      },
+      "preparation": {
+        "name": "備え",
+        "description": "スプリント、回避、バニッシュのクールダウンを終了させる。（ローグタレント）"
+      },
+      "presence_of_mind": {
+        "name": "駆ける心",
+        "description": "次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）"
+      },
+      "psychic_scream": {
+        "name": "精神の絶叫",
+        "description": "周囲の敵を最大 4 秒間恐怖させる。ダメージで効果が解ける場合がある。（プリーストタレント）"
+      },
+      "rallying_cry": {
+        "name": "結束の雄叫び",
+        "description": "結束の雄叫びを上げ、40yd以内の自分とパーティメンバーの最大体力を10秒間、20%増加させます。"
       },
       "counter_shot": {
         "name": "沈黙の一射",
@@ -6369,6 +6758,18 @@ export const ja_JP: EnTranslations = {
         "name": "叱咤",
         "description": "対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。"
       },
+      "shadowstep": {
+        "name": "影すべり",
+        "description": "影を抜けて対象のもとへ移動する。（ローグタレント）"
+      },
+      "shield_wall": {
+        "name": "防壁",
+        "description": "揺るぎない防壁を築き、アーマーを大幅に高める。効果時間 10 秒。（ウォリアータレント）"
+      },
+      "silence": {
+        "name": "沈黙",
+        "description": "対象を 4 秒間沈黙させる。（プリーストタレント）"
+      },
       "skull_bash": {
         "name": "頭突き",
         "description": "突進する頭突きで対象の詠唱を中断し、4秒間その系統を封じる。"
@@ -6376,6 +6777,10 @@ export const ja_JP: EnTranslations = {
       "spell_lock": {
         "name": "猿轡",
         "description": "詠唱中の対象を沈黙させ、5秒間その系統の呪文を封じる。"
+      },
+      "tranquility": {
+        "name": "木立の歌",
+        "description": "回復の力を注ぎ、毎秒周囲の味方を回復する。（ドルイドタレント）"
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",
@@ -6396,6 +6801,98 @@ export const ja_JP: EnTranslations = {
       "revive_pet": {
         "name": "ペット蘇生",
         "description": "死んだペットを蘇生させ、自分のそばに呼び戻す。"
+      },
+      "revenge": {
+        "name": "意趣返し",
+        "description": "大きく弧を描いて攻撃し、前方のすべての敵に物理ダメージを与えます。対象が5体を超えるとダメージが減少します。回避または受け流しに成功すると、次の意趣返しの怒りコストが0になることがあります。"
+      },
+      "battle_stance": {
+        "name": "バトルスタンス",
+        "description": "攻撃的な戦闘スタンスです。怒りの生成量が10%増加します。武器と防御の基本スタンスです。"
+      },
+      "berserker_stance": {
+        "name": "バーサーカースタンス",
+        "description": "無謀な戦闘スタンスです。クリティカルの発生率が3%上昇し、ダメージが3%増加します。狂怒ウォリアーは常にこのスタンスで戦います。"
+      },
+      "sweeping_strikes": {
+        "name": "広がる弧",
+        "description": "12秒間、単体攻撃が近くの敵1体にも75%のダメージで命中します。（武器）"
+      },
+      "deep_wounds": {
+        "name": "抉れた傷",
+        "description": "パッシブ: あなたの重傷の一撃が対象に出血を残し、6秒かけて物理ダメージを与えます。（武器）"
+      },
+      "enrage_passive": {
+        "name": "狂乱",
+        "description": "パッシブ: 激昂している間、与えるダメージが11%増加し、攻撃速度が25%、移動速度が10%上昇します（4秒間）。瀉血には30%の確率で激昂させる効果があり、赤い収穫は必ず激昂させます。（狂怒）"
+      },
+      "raging_gale": {
+        "name": "双撃",
+        "description": "武器で即座に2回攻撃し、それぞれ武器ダメージの60%に{damage}を加えたダメージを与え、怒りを{rage}生成します。最大2チャージまで蓄積します。（狂怒）"
+      },
+      "red_harvest": {
+        "name": "赤い収穫",
+        "description": "すべてを注ぎ込み、狂乱のうちに3回攻撃し、それぞれ武器ダメージに{damage}を加えたダメージを与えます。（狂怒）"
+      },
+      "furious_mending": {
+        "name": "憤怒の癒し",
+        "description": "10秒間、受けるダメージが20%減少し、効果中は瀉血が最大体力の20%を回復します。（狂怒）"
+      },
+      "emboldening_roar": {
+        "name": "奮起の咆哮",
+        "description": "奮い立たせる咆哮を上げ、40yd以内の自分と味方プレイヤーを鼓舞します。次の3回のアビリティが必ずクリティカルになります。（狂怒）"
+      },
+      "raised_guard": {
+        "name": "守りの構え",
+        "description": "盾の陰に身を構え、6秒間、受ける物理ダメージが50%減少します。最大2チャージまで蓄積します。（防御）"
+      },
+      "iron_resolve": {
+        "name": "鉄の決意",
+        "description": "歯を食いしばって痛みを堪え、怒りをすべて消費し（最低20）、消費した怒り1につき4のダメージを吸収します。最大10秒間持続します。（防御）"
+      },
+      "faultline": {
+        "name": "断層",
+        "description": "地面に衝撃波を走らせ、前方8yd以内の敵に{damage}のダメージを与え、3秒間スタンさせます。（防御）"
+      },
+      "defiant_bellow": {
+        "name": "不屈の雄叫び",
+        "description": "不屈の雄叫びを上げ、10yd以内のすべての敵を挑発し、3秒間あなたを攻撃するよう強制します。（防御）"
+      },
+      "breachmaker": {
+        "name": "崩し手",
+        "description": "対象を打ち据えて武器ダメージに{damage}を加えたダメージを与え、その守りを崩します。8秒間、あなたがその対象に与えるダメージが20%増加します。（武器）"
+      },
+      "measured_fury": {
+        "name": "制御された怒り",
+        "description": "制御された怒りが効率を高め、アビリティの怒りコストが10%減少します。（武器）"
+      },
+      "seasoned_soldier": {
+        "name": "歴戦の兵",
+        "description": "クリティカルの通常攻撃が生成する怒りが10%増加します。（武器）"
+      },
+      "diabolical_twinstrike": {
+        "name": "極悪の双撃",
+        "description": "激昂している間、双撃のダメージが15%増加します。（狂怒）"
+      },
+      "cleaving_blows": {
+        "name": "切り裂く連撃",
+        "description": "赤い収穫は必ず双撃のチャージを1つ回復します。（狂怒）"
+      },
+      "sudden_death": {
+        "name": "突然死",
+        "description": "通常攻撃に、体力に関係なく早すぎる墓を怒りコストなしで使用できるようになる確率があります。（武器）"
+      },
+      "shamanistic_rage": {
+        "name": "呪術師の怒り",
+        "description": "呪術師の怒りを解き放ち、マナを160回復します。（エンハンスメントシグネチャー）"
+      },
+      "natures_swiftness": {
+        "name": "自然の敏捷",
+        "description": "自然の力を借りて、次の呪文を即時発動にします。（回復シグネチャー）"
+      },
+      "fel_domination": {
+        "name": "フェルの支配",
+        "description": "フェルのエネルギーを支配し、次の呪文を即時発動にします。（悪魔学シグネチャー）"
       }
     },
     "items": {
@@ -7722,31 +8219,61 @@ export const ja_JP: EnTranslations = {
       "deathless_heartwood": {
         "name": "不死王冠の心材"
       },
+      "deathless_heartwood_heroic": {
+        "name": "不死王冠の心材"
+      },
       "kingsbane_last_oath": {
+        "name": "スロウンベイン、ソーンピーク最後の誓い"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "スロウンベイン、ソーンピーク最後の誓い"
       },
       "crownforged_dreadhelm": {
         "name": "ボーンロートの恐怖兜"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "ボーンロートの恐怖兜"
+      },
       "crownforged_warspaulders": {
+        "name": "ボーンロートの戦肩当て"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "ボーンロートの戦肩当て"
       },
       "nighttalon_crown": {
         "name": "ダイアファングの冠"
       },
+      "nighttalon_crown_heroic": {
+        "name": "ダイアファングの冠"
+      },
       "nighttalon_shoulderguards": {
+        "name": "ダイアファングの肩守り"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "ダイアファングの肩守り"
       },
       "soulflame_cowl": {
         "name": "レイスファイアの頭巾"
       },
+      "soulflame_cowl_heroic": {
+        "name": "レイスファイアの頭巾"
+      },
       "soulflame_mantle": {
+        "name": "レイスファイアのマント"
+      },
+      "soulflame_mantle_heroic": {
         "name": "レイスファイアのマント"
       },
       "stormcallers_crown": {
         "name": "ゲイルコールの冠"
       },
+      "stormcallers_crown_heroic": {
+        "name": "ゲイルコールの冠"
+      },
       "stormcallers_spaulders": {
+        "name": "ゲイルコールの肩当て"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "ゲイルコールの肩当て"
       },
       "unknown_alien_weaponry": {
@@ -7823,6 +8350,30 @@ export const ja_JP: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "嵐呼びの腰当て"
+      },
+      "eastbrook_buckler": {
+        "name": "イーストブルックのバックラー"
+      },
+      "eastbrook_greatsword": {
+        "name": "イーストブルックの大剣"
+      },
+      "highwatch_wallshield": {
+        "name": "ハイウォッチの壁盾"
+      },
+      "highwatch_greatsword": {
+        "name": "ハイウォッチの大剣"
+      },
+      "deathless_warguard_legmail": {
+        "name": "不死の戦衛レッグメイル"
+      },
+      "soulrend_diadem": {
+        "name": "ソウルレンドの宝冠"
+      },
+      "scourgehide_carapace": {
+        "name": "スカージハイドの甲殻"
+      },
+      "soulforged_warplate": {
+        "name": "魂鍛の戦甲"
       }
     },
     "mobs": {
@@ -7997,9 +8548,6 @@ export const ja_JP: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "蘇った王家の衛兵"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "ナイスラクシス、ソーンピークの災厄"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "死なずの戦衛オルドレン"
       },
@@ -8008,6 +8556,9 @@ export const ja_JP: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "死なずの刃ヴォス"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "ナイスラクシス、ソーンピークの災厄"
       },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"

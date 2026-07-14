@@ -85,6 +85,9 @@ export const zh_CN: EnTranslations = {
       "title": "天赋",
       "classTab": "职业",
       "specTab": "专精",
+      "choicesTab": "抉择",
+      "rowUnlockToast": "新的天赋抉择已解锁！",
+      "rowUnlocks": "在 {level} 级解锁",
       "available": "可用",
       "spent": "已用",
       "pointSource": "从 {first} 级到 {cap} 级，每升一级获得 1 点天赋点。继续升级可获得更多点数。",
@@ -143,6 +146,7 @@ export const zh_CN: EnTranslations = {
         "noTree": "你的职业暂无天赋树。",
         "locked": "你尚未解锁天赋，天赋将在 {level} 级开启。",
         "noSpec": "未选择专精",
+        "rowsSummary": "天赋：{head}，已选择 {picked}/{unlocked} 行选项。",
         "summary": "天赋：{head} — 已用 {spent}/{total} 点（{breakdown}）。",
         "breakdownClass": "职业 {classPts}",
         "breakdownSpec": "职业 {classPts}，{spec} {specPts}",
@@ -166,6 +170,10 @@ export const zh_CN: EnTranslations = {
       "resurrectAtCorpse": "在尸体旁复活",
       "resurrectAtHealer": "灵魂医者（复活后遗症）",
       "spiritHealerAlive": "灵魂医者只看护逝者。你仍是生者。"
+    },
+    "fct": {
+      "absorbed": "吸收 {amount}",
+      "cheap": "费用降低!"
     },
     "emotes": {
       "wave": "挥手",
@@ -862,9 +870,28 @@ export const zh_CN: EnTranslations = {
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "显示目标的目标",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
-      "mobileLeftHanded": "左手布局"
+      "mobileLeftHanded": "左手布局",
+      "mouseoverCast": "队伍头像上鼠标悬停施法"
+    },
+    "talentRows": {
+      "tab": "抉择",
+      "defaultLoadout": "默认配置",
+      "comingSoon": "敬请期待"
+    },
+    "specPanel": {
+      "primaryAttr": "主属性",
+      "complexity": "复杂度",
+      "complexityLow": "Low",
+      "complexityMedium": "中等",
+      "complexityHigh": "High",
+      "exampleAbilities": "示例技能",
+      "viewTalents": "查看天赋",
+      "specUnlockBanner": "专精已解锁！",
+      "specUnlockHint": "按 N 键选择你的专精。"
     },
     "controller": {
       "title": "手柄",
@@ -977,7 +1004,9 @@ export const zh_CN: EnTranslations = {
         "spellPower": "法术强度",
         "critRating": "暴击等级",
         "hasteRating": "急速等级",
-        "warfare": "战争"
+        "warfare": "战争",
+        "haste": "急速",
+        "parry": "招架"
       },
       "warfareValue": "造成伤害 +{increase}% / 承受伤害 -{reduction}%",
       "desc": {
@@ -994,7 +1023,9 @@ export const zh_CN: EnTranslations = {
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
         "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
         "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。",
-        "warfare": "对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。"
+        "warfare": "对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。",
+        "haste": "加快你的武器挥击和法术施放。它不会缩短全局冷却时间。",
+        "parry": "你完全招架来自正面近战攻击、不受任何伤害的几率。来自背后的攻击无法被招架。"
       },
       "effects": {
         "attackPower": "+{value} 攻击强度",
@@ -1113,7 +1144,8 @@ export const zh_CN: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
-      "unequipHint": "点击 ×、右键点击或拖到背包以卸下"
+      "unequipHint": "点击 ×、右键点击或拖到背包以卸下",
+      "offhand": "副手"
     },
     "account": {
       "title": "账户",
@@ -1322,8 +1354,16 @@ export const zh_CN: EnTranslations = {
       "attackSpeedFast": "攻击速度提高 {pct}%",
       "haste": "攻击速度和施法速度提高 {pct}%",
       "tongues": "施法时间延长 {pct}%",
+      "combustionCrit": "你的火焰法术必定造成致命一击",
+      "overloadNext": "下一个法术效果提高{pct}%，但法力消耗增加50%",
+      "powerEchoNext": "下一个直接法术以{pct}%的威力对同一目标重复施放",
+      "iceFloesCasts": "接下来{n}个有施法时间的法术可在移动中施放",
+      "freeCast": "下一次施法不消耗任何资源",
+      "instantCast": "下一个有施法时间的法术变为瞬发",
+      "cheapCast": "下一个法术消耗降低{pct}%",
       "increase": {
         "ap": "攻击强度提高 {value}",
+        "sp": "法术强度提高 {value}",
         "armor": "护甲提高 {value}",
         "int": "智力提高 {value}",
         "agi": "敏捷提高 {value}",
@@ -1387,7 +1427,22 @@ export const zh_CN: EnTranslations = {
         "shadow": "暗影",
         "holy": "神圣",
         "nature": "自然"
-      }
+      },
+      "battleStance": "战斗姿态：怒气产生提高 10%",
+      "berserkerStance": "狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%",
+      "dmgDone": "造成的伤害提高 {pct}%",
+      "dmgDoneReduce": "造成的伤害降低 {pct}%",
+      "crit": "暴击几率提高 {pct}%",
+      "rageGen": "怒气产生提高 {pct}%",
+      "reckless": "暴击几率提高 {pct}%，怒气产生提高 {ragePct}%",
+      "avatar": "巨像：造成的伤害提高 {pct}%",
+      "bloodbath": "暴击几率和造成的伤害提高 {pct}%",
+      "dieBySword": "受到的伤害降低 {pct}%（生命值低于 {hpPct}% 时为 {lowPct}%）",
+      "sanguine": "攻击速度提高 {hastePct}%，造成的伤害提高 {dmgPct}%",
+      "battleTrance": "你的下一次劫掠打击或蛮力挥击不消耗怒气",
+      "revengeFree": "你的下一次复仇不消耗怒气",
+      "victoryRush": "乘胜追击已就绪",
+      "maxHpPct": "最大生命值提高 {pct}%"
     },
     "worldBoss": {
       "spawn": "{name}在荆峰高地崛起！"
@@ -1437,6 +1492,33 @@ export const zh_CN: EnTranslations = {
     "playerFrame": {
       "unlock": "移动玩家框",
       "lock": "锁定玩家框"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "重置框体位置"
@@ -2491,6 +2573,14 @@ export const zh_CN: EnTranslations = {
       "frost_armor": "持续的自我增益，开战前先硬化你的护甲。",
       "arcane_intellect": "提升智力以扩大盟友的法力上限，开怪前先施放。",
       "frostbolt": "从远处发动攻击并减速目标，让它无法贴近你。",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "制造饮品以恢复法力，让你在两次开怪之间补给。",
       "conjure_food": "制造食物，坐下进食时可以恢复生命值。",
       "shadow_bolt": "向目标施放一道暗影箭，是你的常用输出。",
@@ -2504,7 +2594,9 @@ export const zh_CN: EnTranslations = {
       "mark_of_the_wild": "开战前为自己或盟友施加的持续祝福。",
       "moonfire": "瞬间命中并让目标持续燃烧，移动时也很好用。",
       "rejuvenation": "瞬发施放，持续治疗盟友，让你可以继续行动。",
-      "thorns": "守护盟友，让近战攻击者在打击时反伤自己。"
+      "thorns": "守护盟友，让近战攻击者在打击时反伤自己。",
+      "revenge": "一次横扫反击，命中你前方的所有目标；在你架开一击后紧接着施放会更省怒气。",
+      "hamstring": "划伤目标的双腿使其减速，让它无法追上你。"
     },
     "petHook": {
       "emberkin": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
@@ -4967,7 +5059,9 @@ export const zh_CN: EnTranslations = {
       "death": "{name}死亡。",
       "auraGain": "你获得了 {name}。",
       "auraFade": "{name}从你身上消失。",
-      "auraAfflicted": "{target}受到了 {name} 影响。"
+      "auraAfflicted": "{target}受到了 {name} 影响。",
+      "floatingParry": "招架",
+      "parried": "{target}招架了你的{ability}。"
     },
     "system": {
       "playerDeath": "你已经死亡。",
@@ -5053,7 +5147,9 @@ export const zh_CN: EnTranslations = {
       "tradeInProgress": "已有交易正在进行。",
       "tradeTooFar": "目标太远，无法交易。",
       "tradeExpired": "交易请求已过期。",
-      "tradeFailed": "交易失败：物品或金钱已不可用。"
+      "tradeFailed": "交易失败：物品或金钱已不可用。",
+      "nothingToConsume": "没有可消耗的效果。",
+      "needShield": "你必须装备盾牌。"
     },
     "logs": {
       "standUp": "你站了起来。",
@@ -5119,6 +5215,7 @@ export const zh_CN: EnTranslations = {
     },
     "pet": {
       "attack": "攻击",
+      "waterJet": "Water Jet",
       "taunt": "嘲讽",
       "healDemon": "治疗恶魔",
       "healPet": "治疗宠物",
@@ -5127,6 +5224,8 @@ export const zh_CN: EnTranslations = {
       "aggressive": "攻击",
       "petAttackTitle": "宠物攻击",
       "petAttackDesc": "命令你的宠物攻击当前敌对目标。",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "宠物嘲讽",
       "petTauntDesc": "命令你的宠物接战，并在进入范围时使用低吼。10 秒冷却。",
       "healDemonDesc": "消耗法力，在 5 秒内向你的恶魔引导治疗。",
@@ -5249,6 +5348,7 @@ export const zh_CN: EnTranslations = {
     "actionBar": {
       "attackName": "攻击",
       "attackTooltip": "对目标开启或关闭自动攻击。右键点击敌人也会发起攻击。",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "空栏位",
       "slotAria": "动作栏位 {slot}：{ability}",
       "emptySlotAria": "动作栏位 {slot}：空",
@@ -5400,7 +5500,8 @@ export const zh_CN: EnTranslations = {
       "legs": "腿部",
       "gloves": "手部",
       "feet": "脚部",
-      "ring": "手指"
+      "ring": "手指",
+      "twoHand": "双手"
     },
     "quality": {
       "poor": "粗糙",
@@ -5744,6 +5845,46 @@ export const zh_CN: EnTranslations = {
       "frostbolt": {
         "name": "凛霜之矛",
         "description": "发射一支寒冰箭，造成 {damage} 点冰霜伤害，并使移动速度降低 40%。"
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Flurry",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Shatter",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "束水术",
@@ -6245,9 +6386,17 @@ export const zh_CN: EnTranslations = {
         "name": "神圣震击",
         "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"
       },
+      "aura_surge": {
+        "name": "光辉涌动",
+        "description": "过载你的光环，使你在10秒内获得160点护甲。（圣骑士天赋）"
+      },
       "holy_shield": {
         "name": "神圣之盾",
         "description": "以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）"
+      },
+      "repentance": {
+        "name": "忏悔",
+        "description": "使敌人陷入冥想状态，最多持续 6 秒。任何伤害都会打破效果。（惩戒专精标志技能）"
       },
       "bestial_wrath": {
         "name": "狂野怒火",
@@ -6321,6 +6470,34 @@ export const zh_CN: EnTranslations = {
         "name": "迅捷治愈",
         "description": "吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）"
       },
+      "storm_bolt": {
+        "name": "风暴之锤",
+        "description": "将你的武器掷向目标，造成 {damage} 点伤害，并使其昏迷 3 秒。"
+      },
+      "piercing_howl": {
+        "name": "穿刺怒吼",
+        "description": "一声穿刺的呼喝，使 15 码内的所有敌人减速 50%，持续 8 秒。"
+      },
+      "die_by_sword": {
+        "name": "剑在人在",
+        "description": "防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。"
+      },
+      "recklessness": {
+        "name": "鲁莽",
+        "description": "激怒：你的怒气产生提高 50%，暴击几率提高 20%，持续 12 秒。"
+      },
+      "sanguine_aura": {
+        "name": "血色光环",
+        "description": "以敌人之血浸染你的武器：你和你的近战盟友获得 10% 攻击速度和 10% 伤害加成，持续 20 秒。"
+      },
+      "victory_rush": {
+        "name": "乘胜追击",
+        "description": "攻击造成武器伤害加 {damage}，并治疗相当于最大生命值 20% 的生命。仅可在击杀敌人后 20 秒内使用。"
+      },
+      "intimidating_shout": {
+        "name": "破胆怒吼",
+        "description": "一声骇人的怒吼，使 8 码内至多 5 个敌人恐惧逃散 8 秒。伤害可能打破效果。"
+      },
       "summon_imp": {
         "name": "召唤烬裔",
         "description": "召唤一只听从术士命令的烬裔。烬裔会从远处向你的敌人投掷灰烬箭。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
@@ -6349,6 +6526,146 @@ export const zh_CN: EnTranslations = {
         "name": "召唤亡魂裔",
         "description": "将一只亡魂裔束缚于你的意志之下，这是一种精英恶魔，会从远处倾泻沉重的暗影伤害。漫长的冷却时间限制了它的毁灭性威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
       },
+      "aspect_of_the_wild": {
+        "name": "野牙伪装",
+        "description": "以野性之力激励附近的盟友，提高攻击强度，持续 5 分钟。（猎人天赋）"
+      },
+      "avatar": {
+        "name": "战争化身",
+        "description": "化身为巨像，持续 20 秒，解除你身上的所有控制效果，并使你造成的伤害提高 20%。"
+      },
+      "avenging_wrath": {
+        "name": "复仇之翼",
+        "description": "唤降复仇之力，提高攻击强度和法术强度，持续 20 秒。（圣骑士天赋）"
+      },
+      "berserk": {
+        "name": "赤红迷雾",
+        "description": "提高攻击强度，持续 15 秒。（德鲁伊天赋）"
+      },
+      "bladestorm": {
+        "name": "剑刃风暴",
+        "description": "化身为一道旋转的钢铁风暴，在 4 秒内每秒对 8 码内的所有敌人造成 {damage} 点伤害。"
+      },
+      "razor_howl": {
+        "name": "锐刃怒吼",
+        "description": "使 15 码内的敌人减速 50%，持续 8 秒。（战士天赋）"
+      },
+      "stormthrow": {
+        "name": "风暴投掷",
+        "description": "投掷武器，使目标昏迷 3 秒。（战士天赋）"
+      },
+      "reckless_vow": {
+        "name": "鲁莽誓言",
+        "description": "所有怒气生成提高 50%，暴击几率提高 20%，持续 12 秒。（战士天赋）"
+      },
+      "red_banner": {
+        "name": "赤红战旗",
+        "description": "你和附近盟友的攻击速度提高 10%，伤害提高 10%，持续 20 秒。（战士天赋）"
+      },
+      "blink": {
+        "name": "闪烁步",
+        "description": "向前瞬移 15 码并解除定身效果。（法师天赋）"
+      },
+      "bloodlust": {
+        "name": "战鼓",
+        "description": "让附近的盟友陷入狂热，提高攻击速度，持续 15 秒。（萨满天赋）"
+      },
+      "chain_lightning": {
+        "name": "叉状闪电",
+        "description": "向目标区域掷出闪电，对附近敌人造成 {damage} 点伤害。（萨满天赋）"
+      },
+      "chaos_bolt": {
+        "name": "毁灭箭",
+        "description": "掷出一枚混乱火焰之箭，造成 {damage} 点火焰伤害。（术士天赋）"
+      },
+      "cloak_of_shadows": {
+        "name": "暗影斗篷",
+        "description": "以暗影包裹自身，吸收伤害，持续 5 秒。（潜行者天赋）"
+      },
+      "cone_of_cold": {
+        "name": "寒霜横扫",
+        "description": "以寒霜冲击附近的敌人，造成 {damage} 点冰霜伤害。（冰霜专精标志技能）"
+      },
+      "counterspell": {
+        "name": "破法",
+        "description": "反制目标的施法，并在6秒内封锁该法术学派。"
+      },
+      "curse_of_exhaustion": {
+        "name": "铅沉妖咒",
+        "description": "诅咒目标，使其移动速度降低 30%，持续 12 秒。（术士天赋）"
+      },
+      "death_coil": {
+        "name": "墓穴缠卷",
+        "description": "对敌人造成 {damage} 点暗影伤害，随后使其恐惧 3 秒。此法术不会治疗施法者。（术士天赋）"
+      },
+      "deep_freeze": {
+        "name": "死霜",
+        "description": "将目标深度冻结，造成 {damage} 点冰霜伤害并使其昏迷 4 秒。（法师天赋）"
+      },
+      "desperate_prayer": {
+        "name": "最后祈祷",
+        "description": "立即为你治疗 {damage} 点生命值。（牧师天赋）"
+      },
+      "deterrence": {
+        "name": "鬃刺守卫",
+        "description": "提高你的躲闪几率 50%，持续 10 秒。（猎人天赋）"
+      },
+      "divine_shield": {
+        "name": "圣光守护",
+        "description": "以神圣之力护佑你，吸收大量伤害，持续 8 秒。（圣骑士天赋）"
+      },
+      "earthbind": {
+        "name": "攫握大地",
+        "description": "将附近的敌人束缚于大地，定身 2 秒。（萨满天赋）"
+      },
+      "evocation": {
+        "name": "以太之井",
+        "description": "快速恢复法力。（法师天赋）"
+      },
+      "frenzied_regeneration": {
+        "name": "野性愈合",
+        "description": "在 10 秒内恢复生命值。仅限蛮熊形态。（德鲁伊天赋）"
+      },
+      "frost_trap": {
+        "name": "霜纹陷阱",
+        "description": "将目标区域的敌人冻结在原地，持续 3 秒。（猎人天赋）"
+      },
+      "ghostly_strike": {
+        "name": "幽魂打击",
+        "description": "对敌人造成武器伤害外加 {damage} 点伤害，并短暂提高躲闪几率。获得 1 个连击点。（潜行者天赋）"
+      },
+      "hammer_of_wrath": {
+        "name": "鸣钟之锤",
+        "description": "向受创的敌人掷出神圣之锤，造成 {damage} 点神圣伤害。仅可对生命值低于 20% 的目标使用。（圣骑士天赋）"
+      },
+      "healing_stream": {
+        "name": "泉涌",
+        "description": "在 12 秒内治疗一名友方目标。（萨满天赋）"
+      },
+      "heroic_leap": {
+        "name": "英勇飞跃",
+        "description": "跃向目标区域，对附近的敌人造成 {damage} 点伤害。"
+      },
+      "holy_wrath": {
+        "name": "圣徒之怒",
+        "description": "释放神圣之力，对附近敌人造成 {damage} 点伤害。（圣骑士天赋）"
+      },
+      "howl_of_terror": {
+        "name": "恐惧嚎叫",
+        "description": "恐吓附近的敌人，最多持续 3 秒。受到伤害可能打破该效果。（术士天赋）"
+      },
+      "ice_block": {
+        "name": "寒冰棺",
+        "description": "将你封入寒冰之中，吸收大量伤害，持续 8 秒。（法师天赋）"
+      },
+      "inner_focus": {
+        "name": "静心",
+        "description": "使你的下一个法术不消耗法力。持续 60 秒。（牧师天赋）"
+      },
+      "innervate": {
+        "name": "生命树液",
+        "description": "生命树液在你体内涌动10秒，如波浪般恢复20点当前资源：法力、怒气或能量，变形也不会中断。（德鲁伊天赋）"
+      },
       "pummel": {
         "name": "碎颚击",
         "description": "打断目标的施法，并在4秒内封锁该法术学派。"
@@ -6357,9 +6674,81 @@ export const zh_CN: EnTranslations = {
         "name": "飞踢",
         "description": "打断目标的施法，并在4秒内封锁该法术学派。"
       },
-      "counterspell": {
-        "name": "破法",
-        "description": "反制目标的施法，并在6秒内封锁该法术学派。"
+      "last_stand": {
+        "name": "第十一刻",
+        "description": "暂时提高耐力，持续 15 秒，提高最大生命值。（战士天赋）"
+      },
+      "mend_pet": {
+        "name": "修补",
+        "description": "在 15 秒内为友方目标治疗 {damage} 点生命值。（猎人天赋）"
+      },
+      "meteor": {
+        "name": "天石",
+        "description": "唤降一颗陨石轰击目标区域，造成 {damage} 点火焰伤害并点燃地面。（法师天赋）"
+      },
+      "temporal_mend": {
+        "name": "时光缝合",
+        "description": "将盟友向前拉动一瞬，在身体安定于更健康的未来形态时治疗{damage}点生命值。(时光术特色技能)"
+      },
+      "temporal_barrier": {
+        "name": "时光屏障",
+        "description": "将目标移出当下一瞬：时光之壳在10秒内吸收{damage}点伤害，随后时间线弹回原位。"
+      },
+      "temporal_echo": {
+        "name": "时光回响",
+        "description": "以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你造成的奥术伤害有一部分会通过回响转化为对其的治疗。"
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "灼思",
+        "description": "向目标区域引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）"
+      },
+      "multi_shot": {
+        "name": "分裂射击",
+        "description": "射出多枚箭矢，对附近敌人造成 {damage} 点伤害。（猎人天赋）"
+      },
+      "prayer_of_healing": {
+        "name": "圣歌愈疗",
+        "description": "治疗附近的盟友 {damage} 点生命值。（牧师天赋）"
+      },
+      "preparation": {
+        "name": "应变",
+        "description": "结束疾跑、闪避和消失的冷却时间。（潜行者天赋）"
+      },
+      "presence_of_mind": {
+        "name": "疾思",
+        "description": "使你的下一个有施法时间的法术立即完成。持续 60 秒。（法师天赋）"
+      },
+      "psychic_scream": {
+        "name": "心灵尖啸",
+        "description": "恐吓附近的敌人，最多持续 4 秒。受到伤害可能打破该效果。（牧师天赋）"
+      },
+      "rallying_cry": {
+        "name": "集结呐喊",
+        "description": "发出一声集结呐喊，使你和 40 码内的队伍成员获得 20% 的额外最大生命值，持续 10 秒。"
       },
       "counter_shot": {
         "name": "静默射击",
@@ -6369,6 +6758,18 @@ export const zh_CN: EnTranslations = {
         "name": "谴喝",
         "description": "打断目标的施法，并在4秒内封锁该法术学派。"
       },
+      "shadowstep": {
+        "name": "影步",
+        "description": "穿过暗影，移动到目标身旁。（潜行者天赋）"
+      },
+      "shield_wall": {
+        "name": "壁垒",
+        "description": "筑起坚不可摧的壁垒，大幅提高护甲，持续 10 秒。（战士天赋）"
+      },
+      "silence": {
+        "name": "沉默",
+        "description": "沉默目标，持续 4 秒。（牧师天赋）"
+      },
       "skull_bash": {
         "name": "头槌",
         "description": "猛然头槌，打断目标的施法，并在4秒内封锁该学派。"
@@ -6376,6 +6777,10 @@ export const zh_CN: EnTranslations = {
       "spell_lock": {
         "name": "封口令",
         "description": "在施法中沉默目标，并在5秒内封锁该法术学派。"
+      },
+      "tranquility": {
+        "name": "林地之歌",
+        "description": "引导恢复之力，每秒治疗附近的盟友。（德鲁伊天赋）"
       },
       "bear_charge": {
         "name": "巨熊冲锋",
@@ -6396,6 +6801,98 @@ export const zh_CN: EnTranslations = {
       "revive_pet": {
         "name": "复活宠物",
         "description": "复活你死去的宠物，并将其召回身边。"
+      },
+      "revenge": {
+        "name": "复仇",
+        "description": "以宽阔的弧线攻击，对你前方所有敌人造成物理伤害。目标超过 5 个时伤害降低。当你躲闪或招架时，你的下一次复仇可能不消耗怒气。"
+      },
+      "battle_stance": {
+        "name": "战斗姿态",
+        "description": "一种具有侵略性的战斗姿态：你产生的怒气提高 10%。武器和防护专精的默认姿态。"
+      },
+      "berserker_stance": {
+        "name": "狂暴姿态",
+        "description": "一种鲁莽的战斗姿态：你的暴击几率提高 3%，暴击伤害提高 3%。狂怒战士始终以此姿态作战。"
+      },
+      "sweeping_strikes": {
+        "name": "扩弧斩",
+        "description": "持续 12 秒，你的单体攻击还会以 75% 的伤害额外打击 1 个附近的敌人。（武器）"
+      },
+      "deep_wounds": {
+        "name": "裂创",
+        "description": "被动：你的致残打击会使目标流血，在 6 秒内造成物理伤害。（武器）"
+      },
+      "enrage_passive": {
+        "name": "暴乱",
+        "description": "被动：处于激怒状态时，你造成的伤害提高 11%，攻击速度提高 25%，移动速度提高 10%，持续 4 秒。放血有 30% 几率使你激怒；血色收割则必定触发。（狂怒）"
+      },
+      "raging_gale": {
+        "name": "双重打击",
+        "description": "立即用武器攻击两次，每次命中造成 60% 武器伤害加 {damage}，并产生 {rage} 点怒气。最多储存 2 次充能。（狂怒）"
+      },
+      "red_harvest": {
+        "name": "血色收割",
+        "description": "倾尽所有：在狂乱中攻击三次，每次造成武器伤害加 {damage}。（狂怒）"
+      },
+      "furious_mending": {
+        "name": "狂怒愈合",
+        "description": "持续 10 秒，你受到的伤害降低 20%，并且在此期间你的放血会为你治疗相当于最大生命值 20% 的生命。（狂怒）"
+      },
+      "emboldening_roar": {
+        "name": "鼓舞怒吼",
+        "description": "发出一声鼓舞的怒吼：你和 40 码内的友方玩家获得鼓舞，你接下来的 3 个技能必定暴击。（狂怒）"
+      },
+      "raised_guard": {
+        "name": "举盾格挡",
+        "description": "举盾防身：你受到的物理伤害降低 50%，持续 6 秒。最多储存 2 次充能。（防护）"
+      },
+      "iron_resolve": {
+        "name": "钢铁意志",
+        "description": "咬紧牙关无视疼痛：消耗你的全部怒气（至少 20 点），每消耗 1 点怒气吸收 4 点伤害，最多持续 10 秒。（防护）"
+      },
+      "faultline": {
+        "name": "地裂",
+        "description": "沿地面发出一道冲击波：你前方 8 码内的敌人受到 {damage} 点伤害，并昏迷 3 秒。（防护）"
+      },
+      "defiant_bellow": {
+        "name": "挑衅怒吼",
+        "description": "一声挑衅的怒吼：10 码内的每个敌人都被嘲讽，被迫攻击你 3 秒。（防护）"
+      },
+      "breachmaker": {
+        "name": "破防者",
+        "description": "重击目标，造成武器伤害加 {damage}，并破开其防御：你对它的攻击造成的伤害提高 20%，持续 8 秒。（武器）"
+      },
+      "measured_fury": {
+        "name": "蓄怒",
+        "description": "你收放自如的怒火让消耗更精打细算：你的技能怒气消耗降低 10%。（武器）"
+      },
+      "seasoned_soldier": {
+        "name": "沙场老兵",
+        "description": "你的自动攻击暴击时产生的怒气提高 10%。（武器）"
+      },
+      "diabolical_twinstrike": {
+        "name": "邪恶双重打击",
+        "description": "处于激怒状态时，你的双重打击造成的伤害提高 15%。（狂怒）"
+      },
+      "cleaving_blows": {
+        "name": "顺劈打击",
+        "description": "血色收割必定返还一次双重打击的充能。（狂怒）"
+      },
+      "sudden_death": {
+        "name": "骤死",
+        "description": "你的自动攻击有几率让你对任意生命值的目标施放早赴黄泉，且不消耗怒气。（武器）"
+      },
+      "shamanistic_rage": {
+        "name": "萨满之怒",
+        "description": "释放萨满之怒，恢复 160 点法力。（增强专精标志技能）"
+      },
+      "natures_swiftness": {
+        "name": "自然迅捷",
+        "description": "呼唤自然之力，使你的下一个法术瞬发。（恢复专精标志技能）"
+      },
+      "fel_domination": {
+        "name": "邪能支配",
+        "description": "支配邪能，使你的下一个法术瞬发。（恶魔学识专精标志技能）"
       }
     },
     "items": {
@@ -7722,31 +8219,61 @@ export const zh_CN: EnTranslations = {
       "deathless_heartwood": {
         "name": "不朽王冠之心木"
       },
+      "deathless_heartwood_heroic": {
+        "name": "不朽王冠之心木"
+      },
       "kingsbane_last_oath": {
+        "name": "弑座者，荆峰的最后誓言"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "弑座者，荆峰的最后誓言"
       },
       "crownforged_dreadhelm": {
         "name": "骨铸恐惧头盔"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "骨铸恐惧头盔"
+      },
       "crownforged_warspaulders": {
+        "name": "骨铸战肩甲"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "骨铸战肩甲"
       },
       "nighttalon_crown": {
         "name": "恐牙之冠"
       },
+      "nighttalon_crown_heroic": {
+        "name": "恐牙之冠"
+      },
       "nighttalon_shoulderguards": {
+        "name": "恐牙护肩"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "恐牙护肩"
       },
       "soulflame_cowl": {
         "name": "魂焰兜帽"
       },
+      "soulflame_cowl_heroic": {
+        "name": "魂焰兜帽"
+      },
       "soulflame_mantle": {
+        "name": "魂焰披肩"
+      },
+      "soulflame_mantle_heroic": {
         "name": "魂焰披肩"
       },
       "stormcallers_crown": {
         "name": "唤风之冠"
       },
+      "stormcallers_crown_heroic": {
+        "name": "唤风之冠"
+      },
       "stormcallers_spaulders": {
+        "name": "唤风肩甲"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "唤风肩甲"
       },
       "unknown_alien_weaponry": {
@@ -7823,6 +8350,30 @@ export const zh_CN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "唤雷者腰甲"
+      },
+      "eastbrook_buckler": {
+        "name": "东溪小圆盾"
+      },
+      "eastbrook_greatsword": {
+        "name": "东溪巨剑"
+      },
+      "highwatch_wallshield": {
+        "name": "高望壁盾"
+      },
+      "highwatch_greatsword": {
+        "name": "高望巨剑"
+      },
+      "deathless_warguard_legmail": {
+        "name": "不死战卫腿甲"
+      },
+      "soulrend_diadem": {
+        "name": "裂魂冠冕"
+      },
+      "scourgehide_carapace": {
+        "name": "灾祸之皮甲壳"
+      },
+      "soulforged_warplate": {
+        "name": "铸魂战甲"
       }
     },
     "mobs": {
@@ -7997,9 +8548,6 @@ export const zh_CN: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "复苏王室卫兵"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "尼思拉克西斯，荆峰之灾"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "奥德伦，亡魂战卫"
       },
@@ -8008,6 +8556,9 @@ export const zh_CN: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "沃斯，亡魂之刃"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "尼思拉克西斯，荆峰之灾"
       },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"

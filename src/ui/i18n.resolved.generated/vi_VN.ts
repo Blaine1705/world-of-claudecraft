@@ -85,6 +85,9 @@ export const vi_VN: EnTranslations = {
       "title": "Thiên phú",
       "classTab": "Lớp",
       "specTab": "Chuyên môn",
+      "choicesTab": "Lựa chọn",
+      "rowUnlockToast": "Đã mở khóa một lựa chọn tài năng mới!",
+      "rowUnlocks": "Mở khóa ở cấp {level}",
       "available": "Khả dụng",
       "spent": "Đã dùng",
       "pointSource": "Nhận 1 điểm tài năng mỗi cấp từ cấp {first} đến {cap}. Lên cấp để có thêm điểm.",
@@ -143,6 +146,7 @@ export const vi_VN: EnTranslations = {
         "noTree": "Lớp nhân vật của bạn chưa có cây thiên phú.",
         "locked": "Bạn chưa mở khóa thiên phú — chúng bắt đầu ở cấp {level}.",
         "noSpec": "chưa có chuyên môn",
+        "rowsSummary": "Tài năng: {head}, đã chọn {picked}/{unlocked} hàng lựa chọn.",
         "summary": "Thiên phú: {head} — đã dùng {spent}/{total} điểm ({breakdown}).",
         "breakdownClass": "Lớp {classPts}",
         "breakdownSpec": "Lớp {classPts}, {spec} {specPts}",
@@ -166,6 +170,10 @@ export const vi_VN: EnTranslations = {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
       "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống."
+    },
+    "fct": {
+      "absorbed": "Đã hấp thụ {amount}",
+      "cheap": "Giảm chi phí!"
     },
     "emotes": {
       "wave": "Vẫy Tay",
@@ -862,9 +870,27 @@ export const vi_VN: EnTranslations = {
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
       "mobileLeftHanded": "Bố cục thuận tay trái"
+    },
+    "talentRows": {
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
+    },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "specUnlockBanner": "Specialization Unlocked!",
+      "specUnlockHint": "Press N to choose your specialization."
     },
     "controller": {
       "title": "Tay Cầm",
@@ -1277,7 +1303,7 @@ export const vi_VN: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Không thể phá hủy vật phẩm này.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Nhấp phải để phá hủy",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",
@@ -1322,8 +1348,16 @@ export const vi_VN: EnTranslations = {
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
+      "combustionCrit": "Your Fire spells always critically strike",
+      "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",
+      "powerEchoNext": "Your next direct spell repeats at {pct}% power on the same target",
+      "iceFloesCasts": "Your next {n} spells with a cast time can be cast while moving",
+      "freeCast": "Your next cast costs nothing",
+      "instantCast": "Your next spell with a cast time is instant",
+      "cheapCast": "Your next spell costs {pct}% less",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
+        "sp": "Increases spell power by {value}",
         "armor": "Aumenta la armadura en {value}",
         "int": "Aumenta el intelecto en {value}",
         "agi": "Aumenta la agilidad en {value}",
@@ -1437,6 +1471,33 @@ export const vi_VN: EnTranslations = {
     "playerFrame": {
       "unlock": "Di chuyển khung người chơi",
       "lock": "Khóa khung người chơi"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Đặt Lại Vị Trí Các Khung"
@@ -2491,6 +2552,14 @@ export const vi_VN: EnTranslations = {
       "frost_armor": "Một buff bản thân lâu dài giúp tôi luyện giáp của bạn trước trận đấu.",
       "arcane_intellect": "Tăng Trí Tuệ để mở rộng bể mana của đồng đội, hãy niệm trước khi vào trận.",
       "frostbolt": "Tấn công từ xa và làm chậm mục tiêu để nó không thể áp sát bạn.",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "Tạo ra đồ uống hồi mana, để bạn nạp lại giữa các đợt kéo quái.",
       "conjure_food": "Tạo ra thức ăn hồi máu khi bạn ngồi xuống dùng bữa.",
       "shadow_bolt": "Một tia bóng tối bạn niệm vào mục tiêu, đòn chủ lực quen thuộc của bạn.",
@@ -5119,6 +5188,7 @@ export const vi_VN: EnTranslations = {
     },
     "pet": {
       "attack": "Tấn Công",
+      "waterJet": "Water Jet",
       "taunt": "Khiêu Khích",
       "healDemon": "Trị Liệu Quỷ",
       "healPet": "Trị Liệu Thú",
@@ -5127,6 +5197,8 @@ export const vi_VN: EnTranslations = {
       "aggressive": "Hung Hãn",
       "petAttackTitle": "Thú Tấn Công",
       "petAttackDesc": "Ra lệnh cho thú tấn công mục tiêu thù địch hiện tại của bạn.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Thú Khiêu Khích",
       "petTauntDesc": "Ra lệnh cho thú lao vào và Gầm Gừ khi trong tầm. Hồi chiêu 10 giây.",
       "healDemonDesc": "Tiêu hao mana để truyền trị liệu cho quỷ của bạn trong 5 giây.",
@@ -5249,6 +5321,7 @@ export const vi_VN: EnTranslations = {
     "actionBar": {
       "attackName": "Tấn Công",
       "attackTooltip": "Bật/tắt tự động tấn công mục tiêu. Nhấp chuột phải vào kẻ địch cũng sẽ tấn công.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Ô trống",
       "slotAria": "Ô hành động {slot}: {ability}",
       "emptySlotAria": "Ô hành động {slot}: trống",
@@ -5744,6 +5817,46 @@ export const vi_VN: EnTranslations = {
       "frostbolt": {
         "name": "Thương Băng Giá",
         "description": "Phóng ra một mũi tiễn băng, gây {damage} sát thương Băng và làm chậm di chuyển 40%."
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Flurry",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Shatter",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Kết Nước",
@@ -6245,9 +6358,17 @@ export const vi_VN: EnTranslations = {
         "name": "Sốc Thánh",
         "description": "Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)"
       },
+      "aura_surge": {
+        "name": "Sóng Hào Quang",
+        "description": "Quá tải hào quang của bạn, gia cố 160 giáp trong 10 giây. (thiên phú Paladin)"
+      },
       "holy_shield": {
         "name": "Khiên Thánh",
         "description": "Bảo vệ bạn bằng sức mạnh Thánh trong 10 giây, tăng giáp thêm 90 và đánh kẻ tấn công cận chiến gây 12 sát thương Thánh. (dấu ấn Bảo Hộ)"
+      },
+      "repentance": {
+        "name": "Repentance",
+        "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
       },
       "bestial_wrath": {
         "name": "Cơn Thịnh Nộ Dã Thú",
@@ -6321,6 +6442,34 @@ export const vi_VN: EnTranslations = {
         "name": "Hồi Phục Nhanh",
         "description": "Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage}. (dấu ấn Phục Hồi)"
       },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
       "summon_imp": {
         "name": "Triệu Hồi Emberkin",
         "description": "Triệu hồi một Emberkin dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Emberkin ném Tiễn Tro vào kẻ địch của bạn từ xa. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
@@ -6349,6 +6498,146 @@ export const vi_VN: EnTranslations = {
         "name": "Triệu Hồi Wraithborn",
         "description": "Ràng buộc một Wraithborn theo ý chí của bạn, một con quỷ tinh nhuệ trút sát thương Bóng Tối nặng nề từ xa. Thời gian hồi chiêu dài kìm hãm sức mạnh tàn phá của nó. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
       },
+      "aspect_of_the_wild": {
+        "name": "Dáng Nanh Hoang",
+        "description": "Inspira a gần đó đồng minh con fuerza salvaje, aumentando sức tấn công durante 5 phút. (thiên phú thợ săn)"
+      },
+      "avatar": {
+        "name": "Khổng Tượng",
+        "description": "Te transforma en un coloso y aumenta sức tấn công durante 20 giây. (thiên phú chiến binh)"
+      },
+      "avenging_wrath": {
+        "name": "Cánh Báo Thù",
+        "description": "Invoca poder vengador y aumenta sức tấn công y sức mạnh phép durante 20 giây. (thiên phú hiệp sĩ)"
+      },
+      "berserk": {
+        "name": "Sương Đỏ",
+        "description": "Aumenta sức tấn công durante 15 giây. (thiên phú druid)"
+      },
+      "bladestorm": {
+        "name": "Lốc Thép",
+        "description": "Te convierte en una tormenta de acero que golpea a gần đó kẻ địch cada segundo por {damage}. (thiên phú chiến binh)"
+      },
+      "razor_howl": {
+        "name": "Tiếng Hú Sắc Lẻm",
+        "description": "Một tiếng hét làm chậm kẻ địch trong phạm vi 15 m đi 50% trong 8 giây. (Tài năng chiến binh)"
+      },
+      "stormthrow": {
+        "name": "Ném Bão",
+        "description": "Ném vũ khí để làm choáng mục tiêu trong 3 giây. (Tài năng chiến binh)"
+      },
+      "reckless_vow": {
+        "name": "Lời Thề Liều Lĩnh",
+        "description": "Tăng 50% toàn bộ lượng nộ tạo ra và 20% tỉ lệ chí mạng trong 12 giây. (Tài năng chiến binh)"
+      },
+      "red_banner": {
+        "name": "Chiến Kỳ Đỏ",
+        "description": "Bạn và đồng minh ở gần nhận 10% tốc độ đánh và 10% sát thương trong 20 giây. (Tài năng chiến binh)"
+      },
+      "blink": {
+        "name": "Bước Chớp",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (thiên phú pháp sư)"
+      },
+      "bloodlust": {
+        "name": "Trống Chiến",
+        "description": "Lleva a gần đó đồng minh al frenesí y aumenta su velocidad de ataque durante 15 giây. (thiên phú pháp sư tổ linh)"
+      },
+      "chain_lightning": {
+        "name": "Sét Rẽ Nhánh",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a gần đó kẻ địch. (thiên phú pháp sư tổ linh)"
+      },
+      "chaos_bolt": {
+        "name": "Tia Hủy Diệt",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Lửa. (thiên phú thuật sĩ)"
+      },
+      "cloak_of_shadows": {
+        "name": "Áo Choàng Bóng",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 giây. (thiên phú đạo tặc)"
+      },
+      "cone_of_cold": {
+        "name": "Quét Băng",
+        "description": "Golpea a gần đó kẻ địch con escarcha e inflige {damage} de daño de Băng. (thiên phú pháp sư)"
+      },
+      "counterspell": {
+        "name": "Phản Phép",
+        "description": "Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây."
+      },
+      "curse_of_exhaustion": {
+        "name": "Lời Nguyền Chì",
+        "description": "Maldice a mục tiêu y reduce su velocidad de movimiento un 30% durante 12 giây. (thiên phú thuật sĩ)"
+      },
+      "death_coil": {
+        "name": "Vòng Xoáy Mộ",
+        "description": "Golpea a mục tiêu por {damage} de daño de Bóng tối y luego lo aterroriza durante 3 giây. Esta versión no sana al lanzador. (thiên phú thuật sĩ)"
+      },
+      "deep_freeze": {
+        "name": "Băng Chết",
+        "description": "Congela profundamente a mục tiêu, inflige {damage} de daño de Băng y lo aturde durante 4 giây. (thiên phú pháp sư)"
+      },
+      "desperate_prayer": {
+        "name": "Lời Cầu Cuối",
+        "description": "Te sana al instante por {damage}. (thiên phú tu sĩ)"
+      },
+      "deterrence": {
+        "name": "Hộ Vệ Gai",
+        "description": "Aumenta tu tỉ lệ né un 50% durante 10 giây. (thiên phú thợ săn)"
+      },
+      "divine_shield": {
+        "name": "Hộ Vệ Ánh Sáng",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú hiệp sĩ)"
+      },
+      "earthbind": {
+        "name": "Đất Níu Giữ",
+        "description": "Ata a la tierra a gần đó kẻ địch y los inmoviliza durante 2 giây. (thiên phú pháp sư tổ linh)"
+      },
+      "evocation": {
+        "name": "Giếng Ête",
+        "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
+      },
+      "frenzied_regeneration": {
+        "name": "Hồi Phục Hoang Dã",
+        "description": "Regenera salud durante 10 giây. Solo en Forma de oso. (thiên phú druid)"
+      },
+      "frost_trap": {
+        "name": "Bẫy Sương Giá",
+        "description": "Congela a los kẻ địch en el área objetivo durante 3 giây. (thiên phú thợ săn)"
+      },
+      "ghostly_strike": {
+        "name": "Đòn Ma Ảnh",
+        "description": "Golpea a mục tiêu por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (thiên phú đạo tặc)"
+      },
+      "hammer_of_wrath": {
+        "name": "Búa Ngân Chuông",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Thánh. Solo se usa por debajo del 20% de salud. (thiên phú hiệp sĩ)"
+      },
+      "healing_stream": {
+        "name": "Giếng Suối",
+        "description": "Restaura a mục tiêu thân thiện durante 12 giây. (thiên phú pháp sư tổ linh)"
+      },
+      "heroic_leap": {
+        "name": "Bước Nhảy Chiến",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Vật lý a gần đó kẻ địch. (thiên phú chiến binh)"
+      },
+      "holy_wrath": {
+        "name": "Cơn Giận Thánh",
+        "description": "Desata poder sagrado e inflige {damage} de daño a gần đó kẻ địch. (thiên phú hiệp sĩ)"
+      },
+      "howl_of_terror": {
+        "name": "Tiếng Hú Kinh Hoàng",
+        "description": "Aterroriza a gần đó kẻ địch hasta 3 giây. El daño puede romper el efecto. (thiên phú thuật sĩ)"
+      },
+      "ice_block": {
+        "name": "Quan Tài Lạnh",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú pháp sư)"
+      },
+      "inner_focus": {
+        "name": "Tâm Trí Tĩnh",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 giây. (thiên phú tu sĩ)"
+      },
+      "innervate": {
+        "name": "Nhựa Sống",
+        "description": "Nhựa sống trào dâng trong bạn trong 10 giây, hồi 20 tài nguyên hiện tại theo từng đợt: mana, nộ khí hoặc năng lượng; biến hình không làm gián đoạn. (thiên phú Druid)"
+      },
       "pummel": {
         "name": "Đấm Dồn Dập",
         "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
@@ -6357,9 +6646,81 @@ export const vi_VN: EnTranslations = {
         "name": "Cú Đá",
         "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
       },
-      "counterspell": {
-        "name": "Phản Phép",
-        "description": "Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây."
+      "last_stand": {
+        "name": "Giờ Thứ Mười Một",
+        "description": "Aumenta temporalmente Thể lực durante 15 giây, aumentando la salud máxima. (thiên phú chiến binh)"
+      },
+      "mend_pet": {
+        "name": "Băng Bó",
+        "description": "Sana a mục tiêu thân thiện por {damage} durante 15 giây. (thiên phú thợ săn)"
+      },
+      "meteor": {
+        "name": "Đá Trời",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Lửa y quema el suelo. (thiên phú pháp sư)"
+      },
+      "temporal_mend": {
+        "name": "Temporal Mend",
+        "description": "Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)"
+      },
+      "temporal_barrier": {
+        "name": "Temporal Barrier",
+        "description": "Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back."
+      },
+      "temporal_echo": {
+        "name": "Temporal Echo",
+        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "Thiêu Ý Nghĩ",
+        "description": "Canaliza energía de Bóng tối en el área objetivo e inflige {damage} cada segundo a gần đó kẻ địch. (thiên phú tu sĩ)"
+      },
+      "multi_shot": {
+        "name": "Bắn Tách",
+        "description": "Dispara varios proyectiles e inflige {damage} a gần đó kẻ địch. (thiên phú thợ săn)"
+      },
+      "prayer_of_healing": {
+        "name": "Hồi Phục Hợp Xướng",
+        "description": "Sana a gần đó đồng minh por {damage}. (thiên phú tu sĩ)"
+      },
+      "preparation": {
+        "name": "Dự Phòng",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (thiên phú đạo tặc)"
+      },
+      "presence_of_mind": {
+        "name": "Tâm Trí Tăng Tốc",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)"
+      },
+      "psychic_scream": {
+        "name": "Tiếng Thét Tâm Linh",
+        "description": "Aterroriza a gần đó kẻ địch hasta 4 giây. El daño puede romper el efecto. (thiên phú tu sĩ)"
+      },
+      "rallying_cry": {
+        "name": "Hiệu Triệu",
+        "description": "Lanza un grito de reunión y aumenta sức tấn công de gần đó đồng minh durante 10 giây. (thiên phú chiến binh)"
       },
       "counter_shot": {
         "name": "Phát Bắn Phản Đòn",
@@ -6369,6 +6730,18 @@ export const vi_VN: EnTranslations = {
         "name": "Quở Trách",
         "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
       },
+      "shadowstep": {
+        "name": "Trượt Bóng",
+        "description": "Das un paso entre las sombras hacia tu mục tiêu. (thiên phú đạo tặc)"
+      },
+      "shield_wall": {
+        "name": "Thành Lũy",
+        "description": "Alzas un muro de escudo y aumentas mucho la giáp durante 10 giây. (thiên phú chiến binh)"
+      },
+      "silence": {
+        "name": "Câm Lặng",
+        "description": "Silencia a mục tiêu durante 4 giây. (thiên phú tu sĩ)"
+      },
       "skull_bash": {
         "name": "Húc Sọ",
         "description": "Một cú húc đầu lao tới làm gián đoạn niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây."
@@ -6376,6 +6749,10 @@ export const vi_VN: EnTranslations = {
       "spell_lock": {
         "name": "Khóa Phép",
         "description": "Làm câm lặng mục tiêu đang niệm phép và ngăn mục tiêu thi triển phép thuộc hệ đó trong 5 giây."
+      },
+      "tranquility": {
+        "name": "Khúc Ca Rừng Thưa",
+        "description": "Canaliza energía restauradora y sana a gần đó đồng minh cada segundo. (thiên phú druid)"
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",
@@ -7722,31 +8099,61 @@ export const vi_VN: EnTranslations = {
       "deathless_heartwood": {
         "name": "Lõi Gỗ Của Vương Miện Bất Tử"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Lõi Gỗ Của Vương Miện Bất Tử"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Lời Thề Cuối Cùng Của Đỉnh Gai"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Lời Thề Cuối Cùng Của Đỉnh Gai"
       },
       "crownforged_dreadhelm": {
         "name": "Mũ Kinh Hoàng Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Mũ Kinh Hoàng Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Giáp Vai Chiến Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Giáp Vai Chiến Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Vương Miện Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Vương Miện Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Giáp Vai Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Giáp Vai Direfang"
       },
       "soulflame_cowl": {
         "name": "Mũ Trùm Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Mũ Trùm Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Áo Choàng Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Áo Choàng Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Vương Miện Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Vương Miện Galecall"
+      },
       "stormcallers_spaulders": {
+        "name": "Giáp Vai Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Giáp Vai Galecall"
       },
       "unknown_alien_weaponry": {
@@ -7823,6 +8230,18 @@ export const vi_VN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Hộ Yêu của Triệu Bão Sư"
+      },
+      "deathless_warguard_legmail": {
+        "name": "Giáp Chân Lưới Vệ Chiến Bất Tử"
+      },
+      "scourgehide_carapace": {
+        "name": "Giáp Mai Da Tai Ương"
+      },
+      "soulforged_warplate": {
+        "name": "Chiến Giáp Rèn Hồn"
+      },
+      "soulrend_diadem": {
+        "name": "Vương Miện Xé Hồn"
       }
     },
     "mobs": {
@@ -7997,9 +8416,6 @@ export const vi_VN: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Cấm Vệ Hồi Sinh"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Tai Họa Đỉnh Gai"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "Aldren, Vệ Chiến Bất Tử"
       },
@@ -8008,6 +8424,9 @@ export const vi_VN: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "Voss, Lưỡi Dao Bất Tử"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Tai Họa Đỉnh Gai"
       },
       "reliquary_ledger_wraith": {
         "name": "Oan Hồn Sổ Sách"

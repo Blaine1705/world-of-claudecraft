@@ -85,6 +85,9 @@ export const da_DK: EnTranslations = {
       "title": "Talenter",
       "classTab": "Klasse",
       "specTab": "Specialisering",
+      "choicesTab": "Valg",
+      "rowUnlockToast": "Et nyt talentvalg er låst op!",
+      "rowUnlocks": "Låses op på niveau {level}",
       "available": "Tilgængelig",
       "spent": "Brugt",
       "pointSource": "Optjen 1 talentpoint per niveau fra niveau {first} til {cap}. Stig i niveau for at få flere point.",
@@ -143,6 +146,7 @@ export const da_DK: EnTranslations = {
         "noTree": "Din klasse har endnu ikke et talenttræ.",
         "locked": "Du har endnu ikke låst talenter op — de begynder ved niveau {level}.",
         "noSpec": "ingen specialisering",
+        "rowsSummary": "Talenter: {head}, {picked}/{unlocked} valgrupper valgt.",
         "summary": "Talenter: {head} — {spent}/{total} point brugt ({breakdown}).",
         "breakdownClass": "Klasse {classPts}",
         "breakdownSpec": "Klasse {classPts}, {spec} {specPts}",
@@ -166,6 +170,10 @@ export const da_DK: EnTranslations = {
       "resurrectAtCorpse": "Genopstå ved liget",
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",
       "spiritHealerAlive": "Den Blege Vogter våger over de døde. Du er stadig blandt de levende."
+    },
+    "fct": {
+      "absorbed": "{amount} absorberet",
+      "cheap": "Billigere!"
     },
     "emotes": {
       "wave": "Vink",
@@ -862,9 +870,27 @@ export const da_DK: EnTranslations = {
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",
       "mobileLeftHanded": "Venstrehånds layout"
+    },
+    "talentRows": {
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
+    },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "specUnlockBanner": "Specialization Unlocked!",
+      "specUnlockHint": "Press N to choose your specialization."
     },
     "controller": {
       "title": "Controller",
@@ -1277,7 +1303,7 @@ export const da_DK: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Denne genstand kan ikke ødelægges.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Højreklik for at ødelægge",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -1322,8 +1348,16 @@ export const da_DK: EnTranslations = {
       "attackSpeedFast": "Erhöht Angriffstempo um {pct}%",
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
       "tongues": "Erhöht Zauberzeit um {pct}%",
+      "combustionCrit": "Your Fire spells always critically strike",
+      "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",
+      "powerEchoNext": "Your next direct spell repeats at {pct}% power on the same target",
+      "iceFloesCasts": "Your next {n} spells with a cast time can be cast while moving",
+      "freeCast": "Your next cast costs nothing",
+      "instantCast": "Your next spell with a cast time is instant",
+      "cheapCast": "Your next spell costs {pct}% less",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
+        "sp": "Increases spell power by {value}",
         "armor": "Erhöht Rüstung um {value}",
         "int": "Erhöht Intelligenz um {value}",
         "agi": "Erhöht Beweglichkeit um {value}",
@@ -1437,6 +1471,33 @@ export const da_DK: EnTranslations = {
     "playerFrame": {
       "unlock": "Flyt spillerrammen",
       "lock": "Lås spillerrammen"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Nulstil rammepositioner"
@@ -2491,6 +2552,14 @@ export const da_DK: EnTranslations = {
       "frost_armor": "En vedvarende selvforstærkning der hærder din rustning før en kamp.",
       "arcane_intellect": "Hæver Intellekt for at uddybe en allierets manapulje, kast den før kampen.",
       "frostbolt": "Slår fra afstand og sløver målet så det ikke kan komme tæt på dig.",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "Frembringer drikke der genopretter mana, så du kan fylde op mellem kampene.",
       "conjure_food": "Frembringer mad der genopretter helbred når du sætter dig ned for at spise.",
       "shadow_bolt": "Et lyn af skygge du kaster mod et mål, din foretrukne bombe.",
@@ -5119,6 +5188,7 @@ export const da_DK: EnTranslations = {
     },
     "pet": {
       "attack": "Angrib",
+      "waterJet": "Water Jet",
       "taunt": "Hån",
       "healDemon": "Helbred dæmon",
       "healPet": "Helbred kæledyr",
@@ -5127,6 +5197,8 @@ export const da_DK: EnTranslations = {
       "aggressive": "Aggressiv",
       "petAttackTitle": "Kæledyrsangreb",
       "petAttackDesc": "Befal dit kæledyr at angribe dit nuværende fjendtlige mål.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Kæledyrshån",
       "petTauntDesc": "Befal dit kæledyr at gå i kamp og knurre, når det er inden for rækkevidde. 10 sekunders nedkøling.",
       "healDemonDesc": "Brug mana til at kanalisere helbredelse ind i din dæmon over 5 sekunder.",
@@ -5249,6 +5321,7 @@ export const da_DK: EnTranslations = {
     "actionBar": {
       "attackName": "Angrib",
       "attackTooltip": "Slå automatisk angreb til/fra på dit mål. Højreklik på en fjende angriber også.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Tom plads",
       "slotAria": "Handlingsplads {slot}: {ability}",
       "emptySlotAria": "Handlingsplads {slot}: tom",
@@ -5744,6 +5817,46 @@ export const da_DK: EnTranslations = {
       "frostbolt": {
         "name": "Rimlanse",
         "description": "Affyrer et frostlyn, der volder {damage} frostskade og sænker bevægelsen med 40%."
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Flurry",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Shatter",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Vandbinding",
@@ -6245,9 +6358,17 @@ export const da_DK: EnTranslations = {
         "name": "Hellig chok",
         "description": "Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)"
       },
+      "aura_surge": {
+        "name": "Strålende Svulmen",
+        "description": "Overbelaster din aura og hærder dig med 160 rustning i 10 sek. (Paladintalent)"
+      },
       "holy_shield": {
         "name": "Hellig skjold",
         "description": "Beskytter dig med hellig kraft i 10 sek, øger rustning med 90 og rammer nærkampsangribere for 12 hellig skade. (Beskyttelsessignatur)"
+      },
+      "repentance": {
+        "name": "Repentance",
+        "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
       },
       "bestial_wrath": {
         "name": "Bestialsk vrede",
@@ -6321,6 +6442,34 @@ export const da_DK: EnTranslations = {
         "name": "Hurtig heling",
         "description": "Forbruger en helbredelse over tid-effekt på et venligt mål for at helbrede det for {damage}. (Genoprettelsessignatur)"
       },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
       "summon_imp": {
         "name": "Tilkald Emberkin",
         "description": "Tilkalder en Emberkin under Heksemesterens kommando. Emberkinen slynger Askelyn mod dine fjender fra det fjerne. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
@@ -6349,6 +6498,146 @@ export const da_DK: EnTranslations = {
         "name": "Tilkald Wraithborn",
         "description": "Binder en Wraithborn til din vilje, en elitedæmon der regner tung Skygge skade ned på afstand. En lang nedkøling holder dens ødelæggende kraft i skak. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
       },
+      "aspect_of_the_wild": {
+        "name": "Vildtands skikkelse",
+        "description": "Inspira a nærliggende allierede con fuerza salvaje, aumentando angrebskraft durante 5 min. (jægertalent)"
+      },
+      "avatar": {
+        "name": "Kolossen",
+        "description": "Te transforma en un coloso y aumenta angrebskraft durante 20 sek. (krigertalent)"
+      },
+      "avenging_wrath": {
+        "name": "Hævnerfløj",
+        "description": "Invoca poder vengador y aumenta angrebskraft y trolddomskraft durante 20 sek. (paladintalent)"
+      },
+      "berserk": {
+        "name": "Rød dis",
+        "description": "Aumenta angrebskraft durante 15 sek. (druidentalent)"
+      },
+      "bladestorm": {
+        "name": "Stålcyklon",
+        "description": "Te convierte en una tormenta de acero que golpea a nærliggende fjender cada segundo por {damage}. (krigertalent)"
+      },
+      "razor_howl": {
+        "name": "Skarpt hyl",
+        "description": "Et råb, der sænker fjender inden for 15 m med 50% i 8 sek. (Kriger-talent)"
+      },
+      "stormthrow": {
+        "name": "Stormkast",
+        "description": "Kast dit våben for at bedøve et mål i 3 sek. (Kriger-talent)"
+      },
+      "reckless_vow": {
+        "name": "Dumdristigt løfte",
+        "description": "Øger al generering af raseri med 50% og chancen for kritiske træffere med 20% i 12 sek. (Kriger-talent)"
+      },
+      "red_banner": {
+        "name": "Rødt banner",
+        "description": "Du og allierede i nærheden får 10% angrebshastighed og 10% skade i 20 sek. (Kriger-talent)"
+      },
+      "blink": {
+        "name": "Flimmertrin",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (magikertalent)"
+      },
+      "bloodlust": {
+        "name": "Krigstrommer",
+        "description": "Lleva a nærliggende allierede al frenesí y aumenta su velocidad de ataque durante 15 sek. (shamantent)"
+      },
+      "chain_lightning": {
+        "name": "Gaffellyn",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a nærliggende fjender. (shamantent)"
+      },
+      "chaos_bolt": {
+        "name": "Ruinbolt",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Ild. (troldmandstalent)"
+      },
+      "cloak_of_shadows": {
+        "name": "Skyggekappe",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 sek. (snigmordertalent)"
+      },
+      "cone_of_cold": {
+        "name": "Frostfej",
+        "description": "Golpea a nærliggende fjender con escarcha e inflige {damage} de daño de Frost. (magikertalent)"
+      },
+      "counterspell": {
+        "name": "Besværgelsesbrud",
+        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 6 sek."
+      },
+      "curse_of_exhaustion": {
+        "name": "Blytung forbandelse",
+        "description": "Maldice a målet y reduce su velocidad de movimiento un 30% durante 12 sek. (troldmandstalent)"
+      },
+      "death_coil": {
+        "name": "Gravspiral",
+        "description": "Golpea a målet por {damage} de daño de Skygge y luego lo aterroriza durante 3 sek. Esta versión no sana al lanzador. (troldmandstalent)"
+      },
+      "deep_freeze": {
+        "name": "Dødfrost",
+        "description": "Congela profundamente a målet, inflige {damage} de daño de Frost y lo aturde durante 4 sek. (magikertalent)"
+      },
+      "desperate_prayer": {
+        "name": "Sidste bøn",
+        "description": "Te sana al instante por {damage}. (præstetalent)"
+      },
+      "deterrence": {
+        "name": "Børsteværn",
+        "description": "Aumenta tu undvigelseschance un 50% durante 10 sek. (jægertalent)"
+      },
+      "divine_shield": {
+        "name": "Lysværn",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 sek. (paladintalent)"
+      },
+      "earthbind": {
+        "name": "Gribende jord",
+        "description": "Ata a la tierra a nærliggende fjender y los inmoviliza durante 2 sek. (shamantent)"
+      },
+      "evocation": {
+        "name": "Æterbrønd",
+        "description": "Restaura mana rápidamente. (magikertalent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Vild heling",
+        "description": "Regenera salud durante 10 sek. Solo en Forma de oso. (druidentalent)"
+      },
+      "frost_trap": {
+        "name": "Rimfælde",
+        "description": "Congela a los fjender en el área objetivo durante 3 sek. (jægertalent)"
+      },
+      "ghostly_strike": {
+        "name": "Genfærdsslag",
+        "description": "Golpea a målet por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (snigmordertalent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Klanghammer",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Hellig. Solo se usa por debajo del 20% de salud. (paladintalent)"
+      },
+      "healing_stream": {
+        "name": "Kildebrønd",
+        "description": "Restaura a et venligt mål durante 12 sek. (shamantent)"
+      },
+      "heroic_leap": {
+        "name": "Krigsspring",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Fysisk a nærliggende fjender. (krigertalent)"
+      },
+      "holy_wrath": {
+        "name": "Helgenvrede",
+        "description": "Desata poder sagrado e inflige {damage} de daño a nærliggende fjender. (paladintalent)"
+      },
+      "howl_of_terror": {
+        "name": "Rædselshyl",
+        "description": "Aterroriza a nærliggende fjender hasta 3 sek. El daño puede romper el efecto. (troldmandstalent)"
+      },
+      "ice_block": {
+        "name": "Kold kiste",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalent)"
+      },
+      "inner_focus": {
+        "name": "Stillet sind",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 sek. (præstetalent)"
+      },
+      "innervate": {
+        "name": "Livssaft",
+        "description": "Levende saft vælder op i dig i 10 sek. og genopretter 20 af din nuværende ressource i bølger: mana, raseri eller energi; formskifte afbryder den ikke. (Druidetalent)"
+      },
       "pummel": {
         "name": "Kæbeknuser",
         "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
@@ -6357,9 +6646,81 @@ export const da_DK: EnTranslations = {
         "name": "Spark",
         "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
       },
-      "counterspell": {
-        "name": "Besværgelsesbrud",
-        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 6 sek."
+      "last_stand": {
+        "name": "Ellevte time",
+        "description": "Aumenta temporalmente Udholdenhed durante 15 sek, aumentando la salud máxima. (krigertalent)"
+      },
+      "mend_pet": {
+        "name": "Lappe sammen",
+        "description": "Sana a et venligt mål por {damage} durante 15 sek. (jægertalent)"
+      },
+      "meteor": {
+        "name": "Himmelsten",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Ild y quema el suelo. (magikertalent)"
+      },
+      "temporal_mend": {
+        "name": "Temporal Mend",
+        "description": "Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)"
+      },
+      "temporal_barrier": {
+        "name": "Temporal Barrier",
+        "description": "Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back."
+      },
+      "temporal_echo": {
+        "name": "Temporal Echo",
+        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "Tankebrand",
+        "description": "Canaliza energía de Skygge en el área objetivo e inflige {damage} cada segundo a nærliggende fjender. (præstetalent)"
+      },
+      "multi_shot": {
+        "name": "Splitskud",
+        "description": "Dispara varios proyectiles e inflige {damage} a nærliggende fjender. (jægertalent)"
+      },
+      "prayer_of_healing": {
+        "name": "Korhelbredelse",
+        "description": "Sana a nærliggende allierede por {damage}. (præstetalent)"
+      },
+      "preparation": {
+        "name": "Nødplan",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (snigmordertalent)"
+      },
+      "presence_of_mind": {
+        "name": "Ræsende sind",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalent)"
+      },
+      "psychic_scream": {
+        "name": "Psykisk skrig",
+        "description": "Aterroriza a nærliggende fjender hasta 4 sek. El daño puede romper el efecto. (præstetalent)"
+      },
+      "rallying_cry": {
+        "name": "Mønstring",
+        "description": "Lanza un grito de reunión y aumenta angrebskraft de nærliggende allierede durante 10 sek. (krigertalent)"
       },
       "counter_shot": {
         "name": "Dæmpende Skud",
@@ -6369,6 +6730,18 @@ export const da_DK: EnTranslations = {
         "name": "Irettesættelse",
         "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
       },
+      "shadowstep": {
+        "name": "Skyggesmut",
+        "description": "Das un paso entre las sombras hacia tu målet. (snigmordertalent)"
+      },
+      "shield_wall": {
+        "name": "Bolværk",
+        "description": "Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigertalent)"
+      },
+      "silence": {
+        "name": "Tavshed",
+        "description": "Silencia a målet durante 4 sek. (præstetalent)"
+      },
       "skull_bash": {
         "name": "Skalle",
         "description": "En fremadstormende skalle, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek."
@@ -6376,6 +6749,10 @@ export const da_DK: EnTranslations = {
       "spell_lock": {
         "name": "Mundkurv",
         "description": "Gør målet tavst midt i en besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 5 sek."
+      },
+      "tranquility": {
+        "name": "Lundens sang",
+        "description": "Canaliza energía restauradora y sana a nærliggende allierede cada segundo. (druidentalent)"
       },
       "bear_charge": {
         "name": "Bruin-storm",
@@ -7722,31 +8099,61 @@ export const da_DK: EnTranslations = {
       "deathless_heartwood": {
         "name": "Kerneved fra Den Udødelige Krone"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Kerneved fra Den Udødelige Krone"
+      },
       "kingsbane_last_oath": {
+        "name": "Tronebane, Tornetops Sidste Ed"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Tronebane, Tornetops Sidste Ed"
       },
       "crownforged_dreadhelm": {
         "name": "Bonewrought Rædselshjelm"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought Rædselshjelm"
+      },
       "crownforged_warspaulders": {
+        "name": "Bonewrought Krigsskulderplader"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bonewrought Krigsskulderplader"
       },
       "nighttalon_crown": {
         "name": "Direfang-Krone"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang-Krone"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Direfang-Skulderværn"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Direfang-Skulderværn"
       },
       "soulflame_cowl": {
         "name": "Wraithfire-Hætte"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire-Hætte"
+      },
       "soulflame_mantle": {
+        "name": "Wraithfire-Kappe"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Wraithfire-Kappe"
       },
       "stormcallers_crown": {
         "name": "Galecall-Krone"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall-Krone"
+      },
       "stormcallers_spaulders": {
+        "name": "Galecall-Skulderplader"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Galecall-Skulderplader"
       },
       "unknown_alien_weaponry": {
@@ -7823,6 +8230,18 @@ export const da_DK: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Stormkalderens Livværn"
+      },
+      "deathless_warguard_legmail": {
+        "name": "Udødelig Krigsvagt-Benbrynje"
+      },
+      "scourgehide_carapace": {
+        "name": "Svøbehud-Panser"
+      },
+      "soulforged_warplate": {
+        "name": "Sjælesmedet Krigsplade"
+      },
+      "soulrend_diadem": {
+        "name": "Sjæleflæng-Diadem"
       }
     },
     "mobs": {
@@ -7997,9 +8416,6 @@ export const da_DK: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Genopstanden Kongelig Garder"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Tornetops Svøbe"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "Aldren, Den Udødelige Krigsvagt"
       },
@@ -8008,6 +8424,9 @@ export const da_DK: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "Voss, Den Udødelige Kniv"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Tornetops Svøbe"
       },
       "reliquary_ledger_wraith": {
         "name": "Regnskabsgenfærd"

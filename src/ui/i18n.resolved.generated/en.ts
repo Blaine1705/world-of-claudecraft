@@ -85,6 +85,9 @@ export const en: EnTranslations = {
       "title": "Talents",
       "classTab": "Class",
       "specTab": "Specialization",
+      "choicesTab": "Choices",
+      "rowUnlockToast": "New talent choice available!",
+      "rowUnlocks": "Unlocks at level {level}",
       "available": "Available",
       "spent": "Spent",
       "pointSource": "Earn 1 talent point each level from level {first} to {cap}. Level up to get more points.",
@@ -143,6 +146,7 @@ export const en: EnTranslations = {
         "noTree": "Your class has no talent tree yet.",
         "locked": "You have not unlocked talents yet — they begin at level {level}.",
         "noSpec": "no specialization",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
         "summary": "Talents: {head} — {spent}/{total} points spent ({breakdown}).",
         "breakdownClass": "Class {classPts}",
         "breakdownSpec": "Class {classPts}, {spec} {specPts}",
@@ -166,6 +170,10 @@ export const en: EnTranslations = {
       "resurrectAtCorpse": "Resurrect at Corpse",
       "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
       "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
+    },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
     },
     "emotes": {
       "wave": "Wave",
@@ -862,9 +870,27 @@ export const en: EnTranslations = {
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
       "mobileLeftHanded": "Left-handed layout"
+    },
+    "talentRows": {
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
+    },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "specUnlockBanner": "Specialization Unlocked!",
+      "specUnlockHint": "Press N to choose your specialization."
     },
     "controller": {
       "title": "Controller",
@@ -1322,8 +1348,16 @@ export const en: EnTranslations = {
       "attackSpeedFast": "Increases attack speed by {pct}%",
       "haste": "Increases attack and casting speed by {pct}%",
       "tongues": "Increases casting time by {pct}%",
+      "combustionCrit": "Your Fire spells always critically strike",
+      "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",
+      "powerEchoNext": "Your next direct spell repeats at {pct}% power on the same target",
+      "iceFloesCasts": "Your next {n} spells with a cast time can be cast while moving",
+      "freeCast": "Your next cast costs nothing",
+      "instantCast": "Your next spell with a cast time is instant",
+      "cheapCast": "Your next spell costs {pct}% less",
       "increase": {
         "ap": "Increases attack power by {value}",
+        "sp": "Increases spell power by {value}",
         "armor": "Increases armor by {value}",
         "int": "Increases Intellect by {value}",
         "agi": "Increases Agility by {value}",
@@ -1437,6 +1471,33 @@ export const en: EnTranslations = {
     "playerFrame": {
       "unlock": "Move player frame",
       "lock": "Lock player frame"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Reset Frame Positions"
@@ -2491,6 +2552,14 @@ export const en: EnTranslations = {
       "frost_armor": "A lasting self-buff that hardens your armor before a fight.",
       "arcane_intellect": "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
       "frostbolt": "Strikes from range and slows the target so it cannot close on you.",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "Conjures drinks that restore mana, so you can refill between pulls.",
       "conjure_food": "Conjures food that restores health when you sit down to eat.",
       "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
@@ -5119,6 +5188,7 @@ export const en: EnTranslations = {
     },
     "pet": {
       "attack": "Attack",
+      "waterJet": "Water Jet",
       "taunt": "Taunt",
       "healDemon": "Heal Demon",
       "healPet": "Feed Pet",
@@ -5127,8 +5197,10 @@ export const en: EnTranslations = {
       "aggressive": "Aggressive",
       "petAttackTitle": "Pet Attack",
       "petAttackDesc": "Command your pet to attack your current hostile target.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Pet Taunt",
-      "petTauntDesc": "Command your pet to engage and Growl when in range. 10 second cooldown.",
+      "petTauntDesc": "Command your pet to engage and Growl when in range. 10 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "healDemonDesc": "Spend mana to channel healing into your demon over 5 seconds.",
       "healPetDesc": "Click, then click food in your bags to feed your pet, healing it over 5 seconds.",
       "stanceTitle": "Pet Stance",
@@ -5249,6 +5321,7 @@ export const en: EnTranslations = {
     "actionBar": {
       "attackName": "Attack",
       "attackTooltip": "Toggle auto-attack on your target. Right-clicking an enemy also attacks.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Empty slot",
       "slotAria": "Action slot {slot}: {ability}",
       "emptySlotAria": "Action slot {slot}: empty",
@@ -5744,6 +5817,46 @@ export const en: EnTranslations = {
       "frostbolt": {
         "name": "Rimelance",
         "description": "Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%."
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Flurry",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Shatter",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Waterbind",
@@ -6245,9 +6358,17 @@ export const en: EnTranslations = {
         "name": "Holy Shock",
         "description": "Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)"
       },
+      "aura_surge": {
+        "name": "Radiant Swell",
+        "description": "Overcharges your aura, hardening you with 160 armor for 10 sec. (Paladin talent)"
+      },
       "holy_shield": {
         "name": "Hallowed Wall",
         "description": "Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)"
+      },
+      "repentance": {
+        "name": "Repentance",
+        "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
       },
       "bestial_wrath": {
         "name": "Howling Rage",
@@ -6266,8 +6387,8 @@ export const en: EnTranslations = {
         "description": "Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)"
       },
       "combustion": {
-        "name": "Flashfire",
-        "description": "Increases spell critical chance by 50% for 15 sec. (Fire signature)"
+        "name": "Combustion",
+        "description": "Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)"
       },
       "icy_veins": {
         "name": "Icy Veins",
@@ -6321,6 +6442,34 @@ export const en: EnTranslations = {
         "name": "Swiftmend",
         "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)"
       },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
       "summon_imp": {
         "name": "Summon Emberkin",
         "description": "Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time."
@@ -6349,6 +6498,146 @@ export const en: EnTranslations = {
         "name": "Summon Wraithborn",
         "description": "Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time."
       },
+      "aspect_of_the_wild": {
+        "name": "Wildfang Guise",
+        "description": "Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)"
+      },
+      "avatar": {
+        "name": "Colossus",
+        "description": "Break control effects and become a colossus, increasing damage dealt by 20% for 20 sec. (Warrior talent)"
+      },
+      "avenging_wrath": {
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)"
+      },
+      "berserk": {
+        "name": "Red Haze",
+        "description": "Increases attack power for 15 sec. (Druid talent)"
+      },
+      "bladestorm": {
+        "name": "Steel Cyclone",
+        "description": "Become a storm of steel, striking nearby enemies each second for {damage}. (Warrior talent)"
+      },
+      "razor_howl": {
+        "name": "Razor Howl",
+        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+      },
+      "stormthrow": {
+        "name": "Stormthrow",
+        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+      },
+      "reckless_vow": {
+        "name": "Reckless Vow",
+        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+      },
+      "red_banner": {
+        "name": "Red Banner",
+        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+      },
+      "blink": {
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
+      },
+      "bloodlust": {
+        "name": "War Drums",
+        "description": "Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Bloodlust or Temporal Acceleration are too exhausted to benefit. (Shaman talent)"
+      },
+      "chain_lightning": {
+        "name": "Forked Lightning",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+      },
+      "chaos_bolt": {
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+      },
+      "cloak_of_shadows": {
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)"
+      },
+      "cone_of_cold": {
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Mage talent)"
+      },
+      "counterspell": {
+        "name": "Spellbreak",
+        "description": "Counters enemy spellcasting, preventing any spell in that school from being cast for 6 sec. (Mage talent)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+      },
+      "death_coil": {
+        "name": "Grave Coil",
+        "description": "Blasts the enemy for {damage} Shadow damage, then horrifies them for 3 sec. This version does not heal the caster. (Warlock talent)"
+      },
+      "deep_freeze": {
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
+      },
+      "desperate_prayer": {
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
+      },
+      "deterrence": {
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50% for 10 sec. (Hunter talent)"
+      },
+      "divine_shield": {
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)"
+      },
+      "earthbind": {
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+      },
+      "evocation": {
+        "name": "Aetherwell",
+        "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Savage Mending",
+        "description": "Regenerates health over 10 sec. Bruin Form only. (Druid talent)"
+      },
+      "frost_trap": {
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area in place for 3 sec. (Hunter talent)"
+      },
+      "ghostly_strike": {
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
+      },
+      "healing_stream": {
+        "name": "Springwell",
+        "description": "Restores a friendly target over 12 sec. (Shaman talent)"
+      },
+      "heroic_leap": {
+        "name": "Warleap",
+        "description": "Leap to the target area, dealing {damage} Physical damage to nearby enemies. (Warrior talent)"
+      },
+      "holy_wrath": {
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+      },
+      "howl_of_terror": {
+        "name": "Dread Howl",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+      },
+      "ice_block": {
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)"
+      },
+      "inner_focus": {
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+      },
+      "innervate": {
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
+      },
       "pummel": {
         "name": "Jawcrack",
         "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
@@ -6357,9 +6646,81 @@ export const en: EnTranslations = {
         "name": "Boot",
         "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
       },
-      "counterspell": {
-        "name": "Spellbreak",
-        "description": "Counters the target's spellcast and prevents casting from that school for 6 sec."
+      "last_stand": {
+        "name": "Eleventh Hour",
+        "description": "Temporarily increases Stamina for 15 sec, increasing maximum health. (Warrior talent)"
+      },
+      "mend_pet": {
+        "name": "Patch Up",
+        "description": "Heals a friendly target for {damage} over 15 sec. (Hunter talent)"
+      },
+      "meteor": {
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage and burning the ground. (Mage talent)"
+      },
+      "temporal_mend": {
+        "name": "Temporal Mend",
+        "description": "Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)"
+      },
+      "temporal_barrier": {
+        "name": "Temporal Barrier",
+        "description": "Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back."
+      },
+      "temporal_echo": {
+        "name": "Temporal Echo",
+        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
+      },
+      "multi_shot": {
+        "name": "Splitshot",
+        "description": "Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)"
+      },
+      "prayer_of_healing": {
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
+      },
+      "preparation": {
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
+      },
+      "presence_of_mind": {
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
+      },
+      "psychic_scream": {
+        "name": "Terror Shriek",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+      },
+      "rallying_cry": {
+        "name": "Muster",
+        "description": "Lets loose a mustering cry, increasing nearby allies' attack power for 10 sec. (Warrior talent)"
       },
       "counter_shot": {
         "name": "Hushing Shot",
@@ -6369,6 +6730,18 @@ export const en: EnTranslations = {
         "name": "Reproach",
         "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
       },
+      "shadowstep": {
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
+      },
+      "shield_wall": {
+        "name": "Bulwark",
+        "description": "Raise an unbreakable bulwark, greatly increasing armor for 10 sec. (Warrior talent)"
+      },
+      "silence": {
+        "name": "Silent Treatment",
+        "description": "Silences the target for 4 sec. (Priest talent)"
+      },
       "skull_bash": {
         "name": "Headbutt",
         "description": "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec."
@@ -6376,6 +6749,10 @@ export const en: EnTranslations = {
       "spell_lock": {
         "name": "Gag Order",
         "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
+      },
+      "tranquility": {
+        "name": "Gladesong",
+        "description": "Channels restorative energy, healing nearby allies each second. (Druid talent)"
       },
       "bear_charge": {
         "name": "Bruin Rush",
@@ -7722,31 +8099,61 @@ export const en: EnTranslations = {
       "deathless_heartwood": {
         "name": "Heartwood of the Deathless Crown"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Heartwood of the Deathless Crown"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Last Oath of Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Last Oath of Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Bonewrought Dreadhelm"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought Dreadhelm"
+      },
       "crownforged_warspaulders": {
+        "name": "Bonewrought Warspaulders"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bonewrought Warspaulders"
       },
       "nighttalon_crown": {
         "name": "Direfang Crown"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang Crown"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Direfang Shoulderguards"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Direfang Shoulderguards"
       },
       "soulflame_cowl": {
         "name": "Wraithfire Cowl"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire Cowl"
+      },
       "soulflame_mantle": {
+        "name": "Wraithfire Mantle"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Wraithfire Mantle"
       },
       "stormcallers_crown": {
         "name": "Galecall Crown"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall Crown"
+      },
       "stormcallers_spaulders": {
+        "name": "Galecall Spaulders"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Galecall Spaulders"
       },
       "unknown_alien_weaponry": {
@@ -7997,9 +8404,6 @@ export const en: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Risen Royal Guard"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Scourge of Thornpeak"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "Spirit of Aldren"
       },
@@ -8008,6 +8412,9 @@ export const en: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "Spirit of Voss"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Scourge of Thornpeak"
       },
       "reliquary_ledger_wraith": {
         "name": "Ledger Wraith"

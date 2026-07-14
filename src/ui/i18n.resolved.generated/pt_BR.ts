@@ -85,6 +85,9 @@ export const pt_BR: EnTranslations = {
       "title": "Talentos",
       "classTab": "Classe",
       "specTab": "Especialização",
+      "choicesTab": "Escolhas",
+      "rowUnlockToast": "Nova escolha de talento disponível!",
+      "rowUnlocks": "Desbloqueia no nível {level}",
       "available": "Disponíveis",
       "spent": "Gastos",
       "pointSource": "Ganhe 1 ponto de talento por nível do {first} ao {cap}. Suba de nível para conseguir mais pontos.",
@@ -143,6 +146,7 @@ export const pt_BR: EnTranslations = {
         "noTree": "Sua classe ainda não tem árvore de talentos.",
         "locked": "Você ainda não desbloqueou talentos — eles começam no nível {level}.",
         "noSpec": "sem especialização",
+        "rowsSummary": "Talentos: {head}, escolhidas {picked}/{unlocked} linhas de opções.",
         "summary": "Talentos: {head} — {spent}/{total} pontos gastos ({breakdown}).",
         "breakdownClass": "Classe {classPts}",
         "breakdownSpec": "Classe {classPts}, {spec} {specPts}",
@@ -166,6 +170,10 @@ export const pt_BR: EnTranslations = {
       "resurrectAtCorpse": "Ressuscitar no Cadáver",
       "resurrectAtHealer": "O Guardião Pálido (Tributo do Guardião)",
       "spiritHealerAlive": "O Guardião Pálido vela pelos mortos. Você ainda está entre os vivos."
+    },
+    "fct": {
+      "absorbed": "{amount} absorvido",
+      "cheap": "Custo reduzido!"
     },
     "emotes": {
       "wave": "Acenar",
@@ -862,9 +870,27 @@ export const pt_BR: EnTranslations = {
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
       "mobileCameraJoystick": "Joystick da câmera",
       "mobileLeftHanded": "Layout para canhotos"
+    },
+    "talentRows": {
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
+    },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "specUnlockBanner": "Specialization Unlocked!",
+      "specUnlockHint": "Press N to choose your specialization."
     },
     "controller": {
       "title": "Controle",
@@ -1277,7 +1303,7 @@ export const pt_BR: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Este item não pode ser destruído.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Clique com o botão direito para destruir",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
       "filterWeapon": "Armas",
@@ -1322,8 +1348,16 @@ export const pt_BR: EnTranslations = {
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
+      "combustionCrit": "Your Fire spells always critically strike",
+      "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",
+      "powerEchoNext": "Your next direct spell repeats at {pct}% power on the same target",
+      "iceFloesCasts": "Your next {n} spells with a cast time can be cast while moving",
+      "freeCast": "Your next cast costs nothing",
+      "instantCast": "Your next spell with a cast time is instant",
+      "cheapCast": "Your next spell costs {pct}% less",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
+        "sp": "Increases spell power by {value}",
         "armor": "Aumenta la armadura en {value}",
         "int": "Aumenta el intelecto en {value}",
         "agi": "Aumenta la agilidad en {value}",
@@ -1437,6 +1471,33 @@ export const pt_BR: EnTranslations = {
     "playerFrame": {
       "unlock": "Mover quadro do jogador",
       "lock": "Travar quadro do jogador"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Redefinir Posições dos Quadros"
@@ -2491,6 +2552,14 @@ export const pt_BR: EnTranslations = {
       "frost_armor": "Um aprimoramento próprio duradouro que endurece sua armadura antes da luta.",
       "arcane_intellect": "Aumenta o Intelecto para ampliar a reserva de mana de um aliado; lance antes da puxada.",
       "frostbolt": "Atinge à distância e reduz a velocidade do alvo para que ele não chegue até você.",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "Conjura bebidas que restauram mana, para você reabastecer entre as puxadas.",
       "conjure_food": "Conjura comida que restaura vida quando você se senta para comer.",
       "shadow_bolt": "Uma seta de sombra que você lança no alvo, sua magia de ataque preferida.",
@@ -5119,6 +5188,7 @@ export const pt_BR: EnTranslations = {
     },
     "pet": {
       "attack": "Atacar",
+      "waterJet": "Water Jet",
       "taunt": "Provocar",
       "healDemon": "Curar demônio",
       "healPet": "Curar mascote",
@@ -5127,6 +5197,8 @@ export const pt_BR: EnTranslations = {
       "aggressive": "Agressivo",
       "petAttackTitle": "Ataque do mascote",
       "petAttackDesc": "Comande seu mascote a atacar seu alvo hostil atual.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Provocação do mascote",
       "petTauntDesc": "Comande seu mascote a entrar em combate e usar Rosnar quando estiver ao alcance. Recarga de 10 segundos.",
       "healDemonDesc": "Gaste mana para canalizar cura no seu demônio por 5 segundos.",
@@ -5249,6 +5321,7 @@ export const pt_BR: EnTranslations = {
     "actionBar": {
       "attackName": "Atacar",
       "attackTooltip": "Ativa ou desativa o autoataque no alvo. Clicar com o botão direito em um inimigo também ataca.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Espaço vazio",
       "slotAria": "Espaço de ação {slot}: {ability}",
       "emptySlotAria": "Espaço de ação {slot}: vazio",
@@ -5744,6 +5817,46 @@ export const pt_BR: EnTranslations = {
       "frostbolt": {
         "name": "Lança de Geada",
         "description": "Lança uma seta de gelo, causando {damage} de dano de Gelo e reduzindo a velocidade de movimento em 40%."
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Flurry",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Shatter",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Vínculo de Água",
@@ -6245,9 +6358,17 @@ export const pt_BR: EnTranslations = {
         "name": "Choque Sagrado",
         "description": "Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)"
       },
+      "aura_surge": {
+        "name": "Onda Radiante",
+        "description": "Sobrecarrega sua aura, fortalecendo você com 160 de armadura por 10 s. (talento de Paladino)"
+      },
       "holy_shield": {
         "name": "Escudo Sagrado",
         "description": "Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)"
+      },
+      "repentance": {
+        "name": "Repentance",
+        "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
       },
       "bestial_wrath": {
         "name": "Ira Bestial",
@@ -6321,6 +6442,34 @@ export const pt_BR: EnTranslations = {
         "name": "Recuperação Rápida",
         "description": "Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. (assinatura Restauração)"
       },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
       "summon_imp": {
         "name": "Invocar Emberkin",
         "description": "Invoca um Emberkin sob o comando do bruxo. O Emberkin arremessa flechas de cinzas nos seus inimigos à distância. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez."
@@ -6349,6 +6498,146 @@ export const pt_BR: EnTranslations = {
         "name": "Invocar Wraithborn",
         "description": "Vincula um Wraithborn à sua vontade, um demônio de elite que faz chover pesado dano Sombrio à distância. Uma longa recarga limita seu poder devastador. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez."
       },
+      "aspect_of_the_wild": {
+        "name": "Aspecto Presa Selvagem",
+        "description": "Inspira a próximos aliados con fuerza salvaje, aumentando poder de ataque durante 5 min. (talento de caçador)"
+      },
+      "avatar": {
+        "name": "Colosso",
+        "description": "Te transforma en un coloso y aumenta poder de ataque durante 20 s. (talento de guerreiro)"
+      },
+      "avenging_wrath": {
+        "name": "Asa Vingadora",
+        "description": "Invoca poder vengador y aumenta poder de ataque y poder mágico durante 20 s. (talento de paladino)"
+      },
+      "berserk": {
+        "name": "Névoa Rubra",
+        "description": "Aumenta poder de ataque durante 15 s. (talento de druida)"
+      },
+      "bladestorm": {
+        "name": "Ciclone de Aço",
+        "description": "Te convierte en una tormenta de acero que golpea a próximos inimigos cada segundo por {damage}. (talento de guerreiro)"
+      },
+      "razor_howl": {
+        "name": "Uivo Cortante",
+        "description": "Um grito que reduz em 50% a velocidade dos inimigos em um raio de 15 m por 8 s. (Talento de guerreiro)"
+      },
+      "stormthrow": {
+        "name": "Arremesso da Tempestade",
+        "description": "Arremessa sua arma para atordoar um alvo por 3 s. (Talento de guerreiro)"
+      },
+      "reckless_vow": {
+        "name": "Juramento Imprudente",
+        "description": "Aumenta em 50% toda a geração de raiva e em 20% a chance de acerto crítico por 12 s. (Talento de guerreiro)"
+      },
+      "red_banner": {
+        "name": "Estandarte Vermelho",
+        "description": "Você e os aliados próximos recebem 10% de velocidade de ataque e 10% de dano por 20 s. (Talento de guerreiro)"
+      },
+      "blink": {
+        "name": "Passo Cintilante",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (talento de mago)"
+      },
+      "bloodlust": {
+        "name": "Tambores de Guerra",
+        "description": "Lleva a próximos aliados al frenesí y aumenta su velocidad de ataque durante 15 s. (talento de xamã)"
+      },
+      "chain_lightning": {
+        "name": "Relâmpago Bifurcado",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a próximos inimigos. (talento de xamã)"
+      },
+      "chaos_bolt": {
+        "name": "Seta da Ruína",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Fogo. (talento de bruxo)"
+      },
+      "cloak_of_shadows": {
+        "name": "Manto Sombrio",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 s. (talento de ladino)"
+      },
+      "cone_of_cold": {
+        "name": "Varredura Gélida",
+        "description": "Golpea a próximos inimigos con escarcha e inflige {damage} de daño de Gelo. (talento de mago)"
+      },
+      "counterspell": {
+        "name": "Quebra-feitiço",
+        "description": "Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 6 s."
+      },
+      "curse_of_exhaustion": {
+        "name": "Maldição Chúmbea",
+        "description": "Maldice a alvo y reduce su velocidad de movimiento un 30% durante 12 s. (talento de bruxo)"
+      },
+      "death_coil": {
+        "name": "Espiral da Tumba",
+        "description": "Golpea a alvo por {damage} de daño de Sombra y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (talento de bruxo)"
+      },
+      "deep_freeze": {
+        "name": "Geada Morta",
+        "description": "Congela profundamente a alvo, inflige {damage} de daño de Gelo y lo aturde durante 4 s. (talento de mago)"
+      },
+      "desperate_prayer": {
+        "name": "Última Prece",
+        "description": "Te sana al instante por {damage}. (talento de sacerdote)"
+      },
+      "deterrence": {
+        "name": "Guarda Espinhosa",
+        "description": "Aumenta tu chance de esquiva un 50% durante 10 s. (talento de caçador)"
+      },
+      "divine_shield": {
+        "name": "Guarda de Luz",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (talento de paladino)"
+      },
+      "earthbind": {
+        "name": "Terra Agarradora",
+        "description": "Ata a la tierra a próximos inimigos y los inmoviliza durante 2 s. (talento de xamã)"
+      },
+      "evocation": {
+        "name": "Poço Etéreo",
+        "description": "Restaura mana rápidamente. (talento de mago)"
+      },
+      "frenzied_regeneration": {
+        "name": "Remendo Selvagem",
+        "description": "Regenera salud durante 10 s. Solo en Forma de oso. (talento de druida)"
+      },
+      "frost_trap": {
+        "name": "Armadilha de Geada",
+        "description": "Congela a los inimigos en el área objetivo durante 3 s. (talento de caçador)"
+      },
+      "ghostly_strike": {
+        "name": "Golpe Espectral",
+        "description": "Golpea a alvo por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talento de ladino)"
+      },
+      "hammer_of_wrath": {
+        "name": "Martelo Badalante",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Sagrado. Solo se usa por debajo del 20% de salud. (talento de paladino)"
+      },
+      "healing_stream": {
+        "name": "Fonte Viva",
+        "description": "Restaura a alvo aliado durante 12 s. (talento de xamã)"
+      },
+      "heroic_leap": {
+        "name": "Salto de Guerra",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Físico a próximos inimigos. (talento de guerreiro)"
+      },
+      "holy_wrath": {
+        "name": "Ira do Santo",
+        "description": "Desata poder sagrado e inflige {damage} de daño a próximos inimigos. (talento de paladino)"
+      },
+      "howl_of_terror": {
+        "name": "Uivo de Terror",
+        "description": "Aterroriza a próximos inimigos hasta 3 s. El daño puede romper el efecto. (talento de bruxo)"
+      },
+      "ice_block": {
+        "name": "Caixão Frio",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento de mago)"
+      },
+      "inner_focus": {
+        "name": "Mente Serena",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talento de sacerdote)"
+      },
+      "innervate": {
+        "name": "Seiva Vital",
+        "description": "A seiva viva brota em você por 10 s, restaurando 20 do seu recurso atual em ondas: mana, ira ou energia; trocar de forma não a interrompe. (talento de Druida)"
+      },
       "pummel": {
         "name": "Quebra-queixo",
         "description": "Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 4 s."
@@ -6357,9 +6646,81 @@ export const pt_BR: EnTranslations = {
         "name": "Chute",
         "description": "Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 4 s."
       },
-      "counterspell": {
-        "name": "Quebra-feitiço",
-        "description": "Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 6 s."
+      "last_stand": {
+        "name": "Décima Primeira Hora",
+        "description": "Aumenta temporalmente Vigor durante 15 s, aumentando la salud máxima. (talento de guerreiro)"
+      },
+      "mend_pet": {
+        "name": "Remendar",
+        "description": "Sana a alvo aliado por {damage} durante 15 s. (talento de caçador)"
+      },
+      "meteor": {
+        "name": "Pedra Celeste",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Fogo y quema el suelo. (talento de mago)"
+      },
+      "temporal_mend": {
+        "name": "Temporal Mend",
+        "description": "Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)"
+      },
+      "temporal_barrier": {
+        "name": "Temporal Barrier",
+        "description": "Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back."
+      },
+      "temporal_echo": {
+        "name": "Temporal Echo",
+        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "Queima-mente",
+        "description": "Canaliza energía de Sombra en el área objetivo e inflige {damage} cada segundo a próximos inimigos. (talento de sacerdote)"
+      },
+      "multi_shot": {
+        "name": "Disparo Dividido",
+        "description": "Dispara varios proyectiles e inflige {damage} a próximos inimigos. (talento de caçador)"
+      },
+      "prayer_of_healing": {
+        "name": "Cura do Coro",
+        "description": "Sana a próximos aliados por {damage}. (talento de sacerdote)"
+      },
+      "preparation": {
+        "name": "Contingência",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talento de ladino)"
+      },
+      "presence_of_mind": {
+        "name": "Mente Acelerada",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento de mago)"
+      },
+      "psychic_scream": {
+        "name": "Grito Psíquico",
+        "description": "Aterroriza a próximos inimigos hasta 4 s. El daño puede romper el efecto. (talento de sacerdote)"
+      },
+      "rallying_cry": {
+        "name": "Reunir",
+        "description": "Lanza un grito de reunión y aumenta poder de ataque de próximos aliados durante 10 s. (talento de guerreiro)"
       },
       "counter_shot": {
         "name": "Tiro Silenciador",
@@ -6369,6 +6730,18 @@ export const pt_BR: EnTranslations = {
         "name": "Repreensão",
         "description": "Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 4 s."
       },
+      "shadowstep": {
+        "name": "Passo Sombrio",
+        "description": "Das un paso entre las sombras hacia tu alvo. (talento de ladino)"
+      },
+      "shield_wall": {
+        "name": "Baluarte",
+        "description": "Alzas un muro de escudo y aumentas mucho la armadura durante 10 s. (talento de guerreiro)"
+      },
+      "silence": {
+        "name": "Silêncio",
+        "description": "Silencia a alvo durante 4 s. (talento de sacerdote)"
+      },
       "skull_bash": {
         "name": "Cabeçada",
         "description": "Uma cabeçada em avanço que interrompe a conjuração do alvo e bloqueia essa escola por 4 s."
@@ -6376,6 +6749,10 @@ export const pt_BR: EnTranslations = {
       "spell_lock": {
         "name": "Ordem de Silêncio",
         "description": "Silencia o alvo durante a conjuração e impede lançar feitiços dessa escola por 5 s."
+      },
+      "tranquility": {
+        "name": "Canto do Bosque",
+        "description": "Canaliza energía restauradora y sana a próximos aliados cada segundo. (talento de druida)"
       },
       "bear_charge": {
         "name": "Investida de Bruin",
@@ -7722,31 +8099,61 @@ export const pt_BR: EnTranslations = {
       "deathless_heartwood": {
         "name": "Cerne da Coroa Imortal"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Cerne da Coroa Imortal"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Último Juramento de Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Último Juramento de Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Elmo Aterrador Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Elmo Aterrador Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Espaldares de Guerra Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Espaldares de Guerra Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Coroa Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Coroa Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Guarda-ombros Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Guarda-ombros Direfang"
       },
       "soulflame_cowl": {
         "name": "Capuz Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Capuz Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Manto Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Manto Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Coroa Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Coroa Galecall"
+      },
       "stormcallers_spaulders": {
+        "name": "Espaldares Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Espaldares Galecall"
       },
       "unknown_alien_weaponry": {
@@ -7823,6 +8230,18 @@ export const pt_BR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guarda-cintura do Chamatormentas"
+      },
+      "deathless_warguard_legmail": {
+        "name": "Malha de Pernas Imortal da Guarda de Guerra"
+      },
+      "scourgehide_carapace": {
+        "name": "Carapaça de Couro do Flagelo"
+      },
+      "soulforged_warplate": {
+        "name": "Placa de Guerra Forjada na Alma"
+      },
+      "soulrend_diadem": {
+        "name": "Diadema Dilacera-Almas"
       }
     },
     "mobs": {
@@ -7997,9 +8416,6 @@ export const pt_BR: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Guarda real reerguido"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Flagelo de Thornpeak"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "Aldren, Guarda de Guerra Imortal"
       },
@@ -8008,6 +8424,9 @@ export const pt_BR: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "Voss, Lâmina Imortal"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Flagelo de Thornpeak"
       },
       "reliquary_ledger_wraith": {
         "name": "Espectro do Registro"

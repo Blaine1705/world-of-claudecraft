@@ -85,6 +85,9 @@ export const cs_CZ: EnTranslations = {
       "title": "Talenty",
       "classTab": "Třída",
       "specTab": "Specializace",
+      "choicesTab": "Volby",
+      "rowUnlockToast": "Odemkla se nová volba talentu!",
+      "rowUnlocks": "Odemkne se na úrovni {level}",
       "available": "Dostupné",
       "spent": "Utraceno",
       "pointSource": "Získáš 1 talentový bod na každé úrovni od úrovně {first} do {cap}. Zvyšuj úroveň a získáš další body.",
@@ -143,6 +146,7 @@ export const cs_CZ: EnTranslations = {
         "noTree": "Tvoje třída zatím nemá talentový strom.",
         "locked": "Talenty ještě nemáš odemčené - začínají na úrovni {level}.",
         "noSpec": "žádná specializace",
+        "rowsSummary": "Talenty: {head}, vybráno {picked}/{unlocked} řádků voleb.",
         "summary": "Talenty: {head} - utraceno {spent}/{total} bodů ({breakdown}).",
         "breakdownClass": "Třída {classPts}",
         "breakdownSpec": "Třída {classPts}, {spec} {specPts}",
@@ -166,6 +170,10 @@ export const cs_CZ: EnTranslations = {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
       "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými."
+    },
+    "fct": {
+      "absorbed": "Pohlceno {amount}",
+      "cheap": "Levnější!"
     },
     "emotes": {
       "wave": "Zamávání",
@@ -862,9 +870,27 @@ export const cs_CZ: EnTranslations = {
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
       "mobileLeftHanded": "Rozvržení pro leváky"
+    },
+    "talentRows": {
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
+    },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "specUnlockBanner": "Specialization Unlocked!",
+      "specUnlockHint": "Press N to choose your specialization."
     },
     "controller": {
       "title": "Ovladač",
@@ -1322,8 +1348,16 @@ export const cs_CZ: EnTranslations = {
       "attackSpeedFast": "Zvyšuje rychlost útoku o {pct} %",
       "haste": "Zvyšuje rychlost útoku a sesílání o {pct} %",
       "tongues": "Zvyšuje dobu sesílání o {pct} %",
+      "combustionCrit": "Your Fire spells always critically strike",
+      "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",
+      "powerEchoNext": "Your next direct spell repeats at {pct}% power on the same target",
+      "iceFloesCasts": "Your next {n} spells with a cast time can be cast while moving",
+      "freeCast": "Your next cast costs nothing",
+      "instantCast": "Your next spell with a cast time is instant",
+      "cheapCast": "Your next spell costs {pct}% less",
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
+        "sp": "Increases spell power by {value}",
         "armor": "Zvyšuje brnění o {value}",
         "int": "Zvyšuje Intelekt o {value}",
         "agi": "Zvyšuje Obratnost o {value}",
@@ -1437,6 +1471,33 @@ export const cs_CZ: EnTranslations = {
     "playerFrame": {
       "unlock": "Přesunout rám hráče",
       "lock": "Zamknout rám hráče"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Resetovat pozice rámů"
@@ -2491,6 +2552,14 @@ export const cs_CZ: EnTranslations = {
       "frost_armor": "Trvalý self-buff, který před bojem zpevní tvoji zbroj.",
       "arcane_intellect": "Zvedne intelekt a prohloubí spojenci zásobu many, sesílej před pullem.",
       "frostbolt": "Zasáhne z dálky a zpomalí cíl, aby se k tobě nedostal.",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "Vyvolá nápoje obnovující manu, abys mezi pully doplnil zásoby.",
       "conjure_food": "Vyvolá jídlo obnovující zdraví, když si sedneš k jídlu.",
       "shadow_bolt": "Stínová střela seslaná na cíl, tvoje základní ničivé kouzlo.",
@@ -5119,6 +5188,7 @@ export const cs_CZ: EnTranslations = {
     },
     "pet": {
       "attack": "Útok",
+      "waterJet": "Water Jet",
       "taunt": "Provokace",
       "healDemon": "Léčit démona",
       "healPet": "Nakrm mazlíčka",
@@ -5127,6 +5197,8 @@ export const cs_CZ: EnTranslations = {
       "aggressive": "Agresivní",
       "petAttackTitle": "Útok mazlíčka",
       "petAttackDesc": "Přikaž mazlíčkovi zaútočit na tvůj aktuální nepřátelský cíl.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Provokace mazlíčka",
       "petTauntDesc": "Přikaž mazlíčkovi zapojit se a zavrčet, jakmile bude v dosahu. Doba obnovy 10 sekund.",
       "healDemonDesc": "Utrať manu a směruj léčení do svého démona po dobu 5 sekund.",
@@ -5249,6 +5321,7 @@ export const cs_CZ: EnTranslations = {
     "actionBar": {
       "attackName": "Útok",
       "attackTooltip": "Přepne automatický útok na cíl. Kliknutí pravým tlačítkem na nepřítele také zaútočí.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Prázdný slot",
       "slotAria": "Akční slot {slot}: {ability}",
       "emptySlotAria": "Akční slot {slot}: prázdný",
@@ -5744,6 +5817,46 @@ export const cs_CZ: EnTranslations = {
       "frostbolt": {
         "name": "Kopí jinovatky",
         "description": "Vypustí mrazivý šíp, způsobí {damage} mrazového poškození a zpomalí pohyb o 40 %."
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Flurry",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Shatter",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Vodní pouto",
@@ -6245,9 +6358,17 @@ export const cs_CZ: EnTranslations = {
         "name": "Svatý otřes",
         "description": "Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)"
       },
+      "aura_surge": {
+        "name": "Zářivý příboj",
+        "description": "Přetíží tvou auru a zpevní tě 160 body brnění na 10 sek. (Paladinský talent)"
+      },
       "holy_shield": {
         "name": "Posvěcená hradba",
         "description": "Vrhne na nepřítele zářivou záštitu, způsobí mu svaté poškození a odrazí se ke 2 blízkým nepřátelům. (klíčová schopnost Ochrany)"
+      },
+      "repentance": {
+        "name": "Repentance",
+        "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
       },
       "bestial_wrath": {
         "name": "Vyjící běs",
@@ -6321,6 +6442,34 @@ export const cs_CZ: EnTranslations = {
         "name": "Rychlé zhojení",
         "description": "Spotřebuje průběžné léčení na spojeneckém cíli a vyléčí ho za {damage}. (klíčová schopnost Obnovy)"
       },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
       "summon_imp": {
         "name": "Vyvolat Žhavorozeného",
         "description": "Vyvolá Žhavorozeného pod velením černokněžníka. Žhavorozený vrhá na nepřátele z dálky popelavé šípy. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona."
@@ -6349,6 +6498,146 @@ export const cs_CZ: EnTranslations = {
         "name": "Vyvolat Zrozence přízraků",
         "description": "Spoutá Zrozence přízraků do tvé vůle, elitního démona, který z dálky sesílá těžké stínové poškození. Jeho ničivou sílu omezuje dlouhý cooldown. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona."
       },
+      "aspect_of_the_wild": {
+        "name": "Maska divokého tesáku",
+        "description": "Inspira a blízké spojence con fuerza salvaje, aumentando útočnou sílu durante 5 min. (lovecký talent)"
+      },
+      "avatar": {
+        "name": "Kolos",
+        "description": "Te transforma en un coloso y aumenta útočnou sílu durante 20 s. (válečnický talent)"
+      },
+      "avenging_wrath": {
+        "name": "Křídlo odplaty",
+        "description": "Invoca poder vengador y aumenta útočnou sílu y sílu kouzel durante 20 s. (paladinský talent)"
+      },
+      "berserk": {
+        "name": "Rudý opar",
+        "description": "Aumenta útočnou sílu durante 15 s. (druidský talent)"
+      },
+      "bladestorm": {
+        "name": "Ocelový cyklon",
+        "description": "Te convierte en una tormenta de acero que golpea a blízké nepřátele cada segundo por {damage}. (válečnický talent)"
+      },
+      "razor_howl": {
+        "name": "Břitký řev",
+        "description": "Výkřik, který na 8 sek. zpomalí nepřátele do 15 m o 50 %. (Válečnický talent)"
+      },
+      "stormthrow": {
+        "name": "Bouřný hod",
+        "description": "Mrští tvou zbraní a omráčí cíl na 3 sek. (Válečnický talent)"
+      },
+      "reckless_vow": {
+        "name": "Lehkomyslná přísaha",
+        "description": "Na 12 sek. zvýší veškerou tvorbu zuřivosti o 50 % a šanci na kritický zásah o 20 %. (Válečnický talent)"
+      },
+      "red_banner": {
+        "name": "Rudý prapor",
+        "description": "Ty a spojenci poblíž získáte na 20 sek. 10 % k rychlosti útoku a 10 % k poškození. (Válečnický talent)"
+      },
+      "blink": {
+        "name": "Mihokrok",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (mágovský talent)"
+      },
+      "bloodlust": {
+        "name": "Válečné bubny",
+        "description": "Lleva a blízké spojence al frenesí y aumenta su velocidad de ataque durante 15 s. (šamanský talent)"
+      },
+      "chain_lightning": {
+        "name": "Rozvětvený blesk",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a blízké nepřátele. (šamanský talent)"
+      },
+      "chaos_bolt": {
+        "name": "Zkázný šíp",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Ohně. (černokněžnický talent)"
+      },
+      "cloak_of_shadows": {
+        "name": "Stínoplášť",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 s. (lotrovský talent)"
+      },
+      "cone_of_cold": {
+        "name": "Mrazivý smyk",
+        "description": "Golpea a blízké nepřátele con escarcha e inflige {damage} de daño de Mrazu. (mágovský talent)"
+      },
+      "counterspell": {
+        "name": "Zlomení kouzla",
+        "description": "Přeruší sesílání kouzla cíle a na 6 s mu znemožní kouzla stejné školy."
+      },
+      "curse_of_exhaustion": {
+        "name": "Olověná kletba",
+        "description": "Maldice a cíl y reduce su velocidad de movimiento un 30% durante 12 s. (černokněžnický talent)"
+      },
+      "death_coil": {
+        "name": "Hrobová spirála",
+        "description": "Golpea a cíl por {damage} de daño de Stínu y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (černokněžnický talent)"
+      },
+      "deep_freeze": {
+        "name": "Mrtvý mráz",
+        "description": "Congela profundamente a cíl, inflige {damage} de daño de Mrazu y lo aturde durante 4 s. (mágovský talent)"
+      },
+      "desperate_prayer": {
+        "name": "Poslední modlitba",
+        "description": "Te sana al instante por {damage}. (kněžský talent)"
+      },
+      "deterrence": {
+        "name": "Štětinová stráž",
+        "description": "Aumenta tu šanci na vyhnutí un 50% durante 10 s. (lovecký talent)"
+      },
+      "divine_shield": {
+        "name": "Světelný štít",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (paladinský talent)"
+      },
+      "earthbind": {
+        "name": "Svírající země",
+        "description": "Ata a la tierra a blízké nepřátele y los inmoviliza durante 2 s. (šamanský talent)"
+      },
+      "evocation": {
+        "name": "Éterická studna",
+        "description": "Restaura manu rápidamente. (mágovský talent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Divoké zacelení",
+        "description": "Regenera salud durante 10 s. Solo en Forma de oso. (druidský talent)"
+      },
+      "frost_trap": {
+        "name": "Jinovatková léčka",
+        "description": "Congela a los nepřátele en el área objetivo durante 3 s. (lovecký talent)"
+      },
+      "ghostly_strike": {
+        "name": "Přízračný úder",
+        "description": "Golpea a cíl por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (lotrovský talent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Zvonící kladivo",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Svaté magie. Solo se usa por debajo del 20% de salud. (paladinský talent)"
+      },
+      "healing_stream": {
+        "name": "Pramenná studna",
+        "description": "Restaura a spřátelený cíl durante 12 s. (šamanský talent)"
+      },
+      "heroic_leap": {
+        "name": "Válečný skok",
+        "description": "Saltas al área objetivo e infliges {damage} de daño fyzického a blízké nepřátele. (válečnický talent)"
+      },
+      "holy_wrath": {
+        "name": "Hněv světce",
+        "description": "Desata poder sagrado e inflige {damage} de daño a blízké nepřátele. (paladinský talent)"
+      },
+      "howl_of_terror": {
+        "name": "Děsivé zavytí",
+        "description": "Aterroriza a blízké nepřátele hasta 3 s. El daño puede romper el efecto. (černokněžnický talent)"
+      },
+      "ice_block": {
+        "name": "Ledová rakev",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (mágovský talent)"
+      },
+      "inner_focus": {
+        "name": "Ztišená mysl",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (kněžský talent)"
+      },
+      "innervate": {
+        "name": "Míza života",
+        "description": "Živá míza v tobě 10 s vzlíná a ve vlnách obnovuje 20 tvého aktuálního zdroje: manu, zuřivost nebo energii; změna podoby ji nepřeruší. (druidský talent)"
+      },
       "pummel": {
         "name": "Drtič čelistí",
         "description": "Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy."
@@ -6357,9 +6646,81 @@ export const cs_CZ: EnTranslations = {
         "name": "Kopanec",
         "description": "Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy."
       },
-      "counterspell": {
-        "name": "Zlomení kouzla",
-        "description": "Přeruší sesílání kouzla cíle a na 6 s mu znemožní kouzla stejné školy."
+      "last_stand": {
+        "name": "Jedenáctá hodina",
+        "description": "Aumenta temporalmente Výdrž durante 15 s, aumentando la salud máxima. (válečnický talent)"
+      },
+      "mend_pet": {
+        "name": "Ošetření",
+        "description": "Sana a spřátelený cíl por {damage} durante 15 s. (lovecký talent)"
+      },
+      "meteor": {
+        "name": "Nebeský kámen",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Ohně y quema el suelo. (mágovský talent)"
+      },
+      "temporal_mend": {
+        "name": "Temporal Mend",
+        "description": "Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)"
+      },
+      "temporal_barrier": {
+        "name": "Temporal Barrier",
+        "description": "Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back."
+      },
+      "temporal_echo": {
+        "name": "Temporal Echo",
+        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "Spálení mysli",
+        "description": "Canaliza energía de Stínu en el área objetivo e inflige {damage} cada segundo a blízké nepřátele. (kněžský talent)"
+      },
+      "multi_shot": {
+        "name": "Tříštivý výstřel",
+        "description": "Dispara varios proyectiles e inflige {damage} a blízké nepřátele. (lovecký talent)"
+      },
+      "prayer_of_healing": {
+        "name": "Sborové zacelení",
+        "description": "Sana a blízké spojence por {damage}. (kněžský talent)"
+      },
+      "preparation": {
+        "name": "Záložní plán",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (lotrovský talent)"
+      },
+      "presence_of_mind": {
+        "name": "Zrychlená mysl",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (mágovský talent)"
+      },
+      "psychic_scream": {
+        "name": "Výkřik hrůzy",
+        "description": "Aterroriza a blízké nepřátele hasta 4 s. El daño puede romper el efecto. (kněžský talent)"
+      },
+      "rallying_cry": {
+        "name": "Svolání",
+        "description": "Lanza un grito de reunión y aumenta útočnou sílu de blízké spojence durante 10 s. (válečnický talent)"
       },
       "counter_shot": {
         "name": "Umlčující výstřel",
@@ -6369,6 +6730,18 @@ export const cs_CZ: EnTranslations = {
         "name": "Pokárání",
         "description": "Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy."
       },
+      "shadowstep": {
+        "name": "Stínový skluz",
+        "description": "Das un paso entre las sombras hacia tu cíl. (lotrovský talent)"
+      },
+      "shield_wall": {
+        "name": "Bašta",
+        "description": "Alzas un muro de escudo y aumentas mucho la zbroj durante 10 s. (válečnický talent)"
+      },
+      "silence": {
+        "name": "Umlčení",
+        "description": "Silencia a cíl durante 4 s. (kněžský talent)"
+      },
       "skull_bash": {
         "name": "Úder hlavou",
         "description": "Výpad hlavou, který přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy."
@@ -6376,6 +6749,10 @@ export const cs_CZ: EnTranslations = {
       "spell_lock": {
         "name": "Příkaz mlčet",
         "description": "Umlčí cíl během sesílání a na 5 s mu znemožní kouzla stejné školy."
+      },
+      "tranquility": {
+        "name": "Píseň háje",
+        "description": "Canaliza energía restauradora y sana a blízké spojence cada segundo. (druidský talent)"
       },
       "bear_charge": {
         "name": "Medvědí výpad",
@@ -7722,31 +8099,61 @@ export const cs_CZ: EnTranslations = {
       "deathless_heartwood": {
         "name": "Jádrové dřevo nesmrtelné koruny"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Jádrové dřevo nesmrtelné koruny"
+      },
       "kingsbane_last_oath": {
+        "name": "Trůnobijec, poslední přísaha Thornpeaku"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Trůnobijec, poslední přísaha Thornpeaku"
       },
       "crownforged_dreadhelm": {
         "name": "Děsivá helma z kosti"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Děsivá helma z kosti"
+      },
       "crownforged_warspaulders": {
+        "name": "Válečné nárameníky z kosti"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Válečné nárameníky z kosti"
       },
       "nighttalon_crown": {
         "name": "Koruna děsivého tesáku"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Koruna děsivého tesáku"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Ramenní chrániče děsivého tesáku"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Ramenní chrániče děsivého tesáku"
       },
       "soulflame_cowl": {
         "name": "Kápě přízračného ohně"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Kápě přízračného ohně"
+      },
       "soulflame_mantle": {
+        "name": "Plášť přízračného ohně"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Plášť přízračného ohně"
       },
       "stormcallers_crown": {
         "name": "Koruna volání vichru"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Koruna volání vichru"
+      },
       "stormcallers_spaulders": {
+        "name": "Nárameníky volání vichru"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Nárameníky volání vichru"
       },
       "unknown_alien_weaponry": {
@@ -7997,9 +8404,6 @@ export const cs_CZ: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Povstalá královská stráž"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, metla Thornpeaku"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "Aldren, nesmrtelná válečná stráž"
       },
@@ -8008,6 +8412,9 @@ export const cs_CZ: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "Voss, nesmrtelný nůž"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, metla Thornpeaku"
       },
       "reliquary_ledger_wraith": {
         "name": "Přízrak pohřební knihy"

@@ -85,6 +85,9 @@ export const ko_KR: EnTranslations = {
       "title": "특성",
       "classTab": "직업",
       "specTab": "전문화",
+      "choicesTab": "선택",
+      "rowUnlockToast": "새로운 특성 선택이 열렸습니다!",
+      "rowUnlocks": "{level} 레벨에 해제",
       "available": "사용 가능",
       "spent": "사용함",
       "pointSource": "{first}레벨부터 {cap}레벨까지 레벨마다 특성 점수 1점을 얻습니다. 더 많은 점수를 얻으려면 레벨을 올리세요.",
@@ -143,6 +146,7 @@ export const ko_KR: EnTranslations = {
         "noTree": "이 직업은 아직 특성 트리가 없습니다.",
         "locked": "아직 특성을 해제하지 않았습니다 — 특성은 {level}레벨부터 시작됩니다.",
         "noSpec": "전문화 없음",
+        "rowsSummary": "특성: {head}, 선택한 줄 {picked}/{unlocked}.",
         "summary": "특성: {head} — {spent}/{total} 점 사용 ({breakdown}).",
         "breakdownClass": "직업 {classPts}",
         "breakdownSpec": "직업 {classPts}, {spec} {specPts}",
@@ -166,6 +170,10 @@ export const ko_KR: EnTranslations = {
       "resurrectAtCorpse": "시신에서 부활",
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
       "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다."
+    },
+    "fct": {
+      "absorbed": "{amount} 흡수",
+      "cheap": "비용 감소!"
     },
     "emotes": {
       "wave": "손인사",
@@ -862,9 +870,28 @@ export const ko_KR: EnTranslations = {
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "대상의 대상 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
-      "mobileLeftHanded": "왼손잡이 레이아웃"
+      "mobileLeftHanded": "왼손잡이 레이아웃",
+      "mouseoverCast": "파티 창에서 마우스오버 시전"
+    },
+    "talentRows": {
+      "tab": "선택",
+      "defaultLoadout": "기본 구성",
+      "comingSoon": "준비 중"
+    },
+    "specPanel": {
+      "primaryAttr": "주요 능력치",
+      "complexity": "복잡도",
+      "complexityLow": "Low",
+      "complexityMedium": "중간",
+      "complexityHigh": "High",
+      "exampleAbilities": "대표 능력",
+      "viewTalents": "특성 보기",
+      "specUnlockBanner": "전문화 해제!",
+      "specUnlockHint": "N을 눌러 전문화를 선택하세요."
     },
     "controller": {
       "title": "컨트롤러",
@@ -977,7 +1004,9 @@ export const ko_KR: EnTranslations = {
         "spellPower": "주문력",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
-        "warfare": "워페어"
+        "warfare": "워페어",
+        "haste": "가속",
+        "parry": "무기 막기"
       },
       "warfareValue": "주는 피해 +{increase}% / 받는 피해 -{reduction}%",
       "desc": {
@@ -994,7 +1023,9 @@ export const ko_KR: EnTranslations = {
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
         "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
-        "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다."
+        "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다.",
+        "haste": "무기 공격과 주문 시전 속도를 높입니다. 공용 재사용 대기시간은 줄이지 않습니다.",
+        "parry": "전방 근접 공격을 완전히 무기로 막아 피해를 입지 않을 확률입니다. 뒤에서 오는 공격은 막을 수 없습니다."
       },
       "effects": {
         "attackPower": "+{value} 전투력",
@@ -1113,7 +1144,8 @@ export const ko_KR: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item} 장착 해제",
-      "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제"
+      "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제",
+      "offhand": "보조장비"
     },
     "account": {
       "title": "계정",
@@ -1322,8 +1354,16 @@ export const ko_KR: EnTranslations = {
       "attackSpeedFast": "공격 속도를 {pct}% 증가시킵니다",
       "haste": "공격 속도와 시전 속도를 {pct}% 증가시킵니다",
       "tongues": "시전 시간을 {pct}% 증가시킵니다",
+      "combustionCrit": "화염 주문이 항상 치명타로 적중합니다",
+      "overloadNext": "다음 주문이 {pct}% 강화되지만 마나 소모가 50% 증가합니다",
+      "powerEchoNext": "다음 직접 주문이 같은 대상에게 {pct}%의 위력으로 반복됩니다",
+      "iceFloesCasts": "다음 {n}개의 시전 주문을 이동하면서 시전할 수 있습니다",
+      "freeCast": "다음 시전에 자원이 들지 않습니다",
+      "instantCast": "시전 시간이 있는 다음 주문이 즉시 시전됩니다",
+      "cheapCast": "다음 주문의 소모량이 {pct}% 감소합니다",
       "increase": {
         "ap": "공격력을 {value} 증가시킵니다",
+        "sp": "주문력을 {value} 증가시킵니다",
         "armor": "방어도를 {value} 증가시킵니다",
         "int": "지능을 {value} 증가시킵니다",
         "agi": "민첩성을 {value} 증가시킵니다",
@@ -1387,7 +1427,22 @@ export const ko_KR: EnTranslations = {
         "shadow": "암흑",
         "holy": "신성",
         "nature": "자연"
-      }
+      },
+      "battleStance": "전투 태세: 분노 생성 10% 증가",
+      "berserkerStance": "광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가",
+      "dmgDone": "입히는 피해가 {pct}% 증가합니다",
+      "dmgDoneReduce": "입히는 피해가 {pct}% 감소합니다",
+      "crit": "치명타 확률이 {pct}% 증가합니다",
+      "rageGen": "분노 생성이 {pct}% 증가합니다",
+      "reckless": "치명타 확률이 {pct}%, 분노 생성이 {ragePct}% 증가합니다",
+      "avatar": "거상: 입히는 피해가 {pct}% 증가합니다",
+      "bloodbath": "치명타 확률과 입히는 피해가 {pct}% 증가합니다",
+      "dieBySword": "받는 피해가 {pct}% 감소합니다 (생명력 {hpPct}% 미만일 때 {lowPct}%)",
+      "sanguine": "공격 속도가 {hastePct}%, 입히는 피해가 {dmgPct}% 증가합니다",
+      "battleTrance": "다음 약탈자의 일격 또는 우악스러운 휘두르기가 분노를 소모하지 않습니다",
+      "revengeFree": "다음 복수가 분노를 소모하지 않습니다",
+      "victoryRush": "연전연승을 사용할 수 있습니다",
+      "maxHpPct": "최대 생명력이 {pct}% 증가합니다"
     },
     "worldBoss": {
       "spawn": "{name}이(가) 쏜피크 고지에 솟아올랐습니다!"
@@ -1437,6 +1492,33 @@ export const ko_KR: EnTranslations = {
     "playerFrame": {
       "unlock": "플레이어 프레임 이동",
       "lock": "플레이어 프레임 고정"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "프레임 위치 초기화"
@@ -2491,6 +2573,14 @@ export const ko_KR: EnTranslations = {
       "frost_armor": "전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.",
       "arcane_intellect": "지능을 높여 아군의 마나량을 늘려 줍니다. 전투를 시작하기 전에 시전하세요.",
       "frostbolt": "원거리에서 타격하며 대상의 이동 속도를 늦춰 다가오지 못하게 합니다.",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "마나를 회복시켜 주는 음료를 창조하여 전투 사이에 채울 수 있습니다.",
       "conjure_food": "앉아서 먹으면 생명력을 회복시켜 주는 음식을 창조합니다.",
       "shadow_bolt": "대상에게 시전하는 어둠의 화살로, 주력 공격기입니다.",
@@ -2504,7 +2594,9 @@ export const ko_KR: EnTranslations = {
       "mark_of_the_wild": "전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.",
       "moonfire": "즉시 타격하고 대상을 계속 불태우므로, 이동 중에 쓰기 좋습니다.",
       "rejuvenation": "즉시 시전되어 아군을 지속적으로 치유하므로, 계속 행동할 수 있습니다.",
-      "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다."
+      "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다.",
+      "revenge": "전방의 모든 적을 휩쓰는 반격으로, 공격을 받아넘긴 직후에는 더 저렴하게 사용할 수 있습니다.",
+      "hamstring": "대상의 다리를 베어 이동 속도를 늦춰 당신을 쫓아오지 못하게 합니다."
     },
     "petHook": {
       "emberkin": "안전한 거리에서 적을 조금씩 깎는 원거리 화염 화살 악마입니다.",
@@ -4967,7 +5059,9 @@ export const ko_KR: EnTranslations = {
       "death": "{name} 사망.",
       "auraGain": "{name} 효과를 얻었습니다.",
       "auraFade": "{name} 효과가 사라졌습니다.",
-      "auraAfflicted": "{target}이 {name} 효과에 걸렸습니다."
+      "auraAfflicted": "{target}이 {name} 효과에 걸렸습니다.",
+      "floatingParry": "무기 막기",
+      "parried": "{target}이 당신의 {ability}을 무기로 막았습니다."
     },
     "system": {
       "playerDeath": "사망했습니다.",
@@ -5053,7 +5147,9 @@ export const ko_KR: EnTranslations = {
       "tradeInProgress": "이미 거래가 진행 중입니다.",
       "tradeTooFar": "대상이 너무 멀어 거래할 수 없습니다.",
       "tradeExpired": "거래 요청이 만료되었습니다.",
-      "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다."
+      "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
+      "nothingToConsume": "소모할 대상이 없습니다.",
+      "needShield": "방패를 착용해야 합니다."
     },
     "logs": {
       "standUp": "일어섰습니다.",
@@ -5119,6 +5215,7 @@ export const ko_KR: EnTranslations = {
     },
     "pet": {
       "attack": "공격",
+      "waterJet": "Water Jet",
       "taunt": "도발",
       "healDemon": "악마 치유",
       "healPet": "소환수 치유",
@@ -5127,6 +5224,8 @@ export const ko_KR: EnTranslations = {
       "aggressive": "공격적",
       "petAttackTitle": "소환수 공격",
       "petAttackDesc": "현재 적대적인 대상에게 소환수가 공격하도록 명령합니다.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "소환수 도발",
       "petTauntDesc": "소환수에게 교전하고 사거리 안에서 으르렁거리도록 명령합니다. 재사용 대기시간 10초.",
       "healDemonDesc": "마나를 소비해 5초 동안 악마에게 치유를 집중합니다.",
@@ -5249,6 +5348,7 @@ export const ko_KR: EnTranslations = {
     "actionBar": {
       "attackName": "공격",
       "attackTooltip": "대상에게 자동 공격을 켜거나 끕니다. 적을 우클릭해도 공격합니다.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "빈 칸",
       "slotAria": "행동 칸 {slot}: {ability}",
       "emptySlotAria": "행동 칸 {slot}: 비어 있음",
@@ -5400,7 +5500,8 @@ export const ko_KR: EnTranslations = {
       "legs": "다리",
       "gloves": "손",
       "feet": "발",
-      "ring": "손가락"
+      "ring": "손가락",
+      "twoHand": "양손"
     },
     "quality": {
       "poor": "하급",
@@ -5744,6 +5845,46 @@ export const ko_KR: EnTranslations = {
       "frostbolt": {
         "name": "서리 창",
         "description": "냉기의 화살을 발사해 {damage}의 냉기 피해를 입히고 이동 속도를 40%만큼 늦춥니다."
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Flurry",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Shatter",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "물 창조",
@@ -6245,9 +6386,17 @@ export const ko_KR: EnTranslations = {
         "name": "신성 충격",
         "description": "신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)"
       },
+      "aura_surge": {
+        "name": "광휘의 파동",
+        "description": "오라를 과충전하여 10초 동안 방어도 160으로 몸을 단단히 합니다. (성기사 특성)"
+      },
       "holy_shield": {
         "name": "신성한 방패",
         "description": "10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)"
+      },
+      "repentance": {
+        "name": "회개",
+        "description": "적을 최대 6초 동안 명상 상태에 빠뜨립니다. 어떤 피해든 효과를 해제합니다. (징벌 대표 기술)"
       },
       "bestial_wrath": {
         "name": "야수의 격노",
@@ -6321,6 +6470,34 @@ export const ko_KR: EnTranslations = {
         "name": "신속한 치유",
         "description": "아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)"
       },
+      "storm_bolt": {
+        "name": "폭풍 망치",
+        "description": "대상에게 무기를 던져 {damage}의 피해를 입히고 3초 동안 기절시킵니다."
+      },
+      "piercing_howl": {
+        "name": "꿰뚫는 절규",
+        "description": "날카로운 외침으로 15yd 이내의 모든 적의 이동 속도를 8초 동안 50% 감소시킵니다."
+      },
+      "die_by_sword": {
+        "name": "검의 승부",
+        "description": "방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다."
+      },
+      "recklessness": {
+        "name": "무모함",
+        "description": "격노: 12초 동안 분노 생성이 50%, 치명타 확률이 20% 증가합니다."
+      },
+      "sanguine_aura": {
+        "name": "선혈의 오라",
+        "description": "적의 피로 무기를 물들여 20초 동안 자신과 근접 아군의 공격 속도와 피해가 10% 증가합니다."
+      },
+      "victory_rush": {
+        "name": "연전연승",
+        "description": "무기 피해에 {damage}를 더한 피해로 공격하고 최대 생명력의 20%를 회복합니다. 적을 처치한 후 20초 이내에만 사용할 수 있습니다."
+      },
+      "intimidating_shout": {
+        "name": "위협의 외침",
+        "description": "무시무시한 외침으로 8yd 이내의 적 최대 5명을 8초 동안 공포에 질려 달아나게 합니다. 피해를 입으면 효과가 해제될 수 있습니다."
+      },
       "summon_imp": {
         "name": "불씨족 소환",
         "description": "흑마법사의 명령을 따르는 불씨족을 소환합니다. 불씨족은 멀리서 적에게 잿불 화살을 날립니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
@@ -6349,6 +6526,146 @@ export const ko_KR: EnTranslations = {
         "name": "망령태생 소환",
         "description": "망령태생을 당신의 의지에 결속합니다. 망령태생은 멀리서 강력한 암흑 피해를 퍼붓는 정예 악마입니다. 긴 재사용 대기시간이 그 파괴적인 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
       },
+      "aspect_of_the_wild": {
+        "name": "야생송곳니 형상",
+        "description": "야생의 힘으로 주위 아군을 고무하여 전투력을 높입니다. 5분 동안 지속됩니다. (사냥꾼 특성)"
+      },
+      "avatar": {
+        "name": "화신",
+        "description": "20초 동안 거상으로 변신하여 자신에게 걸린 모든 군중 제어 효과를 해제하고 입히는 피해가 20% 증가합니다."
+      },
+      "avenging_wrath": {
+        "name": "응징의 날개",
+        "description": "복수의 힘을 내려 전투력과 주문력을 높입니다. 20초 동안 지속됩니다. (성기사 특성)"
+      },
+      "berserk": {
+        "name": "붉은 안개",
+        "description": "전투력을 높입니다. 15초 동안 지속됩니다. (드루이드 특성)"
+      },
+      "bladestorm": {
+        "name": "칼날폭풍",
+        "description": "소용돌이치는 강철의 폭풍이 되어 4초 동안 매초 8yd 이내의 모든 적에게 {damage}의 피해를 입힙니다."
+      },
+      "razor_howl": {
+        "name": "칼날 포효",
+        "description": "15미터 안의 적을 8초 동안 50% 느려지게 합니다. (전사 특성)"
+      },
+      "stormthrow": {
+        "name": "폭풍 투척",
+        "description": "무기를 던져 대상을 3초 동안 기절시킵니다. (전사 특성)"
+      },
+      "reckless_vow": {
+        "name": "무모한 맹세",
+        "description": "12초 동안 모든 분노 생성이 50%, 치명타 확률이 20% 증가합니다. (전사 특성)"
+      },
+      "red_banner": {
+        "name": "붉은 깃발",
+        "description": "20초 동안 자신과 주위 아군의 공격 속도와 피해가 각각 10% 증가합니다. (전사 특성)"
+      },
+      "blink": {
+        "name": "섬광걸음",
+        "description": "전방 15미터로 순간이동하며 이동 불가 효과를 해제합니다. (마법사 특성)"
+      },
+      "bloodlust": {
+        "name": "전쟁 북",
+        "description": "주위 아군을 광란에 빠뜨려 공격 속도를 높입니다. 15초 동안 지속됩니다. (주술사 특성)"
+      },
+      "chain_lightning": {
+        "name": "갈래 번개",
+        "description": "대상 지역에 번개를 던져 주위 적에게 {damage}의 피해를 입힙니다. (주술사 특성)"
+      },
+      "chaos_bolt": {
+        "name": "파멸 화살",
+        "description": "혼돈의 화염 화살을 발사하여 {damage}의 화염 피해를 입힙니다. (흑마법사 특성)"
+      },
+      "cloak_of_shadows": {
+        "name": "그림자망토",
+        "description": "그림자로 몸을 감싸 피해를 흡수합니다. 5초 동안 지속됩니다. (도적 특성)"
+      },
+      "cone_of_cold": {
+        "name": "서리휩쓸기",
+        "description": "주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 입힙니다. (냉기 대표 기술)"
+      },
+      "counterspell": {
+        "name": "주문 분쇄",
+        "description": "대상의 주문을 무효화하고 6초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "curse_of_exhaustion": {
+        "name": "납빛 저주",
+        "description": "대상을 저주하여 이동 속도를 30% 늦춥니다. 12초 동안 지속됩니다. (흑마법사 특성)"
+      },
+      "death_coil": {
+        "name": "무덤 고리",
+        "description": "적에게 {damage}의 암흑 피해를 입힌 뒤 3초 동안 공포에 빠뜨립니다. 이 주문은 시전자를 치유하지 않습니다. (흑마법사 특성)"
+      },
+      "deep_freeze": {
+        "name": "죽은서리",
+        "description": "대상을 깊이 얼려 {damage}의 냉기 피해를 입히고 4초 동안 기절시킵니다. (마법사 특성)"
+      },
+      "desperate_prayer": {
+        "name": "마지막 기도",
+        "description": "자신을 즉시 {damage}만큼 치유합니다. (사제 특성)"
+      },
+      "deterrence": {
+        "name": "가시수호",
+        "description": "회피율을 50% 높입니다. 10초 동안 지속됩니다. (사냥꾼 특성)"
+      },
+      "divine_shield": {
+        "name": "빛의 수호",
+        "description": "신성한 힘으로 자신을 보호하여 엄청난 피해를 흡수합니다. 8초 동안 지속됩니다. (성기사 특성)"
+      },
+      "earthbind": {
+        "name": "붙드는 대지",
+        "description": "주위 적을 대지에 옭아매어 2초 동안 이동 불가로 만듭니다. (주술사 특성)"
+      },
+      "evocation": {
+        "name": "에테르샘",
+        "description": "마나를 빠르게 회복합니다. (마법사 특성)"
+      },
+      "frenzied_regeneration": {
+        "name": "야성 치유",
+        "description": "10초에 걸쳐 생명력을 회복합니다. 브루인 형상에서만 사용할 수 있습니다. (드루이드 특성)"
+      },
+      "frost_trap": {
+        "name": "서리덫",
+        "description": "대상 지역의 적을 3초 동안 그 자리에 얼립니다. (사냥꾼 특성)"
+      },
+      "ghostly_strike": {
+        "name": "망령의 일격",
+        "description": "적에게 무기 피해에 더해 {damage}의 피해를 입히고 잠시 회피율을 높입니다. 연계 점수를 1점 얻습니다. (도적 특성)"
+      },
+      "hammer_of_wrath": {
+        "name": "울림 망치",
+        "description": "부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 입힙니다. 생명력이 20% 미만인 대상에게만 사용할 수 있습니다. (성기사 특성)"
+      },
+      "healing_stream": {
+        "name": "샘물",
+        "description": "12초에 걸쳐 아군 대상을 치유합니다. (주술사 특성)"
+      },
+      "heroic_leap": {
+        "name": "영웅의 도약",
+        "description": "지정한 지역으로 도약하여 주위 적에게 {damage}의 피해를 입힙니다."
+      },
+      "holy_wrath": {
+        "name": "성자의 분노",
+        "description": "신성한 힘을 발산하여 주위 적에게 {damage}의 피해를 입힙니다. (성기사 특성)"
+      },
+      "howl_of_terror": {
+        "name": "공포의 울부짖음",
+        "description": "주위 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다. (흑마법사 특성)"
+      },
+      "ice_block": {
+        "name": "차가운 관",
+        "description": "자신을 얼음 속에 가두어 엄청난 피해를 흡수합니다. 8초 동안 지속됩니다. (마법사 특성)"
+      },
+      "inner_focus": {
+        "name": "고요한 마음",
+        "description": "다음 주문의 소모값을 없앱니다. 60초 동안 지속됩니다. (사제 특성)"
+      },
+      "innervate": {
+        "name": "생명 수액",
+        "description": "생명의 수액이 10초 동안 차올라 현재 자원을 파도처럼 20씩 회복합니다. 마나, 분노, 기력 모두에 적용되며 변신해도 끊기지 않습니다. (드루이드 특성)"
+      },
       "pummel": {
         "name": "턱 강타",
         "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
@@ -6357,9 +6674,81 @@ export const ko_KR: EnTranslations = {
         "name": "발차기",
         "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
       },
-      "counterspell": {
-        "name": "주문 분쇄",
-        "description": "대상의 주문을 무효화하고 6초 동안 해당 계열의 주문을 봉쇄합니다."
+      "last_stand": {
+        "name": "열한 번째 시각",
+        "description": "일시적으로 체력을 높여 최대 생명력을 증가시킵니다. 15초 동안 지속됩니다. (전사 특성)"
+      },
+      "mend_pet": {
+        "name": "응급처치",
+        "description": "15초에 걸쳐 아군 대상을 {damage}만큼 치유합니다. (사냥꾼 특성)"
+      },
+      "meteor": {
+        "name": "하늘돌",
+        "description": "대상 지역에 운석을 떨어뜨려 {damage}의 화염 피해를 입히고 지면을 불태웁니다. (마법사 특성)"
+      },
+      "temporal_mend": {
+        "name": "시간의 꿰매기",
+        "description": "아군을 한순간 미래로 끌어당겨 더 건강한 미래의 몸에 자리 잡는 동안 생명력을 {damage} 회복시킵니다. (시간술 고유 기술)"
+      },
+      "temporal_barrier": {
+        "name": "시간의 방벽",
+        "description": "대상을 현재에서 한 박자 벗어나게 합니다. 시간의 껍질이 10초 동안 피해를 {damage} 흡수한 뒤 시간선이 제자리로 돌아옵니다."
+      },
+      "temporal_echo": {
+        "name": "시간의 메아리",
+        "description": "더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다."
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "생각불꽃",
+        "description": "대상 지역에 암흑 기운을 퍼부어 매초 주위 적에게 {damage}의 피해를 입힙니다. (사제 특성)"
+      },
+      "multi_shot": {
+        "name": "분산 사격",
+        "description": "여러 발의 화살을 쏘아 주위 적에게 {damage}의 피해를 입힙니다. (사냥꾼 특성)"
+      },
+      "prayer_of_healing": {
+        "name": "성가 치유",
+        "description": "주위 아군을 {damage}만큼 치유합니다. (사제 특성)"
+      },
+      "preparation": {
+        "name": "대비책",
+        "description": "전력 질주, 회피, 소멸의 재사용 대기시간을 초기화합니다. (도적 특성)"
+      },
+      "presence_of_mind": {
+        "name": "질주하는 정신",
+        "description": "시전 시간이 있는 다음 주문을 즉시 시전합니다. 60초 동안 지속됩니다. (마법사 특성)"
+      },
+      "psychic_scream": {
+        "name": "정신의 절규",
+        "description": "주위 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다. (사제 특성)"
+      },
+      "rallying_cry": {
+        "name": "재집결의 함성",
+        "description": "재집결의 함성을 내질러 자신과 40yd 이내의 파티원에게 10초 동안 최대 생명력을 20% 추가로 부여합니다."
       },
       "counter_shot": {
         "name": "침묵의 사격",
@@ -6369,6 +6758,18 @@ export const ko_KR: EnTranslations = {
         "name": "질책",
         "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
       },
+      "shadowstep": {
+        "name": "그림자걸음",
+        "description": "그림자를 통과해 대상 곁으로 이동합니다. (도적 특성)"
+      },
+      "shield_wall": {
+        "name": "보루",
+        "description": "무너지지 않는 방벽을 세워 방어도를 크게 높입니다. 10초 동안 지속됩니다. (전사 특성)"
+      },
+      "silence": {
+        "name": "침묵",
+        "description": "대상을 4초 동안 침묵시킵니다. (사제 특성)"
+      },
       "skull_bash": {
         "name": "박치기",
         "description": "돌진 박치기로 대상의 시전을 중단시키고 4초 동안 해당 계열을 봉쇄합니다."
@@ -6376,6 +6777,10 @@ export const ko_KR: EnTranslations = {
       "spell_lock": {
         "name": "재갈 물리기",
         "description": "시전 중인 대상을 침묵시키고 5초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "tranquility": {
+        "name": "숲노래",
+        "description": "회복의 기운을 쏟아 매초 주위 아군을 치유합니다. (드루이드 특성)"
       },
       "bear_charge": {
         "name": "큰곰 돌진",
@@ -6396,6 +6801,98 @@ export const ko_KR: EnTranslations = {
       "revive_pet": {
         "name": "소환수 소생",
         "description": "죽은 소환수를 되살려 당신의 곁으로 되돌립니다."
+      },
+      "revenge": {
+        "name": "복수",
+        "description": "넓은 호를 그리며 공격하여 전방의 모든 적에게 물리 피해를 입힙니다. 대상이 5명을 넘으면 피해가 감소합니다. 회피하거나 무기로 막으면 다음 복수가 분노를 소모하지 않을 수 있습니다."
+      },
+      "battle_stance": {
+        "name": "전투 태세",
+        "description": "공격적인 전투 태세입니다. 분노를 10% 더 생성합니다. 무기와 방어 전문화의 기본 태세입니다."
+      },
+      "berserker_stance": {
+        "name": "광전사 태세",
+        "description": "무모한 전투 태세입니다. 치명타 확률이 3% 증가하고 치명타 피해가 3% 증가합니다. 분노 전사는 항상 이 태세로 싸웁니다."
+      },
+      "sweeping_strikes": {
+        "name": "넓어지는 호",
+        "description": "12초 동안 단일 대상 공격이 주위 적 1명에게도 75% 피해로 적중합니다. (무기 특성)"
+      },
+      "deep_wounds": {
+        "name": "벌어진 상처",
+        "description": "지속 효과: 불구의 일격이 대상에게 6초에 걸쳐 물리 피해를 입히는 출혈을 남깁니다. (무기 특성)"
+      },
+      "enrage_passive": {
+        "name": "아수라장",
+        "description": "지속 효과: 격노 상태일 때 4초 동안 입히는 피해가 11% 증가하고 공격 속도가 25%, 이동 속도가 10% 빨라집니다. 사혈은 30% 확률로 격노시키며, 붉은 수확은 항상 격노시킵니다. (분노 특성)"
+      },
+      "raging_gale": {
+        "name": "쌍격",
+        "description": "무기로 즉시 두 번 공격하여 각 타격마다 무기 피해의 60%에 {damage}를 더한 피해를 입히고 분노 {rage}를 생성합니다. 최대 2회까지 충전됩니다. (분노 특성)"
+      },
+      "red_harvest": {
+        "name": "붉은 수확",
+        "description": "모든 것을 쏟아부어 광란에 휩싸여 세 번 공격하며, 각 타격마다 무기 피해에 {damage}를 더한 피해를 입힙니다. (분노 특성)"
+      },
+      "furious_mending": {
+        "name": "분노의 회복",
+        "description": "10초 동안 받는 피해가 20% 감소하며, 지속되는 동안 사혈이 최대 생명력의 20%만큼 자신을 치유합니다. (분노 특성)"
+      },
+      "emboldening_roar": {
+        "name": "대담한 포효",
+        "description": "대담한 포효를 내질러 자신과 40yd 이내의 아군 플레이어에게 대담함을 부여하며, 다음 3개의 기술이 반드시 치명타로 적중합니다. (분노 특성)"
+      },
+      "raised_guard": {
+        "name": "방패 세우기",
+        "description": "방패 뒤로 몸을 웅크려 6초 동안 받는 물리 피해가 50% 감소합니다. 최대 2회까지 충전됩니다. (방어 특성)"
+      },
+      "iron_resolve": {
+        "name": "강철 의지",
+        "description": "이를 악물고 고통을 견뎌내며 모든 분노(최소 20)를 소모하여 소모한 분노 1당 피해 4를 흡수하고, 최대 10초 동안 지속됩니다. (방어 특성)"
+      },
+      "faultline": {
+        "name": "단층선",
+        "description": "땅에 충격파를 보내 전방 8yd 이내의 적에게 {damage}의 피해를 입히고 3초 동안 기절시킵니다. (방어 특성)"
+      },
+      "defiant_bellow": {
+        "name": "반항의 고함",
+        "description": "반항의 고함을 내질러 10yd 이내의 모든 적을 도발하여 3초 동안 자신을 공격하게 만듭니다. (방어 특성)"
+      },
+      "breachmaker": {
+        "name": "돌파자",
+        "description": "대상을 강타하여 무기 피해에 {damage}를 더한 피해를 입히고 방어를 무너뜨려, 8초 동안 대상에게 가하는 자신의 공격이 20% 더 큰 피해를 입힙니다. (무기 특성)"
+      },
+      "measured_fury": {
+        "name": "절제된 분노",
+        "description": "절제된 분노가 자원 운용을 다듬어 기술의 분노 소모가 10% 감소합니다. (무기 특성)"
+      },
+      "seasoned_soldier": {
+        "name": "노련한 전사",
+        "description": "자동 공격이 치명타로 적중하면 분노를 10% 더 생성합니다. (무기 특성)"
+      },
+      "diabolical_twinstrike": {
+        "name": "사악한 쌍격",
+        "description": "격노 상태일 때 쌍격이 15% 더 큰 피해를 입힙니다. (분노 특성)"
+      },
+      "cleaving_blows": {
+        "name": "가르는 일격",
+        "description": "붉은 수확이 항상 쌍격의 충전을 하나 되돌려줍니다. (분노 특성)"
+      },
+      "sudden_death": {
+        "name": "급살",
+        "description": "자동 공격 시 일정 확률로 생명력에 관계없이 대상에게 이른 무덤을 분노 소모 없이 시전할 수 있습니다. (무기 특성)"
+      },
+      "shamanistic_rage": {
+        "name": "주술사의 격노",
+        "description": "주술사의 격노를 발산하여 마나 160을 회복합니다. (고양 대표 기술)"
+      },
+      "natures_swiftness": {
+        "name": "자연의 신속함",
+        "description": "자연의 힘을 빌려 다음 주문을 즉시 시전합니다. (복원 대표 기술)"
+      },
+      "fel_domination": {
+        "name": "지옥 지배",
+        "description": "지옥의 기운을 지배하여 다음 주문을 즉시 시전합니다. (악마 대표 기술)"
       }
     },
     "items": {
@@ -7722,31 +8219,61 @@ export const ko_KR: EnTranslations = {
       "deathless_heartwood": {
         "name": "죽지 않는 왕관의 심재"
       },
+      "deathless_heartwood_heroic": {
+        "name": "죽지 않는 왕관의 심재"
+      },
       "kingsbane_last_oath": {
+        "name": "왕좌살해자, 손피크의 마지막 맹세"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "왕좌살해자, 손피크의 마지막 맹세"
       },
       "crownforged_dreadhelm": {
         "name": "뼈벼림 공포투구"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "뼈벼림 공포투구"
+      },
       "crownforged_warspaulders": {
+        "name": "뼈벼림 전쟁 어깨갑옷"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "뼈벼림 전쟁 어깨갑옷"
       },
       "nighttalon_crown": {
         "name": "흉포송곳니 왕관"
       },
+      "nighttalon_crown_heroic": {
+        "name": "흉포송곳니 왕관"
+      },
       "nighttalon_shoulderguards": {
+        "name": "흉포송곳니 어깨수호대"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "흉포송곳니 어깨수호대"
       },
       "soulflame_cowl": {
         "name": "망령불꽃 두건"
       },
+      "soulflame_cowl_heroic": {
+        "name": "망령불꽃 두건"
+      },
       "soulflame_mantle": {
+        "name": "망령불꽃 어깨덮개"
+      },
+      "soulflame_mantle_heroic": {
         "name": "망령불꽃 어깨덮개"
       },
       "stormcallers_crown": {
         "name": "강풍부름 관"
       },
+      "stormcallers_crown_heroic": {
+        "name": "강풍부름 관"
+      },
       "stormcallers_spaulders": {
+        "name": "강풍부름 어깨갑옷"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "강풍부름 어깨갑옷"
       },
       "unknown_alien_weaponry": {
@@ -7823,6 +8350,30 @@ export const ko_KR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "폭풍소환사의 허리보호구"
+      },
+      "eastbrook_buckler": {
+        "name": "이스트브룩 버클러"
+      },
+      "eastbrook_greatsword": {
+        "name": "이스트브룩 대검"
+      },
+      "highwatch_wallshield": {
+        "name": "하이워치 벽방패"
+      },
+      "highwatch_greatsword": {
+        "name": "하이워치 대검"
+      },
+      "deathless_warguard_legmail": {
+        "name": "불사 전쟁수호 다리갑옷"
+      },
+      "soulrend_diadem": {
+        "name": "영혼분열 왕관"
+      },
+      "scourgehide_carapace": {
+        "name": "재앙가죽 갑각"
+      },
+      "soulforged_warplate": {
+        "name": "혼주조 전투갑옷"
       }
     },
     "mobs": {
@@ -7997,9 +8548,6 @@ export const ko_KR: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "되살아난 왕실 근위병"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "나이트락시스, 손피크의 재앙"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "죽지 않는 전쟁수호병 알드렌"
       },
@@ -8008,6 +8556,9 @@ export const ko_KR: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "죽지 않는 칼날 보스"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "나이트락시스, 손피크의 재앙"
       },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"

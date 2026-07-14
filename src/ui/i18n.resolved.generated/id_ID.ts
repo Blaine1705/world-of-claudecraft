@@ -85,6 +85,9 @@ export const id_ID: EnTranslations = {
       "title": "Talenta",
       "classTab": "Kelas",
       "specTab": "Spesialisasi",
+      "choicesTab": "Pilihan",
+      "rowUnlockToast": "Pilihan talenta baru terbuka!",
+      "rowUnlocks": "Terbuka pada level {level}",
       "available": "Tersedia",
       "spent": "Terpakai",
       "pointSource": "Dapatkan 1 poin talenta tiap level dari level {first} hingga {cap}. Naik level untuk mendapat lebih banyak poin.",
@@ -143,6 +146,7 @@ export const id_ID: EnTranslations = {
         "noTree": "Kelasmu belum memiliki pohon talenta.",
         "locked": "Kamu belum membuka talenta — talenta mulai tersedia di level {level}.",
         "noSpec": "tanpa spesialisasi",
+        "rowsSummary": "Talenta: {head}, {picked}/{unlocked} baris pilihan dipilih.",
         "summary": "Talenta: {head} — {spent}/{total} poin terpakai ({breakdown}).",
         "breakdownClass": "Kelas {classPts}",
         "breakdownSpec": "Kelas {classPts}, {spec} {specPts}",
@@ -166,6 +170,10 @@ export const id_ID: EnTranslations = {
       "resurrectAtCorpse": "Bangkit di Jasad",
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",
       "spiritHealerAlive": "Sang Penjaga Pucat mengawasi para mati. Kamu masih termasuk yang hidup."
+    },
+    "fct": {
+      "absorbed": "{amount} diserap",
+      "cheap": "Lebih murah!"
     },
     "emotes": {
       "wave": "Melambai",
@@ -862,9 +870,27 @@ export const id_ID: EnTranslations = {
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
       "mobileLeftHanded": "Tata letak kidal"
+    },
+    "talentRows": {
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
+    },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "specUnlockBanner": "Specialization Unlocked!",
+      "specUnlockHint": "Press N to choose your specialization."
     },
     "controller": {
       "title": "Kontroler",
@@ -1277,7 +1303,7 @@ export const id_ID: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Item ini tidak dapat dihancurkan.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Klik kanan untuk menghancurkan",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -1322,8 +1348,16 @@ export const id_ID: EnTranslations = {
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
+      "combustionCrit": "Your Fire spells always critically strike",
+      "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",
+      "powerEchoNext": "Your next direct spell repeats at {pct}% power on the same target",
+      "iceFloesCasts": "Your next {n} spells with a cast time can be cast while moving",
+      "freeCast": "Your next cast costs nothing",
+      "instantCast": "Your next spell with a cast time is instant",
+      "cheapCast": "Your next spell costs {pct}% less",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
+        "sp": "Increases spell power by {value}",
         "armor": "Aumenta la armadura en {value}",
         "int": "Aumenta el intelecto en {value}",
         "agi": "Aumenta la agilidad en {value}",
@@ -1437,6 +1471,33 @@ export const id_ID: EnTranslations = {
     "playerFrame": {
       "unlock": "Pindahkan bingkai pemain",
       "lock": "Kunci bingkai pemain"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Atur Ulang Posisi Bingkai"
@@ -2491,6 +2552,14 @@ export const id_ID: EnTranslations = {
       "frost_armor": "Penguat-diri tahan lama yang mengeraskan zirahmu sebelum pertarungan.",
       "arcane_intellect": "Menaikkan Intelek untuk memperdalam kolam mana sekutu, rapalkan sebelum menarik musuh.",
       "frostbolt": "Menyerang dari kejauhan dan melambatkan sasaran sehingga tak bisa mendekatimu.",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "Menciptakan minuman yang memulihkan mana, sehingga kamu bisa mengisi ulang di sela tarikan.",
       "conjure_food": "Menciptakan makanan yang memulihkan nyawa saat kamu duduk untuk menyantapnya.",
       "shadow_bolt": "Anak panah bayangan yang kamu rapalkan ke sasaran, serangan andalanmu.",
@@ -5119,6 +5188,7 @@ export const id_ID: EnTranslations = {
     },
     "pet": {
       "attack": "Serang",
+      "waterJet": "Water Jet",
       "taunt": "Provokasi",
       "healDemon": "Sembuhkan Iblis",
       "healPet": "Sembuhkan Peliharaan",
@@ -5127,6 +5197,8 @@ export const id_ID: EnTranslations = {
       "aggressive": "Agresif",
       "petAttackTitle": "Serangan Peliharaan",
       "petAttackDesc": "Perintahkan peliharaan Anda untuk menyerang target bermusuhan Anda saat ini.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Provokasi Peliharaan",
       "petTauntDesc": "Perintahkan peliharaan Anda untuk menyerbu dan Menggeram saat dalam jangkauan. Waktu jeda 10 detik.",
       "healDemonDesc": "Habiskan mana untuk menyalurkan penyembuhan ke iblis Anda selama 5 detik.",
@@ -5249,6 +5321,7 @@ export const id_ID: EnTranslations = {
     "actionBar": {
       "attackName": "Serang",
       "attackTooltip": "Alihkan serangan otomatis pada targetmu. Klik kanan pada musuh juga menyerang.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Slot kosong",
       "slotAria": "Slot aksi {slot}: {ability}",
       "emptySlotAria": "Slot aksi {slot}: kosong",
@@ -5744,6 +5817,46 @@ export const id_ID: EnTranslations = {
       "frostbolt": {
         "name": "Rimelance",
         "description": "Melepaskan panah embun beku, menimbulkan {damage} kerusakan Beku dan memperlambat gerakan sebesar 40%."
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Flurry",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Shatter",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Waterbind",
@@ -6245,9 +6358,17 @@ export const id_ID: EnTranslations = {
         "name": "Kejutan Suci",
         "description": "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)"
       },
+      "aura_surge": {
+        "name": "Gelombang Cemerlang",
+        "description": "Mengisi berlebih aura Anda, memperkuat dengan 160 zirah selama 10 detik. (talenta Paladin)"
+      },
       "holy_shield": {
         "name": "Perisai Suci",
         "description": "Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)"
+      },
+      "repentance": {
+        "name": "Repentance",
+        "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
       },
       "bestial_wrath": {
         "name": "Murka Buas",
@@ -6321,6 +6442,34 @@ export const id_ID: EnTranslations = {
         "name": "Pemulihan Cepat",
         "description": "Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)"
       },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
       "summon_imp": {
         "name": "Panggil Emberkin",
         "description": "Memanggil Emberkin di bawah perintah Penyihir Iblis. Emberkin melontarkan Ashbolt ke arah musuhmu dari kejauhan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
@@ -6349,6 +6498,146 @@ export const id_ID: EnTranslations = {
         "name": "Panggil Wraithborn",
         "description": "Mengikat Wraithborn pada kehendakmu, iblis elit yang menghujani kerusakan Bayangan berat dari kejauhan. Waktu jeda yang panjang membatasi kekuatannya yang menghancurkan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
       },
+      "aspect_of_the_wild": {
+        "name": "Rupa Taring Liar",
+        "description": "Inspira a di dekat sekutu con fuerza salvaje, aumentando daya serang durante 5 mnt. (talenta hunter)"
+      },
+      "avatar": {
+        "name": "Kolosus",
+        "description": "Te transforma en un coloso y aumenta daya serang durante 20 detik. (talenta warrior)"
+      },
+      "avenging_wrath": {
+        "name": "Sayap Pembalas",
+        "description": "Invoca poder vengador y aumenta daya serang y daya sihir durante 20 detik. (talenta paladin)"
+      },
+      "berserk": {
+        "name": "Kabut Merah",
+        "description": "Aumenta daya serang durante 15 detik. (talenta druid)"
+      },
+      "bladestorm": {
+        "name": "Siklon Baja",
+        "description": "Te convierte en una tormenta de acero que golpea a di dekat musuh cada segundo por {damage}. (talenta warrior)"
+      },
+      "razor_howl": {
+        "name": "Raungan Tajam",
+        "description": "Teriakan yang memperlambat musuh dalam jarak 15 m sebesar 50% selama 8 dtk. (Talenta petarung)"
+      },
+      "stormthrow": {
+        "name": "Lemparan Badai",
+        "description": "Lemparkan senjatamu untuk membuat target pingsan selama 3 dtk. (Talenta petarung)"
+      },
+      "reckless_vow": {
+        "name": "Sumpah Nekat",
+        "description": "Meningkatkan semua perolehan amarah sebesar 50% dan peluang serangan kritis sebesar 20% selama 12 dtk. (Talenta petarung)"
+      },
+      "red_banner": {
+        "name": "Panji Merah",
+        "description": "Kamu dan sekutu di dekatmu memperoleh 10% kecepatan serangan dan 10% kerusakan selama 20 dtk. (Talenta petarung)"
+      },
+      "blink": {
+        "name": "Langkah Kilat",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (talenta mage)"
+      },
+      "bloodlust": {
+        "name": "Genderang Perang",
+        "description": "Lleva a di dekat sekutu al frenesí y aumenta su velocidad de ataque durante 15 detik. (talenta shaman)"
+      },
+      "chain_lightning": {
+        "name": "Petir Bercabang",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a di dekat musuh. (talenta shaman)"
+      },
+      "chaos_bolt": {
+        "name": "Baut Reruntuhan",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Api. (talenta warlock)"
+      },
+      "cloak_of_shadows": {
+        "name": "Jubah Bayang",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 detik. (talenta rogue)"
+      },
+      "cone_of_cold": {
+        "name": "Sapuan Beku",
+        "description": "Golpea a di dekat musuh con escarcha e inflige {damage} de daño de Es. (talenta mage)"
+      },
+      "counterspell": {
+        "name": "Penangkal Mantra",
+        "description": "Menangkal perapalan mantra target dan mencegah perapalan dari aliran sihir itu selama 6 detik."
+      },
+      "curse_of_exhaustion": {
+        "name": "Kutuk Timah",
+        "description": "Maldice a target y reduce su velocidad de movimiento un 30% durante 12 detik. (talenta warlock)"
+      },
+      "death_coil": {
+        "name": "Kumparan Kubur",
+        "description": "Golpea a target por {damage} de daño de Bayangan y luego lo aterroriza durante 3 detik. Esta versión no sana al lanzador. (talenta warlock)"
+      },
+      "deep_freeze": {
+        "name": "Embun Mati",
+        "description": "Congela profundamente a target, inflige {damage} de daño de Es y lo aturde durante 4 detik. (talenta mage)"
+      },
+      "desperate_prayer": {
+        "name": "Doa Terakhir",
+        "description": "Te sana al instante por {damage}. (talenta priest)"
+      },
+      "deterrence": {
+        "name": "Penjaga Duri",
+        "description": "Aumenta tu peluang menghindar un 50% durante 10 detik. (talenta hunter)"
+      },
+      "divine_shield": {
+        "name": "Pelindung Cahaya",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 detik. (talenta paladin)"
+      },
+      "earthbind": {
+        "name": "Bumi Mencengkeram",
+        "description": "Ata a la tierra a di dekat musuh y los inmoviliza durante 2 detik. (talenta shaman)"
+      },
+      "evocation": {
+        "name": "Sumur Eter",
+        "description": "Restaura mana rápidamente. (talenta mage)"
+      },
+      "frenzied_regeneration": {
+        "name": "Pemulihan Liar",
+        "description": "Regenera salud durante 10 detik. Solo en Forma de oso. (talenta druid)"
+      },
+      "frost_trap": {
+        "name": "Jerat Rima",
+        "description": "Congela a los musuh en el área objetivo durante 3 detik. (talenta hunter)"
+      },
+      "ghostly_strike": {
+        "name": "Serangan Arwah",
+        "description": "Golpea a target por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talenta rogue)"
+      },
+      "hammer_of_wrath": {
+        "name": "Palu Berdentang",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Suci. Solo se usa por debajo del 20% de salud. (talenta paladin)"
+      },
+      "healing_stream": {
+        "name": "Mata Air",
+        "description": "Restaura a target sekutu durante 12 detik. (talenta shaman)"
+      },
+      "heroic_leap": {
+        "name": "Lompatan Perang",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Fisik a di dekat musuh. (talenta warrior)"
+      },
+      "holy_wrath": {
+        "name": "Murka Santo",
+        "description": "Desata poder sagrado e inflige {damage} de daño a di dekat musuh. (talenta paladin)"
+      },
+      "howl_of_terror": {
+        "name": "Lolongan Ngeri",
+        "description": "Aterroriza a di dekat musuh hasta 3 detik. El daño puede romper el efecto. (talenta warlock)"
+      },
+      "ice_block": {
+        "name": "Peti Es",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 detik. (talenta mage)"
+      },
+      "inner_focus": {
+        "name": "Pikiran Hening",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 detik. (talenta priest)"
+      },
+      "innervate": {
+        "name": "Getah Hidup",
+        "description": "Getah hidup mengalir dalam dirimu selama 10 detik, memulihkan 20 sumber daya saat ini secara bergelombang: mana, amarah, atau energi; berganti wujud tidak memutusnya. (talenta Druid)"
+      },
       "pummel": {
         "name": "Pukulan Bertubi",
         "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
@@ -6357,9 +6646,81 @@ export const id_ID: EnTranslations = {
         "name": "Tendangan",
         "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
       },
-      "counterspell": {
-        "name": "Penangkal Mantra",
-        "description": "Menangkal perapalan mantra target dan mencegah perapalan dari aliran sihir itu selama 6 detik."
+      "last_stand": {
+        "name": "Jam Kesebelas",
+        "description": "Aumenta temporalmente Stamina durante 15 detik, aumentando la salud máxima. (talenta warrior)"
+      },
+      "mend_pet": {
+        "name": "Tambal Luka",
+        "description": "Sana a target sekutu por {damage} durante 15 detik. (talenta hunter)"
+      },
+      "meteor": {
+        "name": "Batu Langit",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Api y quema el suelo. (talenta mage)"
+      },
+      "temporal_mend": {
+        "name": "Temporal Mend",
+        "description": "Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)"
+      },
+      "temporal_barrier": {
+        "name": "Temporal Barrier",
+        "description": "Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back."
+      },
+      "temporal_echo": {
+        "name": "Temporal Echo",
+        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "Bakar Pikir",
+        "description": "Canaliza energía de Bayangan en el área objetivo e inflige {damage} cada segundo a di dekat musuh. (talenta priest)"
+      },
+      "multi_shot": {
+        "name": "Tembakan Pecah",
+        "description": "Dispara varios proyectiles e inflige {damage} a di dekat musuh. (talenta hunter)"
+      },
+      "prayer_of_healing": {
+        "name": "Penyembuhan Koor",
+        "description": "Sana a di dekat sekutu por {damage}. (talenta priest)"
+      },
+      "preparation": {
+        "name": "Rencana Cadangan",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talenta rogue)"
+      },
+      "presence_of_mind": {
+        "name": "Pikiran Melaju",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 detik. (talenta mage)"
+      },
+      "psychic_scream": {
+        "name": "Jerit Psikis",
+        "description": "Aterroriza a di dekat musuh hasta 4 detik. El daño puede romper el efecto. (talenta priest)"
+      },
+      "rallying_cry": {
+        "name": "Seruan Kumpul",
+        "description": "Lanza un grito de reunión y aumenta daya serang de di dekat sekutu durante 10 detik. (talenta warrior)"
       },
       "counter_shot": {
         "name": "Tembakan Penangkal",
@@ -6369,6 +6730,18 @@ export const id_ID: EnTranslations = {
         "name": "Teguran",
         "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
       },
+      "shadowstep": {
+        "name": "Selip Bayang",
+        "description": "Das un paso entre las sombras hacia tu target. (talenta rogue)"
+      },
+      "shield_wall": {
+        "name": "Benteng",
+        "description": "Alzas un muro de escudo y aumentas mucho la armor durante 10 detik. (talenta warrior)"
+      },
+      "silence": {
+        "name": "Senyap",
+        "description": "Silencia a target durante 4 detik. (talenta priest)"
+      },
       "skull_bash": {
         "name": "Hantaman Tengkorak",
         "description": "Serudukan kepala yang menerjang, mengganggu perapalan mantra target dan mengunci aliran sihir itu selama 4 detik."
@@ -6376,6 +6749,10 @@ export const id_ID: EnTranslations = {
       "spell_lock": {
         "name": "Kunci Mantra",
         "description": "Membungkam target saat sedang merapal dan mencegah perapalan dari aliran sihir itu selama 5 detik."
+      },
+      "tranquility": {
+        "name": "Lagu Rimba",
+        "description": "Canaliza energía restauradora y sana a di dekat sekutu cada segundo. (talenta druid)"
       },
       "bear_charge": {
         "name": "Terjangan Bruin",
@@ -7722,31 +8099,61 @@ export const id_ID: EnTranslations = {
       "deathless_heartwood": {
         "name": "Inti Kayu Mahkota Baka"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Inti Kayu Mahkota Baka"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Sumpah Terakhir Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Sumpah Terakhir Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Helm Seram Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Helm Seram Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Bahu Perang Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bahu Perang Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Mahkota Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Mahkota Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Pelindung Bahu Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Pelindung Bahu Direfang"
       },
       "soulflame_cowl": {
         "name": "Tudung Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Tudung Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Mantel Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Mantel Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Mahkota Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Mahkota Galecall"
+      },
       "stormcallers_spaulders": {
+        "name": "Pelindung Bahu Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Pelindung Bahu Galecall"
       },
       "unknown_alien_weaponry": {
@@ -7823,6 +8230,18 @@ export const id_ID: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Pelindung Pinggang Pemanggil Badai"
+      },
+      "deathless_warguard_legmail": {
+        "name": "Zirah Kaki Garda Perang Nirmaut"
+      },
+      "scourgehide_carapace": {
+        "name": "Karapas Kulit Sampar"
+      },
+      "soulforged_warplate": {
+        "name": "Zirah Perang Tempaan Jiwa"
+      },
+      "soulrend_diadem": {
+        "name": "Diadem Pengoyak Jiwa"
       }
     },
     "mobs": {
@@ -7997,9 +8416,6 @@ export const id_ID: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Pengawal Kerajaan Bangkit"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Bencana Thornpeak"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "Aldren, Garda Perang Nirmaut"
       },
@@ -8008,6 +8424,9 @@ export const id_ID: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "Voss, Belati Nirmaut"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Bencana Thornpeak"
       },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"
