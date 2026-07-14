@@ -113,6 +113,17 @@ export const REALM_ROADS: { x: number; z: number }[][] = [
   ], // the Gleaming Deep -> Crystalline Shallows
 ];
 
+// Dense ground-cover flower drifts (dusk palette). The renderer's grass ring
+// treats these circles like guaranteed field cells, so the whole area blooms
+// instead of the usual scattered patches. Flowers are walk-through dressing:
+// no colliders, and placement still skips water, steep ground, and roads.
+export const REALM_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
+  // Starfall Basin: the meadow bowl around the fallen star's lake
+  { x: 60, z: 972, r: 26 }, // the road meadow below Elder Grove
+  { x: 92, z: 966, r: 20 }, // the south shore sweep
+  { x: 80, z: 1002, r: 18 }, // the glimmerwisp meadow at the northwest inlet
+];
+
 // The hidden way in. Side a is the concealed cave in the northwest Thornpeak
 // cliffs (no POI, no map marker: found by exploring); side b is the Duskfall
 // Cave on the realm's southern wall. Landings sit ~5yd outside the opposite
@@ -429,7 +440,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     name: 'Keeper Saelwyn',
     title: 'Keeper of the Hollow',
     pos: { x: -43, z: 1016 },
-    facing: 0.3,
+    facing: -2.85, // back to the great tree, greeting arrivals from the ring
     color: 0xd8c4f0,
     questIds: [
       'q_veil_thinned',
@@ -484,7 +495,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     name: 'Archivist Tullo',
     title: 'Reader of Stones',
     pos: { x: -31, z: 1021 },
-    facing: -1.06,
+    facing: 2.08, // back to the great tree, looking out toward his monuments
     color: 0xb8a8d8,
     questIds: ['q_monument_tour', 'q_shards_of_starfall', 'q_wardens_echoes'],
     greeting:
@@ -1040,7 +1051,10 @@ export const REALM_PROPS: ZonePropsDef = {
   // by render/realm_flora.ts; these are the built structures around it).
   // The great tree's trunk is solid (colliders.ts); everything else rings it
   // at a respectful distance so the square breathes.
-  greatTrees: [{ x: -40, z: 1026, r: 2.6 }],
+  // r matches the rendered trunk's root flare at ground level (the twisted_1
+  // model spans 0.85 native at its base, 5.5yd at the 6.5x town scale), so
+  // players collide with the visual bark instead of sinking into it.
+  greatTrees: [{ x: -40, z: 1026, r: 5.5 }],
   buildings: [
     // The whole town is the KayKit medieval set in the Hollow's dusk palette
     // (violet roofs, warm timber; render/props.ts maps each kind to its GLB).

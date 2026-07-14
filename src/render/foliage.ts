@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { REALM_FLOWER_MEADOWS } from '../sim/content/realm';
 import {
   CAMPS,
   DUNGEON_X_THRESHOLD,
@@ -1733,6 +1734,13 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const i1 = Math.ceil(maxX / step) + 1;
     const j0 = Math.floor(minZ / step) - 1;
     const j1 = Math.ceil(maxZ / step) + 1;
+    // authored flower meadows overlapping this chunk (dusk realm only)
+    const meadowsInChunk = duskFields
+      ? REALM_FLOWER_MEADOWS.filter(
+          (mw) =>
+            mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
+        )
+      : [];
 
     for (let i = i0; i <= i1 && n < maxChunkCount; i++) {
       for (let j = j0; j <= j1 && n < maxChunkCount; j++) {
@@ -1770,11 +1778,19 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         im.setColorAt(n, c);
         n++;
         // roughly one tuft in nine sprouts a flower cluster beside it; in
-        // the dusk realm, coarse field cells bloom into dense drifts
+        // the dusk realm, coarse field cells bloom into dense drifts, and the
+        // authored meadow circles (REALM_FLOWER_MEADOWS) always bloom
         const fieldCell = duskFields ? hashAt(Math.floor(x / 22), Math.floor(z / 22), 13) : 1;
+        const inMeadow = meadowsInChunk.some((mw) => {
+          const mdx = x - mw.x;
+          const mdz = z - mw.z;
+          return mdx * mdx + mdz * mdz < mw.r * mw.r;
+        });
+        // meadows bloom harder than hash fields: their ground carries fewer
+        // grass tufts (each tuft is a flower anchor), so density compensates
         const inField = duskFields && fieldCell < 0.42;
-        const flowerChance = inField ? 0.6 : duskFields ? 0.05 : 0.11;
-        const reps = inField ? 3 : 1;
+        const flowerChance = inMeadow ? 0.9 : inField ? 0.6 : duskFields ? 0.05 : 0.11;
+        const reps = inMeadow ? 4 : inField ? 3 : 1;
         if (hashAt(i, j, 6) < flowerChance) {
           for (let rep = 0; rep < reps && fn < flowerCap; rep++) {
             const fx = x + (hashAt(i + rep, j, 7) - 0.5) * (1.4 + rep * 1.3);
@@ -1793,6 +1809,35 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
             fm.setColorAt(fn, c);
             fn++;
           }
+        }
+      }
+    }
+
+    // Authored meadows also bloom independent of grass anchors: the scrubby
+    // basin shore carries few tufts (each tuft is a flower anchor above), so
+    // a direct grid pass keeps the drifts solid on bare ground too.
+    for (const mw of meadowsInChunk) {
+      for (let i = i0; i <= i1 && fn < flowerCap; i++) {
+        for (let j = j0; j <= j1 && fn < flowerCap; j++) {
+          if (hashAt(i, j, 14) > 0.5) continue;
+          const fx = i * step + (hashAt(i, j, 15) - 0.5) * step * 1.6;
+          const fz = j * step + (hashAt(i, j, 16) - 0.5) * step * 1.6;
+          if (fx < minX || fx >= maxX || fz < minZ || fz >= maxZ) continue;
+          const mdx = fx - mw.x;
+          const mdz = fz - mw.z;
+          if (mdx * mdx + mdz * mdz >= mw.r * mw.r) continue;
+          const fh = terrainHeight(fx, fz, seed);
+          if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
+            continue;
+          }
+          const fs = 0.55 + hashAt(i, j, 17) * 0.5;
+          q.setFromAxisAngle(up, hashAt(i, j, 18) * 12.4);
+          m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
+          fm.setMatrixAt(fn, m);
+          c.setHex(0xffffff);
+          c.offsetHSL((hashAt(i, j, 19) - 0.5) * 0.04, 0, (hashAt(j, i, 19) - 0.5) * 0.12);
+          fm.setColorAt(fn, c);
+          fn++;
         }
       }
     }

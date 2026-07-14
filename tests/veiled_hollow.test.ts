@@ -291,6 +291,27 @@ describe('the storybook decor set (decorProps)', () => {
     for (let t = 0; t < 20 * 4; t++) sim2.tick();
     expect(p2.pos.z).toBeGreaterThan(bed.z + 2);
   });
+
+  it('the great tree trunk blocks movement at its visual radius', () => {
+    // The collider radius mirrors the rendered trunk's root flare, so a
+    // player walking at the tree stops at the bark instead of wading in.
+    const tree = REALM_PROPS.greatTrees?.[0];
+    if (!tree) throw new Error('expected the Eldergleam great tree');
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
+    const p = sim.player;
+    p.pos.x = tree.x + tree.r + 4; // approach from the east, a clear lane
+    p.pos.z = tree.z;
+    p.pos.y = terrainHeight(p.pos.x, p.pos.z, SEED);
+    p.prevPos = { ...p.pos };
+    p.facing = -Math.PI / 2; // 0 faces +z; walk west into the trunk
+    sim.moveInput.forward = true;
+    let minDist = Number.POSITIVE_INFINITY;
+    for (let t = 0; t < 20 * 4; t++) {
+      sim.tick();
+      minDist = Math.min(minDist, Math.hypot(p.pos.x - tree.x, p.pos.z - tree.z));
+    }
+    expect(minDist).toBeGreaterThan(tree.r - 0.1);
+  });
 });
 
 describe('the crystal cove ramp', () => {
