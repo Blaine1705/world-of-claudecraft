@@ -15,6 +15,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
+import { isDebuffAura } from '../aura_classify';
 import { ABILITIES, isDelvePos } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
@@ -61,6 +62,7 @@ import {
   ARCANE_SURGE_ID,
   aetherSurgeAddStack,
   aetherSurgeDamageMult,
+  applyPerfectMoment,
   placeGroupEcho,
   placeTemporalEcho,
   selectCascadeTargets,
@@ -78,8 +80,10 @@ import {
   SHATTER_CRIT_DMG_BONUS,
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
+import { glacialFrontContains } from './glacial_front';
 import { applyGroupHaste } from './haste_burst';
 import { applyRewind } from './rewind';
+import { spawnRingOfFrost } from './ring_of_frost';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
@@ -676,6 +680,12 @@ export function runEffects(
         });
         break;
       }
+      case 'perfectMoment': {
+        // Perfect Moment (combat/chronomancy.ts): slam the caster to full Arcane
+        // Charges and open the window in which Aether Darts stops consuming them.
+        applyPerfectMoment(ctx, p);
+        break;
+      }
       case 'rewind': {
         // Chronomancy Rewind (combat/rewind.ts): instant, no target, centered on the
         // caster. Restores a fraction of the recent REAL damage every living group/
@@ -1046,6 +1056,19 @@ export function runEffects(
             aura.kind === 'disarm' ||
             aura.kind === 'slow'
           ) {
+            p.auras.splice(i, 1);
+            ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+          }
+        }
+        break;
+      }
+      case 'cleanseSelf': {
+        // Ice Block: strip EVERY debuff off the caster (control, DoTs, stat saps, ...),
+        // broader than breakControl. Uses the shared classifier so the split matches
+        // the buff/debuff frame exactly. Emits the aura-lost event so client bars clear.
+        for (let i = p.auras.length - 1; i >= 0; i--) {
+          const aura = p.auras[i];
+          if (isDebuffAura(aura.kind, aura.value)) {
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }
@@ -1529,6 +1552,7 @@ export function runEffects(
             z: zoneCenter.z,
             school: ability.school,
             fx: 'meteorFall',
+            radius: eff.radius,
             duration: eff.interval,
           });
         }
@@ -1662,6 +1686,93 @@ export function runEffects(
         }
         break;
       }
+      case 'empoweredCone': {
+        const level = Math.max(1, Math.min(eff.stages.length, res.empowerLevel ?? 1));
+        const stage = eff.stages[level - 1];
+        const angle = stage.angle ?? eff.angle;
+        const fx = eff.fx ?? 'frostCone';
+        let hotStreakHit = false;
+        let hotStreakCrit = false;
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx,
+          range: stage.range,
+          angle,
+          level,
+        });
+        const spellPower = directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime * (level / eff.stages.length),
+          true,
+        );
+        for (const m of ctx.hostilesInRadius(p, p.pos, stage.range)) {
+          if (m.dead || !ctx.hasLineOfSight(p, m)) continue;
+          if (!glacialFrontContains(p.pos, p.facing, m.pos, stage.range, angle)) continue;
+          const critRoll = ctx.rng.chance(ctx.spellCrit(p));
+          const crit =
+            critRoll ||
+            fireGuaranteedCrit(ctx, p, ability.id, ability.school, m) ||
+            (eff.guaranteedCritLevel !== undefined && level === eff.guaranteedCritLevel);
+          let damage = ctx.rng.range(stage.min, stage.max) + spellPower;
+          damage *= spellDamageMultFromAuras(p);
+          if (crit) damage *= 1.5 + p.critDmgBonus;
+          ctx.dealDamage(p, m, Math.round(damage), crit, ability.school, ability.name, 'hit');
+          if (eff.hotStreakOnce) {
+            hotStreakHit = true;
+            hotStreakCrit ||= crit;
+          } else noteSpellHit(ctx, p, crit, ability.id);
+          if (m.dead) continue;
+          if (eff.slowMult !== undefined && eff.slowDuration !== undefined) {
+            ctx.applyAura(m, {
+              id: `${ability.id}_slow`,
+              name: ability.name,
+              kind: 'slow',
+              remaining: eff.slowDuration,
+              duration: eff.slowDuration,
+              value: eff.slowMult,
+              sourceId: p.id,
+              school: ability.school,
+            });
+          }
+          if (stage.incapacitateDuration) {
+            const duration = ctx.diminishedCrowdControlDuration(
+              p,
+              m,
+              'fear',
+              stage.incapacitateDuration,
+            );
+            if (duration === null) continue;
+            ctx.applyAura(m, {
+              id: `${ability.id}_incap`,
+              name: ability.name,
+              kind: 'incapacitate',
+              remaining: duration,
+              duration,
+              value: 0,
+              sourceId: p.id,
+              school: ability.school,
+              breaksOnDamage: true,
+            });
+          }
+          if (stage.rootDuration) {
+            ctx.applyRootAura(
+              p,
+              m,
+              ability.name,
+              `${ability.id}_root`,
+              stage.rootDuration,
+              ability.school,
+            );
+          }
+          ctx.enterCombat(p, m);
+        }
+        if (eff.hotStreakOnce && hotStreakHit) noteSpellHit(ctx, p, hotStreakCrit, ability.id);
+        break;
+      }
       case 'aoeAllyAttackPower': {
         // The friendly mirror of aoeAttackPower: an AP BUFF on the caster and
         // nearby allies (Trueshot Aura, Iron Bellow), riding the friendlies seam.
@@ -1734,9 +1845,30 @@ export function runEffects(
         break;
       }
       case 'aoeAllyAbsorb': {
-        // Mass Barrier: the aoeAlly* loop shape with an absorb shield on the
-        // caster and every friendly in radius. Draws no rng.
-        for (const mE of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
+        // Mass Barrier: an absorb shield on the caster and friendlies in radius.
+        // When eff.maxTargets is set (owner 2026-07-13: 5), only the NEAREST that
+        // many are shielded (the caster is distance 0, so always covered). Draws no rng.
+        let recipients = ctx.friendliesInRadius(p, p.pos, eff.radius);
+        if (eff.maxTargets && recipients.length > eff.maxTargets) {
+          recipients = [...recipients]
+            .sort((a, b) => {
+              if (a.id === p.id) return -1;
+              if (b.id === p.id) return 1;
+              const da = (a.pos.x - p.pos.x) ** 2 + (a.pos.z - p.pos.z) ** 2;
+              const db = (b.pos.x - p.pos.x) ** 2 + (b.pos.z - p.pos.z) ** 2;
+              return da - db || a.id - b.id;
+            })
+            .slice(0, eff.maxTargets);
+        }
+        const resolved = ctx.resolve(p.id);
+        const spec = resolved ? ctx.playerMods(resolved.meta).spec : null;
+        const barrierSchool =
+          ability.id === 'mass_barrier' && spec === 'arcane'
+            ? 'arcane'
+            : ability.id === 'mass_barrier' && spec === 'fire'
+              ? 'fire'
+              : ability.school;
+        for (const mE of recipients) {
           ctx.applyAura(mE, {
             id: ability.id,
             name: ability.name,
@@ -1745,7 +1877,7 @@ export function runEffects(
             duration: eff.duration,
             value: eff.amount,
             sourceId: p.id,
-            school: ability.school,
+            school: barrierSchool,
           });
         }
         break;
@@ -1921,6 +2053,17 @@ export function runEffects(
         // center. Mirrors the aoeDamage castAim convention, including the
         // world-anchored fx for an aimed ring.
         const rootCenter = p.castAim ?? p.pos;
+        if (eff.ring) {
+          spawnRingOfFrost(
+            ctx,
+            p,
+            rootCenter,
+            { ...eff, ring: eff.ring },
+            ability.name,
+            ability.id,
+          );
+          break;
+        }
         if (p.castAim) {
           ctx.emit({
             type: 'spellfxAt',

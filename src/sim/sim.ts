@@ -1,5 +1,6 @@
 import type {
   AccountCosmetics,
+  ActiveFrostRing,
   BankBonusSource,
   DailyRewardHistory,
   DailyRewardLeaderboardPage,
@@ -37,16 +38,18 @@ import {
   castAbilityBySlot as castAbilityBySlotImpl,
   castAbility as castAbilityImpl,
   pushbackCast as pushbackCastImpl,
+  releaseEmpoweredAbility as releaseEmpoweredAbilityImpl,
   spendResource as spendResourceImpl,
   updateCasting as updateCastingImpl,
 } from './combat/casting_lifecycle';
 import { isRooted, isStunned } from './combat/cc';
-import { aetherSurgeCostMult, echoVisibleTo } from './combat/chronomancy';
+import { aetherSurgeCostMult, echoVisibleTo, partyAuraPriority } from './combat/chronomancy';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
   handleDeath as handleDeathImpl,
 } from './combat/damage';
+import { damageTakenWithin } from './combat/damage_history';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
@@ -59,6 +62,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
+import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
@@ -756,6 +760,8 @@ export interface ResolvedAbility {
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
   charges?: number; // stored uses (def maxCharges and/or Double Charge talent); undefined = 1
   bonusCharges?: number;
+  /** 1-based authoritative charge stage for hold-to-charge spells. */
+  empowerLevel?: number;
 }
 
 export interface RewardCounters {
@@ -1172,6 +1178,7 @@ export interface PetState {
   dead: boolean;
   mode?: PetMode;
   autoTaunt?: boolean;
+  autoWaterJet?: boolean;
 }
 
 // PendingMobRespawn is exported so SimContext can type the live `pendingMobRespawns`
@@ -1321,6 +1328,23 @@ export class Sim {
   private devSandboxIds: number[] = [];
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
+  get activeFrostRings(): ActiveFrostRing[] {
+    const rings: ActiveFrostRing[] = [];
+    for (const effect of this.groundAoEs) {
+      const ring = effect.frostRing;
+      if (!ring || effect.remaining <= 0) continue;
+      rings.push({
+        id: ring.id,
+        x: effect.pos.x,
+        z: effect.pos.z,
+        radius: effect.radius,
+        innerRadius: ring.innerRadius,
+        duration: ring.duration,
+        remaining: effect.remaining,
+      });
+    }
+    return rings;
+  }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
   private frozenOrbs: FrozenOrbState[] = [];
@@ -2070,8 +2094,8 @@ export class Sim {
 
   // A friendly stationary ally bot for the Cascada playtest scenario, dropped at an
   // exact spot (no name-uniqueness gate, so /dev cascade can be re-run). Dev only.
-  private spawnScenarioAlly(name: string, x: number, z: number): number {
-    const id = this.addPlayer('mage', name);
+  private spawnScenarioAlly(name: string, x: number, z: number, cls: PlayerClass = 'mage'): number {
+    const id = this.addPlayer(cls, name);
     const meta = this.players.get(id);
     if (meta) meta.isDevBot = true;
     // Level 20 like the mage: a level-1 ally has so little health that a single Echo
@@ -2187,13 +2211,29 @@ export class Sim {
     );
     dummy.hostile = true;
     this.addEntity(dummy);
+    // A mixed party rather than all-mages (owner 2026-07-13): a rotating spread of
+    // classes so the practice allies read like a real group (tank/healer/melee/etc.),
+    // each with its own class HP pool and armor.
+    const sandboxClasses: PlayerClass[] = [
+      'warrior',
+      'priest',
+      'rogue',
+      'hunter',
+      'shaman',
+      'warlock',
+      'druid',
+      'paladin',
+      'mage',
+    ];
     const botIds: number[] = [];
     for (let i = 0; i < cfg.bots; i++) {
+      const cls = sandboxClasses[i % sandboxClasses.length];
       botIds.push(
         this.spawnScenarioAlly(
-          `Practice${i + 1}`,
+          `${cls[0].toUpperCase()}${cls.slice(1)}${i + 1}`,
           me.pos.x + cfg.botX0 + i * cfg.botGap,
           me.pos.z + cfg.botZ,
+          cls,
         ),
       );
     }
@@ -3317,6 +3357,8 @@ export class Sim {
     const e = this.entities.get(meta.entityId);
     if (!e) return;
     const before = new Map(meta.known.map((k) => [k.def.id, k.rank]));
+    // (Frost's second Ice Block charge is resolved inside abilitiesKnownAt, the
+    // shared known-list builder, so ClientWorld's recomputed list matches.)
     meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
     if (announce) {
       for (const k of meta.known) {
@@ -3496,8 +3538,11 @@ export class Sim {
       cost = Math.round(cost * aetherSurgeCostMult(r.e));
     }
     // Return a shallow copy so the cached known-list entry is never mutated.
-    if (cost !== found.cost) return { ...found, cost };
-    return found;
+    const result: ResolvedAbility = cost !== found.cost ? { ...found, cost } : found;
+    // Frost's second Ice Block charge (the abilityCharges recharge model) now rides
+    // the KNOWN entry (stamped in refreshKnownAbilities), so `found` already carries
+    // bonusCharges and there is nothing spec-specific to add here.
+    return result;
   }
 
   // Highest active cost_tax aura, expressed as a cost multiplier (1 = no tax).
@@ -4216,6 +4261,10 @@ export class Sim {
     castAbilityImpl(this.ctx, abilityId, pid, undefined, targetId);
   }
 
+  releaseEmpoweredAbility(abilityId: string, pid?: number): void {
+    releaseEmpoweredAbilityImpl(this.ctx, abilityId, pid);
+  }
+
   // Voluntarily cancel one of a player's own helpful auras (the HUD right-click-a-buff
   // action). Authoritative: the pure predicate refuses debuffs, so a player can never
   // strip a silence/hex/root off themselves. Mirrors clearAurasFromSource's fade-event
@@ -4624,6 +4673,10 @@ export class Sim {
     petCommands.petTaunt(this.ctx, pid);
   }
 
+  petWaterJet(pid?: number): void {
+    petCommands.petWaterJet(this.ctx, pid);
+  }
+
   feedPet(itemId: string, pid?: number): void {
     petCommands.feedPet(this.ctx, itemId, pid);
   }
@@ -4642,6 +4695,10 @@ export class Sim {
 
   setPetAutoTaunt(enabled: boolean, pid?: number): void {
     petCommands.setPetAutoTaunt(this.ctx, enabled, pid);
+  }
+
+  setPetAutoWaterJet(enabled: boolean, pid?: number): void {
+    petCommands.setPetAutoWaterJet(this.ctx, enabled, pid);
   }
 
   // despawnPet (summoned-demon hard despawn: player-target + threat scrub) moved to
@@ -7234,9 +7291,37 @@ export class Sim {
   }
 
   // UI-facing info objects (the same shapes the server sends over the wire)
+  partyIncomingHeals(memberIds: readonly number[]): Map<number, number> {
+    const members = new Set(memberIds);
+    const incoming = new Map<number, number>();
+    for (const casterId of memberIds) {
+      const caster = this.entities.get(casterId);
+      if (!caster?.castingAbility || caster.castTargetId === null) continue;
+      if (!members.has(caster.castTargetId)) continue;
+      const ability = this.players
+        .get(casterId)
+        ?.known.find((known) => known.def.id === caster.castingAbility);
+      if (!ability) continue;
+      let amount = 0;
+      for (const effect of ability.effects) {
+        if (effect.type === 'heal') amount += Math.round((effect.min + effect.max) / 2);
+        else if (effect.type === 'hot') amount += effect.total;
+      }
+      if (amount > 0)
+        incoming.set(caster.castTargetId, (incoming.get(caster.castTargetId) ?? 0) + amount);
+    }
+    return incoming;
+  }
+
   get partyInfo(): import('../world_api').PartyInfo | null {
     const party = this.partyOf(this.primaryId);
     if (!party) return null;
+    const aggroTargets = new Set<number>();
+    for (const entity of this.entities.values()) {
+      if (entity.kind === 'mob' && !entity.dead && entity.aggroTargetId !== null)
+        aggroTargets.add(entity.aggroTargetId);
+    }
+    const incomingHeals = this.partyIncomingHeals(party.members);
     return {
       leader: party.leader,
       raid: party.raid,
@@ -7265,6 +7350,11 @@ export class Sim {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
+                ...(meta.talentMods.role ? { role: meta.talentMods.role } : {}),
+                rewind: rewindHealAmount(damageTakenWithin(e, this.tickCount), e.hp, e.maxHp),
+                connected: 1,
+                hasAggro: aggroTargets.has(mPid) ? 1 : 0,
+                incomingHeal: incomingHeals.get(mPid) ?? 0,
                 // The mini aura strip under the member's party row: first N in
                 // aura order (buffs and debuffs alike), id + kind + sap flag
                 // only, no countdown (see PartyMemberAura in world_api/party.ts).
@@ -7274,10 +7364,14 @@ export class Sim {
                 // the real aura sourceId, so no wire field is added.
                 auras: e.auras
                   .filter((a) => echoVisibleTo(a, this.primaryId))
+                  .sort((a, b) => partyAuraPriority(a) - partyAuraPriority(b))
                   .slice(0, PARTY_MEMBER_AURA_CAP)
                   .map((a) => ({
                     id: a.id,
                     kind: a.kind,
+                    ...(a.kind === 'temporal_echo'
+                      ? { remaining: Math.max(0, Math.ceil(a.remaining)) }
+                      : {}),
                     ...(a.value < 0 ? { neg: 1 as const } : {}),
                   })),
               },

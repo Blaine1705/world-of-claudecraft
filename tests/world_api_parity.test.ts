@@ -100,6 +100,7 @@ export const IWORLD_MEMBERS = [
   { name: 'craftSkills', kind: 'data' },
   { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
+  { name: 'activeFrostRings', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
@@ -108,6 +109,7 @@ export const IWORLD_MEMBERS = [
   { name: 'castAbilityAt', kind: 'method' },
   { name: 'castAbilityBySlot', kind: 'method' },
   { name: 'castAbilityOn', kind: 'method' },
+  { name: 'releaseEmpoweredAbility', kind: 'method' },
   { name: 'cancelAura', kind: 'method' },
   { name: 'targetEntity', kind: 'method' },
   { name: 'tabTarget', kind: 'method' },
@@ -152,8 +154,10 @@ export const IWORLD_MEMBERS = [
   { name: 'renamePet', kind: 'method' },
   { name: 'revivePet', kind: 'method' },
   { name: 'petAttack', kind: 'method' },
+  { name: 'petWaterJet', kind: 'method' },
   { name: 'petTaunt', kind: 'method' },
   { name: 'setPetAutoTaunt', kind: 'method' },
+  { name: 'setPetAutoWaterJet', kind: 'method' },
   { name: 'feedPet', kind: 'method' },
   { name: 'healPet', kind: 'method' },
   { name: 'setPetMode', kind: 'method' },
@@ -400,10 +404,10 @@ beforeAll(() => {
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
     // Merged: upstream v0.23's surface plus the warrior branch's additions
-    // (castAbilityOn, pickRowTalent, rowPicks, ...) yields 207/55/152.
-    expect(IWORLD_MEMBERS.length).toBe(207);
-    expect(DATA_MEMBERS.length).toBe(55);
-    expect(METHOD_MEMBERS.length).toBe(152);
+    // (castAbilityOn, pickRowTalent, rowPicks, ..., petWaterJet) yields 208/55/153.
+    expect(IWORLD_MEMBERS.length).toBe(211);
+    expect(DATA_MEMBERS.length).toBe(56);
+    expect(METHOD_MEMBERS.length).toBe(155);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -412,7 +416,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   // Sorted-name `toEqual` snapshots: a dropped, renamed, or kind-flipped member reddens
   // these deliberately, forcing a reviewed edit. NOT length-only.
-  it('the full sorted member set is exactly the pinned 207', () => {
+  it('the full sorted member set is exactly the pinned 211', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -421,6 +425,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptQuest',
       'accountCosmetics',
       'activeArchetype',
+      'activeFrostRings',
       'activeLoadout',
       'activeLootRolls',
       'advanceAmendsProgress',
@@ -552,6 +557,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyPromote',
       'petAttack',
       'petTaunt',
+      'petWaterJet',
       'pickRowTalent',
       'pickUpObject',
       'playEmote',
@@ -566,6 +572,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'raidLockouts',
       'realm',
       'recipeList',
+      'releaseEmpoweredAbility',
       'releaseSpirit',
       'renamePet',
       'reportTelemetry',
@@ -583,6 +590,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoTaunt',
+      'setPetAutoWaterJet',
       'setPetMode',
       'setSpec',
       'setTownFocus',
@@ -624,10 +632,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted data-kind set is exactly the pinned 54', () => {
+  it('the sorted data-kind set is exactly the pinned 56', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountCosmetics',
       'activeArchetype',
+      'activeFrostRings',
       'activeLoadout',
       'archetypeAmendsProgress',
       'archetypeAmendsRequired',
@@ -684,7 +693,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted method-kind set is exactly the pinned 150', () => {
+  it('the sorted method-kind set is exactly the pinned 155', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -788,12 +797,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyPromote',
       'petAttack',
       'petTaunt',
+      'petWaterJet',
       'pickRowTalent',
       'pickUpObject',
       'playEmote',
       'prestige',
       'questState',
       'raidLockouts',
+      'releaseEmpoweredAbility',
       'releaseSpirit',
       'renamePet',
       'reportTelemetry',
@@ -809,6 +820,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoTaunt',
+      'setPetAutoWaterJet',
       'setPetMode',
       'setSpec',
       'setTownFocus',
@@ -909,10 +921,12 @@ type _ExhaustEntityRoster = AssertNever<
 
 const FACET_COMBAT = [
   'known',
+  'activeFrostRings',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
   'castAbilityOn',
+  'releaseEmpoweredAbility',
   'cancelAura',
   'startAutoAttack',
   'stopAutoAttack',
@@ -1035,8 +1049,10 @@ const FACET_PET = [
   'renamePet',
   'revivePet',
   'petAttack',
+  'petWaterJet',
   'petTaunt',
   'setPetAutoTaunt',
+  'setPetAutoWaterJet',
   'feedPet',
   'healPet',
   'setPetMode',
@@ -1276,10 +1292,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 25 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 25 facets equals the pinned 207-member IWORLD_MEMBERS set', () => {
+  it('the union of the 25 facets equals the pinned 211-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(207);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(207);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(211);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(211);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

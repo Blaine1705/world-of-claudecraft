@@ -6,7 +6,7 @@
     "pyromancer (fire)",
     "cryomancer (frost)",
     "lightning-mage (arcane)",
-    "aeromancer (unused \u2014 mage has no wind)"
+    "aeromancer (unused — mage has no wind)"
   ],
   "runtimeDir": "public/ui/skills/mage",
   "abilities": [
@@ -231,7 +231,145 @@
       "sourcePack": "custom-user",
       "sourceFile": "C:/Users/joseg/Desktop/Aetherwell.png",
       "output": "evocation.webp"
+    },
+    {
+      "abilityId": "blink",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades.png (Blink crop)",
+      "output": "blink.webp"
+    },
+    {
+      "abilityId": "temporal_barrier",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades.png (Barrera temporal crop)",
+      "output": "temporal_barrier.webp"
+    },
+    {
+      "abilityId": "temporal_echo",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades.png (Eco temporal crop)",
+      "output": "temporal_echo.webp"
+    },
+    {
+      "abilityId": "temporal_mend",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades.png (Remiendo temporal crop)",
+      "output": "temporal_mend.webp"
+    },
+    {
+      "abilityId": "arcane_surge",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades.png (Oleada de eter crop)",
+      "output": "arcane_surge.webp"
+    },
+    {
+      "abilityId": "fingers_of_frost",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/frost.png (fingers_of_frost crop)",
+      "output": "fingers_of_frost.webp"
+    },
+    {
+      "abilityId": "summon_water_elemental",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/frost.png (summon_water_elemental crop)",
+      "output": "summon_water_elemental.webp"
+    },
+    {
+      "abilityId": "ice_block",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/frost.png (ice_block crop)",
+      "output": "ice_block.webp"
+    },
+    {
+      "abilityId": "brain_freeze",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/frost.png (brain_freeze crop)",
+      "output": "brain_freeze.webp"
+    },
+    {
+      "abilityId": "shatter",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/frost.png (shatter crop)",
+      "output": "shatter.webp"
+    },
+    {
+      "abilityId": "glacial_spike",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/frost.png (glacial_spike crop)",
+      "output": "glacial_spike.webp"
+    },
+    {
+      "abilityId": "glacial_front",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/frost.png (glacial_front crop)",
+      "output": "glacial_front.webp"
+    },
+    {
+      "abilityId": "ignition",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Mago fuego.png (ignition crop)",
+      "output": "ignition.webp"
+    },
+    {
+      "abilityId": "hot_streak",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Mago fuego.png (hot_streak crop)",
+      "output": "hot_streak.webp"
+    },
+    {
+      "abilityId": "blazing_barrier",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Mago fuego.png (blazing_barrier crop)",
+      "output": "blazing_barrier.webp"
+    },
+    {
+      "abilityId": "meteor",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Mago fuego.png (meteor crop)",
+      "output": "meteor.webp"
+    },
+    {
+      "abilityId": "dragons_breath",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Mago fuego.png (dragons_breath crop)",
+      "output": "dragons_breath.webp"
+    },
+    {
+      "abilityId": "flamestrike",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Mago fuego.png (flamestrike crop)",
+      "output": "flamestrike.webp"
+    },
+    {
+      "abilityId": "temporal_cascade",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Chronomancer.png (temporal_cascade crop)",
+      "output": "temporal_cascade.webp"
+    },
+    {
+      "abilityId": "temporal_reversal",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Chronomancer.png (temporal_reversal crop)",
+      "output": "temporal_reversal.webp"
+    },
+    {
+      "abilityId": "temporal_rewind",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Chronomancer.png (temporal_rewind crop)",
+      "output": "temporal_rewind.webp"
+    },
+    {
+      "abilityId": "temporal_acceleration",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Chronomancer.png (temporal_acceleration crop)",
+      "output": "temporal_acceleration.webp"
+    },
+    {
+      "abilityId": "combustion",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/combustion.png (combustion crop)",
+      "output": "combustion.webp"
     }
   ],
-  "deferredStayProcedural": {}
+  "deferredStayProcedural": []
 }

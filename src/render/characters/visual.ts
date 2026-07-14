@@ -348,6 +348,17 @@ export class CharacterVisual {
     return this.currentIsOneShot;
   }
 
+  /** A channel-start event can arrive just before its authoritative entity
+   * snapshot. Enter the looping cast pose immediately and interrupt any short
+   * projectile one-shot that would otherwise mask the first part of the channel. */
+  beginCastChannel(): void {
+    if (this.deadLock) return;
+    this.baseState = 'cast';
+    this.currentIsOneShot = false;
+    this.currentOneShotIsEmote = false;
+    this.fadeTo(this.action(this.def.clips.cast) ?? this.action(this.def.clips.idle), FADE, false);
+  }
+
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
     // A mapped ability plays its specific swing clip (if the model has it);

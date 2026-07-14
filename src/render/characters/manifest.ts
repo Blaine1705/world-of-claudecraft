@@ -220,6 +220,20 @@ const FLOATING: ClipMap = {
   death: 'Death',
 };
 
+// Procedurally authored Water Elemental. Node transforms ripple its layered
+// translucent body and drive the hands through the Waterbolt casting motion.
+const WATER_ELEMENTAL: ClipMap = {
+  idle: 'Idle',
+  walk: 'Move',
+  run: 'Move',
+  // Waterbolt uses the short one-shot Cast attack; Water Jet holds this
+  // dedicated forward-arms loop for its full server-authoritative channel.
+  cast: 'Channel',
+  attack: ['Cast'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
 const SPIDER: ClipMap = {
   idle: 'Spider_Idle',
   walk: 'Spider_Walk',
@@ -765,6 +779,13 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.4,
   },
+  mob_water_elemental: {
+    url: `${CREATURES}/water_elemental.glb`,
+    height: 2.65,
+    hover: 0.12,
+    clips: WATER_ELEMENTAL,
+    attackTimeScale: 1.1,
+  },
   mob_dragonkin: {
     url: `${CREATURES}/dragonevolved.glb`,
     height: 2.4,
@@ -1100,6 +1121,7 @@ const MOB_KEYS: Record<string, string> = {
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
   emberkin: 'mob_demon',
+  water_elemental: 'mob_water_elemental',
   gloomshade: 'mob_demon',
   duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',

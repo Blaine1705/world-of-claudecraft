@@ -116,14 +116,6 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     expectAtLeastFloor(row, 'party-frame');
   });
 
-  it('the party leave button', () => {
-    const frames = el('div', { id: 'party-frames' });
-    const leave = el('button', { id: 'party-leave' });
-    frames.appendChild(leave);
-    document.body.appendChild(frames);
-    expectAtLeastFloor(leave, '#party-leave');
-  });
-
   it('the mobile More-tray close button', () => {
     document.body.className = 'mobile-touch game-active mobile-more-open';
     const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });

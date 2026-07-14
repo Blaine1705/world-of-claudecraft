@@ -3525,6 +3525,9 @@ function c4bEffectDispatch(): Scenario {
       rec.snapshot('warrior-sunder');
 
       // --- mage: arcane_explosion (aoeDamage per-target rng.range over 2 mobs) ---
+      // Aetherburst is Chronomancer-gated (owner spec split 2026-07-14); commit the
+      // arcane spec so it stays known, the same idiom as the warrior's prot above.
+      sim.setSpec('arcane', mage);
       const mobM1 = spawnMob(sim, 'forest_wolf', 8, eMage.pos.x + 2, eMage.pos.y, eMage.pos.z + 1);
       const mobM2 = spawnMob(sim, 'forest_wolf', 8, eMage.pos.x - 2, eMage.pos.y, eMage.pos.z + 2);
       for (const m of [mobM1, mobM2]) {

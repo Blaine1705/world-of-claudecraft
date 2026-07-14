@@ -68,9 +68,10 @@ describe('gating', () => {
     }
   });
 
-  it('the healer keeps the shared arcane/utility kit and loses the DPS nukes', () => {
+  it('the healer keeps its arcane kit + shared utility and loses the DPS nukes', () => {
     const chrono = knownIds('arcane');
     for (const kept of [
+      // The arcane school is Chronomancer-exclusive now (owner spec split 2026-07-14).
       'arcane_missiles',
       'arcane_explosion',
       'arcane_intellect',
@@ -79,22 +80,45 @@ describe('gating', () => {
       'fireball',
       'frostbolt',
       'frost_nova',
-      'frost_armor',
       'conjure_food',
       'conjure_water',
     ]) {
       expect(chrono, kept).toContain(kept);
     }
-    for (const gone of ['fire_blast', 'scorch', 'pyroblast', 'flamestrike', 'ice_barrier']) {
+    // frost_armor is Frost identity (excludeSpecs hand-off, like Reaver Strike).
+    for (const gone of [
+      'fire_blast',
+      'scorch',
+      'pyroblast',
+      'flamestrike',
+      'ice_barrier',
+      'frost_armor',
+    ]) {
       expect(chrono, gone).not.toContain(gone);
     }
   });
 
-  it('fire and frost keep their books exactly as before the healer landed', () => {
+  it('the owner spec split (2026-07-14): fire keeps the fire book, frost sheds it', () => {
+    const fire = knownIds('fire');
+    for (const kept of ['fire_blast', 'scorch', 'pyroblast', 'flamestrike', 'blazing_barrier']) {
+      expect(fire, `fire:${kept}`).toContain(kept);
+    }
+    // Fire hands off the starter frost armor on commit (excludeSpecs), and its
+    // barrier is Blazing Barrier at the spec pick: no shared Frostveil.
+    expect(fire, 'fire:frost_armor').not.toContain('frost_armor');
+    expect(fire, 'fire:ice_barrier').not.toContain('ice_barrier');
+    const frost = knownIds('frost');
+    // Frost keeps its own barrier + starter armor, but the fire nukes are
+    // fire-only now (Lluvia de Ascuas / Escaldar / Lanza Ignea / Llamarada).
+    expect(frost, 'frost:ice_barrier').toContain('ice_barrier');
+    expect(frost, 'frost:frost_armor').toContain('frost_armor');
+    for (const gone of ['fire_blast', 'scorch', 'pyroblast', 'flamestrike']) {
+      expect(frost, `frost:${gone}`).not.toContain(gone);
+    }
+    // The arcane school stays Chronomancer-exclusive for both DPS specs.
     for (const spec of ['fire', 'frost'] as const) {
-      const book = knownIds(spec);
-      for (const kept of ['fire_blast', 'scorch', 'pyroblast', 'flamestrike', 'ice_barrier']) {
-        expect(book, `${spec}:${kept}`).toContain(kept);
+      for (const gone of ['arcane_missiles', 'arcane_explosion']) {
+        expect(knownIds(spec), `${spec}:${gone}`).not.toContain(gone);
       }
     }
   });

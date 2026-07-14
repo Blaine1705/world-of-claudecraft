@@ -140,6 +140,7 @@ function mergeNameTranslations<TId extends string>(
 const mergePetHud = {
   en: {
     attack: 'Attack',
+    waterJet: 'Water Jet',
     taunt: 'Taunt',
     healDemon: 'Heal Demon',
     healPet: 'Feed Pet',
@@ -148,8 +149,12 @@ const mergePetHud = {
     aggressive: 'Aggressive',
     petAttackTitle: 'Pet Attack',
     petAttackDesc: 'Command your pet to attack your current hostile target.',
+    waterJetTitle: 'Water Jet',
+    waterJetDesc:
+      'Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.',
     petTauntTitle: 'Pet Taunt',
-    petTauntDesc: 'Command your pet to engage and Growl when in range. 10 second cooldown.',
+    petTauntDesc:
+      'Command your pet to engage and Growl when in range. 10 second cooldown. Right-click to auto-cast it whenever it is off cooldown.',
     healDemonDesc: 'Spend mana to channel healing into your demon over 5 seconds.',
     healPetDesc: 'Click, then click food in your bags to feed your pet, healing it over 5 seconds.',
     stanceTitle: 'Pet Stance',
@@ -171,6 +176,7 @@ const mergePetHud = {
   },
   es: {
     attack: 'Atacar',
+    waterJet: 'Chorro de agua',
     taunt: 'Provocar',
     healDemon: 'Sanar demonio',
     healPet: 'Sanar mascota',
@@ -179,9 +185,12 @@ const mergePetHud = {
     aggressive: 'Agresivo',
     petAttackTitle: 'Ataque de mascota',
     petAttackDesc: 'Ordena a tu mascota atacar a tu objetivo hostil actual.',
+    waterJetTitle: 'Chorro de agua',
+    waterJetDesc:
+      'Ordena a tu elemental de agua canalizar un chorro ralentizador durante 3 segundos. Reutilización de 8 segundos. Clic derecho para autolanzarlo cuando esté disponible.',
     petTauntTitle: 'Provocación de mascota',
     petTauntDesc:
-      'Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos.',
+      'Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos. Clic derecho para autolanzarlo cuando esté disponible.',
     healDemonDesc: 'Gasta maná para canalizar sanación hacia tu demonio durante 5 segundos.',
     healPetDesc:
       'Haz clic y luego haz clic en comida de tus bolsas para alimentar y sanar a tu mascota durante 5 segundos.',

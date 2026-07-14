@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { chatPlayerContextActions } from '../src/ui/player_context_menu';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { chatPlayerContextActions, selfPlayerContextActions } from '../src/ui/player_context_menu';
 
 describe('chat player context menu', () => {
   afterEach(() => setLanguage('en'));
@@ -63,5 +63,29 @@ describe('chat player context menu', () => {
 
     expect(actions.find((a) => a.id === 'whisper')?.label).toBe('Flüstern');
     expect(actions.find((a) => a.id === 'report')?.label).toBe('Spieler melden');
+  });
+});
+
+describe('self player context menu', () => {
+  it('offers Leave Party from the player portrait only while grouped', () => {
+    expect(
+      selfPlayerContextActions({
+        inParty: true,
+        isLeader: false,
+        isRaid: false,
+        partySize: 3,
+        isHeroic: false,
+      }).map((action) => action.id),
+    ).toEqual(['loot-settings', 'leave-party', 'close']);
+
+    expect(
+      selfPlayerContextActions({
+        inParty: false,
+        isLeader: false,
+        isRaid: false,
+        partySize: 1,
+        isHeroic: false,
+      }).map((action) => action.id),
+    ).not.toContain('leave-party');
   });
 });

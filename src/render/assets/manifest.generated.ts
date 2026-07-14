@@ -193,6 +193,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/tolling_bell.glb": "/media/models/creatures/tolling_bell.7f89922472aa.glb",
   "models/creatures/tribal.glb": "/media/models/creatures/tribal.36f1f0f698db.glb",
   "models/creatures/velociraptor.glb": "/media/models/creatures/velociraptor.3385fbba757a.glb",
+  "models/creatures/water_elemental.glb": "/media/models/creatures/water_elemental.8b02b114d814.glb",
   "models/creatures/wild_boar.glb": "/media/models/creatures/wild_boar.d47c367f4630.glb",
   "models/creatures/wolf_basic.glb": "/media/models/creatures/wolf_basic.655da121afa8.glb",
   "models/creatures/yeti.glb": "/media/models/creatures/yeti.acbf79f899d2.glb",

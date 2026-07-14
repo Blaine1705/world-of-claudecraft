@@ -1,7 +1,9 @@
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
-import { echoVisibleTo } from '../src/sim/combat/chronomancy';
+import { echoVisibleTo, partyAuraPriority } from '../src/sim/combat/chronomancy';
+import { damageTakenWithin } from '../src/sim/combat/damage_history';
+import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
@@ -809,6 +811,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     out.pm = e.petMode;
     out.pt = round2(e.petTauntTimer);
     if (e.petAutoTaunt) out.pa = 1;
+    if (e.petAutoWaterJet) out.pw = 1;
   }
   if (e.rangedPower) out.rp = e.rangedPower;
   // top hate-table entries so the party threat meter shows real numbers
@@ -3137,6 +3140,9 @@ export class GameServer {
           }
         }
         break;
+      case 'releaseEmpowered':
+        if (typeof msg.ability === 'string') sim.releaseEmpoweredAbility(msg.ability, pid);
+        break;
       case 'cancel_aura':
         if (typeof msg.aura === 'string') sim.cancelAura(msg.aura, pid);
         break;
@@ -3483,11 +3489,17 @@ export class GameServer {
       case 'pet_attack':
         sim.petAttack(pid);
         break;
+      case 'pet_water_jet':
+        sim.petWaterJet(pid);
+        break;
       case 'pet_taunt':
         sim.petTaunt(pid);
         break;
       case 'pet_auto_taunt':
         if (typeof msg.enabled === 'boolean') sim.setPetAutoTaunt(msg.enabled, pid);
+        break;
+      case 'pet_auto_water_jet':
+        if (typeof msg.enabled === 'boolean') sim.setPetAutoWaterJet(msg.enabled, pid);
         break;
       case 'pet_feed':
         if (typeof msg.item === 'string') sim.feedPet(msg.item, pid);
@@ -4092,6 +4104,7 @@ export class GameServer {
       }
     }
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
+    const activeFrostRings = this.sim.activeFrostRings;
     // Guard each session: a throw while building one player's snapshot must not
     // starve every other session of its snapshot this tick (server/CLAUDE.md).
     forEachGuarded(
@@ -4187,7 +4200,23 @@ export class GameServer {
         const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-        this.sendRaw(session, `${head},"self":${selfJson},"ents":[${ents.join(',')}]${keepJson}}`);
+        const frostRings = activeFrostRings
+          .filter((ring) => {
+            const dx = ring.x - anchorEntity.pos.x;
+            const dz = ring.z - anchorEntity.pos.z;
+            const limit = INTEREST_QUERY_RADIUS + ring.radius;
+            return dx * dx + dz * dz <= limit * limit;
+          })
+          .map(
+            (ring) =>
+              `{"id":${JSON.stringify(ring.id)},"x":${round2(ring.x)},"z":${round2(ring.z)},"r":${round2(ring.radius)},"i":${round2(ring.innerRadius)},"dur":${round2(ring.duration)},"rem":${round2(ring.remaining)}}`,
+          );
+        const frostRingsJson =
+          frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
+        this.sendRaw(
+          session,
+          `${head},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${keepJson}}`,
+        );
       },
       (err, session) =>
         console.error(`[snap] failed to build snapshot for pid ${session.pid}, skipping:`, err),
@@ -4336,6 +4365,15 @@ export class GameServer {
       'chg',
       p.charges ? Object.fromEntries([...p.charges.entries()].map(([k, v]) => [k, v.spent])) : {},
     );
+    // Recharge-model live charge counts (abilityCharges: Frost's second Ice Block):
+    // {abilityId: charges}. The recharge timer itself rides `cds`; the client
+    // derives the max from its own known-list rebake (1 + bonusCharges).
+    maybe(
+      'achg',
+      p.abilityCharges
+        ? Object.fromEntries(Object.entries(p.abilityCharges).map(([k, v]) => [k, v.charges]))
+        : {},
+    );
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
     maybe('party', this.partyWire(anchorSession.pid));
@@ -4434,6 +4472,12 @@ export class GameServer {
   private partyWire(pid: number): unknown {
     const party = this.sim.partyOf(pid);
     if (!party) return null;
+    const aggroTargets = new Set<number>();
+    for (const entity of this.sim.entities.values()) {
+      if (entity.kind === 'mob' && !entity.dead && entity.aggroTargetId !== null)
+        aggroTargets.add(entity.aggroTargetId);
+    }
+    const incomingHeals = this.sim.partyIncomingHeals(party.members);
     return {
       leader: party.leader,
       raid: party.raid,
@@ -4463,6 +4507,14 @@ export class GameServer {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
+                ...(meta.talentMods.role ? { role: meta.talentMods.role } : {}),
+                rewind: rewindHealAmount(damageTakenWithin(e, this.sim.tickCount), e.hp, e.maxHp),
+                connected:
+                  meta.isDevBot || (this.clients.has(mPid) && !this.clients.get(mPid)?.linkdead)
+                    ? 1
+                    : 0,
+                hasAggro: aggroTargets.has(mPid) ? 1 : 0,
+                incomingHeal: incomingHeals.get(mPid) ?? 0,
                 // The mini aura strip under the member's party row (mirrors
                 // Sim.partyInfo): first N in aura order, id + kind + sap flag
                 // only, no countdown, so this payload changes only when the
@@ -4473,10 +4525,14 @@ export class GameServer {
                 // sourceId OFF the wire (no protocol change).
                 auras: e.auras
                   .filter((a) => echoVisibleTo(a, pid))
+                  .sort((a, b) => partyAuraPriority(a) - partyAuraPriority(b))
                   .slice(0, PARTY_MEMBER_AURA_CAP)
                   .map((a) => ({
                     id: a.id,
                     kind: a.kind,
+                    ...(a.kind === 'temporal_echo'
+                      ? { remaining: Math.max(0, Math.ceil(a.remaining)) }
+                      : {}),
                     ...(a.value < 0 ? { neg: 1 } : {}),
                   })),
               }

@@ -56,7 +56,12 @@ import {
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
 import { recordDamageTaken } from './damage_history';
-import { igniteOnCrit, PERSONAL_BARRIER_IDS } from './fire_mage';
+import {
+  cauterizeFireDamageMult,
+  fireMageCauterize,
+  igniteOnCrit,
+  PERSONAL_BARRIER_IDS,
+} from './fire_mage';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // Choice-row on-kill talent tuning (owner design draft: Pursuit +30% speed for
@@ -106,6 +111,10 @@ export function dealDamage(
 ): void {
   if (target.dead) return;
   if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
+  // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
+  // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
+  // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
+  if (target.auras.some((a) => a.kind === 'stasis')) return;
   // A wild mob that broke leash is in 'evade': it has dropped its hate table
   // and walks home without fighting back, healing to full only on arrival.
   // Classic mechanics make it immune while it retreats, so it can't be chipped
@@ -113,6 +122,11 @@ export function dealDamage(
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
   if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
   amount = Math.max(0, amount);
+
+  // Cauterize (fire spec): +12% Fire damage to enemies while the caster is burning
+  // (combat/fire_mage.ts). Returns 1x for everyone else and for the self-burn, so all
+  // other damage is byte-identical.
+  amount = Math.round(amount * cauterizeFireDamageMult(source, target, school));
 
   // Master Armorer (Arms mastery): extra physical damage you deal WHILE wielding a
   // two-handed weapon. The magnitude lives on the mastery's talent effect
@@ -475,6 +489,12 @@ export function dealDamage(
     }
   }
 
+  // Cauterize (fire spec passive, combat/fire_mage.ts): the FIRST lethal hit heals the
+  // mage to 25% max HP and sets them burning instead of killing them. Checked before
+  // the generic cheat-death: on a save it negates the blow (returns 0), so the generic
+  // save below sees a non-lethal amount and does not also fire.
+  const cauterized = fireMageCauterize(ctx, target, amount);
+  if (cauterized !== null) amount = cauterized;
   // Cheat death (talent global): a killing blow leaves the player at 1 hp
   // instead, gated by a long internal cooldown on procState. No rng.
   if (target.kind === 'player' && amount >= target.hp && !target.dead) {

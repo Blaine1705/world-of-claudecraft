@@ -117,6 +117,19 @@ export const SETTING_RANGES = {
   // The target frame's twin of playerFrameScale, via --target-frame-scale.
   // Same children-zoom trick (the frame itself is drag-positioned). 1.0 = stock.
   targetFrameScale: { min: 0.7, max: 1.15, def: 1 },
+  // WoW-style party/raid frame profile. Width/height are CSS pixels before the
+  // independent scale; columns and spacing let raids grow across rather than
+  // covering the whole left edge. style: 0 automatic, 1 classic, 2 raid frames.
+  // healthTextMode: 0 none, 1 percent, 2 current, 3 current/max.
+  // partyFrameSort: 0 group, 1 role, 2 name.
+  partyFrameStyle: { min: 0, max: 2, def: 0 },
+  partyFrameScale: { min: 0.7, max: 1.4, def: 1 },
+  partyFrameWidth: { min: 120, max: 260, def: 170 },
+  partyFrameHeight: { min: 30, max: 72, def: 42 },
+  partyFrameSpacing: { min: 0, max: 12, def: 4 },
+  partyFrameColumns: { min: 1, max: 5, def: 1 },
+  partyFrameHealthText: { min: 0, max: 3, def: 1 },
+  partyFrameSort: { min: 0, max: 2, def: 0 },
 } as const;
 
 export const BOOL_SETTINGS = {
@@ -181,6 +194,12 @@ export const BOOL_SETTINGS = {
   // casts it on the hovered member without touching the current target (read
   // live by Hud.castSlot). Off restores the classic target-else-self routing.
   mouseoverCast: { def: true },
+  // Party/raid frame display profile. Health is always visible; these switches
+  // choose the supporting information layered around it.
+  partyFrameShowResource: { def: true },
+  partyFrameShowAbsorbs: { def: true },
+  partyFrameShowAuras: { def: true },
+  partyFrameShowSelf: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---
   // off by default: drop every HUD cross-fade / panel animation, for players
@@ -251,6 +270,13 @@ export const BOOL_SETTINGS = {
   // applied in main.ts. Purely a display preference; the slots stay reachable via
   // their keybinds either way, so the row being hidden never disables those abilities.
   showSecondaryActionBar: { def: false },
+  // on by default: the classic fixed Attack (auto-attack toggle) in the first
+  // action-bar slot. Off turns that slot into a NORMAL assignable slot (read live
+  // by Hud.attackSlotIsAttack): drag an ability in and its key casts it. Right-click
+  // on the Attack button flips this off (the "remove from bar" gesture); toggling it
+  // back on in Options restores Attack. Auto-attack itself is unaffected: right-click
+  // on enemies and startAttackOnAbilityUse (read at cast time) keep working.
+  showAttackButton: { def: true },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display

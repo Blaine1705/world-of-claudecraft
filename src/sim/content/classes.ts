@@ -128,6 +128,9 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       // two level-5 choice-row options modify it, so it can no longer live
       // behind a row grant of its own.
       'blink',
+      // Ice Block joins the BASE kit (owner 2026-07-13): a key mage escape/immunity
+      // every spec gets. No specs gate; Frost carries a second charge (resolvedAbility).
+      'ice_block',
       // Fire spec kit (owner design 2026-07-11, `specs: ['fire']` gated):
       // the Ignition mastery + Hot Streak passives at the pick, Blazing
       // Barrier at 10, Meteor at 17. Combustion is the shared signature slot.
@@ -135,6 +138,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'hot_streak',
       'blazing_barrier',
       'meteor',
+      'combustion',
       // Frost spec kit (owner design 2026-07-11, `specs: ['frost']` gated):
       // Ice Lance + its three spec passives at the spec pick, Flurry at 8,
       // the Water Elemental at 12.
@@ -151,6 +155,10 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frost_nova',
       'frozen_orb',
       'blizzard',
+      'icy_veins',
+      'glacial_spike',
+      'glacial_front',
+      'dragons_breath',
       'arcane_explosion',
       'scorch',
       'ice_barrier',
@@ -175,6 +183,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       // Group haste cooldown (the Chronomancer's Bloodlust): +30% full haste, shares
       // the Bloodlust exhaustion.
       'temporal_acceleration',
+      'perfect_moment',
     ],
     color: 0x69ccf0,
   },
@@ -1331,6 +1340,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Hoarfrost Mantle',
     class: 'mage',
     learnLevel: 1,
+    // Frost identity (owner 2026-07-14 spec split): committing to Fire or
+    // Chronomancy hands the armor off (excludeSpecs, the Reaver Strike idiom),
+    // while the level 1-4 pre-spec mage keeps its starter armor.
+    excludeSpecs: ['fire', 'arcane'],
     cost: 20,
     castTime: 0,
     cooldown: 0,
@@ -1358,7 +1371,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_intellect',
     name: 'Aether Insight',
     class: 'mage',
-    learnLevel: 1,
+    learnLevel: 3,
     cost: 25,
     castTime: 0,
     cooldown: 0,
@@ -1495,7 +1508,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'frozen_orb',
     name: 'Frozen Orb',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 12,
     specs: ['frost'],
     cost: 50,
     castTime: 0,
@@ -1515,6 +1528,44 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Release an orb of swirling frost that drifts forward for 8 sec, dealing $d Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)',
   },
+  // Glacial Spike: the frost spec's slow, heavy spender. Gated on a FULL Icicles
+  // stack (requiresAuraStacks 5), which the cast consumes; it lands a big frost
+  // hit and freezes the target with a short root, so the follow-up Ice Lance and
+  // spells Shatter even where the target was not already frozen. The Icicles
+  // build-up lives in combat/frost_mage.ts (fed by Rimelance impacts + Frozen Orb
+  // pulses); the freeze reuses the shared root effect so isRooted counts it.
+  glacial_spike: {
+    id: 'glacial_spike',
+    name: 'Glacial Spike',
+    class: 'mage',
+    learnLevel: 16,
+    specs: ['frost'],
+    cost: 50,
+    castTime: 2.7,
+    cooldown: 0,
+    range: 30,
+    school: 'frost',
+    requiresTarget: true,
+    requiresAuraKind: 'icicles',
+    requiresAuraStacks: 5,
+    effects: [
+      { type: 'directDamage', min: 90, max: 105 },
+      { type: 'root', duration: 4 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 65,
+        effects: [
+          { type: 'directDamage', min: 140, max: 160 },
+          { type: 'root', duration: 4 },
+        ],
+      },
+    ],
+    description:
+      'Conjure a massive spike of ice, consuming 5 Icicles to deal $d Frost damage and freeze the target in place for 4 sec. (Frost)',
+  },
   // Blizzard: the frost AoE workhorse, a ground-aimed channel on the
   // rain_of_fire template plus a snare rider (the position-channel aoeSlow
   // pulse) and the Frozen Orb refund (frostMageChannelPulse, 0.5s per enemy
@@ -1523,7 +1574,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'blizzard',
     name: 'Blizzard',
     class: 'mage',
-    learnLevel: 14,
+    learnLevel: 10,
     specs: ['frost'],
     cost: 70,
     cooldown: 8,
@@ -1554,6 +1605,76 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description:
       'Conjures an ice storm at the target area: after a 2 sec cast it rages for 6 sec, dealing 12 to 16 Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
+  },
+  // Frente Glacial: Frost's hold-to-charge cone. The 2.4 sec cast is the
+  // authoritative maximum charge clock; releasing earlier selects one of the
+  // four range/damage stages. The preview grows continuously, but gameplay
+  // changes only at the deterministic quarter thresholds.
+  glacial_front: {
+    id: 'glacial_front',
+    name: 'Glacial Front',
+    class: 'mage',
+    learnLevel: 17,
+    specs: ['frost'],
+    cost: 80,
+    castTime: 2.4,
+    empowerStages: 4,
+    cooldown: 12,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    projectile: false,
+    effects: [
+      {
+        type: 'empoweredCone',
+        angle: 70,
+        slowMult: 0.5,
+        slowDuration: 4,
+        stages: [
+          { range: 7, min: 35, max: 42 },
+          { range: 10, min: 50, max: 60 },
+          { range: 13, min: 68, max: 80 },
+          { range: 16, min: 88, max: 104, rootDuration: 1 },
+        ],
+      },
+    ],
+    description:
+      'Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)',
+  },
+  // Aliento de dragón: Fire's hold-to-charge frontal breath. The server owns
+  // the live 2.4 second clock; each release resolves one deterministic range,
+  // angle, damage, and breakable disorientation stage.
+  dragons_breath: {
+    id: 'dragons_breath',
+    name: "Dragon's Breath",
+    class: 'mage',
+    learnLevel: 14,
+    specs: ['fire'],
+    cost: 90,
+    castTime: 2.4,
+    empowerStages: 4,
+    cooldown: 20,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    projectile: false,
+    effects: [
+      {
+        type: 'empoweredCone',
+        angle: 90,
+        fx: 'fireCone',
+        guaranteedCritLevel: 4,
+        hotStreakOnce: true,
+        stages: [
+          { range: 6, angle: 55, min: 32, max: 40, incapacitateDuration: 1 },
+          { range: 8, angle: 65, min: 48, max: 60, incapacitateDuration: 1.5 },
+          { range: 10, angle: 78, min: 68, max: 82, incapacitateDuration: 2 },
+          { range: 12, angle: 90, min: 90, max: 110, incapacitateDuration: 3 },
+        ],
+      },
+    ],
+    description:
+      'Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)',
   },
   // The three frost spec passives: spellbook/spec-screen documentation of the
   // proc engine (combat/frost_mage.ts owns the mechanics; these carry no
@@ -1596,7 +1717,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'shatter',
     name: 'Shatter',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 10,
     specs: ['frost'],
     passive: true,
     cost: 0,
@@ -1621,9 +1742,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: false,
     effects: [], // special-cased: creates conjured_water{rank} in bags
+    // Rank ladder per the owner's leveling pass (2026-07-14): 4 / 8 / 12 / 16.
     ranks: [
-      { rank: 2, level: 10, cost: 70, effects: [] },
-      { rank: 3, level: 16, cost: 110, effects: [] },
+      { rank: 2, level: 8, cost: 70, effects: [] },
+      { rank: 3, level: 12, cost: 110, effects: [] },
+      { rank: 4, level: 16, cost: 150, effects: [] },
     ],
     description:
       'Conjures 2 bottles of water, restoring mana when drunk. Higher ranks conjure purer water.',
@@ -1640,9 +1763,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: false,
     effects: [], // special-cased: creates conjured_bread{rank} in bags
+    // Rank ladder per the owner's leveling pass (2026-07-14): 5 / 10 / 15 / 20.
     ranks: [
-      { rank: 2, level: 12, cost: 75, effects: [] },
-      { rank: 3, level: 18, cost: 115, effects: [] },
+      { rank: 2, level: 10, cost: 75, effects: [] },
+      { rank: 3, level: 15, cost: 115, effects: [] },
+      { rank: 4, level: 20, cost: 155, effects: [] },
     ],
     description:
       'Conjures 2 servings of bread, restoring health when eaten. Higher ranks conjure heartier fare.',
@@ -1651,7 +1776,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'fire_blast',
     // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
     // both damage specs keep it exactly as before; the healer does not.
-    specs: ['fire', 'frost'],
+    specs: ['fire'],
     name: 'Cinderfall',
     class: 'mage',
     learnLevel: 5,
@@ -1666,8 +1791,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Owner rule (round five): fully off the GCD, like Combustion: castable
     // during one and it never arms one for the other abilities.
     offGcd: true,
-    // Owner playtest 2026-07-11: two stored charges, back to back if banked.
-    maxCharges: 2,
+    // Owner playtest 2026-07-13: three stored charges (was two), back to back if banked.
+    maxCharges: 3,
     // Owner playtest round four: no bolt, the embers bite the moment you press.
     projectile: false,
     effects: [{ type: 'directDamage', min: 27, max: 35 }],
@@ -1682,6 +1807,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Aether Darts',
     class: 'mage',
     learnLevel: 5,
+    specs: ['arcane'],
     cost: 50,
     castTime: 0,
     channel: { duration: 3, ticks: 3 },
@@ -1701,7 +1827,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'polymorph',
     name: 'Bewitch',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 7,
     cost: 50,
     castTime: 1.5,
     cooldown: 0,
@@ -1739,7 +1865,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_explosion',
     name: 'Aetherburst',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 7,
+    specs: ['arcane'],
     cost: 60,
     castTime: 0,
     cooldown: 0,
@@ -1756,10 +1883,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'flamestrike',
     // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
     // both damage specs keep it exactly as before; the healer does not.
-    specs: ['fire', 'frost'],
+    specs: ['fire'],
     name: 'Flamestrike',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 12,
     cost: 80,
     // Owner rule 2026-07-11: a real cast, EXCEPT under Hot Streak, whose
     // next_cast_instant makes it instant and free (the spender machinery).
@@ -1849,16 +1976,19 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'scorch',
     // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
     // both damage specs keep it exactly as before; the healer does not.
-    specs: ['fire', 'frost'],
+    specs: ['fire'],
     name: 'Scald',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 10,
     cost: 35,
     castTime: 1.5,
     cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: true,
+    // Owner playtest 2026-07-13: Scald lands instantly, no traveling bolt (projectile
+    // false), so the damage resolves the moment the cast finishes.
+    projectile: false,
     // Owner playtest 2026-07-11: casting it also quickens your feet; round
     // four made the cast itself mobile (the fire mage's on-the-run filler).
     castWhileMoving: true,
@@ -1873,7 +2003,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'pyroblast',
     // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
     // both damage specs keep it exactly as before; the healer does not.
-    specs: ['fire', 'frost'],
+    specs: ['fire'],
     name: 'Pyrelance',
     class: 'mage',
     learnLevel: 5,
@@ -1951,7 +2081,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'temporal_echo',
     name: 'Temporal Echo',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 8,
     specs: ['arcane'],
     cost: 40,
     castTime: 0,
@@ -2001,7 +2131,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'temporal_cascade',
     name: 'Temporal Cascade',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 12,
     specs: ['arcane'],
     cost: 90,
     castTime: 2,
@@ -2025,7 +2155,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       {
         rank: 2,
-        level: 12,
+        level: 16,
         cost: 130,
         effects: [
           {
@@ -2039,7 +2169,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
       {
         rank: 3,
-        level: 18,
+        level: 20,
         cost: 170,
         effects: [
           {
@@ -2064,7 +2194,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'temporal_reversal',
     name: 'Temporal Reversal',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 16,
     specs: ['arcane'],
     cost: 60,
     castTime: 2,
@@ -2089,7 +2219,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'temporal_rewind',
     name: 'Rewind',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 14,
     specs: ['arcane'],
     cost: 150,
     castTime: 0,
@@ -2107,6 +2237,28 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // FULL haste (attack + cast + channel) for 15s on a 5 min cooldown, sharing the
   // `sated` exhaustion with Bloodlust so the two can never be chained. Runs through
   // the same aoeAllyHaste effect + combat/haste_burst.ts.
+  // Perfect Moment: the Chronomancer's offensive cooldown (owner design
+  // 2026-07-14). Instantly grants FOUR Arcane Charges and freezes them for 10
+  // sec: Aether Darts fires its full-charge five-missile barrage without
+  // spending the stack (combat/chronomancy.ts applyPerfectMoment +
+  // aetherDartsBoltBonus's window guard). Off the GCD, like Combustion.
+  perfect_moment: {
+    id: 'perfect_moment',
+    name: 'Perfect Moment',
+    class: 'mage',
+    learnLevel: 10,
+    specs: ['arcane'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    offGcd: true,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    effects: [{ type: 'perfectMoment' }],
+    description:
+      'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancer)',
+  },
   temporal_acceleration: {
     id: 'temporal_acceleration',
     name: 'Temporal Acceleration',
@@ -2168,9 +2320,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   ice_barrier: {
     id: 'ice_barrier',
-    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
-    // both damage specs keep it exactly as before; the healer does not.
-    specs: ['fire', 'frost'],
+    // Frost's personal barrier (owner leveling pass 2026-07-14): Fire gets its
+    // own Blazing Barrier at the spec pick, so the shared Frostveil is gone.
+    specs: ['frost'],
     name: 'Frostveil',
     class: 'mage',
     learnLevel: 5,
@@ -5051,9 +5203,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   combustion: {
     id: 'combustion',
+    specs: ['fire'],
     name: 'Combustion',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 12,
     cost: 100,
     castTime: 0,
     cooldown: 120,
@@ -5088,9 +5241,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   icy_veins: {
     id: 'icy_veins',
+    specs: ['frost'],
     name: 'Icy Veins',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 12,
     cost: 0,
     castTime: 0,
     cooldown: 180,
@@ -5453,7 +5607,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'blink',
     name: 'Flickerstep',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 10,
     cost: 40,
     castTime: 0,
     cooldown: 15,
@@ -5708,11 +5862,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // (the buff lingers after the channel ends).
     channel: { duration: 6, ticks: 6 },
     effects: [
-      { type: 'gainResource', amount: 40 },
+      { type: 'gainResource', amount: 100 },
       { type: 'selfBuff', kind: 'buff_spellpower', value: 8, duration: 15 },
     ],
     description:
-      'Channel for 6 sec: each second restores 40 mana and builds 8 spell power, stacking while you channel and lasting 15 sec. (Mage talent)',
+      'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel and lasting 15 sec. (Mage talent)',
   },
   frenzied_regeneration: {
     id: 'frenzied_regeneration',
@@ -5827,19 +5981,20 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ice_block',
     name: 'Cold Coffin',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 12,
     cost: 15,
     castTime: 0,
     cooldown: 240,
     range: 0,
     school: 'frost',
     requiresTarget: false,
-    effects: [
-      { type: 'absorb', amount: 600, duration: 8 },
-      { type: 'selfBuff', kind: 'stasis', value: 0, duration: 8 },
-    ],
+    // Owner 2026-07-13: usable while stunned/polymorphed/silenced (it always frees
+    // you); grants TOTAL immunity (the stasis check in dealDamage) and strips every
+    // debuff on cast (cleanseSelf). Frost carries a second charge (resolvedAbility).
+    usableWhileControlled: true,
+    effects: [{ type: 'cleanseSelf' }, { type: 'selfBuff', kind: 'stasis', value: 0, duration: 8 }],
     description:
-      'Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)',
+      'Encases you in solid ice for 8 sec, becoming immune to all damage and effects and removing every harmful effect. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)',
   },
   inner_focus: {
     id: 'inner_focus',
@@ -5920,7 +6075,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'meteor',
     name: 'Meteor',
     class: 'mage',
-    learnLevel: 17,
+    learnLevel: 16,
     specs: ['fire'],
     cost: 120,
     castTime: 0,
@@ -6020,6 +6175,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'arcane',
     requiresTarget: false,
+    offGcd: true, // owner 2026-07-13: fire it without spending the global cooldown
     effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
     description: 'Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)',
   },
@@ -6074,12 +6230,21 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 25,
     school: 'frost',
     requiresTarget: false,
-    // Aimed at the ground; the cast time IS the arming delay, then the ring
-    // roots everything inside (the aoeRoot case centers on castAim when aimed).
+    // Aimed at the ground; the cast time is the arming delay. The center stays
+    // safe, while enemies touching the persistent perimeter trigger it once.
     targetMode: 'position',
-    effects: [{ type: 'aoeRoot', duration: 4, radius: 6, min: 0, max: 0 }],
+    effects: [
+      {
+        type: 'aoeRoot',
+        duration: 4,
+        radius: 6,
+        min: 0,
+        max: 0,
+        ring: { duration: 10, innerRadius: 4.5 },
+      },
+    ],
     description:
-      'Summons a ring of frost, rooting enemies in the target area for 4 sec. (Mage talent)',
+      'Summons a ring for 10 sec. Enemies crossing its perimeter are frozen for 4 sec. (Mage talent)',
   },
   cold_snap: {
     id: 'cold_snap',
@@ -6119,9 +6284,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'frost',
     requiresTarget: false,
-    effects: [{ type: 'aoeAllyAbsorb', amount: 130, duration: 60, radius: 30 }],
+    effects: [{ type: 'aoeAllyAbsorb', amount: 130, duration: 60, radius: 30, maxTargets: 5 }],
     description:
-      'Shields you and all allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
+      'Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
   },
   overload: {
     id: 'overload',
@@ -6179,7 +6344,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'blazing_barrier',
     name: 'Blazing Barrier',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     specs: ['fire'],
     cost: 90,
     castTime: 0,
@@ -6661,6 +6826,11 @@ export function abilitiesKnownAt(
     // gate + updateTimers' recharge refund need no new path. Talent
     // bonusCharges (applyTalentMods) stacks on top of this base.
     if (def.maxCharges !== undefined) entry.charges = def.maxCharges;
+    // Frost mages carry a SECOND Ice Block charge (owner 2026-07-13: "doble cubo"),
+    // on the abilityCharges recharge model. Resolved HERE (the shared known-list
+    // builder) so BOTH worlds see it: the offline Sim's meta.known and the
+    // ClientWorld's locally recomputed list, which is what the action bar badges.
+    if (id === 'ice_block' && mods?.spec === 'frost') entry.bonusCharges = 1;
     if (mods) applyTalentMods(entry, mods);
     out.push(entry);
   }

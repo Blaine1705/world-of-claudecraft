@@ -1,7 +1,19 @@
 import type { ResolvedAbility } from '../sim/sim';
 
+export interface ActiveFrostRing {
+  id: string;
+  x: number;
+  z: number;
+  radius: number;
+  innerRadius: number;
+  duration: number;
+  remaining: number;
+}
+
 export interface IWorldCombat {
   known: ResolvedAbility[];
+  /** Server-authored persistent traps currently visible to this world view. */
+  activeFrostRings: ActiveFrostRing[];
   castAbility(abilityId: string): void;
   castAbilityBySlot(slot: number): void;
   // Ground-targeted cast: the ability is aimed at a world point (x, z) the player
@@ -14,6 +26,8 @@ export interface IWorldCombat {
   // persistent selection. A stale/invalid target falls back to the classic
   // current-friendly-target-else-self resolution in the sim.
   castAbilityOn(abilityId: string, targetId: number): void;
+  /** Release the local player's active hold-to-charge spell. */
+  releaseEmpoweredAbility(abilityId: string): void;
   // Voluntarily cancel one of the local player's own helpful auras (right-click a
   // buff). No-op if the id names a debuff or an aura the player does not carry.
   cancelAura(auraId: string): void;

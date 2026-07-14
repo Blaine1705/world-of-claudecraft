@@ -1,0 +1,59 @@
+import { describe, expect, it } from 'vitest';
+import { Sim } from '../src/sim/sim';
+
+describe('Mass Barrier specialization theme', () => {
+  for (const [spec, school] of [
+    ['arcane', 'arcane'],
+    ['fire', 'fire'],
+    ['frost', 'frost'],
+  ] as const) {
+    it(`stores the ${school} visual school for a ${spec} caster`, () => {
+      const sim = new Sim({ seed: 87, playerClass: 'mage', autoEquip: true });
+      sim.setPlayerLevel(20);
+      expect(sim.applyTalents({ spec, rows: { 17: 'mag_r17_mass_barrier' } })).toBe(true);
+      const player = sim.player;
+      const allyId = sim.addPlayer('warrior', `Ally${spec}`);
+      const ally = sim.entities.get(allyId)!;
+      ally.pos = { ...player.pos };
+      ally.prevPos = { ...player.pos };
+      player.resource = player.maxResource;
+
+      sim.castAbility('mass_barrier');
+      sim.tick();
+
+      const barrier = player.auras.find((a) => a.id === 'mass_barrier');
+      const allyBarrier = ally.auras.find((a) => a.id === 'mass_barrier');
+      expect(barrier?.school).toBe(school);
+      expect(allyBarrier?.school).toBe(school);
+    });
+  }
+
+  it('always includes a higher-id caster when five allies are co-located', () => {
+    const sim = new Sim({ seed: 88, playerClass: 'warrior', autoEquip: true });
+    const lowerIdAllies = [sim.player];
+    for (let i = 0; i < 4; i++) {
+      const allyId = sim.addPlayer('warrior', `Tie${i}`);
+      lowerIdAllies.push(sim.entities.get(allyId)!);
+    }
+    const casterId = sim.addPlayer('mage', 'TieMage');
+    const caster = sim.entities.get(casterId)!;
+    sim.setPlayerLevel(20, casterId);
+    expect(
+      sim.applyTalents({ spec: 'arcane', rows: { 17: 'mag_r17_mass_barrier' } }, casterId),
+    ).toBe(true);
+    for (const ally of lowerIdAllies) {
+      ally.pos = { ...caster.pos };
+      ally.prevPos = { ...caster.pos };
+    }
+    caster.resource = caster.maxResource;
+
+    sim.castAbility('mass_barrier', casterId);
+    sim.tick();
+
+    const shielded = [...sim.entities.values()].filter((entity) =>
+      entity.auras.some((aura) => aura.id === 'mass_barrier'),
+    );
+    expect(caster.auras.some((aura) => aura.id === 'mass_barrier')).toBe(true);
+    expect(shielded).toHaveLength(5);
+  });
+});

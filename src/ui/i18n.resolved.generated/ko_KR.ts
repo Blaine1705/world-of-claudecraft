@@ -579,6 +579,7 @@ export const ko_KR: EnTranslations = {
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
+      "showAttackButton": "Show Attack Button",
       "showTargetOfTarget": "대상의 대상 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
@@ -1167,6 +1168,33 @@ export const ko_KR: EnTranslations = {
     "playerFrame": {
       "unlock": "플레이어 프레임 이동",
       "lock": "플레이어 프레임 고정"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "프레임 위치 초기화"
@@ -4619,6 +4647,7 @@ export const ko_KR: EnTranslations = {
     },
     "pet": {
       "attack": "공격",
+      "waterJet": "Water Jet",
       "taunt": "도발",
       "healDemon": "악마 치유",
       "healPet": "소환수 치유",
@@ -4627,6 +4656,8 @@ export const ko_KR: EnTranslations = {
       "aggressive": "공격적",
       "petAttackTitle": "소환수 공격",
       "petAttackDesc": "현재 적대적인 대상에게 소환수가 공격하도록 명령합니다.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "소환수 도발",
       "petTauntDesc": "소환수에게 교전하고 사거리 안에서 으르렁거리도록 명령합니다. 재사용 대기시간 10초.",
       "healDemonDesc": "마나를 소비해 5초 동안 악마에게 치유를 집중합니다.",
@@ -4749,6 +4780,7 @@ export const ko_KR: EnTranslations = {
     "actionBar": {
       "attackName": "공격",
       "attackTooltip": "대상에게 자동 공격을 켜거나 끕니다. 적을 우클릭해도 공격합니다.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "빈 칸",
       "slotAria": "행동 칸 {slot}: {ability}",
       "emptySlotAria": "행동 칸 {slot}: 비어 있음",
@@ -5277,6 +5309,18 @@ export const ko_KR: EnTranslations = {
       "blizzard": {
         "name": "Blizzard",
         "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
       },
       "fingers_of_frost": {
         "name": "Fingers of Frost",
@@ -6189,6 +6233,10 @@ export const ko_KR: EnTranslations = {
       "temporal_acceleration": {
         "name": "Temporal Acceleration",
         "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
       },
       "arcane_surge": {
         "name": "Aether Surge",

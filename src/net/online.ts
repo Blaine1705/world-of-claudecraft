@@ -53,6 +53,7 @@ import {
 } from '../sim/types';
 import {
   type AccountCosmetics,
+  type ActiveFrostRing,
   type ArenaInfo,
   type BankInfo,
   type CharacterSearchResult,
@@ -972,6 +973,7 @@ function blankEntity(id: number): Entity {
     petMode: 'defensive',
     petTauntTimer: 0,
     petAutoTaunt: false,
+    petAutoWaterJet: false,
     petManualTauntPending: false,
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
@@ -1210,6 +1212,7 @@ export class ClientWorld implements IWorld {
   private readonly base: string;
   private readonly clientSeed: string;
   private eventQueue: SimEvent[] = [];
+  activeFrostRings: ActiveFrostRing[] = [];
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -1604,6 +1607,35 @@ export class ClientWorld implements IWorld {
     if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
       this.serverTickHz = snap.tickHz;
     }
+    this.activeFrostRings = Array.isArray(snap.rings)
+      ? snap.rings.flatMap((value: unknown): ActiveFrostRing[] => {
+          if (!value || typeof value !== 'object') return [];
+          const ring = value as Record<string, unknown>;
+          if (
+            typeof ring.id !== 'string' ||
+            ![ring.x, ring.z, ring.r, ring.i, ring.dur, ring.rem].every(
+              (value) => typeof value === 'number' && Number.isFinite(value),
+            ) ||
+            (ring.r as number) <= 0 ||
+            (ring.i as number) < 0 ||
+            (ring.i as number) >= (ring.r as number) ||
+            (ring.dur as number) <= 0 ||
+            (ring.rem as number) <= 0
+          )
+            return [];
+          return [
+            {
+              id: ring.id,
+              x: ring.x as number,
+              z: ring.z as number,
+              radius: ring.r as number,
+              innerRadius: ring.i as number,
+              duration: ring.dur as number,
+              remaining: Math.min(ring.rem as number, ring.dur as number),
+            },
+          ];
+        })
+      : [];
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
@@ -1756,6 +1788,7 @@ export class ClientWorld implements IWorld {
       e.petMode = w.pm ?? 'defensive';
       e.petTauntTimer = w.pt ?? 0;
       e.petAutoTaunt = !!w.pa;
+      e.petAutoWaterJet = !!w.pw;
       e.petManualTauntPending = false;
       // same semantics as `new Map(w.thr ?? [])` (absent thr = empty table), but
       // updates the existing Map in place: no per-entity Map churn at 20 Hz
@@ -1881,6 +1914,19 @@ export class ClientWorld implements IWorld {
         if (!e.charges) e.charges = new Map();
         e.charges.clear();
         for (const k in s.chg) e.charges.set(k, { spent: Number(s.chg[k]), cdMax: 0 });
+      }
+      if (s.achg !== undefined) {
+        // Recharge-model live counts (Frost's second Ice Block). Only the count is
+        // displayed; max/recharge are server-side details the mirror zero-fills.
+        e.abilityCharges = {};
+        for (const k in s.achg) {
+          e.abilityCharges[k] = {
+            charges: Number(s.achg[k]),
+            maxCharges: 0,
+            recharge: 0,
+            rechargeLength: 0,
+          };
+        }
       }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
@@ -2128,6 +2174,9 @@ export class ClientWorld implements IWorld {
   castAbilityOn(abilityId: string, targetId: number): void {
     this.cmd({ cmd: 'cast', ability: abilityId, target: targetId });
   }
+  releaseEmpoweredAbility(abilityId: string): void {
+    this.cmd({ cmd: 'releaseEmpowered', ability: abilityId });
+  }
   cancelAura(auraId: string): void {
     // Authoritative on the server; the dropped aura disappears on the next self
     // snapshot. No optimistic local removal (stat recalc is server-owned).
@@ -2338,6 +2387,9 @@ export class ClientWorld implements IWorld {
   petTaunt(): void {
     this.cmd({ cmd: 'pet_taunt' });
   }
+  petWaterJet(): void {
+    this.cmd({ cmd: 'pet_water_jet' });
+  }
   setPetAutoTaunt(enabled: boolean): void {
     for (const e of this.entities.values()) {
       if (e.kind === 'mob' && e.ownerId === this.playerId) {
@@ -2346,6 +2398,16 @@ export class ClientWorld implements IWorld {
       }
     }
     this.cmd({ cmd: 'pet_auto_taunt', enabled });
+  }
+
+  setPetAutoWaterJet(enabled: boolean): void {
+    for (const e of this.entities.values()) {
+      if (e.kind === 'mob' && e.ownerId === this.playerId) {
+        e.petAutoWaterJet = enabled;
+        break;
+      }
+    }
+    this.cmd({ cmd: 'pet_auto_water_jet', enabled });
   }
   feedPet(itemId: string): void {
     this.cmd({ cmd: 'pet_feed', item: itemId });

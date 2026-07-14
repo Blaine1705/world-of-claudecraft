@@ -20,6 +20,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { tickRingOfFrost } from './combat/ring_of_frost';
 import { DELVES, dungeonAt, zoneAt } from './data';
 import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
@@ -61,6 +62,16 @@ export type GroundAoE = {
   slowMult?: number;
   slowDuration?: number;
   orbCdr?: boolean;
+  // Ring of Frost: annular contact trap state. Its duration uses `remaining`;
+  // targets are remembered so standing on or re-entering one ring cannot chain-root.
+  frostRing?: {
+    id: string;
+    abilityId: string;
+    duration: number;
+    freezeDuration: number;
+    innerRadius: number;
+    triggeredIds: Set<number>;
+  };
 };
 
 // A SimEvent scheduled to fire at a future sim time, optionally gated by a live-
@@ -156,7 +167,16 @@ export function drainDelayedEvents(ctx: SimContext): void {
 export function tickGroundAoEs(ctx: SimContext): void {
   for (let i = ctx.groundAoEs.length - 1; i >= 0; i--) {
     const effect = ctx.groundAoEs[i];
+    if (effect.frostRing && !ctx.entities.has(effect.sourceId)) {
+      ctx.groundAoEs.splice(i, 1);
+      continue;
+    }
     effect.remaining -= DT;
+    if (effect.frostRing) {
+      if (effect.remaining > CAST_COMPLETE_EPS) tickRingOfFrost(ctx, effect);
+      if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
+      continue;
+    }
     effect.tickTimer -= DT;
     while (effect.tickTimer <= CAST_COMPLETE_EPS && effect.remaining > CAST_COMPLETE_EPS) {
       effect.tickTimer += effect.interval;

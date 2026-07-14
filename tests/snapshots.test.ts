@@ -2012,6 +2012,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
 // 37th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
+  'achg',
   'arena',
   'bags',
   'bank',
@@ -2059,6 +2060,7 @@ const ALL_DELTA_KEYS = [
 // delta key whose IWorld name differs from its terse key (stats/weapon/delveDaily
 // keep their name; tal fans out to several members and is asserted directly).
 const TERSE_TO_IWORLD: Record<string, string> = {
+  achg: 'abilityCharges',
   arena: 'arenaInfo',
   bags: 'bags',
   bank: 'bankInfo',
@@ -2194,6 +2196,9 @@ function dirtyEveryDeltaField(): {
   // Player Entity fields.
   p.cooldowns.set('heroic_strike', 5);
   p.charges = new Map([['charge', { spent: 1, cdMax: 15 }]]);
+  p.abilityCharges = {
+    ice_block: { charges: 1, maxCharges: 2, recharge: 10, rechargeLength: 240 },
+  };
   p.stats = { ...p.stats, str: 12345 };
   p.weapon = { ...p.weapon, min: 999 };
   p.resource = 42;
@@ -2248,6 +2253,7 @@ describe('full self-state snapshot delta fixture', () => {
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
     expect(client.player.charges?.get('charge')?.spent).toBe(1); // chg -> e.charges
+    expect(client.player.abilityCharges?.ice_block?.charges).toBe(1); // achg -> e.abilityCharges
     expect(client.player.stats).toMatchObject({ str: 12345 }); // stats (inline s.X ?? e.X)
     expect(client.player.weapon).toMatchObject({ min: 999 }); // weapon (inline s.X ?? e.X)
     expect(client.player.resource).toBe(42); // res -> resource
@@ -2359,9 +2365,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 37 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(37);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(37);
+  it('ALL_DELTA_KEYS contains exactly 38 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(38);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(38);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2373,7 +2379,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(37);
+    expect(scraped.size).toBe(38);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2867,5 +2873,55 @@ describe('client mirror of the server tick rate', () => {
       (client as any).applySnapshot({ t: 'snap', tickHz: junk, ents: [] });
     }
     expect(client.serverTickHz).toBe(20);
+  });
+});
+
+describe('Ring of Frost snapshot parity', () => {
+  it('mirrors authoritative active rings and clears zones missing from the next snapshot', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      rings: [{ id: '1:20', x: 3, z: 5, r: 6, i: 4.5, dur: 10, rem: 7.25 }],
+    });
+    expect(client.activeFrostRings).toEqual([
+      { id: '1:20', x: 3, z: 5, radius: 6, innerRadius: 4.5, duration: 10, remaining: 7.25 },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeFrostRings).toEqual([]);
+  });
+
+  it('interest-scopes active rings with their server-authored remaining lifetime', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Frostwire', 'mage');
+    const caster = server.sim.entities.get(session.pid)!;
+    (server.sim as any).groundAoEs.push({
+      sourceId: caster.id,
+      pos: { x: caster.pos.x + 4, y: caster.pos.y, z: caster.pos.z },
+      radius: 6,
+      min: 0,
+      max: 0,
+      remaining: 7.5,
+      interval: 10,
+      tickTimer: 10,
+      school: 'frost',
+      ability: 'Ring of Frost',
+      frostRing: {
+        id: `${caster.id}:10`,
+        abilityId: 'rings_of_frost',
+        duration: 10,
+        freezeDuration: 4,
+        innerRadius: 4.5,
+        triggeredIds: new Set<number>(),
+      },
+    });
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).rings).toEqual([
+      expect.objectContaining({ id: `${caster.id}:10`, r: 6, i: 4.5, dur: 10, rem: 7.5 }),
+    ]);
   });
 });

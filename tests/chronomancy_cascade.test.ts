@@ -23,7 +23,7 @@ import {
 } from '../src/sim/combat/chronomancy';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import type { Entity } from '../src/sim/types';
+import type { Aura, Entity } from '../src/sim/types';
 import { type AuraInput, type AurasDeps, createAurasView } from '../src/ui/auras_view';
 
 function ctxOf(sim: Sim): SimContext {
@@ -328,6 +328,39 @@ describe('UI visibility: only the local player sees its own echoes', () => {
     // The strip carries no sourceId, but the foreign mark was filtered out at the
     // source, so exactly ONE Temporal Echo icon (the local player's) remains.
     expect(echoAuras).toHaveLength(1);
+  });
+
+  it('prioritizes a later HoT before maintenance buffs at the party aura cap', () => {
+    const { sim, p } = chronoMage();
+    const ally = addAlly(sim, p.pos.x + 1, p.pos.z, 'AuraCapAlly');
+    sim.partyInvite(ally.id, p.id);
+    sim.partyAccept(ally.id);
+    const maintenance: Aura[] = Array.from({ length: 8 }, (_, index) => ({
+      id: `maintenance_${index}`,
+      name: `Maintenance ${index}`,
+      kind: 'buff_int',
+      remaining: 1800,
+      duration: 1800,
+      value: 10,
+      sourceId: ally.id,
+      school: 'arcane',
+    }));
+    ally.auras = [
+      ...maintenance,
+      {
+        id: 'renew',
+        name: 'Renew',
+        kind: 'hot',
+        remaining: 12,
+        duration: 12,
+        value: 20,
+        sourceId: p.id,
+        school: 'holy',
+      },
+    ];
+
+    const row = sim.partyInfo?.members.find((member) => member.pid === ally.id);
+    expect(row?.auras?.[0]).toEqual({ id: 'renew', kind: 'hot' });
   });
 
   it('auras_view drops a foreign temporal_echo but renders an own one and other auras', () => {

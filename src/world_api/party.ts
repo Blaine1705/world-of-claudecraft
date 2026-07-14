@@ -6,16 +6,19 @@ import type {
   ResourceType,
 } from '../sim/types';
 
-/** A compact aura summary for a party row's mini icon strip: the ability/aura id
+/** A compact, actionable aura summary for a party row's mini icon strip: the ability/aura id
  *  (drives the icon and the tooltip name), its kind (the fallback icon and the
  *  debuff classification), and neg=1 when the aura's value saps (a negative
- *  stat buff reads as a debuff). Capped at PARTY_MEMBER_AURA_CAP entries per
+ *  stat buff reads as a debuff). Actionable effects are prioritized before the
+ *  PARTY_MEMBER_AURA_CAP limit per
  *  member (sim/types.ts); deliberately NO remaining time, so the party payload
  *  only changes when the aura SET changes, never every tick of a countdown. */
 export interface PartyMemberAura {
   id: string;
   kind: AuraKind;
   neg?: 1;
+  /** Whole seconds remaining for the viewer's own Temporal Echo only. */
+  remaining?: number;
 }
 
 export interface PartyMemberInfo {
@@ -34,6 +37,16 @@ export interface PartyMemberInfo {
   dead: number;
   inCombat: number;
   group: 1 | 2;
+  /** Active specialization role, when known. Older snapshots omit it. */
+  role?: 'tank' | 'healer' | 'dps';
+  /** Effective health Rewind could currently restore to this member. */
+  rewind?: number;
+  /** 0 only when the realm reports this member linkdead/disconnected. */
+  connected?: number;
+  /** 1 while at least one living hostile mob is actively targeting this member. */
+  hasAggro?: number;
+  /** Base healing already being cast toward this member. */
+  incomingHeal?: number;
   /** Optional (an older server snapshot without it decodes as "no auras"). */
   auras?: PartyMemberAura[];
 }

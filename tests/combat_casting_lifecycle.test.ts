@@ -385,9 +385,12 @@ describe('casting_lifecycle: spell queue (#1360)', () => {
   it('holds a queued cast that would complete before the arming GCD clears, and fires it once the GCD does', () => {
     const { sim, p } = makeSim('priest', 40);
     spawnTarget(sim, p);
-    p.spellHaste = 1; // halves cast time: a short cast completes well inside the 1.5s GCD
-    castAbility(sim.ctx, 'flash_heal', p.id); // starts a cast; GCD armed at flat 1.5s
-    expect(p.gcdRemaining).toBeCloseTo(1.5, 5);
+    // Owner 2026-07-13: haste now shortens the GCD too (floored at MIN_GCD). At +300%
+    // spell haste the cast shrinks to base/4 while the GCD floors at 0.75, so the cast
+    // still completes well inside the arming GCD (the case this test exercises).
+    p.spellHaste = 3;
+    castAbility(sim.ctx, 'flash_heal', p.id); // starts a cast; GCD armed at the floored 0.75s
+    expect(p.gcdRemaining).toBeCloseTo(0.75, 5);
     while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
 
     castAbility(sim.ctx, 'flash_heal', p.id);

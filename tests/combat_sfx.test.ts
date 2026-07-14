@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { shouldPlayCombatImpactForTarget, shouldPlayCritSfxForTarget, shouldPlayMobVoiceSfxForEntity } from '../src/ui/combat_sfx';
 import type { Entity } from '../src/sim/types';
+import {
+  mobVoiceFamily,
+  shouldPlayCombatImpactForTarget,
+  shouldPlayCritSfxForTarget,
+  shouldPlayMobVoiceSfxForEntity,
+} from '../src/ui/combat_sfx';
 
 function target(kind: Entity['kind'], templateId: string): Entity {
   return {
@@ -71,6 +76,10 @@ function target(kind: Entity['kind'], templateId: string): Entity {
 }
 
 describe('combat SFX policy', () => {
+  it('routes the Water Elemental away from the generic elemental growls', () => {
+    expect(mobVoiceFamily('water_elemental')).toBe('water_elemental');
+    expect(mobVoiceFamily('stormcrag_elemental')).toBe('elemental');
+  });
   it('suppresses crit stingers for boss targets only', () => {
     expect(shouldPlayCritSfxForTarget(target('mob', 'nythraxis_scourge_of_thornpeak'))).toBe(false);
     expect(shouldPlayCritSfxForTarget(target('mob', 'nythraxis_skeleton_warrior'))).toBe(true);
@@ -84,8 +93,12 @@ describe('combat SFX policy', () => {
   });
 
   it('mutes all non-dialogue Nythraxis boss combat sounds', () => {
-    expect(shouldPlayMobVoiceSfxForEntity(target('mob', 'nythraxis_scourge_of_thornpeak'))).toBe(false);
-    expect(shouldPlayCombatImpactForTarget(target('mob', 'nythraxis_scourge_of_thornpeak'))).toBe(false);
+    expect(shouldPlayMobVoiceSfxForEntity(target('mob', 'nythraxis_scourge_of_thornpeak'))).toBe(
+      false,
+    );
+    expect(shouldPlayCombatImpactForTarget(target('mob', 'nythraxis_scourge_of_thornpeak'))).toBe(
+      false,
+    );
     expect(shouldPlayCombatImpactForTarget(target('mob', 'crypt_shambler'))).toBe(true);
     expect(shouldPlayCombatImpactForTarget(target('player', 'warrior'))).toBe(true);
   });

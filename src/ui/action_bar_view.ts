@@ -77,12 +77,17 @@ export interface ActionBarAbility {
   cost: number;
   /** Talent-resolved stored uses (Double Charge); undefined = 1. */
   charges?: number;
+  /** Extra stored uses on the abilityCharges recharge model (e.g. Frost's second
+   *  Ice Block); total max = 1 + bonusCharges. undefined = 0. */
+  bonusCharges?: number;
 }
 
 export interface ActionBarAuraInput {
   kind: AuraKind;
   value?: number;
   empowerAbilities?: readonly string[];
+  /** Stacks, for a stack-gated ability (Glacial Spike needs 5 Icicles). */
+  stacks?: number;
 }
 
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
@@ -90,10 +95,12 @@ export interface ActionBarAuraInput {
  *  painter descriptor); NO per-frame allocation (the accessors return existing refs
  *  or null, never a fresh wrapper object). */
 export interface ActionBarSlotDescriptor {
-  /** 0-based slot index; slot 0 is the fixed Attack toggle. */
+  /** 0-based slot index; slot 0 is the Attack toggle by default. */
   slotIndex: number;
-  /** Whether this is the fixed attack slot (slot 0). */
-  isAttack: boolean;
+  /** Whether the slot currently renders the fixed Attack toggle. An accessor (like
+   *  ability()/item()) because the desktop bar's slot 0 can be switched to a normal
+   *  assignable slot live via the "Show Attack Button" Interface option. */
+  isAttack(): boolean;
   /** Whether the slot has ANY raw binding assigned (even one whose ability is
    *  unlearned or item id is unknown). The many-spells count source: kept distinct
    *  from ability()/item() so the count stays byte-identical to the former
@@ -147,6 +154,9 @@ export interface ActionBarPlayerInput {
   /** Charge-limited abilities' spent counts (Double Charge); the recharge
    *  timer itself rides `cooldowns`. Optional: absent when nothing is spent. */
   charges?: { get(id: string): { spent: number } | undefined };
+  /** Live charges on the abilityCharges recharge model (Frost's second Ice Block):
+   *  the current count per ability id. Optional: absent when nothing uses it. */
+  abilityCharges?: { [id: string]: { charges: number } | undefined };
 }
 
 /** The target fields the bar reads; null when there is no current target. */
@@ -295,7 +305,7 @@ export function createActionBarView(
           boundCount++;
         }
 
-        if (sd.isAttack) {
+        if (sd.isAttack()) {
           slot.kind = 'attack';
           slot.abilityId = null;
           slot.itemId = null;
@@ -401,9 +411,21 @@ export function createActionBarView(
         // Charge-limited (Double Charge): the running cooldown is only the
         // RECHARGE timer; the badge shows the stored uses left and the slot
         // stays usable while any remain.
-        const maxCharges = ability.charges ?? 1;
+        // Two stored-use systems (mutually exclusive per ability, casting_lifecycle):
+        // the Double Charge Map (ability.charges + player.charges.spent) and the
+        // abilityCharges recharge model (1 + bonusCharges, live count in
+        // player.abilityCharges). Read whichever the ability uses so the badge shows
+        // for both (e.g. Frost's second Ice Block rode the recharge model, unbadged).
+        const rechargeMax = 1 + (ability.bonusCharges ?? 0);
+        const maxCharges = rechargeMax > 1 ? rechargeMax : (ability.charges ?? 1);
         const chargesLeft =
-          maxCharges > 1 ? maxCharges - (player.charges?.get(def.id)?.spent ?? 0) : cd > 0 ? 0 : 1;
+          rechargeMax > 1
+            ? (player.abilityCharges?.[def.id]?.charges ?? maxCharges)
+            : maxCharges > 1
+              ? maxCharges - (player.charges?.get(def.id)?.spent ?? 0)
+              : cd > 0
+                ? 0
+                : 1;
         slot.count = maxCharges > 1 ? deps.formatCount(chargesLeft) : '';
         // A free-cost proc (Battle Trance / next_cast_free) covers the cost:
         // the slot is usable at any resource and glows (the sim predicate is
@@ -416,7 +438,10 @@ export function createActionBarView(
         if (def.requiresAuraKind) {
           windowOpen = false;
           for (const a of player.auras) {
-            if (a.kind === def.requiresAuraKind) {
+            if (
+              a.kind === def.requiresAuraKind &&
+              (a.stacks ?? 1) >= (def.requiresAuraStacks ?? 1)
+            ) {
               windowOpen = true;
               break;
             }

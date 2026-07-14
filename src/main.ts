@@ -1440,6 +1440,15 @@ async function startGame(
       if (!v) hud.cancelGroundAim();
       return;
     }
+    if (
+      key === 'partyFrameShowResource' ||
+      key === 'partyFrameShowAbsorbs' ||
+      key === 'partyFrameShowAuras' ||
+      key === 'partyFrameShowSelf'
+    ) {
+      settings.set(key, !!value);
+      return;
+    }
     if (key === 'attackMove') {
       const v = settings.set('attackMove', !!value);
       if (!v) input.clearClickMove();
@@ -1475,6 +1484,13 @@ async function startGame(
         'show-actionbar2',
         settings.set('showSecondaryActionBar', !!value),
       );
+      return;
+    }
+    if (key === 'showAttackButton') {
+      // Slot-0 mode switch, read LIVE by the HUD (attackSlotIsAttack): ON keeps the
+      // classic Attack toggle; OFF turns the first slot into a normal assignable one
+      // (its key then casts the assigned action). Persistence is the only page work.
+      settings.set('showAttackButton', !!value);
       return;
     }
     if (key === 'showTargetOfTarget') {
@@ -1634,6 +1650,27 @@ async function startGame(
         break;
       case 'targetFrameScale':
         document.documentElement.style.setProperty('--target-frame-scale', String(v));
+        break;
+      case 'partyFrameScale':
+        document.documentElement.style.setProperty('--party-frame-scale', String(v));
+        break;
+      case 'partyFrameWidth':
+        document.documentElement.style.setProperty('--party-frame-width', `${v}px`);
+        break;
+      case 'partyFrameHeight':
+        document.documentElement.style.setProperty('--party-frame-height', `${v}px`);
+        break;
+      case 'partyFrameSpacing':
+        document.documentElement.style.setProperty('--party-frame-spacing', `${v}px`);
+        break;
+      case 'partyFrameColumns':
+        document.documentElement.style.setProperty('--party-frame-columns', String(Math.round(v)));
+        break;
+      case 'partyFrameHealthText':
+      case 'partyFrameSort':
+      case 'partyFrameStyle':
+        // Read live by Hud.updatePartyFrames; persistence above is the only
+        // page-level work needed.
         break;
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);

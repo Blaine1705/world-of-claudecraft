@@ -499,7 +499,7 @@ describe('client HTML shell', () => {
 
   it('ships the mobile party-chip CSS with a 40px touch floor, scoped to body.mobile-touch', () => {
     // The chip meets the mobile touch floor and reveals the frames only under the
-    // painter-driven .party-expanded class (collapsed by default hides the rows + Leave).
+    // painter-driven .party-expanded class (collapsed by default hides the rows).
     const chipRule = hudMobileCss.match(/body\.mobile-touch #party-chip \{([^}]*)\}/)?.[1] ?? '';
     expect(chipRule).toMatch(/min-width:\s*40px/);
     expect(chipRule).toMatch(/min-height:\s*40px/);
@@ -507,13 +507,32 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames.party-expanded #party-chip .ui-icon {\n    transform: rotate(90deg);',
     );
-    // Collapsed OR chat-yielded (no .party-expanded on mobile) hides the member rows +
-    // Leave button, so both states leave only the chip (if present) as the party UI.
+    // Collapsed OR chat-yielded (no .party-expanded on mobile) hides the member rows,
+    // so both states leave only the chip (if present) as the party UI.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames:not(.party-expanded) .party-frame,',
+      'body.mobile-touch #party-frames:not(.party-expanded) .party-frame {\n    display: none;',
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames:not(.party-expanded) #party-leave {\n    display: none;',
+  });
+
+  it('ships stable WoW-style raid frames with class health and a thin resource edge', () => {
+    expect(hudCss).toMatch(
+      /#party-frames\.party-style-raid \.party-frame \.bar\.hp \.bar-fill \{[^}]*background-color: var\(--cls\);/,
+    );
+    expect(hudCss).toMatch(
+      /#party-frames\.party-style-raid \.party-frame > \.bar:not\(\.hp\) \{[^}]*height: 3px;/,
+    );
+    expect(hudCss).toMatch(/\.party-frame \.pfm-auras \{[^}]*position: absolute;/);
+    expect(hudCss).toMatch(
+      /\.party-frame \.pfm-auras \{[^}]*max-width: calc\(100% - 4px\);[^}]*overflow: hidden;/,
+    );
+    expect(hudMobileCss).toMatch(
+      /#party-frames\.party-style-raid \.party-rows \{[^}]*grid-auto-flow: row;[^}]*grid-template-columns: repeat\(2,/,
+    );
+    expect(hudCss).toMatch(
+      /#party-frames\.party-style-raid \.party-frame \.pfm-auras \{[^}]*left: auto;[^}]*right: 2px;[^}]*top: auto;[^}]*bottom: 4px;[^}]*translate: none;/,
+    );
+    expect(hudCss).toMatch(
+      /#party-frames\.party-style-raid \.party-frame \.pfm-auras \.buff \{[^}]*flex: 0 0 12px;[^}]*width: 12px;[^}]*height: 12px;/,
     );
   });
 
@@ -1158,23 +1177,21 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-frame:not(:first-of-type) {\n    margin-top: -1px;',
     );
-    // F1: the container is a simple flex column now (chip, rows wrapper, master-loot,
-    // leave), so the leave button carries no grid placement and no member frame can
-    // auto-flow beside the chip.
+    // F1: the container is a simple flex column now (chip, rows wrapper, master-loot),
+    // so no member frame can auto-flow beside the chip.
     expect(hudMobileCss).toMatch(
       /body\.mobile-touch #party-frames \{[^}]*display: flex;[^}]*flex-direction: column;/,
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames #party-leave {\n    width: auto;\n    min-width: 0;\n    min-height: 40px;',
-    );
-    expect(hudMobileCss).not.toMatch(/#party-leave \{\n {4}grid-column/);
+    expect(hudMobileCss).not.toContain('#party-leave');
     // The double-stack grid the container used to carry moved to the .party-rows WRAPPER;
     // on desktop the wrapper is transparent (display: contents), so the desktop stack is
     // unchanged. Both pins guard the two-arm structure.
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames .party-rows {\n    display: grid;\n    grid-auto-flow: column;\n    grid-template-rows: repeat(2, auto);',
+    expect(hudMobileCss).toMatch(
+      /body\.mobile-touch #party-frames \.party-rows \{[^}]*display: grid;[^}]*zoom: 1;[^}]*grid-auto-flow: column;[^}]*grid-template-rows: repeat\(2, auto\);/,
     );
-    expect(hudCss).toContain('#party-frames .party-rows {\n    display: contents;\n  }');
+    expect(hudCss).toMatch(
+      /#party-frames \.party-rows \{[^}]*display: grid;[^}]*grid-template-columns: repeat\(var\(--party-frame-columns, 1\), var\(--party-frame-width, 170px\)\);/,
+    );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-frame {\n      width: calc(100px * var(--mobile-chrome-scale, 1));\n      min-height: 40px;',
     );
@@ -1206,10 +1223,11 @@ describe('client HTML shell', () => {
     // If a future change moves the pool back inline or drops the keyed builder, this
     // fails instead of silently losing the guard.
 
-    // Party rows: the per-member row + the #party-leave button are built once by
-    // the pooled row builder, not re-created on every party rebuild in hud.ts.
+    // Party rows are built once by the pooled row builder, not re-created on every
+    // party rebuild in hud.ts. Leaving the group lives in the self-portrait menu.
     expect(partyFrameRowTs).toContain("row.className = 'party-frame panel';");
-    expect(partyFrameRowTs).toContain("btn.id = 'party-leave';");
+    expect(partyFrameRowTs).not.toContain('party-leave');
+    expect(hudTs).toContain("else if (act === 'leave-party') this.sim.partyLeave();");
 
     // Aura slots: one node per aura id, held in a keyed pool and built once in
     // createNode() as .buff > .dur + .stacks. The hud.ts-wiring assertion (mirroring the

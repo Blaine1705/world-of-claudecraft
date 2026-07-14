@@ -14,6 +14,7 @@ import { COMMAND_FACETS, COMMAND_NAMES, DISPATCH_ONLY_COMMANDS } from '../src/wo
 const W6_TAGS: Readonly<Record<string, string>> = {
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',
+  releaseEmpowered: 'IWorldCombat',
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
   release: 'IWorldCombat',
@@ -110,6 +111,7 @@ const W8_TAGS: Readonly<Record<string, string>> = {
   pet_rename: 'IWorldPet',
   pet_revive: 'IWorldPet',
   pet_attack: 'IWorldPet',
+  pet_water_jet: 'IWorldPet',
   pet_taunt: 'IWorldPet',
   pet_auto_taunt: 'IWorldPet',
   pet_feed: 'IWorldPet',

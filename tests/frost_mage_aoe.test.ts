@@ -81,7 +81,7 @@ describe('AoE content defs', () => {
     const def = ABILITIES.frozen_orb;
     expect(def).toBeDefined();
     expect(def.name).toBe('Frozen Orb');
-    expect(def.learnLevel).toBe(10);
+    expect(def.learnLevel).toBe(12);
     expect(def.specs).toEqual(['frost']);
     expect(def.castTime).toBe(0);
     expect(def.cooldown).toBe(30);
@@ -96,7 +96,7 @@ describe('AoE content defs', () => {
     const def = ABILITIES.blizzard;
     expect(def).toBeDefined();
     expect(def.name).toBe('Blizzard');
-    expect(def.learnLevel).toBe(14);
+    expect(def.learnLevel).toBe(10);
     expect(def.specs).toEqual(['frost']);
     expect(def.targetMode).toBe('position');
     // Owner playtest 2026-07-11: no longer a channel; the cast IS the wind-up.

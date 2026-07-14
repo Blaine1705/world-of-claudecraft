@@ -854,6 +854,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     drinkMana: 672,
     sellValue: 0,
   },
+  conjured_water4: {
+    id: 'conjured_water4',
+    name: 'Conjured Springwater',
+    kind: 'drink',
+    quality: 'common',
+    drinkMana: 1150,
+    sellValue: 0,
+  },
   // --- conjured food (mage Conjure Food ranks; foodHp tiers pair with the
   // conjured-water mana tiers above) ---
   conjured_bread: {
@@ -878,6 +886,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'food',
     quality: 'common',
     foodHp: 552,
+    sellValue: 0,
+  },
+  conjured_bread4: {
+    id: 'conjured_bread4',
+    name: 'Conjured Feastloaf',
+    kind: 'food',
+    quality: 'common',
+    foodHp: 980,
     sellValue: 0,
   },
   // --- Smith Haldren's stock (common/white, levels 3-7) ---

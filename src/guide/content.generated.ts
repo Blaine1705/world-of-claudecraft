@@ -890,13 +890,13 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "fire",
         "name": "Pyromancy",
         "role": "dps",
-        "signature": "combustion"
+        "signature": "pyroblast"
       },
       {
         "id": "frost",
         "name": "Cryomancy",
         "role": "dps",
-        "signature": "icy_veins"
+        "signature": "ice_lance"
       }
     ],
     "signatureAbilities": [
@@ -951,6 +951,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Flickerstep"
       },
       {
+        "id": "ice_block",
+        "name": "Cold Coffin"
+      },
+      {
         "id": "ignition",
         "name": "Ignition"
       },
@@ -965,6 +969,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "meteor",
         "name": "Meteor"
+      },
+      {
+        "id": "combustion",
+        "name": "Combustion"
       },
       {
         "id": "summon_water_elemental",
@@ -1017,6 +1025,22 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "blizzard",
         "name": "Blizzard"
+      },
+      {
+        "id": "icy_veins",
+        "name": "Icy Veins"
+      },
+      {
+        "id": "glacial_spike",
+        "name": "Glacial Spike"
+      },
+      {
+        "id": "glacial_front",
+        "name": "Glacial Front"
+      },
+      {
+        "id": "dragons_breath",
+        "name": "Dragon's Breath"
       },
       {
         "id": "arcane_explosion",

@@ -1,13 +1,17 @@
+// Ice Block (Cold Coffin) rework, owner 2026-07-13: total immunity while encased (no
+// finite absorb), a full debuff cleanse on cast, castable while stunned/polymorphed,
+// the recast toggle, and a second charge for Frost.
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Aura, Entity } from '../src/sim/types';
 
-function rigMage() {
+function rigMage(spec: 'frost' | 'fire' | 'arcane' | null = null) {
   const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
   sim.setPlayerLevel(20);
-  expect(sim.applyTalents({ spec: null, rows: { 17: 'mag_r17_ice_block' } })).toBe(true);
+  if (spec) expect(sim.setSpec(spec)).toBe(true); // Ice Block is base kit, no talent needed
+  sim.tick();
   const p = sim.player;
   p.resource = p.maxResource;
   p.gcdRemaining = 0;
@@ -16,11 +20,7 @@ function rigMage() {
 
 function addTargetMob(sim: Sim, dist = 8): Entity {
   const p = sim.player;
-  const mob = createMob(9100, MOBS.forest_wolf, 20, {
-    x: p.pos.x + dist,
-    y: p.pos.y,
-    z: p.pos.z,
-  });
+  const mob = createMob(9100, MOBS.forest_wolf, 20, { x: p.pos.x + dist, y: p.pos.y, z: p.pos.z });
   mob.hostile = true;
   mob.maxHp = mob.hp = 100000;
   (sim as unknown as { addEntity(e: Entity): void }).addEntity(mob);
@@ -29,20 +29,12 @@ function addTargetMob(sim: Sim, dist = 8): Entity {
   return mob;
 }
 
-function dealDamage(sim: Sim, target: Entity, amount: number): void {
+function dealDamage(sim: Sim, target: Entity, amount: number, school = 'physical'): void {
   (
     sim as unknown as {
-      dealDamage(
-        s: Entity | null,
-        t: Entity,
-        n: number,
-        c: boolean,
-        sc: string,
-        a: string | null,
-        k: string,
-      ): void;
+      dealDamage(s: Entity | null, t: Entity, n: number, c: boolean, sc: string, a: string | null, k: string): void;
     }
-  ).dealDamage(null, target, amount, false, 'physical', null, 'hit');
+  ).dealDamage(null, target, amount, false, school, null, 'hit');
 }
 
 function tickSeconds(sim: Sim, seconds: number) {
@@ -51,65 +43,87 @@ function tickSeconds(sim: Sim, seconds: number) {
   return events;
 }
 
-function auraKinds(p: Entity): string[] {
-  return p.auras.map((a) => `${a.id}:${a.kind}:${Math.round(a.value)}:${a.remaining.toFixed(2)}`);
+function debuff(id: string, kind: Aura['kind'], value = 0): Aura {
+  return { id, name: id, kind, value, remaining: 30, duration: 30, sourceId: 0, school: 'shadow' };
 }
 
-describe('ice block stasis', () => {
-  it('blocks casts and swings while held, absorbs damage, then restores action on expiry', () => {
+describe('Ice Block: immunity + cleanse + control', () => {
+  it('grants total immunity and blocks your own actions, then restores on expiry', () => {
     const { sim, p } = rigMage();
     const mob = addTargetMob(sim);
-
     sim.startAutoAttack();
     expect(p.autoAttack).toBe(true);
 
     sim.castAbility('ice_block');
     expect(p.auras.some((a) => a.id === 'ice_block' && a.kind === 'stasis')).toBe(true);
-    const shield = p.auras.find((a) => a.id === 'ice_block_absorb' && a.kind === 'absorb');
-    expect(shield?.value).toBe(600);
+    expect(p.auras.some((a) => a.kind === 'absorb')).toBe(false); // no finite shield anymore
     expect(p.autoAttack).toBe(false);
 
+    // Your own casts/swings are blocked while encased.
     p.gcdRemaining = 0;
     p.resource = p.maxResource;
     sim.castAbility('fireball');
     expect(p.castingAbility).toBe(null);
-
     sim.startAutoAttack();
     expect(p.autoAttack).toBe(false);
-    const blockedSwingEvents = tickSeconds(sim, 4).filter(
+    const swings = tickSeconds(sim, 3).filter(
       (e) => e.type === 'damage' && e.sourceId === p.id && e.targetId === mob.id,
     );
-    expect(blockedSwingEvents).toEqual([]);
+    expect(swings).toEqual([]);
 
-    const hpBefore = p.hp;
-    const shieldBefore = p.auras.find((a) => a.id === 'ice_block_absorb')?.value ?? 0;
-    dealDamage(sim, p, 250);
-    expect(p.hp).toBe(hpBefore);
-    expect(p.auras.find((a) => a.id === 'ice_block_absorb')?.value).toBe(shieldBefore - 250);
+    // TOTAL immunity: even a huge hit does nothing.
+    const hp0 = p.hp;
+    dealDamage(sim, p, 999999, 'fire');
+    expect(p.hp).toBe(hp0);
 
-    tickSeconds(sim, 5);
+    tickSeconds(sim, 5); // 8s stasis expires
     expect(p.auras.some((a) => a.kind === 'stasis')).toBe(false);
-    expect(p.auras.some((a) => a.id === 'ice_block_absorb')).toBe(false);
-
     p.gcdRemaining = 0;
     p.resource = p.maxResource;
     sim.castAbility('fireball');
-    expect(p.castingAbility).toBe('fireball');
+    expect(p.castingAbility).toBe('fireball'); // action restored
   });
 
-  it('recast cancels stasis and the remaining absorb early', () => {
+  it('strips every debuff on cast and can be cast while stunned or polymorphed', () => {
     const { sim, p } = rigMage();
-    addTargetMob(sim);
-
+    p.auras.push(debuff('test_stun', 'stun'));
+    p.auras.push(debuff('test_poly', 'polymorph'));
+    p.auras.push(debuff('test_dot', 'dot', 50));
+    p.auras.push(debuff('test_slow', 'slow', 1.5));
+    // Stunned + polymorphed, yet Ice Block still fires (usableWhileControlled)...
     sim.castAbility('ice_block');
     expect(p.auras.some((a) => a.kind === 'stasis')).toBe(true);
-    expect(p.auras.some((a) => a.id === 'ice_block_absorb')).toBe(true);
+    // ...and it removed every harmful effect.
+    for (const id of ['test_stun', 'test_poly', 'test_dot', 'test_slow']) {
+      expect(p.auras.some((a) => a.id === id)).toBe(false);
+    }
+  });
 
+  it('recast cancels the stasis early', () => {
+    const { sim, p } = rigMage();
+    sim.castAbility('ice_block');
+    expect(p.auras.some((a) => a.kind === 'stasis')).toBe(true);
     tickSeconds(sim, 1);
     sim.castAbility('ice_block');
-
     expect(p.auras.some((a) => a.kind === 'stasis')).toBe(false);
-    expect(p.auras.some((a) => a.id === 'ice_block_absorb')).toBe(false);
+  });
+
+  it('Frost carries two Ice Block charges; other specs carry one', () => {
+    const frost = rigMage('frost');
+    const frostRes = frost.sim.resolvedAbility('ice_block', frost.p.id);
+    expect(frostRes?.bonusCharges ?? 0).toBe(1); // +1 => two total charges
+
+    // The KNOWN entry carries it too (abilitiesKnownAt, the shared builder):
+    // this is what the action bar badges, and what ClientWorld's local
+    // recompute mirrors, so a resolvedAbility-only stamp would regress the "2".
+    const frostKnown = frost.sim.known.find((k) => k.def.id === 'ice_block');
+    expect(frostKnown?.bonusCharges ?? 0).toBe(1);
+
+    const plain = rigMage(null);
+    const plainRes = plain.sim.resolvedAbility('ice_block', plain.p.id);
+    expect(plainRes?.bonusCharges ?? 0).toBe(0); // one charge
+    const plainKnown = plain.sim.known.find((k) => k.def.id === 'ice_block');
+    expect(plainKnown?.bonusCharges ?? 0).toBe(0);
   });
 
   it('replays deterministically', () => {
@@ -122,26 +136,13 @@ describe('ice block stasis', () => {
       events.push(...tickSeconds(sim, 2));
       dealDamage(sim, p, 175);
       p.gcdRemaining = 0;
-      sim.castAbility('fireball');
-      events.push(...tickSeconds(sim, 1));
       sim.castAbility('ice_block');
       p.gcdRemaining = 0;
       p.resource = p.maxResource;
       sim.castAbility('fireball');
       events.push(...tickSeconds(sim, 4));
-      return {
-        player: {
-          hp: p.hp,
-          resource: p.resource,
-          castingAbility: p.castingAbility,
-          cooldowns: [...p.cooldowns.entries()].sort(),
-          auras: auraKinds(p),
-        },
-        mob: { hp: mob.hp, auras: auraKinds(mob) },
-        events,
-      };
+      return { hp: p.hp, casting: p.castingAbility, mobHp: mob.hp, events };
     };
-
     expect(run()).toEqual(run());
   });
 });

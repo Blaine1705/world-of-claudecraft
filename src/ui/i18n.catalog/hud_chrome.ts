@@ -192,7 +192,7 @@ export const hudChromeStrings = {
     // companions, parallel to playerLabel / targetLabel.
     partyLabel: 'Your Band',
     // partyChip is the caption on the mobile-only collapse chip that stands in for the
-    // expanded party stack (the member frames + Leave button) on the touch HUD: tap it
+    // expanded party stack (the member frames) on the touch HUD: tap it
     // to reveal the stack, tap again to collapse. A distinct key from the chat channel
     // "Party" (a different render sink: a disclosure header, not a channel tab), so a
     // locale can name the two independently. WORDY by M16 ("Party" to "arty", a four-
@@ -654,6 +654,10 @@ export const hudChromeStrings = {
     // Interface panel toggle that reveals the optional second action bar row (off
     // by default). The abilities bound to its slots stay castable via their keybinds.
     showSecondaryActionBar: 'Show Secondary Action Bar',
+    // Interface panel toggle for the fixed Attack button in the first action-bar
+    // slot (on by default). Off frees that slot for a normal action (drag one in;
+    // its key then casts it). Right-clicking the Attack button flips this off too.
+    showAttackButton: 'Show Attack Button',
     // Interface panel toggle for the classic "target of target" mini-frame (off by
     // default): a small unit frame under the target frame showing who your target
     // is targeting.
@@ -1432,6 +1436,33 @@ export const hudChromeStrings = {
   playerFrame: {
     unlock: 'Move player frame',
     lock: 'Lock player frame',
+  },
+  partyFrames: {
+    section: 'Party and Raid Frames',
+    unlock: 'Move party and raid frames',
+    lock: 'Lock party and raid frames',
+    style: 'Frame Style',
+    styleAutomatic: 'Automatic',
+    styleClassic: 'Classic Party Frames',
+    styleRaid: 'Raid Frames',
+    scale: 'Frame Scale',
+    width: 'Frame Width',
+    height: 'Frame Height',
+    spacing: 'Frame Spacing',
+    columns: 'Raid Columns',
+    healthText: 'Health Text',
+    healthNone: 'None',
+    healthPercent: 'Percent',
+    healthCurrent: 'Current',
+    healthCurrentMax: 'Current / Max',
+    sort: 'Sort Players',
+    sortGroup: 'Group',
+    sortRole: 'Role',
+    sortName: 'Name',
+    showResource: 'Show Mana, Rage, and Energy',
+    showAbsorbs: 'Show Absorb Shields',
+    showAuras: 'Show Buffs and Debuffs',
+    showSelf: 'Show Your Frame',
   },
   // Interface panel row: snap both movable unit frames back to their stock
   // spots (the button reuses chatWindow.resetAction). Wordy (M16): the five

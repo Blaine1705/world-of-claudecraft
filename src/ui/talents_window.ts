@@ -137,6 +137,9 @@ function specIconUrl(cls: PlayerClass, specId: string): string | null {
   if (cls === 'warrior' && (specId === 'arms' || specId === 'fury' || specId === 'prot')) {
     return `${SPEC_ICON_DIR}/${cls}/${specId}.webp`;
   }
+  if (cls === 'mage' && (specId === 'arcane' || specId === 'fire' || specId === 'frost')) {
+    return `${SPEC_ICON_DIR}/${cls}/${specId}.png`;
+  }
   return null;
 }
 
@@ -236,8 +239,10 @@ export class TalentsWindow {
     // No point-economy header any more: the point-spending Class tree tab is gone,
     // so the two remaining tabs (Specialization, Choices) never spend talent points.
     // The Choices tab carries its own picked/total badge instead.
+    const classDescription = tEntity({ kind: 'class', id: cls, field: 'description' });
     el.innerHTML =
       `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
+      `<p class="ts-class-description">${esc(classDescription)}</p>` +
       `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
       `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span></div>` +
       rowsTab +

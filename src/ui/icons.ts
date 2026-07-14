@@ -2231,6 +2231,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // pet action bar (dedicated, never a class ability id: see pet_action_icons.ts).
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
   pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
+  pet_water_jet: r('frost', 'ice', ['bolt', 'snowflake'], ['drips']),
   pet_feed: r('food', 'ember', ['meat']), // roasted meat: hunters feed, not magic-heal
   pet_mend: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   pet_passive: r('nature', 'earthBrown', ['paw']),
@@ -2266,6 +2267,15 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   frostbolt: r('frost', 'ice', ['bolt', { p: 'snowflake', ...BR }], ['motion']),
   conjure_water: r('arcane', 'sky', [{ p: 'potion', pal: 'sky' }], ['sparkle']),
   fire_blast: r('fire', 'ember', [{ p: 'sunburst', ...BIG }, 'flame'], ['glow']),
+  dragons_breath: r(
+    'fire',
+    'ember',
+    [
+      { p: 'flame', s: 1.15 },
+      { p: 'claw_slash', ...BR, s: 0.75 },
+    ],
+    ['arcs', 'glow'],
+  ),
   arcane_missiles: r(
     'arcane',
     'arcanePink',
@@ -2281,6 +2291,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // Frost spec kit (owner design 2026-07-11): procedural recipes; distinct
   // silhouettes from frostbolt (bolt+flake) and frost_nova (flake+arcs).
   ice_lance: r('frost', 'ice', [{ p: 'dagger', rot: -Math.PI / 4 }], ['glow', 'motion']),
+  glacial_spike: r('frost', 'ice', [{ p: 'dagger', rot: 0 }], ['glow']),
   flurry: r(
     'frost',
     'ice',
@@ -2309,6 +2320,16 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
       { p: 'snowflake', x: -2, y: 12, s: 0.45 },
     ],
     ['motion'],
+  ),
+  glacial_front: r(
+    'frost',
+    'ice',
+    [
+      { p: 'snowflake', x: 0, y: -10, s: 0.55 },
+      { p: 'bolt', x: -11, y: 6, s: 0.6, rot: -0.55 },
+      { p: 'bolt', x: 11, y: 6, s: 0.6, rot: 0.55 },
+    ],
+    ['arcs', 'motion', 'glow'],
   ),
   fingers_of_frost: r('frost', 'ice', ['claw_slash', { p: 'snowflake', ...BR }], ['glow']),
   brain_freeze: r('frost', 'ice', ['eye', { p: 'snowflake', ...BR }], ['sparkle']),
@@ -2537,6 +2558,33 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   temporal_barrier: r('arcane', 'arcanePink', ['shield', { p: 'moon', ...TR }], ['glow']),
   // Phase 2: the Arcane-damage-to-healing mark (heart + a radiating echo).
   temporal_echo: r('arcane', 'arcanePink', ['heart', { p: 'sunburst', ...TR }], ['sparkle']),
+  // Chronomancy later phases (procedural fallbacks; the painted desktop-sheet
+  // icons ride ABILITY_IMAGE_IDS): the stacking nuke, the group echo, the combat
+  // res, the raid rewind, and the group lust. Distinct shape combos per the
+  // no-identical-icons guard.
+  arcane_surge: r('arcane', 'arcanePink', [{ p: 'sunburst', ...BIG }, 'bolt'], ['glow']),
+  temporal_cascade: r(
+    'arcane',
+    'arcanePink',
+    [
+      { p: 'heart', s: 0.8 },
+      { p: 'moon', ...BR },
+    ],
+    ['arcs'],
+  ),
+  temporal_reversal: r('arcane', 'arcanePink', ['cross', { p: 'moon', ...TR }], ['glow']),
+  temporal_rewind: r('arcane', 'arcanePink', [{ p: 'moon', s: 1.1 }], ['arcs', 'glow']),
+  temporal_acceleration: r('arcane', 'arcanePink', ['boot', { p: 'moon', ...TR }], ['motion']),
+  // Perfect Moment: the loaded-bird offensive window (gem = the held charges).
+  perfect_moment: r(
+    'arcane',
+    'arcanePink',
+    [
+      { p: 'gem', s: 1.05 },
+      { p: 'moon', ...TR },
+    ],
+    ['glow'],
+  ),
   crusader_strike: r('holy', 'gold', ['sword', { p: 'cross', ...BR }], ['glow']),
   // rogue
   kidney_shot: r('shadow', 'steel', ['dagger', { p: 'boot', ...BR }]),
@@ -2915,6 +2963,8 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_fingers_of_frost: r('frost', 'ice', ['snowflake'], ['glow']),
   aura_brain_freeze: r('frost', 'ice', ['snowflake', { p: 'sunburst', ...TR }], ['sparkle']),
   aura_winters_chill: r('frost', 'ice', ['snowflake', { p: 'skull', ...BR }]),
+  aura_icicles: r('frost', 'ice', [{ p: 'dagger', rot: 0 }], ['glow']),
+  aura_perfect_moment: r('arcane', 'arcanePink', [{ p: 'gem', s: 1.05 }], ['glow', 'sparkle']),
   // Hot Streak (the armed free instant): the blazing counterpart of Heating Up.
   aura_next_cast_free: r('fire', 'ember', ['flame', { p: 'sunburst', ...BIG }], ['glow']),
   aura_next_cast_instant: r('storm', 'sky', ['lightning'], ['glow']),
@@ -3500,6 +3550,33 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'rune_of_power',
   'overflowing_power',
   'evocation',
+  // Owner-provided Chronomancy sheet, cropped into individual painted icons.
+  'blink',
+  'temporal_mend',
+  'temporal_barrier',
+  'temporal_echo',
+  'arcane_surge',
+  // Owner-provided spec icon sheets (2026-07-14: frost.png / "Mago fuego.png" /
+  // Chronomancer.png + a standalone combustion.png on the desktop), cropped into
+  // individual painted icons (the label rows trimmed off).
+  'fingers_of_frost',
+  'summon_water_elemental',
+  'ice_block',
+  'brain_freeze',
+  'shatter',
+  'glacial_spike',
+  'glacial_front',
+  'ignition',
+  'hot_streak',
+  'blazing_barrier',
+  'meteor',
+  'dragons_breath',
+  'flamestrike',
+  'combustion',
+  'temporal_cascade',
+  'temporal_reversal',
+  'temporal_rewind',
+  'temporal_acceleration',
   // druid (CraftPix premium "RPG Druid" pack). moonfire (no moon), bear_charge, pounce,
   // demoralizing_roar, hibernate (no sleep), insect_swarm have no fitting art — procedural.
   'wrath',

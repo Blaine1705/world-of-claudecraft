@@ -52,7 +52,7 @@ interface SlotOpts {
 function slot(slotIndex: number, opts: SlotOpts = {}): ActionBarSlotDescriptor {
   return {
     slotIndex,
-    isAttack: opts.attack ?? false,
+    isAttack: () => opts.attack ?? false,
     hasAction: () => opts.hasAction ?? (opts.ability != null || opts.item != null),
     ability: () => opts.ability ?? null,
     item: () => opts.item ?? null,
@@ -92,6 +92,7 @@ interface WorldOpts {
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
+  abilityCharges?: { [id: string]: { charges: number } | undefined };
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -107,6 +108,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
       auras: opts.auras ?? [],
+      abilityCharges: opts.abilityCharges,
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
@@ -398,6 +400,27 @@ describe('actionBarView: attack + item slots', () => {
     const dead = view.tick(world({ dead: true, inventory: [{ itemId: 'potion', count: 1 }] }))
       .slots[0];
     expect(dead.usable).toBe(false);
+  });
+
+  it('badges the recharge-model charges (Frost second Ice Block: 1 + bonusCharges)', () => {
+    // An ability on the abilityCharges recharge model carries its extra uses as
+    // bonusCharges (not the Double Charge Map), so the max is 1 + bonusCharges and the
+    // live count comes from player.abilityCharges. This is what Frost's second Ice
+    // Block rode, which showed no badge before the fix.
+    const iceBlock: ActionBarAbility = { def: ability('ice_block').def, cost: 0, bonusCharges: 1 };
+    const view = createActionBarView(descriptor(slot(1, { ability: iceBlock })), fakeDeps());
+    // Before any cast (no abilityCharges entry): the full 2 charges show.
+    expect(view.tick(world()).slots[0].count).toBe('2');
+    // One spent: the live recharge-model count shows 1.
+    expect(view.tick(world({ abilityCharges: { ice_block: { charges: 1 } } })).slots[0].count).toBe(
+      '1',
+    );
+    // A single-charge ability (no bonusCharges) still shows no badge.
+    const single = createActionBarView(
+      descriptor(slot(1, { ability: ability('frostbolt') })),
+      fakeDeps(),
+    );
+    expect(single.tick(world()).slots[0].count).toBe('');
   });
 
   it('paints the shared potion cooldown swipe on a potion item-slot', () => {

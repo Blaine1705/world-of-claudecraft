@@ -205,6 +205,8 @@ const baseEnTable = {
   'aura.elixirBear': 'Might of the Bear',
   // Shared Bloodlust / Temporal Acceleration exhaustion debuff (combat/haste_burst.ts).
   'aura.temporalExhaustion': 'Temporal Exhaustion',
+  // Cauterize's 5 min lockout debuff (combat/fire_mage.ts); survives death.
+  'aura.cauterizeFatigue': 'Cauterize Fatigue',
   'mechanic.warStomp': 'Shuddering Stomp',
   'mechanic.boneCarapace': 'Bone Carapace',
   'mechanic.bansheesWail': 'Keening Wail',
@@ -339,6 +341,8 @@ const baseEnTable = {
   'aura.fingersOfFrost': 'Fingers of Frost',
   'aura.brainFreeze': 'Brain Freeze',
   'aura.wintersChill': "Winter's Chill",
+  'aura.icicles': 'Icicles',
+  'aura.perfectMoment': 'Perfect Moment',
 } as const;
 
 const petEnTable = {
@@ -356,6 +360,7 @@ const petEnTable = {
   'error.noLivingPet': 'You have no living pet.',
   'error.petNeedsHostileTarget': 'Your pet needs a hostile target.',
   'error.petTauntNotReady': 'Pet taunt is not ready.',
+  'error.petCannotTaunt': 'This pet cannot taunt.',
   'petGrowl.ready': "Your pet's Growl is ready. {autoState}",
   'petGrowl.cooldown': "Your pet's Growl is on cooldown. {autoState} Ready in {seconds}s.",
   'petGrowl.autoOn': 'Auto-taunt is on.',
@@ -3997,6 +4002,7 @@ const PET_DICT_EN: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'You have no living pet.',
   'error.petNeedsHostileTarget': 'Your pet needs a hostile target.',
   'error.petTauntNotReady': 'Pet taunt is not ready.',
+  'error.petCannotTaunt': 'This pet cannot taunt.',
   'petGrowl.ready': "Your pet's Growl is ready. {autoState}",
   'petGrowl.cooldown': "Your pet's Growl is on cooldown. {autoState} Ready in {seconds}s.",
   'petGrowl.autoOn': 'Auto-taunt is on.',
@@ -4042,6 +4048,7 @@ const PET_DICT_ES: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'No tienes una mascota viva.',
   'error.petNeedsHostileTarget': 'Tu mascota necesita un objetivo hostil.',
   'error.petTauntNotReady': 'La provocación de mascota no está lista.',
+  'error.petCannotTaunt': 'Esta mascota no puede provocar.',
   'petGrowl.ready': 'El Gruñido de tu mascota está listo. {autoState}',
   'petGrowl.cooldown':
     'El Gruñido de tu mascota está en reutilización. {autoState} Listo en {seconds}s.',
@@ -4088,6 +4095,7 @@ const PET_DICT_FR: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': "Vous n'avez pas de familier vivant.",
   'error.petNeedsHostileTarget': "Votre familier a besoin d'une cible hostile.",
   'error.petTauntNotReady': "La provocation du familier n'est pas prête.",
+  'error.petCannotTaunt': 'Ce familier ne peut pas provoquer.',
   'petGrowl.ready': 'Le Grondement de votre familier est prêt. {autoState}',
   'petGrowl.cooldown':
     'Le Grondement de votre familier est en recharge. {autoState} Prêt dans {seconds}s.',
@@ -4134,6 +4142,7 @@ const PET_DICT_IT: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'Non hai una mascotte viva.',
   'error.petNeedsHostileTarget': 'La tua mascotte ha bisogno di un bersaglio ostile.',
   'error.petTauntNotReady': 'La provocazione della mascotte non è pronta.',
+  'error.petCannotTaunt': 'Questa mascotte non può provocare.',
   'petGrowl.ready': 'Il Ringhio della tua mascotte è pronto. {autoState}',
   'petGrowl.cooldown':
     'Il Ringhio della tua mascotte è in recupero. {autoState} Pronto tra {seconds}s.',
@@ -4181,6 +4190,7 @@ const PET_DICT_DE: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'Du hast kein lebendes Begleittier.',
   'error.petNeedsHostileTarget': 'Dein Begleiter braucht ein feindliches Ziel.',
   'error.petTauntNotReady': 'Der Begleiterspott ist noch nicht bereit.',
+  'error.petCannotTaunt': 'Dieser Begleiter kann nicht spotten.',
   'petGrowl.ready': 'Knurren deines Begleiters ist bereit. {autoState}',
   'petGrowl.cooldown':
     'Knurren deines Begleiters hat Abklingzeit. {autoState} Bereit in {seconds}s.',
@@ -4226,6 +4236,7 @@ const PET_DICT_ZH_CN: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': '你没有活着的宠物。',
   'error.petNeedsHostileTarget': '你的宠物需要一个敌对目标。',
   'error.petTauntNotReady': '宠物嘲讽尚未就绪。',
+  'error.petCannotTaunt': '该宠物无法嘲讽。',
   'petGrowl.ready': '宠物低吼已就绪。{autoState}',
   'petGrowl.cooldown': '宠物低吼正在冷却。{autoState} {seconds}s 后就绪。',
   'petGrowl.autoOn': '自动嘲讽已开启。',
@@ -4269,6 +4280,7 @@ const PET_DICT_ZH_TW: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': '你沒有活著的寵物。',
   'error.petNeedsHostileTarget': '你的寵物需要一個敵對目標。',
   'error.petTauntNotReady': '寵物嘲諷尚未就緒。',
+  'error.petCannotTaunt': '該寵物無法嘲諷。',
   'petGrowl.ready': '寵物低吼已就緒。{autoState}',
   'petGrowl.cooldown': '寵物低吼正在冷卻。{autoState} {seconds}s 後就緒。',
   'petGrowl.autoOn': '自動嘲諷已開啟。',
@@ -4313,6 +4325,7 @@ const PET_DICT_KO: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': '살아 있는 소환수가 없습니다.',
   'error.petNeedsHostileTarget': '소환수에게 적대적인 대상이 필요합니다.',
   'error.petTauntNotReady': '소환수 도발이 아직 준비되지 않았습니다.',
+  'error.petCannotTaunt': '이 소환수는 도발할 수 없습니다.',
   'petGrowl.ready': '소환수의 포효가 준비되었습니다. {autoState}',
   'petGrowl.cooldown':
     '소환수의 포효가 재사용 대기 중입니다. {autoState} {seconds}s 후 준비됩니다.',
@@ -4358,6 +4371,7 @@ const PET_DICT_JA: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': '生きているペットがいません。',
   'error.petNeedsHostileTarget': 'ペットには敵対的な対象が必要です。',
   'error.petTauntNotReady': 'ペットの挑発はまだ準備できていません。',
+  'error.petCannotTaunt': 'このペットは挑発できません。',
   'petGrowl.ready': 'ペットのグロウルは準備完了です。{autoState}',
   'petGrowl.cooldown': 'ペットのグロウルはクールダウン中です。{autoState} {seconds}s後に準備完了。',
   'petGrowl.autoOn': '自動挑発はオンです。',
@@ -4403,6 +4417,7 @@ const PET_DICT_PT: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'Você não tem um mascote vivo.',
   'error.petNeedsHostileTarget': 'Seu mascote precisa de um alvo hostil.',
   'error.petTauntNotReady': 'A provocação do mascote não está pronta.',
+  'error.petCannotTaunt': 'Este mascote não pode provocar.',
   'petGrowl.ready': 'O Rosnar do seu mascote está pronto. {autoState}',
   'petGrowl.cooldown': 'O Rosnar do seu mascote está em recarga. {autoState} Pronto em {seconds}s.',
   'petGrowl.autoOn': 'Provocação automática ativada.',
@@ -4448,6 +4463,7 @@ const PET_DICT_RU: Record<PetSimMessageKey, string> = {
   'error.noLivingPet': 'У вас нет живого питомца.',
   'error.petNeedsHostileTarget': 'Вашему питомцу нужна враждебная цель.',
   'error.petTauntNotReady': 'Провокация питомца ещё не готова.',
+  'error.petCannotTaunt': 'Этот питомец не может провоцировать.',
   'petGrowl.ready': 'Рык вашего питомца готов. {autoState}',
   'petGrowl.cooldown': 'Рык вашего питомца восстанавливается. {autoState} Готово через {seconds}с.',
   'petGrowl.autoOn': 'Автопровокация включена.',
@@ -4580,6 +4596,7 @@ function locPetGrowlAutoState(state: string): string {
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
   'Temporal Exhaustion': 'aura.temporalExhaustion',
+  'Cauterize Fatigue': 'aura.cauterizeFatigue',
   'Might of the Bear': 'aura.elixirBear',
   Summoned: 'aura.summoned',
   Fed: 'aura.fed',
@@ -4674,6 +4691,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Fingers of Frost': 'aura.fingersOfFrost',
   'Brain Freeze': 'aura.brainFreeze',
   "Winter's Chill": 'aura.wintersChill',
+  Icicles: 'aura.icicles',
+  'Perfect Moment': 'aura.perfectMoment',
   // Talent-proc buff/ward names (choice rows).
   'Searing Light': 'aura.searingLight',
   'Lingering Grace': 'aura.lingeringGraceWard',

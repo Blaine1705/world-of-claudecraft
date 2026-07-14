@@ -7,6 +7,9 @@ const abilityStringsEn = {
     actionBar: {
       attackName: 'Attack',
       attackTooltip: 'Toggle auto-attack on your target. Right-clicking an enemy also attacks.',
+      // Shown under the Attack tooltip: right-click removes the button from the bar,
+      // freeing the slot (and its key) for a normal action. Restored in Options.
+      attackRemoveHint: 'Right-click to remove it from the bar and free the slot.',
       emptySlot: 'Empty slot',
       slotAria: 'Action slot {slot}: {ability}',
       emptySlotAria: 'Action slot {slot}: empty',
@@ -749,6 +752,21 @@ const classAbilityNamesEn = {
         'blizzard',
         'Blizzard',
         'Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
+      ],
+      [
+        'glacial_spike',
+        'Glacial Spike',
+        'Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)',
+      ],
+      [
+        'glacial_front',
+        'Glacial Front',
+        'Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)',
+      ],
+      [
+        'dragons_breath',
+        "Dragon's Breath",
+        'Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)',
       ],
       [
         'fingers_of_frost',
@@ -1634,7 +1652,7 @@ const classAbilityNamesEn = {
       [
         'evocation',
         'Aetherwell',
-        'Channel for 6 sec: each second restores 40 mana and builds 8 spell power, stacking while you channel. (Mage talent)',
+        'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)',
       ],
       [
         'frenzied_regeneration',
@@ -1733,6 +1751,11 @@ const classAbilityNamesEn = {
         'temporal_acceleration',
         'Temporal Acceleration',
         'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)',
+      ],
+      [
+        'perfect_moment',
+        'Perfect Moment',
+        'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)',
       ],
       [
         'arcane_surge',

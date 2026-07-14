@@ -579,6 +579,7 @@ export const nl_NL: EnTranslations = {
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
+      "showAttackButton": "Show Attack Button",
       "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
@@ -1167,6 +1168,33 @@ export const nl_NL: EnTranslations = {
     "playerFrame": {
       "unlock": "Spelerframe verplaatsen",
       "lock": "Spelerframe vergrendelen"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Frameposities herstellen"
@@ -4619,6 +4647,7 @@ export const nl_NL: EnTranslations = {
     },
     "pet": {
       "attack": "Aanvallen",
+      "waterJet": "Water Jet",
       "taunt": "Provoceren",
       "healDemon": "Demon genezen",
       "healPet": "Huisdier genezen",
@@ -4627,6 +4656,8 @@ export const nl_NL: EnTranslations = {
       "aggressive": "Agressief",
       "petAttackTitle": "Huisdier aanval",
       "petAttackDesc": "Beveel je huisdier om je huidige vijandige doelwit aan te vallen.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Huisdier provoceren",
       "petTauntDesc": "Beveel je huisdier om aan te vallen en te Grommen wanneer het binnen bereik is. Afkoeltijd van 10 seconden.",
       "healDemonDesc": "Besteed mana om gedurende 5 seconden genezing in je demon te kanaliseren.",
@@ -4749,6 +4780,7 @@ export const nl_NL: EnTranslations = {
     "actionBar": {
       "attackName": "Aanvallen",
       "attackTooltip": "Schakel auto-aanval op je doelwit in of uit. Rechtsklikken op een vijand valt ook aan.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Lege sleuf",
       "slotAria": "Actiesleuf {slot}: {ability}",
       "emptySlotAria": "Actiesleuf {slot}: leeg",
@@ -5277,6 +5309,18 @@ export const nl_NL: EnTranslations = {
       "blizzard": {
         "name": "Blizzard",
         "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
       },
       "fingers_of_frost": {
         "name": "Fingers of Frost",
@@ -6189,6 +6233,10 @@ export const nl_NL: EnTranslations = {
       "temporal_acceleration": {
         "name": "Temporal Acceleration",
         "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
       },
       "arcane_surge": {
         "name": "Aether Surge",

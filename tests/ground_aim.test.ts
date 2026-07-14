@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ABILITIES } from '../src/sim/data';
 import type { AbilityEffect, Entity } from '../src/sim/types';
 import {
   abilityAoeRadius,
@@ -46,6 +47,10 @@ describe('ground_aim', () => {
     expect(abilityAoeRadius({ effects: [{ type: 'directDamage', min: 1, max: 2 }] })).toBe(
       DEFAULT_GROUND_AOE_RADIUS,
     );
+  });
+
+  it('uses Meteor actual 8-yard impact radius', () => {
+    expect(abilityAoeRadius(ABILITIES.meteor)).toBe(8);
   });
 
   it('transitions enter to cancel to commit', () => {

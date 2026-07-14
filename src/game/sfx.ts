@@ -11,6 +11,7 @@
 
 import type { BiomeId } from '../sim/types';
 import { SFX_CLIPS } from './sfx_manifest.generated';
+import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
 const MAX_VOICES = 24; // concurrent one-shot sources (frame-budget guard)
@@ -110,6 +111,16 @@ class Sfx {
     try {
       this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6, false));
       this.buffers.set('vcup_crowd_roar', this.makeCrowdBuffer(ctx, 2.6, true));
+      for (const cue of [
+        'aggro',
+        'attack',
+        'death',
+      ] as const satisfies readonly WaterElementalCue[]) {
+        const samples = waterElementalSamples(cue, ctx.sampleRate);
+        const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+        buffer.getChannelData(0).set(samples);
+        this.buffers.set(`mob_water_elemental_${cue}`, buffer);
+      }
     } catch {
       /* stub AudioContext in tests: the keys just stay silent */
     }

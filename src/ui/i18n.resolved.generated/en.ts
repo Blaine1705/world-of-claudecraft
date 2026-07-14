@@ -579,6 +579,7 @@ export const en: EnTranslations = {
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
+      "showAttackButton": "Show Attack Button",
       "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
@@ -1167,6 +1168,33 @@ export const en: EnTranslations = {
     "playerFrame": {
       "unlock": "Move player frame",
       "lock": "Lock player frame"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Reset Frame Positions"
@@ -4619,6 +4647,7 @@ export const en: EnTranslations = {
     },
     "pet": {
       "attack": "Attack",
+      "waterJet": "Water Jet",
       "taunt": "Taunt",
       "healDemon": "Heal Demon",
       "healPet": "Feed Pet",
@@ -4627,8 +4656,10 @@ export const en: EnTranslations = {
       "aggressive": "Aggressive",
       "petAttackTitle": "Pet Attack",
       "petAttackDesc": "Command your pet to attack your current hostile target.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Pet Taunt",
-      "petTauntDesc": "Command your pet to engage and Growl when in range. 10 second cooldown.",
+      "petTauntDesc": "Command your pet to engage and Growl when in range. 10 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "healDemonDesc": "Spend mana to channel healing into your demon over 5 seconds.",
       "healPetDesc": "Click, then click food in your bags to feed your pet, healing it over 5 seconds.",
       "stanceTitle": "Pet Stance",
@@ -4749,6 +4780,7 @@ export const en: EnTranslations = {
     "actionBar": {
       "attackName": "Attack",
       "attackTooltip": "Toggle auto-attack on your target. Right-clicking an enemy also attacks.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Empty slot",
       "slotAria": "Action slot {slot}: {ability}",
       "emptySlotAria": "Action slot {slot}: empty",
@@ -5277,6 +5309,18 @@ export const en: EnTranslations = {
       "blizzard": {
         "name": "Blizzard",
         "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
       },
       "fingers_of_frost": {
         "name": "Fingers of Frost",
@@ -6100,7 +6144,7 @@ export const en: EnTranslations = {
       },
       "evocation": {
         "name": "Aetherwell",
-        "description": "Channel for 6 sec: each second restores 40 mana and builds 8 spell power, stacking while you channel. (Mage talent)"
+        "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)"
       },
       "frenzied_regeneration": {
         "name": "Savage Mending",
@@ -6189,6 +6233,10 @@ export const en: EnTranslations = {
       "temporal_acceleration": {
         "name": "Temporal Acceleration",
         "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
       },
       "arcane_surge": {
         "name": "Aether Surge",
