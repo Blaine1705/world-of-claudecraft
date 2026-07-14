@@ -238,6 +238,9 @@ const localeTextByBase = {
     },
     masteryDescriptions: {
       arms: 'Mientras empuñas un arma a dos manos, infliges un 10% más de daño.',
+      fire: 'Tus hechizos de Fuego que asestan golpes críticos aplican Ignición, que inflige un 40% del daño durante 6 s y se acumula. Aumenta además tu probabilidad de crítico un 2%.',
+      arcane:
+        'Aumenta toda la sanación que realizas un 15%, tu maná máximo un 5% y tu regeneración de maná un 20%.',
     },
     grant: (abilityName) => `Otorga ${abilityName}.`,
     increase: (target, amount, perRank) => `Aumenta ${target} en ${amount}${perRank}.`,
