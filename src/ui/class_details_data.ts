@@ -132,6 +132,6 @@ export const SPEC_CARD_INFO: Record<string, SpecCardInfo> = {
   arcane: {
     primaryStat: 'int',
     complexity: 'high',
-    examples: ['temporal_mend', 'temporal_cascade', 'temporal_rewind', 'arcane_power'],
+    examples: ['temporal_mend', 'temporal_cascade', 'temporal_rewind', 'perfect_moment'],
   },
 };

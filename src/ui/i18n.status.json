@@ -35,8 +35,8 @@
   "counts": {
     "keys": 7023,
     "rows": 147483,
-    "translated": 143977,
-    "pending": 3313,
+    "translated": 143981,
+    "pending": 3309,
     "blocked": 193,
     "blockedSource": 96
   },
@@ -127394,10 +127394,14 @@
       "placeholders": [],
       "locales": {
         "es": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "aa1513e47dc6f1b6",
+          "by": "human"
         },
         "es_ES": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "aa1513e47dc6f1b6",
+          "by": "human"
         },
         "fr_FR": {
           "state": "pending"
@@ -127466,10 +127470,14 @@
       "placeholders": [],
       "locales": {
         "es": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "71ba9ceeb86b29d4",
+          "by": "human"
         },
         "es_ES": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "71ba9ceeb86b29d4",
+          "by": "human"
         },
         "fr_FR": {
           "state": "pending"

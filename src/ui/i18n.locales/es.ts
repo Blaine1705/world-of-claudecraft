@@ -3261,6 +3261,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_power.name': 'Poder Arcano',
   'entities.abilities.arcane_power.description':
     'Aumenta el daño con hechizos un 20% y la celeridad con hechizos un 10% durante 10 s. (habilidad distintiva de Arcano)',
+  'entities.abilities.perfect_moment.name': 'Momento perfecto',
+  'entities.abilities.perfect_moment.description':
+    'Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)',
   'entities.abilities.combustion.name': 'Combustión',
   'entities.abilities.combustion.description':
     'Combustión: durante 10 s tus hechizos de Fuego siempre asestan golpes críticos, incluidos los proyectiles ya en vuelo. No activa el tiempo de reutilización global. Estos críticos acumulan Buena Racha como cualquier otro. (habilidad distintiva de Fuego)',

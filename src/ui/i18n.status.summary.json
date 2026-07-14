@@ -34,20 +34,20 @@
   "counts": {
     "keys": 7023,
     "rows": 147483,
-    "translated": 143977,
-    "pending": 3313,
+    "translated": 143981,
+    "pending": 3309,
     "blocked": 193,
     "blockedSource": 96
   },
   "perLocale": {
     "es": {
-      "translated": 6850,
-      "pending": 167,
+      "translated": 6852,
+      "pending": 165,
       "blocked": 6
     },
     "es_ES": {
-      "translated": 6850,
-      "pending": 167,
+      "translated": 6852,
+      "pending": 165,
       "blocked": 6
     },
     "fr_FR": {
