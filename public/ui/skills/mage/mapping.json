@@ -365,6 +365,12 @@
       "output": "temporal_acceleration.webp"
     },
     {
+      "abilityId": "perfect_moment",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/poder arcano.png",
+      "output": "perfect_moment.webp"
+    },
+    {
       "abilityId": "combustion",
       "sourcePack": "custom-user",
       "sourceFile": "C:/Users/joseg/Desktop/combustion.png (combustion crop)",

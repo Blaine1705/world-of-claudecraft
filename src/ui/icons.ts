@@ -3577,6 +3577,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'temporal_reversal',
   'temporal_rewind',
   'temporal_acceleration',
+  'perfect_moment',
   // druid (CraftPix premium "RPG Druid" pack). moonfire (no moon), bear_charge, pounce,
   // demoralizing_roar, hibernate (no sleep), insect_swarm have no fitting art — procedural.
   'wrath',
