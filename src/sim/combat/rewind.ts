@@ -39,9 +39,20 @@ export function selectRewindTargets(ctx: SimContext, caster: Entity, radius: num
 // HP ). 0 when the ally took no recent damage or is already at full health. No rng.
 export function rewindHealFor(ctx: SimContext, ally: Entity, p: RewindParams): number {
   const recent = damageTakenWithin(ally, ctx.tickCount, Math.round(p.windowSec * 20));
-  const fromDamage = Math.round(recent * p.fraction);
-  const maxHpCap = Math.round(ally.maxHp * p.maxHpFraction);
-  const missing = ally.maxHp - ally.hp;
+  return rewindHealAmount(recent, ally.hp, ally.maxHp, p.fraction, p.maxHpFraction);
+}
+
+/** Pure preview shared by Rewind and party-frame wire projection. */
+export function rewindHealAmount(
+  recentDamage: number,
+  hp: number,
+  maxHp: number,
+  fraction = 0.3,
+  maxHpFraction = 0.35,
+): number {
+  const fromDamage = Math.round(recentDamage * fraction);
+  const maxHpCap = Math.round(maxHp * maxHpFraction);
+  const missing = maxHp - hp;
   return Math.max(0, Math.min(fromDamage, maxHpCap, missing));
 }
 

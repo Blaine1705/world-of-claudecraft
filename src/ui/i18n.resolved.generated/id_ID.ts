@@ -871,6 +871,8 @@ export const id_ID: EnTranslations = {
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
       "mobileLeftHanded": "Tata letak kidal"
@@ -1454,6 +1456,33 @@ export const id_ID: EnTranslations = {
     "playerFrame": {
       "unlock": "Pindahkan bingkai pemain",
       "lock": "Kunci bingkai pemain"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Atur Ulang Posisi Bingkai"
@@ -5144,6 +5173,7 @@ export const id_ID: EnTranslations = {
     },
     "pet": {
       "attack": "Serang",
+      "waterJet": "Water Jet",
       "taunt": "Provokasi",
       "healDemon": "Sembuhkan Iblis",
       "healPet": "Sembuhkan Peliharaan",
@@ -5152,6 +5182,8 @@ export const id_ID: EnTranslations = {
       "aggressive": "Agresif",
       "petAttackTitle": "Serangan Peliharaan",
       "petAttackDesc": "Perintahkan peliharaan Anda untuk menyerang target bermusuhan Anda saat ini.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Provokasi Peliharaan",
       "petTauntDesc": "Perintahkan peliharaan Anda untuk menyerbu dan Menggeram saat dalam jangkauan. Waktu jeda 10 detik.",
       "healDemonDesc": "Habiskan mana untuk menyalurkan penyembuhan ke iblis Anda selama 5 detik.",
@@ -5274,6 +5306,7 @@ export const id_ID: EnTranslations = {
     "actionBar": {
       "attackName": "Serang",
       "attackTooltip": "Alihkan serangan otomatis pada targetmu. Klik kanan pada musuh juga menyerang.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Slot kosong",
       "slotAria": "Slot aksi {slot}: {ability}",
       "emptySlotAria": "Slot aksi {slot}: kosong",
@@ -5785,6 +5818,18 @@ export const id_ID: EnTranslations = {
       "blizzard": {
         "name": "Blizzard",
         "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
       },
       "fingers_of_frost": {
         "name": "Fingers of Frost",
@@ -6593,6 +6638,10 @@ export const id_ID: EnTranslations = {
       "temporal_acceleration": {
         "name": "Temporal Acceleration",
         "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
       },
       "arcane_surge": {
         "name": "Aether Surge",

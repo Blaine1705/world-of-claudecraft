@@ -232,8 +232,7 @@ export class TalentsWindow {
     const classDescription = tEntity({ kind: 'class', id: cls, field: 'description' });
     el.innerHTML =
       `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
-      `<div class="tal-head"><span>${t('game.talents.choicesTab')}: <b>${view.rowsPicked}</b> / ${view.rowsUnlocked}</span></div>` +
-      `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>` +
+      `<p class="ts-class-description">${esc(classDescription)}</p>` +
       `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
       `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span></div>` +
       `<div class="tal-tab${this.tab === 'choices' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'choices' ? '0' : '-1'}" aria-selected="${this.tab === 'choices'}" aria-controls="tal-body" data-tab="choices"><span class="tal-tab-label">${t('game.talents.choicesTab')}</span><span class="tt-pts">${view.rowsPicked}/${view.rowsUnlocked}</span></div>` +

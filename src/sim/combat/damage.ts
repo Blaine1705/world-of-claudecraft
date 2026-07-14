@@ -56,7 +56,12 @@ import {
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
 import { recordDamageTaken } from './damage_history';
-import { igniteOnCrit, PERSONAL_BARRIER_IDS } from './fire_mage';
+import {
+  cauterizeFireDamageMult,
+  fireMageCauterize,
+  igniteOnCrit,
+  PERSONAL_BARRIER_IDS,
+} from './fire_mage';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -487,6 +492,12 @@ export function dealDamage(
     }
   }
 
+  // Cauterize (fire spec passive, combat/fire_mage.ts): the FIRST lethal hit heals the
+  // mage to 25% max HP and sets them burning instead of killing them. Checked before
+  // the generic cheat-death: on a save it negates the blow (returns 0), so the generic
+  // save below sees a non-lethal amount and does not also fire.
+  const cauterized = fireMageCauterize(ctx, target, amount);
+  if (cauterized !== null) amount = cauterized;
   // Cheat death (talent global): a killing blow leaves the player at 1 hp
   // instead, gated by a long internal cooldown on procState. No rng.
   if (target.kind === 'player' && amount >= target.hp && !target.dead) {

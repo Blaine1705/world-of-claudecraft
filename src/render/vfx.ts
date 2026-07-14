@@ -179,6 +179,15 @@ interface Projectile {
   scale?: number;
 }
 
+interface BubbleBeam {
+  sourceId: number;
+  targetId: number;
+  remaining: number;
+  group: THREE.Group;
+  core: THREE.Mesh;
+  water: THREE.Mesh;
+}
+
 // fire reads as flame tongues; everything else as sparkling magic
 function projectileSprites(school: string): { core: number; trail: number } {
   return school === 'fire'
@@ -438,8 +447,61 @@ export class Vfx {
     this.spawn(to.x, to.y, to.z, 0, 0.2, 0, color, 0.9, 0.2, 0, SPR.magicRune);
   }
 
-  // A "bolt-shaped" traveling projectile: fires a homing bolt with the SAME
-  // travel + impact timing as a normal spell projectile (so the damage lands when
+  /** Water Jet's sustained hose: a bright liquid core surrounded by larger
+   * ring-shaped bubbles that rise as they travel between both moving anchors. */
+  bubbleBeam(sourceId: number, targetId: number, duration: number): void {
+    const existing = this.bubbleBeams.find((b) => b.sourceId === sourceId);
+    if (duration <= 0) {
+      if (existing) {
+        this.removeBubbleBeam(this.bubbleBeams.indexOf(existing));
+      }
+      return;
+    }
+    if (existing) {
+      existing.targetId = targetId;
+      existing.remaining = duration;
+      return;
+    }
+    const geometry = new THREE.CylinderGeometry(1, 1, 1, 10, 1, false);
+    const water = new THREE.Mesh(
+      geometry,
+      new THREE.MeshBasicMaterial({
+        color: 0x42bfe8,
+        transparent: true,
+        opacity: 0.48,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    );
+    const core = new THREE.Mesh(
+      geometry,
+      new THREE.MeshBasicMaterial({
+        color: 0xc5f7ff,
+        transparent: true,
+        opacity: 0.88,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    );
+    water.renderOrder = 5;
+    core.renderOrder = 6;
+    const group = new THREE.Group();
+    group.userData.renderCategory = 'vfx';
+    group.add(water, core);
+    this.scene.add(group);
+    this.bubbleBeams.push({ sourceId, targetId, remaining: duration, group, core, water });
+  }
+
+  private removeBubbleBeam(index: number): void {
+    const stream = this.bubbleBeams[index];
+    if (!stream) return;
+    this.scene.remove(stream.group);
+    stream.water.geometry.dispose();
+    (stream.water.material as THREE.Material).dispose();
+    (stream.core.material as THREE.Material).dispose();
+    this.bubbleBeams.splice(index, 1);
+  }
+
   // Chain Heal's signature arc: a bright green cord that lifts in a gentle parabola
   // from the source ally to the target, denser and softer than a nuke beam so it
   // reads as flowing healing water rather than crackling lightning. Each hop of the

@@ -871,6 +871,8 @@ export const zh_CN: EnTranslations = {
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "显示目标的目标",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
       "mobileLeftHanded": "左手布局"
@@ -1454,6 +1456,33 @@ export const zh_CN: EnTranslations = {
     "playerFrame": {
       "unlock": "移动玩家框",
       "lock": "锁定玩家框"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "重置框体位置"
@@ -5144,6 +5173,7 @@ export const zh_CN: EnTranslations = {
     },
     "pet": {
       "attack": "攻击",
+      "waterJet": "Water Jet",
       "taunt": "嘲讽",
       "healDemon": "治疗恶魔",
       "healPet": "治疗宠物",
@@ -5152,6 +5182,8 @@ export const zh_CN: EnTranslations = {
       "aggressive": "攻击",
       "petAttackTitle": "宠物攻击",
       "petAttackDesc": "命令你的宠物攻击当前敌对目标。",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "宠物嘲讽",
       "petTauntDesc": "命令你的宠物接战，并在进入范围时使用低吼。10 秒冷却。",
       "healDemonDesc": "消耗法力，在 5 秒内向你的恶魔引导治疗。",
@@ -5274,6 +5306,7 @@ export const zh_CN: EnTranslations = {
     "actionBar": {
       "attackName": "攻击",
       "attackTooltip": "对目标开启或关闭自动攻击。右键点击敌人也会发起攻击。",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "空栏位",
       "slotAria": "动作栏位 {slot}：{ability}",
       "emptySlotAria": "动作栏位 {slot}：空",
@@ -5785,6 +5818,18 @@ export const zh_CN: EnTranslations = {
       "blizzard": {
         "name": "Blizzard",
         "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
       },
       "fingers_of_frost": {
         "name": "Fingers of Frost",
@@ -6593,6 +6638,10 @@ export const zh_CN: EnTranslations = {
       "temporal_acceleration": {
         "name": "Temporal Acceleration",
         "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
       },
       "arcane_surge": {
         "name": "Aether Surge",

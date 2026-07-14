@@ -135,7 +135,10 @@ const MAGE_SPECS: SpecDef[] = [
     'dps',
     'x',
     'A volatile caster built around fast, high-damage Fire spells.',
-    'combustion',
+    // Signature swapped to the Hot Streak spender (owner leveling pass 2026-07-14):
+    // Combustion moved into the spec kit at level 12, and a signature grant would
+    // bypass that learnLevel gate (grants always do).
+    'pyroblast',
     'Ignition',
     'Your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. Increases critical strike chance by 2%.',
     // The burn fraction is the scalable mastery axis (runtime: fire_mage's
@@ -150,7 +153,9 @@ const MAGE_SPECS: SpecDef[] = [
     'dps',
     '#',
     'A controlling caster who trades peak burst for survival and slows.',
-    'icy_veins',
+    // Signature swapped to the proc spender (owner leveling pass 2026-07-14):
+    // Icy Veins moved into the spec kit at level 12 (see combustion above).
+    'ice_lance',
     'Brittlebreak',
     'Increases your Frost spell damage by 25%. Increases armor by 10%.',
     // The scalable mastery axis is the Frost-kit damage (ability-scoped so the

@@ -18,6 +18,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/
 // Date.now/performance.now (enforced by tests/architecture.test.ts).
 
+import { isDebuffAura, isPartyFrameRelevantAura } from '../aura_classify';
 import { ABILITIES } from '../data';
 import { recordCascadeConversion, recordCascadeDamage } from '../dev/cascade_playtest';
 import type { SimContext } from '../sim_context';
@@ -60,6 +61,14 @@ function echoRateFor(a: Aura, aoe: boolean): number {
 export function echoVisibleTo(a: { kind: string; sourceId: number }, viewerId: number): boolean {
   if (a.kind !== 'temporal_echo') return true;
   return a.sourceId === viewerId;
+}
+
+/** Raid-frame aura order: harmful effects, own Echo, healer effects, then maintenance buffs. */
+export function partyAuraPriority(aura: Aura): number {
+  if (!isPartyFrameRelevantAura(aura)) return 3;
+  if (isDebuffAura(aura.kind, aura.value)) return 0;
+  if (aura.kind === 'temporal_echo') return 1;
+  return 2;
 }
 
 /**
@@ -433,6 +442,52 @@ export function armAetherSurgeFree(ctx: SimContext, caster: Entity): void {
   });
 }
 
+// Perfect Moment (owner design 2026-07-14): the Chronomancer's offensive
+// cooldown. Instantly slams the caster to FOUR Arcane Charges (the overlay bird
+// lights whole) and, for its window, Aether Darts stops consuming them: ten
+// seconds of chained full-charge barrages. Deterministic aura writes, no rng.
+export const PERFECT_MOMENT_ID = 'perfect_moment';
+export const PERFECT_MOMENT_DURATION = 10;
+
+/** Whether the caster's Perfect Moment window is open (Darts keeps its charges). */
+export function perfectMomentActive(e: Entity): boolean {
+  return e.auras.some((a) => a.id === PERFECT_MOMENT_ID);
+}
+
+/** Open the window: the marker buff plus a FULL charge stack whose remaining
+ *  matches the window, so the loaded bird can never decay inside it. Casting
+ *  Aether Surge inside the window refreshes/extends the charges normally. */
+export function applyPerfectMoment(ctx: SimContext, caster: Entity): void {
+  ctx.applyAura(caster, {
+    id: PERFECT_MOMENT_ID,
+    name: 'Perfect Moment',
+    kind: 'perfect_moment',
+    value: 0,
+    remaining: PERFECT_MOMENT_DURATION,
+    duration: PERFECT_MOMENT_DURATION,
+    sourceId: caster.id,
+    school: 'arcane',
+  });
+  ctx.applyAura(caster, {
+    id: ARCANE_SURGE_ID,
+    name: ARCANE_SURGE_NAME,
+    kind: 'arcane_charge',
+    remaining: PERFECT_MOMENT_DURATION,
+    duration: PERFECT_MOMENT_DURATION,
+    value: AETHER_SURGE_MAX_CHARGES,
+    stacks: AETHER_SURGE_MAX_CHARGES,
+    sourceId: caster.id,
+    school: 'arcane',
+  });
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: caster.id,
+    targetId: caster.id,
+    school: 'arcane',
+    fx: 'procSurge',
+  });
+}
+
 /** Channel-start hook (casting_lifecycle's channel block): arm the Aether Darts
  *  dump so the FIRST landed missile of THIS channel consumes the charges. Inert
  *  for every other channel. */
@@ -456,11 +511,16 @@ export function aetherDartsBoltBonus(ctx: SimContext, caster: Entity, ticks: num
   if (caster.aetherDartsConsumePending) {
     caster.aetherDartsConsumePending = false;
     const stacks = aetherSurgeStacks(caster);
-    const idx = caster.auras.findIndex((a) => a.id === ARCANE_SURGE_ID);
-    if (idx >= 0) {
-      const a = caster.auras[idx];
-      caster.auras.splice(idx, 1);
-      ctx.emit({ type: 'aura', targetId: caster.id, name: a.name, gained: false });
+    // Perfect Moment: the window's whole point is that the dump does NOT spend
+    // the charges (the bonus below still reads them), so back-to-back
+    // full-charge barrages chain for its duration.
+    if (!perfectMomentActive(caster)) {
+      const idx = caster.auras.findIndex((a) => a.id === ARCANE_SURGE_ID);
+      if (idx >= 0) {
+        const a = caster.auras[idx];
+        caster.auras.splice(idx, 1);
+        ctx.emit({ type: 'aura', targetId: caster.id, name: a.name, gained: false });
+      }
     }
     const total = AETHER_DARTS_BONUS_PER_CHARGE * stacks;
     // Split across the ACTUAL missile count this channel (5 at full charge, else the

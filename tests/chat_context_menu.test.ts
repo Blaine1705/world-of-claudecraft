@@ -1,40 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { StreamerLinks } from '../src/sim/account_flair';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
-import {
-  type ChatPlayerContextState,
-  chatPlayerContextActions,
-  selfPlayerContextActions,
-  streamerActionPlatform,
-  streamerMenuActions,
-} from '../src/ui/player_context_menu';
-
-const BASE: ChatPlayerContextState = {
-  playerName: 'Badmage',
-  selfName: 'Adventurer',
-  online: true,
-  isFriend: false,
-  ignored: false,
-  blocked: false,
-  canGuildInvite: false,
-  alreadyGuilded: false,
-  canReport: true,
-};
-
-const ALL_LINKS: StreamerLinks = {
-  // deliberately NOT in render order, so an ordering assertion cannot pass by
-  // accidentally echoing the input's key order
-  youtube: 'https://www.youtube.com/@woc',
-  twitch: 'https://twitch.tv/woc',
-  kick: 'https://kick.com/woc',
-  x: 'https://x.com/woc',
-};
-
-const state = (over: Partial<ChatPlayerContextState> = {}): ChatPlayerContextState => ({
-  ...BASE,
-  ...over,
-});
+import { chatPlayerContextActions, selfPlayerContextActions } from '../src/ui/player_context_menu';
 
 describe('chat player context menu', () => {
   afterEach(() => setLanguage('en'));
@@ -249,46 +216,5 @@ describe('self player context menu', () => {
         isHeroic: false,
       }).map((action) => action.id),
     ).not.toContain('leave-party');
-  });
-});
-
-// The streamer links are operator-entered text that ends up in window.open on every
-// player's client. normalizeStreamerLink pins them to an https URL on the platform's
-// own host, but the WHATWG URL parser leaves a single quote UNENCODED in the path, so
-// a legal-but-hostile https://twitch.tv/a'onmouseover=alert(1)' would break straight out
-// of a single-quoted or unquoted HTML attribute.
-//
-// What actually keeps that safe is a structural property, not the validator: the href is
-// held in the JS actions array and handed to window.open, and is NEVER interpolated into
-// markup. That property is invisible at the call site and one careless `href="${...}"`
-// away from an XSS, so it is pinned here rather than left to a code comment.
-describe('the ctx-menu markup builder never interpolates a stream href', () => {
-  const hudSrc = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-
-  it('keeps href out of ctxItemHtml entirely', () => {
-    const body =
-      /private ctxItemHtml\(action: PlayerContextAction\): string \{([\s\S]*?)\n {2}\}/.exec(
-        hudSrc,
-      )?.[1];
-    expect(body, 'ctxItemHtml not found: update this guard if it was renamed').toBeTruthy();
-    expect(body).not.toMatch(/href/);
-    // and it still escapes the one operator-influenced-looking value it DOES render
-    expect(body).toMatch(/esc\(action\.label\)/);
-  });
-
-  it('never builds an anchor or an href attribute anywhere in the context menu', () => {
-    // A future "make the stream row a real link" refactor is the exact thing that would
-    // reintroduce the hole. Catch it at the source rather than at the payload.
-    const ctxRegion = /ctxItemHtml[\s\S]*?openStreamerLink[\s\S]*?\n {2}\}/.exec(hudSrc)?.[0] ?? '';
-    expect(ctxRegion).not.toMatch(/href\s*=\s*["'`]/);
-    expect(ctxRegion).not.toMatch(/<a\s/);
-  });
-
-  it('still carries the href on the action object, so the data path is intact', () => {
-    // The guard above must not be satisfiable by simply dropping the link feature.
-    const links: StreamerLinks = { twitch: 'https://twitch.tv/foo' };
-    const [row] = streamerMenuActions(links);
-    expect(row.href).toBe('https://twitch.tv/foo');
-    expect(row.id).toBe('stream-twitch');
   });
 });

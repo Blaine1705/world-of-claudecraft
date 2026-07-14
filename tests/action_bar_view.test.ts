@@ -93,7 +93,6 @@ interface WorldOpts {
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
   abilityCharges?: { [id: string]: { charges: number } | undefined };
-  stealthed?: boolean;
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -111,7 +110,6 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
       auras: opts.auras ?? [],
       abilityCharges: opts.abilityCharges,
-      stealthed: opts.stealthed ?? false,
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],

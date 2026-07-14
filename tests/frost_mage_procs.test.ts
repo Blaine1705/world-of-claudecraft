@@ -136,13 +136,19 @@ describe('frost kit content defs', () => {
   });
 
   it('pins the three spec passives as effect-less frost-gated docs', () => {
-    for (const id of ['fingers_of_frost', 'brain_freeze', 'shatter']) {
+    // Owner leveling pass 2026-07-14: the two proc passives arrive at the spec
+    // pick (5); the Shatter payoff lands at 10.
+    for (const [id, lvl] of [
+      ['fingers_of_frost', 5],
+      ['brain_freeze', 5],
+      ['shatter', 10],
+    ] as const) {
       const def = ABILITIES[id];
       expect(def, id).toBeDefined();
       expect(def.passive, id).toBe(true);
       expect(def.specs, id).toEqual(['frost']);
       expect(def.effects, id).toEqual([]);
-      expect(def.learnLevel, id).toBe(5);
+      expect(def.learnLevel, id).toBe(lvl);
     }
   });
 

@@ -205,6 +205,11 @@ export type AuraKind =
   // no stat effect. While it rides, a target cannot benefit from another group haste
   // burst (aoeAllyHaste with exhaust), so the effects can never be chained.
   | 'sated'
+  // Cauterize lockout (fire mage, combat/fire_mage.ts): a pure debuff marking that
+  // the lethal save already fired. While worn, Cauterize cannot save again. It
+  // SURVIVES death (resurrection.ts aurasSurvivingDeath) and pauses while dead, so
+  // dying, reviving, and dying again inside the window never double-saves.
+  | 'cauterize_fatigue'
   | 'cast_shield'
   | 'hot'
   | 'absorb'
@@ -241,9 +246,16 @@ export type AuraKind =
   // cooldown and hits 30% harder (consumed in castAbility's override).
   // `winters_chill`: TARGET debuff with 2 charges; each compatible spell
   // impact spends one to count the target as frozen.
+  // `icicles`: self buff, up to 5 stacks, built by Rimelance impacts and Frozen
+  // Orb pulses. At 5 it gates Glacial Spike (requiresAuraStacks), which consumes
+  // the whole stack for its slow, heavy hit + a target freeze.
   | 'fingers_of_frost'
   | 'brain_freeze'
   | 'winters_chill'
+  | 'icicles'
+  // Chronomancer offensive cooldown (combat/chronomancy.ts): while worn, Aether
+  // Darts does not consume the caster's Arcane Charges.
+  | 'perfect_moment'
   // Warrior combat stances (mutually exclusive, exclusiveGroup 'warrior_stance').
   // `battle_stance`: the offensive default for Arms/Prot/no-spec; its only effect
   // is +STANCE_RAGE_GEN rage generation, folded in rageGenAuraMult below.
@@ -1443,11 +1455,19 @@ export interface MobTemplate {
   petRanged?: {
     range: number;
     school: Aura['school'];
-    // Water Jet (mage water elemental): every `every`-th attack the pet
-    // channels a beam instead of a bolt, leaving `total` damage ticking over
-    // `duration` at `interval` (pet_ai, deterministic counter on an aura).
-    jet?: { every: number; total: number; duration: number; interval: number };
+    // Water Jet (mage water elemental): the pet-bar command channels a beam,
+    // leaving `total` damage ticking over `duration` at `interval`.
+    jet?: {
+      total: number;
+      duration: number;
+      interval: number;
+      /** Movement multiplier while the channel connects (0.6 = 40% slow). */
+      slow: number;
+      cooldown: number;
+    };
   };
+  /** False for utility-free ranged summons such as the mage Water Elemental. */
+  petCanTaunt?: boolean;
   petRole?: PetRole;
   petSpell?: {
     name: string;
@@ -1580,6 +1600,9 @@ export type AbilityEffect =
   | { type: 'aoeFear'; duration: number; radius: number }
   | { type: 'clearCooldowns'; abilities: string[] }
   | { type: 'breakControl' }
+  // Ice Block: strip EVERY debuff (control, DoTs, stat saps, ...) off the caster.
+  // Broader than breakControl (which covers control auras only). See effect_dispatch.
+  | { type: 'cleanseSelf' }
   // Swept teleports: reposition along the line, stopping at walls/fences/steep
   // slopes/deep water (never clips through). repositionToAim uses the ground-target
   // aim point; blinkForward travels facing-forward (Shadeslip snaps behind the target).
@@ -1609,6 +1632,9 @@ export type AbilityEffect =
   // Chronomancy combat resurrection (Temporal Reversal): rewind a DEAD group/raid
   // member back to life at their corpse with `hpFrac` of their pools, no sickness.
   | { type: 'resurrectAlly'; hpFrac: number }
+  // Chronomancer offensive cooldown (Perfect Moment): slam the caster to full
+  // Arcane Charges and open the no-consume window (combat/chronomancy.ts).
+  | { type: 'perfectMoment' }
   // Chronomancy raid cooldown (Rewind / Rebobinar): instant, no target, centered on
   // the caster. Restores `fraction` of the REAL damage each living group/raid member
   // within `radius` took in the last `windowSec` seconds, capped per target at
@@ -1750,7 +1776,33 @@ export type AbilityEffect =
   | { type: 'aoeAllyDamage'; pct: number; duration: number; radius: number }
   | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
   | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
-  | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
+  | {
+      type: 'aoeRoot';
+      duration: number;
+      radius: number;
+      min: number;
+      max: number;
+      // Optional persistent annular trap. `duration` remains the root duration;
+      // the nested duration is how long the ring can catch new enemies.
+      ring?: { duration: number; innerRadius: number };
+    }
+  | {
+      type: 'empoweredCone';
+      angle: number;
+      slowMult?: number;
+      slowDuration?: number;
+      fx?: 'frostCone' | 'fireCone';
+      guaranteedCritLevel?: number;
+      hotStreakOnce?: boolean;
+      stages: readonly {
+        range: number;
+        min: number;
+        max: number;
+        angle?: number;
+        rootDuration?: number;
+        incapacitateDuration?: number;
+      }[];
+    }
   // Frozen Orb (combat/frozen_orb.ts): releases a slow-drifting orb from the
   // caster that pulses frost damage + a snare every `interval` for `duration`
   // seconds and feeds Fingers of Frost (frost mage spec kit).
@@ -1817,7 +1869,15 @@ export type AbilityEffect =
   | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
   // Mass Barrier (mage choice row): the caster and every friendly within radius
   // gain an absorb shield (the aoeAlly* family shape with an 'absorb' aura).
-  | { type: 'aoeAllyAbsorb'; amount: number; duration: number; radius: number }
+  | {
+      type: 'aoeAllyAbsorb';
+      amount: number;
+      duration: number;
+      radius: number;
+      // When set, only the NEAREST this many friendlies in radius are shielded (the
+      // caster included, distance 0). Absent = every friendly in radius.
+      maxTargets?: number;
+    }
   // Greater Invisibility (mage choice row): one dispatch applies the whole
   // package (a 'stealth'-kind vanish for `duration`, a buff_dr damage cut for
   // `duration` + `linger` so it survives an early break, and strips up to
@@ -1932,6 +1992,10 @@ export interface AbilityDef {
   // touching it (Fire Blast, Combustion; casting_lifecycle's through-cast
   // path, the same door Blink While Casting opens by talent).
   usableWhileCasting?: boolean;
+  // An escape/immunity press (Ice Block) that ignores control: it can be cast while
+  // stunned, polymorphed, incapacitated, silenced, or locked out, so it always frees
+  // the caster. The CC cast gate in casting_lifecycle skips those checks for it.
+  usableWhileControlled?: boolean;
   targetType?: 'enemy' | 'friendly' | 'any';
   // Restrict a friendly-target ability to the caster or a member of the caster's
   // group/raid (never an external friendly player, pet, or friendly NPC). Cascada
@@ -2907,6 +2971,7 @@ export type SimEvent = { pid?: number } & (
         // identical to 'projectile', only the renderer scales it up.
         | 'heavyBolt'
         | 'beam'
+        | 'bubbleBeam'
         | 'tick'
         | 'nova'
         | 'windup'
@@ -2923,12 +2988,19 @@ export type SimEvent = { pid?: number } & (
         // a brief temporal glyph blooming directly OVER the marked ally on apply.
         // Target-anchored, no projectile travels to the ally. Visual-only.
         | 'temporalGlyph'
+        | 'frostCone'
+        | 'fireCone'
         // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
         | 'blinkStep';
       // The casting ability's id, carried only by fx kinds whose visual varies per
       // ability (shouts pick their wave colour; weapon auras identify the buff).
       ability?: string;
+      /** Lifetime of a persistent visual such as Water Jet's bubble stream. */
+      duration?: number;
+      range?: number;
+      angle?: number;
+      level?: number;
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not

@@ -90,12 +90,6 @@ export interface ActionBarAuraInput {
   stacks?: number;
 }
 
-export interface ActionBarAuraInput {
-  kind: AuraKind;
-  value?: number;
-  empowerAbilities?: readonly string[];
-}
-
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
  *  slot's current binding and keybind label. NO element refs (those live on the
  *  painter descriptor); NO per-frame allocation (the accessors return existing refs
@@ -152,7 +146,17 @@ export interface ActionBarPlayerInput {
   potionCdRemaining: number;
   queuedOnSwing: string | null;
   pos: Vec3;
-  auras?: readonly ActionBarAuraInput[];
+  /** The player's worn auras: the free-cost proc read (Battle Trance /
+   *  next_cast_free) that drives the slot glow and usable state, the kill-window
+   *  gate, and the next-cast empowerment read. Both worlds expose the live aura
+   *  list. */
+  auras: readonly ActionBarAuraInput[];
+  /** Charge-limited abilities' spent counts (Double Charge); the recharge
+   *  timer itself rides `cooldowns`. Optional: absent when nothing is spent. */
+  charges?: { get(id: string): { spent: number } | undefined };
+  /** Live charges on the abilityCharges recharge model (Frost's second Ice Block):
+   *  the current count per ability id. Optional: absent when nothing uses it. */
+  abilityCharges?: { [id: string]: { charges: number } | undefined };
 }
 
 /** The target fields the bar reads; null when there is no current target. */

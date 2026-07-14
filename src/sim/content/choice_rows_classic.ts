@@ -9,6 +9,8 @@ const mageSpellAbilityIds = [
   'flurry',
   'frozen_orb',
   'blizzard',
+  'glacial_front',
+  'dragons_breath',
   'fire_blast',
   'frost_armor',
   'arcane_intellect',
@@ -323,12 +325,9 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r11_rings_of_frost',
           name: 'Ring of Frost',
           description:
-            'Grants Ring of Frost with 2 charges: root enemies in the target area for 4 sec.',
+            'Grants Ring of Frost: its perimeter persists for 10 sec and freezes enemies that cross it for 4 sec.',
           icon: 'rings_of_frost',
-          effect: {
-            grant: { ability: 'rings_of_frost' },
-            ability: [{ ability: 'rings_of_frost', bonusCharges: 1 }],
-          },
+          effect: { grant: { ability: 'rings_of_frost' } },
         },
         {
           id: 'mag_r11_snap_polymorph',

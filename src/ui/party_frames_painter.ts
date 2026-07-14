@@ -79,6 +79,8 @@ export interface PartyFramesPainterDeps {
   classCss: (cls: string) => string;
   onTarget: (pid: number) => void;
   onContextMenu: (pid: number, name: string, x: number, y: number) => void;
+  /** Hover tracking for Clique-style mouseover casts: pid on enter, null on leave. */
+  onHover: (pid: number | null) => void;
   /** The localized "Party" chip caption, re-read each update so an in-game language
    *  switch re-localizes it (through the elided setText). Mobile only. */
   chipLabel: () => string;

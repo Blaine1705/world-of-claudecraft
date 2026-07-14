@@ -21,7 +21,7 @@
 
 import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
-import { gainFingersOfFrost } from './frost_mage';
+import { gainFingersOfFrost, gainIcicle } from './frost_mage';
 import { spellDamageMultFromAuras } from './spell_combat';
 
 // Slow drift, WoW-style: fast enough to sweep a pack, slow enough that a
@@ -209,6 +209,10 @@ function pulseOrb(ctx: SimContext, orb: FrozenOrbState, source: Entity): void {
     struck++;
   }
   if (struck === 0) return;
+  // Each striking pulse also banks one Icicle toward Glacial Spike (deterministic,
+  // no rng, so it never shifts the shared stream); this is what makes the orb the
+  // spender's accelerator. One per pulse, not per target, matching the proc rule.
+  gainIcicle(ctx, source);
   // Proc generation: the orb's whole point. One guaranteed stack on the first
   // strike of the orb's life, then AT MOST one 20% roll per striking pulse
   // (never one per target, so pack size cannot flood the rng stream).

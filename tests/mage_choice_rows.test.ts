@@ -45,9 +45,13 @@ function tickFor(sim: Sim, seconds: number): void {
 }
 
 describe('mage base kit', () => {
-  it('Flickerstep (blink) is a BASE ability at level 5, no row pick needed', () => {
-    const ids = abilitiesKnownAt('mage', 5).map((k) => k.def.id);
-    expect(ids).toContain('blink');
+  it('Flickerstep (blink) is a BASE ability at level 10, no row pick needed', () => {
+    // Owner leveling pass 2026-07-14: blink moved 5 -> 10. NOTE the level-5 row
+    // still offers two blink-modifying picks; they simply come online at 10.
+    const at5 = abilitiesKnownAt('mage', 5).map((k) => k.def.id);
+    expect(at5).not.toContain('blink');
+    const at10 = abilitiesKnownAt('mage', 10).map((k) => k.def.id);
+    expect(at10).toContain('blink');
   });
 });
 
@@ -157,16 +161,24 @@ describe('mage choice rows (owner tree)', () => {
     expect(dr?.duration).toBeCloseTo(23); // 20s vanish + 3s linger
   });
 
-  it('Ring of Frost roots enemies at the aimed point after its cast, with 2 charges', () => {
+  it('Ring of Frost arms at the aimed point with a single charge', () => {
     const { sim, p } = rig({ 11: 'mag_r11_rings_of_frost' });
     const mob = addTargetMob(sim, 100000, 15);
-    sim.castAbilityAt('rings_of_frost', { x: mob.pos.x, z: mob.pos.z });
+    const center = { x: mob.pos.x, z: mob.pos.z };
+    sim.castAbilityAt('rings_of_frost', center);
     tickFor(sim, 2); // the 1.5s cast is the arming delay
+    expect(mob.auras.some((a) => a.kind === 'root')).toBe(false); // center is safe
+    mob.pos.x = center.x + 5.3;
+    mob.prevPos = { ...mob.pos };
+    sim.tick();
     expect(mob.auras.some((a) => a.kind === 'root')).toBe(true);
     const res = (
-      sim as unknown as { resolvedAbility(id: string, pid: number): { charges?: number } }
+      sim as unknown as {
+        resolvedAbility(id: string, pid: number): { charges?: number; bonusCharges?: number };
+      }
     ).resolvedAbility('rings_of_frost', p.id);
-    expect(res.charges).toBe(2);
+    expect(res.charges ?? 1).toBe(1);
+    expect(res.bonusCharges ?? 0).toBe(0);
   });
 
   it('Snap Polymorph makes Bewitch instant on a real 20 sec cooldown', () => {
@@ -227,7 +239,9 @@ describe('mage choice rows (owner tree)', () => {
     addTargetMob(sim, 100000, 3);
     p.cooldowns.set('blink', 15);
     const before = p.resource;
-    sim.castAbility('arcane_explosion'); // instant mana spender
+    // ice_lance: the frost rig's instant mana spender (arcane_explosion is
+    // Chronomancer-only since the owner spec split 2026-07-14).
+    sim.castAbility('ice_lance');
     const spent = before - p.resource;
     expect(spent).toBeGreaterThan(0);
     const shave = (spent / p.maxResource) * 10 * 2;
@@ -288,10 +302,10 @@ describe('mage choice rows (owner tree)', () => {
     expect(p.auras.some((a) => a.kind === 'overload')).toBe(true);
     const res = (
       sim as unknown as { resolvedAbility(id: string, pid: number): { cost: number } }
-    ).resolvedAbility('fire_blast', p.id);
+    ).resolvedAbility('ice_lance', p.id);
     const mana0 = p.resource;
     (p as { gcdRemaining: number }).gcdRemaining = 0;
-    sim.castAbility('fire_blast');
+    sim.castAbility('ice_lance');
     expect(p.resource).toBe(mana0 - Math.round(res.cost * 1.5)); // the steeper bill
     expect(p.auras.some((a) => a.kind === 'overload')).toBe(false); // consumed
   });
@@ -302,7 +316,8 @@ describe('mage choice rows (owner tree)', () => {
     sim.castAbility('power_echo');
     (p as { gcdRemaining: number }).gcdRemaining = 0;
     const hp0 = mob.hp;
-    sim.castAbility('fire_blast');
+    // ice_lance: frost-known instant (fire_blast is fire-only since the split).
+    sim.castAbility('ice_lance');
     // The bolt is a projectile: fly it to impact, collecting the tick events.
     const collected: { type: string; amount?: number }[] = [];
     for (let i = 0; i < 30; i++) collected.push(...(sim.tick() as never[]));
@@ -317,8 +332,9 @@ describe('mage choice rows (owner tree)', () => {
   it('Elemental Convergence opens the surge on a Fire-Frost alternation, once per 30 sec', () => {
     const { sim, p } = rig({ 17: 'mag_r17_convergence' });
     addTargetMob(sim, 100000, 5);
-    sim.castAbility('fire_blast');
-    tickFor(sim, 1); // the bolt lands; alternation is measured at impact
+    // fireball: the base-kit fire school (fire_blast is fire-only since the split).
+    sim.castAbility('fireball');
+    tickFor(sim, 4); // ride the hard cast plus the bolt's flight
     expect(p.auras.some((a) => a.id === 'elemental_convergence')).toBe(false);
     (p as { gcdRemaining: number }).gcdRemaining = 0;
     sim.castAbility('frostbolt'); // base-kit frost (ice_lance is spec-gated)
@@ -329,9 +345,9 @@ describe('mage choice rows (owner tree)', () => {
     expect(p.auras.some((a) => a.id === 'convergence_cd')).toBe(true);
     // Another alternation inside the internal cooldown re-arms nothing new.
     (p as { gcdRemaining: number }).gcdRemaining = 0;
-    p.cooldowns.delete('fire_blast');
-    sim.castAbility('fire_blast');
-    tickFor(sim, 1);
+    p.resource = p.maxResource;
+    sim.castAbility('fireball');
+    tickFor(sim, 4);
     (p as { gcdRemaining: number }).gcdRemaining = 0;
     sim.castAbility('frostbolt');
     tickFor(sim, 4);

@@ -205,6 +205,8 @@ const baseEnTable = {
   'aura.elixirBear': 'Might of the Bear',
   // Shared Bloodlust / Temporal Acceleration exhaustion debuff (combat/haste_burst.ts).
   'aura.temporalExhaustion': 'Temporal Exhaustion',
+  // Cauterize's 5 min lockout debuff (combat/fire_mage.ts); survives death.
+  'aura.cauterizeFatigue': 'Cauterize Fatigue',
   'mechanic.warStomp': 'Shuddering Stomp',
   'mechanic.boneCarapace': 'Bone Carapace',
   'mechanic.bansheesWail': 'Keening Wail',
@@ -339,6 +341,8 @@ const baseEnTable = {
   'aura.fingersOfFrost': 'Fingers of Frost',
   'aura.brainFreeze': 'Brain Freeze',
   'aura.wintersChill': "Winter's Chill",
+  'aura.icicles': 'Icicles',
+  'aura.perfectMoment': 'Perfect Moment',
 } as const;
 
 const petEnTable = {
@@ -4592,6 +4596,7 @@ function locPetGrowlAutoState(state: string): string {
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
   'Temporal Exhaustion': 'aura.temporalExhaustion',
+  'Cauterize Fatigue': 'aura.cauterizeFatigue',
   'Might of the Bear': 'aura.elixirBear',
   Summoned: 'aura.summoned',
   Fed: 'aura.fed',
@@ -4686,6 +4691,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Fingers of Frost': 'aura.fingersOfFrost',
   'Brain Freeze': 'aura.brainFreeze',
   "Winter's Chill": 'aura.wintersChill',
+  Icicles: 'aura.icicles',
+  'Perfect Moment': 'aura.perfectMoment',
   // Talent-proc buff/ward names (choice rows).
   'Searing Light': 'aura.searingLight',
   'Lingering Grace': 'aura.lingeringGraceWard',

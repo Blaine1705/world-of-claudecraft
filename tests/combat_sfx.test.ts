@@ -1,24 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { SFX_CLIPS, SFX_MOB_EXTENSION_FAMILIES } from '../src/game/sfx_manifest.generated';
-import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import type { Entity } from '../src/sim/types';
 import {
-  auraApplyCue,
-  castCueForAbility,
-  impactCueForDamage,
-  MOB_VOICE_CUES,
-  mobVoiceActionForDamage,
-  mobVoiceCue,
-  mobVoiceCueWithFallback,
   mobVoiceFamily,
-  playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
-  spellFxCue,
-  weaponSwingCue,
 } from '../src/ui/combat_sfx';
-
-type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
 
 function target(kind: Entity['kind'], templateId: string): Entity {
   return {

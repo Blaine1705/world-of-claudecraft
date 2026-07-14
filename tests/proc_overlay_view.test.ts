@@ -2,10 +2,16 @@
 // Streak, and the Chronomancy 4-charge variant) plus the thin painter's class
 // mapping. No DOM: the painter routes through a fake writer that records the
 // toggled classes, so the quarter-by-quarter reveal is pinned.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import { ProcOverlayPainter } from '../src/ui/proc_overlay_painter';
-import { chronoOverlayCharges, procOverlayState } from '../src/ui/proc_overlay_view';
+import {
+  chronoOverlayCharges,
+  combustionOverlayActive,
+  frostOverlayCharges,
+  procOverlayState,
+} from '../src/ui/proc_overlay_view';
 
 describe('procOverlayState (fire)', () => {
   it('maps Heating Up / Hot Streak / none', () => {
@@ -14,6 +20,14 @@ describe('procOverlayState (fire)', () => {
     expect(procOverlayState([{ id: 'hot_streak' }])).toBe('hot');
     // Hot Streak wins over Heating Up.
     expect(procOverlayState([{ id: 'heating_up' }, { id: 'hot_streak' }])).toBe('hot');
+  });
+});
+
+describe('combustionOverlayActive (Fire cooldown)', () => {
+  it('pins the Fire phoenix only while Combustion is worn', () => {
+    expect(combustionOverlayActive([])).toBe(false);
+    expect(combustionOverlayActive([{ id: 'heating_up' }])).toBe(false);
+    expect(combustionOverlayActive([{ id: 'combustion' }])).toBe(true);
   });
 });
 
@@ -29,6 +43,21 @@ describe('chronoOverlayCharges (Chronomancy 4-charge variant)', () => {
     expect(chronoOverlayCharges([{ id: 'temporal_echo', value: 1 }])).toBe(0);
     expect(chronoOverlayCharges([{ id: 'arcane_surge', value: 9 }])).toBe(4);
     expect(chronoOverlayCharges([{ id: 'arcane_surge' }])).toBe(0); // no value -> 0
+  });
+});
+
+describe('frostOverlayCharges (Frost 5-Icicle variant)', () => {
+  it('reads the Icicle stack, including the wire-defaulted first stack', () => {
+    expect(frostOverlayCharges([])).toBe(0);
+    expect(frostOverlayCharges([{ id: 'icicles' }])).toBe(1);
+    expect(frostOverlayCharges([{ id: 'icicles', stacks: 3 }])).toBe(3);
+    expect(frostOverlayCharges([{ id: 'icicles', stacks: 5 }])).toBe(5);
+  });
+
+  it('clamps malformed mirrored values and ignores unrelated auras', () => {
+    expect(frostOverlayCharges([{ id: 'fingers_of_frost', stacks: 2 }])).toBe(0);
+    expect(frostOverlayCharges([{ id: 'icicles', stacks: 99 }])).toBe(5);
+    expect(frostOverlayCharges([{ id: 'icicles', stacks: -2 }])).toBe(0);
   });
 });
 
@@ -77,5 +106,89 @@ describe('ProcOverlayPainter class mapping', () => {
     expect(classes.get('c3')).toBe(false);
     expect(classes.get('c4')).toBe(false);
     expect(classes.get('hot')).toBe(true);
+  });
+
+  it('lights one frozen section per Icicle and clears other themes', () => {
+    const { writers, classes } = fakeWriters();
+    const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+
+    painter.paintFrostCharges(3);
+    expect(classes.get('frost')).toBe(true);
+    expect(classes.get('f1')).toBe(true);
+    expect(classes.get('f2')).toBe(true);
+    expect(classes.get('f3')).toBe(true);
+    expect(classes.get('f4')).toBe(false);
+    expect(classes.get('f5')).toBe(false);
+    expect(classes.get('chrono')).toBe(false);
+    expect(classes.get('hot')).toBe(false);
+
+    painter.paintFrostCharges(5);
+    expect(classes.get('f4')).toBe(true);
+    expect(classes.get('f5')).toBe(true);
+
+    painter.paintFrostCharges(0);
+    expect(classes.get('f1')).toBe(false);
+    expect(classes.get('f5')).toBe(false);
+  });
+
+  it('clears every Frost class when another theme takes ownership', () => {
+    const { writers, classes } = fakeWriters();
+    const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+    painter.paintFrostCharges(5);
+
+    painter.paintChronoCharges(2);
+    expect(classes.get('frost')).toBe(false);
+    expect(classes.get('f1')).toBe(false);
+    expect(classes.get('f5')).toBe(false);
+    expect(classes.get('chrono')).toBe(true);
+
+    painter.paintFrostCharges(5);
+    painter.paint('hot');
+    expect(classes.get('frost')).toBe(false);
+    expect(classes.get('f1')).toBe(false);
+    expect(classes.get('f5')).toBe(false);
+    expect(classes.get('hot')).toBe(true);
+  });
+
+  it('pins the Fire phoenix during Combustion without requiring Hot Streak', () => {
+    const { writers, classes } = fakeWriters();
+    const painter = new ProcOverlayPainter(writers, {} as HTMLElement);
+    painter.paint('none', true);
+    expect(classes.get('combustion')).toBe(true);
+    expect(classes.get('combustion-enter')).toBe(true);
+    expect(classes.get('heating')).toBe(false);
+    expect(classes.get('hot')).toBe(false);
+
+    painter.paint('hot', true);
+    expect(classes.get('combustion')).toBe(true);
+    expect(classes.get('hot')).toBe(true);
+
+    painter.paint('none', false);
+    expect(classes.get('combustion')).toBe(false);
+    expect(classes.get('combustion-enter')).toBe(false);
+  });
+});
+
+describe('Frost phoenix visual progression', () => {
+  it('keeps the complete phoenix silhouette at every Icicle count', () => {
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    for (const part of ['tail', 'left', 'right', 'core']) {
+      const rule = css.match(new RegExp(`#proc-overlay\\.frost \\.frost-${part} \\{([^}]*)\\}`));
+      expect(rule?.[1]).toBeDefined();
+      expect(rule?.[1]).not.toContain('clip-path');
+    }
+  });
+
+  it('renders one independently lit crown crystal per Icicle', () => {
+    const domSource = readFileSync(
+      new URL('../src/ui/proc_overlay_dom.ts', import.meta.url),
+      'utf8',
+    );
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+
+    expect(domSource.match(/class="frost-crystal frost-crystal-[1-5]"/g)).toHaveLength(5);
+    for (let stack = 1; stack <= 5; stack++) {
+      expect(css).toContain(`#proc-overlay.frost.f${stack} .frost-crystal-${stack}`);
+    }
   });
 });

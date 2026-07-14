@@ -373,7 +373,12 @@ describe('Meteor', () => {
     const { sim, p } = mageWithSpec('fire');
     const mob = addDummy(sim, 15);
     sim.castAbilityAt('meteor', { x: mob.pos.x, z: mob.pos.z });
-    collect(sim, 1); // still falling
+    const falling = collect(sim, 1); // still falling
+    const warning = falling.find(
+      (event): event is Extract<SimEvent, { type: 'spellfxAt' }> =>
+        event.type === 'spellfxAt' && event.fx === 'meteorFall',
+    );
+    expect(warning?.radius).toBe(8);
     expect(mob.auras.some((a) => a.id === 'ignite')).toBe(false);
     const events = collect(sim, 2); // impact at ~2s
     const hit = events.find(
@@ -433,9 +438,9 @@ describe('the personal-barrier slot', () => {
 });
 
 describe('Water Elemental', () => {
-  it('the frost mage summons it, it bolts the target, and every 4th attack is Water Jet', () => {
+  it('the frost mage summons it and it bolts the target', () => {
     const { sim, p } = mageWithSpec('frost');
-    const mob = addDummy(sim, 10);
+    addDummy(sim, 10);
     sim.castAbility('summon_water_elemental');
     collect(sim, 3); // ride the 2s summon cast
     const pet = [...sim.entities.values()].find(
@@ -452,8 +457,54 @@ describe('Water Elemental', () => {
         e.type === 'damage' && e.sourceId === (pet as Entity).id && e.amount > 0,
     );
     expect(bolts.length).toBeGreaterThanOrEqual(1); // Waterbolts landing
-    // The 4th attack channeled Water Jet: its burn ticked damage under that
-    // name (the short dot may already have expired by now, so read the ledger).
-    expect(bolts.some((e) => e.ability === 'Water Jet')).toBe(true);
+    expect(bolts.some((e) => e.ability === 'Water Jet')).toBe(false);
+  });
+
+  it('has no taunt command or autocast', () => {
+    const { sim, p } = mageWithSpec('frost');
+    const mob = addDummy(sim, 5);
+    sim.castAbility('summon_water_elemental');
+    collect(sim, 3);
+    const pet = [...sim.entities.values()].find(
+      (e) => e.templateId === 'water_elemental' && e.ownerId === p.id,
+    ) as Entity;
+    p.targetId = mob.id;
+    pet.aggroTargetId = mob.id;
+    mob.forcedTargetId = null;
+    (sim as unknown as { setPetAutoTaunt(enabled: boolean): void }).setPetAutoTaunt(true);
+    (sim as unknown as { petTaunt(): void }).petTaunt();
+    expect(pet.petAutoTaunt).toBe(false);
+    expect(mob.forcedTargetId).toBeNull();
+  });
+
+  it('channels Water Jet for three seconds and deals damage throughout the beam', () => {
+    const { sim, p } = mageWithSpec('frost');
+    addDummy(sim, 10);
+    sim.castAbility('summon_water_elemental');
+    collect(sim, 3);
+    const pet = [...sim.entities.values()].find(
+      (e) => e.templateId === 'water_elemental' && e.ownerId === p.id,
+    ) as Entity;
+    gcdReset(p);
+    sim.castAbility('frostbolt');
+    (sim as unknown as { petAttack(): void }).petAttack();
+    sim.petWaterJet();
+
+    let channelStarted = false;
+    let channelTicks = 0;
+    for (let i = 0; i < 20 * 14; i++) {
+      for (const event of sim.tick()) {
+        if (event.type === 'spellfx' && event.sourceId === pet.id && event.fx === 'bubbleBeam') {
+          channelStarted = true;
+          expect(event.duration).toBe(3);
+        }
+        if (event.type === 'damage' && event.sourceId === pet.id && event.ability === 'Water Jet') {
+          channelTicks++;
+        }
+      }
+      if (channelStarted && !pet.channeling) break;
+    }
+    expect(channelStarted).toBe(true);
+    expect(channelTicks).toBe(3);
   });
 });

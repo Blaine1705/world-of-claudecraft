@@ -346,7 +346,12 @@ import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fc
 import { buildProcOverlay } from './proc_overlay_dom';
 import { attachOverlayDrag } from './proc_overlay_drag';
 import { ProcOverlayPainter } from './proc_overlay_painter';
-import { chronoOverlayCharges, procOverlayState } from './proc_overlay_view';
+import {
+  chronoOverlayCharges,
+  combustionOverlayActive,
+  frostOverlayCharges,
+  procOverlayState,
+} from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
 import { QuestProgressBanner } from './quest_progress_banner';
@@ -7213,8 +7218,10 @@ export class Hud {
     // spec swap never strands a half-lit bird.
     if (this.sim.talentSpec === 'arcane') {
       this.procOverlayPainter.paintChronoCharges(chronoOverlayCharges(p.auras));
+    } else if (this.sim.talentSpec === 'frost') {
+      this.procOverlayPainter.paintFrostCharges(frostOverlayCharges(p.auras));
     } else {
-      this.procOverlayPainter.paint(procOverlayState(p.auras));
+      this.procOverlayPainter.paint(procOverlayState(p.auras), combustionOverlayActive(p.auras));
     }
 
     // action bar: the slot row, driven by the pure action_bar_view core + the thin

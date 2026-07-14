@@ -304,61 +304,15 @@ export function petRangedAttack(
   ranged: {
     range: number;
     school: Aura['school'];
-    jet?: { every: number; total: number; duration: number; interval: number };
+    jet?: {
+      total: number;
+      duration: number;
+      interval: number;
+      slow: number;
+      cooldown: number;
+    };
   },
 ): void {
-  // Water Jet (mage water elemental): every `every`-th attack the pet
-  // CHANNELS a beam instead of hurling the bolt, leaving the jet's damage
-  // ticking on the target. The attack counter rides an aura on the pet (no
-  // new entity field in the parity hash) and the jet path draws NO rng (only
-  // this new pet ever takes it, so no existing stream position moves).
-  if (ranged.jet) {
-    const counter = pet.auras.find((a) => a.id === 'water_jet_count');
-    const count = (counter?.value ?? 0) + 1;
-    if (count >= ranged.jet.every) {
-      if (counter) pet.auras.splice(pet.auras.indexOf(counter), 1);
-      ctx.emit({
-        type: 'spellfx',
-        sourceId: pet.id,
-        targetId: target.id,
-        school: ranged.school,
-        fx: 'beam',
-      });
-      const perTick = Math.max(
-        1,
-        Math.round(ranged.jet.total / (ranged.jet.duration / ranged.jet.interval)),
-      );
-      ctx.applyAura(target, {
-        id: 'water_jet',
-        name: 'Water Jet',
-        kind: 'dot',
-        value: perTick,
-        remaining: ranged.jet.duration,
-        duration: ranged.jet.duration,
-        tickInterval: ranged.jet.interval,
-        tickTimer: ranged.jet.interval,
-        sourceId: pet.id,
-        school: ranged.school,
-      });
-      return;
-    }
-    if (counter) {
-      counter.value = count;
-      counter.remaining = 30;
-      counter.duration = 30;
-    } else {
-      ctx.applyAura(pet, {
-        id: 'water_jet_count',
-        name: 'Water Jet',
-        kind: 'internal_cd',
-        value: 1,
-        remaining: 30,
-        duration: 30,
-        sourceId: pet.id,
-        school: ranged.school,
-      });
-    }
-  }
   ctx.emit({
     type: 'spellfx',
     sourceId: pet.id,

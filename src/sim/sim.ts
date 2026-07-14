@@ -43,7 +43,7 @@ import {
   updateCasting as updateCastingImpl,
 } from './combat/casting_lifecycle';
 import { isRooted, isStunned } from './combat/cc';
-import { aetherSurgeCostMult, echoVisibleTo } from './combat/chronomancy';
+import { aetherSurgeCostMult, echoVisibleTo, partyAuraPriority } from './combat/chronomancy';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
@@ -62,6 +62,8 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
+import { rewindHealAmount } from './combat/rewind';
+import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
 import { ensureWarriorStance } from './combat/warrior_stances';
@@ -757,6 +759,8 @@ export interface ResolvedAbility {
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
   bonusCharges?: number;
+  /** 1-based authoritative charge stage for hold-to-charge spells. */
+  empowerLevel?: number;
 }
 
 export interface RewardCounters {
@@ -1323,6 +1327,23 @@ export class Sim {
   private devSandboxIds: number[] = [];
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
+  get activeFrostRings(): ActiveFrostRing[] {
+    const rings: ActiveFrostRing[] = [];
+    for (const effect of this.groundAoEs) {
+      const ring = effect.frostRing;
+      if (!ring || effect.remaining <= 0) continue;
+      rings.push({
+        id: ring.id,
+        x: effect.pos.x,
+        z: effect.pos.z,
+        radius: effect.radius,
+        innerRadius: ring.innerRadius,
+        duration: ring.duration,
+        remaining: effect.remaining,
+      });
+    }
+    return rings;
+  }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
   private frozenOrbs: FrozenOrbState[] = [];
@@ -2062,8 +2083,8 @@ export class Sim {
 
   // A friendly stationary ally bot for the Cascada playtest scenario, dropped at an
   // exact spot (no name-uniqueness gate, so /dev cascade can be re-run). Dev only.
-  private spawnScenarioAlly(name: string, x: number, z: number): number {
-    const id = this.addPlayer('mage', name);
+  private spawnScenarioAlly(name: string, x: number, z: number, cls: PlayerClass = 'mage'): number {
+    const id = this.addPlayer(cls, name);
     const meta = this.players.get(id);
     if (meta) meta.isDevBot = true;
     // Level 20 like the mage: a level-1 ally has so little health that a single Echo
@@ -2179,13 +2200,29 @@ export class Sim {
     );
     dummy.hostile = true;
     this.addEntity(dummy);
+    // A mixed party rather than all-mages (owner 2026-07-13): a rotating spread of
+    // classes so the practice allies read like a real group (tank/healer/melee/etc.),
+    // each with its own class HP pool and armor.
+    const sandboxClasses: PlayerClass[] = [
+      'warrior',
+      'priest',
+      'rogue',
+      'hunter',
+      'shaman',
+      'warlock',
+      'druid',
+      'paladin',
+      'mage',
+    ];
     const botIds: number[] = [];
     for (let i = 0; i < cfg.bots; i++) {
+      const cls = sandboxClasses[i % sandboxClasses.length];
       botIds.push(
         this.spawnScenarioAlly(
-          `Practice${i + 1}`,
+          `${cls[0].toUpperCase()}${cls.slice(1)}${i + 1}`,
           me.pos.x + cfg.botX0 + i * cfg.botGap,
           me.pos.z + cfg.botZ,
+          cls,
         ),
       );
     }
@@ -7293,10 +7330,14 @@ export class Sim {
                 // the real aura sourceId, so no wire field is added.
                 auras: e.auras
                   .filter((a) => echoVisibleTo(a, this.primaryId))
+                  .sort((a, b) => partyAuraPriority(a) - partyAuraPriority(b))
                   .slice(0, PARTY_MEMBER_AURA_CAP)
                   .map((a) => ({
                     id: a.id,
                     kind: a.kind,
+                    ...(a.kind === 'temporal_echo'
+                      ? { remaining: Math.max(0, Math.ceil(a.remaining)) }
+                      : {}),
                     ...(a.value < 0 ? { neg: 1 as const } : {}),
                   })),
               },

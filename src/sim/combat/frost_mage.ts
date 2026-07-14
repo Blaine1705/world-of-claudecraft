@@ -55,6 +55,13 @@ export const WINTERS_CHILL_SPENDERS: ReadonlySet<string> = new Set(['ice_lance']
 export const BLIZZARD_ORB_CDR_PER_ENEMY = 0.5;
 export const BLIZZARD_ORB_CDR_CAP = 3;
 
+// Icicles: the frost build-up resource. Rimelance impacts and Frozen Orb pulses
+// each bank one, up to ICICLE_MAX; at the cap Glacial Spike is castable
+// (requiresAuraStacks) and consumes the whole stack. A long duration so a partial
+// stack survives between casts in a real fight, refreshed on each new icicle.
+export const ICICLE_MAX = 5;
+export const ICICLE_DURATION = 30;
+
 /** Pure aura-list predicate for the action bar (the freeCostAuraActive
  *  idiom): does a worn frost proc empower this ability right now? Ice Lance
  *  glows while Fingers of Frost is banked; Flurry glows while Brain Freeze
@@ -69,6 +76,14 @@ export function frostProcGlowActive(
     if (a.kind === 'brain_freeze' && abilityId === 'flurry') return true;
   }
   return false;
+}
+
+/** Pure reader: the banked Icicle count (0..ICICLE_MAX). Exposed for the frost
+ *  build-up overlay to render the stack as it fills toward a Glacial Spike, the
+ *  same structural-aura idiom as chronoOverlayCharges. */
+export function frostIcicleCharges(auras: readonly { kind: string; stacks?: number }[]): number {
+  const icicles = auras.find((a) => a.kind === 'icicles');
+  return icicles ? (icicles.stacks ?? 1) : 0;
 }
 
 /** Cooldown-gate bypass (castAbility): an armed Brain Freeze lets Flurry be
@@ -130,6 +145,32 @@ export function gainBrainFreeze(ctx: SimContext, p: Entity): void {
     school: 'frost',
   });
   ctx.emit({ type: 'spellfx', sourceId: p.id, targetId: p.id, school: 'frost', fx: 'procSurge' });
+}
+
+/** Bank one Icicle (Rimelance impact or Frozen Orb pulse), up to ICICLE_MAX.
+ *  Refreshes the duration on each gain so a partial stack does not decay mid
+ *  build-up; at the cap the new icicle is lost (no over-cap), mirroring the
+ *  anti-waste rule of the procs. Deterministic aura write, no rng. */
+export function gainIcicle(ctx: SimContext, p: Entity): void {
+  const existing = p.auras.find((a) => a.kind === 'icicles');
+  if (existing) {
+    existing.remaining = ICICLE_DURATION;
+    existing.duration = ICICLE_DURATION;
+    if ((existing.stacks ?? 1) >= ICICLE_MAX) return; // at the cap, the new icicle is lost
+    existing.stacks = (existing.stacks ?? 1) + 1;
+    return;
+  }
+  ctx.applyAura(p, {
+    id: 'icicles',
+    name: 'Icicles',
+    kind: 'icicles',
+    value: 0,
+    stacks: 1,
+    remaining: ICICLE_DURATION,
+    duration: ICICLE_DURATION,
+    sourceId: p.id,
+    school: 'frost',
+  });
 }
 
 /** Roll the two frostbolt-impact procs. Exactly two draws, Fingers first then
@@ -247,6 +288,8 @@ export function frostMageAfterCast(
   if (ability.class !== 'mage' || p.kind !== 'player') return;
   if (ability.id === 'frostbolt') {
     rollFrostboltProcs(ctx, p, meta);
+    // Each Rimelance impact also banks an Icicle toward Glacial Spike.
+    if (isCommittedFrost(ctx, meta)) gainIcicle(ctx, p);
   } else if (ability.id === 'flurry' && isCommittedFrost(ctx, meta)) {
     if (target && !target.dead) applyWintersChill(ctx, p, target);
   }

@@ -74,6 +74,11 @@ import {
   type FoliageView,
 } from './foliage';
 import { activeFormTint } from './form_tint';
+import {
+  type FrostNovaRootVisual,
+  isFrostNovaRootAura,
+  syncFrostNovaRootVisual,
+} from './frost_nova_root_visual';
 import { FrozenOrbFx } from './frozen_orb_fx';
 import { buildGatherNodes } from './gather_nodes';
 import {
@@ -93,6 +98,12 @@ import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
+import {
+  type MageBarrierState,
+  type MageBarrierVisual,
+  mageBarrierStateForAura,
+  syncMageBarrierVisual,
+} from './mage_barrier_visual';
 import { MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
@@ -967,6 +978,9 @@ export class Renderer {
   vfx: Vfx;
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
+  private ringOfFrostVisuals!: RingOfFrostVisuals;
+  private readonly mageBarrierStateScratch: MageBarrierState = { theme: 'frost', value: 0 };
+  private glacialFrontVisual!: GlacialFrontVisual;
   private lightPulses!: LightPulses;
   private pulseAt!: (id: number, school: string, intensity: number, duration: number) => void;
   private weather: Weather;
@@ -1528,6 +1542,9 @@ export class Renderer {
     // Frozen Orb: the roaming ice-sphere visual, animated locally from the one
     // 'orb' release event (see src/render/frozen_orb_fx.ts).
     this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
+    this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
     // Meteor falls + Rune of Power circles (see src/render/mage_ground_fx.ts);
     // a landing meteor detonates with the same burst an aimed blast uses.
     this.mageGroundFx = new MageGroundFx(
@@ -1537,6 +1554,9 @@ export class Renderer {
         const gy = groundHeight(x, z, this.sim.cfg.seed);
         this.vfx.burst(new THREE.Vector3(x, gy + 0.4, z), 'fire', 34, 1.4);
       },
+    );
+    this.ringOfFrostVisuals = new RingOfFrostVisuals(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
     );
     this.vfx = new Vfx(this.scene, (id, frac) => {
       const v = this.views.get(id);
@@ -2208,6 +2228,10 @@ export class Renderer {
     this.vfx.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
+    this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
+    this.ringOfFrostVisuals.update(dt);
+    this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
+    this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
     const pv = this.views.get(p.id);
     if (pv) {
@@ -2969,6 +2993,40 @@ export class Renderer {
           this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
           break;
         }
+        if (ev.fx === 'frostCone') {
+          const source = this.sim.entities.get(ev.sourceId);
+          if (source) {
+            this.glacialFrontVisual.spawn(
+              source.pos.x,
+              groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
+              source.pos.z,
+              source.facing,
+              ev.range ?? 7,
+              ev.level ?? 1,
+              ev.angle ?? 70,
+              ev.fx,
+            );
+            this.triggerAttack(ev.sourceId, 'glacial_front');
+          }
+          break;
+        }
+        if (ev.fx === 'fireCone') {
+          const source = this.sim.entities.get(ev.sourceId);
+          if (source) {
+            this.glacialFrontVisual.spawn(
+              source.pos.x,
+              groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
+              source.pos.z,
+              source.facing,
+              ev.range ?? 6,
+              ev.level ?? 1,
+              ev.angle ?? 55,
+              ev.fx,
+            );
+            this.triggerAttack(ev.sourceId, 'dragons_breath');
+          }
+          break;
+        }
         if (ev.fx === 'windup') {
           // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
@@ -2989,7 +3047,17 @@ export class Renderer {
           // Pyroblast's boulder: the same homing comet, doubled up.
           this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 2);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
-        else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
+        else if (ev.fx === 'bubbleBeam') {
+          const duration = ev.duration ?? 4;
+          this.vfx.bubbleBeam(ev.sourceId, ev.targetId, duration);
+          if (duration <= 0) {
+            this.waterJetVisualChannels.delete(ev.sourceId);
+          } else {
+            this.waterJetVisualChannels.set(ev.sourceId, duration);
+            const view = this.views.get(ev.sourceId);
+            if (view) this.activeVisual(view)?.beginCastChannel();
+          }
+        } else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
         else if (ev.fx === 'procSurge') {
           this.vfx.procSurge(ev.targetId, ev.school);
           this.pulseAt(ev.targetId, ev.school, 5, 0.4);
@@ -3036,7 +3104,12 @@ export class Renderer {
         // The pulse novas below stay the area telegraph, so no actionable
         // information rides on this mesh.
         if (ev.fx === 'meteorFall') {
-          this.mageGroundFx.spawnMeteor({ x: ev.x, z: ev.z, duration: ev.duration ?? 2 });
+          this.mageGroundFx.spawnMeteor({
+            x: ev.x,
+            z: ev.z,
+            radius: ev.radius ?? 8,
+            duration: ev.duration ?? 2,
+          });
           break;
         }
         if (ev.fx === 'snowZone') {
@@ -4442,6 +4515,9 @@ export class Renderer {
       let hasShadowform = false;
       let hasMoonkin = false;
       let hasMetamorph = false;
+      let hasStasis = false;
+      let hasFrostNovaRoot = false;
+      let mageBarrierState: MageBarrierState | null = null;
       for (const a of e.auras) {
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
@@ -4452,6 +4528,9 @@ export class Renderer {
         if (a.kind === 'form_shadow') hasShadowform = true;
         if (a.kind === 'form_moonkin') hasMoonkin = true;
         if (a.kind === 'form_metamorph') hasMetamorph = true;
+        if (a.kind === 'stasis') hasStasis = true;
+        if (isFrostNovaRootAura(a)) hasFrostNovaRoot = true;
+        mageBarrierState ??= mageBarrierStateForAura(a, this.mageBarrierStateScratch);
       }
       const polyed = hasPoly;
       const bear = !polyed && hasBear;
@@ -5095,6 +5174,10 @@ export class Renderer {
     this.vfx.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
+    this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
+    this.ringOfFrostVisuals.update(dt);
+    this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
+    this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);

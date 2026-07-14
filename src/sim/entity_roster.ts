@@ -62,6 +62,16 @@ export type GroundAoE = {
   slowMult?: number;
   slowDuration?: number;
   orbCdr?: boolean;
+  // Ring of Frost: annular contact trap state. Its duration uses `remaining`;
+  // targets are remembered so standing on or re-entering one ring cannot chain-root.
+  frostRing?: {
+    id: string;
+    abilityId: string;
+    duration: number;
+    freezeDuration: number;
+    innerRadius: number;
+    triggeredIds: Set<number>;
+  };
 };
 
 // A SimEvent scheduled to fire at a future sim time, optionally gated by a live-

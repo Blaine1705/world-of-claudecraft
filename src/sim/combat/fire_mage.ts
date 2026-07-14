@@ -44,10 +44,29 @@ export const HOT_STREAK_BUILDERS: readonly string[] = [
   'scorch',
   'pyroblast',
   'flamestrike',
+  'dragons_breath',
 ];
 export const HOT_STREAK_SPENDERS: readonly string[] = ['pyroblast', 'flamestrike'];
 export const HEATING_UP_WINDOW = 10; // seconds the first crit is remembered
 export const HOT_STREAK_DURATION = 12; // seconds to spend the free instant
+// Owner 2026-07-13: seconds shaved off Combustion's cooldown per builder crit landed
+// outside Combustion. Tunable.
+export const COMBUSTION_CDR_PER_CRIT = 1;
+
+// Cauterize (fire-spec passive, owner 2026-07-13): the first lethal hit does not kill.
+// Instead you heal to 25% max HP and BURN for 6s (5% max HP per second, 30% total),
+// dealing +12% Fire damage to enemies while it rides. 5 minute internal cooldown. It
+// is a gamble: the burn can finish you if no one heals through it.
+export const CAUTERIZE_ICD = 300; // seconds (5 min), worn as the fatigue debuff below
+// The visible 5 min lockout debuff. It gates the save (not a procState icd, which
+// death wipes), SURVIVES death (resurrection.ts aurasSurvivingDeath), and pauses
+// while dead (updateAuras' dead guard), so die-revive-die never double-saves.
+export const CAUTERIZE_FATIGUE_ID = 'cauterize_fatigue';
+export const CAUTERIZE_HEAL_FRAC = 0.25;
+export const CAUTERIZE_BURN_PER_SEC = 0.05; // of max HP, per 1s tick
+export const CAUTERIZE_BURN_DURATION = 6; // seconds
+export const CAUTERIZE_FIRE_DMG_BONUS = 0.12; // +12% Fire damage while burning
+const CAUTERIZING_ID = 'cauterizing';
 
 // The personal-barrier SLOT (owner rule): each mage spec fills it with its own
 // shield, and the shared row talents (Warded / Cold Snap / Overflowing Power)
@@ -106,6 +125,13 @@ export function fireMageOnSpellHit(
     }
     return;
   }
+  // Owner 2026-07-13: a builder crit OUTSIDE Combustion shaves its cooldown, so a run
+  // of Fireball / Scald crits brings the next Combustion up sooner. During Combustion
+  // its guaranteed crits do not (it is already active). Draws no rng.
+  if (!p.auras.some((a) => a.kind === 'combustion')) {
+    const cd = p.cooldowns.get('combustion');
+    if (cd && cd > 0) p.cooldowns.set('combustion', Math.max(0, cd - COMBUSTION_CDR_PER_CRIT));
+  }
   if (heatingIdx < 0) {
     ctx.applyAura(p, {
       id: 'heating_up',
@@ -146,6 +172,69 @@ export function fireMageOnSpellHit(
     school: 'fire',
     empowerAbilities: [...HOT_STREAK_SPENDERS],
   });
+}
+
+/** Cauterize's Fire-damage bonus while the burn rides: 1 + 12% when `source` is
+ *  burning and the hit is Fire on someone OTHER than the source (never the self-burn),
+ *  else 1. Read at the top of dealDamage. Draws no rng. */
+export function cauterizeFireDamageMult(
+  source: Entity | null,
+  target: Entity,
+  school: string,
+): number {
+  if (!source || source === target || school !== 'fire') return 1;
+  return source.auras.some((a) => a.id === CAUTERIZING_ID) ? 1 + CAUTERIZE_FIRE_DMG_BONUS : 1;
+}
+
+/** Cauterize's lethal save (fire spec passive). When a killing blow (`incoming` >= hp)
+ *  lands on a fire mage whose Cauterize is off its internal cooldown, the mage survives:
+ *  healed to 25% max HP, set burning for 6s (5% max HP/s), the 5 min ICD armed, and the
+ *  +12% Fire window opened. Returns the damage to actually apply (0, the blow negated)
+ *  on a save, or null when it does not fire (not fire spec, on cooldown, or not lethal).
+ *  Draws no rng. */
+export function fireMageCauterize(
+  ctx: SimContext,
+  target: Entity,
+  incoming: number,
+): number | null {
+  if (target.kind !== 'player' || target.dead || incoming < target.hp) return null;
+  if (!fireSpecMods(ctx, target)) return null;
+  // The fatigue debuff IS the cooldown: while worn, no second save. An aura (not a
+  // procState icd) because procState resets on death, and this lockout must hold
+  // through a die-revive-die inside the window (owner 2026-07-13).
+  if (target.auras.some((a) => a.kind === 'cauterize_fatigue')) return null;
+  target.hp = Math.max(1, Math.round(target.maxHp * CAUTERIZE_HEAL_FRAC));
+  ctx.applyAura(target, {
+    id: CAUTERIZE_FATIGUE_ID,
+    name: 'Cauterize Fatigue',
+    kind: 'cauterize_fatigue',
+    value: 0,
+    remaining: CAUTERIZE_ICD,
+    duration: CAUTERIZE_ICD,
+    sourceId: target.id,
+    school: 'fire',
+  });
+  ctx.applyAura(target, {
+    id: CAUTERIZING_ID,
+    name: 'Cauterized',
+    kind: 'dot',
+    value: Math.max(1, Math.round(target.maxHp * CAUTERIZE_BURN_PER_SEC)),
+    remaining: CAUTERIZE_BURN_DURATION,
+    duration: CAUTERIZE_BURN_DURATION,
+    tickInterval: 1,
+    tickTimer: 1,
+    sourceId: target.id,
+    school: 'fire',
+  });
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: target.id,
+    targetId: target.id,
+    school: 'fire',
+    fx: 'wardBloom',
+  });
+  ctx.emit({ type: 'log', pid: target.id, text: 'Cauterize saves you!', color: '#ff7a1a' });
+  return 0;
 }
 
 /** Bank a burn on the target over IGNITE_DURATION, STACKING into the running

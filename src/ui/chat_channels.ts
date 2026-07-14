@@ -48,14 +48,13 @@ export type ChatTabId = 'all' | 'combat' | ChatOpenTab;
 // Slash prefix prepended to plain text typed while a channel tab is active, so a
 // message reaches that channel without the player retyping the command. These
 // mirror the commands parsed in src/sim/sim.ts and server/game.ts:
-//  - `say` is explicit: online sessions remember whisper/guild modes, so a
-//    neutral Say input must reset that server-side state instead of relying on
-//    unprefixed text.
+//  - `say` is explicit: the online server remembers the last-used channel, so
+//    bare text after a whisper would otherwise keep whispering that target.
 //  - `/general ` (not `/g `, which the server routes to GUILD) hits the
 //    always-on general channel.
 //  - `/gu ` / `/o ` are guild / officer (server-side social channels).
 const CHANNEL_SEND_PREFIX: Record<ChatTabChannel, string> = {
-  say: '/say ',
+  say: '/s ',
   yell: '/y ',
   party: '/p ',
   general: '/general ',
@@ -160,28 +159,14 @@ export function composeWhisperReply(typed: string): string {
   return `/r ${text}`;
 }
 
-// The standing channel the actually-sent line reached, used to update the sticky
-// "last used" send channel so the next opened input (on the All tab) defaults
-// there. Plain text (no leading slash) went to `say`. An explicit slash command
-// maps by its leading token; only the standing channels below are recognized, so
-// whisper / reply (`/w`, `/r`), emotes (`/me`, `/dance`), rolls (`/roll`),
-// channel membership (`/join`, `/leave`), the ambiguous bare `/g` (say offline,
-// guild online), and any unknown command return null and leave the sticky
-// channel unchanged. Host-independent by design: only prefixes that route
-// identically offline and online are mapped (hence `/gu`/`/general`, never `/g`).
-export function sentLineChannel(line: string): ChatTabChannel | null {
-  const text = line.trim();
-  if (!text) return null;
-  if (!text.startsWith('/')) return 'say';
-  if (/^\/p(arty)?\s/i.test(text)) return 'party';
-  if (/^\/y(ell)?\s/i.test(text)) return 'yell';
-  if (/^\/s(ay)?\s/i.test(text)) return 'say';
-  if (/^\/gu(ild)?\s/i.test(text)) return 'guild';
-  if (/^\/o(fficer)?\s/i.test(text)) return 'officer';
-  if (/^\/general\s/i.test(text)) return 'general';
-  if (/^\/world\s/i.test(text)) return 'world';
-  if (/^\/lfg\s/i.test(text)) return 'lfg';
-  return null;
+// Compose against the tab selected at send time. Keeping this decision in the
+// pure model prevents the composer from retaining a previously selected channel
+// when the player moves between tabs. The built-in views explicitly return to
+// Say, while Whisper keeps its reply behavior. Explicit slash commands still win.
+export function composeChatTabLine(tab: ChatTabId, typed: string): string {
+  if (tab === WHISPER_TAB) return composeWhisperReply(typed);
+  if (isChatTabChannel(tab)) return composeChatLine(tab, typed);
+  return composeChatLine('say', typed);
 }
 
 // Persistence: the ordered list of channel tabs the player has opened. The

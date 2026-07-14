@@ -79,6 +79,7 @@ import {
   frostMageChannelPulse,
   frostMageChannelStart,
 } from './frost_mage';
+import { empoweredCastProgress, empoweredStageForProgress } from './glacial_front';
 import {
   hasCastShield,
   noteSpellHit,
@@ -444,18 +445,24 @@ export function castAbility(
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
   if (cancelStasisToggle(ctx, p, ability)) return;
-  if (isInStasis(p)) return;
-  if (isStunned(p)) {
-    ctx.error(p.id, 'You are stunned!');
-    return;
-  }
-  if (ability.school !== 'physical' && isSilenced(p)) {
-    ctx.error(p.id, 'You are silenced!');
-    return;
-  }
-  if (ability.school !== 'physical' && isLockedOut(p, ability.school)) {
-    ctx.error(p.id, 'You are silenced!');
-    return;
+  // Ice Block (usableWhileControlled) ignores control: it may be pressed while
+  // stunned, polymorphed, incapacitated, silenced, or locked out, so it always frees
+  // the caster (its cleanseSelf effect then strips the debuffs). Its own stasis is the
+  // one control it still respects, but the recast toggle above already handles that.
+  if (!ability.usableWhileControlled) {
+    if (isInStasis(p)) return;
+    if (isStunned(p)) {
+      ctx.error(p.id, 'You are stunned!');
+      return;
+    }
+    if (ability.school !== 'physical' && isSilenced(p)) {
+      ctx.error(p.id, 'You are silenced!');
+      return;
+    }
+    if (ability.school !== 'physical' && isLockedOut(p, ability.school)) {
+      ctx.error(p.id, 'You are silenced!');
+      return;
+    }
   }
   // Blink While Casting (mage choice row): Flickerstep slips through the busy
   // guard AND the GCD, an escape button that never touches the cast in
@@ -529,6 +536,20 @@ export function castAbility(
   ctx.stopFollow(p);
   if (ability.requiresDodgeProc && ctx.time > p.overpowerUntil) {
     ctx.error(p.id, 'Your target must dodge first.');
+    return;
+  }
+  // Kill-window abilities (Victory Rush): usable only while the enabling aura
+  // is worn; runEffects consumes it on a successful cast. Reuses the existing
+  // not-ready error literal so no new client matcher is needed. requiresAuraStacks
+  // (Glacial Spike's full 5-stack Icicles) additionally gates on the stack count.
+  if (
+    ability.requiresAuraKind &&
+    !p.auras.some(
+      (a) =>
+        a.kind === ability.requiresAuraKind && (a.stacks ?? 1) >= (ability.requiresAuraStacks ?? 1),
+    )
+  ) {
+    ctx.error(p.id, 'That ability is not ready yet.');
     return;
   }
   // combo points are character-bound: any built points finish on the current target
@@ -763,7 +784,11 @@ export function castAbility(
   // cooldown and carries its 30% baked into the resolved effects.
   res = applyBrainFreezeOverride(ctx, p, res);
 
-  const gcd = ctx.playerGcdFor(meta.cls);
+  // Owner 2026-07-13: spell haste shortens the global cooldown (floored at MIN_GCD),
+  // so gear/Bloodlust/Temporal Acceleration haste speeds the whole rotation, not just
+  // cast bars. spellHasteMult is 1 for anyone without spell haste, so their GCD is
+  // unchanged.
+  const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.
   const castTime =
     !ability.channel &&
@@ -846,7 +871,10 @@ export function castAbility(
   }
 
   if (!ability.offGcd) p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
-  applyAbility(ctx, p, meta, res, castTargetId);
+  const instantResolved = ability.empowerStages
+    ? { ...res, empowerLevel: ability.empowerStages }
+    : res;
+  applyAbility(ctx, p, meta, instantResolved, castTargetId);
   // instant ground-targeted cast: its effects have consumed the aim point. An
   // interleaved instant instead hands the aim back to the cast still running.
   p.castAim = blinkThrough ? heldCastAim : null;
@@ -967,6 +995,16 @@ function consumeOverload(ctx: SimContext, p: Entity, res: ResolvedAbility): Reso
   p.auras.splice(idx, 1);
   ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
   const effects = res.effects.map((eff) => {
+    if (eff.type === 'empoweredCone') {
+      return {
+        ...eff,
+        stages: eff.stages.map((stage) => ({
+          ...stage,
+          min: Math.round(stage.min * amp),
+          max: Math.round(stage.max * amp),
+        })),
+      };
+    }
     const scaled: Record<string, unknown> = { ...eff };
     for (const key of ['min', 'max', 'amount', 'bonus', 'total', 'value'] as const) {
       const v = scaled[key];

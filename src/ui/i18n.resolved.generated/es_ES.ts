@@ -871,6 +871,8 @@ export const es_ES: EnTranslations = {
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
+      "showAttackButton": "Show Attack Button",
+      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
       "mobileLeftHanded": "Diseño para zurdos"
@@ -1454,6 +1456,33 @@ export const es_ES: EnTranslations = {
     "playerFrame": {
       "unlock": "Mover marco del jugador",
       "lock": "Fijar marco del jugador"
+    },
+    "partyFrames": {
+      "section": "Marcos de grupo y banda",
+      "unlock": "Mover marcos de grupo y banda",
+      "lock": "Fijar marcos de grupo y banda",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Escala de los marcos",
+      "width": "Ancho de los marcos",
+      "height": "Alto de los marcos",
+      "spacing": "Separación entre marcos",
+      "columns": "Columnas de banda",
+      "healthText": "Texto de salud",
+      "healthNone": "Ninguno",
+      "healthPercent": "Porcentaje",
+      "healthCurrent": "Actual",
+      "healthCurrentMax": "Actual / máxima",
+      "sort": "Ordenar jugadores",
+      "sortGroup": "Grupo",
+      "sortRole": "Rol",
+      "sortName": "Nombre",
+      "showResource": "Mostrar maná, ira y energía",
+      "showAbsorbs": "Mostrar escudos de absorción",
+      "showAuras": "Mostrar beneficios y perjuicios",
+      "showSelf": "Mostrar tu marco"
     },
     "frameReset": {
       "label": "Restablecer posición de los marcos"
@@ -5144,6 +5173,7 @@ export const es_ES: EnTranslations = {
     },
     "pet": {
       "attack": "Atacar",
+      "waterJet": "Water Jet",
       "taunt": "Provocar",
       "healDemon": "Sanar demonio",
       "healPet": "Sanar mascota",
@@ -5152,6 +5182,8 @@ export const es_ES: EnTranslations = {
       "aggressive": "Agresivo",
       "petAttackTitle": "Ataque de mascota",
       "petAttackDesc": "Ordena a tu mascota atacar a tu objetivo hostil actual.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Provocación de mascota",
       "petTauntDesc": "Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos.",
       "healDemonDesc": "Gasta maná para canalizar sanación hacia tu demonio durante 5 segundos.",
@@ -5274,6 +5306,7 @@ export const es_ES: EnTranslations = {
     "actionBar": {
       "attackName": "Atacar",
       "attackTooltip": "Activa o desactiva el autoataque sobre tu objetivo. Hacer clic derecho en un enemigo también ataca.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Ranura vacía",
       "slotAria": "Ranura de acción {slot}: {ability}",
       "emptySlotAria": "Ranura de acción {slot}: vacía",
@@ -5785,6 +5818,18 @@ export const es_ES: EnTranslations = {
       "blizzard": {
         "name": "Blizzard",
         "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
       },
       "fingers_of_frost": {
         "name": "Fingers of Frost",
@@ -6593,6 +6638,10 @@ export const es_ES: EnTranslations = {
       "temporal_acceleration": {
         "name": "Temporal Acceleration",
         "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
       },
       "arcane_surge": {
         "name": "Aether Surge",

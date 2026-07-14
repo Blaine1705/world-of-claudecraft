@@ -2397,7 +2397,7 @@
     border-radius: 8px;
     background: #1a1409;
     cursor: var(--cursor-point);
-    overflow: auto;
+    overflow: hidden;
   }
   .ts-class-description {
     max-width: 820px;
@@ -2406,7 +2406,6 @@
     font-size: 13px;
     line-height: 1.4;
     text-align: center;
-    overflow-wrap: anywhere;
   }
   .ts-panel.sel {
     border-color: #ffd100;
