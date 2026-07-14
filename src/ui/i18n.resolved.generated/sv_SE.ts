@@ -428,7 +428,7 @@ export const sv_SE: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
+      "stableHint": "Learn to ride at the stables outside Thornpeak.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -448,6 +448,23 @@ export const sv_SE: EnTranslations = {
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "Dalcupen",
@@ -7496,7 +7513,7 @@ export const sv_SE: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Stallmästare",
-        "greeting": "Varje ryttare kommer in på två ben. Guld i förskott, sadeln när du kan sitta kvar i den."
+        "greeting": "Varje ryttare kommer in på två ben, {className}. Tyglarna får du inte förrän du kan sitta kvar på Valorsteed utan att kyssa leran, och Highwatch har inga läkare att avvara för brutna ben."
       },
       "warden_fenwick": {
         "name": "Väktaren Fenwick",
@@ -8419,6 +8436,16 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Skogsvarg dödad"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Ridlektioner",
+        "text": "Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer, och det lär man sig inte på en eftermiddag. Kliv upp, lägg märke till mina händer på tyglarna, och följ Valorsteeds lutning innan den bestämmer att du inte är besväret värd.",
+        "completion": "Så där ja. Inte en enda gång tog du tag i stängslet under hela ridturen. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.",
+        "objectives": {
+          "0": {
+            "label": "Tämj Valorsteed"
           }
         }
       },

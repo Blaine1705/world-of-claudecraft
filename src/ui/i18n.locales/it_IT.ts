@@ -3557,7 +3557,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Stalliera capo',
   'entities.npcs.stablemaster_marla.greeting':
-    'Ogni cavaliere arriva sulle proprie gambe. Prima l’oro, la sella quando saprai restarci in groppa.',
+    'Ogni cavaliere arriva sulle proprie gambe, {className}. Non ti darò le redini finché non saprai restare in sella al Destriero del Valore senza baciare il fango, e a Highwatch non abbondano i guaritori per le ossa rotte.',
+  'entities.quests.q_riding_lessons.title': 'Lezioni di equitazione',
+  'entities.quests.q_riding_lessons.text':
+    'Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo, e non si impara in un pomeriggio. Sali, presta attenzione alle mie mani sulle redini, e segui il movimento del Destriero del Valore prima che decida che non vali la pena.',
+  'entities.quests.q_riding_lessons.completion':
+    'Ecco, così. Non ti sei aggrappato alla staccionata nemmeno una volta, per tutto il giro. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Doma il Destriero del Valore',
   'entities.npcs.marshal_redbrook.title': 'Maresciallo cittadino',
   'entities.npcs.marshal_redbrook.greeting':
     'Tieni la lama vicina, {className}. La Valle non è più quella di una volta.',
@@ -6778,7 +6784,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.',
   'hudChrome.mounts.notCollected': 'Non ottenuta',
-  'hudChrome.mounts.stableHint': 'Venduta dallo stalliere nella Valle di Eastbrook.',
+  'hudChrome.mounts.stableHint': 'Impara a cavalcare nelle stalle fuori Thornpeak.',
   'hudChrome.mounts.dropHint': 'Bottino dei boss di spedizione e incursione.',
   'hudChrome.mounts.clickManage': 'Clicca per scegliere la tua cavalcatura',
 };

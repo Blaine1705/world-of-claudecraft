@@ -24,7 +24,7 @@ import {
   normalizeMountKey,
   normalizeSelectedMount,
 } from '../src/sim/content/mounts';
-import { ITEMS, MOBS } from '../src/sim/data';
+import { ITEMS, MOBS, QUESTS } from '../src/sim/data';
 import {
   MOUNT_DISMOUNT_SECONDS,
   MOUNT_SUMMON_SECONDS,
@@ -191,7 +191,13 @@ describe('mount reins items (the collection: owning the item is owning the mount
   });
 });
 
-describe('mount purchase (the stablemaster)', () => {
+// The stablemaster no longer sells the horse reins directly: she teaches the
+// q_riding_lessons quest (giver/turn-in) and the reins are its itemReward,
+// granted only through the mount-training minigame's 'interact' objective
+// (sentinel targetObjectItemId 'train_valorsteed'). The old direct-purchase
+// flow this block used to cover is replaced by tests/mounts_training.test.ts;
+// this block now pins the new giver/reward wiring instead.
+describe('mount purchase (the stablemaster teaches, no longer sells)', () => {
   const stablemaster = (sim: Sim) =>
     [...sim.entities.values()].find(
       (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
@@ -206,49 +212,48 @@ describe('mount purchase (the stablemaster)', () => {
     return npc.id;
   }
 
-  it('spawns the stablemaster in town, stocking only the horse reins', () => {
+  it('spawns the stablemaster stocking nothing; she offers q_riding_lessons, not a sale', () => {
     const sim = makeWorld();
     join(sim, 20);
     const npc = stablemaster(sim);
     expect(npc).toBeDefined();
-    expect(npc.vendorItems).toEqual(['reins_valorsteed']);
+    expect(npc.vendorItems).toEqual([]); // no vendorItems: reins is not for sale here
+    expect(npc.questIds).toContain('q_riding_lessons');
   });
 
-  it('sells the horse reins for 100 gold, debiting copper and landing the item', () => {
+  it('refuses a direct buyItem for the horse reins; no charge, no item', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
     const meta = sim.players.get(pid)!;
     meta.copper = 2_000_000;
     const npcId = standAtStable(sim, pid);
     sim.buyItem(npcId, 'reins_valorsteed', pid);
-    expect(meta.copper).toBe(1_000_000); // 2,000,000 - 100 gold
-    expect(sim.countItem('reins_valorsteed', pid)).toBe(1);
-    expect(mountOwned(meta, 'valorsteed')).toBe(true);
-  });
-
-  it('refuses the purchase below level 20 (no charge, no item)', () => {
-    const sim = makeWorld();
-    const pid = join(sim, 10);
-    const meta = sim.players.get(pid)!;
-    meta.copper = 2_000_000;
-    const npcId = standAtStable(sim, pid);
-    sim.buyItem(npcId, 'reins_valorsteed', pid);
-    expect(errorTexts(sim.tick())).toContain('You must be level 20 to buy a mount.');
+    expect(errorTexts(sim.tick())).toContain('That merchant is not available.');
     expect(meta.copper).toBe(2_000_000);
     expect(sim.countItem('reins_valorsteed', pid)).toBe(0);
+    expect(mountOwned(meta, 'valorsteed')).toBe(false);
   });
 
-  it('refuses a second purchase of an already-owned mount', () => {
-    const sim = makeWorld();
-    const pid = join(sim, 20);
-    const meta = sim.players.get(pid)!;
-    meta.copper = 3_000_000;
-    const npcId = standAtStable(sim, pid);
-    sim.buyItem(npcId, 'reins_valorsteed', pid);
-    expect(mountOwned(meta, 'valorsteed')).toBe(true);
-    sim.buyItem(npcId, 'reins_valorsteed', pid);
-    expect(errorTexts(sim.tick())).toContain('You already own that mount.');
-    expect(sim.countItem('reins_valorsteed', pid)).toBe(1); // still just the one
+  it('gates the horse behind q_riding_lessons instead: level 20, given/turned in at Marla', () => {
+    const quest = QUESTS['q_riding_lessons'];
+    expect(quest).toBeDefined();
+    expect(quest.giverNpcId).toBe('stablemaster_marla');
+    expect(quest.turnInNpcId).toBe('stablemaster_marla');
+    expect(quest.minLevel).toBe(20);
+  });
+
+  it('the quest itemReward is the horse reins for every class, tied to the training objective', () => {
+    const quest = QUESTS['q_riding_lessons'];
+    expect(quest.itemRewards).toEqual({
+      warrior: 'reins_valorsteed',
+      mage: 'reins_valorsteed',
+      rogue: 'reins_valorsteed',
+    });
+    expect(quest.objectives).toHaveLength(1);
+    const obj = quest.objectives[0];
+    expect(obj.type).toBe('interact');
+    expect(obj.targetObjectItemId).toBe('train_valorsteed');
+    expect(obj.count).toBe(1);
   });
 });
 

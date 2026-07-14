@@ -428,7 +428,7 @@ export const fr_FR: EnTranslations = {
       "keybindHint": "Appuyez sur la touche Monter / Descendre (Z par défaut) pour chevaucher.",
       "notCollected": "Non collectée",
       "dropHint": "Butin des boss de donjon et de raid.",
-      "stableHint": "Vendue par le maître d’écurie au Val d’Eastbrook.",
+      "stableHint": "Apprenez à monter aux écuries, aux abords de Thornpeak.",
       "clickManage": "Cliquez pour choisir votre monture",
       "rarity_common": "Commune",
       "rarity_rare": "Rare",
@@ -448,6 +448,23 @@ export const fr_FR: EnTranslations = {
       "desc_aether_hover_cycle": "Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.",
       "desc_shadowjump_toad": "Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.",
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "La Coupe du Val",
@@ -7496,7 +7513,7 @@ export const fr_FR: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Maîtresse d’écurie",
-        "greeting": "Tout cavalier arrive sur ses deux jambes. L’or d’abord, la selle quand tu sauras t’y tenir."
+        "greeting": "Tout cavalier arrive sur ses deux jambes, {className}. Je ne te donnerai les rênes que lorsque tu sauras tenir en selle sur le Destrier de Bravoure sans mordre la boue, et Highwatch n’a pas de guérisseurs de trop pour les os brisés."
       },
       "warden_fenwick": {
         "name": "Gardien Fenwick",
@@ -8419,6 +8436,16 @@ export const fr_FR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Loup des forêts tué"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Leçons d’équitation",
+        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends, et cela ne s’apprend pas en une après-midi. Monte, surveille mes mains sur les rênes, et suis le balancement du Destrier de Bravoure avant qu’il ne décide que tu n’en vaux pas la peine.",
+        "completion": "Voilà. Pas une seule fois agrippé à la barrière, du début à la fin. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.",
+        "objectives": {
+          "0": {
+            "label": "Dompter le Destrier de Bravoure"
           }
         }
       },

@@ -3544,7 +3544,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Cavalariça-mor',
   'entities.npcs.stablemaster_marla.greeting':
-    'Cada cavaleiro chega a pé. Ouro adiantado; a sela, quando você puder montá-la.',
+    'Cada cavaleiro chega a pé, {className}. Só entrego as rédeas quando você conseguir montar o Corcel do Valor sem beijar a lama, e Highwatch não tem curandeiros de sobra para ossos quebrados.',
+  'entities.quests.q_riding_lessons.title': 'Aulas de Equitação',
+  'entities.quests.q_riding_lessons.text':
+    'Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo, e isso não se aprende em uma tarde. Suba, preste atenção nas minhas mãos nas rédeas, e acompanhe a inclinação do Corcel do Valor antes que ele decida que você não vale o esforço.',
+  'entities.quests.q_riding_lessons.completion':
+    'Pronto, assim mesmo. Nem uma vez você se segurou na cerca durante toda a volta. O Corcel do Valor é seu, {playerName}: sela, rédeas, e a reputação de um cavaleiro que conquistou o assento em vez de comprá-lo.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Domar o Corcel do Valor',
   'entities.npcs.marshal_redbrook.title': 'Marechal da cidade',
   'entities.npcs.marshal_redbrook.greeting':
     'Mantenha a lâmina por perto, {className}. O Vale já não é o mesmo.',
@@ -6751,7 +6757,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.',
   'hudChrome.mounts.notCollected': 'Não coletada',
-  'hudChrome.mounts.stableHint': 'Vendida pelo estribeiro no Vale de Eastbrook.',
+  'hudChrome.mounts.stableHint': 'Aprenda a montar nos estábulos nos arredores de Thornpeak.',
   'hudChrome.mounts.dropHint': 'Obtida de chefes de masmorra e raide.',
   'hudChrome.mounts.clickManage': 'Clique para escolher sua montaria',
 };

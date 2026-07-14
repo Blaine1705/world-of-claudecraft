@@ -2609,7 +2609,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': '마를라 히첸',
   'entities.npcs.stablemaster_marla.title': '마구간지기',
   'entities.npcs.stablemaster_marla.greeting':
-    '기수는 누구나 두 발로 걸어 들어오지. 금은 선불, 안장은 네가 앉을 수 있을 때 내주마.',
+    '기수는 누구나 두 발로 걸어 들어오지, {className}. 발러스티드 위에서 진흙에 처박히지 않고 버틸 수 있을 때까지는 고삐를 내주지 않아. 하이워치엔 부러진 뼈를 봐줄 치료사도 넉넉지 않으니까.',
+  'entities.quests.q_riding_lessons.title': '승마 수업',
+  'entities.quests.q_riding_lessons.text':
+    '기수는 누구나 두 발로 걸어 들어오지, {playerName}, 우리가 처음 만난 날 말했던 그대로다. 내가 가르치는 건 자리에 앉는 법이지 파는 물건이 아니야, 그리고 그건 한나절 만에 배울 수 있는 게 아니지. 올라타서 고삐를 쥔 내 손을 잘 보고, 발러스티드가 널 내던지기 전에 그 기울임에 맞춰봐라.',
+  'entities.quests.q_riding_lessons.completion':
+    '그래, 됐다. 도는 내내 울타리를 한 번도 붙잡지 않았구나. 발러스티드는 이제 네 것이다, {playerName}: 안장도 고삐도, 그리고 값을 치른 게 아니라 스스로 얻어낸 기수의 자리도.',
+  'entities.quests.q_riding_lessons.objectives.0.label': '발러스티드 길들이기',
   'entities.npcs.marshal_redbrook.title': '마을 원수',
   'entities.npcs.marshal_redbrook.greeting':
     '검을 가까이 두십시오, {className}. 계곡은 더 이상 예전 같지 않습니다.',
@@ -6552,7 +6558,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
   'hudChrome.mounts.notCollected': '미보유',
-  'hudChrome.mounts.stableHint': '이스트브룩 골짜기의 마구간지기가 판매합니다.',
+  'hudChrome.mounts.stableHint': '쏜피크 외곽의 마구간에서 승마를 배우세요.',
   'hudChrome.mounts.dropHint': '던전 및 공격대 우두머리가 떨어뜨립니다.',
   'hudChrome.mounts.clickManage': '클릭하여 탈것 선택',
+  'hudChrome.mountTraining.title': '승마 수업',
+  'hudChrome.mountTraining.prompt': '말이 널 내던지기 전에 기울임에 맞춰라.',
+  'hudChrome.mountTraining.leanRight': '오른쪽으로 기울이기',
+  'hudChrome.mountTraining.steady': '자세 유지',
+  'hudChrome.mountTraining.cueLeft': '말이 왼쪽으로 기운다.',
+  'hudChrome.mountTraining.cueRight': '말이 오른쪽으로 기운다.',
+  'hudChrome.mountTraining.cueSteady': '말이 균형을 잡는다.',
+  'hudChrome.mountTraining.begin': '수업 시작',
+  'hudChrome.mountTraining.round': '{total} 라운드 중 {n}회',
+  'hudChrome.mountTraining.misses': '실수 {n}/{cap}',
+  'hudChrome.mountTraining.thrown': '낙마했다. 침착하게 다시 시도하라.',
+  'hudChrome.mountTraining.success': '발러스티드를 길들였다.',
+  'hudChrome.mountTraining.close': '닫기',
 };

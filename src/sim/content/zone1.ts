@@ -632,19 +632,6 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     vendorItems: ['simple_fishing_pole'],
     greeting: 'Blrb-glub— sorry, been listening to those fish-men too long.',
   },
-  stablemaster_marla: {
-    id: 'stablemaster_marla',
-    name: 'Marla Hitchen',
-    title: 'Stablemaster',
-    // east side of the square, a few paces south of the well and clear of the
-    // mine / tunnel-rat spawns further south; faces back toward the well.
-    pos: { x: 14, z: -2 },
-    facing: -1.29,
-    color: 0x8b5a2b,
-    questIds: [],
-    vendorItems: ['reins_valorsteed'],
-    greeting: 'Every rider walks in on two legs. Gold up front, saddle when you can sit it.',
-  },
   foreman_odell: {
     id: 'foreman_odell',
     name: 'Foreman Odell',

@@ -2626,7 +2626,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'マーラ・ヒッチェン',
   'entities.npcs.stablemaster_marla.title': '厩舎長',
   'entities.npcs.stablemaster_marla.greeting':
-    '騎手はみな二本足で歩いてくる。金は先払い、鞍にまたがれるようになったら乗せてやろう。',
+    '騎手はみな二本足で歩いてくる、{className}よ。ヴァロースティードにまたがって泥にまみれずにいられるようになるまで、手綱は渡さない。ハイウォッチには骨折を治せる者もそう余っていないのでね。',
+  'entities.quests.q_riding_lessons.title': '乗馬の稽古',
+  'entities.quests.q_riding_lessons.text':
+    '騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。そしてそれは一日の午後だけでは身につかない。上に乗って、手綱を握るわたしの手をよく見て、振り落とされる前にヴァロースティードの傾きに合わせるのだ。',
+  'entities.quests.q_riding_lessons.completion':
+    'よし、それでいい。ひとっ走りの間、柵に一度もしがみつかなかったな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'ヴァロースティードを乗りこなす',
   'entities.npcs.marshal_redbrook.title': '町の元帥',
   'entities.npcs.marshal_redbrook.greeting':
     '刃を近くに置いておきなさい、{className}。谷はもう昔のままではありません。',
@@ -6567,7 +6573,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。',
   'hudChrome.mounts.notCollected': '未入手',
-  'hudChrome.mounts.stableHint': 'イーストブルック渓谷の厩舎番から購入できます。',
+  'hudChrome.mounts.stableHint': 'ソーンピーク郊外の厩舎で乗馬を学べます。',
   'hudChrome.mounts.dropHint': 'ダンジョンやレイドのボスがドロップします。',
   'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
+  'hudChrome.mountTraining.title': '乗馬レッスン',
+  'hudChrome.mountTraining.prompt': '振り落とされる前に、馬の傾きに合わせよう。',
+  'hudChrome.mountTraining.leanRight': '右に傾ける',
+  'hudChrome.mountTraining.steady': '姿勢を保つ',
+  'hudChrome.mountTraining.cueLeft': '馬が左に傾く。',
+  'hudChrome.mountTraining.cueRight': '馬が右に傾く。',
+  'hudChrome.mountTraining.cueSteady': '馬が落ち着く。',
+  'hudChrome.mountTraining.begin': 'レッスン開始',
+  'hudChrome.mountTraining.round': '{total} ラウンド中 {n} 回目',
+  'hudChrome.mountTraining.misses': '失敗 {n}/{cap}',
+  'hudChrome.mountTraining.thrown': '振り落とされた。落ち着いてもう一度挑戦しよう。',
+  'hudChrome.mountTraining.success': 'ヴァロースティードを乗りこなした。',
+  'hudChrome.mountTraining.close': '閉じる',
 };

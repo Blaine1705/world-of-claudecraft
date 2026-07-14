@@ -428,7 +428,7 @@ export const pl_PL: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
+      "stableHint": "Learn to ride at the stables outside Thornpeak.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -448,6 +448,23 @@ export const pl_PL: EnTranslations = {
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "Puchar Doliny",
@@ -7496,7 +7513,7 @@ export const pl_PL: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Zarządczyni stajni",
-        "greeting": "Każdy jeździec przychodzi na dwóch nogach. Złoto z góry, siodło, gdy zdołasz w nim usiedzieć."
+        "greeting": "Każdy jeździec przychodzi na dwóch nogach, {className}. Wodzy nie dostaniesz, dopóki nie utrzymasz się na Valorsteedzie bez całowania błota, a Highwatch nie ma zbyt wielu uzdrowicieli na złamane kości."
       },
       "warden_fenwick": {
         "name": "Strażnik Fenwick",
@@ -8419,6 +8436,16 @@ export const pl_PL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Leśny Wilk zabity"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Lekcje jazdy konnej",
+        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję, a tego nie nauczysz się w jedno popołudnie. Wsiadaj, patrz na moje ręce na wodzach i dopasuj się do przechyłów Valorsteeda, zanim uzna, że nie jesteś wart zachodu.",
+        "completion": "No, właśnie tak. Ani razu nie złapałeś się ogrodzenia przez całą przejażdżkę. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.",
+        "objectives": {
+          "0": {
+            "label": "Ujeżdżenie Valorsteeda"
           }
         }
       },

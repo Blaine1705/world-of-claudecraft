@@ -89,6 +89,8 @@ const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
     'small centered modal (dynamic, reused by the input dialog); the base .window centering is correct on touch',
   'delve-rite-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
   'lockpick-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
+  'mount-training-panel':
+    'in-run gameplay overlay (the riding-lesson minigame), not a menu window that docks to a sheet; a centered popup on the lockpick-panel / delve-rite-panel precedent with touch-sized lean buttons',
   'daily-rewards-window':
     'sized entirely by the shared body.mobile-touch .window sheet base (max-width/max-height) plus its own .dr-body 2-column body rule; its only id-specific mobile rule is a z-index bump, so it carries no id-scoped pin of its own',
 };

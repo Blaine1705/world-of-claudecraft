@@ -111,7 +111,7 @@ const NPC_IDS = [
   'smith_haldren',
   'fisherman_brandt',
   'foreman_odell',
-  'stablemaster_marla', // the stablemaster: sells the horse reins (Eastbrook, zone 1)
+  'stablemaster_marla', // the stablemaster: teaches riding lessons (Highwatch, zone 3)
   'warden_fenwick',
   'brother_aldric_fen',
   'provisioner_hale',
@@ -213,6 +213,7 @@ const QUEST_IDS = [
   'q_mogger',
   'q_archetype_acceptance',
   'q_prof_make_amends',
+  'q_riding_lessons',
 ] as const;
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;

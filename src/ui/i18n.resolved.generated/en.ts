@@ -428,7 +428,7 @@ export const en: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
+      "stableHint": "Learn to ride at the stables outside Thornpeak.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -448,6 +448,23 @@ export const en: EnTranslations = {
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "The Vale Cup",
@@ -7496,7 +7513,7 @@ export const en: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Stablemaster",
-        "greeting": "Every rider walks in on two legs. Gold up front, saddle when you can sit it."
+        "greeting": "Every rider walks in on two legs, {className}. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and Highwatch has no menders to spare for broken bones."
       },
       "warden_fenwick": {
         "name": "Warden Fenwick",
@@ -8419,6 +8436,16 @@ export const en: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Forest Wolf slain"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Riding Lessons",
+        "text": "Every rider walks in on two legs, {playerName}, same as I told you the day we met. The sitting is what I teach, not what I sell, and I do not teach it in one afternoon. Climb up, mind my hands on the reins, and match the Valorsteed's lean before it decides you are not worth the trouble.",
+        "completion": "There, now. Not one grab at the fence rail the whole run through. The Valorsteed is yours, {playerName}: saddle, reins, and the standing of a rider who earned the seat instead of buying it.",
+        "objectives": {
+          "0": {
+            "label": "Tame the Valorsteed"
           }
         }
       },

@@ -428,7 +428,7 @@ export const ja_JP: EnTranslations = {
       "keybindHint": "騎乗 / 降車キー(初期設定Z)で騎乗します。",
       "notCollected": "未入手",
       "dropHint": "ダンジョンやレイドのボスがドロップします。",
-      "stableHint": "イーストブルック渓谷の厩舎番から購入できます。",
+      "stableHint": "ソーンピーク郊外の厩舎で乗馬を学べます。",
       "clickManage": "クリックしてマウントを選択",
       "rarity_common": "コモン",
       "rarity_rare": "レア",
@@ -448,6 +448,23 @@ export const ja_JP: EnTranslations = {
       "desc_aether_hover_cycle": "低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。",
       "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。"
+    },
+    "mountTraining": {
+      "title": "乗馬レッスン",
+      "prompt": "振り落とされる前に、馬の傾きに合わせよう。",
+      "leanLeft": "Lean Left",
+      "leanRight": "右に傾ける",
+      "steady": "姿勢を保つ",
+      "cueLeft": "馬が左に傾く。",
+      "cueRight": "馬が右に傾く。",
+      "cueSteady": "馬が落ち着く。",
+      "begin": "レッスン開始",
+      "abort": "Give Up",
+      "round": "{total} ラウンド中 {n} 回目",
+      "misses": "失敗 {n}/{cap}",
+      "thrown": "振り落とされた。落ち着いてもう一度挑戦しよう。",
+      "success": "ヴァロースティードを乗りこなした。",
+      "close": "閉じる"
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -7496,7 +7513,7 @@ export const ja_JP: EnTranslations = {
       "stablemaster_marla": {
         "name": "マーラ・ヒッチェン",
         "title": "厩舎長",
-        "greeting": "騎手はみな二本足で歩いてくる。金は先払い、鞍にまたがれるようになったら乗せてやろう。"
+        "greeting": "騎手はみな二本足で歩いてくる、{className}よ。ヴァロースティードにまたがって泥にまみれずにいられるようになるまで、手綱は渡さない。ハイウォッチには骨折を治せる者もそう余っていないのでね。"
       },
       "warden_fenwick": {
         "name": "番人フェンウィック",
@@ -8419,6 +8436,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フォレストウルフを討伐"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "乗馬の稽古",
+        "text": "騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。そしてそれは一日の午後だけでは身につかない。上に乗って、手綱を握るわたしの手をよく見て、振り落とされる前にヴァロースティードの傾きに合わせるのだ。",
+        "completion": "よし、それでいい。ひとっ走りの間、柵に一度もしがみつかなかったな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。",
+        "objectives": {
+          "0": {
+            "label": "ヴァロースティードを乗りこなす"
           }
         }
       },

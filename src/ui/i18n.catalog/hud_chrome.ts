@@ -444,7 +444,7 @@ export const hudChromeStrings = {
     keybindHint: 'Press the Mount / Dismount key (default Z) to ride.',
     notCollected: 'Not collected',
     dropHint: 'Drops from dungeon and raid bosses.',
-    stableHint: 'Sold by the stablemaster in Eastbrook Vale.',
+    stableHint: 'Learn to ride at the stables outside Thornpeak.',
     clickManage: 'Click to choose your mount',
     rarity_common: 'Common',
     rarity_rare: 'Rare',
@@ -467,6 +467,27 @@ export const hudChromeStrings = {
       'A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.',
     desc_stormfeather_griffin:
       'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
+  },
+  // The riding-lesson minigame at the Highwatch stables (q_riding_lessons):
+  // Stablemaster Marla walks the player through matching the Valorsteed's lean
+  // before it throws them. Sim-side gameplay lives in src/sim/mounts_training.ts;
+  // these are the panel/prompt/cue strings for its UI.
+  mountTraining: {
+    title: 'Riding Lesson',
+    prompt: "Match the horse's lean before it throws you.",
+    leanLeft: 'Lean Left',
+    leanRight: 'Lean Right',
+    steady: 'Hold Steady',
+    cueLeft: 'The horse pitches left.',
+    cueRight: 'The horse pitches right.',
+    cueSteady: 'The horse steadies.',
+    begin: 'Begin Lesson',
+    abort: 'Give Up',
+    round: 'Round {n} of {total}',
+    misses: 'Slips {n} of {cap}',
+    thrown: 'You were thrown. Steady up and try again.',
+    success: 'You have tamed the Valorsteed.',
+    close: 'Close',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
   // the persistent indicator button, the in-match score strip, and the event

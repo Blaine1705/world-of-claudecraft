@@ -1155,6 +1155,21 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     banker: true,
     greeting: 'Every crate, coffer, and trinket is safe with the Gilded Strongbox.',
   },
+  // Relocated from Eastbrook Vale (zone 1): Marla moved her stable up to
+  // Highwatch, where the mountain roads finally justified teaching riding
+  // lessons instead of just selling reins over a fence. Stands at the gate of
+  // the stable yard, a short walk down the slope southwest of the south gate.
+  stablemaster_marla: {
+    id: 'stablemaster_marla',
+    name: 'Marla Hitchen',
+    title: 'Stablemaster',
+    pos: { x: -18, z: 626 },
+    facing: -1.7,
+    color: 0x8b5a2b,
+    questIds: ['q_riding_lessons'],
+    greeting:
+      'Every rider walks in on two legs, $C. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and Highwatch has no menders to spare for broken bones.',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -1810,6 +1825,35 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     minLevel: 20,
     suggestedPlayers: 10,
   },
+  // Riding lessons at the Highwatch stable yard: the story path to the
+  // Valorsteed. The single interact objective is a sentinel credited by the
+  // riding-lesson minigame on success (see src/sim/mounts_training.ts), not a
+  // real placed ground object, so no ZONE3_OBJECTS entry backs it.
+  q_riding_lessons: {
+    id: 'q_riding_lessons',
+    name: 'Riding Lessons',
+    giverNpcId: 'stablemaster_marla',
+    turnInNpcId: 'stablemaster_marla',
+    text: "Every rider walks in on two legs, $N, same as I told you the day we met. The sitting is what I teach, not what I sell, and I do not teach it in one afternoon. Climb up, mind my hands on the reins, and match the Valorsteed's lean before it decides you are not worth the trouble.",
+    completionText:
+      'There, now. Not one grab at the fence rail the whole run through. The Valorsteed is yours, $N: saddle, reins, and the standing of a rider who earned the seat instead of buying it.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'train_valorsteed',
+        count: 1,
+        label: 'Tame the Valorsteed',
+      },
+    ],
+    xpReward: 3000,
+    copperReward: 1500,
+    itemRewards: {
+      warrior: 'reins_valorsteed',
+      mage: 'reins_valorsteed',
+      rogue: 'reins_valorsteed',
+    },
+    minLevel: 20,
+  },
 };
 
 export const ZONE3_QUEST_ORDER = [
@@ -1846,6 +1890,7 @@ export const ZONE3_QUEST_ORDER = [
   'q_nythraxis_sealed_crypt',
   'q_nythraxis_bound_guardian',
   'q_nythraxis_scourges_end',
+  'q_riding_lessons',
 ];
 
 // ---------------------------------------------------------------------------
@@ -3158,11 +3203,19 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { kind: 'house', x: 18, z: 660, w: 6, d: 5, rot: 1.2 },
     { kind: 'inn', x: -15, z: 666, w: 6, d: 7, rot: 0.6 },
     { kind: 'chapel', x: -16, z: 650, w: 5, d: 7, rot: 0.9 },
+    // Stable yard (Stablemaster Marla): a short walk down the slope southwest of
+    // the south gate, clear of the ridge_stalker/training_dummy camps. The barn
+    // reuses the 'inn' building kind for a larger, barn-like footprint.
+    { kind: 'inn', x: -20, z: 630, w: 9, d: 7, rot: -0.3 },
   ],
-  wells: [{ x: 0, z: 662, r: 1.5 }],
+  wells: [
+    { x: 0, z: 662, r: 1.5 },
+    { x: -19, z: 620, r: 1.3 }, // stable yard water trough
+  ],
   stalls: [
     { x: -7.5, z: 667, rot: Math.PI / 2, r: 1.7 }, // Quartermaster Bree
     { x: -4.5, z: 673.5, rot: -0.6, r: 1.7 }, // Armorer Hode
+    { x: -11, z: 633, rot: 1.0, r: 1.6 }, // stable yard feed stall
   ],
   mines: [
     { x: 88, z: 612, rot: -2.0 }, // Deeprock Burrows
@@ -3179,6 +3232,8 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { x: 58, z: 823, rot: -0.5, scale: 1 },
     { x: 60, z: 812, rot: 2.2, scale: 1 },
     { x: 28, z: 848, rot: 1.5, scale: 1 },
+    // Stable yard: a tack tent beside the barn
+    { x: -10, z: 628, rot: 2.0, scale: 1 },
   ],
   crates: [
     [-118, 728],
@@ -3206,6 +3261,10 @@ export const ZONE3_PROPS: ZonePropsDef = {
   fences: [
     { x1: -14, z1: 649, x2: -4, z2: 647 }, // south gate, east run
     { x1: 4, z1: 647, x2: 14, z2: 649 }, // south gate, west run
+    // Stable yard corral: three fenced sides open north toward the barn door
+    { x1: -25, z1: 614, x2: -25, z2: 626 }, // corral, west run
+    { x1: -25, z1: 614, x2: -13, z2: 614 }, // corral, south run
+    { x1: -13, z1: 614, x2: -13, z2: 626 }, // corral, east run
   ],
   graveyards: [
     { x: 15, z: 645 },

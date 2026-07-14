@@ -2485,7 +2485,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Zarządczyni stajni',
   'entities.npcs.stablemaster_marla.greeting':
-    'Każdy jeździec przychodzi na dwóch nogach. Złoto z góry, siodło, gdy zdołasz w nim usiedzieć.',
+    'Każdy jeździec przychodzi na dwóch nogach, {className}. Wodzy nie dostaniesz, dopóki nie utrzymasz się na Valorsteedzie bez całowania błota, a Highwatch nie ma zbyt wielu uzdrowicieli na złamane kości.',
+  'entities.quests.q_riding_lessons.title': 'Lekcje jazdy konnej',
+  'entities.quests.q_riding_lessons.text':
+    'Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję, a tego nie nauczysz się w jedno popołudnie. Wsiadaj, patrz na moje ręce na wodzach i dopasuj się do przechyłów Valorsteeda, zanim uzna, że nie jesteś wart zachodu.',
+  'entities.quests.q_riding_lessons.completion':
+    'No, właśnie tak. Ani razu nie złapałeś się ogrodzenia przez całą przejażdżkę. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Ujeżdżenie Valorsteeda',
   'entities.npcs.marshal_redbrook.title': 'Marszałek Miasta',
   'entities.npcs.provisioner_hale.greeting':
     'Suche buty, suchy chleb, suchy proch - w Fenbridge w dobry dzień dostaniesz dwa z trzech.',

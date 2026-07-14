@@ -2584,7 +2584,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Kepala Kandang',
   'entities.npcs.stablemaster_marla.greeting':
-    'Setiap penunggang datang dengan dua kaki. Emas di muka, pelana saat kau sanggup menungganginya.',
+    'Setiap penunggang datang dengan dua kaki, {className}. Kendali baru kuberikan setelah kau sanggup menunggangi Valorsteed tanpa jatuh tersungkur, dan Highwatch tak punya tabib lebih untuk tulang yang patah.',
+  'entities.quests.q_riding_lessons.title': 'Pelajaran Menunggang Kuda',
+  'entities.quests.q_riding_lessons.text':
+    'Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual, dan itu tak bisa dipelajari dalam satu sore saja. Naiklah, perhatikan tanganku pada kendali, dan ikuti gerak condong Valorsteed sebelum ia memutuskan kau tak layak direpotkan.',
+  'entities.quests.q_riding_lessons.completion':
+    'Nah, begitu. Tak sekali pun kau memegang pagar sepanjang putaran itu. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Jinakkan Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Marsekal Kota',
   'entities.npcs.provisioner_hale.greeting':
     'Sepatu kering, roti kering, bubuk mesiu kering - di Fenbridge kau dapat dua dari tiga di hari yang baik.',

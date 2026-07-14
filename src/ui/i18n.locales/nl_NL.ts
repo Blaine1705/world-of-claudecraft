@@ -2516,7 +2516,13 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Stalmeesteres',
   'entities.npcs.stablemaster_marla.greeting':
-    'Elke ruiter komt op twee benen binnen. Goud vooraf, het zadel als je erin kunt blijven zitten.',
+    'Elke ruiter komt op twee benen binnen, {className}. De teugels krijg je pas als je op de Valorsteed kunt blijven zitten zonder in de modder te belanden, en Highwatch heeft geen genezers over voor gebroken botten.',
+  'entities.quests.q_riding_lessons.title': 'Rijlessen',
+  'entities.quests.q_riding_lessons.text':
+    'Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Blijven zitten is wat ik leer, niet wat ik verkoop, en dat leer je niet op één middag. Klim erop, let op mijn handen aan de teugels, en volg de helling van de Valorsteed voordat hij besluit dat je de moeite niet waard bent.',
+  'entities.quests.q_riding_lessons.completion':
+    'Zo, ja. Geen één keer greep je naar het hek, de hele rit door. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Tem de Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Stadsmaarschalk',
   'entities.npcs.provisioner_hale.greeting':
     'Droge laarzen, droog brood, droog kruit, bij Fenbridge krijg je er op een goede dag twee van de drie.',

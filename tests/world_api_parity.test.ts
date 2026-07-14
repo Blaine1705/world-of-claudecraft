@@ -302,6 +302,11 @@ export const IWORLD_MEMBERS = [
   { name: 'ownedMounts', kind: 'method' }, // read-returning
   { name: 'selectMount', kind: 'method' },
   { name: 'toggleMounted', kind: 'method' },
+  // --- riding-lesson / mount-training minigame (IWorldMounts) ---
+  { name: 'mountTrainingView', kind: 'method' }, // read-returning
+  { name: 'mountTrainBegin', kind: 'method' },
+  { name: 'mountTrainAnswer', kind: 'method' },
+  { name: 'mountTrainAbort', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -403,9 +408,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(209);
+    expect(IWORLD_MEMBERS.length).toBe(213);
     expect(DATA_MEMBERS.length).toBe(54);
-    expect(METHOD_MEMBERS.length).toBe(155);
+    expect(METHOD_MEMBERS.length).toBe(159);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -541,6 +546,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketInfo',
       'marketList',
       'marketSearch',
+      'mountTrainAbort',
+      'mountTrainAnswer',
+      'mountTrainBegin',
+      'mountTrainingView',
       'moveInput',
       'moveRaidMember',
       'nodeHarvestableByMe',
@@ -780,6 +789,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollect',
       'marketList',
       'marketSearch',
+      'mountTrainAbort',
+      'mountTrainAnswer',
+      'mountTrainBegin',
+      'mountTrainingView',
       'moveRaidMember',
       'nodeHarvestableByMe',
       'ownedMounts',
@@ -1207,6 +1220,10 @@ const FACET_MOUNTS = [
   'ownedMounts',
   'selectMount',
   'toggleMounted',
+  'mountTrainingView',
+  'mountTrainBegin',
+  'mountTrainAnswer',
+  'mountTrainAbort',
 ] as const satisfies readonly (keyof IWorldMounts)[];
 type _ExhaustMounts = AssertNever<Exclude<keyof IWorldMounts, (typeof FACET_MOUNTS)[number]>>;
 
@@ -1289,10 +1306,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 26 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 26 facets equals the pinned 209-member IWORLD_MEMBERS set', () => {
+  it('the union of the 26 facets equals the pinned 213-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(209);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(209);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(213);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(213);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

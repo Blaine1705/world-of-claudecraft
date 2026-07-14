@@ -8,6 +8,7 @@ import type {
   DelveCompanionInfo,
   DelveRunInfo,
   LockpickView,
+  MountTrainingView,
   PlayerProfessionsView,
 } from '../world_api';
 import * as bagsMod from './bags';
@@ -199,6 +200,14 @@ import {
   toggleMount as toggleMountImpl,
   updateMountTransition,
 } from './mounts';
+import {
+  abandonMountTraining as abandonMountTrainingImpl,
+  mountTrainAbort as mountTrainAbortImpl,
+  mountTrainAnswer as mountTrainAnswerImpl,
+  mountTrainBegin as mountTrainBeginImpl,
+  mountTrainingViewFor as mountTrainingViewForImpl,
+  tickMountTrainingTimeout as tickMountTrainingTimeoutImpl,
+} from './mounts_training';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -410,6 +419,7 @@ import {
   type MasterLootThreshold,
   MELEE_RANGE,
   type MobFamily,
+  type MountTrainingSession,
   type MoveInput,
   type OverheadEmoteId,
   PARTY_MEMBER_AURA_CAP,
@@ -430,6 +440,7 @@ import {
   SUNDER_ARMOR_PCT_PER_STACK,
   steadyAngleTo,
   swingMissChance,
+  type TrainingLean,
   type VcBracket,
   type VcNationId,
   type Vec3,
@@ -813,6 +824,17 @@ export interface PlayerMeta {
   // now" state is Entity.mountKey, which starts '' on login and clears on
   // death. Collection + rules live in src/sim/mounts.ts.
   selectedMount: MountKey;
+  // The active riding-lesson (mount-training minigame) attempt, or null. Session
+  // state, never persisted: src/sim/mounts_training.ts owns the rules; this is
+  // the same optional-plus-null shape as other transient session fields below
+  // (e.g. `away`), initialized to null in createPlayer.
+  mountTraining?: MountTrainingSession | null;
+  // One-time riding-lesson fee (100g), charged at the first successful
+  // mount_train_begin. Optional so absent === false (pre-feature saves and a
+  // fresh character stay byte-equal): never explicitly set to false, only ever
+  // flipped true, mirroring the selectedMount-omitted-while-default convention
+  // in serializeCharacter below.
+  mountTrainingFeePaid?: boolean;
   moveInput: MoveInput;
   // Monotonic counter bumped when a bulky, rarely-changing wire field (the
   // inventory, and the collection-quest progress derived from it) mutates, so a
@@ -1130,6 +1152,11 @@ export interface CharacterState {
   // Rideable mount pick (JSONB; optional AND absent while on the default
   // horse, so pre-mount saves stay byte-equal and load as the horse).
   selectedMount?: string;
+  // One-time riding-lesson training fee (100g), charged at the first successful
+  // mount_train_begin (src/sim/mounts_training.ts). Optional and absent until
+  // paid, so pre-mount-training saves (and every save before the fee is ever
+  // charged) stay byte-equal.
+  mountTrainingFeePaid?: boolean;
   delveMarks?: number;
   delveClears?: Record<string, number>;
   companionUpgrades?: Record<string, number>;
@@ -1810,6 +1837,7 @@ export class Sim {
       activeLoadout: -1,
       raidLockouts: new Map(),
       away: null,
+      mountTraining: null,
       marketFilter: '',
       craftSkills: emptyCraftSkills(),
       knownRecipes: new Set(),
@@ -1928,6 +1956,9 @@ export class Sim {
       if (s.knownRecipes) meta.knownRecipes = new Set(s.knownRecipes);
       meta.archetype = normalizeArchetypeState(s.archetype);
       meta.mailWelcomed = s.mailWelcomed === true;
+      // Never explicitly set false: absent stays absent so a pre-feature save
+      // (or one where the fee was never charged) round-trips byte-equal.
+      if (s.mountTrainingFeePaid === true) meta.mountTrainingFeePaid = true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -2063,6 +2094,9 @@ export class Sim {
     const leavingRun = this.delveRunForPlayer(pid);
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
+    // A leaving player's riding-lesson session is likewise abandoned (never
+    // silently left IN_PROGRESS); the one-time fee stays paid either way.
+    if (meta.mountTraining?.state === 'IN_PROGRESS') this.ctx.abandonMountTraining(meta);
     this.preparePlayerLeave(pid);
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
@@ -2296,6 +2330,8 @@ export class Sim {
       // Absent while on the default horse (back-compat: legacy no-pick saves
       // and horse-pick saves load identically, as the horse).
       ...(meta.selectedMount !== DEFAULT_MOUNT ? { selectedMount: meta.selectedMount } : {}),
+      // Absent until the fee is actually charged (back-compat + parity-stable saves).
+      ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       craftSkills: { ...meta.craftSkills },
       knownRecipes: [...meta.knownRecipes],
       archetype: { ...meta.archetype },
@@ -2363,6 +2399,37 @@ export class Sim {
   }
   toggleMounted(): void {
     this.toggleMountFor(this.primaryId);
+  }
+
+  /** Per-pid riding-lesson (mount-training minigame) command surface (the server
+   *  path); the IWorld members below ride primaryId. Rules live in
+   *  src/sim/mounts_training.ts. */
+  mountTrainBeginFor(pid: number): void {
+    mountTrainBeginImpl(this.ctx, pid);
+  }
+  mountTrainAnswerFor(pid: number, lean: TrainingLean): void {
+    mountTrainAnswerImpl(this.ctx, lean, pid);
+  }
+  mountTrainAbortFor(pid: number): void {
+    mountTrainAbortImpl(this.ctx, pid);
+  }
+  /** Read-only projection of a player's active riding-lesson attempt. */
+  mountTrainingViewFor(pid?: number): MountTrainingView | null {
+    return mountTrainingViewForImpl(this.ctx, pid);
+  }
+
+  // --- IWorldMounts: riding-lesson (mount-training) minigame ---
+  mountTrainingView(): MountTrainingView | null {
+    return this.mountTrainingViewFor(this.primaryId);
+  }
+  mountTrainBegin(): void {
+    this.mountTrainBeginFor(this.primaryId);
+  }
+  mountTrainAnswer(lean: TrainingLean): void {
+    this.mountTrainAnswerFor(this.primaryId, lean);
+  }
+  mountTrainAbort(): void {
+    this.mountTrainAbortFor(this.primaryId);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and
@@ -3130,6 +3197,8 @@ export class Sim {
       maybeCompanionBark: (run, pid, barkId) => sim.maybeCompanionBark(run, pid, barkId),
       abandonLockpick: (run) => lockpickMod.abandonLockpick(sim.ctx, run),
       tickLockpickTimeout: (run) => lockpickMod.tickLockpickTimeout(sim.ctx, run),
+      tickMountTrainingTimeout: (meta) => tickMountTrainingTimeoutImpl(sim.ctx, meta),
+      abandonMountTraining: (meta) => abandonMountTrainingImpl(sim.ctx, meta),
       delveRunForMob: (mobId) => sim.delveRunForMob(mobId),
       onDelveBossDefeated: (run) => sim.onDelveBossDefeated(run),
       delveDetectMult: (player) => sim.delveDetectMult(player),
@@ -3432,6 +3501,9 @@ export class Sim {
         // swimmer. Live players only (a dead player is already force-dismounted by
         // handleDeath). Draws no rng, so the tick-phase draw order is unchanged.
         updateMountTransition(this.ctx, p, this.isSwimming(p));
+        // Riding-lesson (mount-training) per-round deadline: server-authoritative,
+        // times a round out as a miss when its window elapses. Draws no rng.
+        this.ctx.tickMountTrainingTimeout(meta);
         lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not

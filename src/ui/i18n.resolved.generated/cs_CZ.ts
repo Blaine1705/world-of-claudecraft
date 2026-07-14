@@ -428,7 +428,7 @@ export const cs_CZ: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
+      "stableHint": "Learn to ride at the stables outside Thornpeak.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -448,6 +448,23 @@ export const cs_CZ: EnTranslations = {
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -7496,7 +7513,7 @@ export const cs_CZ: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Správkyně stájí",
-        "greeting": "Každý jezdec sem přijde po svých. Zlato předem, sedlo, až se v něm udržíš."
+        "greeting": "Každý jezdec sem přijde po svých, {className}. Otěže nedostaneš, dokud neusedneš na Valorsteeda, aniž bys skončil v blátě, a Highwatch nemá ranhojiče nazbyt pro zlomené kosti."
       },
       "warden_fenwick": {
         "name": "Strážce Fenwick",
@@ -8419,6 +8436,16 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lesní vlk zabit"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Jezdecké lekce",
+        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám, a to se nenaučíš za jedno odpoledne. Vylez nahoru, dávej pozor na mé ruce na otěžích a přizpůsob se náklonu Valorsteeda, než usoudí, že s tebou není žádná námaha.",
+        "completion": "Tak. Ani jednou ses nechytil plotu celou tu dobu. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.",
+        "objectives": {
+          "0": {
+            "label": "Zkroť Valorsteeda"
           }
         }
       },

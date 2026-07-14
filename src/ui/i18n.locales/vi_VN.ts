@@ -2558,7 +2558,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Quản Mã',
   'entities.npcs.stablemaster_marla.greeting':
-    'Kỵ sĩ nào cũng bước vào bằng hai chân. Vàng trả trước, yên ngựa khi nào ngồi vững thì trao.',
+    'Kỵ sĩ nào cũng bước vào bằng hai chân, {className}. Ta chỉ trao dây cương khi nào ngươi ngồi vững trên lưng Valorsteed mà không lăn xuống bùn, vì Highwatch chẳng dư thầy thuốc để chữa xương gãy.',
+  'entities.quests.q_riding_lessons.title': 'Bài Học Cưỡi Ngựa',
+  'entities.quests.q_riding_lessons.text':
+    'Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán, và chẳng ai học được điều đó trong một buổi chiều. Leo lên, để ý đôi tay ta trên dây cương, và theo nhịp nghiêng của Valorsteed trước khi nó quyết định ngươi không đáng để bận tâm.',
+  'entities.quests.q_riding_lessons.completion':
+    'Đấy, được rồi. Suốt cả vòng chạy, ngươi chẳng một lần bám vào hàng rào. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Thuần Hóa Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Cảnh Trưởng Thị Trấn',
   'entities.npcs.provisioner_hale.greeting':
     'Giày khô, bánh khô, thuốc súng khô, ở Fenbridge ngày đẹp trời lắm thì được hai trong ba.',

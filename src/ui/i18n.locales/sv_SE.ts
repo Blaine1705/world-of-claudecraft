@@ -2472,7 +2472,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Stallmästare',
   'entities.npcs.stablemaster_marla.greeting':
-    'Varje ryttare kommer in på två ben. Guld i förskott, sadeln när du kan sitta kvar i den.',
+    'Varje ryttare kommer in på två ben, {className}. Tyglarna får du inte förrän du kan sitta kvar på Valorsteed utan att kyssa leran, och Highwatch har inga läkare att avvara för brutna ben.',
+  'entities.quests.q_riding_lessons.title': 'Ridlektioner',
+  'entities.quests.q_riding_lessons.text':
+    'Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer, och det lär man sig inte på en eftermiddag. Kliv upp, lägg märke till mina händer på tyglarna, och följ Valorsteeds lutning innan den bestämmer att du inte är besväret värd.',
+  'entities.quests.q_riding_lessons.completion':
+    'Så där ja. Inte en enda gång tog du tag i stängslet under hela ridturen. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Tämj Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Stadsmarskalk',
   'entities.npcs.provisioner_hale.greeting':
     'Torra stövlar, torrt bröd, torrt krut - vid Kärrbron får du två av tre en bra dag.',

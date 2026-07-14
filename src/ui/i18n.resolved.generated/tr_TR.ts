@@ -428,7 +428,7 @@ export const tr_TR: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
+      "stableHint": "Learn to ride at the stables outside Thornpeak.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -448,6 +448,23 @@ export const tr_TR: EnTranslations = {
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "Vadi Kupası",
@@ -7496,7 +7513,7 @@ export const tr_TR: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Ahır Ustası",
-        "greeting": "Her binici buraya iki ayağıyla gelir. Altın peşin, eyer ise ona oturabildiğinde."
+        "greeting": "Her binici buraya iki ayağıyla gelir, {className}. Çamura yüz üstü düşmeden Valorsteed'e oturana dek dizginleri sana vermem, çünkü Highwatch'ta kırık kemiklere bakacak fazladan şifacı yok."
       },
       "warden_fenwick": {
         "name": "Muhafız Fenwick",
@@ -8419,6 +8436,16 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Orman kurdu öldürüldü"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Binicilik Dersleri",
+        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil, ve bu bir öğleden sonrada öğrenilmez. Bin, dizginlerdeki ellerime dikkat et ve seni fazla zahmetli bulup atmadan önce Valorsteed'in yatışına ayak uydur.",
+        "completion": "İşte böyle. Bütün tur boyunca bir kere bile çite tutunmadın. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.",
+        "objectives": {
+          "0": {
+            "label": "Valorsteed'i evcilleştir"
           }
         }
       },

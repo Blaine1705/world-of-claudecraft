@@ -2518,7 +2518,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': '瑪拉·希琴',
   'entities.npcs.stablemaster_marla.title': '馬廄總管',
   'entities.npcs.stablemaster_marla.greeting':
-    '每個騎手都是兩條腿走進來的。先付金子，等你坐得穩了再上鞍。',
+    '每個騎手都是兩條腿走進來的，{className}。你能騎穩英勇戰馬、不摔進泥裡之前，我是不會把韁繩交給你的，高望這兒可沒有多餘的醫者去治斷骨。',
+  'entities.quests.q_riding_lessons.title': '騎術課',
+  'entities.quests.q_riding_lessons.text':
+    '每個騎手都是兩條腿走進來的，{playerName}，就像我們初次見面那天我說的那樣。我教的是怎麼坐穩，不是拿來賣的東西，這也不是一個下午就能學會的。上馬吧，盯緊我握著韁繩的手，在英勇戰馬決定你不值得費這個勁之前，跟上牠傾身的節奏。',
+  'entities.quests.q_riding_lessons.completion':
+    '好了，就是這樣。整趟下來你一次都沒抓過柵欄。英勇戰馬現在是你的了，{playerName}：馬鞍、韁繩，還有靠本事掙來而不是買來的騎手身份。',
+  'entities.quests.q_riding_lessons.objectives.0.label': '馴服英勇戰馬',
   'entities.npcs.marshal_redbrook.title': '城鎮元帥',
   'entities.npcs.marshal_redbrook.greeting': '刀別離手，{className}。山谷已經不是從前的山谷了。',
   'entities.npcs.trader_wilkes.name': '威爾克斯商人',
@@ -6223,7 +6229,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     '一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。',
   'hudChrome.mounts.notCollected': '未收集',
-  'hudChrome.mounts.stableHint': '由東溪谷的馬廄管理員出售。',
+  'hudChrome.mounts.stableHint': '在荊峰郊外的馬廄學習騎術。',
   'hudChrome.mounts.dropHint': '由地城和團隊副本首領掉落。',
   'hudChrome.mounts.clickManage': '點擊選擇坐騎',
+  'hudChrome.mountTraining.title': '騎乘課',
+  'hudChrome.mountTraining.prompt': '在馬把你甩下去之前，跟上牠的傾斜方向。',
+  'hudChrome.mountTraining.leanRight': '向右傾',
+  'hudChrome.mountTraining.steady': '保持穩定',
+  'hudChrome.mountTraining.cueLeft': '馬向左傾。',
+  'hudChrome.mountTraining.cueRight': '馬向右傾。',
+  'hudChrome.mountTraining.cueSteady': '馬站穩了。',
+  'hudChrome.mountTraining.begin': '開始課程',
+  'hudChrome.mountTraining.round': '第 {n} 輪，共 {total} 輪',
+  'hudChrome.mountTraining.misses': '失誤 {n}/{cap}',
+  'hudChrome.mountTraining.thrown': '你被甩下馬了。穩住，再試一次。',
+  'hudChrome.mountTraining.success': '你已經馴服了英勇戰馬。',
+  'hudChrome.mountTraining.close': '關閉',
 };

@@ -428,7 +428,7 @@ export const de_DE: EnTranslations = {
       "keybindHint": "Drückt die Aufsitzen-/Absitzen-Taste (Standard Z), um zu reiten.",
       "notCollected": "Nicht gesammelt",
       "dropHint": "Wird von Dungeon- und Schlachtzugsbossen fallen gelassen.",
-      "stableHint": "Wird vom Stallmeister im Eastbrook-Tal verkauft.",
+      "stableHint": "Lernt das Reiten in den Ställen vor Thornpeak.",
       "clickManage": "Anklicken, um Euer Reittier zu wählen",
       "rarity_common": "Verbreitet",
       "rarity_rare": "Selten",
@@ -448,6 +448,23 @@ export const de_DE: EnTranslations = {
       "desc_aether_hover_cycle": "Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.",
       "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
       "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "Der Talpokal",
@@ -7496,7 +7513,7 @@ export const de_DE: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Stallmeisterin",
-        "greeting": "Jeder Reiter kommt auf zwei Beinen herein. Gold im Voraus, den Sattel, wenn Ihr ihn halten könnt."
+        "greeting": "Jeder Reiter kommt auf zwei Beinen herein, {className}. Die Zügel gebe ich erst, wenn Ihr den Valorross reiten könnt, ohne im Dreck zu landen, und Highwatch hat keine Heiler für gebrochene Knochen übrig."
       },
       "warden_fenwick": {
         "name": "Wärter Fenwick",
@@ -8419,6 +8436,16 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Waldwolf getötet"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Reitstunden",
+        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe, und das lernt man nicht an einem Nachmittag. Steigt auf, achtet auf meine Hände an den Zügeln, und gleicht Euch der Neigung des Valorross an, bevor er entscheidet, Ihr seid die Mühe nicht wert.",
+        "completion": "So, ja. Kein einziges Mal nach dem Zaun gegriffen, die ganze Runde über. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.",
+        "objectives": {
+          "0": {
+            "label": "Bezähmt den Valorross"
           }
         }
       },

@@ -2548,7 +2548,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Ahır Ustası',
   'entities.npcs.stablemaster_marla.greeting':
-    'Her binici buraya iki ayağıyla gelir. Altın peşin, eyer ise ona oturabildiğinde.',
+    "Her binici buraya iki ayağıyla gelir, {className}. Çamura yüz üstü düşmeden Valorsteed'e oturana dek dizginleri sana vermem, çünkü Highwatch'ta kırık kemiklere bakacak fazladan şifacı yok.",
+  'entities.quests.q_riding_lessons.title': 'Binicilik Dersleri',
+  'entities.quests.q_riding_lessons.text':
+    "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil, ve bu bir öğleden sonrada öğrenilmez. Bin, dizginlerdeki ellerime dikkat et ve seni fazla zahmetli bulup atmadan önce Valorsteed'in yatışına ayak uydur.",
+  'entities.quests.q_riding_lessons.completion':
+    'İşte böyle. Bütün tur boyunca bir kere bile çite tutunmadın. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.',
+  'entities.quests.q_riding_lessons.objectives.0.label': "Valorsteed'i evcilleştir",
   'entities.npcs.marshal_redbrook.title': 'Kasaba Mareşali',
   'entities.npcs.provisioner_hale.greeting':
     "Kuru çizme, kuru ekmek, kuru barut, Fenbridge'de iyi bir günde üçünden ikisini bulursun.",

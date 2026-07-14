@@ -88,7 +88,13 @@ export type {
   GuildLeaderboardPage,
   LeaderboardPage,
 } from './sim/leaderboard_page';
-export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from './sim/types';
+export type {
+  ArenaCombatant,
+  ArenaFormat,
+  ArenaStanding,
+  OverheadEmoteId,
+  TrainingLean,
+} from './sim/types';
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
 export type { BankBonusSource, BankInfo } from './world_api/bank';
@@ -124,6 +130,7 @@ export type {
 export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
+export type { MountTrainingView } from './world_api/mounts';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
 export type {
@@ -347,6 +354,9 @@ export const COMMAND_NAMES = [
   'vcup_practice',
   'mount_select',
   'mount_toggle',
+  'mount_train_begin',
+  'mount_train_answer',
+  'mount_train_abort',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -568,6 +578,12 @@ export const COMMAND_FACETS = {
   vcup_practice: 'IWorldValeCup',
   // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
   // selectedMount is a self-snapshot read (terse `mnt`, no send, untagged).
+  // mount_train_* is the riding-lesson minigame; mountTrainingView rebuilds
+  // client-side from the mountTrain* events (no snapshot field, untagged),
+  // the lockpickState precedent.
   mount_select: 'IWorldMounts',
   mount_toggle: 'IWorldMounts',
+  mount_train_begin: 'IWorldMounts',
+  mount_train_answer: 'IWorldMounts',
+  mount_train_abort: 'IWorldMounts',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

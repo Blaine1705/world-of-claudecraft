@@ -3566,7 +3566,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Caballeriza mayor',
   'entities.npcs.stablemaster_marla.greeting':
-    'Cada jinete llega a pie. El oro por delante; la silla, cuando puedas montarla.',
+    'Cada jinete llega a pie, {className}. No te daré las riendas hasta que puedas montar al Corcel del Valor sin besar el barro, y en Highwatch no sobran sanadores para huesos rotos.',
+  'entities.quests.q_riding_lessons.title': 'Lecciones de equitación',
+  'entities.quests.q_riding_lessons.text':
+    'Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo, y eso no se aprende en una tarde. Sube, atiende a mis manos en las riendas, y sigue el vaivén del Corcel del Valor antes de que decida que no vales la pena.',
+  'entities.quests.q_riding_lessons.completion':
+    'Así, muy bien. Ni una sola vez te agarraste a la cerca en toda la vuelta. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Doma al Corcel del Valor',
   'entities.npcs.marshal_redbrook.title': 'Mariscal de la ciudad',
   'entities.npcs.marshal_redbrook.greeting':
     'Ten la hoja cerca, {className}. El Valle ya no es lo que era.',
@@ -6793,7 +6799,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.',
   'hudChrome.mounts.notCollected': 'Sin coleccionar',
-  'hudChrome.mounts.stableHint': 'La vende el establero en el Valle de Eastbrook.',
+  'hudChrome.mounts.stableHint': 'Aprende a montar en los establos, a las afueras de Thornpeak.',
   'hudChrome.mounts.dropHint': 'Lo sueltan los jefes de mazmorras y bandas.',
   'hudChrome.mounts.clickManage': 'Haz clic para elegir tu montura',
 };

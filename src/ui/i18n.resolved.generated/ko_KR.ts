@@ -428,7 +428,7 @@ export const ko_KR: EnTranslations = {
       "keybindHint": "탑승 / 하차 키(기본 Z)를 눌러 탑승합니다.",
       "notCollected": "미보유",
       "dropHint": "던전 및 공격대 우두머리가 떨어뜨립니다.",
-      "stableHint": "이스트브룩 골짜기의 마구간지기가 판매합니다.",
+      "stableHint": "쏜피크 외곽의 마구간에서 승마를 배우세요.",
       "clickManage": "클릭하여 탈것 선택",
       "rarity_common": "일반",
       "rarity_rare": "희귀",
@@ -448,6 +448,23 @@ export const ko_KR: EnTranslations = {
       "desc_aether_hover_cycle": "낮게 떠서 빠르게 전장을 가로지르도록 설계된 강력한 마도 바이크입니다.",
       "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다."
+    },
+    "mountTraining": {
+      "title": "승마 수업",
+      "prompt": "말이 널 내던지기 전에 기울임에 맞춰라.",
+      "leanLeft": "Lean Left",
+      "leanRight": "오른쪽으로 기울이기",
+      "steady": "자세 유지",
+      "cueLeft": "말이 왼쪽으로 기운다.",
+      "cueRight": "말이 오른쪽으로 기운다.",
+      "cueSteady": "말이 균형을 잡는다.",
+      "begin": "수업 시작",
+      "abort": "Give Up",
+      "round": "{total} 라운드 중 {n}회",
+      "misses": "실수 {n}/{cap}",
+      "thrown": "낙마했다. 침착하게 다시 시도하라.",
+      "success": "발러스티드를 길들였다.",
+      "close": "닫기"
     },
     "vcup": {
       "title": "베일 컵",
@@ -7496,7 +7513,7 @@ export const ko_KR: EnTranslations = {
       "stablemaster_marla": {
         "name": "마를라 히첸",
         "title": "마구간지기",
-        "greeting": "기수는 누구나 두 발로 걸어 들어오지. 금은 선불, 안장은 네가 앉을 수 있을 때 내주마."
+        "greeting": "기수는 누구나 두 발로 걸어 들어오지, {className}. 발러스티드 위에서 진흙에 처박히지 않고 버틸 수 있을 때까지는 고삐를 내주지 않아. 하이워치엔 부러진 뼈를 봐줄 치료사도 넉넉지 않으니까."
       },
       "warden_fenwick": {
         "name": "감시관 펜윅",
@@ -8419,6 +8436,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "숲늑대 처치"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "승마 수업",
+        "text": "기수는 누구나 두 발로 걸어 들어오지, {playerName}, 우리가 처음 만난 날 말했던 그대로다. 내가 가르치는 건 자리에 앉는 법이지 파는 물건이 아니야, 그리고 그건 한나절 만에 배울 수 있는 게 아니지. 올라타서 고삐를 쥔 내 손을 잘 보고, 발러스티드가 널 내던지기 전에 그 기울임에 맞춰봐라.",
+        "completion": "그래, 됐다. 도는 내내 울타리를 한 번도 붙잡지 않았구나. 발러스티드는 이제 네 것이다, {playerName}: 안장도 고삐도, 그리고 값을 치른 게 아니라 스스로 얻어낸 기수의 자리도.",
+        "objectives": {
+          "0": {
+            "label": "발러스티드 길들이기"
           }
         }
       },

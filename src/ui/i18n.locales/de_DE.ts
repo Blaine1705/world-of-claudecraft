@@ -3571,7 +3571,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Stallmeisterin',
   'entities.npcs.stablemaster_marla.greeting':
-    'Jeder Reiter kommt auf zwei Beinen herein. Gold im Voraus, den Sattel, wenn Ihr ihn halten könnt.',
+    'Jeder Reiter kommt auf zwei Beinen herein, {className}. Die Zügel gebe ich erst, wenn Ihr den Valorross reiten könnt, ohne im Dreck zu landen, und Highwatch hat keine Heiler für gebrochene Knochen übrig.',
+  'entities.quests.q_riding_lessons.title': 'Reitstunden',
+  'entities.quests.q_riding_lessons.text':
+    'Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe, und das lernt man nicht an einem Nachmittag. Steigt auf, achtet auf meine Hände an den Zügeln, und gleicht Euch der Neigung des Valorross an, bevor er entscheidet, Ihr seid die Mühe nicht wert.',
+  'entities.quests.q_riding_lessons.completion':
+    'So, ja. Kein einziges Mal nach dem Zaun gegriffen, die ganze Runde über. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Bezähmt den Valorross',
   'entities.npcs.marshal_redbrook.title': 'Stadtmarschall',
   'entities.npcs.marshal_redbrook.greeting':
     'Halte deine Klinge nah, {className}. Das Tal ist nicht mehr, was es war.',
@@ -6815,7 +6821,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.',
   'hudChrome.mounts.notCollected': 'Nicht gesammelt',
-  'hudChrome.mounts.stableHint': 'Wird vom Stallmeister im Eastbrook-Tal verkauft.',
+  'hudChrome.mounts.stableHint': 'Lernt das Reiten in den Ställen vor Thornpeak.',
   'hudChrome.mounts.dropHint': 'Wird von Dungeon- und Schlachtzugsbossen fallen gelassen.',
   'hudChrome.mounts.clickManage': 'Anklicken, um Euer Reittier zu wählen',
 };

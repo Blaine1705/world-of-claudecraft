@@ -428,7 +428,7 @@ export const pt_BR: EnTranslations = {
       "keybindHint": "Pressione a tecla Montar / Desmontar (Z por padrão) para montar.",
       "notCollected": "Não coletada",
       "dropHint": "Obtida de chefes de masmorra e raide.",
-      "stableHint": "Vendida pelo estribeiro no Vale de Eastbrook.",
+      "stableHint": "Aprenda a montar nos estábulos nos arredores de Thornpeak.",
       "clickManage": "Clique para escolher sua montaria",
       "rarity_common": "Comum",
       "rarity_rare": "Rara",
@@ -448,6 +448,23 @@ export const pt_BR: EnTranslations = {
       "desc_aether_hover_cycle": "Uma poderosa moto magitec projetada para travessias de combate rápidas e rente ao chão.",
       "desc_shadowjump_toad": "Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.",
       "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "A Copa do Vale",
@@ -7496,7 +7513,7 @@ export const pt_BR: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Cavalariça-mor",
-        "greeting": "Cada cavaleiro chega a pé. Ouro adiantado; a sela, quando você puder montá-la."
+        "greeting": "Cada cavaleiro chega a pé, {className}. Só entrego as rédeas quando você conseguir montar o Corcel do Valor sem beijar a lama, e Highwatch não tem curandeiros de sobra para ossos quebrados."
       },
       "warden_fenwick": {
         "name": "Guardião Fenwick",
@@ -8419,6 +8436,16 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lobo da Floresta morto"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Aulas de Equitação",
+        "text": "Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo, e isso não se aprende em uma tarde. Suba, preste atenção nas minhas mãos nas rédeas, e acompanhe a inclinação do Corcel do Valor antes que ele decida que você não vale o esforço.",
+        "completion": "Pronto, assim mesmo. Nem uma vez você se segurou na cerca durante toda a volta. O Corcel do Valor é seu, {playerName}: sela, rédeas, e a reputação de um cavaleiro que conquistou o assento em vez de comprá-lo.",
+        "objectives": {
+          "0": {
+            "label": "Domar o Corcel do Valor"
           }
         }
       },

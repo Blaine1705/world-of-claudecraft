@@ -428,7 +428,7 @@ export const it_IT: EnTranslations = {
       "keybindHint": "Premi il tasto Monta / Smonta (Z predefinito) per cavalcare.",
       "notCollected": "Non ottenuta",
       "dropHint": "Bottino dei boss di spedizione e incursione.",
-      "stableHint": "Venduta dallo stalliere nella Valle di Eastbrook.",
+      "stableHint": "Impara a cavalcare nelle stalle fuori Thornpeak.",
       "clickManage": "Clicca per scegliere la tua cavalcatura",
       "rarity_common": "Comune",
       "rarity_rare": "Rara",
@@ -448,6 +448,23 @@ export const it_IT: EnTranslations = {
       "desc_aether_hover_cycle": "Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.",
       "desc_shadowjump_toad": "Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.",
       "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "La Coppa della Valle",
@@ -7496,7 +7513,7 @@ export const it_IT: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Stalliera capo",
-        "greeting": "Ogni cavaliere arriva sulle proprie gambe. Prima l’oro, la sella quando saprai restarci in groppa."
+        "greeting": "Ogni cavaliere arriva sulle proprie gambe, {className}. Non ti darò le redini finché non saprai restare in sella al Destriero del Valore senza baciare il fango, e a Highwatch non abbondano i guaritori per le ossa rotte."
       },
       "warden_fenwick": {
         "name": "Custode Fenwick",
@@ -8419,6 +8436,16 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lupo della Foresta ucciso"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Lezioni di equitazione",
+        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo, e non si impara in un pomeriggio. Sali, presta attenzione alle mie mani sulle redini, e segui il movimento del Destriero del Valore prima che decida che non vali la pena.",
+        "completion": "Ecco, così. Non ti sei aggrappato alla staccionata nemmeno una volta, per tutto il giro. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.",
+        "objectives": {
+          "0": {
+            "label": "Doma il Destriero del Valore"
           }
         }
       },

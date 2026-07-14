@@ -168,6 +168,8 @@ const CALLBACK_KEYS = [
   'abandonLockpick',
   'tickLockpickTimeout',
   'startDelveRaiseDeadChannel',
+  'tickMountTrainingTimeout',
+  'abandonMountTraining',
   // C4a casting-lifecycle surface.
   'resolvedAbility',
   'playerGcdFor',
@@ -429,6 +431,8 @@ function makeFakeHost() {
     abandonLockpick: vi.fn(),
     tickLockpickTimeout: vi.fn(),
     startDelveRaiseDeadChannel: vi.fn(() => false),
+    tickMountTrainingTimeout: vi.fn(),
+    abandonMountTraining: vi.fn(),
     resolvedAbility: vi.fn(() => null),
     playerGcdFor: vi.fn(() => 1.5),
     isFriendlyTo: vi.fn(() => false),

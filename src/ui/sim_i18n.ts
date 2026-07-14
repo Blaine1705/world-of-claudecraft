@@ -50,6 +50,13 @@ const baseEnTable = {
   'error.noMountYet': "You don't have a mount yet.",
   'error.mountBuyLevel': 'You must be level 20 to buy a mount.',
   'error.mountAlreadyOwned': 'You already own that mount.',
+  // Riding-lesson (mount-training) minigame (src/sim/mounts_training.ts). The
+  // shared "Too far away." / "Not enough money." / "You can't do that while
+  // dead." refusals are reused verbatim and already registered above.
+  'error.mountTrainLevel': 'You must be level 20 to take riding lessons.',
+  'error.mountTrainNeedsQuest': 'You need to accept the riding lesson quest first.',
+  'error.mountTrainInProgress': 'A riding lesson is already in progress.',
+  'error.mountTrainNoSession': 'No riding lesson in progress.',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
   'error.maxLoadouts': 'You can save at most {count} loadouts.',

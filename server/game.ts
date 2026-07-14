@@ -44,6 +44,7 @@ import {
   RUN_SPEED,
   type SimEvent,
   type SportRole,
+  type TrainingLean,
   type VcBracket,
   type VcNationId,
 } from '../src/sim/types';
@@ -335,6 +336,11 @@ function talentAllocationFromWire(value: unknown): TalentAllocation | null {
 
 function isPickAction(value: unknown): value is PickAction {
   return typeof value === 'string' && LOCKPICK_ACTIONS.has(value as PickAction);
+}
+
+const TRAINING_LEANS = new Set<TrainingLean>(['left', 'right', 'steady']);
+function isTrainingLean(value: unknown): value is TrainingLean {
+  return typeof value === 'string' && TRAINING_LEANS.has(value as TrainingLean);
 }
 
 // Vale Cup wire validation (anti-cheat: every field type-checked against the
@@ -3318,6 +3324,17 @@ export class GameServer {
         break;
       case 'mount_toggle':
         sim.toggleMountFor(pid);
+        break;
+      // Riding-lesson (mount-training) minigame: the Sim re-validates
+      // everything (level, range, quest state, fee, session state).
+      case 'mount_train_begin':
+        sim.mountTrainBeginFor(pid);
+        break;
+      case 'mount_train_answer':
+        if (isTrainingLean(msg.lean)) sim.mountTrainAnswerFor(pid, msg.lean);
+        break;
+      case 'mount_train_abort':
+        sim.mountTrainAbortFor(pid);
         break;
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.

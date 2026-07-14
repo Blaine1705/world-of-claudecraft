@@ -428,7 +428,7 @@ export const zh_CN: EnTranslations = {
       "keybindHint": "按下骑乘 / 下骑键(默认Z)即可骑乘。",
       "notCollected": "未收集",
       "dropHint": "由地下城和团队副本首领掉落。",
-      "stableHint": "由东溪谷的马厩管理员出售。",
+      "stableHint": "在荆峰郊外的马厩学习骑术。",
       "clickManage": "点击选择坐骑",
       "rarity_common": "普通",
       "rarity_rare": "稀有",
@@ -448,6 +448,23 @@ export const zh_CN: EnTranslations = {
       "desc_aether_hover_cycle": "一辆强大的魔导机车，专为快速贴地悬浮的战斗穿行而设计。",
       "desc_shadowjump_toad": "一只体型庞大、步伐稳健的巨蟾，受训于闪电般的暗影跳跃，可跨越任何地形。",
       "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。"
+    },
+    "mountTraining": {
+      "title": "骑乘课",
+      "prompt": "在马把你甩下去之前，跟上它的倾斜方向。",
+      "leanLeft": "Lean Left",
+      "leanRight": "向右倾",
+      "steady": "保持稳定",
+      "cueLeft": "马向左倾。",
+      "cueRight": "马向右倾。",
+      "cueSteady": "马站稳了。",
+      "begin": "开始课程",
+      "abort": "Give Up",
+      "round": "第 {n} 轮，共 {total} 轮",
+      "misses": "失误 {n}/{cap}",
+      "thrown": "你被甩下马了。稳住，再试一次。",
+      "success": "你已经驯服了英勇战马。",
+      "close": "关闭"
     },
     "vcup": {
       "title": "溪谷杯",
@@ -7496,7 +7513,7 @@ export const zh_CN: EnTranslations = {
       "stablemaster_marla": {
         "name": "玛拉·希琴",
         "title": "马厩总管",
-        "greeting": "每个骑手都是两条腿走进来的。先付金子，等你坐得稳了再上鞍。"
+        "greeting": "每个骑手都是两条腿走进来的，{className}。你能骑稳英勇战马、不摔进泥里之前，我是不会把缰绳交给你的，高望这儿可没有多余的医者去治断骨。"
       },
       "warden_fenwick": {
         "name": "芬威克守望者",
@@ -8419,6 +8436,16 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败森林之狼"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "骑术课",
+        "text": "每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。我教的是怎么坐稳，不是拿来卖的东西，这也不是一个下午就能学会的。上马吧，盯紧我握着缰绳的手，在英勇战马决定你不值得费这个劲之前，跟上它倾身的节奏。",
+        "completion": "好了，就是这样。整趟下来你一次都没抓过栅栏。英勇战马现在是你的了，{playerName}：马鞍、缰绳，还有靠本事挣来而不是买来的骑手身份。",
+        "objectives": {
+          "0": {
+            "label": "驯服英勇战马"
           }
         }
       },

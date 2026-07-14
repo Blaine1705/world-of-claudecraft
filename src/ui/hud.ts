@@ -115,6 +115,7 @@ import {
   OVERHEAD_EMOTES,
   type OverheadEmoteId,
   type PartyInfo,
+  type TrainingLean,
 } from '../world_api';
 import {
   type AbilityScaling,
@@ -311,6 +312,7 @@ import {
 } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_picker';
+import { MountTrainingWindow } from './mount_training_window';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -1169,6 +1171,17 @@ export class Hud {
     onAbort: () => this.submitLockpickAbort(),
     onClose: () => this.closeLockpick(),
   });
+  private mountTrainTrap: FocusTrapHandle | null = null;
+  private mountTrainKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+  // Stablemaster Marla's "Riding Lessons" minigame: paints from the
+  // authoritative world.mountTrainingView() (never a cached copy), the same
+  // split as the lockpick board above. hud.ts keeps only session routing, focus
+  // restore, and keybinds.
+  private readonly mountTrainWindow = new MountTrainingWindow({
+    getState: () => this.sim.mountTrainingView(),
+    onAnswer: (lean) => this.submitMountTrainAnswer(lean),
+    onAbort: () => this.submitMountTrainAbort(),
+  });
   // Drowned Reliquary Rite difficulty popup. Opened on the delveRiteChoosePrompt
   // cue (approaching the risen reliquary), closed once playback starts.
   private riteTrap: FocusTrapHandle | null = null;
@@ -1584,17 +1597,18 @@ export class Hud {
         this.questlogWindow.openWithQuest(row.dataset.quest);
       }
     });
-    // The delve board, lockpick panel, map window, and the bank + bags cluster are
-    // non-modal overlays, so canUseGameKeys() stays true and the global jump (Space)
-    // / chat (Enter) binds would otherwise hijack those keys on a focused panel
-    // button (the map's Quests toggle, a bank grid cell, and each close button
-    // included). Stop propagation (but NOT the default, so the button's native
-    // activation still fires) when a panel button has focus, mirroring the
-    // quest-tracker guard above.
+    // The delve board, lockpick panel, mount-training panel, map window, and the
+    // bank + bags cluster are non-modal overlays, so canUseGameKeys() stays true
+    // and the global jump (Space) / chat (Enter) binds would otherwise hijack
+    // those keys on a focused panel button (the map's Quests toggle, a bank grid
+    // cell, and each close button included). Stop propagation (but NOT the
+    // default, so the button's native activation still fires) when a panel
+    // button has focus, mirroring the quest-tracker guard above.
     for (const panelId of [
       '#delve-board',
       '#lockpick-panel',
       '#delve-rite-panel',
+      '#mount-training-panel',
       '#map-window',
       '#bank-window',
       '#bags',
@@ -6528,6 +6542,7 @@ export class Hud {
     }
     this.meters.update();
     this.lockpickWindow.repaintIfChanged();
+    this.mountTrainWindow.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
     this.reconcileLootRollStatus(now);
@@ -7631,6 +7646,94 @@ export class Hud {
     }
     this.lockpickTrap?.release(restoreFocus);
     this.lockpickTrap = null;
+  }
+
+  // ---------------------------------------------------------------------------
+  // "Riding Lessons": Stablemaster Marla's story riding-lesson minigame. Begin
+  // Lesson (her gossip dialog) starts a server-authoritative lean-with-the-horse
+  // reaction game driven entirely by mountTrainSession/Round/End events, mirroring
+  // the lockpick minigame above. Player text renders through the
+  // hudChrome.mountTraining.* t() keys.
+  // ---------------------------------------------------------------------------
+
+  private beginMountTraining(): void {
+    this.sim.mountTrainBegin();
+    this.flushMountTrainEvents();
+  }
+
+  // A mountTrainSession event means the authoritative lesson is live in
+  // world.mountTrainingView(); show the panel and let the window paint from it.
+  private openMountTraining(): void {
+    const el = $('#mount-training-panel');
+    if (el.style.display !== 'block')
+      this.mountTrainTrap = this.focusManager.open({ root: () => $('#mount-training-panel') });
+    el.style.display = 'block';
+    this.bindMountTrainKeys();
+    this.mountTrainWindow.open();
+    this.mountTrainTrap?.focusFirst('.mt-lean-btn');
+  }
+
+  private endMountTraining(outcome: 'success' | 'thrown' | 'abandoned'): void {
+    // Abandoning is always the player's own Give Up / close click: they already
+    // know they stopped, so (like a dropped party invite) it gets no banner.
+    if (outcome !== 'abandoned') {
+      const summary =
+        outcome === 'success'
+          ? t('hudChrome.mountTraining.success')
+          : t('hudChrome.mountTraining.thrown');
+      this.showBanner(summary);
+      this.log(summary, outcome === 'success' ? '#7fdc4f' : '#ff7a6a');
+    }
+    this.closeMountTraining();
+  }
+
+  private bindMountTrainKeys(): void {
+    if (this.mountTrainKeyHandler) return;
+    const handler = (e: KeyboardEvent): void => {
+      if ($('#mount-training-panel').style.display !== 'block') return;
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      this.submitMountTrainAbort();
+    };
+    this.mountTrainKeyHandler = handler;
+    window.addEventListener('keydown', handler, true); // capture: beats game input
+  }
+
+  /** Offline sim queues its events until the 20 Hz tick; flush them now so the
+   * next cue/round readout and the cosmetic clock react immediately. Online has
+   * no drainEvents and reacts to the normal event stream instead. */
+  flushMountTrainEvents(): void {
+    const drain = (this.sim as { drainEvents?: () => SimEvent[] }).drainEvents;
+    if (!drain) return;
+    const events = drain.call(this.sim);
+    if (events.length > 0) this.handleEvents(events);
+  }
+
+  submitMountTrainAnswer(lean: TrainingLean): void {
+    this.sim.mountTrainAnswer(lean);
+    this.flushMountTrainEvents();
+    // Safety net for any path that didn't emit a round event (e.g. a rejected
+    // answer): realign the panel to the authoritative state.
+    this.mountTrainWindow.repaintIfChanged();
+  }
+
+  submitMountTrainAbort(): void {
+    this.mountTrainWindow.stopTimer();
+    this.sim.mountTrainAbort();
+    this.flushMountTrainEvents();
+  }
+
+  private closeMountTraining(restoreFocus = true): void {
+    $('#mount-training-panel').style.display = 'none';
+    this.mountTrainWindow.close();
+    this.hideTooltip();
+    if (this.mountTrainKeyHandler) {
+      window.removeEventListener('keydown', this.mountTrainKeyHandler, true);
+      this.mountTrainKeyHandler = null;
+    }
+    this.mountTrainTrap?.release(restoreFocus);
+    this.mountTrainTrap = null;
   }
 
   // Drowned Reliquary Rite: the difficulty popup opens when a player interacts
@@ -9438,6 +9541,15 @@ export class Hud {
           this.combatLog(t('sim.lockpick.lockYields', { tier }), '#ffdd88');
           break;
         }
+        case 'mountTrainSession':
+          this.openMountTraining();
+          break;
+        case 'mountTrainRound':
+          this.mountTrainWindow.onRound();
+          break;
+        case 'mountTrainEnd':
+          this.endMountTraining(ev.outcome);
+          break;
         case 'delveRiteChoosePrompt':
           this.openRitePanel();
           break;
@@ -10603,6 +10715,12 @@ export class Hud {
     if (npc.templateId === 'groundskeeper_bram') {
       html += `<button type="button" class="qd-list-item" data-vcup="1" aria-label="${esc(t('hudChrome.vcup.gossipOpenAria'))}"><span class="gold">${svgIcon('ball')}</span> ${esc(t('hudChrome.vcup.gossipOpen'))}</button>`;
     }
+    // Stablemaster Marla's story riding lesson ("Riding Lessons"): her gossip
+    // menu offers a Begin Lesson action alongside her stable goods (same
+    // templateId-keyed precedent as Bram's Vale Cup button above).
+    if (npc.templateId === 'stablemaster_marla') {
+      html += `<button type="button" class="qd-list-item" data-mount-training="1" aria-label="${esc(t('hudChrome.mountTraining.begin'))}"><span class="gold">${svgIcon('mount')}</span> ${esc(t('hudChrome.mountTraining.begin'))}</button>`;
+    }
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
       item.addEventListener('click', () =>
@@ -10635,6 +10753,10 @@ export class Hud {
     el.querySelector('[data-vcup]')?.addEventListener('click', () => {
       this.closeQuestDialog(false);
       this.toggleValeCup();
+    });
+    el.querySelector('[data-mount-training]')?.addEventListener('click', () => {
+      this.closeQuestDialog(false);
+      this.beginMountTraining();
     });
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';

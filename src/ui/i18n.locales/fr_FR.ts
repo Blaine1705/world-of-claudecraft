@@ -3594,7 +3594,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Maîtresse d’écurie',
   'entities.npcs.stablemaster_marla.greeting':
-    'Tout cavalier arrive sur ses deux jambes. L’or d’abord, la selle quand tu sauras t’y tenir.',
+    'Tout cavalier arrive sur ses deux jambes, {className}. Je ne te donnerai les rênes que lorsque tu sauras tenir en selle sur le Destrier de Bravoure sans mordre la boue, et Highwatch n’a pas de guérisseurs de trop pour les os brisés.',
+  'entities.quests.q_riding_lessons.title': 'Leçons d’équitation',
+  'entities.quests.q_riding_lessons.text':
+    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends, et cela ne s’apprend pas en une après-midi. Monte, surveille mes mains sur les rênes, et suis le balancement du Destrier de Bravoure avant qu’il ne décide que tu n’en vaux pas la peine.',
+  'entities.quests.q_riding_lessons.completion':
+    'Voilà. Pas une seule fois agrippé à la barrière, du début à la fin. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Dompter le Destrier de Bravoure',
   'entities.npcs.marshal_redbrook.title': 'Maréchal de la ville',
   'entities.npcs.marshal_redbrook.greeting':
     "Gardez votre lame près de vous, {className}. Le Val n'est plus ce qu'il était.",
@@ -6844,7 +6850,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
   'hudChrome.mounts.notCollected': 'Non collectée',
-  'hudChrome.mounts.stableHint': 'Vendue par le maître d’écurie au Val d’Eastbrook.',
+  'hudChrome.mounts.stableHint': 'Apprenez à monter aux écuries, aux abords de Thornpeak.',
   'hudChrome.mounts.dropHint': 'Butin des boss de donjon et de raid.',
   'hudChrome.mounts.clickManage': 'Cliquez pour choisir votre monture',
 };

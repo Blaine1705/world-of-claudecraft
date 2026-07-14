@@ -428,7 +428,7 @@ export const nl_NL: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
+      "stableHint": "Learn to ride at the stables outside Thornpeak.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -448,6 +448,23 @@ export const nl_NL: EnTranslations = {
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "De Dalbeker",
@@ -7496,7 +7513,7 @@ export const nl_NL: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Stalmeesteres",
-        "greeting": "Elke ruiter komt op twee benen binnen. Goud vooraf, het zadel als je erin kunt blijven zitten."
+        "greeting": "Elke ruiter komt op twee benen binnen, {className}. De teugels krijg je pas als je op de Valorsteed kunt blijven zitten zonder in de modder te belanden, en Highwatch heeft geen genezers over voor gebroken botten."
       },
       "warden_fenwick": {
         "name": "Wachter Fenwick",
@@ -8419,6 +8436,16 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Boswolf gedood"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Rijlessen",
+        "text": "Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Blijven zitten is wat ik leer, niet wat ik verkoop, en dat leer je niet op één middag. Klim erop, let op mijn handen aan de teugels, en volg de helling van de Valorsteed voordat hij besluit dat je de moeite niet waard bent.",
+        "completion": "Zo, ja. Geen één keer greep je naar het hek, de hele rit door. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.",
+        "objectives": {
+          "0": {
+            "label": "Tem de Valorsteed"
           }
         }
       },

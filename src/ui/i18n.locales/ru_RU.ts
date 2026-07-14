@@ -2652,7 +2652,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Марла Хитчен',
   'entities.npcs.stablemaster_marla.title': 'Старшая конюшая',
   'entities.npcs.stablemaster_marla.greeting':
-    'Каждый всадник приходит на своих двоих. Золото вперёд, седло — когда сможешь в нём усидеть.',
+    'Каждый всадник приходит на своих двоих, {className}. Поводья я отдам не раньше, чем ты научишься держаться на Доблестном скакуне, не целуя грязь, а лекарей на все сломанные кости в Хайвотче не напасёшься.',
+  'entities.quests.q_riding_lessons.title': 'Уроки верховой езды',
+  'entities.quests.q_riding_lessons.text':
+    'Каждый всадник приходит на своих двоих, {playerName}, как я и сказала в день нашей встречи. Держаться в седле — вот чему я учу, а не чем торгую, и за один вечер этому не выучиться. Забирайся, следи за моими руками на поводьях и подстраивайся под наклон Доблестного скакуна, пока он не решил, что возиться с тобой не стоит.',
+  'entities.quests.q_riding_lessons.completion':
+    'Вот так, хорошо. За весь круг ты ни разу не ухватился за ограду. Доблестный скакун теперь твой, {playerName}: седло, поводья и репутация всадника, который заслужил место в седле, а не купил его.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Приручить Доблестного скакуна',
   'entities.npcs.marshal_redbrook.title': 'Городской маршал',
   'entities.npcs.marshal_redbrook.greeting':
     'Держите клинок рядом, {className}. Долина уже не та, что прежде.',
@@ -6700,7 +6706,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
   'hudChrome.mounts.notCollected': 'Не получено',
-  'hudChrome.mounts.stableHint': 'Продаётся конюхом в Истврукской долине.',
+  'hudChrome.mounts.stableHint': 'Учитесь верховой езде в конюшнях у Хайвотча.',
   'hudChrome.mounts.dropHint': 'Добывается с боссов подземелий и рейдов.',
   'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
+  'hudChrome.mountTraining.title': 'Урок верховой езды',
+  'hudChrome.mountTraining.prompt': 'Подстраивайся под наклон коня, пока он тебя не сбросил.',
+  'hudChrome.mountTraining.leanRight': 'Наклон вправо',
+  'hudChrome.mountTraining.steady': 'Держать равновесие',
+  'hudChrome.mountTraining.cueLeft': 'Конь клонится влево.',
+  'hudChrome.mountTraining.cueRight': 'Конь клонится вправо.',
+  'hudChrome.mountTraining.cueSteady': 'Конь выравнивается.',
+  'hudChrome.mountTraining.begin': 'Начать урок',
+  'hudChrome.mountTraining.round': 'Раунд {n} из {total}',
+  'hudChrome.mountTraining.misses': 'Промахи {n} из {cap}',
+  'hudChrome.mountTraining.thrown': 'Тебя сбросили. Успокойся и попробуй снова.',
+  'hudChrome.mountTraining.success': 'Ты приручил Доблестного скакуна.',
+  'hudChrome.mountTraining.close': 'Закрыть',
 };

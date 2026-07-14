@@ -85,6 +85,7 @@ import {
   type LockpickView,
   type MailInfo,
   type MarketInfo,
+  type MountTrainingView,
   type OverheadEmoteId,
   type PartyInfo,
   type PlayerProfessionsView,
@@ -93,6 +94,7 @@ import {
   type RecipeDef,
   type SocialInfo,
   type TradeInfo,
+  type TrainingLean,
 } from '../world_api';
 import { isTransientReconnectRejection } from './reconnect_policy';
 
@@ -1096,6 +1098,9 @@ export class ClientWorld implements IWorld {
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
+  // Riding-lesson (mount-training) minigame: rebuilt from the mountTrain*
+  // events (there is no snapshot field), the lockpickState precedent.
+  private mountTrainingMirror: MountTrainingView | null = null;
   delveMarks = 0;
   companionUpgrades: Record<string, number> = {};
   // Flat per-craft skill tracking (#1126). NOT yet mirrored over the wire: this
@@ -1512,6 +1517,7 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'events') {
       for (const ev of msg.list) {
         this.applyLockpickEvent(ev as SimEvent);
+        this.applyMountTrainingEvent(ev as SimEvent);
         this.applyCraftResultEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
@@ -2295,6 +2301,21 @@ export class ClientWorld implements IWorld {
   toggleMounted(): void {
     this.cmd({ cmd: 'mount_toggle' });
   }
+  // --- riding-lesson (mount-training) minigame: fully server-authoritative,
+  // no optimistic local nudge (unlike selectMount above). mountTrainingMirror
+  // is rebuilt from the mountTrain* events by applyMountTrainingEvent. ---
+  mountTrainingView(): MountTrainingView | null {
+    return this.mountTrainingMirror;
+  }
+  mountTrainBegin(): void {
+    this.cmd({ cmd: 'mount_train_begin' });
+  }
+  mountTrainAnswer(lean: TrainingLean): void {
+    this.cmd({ cmd: 'mount_train_answer', lean });
+  }
+  mountTrainAbort(): void {
+    this.cmd({ cmd: 'mount_train_abort' });
+  }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);
     const skin = mechChromaSkinIndex(chromaId);
@@ -2726,6 +2747,33 @@ export class ClientWorld implements IWorld {
       }
     } else if (ev.type === 'lockpickEnd') {
       if (this.lockpickState?.sessionId === ev.sessionId) this.lockpickState = null;
+    }
+  }
+  // Mirror the authoritative riding-lesson lifecycle into mountTrainingMirror.
+  // The events still flow to the HUD (drainEvents) for transient feedback.
+  private applyMountTrainingEvent(ev: SimEvent): void {
+    if (ev.type === 'mountTrainSession') {
+      this.mountTrainingMirror = {
+        sessionId: ev.sessionId,
+        round: ev.round,
+        roundsTotal: ev.roundsTotal,
+        misses: ev.misses,
+        missCap: ev.missCap,
+        cue: ev.cue,
+        windowMs: ev.windowMs,
+      };
+    } else if (ev.type === 'mountTrainRound') {
+      const s = this.mountTrainingMirror;
+      if (s && s.sessionId === ev.sessionId) {
+        s.round = ev.round;
+        s.roundsTotal = ev.roundsTotal;
+        s.misses = ev.misses;
+        s.missCap = ev.missCap;
+        s.cue = ev.cue;
+        s.windowMs = ev.windowMs;
+      }
+    } else if (ev.type === 'mountTrainEnd') {
+      if (this.mountTrainingMirror?.sessionId === ev.sessionId) this.mountTrainingMirror = null;
     }
   }
   // --- IWorldProgressionXp: lifetime-XP leaderboard (REST GET, no wire command) +

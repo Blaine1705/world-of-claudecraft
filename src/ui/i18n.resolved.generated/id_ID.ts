@@ -428,7 +428,7 @@ export const id_ID: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
+      "stableHint": "Learn to ride at the stables outside Thornpeak.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -448,6 +448,23 @@ export const id_ID: EnTranslations = {
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "Piala Lembah",
@@ -7496,7 +7513,7 @@ export const id_ID: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Kepala Kandang",
-        "greeting": "Setiap penunggang datang dengan dua kaki. Emas di muka, pelana saat kau sanggup menungganginya."
+        "greeting": "Setiap penunggang datang dengan dua kaki, {className}. Kendali baru kuberikan setelah kau sanggup menunggangi Valorsteed tanpa jatuh tersungkur, dan Highwatch tak punya tabib lebih untuk tulang yang patah."
       },
       "warden_fenwick": {
         "name": "Penjaga Fenwick",
@@ -8419,6 +8436,16 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Serigala Hutan dibunuh"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Pelajaran Menunggang Kuda",
+        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual, dan itu tak bisa dipelajari dalam satu sore saja. Naiklah, perhatikan tanganku pada kendali, dan ikuti gerak condong Valorsteed sebelum ia memutuskan kau tak layak direpotkan.",
+        "completion": "Nah, begitu. Tak sekali pun kau memegang pagar sepanjang putaran itu. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.",
+        "objectives": {
+          "0": {
+            "label": "Jinakkan Valorsteed"
           }
         }
       },

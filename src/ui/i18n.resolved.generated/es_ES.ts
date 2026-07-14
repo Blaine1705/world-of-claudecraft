@@ -428,7 +428,7 @@ export const es_ES: EnTranslations = {
       "keybindHint": "Pulsa la tecla Montar / Desmontar (Z por defecto) para montar.",
       "notCollected": "Sin coleccionar",
       "dropHint": "Lo sueltan los jefes de mazmorras y bandas.",
-      "stableHint": "La vende el establero en el Valle de Eastbrook.",
+      "stableHint": "Aprende a montar en los establos, a las afueras de Thornpeak.",
       "clickManage": "Haz clic para elegir tu montura",
       "rarity_common": "Común",
       "rarity_rare": "Rara",
@@ -448,6 +448,23 @@ export const es_ES: EnTranslations = {
       "desc_aether_hover_cycle": "Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.",
       "desc_shadowjump_toad": "Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.",
       "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "La Copa del Valle",
@@ -7496,7 +7513,7 @@ export const es_ES: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Caballeriza mayor",
-        "greeting": "Cada jinete llega a pie. El oro por delante; la silla, cuando puedas montarla."
+        "greeting": "Cada jinete llega a pie, {className}. No te daré las riendas hasta que puedas montar al Corcel del Valor sin besar el barro, y en Highwatch no sobran sanadores para huesos rotos."
       },
       "warden_fenwick": {
         "name": "Guardián Fenwick",
@@ -8419,6 +8436,16 @@ export const es_ES: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lobo del bosque matado"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Lecciones de equitación",
+        "text": "Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo, y eso no se aprende en una tarde. Sube, atiende a mis manos en las riendas, y sigue el vaivén del Corcel del Valor antes de que decida que no vales la pena.",
+        "completion": "Así, muy bien. Ni una sola vez te agarraste a la cerca en toda la vuelta. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.",
+        "objectives": {
+          "0": {
+            "label": "Doma al Corcel del Valor"
           }
         }
       },

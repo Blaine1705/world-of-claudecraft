@@ -428,7 +428,7 @@ export const vi_VN: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key (default Z) to ride.",
       "notCollected": "Not collected",
       "dropHint": "Drops from dungeon and raid bosses.",
-      "stableHint": "Sold by the stablemaster in Eastbrook Vale.",
+      "stableHint": "Learn to ride at the stables outside Thornpeak.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
@@ -448,6 +448,23 @@ export const vi_VN: EnTranslations = {
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+    },
+    "mountTraining": {
+      "title": "Riding Lesson",
+      "prompt": "Match the horse's lean before it throws you.",
+      "leanLeft": "Lean Left",
+      "leanRight": "Lean Right",
+      "steady": "Hold Steady",
+      "cueLeft": "The horse pitches left.",
+      "cueRight": "The horse pitches right.",
+      "cueSteady": "The horse steadies.",
+      "begin": "Begin Lesson",
+      "abort": "Give Up",
+      "round": "Round {n} of {total}",
+      "misses": "Slips {n} of {cap}",
+      "thrown": "You were thrown. Steady up and try again.",
+      "success": "You have tamed the Valorsteed.",
+      "close": "Close"
     },
     "vcup": {
       "title": "Cúp Thung Lũng",
@@ -7496,7 +7513,7 @@ export const vi_VN: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Quản Mã",
-        "greeting": "Kỵ sĩ nào cũng bước vào bằng hai chân. Vàng trả trước, yên ngựa khi nào ngồi vững thì trao."
+        "greeting": "Kỵ sĩ nào cũng bước vào bằng hai chân, {className}. Ta chỉ trao dây cương khi nào ngươi ngồi vững trên lưng Valorsteed mà không lăn xuống bùn, vì Highwatch chẳng dư thầy thuốc để chữa xương gãy."
       },
       "warden_fenwick": {
         "name": "Vệ Quan Fenwick",
@@ -8419,6 +8436,16 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Sói rừng bị giết"
+          }
+        }
+      },
+      "q_riding_lessons": {
+        "title": "Bài Học Cưỡi Ngựa",
+        "text": "Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán, và chẳng ai học được điều đó trong một buổi chiều. Leo lên, để ý đôi tay ta trên dây cương, và theo nhịp nghiêng của Valorsteed trước khi nó quyết định ngươi không đáng để bận tâm.",
+        "completion": "Đấy, được rồi. Suốt cả vòng chạy, ngươi chẳng một lần bám vào hàng rào. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.",
+        "objectives": {
+          "0": {
+            "label": "Thuần Hóa Valorsteed"
           }
         }
       },

@@ -2103,6 +2103,30 @@ export interface ReadyCheck {
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
 }
 
+// Mount-training minigame ("riding lessons"): the player leans the matching
+// direction for a cue within a shrinking window. Re-exported from world_api so
+// render/ui consume it there instead of reaching into sim/ (see mounts_training.ts).
+export type TrainingLean = 'left' | 'right' | 'steady';
+
+// A player's active riding-lesson attempt (src/sim/mounts_training.ts), kept on
+// PlayerMeta.mountTraining. Session-only: never persisted/serialized (unlike the
+// one-time mountTrainingFeePaid flag also on PlayerMeta), so a save/load never
+// resumes a half-finished lesson. `seed` plus the (round, misses) counters are
+// enough to deterministically rederive every cue the session has drawn or will
+// draw, from a per-module Rng sub-stream (never the shared ctx.rng).
+export interface MountTrainingSession {
+  sessionId: string;
+  ownerId: number;
+  round: number; // 1-based: the Nth cue the player must still clear
+  roundsTotal: number;
+  misses: number;
+  missCap: number;
+  cue: TrainingLean;
+  seed: number;
+  deadlineTick: number;
+  state: 'IN_PROGRESS' | 'SUCCESS' | 'THROWN' | 'ABANDONED';
+}
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -2458,6 +2482,39 @@ export type SimEvent = { pid?: number } & (
         | 'recipe_not_learned'
         | 'throttled'
         | 'not_at_hub';
+    }
+  // Mount-training minigame ("riding lessons", src/sim/mounts_training.ts). All
+  // personal (pid-scoped). mountTrainSession opens a fresh attempt; mountTrainRound
+  // reports one answered/timed-out cue (and carries the NEXT cue to react to,
+  // unless the session just ended); mountTrainEnd reports the terminal outcome.
+  | {
+      type: 'mountTrainSession';
+      sessionId: string;
+      round: number;
+      roundsTotal: number;
+      misses: number;
+      missCap: number;
+      cue: TrainingLean;
+      windowMs: number;
+      pid: number;
+    }
+  | {
+      type: 'mountTrainRound';
+      sessionId: string;
+      round: number;
+      roundsTotal: number;
+      misses: number;
+      missCap: number;
+      result: 'good' | 'miss';
+      cue: TrainingLean;
+      windowMs: number;
+      pid: number;
+    }
+  | {
+      type: 'mountTrainEnd';
+      sessionId: string;
+      outcome: 'success' | 'thrown' | 'abandoned';
+      pid: number;
     }
 );
 

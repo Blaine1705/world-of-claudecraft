@@ -4649,7 +4649,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
   'entities.npcs.stablemaster_marla.title': 'Správkyně stájí',
   'entities.npcs.stablemaster_marla.greeting':
-    'Každý jezdec sem přijde po svých. Zlato předem, sedlo, až se v něm udržíš.',
+    'Každý jezdec sem přijde po svých, {className}. Otěže nedostaneš, dokud neusedneš na Valorsteeda, aniž bys skončil v blátě, a Highwatch nemá ranhojiče nazbyt pro zlomené kosti.',
+  'entities.quests.q_riding_lessons.title': 'Jezdecké lekce',
+  'entities.quests.q_riding_lessons.text':
+    'Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám, a to se nenaučíš za jedno odpoledne. Vylez nahoru, dávej pozor na mé ruce na otěžích a přizpůsob se náklonu Valorsteeda, než usoudí, že s tebou není žádná námaha.',
+  'entities.quests.q_riding_lessons.completion':
+    'Tak. Ani jednou ses nechytil plotu celou tu dobu. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Zkroť Valorsteeda',
   'entities.npcs.marshal_redbrook.title': 'Městský maršál',
   'entities.npcs.provisioner_hale.greeting':
     'Suché boty, suchý chléb, suchý prach: ve Fenbridge máš v dobrý den dvě ze tří.',
