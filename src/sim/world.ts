@@ -624,7 +624,7 @@ const WALL_STANDOFF_SAMPLES = 8;
 // `terrainWallStandoff` below for why it must be iterated rather than trusted
 // to converge in one call, and why the caller must accept a push that only
 // REDUCES steepness rather than requiring it clear `maxSlope` outright).
-function terrainWallStandoffPass(
+export function terrainWallStandoffPass(
   x: number,
   z: number,
   seed: number,

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
-import { groundHeight, terrainSteepnessAt, terrainWallStandoff } from '../src/sim/world';
+import { terrainSteepnessAt, terrainWallStandoff, terrainWallStandoffPass } from '../src/sim/world';
 
 // terrainWallStandoff pushes a player's body off nearby steep terrain in a
 // single ring-sample-and-nudge pass, capped at one body radius. In a CONCAVE
@@ -14,38 +14,20 @@ import { groundHeight, terrainSteepnessAt, terrainWallStandoff } from '../src/si
 // terrain the downhill-slide fallback (terrainDownhill in stepPlayerMotion)
 // happens to always have a valid escape gradient wherever standoff alone
 // would fall short, so the practical "permanently wedged" symptom isn't
-// reproducible here today (see tests/veiled_hollow.test.ts on a branch with
-// the newer organic coastline terrain for a case where it IS). This file
-// pins the property that actually matters everywhere: iterating the
-// standoff push converges strictly further than a single pass in a genuine
-// concave pocket, and never regresses an already-fine position.
+// reproducible here today. This file pins the property that actually matters
+// everywhere: iterating the standoff push converges strictly further than a
+// single pass in a genuine concave pocket, and never regresses an
+// already-fine position.
 const SEED = 20061; // the fixed production seed (src/main.ts, server/game.ts)
 const R = PLAYER_BODY_RADIUS;
 const SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 
-// A standalone re-implementation of one ring-sample-and-nudge pass (the
-// pre-fix behavior), kept independent of world.ts so this test still catches
-// a regression if the internal helper is ever renamed or inlined away.
+// A single ring-sample-and-nudge pass (the pre-fix behavior). Uses the real
+// production helper (exported from world.ts for this purpose) rather than a
+// hand copy, so this "never worse than a single pass" sweep cannot silently
+// drift from production if the pass logic changes.
 function singlePass(x: number, z: number): { x: number; z: number } {
-  const h0 = groundHeight(x, z, SEED);
-  const wallRise = R * SLOPE;
-  let pushX = 0;
-  let pushZ = 0;
-  for (let k = 0; k < 8; k++) {
-    const a = (k / 8) * Math.PI * 2;
-    const sx = Math.sin(a);
-    const sz = Math.cos(a);
-    const rise = groundHeight(x + sx * R, z + sz * R, SEED) - h0;
-    if (rise > wallRise) {
-      const setback = Math.min((rise - wallRise) / SLOPE, R);
-      pushX -= sx * setback;
-      pushZ -= sz * setback;
-    }
-  }
-  if (pushX === 0 && pushZ === 0) return { x, z };
-  const mag = Math.hypot(pushX, pushZ);
-  const scale = Math.min(mag, R) / mag;
-  return { x: x + pushX * scale, z: z + pushZ * scale };
+  return terrainWallStandoffPass(x, z, SEED, R, SLOPE);
 }
 
 // A band of probe points near each of the playable rectangle's four
@@ -68,9 +50,13 @@ describe('terrainWallStandoff converges further than a single pass in concave co
     const steepOnce = terrainSteepnessAt(once.x, once.z, SEED);
     const iterated = terrainWallStandoff(PIN.x, PIN.z, SEED, R, SLOPE);
     const steepIterated = terrainSteepnessAt(iterated.x, iterated.z, SEED);
-    // Independent pins on both readings (not a self-comparison): a single
-    // pass leaves this pocket well over 3x the climb limit, iteration brings
-    // it under it.
+    // Independent pins on both readings (not a self-comparison). steepOnce is
+    // effectively the UNMOVED starting steepness here: terrainSteepnessAt
+    // rounds to 1-yard cells and the single pass's push does not leave that
+    // cell in this pocket, so the value below (~3.66, about 2.4x the ~1.5
+    // climb limit) pins "a single pass makes no meaningful progress," not
+    // what one pass alone converges to in general. Iteration brings the
+    // reading under the climb limit.
     expect(steepOnce).toBeGreaterThan(3.5);
     expect(steepIterated).toBeLessThan(SLOPE);
   });

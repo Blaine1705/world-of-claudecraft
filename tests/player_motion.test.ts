@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, resolveMovement } from '../src/sim/colliders';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MoveInput } from '../src/sim/types';
-import { terrainHeight, terrainSteepness, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
+import {
+  groundHeight,
+  terrainHeight,
+  terrainSteepness,
+  terrainSteepnessAt,
+  terrainWallStandoff,
+  WATER_LEVEL,
+} from '../src/sim/world';
 
 // The parity gate for the movement-kernel extraction (MV1) and the foundation
 // of the online self extrapolator: stepPlayerMotion driven with CLIENT-shaped
@@ -253,5 +261,76 @@ describe('player motion kernel parity with the live Sim', () => {
       return JSON.stringify(out);
     };
     expect(trace()).toBe(trace());
+  });
+});
+
+// The wall-standoff ACCEPTANCE GATE inside stepPlayerMotion (distinct from the
+// terrainWallStandoff iteration itself, covered by
+// tests/terrain_wall_standoff.test.ts): committing a push once it strictly
+// improves on the player's current steepness, not only once it fully clears
+// the climb limit. Pinned at a concave rim-corner pocket (production seed
+// 20061) where a single standoff resolves the player to steepness ~1.56, well
+// over the ~1.5 climb limit, but a strict improvement over the ~4.08 the
+// player started at. The OLD gate (accept only if standSteep <= climb limit)
+// would have discarded this push outright, leaving the player wedged; the NEW
+// gate (accept if standSteep <= climb limit OR standSteep <= current
+// steepness) commits it.
+describe('stepPlayerMotion wall-standoff acceptance gate', () => {
+  const GATE_SEED = 20061; // the fixed production seed (src/main.ts, server/game.ts)
+  const GATE_R = PLAYER_BODY_RADIUS;
+  const GATE_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
+  const PIN = { x: -170, z: -24.5 };
+
+  it('commits a standoff push that strictly improves steepness but stays above the climb limit', () => {
+    const steepStart = terrainSteepnessAt(PIN.x, PIN.z, GATE_SEED);
+    const standoff = terrainWallStandoff(PIN.x, PIN.z, GATE_SEED, GATE_R, GATE_SLOPE);
+    const steepStand = terrainSteepnessAt(standoff.x, standoff.z, GATE_SEED);
+    // Pin the scenario itself: still above the climb limit (so the OLD gate,
+    // which only ever accepted full clearance, would reject this push), but a
+    // strict improvement over the starting steepness (so the NEW gate accepts).
+    expect(steepStand).toBeGreaterThan(GATE_SLOPE);
+    expect(steepStand).toBeLessThan(steepStart);
+
+    // Drive the real gate via stepPlayerMotion. The player's own position is
+    // steep enough here to also trigger the downhill-slide movement earlier in
+    // the same tick (a separate code path from the standoff gate under test),
+    // so the first resolveMove call (the slide) is stubbed to a no-op; the
+    // second call is the real standoff resolveMove the gate under test drives.
+    let resolveMoveCalls = 0;
+    const deps: PlayerMotionDeps = {
+      seed: GATE_SEED,
+      moveSpeedMult: (e) => moveSpeedMult(e, 0),
+      resolveMove: (fromX, fromZ, nx, nz, r, _e, ignoreFences) => {
+        resolveMoveCalls++;
+        if (resolveMoveCalls === 1) return { x: fromX, z: fromZ };
+        return resolveMovement(GATE_SEED, fromX, fromZ, nx, nz, r, ignoreFences);
+      },
+      resolvedAbility: () => null,
+      cancelCast: () => {},
+      standUp: () => {},
+      dealDamage: () => {},
+    };
+    const p = {
+      pos: { x: PIN.x, z: PIN.z, y: groundHeight(PIN.x, PIN.z, GATE_SEED) },
+      prevPos: { x: PIN.x, z: PIN.z, y: groundHeight(PIN.x, PIN.z, GATE_SEED) },
+      facing: 0,
+      onGround: true,
+      jumping: false,
+      vx: 0,
+      vz: 0,
+      vy: 0,
+      fallStartY: groundHeight(PIN.x, PIN.z, GATE_SEED),
+      auras: [],
+      sitting: false,
+      maxHp: 100,
+    } as unknown as Entity;
+
+    stepPlayerMotion(deps, p, mi());
+
+    // The gate committed: the player ends up exactly at the (iterated)
+    // standoff point, not frozen at the pin.
+    expect(p.pos.x).toBeCloseTo(standoff.x, 6);
+    expect(p.pos.z).toBeCloseTo(standoff.z, 6);
+    expect(p.pos.x === PIN.x && p.pos.z === PIN.z).toBe(false);
   });
 });
