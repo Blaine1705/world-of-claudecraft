@@ -854,9 +854,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.3,
   },
-  // the Veiled Hollow's spirits and wisps: the ghost rig, entity-tinted so
-  // the rose glimmerwisps, violet duskwisps, and teal hollow spirits read as
-  // one ethereal family unlike anything in the outer three zones
+  // the Veiled Hollow's spirits: the ghost rig, entity-tinted (teal hollow
+  // remnants and the ice wisp still wear it)
   mob_ghost: {
     url: `${CREATURES}/ghost.glb`,
     height: 1.6,
@@ -864,6 +863,25 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.55,
+  },
+  // the Hollow wisps: bespoke static meshes from the approved concepts
+  // (user-generated via Tripo). No rig on purpose: they drift and hover,
+  // and every clip lookup null-guards, so FLOATING names simply no-op.
+  // Baked palettes, so no entity tint. Front faces +x off the generator;
+  // yaw turns it to the +z game convention.
+  mob_glimmerwisp: {
+    url: `${CREATURES}/glimmerwisp.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    yaw: -Math.PI / 2,
+  },
+  mob_duskwisp: {
+    url: `${CREATURES}/duskwisp.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    yaw: -Math.PI / 2,
   },
   // spore-borne mushroom folk: the glub blob drifting just above the glade
   mob_glub: {
@@ -1271,8 +1289,8 @@ const MOB_KEYS: Record<string, string> = {
   lily_wisp: 'mob_ghost',
   ancient_guardian: 'skel_golem',
   waking_warden: 'skel_golem',
-  glimmerwisp: 'mob_ghost',
-  duskwisp: 'mob_ghost',
+  glimmerwisp: 'mob_glimmerwisp',
+  duskwisp: 'mob_duskwisp',
   ice_wisp: 'mob_ghost',
   frostmane_yeti: 'mob_yeti',
   sporeling_gatherer: 'mob_glub',
