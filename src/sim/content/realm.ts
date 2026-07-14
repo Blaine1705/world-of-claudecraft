@@ -1022,15 +1022,19 @@ export const REALM_PROPS: ZonePropsDef = {
   // at a respectful distance so the square breathes.
   greatTrees: [{ x: -40, z: 1026, r: 2.6 }],
   buildings: [
-    { kind: 'inn', x: -58, z: 1046, w: 6, d: 7, rot: 0.7 },
-    // hollowHouse: the same crisp village house geometry in the Hollow's dusk
-    // palette (violet roofs, glowing amethyst windows; render/props.ts)
+    // The whole town is the KayKit medieval set in the Hollow's dusk palette
+    // (violet roofs, warm timber; render/props.ts maps each kind to its GLB).
+    { kind: 'hollowInn', x: -58, z: 1046, w: 6, d: 7, rot: 0.7 },
     { kind: 'hollowHouse', x: -22, z: 1048, w: 7, d: 6, rot: -0.4 },
     { kind: 'hollowHouse', x: -62, z: 1016, w: 6, d: 6, rot: 1.2 },
-    { kind: 'chapel', x: -18, z: 1012, w: 5, d: 7, rot: -1.9 }, // the shrine
+    { kind: 'hollowChapel', x: -18, z: 1012, w: 5, d: 7, rot: -0.9 }, // the shrine
     // the two homes on the fringe (these replaced the generated cottages)
     { kind: 'hollowHouse', x: -72, z: 1034, w: 7, d: 6, rot: 1.35 },
     { kind: 'hollowHouse', x: -12, z: 1046, w: 7, d: 6, rot: -1.8 },
+    // the working quarter: smithy by the east road, market hall on the
+    // Duskfall approach where wayfarers come in
+    { kind: 'hollowSmith', x: -12, z: 1022, w: 7, d: 6.5, rot: -1.29 },
+    { kind: 'hollowMarket', x: -70, z: 1024, w: 8, d: 6, rot: 1.37 },
   ],
   wells: [{ x: -40, z: 1042, r: 1.5 }],
   stalls: [

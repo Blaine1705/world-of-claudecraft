@@ -26,7 +26,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
-import type { WorldContent } from './types';
+import type { BuildingDef, WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import {
   crossesGardenHedge,
@@ -93,6 +93,17 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
 // Collider sets
 // ---------------------------------------------------------------------------
 
+// Per-kind building heights: the camera-collider top AND the renderer's roof
+// line (render/props.ts imports this so the two can never drift apart).
+export const BUILDING_COLLIDER_HEIGHTS: Partial<Record<BuildingDef['kind'], number>> = {
+  chapel: 10.8,
+  inn: 7.8,
+  hollowInn: 8.5,
+  hollowChapel: 10.5,
+  hollowSmith: 6.2,
+  hollowMarket: 5.2,
+};
+
 function staticWorldColliders(seed: number): Collider[] {
   const out: Collider[] = [];
   const content = getActiveWorldContent();
@@ -102,7 +113,7 @@ function staticWorldColliders(seed: number): Collider[] {
   // chase cam no longer pulls in for them; the renderer hides whichever one
   // crosses the eye-to-camera segment instead.
   for (const b of PROPS.buildings) {
-    const height = b.kind === 'chapel' ? 10.8 : b.kind === 'inn' ? 7.8 : 8.0;
+    const height = BUILDING_COLLIDER_HEIGHTS[b.kind] ?? 8.0;
     out.push({
       type: 'obb',
       x: b.x,

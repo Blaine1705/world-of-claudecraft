@@ -1693,9 +1693,17 @@ export interface PortalDef {
 }
 
 export interface BuildingDef {
-  // hollowHouse is the Veiled Hollow restyle of the village house models
-  // (same geometry and colliders, dusk-palette materials; see render/props.ts)
-  kind: 'house' | 'inn' | 'chapel' | 'hollowHouse';
+  // hollow* kinds are the Veiled Hollow town set: KayKit medieval buildings
+  // recolored to the dusk palette (render/props.ts maps kind -> asset)
+  kind:
+    | 'house'
+    | 'inn'
+    | 'chapel'
+    | 'hollowHouse'
+    | 'hollowInn'
+    | 'hollowChapel'
+    | 'hollowSmith'
+    | 'hollowMarket';
   x: number;
   z: number;
   w: number;

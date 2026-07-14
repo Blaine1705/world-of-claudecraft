@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { BUILDING_COLLIDER_HEIGHTS } from '../sim/colliders';
 import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import { hash2 } from '../sim/rng';
+import type { BuildingDef } from '../sim/types';
 import { terrainHeight, waterLevel } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -67,11 +69,17 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   house1: { url: '/models/props/house_1.glb', kit: 'village' },
   house2: { url: '/models/props/house_2.glb', kit: 'village', yaw: -Math.PI / 2 },
   house3: { url: '/models/props/house_3.glb', kit: 'village' },
-  // Veiled Hollow restyles: the same crisp village house geometry under the
-  // 'hvillage' material overrides (violet roofs, amethyst windows, dusk
-  // timber). Placed via BuildingDef kind 'hollowHouse'.
-  hollowHouse1: { url: '/models/props/house_1.glb', kit: 'hvillage' },
-  hollowHouse2: { url: '/models/props/house_2.glb', kit: 'hvillage', yaw: -Math.PI / 2 },
+  // Veiled Hollow town: KayKit Medieval Hexagon Pack buildings (CC0) with the
+  // blue-colorway palette texture shifted to the Hollow's dusk violet (baked
+  // into the *_hollow.glb files by tmp/make_kmed_hollow.mjs). Placed via the
+  // BuildingDef kinds hollowHouse / hollowInn / hollowChapel / hollowSmith /
+  // hollowMarket.
+  kmedHomeA: { url: '/models/props/kmed_home_A_hollow.glb', kit: 'kmed' },
+  kmedHomeB: { url: '/models/props/kmed_home_B_hollow.glb', kit: 'kmed' },
+  kmedTavern: { url: '/models/props/kmed_tavern_hollow.glb', kit: 'kmed' },
+  kmedChurch: { url: '/models/props/kmed_church_hollow.glb', kit: 'kmed' },
+  kmedBlacksmith: { url: '/models/props/kmed_blacksmith_hollow.glb', kit: 'kmed' },
+  kmedMarket: { url: '/models/props/kmed_market_hollow.glb', kit: 'kmed' },
   blacksmith: { url: '/models/props/blacksmith.glb', kit: 'village' },
   inn: { url: '/models/props/inn.glb', kit: 'village' },
   bellTower: { url: '/models/props/bell_tower.glb', kit: 'village' },
@@ -242,20 +250,6 @@ const MAT_OVERRIDES: Record<
   'minerock:_defaultMat': { color: 0x6f7376 },
   // graveyard colormap is near-white; knock it toward weathered stone
   'grave:colormap': { color: 0xd2d2c8 },
-  // Veiled Hollow village restyle: dusk palette over the crisp house kit.
-  // Violet roof tiles, amethyst glass lit from within, timber and stone
-  // shifted cool so the buildings sit under the permanent dusk.
-  'hvillage:RoofTiles': { color: 0x5c4180 },
-  'hvillage:RoofTiles_Red': { color: 0x5c4180 },
-  'hvillage:Windows': { emissive: 0x9a5fd8, emissiveIntensity: 1.5, roughness: 0.4 },
-  'hvillage:Plaster': { color: 0xe6dccd },
-  'hvillage:Beige': { color: 0xe6dccd },
-  'hvillage:Wood': { color: 0x66507a },
-  'hvillage:Wood_Side': { color: 0x584468 },
-  'hvillage:Wood_Light': { color: 0x84699c },
-  'hvillage:Stone': { color: 0x86808f },
-  'hvillage:Stone_Light': { color: 0xa19aad },
-  'hvillage:Stone_Dark': { color: 0x6b6577 },
 };
 
 // ---------------------------------------------------------------------------
@@ -827,21 +821,33 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
 
   // ---- buildings: village houses / inn / composed chapel ------------------
   const housePool: PropKey[] = ['house1', 'house2', 'blacksmith'];
-  const hollowPool: PropKey[] = ['hollowHouse1', 'hollowHouse2'];
+  const hollowPool: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
   const houseHeight: Record<string, number> = {
     house1: 8.0,
     house2: 7.6,
     blacksmith: 6.6,
     inn: 7.6,
-    hollowHouse1: 8.0,
-    hollowHouse2: 7.6,
+    kmedHomeA: 8.0,
+    kmedHomeB: 8.8,
+    kmedTavern: 8.5,
+    kmedChurch: 10.5,
+    kmedBlacksmith: 6.2,
+    kmedMarket: 5.2,
+  };
+  // single-asset (non-pool) building kinds
+  const kindAsset: Partial<Record<BuildingDef['kind'], PropKey>> = {
+    inn: 'inn',
+    hollowInn: 'kmedTavern',
+    hollowChapel: 'kmedChurch',
+    hollowSmith: 'kmedBlacksmith',
+    hollowMarket: 'kmedMarket',
   };
 
   for (const b of getActiveWorldContent().props.buildings) {
     const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
     // roof Y mirrors the camera collider height in colliders.ts
-    const roofY = y + (b.kind === 'chapel' ? 10.8 : b.kind === 'inn' ? 7.8 : 8.0);
+    const roofY = y + (BUILDING_COLLIDER_HEIGHTS[b.kind] ?? 8.0);
     if (b.kind === 'chapel') {
       // composed chapel: tall bell tower at the rear + squat stone entry hall
       // in front; the hall door lands on the footprint's +z edge.
@@ -864,7 +870,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     }
     const pool = b.kind === 'hollowHouse' ? hollowPool : housePool;
     const asset: PropKey =
-      b.kind === 'inn' ? 'inn' : pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
+      kindAsset[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
     const a = propAsset(asset);
     const g = new THREE.Group();
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
