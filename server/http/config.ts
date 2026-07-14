@@ -197,11 +197,6 @@ function resolveRequireWebLogin(env: NodeJS.ProcessEnv): boolean {
   return env.NODE_ENV === 'production';
 }
 
-function resolveBooleanFlag(env: NodeJS.ProcessEnv, key: string): boolean {
-  const value = (env[key] ?? '').toLowerCase();
-  return value === '1' || value === 'true';
-}
-
 // Whether a raw value is a bare http(s) origin, mirroring server/realm.ts
 // resolvePublicOrigin's acceptance rule (http/https scheme, no credentials, no
 // path/query/hash; a single trailing slash is tolerated). Kept inline (not an

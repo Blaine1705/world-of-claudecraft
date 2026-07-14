@@ -180,6 +180,13 @@ export function loadRiftWorldState(
     if (options.strict) throw new Error('unsupported or malformed shared Rift state');
     return 0;
   }
+  // The strict predicate above narrows only its ternary arm. Repeat the cheap
+  // shape guard so TypeScript and the tolerant path share one concrete array.
+  if (!Array.isArray(save.events)) {
+    if (options.strict) throw new Error('unsupported or malformed shared Rift state');
+    return 0;
+  }
+  const savedEvents = save.events;
 
   for (const portal of [...ctx.naturalRiftPortals]) {
     if (ctx.entities.has(portal.id)) ctx.dropEntity(portal.id);
@@ -187,7 +194,7 @@ export function loadRiftWorldState(
   ctx.naturalRiftPortals.splice(0);
   ctx.riftEvents.splice(0);
   const seen = new Set<string>();
-  for (const raw of save.events.slice(-MAX_SAVED_EVENTS)) {
+  for (const raw of savedEvents.slice(-MAX_SAVED_EVENTS)) {
     if (!validSavedEvent(raw) || seen.has(raw.eventId)) continue;
     seen.add(raw.eventId);
     const expectedFloorCount = generateRiftPlan(
