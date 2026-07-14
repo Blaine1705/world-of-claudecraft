@@ -63,29 +63,49 @@ export const REALM_ZONE: ZoneDef = {
 // the grove, the basin, the ruins, and the mushroom forest.
 export const REALM_ROADS: { x: number; z: number }[][] = [
   [
+    // the Eldergleam ring: a circular walk around the great tree; the four
+    // spoke roads below each end on this circle
+    { x: -40, z: 1040 },
+    { x: -33, z: 1038.1 },
+    { x: -27.9, z: 1033 },
+    { x: -26, z: 1026 },
+    { x: -27.9, z: 1019 },
+    { x: -33, z: 1013.9 },
+    { x: -40, z: 1012 },
+    { x: -47, z: 1013.9 },
+    { x: -52.1, z: 1019 },
+    { x: -54, z: 1026 },
+    { x: -52.1, z: 1033 },
+    { x: -47, z: 1038.1 },
+    { x: -40, z: 1040 },
+  ],
+  [
     { x: -140, z: 955 },
     { x: -125, z: 980 },
     { x: -95, z: 1005 },
-    { x: -40, z: 1030 },
-  ], // Duskfall Cave -> Eldergleam
+    { x: -53, z: 1022 },
+  ], // Duskfall Cave -> the Eldergleam ring, west
   [
+    { x: -45, z: 1039 },
     { x: -45, z: 1052 },
     { x: -60, z: 1105 },
     { x: -70, z: 1150 },
-  ], // Eldergleam -> the Gleaming Deep
+  ], // the Eldergleam ring, north -> the Gleaming Deep
   [
+    { x: -26, z: 1030 },
     { x: -18, z: 1030 },
     { x: 30, z: 1042 },
     { x: 80, z: 1062 },
     { x: 120, z: 1085 },
-  ], // Eldergleam -> the Sunken Court
+  ], // the Eldergleam ring, east -> the Sunken Court
   [
+    { x: -33, z: 1014 },
     { x: -30, z: 1010 },
     { x: 15, z: 982 },
     { x: 70, z: 975 },
     { x: 88, z: 982 },
     { x: 100, z: 984 },
-  ], // Eldergleam -> Starfall Basin shore -> the Star's Cradle causeway
+  ], // the Eldergleam ring, southeast -> Starfall Basin -> the Star's Cradle causeway
   [
     { x: -62, z: 1155 },
     { x: -10, z: 1172 },
@@ -408,7 +428,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'keeper_saelwyn',
     name: 'Keeper Saelwyn',
     title: 'Keeper of the Hollow',
-    pos: { x: -42, z: 1019 },
+    pos: { x: -43, z: 1016 },
     facing: 0.3,
     color: 0xd8c4f0,
     questIds: [
@@ -434,8 +454,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'provisioner_fenna',
     name: 'Provisioner Fenna',
     title: 'Eldergleam Provisioner',
-    pos: { x: -52, z: 1037.5 },
-    facing: 1.6,
+    pos: { x: -46, z: 1031 },
+    facing: -0.87,
     color: 0x8fbf8a,
     questIds: ['q_gleaming_antlers', 'q_grove_menace'],
     vendorItems: [
@@ -452,8 +472,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'wardsmith_orun',
     name: 'Wardsmith Orun',
     title: 'Keeper of the Old Forges',
-    pos: { x: -28, z: 1039.5 },
-    facing: -0.5,
+    pos: { x: -34, z: 1031 },
+    facing: 0.87,
     color: 0x9a86b8,
     questIds: [],
     vendorItems: ['wardplate_cuirass', 'nightweave_tunic', 'veilcloth_robe'],
@@ -463,8 +483,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'archivist_tullo',
     name: 'Archivist Tullo',
     title: 'Reader of Stones',
-    pos: { x: -34, z: 1021 },
-    facing: 2.6,
+    pos: { x: -31, z: 1021 },
+    facing: -1.06,
     color: 0xb8a8d8,
     questIds: ['q_monument_tour', 'q_shards_of_starfall', 'q_wardens_echoes'],
     greeting:
@@ -1024,26 +1044,27 @@ export const REALM_PROPS: ZonePropsDef = {
   buildings: [
     // The whole town is the KayKit medieval set in the Hollow's dusk palette
     // (violet roofs, warm timber; render/props.ts maps each kind to its GLB).
-    { kind: 'hollowInn', x: -58, z: 1046, w: 6, d: 7, rot: 0.7 },
-    { kind: 'hollowHouse', x: -22, z: 1048, w: 7, d: 6, rot: -0.4 },
-    { kind: 'hollowHouse', x: -62, z: 1016, w: 6, d: 6, rot: 1.2 },
+    // Layout is radial: everything rings the great tree at (-40,1026), placed
+    // in the quiet sectors BETWEEN the four spoke roads, doors facing the
+    // tree, well clear of the ring path (r 14) and every spoke corridor.
+    { kind: 'hollowInn', x: -59, z: 1033, w: 6, d: 7, rot: 1.92 }, // northwest sector
+    { kind: 'hollowHouse', x: -52, z: 1041, w: 7, d: 6, rot: 2.47 },
+    { kind: 'hollowHouse', x: -33, z: 1044, w: 7, d: 6, rot: 2.77 }, // northeast sector
+    { kind: 'hollowHouse', x: -24, z: 1038, w: 6, d: 6, rot: -2.21 },
+    { kind: 'hollowSmith', x: -21, z: 1023, w: 7, d: 6.5, rot: -1.41 }, // southeast sector
     { kind: 'hollowChapel', x: -18, z: 1012, w: 5, d: 7, rot: -0.9 }, // the shrine
-    // the two homes on the fringe (these replaced the generated cottages)
-    { kind: 'hollowHouse', x: -72, z: 1034, w: 7, d: 6, rot: 1.35 },
-    { kind: 'hollowHouse', x: -12, z: 1046, w: 7, d: 6, rot: -1.8 },
-    // the working quarter: smithy by the east road, market hall on the
-    // Duskfall approach where wayfarers come in
-    { kind: 'hollowSmith', x: -12, z: 1022, w: 7, d: 6.5, rot: -1.29 },
-    { kind: 'hollowMarket', x: -70, z: 1024, w: 8, d: 6, rot: 1.37 },
+    { kind: 'hollowHouse', x: -47, z: 1008, w: 7, d: 6, rot: 0.37 }, // southwest sector
+    { kind: 'hollowMarket', x: -54, z: 1010, w: 8, d: 6, rot: 0.72 }, // the Duskfall approach
   ],
-  wells: [{ x: -40, z: 1042, r: 1.5 }],
+  wells: [{ x: -40, z: 1035, r: 1.5 }], // inside the ring, north of the tree
   stalls: [
-    { x: -52, z: 1036, rot: Math.PI / 2, r: 1.7 }, // Provisioner Fenna
-    { x: -28, z: 1038, rot: -0.5, r: 1.7 }, // Wardsmith Orun
+    // the market stalls nestle close under the tree, facing out at the ring
+    { x: -47, z: 1032, rot: -0.87, r: 1.7 }, // Provisioner Fenna
+    { x: -33, z: 1032, rot: 0.87, r: 1.7 }, // Wardsmith Orun
   ],
   crates: [
-    [-51, 1033],
-    [-27, 1041],
+    [-49, 1030],
+    [-31, 1030],
   ],
   campfires: [
     [-40, 1008], // town square gathering fire, south of the tree
@@ -1056,10 +1077,10 @@ export const REALM_PROPS: ZonePropsDef = {
     { x: 31, z: 962, rot: 2.4, scale: 1.05 },
   ],
   fences: [
-    // the magical garden ring on the town's north edge
-    { x1: -52, z1: 1052, x2: -42, z2: 1056 },
-    { x1: -42, z1: 1056, x2: -30, z2: 1055 },
-    { x1: -30, z1: 1055, x2: -22, z2: 1050 },
+    // the magical garden hedge behind the northeast homes, clear of the
+    // north and east roads
+    { x1: -35, z1: 1052, x2: -30, z2: 1050 },
+    { x1: -30, z1: 1050, x2: -26, z2: 1047 },
   ],
   ruinRings: [
     // the Sunken Court: an overgrown temple complex
@@ -1111,26 +1132,29 @@ export const REALM_PROPS: ZonePropsDef = {
     //    star's open face turned toward the road approach) and the stags'
     //    antler shrine on the meadow where the herd grazes --
     { key: 'starHeartCrystal', x: 110, z: 985, rot: -1.6, r: 4.6, h: 5.5 },
-    // the C-shaped shrine wall (KayKit dungeon stone), gap west at the causeway
-    { key: 'kkWall', x: 103.21, z: 989.23, rot: -1.01, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 104.6, z: 990.9, rot: -0.74, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 106.39, z: 992.14, rot: -0.47, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 108.45, z: 992.85, rot: -0.19, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWallCracked', x: 110.62, z: 992.98, rot: 0.08, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 112.75, z: 992.51, rot: 0.35, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 114.68, z: 991.49, rot: 0.62, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 116.25, z: 989.99, rot: 0.9, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 117.37, z: 988.12, rot: 1.17, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWallCracked', x: 117.94, z: 986.01, rot: 1.44, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 117.91, z: 983.84, rot: 1.72, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 117.31, z: 981.74, rot: 1.99, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 116.16, z: 979.89, rot: 2.26, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 114.55, z: 978.42, rot: 2.54, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWallCracked', x: 112.61, z: 977.44, rot: 2.81, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 110.47, z: 977.01, rot: 3.08, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 108.3, z: 977.18, rot: 3.36, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 106.26, z: 977.93, rot: 3.63, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkWall', x: 104.49, z: 979.2, rot: 3.9, r: 1.1, h: 2.4, scale: 0.55 },
+    // the C-shaped shrine wall (KayKit dungeon stone), gap west at the causeway.
+    // 20 segments span the arc from gap edge to gap edge (step 0.27216 rad,
+    // chord 2.17 vs 2.2 wall length), so the runs end flush at both gateposts.
+    { key: 'kkWall', x: 103.21, z: 989.22, rot: -1.01, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 104.59, z: 990.89, rot: -0.74, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 106.37, z: 992.13, rot: -0.47, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 108.42, z: 992.84, rot: -0.2, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 110.59, z: 992.98, rot: 0.07, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 112.71, z: 992.53, rot: 0.35, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 114.64, z: 991.52, rot: 0.62, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 116.22, z: 990.03, rot: 0.89, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 117.34, z: 988.18, rot: 1.16, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 117.93, z: 986.09, rot: 1.43, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 117.93, z: 983.91, rot: 1.71, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 117.34, z: 981.82, rot: 1.98, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 116.22, z: 979.97, rot: 2.25, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 114.64, z: 978.48, rot: 2.52, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 112.71, z: 977.47, rot: 2.8, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 110.59, z: 977.02, rot: 3.07, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 108.42, z: 977.16, rot: -2.94, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 106.37, z: 977.87, rot: -2.67, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 104.59, z: 979.11, rot: -2.4, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 103.21, z: 980.78, rot: -2.13, r: 1.1, h: 2.4, scale: 0.55 },
     { key: 'kkPillar', x: 102.7, z: 988.26, rot: -1.15, r: 0.7, h: 3, scale: 0.6 },
     { key: 'kkPillar', x: 102.7, z: 981.74, rot: -1.99, r: 0.7, h: 3, scale: 0.6 },
     { key: 'stagShrine', x: 4, z: 1112, rot: 0.79, r: 2.0, h: 4.2 },
