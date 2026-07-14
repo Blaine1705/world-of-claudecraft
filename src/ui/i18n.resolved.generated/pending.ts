@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -125,6 +126,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -133,6 +135,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "es_ES": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -248,6 +251,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -256,6 +260,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "fr_FR": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -371,6 +376,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -379,6 +385,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "fr_CA": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -494,6 +501,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -503,6 +511,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -618,6 +627,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -626,6 +636,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "de_DE": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -741,6 +752,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -765,6 +777,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill"
   ],
   "pt_BR": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -880,6 +893,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -892,6 +906,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill"
   ],
   "cs_CZ": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -1007,6 +1022,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -1015,6 +1031,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "nl_NL": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -1130,6 +1147,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -1138,6 +1156,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "pl_PL": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -1253,6 +1272,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -1261,6 +1281,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "id_ID": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -1376,6 +1397,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -1384,6 +1406,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "tr_TR": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -1499,6 +1522,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -1507,6 +1531,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "sv_SE": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -1622,6 +1647,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -1630,6 +1656,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "vi_VN": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -1745,6 +1772,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -1753,6 +1781,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.other"
   ],
   "da_DK": [
+    "abilityUi.actionBar.attackRemoveHint",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -1868,6 +1897,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.yourRoles",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",

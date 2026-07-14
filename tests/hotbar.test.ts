@@ -5,8 +5,11 @@ import {
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,
+  encodeStoredHotbarAction,
+  handleMobileAttackTap,
   hotbarActionsEqual,
   parseHotbarActions,
+  parseStoredHotbarAction,
   placeAbilityOnSlot,
   placeItemOnSlot,
   resolveMobileHotbarDrop,
@@ -58,6 +61,83 @@ describe('hotbar action parsing', () => {
       { type: 'ability', id: 'shared_id' },
       { type: 'item', id: 'shared_id' },
     ]);
+  });
+
+  it('parses only valid persisted abilities and items that still exist', () => {
+    expect(
+      parseStoredHotbarAction(
+        JSON.stringify({ type: 'ability', id: 'fireball' }),
+        abilityExists,
+        itemExists,
+      ),
+    ).toEqual({ type: 'ability', id: 'fireball' });
+    expect(
+      parseStoredHotbarAction(
+        JSON.stringify({ type: 'item', id: 'baked_bread' }),
+        abilityExists,
+        itemExists,
+      ),
+    ).toEqual({ type: 'item', id: 'baked_bread' });
+    expect(
+      parseStoredHotbarAction(
+        JSON.stringify({ type: 'ability', id: 'unknown' }),
+        abilityExists,
+        itemExists,
+      ),
+    ).toBeNull();
+    expect(
+      parseStoredHotbarAction(JSON.stringify({ type: 'item', id: 42 }), abilityExists, itemExists),
+    ).toBeNull();
+    expect(parseStoredHotbarAction('{broken', abilityExists, itemExists)).toBeNull();
+    expect(parseStoredHotbarAction(null, abilityExists, itemExists)).toBeNull();
+  });
+
+  it('encodes persisted actions and represents an empty slot without JSON null', () => {
+    expect(encodeStoredHotbarAction({ type: 'ability', id: 'fireball' })).toBe(
+      JSON.stringify({ type: 'ability', id: 'fireball' }),
+    );
+    expect(encodeStoredHotbarAction(null)).toBeNull();
+  });
+});
+
+describe('mobile attack tap', () => {
+  it.each([
+    { autoAttack: true, hasLiveHostileTarget: false },
+    { autoAttack: false, hasLiveHostileTarget: true },
+  ])('toggles auto-attack for an active combat state', (state) => {
+    const calls: string[] = [];
+
+    handleMobileAttackTap(state, {
+      activateAttack: () => calls.push('toggle'),
+      attackNearest: () => calls.push('nearest'),
+    });
+
+    expect(calls).toEqual(['toggle']);
+  });
+
+  it('acquires the nearest target when idle and a resolver is available', () => {
+    const calls: string[] = [];
+
+    handleMobileAttackTap(
+      { autoAttack: false, hasLiveHostileTarget: false },
+      {
+        activateAttack: () => calls.push('toggle'),
+        attackNearest: () => calls.push('nearest'),
+      },
+    );
+
+    expect(calls).toEqual(['nearest']);
+  });
+
+  it('falls back to the auto-attack toggle when no nearest resolver is wired', () => {
+    const calls: string[] = [];
+
+    handleMobileAttackTap(
+      { autoAttack: false, hasLiveHostileTarget: false },
+      { activateAttack: () => calls.push('toggle'), attackNearest: null },
+    );
+
+    expect(calls).toEqual(['toggle']);
   });
 });
 

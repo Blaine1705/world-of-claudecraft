@@ -6,6 +6,10 @@ export function encodeHotbarAction(action: Exclude<HotbarAction, null>): string 
   return JSON.stringify(action);
 }
 
+export function encodeStoredHotbarAction(action: HotbarAction): string | null {
+  return action === null ? null : encodeHotbarAction(action);
+}
+
 export function parseHotbarAction(
   value: unknown,
   abilityExists: (id: string) => boolean,
@@ -18,6 +22,30 @@ export function parseHotbarAction(
     return { type: 'ability', id: action.id };
   if (action.type === 'item' && itemExists(action.id)) return { type: 'item', id: action.id };
   return null;
+}
+
+export function parseStoredHotbarAction(
+  raw: string | null,
+  abilityExists: (id: string) => boolean,
+  itemExists: (id: string) => boolean,
+): Exclude<HotbarAction, null> | null {
+  if (raw === null) return null;
+  try {
+    return parseHotbarAction(JSON.parse(raw), abilityExists, itemExists);
+  } catch {
+    return null;
+  }
+}
+
+export function handleMobileAttackTap(
+  state: { autoAttack: boolean; hasLiveHostileTarget: boolean },
+  actions: { activateAttack: () => void; attackNearest: (() => void) | null },
+): void {
+  if (!state.autoAttack && !state.hasLiveHostileTarget && actions.attackNearest) {
+    actions.attackNearest();
+    return;
+  }
+  actions.activateAttack();
 }
 
 export function parseHotbarActions(

@@ -364,8 +364,9 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     expect(hud).toContain('this.buildMobileActionRing();');
   });
 
-  it('wires the attack button to castSlot(0)', () => {
-    expect(hud).toContain('this.castSlot(0);');
+  it('keeps the mobile attack button independent from the assignable desktop slot 0', () => {
+    expect(hud).toContain('handleMobileAttackTap(');
+    expect(hud).not.toMatch(/bindTouchTap\(attackBtn,[\s\S]*?this\.castSlot\(0\);/);
   });
 
   it('resolves the source slot for a mobile button INSIDE the click handler, not captured at bind time', () => {
