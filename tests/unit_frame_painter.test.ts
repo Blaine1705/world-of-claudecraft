@@ -112,8 +112,7 @@ describe('UnitFramePainter: the player instance routes every write through the e
       { m: 'setText', args: [LEVEL, '60'] },
       { m: 'setTransform', args: [HP_FILL, 'scaleX(0.5)'] },
       { m: 'setText', args: [HP_TEXT, '300 / 600'] },
-      { m: 'setStyleProp', args: [ABSORB, '--absorb-start', '50%'] },
-      { m: 'setTransform', args: [ABSORB, 'scaleX(0)'] },
+      { m: 'setTransform', args: [ABSORB, 'scaleX(0.5)'] },
       { m: 'toggleClass', args: [ABSORB, 'overshield', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'rage', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'energy', false] },
@@ -160,11 +159,7 @@ describe('UnitFramePainter: the player instance routes every write through the e
         },
       }),
     );
-    expect(calls).toContainEqual({
-      m: 'setStyleProp',
-      args: [ABSORB, '--absorb-start', `${(1 - 50 / 600) * 100}%`],
-    });
-    expect(calls).toContainEqual({ m: 'setTransform', args: [ABSORB, `scaleX(${50 / 600})`] });
+    expect(calls).toContainEqual({ m: 'setTransform', args: [ABSORB, 'scaleX(1)'] });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [ABSORB, 'overshield', true] });
   });
 });
@@ -328,5 +323,42 @@ describe('UnitFramePainter: no raw DOM writes, no magic values', () => {
     expect(hex, `hex: ${hex.join(', ')}`).toEqual([]);
     expect(rgb, `rgb: ${rgb.join(', ')}`).toEqual([]);
     expect(px, `px: ${px.join(', ')}`).toEqual([]);
+  });
+});
+
+describe('UnitFramePainter: the title-decoration spans (Book of Deeds)', () => {
+  const TITLE_PRE = { tag: 'titlePre' } as unknown as HTMLElement;
+  const TITLE_POST = { tag: 'titlePost' } as unknown as HTMLElement;
+  const TITLED_ELEMENTS: UnitFrameElements = {
+    ...FULL_ELEMENTS,
+    titlePre: TITLE_PRE,
+    titlePost: TITLE_POST,
+  };
+
+  it('writes both decoration strings on an instance that supplies the spans', () => {
+    const calls = paint(
+      playerDescriptor({ titlePre: '', titlePost: ' [Veteran]' }),
+      TITLED_ELEMENTS,
+      { shownDisplay: 'flex' },
+    );
+    expect(calls).toContainEqual({ m: 'setText', args: [NAME, 'Aerwynn'] });
+    expect(calls).toContainEqual({ m: 'setText', args: [TITLE_PRE, ''] });
+    expect(calls).toContainEqual({ m: 'setText', args: [TITLE_POST, ' [Veteran]'] });
+  });
+
+  it('writes empty strings for an untitled unit (the spans collapse, height unchanged)', () => {
+    const calls = paint(playerDescriptor(), TITLED_ELEMENTS, { shownDisplay: 'flex' });
+    expect(calls).toContainEqual({ m: 'setText', args: [TITLE_PRE, ''] });
+    expect(calls).toContainEqual({ m: 'setText', args: [TITLE_POST, ''] });
+  });
+
+  it('an instance without the spans pays zero title writes even when the view carries one', () => {
+    const calls = paint(
+      playerDescriptor({ titlePre: '[Pre] ', titlePost: ' [Post]' }),
+      FULL_ELEMENTS,
+      { shownDisplay: 'flex' },
+    );
+    expect(calls.some((c) => c.args[0] === TITLE_PRE || c.args[0] === TITLE_POST)).toBe(false);
+    expect(calls.some((c) => c.args[1] === '[Pre] ' || c.args[1] === ' [Post]')).toBe(false);
   });
 });

@@ -316,11 +316,7 @@ describe('character list handlers', () => {
       name: 'Aaa',
       class: 'warrior',
       level: 10,
-      state: st({
-        skin: 3,
-        skinCatalog: 'mech',
-        equipment: { mainhand: 'zealotsbane_blade', offhand: 'eastbrook_buckler' },
-      }),
+      state: st({ skin: 3 }),
       force_rename: false,
       last_played: new Date('2026-01-02T03:04:05.000Z'),
       playtime_seconds: '120',
@@ -352,9 +348,6 @@ describe('character list handlers', () => {
           forceRename: false,
           lastPlayed: '2026-01-02T03:04:05.000Z',
           playtimeSeconds: 120,
-          skinCatalog: 'mech',
-          mainhandItemId: 'zealotsbane_blade',
-          offhandItemId: 'eastbrook_buckler',
         },
         {
           id: 2,
@@ -366,9 +359,6 @@ describe('character list handlers', () => {
           forceRename: true,
           lastPlayed: null,
           playtimeSeconds: 0, // null -> 0
-          skinCatalog: 'class',
-          mainhandItemId: null,
-          offhandItemId: null,
         },
       ],
     };
@@ -415,6 +405,9 @@ describe('owner sheet handler', () => {
     setCharactersDbForTests({
       guildNameForCharacter: async () => 'Guildy',
       lifetimeXpRankForCharacter: async () => ({ rank: 2, total: 50 }),
+      recentDeedsForCharacter: async () => [
+        { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' },
+      ],
     });
     installRuntime({ publicOrigin: () => 'https://worldofclaudecraft.com' });
     const row = charRow({
@@ -438,6 +431,14 @@ describe('owner sheet handler', () => {
     });
     // Owner visibility carries the private stats block (absent on the public sheet).
     expect(bodyRecord(res.body).stats).toBeDefined();
+    // The owner sheet carries the same deeds summary block the public sheet
+    // serves, with the recent strip read through the db seam.
+    expect(bodyRecord(res.body).deeds).toEqual({
+      renown: 0,
+      earnedCount: 0,
+      activeTitle: null,
+      recent: [{ deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' }],
+    });
   });
 
   it('200s an owner sheet with rank:null when the character has no lifetime-XP rank', async () => {
@@ -445,6 +446,7 @@ describe('owner sheet handler', () => {
     setCharactersDbForTests({
       guildNameForCharacter: async () => null,
       lifetimeXpRankForCharacter: async () => null,
+      recentDeedsForCharacter: async () => [],
     });
     const row = charRow({ id: 4, name: 'Rankless', level: 5, state: st({ skin: 0 }) });
     const res = await callHandler('GET', '/api/characters/:id/sheet', {

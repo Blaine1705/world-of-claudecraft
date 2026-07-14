@@ -37,13 +37,13 @@ import { abilitiesKnownAt } from '../content/classes';
 import { computeModifiersWithRows, rowTreeFor } from '../content/talent_rows';
 import {
   cloneAllocation,
+  FIRST_TALENT_LEVEL,
   MAX_LOADOUTS,
   repairAllocation,
   rowsPicked,
   rowsUnlockedAtLevel,
   SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
-  SPEC_UNLOCK_LEVEL,
   type TalentAllocation,
   talentsFor,
   validateAllocation,
@@ -56,9 +56,8 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
-// The ONLY place a talent tree is walked. Re-resolves the flat modifier struct
-// (point tree + choice-row picks, one bake) and refreshes the stat pass +
-// known-ability resolver that consume it.
+// The ONLY place a talent tree is walked. Re-resolves the flat modifier struct and
+// refreshes the stat pass + known-ability resolver that consume it.
 function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   const e = ctx.entities.get(meta.entityId);
   meta.talentMods = computeModifiersWithRows(meta.cls, meta.talents, meta.rowPicks, e?.level ?? 20);
@@ -107,8 +106,8 @@ export function applyTalentAllocation(
     return false;
   }
   const sanitized = sanitizeTalentAllocation(alloc);
-  if (sanitized.spec && r.e.level < SPEC_UNLOCK_LEVEL) {
-    ctx.error(r.e.id, `You may choose a specialization at level ${SPEC_UNLOCK_LEVEL}.`);
+  if (sanitized.spec && r.e.level < FIRST_TALENT_LEVEL) {
+    ctx.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`);
     return false;
   }
   const check = validateAllocation(r.meta.cls, sanitized, r.e.level);
@@ -265,8 +264,8 @@ export function saveTalentLoadout(
       return -1;
     }
     const sanitized = sanitizeTalentAllocation(alloc);
-    if (sanitized.spec && r.e.level < SPEC_UNLOCK_LEVEL) {
-      ctx.error(r.e.id, `You may choose a specialization at level ${SPEC_UNLOCK_LEVEL}.`);
+    if (sanitized.spec && r.e.level < FIRST_TALENT_LEVEL) {
+      ctx.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`);
       return -1;
     }
     const check = validateAllocation(r.meta.cls, sanitized, r.e.level);
@@ -314,7 +313,7 @@ export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number
     ctx.error(r.e.id, 'No such loadout.');
     return false;
   }
-  if (lo.alloc.spec && r.e.level < SPEC_UNLOCK_LEVEL) {
+  if (lo.alloc.spec && r.e.level < FIRST_TALENT_LEVEL) {
     ctx.error(r.e.id, 'That loadout needs a higher level.');
     return false;
   }

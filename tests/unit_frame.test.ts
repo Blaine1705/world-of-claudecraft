@@ -75,10 +75,10 @@ describe('unitFrameView: the present / hidden gate', () => {
       resText: '',
       levelText: null,
       name: '',
+      titlePre: '',
+      titlePost: '',
       portraitKey: '',
       absorbFrac: 0,
-      absorbStartFrac: 0,
-      absorbSizeFrac: 0,
       absorbOvershield: false,
       dead: false,
       outOfRange: false,
@@ -92,8 +92,6 @@ describe('unitFrameView: absorb resolution via the shared absorbBarView core', (
       playerDescriptor({ absorb: { hp: 300, maxHp: 600, auras: [shield(60)] } }),
     );
     expect(v.absorbFrac).toBeCloseTo((300 + 60) / 600); // 0.6
-    expect(v.absorbStartFrac).toBeCloseTo(0.5);
-    expect(v.absorbSizeFrac).toBeCloseTo(0.1);
     expect(v.absorbOvershield).toBe(false);
   });
 
@@ -102,24 +100,13 @@ describe('unitFrameView: absorb resolution via the shared absorbBarView core', (
       playerDescriptor({ absorb: { hp: 590, maxHp: 600, auras: [shield(50)] } }),
     );
     expect(v.absorbFrac).toBe(1);
-    expect(v.absorbStartFrac).toBeCloseTo(1 - 50 / 600);
-    expect(v.absorbSizeFrac).toBeCloseTo(50 / 600);
     expect(v.absorbOvershield).toBe(true);
   });
 
   it('treats a null absorb input as no shield (the dead-target case)', () => {
     const v = unitFrameView(playerDescriptor({ absorb: null }));
     expect(v.absorbFrac).toBe(0);
-    expect(v.absorbStartFrac).toBe(0);
-    expect(v.absorbSizeFrac).toBe(0);
     expect(v.absorbOvershield).toBe(false);
-  });
-
-  it('appends shield text only when requested by the frame instance', () => {
-    const hidden = unitFrameView(playerDescriptor());
-    const shown = unitFrameView(playerDescriptor({ showAbsorbText: true }));
-    expect(hidden.hpText).toBe('300 / 600');
-    expect(shown.hpText).toBe('300 / 600 (60)');
   });
 });
 
@@ -190,27 +177,6 @@ describe('unitFrameView: TWO-DESCRIPTOR contract (the FULL field set)', () => {
     expect(v.levelText).toBeNull();
     expect(v.resClass).toBe('mana');
   });
-
-  it('drives a PARTY-shaped descriptor from a compact shield total without hp text', () => {
-    const v = unitFrameView({
-      present: true,
-      hpFrac: 0.8,
-      hpText: '',
-      resourceKind: 'mana',
-      resFrac: 0.7,
-      resText: '',
-      levelText: null,
-      name: 'Goradil',
-      portraitKey: 'player:warrior:2',
-      absorb: { hp: 80, maxHp: 100, total: 20 },
-      dead: false,
-      outOfRange: false,
-    });
-    expect(v.hpText).toBe('');
-    expect(v.absorbStartFrac).toBeCloseTo(0.8);
-    expect(v.absorbSizeFrac).toBeCloseTo(0.2);
-    expect(v.absorbOvershield).toBe(true);
-  });
 });
 
 describe('unitFrameView: determinism + ClientWorld-vs-Sim parity', () => {
@@ -263,5 +229,23 @@ describe('unit_frame core stays DOM-free, i18n-free, and id-free (no single-inst
     expect(code).not.toMatch(/#pf-/);
     expect(code).not.toMatch(/player-frame/);
     expect(code).not.toMatch(/querySelector|getElementById/);
+  });
+});
+
+describe('unitFrameView: the title decoration pass-through (Book of Deeds)', () => {
+  it('passes titlePre/titlePost through pre-localized, verbatim', () => {
+    const v = unitFrameView(playerDescriptor({ titlePre: '', titlePost: ' [Veteran]' }));
+    expect(v.titlePre).toBe('');
+    expect(v.titlePost).toBe(' [Veteran]');
+    // A prefix-placing locale flows the same way (the core knows no layout).
+    const pre = unitFrameView(playerDescriptor({ titlePre: '[Veterano] ', titlePost: '' }));
+    expect(pre.titlePre).toBe('[Veterano] ');
+    expect(pre.titlePost).toBe('');
+  });
+
+  it('defaults both to empty when the instance passes no title fields (player, party)', () => {
+    const v = unitFrameView(playerDescriptor());
+    expect(v.titlePre).toBe('');
+    expect(v.titlePost).toBe('');
   });
 });

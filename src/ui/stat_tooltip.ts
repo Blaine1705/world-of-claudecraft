@@ -15,6 +15,7 @@ import { CLASSES } from '../sim/data';
 import {
   type AuraKind,
   armorReduction,
+  type CoreStats,
   type PlayerClass,
   SPELL_POWER_PER_INT,
   type Stats,
@@ -49,8 +50,7 @@ export type StatId =
   | 'dodge'
   | 'critRating'
   | 'hasteRating'
-  | 'haste'
-  | 'parry';
+  | 'warfare';
 
 /** A single contribution line. `value` is already in the unit the line displays
  *  (attack power as an integer, percents as a percent number like 1.1, etc.). */
@@ -101,7 +101,7 @@ export interface StatSource {
 /** One equipped item's stat contribution, as the HUD reads it from ITEMS. */
 export interface GearStatSource {
   name: string;
-  stats?: Partial<Pick<Stats, 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'>>;
+  stats?: Partial<CoreStats>;
   spellPower?: number;
 }
 
@@ -119,6 +119,9 @@ export interface StatTooltipModel {
   isPrimary: boolean;
   /** The stat's current displayed value (header / informational). */
   statValue: number;
+  /** The two live effects summarized by the single player-facing Warfare stat. */
+  warfareDamageIncrease?: number;
+  warfareDamageReduction?: number;
   effects: StatEffect[];
   /** Show "Of little benefit to your class." (Int/Spi on a non-mana class). */
   minorForClass: boolean;
@@ -148,10 +151,6 @@ export interface StatTooltipInput {
   critRating: number;
   /** entity.hasteRating, the accumulated haste rating from gear + set bonuses. */
   hasteRating: number;
-  /** entity haste fraction (0.25 = 25% faster swings/casts), 0..1+. */
-  haste: number;
-  /** entity.parryChance, 0..1 (chance to fully avoid a frontal melee attack). */
-  parryChance: number;
   /** Weapon damage-per-second exactly as the panel computes it. */
   dps: number;
   /** Equipped items contributing stats, for the gear source line (HUD maps from
@@ -246,6 +245,8 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
   let dpsApproxNote = false;
   let isPrimary = true;
   let statValue = 0;
+  let warfareDamageIncrease: number | undefined;
+  let warfareDamageReduction: number | undefined;
 
   switch (stat) {
     case 'str': {
@@ -342,19 +343,11 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       statValue = input.hasteRating;
       break;
     }
-    case 'haste': {
-      // Shown as a percent (25 = +25% faster swings/casts). No base-chance note:
-      // it starts at 0 and comes from gear set bonuses + buffs like Enrage.
+    case 'warfare': {
       isPrimary = false;
-      statValue = input.haste * 100;
-      break;
-    }
-    case 'parry': {
-      // Front-only avoidance, shown as a percent like dodge (a parry class starts
-      // at a base chance; casters stay at 0).
-      isPrimary = false;
-      statValue = input.parryChance * 100;
-      baseChanceNote = true;
+      statValue = stats.pvpOffense * 100;
+      warfareDamageIncrease = stats.pvpOffense * 100;
+      warfareDamageReduction = stats.pvpDefense * 100;
       break;
     }
   }
@@ -363,6 +356,8 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
     stat,
     isPrimary,
     statValue,
+    warfareDamageIncrease,
+    warfareDamageReduction,
     effects,
     minorForClass,
     baseChanceNote,
@@ -386,13 +381,13 @@ const PRIMARY_BUFF_KINDS: Record<'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'
 
 /** Base value of a primary attribute (or armor) from class + level, before any
  *  gear / buff / talent layer. Mirrors recalcPlayerStats' opening derivation. */
-function basePrimary(cls: PlayerClass, key: keyof Stats, level: number): number {
+function basePrimary(cls: PlayerClass, key: keyof CoreStats, level: number): number {
   const def = CLASSES[cls];
   return def.baseStats[key] + def.statsPerLevel[key] * (level - 1);
 }
 
 /** Sum the contribution of one attribute (or spellPower) across equipped gear. */
-function gearTotal(gear: GearStatSource[], key: keyof Stats | 'spellPower'): number {
+function gearTotal(gear: GearStatSource[], key: keyof CoreStats | 'spellPower'): number {
   let total = 0;
   for (const g of gear) {
     if (key === 'spellPower') total += g.spellPower ?? 0;
@@ -504,14 +499,7 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
     // description carries the meaning, so no per-source breakdown line.
     case 'critRating':
     case 'hasteRating':
-      return sources;
-    // Haste comes straight off gear set bonuses + buffs (Enrage); the value plus
-    // its description carries the meaning, so no per-source breakdown line.
-    case 'haste':
-      return sources;
-    // Parry is a base chance plus Strength scaling; the value + description carry
-    // the meaning, so no per-source breakdown line for now.
-    case 'parry':
+    case 'warfare':
       return sources;
   }
 }

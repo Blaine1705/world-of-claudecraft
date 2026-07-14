@@ -231,6 +231,17 @@ const HOT_PAINTERS: ReadonlyArray<{
     allow: { '.className': 1, '.setAttribute': 1 },
     reflowAllow: { '.offsetWidth': 1 },
   },
+  // deed_tracker builds its whole static skeleton (header + pooled lines) in
+  // ONE constructor innerHTML write; every refresh write is facet-routed. The
+  // three setAttribute/removeAttribute pairs run ONLY on a chip-mode
+  // transition (compact-touch tier flip, guarded by lastChip): the elided
+  // setAttr facet caches per (element, attr) and would go stale across a raw
+  // removeAttribute, so the transition swap must be direct. Never per-frame.
+  {
+    file: 'deed_tracker_painter.ts',
+    allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
+    reflowAllow: {},
+  },
 ];
 
 // The OTHER src/ui/*_painter.ts modules, NOT facet-routed, so deliberately not in the
@@ -429,8 +440,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
     const desc: UnitFrameDescriptor = {
       present: true,
       hpFrac: 0.5,
-      hpText: '300/600',
-      showAbsorbText: true,
+      hpText: '300 / 600',
       resourceKind: 'mana',
       resFrac: 0.8,
       resText: '80 / 100',
@@ -553,8 +563,8 @@ function idleWorld(): ActionBarWorldInput {
       gcdRemaining: 0,
       potionCdRemaining: 0,
       queuedOnSwing: null,
+      stealthed: false,
       pos: { x: 0, y: 0, z: 0 },
-      auras: [],
     },
     target: null,
     inventory: [],

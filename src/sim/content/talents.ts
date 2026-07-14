@@ -100,10 +100,15 @@ export interface GlobalModEffect {
   petDmgPct?: number; // owner's passive pet damage
   petDmgSharePct?: number; // incoming damage redirected to a living pet
   threatPct?: number; // bonus threat (tank role)
-  // Extra critical-strike damage (0.5 = +50%). Added to the base crit multiplier for BOTH
-  // spell (base 1.5) and physical (base 2.0) crits: a spec mastery so a Fire mage's crits
-  // hit harder. Baked onto Entity.critDmgBonus in recalcPlayerStats.
-  critDmgPct?: number;
+  // Extra critical-strike damage (0.5 = +50%), split by OUTPUT CHANNEL so a spec mastery
+  // only strengthens the crits it is meant to: a Fire/Destruction mastery boosts SPELL
+  // crits, an Arms/Subtlety mastery boosts PHYSICAL crits, and a Holy paladin mastery
+  // boosts HEAL crits, never the others. Added to the matching base crit multiplier
+  // (spell 1.5, physical 2.0, heal 1.5). Baked onto the paired Entity.critDmg*Bonus in
+  // recalcPlayerStats.
+  critDmgSpellPct?: number;
+  critDmgPhysPct?: number;
+  critDmgHealPct?: number;
   // Passive spell haste from a spec mastery (0.1 = +10%). Folds into Entity.spellHaste, so
   // it shortens every cast and the cast-time tooltips reflect it live.
   spellHastePct?: number;
@@ -281,12 +286,6 @@ export function hasTalents(cls: PlayerClass): boolean {
 
 export const FIRST_TALENT_LEVEL = 10;
 
-// Spec identity (the signature ability + mastery + spec-gated kit) unlocks EARLIER
-// than talent POINTS: a specialization may be committed from SPEC_UNLOCK_LEVEL, but
-// points still accrue from FIRST_TALENT_LEVEL (talentPointsAtLevel is unchanged), so
-// the talent tree and point economy are untouched. A spec below this level is illegal.
-export const SPEC_UNLOCK_LEVEL = 5;
-
 export function talentPointsAtLevel(level: number): number {
   return Math.max(0, Math.min(level, MAX_LEVEL) - (FIRST_TALENT_LEVEL - 1));
 }
@@ -434,7 +433,9 @@ function zeroGlobal(): Required<GlobalModEffect> {
     petDmgPct: 0,
     petDmgSharePct: 0,
     threatPct: 0,
-    critDmgPct: 0,
+    critDmgSpellPct: 0,
+    critDmgPhysPct: 0,
+    critDmgHealPct: 0,
     spellHastePct: 0,
     critVsRooted: 0,
     autoRagePct: 0,
@@ -540,7 +541,9 @@ export function accumulate(
     g.petDmgPct += (e.petDmgPct ?? 0) * mult;
     g.petDmgSharePct += (e.petDmgSharePct ?? 0) * mult;
     g.threatPct += (e.threatPct ?? 0) * mult;
-    g.critDmgPct += (e.critDmgPct ?? 0) * mult;
+    g.critDmgSpellPct += (e.critDmgSpellPct ?? 0) * mult;
+    g.critDmgPhysPct += (e.critDmgPhysPct ?? 0) * mult;
+    g.critDmgHealPct += (e.critDmgHealPct ?? 0) * mult;
     g.spellHastePct += (e.spellHastePct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
     g.autoRagePct += (e.autoRagePct ?? 0) * mult;

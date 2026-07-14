@@ -45,7 +45,7 @@ describe('warlock low-level sustained damage tuning', () => {
     // Masteries were made impactful across all specs (spec identity pass): affliction
     // amplifies its damage-over-time effects, destruction doubles spell crit damage.
     expect(spec('affliction').mastery.effect.global?.dotDmgPct).toBe(0.2);
-    expect(spec('destruction').mastery.effect.global?.critDmgPct).toBe(0.5);
+    expect(spec('destruction').mastery.effect.global?.critDmgSpellPct).toBe(0.5);
     expect(spec('destruction').mastery.effect.stats?.crit).toBe(0.02);
 
     // The point-tree amplifiers above lived in the deleted node trees; their

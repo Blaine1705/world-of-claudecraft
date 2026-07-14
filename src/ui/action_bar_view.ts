@@ -71,7 +71,7 @@ const EMPTY_SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.emptySlotAria';
 const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
 
 /** The ability fields the core reads. A structural subset of ResolvedAbility that
- *  both worlds expose (def + the talent-resolved cost and stored uses). */
+ *  both worlds expose (def + the talent-resolved cost). */
 export interface ActionBarAbility {
   def: AbilityDef;
   cost: number;
@@ -157,6 +157,12 @@ export interface ActionBarPlayerInput {
   /** Live charges on the abilityCharges recharge model (Frost's second Ice Block):
    *  the current count per ability id. Optional: absent when nothing uses it. */
   abilityCharges?: { [id: string]: { charges: number } | undefined };
+  /** Whether the player currently carries a `kind:'stealth'` aura (Stealth or
+   *  Vanish). Gates a `requiresStealth` ability's usable state (issue #1890):
+   *  without this the bar never dimmed Cheap Shot/Ambush/Garrote out of
+   *  stealth, so they looked equally "ready" whether or not the cast would
+   *  actually succeed. */
+  stealthed: boolean;
 }
 
 /** The target fields the bar reads; null when there is no current target. */
@@ -451,7 +457,8 @@ export function createActionBarView(
         slot.usable =
           (!(player.resource < ability.cost) || freeByProc) &&
           windowOpen &&
-          !(maxCharges > 1 && chargesLeft <= 0);
+          !(maxCharges > 1 && chargesLeft <= 0) &&
+          (!def.requiresStealth || player.stealthed);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&

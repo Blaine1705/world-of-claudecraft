@@ -65,7 +65,6 @@ describe('partyRowHandlers: the closures read the LIVE slot, never a captured me
     level: 10,
     hp: 1,
     mhp: 1,
-    absorb: 0,
     res: 0,
     mres: 0,
     rtype: 'mana',
@@ -84,7 +83,6 @@ describe('partyRowHandlers: the closures read the LIVE slot, never a captured me
     const handlers = partyRowHandlers(slot, {
       onTarget: (pid) => targets.push(pid),
       onContextMenu: (pid, name) => menus.push([pid, name]),
-      onHover: () => {},
     });
 
     handlers.click();
@@ -106,7 +104,6 @@ describe('partyRowHandlers: the closures read the LIVE slot, never a captured me
     const handlers = partyRowHandlers(slot, {
       onTarget: (pid) => targets.push(pid),
       onContextMenu: (pid, _name, x, y) => menus.push([pid, x, y]),
-      onHover: () => {},
     });
     for (const key of ['Enter', ' ']) {
       handlers.keydown({ key, preventDefault() {} } as unknown as KeyboardEvent);
@@ -274,7 +271,7 @@ describe('createPartyRow: decorative badges + relocalize hook (a11y + live langu
     createPartyRow(
       fakeDoc,
       recordingFacet().writers,
-      { onTarget() {}, onContextMenu() {}, onHover() {} },
+      { onTarget() {}, onContextMenu() {} },
       member({ pid: 1 }),
       auraDeps,
     );
@@ -324,6 +321,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
   let painter: PartyFramesPainter;
   let targeted: number[];
   let toggles: number;
+  let leftParty: number;
 
   beforeEach(() => {
     container = fakeEl('div');
@@ -331,6 +329,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     calls = facet.calls;
     targeted = [];
     toggles = 0;
+    leftParty = 0;
     painter = new PartyFramesPainter(
       facet.writers,
       container as unknown as HTMLElement,
@@ -338,7 +337,10 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
         classCss: () => 'var(--cls)',
         onTarget: (pid) => targeted.push(pid),
         onContextMenu: () => {},
-        onHover: () => {},
+        onLeave: () => {
+          leftParty++;
+        },
+        leaveLabel: () => 'Leave Party',
         chipLabel: () => 'Party',
         onToggleCollapse: () => {
           toggles++;
@@ -366,7 +368,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(rowA.listeners.keydown).toHaveLength(1);
 
     // Re-sync the SAME member (a stat changed): the row is reused, not rebuilt.
-    painter.sync([member({ pid: 2, name: 'Alice', hp: 10, absorb: 15 })], 1, false);
+    painter.sync([member({ pid: 2, name: 'Alice', hp: 10 })], 1, false);
     expect(rows()[0]).toBe(rowA);
     expect(rowA.listeners.click).toHaveLength(1);
 
@@ -423,11 +425,25 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(icons()).toHaveLength(0);
   });
 
-  it('orders rows without a fixed leave button beneath the frames', () => {
+  it('orders rows in member order with the leave button last', () => {
     painter.sync([member({ pid: 2 }), member({ pid: 3 }), member({ pid: 4 })], 1, false);
     const kids = container.childNodes;
     expect(rows()).toHaveLength(3); // three member rows inside the wrapper
-    expect(kids.some((child) => child.id === 'party-leave')).toBe(false);
+    expect(kids[kids.length - 1].tagName).toBe('BUTTON'); // leave button last (container child)
+  });
+
+  it('the leave button click leaves the party', () => {
+    painter.sync([member({ pid: 2 })], 1, false);
+    const leave = container.childNodes.find((c) => c.tagName === 'BUTTON');
+    leave?.fire('click', {});
+    expect(leftParty).toBe(1);
+  });
+
+  it('relocalize() re-localizes the leave label in place (the live language-switch hook)', () => {
+    painter.sync([member({ pid: 2 })], 1, false);
+    calls.length = 0;
+    painter.relocalize();
+    expect(calls.some((c) => c.m === 'setText' && c.args[0] === 'Leave Party')).toBe(true);
   });
 
   it('toggles the raid-frame presentation for automatic raids and forced party use', () => {
@@ -527,16 +543,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     painter.setBelowTarget(true);
     painter.sync(
       [
-        member({
-          pid: 2,
-          name: 'Alice',
-          dead: 0,
-          inCombat: 1,
-          hp: 50,
-          mhp: 100,
-          absorb: 25,
-          oor: false,
-        }),
+        member({ pid: 2, name: 'Alice', dead: 0, inCombat: 1, hp: 50, mhp: 100, oor: false }),
         member({ pid: 3, name: 'Bob', dead: 1, oor: false }),
         member({ pid: 4, name: 'Cora', dead: 0, inCombat: 0, oor: true }),
       ],
@@ -559,9 +566,6 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     // A combat member is NOT also dead (dead wins), so its combat is on but dead off.
     // The hp bar keeps the inline .toFixed(3) precision via formatScaleX.
     expect(has('setTransform', (c) => /^scaleX\(\d\.\d{3}\)$/.test(String(c.args[0])))).toBe(true);
-    expect(has('setStyleProp', (c) => c.args[0] === '--absorb-start')).toBe(true);
-    expect(has('setTransform', (c) => c.args[0] === 'scaleX(0.250)')).toBe(true);
-    expect(has('setText', (c) => String(c.args[0]).includes('(25)'))).toBe(false);
     // The leader star is its OWN aria-hidden write (★), and the level element
     // (.lead-num) holds the bare number (20), never the old concatenated '★20'. Both
     // route through the elided setText (no raw write on the hot path).

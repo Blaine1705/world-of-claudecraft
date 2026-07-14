@@ -1,9 +1,16 @@
-import type { AbilityDef, AbilityEffect, AuraKind, PlayerClass, Stats, WeaponInfo } from '../types';
+import type {
+  AbilityDef,
+  AbilityEffect,
+  AuraKind,
+  CoreStats,
+  PlayerClass,
+  WeaponInfo,
+} from '../types';
 import type { TalentModifiers } from './talents';
 import { SPORT_ABILITIES } from './vale_cup';
 
 // ---------------------------------------------------------------------------
-// Player classes - per-level base stats follow classic-era growth curves.
+// Player classes — per-level base stats follow classic-era growth curves.
 // HP/mana rules are the real ones: first 20 stamina gives 1 hp each, the rest
 // 10 hp each; first 20 intellect gives 1 mana each, the rest 15 mana each.
 // ---------------------------------------------------------------------------
@@ -11,15 +18,14 @@ import { SPORT_ABILITIES } from './vale_cup';
 export interface ClassDef {
   id: PlayerClass;
   name: string;
-  baseStats: Stats;
-  statsPerLevel: Stats;
+  baseStats: CoreStats;
+  statsPerLevel: CoreStats;
   baseHp: number; // class hp before stamina at level 1
   hpPerLevel: number;
   baseMana: number;
   manaPerLevel: number;
   resourceType: 'rage' | 'mana' | 'energy';
   startWeapon: string;
-  startOffhand?: string;
   startChest: string;
   // Consumables in a fresh character's bags: every class carries food; the
   // mana classes also carry water. Saved characters load their own bags.
@@ -56,51 +62,26 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     manaPerLevel: 0,
     resourceType: 'rage',
     startWeapon: 'worn_sword',
-    startOffhand: 'eastbrook_buckler',
     startChest: 'recruit_tunic',
     startItems: START_RATIONS,
     abilities: [
       'heroic_strike',
-      'revenge',
       'battle_shout',
+      'commanding_shout',
       'charge',
+      'rend',
       'thunder_clap',
       'hamstring',
       'bloodrage',
       'overpower',
-      'raging_gale',
-      'raised_guard',
-      'pummel',
       'execute',
-      'furious_mending',
-      'iron_resolve',
       'slam',
-      'red_harvest',
-      'faultline',
-      'heroic_leap',
       'cleave',
-      'rallying_cry',
-      'emboldening_roar',
-      'defiant_bellow',
-      'battle_stance',
-      'berserker_stance',
       'defensive_stance',
       'demoralizing_shout',
-      'intimidating_shout',
       'sunder_armor',
       'taunt',
-      'measured_fury',
-      'seasoned_soldier',
-      'sudden_death',
-      'diabolical_twinstrike',
-      'cleaving_blows',
-      'breachmaker',
-      // Arms restructure 2026-07-08: its own defensive cooldown, a cleave window,
-      // and the Deep Wounds bleed passive (replacing the retired Deep Gash).
-      'die_by_sword',
-      'sweeping_strikes',
-      'deep_wounds',
-      'enrage_passive',
+      'pummel',
     ],
     color: 0xc79c6e,
   },
@@ -164,6 +145,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'ice_barrier',
       'pyroblast',
       'flamestrike',
+      'counterspell',
       // Chronomancy healer kit (docs/prd/mage-chronomancy.md, `specs: ['arcane']`
       // gated): the single-target shield (Phase 1) and Temporal Echo (Phase 2, the
       // Arcane-damage-to-healing mark). Temporal Mend is the spec signature,
@@ -198,7 +180,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     manaPerLevel: 0,
     resourceType: 'energy',
     startWeapon: 'rusty_dagger',
-    startOffhand: 'rusty_dagger',
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS,
     abilities: [
@@ -223,6 +204,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'deadly_poison',
       'blind',
       'stealth',
+      'kick',
     ],
     color: 0xfff569,
   },
@@ -248,11 +230,13 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'divine_protection',
       'hammer_of_justice',
       'lay_on_hands',
+      'holy_taunt',
       'flash_of_light',
       'exorcism',
       'consecration',
       'righteous_fury',
       'retribution_aura',
+      'rebuke',
     ],
     color: 0xf58cba,
   },
@@ -286,6 +270,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'aimed_shot',
       'rapid_fire',
       'volley',
+      'counter_shot',
     ],
     color: 0xabd473,
   },
@@ -378,6 +363,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'summon_infernal',
       'summon_doomguard',
       'rain_of_fire',
+      'spell_lock',
     ],
     color: 0x9482c9,
   },
@@ -427,13 +413,14 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'tigers_fury',
       'rip',
       'hurricane',
+      'skull_bash',
     ],
     color: 0xff7d0a,
   },
 };
 
 // ---------------------------------------------------------------------------
-// Abilities - classic-era rank values and learn levels (levels 1-10)
+// Abilities — classic-era rank values and learn levels (levels 1-10)
 // ---------------------------------------------------------------------------
 
 export const ABILITIES: Record<string, AbilityDef> = {
@@ -451,11 +438,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     onNextSwing: true,
     offGcd: true,
-    // Reaver Strike is the NO-SPEC (pre-specialization) filler only: Protection
-    // replaces it with Revenge, Arms (owner restructure 2026-07-08) leans on
-    // Maiming Strike + Brute Swing, and Fury (owner 2026-07-08) dropped it too
-    // in favour of Bloodletting / Twinstrike. All three committed specs exclude it.
-    excludeSpecs: ['prot', 'arms', 'fury'],
     threat: { flat: 20 }, // classic per-rank values: 20/39/59/78
     effects: [{ type: 'weaponDamage', bonus: 11 }],
     ranks: [
@@ -485,71 +467,70 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   battle_shout: {
     id: 'battle_shout',
-    castFx: 'shout',
     name: 'Iron Bellow',
     class: 'warrior',
     learnLevel: 1,
-    cost: 0,
+    cost: 10,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     exclusiveGroup: 'warrior_shout',
-    // 1800s matches the other five standardized class raid buffs (int, armor,
-    // AP, stamina, stats all run 30 min); 120s was the odd one out.
-    effects: [{ type: 'buffTarget', kind: 'buff_ap_pct', value: 10, duration: 1800, party: true }],
-    description: 'A shout that increases the attack power of all party members by $b% for 30 min.',
+    effects: [{ type: 'buffTarget', kind: 'buff_ap_pct', value: 10, duration: 120, party: true }],
+    description: 'A shout that increases the attack power of all party members by $b% for 2 min.',
   },
   commanding_shout: {
     id: 'commanding_shout',
-    castFx: 'shout',
     name: 'Bolstering Cry',
     class: 'warrior',
     learnLevel: 14,
-    specs: ['prot'],
-    cost: 0,
+    cost: 10,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 6, duration: 3600 }],
+    exclusiveGroup: 'warrior_shout',
+    effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 6, duration: 120 }],
     ranks: [
       {
         rank: 2,
         level: 24,
-        cost: 0,
-        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 11, duration: 3600 }],
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 11, duration: 120 }],
       },
     ],
-    description: 'Increases your Stamina by 6 for 1 hour.',
+    description: 'Increases your Stamina by $b for 2 min.',
   },
   demoralizing_shout: {
     id: 'demoralizing_shout',
-    castFx: 'shout',
     name: 'Direhowl',
     class: 'warrior',
-    learnLevel: 12,
-    specs: ['prot'],
+    learnLevel: 14,
     cost: 10,
     castTime: 0,
-    // Owner rework: a real defensive cooldown instead of a spammable flat AP
-    // drain (which barely dented mobs, whose damage rides the weapon roll):
-    // 45s cd, every nearby enemy deals 20% less damage for 20s (pct form).
-    cooldown: 45,
+    cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'aoeAttackPower', pct: 0.2, duration: 20, radius: 10 }],
+    effects: [{ type: 'aoeAttackPower', amount: 30, duration: 30, radius: 10 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 45, duration: 30, radius: 10 }],
+      },
+    ],
     description:
-      'Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by 20% for 20 sec.',
+      'Lets out a fearsome shout, reducing the attack power of all nearby enemies by $b for 30 sec.',
   },
   charge: {
     id: 'charge',
     name: 'Onrush',
     class: 'warrior',
-    learnLevel: 3,
+    learnLevel: 4,
     cost: 0,
     castTime: 0,
     cooldown: 15,
@@ -565,8 +546,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rend',
     name: 'Deep Gash',
     class: 'warrior',
-    learnLevel: 5,
-    specs: ['arms'],
+    learnLevel: 4,
     cost: 10,
     castTime: 0,
     cooldown: 0,
@@ -594,10 +574,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'thunder_clap',
     name: 'Quaking Blow',
     class: 'warrior',
-    learnLevel: 5,
-    // Protection-only now (owner restructure 2026-07-08): the seismic AoE belongs
-    // to the tank; Arms dropped it to declutter its bar.
-    specs: ['prot'],
+    learnLevel: 6,
     cost: 20,
     castTime: 0,
     cooldown: 4,
@@ -635,7 +612,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'hamstring',
     name: 'Hobbling Cut',
     class: 'warrior',
-    learnLevel: 5,
+    learnLevel: 8,
     cost: 10,
     castTime: 0,
     cooldown: 0,
@@ -663,8 +640,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'bloodrage',
     name: 'Blood Toll',
     class: 'warrior',
-    learnLevel: 6,
-    specs: ['arms', 'prot'],
+    learnLevel: 10,
     cost: 0,
     castTime: 0,
     cooldown: 60,
@@ -676,86 +652,37 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'selfDamagePctMax', pct: 0.08 },
       { type: 'gainResource', amount: 10 },
     ],
-    // The sim-source fallback hardcodes the base gainResource amount (10); the
-    // translated catalog uses the {rage} splice so the Blood Offering talent's
-    // upgraded amount shows live in the rendered tooltip.
     description: 'Generates 10 rage at the cost of health.',
   },
   overpower: {
     id: 'overpower',
     name: 'Redhand',
     class: 'warrior',
-    learnLevel: 2,
-    cost: 20,
+    learnLevel: 10,
+    cost: 5,
     castTime: 0,
     cooldown: 5,
-    // Two charges (owner 2026-07-08, like Twinstrike): usable twice back to back,
-    // each charge recharging on the cooldown, and each use stacking its empower.
-    maxCharges: 2,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    // Owner decision 2026-07-09: baseline early rage SPENDER (learned at level 2),
-    // costing 20 rage per use. The classic dodge-proc gate stays gone (too RNG);
-    // the requiresDodgeProc machinery itself remains for hunter mongoose_bite.
-    // Fury hands it off at 10 (owner 2026-07-10): it stays the spec's only real
-    // rage spender through 5-9 (Bloodletting/Twinstrike cost 0), then retires
-    // the moment Red Harvest (its learnLevel, 10) takes the rage-dump role,
-    // since its empower rider feeds the Arms-granted Maiming Strike.
-    excludeSpecs: ['fury'],
-    excludeSpecsAtLevel: 10,
-    effects: [
-      { type: 'weaponStrike', bonus: 5, cannotBeDodged: true },
-      // Empowers the next Maiming Strike (+20% per stack, up to 2), consumed in
-      // effect_dispatch's weaponStrike case. Only Arms owns Maiming Strike, so the
-      // stack is a no-op for other specs (harmless).
-      { type: 'selfBuff', kind: 'overpower_charge', value: 0.2, duration: 15 },
-    ],
+    requiresDodgeProc: true,
+    effects: [{ type: 'weaponStrike', bonus: 5, cannotBeDodged: true }],
     ranks: [
       {
         rank: 2,
         level: 16,
-        cost: 20,
-        effects: [
-          { type: 'weaponStrike', bonus: 15, cannotBeDodged: true },
-          { type: 'selfBuff', kind: 'overpower_charge', value: 0.2, duration: 15 },
-        ],
+        cost: 5,
+        effects: [{ type: 'weaponStrike', bonus: 15, cannotBeDodged: true }],
       },
     ],
     description:
-      'Instant attack (2 charges) for weapon damage plus $d that empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged.',
-  },
-  // Fury's active rage builder (operator design, Arremetida Enfurecida): two
-  // 60%-weapon hits so the pair lands slightly more than one signature
-  // Bloodletting swing, plus a rage kick. First BASE-KIT user of the
-  // multi-charge cooldown flow (maxCharges; the Double Charge talent row
-  // pioneered the Entity.charges machinery).
-  raging_gale: {
-    id: 'raging_gale',
-    name: 'Twinstrike',
-    class: 'warrior',
-    learnLevel: 7,
-    specs: ['fury'],
-    cost: 0,
-    castTime: 0,
-    cooldown: 8,
-    maxCharges: 2,
-    range: 0,
-    school: 'physical',
-    requiresTarget: true,
-    effects: [
-      { type: 'weaponStrike', bonus: 24, weaponMult: 0.6 },
-      { type: 'weaponStrike', bonus: 24, weaponMult: 0.6 },
-      { type: 'gainResource', amount: 8 },
-    ],
-    description:
-      'Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus $d, and generate 8 rage. Stores up to 2 charges. (Fury)',
+      'Instant attack for weapon damage plus $d. Only usable after the target dodges. Cannot be dodged.',
   },
   execute: {
     id: 'execute',
     name: 'Early Grave',
     class: 'warrior',
-    learnLevel: 12,
+    learnLevel: 14,
     cost: 15,
     castTime: 0,
     cooldown: 0,
@@ -771,14 +698,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'slam',
     name: 'Brute Swing',
     class: 'warrior',
-    learnLevel: 5,
-    // Arms-only (owner 2026-07-08): Protection dropped Brute Swing since Revenge
-    // is already its filler; a generic mandoble adds nothing for a tank.
-    specs: ['arms'],
+    learnLevel: 16,
     cost: 15,
-    // Instant by owner decision (MoP-era Slam): a timed cast on a rage melee
-    // felt wrong in play. Deliberate divergence from the classic 1.5s cast.
-    castTime: 0,
+    castTime: 1.5,
     cooldown: 0,
     range: 0,
     school: 'physical',
@@ -786,369 +708,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'weaponStrike', bonus: 25 }],
     description: 'Slams the opponent for weapon damage plus $d.',
   },
-  // Fury's dump-everything spender (operator design, Desenfreno): three full
-  // weapon hits, each carrying a Maiming Strike-scale bonus (era table:
-  // docs/design/spell-ranks.md), for the whole 80-rage bar. GCD only.
-  red_harvest: {
-    id: 'red_harvest',
-    name: 'Red Harvest',
-    class: 'warrior',
-    learnLevel: 10,
-    specs: ['fury'],
-    cost: 80,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: true,
-    effects: [
-      { type: 'weaponStrike', bonus: 55 },
-      { type: 'weaponStrike', bonus: 55 },
-      { type: 'weaponStrike', bonus: 55 },
-      // Always Enrages for 4 sec (Rampage / Desenfreno, the guaranteed proc).
-      { type: 'enrageChance', chance: 1, duration: 4 },
-    ],
-    description:
-      'Spend everything: strike three times in a frenzy for weapon damage plus $d each, always Enraging you. (Fury)',
-  },
-  // Spellbook-only passive trait (owner 2026-07-08): documents the Enrage buff
-  // that Bloodletting / Red Harvest apply (the actual mechanic is the enrageChance
-  // effect + the 'enrage' aura). No effects of its own; never castable.
-  enrage_passive: {
-    id: 'enrage_passive',
-    name: 'Mayhem',
-    class: 'warrior',
-    learnLevel: 5,
-    specs: ['fury'],
-    passive: true,
-    cost: 0,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [],
-    description:
-      'Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
-  },
-  // Fury's defensive cooldown (operator correction 2026-07-07, Regeneracion
-  // Enfurecida): a 10s / 20% damage-taken cut (the buff_dr aura read by
-  // combat/damage.ts), NOT a flat heal-over-time. The healing is delivered
-  // through Bloodletting: while this aura (detectable id 'furious_mending') is
-  // up, bloodthirst's selfHealPctMax jumps from 3% to 20% of max health
-  // (combat/effect_dispatch.ts).
-  furious_mending: {
-    id: 'furious_mending',
-    name: 'Furious Mending',
-    class: 'warrior',
-    learnLevel: 10,
-    specs: ['fury'],
-    cost: 0,
-    castTime: 0,
-    cooldown: 120,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [
-      {
-        type: 'selfBuff',
-        kind: 'buff_dr',
-        value: 0.2,
-        duration: 10,
-        auraId: 'furious_mending',
-        auraName: 'Furious Mending',
-      },
-    ],
-    description:
-      'For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)',
-  },
-  // Fury's support offensive cooldown (operator design, Grito Alentador): the
-  // caster and friendly players within 40 yd are Emboldened, their next 3
-  // damaging ability CASTS guaranteed critical strikes (aura kind 'sure_crit',
-  // overridden-not-skipped crit rolls; combat/sure_crit.ts).
-  emboldening_roar: {
-    id: 'emboldening_roar',
-    castFx: 'shout',
-    name: 'Emboldening Roar',
-    class: 'warrior',
-    learnLevel: 16,
-    specs: ['fury'],
-    cost: 0,
-    castTime: 0,
-    cooldown: 180,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [{ type: 'aoeAllySureCrit', charges: 3, duration: 20, radius: 40 }],
-    description:
-      'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
-  },
-  // Protection's active shield block (operator design, Bloquear con Escudo):
-  // an off-GCD 6 sec self buff cutting PHYSICAL damage taken in half (the
-  // 'buff_dr_phys' sibling of Furious Mending's buff_dr, read at the same
-  // combat/damage.ts fold but gated on the school being physical).
-  raised_guard: {
-    id: 'raised_guard',
-    castFx: 'flourish',
-    name: 'Raised Guard',
-    class: 'warrior',
-    learnLevel: 8,
-    specs: ['prot'],
-    requiresShield: true,
-    cost: 15,
-    castTime: 0,
-    cooldown: 12,
-    maxCharges: 2,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    effects: [
-      {
-        type: 'selfBuff',
-        kind: 'buff_dr_phys',
-        value: 0.5,
-        duration: 6,
-        auraId: 'raised_guard_dr',
-        auraName: 'Raised Guard',
-      },
-    ],
-    description:
-      'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)',
-  },
-  // Protection's rage-dump survival wall (operator design, Ignorar Dolor): the
-  // FIRST spendsAllResource ability. `cost` is the 20-rage minimum gate; casting
-  // spends up to spendResourceCap (40) rage from the bar and grants a damage-absorb
-  // shield (the priest-style 'absorb' aura kind, drained by dealDamage and read by
-  // the HUD absorb bar) soaking 4 damage per rage actually spent, up to 10 sec.
-  iron_resolve: {
-    id: 'iron_resolve',
-    name: 'Iron Resolve',
-    class: 'warrior',
-    learnLevel: 14,
-    specs: ['prot'],
-    cost: 20,
-    spendsAllResource: true,
-    spendResourceCap: 40,
-    castTime: 0,
-    cooldown: 15,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [{ type: 'absorbSpentResource', mult: 4, duration: 10 }],
-    description:
-      'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)',
-  },
-  // Protection's frontal control slam (operator design, Ola de Choque): modest
-  // aoe damage plus a 3 sec stun, restricted to enemies in the MELEE_ARC
-  // frontal arc (the aoeDamage `frontal` flag) within 8 yd.
-  faultline: {
-    id: 'faultline',
-    name: 'Faultline',
-    class: 'warrior',
-    learnLevel: 14,
-    specs: ['prot'],
-    cost: 15,
-    castTime: 0,
-    cooldown: 30,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [{ type: 'aoeDamage', min: 15, max: 20, radius: 8, frontal: true, stunSec: 3 }],
-    description:
-      'Send a shockwave through the ground: enemies in front of you within 8 yards take $d damage and are stunned for 3 sec. (Protection)',
-  },
-  // Protection's aoe taunt (operator design, Grito Desafiante): every hostile
-  // mob within 10 yd goes through the SHARED applyTaunt entry (threat lifted
-  // to the top of its table + forced onto the caster), the fan-out of Goad.
-  defiant_bellow: {
-    id: 'defiant_bellow',
-    castFx: 'shout',
-    name: 'Defiant Bellow',
-    class: 'warrior',
-    learnLevel: 12,
-    specs: ['prot'],
-    cost: 0,
-    castTime: 0,
-    cooldown: 60,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [{ type: 'aoeTaunt', radius: 10 }],
-    description:
-      'A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)',
-  },
-  // Arms's damage-amplifier (operator design, Aplastar Coloso): a modest weapon
-  // strike that also stamps a SOURCE-SCOPED vulnerability (vuln_source) on the
-  // target, so only YOUR hits on that target land 20% harder for 8 sec. The aura
-  // carries the caster's id (debuffTargetSource), so it never buffs other
-  // attackers, unlike the raid-wide 'vulnerability' curse.
-  breachmaker: {
-    id: 'breachmaker',
-    name: 'Breachmaker',
-    class: 'warrior',
-    learnLevel: 12,
-    specs: ['arms'],
-    cost: 10,
-    castTime: 0,
-    cooldown: 45,
-    range: 0,
-    school: 'physical',
-    requiresTarget: true,
-    effects: [
-      { type: 'weaponStrike', bonus: 15 },
-      {
-        type: 'debuffTargetSource',
-        kind: 'vuln_source',
-        value: 0.2,
-        duration: 8,
-        auraId: 'breachmaker_vuln',
-        auraName: 'Breachmaker',
-      },
-    ],
-    description:
-      'Batter the target for weapon damage plus $d and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)',
-  },
-  // Arms's rage-economy passive (operator design, Intrepidez): a calm, measured
-  // fury makes every one of your abilities cost 10% less rage. Never castable and
-  // never on the action bar; the discount folds at the resolvedAbility cost choke
-  // point while the passive is in the known list (spec-gated to arms).
-  measured_fury: {
-    id: 'measured_fury',
-    name: 'Measured Fury',
-    class: 'warrior',
-    learnLevel: 5,
-    specs: ['arms'],
-    passive: true,
-    cost: 0,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [],
-    description:
-      'Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)',
-  },
-  // Seasoned Soldier (Arms passive, owner 2026-07-09): critical auto-attacks mint
-  // 10% more rage. Wired in combat/damage.ts's auto-attack rage block, gated on the
-  // passive being known AND committed arms (mirrors Measured Fury's cost hook).
-  seasoned_soldier: {
-    id: 'seasoned_soldier',
-    name: 'Seasoned Soldier',
-    class: 'warrior',
-    learnLevel: 5,
-    specs: ['arms'],
-    passive: true,
-    cost: 0,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [],
-    description: 'Your critical auto-attacks generate 10% more rage. (Arms)',
-  },
-  // Diabolical Twinstrike (Fury passive, owner 2026-07-09): Twinstrike hits 15%
-  // harder while Enraged. Wired in effect_dispatch's weaponStrike case.
-  diabolical_twinstrike: {
-    id: 'diabolical_twinstrike',
-    name: 'Diabolical Twinstrike',
-    class: 'warrior',
-    learnLevel: 5,
-    specs: ['fury'],
-    passive: true,
-    cost: 0,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [],
-    description: 'While Enraged, your Twinstrike deals 15% more damage. (Fury)',
-  },
-  // Cleaving Blows (Fury passive, owner 2026-07-09): Red Harvest always refunds a
-  // charge of Twinstrike. Wired in effect_dispatch's runEffects red_harvest path.
-  cleaving_blows: {
-    id: 'cleaving_blows',
-    name: 'Cleaving Blows',
-    class: 'warrior',
-    learnLevel: 5,
-    specs: ['fury'],
-    passive: true,
-    cost: 0,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [],
-    description: 'Red Harvest always refunds a charge of Twinstrike. (Fury)',
-  },
-  // Sudden Death (Arms passive, owner 2026-07-09): a connected auto swing has a
-  // chance to let you cast Early Grave on a target at ANY health, for no rage.
-  // Proc in auto_attack.ts; the free cost + HP-gate bypass ride the 'sudden_death'
-  // aura (empower_next.ts + casting_lifecycle).
-  sudden_death: {
-    id: 'sudden_death',
-    name: 'Sudden Death',
-    class: 'warrior',
-    learnLevel: 5,
-    specs: ['arms'],
-    passive: true,
-    cost: 0,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [],
-    description:
-      'Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)',
-  },
-  // Arms restructure 2026-07-08. Sweeping Strikes: a 12s window where your
-  // single-target strikes also clip one nearby enemy (75%). Deep Wounds: a
-  // passive marker; the bleed itself rides Maiming Strike's effects.
-  sweeping_strikes: {
-    id: 'sweeping_strikes',
-    name: 'Widening Arc',
-    class: 'warrior',
-    learnLevel: 18,
-    specs: ['arms'],
-    cost: 0,
-    castTime: 0,
-    cooldown: 30,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'sweeping_strikes', value: 0.75, duration: 12 }],
-    description:
-      'For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)',
-  },
-  deep_wounds: {
-    id: 'deep_wounds',
-    name: 'Gaping Wounds',
-    class: 'warrior',
-    learnLevel: 9,
-    specs: ['arms'],
-    passive: true,
-    cost: 0,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [],
-    description:
-      'Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)',
-  },
   cleave: {
     id: 'cleave',
     name: 'Reaping Arc',
     class: 'warrior',
-    learnLevel: 14,
-    specs: ['arms'],
+    learnLevel: 18,
     cost: 20,
     castTime: 0,
     cooldown: 0,
@@ -1159,75 +723,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'aoeDamage', min: 20, max: 26, radius: 5 }],
     description: 'A sweeping strike that hits all enemies in front of you for $d damage.',
   },
-  // Protection's frontal-arc filler, replacing Reaver Strike for committed prot
-  // (heroic_strike excludeSpecs ['prot'] + this specs ['prot']). Hits every enemy
-  // in the melee facing arc; a soft cap (softCap 5) holds the TOTAL to 5x per-
-  // target above 5 enemies. A dodge or parry against the warrior has a chance to
-  // make the next cast free (the revenge_free proc, applied in mobSwing).
-  revenge: {
-    id: 'revenge',
-    name: 'Revenge',
-    class: 'warrior',
-    learnLevel: 7,
-    specs: ['prot'],
-    cost: 20,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    threat: { flat: 30 },
-    effects: [{ type: 'aoeDamage', min: 18, max: 24, radius: 8, frontal: true, softCap: 5 }],
-    description:
-      'Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)',
-  },
-  // Warrior combat stances. All three share exclusiveGroup 'warrior_stance', so
-  // casting one swaps the sibling and a warrior is never stanceless (the default
-  // for the spec is also auto-applied by combat/warrior_stances.ts). Gating:
-  // Battle is for Arms/Prot/no-spec (excludeSpecs Fury), Guarded for Arms/Prot,
-  // Berserker for Fury only.
-  battle_stance: {
-    id: 'battle_stance',
-    name: 'Battle Stance',
-    class: 'warrior',
-    learnLevel: 1,
-    excludeSpecs: ['fury'],
-    cost: 0,
-    castTime: 0,
-    cooldown: 1,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    exclusiveGroup: 'warrior_stance',
-    effects: [{ type: 'selfBuff', kind: 'battle_stance', value: 0, duration: 3600 }],
-    description:
-      'An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection.',
-  },
-  berserker_stance: {
-    id: 'berserker_stance',
-    name: 'Berserker Stance',
-    class: 'warrior',
-    learnLevel: 5,
-    specs: ['fury'],
-    cost: 0,
-    castTime: 0,
-    cooldown: 1,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    exclusiveGroup: 'warrior_stance',
-    effects: [{ type: 'selfBuff', kind: 'berserker_stance', value: 0, duration: 3600 }],
-    description:
-      'A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance.',
-  },
   defensive_stance: {
     id: 'defensive_stance',
     name: 'Guarded Stance',
     class: 'warrior',
-    learnLevel: 5,
-    specs: ['arms', 'prot'],
+    learnLevel: 10,
     cost: 0,
     castTime: 0,
     cooldown: 1,
@@ -1235,19 +735,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    exclusiveGroup: 'warrior_stance',
     effects: [{ type: 'selfBuff', kind: 'defensive_stance', value: 0.9, duration: 3600 }],
     description:
-      'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast Battle Stance to return to the offensive.',
+      'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast again to leave the stance.',
   },
   sunder_armor: {
     id: 'sunder_armor',
     name: 'Armor Shear',
     class: 'warrior',
-    learnLevel: 5,
-    // Protection-only now (owner restructure 2026-07-08): Arms dropped armor
-    // shred to declutter its bar.
-    specs: ['prot'],
+    learnLevel: 10,
     cost: 15,
     castTime: 0,
     cooldown: 0,
@@ -1272,7 +768,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'taunt',
     name: 'Goad',
     class: 'warrior',
-    learnLevel: 5,
+    learnLevel: 10,
     cost: 0,
     castTime: 0,
     cooldown: 10,
@@ -2882,6 +2378,22 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [{ rank: 2, level: 18, cost: 0, effects: [{ type: 'heal', min: 600, max: 600 }] }],
     description: 'A massive surge of healing: restores $d health. 10 min cooldown.',
   },
+  holy_taunt: {
+    id: 'holy_taunt',
+    name: 'Sacred Goad',
+    class: 'paladin',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 10,
+    range: 30,
+    school: 'holy',
+    requiresTarget: true,
+    offGcd: true,
+    effects: [{ type: 'taunt' }],
+    description:
+      'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+  },
   flash_of_light: {
     id: 'flash_of_light',
     name: 'Lightmend',
@@ -3494,6 +3006,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Imbues your weapon with the fury of stone: each swing deals $d additional damage for 5 min.',
   },
+  // Restoration shaman signature (granted only via the Restoration spec, not in the base
+  // kit). v1 is a strong single-target heal; the multi-target "chain" bounce is a
+  // follow-up once a bounce/jump primitive exists.
   chain_heal: {
     id: 'chain_heal',
     name: 'Chain Heal',
@@ -4067,7 +3582,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'summonDemon', mobId: 'pyre_colossus' }],
     description:
-      'Binds a Pyre Colossus to your will - a hulking juggernaut with crushing melee and the deepest health and armor of any demon. A long cooldown gates its raw power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Binds a Pyre Colossus to your will — a hulking juggernaut with crushing melee and the deepest health and armor of any demon. A long cooldown gates its raw power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_doomguard: {
     id: 'summon_doomguard',
@@ -4082,7 +3597,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'summonDemon', mobId: 'wraithborn' }],
     description:
-      'Binds a Wraithborn to your will - an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
 
   // ====================== DRUID ======================
@@ -4692,13 +4207,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
 
   // ============== TALENT-GRANTED (Warrior) ==============
-  // Not in CLASSES.warrior.abilities - unlocked only via talent grants (spec
+  // Not in CLASSES.warrior.abilities — unlocked only via talent grants (spec
   // signatures + active nodes), so abilitiesKnownAt adds them by `mods.grants`.
   mortal_strike: {
     id: 'mortal_strike',
     name: 'Maiming Strike',
     class: 'warrior',
-    learnLevel: 5,
+    learnLevel: 10,
     cost: 30,
     castTime: 0,
     cooldown: 6,
@@ -4706,98 +4221,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     threat: { mult: 1.2 },
-    effects: [
-      { type: 'weaponStrike', bonus: 40 },
-      { type: 'buffTarget', kind: 'mortal_wound', value: 0.5, duration: 10 },
-      // Deep Wounds passive (Arms restructure 2026-07-08): Maiming Strike leaves
-      // a bleed. Arms-scoped naturally (mortal_strike is Arms-granted). A distinct
-      // auraId keeps it from overwriting the mortal_wound healing debuff above.
-      { type: 'dot', total: 24, duration: 6, interval: 3, auraId: 'deep_wounds' },
-    ],
-    description:
-      'A vicious strike dealing weapon damage plus $d and reducing healing the target receives by 50% for 10 sec. Applies Gaping Wounds (bleed). (Arms signature)',
+    effects: [{ type: 'weaponStrike', bonus: 40 }],
+    description: 'A vicious strike dealing weapon damage plus $d. (Arms signature)',
   },
   bloodthirst: {
     id: 'bloodthirst',
     name: 'Bloodletting',
     class: 'warrior',
-    learnLevel: 5,
-    cost: 0,
+    learnLevel: 10,
+    cost: 30,
     castTime: 0,
     cooldown: 6,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [
-      { type: 'weaponStrike', bonus: 35, weaponMult: 0.6 },
-      { type: 'selfHealPctMax', pct: 0.03 },
-      { type: 'gainResource', amount: 12 },
-      // 30% chance to Enrage for 4 sec (the classic Bloodthirst proc).
-      { type: 'enrageChance', chance: 0.3, duration: 4 },
-    ],
+    effects: [{ type: 'weaponStrike', bonus: 35, weaponMult: 0.6 }],
     description:
-      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health and generating 12 rage. Has a 30% chance to Enrage you. (Fury signature)',
+      'Instantly attack in a blood frenzy for 60% weapon damage plus $d. (Fury signature)',
   },
   shield_slam: {
     id: 'shield_slam',
     name: 'Shieldcrack',
     class: 'warrior',
-    learnLevel: 5,
-    requiresShield: true,
-    // Protection's active rage BUILDER (owner 2026-07-08): no cost, and it
-    // GENERATES 15 rage on a short cooldown, so the tank loop is take-hits +
-    // Shieldcrack to build, then spend on Revenge / Armor Shear. Prot-only
-    // (spec signature), so no per-spec gate is needed on the rage grant.
-    cost: 0,
+    learnLevel: 10,
+    cost: 20,
     castTime: 0,
     cooldown: 6,
     range: 0,
     school: 'physical',
     requiresTarget: true,
     threat: { flat: 110 },
-    effects: [
-      { type: 'weaponStrike', bonus: 30, weaponMult: 0.5 },
-      { type: 'gainResource', amount: 15 },
-    ],
+    effects: [{ type: 'weaponStrike', bonus: 30, weaponMult: 0.5 }],
     description:
-      'Slam the target with your shield for $d and massive threat, generating 15 rage. (Protection signature)',
+      'Slam the target with your shield for 50% weapon damage plus $d and massive threat. (Protection signature)',
   },
   whirlwind: {
     id: 'whirlwind',
     name: 'Bladed Gyre',
     class: 'warrior',
     learnLevel: 10,
-    // Bladed Gyre GENERATES rage instead of costing it (operator, Batch
-    // 2026-07-08): cost 0, and the aoeDamage's rageOnHit grants 5 rage plus 1
-    // per enemy struck (capped at +5), so 5 to 10 rage per spin.
-    cost: 0,
+    cost: 25,
     castTime: 0,
     cooldown: 10,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [
-      {
-        type: 'aoeDamage',
-        min: 30,
-        max: 42,
-        radius: 8,
-        rageOnHit: { base: 5, perTarget: 1, capTargets: 5 },
-      },
-      // Bladed Echo: arms the caster for 2 echoing casts (combat/area_echo.ts).
-      // Its own aoeDamage disqualifies whirlwind from consuming the charge.
-      {
-        type: 'selfBuff',
-        kind: 'aoe_echo',
-        value: 0,
-        duration: 12,
-        charges: 2,
-        auraId: 'bladed_echo',
-        auraName: 'Bladed Echo',
-      },
-    ],
-    description:
-      'Spin in a deadly arc, striking all nearby enemies for $d and generating rage for each foe struck instead of costing any. Your next 2 single-target abilities also strike enemies near their target. (Fury talent)',
+    effects: [{ type: 'aoeDamage', min: 30, max: 42, radius: 8 }],
+    description: 'Spin in a deadly arc, striking all nearby enemies for $d. (Fury talent)',
   },
   berserker_rage: {
     id: 'berserker_rage',
@@ -5113,7 +4583,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [
       { type: 'directDamage', min: 90, max: 110 },
-      { type: 'aoeDamage', min: 60, max: 75, radius: 10 },
+      { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
     ],
     description:
       'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',

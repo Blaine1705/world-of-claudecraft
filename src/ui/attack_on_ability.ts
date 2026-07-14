@@ -39,7 +39,9 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   finisherDamage: 'damage',
   dot: 'damage',
   aoeDamage: 'damage',
+  chainDamage: 'damage',
   aoeHeal: 'other',
+  chainHeal: 'other',
   groundAoE: 'damage',
   frozenOrb: 'damage',
   aoeRoot: 'damage',
@@ -57,16 +59,12 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   resurrectAlly: 'other',
   perfectMoment: 'other',
   rewind: 'other',
-  chainHeal: 'other',
   feralCharge: 'other',
   hot: 'other',
   absorb: 'other',
   imbue: 'other',
   lifeTap: 'other',
   buffTarget: 'other',
-  // Breachmaker's source-scoped vulnerability debuff is a non-breaking amp; the
-  // ability's paired weaponStrike is what classifies it as an attack.
-  debuffTargetSource: 'other',
   slow: 'other',
   root: 'other',
   stun: 'other',
@@ -89,20 +87,11 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   applyDebuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',
-  // Fury Enrage proc: a pure self-buff, never itself an attack (the ability's
-  // weaponStrikes classify it).
-  enrageChance: 'other',
   gainResource: 'other',
   selfDamagePctMax: 'other',
-  selfHealPctMax: 'other',
   charge: 'other',
   sunder: 'other',
   faerieFire: 'other',
-  // Prot kit: the Iron Resolve absorb shield is pure utility; the Defiant
-  // Bellow aoe taunt already forces the mobs onto the caster, no swing needed
-  // to engage (mirrors the single-target 'taunt' classification).
-  absorbSpentResource: 'other',
-  aoeTaunt: 'other',
   taunt: 'other',
   tamePet: 'other',
   dismissPet: 'other',

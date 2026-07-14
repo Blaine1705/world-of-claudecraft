@@ -74,14 +74,14 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
     roleType: 'hybrid',
     armorKey: 'classDetails.armor.leatherCloth',
     weaponsKey: 'classDetails.weapons.staves',
-  },
+  }
 };
 
 // Three curated "signature" abilities per class, shown on the select screen.
 // Each entry MUST be a real ability that the class can learn, enforced by
 // tests/charselect_class_details.test.ts so this never drifts from the sim.
 export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
-  warrior: ['charge', 'heroic_strike', 'execute'],
+  warrior: ['charge', 'heroic_strike', 'rend'],
   paladin: ['holy_light', 'judgement', 'seal_of_righteousness'],
   hunter: ['serpent_sting', 'aimed_shot', 'arcane_shot'],
   rogue: ['sinister_strike', 'eviscerate', 'evasion'],

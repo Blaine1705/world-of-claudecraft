@@ -56,9 +56,11 @@ export function abilityDamageBonus(
         : directHitBonus(power, def, res.castTime, false);
     case 'aoeDamage':
     case 'aoeRoot':
+    case 'chainDamage':
       // A channelled AoE (Rain of Fire, Hurricane, Volley) pulses through the
       // channel-tick path in casting_lifecycle, which adds channelTickBonus to
-      // each pulse, not the single-cast AoE coefficient.
+      // each pulse, not the single-cast AoE coefficient. chainDamage (Hallowed Wall
+      // bounce) is a one-shot AoE hit, so it takes the same AoE coefficient.
       return def.channel
         ? channelTickBonus(power, def)
         : directHitBonus(power, def, res.castTime, true);
@@ -120,15 +122,13 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
     (eff) =>
       eff.type === 'directDamage' ||
       eff.type === 'heal' ||
-      eff.type === 'chainHeal' ||
       eff.type === 'weaponDamage' ||
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
+      eff.type === 'aoeHeal' ||
       eff.type === 'aoeRoot' ||
       eff.type === 'groundAoE' ||
-      // Heroic Leap: the landing blast is nested in repositionToAim.landingAoe
-      // (fired on touchdown), so $d reads that when present.
-      (eff.type === 'repositionToAim' && eff.landingAoe != null) ||
+      eff.type === 'consumeAura' ||
       eff.type === 'finisherDamage' ||
       eff.type === 'drainTick' ||
       eff.type === 'sunder' ||
@@ -160,10 +160,7 @@ export function abilityOverTimeEffect(
 export function abilityBuffValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
     if (eff.type === 'selfBuff' || eff.type === 'buffTarget') return eff.value;
-    // aoeAttackPower reads its flat `amount`, or a `pct` reduction as a whole
-    // percent (Direhowl's 0.2 -> 20 for the "{buff}%" tooltip).
-    if (eff.type === 'aoeAttackPower')
-      return eff.amount ?? (eff.pct != null ? eff.pct * 100 : null);
+    if (eff.type === 'aoeAttackPower') return eff.amount;
   }
   return null;
 }

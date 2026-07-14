@@ -30,7 +30,9 @@ const PCT_FIELDS = new Set([
   'spellDmgPct',
   'healPct',
   'threatPct',
-  'critDmgPct',
+  'critDmgSpellPct',
+  'critDmgPhysPct',
+  'critDmgHealPct',
   'dotDmgPct',
   'hotHealPct',
   'absorbPct',
@@ -39,13 +41,10 @@ const PCT_FIELDS = new Set([
   'petDmgPct',
   'petDmgSharePct',
   'secondWindPctPerSec',
-  'secondWindHpBelow',
   'fearBreakPct',
   'onKillSpeedPct',
   'autoRagePct',
   'abilityRagePct',
-  'battleRhythmRagePct',
-  'battleRhythmDmgPct',
   'bloodbathPct',
   'bloodbathMaxPct',
   'dmgPct',
@@ -82,7 +81,9 @@ function expectedTokens(effect: unknown): string[] {
         // choice rows) are picked/not-picked flags like battleRhythm; their
         // timings are stated as durations, not this 1.
         if (key === 'temporalRift' || key === 'blinkCast' || key === 'convergence') continue;
-        if (key === 'critDmgPct' && value === 0.5) {
+        // A +50% spell or heal crit-damage mastery lifts the 1.5x base to 2.0x, which the
+        // hand-written descriptions phrase as "double" rather than "50%".
+        if ((key === 'critDmgSpellPct' || key === 'critDmgHealPct') && value === 0.5) {
           toks.push('double');
           continue;
         }

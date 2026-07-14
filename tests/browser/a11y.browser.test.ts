@@ -62,6 +62,7 @@ function entry(over: Partial<LeaderboardEntry> = {}): LeaderboardEntry {
     lifetimeXp: 5_000_000,
     prestigeRank: 0,
     ...over,
+    title: over.title ?? null,
   };
 }
 
@@ -148,6 +149,7 @@ describe('axe: talents window', () => {
         activeLoadout: () => -1,
         loadouts: () => [],
         currentBar: () => [],
+        buildDropdown: () => document.createElement('div'),
         captureFocus: () => null,
       }),
     );
@@ -486,6 +488,7 @@ describe('axe: character window', () => {
             cfg: { playerClass: 'warrior' },
             player: { name: 'Aurelia', level: 60, skin: 0 },
             equipment: {},
+            professionsState: { skills: [] },
           }) as never,
         statCellHtml: () => '',
         statTooltipHtml: () => '',

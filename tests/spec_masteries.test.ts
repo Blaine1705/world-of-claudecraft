@@ -39,7 +39,7 @@ function metaOf(sim: Sim, entity: Entity) {
 describe('spec masteries', () => {
   it('authors the ten PR B mastery effects exactly', () => {
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
-      global: { critDmgPct: 0.5 },
+      global: { critDmgHealPct: 0.5 },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'discipline')?.mastery.effect).toEqual({
       global: { absorbPct: 0.3 },
@@ -57,8 +57,11 @@ describe('spec masteries', () => {
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.2 },
     });
+    // Mage rework (owner leveling pass 2026-07-14): Fire's mastery is Ignition, a
+    // crit-triggered burn (ignitionPct) plus a static +2% crit chance, not the old
+    // Afterflame crit-damage bonus.
     expect(TALENTS.mage?.specs.find((s) => s.id === 'fire')?.mastery.effect).toEqual({
-      global: { critDmgPct: 0.5 },
+      global: { ignitionPct: 0.4 },
       stats: { crit: 0.02 },
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'frost')?.mastery.effect).toEqual({
@@ -99,15 +102,17 @@ describe('spec masteries', () => {
       global: { meleeDmgPct: 0.15 },
       stats: { agiPct: 0.15 },
     });
+    // Mage rework: the 'arcane' internal id is now the Chronomancy healer (Chronoweave
+    // mastery), so its effect boosts healing/mana, not spell damage.
     expect(TALENTS.mage?.specs.find((s) => s.id === 'arcane')?.mastery.effect).toEqual({
-      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      global: { healPct: 0.15, manaPct: 0.05, manaRegenPct: 0.2 },
     });
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'assassination')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.2 },
       stats: { crit: 0.03 },
     });
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
-      global: { critDmgPct: 0.4 },
+      global: { critDmgPhysPct: 0.4 },
       stats: { agiPct: 0.1 },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
@@ -126,7 +131,7 @@ describe('spec masteries', () => {
       global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
-      global: { critDmgPct: 0.5 },
+      global: { critDmgSpellPct: 0.5 },
       stats: { crit: 0.02 },
     });
   });
@@ -148,6 +153,90 @@ describe('spec masteries', () => {
     expect(effect(known('rogue', 'sinister_strike', 'combat'), 'weaponStrike').bonus).toBe(16);
   });
 
+  it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
+    // Drive the actual damage sites (a regression that drops `dmg *= petDamageMult` at
+    // either would still pass a helper-only assertion). Same seed + fixed rolls + an
+    // identical dummy (armor cancels in the ratio) isolate the multiplier: BM's Packbond (petDmgPct 0.35)
+    // must deal exactly 1.35x what a no-pet-mastery spec's identical pet deals.
+    const setup = (spec: string) => {
+      const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
+      sim.setPlayerLevel(20);
+      sim.setSpec(spec);
+      const pet = createMob(9101, MOBS.forest_wolf, 20, sim.player.pos);
+      pet.ownerId = sim.player.id;
+      pet.weapon = { ...pet.weapon, min: 100, max: 100 };
+      pet.swingTimer = 0;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
+      const dummy = createMob(9102, MOBS.forest_wolf, 20, {
+        x: sim.player.pos.x,
+        y: sim.player.pos.y,
+        z: sim.player.pos.z + 2,
+      });
+      dummy.maxHp = dummy.hp = 100000;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(dummy);
+      return { sim, pet, dummy };
+    };
+    const dealtMelee = (spec: string): number => {
+      const { sim, pet, dummy } = setup(spec);
+      const before = dummy.hp;
+      (sim as unknown as { mobSwing(a: Entity, b: Entity): void }).mobSwing(pet, dummy);
+      return before - dummy.hp;
+    };
+    const dealtRanged = (spec: string): number => {
+      const { sim, pet, dummy } = setup(spec);
+      const spell = {
+        name: 'Test Bolt',
+        school: 'nature' as const,
+        min: 100,
+        max: 100,
+        range: 100,
+        every: 2,
+      };
+      const before = dummy.hp;
+      (
+        sim as unknown as { updateRangedPetAttack(p: Entity, t: Entity, s: typeof spell): void }
+      ).updateRangedPetAttack(pet, dummy, spell);
+      return before - dummy.hp;
+    };
+    const meleeBm = dealtMelee('beast_mastery');
+    const meleeNone = dealtMelee('marksmanship');
+    expect(meleeNone).toBeGreaterThan(0);
+    expect(meleeBm / meleeNone).toBeCloseTo(1.35, 2);
+
+    const rangedBm = dealtRanged('beast_mastery');
+    const rangedNone = dealtRanged('marksmanship');
+    expect(rangedNone).toBeGreaterThan(0);
+    expect(rangedBm / rangedNone).toBeCloseTo(1.35, 2);
+  });
+
+  it('Veinleech (siphon_life) leeches: the affliction dot tick heals the caster', () => {
+    const sim = new Sim({ seed: 12, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('affliction'); // grants the Veinleech signature (siphon_life)
+    const caster = sim.player;
+    caster.hp = Math.round(caster.maxHp * 0.5); // leave room for the leech to heal
+    const target = createMob(9201, MOBS.forest_wolf, 20, {
+      x: caster.pos.x,
+      y: caster.pos.y,
+      z: caster.pos.z + 3,
+    });
+    target.hostile = true;
+    target.maxHp = target.hp = 100000;
+    (sim as unknown as { addEntity(e: Entity): void }).addEntity(target);
+    sim.targetEntity(target.id);
+    caster.facing = Math.atan2(target.pos.x - caster.pos.x, target.pos.z - caster.pos.z);
+    sim.castAbility('siphon_life');
+
+    // Tick until a dot tick lands; the leech emits a heal2 whose target is the caster.
+    let selfHeal = false;
+    for (let i = 0; i < 20 * 6 && !selfHeal; i++) {
+      for (const ev of sim.tick()) {
+        if (ev.type === 'heal2' && ev.targetId === caster.id && ev.amount > 0) selfHeal = true;
+      }
+    }
+    expect(selfHeal).toBe(true);
+  });
+
   it('applies passive stat, pet damage, damage-share, and heal-crit masteries at runtime', () => {
     const rogue = new Sim({ seed: 4, playerClass: 'rogue', autoEquip: true });
     rogue.setPlayerLevel(20);
@@ -167,14 +256,17 @@ describe('spec masteries', () => {
     paladin.setPlayerLevel(20);
     paladin.setSpec('holy');
     paladin.player.stats.int = 2000;
-    paladin.player.critDmgBonus = 0;
+    paladin.player.critDmgHealBonus = 0;
     paladin.player.hp = 0;
     (
       paladin as unknown as { applyHeal(s: Entity, t: Entity, a: number, n: string): void }
     ).applyHeal(paladin.player, paladin.player, 100, 'test');
     expect(paladin.player.hp).toBe(150);
     paladin.player.hp = 0;
-    paladin.player.critDmgBonus = metaOf(paladin, paladin.player).talentMods.global.critDmgPct;
+    paladin.player.critDmgHealBonus = metaOf(
+      paladin,
+      paladin.player,
+    ).talentMods.global.critDmgHealPct;
     (
       paladin as unknown as { applyHeal(s: Entity, t: Entity, a: number, n: string): void }
     ).applyHeal(paladin.player, paladin.player, 100, 'test');
@@ -222,7 +314,25 @@ describe('spec masteries', () => {
     expect(at20).toBeGreaterThan(at10);
   });
 
+  it('setPlayerLevel re-bakes level-scaled mastery (dev/GM cap-level path)', () => {
+    // Spec is chosen FIRST (baked at 20), then the level is jumped down: the mastery
+    // must re-bake to the new level, not keep its old-level strength. Before the fix,
+    // setPlayerLevel recalced stats but left talentMods baked at the prior level.
+    const sim = new Sim({ seed: 12, playerClass: 'druid', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('restoration');
+    expect(metaOf(sim, sim.player).talentMods.global.hotHealPct).toBeCloseTo(0.25, 10);
+    // Jump down to level 10: mastery must halve (min(1, 10/20) = 0.5).
+    sim.setPlayerLevel(10);
+    expect(metaOf(sim, sim.player).talentMods.global.hotHealPct).toBeCloseTo(0.25 * 0.5, 10);
+    // And back up to 20: full strength again.
+    sim.setPlayerLevel(20);
+    expect(metaOf(sim, sim.player).talentMods.global.hotHealPct).toBeCloseTo(0.25, 10);
+  });
+
   it('re-bakes mastery-scaled passive stats when setPlayerLevel jumps without a respec', () => {
+    // The mage-rework Fire mastery also grants +2% crit chance (stats.crit 0.02) on top of
+    // its crit-damage bonus, and that passive stat must re-bake to the new level.
     const sim = new Sim({ seed: 12, playerClass: 'mage', autoEquip: true });
     sim.setPlayerLevel(10);
     sim.setSpec('fire');
@@ -250,14 +360,12 @@ describe('spec masteries', () => {
       | { abilities: string[]; dmgPct?: number; costPct?: number };
     const AXES: Record<string, Record<string, Axis>> = {
       warrior: {
-        // Warrior overhaul masteries: Arms scales two-handed damage (Master Armorer),
-        // Fury crit (Bloodletter), Protection threat (Recompense).
-        arms: { global: 'masteryTwoHandDmgPct', value: 0.1 },
-        fury: { stat: 'crit', value: 0.05 },
-        prot: { global: 'threatPct', value: 0.3 },
+        arms: { global: 'meleeDmgPct', value: 0.15 },
+        fury: { stat: 'crit', value: 0.1 },
+        prot: { global: 'threatPct', value: 0.5 },
       },
       paladin: {
-        holy: { global: 'critDmgPct', value: 0.5 },
+        holy: { global: 'critDmgHealPct', value: 0.5 },
         protection: { global: 'threatPct', value: 0.5 },
         retribution: { global: 'meleeDmgPct', value: 0.2 },
       },
@@ -267,14 +375,15 @@ describe('spec masteries', () => {
         survival: { global: 'meleeDmgPct', value: 0.15 },
       },
       mage: {
-        arcane: { global: 'spellDmgPct', value: 0.15 },
-        fire: { global: 'critDmgPct', value: 0.5 },
+        // Mage rework: arcane is the Chronomancy healer (healing axis), fire is Ignition.
+        arcane: { global: 'healPct', value: 0.15 },
+        fire: { global: 'ignitionPct', value: 0.4 },
         frost: { abilities: ['frostbolt', 'frost_nova'], dmgPct: 0.25 },
       },
       rogue: {
         assassination: { global: 'dotDmgPct', value: 0.2 },
         combat: { global: 'meleeHastePct', value: 0.1 },
-        subtlety: { global: 'critDmgPct', value: 0.4 },
+        subtlety: { global: 'critDmgPhysPct', value: 0.4 },
       },
       priest: {
         discipline: { global: 'absorbPct', value: 0.3 },
@@ -289,7 +398,7 @@ describe('spec masteries', () => {
       warlock: {
         affliction: { global: 'dotDmgPct', value: 0.2 },
         demonology: { global: 'petDmgSharePct', value: 0.2 },
-        destruction: { global: 'critDmgPct', value: 0.5 },
+        destruction: { global: 'critDmgSpellPct', value: 0.5 },
       },
       druid: {
         balance: { global: 'spellDmgPct', value: 0.15 },

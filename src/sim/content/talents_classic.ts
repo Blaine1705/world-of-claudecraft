@@ -43,7 +43,7 @@ const PALADIN_SPECS: SpecDef[] = [
     'holy_shock',
     'Kindled Faith',
     'Your healing spells critically heal for double.',
-    { global: { critDmgPct: 0.5 } },
+    { global: { critDmgHealPct: 0.5 } },
   ),
   spec(
     'protection',
@@ -206,7 +206,7 @@ const ROGUE_SPECS: SpecDef[] = [
     'hemorrhage',
     'False Face',
     'Increases the damage of your critical strikes by 40% and your Agility by 10%.',
-    { global: { critDmgPct: 0.4 }, stats: { agiPct: 0.1 } },
+    { global: { critDmgPhysPct: 0.4 }, stats: { agiPct: 0.1 } },
   ),
 ];
 
@@ -329,7 +329,7 @@ const WARLOCK_SPECS: SpecDef[] = [
     'Desolation',
     'Your Fire spell critical strikes deal double damage, and ' +
       'your critical strike chance is increased by 2%.',
-    { global: { critDmgPct: 0.5 }, stats: { crit: 0.02 } },
+    { global: { critDmgSpellPct: 0.5 }, stats: { crit: 0.02 } },
   ),
 ];
 

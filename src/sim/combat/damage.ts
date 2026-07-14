@@ -3,8 +3,9 @@
 // This module owns the post-mitigation damage pipeline: dealDamage's amp/absorb/
 // duel/fiesta/arena routing + death handoff, the two reactive hooks it drives
 // (maybeFrenzyOnHit, reflectSpellWard), the death teardown (handleDeath), and the
-// XP-grant chain (grantXp -> accrueLifetimeXp -> checkMilestones). It is the widest-
-// coupled slice in the refactor, so it consumes a large slice of the SimContext seam.
+// XP-grant chain (grantXp -> accrueLifetimeXp, whose tail marks the player dirty
+// for the Book of Deeds tick-tail evaluator). It is the widest-coupled slice in
+// the refactor, so it consumes a large slice of the SimContext seam.
 //
 // PRIME DIRECTIVE: this is a MOVE, not a rewrite. Every function below is the former
 // `Sim` method verbatim, with `this.X` rewritten to `ctx.X` (the SimContext seam) or
@@ -23,10 +24,11 @@
 // (enforced by tests/architecture.test.ts).
 
 import { computeModifiersWithRows } from '../content/talent_rows';
-import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
+import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
+import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
-import { weaponHand } from '../equipment_rules';
+import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -34,22 +36,15 @@ import { vcupBothSeated } from '../social/vale_cup';
 import { addThreat, clearThreat } from '../threat';
 import type { Entity } from '../types';
 import {
-  berserkerCritDamage,
-  DIE_BY_SWORD_CUT,
-  DIE_BY_SWORD_LOW_CUT,
-  DIE_BY_SWORD_LOW_HP,
   dist2d,
   FISHING_CAST_ID,
   isConsuming,
   MAX_LEVEL,
-  MILESTONES,
   mobXpValue,
   NYTHRAXIS_BOSS_ID,
   PARTY_XP_RANGE,
   rageFromDealing,
   rageFromTaking,
-  rageGenAuraMult,
-  VICTORY_RUSH_WINDOW,
   virtualLevel,
   xpForLevel,
 } from '../types';
@@ -64,12 +59,6 @@ import {
 } from './fire_mage';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
-// Choice-row on-kill talent tuning (owner design draft: Pursuit +30% speed for
-// 6s; Bloodbath +5% crit and damage per stack, 8s, capped at 5 stacks).
-const PURSUIT_SPEED_DURATION = 6;
-const BLOODBATH_DURATION = 8;
-const BLOODBATH_MAX_STACKS = 5;
-
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
 const CORPSE_DURATION = 60;
@@ -78,12 +67,10 @@ const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
 const PURSUIT_AURA_ID = 'war_pursuit_speed';
 const BLOODBATH_AURA_ID = 'war_bloodbath';
 
-// A handful of casts ignore classic-era spell pushback: ghost_wolf, plus any
-// def flagged `uninterruptible` (Bladestorm: the channel must run its full
-// listed duration even while being hit). Sole user is the dealDamage pushback
-// branch, so the predicate lives here with it.
+// A handful of casts ignore classic-era spell pushback (e.g. ghost_wolf). Sole user is
+// the dealDamage pushback branch, so the predicate lives here with it.
 function ignoresDamagePushback(abilityId: string): boolean {
-  return abilityId === 'ghost_wolf' || ABILITIES[abilityId]?.uninterruptible === true;
+  return abilityId === 'ghost_wolf';
 }
 
 export function dealDamage(
@@ -102,6 +89,12 @@ export function dealDamage(
   // ticks). Only direct damage may walk a mob's leash anchor; passive damage must
   // let the mob leash (evade home) so it can't be kited an unlimited distance.
   direct = true,
+  attackAnimationStarted = false,
+  // The amount is ALREADY fully source-modified (e.g. a Fiendlore share of damage the
+  // owner already took): skip the source-output mods (Defensive Stance's own-damage cut,
+  // Weakening Hex) so they are not applied a second time. Target-side amps, absorb, death,
+  // and events still run so the redirected hit lands normally on the pet.
+  alreadyFinal = false,
   // Whether this dealDamage call is one iteration of an AREA effect (an
   // aoeDamage/groundAoE fan-out) rather than a single-target hit. Only read by
   // the Chronomancy Temporal Echo conversion (combat/chronomancy.ts): area
@@ -110,7 +103,7 @@ export function dealDamage(
   aoe = false,
 ): void {
   if (target.dead) return;
-  if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
+  if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
   // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
@@ -122,30 +115,23 @@ export function dealDamage(
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
   if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
   amount = Math.max(0, amount);
+  const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
 
   // Cauterize (fire spec): +12% Fire damage to enemies while the caster is burning
   // (combat/fire_mage.ts). Returns 1x for everyone else and for the self-burn, so all
   // other damage is byte-identical.
   amount = Math.round(amount * cauterizeFireDamageMult(source, target, school));
 
-  // Master Armorer (Arms mastery): extra physical damage you deal WHILE wielding a
-  // two-handed weapon. The magnitude lives on the mastery's talent effect
-  // (global.masteryTwoHandDmgPct, so the tooltip is effect-backed), but is applied
-  // ONLY here so it keys off the LIVE equipped mainhand (equip-time state the
-  // precomputed talent mods cannot see) and never folds into the generic
-  // meleeDmgPct path. Short-circuits when the bonus is 0, so every non-arms spec's
-  // damage is byte-identical.
-  if (source && source.kind === 'player' && school === 'physical' && source.id !== target.id) {
-    const srcMeta = ctx.players.get(source.id);
-    const twoHandPct = srcMeta ? ctx.playerMods(srcMeta).global.masteryTwoHandDmgPct : 0;
-    const mh = srcMeta?.equipment.mainhand ? ITEMS[srcMeta.equipment.mainhand] : undefined;
-    if (twoHandPct > 0 && mh?.kind === 'weapon' && weaponHand(mh) === 'twohand') {
-      amount = Math.round(amount * (1 + twoHandPct));
-    }
-  }
+  // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
+  // through raid bosses to inspect drops without one-shotting them past their phase
+  // transitions. Gated on devCommands so it can NEVER apply in production (where gm
+  // marks real, non-fighting game masters). Draws no rng.
+  if (source?.devGod && source.kind === 'player' && ctx.devCommands)
+    amount = Math.round(amount * 100);
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (
+    !alreadyFinal &&
     source &&
     source.id !== target.id &&
     source.auras.some((a) => a.kind === 'defensive_stance')
@@ -189,73 +175,27 @@ export function dealDamage(
     if (vuln > 0) amount = Math.round(amount * (1 + vuln));
   }
 
-  // Breachmaker: a SOURCE-SCOPED vulnerability. Unlike the raid-wide
-  // 'vulnerability' above, only the attacker whose id matches the aura's
-  // sourceId sees the amplification, so the debuff sharpens the caster's own
-  // hits without buffing every other attacker on the target. Sums additively
-  // across the caster's own vuln_source auras.
-  if (source && amount > 0) {
-    let vs = 0;
-    for (const a of target.auras)
-      if (a.kind === 'vuln_source' && a.sourceId === source.id) vs += a.value;
-    if (vs > 0) amount = Math.round(amount * (1 + vs));
-  }
-
   // Weakening Hex: a hexed source deals less damage (mirrors the healing cut in
   // applyHeal). Self-damage paths (source === target) are left untouched.
-  if (source && source.id !== target.id) {
+  if (!alreadyFinal && source && source.id !== target.id) {
     const hexMult = ctx.hexOutputMult(source);
     if (hexMult !== 1) amount = Math.round(amount * hexMult);
   }
 
-  // Damage-done buffs AND debuffs: an additive amp on the source's outgoing
-  // damage, summed across auras. Positive values are the choice-row cooldowns
-  // (Avatar / Bloodbath / Sanguine Aura / Battle Rhythm's blink; a bloodbath
-  // aura's value already carries its stack total); a NEGATIVE buff_dmg_done is
-  // a demoralize (Direhowl's pct form) cutting what the victim deals. The sum
-  // is floored at a zero multiplier so stacked demoralizes can never heal.
-  // Self-damage is untouched, mirroring the hex rule above.
-  if (source && source.id !== target.id && amount > 0) {
-    let dmgAmp = 0;
-    for (const a of source.auras) {
-      if (
-        a.kind === 'buff_dmg_done' ||
-        a.kind === 'bloodbath' ||
-        a.kind === 'buff_avatar' ||
-        a.kind === 'enrage' // Fury Enrage's +11% outgoing (value = ENRAGE_DMG_DONE)
-      )
-        dmgAmp += a.value;
-      // Sanguine Aura's damage half rides value2 (value is its swing mult).
-      if (a.kind === 'sanguine') dmgAmp += a.value2 ?? 0;
-    }
-    if (dmgAmp !== 0) amount = Math.round(amount * Math.max(0, 1 + dmgAmp));
-  }
-
-  // Die by the Sword (choice-row defensive cooldown): the wearer takes 10% less
-  // damage, doubled to a 20% cut while below 30% health. A single self aura,
-  // never stacked, checked target-side beside the Defensive Stance cut above.
-  if (source && source.id !== target.id && amount > 0) {
-    if (target.auras.some((a) => a.kind === 'die_by_sword')) {
-      const cut =
-        target.hp < target.maxHp * DIE_BY_SWORD_LOW_HP ? DIE_BY_SWORD_LOW_CUT : DIE_BY_SWORD_CUT;
-      amount = Math.round(amount * cut);
-    }
-  }
-
-  // Parameterized damage-reduction buffs (buff_dr): the wearer takes `value`
-  // fraction less damage from any EXTERNAL source (Furious Mending's 20% cut).
-  // Summed across auras and floored at a zero multiplier, checked target-side
-  // beside the Die by the Sword cut above; self-damage is untouched.
-  if (source && source.id !== target.id && amount > 0) {
-    let drCut = 0;
-    for (const a of target.auras) if (a.kind === 'buff_dr') drCut += a.value;
-    if (drCut > 0) amount = Math.round(amount * Math.max(0, 1 - drCut));
+  // Gloamveil Form (Shadowform): while in the form, the caster's SHADOW-school damage
+  // is amplified (classic +15%). School-scoped so only shadow spells benefit, and a
+  // source-output mod (skipped when the amount is already final, e.g. a redirect share).
+  // Every shadow damage path (direct nuke, DoT tick, Mind Flay channel, AoE) funnels
+  // here, so this one site covers them all; the boost is dynamic (it follows the form).
+  if (!alreadyFinal && source && school === 'shadow' && amount > 0) {
+    const form = source.auras.find((a) => a.kind === 'form_shadow');
+    if (form) amount = Math.round(amount * (1 + form.value / 100));
   }
 
   // Warded (mage choice row): the wearer takes barrierDrPct less damage while
   // their own personal barrier (an ice_barrier absorb aura) is up. Checked
-  // target-side beside the buff_dr fold above, BEFORE absorb shields soak, so
-  // the cut stretches the barrier it is anchored to. Draws no rng.
+  // target-side BEFORE absorb shields soak, so the cut stretches the barrier it
+  // is anchored to. Draws no rng.
   if (
     source &&
     source.id !== target.id &&
@@ -268,16 +208,6 @@ export function dealDamage(
     if (wardedCut > 0) amount = Math.round(amount * Math.max(0, 1 - wardedCut));
   }
 
-  // Physical-only damage-reduction buffs (buff_dr_phys): Raised Guard's 50%
-  // cut applies only when the incoming school is physical; every other school
-  // passes untouched. Same fold shape as buff_dr above (summed, floored at a
-  // zero multiplier, external sources only), gated on the damage school.
-  if (source && source.id !== target.id && amount > 0 && school === 'physical') {
-    let physCut = 0;
-    for (const a of target.auras) if (a.kind === 'buff_dr_phys') physCut += a.value;
-    if (physCut > 0) amount = Math.round(amount * Math.max(0, 1 - physCut));
-  }
-
   // "Find Weakness": a critvuln debuff makes the target's exposed flesh take
   // extra damage from CRITICAL hits only (any attacker, any school). Applied
   // after the defensive-stance reduction, before absorb shields soak it.
@@ -288,6 +218,20 @@ export function dealDamage(
 
   const sourcePlayer = ctx.pvpController(source);
 
+  // WARFARE is a hostile player-vs-player modifier only. Pets, self-damage,
+  // friendly effects, player-vs-mob, and mob-vs-player damage stay byte-identical.
+  // dealDamage receives post-mitigation damage, so this deterministic step sits
+  // after the upstream armor/resist roll and before absorb shields.
+  if (
+    amount > 0 &&
+    source?.kind === 'player' &&
+    target.kind === 'player' &&
+    source.id !== target.id &&
+    ctx.isHostileTo(source, target)
+  ) {
+    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(source, target)));
+  }
+
   // The Vale Cup: nobody bleeds at the Sowfield. Any damage between two seated
   // cup fighters is floored to 0 BEFORE absorb shields soak it, belt and
   // braces: the sport kit has no damage abilities, but a stray consumable,
@@ -295,13 +239,6 @@ export function dealDamage(
   if (amount > 0 && sourcePlayer && target.kind === 'player') {
     const cupMatch = ctx.vcup.match;
     if (cupMatch && vcupBothSeated(cupMatch, sourcePlayer.id, target.id)) amount = 0;
-  }
-
-  // Berserker Stance (Fury): the source's critical hits deal an extra fraction.
-  // Its crit-CHANCE half lives in recalcPlayerStats; this is the crit-DAMAGE half.
-  if (crit && amount > 0 && source && source.id !== target.id) {
-    const cd = berserkerCritDamage(source);
-    if (cd > 0) amount = Math.round(amount * (1 + cd));
   }
 
   // Ignition (fire mage mastery, combat/fire_mage.ts): a Fire-school ABILITY
@@ -349,6 +286,10 @@ export function dealDamage(
           noRage,
           threatOpts,
           direct,
+          attackAnimationStarted,
+          // The share is already fully source-modified: don't re-apply the source's
+          // Defensive Stance cut / Weakening Hex to the pet's portion.
+          true,
           // Carry the AoE flag so a redirected slice of an area Arcane hit still
           // rates its Temporal Echo conversion at the area (15%) coefficient, not
           // the single-target 35%.
@@ -379,7 +320,11 @@ export function dealDamage(
         ability,
         kind,
         absorbed: totalAbsorbed || undefined,
+        ...attackAnimation,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng; the early
+      // return skips the shared deed site and the session RewardCounters).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.endDuel(duel, sourcePlayer.id);
       return;
     }
@@ -422,7 +367,10 @@ export function dealDamage(
         ability,
         kind,
         absorbed: totalAbsorbed || undefined,
+        ...attackAnimation,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
       return;
     }
@@ -448,7 +396,10 @@ export function dealDamage(
         school,
         ability,
         kind,
+        ...attackAnimation,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.yumiPlayerDown(match, target, sourcePlayer.id);
       return;
     }
@@ -479,7 +430,10 @@ export function dealDamage(
         ability,
         kind,
         absorbed: totalAbsorbed || undefined,
+        ...attackAnimation,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       handleDeath(ctx, target, source);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
@@ -528,7 +482,17 @@ export function dealDamage(
   if (target.kind === 'mob') {
     const ymatch = ctx.yumiCatMatches.get(target.id);
     if (ymatch) {
-      ctx.yumiCatDamaged(ymatch, source, target, amount, crit, school, ability, kind);
+      ctx.yumiCatDamaged(
+        ymatch,
+        source,
+        target,
+        amount,
+        crit,
+        school,
+        ability,
+        kind,
+        attackAnimationStarted,
+      );
       return;
     }
   }
@@ -550,6 +514,7 @@ export function dealDamage(
     ability,
     kind,
     absorbed: totalAbsorbed || undefined,
+    ...attackAnimation,
   });
 
   // Chronomancy Temporal Echo (combat/chronomancy.ts): siphon a fraction of the
@@ -566,17 +531,11 @@ export function dealDamage(
       target.damageIdleDespawnTimer = DAMAGE_IDLE_DESPAWN_SECONDS;
     }
     for (let i = target.auras.length - 1; i >= 0; i--) {
-      const breakable = target.auras[i];
-      if (breakable.breaksOnDamage) {
-        // Lingering Dread: a thresholded fear soaks damage before breaking.
-        if (breakable.breakThreshold !== undefined && breakable.breakThreshold > amount) {
-          breakable.breakThreshold -= amount;
-          continue;
-        }
+      if (target.auras[i].breaksOnDamage) {
         ctx.emit({
           type: 'aura',
           targetId: target.id,
-          name: breakable.name,
+          name: target.auras[i].name,
           gained: false,
         });
         target.auras.splice(i, 1);
@@ -632,7 +591,14 @@ export function dealDamage(
     addThreat(target, source.id, threat);
   }
 
-  // tap rights: the first player (or their pet) to damage a mob owns it
+  // Tap rights: the first player (or their pet) to damage a mob owns it. Classic-era
+  // behavior for every mob, including rares: pet damage taps. A camper who
+  // monopolizes a rare's tap through their pet alone does not deny anyone the kill
+  // reward, because rares also track PERSONAL loot contribution (below, mirroring
+  // world bosses): every player who lands a hit gets their own credit toward a
+  // guaranteed quest drop regardless of who holds the tap, so tap rights only gate
+  // who owns the corpse/party-loot roll, never who is credited for a personal
+  // quest item.
   if (
     source &&
     target.kind === 'mob' &&
@@ -640,19 +606,38 @@ export function dealDamage(
     target.tappedById === null &&
     amount > 0
   ) {
-    if (source.kind === 'player') target.tappedById = source.id;
-    else if (source.ownerId !== null) target.tappedById = source.ownerId;
+    const sourcePid = source.kind === 'player' ? source.id : source.ownerId;
+    const sourceMeta = sourcePid !== null ? ctx.players.get(sourcePid) : null;
+    if (sourceMeta && !sourceMeta.leaving) target.tappedById = sourcePid;
   }
 
-  // World-boss loot roster: every player (or pet owner) who lands a hit on a world
-  // boss becomes a permanent loot contributor. Unlike the hate table above, this set
-  // is NEVER pruned when they die, release their spirit, or drop off threat, so a
-  // raider who died to the boss still gets their personal drop. Read at death by
-  // worldBossLootContributors. Only world-boss templates ever populate it.
-  if (source && amount > 0 && MOBS[target.templateId]?.worldBoss) {
+  // Personal-drop contributor roster: every player (or pet owner) who lands a hit on
+  // a world boss OR a rare becomes a permanent loot contributor. Unlike the hate
+  // table above, this set is NEVER pruned when they die, release their spirit, or
+  // drop off threat, so a contributor who died still gets credit. Read at death by
+  // worldBossLootContributors. Rares reuse this contributor tracking (not the
+  // world-boss PERSONAL LOOT TABLE roll, just the roster) so a guaranteed personal
+  // quest drop (a rare's `chance: 1` quest item, e.g. greyjaw_fang) can be credited
+  // to every quest-needing contributor, not just whoever holds the tap. A rare has a
+  // single camp spawn shared by the whole zone: without this, a camper's aggressive
+  // pet re-tapping it the instant it respawns (petPickTarget's anti-AFK window,
+  // pet/pet_ai.ts) would monopolize the guaranteed drop forever, and a passerby who
+  // lands one hit to steal the tap back would also steal it from the player who
+  // actually farmed the kill. Tracking contribution, not tap, closes both holes
+  // without changing the classic pet-tap rule itself.
+  if (
+    source &&
+    amount > 0 &&
+    (MOBS[target.templateId]?.worldBoss || MOBS[target.templateId]?.rare)
+  ) {
     const contributorId = source.kind === 'player' ? source.id : source.ownerId;
     if (contributorId !== null) target.bossDamagers.add(contributorId);
   }
+
+  // Book of Deeds bookkeeping (pure state transitions, zero rng): the
+  // persisted lifetime damage counters beside the session RewardCounters
+  // below, plus encounter participant tracking for the roster tasks.
+  if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
 
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
@@ -660,26 +645,9 @@ export function dealDamage(
     // Talent procs listening for spell crits (deterministic, no rng draw).
     if (crit && school !== 'physical' && ability) onSpellCrit(ctx, source, ability, target);
     if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
-      // Auto-attack rage, scaled by the choice-row talent multiplier (Anger
-      // Management's autoRagePct) and the aura-driven bonus (Recklessness).
-      // Both are exactly 1 for everyone else, leaving the classic mint.
-      // Seasoned Soldier (Arms passive): a CRIT auto mints 10% more rage. Gated on
-      // the passive being known AND committed arms, so every non-arms mint is
-      // byte-identical (mirrors Measured Fury's cost hook).
-      const seasonedCrit =
-        crit &&
-        meta &&
-        ctx.playerMods(meta).spec === 'arms' &&
-        meta.known.some((k) => k.def.passive && k.def.id === 'seasoned_soldier')
-          ? 1.1
-          : 1;
-      const autoMult =
-        (1 + (meta ? ctx.playerMods(meta).global.autoRagePct : 0)) *
-        rageGenAuraMult(source) *
-        seasonedCrit;
       source.resource = Math.min(
         source.maxResource,
-        source.resource + rageFromDealing(amount, source.level) * autoMult,
+        source.resource + rageFromDealing(amount, source.level),
       );
     }
   }
@@ -689,11 +657,9 @@ export function dealDamage(
     // Talent procs listening for big single hits (deterministic, ICD-gated).
     if (amount > 0 && !target.dead) onDamageTaken(ctx, target, amount);
     if (target.resourceType === 'rage' && source && source.id !== target.id) {
-      // Rage from taking damage honors the aura-driven bonus only (Recklessness
-      // enrages ALL rage generation); the talent-static globals do not apply here.
       target.resource = Math.min(
         target.maxResource,
-        target.resource + rageFromTaking(amount, source.level) * rageGenAuraMult(target),
+        target.resource + rageFromTaking(amount, source.level),
       );
     }
     if (isConsuming(target)) {
@@ -842,6 +808,14 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   // so a stale mark would otherwise reappear on the respawn
   if (e.kind === 'mob') ctx.clearEntityMarker(e.id);
 
+  // Book of Deeds death bookkeeping runs BEFORE the hate tables are cleared just
+  // below, so its world-boss survival taint and the engaged-room folds observe
+  // the dying player's own pre-death threat: a heal-only contributor leaves no
+  // damage trace, so their live threat entry is the only proof they were engaged,
+  // and the clear loop would erase it out from under the hook. (The player-block
+  // counters and side effects stay below; only this pure read-of-threat moves up.)
+  if (e.kind === 'player') deedsMod.onPlayerDeathForDeeds(ctx, e);
+
   // the dead drop off every hate table (and any taunt lock on them)
   for (const m of ctx.entities.values()) {
     if (m.kind !== 'mob' || m.id === e.id) continue;
@@ -860,6 +834,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     stripTemporalEchoes(ctx, e.id);
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
+    // The Book of Deeds death hook (lifetime deaths counter, the Keeper's Toll
+    // delight, perfection-window taints, the world-boss survival record) already
+    // ran above, before the hate tables were cleared.
     e.autoAttack = false;
     e.queuedOnSwing = null;
     delete e.queuedOnSwingFree;
@@ -871,7 +848,6 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.sitting = false;
     e.chargeTargetId = null;
     e.chargePath = [];
-    e.leap = null;
     e.followTargetId = null;
     ctx.emit({ type: 'playerDeath', pid: e.id });
     for (const m of ctx.entities.values()) {
@@ -917,7 +893,6 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         mobId: 'reliquary_bonewalker',
       });
     }
-    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     e.respawnTimer =
@@ -936,6 +911,12 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // whole window, and a slain add's in-place respawn timer would revive it
     // mid-window (only fires for worldBoss templates, so no parity rng change).
     const worldBossContribs = template?.worldBoss ? worldBossLootContributors(ctx, e) : null;
+    // Rares: same contributor roster as a world boss, but used only to widen who is
+    // eligible for a guaranteed personal quest drop (rollLoot's questId branch below),
+    // never to run the world-boss PERSONAL LOOT TABLE roll. Snapshot BEFORE
+    // clearThreat below, exactly like worldBossContribs.
+    const rareContribs =
+      !template?.worldBoss && template?.rare ? worldBossLootContributors(ctx, e) : null;
     if (template?.worldBoss) {
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;
@@ -956,11 +937,26 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     ctx.frenzyPackmates(e); // wild packmates fly into a frenzy when one falls
     ctx.armDeathThroes(e); // volatile corpses begin to destabilize, then burst
 
-    // credit goes to the tapping player (fall back to the killer)
-    const creditId = e.tappedById ?? (killer?.kind === 'player' ? killer.id : null);
+    // Credit goes to the tapping player, unless authoritative leave teardown
+    // already froze that character before its persistence await. Immediate
+    // removal would clear the tap, so mirror that result and fall back to the
+    // live killing player instead of dropping the whole party's reward.
+    const tapperMeta = e.tappedById !== null ? ctx.players.get(e.tappedById) : null;
+    const killerPid = killer?.kind === 'player' ? killer.id : (killer?.ownerId ?? null);
+    const killerMeta = killerPid !== null ? ctx.players.get(killerPid) : null;
+    const creditId =
+      e.tappedById !== null && tapperMeta && !tapperMeta.leaving
+        ? e.tappedById
+        : killerPid !== null && killerMeta && !killerMeta.leaving
+          ? killerPid
+          : null;
     const meta = creditId !== null ? ctx.players.get(creditId) : null;
     const creditEntity = creditId !== null ? ctx.entities.get(creditId) : null;
-    if (meta && creditEntity) {
+    const rewardInstance = ctx.instances.find(
+      (inst) => inst.partyKey !== null && inst.mobIds.includes(e.id),
+    );
+    let heroicRewardRecipients: PlayerMeta[] = [];
+    if (meta && creditEntity && !meta.leaving) {
       const tmpl = MOBS[e.templateId];
       // xpMult 0 marks a puzzle-object mob (the 1 HP spider egg-sac): killable
       // in one hit by design, so it must not pay full kill XP.
@@ -976,80 +972,33 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         for (const mPid of party.members) {
           const mMeta = ctx.players.get(mPid);
           const mE = ctx.entities.get(mPid);
-          if (mMeta && mE && dist2d(mE.pos, e.pos) <= PARTY_XP_RANGE) eligible.push(mMeta);
+          // A released player entity stands at the graveyard, but their body is
+          // still where they fell. Use that corpse position for the kill-time
+          // participation snapshot so releasing during the final seconds does
+          // not erase XP, loot-roll, or Heroic Mark rights.
+          const matchingInstanceCorpse =
+            mE?.ghost &&
+            mE.corpsePos &&
+            (!rewardInstance || mE.corpseInstanceId === rewardInstance.exitId)
+              ? mE.corpsePos
+              : null;
+          const participationPos = matchingInstanceCorpse ?? mE?.pos;
+          if (
+            mMeta &&
+            !mMeta.leaving &&
+            participationPos &&
+            dist2d(participationPos, e.pos) <= PARTY_XP_RANGE
+          )
+            eligible.push(mMeta);
         }
       }
       if (eligible.length === 0) eligible.push(meta);
+      heroicRewardRecipients = eligible;
       e.lootRecipientIds = eligible.map((member) => member.entityId);
       const bonus = GROUP_XP_BONUS[Math.min(eligible.length, GROUP_XP_BONUS.length) - 1];
 
       meta.counters.kills++;
       if (creditEntity.targetId === e.id) creditEntity.autoAttack = false;
-      // Choice-row on-kill talents for the credited player (draws no rng):
-      // Pursuit's speed burst and Bloodbath's stacking crit + damage buff.
-      if (!creditEntity.dead) {
-        const killMods = ctx.playerMods(meta).global;
-        if (killMods.onKillSpeedPct > 0) {
-          ctx.applyAura(creditEntity, {
-            id: 'pursuit',
-            name: 'Pursuit',
-            kind: 'buff_speed',
-            value: 1 + killMods.onKillSpeedPct,
-            remaining: PURSUIT_SPEED_DURATION,
-            duration: PURSUIT_SPEED_DURATION,
-            sourceId: creditEntity.id,
-            school: 'physical',
-          });
-        }
-        if (killMods.bloodbathPct > 0) {
-          const existing = creditEntity.auras.find((a) => a.kind === 'bloodbath');
-          if (existing) {
-            existing.stacks = Math.min(BLOODBATH_MAX_STACKS, (existing.stacks ?? 1) + 1);
-            existing.value = killMods.bloodbathPct * existing.stacks;
-            existing.remaining = BLOODBATH_DURATION;
-            existing.duration = BLOODBATH_DURATION;
-          } else {
-            ctx.applyAura(creditEntity, {
-              id: 'bloodbath',
-              name: 'Bloodbath',
-              kind: 'bloodbath',
-              value: killMods.bloodbathPct,
-              remaining: BLOODBATH_DURATION,
-              duration: BLOODBATH_DURATION,
-              sourceId: creditEntity.id,
-              school: 'physical',
-              stacks: 1,
-            });
-          }
-          // handleDeath sits outside runEffects, so nothing recalcs for us: fold
-          // the new crit into the derived stats here (the expiry pass already
-          // re-runs recalc when the aura fades, bloodbath being a buff* kind...
-          // it is NOT: 'bloodbath' does not start with 'buff', so the expiry
-          // pass must know it. See the expiry arm in combat/auras.ts.
-          recalcPlayerStats(
-            creditEntity,
-            meta.cls,
-            meta.equipment,
-            ctx.playerMods(meta),
-            meta.equipmentInstance,
-          );
-        }
-        // Victory Rush (choice row): a credited kill opens the window in which
-        // the granted strike is usable. A normal self aura (rides the aura
-        // wire and the buff frame; the strike requires and consumes it).
-        if (ctx.playerMods(meta).grants.some((g) => g.ability === 'victory_rush')) {
-          ctx.applyAura(creditEntity, {
-            id: 'victory_rush',
-            name: 'Victory Rush',
-            kind: 'victory_rush',
-            value: 0,
-            remaining: VICTORY_RUSH_WINDOW,
-            duration: VICTORY_RUSH_WINDOW,
-            sourceId: creditEntity.id,
-            school: 'physical',
-          });
-        }
-      }
       // combo points are character-bound: unspent points survive the kill and
       // carry to the next target (they fade on their own via updateComboExpiry)
       for (const member of eligible) {
@@ -1065,15 +1014,30 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         ctx.onMobKilledForQuests(e, member);
       }
       // World bosses use PERSONAL loot for every contributor (rolled below from the
-      // hate-table snapshot), not the tapper/party shared-corpse roll.
-      if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible);
-      // A heroic final boss additionally carries one personal Heroic Mark per
-      // eligible participant (no-op outside a heroic instance; draws no rng).
-      ctx.awardHeroicMarks(e, eligible);
+      // hate-table snapshot), not the tapper/party shared-corpse roll. Rares pass
+      // their own damage-contributor snapshot (rareContribs) so rollLoot's guaranteed
+      // personal quest-item entries (questId, chance:1) can credit every contributing
+      // quest-needer, not just the tap-credited party.
+      if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible, rareContribs ?? undefined);
+      // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
+      // clears, and the encounter skill tasks that resolve at this death.
+      deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
     }
+    // Settle the heroic reward and its realm-reset lockout together. This runs
+    // even without player credit so the owning group cannot dodge the lockout;
+    // only the participation snapshot above receives marks.
+    ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    // Nythraxis normal and heroic raid lockouts use a wider room sweep than
+    // generic dungeon claims. Run it after heroic settlement so its lock stamp
+    // cannot make first-clear participants look previously rewarded.
+    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
     // damaged the boss, so it rolls outside the credited-player block above.
-    if (worldBossContribs) ctx.rollWorldBossLoot(e, worldBossContribs);
+    if (worldBossContribs) {
+      ctx.rollWorldBossLoot(e, worldBossContribs);
+      // World-boss deeds ride the same never-pruned contributor roster.
+      deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
+    }
   }
 }
 
@@ -1133,8 +1097,11 @@ export function grantXp(
 }
 
 // Add to the monotonic lifetime counter, emitting cosmetic virtual-level-up
-// events past the cap and unlocking any newly crossed milestones. Cheap: one
-// add plus an O(log n) table lookup, never touched on the per-tick hot path.
+// events past the cap. Cheap: one add plus an O(log n) table lookup, never
+// touched on the per-tick hot path. The legacy milestone check unified into
+// the Book of Deeds: the dirty mark at the tail hands the lifetime-XP (and
+// level) predicates to the tick-tail evaluator, whose grant path dual-writes
+// unlockedMilestones and emits deedUnlocked as the single grant event.
 function accrueLifetimeXp(ctx: SimContext, amount: number, meta: PlayerMeta, p: Entity): void {
   const atCap = p.level >= MAX_LEVEL;
   const beforeVL = atCap ? virtualLevel(meta.lifetimeXp) : 0;
@@ -1151,15 +1118,5 @@ function accrueLifetimeXp(ctx: SimContext, amount: number, meta: PlayerMeta, p: 
       ctx.emit({ type: 'virtualLevelUp', level: v, pid: p.id });
     }
   }
-  checkMilestones(ctx, meta, p);
-}
-
-// Unlock any cosmetic milestone whose lifetime-XP threshold was just crossed.
-function checkMilestones(ctx: SimContext, meta: PlayerMeta, p: Entity): void {
-  for (const m of MILESTONES) {
-    if (meta.lifetimeXp >= m.lifetimeXp && !meta.unlockedMilestones.has(m.id)) {
-      meta.unlockedMilestones.add(m.id);
-      ctx.emit({ type: 'milestoneUnlocked', milestoneId: m.id, pid: p.id });
-    }
-  }
+  ctx.markDeedsDirty(meta.entityId);
 }

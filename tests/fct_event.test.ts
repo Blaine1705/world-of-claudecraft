@@ -100,7 +100,7 @@ describe('fctSpawnShape: landed hit (damage-done vs damage-taken vs none)', () =
   });
 });
 
-describe('fctSpawnShape: heal / xp / rested-xp / self-note', () => {
+describe('fctSpawnShape: absorb / heal / xp / rested-xp / honor / self-note', () => {
   it('absorb is an informational self floater', () => {
     expect(fctSpawnShape({ type: 'absorb' })).toEqual<FctSpawnShape>({
       kind: 'absorb',
@@ -118,7 +118,7 @@ describe('fctSpawnShape: heal / xp / rested-xp / self-note', () => {
     ).toEqual<FctSpawnShape>({ kind: 'heal', isSelf: false, crit: true });
   });
 
-  it('xp / rested-xp / self-note are always self, never crit', () => {
+  it('xp / rested-xp / honor / self-note are always self, never crit', () => {
     expect(fctSpawnShape({ type: 'xp' })).toEqual<FctSpawnShape>({
       kind: 'xp',
       isSelf: true,
@@ -126,6 +126,11 @@ describe('fctSpawnShape: heal / xp / rested-xp / self-note', () => {
     });
     expect(fctSpawnShape({ type: 'rested-xp' })).toEqual<FctSpawnShape>({
       kind: 'rested-xp',
+      isSelf: true,
+      crit: false,
+    });
+    expect(fctSpawnShape({ type: 'honor' })).toEqual<FctSpawnShape>({
+      kind: 'honor',
       isSelf: true,
       crit: false,
     });

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ABILITIES,
   abilitiesKnownAt,
   CLASSES,
   CRYPT_SPAWNS,

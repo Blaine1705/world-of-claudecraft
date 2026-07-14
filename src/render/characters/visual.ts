@@ -4,11 +4,11 @@
 // mid-distance band. All geometry/materials are shared caches — dispose()
 // only releases mixer bindings.
 import * as THREE from 'three';
-import { ITEMS } from '../../sim/data';
-import { weaponHand } from '../../sim/equipment_rules';
+import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
-import type { FormTint } from '../form_tint';
 import { GFX } from '../gfx';
+import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
+import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
   type AnimState,
   type BaseState,
@@ -21,35 +21,70 @@ import {
   assembleModel,
   ensureSkinTexture,
   prepareVisual,
-  setHeldItems,
+  setHeldWeapon,
   skinEmissiveTexture,
   skinTexture,
   tintedFarMaterials,
 } from './assets';
-import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
+import {
+  disposeOwnedWeaponSkinMaterials,
+  markOwnedWeaponSkinMaterials,
+} from './weapon_skin_materials';
 
 export type { AnimState, BaseState } from './anim_state';
+
+// Current canvas height in device pixels, pushed by the renderer on resolution
+// changes so newly created weapon-skin VFX rigs size their point sprites right.
+let weaponVfxViewportHeight = 1080;
+
+export function setWeaponVfxViewportHeight(heightPx: number): void {
+  weaponVfxViewportHeight = Math.max(1, Math.round(heightPx));
+}
+
+// The VFX rig sizes point sprites for the inspector's 35 degree vertical fov.
+// Rendering under a different camera needs an equivalent-height correction or
+// particles draw the wrong size (the 60 degree world camera showed them ~1.8x
+// too large). Each visual carries the factor for the camera it renders under.
+const VFX_RIG_FOV_DEG = 35;
+
+export function weaponVfxSpriteScaleForFov(fovDeg: number): number {
+  return Math.tan((VFX_RIG_FOV_DEG * Math.PI) / 360) / Math.tan((fovDeg * Math.PI) / 360);
+}
+
+// World camera default (CAMERA_BASE_FOV = 60 in renderer.ts).
+const WORLD_FOV_SPRITE_SCALE = weaponVfxSpriteScaleForFov(60);
+
+// Scratch quaternions for the per-frame bow orientation pin (no allocation).
+const BOW_Q_ROOT = new THREE.Quaternion();
+const BOW_Q_B = new THREE.Quaternion();
+const BOW_Q_TARGET = new THREE.Quaternion();
+// Root-relative aim orientation a firing bow blends to: upright limbs (the
+// variant convention authors limbs along +Y), STRING toward the archer (the
+// belly faces the target), the full profile square to the aim.
+const BOW_AIM_QUAT = new THREE.Quaternion().setFromEuler(
+  new THREE.Euler(0, -Math.PI / 2, 0, 'XYZ'),
+);
+// Root-relative carry for a bow-slot gun outside the shot: muzzle (authored
+// along +Y) pitched forward to the horizon, then rolled a quarter turn about
+// the barrel so the handle lies parallel to the hunter's body instead of
+// jutting out sideways. The shot itself keeps the hand-tuned grip.
+const GUN_CARRY_QUAT = new THREE.Quaternion()
+  .setFromEuler(new THREE.Euler(Math.PI / 2, 0, 0, 'XYZ'))
+  .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2));
+const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
 
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
 const HIT_REACT_COOLDOWN = 0.9;
+
 // Lie_Idle already lays the rig flat — a touch of extra pitch reads as a
 // surface glide; clip-less rigs (creatures) get the full procedural prone
 const SWIM_PITCH_CLIP = 0.35;
 const SWIM_PITCH_PROCEDURAL = 1.18;
 const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
 const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
-// Bladestorm whirl: how fast the body spins on itself (radians/sec, ~2.2
-// turns/sec; operator asked for a visibly quicker whirl than the classic
-// ~1.75) and the swing-loop speed.
-const SPIN_RATE = 14;
-const SPIN_ATTACK_TIMESCALE = 1.6;
-// Bladed Gyre (the INSTANT whirlwind): one quick self-spin rather than the held
-// Bladestorm channel. About 1.6 turns over the short duration reads as a snappy
-// little tornado, then the body snaps back to its facing.
-const SPIN_ONCE_DURATION = 0.55; // seconds
-const SPIN_ONCE_RATE = 18; // rad/sec
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
@@ -102,8 +137,19 @@ export class CharacterVisual {
   private key: string;
   private entityColor: number;
   private skinIndex: number;
-  private mainhandItemId: string | null;
-  private offhandItemId: string | null;
+  private weaponItemId: string | null;
+  private weaponSkinId: string | null = null;
+  private weaponVfx: WeaponVfxHandle[] = [];
+  // Skin payloads whose orientation blends to a root-relative pin (see
+  // applySkinOrientation): bows aim upright DURING the shot, bow-slot guns
+  // carry forward OUTSIDE it. qGrip is the authored grip-local orientation.
+  private orientPins: {
+    payload: THREE.Object3D;
+    qGrip: THREE.Quaternion;
+    blend: number;
+    duringShot: boolean;
+  }[] = [];
+  private weaponVfxSpriteScale = WORLD_FOV_SPRITE_SCALE;
   private disposed = false;
   private ghosted = false;
   private mixer: THREE.AnimationMixer;
@@ -116,11 +162,8 @@ export class CharacterVisual {
   private shadowProxy: THREE.Mesh | null = null;
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
-  private weaponAuraMeshes: THREE.Mesh[] = [];
-  private weaponAuraOn = false;
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
-  private formTintMaterials = new Map<string, Map<THREE.Material, THREE.Material>>();
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
   private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
@@ -136,14 +179,10 @@ export class CharacterVisual {
   private hitCooldown = 0;
   private pendingDt = 0;
   private swimPitch = 0;
-  private spinAngle = 0;
-  private spinOnceTimer = 0;
 
   private shadowOn = true;
   private far = false;
   private soulRend = false;
-  private formTint: FormTint | null = null;
-  private formTintSig = '';
   private shadowform = false;
   private moonkin = false;
   private metamorph = false;
@@ -153,8 +192,7 @@ export class CharacterVisual {
     key: string,
     entityColor: number,
     skinIndex = 0,
-    mainhandItemId: string | null = null,
-    offhandItemId: string | null = null,
+    weaponItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
   ) {
     const prep = prepareVisual(key);
@@ -168,14 +206,13 @@ export class CharacterVisual {
     this.key = key;
     this.entityColor = entityColor;
     this.skinIndex = skinIndex;
-    this.mainhandItemId = mainhandItemId;
-    this.offhandItemId = offhandItemId;
+    this.weaponItemId = weaponItemId;
     this.height = prep.def.height;
 
     // model: yaw/scale/feet normalization wrapper around the skinned clone. The
-    // Equipped held items (if the class swaps; see VisualDef.weaponSlots) pick
-    // the visible weapon/shield models, so the visual is born holding live gear.
-    this.model = assembleModel(this.def, [mainhandItemId, offhandItemId]);
+    // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
+    // the held weapon model, so the visual is born holding the right weapon.
+    this.model = assembleModel(this.def, weaponItemId);
     applyMaterials(
       this.model,
       this.def,
@@ -183,14 +220,6 @@ export class CharacterVisual {
       skinTexture(key, skinIndex),
       skinEmissiveTexture(key, skinIndex),
     );
-    // Class halo (the priest's Light): a glowing ring behind the head bone.
-    // Added AFTER applyMaterials (its additive material must not be re-mapped)
-    // and BEFORE the originalMaterials snapshot, so ghost/stealth material
-    // swaps restore it like any other mesh.
-    if (this.def.halo !== undefined) {
-      const head = this.model.getObjectByName('head');
-      head?.add(buildHalo(this.def.halo));
-    }
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
@@ -240,7 +269,7 @@ export class CharacterVisual {
     this.root.add(this.clickProxy);
 
     this.mixer = new THREE.AnimationMixer(this.model);
-    for (const name of clipNamesOf(prep.def)) {
+    for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {
       const clip = prep.clips.get(name);
       if (clip) this.actions.set(name, this.mixer.clipAction(clip));
     }
@@ -287,26 +316,8 @@ export class CharacterVisual {
             this.current.time = Math.max(0, this.current.getClip().duration - 1e-3);
           this.current.timeScale = timeScale;
         }
-        // the whirl swings faster than a normal one-shot attack
-        if (this.baseState === 'spin') this.current.timeScale = SPIN_ATTACK_TIMESCALE;
       }
     }
-
-    // Bladestorm whirl: spin the body on itself while the channel runs. The
-    // yaw rides poseWrap (relative to the renderer-driven facing), and snaps
-    // back to 0 the moment the channel ends so facing is authoritative again.
-    if (s.spinning && !s.dead) {
-      this.spinAngle = (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
-      this.spinOnceTimer = 0; // the held channel supersedes a one-shot whirl
-    } else if (this.spinOnceTimer > 0 && !s.dead) {
-      // Bladed Gyre: one quick spin, then snap the body back to its facing.
-      this.spinOnceTimer = Math.max(0, this.spinOnceTimer - dt);
-      this.spinAngle =
-        this.spinOnceTimer > 0 ? (this.spinAngle + dt * SPIN_ONCE_RATE) % (Math.PI * 2) : 0;
-    } else {
-      this.spinAngle = 0;
-    }
-    this.poseWrap.rotation.y = this.spinAngle;
 
     // swim pose: Lie_Idle (when the rig has it) + pitch and surface bob
     const proneAngle = this.action(this.def.clips.swim) ? SWIM_PITCH_CLIP : SWIM_PITCH_PROCEDURAL;
@@ -320,7 +331,7 @@ export class CharacterVisual {
         : 0;
 
     // distant corpses show the static idle far mesh — tip it over
-    if (this.farMesh?.visible) {
+    if (this.farMesh && this.farMesh.visible) {
       if (s.dead) {
         this.farMesh.rotation.z = Math.PI / 2;
         this.farMesh.position.y = this.height * 0.16;
@@ -359,50 +370,13 @@ export class CharacterVisual {
     this.fadeTo(this.action(this.def.clips.cast) ?? this.action(this.def.clips.idle), FADE, false);
   }
 
-  playAttack(abilityId?: string): void {
+  playAttack(): void {
     if (this.deadLock) return;
-    // A mapped ability plays its specific swing clip (if the model has it);
-    // a plain auto then swings by weapon style (two-hander overhead / dual
-    // wield double chop) when the manifest maps one, and everything else
-    // rotates through the generic attack clips for variety.
-    const override = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
-    if (override && this.action(override)) {
-      this.playOneShot(override, this.def.attackTimeScale ?? 1.3);
-      return;
-    }
-    const style = this.weaponSwingStyle();
-    const handClip = style ? this.def.clips.attackByHand?.[style] : undefined;
-    if (handClip && this.action(handClip)) {
-      this.playOneShot(handClip, this.def.attackTimeScale ?? 1.3);
-      return;
-    }
-    const clips = this.def.clips.attack;
+    const skinAttack = weaponSkinAttackClips(this.weaponSkinId);
+    const clips = skinAttack?.clips ?? this.def.clips.attack;
     if (clips.length === 0) return;
     const name = clips[this.attackIdx++ % clips.length];
-    this.playOneShot(name, this.def.attackTimeScale ?? 1.3);
-  }
-
-  /** 'dualwield' when both hands hold weapons (checked first: a Titan's Grip
-   *  pair must read as two one-hand swings, never the two-handed overhead),
-   *  'twohand' for a lone two-handed mainhand; null keeps the rotation. */
-  private weaponSwingStyle(): 'twohand' | 'dualwield' | null {
-    const mh = this.mainhandItemId ? ITEMS[this.mainhandItemId] : undefined;
-    if (mh?.kind !== 'weapon') return null;
-    const oh = this.offhandItemId ? ITEMS[this.offhandItemId] : undefined;
-    if (oh?.kind === 'weapon') return 'dualwield';
-    return weaponHand(mh) === 'twohand' ? 'twohand' : null;
-  }
-
-  /** Instant whirlwind (Bladed Gyre): swing the blades fast while the body does
-   *  a single quick self-spin. Retriggering (each AoE target hit) just refreshes
-   *  the timer, so the whole spin holds for one duration. */
-  playWhirl(): void {
-    if (this.deadLock) return;
-    this.spinOnceTimer = SPIN_ONCE_DURATION;
-    const clips = this.def.clips.attack;
-    if (clips.length > 0) {
-      this.playOneShot(clips[this.attackIdx++ % clips.length], SPIN_ATTACK_TIMESCALE);
-    }
+    this.playOneShot(name, skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3);
   }
 
   playHit(): void {
@@ -413,14 +387,12 @@ export class CharacterVisual {
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
   }
 
-  playEmote(id: OverheadEmoteId, repeatsOverride?: number): void {
+  playEmote(id: OverheadEmoteId): void {
     if (this.deadLock) return;
     const spec = this.def.clips.emote?.[id];
     const clip = firstLoadedEmoteClip(spec, (name) => this.action(name));
     if (!clip) return;
-    // A caller may cap the repeats (the warrior shout roars ONCE; the chat
-    // /cheer keeps its double pump from the spec).
-    this.playOneShot(clip, spec?.timeScale ?? 1, repeatsOverride ?? spec?.repeats ?? 1, id);
+    this.playOneShot(clip, spec?.timeScale ?? 1, spec?.repeats ?? 1, id);
   }
 
   // -------------------------------------------------------------------------
@@ -521,11 +493,21 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
-  setFormTint(tint: FormTint | null): void {
-    const sig = tint ? `${tint.color}:${tint.opacity}` : '';
-    if (sig === this.formTintSig) return;
-    this.formTint = tint;
-    this.formTintSig = sig;
+  setShadowform(on: boolean): void {
+    if (on === this.shadowform) return;
+    this.shadowform = on;
+    this.applyVisualMaterials();
+  }
+
+  setMoonkin(on: boolean): void {
+    if (on === this.moonkin) return;
+    this.moonkin = on;
+    this.applyVisualMaterials();
+  }
+
+  setMetamorph(on: boolean): void {
+    if (on === this.metamorph) return;
+    this.metamorph = on;
     this.applyVisualMaterials();
   }
 
@@ -592,21 +574,58 @@ export class CharacterVisual {
     this.originalMaterials.clear();
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
-      if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
+      // VFX rig meshes stay out of the ghost/restore cycle: their shader
+      // materials are owned by the weapon-skin handle, never overlaid.
+      if (mesh.isMesh && !mesh.userData.weaponVfxMesh)
+        this.originalMaterials.set(mesh, mesh.material);
     });
     this.applyVisualMaterials();
   }
 
-  /** Swap the held item models at runtime (gear equip/unequip); no-op if unchanged
-   *  or if this class keeps fixed props. Mirrors setSkin: re-attach the prop(s),
-   *  re-run the shared material pass, re-snapshot the original-material map, then
-   *  re-apply any active ghost/soul-rend overlay. */
-  setWeapons(mainhandItemId: string | null, offhandItemId: string | null): void {
-    if (mainhandItemId === this.mainhandItemId && offhandItemId === this.offhandItemId) return;
-    this.mainhandItemId = mainhandItemId;
-    this.offhandItemId = offhandItemId;
+  /** Swap the held mainhand weapon model at runtime (gear equip/unequip); no-op if
+   *  unchanged or if this class keeps a fixed weapon (hunter crossbow, mobs/NPCs —
+   *  no VisualDef.weaponSlot). Mirrors setSkin: re-attach the prop, re-run the
+   *  shared material pass, re-snapshot the original-material map, then re-apply any
+   *  active ghost/soul-rend overlay. Cheap (one prop clone) and keeps the mixer/
+   *  animation state, unlike a full visual rebuild. */
+  setWeapon(weaponItemId: string | null): void {
+    if (weaponItemId === this.weaponItemId) return;
+    this.weaponItemId = weaponItemId;
     if (!this.def.weaponSlots?.length) return;
-    setHeldItems(this.model, this.def, [mainhandItemId, offhandItemId]);
+    this.reattachHeldWeapon();
+  }
+
+  /** Apply or clear a Season 1 Armory weapon-skin cosmetic: the skin's model
+   *  replaces the held weapon (all swap slots, or the hunter's fixed ranged
+   *  attach) and its rarity VFX ride the new payloads. Null restores the
+   *  equipped item's own model. */
+  setWeaponSkin(weaponSkinId: string | null): void {
+    if (weaponSkinId === this.weaponSkinId) return;
+    this.weaponSkinId = weaponSkinId;
+    this.reattachHeldWeapon();
+  }
+
+  private reattachHeldWeapon(): void {
+    this.disposeWeaponVfx();
+    this.disposeWeaponSkinMaterials();
+    const payloads = setHeldWeapon(this.model, this.def, this.weaponItemId, this.weaponSkinId);
+    // Ranged skins take a root-relative orientation pin (position always rides
+    // the hand): a bow aims upright WHILE the shot one-shot plays (the string
+    // hand rolls a glued bow sideways mid-draw); a bow-slot gun carries muzzle
+    // forward OUTSIDE the shot (the hanging idle arm points it at the ground)
+    // and keeps the hand-tuned grip during the shouldered aim
+    // (applySkinOrientation each frame).
+    {
+      const mode = weaponSkinOrientPin(this.weaponSkinId);
+      this.orientPins = mode
+        ? payloads.map((payload) => ({
+            payload,
+            qGrip: payload.quaternion.clone(),
+            blend: 0,
+            duringShot: mode === 'aimDuringShot',
+          }))
+        : [];
+    }
     applyMaterials(
       this.model,
       this.def,
@@ -614,59 +633,128 @@ export class CharacterVisual {
       skinTexture(this.key, this.skinIndex),
       skinEmissiveTexture(this.key, this.skinIndex),
     );
+    // A VFX-tier skin's emissive derive mutates its payload materials in place,
+    // so give each payload exclusive clones BEFORE the caster snapshot: the
+    // shared tinted-material cache must never carry derived state (two players
+    // with one skin, or a rogue's two hands, would corrupt each other), and the
+    // ghost/stealth snapshot below must target the clones the rig restores.
+    if (this.weaponSkinVfxSpec()) {
+      for (const payload of payloads) {
+        payload.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          mesh.material = Array.isArray(mesh.material)
+            ? mesh.material.map((m) => m.clone())
+            : mesh.material.clone();
+          mesh.userData.weaponSkinIsolated = true;
+          markOwnedWeaponSkinMaterials(mesh);
+        });
+      }
+    }
     // the model graph changed (weapon meshes added/removed): rebuild the caster
     // list and re-snapshot originals, then re-apply ghost/stealth overlays.
     this.originalMaterials.clear();
     this.rebuildCasters();
     this.applyVisualMaterials();
-    this.rebuildWeaponAura();
+    this.buildWeaponVfx(payloads);
   }
 
-  /** Adds a lightweight additive overlay to the equipped mainhand only. */
-  setWeaponAura(on: boolean): void {
-    if (on === this.weaponAuraOn) return;
-    this.weaponAuraOn = on;
-    this.rebuildWeaponAura();
+  private weaponSkinVfxSpec() {
+    const skin = this.weaponSkinId ? WEAPON_SKINS[this.weaponSkinId] : null;
+    return skin ? (WEAPON_VFX[skin.model] ?? null) : null;
   }
 
-  private rebuildWeaponAura(): void {
-    for (const mesh of this.weaponAuraMeshes) {
-      mesh.removeFromParent();
-      (mesh.material as THREE.Material).dispose();
+  /** Attach the skin's rarity VFX rig to each held payload (in-hand mode: no
+   *  backdrop dome, no ground pool; emissive + particles ride the weapon). */
+  private buildWeaponVfx(payloads: THREE.Object3D[]): void {
+    const skin = this.weaponSkinId ? WEAPON_SKINS[this.weaponSkinId] : null;
+    const spec = skin ? (WEAPON_VFX[skin.model] ?? null) : null;
+    if (!skin || !spec) return;
+    for (const payload of payloads) {
+      const handle = createWeaponVfx(payload, spec, { grounded: false });
+      handle.setBackdropVisible(false);
+      handle.setTuning(weaponVfxTuningFor(skin.model, spec.tier));
+      handle.setPixelScale(weaponVfxViewportHeight * this.weaponVfxSpriteScale);
+      // Tag the rig's own scene nodes: applyMaterials must never tint its
+      // ShaderMaterials and the shadow pass has no business with sprite shells.
+      handle.group.traverse((o) => {
+        o.userData.weaponVfxMesh = true;
+        const mesh = o as THREE.Mesh;
+        if (mesh.isMesh) mesh.castShadow = false;
+      });
+      this.weaponVfx.push(handle);
     }
-    this.weaponAuraMeshes.length = 0;
-    if (!this.weaponAuraOn) return;
+  }
 
-    const weaponHolders: THREE.Object3D[] = [];
-    this.model.traverse((o) => {
-      if (o.userData.swapWeaponHolder) weaponHolders.push(o);
-    });
-    // Pick the MAINHAND holder by its stamped held slot (0 = mainhand): traverse
-    // order is not slot order, so "first found" used to land the glow on the
-    // offhand shield. Legacy holders without the stamp fall back to first-found.
-    const mainhand = weaponHolders.find((o) => o.userData.heldSlot === 0) ?? weaponHolders[0];
-    if (!mainhand) return;
-    mainhand.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
-      const aura = new THREE.Mesh(
-        mesh.geometry,
-        new THREE.MeshBasicMaterial({
-          color: 0x45ff9a,
-          transparent: true,
-          opacity: 0.42,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          side: THREE.DoubleSide,
-        }),
-      );
-      aura.position.copy(mesh.position);
-      aura.quaternion.copy(mesh.quaternion);
-      aura.scale.copy(mesh.scale).multiplyScalar(1.08);
-      aura.renderOrder = 3;
-      mesh.parent.add(aura);
-      this.weaponAuraMeshes.push(aura);
-    });
+  /** Advance the weapon-skin VFX (shader time, pulse, flicker). Cheap no-op
+   *  without an active skin; the renderer calls it once per entity per frame.
+   *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
+  updateWeaponVfx(dt: number): void {
+    this.applySkinOrientation(dt);
+    for (const handle of this.weaponVfx) handle.update(dt);
+  }
+
+  /** Blend pinned skin payloads between the authored grip glue and their
+   *  root-relative pin: a bow to BOW_AIM_QUAT while the shot one-shot plays, a
+   *  bow-slot gun to GUN_CARRY_QUAT everywhere BUT the shot (and never while
+   *  dead: a corpse's weapon just lies with the hand). Position always follows
+   *  the hand. No-op without pinned payloads. */
+  private applySkinOrientation(dt: number): void {
+    if (this.orientPins.length === 0) return;
+    const shot = this.currentIsOneShot && !this.currentOneShotIsEmote;
+    const step = dt / BOW_PIN_BLEND_S;
+    this.root.getWorldQuaternion(BOW_Q_ROOT);
+    for (const entry of this.orientPins) {
+      const parent = entry.payload.parent;
+      if (!parent) continue;
+      const engaged = !this.deadLock && (entry.duringShot ? shot : !shot);
+      entry.blend = Math.min(1, Math.max(0, entry.blend + (engaged ? step : -step)));
+      if (entry.blend === 0) {
+        entry.payload.quaternion.copy(entry.qGrip);
+        continue;
+      }
+      // pinned local = parentWorld^-1 * rootWorld * pin target
+      parent.getWorldQuaternion(BOW_Q_B).invert();
+      BOW_Q_TARGET.copy(BOW_Q_B)
+        .multiply(BOW_Q_ROOT)
+        .multiply(entry.duringShot ? BOW_AIM_QUAT : GUN_CARRY_QUAT);
+      entry.payload.quaternion.copy(entry.qGrip).slerp(BOW_Q_TARGET, entry.blend);
+    }
+  }
+
+  /** Re-scale VFX point sprites after a viewport/pixel-ratio change. */
+  setWeaponVfxPixelScale(heightPx: number): void {
+    for (const handle of this.weaponVfx) {
+      handle.setPixelScale(heightPx * this.weaponVfxSpriteScale);
+    }
+  }
+
+  /** Set the camera fov this visual renders under (preview rigs differ from the
+   *  world camera); re-scales any live VFX sprites to match. */
+  setWeaponVfxCameraFov(fovDeg: number): void {
+    this.weaponVfxSpriteScale = weaponVfxSpriteScaleForFov(fovDeg);
+  }
+
+  private disposeWeaponVfx(): void {
+    for (const handle of this.weaponVfx) handle.dispose();
+    this.weaponVfx.length = 0;
+  }
+
+  private disposeWeaponSkinMaterials(): void {
+    disposeOwnedWeaponSkinMaterials(this.model, this.originalMaterials, [
+      this.ghostMaterials,
+      this.soulRendMaterials,
+    ]);
+  }
+
+  private disposeEffectMaterials(): void {
+    const materials = new Set<THREE.Material>([
+      ...this.ghostMaterials.values(),
+      ...this.soulRendMaterials.values(),
+    ]);
+    for (const material of materials) material.dispose();
+    this.ghostMaterials.clear();
+    this.soulRendMaterials.clear();
   }
 
   /** Rebuild the shadow-caster list and original-material snapshot after the model
@@ -675,7 +763,7 @@ export class CharacterVisual {
     this.casters.length = 0;
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh) return;
+      if (!mesh.isMesh || mesh.userData.weaponVfxMesh) return;
       mesh.castShadow = this.shadowOn;
       mesh.receiveShadow = false;
       if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
@@ -686,11 +774,9 @@ export class CharacterVisual {
 
   dispose(): void {
     this.disposed = true;
-    for (const mesh of this.weaponAuraMeshes) {
-      mesh.removeFromParent();
-      (mesh.material as THREE.Material).dispose();
-    }
-    this.weaponAuraMeshes.length = 0;
+    this.disposeWeaponVfx();
+    this.disposeWeaponSkinMaterials();
+    this.disposeEffectMaterials();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.root.removeFromParent();
@@ -720,12 +806,9 @@ export class CharacterVisual {
   }
 
   private effectSingleMaterial(material: THREE.Material): THREE.Material {
-    // Death treatments (soul rend, ghost run) win over the shapeshift tints. The
-    // data-driven form tint (shadow, moonkin) takes precedence over the dedicated
-    // shapeshift materials, which cover forms not in the tint table (metamorph).
+    // Death treatments (soul rend, ghost run) win over the shapeshift tints.
     if (this.soulRend) return this.soulRendMaterial(material);
     if (this.ghosted) return this.ghostMaterial(material);
-    if (this.formTint) return this.formTintMaterial(material, this.formTint);
     if (this.metamorph) return this.metamorphMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
@@ -764,27 +847,67 @@ export class CharacterVisual {
     return marked;
   }
 
-  private formTintMaterial(material: THREE.Material, tint: FormTint): THREE.Material {
-    let byMaterial = this.formTintMaterials.get(this.formTintSig);
-    if (!byMaterial) {
-      byMaterial = new Map<THREE.Material, THREE.Material>();
-      this.formTintMaterials.set(this.formTintSig, byMaterial);
-    }
-    const cached = byMaterial.get(material);
+  private shadowformMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.shadowformMaterials.get(material);
     if (cached) return cached;
-    const tinted = material.clone();
-    const withColor = tinted as THREE.Material & {
+    const marked = material.clone();
+    marked.transparent = true;
+    marked.opacity = SHADOWFORM_OPACITY;
+    marked.depthWrite = true;
+    const withColor = marked as THREE.Material & {
       color?: THREE.Color;
-      opacity: number;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
     };
-    if (withColor.color) withColor.color.multiply(new THREE.Color(tint.color));
-    if (tint.opacity < 1) {
-      tinted.transparent = true;
-      withColor.opacity *= tint.opacity;
-      tinted.depthWrite = false;
+    if (withColor.color) withColor.color.copy(SHADOWFORM_TINT);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(0x2a0a4a);
+      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.4);
     }
-    byMaterial.set(material, tinted);
-    return tinted;
+    this.shadowformMaterials.set(material, marked);
+    return marked;
+  }
+
+  private moonkinMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.moonkinMaterials.get(material);
+    if (cached) return cached;
+    const marked = material.clone();
+    marked.transparent = true;
+    marked.opacity = MOONKIN_OPACITY;
+    marked.depthWrite = true;
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) withColor.color.copy(MOONKIN_TINT);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(0x6a3fd0);
+      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.55);
+    }
+    this.moonkinMaterials.set(material, marked);
+    return marked;
+  }
+
+  private metamorphMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.metamorphMaterials.get(material);
+    if (cached) return cached;
+    const marked = material.clone();
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) withColor.color.copy(METAMORPH_TINT);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(0x7a1abf);
+      // Set, don't floor: the source materials ship emissiveIntensity 1 (with a
+      // black emissive color), so a Math.max floor keeps full-strength glow and
+      // the body renders as flat neon, drowning the fire aura and all shading.
+      withColor.emissiveIntensity = 0.35;
+    }
+    this.metamorphMaterials.set(material, marked);
+    return marked;
   }
 
   private shadowformMaterial(material: THREE.Material): THREE.Material {
@@ -865,10 +988,6 @@ export class CharacterVisual {
         return this.action(c.run) ?? this.action(c.walk);
       case 'cast':
         return this.action(c.cast) ?? this.action(c.idle);
-      case 'spin':
-        // loop the first attack swing while the body whirls (Bladestorm);
-        // rigs without an attack clip just spin on their idle
-        return this.action(this.def.clips.attack[0]) ?? this.action(c.idle);
       case 'swim':
         return this.action(c.swim) ?? this.action(c.idle);
       case 'sit':
@@ -881,7 +1000,7 @@ export class CharacterVisual {
   }
 
   private shouldInterruptEmote(s: AnimState): boolean {
-    return s.moving || s.airborne || s.swimming || s.casting || !!s.spinning || s.sitting || s.dead;
+    return s.moving || s.airborne || s.swimming || s.casting || s.sitting || s.dead;
   }
 
   private fadeTo(next: THREE.AnimationAction | null, fade: number, oneShot: boolean): void {
@@ -986,7 +1105,7 @@ export class CharacterVisual {
     if (flourish) {
       // skeletons claw back out of the ground; bosses taunt
       this.current = null;
-      this.playOneShot(flourish.getClip().name, 1);
+      this.playOneShot(this.def.clips.flourish!, 1);
     } else {
       this.fadeTo(this.action(this.def.clips.idle), 0.2, false);
     }
@@ -1001,8 +1120,6 @@ function clipNamesOf(def: VisualDef): string[] {
     c.run,
     c.death,
     ...(c.attack ?? []),
-    ...Object.values(c.attackByAbility ?? {}),
-    ...Object.values(c.attackByHand ?? {}),
     ...(c.hit ?? []),
     c.cast,
     c.sitDown,

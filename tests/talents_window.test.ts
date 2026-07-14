@@ -53,16 +53,4 @@ describe('talents_window: no magic values', () => {
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     expect(hud).toContain('commitSpec: (specId) => this.sim.setSpec(specId),');
   });
-
-  it('wires Choices row radios to roving tabindex and arrow-key selection', () => {
-    const rowsPainter = readFileSync(
-      new URL('../src/ui/talent_rows_tab.ts', import.meta.url),
-      'utf8',
-    );
-    expect(rowsPainter).toContain('class="tal-row-opt');
-    expect(rowsPainter).toContain('aria-pressed=');
-    expect(rowsPainter).toContain('data-row=');
-    expect(rowsPainter).toContain('deps.pickRow(rowIndex, wasPicked ? null : optId);');
-    expect(painter).toContain("const next = rovingTarget(ke.key, i, tabs.length, 'horizontal');");
-  });
 });
