@@ -62,7 +62,7 @@ describe('community test character templates', () => {
         expect(meetsLevelRequirement(MAX_LEVEL, item)).toBe(true);
       }
 
-      const reloaded = new Sim({ seed: 20061, noPlayer: true });
+      const reloaded = new Sim({ seed: 20061, playerClass: cls, noPlayer: true });
       const pid = reloaded.addPlayer(cls, name, { state });
       const player = reloaded.entities.get(pid);
       if (!player) throw new Error(`failed to reload ${name}`);

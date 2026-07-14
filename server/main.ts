@@ -72,6 +72,7 @@ import {
   handleClaudiumApi,
   handleClaudiumStripeWebhook,
 } from './claudium';
+import { configureCommunityTestAccounts } from './community_test_accounts';
 import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
   accountAndScopeForToken,
@@ -2538,6 +2539,7 @@ export async function startServer(): Promise<http.Server> {
   // primes activeConfig() for the request path (a request-time read returns this
   // same memoized Config).
   const config = activeConfig();
+  configureCommunityTestAccounts(config.provisionTestAccounts);
   // Point the contributor-stats reader at the one boot Config, replacing its former
   // duplicate GITHUB_REPO/GITHUB_TOKEN module reads (configure<Domain>Runtime).
   configureGithubContributorsRuntime({
