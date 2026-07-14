@@ -4,7 +4,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Toplu Geri Sarım',
   'entities.abilities.collective_reversal.description':
-    'Grubunuzdaki veya baskınınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları bedenlerinin yanında tam sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)',
+    'Grubunuzdaki veya baskınınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları bedenlerinin yanında %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)',
   'entities.abilities.sport_boot.description':
     'Nişan noktasına doğru uzun, havadan bir vuruş. Seyirci buna bayılır.',
   'entities.abilities.sport_boot.name': 'Aşırtma',

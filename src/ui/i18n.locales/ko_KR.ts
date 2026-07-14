@@ -16,7 +16,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': '집단 역행',
   'entities.abilities.collective_reversal.description':
-    '그룹 또는 공격대에서 사망한 모든 구성원의 시간선을 되돌려 시체 옆에서 생명력과 마나가 가득 찬 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)',
+    '그룹 또는 공격대에서 사망한 모든 구성원의 시간선을 되돌려 시체 옆에서 생명력과 마나가 30%인 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)',
   'entities.abilities.temporal_hourglass.name': '정지의 모래시계',
   'entities.abilities.temporal_hourglass.description':
     '선택한 위치에 시간의 모래시계를 놓습니다. 적의 발밑에서는 PvE에서 {hostilePveDuration}초, PvP에서 {hostilePvpDuration}초 동안 정지시키며 피해를 받으면 해제됩니다. 자신이나 파티 아군의 발밑에서는 {duration}초 동안 정지 상태가 되어 피해에 면역이고 행동할 수 없으며, 최대 생명력의 {healing}%를 회복합니다. 자신의 재사용 대기시간은 {selfCooldownRecovery}%, 아군의 재사용 대기시간은 {allyCooldownRecovery}% 더 빠르게 회복됩니다. 빈 지면에 놓으면 {groundDuration}초 동안 유지되며 처음 밟은 유효한 대상에게 적용됩니다. 이로운 효과는 직접 해제할 수 있습니다.',

@@ -6229,7 +6229,7 @@ export const en_CA: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Collective Reversal",
-        "description": "Rewinds every fallen member of your group or raid, returning them to life at their body with full health and mana. Cannot be cast in combat. (Chronomancy)"
+        "description": "Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
       },
       "temporal_rewind": {
         "name": "Rewind",

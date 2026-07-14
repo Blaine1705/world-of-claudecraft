@@ -6229,7 +6229,7 @@ export const fr_FR: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Réversion collective",
-        "description": "Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid et le ramène à la vie près de son corps avec tous ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)"
+        "description": "Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid et le ramène à la vie près de son corps avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)"
       },
       "temporal_rewind": {
         "name": "Rewind",

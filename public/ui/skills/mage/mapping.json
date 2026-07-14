@@ -371,6 +371,18 @@
       "output": "perfect_moment.webp"
     },
     {
+      "abilityId": "collective_reversal",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/mass res.png",
+      "output": "collective_reversal.webp"
+    },
+    {
+      "abilityId": "temporal_hourglass",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/reloj en el suelo.png",
+      "output": "temporal_hourglass.webp"
+    },
+    {
       "abilityId": "combustion",
       "sourcePack": "custom-user",
       "sourceFile": "C:/Users/joseg/Desktop/combustion.png (combustion crop)",

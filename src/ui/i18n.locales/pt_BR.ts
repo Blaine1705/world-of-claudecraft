@@ -16,7 +16,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Reversão coletiva',
   'entities.abilities.collective_reversal.description':
-    'Rebobina a linha temporal de cada membro morto do seu grupo ou raide e o traz de volta à vida junto ao corpo com vida e mana máximas. Não pode ser lançada em combate. (Cronomancia)',
+    'Rebobina a linha temporal de cada membro morto do seu grupo ou raide e o traz de volta à vida junto ao corpo com 30% de vida e mana. Não pode ser lançada em combate. (Cronomancia)',
   'entities.abilities.sport_boot.description':
     'Um chutão alto e longo em direção ao ponto de mira. A torcida adora.',
   'entities.abilities.sport_boot.name': 'Chutão',

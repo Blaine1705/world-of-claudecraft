@@ -1745,7 +1745,7 @@ const classAbilityNamesEn = {
       [
         'collective_reversal',
         'Collective Reversal',
-        'Rewinds every fallen member of your group or raid, returning them to life at their body with full health and mana. Cannot be cast in combat. (Chronomancy)',
+        'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
       ],
       [
         'temporal_rewind',

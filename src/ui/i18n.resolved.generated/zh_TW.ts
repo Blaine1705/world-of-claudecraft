@@ -6229,7 +6229,7 @@ export const zh_TW: EnTranslations = {
       },
       "collective_reversal": {
         "name": "集體逆轉",
-        "description": "倒轉隊伍或團隊中每位陣亡成員的時間線，使其在遺體旁以滿生命值和滿法力值復活。無法在戰鬥中施放。（時空魔法）"
+        "description": "倒轉隊伍或團隊中每位陣亡成員的時間線，使其在遺體旁以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）"
       },
       "temporal_rewind": {
         "name": "Rewind",

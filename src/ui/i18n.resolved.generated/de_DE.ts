@@ -6229,7 +6229,7 @@ export const de_DE: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Kollektive Umkehr",
-        "description": "Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe zurück und erweckt es bei seinem Körper mit voller Gesundheit und vollem Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)"
+        "description": "Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe zurück und erweckt es bei seinem Körper mit 30% Gesundheit und Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)"
       },
       "temporal_rewind": {
         "name": "Rewind",

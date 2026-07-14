@@ -6229,7 +6229,7 @@ export const da_DK: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Kollektiv tilbagespoling",
-        "description": "Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid og genopliver dem ved deres krop med fuldt helbred og mana. Kan ikke kastes i kamp. (Kronomanti)"
+        "description": "Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid og genopliver dem ved deres krop med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)"
       },
       "temporal_rewind": {
         "name": "Rewind",

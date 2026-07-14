@@ -6229,7 +6229,7 @@ export const it_IT: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Inversione collettiva",
-        "description": "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione, riportandolo in vita accanto al corpo con salute e mana al massimo. Non può essere lanciata in combattimento. (Cronomanzia)"
+        "description": "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione, riportandolo in vita accanto al corpo con il 30% di salute e mana. Non può essere lanciata in combattimento. (Cronomanzia)"
       },
       "temporal_rewind": {
         "name": "Rewind",

@@ -6229,7 +6229,7 @@ export const id_ID: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Pembalikan Kolektif",
-        "description": "Memundurkan alur waktu setiap anggota grup atau raid yang gugur, menghidupkan mereka kembali di dekat jasad dengan kesehatan dan mana penuh. Tidak dapat digunakan saat bertarung. (Kronomansi)"
+        "description": "Memundurkan alur waktu setiap anggota grup atau raid yang gugur, menghidupkan mereka kembali di dekat jasad dengan 30% kesehatan dan mana. Tidak dapat digunakan saat bertarung. (Kronomansi)"
       },
       "temporal_rewind": {
         "name": "Rewind",

@@ -4,7 +4,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Kollektiv tilbagespoling',
   'entities.abilities.collective_reversal.description':
-    'Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid og genopliver dem ved deres krop med fuldt helbred og mana. Kan ikke kastes i kamp. (Kronomanti)',
+    'Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid og genopliver dem ved deres krop med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)',
   'entities.abilities.sport_boot.description':
     'Et langt, højt spark mod sigtepunktet. Publikum elsker det.',
   'entities.abilities.sport_boot.name': 'Kæmpespark',

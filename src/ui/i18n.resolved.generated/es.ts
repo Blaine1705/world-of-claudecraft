@@ -6229,7 +6229,7 @@ export const es: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Reversión colectiva",
-        "description": "Rebobina a todos los miembros muertos de tu grupo o banda y los devuelve a la vida junto a sus cuerpos con la salud y el maná al máximo. No se puede lanzar en combate. (Cronomancia)"
+        "description": "Rebobina a todos los miembros muertos de tu grupo o banda y los devuelve a la vida junto a sus cuerpos con un 30% de salud y maná. No se puede lanzar en combate. (Cronomancia)"
       },
       "temporal_rewind": {
         "name": "Rewind",

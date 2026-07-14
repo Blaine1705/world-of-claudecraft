@@ -43,17 +43,17 @@ describe('Collective Reversal content', () => {
     expect(def).toMatchObject({
       class: 'mage',
       specs: ['arcane'],
-      learnLevel: 20,
+      learnLevel: 8,
       castTime: 7,
       requiresTarget: false,
       requiresOutOfCombat: true,
     });
-    expect(def.effects).toContainEqual({ type: 'massResurrectGroup', hpFrac: 1 });
+    expect(def.effects).toContainEqual({ type: 'massResurrectGroup', hpFrac: 0.3 });
 
     const known = (spec: 'arcane' | 'fire' | 'frost') =>
       abilitiesKnownAt(
         'mage',
-        20,
+        8,
         computeTalentModifiers('mage', { ...emptyAllocation(), spec }),
       ).map((ability) => ability.def.id);
     expect(known('arcane')).toContain(ABILITY_ID);
@@ -66,8 +66,10 @@ describe('Collective Reversal content', () => {
     expect(abilityIconRecipe(ABILITY_ID)).not.toEqual(abilityIconRecipe('temporal_reversal'));
     expect(en.entities.abilities.collective_reversal.name).toBe('Collective Reversal');
     expect(en.entities.abilities.collective_reversal.description).toContain('group or raid');
+    expect(en.entities.abilities.collective_reversal.description).toContain('30%');
     expect(es.entities.abilities.collective_reversal.name).toBe('Reversión colectiva');
     expect(es.entities.abilities.collective_reversal.description).toContain('grupo o banda');
+    expect(es.entities.abilities.collective_reversal.description).toContain('30%');
     expect(es_ES.entities.abilities.collective_reversal).toEqual(
       es.entities.abilities.collective_reversal,
     );
@@ -112,8 +114,12 @@ describe('Collective Reversal behavior', () => {
       expect(revived.dead).toBe(false);
       expect(revived.ghost).toBe(false);
       expect(revived.corpsePos).toBeNull();
-      expect(revived.hp).toBe(revived.maxHp);
-      if (revived.resourceType === 'mana') expect(revived.resource).toBe(revived.maxResource);
+      expect(revived.hp).toBe(Math.round(revived.maxHp * 0.3));
+      if (revived.resourceType === 'mana') {
+        expect(revived.resource).toBe(Math.round(revived.maxResource * 0.3));
+      } else {
+        expect(revived.resource).toBe(0);
+      }
     }
     expect(livingMage.hp).toBe(livingHp);
     expect(stranger.dead).toBe(true);

@@ -6229,7 +6229,7 @@ export const ko_KR: EnTranslations = {
       },
       "collective_reversal": {
         "name": "집단 역행",
-        "description": "그룹 또는 공격대에서 사망한 모든 구성원의 시간선을 되돌려 시체 옆에서 생명력과 마나가 가득 찬 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)"
+        "description": "그룹 또는 공격대에서 사망한 모든 구성원의 시간선을 되돌려 시체 옆에서 생명력과 마나가 30%인 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)"
       },
       "temporal_rewind": {
         "name": "Rewind",

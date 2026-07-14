@@ -6229,7 +6229,7 @@ export const ja_JP: EnTranslations = {
       },
       "collective_reversal": {
         "name": "集団逆行",
-        "description": "グループまたはレイドの死亡した全メンバーの時間軸を巻き戻し、遺体のそばで体力とマナが最大の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）"
+        "description": "グループまたはレイドの死亡した全メンバーの時間軸を巻き戻し、遺体のそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）"
       },
       "temporal_rewind": {
         "name": "Rewind",

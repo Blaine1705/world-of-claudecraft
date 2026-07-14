@@ -4,7 +4,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Hromadné navrácení',
   'entities.abilities.collective_reversal.description':
-    'Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu a oživí ho u jeho těla s plným zdravím a manou. Nelze seslat v boji. (Chronomancie)',
+    'Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu a oživí ho u jeho těla s 30% zdraví a many. Nelze seslat v boji. (Chronomancie)',
   'entities.abilities.sport_boot.description':
     'Dlouhý vysoký odkop směrem k zaměřovanému bodu. Dav to miluje.',
   'entities.abilities.sport_boot.name': 'Velký odkop',

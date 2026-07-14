@@ -6229,7 +6229,7 @@ export const tr_TR: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Toplu Geri Sarım",
-        "description": "Grubunuzdaki veya baskınınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları bedenlerinin yanında tam sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)"
+        "description": "Grubunuzdaki veya baskınınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları bedenlerinin yanında %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)"
       },
       "temporal_rewind": {
         "name": "Rewind",

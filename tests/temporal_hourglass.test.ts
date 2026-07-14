@@ -17,12 +17,12 @@ const FLAT_X = 700;
 
 function knownIds(spec: 'arcane' | 'fire' | 'frost'): string[] {
   const mods = computeTalentModifiers('mage', { ...emptyAllocation(), spec } as never);
-  return abilitiesKnownAt('mage', 20, mods).map((known) => known.def.id);
+  return abilitiesKnownAt('mage', 14, mods).map((known) => known.def.id);
 }
 
 function makeChronomancer(): { sim: Sim; mage: Entity } {
   const sim = new Sim({ seed: 147, playerClass: 'mage' });
-  sim.setPlayerLevel(20);
+  sim.setPlayerLevel(14);
   expect(sim.setSpec('arcane')).toBe(true);
   sim.tick();
   const mage = sim.player;
@@ -80,11 +80,13 @@ describe('Hourglass of Suspension content', () => {
     const { sim } = makeChronomancer();
     const resolved = sim.resolvedAbility('temporal_hourglass');
     expect(resolved?.def).toMatchObject({
+      class: 'mage',
+      specs: ['arcane'],
       targetMode: 'position',
       requiresTarget: false,
       cooldown: 50,
       range: 28,
-      learnLevel: 18,
+      learnLevel: 14,
     });
   });
 });

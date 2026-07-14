@@ -3614,6 +3614,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'temporal_barrier',
   'temporal_echo',
   'arcane_surge',
+  'collective_reversal',
+  'temporal_hourglass',
   // Owner-provided spec icon sheets (2026-07-14: frost.png / "Mago fuego.png" /
   // Chronomancer.png + a standalone combustion.png on the desktop), cropped into
   // individual painted icons (the label rows trimmed off).

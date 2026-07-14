@@ -4,7 +4,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Đảo ngược tập thể',
   'entities.abilities.collective_reversal.description':
-    'Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với đầy máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)',
+    'Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)',
   'entities.abilities.sport_boot.description':
     'Một cú sút bổng thật xa về phía điểm ngắm. Khán đài mê tít.',
   'entities.abilities.sport_boot.name': 'Cú Sút Lớn',

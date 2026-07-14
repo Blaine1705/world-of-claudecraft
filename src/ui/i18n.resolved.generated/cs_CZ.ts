@@ -6229,7 +6229,7 @@ export const cs_CZ: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Hromadné navrácení",
-        "description": "Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu a oživí ho u jeho těla s plným zdravím a manou. Nelze seslat v boji. (Chronomancie)"
+        "description": "Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu a oživí ho u jeho těla s 30% zdraví a many. Nelze seslat v boji. (Chronomancie)"
       },
       "temporal_rewind": {
         "name": "Rewind",

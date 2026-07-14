@@ -6229,7 +6229,7 @@ export const nl_NL: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Collectieve omkering",
-        "description": "Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid terug en brengt hen bij hun lichaam tot leven met volledige gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)"
+        "description": "Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid terug en brengt hen bij hun lichaam tot leven met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)"
       },
       "temporal_rewind": {
         "name": "Rewind",

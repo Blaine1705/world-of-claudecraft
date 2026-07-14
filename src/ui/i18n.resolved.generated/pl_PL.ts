@@ -6229,7 +6229,7 @@ export const pl_PL: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Zbiorowe odwrócenie",
-        "description": "Cofa linię czasu każdego poległego członka grupy lub rajdu i przywraca go do życia przy ciele z pełnym zdrowiem i maną. Nie można użyć podczas walki. (Chronomancja)"
+        "description": "Cofa linię czasu każdego poległego członka grupy lub rajdu i przywraca go do życia przy ciele z 30% zdrowia i many. Nie można użyć podczas walki. (Chronomancja)"
       },
       "temporal_rewind": {
         "name": "Rewind",

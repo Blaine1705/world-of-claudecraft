@@ -6229,7 +6229,7 @@ export const pt_BR: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Reversão coletiva",
-        "description": "Rebobina a linha temporal de cada membro morto do seu grupo ou raide e o traz de volta à vida junto ao corpo com vida e mana máximas. Não pode ser lançada em combate. (Cronomancia)"
+        "description": "Rebobina a linha temporal de cada membro morto do seu grupo ou raide e o traz de volta à vida junto ao corpo com 30% de vida e mana. Não pode ser lançada em combate. (Cronomancia)"
       },
       "temporal_rewind": {
         "name": "Rewind",

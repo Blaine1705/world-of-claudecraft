@@ -35,7 +35,7 @@ describe('Hourglass allied cancellation online', () => {
     const server = new GameServer();
     const session = server.join(fakeWs(), 1, 1, 'Chrona', 'mage', null);
     if ('error' in session) throw new Error('join failed');
-    server.sim.setPlayerLevel(20, session.pid);
+    server.sim.setPlayerLevel(14, session.pid);
     expect(server.sim.setSpec('arcane', session.pid)).toBe(true);
     server.sim.tick();
     const mage = server.sim.entities.get(session.pid);
@@ -59,7 +59,7 @@ describe('Hourglass allied cancellation online', () => {
     const allySession = server.join(fakeWs(), 2, 2, 'Guard', 'warrior', null);
     if ('error' in mageSession || 'error' in allySession) throw new Error('join failed');
 
-    server.sim.setPlayerLevel(20, mageSession.pid);
+    server.sim.setPlayerLevel(14, mageSession.pid);
     expect(server.sim.setSpec('arcane', mageSession.pid)).toBe(true);
     server.sim.tick();
     const mage = server.sim.entities.get(mageSession.pid);

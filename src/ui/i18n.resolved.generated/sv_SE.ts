@@ -6229,7 +6229,7 @@ export const sv_SE: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Kollektiv återgång",
-        "description": "Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid och återupplivar dem vid kroppen med full hälsa och mana. Kan inte användas i strid. (Kronomanti)"
+        "description": "Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid och återupplivar dem vid kroppen med 30% hälsa och mana. Kan inte användas i strid. (Kronomanti)"
       },
       "temporal_rewind": {
         "name": "Rewind",

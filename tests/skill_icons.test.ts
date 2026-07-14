@@ -62,6 +62,11 @@ describe('class ability webp icons', () => {
     expect(ABILITY_IMAGE_IDS.size).toBeGreaterThan(0);
   });
 
+  it('uses the owner-provided painted icons for both Chronomancy abilities', () => {
+    expect(abilityImageUrl('collective_reversal')).toBe('/ui/skills/mage/collective_reversal.webp');
+    expect(abilityImageUrl('temporal_hourglass')).toBe('/ui/skills/mage/temporal_hourglass.webp');
+  });
+
   it('A) every image-backed ability id resolves to a committed, valid .webp', () => {
     const broken: string[] = [];
     for (const id of ABILITY_IMAGE_IDS) {

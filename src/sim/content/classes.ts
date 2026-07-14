@@ -2234,7 +2234,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'collective_reversal',
     name: 'Collective Reversal',
     class: 'mage',
-    learnLevel: 20,
+    learnLevel: 8,
     specs: ['arcane'],
     cost: 250,
     castTime: 7,
@@ -2244,9 +2244,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     requiresOutOfCombat: true,
     projectile: false,
-    effects: [{ type: 'massResurrectGroup', hpFrac: 1 }],
+    effects: [{ type: 'massResurrectGroup', hpFrac: 0.3 }],
     description:
-      'Rewinds every fallen member of your group or raid, returning them to life at their body with full health and mana. Cannot be cast in combat. (Chronomancy)',
+      'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
   },
   // ---- Chronomancy (healer) "Correct" pillar: Rewind (Rebobinar), the raid
   // cooldown. docs/prd/mage-chronomancy.md. Instant, no target, self-centered 40 yd
@@ -2279,7 +2279,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'temporal_hourglass',
     name: 'Hourglass of Suspension',
     class: 'mage',
-    learnLevel: 18,
+    learnLevel: 14,
     specs: ['arcane'],
     cost: 110,
     castTime: 0,

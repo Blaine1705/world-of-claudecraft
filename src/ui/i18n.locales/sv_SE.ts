@@ -4,7 +4,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.collective_reversal.name': 'Kollektiv återgång',
   'entities.abilities.collective_reversal.description':
-    'Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid och återupplivar dem vid kroppen med full hälsa och mana. Kan inte användas i strid. (Kronomanti)',
+    'Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid och återupplivar dem vid kroppen med 30% hälsa och mana. Kan inte användas i strid. (Kronomanti)',
   'entities.abilities.sport_boot.description':
     'En lång, hög spark mot siktpunkten. Publiken älskar den.',
   'entities.abilities.sport_boot.name': 'Storspark',

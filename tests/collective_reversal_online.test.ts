@@ -30,7 +30,7 @@ describe('Collective Reversal authoritative online path', () => {
     const allySession = server.join(fakeWs(), 2, 2, 'Fallen', 'priest', null);
     if ('error' in mageSession || 'error' in allySession) throw new Error('join failed');
 
-    server.sim.setPlayerLevel(20, mageSession.pid);
+    server.sim.setPlayerLevel(10, mageSession.pid);
     expect(server.sim.setSpec('arcane', mageSession.pid)).toBe(true);
     server.sim.tick();
     const mage = server.sim.entities.get(mageSession.pid);
@@ -53,7 +53,7 @@ describe('Collective Reversal authoritative online path', () => {
     for (let tick = 0; tick < 140; tick++) server.sim.tick();
 
     expect(ally.dead).toBe(false);
-    expect(ally.hp).toBe(ally.maxHp);
-    expect(ally.resource).toBe(ally.maxResource);
+    expect(ally.hp).toBe(Math.round(ally.maxHp * 0.3));
+    expect(ally.resource).toBe(Math.round(ally.maxResource * 0.3));
   });
 });

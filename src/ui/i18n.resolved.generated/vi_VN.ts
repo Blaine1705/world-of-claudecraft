@@ -6229,7 +6229,7 @@ export const vi_VN: EnTranslations = {
       },
       "collective_reversal": {
         "name": "Đảo ngược tập thể",
-        "description": "Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với đầy máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)"
+        "description": "Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)"
       },
       "temporal_rewind": {
         "name": "Rewind",
