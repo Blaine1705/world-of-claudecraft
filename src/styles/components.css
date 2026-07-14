@@ -2383,13 +2383,16 @@
     gap: 8px;
     margin: 10px 0;
     align-items: stretch;
-    /* Keep the WoW-style spec sheets square, like the warrior presentation. */
-    min-height: 0;
+    /* Fill the tall talents body so every sheet has room for its bottom action. */
+    min-height: min(50vh, 540px);
   }
   .ts-panel {
     flex: 1 1 0;
     min-width: 0;
-    aspect-ratio: 1 / 1;
+    /* The desktop window is intentionally tall; let the sheets stretch to its
+       full height instead of clipping the mastery/examples and View talents action. */
+    aspect-ratio: auto;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     padding: 14px 12px;
