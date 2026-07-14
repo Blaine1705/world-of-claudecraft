@@ -674,6 +674,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': '表情輪盤',
   'hudChrome.keybinds.targetFriendly': '選取最近友方',
   'hudChrome.keybinds.targetFriendlyNext': '切換友方目標',
+  'hudChrome.petFeed.disabledFullHp': '寵物生命值已滿',
+  'hudChrome.petFeed.disabledNoFood': '你的背包中沒有可以治療寵物的食物',
   'hudChrome.options.clickMoveLeft': '左鍵',
   'hudChrome.options.clickMoveRight': '右鍵',
   'hudChrome.options.browserEffects': '瀏覽器特效',
@@ -4132,6 +4134,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
   'hudChrome.meters.seconds': '{s}秒',
+  'hudChrome.meters.autoShowHint':
+    '一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。',
   'hudChrome.mobile.actionPageToggle': '切換動作頁',
   'hudChrome.mobile.actionRing': '戰鬥動作',
   'hudChrome.mobile.haptics': '觸覺回饋',

@@ -671,7 +671,12 @@ export const vi_VN: EnTranslations = {
       "perSecond": "{value}/g",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}p {s}g",
-      "seconds": "{s}g"
+      "seconds": "{s}g",
+      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+    },
+    "petFeed": {
+      "disabledFullHp": "Pet is at full health",
+      "disabledNoFood": "No food in your bags will heal your pet"
     },
     "keybinds": {
       "emoteWheel": "Vòng Biểu Cảm",

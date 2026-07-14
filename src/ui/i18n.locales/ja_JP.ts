@@ -701,6 +701,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': 'エモートホイール',
   'hudChrome.keybinds.targetFriendly': '最も近い味方をターゲット',
   'hudChrome.keybinds.targetFriendlyNext': '味方ターゲットを順に切り替え',
+  'hudChrome.petFeed.disabledFullHp': 'ペットは満タンの体力です',
+  'hudChrome.petFeed.disabledNoFood': 'バッグの中にペットを回復できる食べ物がありません',
   'hudChrome.options.clickMoveLeft': '左クリック',
   'hudChrome.options.clickMoveRight': '右クリック',
   'hudChrome.options.browserEffects': 'ブラウザエフェクト',
@@ -4296,6 +4298,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
   'hudChrome.meters.seconds': '{s}秒',
+  'hudChrome.meters.autoShowHint':
+    'パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。',
   'hudChrome.mobile.actionPageToggle': '行動ページ切替',
   'hudChrome.mobile.actionRing': '戦闘アクション',
   'hudChrome.mobile.haptics': '振動',

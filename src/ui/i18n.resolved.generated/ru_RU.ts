@@ -671,7 +671,12 @@ export const ru_RU: EnTranslations = {
       "perSecond": "{value}/с",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} мин {s} сек.",
-      "seconds": "{s} сек."
+      "seconds": "{s} сек.",
+      "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя."
+    },
+    "petFeed": {
+      "disabledFullHp": "Питомец полностью здоров",
+      "disabledNoFood": "В ваших сумках нет еды, которая могла бы вылечить питомца"
     },
     "keybinds": {
       "emoteWheel": "Колесо эмоций",
