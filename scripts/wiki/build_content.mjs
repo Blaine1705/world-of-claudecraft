@@ -24,12 +24,8 @@ const entrySource = `
   export { CLASSES, ABILITIES } from './src/sim/content/classes.ts';
   export { TALENTS } from './src/sim/content/talents.ts';
   export { ALL_CLASSES } from './src/sim/types.ts';
-  export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS } from './src/sim/data.ts';
+  export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, zoneAt } from './src/sim/data.ts';
   export { WARLOCK_PET_MOBS } from './src/sim/content/warlock_pets.ts';
-  export { ZONE1_MOBS } from './src/sim/content/zone1.ts';
-  export { ZONE2_MOBS } from './src/sim/content/zone2.ts';
-  export { ZONE3_MOBS } from './src/sim/content/zone3.ts';
-  export { TEMPLE_MOBS } from './src/sim/content/temple.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
   export { DEEDS, DEED_ORDER } from './src/sim/content/deeds.ts';
   export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
@@ -59,11 +55,8 @@ const {
   DUNGEONS,
   MOBS,
   CAMPS,
+  zoneAt,
   WARLOCK_PET_MOBS,
-  ZONE1_MOBS,
-  ZONE2_MOBS,
-  ZONE3_MOBS,
-  TEMPLE_MOBS,
   DELVE_LIST,
   NPCS,
   DELVE_COMPANIONS,
@@ -239,13 +232,16 @@ const FAMILY_ORDER = [
   'beast',
   'spider',
   'mudfin',
+  'murloc',
   'burrower',
+  'kobold',
   'humanoid',
   'troll',
   'ogre',
   'undead',
   'elemental',
   'dragonkin',
+  'demon',
   'reptile',
 ];
 // A creature only belongs in the public bestiary if it actually spawns in the open world,
@@ -255,12 +251,7 @@ const FAMILY_ORDER = [
 const campedMobIds = new Set(CAMPS.map((c) => c.mobId));
 const publishedMobIds = new Set();
 const famMap = {};
-for (const [id, m] of Object.entries({
-  ...ZONE1_MOBS,
-  ...ZONE2_MOBS,
-  ...ZONE3_MOBS,
-  ...TEMPLE_MOBS,
-})) {
+for (const [id, m] of Object.entries(MOBS)) {
   if (m.elite || m.boss) continue;
   if (id.startsWith('warlock_')) continue; // summoned pets, not wild creatures
   if (!campedMobIds.has(id)) continue; // summon-only encounter adds, never met in the open
@@ -291,17 +282,14 @@ const families = FAMILY_ORDER.filter((f) => famMap[f]).map((f) => ({
   creatures: [...famMap[f].values()].sort((a, b) => a.min - b.min || a.name.localeCompare(b.name)),
 }));
 
-// Which bestiary families actually live in each zone, from camp GEOGRAPHY (a camp's
-// center z falls inside exactly one zone's z-band), never from level-band overlap: a
-// creature whose levels straddle a zone border is not a resident of a zone it has no
-// camp in. Drives the world page's "who you will meet" cross-links.
-const zoneIdForZ = (zv) => ZONES.find((z) => zv >= z.zMin && zv <= z.zMax)?.id ?? null;
+// Which bestiary families actually live in each zone, from the same two-dimensional
+// zone lookup the simulation uses. A camp's x coordinate matters now that several
+// zones share a north/south band in different world columns.
 const familiesByZone = {};
 for (const c of CAMPS) {
   const m = MOBS[c.mobId];
   if (!m || !publishedMobIds.has(c.mobId)) continue; // only bestiary-published creatures
-  const zid = zoneIdForZ(c.center.z);
-  if (!zid) continue;
+  const zid = zoneAt(c.center.x, c.center.z).id;
   familiesByZone[zid] ??= new Set();
   familiesByZone[zid].add(m.family);
 }

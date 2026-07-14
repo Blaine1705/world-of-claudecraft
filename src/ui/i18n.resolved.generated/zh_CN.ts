@@ -1442,7 +1442,10 @@ export const zh_CN: EnTranslations = {
       "label": "重置框体位置"
     },
     "itemTooltip": {
-      "requiresLevel": "需要等级 {level}"
+      "requiresLevel": "需要等级 {level}",
+      "riftTier": "{tier}级裂隙物品",
+      "riftUpgrade": "裂隙强化 {level}/{max}",
+      "riftSockets": "裂隙宝石 {used}/{total}"
     },
     "discord": {
       "title": "Discord",
@@ -2110,7 +2113,17 @@ export const zh_CN: EnTranslations = {
         "marshName": "泥沼湿地",
         "marshBlurb": "沉没的沼泽与遭潮水侵蚀的废墟，泥鳍与更可怕之物的栖身之所。",
         "peaksName": "荆棘峰高地",
-        "peaksBlurb": "狂风侵蚀的山脊,向上攀升,直抵这片国度最寒冷的险境。"
+        "peaksBlurb": "狂风侵蚀的山脊,向上攀升,直抵这片国度最寒冷的险境。",
+        "duskName": "帷幕幽谷",
+        "duskBlurb": "群山之下封存的国度，如果关于入口的低语属实。",
+        "emberName": "龙裔荒原",
+        "emberBlurb": "越过苍白堤道，绿意让位于灰烬，古老的存在统治着荒漠。",
+        "frostName": "霜幕之境",
+        "frostBlurb": "一处任何地图都未曾标出的雪封高地，只在舞动的极光中若隐若现。",
+        "amberName": "琥珀秋境",
+        "amberBlurb": "西边峭壁之后，是一场永不落幕的秋天，金色湖面上灯火点点。",
+        "fenName": "柳泽沼地",
+        "fenBlurb": "越过秋色之冠，是一片垂柳与静水的明亮沼泽，还有一座护城河环绕的小镇。"
       },
       "group": {
         "heading": "组队迎接硬仗",
@@ -2570,6 +2583,18 @@ export const zh_CN: EnTranslations = {
       "reptile": {
         "name": "爬行类",
         "desc": "冷血的猎手，带着独有的嘶声与撕咬，与温血的野兽截然不同。"
+      },
+      "murloc": {
+        "name": "蛙鳍族",
+        "desc": "湖岸与潮池间呱呱叫的鱼人族群，谁涉水靠得太近，它们便会一拥而上。"
+      },
+      "kobold": {
+        "name": "林间小妖",
+        "desc": "在林间空地与树篱下窜来窜去的拾荒者和小妖精，单个不过讨人嫌，聚成一群才成祸患。"
+      },
+      "demon": {
+        "name": "恶魔",
+        "desc": "来自裂隙彼端的入侵者，浑身是火焰与怨毒。只要有一只现身，裂口就绝不会远。"
       }
     },
     "worldPage": {
@@ -2583,15 +2608,55 @@ export const zh_CN: EnTranslations = {
       "valeBlurb": "青翠的起始山谷，新英雄在东溪镇周边的野狼与盗匪身上磨砺技艺。",
       "marshBlurb": "一片被洪水淹没、迷雾与废墟交织的国度。泥鳍涌入浅滩，水下有更古老之物蠢蠢欲动，由桥镇芬桥镇守望着。",
       "peaksBlurb": "风蚀的山脊与古老的矿坑向上攀升，通往这片王国中最寒冷、最高处的危险之地，由高守哨站镇守。",
+      "duskBlurb": "一座笼罩在永恒暮色中的山谷，坐落于古辉巨树之下，水晶废墟泛着微光，空气中回荡着古老的魔力。",
+      "emberBlurb": "一片被风暴照亮、遍布灰烬与血玻璃的荒漠，巨龙在火山口上空盘旋，巨魔的篝火在沙丘间燃烧，由门镇望龙哨守望着。",
+      "frostBlurb": "极光之下，白雪与黑松一片静谧，寒冷本身仿佛苏醒了，唯有冰幔镇的炉火长燃不熄。",
+      "amberBlurb": "一场永恒的秋天，金红的叶子从不飘落，环绕着灯火通明的灯湖镇。",
+      "fenBlurb": "一片明亮而嗡鸣不息的湿地，睡莲漂浮在缓缓的水面上，从桥镇桥湖镇踏上古旧的木栈道即可穿行其间。",
+      "nightBlurb": "一片星光璀璨的午夜国度，花朵照亮小径，月栖镇在梦境般的夜空下静静守望。",
+      "hauntBlurb": "一片被巨大树冠笼罩的闹鬼森林，路上唯一可信的光亮，便是绞湖镇的灯笼。",
+      "galeBlurb": "海崖与呼啸的丘陵，这里的风从不停歇，老灯塔的火从未熄灭，烛港的家家户户都把门关得严严实实。",
+      "jungleBlurb": "棕榈、白沙与喧闹鸟鸣交织的热带丛林，海滨小镇漂流港在沙滩上燃着一堆长明的篝火。",
+      "gardenBlurb": "一座树篱迷宫般的花园国度，至今仍被修剪得整整齐齐，却无人见过园丁；经由篱苑镇及其喷泉庭院方可进入。",
       "valeGreeting": "把你的刀剑带在身边。谷地已不复往日。",
       "valeGreeter": "雷德布鲁克元帅，东溪",
       "marshGreeting": "守在门口。过了那片芦苇，泥沼会替我们动手杀人。",
       "marshGreeter": "守望者芬威克，芬桥",
       "peaksGreeting": "这堵墙已守了两百年。在我当值时它绝不会破，但它在呻吟。",
       "peaksGreeter": "塞萨莉队长，高守哨站",
+      "duskGreeting": "你的同族鲜少踏足这片树荫。轻声慢行，欢迎你的到来。",
+      "duskGreeter": "守护者塞尔文，古辉镇",
+      "emberGreeting": "荒漠吹来灼热的风，巨龙盘旋在龙喉火山上空，巨魔的篝火在沙丘间燃烧。出发之前，先喝口水吧。",
+      "emberGreeter": "守关人，望龙哨",
+      "frostGreeting": "出了墙外，白雪吞没一切声响。若天上的光开始舞动，就压低嗓音，别让火堆熄灭。",
+      "frostGreeter": "守炉人，冰幔镇",
+      "amberGreeting": "这里每一片叶子都燃烧着金红，却从不飘落。灯笼已为你点亮；上山路过融金隘口时可要当心。",
+      "amberGreeter": "灯匠，灯湖镇",
+      "fenGreeting": "沼泽里蜻蜓与蜜蜂嗡嗡作响。跨过桥来歇歇脚，过了水池就别离开木栈道。",
+      "fenGreeter": "守桥人，桥湖镇",
+      "nightGreeting": "越过夜门，连空气都在做梦。沿着花光前行，别忘了留意悬在天上沉睡的世界。",
+      "nightGreeter": "守夜人，月栖镇",
+      "hauntGreeting": "跟紧灯笼走，旅人。若林中有声音在路外喊你的名字，千万别回应。",
+      "hauntGreeter": "点灯人，绞湖镇",
+      "galeGreeting": "这里的风从未停过一刻，老灯塔的火也从未熄过一次。进来后记得随手关上旅店的门。",
+      "galeGreeter": "守塔人，烛港",
+      "jungleGreeting": "温暖的沙滩，喧闹的鸟鸣，还有吞没地平线的丛林。我们在海滩上留着一堆篝火；可要记得回到火边来。",
+      "jungleGreeter": "港务长，漂流港",
+      "gardenGreeting": "树篱仍有人在修剪，可百年来无人见过园丁。当心迷宫：它也在留意你。",
+      "gardenGreeter": "守门人，篱苑镇",
       "valePlaceNotes": "东溪镇是你的第一个大本营。狼奔谷与野猪草甸是温和的狩猎场；镜湖是供垂钓的好水域，只是浅滩处泥鳍鱼成群；墨网林与铜矿坑藏着蜘蛛和贪婪掘矿的家伙；一处强盗营地与陷落礼拜堂里有更棘手的活儿；圣物库山丘向下通往坍塌的圣物库，这是王国的第一座探秘；明木林地是北方一片宁静、阳光普照的林地；而母猪场则是东溪镇有围墙的野猪球场，溪谷杯就在丰收休战的庇护下在那里开赛。",
       "marshPlaceNotes": "芬桥守着唯一一条干燥的道路。潜行者芦苇荡与深沼浅滩里满是沼泽野兽和泥鳍；寡妇密林被蛛网织得密不透风；溺亡礼拜堂与巨魔土丘藏着更古老的危险，而这片湿地自己的探秘，溺亡连祷，就在土丘以北不远处开放；唤墓者营地是邪教的盘踞之处，沉没堡垒则是这片湿地的副本核心。",
       "peaksPlaceNotes": "高守哨站扼守着城墙。潜猎者山脊与深岩洞穴属于山脊猫和穴居者；食人魔丘陵与卓格玛的战营属于受雇的莽夫；风暴岩中元素噼啪作响，其下方泛着微光的便是微光湖，这座山中小湖的湖畔守着一道通往溺亡神殿的苍白之光之门；蜿龙教帐篷与亡魂之野环绕着邪教的制高点，墓龙圣所则居于其巅。",
+      "duskPlaceNotes": "古辉镇聚居在巨树之下。暮落洞穴与其瞭望台是入口，也是初见山谷的地方；古木林地与星落盆地守着宁静的南方；沉没王庭在东面藏着草木蔓生的废墟；辉光深处与水晶浅滩则在北方闪着微光。",
+      "emberPlaceNotes": "望龙哨扼守着大门。门林是荒漠前最后一片绿意；烬沙丘随风飘着灰烬，还有更糟的东西；巨魔集会是沙丘巨魔燃起篝火聚集之处；血玻璃原野闪烁着锋利的碎片；而龙喉火山口则是群龙盘旋其上的冒烟王冠。",
+      "frostPlaceNotes": "冰幔镇守着最后一座温暖的炉火。雪线隘口标记着积雪接管一切的地方；冰川湖是冰层之下漆黑而静止的水；极光台阶在舞动的光芒下向上攀升；颤栗沼泽是一片从未真正沉睡的冰封泥沼；而呼啸台地每到夜里都名副其实。",
+      "amberPlaceNotes": "灯湖镇在丰收之地的中心闪着光。融金隘口是那条覆着琥珀的进山之路；鎏金果园与丰收谷藏着最甜的果实和最大胆的窃贼；大湖倒映着燃烧的秋叶；烬枫坡上的枫树最高也最红；而斜碑还记得比秋天更古老的事。",
+      "fenPlaceNotes": "桥湖镇横跨在缓缓的水面上。琥珀沼石阶从丰收之乡蜿蜒而下；睡莲泽与泽光池间闪烁着鬼火与蜻蜓；垂柳湾的柳枝垂入湖中；而沉眠浅滩已是这片土地最温柔的去处。",
+      "nightPlaceNotes": "月栖镇守着长夜的警戒。夜门是通往午夜国度的入口；月井盛着可以伫立其旁的星光；暮光花田在黑暗中绽放；守望石阵一动不动地凝视着；而不眠古冢是这里唯一从不做梦的地方。",
+      "hauntPlaceNotes": "绞湖镇蜷缩在自己的灯笼之间。鸦门是这片森林阴森的正门；寡妇棘丛被蛛网织得密不透风；吊影林地与哀石礼拜堂承载着森林最古老的悲恸；而猎手林隙属于至今仍在那里狩猎的东西。",
+      "galePlaceNotes": "烛港迎风而立。风道是进来的悬崖之路；啸风丘陵在狂风下光秃起伏；老灯塔燃烧的岁月已无人能说清；断崖直落入海；沉船滩让人不敢小看这段海岸；而镜湖是整个国度里唯一静止的东西。",
+      "junglePlaceNotes": "漂流港在海滩上燃着篝火。缠木隘口是大河汇入绿墙之处；棕榈长滩沿着浪缘铺展，洁白而温暖；翠绿丛林与垂藤林吞没了内陆；蓝宝石潟湖清澈而幽深地发着光；而沉没神像则在水下静静注视。",
+      "gardenPlaceNotes": "篱苑镇候在花园之门前。雕像步道有它沉默的伙伴相随；野蔷薇丛早已长出了花圃之外；花瓣池终年漂着粉色的花瓣；大迷宫会为每一位客人重新排布自己的礼数；而喷泉庭院仍在花园中心流淌着清泉。",
       "gladeTitle": "宁静一隅：明木林地",
       "gladeBody": "the Vale 里的故事并不全都关于亡者。北方有一片阳光照耀的林地，名为 Brightwood Glade，自有它更为温和的节奏：尽是安静的小径，以及枝叶下斑驳的光影。它是你所追寻的踪迹之外一段柔和的对照，若道路给你余裕闲逛，很值得去看一看。",
       "worldBossTitle": "当山峰苏醒：世界首领",
@@ -3892,6 +3957,35 @@ export const zh_CN: EnTranslations = {
     "chat": "打开聊天框"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "所有裂隙目前都不稳定。请稍后再试。",
+      "enterFloor": "你穿过裂隙，进入了{name}。",
+      "descendFloor": "你深入{name}的更深处。",
+      "stepBack": "你退回裂隙，返回原地。",
+      "pylonLit": "一座符文尖塔亮起（{lit}/{total}）。",
+      "wayDownOpens": "通往下层的裂口被撕开了。",
+      "exitOpens": "裂隙震颤。一条归途在倒下的敌人身后撕裂开来。",
+      "portalOpens": "一道{tier}级裂隙在{zone}撕裂而开！",
+      "portalSealed": "{zone}的{tier}级裂隙已被封印。",
+      "portalCollapses": "{zone}的{tier}级裂隙坍塌了。",
+      "levelGate": "只有等级达到{level}级或以上的冒险者才能进入这道裂隙。",
+      "iceGoalLit": "霜之印记熊熊燃起。去路随之震动。",
+      "socketsShut": "凹槽隆隆合拢。去路随之震动。",
+      "seqProgress": "符文依次回应（{step}/{total}）。",
+      "seqReset": "符文尽数熄灭。从头再来。",
+      "gateOpen": "闸门轰隆隆地开启了。",
+      "orbSealed": "宝珠被下方的仪式封印着。",
+      "orbWakes": "五芒星阵的火焰熄灭了。祭坛上有什么苏醒了。",
+      "orbOpensGate": "血色宝珠骤然爆发。神殿之门轰然开启。",
+      "alreadyCleared": "该裂隙已被 {names} 清除。",
+      "raceLost": "该裂隙已被 {names} 清除。你的挑战结束了。",
+      "raceWorldWin": "{names} 用时 {seconds} 秒赢得了 {tier} 级裂隙竞速！",
+      "raceWinBanner": "裂隙竞速胜利 — {seconds} 秒",
+      "raceLostBanner": "裂隙已被清除",
+      "forgeUpgraded": "{name} 的裂隙强化已完成。",
+      "forgeEnchanted": "{name} 的裂隙附魔已完成。",
+      "forgeSocketed": "已为 {name} 镶嵌裂隙宝石。"
+    },
     "delve": {
       "cannotEnterNow": "你现在无法进入探秘。",
       "leaveDungeonFirst": "请先离开地下城。",
@@ -4697,6 +4791,8 @@ export const zh_CN: EnTranslations = {
       "secondsRemaining": "剩余 {seconds} 秒",
       "enteringZone": "进入 {zone}。",
       "welcomeZone": "欢迎来到 {zone}！",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "{level} 级！",
       "levelLog": "你已达到 {level} 级！",
       "xpGain": "你获得 {amount} 点经验。",
@@ -6997,6 +7093,66 @@ export const zh_CN: EnTranslations = {
       "sunpetal_sickle": {
         "name": "阳瓣镰刀"
       },
+      "duskwisp_essence": {
+        "name": "暮光灵精华"
+      },
+      "spore_heart": {
+        "name": "孢子之心"
+      },
+      "gleaming_antler": {
+        "name": "辉光鹿角"
+      },
+      "wisp_mote": {
+        "name": "光尘"
+      },
+      "starfall_shard": {
+        "name": "星落碎片"
+      },
+      "elder_bark": {
+        "name": "长者树皮"
+      },
+      "hollow_sealstone": {
+        "name": "幽谷封印石"
+      },
+      "monument_overlook": {
+        "name": "风蚀石碑"
+      },
+      "monument_court": {
+        "name": "沉没石碑"
+      },
+      "monument_north": {
+        "name": "遗忘石碑"
+      },
+      "guardian_core": {
+        "name": "守卫核心"
+      },
+      "wardens_seal": {
+        "name": "守望者之印"
+      },
+      "gleamstag_charm": {
+        "name": "辉鹿护符"
+      },
+      "veilsteel_blade": {
+        "name": "帷钢之刃"
+      },
+      "duskfang_dirk": {
+        "name": "暮牙短剑"
+      },
+      "gleamwood_stave": {
+        "name": "辉木长杖"
+      },
+      "wardens_oathband": {
+        "name": "守望者誓言护手"
+      },
+      "wardplate_cuirass": {
+        "name": "守卫板甲胸铠"
+      },
+      "nightweave_tunic": {
+        "name": "夜织皮甲"
+      },
+      "veilcloth_robe": {
+        "name": "帷纱长袍"
+      },
       "thorium_ore": {
         "name": "瑟银矿石"
       },
@@ -7134,6 +7290,27 @@ export const zh_CN: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "烬晶战杖"
+      },
+      "rift_essence": {
+        "name": "裂隙精华"
+      },
+      "rift_gem_crimson": {
+        "name": "猩红裂隙宝石"
+      },
+      "rift_gem_azure": {
+        "name": "蔚蓝裂隙宝石"
+      },
+      "rift_gem_verdant": {
+        "name": "翠绿裂隙宝石"
+      },
+      "riftbound_band_of_might": {
+        "name": "力量裂隙之戒"
+      },
+      "riftbound_band_of_insight": {
+        "name": "洞察裂隙之戒"
+      },
+      "riftbound_band_of_guile": {
+        "name": "诡诈裂隙之戒"
       },
       "bristleback_maul": {
         "name": "加洛格拉斯之锤"
@@ -8067,6 +8244,255 @@ export const zh_CN: EnTranslations = {
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
       },
+      "rift_spawnling": {
+        "name": "裂隙孽生体"
+      },
+      "rift_bonewalker": {
+        "name": "复生骨行者"
+      },
+      "rift_frost_revenant": {
+        "name": "霜缚亡魂"
+      },
+      "rift_rime_elemental": {
+        "name": "白霜元素"
+      },
+      "rift_ember_fiend": {
+        "name": "余烬恶鬼"
+      },
+      "rift_magma_brute": {
+        "name": "熔岩蛮兽"
+      },
+      "rift_venom_weaver": {
+        "name": "毒液织网者"
+      },
+      "rift_thornback": {
+        "name": "荆棘潜袭者"
+      },
+      "rift_boneclad": {
+        "name": "骨甲战士"
+      },
+      "rift_marrow_troll": {
+        "name": "骨髓巨魔"
+      },
+      "rift_void_acolyte": {
+        "name": "虚空侍僧"
+      },
+      "rift_dread_stalker": {
+        "name": "恐惧潜猎者"
+      },
+      "rift_storm_caller": {
+        "name": "唤风者"
+      },
+      "rift_stormscale": {
+        "name": "风暴鳞龙"
+      },
+      "rift_tide_thrall": {
+        "name": "潮汐奴仆"
+      },
+      "rift_deep_lurker": {
+        "name": "深渊潜伏者"
+      },
+      "rift_stone_ogre": {
+        "name": "石食人魔"
+      },
+      "rift_boss_frost": {
+        "name": "白霜守望者"
+      },
+      "rift_boss_ember": {
+        "name": "余烬熔炉暴君"
+      },
+      "rift_boss_venom": {
+        "name": "育母维斯卡"
+      },
+      "rift_boss_necro": {
+        "name": "骨领主萨瑞斯"
+      },
+      "rift_boss_brute": {
+        "name": "督军格拉斯克"
+      },
+      "rift_boss_arcane": {
+        "name": "执政官尼克萨里斯"
+      },
+      "rift_boss_storm": {
+        "name": "风暴威洛克"
+      },
+      "rift_boss_tide": {
+        "name": "深渊之喉"
+      },
+      "glimmerwisp": {
+        "name": "微光灵"
+      },
+      "duskwisp": {
+        "name": "暮光灵"
+      },
+      "hollow_spirit": {
+        "name": "幽谷之灵"
+      },
+      "veiled_stag": {
+        "name": "帷纱雄鹿"
+      },
+      "gleamstag": {
+        "name": "辉光雄鹿"
+      },
+      "sporeling_gatherer": {
+        "name": "孢子人采集者"
+      },
+      "corrupted_sporeling": {
+        "name": "堕落的孢子人"
+      },
+      "treant_elder": {
+        "name": "树人长者"
+      },
+      "ancient_guardian": {
+        "name": "上古守卫"
+      },
+      "waking_warden": {
+        "name": "苏醒的守望者"
+      },
+      "old_marrowshell": {
+        "name": "老甲髓"
+      },
+      "aurelhorn": {
+        "name": "金角，鹿群之首"
+      },
+      "snowdrift_wolf": {
+        "name": "雪堆狼"
+      },
+      "ice_wisp": {
+        "name": "寒冰微光"
+      },
+      "rime_elemental": {
+        "name": "霜凝元素"
+      },
+      "fen_sprite": {
+        "name": "沼泽小妖"
+      },
+      "frostmane_yeti": {
+        "name": "霜鬃雪人"
+      },
+      "emberwing_drake": {
+        "name": "烬翼幼龙"
+      },
+      "ashbone_raider": {
+        "name": "灰骨掠夺者"
+      },
+      "ashbone_warcaller": {
+        "name": "灰骨战吼者"
+      },
+      "dune_troll": {
+        "name": "沙丘巨魔"
+      },
+      "gilded_stag": {
+        "name": "鎏金雄鹿"
+      },
+      "gloam_fox": {
+        "name": "暮光狐"
+      },
+      "orchard_treant": {
+        "name": "果园树人"
+      },
+      "harvest_sprite": {
+        "name": "丰收小妖"
+      },
+      "mere_lurker": {
+        "name": "湖泽潜伏者"
+      },
+      "bogtoad": {
+        "name": "沼蟾"
+      },
+      "drowsy_croaker": {
+        "name": "瞌睡蛙王"
+      },
+      "lily_wisp": {
+        "name": "睡莲微光"
+      },
+      "willow_sprite": {
+        "name": "柳树小妖"
+      },
+      "moonfleece_grazer": {
+        "name": "月绒兽"
+      },
+      "gloam_strider": {
+        "name": "幽暝疾行者"
+      },
+      "nightkin_stargazer": {
+        "name": "夜裔观星者"
+      },
+      "barrow_king": {
+        "name": "古冢之王"
+      },
+      "widowsilk_spinner": {
+        "name": "寡妇丝纺蛛"
+      },
+      "wood_wraith": {
+        "name": "林中怨灵"
+      },
+      "gravenbark_shambler": {
+        "name": "墓皮树怪"
+      },
+      "pale_huntsman": {
+        "name": "苍白猎手"
+      },
+      "tide_scuttler": {
+        "name": "潮汐蟹"
+      },
+      "thicket_boar": {
+        "name": "灌丛野猪"
+      },
+      "canopy_weaver": {
+        "name": "树冠织网蛛"
+      },
+      "idol_guardian": {
+        "name": "神像守卫"
+      },
+      "topiary_stag": {
+        "name": "绿雕雄鹿"
+      },
+      "topiary_wolf": {
+        "name": "绿雕之狼"
+      },
+      "hedge_gnome": {
+        "name": "树篱地精"
+      },
+      "the_topiary_bull": {
+        "name": "绿雕公牛"
+      },
+      "moor_ram": {
+        "name": "荒原羊"
+      },
+      "gale_wisp": {
+        "name": "疾风精"
+      },
+      "shoal_scuttler": {
+        "name": "浅滩蟹"
+      },
+      "the_wreck_warden": {
+        "name": "沉船守卫"
+      },
+      "riftspawn": {
+        "name": "裂生怪"
+      },
+      "breach_wretch": {
+        "name": "裂口恶徒"
+      },
+      "void_stalker": {
+        "name": "虚空潜行者"
+      },
+      "sundered_horror": {
+        "name": "碎裂恐魔"
+      },
+      "rift_hellguard": {
+        "name": "地狱卫士"
+      },
+      "rift_pact_acolyte": {
+        "name": "契约侍僧"
+      },
+      "rift_boss_ritualist": {
+        "name": "契约缚身者维尔科尔法师"
+      },
+      "rift_boss_pitlord": {
+        "name": "深渊之主阿兹戈拉斯"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -8341,6 +8767,61 @@ export const zh_CN: EnTranslations = {
         "name": "编年史者赞茜",
         "title": "荆峰高地编年史",
         "greeting": "高山什么都不会忘记，{playerName}，我也一样。让我看看你都做过什么吧。"
+      },
+      "keeper_saelwyn": {
+        "name": "守护者塞尔文",
+        "title": "幽谷守护者",
+        "greeting": "你的同族鲜少踏足这片树荫，{className}。轻声慢行，欢迎你的到来。"
+      },
+      "loremother_bryn": {
+        "name": "传识之母布琳",
+        "title": "圣祠之声",
+        "greeting": "这山谷里的每一盏光都铭记着什么，{playerName}。帮我听听它们的低语。"
+      },
+      "provisioner_fenna": {
+        "name": "补给员芬娜",
+        "title": "古辉镇补给员",
+        "greeting": "面包还热着，泉水依然甘甜。幽谷有所馈赠，我也一样。"
+      },
+      "wardsmith_orun": {
+        "name": "结界铁匠欧伦",
+        "title": "古炉看守",
+        "greeting": "这些熔炉几百年前就冷了，{className}，但它们锻出的兵刃至今锋利。"
+      },
+      "archivist_tullo": {
+        "name": "档案员图洛",
+        "title": "读石者",
+        "greeting": "外面那些石碑已经许久不曾对人开口。也许它们正等着新的耳朵。"
+      },
+      "warden_coalfast": {
+        "name": "守望者·煤耐",
+        "title": "堡垒指挥官",
+        "greeting": "裂隙才不管鸥港有多小，{className}。我们守住这片海岸，否则就再没有海岸可守。与我们并肩而战，我不会忘记你的付出。"
+      },
+      "riftwatch_ollun": {
+        "name": "裂察·奥伦",
+        "title": "裂隙学者",
+        "greeting": "每道裂隙开启之前都会歌唱，只要你有听它的耳朵。此刻我能听见岛上三道裂隙正在骚动，其中一道就在近处。"
+      },
+      "quartermaster_edda": {
+        "name": "军需官·艾达",
+        "title": "堡垒军械师",
+        "greeting": "钢铁与海盐，{className}，这就是我还能发给你的全部了。拿上它，让那些裂隙后悔在我够得着的地方裂开。"
+      },
+      "mender_saul": {
+        "name": "疗愈者·索尔",
+        "title": "战地外科医",
+        "greeting": "这一个月里我接的骨头，比过去十年医治渔民跌伤加起来还多。裂隙夺走的东西，很少留下什么。若你办得到，就囫囵着回来见我。"
+      },
+      "bellkeeper_tam": {
+        "name": "守钟人·塔姆",
+        "title": "警钟守",
+        "greeting": "这口钟，是裂隙留给我们的唯一预警，{className}。一声,是田野;两声,是断崖;三声,便是它已近得逃也无用。留心听着,它或许能保你全身。"
+      },
+      "fisher_nell": {
+        "name": "受惊的奈尔",
+        "title": "鸥港渔民",
+        "greeting": "它就在晾网的地方裂开了。就在那儿，我这辈子每天清晨都站着的地方。我再也不下到海岸去了。如今我哪儿都不太去了。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -9161,6 +9642,152 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_veil_thinned": {
+        "title": "稀薄的帷幕",
+        "text": "洞穴竟为你敞开了。那么封印比我担心的还要脆弱，{playerName}。帷幕撕裂之处，光灵会变得阴冷黑暗。给我带来八份暮光灵的精华，我便能读出这道伤口有多深。",
+        "completion": "每一份都是冰冷的。幽谷也许只剩一个季节，裂缝就会变成裂谷。你我有得忙了。",
+        "objectives": {
+          "0": {
+            "label": "暮光灵精华"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "辉光鹿角",
+        "text": "帷纱雄鹿在吃草的地方洒下微光，它们蜕下的鹿角能把光留住许多年。从星落盆地的鹿群那里取来五支，我的灯笼整个冬天都不用点油。不必伤害雄鹿，但它们也不会轻易相让。",
+        "completion": "看它们把光留得多好！没有火焰，没有烟，只有光。幽谷自有馈赠。",
+        "objectives": {
+          "0": {
+            "label": "辉光鹿角"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "浅滩之光",
+        "text": "微光灵身上带着幽谷封印之时落下的古老星光。六粒光尘，圣祠的灯便能燃上一年。只取那些将熄的，幽谷的馈赠足够，无需贪求。",
+        "completion": "柔和得像最初的星辰。放在祭坛边吧，圣祠会完成剩下的事。",
+        "objectives": {
+          "0": {
+            "label": "光尘"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "安抚幽深",
+        "text": "辉光深处的孢子人本是温和的族群，直到裂缝触到了他们的蘑菇环。被侵蚀夺走的，再也不会归还。让堕落者安息吧，{playerName}：深处北面，十个。",
+        "completion": "你做了我不忍做的事。南边的采集者还在歌唱；因为你，他们能一直唱下去。",
+        "objectives": {
+          "0": {
+            "label": "堕落的孢子人：已安息"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "蘑菇环之心",
+        "text": "孢子人堕入黑暗后，心脏仍靠借来的阴影跳动。四颗这样的心，在圣祠净化后，能让我们弄清侵蚀如何蔓延。这活计残酷，{playerName}，却是修补之工。",
+        "completion": "好了。净化了，也安静了。每一颗都指向同一处：阴影来自沉没王庭。去告诉塞尔文。",
+        "objectives": {
+          "0": {
+            "label": "孢子之心"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "石碑的记忆",
+        "text": "封印之前的石碑还立着三座：一座在暮落瞭望台，一座在沉没王庭，还有一座失落在无人行走的东北角。替我读一读它们，{playerName}。我的膝盖两百年前就爬不动台阶了。",
+        "completion": "瞭望台、王庭、被遗忘的角落……封印之歌的三段歌词，自吟唱之日起第一次重聚。你让一个老读者非常快乐。",
+        "objectives": {
+          "0": {
+            "label": "已读瞭望台石碑"
+          },
+          "1": {
+            "label": "已读王庭石碑"
+          },
+          "2": {
+            "label": "已读遗忘石碑"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "林间之患",
+        "text": "入夜后暮光灵开始在我的摊位间游荡，{playerName}，它们的寒气碰什么坏什么。替我清一清：十只，哪里帷幕破了就去哪里。",
+        "completion": "夜市又能开张了。你有一位终身顾客，至少也有个折扣。",
+        "objectives": {
+          "0": {
+            "label": "已驱散暮光灵"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "星落碎片",
+        "text": "暮光灵飘过水晶原野时，古老星光的碎屑会像芒刺般附在它们身上。六枚碎片，{playerName}，我就能把封印的年代精确到吟唱的那个季节。",
+        "completion": "看这些纹理！秋天。幽谷是在秋天被封印的。两百年的争论，被六块小石头了结。",
+        "objectives": {
+          "0": {
+            "label": "星落碎片"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "树人之约",
+        "text": "树荫长者们的根被侵蚀啃噬，外层树皮纷纷剥落。四段树皮，我就能为整片林地熬制药膏。你去撬树皮时它们不会道谢，{playerName}，但它们会因此多站立一个世纪。",
+        "completion": "四段都厚实完好。药膏要熬一个星期，药效要过一百年才算完。树木衡量善意的方式不一样。",
+        "objectives": {
+          "0": {
+            "label": "长者树皮"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "抵御孢子之潮",
+        "text": "药膏守住了林地，但每到黄昏，侵蚀就把深处逼得更紧。还要让十二个堕落者安息，采集者们才能夺回北面的蘑菇环，{playerName}。",
+        "completion": "今夜北面的蘑菇环又在歌唱了。轻轻地，但在歌唱。",
+        "objectives": {
+          "0": {
+            "label": "堕落的孢子人：已安息"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "沉没王庭",
+        "text": "布琳读得没错：裂缝贯穿东边的古老王庭，而它的守卫醒得不对了。它们本是为守护封印而造；如今却会碾碎任何靠近的人。清除废墟中的八座。",
+        "completion": "八座守卫，归于沉寂。我还记得它们被立起来的时候，{playerName}。别这么惊讶；幽谷让它的守护者活得很久。",
+        "objectives": {
+          "0": {
+            "label": "上古守卫：已沉寂"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "守望者的回响",
+        "text": "主人虽已沉默，王庭的守卫仍在重复它最后的命令，像一道不肯消散的回声。封印一日不归位，它们就会不断苏醒，{playerName}。再平息十座，石匠们才能抵达封印石。",
+        "completion": "回声一次比一次微弱。很快王庭就只剩下风和常春藤，废墟本该如此。",
+        "objectives": {
+          "0": {
+            "label": "上古守卫：已沉寂"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "苏醒的守望者",
+        "text": "王庭安静了，它的主人却没有。持守封印的守望者在扭曲中苏醒，它不倒下，封印就无法修复。这一战不会轻松；能找到一个朋友就带上一个，{playerName}。能找到两个就带上两个。",
+        "completion": "它钟鸣般的嗓音沉寂了。我在这里都感觉到了，像有重担从整座山谷卸下。",
+        "objectives": {
+          "0": {
+            "label": "已击败苏醒的守望者"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "封印重铸",
+        "text": "带上守望者之印，去王庭中心的封印石那里，把它放回被击落的位置。那时幽谷便能开始愈合，而你，{playerName}，将完成你的同族从未做到的事。",
+        "completion": "我在这里感觉到它合拢了，温柔如暮色。幽谷会记得它的朋友，{playerName}。无论你走多远，大树下总会为你留一盏灯。",
+        "objectives": {
+          "0": {
+            "label": "封印已放回封印石"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "溺亡唱诗班",
         "text": "那些涉行者并非孤身行动。它们之中游走着溺亡信徒——随神殿一同沉没的邪教徒，至今仍披着腐烂的法衣，仍在岸边礁石上吟唱祷词。让其中八名永远噤声，再为我带回它们随身携带的六件祭品。我想知道它们打算献给女神什么。",
@@ -9262,6 +9889,9 @@ export const zh_CN: EnTranslations = {
           },
           "10": {
             "label": "母猪场"
+          },
+          "11": {
+            "label": "远岸沙洲堤道"
           }
         }
       },
@@ -9328,6 +9958,285 @@ export const zh_CN: EnTranslations = {
           },
           "9": {
             "label": "墓龙圣所"
+          }
+        }
+      },
+      "veiled_hollow": {
+        "name": "帷幕幽谷",
+        "welcome": "空气中回荡着古老魔法的低鸣。到古辉镇的巨树下寻找守护者塞尔文吧。",
+        "pois": {
+          "0": {
+            "label": "古辉镇"
+          },
+          "1": {
+            "label": "暮落洞穴"
+          },
+          "2": {
+            "label": "暮落瞭望台"
+          },
+          "3": {
+            "label": "古木林地"
+          },
+          "4": {
+            "label": "星落盆地"
+          },
+          "5": {
+            "label": "沉没王庭"
+          },
+          "6": {
+            "label": "水晶浅滩"
+          },
+          "7": {
+            "label": "辉光深处"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "龙裔荒原",
+        "welcome": "灼热的风从前方的荒漠滚滚而来。巨龙在龙喉火山上空盘旋，巨魔的篝火在沙丘间燃烧。",
+        "pois": {
+          "0": {
+            "label": "望龙哨"
+          },
+          "1": {
+            "label": "门林"
+          },
+          "2": {
+            "label": "烬沙丘"
+          },
+          "3": {
+            "label": "巨魔集会"
+          },
+          "4": {
+            "label": "血玻璃原野"
+          },
+          "5": {
+            "label": "龙喉火山口"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "霜幕之境",
+        "welcome": "白雪吞没了一切声响。在舞动的极光之下，寒冷本身仿佛苏醒了。",
+        "pois": {
+          "0": {
+            "label": "冰幔镇"
+          },
+          "1": {
+            "label": "雪线隘口"
+          },
+          "2": {
+            "label": "冰川湖"
+          },
+          "3": {
+            "label": "极光台阶"
+          },
+          "4": {
+            "label": "颤栗沼泽"
+          },
+          "5": {
+            "label": "呼啸台地"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "琥珀秋境",
+        "welcome": "这里每一片叶子都燃烧着金红，却从不飘落。灯湖镇的灯笼已为你点亮。",
+        "pois": {
+          "0": {
+            "label": "灯湖镇"
+          },
+          "1": {
+            "label": "融金隘口"
+          },
+          "2": {
+            "label": "鎏金果园"
+          },
+          "3": {
+            "label": "丰收谷"
+          },
+          "4": {
+            "label": "大湖"
+          },
+          "5": {
+            "label": "烬枫坡"
+          },
+          "6": {
+            "label": "斜碑"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "柳泽沼地",
+        "welcome": "沼泽里蜻蜓与蜜蜂嗡嗡作响。跨过桥进入桥湖镇，歇歇脚吧。",
+        "pois": {
+          "0": {
+            "label": "桥湖镇"
+          },
+          "1": {
+            "label": "琥珀沼石阶"
+          },
+          "2": {
+            "label": "睡莲泽"
+          },
+          "3": {
+            "label": "泽光池"
+          },
+          "4": {
+            "label": "垂柳湾"
+          },
+          "5": {
+            "label": "沉眠浅滩"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "夜绽花野",
+        "welcome": "越过夜门，连空气都在做梦。沿着花光走向月栖镇，别忘了看看悬在天上沉睡的世界。",
+        "pois": {
+          "0": {
+            "label": "月栖镇"
+          },
+          "1": {
+            "label": "夜门"
+          },
+          "2": {
+            "label": "月井"
+          },
+          "3": {
+            "label": "暮光花田"
+          },
+          "4": {
+            "label": "守望石阵"
+          },
+          "5": {
+            "label": "不眠古冢"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "怨灵林",
+        "welcome": "树冠像棺盖一样在路上合拢。跟紧绞湖镇的灯火，若林中有声音喊你的名字，千万别回应。",
+        "pois": {
+          "0": {
+            "label": "绞湖镇"
+          },
+          "1": {
+            "label": "鸦门"
+          },
+          "2": {
+            "label": "寡妇棘丛"
+          },
+          "3": {
+            "label": "吊影林地"
+          },
+          "4": {
+            "label": "哀石礼拜堂"
+          },
+          "5": {
+            "label": "猎手林隙"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "棕榈湾",
+        "welcome": "温暖的沙滩，喧闹的鸟鸣，还有吞没地平线的丛林。漂流港在海滩上为你留着一堆篝火。",
+        "pois": {
+          "0": {
+            "label": "漂流港"
+          },
+          "1": {
+            "label": "缠木隘口"
+          },
+          "2": {
+            "label": "棕榈长滩"
+          },
+          "3": {
+            "label": "翠绿丛林"
+          },
+          "4": {
+            "label": "垂藤林"
+          },
+          "5": {
+            "label": "蓝宝石潟湖"
+          },
+          "6": {
+            "label": "沉没神像"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "常青园",
+        "welcome": "树篱仍有人在修剪，可百年来无人见过园丁。当心迷宫：它也在留意你。",
+        "pois": {
+          "0": {
+            "label": "篱苑镇"
+          },
+          "1": {
+            "label": "花园之门"
+          },
+          "2": {
+            "label": "雕像步道"
+          },
+          "3": {
+            "label": "野蔷薇丛"
+          },
+          "4": {
+            "label": "花瓣池"
+          },
+          "5": {
+            "label": "大迷宫"
+          },
+          "6": {
+            "label": "喷泉庭院"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "疾风崖",
+        "welcome": "这里的风从未停过，老灯塔的火也从未熄过。烛港只求你随手关上旅店的门。",
+        "pois": {
+          "0": {
+            "label": "烛港"
+          },
+          "1": {
+            "label": "风道"
+          },
+          "2": {
+            "label": "啸风丘陵"
+          },
+          "3": {
+            "label": "老灯塔"
+          },
+          "4": {
+            "label": "断崖"
+          },
+          "5": {
+            "label": "沉船滩"
+          },
+          "6": {
+            "label": "镜湖"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "远岸",
+        "welcome": "越过沙洲，鸥港的警钟会先于这座镇子寻到你。裂隙毫无预兆地撕裂开来，而这座堡垒守着自己的海岸，抵挡从中涌出的一切。他们已经等待像你这样的人很久了。",
+        "pois": {
+          "0": {
+            "label": "鸥港"
+          },
+          "1": {
+            "label": "登岸口"
+          },
+          "2": {
+            "label": "守望草甸"
+          },
+          "3": {
+            "label": "碎裂断崖"
+          },
+          "4": {
+            "label": "裂野"
           }
         }
       }
