@@ -119,4 +119,19 @@ export const SPEC_CARD_INFO: Record<string, SpecCardInfo> = {
     complexity: 'medium',
     examples: ['shield_slam', 'revenge', 'thunder_clap', 'sunder_armor'],
   },
+  fire: {
+    primaryStat: 'int',
+    complexity: 'high',
+    examples: ['fireball', 'pyroblast', 'combustion', 'meteor'],
+  },
+  frost: {
+    primaryStat: 'int',
+    complexity: 'medium',
+    examples: ['frostbolt', 'ice_lance', 'frozen_orb', 'frost_nova'],
+  },
+  arcane: {
+    primaryStat: 'int',
+    complexity: 'high',
+    examples: ['temporal_mend', 'temporal_cascade', 'temporal_rewind', 'arcane_power'],
+  },
 };

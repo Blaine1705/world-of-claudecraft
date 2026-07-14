@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { CLASS_DETAILS, SIGNATURE_ABILITIES } from '../src/ui/class_details_data';
-import { CLASSES, ABILITIES } from '../src/sim/content/classes';
+import { describe, expect, it } from 'vitest';
+import { ABILITIES, CLASSES } from '../src/sim/content/classes';
 import type { PlayerClass } from '../src/sim/types';
+import { CLASS_DETAILS, SIGNATURE_ABILITIES, SPEC_CARD_INFO } from '../src/ui/class_details_data';
 
 // Guards the hand-maintained character-select showcase data against drift from
 // the sim's source of truth. If a class's ability kit or roster changes, these
@@ -41,4 +41,19 @@ describe('character-select class details parity', () => {
       }
     });
   }
+});
+
+describe('mage specialization card metadata', () => {
+  it('covers all three mage specs with real ability examples', () => {
+    for (const id of ['fire', 'frost', 'arcane']) {
+      const card = SPEC_CARD_INFO[id];
+      expect(card, `missing mage spec card for ${id}`).toBeTruthy();
+      if (!card) continue;
+      expect(card.primaryStat).toBe('int');
+      expect(card.examples.length).toBeGreaterThanOrEqual(3);
+      for (const abilityId of card.examples) {
+        expect(ABILITIES[abilityId], `ability "${abilityId}" does not exist`).toBeTruthy();
+      }
+    }
+  });
 });

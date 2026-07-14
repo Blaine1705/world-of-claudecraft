@@ -55,16 +55,14 @@ describe('talents_window: no magic values', () => {
   });
 
   it('wires Choices row radios to roving tabindex and arrow-key selection', () => {
-    expect(painter).toContain('const rowOptCards: HTMLElement[] = [];');
-    expect(painter).toContain(
-      "card.setAttribute('tabindex', row.unlocked && optionIndex === rovingIndex ? '0' : '-1')",
+    const rowsPainter = readFileSync(
+      new URL('../src/ui/talent_rows_tab.ts', import.meta.url),
+      'utf8',
     );
-    expect(painter).toContain("const next = rovingTarget(ke.key, i, rowOptCards.length, 'both');");
-    expect(painter).toMatch(
-      /this\.deps\s*\.root\(\)\s*\.querySelectorAll\('\.tal-row-opts'\)\s*\[rowIndex\]/,
-    );
-    expect(painter).toContain(
-      'this.keyboardActivate(ke, () => this.pickRowChoice(stage, row.level, option.id));',
-    );
+    expect(rowsPainter).toContain('class="tal-row-opt');
+    expect(rowsPainter).toContain('aria-pressed=');
+    expect(rowsPainter).toContain('data-row=');
+    expect(rowsPainter).toContain('deps.pickRow(rowIndex, wasPicked ? null : optId);');
+    expect(painter).toContain("const next = rovingTarget(ke.key, i, tabs.length, 'horizontal');");
   });
 });

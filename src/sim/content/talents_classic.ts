@@ -122,7 +122,7 @@ const MAGE_SPECS: SpecDef[] = [
     'Chronomancy',
     'healer',
     '*',
-    'A temporal healer who repairs, prevents and rewinds harm with time-bending Arcane magic.',
+    'A mage who manipulates time and aether to protect allies. They can anticipate wounds, repeat healing, and reverse damage before it is too late.',
     'temporal_mend',
     'Chronoweave',
     'Increases all healing you do by 15%, your maximum mana by 5%, and your mana regeneration by 20%.',
@@ -134,7 +134,7 @@ const MAGE_SPECS: SpecDef[] = [
     'Pyromancy',
     'dps',
     'x',
-    'A volatile caster built around fast, high-damage Fire spells.',
+    'A master of flame who chains critical strikes into devastating explosions. Fast, aggressive, and capable of igniting many enemies.',
     // Signature swapped to the Hot Streak spender (owner leveling pass 2026-07-14):
     // Combustion moved into the spec kit at level 12, and a signature grant would
     // bypass that learnLevel gate (grants always do).
@@ -152,7 +152,7 @@ const MAGE_SPECS: SpecDef[] = [
     'Cryomancy',
     'dps',
     '#',
-    'A controlling caster who trades peak burst for survival and slows.',
+    'A spellcaster who controls the battlefield with ice, slows, and freezes. They build glacial power to destroy enemies with precise attacks.',
     // Signature swapped to the proc spender (owner leveling pass 2026-07-14):
     // Icy Veins moved into the spec kit at level 12 (see combustion above).
     'ice_lance',
