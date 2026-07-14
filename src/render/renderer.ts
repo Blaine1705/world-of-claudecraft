@@ -85,8 +85,8 @@ import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_po
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { objectDisplayName } from './entity_labels';
-import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
+import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFish, type FishView } from './fish';
 import {
   buildFoliage,
@@ -4773,7 +4773,7 @@ export class Renderer {
               ? 'nythraxis'
               : inside
                 ? 'dungeon'
-                : camY < WATER_LEVEL - 0.05
+                : camY < waterLevelAt(px, pz) - 0.05
                   ? 'underwater'
                   : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
@@ -5492,9 +5492,9 @@ export class Renderer {
       }
 
       // swimming pose: prone at the surface (derived here, the sim is unaware).
-      // The cheap feet-depth test gates on the flat sea level first, so the vast
-      // majority (everyone on land) skip groundHeight() entirely each frame.
-      const wl = WATER_LEVEL;
+      // waterLevelAt is -Infinity outside a declared lake, so dry terrain never
+      // enters the swimming pose even when its sculpted height is below sea level.
+      const wl = waterLevelAt(e.pos.x, e.pos.z);
       const swimming =
         !e.dead &&
         e.pos.y <= wl - 0.5 &&
@@ -6570,7 +6570,7 @@ export class Renderer {
               : null;
       // Only at the water's edge / in it — sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.
-      const nearWater = !inDungeon && groundHeight(px, pz, seed) < WATER_LEVEL + 0.4;
+      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
       const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);

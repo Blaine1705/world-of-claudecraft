@@ -15,7 +15,7 @@ vi.mock('../../server/db', () => ({
 }));
 
 import { GameServer, mobZonePhase, SIM_LAP_PHASES, SIM_MOB_ZONE_PHASES } from '../../server/game';
-import { ZONES } from '../../src/sim/data';
+import { DUNGEON_X_THRESHOLD, ZONES } from '../../src/sim/data';
 import { Sim } from '../../src/sim/sim';
 import type { Entity } from '../../src/sim/types';
 
@@ -230,13 +230,15 @@ describe('tick perf capture lifecycle', () => {
     const at = (x: number, z: number): string => mobZonePhase({ pos: { x, z } } as Entity);
     // Each overworld zone resolves to its own registered bucket.
     for (const zone of ZONES) {
-      const mid = (zone.zMin + zone.zMax) / 2;
-      const bucket = at(0, mid);
+      const x =
+        zone.xMin !== undefined && zone.xMax !== undefined ? (zone.xMin + zone.xMax) / 2 : 0;
+      const z = (zone.zMin + zone.zMax) / 2;
+      const bucket = at(x, z);
       expect(bucket).toBe(`sim.mob.z:${zone.id}`);
       expect(SIM_MOB_ZONE_PHASES).toContain(bucket);
     }
     // Instance/delve mobs (x beyond the dungeon threshold) share the 'instance' bucket.
-    expect(at(10_000, 0)).toBe('sim.mob.z:instance');
+    expect(at(DUNGEON_X_THRESHOLD + 1, 0)).toBe('sim.mob.z:instance');
     // Distinct overworld zones do not collapse into one bucket.
     expect(at(0, (ZONES[0].zMin + ZONES[0].zMax) / 2)).not.toBe(
       at(0, (ZONES[1].zMin + ZONES[1].zMax) / 2),
