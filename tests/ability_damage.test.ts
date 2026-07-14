@@ -35,7 +35,11 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     if (!hourglass) return;
     expect(abilityTemporalHourglassValues(hourglass)).toEqual({
       healing: 30,
-      cooldownRecovery: 50,
+      hostilePveDuration: 60,
+      hostilePvpDuration: 10,
+      groundDuration: 30,
+      selfCooldownRecovery: 100,
+      allyCooldownRecovery: 75,
     });
   });
 
