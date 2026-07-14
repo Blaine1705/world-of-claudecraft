@@ -679,6 +679,27 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // the Veiled Hollow stags: the shipped stag rig repainted to the approved
+  // concepts (tmp/make_hollow_stags.mjs): dusk coats baked into the materials
+  // and the antlers split onto their own emissive amethyst material, so no
+  // entity tint (a wash would muddy the baked palette and the antler glow)
+  mob_veiled_stag: {
+    url: `${CREATURES}/veiled_stag.glb`,
+    height: 1.9,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  mob_gleamstag: {
+    url: `${CREATURES}/gleamstag.glb`,
+    height: 1.9,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  // Aurelhorn keeps the bull's bulk (height) but joins the herd's species:
+  // the same repainted stag rig in the patriarch's gold
+  mob_aurelhorn: {
+    url: `${CREATURES}/aurelhorn.glb`,
+    height: 2.1,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
   // Deepfen Spearjaw (The Drowned Litany): unused Quaternius raptor rig, a
   // toothy quadruped that reads far more like a swamp predator than the
   // generic wolf fallback (docs/prd/drowned-litany-asset-generation-plan.md).
@@ -1235,8 +1256,8 @@ const MOB_KEYS: Record<string, string> = {
   // wolf; the court guardians borrow the golem rig as stone constructs; the
   // spirits, mushroom folk, and treants get realm-only rigs (ghost, glub,
   // yeti) that appear nowhere in the outer three zones
-  veiled_stag: 'mob_stag',
-  gleamstag: 'mob_stag',
+  veiled_stag: 'mob_veiled_stag',
+  gleamstag: 'mob_gleamstag',
   gilded_stag: 'mob_stag',
   gloam_fox: 'mob_fox',
   orchard_treant: 'mob_treant',
@@ -1252,7 +1273,7 @@ const MOB_KEYS: Record<string, string> = {
   mushroom_pixie: 'mob_mushroom_pixie',
   treant_elder: 'mob_treant',
   old_marrowshell: 'mob_crab',
-  aurelhorn: 'mob_bull',
+  aurelhorn: 'mob_aurelhorn',
   // the Nightbloom: silver herds, night-running raptors, hovering star folk;
   // the Barrow King borrows the armored skeleton the other revenants wear
   moonfleece_grazer: 'mob_alpaca',
