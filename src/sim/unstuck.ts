@@ -129,9 +129,7 @@ export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): Loca
   const claimId = ctx.instanceClaimIdAt(pos);
   if (claimId !== null) {
     const instance = ctx.instances.find(
-      (candidate) =>
-        candidate.exitId === claimId &&
-        candidate.partyKey === ctx.instanceKeyFor(pid),
+      (candidate) => candidate.exitId === claimId && candidate.partyKey === ctx.instanceKeyFor(pid),
     );
     if (!instance) return null;
     return located(

@@ -227,7 +227,7 @@ const SPIDER: ClipMap = {
   death: 'Spider_Death', // no hit-react in asset
 };
 
-// Velociraptor rig (velociraptor.glb) — like the spider, no hit-react clips
+// Velociraptor rig (velociraptor.glb): like the spider, no hit-react clips
 const RAPTOR: ClipMap = {
   idle: 'Velociraptor_Idle',
   walk: 'Velociraptor_Walk',

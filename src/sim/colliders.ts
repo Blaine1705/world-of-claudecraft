@@ -390,7 +390,7 @@ function decorationCollider(seed: number, d: Decoration): Collider | null {
       cameraTopY: topY(seed, d.x, d.z, 1.25 * d.scale),
     };
   }
-  // tree trunks only — canopies don't block
+  // tree trunks only; canopies don't block
   return {
     type: 'circle',
     x: d.x,

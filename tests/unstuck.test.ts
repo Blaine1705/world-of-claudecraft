@@ -630,15 +630,12 @@ describe('unstuck area identity', () => {
       sim.partyAccept(member);
     }
     sim.convertPartyToRaid(owner);
-    required(sim.meta(owner), 'raid owner metadata').questsDone.add(
-      'q_nythraxis_bound_guardian',
-    );
+    required(sim.meta(owner), 'raid owner metadata').questsDone.add('q_nythraxis_bound_guardian');
     sim.enterDungeon('nythraxis_boss_arena', owner);
 
     const claim = required(
       sim.instances.find(
-        (instance) =>
-          instance.dungeonId === 'nythraxis_boss_arena' && instance.partyKey !== null,
+        (instance) => instance.dungeonId === 'nythraxis_boss_arena' && instance.partyKey !== null,
       ),
       'live Nythraxis claim',
     );
