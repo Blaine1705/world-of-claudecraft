@@ -7419,6 +7419,7 @@ export class Hud {
         }),
         this.mobileActionPage,
         mobilePageCount(),
+        this.attackSlotIsAttack(),
       );
     }
 
