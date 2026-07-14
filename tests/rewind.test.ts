@@ -338,5 +338,9 @@ describe('Rewind: rules', () => {
     expect(
       events.filter((event) => event.type === 'spellfx' && event.fx === 'temporalClock'),
     ).toHaveLength(1);
+    expect(events.some((event) => event.type === 'spellfx' && event.fx === 'nova')).toBe(false);
+    expect(
+      events.filter((event) => event.type === 'spellfx' && event.fx === 'temporalRewindNova'),
+    ).toHaveLength(1);
   });
 });

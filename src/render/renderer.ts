@@ -3172,6 +3172,8 @@ export class Renderer {
           this.pulseAt(ev.targetId, 'arcane', 5, 0.45);
         } else if (ev.fx === 'temporalClock') {
           // Audio-only cue. The authoritative Rewind nova is emitted separately.
+        } else if (ev.fx === 'temporalRewindNova') {
+          this.vfx.nova(ev.targetId, ev.school);
         } else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);

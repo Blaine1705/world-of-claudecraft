@@ -67,13 +67,14 @@ export function applyRewind(
   p: RewindParams,
   abilityName: string,
 ): number {
-  // The arcane wave rolling off the Chronomancer (an area telegraph on the caster).
+  // The arcane wave rolling off the Chronomancer. Its specific cue preserves the
+  // nova visual without triggering the generic spell_nova audio clip.
   ctx.emit({
     type: 'spellfx',
     sourceId: caster.id,
     targetId: caster.id,
     school: 'arcane',
-    fx: 'nova',
+    fx: 'temporalRewindNova',
   });
   ctx.emit({
     type: 'spellfx',

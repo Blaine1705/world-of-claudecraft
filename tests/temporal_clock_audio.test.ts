@@ -21,6 +21,8 @@ describe('Chronomancy clock audio', () => {
     const hud = source('../src/ui/hud.ts');
 
     expect(rewind.match(/fx: 'temporalClock'/g)).toHaveLength(1);
+    expect(rewind).toContain("fx: 'temporalRewindNova'");
+    expect(rewind).not.toContain("fx: 'nova'");
     expect(hud).toContain("if (ev.fx === 'temporalClock')");
     expect(hud).toContain('audio.temporalClock(2)');
   });
