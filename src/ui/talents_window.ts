@@ -338,7 +338,11 @@ export class TalentsWindow {
           `<div class="ts-det-cx ts-cx-${info.complexity}"><span class="ts-det-cx-cap">${t('hudChrome.specPanel.complexity')}</span> ${t(cxKey)}</div>` +
           `</div>`;
       }
-      html += `<div class="ts-det-mastery"><b>${esc(masteryName)}</b> - ${esc(masteryDesc)}</div>`;
+      const masteryIcon =
+        sp.id === 'arcane'
+          ? `<span class="ts-mastery-icon" style="background-image:url(${iconDataUrl('ability', 'arcane_power')})" aria-label="${esc(signatureName('arcane_power'))}" role="img"></span>`
+          : '';
+      html += `<div class="ts-det-mastery">${masteryIcon}<span><b>${esc(masteryName)}</b> - ${esc(masteryDesc)}</span></div>`;
       if (info?.examples.length) {
         html += `<div class="ts-ex-block"><div class="ts-det-label">${t('hudChrome.specPanel.exampleAbilities')}</div><div class="ts-ex-list">`;
         for (const id of info.examples) {
