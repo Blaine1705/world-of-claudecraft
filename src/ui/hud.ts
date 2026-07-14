@@ -19,6 +19,7 @@ import {
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
+import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
@@ -32,6 +33,11 @@ import { currentDayNightPhase } from '../render/day_night_clock';
 import { globalDayness, skyTintForDayness } from '../render/day_night_core';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
+import {
+  type ChatSenderFlair,
+  normalizeStreamerLink,
+  type StreamerLinks,
+} from '../sim/account_flair';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
@@ -86,6 +92,7 @@ import type {
   AbilityDef,
   CalendarResultCode,
   EquipSlot,
+  HonorReason,
   InvSlot,
   ItemInstancePayload,
   ItemSlot,
@@ -119,6 +126,7 @@ import {
 import { isAtSowfield } from '../sim/vale_cup_layout';
 import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
+  type CharacterProfile,
   type DailyRewardStatus,
   type DelveRunInfo,
   type IWorld,
@@ -185,8 +193,18 @@ import {
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
 } from './chat_channels';
+import {
+  ignoreKey,
+  type PlayerSocialFlags,
+  parseIgnoreList,
+  resolvePlayerSocialFlags,
+  serializeIgnoreList,
+} from './chat_ignore_core';
+import { appendChatLineParts, CHAT_MESSAGE_TOKEN, CHAT_NAME_TOKEN, chatAiTagEl } from './chat_line';
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './chat_timestamp';
 import { type ChatBoxGeometry, clampChatBox, parseChatBox, serializeChatBox } from './chat_window';
+import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
+import { ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
 import { CombatAnnouncer } from './combat_announcer';
 import {
@@ -379,7 +397,13 @@ import {
   type PublishedCard,
   publishCard,
 } from './player_card_share';
-import { chatPlayerContextActions } from './player_context_menu';
+import {
+  chatPlayerContextActions,
+  type PlayerContextAction,
+  type PlayerContextActionId,
+  streamerActionPlatform,
+  streamerMenuActions,
+} from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
@@ -402,7 +426,12 @@ import {
   type StatTooltipModel,
   weaponDps,
 } from './stat_tooltip';
-import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
+import {
+  type StatTooltipI18n,
+  statCellHtml,
+  statNameKey,
+  statTooltipHtml,
+} from './stat_tooltip_view';
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
@@ -443,8 +472,14 @@ import {
   wocBalanceVerified,
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
+import {
+  installWindowDrag,
+  isWindowDragPreviewMutation,
+  type WindowDragController,
+} from './window_drag';
 import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
+import { stackedWindowsVisible } from './window_stack_state_core';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
@@ -505,6 +540,37 @@ export interface GamepadBindingsHooks {
 export interface ReportHooks {
   submit(targetPid: number, reason: string, details: string): Promise<void>;
   submitByName?(targetName: string, reason: string, details: string): Promise<void>;
+}
+
+/**
+ * Online-only glue that backs the Claudium store window. main.ts wires this from
+ * the client economy SDK (which hits the game server's /api/claudium/* routes).
+ * snapshot() reads the current service state; buy()/spend() begin the client-signed
+ * purchase / cosmetic-redeem flows. All values originate in the economy service.
+ */
+export interface ClaudiumHooks {
+  balance(): Promise<number | null>;
+  storeSnapshot(): Promise<{
+    available: boolean;
+    balance: number | null;
+    storeItems: readonly ClaudiumStoreItem[];
+  }>;
+  snapshot(): Promise<ClaudiumSnapshot>;
+  buy(rail: ClaudiumRail, sku: string): Promise<void>;
+  spend(
+    itemId: string,
+    kind: 'cosmetic' | 'skin' | 'item',
+    expectedCostClaudium: number,
+  ): Promise<{
+    granted: boolean;
+    balance: number | null;
+    costClaudium: number | null;
+    reason: string | null;
+  }>;
+}
+
+export interface HudFeatures {
+  dailyRewardsEnabled: boolean;
 }
 
 export interface BugReportPayload {
@@ -652,6 +718,12 @@ const CALENDAR_RESULT_KEYS: Record<CalendarResultCode, TranslationKey> = {
   calendarFull: 'hudChrome.calendar.result.calendarFull',
   eventGone: 'hudChrome.calendar.result.eventGone',
 };
+const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
+  arena_win: 'hudChrome.warfare.reasons.arenaWin',
+  fiesta_kill: 'hudChrome.warfare.reasons.fiestaKill',
+  fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
+  fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
+};
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
   'hud.markers.names.circle',
@@ -739,7 +811,13 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = [
   'cry',
 ];
 
-const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
+// yards past a zone boundary before the crossing banner/welcome commits
+const ZONE_BANNER_DEADBAND = 5;
+// The OFFLINE ignore store. Online, the ignore list is server-persisted and
+// arrives on the `social` frame, so this set is not consulted at all (see the
+// chat event filter): keeping a second, name-keyed local list live online is
+// exactly how you get "I unignored them and still cannot see them".
+const LOCAL_IGNORES_KEY = 'woc_ignored_chat_names';
 // Classic-style chat tabs: the ordered channel tabs the player has opened, and the
 // tab that was active last session. The built-in `all`/`combat` views are
 // implicit and never stored.
@@ -1155,9 +1233,12 @@ export class Hud {
     number,
     { event: Extract<SimEvent, { type: 'lootRoll' }>; receivedAt: number; durationMs: number }
   >();
-  // rolls the player has answered or let expire locally; suppresses the
-  // snapshot reconcile from re-showing them until the server drops the roll
-  private dismissedLootRolls = new Set<number>();
+  // rolls the player has answered or let expire locally, mapped to the wall-clock
+  // time of that dismissal. The reconcile keeps them out of the DOM while the
+  // authoritative mirror still lists them open, re-showing only if one stays open
+  // past a short grace (a genuinely dropped submit) so a normal answer does not
+  // flash back; the entry is forgotten once the server drops the roll.
+  private dismissedLootRolls = new Map<number, number>();
   // shown rolls already observed in the open-roll mirror at least once, so their
   // later absence from the mirror means the server resolved them (retire), not
   // that the mirror simply has not caught up to a just-shown event yet.
@@ -1279,12 +1360,7 @@ export class Hud {
   // The quest-giver glyphs of the last overworld map paint, for the hover
   // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
   private mapNpcMarkers: MapNpcMarker[] = [];
-  private windowDrag: {
-    el: HTMLElement;
-    pointerId: number;
-    offsetX: number;
-    offsetY: number;
-  } | null = null;
+  private windowDragController: WindowDragController | null = null;
   // Movable/resizable chat box: current geometry (null = stock CSS default) plus
   // the in-progress pointer gesture, if any. See chat_window.ts for the math.
   private chatBox: ChatBoxGeometry | null = null;
@@ -1309,7 +1385,7 @@ export class Hud {
   private playerFrameMover: MovableFrame | null = null;
   private windowObserver: MutationObserver | null = null;
   private windowZ = 50;
-  private ignoredChatNames = new Set<string>();
+  private localIgnoredNames = new Set<string>();
   private lastHudFastAt = 0;
   private lastHudMediumAt = 0;
   private lastHudSlowAt = 0;
@@ -1380,8 +1456,9 @@ export class Hud {
     private sim: IWorld,
     private renderer: Renderer,
     private keybinds: Keybinds,
+    private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
-    this.ignoredChatNames = this.loadIgnoredChatNames();
+    this.localIgnoredNames = this.loadLocalIgnoredNames();
     this.meters = new Meters(sim);
     this.initChatTabs();
     this.initChatBoxGeometry();
@@ -1566,6 +1643,7 @@ export class Hud {
       this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
       dailyRewardsButton.innerHTML =
         '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
+      this.syncDailyRewardsSurfaceLabels();
       dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
       dailyRewardsButton.addEventListener('pointerdown', (event) => {
@@ -1964,6 +2042,7 @@ export class Hud {
       markResizableWindow(el);
     };
     this.windowObserver = new MutationObserver((mutations) => {
+      const windowsToSync = new Set<HTMLElement>();
       for (const m of mutations) {
         if (m.type === 'childList') {
           m.addedNodes.forEach((node) => {
@@ -1974,58 +2053,24 @@ export class Hud {
           continue;
         }
         if (m.target instanceof HTMLElement && m.target.matches('.window.panel')) {
-          this.syncWindowOpenState(m.target);
+          if (isWindowDragPreviewMutation(m.attributeName, m.target)) continue;
+          windowsToSync.add(m.target);
         }
       }
+      for (const win of windowsToSync) this.syncWindowOpenState(win);
     });
     document.querySelectorAll<HTMLElement>('.window.panel').forEach(observeWindow);
     this.windowObserver.observe(document.body, { childList: true, subtree: true });
     this.syncAnyWindowOpenState();
 
-    document.addEventListener('pointerdown', (ev) => {
-      const target = ev.target as HTMLElement | null;
-      const el = target?.closest?.('.window.panel') as HTMLElement | null;
-      if (!el) return;
-      this.bringWindowToFront(el);
-      if (ev.button !== 0 || !target || !this.isWindowDragHandle(target, el)) return;
-      ev.preventDefault();
-      this.hideTooltip();
-      const rect = el.getBoundingClientRect();
-      this.setWindowPixelPosition(el, rect.left, rect.top, rect);
-      this.windowDrag = {
-        el,
-        pointerId: ev.pointerId,
-        offsetX: ev.clientX - rect.left,
-        offsetY: ev.clientY - rect.top,
-      };
-      el.classList.add('window-dragging');
-      el.dataset.windowMoved = '1';
-      try {
-        target.setPointerCapture?.(ev.pointerId);
-      } catch {
-        /* synthetic/legacy pointer without active capture */
-      }
+    this.windowDragController = installWindowDrag({
+      getScale: () => getUiScale(),
+      isDragHandle: (target, el) => this.isWindowDragHandle(target, el),
+      bringToFront: (el) => this.bringWindowToFront(el),
+      hideTooltip: () => this.hideTooltip(),
+      pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
+      commitWindow: (el, left, top, rect) => this.setWindowPixelPosition(el, left, top, rect),
     });
-    document.addEventListener('pointermove', (ev) => {
-      const drag = this.windowDrag;
-      if (!drag || drag.pointerId !== ev.pointerId) return;
-      ev.preventDefault();
-      const rect = drag.el.getBoundingClientRect();
-      this.setWindowPixelPosition(
-        drag.el,
-        ev.clientX - drag.offsetX,
-        ev.clientY - drag.offsetY,
-        rect,
-      );
-    });
-    const endDrag = (ev: PointerEvent) => {
-      const drag = this.windowDrag;
-      if (!drag || drag.pointerId !== ev.pointerId) return;
-      drag.el.classList.remove('window-dragging');
-      this.windowDrag = null;
-    };
-    document.addEventListener('pointerup', endDrag);
-    document.addEventListener('pointercancel', endDrag);
     installWindowResize({
       getScale: () => getUiScale(),
       pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
@@ -2078,6 +2123,15 @@ export class Hud {
       .filter((win) => win.id !== 'mobile-extra-controls')
       .some((win) => this.isWindowVisible(win));
     document.body.classList.toggle('mobile-window-open', anyOpen);
+    const storeWindow = document.getElementById('daily-rewards-window') as HTMLElement | null;
+    const claudiumWindow = document.getElementById('claudium-window') as HTMLElement | null;
+    document.body.classList.toggle(
+      'store-stack-open',
+      stackedWindowsVisible(
+        !!storeWindow && this.isWindowVisible(storeWindow),
+        !!claudiumWindow && this.isWindowVisible(claudiumWindow),
+      ),
+    );
     const mapWindow = document.getElementById('map-window');
     const questLogWindow = document.getElementById('quest-log-window');
     document.body.classList.toggle(
@@ -2126,13 +2180,22 @@ export class Hud {
   }
 
   private bringWindowToFront(el: HTMLElement): void {
+    // The confirm/input prompt is the topmost modal by definition and never
+    // joins the 50-89 window band: banding it (a pointerdown raise, or the
+    // normalize sweep) drops it BEHIND the armory inspect overlay (z 90), so a
+    // real mouse press on the dialog demotes it mid-click and its own OK
+    // button becomes unclickable (the "phantom dead confirm" bug).
+    if (el.id === 'confirm-dialog') {
+      el.style.zIndex = String(Math.max(this.windowZValue(el), 95));
+      return;
+    }
     if (this.windowZ >= 89) this.normalizeWindowZ();
     el.style.zIndex = String(++this.windowZ);
   }
 
   private normalizeWindowZ(): void {
     const open = [...document.querySelectorAll<HTMLElement>('.window.panel')]
-      .filter((el) => this.isWindowVisible(el))
+      .filter((el) => el.id !== 'confirm-dialog' && this.isWindowVisible(el))
       .sort((a, b) => this.windowZValue(a) - this.windowZValue(b));
     this.windowZ = 50;
     for (const el of open) el.style.zIndex = String(++this.windowZ);
@@ -2258,7 +2321,7 @@ export class Hud {
   }
 
   private closeManagedWindow(el: HTMLElement): void {
-    if (this.windowDrag?.el === el) this.windowDrag = null;
+    this.windowDragController?.cancel(el);
     delete el.dataset.windowOpen;
     switch (el.id) {
       case 'confirm-dialog':
@@ -3689,6 +3752,8 @@ export class Hud {
     root: () => $('#bags'),
     world: () => this.sim,
     wocBalanceHtml: () => this.wocBalanceHtml(),
+    claudiumLauncherHtml: () => this.claudiumLauncherHtml(),
+    openClaudium: () => this.toggleClaudium(),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     cancelPetFeed: () => this.cancelPetFeed(),
@@ -3998,11 +4063,62 @@ export class Hud {
     onWalletConnect: () => {
       window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
     },
-    showChestButton: () => this.showDailyRewardsChestButton(),
-    setShowChestButton: (show) => this.setDailyRewardsChestButtonPreference(show),
+    storeEnabled: () => this.claudiumHooks !== null,
+    storeSnapshot: async () => {
+      const snapshot = await this.claudiumHooks?.storeSnapshot();
+      if (!snapshot) return { available: false, balance: null, items: [] };
+      this.setClaudiumLauncherBalance(snapshot.balance);
+      return {
+        available: snapshot.available,
+        balance: snapshot.balance,
+        items: [...snapshot.storeItems],
+      };
+    },
+    spendStoreItem: async (itemId, kind, expectedCostClaudium) => {
+      const result = await this.claudiumHooks?.spend(itemId, kind, expectedCostClaudium);
+      if (result?.balance !== null && result?.balance !== undefined) {
+        this.setClaudiumLauncherBalance(result.balance);
+      }
+      return (
+        result ?? {
+          granted: false,
+          balance: null,
+          costClaudium: null,
+          reason: 'unavailable',
+        }
+      );
+    },
+    openClaudium: () => this.toggleClaudium(),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+  });
+  // Claudium (server-authoritative soft currency) window. main.ts injects the
+  // economy hooks when online via attachClaudium; until then (and offline) the
+  // hooks are null and the window renders its clean disabled/empty state. The
+  // window computes NOTHING; every number rides in through these hooks.
+  private claudiumHooks: ClaudiumHooks | null = null;
+  private claudiumLauncherBalance: number | null = null;
+  private claudiumLauncherBalancePending = false;
+  private claudiumLauncherBalanceLastMs = 0;
+  private claudiumLauncherBalanceSeq = 0;
+  private readonly claudiumWindow = new ClaudiumWindow({
+    root: () => $('#claudium-window'),
+    closeOthers: () => this.closeOtherWindows('#claudium-window'),
+    snapshot: async () => {
+      const snapshot =
+        (await this.claudiumHooks?.snapshot()) ??
+        ({
+          balance: null,
+          skus: [],
+          nativeRails: { sol: false, woc: false },
+        } satisfies ClaudiumSnapshot);
+      this.setClaudiumLauncherBalance(snapshot.balance);
+      return snapshot;
+    },
+    buy: (rail, sku) => this.claudiumHooks?.buy(rail, sku) ?? Promise.resolve(),
+    ...this.windowFocus('#claudium-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
@@ -4018,7 +4134,11 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
     abilitySummary: (known) =>
-      describeAbilitySummary(known, this.sim.player.resourceType, this.sim.player.spellHaste),
+      describeAbilitySummary(
+        known,
+        this.sim.player.resourceType,
+        playerSpellHasteFrac(this.sim.player),
+      ),
     abilityTooltip: (known) => this.abilityTooltip(known),
     barAbilityIds: () =>
       this.hotbarActions.flatMap((a) => (a && a.type === 'ability' ? [a.id] : [])),
@@ -4117,6 +4237,46 @@ export class Hud {
       ? t('wallet.balanceAria', { balance })
       : t('wallet.balancePreviewAria', { balance });
     return `<span class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</span>`;
+  }
+
+  private claudiumLauncherHtml(): string {
+    if (!this.claudiumHooks) return '';
+    this.refreshClaudiumLauncherBalance();
+    const label =
+      this.claudiumLauncherBalance === null
+        ? '--'
+        : formatNumber(this.claudiumLauncherBalance, { maximumFractionDigits: 0 });
+    const aria = t('hudChrome.claudium.open');
+    return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
+  }
+
+  private setClaudiumLauncherBalance(balance: number | null): void {
+    this.claudiumLauncherBalance = balance;
+    this.claudiumLauncherBalanceLastMs = Date.now();
+  }
+
+  private refreshClaudiumLauncherBalance(force = false): void {
+    if (!this.claudiumHooks || this.claudiumLauncherBalancePending) return;
+    const now = Date.now();
+    if (!force && now - this.claudiumLauncherBalanceLastMs < 30_000) return;
+    this.claudiumLauncherBalancePending = true;
+    const seq = ++this.claudiumLauncherBalanceSeq;
+    void this.claudiumHooks
+      .balance()
+      .then((balance) => {
+        if (seq !== this.claudiumLauncherBalanceSeq) return;
+        this.setClaudiumLauncherBalance(balance);
+        if ($('#bags').style.display !== 'none') this.renderBags();
+      })
+      .catch(() => {
+        if (seq !== this.claudiumLauncherBalanceSeq) return;
+        this.setClaudiumLauncherBalance(null);
+      })
+      .finally(() => {
+        if (seq === this.claudiumLauncherBalanceSeq) {
+          this.claudiumLauncherBalancePending = false;
+        }
+      });
   }
 
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
@@ -4515,6 +4675,15 @@ export class Hud {
         }),
       )}</div>`;
     }
+    const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
+    if (warfareRating > 0) {
+      html += `<div class="tt-green">${esc(
+        t('itemUi.tooltip.stat', {
+          value: itemNumber(warfareRating),
+          stat: t(statNameKey('warfare') as TranslationKey),
+        }),
+      )}</div>`;
+    }
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -4661,7 +4830,9 @@ export class Hud {
           minimumFractionDigits: d.decimals,
           maximumFractionDigits: d.decimals,
         });
-        return `<div class="${cls}">${sign}${magnitude} ${esc(t(`itemUi.stats.${d.stat}` as TranslationKey))}</div>`;
+        return `<div class="${cls}">${sign}${magnitude} ${esc(
+          t(statNameKey(d.stat) as TranslationKey),
+        )}</div>`;
       })
       .join('');
     let html = `<div class="tt-cmp"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
@@ -4743,6 +4914,7 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    this.syncDailyRewardsSurfaceLabels();
     this.refreshKeybindLabels();
     this.updateQuestTracker();
     this.updateDelveTracker();
@@ -4816,7 +4988,7 @@ export class Hud {
     const rangeLine = abilityRangeLine(a);
     if (rangeLine) costLine.push(rangeLine);
     if (costLine.length) html += `<div class="tt-stat">${costLine.map(esc).join(' &nbsp; ')}</div>`;
-    const castLine = [abilityCastLine(res, this.sim.player.spellHaste)];
+    const castLine = [abilityCastLine(res, playerSpellHasteFrac(this.sim.player))];
     // Use the RESOLVED cooldown (res.cooldown), not res.def.cooldown, so talents that
     // reduce cooldown (Improved Mortal Strike, Barrage, Improved Fire Blast, ...) show
     // their effect in the tooltip.
@@ -6632,10 +6804,26 @@ export class Hud {
   }
 
   private dailyRewardsEnabled(): boolean {
-    return !(
-      document.body.classList.contains('native-app') &&
-      document.body.classList.contains('mobile-touch')
-    );
+    return this.features.dailyRewardsEnabled;
+  }
+
+  private syncDailyRewardsSurfaceLabels(): void {
+    const storeEnabled = this.claudiumHooks !== null;
+    const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
+    const labelKey = storeEnabled ? 'hudChrome.wocStore.storeTab' : 'hudChrome.dailyRewards.title';
+    const title = t(titleKey);
+    for (const button of [this.dailyRewardsButtonEl, this.mobileDailyRewardsButtonEl]) {
+      if (!button) continue;
+      button.setAttribute('data-i18n-title', titleKey);
+      button.setAttribute('data-i18n-aria', titleKey);
+      button.title = title;
+      button.setAttribute('aria-label', title);
+    }
+    const label = this.mobileDailyRewardsButtonEl?.querySelector<HTMLElement>('.mobile-label');
+    if (label) {
+      label.setAttribute('data-i18n', labelKey);
+      label.textContent = t(labelKey);
+    }
   }
 
   private showDailyRewardsChestButton(): boolean {
@@ -8812,6 +9000,12 @@ export class Hud {
       }
       case 'castStart': {
         const ent = sim.entities.get(ev.entityId);
+        // Chain Heal uses a custom one-shot healing cast clip (cast_chain_heal)
+        // instead of the earthy nature cast loop its school would otherwise pick.
+        if (ent && ev.ability === 'chain_heal') {
+          this.combat('cast_chain_heal', ent.pos.x, ent.pos.y, ent.pos.z, 0.45);
+          return;
+        }
         const key = castCueForAbility(ev.ability);
         if (ent && key) {
           sfx.loop(`cast:${ev.entityId}`, key, 0.45 * COMBAT_GAIN, ent.pos.x, ent.pos.y, ent.pos.z);
@@ -9124,6 +9318,28 @@ export class Hud {
           }
           break;
         }
+        case 'honor': {
+          const amount = formatNumber(ev.amount, { maximumFractionDigits: 0 });
+          const honorShape = fctSpawnShape({ type: 'honor' });
+          if (honorShape) {
+            this.fctPainter.spawn(
+              {
+                ...honorShape,
+                text: t('hudChrome.warfare.honorFloat', { amount }),
+                target: sim.player,
+              },
+              now,
+            );
+          }
+          this.combatLog(
+            t('hudChrome.warfare.honorGain', {
+              amount,
+              reason: t(HONOR_REASON_KEYS[ev.reason]),
+            }),
+            '#ffd100',
+          );
+          break;
+        }
         case 'levelup': {
           this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
@@ -9160,6 +9376,9 @@ export class Hud {
           break;
         }
         case 'learnAbility':
+          // A newly granted ability (level-up or spec signature) must appear in
+          // an open spellbook right away, not on the next manual reopen.
+          if (this.spellbookWindow.isOpen) this.spellbookWindow.render();
           break; // logged by sim
         case 'comboPoint':
           break;
@@ -9320,7 +9539,11 @@ export class Hud {
           this.refreshGossip();
           break;
         case 'chat': {
-          if (this.isChatIgnored(ev.from)) break;
+          // OFFLINE ONLY. Online, the server drops an ignored player's public chat
+          // before it reaches us (and honours the whisper/roll carve-outs), so
+          // consulting the local list here as well would resurrect stale ignores
+          // the player has since cleared from their account.
+          if (this.sim.socialInfo === null && this.localIgnoredNames.has(ignoreKey(ev.from))) break;
           switch (ev.channel) {
             case 'party':
               this.chatLogFrom(
@@ -9330,6 +9553,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.party,
                 'party',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9341,6 +9565,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9355,6 +9580,7 @@ export class Hud {
                   CHAT_TEMPLATE_KEYS.toWhisper,
                   'whisper',
                   ev.fromPid,
+                  ev.flair,
                 );
               else {
                 this.chatLogFrom(
@@ -9364,6 +9590,7 @@ export class Hud {
                   CHAT_TEMPLATE_KEYS.whisper,
                   'whisper',
                   ev.fromPid,
+                  ev.flair,
                   ev.fromTitle,
                 );
                 audio.whisper();
@@ -9377,6 +9604,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.general,
                 'general',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9388,6 +9616,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.world,
                 'world',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9399,6 +9628,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.lfg,
                 'lfg',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9410,6 +9640,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.guild,
                 'guild',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9421,6 +9652,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.officer,
                 'officer',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9432,6 +9664,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.emote,
                 'emote',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9443,6 +9676,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.roll,
                 'roll',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9454,6 +9688,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.say,
                 'say',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -10168,6 +10403,7 @@ export class Hud {
     templateKey: TranslationKey,
     chan: string,
     fromPid?: number,
+    flair?: ChatSenderFlair,
     fromTitle?: string,
   ): void {
     const wasNearBottom =
@@ -10183,41 +10419,41 @@ export class Hud {
     // deed id on the event, localized here); the context-menu handlers below
     // close over the RAW `name`, so whisper/social lookups stay unaffected.
     sender.textContent = titledDisplayName(name, fromTitle);
-    sender.title = t('hud.chat.rightClickName', { name });
+    sender.title = t('hudChrome.playerMenu.openFor', { name });
     sender.setAttribute('role', 'button');
-    sender.setAttribute('aria-label', t('hud.chat.rightClickName', { name }));
+    sender.setAttribute('aria-label', t('hudChrome.playerMenu.openFor', { name }));
     sender.tabIndex = 0;
+    // Anchor the menu under the name itself for a click/tap/keyboard open, and at
+    // the cursor for a right-click.
+    const openUnderName = () => {
+      const rect = sender.getBoundingClientRect();
+      this.openChatPlayerContextMenu(name, rect.left, rect.bottom, sender);
+    };
+    // bindTouchTap covers BOTH paths: any touch pointer (the browser only
+    // synthesizes `click` for the PRIMARY one, so a bare click binding goes dead
+    // while the other thumb is steering) AND the ordinary mouse/keyboard click.
+    // Do NOT also addEventListener('click', ...) here: bindTouchTap binds click
+    // itself, so the handler would fire twice per click and the second call would
+    // hit the toggle branch below and slam the menu shut the instant it opened.
+    bindTouchTap(sender, openUnderName);
     sender.addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
-      this.openChatPlayerContextMenu(name, ev.clientX, ev.clientY);
+      this.openChatPlayerContextMenu(name, ev.clientX, ev.clientY, sender);
     });
     sender.addEventListener('keydown', (ev) => {
       if (ev.key !== 'Enter' && ev.key !== ' ') return;
       ev.preventDefault();
-      const rect = sender.getBoundingClientRect();
-      this.openChatPlayerContextMenu(name, rect.left, rect.bottom);
+      openUnderName();
     });
-    const nameToken = '__WOC_CHAT_NAME__';
-    const messageToken = '__WOC_CHAT_MESSAGE__';
-    const rendered = t(templateKey, { name: nameToken, message: messageToken });
-    let senderAppended = false;
-    let messageAppended = false;
-    for (const part of rendered.split(/(__WOC_CHAT_NAME__|__WOC_CHAT_MESSAGE__)/)) {
-      if (part === nameToken) {
-        div.append(sender);
-        senderAppended = true;
-      } else if (part === messageToken) {
-        this.appendChatMessageBody(div, text, fromPid);
-        messageAppended = true;
-      } else if (part) {
-        div.append(document.createTextNode(part));
-      }
-    }
-    if (!senderAppended || !messageAppended) {
-      div.textContent = '';
-      div.append(sender, document.createTextNode(': '));
-      this.appendChatMessageBody(div, text, fromPid);
-    }
+    // The [AI] tag rides the {name} slot, not the head of the line: the localized
+    // templates read '[General] {name}: {message}', so it must sit beside the name
+    // and not look like part of the channel prefix (see ./chat_line).
+    const rendered = t(templateKey, { name: CHAT_NAME_TOKEN, message: CHAT_MESSAGE_TOKEN });
+    appendChatLineParts(div, rendered, {
+      aiTag: flair?.ai ? chatAiTagEl(document) : null,
+      sender,
+      appendBody: (parent) => this.appendChatMessageBody(parent, text, fromPid),
+    });
     this.chatLogEl.appendChild(div);
     // Announce the player-chat line through the tab-independent #chat-live region.
     this.announceChatLine(div);
@@ -10398,6 +10634,7 @@ export class Hud {
       "This quest can't be shared.": 'hudChrome.questShare.notShareable',
       'That item is not sold here.': 'itemUi.errors.notSoldHere',
       'Not enough money.': 'itemUi.errors.notEnoughMoney',
+      'Not enough honor.': 'hudChrome.warfare.notEnoughHonor',
       'You must bring your goods to the Merchant.': 'itemUi.errors.bringGoods',
       'The Merchant will not broker quest items.': 'itemUi.errors.noQuestItems',
       'You do not have that many to sell.': 'itemUi.errors.notEnoughToSell',
@@ -11508,7 +11745,7 @@ export class Hud {
   private submitLootRoll(rollId: number, choice: LootRollChoice): void {
     this.sim.submitLootRoll(rollId, choice);
     this.activeLootRolls.delete(rollId);
-    this.dismissedLootRolls.add(rollId);
+    this.dismissedLootRolls.set(rollId, performance.now());
     this.renderLootRolls();
   }
 
@@ -11532,11 +11769,15 @@ export class Hud {
       return;
     }
     const promptById = new Map(open.map((p) => [p.rollId, p] as const));
+    const dismissedAt: Record<number, number> = {};
+    for (const [id, at] of this.dismissedLootRolls) dismissedAt[id] = at;
     const decision = computeLootRollReconcile({
       open: open.map((p) => p.rollId),
       shown: [...this.activeLootRolls.keys()],
-      dismissed: [...this.dismissedLootRolls],
+      dismissed: [...this.dismissedLootRolls.keys()],
       confirmed: [...this.confirmedLootRolls],
+      dismissedAt,
+      nowMs: performance.now(),
     });
     this.confirmedLootRolls = new Set(decision.confirmed);
     for (const id of decision.toPrune) this.dismissedLootRolls.delete(id); // server confirmed it is gone
@@ -11586,6 +11827,7 @@ export class Hud {
       statuses,
       [...this.activeLootRolls.keys()],
       this.sim.playerId,
+      !this.isMobileLayout(),
     );
     const fp = lootRollStatusFingerprint(rows);
     if (fp === this.lootRollStatusFp) return;
@@ -11610,7 +11852,9 @@ export class Hud {
     for (const [rollId, roll] of this.activeLootRolls) {
       if (now - roll.receivedAt >= roll.durationMs) {
         this.activeLootRolls.delete(rollId);
-        this.dismissedLootRolls.add(rollId); // expired locally; don't let reconcile re-show it
+        // Expired locally: stamp the dismissal so reconcile only re-shows it if
+        // the server still lists it open past the grace, not on the next frame.
+        this.dismissedLootRolls.set(rollId, now);
         changed = true;
       }
     }
@@ -11942,7 +12186,10 @@ export class Hud {
     renderVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
-      buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS),
+      buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS, {
+        copper: this.sim.copper,
+        honor: this.sim.honor,
+      }),
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
@@ -12346,6 +12593,9 @@ export class Hud {
 
   onCosmeticsChanged(): void {
     this.renderCharIfOpen();
+    // A grant or apply from another session on the account (or a server
+    // correction of an optimistic apply) must refresh an open armory too.
+    this.dailyRewardsWindow.onCosmeticsChanged();
   }
 
   private renderCharIfOpen(): void {
@@ -13519,6 +13769,10 @@ export class Hud {
       `<div class="cd-actions"><button type="button" class="btn" data-cancel>${esc(cancelText)}</button><button type="button" class="btn cd-ok" data-ok>${esc(okText)}</button></div>`;
     document.body.appendChild(el);
     this.bringWindowToFront(el);
+    // A confirm prompt is the topmost modal by definition: the window band tops
+    // out at 89 and the armory inspect overlay sits at 90, so floor it above
+    // both or a purchase confirmation opens invisibly underneath.
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 95));
     this.confirmTrap = this.focusManager.open({ root: () => el });
     el.querySelector<HTMLElement>('[data-ok]')?.focus();
     const close = () => {
@@ -13763,6 +14017,32 @@ export class Hud {
     this.refreshDailyRewardsLauncher(true);
   }
 
+  /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */
+  attachClaudium(hooks: ClaudiumHooks): void {
+    this.claudiumHooks = hooks;
+    this.syncDailyRewardsSurfaceLabels();
+    this.claudiumLauncherBalance = null;
+    this.claudiumLauncherBalanceLastMs = 0;
+    this.claudiumLauncherBalanceSeq++;
+    this.claudiumLauncherBalancePending = false;
+    this.refreshClaudiumLauncherBalance(true);
+  }
+
+  /**
+   * Open or close the Claudium store. Always renders: with no hooks (offline or the
+   * service off) the window shows its clean disabled state, never a boot crash.
+   */
+  toggleClaudium(): void {
+    if (!this.claudiumHooks) return;
+    this.claudiumWindow.toggle();
+  }
+
+  async refreshClaudium(): Promise<void> {
+    this.refreshClaudiumLauncherBalance(true);
+    if (!this.claudiumWindow.isOpen) return;
+    await this.claudiumWindow.render();
+  }
+
   // -------------------------------------------------------------------------
   // Spellbook
   // -------------------------------------------------------------------------
@@ -13990,26 +14270,102 @@ export class Hud {
     }
   }
 
+  /**
+   * The stream-link rows both player menus share. Resolved by NAME through
+   * IWorld.accountFlair, which works for a player far outside your ~120yd interest
+   * scope (a name you only ever saw in chat); the live entity's wire fields are the
+   * fallback for the in-view case. streamerMenuActions re-validates every URL, so a
+   * link that is not a plain https URL on that platform's own host never becomes a
+   * row at all.
+   */
+  private streamerLinksFor(name: string, ent?: Entity): StreamerLinks | undefined {
+    return (
+      this.sim.accountFlair(name)?.links ?? (ent?.kind === 'player' ? ent.streamerLinks : undefined)
+    );
+  }
+
+  private streamerActionsFor(name: string, ent?: Entity): PlayerContextAction[] {
+    return streamerMenuActions(this.streamerLinksFor(name, ent));
+  }
+
+  /**
+   * Is this account AI-operated? Same two sources, same precedence as
+   * streamerLinksFor: the by-name flair cache first (so it resolves for a player who
+   * is nowhere near you and only ever spoke in chat), then the live entity.
+   */
+  private isAiAccount(name: string, ent?: Entity): boolean {
+    return (
+      this.sim.accountFlair(name)?.ai ?? (ent?.kind === 'player' ? ent.aiAccount === true : false)
+    );
+  }
+
+  /**
+   * The player-menu header: portrait chip, then the name, with the [AI] mark inside
+   * the name span rather than beside it. The header is a flex row with a wide gap, so
+   * a sibling tag would drift away from the name it qualifies; nested, it stays glued
+   * to the name and the name's ellipsis still governs the overflow. Shared by both
+   * player menus (chat-name and nameplate) so the two cannot drift apart.
+   */
+  private ctxPlayerTitleHtml(name: string, entCls: PlayerClass | null, ent?: Entity): string {
+    const chip = entCls
+      ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' })
+      : '';
+    const label = esc(t('hudChrome.playerMenu.aiTagTitle'));
+    const ai = this.isAiAccount(name, ent)
+      ? `<span class="ai-tag ctx-title-ai" role="img" aria-label="${label}" title="${label}">${esc(t('hudChrome.playerMenu.aiTag'))}</span>`
+      : '';
+    return `<div class="ctx-title ctx-title-player">${chip}<span class="ctx-title-name">${ai}${esc(name)}</span></div>`;
+  }
+
+  /**
+   * NEVER interpolate `action.href` into this markup, not even inside a quoted
+   * attribute. A streamer link is operator-entered text, and while
+   * normalizeStreamerLink pins it to an https URL on the platform's own host, the
+   * WHATWG URL parser leaves a single quote (and `&`) UNENCODED in the path: a
+   * legal-but-hostile `https://twitch.tv/a'onmouseover=alert(1)'` would break out
+   * of a single-quoted or unquoted attribute. The href is deliberately kept in the
+   * JS `actions` array and handed straight to window.open by openStreamerLink, so
+   * it never becomes HTML. Only the fixed enum id, the fixed-registry icon, and an
+   * esc()'d t() label are interpolated here. tests/chat_context_menu.test.ts pins this.
+   */
+  private ctxItemHtml(action: PlayerContextAction): string {
+    const icon = action.icon ? svgIcon(action.icon) : '';
+    return `<div class="ctx-item${action.icon ? ' ctx-stream' : ''}" data-act="${action.id}">${icon}${esc(action.label)}</div>`;
+  }
+
+  /**
+   * Open a stream-link row's channel, if `act` is one; false for every other row.
+   * The URL is re-validated HERE, at click time, even though the server validated it
+   * on write and streamerLinkList validated it again when the row was built: this is
+   * the last gate before an operator-entered string reaches window.open.
+   */
+  private openStreamerLink(act: string, actions: PlayerContextAction[]): boolean {
+    const platform = streamerActionPlatform(act as PlayerContextActionId);
+    if (!platform) return false;
+    const url = normalizeStreamerLink(platform, actions.find((a) => a.id === act)?.href);
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    return true;
+  }
+
   openContextMenu(pid: number, name: string, x: number, y: number): void {
     const el = $('#ctx-menu');
     const party = this.sim.partyInfo;
     const isLeader = party?.leader === this.sim.playerId;
     const isMember = !!party?.members.some((m) => m.pid === pid);
-    // online play exposes persistent friends/ignore/guild; offline falls back
-    // to the client-only chat ignore stored in localStorage
-    const online = this.sim.socialInfo !== null;
-    const social = this.sim.socialInfo;
-    const isFriend = !!social?.friends.some((f) => f.name === name);
-    const inGuildWithInvite = !!social?.guild && social.guild.rank !== 'member';
-    const alreadyGuilded = !!social?.guild?.members.some((m) => m.name === name);
-    const ignored = online
-      ? !!social?.blocks.some((b) => b.name === name)
-      : this.isChatIgnored(name);
+    // Same flag resolution the chat-name menu uses, so the two menus can never
+    // disagree about whether this player is muted, blocked, friended or guilded.
+    const flags = this.playerSocialFlags(name);
+    const { online, isFriend, ignored, blocked } = flags;
+    const inGuildWithInvite = flags.canGuildInvite;
+    const alreadyGuilded = flags.alreadyGuilded;
     const ent = this.sim.entities.get(pid);
     const entCls = ent && ent.kind === 'player' ? (ent.templateId as PlayerClass) : null;
-    let html = `<div class="ctx-title ctx-title-player">${entCls ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' }) : ''}<span class="ctx-title-name">${esc(name)}</span></div>`;
-    if (entCls)
-      html += `<div class="ctx-item" data-act="inspect">${esc(t('character.viewProfile'))}</div>`;
+    // An official streamer's own channels lead, right under the title, exactly as
+    // they do on the chat-name menu (both build their rows from streamerMenuActions).
+    const streamActions = this.streamerActionsFor(name, ent);
+    let html = this.ctxPlayerTitleHtml(name, entCls, ent);
+    html += streamActions.map((a) => this.ctxItemHtml(a)).join('');
+    html += `<div class="ctx-item" data-act="info">${esc(t('hudChrome.playerMenu.info'))}</div>`;
     if (pid !== this.sim.playerId)
       html += `<div class="ctx-item" data-act="whisper">${esc(t('hud.chat.context.whisper'))}</div>`;
     if (!isMember)
@@ -14020,17 +14376,9 @@ export class Hud {
       html += `<div class="ctx-item" data-act="${isFriend ? 'unfriend' : 'friend'}">${esc(t(isFriend ? 'hud.chat.context.removeFriend' : 'hud.chat.context.addFriend'))}</div>`;
     if (inGuildWithInvite && !alreadyGuilded)
       html += `<div class="ctx-item" data-act="ginvite">${esc(t('hud.chat.context.inviteGuild'))}</div>`;
-    html += `<div class="ctx-item" data-act="ignore">${esc(
-      t(
-        ignored
-          ? online
-            ? 'hud.chat.context.unignore'
-            : 'hud.chat.context.unignoreChat'
-          : online
-            ? 'hud.chat.context.ignore'
-            : 'hud.chat.context.ignoreChat',
-      ),
-    )}</div>`;
+    html += `<div class="ctx-item" data-act="ignore">${esc(t(ignored ? 'hud.chat.context.unignore' : 'hud.chat.context.ignore'))}</div>`;
+    if (online)
+      html += `<div class="ctx-item" data-act="block">${esc(t(blocked ? 'hudChrome.playerMenu.unblock' : 'hudChrome.playerMenu.block'))}</div>`;
     if (this.reportHooks && pid !== this.sim.playerId)
       html += `<div class="ctx-item" data-act="report">${esc(t('hud.chat.context.report'))}</div>`;
     if (isLeader && isMember && pid !== this.sim.playerId) {
@@ -14053,7 +14401,8 @@ export class Hud {
     this.placePopupAt(el, x, y, 170, ctxReserveBottom);
     this.keepPopupOnScreen(el);
     this.bindContextMenuActions((act) => {
-      if (act === 'inspect') this.openInspect(pid);
+      if (this.openStreamerLink(act, streamActions)) return;
+      if (act === 'info') this.openPlayerInfo(name, pid);
       else if (act === 'whisper') this.startWhisper(name);
       else if (act === 'invite') this.sim.partyInvite(pid);
       else if (act === 'trade') this.sim.tradeRequest(pid);
@@ -14061,11 +14410,9 @@ export class Hud {
       else if (act === 'friend') this.sim.friendAdd(name);
       else if (act === 'unfriend') this.sim.friendRemove(name);
       else if (act === 'ginvite') this.sim.guildInvite(name);
-      else if (act === 'ignore') {
-        if (online) {
-          ignored ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
-        } else this.toggleChatIgnore(name);
-      } else if (act === 'report') this.openReportWindow({ pid, name });
+      else if (act === 'ignore') this.togglePlayerIgnore(name, ignored);
+      else if (act === 'block') this.togglePlayerBlock(name, blocked);
+      else if (act === 'report') this.openReportWindow({ pid, name });
       else if (act === 'promote') this.sim.partyPromote(pid);
       else if (act === 'kick') this.sim.partyKick(pid);
       else if (act === 'loot-settings') this.openLootSettings();
@@ -14080,9 +14427,13 @@ export class Hud {
     const tier = target.discordTier ?? 0;
     const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
     const devIdx = showDevBadges ? (target.devTier ?? 0) : 0;
+    // The AI mark rides this line too, so it has to be in BOTH the early-out below
+    // and the signature: without it an AI account carrying no Discord/dev flair
+    // would never render the line at all, and a live flag flip would never repaint.
+    const isAi = target.aiAccount === true;
     if (
       target.kind !== 'player' ||
-      (!tier && !target.discordName && !target.discordRole && !devIdx)
+      (!tier && !target.discordName && !target.discordRole && !devIdx && !isAi)
     ) {
       if (this.targetDiscordSig !== '') {
         this.targetDiscordSig = '';
@@ -14094,7 +14445,7 @@ export class Hud {
     // This runs every frame the target frame updates; only rebuild when the Discord
     // content actually changes (else a fresh <img> per frame would re-fetch the
     // avatar and, on a failing CDN load, flicker between the broken glyph and hidden).
-    const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}`;
+    const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}|${isAi ? 1 : 0}`;
     if (sig === this.targetDiscordSig) return;
     this.targetDiscordSig = sig;
     const parts: string[] = [];
@@ -14117,6 +14468,20 @@ export class Hud {
     if (devDef) {
       parts.push(`<span class="uf-dc-chip dev">${esc(devTierDisplayName(devDef))}</span>`);
     }
+    if (isAi) {
+      // The shared .ai-tag mark, and deliberately NOT a .uf-dc-chip: the chip rules
+      // live UNLAYERED in index.extra.css, and unlayered CSS beats every @layer rule,
+      // so the chip's own color/background would override the gradient in
+      // @layer components and paint straight over it. The flair line is a flex row,
+      // so a bare span sits inline beside the chips anyway.
+      parts.push(
+        // role=img + aria-label, not just title: this is a DISCLOSURE, and assistive
+        // tech announces `title` inconsistently on a non-focusable span. Screen-reader
+        // users must hear "AI-operated account", not the bare "[AI]" literal (or, if
+        // the title is skipped entirely, nothing at all). Mirrors chatAiTagEl.
+        `<span class="ai-tag" role="img" aria-label="${esc(t('hudChrome.playerMenu.aiTagTitle'))}" title="${esc(t('hudChrome.playerMenu.aiTagTitle'))}">${esc(t('hudChrome.playerMenu.aiTag'))}</span>`,
+      );
+    }
     el.innerHTML = parts.join('');
     // Hide the external Discord avatar if its CDN image fails to load, so the line
     // never shows the browser's broken-image placeholder (the nickname stays).
@@ -14127,6 +14492,39 @@ export class Hud {
 
   /** Inspect another player: a profile window with their portrait, name, level
    *  and class — rendered locally from their entity's class + skin. */
+  /**
+   * The out-of-range Player Info card: the same #inspect-window, painted from the
+   * public character sheet. Deliberately thinner than openInspect: no worn gear,
+   * no wallet balance, no Discord/GitHub identity. Those live on the per-entity
+   * wire and stay proximity-gated, so standing next to someone still shows you
+   * strictly more than looking their name up from chat.
+   */
+  private openRemoteProfile(profile: CharacterProfile): void {
+    const cls = profile.cls as PlayerClass;
+    const el = $('#inspect-window');
+    this.closeOtherWindows('#inspect-window');
+    const guildHtml = profile.guild ? `<div class="inspect-meta">${esc(profile.guild)}</div>` : '';
+    el.innerHTML =
+      `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +
+      `<button type="button" class="x-btn" data-close aria-label="${esc(t('character.closeProfile'))}">${svgIcon('close')}</button></div>` +
+      `<div class="inspect-card">` +
+      portraitChipHtml({ cls, skin: profile.skin, name: profile.name, variant: 'lg' }) +
+      `<div class="inspect-name">${esc(profile.name)}</div>` +
+      `<div class="inspect-meta">${esc(
+        t('itemUi.equipment.levelClass', {
+          level: formatNumber(profile.level, { maximumFractionDigits: 0 }),
+          className: classDisplayName(cls),
+        }),
+      )}</div>` +
+      guildHtml +
+      `</div>`;
+    hydratePortraits(el);
+    el.querySelector('[data-close]')?.addEventListener('click', () => {
+      el.style.display = 'none';
+    });
+    el.style.display = 'block';
+  }
+
   openInspect(pid: number): void {
     const e = this.sim.entities.get(pid);
     if (e?.kind !== 'player') return;
@@ -14413,59 +14811,88 @@ export class Hud {
     });
   }
 
-  private openChatPlayerContextMenu(name: string, x: number, y: number): void {
+  private openChatPlayerContextMenu(
+    name: string,
+    x: number,
+    y: number,
+    opener?: HTMLElement,
+  ): void {
     const el = $('#ctx-menu');
-    const online = this.sim.socialInfo !== null;
-    const social = this.sim.socialInfo;
-    const isFriend = !!social?.friends.some((f) => f.name === name);
-    const canGuildInvite = !!social?.guild && social.guild.rank !== 'member';
-    const alreadyGuilded = !!social?.guild?.members.some((m) => m.name === name);
-    const ignored = online
-      ? !!social?.blocks.some((b) => b.name === name)
-      : this.isChatIgnored(name);
+    // Clicking the same name twice closes the menu. Without this branch, the
+    // outside-click dismiss refuses to close a menu whose opener was clicked
+    // (it treats the opener as "inside"), so the second click would silently
+    // re-open it instead of toggling it shut.
+    if (opener && el.style.display === 'block' && this.ctxMenuOpener === opener) {
+      this.closeContextMenu();
+      return;
+    }
+    const flags = this.playerSocialFlags(name);
+    // A portrait chip only when the player is close enough to have a live entity;
+    // for a name seen in /world or /lfg the title is name-only. Player Info still
+    // works either way (it falls back to the public character sheet).
+    const livePidForMenu = this.playerPidByName(name);
+    const ent = livePidForMenu !== null ? this.sim.entities.get(livePidForMenu) : undefined;
     const actions = chatPlayerContextActions({
       playerName: name,
       selfName: this.sim.player.name,
-      online,
-      isFriend,
-      ignored,
-      canGuildInvite,
-      alreadyGuilded,
+      online: flags.online,
+      isFriend: flags.isFriend,
+      ignored: flags.ignored,
+      blocked: flags.blocked,
+      canGuildInvite: flags.canGuildInvite,
+      alreadyGuilded: flags.alreadyGuilded,
       canReport: !!this.reportHooks?.submitByName,
+      streamerLinks: this.streamerLinksFor(name, ent),
     });
-    // If the player is in view we know their class+skin, so show a portrait and
-    // a "View Profile" entry; otherwise the menu is name-only as before.
-    const livePidForMenu = this.playerPidByName(name);
-    const ent = livePidForMenu !== null ? this.sim.entities.get(livePidForMenu) : undefined;
     const entCls = ent && ent.kind === 'player' ? (ent.templateId as PlayerClass) : null;
-    const titleHtml = `<div class="ctx-title ctx-title-player">${entCls ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' }) : ''}<span class="ctx-title-name">${esc(name)}</span></div>`;
-    const inspectHtml = entCls
-      ? `<div class="ctx-item" data-act="inspect">${esc(t('character.viewProfile'))}</div>`
-      : '';
-    el.innerHTML =
-      titleHtml +
-      inspectHtml +
-      actions.map((a) => `<div class="ctx-item" data-act="${a.id}">${esc(a.label)}</div>`).join('');
+    const titleHtml = this.ctxPlayerTitleHtml(name, entCls, ent);
+    el.innerHTML = titleHtml + actions.map((a) => this.ctxItemHtml(a)).join('');
     hydratePortraits(el);
     el.style.display = 'block';
-    this.placePopupAt(el, x, y, 170, 240);
+    // Reserve the real height (title + one row per action) instead of a fixed 240,
+    // which the mobile 40px item floor now overflows.
+    const reserveBottom = 80 + actions.length * (this.isMobileLayout() ? 44 : 28);
+    this.placePopupAt(el, x, y, 170, reserveBottom);
     this.keepPopupOnScreen(el);
+    this.ctxMenuOpener = opener ?? null;
     this.bindContextMenuActions((act) => {
+      if (this.openStreamerLink(act, actions)) return;
       const livePid = this.playerPidByName(name);
-      if (act === 'inspect') {
-        if (livePid !== null) this.openInspect(livePid);
-      } else if (act === 'whisper') this.startWhisper(name);
+      if (act === 'info') this.openPlayerInfo(name, livePid);
+      else if (act === 'whisper') this.startWhisper(name);
       else if (act === 'invite') {
+        // Route by NAME, not by pid: a chat name from /world, /lfg or /guild has
+        // no entity inside our ~120yd interest scope, but the server-side sim
+        // resolves /invite against every player on the realm.
         if (livePid !== null) this.sim.partyInvite(livePid);
-        else this.showError(t('hud.system.playerNotNearby'));
+        else this.sim.chat(`/invite ${name}`);
       } else if (act === 'friend') this.sim.friendAdd(name);
       else if (act === 'unfriend') this.sim.friendRemove(name);
       else if (act === 'ginvite') this.sim.guildInvite(name);
-      else if (act === 'ignore') {
-        if (online) {
-          ignored ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
-        } else this.toggleChatIgnore(name);
-      } else if (act === 'report') this.openReportWindow({ name });
+      else if (act === 'ignore') this.togglePlayerIgnore(name, flags.ignored);
+      else if (act === 'block') this.togglePlayerBlock(name, flags.blocked);
+      else if (act === 'report') this.openReportWindow({ name });
+    });
+  }
+
+  /**
+   * Player Info for a name. In view we have the live entity, so open the full
+   * inspect card (gear + $WOC/Discord/dev flair, all of which ride the
+   * proximity-gated entity wire). Out of view, fall back to the PUBLIC character
+   * sheet, which is the same subset the crawlable /c/<name> page already serves,
+   * so looking someone up from chat exposes nothing new about them.
+   */
+  private openPlayerInfo(name: string, pid: number | null): void {
+    if (pid !== null && this.sim.entities.get(pid)?.kind === 'player') {
+      this.openInspect(pid);
+      return;
+    }
+    void this.sim.characterProfile(name).then((profile) => {
+      if (!profile) {
+        this.showError(t('hudChrome.playerMenu.profileUnavailable', { name }));
+        return;
+      }
+      this.openRemoteProfile(profile);
     });
   }
 
@@ -14581,43 +15008,53 @@ export class Hud {
     return keyByMessage[text] ? t(keyByMessage[text]) : t('hud.report.failed');
   }
 
-  private chatIgnoreKey(name: string): string {
-    return name.trim().toLowerCase();
+  /** The per-player flags both context menus render from. */
+  private playerSocialFlags(name: string): PlayerSocialFlags {
+    return resolvePlayerSocialFlags(name, this.sim.socialInfo, this.localIgnoredNames);
   }
 
-  private isChatIgnored(name: string): boolean {
-    return this.ignoredChatNames.has(this.chatIgnoreKey(name));
-  }
-
-  private loadIgnoredChatNames(): Set<string> {
+  private loadLocalIgnoredNames(): Set<string> {
     try {
-      const raw = localStorage.getItem(IGNORED_CHAT_NAMES_KEY);
-      const parsed = raw ? JSON.parse(raw) : [];
-      return new Set(
-        Array.isArray(parsed)
-          ? parsed.filter((name): name is string => typeof name === 'string')
-          : [],
-      );
+      return parseIgnoreList(localStorage.getItem(LOCAL_IGNORES_KEY));
     } catch {
       return new Set();
     }
   }
 
-  private saveIgnoredChatNames(): void {
-    localStorage.setItem(IGNORED_CHAT_NAMES_KEY, JSON.stringify([...this.ignoredChatNames]));
+  private saveLocalIgnoredNames(): void {
+    try {
+      localStorage.setItem(LOCAL_IGNORES_KEY, serializeIgnoreList(this.localIgnoredNames));
+    } catch {
+      // a full or blocked localStorage must never break chat
+    }
   }
 
-  private toggleChatIgnore(name: string): void {
-    const key = this.chatIgnoreKey(name);
+  /**
+   * Toggle an ignore. Online the server owns the list (it is what filters the
+   * chat before it ever reaches us, and it follows the account to another
+   * browser); offline there is no server, so the local set is the whole store.
+   */
+  private togglePlayerIgnore(name: string, ignored: boolean): void {
+    if (this.sim.socialInfo !== null) {
+      ignored ? this.sim.ignoreRemove(name) : this.sim.ignoreAdd(name);
+      return;
+    }
+    const key = ignoreKey(name);
     if (!key) return;
-    if (this.ignoredChatNames.has(key)) {
-      this.ignoredChatNames.delete(key);
+    if (this.localIgnoredNames.has(key)) {
+      this.localIgnoredNames.delete(key);
       this.log(t('hud.system.noLongerIgnoring', { name }), '#aaf');
     } else {
-      this.ignoredChatNames.add(key);
+      this.localIgnoredNames.add(key);
       this.log(t('hud.system.ignoringChat', { name }), '#aaf');
     }
-    this.saveIgnoredChatNames();
+    this.saveLocalIgnoredNames();
+  }
+
+  /** Blocking is a server-side social action, so it only exists online. */
+  private togglePlayerBlock(name: string, blocked: boolean): void {
+    if (this.sim.socialInfo === null) return;
+    blocked ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
   }
 
   closeContextMenu(): void {
@@ -15143,9 +15580,22 @@ function abilityRangeLine(def: AbilityDef): string | null {
   return t('abilityUi.tooltip.range', { range: formatAbilityNumber(def.range) });
 }
 
-// `spellHaste` (the live character's set-bonus spell haste, a fraction) shortens
-// the shown cast / channel time exactly as the sim does, so a hasted caster's
-// tooltips reflect the real, faster cast.
+// The live caster's TOTAL spell-haste fraction: the resolved stat (set bonuses + spec
+// mastery) PLUS active buff_spellhaste auras (Arcane Power, Icy Veins, Metamorphosis).
+// Mirrors the sim's spellHasteMult (spell_combat.ts) EXACTLY, including its
+// `Math.max(0, ...)` floor, so a shown cast time never disagrees with the real one (a
+// net-negative haste, e.g. a cast-slow debuff, floors at 0 for both). ui/ cannot import
+// the sim-combat helper across the seam, so the formula is kept identical here by hand.
+function playerSpellHasteFrac(p: Entity | null | undefined): number {
+  if (!p) return 0;
+  let frac = p.spellHaste;
+  for (const a of p.auras) if (a.kind === 'buff_spellhaste') frac += a.value;
+  return Math.max(0, frac);
+}
+
+// `spellHaste` (the live character's total spell haste, a fraction) shortens the shown
+// cast / channel time exactly as the sim does, so a hasted caster's tooltips reflect the
+// real, faster cast.
 function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
   const h = 1 + Math.max(0, spellHaste);
   if (known.def.channel) {
@@ -15204,10 +15654,19 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       case 'directDamage':
       case 'heal':
       case 'aoeDamage':
+      case 'aoeHeal':
       case 'aoeRoot':
       case 'groundAoE':
       case 'drainTick':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
+      case 'consumeAura':
+        if (primary.deal) {
+          return abilityAmountRange(primary.deal.min, primary.deal.max) + suffix(primary);
+        }
+        if (primary.heal) {
+          return abilityAmountRange(primary.heal.min, primary.heal.max) + suffix(primary);
+        }
+        return '';
       case 'weaponDamage':
       case 'weaponStrike':
         return formatAbilityNumber(primary.bonus);

@@ -7,6 +7,8 @@
 // Assembled into `en` by ./index.ts under the `hudChrome` namespace. Kept as its
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
+import { armoryCollectionStrings, armorySkinStrings } from './armory';
+
 export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
@@ -110,6 +112,122 @@ export const hudChromeStrings = {
       price_unavailable: 'WOC price is unavailable, rewards are temporarily locked.',
       banned: 'You are banned from Daily Rewards. Reason: {reason}',
     },
+  },
+  wocStore: {
+    title: 'WOC Store',
+    close: 'Close WOC Store',
+    tabsLabel: 'WOC Store sections',
+    storeTab: 'Store',
+    rewardsTab: 'Daily Rewards',
+    loading: 'Loading WOC Store...',
+    error: 'The WOC Store is unavailable right now. Please try again shortly.',
+    balance: 'Claudium Balance',
+    buyClaudium: 'Purchase Claudium',
+    owned: 'Owned',
+    needMoreTitle: 'More Claudium Required',
+    needMoreBody: 'You need {shortfall} more Claudium to purchase {item}.',
+    cancel: 'Cancel',
+    confirmTitle: 'Confirm Cosmetic Purchase',
+    confirmBody: 'Purchase {item} for {cost} Claudium?',
+    confirmPurchase: 'Purchase',
+    priceChanged:
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.',
+    // Season 1 Armory (weapon skins). English copy comes from the dedicated
+    // Armory i18n catalog; the sim registry remains mechanical and locale-free.
+    armoryEyebrow: 'Season 1',
+    armoryTitle: 'The Armory',
+    armoryBody:
+      'Limited weapon skins from the Season 1 Armory. Account-wide, purely cosmetic, and shown to everyone around you.',
+    collectionLine: '{collection} Collection',
+    collections: armoryCollectionStrings,
+    skins: armorySkinStrings,
+    seasonOne: 'Season 1',
+    rarity: {
+      uncommon: 'Uncommon',
+      rare: 'Rare',
+      epic: 'Epic',
+      legendary: 'Legendary',
+    },
+    wtype: {
+      sword: 'Sword',
+      axe: 'Axe',
+      mace: 'Mace',
+      dagger: 'Dagger',
+      staff: 'Staff',
+      wand: 'Wand',
+      bow: 'Bow',
+      crossbow: 'Crossbow',
+    },
+    badge: {
+      flagship: 'Flagship',
+      hero: 'Hero',
+    },
+    inspectAria: 'Inspect {item}',
+    viewModeLabel: 'Preview mode',
+    tryOn: 'Try it on',
+    weaponOnly: 'Weapon only',
+    sceneLabel: 'Scene lighting',
+    scene: {
+      day: 'Day',
+      dusk: 'Dusk',
+      night: 'Night',
+    },
+    lore: 'Lore',
+    buySkin: 'Purchase Skin',
+    unavailable: 'Unavailable',
+    applied: 'Applied',
+    apply: 'Apply Skin',
+    detach: 'Detach Skin',
+    equipHint: 'Equip a {type} to apply this skin.',
+  },
+  // CLAUDIUM: a server-authoritative soft currency. The game renders only what the
+  // economy service returns (balance, SKU credits, prices, store costs); it
+  // computes nothing. One-way: buy with money, spend on cosmetics, never cashes out.
+  claudium: {
+    title: 'Claudium',
+    open: 'Open Claudium',
+    close: 'Close Claudium',
+    loading: 'Loading Claudium...',
+    balanceLabel: 'Balance',
+    balanceUnit: '{amount} Claudium',
+    solBalance: 'SOL: {amount}',
+    wocBalance: 'WOC: {amount}',
+    unavailable:
+      'The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.',
+    disclosure:
+      'Claudium is a one-way soft currency: buy it with money and spend it on cosmetics. It cannot be redeemed, transferred, or cashed out.',
+    buyTitle: 'Buy Claudium',
+    railLabel: 'Payment method',
+    railStripe: 'Card',
+    railSol: 'SOL',
+    railWoc: 'WOC',
+    railWocDiscount: '20% off',
+    railWocUnavailable: 'WOC pricing is unavailable right now.',
+    railNativeUnavailable: 'SOL/WOC off.',
+    amountLabel: 'Amount',
+    showAmounts: 'Show all Claudium amounts',
+    hideAmounts: 'Hide extra Claudium amounts',
+    skuRow: '{usd} for {claudium} Claudium',
+    buyButton: 'Buy',
+    buyUnavailable: 'Purchasing is unavailable right now.',
+    storeTitle: 'Cosmetic Store',
+    storeEmpty: 'No cosmetics are available right now.',
+    storeCost: '{amount} Claudium',
+    spendButton: 'Redeem',
+    kindCosmetic: 'Cosmetic',
+    kindSkin: 'Skin',
+    kindItem: 'Item',
+    checkoutTitle: 'Complete purchase',
+    checkoutClose: 'Close checkout',
+    checkoutLoading: 'Loading checkout...',
+    checkoutPending: 'Transaction in progress. Confirm in your wallet and keep this panel open.',
+    checkoutPendingButton: 'Processing',
+    checkoutFailed: 'Checkout could not be loaded. Please try again.',
+    checkoutUnavailable: 'That Claudium purchase is not available right now.',
+    checkoutWalletRequired: 'Connect a Solana wallet before buying Claudium with crypto.',
+    checkoutWalletUnsupported: 'This wallet cannot sign and send Solana transactions.',
+    checkoutNotSettled:
+      'The transaction was sent but Claudium was not credited yet. Please try again shortly.',
   },
   theme: {
     preset: 'UI Theme',
@@ -244,7 +362,7 @@ export const hudChromeStrings = {
   mobile: {
     jump: 'Jump',
     leaderboard: 'Ranks',
-    dailyRewards: 'Rewards',
+    dailyRewards: 'Store',
     deeds: 'Deeds',
     nameplates: 'Names',
     haptics: 'Haptics',
@@ -796,6 +914,20 @@ export const hudChromeStrings = {
     highContrastAria:
       'Toggle high-contrast background: disables the moving trailer so start-screen text stays legible',
   },
+  warfare: {
+    honorAmount: '{amount} Honor',
+    dualPrice: '{money} + {honor}',
+    balance: 'Honor: {amount}',
+    honorFloat: '+{amount} Honor',
+    honorGain: 'You gain {amount} Honor ({reason}).',
+    notEnoughHonor: 'Not enough Honor.',
+    reasons: {
+      arenaWin: 'Arena victory',
+      fiestaKill: 'Fiesta takedown',
+      fiestaComplete: 'Fiesta completed',
+      fiestaWin: 'Fiesta victory',
+    },
+  },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
   // The breakdown numbers are recomputed live from the player's current stats
@@ -812,7 +944,9 @@ export const hudChromeStrings = {
       spellPower: 'Spell Power',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
+      warfare: 'Warfare',
     },
+    warfareValue: '+{increase}% dealt / -{reduction}% taken',
     desc: {
       str: 'Increases your attack power, so your weapon strikes land harder.',
       agi: 'Sharpens your reflexes and aim, improving several of your combat stats.',
@@ -831,6 +965,8 @@ export const hudChromeStrings = {
         'Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.',
       hasteRating:
         'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.',
+      warfare:
+        'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {
@@ -1156,6 +1292,29 @@ export const hudChromeStrings = {
     // The global "/invite <name>" usage hint shown when the command is typed
     // without a name (the invite itself has no proximity gate).
     inviteUsage: 'Invite whom? Usage: /invite <name>.',
+  },
+  // The player context menu (click a name in chat, or right-click a unit frame).
+  // Ignore is the chat-only tier: it hides their public chat from you (its
+  // Ignore/Unignore labels are the existing hud.chat.context.* keys). Block is the
+  // heavy tier: it also drops invites, whispers, mail and /who visibility.
+  // Neither is the ADMIN "mute", which is a staff silence, not a player action.
+  playerMenu: {
+    info: 'Player Info',
+    block: 'Block',
+    unblock: 'Unblock',
+    // Accessible name on a clickable chat sender name.
+    openFor: 'Open player menu for {name}',
+    // Shown when a profile lookup for an out-of-range player finds nothing.
+    profileUnavailable: 'No profile found for {name}.',
+    // Operator-set account flair. The tag itself is the bracketed literal every
+    // classic client shows beside a name; the title is its hover explanation.
+    aiTag: '[AI]',
+    aiTagTitle: 'AI-operated account',
+    // Player-menu rows linking out to an official streamer's own channel.
+    watchTwitch: 'Watch on Twitch',
+    watchX: 'View on X',
+    watchKick: 'Watch on Kick',
+    watchYouTube: 'Watch on YouTube',
   },
   lootSettings: {
     title: 'Loot Settings',
@@ -1781,6 +1940,16 @@ export const hudChromeStrings = {
   social: {
     lastSeen: 'Last seen: {when}',
     lastSeenNever: 'never',
+    // The two PLAYER chat-filter tiers get a tab each. Ignored is chat-only;
+    // Blocked also stops whispers, invites and mail. (Neither is the admin mute.)
+    ignoredTab: 'Ignored',
+    blockedTab: 'Blocked',
+    ignoredEmpty: 'You are not ignoring anyone.',
+    blockedEmpty: 'You have not blocked anyone.',
+    blockSearchPlaceholder: 'Player name',
+    blockAction: 'Block',
+    nowBlocking: 'Blocked {name}.',
+    stopBlockingTitle: 'Stop blocking {name}',
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).

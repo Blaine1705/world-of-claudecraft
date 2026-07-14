@@ -2581,17 +2581,11 @@ export function terrainDownhill(
 // players).
 const WALL_STANDOFF_SAMPLES = 8;
 
-// Push a body of `radius` out of terrain steeper than `maxSlope` so the
-// character model does not sink into a cliff face. Movement collision samples
-// only the center point (the climb gate blocks the center from CLIMBING a wall,
-// but nothing keeps the body's WIDTH clear of one), so standing at or strafing
-// along the foot of a near-vertical wall buries the model's near side. This
-// samples the heightfield on a ring at the body radius; any direction rising
-// faster than a climbable slope is a wall within reach, and the center is nudged
-// directly away from it, toward the lower walkable side. Pure and deterministic;
-// returns the input unchanged on open or merely-sloped ground (no ring sample
-// exceeds a climbable rise there), so it is a near-no-op away from the walls.
-export function terrainWallStandoff(
+// A single ring-sample-and-nudge pass, capped at one body radius of push (see
+// `terrainWallStandoff` below for why it must be iterated rather than trusted
+// to converge in one call, and why the caller must accept a push that only
+// REDUCES steepness rather than requiring it clear `maxSlope` outright).
+export function terrainWallStandoffPass(
   x: number,
   z: number,
   seed: number,
@@ -2620,6 +2614,48 @@ export function terrainWallStandoff(
   const mag = Math.hypot(pushX, pushZ);
   const scale = Math.min(mag, radius) / mag; // total nudge never exceeds one body radius
   return { x: x + pushX * scale, z: z + pushZ * scale };
+}
+
+// The most passes `terrainWallStandoff` will take to converge. Mirrors the
+// 3-iteration prop/OBB push-out loop in `colliders.ts`'s `resolveAgainst`.
+const WALL_STANDOFF_ITERATIONS = 3;
+
+// Push a body of `radius` out of terrain steeper than `maxSlope` so the
+// character model does not sink into a cliff face. Movement collision samples
+// only the center point (the climb gate blocks the center from CLIMBING a wall,
+// but nothing keeps the body's WIDTH clear of one), so standing at or strafing
+// along the foot of a near-vertical wall buries the model's near side. This
+// samples the heightfield on a ring at the body radius; any direction rising
+// faster than a climbable slope is a wall within reach, and the center is nudged
+// directly away from it, toward the lower walkable side. Pure and deterministic;
+// returns the input unchanged on open or merely-sloped ground (no ring sample
+// exceeds a climbable rise there), so it is a near-no-op away from the walls.
+//
+// A single pass can leave the pushed point still reading as a wall in a
+// CONCAVE pocket (a ridge/rim corner or a coastline notch wrapping more than
+// half the sample ring): one pass's push, capped at one body radius, is not
+// always enough to clear it. The caller (`stepPlayerMotion`) only ever
+// committed the result when it stopped reading as steep, so an unconverged
+// single pass silently no-ops right where standoff is needed most, leaving
+// the player permanently wedged. Iterating a few passes lets each subsequent
+// ring sample, now centered on the partially-pushed point, see less of the
+// wall, converging out of the pocket instead of stalling on it.
+export function terrainWallStandoff(
+  x: number,
+  z: number,
+  seed: number,
+  radius: number,
+  maxSlope: number,
+): { x: number; z: number } {
+  let cx = x;
+  let cz = z;
+  for (let iter = 0; iter < WALL_STANDOFF_ITERATIONS; iter++) {
+    const next = terrainWallStandoffPass(cx, cz, seed, radius, maxSlope);
+    if (next.x === cx && next.z === cz) break;
+    cx = next.x;
+    cz = next.z;
+  }
+  return { x: cx, z: cz };
 }
 
 // ---------------------------------------------------------------------------

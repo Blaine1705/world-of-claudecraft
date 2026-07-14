@@ -879,7 +879,7 @@ describe('client HTML shell', () => {
     // Mobile has no keyboard, so the U-key Discord panel toggle is unreachable;
     // this drawer button is the touch path to Discord (the account panel when
     // available, else the community invite). Donate mirrors the desktop shell's
-    // sponsors community link.
+    // Ko-fi community link.
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
@@ -900,15 +900,22 @@ describe('client HTML shell', () => {
     // .donate links in hud.css.
     expect(hudCss).toContain('body.native-app #mobile-donate,');
     // The tap targets: the account panel with the invite as the logged-out /
-    // offline fallback, and the sponsors page, pinned to the shells' URLs.
+    // offline fallback, and the Ko-fi page, pinned to the shells' URLs.
     expect(mainTs).toContain("const DISCORD_INVITE_URL = 'https://discord.gg/GjhnUsBtw';");
-    expect(mainTs).toContain("const DONATE_URL = 'https://github.com/sponsors/levy-street';");
+    expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
     expect(mainTs).toContain(
       "window.open(discordInviteUrl() || DISCORD_INVITE_URL, '_blank', 'noopener,noreferrer');",
     );
     expect(mainTs).toContain(
       "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
     );
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(3);
+      expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
+    }
   });
 
   it('offers a desktop micro-menu Discord entry in BOTH entries (not keybind-only)', () => {
@@ -2174,5 +2181,21 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('top: 50%;');
     expect(hudMobileCss).toContain('transform: translate(-50%, -50%);');
     expect(hudMobileCss).toContain('z-index: 95 !important;');
+  });
+  it('keeps desktop rolls above managed windows and the mobile bag sheet above rolls', () => {
+    const railZ = Number(componentsCss.match(/#loot-rolls \{[\s\S]*?z-index:\s*(\d+);/)?.[1]);
+    const managedFloors = [
+      ...hudTs.matchAll(/(?:private windowZ =|this\.windowZ =)\s*(\d+);/g),
+    ].map((match) => Number(match[1]));
+    expect(Number.isFinite(railZ)).toBe(true);
+    expect(managedFloors).toHaveLength(2); // initial value + normalization reset
+    for (const floor of managedFloors) {
+      // Desktop Bags shares the roll rail's bottom-right footprint, so the first
+      // managed window must remain below it.
+      expect(floor + 1, `first managed z-index overlaps loot rail ${railZ}`).toBeLessThan(railZ);
+    }
+    // On mobile Bags is a full-screen modal sheet. !important intentionally
+    // beats the inline managed-window value without changing desktop stacking.
+    expect(hudMobileCss).toMatch(/body\.mobile-touch #bags \{[\s\S]*?z-index:\s*95 !important;/);
   });
 });

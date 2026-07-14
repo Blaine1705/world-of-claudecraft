@@ -120,6 +120,7 @@ const simFiles = walk(simRoot);
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/chat_ignore_core.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
@@ -145,6 +146,8 @@ const UI_PURE_CORES = [
   'src/ui/options_view.ts',
   'src/ui/vendor_view.ts',
   'src/ui/heroic_vendor_view.ts',
+  'src/ui/claudium_view.ts',
+  'src/ui/woc_store_view.ts',
   'src/ui/loot_roll_status_view.ts',
   'src/ui/loot_settings_view.ts',
   'src/ui/crafting_view.ts',
@@ -181,7 +184,9 @@ const UI_PURE_CORES = [
   'src/ui/gathering_view.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
+  'src/ui/window_drag_core.ts',
   'src/ui/window_resize_core.ts',
+  'src/ui/window_stack_state_core.ts',
   'src/ui/focus_order.ts',
   'src/ui/roving_index.ts',
   'src/ui/live_region_politeness.ts',

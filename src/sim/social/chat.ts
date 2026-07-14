@@ -20,7 +20,9 @@ import { CLASSES, ITEMS, zoneAt } from '../data';
 import * as deedsMod from '../deeds';
 import { createGroundObject } from '../entity';
 import { graveyardReadout } from '../entity_roster';
+import { enterDungeon } from '../instances/dungeons';
 import { isGatheringProfessionId, queueGatheringGrant } from '../professions/gathering';
+import { completeAllQuestsForDev } from '../quests/dev_quest_commands';
 import { generateRiftPlan, isSetPieceSeed } from '../rift/rift_gen';
 import {
   type AwayStatus,
@@ -1079,23 +1081,6 @@ export function handleDevChat(
     });
     return null;
   }
-  // [dev] Toggle invulnerability (rides the existing GM damage-immunity funnel in
-  // dealDamage). Handy for touring the group-tuned rifts solo. Tops off HP when
-  // enabling so a mid-fight toggle is a clean reset.
-  if (/^\/(?:dev\s+god|devgod)\s*$/i.test(raw)) {
-    const e = ctx.entities.get(pid);
-    if (e) {
-      e.gm = !e.gm;
-      if (e.gm) e.hp = e.maxHp;
-      ctx.emit({
-        type: 'log',
-        text: e.gm ? '[dev] God mode ON (invulnerable).' : '[dev] God mode OFF.',
-        color: '#b9f',
-        pid,
-      });
-    }
-    return null;
-  }
   // [dev] Toggle one-shot ("smite") mode: this player's every hit deletes any mob
   // it lands on (see dealDamage). Handy for blasting through the giga-boss rifts.
   if (/^\/(?:dev\s+(?:smite|oneshot|nuke)|devsmite)\s*$/i.test(raw)) {
@@ -1111,6 +1096,45 @@ export function handleDevChat(
     }
     return null;
   }
+  if (/^\/(?:dev\s+attune|devattune)\s*$/i.test(raw)) {
+    // [dev] Mark every quest complete so all attunement / requiresQuest gates open.
+    completeAllQuestsForDev(ctx, pid);
+    return null;
+  }
+  // [dev] /dev raid [heroic|normal|reset] (also accepts "/dev tp raid <n> heroic").
+  // Zones a lone tester straight into the Nythraxis raid, bypassing the raid-group
+  // and attunement gates; "reset" clears the raid lockouts so it can be re-run.
+  const raidM = /^\/(?:dev\s+)(?:tp\s+)?raid\b\s*(.*)$/i.exec(raw);
+  if (raidM) {
+    const rest = raidM[1].toLowerCase();
+    const meta = ctx.players.get(pid);
+    if (/\breset\b/.test(rest)) {
+      if (meta) meta.raidLockouts.clear();
+      ctx.emit({ type: 'log', text: '[dev] Raid lockouts cleared.', pid });
+      return null;
+    }
+    const difficulty = /\bnormal\b/.test(rest) ? 'normal' : 'heroic';
+    ctx.setDungeonDifficulty(difficulty, pid);
+    enterDungeon(ctx, 'nythraxis_boss_arena', pid, true);
+    ctx.emit({ type: 'log', text: `[dev] Entering Nythraxis raid (${difficulty}).`, pid });
+    return null;
+  }
+  if (/^\/(?:dev\s+god|devgod)\s*$/i.test(raw)) {
+    // [dev] Toggle god mode: invulnerable (target.devGod in dealDamage) and 100x
+    // outgoing damage (dev-gated), so a solo tester can survive and down raid bosses
+    // to inspect their drops. Enabling also tops off health and resource. Uses its
+    // OWN devGod flag, never the production gm flag, so it can never touch a real GM.
+    const e = ctx.entities.get(pid);
+    if (e) {
+      e.devGod = !e.devGod;
+      if (e.devGod) {
+        e.hp = e.maxHp;
+        e.resource = e.maxResource;
+      }
+      ctx.emit({ type: 'log', text: `[dev] God mode ${e.devGod ? 'ON' : 'OFF'}.`, pid });
+    }
+    return null;
+  }
   if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
     // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
     // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
@@ -1122,7 +1146,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev portal [seed] [level], /dev god, /dev smite, /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev attune, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev portal [seed] [level], /dev god, /dev smite, /dev raid [heroic|normal|reset], /dev kill',
     );
     return null;
   }
@@ -1226,6 +1250,7 @@ export function helpLines(): string[] {
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
+    'Hide a player: /ignore <name> hides their public chat only. /block <name> also stops their whispers, invites and mail. Also /unignore, /unblock, /ignorelist, /blocklist.',
     'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',
