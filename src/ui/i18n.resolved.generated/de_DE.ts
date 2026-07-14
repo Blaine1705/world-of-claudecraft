@@ -692,6 +692,7 @@ export const de_DE: EnTranslations = {
       "targetFriendlyNext": "Freundliches Ziel wechseln",
       "discord": "Discord",
       "valecup": "Talpokal",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Begleiter",
       "petAttack": "Begleiter: Angreifen",
       "petStop": "Begleiter: Stopp",
@@ -1092,6 +1093,12 @@ export const de_DE: EnTranslations = {
         "few": "Ihr seid {rank}, {count} Mitglieder",
         "many": "Ihr seid {rank}, {count} Mitglieder",
         "other": "Ihr seid {rank}, {count} Mitglieder"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} Charakter",
@@ -1891,6 +1898,107 @@ export const de_DE: EnTranslations = {
       "notAtHub": "Ihr müsst Euch am Handwerksplatz und auf der erforderlichen Stufe befinden, um das herzustellen.",
       "throttled": "Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.",
       "recipeNotLearned": "Ihr habt dieses Rezept noch nicht erlernt."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Buch der Taten",
@@ -6501,34 +6609,6 @@ export const de_DE: EnTranslations = {
         "name": "Rasche Heilung",
         "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)"
       },
-      "storm_bolt": {
-        "name": "Storm Bolt",
-        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
-      },
-      "piercing_howl": {
-        "name": "Piercing Howl",
-        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
-      },
-      "die_by_sword": {
-        "name": "Die by the Sword",
-        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
-      },
-      "recklessness": {
-        "name": "Recklessness",
-        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
-      },
-      "sanguine_aura": {
-        "name": "Sanguine Aura",
-        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
-      },
-      "victory_rush": {
-        "name": "Victory Rush",
-        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
-      },
-      "intimidating_shout": {
-        "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
-      },
       "summon_imp": {
         "name": "Emberkin beschwören",
         "description": "Beschwört einen Emberkin unter dem Befehl des Hexenmeisters. Der Emberkin schleudert aus der Ferne Ashbolts auf Eure Feinde. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben."
@@ -6673,10 +6753,6 @@ export const de_DE: EnTranslations = {
         "name": "Quellbrunnen",
         "description": "Restaura a freundliches Ziel durante 12 Sek.. (Schamanen-Talent)"
       },
-      "heroic_leap": {
-        "name": "Kriegssprung",
-        "description": "Saltas al área objetivo e infliges {damage} de daño physischen a nahe Gegner. (Krieger-Talent)"
-      },
       "holy_wrath": {
         "name": "Heiligenzorn",
         "description": "Desata poder sagrado e inflige {damage} de daño a nahe Gegner. (Paladin-Talent)"
@@ -6704,10 +6780,6 @@ export const de_DE: EnTranslations = {
       "kick": {
         "name": "Boot",
         "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
-      },
-      "last_stand": {
-        "name": "Elfte Stunde",
-        "description": "Aumenta temporalmente Ausdauer durante 15 Sek., aumentando la salud máxima. (Krieger-Talent)"
       },
       "mend_pet": {
         "name": "Zusammenflicken",
@@ -6777,10 +6849,6 @@ export const de_DE: EnTranslations = {
         "name": "Schreckensschrei",
         "description": "Aterroriza a nahe Gegner hasta 4 Sek.. El daño puede romper el efecto. (Priester-Talent)"
       },
-      "rallying_cry": {
-        "name": "Sammelruf",
-        "description": "Lanza un grito de reunión y aumenta Angriffskraft de nahe Verbündete durante 10 Sek.. (Krieger-Talent)"
-      },
       "counter_shot": {
         "name": "Hushing Shot",
         "description": "Ein schneller Schuss, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken."
@@ -6792,10 +6860,6 @@ export const de_DE: EnTranslations = {
       "shadowstep": {
         "name": "Schattengleiten",
         "description": "Das un paso entre las sombras hacia tu Ziel. (Schurken-Talent)"
-      },
-      "shield_wall": {
-        "name": "Bollwerk",
-        "description": "Alzas un muro de escudo y aumentas mucho la Rüstung durante 10 Sek.. (Krieger-Talent)"
       },
       "silence": {
         "name": "Stille",
@@ -8089,6 +8153,15 @@ export const de_DE: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Zepter des Todlosen Hofes"
       },
+      "deathless_warguard_legmail": {
+        "name": "Todlose Beinkette der Kriegswache"
+      },
+      "soulrend_diadem": {
+        "name": "Seelenriss-Diadem"
+      },
+      "scourgehide_carapace": {
+        "name": "Geißelhaut-Panzer"
+      },
       "cryptplate_helm": {
         "name": "Gruftplatten-Helm"
       },
@@ -8127,6 +8200,9 @@ export const de_DE: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Todlose Großklinge"
+      },
+      "soulforged_warplate": {
+        "name": "Seelengeschmiedete Kriegsplatte"
       },
       "stormcallers_focus": {
         "name": "Fokus des Sturmrufers"

@@ -1293,9 +1293,10 @@ describe('client HTML shell', () => {
     // fails instead of silently losing the guard.
 
     // Party rows are built once by the pooled row builder, not re-created on every
-    // party rebuild in hud.ts. Leaving the group lives in the self-portrait menu.
+    // party rebuild in hud.ts. Keep the branch-owned persistent Leave Party button
+    // alongside the self-portrait menu action.
     expect(partyFrameRowTs).toContain("row.className = 'party-frame panel';");
-    expect(partyFrameRowTs).not.toContain('party-leave');
+    expect(partyFrameRowTs).toContain("btn.id = 'party-leave';");
     expect(hudTs).toContain("else if (act === 'leave-party') this.sim.partyLeave();");
 
     // Aura slots: one node per aura id, held in a keyed pool and built once in

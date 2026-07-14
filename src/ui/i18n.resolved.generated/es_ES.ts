@@ -692,6 +692,7 @@ export const es_ES: EnTranslations = {
       "targetFriendlyNext": "Objetivo amistoso siguiente",
       "discord": "Discord",
       "valecup": "Copa del Valle",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Mascota",
       "petAttack": "Mascota: atacar",
       "petStop": "Mascota: detenerse",
@@ -1092,6 +1093,12 @@ export const es_ES: EnTranslations = {
         "few": "eres {rank}, {count} miembros",
         "many": "eres {rank}, {count} miembros",
         "other": "eres {rank}, {count} miembros"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} personaje",
@@ -1891,6 +1898,107 @@ export const es_ES: EnTranslations = {
       "notAtHub": "Debes estar en el centro de elaboración, con el nivel requerido, para elaborar eso.",
       "throttled": "Estás elaborando demasiado rápido. Espera un momento e inténtalo de nuevo.",
       "recipeNotLearned": "Aún no has aprendido esa receta."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Libro de Gestas",
@@ -6501,34 +6609,6 @@ export const es_ES: EnTranslations = {
         "name": "Alivio presto",
         "description": "Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)"
       },
-      "storm_bolt": {
-        "name": "Storm Bolt",
-        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
-      },
-      "piercing_howl": {
-        "name": "Piercing Howl",
-        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
-      },
-      "die_by_sword": {
-        "name": "Die by the Sword",
-        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
-      },
-      "recklessness": {
-        "name": "Recklessness",
-        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
-      },
-      "sanguine_aura": {
-        "name": "Sanguine Aura",
-        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
-      },
-      "victory_rush": {
-        "name": "Victory Rush",
-        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
-      },
-      "intimidating_shout": {
-        "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
-      },
       "summon_imp": {
         "name": "Invocar Emberkin",
         "description": "Invoca a un Emberkin bajo el mando del brujo. El Emberkin lanza Descargas de Ceniza a tus enemigos desde la distancia. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez."
@@ -6673,10 +6753,6 @@ export const es_ES: EnTranslations = {
         "name": "Manantial",
         "description": "Restaura a objetivo amistoso durante 12 s. (talento de chamán)"
       },
-      "heroic_leap": {
-        "name": "Salto de Guerra",
-        "description": "Saltas al área objetivo e infliges {damage} de daño Físico a cercanos enemigos. (talento de guerrero)"
-      },
       "holy_wrath": {
         "name": "Ira del Santo",
         "description": "Desata poder sagrado e inflige {damage} de daño a cercanos enemigos. (talento de paladín)"
@@ -6704,10 +6780,6 @@ export const es_ES: EnTranslations = {
       "kick": {
         "name": "Patada",
         "description": "Interrumpe el lanzamiento de hechizos del objetivo e impide lanzar hechizos de esa escuela durante 4 s."
-      },
-      "last_stand": {
-        "name": "Undécima Hora",
-        "description": "Aumenta temporalmente Aguante durante 15 s, aumentando la salud máxima. (talento de guerrero)"
       },
       "mend_pet": {
         "name": "Remendar",
@@ -6777,10 +6849,6 @@ export const es_ES: EnTranslations = {
         "name": "Alarido Psíquico",
         "description": "Aterroriza a cercanos enemigos hasta 4 s. El daño puede romper el efecto. (talento de sacerdote)"
       },
-      "rallying_cry": {
-        "name": "Arenga",
-        "description": "Lanza un grito de reunión y aumenta poder de ataque de cercanos aliados durante 10 s. (talento de guerrero)"
-      },
       "counter_shot": {
         "name": "Disparo silenciador",
         "description": "Un disparo rápido que interrumpe el lanzamiento de hechizos del objetivo y bloquea esa escuela durante 4 s."
@@ -6792,10 +6860,6 @@ export const es_ES: EnTranslations = {
       "shadowstep": {
         "name": "Paso Sombrío",
         "description": "Das un paso entre las sombras hacia tu objetivo. (talento de pícaro)"
-      },
-      "shield_wall": {
-        "name": "Baluarte",
-        "description": "Alzas un muro de escudo y aumentas mucho la armadura durante 10 s. (talento de guerrero)"
       },
       "silence": {
         "name": "Silencio",
@@ -8089,6 +8153,15 @@ export const es_ES: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Cetro de la Corte Imperecedera"
       },
+      "deathless_warguard_legmail": {
+        "name": "Malla de piernas del Guardián Imperecedero"
+      },
+      "soulrend_diadem": {
+        "name": "Diadema Desgarralmas"
+      },
+      "scourgehide_carapace": {
+        "name": "Caparazón de piel de Azote"
+      },
       "cryptplate_helm": {
         "name": "Yelmo Placacripta"
       },
@@ -8127,6 +8200,9 @@ export const es_ES: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Mandoble Imperecedero"
+      },
+      "soulforged_warplate": {
+        "name": "Coraza de guerra forjada en almas"
       },
       "stormcallers_focus": {
         "name": "Foco del Invocador de Tormentas"

@@ -692,6 +692,7 @@ export const nl_NL: EnTranslations = {
       "targetFriendlyNext": "Door Bondgenoten Bladeren",
       "discord": "Discord",
       "valecup": "Dalbeker",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Huisdier",
       "petAttack": "Huisdier: Aanvallen",
       "petStop": "Huisdier: Stoppen",
@@ -1092,6 +1093,12 @@ export const nl_NL: EnTranslations = {
         "few": "je bent {rank}, {count} leden",
         "many": "je bent {rank}, {count} leden",
         "other": "je bent {rank}, {count} leden"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} personage",
@@ -1891,6 +1898,107 @@ export const nl_NL: EnTranslations = {
       "notAtHub": "Je moet bij de werkbank zijn, op het vereiste niveau, om dat te maken.",
       "throttled": "Je maakt te snel. Wacht even en probeer het opnieuw.",
       "recipeNotLearned": "Je hebt dat recept nog niet geleerd."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Boek der Daden",
@@ -6501,34 +6609,6 @@ export const nl_NL: EnTranslations = {
         "name": "Snelle genezing",
         "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)"
       },
-      "storm_bolt": {
-        "name": "Storm Bolt",
-        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
-      },
-      "piercing_howl": {
-        "name": "Piercing Howl",
-        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
-      },
-      "die_by_sword": {
-        "name": "Die by the Sword",
-        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
-      },
-      "recklessness": {
-        "name": "Recklessness",
-        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
-      },
-      "sanguine_aura": {
-        "name": "Sanguine Aura",
-        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
-      },
-      "victory_rush": {
-        "name": "Victory Rush",
-        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
-      },
-      "intimidating_shout": {
-        "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
-      },
       "summon_imp": {
         "name": "Emberkin Oproepen",
         "description": "Roept een Emberkin op onder bevel van de Heksenmeester. De Emberkin slingert van veraf Ashbolts naar je vijanden. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
@@ -6673,10 +6753,6 @@ export const nl_NL: EnTranslations = {
         "name": "Bronwel",
         "description": "Restaura a vriendelijk doelwit durante 12 sec. (sjamaantalent)"
       },
-      "heroic_leap": {
-        "name": "Oorlogssprong",
-        "description": "Saltas al área objetivo e infliges {damage} de daño Fysieke a nabije vijanden. (krijgerstalent)"
-      },
       "holy_wrath": {
         "name": "Heiligenwoede",
         "description": "Desata poder sagrado e inflige {damage} de daño a nabije vijanden. (paladijntalent)"
@@ -6704,10 +6780,6 @@ export const nl_NL: EnTranslations = {
       "kick": {
         "name": "Schop",
         "description": "Onderbreekt de spreuk van het doelwit en verhindert het 4 sec lang spreuken uit die magieschool uit te spreken."
-      },
-      "last_stand": {
-        "name": "Elfde uur",
-        "description": "Aumenta temporalmente Uithoudingsvermogen durante 15 sec, aumentando la salud máxima. (krijgerstalent)"
       },
       "mend_pet": {
         "name": "Oplappen",
@@ -6777,10 +6849,6 @@ export const nl_NL: EnTranslations = {
         "name": "Psychische schreeuw",
         "description": "Aterroriza a nabije vijanden hasta 4 sec. El daño puede romper el efecto. (priestertalent)"
       },
-      "rallying_cry": {
-        "name": "Verzameling",
-        "description": "Lanza un grito de reunión y aumenta aanvalskracht de nabije bondgenoten durante 10 sec. (krijgerstalent)"
-      },
       "counter_shot": {
         "name": "Dempingsschot",
         "description": "Een snel schot dat de spreuk van het doelwit onderbreekt en die magieschool 4 sec vergrendelt."
@@ -6792,10 +6860,6 @@ export const nl_NL: EnTranslations = {
       "shadowstep": {
         "name": "Schaduwglip",
         "description": "Das un paso entre las sombras hacia tu doelwit. (schurkentalent)"
-      },
-      "shield_wall": {
-        "name": "Bolwerk",
-        "description": "Alzas un muro de escudo y aumentas mucho la pantser durante 10 sec. (krijgerstalent)"
       },
       "silence": {
         "name": "Stilte",
@@ -8089,6 +8153,15 @@ export const nl_NL: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Scepter van het Doodloze Hof"
       },
+      "deathless_warguard_legmail": {
+        "name": "Doodloze Krijgswacht-Beenmalie"
+      },
+      "soulrend_diadem": {
+        "name": "Zielscheur-Diadeem"
+      },
+      "scourgehide_carapace": {
+        "name": "Geselhuid-Pantser"
+      },
       "cryptplate_helm": {
         "name": "Kryptplaat-Helm"
       },
@@ -8127,6 +8200,9 @@ export const nl_NL: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Doodloos Grootzwaard"
+      },
+      "soulforged_warplate": {
+        "name": "Zielgesmede Krijgsplaat"
       },
       "stormcallers_focus": {
         "name": "Stormroepers Focus"

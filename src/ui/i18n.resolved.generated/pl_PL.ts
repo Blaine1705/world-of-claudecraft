@@ -692,6 +692,7 @@ export const pl_PL: EnTranslations = {
       "targetFriendlyNext": "Przełączaj przyjazny cel",
       "discord": "Discord",
       "valecup": "Puchar Doliny",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Zwierzę",
       "petAttack": "Zwierzę: Atak",
       "petStop": "Zwierzę: Zatrzymaj",
@@ -1092,6 +1093,12 @@ export const pl_PL: EnTranslations = {
         "few": "jesteś rangi {rank}, {count} członkowie",
         "many": "jesteś rangi {rank}, {count} członków",
         "other": "jesteś rangi {rank}, {count} członków"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} postać",
@@ -1891,6 +1898,107 @@ export const pl_PL: EnTranslations = {
       "notAtHub": "Musisz być w warsztacie rzemieślniczym i mieć wymagany poziom, aby to wytworzyć.",
       "throttled": "Wytwarzasz zbyt szybko. Zaczekaj chwilę i spróbuj ponownie.",
       "recipeNotLearned": "Nie nauczyłeś się jeszcze tego przepisu."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Księga Czynów",
@@ -6501,34 +6609,6 @@ export const pl_PL: EnTranslations = {
         "name": "Szybkie uzdrowienie",
         "description": "Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. (specjalizacja Odnowa)"
       },
-      "storm_bolt": {
-        "name": "Storm Bolt",
-        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
-      },
-      "piercing_howl": {
-        "name": "Piercing Howl",
-        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
-      },
-      "die_by_sword": {
-        "name": "Die by the Sword",
-        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
-      },
-      "recklessness": {
-        "name": "Recklessness",
-        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
-      },
-      "sanguine_aura": {
-        "name": "Sanguine Aura",
-        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
-      },
-      "victory_rush": {
-        "name": "Victory Rush",
-        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
-      },
-      "intimidating_shout": {
-        "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
-      },
       "summon_imp": {
         "name": "Przywołanie Emberkina",
         "description": "Przywołuje Emberkina pod komendę Czarnoksiężnika. Emberkin ciska popielnymi pociskami w twoich wrogów z oddali. Przywołanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz."
@@ -6673,10 +6753,6 @@ export const pl_PL: EnTranslations = {
         "name": "Źródlisko",
         "description": "Restaura a przyjazny cel durante 12 s. (talent szamana)"
       },
-      "heroic_leap": {
-        "name": "Wojenny Skok",
-        "description": "Saltas al área objetivo e infliges {damage} de daño Fizyczne a pobliskich wrogów. (talent wojownika)"
-      },
       "holy_wrath": {
         "name": "Gniew Świętego",
         "description": "Desata poder sagrado e inflige {damage} de daño a pobliskich wrogów. (talent paladyna)"
@@ -6704,10 +6780,6 @@ export const pl_PL: EnTranslations = {
       "kick": {
         "name": "Kopnięcie",
         "description": "Przerywa rzucanie zaklęć celu i uniemożliwia rzucanie ich z tej szkoły na 4 sekundy."
-      },
-      "last_stand": {
-        "name": "Jedenasta Godzina",
-        "description": "Aumenta temporalmente Wytrzymałość durante 15 s, aumentando la salud máxima. (talent wojownika)"
       },
       "mend_pet": {
         "name": "Opatrunek",
@@ -6777,10 +6849,6 @@ export const pl_PL: EnTranslations = {
         "name": "Psychiczny Krzyk",
         "description": "Aterroriza a pobliskich wrogów hasta 4 s. El daño puede romper el efecto. (talent kapłana)"
       },
-      "rallying_cry": {
-        "name": "Zbiórka",
-        "description": "Lanza un grito de reunión y aumenta siłę ataku de pobliskich sojuszników durante 10 s. (talent wojownika)"
-      },
       "counter_shot": {
         "name": "Uciszający Strzał",
         "description": "Szybki strzał, który przerywa rzucanie zaklęć celu i blokuje tę szkołę na 4 sekundy."
@@ -6792,10 +6860,6 @@ export const pl_PL: EnTranslations = {
       "shadowstep": {
         "name": "Cieniokrok",
         "description": "Das un paso entre las sombras hacia tu cel. (talent łotrzyka)"
-      },
-      "shield_wall": {
-        "name": "Bastion",
-        "description": "Alzas un muro de escudo y aumentas mucho la pancerz durante 10 s. (talent wojownika)"
       },
       "silence": {
         "name": "Cisza",
@@ -8089,6 +8153,15 @@ export const pl_PL: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Berło nieśmiertelnego dworu"
       },
+      "deathless_warguard_legmail": {
+        "name": "Nieśmiertelne nogawice wojennej straży"
+      },
+      "soulrend_diadem": {
+        "name": "Diadem rozdarcia dusz"
+      },
+      "scourgehide_carapace": {
+        "name": "Pancerz ze skóry plagi"
+      },
       "cryptplate_helm": {
         "name": "Hełm z kryptowej płyty"
       },
@@ -8127,6 +8200,9 @@ export const pl_PL: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Nieśmiertelne wielkie ostrze"
+      },
+      "soulforged_warplate": {
+        "name": "Bojowa zbroja kuta z duszy"
       },
       "stormcallers_focus": {
         "name": "Ognisko przyzywacza burz"

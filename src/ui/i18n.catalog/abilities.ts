@@ -1441,41 +1441,6 @@ const classAbilityNamesEn = {
         'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)',
       ],
       [
-        'storm_bolt',
-        'Storm Bolt',
-        'Hurl your weapon at the target for {damage}, stunning it for 3 sec.',
-      ],
-      [
-        'piercing_howl',
-        'Piercing Howl',
-        'A piercing shout that slows all enemies within 15 yards by 50% for 8 sec.',
-      ],
-      [
-        'die_by_sword',
-        'Die by the Sword',
-        'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
-      ],
-      [
-        'recklessness',
-        'Recklessness',
-        'Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec.',
-      ],
-      [
-        'sanguine_aura',
-        'Sanguine Aura',
-        'Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec.',
-      ],
-      [
-        'victory_rush',
-        'Victory Rush',
-        'Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy.',
-      ],
-      [
-        'intimidating_shout',
-        'Intimidating Shout',
-        'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect.',
-      ],
-      [
         'summon_imp',
         'Summon Emberkin',
         'Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
@@ -1636,11 +1601,6 @@ const classAbilityNamesEn = {
       ],
       ['healing_stream', 'Springwell', 'Restores a friendly target over 12 sec. (Shaman talent)'],
       [
-        'heroic_leap',
-        'Warleap',
-        'Leap to the target area, dealing {damage} Physical damage to nearby enemies. (Warrior talent)',
-      ],
-      [
         'holy_wrath',
         "Saint's Ire",
         'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
@@ -1671,11 +1631,6 @@ const classAbilityNamesEn = {
         'kick',
         'Boot',
         "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
-      ],
-      [
-        'last_stand',
-        'Eleventh Hour',
-        'Temporarily increases Stamina for 15 sec, increasing maximum health. (Warrior talent)',
       ],
       ['mend_pet', 'Patch Up', 'Heals a friendly target for {damage} over 15 sec. (Hunter talent)'],
       [
@@ -1755,11 +1710,6 @@ const classAbilityNamesEn = {
         'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
       ],
       [
-        'rallying_cry',
-        'Muster',
-        "Lets loose a mustering cry, increasing nearby allies' attack power for 10 sec. (Warrior talent)",
-      ],
-      [
         'counter_shot',
         'Hushing Shot',
         "A snap shot that interrupts the target's spellcast and locks that school for 4 sec.",
@@ -1770,11 +1720,6 @@ const classAbilityNamesEn = {
         "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
       ],
       ['shadowstep', 'Shadeslip', 'Steps through the shadows toward your target. (Rogue talent)'],
-      [
-        'shield_wall',
-        'Bulwark',
-        'Raise an unbreakable bulwark, greatly increasing armor for 10 sec. (Warrior talent)',
-      ],
       ['silence', 'Silent Treatment', 'Silences the target for 4 sec. (Priest talent)'],
       [
         'skull_bash',
@@ -5190,39 +5135,10 @@ export const classAbilityNames = {
           '迅捷治愈',
           '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）',
         ],
-        ['storm_bolt', '风暴之锤', '将武器掷向目标，造成 {damage}，并使其昏迷 3 秒。'],
-        ['piercing_howl', '刺耳怒吼', '发出刺耳的吼声，使 15 码内所有敌人减速 50%，持续 8 秒。'],
-        [
-          'die_by_sword',
-          '剑在人在',
-          '防御性冷却：持续 8 秒，你受到的伤害降低 30%，并能躲闪更多攻击。',
-        ],
-        ['recklessness', '鲁莽', '激怒：怒气获取提高 50%，暴击几率提高 20%，持续 12 秒。'],
-        [
-          'sanguine_aura',
-          '血色光环',
-          '以敌人之血浸染你的武器：你和近战盟友获得 10% 攻击速度和 10% 伤害加成，持续 20 秒。',
-        ],
-        [
-          'victory_rush',
-          '乘胜追击',
-          '发动打击，造成武器伤害加 {damage}，并为你恢复最大生命值的 20%。只能在击杀敌人后 20 秒内使用。',
-        ],
-        [
-          'intimidating_shout',
-          '破胆怒吼',
-          '发出骇人的怒吼，使 8 码内最多 5 名敌人惊惧逃窜 8 秒。受到伤害可能打破该效果。',
-        ],
         [
           'pummel',
           '拳击',
           '打断施法，并使该系法术在 4 秒内无法施放。成功打断施法时产生 10 点怒气。',
-        ],
-        ['heroic_leap', '英勇飞跃', '跃向目标区域，对附近敌人造成 {damage} 点伤害。'],
-        [
-          'rallying_cry',
-          '集结呐喊',
-          '发出集结呐喊，使你和 40 码内的小队成员获得 20% 的额外最大生命值，持续 10 秒。',
         ],
         [
           'summon_imp',
@@ -5642,39 +5558,10 @@ export const classAbilityNames = {
           '迅癒',
           '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）',
         ],
-        ['storm_bolt', '風暴之錘', '將武器擲向目標，造成 {damage}，並使其昏迷 3 秒。'],
-        ['piercing_howl', '刺耳怒吼', '發出刺耳的吼聲，使 15 碼內所有敵人減速 50%，持續 8 秒。'],
-        [
-          'die_by_sword',
-          '劍在人在',
-          '防禦性冷卻：持續 8 秒，你受到的傷害降低 30%，並能閃躲更多攻擊。',
-        ],
-        ['recklessness', '魯莽', '激怒：怒氣獲取提高 50%，爆擊機率提高 20%，持續 12 秒。'],
-        [
-          'sanguine_aura',
-          '血色光環',
-          '以敵人之血浸染你的武器：你和近戰盟友獲得 10% 攻擊速度和 10% 傷害加成，持續 20 秒。',
-        ],
-        [
-          'victory_rush',
-          '乘勝追擊',
-          '發動打擊，造成武器傷害加 {damage}，並為你恢復最大生命值的 20%。只能在擊殺敵人後 20 秒內使用。',
-        ],
-        [
-          'intimidating_shout',
-          '破膽怒吼',
-          '發出駭人的怒吼，使 8 碼內最多 5 名敵人驚懼逃竄 8 秒。受到傷害可能打破該效果。',
-        ],
         [
           'pummel',
           '拳擊',
           '打斷施法，並使該系法術在 4 秒內無法施放。成功打斷施法時產生 10 點怒氣。',
-        ],
-        ['heroic_leap', '英勇飛躍', '躍向目標區域，對附近敵人造成 {damage} 點傷害。'],
-        [
-          'rallying_cry',
-          '集結吶喊',
-          '發出集結吶喊，使你和 40 碼內的隊伍成員獲得 20% 的額外最大生命值，持續 10 秒。',
         ],
         [
           'summon_imp',
@@ -6319,54 +6206,9 @@ export const classAbilityNames = {
           '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
         ],
         [
-          'storm_bolt',
-          '폭풍망치',
-          '무기를 던져 대상에게 {damage}의 피해를 입히고 3초 동안 기절시킵니다.',
-        ],
-        [
-          'piercing_howl',
-          '날카로운 고함',
-          '날카로운 고함을 질러 15미터 내 모든 적의 이동 속도를 8초 동안 50% 감소시킵니다.',
-        ],
-        [
-          'die_by_sword',
-          '투사의 혼',
-          '방어 재사용 대기시간: 8초 동안 받는 피해가 30% 감소하고 훨씬 더 많은 공격을 회피합니다.',
-        ],
-        [
-          'recklessness',
-          '무모한 희생',
-          '격노: 12초 동안 분노 생성량이 50%, 치명타 확률이 20% 증가합니다.',
-        ],
-        [
-          'sanguine_aura',
-          '핏빛 오라',
-          '적의 피로 무기를 물들입니다. 자신과 근접 아군의 공격 속도가 10%, 피해가 10% 증가합니다. 20초 동안 지속됩니다.',
-        ],
-        [
-          'victory_rush',
-          '연전연승',
-          '무기 피해에 {damage}를 더한 피해를 입히고 최대 생명력의 20%를 회복합니다. 적 처치 후 20초 이내에만 사용할 수 있습니다.',
-        ],
-        [
-          'intimidating_shout',
-          '위협의 외침',
-          '공포스러운 외침으로 8미터 내 최대 5명의 적을 8초 동안 공포에 질려 도망치게 합니다. 피해를 입으면 효과가 풀릴 수 있습니다.',
-        ],
-        [
           'pummel',
           '자루 공격',
           '시전을 방해하고 해당 계열 주문을 4초 동안 시전할 수 없게 합니다. 시전을 끊으면 분노 10을 생성합니다.',
-        ],
-        [
-          'heroic_leap',
-          '영웅의 도약',
-          '목표 지점으로 도약하여 주위 적에게 {damage}의 피해를 입힙니다.',
-        ],
-        [
-          'rallying_cry',
-          '재집결의 함성',
-          '재집결의 함성을 질러 자신과 40미터 내 파티원의 최대 생명력을 10초 동안 20% 증가시킵니다.',
         ],
         [
           'summon_imp',
@@ -7047,54 +6889,9 @@ export const classAbilityNames = {
           '味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）',
         ],
         [
-          'storm_bolt',
-          'ストームボルト',
-          '武器を投げつけて{damage}のダメージを与え、対象を3秒間スタンさせます。',
-        ],
-        [
-          'piercing_howl',
-          'ピアシングハウル',
-          '鋭い咆哮を上げ、15ヤード以内の敵全員を8秒間50%減速させます。',
-        ],
-        [
-          'die_by_sword',
-          'ダイ・バイ・ザ・ソード',
-          '防御用クールダウン：8秒間、受けるダメージが30%減少し、はるかに多くの攻撃を回避します。',
-        ],
-        [
-          'recklessness',
-          'レックレスネス',
-          '激怒：12秒間、怒りの生成が50%、クリティカル率が20%増加します。',
-        ],
-        [
-          'sanguine_aura',
-          'サングインオーラ',
-          '敵の血で武器を染め上げます。自身と近接の味方の攻撃速度が10%、ダメージが10%増加します。20秒間持続します。',
-        ],
-        [
-          'victory_rush',
-          'ヴィクトリーラッシュ',
-          '武器ダメージ+{damage}の一撃を放ち、最大体力の20%を回復します。敵を倒してから20秒以内のみ使用可能です。',
-        ],
-        [
-          'intimidating_shout',
-          '威嚇の雄叫び',
-          '恐ろしい雄叫びを上げ、8ヤード以内の最大5体の敵を8秒間恐怖で逃げ惑わせます。ダメージで効果が解除されることがあります。',
-        ],
-        [
           'pummel',
           'パンメル',
           '詠唱を妨害し、その系統の呪文を4秒間詠唱不能にします。詠唱を止めると怒りを10生成します。',
-        ],
-        [
-          'heroic_leap',
-          'ヒロイックリープ',
-          '目標地点へ跳躍し、周囲の敵に{damage}のダメージを与えます。',
-        ],
-        [
-          'rallying_cry',
-          'ラリングクライ',
-          '鬨の声を上げ、自身と40ヤード以内のパーティメンバーの最大体力を10秒間20%増加させます。',
         ],
         [
           'summon_imp',
@@ -8550,51 +8347,10 @@ export const classAbilityNames = {
           'Быстрое восстановление',
           'Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. (знаковое умение Исцеления)',
         ],
-        ['storm_bolt', 'Удар бури', 'Метает оружие в цель, нанося {damage} и оглушая ее на 3 сек.'],
-        [
-          'piercing_howl',
-          'Пронзительный вой',
-          'Пронзительный крик, замедляющий всех противников в радиусе 15 м на 50% на 8 сек.',
-        ],
-        [
-          'die_by_sword',
-          'Смерть от меча',
-          'Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак.',
-        ],
-        [
-          'recklessness',
-          'Безрассудство',
-          'Исступление: накопление ярости увеличено на 50%, а вероятность критического удара на 20% на 12 сек.',
-        ],
-        [
-          'sanguine_aura',
-          'Кровавая аура',
-          'Пропитывает оружие кровью врагов: вы и ваши союзники ближнего боя получаете 10% к скорости атаки и 10% к урону на 20 сек.',
-        ],
-        [
-          'victory_rush',
-          'Победный рывок',
-          'Удар, наносящий урон оружием плюс {damage} и восполняющий 20% вашего максимального здоровья. Можно использовать только в течение 20 сек после убийства врага.',
-        ],
-        [
-          'intimidating_shout',
-          'Устрашающий крик',
-          'Ужасающий крик, обращающий в паническое бегство до 5 врагов в радиусе 8 м на 8 сек. Урон может прервать эффект.',
-        ],
         [
           'pummel',
           'Зуботычина',
           'Прерывает произнесение заклинания и блокирует эту школу магии на 4 сек. Дает 10 ед. ярости, если заклинание было прервано.',
-        ],
-        [
-          'heroic_leap',
-          'Героический прыжок',
-          'Прыжок в указанную область, наносящий {damage} урона ближайшим врагам.',
-        ],
-        [
-          'rallying_cry',
-          'Воодушевляющий крик',
-          'Воодушевляющий крик дает вам и членам группы в радиусе 40 м 20% дополнительного максимального здоровья на 10 сек.',
         ],
         [
           'summon_imp',

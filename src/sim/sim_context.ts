@@ -35,6 +35,7 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
 import type {
@@ -412,6 +413,12 @@ export interface SimContextCallbacks {
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
+  // Dungeon Finder formation seam (owned by social/party.ts): merge solo
+  // players and whole partial parties into ONE party/raid without synthesizing
+  // invite prompts or accept events. Returns the formed party, or null (and
+  // mutates nothing) when a source roster no longer matches live party state.
+  // Consumed by social/dungeon_finder.ts.
+  formDungeonFinderGroup(units: FinderFormationUnit[], opts: { raid: boolean }): Party | null;
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
@@ -688,6 +695,12 @@ export interface SimContextCallbacks {
   // /dev sandbox: a generic practice scenario (dummy + regen-frozen raid bots at a 10k
   // pool). Returns the number of allies spawned. Stays on Sim.
   startDevSandbox(pid?: number): number;
+  // Dev-only Dungeon Finder scenario seeding backing "/dev lfg" (social/chat.ts,
+  // gated by devCommands). Spawns finder dev bots around the caller. Stays on Sim.
+  seedDungeonFinderDev(
+    mode: 'queue' | 'raid' | 'board',
+    pid?: number,
+  ): { spawned: number; note: 'ok' | 'needRoles' | 'noneEligible' };
 
   // L2 inventory/vendor (src/sim/items.ts): the four helpers the moved useItem
   // dispatches to that STAY on Sim (their owning facets are decided later). W2 owns
@@ -1036,6 +1049,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     readyCheckStart: host.readyCheckStart,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
+    formDungeonFinderGroup: host.formDungeonFinderGroup,
     onMobKilledForQuests: host.onMobKilledForQuests,
     onInventoryChangedForQuests: host.onInventoryChangedForQuests,
     checkQuestReady: host.checkQuestReady,
@@ -1149,6 +1163,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     spawnDevVendor: host.spawnDevVendor,
     startCascadePlaytest: host.startCascadePlaytest,
     startDevSandbox: host.startDevSandbox,
+    seedDungeonFinderDev: host.seedDungeonFinderDev,
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: host.startFishing,
     unlockMechChromaFromItem: host.unlockMechChromaFromItem,

@@ -93,13 +93,13 @@ function broadcast(server: GameServer): void {
 }
 
 // A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.
-function bareClient(pid: number): ClientWorld {
+function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
   const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
+  c.cfg = { seed: 20061, playerClass };
   c.entities = new Map();
   c.playerId = pid;
   c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
+  c.ownPlayerClass = playerClass;
   c.spectating = null;
   c.cupInfo = null;
   c.sportRole = null;
@@ -490,7 +490,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade/bank); all 42 of them
+    // first snapshot (even the null-valued ones like party/trade/bank); all 44 of them
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -776,6 +776,39 @@ describe('delta snapshots', () => {
     expect(snap.self.inv.some((s: any) => s.itemId === 'baked_bread')).toBe(true);
     expect(snap.self).not.toHaveProperty('qlog');
     expect(snap.self).not.toHaveProperty('stats');
+  });
+
+  it('flushes mage row picks in the next heavy self snapshot', () => {
+    const mageServer = new GameServer();
+    const mageFc = fakeWs();
+    const mage = joinServer(mageServer, mageFc, 9, 'Rowwire', 'mage');
+    mageServer.sim.setPlayerLevel(5, mage.pid);
+
+    broadcast(mageServer);
+    const client = bareClient(mage.pid, 'mage');
+    (client as any).applySnapshot(lastSnap(mageFc.sent));
+    mageFc.sent.length = 0;
+    broadcast(mageServer);
+    expect(lastSnap(mageFc.sent).self).not.toHaveProperty('tal');
+
+    mageFc.sent.length = 0;
+    mageServer.handleMessage(
+      mage,
+      JSON.stringify({ t: 'cmd', cmd: 'pickRowTalent', row: 0, option: 'mag_r5_ice_floes' }),
+    );
+    broadcast(mageServer);
+
+    const snap = lastSnap(mageFc.sent);
+    expect(snap.self.tal.rowPicks).toEqual([
+      'mag_r5_ice_floes',
+      null,
+      null,
+      null,
+      null,
+      null,
+    ]);
+    (client as any).applySnapshot(snap);
+    expect(client.rowPicks).toEqual(['mag_r5_ice_floes', null, null, null, null, null]);
   });
 
   it('resends equip + inv on the next snapshot after an online unequip', () => {
@@ -2471,9 +2504,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 42 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 46 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 41st unregistered delta key reddens this gate.
+// 47th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'achg',
   'arena',
@@ -2490,6 +2523,8 @@ const ALL_DELTA_KEYS = [
   'dcompanion',
   'deeds',
   'delveDaily',
+  'df',
+  'dfb',
   'dmarks',
   'drun',
   'dstats',
@@ -2541,6 +2576,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
   deeds: 'deedsEarned',
+  df: 'dungeonFinderInfo',
+  dfb: 'dungeonFinderBoard',
   dmarks: 'delveMarks',
   drun: 'delveRun',
   dstats: 'deedStats',
@@ -2655,6 +2692,7 @@ function dirtyEveryDeltaField(): {
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
+  meta.rowPicks = ['wire_row_pick', null, null, null, null, null];
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
   // sets, and a clear record, a renown total, and an active title
@@ -2826,9 +2864,10 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.deedStats.dungeonClears).toEqual({ hollow_crypt: 2 });
     expect(client.renown).toBe(15); // renown (same name both sides, no rename)
     expect(client.activeTitle).toBe('prog_veteran'); // atitle -> activeTitle
-    // tal -> talents / talentSpec / loadouts / activeLoadout
+    // tal -> talents / talentSpec / rowPicks / loadouts / activeLoadout
     expect(client.talents).toEqual({ spec: 'arms', ranks: {}, choices: {} });
     expect(client.talentSpec).toBe('arms');
+    expect(client.rowPicks).toEqual(['wire_row_pick', null, null, null, null, null]);
     expect(client.loadouts).toEqual([
       { name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] },
     ]);
@@ -2876,9 +2915,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 44 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(44);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(44);
+  it('ALL_DELTA_KEYS contains exactly 46 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(46);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(46);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2890,7 +2929,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(44);
+    expect(scraped.size).toBe(46);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

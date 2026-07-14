@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { emptyModifiers, type TalentModifiers } from '../src/sim/content/talents';
 import {
   abilityScalingPower,
   channelTickBonus,
@@ -11,11 +12,12 @@ import {
 import { MAX_LEVEL } from '../src/sim/types';
 import { type AbilityScaling, abilityDamageBonus } from '../src/ui/ability_damage';
 
-function known(cls: Parameters<typeof abilitiesKnownAt>[0], id: string) {
-  return abilitiesKnownAt(cls, MAX_LEVEL).find((k) => k.def.id === id)!;
+function known(cls: Parameters<typeof abilitiesKnownAt>[0], id: string, mods?: TalentModifiers) {
+  return abilitiesKnownAt(cls, MAX_LEVEL, mods).find((k) => k.def.id === id)!;
 }
 
 const SC: AbilityScaling = { spellPower: 80, rangedPower: 200, attackPower: 140 };
+const ARCANE_MODS = { ...emptyModifiers(), spec: 'arcane' as const };
 
 describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   it('a direct nuke folds Spell Power with the rank-resolved cast time', () => {
@@ -28,7 +30,7 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   });
 
   it('an AoE nuke takes the AoE-penalised coefficient', () => {
-    const ae = known('mage', 'arcane_explosion');
+    const ae = known('mage', 'arcane_explosion', ARCANE_MODS);
     const eff = ae.effects.find((e) => e.type === 'aoeDamage')!;
     expect(abilityDamageBonus(ae, eff, SC)).toBe(
       directHitBonus(SC.spellPower, ae.def, ae.castTime, true),
@@ -55,7 +57,7 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   });
 
   it('a channelled directDamage (Arcane Missiles) uses the per-tick CHANNEL coefficient', () => {
-    const am = known('mage', 'arcane_missiles');
+    const am = known('mage', 'arcane_missiles', ARCANE_MODS);
     const eff = am.effects.find((e) => e.type === 'directDamage')!;
     // It is a per-missile channel tick, so it must use the channel coefficient, not
     // the single-cast direct coefficient.

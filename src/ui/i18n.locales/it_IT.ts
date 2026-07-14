@@ -310,6 +310,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Elmetto della madre del coro',
   'entities.items.cryptplate_helm.name': 'Elmo della corazza della cripta',
   'entities.items.deathless_greatblade.name': 'Spadone senza morte',
+  'entities.items.deathless_warguard_legmail.name':
+    'Cosciali di maglia del guardiaguerra senza morte',
   'entities.items.gravescale_girdle.name': 'Cintura scagliatomba',
   'entities.items.gravewyrm_claws.name': 'Artigli del wyrm tombale',
   'entities.items.gravewyrm_cleaver.name': 'Mannaia del wyrm tombale',
@@ -325,10 +327,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Prese del predatore del santuario',
   'entities.items.sash_of_the_sunken_court.name': 'Fascia della corte sommersa',
   'entities.items.scepter_of_the_deathless_court.name': 'Scettro della corte senza morte',
+  'entities.items.scourgehide_carapace.name': 'Carapace di pelle del flagello',
   'entities.items.seal_of_the_nine_oaths.name': 'Sigillo dei nove giuramenti',
   'entities.items.shadowpulse_handwraps.name': 'Bende ombrapulsante',
   'entities.items.shadowpulse_slippers.name': 'Calzari ombrapulsante',
   'entities.items.shroud_of_the_gravewyrm.name': 'Sudario del wyrm tombale',
+  'entities.items.soulforged_warplate.name': 'Corazza da guerra forgianima',
+  'entities.items.soulrend_diadem.name': 'Diadema straccianima',
   'entities.items.stormcallers_focus.name': "Focus dell'evocatempesta",
   'entities.items.sunken_court_mantle.name': 'Mantello della corte sommersa',
   'entities.items.sutils_gambit.name': 'Gambetto di Sutil',
@@ -7552,9 +7557,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Fonte Viva',
   'entities.abilities.healing_stream.description':
     'Restaura a bersaglio alleato durante 12 s. (talento da sciamano)',
-  'entities.abilities.heroic_leap.name': 'Balzo di Guerra',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Fisico a vicini nemici. (talento da guerriero)',
   'entities.abilities.holy_wrath.name': 'Ira del Santo',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a vicini nemici. (talento da paladino)',
@@ -7570,9 +7572,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Linfa Vitale',
   'entities.abilities.innervate.description':
     'La linfa vivente sgorga in te per 10 sec, ripristinando 20 della tua risorsa attuale a ondate: mana, rabbia o energia; cambiare forma non la interrompe. (talento del Druido)',
-  'entities.abilities.last_stand.name': 'Undicesima Ora',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Tempra durante 15 s, aumentando la salud máxima. (talento da guerriero)',
   'entities.abilities.mend_pet.name': 'Rattoppo',
   'entities.abilities.mend_pet.description':
     'Sana a bersaglio alleato por {damage} durante 15 s. (talento da cacciatore)',
@@ -7597,15 +7596,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Urlo Psichico',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a vicini nemici hasta 4 s. El daño puede romper el efecto. (talento da sacerdote)',
-  'entities.abilities.rallying_cry.name': 'Adunata',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta potenza d’attacco de vicini alleati durante 10 s. (talento da guerriero)',
   'entities.abilities.shadowstep.name': 'Scivolo d’Ombra',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu bersaglio. (talento da ladro)',
-  'entities.abilities.shield_wall.name': 'Baluardo',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la armatura durante 10 s. (talento da guerriero)',
   'entities.abilities.silence.name': 'Silenzio',
   'entities.abilities.silence.description':
     'Silencia a bersaglio durante 4 s. (talento da sacerdote)',

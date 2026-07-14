@@ -336,6 +336,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': "Koroana'nın Miğferi",
   'entities.items.cryptplate_helm.name': 'Mezarzırh Miğferi',
   'entities.items.deathless_greatblade.name': 'Ölümsüz Pala',
+  'entities.items.deathless_warguard_legmail.name': 'Ölümsüz Savaşmuhafızı Bacak Zırhı',
   'entities.items.gravescale_girdle.name': 'Mezarpulu Kemeri',
   'entities.items.gravewyrm_claws.name': 'Mezarejderi Pençeleri',
   'entities.items.gravewyrm_cleaver.name': 'Mezarejderi Satırı',
@@ -351,10 +352,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Mabet Avcısının Eldivenleri',
   'entities.items.sash_of_the_sunken_court.name': 'Boğulmuş Saray Kuşağı',
   'entities.items.scepter_of_the_deathless_court.name': 'Ölümsüz Saray Asası',
+  'entities.items.scourgehide_carapace.name': 'Afetpostu Kabuğu',
   'entities.items.seal_of_the_nine_oaths.name': 'Dokuz Yeminin Mührü',
   'entities.items.shadowpulse_handwraps.name': 'Gölgenabzı El Sargıları',
   'entities.items.shadowpulse_slippers.name': 'Gölgenabzı Terlikleri',
   'entities.items.shroud_of_the_gravewyrm.name': 'Mezarejderi Kefeni',
+  'entities.items.soulforged_warplate.name': 'Ruhdövümü Savaş Zırhı',
+  'entities.items.soulrend_diadem.name': 'Ruhyırtan Tacı',
   'entities.items.stormcallers_focus.name': 'Fırtınaçağıranın Odağı',
   'entities.items.sunken_court_mantle.name': 'Boğulmuş Saray Pelerini',
   'entities.items.sutils_gambit.name': "Sutil'in Kumarı",
@@ -7405,9 +7409,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Kaynak Kuyusu',
   'entities.abilities.healing_stream.description':
     'Restaura a dost hedefi durante 12 sn. (şaman yeteneği)',
-  'entities.abilities.heroic_leap.name': 'Savaş Sıçrayışı',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Fiziksel a yakındaki düşmanları. (savaşçı yeteneği)',
   'entities.abilities.holy_wrath.name': 'Aziz Hiddeti',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a yakındaki düşmanları. (paladin yeteneği)',
@@ -7423,9 +7424,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Yaşam Özsuyu',
   'entities.abilities.innervate.description':
     'Canlı özsu 10 sn boyunca içinde kabarır ve mevcut kaynağından dalgalar halinde 20 doldurur: mana, öfke veya enerji; form değiştirmek bunu bozmaz. (Druid yeteneği)',
-  'entities.abilities.last_stand.name': 'On Birinci Saat',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Dayanıklılığı durante 15 sn, aumentando la salud máxima. (savaşçı yeteneği)',
   'entities.abilities.mend_pet.name': 'Yama Yap',
   'entities.abilities.mend_pet.description':
     'Sana a dost hedefi por {damage} durante 15 sn. (avcı yeteneği)',
@@ -7450,15 +7448,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Psişik Çığlık',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a yakındaki düşmanları hasta 4 sn. El daño puede romper el efecto. (rahip yeteneği)',
-  'entities.abilities.rallying_cry.name': 'Toplanma Çağrısı',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta saldırı gücünü de yakındaki müttefikleri durante 10 sn. (savaşçı yeteneği)',
   'entities.abilities.shadowstep.name': 'Gölge Kayışı',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu hedefi. (haydut yeteneği)',
-  'entities.abilities.shield_wall.name': 'Tabya',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la zırhı durante 10 sn. (savaşçı yeteneği)',
   'entities.abilities.silence.name': 'Sessizlik',
   'entities.abilities.silence.description': 'Silencia a hedefi durante 4 sn. (rahip yeteneği)',
   'entities.abilities.tranquility.name': 'Koru Şarkısı',

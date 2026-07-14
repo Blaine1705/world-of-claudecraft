@@ -292,6 +292,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Koormoeders Helm',
   'entities.items.cryptplate_helm.name': 'Kryptplaat-Helm',
   'entities.items.deathless_greatblade.name': 'Doodloos Grootzwaard',
+  'entities.items.deathless_warguard_legmail.name': 'Doodloze Krijgswacht-Beenmalie',
   'entities.items.gravescale_girdle.name': 'Grafschub-Gordel',
   'entities.items.gravewyrm_claws.name': 'Grafwurm-Klauwen',
   'entities.items.gravewyrm_cleaver.name': 'Grafwurm-Kliever',
@@ -307,10 +308,13 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Heiligdomsluiper-Grepen',
   'entities.items.sash_of_the_sunken_court.name': 'Sjerp van het Verzonken Hof',
   'entities.items.scepter_of_the_deathless_court.name': 'Scepter van het Doodloze Hof',
+  'entities.items.scourgehide_carapace.name': 'Geselhuid-Pantser',
   'entities.items.seal_of_the_nine_oaths.name': 'Zegel van de Negen Eden',
   'entities.items.shadowpulse_handwraps.name': 'Schaduwpuls-Handwindsels',
   'entities.items.shadowpulse_slippers.name': 'Schaduwpuls-Sloffen',
   'entities.items.shroud_of_the_gravewyrm.name': 'Doodskleed van de Grafwurm',
+  'entities.items.soulforged_warplate.name': 'Zielgesmede Krijgsplaat',
+  'entities.items.soulrend_diadem.name': 'Zielscheur-Diadeem',
   'entities.items.stormcallers_focus.name': 'Stormroepers Focus',
   'entities.items.sunken_court_mantle.name': 'Mantel van het Verzonken Hof',
   'entities.items.sutils_gambit.name': 'Sutils Gambiet',
@@ -7492,9 +7496,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Bronwel',
   'entities.abilities.healing_stream.description':
     'Restaura a vriendelijk doelwit durante 12 sec. (sjamaantalent)',
-  'entities.abilities.heroic_leap.name': 'Oorlogssprong',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Fysieke a nabije vijanden. (krijgerstalent)',
   'entities.abilities.holy_wrath.name': 'Heiligenwoede',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a nabije vijanden. (paladijntalent)',
@@ -7510,9 +7511,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Levenssap',
   'entities.abilities.innervate.description':
     'Levend sap welt 10 sec in je op en herstelt in golven 20 van je huidige energiebron: mana, woede of energie; van gedaante wisselen onderbreekt het niet. (Druïdetalent)',
-  'entities.abilities.last_stand.name': 'Elfde uur',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Uithoudingsvermogen durante 15 sec, aumentando la salud máxima. (krijgerstalent)',
   'entities.abilities.mend_pet.name': 'Oplappen',
   'entities.abilities.mend_pet.description':
     'Sana a vriendelijk doelwit por {damage} durante 15 sec. (jagertalent)',
@@ -7537,15 +7535,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Psychische schreeuw',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a nabije vijanden hasta 4 sec. El daño puede romper el efecto. (priestertalent)',
-  'entities.abilities.rallying_cry.name': 'Verzameling',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta aanvalskracht de nabije bondgenoten durante 10 sec. (krijgerstalent)',
   'entities.abilities.shadowstep.name': 'Schaduwglip',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu doelwit. (schurkentalent)',
-  'entities.abilities.shield_wall.name': 'Bolwerk',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la pantser durante 10 sec. (krijgerstalent)',
   'entities.abilities.silence.name': 'Stilte',
   'entities.abilities.silence.description': 'Silencia a doelwit durante 4 sec. (priestertalent)',
   'entities.abilities.tranquility.name': 'Woudlied',

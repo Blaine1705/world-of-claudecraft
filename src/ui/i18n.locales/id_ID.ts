@@ -342,6 +342,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Ketopong Ibu Paduan Suara',
   'entities.items.cryptplate_helm.name': 'Helm Lempeng Kripta',
   'entities.items.deathless_greatblade.name': 'Bilah Agung Nirmaut',
+  'entities.items.deathless_warguard_legmail.name': 'Zirah Kaki Garda Perang Nirmaut',
   'entities.items.gravescale_girdle.name': 'Sabuk Sisik Kubur',
   'entities.items.gravewyrm_claws.name': 'Cakar Wyrm Kubur',
   'entities.items.gravewyrm_cleaver.name': 'Kapak Pembelah Wyrm Kubur',
@@ -357,10 +358,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Sarung Tangan Pengendap Sanktum',
   'entities.items.sash_of_the_sunken_court.name': 'Selempang Istana Karam',
   'entities.items.scepter_of_the_deathless_court.name': 'Tongkat Kebesaran Istana Nirmaut',
+  'entities.items.scourgehide_carapace.name': 'Karapas Kulit Sampar',
   'entities.items.seal_of_the_nine_oaths.name': 'Segel Sembilan Sumpah',
   'entities.items.shadowpulse_handwraps.name': 'Pembalut Tangan Denyut Bayangan',
   'entities.items.shadowpulse_slippers.name': 'Selop Denyut Bayangan',
   'entities.items.shroud_of_the_gravewyrm.name': 'Kafan Sang Wyrm Kubur',
+  'entities.items.soulforged_warplate.name': 'Zirah Perang Tempaan Jiwa',
+  'entities.items.soulrend_diadem.name': 'Diadem Pengoyak Jiwa',
   'entities.items.stormcallers_focus.name': 'Fokus Pemanggil Badai',
   'entities.items.sunken_court_mantle.name': 'Mantel Istana Karam',
   'entities.items.sutils_gambit.name': 'Gambit Sutil',
@@ -7486,9 +7490,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Mata Air',
   'entities.abilities.healing_stream.description':
     'Restaura a target sekutu durante 12 detik. (talenta shaman)',
-  'entities.abilities.heroic_leap.name': 'Lompatan Perang',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Fisik a di dekat musuh. (talenta warrior)',
   'entities.abilities.holy_wrath.name': 'Murka Santo',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a di dekat musuh. (talenta paladin)',
@@ -7504,9 +7505,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Getah Hidup',
   'entities.abilities.innervate.description':
     'Getah hidup mengalir dalam dirimu selama 10 detik, memulihkan 20 sumber daya saat ini secara bergelombang: mana, amarah, atau energi; berganti wujud tidak memutusnya. (talenta Druid)',
-  'entities.abilities.last_stand.name': 'Jam Kesebelas',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Stamina durante 15 detik, aumentando la salud máxima. (talenta warrior)',
   'entities.abilities.mend_pet.name': 'Tambal Luka',
   'entities.abilities.mend_pet.description':
     'Sana a target sekutu por {damage} durante 15 detik. (talenta hunter)',
@@ -7531,15 +7529,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Jerit Psikis',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a di dekat musuh hasta 4 detik. El daño puede romper el efecto. (talenta priest)',
-  'entities.abilities.rallying_cry.name': 'Seruan Kumpul',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta daya serang de di dekat sekutu durante 10 detik. (talenta warrior)',
   'entities.abilities.shadowstep.name': 'Selip Bayang',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu target. (talenta rogue)',
-  'entities.abilities.shield_wall.name': 'Benteng',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la armor durante 10 detik. (talenta warrior)',
   'entities.abilities.silence.name': 'Senyap',
   'entities.abilities.silence.description': 'Silencia a target durante 4 detik. (talenta priest)',
   'entities.abilities.tranquility.name': 'Lagu Rimba',

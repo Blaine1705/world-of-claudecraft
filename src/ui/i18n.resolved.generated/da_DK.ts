@@ -692,6 +692,7 @@ export const da_DK: EnTranslations = {
       "targetFriendlyNext": "Skift allieret mål",
       "discord": "Discord",
       "valecup": "Dalpokalen",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Kæledyr",
       "petAttack": "Kæledyr: Angrib",
       "petStop": "Kæledyr: Stop",
@@ -1092,6 +1093,12 @@ export const da_DK: EnTranslations = {
         "few": "du er {rank}, {count} medlemmer",
         "many": "du er {rank}, {count} medlemmer",
         "other": "du er {rank}, {count} medlemmer"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} karakter",
@@ -1891,6 +1898,107 @@ export const da_DK: EnTranslations = {
       "notAtHub": "Du skal være ved håndværksstationen og på det krævede niveau for at lave det.",
       "throttled": "Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.",
       "recipeNotLearned": "Du har ikke lært den opskrift endnu."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Bedrifternes Bog",
@@ -6501,34 +6609,6 @@ export const da_DK: EnTranslations = {
         "name": "Hurtig heling",
         "description": "Forbruger en helbredelse over tid-effekt på et venligt mål for at helbrede det for {damage}. (Genoprettelsessignatur)"
       },
-      "storm_bolt": {
-        "name": "Storm Bolt",
-        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
-      },
-      "piercing_howl": {
-        "name": "Piercing Howl",
-        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
-      },
-      "die_by_sword": {
-        "name": "Die by the Sword",
-        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
-      },
-      "recklessness": {
-        "name": "Recklessness",
-        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
-      },
-      "sanguine_aura": {
-        "name": "Sanguine Aura",
-        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
-      },
-      "victory_rush": {
-        "name": "Victory Rush",
-        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
-      },
-      "intimidating_shout": {
-        "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
-      },
       "summon_imp": {
         "name": "Tilkald Emberkin",
         "description": "Tilkalder en Emberkin under Heksemesterens kommando. Emberkinen slynger Askelyn mod dine fjender fra det fjerne. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
@@ -6673,10 +6753,6 @@ export const da_DK: EnTranslations = {
         "name": "Kildebrønd",
         "description": "Restaura a et venligt mål durante 12 sek. (shamantent)"
       },
-      "heroic_leap": {
-        "name": "Krigsspring",
-        "description": "Saltas al área objetivo e infliges {damage} de daño Fysisk a nærliggende fjender. (krigertalent)"
-      },
       "holy_wrath": {
         "name": "Helgenvrede",
         "description": "Desata poder sagrado e inflige {damage} de daño a nærliggende fjender. (paladintalent)"
@@ -6704,10 +6780,6 @@ export const da_DK: EnTranslations = {
       "kick": {
         "name": "Spark",
         "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
-      },
-      "last_stand": {
-        "name": "Ellevte time",
-        "description": "Aumenta temporalmente Udholdenhed durante 15 sek, aumentando la salud máxima. (krigertalent)"
       },
       "mend_pet": {
         "name": "Lappe sammen",
@@ -6777,10 +6849,6 @@ export const da_DK: EnTranslations = {
         "name": "Psykisk skrig",
         "description": "Aterroriza a nærliggende fjender hasta 4 sek. El daño puede romper el efecto. (præstetalent)"
       },
-      "rallying_cry": {
-        "name": "Mønstring",
-        "description": "Lanza un grito de reunión y aumenta angrebskraft de nærliggende allierede durante 10 sek. (krigertalent)"
-      },
       "counter_shot": {
         "name": "Dæmpende Skud",
         "description": "Et hurtigt skud, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek."
@@ -6792,10 +6860,6 @@ export const da_DK: EnTranslations = {
       "shadowstep": {
         "name": "Skyggesmut",
         "description": "Das un paso entre las sombras hacia tu målet. (snigmordertalent)"
-      },
-      "shield_wall": {
-        "name": "Bolværk",
-        "description": "Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigertalent)"
       },
       "silence": {
         "name": "Tavshed",
@@ -8089,6 +8153,15 @@ export const da_DK: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Scepter fra Det Udødelige Hof"
       },
+      "deathless_warguard_legmail": {
+        "name": "Udødelig Krigsvagt-Benbrynje"
+      },
+      "soulrend_diadem": {
+        "name": "Sjæleflæng-Diadem"
+      },
+      "scourgehide_carapace": {
+        "name": "Svøbehud-Panser"
+      },
       "cryptplate_helm": {
         "name": "Kryptplade-Hjelm"
       },
@@ -8127,6 +8200,9 @@ export const da_DK: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Udødelig Storklinge"
+      },
+      "soulforged_warplate": {
+        "name": "Sjælesmedet Krigsplade"
       },
       "stormcallers_focus": {
         "name": "Stormkalderens Fokus"

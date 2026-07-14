@@ -289,6 +289,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Přilbice matky chóru',
   'entities.items.cryptplate_helm.name': 'Kryptoplátová helma',
   'entities.items.deathless_greatblade.name': 'Nesmrtelná velká čepel',
+  'entities.items.deathless_warguard_legmail.name': 'Nesmrtelné nohavice válečné stráže',
   'entities.items.gravescale_girdle.name': 'Pás z hrobových šupin',
   'entities.items.gravewyrm_claws.name': 'Spáry Hrobodraka',
   'entities.items.gravewyrm_cleaver.name': 'Sekáč Hrobodraka',
@@ -304,10 +305,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Rukavice slídila svatyně',
   'entities.items.sash_of_the_sunken_court.name': 'Šerpa potopeného dvora',
   'entities.items.scepter_of_the_deathless_court.name': 'Žezlo nesmrtelného dvora',
+  'entities.items.scourgehide_carapace.name': 'Krunýř z kůže pohromy',
   'entities.items.seal_of_the_nine_oaths.name': 'Pečeť devíti přísah',
   'entities.items.shadowpulse_handwraps.name': 'Omotávky stínového pulzu',
   'entities.items.shadowpulse_slippers.name': 'Střevíce stínového pulzu',
   'entities.items.shroud_of_the_gravewyrm.name': 'Rubáš Hrobodraka',
+  'entities.items.soulforged_warplate.name': 'Duší kovaný válečný plát',
+  'entities.items.soulrend_diadem.name': 'Diadém rozervání duše',
   'entities.items.stormcallers_focus.name': 'Ohnisko volání vichru',
   'entities.items.sunken_court_mantle.name': 'Plášť potopeného dvora',
   'entities.items.sutils_gambit.name': 'Sutilův gambit',
@@ -4567,9 +4571,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Pramenná studna',
   'entities.abilities.healing_stream.description':
     'Restaura a spřátelený cíl durante 12 s. (šamanský talent)',
-  'entities.abilities.heroic_leap.name': 'Válečný skok',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño fyzického a blízké nepřátele. (válečnický talent)',
   'entities.abilities.holy_wrath.name': 'Hněv světce',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a blízké nepřátele. (paladinský talent)',
@@ -4588,9 +4589,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.kick.name': 'Kopanec',
   'entities.abilities.kick.description':
     'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.last_stand.name': 'Jedenáctá hodina',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Výdrž durante 15 s, aumentando la salud máxima. (válečnický talent)',
   'entities.abilities.mend_pet.name': 'Ošetření',
   'entities.abilities.mend_pet.description':
     'Sana a spřátelený cíl por {damage} durante 15 s. (lovecký talent)',
@@ -4618,18 +4616,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pummel.name': 'Drtič čelistí',
   'entities.abilities.pummel.description':
     'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.rallying_cry.name': 'Svolání',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta útočnou sílu de blízké spojence durante 10 s. (válečnický talent)',
   'entities.abilities.rebuke.name': 'Pokárání',
   'entities.abilities.rebuke.description':
     'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
   'entities.abilities.shadowstep.name': 'Stínový skluz',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu cíl. (lotrovský talent)',
-  'entities.abilities.shield_wall.name': 'Bašta',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la zbroj durante 10 s. (válečnický talent)',
   'entities.abilities.silence.name': 'Umlčení',
   'entities.abilities.silence.description': 'Silencia a cíl durante 4 s. (kněžský talent)',
   'entities.abilities.skull_bash.name': 'Úder hlavou',

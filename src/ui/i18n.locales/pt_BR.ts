@@ -310,6 +310,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Elmo da Mãe do Coro',
   'entities.items.cryptplate_helm.name': 'Elmo de Placas da Cripta',
   'entities.items.deathless_greatblade.name': 'Grande Lâmina Imortal',
+  'entities.items.deathless_warguard_legmail.name': 'Malha de Pernas Imortal da Guarda de Guerra',
   'entities.items.gravescale_girdle.name': 'Cinto de Escamas Tumulares',
   'entities.items.gravewyrm_claws.name': 'Garras do Verme Tumular',
   'entities.items.gravewyrm_cleaver.name': 'Cutelo do Verme Tumular',
@@ -325,10 +326,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Manoplas do Espreitador do Santuário',
   'entities.items.sash_of_the_sunken_court.name': 'Faixa da Corte Submersa',
   'entities.items.scepter_of_the_deathless_court.name': 'Cetro da Corte Imortal',
+  'entities.items.scourgehide_carapace.name': 'Carapaça de Couro do Flagelo',
   'entities.items.seal_of_the_nine_oaths.name': 'Selo dos Nove Juramentos',
   'entities.items.shadowpulse_handwraps.name': 'Faixas de Mãos do Pulso Sombrio',
   'entities.items.shadowpulse_slippers.name': 'Sapatilhas do Pulso Sombrio',
   'entities.items.shroud_of_the_gravewyrm.name': 'Mortalha do Verme Tumular',
+  'entities.items.soulforged_warplate.name': 'Placa de Guerra Forjada na Alma',
+  'entities.items.soulrend_diadem.name': 'Diadema Dilacera-Almas',
   'entities.items.stormcallers_focus.name': 'Foco do Invocador da Tempestade',
   'entities.items.sunken_court_mantle.name': 'Manto da Corte Submersa',
   'entities.items.sutils_gambit.name': 'O Estratagema de Sutil',
@@ -7527,9 +7531,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Fonte Viva',
   'entities.abilities.healing_stream.description':
     'Restaura a alvo aliado durante 12 s. (talento de xamã)',
-  'entities.abilities.heroic_leap.name': 'Salto de Guerra',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Físico a próximos inimigos. (talento de guerreiro)',
   'entities.abilities.holy_wrath.name': 'Ira do Santo',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a próximos inimigos. (talento de paladino)',
@@ -7545,9 +7546,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Seiva Vital',
   'entities.abilities.innervate.description':
     'A seiva viva brota em você por 10 s, restaurando 20 do seu recurso atual em ondas: mana, ira ou energia; trocar de forma não a interrompe. (talento de Druida)',
-  'entities.abilities.last_stand.name': 'Décima Primeira Hora',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Vigor durante 15 s, aumentando la salud máxima. (talento de guerreiro)',
   'entities.abilities.mend_pet.name': 'Remendar',
   'entities.abilities.mend_pet.description':
     'Sana a alvo aliado por {damage} durante 15 s. (talento de caçador)',
@@ -7572,15 +7570,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Grito Psíquico',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a próximos inimigos hasta 4 s. El daño puede romper el efecto. (talento de sacerdote)',
-  'entities.abilities.rallying_cry.name': 'Reunir',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta poder de ataque de próximos aliados durante 10 s. (talento de guerreiro)',
   'entities.abilities.shadowstep.name': 'Passo Sombrio',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu alvo. (talento de ladino)',
-  'entities.abilities.shield_wall.name': 'Baluarte',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la armadura durante 10 s. (talento de guerreiro)',
   'entities.abilities.silence.name': 'Silêncio',
   'entities.abilities.silence.description': 'Silencia a alvo durante 4 s. (talento de sacerdote)',
   'entities.abilities.tranquility.name': 'Canto do Bosque',

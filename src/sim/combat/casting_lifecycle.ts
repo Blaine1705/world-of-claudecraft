@@ -51,6 +51,7 @@ import {
   MIN_GCD,
   normAngle,
 } from '../types';
+import { drawWeapon } from '../weapon_stow';
 import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
 import {
   ARCANE_SURGE_ID,
@@ -86,9 +87,7 @@ import { onCastCompleted } from './talent_procs';
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
 const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
 const COLOSSAL_MIGHT_COOLDOWNS = new Set([
-  'recklessness',
   'avatar',
-  'storm_bolt',
   'bladestorm',
   'reckless_vow',
   'red_banner',
@@ -734,6 +733,7 @@ export function castAbility(
   }
 
   if (p.sitting) ctx.standUp(p);
+  if (p.weaponStowed) drawWeapon(p);
   if (ability.id !== 'ghost_wolf' && p.auras.some((a) => a.id === 'ghost_wolf')) {
     ctx.breakGhostWolf(p);
   }

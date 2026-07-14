@@ -310,6 +310,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Helm der Chormutter',
   'entities.items.cryptplate_helm.name': 'Gruftplatten-Helm',
   'entities.items.deathless_greatblade.name': 'Todlose Großklinge',
+  'entities.items.deathless_warguard_legmail.name': 'Todlose Beinkette der Kriegswache',
   'entities.items.gravescale_girdle.name': 'Grabschuppen-Gürtel',
   'entities.items.gravewyrm_claws.name': 'Grabwyrm-Klauen',
   'entities.items.gravewyrm_cleaver.name': 'Grabwyrm-Spalter',
@@ -325,10 +326,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Griffe des Sanktum-Pirschers',
   'entities.items.sash_of_the_sunken_court.name': 'Schärpe des Versunkenen Hofes',
   'entities.items.scepter_of_the_deathless_court.name': 'Zepter des Todlosen Hofes',
+  'entities.items.scourgehide_carapace.name': 'Geißelhaut-Panzer',
   'entities.items.seal_of_the_nine_oaths.name': 'Siegel der Neun Eide',
   'entities.items.shadowpulse_handwraps.name': 'Schattenpuls-Handwickel',
   'entities.items.shadowpulse_slippers.name': 'Schattenpuls-Schuhe',
   'entities.items.shroud_of_the_gravewyrm.name': 'Leichentuch des Grabwyrms',
+  'entities.items.soulforged_warplate.name': 'Seelengeschmiedete Kriegsplatte',
+  'entities.items.soulrend_diadem.name': 'Seelenriss-Diadem',
   'entities.items.stormcallers_focus.name': 'Fokus des Sturmrufers',
   'entities.items.sunken_court_mantle.name': 'Umhang des Versunkenen Hofes',
   'entities.items.sutils_gambit.name': 'Sutils Gambit',
@@ -7593,9 +7597,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Quellbrunnen',
   'entities.abilities.healing_stream.description':
     'Restaura a freundliches Ziel durante 12 Sek.. (Schamanen-Talent)',
-  'entities.abilities.heroic_leap.name': 'Kriegssprung',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño physischen a nahe Gegner. (Krieger-Talent)',
   'entities.abilities.holy_wrath.name': 'Heiligenzorn',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a nahe Gegner. (Paladin-Talent)',
@@ -7611,9 +7612,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Lebenssaft',
   'entities.abilities.innervate.description':
     'Lebendiger Pflanzensaft quillt 10 Sek. lang in Euch auf und stellt in Wellen 20 Eurer aktuellen Ressource wieder her: Mana, Wut oder Energie; Gestaltwandel unterbricht ihn nicht. (Druidentalent)',
-  'entities.abilities.last_stand.name': 'Elfte Stunde',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Ausdauer durante 15 Sek., aumentando la salud máxima. (Krieger-Talent)',
   'entities.abilities.mend_pet.name': 'Zusammenflicken',
   'entities.abilities.mend_pet.description':
     'Sana a freundliches Ziel por {damage} durante 15 Sek.. (Jäger-Talent)',
@@ -7638,15 +7636,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Schreckensschrei',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a nahe Gegner hasta 4 Sek.. El daño puede romper el efecto. (Priester-Talent)',
-  'entities.abilities.rallying_cry.name': 'Sammelruf',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta Angriffskraft de nahe Verbündete durante 10 Sek.. (Krieger-Talent)',
   'entities.abilities.shadowstep.name': 'Schattengleiten',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu Ziel. (Schurken-Talent)',
-  'entities.abilities.shield_wall.name': 'Bollwerk',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la Rüstung durante 10 Sek.. (Krieger-Talent)',
   'entities.abilities.silence.name': 'Stille',
   'entities.abilities.silence.description': 'Silencia a Ziel durante 4 Sek.. (Priester-Talent)',
   'entities.abilities.tranquility.name': 'Hainlied',

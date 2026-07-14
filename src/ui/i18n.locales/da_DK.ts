@@ -284,6 +284,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Kormoderens Hjelm',
   'entities.items.cryptplate_helm.name': 'Kryptplade-Hjelm',
   'entities.items.deathless_greatblade.name': 'Udødelig Storklinge',
+  'entities.items.deathless_warguard_legmail.name': 'Udødelig Krigsvagt-Benbrynje',
   'entities.items.gravescale_girdle.name': 'Gravskæl-Livgjord',
   'entities.items.gravewyrm_claws.name': 'Gravorm-Kløer',
   'entities.items.gravewyrm_cleaver.name': 'Gravorm-Kløver',
@@ -299,10 +300,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Helligdommens Luskers Greb',
   'entities.items.sash_of_the_sunken_court.name': 'Skærf fra Det Sunkne Hof',
   'entities.items.scepter_of_the_deathless_court.name': 'Scepter fra Det Udødelige Hof',
+  'entities.items.scourgehide_carapace.name': 'Svøbehud-Panser',
   'entities.items.seal_of_the_nine_oaths.name': 'Segl over De Ni Eder',
   'entities.items.shadowpulse_handwraps.name': 'Skyggepuls-Håndomvikling',
   'entities.items.shadowpulse_slippers.name': 'Skyggepuls-Futter',
   'entities.items.shroud_of_the_gravewyrm.name': 'Gravormens Ligklæde',
+  'entities.items.soulforged_warplate.name': 'Sjælesmedet Krigsplade',
+  'entities.items.soulrend_diadem.name': 'Sjæleflæng-Diadem',
   'entities.items.stormcallers_focus.name': 'Stormkalderens Fokus',
   'entities.items.sunken_court_mantle.name': 'Kappe fra Det Sunkne Hof',
   'entities.items.sutils_gambit.name': 'Sutils Gambit',
@@ -7381,9 +7385,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Kildebrønd',
   'entities.abilities.healing_stream.description':
     'Restaura a et venligt mål durante 12 sek. (shamantent)',
-  'entities.abilities.heroic_leap.name': 'Krigsspring',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Fysisk a nærliggende fjender. (krigertalent)',
   'entities.abilities.holy_wrath.name': 'Helgenvrede',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a nærliggende fjender. (paladintalent)',
@@ -7399,9 +7400,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Livssaft',
   'entities.abilities.innervate.description':
     'Levende saft vælder op i dig i 10 sek. og genopretter 20 af din nuværende ressource i bølger: mana, raseri eller energi; formskifte afbryder den ikke. (Druidetalent)',
-  'entities.abilities.last_stand.name': 'Ellevte time',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Udholdenhed durante 15 sek, aumentando la salud máxima. (krigertalent)',
   'entities.abilities.mend_pet.name': 'Lappe sammen',
   'entities.abilities.mend_pet.description':
     'Sana a et venligt mål por {damage} durante 15 sek. (jægertalent)',
@@ -7426,15 +7424,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Psykisk skrig',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a nærliggende fjender hasta 4 sek. El daño puede romper el efecto. (præstetalent)',
-  'entities.abilities.rallying_cry.name': 'Mønstring',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta angrebskraft de nærliggende allierede durante 10 sek. (krigertalent)',
   'entities.abilities.shadowstep.name': 'Skyggesmut',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu målet. (snigmordertalent)',
-  'entities.abilities.shield_wall.name': 'Bolværk',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigertalent)',
   'entities.abilities.silence.name': 'Tavshed',
   'entities.abilities.silence.description': 'Silencia a målet durante 4 sek. (præstetalent)',
   'entities.abilities.tranquility.name': 'Lundens sang',

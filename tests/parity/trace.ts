@@ -185,6 +185,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   // so excluding the raw ring avoids per-combat-frame digest churn without losing
   // gameplay coverage (like wireRev above).
   'damageHistory',
+  'weaponStowed', // Z-key sheathe pose; render-only, no gameplay path reads it
 ]);
 
 // Session-only / presentation / derived PlayerMeta fields. Derived fields

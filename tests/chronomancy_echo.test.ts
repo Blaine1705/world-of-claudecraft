@@ -23,6 +23,8 @@ type DealDamage = (
   noRage?: boolean,
   threatOpts?: { flat?: number; mult?: number },
   direct?: boolean,
+  attackAnimationStarted?: boolean,
+  alreadyFinal?: boolean,
   aoe?: boolean,
 ) => void;
 
@@ -176,6 +178,8 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
       false,
       undefined,
       true,
+      false,
+      false,
       true,
     );
     expect(ally.hp - hp0).toBe(15); // round(100 * 0.15)

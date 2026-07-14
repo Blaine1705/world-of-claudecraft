@@ -692,6 +692,7 @@ export const tr_TR: EnTranslations = {
       "targetFriendlyNext": "Dost Hedefler Arasında Geç",
       "discord": "Discord",
       "valecup": "Vadi Kupası",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Yoldaş",
       "petAttack": "Yoldaş: Saldır",
       "petStop": "Yoldaş: Dur",
@@ -1092,6 +1093,12 @@ export const tr_TR: EnTranslations = {
         "few": "rütben {rank}, {count} üye",
         "many": "rütben {rank}, {count} üye",
         "other": "rütben {rank}, {count} üye"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} karakter",
@@ -1891,6 +1898,107 @@ export const tr_TR: EnTranslations = {
       "notAtHub": "Bunu üretmek için zanaat merkezinde ve gereken kademede olmalısın.",
       "throttled": "Çok hızlı üretiyorsun. Bir an bekle ve tekrar dene.",
       "recipeNotLearned": "Bu tarifi henüz öğrenmedin."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Yiğitlikler Kitabı",
@@ -6501,34 +6609,6 @@ export const tr_TR: EnTranslations = {
         "name": "Hızlı İyileştirme",
         "description": "Dost bir hedefteki zamanla iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. (Restorasyon imzası)"
       },
-      "storm_bolt": {
-        "name": "Storm Bolt",
-        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
-      },
-      "piercing_howl": {
-        "name": "Piercing Howl",
-        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
-      },
-      "die_by_sword": {
-        "name": "Die by the Sword",
-        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
-      },
-      "recklessness": {
-        "name": "Recklessness",
-        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
-      },
-      "sanguine_aura": {
-        "name": "Sanguine Aura",
-        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
-      },
-      "victory_rush": {
-        "name": "Victory Rush",
-        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
-      },
-      "intimidating_shout": {
-        "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
-      },
       "summon_imp": {
         "name": "Emberkin Çağırma",
         "description": "Karabüyücünün komutası altında bir Emberkin çağırır. Emberkin, düşmanlarına uzaktan Kül Okları fırlatır. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir."
@@ -6673,10 +6753,6 @@ export const tr_TR: EnTranslations = {
         "name": "Kaynak Kuyusu",
         "description": "Restaura a dost hedefi durante 12 sn. (şaman yeteneği)"
       },
-      "heroic_leap": {
-        "name": "Savaş Sıçrayışı",
-        "description": "Saltas al área objetivo e infliges {damage} de daño Fiziksel a yakındaki düşmanları. (savaşçı yeteneği)"
-      },
       "holy_wrath": {
         "name": "Aziz Hiddeti",
         "description": "Desata poder sagrado e inflige {damage} de daño a yakındaki düşmanları. (paladin yeteneği)"
@@ -6704,10 +6780,6 @@ export const tr_TR: EnTranslations = {
       "kick": {
         "name": "Tekme",
         "description": "Hedefin büyüsünü keser ve 4 saniye boyunca o okuldan büyü yapılmasını engeller."
-      },
-      "last_stand": {
-        "name": "On Birinci Saat",
-        "description": "Aumenta temporalmente Dayanıklılığı durante 15 sn, aumentando la salud máxima. (savaşçı yeteneği)"
       },
       "mend_pet": {
         "name": "Yama Yap",
@@ -6777,10 +6849,6 @@ export const tr_TR: EnTranslations = {
         "name": "Psişik Çığlık",
         "description": "Aterroriza a yakındaki düşmanları hasta 4 sn. El daño puede romper el efecto. (rahip yeteneği)"
       },
-      "rallying_cry": {
-        "name": "Toplanma Çağrısı",
-        "description": "Lanza un grito de reunión y aumenta saldırı gücünü de yakındaki müttefikleri durante 10 sn. (savaşçı yeteneği)"
-      },
       "counter_shot": {
         "name": "Karşı Atış",
         "description": "Hedefin büyüsünü kesintiye uğratan ve okulu 4 saniyeliğine kilitleyen anlık atış."
@@ -6792,10 +6860,6 @@ export const tr_TR: EnTranslations = {
       "shadowstep": {
         "name": "Gölge Kayışı",
         "description": "Das un paso entre las sombras hacia tu hedefi. (haydut yeteneği)"
-      },
-      "shield_wall": {
-        "name": "Tabya",
-        "description": "Alzas un muro de escudo y aumentas mucho la zırhı durante 10 sn. (savaşçı yeteneği)"
       },
       "silence": {
         "name": "Sessizlik",
@@ -8089,6 +8153,15 @@ export const tr_TR: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Ölümsüz Saray Asası"
       },
+      "deathless_warguard_legmail": {
+        "name": "Ölümsüz Savaşmuhafızı Bacak Zırhı"
+      },
+      "soulrend_diadem": {
+        "name": "Ruhyırtan Tacı"
+      },
+      "scourgehide_carapace": {
+        "name": "Afetpostu Kabuğu"
+      },
       "cryptplate_helm": {
         "name": "Mezarzırh Miğferi"
       },
@@ -8127,6 +8200,9 @@ export const tr_TR: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Ölümsüz Pala"
+      },
+      "soulforged_warplate": {
+        "name": "Ruhdövümü Savaş Zırhı"
       },
       "stormcallers_focus": {
         "name": "Fırtınaçağıranın Odağı"

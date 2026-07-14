@@ -668,6 +668,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Casque de la Mère du Choeur',
   'entities.items.cryptplate_helm.name': 'Heaume de plaques sépulcrales',
   'entities.items.deathless_greatblade.name': 'Grande lame immortelle',
+  'entities.items.deathless_warguard_legmail.name': 'Cotte de jambes de la garde immortelle',
   'entities.items.gravescale_girdle.name': "Ceinturon d'écailles sépulcrales",
   'entities.items.gravewyrm_claws.name': 'Griffes du Gravewyrm',
   'entities.items.gravewyrm_cleaver.name': 'Fendoir du Gravewyrm',
@@ -683,10 +684,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Poignes du Rôdeur du Sanctuaire',
   'entities.items.sash_of_the_sunken_court.name': 'Écharpe de la Cour engloutie',
   'entities.items.scepter_of_the_deathless_court.name': 'Sceptre de la Cour immortelle',
+  'entities.items.scourgehide_carapace.name': 'Carapace en peau de Fléau',
   'entities.items.seal_of_the_nine_oaths.name': 'Sceau des Neuf Serments',
   'entities.items.shadowpulse_handwraps.name': "Bandes de mains d'Ombre pulsante",
   'entities.items.shadowpulse_slippers.name': "Chaussons d'Ombre pulsante",
   'entities.items.shroud_of_the_gravewyrm.name': 'Suaire du Gravewyrm',
+  'entities.items.soulforged_warplate.name': 'Harnois de guerre forgé dans les âmes',
+  'entities.items.soulrend_diadem.name': 'Diadème Déchire-âme',
   'entities.items.stormcallers_focus.name': "Focalisateur de l'Invocateur de tempêtes",
   'entities.items.sunken_court_mantle.name': 'Mantelet de la Cour engloutie',
   'entities.items.sutils_gambit.name': 'Gambit de Sutil',
@@ -7623,9 +7627,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Puits de source',
   'entities.abilities.healing_stream.description':
     'Restaura a cible alliée durante 12 s. (talent de chaman)',
-  'entities.abilities.heroic_leap.name': 'Bond de guerre',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Physique a proches ennemis. (talent de guerrier)',
   'entities.abilities.holy_wrath.name': 'Courroux du saint',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a proches ennemis. (talent de paladin)',
@@ -7641,9 +7642,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Sève vitale',
   'entities.abilities.innervate.description':
     "La sève vivante afflue en vous pendant 10 s, restaurant 20 de votre ressource actuelle par vagues : mana, rage ou énergie ; changer de forme ne l'interrompt pas. (talent de druide)",
-  'entities.abilities.last_stand.name': 'Onzième heure',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Endurance durante 15 s, aumentando la salud máxima. (talent de guerrier)',
   'entities.abilities.mend_pet.name': 'Rapiécer',
   'entities.abilities.mend_pet.description':
     'Sana a cible alliée por {damage} durante 15 s. (talent de chasseur)',
@@ -7668,15 +7666,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Cri psychique',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a proches ennemis hasta 4 s. El daño puede romper el efecto. (talent de prêtre)',
-  'entities.abilities.rallying_cry.name': 'Ralliement',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta puissance d’attaque de proches alliés durante 10 s. (talent de guerrier)',
   'entities.abilities.shadowstep.name': 'Glissement d’ombre',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu cible. (talent de voleur)',
-  'entities.abilities.shield_wall.name': 'Rempart',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la armure durante 10 s. (talent de guerrier)',
   'entities.abilities.silence.name': 'Silence',
   'entities.abilities.silence.description': 'Silencia a cible durante 4 s. (talent de prêtre)',
   'entities.abilities.tranquility.name': 'Chant du bosquet',

@@ -692,6 +692,7 @@ export const ko_KR: EnTranslations = {
       "targetFriendlyNext": "아군 대상 순환",
       "discord": "Discord",
       "valecup": "베일 컵",
+      "sheathe": "무기 넣기/빼기",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
       "petStop": "펫: 정지",
@@ -1092,6 +1093,12 @@ export const ko_KR: EnTranslations = {
         "few": "당신은 {rank}, {count}명 회원",
         "many": "당신은 {rank}, {count}명 회원",
         "other": "당신은 {rank}, {count}명 회원"
+      },
+      "finderPartySize": {
+        "one": "{count}인",
+        "few": "{count}인",
+        "many": "{count}인",
+        "other": "{count}인"
       },
       "characterCount": {
         "one": "캐릭터 {count}개",
@@ -1891,6 +1898,107 @@ export const ko_KR: EnTranslations = {
       "notAtHub": "그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.",
       "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다."
+    },
+    "finder": {
+      "title": "던전 찾기",
+      "close": "닫기",
+      "back": "뒤로",
+      "syncing": "서버 응답을 기다리는 중...",
+      "tabCatalogue": "목록",
+      "tabQueue": "빠른 매칭",
+      "tabBoard": "사전 모집",
+      "normal": "일반",
+      "heroic": "영웅",
+      "kindDungeon": "던전",
+      "kindRaid": "공격대",
+      "kindSolo": "솔로 모험",
+      "levels": "레벨 {min} ~ {max}",
+      "levelOne": "레벨 {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{role} {count}",
+      "roleTank": "방어 전담",
+      "roleHealer": "치유 전담",
+      "roleDps": "공격 전담",
+      "freeRoles": "역할 제한 없음",
+      "lockoutDaily": "최종 우두머리 일일 귀속",
+      "lockoutNone": "귀속 없음",
+      "lockedFor": "약 {minutes}분 동안 귀속됨",
+      "attunement": "선행 퀘스트 필요: {quest}",
+      "heroicMarks": "영웅의 징표: 1인당 {count}개",
+      "entrance": "입구: {zone}",
+      "showOnMap": "지도에 표시",
+      "encounters": "우두머리 전투",
+      "finalBoss": "최종 우두머리",
+      "summoned": "소환되는 수호자",
+      "lootGuaranteed": "다음 중 하나가 반드시 드롭:",
+      "lootMaybe": "다음 중 최대 하나가 드롭:",
+      "lootChance": "추가 확률 드롭:",
+      "lootHeroic": "영웅 보상, 다음 중 하나가 반드시 드롭:",
+      "pct": "{pct}%",
+      "blockedLevel": "레벨 {min} ~ {max} 전용",
+      "blockedSpec": "전문화 선택 필요",
+      "yourRoles": "내 역할",
+      "needsSpec": "던전 찾기를 사용하려면 전문화를 선택하세요.",
+      "leaderNote": "파티장만 파티를 대기열에 등록할 수 있습니다.",
+      "chooseActivities": "콘텐츠 선택",
+      "joinQueue": "대기열 참가",
+      "leaveQueue": "대기열 나가기",
+      "waited": "대기 시간: {time}",
+      "cooldownNote": "{seconds}초 후에 다시 대기열에 참가할 수 있습니다.",
+      "travelNote": "파티는 그 자리에서 결성됩니다. 함께 입구까지 이동하세요. 순간이동은 없습니다.",
+      "proposalTitle": "파티 결성: {name}",
+      "proposalRole": "내 역할: {role}",
+      "accepted": "{size}명 중 {accepted}명 수락",
+      "remaining": "응답까지 {seconds}초",
+      "accept": "수락",
+      "decline": "거절",
+      "acceptedWait": "다른 플레이어를 기다리는 중...",
+      "slotState": "{role}: {total}명 중 {accepted}명 준비 완료",
+      "openListings": "공개 모집",
+      "boardEmpty": "지금은 모집이 없습니다. 직접 올려 보세요!",
+      "boardLeaderGate": "파티장만 모집 글을 올릴 수 있습니다.",
+      "publishListing": "모집 등록",
+      "activity": "콘텐츠",
+      "publish": "등록",
+      "yourListing": "내 모집",
+      "closeListing": "모집 마감",
+      "applicants": "신청자",
+      "noApplicants": "아직 신청자가 없습니다.",
+      "acceptApplicantAria": "{name} 수락",
+      "declineApplicantAria": "{name} 거절",
+      "levelClass": "Lv {level} {className}",
+      "leader": "파티장: {name}",
+      "needs": "필요: {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "신청",
+      "withdraw": "신청 취소",
+      "tagFirstRun": "첫 공략",
+      "tagQuestRun": "퀘스트 진행",
+      "tagFullClear": "완전 공략",
+      "tagLearning": "초보 환영",
+      "tagFastRun": "빠른 공략",
+      "mech": {
+        "shadow_pulse": "어둠의 파동(주기적 광역 피해)",
+        "reaping_arc": "수확의 호(전방 휩쓸기)",
+        "mist_surge": "안개 쇄도(주기적 광역 피해)",
+        "summons_adds": "증원 소환",
+        "lunar_tide": "달의 파도(주기적 광역 피해)",
+        "enrage": "체력이 낮으면 격노",
+        "shuddering_stomp": "전율의 발구르기(광역 기절)",
+        "necrotic_shockwave": "괴사의 충격파(높은 광역 피해)",
+        "grave_cleaver": "무덤 절단(전방 휩쓸기)",
+        "shadow_nova": "어둠의 회오리(광역 폭발)",
+        "profane_mending": "모독의 치유(아군 치유)",
+        "mana_burn": "시든 축복(마나 연소)",
+        "deathstalker_cleave": "죽음추적자의 절단(전방 휩쓸기)",
+        "mortal_wound": "잊힌 상처(받는 치유 감소)",
+        "sealbreak_shockwave": "봉인 파괴 충격파(광역 폭발)",
+        "gravebreaker": "무덤파괴자(전방 부채꼴, 공격대 반대편으로)",
+        "raise_fallen": "망자 소생(주기적 증원)",
+        "soul_rend": "영혼 가르기(표식 대상은 산개 후 치유 필요)",
+        "deathless_rage": "불사의 격노(수호석에서 저지)",
+        "wardstones": "수호석 정신집중(단계 전환)"
+      }
     },
     "deeds": {
       "title": "업적의 서",
@@ -6501,34 +6609,6 @@ export const ko_KR: EnTranslations = {
         "name": "신속한 치유",
         "description": "아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)"
       },
-      "storm_bolt": {
-        "name": "폭풍 망치",
-        "description": "대상에게 무기를 던져 {damage}의 피해를 입히고 3초 동안 기절시킵니다."
-      },
-      "piercing_howl": {
-        "name": "꿰뚫는 절규",
-        "description": "날카로운 외침으로 15yd 이내의 모든 적의 이동 속도를 8초 동안 50% 감소시킵니다."
-      },
-      "die_by_sword": {
-        "name": "검의 승부",
-        "description": "방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다."
-      },
-      "recklessness": {
-        "name": "무모함",
-        "description": "격노: 12초 동안 분노 생성이 50%, 치명타 확률이 20% 증가합니다."
-      },
-      "sanguine_aura": {
-        "name": "선혈의 오라",
-        "description": "적의 피로 무기를 물들여 20초 동안 자신과 근접 아군의 공격 속도와 피해가 10% 증가합니다."
-      },
-      "victory_rush": {
-        "name": "연전연승",
-        "description": "무기 피해에 {damage}를 더한 피해로 공격하고 최대 생명력의 20%를 회복합니다. 적을 처치한 후 20초 이내에만 사용할 수 있습니다."
-      },
-      "intimidating_shout": {
-        "name": "위협의 외침",
-        "description": "무시무시한 외침으로 8yd 이내의 적 최대 5명을 8초 동안 공포에 질려 달아나게 합니다. 피해를 입으면 효과가 해제될 수 있습니다."
-      },
       "summon_imp": {
         "name": "불씨족 소환",
         "description": "흑마법사의 명령을 따르는 불씨족을 소환합니다. 불씨족은 멀리서 적에게 잿불 화살을 날립니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
@@ -6673,10 +6753,6 @@ export const ko_KR: EnTranslations = {
         "name": "샘물",
         "description": "12초에 걸쳐 아군 대상을 치유합니다. (주술사 특성)"
       },
-      "heroic_leap": {
-        "name": "영웅의 도약",
-        "description": "지정한 지역으로 도약하여 주위 적에게 {damage}의 피해를 입힙니다."
-      },
       "holy_wrath": {
         "name": "성자의 분노",
         "description": "신성한 힘을 발산하여 주위 적에게 {damage}의 피해를 입힙니다. (성기사 특성)"
@@ -6704,10 +6780,6 @@ export const ko_KR: EnTranslations = {
       "kick": {
         "name": "발차기",
         "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
-      },
-      "last_stand": {
-        "name": "열한 번째 시각",
-        "description": "일시적으로 체력을 높여 최대 생명력을 증가시킵니다. 15초 동안 지속됩니다. (전사 특성)"
       },
       "mend_pet": {
         "name": "응급처치",
@@ -6777,10 +6849,6 @@ export const ko_KR: EnTranslations = {
         "name": "정신의 절규",
         "description": "주위 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다. (사제 특성)"
       },
-      "rallying_cry": {
-        "name": "재집결의 함성",
-        "description": "재집결의 함성을 내질러 자신과 40yd 이내의 파티원에게 10초 동안 최대 생명력을 20% 추가로 부여합니다."
-      },
       "counter_shot": {
         "name": "침묵의 사격",
         "description": "빠른 사격으로 대상의 시전을 중단시키고 4초 동안 해당 계열을 봉쇄합니다."
@@ -6792,10 +6860,6 @@ export const ko_KR: EnTranslations = {
       "shadowstep": {
         "name": "그림자걸음",
         "description": "그림자를 통과해 대상 곁으로 이동합니다. (도적 특성)"
-      },
-      "shield_wall": {
-        "name": "보루",
-        "description": "무너지지 않는 방벽을 세워 방어도를 크게 높입니다. 10초 동안 지속됩니다. (전사 특성)"
       },
       "silence": {
         "name": "침묵",
@@ -8089,6 +8153,15 @@ export const ko_KR: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "불사 궁정의 홀"
       },
+      "deathless_warguard_legmail": {
+        "name": "불사 전쟁수호 다리갑옷"
+      },
+      "soulrend_diadem": {
+        "name": "영혼분열 왕관"
+      },
+      "scourgehide_carapace": {
+        "name": "재앙가죽 갑각"
+      },
       "cryptplate_helm": {
         "name": "묘지판금 투구"
       },
@@ -8127,6 +8200,9 @@ export const ko_KR: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "불사 대검"
+      },
+      "soulforged_warplate": {
+        "name": "혼주조 전투갑옷"
       },
       "stormcallers_focus": {
         "name": "폭풍소환사의 매개체"

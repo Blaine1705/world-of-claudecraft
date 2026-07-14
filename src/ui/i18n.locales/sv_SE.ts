@@ -283,6 +283,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Körmoderns hjälm',
   'entities.items.cryptplate_helm.name': 'Kryptplåtshjälm',
   'entities.items.deathless_greatblade.name': 'Odödlig storklinga',
+  'entities.items.deathless_warguard_legmail.name': 'Odödlig krigsvakts benbrynja',
   'entities.items.gravescale_girdle.name': 'Gravfjällsgördel',
   'entities.items.gravewyrm_claws.name': 'Gravlindormsklor',
   'entities.items.gravewyrm_cleaver.name': 'Gravlindormsklyva',
@@ -298,10 +299,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Helgedomssmygarens handskar',
   'entities.items.sash_of_the_sunken_court.name': 'Sjunkna hovets skärp',
   'entities.items.scepter_of_the_deathless_court.name': 'Odödliga hovets spira',
+  'entities.items.scourgehide_carapace.name': 'Gisselhudspansar',
   'entities.items.seal_of_the_nine_oaths.name': 'De nio edernas sigill',
   'entities.items.shadowpulse_handwraps.name': 'Skuggpulshandlindor',
   'entities.items.shadowpulse_slippers.name': 'Skuggpulstofflor',
   'entities.items.shroud_of_the_gravewyrm.name': 'Gravlindormens svepning',
+  'entities.items.soulforged_warplate.name': 'Själssmidd krigsplåt',
+  'entities.items.soulrend_diadem.name': 'Själsrivardiadem',
   'entities.items.stormcallers_focus.name': 'Stormkallarens fokus',
   'entities.items.sunken_court_mantle.name': 'Sjunkna hovets mantel',
   'entities.items.sutils_gambit.name': 'Sutils gambit',
@@ -7398,9 +7402,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Källbrunn',
   'entities.abilities.healing_stream.description':
     'Restaura a vänligt mål durante 12 sek. (shamantalang)',
-  'entities.abilities.heroic_leap.name': 'Krigssprång',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Fysisk a närliggande fiender. (krigartalang)',
   'entities.abilities.holy_wrath.name': 'Helgonvrede',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a närliggande fiender. (paladintalang)',
@@ -7416,9 +7417,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Livssav',
   'entities.abilities.innervate.description':
     'Levande sav väller upp i dig i 10 sek och återställer 20 av din nuvarande resurs i vågor: mana, raseri eller energi; att byta form avbryter den inte. (Druidtalang)',
-  'entities.abilities.last_stand.name': 'Elfte timmen',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Uthållighet durante 15 sek, aumentando la salud máxima. (krigartalang)',
   'entities.abilities.mend_pet.name': 'Lappa ihop',
   'entities.abilities.mend_pet.description':
     'Sana a vänligt mål por {damage} durante 15 sek. (jägartalang)',
@@ -7443,15 +7441,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Psykiskt skrik',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a närliggande fiender hasta 4 sek. El daño puede romper el efecto. (prästtalang)',
-  'entities.abilities.rallying_cry.name': 'Mönstring',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta attackkraft de närliggande allierade durante 10 sek. (krigartalang)',
   'entities.abilities.shadowstep.name': 'Skuggkliv',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu målet. (skurk talang)',
-  'entities.abilities.shield_wall.name': 'Bålverk',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigartalang)',
   'entities.abilities.silence.name': 'Tystnad',
   'entities.abilities.silence.description': 'Silencia a målet durante 4 sek. (prästtalang)',
   'entities.abilities.tranquility.name': 'Gläntsång',

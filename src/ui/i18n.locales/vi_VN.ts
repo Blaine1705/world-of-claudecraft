@@ -336,6 +336,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Mũ Trụ của Mẹ Hợp Ca',
   'entities.items.cryptplate_helm.name': 'Mũ Giáp Tấm Hầm Mộ',
   'entities.items.deathless_greatblade.name': 'Đại Kiếm Bất Tử',
+  'entities.items.deathless_warguard_legmail.name': 'Giáp Chân Lưới Vệ Chiến Bất Tử',
   'entities.items.gravescale_girdle.name': 'Đai Lưng Vảy Mộ',
   'entities.items.gravewyrm_claws.name': 'Vuốt Mộ Long',
   'entities.items.gravewyrm_cleaver.name': 'Đao Phanh Mộ Long',
@@ -351,10 +352,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Găng Kẻ Rình Thánh Đường',
   'entities.items.sash_of_the_sunken_court.name': 'Đai Lưng Triều Đình Chìm',
   'entities.items.scepter_of_the_deathless_court.name': 'Vương Trượng Triều Đình Bất Tử',
+  'entities.items.scourgehide_carapace.name': 'Giáp Mai Da Tai Ương',
   'entities.items.seal_of_the_nine_oaths.name': 'Ấn Chín Lời Thề',
   'entities.items.shadowpulse_handwraps.name': 'Quấn Tay Mạch Bóng Tối',
   'entities.items.shadowpulse_slippers.name': 'Hài Mạch Bóng Tối',
   'entities.items.shroud_of_the_gravewyrm.name': 'Vải Liệm Mộ Long',
+  'entities.items.soulforged_warplate.name': 'Chiến Giáp Rèn Hồn',
+  'entities.items.soulrend_diadem.name': 'Vương Miện Xé Hồn',
   'entities.items.stormcallers_focus.name': 'Pháp Khí của Kẻ Gọi Bão',
   'entities.items.sunken_court_mantle.name': 'Áo Choàng Triều Đình Chìm',
   'entities.items.sutils_gambit.name': 'Nước Cờ của Sutil',
@@ -7425,9 +7429,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Giếng Suối',
   'entities.abilities.healing_stream.description':
     'Restaura a mục tiêu thân thiện durante 12 giây. (thiên phú pháp sư tổ linh)',
-  'entities.abilities.heroic_leap.name': 'Bước Nhảy Chiến',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Vật lý a gần đó kẻ địch. (thiên phú chiến binh)',
   'entities.abilities.holy_wrath.name': 'Cơn Giận Thánh',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a gần đó kẻ địch. (thiên phú hiệp sĩ)',
@@ -7443,9 +7444,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Nhựa Sống',
   'entities.abilities.innervate.description':
     'Nhựa sống trào dâng trong bạn trong 10 giây, hồi 20 tài nguyên hiện tại theo từng đợt: mana, nộ khí hoặc năng lượng; biến hình không làm gián đoạn. (thiên phú Druid)',
-  'entities.abilities.last_stand.name': 'Giờ Thứ Mười Một',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Thể lực durante 15 giây, aumentando la salud máxima. (thiên phú chiến binh)',
   'entities.abilities.mend_pet.name': 'Băng Bó',
   'entities.abilities.mend_pet.description':
     'Sana a mục tiêu thân thiện por {damage} durante 15 giây. (thiên phú thợ săn)',
@@ -7470,15 +7468,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Tiếng Thét Tâm Linh',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a gần đó kẻ địch hasta 4 giây. El daño puede romper el efecto. (thiên phú tu sĩ)',
-  'entities.abilities.rallying_cry.name': 'Hiệu Triệu',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta sức tấn công de gần đó đồng minh durante 10 giây. (thiên phú chiến binh)',
   'entities.abilities.shadowstep.name': 'Trượt Bóng',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu mục tiêu. (thiên phú đạo tặc)',
-  'entities.abilities.shield_wall.name': 'Thành Lũy',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la giáp durante 10 giây. (thiên phú chiến binh)',
   'entities.abilities.silence.name': 'Câm Lặng',
   'entities.abilities.silence.description': 'Silencia a mục tiêu durante 4 giây. (thiên phú tu sĩ)',
   'entities.abilities.tranquility.name': 'Khúc Ca Rừng Thưa',

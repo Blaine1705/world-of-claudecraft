@@ -692,6 +692,7 @@ export const id_ID: EnTranslations = {
       "targetFriendlyNext": "Putar Bidikan Sekutu",
       "discord": "Discord",
       "valecup": "Piala Lembah",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Peliharaan",
       "petAttack": "Peliharaan: Serang",
       "petStop": "Peliharaan: Berhenti",
@@ -1092,6 +1093,12 @@ export const id_ID: EnTranslations = {
         "few": "Anda adalah {rank}, {count} anggota",
         "many": "Anda adalah {rank}, {count} anggota",
         "other": "Anda adalah {rank}, {count} anggota"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} karakter",
@@ -1891,6 +1898,107 @@ export const id_ID: EnTranslations = {
       "notAtHub": "Kamu harus berada di pusat kerajinan, pada level yang disyaratkan, untuk membuat itu.",
       "throttled": "Kamu membuat terlalu cepat. Tunggu sejenak dan coba lagi.",
       "recipeNotLearned": "Kamu belum mempelajari resep itu."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Kitab Jasa",
@@ -6501,34 +6609,6 @@ export const id_ID: EnTranslations = {
         "name": "Pemulihan Cepat",
         "description": "Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)"
       },
-      "storm_bolt": {
-        "name": "Storm Bolt",
-        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
-      },
-      "piercing_howl": {
-        "name": "Piercing Howl",
-        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
-      },
-      "die_by_sword": {
-        "name": "Die by the Sword",
-        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
-      },
-      "recklessness": {
-        "name": "Recklessness",
-        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
-      },
-      "sanguine_aura": {
-        "name": "Sanguine Aura",
-        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
-      },
-      "victory_rush": {
-        "name": "Victory Rush",
-        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
-      },
-      "intimidating_shout": {
-        "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
-      },
       "summon_imp": {
         "name": "Panggil Emberkin",
         "description": "Memanggil Emberkin di bawah perintah Penyihir Iblis. Emberkin melontarkan Ashbolt ke arah musuhmu dari kejauhan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
@@ -6673,10 +6753,6 @@ export const id_ID: EnTranslations = {
         "name": "Mata Air",
         "description": "Restaura a target sekutu durante 12 detik. (talenta shaman)"
       },
-      "heroic_leap": {
-        "name": "Lompatan Perang",
-        "description": "Saltas al área objetivo e infliges {damage} de daño Fisik a di dekat musuh. (talenta warrior)"
-      },
       "holy_wrath": {
         "name": "Murka Santo",
         "description": "Desata poder sagrado e inflige {damage} de daño a di dekat musuh. (talenta paladin)"
@@ -6704,10 +6780,6 @@ export const id_ID: EnTranslations = {
       "kick": {
         "name": "Tendangan",
         "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
-      },
-      "last_stand": {
-        "name": "Jam Kesebelas",
-        "description": "Aumenta temporalmente Stamina durante 15 detik, aumentando la salud máxima. (talenta warrior)"
       },
       "mend_pet": {
         "name": "Tambal Luka",
@@ -6777,10 +6849,6 @@ export const id_ID: EnTranslations = {
         "name": "Jerit Psikis",
         "description": "Aterroriza a di dekat musuh hasta 4 detik. El daño puede romper el efecto. (talenta priest)"
       },
-      "rallying_cry": {
-        "name": "Seruan Kumpul",
-        "description": "Lanza un grito de reunión y aumenta daya serang de di dekat sekutu durante 10 detik. (talenta warrior)"
-      },
       "counter_shot": {
         "name": "Tembakan Penangkal",
         "description": "Sebuah tembakan yang mengganggu perapalan mantra target dan mengunci sekolah itu selama 4 detik."
@@ -6792,10 +6860,6 @@ export const id_ID: EnTranslations = {
       "shadowstep": {
         "name": "Selip Bayang",
         "description": "Das un paso entre las sombras hacia tu target. (talenta rogue)"
-      },
-      "shield_wall": {
-        "name": "Benteng",
-        "description": "Alzas un muro de escudo y aumentas mucho la armor durante 10 detik. (talenta warrior)"
       },
       "silence": {
         "name": "Senyap",
@@ -8089,6 +8153,15 @@ export const id_ID: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Tongkat Kebesaran Istana Nirmaut"
       },
+      "deathless_warguard_legmail": {
+        "name": "Zirah Kaki Garda Perang Nirmaut"
+      },
+      "soulrend_diadem": {
+        "name": "Diadem Pengoyak Jiwa"
+      },
+      "scourgehide_carapace": {
+        "name": "Karapas Kulit Sampar"
+      },
       "cryptplate_helm": {
         "name": "Helm Lempeng Kripta"
       },
@@ -8127,6 +8200,9 @@ export const id_ID: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Bilah Agung Nirmaut"
+      },
+      "soulforged_warplate": {
+        "name": "Zirah Perang Tempaan Jiwa"
       },
       "stormcallers_focus": {
         "name": "Fokus Pemanggil Badai"

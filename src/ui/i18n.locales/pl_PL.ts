@@ -292,6 +292,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Hełm matki chóru',
   'entities.items.cryptplate_helm.name': 'Hełm z kryptowej płyty',
   'entities.items.deathless_greatblade.name': 'Nieśmiertelne wielkie ostrze',
+  'entities.items.deathless_warguard_legmail.name': 'Nieśmiertelne nogawice wojennej straży',
   'entities.items.gravescale_girdle.name': 'Pas z grobowej łuski',
   'entities.items.gravewyrm_claws.name': 'Szpony grobowego żmija',
   'entities.items.gravewyrm_cleaver.name': 'Tasak grobowego żmija',
@@ -307,10 +308,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Rękawice skradacza sanktuarium',
   'entities.items.sash_of_the_sunken_court.name': 'Szarfa zatopionego dworu',
   'entities.items.scepter_of_the_deathless_court.name': 'Berło nieśmiertelnego dworu',
+  'entities.items.scourgehide_carapace.name': 'Pancerz ze skóry plagi',
   'entities.items.seal_of_the_nine_oaths.name': 'Pieczęć dziewięciu przysiąg',
   'entities.items.shadowpulse_handwraps.name': 'Owijki cienistego pulsu',
   'entities.items.shadowpulse_slippers.name': 'Trzewiki cienistego pulsu',
   'entities.items.shroud_of_the_gravewyrm.name': 'Całun grobowego żmija',
+  'entities.items.soulforged_warplate.name': 'Bojowa zbroja kuta z duszy',
+  'entities.items.soulrend_diadem.name': 'Diadem rozdarcia dusz',
   'entities.items.stormcallers_focus.name': 'Ognisko przyzywacza burz',
   'entities.items.sunken_court_mantle.name': 'Peleryna zatopionego dworu',
   'entities.items.sutils_gambit.name': 'Gambit Sutila',
@@ -7439,9 +7443,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': 'Źródlisko',
   'entities.abilities.healing_stream.description':
     'Restaura a przyjazny cel durante 12 s. (talent szamana)',
-  'entities.abilities.heroic_leap.name': 'Wojenny Skok',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Fizyczne a pobliskich wrogów. (talent wojownika)',
   'entities.abilities.holy_wrath.name': 'Gniew Świętego',
   'entities.abilities.holy_wrath.description':
     'Desata poder sagrado e inflige {damage} de daño a pobliskich wrogów. (talent paladyna)',
@@ -7457,9 +7458,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.innervate.name': 'Życiodajna Soki',
   'entities.abilities.innervate.description':
     'Żywe soki wzbierają w tobie przez 10 sek., przywracając falami 20 twojego bieżącego zasobu: many, szału lub energii; zmiana postaci ich nie przerywa. (talent Druida)',
-  'entities.abilities.last_stand.name': 'Jedenasta Godzina',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Wytrzymałość durante 15 s, aumentando la salud máxima. (talent wojownika)',
   'entities.abilities.mend_pet.name': 'Opatrunek',
   'entities.abilities.mend_pet.description':
     'Sana a przyjazny cel por {damage} durante 15 s. (talent łowcy)',
@@ -7484,15 +7482,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Psychiczny Krzyk',
   'entities.abilities.psychic_scream.description':
     'Aterroriza a pobliskich wrogów hasta 4 s. El daño puede romper el efecto. (talent kapłana)',
-  'entities.abilities.rallying_cry.name': 'Zbiórka',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta siłę ataku de pobliskich sojuszników durante 10 s. (talent wojownika)',
   'entities.abilities.shadowstep.name': 'Cieniokrok',
   'entities.abilities.shadowstep.description':
     'Das un paso entre las sombras hacia tu cel. (talent łotrzyka)',
-  'entities.abilities.shield_wall.name': 'Bastion',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la pancerz durante 10 s. (talent wojownika)',
   'entities.abilities.silence.name': 'Cisza',
   'entities.abilities.silence.description': 'Silencia a cel durante 4 s. (talent kapłana)',
   'entities.abilities.tranquility.name': 'Pieśń Gaju',
