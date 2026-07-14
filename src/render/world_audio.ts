@@ -26,8 +26,9 @@ export function footstepSurfaceAt(
   if (groundHeight(x, z, seed) < waterLevel && y <= waterLevel + 0.3) return 'water';
   const biome = zoneBiomeAt(x, z);
   if (biome === 'vale') return 'grass';
-  if (biome === 'marsh') return 'dirt';
-  return weatherOn ? 'snow' : 'stone';
+  if (biome === 'marsh' || biome === 'ember') return 'dirt'; // ember: sandy waste
+  if (biome === 'amber' || biome === 'fen') return 'grass';
+  return weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
 }
 
 export function crowdAmbienceAt(

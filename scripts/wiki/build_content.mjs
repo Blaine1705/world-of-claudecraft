@@ -47,6 +47,7 @@ const built = await esbuild.build({
 });
 const dataUrl = `data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`;
 const {
+  zoneAt,
   CLASSES,
   ABILITIES,
   TALENTS,
@@ -55,7 +56,6 @@ const {
   DUNGEONS,
   MOBS,
   CAMPS,
-  zoneAt,
   WARLOCK_PET_MOBS,
   DELVE_LIST,
   NPCS,
@@ -251,6 +251,10 @@ const FAMILY_ORDER = [
 const campedMobIds = new Set(CAMPS.map((c) => c.mobId));
 const publishedMobIds = new Set();
 const famMap = {};
+// Enumerate the MERGED mob table (every zone module, old world and new-world realms
+// alike), not a hand-kept list of zone tables: the camp filter below already scopes
+// the bestiary to open-world wild creatures, and a new zone module then publishes
+// its residents without touching this generator.
 for (const [id, m] of Object.entries(MOBS)) {
   if (m.elite || m.boss) continue;
   if (id.startsWith('warlock_')) continue; // summoned pets, not wild creatures
@@ -282,14 +286,20 @@ const families = FAMILY_ORDER.filter((f) => famMap[f]).map((f) => ({
   creatures: [...famMap[f].values()].sort((a, b) => a.min - b.min || a.name.localeCompare(b.name)),
 }));
 
-// Which bestiary families actually live in each zone, from the same two-dimensional
-// zone lookup the simulation uses. A camp's x coordinate matters now that several
-// zones share a north/south band in different world columns.
+// Which bestiary families actually live in each zone, from camp GEOGRAPHY (a camp's
+// center z falls inside exactly one zone's z-band), never from level-band overlap: a
+// creature whose levels straddle a zone border is not a resident of a zone it has no
+// camp in. Drives the world page's "who you will meet" cross-links.
+// Zones live on a 2D atlas grid (east columns share z-bands with west realms), so a
+// camp resolves through the sim's own authoritative zoneAt (exclusive max edges,
+// column ordering), never a re-derived rectangle scan.
+const zoneIdForXZ = (xv, zv) => zoneAt(xv, zv)?.id ?? null;
 const familiesByZone = {};
 for (const c of CAMPS) {
   const m = MOBS[c.mobId];
   if (!m || !publishedMobIds.has(c.mobId)) continue; // only bestiary-published creatures
-  const zid = zoneAt(c.center.x, c.center.z).id;
+  const zid = zoneIdForXZ(c.center.x, c.center.z);
+  if (!zid) continue;
   familiesByZone[zid] ??= new Set();
   familiesByZone[zid].add(m.family);
 }

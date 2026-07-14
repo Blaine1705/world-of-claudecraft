@@ -184,6 +184,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     pos: { x: -18, z: 678 },
     level: 17,
   },
+
   // The Veiled Hollow, around Eldergleam: hub-outskirt veins, stands, and patches so every
   // profession can gather without backtracking to an older zone.
   {
