@@ -170,9 +170,11 @@ export const ja_JP: EnTranslations = {
     "unstuck": {
       "menuButton": "スタック解除",
       "help": "復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。",
+      "helpAtGraveyard": "復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。",
       "started": "{seconds}秒後にスタックを解除します。移動、戦闘、被ダメージ、別の行動を始めるとキャンセルされます。",
       "countdown": "スタック解除：{seconds}",
       "completed": "到達可能な最寄りの安全な場所へ移動しました。",
+      "completedAtGraveyard": "魂は最寄りの墓地へ戻りました。霊魂の癒し手に話しかけ、番人の代償を受けてください。",
       "cancelledMoved": "移動したため、スタック解除をキャンセルしました。",
       "cancelledDamaged": "ダメージを受けたため、スタック解除をキャンセルしました。",
       "cancelledCombat": "戦闘に入ったため、スタック解除をキャンセルしました。",
@@ -187,6 +189,7 @@ export const ja_JP: EnTranslations = {
       "combat": "戦闘中はスタック解除を使用できません。",
       "controlled": "移動を妨げられている間はスタック解除を使用できません。",
       "standStill": "安定した地面で静止してからスタック解除を使用してください。",
+      "standStillAnywhere": "静止してからスタック解除を使用してください。",
       "busy": "現在の行動を終えてからスタック解除を使用してください。",
       "unavailable": "現在の状態ではスタック解除を使用できません。"
     },

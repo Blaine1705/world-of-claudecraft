@@ -170,9 +170,11 @@ export const ko_KR: EnTranslations = {
     "unstuck": {
       "menuButton": "갇힘 탈출",
       "help": "탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.",
+      "helpAtGraveyard": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.",
       "started": "{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.",
       "countdown": "갇힘 탈출: {seconds}",
       "completed": "도달할 수 있는 가장 가까운 안전한 위치로 이동했습니다.",
+      "completedAtGraveyard": "영혼이 가장 가까운 묘지로 돌아왔습니다. 영혼 치유사에게 말을 걸어 수호자의 대가를 받으세요.",
       "cancelledMoved": "이동해서 갇힘 탈출이 취소되었습니다.",
       "cancelledDamaged": "피해를 받아 갇힘 탈출이 취소되었습니다.",
       "cancelledCombat": "전투에 진입해 갇힘 탈출이 취소되었습니다.",
@@ -187,6 +189,7 @@ export const ko_KR: EnTranslations = {
       "combat": "전투 중에는 갇힘 탈출을 사용할 수 없습니다.",
       "controlled": "이동이 제한된 동안에는 갇힘 탈출을 사용할 수 없습니다.",
       "standStill": "단단한 지면에 멈춰 선 뒤 갇힘 탈출을 사용하세요.",
+      "standStillAnywhere": "제자리에 멈춘 뒤 갇힘 탈출을 사용하세요.",
       "busy": "현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.",
       "unavailable": "현재 상태에서는 갇힘 탈출을 사용할 수 없습니다."
     },

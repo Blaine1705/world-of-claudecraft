@@ -18,6 +18,7 @@ import {
   RES_HEALER_HP_FRACTION,
   RES_HP_FRACTION,
   RESURRECTION_SICKNESS_ID,
+  resurrectOnInstanceReentry,
   SPIRIT_HEALER_RANGE,
 } from '../src/sim/spirit';
 import { dist2d, type Entity, type WorldContent } from '../src/sim/types';
@@ -121,6 +122,22 @@ describe('spirit: release to ghost', () => {
 });
 
 describe('spirit: resurrect at corpse', () => {
+  it('does not let a ghost with an abandoned corpse bypass the Pale Keeper through an instance', () => {
+    const sim = makeSim();
+    const p = sim.player as AnyEntity;
+    const meta = sim.meta(p.id);
+    if (!meta) throw new Error('Expected player metadata');
+    p.dead = true;
+    p.ghost = true;
+    p.corpsePos = null;
+    p.corpseInstanceId = null;
+
+    resurrectOnInstanceReentry(sim.ctx, meta, p, sim.groundPos(10, 10));
+
+    expect(p.dead).toBe(true);
+    expect(p.ghost).toBe(true);
+  });
+
   it('resurrects penalty-free at the body when in range', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);

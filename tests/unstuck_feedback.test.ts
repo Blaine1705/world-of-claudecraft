@@ -30,24 +30,24 @@ describe('unstuck feedback', () => {
       log: false,
       clearBanner: false,
     });
-    expect(
-      unstuckFeedback({
-        type: 'unstuck',
-        phase: 'completed',
-        reason: 'nearest_safe_position',
-        area,
-        origin,
-        destination: { ...origin, z: 1, localZ: 1 },
-        duration: 10,
-        distance: 1,
-      }),
-    ).toEqual({
-      key: 'hudChrome.unstuck.completed',
+    const completed = unstuckFeedback({
+      type: 'unstuck',
+      phase: 'completed',
+      reason: 'nearest_graveyard',
+      area,
+      origin,
+      destination: { ...origin, z: 1, localZ: 1 },
+      duration: 10,
+      distance: 1,
+    });
+    expect(completed).toEqual({
+      key: 'hudChrome.unstuck.completedAtGraveyard',
       kind: 'success',
       banner: true,
       log: true,
       clearBanner: true,
     });
+    expect(t(completed.key)).toContain('Pale Keeper');
   });
 
   it('formats visible countdown numbers through the active locale formatter', () => {
@@ -89,7 +89,7 @@ describe('unstuck feedback', () => {
     ['combat', 'hudChrome.unstuck.combat'],
     ['controlled', 'hudChrome.unstuck.controlled'],
     ['falling', 'hudChrome.unstuck.standStill'],
-    ['moving', 'hudChrome.unstuck.standStill'],
+    ['moving', 'hudChrome.unstuck.standStillAnywhere'],
     ['busy', 'hudChrome.unstuck.busy'],
     ['jailed', 'hudChrome.unstuck.unavailable'],
     ['spectating', 'hudChrome.unstuck.unavailable'],

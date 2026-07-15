@@ -7959,10 +7959,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.menuButton': 'Выбраться',
   'hudChrome.unstuck.help':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.',
+  'hudChrome.unstuck.helpAtGraveyard':
+    'Спасение: /unstuck запускает неподвижный отсчёт, после которого ваш дух отправится на ближайшее кладбище. Чтобы вернуться к жизни, примите Подать Хранителя у Целителя душ.',
   'hudChrome.unstuck.started':
     'Перемещение из ловушки через {seconds} сек. Движение, бой, получение урона или другое действие отменят его.',
   'hudChrome.unstuck.countdown': 'Выбраться: {seconds}',
   'hudChrome.unstuck.completed': 'Вы перемещены в ближайшее доступное безопасное место.',
+  'hudChrome.unstuck.completedAtGraveyard':
+    'Ваш дух вернулся на ближайшее кладбище. Поговорите с Целителем душ и примите Подать Хранителя.',
   'hudChrome.unstuck.cancelledMoved': 'Перемещение отменено, потому что вы сдвинулись с места.',
   'hudChrome.unstuck.cancelledDamaged': 'Перемещение отменено, потому что вы получили урон.',
   'hudChrome.unstuck.cancelledCombat': 'Перемещение отменено, потому что вы вступили в бой.',
@@ -7978,6 +7982,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.combat': 'Нельзя выбраться во время боя.',
   'hudChrome.unstuck.controlled': 'Нельзя выбраться, пока ваше движение ограничено.',
   'hudChrome.unstuck.standStill': 'Остановитесь на твёрдой земле, прежде чем выбираться.',
+  'hudChrome.unstuck.standStillAnywhere': 'Остановитесь, прежде чем выбираться.',
   'hudChrome.unstuck.busy': 'Завершите текущее действие, прежде чем выбираться.',
   'hudChrome.unstuck.unavailable': 'В текущем состоянии выбраться нельзя.',
 };

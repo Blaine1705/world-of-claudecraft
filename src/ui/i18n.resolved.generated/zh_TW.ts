@@ -170,9 +170,11 @@ export const zh_TW: EnTranslations = {
     "unstuck": {
       "menuButton": "脫困",
       "help": "脫困：/unstuck 會啟動原地倒數，之後將你移動到附近可到達的安全位置。",
+      "helpAtGraveyard": "脫困：/unstuck 會啟動原地倒數，結束後將你的靈魂送往最近的墓地。你必須向靈魂醫者接受守護者的代價才能復活。",
       "started": "將在 {seconds} 秒後脫困。移動、戰鬥、受到傷害或開始其他動作都會取消。",
       "countdown": "脫困：{seconds}",
       "completed": "已移動到最近且可到達的安全位置。",
+      "completedAtGraveyard": "你的靈魂已返回最近的墓地。與靈魂醫者交談並接受守護者的代價。",
       "cancelledMoved": "你進行了移動，脫困已取消。",
       "cancelledDamaged": "你受到了傷害，脫困已取消。",
       "cancelledCombat": "你進入了戰鬥，脫困已取消。",
@@ -187,6 +189,7 @@ export const zh_TW: EnTranslations = {
       "combat": "戰鬥中無法使用脫困。",
       "controlled": "移動受限時無法使用脫困。",
       "standStill": "請在堅實地面上站穩後再使用脫困。",
+      "standStillAnywhere": "請先停下再使用脫困。",
       "busy": "請先完成目前動作再使用脫困。",
       "unavailable": "目前狀態下無法使用脫困。"
     },

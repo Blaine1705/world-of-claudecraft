@@ -170,9 +170,11 @@ export const en_CA: EnTranslations = {
     "unstuck": {
       "menuButton": "Unstuck",
       "help": "Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.",
+      "helpAtGraveyard": "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
       "started": "Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.",
       "countdown": "Unstuck: {seconds}",
       "completed": "Moved to the nearest reachable safe spot.",
+      "completedAtGraveyard": "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
       "cancelledMoved": "Unstuck cancelled because you moved.",
       "cancelledDamaged": "Unstuck cancelled because you took damage.",
       "cancelledCombat": "Unstuck cancelled because you entered combat.",
@@ -187,6 +189,7 @@ export const en_CA: EnTranslations = {
       "combat": "You cannot use Unstuck during combat.",
       "controlled": "You cannot use Unstuck while movement is impaired.",
       "standStill": "Stand still on solid ground before using Unstuck.",
+      "standStillAnywhere": "Stand still before using Unstuck.",
       "busy": "Finish your current action before using Unstuck.",
       "unavailable": "Unstuck is unavailable in your current state."
     },

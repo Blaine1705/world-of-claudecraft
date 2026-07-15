@@ -2445,7 +2445,7 @@ export type UnstuckEvent =
   | {
       type: 'unstuck';
       phase: 'completed';
-      reason: 'nearest_safe_position';
+      reason: 'nearest_safe_position' | 'nearest_graveyard';
       area: UnstuckArea;
       origin: UnstuckPosition;
       destination: UnstuckPosition;

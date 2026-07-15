@@ -7453,10 +7453,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.menuButton': '脱困',
   'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
+  'hudChrome.unstuck.helpAtGraveyard':
+    '脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。',
   'hudChrome.unstuck.started':
     '将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。',
   'hudChrome.unstuck.countdown': '脱困：{seconds}',
   'hudChrome.unstuck.completed': '已移动到最近且可到达的安全位置。',
+  'hudChrome.unstuck.completedAtGraveyard':
+    '你的灵魂已返回最近的墓地。与灵魂医者交谈并接受守护者的代价。',
   'hudChrome.unstuck.cancelledMoved': '你进行了移动，脱困已取消。',
   'hudChrome.unstuck.cancelledDamaged': '你受到了伤害，脱困已取消。',
   'hudChrome.unstuck.cancelledCombat': '你进入了战斗，脱困已取消。',
@@ -7471,6 +7475,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.combat': '战斗中无法使用脱困。',
   'hudChrome.unstuck.controlled': '移动受限时无法使用脱困。',
   'hudChrome.unstuck.standStill': '请在坚实地面上站稳后再使用脱困。',
+  'hudChrome.unstuck.standStillAnywhere': '请先停下再使用脱困。',
   'hudChrome.unstuck.busy': '请先完成当前动作再使用脱困。',
   'hudChrome.unstuck.unavailable': '当前状态下无法使用脱困。',
 };

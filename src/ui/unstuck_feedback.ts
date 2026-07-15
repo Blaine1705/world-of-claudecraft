@@ -52,7 +52,7 @@ export function unstuckFeedback(event: Event): UnstuckFeedback {
   }
   if (event.phase === 'completed') {
     return {
-      key: 'hudChrome.unstuck.completed',
+      key: 'hudChrome.unstuck.completedAtGraveyard',
       kind: 'success',
       banner: true,
       log: true,
@@ -100,8 +100,9 @@ export function unstuckFeedback(event: Event): UnstuckFeedback {
     case 'controlled':
       return error('hudChrome.unstuck.controlled');
     case 'falling':
-    case 'moving':
       return error('hudChrome.unstuck.standStill');
+    case 'moving':
+      return error('hudChrome.unstuck.standStillAnywhere');
     case 'busy':
       return error('hudChrome.unstuck.busy');
     case 'jailed':

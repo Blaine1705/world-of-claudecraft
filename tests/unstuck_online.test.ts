@@ -111,7 +111,7 @@ describe('online unstuck command wiring', () => {
     const event: SimEvent = {
       type: 'unstuck',
       phase: 'completed',
-      reason: 'nearest_safe_position',
+      reason: 'nearest_graveyard',
       pid: 7,
       area: { kind: 'overworld', id: 'world' },
       origin: { x: 1, y: 2, z: 3, localX: 1, localZ: 3 },

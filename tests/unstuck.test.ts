@@ -1,41 +1,25 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import {
-  BUILTIN_WORLD,
-  DELVE_MODULES,
-  DELVES,
-  INSTANCE_X_BASE,
-  riftInstanceOrigin,
-  setActiveWorldContent,
-} from '../src/sim/data';
-import { delveModuleEntry, delveModuleZOffset } from '../src/sim/delves/runs';
+import { BUILTIN_WORLD, DELVES, INSTANCE_X_BASE, setActiveWorldContent } from '../src/sim/data';
+import { delveModuleEntry } from '../src/sim/delves/runs';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
-import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { swimSurfaceY } from '../src/sim/player_motion';
-import { generateRiftFloor } from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
-import type { SimContext } from '../src/sim/sim_context';
-import type { BlockerDef, DelveRun, SimEvent, WorldContent } from '../src/sim/types';
+import { nearestOverworldGraveyard, RESURRECTION_SICKNESS_ID } from '../src/sim/spirit';
+import type { BlockerDef, SimEvent, WorldContent } from '../src/sim/types';
 import {
-  isUnstuckDestinationSafe,
   UNSTUCK_COOLDOWN_ID,
   UNSTUCK_COUNTDOWN_SECONDS,
-  UNSTUCK_EMBEDDED_CORRECTION_MAX,
-  UNSTUCK_MAX_DISTANCE,
   UNSTUCK_RETRY_SECONDS,
   UNSTUCK_SUCCESS_COOLDOWN_SECONDS,
   unstuckLocationAt,
-  unstuckRouteReachable,
-  updateUnstuck,
 } from '../src/sim/unstuck';
-import { groundHeight, waterLevelAt } from '../src/sim/world';
 
 type Event = Extract<SimEvent, { type: 'unstuck' }>;
 
 const SEED = 42;
 const START = { x: 0, z: -40 };
 const WEDGE_WALL_Z = START.z + 0.4;
-// A deep point eight yards inside Mirror Lake's first dry, walkable shoreline.
-// The normal swim kernel can move here but cannot climb the bank at the edge.
+// A deep point inside Mirror Lake where the normal swim kernel can move.
 const WATER_TRAP = { x: -64.75, z: 88 };
 
 function required<T>(value: T | null | undefined, label: string): T {
@@ -90,15 +74,6 @@ function placeInWaterTrap(sim: Sim): void {
   p.jumping = false;
   sim.grid.update(p);
   sim.playerGrid.update(p);
-}
-
-function seedWithFloor0(
-  predicate: (floor: ReturnType<typeof generateRiftFloor>) => boolean,
-): number {
-  for (let seed = 1; seed <= 500; seed++) {
-    if (predicate(generateRiftFloor(seed, 20, 0))) return seed;
-  }
-  throw new Error('Expected matching rift floor seed');
 }
 
 function eventsOf(events: SimEvent[]): Event[] {
@@ -337,12 +312,14 @@ describe('unstuck countdown and cancellation', () => {
   });
 });
 
-describe('unstuck destination', () => {
+describe('unstuck graveyard release', () => {
   function runCompletion(): {
+    sim: Sim;
     player: Sim['player'];
     event: Extract<Event, { phase: 'completed' }>;
   } {
-    const sim = makeWedgedWorld();
+    const sim = makeWorld();
+    sim.setPlayerLevel(10);
     const { player } = accepted(sim);
     const events = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20));
     const event = events.find(
@@ -351,241 +328,69 @@ describe('unstuck destination', () => {
     );
     expect(event).toBeDefined();
     expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
-    return { player, event: required(event, 'completed event') };
+    return { sim, player, event: required(event, 'completed event') };
   }
 
-  it('completes deterministically at a same-area point no farther than eight yards', () => {
-    const first = runCompletion();
-    const second = runCompletion();
+  it('works from an ordinary safe position, kills the player, and forces the Pale Keeper toll', () => {
+    const { sim, player, event } = runCompletion();
+    const graveyard = nearestOverworldGraveyard(START.x, START.z);
 
-    expect(second.event.destination).toEqual(first.event.destination);
-    expect(second.event.distance).toBe(first.event.distance);
-    expect(first.event.distance).toBeGreaterThan(0);
-    expect(first.event.distance).toBeLessThanOrEqual(UNSTUCK_MAX_DISTANCE);
-    expect(first.event.distance).toBeLessThanOrEqual(UNSTUCK_EMBEDDED_CORRECTION_MAX);
-    expect(first.event.destination.z).toBeLessThan(WEDGE_WALL_Z);
-    expect(first.player.pos).toMatchObject({
-      x: first.event.destination.x,
-      y: first.event.destination.y,
-      z: first.event.destination.z,
-    });
-    expect(first.player.prevPos).toEqual(first.player.pos);
-    expect(first.event.area.kind).toBe('overworld');
+    expect(event.reason).toBe('nearest_graveyard');
+    expect(event.destination).toMatchObject(graveyard);
+    expect(player.pos).toMatchObject(graveyard);
+    expect(player.prevPos).toEqual(player.pos);
+    expect(player.dead).toBe(true);
+    expect(player.ghost).toBe(true);
+    expect(player.corpsePos).toBeNull();
+    expect(required(sim.meta(player.id), 'player metadata').counters.deaths).toBe(1);
+
+    sim.resurrectAtCorpse();
+    expect(player.dead).toBe(true);
+    expect(player.ghost).toBe(true);
+
+    sim.resurrectAtSpiritHealer();
+    expect(player.dead).toBe(false);
+    expect(player.ghost).toBe(false);
+    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(true);
   });
 
-  it('immediately rejects an already-safe player without cooldown or terminal telemetry', () => {
+  it('uses the same graveyard death flow for an idle swimmer', () => {
     const sim = makeWorld();
-    const player = sim.player;
-    const meta = required(sim.meta(player.id), 'primary player metadata');
-    const origin = { ...player.pos };
-
-    expect(sim.unstuck(player.id)).toBe(false);
-    expect(eventsOf(sim.drainEvents())).toEqual([
-      { type: 'unstuck', phase: 'blocked', reason: 'already_safe', pid: player.id },
-    ]);
-    expect(meta.pendingUnstuck).toBeNull();
-    expect(player.cooldowns.has(UNSTUCK_COOLDOWN_ID)).toBe(false);
-    expect(player.pos).toEqual(origin);
-
-    const laterEvents = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20));
-    expect(laterEvents).toEqual([]);
-    expect(player.pos).toEqual(origin);
-  });
-
-  it('moves an idle swimmer across an unclimbable shoreline to the nearest dry point', () => {
-    const sim = makeWorld();
+    sim.setPlayerLevel(10);
     placeInWaterTrap(sim);
     const player = sim.player;
-    const origin = { ...player.pos };
+    const graveyard = nearestOverworldGraveyard(WATER_TRAP.x, WATER_TRAP.z);
 
     expect(sim.ctx.isSwimming(player)).toBe(true);
-    expect(groundHeight(origin.x, origin.z, sim.cfg.seed)).toBeLessThan(
-      waterLevelAt(origin.x, origin.z) - 0.8,
-    );
     expect(sim.unstuck(player.id)).toBe(true);
     sim.drainEvents();
+    const completed = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+      (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
+    );
 
-    const event = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
-      (candidate): candidate is Extract<Event, { phase: 'completed' }> =>
-        candidate.phase === 'completed',
-    );
-    expect(event).toBeDefined();
-    expect(event?.distance).toBeGreaterThan(0);
-    expect(event?.distance).toBeLessThanOrEqual(UNSTUCK_MAX_DISTANCE);
-    expect(groundHeight(player.pos.x, player.pos.z, sim.cfg.seed)).toBeGreaterThanOrEqual(
-      waterLevelAt(player.pos.x, player.pos.z),
-    );
-    expect(sim.ctx.isSwimming(player)).toBe(false);
+    expect(completed?.reason).toBe('nearest_graveyard');
+    expect(player.pos).toMatchObject(graveyard);
+    expect(player.dead).toBe(true);
+    expect(player.ghost).toBe(true);
+    expect(player.corpsePos).toBeNull();
   });
 
-  it('does not let water recovery teleport through a real blocker wall', () => {
-    const wall: BlockerDef = { x1: -61, z1: 70, x2: -61, z2: 106 };
-    const sim = makeWorld([wall]);
-    placeInWaterTrap(sim);
-    const origin = { ...sim.player.pos };
+  it('returns a delve player to the graveyard nearest the delve entrance', () => {
+    const sim = makeWorld();
+    const pid = sim.player.id;
+    const delve = DELVES.collapsed_reliquary;
+    sim.setPlayerLevel(delve.minLevel, pid);
+    sim.enterDelve(delve.id, 'normal', pid);
+    const graveyard = nearestOverworldGraveyard(delve.doorPos.x, delve.doorPos.z);
 
-    expect(sim.unstuck(sim.player.id)).toBe(true);
+    expect(sim.unstuck(pid)).toBe(true);
     sim.drainEvents();
-    const events = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20));
+    tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
 
-    expect(events).toContainEqual(
-      expect.objectContaining({
-        type: 'unstuck',
-        phase: 'failed',
-        reason: 'no_safe_position',
-      }),
-    );
-    expect(sim.player.pos).toEqual(origin);
-  });
-
-  it('rejects a route through a real blocker wall', () => {
-    const wallZ = 38.2;
-    const wall: BlockerDef = { x1: -10, z1: wallZ, x2: 10, z2: wallZ };
-    const sim = makeWorld([wall]);
-    const player = sim.player;
-    player.pos = sim.groundPos(0, 37);
-    player.prevPos = { ...player.pos };
-    sim.grid.update(player);
-    sim.playerGrid.update(player);
-
-    const direct = sim.ctx.resolvePlayerMove(
-      player.pos.x,
-      player.pos.z,
-      player.pos.x,
-      40,
-      PLAYER_BODY_RADIUS,
-      player,
-      false,
-    );
-    expect(direct.z).toBeLessThan(wallZ);
-
-    const destination = sim.groundPos(player.pos.x, 40);
-    expect(unstuckRouteReachable(sim.ctx, player, player.pos, destination)).toBe(false);
-  });
-
-  it('rejects an eight-yard route whose endpoints are stable but crosses a climb gate', () => {
-    const sim = makeWorld();
-    const player = sim.player;
-    const origin = sim.groundPos(-225, 182);
-    const destination = sim.groundPos(-217.6089637399097, 178.93853254107927);
-    player.pos = { ...origin };
-    player.prevPos = { ...origin };
-
-    expect(isUnstuckDestinationSafe(sim.ctx, player, origin)).toBe(true);
-    expect(isUnstuckDestinationSafe(sim.ctx, player, destination)).toBe(true);
-    const staticSweep = sim.ctx.resolvePlayerMove(
-      origin.x,
-      origin.z,
-      destination.x,
-      destination.z,
-      PLAYER_BODY_RADIUS,
-      player,
-      false,
-    );
-    expect(staticSweep).toEqual({ x: destination.x, z: destination.z });
-    expect(unstuckRouteReachable(sim.ctx, player, origin, destination)).toBe(false);
-  });
-
-  it('rejects a route through a real closed delve door and accepts it once opened', () => {
-    const sim = makeWorld();
-    const pid = sim.player.id;
-    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, pid);
-    sim.enterDelve('collapsed_reliquary', 'normal', pid);
-    const run = required(sim.delveRunForPlayer(pid), 'active delve run');
-    run.modules = ['reliquary_sunken_ossuary'];
-    run.moduleIndex = 0;
-    (sim as unknown as { spawnDelveModule(run: DelveRun): void }).spawnDelveModule(run);
-    const doorId = required(
-      run.objectIds.find((id) => run.objectState[id]?.kind === 'locked_door'),
-      'closed delve door',
-    );
-    const door = required(sim.entities.get(doorId), 'closed delve door entity');
-    const from = sim.groundPos(door.pos.x, door.pos.z - 3);
-    const to = sim.groundPos(door.pos.x, door.pos.z + 3);
-    sim.player.pos = { ...from };
-    sim.player.prevPos = { ...from };
-
-    expect(run.objectState[doorId].open).toBe(false);
-    expect(unstuckRouteReachable(sim.ctx, sim.player, from, to)).toBe(false);
-    run.objectState[doorId].open = true;
-    expect(unstuckRouteReachable(sim.ctx, sim.player, from, to)).toBe(true);
-  });
-
-  it('rejects a live delve Blackwater destination', () => {
-    const sim = makeWorld();
-    const pid = sim.player.id;
-    sim.setPlayerLevel(DELVES.drowned_litany.minLevel, pid);
-    sim.enterDelve('drowned_litany', 'normal', pid);
-    const run = required(sim.delveRunForPlayer(pid), 'active Drowned Litany run');
-    const module = required(DELVE_MODULES[run.modules[run.moduleIndex]], 'active delve module');
-    const hazard = required(module.hazards?.[0], 'active Blackwater zone');
-    const destination = sim.groundPos(
-      run.origin.x + hazard.x,
-      run.origin.z + delveModuleZOffset(run) + hazard.z,
-    );
-
-    expect(isUnstuckDestinationSafe(sim.ctx, sim.player, destination)).toBe(false);
-  });
-
-  it('rejects live rift lava, ice, and rolling-boulder lanes', () => {
-    const cases = [
-      {
-        seed: seedWithFloor0((floor) => floor.hazards.length > 0),
-        point: (floor: ReturnType<typeof generateRiftFloor>) => floor.hazards[0],
-      },
-      {
-        seed: seedWithFloor0((floor) => floor.iceZone !== null),
-        point: (floor: ReturnType<typeof generateRiftFloor>) => required(floor.iceZone, 'ice zone'),
-      },
-      {
-        seed: seedWithFloor0((floor) => floor.rollers.length > 0),
-        point: (floor: ReturnType<typeof generateRiftFloor>) => {
-          const roller = required(floor.rollers[0], 'roller lane');
-          return { x: roller.x, z: (roller.z0 + roller.z1) / 2 };
-        },
-      },
-    ];
-
-    for (const testCase of cases) {
-      const sim = makeWorld();
-      sim.enterRift(testCase.seed, 20, sim.player.id);
-      const instance = required(
-        sim.riftInstances.find((candidate) => candidate.partyKey !== null),
-        'active rift instance',
-      );
-      const floor = generateRiftFloor(testCase.seed, 20, 0);
-      const local = testCase.point(floor);
-      const origin = riftInstanceOrigin(instance.slot, 0);
-      const destination = sim.groundPos(origin.x + local.x, origin.z + local.z);
-      expect(isUnstuckDestinationSafe(sim.ctx, sim.player, destination)).toBe(false);
-    }
-  });
-
-  it('emits a typed failure and leaves the player in place when no point is safe', () => {
-    const sim = makeWedgedWorld();
-    const { player, meta } = accepted(sim);
-    const origin = { ...player.pos };
-
-    const noSafeContext = new Proxy(sim.ctx, {
-      get(target, property, receiver) {
-        if (property === 'time') return UNSTUCK_COUNTDOWN_SECONDS;
-        if (property === 'resolveMovePoint') {
-          return (x: number, z: number) => ({ x: x + 100, z: z + 100 });
-        }
-        return Reflect.get(target, property, receiver);
-      },
-    }) as SimContext;
-
-    updateUnstuck(noSafeContext);
-    expect(eventsOf(sim.drainEvents())).toContainEqual(
-      expect.objectContaining({
-        type: 'unstuck',
-        phase: 'failed',
-        reason: 'no_safe_position',
-      }),
-    );
-    expect(meta.pendingUnstuck).toBeNull();
-    expect(player.pos).toEqual(origin);
+    expect(sim.player.pos).toMatchObject(graveyard);
+    expect(sim.player.dead).toBe(true);
+    expect(sim.player.ghost).toBe(true);
+    expect(sim.player.corpsePos).toBeNull();
   });
 });
 

@@ -10889,8 +10889,8 @@ export class Hud {
       'You mutter to yourself. Nobody hears it.': 'hud.errors.whisperSelf',
       'You are not in a party.': 'hud.errors.notInParty',
       'You must be in a party to start a ready check.': 'hudChrome.readyCheck.notInPartyError',
-      'Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.':
-        'hudChrome.unstuck.help',
+      "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.":
+        'hudChrome.unstuck.helpAtGraveyard',
       'A ready check is already in progress.': 'hudChrome.readyCheck.inProgressError',
       'Only the party leader can change the loot method.': 'hudChrome.masterLoot.leaderOnly',
       'Only the party leader may invite.': 'hud.errors.partyLeaderInvite',
