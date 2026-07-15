@@ -267,6 +267,39 @@ describe('riding lesson, abandon paths', () => {
     expect(metaOf(sim).mountTraining?.state).toBe('IN_PROGRESS');
   });
 
+  it('persists the paid fee across a relog so the next attempt stays free', () => {
+    const sim = makeSim();
+    setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER + 777 });
+    beginLesson(sim);
+    expect(metaOf(sim).copper).toBe(777);
+    sim.mountTrainAbortFor(sim.playerId);
+    sim.tick();
+
+    const state = sim.serializeCharacter(sim.playerId);
+    expect(state).not.toBeNull();
+    expect(state?.mountTrainingFeePaid).toBe(true);
+
+    const restored = new Sim({
+      seed: sim.cfg.seed,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+    });
+    const restoredPid = restored.addPlayer('warrior', 'Rider', { state: state! });
+    restored.tick();
+    const restoredMeta = restored.players.get(restoredPid)!;
+    expect(restoredMeta.mountTrainingFeePaid).toBe(true);
+    expect(restoredMeta.mountTraining ?? null).toBeNull();
+    const copperBeforeRetry = restoredMeta.copper;
+
+    restored.mountTrainBeginFor(restoredPid);
+    const events = restored.tick();
+
+    expect(events.some((e) => e.type === 'mountTrainSession')).toBe(true);
+    expect(restoredMeta.mountTraining?.state).toBe('IN_PROGRESS');
+    expect(restoredMeta.copper).toBe(copperBeforeRetry);
+  });
+
   it('straying beyond the paddock abandons the lesson', () => {
     const sim = makeSim();
     setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });

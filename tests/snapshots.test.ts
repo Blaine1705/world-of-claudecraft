@@ -25,7 +25,9 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
+import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { DELVES, GATHER_NODES } from '../src/sim/data';
+import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -138,6 +140,10 @@ function bareClient(pid: number): ClientWorld {
   c.pendingSpectateFacing = null;
   c.nodeCooldowns = new Map();
   return c;
+}
+
+function feedEventFrame(client: ClientWorld, frame: unknown): void {
+  (client as any).onMessage(JSON.stringify(frame));
 }
 
 describe('self stat wire round-trip', () => {
@@ -2432,6 +2438,107 @@ describe('lockpick view rebuilds from events on the online client', () => {
     feed(client, { type: 'lockpickEnd', sessionId: 'OTHER', outcome: 'fail' });
     expect(client.lockpickState).not.toBeNull();
     expect(client.lockpickState?.sessionId).toBe('s2');
+  });
+});
+
+describe('online mount command and race-event transport', () => {
+  it('round-trips client frames through actor-scoped server dispatch and mirrors the race lifecycle', () => {
+    const server = new GameServer();
+    const actorWire = fakeWs();
+    const actor = joinServer(server, actorWire, 1, 'Rider');
+    const otherWire = fakeWs();
+    const other = joinServer(server, otherWire, 2, 'Bystander');
+    const sim = server.sim;
+    const actorMeta = sim.players.get(actor.pid)!;
+    const otherMeta = sim.players.get(other.pid)!;
+    const actorEntity = sim.entities.get(actor.pid)!;
+    const otherEntity = sim.entities.get(other.pid)!;
+    sim.setPlayerLevel(20, actor.pid);
+    sim.setPlayerLevel(20, other.pid);
+    sim.addItem('reins_grag_bear', 1, actor.pid);
+
+    // Drive the real ClientWorld command adapter. The select payload is the
+    // fragile arm: both the command token and the `mount` field must arrive
+    // unchanged at the server dispatch.
+    const outbox: string[] = [];
+    const commandClient = bareClient(actor.pid);
+    (commandClient as any).connected = true;
+    (commandClient as any).ws = { readyState: 1, send: (payload: string) => outbox.push(payload) };
+    (commandClient as any).entities.set(actor.pid, { level: 20 });
+    const owned: MountKey[] = ['grag_bear'];
+    (commandClient as any).selfOwnedMounts = owned;
+    commandClient.selectMount('grag_bear');
+    commandClient.toggleMounted();
+    commandClient.mountRaceStart();
+    commandClient.mountRaceCancel();
+    expect(outbox.map((payload) => JSON.parse(payload))).toEqual([
+      { t: 'cmd', cmd: 'mount_select', mount: 'grag_bear' },
+      { t: 'cmd', cmd: 'mount_toggle' },
+      { t: 'cmd', cmd: 'mount_race_start' },
+      { t: 'cmd', cmd: 'mount_race_cancel' },
+    ]);
+
+    server.handleMessage(actor, outbox[0]);
+    expect(actorMeta.selectedMount).toBe('grag_bear');
+    expect(otherMeta.selectedMount).toBe('valorsteed');
+    server.handleMessage(actor, outbox[1]);
+    expect(actorEntity.mountCastKey).toBe('grag_bear');
+    expect(otherEntity.mountCastKey).toBe('');
+
+    // Put the actor at the course on the selected mount, then start through the
+    // client-built frame. The bystander must never gain a session or receive
+    // the actor's personal race events.
+    actorEntity.mountCastRemaining = 0;
+    actorEntity.mountCastKey = '';
+    actorEntity.mountKey = 'grag_bear';
+    actorEntity.inCombat = false;
+    actorEntity.onGround = true;
+    actorEntity.pos.x = MOUNT_RACE_START_PLATFORM.x;
+    actorEntity.pos.z = MOUNT_RACE_START_PLATFORM.z;
+    actorEntity.pos.y = terrainHeight(actorEntity.pos.x, actorEntity.pos.z, sim.cfg.seed);
+    actorEntity.prevPos = { ...actorEntity.pos };
+    server.handleMessage(actor, outbox[2]);
+    expect(actorMeta.mountRace?.phase).toBe('countdown');
+    expect(otherMeta.mountRace ?? null).toBeNull();
+
+    const mirror = bareClient(actor.pid);
+    const routeTick = (): void => {
+      const events = sim.tick();
+      (server as any).routeEvents(events);
+    };
+    const feedNewActorFrames = (): void => {
+      for (const frame of actorWire.sent.splice(0)) {
+        if (
+          frame.t === 'events' &&
+          frame.list.some((event: { type?: string }) => event.type?.startsWith('mountRace'))
+        ) {
+          feedEventFrame(mirror, frame);
+        }
+      }
+    };
+
+    routeTick();
+    feedNewActorFrames();
+    expect(mirror.mountRaceView()).toMatchObject({ phase: 'countdown', cleared: 0 });
+
+    for (let i = 1; i < MOUNT_RACE_COUNTDOWN_TICKS; i++) routeTick();
+    feedNewActorFrames();
+    expect(actorMeta.mountRace?.phase).toBe('racing');
+    expect(mirror.mountRaceView()).toMatchObject({ phase: 'racing', cleared: 0 });
+
+    server.handleMessage(actor, outbox[3]);
+    routeTick();
+    feedNewActorFrames();
+    expect(actorMeta.mountRace ?? null).toBeNull();
+    expect(mirror.mountRaceView()).toBeNull();
+    expect(otherMeta.mountRace ?? null).toBeNull();
+    expect(
+      otherWire.sent.some(
+        (frame) =>
+          frame.t === 'events' &&
+          frame.list.some((event: { type?: string }) => event.type?.startsWith('mountRace')),
+      ),
+    ).toBe(false);
   });
 });
 
