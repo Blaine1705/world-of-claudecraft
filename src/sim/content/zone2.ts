@@ -1576,6 +1576,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     mount: 'stalkglider_snail',
     quality: 'common',
     soulbound: true,
+    noDiscard: true,
     sellValue: 0,
   },
   fenmist_robe: {

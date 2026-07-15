@@ -2993,6 +2993,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     mount: 'shadowjump_toad',
     quality: 'rare',
     soulbound: true,
+    noDiscard: true,
     sellValue: 0,
   },
   reins_stormfeather_griffin: {
@@ -3002,6 +3003,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     mount: 'stormfeather_griffin',
     quality: 'epic',
     soulbound: true,
+    noDiscard: true,
     sellValue: 0,
   },
   reins_thunderstrut_gobbler: {
@@ -3011,6 +3013,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     mount: 'thunderstrut_gobbler',
     quality: 'epic',
     soulbound: true,
+    noDiscard: true,
     sellValue: 0,
   },
   crownforged_dreadhelm: {

@@ -31,7 +31,7 @@ import { dist2d, type Entity, INTERACT_RANGE, type MountTrainingSession } from '
 
 // --- tuning (change numbers here, not inline) -------------------------------
 export const MOUNT_TRAIN_MIN_LEVEL = 20;
-export const MOUNT_TRAIN_FEE_COPPER = 10000; // 100 gold, charged once, ever
+export const MOUNT_TRAIN_FEE_COPPER = 1_000_000; // 100 gold, charged once, ever
 // The lesson's play area: the paddock rect plus a small margin (which also covers
 // Marla, who stands just north of the fence at z=708). Straying beyond it during
 // the lesson abandons the attempt. This replaces the old fixed radius around

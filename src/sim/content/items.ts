@@ -334,6 +334,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     mount: 'valorsteed',
     quality: 'common',
     soulbound: true,
+    noDiscard: true,
     sellValue: 0,
     buyValue: 1_000_000,
   },
@@ -347,6 +348,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     mount: 'grag_bear',
     quality: 'common',
     soulbound: true,
+    noDiscard: true,
     sellValue: 0,
   },
   mistveil_cord: {

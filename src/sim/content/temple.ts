@@ -656,6 +656,7 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     mount: 'aether_hover_cycle',
     quality: 'rare',
     soulbound: true,
+    noDiscard: true,
     sellValue: 0,
   },
   moonshroud_robe: {

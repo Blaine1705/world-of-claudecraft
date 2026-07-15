@@ -128,6 +128,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
       expect(item.soulbound).toBe(true); // never traded, mailed, listed, or destroyed
+      expect(item.noDiscard).toBe(true);
       expect(item.sellValue).toBe(0);
       // The item's name color matches the card's rarity tier.
       expect(item.quality).toBe(MOUNTS[key].rarity);
@@ -190,6 +191,22 @@ describe('mount reins items (the collection: owning the item is owning the mount
     sim.addItem('reins_shadowjump_toad', 1, pid);
     expect(sim.ownedMounts()).toEqual(['shadowjump_toad']);
     expect(sim.ownedMountsFor(pid)).toEqual(['shadowjump_toad']);
+  });
+
+  it('refuses to discard mount reins so an active mount cannot outlive ownership', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    sim.addItem('reins_stormfeather_griffin', 1, pid);
+    selectMount(sim.ctx, pid, 'stormfeather_griffin');
+    ride(sim, pid);
+    expect(e.mountKey).toBe('stormfeather_griffin');
+
+    sim.discardItem('reins_stormfeather_griffin', 1, pid);
+
+    expect(sim.countItem('reins_stormfeather_griffin', pid)).toBe(1);
+    expect(mountOwned(sim.players.get(pid)!, 'stormfeather_griffin')).toBe(true);
+    expect(e.mountKey).toBe('stormfeather_griffin');
   });
 });
 

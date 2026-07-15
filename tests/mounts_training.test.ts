@@ -15,13 +15,12 @@ import {
 } from '../src/sim/content/mounts';
 import { QUESTS } from '../src/sim/data';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { MOUNT_TRAIN_FEE_COPPER } from '../src/sim/mounts_training';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const RIDING_LESSONS_QUEST_ID = 'q_riding_lessons';
-const MOUNT_TRAIN_FEE_COPPER = 10000;
-
 const makeSim = (seed = 1) => new Sim({ seed, playerClass: 'warrior', autoEquip: true });
 
 function marlaOf(sim: Sim) {
@@ -114,6 +113,10 @@ function completeRace(sim: Sim): SimEvent[] {
 }
 
 describe('riding lesson, begin gates', () => {
+  it('prices the one-time lesson at exactly 100 gold in copper', () => {
+    expect(MOUNT_TRAIN_FEE_COPPER).toBe(1_000_000);
+  });
+
   it('refuses an underlevel player (no session started)', () => {
     const sim = makeSim();
     setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
