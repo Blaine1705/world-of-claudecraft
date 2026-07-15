@@ -21,6 +21,7 @@ import {
 import { ZONE3_PROPS } from '../src/sim/content/zone3';
 import { PROPS } from '../src/sim/data';
 import { MOUNT_RACE_COUNTDOWN_TICKS, MOUNT_RACE_TIME_LIMIT_TICKS } from '../src/sim/mount_race';
+import { MOUNT_TRAIN_FEE_COPPER } from '../src/sim/mounts_training';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -237,7 +238,7 @@ describe('starting a race', () => {
     const sim = makeSim();
     sim.setPlayerLevel(20);
     const meta = sim.players.get(sim.playerId)!;
-    meta.copper = 10000;
+    meta.copper = MOUNT_TRAIN_FEE_COPPER;
     meta.questLog.set('q_riding_lessons', {
       questId: 'q_riding_lessons',
       counts: [0],
