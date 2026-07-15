@@ -38,7 +38,7 @@ function singlePass(x: number, z: number): { x: number; z: number } {
 // large single-pass shortfall that iteration closes; this world's terrain
 // generation is content-driven and shifts pockets around, so this pin is
 // re-derived whenever terrain content changes invalidate the previous one.
-const PIN = { x: -159, z: 1841 }; // steepOnce ~15.13, steepIterated ~1.31 at SEED 20061
+const PIN = { x: 328, z: 980 }; // steepOnce ~5.59, steepIterated ~0.12 at SEED 20061 (re-derived: the no-stuck terrain graded the prior pocket away)
 const CORNER_ORIGINS = [
   { x: WORLD_MAX_X, z: WORLD_MIN_Z, sx: -1, sz: 1 },
   { x: WORLD_MAX_X, z: WORLD_MAX_Z, sx: -1, sz: -1 },

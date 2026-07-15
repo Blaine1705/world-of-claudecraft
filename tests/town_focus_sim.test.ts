@@ -102,7 +102,11 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 30000 + i, ZONE1.hub);
         sim.harvestCorpse(mob.id, undefined, a);
-        total = sim.countItem('boar_hide', a);
+        // drain the bag each harvest: richer merged-world yields can hit the
+        // bag cap inside 300 trials, and a capped total reads as a dead heat
+        const gained = sim.countItem('boar_hide', a);
+        total += gained;
+        if (gained > 0) sim.removeItem('boar_hide', gained, a);
       }
       return total;
     }

@@ -82,9 +82,10 @@ export const FROSTVEIL_ROADS: { x: number; z: number }[][] = [
     { x: 30, z: 1666 },
     { x: 80, z: 1694 },
     { x: 130, z: 1760 },
-    { x: 160, z: 1830 },
+    { x: 120, z: 1840 },
+    { x: 142, z: 1876 },
     { x: 176, z: 1888 },
-  ], // Icemantle -> around the tarn -> the Snowline crossing
+  ], // Icemantle -> around the tarn -> the Snowline crossing (west of the moat coves)
   [
     { x: -30, z: 1560 },
     { x: -10, z: 1520 },

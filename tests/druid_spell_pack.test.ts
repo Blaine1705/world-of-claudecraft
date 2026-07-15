@@ -59,7 +59,9 @@ function findDeepWater(seed: number): { x: number; z: number } {
   // stalls the run against a wall). The fixture seed is fixed, so this is stable;
   // the guard fires loudly if a future world change moves the lake.
   const spot = { x: -100, z: 70 };
-  if (groundHeight(spot.x, spot.z, seed) >= WATER_LEVEL - 3) {
+  // (the no-stuck shore grading floats every carved bed ~0.9yd shallower, so
+  // the guard bites at 2yd: still far past the 0.8yd swim line for the run)
+  if (groundHeight(spot.x, spot.z, seed) >= WATER_LEVEL - 2) {
     throw new Error('test fixture deep-water spot is no longer deep water; pick a new lake centre');
   }
   return spot;

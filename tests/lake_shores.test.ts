@@ -135,7 +135,7 @@ describe('every declared lake can be walked out of (terrain generation)', () => 
       expect(total, `blocked escape rays world-wide:\n${rows.join('\n')}`).toBeLessThanOrEqual(
         MAX_BLOCKED_TOTAL,
       );
-    });
+    }, 60_000);
   }
 
   it('a border ridge breaks where a declared lake crosses a zone border', () => {

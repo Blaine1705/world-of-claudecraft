@@ -25,7 +25,7 @@ export const BAKED_MAP_BG = {
   "veiled_hollow": {
     "w": 480,
     "h": 720,
-    "rowHash": "6de5b0ae"
+    "rowHash": "5b1dad40"
   },
   "drakelands": {
     "w": 480,
@@ -45,32 +45,32 @@ export const BAKED_MAP_BG = {
   "willowfen": {
     "w": 480,
     "h": 693,
-    "rowHash": "b5dbb642"
+    "rowHash": "4dcd71c9"
   },
   "nightbloom": {
     "w": 480,
     "h": 747,
-    "rowHash": "e6dfe4ab"
+    "rowHash": "b328f747"
   },
   "wraithwood": {
     "w": 480,
     "h": 747,
-    "rowHash": "a13521d7"
+    "rowHash": "bb7e41a8"
   },
   "palmreach": {
     "w": 480,
     "h": 747,
-    "rowHash": "a474c73f"
+    "rowHash": "54c125e0"
   },
   "evergarden": {
     "w": 480,
     "h": 747,
-    "rowHash": "9d91ad28"
+    "rowHash": "50e6f60f"
   },
   "galecrest": {
     "w": 480,
     "h": 693,
-    "rowHash": "843854a0"
+    "rowHash": "77f67a2c"
   },
   "farshore_isle": {
     "w": 480,
