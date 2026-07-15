@@ -42,6 +42,19 @@ provided as a courtesy.
 | Zone map overlays (`public/map_art/*.png`) | World of ClaudeCraft | Project-generated painterly map overlay art derived from local zone reference plates | Project asset |
 | Infernal Citadel props (`public/models/props/infernal_brazier.glb`, `infernal_altar.glb`, `demon_idol.glb`, `hell_forge.glb`, `hanging_cage.glb`, `bone_pile.glb`, `obsidian_fang.glb`, `infernal_statue.glb`, `slag_cauldron.glb`, `bone_throne.glb`) | World of ClaudeCraft | Project-generated via `scripts/asset_pipeline` (Tripo AI text-to-3D), owned under the Tripo paid-plan license | Project asset |
 | Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets; all 152 abilities across the 9 classes covered) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) |
+| Generated weapon model + icon (emberfang_sword) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated class skin-suit set "Prismatic Vanguard" (suit_prismatic, all classes) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (procedural gradient-map atlas) | Project asset |
+| Generated class skin-suit set "Liquid Chrome" (suit_chrome, all classes) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (procedural gradient-map atlas) | Project asset |
+| Generated weapon model + icon (redskull_sword) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (redskull_dagger) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (redskull_staff) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (redskull_wand) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (redskull_hammer) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_sword) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_dagger) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_axe) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_staff) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_wand) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 
 ## Audio
 

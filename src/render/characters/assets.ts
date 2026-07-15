@@ -24,6 +24,11 @@ import {
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
 } from './manifest';
+import {
+  variantGripTransform,
+  WEAPON_GRIP_OVERRIDES,
+  type WeaponGripOverride,
+} from './weapon_grip';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -93,6 +98,17 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   wand_a: 'VAR_WAND',
   wand_b: 'VAR_WAND',
   adv_wand: 'VAR_WAND',
+  emberfang_sword: 'VAR_SWORD',
+  redskull_sword: 'VAR_SWORD',
+  redskull_dagger: 'VAR_DAGGER',
+  redskull_staff: 'VAR_STAFF',
+  redskull_wand: 'VAR_WAND',
+  redskull_hammer: 'VAR_AXE',
+  purple_sword: 'VAR_SWORD',
+  purple_dagger: 'VAR_DAGGER',
+  purple_axe: 'VAR_AXE',
+  purple_staff: 'VAR_STAFF',
+  purple_wand: 'VAR_WAND',
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach
@@ -231,14 +247,34 @@ function variantGripFor(url: string): VariantGrip | null {
   const accessory = kaykitAccessoryFor(url);
   return accessory ? (VARIANT_GRIPS[accessory] ?? null) : null;
 }
-function applyVariantGrip(payload: THREE.Object3D, bone: string, grip: VariantGrip): void {
+// Per-weapon fine-tune layered on the family grip, keyed by model basename (the
+// same key as KAYKIT_WEAPON_ACCESSORY). Absent = identity (native family fit).
+function gripOverrideFor(url: string): WeaponGripOverride | undefined {
+  const base =
+    url
+      .split('/')
+      .pop()
+      ?.replace(/\.glb$/, '') ?? '';
+  return WEAPON_GRIP_OVERRIDES[base];
+}
+function applyVariantGrip(
+  payload: THREE.Object3D,
+  bone: string,
+  grip: VariantGrip,
+  override?: WeaponGripOverride,
+): void {
   variantBox.setFromObject(payload);
   const height = variantBox.max.y - variantBox.min.y;
-  const scale = height > 1e-3 ? Math.min(1, grip.maxHeight / height) : 1;
-  const left = handSide(bone) === 'l';
-  payload.position.set(0, grip.lift, 0);
-  payload.quaternion.set(0, left ? 0 : 1, 0, left ? 1 : 0);
-  payload.scale.setScalar(scale);
+  const t = variantGripTransform(
+    height,
+    handSide(bone) === 'l',
+    grip.lift,
+    grip.maxHeight,
+    override,
+  );
+  payload.position.set(...t.position);
+  payload.quaternion.set(...t.quaternion);
+  payload.scale.setScalar(t.scale);
 }
 
 function attachProp(
@@ -254,7 +290,7 @@ function attachProp(
   if (markSwap) payload.userData[SWAP_WEAPON_TAG] = true;
   const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
   if (variantGrip) {
-    applyVariantGrip(payload, att.bone, variantGrip);
+    applyVariantGrip(payload, att.bone, variantGrip, gripOverrideFor(att.url));
   } else if (att.position || att.rotationY !== undefined) {
     if (att.position) payload.position.set(...att.position);
     if (att.rotationY !== undefined) payload.rotation.y = att.rotationY;

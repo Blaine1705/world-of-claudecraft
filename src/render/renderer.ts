@@ -126,7 +126,7 @@ import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor } from './self_motion';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
-import { buildClouds, buildSky, ensureSkyAssetsAt, type SkyView } from './sky';
+import { buildSky, ensureSkyAssetsAt, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
 import { shouldRenderStealthGhost } from './stealth';
@@ -284,8 +284,10 @@ const SELF_RENDER_SNAP_DIST_SQ = 6 * 6;
 // takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
 const SELF_MOTION_HANDOFF_RATE = 15;
 // lighting rig (high/ultra) — IBL supplies ambient, sun carries the key
-const HEMI_INTENSITY = 0.45;
-const SUN_INTENSITY = 2.8;
+const HEMI_INTENSITY = 0.42;
+// Held under its old 2.8 with a golden key color (see the rig below): full
+// strength white read as harsh midday glare against the sunless realm skies.
+const SUN_INTENSITY = 2.45;
 const ENV_INTENSITY = 0.5;
 // dungeon interiors: kill the daylight so torchlight carries the scene
 // (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
@@ -373,7 +375,6 @@ function prewarmPlayerSkinVariantCount(): number {
 type RendererPhase = 'setup' | 'entities' | 'world' | 'nameplates' | 'submit' | 'total';
 type RendererWorldPhase =
   | 'lights'
-  | 'clouds'
   | 'water'
   | 'terrain'
   | 'props'
@@ -686,7 +687,6 @@ function emptyFramePhaseMs(): RendererFramePhaseMs {
 function emptyWorldPhaseMs(): RendererWorldPhaseMs {
   return {
     lights: 0,
-    clouds: 0,
     water: 0,
     terrain: 0,
     props: 0,
@@ -953,7 +953,6 @@ export class Renderer {
   private moonUp = 0;
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
   private sunAzimuth = new THREE.Vector3(SUN_DIR.x, 0, SUN_DIR.z).normalize();
-  private clouds: THREE.Sprite[] = [];
   private waterView: WaterView;
   private terrainView: TerrainView;
   // Map-editor placed GLB assets; null when the world has none and the editor
@@ -1242,9 +1241,11 @@ export class Renderer {
     const hemi = new THREE.HemisphereLight(0xdcefff, 0x465f39, LOW_GFX ? 0.98 : HEMI_INTENSITY);
     this.scene.add(hemi);
     this.hemi = hemi;
+    // Golden key light: warmer than the old near-white cream so daylight reads
+    // as soft sun, not white glare; the hemisphere stays cool for contrast.
     const sun = new THREE.DirectionalLight(
-      LOW_GFX ? 0xfff0d0 : 0xffedd0,
-      LOW_GFX ? 2.65 : SUN_INTENSITY,
+      LOW_GFX ? 0xffe6b8 : 0xffe3ae,
+      LOW_GFX ? 2.5 : SUN_INTENSITY,
     );
     sun.position.copy(SUN_ANCHOR);
     sun.castShadow = !LOW_GFX;
@@ -1377,14 +1378,6 @@ export class Renderer {
         this.godRays.push(sp);
         this.scene.add(sp);
       }
-    }
-
-    // clouds, spread over the whole zone strip (3 sprite variants + a faint
-    // high cirrus layer on the full pipeline)
-    for (const cl of buildClouds(LOW_GFX).sprites) {
-      setRenderCategory(cl, 'sky');
-      this.clouds.push(cl);
-      this.scene.add(cl);
     }
 
     this.terrainView = buildTerrain(this.sim.cfg.seed);
@@ -2492,6 +2485,7 @@ export class Renderer {
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
+      this.skyView.setFog((this.scene.fog as THREE.Fog).color);
       this.skyView.setStars(this.starAmt, this.time);
       this.updateEnvBiome(dt);
     }
@@ -4170,10 +4164,13 @@ export class Renderer {
   // preserve each climate while the bounded far plane keeps remote unloaded
   // regions fully hidden and out of terrain/prop/foliage culling sets.
   private static BIOME_FOG: Record<BiomeId, { color: number; near: number; far: number }> = {
-    vale: { color: 0xa6c6e0, near: 55, far: MAX_OUTDOOR_FOG_FAR },
+    // The blue-sky biomes carry a deeper sky-blue haze (the old paler values
+    // tonemapped to near white, so fully fogged distant trees and zones read
+    // as white cutouts against the HDRI sky instead of far-off silhouettes).
+    vale: { color: 0x7095bd, near: 55, far: MAX_OUTDOOR_FOG_FAR },
     marsh: { color: 0xa3b294, near: 45, far: 110 },
-    peaks: { color: 0xbdd3ec, near: 55, far: MAX_OUTDOOR_FOG_FAR },
-    beach: { color: 0xbcd6e6, near: 50, far: MAX_OUTDOOR_FOG_FAR },
+    peaks: { color: 0x8bb0d4, near: 55, far: MAX_OUTDOOR_FOG_FAR },
+    beach: { color: 0x7ea6c9, near: 50, far: MAX_OUTDOOR_FOG_FAR },
     desert: { color: 0xd8c9a8, near: 50, far: MAX_OUTDOOR_FOG_FAR },
     volcano: { color: 0x8a7468, near: 38, far: 100 },
     cave: { color: 0x76807c, near: 32, far: 90 },
@@ -5528,26 +5525,6 @@ export class Renderer {
     this.budgetFireLights(p.pos.x, p.pos.z);
     worldStart = markWorldPhase('lights', worldStart);
 
-    // clouds drift (the high cirrus layer crawls slower); on the lit tiers
-    // they tint warm sunward / cool anti-sun to anchor the key light's azimuth
-    for (const cl of this.clouds) {
-      cl.position.x += dt * ((cl.userData.drift as number | undefined) ?? 1.6);
-      if (cl.position.x > 620) cl.position.x = -620;
-      if (!this.lowGfx) {
-        const along =
-          ((cl.position.x - this.camera.position.x) * this.sunAzimuth.x +
-            (cl.position.z - this.camera.position.z) * this.sunAzimuth.z) /
-          320;
-        const t = Math.max(-1, Math.min(1, along)) * 0.5 + 0.5;
-        (cl.material as THREE.SpriteMaterial).color.setRGB(
-          0.86 + 0.14 * t,
-          0.9 + 0.05 * t,
-          1.0 - 0.13 * t,
-        );
-      }
-    }
-    worldStart = markWorldPhase('clouds', worldStart);
-
     // water shimmer (low-tier texture scroll; shader water rides uTime)
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
@@ -5642,6 +5619,7 @@ export class Renderer {
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
+      this.skyView.setFog((this.scene.fog as THREE.Fog).color);
       this.skyView.setStars(this.starAmt, this.time);
       this.updateEnvBiome(dt);
     }

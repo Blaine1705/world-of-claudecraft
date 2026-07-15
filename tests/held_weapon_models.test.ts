@@ -6,6 +6,7 @@ import {
   mechHeldWeaponOverride,
   VISUALS,
 } from '../src/render/characters/manifest';
+import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from '../src/render/characters/weapon_grip';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // The per-item held weapon models: each weapon item maps (via the shared
@@ -94,6 +95,86 @@ describe('held weapon models', () => {
       'druid',
     ] as const) {
       expect(mechHeldWeaponOverride(cls), `${cls} should not dual-wield on the mech`).toBeNull();
+    }
+  });
+});
+
+// Per-weapon grip fine-tuning (src/render/characters/weapon_grip.ts). The engine's
+// applyVariantGrip composes the family VariantGrip (lift + shrink clamp + hand flip)
+// with an optional per-weapon override; the pipeline inspector mirrors this math.
+describe('variant grip transform + per-weapon overrides', () => {
+  it('reproduces the family grip exactly when no override is given', () => {
+    // Native height under the family maxHeight: scale stays 1 (native variety kept).
+    const t = variantGripTransform(1.8, false, 0.04, 2.0);
+    expect(t.position).toEqual([0, 0.04, 0]);
+    expect(t.quaternion).toEqual([0, 1, 0, 0]); // right-hand 180-degree flip
+    expect(t.scale).toBe(1);
+  });
+
+  it('clamps an oversized model DOWN only (never enlarges by itself)', () => {
+    const big = variantGripTransform(4.0, false, 0.04, 2.0);
+    expect(big.scale).toBeCloseTo(0.5, 6); // 2.0 / 4.0
+    const small = variantGripTransform(1.0, false, 0.04, 2.0);
+    expect(small.scale).toBe(1); // min(1, 2.0/1.0) => native
+  });
+
+  it('mirrors the flip for the off hand', () => {
+    const left = variantGripTransform(1.8, true, 0.04, 2.0);
+    expect(left.quaternion).toEqual([0, 0, 0, 1]); // identity (no flip)
+  });
+
+  it('override move adds to the family lift on Y and offsets X/Z', () => {
+    const t = variantGripTransform(1.8, false, 0.04, 2.0, { pos: [0.1, 0.02, -0.05] });
+    expect(t.position[0]).toBeCloseTo(0.1, 6);
+    expect(t.position[1]).toBeCloseTo(0.06, 6); // 0.04 lift + 0.02
+    expect(t.position[2]).toBeCloseTo(-0.05, 6);
+  });
+
+  it('override scale MULTIPLIES the family clamp (can enlarge past native)', () => {
+    const t = variantGripTransform(1.0, false, 0.04, 2.0, { scale: 1.5 });
+    expect(t.scale).toBeCloseTo(1.5, 6); // clamp 1 * 1.5
+    const clamped = variantGripTransform(4.0, false, 0.04, 2.0, { scale: 2 });
+    expect(clamped.scale).toBeCloseTo(1.0, 6); // clamp 0.5 * 2
+  });
+
+  it('override rotation composes onto the hand flip (unit quaternion, not identity)', () => {
+    const base = variantGripTransform(1.8, false, 0.04, 2.0);
+    const rotated = variantGripTransform(1.8, false, 0.04, 2.0, { rot: [0, 0, 90] });
+    expect(rotated.quaternion).not.toEqual(base.quaternion);
+    const norm = Math.hypot(...rotated.quaternion);
+    expect(norm).toBeCloseTo(1, 6); // stays a unit quaternion
+  });
+
+  it('composes a rotation override on the OFF hand against the left-hand base', () => {
+    // The engine applies a saved rot on both hands; on the off hand it composes
+    // with the mirrored (identity) base, so it differs from the right hand's.
+    const left = variantGripTransform(1.8, true, 0.04, 2.0, { rot: [0, 0, 90] });
+    const leftBase = variantGripTransform(1.8, true, 0.04, 2.0);
+    expect(left.quaternion).not.toEqual(leftBase.quaternion);
+    expect(Math.hypot(...left.quaternion)).toBeCloseTo(1, 6);
+    const right = variantGripTransform(1.8, false, 0.04, 2.0, { rot: [0, 0, 90] });
+    expect(left.quaternion).not.toEqual(right.quaternion);
+  });
+
+  it('a zero override equals no override (identity is a true no-op)', () => {
+    const none = variantGripTransform(1.8, false, 0.04, 2.0);
+    const zero = variantGripTransform(1.8, false, 0.04, 2.0, {
+      pos: [0, 0, 0],
+      rot: [0, 0, 0],
+      scale: 1,
+    });
+    expect(zero.position).toEqual(none.position);
+    expect(zero.scale).toBe(none.scale);
+    for (let i = 0; i < 4; i++) expect(zero.quaternion[i]).toBeCloseTo(none.quaternion[i], 9);
+  });
+
+  it('WEAPON_GRIP_OVERRIDES is a keyed registry (empty or snake_case keys only)', () => {
+    expect(typeof WEAPON_GRIP_OVERRIDES).toBe('object');
+    for (const [key, o] of Object.entries(WEAPON_GRIP_OVERRIDES)) {
+      expect(key, `${key} must be snake_case`).toMatch(/^[a-z0-9_]+$/);
+      if (o.pos) expect(o.pos).toHaveLength(3);
+      if (o.rot) expect(o.rot).toHaveLength(3);
+      if (o.scale !== undefined) expect(Number.isFinite(o.scale)).toBe(true);
     }
   });
 });

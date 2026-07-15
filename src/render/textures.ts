@@ -1149,7 +1149,7 @@ export function foliageCardTexture(): THREE.CanvasTexture {
   for (let i = 0; i < 240; i++) {
     // leaves cluster densely at the centre, thin toward the rim
     const a = rnd() * Math.PI * 2;
-    const d = Math.pow(rnd(), 0.6) * 56;
+    const d = rnd() ** 0.6 * 56;
     const x = cx + Math.cos(a) * d,
       y = cy + Math.sin(a) * d;
     const fade = 1 - d / 64;

@@ -1,0 +1,107 @@
+// Per-weapon grip fine-tuning: pure, three-free transform math shared by the
+// engine attach path (assets.ts applyVariantGrip) and mirrored by the asset
+// pipeline's live inspector (scripts/asset_pipeline/viewer_live.js). Kept
+// host-agnostic so a Vitest exercises the compose math directly, without loading
+// the GLTF/preload machinery in assets.ts.
+//
+// A variant weapon attaches at the family VariantGrip (a Y lift along the hand
+// bone, a hand-side 180-degree flip, and a maxHeight clamp that only ever shrinks
+// an oversized model). That is a per-FAMILY fit; a single generated model can
+// still sit slightly wrong. WEAPON_GRIP_OVERRIDES layers a per-WEAPON nudge on
+// top so one model fits the hand nicely without retuning the whole family.
+
+/** Per-weapon grip fine-tune, applied ON TOP of the family VariantGrip. Every
+ *  field is optional and defaults to identity, so an absent override reproduces
+ *  the exact prior behavior. `pos` is a hand-local offset ADDED to the family
+ *  lift ([x, y, z]); `rot` is an XYZ euler in DEGREES applied AFTER the hand-side
+ *  flip; `scale` MULTIPLIES the family maxHeight clamp (so a weapon can be nudged
+ *  larger or smaller than its clamped size). Keyed by weapon model basename (the
+ *  `<key>.glb` file, the same key as KAYKIT_WEAPON_ACCESSORY in assets.ts).
+ *  Overrides are authored (and inspector-previewed) against the RIGHT hand; on an
+ *  off-hand attachment (rogue dual-wield) `rot` composes against the mirrored
+ *  (identity) base, so keep offhand-visible rotations small or expect a mirror. */
+export interface WeaponGripOverride {
+  scale?: number;
+  rot?: [number, number, number];
+  pos?: [number, number, number];
+}
+
+/** Authored per-weapon grip overrides, keyed by weapon model basename. Empty by
+ *  default (identity fit for every weapon). Tuned by hand, or saved from the
+ *  asset-pipeline live inspector (`pipeline.mjs library --serve`). Read by
+ *  applyVariantGrip (assets.ts); the inspector mirrors the same compose math.
+ *  Each value carries any of pos (hand-local offset), rot (XYZ euler degrees),
+ *  and scale (a multiplier on the family clamp); omitted fields stay identity. */
+export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
+  // Populated by hand or by the inspector Save button. An absent key is identity.
+};
+
+export interface GripTransform {
+  position: [number, number, number];
+  quaternion: [number, number, number, number];
+  scale: number;
+}
+
+const DEG2RAD = Math.PI / 180;
+
+// Quaternion from an XYZ-order euler (radians). Matches THREE.Quaternion
+// .setFromEuler with the default 'XYZ' order, so the engine and the THREE-based
+// inspector produce byte-identical orientations.
+function quatFromEuler(x: number, y: number, z: number): [number, number, number, number] {
+  const c1 = Math.cos(x / 2);
+  const c2 = Math.cos(y / 2);
+  const c3 = Math.cos(z / 2);
+  const s1 = Math.sin(x / 2);
+  const s2 = Math.sin(y / 2);
+  const s3 = Math.sin(z / 2);
+  return [
+    s1 * c2 * c3 + c1 * s2 * s3,
+    c1 * s2 * c3 - s1 * c2 * s3,
+    c1 * c2 * s3 + s1 * s2 * c3,
+    c1 * c2 * c3 - s1 * s2 * s3,
+  ];
+}
+
+// a * b, matching THREE.Quaternion.multiplyQuaternions(a, b): the override euler
+// is applied in the weapon's local frame AFTER the base hand-side orientation.
+function quatMul(
+  a: [number, number, number, number],
+  b: [number, number, number, number],
+): [number, number, number, number] {
+  const [ax, ay, az, aw] = a;
+  const [bx, by, bz, bw] = b;
+  return [
+    ax * bw + aw * bx + ay * bz - az * by,
+    ay * bw + aw * by + az * bx - ax * bz,
+    az * bw + aw * bz + ax * by - ay * bx,
+    aw * bw - ax * bx - ay * by - az * bz,
+  ];
+}
+
+/** Compose the final hand-local transform for a variant weapon. `height` is the
+ *  model's native (pre-scale) world height, `left` the hand side (mirrors the
+ *  180-degree flip), `lift`/`maxHeight` the family VariantGrip, `override` the
+ *  optional per-weapon fine-tune. With no override this is exactly the prior
+ *  behavior: position (0, lift, 0), the hand-side flip, and the shrink-only
+ *  clamp scale. */
+export function variantGripTransform(
+  height: number,
+  left: boolean,
+  lift: number,
+  maxHeight: number,
+  override?: WeaponGripOverride,
+): GripTransform {
+  const clamp = height > 1e-3 ? Math.min(1, maxHeight / height) : 1;
+  const [ox, oy, oz] = override?.pos ?? [0, 0, 0];
+  const base: [number, number, number, number] = left ? [0, 0, 0, 1] : [0, 1, 0, 0];
+  let quaternion = base;
+  if (override?.rot) {
+    const [rx, ry, rz] = override.rot;
+    quaternion = quatMul(base, quatFromEuler(rx * DEG2RAD, ry * DEG2RAD, rz * DEG2RAD));
+  }
+  return {
+    position: [ox, lift + oy, oz],
+    quaternion,
+    scale: clamp * (override?.scale ?? 1),
+  };
+}
