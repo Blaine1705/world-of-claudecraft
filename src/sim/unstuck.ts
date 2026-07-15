@@ -2,9 +2,11 @@
 //
 // Unstuck is deliberately not a travel primitive: the player must remain idle
 // for a server-authoritative countdown, the destination is capped to eight
-// yards, every candidate must be point-clear and reachable through the same
-// swept collision resolver as normal movement, and the destination must remain
-// in the same world/instance identity. There is no graveyard fallback.
+// yards, every candidate must be point-clear and remain in the same
+// world/instance identity, and every route must respect real static blockers.
+// Water recovery deliberately ignores the normal terrain climb gate: escaping
+// a shoreline the movement kernel cannot climb is one of this system's jobs.
+// There is no graveyard fallback.
 
 import { isRooted, isStunned } from './combat/cc';
 import {
@@ -49,8 +51,8 @@ export { UNSTUCK_COOLDOWN_ID } from './unstuck_cooldown';
 const POSITION_EPS = 1e-4;
 const CANCEL_MOVE_DISTANCE = 0.5;
 const CANCEL_VERTICAL_DISTANCE = 0.25;
-const CANDIDATE_DIRECTIONS = 16;
-const CANDIDATE_RADII = [1, 2, 3, 4, 6, 8] as const;
+const CANDIDATE_DIRECTIONS = 32;
+const CANDIDATE_RADIUS_STEP = 0.5;
 const ROUTE_SAMPLE_DISTANCE = 0.25;
 
 export interface PendingUnstuck {
@@ -196,7 +198,6 @@ function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlo
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (isStunned(p) || isRooted(p)) return 'controlled';
   if (!p.onGround || p.jumping) return 'falling';
-  if (ctx.isSwimming(p)) return 'falling';
   if (forcedMovement(p)) return 'moving';
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (competitive(ctx, p.id, p)) return 'competitive';
@@ -270,6 +271,17 @@ function geometricallyStablePoint(ctx: SimContext, p: Entity, x: number, z: numb
   return groundHeight(x, z, ctx.cfg.seed) >= waterLevelAt(x, z) - PLAYER_SWIM_DEPTH;
 }
 
+function deepWaterAt(ctx: SimContext, pos: Vec3): boolean {
+  return groundHeight(pos.x, pos.z, ctx.cfg.seed) < waterLevelAt(pos.x, pos.z) - PLAYER_SWIM_DEPTH;
+}
+
+function dryRecoveryPoint(ctx: SimContext, p: Entity, pos: Vec3): boolean {
+  return (
+    isUnstuckDestinationSafe(ctx, p, pos) &&
+    groundHeight(pos.x, pos.z, ctx.cfg.seed) >= waterLevelAt(pos.x, pos.z)
+  );
+}
+
 /** Destination safety adds live instance hazards to the static geometry checks. */
 export function isUnstuckDestinationSafe(ctx: SimContext, p: Entity, pos: Vec3): boolean {
   if (!unstuckLocationAt(ctx, p.id, pos)) return false;
@@ -285,6 +297,21 @@ export function isUnstuckDestinationSafe(ctx: SimContext, p: Entity, pos: Vec3):
  * the movement kernel's terrain climb gate and live instance doors.
  */
 export function unstuckRouteReachable(ctx: SimContext, p: Entity, from: Vec3, to: Vec3): boolean {
+  return unstuckRouteClear(ctx, p, from, to, true);
+}
+
+/**
+ * Shared straight-line route check. Geometry recoveries enforce normal terrain
+ * climbing. Water recoveries skip only that terrain gate while preserving the
+ * same swept blockers, live doors, and rift collision checks.
+ */
+function unstuckRouteClear(
+  ctx: SimContext,
+  p: Entity,
+  from: Vec3,
+  to: Vec3,
+  enforceTerrain: boolean,
+): boolean {
   const distance = Math.hypot(to.x - from.x, to.z - from.z);
   if (distance <= POSITION_EPS) return true;
   const steps = Math.ceil(distance / ROUTE_SAMPLE_DISTANCE);
@@ -298,6 +325,7 @@ export function unstuckRouteReachable(ctx: SimContext, p: Entity, from: Vec3, to
     const h0 = groundHeight(currentX, currentZ, ctx.cfg.seed);
     const h1 = groundHeight(targetX, targetZ, ctx.cfg.seed);
     if (
+      enforceTerrain &&
       h1 > h0 &&
       run > POSITION_EPS &&
       ((h1 - h0) / run > PLAYER_MAX_CLIMB_SLOPE ||
@@ -305,14 +333,16 @@ export function unstuckRouteReachable(ctx: SimContext, p: Entity, from: Vec3, to
     ) {
       return false;
     }
-    const stand = terrainWallStandoff(
-      targetX,
-      targetZ,
-      ctx.cfg.seed,
-      PLAYER_BODY_RADIUS,
-      PLAYER_MAX_CLIMB_SLOPE,
-    );
-    if (Math.hypot(stand.x - targetX, stand.z - targetZ) > POSITION_EPS) return false;
+    if (enforceTerrain) {
+      const stand = terrainWallStandoff(
+        targetX,
+        targetZ,
+        ctx.cfg.seed,
+        PLAYER_BODY_RADIUS,
+        PLAYER_MAX_CLIMB_SLOPE,
+      );
+      if (Math.hypot(stand.x - targetX, stand.z - targetZ) > POSITION_EPS) return false;
+    }
     const target = ctx.groundPos(targetX, targetZ);
     if (!riftRecoveryRoutePointClear(ctx, p, target)) return false;
     const swept = ctx.resolvePlayerMove(
@@ -329,6 +359,42 @@ export function unstuckRouteReachable(ctx: SimContext, p: Entity, from: Vec3, to
     currentZ = targetZ;
   }
   return true;
+}
+
+function candidateRadii(): number[] {
+  const radii: number[] = [];
+  for (
+    let radius = CANDIDATE_RADIUS_STEP;
+    radius <= UNSTUCK_MAX_DISTANCE;
+    radius += CANDIDATE_RADIUS_STEP
+  ) {
+    radii.push(radius);
+  }
+  return radii;
+}
+
+function findWaterRecoveryDestination(
+  ctx: SimContext,
+  p: Entity,
+  pending: PendingUnstuck,
+): Vec3 | null {
+  const origin = pending.origin;
+  for (const radius of candidateRadii()) {
+    for (let i = 0; i < CANDIDATE_DIRECTIONS; i++) {
+      const angle = (i / CANDIDATE_DIRECTIONS) * Math.PI * 2;
+      const candidate = pointInArea(
+        ctx,
+        p.id,
+        pending.area,
+        origin.x + Math.sin(angle) * radius,
+        origin.z + Math.cos(angle) * radius,
+      );
+      if (!candidate || !dryRecoveryPoint(ctx, p, candidate)) continue;
+      if (!unstuckRouteClear(ctx, p, origin, candidate, false)) continue;
+      return candidate;
+    }
+  }
+  return null;
 }
 
 function embeddedCorrectionReachable(
@@ -392,6 +458,8 @@ export function findUnstuckDestination(
   pending: PendingUnstuck,
 ): Vec3 | null {
   const origin = pending.origin;
+  if (deepWaterAt(ctx, origin)) return findWaterRecoveryDestination(ctx, p, pending);
+
   const pointResolved = ctx.resolveMovePoint(origin.x, origin.z, PLAYER_BODY_RADIUS, p);
   const stoodOff = terrainWallStandoff(
     pointResolved.x,
@@ -412,7 +480,7 @@ export function findUnstuckDestination(
   if (!embeddedCorrectionReachable(ctx, p, origin, anchor)) return null;
   if (isUnstuckDestinationSafe(ctx, p, anchor)) return anchor;
 
-  for (const radius of CANDIDATE_RADII) {
+  for (const radius of candidateRadii()) {
     for (let i = 0; i < CANDIDATE_DIRECTIONS; i++) {
       const angle = (i / CANDIDATE_DIRECTIONS) * Math.PI * 2;
       const x = anchor.x + Math.sin(angle) * radius;
@@ -454,7 +522,6 @@ function cancelReason(
     isRooted(p) ||
     !p.onGround ||
     p.jumping ||
-    ctx.isSwimming(p) ||
     forcedMovement(p) ||
     competitive(ctx, p.id, p) ||
     ctx.tradeFor(p.id)

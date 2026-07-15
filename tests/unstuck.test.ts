@@ -10,6 +10,7 @@ import {
 import { delveModuleEntry, delveModuleZOffset } from '../src/sim/delves/runs';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
+import { swimSurfaceY } from '../src/sim/player_motion';
 import { generateRiftFloor } from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -26,12 +27,16 @@ import {
   unstuckRouteReachable,
   updateUnstuck,
 } from '../src/sim/unstuck';
+import { groundHeight, waterLevelAt } from '../src/sim/world';
 
 type Event = Extract<SimEvent, { type: 'unstuck' }>;
 
 const SEED = 42;
 const START = { x: 0, z: -40 };
 const WEDGE_WALL_Z = START.z + 0.4;
+// A deep point eight yards inside Mirror Lake's first dry, walkable shoreline.
+// The normal swim kernel can move here but cannot climb the bank at the edge.
+const WATER_TRAP = { x: -64.75, z: 88 };
 
 function required<T>(value: T | null | undefined, label: string): T {
   if (value == null) throw new Error(`Expected ${label}`);
@@ -68,6 +73,23 @@ function makeWorld(blockers: BlockerDef[] = []): Sim {
 
 function makeWedgedWorld(): Sim {
   return makeWorld([{ x1: -10, z1: WEDGE_WALL_Z, x2: 10, z2: WEDGE_WALL_Z }]);
+}
+
+function placeInWaterTrap(sim: Sim): void {
+  const p = sim.player;
+  p.pos = {
+    x: WATER_TRAP.x,
+    y: swimSurfaceY(WATER_TRAP.x, WATER_TRAP.z),
+    z: WATER_TRAP.z,
+  };
+  p.prevPos = { ...p.pos };
+  p.vx = 0;
+  p.vy = 0;
+  p.vz = 0;
+  p.onGround = true;
+  p.jumping = false;
+  sim.grid.update(p);
+  sim.playerGrid.update(p);
 }
 
 function seedWithFloor0(
@@ -368,6 +390,52 @@ describe('unstuck destination', () => {
     const laterEvents = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20));
     expect(laterEvents).toEqual([]);
     expect(player.pos).toEqual(origin);
+  });
+
+  it('moves an idle swimmer across an unclimbable shoreline to the nearest dry point', () => {
+    const sim = makeWorld();
+    placeInWaterTrap(sim);
+    const player = sim.player;
+    const origin = { ...player.pos };
+
+    expect(sim.ctx.isSwimming(player)).toBe(true);
+    expect(groundHeight(origin.x, origin.z, sim.cfg.seed)).toBeLessThan(
+      waterLevelAt(origin.x, origin.z) - 0.8,
+    );
+    expect(sim.unstuck(player.id)).toBe(true);
+    sim.drainEvents();
+
+    const event = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+      (candidate): candidate is Extract<Event, { phase: 'completed' }> =>
+        candidate.phase === 'completed',
+    );
+    expect(event).toBeDefined();
+    expect(event?.distance).toBeGreaterThan(0);
+    expect(event?.distance).toBeLessThanOrEqual(UNSTUCK_MAX_DISTANCE);
+    expect(groundHeight(player.pos.x, player.pos.z, sim.cfg.seed)).toBeGreaterThanOrEqual(
+      waterLevelAt(player.pos.x, player.pos.z),
+    );
+    expect(sim.ctx.isSwimming(player)).toBe(false);
+  });
+
+  it('does not let water recovery teleport through a real blocker wall', () => {
+    const wall: BlockerDef = { x1: -61, z1: 70, x2: -61, z2: 106 };
+    const sim = makeWorld([wall]);
+    placeInWaterTrap(sim);
+    const origin = { ...sim.player.pos };
+
+    expect(sim.unstuck(sim.player.id)).toBe(true);
+    sim.drainEvents();
+    const events = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20));
+
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'failed',
+        reason: 'no_safe_position',
+      }),
+    );
+    expect(sim.player.pos).toEqual(origin);
   });
 
   it('rejects a route through a real blocker wall', () => {
