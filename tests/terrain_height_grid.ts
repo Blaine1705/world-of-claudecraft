@@ -4,8 +4,9 @@
 // of terrainHeight(x, z, seed): the open world (rim === 0, no ridge), the outer
 // rim bands on all three edges (rim > 0), the inter-zone ridge walls and their
 // road pass (pass === 0), the outside-fade overshoot (mountainDetail < 1),
-// camps, the Sowfield, and the Mirefen impact crater. World geometry: x spans
-// [-180, 180], z spans [-180, 900], ridges sit at z = 180 and z = 540 (passX 0).
+// camps, the Sowfield, the Highwatch stable yard, and the Mirefen impact crater.
+// World geometry: x spans [-180, 180], z spans [-180, 900], ridges sit at
+// z = 180 and z = 540 (passX 0).
 
 export type GridPoint = [x: number, z: number, seed: number];
 
@@ -93,7 +94,8 @@ export function buildTerrainGrid(): GridPoint[] {
   for (const [x, z] of overshoot) push(x, z);
 
   // Camp flatten blends (a subset of the content camps) and points at their
-  // rims, plus the Sowfield plateau and the Mirefen impact crater.
+  // rims, plus the Sowfield plateau, Highwatch stable yard, and Mirefen impact
+  // crater. The broad interior sweep above also crosses the stable yard apron.
   const features: Array<[number, number]> = [
     [-40, 230],
     [35, 225],
@@ -107,6 +109,9 @@ export function buildTerrainGrid(): GridPoint[] {
     [-11, -130],
     [0, -112],
     [-40, -112],
+    [54, 646],
+    [102, 676],
+    [150, 706],
     [149.5, 295],
     [149.5, 280],
     [149.5, 310],

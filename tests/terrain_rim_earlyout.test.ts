@@ -20,7 +20,8 @@ const golden: Golden = JSON.parse(
 
 describe('terrainHeight rim-crest / terrace early-out (issue #1620)', () => {
   it('is bit-identical to the pre-optimization implementation across the whole grid', () => {
-    // The golden hexes were captured from the ORIGINAL (unconditional) code path.
+    // The golden hexes were captured from the ORIGINAL (unconditional) code path,
+    // including the feature branch's deliberate Highwatch stable-yard flatten.
     // f64hex compares the full IEEE-754 bit pattern, so a -0/+0 or ULP drift on
     // any single sample fails here.
     let mismatches = 0;
