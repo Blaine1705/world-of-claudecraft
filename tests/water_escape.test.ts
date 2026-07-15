@@ -246,7 +246,14 @@ describe('players can always leave the water (stuck-in-water traps)', () => {
     // wading (it only skipped while swimming) and would nudge the body away
     // from the wall every tick. With feet under the waterline it must not act.
     const columnEdits: HeightStamp[] = [
-      { x: BANK.x, z: BANK.z, radius: 5, delta: WATER_LEVEL - 0.05, falloff: 'flat', mode: 'level' },
+      {
+        x: BANK.x,
+        z: BANK.z,
+        radius: 5,
+        delta: WATER_LEVEL - 0.05,
+        falloff: 'flat',
+        mode: 'level',
+      },
       { x: BANK.x, z: BANK.z, radius: 1.5, delta: WATER_LEVEL + 3, falloff: 'flat', mode: 'level' },
     ];
     const sim = makeSim(motionWorld(columnEdits));
