@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { SKINS } from '../src/render/characters/manifest';
 import {
+  classHasSkin,
   EVENT_SKIN_TIERS,
   EVENT_SKIN_TOKEN_ID,
   MECH_CHROMAS,
@@ -244,17 +245,28 @@ describe('cosmetic skin-select event', () => {
     expect(sim.player.skin).toBe(0);
   });
 
-  it('rejects a skin that does not exist for the class, even if the rank allows it', () => {
-    // Paladin only has skins 0 and 1; the epic tier maps to skin 3, which it lacks.
-    const sim = withPendingRank('epic', 'paladin');
-    const epicSkin = EVENT_SKIN_TIERS.find((tier) => tier.rank === 'epic')!.skin;
-    expect(rankAllowsSkin('epic', epicSkin)).toBe(true); // rank gate alone would allow it
-    expect(epicSkin).toBeGreaterThanOrEqual(SKIN_COUNTS.paladin); // but it doesn't exist
+  it('rejects claiming a skin index outside the class range (the claim guard)', () => {
+    // classHasSkin is the existence guard claimEventSkin applies: valid indices
+    // are 0..count-1. (Every class now ships enough skins that the event tiers
+    // themselves never exceed a class range, so this guard is verified directly.)
+    expect(classHasSkin('paladin', SKIN_COUNTS.paladin - 1)).toBe(true);
+    expect(classHasSkin('paladin', SKIN_COUNTS.paladin)).toBe(false);
 
-    sim.claimEventSkin(epicSkin);
+    // End to end: an index past the class's last skin is a no-op even under an
+    // active epic event (the token is kept, no skin applied).
+    let sim: Sim | null = null;
+    for (let seed = 1; seed < 500 && sim === null; seed++) {
+      const r = rollRank(seed, 'paladin');
+      if (r.rank === 'epic') sim = r.sim;
+    }
+    expect(sim).not.toBeNull();
+    const outOfRange = SKIN_COUNTS.paladin; // one past the last valid paladin skin
+    expect(classHasSkin('paladin', outOfRange)).toBe(false);
 
-    expect(sim.player.skin).toBe(0); // not applied
-    expect(sim.inventory.find((s) => s.itemId === EVENT_SKIN_TOKEN_ID)?.count).toBe(1); // token kept
+    sim!.claimEventSkin(outOfRange);
+
+    expect(sim!.player.skin).toBe(0); // not applied
+    expect(sim!.inventory.find((s) => s.itemId === EVENT_SKIN_TOKEN_ID)?.count).toBe(1); // token kept
   });
 
   it('SKIN_COUNTS stays in lockstep with the renderer SKINS manifest', () => {

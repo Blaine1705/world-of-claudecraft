@@ -218,6 +218,8 @@ function placeFlora(seed: number): Placements {
       const inCrystalCountry = area === 'shallows' || area === 'court';
 
       const pushShroom = (scale: number) => {
+        // spore rings retired with the other small mushrooms (user pass,
+        // 2026-07): giants stand alone now
         out.mushrooms.push({
           x,
           z,
@@ -227,205 +229,62 @@ function placeFlora(seed: number): Placements {
           variant,
           tint: scale >= 3.2 ? giantTint : shroomTint,
         });
-        if (scale >= 3.2) {
-          // a giant seeds a spore-ring of small ones around its foot
-          const kids = 2 + Math.floor(hash2(gx, gz, seed + 251) * 3);
-          for (let k = 0; k < kids; k++) {
-            const ang = hash2(gx + k + 1, gz, seed + 261) * Math.PI * 2;
-            const dist = 1.6 + hash2(gx, gz + k + 1, seed + 271) * (1.2 + scale * 0.35);
-            const kx = x + Math.sin(ang) * dist;
-            const kz = z + Math.cos(ang) * dist;
-            const ky = usable(kx, kz, 2.5);
-            if (ky === null) continue;
-            out.mushrooms.push({
-              x: kx,
-              z: kz,
-              y: ky,
-              scale: 0.45 + hash2(gx + k, gz + k, seed + 281) * 0.7,
-              rot: ang * 2.3,
-              variant: hash2(gx - k, gz + k, seed + 291) < 0.5 ? 0 : 1,
-              tint: shroomTint,
+      };
+
+      // Mushroom scatter fully retired (user pass, 2026-07): the hand-placed
+      // village giants carry the mushroom identity now.
+
+      // (duskbell flowers and starbuds retired in the same pass: the sprig
+      // silhouettes read as unfinished next to the modeled flora set)
+    }
+  }
+
+  // (crystal formations: replaced by generated crystal assets, see decorProps)
+
+  // (willows retired: user pass, 2026-07-14)
+
+  // (blossom trees retired: user pass, 2026-07)
+
+  // --- boulders: natural stone scatter across the valley floor ---
+  {
+    const STONE_TINTS = [0x9aa0a6, 0x8b9096, 0xa8adb2, 0x7f8489];
+    for (let gx = -168; gx <= 168; gx += 10) {
+      for (let gz = REALM_ZONE.zMin + 16; gz <= REALM_ZONE.zMax - 20; gz += 10) {
+        const r = hash2(gx, gz, seed + 491);
+        if (r > 0.06) continue;
+        const x = gx + (hash2(gx, gz, seed + 501) - 0.5) * 8;
+        const z = gz + (hash2(gx, gz, seed + 511) - 0.5) * 8;
+        const y = usable(x, z, 4);
+        if (y === null) continue;
+        const tint = STONE_TINTS[Math.floor(hash2(gx, gz, seed + 531) * 97) % STONE_TINTS.length];
+        out.boulders.push({
+          x,
+          z,
+          y,
+          scale: 0.9 + hash2(gx, gz, seed + 521) * 2.2,
+          rot: r * Math.PI * 33,
+          variant: 0,
+          tint,
+        });
+        // some boulders come in pairs: a smaller companion stone
+        if (hash2(gx, gz, seed + 541) < 0.35) {
+          const ang = hash2(gx, gz, seed + 551) * Math.PI * 2;
+          const bx = x + Math.sin(ang) * 2.2;
+          const bz = z + Math.cos(ang) * 2.2;
+          const by = usable(bx, bz, 4);
+          if (by !== null) {
+            out.boulders.push({
+              x: bx,
+              z: bz,
+              y: by,
+              scale: 0.6 + hash2(gx, gz, seed + 561) * 0.9,
+              rot: ang * 5,
+              variant: 0,
+              tint,
             });
           }
         }
-      };
-
-      if (inShroomCountry) {
-        if (r < 0.085)
-          pushShroom(4 + r * 55); // giants, 4 to ~8.5
-        else if (r < 0.5) pushShroom(0.8 + (r - 0.085) * 2.6);
-      } else if (inCrystalCountry) {
-        const chance = area === 'court' ? 0.18 : 0.42;
-        if (r < chance) {
-          out.crystals.push({
-            x,
-            z,
-            y,
-            scale: 0.9 + r * 4.5,
-            rot,
-            variant,
-            tint: pickTint(CRYSTAL_AREA_TINTS[area], r * 3.7),
-            lean: terrainGradient(x, z, seed),
-          });
-        } else if (r > 0.9) {
-          pushShroom(0.7 + (1 - r) * 8);
-        }
-      } else {
-        // the wider glade: a softer mix of everything
-        if (r < 0.095)
-          pushShroom(0.8 + r * 36); // occasional big one
-        else if (r > 0.982) {
-          out.crystals.push({
-            x,
-            z,
-            y,
-            scale: 0.8 + (1 - r) * 60,
-            rot,
-            variant,
-            tint: pickTint(CRYSTAL_AREA_TINTS.glade, r * 5.1),
-            lean: terrainGradient(x, z, seed),
-          });
-        }
       }
-
-      // duskbell flowers: meadow drifts wherever the grass grows, thicker in
-      // the glade and near the town's garden fringe
-      const fr = hash2(gx, gz, seed + 301);
-      const flowerChance = area === 'glade' ? 0.32 : 0.2;
-      if (fr < flowerChance) {
-        const patch = 2 + Math.floor(hash2(gx, gz, seed + 311) * 3);
-        for (let k = 0; k < patch; k++) {
-          const fx = x + (hash2(gx + 7 * k, gz, seed + 321) - 0.5) * 5;
-          const fz = z + (hash2(gx, gz + 7 * k, seed + 331) - 0.5) * 5;
-          const fy = usable(fx, fz, 1.2, 2); // flowers may hug the garden ring
-          if (fy === null) continue;
-          out.flowers.push({
-            x: fx,
-            z: fz,
-            y: fy,
-            scale: 0.7 + hash2(gx + k, gz - k, seed + 341) * 0.7,
-            rot: hash2(gx - k, gz - k, seed + 351) * Math.PI * 2,
-            variant: Math.floor(hash2(gx + k, gz + k, seed + 361) * 7),
-            tint: 0xffffff,
-          });
-        }
-      }
-
-      // starbuds: a tiny understory flower that grows nearly everywhere,
-      // half the size of a duskbell and twice as common
-      const sr = hash2(gx, gz, seed + 531);
-      if (sr < 0.32) {
-        const patch = 2 + Math.floor(hash2(gx, gz, seed + 541) * 3);
-        for (let k = 0; k < patch; k++) {
-          const fx = x + (hash2(gx + 11 * k, gz, seed + 551) - 0.5) * 6;
-          const fz = z + (hash2(gx, gz + 11 * k, seed + 561) - 0.5) * 6;
-          const fy = usable(fx, fz, 1.2, 2);
-          if (fy === null) continue;
-          out.starbuds.push({
-            x: fx,
-            z: fz,
-            y: fy,
-            scale: 0.5 + hash2(gx - k, gz + k, seed + 571) * 0.5,
-            rot: hash2(gx + k, gz - k, seed + 581) * Math.PI * 2,
-            variant: Math.floor(hash2(gx - k, gz - k, seed + 591) * 3),
-            tint: 0xffffff,
-          });
-        }
-      }
-    }
-  }
-
-  // --- steep-slope crystals: jutting from the southern wall and hill faces ---
-  for (let gx = -168; gx <= 168; gx += 6) {
-    for (const gz of [952, 958, 964]) {
-      const r = hash2(gx, gz, seed + 371);
-      if (r > 0.3) continue;
-      const x = gx + (hash2(gx, gz, seed + 381) - 0.5) * 5;
-      const z = gz + (hash2(gx, gz, seed + 391) - 0.5) * 4;
-      const y = terrainHeight(x, z, seed);
-      if (y < WATER_LEVEL + 1 || roadDistance(x, z) < 5) continue;
-      const grad = terrainGradient(x, z, seed);
-      if (Math.hypot(grad.gx, grad.gz) < 0.35) continue; // only real slopes
-      out.crystals.push({
-        x,
-        z,
-        y,
-        scale: 1.2 + r * 8,
-        rot: hash2(gx, gz, seed + 401) * Math.PI * 2,
-        variant: r < 0.15 ? 0 : 1,
-        tint: r < 0.1 ? 0xe8a8d0 : 0xb392e8,
-        lean: grad,
-      });
-    }
-  }
-
-  // --- weeping willows around the two lakeshores ---
-  for (const lake of [STARFALL_LAKE, SHALLOWS_LAKE]) {
-    for (let k = 0; k < 14; k++) {
-      const ang = (k / 14) * Math.PI * 2 + hash2(k, lake.x, seed + 411) * 0.5;
-      const dist = lake.r + 5 + hash2(lake.x, k, seed + 421) * 7;
-      const x = lake.x + Math.sin(ang) * dist;
-      const z = lake.z + Math.cos(ang) * dist;
-      const y = usable(x, z, 3);
-      if (y === null) continue;
-      if (hash2(Math.round(x), Math.round(z), seed + 431) > 0.7) continue;
-      out.willows.push({
-        x,
-        z,
-        y,
-        scale: 0.85 + hash2(k, k + 1, seed + 441) * 0.5,
-        rot: ang,
-        variant: 0,
-        tint: 0xffffff,
-      });
-    }
-  }
-
-  // --- blossom trees along the roads and the town fringe ---
-  for (let gx = -168; gx <= 168; gx += 10) {
-    for (let gz = REALM_ZONE.zMin + 20; gz <= REALM_ZONE.zMax - 20; gz += 10) {
-      const r = hash2(gx, gz, seed + 451);
-      if (r > 0.22) continue;
-      const x = gx + (hash2(gx, gz, seed + 461) - 0.5) * 6;
-      const z = gz + (hash2(gx, gz, seed + 471) - 0.5) * 6;
-      const dRoad = roadDistance(x, z);
-      const dHub = Math.hypot(x - hub.x, z - hub.z);
-      const roadside = dRoad > 5 && dRoad < 10;
-      const townFringe = dHub > hub.radius + 4 && dHub < hub.radius + 16;
-      if (!roadside && !townFringe) continue;
-      const y = usable(x, z, 5, 4);
-      if (y === null) continue;
-      out.blossoms.push({
-        x,
-        z,
-        y,
-        scale: 0.8 + r * 2.2,
-        rot: r * Math.PI * 9,
-        variant: hash2(gx, gz, seed + 481) < 0.6 ? 0 : 1,
-        tint: 0xffffff,
-      });
-    }
-  }
-
-  // --- mossy boulders in the Grove and the Deep ---
-  for (const region of [ELDER_GROVE, GLEAMING_DEEP]) {
-    for (let k = 0; k < 18; k++) {
-      const ang = hash2(k, region.x, seed + 491) * Math.PI * 2;
-      const dist = hash2(region.x, k, seed + 501) * region.r * 0.9;
-      const x = region.x + Math.sin(ang) * dist;
-      const z = region.z + Math.cos(ang) * dist;
-      const y = usable(x, z, 4);
-      if (y === null) continue;
-      if (hash2(Math.round(x), Math.round(z), seed + 511) > 0.6) continue;
-      out.boulders.push({
-        x,
-        z,
-        y,
-        scale: 1.2 + hash2(k, k, seed + 521) * 2.2,
-        rot: ang * 3.1,
-        variant: 0,
-        tint: 0xffffff,
-      });
     }
   }
 
@@ -751,7 +610,6 @@ const FLOWER_TINTS = [
   0x9a7fd8, // deep violet
 ]; // duskbell colorways
 const STARBUD_TINTS = [0xf8f0ff, 0xf2d8a8, 0xf2b8c8]; // tiny understory flowers
-const BOULDER_MOSS = 0x9caa96;
 const SEA_STONE = 0x6f6570; // dusk basalt multiply over the painted rock kit
 const SEA_ROCK_TINTS = [0xfff2ea, 0xd8d2dc, 0xb4aab4, 0xe8d8c8]; // weathering
 // Approximate unscaled heights of the kit (the large rocks are broad low
@@ -989,12 +847,17 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     );
   }
 
-  // --- mossy boulders (bundled rock, moss tint) ---
+  // --- boulders (bundled rock, natural stone; per-spot grey tints) ---
   const boulderParts = loadedParts.get(BOULDER_URL);
   if (boulderParts) {
     for (const part of boulderParts) {
       const mat = part.material.clone() as THREE.MeshStandardMaterial;
-      if ('color' in mat) mat.color.multiply(new THREE.Color(BOULDER_MOSS));
+      // the kit rock ships beige-dirt sides and a teal grass cap; regrade to
+      // granite + dull moss so it reads as real stone (the minerock treatment)
+      if ('color' in mat) {
+        const nm = (part.material.name || '').toLowerCase();
+        mat.color.set(nm.includes('grass') ? 0x6f7a76 : 0x8a8e93);
+      }
       instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
     }
   }
@@ -1054,89 +917,9 @@ export function buildRealmFlora(seed: number): RealmFloraView {
   // basin. A scrolling canvas-streak sheet reads as falling water in the
   // game's low-poly style; two foam discs churn at the base; a translucent
   // pool caps the terrace behind the lip. All render-only.
-  let fallsMap: THREE.CanvasTexture | null = null;
-  const foamDiscs: THREE.Mesh[] = [];
-  {
-    const lip = HOLLOW_FALLS.lip;
-    const t = HOLLOW_FALLS.terrace;
-    const dirX = (110 - t.x) / 29.2,
-      dirZ = (985 - t.z) / 29.2; // toward the lake
-    const topX = lip.x - dirX * 3,
-      topZ = lip.z - dirZ * 3;
-    const baseX = lip.x + dirX * 4,
-      baseZ = lip.z + dirZ * 4;
-    const topY = terrainHeight(topX, topZ, seed);
-    const baseY = Math.max(WATER_LEVEL - 0.5, terrainHeight(baseX, baseZ, seed));
-    const drop = Math.max(4, topY - baseY);
-    if (typeof document !== 'undefined') {
-      const canvas = document.createElement('canvas');
-      canvas.width = 64;
-      canvas.height = 128;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.clearRect(0, 0, 64, 128);
-        for (let i = 0; i < 26; i++) {
-          const sx = hash2(i, 3, seed) * 64;
-          const len = 24 + hash2(i, 7, seed) * 70;
-          const sy = hash2(i, 11, seed) * 128;
-          ctx.fillStyle = `rgba(255,255,255,${0.25 + hash2(i, 13, seed) * 0.45})`;
-          ctx.fillRect(sx, sy, 1.6 + hash2(i, 17, seed) * 2.2, len);
-        }
-        fallsMap = new THREE.CanvasTexture(canvas);
-        fallsMap.wrapS = THREE.RepeatWrapping;
-        fallsMap.wrapT = THREE.RepeatWrapping;
-        const sheet = new THREE.Mesh(
-          new THREE.PlaneGeometry(6.5, drop + 1.5, 1, 4),
-          new THREE.MeshBasicMaterial({
-            map: fallsMap,
-            transparent: true,
-            opacity: 0.85,
-            color: 0xcfe4f2,
-            side: THREE.DoubleSide,
-            depthWrite: false,
-          }),
-        );
-        sheet.position.set(lip.x, (topY + baseY) / 2 + 0.4, lip.z);
-        sheet.rotation.y = Math.atan2(dirX, dirZ);
-        sheet.rotation.x = -0.08; // lean back into the cliff
-        group.add(sheet);
-        const foamMat = new THREE.MeshBasicMaterial({
-          color: 0xeaf4fa,
-          transparent: true,
-          opacity: 0.4,
-          depthWrite: false,
-        });
-        for (const [fs, fx, fz] of [
-          [2.6, baseX, baseZ],
-          [1.7, baseX + dirZ * 1.6, baseZ - dirX * 1.6],
-        ] as const) {
-          const foam = new THREE.Mesh(new THREE.CircleGeometry(fs, 10), foamMat);
-          foam.rotation.x = -Math.PI / 2;
-          foam.position.set(fx, WATER_LEVEL + 0.12, fz);
-          foamDiscs.push(foam);
-          group.add(foam);
-        }
-        // the terrace pool feeding the lip
-        const pool = new THREE.Mesh(
-          new THREE.CircleGeometry(5.5, 14),
-          new THREE.MeshBasicMaterial({
-            color: 0x9fc8e0,
-            transparent: true,
-            opacity: 0.55,
-            depthWrite: false,
-          }),
-        );
-        pool.rotation.x = -Math.PI / 2;
-        pool.position.set(topX - dirX * 4, topY + 0.15, topZ - dirZ * 4);
-        group.add(pool);
-        const fallsLight = new THREE.PointLight(0xbfe0f2, 5, 13, 2);
-        fallsLight.position.set(lip.x, baseY + 2.5, lip.z);
-        fallsLight.userData.baseIntensity = 5;
-        glowLights.push(fallsLight);
-        group.add(fallsLight);
-      }
-    }
-  }
+  // (the waterfall visual is retired: the flat streak sheet read as glitch
+  // bars under the dusk grade and poured straight at the new shrine; a real
+  // animated falls can return as a water.ts feature)
 
   // The ocean's atmosphere: low mist banks over the far water, soft light
   // rays leaning from the sky, and a distant flock tracing slow circles.
@@ -1299,14 +1082,6 @@ export function buildRealmFlora(seed: number): RealmFloraView {
       // one gentle shared breath across the glowing materials
       const breathe = 1 + Math.sin(time * 0.9) * 0.16;
       for (const entry of pulsing) entry.mat.emissiveIntensity = entry.base * breathe;
-      // the falls pour and the foam churns
-      if (fallsMap) fallsMap.offset.y = -((time * 0.55) % 1);
-      for (let i = 0; i < foamDiscs.length; i++) {
-        const foam = foamDiscs[i];
-        foam.rotation.z = time * (i === 0 ? 0.35 : -0.5);
-        const churn = 1 + Math.sin(time * 2.1 + i * 1.9) * 0.08;
-        foam.scale.setScalar(churn);
-      }
       // the surf rings around stacks and shore rocks swell and relax
       for (const f of seaFoam) {
         f.mesh.scale.setScalar(1 + Math.sin(time * 1.4 + f.phase) * 0.12);

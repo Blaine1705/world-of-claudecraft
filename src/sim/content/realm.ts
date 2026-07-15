@@ -63,32 +63,65 @@ export const REALM_ZONE: ZoneDef = {
 // the grove, the basin, the ruins, and the mushroom forest.
 export const REALM_ROADS: { x: number; z: number }[][] = [
   [
+    // the Eldergleam ring: a circular walk around the great tree; the four
+    // spoke roads below each end on this circle
+    { x: -40, z: 1040 },
+    { x: -33, z: 1038.1 },
+    { x: -27.9, z: 1033 },
+    { x: -26, z: 1026 },
+    { x: -27.9, z: 1019 },
+    { x: -33, z: 1013.9 },
+    { x: -40, z: 1012 },
+    { x: -47, z: 1013.9 },
+    { x: -52.1, z: 1019 },
+    { x: -54, z: 1026 },
+    { x: -52.1, z: 1033 },
+    { x: -47, z: 1038.1 },
+    { x: -40, z: 1040 },
+  ],
+  [
     { x: -140, z: 955 },
     { x: -125, z: 980 },
     { x: -95, z: 1005 },
-    { x: -40, z: 1030 },
-  ], // Duskfall Cave -> Eldergleam
+    { x: -53, z: 1022 },
+  ], // Duskfall Cave -> the Eldergleam ring, west
   [
+    { x: -45, z: 1039 },
     { x: -45, z: 1052 },
     { x: -60, z: 1105 },
     { x: -70, z: 1150 },
-  ], // Eldergleam -> the Gleaming Deep
+  ], // the Eldergleam ring, north -> the Gleaming Deep
   [
+    { x: -26, z: 1030 },
     { x: -18, z: 1030 },
     { x: 30, z: 1042 },
     { x: 80, z: 1062 },
     { x: 120, z: 1085 },
-  ], // Eldergleam -> the Sunken Court
+  ], // the Eldergleam ring, east -> the Sunken Court
   [
+    { x: -33, z: 1014 },
     { x: -30, z: 1010 },
     { x: 15, z: 982 },
     { x: 70, z: 975 },
-  ], // Eldergleam -> Starfall Basin shore
+    { x: 88, z: 982 },
+    { x: 100, z: 984 },
+  ], // the Eldergleam ring, southeast -> Starfall Basin -> the Star's Cradle causeway
   [
     { x: -62, z: 1155 },
     { x: -10, z: 1172 },
     { x: 38, z: 1170 },
   ], // the Gleaming Deep -> Crystalline Shallows
+];
+
+// Dense ground-cover flower drifts (dusk palette). The renderer's grass ring
+// treats these circles like guaranteed field cells, so the whole area blooms
+// instead of the usual scattered patches. Flowers are walk-through dressing:
+// no colliders, and placement still skips water, steep ground, and roads.
+export const REALM_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
+  // Starfall Basin: the meadow bowl around the fallen star's lake
+  { x: 60, z: 972, r: 26 }, // the road meadow below Elder Grove
+  { x: 92, z: 966, r: 20 }, // the south shore sweep
+  { x: 80, z: 1002, r: 18 }, // the glimmerwisp meadow at the northwest inlet
 ];
 
 // The hidden way in. Side a is the concealed cave in the northwest Thornpeak
@@ -157,25 +190,6 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     scale: 0.8,
     color: 0x7a5f9e,
   },
-  hollow_spirit: {
-    id: 'hollow_spirit',
-    name: 'Hollow Spirit',
-    minLevel: 16,
-    maxLevel: 17,
-    family: 'elemental',
-    hpBase: 58,
-    hpPerLevel: 21,
-    dmgBase: 12,
-    dmgPerLevel: 2.6,
-    attackSpeed: 2.0,
-    armorPerLevel: 14,
-    moveSpeed: 7.5,
-    aggroRadius: 5, // defends itself and its kin, never hunts
-    mendAlly: { healMin: 38, healMax: 52, radius: 14, every: 9, name: 'Spirit Mending' },
-    loot: [{ copper: 80, chance: 1 }],
-    scale: 0.9,
-    color: 0x8fe8d8,
-  },
   veiled_stag: {
     id: 'veiled_stag',
     name: 'Veiled Stag',
@@ -193,6 +207,24 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     loot: [{ itemId: 'gleaming_antler', chance: 0.55, questId: 'q_gleaming_antlers' }],
     scale: 1.0,
     color: 0xb9a3cf,
+  },
+  veiled_doe: {
+    id: 'veiled_doe',
+    name: 'Veiled Doe',
+    minLevel: 14,
+    maxLevel: 15,
+    family: 'beast',
+    hpBase: 48,
+    hpPerLevel: 16,
+    dmgBase: 7,
+    dmgPerLevel: 1.8,
+    attackSpeed: 2.2,
+    armorPerLevel: 10,
+    moveSpeed: 9.5,
+    aggroRadius: 0, // shies from everything; fights only if cornered
+    loot: [{ copper: 40, chance: 1 }],
+    scale: 0.9,
+    color: 0xcdbfdc,
   },
   gleamstag: {
     id: 'gleamstag',
@@ -217,6 +249,24 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.3,
     color: 0xf2dcff,
+  },
+  mushroom_pixie: {
+    id: 'mushroom_pixie',
+    name: 'Gleamfolk Pixie',
+    minLevel: 15,
+    maxLevel: 16,
+    family: 'kobold',
+    hpBase: 50,
+    hpPerLevel: 17,
+    dmgBase: 8,
+    dmgPerLevel: 2.0,
+    attackSpeed: 2.2,
+    armorPerLevel: 10,
+    moveSpeed: 7.5,
+    aggroRadius: 0, // the little folk of the village never strike first
+    loot: [],
+    scale: 1.0,
+    color: 0xd8c4f0,
   },
   sporeling_gatherer: {
     id: 'sporeling_gatherer',
@@ -407,8 +457,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'keeper_saelwyn',
     name: 'Keeper Saelwyn',
     title: 'Keeper of the Hollow',
-    pos: { x: -42, z: 1019 },
-    facing: 0.3,
+    pos: { x: -43, z: 1016 },
+    facing: -2.85, // back to the great tree, greeting arrivals from the ring
     color: 0xd8c4f0,
     questIds: [
       'q_veil_thinned',
@@ -433,8 +483,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'provisioner_fenna',
     name: 'Provisioner Fenna',
     title: 'Eldergleam Provisioner',
-    pos: { x: -52, z: 1037.5 },
-    facing: 1.6,
+    pos: { x: -46, z: 1031 },
+    facing: -0.87,
     color: 0x8fbf8a,
     questIds: ['q_gleaming_antlers', 'q_grove_menace'],
     vendorItems: [
@@ -451,8 +501,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'wardsmith_orun',
     name: 'Wardsmith Orun',
     title: 'Keeper of the Old Forges',
-    pos: { x: -28, z: 1039.5 },
-    facing: -0.5,
+    pos: { x: -34, z: 1031 },
+    facing: 0.87,
     color: 0x9a86b8,
     questIds: [],
     vendorItems: ['wardplate_cuirass', 'nightweave_tunic', 'veilcloth_robe'],
@@ -462,8 +512,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'archivist_tullo',
     name: 'Archivist Tullo',
     title: 'Reader of Stones',
-    pos: { x: -34, z: 1021 },
-    facing: 2.6,
+    pos: { x: -31, z: 1021 },
+    facing: 2.08, // back to the great tree, looking out toward his monuments
     color: 0xb8a8d8,
     questIds: ['q_monument_tour', 'q_shards_of_starfall', 'q_wardens_echoes'],
     greeting:
@@ -604,7 +654,7 @@ export const REALM_QUESTS: Record<string, QuestDef> = {
     name: 'Gleaming Antlers',
     giverNpcId: 'provisioner_fenna',
     turnInNpcId: 'provisioner_fenna',
-    text: 'The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds at Starfall Basin, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.',
+    text: 'The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds in the open glade at the heart of the valley, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.',
     completionText:
       'Look how they hold the light! No flame, no smoke, just the glow. The Hollow provides.',
     objectives: [
@@ -778,8 +828,10 @@ export const REALM_CAMPS: CampDef[] = [
   { mobId: 'glimmerwisp', center: { x: 60, z: 1150 }, radius: 14, count: 4 },
   { mobId: 'duskwisp', center: { x: 126, z: 1120 }, radius: 12, count: 4 },
   { mobId: 'duskwisp', center: { x: -30, z: 1200 }, radius: 14, count: 4 },
-  { mobId: 'hollow_spirit', center: { x: -75, z: 1170 }, radius: 18, count: 5 },
-  { mobId: 'veiled_stag', center: { x: 92, z: 962 }, radius: 18, count: 6 },
+  { mobId: 'veiled_stag', center: { x: 12, z: 1118 }, radius: 16, count: 6 },
+  // the does graze among the stags, closest to the heart of the glade
+  { mobId: 'veiled_doe', center: { x: 8, z: 1124 }, radius: 12, count: 3 },
+  { mobId: 'veiled_doe', center: { x: 18, z: 1112 }, radius: 10, count: 2 },
   { mobId: 'sporeling_gatherer', center: { x: -95, z: 1180 }, radius: 14, count: 5 },
   { mobId: 'corrupted_sporeling', center: { x: -25, z: 1218 }, radius: 14, count: 6 },
   { mobId: 'corrupted_sporeling', center: { x: -60, z: 1226 }, radius: 12, count: 5 },
@@ -791,7 +843,9 @@ export const REALM_CAMPS: CampDef[] = [
   { mobId: 'gleamstag', center: { x: -145, z: 1100 }, radius: 4, count: 1 },
   // wandering bosses (rare elites, long respawns, appended last for rng order)
   { mobId: 'old_marrowshell', center: { x: 103, z: 1144 }, radius: 5, count: 1 },
-  { mobId: 'aurelhorn', center: { x: 70, z: 995 }, radius: 6, count: 1 },
+  { mobId: 'aurelhorn', center: { x: 22, z: 1110 }, radius: 6, count: 1 },
+  // the Gleamfolk going about their village (appended last for rng order)
+  { mobId: 'mushroom_pixie', center: { x: -95, z: 1186 }, radius: 16, count: 5 },
 ];
 
 // ---------------------------------------------------------------------------
@@ -1018,21 +1072,34 @@ export const REALM_PROPS: ZonePropsDef = {
   // by render/realm_flora.ts; these are the built structures around it).
   // The great tree's trunk is solid (colliders.ts); everything else rings it
   // at a respectful distance so the square breathes.
-  greatTrees: [{ x: -40, z: 1026, r: 2.6 }],
+  // r matches the rendered trunk's root flare at ground level (the twisted_1
+  // model spans 0.85 native at its base, 5.5yd at the 6.5x town scale), so
+  // players collide with the visual bark instead of sinking into it.
+  greatTrees: [{ x: -40, z: 1026, r: 5.5 }],
   buildings: [
-    { kind: 'inn', x: -58, z: 1046, w: 6, d: 7, rot: 0.7 },
-    { kind: 'house', x: -22, z: 1048, w: 7, d: 6, rot: -0.4 },
-    { kind: 'house', x: -62, z: 1016, w: 6, d: 6, rot: 1.2 },
-    { kind: 'chapel', x: -18, z: 1012, w: 5, d: 7, rot: -1.9 }, // the shrine
+    // The whole town is the KayKit medieval set in the Hollow's dusk palette
+    // (violet roofs, warm timber; render/props.ts maps each kind to its GLB).
+    // Layout is radial: everything rings the great tree at (-40,1026), placed
+    // in the quiet sectors BETWEEN the four spoke roads, doors facing the
+    // tree, well clear of the ring path (r 14) and every spoke corridor.
+    { kind: 'hollowInn', x: -59, z: 1033, w: 6, d: 7, rot: 1.92 }, // northwest sector
+    { kind: 'hollowHouse', x: -52, z: 1041, w: 7, d: 6, rot: 2.47 },
+    { kind: 'hollowHouse', x: -33, z: 1044, w: 7, d: 6, rot: 2.77 }, // northeast sector
+    { kind: 'hollowHouse', x: -24, z: 1038, w: 6, d: 6, rot: -2.21 },
+    { kind: 'hollowSmith', x: -21, z: 1023, w: 7, d: 6.5, rot: -1.41 }, // southeast sector
+    { kind: 'hollowChapel', x: -18, z: 1012, w: 5, d: 7, rot: -0.9 }, // the shrine
+    { kind: 'hollowHouse', x: -47, z: 1008, w: 7, d: 6, rot: 0.37 }, // southwest sector
+    { kind: 'hollowMarket', x: -54, z: 1010, w: 8, d: 6, rot: 0.72 }, // the Duskfall approach
   ],
-  wells: [{ x: -40, z: 1042, r: 1.5 }],
+  wells: [{ x: -40, z: 1035, r: 1.5 }], // inside the ring, north of the tree
   stalls: [
-    { x: -52, z: 1036, rot: Math.PI / 2, r: 1.7 }, // Provisioner Fenna
-    { x: -28, z: 1038, rot: -0.5, r: 1.7 }, // Wardsmith Orun
+    // the market stalls nestle close under the tree, facing out at the ring
+    { x: -47, z: 1032, rot: -0.87, r: 1.7 }, // Provisioner Fenna
+    { x: -33, z: 1032, rot: 0.87, r: 1.7 }, // Wardsmith Orun
   ],
   crates: [
-    [-51, 1033],
-    [-27, 1041],
+    [-49, 1030],
+    [-31, 1030],
   ],
   campfires: [
     [-40, 1008], // town square gathering fire, south of the tree
@@ -1045,10 +1112,10 @@ export const REALM_PROPS: ZonePropsDef = {
     { x: 31, z: 962, rot: 2.4, scale: 1.05 },
   ],
   fences: [
-    // the magical garden ring on the town's north edge
-    { x1: -52, z1: 1052, x2: -42, z2: 1056 },
-    { x1: -42, z1: 1056, x2: -30, z2: 1055 },
-    { x1: -30, z1: 1055, x2: -22, z2: 1050 },
+    // the magical garden hedge behind the northeast homes, clear of the
+    // north and east roads
+    { x1: -35, z1: 1052, x2: -30, z2: 1050 },
+    { x1: -30, z1: 1050, x2: -26, z2: 1047 },
   ],
   ruinRings: [
     // the Sunken Court: an overgrown temple complex
@@ -1061,4 +1128,70 @@ export const REALM_PROPS: ZonePropsDef = {
     { x: 160, z: 1230, ringR: 4, columns: 3 },
   ],
   graveyards: [{ x: -60, z: 1004 }],
+  // Hand-placed decor (render/props.ts PROP_ASSET_DEFS). Only the user-made
+  // set remains: the pixie mushroom houses and the flora one-offs that the
+  // realm_flora scatter already uses (the giant mushroom is the village
+  // heart). Collider radii match the model footprints.
+  decorProps: [
+    // -- the pixie village in the Gleaming Deep: mushroom houses around the
+    //    sporeling rings. Scaled 2x from the authored 4yd so they stand at
+    //    regular village-house height (8yd); r doubles in lockstep. --
+    { key: 'pixieMushroomHouse', x: -108, z: 1168, rot: 0.9, r: 3.4, h: 8, scale: 2 },
+    { key: 'pixieMushroomHouse', x: -84, z: 1194, rot: -2.1, r: 3.4, h: 8, scale: 2 },
+    { key: 'pixieMushroomHouse', x: -112, z: 1188, rot: 1.9, r: 3.4, h: 8, scale: 2 },
+    { key: 'pixieMushroomHouse', x: -78, z: 1162, rot: -0.7, r: 3.4, h: 8, scale: 2 },
+    { key: 'pixieMushroomHouse', x: -96, z: 1206, rot: 2.8, r: 3.4, h: 8, scale: 2 },
+    // the village heart: the great mushroom (the user's own model, also the
+    // Gleaming Deep giants), risen as the pixies' moot hall. Kept taller
+    // than the 8yd houses so it stays the village centerpiece.
+    { key: 'mushroomGiantPurple', x: -95, z: 1186, rot: 0.8, r: 1.9, h: 10, scale: 10 },
+    { key: 'mushroomGlowCluster', x: -104, z: 1174, scale: 2.5 },
+    { key: 'flowerGlow', x: -90, z: 1190, scale: 1.6 },
+    // -- the Crystalline Shallows: generated crystal formations, a first
+    //    amethyst set (more colorways to come); trunk-tight colliders --
+    { key: 'crystalAmethystCluster', x: 58, z: 1150, rot: 0.7, r: 2.4, h: 6 },
+    { key: 'crystalAmethystCluster', x: 97, z: 1145, rot: 2.3, r: 1.6, h: 4, scale: 0.65 },
+    { key: 'crystalAmethystCluster', x: 88, z: 1183, rot: -1.1, r: 2.9, h: 7.5, scale: 1.25 },
+    { key: 'crystalAmethystCluster', x: 52, z: 1166, rot: 3.0, r: 1.2, h: 3, scale: 0.5 },
+    // the crystal mound: a walk-up cave mouth on the east shore, its mass
+    // rising out of the lake water behind it
+    { key: 'crystalMoundCave', x: 102, z: 1162, rot: -1.57, r: 5.2, h: 11 },
+    // size-scatter around the whole lake: from knee-high shards to towers
+    { key: 'crystalAmethystCluster', x: 66, z: 1142, rot: 1.2, r: 1.9, h: 4.8, scale: 0.8 },
+    { key: 'crystalAmethystCluster', x: 82, z: 1140, rot: -0.6, r: 3.6, h: 9, scale: 1.5 },
+    { key: 'crystalAmethystCluster', x: 104, z: 1152, rot: 2.0, r: 2.2, h: 5.4, scale: 0.9 },
+    { key: 'crystalAmethystCluster', x: 95, z: 1178, rot: 0.3, r: 1.3, h: 3.3, scale: 0.55 },
+    { key: 'crystalAmethystCluster', x: 50, z: 1186, rot: -2.2, r: 2.9, h: 7.2, scale: 1.2 },
+    { key: 'crystalAmethystCluster', x: 48, z: 1176, rot: 1.7, r: 1.0, h: 2.4, scale: 0.4 },
+    // -- Starfall Basin: the Star's Cradle on the southern rim (the fallen
+    //    star's open face turned toward the road approach) and the stags'
+    //    antler shrine on the meadow where the herd grazes --
+    { key: 'starHeartCrystal', x: 110, z: 985, rot: -1.6, r: 4.6, h: 5.5 },
+    // the C-shaped shrine wall (KayKit dungeon stone), gap west at the causeway.
+    // 20 segments span the arc from gap edge to gap edge (step 0.27216 rad,
+    // chord 2.17 vs 2.2 wall length), so the runs end flush at both gateposts.
+    { key: 'kkWall', x: 103.21, z: 989.22, rot: -1.01, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 104.59, z: 990.89, rot: -0.74, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 106.37, z: 992.13, rot: -0.47, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 108.42, z: 992.84, rot: -0.2, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 110.59, z: 992.98, rot: 0.07, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 112.71, z: 992.53, rot: 0.35, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 114.64, z: 991.52, rot: 0.62, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 116.22, z: 990.03, rot: 0.89, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 117.34, z: 988.18, rot: 1.16, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 117.93, z: 986.09, rot: 1.43, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 117.93, z: 983.91, rot: 1.71, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 117.34, z: 981.82, rot: 1.98, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 116.22, z: 979.97, rot: 2.25, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 114.64, z: 978.48, rot: 2.52, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 112.71, z: 977.47, rot: 2.8, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 110.59, z: 977.02, rot: 3.07, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 108.42, z: 977.16, rot: -2.94, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 106.37, z: 977.87, rot: -2.67, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 104.59, z: 979.11, rot: -2.4, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 103.21, z: 980.78, rot: -2.13, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkPillar', x: 102.7, z: 988.26, rot: -1.15, r: 0.7, h: 3, scale: 0.6 },
+    { key: 'kkPillar', x: 102.7, z: 981.74, rot: -1.99, r: 0.7, h: 3, scale: 0.6 },
+    { key: 'stagShrine', x: 4, z: 1112, rot: 0.79, r: 2.0, h: 4.2 },
+  ],
 };

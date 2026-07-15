@@ -8481,11 +8481,11 @@ export const ru_RU: EnTranslations = {
       "duskwisp": {
         "name": "Сумеречный огонёк"
       },
-      "hollow_spirit": {
-        "name": "Дух лощины"
-      },
       "veiled_stag": {
         "name": "Скрытый олень"
+      },
+      "veiled_doe": {
+        "name": "Скрытая олениха"
       },
       "gleamstag": {
         "name": "Сияющий олень"
@@ -8495,6 +8495,9 @@ export const ru_RU: EnTranslations = {
       },
       "corrupted_sporeling": {
         "name": "Осквернённый спорёныш"
+      },
+      "mushroom_pixie": {
+        "name": "Пикси сияющего народца"
       },
       "treant_elder": {
         "name": "Древень-старейшина"

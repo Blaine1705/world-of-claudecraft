@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { REALM_FLOWER_MEADOWS } from '../sim/content/realm';
 import {
   CAMPS,
   DUNGEON_X_THRESHOLD,
@@ -23,7 +24,7 @@ import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { bucketVisible, type LodDists, lodDistsFor, treeDetailDistance } from './foliage_lod';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
-import { grassTuftTexture } from './textures';
+import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
 //
@@ -1215,13 +1216,12 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
   if (biome === 'cave') return r < 0.5 ? 'mushroom' : 'fern';
   if (biome === 'volcano') return 'bush';
   if (biome === 'dusk') {
-    // glade floor: ferns and flowering bushes carry the ground cover, with
-    // mushrooms as a sparser accent (the big glowing ones live in
-    // realm_flora, so the tiny dressing kind stays scattered and natural)
-    if (r < 0.12) return 'bush';
-    if (r < 0.34) return 'bushFlowers';
-    if (r < 0.78) return 'fern';
-    return 'mushroom';
+    // glade floor: ferns and flowering bushes carry the ground cover. No
+    // dressing mushrooms here: the biome tint turned them neon pink and they
+    // clashed with the realm_flora glow mushrooms (user pass, 2026-07).
+    if (r < 0.16) return 'bush';
+    if (r < 0.4) return 'bushFlowers';
+    return 'fern';
   }
   if (biome === 'fen') {
     // the fen floor blooms: flowering hedges everywhere, mushrooms thick in
@@ -1472,6 +1472,7 @@ interface GrassChunk {
   lastUsed: number;
   prioritySq: number;
   mesh?: THREE.InstancedMesh;
+  flowerMesh?: THREE.InstancedMesh;
 }
 
 // wind sway + masked edge fade for the grass tufts; the fade keys off the
@@ -1621,6 +1622,54 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   );
   applyGrassShader(mat, uniforms);
 
+  // ground-cover flowers: a sparse companion set in the same chunks, sharing
+  // the sway/fade shader so they move and thin exactly like the grass.
+  // Each biome gets its own petal palette (chunk-level pick), and the dusk
+  // realm grows dense flower-field drifts.
+  const fquad = new THREE.PlaneGeometry(0.95, 0.8);
+  fquad.translate(0, 0.38, 0);
+  const fquad2 = fquad.clone().rotateY(Math.PI / 2);
+  const flowerGeo = mergeGeometries([fquad, fquad2]);
+  const FLOWER_PALETTES: Partial<Record<BiomeId, FlowerKind[]>> = {
+    // the Veiled Hollow: pinks, purples, whites
+    dusk: [
+      { p: [238, 150, 190], c: [180, 90, 40] },
+      { p: [190, 150, 235], c: [240, 220, 120] },
+      { p: [246, 242, 250], c: [244, 200, 70] },
+    ],
+    // Drakelands: reds and embers
+    ember: [
+      { p: [225, 70, 60], c: [120, 30, 20] },
+      { p: [240, 110, 60], c: [140, 60, 20] },
+      { p: [200, 50, 80], c: [90, 20, 30] },
+    ],
+    // Amberfall: oranges, yellows, whites
+    amber: [
+      { p: [245, 150, 50], c: [150, 80, 20] },
+      { p: [248, 205, 70], c: [160, 100, 25] },
+      { p: [248, 244, 235], c: [230, 170, 60] },
+    ],
+  };
+  const flowerMatCache = new Map<string, THREE.Material>();
+  const flowerMatFor = (biome: BiomeId): THREE.Material => {
+    const key = FLOWER_PALETTES[biome] ? biome : 'default';
+    let fmMat = flowerMatCache.get(key);
+    if (!fmMat) {
+      const tex = flowerTuftTexture(FLOWER_PALETTES[biome]);
+      fmMat = configureMaskedDoubleSidedVegetationMaterial(
+        lush
+          ? new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.3, roughness: 0.85 })
+          : new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.35 }),
+      );
+      applyGrassShader(fmMat, uniforms);
+      flowerMatCache.set(key, fmMat);
+    }
+    return fmMat;
+  };
+  // build every palette texture up front: a first-visit texture generation
+  // plus shader compile mid-walk reads as a lag spike
+  for (const b of ['vale', 'dusk', 'ember', 'amber'] as BiomeId[]) flowerMatFor(b);
+
   const chunks = new Map<string, GrassChunk>();
   const buildQueue: GrassChunk[] = [];
   let generation = 0;
@@ -1663,6 +1712,15 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     im.frustumCulled = true;
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
+    const chunkBiome = zoneBiomeAt(chunk.centerX, chunk.centerZ);
+    const duskFields = chunkBiome === 'dusk';
+    const flowerCap = Math.max(8, Math.floor(maxChunkCount * (duskFields ? 0.45 : 0.14)));
+    const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
+    fm.userData.renderCategory = 'grass';
+    fm.frustumCulled = true;
+    fm.receiveShadow = true;
+    fm.count = 0;
+    let fn = 0;
 
     const minX = chunk.cx * GRASS_CHUNK_SIZE;
     const maxX = minX + GRASS_CHUNK_SIZE;
@@ -1672,6 +1730,13 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const i1 = Math.ceil(maxX / step) + 1;
     const j0 = Math.floor(minZ / step) - 1;
     const j1 = Math.ceil(maxZ / step) + 1;
+    // authored flower meadows overlapping this chunk (dusk realm only)
+    const meadowsInChunk = duskFields
+      ? REALM_FLOWER_MEADOWS.filter(
+          (mw) =>
+            mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
+        )
+      : [];
 
     for (let i = i0; i <= i1 && n < maxChunkCount; i++) {
       for (let j = j0; j <= j1 && n < maxChunkCount; j++) {
@@ -1708,6 +1773,68 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         );
         im.setColorAt(n, c);
         n++;
+        // roughly one tuft in nine sprouts a flower cluster beside it; in
+        // the dusk realm, coarse field cells bloom into dense drifts, and the
+        // authored meadow circles (REALM_FLOWER_MEADOWS) always bloom
+        const fieldCell = duskFields ? hashAt(Math.floor(x / 22), Math.floor(z / 22), 13) : 1;
+        const inMeadow = meadowsInChunk.some((mw) => {
+          const mdx = x - mw.x;
+          const mdz = z - mw.z;
+          return mdx * mdx + mdz * mdz < mw.r * mw.r;
+        });
+        // meadows bloom harder than hash fields: their ground carries fewer
+        // grass tufts (each tuft is a flower anchor), so density compensates
+        const inField = duskFields && fieldCell < 0.42;
+        const flowerChance = inMeadow ? 0.9 : inField ? 0.6 : duskFields ? 0.05 : 0.11;
+        const reps = inMeadow ? 4 : inField ? 3 : 1;
+        if (hashAt(i, j, 6) < flowerChance) {
+          for (let rep = 0; rep < reps && fn < flowerCap; rep++) {
+            const fx = x + (hashAt(i + rep, j, 7) - 0.5) * (1.4 + rep * 1.3);
+            const fz = z + (hashAt(i, j + rep, 8) - 0.5) * (1.4 + rep * 1.3);
+            const fh = terrainHeight(fx, fz, seed);
+            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
+              continue;
+            }
+            const fs = 0.55 + hashAt(i + rep, j + rep, 9) * 0.5;
+            q.setFromAxisAngle(up, hashAt(i, j, 10 + rep) * 12.4);
+            m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
+            fm.setMatrixAt(fn, m);
+            // flowers keep their own petal colors: light jitter only
+            c.setHex(0xffffff);
+            c.offsetHSL((hashAt(i, j, 11) - 0.5) * 0.04, 0, (hashAt(i, j, 12) - 0.5) * 0.12);
+            fm.setColorAt(fn, c);
+            fn++;
+          }
+        }
+      }
+    }
+
+    // Authored meadows also bloom independent of grass anchors: the scrubby
+    // basin shore carries few tufts (each tuft is a flower anchor above), so
+    // a direct grid pass keeps the drifts solid on bare ground too.
+    for (const mw of meadowsInChunk) {
+      for (let i = i0; i <= i1 && fn < flowerCap; i++) {
+        for (let j = j0; j <= j1 && fn < flowerCap; j++) {
+          if (hashAt(i, j, 14) > 0.5) continue;
+          const fx = i * step + (hashAt(i, j, 15) - 0.5) * step * 1.6;
+          const fz = j * step + (hashAt(i, j, 16) - 0.5) * step * 1.6;
+          if (fx < minX || fx >= maxX || fz < minZ || fz >= maxZ) continue;
+          const mdx = fx - mw.x;
+          const mdz = fz - mw.z;
+          if (mdx * mdx + mdz * mdz >= mw.r * mw.r) continue;
+          const fh = terrainHeight(fx, fz, seed);
+          if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
+            continue;
+          }
+          const fs = 0.55 + hashAt(i, j, 17) * 0.5;
+          q.setFromAxisAngle(up, hashAt(i, j, 18) * 12.4);
+          m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
+          fm.setMatrixAt(fn, m);
+          c.setHex(0xffffff);
+          c.offsetHSL((hashAt(i, j, 19) - 0.5) * 0.04, 0, (hashAt(j, i, 19) - 0.5) * 0.12);
+          fm.setColorAt(fn, c);
+          fn++;
+        }
       }
     }
     if (n > 0) {
@@ -1719,6 +1846,15 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       chunk.mesh = im;
       parent.add(im);
     }
+    if (fn > 0) {
+      fm.count = fn;
+      fm.instanceMatrix.needsUpdate = true;
+      if (fm.instanceColor) fm.instanceColor.needsUpdate = true;
+      fm.computeBoundingSphere();
+      fm.visible = chunk.lastSeen === generation;
+      chunk.flowerMesh = fm;
+      parent.add(fm);
+    }
     chunk.ready = true;
     builtChunks++;
     lastBuildMs = Math.round((performance.now() - started) * 100) / 100;
@@ -1729,6 +1865,10 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     if (chunk.mesh) {
       parent.remove(chunk.mesh);
       chunk.mesh.dispose();
+    }
+    if (chunk.flowerMesh) {
+      parent.remove(chunk.flowerMesh);
+      chunk.flowerMesh.dispose();
     }
     disposedChunks++;
     chunks.delete(chunk.key);
@@ -1795,6 +1935,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           chunk.lastUsed = generation;
           chunk.prioritySq = prioritySq;
           if (chunk.mesh) chunk.mesh.visible = true;
+          if (chunk.flowerMesh) chunk.flowerMesh.visible = true;
           queueChunk(chunk);
         }
       }
@@ -1802,6 +1943,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       for (const chunk of chunks.values()) {
         if (chunk.lastSeen === generation) continue;
         if (chunk.mesh?.visible) chunk.mesh.visible = false;
+        if (chunk.flowerMesh?.visible) chunk.flowerMesh.visible = false;
       }
       buildQueuedChunks();
       retireStaleChunks();

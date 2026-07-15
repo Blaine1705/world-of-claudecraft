@@ -1,11 +1,12 @@
 import * as THREE from 'three';
-import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { loadHdr, loadTexture } from './assets/loader';
 import { GFX } from './gfx';
-import { cloudTexture, skyTexture } from './textures';
+import { skyTexture } from './textures';
 
-// HDRI sky dome + cloud sprites.
+// HDRI sky dome. Cloud cover comes from the sky HDRIs themselves; there is
+// no separate sprite cloud layer.
 //
 // High tier: the dome fragment shader samples real Poly Haven equirect HDRIs
 // (one per biome) by view direction, cross-fading two maps across the same
@@ -31,8 +32,15 @@ const DOME_RADIUS = 560;
 // did. The dawn HDRI carries a huge horizon-level sun glow, so the peaks get
 // reined in harder or half the sky white-outs. The renderer's PMREM capture
 // samples the same shader, so IBL stays in step.
-const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
-  vale: { gain: 0.6, clamp: 2.6 },
+//
+// contrast (optional, default 1) is a pivot curve applied after the gain and
+// before the clamp: values below the 0.8 pivot deepen and cloud shading above
+// it spreads back out, recovering the texture detail the ACES highlight
+// shoulder otherwise flattens to a white wash. Raise it per biome by eye.
+const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number; contrast?: number }> = {
+  // clamp reined in from 2.6 with the contrast pass, so the re-expanded cloud
+  // tops do not just feed the bloom smear instead
+  vale: { gain: 0.6, clamp: 2.0, contrast: 1.25 },
   marsh: { gain: 0.6, clamp: 2.2 },
   peaks: { gain: 0.48, clamp: 1.7 },
   // Paint-only biomes reuse the closest shipped sky (no new HDRI downloads).
@@ -53,21 +61,20 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   // the Wraithwood's storm gloom is project-generated with the darkness
   // baked in; the clamp still reins in the dying sun's water lane
   haunt: { gain: 0.6, clamp: 1.8 },
-  // the Palmreach borrows the fen's bright day until its own tropical sky
-  // lands (skies_in/palmreach.png)
+  // the Palmreach's own tropical day sky (skies_in/palmreach.png), graded
+  // like the fen's bright day
   jungle: { gain: 0.62, clamp: 2.6 },
-  // the Evergarden borrows the fen's day until its own sky lands
-  // (skies_in/evergarden.png)
+  // the Evergarden's own day sky (skies_in/evergarden.png)
   garden: { gain: 0.6, clamp: 2.6 },
-  // the Galecrest borrows the fen's day until its own storm-light sky
-  // lands (skies_in/galecrest.png)
+  // the Galecrest's own storm-light sky (skies_in/galecrest.png)
   gale: { gain: 0.6, clamp: 2.6 },
 };
 
-// The three southern zones keep their Poly Haven photographs; the five realm
-// biomes each get a project-generated sky (skies_in/ sources, converted by
-// the local RGBE pipeline with the sun's HDR energy re-injected). All five
-// have clean ocean horizons: no baked land, so no lift and no tint hacks.
+// Every zone biome carries its own project-generated sky (skies_in/ sources,
+// converted by the local RGBE pipeline), one HDRI per zone; only the four
+// paint-only biomes (beach/desert/volcano/cave) alias a shipped neighbour.
+// The realm skies have clean ocean horizons: no baked land, so no lift and
+// no tint hacks.
 const BIOME_HDRI_2K: Record<BiomeId, string> = {
   vale: '/env/vale_day_2k.hdr',
   marsh: '/env/marsh_overcast_2k.hdr',
@@ -83,9 +90,9 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   fen: '/env/fen_day_2k.hdr',
   night: '/env/nightbloom_dream_2k.hdr',
   haunt: '/env/wraithwood_gloom_2k.hdr',
-  jungle: '/env/fen_day_2k.hdr',
-  garden: '/env/fen_day_2k.hdr',
-  gale: '/env/fen_day_2k.hdr',
+  jungle: '/env/palmreach_day_2k.hdr',
+  garden: '/env/evergarden_day_2k.hdr',
+  gale: '/env/galecrest_day_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
@@ -103,9 +110,9 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   fen: '/env/fen_day_1k.hdr',
   night: '/env/nightbloom_dream_1k.hdr',
   haunt: '/env/wraithwood_gloom_1k.hdr',
-  jungle: '/env/fen_day_1k.hdr',
-  garden: '/env/fen_day_1k.hdr',
-  gale: '/env/fen_day_1k.hdr',
+  jungle: '/env/palmreach_day_1k.hdr',
+  garden: '/env/evergarden_day_1k.hdr',
+  gale: '/env/galecrest_day_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -188,18 +195,20 @@ const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
   gale: 0,
 };
 
-// How strongly the painted horizon backdrop shows per biome. The dusk realm
-// drops it entirely: its border mountains are real geometry and its open sea
-// must meet clear sky at the horizon, not a painted mountain ring.
+// How strongly the painted horizon backdrop shows per biome. At 1 the painted
+// panorama REPLACES the HDRI across the whole dome, so every zone now drops it
+// (0): the project HDRI skies are the one sky source everywhere, matching the
+// realms, whose border mountains are real geometry and whose open sea must
+// meet clear sky at the horizon, not a painted mountain ring.
 const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
-  vale: 1,
-  marsh: 1,
-  peaks: 1,
-  // paint-only biomes reuse the painted backdrop of their aliased base sky
-  beach: 1,
-  desert: 1,
-  volcano: 1,
-  cave: 1,
+  vale: 0,
+  marsh: 0,
+  peaks: 0,
+  // paint-only biomes alias the southern zones and follow them
+  beach: 0,
+  desert: 0,
+  volcano: 0,
+  cave: 0,
   dusk: 0,
   ember: 0,
   frost: 0,
@@ -301,9 +310,9 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   fen: 0.497,
   night: 0.324, // the dream sky's low sun over its glowing sea
   haunt: 0.282, // the storm sky's dying sun on the horizon
-  jungle: 0.497, // shared with the fen's day sky while borrowed
-  garden: 0.497, // shared with the fen's day sky while borrowed
-  gale: 0.497, // shared with the fen's day sky while borrowed
+  jungle: 0.497, // own sky (sunless source): rotation kept at the fen's value
+  garden: 0.497, // own sky (sunless source): rotation kept at the fen's value
+  gale: 0.497, // own sky (sunless source): rotation kept at the fen's value
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
@@ -378,6 +387,8 @@ export interface SkyView {
   setCameraPos(x: number, z: number, dt: number): void;
   /** per-channel day/night multiplier on the dome color (1,1,1 = full day) */
   setDayNight(mul: readonly [number, number, number]): void;
+  /** current scene fog color: drives the dome's horizon fog band */
+  setFog(color: THREE.Color): void;
   /** set the star-field strength (0 day, 1 deep night) and the current time in
    *  seconds (for star twinkle). The sun/moon discs are sprites, not dome-drawn. */
   setStars(starAmt: number, time: number): void;
@@ -409,8 +420,8 @@ const SKY_FRAG = /* glsl */ `
   uniform float uMix;
   uniform float uOffA; // equirect u offset aligning the HDRI sun azimuth
   uniform float uOffB;
-  uniform vec2 uTuneA; // x: radiance gain, y: clamp (bloom economy)
-  uniform vec2 uTuneB;
+  uniform vec3 uTuneA; // x: radiance gain, y: clamp (bloom economy), z: contrast
+  uniform vec3 uTuneB;
   uniform float uStarAmt; // 0 day, 1 deep night: star-field strength
   uniform float uTime;    // seconds, for star twinkle
   uniform sampler2D uBackdropA;
@@ -423,18 +434,24 @@ const SKY_FRAG = /* glsl */ `
   uniform vec3 uTintA; // per-biome dome grade (white = untouched)
   uniform vec3 uTintB;
   uniform vec3 uDayNight; // day/night grade (white = full day, dark blue = night)
+  uniform vec3 uFog; // current scene fog color (biome + day/night graded)
   uniform float uLiftA; // 1 = mask the HDRI's photographed horizon hills
   uniform float uLiftB;
   varying vec3 vDir;
 
-  vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec2 tune, float lift) {
+  vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec3 tune, float lift) {
     // lift resamples low view angles from just above the photographed ridge
     // line, dissolving the HDRI's baked-in horizon hills into clean sky
     float y = mix(dir.y, 0.26, lift * smoothstep(0.24, -0.06, dir.y));
     vec2 uv = vec2(
       atan(dir.z, dir.x) * 0.15915494 + 0.5 + uOff,
       asin(clamp(y, -1.0, 1.0)) * 0.31830989 + 0.5);
-    return min(texture2D(map, uv).rgb * tune.x, vec3(tune.y));
+    vec3 c = texture2D(map, uv).rgb * tune.x;
+    // per-biome contrast around a fixed pivot just under the cloud whites:
+    // deepens the open sky between clouds and spreads cloud shading back out
+    // before the ACES highlight shoulder compresses it flat
+    c = 0.8 * pow(max(c, vec3(0.0)) / 0.8, vec3(tune.z));
+    return min(c, vec3(tune.y));
   }
 
   float hash12(vec2 p) {
@@ -492,6 +509,17 @@ const SKY_FRAG = /* glsl */ `
       float upper = smoothstep(-0.02, 0.2, dir.y);                  // no stars below the horizon
       c += vec3(0.9, 0.93, 1.0) * star * upper * uStarAmt;
     }
+    // Horizon fog band: blend the dome into the scene's fog color at low view
+    // angles, so fully fogged geometry (far trees, unloaded land, distant
+    // mobs) melts into the sky instead of standing above the haze wall as
+    // cutouts. Fogged geometry lands at EXACTLY the fog color, so the band
+    // must hold the dome at 100% fog across the whole elevation range where
+    // fogged skylines appear (treetops and hill crests reach ~6 degrees at
+    // the shortest realm fog range), otherwise the sky share left in the mix
+    // shows them as flat cutouts against a brighter horizon. Solid to ~6
+    // degrees, then fade to clear sky by ~21 degrees for the taller stuff
+    // (a neighbor realm's coast trees seen across a strait).
+    c = mix(uFog, c, smoothstep(0.1, 0.36, dir.y));
     gl_FragColor = vec4(c, 1.0);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -574,6 +602,7 @@ export function buildSky(
       dome,
       setCameraPos: () => {},
       setDayNight: () => {},
+      setFog: () => {},
       setStars: () => {},
       envTexture: () => null,
       envRotationY: () => 0,
@@ -583,8 +612,8 @@ export function buildSky(
 
   const sun = sunDir.clone().normalize();
   const backdropsReady = hasBackdropAssets(startBiomes);
-  const tuneVec = (b: BiomeId): THREE.Vector2 =>
-    new THREE.Vector2(HDRI_TUNE[b].gain, HDRI_TUNE[b].clamp);
+  const tuneVec = (b: BiomeId): THREE.Vector3 =>
+    new THREE.Vector3(HDRI_TUNE[b].gain, HDRI_TUNE[b].clamp, HDRI_TUNE[b].contrast ?? 1);
   const tintVec = (b: BiomeId): THREE.Vector3 => new THREE.Vector3(...BIOME_TINT[b]);
   const backdropTex = (b: BiomeId): THREE.Texture =>
     (backdropsReady ? backdropStore[b] : hdriStore[b]) as THREE.Texture;
@@ -608,6 +637,7 @@ export function buildSky(
     uTintA: { value: tintVec(start.from) },
     uTintB: { value: tintVec(start.to) },
     uDayNight: { value: new THREE.Vector3(1, 1, 1) },
+    uFog: { value: new THREE.Color(0x7095bd) },
     uLiftA: { value: BIOME_HORIZON_LIFT[start.from] },
     uLiftB: { value: BIOME_HORIZON_LIFT[start.to] },
   };
@@ -658,6 +688,9 @@ export function buildSky(
     setDayNight(mul: readonly [number, number, number]): void {
       uniforms.uDayNight.value.set(mul[0], mul[1], mul[2]);
     },
+    setFog(color: THREE.Color): void {
+      uniforms.uFog.value.copy(color);
+    },
     setStars(starAmt: number, time: number): void {
       uniforms.uStarAmt.value = starAmt;
       uniforms.uTime.value = time;
@@ -675,60 +708,4 @@ export function buildSky(
     },
     biomeAt: biomeBlendAt,
   };
-}
-
-export interface CloudLayer {
-  sprites: THREE.Sprite[];
-}
-
-// Cloud sprites. Low tier keeps the full painted layer over its gradient
-// dome. High tier: the HDRIs carry photographic cloud cover, so the cumulus
-// sprite deck is retired — only a faint, slow cirrus layer remains for
-// parallax/motion against the static sky.
-export function buildClouds(lowGfx: boolean): CloudLayer {
-  const variants = lowGfx
-    ? [cloudTexture()]
-    : [cloudTexture(14, 0.5), cloudTexture(8, 0.7), cloudTexture(20, 0.42)];
-  const sprites: THREE.Sprite[] = [];
-  const span = WORLD_MAX_Z - WORLD_MIN_Z + 240;
-
-  const spawn = (
-    count: number,
-    yMin: number,
-    yMax: number,
-    baseOpacity: number,
-    drift: number,
-    scaleMin: number,
-    scaleMax: number,
-  ): void => {
-    for (let i = 0; i < count; i++) {
-      const y = yMin + Math.random() * (yMax - yMin);
-      // higher clouds thin out
-      const altFade = 1 - 0.35 * ((y - yMin) / Math.max(1, yMax - yMin));
-      const mat = new THREE.SpriteMaterial({
-        map: variants[i % variants.length],
-        transparent: true,
-        opacity: baseOpacity * altFade,
-        fog: false,
-        depthWrite: false,
-      });
-      const sprite = new THREE.Sprite(mat);
-      const sc = scaleMin + Math.random() * (scaleMax - scaleMin);
-      sprite.scale.set(sc, sc * 0.45, 1);
-      sprite.position.set(
-        (Math.random() - 0.5) * 1200,
-        y,
-        WORLD_MIN_Z - 120 + Math.random() * span,
-      );
-      sprite.userData.drift = drift;
-      sprites.push(sprite);
-    }
-  };
-
-  if (lowGfx) {
-    spawn(14, 95, 150, 0.85, 1.6, 60, 150);
-  } else {
-    spawn(5, 165, 195, 0.3, 0.55, 140, 240); // high slow cirrus layer only
-  }
-  return { sprites };
 }

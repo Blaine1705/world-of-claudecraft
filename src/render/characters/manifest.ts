@@ -357,49 +357,70 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/knight/alt_a.png`,
     `${SKINS_DIR}/knight/alt_b.png`,
     `${SKINS_DIR}/knight/alt_c.png`,
+    `${SKINS_DIR}/knight/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/knight/alt_suit_chrome.png`,
   ],
-  player_paladin: [null, `${SKINS_DIR}/paladin/alt_a.png`],
+  player_paladin: [
+    null,
+    `${SKINS_DIR}/paladin/alt_a.png`,
+    `${SKINS_DIR}/paladin/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/paladin/alt_suit_chrome.png`,
+  ],
   player_hunter: [
     null,
     `${SKINS_DIR}/ranger/alt_a.png`,
     `${SKINS_DIR}/ranger/alt_b.png`,
     `${SKINS_DIR}/ranger/alt_c.png`,
+    `${SKINS_DIR}/ranger/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/ranger/alt_suit_chrome.png`,
   ],
   player_rogue: [
     null,
     `${SKINS_DIR}/rogue/alt_a.png`,
     `${SKINS_DIR}/rogue/alt_b.png`,
     `${SKINS_DIR}/rogue/alt_c.png`,
+    `${SKINS_DIR}/rogue/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/rogue/alt_suit_chrome.png`,
   ],
   player_priest: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_mage: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_warlock: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_shaman: [
     null,
     `${SKINS_DIR}/barbarian/alt_a.png`,
     `${SKINS_DIR}/barbarian/alt_b.png`,
     `${SKINS_DIR}/barbarian/alt_c.png`,
+    `${SKINS_DIR}/barbarian/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/barbarian/alt_suit_chrome.png`,
   ],
   player_druid: [
     null,
     `${SKINS_DIR}/druid/alt_a.png`,
     `${SKINS_DIR}/druid/alt_b.png`,
     `${SKINS_DIR}/druid/alt_c.png`,
+    `${SKINS_DIR}/druid/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/druid/alt_suit_chrome.png`,
   ],
   // Combat Mech chromas — every index is a real full-model texture (no null
   // default; the embedded base texture is not one of the rewards).
@@ -603,6 +624,28 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // The Gleamfolk pixie villager (Veiled Hollow): Tripo biped from the user's
+  // game-style concept, auto-rigged, clips renamed to the game vocabulary at
+  // bake time. A light entity tint gives individual villagers variety.
+  mob_mushroom_pixie: {
+    url: `${CREATURES}/mushroom_pixie.glb`,
+    height: HUMANOID_H, // villagers stand player-height, cap and all
+    // The Tripo rig rests facing +x; yaw swings the model onto the game's
+    // +z-forward convention so walking and combat face the right way.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
   greyjaw: {
     // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton;
     // clips renamed to the animal() names at bake time. Baked texture, no tint.
@@ -662,6 +705,33 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: animal(['Attack_Headbutt', 'Attack']),
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  // the Veiled Hollow stags: the shipped stag rig repainted to the approved
+  // concepts (tmp/make_hollow_stags.mjs): dusk coats baked into the materials
+  // and the antlers split onto their own emissive amethyst material, so no
+  // entity tint (a wash would muddy the baked palette and the antler glow)
+  mob_veiled_stag: {
+    url: `${CREATURES}/veiled_stag.glb`,
+    height: 1.9,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  mob_gleamstag: {
+    url: `${CREATURES}/gleamstag.glb`,
+    height: 1.9,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  // the does: the same rig with the antler mesh removed and a softer coat
+  mob_veiled_doe: {
+    url: `${CREATURES}/veiled_doe.glb`,
+    height: 1.6,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  // Aurelhorn keeps the bull's bulk (height) but joins the herd's species:
+  // the same repainted stag rig in the patriarch's gold
+  mob_aurelhorn: {
+    url: `${CREATURES}/aurelhorn.glb`,
+    height: 2.1,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
   },
   // Deepfen Spearjaw (The Drowned Litany): unused Quaternius raptor rig, a
   // toothy quadruped that reads far more like a swamp predator than the
@@ -811,9 +881,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.3,
   },
-  // the Veiled Hollow's spirits and wisps: the ghost rig, entity-tinted so
-  // the rose glimmerwisps, violet duskwisps, and teal hollow spirits read as
-  // one ethereal family unlike anything in the outer three zones
+  // the Veiled Hollow's spirits: the ghost rig, entity-tinted (teal hollow
+  // remnants and the ice wisp still wear it)
   mob_ghost: {
     url: `${CREATURES}/ghost.glb`,
     height: 1.6,
@@ -821,6 +890,25 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.55,
+  },
+  // the Hollow wisps: bespoke static meshes from the approved concepts
+  // (user-generated via Tripo). No rig on purpose: they drift and hover,
+  // and every clip lookup null-guards, so FLOATING names simply no-op.
+  // Baked palettes, so no entity tint. Front faces +x off the generator;
+  // yaw turns it to the +z game convention.
+  mob_glimmerwisp: {
+    url: `${CREATURES}/glimmerwisp.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    yaw: -Math.PI / 2,
+  },
+  mob_duskwisp: {
+    url: `${CREATURES}/duskwisp.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    yaw: -Math.PI / 2,
   },
   // spore-borne mushroom folk: the glub blob drifting just above the glade
   mob_glub: {
@@ -1236,24 +1324,25 @@ const MOB_KEYS: Record<string, string> = {
   // wolf; the court guardians borrow the golem rig as stone constructs; the
   // spirits, mushroom folk, and treants get realm-only rigs (ghost, glub,
   // yeti) that appear nowhere in the outer three zones
-  veiled_stag: 'mob_stag',
-  gleamstag: 'mob_stag',
+  veiled_stag: 'mob_veiled_stag',
+  veiled_doe: 'mob_veiled_doe',
+  gleamstag: 'mob_gleamstag',
   gilded_stag: 'mob_stag',
   gloam_fox: 'mob_fox',
   orchard_treant: 'mob_treant',
   lily_wisp: 'mob_ghost',
   ancient_guardian: 'skel_golem',
   waking_warden: 'skel_golem',
-  glimmerwisp: 'mob_ghost',
-  duskwisp: 'mob_ghost',
-  hollow_spirit: 'mob_ghost',
+  glimmerwisp: 'mob_glimmerwisp',
+  duskwisp: 'mob_duskwisp',
   ice_wisp: 'mob_ghost',
   frostmane_yeti: 'mob_yeti',
   sporeling_gatherer: 'mob_glub',
   corrupted_sporeling: 'mob_glub',
+  mushroom_pixie: 'mob_mushroom_pixie',
   treant_elder: 'mob_treant',
   old_marrowshell: 'mob_crab',
-  aurelhorn: 'mob_bull',
+  aurelhorn: 'mob_aurelhorn',
   // the Nightbloom: silver herds, night-running raptors, hovering star folk;
   // the Barrow King borrows the armored skeleton the other revenants wear
   moonfleece_grazer: 'mob_alpaca',

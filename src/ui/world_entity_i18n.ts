@@ -133,11 +133,12 @@ const MOB_IDS = [
   // the Veiled Hollow
   'glimmerwisp',
   'duskwisp',
-  'hollow_spirit',
   'veiled_stag',
+  'veiled_doe',
   'gleamstag',
   'sporeling_gatherer',
   'corrupted_sporeling',
+  'mushroom_pixie',
   'treant_elder',
   'ancient_guardian',
   'waking_warden',

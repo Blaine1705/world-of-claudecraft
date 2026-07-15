@@ -8481,11 +8481,11 @@ export const ja_JP: EnTranslations = {
       "duskwisp": {
         "name": "ダスクウィスプ"
       },
-      "hollow_spirit": {
-        "name": "幽谷の精霊"
-      },
       "veiled_stag": {
         "name": "ヴェールの牡鹿"
+      },
+      "veiled_doe": {
+        "name": "ヴェールの雌鹿"
       },
       "gleamstag": {
         "name": "グリームスタッグ"
@@ -8495,6 +8495,9 @@ export const ja_JP: EnTranslations = {
       },
       "corrupted_sporeling": {
         "name": "堕落したスポアリング"
+      },
+      "mushroom_pixie": {
+        "name": "グリームフォーク・ピクシー"
       },
       "treant_elder": {
         "name": "トレントの長老"

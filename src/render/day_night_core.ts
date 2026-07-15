@@ -58,10 +58,11 @@ export const NEUTRAL_DAY_GRADE: DayNightGrade = {
 // Night targets. The floor stays moonlit, not black, so a neutral realm at
 // deepest night still reads and stays playable, but the sky itself goes a deep
 // dark blue so the moon and stars stand out against it; the fog is a touch
-// lighter than the sky for readability.
-const NIGHT_LIGHT_FLOOR = 0.26;
-const NIGHT_SKY: [number, number, number] = [0.07, 0.09, 0.21];
-const NIGHT_FOG: [number, number, number] = [0.2, 0.26, 0.42];
+// lighter than the sky for readability. Tuned darker than the first pass
+// (floor 0.26, sky 0.07/0.09/0.21) so night actually feels like night.
+const NIGHT_LIGHT_FLOOR = 0.18;
+const NIGHT_SKY: [number, number, number] = [0.045, 0.06, 0.15];
+const NIGHT_FOG: [number, number, number] = [0.14, 0.18, 0.31];
 const NIGHT_FAR_SCALE = 0.82;
 // Day targets. Deliberately held well under white: the shipped HDRIs are bright
 // day skies that bloom out to a jarring white at full strength, so the peak of
