@@ -151,7 +151,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.few",
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
-    "hudChrome.plurals.finderPartySize.other"
+    "hudChrome.plurals.finderPartySize.other",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "es_ES": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -295,7 +297,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.few",
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
-    "hudChrome.plurals.finderPartySize.other"
+    "hudChrome.plurals.finderPartySize.other",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "fr_FR": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -439,7 +443,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.few",
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
-    "hudChrome.plurals.finderPartySize.other"
+    "hudChrome.plurals.finderPartySize.other",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "fr_CA": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -583,7 +589,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.few",
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
-    "hudChrome.plurals.finderPartySize.other"
+    "hudChrome.plurals.finderPartySize.other",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "en_CA": [],
   "it_IT": [
@@ -728,7 +736,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.few",
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
-    "hudChrome.plurals.finderPartySize.other"
+    "hudChrome.plurals.finderPartySize.other",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "de_DE": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -872,7 +882,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.few",
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
-    "hudChrome.plurals.finderPartySize.other"
+    "hudChrome.plurals.finderPartySize.other",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "zh_CN": [
     "hudChrome.discord.roleTag.legend",
@@ -1040,7 +1052,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.few",
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
-    "hudChrome.plurals.finderPartySize.other"
+    "hudChrome.plurals.finderPartySize.other",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "ru_RU": [
     "hudChrome.discord.roleTag.legend",
@@ -1227,7 +1241,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
     "hudChrome.plurals.finderPartySize.other",
-    "itemUi.kind.mount"
+    "itemUi.kind.mount",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "nl_NL": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -1408,7 +1424,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
     "hudChrome.plurals.finderPartySize.other",
-    "itemUi.kind.mount"
+    "itemUi.kind.mount",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "pl_PL": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -1589,7 +1607,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
     "hudChrome.plurals.finderPartySize.other",
-    "itemUi.kind.mount"
+    "itemUi.kind.mount",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "id_ID": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -1770,7 +1790,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
     "hudChrome.plurals.finderPartySize.other",
-    "itemUi.kind.mount"
+    "itemUi.kind.mount",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "tr_TR": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -1951,7 +1973,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
     "hudChrome.plurals.finderPartySize.other",
-    "itemUi.kind.mount"
+    "itemUi.kind.mount",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "sv_SE": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -2132,7 +2156,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
     "hudChrome.plurals.finderPartySize.other",
-    "itemUi.kind.mount"
+    "itemUi.kind.mount",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "vi_VN": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -2313,7 +2339,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
     "hudChrome.plurals.finderPartySize.other",
-    "itemUi.kind.mount"
+    "itemUi.kind.mount",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ],
   "da_DK": [
     "abilityUi.actionBar.attackRemoveHint",
@@ -2494,6 +2522,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.finderPartySize.many",
     "hudChrome.plurals.finderPartySize.one",
     "hudChrome.plurals.finderPartySize.other",
-    "itemUi.kind.mount"
+    "itemUi.kind.mount",
+    "loading.realmFull",
+    "loading.tooManyConnections"
   ]
 };
