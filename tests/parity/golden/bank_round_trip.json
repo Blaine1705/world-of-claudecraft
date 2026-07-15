@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 661,
+      "nextId": 666,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 662,
-      "state": "9f71f8d9",
-      "events": "597bcf3e",
+      "nextId": 667,
+      "state": "6fa5a841",
+      "events": "7a09e0eb",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -69,7 +69,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -108,7 +108,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -151,8 +151,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 662,
-      "state": "2d4bdd59",
+      "nextId": 667,
+      "state": "5dec0b61",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -200,7 +200,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -239,7 +239,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -282,8 +282,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 662,
-      "state": "a20aa913",
+      "nextId": 667,
+      "state": "4188070f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -331,7 +331,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -366,7 +366,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -409,8 +409,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 662,
-      "state": "30476bed",
+      "nextId": 667,
+      "state": "0e792439",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -458,7 +458,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -497,7 +497,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -540,8 +540,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 662,
-      "state": "b9af20b7",
+      "nextId": 667,
+      "state": "351656a3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -582,7 +582,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -621,7 +621,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -664,9 +664,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 662,
-      "state": "76418079",
-      "events": "cf099dd9",
+      "nextId": 667,
+      "state": "606779fb",
+      "events": "960b57b8",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -708,7 +708,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -747,7 +747,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -790,9 +790,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 662,
-      "state": "fcc3a8c5",
-      "events": "826174a7",
+      "nextId": 667,
+      "state": "7e488503",
+      "events": "8d8680e1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -844,7 +844,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -884,7 +884,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.1,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

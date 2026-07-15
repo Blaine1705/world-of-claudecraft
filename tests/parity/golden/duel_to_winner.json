@@ -8,13 +8,13 @@
     "updateDuels countdown -> active + duelStart",
     "endDuel on a PvP finishing blow (winner/loser + this.duels cleared)"
   ],
-  "draws": 482,
-  "drawDigest": "49b0ebaf",
+  "draws": 494,
+  "drawDigest": "a53deb86",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 661,
+      "nextId": 666,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 663,
-      "state": "20f48ae4",
-      "events": "4e0f74d1",
+      "nextId": 668,
+      "state": "9898bfdc",
+      "events": "243d6fa4",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 663,
-      "state": "9891d63c",
-      "events": "b47ae902",
+      "nextId": 668,
+      "state": "375a84fc",
+      "events": "ab510cfe",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -50,23 +50,23 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 663,
-      "state": "bba0816c",
-      "events": "172f8cd0",
+      "nextId": 668,
+      "state": "2daf15d0",
+      "events": "98e259cc",
       "rng": {
-        "draws": 125,
-        "digest": "bc431319"
+        "draws": 128,
+        "digest": "b2a5360f"
       }
     },
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 663,
-      "state": "71622f4e",
-      "events": "8ac11df5",
+      "nextId": 668,
+      "state": "ddc01c0e",
+      "events": "4dd082d5",
       "rng": {
-        "draws": 140,
-        "digest": "35dc179a"
+        "draws": 142,
+        "digest": "e88449bc"
       },
       "label": "duel-active",
       "players": [
@@ -102,7 +102,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -157,7 +157,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 662,
+          "entityId": 667,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -196,7 +196,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -244,7 +244,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 54,
-          "id": 662,
+          "id": 667,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -288,12 +288,12 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 663,
-      "state": "ccc86f77",
-      "events": "16eba5f4",
+      "nextId": 668,
+      "state": "a53eb373",
+      "events": "84db42a4",
       "rng": {
-        "draws": 140,
-        "digest": "35dc179a"
+        "draws": 142,
+        "digest": "e88449bc"
       },
       "label": "duel-ended",
       "players": [
@@ -332,7 +332,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -389,7 +389,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 662,
+          "entityId": 667,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -428,7 +428,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -476,7 +476,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 1,
-          "id": 662,
+          "id": 667,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -520,34 +520,34 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 663,
-      "state": "7f2d90e4",
-      "events": "c63ea5b9",
+      "nextId": 668,
+      "state": "720fc782",
+      "events": "c8e20b87",
       "rng": {
-        "draws": 275,
-        "digest": "ddf59d10"
+        "draws": 286,
+        "digest": "b067ae94"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 663,
-      "state": "abe7979c",
+      "nextId": 668,
+      "state": "ef43755e",
       "events": "741638a5",
       "rng": {
-        "draws": 477,
-        "digest": "a15695e3"
+        "draws": 486,
+        "digest": "7b968630"
       }
     },
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 663,
-      "state": "b0621372",
+      "nextId": 668,
+      "state": "fe020af4",
       "events": "741638a5",
       "rng": {
-        "draws": 482,
-        "digest": "49b0ebaf"
+        "draws": 494,
+        "digest": "a53deb86"
       },
       "label": "final",
       "players": [
@@ -592,7 +592,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -656,7 +656,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 662,
+          "entityId": 667,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -696,7 +696,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 104.05,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -744,7 +744,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 104.05,
           "hp": 7,
-          "id": 662,
+          "id": 667,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

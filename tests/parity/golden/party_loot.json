@@ -8,12 +8,12 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "169ed4c1",
+  "drawDigest": "b4523af3",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 661,
+      "nextId": 666,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,12 +27,12 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 664,
-      "state": "5d0a57dc",
-      "events": "a63f9573",
+      "nextId": 669,
+      "state": "952a24b6",
+      "events": "495fc4a9",
       "rng": {
         "draws": 2,
-        "digest": "169ed4c1"
+        "digest": "b4523af3"
       },
       "label": "final",
       "players": [
@@ -60,6 +60,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "greyjaw_hide_boots",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -72,7 +73,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 661,
+          "entityId": 666,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -84,6 +85,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,
@@ -121,7 +126,6 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "greyjaw_hide_boots",
               "spring_water"
             ]
           },
@@ -133,7 +137,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 662,
+          "entityId": 667,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -149,10 +153,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,
@@ -177,7 +177,7 @@
           "fallStartY": 0.860353,
           "fiveSecondRule": 99.15,
           "hp": 90,
-          "id": 661,
+          "id": 666,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -226,7 +226,7 @@
           "fallStartY": 0.639595,
           "fiveSecondRule": 99.15,
           "hp": 54,
-          "id": 662,
+          "id": 667,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -278,7 +278,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 663,
+          "id": 668,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -303,7 +303,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 661,
+          "tappedById": 666,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
