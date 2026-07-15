@@ -59,6 +59,7 @@ describe('isDebuffAura', () => {
       'form_cat',
       'form_moonkin',
       'form_shadow',
+      'form_fireball',
       'stealth',
       'defensive_stance',
       'righteous_fury',

@@ -214,6 +214,7 @@ export type AuraKind =
   | 'form_bear'
   | 'form_cat'
   | 'form_travel'
+  | 'form_fireball'
   | 'form_moonkin'
   | 'form_shadow'
   // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,

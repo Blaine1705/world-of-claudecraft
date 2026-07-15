@@ -582,6 +582,7 @@ export const guideStrings = {
     lightning_shield: 'Charges you so attackers take Nature damage when they hit you.',
     flame_shock: 'An instant burn that hits up front and keeps searing over time.',
     fireball: 'Your main fire nuke, lands a hit and leaves the target burning.',
+    fireball_form: 'Become a living ember to cross open ground at high speed.',
     frost_armor: 'A lasting self-buff that hardens your armor before a fight.',
     arcane_intellect: "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
     frostbolt: 'Strikes from range and slows the target so it cannot close on you.',

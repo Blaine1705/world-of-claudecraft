@@ -1083,6 +1083,7 @@ export const zh_TW: EnTranslations = {
       "formBear": "巨熊形態：生命值與護甲提高",
       "formCat": "貓形態：近戰傷害與能量",
       "formTravel": "迅捷形態：移動速度提高 {pct}%",
+      "formFireball": "火球形態：移動速度提高 {pct}%；無法攻擊或施法",
       "defensiveStance": "戒備姿態：受到的傷害降低，威脅值提高",
       "battleStance": "戰鬥姿態：怒氣產生提高 10%",
       "berserkerStance": "狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%",
@@ -2064,6 +2065,7 @@ export const zh_TW: EnTranslations = {
       "lightning_shield": "為自己充能，攻擊者打中你時會受到自然傷害。",
       "flame_shock": "瞬發灼燒，先給予一記前置傷害並持續灼燒。",
       "fireball": "你主要的火焰核彈，命中後讓目標持續燃燒。",
+      "fireball_form": "化身為活體火球，高速穿越開闊地帶。",
       "frost_armor": "持續的自我增益，在戰鬥前強化你的護甲。",
       "arcane_intellect": "提升智力以擴大友方的法力上限，開怪前先施放。",
       "frostbolt": "從遠處攻擊並使目標減速，讓它無法逼近你。",
@@ -5233,6 +5235,10 @@ export const zh_TW: EnTranslations = {
       "fireball": {
         "name": "燼焰彈",
         "description": "投擲一團火球，造成 {damage} 點火焰傷害，並附加持續傷害。"
+      },
+      "fireball_form": {
+        "name": "火球形態",
+        "description": "化身為熾烈火球，移動速度提高 {buff}%。變形期間無法攻擊或施放法術。再次施放可恢復正常形態。"
       },
       "frost_armor": {
         "name": "白霜披風",

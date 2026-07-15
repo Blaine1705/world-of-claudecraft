@@ -57,7 +57,7 @@ import { isRootedOrChilled } from './cc';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
-import { isFormAuraKind } from './forms';
+import { isFormAuraKind, isTravelFormAuraKind } from './forms';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
@@ -1694,7 +1694,7 @@ export function runEffects(
             break;
           }
         }
-        if (eff.kind === 'stasis') {
+        if (eff.kind === 'stasis' || isTravelFormAuraKind(eff.kind)) {
           if (p.castingAbility) ctx.cancelCast(p);
           p.autoAttack = false;
         }

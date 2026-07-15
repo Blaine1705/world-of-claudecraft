@@ -2252,6 +2252,16 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   overpower: r('fury', 'gold', ['sword', { p: 'sunburst', ...TL }]),
   // mage
   fireball: r('fire', 'ember', ['bolt', { p: 'flame', ...BR }], ['glow']),
+  fireball_form: r(
+    'fire',
+    'gold',
+    [
+      { p: 'sunburst', s: 1.08 },
+      { p: 'flame', x: -10, s: 0.76 },
+      { p: 'flame', x: 10, s: 0.76, rot: 0.38 },
+    ],
+    ['glow', 'motion', 'sparkle'],
+  ),
   pyroblast: r(
     'fire',
     'ember',
@@ -3391,6 +3401,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   // aeromancer unused, mage has no wind). conjure_food and polymorph have no fit (no
   // bread/food or sheep art) and stay procedural.
   'fireball',
+  'fireball_form',
+  'counterspell',
   'frost_armor',
   'arcane_intellect',
   'frostbolt',

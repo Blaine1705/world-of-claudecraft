@@ -223,6 +223,8 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.formCat` };
     case 'form_travel':
       return { key: `${KEY}.formTravel`, nums: { pct: pctFromMult(a.value) } };
+    case 'form_fireball':
+      return { key: `${KEY}.formFireball`, nums: { pct: pctFromMult(a.value) } };
     case 'battle_stance':
       return { key: `${KEY}.battleStance` };
     case 'berserker_stance':

@@ -53,6 +53,7 @@ import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
+import { isTravelFormAuraKind } from './forms';
 import { rangedShotProfile } from './ranged_shot';
 import { onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
@@ -72,6 +73,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const p = r.e;
   if (p.dead) return;
   if (isInStasis(p)) return;
+  if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   if (!t || t.dead || !ctx.isHostileTo(p, t)) {
     ctx.error(p.id, 'Invalid attack target.');
@@ -116,6 +118,10 @@ export function stopAutoAttack(ctx: SimContext, pid?: number): void {
 export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
+    p.autoAttack = false;
+    return;
+  }
   if (!p.autoAttack || p.castingAbility) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   if (!t || t.dead || !ctx.isHostileTo(p, t)) {

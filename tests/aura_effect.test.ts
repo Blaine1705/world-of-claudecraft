@@ -39,6 +39,13 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
+  it('describes Fireball Form without calling it the Druid travel form', () => {
+    expect(desc({ kind: 'form_fireball', value: 1.4 })).toEqual({
+      key: 'hudChrome.auraEffect.formFireball',
+      nums: { pct: 40 },
+    });
+  });
+
   it('distinguishes attack-speed slow from haste by the multiplier', () => {
     expect(desc({ kind: 'attackspeed', value: 1.2 })?.key).toBe(
       'hudChrome.auraEffect.attackSpeedSlow',

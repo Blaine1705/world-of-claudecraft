@@ -48,6 +48,7 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
   'form_moonkin',
   'form_shadow',
   'form_travel',
+  'form_fireball',
   'defensive_stance',
   'battle_stance',
   'berserker_stance',

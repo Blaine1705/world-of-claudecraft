@@ -126,6 +126,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frostbolt',
       'conjure_water',
       'conjure_food',
+      'counterspell',
       'fire_blast',
       'arcane_missiles',
       'polymorph',
@@ -135,6 +136,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'ice_barrier',
       'pyroblast',
       'flamestrike',
+      'fireball_form',
     ],
     color: 0x69ccf0,
   },
@@ -1301,6 +1303,21 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description: 'Hurls a fiery ball that causes $d Fire damage plus additional damage over time.',
+  },
+  fireball_form: {
+    id: 'fireball_form',
+    name: 'Ember Form',
+    class: 'mage',
+    learnLevel: 11,
+    cost: 50,
+    castTime: 2,
+    cooldown: 10,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'form_fireball', value: 1.4, duration: 3600 }],
+    description:
+      'Transform into a blazing ember, increasing movement speed by $b%. You cannot attack or cast spells while transformed. Recast to return to your normal form.',
   },
   frost_armor: {
     id: 'frost_armor',
@@ -5724,7 +5741,8 @@ function scaleEffect(
         eff.kind === 'buff_scale' ||
         eff.kind === 'buff_jump' ||
         eff.kind === 'mortal_wound' ||
-        eff.kind === 'vuln_source'
+        eff.kind === 'vuln_source' ||
+        eff.kind === 'form_fireball'
       ) {
         return eff;
       }

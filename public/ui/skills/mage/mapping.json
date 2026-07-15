@@ -17,6 +17,12 @@
       "output": "fireball.webp"
     },
     {
+      "abilityId": "fireball_form",
+      "sourcePack": "owner-provided",
+      "sourceFile": "owner-provided artwork (Fireball Form)",
+      "output": "fireball_form.webp"
+    },
+    {
       "abilityId": "frost_armor",
       "sourcePack": "cryomancer",
       "sourceFile": "16.png",
@@ -93,6 +99,12 @@
       "sourcePack": "_Missing_Mage",
       "sourceFile": "32.png",
       "output": "polymorph.webp"
+    },
+    {
+      "abilityId": "counterspell",
+      "sourcePack": "owner-provided",
+      "sourceFile": "owner-provided artwork (Counterspell)",
+      "output": "counterspell.webp"
     }
   ],
   "deferredStayProcedural": {}

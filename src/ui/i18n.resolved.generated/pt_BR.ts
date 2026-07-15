@@ -1083,6 +1083,7 @@ export const pt_BR: EnTranslations = {
       "formBear": "Forma de Bruin: vida e armadura aumentadas",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Forma de Fleet: velocidade de movimento aumentada em {pct}%",
+      "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "defensiveStance": "Postura de Guarda: dano recebido reduzido, mais ameaça",
       "battleStance": "Battle Stance: 10% more rage generation",
       "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
@@ -2064,6 +2065,7 @@ export const pt_BR: EnTranslations = {
       "lightning_shield": "Carrega você de modo que os atacantes sofram dano de Natureza ao acertá-lo.",
       "flame_shock": "Uma queimadura instantânea que acerta de cara e continua escaldando ao longo do tempo.",
       "fireball": "Sua principal magia de fogo, acerta um golpe e deixa o alvo em chamas.",
+      "fireball_form": "Become a living ember to cross open ground at high speed.",
       "frost_armor": "Um aprimoramento próprio duradouro que endurece sua armadura antes da luta.",
       "arcane_intellect": "Aumenta o Intelecto para ampliar a reserva de mana de um aliado; lance antes da puxada.",
       "frostbolt": "Atinge à distância e reduz a velocidade do alvo para que ele não chegue até você.",
@@ -5233,6 +5235,10 @@ export const pt_BR: EnTranslations = {
       "fireball": {
         "name": "Raio de Brasa",
         "description": "Arremessa uma bola flamejante que causa {damage} de dano de Fogo e dano adicional ao longo do tempo."
+      },
+      "fireball_form": {
+        "name": "Ember Form",
+        "description": "Transform into a blazing ember, increasing movement speed by {buff}%. You cannot attack or cast spells while transformed. Recast to return to your normal form."
       },
       "frost_armor": {
         "name": "Manto de Geada",

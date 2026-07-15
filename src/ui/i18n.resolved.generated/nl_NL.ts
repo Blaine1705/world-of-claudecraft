@@ -1083,6 +1083,7 @@ export const nl_NL: EnTranslations = {
       "formBear": "Bruingedaante: verhoogde gezondheid en pantser",
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleetgedaante: bewegingssnelheid verhoogd met {pct}%",
+      "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "defensiveStance": "Bewaakte Houding: minder ontvangen schade, meer dreiging",
       "battleStance": "Battle Stance: 10% more rage generation",
       "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
@@ -2064,6 +2065,7 @@ export const nl_NL: EnTranslations = {
       "lightning_shield": "Laadt je op zodat aanvallers Natuurschade oplopen wanneer ze je raken.",
       "flame_shock": "Een directe brand die vooraan inslaat en blijft schroeien na verloop van tijd.",
       "fireball": "Je belangrijkste vuurnuke, raakt hard en laat het doelwit branden.",
+      "fireball_form": "Become a living ember to cross open ground at high speed.",
       "frost_armor": "Een blijvende zelfbuff die je pantser verhardt voor een gevecht.",
       "arcane_intellect": "Verhoogt Intellect om de manapoel van een bondgenoot te verdiepen, spreek het uit voor de pull.",
       "frostbolt": "Slaat van afstand toe en vertraagt het doelwit zodat het niet op je kan inlopen.",
@@ -5233,6 +5235,10 @@ export const nl_NL: EnTranslations = {
       "fireball": {
         "name": "Sintelbout",
         "description": "Werpt een vurige bal die {damage} Vuurschade toebrengt plus extra schade over tijd."
+      },
+      "fireball_form": {
+        "name": "Ember Form",
+        "description": "Transform into a blazing ember, increasing movement speed by {buff}%. You cannot attack or cast spells while transformed. Recast to return to your normal form."
       },
       "frost_armor": {
         "name": "Rijpmantel",

@@ -1872,6 +1872,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
   'entities.abilities.fireball.name': 'Пепельная стрела',
+  'entities.abilities.fireball_form.name': 'Облик огненного шара',
+  'entities.abilities.fireball_form.description':
+    'Превращает вас в пылающий огненный шар и повышает скорость передвижения на {buff}%. В этом облике нельзя атаковать и применять заклинания. Повторное применение возвращает обычный облик.',
   'entities.abilities.rain_of_fire.name': 'Огненный дождь',
   'entities.abilities.rain_of_fire.description':
     'Обрушивает огненный дождь на указанную область на 4 сек., сжигая врагов и нанося {damage} ед. урона от огня каждую секунду.',
@@ -4600,6 +4603,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.eviscerate':
     'Тратит набранные серии приемов, чтобы добить цель всплеском урона.',
   'guide.abilityHook.fireball': 'Ваш основной огненный удар: бьет по цели и оставляет ее гореть.',
+  'guide.abilityHook.fireball_form':
+    'Превращает вас в живой огненный шар для быстрого движения по открытой местности.',
   'guide.abilityHook.flame_shock':
     'Мгновенный поджог, который бьет сразу и продолжает жечь со временем.',
   'guide.abilityHook.frost_armor':
@@ -5449,6 +5454,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',
   'hudChrome.auraEffect.slow': 'Снижает скорость передвижения на {pct}%',
   'hudChrome.auraEffect.speed': 'Повышает скорость передвижения на {pct}%',
+  'hudChrome.auraEffect.formFireball':
+    'Облик огненного шара: скорость повышена на {pct}%; атаки и заклинания недоступны',
   'hudChrome.auraEffect.attackSpeedSlow': 'Замедляет скорость атаки на {pct}%',
   'hudChrome.auraEffect.attackSpeedFast': 'Повышает скорость атаки на {pct}%',
   'hudChrome.auraEffect.haste': 'Повышает скорость атаки и произнесения заклинаний на {pct}%',

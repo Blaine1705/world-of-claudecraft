@@ -1771,6 +1771,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。',
   'entities.abilities.fireball.name': '燼焰彈',
+  'entities.abilities.fireball_form.name': '火球形態',
+  'entities.abilities.fireball_form.description':
+    '化身為熾烈火球，移動速度提高 {buff}%。變形期間無法攻擊或施放法術。再次施放可恢復正常形態。',
   'entities.abilities.rain_of_fire.name': '烈火之雨',
   'entities.abilities.rain_of_fire.description':
     '在目標區域降下烈火之雨，持續 4 秒，每秒灼燒敵人造成 {damage} 點火焰傷害。',
@@ -4313,6 +4316,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.earth_shock': '瞬發震擊，在你需要時立即造成自然傷害。',
   'guide.abilityHook.eviscerate': '消耗連擊點，以一波爆發了結目標。',
   'guide.abilityHook.fireball': '你主要的火焰核彈，命中後讓目標持續燃燒。',
+  'guide.abilityHook.fireball_form': '化身為活體火球，高速穿越開闊地帶。',
   'guide.abilityHook.flame_shock': '瞬發灼燒，先給予一記前置傷害並持續灼燒。',
   'guide.abilityHook.frost_armor': '持續的自我增益，在戰鬥前強化你的護甲。',
   'guide.abilityHook.frostbolt': '從遠處攻擊並使目標減速，讓它無法逼近你。',
@@ -5086,6 +5090,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.thorns': '對攻擊者造成 {value} 點{school}傷害',
   'hudChrome.auraEffect.slow': '移動速度降低 {pct}%',
   'hudChrome.auraEffect.speed': '移動速度提高 {pct}%',
+  'hudChrome.auraEffect.formFireball': '火球形態：移動速度提高 {pct}%；無法攻擊或施法',
   'hudChrome.auraEffect.attackSpeedSlow': '攻擊速度減慢 {pct}%',
   'hudChrome.auraEffect.attackSpeedFast': '攻擊速度提高 {pct}%',
   'hudChrome.auraEffect.haste': '攻擊與施法速度提高 {pct}%',

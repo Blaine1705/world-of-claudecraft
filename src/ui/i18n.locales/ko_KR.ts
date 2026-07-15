@@ -1836,6 +1836,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
   'entities.abilities.fireball.name': '잉걸 화살',
+  'entities.abilities.fireball_form.name': '화염구 형상',
+  'entities.abilities.fireball_form.description':
+    '타오르는 화염구로 변신해 이동 속도가 {buff}% 증가합니다. 변신 중에는 공격하거나 주문을 시전할 수 없습니다. 다시 사용하면 원래 모습으로 돌아옵니다.',
   'entities.abilities.rain_of_fire.name': '불의 비',
   'entities.abilities.rain_of_fire.description':
     '지정한 지역에 4초 동안 불의 비를 내려 매초 적에게 {damage}의 화염 피해를 입힙니다.',
@@ -4532,6 +4535,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.earth_shock': '지금 당장 필요한 자연 피해를 즉시 주는 충격기입니다.',
   'guide.abilityHook.eviscerate': '쌓아 둔 연계 점수를 소모해 대상에게 폭발적인 마무리를 가합니다.',
   'guide.abilityHook.fireball': '주력 화염 공격기로, 타격을 입히고 대상을 계속 불태웁니다.',
+  'guide.abilityHook.fireball_form': '살아 있는 화염구로 변해 탁 트인 지형을 빠르게 가로지릅니다.',
   'guide.abilityHook.flame_shock': '즉시 타격을 입히고 시간이 지나며 계속 불태우는 점화기입니다.',
   'guide.abilityHook.frost_armor': '전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.',
   'guide.abilityHook.frostbolt':
@@ -5355,6 +5359,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.thorns': '공격자에게 {value}의 {school} 피해를 입힙니다',
   'hudChrome.auraEffect.slow': '이동 속도를 {pct}% 감소시킵니다',
   'hudChrome.auraEffect.speed': '이동 속도를 {pct}% 증가시킵니다',
+  'hudChrome.auraEffect.formFireball': '화염구 형상: 이동 속도 {pct}% 증가, 공격 및 주문 사용 불가',
   'hudChrome.auraEffect.attackSpeedSlow': '공격 속도를 {pct}% 늦춥니다',
   'hudChrome.auraEffect.attackSpeedFast': '공격 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.haste': '공격 속도와 시전 속도를 {pct}% 증가시킵니다',

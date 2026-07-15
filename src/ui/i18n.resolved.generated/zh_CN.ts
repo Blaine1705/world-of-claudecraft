@@ -1083,6 +1083,7 @@ export const zh_CN: EnTranslations = {
       "formBear": "巨熊形态：生命值和护甲提高",
       "formCat": "猫形态：近战伤害与能量",
       "formTravel": "迅捷形态：移动速度提高 {pct}%",
+      "formFireball": "火球形态：移动速度提高 {pct}%；无法攻击或施法",
       "defensiveStance": "戒备姿态：受到的伤害降低，威胁值提高",
       "battleStance": "战斗姿态：怒气产生提高 10%",
       "berserkerStance": "狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%",
@@ -2064,6 +2065,7 @@ export const zh_CN: EnTranslations = {
       "lightning_shield": "为你充能，让攻击者打中你时受到自然伤害。",
       "flame_shock": "瞬发的灼烧，先打出一记，并持续灼烧目标。",
       "fireball": "你的主力火焰输出，命中后让目标持续燃烧。",
+      "fireball_form": "化身为活体火球，高速穿越开阔地带。",
       "frost_armor": "持续的自我增益，开战前先硬化你的护甲。",
       "arcane_intellect": "提升智力以扩大盟友的法力上限，开怪前先施放。",
       "frostbolt": "从远处发动攻击并减速目标，让它无法贴近你。",
@@ -5233,6 +5235,10 @@ export const zh_CN: EnTranslations = {
       "fireball": {
         "name": "余烬弹",
         "description": "投掷一团火球，造成 {damage} 点火焰伤害，并附加持续伤害。"
+      },
+      "fireball_form": {
+        "name": "火球形态",
+        "description": "化身为炽烈火球，移动速度提高 {buff}%。变形期间无法攻击或施放法术。再次施放可恢复正常形态。"
       },
       "frost_armor": {
         "name": "白霜护罩",

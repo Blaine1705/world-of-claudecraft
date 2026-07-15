@@ -1083,6 +1083,7 @@ export const ko_KR: EnTranslations = {
       "formBear": "큰곰 변신: 생명력과 방어도 증가",
       "formCat": "표범 변신: 근접 피해와 기력",
       "formTravel": "쾌속 형태: 이동 속도가 {pct}% 증가합니다",
+      "formFireball": "화염구 형상: 이동 속도 {pct}% 증가, 공격 및 주문 사용 불가",
       "defensiveStance": "방어 태세: 받는 피해 감소, 위협 수준 증가",
       "battleStance": "전투 태세: 분노 생성 10% 증가",
       "berserkerStance": "광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가",
@@ -2064,6 +2065,7 @@ export const ko_KR: EnTranslations = {
       "lightning_shield": "몸에 전하를 둘러 공격자가 당신을 칠 때 자연 피해를 받게 합니다.",
       "flame_shock": "즉시 타격을 입히고 시간이 지나며 계속 불태우는 점화기입니다.",
       "fireball": "주력 화염 공격기로, 타격을 입히고 대상을 계속 불태웁니다.",
+      "fireball_form": "살아 있는 화염구로 변해 탁 트인 지형을 빠르게 가로지릅니다.",
       "frost_armor": "전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.",
       "arcane_intellect": "지능을 높여 아군의 마나량을 늘려 줍니다. 전투를 시작하기 전에 시전하세요.",
       "frostbolt": "원거리에서 타격하며 대상의 이동 속도를 늦춰 다가오지 못하게 합니다.",
@@ -5233,6 +5235,10 @@ export const ko_KR: EnTranslations = {
       "fireball": {
         "name": "잉걸 화살",
         "description": "불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다."
+      },
+      "fireball_form": {
+        "name": "화염구 형상",
+        "description": "타오르는 화염구로 변신해 이동 속도가 {buff}% 증가합니다. 변신 중에는 공격하거나 주문을 시전할 수 없습니다. 다시 사용하면 원래 모습으로 돌아옵니다."
       },
       "frost_armor": {
         "name": "서리 망토",

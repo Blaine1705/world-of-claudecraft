@@ -1853,6 +1853,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
   'entities.abilities.fireball.name': '灰燼の矢',
+  'entities.abilities.fireball_form.name': '火球形態',
+  'entities.abilities.fireball_form.description':
+    '燃え盛る火球に変身し、移動速度が {buff}% 上昇します。変身中は攻撃や呪文の詠唱ができません。再使用すると元の姿に戻ります。',
   'entities.abilities.rain_of_fire.name': '火炎の雨',
   'entities.abilities.rain_of_fire.description':
     '対象地点に4秒間、火の雨を降らせ、敵を焼いて毎秒{damage}の火炎ダメージを与えます。',
@@ -4536,6 +4539,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.eviscerate':
     'コンボポイントを消費し、標的を一気に仕留めるフィニッシャーです。',
   'guide.abilityHook.fireball': '主力のファイア火力。一撃を当て、標的を燃焼させ続けます。',
+  'guide.abilityHook.fireball_form': '生きた火球へと姿を変え、開けた場所を高速で駆け抜けます。',
   'guide.abilityHook.flame_shock': '前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。',
   'guide.abilityHook.frost_armor': '戦闘の前にアーマーを固める、持続する自己強化です。',
   'guide.abilityHook.frostbolt': '遠距離から攻撃し、標的を減速させて近づけなくします。',
@@ -5351,6 +5355,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.thorns': '攻撃者に{value}の{school}ダメージを与える',
   'hudChrome.auraEffect.slow': '移動速度を{pct}%低下させる',
   'hudChrome.auraEffect.speed': '移動速度を{pct}%上昇させる',
+  'hudChrome.auraEffect.formFireball': '火球形態：移動速度が{pct}%上昇、攻撃と呪文は使用不可',
   'hudChrome.auraEffect.attackSpeedSlow': '攻撃速度を{pct}%低下させる',
   'hudChrome.auraEffect.attackSpeedFast': '攻撃速度を{pct}%上昇させる',
   'hudChrome.auraEffect.haste': '攻撃速度と詠唱速度を{pct}%上昇させる',

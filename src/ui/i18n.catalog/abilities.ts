@@ -720,6 +720,11 @@ const classAbilityNamesEn = {
         'Hurls a fiery ball that causes {damage} Fire damage plus additional damage over time.',
       ],
       [
+        'fireball_form',
+        'Ember Form',
+        'Transform into a blazing ember, increasing movement speed by {buff}%. You cannot attack or cast spells while transformed. Recast to return to your normal form.',
+      ],
+      [
         'frost_armor',
         'Hoarfrost Mantle',
         'Encases you in frost, increasing armor by {buff} for 30 min.',

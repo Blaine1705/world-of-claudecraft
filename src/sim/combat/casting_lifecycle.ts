@@ -62,7 +62,7 @@ import {
   consumeNextCastInstant,
   hasFreeCostFor,
 } from './empower_next';
-import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
+import { isActionLockingFormAuraKind, isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import {
   hasCastShield,
   noteSpellHit,
@@ -413,9 +413,9 @@ export function castAbility(
     ctx.error(p.id, 'That ability requires combo points.');
     return;
   }
-  // druid forms gate their kit both ways: form abilities need the form, and
-  // everything else (the caster kit) is locked while shapeshifted
-  const form = p.auras.find((a) => isResourceShiftFormAuraKind(a.kind));
+  // Action-locking forms gate their kit both ways: Druid form abilities need
+  // their form, while travel forms lock the normal kit until toggled off.
+  const form = p.auras.find((a) => isActionLockingFormAuraKind(a.kind));
   if (ability.requiresForm) {
     const need = ability.requiresForm === 'bear' ? 'form_bear' : 'form_cat';
     if (!form || form.kind !== need) {

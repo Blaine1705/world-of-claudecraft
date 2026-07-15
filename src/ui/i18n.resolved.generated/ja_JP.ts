@@ -1083,6 +1083,7 @@ export const ja_JP: EnTranslations = {
       "formBear": "ブルーインフォーム: 体力と防御力が上昇",
       "formCat": "キャットフォーム: 近接ダメージとエネルギー",
       "formTravel": "フリートフォーム: 移動速度が{pct}%上昇",
+      "formFireball": "火球形態：移動速度が{pct}%上昇、攻撃と呪文は使用不可",
       "defensiveStance": "ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
@@ -2064,6 +2065,7 @@ export const ja_JP: EnTranslations = {
       "lightning_shield": "身にまとい、攻撃してきた相手にネイチャーダメージを与えます。",
       "flame_shock": "前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。",
       "fireball": "主力のファイア火力。一撃を当て、標的を燃焼させ続けます。",
+      "fireball_form": "生きた火球へと姿を変え、開けた場所を高速で駆け抜けます。",
       "frost_armor": "戦闘の前にアーマーを固める、持続する自己強化です。",
       "arcane_intellect": "知力を上げて仲間のマナ総量を増やします。プルの前に唱えておきましょう。",
       "frostbolt": "遠距離から攻撃し、標的を減速させて近づけなくします。",
@@ -5233,6 +5235,10 @@ export const ja_JP: EnTranslations = {
       "fireball": {
         "name": "灰燼の矢",
         "description": "炎の球を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。"
+      },
+      "fireball_form": {
+        "name": "火球形態",
+        "description": "燃え盛る火球に変身し、移動速度が {buff}% 上昇します。変身中は攻撃や呪文の詠唱ができません。再使用すると元の姿に戻ります。"
       },
       "frost_armor": {
         "name": "白霜の外套",

@@ -166,7 +166,10 @@ export function abilityOverTimeEffect(
  *  the player actually knows. Null when the ability has none. */
 export function abilityBuffValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
-    if (eff.type === 'selfBuff' || eff.type === 'buffTarget') return eff.value;
+    if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
+      if (eff.kind === 'form_fireball') return (eff.value - 1) * 100;
+      return eff.value;
+    }
     // aoeAttackPower reads its flat `amount`, or a `pct` reduction as a whole
     // percent (Direhowl's 0.2 -> 20 for the "{buff}%" tooltip).
     if (eff.type === 'aoeAttackPower')
