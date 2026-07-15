@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "6bd4c62d",
+      "nextId": 413,
+      "state": "856c5fe4",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 412,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -70,6 +70,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -89,7 +90,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 408,
+          "id": 412,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -132,9 +133,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 409,
-      "state": "da75b1ab",
-      "events": "977a17cf",
+      "nextId": 413,
+      "state": "adfcfcc2",
+      "events": "f914b8dd",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -143,8 +144,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 409,
-      "state": "dc359b6b",
+      "nextId": 413,
+      "state": "b5992056",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -154,8 +155,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 409,
-      "state": "c3decc9d",
+      "nextId": 413,
+      "state": "f61d17e0",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -165,8 +166,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 409,
-      "state": "c3decc9d",
+      "nextId": 413,
+      "state": "f61d17e0",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -212,7 +213,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 412,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -230,6 +231,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 5,
           "restedXp": 0.125,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -249,7 +251,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 90,
-          "id": 408,
+          "id": 412,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -292,9 +294,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 409,
-      "state": "d02ae080",
-      "events": "7fd0fd5c",
+      "nextId": 413,
+      "state": "ea96efa3",
+      "events": "c37d04f7",
       "rng": {
         "draws": 75,
         "digest": "cc652885"
@@ -341,7 +343,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 412,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -360,6 +362,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 5,
           "restedXp": 920,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -380,7 +383,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 90,
-          "id": 408,
+          "id": 412,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -423,9 +426,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 409,
-      "state": "bdfe51ed",
-      "events": "9e92923f",
+      "nextId": 413,
+      "state": "986f1948",
+      "events": "b3f33097",
       "rng": {
         "draws": 75,
         "digest": "cc652885"
@@ -473,7 +476,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 412,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -492,6 +495,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 5,
           "restedXp": 920,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -512,7 +516,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 128,
-          "id": 408,
+          "id": 412,
           "kind": "player",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -555,9 +559,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 409,
-      "state": "f6b05a65",
-      "events": "2896a35f",
+      "nextId": 413,
+      "state": "8dc130aa",
+      "events": "b9c56e55",
       "rng": {
         "draws": 75,
         "digest": "cc652885"
@@ -605,7 +609,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 412,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -624,6 +628,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 5,
           "restedXp": 920,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -644,7 +649,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 408,
+          "id": 412,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -687,9 +692,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 409,
-      "state": "43216972",
-      "events": "41ed0fe7",
+      "nextId": 413,
+      "state": "bb116417",
+      "events": "96265992",
       "rng": {
         "draws": 75,
         "digest": "cc652885"
@@ -737,7 +742,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 412,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -757,6 +762,7 @@
           "prestigeRank": 1,
           "renown": 5,
           "restedXp": 920,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -776,7 +782,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 408,
+          "id": 412,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -819,8 +825,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 409,
-      "state": "43216972",
+      "nextId": 413,
+      "state": "bb116417",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -869,7 +875,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 412,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -889,6 +895,7 @@
           "prestigeRank": 1,
           "renown": 5,
           "restedXp": 920,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -908,7 +915,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 408,
+          "id": 412,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -951,8 +958,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 409,
-      "state": "43216972",
+      "nextId": 413,
+      "state": "bb116417",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -1001,7 +1008,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 412,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1021,6 +1028,7 @@
           "prestigeRank": 1,
           "renown": 5,
           "restedXp": 920,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1040,7 +1048,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 408,
+          "id": 412,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
