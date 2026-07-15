@@ -23,8 +23,12 @@ export function rideHeightAt(x: number, z: number, seed: number): number {
 
 // Feet-under-water test: the ground at (x, z) sits below a live waterline.
 // Weaker than isSwimming (any submerged depth, not just swimmable depth).
+// Order matters for the hot paths: waterLevelAt is a cheap footprint scan
+// (-Infinity outside every declared lake), so the whole dry world answers
+// false without ever sampling the full terrain stack.
 export function isSubmergedAt(x: number, z: number, seed: number): boolean {
-  return groundHeight(x, z, seed) < waterLevelAt(x, z);
+  const wl = waterLevelAt(x, z);
+  return wl !== -Infinity && groundHeight(x, z, seed) < wl;
 }
 
 // Steepness of the ridden surface. Dry ground defers to the memoized
@@ -64,6 +68,9 @@ export function shoreStepOut(
 ): boolean {
   const wl = waterLevelAt(x0, z0);
   return (
+    // the cheap footprint test first: dry land (waterline -Infinity) answers
+    // false before any terrain sampling (this runs inside the movement gates)
+    wl !== -Infinity &&
     groundHeight(x0, z0, seed) < wl &&
     groundHeight(nx, nz, seed) <= wl + SHORE_STEP_UP &&
     rideSteepnessAt(nx, nz, seed) <= maxSlope

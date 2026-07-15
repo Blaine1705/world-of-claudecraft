@@ -5,6 +5,7 @@ import {
   DUNGEON_FLOOR_Y,
   DUNGEON_X_THRESHOLD,
   getActiveWorldContent,
+  getContentGeneration,
   ROADS,
   STRIP_MAX_X,
   STRIP_MIN_X,
@@ -1919,8 +1920,11 @@ function baseHeight(x: number, z: number, seed: number): number {
   // Keep dry land everywhere: soft-floor low dips above the water level...
   const minLand = WATER_LEVEL + 1.4;
   if (h < minLand) h = minLand - (minLand - h) * 0.12;
-  // ...except the carved lake basins
-  for (const zone of ZONES) {
+  // ...except the carved lake basins. The ACTIVE content's lakes (the same
+  // list isInWaterBody/waterLevelAt gate on; identical to the static table for
+  // the builtin world), so a lake a content author declares always gets a real
+  // basin under its water, never a water surface over uncarved ground.
+  for (const zone of getActiveWorldContent().zones) {
     for (const lake of zone.lakes) {
       // organic shores: the carve distance wobbles with fixed-seed noise so
       // lakes read as real waterbodies instead of stamped discs. Northern
@@ -2073,6 +2077,95 @@ export function sowfieldFlattenWeight(x: number, z: number): number {
   return 1 - smoothstep(0, 1, d / f.falloff);
 }
 
+// ---------------------------------------------------------------------------
+// Declared-lake grading: two arms that keep inland water escapable on foot
+// (the terrain-side counterpart of the movement kernel's ride_height.ts).
+// Both read the ACTIVE content's lakes (same footprints waterLevelAt gates
+// on), so editor maps get the same guarantees as the builtin world.
+// ---------------------------------------------------------------------------
+
+// Non-sealed border ridges break where they cross a declared lake, the same
+// reading the seaGate gives the open sea: where two maps meet across a
+// waterway, the water simply continues and the seam bed stays an even,
+// swimmable basin instead of a mountain range in the lake. 1 on land, easing
+// to 0 over the water. Sealed walls are never gated (their ridge and the
+// crossesSealedBorder movement wall are the realm's hard boundary).
+function lakeRidgeGateAt(x: number, z: number): number {
+  let gate = 1;
+  for (const zone of getActiveWorldContent().zones) {
+    for (const lake of zone.lakes) {
+      // hostile in-memory content: a degenerate radius must not gate anything
+      // (the sanitizer clamps documents to [0.5, 200]; mirror the stamp guard)
+      if (!Number.isFinite(lake.radius) || lake.radius <= 0) continue;
+      // zero across the ENTIRE water disc (isInWaterBody reaches
+      // LAKE_BLEND_RADIUS_MULT = 1.6R), rising to the full range on land
+      // beyond, so no mountain flank ever stands inside the drawn water.
+      const fadeIn = lake.radius * LAKE_BLEND_RADIUS_MULT;
+      const fadeOut = lake.radius * 2.0;
+      const dSq = (x - lake.x) ** 2 + (z - lake.z) ** 2;
+      if (dSq >= fadeOut * fadeOut) continue;
+      gate = Math.min(gate, smoothstep(fadeIn, fadeOut, Math.sqrt(dSq)));
+      if (gate === 0) return 0;
+    }
+  }
+  return gate;
+}
+
+// Gradual shores for every declared lake: compress the finished height
+// profile in a band around the waterline so the slope a player wades through
+// leaving the water (and the first bank above it) is always well under the
+// climb limit. The map is anchored at the waterline (band(0) = 0), so every
+// shoreline KEEPS ITS EXACT POSITION and every seed-pinned shore fixture
+// holds; only the profile through the band gets flatter. Below the band the
+// bed rises by a small constant (lakes stay swim-deep), above it the land
+// inside the footprint settles by the same amount, easing to nothing past
+// the footprint. Applied after ALL shaping (ridges, coasts, fixtures) so it
+// is the last word on shore slopes; worst builtin shore was 4.49 rise/run,
+// graded to about 1.1 against the 1.5 climb limit
+// (tests/lake_shores.test.ts sweeps every declared lake).
+const SHORE_BAND_DOWN = 1.2; // yards below the waterline the grading reshapes
+const SHORE_BAND_UP = 1.9; // yards above (past the shore step-out reach)
+const SHORE_GRADE = 0.25; // band slopes multiply by this inside a footprint
+// NOTE for authored fixtures inside a lake footprint (the Star's Cradle
+// plateau, the cove plaza): a flatten target ABOVE the band lands
+// (1 - SHORE_GRADE) * SHORE_BAND_UP = about 1.4yd lower than the constant it
+// names, because the grading applies after those fixtures. Everything stays
+// on the same side of the waterline (the remap is monotone and fixes 0), and
+// every consumer samples groundHeight at runtime, so this is a tuning note,
+// not a hazard: pick fixture heights with the settle in mind.
+
+function applyLakeShoreGrading(x: number, z: number, h: number): number {
+  let w = 0;
+  outer: for (const zone of getActiveWorldContent().zones) {
+    for (const lake of zone.lakes) {
+      // hostile in-memory content: never grade around a degenerate lake
+      // (the sanitizer clamps documents to [0.5, 200]; mirror the stamp guard)
+      if (!Number.isFinite(lake.radius) || lake.radius <= 0) continue;
+      // full grading past every organic shoreline: the carve's wobble can pull
+      // a shore bulge out to ~1.825R on the northern lakes (d + wob < 1.6R
+      // with wob down to -0.225R), so full weight holds to 1.85R and fades
+      // over a ring wide enough that the land settle never reads as a bank
+      const fadeIn = lake.radius * 1.85;
+      const fadeOut = fadeIn + Math.max(lake.radius * 0.25, 6);
+      const dSq = (x - lake.x) ** 2 + (z - lake.z) ** 2;
+      if (dSq >= fadeOut * fadeOut) continue;
+      w = Math.max(w, 1 - smoothstep(fadeIn, fadeOut, Math.sqrt(dSq)));
+      if (w === 1) break outer;
+    }
+  }
+  if (w === 0) return h;
+  // Anchored to the live waterline (the custom-map override when one is set,
+  // the builtin WATER_LEVEL otherwise), the same surface movement and render
+  // gate on, so overridden-water maps get graded shores at their real
+  // shoreline too.
+  const y = h - waterLevel();
+  let gy: number;
+  if (y > SHORE_BAND_UP) gy = y - (1 - SHORE_GRADE) * SHORE_BAND_UP;
+  else if (y < -SHORE_BAND_DOWN) gy = y + (1 - SHORE_GRADE) * SHORE_BAND_DOWN;
+  else gy = y * SHORE_GRADE;
+  return h + (gy - y) * w;
+}
+
 // Ground height including instanced dungeon floors (flat, far off-world), the
 // walkable Vale Cup grandstand lift, and the custom-map sculpt edits.
 export function groundHeight(x: number, z: number, seed: number): number {
@@ -2106,6 +2199,8 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // (sealed walls have no pass and only ever grow past their base height,
   // so no crest dip opens a climbable notch)
   let wallAdd = 0;
+  // lazily computed once per call: non-sealed ridges break at declared lakes
+  let lakeGate = -1;
   for (const edge of BORDER_EDGES) {
     const sigma = edge.sealed ? SEALED_RIDGE_SIGMA : RIDGE_SIGMA;
     const dPerp = Math.abs((edge.kind === 'h' ? z : x) - edge.at);
@@ -2198,9 +2293,14 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       // east border: the wall's gaussian tail must not lean into its bowl
       const dCrater = Math.hypot(x - MIREFEN_IMPACT_CRATER.x, z - MIREFEN_IMPACT_CRATER.z);
       const craterGate = smoothstep(34, 56, dCrater);
+      if (!edge.sealed && lakeGate < 0) lakeGate = lakeRidgeGateAt(x, z);
+      const waterGate = edge.sealed ? 1 : lakeGate;
       // where two borders meet, the TALLER range wins instead of stacking
       // (summed corners built unclimbable knots at every junction)
-      wallAdd = Math.max(wallAdd, height * crest * profile * pass * seaGate * end * craterGate);
+      wallAdd = Math.max(
+        wallAdd,
+        height * crest * profile * pass * seaGate * end * craterGate * waterGate,
+      );
     }
   }
   h += wallAdd;
@@ -2397,6 +2497,10 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // football pitch stays dead flat and dry no matter what the grid's vale coast
   // does beneath it. Its influence ends north of the world-rim onset (z >= -149,
   // see sowfieldFlattenWeight), so it never fights the rim wall.
+  // Gradual shores on every declared lake: the last shaping word before the
+  // stand lift and the editor's stamps, so nothing above can re-steepen a
+  // shore a player must wade out of.
+  h = applyLakeShoreGrading(x, z, h);
   const sow = sowfieldFlattenWeight(x, z);
   if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
   // The custom-map sculpt edits are the LAST word over the finished overworld
@@ -2427,11 +2531,20 @@ const steepnessCache = new Map<number, Map<number, number>>(); // seed -> cell -
 const STEEPNESS_CACHE_MAX = 400_000; // cells per seed; ~the whole overworld
 const STEEPNESS_CACHE_MAX_SEEDS = 4; // hosts run one seed; only test runs see more
 const STEEPNESS_CELL_SPAN = 16384; // cells per axis in the packed key
+// The heightfield is a function of (x, z, seed) AND the active content (its
+// lakes, edits, camps): drop the memo whenever the content swaps (editor
+// play-test enter/leave, test worlds) so no stale cells survive a swap.
+let steepnessCacheGeneration = -1;
 export function terrainSteepnessAt(x: number, z: number, seed: number): number {
   // Instanced interiors (dungeons/arena/delves/rifts) are flat floors; skip the
   // cache entirely so their far-off coordinates never enter (or overflow) the
   // packed key space, which is sized for the overworld.
   if (x > DUNGEON_X_THRESHOLD) return 0;
+  const gen = getContentGeneration();
+  if (gen !== steepnessCacheGeneration) {
+    steepnessCache.clear();
+    steepnessCacheGeneration = gen;
+  }
   const cx = Math.round(x);
   const cz = Math.round(z);
   let bySeed = steepnessCache.get(seed);

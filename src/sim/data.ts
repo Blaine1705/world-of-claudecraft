@@ -643,6 +643,9 @@ export const BUILTIN_WORLD: WorldContent = {
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;
+// Bumped on every content swap so content-derived caches (the terrain
+// steepness memo in world.ts) can drop stale cells; monotone per process.
+let contentGeneration = 0;
 
 // The world content the terrain function and renderer should sample. Defaults to
 // the built-in world; the editor swaps it for a custom map during play-test.
@@ -650,11 +653,16 @@ export function getActiveWorldContent(): WorldContent {
   return activeWorld;
 }
 
+export function getContentGeneration(): number {
+  return contentGeneration;
+}
+
 // Swap in a custom world (editor play-test) or restore the built-in (pass nothing).
 // Affects terrain (world.ts), props (render/props.ts), and any consumer that reads
 // through getActiveWorldContent. Spawns come from SimConfig.world too (sim.ts ctor).
 export function setActiveWorldContent(world: WorldContent | null): void {
   activeWorld = world ?? BUILTIN_WORLD;
+  contentGeneration++;
 }
 
 // Zone containing a world position (overworld only; clamps to the world
