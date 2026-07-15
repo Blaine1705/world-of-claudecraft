@@ -1797,14 +1797,22 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_wolf__8c8270.webp"
       },
       {
+        "name": "Veiled Doe",
+        "min": 14,
+        "max": 15,
+        "rare": false,
+        "templateId": "veiled_doe",
+        "model": "mob_veiled_doe",
+        "still": "/guide-stills/mob_veiled_doe.webp"
+      },
+      {
         "name": "Veiled Stag",
         "min": 15,
         "max": 16,
         "rare": false,
         "templateId": "veiled_stag",
-        "model": "mob_stag",
-        "tint": "#b9a3cf",
-        "still": "/guide-stills/mob_stag__b9a3cf.webp"
+        "model": "mob_veiled_stag",
+        "still": "/guide-stills/mob_veiled_stag.webp"
       },
       {
         "name": "Snowdrift Wolf",
@@ -2060,6 +2068,16 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_bandit",
         "tint": "#6b3a32",
         "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Gleamfolk Pixie",
+        "min": 15,
+        "max": 16,
+        "rare": false,
+        "templateId": "mushroom_pixie",
+        "model": "mob_mushroom_pixie",
+        "tint": "#d8c4f0",
+        "still": "/guide-stills/mob_mushroom_pixie__d8c4f0.webp"
       },
       {
         "name": "Sporeling Gatherer",
@@ -2322,9 +2340,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 16,
         "rare": false,
         "templateId": "duskwisp",
-        "model": "mob_ghost",
-        "tint": "#7a5f9e",
-        "still": "/guide-stills/mob_ghost__7a5f9e.webp"
+        "model": "mob_duskwisp",
+        "still": "/guide-stills/mob_duskwisp.webp"
       },
       {
         "name": "Glimmerwisp",
@@ -2332,19 +2349,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 16,
         "rare": false,
         "templateId": "glimmerwisp",
-        "model": "mob_ghost",
-        "tint": "#ffc4ec",
-        "still": "/guide-stills/mob_ghost__ffc4ec.webp"
-      },
-      {
-        "name": "Hollow Spirit",
-        "min": 16,
-        "max": 17,
-        "rare": false,
-        "templateId": "hollow_spirit",
-        "model": "mob_ghost",
-        "tint": "#8fe8d8",
-        "still": "/guide-stills/mob_ghost__8fe8d8.webp"
+        "model": "mob_glimmerwisp",
+        "still": "/guide-stills/mob_glimmerwisp.webp"
       },
       {
         "name": "Ice Wisp",
@@ -4262,6 +4268,44 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "hover": 0.25,
     "tintStrength": 0.2
   },
+  "mob_glimmerwisp": {
+    "url": "models/creatures/glimmerwisp.glb",
+    "idle": "Flying_Idle",
+    "height": 1.6,
+    "yaw": -1.5707963267948966,
+    "hover": 0.4
+  },
+  "mob_duskwisp": {
+    "url": "models/creatures/duskwisp.glb",
+    "idle": "Flying_Idle",
+    "height": 1.6,
+    "yaw": -1.5707963267948966,
+    "hover": 0.4
+  },
+  "mob_veiled_stag": {
+    "url": "models/creatures/veiled_stag.glb",
+    "idle": "Idle",
+    "height": 1.9
+  },
+  "mob_veiled_doe": {
+    "url": "models/creatures/veiled_doe.glb",
+    "idle": "Idle",
+    "height": 1.6
+  },
+  "mob_mushroom_pixie": {
+    "url": "models/creatures/mushroom_pixie.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "yaw": -1.5707963267948966,
+    "tintStrength": 0.2
+  },
+  "mob_glub": {
+    "url": "models/creatures/glubevolved.glb",
+    "idle": "Flying_Idle",
+    "height": 1.4,
+    "hover": 0.15,
+    "tintStrength": 0.45
+  },
   "mob_ghost": {
     "url": "models/creatures/ghost.glb",
     "idle": "Flying_Idle",
@@ -4274,13 +4318,6 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 1.9,
     "tintStrength": 0.35
-  },
-  "mob_glub": {
-    "url": "models/creatures/glubevolved.glb",
-    "idle": "Flying_Idle",
-    "height": 1.4,
-    "hover": 0.15,
-    "tintStrength": 0.45
   },
   "mob_fox": {
     "url": "models/creatures/fox.glb",
