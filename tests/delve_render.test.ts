@@ -193,6 +193,20 @@ describe('buildDelveInteractable', () => {
     expect(rangeCulled.visible).toBe(false);
   });
 
+  it('keeps non-lootable Rift puzzle, hazard, and consumed-state props visible', () => {
+    const statefulRiftTemplates = [
+      'rift_pylon',
+      'rift_roller',
+      'rift_gate_open',
+      'rift_treasure_open',
+      'rift_chest_jammed',
+    ];
+
+    for (const templateId of statefulRiftTemplates) {
+      expect(delveInteractableVisible(templateId, false), templateId).toBe(true);
+    }
+  });
+
   it('returns a non-empty group for every templateId', () => {
     for (const id of ALL_DELVE_IDS) {
       const { group, height } = buildDelveInteractable(id, 42);
