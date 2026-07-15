@@ -1,4 +1,7 @@
-// Shared fixtures for tests/vale_cup.test.ts and tests/vale_cup_bots.test.ts.
+// Shared world-staging helpers for the three split Vale Cup suites
+// (vale_cup_match, vale_cup_bots, vale_cup_meta). Not a test file: nothing here
+// runs on its own.
+
 import { expect } from 'vitest';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
@@ -6,11 +9,9 @@ import type { SimConfig, SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 // Vale Cup tests need the real terrain, pitch and instance-plane geometry, but
-// none of the hundreds of unrelated overworld mobs/NPCs/objects. Full-match
-// scenarios advance up to 8,400 ticks; spawning the entire 14-zone continent
-// made every one of those ticks pay for the whole MMO and turned one lifecycle
-// assertion into a 36-second test. Keep every terrain-relevant field identical
-// to BUILTIN_WORLD while stripping only constructor-spawned ambient entities.
+// none of the hundreds of unrelated overworld mobs, NPCs, or objects. Full
+// matches advance thousands of ticks, so stripping ambient constructor spawns
+// keeps every terrain-relevant field while avoiding unrelated simulation work.
 export const VALE_CUP_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
   camps: [],
