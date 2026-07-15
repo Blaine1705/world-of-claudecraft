@@ -1005,6 +1005,7 @@ export const ko_KR: EnTranslations = {
         "spellPower": "주문력",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
+        "hitRating": "명중 등급",
         "warfare": "워페어"
       },
       "warfareValue": "주는 피해 +{increase}% / 받는 피해 -{reduction}%",
@@ -1022,6 +1023,7 @@ export const ko_KR: EnTranslations = {
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
         "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
+        "hitRating": "장비와 세트 보너스에서 얻는 명중 등급으로 공격이 빗나가거나 주문이 저항되는 빈도를 줄이며, 특히 더 높은 레벨의 적에게 효과적입니다. 약 10등급당 1% 명중.",
         "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다."
       },
       "effects": {
@@ -1387,6 +1389,8 @@ export const ko_KR: EnTranslations = {
       },
       "dodge": "회피 확률을 {pct}% 증가시킵니다",
       "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
+      "damageReduction": "받는 모든 피해가 {pct}% 감소합니다",
+      "guardianWard": "다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다",
       "armorFlat": "방어도를 {value} 감소시킵니다",
       "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
       "armorPct": "방어도를 {pct}% 감소시킵니다",
@@ -1571,8 +1575,8 @@ export const ko_KR: EnTranslations = {
         "juniormods": "수습 운영자",
         "artists": "아티스트",
         "contentcreator": "콘텐츠 크리에이터",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "legend": "전설",
+        "shill": "홍보대사"
       },
       "guildMember": "인증된 멤버",
       "notMember": "아직 서버에 없음",
@@ -3800,6 +3804,7 @@ export const ko_KR: EnTranslations = {
     "title": "데스크톱 런처 다운로드",
     "desc": "최적화된 성능과 전체 화면 플레이를 위해 독립형 런처를 다운로드하세요.",
     "macCta": "macOS용 다운로드",
+    "windowsCta": "Windows용 다운로드",
     "linuxCta": "Linux용 다운로드",
     "linuxHint": "AppImage 형식입니다. 실행 권한만 부여하면 바로 실행되며, 설치는 필요 없습니다.",
     "windowsPending": "Windows 빌드는 준비 중입니다."
@@ -6402,6 +6407,18 @@ export const ko_KR: EnTranslations = {
       "barkskin": {
         "name": "참나무 가죽",
         "description": "피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다."
+      },
+      "ironhold": {
+        "name": "철벽",
+        "description": "굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다."
+      },
+      "sacred_bulwark": {
+        "name": "신성한 방벽",
+        "description": "{duration}초 동안 다음 적의 치명적인 공격을 무효화하고, 대신 생명력을 최대치의 35%까지 회복합니다."
+      },
+      "primal_reflexes": {
+        "name": "원시의 반사",
+        "description": "본능이 예리해져 6초 동안 회피율이 50% 증가합니다."
       },
       "starfire": {
         "name": "창공 낙하",

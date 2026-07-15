@@ -1005,6 +1005,7 @@ export const en_CA: EnTranslations = {
         "spellPower": "Spell Power",
         "critRating": "Crit Rating",
         "hasteRating": "Haste Rating",
+        "hitRating": "Hit Rating",
         "warfare": "Warfare"
       },
       "warfareValue": "+{increase}% dealt / -{reduction}% taken",
@@ -1022,6 +1023,7 @@ export const en_CA: EnTranslations = {
         "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage.",
         "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
         "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
       },
       "effects": {
@@ -1387,6 +1389,8 @@ export const en_CA: EnTranslations = {
       },
       "dodge": "Increases dodge chance by {pct}%",
       "dodgeReduce": "Reduces dodge chance by {pct}%",
+      "damageReduction": "Reduces all damage taken by {pct}%",
+      "guardianWard": "The next lethal enemy hit restores you to {pct}% health instead",
       "armorFlat": "Reduces armor by {value}",
       "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
       "armorPct": "Reduces armor by {pct}%",
@@ -3800,6 +3804,7 @@ export const en_CA: EnTranslations = {
     "title": "Download Desktop Launcher",
     "desc": "Get the standalone launcher for optimized performance and full-screen play.",
     "macCta": "Download for macOS",
+    "windowsCta": "Download for Windows",
     "linuxCta": "Download for Linux",
     "linuxHint": "AppImage: make it executable, then run it. No install needed.",
     "windowsPending": "Windows build pending."
@@ -6402,6 +6407,18 @@ export const en_CA: EnTranslations = {
       "barkskin": {
         "name": "Oakhide",
         "description": "Your skin hardens like bark, increasing armor by 150 for 15 sec."
+      },
+      "ironhold": {
+        "name": "Ironhold",
+        "description": "Brace behind your guard, reducing all damage taken by 40% for 8 sec."
+      },
+      "sacred_bulwark": {
+        "name": "Sacred Bulwark",
+        "description": "For {duration} sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead."
+      },
+      "primal_reflexes": {
+        "name": "Primal Reflexes",
+        "description": "Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec."
       },
       "starfire": {
         "name": "Skyfall",
@@ -10478,7 +10495,7 @@ export const en_CA: EnTranslations = {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%.",
-        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Barrowlord Battlegear",
@@ -10500,7 +10517,7 @@ export const en_CA: EnTranslations = {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.",
-        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",

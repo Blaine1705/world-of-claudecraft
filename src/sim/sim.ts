@@ -5456,7 +5456,7 @@ export class Sim {
         school: spell.school,
         fx: 'projectile',
       });
-      if (isSpellResisted(this.rng, pet.level, target.level)) {
+      if (isSpellResisted(this.rng, pet.level, target.level, pet.hitBonus)) {
         this.emit({
           type: 'damage',
           sourceId: pet.id,
