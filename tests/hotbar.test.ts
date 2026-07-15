@@ -1,18 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
 import {
+  actionForAttackSlot,
   applyLoadoutBar,
+  assignAttackSlotAction,
+  attackSlotStorageKey,
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,
   encodeStoredHotbarAction,
   handleMobileAttackTap,
   hotbarActionsEqual,
+  loadAttackSlotAction,
   parseHotbarActions,
   parseStoredHotbarAction,
   placeAbilityOnSlot,
   placeItemOnSlot,
   resolveMobileHotbarDrop,
+  saveAttackSlotAction,
   shouldSeedFormBar,
   syncHotbarActions,
 } from '../src/ui/hotbar';
@@ -510,5 +515,52 @@ describe('mobile touch drag drop resolution', () => {
 
   it('cancels when the pointer released back on the source slot', () => {
     expect(resolveMobileHotbarDrop(2, 2)).toBeNull();
+  });
+});
+
+describe('desktop attack slot behavior', () => {
+  const storage = () => {
+    const values = new Map<string, string>();
+    return {
+      values,
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+      removeItem: (key: string) => values.delete(key),
+    };
+  };
+
+  it('uses a separate, stable storage key and round-trips valid actions', () => {
+    const store = storage();
+    const key = attackSlotStorageKey('woc_hotbar_warrior_Thorgar');
+    expect(key).toBe('woc_hotbar_warrior_Thorgar:s0');
+
+    saveAttackSlotAction(store, key, { type: 'ability', id: 'fireball' });
+    expect(loadAttackSlotAction(store, key, abilityExists, itemExists)).toEqual({
+      type: 'ability',
+      id: 'fireball',
+    });
+    saveAttackSlotAction(store, key, null);
+    expect(store.getItem(key)).toBeNull();
+  });
+
+  it('rejects malformed and stale persisted actions', () => {
+    const store = storage();
+    const key = attackSlotStorageKey('bar');
+    store.setItem(key, '{"type":"ability","id":"gone"}');
+    expect(loadAttackSlotAction(store, key, abilityExists, itemExists)).toBeNull();
+    store.setItem(key, '{bad');
+    expect(loadAttackSlotAction(store, key, abilityExists, itemExists)).toBeNull();
+  });
+
+  it('keeps slot 0 empty while Attack is shown and casts its assignment when removed', () => {
+    const action = { type: 'ability' as const, id: 'fireball' };
+    expect(actionForAttackSlot(true, action)).toBeNull();
+    expect(actionForAttackSlot(false, action)).toEqual(action);
+  });
+
+  it('assigns a dropped action and clears the source bar slot when applicable', () => {
+    const action = { type: 'ability' as const, id: 'fireball' };
+    expect(assignAttackSlotAction(action, 3)).toEqual({ action, clearSourceIndex: 3 });
+    expect(assignAttackSlotAction(action, null)).toEqual({ action, clearSourceIndex: null });
   });
 });

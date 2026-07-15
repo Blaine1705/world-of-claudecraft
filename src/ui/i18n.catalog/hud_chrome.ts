@@ -1376,10 +1376,21 @@ export const hudChromeStrings = {
     // Right-click destroy affordance: rejected when the item is flagged noDiscard
     // (soulbound quest keys, etc.), which the sim's discardItem also refuses.
     cannotDestroy: 'This item cannot be destroyed.',
-    // Tooltip sub-line advertising the shift+right-click destroy affordance, shown
-    // only for a destroyable item so junk is removable without hunting for a menu. A
-    // plain right-click equips/uses the item instead (issue 1852).
-    rightClickDestroy: 'Shift+right-click to destroy',
+    // Tooltip sub-line advertising the right-click destroy affordance, shown only
+    // for a destroyable item so junk is removable without hunting for a menu.
+    // DEAD: right-click now uses/equips (the classic binding) and destroying is the
+    // drag-out gesture below. Kept so the locale overlays keep resolving; drop it
+    // (and its overlay rows) at the next locale fill.
+    rightClickDestroy: 'Right-click to destroy',
+    // Tooltip sub-lines for the two drag gestures that replaced right-click-destroy:
+    // drag a gear piece onto the character sheet to equip it, drag any destroyable
+    // stack out onto the world to throw it away (which opens the destroy prompt).
+    dragEquipHint: 'Drag onto your character to equip',
+    dragDestroyHint: 'Drag out into the world to destroy',
+    // Refusal when a stack is dropped on a square of a FILTERED / SEARCHED / SORTED grid:
+    // that grid is a derived list, its squares hold no bag position, so honoring the drop
+    // would move a stack the player never aimed at. Say so instead of doing nothing.
+    reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',

@@ -4232,7 +4232,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.collapseHint': 'クエストトラッカーを折りたたむ',
   'hudChrome.questTracker.expandHint': 'クエストトラッカーを展開する',
   'hudChrome.bags.cannotDestroy': 'このアイテムは破壊できません。',
-  'hudChrome.bags.rightClickDestroy': 'Shift+右クリックで破壊',
+  'hudChrome.bags.rightClickDestroy': '右クリックで破壊',
+  'hudChrome.bags.dragEquipHint': 'キャラクターにドラッグして装備',
+  'hudChrome.bags.dragDestroyHint': '世界へドラッグして破壊',
+  'hudChrome.bags.reorderNeedsRecent':
+    '絞り込みを解除し並び順を「最近」にすると持ち物を並べ替えられます',
   'hudChrome.bags.filterGroupAria': 'バッグをカテゴリーで絞り込む',
   'hudChrome.bags.filterAll': 'すべて',
   'hudChrome.bags.filterWeapon': '武器',

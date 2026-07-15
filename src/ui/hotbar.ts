@@ -1,5 +1,11 @@
 export type HotbarAction = { type: 'ability'; id: string } | { type: 'item'; id: string } | null;
 
+export interface HotbarStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+}
+
 export const HOTBAR_ACTION_MIME = 'application/x-woc-hotbar-action';
 
 export function encodeHotbarAction(action: Exclude<HotbarAction, null>): string {
@@ -35,6 +41,44 @@ export function parseStoredHotbarAction(
   } catch {
     return null;
   }
+}
+
+export function attackSlotStorageKey(normalSlotMapKey: string): string {
+  return `${normalSlotMapKey}:s0`;
+}
+
+export function loadAttackSlotAction(
+  storage: Pick<HotbarStorage, 'getItem'>,
+  key: string,
+  abilityExists: (id: string) => boolean,
+  itemExists: (id: string) => boolean,
+): HotbarAction {
+  try {
+    return parseStoredHotbarAction(storage.getItem(key), abilityExists, itemExists);
+  } catch {
+    return null;
+  }
+}
+
+export function saveAttackSlotAction(
+  storage: Pick<HotbarStorage, 'setItem' | 'removeItem'>,
+  key: string,
+  action: HotbarAction,
+): void {
+  const encoded = encodeStoredHotbarAction(action);
+  if (encoded === null) storage.removeItem(key);
+  else storage.setItem(key, encoded);
+}
+
+export function actionForAttackSlot(showAttackButton: boolean, action: HotbarAction): HotbarAction {
+  return showAttackButton ? null : action;
+}
+
+export function assignAttackSlotAction(
+  action: Exclude<HotbarAction, null>,
+  sourceIndex: number | null | undefined,
+): { action: Exclude<HotbarAction, null>; clearSourceIndex: number | null } {
+  return { action, clearSourceIndex: sourceIndex ?? null };
 }
 
 export function handleMobileAttackTap(
