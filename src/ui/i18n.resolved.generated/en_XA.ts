@@ -883,6 +883,7 @@ export const en_XA: EnTranslations = {
       "aurasOnPlayerFrame": "[Ɓúƒƒš óñ ţĥé Þļáýéŕ Ƒŕáɱé]",
       "highContrastBackground": "[Ĥíĝĥ-Çóñţŕášţ Ɓáçķĝŕóúñð]",
       "startAttackOnAbility": "[Áúţó-Áţţáçķ óñ Áƀíļíţý Úšé]",
+      "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",
       "walkByAutoloot": "[Ŵáļķ-ƀý Áúţóļóóţ]",
       "groundReticle": "[Ĝŕóúñð-Ţáŕĝéţíñĝ Ŕéţíçļé]",
       "showItemLevel": "[Šĥóŵ Íţéɱ Ļéʋéļ]",
@@ -5482,6 +5483,7 @@ export const en_XA: EnTranslations = {
     "actionBar": {
       "attackName": "[Áţţáçķ]",
       "attackTooltip": "[Ţóĝĝļé áúţó-áţţáçķ óñ ýóúŕ ţáŕĝéţ. Ŕíĝĥţ-çļíçķíñĝ áñ éñéɱý áļšó áţţáçķš.]",
+      "attackRemoveHint": "[Ŕíĝĥţ-çļíçķ ţó ŕéɱóʋé íţ ƒŕóɱ ţĥé ƀáŕ áñð ƒŕéé ţĥé šļóţ.]",
       "emptySlot": "[Éɱþţý šļóţ]",
       "slotAria": "[Áçţíóñ šļóţ {slot}: {ability}]",
       "emptySlotAria": "[Áçţíóñ šļóţ {slot}: éɱþţý]",

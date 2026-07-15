@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -464,6 +465,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -523,6 +525,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "es_ES": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -977,6 +980,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -1036,6 +1040,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "fr_FR": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -1490,6 +1495,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -1549,6 +1555,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "fr_CA": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -2003,6 +2010,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -2063,6 +2071,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -2517,6 +2526,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -2576,6 +2586,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "de_DE": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -3030,6 +3041,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -3113,6 +3125,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill"
   ],
   "pt_BR": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -3567,6 +3580,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -3632,6 +3646,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill"
   ],
   "cs_CZ": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.duskfang_dirk.name",
     "entities.items.duskwisp_essence.name",
     "entities.items.elder_bark.name",
@@ -4106,6 +4121,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -4165,6 +4181,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "nl_NL": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -4619,6 +4636,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -4678,6 +4696,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "pl_PL": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -5132,6 +5151,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -5191,6 +5211,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "id_ID": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -5645,6 +5666,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -5704,6 +5726,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "tr_TR": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -6158,6 +6181,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -6217,6 +6241,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "sv_SE": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -6671,6 +6696,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -6730,6 +6756,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "vi_VN": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -7184,6 +7211,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
@@ -7243,6 +7271,7 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "da_DK": [
+    "abilityUi.actionBar.attackRemoveHint",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
     "entities.items.rift_gem_crimson.name",
@@ -7697,6 +7726,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemTooltip.riftUpgrade",
     "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
+    "hudChrome.options.showAttackButton",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood",
     "hudChrome.plurals.finderPartySize.few",
