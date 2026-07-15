@@ -21,6 +21,16 @@ export function rideHeightAt(x: number, z: number, seed: number): number {
   return rideHeight(x, z, groundHeight(x, z, seed));
 }
 
+// The waterline governing a STEP between two points: the higher of the two
+// local waterlines. Water-body footprints are finite, but real water can
+// continue past them (a strait band into the open sea): a mover on the
+// submerged bed just OUTSIDE a footprint must be able to step back in, so the
+// step rides the body's surface if either end has one. Both ends dry gives
+// -Infinity (no clamp anywhere on land).
+export function stepWaterLevel(x0: number, z0: number, x1: number, z1: number): number {
+  return Math.max(waterLevelAt(x0, z0), waterLevelAt(x1, z1));
+}
+
 // Feet-under-water test: the ground at (x, z) sits below a live waterline.
 // Weaker than isSwimming (any submerged depth, not just swimmable depth).
 // Order matters for the hot paths: waterLevelAt is a cheap footprint scan
@@ -66,7 +76,9 @@ export function shoreStepOut(
   seed: number,
   maxSlope: number,
 ): boolean {
-  const wl = waterLevelAt(x0, z0);
+  // The STEP waterline, so a mover on the submerged bed just outside a
+  // footprint (real water continuing past the rect) gets the same pull-out.
+  const wl = stepWaterLevel(x0, z0, nx, nz);
   return (
     // the cheap footprint test first: dry land (waterline -Infinity) answers
     // false before any terrain sampling (this runs inside the movement gates)

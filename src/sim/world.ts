@@ -49,12 +49,15 @@ export function waterLevel(): number {
 export const LAKE_BLEND_RADIUS_MULT = 1.6;
 
 // True when (x,z) falls inside a declared lake's footprint (any active zone's
-// `lakes` list). Terrain outside every declared water body is never "water", no
-// matter how far its height dips below waterLevel(): a content author's sunken
-// feature (crater, sinkhole, tunnel) stays dry and walkable as long as it isn't
-// inside one of these footprints. (dems's open seas are handled separately by
-// the coastal appliers and inHollowOpenSea; this covers only declared lakes.)
+// `lakes` list) or one of the programmatic border waters (the moats, column
+// straits, and row meres where two maps meet: BORDER_WATERS below). Terrain
+// outside every water body is never "water", no matter how far its height dips
+// below waterLevel(): a content author's sunken feature (crater, sinkhole,
+// tunnel) stays dry and walkable as long as it isn't inside one of these
+// footprints. (The open seas are handled separately by the coastal appliers
+// and inHollowOpenSea.)
 export function isInWaterBody(x: number, z: number): boolean {
+  if (inBorderWater(x, z)) return true;
   for (const zone of getActiveWorldContent().zones) {
     for (const lake of zone.lakes) {
       const dSq = (x - lake.x) ** 2 + (z - lake.z) ** 2;
@@ -1260,9 +1263,26 @@ function applyColumnStraits(x: number, z: number, h: number): number {
       }
     }
     const carve = Math.max(strait, scallop);
-    if (carve <= 0) continue;
-    const channel = Math.min(out, WATER_LEVEL - 2.5);
-    out = out + (channel - out) * carve;
+    if (carve > 0) {
+      const channel = Math.min(out, WATER_LEVEL - 2.5);
+      out = out + (channel - out) * carve;
+    }
+    // The OUTER bank (the neighbor realm's flank) cut to the walkable beach
+    // ramp (see borderBankRamp): the border ridge and flank coasts must never
+    // stand as a cliff over the moat water (field-reported trap at the
+    // Palmreach|Hollow crossing). The Hollow's INNER bank keeps its authored
+    // scallop coves and proud headlands (the coves are the designed exits,
+    // and seed-pinned ruins stand on those headlands); the pass isthmus
+    // window keeps its full road profile.
+    if (zGate > 0) {
+      const outward = st.borderX > 0 ? x - st.borderX : st.borderX - x;
+      const outerSide = smoothstep(-4, 4, outward);
+      const wRamp = zGate * outerSide;
+      if (wRamp > 0) {
+        const capped = Math.min(out, borderBankRamp(Math.abs(x - st.borderX)));
+        out = out + (capped - out) * wRamp;
+      }
+    }
   }
   return out;
 }
@@ -1275,6 +1295,16 @@ function applyColumnStraits(x: number, z: number, h: number): number {
 // rows sit against the Hollow/Frost moats, so their inner caps are water
 // too. All rows carve out to the world edge (x=+-540) so no cap sliver is
 // left proud at the map corners.
+// The walkable beach ramp cut into a border-water bank (the meres and the
+// column straits): terrain above this envelope is cut down to a 0.55 rise/run
+// ramp anchored just outside the channel carve, so climbing out of a border
+// water is always a beach walk, never a cliff scramble. Terrain already below
+// the envelope (the water itself, gentle banks) keeps its own shape, and the
+// ramp exceeds every natural bank within ~25yd, so the cut self-releases.
+function borderBankRamp(bankDist: number): number {
+  return WATER_LEVEL + Math.max(0, bankDist - 15) * 0.55;
+}
+
 const ROW_MERES = [
   { borderZ: 700, passX: 400, xLo: 240, xHi: 552 }, // the Lawnmere
   { borderZ: 1260, passX: 390, xLo: 168, xHi: 552 }, // the Gravemere
@@ -1287,14 +1317,24 @@ function applyRowMeres(x: number, z: number, h: number): number {
   let out = h;
   for (const m of ROW_MERES) {
     if (x <= m.xLo - 20 || x > m.xHi + 20) continue;
-    const mere =
-      (1 - smoothstep(2, 12, Math.abs(z - m.borderZ))) *
+    const xWindow =
       smoothstep(26, 52, Math.abs(x - m.passX)) *
       smoothstep(m.xLo - 20, m.xLo + 20, x) *
       (1 - smoothstep(m.xHi - 20, m.xHi + 20, x));
-    if (mere <= 0) continue;
-    const basin = Math.min(out, WATER_LEVEL - 2.5);
-    out = out + (basin - out) * mere;
+    const mere = (1 - smoothstep(2, 12, Math.abs(z - m.borderZ))) * xWindow;
+    if (mere > 0) {
+      const basin = Math.min(out, WATER_LEVEL - 2.5);
+      out = out + (basin - out) * mere;
+    }
+    // The banks: cut both shores down to a walkable beach ramp rising from
+    // the water, so a swimmer can always climb out of the mere instead of
+    // treading under an authored cliff (field-reported trap). The ramp
+    // self-releases where the natural bank is already gentler, and the pass
+    // isthmus window keeps its full road profile.
+    if (xWindow > 0) {
+      const capped = Math.min(out, borderBankRamp(Math.abs(z - m.borderZ)));
+      out = out + (capped - out) * xWindow;
+    }
   }
   return out;
 }
@@ -1748,6 +1788,122 @@ export function inBorderLake(x: number, z: number): boolean {
   return false;
 }
 
+// Every programmatic border water where two maps meet, as generous rects: the
+// moat/melt sections above, the column straits with their Hollow-side scallop
+// coves, and the row meres. These are REAL water to the sim (isInWaterBody),
+// the same as a declared lake: players swim them, the movement kernel rides
+// their surface, border ridges break across them, and their banks take the
+// shore grading. Generous bounds are safe because every consumer self-gates
+// on the real carved depth: a dry isthmus or bank inside a rect never swims,
+// never clamps a slope, and never blocks a walker.
+const BORDER_WATERS: readonly { x0: number; x1: number; z0: number; z1: number }[] = [
+  ...BORDER_LAKES,
+  // half-width 48 covers the channel, the Hollow-side scallop coves, and the
+  // full beach-ramp aprons (borderBankRamp releases by ~40yd), so both banks
+  // sit fully inside (full grading + ridge gate) out to dry land
+  ...COLUMN_STRAITS.map((st) => ({
+    x0: st.borderX - 48,
+    x1: st.borderX + 48,
+    z0: st.lakeLo - 4,
+    z1: st.lakeHi + 4,
+  })),
+  // z half-width 20: the carve wets |z - borderZ| <= ~10 and the beach ramp
+  // can hold water to ~19, so both banks stay fully inside
+  ...ROW_MERES.map((m) => ({ x0: m.xLo, x1: m.xHi, z0: m.borderZ - 20, z1: m.borderZ + 20 })),
+];
+
+// The border ridges break only over the water they actually cross: the moat
+// sections, the straits' channel and OUTER bank (the neighbor realm's flank,
+// where the beach ramp runs), and the meres. The straits' INNER flank keeps
+// its full range: the Hollow's authored headland fixtures (ruin rings, POIs)
+// stand on that ridge, and the scallop coves between them are the designed
+// inner exits.
+const RIDGE_BREAK_WATERS: readonly { x0: number; x1: number; z0: number; z1: number }[] = [
+  ...BORDER_LAKES,
+  // inner reach 14 opens the inner lip for entry, EXCEPT across the two
+  // Tablecrag mesa guards (z windows below): their foot-approach ramps are
+  // the ridge flank itself, so the gate narrows to the channel core there.
+  // The Hollow's other headland fixtures sit beyond 14yd and keep their
+  // ridge either way; the scallop coves stay the designed inner exits.
+  ...COLUMN_STRAITS.flatMap((st) => {
+    const inner = (reach: number): number =>
+      st.borderX > 0 ? st.borderX - reach : st.borderX + reach;
+    const outer = st.borderX > 0 ? st.borderX + 48 : st.borderX - 48;
+    const rect = (z0: number, z1: number, reach: number) => ({
+      x0: Math.min(outer, inner(reach)),
+      x1: Math.max(outer, inner(reach)),
+      z0,
+      z1,
+    });
+    if (st.borderX > 0) {
+      // east strait: no mesas on this flank
+      return [rect(st.lakeLo - 4, st.lakeHi + 4, 14)];
+    }
+    // west strait: segment around the Tablecrag mesas at z 1072 and 1195
+    return [
+      rect(st.lakeLo - 4, 1040, 14),
+      rect(1040, 1105, 8),
+      rect(1105, 1160, 14),
+      rect(1160, 1230, 8),
+      rect(1230, st.lakeHi + 4, 14),
+    ];
+  }),
+  ...ROW_MERES.map((m) => ({ x0: m.xLo, x1: m.xHi, z0: m.borderZ - 20, z1: m.borderZ + 20 })),
+];
+
+// Distance to the nearest rect of a border-water list: 0 inside one, the
+// outside clearance otherwise. Shared by the water test (=== 0), the ridge
+// gate, and the shore grading fade.
+function borderWaterOutsideDist(
+  x: number,
+  z: number,
+  rects: readonly { x0: number; x1: number; z0: number; z1: number }[],
+): number {
+  let best = Infinity;
+  for (const r of rects) {
+    const dx = Math.max(r.x0 - x, 0, x - r.x1);
+    const dz = Math.max(r.z0 - z, 0, z - r.z1);
+    if (dx === 0 && dz === 0) return 0;
+    // one axis is usually 0 (beside an edge): skip the hypot there
+    const d = dx === 0 ? dz : dz === 0 ? dx : Math.hypot(dx, dz);
+    if (d < best) best = d;
+  }
+  return best;
+}
+
+// Boolean-only rect scan (no distances): this sits inside isInWaterBody,
+// which the movement kernel queries several times per tick.
+export function inBorderWater(x: number, z: number): boolean {
+  for (const r of BORDER_WATERS) {
+    if (x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1) return true;
+  }
+  return false;
+}
+
+// The fatigue-free CROSSING CORRIDORS: the moat/melt rects, the meres, and
+// the straits' channel plus outer approach. Deliberately NOT the straits'
+// inner scallop reach: the Hollow's wider inner water keeps the open-sea
+// fatigue turnback ("a place you arrive at on purpose, not by drifting",
+// pinned by tests/world_grid.test.ts), and a cove landing from the channel
+// is a few seconds' swim, inside the fatigue grace.
+const FATIGUE_FREE_WATERS: readonly { x0: number; x1: number; z0: number; z1: number }[] = [
+  ...BORDER_LAKES,
+  ...COLUMN_STRAITS.map((st) => ({
+    x0: st.borderX > 0 ? st.borderX - 14 : st.borderX - 48,
+    x1: st.borderX > 0 ? st.borderX + 48 : st.borderX + 14,
+    z0: st.lakeLo - 4,
+    z1: st.lakeHi + 4,
+  })),
+  ...ROW_MERES.map((m) => ({ x0: m.xLo, x1: m.xHi, z0: m.borderZ - 20, z1: m.borderZ + 20 })),
+];
+
+export function inFatigueFreeWater(x: number, z: number): boolean {
+  for (const r of FATIGUE_FREE_WATERS) {
+    if (x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1) return true;
+  }
+  return false;
+}
+
 // The northern realms' open sea (swim fatigue + rim suppression): far enough
 // offshore that no land lobe reaches, near a true map border edge. The
 // Hollow's north edge stopped being a border when the Drakelands landed
@@ -1757,9 +1913,12 @@ export function inHollowOpenSea(x: number, z: number): boolean {
   if (x > DUNGEON_X_THRESHOLD) return false;
   // the Mirrorshallow: enclosed lake water, never open sea
   if (Math.hypot(x - 152, z - 1112) < 42) return false;
-  // the interior border meres are landlocked, never open sea (the Hollow's
-  // moat sections are deliberately NOT on that list)
-  if (inBorderLake(x, z)) return false;
+  // every designed crossing corridor (the moats, the straits' channel and
+  // outer approach, the row meres) is a CROSSING, never open sea: swim
+  // fatigue must not kill a player mid-crossing between two realms. Fatigue
+  // resumes past the corridors (the mere mouths into the outer sea, the
+  // Hollow's wider inner water), so the containment lines hold.
+  if (inFatigueFreeWater(x, z)) return false;
   const seaXb = worldXBoundsAt(z);
   if (z < 180) {
     // the starter sea: open water past the vale's and the island's organic
@@ -2084,14 +2243,19 @@ export function sowfieldFlattenWeight(x: number, z: number): number {
 // on), so editor maps get the same guarantees as the builtin world.
 // ---------------------------------------------------------------------------
 
-// Non-sealed border ridges break where they cross a declared lake, the same
-// reading the seaGate gives the open sea: where two maps meet across a
-// waterway, the water simply continues and the seam bed stays an even,
-// swimmable basin instead of a mountain range in the lake. 1 on land, easing
-// to 0 over the water. Sealed walls are never gated (their ridge and the
+// Non-sealed border ridges break where they cross a declared lake or a
+// border water (moat, strait, row mere), the same reading the seaGate gives
+// the open sea: where two maps meet across a waterway, the water simply
+// continues and the seam bed stays an even, swimmable basin instead of a
+// mountain range rising sheer from the channel. 1 on land, easing to 0 over
+// the water. Sealed walls are never gated (their ridge and the
 // crossesSealedBorder movement wall are the realm's hard boundary).
 function lakeRidgeGateAt(x: number, z: number): number {
-  let gate = 1;
+  // a tight fade: the beach ramps (borderBankRamp) own the bank softness, so
+  // the ridge only needs to vanish over the water itself, and the straits'
+  // inner-flank ridge (with its seed-pinned headland fixtures) stays intact
+  let gate = smoothstep(0, 8, borderWaterOutsideDist(x, z, RIDGE_BREAK_WATERS));
+  if (gate === 0) return 0;
   for (const zone of getActiveWorldContent().zones) {
     for (const lake of zone.lakes) {
       // hostile in-memory content: a degenerate radius must not gate anything
@@ -2134,8 +2298,24 @@ const SHORE_GRADE = 0.25; // band slopes multiply by this inside a footprint
 // every consumer samples groundHeight at runtime, so this is a tuning note,
 // not a hazard: pick fixture heights with the settle in mind.
 
+// The band remap itself: compress heights around the live waterline
+// (band(0) = 0 keeps every shoreline position exact; monotone, so wet stays
+// wet and dry stays dry). Anchored to waterLevel() (the custom-map override
+// when one is set), the same surface movement and render gate on.
+function gradeShoreBand(h: number, w: number): number {
+  const y = h - waterLevel();
+  let gy: number;
+  if (y > SHORE_BAND_UP) gy = y - (1 - SHORE_GRADE) * SHORE_BAND_UP;
+  else if (y < -SHORE_BAND_DOWN) gy = y + (1 - SHORE_GRADE) * SHORE_BAND_DOWN;
+  else gy = y * SHORE_GRADE;
+  return h + (gy - y) * w;
+}
+
 function applyLakeShoreGrading(x: number, z: number, h: number): number {
-  let w = 0;
+  // border waters (moats, straits, row meres) grade like any lake: full
+  // weight over the water, fading to nothing a short walk up the bank
+  let w = 1 - smoothstep(0, 10, borderWaterOutsideDist(x, z, BORDER_WATERS));
+  if (w === 1) return gradeShoreBand(h, 1);
   outer: for (const zone of getActiveWorldContent().zones) {
     for (const lake of zone.lakes) {
       // hostile in-memory content: never grade around a degenerate lake
@@ -2154,16 +2334,7 @@ function applyLakeShoreGrading(x: number, z: number, h: number): number {
     }
   }
   if (w === 0) return h;
-  // Anchored to the live waterline (the custom-map override when one is set,
-  // the builtin WATER_LEVEL otherwise), the same surface movement and render
-  // gate on, so overridden-water maps get graded shores at their real
-  // shoreline too.
-  const y = h - waterLevel();
-  let gy: number;
-  if (y > SHORE_BAND_UP) gy = y - (1 - SHORE_GRADE) * SHORE_BAND_UP;
-  else if (y < -SHORE_BAND_DOWN) gy = y + (1 - SHORE_GRADE) * SHORE_BAND_DOWN;
-  else gy = y * SHORE_GRADE;
-  return h + (gy - y) * w;
+  return gradeShoreBand(h, w);
 }
 
 // Ground height including instanced dungeon floors (flat, far off-world), the

@@ -19,7 +19,7 @@
 
 import { isRooted, isStunned } from './combat/cc';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
-import { isSubmergedAt, rideHeightAt, rideSteepnessAt, shoreStepOut } from './ride_height';
+import { isSubmergedAt, rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { GHOST_RUN_MULT } from './spirit';
 import { DT, type Entity, type MoveInput, normAngle, RUN_SPEED, TURN_SPEED } from './types';
 import { groundHeight, terrainDownhill, terrainWallStandoff, waterLevelAt } from './world';
@@ -183,14 +183,20 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     // real waterline-to-bank rise; a too-steep bank still yields to the shore
     // step-out onto a low standable lip.
     if (p.onGround && !swimming) {
-      const h0 = rideHeightAt(p.pos.x, p.pos.z, deps.seed);
-      const h1 = rideHeightAt(nx, nz, deps.seed);
+      // ride heights clamp to the STEP's waterline (the higher of both ends'),
+      // so stepping back into a water body from the submerged bed just outside
+      // its footprint is never a wall (real water can continue past a
+      // footprint edge into the open sea)
+      const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+      const g1 = groundHeight(nx, nz, deps.seed);
+      const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls);
+      const r1 = Math.max(g1, wls);
       const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
       if (
-        h1 > h0 &&
+        r1 > r0 &&
         run > 1e-5 &&
-        ((h1 - h0) / run > MAX_CLIMB_SLOPE ||
-          rideSteepnessAt(nx, nz, deps.seed) > MAX_CLIMB_SLOPE) &&
+        ((r1 - r0) / run > MAX_CLIMB_SLOPE ||
+          (g1 >= wls && rideSteepnessAt(nx, nz, deps.seed) > MAX_CLIMB_SLOPE)) &&
         !shoreStepOut(p.pos.x, p.pos.z, nx, nz, deps.seed, MAX_CLIMB_SLOPE)
       ) {
         nx = p.pos.x;
@@ -204,14 +210,15 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       // same low banks a wading step can reach.
       const h1 = groundHeight(nx, nz, deps.seed);
       if (h1 > p.pos.y) {
-        const r0 = rideHeightAt(p.pos.x, p.pos.z, deps.seed);
-        const r1 = rideHeightAt(nx, nz, deps.seed);
+        const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+        const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls);
+        const r1 = Math.max(h1, wls);
         const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
         if (
           r1 > r0 &&
           run > 1e-5 &&
           ((r1 - r0) / run > MAX_CLIMB_SLOPE ||
-            rideSteepnessAt(nx, nz, deps.seed) > MAX_CLIMB_SLOPE) &&
+            (h1 >= wls && rideSteepnessAt(nx, nz, deps.seed) > MAX_CLIMB_SLOPE)) &&
           !shoreStepOut(p.pos.x, p.pos.z, nx, nz, deps.seed, MAX_CLIMB_SLOPE)
         ) {
           nx = p.pos.x;

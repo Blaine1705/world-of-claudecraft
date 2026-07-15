@@ -207,7 +207,6 @@ import {
 } from './pathfind';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
-import { rideHeightAt, rideSteepnessAt, shoreStepOut } from './ride_height';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -271,6 +270,7 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
+import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
@@ -3788,12 +3788,13 @@ export class Sim {
     // already plans with, so a wading-depth ford never ends a charge.
     const h1 = groundHeight(nx, nz, this.cfg.seed);
     if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) return done(false);
-    const r0 = rideHeightAt(p.pos.x, p.pos.z, this.cfg.seed);
-    const r1 = rideHeightAt(nx, nz, this.cfg.seed);
+    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+    const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
+    const r1 = Math.max(h1, wls);
     if (
       r1 > r0 &&
       ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
-        rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE) &&
+        (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
       !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE)
     ) {
       return done(false);
@@ -3861,13 +3862,14 @@ export class Sim {
     // ridden-surface slopes plus the shore step-out (ride_height.ts), matching
     // the movement kernel: a follower crosses the same fords and climbs the
     // same low banks its leader just walked.
-    const r0 = rideHeightAt(p.pos.x, p.pos.z, this.cfg.seed);
-    const r1 = rideHeightAt(nx, nz, this.cfg.seed);
+    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+    const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
+    const r1 = Math.max(h1, wls);
     if (
       r1 > r0 &&
       step > 1e-5 &&
       ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
-        rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE) &&
+        (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
       !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE)
     ) {
       return true; // wall/cliff
@@ -4215,12 +4217,13 @@ export class Sim {
       // ridden-surface slopes (ride_height.ts): a submerged bed bump does not
       // stop a shove crossing shallow water. No shore step-out here: a forced
       // displacement conservatively stops at a bank face.
-      const r0 = rideHeightAt(cx, cz, this.cfg.seed);
-      const r1 = rideHeightAt(nx, nz, this.cfg.seed);
+      const wls = stepWaterLevel(cx, cz, nx, nz);
+      const r0 = Math.max(groundHeight(cx, cz, this.cfg.seed), wls);
+      const r1 = Math.max(h1, wls);
       if (
         r1 > r0 &&
         ((r1 - r0) / adv > MAX_CLIMB_SLOPE ||
-          rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)
+          (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE))
       ) {
         break; // would slam into a cliff
       }
