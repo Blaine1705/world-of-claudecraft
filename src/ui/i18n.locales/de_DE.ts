@@ -7016,8 +7016,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.dismount': 'Absitzen',
   'hudChrome.mounts.requiresLevel': 'Benötigt Stufe {level}',
   'hudChrome.mounts.pickFirst': 'Wählt ein Reittier zum Reiten.',
-  'hudChrome.mounts.keybindHint':
-    'Drückt die Aufsitzen-/Absitzen-Taste, um zu reiten.',
+  'hudChrome.mounts.keybindHint': 'Drückt die Aufsitzen-/Absitzen-Taste, um zu reiten.',
   'hudChrome.mounts.rarity_common': 'Verbreitet',
   'hudChrome.mounts.rarity_rare': 'Selten',
   'hudChrome.mounts.rarity_epic': 'Episch',

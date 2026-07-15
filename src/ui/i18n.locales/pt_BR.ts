@@ -6951,8 +6951,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.dismount': 'Desmontar',
   'hudChrome.mounts.requiresLevel': 'Requer nível {level}',
   'hudChrome.mounts.pickFirst': 'Escolha uma montaria para montar.',
-  'hudChrome.mounts.keybindHint':
-    'Pressione a tecla Montar / Desmontar para montar.',
+  'hudChrome.mounts.keybindHint': 'Pressione a tecla Montar / Desmontar para montar.',
   'hudChrome.mounts.rarity_common': 'Comum',
   'hudChrome.mounts.rarity_rare': 'Rara',
   'hudChrome.mounts.rarity_epic': 'Épica',

@@ -7400,8 +7400,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.dismount': 'Descendre',
   'hudChrome.mounts.requiresLevel': 'Niveau {level} requis',
   'hudChrome.mounts.pickFirst': 'Choisissez une monture à chevaucher.',
-  'hudChrome.mounts.keybindHint':
-    'Appuyez sur la touche Monter / Descendre pour chevaucher.',
+  'hudChrome.mounts.keybindHint': 'Appuyez sur la touche Monter / Descendre pour chevaucher.',
   'hudChrome.mounts.rarity_common': 'Commune',
   'hudChrome.mounts.rarity_rare': 'Rare',
   'hudChrome.mounts.rarity_epic': 'Épique',

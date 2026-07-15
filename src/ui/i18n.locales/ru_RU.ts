@@ -7446,8 +7446,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.dismount': 'Спешиться',
   'hudChrome.mounts.requiresLevel': 'Требуется {level} уровень',
   'hudChrome.mounts.pickFirst': 'Выберите транспорт для езды.',
-  'hudChrome.mounts.keybindHint':
-    'Нажмите клавишу «Сесть / Спешиться», чтобы поехать.',
+  'hudChrome.mounts.keybindHint': 'Нажмите клавишу «Сесть / Спешиться», чтобы поехать.',
   'hudChrome.mounts.rarity_common': 'Обычный',
   'hudChrome.mounts.rarity_rare': 'Редкий',
   'hudChrome.mounts.rarity_epic': 'Эпический',
