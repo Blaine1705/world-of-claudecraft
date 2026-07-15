@@ -442,17 +442,33 @@ export const pt_BR: EnTranslations = {
       "name_aether_hover_cycle": "Aerociclo do Justador do Éter",
       "name_shadowjump_toad": "Kama-Kage, o Sapo Salta-Sombras",
       "name_stormfeather_griffin": "Pluma-Tormenta Alcança-Céu",
+      "name_thunderstrut_gobbler": "Pavoneia-Trovões, o Grande Peru",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
       "desc_aether_hover_cycle": "Uma poderosa moto magitec projetada para travessias de combate rápidas e rente ao chão.",
       "desc_shadowjump_toad": "Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.",
-      "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas."
+      "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.",
+      "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "A Copa do Vale",
@@ -7108,6 +7124,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Rédeas do Pluma-Tormenta Alcança-Céu"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Rédeas de Pavoneia-Trovões, o Grande Peru"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Aulas de Equitação",
-        "text": "Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo. Pague a taxa e, quando eu der o sinal, chame o Corcel do Valor de treinamento e suba na sela. Fique comigo no pátio enquanto isso; se você se afastar, começamos de novo.",
+        "text": "Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Pague a taxa e, quando eu der o sinal, chame o Corcel do Valor de treinamento e suba na sela. Depois faça o percurso: siga a marca até o arco de largada, salte limpo cada obstáculo e cruze a linha de novo antes que a areia acabe. Consiga isso e a sela é sua. Saia do cercado e começamos de novo.",
         "completion": "Pronto, assim mesmo. Subiu num movimento só e ficou firme lá em cima. O Corcel do Valor é seu, {playerName}: sela, rédeas, e a reputação de um cavaleiro que conquistou o assento em vez de comprá-lo.",
         "objectives": {
           "0": {

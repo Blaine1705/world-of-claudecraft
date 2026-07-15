@@ -442,17 +442,33 @@ export const de_DE: EnTranslations = {
       "name_aether_hover_cycle": "Ätherlanzen-Schwebrad",
       "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
       "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
+      "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
       "desc_aether_hover_cycle": "Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.",
       "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
-      "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht."
+      "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
+      "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Der Talpokal",
@@ -7108,6 +7124,9 @@ export const de_DE: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Zügel des Himmelsgreifs Sturmfeder"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Zügel von Donnerstolz, dem Großen Puter"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const de_DE: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Reitstunden",
-        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Das Sitzen ist es, was ich lehre, nicht was ich verkaufe. Zahlt die Gebühr, und wenn ich das Wort gebe, ruft das Übungs-Valorross zu Euch und steigt in den Sattel. Bleibt dabei bei mir im Hof; entfernt Ihr Euch, fangen wir von vorn an.",
+        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Zahlt die Gebühr, und wenn ich das Wort gebe, ruft das Übungs-Valorross zu Euch und steigt auf. Dann reitet den Parcours: folgt der Markierung zum Startbogen, nehmt jeden Sprung sauber und überquert die Linie erneut, ehe die Sanduhr leerläuft. Schafft Ihr das, gehört Euch der Sattel. Verlasst Ihr die Koppel, fangen wir von vorn an.",
         "completion": "So, ja. In einer einzigen sauberen Bewegung hinauf und oben ruhig gesessen. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.",
         "objectives": {
           "0": {

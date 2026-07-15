@@ -17,7 +17,8 @@ export type MountKey =
   | 'valorsteed'
   | 'aether_hover_cycle'
   | 'shadowjump_toad'
-  | 'stormfeather_griffin';
+  | 'stormfeather_griffin'
+  | 'thunderstrut_gobbler';
 
 export type MountRarity = 'common' | 'rare' | 'epic';
 
@@ -38,9 +39,9 @@ export interface MountDef {
 
 // Speed/stat tiers (design directive): the purchasable horse is the 60% base;
 // the loot-only specials tier above it (70% commons, 75% rares with a little
-// crit, the 80% epic griffin with the most block and crit). The horse's level
-// gate (20) matches the stablemaster's buy gate; the loot commons ride earlier
-// (10), the rares at 15, the epic at 20.
+// crit, the 80% epics, the griffin and the gobbler, with the most block and
+// crit). The horse's level gate (20) matches the stablemaster's buy gate; the
+// loot commons ride earlier (10), the rares at 15, the epics at 20.
 export const MOUNTS: Record<MountKey, MountDef> = {
   // The base mount: first in the catalog, the natural default pick, sold by the
   // stablemaster (the only purchasable mount). Level 20 to match the buy gate.
@@ -92,6 +93,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   stormfeather_griffin: {
     key: 'stormfeather_griffin',
     name: 'Sky-Reach Stormfeather',
+    rarity: 'epic',
+    level: 20,
+    moveSpeedPct: 0.8,
+    meleeBlockPct: 0.08,
+    critPct: 0.05,
+  },
+  thunderstrut_gobbler: {
+    key: 'thunderstrut_gobbler',
+    name: 'Thunderstrut the Grand Gobbler',
     rarity: 'epic',
     level: 20,
     moveSpeedPct: 0.8,
@@ -150,8 +160,8 @@ export function mountMoveSpeedPct(mountKey: string): number {
 }
 
 // ---------------------------------------------------------------------------
-// The Highwatch Stables (zone 3): the fenced paddock, split by an interior divider
-// rail into a NORTH horse pasture and a SOUTH open yard, plus the ambient stable
+// The Highwatch Stables (zone 3): an L-shaped fenced paddock with a narrower NORTH
+// horse pasture above the full-width SOUTH open yard, plus the ambient stable
 // horses. This is the SINGLE SOURCE OF TRUTH for the stable-yard geometry: zone3
 // content (content/zone3.ts) places its fences and horse spawns from it, and
 // ambient.ts clamps the horse wander to it. Keep the numbers here so the fences
@@ -159,37 +169,61 @@ export function mountMoveSpeedPct(mountKey: string): number {
 // ---------------------------------------------------------------------------
 
 export interface StablePaddockDef {
-  /** The full fenced paddock rectangle (world x/z). Its NORTH fence (z2) carries
-   *  the opening the rider and horses pass through from Marla's yard. */
+  /** Bounding rectangle of the full race yard and pasture (world x/z). */
   x1: number;
   x2: number;
   z1: number;
   z2: number;
-  opening: { x1: number; x2: number };
-  /** The interior divider rail (a real collider) at z=`z`, splitting the paddock
-   *  into the north pasture and the south yard, with a gap the rider passes
-   *  through. content/zone3 fences it as two runs around `opening`. */
-  divider: { z: number; opening: { x1: number; x2: number } };
+  /** The narrower, fully enclosed north pasture extension. */
+  pasture: { x1: number };
+  /** The one intentional entrance in the race yard's north edge, beside the barn. */
+  entrance: { x1: number; x2: number };
+  /** The shared z coordinate for the race yard's north edge and pasture divider. */
+  divider: { z: number };
 }
 
 /** The stable paddock (see the header). Consumed by content/zone3 (fences) and
  *  src/sim/mob/ambient.ts (via STABLE_PASTURE below) as the single source of
- *  truth; do not duplicate these coordinates. */
+ *  truth; do not duplicate these coordinates. Sized so the (enlarged) show-jumping
+ *  race ring (MOUNT_RACE_COURSE below) fits south of the divider with clearance.
+ *  The south edge (z1) keeps ~3yd clear of the deeprock_kobold camp at (75,625)
+ *  r18 (its north edge is z=643), so the flattened apron never swallows the camp. */
 export const STABLE_PADDOCK: StablePaddockDef = {
-  x1: 78,
-  x2: 126,
-  z1: 668,
+  x1: 54,
+  x2: 150,
+  z1: 646,
   z2: 706,
-  opening: { x1: 88, x2: 94 },
-  divider: { z: 688, opening: { x1: 98, x2: 106 } },
+  pasture: { x1: 104 },
+  entrance: { x1: 84, x2: 94 },
+  divider: { z: 688 },
 };
 
-// The ambient horses' wander bound: the paddock inset by a body-clearance margin and
-// restricted to NORTH of the divider, so a horse never leaves the pasture. Derived
-// from STABLE_PADDOCK so nothing carries a stale copy of the rectangle.
+/** The paddock terrain plateau: terrainHeight (src/sim/world.ts) blends the ground
+ *  toward a single height inside the paddock rect, easing to natural terrain over
+ *  `falloff` yards beyond the fence (the Sowfield SOWFIELD_FLAT precedent), so the
+ *  course sits on flat, fair ground. Living in terrainHeight means sim collision,
+ *  movement, fences, props, and the renderer all agree on the height (the repo's
+ *  hard terrain invariant). `height` (7.5) is the mid of the rect's natural range
+ *  (samples at seed 20061 spanned ~-2..16, mean ~7.3); `falloff` (10) keeps the
+ *  apron a gentle slope, not a cliff. Derived from STABLE_PADDOCK so it can never
+ *  drift from the shared yard apron. The full bounding rectangle intentionally
+ *  stays level so the barn cluster in the open northwest notch is not left on a
+ *  different terrain shelf from the race yard and pasture. */
+export const STABLE_FLAT = {
+  x1: STABLE_PADDOCK.x1,
+  x2: STABLE_PADDOCK.x2,
+  z1: STABLE_PADDOCK.z1,
+  z2: STABLE_PADDOCK.z2,
+  height: 7.5,
+  falloff: 10,
+} as const;
+
+// The ambient horses' wander bound: the narrower pasture extension inset by a
+// body-clearance margin and restricted to NORTH of the divider, so a horse never
+// leaves the pasture. Derived from STABLE_PADDOCK so nothing carries stale geometry.
 const PASTURE_MARGIN = 2;
 export const STABLE_PASTURE = {
-  xMin: STABLE_PADDOCK.x1 + PASTURE_MARGIN,
+  xMin: STABLE_PADDOCK.pasture.x1 + PASTURE_MARGIN,
   xMax: STABLE_PADDOCK.x2 - PASTURE_MARGIN,
   zMin: STABLE_PADDOCK.divider.z + PASTURE_MARGIN,
   zMax: STABLE_PADDOCK.z2 - PASTURE_MARGIN,
@@ -198,3 +232,125 @@ export const STABLE_PASTURE = {
 /** Template id of the ambient Highwatch stable horse (content/zone3 mob def). The
  *  locomotion dispatcher's ambient arm (src/sim/mob/ambient.ts) routes on it. */
 export const STABLE_HORSE_TEMPLATE_ID = 'stable_horse';
+
+// ---------------------------------------------------------------------------
+// The Highwatch show-jumping race (docs-free minigame, always open): a permanent
+// course inside the paddock's south yard. Stand on the glowing platform behind
+// the start arch to arm your personal timer, clear every jump in riding order,
+// and cross the arch again before the time limit. This block is the SINGLE SOURCE OF TRUTH
+// for the course: zone3 content places the arch/jump props from it, the race
+// system (src/sim/mount_race.ts) drives gate detection off it, and the client
+// racing line + HUD strip derive from it. No coordinate lives anywhere else.
+// ---------------------------------------------------------------------------
+
+export type RaceJumpKind = 'vertical' | 'oxer';
+
+/** Shared visual/collision footprint for each jump style. The renderer scales
+ *  the GLB to these dimensions and colliders.ts builds the matching jumpable
+ *  OBB, so a larger fixture never drifts from its physical footprint. */
+export const MOUNT_RACE_JUMP_FIXTURES = {
+  vertical: { width: 7.5, depth: 0.8, maxHeight: 1.7 },
+  oxer: { width: 8, depth: 1.8, maxHeight: 1.85 },
+} as const satisfies Record<RaceJumpKind, { width: number; depth: number; maxHeight: number }>;
+
+/** One gate on the course. `dir` is the RIDING heading through the gate (the
+ *  game convention: heading h points at (sin h, cos h) in x/z); the physical
+ *  crossbar and the detection segment run perpendicular to it. */
+export interface RaceGateDef {
+  x: number;
+  z: number;
+  dir: number;
+  kind: RaceJumpKind;
+}
+
+export interface MountRaceCourseDef {
+  /** The finish arch and authored riding direction. The start action is armed
+   *  from MOUNT_RACE_START_PLATFORM behind it; crossing after every jump finishes. */
+  arch: { x: number; z: number; dir: number };
+  /** Half-width of the arch's crossing segment (world units). */
+  archHalfWidth: number;
+  /** The jumps in riding order (a clockwise ring from the arch). */
+  jumps: readonly RaceGateDef[];
+  /** Half-width of a jump's crossing segment (a touch wider than the physical
+   *  crossbar, so brushing a post still counts). */
+  jumpHalfWidth: number;
+  /** Personal time budget from arch to arch. */
+  timeLimitSeconds: number;
+}
+
+// The ring the course is laid out on: an ellipse centred in the south yard. The
+// enlarged paddock (x 54..150, south yard z 646..688) lets it grow to a proper
+// arena. Ring x spans 66..138, z spans 652..682. Clearances (ring edge to fence):
+// west 12, east 12, south 6, divider 6.
+const RACE_RING = { cx: 102, cz: 667, rx: 36, rz: 15 } as const;
+
+/** A point + riding tangent on RACE_RING at parameter t (t=0 is the north point,
+ *  increasing t rides CLOCKWISE: east along the top first). */
+function ringGate(t: number, kind: RaceJumpKind): RaceGateDef {
+  const x = RACE_RING.cx + RACE_RING.rx * Math.sin(t);
+  const z = RACE_RING.cz + RACE_RING.rz * Math.cos(t);
+  // Tangent of (sin t, cos t) parametrisation: (rx*cos t, -rz*sin t).
+  const dir = Math.atan2(RACE_RING.rx * Math.cos(t), -RACE_RING.rz * Math.sin(t));
+  return { x, z, dir, kind };
+}
+
+/** The Highwatch stables race course: the arch sits east of the ring's north
+ *  point and is ridden EASTWARD, then seven jumps circle the arena. */
+export const MOUNT_RACE_COURSE: MountRaceCourseDef = {
+  arch: { x: 114, z: RACE_RING.cz + RACE_RING.rz, dir: Math.PI / 2 },
+  // Half-widths of the crossing segments, sized to the bigger fixtures (props.ts):
+  // the ~10yd arch and the 7.5-8yd jumps, each a touch wider than the physical
+  // gate so brushing a post still counts.
+  archHalfWidth: 5,
+  jumps: [
+    ringGate(Math.PI / 4, 'vertical'),
+    ringGate(Math.PI / 2, 'oxer'),
+    ringGate((3 * Math.PI) / 4, 'vertical'),
+    ringGate(Math.PI, 'oxer'),
+    ringGate((5 * Math.PI) / 4, 'vertical'),
+    ringGate((3 * Math.PI) / 2, 'oxer'),
+    ringGate((7 * Math.PI) / 4, 'vertical'),
+  ],
+  jumpHalfWidth: MOUNT_RACE_JUMP_FIXTURES.oxer.width / 2 + 0.35,
+  // Arch-to-arch budget for the enlarged lap. Ring perimeter (Ramanujan, rx36 rz15)
+  // is ~167yd; a mount runs 7 * 1.6 = 11.2 yd/s, so a clean lap is ~15s of pure
+  // travel. The requested 20s budget leaves roughly five seconds for the seven
+  // jump set-ups beyond a clean mounted lap, making the event a fast sprint.
+  timeLimitSeconds: 20,
+};
+
+/** The glowing square a rider stands on to arm the race UI. It sits directly
+ *  behind the arch relative to the authored riding direction. Shared by the
+ *  renderer, HUD proximity check, and authoritative start validation. */
+const START_PLATFORM_BACK_OFFSET = 8;
+export const MOUNT_RACE_START_PLATFORM = {
+  x: MOUNT_RACE_COURSE.arch.x - Math.sin(MOUNT_RACE_COURSE.arch.dir) * START_PLATFORM_BACK_OFFSET,
+  z: MOUNT_RACE_COURSE.arch.z - Math.cos(MOUNT_RACE_COURSE.arch.dir) * START_PLATFORM_BACK_OFFSET,
+  size: 8,
+} as const;
+
+/** True while a world position is standing within the square start platform. */
+export function isOnMountRaceStartPlatform(pos: { x: number; z: number }): boolean {
+  const half = MOUNT_RACE_START_PLATFORM.size / 2;
+  return (
+    Math.abs(pos.x - MOUNT_RACE_START_PLATFORM.x) <= half &&
+    Math.abs(pos.z - MOUNT_RACE_START_PLATFORM.z) <= half
+  );
+}
+
+/** Endpoints of a gate's crossing segment: perpendicular to the riding heading,
+ *  centred on the gate. Shared by the race system's segment tests, the prop
+ *  placement, and the geometry contract tests. */
+export function raceGateSegment(
+  gate: { x: number; z: number; dir: number },
+  halfWidth: number,
+): { ax: number; az: number; bx: number; bz: number } {
+  const nx = Math.sin(gate.dir + Math.PI / 2);
+  const nz = Math.cos(gate.dir + Math.PI / 2);
+  return {
+    ax: gate.x - nx * halfWidth,
+    az: gate.z - nz * halfWidth,
+    bx: gate.x + nx * halfWidth,
+    bz: gate.z + nz * halfWidth,
+  };
+}

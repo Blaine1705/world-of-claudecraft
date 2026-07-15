@@ -115,6 +115,19 @@ export function forceDismount(ctx: SimContext, e: Entity): void {
   if (meta) recalcFor(ctx, e, meta);
 }
 
+/** Put an active riding-lesson player straight onto the training Valorsteed.
+ *  Used by the start-platform flow, which replaces the old Marla button and
+ *  therefore needs the race click to lend the lesson mount immediately. */
+export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
+  const meta = ctx.players.get(e.id);
+  if (meta?.mountTraining?.state !== 'IN_PROGRESS') return false;
+  e.mountKey = TRAINING_MOUNT_KEY;
+  e.mountCastRemaining = 0;
+  e.mountCastKey = '';
+  recalcFor(ctx, e, meta);
+  return true;
+}
+
 /** Pick the player's stable mount (persisted). Ownership- and level-gated;
  *  swaps the live mount in place when already riding. Returns false on an
  *  unknown key or a failed gate (an error event carries the reason). */

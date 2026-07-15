@@ -442,17 +442,33 @@ export const id_ID: EnTranslations = {
       "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
       "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
       "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
-      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Piala Lembah",
@@ -7108,6 +7124,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Tali Kekang Bulu Badai Penggapai Langit"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Tali Kekang Kalkun Agung Penderap Guntur"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const id_ID: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Pelajaran Menunggang Kuda",
-        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Bayar biayanya, dan saat kuberi aba-aba, panggil Valorsteed latihan itu dan naiklah ke pelana. Tetaplah bersamaku di pekarangan selagi melakukannya; kalau kau pergi menjauh, kita mulai lagi dari awal.",
+        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Bayar biayanya, dan saat kuberi aba-aba, panggil Valorsteed latihan itu dan naiklah ke pelana. Lalu tempuh lintasannya: ikuti penanda ke gerbang start, lewati tiap rintangan dengan bersih, dan lintasi garis lagi sebelum pasir habis. Berhasil, dan pelana itu milikmu. Kalau kau keluar dari padok, kita mulai lagi dari awal.",
         "completion": "Nah, begitu. Naik dengan satu gerakan mulus dan duduk mantap di atas. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.",
         "objectives": {
           "0": {

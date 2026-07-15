@@ -1,8 +1,8 @@
 // Visual proof of the collectible-mounts feature: boots the offline game,
 // levels to 20 via the dev sim handle, grants every reins item, screenshots
 // the bags (the collection), the character sheet's mount picker, and mounted
-// riders in the world (the rigged Valorsteed, the epic griffin, and the
-// clipless hover cycle). Z rides the pick directly; the pick changes in the
+// riders in the world (the rigged Valorsteed, the epic griffin and gobbler,
+// and the clipless hover cycle). Z rides the pick directly; the pick changes in the
 // character sheet's picker (the old Mounts window is retired).
 //   node scripts/mounts_shot.mjs    (needs `npm run dev`; GAME_URL overrides :5173)
 import fs from 'node:fs';
@@ -69,6 +69,7 @@ await page.evaluate(() => {
     'reins_aether_hover_cycle',
     'reins_shadowjump_toad',
     'reins_stormfeather_griffin',
+    'reins_thunderstrut_gobbler',
   ])
     sim.addItem(id, 1);
 });
@@ -165,6 +166,7 @@ const swapTo = async (key, path) => {
   console.log(`${key}: ${path}`);
 };
 await swapTo('stormfeather_griffin', 'tmp/mounts_griffin.png');
+await swapTo('thunderstrut_gobbler', 'tmp/mounts_gobbler.png');
 await swapTo('aether_hover_cycle', 'tmp/mounts_hover_cycle.png');
 
 await browser.close();

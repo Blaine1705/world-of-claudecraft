@@ -3557,6 +3557,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_aether_hover_cycle',
   'reins_shadowjump_toad',
   'reins_stormfeather_griffin',
+  'reins_thunderstrut_gobbler',
 ]);
 
 /** Static URL of an item's image icon, or null if it uses a recipe. */

@@ -547,6 +547,15 @@ export interface SimContextCallbacks {
   tickMountTraining(meta: PlayerMeta): void;
   abandonMountTraining(meta: PlayerMeta): void;
 
+  // Show-jumping race (src/sim/mount_race.ts): a strictly per-player session on
+  // PlayerMeta.mountRace. tickMountRace is the per-tick driver (called from the
+  // coordinator's per-player loop after movement, so the tick's prevPos -> pos
+  // segment is what gate crossings are detected on). There is no abandon
+  // callback: the driver voids a run itself on death/dismount/leaving, and a
+  // leaving player's session simply dies with their PlayerMeta (nothing external
+  // references it).
+  tickMountRace(meta: PlayerMeta): void;
+
   // C4a casting lifecycle (src/sim/combat/casting_lifecycle.ts) consumes these; all
   // still on Sim. `runEffects` is the C4b boundary (the moved applyAbility +
   // applyChannelTick reach the actual ability resolution only through here).
@@ -1017,6 +1026,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     startDelveRaiseDeadChannel: host.startDelveRaiseDeadChannel,
     tickMountTraining: host.tickMountTraining,
     abandonMountTraining: host.abandonMountTraining,
+    tickMountRace: host.tickMountRace,
     resolvedAbility: host.resolvedAbility,
     playerGcdFor: host.playerGcdFor,
     isFriendlyTo: host.isFriendlyTo,

@@ -442,17 +442,33 @@ export const vi_VN: EnTranslations = {
       "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
       "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
       "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
-      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Cúp Thung Lũng",
@@ -7108,6 +7124,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Dây cương Vũ Bão Vươn Trời"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Dây cương Gà Tây Chúa Sải Bước Sấm"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Bài Học Cưỡi Ngựa",
-        "text": "Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán. Trả lệ phí, rồi khi ta ra hiệu, hãy gọi con Valorsteed huấn luyện đến và leo lên yên. Trong lúc đó hãy ở lại sân cùng ta; đi xa là ta bắt đầu lại từ đầu.",
+        "text": "Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Trả lệ phí, rồi khi ta ra hiệu, hãy gọi con Valorsteed huấn luyện đến và leo lên yên. Rồi chạy hết đường đua: theo dấu hiệu tới cổng vòm xuất phát, vượt sạch từng chướng ngại, và băng qua vạch lần nữa trước khi cát chảy hết. Làm được vậy thì yên ngựa là của ngươi. Đi khỏi bãi quây là ta bắt đầu lại từ đầu.",
         "completion": "Đấy, được rồi. Lên yên bằng một động tác gọn gàng và ngồi thật vững. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.",
         "objectives": {
           "0": {

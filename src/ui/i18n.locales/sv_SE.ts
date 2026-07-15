@@ -2476,7 +2476,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Varje ryttare kommer in på två ben, {className}. Tyglarna får du inte förrän du kan sitta kvar på Valorsteed utan att kyssa leran, och Highwatch har inga läkare att avvara för brutna ben.',
   'entities.quests.q_riding_lessons.title': 'Ridlektioner',
   'entities.quests.q_riding_lessons.text':
-    'Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Att sitta kvar är vad jag lär ut, inte vad jag säljer. Betala avgiften, och när jag ger tecken kallar du till dig övnings-Valorsteeden och kliver upp i sadeln. Stanna hos mig på gården under tiden; vandrar du iväg börjar vi om.',
+    'Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Betala avgiften, och när jag ger tecken kallar du till dig övnings-Valorsteeden och kliver upp i sadeln. Rid sedan banan: följ markören till startbågen, ta varje hinder rent och korsa linjen igen innan sanden runnit ut. Klarar du det är sadeln din. Vandrar du ut ur hagen börjar vi om.',
   'entities.quests.q_riding_lessons.completion':
     'Så där ja. Upp i en enda mjuk rörelse och stadigt sittande där uppe. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Tämj Valorsteed',
@@ -6584,6 +6584,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': 'Tändningsnyckel: eterriddarens svävarcykel',
   'entities.items.reins_shadowjump_toad.name': 'Tyglar till Kama-Kage, skuggsprångspaddan',
   'entities.items.reins_stormfeather_griffin.name': 'Tyglar till den himlanående Stormfjädern',
+  'entities.items.reins_thunderstrut_gobbler.name':
+    'Tyglar till Åskstoltseraren, den stora kalkonen',
   'entities.quests.q_prof_intro.completion':
     'Ser du? Malm i packningen och valkar på händerna. Fortsätt med gruvdrift, skogsavverkning och örtplockning medan du färdas längs vägarna. När du är tillbaka i staden, kom ihåg Stadsfokus-tavlan vid marknaden och arbetsbänken i närheten. Det går att försörja sig hederligt på alltihop, om du vill.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmklump',

@@ -10,6 +10,7 @@ import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import {
   DEFAULT_MOUNT,
+  MOUNT_RACE_COURSE,
   type MountKey,
   mountDef,
   normalizeMountKey,
@@ -55,6 +56,7 @@ import {
   type RiteIntensity,
   type SimEvent,
   type SportRole,
+  TICK_RATE,
   type VcBracket,
   type VcNationId,
 } from '../sim/types';
@@ -85,6 +87,7 @@ import {
   type LockpickView,
   type MailInfo,
   type MarketInfo,
+  type MountRaceView,
   type OverheadEmoteId,
   type PartyInfo,
   type PlayerProfessionsView,
@@ -1096,6 +1099,25 @@ export class ClientWorld implements IWorld {
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
+  // Show-jumping race: rebuilt from the mountRace* events (no snapshot field),
+  // the lockpickState precedent. Internal shape carries wall-clock anchors
+  // (performance.now scale, render-interpolation timing only): goDeadlineMs for
+  // the 3..2..1 countdown and deadlineMs for the timed lap, so mountRaceView() can
+  // count both down; the server stays authoritative (its end event clears the
+  // mirror). clearedMask/cleared mirror the any-order jump progress.
+  private mountRaceMirror: {
+    raceId: string;
+    phase: 'countdown' | 'racing';
+    clearedMask: number;
+    cleared: number;
+    jumpsTotal: number;
+    goDeadlineMs: number;
+    deadlineMs: number;
+    timeLimitTicks: number;
+  } | null = null;
+  // Riding lesson liveness, mirrored from the mountTrain* events for legacy
+  // mountLessonActive() consumers; no snapshot field.
+  private mountLessonActiveMirror = false;
   delveMarks = 0;
   companionUpgrades: Record<string, number> = {};
   // Flat per-craft skill tracking (#1126). NOT yet mirrored over the wire: this
@@ -1512,6 +1534,8 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'events') {
       for (const ev of msg.list) {
         this.applyLockpickEvent(ev as SimEvent);
+        this.applyMountRaceEvent(ev as SimEvent);
+        this.applyMountTrainEvent(ev as SimEvent);
         this.applyCraftResultEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
@@ -2300,6 +2324,90 @@ export class ClientWorld implements IWorld {
   // the HUD (drainEvents), no mirrored state. ---
   mountTrainBegin(): void {
     this.cmd({ cmd: 'mount_train_begin' });
+  }
+  // --- show-jumping race: start/cancel commands (platform and eligibility are
+  // re-validated server-side); the read is rebuilt from the mountRace* events by
+  // applyMountRaceEvent, counting the countdown then the lap timer down against
+  // wall-clock anchors. ---
+  mountRaceStart(): void {
+    this.cmd({ cmd: 'mount_race_start' });
+  }
+  mountRaceCancel(): void {
+    this.cmd({ cmd: 'mount_race_cancel' });
+  }
+  mountLessonActive(): boolean {
+    return this.mountLessonActiveMirror;
+  }
+  mountRaceView(): MountRaceView | null {
+    const s = this.mountRaceMirror;
+    if (!s) return null;
+    const now = performance.now();
+    const goMs = Math.max(0, s.goDeadlineMs - now);
+    const remMs = Math.max(0, s.deadlineMs - now);
+    return {
+      raceId: s.raceId,
+      phase: s.phase,
+      clearedMask: s.clearedMask,
+      cleared: s.cleared,
+      jumpsTotal: s.jumpsTotal,
+      goTicksLeft: s.phase === 'countdown' ? Math.round((goMs / 1000) * TICK_RATE) : 0,
+      ticksLeft: s.phase === 'racing' ? Math.round((remMs / 1000) * TICK_RATE) : s.timeLimitTicks,
+      timeLimitTicks: s.timeLimitTicks,
+    };
+  }
+  // Mirror the authoritative race lifecycle into mountRaceMirror. Gate positions
+  // never ride the wire (the racing line derives from the shared
+  // MOUNT_RACE_COURSE content); the events still flow to the HUD (drainEvents)
+  // for the countdown/banners.
+  private applyMountRaceEvent(ev: SimEvent): void {
+    if (ev.type === 'mountRaceCountdown') {
+      this.mountRaceMirror = {
+        raceId: ev.raceId,
+        phase: 'countdown',
+        clearedMask: 0,
+        cleared: 0,
+        jumpsTotal: MOUNT_RACE_COURSE.jumps.length,
+        goDeadlineMs: performance.now() + (ev.countdownTicks / TICK_RATE) * 1000,
+        deadlineMs: 0,
+        timeLimitTicks: 0,
+      };
+    } else if (ev.type === 'mountRaceStart') {
+      const s = this.mountRaceMirror;
+      const deadlineMs = performance.now() + (ev.timeLimitTicks / TICK_RATE) * 1000;
+      if (s && s.raceId === ev.raceId) {
+        s.phase = 'racing';
+        s.jumpsTotal = ev.jumpsTotal;
+        s.timeLimitTicks = ev.timeLimitTicks;
+        s.deadlineMs = deadlineMs;
+      } else {
+        // A start without a preceding countdown mirror (late join / dropped
+        // event): build the racing mirror straight from the start event.
+        this.mountRaceMirror = {
+          raceId: ev.raceId,
+          phase: 'racing',
+          clearedMask: 0,
+          cleared: 0,
+          jumpsTotal: ev.jumpsTotal,
+          goDeadlineMs: 0,
+          deadlineMs,
+          timeLimitTicks: ev.timeLimitTicks,
+        };
+      }
+    } else if (ev.type === 'mountRaceJump') {
+      const s = this.mountRaceMirror;
+      if (s && s.raceId === ev.raceId) {
+        s.clearedMask = ev.mask;
+        s.cleared = ev.cleared;
+        s.jumpsTotal = ev.jumpsTotal;
+      }
+    } else if (ev.type === 'mountRaceEnd') {
+      if (this.mountRaceMirror?.raceId === ev.raceId) this.mountRaceMirror = null;
+    }
+  }
+  // Mirror riding-lesson liveness for legacy mountLessonActive() consumers.
+  private applyMountTrainEvent(ev: SimEvent): void {
+    if (ev.type === 'mountTrainSession') this.mountLessonActiveMirror = true;
+    else if (ev.type === 'mountTrainEnd') this.mountLessonActiveMirror = false;
   }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);

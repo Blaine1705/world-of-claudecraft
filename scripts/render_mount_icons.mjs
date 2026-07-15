@@ -62,6 +62,13 @@ const JOBS = [
     id: 'reins_stormfeather_griffin',
     cfg: { headFwd: 0.88, headUp: 0.7, fill: 0.55, yaw: 0.5, pitch: 0.18 },
   },
+  {
+    // The gobbler's head rides high on the front of the neck, above mid-body;
+    // frame a touch wider so the fanned tail still reads behind the face.
+    file: 'thunderstrut_gobbler.glb',
+    id: 'reins_thunderstrut_gobbler',
+    cfg: { headFwd: 0.7, headUp: 0.7, fill: 0.62, yaw: 0.45, pitch: 0.12 },
+  },
 ];
 
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;

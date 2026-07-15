@@ -2469,7 +2469,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Enhver rytter kommer ind på to ben, {className}. Du får ikke tøjlerne, før du kan sidde Valorsteed uden at kysse jorden, og Highwatch har ingen healere til overs til brækkede knogler.',
   'entities.quests.q_riding_lessons.title': 'Ridelektioner',
   'entities.quests.q_riding_lessons.text':
-    'Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger. Betal gebyret, og når jeg giver ordet, så kald trænings-Valorsteeden til dig og kravl op i sadlen. Bliv hos mig på gårdspladsen imens; vandrer du væk, starter vi forfra.',
+    'Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Betal gebyret, og når jeg giver ordet, så kald trænings-Valorsteeden til dig og kravl op i sadlen. Rid så banen: følg markøren til startbuen, tag hvert spring rent, og kryds linjen igen, før sandet er løbet ud. Klarer du det, er sadlen din. Vandrer du ud af folden, starter vi forfra.',
   'entities.quests.q_riding_lessons.completion':
     'Sådan, ja. Op i én glidende bevægelse og et roligt sæde deroppe. Valorsteed er din, {playerName}: sadel, tøjler og ry som en rytter, der har fortjent sædet i stedet for at købe det.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Tæm Valorsteed',
@@ -6567,6 +6567,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': 'Tændingsnøgle: Æterridderens svævecykel',
   'entities.items.reins_shadowjump_toad.name': 'Tøjler til Kama-Kage, skyggespringstudsen',
   'entities.items.reins_stormfeather_griffin.name': 'Tøjler til den himmelrækkende Stormfjer',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Tøjler til Tordenspankeren, den store kalkun',
   'entities.quests.q_prof_intro.completion':
     'Kan du se? Malm i din taske og hård hud på dine hænder. Fortsæt med minedrift, skovhugst og urtesamling, mens du rejser ad vejene. Når du er tilbage i byen, så husk Byfokus-tavlen ved markedet og arbejdsbænken i nærheden. Der er et hæderligt levebrød i det alt sammen, hvis du ønsker det.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmklump',

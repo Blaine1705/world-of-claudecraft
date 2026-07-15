@@ -3334,6 +3334,14 @@ export class GameServer {
         // the fee stays paid.
         sim.mountTrainAbortFor(pid);
         break;
+      // Show-jumping race: the Sim re-validates the glowing platform, lesson or
+      // mount eligibility, and liveness before arming the countdown.
+      case 'mount_race_start':
+        sim.mountRaceStartFor(pid);
+        break;
+      case 'mount_race_cancel':
+        sim.mountRaceCancelFor(pid);
+        break;
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':

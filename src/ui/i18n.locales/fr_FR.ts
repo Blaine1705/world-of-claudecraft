@@ -3597,7 +3597,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Tout cavalier arrive sur ses deux jambes, {className}. Je ne te donnerai les rênes que lorsque tu sauras tenir en selle sur le Destrier de Bravoure sans mordre la boue, et Highwatch n’a pas de guérisseurs de trop pour les os brisés.',
   'entities.quests.q_riding_lessons.title': 'Leçons d’équitation',
   'entities.quests.q_riding_lessons.text':
-    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Paie les frais, et quand j’en donne l’ordre, appelle à toi le Destrier de Bravoure d’entraînement et monte en selle. Reste près de moi dans la cour pendant ce temps; si tu t’éloignes, on recommence.',
+    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Paie les frais, et quand j’en donne l’ordre, appelle à toi le Destrier de Bravoure d’entraînement et mets-toi en selle. Puis fais le parcours : suis le repère jusqu’à l’arche de départ, franchis chaque obstacle proprement et repasse la ligne avant que le sable ne s’écoule. Réussis, et la selle est à toi. Sors de l’enclos et l’on recommence.',
   'entities.quests.q_riding_lessons.completion':
     'Voilà. En selle d’un seul mouvement, et bien stable une fois là-haut. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Dompter le Destrier de Bravoure',
@@ -6780,6 +6780,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': 'Clé de contact : Aérocycle du Jouteur d’Éther',
   'entities.items.reins_shadowjump_toad.name': 'Rênes de Kama-Kage, le Crapaud Saute-Ombre',
   'entities.items.reins_stormfeather_griffin.name': 'Rênes du Plume-d’Orage Toise-Ciel',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Rênes de Pavane-Tonnerre, le Grand Dindon',
   'entities.quests.q_prof_intro.completion':
     'Vous voyez ? Du minerai dans votre sac et des cals aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l’établi d’artisanat juste à côté. Tout cela peut vous offrir un gagne-pain honorable, si le cœur vous en dit.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Morceau de minerai',
@@ -6839,6 +6840,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Aérocycle du Jouteur d’Éther',
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, le Crapaud Saute-Ombre',
   'hudChrome.mounts.name_stormfeather_griffin': 'Plume-d’Orage Toise-Ciel',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavane-Tonnerre, le Grand Dindon',
   'hudChrome.mounts.desc_valorsteed':
     'Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6851,6 +6853,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.',
   'hudChrome.mounts.emptyTitle': 'Aucune monture collectée',
   'hudChrome.mounts.emptyStableHint':
     'Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.',

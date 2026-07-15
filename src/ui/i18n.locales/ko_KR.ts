@@ -2612,7 +2612,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '기수는 누구나 두 발로 걸어 들어오지, {className}. 발러스티드 위에서 진흙에 처박히지 않고 버틸 수 있을 때까지는 고삐를 내주지 않아. 하이워치엔 부러진 뼈를 봐줄 치료사도 넉넉지 않으니까.',
   'entities.quests.q_riding_lessons.title': '승마 수업',
   'entities.quests.q_riding_lessons.text':
-    '기수는 누구나 두 발로 걸어 들어오지, {playerName}, 우리가 처음 만난 날 말했던 그대로다. 내가 가르치는 건 자리에 앉는 법이지 파는 물건이 아니야. 수업료를 내고, 내가 신호를 주면 훈련용 발러스티드를 불러 안장에 올라타라. 그동안은 내 곁 마당에 머물러라. 멀리 벗어나면 처음부터 다시 시작이다.',
+    '기수는 누구나 두 발로 걸어 들어오지, {playerName}, 우리가 처음 만난 날 말했던 그대로다. 수업료를 내고, 내가 신호를 주면 훈련용 발러스티드를 불러 안장에 올라타라. 그런 다음 코스를 달려라. 표식을 따라 출발 아치로 가서, 모든 장애물을 깔끔하게 뛰어넘고, 모래가 다 떨어지기 전에 결승선을 다시 넘어라. 그걸 해내면 그 안장은 네 것이다. 마당 밖으로 벗어나면 처음부터 다시다.',
   'entities.quests.q_riding_lessons.completion':
     '그래, 됐다. 한 번에 매끄럽게 올라타서 흔들림 없이 앉았구나. 발러스티드는 이제 네 것이다, {playerName}: 안장도 고삐도, 그리고 값을 치른 게 아니라 스스로 얻어낸 기수의 자리도.',
   'entities.quests.q_riding_lessons.objectives.0.label': '발러스티드 길들이기',
@@ -5966,6 +5966,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': '시동 열쇠: 에테르 기사 호버사이클',
   'entities.items.reins_shadowjump_toad.name': '그림자 도약 두꺼비 카마카게의 고삐',
   'entities.items.reins_stormfeather_griffin.name': '하늘닿이 폭풍깃의 고삐',
+  'entities.items.reins_thunderstrut_gobbler.name': '천둥활보 대왕 칠면조의 고삐',
   'entities.mobs.drowned_cantor.name': '익사한 영창자',
   'entities.mobs.reedbound_acolyte.name': '갈대에 묶인 신도',
   'entities.mobs.deepfen_spearjaw.name': '깊은늪 창턱',
@@ -6550,6 +6551,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': '에테르 기사 호버사이클',
   'hudChrome.mounts.name_shadowjump_toad': '그림자 도약 두꺼비 카마카게',
   'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
+  'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
   'hudChrome.mounts.desc_grag_bear': '여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.',
   'hudChrome.mounts.desc_stalkglider_snail': '여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.',
@@ -6559,12 +6561,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    '깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.',
   'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
   'hudChrome.mounts.emptyStableHint':
     '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
   'hudChrome.mounts.emptyDropHint': '더 희귀한 탈것은 던전과 공격대 우두머리가 떨어뜨립니다.',
   'hudChrome.mounts.clickManage': '클릭하여 탈것 선택',
   'hudChrome.mountTraining.mountPrompt': '{key} 키를 눌러 훈련용 발러스티드에 탑승한다.',
+  'hudChrome.mountTraining.ownedMountPrompt': '{key} 키를 눌러 탑승하세요',
+  'hudChrome.mountTraining.ridePrompt':
+    '빛나는 표식을 따라 출발선으로 간 뒤 레이스 시작을 누르세요.',
   'hudChrome.mountTraining.begin': '수업 시작',
   'hudChrome.mountTraining.success': '발러스티드를 길들였다.',
+  'hudChrome.mountTraining.returnToMarla': '마구간의 마를라에게 돌아가 마구간 말을 입양하세요.',
+  'hudChrome.mountRace.cancelButton': '경기 취소',
+  'hudChrome.mountRace.startButton': '레이스 시작',
+  'hudChrome.mountRace.start': '출발! 모든 장애물을 뛰어넘고 아치로 돌아가 통과하라.',
+  'hudChrome.mountRace.toFinish': '아치로 돌아가 통과하라!',
+  'hudChrome.mountRace.finished': '{seconds}초 만에 완주!',
+  'hudChrome.mountRace.timeout': '레이스 실패',
+  'hudChrome.mountRace.progress': '장애물 {n} / {total}',
 };

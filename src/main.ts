@@ -2143,6 +2143,7 @@ async function startGame(
   let acc = 0;
   let onlineInputEchoMs = 0;
   let playerWasDead = world.player.dead;
+  let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
   // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
   // perf overlay's Jitter row.
   let onlineJitterMs = 0;
@@ -2403,10 +2404,19 @@ async function startGame(
     perf.frame(frameDt);
     syncPerfOverlay(frameDt, now);
 
-    // freeze movement while the game menu is up so WASD doesn't walk the
-    // character behind it (other windows stay non-modal, as before); the
-    // first-spawn intro cinematic holds movement the same way until it lands
-    input.setSuspendMovement(!gameInputReady || hud.isModalOpen() || intro !== null);
+    // Freeze movement while the game menu is up, during the first-spawn intro,
+    // and through the race countdown. The sim independently enforces the same
+    // countdown lock, so online latency cannot move the authoritative rider.
+    const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
+    if (raceMovementLocked && !raceMovementWasLocked) {
+      input.clearClickMove();
+      input.setAutorun(false);
+      mobileControls.syncAutorun(false);
+    }
+    raceMovementWasLocked = raceMovementLocked;
+    input.setSuspendMovement(
+      !gameInputReady || hud.isModalOpen() || intro !== null || raceMovementLocked,
+    );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
       input.setAutorun(false);

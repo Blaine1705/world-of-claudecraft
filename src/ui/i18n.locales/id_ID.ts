@@ -2435,6 +2435,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': 'Kunci Kontak: Sepeda Layang Penunggang Eter',
   'entities.items.reins_shadowjump_toad.name': 'Tali Kekang Kama-Kage si Kodok Lompat Bayangan',
   'entities.items.reins_stormfeather_griffin.name': 'Tali Kekang Bulu Badai Penggapai Langit',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Tali Kekang Kalkun Agung Penderap Guntur',
   'entities.mobs.acolyte_tessa.name': 'Akolit Tessa',
   'entities.mobs.bastion_revenant.name': 'Arwah Benteng',
   'entities.mobs.bog_bloat.name': 'Kembung Rawa',
@@ -2588,7 +2589,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Setiap penunggang datang dengan dua kaki, {className}. Kendali baru kuberikan setelah kau sanggup menunggangi Valorsteed tanpa jatuh tersungkur, dan Highwatch tak punya tabib lebih untuk tulang yang patah.',
   'entities.quests.q_riding_lessons.title': 'Pelajaran Menunggang Kuda',
   'entities.quests.q_riding_lessons.text':
-    'Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Duduk tegak di atas kuda itulah yang kuajarkan, bukan yang kujual. Bayar biayanya, dan saat kuberi aba-aba, panggil Valorsteed latihan itu dan naiklah ke pelana. Tetaplah bersamaku di pekarangan selagi melakukannya; kalau kau pergi menjauh, kita mulai lagi dari awal.',
+    'Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Bayar biayanya, dan saat kuberi aba-aba, panggil Valorsteed latihan itu dan naiklah ke pelana. Lalu tempuh lintasannya: ikuti penanda ke gerbang start, lewati tiap rintangan dengan bersih, dan lintasi garis lagi sebelum pasir habis. Berhasil, dan pelana itu milikmu. Kalau kau keluar dari padok, kita mulai lagi dari awal.',
   'entities.quests.q_riding_lessons.completion':
     'Nah, begitu. Naik dengan satu gerakan mulus dan duduk mantap di atas. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Jinakkan Valorsteed',

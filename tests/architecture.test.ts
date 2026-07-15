@@ -188,6 +188,7 @@ const UI_PURE_CORES = [
   'src/ui/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
   'src/ui/mount_picker_view.ts',
+  'src/ui/mount_race_view.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
 ].map((rel) => join(repoRoot, rel));
@@ -204,6 +205,7 @@ const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
+  'src/render/race_line_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
 ].map((rel) => join(repoRoot, rel));

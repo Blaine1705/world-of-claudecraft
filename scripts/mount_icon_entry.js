@@ -2,8 +2,8 @@
 // self-contained IIFE and injected into a blank page by scripts/render_mount_icons.mjs.
 // Exposes window.renderMountFace(base64Glb, cfg) -> transparent PNG data URL. We parse
 // GLB bytes directly (no fetch) so it runs offline under headless swiftshader, mirroring
-// scripts/weapon_render_entry.js. Meshopt-compressed mount GLBs (aether_hover_cycle,
-// stalkglider_snail, stormfeather_griffin) decode via the wired MeshoptDecoder.
+// scripts/weapon_render_entry.js. Meshopt-compressed mount GLBs (most of the set,
+// valorsteed and thunderstrut_gobbler included) decode via the wired MeshoptDecoder.
 //
 // Framing rule: every character/mount model stands at the origin facing +Z with feet near
 // y=0 (see src/render/characters/portrait.ts:35; the mount manifest defs carry no yaw

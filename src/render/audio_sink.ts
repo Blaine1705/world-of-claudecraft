@@ -19,6 +19,8 @@ export interface SpatialAudioSink {
     running: boolean,
     self: boolean,
   ): void;
+  /** One custom running stride for a mounted entity. */
+  mountRun(x: number, y: number, z: number, mountKey: string, self: boolean): void;
   /** A discrete movement event (jump / land / water entry / swim stroke). */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',

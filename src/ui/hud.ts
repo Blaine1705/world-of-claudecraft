@@ -28,7 +28,7 @@ import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
-import { MOUNTS } from '../sim/content/mounts';
+import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -102,6 +102,7 @@ import {
   type RiteIntensity,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
+  TICK_RATE,
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
@@ -311,6 +312,8 @@ import {
 } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_picker';
+import { MountRaceControls } from './mount_race_controls';
+import { MountRaceStrip } from './mount_race_strip';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -987,6 +990,7 @@ export class Hud {
   private lastMobTooltipId: string | null = null;
   private errorTimer: number | undefined;
   private bannerTimer: number | undefined;
+  private mountRaceInstructionTimer: number | undefined;
   private pfLevelEl = $('#pf-level');
   private pfHpEl = $('#pf-hp');
   private pfHpTextEl = $('#pf-hp-text');
@@ -1168,6 +1172,23 @@ export class Hud {
     onAction: (action) => this.submitLockpickAction(action),
     onAbort: () => this.submitLockpickAbort(),
     onClose: () => this.closeLockpick(),
+  });
+  // The show-jumping race: a slim, non-interactive bottom strip painted from the
+  // authoritative world.mountRaceView() (never a cached copy). hud.ts keeps only
+  // the event routing, the start/finish banners, and show/hide.
+  private readonly mountRaceStrip = new MountRaceStrip({
+    getState: () => this.sim.mountRaceView(),
+  });
+  // The Start/Cancel Race button above the player frame + 3..2..1..GO countdown.
+  // Start appears on the shared glowing square; active-quest riders may start
+  // dismounted because the authoritative command lends the training horse.
+  private readonly mountRaceControls = new MountRaceControls({
+    getState: () => this.sim.mountRaceView(),
+    canStart: () =>
+      isOnMountRaceStartPlatform(this.sim.player.pos) &&
+      (this.sim.questState('q_riding_lessons') === 'active' || !!this.sim.player.mountKey),
+    startRace: () => this.sim.mountRaceStart(),
+    cancelRace: () => this.sim.mountRaceCancel(),
   });
   // Drowned Reliquary Rite difficulty popup. Opened on the delveRiteChoosePrompt
   // cue (approaching the risen reliquary), closed once playback starts.
@@ -6528,6 +6549,8 @@ export class Hud {
     }
     this.meters.update();
     this.lockpickWindow.repaintIfChanged();
+    this.mountRaceStrip.repaintIfChanged();
+    this.mountRaceControls.update();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
     this.reconcileLootRollStatus(now);
@@ -7634,18 +7657,10 @@ export class Hud {
   }
 
   // ---------------------------------------------------------------------------
-  // "Riding Lessons": Stablemaster Marla's Mount/Dismount keybind tutorial. Begin
-  // Lesson (her gossip dialog, gated on the quest being accepted) opens a
-  // server-authoritative session; climbing onto the training Valorsteed with the
-  // Mount/Dismount keybind succeeds it and credits the quest. Driven by the
-  // mountTrainSession/End events; the guidance is two transient toasts. Player
-  // text renders through hudChrome.mountTraining.*.
+  // "Riding Lessons": the glowing square's Start Race action opens the lesson,
+  // lends the training Valorsteed, and arms the countdown in one deliberate step.
+  // The mountTrainSession/End events retain the quest guidance and completion UI.
   // ---------------------------------------------------------------------------
-
-  private beginMountTraining(): void {
-    this.sim.mountTrainBegin();
-    this.flushMountTrainEvents();
-  }
 
   private mountKey(): string {
     // The live Mount/Dismount binding label (a physical keycap, shown verbatim), or
@@ -7653,9 +7668,15 @@ export class Hud {
     return this.keybinds.primaryLabel('mount') || 'Z';
   }
 
-  // A mountTrainSession event announces a fresh attempt: toast the mount hint.
-  private onMountTrainSession(): void {
-    this.showBanner(t('hudChrome.mountTraining.mountPrompt', { key: this.mountKey() }));
+  // A mountTrainSession event announces a fresh attempt or a phase change: at
+  // 'mount' toast the Mount/Dismount hint; at 'ride' (climbed aboard) point the
+  // rider at the start line.
+  private onMountTrainSession(phase: 'mount' | 'ride'): void {
+    if (phase === 'ride') {
+      this.showBanner(t('hudChrome.mountTraining.ridePrompt'));
+    } else {
+      this.showBanner(t('hudChrome.mountTraining.mountPrompt', { key: this.mountKey() }));
+    }
   }
 
   private endMountTraining(outcome: 'success' | 'abandoned'): void {
@@ -7663,19 +7684,49 @@ export class Hud {
     // helps), so it gets no banner; success gets a banner + log line.
     if (outcome === 'success') {
       const summary = t('hudChrome.mountTraining.success');
-      this.showBanner(summary);
+      this.showBanner(summary, t('hudChrome.mountTraining.returnToMarla'), 6000);
       this.log(summary, '#7fdc4f');
     }
   }
 
-  /** Offline sim queues its events until the 20 Hz tick; flush them now so the
-   * toasts react immediately. Online has no drainEvents and reacts to the normal
-   * event stream instead. */
-  flushMountTrainEvents(): void {
-    const drain = (this.sim as { drainEvents?: () => SimEvent[] }).drainEvents;
-    if (!drain) return;
-    const events = drain.call(this.sim);
-    if (events.length > 0) this.handleEvents(events);
+  // ---------------------------------------------------------------------------
+  // Show-jumping race: the always-open paddock course (src/sim/mount_race.ts).
+  // The bottom control sends the explicit start/cancel commands; mountRace*
+  // events show the bottom strip + a go banner, repaint cleared jumps, and
+  // announce the outcome. Player text renders through hudChrome.mountRace.*.
+  // ---------------------------------------------------------------------------
+
+  private openMountRace(): void {
+    $('#mount-race-strip').style.display = 'flex';
+    this.mountRaceStrip.show();
+    // The large GO flash occupies the center first. Wait until it clears before
+    // showing the course instruction in the upper banner slot.
+    clearTimeout(this.mountRaceInstructionTimer);
+    this.mountRaceInstructionTimer = window.setTimeout(() => {
+      if (this.sim.mountRaceView()?.phase === 'racing') {
+        this.showBanner(t('hudChrome.mountRace.start'));
+      }
+    }, 900);
+  }
+
+  private endMountRace(outcome: 'finished' | 'timeout' | 'abandoned', timeTicks: number): void {
+    clearTimeout(this.mountRaceInstructionTimer);
+    // Abandoning is the player's own dismount/exit, so it gets no banner; a
+    // finish or a timeout gets a banner + log line.
+    if (outcome === 'finished') {
+      const seconds = formatNumber(timeTicks / TICK_RATE, { maximumFractionDigits: 1 });
+      const summary = t('hudChrome.mountRace.finished', { seconds });
+      this.showBanner(summary);
+      this.log(summary, '#7fdc4f');
+    } else if (outcome === 'timeout') {
+      const summary = t('hudChrome.mountRace.timeout');
+      this.showBanner(summary);
+      this.log(summary, '#ff7a6a');
+      audio.error();
+    }
+    $('#mount-race-strip').style.display = 'none';
+    this.mountRaceStrip.hide();
+    this.mountRaceControls.hide();
   }
 
   // Drowned Reliquary Rite: the difficulty popup opens when a player interacts
@@ -8876,6 +8927,13 @@ export class Hud {
         }
         case 'questDone':
           sfx.playUi('quest_complete', { gain: 1.8 });
+          if (ev.questId === 'q_riding_lessons') {
+            this.showBanner(
+              t('hudChrome.mountTraining.ownedMountPrompt', { key: this.mountKey() }),
+              undefined,
+              6000,
+            );
+          }
           this.refreshGossip();
           break;
         case 'chat': {
@@ -9484,10 +9542,26 @@ export class Hud {
           break;
         }
         case 'mountTrainSession':
-          this.onMountTrainSession();
+          this.onMountTrainSession(ev.phase);
           break;
         case 'mountTrainEnd':
           this.endMountTraining(ev.outcome);
+          break;
+        case 'mountRaceCountdown':
+          // The 3..2..1 countdown paints from the per-frame view; nudge it now so
+          // it appears the instant the race arms. Clear any lingering lesson
+          // instruction immediately so the two center-screen messages cannot overlap.
+          this.hideBannerImmediately();
+          this.mountRaceControls.update();
+          break;
+        case 'mountRaceStart':
+          this.openMountRace();
+          break;
+        case 'mountRaceJump':
+          this.mountRaceStrip.repaintIfChanged();
+          break;
+        case 'mountRaceEnd':
+          this.endMountRace(ev.outcome, ev.timeTicks);
           break;
         case 'delveRiteChoosePrompt':
           this.openRitePanel();
@@ -10250,13 +10324,32 @@ export class Hud {
     audio.error();
   }
 
-  showBanner(text: string): void {
-    this.bannerEl.textContent = text;
+  showBanner(text: string, subtext?: string, durationMs = 2600): void {
+    this.bannerEl.style.removeProperty('display');
+    this.bannerEl.replaceChildren();
+    this.bannerEl.classList.toggle('has-subtext', !!subtext);
+    if (subtext) {
+      const title = document.createElement('span');
+      title.className = 'banner-title';
+      title.textContent = text;
+      const detail = document.createElement('span');
+      detail.className = 'banner-subtext';
+      detail.textContent = subtext;
+      this.bannerEl.append(title, detail);
+    } else {
+      this.bannerEl.textContent = text;
+    }
     this.bannerEl.style.opacity = '1';
     clearTimeout(this.bannerTimer);
     this.bannerTimer = window.setTimeout(() => {
       this.bannerEl.style.opacity = '0';
-    }, 2600);
+    }, durationMs);
+  }
+
+  private hideBannerImmediately(): void {
+    clearTimeout(this.bannerTimer);
+    this.bannerEl.style.opacity = '0';
+    this.bannerEl.style.display = 'none';
   }
 
   showSubzone(text: string): void {
@@ -10654,16 +10747,6 @@ export class Hud {
     if (npc.templateId === 'groundskeeper_bram') {
       html += `<button type="button" class="qd-list-item" data-vcup="1" aria-label="${esc(t('hudChrome.vcup.gossipOpenAria'))}"><span class="gold">${svgIcon('ball')}</span> ${esc(t('hudChrome.vcup.gossipOpen'))}</button>`;
     }
-    // Stablemaster Marla's story riding lesson ("Riding Lessons"): her gossip menu
-    // offers a Begin Lesson action, but only once the player has ACCEPTED
-    // q_riding_lessons and not yet completed its objective (state 'active'). The Sim
-    // re-gates on begin regardless (defense in depth); this just hides a dead button.
-    if (
-      npc.templateId === 'stablemaster_marla' &&
-      this.sim.questState('q_riding_lessons') === 'active'
-    ) {
-      html += `<button type="button" class="qd-list-item" data-mount-training="1" aria-label="${esc(t('hudChrome.mountTraining.begin'))}"><span class="gold">${svgIcon('mount')}</span> ${esc(t('hudChrome.mountTraining.begin'))}</button>`;
-    }
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
       item.addEventListener('click', () =>
@@ -10696,10 +10779,6 @@ export class Hud {
     el.querySelector('[data-vcup]')?.addEventListener('click', () => {
       this.closeQuestDialog(false);
       this.toggleValeCup();
-    });
-    el.querySelector('[data-mount-training]')?.addEventListener('click', () => {
-      this.closeQuestDialog(false);
-      this.beginMountTraining();
     });
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';

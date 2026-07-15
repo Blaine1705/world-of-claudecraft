@@ -408,6 +408,19 @@ class Sfx {
   }
   private footTick = 0;
 
+  /** One custom stride for a running mount. This is part of the world SFX mix,
+   *  independent of the optional on-foot footstep toggle. */
+  mountRun(x: number, y: number, z: number, mountKey: string, _self: boolean): void {
+    const key = `mount_run_${mountKey}`;
+    if (!(key in SFX_CLIPS)) return;
+    this.playAt(key, x, y, z, {
+      gain: 0.85,
+      rate: 1,
+      cooldown: 0.05,
+      release: 0.44,
+    });
+  }
+
   /** Jump / land / water-entry / swim-stroke. */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',

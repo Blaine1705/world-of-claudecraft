@@ -14,9 +14,11 @@
 // at the emit site (the S3 i18n guard scans this file + chat_readouts.ts).
 
 import { type AssistCandidate, resolveAssist } from '../assist';
+import { MOUNT_KEYS, MOUNTS, TRAINING_MOUNT_KEY } from '../content/mounts';
 import { GATHERING_PROFESSIONS } from '../content/professions';
-import { CLASSES, ITEMS, zoneAt } from '../data';
+import { CLASSES, ITEMS, NPCS, zoneAt } from '../data';
 import { graveyardReadout } from '../entity_roster';
+import { mountItemId, mountOwned } from '../mounts';
 import { isGatheringProfessionId, queueGatheringGrant } from '../professions/gathering';
 import {
   type AwayStatus,
@@ -933,6 +935,59 @@ export function handleDevChat(
     ctx.addItem(itemId, count, pid);
     return null;
   }
+  const mountsM = /^\/(?:dev\s+mounts?|devmounts?)\s*$/i.exec(raw);
+  if (mountsM) {
+    const meta = ctx.players.get(pid);
+    const e = ctx.entities.get(pid);
+    if (meta && e) {
+      // The game's "riding skill" is the per-mount level gate, so ensure the
+      // highest catalog gate first; then grant every reins item not already
+      // held (soulbound collectibles, so never a duplicate).
+      const maxGate = Math.max(...MOUNT_KEYS.map((k) => MOUNTS[k].level));
+      const leveled = e.level < maxGate;
+      if (leveled) ctx.setPlayerLevel(maxGate, pid);
+      let granted = 0;
+      for (const key of MOUNT_KEYS) {
+        if (mountOwned(meta, key)) continue;
+        const itemId = mountItemId(key);
+        if (!itemId) continue;
+        ctx.addItem(itemId, 1, pid);
+        granted += 1;
+      }
+      // Dev-only English diagnostics, routed through vars so they read as
+      // dev-channel text (like the other /dev feedback), never localized.
+      const levelNote = leveled ? `, level raised to ${maxGate} for the riding gates` : '';
+      const doneText = `[dev] Granted ${granted} mount reins (${MOUNT_KEYS.length} owned)${levelNote}. Press Z to ride.`;
+      ctx.emit({ type: 'log', text: doneText, pid });
+    }
+    return null;
+  }
+  // One-stop setup for playtesting the riding-lesson quest: level to the
+  // lesson gate, fund the fee (100g, also the horse's old buy price), and
+  // drop the player in Marla's yard at the Highwatch Stables.
+  const mountQuestM = /^\/(?:dev\s+(?:mountquest|startmount)|devmountquest)\s*$/i.exec(raw);
+  if (mountQuestM) {
+    const meta = ctx.players.get(pid);
+    const e = ctx.entities.get(pid);
+    const marla = NPCS.stablemaster_marla;
+    if (meta && e && marla) {
+      const gate = MOUNTS[TRAINING_MOUNT_KEY].level;
+      const leveled = e.level < gate;
+      if (leveled) ctx.setPlayerLevel(gate, pid);
+      meta.copper += 100 * 10000;
+      // Beside Marla in her yard, clear of her body, facing the paddock like her.
+      const p = ctx.groundPos(marla.pos.x + 2, marla.pos.z + 1);
+      e.pos = p;
+      e.prevPos = { ...p };
+      ctx.grid.update(e);
+      ctx.playerGrid.update(e);
+      // Dev-only English diagnostics, routed through vars (dev-channel text).
+      const levelNote = leveled ? `level ${gate}, ` : '';
+      const doneText = `[dev] ${levelNote}100g added, teleported to the Highwatch Stables. Talk to Stablemaster Marla to begin the riding lesson.`;
+      ctx.emit({ type: 'log', text: doneText, pid });
+    }
+    return null;
+  }
   const goldM = /^\/(?:dev\s+gold|devgold)\s+(\d+)\s*$/i.exec(raw);
   if (goldM) {
     const gold = Math.max(1, Math.min(100000, Number(goldM[1])));
@@ -991,7 +1046,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev mounts, /dev mountquest, /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev kill',
     );
     return null;
   }

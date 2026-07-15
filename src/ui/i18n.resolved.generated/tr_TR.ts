@@ -442,17 +442,33 @@ export const tr_TR: EnTranslations = {
       "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
       "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
       "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
-      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Vadi Kupası",
@@ -7108,6 +7124,9 @@ export const tr_TR: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Göğe Uzanan Fırtına Tüyünün Dizginleri"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Yıldırım Adımlı Büyük Hindinin Dizginleri"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Binicilik Dersleri",
-        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. Ücreti öde, işaret verdiğimde eğitim Valorsteed'ini yanına çağır ve eyere çık. Bu sırada avluda yanımda kal; uzaklaşırsan baştan başlarız.",
+        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Ücreti öde, işaret verdiğimde eğitim Valorsteed'ini yanına çağır ve eyere çık. Sonra parkuru koş: işareti izleyip başlangıç kemerine git, her engeli temiz al ve kum bitmeden çizgiyi yeniden geç. Bunu başarırsan eyer senindir. Padoktan uzaklaşırsan baştan başlarız.",
         "completion": "İşte böyle. Tek hamlede eyere çıktın ve yukarıda dimdik oturdun. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.",
         "objectives": {
           "0": {

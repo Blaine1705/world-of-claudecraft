@@ -74,9 +74,9 @@ function ride(sim: Sim, pid: number): void {
   finishTransition(sim, pid);
 }
 
-describe('mount catalog (the six ground mounts from the cards)', () => {
-  it('has exactly the six mounts with the horse first (the base mount)', () => {
-    expect(MOUNT_KEYS).toHaveLength(6);
+describe('mount catalog (the seven ground mounts from the cards)', () => {
+  it('has exactly the seven mounts with the horse first (the base mount)', () => {
+    expect(MOUNT_KEYS).toHaveLength(7);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
   });
@@ -92,6 +92,7 @@ describe('mount catalog (the six ground mounts from the cards)', () => {
     expect(spec('aether_hover_cycle')).toEqual([15, 'rare', 0.75, 0.05, 0.03]);
     expect(spec('shadowjump_toad')).toEqual([15, 'rare', 0.75, 0.05, 0.03]);
     expect(spec('stormfeather_griffin')).toEqual([20, 'epic', 0.8, 0.08, 0.05]);
+    expect(spec('thunderstrut_gobbler')).toEqual([20, 'epic', 0.8, 0.08, 0.05]);
   });
 
   it('normalizeMountKey coerces unknown or absent keys to "" (unmounted)', () => {
@@ -149,6 +150,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       ['ysolei', 'reins_aether_hover_cycle', 0.005],
       ['korzul_the_gravewyrm', 'reins_shadowjump_toad', 0.005],
       ['nythraxis_scourge_of_thornpeak', 'reins_stormfeather_griffin', 0.002],
+      ['thunzharr_waking_peak', 'reins_thunderstrut_gobbler', 0.003],
     ];
     for (const [mobId, itemId, chance] of drops) {
       const entry = MOBS[mobId].loot.find((l) => l.itemId === itemId);

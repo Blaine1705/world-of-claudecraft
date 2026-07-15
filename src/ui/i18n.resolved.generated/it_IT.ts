@@ -442,17 +442,33 @@ export const it_IT: EnTranslations = {
       "name_aether_hover_cycle": "Aerociclo del Giostratore d’Etere",
       "name_shadowjump_toad": "Kama-Kage, il Rospo Saltombra",
       "name_stormfeather_griffin": "Piumatempesta Toccacielo",
+      "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
       "desc_aether_hover_cycle": "Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.",
       "desc_shadowjump_toad": "Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.",
-      "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate."
+      "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.",
+      "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "La Coppa della Valle",
@@ -7108,6 +7124,9 @@ export const it_IT: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Redini del Piumatempesta Toccacielo"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Redini di Passotuono, il Gran Tacchino"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const it_IT: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lezioni di equitazione",
-        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Paga la quota e, quando te lo dico, chiama a te il Destriero del Valore da addestramento e sali in sella. Resta con me nel cortile mentre lo fai; se ti allontani, si ricomincia.",
+        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Paga la quota e, quando te lo dico, chiama a te il Destriero del Valore da addestramento e sali in sella. Poi affronta il percorso: segui il segnale fino all’arco di partenza, supera pulito ogni ostacolo e taglia di nuovo il traguardo prima che la sabbia si esaurisca. Riuscirci, e la sella è tua. Esci dal recinto e si ricomincia.",
         "completion": "Ecco, così. Su con un solo movimento pulito e ben saldo in sella. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.",
         "objectives": {
           "0": {

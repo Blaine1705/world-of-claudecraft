@@ -2407,6 +2407,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': 'Chìa khóa khởi động: Xe Bay Kỵ Sĩ Aether',
   'entities.items.reins_shadowjump_toad.name': 'Dây cương Kama-Kage, Cóc Nhảy Bóng',
   'entities.items.reins_stormfeather_griffin.name': 'Dây cương Vũ Bão Vươn Trời',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Dây cương Gà Tây Chúa Sải Bước Sấm',
   'entities.mobs.acolyte_tessa.name': 'Tế Đồ Tessa',
   'entities.mobs.bastion_revenant.name': 'Oán Linh Pháo Đài',
   'entities.mobs.bog_bloat.name': 'Quái Phình Đầm Lầy',
@@ -2562,7 +2563,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Kỵ sĩ nào cũng bước vào bằng hai chân, {className}. Ta chỉ trao dây cương khi nào ngươi ngồi vững trên lưng Valorsteed mà không lăn xuống bùn, vì Highwatch chẳng dư thầy thuốc để chữa xương gãy.',
   'entities.quests.q_riding_lessons.title': 'Bài Học Cưỡi Ngựa',
   'entities.quests.q_riding_lessons.text':
-    'Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Ngồi vững trên lưng ngựa là điều ta dạy, không phải thứ ta bán. Trả lệ phí, rồi khi ta ra hiệu, hãy gọi con Valorsteed huấn luyện đến và leo lên yên. Trong lúc đó hãy ở lại sân cùng ta; đi xa là ta bắt đầu lại từ đầu.',
+    'Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Trả lệ phí, rồi khi ta ra hiệu, hãy gọi con Valorsteed huấn luyện đến và leo lên yên. Rồi chạy hết đường đua: theo dấu hiệu tới cổng vòm xuất phát, vượt sạch từng chướng ngại, và băng qua vạch lần nữa trước khi cát chảy hết. Làm được vậy thì yên ngựa là của ngươi. Đi khỏi bãi quây là ta bắt đầu lại từ đầu.',
   'entities.quests.q_riding_lessons.completion':
     'Đấy, được rồi. Lên yên bằng một động tác gọn gàng và ngồi thật vững. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Thuần Hóa Valorsteed',

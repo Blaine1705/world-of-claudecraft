@@ -442,17 +442,33 @@ export const zh_TW: EnTranslations = {
       "name_aether_hover_cycle": "乙太騎士懸浮機車",
       "name_shadowjump_toad": "影躍蟾蜍卡瑪影",
       "name_stormfeather_griffin": "凌天風暴之羽",
+      "name_thunderstrut_gobbler": "雷霆闊步大火雞",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。",
       "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
-      "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。"
+      "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
+      "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
+      "ownedMountPrompt": "按 {key} 鍵騎乘",
+      "ridePrompt": "跟隨發光的標記前往起點線，然後點擊開始比賽。",
       "begin": "開始課程",
-      "success": "你已經馴服了英勇戰馬。"
+      "success": "你已經馴服了英勇戰馬。",
+      "returnToMarla": "返回馬廄找瑪拉，領養一匹馬廄裡的馬。"
+    },
+    "mountRace": {
+      "startButton": "開始比賽",
+      "cancelButton": "取消比賽",
+      "go": "GO!",
+      "start": "出發！跳過每一道障礙，再騎回拱門衝線。",
+      "toFinish": "騎回拱門衝線！",
+      "finished": "完成！用時 {seconds} 秒！",
+      "timeout": "比賽失敗",
+      "progress": "障礙 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "溪谷盃",
@@ -7108,6 +7124,9 @@ export const zh_TW: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "凌天風暴之羽的韁繩"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "雷霆闊步大火雞的韁繩"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "騎術課",
-        "text": "每個騎手都是兩條腿走進來的，{playerName}，就像我們初次見面那天我說的那樣。我教的是怎麼坐穩，不是拿來賣的東西。交上學費，等我發話，就把訓練用的英勇戰馬喚到身邊，翻身上鞍。這期間待在院子裡別走遠；跑遠了，我們就從頭再來。",
+        "text": "每個騎手都是兩條腿走進來的，{playerName}，就像我們初次見面那天我說的那樣。交上學費，等我發話，就把訓練用的英勇戰馬喚到身邊，翻身上鞍。然後跑完賽道：跟著標記到起點拱門，把每一道障礙都跳得乾淨俐落，在沙子漏盡之前再次衝過終點線。做到了，這鞍子就是你的。要是跑出圍場，我們就從頭再來。",
         "completion": "好了，就是這樣。一個俐落的動作上了鞍，坐得穩穩當當。英勇戰馬現在是你的了，{playerName}：馬鞍、韁繩，還有靠本事掙來而不是買來的騎手身份。",
         "objectives": {
           "0": {

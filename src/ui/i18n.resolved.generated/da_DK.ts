@@ -442,17 +442,33 @@ export const da_DK: EnTranslations = {
       "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
       "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
       "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
-      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Dalpokalen",
@@ -7108,6 +7124,9 @@ export const da_DK: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Tøjler til den himmelrækkende Stormfjer"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Tøjler til Tordenspankeren, den store kalkun"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const da_DK: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Ridelektioner",
-        "text": "Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Det at sidde er det, jeg lærer fra mig, ikke det, jeg sælger. Betal gebyret, og når jeg giver ordet, så kald trænings-Valorsteeden til dig og kravl op i sadlen. Bliv hos mig på gårdspladsen imens; vandrer du væk, starter vi forfra.",
+        "text": "Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Betal gebyret, og når jeg giver ordet, så kald trænings-Valorsteeden til dig og kravl op i sadlen. Rid så banen: følg markøren til startbuen, tag hvert spring rent, og kryds linjen igen, før sandet er løbet ud. Klarer du det, er sadlen din. Vandrer du ud af folden, starter vi forfra.",
         "completion": "Sådan, ja. Op i én glidende bevægelse og et roligt sæde deroppe. Valorsteed er din, {playerName}: sadel, tøjler og ry som en rytter, der har fortjent sædet i stedet for at købe det.",
         "objectives": {
           "0": {

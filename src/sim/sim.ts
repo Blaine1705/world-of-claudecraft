@@ -8,6 +8,7 @@ import type {
   DelveCompanionInfo,
   DelveRunInfo,
   LockpickView,
+  MountRaceView,
   PlayerProfessionsView,
 } from '../world_api';
 import * as bagsMod from './bags';
@@ -193,6 +194,12 @@ import {
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
+import {
+  cancelMountRace as cancelMountRaceImpl,
+  mountRaceViewFor as mountRaceViewForImpl,
+  startMountRace as startMountRaceImpl,
+  tickMountRace as tickMountRaceImpl,
+} from './mount_race';
 import {
   ownedMounts as ownedMountsImpl,
   selectMount as selectMountImpl,
@@ -416,6 +423,7 @@ import {
   type MasterLootThreshold,
   MELEE_RANGE,
   type MobFamily,
+  type MountRaceSession,
   type MountTrainingSession,
   type MoveInput,
   type OverheadEmoteId,
@@ -825,8 +833,12 @@ export interface PlayerMeta {
   // optional-plus-null shape as other transient session fields below (e.g.
   // `away`), initialized to null in createPlayer.
   mountTraining?: MountTrainingSession | null;
-  // One-time riding-lesson fee (100g), charged at the first successful
-  // mount_train_begin. Optional so absent === false (pre-feature saves and a
+  // The player's own active show-jumping race, or null. Session state, never
+  // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
+  // simultaneous racers never share or contend on anything.
+  mountRace?: MountRaceSession | null;
+  // One-time riding-lesson fee (100g), charged when the first lesson race starts
+  // (or through the legacy mount_train_begin command). Optional so absent === false (pre-feature saves and a
   // fresh character stay byte-equal): never explicitly set to false, only ever
   // flipped true, mirroring the selectedMount-omitted-while-default convention
   // in serializeCharacter below.
@@ -1148,8 +1160,8 @@ export interface CharacterState {
   // Rideable mount pick (JSONB; optional AND absent while on the default
   // horse, so pre-mount saves stay byte-equal and load as the horse).
   selectedMount?: string;
-  // One-time riding-lesson training fee (100g), charged at the first successful
-  // mount_train_begin (src/sim/mounts_training.ts). Optional and absent until
+  // One-time riding-lesson training fee (100g), charged when the first lesson
+  // race starts (or through legacy mount_train_begin). Optional and absent until
   // paid, so pre-mount-training saves (and every save before the fee is ever
   // charged) stay byte-equal.
   mountTrainingFeePaid?: boolean;
@@ -1836,6 +1848,7 @@ export class Sim {
       raidLockouts: new Map(),
       away: null,
       mountTraining: null,
+      mountRace: null,
       marketFilter: '',
       craftSkills: emptyCraftSkills(),
       knownRecipes: new Set(),
@@ -2413,6 +2426,42 @@ export class Sim {
   // --- IWorldMounts: the riding lesson ---
   mountTrainBegin(): void {
     this.mountTrainBeginFor(this.primaryId);
+  }
+
+  /** Per-pid show-jumping race start (the server wire path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/mount_race.ts. */
+  mountRaceStartFor(pid: number): void {
+    startMountRaceImpl(this.ctx, pid);
+  }
+
+  mountRaceCancelFor(pid: number): void {
+    cancelMountRaceImpl(this.ctx, pid);
+  }
+
+  /** Read-only projection of a player's own active show-jumping race
+   *  (src/sim/mount_race.ts); null when not racing. */
+  mountRaceViewFor(pid?: number): MountRaceView | null {
+    return mountRaceViewForImpl(this.ctx, pid);
+  }
+
+  /** Whether a player has a live riding lesson in progress. Retained for online
+   *  parity and legacy consumers; offline rides primaryId below. */
+  mountLessonActiveFor(pid: number): boolean {
+    return this.players.get(pid)?.mountTraining?.state === 'IN_PROGRESS';
+  }
+
+  // --- IWorldMounts: the show-jumping race (offline rides primaryId) ---
+  mountRaceStart(): void {
+    this.mountRaceStartFor(this.primaryId);
+  }
+  mountRaceCancel(): void {
+    this.mountRaceCancelFor(this.primaryId);
+  }
+  mountLessonActive(): boolean {
+    return this.mountLessonActiveFor(this.primaryId);
+  }
+  mountRaceView(): MountRaceView | null {
+    return this.mountRaceViewFor(this.primaryId);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and
@@ -3181,6 +3230,7 @@ export class Sim {
       abandonLockpick: (run) => lockpickMod.abandonLockpick(sim.ctx, run),
       tickLockpickTimeout: (run) => lockpickMod.tickLockpickTimeout(sim.ctx, run),
       tickMountTraining: (meta) => tickMountTrainingImpl(sim.ctx, meta),
+      tickMountRace: (meta) => tickMountRaceImpl(sim.ctx, meta),
       abandonMountTraining: (meta) => abandonMountTrainingImpl(sim.ctx, meta),
       delveRunForMob: (mobId) => sim.delveRunForMob(mobId),
       onDelveBossDefeated: (run) => sim.onDelveBossDefeated(run),
@@ -3494,12 +3544,14 @@ export class Sim {
         this.updateDoorTriggers(p);
         lap?.('p.move');
       }
-      // Riding-lesson driver: server-authoritative; succeeds the lesson once the
-      // live player is in the training steed's saddle, and ends a dead/ghost
-      // player's IN_PROGRESS lesson (the driver's first check), so death never
-      // strands the session. Draws no rng, so the tick-phase draw order is
-      // unchanged.
+      // Riding-lesson driver: server-authoritative; tracks the training-steed
+      // phase and ends a dead/ghost player's IN_PROGRESS lesson, so death never
+      // strands the session. Finishing the race credits success. Draws no rng,
+      // so the tick-phase draw order is unchanged.
       this.ctx.tickMountTraining(meta);
+      // Show-jumping race driver: per-player, server-authoritative, rng-free
+      // (runs after movement so prevPos -> pos is this tick's ridden segment).
+      this.ctx.tickMountRace(meta);
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);
@@ -3898,6 +3950,9 @@ export class Sim {
     ) {
       meta.lastActiveTick = this.tickCount;
     }
+    // The race countdown is a real start lock, not just a client animation.
+    // Hold every forced/manual locomotion mode until the authoritative GO tick.
+    if (meta.mountRace?.phase === 'countdown') return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
     if (this.updateFearMovement(p)) return;

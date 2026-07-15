@@ -2519,7 +2519,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '每个骑手都是两条腿走进来的，{className}。你能骑稳英勇战马、不摔进泥里之前，我是不会把缰绳交给你的，高望这儿可没有多余的医者去治断骨。',
   'entities.quests.q_riding_lessons.title': '骑术课',
   'entities.quests.q_riding_lessons.text':
-    '每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。我教的是怎么坐稳，不是拿来卖的东西。交上学费，等我发话，就把训练用的英勇战马唤到身边，翻身上鞍。这期间待在院子里别走远；跑远了，我们就从头再来。',
+    '每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。交上学费，等我发话，就把训练用的英勇战马唤到身边，翻身上鞍。然后跑完赛道：跟着标记到起点拱门，把每一道障碍都跳得干净利落，在沙子漏尽之前再次冲过终点线。做到了，这鞍子就是你的。要是跑出围场，我们就从头再来。',
   'entities.quests.q_riding_lessons.completion':
     '好了，就是这样。一个利落的动作上了鞍，坐得稳稳当当。英勇战马现在是你的了，{playerName}：马鞍、缰绳，还有靠本事挣来而不是买来的骑手身份。',
   'entities.quests.q_riding_lessons.objectives.0.label': '驯服英勇战马',
@@ -5665,6 +5665,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': '点火钥匙：以太骑士悬浮机车',
   'entities.items.reins_shadowjump_toad.name': '影跃蟾蜍卡玛影的缰绳',
   'entities.items.reins_stormfeather_griffin.name': '凌天风暴之羽的缰绳',
+  'entities.items.reins_thunderstrut_gobbler.name': '雷霆阔步大火鸡的缰绳',
   'entities.mobs.drowned_cantor.name': '溺亡诵经者',
   'entities.mobs.reedbound_acolyte.name': '芦苇缚信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼枪颚兽',
@@ -6221,6 +6222,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': '以太骑士悬浮机车',
   'hudChrome.mounts.name_shadowjump_toad': '影跃蟾蜍卡玛影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
+  'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一头坚韧稳健的巨熊，可提升旅行速度。',
   'hudChrome.mounts.desc_stalkglider_snail': '一只坚毅耐久的蜗牛，可提升旅行速度。',
@@ -6230,11 +6232,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一只体型庞大、步伐稳健的巨蟾，受训于闪电般的暗影跳跃，可跨越任何地形。',
   'hudChrome.mounts.desc_stormfeather_griffin':
     '一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    '一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。',
   'hudChrome.mounts.emptyTitle': '尚未收集坐骑',
   'hudChrome.mounts.emptyStableHint': '升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。',
   'hudChrome.mounts.emptyDropHint': '较稀有的坐骑由地下城和团队副本首领掉落。',
   'hudChrome.mounts.clickManage': '点击选择坐骑',
   'hudChrome.mountTraining.mountPrompt': '按 {key} 键骑上训练用英勇战马。',
+  'hudChrome.mountTraining.ownedMountPrompt': '按 {key} 键骑乘',
+  'hudChrome.mountTraining.ridePrompt': '跟随发光的标记前往起点线，然后点击开始比赛。',
   'hudChrome.mountTraining.begin': '开始课程',
   'hudChrome.mountTraining.success': '你已经驯服了英勇战马。',
+  'hudChrome.mountTraining.returnToMarla': '返回马厩找玛拉，领养一匹马厩里的马。',
+  'hudChrome.mountRace.cancelButton': '取消比赛',
+  'hudChrome.mountRace.startButton': '开始比赛',
+  'hudChrome.mountRace.start': '出发！跳过每一道障碍，再骑回拱门冲线。',
+  'hudChrome.mountRace.toFinish': '骑回拱门冲线！',
+  'hudChrome.mountRace.finished': '完成！用时 {seconds} 秒！',
+  'hudChrome.mountRace.timeout': '比赛失败',
+  'hudChrome.mountRace.progress': '障碍 {n} / {total}',
 };

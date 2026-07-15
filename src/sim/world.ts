@@ -1,3 +1,4 @@
+import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { DUNGEON_FLOOR_Y, DUNGEON_X_THRESHOLD, getActiveWorldContent, WORLD_MAX_X } from './data';
 import { fbm2, hash2 } from './rng';
 import type { BiomeId, HeightStamp, WorldContent } from './types';
@@ -332,6 +333,24 @@ export function sowfieldFlattenWeight(x: number, z: number): number {
   return 1 - smoothstep(0, 1, d / f.falloff);
 }
 
+// The Highwatch stables paddock plateau (STABLE_FLAT): the worked yard leveled to
+// one height so the enlarged show-jumping course sits on fair, flat ground. Weight
+// is 1 inside the paddock rect, easing to 0 over STABLE_FLAT.falloff yards beyond
+// it (the sowfieldFlattenWeight apron precedent). Living in terrainHeight is the
+// whole point: sim collision, movement, fences, props, and the renderer all sample
+// the SAME height, so no fixture floats and no fence clips. Its influence never
+// reaches a zone ridge/rim (the stables sit deep inside zone 3), so ordering with
+// the additive walls is moot; it runs beside the Sowfield pull for symmetry.
+export function stableFlattenWeight(x: number, z: number): number {
+  const f = STABLE_FLAT;
+  const dx = Math.max(0, f.x1 - x, x - f.x2);
+  const dz = Math.max(0, f.z1 - z, z - f.z2);
+  if (dx === 0 && dz === 0) return 1;
+  const d = Math.sqrt(dx * dx + dz * dz);
+  if (d >= f.falloff) return 0;
+  return 1 - smoothstep(0, 1, d / f.falloff);
+}
+
 export function mirefenImpactCraterOffset(x: number, z: number): number {
   const dx = x - MIREFEN_IMPACT_CRATER.x;
   const dz = z - MIREFEN_IMPACT_CRATER.z;
@@ -479,6 +498,10 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // sowfieldFlattenWeight), so the rim still wins everywhere it exists.
   const sow = sowfieldFlattenWeight(x, z);
   if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
+
+  // The Highwatch stables paddock plateau (a LEVEL pull, like the Sowfield above).
+  const stab = stableFlattenWeight(x, z);
+  if (stab > 0) h = lerp(h, STABLE_FLAT.height, stab);
 
   // Mountain ridge walls between zones, pierced by the road pass
   let mountainAdd = 0;
@@ -767,6 +790,17 @@ export function generateDecorations(seed: number): Decoration[] {
       // The Sowfield stadium footprint grows no trees or rocks (hash-based
       // placement, so skipping here shifts no other decoration or rng draw).
       if (isInSowfieldShell(x, z)) continue;
+      // The Highwatch stables paddock is likewise kept clear: it is a worked
+      // yard (the show-jumping course + the horse pasture), and a tree inside
+      // it would be an invisible wall across the race line. Same hash-based
+      // reasoning: skipping here shifts no other decoration or rng draw.
+      if (
+        x > STABLE_PADDOCK.x1 - 1 &&
+        x < STABLE_PADDOCK.x2 + 1 &&
+        z > STABLE_PADDOCK.z1 - 1 &&
+        z < STABLE_PADDOCK.z2 + 1
+      )
+        continue;
       let inHub = false;
       for (const zone of w.content.zones) {
         const dx = x - zone.hub.x,

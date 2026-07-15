@@ -91,6 +91,7 @@ import { buildJailScene } from './jail_scene';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
+import { MountBeacon } from './mount_beacon';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { NameplatePainter } from './nameplate_painter';
@@ -104,6 +105,7 @@ import { PlacedAssetsView } from './placed_assets';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
+import { RaceLine } from './race_line';
 import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
@@ -196,6 +198,9 @@ const SFX_MOVE_RANGE_SQ = 42 * 42;
 // Stride length (world units travelled) between footfalls — longer at a run.
 const FOOT_STRIDE_WALK = 0.95;
 const FOOT_STRIDE_RUN = 1.55;
+// Mount clips contain a full gait beat (usually two contacts), so their cadence
+// is intentionally longer than an on-foot stride and leaves the one-shot tail clear.
+const MOUNT_STRIDE_RUN = 5.8;
 const SWIM_STRIDE = 2.4;
 const FOOT_RUN_SPEED = 4.5; // u/s — matches the run threshold in characters/anim_state.ts
 // fire/torch point lights beyond this never shine (their falloff range is
@@ -969,6 +974,8 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
+  private raceLine: RaceLine;
+  private mountBeacon: MountBeacon;
   private weather: Weather;
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
@@ -1533,6 +1540,12 @@ export class Renderer {
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
     });
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+
+    // Show-jumping racing line: self-scoped course guidance, hidden outside the
+    // player's own race (driven per frame from world.mountRaceView() below).
+    this.raceLine = new RaceLine(this.scene, this.groundSample);
+    // Riding-lesson start platform: the glowing square behind the start arch.
+    this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -4622,6 +4635,7 @@ export class Renderer {
       // A mounted rider stays planted in the saddle: the MOUNT carries the
       // jump arc (its anim scratch below keeps the real airborne flag), while
       // the rider holds the seated pose instead of replaying the jump clip.
+      const logicallyMounted = e.mountKey !== '';
       const riderMounted = v.mountLift > 0;
       st.airborne = airborne && !riderMounted;
       st.backwards = loco.backwards;
@@ -4646,13 +4660,23 @@ export class Renderer {
         if (swimming && !v.wasSwimming && !visuallyDead)
           sink.movement('splash', ax, ay, az, isSelf);
         // footfalls / swim strokes via a distance accumulator (no timers)
-        if (visuallyDead || st.sitting) {
+        if (visuallyDead || (st.sitting && !riderMounted)) {
           v.stepAccum = 0;
         } else if (swimming) {
           v.stepAccum += loco.speed * dt;
           if (v.stepAccum >= SWIM_STRIDE) {
             v.stepAccum = 0;
             sink.movement('swim', ax, ay, az, isSelf);
+          }
+        } else if (logicallyMounted && moving && !airborne) {
+          if (loco.speed >= FOOT_RUN_SPEED) {
+            v.stepAccum += loco.speed * dt;
+            if (v.stepAccum >= MOUNT_STRIDE_RUN) {
+              v.stepAccum = 0;
+              sink.mountRun(ax, ay, az, e.mountKey, isSelf);
+            }
+          } else {
+            v.stepAccum = MOUNT_STRIDE_RUN * 0.6;
           }
         } else if (moving && !airborne) {
           v.stepAccum += loco.speed * dt;
@@ -4959,6 +4983,13 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    // Racing line (cosmetic; reads the self race view only).
+    this.raceLine.update(this.sim.mountRaceView(), this.time, dt);
+    // Start platform: visible while the riding quest is active and no race is live.
+    this.mountBeacon.update(
+      this.sim.questState('q_riding_lessons') === 'active' && !this.sim.mountRaceView(),
+      this.time,
+    );
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
     this.tickFiestaGlows(dt);

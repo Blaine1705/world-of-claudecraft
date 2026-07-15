@@ -3569,7 +3569,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cada jinete llega a pie, {className}. No te daré las riendas hasta que puedas montar al Corcel del Valor sin besar el barro, y en Highwatch no sobran sanadores para huesos rotos.',
   'entities.quests.q_riding_lessons.title': 'Lecciones de equitación',
   'entities.quests.q_riding_lessons.text':
-    'Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo. Paga la cuota y, cuando te dé la orden, llama al Corcel del Valor de entrenamiento y sube a la silla. Quédate conmigo en el patio mientras tanto; si te alejas, empezamos de nuevo.',
+    'Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Paga la cuota y, cuando te dé la orden, llama al Corcel del Valor de entrenamiento y sube a la silla. Luego haz el recorrido: sigue la señal hasta el arco de salida, salta limpio cada obstáculo y cruza la línea de nuevo antes de que se acabe la arena. Hazlo y la silla es tuya. Si te sales del corral, empezamos de nuevo.',
   'entities.quests.q_riding_lessons.completion':
     'Así, muy bien. Arriba de un solo impulso y bien firme en la silla. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Doma al Corcel del Valor',
@@ -6731,6 +6731,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Llave de encendido: Aerocicleta Justadora del Éter',
   'entities.items.reins_shadowjump_toad.name': 'Riendas de Kama-Kage, el Sapo Saltasombras',
   'entities.items.reins_stormfeather_griffin.name': 'Riendas del Plumatormenta Alcanzacielos',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Riendas de Pavoneatruenos, el Gran Pavo',
   'entities.quests.q_prof_intro.completion':
     '¿Lo ves? Mineral en la mochila y callos en las manos. Sigue minando, talando y recogiendo hierbas mientras recorres los caminos. Cuando vuelvas al pueblo, no pierdas de vista el tablón de Enfoque del pueblo junto al mercado ni el banco de artesanía cercano. En esos oficios te espera una vida honrada, si la quieres.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Trozo de mineral',
@@ -6788,6 +6789,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Aerocicleta Justadora del Éter',
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, el Sapo Saltasombras',
   'hudChrome.mounts.name_stormfeather_griffin': 'Plumatormenta Alcanzacielos',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavoneatruenos, el Gran Pavo',
   'hudChrome.mounts.desc_valorsteed':
     'Un corcel resistente y de paso firme que aumenta la velocidad de viaje.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6800,6 +6802,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.',
   'hudChrome.mounts.emptyTitle': 'Ninguna montura obtenida',
   'hudChrome.mounts.emptyStableHint':
     'Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.',

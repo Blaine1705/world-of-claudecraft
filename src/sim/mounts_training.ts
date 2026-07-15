@@ -1,13 +1,16 @@
 // The riding lesson ("mount training"), server-authoritative, a sibling system
-// behind SimContext. The lesson is the Mount/Dismount keybind tutorial gating the
-// first mount: the player begins at Stablemaster Marla (paying the one-time 100g
-// fee), then climbs onto a training Valorsteed by pressing the Mount/Dismount
-// hotkey. Being in the saddle IS the lesson: it credits the quest objective at
-// once, Marla takes the steed back (an instant force-dismount; the player never
-// keeps the unowned mount), and turning in q_riding_lessons at her grants
-// reins_valorsteed.
+// behind SimContext. After accepting Marla's quest, the player stands on the
+// glowing square behind the arch and presses Start Race. That deliberate action
+// pays the one-time 100g fee, lends a training Valorsteed, and arms the countdown.
+// FINISHING the course passes the lesson and credits its quest objective
+// (mountTrainingRaceFinished, called from src/sim/mount_race.ts). Marla takes the
+// steed back afterward (an instant force-dismount; the player never keeps the
+// unowned mount), and turning in
+// q_riding_lessons at her grants reins_valorsteed. Dismounting or leaving the
+// paddock abandons the attempt (the fee stays paid).
 //
-// The session lives directly on PlayerMeta.mountTraining. The NPC
+// The legacy mount_train_begin command remains append-only compatible, but no
+// current HUD button sends it. The session lives directly on PlayerMeta.mountTraining. The NPC
 // (stablemaster_marla) and the quest (q_riding_lessons, one 'interact' objective
 // keyed on the sentinel targetObjectItemId 'train_valorsteed') are content-slice
 // data; this module resolves them by id/string. On success it credits that
@@ -19,9 +22,9 @@
 // draws NO rng and perturbs no draw order. `src/sim`-pure: no DOM/Three, no
 // Math.random/Date.now/performance.now (enforced by tests/architecture.test.ts).
 
-import { TRAINING_MOUNT_KEY } from './content/mounts';
+import { MOUNT_RACE_START_PLATFORM, STABLE_PADDOCK, TRAINING_MOUNT_KEY } from './content/mounts';
 import { QUESTS } from './data';
-import { forceDismount } from './mounts';
+import { forceDismount, forceTrainingMount } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, type MountTrainingSession } from './types';
@@ -29,8 +32,20 @@ import { dist2d, type Entity, INTERACT_RANGE, type MountTrainingSession } from '
 // --- tuning (change numbers here, not inline) -------------------------------
 export const MOUNT_TRAIN_MIN_LEVEL = 20;
 export const MOUNT_TRAIN_FEE_COPPER = 10000; // 100 gold, charged once, ever
-/** Distance from Marla beyond which an in-progress lesson counts as abandoned. */
-export const MOUNT_TRAIN_LEAVE_RADIUS = 50;
+// The lesson's play area: the paddock rect plus a small margin (which also covers
+// Marla, who stands just north of the fence at z=708). Straying beyond it during
+// the lesson abandons the attempt. This replaces the old fixed radius around
+// Marla, since the show-jumping course now fills the whole (enlarged) paddock.
+const LESSON_MARGIN = 4;
+
+function outsideLessonBounds(e: Entity): boolean {
+  return (
+    e.pos.x < STABLE_PADDOCK.x1 - LESSON_MARGIN ||
+    e.pos.x > STABLE_PADDOCK.x2 + LESSON_MARGIN ||
+    e.pos.z < STABLE_PADDOCK.z1 - LESSON_MARGIN ||
+    e.pos.z > STABLE_PADDOCK.z2 + LESSON_MARGIN
+  );
+}
 
 // The stablemaster NPC + her quest, resolved by id (content-slice data; this
 // module never imports src/sim/content/* records directly, matching the seam).
@@ -53,6 +68,64 @@ function findStablemaster(ctx: SimContext): Entity | null {
     if (e.kind === 'npc' && e.templateId === STABLEMASTER_NPC_ID) return e;
   }
   return null;
+}
+
+/** Whether this player still needs to clear the course for the accepted riding
+ *  lesson. A ready or completed quest no longer uses the training mount. */
+export function needsRidingLessonRace(meta: PlayerMeta): boolean {
+  return meta.questLog.get(RIDING_LESSONS_QUEST_ID)?.state === 'active';
+}
+
+/** Prepare the accepted riding lesson directly from the glowing start platform.
+ *  This replaces the old extra Begin Lesson gossip click: the deliberate Start
+ *  Race click charges the one-time fee, opens the lesson, and lends the training
+ *  Valorsteed immediately. */
+export function prepareRidingLessonRace(ctx: SimContext, meta: PlayerMeta, e: Entity): boolean {
+  if (!needsRidingLessonRace(meta)) return false;
+  if (e.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return false;
+  }
+  if (e.level < MOUNT_TRAIN_MIN_LEVEL) {
+    ctx.error(meta.entityId, 'You must be level 20 to take riding lessons.');
+    return false;
+  }
+  if (e.inCombat) {
+    ctx.error(meta.entityId, "You can't do that while in combat.");
+    return false;
+  }
+  if (!meta.mountTrainingFeePaid) {
+    if (meta.copper < MOUNT_TRAIN_FEE_COPPER) {
+      ctx.error(meta.entityId, 'Not enough money.');
+      return false;
+    }
+    meta.copper -= MOUNT_TRAIN_FEE_COPPER;
+    meta.mountTrainingFeePaid = true;
+  }
+  let session = meta.mountTraining;
+  const announce = session?.state !== 'IN_PROGRESS' || session.phase !== 'ride';
+  if (session?.state !== 'IN_PROGRESS') {
+    session = {
+      sessionId: `mt_${meta.entityId}_${ctx.tickCount}`,
+      ownerId: meta.entityId,
+      anchor: { x: MOUNT_RACE_START_PLATFORM.x, z: MOUNT_RACE_START_PLATFORM.z },
+      state: 'IN_PROGRESS',
+      phase: 'ride',
+    };
+    meta.mountTraining = session;
+  } else {
+    session.phase = 'ride';
+  }
+  if (!forceTrainingMount(ctx, e)) return false;
+  if (announce) {
+    ctx.emit({
+      type: 'mountTrainSession',
+      sessionId: session.sessionId,
+      phase: 'ride',
+      pid: meta.entityId,
+    });
+  }
+  return true;
 }
 
 /** Credit the q_riding_lessons 'interact' objective (sentinel targetObjectItemId
@@ -100,6 +173,14 @@ export function mountTrainBegin(ctx: SimContext, pid?: number): void {
     ctx.error(meta.entityId, 'You must be level 20 to take riding lessons.');
     return;
   }
+  // The lesson IS climbing into the saddle with the Mount/Dismount key, so a
+  // player already riding (or mid-summon) must step down first: otherwise the
+  // driver would credit the objective the same tick and the lesson would feel
+  // like it completed itself.
+  if (e.mountKey !== '' || (e.mountCastRemaining ?? 0) > 0) {
+    ctx.error(meta.entityId, 'Dismount first.');
+    return;
+  }
   const marla = findStablemaster(ctx);
   if (!marla || dist2d(e.pos, marla.pos) > INTERACT_RANGE + 2) {
     ctx.error(meta.entityId, 'Too far away.');
@@ -127,18 +208,22 @@ export function mountTrainBegin(ctx: SimContext, pid?: number): void {
     ownerId: meta.entityId,
     anchor: { x: marla.pos.x, z: marla.pos.z },
     state: 'IN_PROGRESS',
+    phase: 'mount',
   };
   meta.mountTraining = session;
   ctx.emit({
     type: 'mountTrainSession',
     sessionId: session.sessionId,
+    phase: 'mount',
     pid: meta.entityId,
   });
 }
 
-/** Server-authoritative per-tick driver, run every tick for every player. Succeeds
- *  the lesson the moment the player is in the training steed's saddle, and ends it
- *  on death or on straying from Marla's yard. Draws no rng. */
+/** Server-authoritative per-tick driver, run every tick for every player. Advances
+ *  the lesson from 'mount' (climb aboard) to 'ride' (ride the course to the start
+ *  line), and ends it on death or on straying beyond the paddock. The lesson is NO
+ *  LONGER completed by mounting: a race finished while it is live credits it (see
+ *  mountTrainingRaceFinished). Draws no rng. */
 export function tickMountTraining(ctx: SimContext, meta: PlayerMeta): void {
   const session = meta.mountTraining;
   if (session?.state !== 'IN_PROGRESS') return;
@@ -151,19 +236,43 @@ export function tickMountTraining(ctx: SimContext, meta: PlayerMeta): void {
     abandonMountTraining(ctx, meta);
     return;
   }
-  // Straying from the stablemaster's yard abandons. The anchor is Marla's
-  // position captured at begin (she never moves), so this draws no entity scan.
-  if (
-    Math.hypot(e.pos.x - session.anchor.x, e.pos.z - session.anchor.z) > MOUNT_TRAIN_LEAVE_RADIUS
-  ) {
+  // Straying beyond the paddock abandons (the course fills the whole yard now, so
+  // the bound is the paddock rect, not a small radius around Marla).
+  if (outsideLessonBounds(e)) {
     ctx.notice(meta.entityId, NOTICE_LEFT_YARD);
     abandonMountTraining(ctx, meta);
     return;
   }
 
-  // In the saddle: the lesson is passed (the whole point was pressing the
-  // Mount/Dismount key). Credit the quest objective and hand the steed back.
-  if (e.mountKey === TRAINING_MOUNT_KEY) succeed(ctx, meta, session, e);
+  if (session.phase === 'mount') {
+    // Climbing into the saddle advances to the ride phase (it no longer completes
+    // the lesson). Re-emit the session event so the HUD toasts the marker hint.
+    if (e.mountKey === TRAINING_MOUNT_KEY) {
+      session.phase = 'ride';
+      ctx.emit({
+        type: 'mountTrainSession',
+        sessionId: session.sessionId,
+        phase: 'ride',
+        pid: meta.entityId,
+      });
+    }
+    return;
+  }
+  // 'ride' phase: stepping off the training steed abandons the attempt (the toast
+  // rides the mountTrainEnd event). A finished race is what passes the lesson.
+  if (e.mountKey !== TRAINING_MOUNT_KEY) abandonMountTraining(ctx, meta);
+}
+
+/** Credit a live riding lesson when the player finishes a show-jumping race
+ *  (src/sim/mount_race.ts calls this on a 'finished' outcome). A no-op unless a
+ *  lesson is IN_PROGRESS: runs the same success body as before (credit the quest
+ *  objective, hand the unowned steed back, notice + event). */
+export function mountTrainingRaceFinished(ctx: SimContext, meta: PlayerMeta): void {
+  const session = meta.mountTraining;
+  if (session?.state !== 'IN_PROGRESS') return;
+  const e = ctx.entities.get(meta.entityId);
+  if (!e) return;
+  succeed(ctx, meta, session, e);
 }
 
 function succeed(

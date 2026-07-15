@@ -2655,7 +2655,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Каждый всадник приходит на своих двоих, {className}. Поводья я отдам не раньше, чем ты научишься держаться на Доблестном скакуне, не целуя грязь, а лекарей на все сломанные кости в Хайвотче не напасёшься.',
   'entities.quests.q_riding_lessons.title': 'Уроки верховой езды',
   'entities.quests.q_riding_lessons.text':
-    'Каждый всадник приходит на своих двоих, {playerName}, как я и сказала в день нашей встречи. Держаться в седле, вот чему я учу, а не чем торгую. Заплати за обучение, и когда я подам знак, подзови учебного Доблестного скакуна и заберись в седло. Оставайся при этом у меня во дворе; уйдёшь далеко, начнём заново.',
+    'Каждый всадник приходит на своих двоих, {playerName}, как я и сказала в день нашей встречи. Заплати за обучение, и когда я подам знак, подзови учебного Доблестного скакуна и заберись в седло. Потом пройди маршрут: следуй за меткой к стартовой арке, бери каждое препятствие чисто и снова пересеки черту, пока не высыпался песок. Справишься — седло твоё. Выйдешь за пределы загона — начнём заново.',
   'entities.quests.q_riding_lessons.completion':
     'Вот так, хорошо. Взлетел в седло одним движением и сидишь уверенно. Доблестный скакун теперь твой, {playerName}: седло, поводья и репутация всадника, который заслужил место в седле, а не купил его.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Приручить Доблестного скакуна',
@@ -6095,6 +6095,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ключ зажигания: эфирный ховерцикл турнирного бойца',
   'entities.items.reins_shadowjump_toad.name': 'Поводья Кама-Кагэ, жабы теневых прыжков',
   'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Поводья Громоступа, великого индюка',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -6695,6 +6696,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Эфирный ховерцикл турнирного бойца',
   'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
   'hudChrome.mounts.desc_valorsteed':
     'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6707,6 +6709,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Огромная устойчивая жаба, обученная молниеносным теневым прыжкам по любой местности.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
   'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
   'hudChrome.mounts.emptyStableHint':
     'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
@@ -6714,6 +6718,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
   'hudChrome.mountTraining.mountPrompt':
     'Нажми {key}, чтобы оседлать учебного Доблестного скакуна.',
+  'hudChrome.mountTraining.ownedMountPrompt': 'Нажми {key}, чтобы оседлать скакуна',
+  'hudChrome.mountTraining.ridePrompt':
+    'Следуй за светящейся меткой к линии старта и нажми «Начать заезд».',
   'hudChrome.mountTraining.begin': 'Начать урок',
   'hudChrome.mountTraining.success': 'Ты приручил Доблестного скакуна.',
+  'hudChrome.mountTraining.returnToMarla':
+    'Вернись к Марле в конюшни, чтобы взять себе конюшенную лошадь.',
+  'hudChrome.mountRace.cancelButton': 'Отменить заезд',
+  'hudChrome.mountRace.startButton': 'Начать заезд',
+  'hudChrome.mountRace.start': 'Вперёд! Бери все препятствия и скачи назад через арку.',
+  'hudChrome.mountRace.toFinish': 'Скачи назад через арку!',
+  'hudChrome.mountRace.finished': 'Финиш за {seconds} с!',
+  'hudChrome.mountRace.timeout': 'Заезд провален',
+  'hudChrome.mountRace.progress': 'Барьеры {n} из {total}',
 };

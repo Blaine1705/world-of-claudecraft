@@ -23,6 +23,7 @@ export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
   aether_hover_cycle: 'hudChrome.mounts.name_aether_hover_cycle',
   shadowjump_toad: 'hudChrome.mounts.name_shadowjump_toad',
   stormfeather_griffin: 'hudChrome.mounts.name_stormfeather_griffin',
+  thunderstrut_gobbler: 'hudChrome.mounts.name_thunderstrut_gobbler',
 };
 
 export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
@@ -32,6 +33,7 @@ export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
   aether_hover_cycle: 'hudChrome.mounts.desc_aether_hover_cycle',
   shadowjump_toad: 'hudChrome.mounts.desc_shadowjump_toad',
   stormfeather_griffin: 'hudChrome.mounts.desc_stormfeather_griffin',
+  thunderstrut_gobbler: 'hudChrome.mounts.desc_thunderstrut_gobbler',
 };
 
 export const MOUNT_RARITY_KEYS: Record<string, TranslationKey> = {

@@ -442,17 +442,33 @@ export const cs_CZ: EnTranslations = {
       "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
       "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
       "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
-      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -7108,6 +7124,9 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Otěže Bouřopera Nebedosahujícího"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Otěže Hromokroka, velkého krocana"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Jezdecké lekce",
-        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám. Zaplať poplatek, a až dám pokyn, přivolej cvičného Valorsteeda a vylez do sedla. Zůstaň přitom u mě na dvoře; když se zatouláš, začínáme znovu.",
+        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Zaplať poplatek, a až dám pokyn, přivolej cvičného Valorsteeda a vylez do sedla. Pak projeď parkur: sleduj značku ke startovnímu oblouku, vezmi každý skok čistě a znovu projeď cílem, než se přesýpací hodiny vyprázdní. Dokážeš to, a sedlo je tvoje. Zatouláš se z ohrady a začínáme znovu.",
         "completion": "Tak. Nahoru jedním plynulým pohybem a v sedle pevně jako skála. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.",
         "objectives": {
           "0": {

@@ -60,6 +60,10 @@ which already computes interpolated position, `loco.speed/moving`, `swimming`,
   `zoneBiomeAt(z)` (vale→grass, marsh→dirt, peaks→stone) → water if wading →
   dungeon→wood/stone → snow if weather is snowing. Suppressed while airborne /
   swimming / dead and gated by `d2 < SFX_RANGE_SQ`.
+- **Mount running:** the same distance accumulator fires a mount-specific
+  `sink.mountRun(x,y,z, mountKey, self)` gait beat while a grounded mount runs.
+  Mount walking stays quiet. These cues use the normal SFX mix and remain audible
+  when the optional on-foot footstep setting is disabled.
 - **Jump / land / splash / swim:** per-view edge detection on `airborne` and
   `swimming` transitions fires `sink.movement('jump'|'land'|'splash'|'swim', …)`.
 - **Listener:** after the camera is positioned (~L1583), `sink.setListener(camPos,
@@ -110,6 +114,13 @@ Keys map to `public/audio/sfx/<key>.mp3`; the manifest
 | `foot_wood` | 0.5 | single boot step on hollow wooden planks, dull creak, close |
 | `foot_snow` | 0.5 | single boot step crunching fresh snow, soft compression |
 | `foot_water` | 0.6 | single footstep wading in shallow water, splashy, close |
+| `mount_run_valorsteed` | 0.39 | armored warhorse gallop |
+| `mount_run_grag_bear` | 0.70 | pitched-down paired heavy footfalls |
+| `mount_run_stalkglider_snail` | 0.55 | rapid slime surge |
+| `mount_run_aether_hover_cycle` | 0.65 | hovercraft acceleration pulse |
+| `mount_run_shadowjump_toad` | 0.52 | slime spring and damp footfall |
+| `mount_run_stormfeather_griffin` | 0.51 | large wing rush and hard talon contact |
+| `mount_run_thunderstrut_gobbler` | 0.40 | higher feather rush and quick claw contact |
 | `move_jump` | 0.5 | quick light gear/leather exertion and fabric rustle, a person leaping up |
 | `move_land` | 0.6 | a person landing from a jump, boots thud with armor and gear settle |
 | `move_splash` | 0.8 | a body plunging into water, big splash |
@@ -216,18 +227,25 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `murloc`, `kobold`,
 ## Generation
 `ELEVENLABS_API_KEY=… node scripts/gen_sfx.mjs [--force]` — reads
 `scripts/sfx/sfx_prompts.mjs`, calls `POST /v1/sound-generation` per clip
-(`duration_seconds`, `prompt_influence` 0.4, `loop` per entry,
-`output_format=mp3_44100_128`), writes `public/audio/sfx/<key>.mp3`, and emits
+(`eleven_text_to_sound_v2`, `duration_seconds`, `prompt_influence` 0.4, `loop` per
+entry, `output_format=mp3_44100_128`), writes `public/audio/sfx/<key>.mp3`, and emits
 `src/game/sfx_manifest.generated.ts` (key → `/audio/sfx/<key>.mp3`). Idempotent
 (skips existing; `--force` to regenerate). Offline-only; the key is never read at
 runtime. Served from `public/` via plain `/audio/sfx/...` paths (no media-manifest
 hashing), matching the voice-over assets.
+
+The `mount_*.mp3` entries are custom, optimized edits of CC0 or public-domain
+sources and are never sent to ElevenLabs. Their exact provenance is recorded in
+`CREDITS.md`. Running the generator without an API key is sufficient to rebuild
+the manifest when every generated clip already exists.
 
 ## Efficiency budget
 - One decoded `AudioBuffer` per clip, shared across all sources.
 - `MAX_VOICES` concurrent one-shots; over-cap plays are dropped (oldest-wins).
 - Footsteps gated by `d2 < SFX_RANGE_SQ` (reuses the renderer's per-entity squared
   distance) and a per-entity stride accumulator — no timers, no per-frame alloc.
+- Mount gait beats reuse that distance gate and accumulator with a longer stride
+  distance so each custom clip decays before the next one begins.
 - Ambience/cast loops are a small pool of persistent sources, cross-faded by gain.
 - Listener updated once per frame; panners use cheap `equalpower` + linear rolloff
   with a hard `maxDistance` so far sounds cost nothing.

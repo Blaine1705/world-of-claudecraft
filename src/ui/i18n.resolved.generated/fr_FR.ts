@@ -442,17 +442,33 @@ export const fr_FR: EnTranslations = {
       "name_aether_hover_cycle": "Aérocycle du Jouteur d’Éther",
       "name_shadowjump_toad": "Kama-Kage, le Crapaud Saute-Ombre",
       "name_stormfeather_griffin": "Plume-d’Orage Toise-Ciel",
+      "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
       "desc_aether_hover_cycle": "Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.",
       "desc_shadowjump_toad": "Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.",
-      "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées."
+      "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
+      "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "La Coupe du Val",
@@ -7108,6 +7124,9 @@ export const fr_FR: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Rênes du Plume-d’Orage Toise-Ciel"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Rênes de Pavane-Tonnerre, le Grand Dindon"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Leçons d’équitation",
-        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Tenir en selle, voilà ce que j’enseigne, pas ce que je vends. Paie les frais, et quand j’en donne l’ordre, appelle à toi le Destrier de Bravoure d’entraînement et monte en selle. Reste près de moi dans la cour pendant ce temps; si tu t’éloignes, on recommence.",
+        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Paie les frais, et quand j’en donne l’ordre, appelle à toi le Destrier de Bravoure d’entraînement et mets-toi en selle. Puis fais le parcours : suis le repère jusqu’à l’arche de départ, franchis chaque obstacle proprement et repasse la ligne avant que le sable ne s’écoule. Réussis, et la selle est à toi. Sors de l’enclos et l’on recommence.",
         "completion": "Voilà. En selle d’un seul mouvement, et bien stable une fois là-haut. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.",
         "objectives": {
           "0": {

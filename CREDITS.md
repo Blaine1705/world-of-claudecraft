@@ -43,6 +43,13 @@ provided as a courtesy.
 
 | Assets | Author | Source | License |
 |---|---|---|---|
+| Generated world, combat, creature, and ambience sound effects (`public/audio/sfx/*.mp3`, excluding `quest_*.mp3` and `mount_*.mp3`) | World of ClaudeCraft | Project-generated with the ElevenLabs Sound Effects API from `scripts/sfx/sfx_prompts.mjs` | Project asset |
+| Valorsteed gallop layer (`mount_run_valorsteed.mp3`) | D4XX, adapted by congusbongus | [Horse gallop on different surfaces](https://opengameart.org/content/horse-gallop-on-different-surfaces), individual `ground.mp3` source identified as CC0 in the included credits | CC0 1.0 |
+| Mount footfall layers (`mount_run_grag_bear.mp3`, `mount_run_shadowjump_toad.mp3`, `mount_run_stormfeather_griffin.mp3`, `mount_run_thunderstrut_gobbler.mp3`) | Fantozzi, extracted by qubodup | [Fantozzi's Footsteps](https://opengameart.org/content/fantozzis-footsteps-grasssand-stone) | CC0 1.0 |
+| Stalk-Glider slime layer (`mount_run_stalkglider_snail.mp3`) | RandomUser | [Slime ultimate the best](https://opengameart.org/content/slime-ultimate-the-best) | CC0 1.0 |
+| Shadow-Jump Toad slime layer (`mount_run_shadowjump_toad.mp3`) | KobatoGames | [Slime jump effect](https://opengameart.org/content/slime-jump-effect) | CC0 1.0 |
+| Hover-Cycle movement layer (`mount_run_aether_hover_cycle.mp3`) | Umplix | [Hovermobile SFX](https://opengameart.org/content/hovermobile-sfx) | CC0 1.0 |
+| Stormfeather and Grand Gobbler wing layers (`mount_run_stormfeather_griffin.mp3`, `mount_run_thunderstrut_gobbler.mp3`) | AntumDeluge, derived from dave.des | [Large Wings Flap](https://opengameart.org/content/large-wings-flap) | CC0 1.0 |
 | Quest event sound effects (`public/audio/sfx/quest_*.mp3`); original compositions | @jamiecypher | Original work | CC0 1.0 |
 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,

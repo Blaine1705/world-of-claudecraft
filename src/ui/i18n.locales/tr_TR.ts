@@ -2400,6 +2400,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kontak Anahtarı: Eter Şövalyesinin Uçan Motosikleti',
   'entities.items.reins_shadowjump_toad.name': 'Gölge Sıçrayışlı Kurbağa Kama-Kage’nin Dizginleri',
   'entities.items.reins_stormfeather_griffin.name': 'Göğe Uzanan Fırtına Tüyünün Dizginleri',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Yıldırım Adımlı Büyük Hindinin Dizginleri',
   'entities.mobs.acolyte_tessa.name': 'Çömez Tessa',
   'entities.mobs.bastion_revenant.name': 'Kale Hortlağı',
   'entities.mobs.bog_bloat.name': 'Bataklık Şişkini',
@@ -2552,7 +2553,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Her binici buraya iki ayağıyla gelir, {className}. Çamura yüz üstü düşmeden Valorsteed'e oturana dek dizginleri sana vermem, çünkü Highwatch'ta kırık kemiklere bakacak fazladan şifacı yok.",
   'entities.quests.q_riding_lessons.title': 'Binicilik Dersleri',
   'entities.quests.q_riding_lessons.text':
-    "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Öğrettiğim şey oturmayı bilmek, sattığım şey değil. Ücreti öde, işaret verdiğimde eğitim Valorsteed'ini yanına çağır ve eyere çık. Bu sırada avluda yanımda kal; uzaklaşırsan baştan başlarız.",
+    "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Ücreti öde, işaret verdiğimde eğitim Valorsteed'ini yanına çağır ve eyere çık. Sonra parkuru koş: işareti izleyip başlangıç kemerine git, her engeli temiz al ve kum bitmeden çizgiyi yeniden geç. Bunu başarırsan eyer senindir. Padoktan uzaklaşırsan baştan başlarız.",
   'entities.quests.q_riding_lessons.completion':
     'İşte böyle. Tek hamlede eyere çıktın ve yukarıda dimdik oturdun. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.',
   'entities.quests.q_riding_lessons.objectives.0.label': "Valorsteed'i evcilleştir",

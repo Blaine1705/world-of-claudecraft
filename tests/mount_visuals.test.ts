@@ -67,6 +67,15 @@ describe('procedural bob math', () => {
     expect(mountBobY(spec, 0.7, true)).toBe(0);
   });
 
+  it('the gobbler is gait-rigged with the saddle over the hips (authored strut clips)', () => {
+    const spec = MOUNT_VISUAL_SPECS.thunderstrut_gobbler;
+    expect(spec.rigged).toBe(true);
+    expect(spec.seat).toBe(2.05);
+    expect(spec.seatFwd).toBe(-0.15);
+    expect(spec.fx).toBeNull();
+    expect(mountBobY(spec, 0.7, true)).toBe(0);
+  });
+
   it('the snail glides flat (no bob at all)', () => {
     const spec = MOUNT_VISUAL_SPECS.stalkglider_snail;
     expect(mountBobY(spec, 0.5, true)).toBe(0);

@@ -442,17 +442,33 @@ export const pl_PL: EnTranslations = {
       "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
       "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
       "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
-      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled."
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Puchar Doliny",
@@ -7108,6 +7124,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Wodze Burzopióra Podniebnego"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Wodze Gromostępa, Wielkiego Indora"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lekcje jazdy konnej",
-        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Zapłać opłatę, a gdy dam znak, przywołaj treningowego Valorsteeda i wsiądź do siodła. Zostań przy mnie na dziedzińcu, póki tego nie zrobisz; oddalisz się i zaczynamy od nowa.",
+        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Zapłać opłatę, a gdy dam znak, przywołaj treningowego Valorsteeda i wsiądź do siodła. Potem przejedź parkur: podążaj za znacznikiem do łuku startowego, weź każdą przeszkodę czysto i ponownie przekrocz linię, zanim przesypie się piasek. Uda ci się i siodło jest twoje. Wyjedziesz poza zagrodę i zaczynamy od nowa.",
         "completion": "No, właśnie tak. W siodle za jednym płynnym ruchem i pewnie usadzony. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.",
         "objectives": {
           "0": {

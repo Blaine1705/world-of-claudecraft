@@ -281,6 +281,7 @@ function makeCtx() {
     tickLockpickTimeout: vi.fn(),
     startDelveRaiseDeadChannel: vi.fn(() => false),
     tickMountTraining: vi.fn(),
+    tickMountRace: vi.fn(),
     abandonMountTraining: vi.fn(),
     resolvedAbility: vi.fn(() => null),
     playerGcdFor: vi.fn(() => 1.5),

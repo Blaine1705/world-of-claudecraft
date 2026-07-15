@@ -442,17 +442,33 @@ export const zh_CN: EnTranslations = {
       "name_aether_hover_cycle": "以太骑士悬浮机车",
       "name_shadowjump_toad": "影跃蟾蜍卡玛影",
       "name_stormfeather_griffin": "凌天风暴之羽",
+      "name_thunderstrut_gobbler": "雷霆阔步大火鸡",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一辆强大的魔导机车，专为快速贴地悬浮的战斗穿行而设计。",
       "desc_shadowjump_toad": "一只体型庞大、步伐稳健的巨蟾，受训于闪电般的暗影跳跃，可跨越任何地形。",
-      "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。"
+      "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。",
+      "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
+      "ownedMountPrompt": "按 {key} 键骑乘",
+      "ridePrompt": "跟随发光的标记前往起点线，然后点击开始比赛。",
       "begin": "开始课程",
-      "success": "你已经驯服了英勇战马。"
+      "success": "你已经驯服了英勇战马。",
+      "returnToMarla": "返回马厩找玛拉，领养一匹马厩里的马。"
+    },
+    "mountRace": {
+      "startButton": "开始比赛",
+      "cancelButton": "取消比赛",
+      "go": "GO!",
+      "start": "出发！跳过每一道障碍，再骑回拱门冲线。",
+      "toFinish": "骑回拱门冲线！",
+      "finished": "完成！用时 {seconds} 秒！",
+      "timeout": "比赛失败",
+      "progress": "障碍 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "溪谷杯",
@@ -7108,6 +7124,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "凌天风暴之羽的缰绳"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "雷霆阔步大火鸡的缰绳"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "骑术课",
-        "text": "每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。我教的是怎么坐稳，不是拿来卖的东西。交上学费，等我发话，就把训练用的英勇战马唤到身边，翻身上鞍。这期间待在院子里别走远；跑远了，我们就从头再来。",
+        "text": "每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。交上学费，等我发话，就把训练用的英勇战马唤到身边，翻身上鞍。然后跑完赛道：跟着标记到起点拱门，把每一道障碍都跳得干净利落，在沙子漏尽之前再次冲过终点线。做到了，这鞍子就是你的。要是跑出围场，我们就从头再来。",
         "completion": "好了，就是这样。一个利落的动作上了鞍，坐得稳稳当当。英勇战马现在是你的了，{playerName}：马鞍、缰绳，还有靠本事挣来而不是买来的骑手身份。",
         "objectives": {
           "0": {

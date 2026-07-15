@@ -1,5 +1,8 @@
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { sfx } from '../src/game/sfx';
+import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
+import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
 // The footstep "jingling" bug: foot clips are ~0.48s but steps fire every ~0.22s
 // at a run, so flat retriggers overlap two pitch-jittered copies of one sample and
@@ -24,29 +27,64 @@ let nowT = 0;
 function installAudioStub(): void {
   sources.length = 0;
   nowT += 1000; // monotonic across tests so the singleton's cooldown map never blocks
-  const param = () => ({ value: 0, setValueAtTime() {}, linearRampToValueAtTime() {}, setTargetAtTime() {} });
+  const param = () => ({
+    value: 0,
+    setValueAtTime() {},
+    linearRampToValueAtTime() {},
+    setTargetAtTime() {},
+  });
   class FakeCtx {
-    get currentTime() { return nowT; }
+    get currentTime() {
+      return nowT;
+    }
     destination = {};
     listener = {} as Record<string, unknown>;
-    createGain() { return { gain: param(), connect(n: unknown) { return n; }, disconnect() {} }; }
+    createGain() {
+      return {
+        gain: param(),
+        connect(n: unknown) {
+          return n;
+        },
+        disconnect() {},
+      };
+    }
     createPanner() {
       return {
-        panningModel: '', distanceModel: '', refDistance: 0, maxDistance: 0, rolloffFactor: 0,
-        setPosition() {}, connect(n: unknown) { return n; }, disconnect() {},
+        panningModel: '',
+        distanceModel: '',
+        refDistance: 0,
+        maxDistance: 0,
+        rolloffFactor: 0,
+        setPosition() {},
+        connect(n: unknown) {
+          return n;
+        },
+        disconnect() {},
       };
     }
     createBufferSource(): FakeSource {
       const s: FakeSource = {
-        buffer: null, playbackRate: { value: 1 }, onended: null, started: false, stopAt: null,
-        connect(n: unknown) { return n; },
-        start() { this.started = true; },
-        stop(t?: number) { this.stopAt = t ?? 0; },
+        buffer: null,
+        playbackRate: { value: 1 },
+        onended: null,
+        started: false,
+        stopAt: null,
+        connect(n: unknown) {
+          return n;
+        },
+        start() {
+          this.started = true;
+        },
+        stop(t?: number) {
+          this.stopAt = t ?? 0;
+        },
       };
       sources.push(s);
       return s;
     }
-    resume() { return Promise.resolve(); }
+    resume() {
+      return Promise.resolve();
+    }
   }
   (globalThis as never as { AudioContext: unknown }).AudioContext = FakeCtx;
 }
@@ -62,6 +100,9 @@ beforeEach(() => {
   // Inject decoded buffers directly (skip async fetch/decode in preload).
   const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
   buffers.set('foot_grass', { duration: 0.48 });
+  for (const [index, mountKey] of MOUNT_KEYS.entries()) {
+    buffers.set(`mount_run_${mountKey}`, { duration: 0.5 + index / 100 });
+  }
 });
 
 describe('footstep audio', () => {
@@ -85,6 +126,67 @@ describe('footstep audio', () => {
   });
 });
 
+describe('mount running audio', () => {
+  it('ships one generated manifest entry for every catalog mount', () => {
+    for (const mountKey of MOUNT_KEYS) {
+      expect(SFX_CLIPS[`mount_run_${mountKey}`]).toEqual({
+        url: `/audio/sfx/mount_run_${mountKey}.mp3`,
+        loop: false,
+      });
+    }
+  });
+
+  it('ships one non-empty MP3 asset for every catalog mount and no orphan mount clips', () => {
+    const directory = new URL('../public/audio/sfx/', import.meta.url);
+    const expected = MOUNT_KEYS.map((mountKey) => `mount_run_${mountKey}.mp3`).sort();
+    const actual = readdirSync(directory)
+      .filter((file) => file.startsWith('mount_run_') && file.endsWith('.mp3'))
+      .sort();
+
+    expect(actual).toEqual(expected);
+    for (const file of expected) {
+      const url = new URL(file, directory);
+      expect(statSync(url).size).toBeGreaterThan(5_000);
+      const header = readFileSync(url).subarray(0, 3).toString('ascii');
+      expect(header).toBe('ID3');
+    }
+  });
+
+  it('plays a distinct custom clip for every catalog mount', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    const played = new Set<unknown>();
+
+    for (const mountKey of MOUNT_KEYS) {
+      nowT += 0.5;
+      sfx.mountRun(0, 0, 0, mountKey, true);
+      const src = sources.at(-1)!;
+      expect(src.buffer).toBe(buffers.get(`mount_run_${mountKey}`));
+      played.add(src.buffer);
+    }
+
+    expect(played.size).toBe(MOUNT_KEYS.length);
+  });
+
+  it('plays independently of the optional on-foot footstep toggle', () => {
+    sfx.setFootstepsEnabled(false);
+    sfx.mountRun(0, 0, 0, 'valorsteed', true);
+    expect(sources.at(-1)!.started).toBe(true);
+  });
+
+  it('truncates each stride before the next mounted running beat', () => {
+    sfx.mountRun(0, 0, 0, 'valorsteed', true);
+    const src = sources.at(-1)!;
+    expect(src.stopAt).not.toBeNull();
+    expect(src.stopAt! - nowT).toBeLessThan(0.5);
+  });
+
+  it('ignores unknown mount keys', () => {
+    const before = sources.length;
+    sfx.mountRun(0, 0, 0, 'unknown_mount', true);
+    expect(sources.length).toBe(before);
+  });
+});
+
 // Footstep sounds ship OFF by default and are toggleable via the footstepSfx
 // setting. While disabled, footstep() must be a no-op (no source created) for
 // self and other entities alike; re-enabling resumes playback.
@@ -92,7 +194,7 @@ describe('footstep toggle', () => {
   it('is a no-op when footsteps are disabled', () => {
     sfx.setFootstepsEnabled(false);
     const before = sources.length;
-    sfx.footstep(0, 0, 0, 'grass', true, true);  // self
+    sfx.footstep(0, 0, 0, 'grass', true, true); // self
     sfx.footstep(5, 0, 5, 'grass', false, false); // another entity
     expect(sources.length).toBe(before);
   });

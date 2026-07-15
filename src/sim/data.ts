@@ -276,6 +276,11 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     // optional per-zone field, was being dropped here, so the delve entrance
     // marker (name slab + arch) never reached the renderer (props.ts)
     delveMarkers: sets.flatMap((s) => s.delveMarkers ?? []),
+    // same optional-field trap as delveMarkers above: raceCourse is a singleton
+    // (one Highwatch course), not a flat-mappable list, so take the first set
+    // that defines it. Dropping it here left the arch + jumps out of the merged
+    // PROPS the renderer reads (props.ts), so no race fixture ever rendered.
+    raceCourse: sets.map((s) => s.raceCourse).find(Boolean),
   };
 }
 

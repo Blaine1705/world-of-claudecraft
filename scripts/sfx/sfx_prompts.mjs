@@ -1,5 +1,6 @@
 // Authoritative sound-effect catalog — consumed by scripts/gen_sfx.mjs.
-// Each entry: { key, prompt, duration (seconds 0.5–30), loop? }.
+// Generated entries carry prompt and duration. Custom/open-source entries carry
+// `custom: true` and are inventoried without being sent to ElevenLabs.
 // Human-readable design + spatial behaviour: docs/design/sound_effects.md.
 //
 // Keys map to public/audio/sfx/<key>.mp3 and to src/game/sfx_manifest.generated.ts.
@@ -39,6 +40,34 @@ export const SFX = [
   FOOT('foot_wood', 'on hollow wooden planks, dull creak'),
   FOOT('foot_snow', 'crunching into fresh deep snow, soft compression'),
   FOOT('foot_water', 'splashing through shallow water, wet splash'),
+  {
+    key: 'mount_run_valorsteed',
+    custom: true,
+  },
+  {
+    key: 'mount_run_grag_bear',
+    custom: true,
+  },
+  {
+    key: 'mount_run_stalkglider_snail',
+    custom: true,
+  },
+  {
+    key: 'mount_run_aether_hover_cycle',
+    custom: true,
+  },
+  {
+    key: 'mount_run_shadowjump_toad',
+    custom: true,
+  },
+  {
+    key: 'mount_run_stormfeather_griffin',
+    custom: true,
+  },
+  {
+    key: 'mount_run_thunderstrut_gobbler',
+    custom: true,
+  },
   {
     key: 'move_jump',
     duration: 0.5,
@@ -192,6 +221,12 @@ export const SFX = [
     loop: true,
     prompt:
       'Earthy nature magic growing: rustling leaves and a low primal hum building. Seamless loop, no music.',
+  },
+  {
+    key: 'cast_lightning_bolt',
+    file: 'cast_lightning_bolt.wav',
+    loop: true,
+    custom: true,
   },
 
   // --- Spell projectiles ----------------------------------------------------

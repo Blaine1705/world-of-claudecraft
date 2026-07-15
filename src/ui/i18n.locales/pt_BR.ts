@@ -3547,7 +3547,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Cada cavaleiro chega a pé, {className}. Só entrego as rédeas quando você conseguir montar o Corcel do Valor sem beijar a lama, e Highwatch não tem curandeiros de sobra para ossos quebrados.',
   'entities.quests.q_riding_lessons.title': 'Aulas de Equitação',
   'entities.quests.q_riding_lessons.text':
-    'Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Manter-se montado é o que eu ensino, não o que eu vendo. Pague a taxa e, quando eu der o sinal, chame o Corcel do Valor de treinamento e suba na sela. Fique comigo no pátio enquanto isso; se você se afastar, começamos de novo.',
+    'Cada cavaleiro chega a pé, {playerName}, exatamente como eu disse no dia em que nos conhecemos. Pague a taxa e, quando eu der o sinal, chame o Corcel do Valor de treinamento e suba na sela. Depois faça o percurso: siga a marca até o arco de largada, salte limpo cada obstáculo e cruze a linha de novo antes que a areia acabe. Consiga isso e a sela é sua. Saia do cercado e começamos de novo.',
   'entities.quests.q_riding_lessons.completion':
     'Pronto, assim mesmo. Subiu num movimento só e ficou firme lá em cima. O Corcel do Valor é seu, {playerName}: sela, rédeas, e a reputação de um cavaleiro que conquistou o assento em vez de comprá-lo.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Domar o Corcel do Valor',
@@ -6688,6 +6688,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': 'Chave de ignição: Aerociclo do Justador do Éter',
   'entities.items.reins_shadowjump_toad.name': 'Rédeas de Kama-Kage, o Sapo Salta-Sombras',
   'entities.items.reins_stormfeather_griffin.name': 'Rédeas do Pluma-Tormenta Alcança-Céu',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Rédeas de Pavoneia-Trovões, o Grande Peru',
   'entities.quests.q_prof_intro.completion':
     'Viu só? Minério na mochila e calos nas mãos. Continue minerando, cortando madeira e colhendo ervas enquanto percorre as estradas. Quando voltar à cidade, preste atenção no quadro do Foco da Cidade perto do mercado e na bancada de criação ali ao lado. Dá para ganhar a vida honestamente com tudo isso, se você quiser.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Pedaço de Minério',
@@ -6746,6 +6747,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Aerociclo do Justador do Éter',
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, o Sapo Salta-Sombras',
   'hudChrome.mounts.name_stormfeather_griffin': 'Pluma-Tormenta Alcança-Céu',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavoneia-Trovões, o Grande Peru',
   'hudChrome.mounts.desc_valorsteed':
     'Um corcel resistente e de passo firme que aumenta a velocidade de viagem.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6758,6 +6760,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.',
   'hudChrome.mounts.emptyTitle': 'Nenhuma montaria coletada',
   'hudChrome.mounts.emptyStableHint':
     'Alcance o nível 20 e faça aulas de montaria com a Cavalariça-mor Marla nos estábulos a oeste de Highwatch.',

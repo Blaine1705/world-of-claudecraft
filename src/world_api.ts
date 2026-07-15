@@ -129,6 +129,7 @@ export type {
 export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
+export type { MountRaceView } from './world_api/mounts';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
 export type {
@@ -355,6 +356,8 @@ export const COMMAND_NAMES = [
   'mount_train_begin',
   'mount_train_answer',
   'mount_train_abort',
+  'mount_race_start',
+  'mount_race_cancel',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -583,9 +586,14 @@ export const COMMAND_FACETS = {
   vcup_practice: 'IWorldValeCup',
   // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
   // selectedMount is a self-snapshot read (terse `mnt`, no send, untagged).
-  // mount_train_begin starts the riding lesson (the Mount/Dismount keybind
-  // tutorial); its feedback rides the mountTrain* events (no snapshot field).
+  // mount_train_begin is the legacy riding-lesson entry point; its feedback
+  // rides the mountTrain* events (no snapshot field).
   mount_select: 'IWorldMounts',
   mount_toggle: 'IWorldMounts',
   mount_train_begin: 'IWorldMounts',
+  // mount_race_start begins a show-jumping race from the glowing platform;
+  // mount_race_cancel exits it. Both are validated server-side and feed the
+  // mountRace* events.
+  mount_race_start: 'IWorldMounts',
+  mount_race_cancel: 'IWorldMounts',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

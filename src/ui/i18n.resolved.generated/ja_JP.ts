@@ -442,17 +442,33 @@ export const ja_JP: EnTranslations = {
       "name_aether_hover_cycle": "エーテルジャウスター・ホバーサイクル",
       "name_shadowjump_toad": "影跳びのカマカゲ",
       "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
+      "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
       "desc_aether_hover_cycle": "低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。",
       "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
-      "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。"
+      "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
+      "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
+      "ownedMountPrompt": "{key} キーを押して騎乗する",
+      "ridePrompt": "光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。",
       "begin": "レッスン開始",
-      "success": "ヴァロースティードを乗りこなした。"
+      "success": "ヴァロースティードを乗りこなした。",
+      "returnToMarla": "厩舎のマーラのもとへ戻り、厩舎の馬を引き取ろう。"
+    },
+    "mountRace": {
+      "startButton": "レース開始",
+      "cancelButton": "レースをキャンセル",
+      "go": "GO!",
+      "start": "スタート！すべての障害を跳び越え、アーチへ戻って駆け抜けろ。",
+      "toFinish": "アーチへ戻って駆け抜けろ！",
+      "finished": "{seconds}秒でゴール！",
+      "timeout": "レース失敗",
+      "progress": "障害 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -7108,6 +7124,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "スカイリーチ・ストームフェザーの手綱"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "大七面鳥サンダーストラットの手綱"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "乗馬の稽古",
-        "text": "騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。謝礼を払い、わたしが合図したら、調教用のヴァロースティードを呼び寄せて鞍にまたがるのだ。その間はわたしのそばの庭にいろ。離れれば、また最初からやり直しだ。",
+        "text": "騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。謝礼を払い、わたしが合図したら、調教用のヴァロースティードを呼び寄せて騎乗しろ。それからコースを走れ。目印をたどってスタートアーチへ向かい、どの障害もきれいに跳び越え、砂が落ちきる前にもう一度ラインを越えるのだ。やり遂げれば、その鞍はお前のものだ。パドックの外へさまよい出れば、また最初からやり直しだ。",
         "completion": "よし、それでいい。ひと息にまたがり、上でも堂々と座っていたな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。",
         "objectives": {
           "0": {

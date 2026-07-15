@@ -2489,7 +2489,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Każdy jeździec przychodzi na dwóch nogach, {className}. Wodzy nie dostaniesz, dopóki nie utrzymasz się na Valorsteedzie bez całowania błota, a Highwatch nie ma zbyt wielu uzdrowicieli na złamane kości.',
   'entities.quests.q_riding_lessons.title': 'Lekcje jazdy konnej',
   'entities.quests.q_riding_lessons.text':
-    'Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Utrzymanie się w siodle to to, czego uczę, nie to, co sprzedaję. Zapłać opłatę, a gdy dam znak, przywołaj treningowego Valorsteeda i wsiądź do siodła. Zostań przy mnie na dziedzińcu, póki tego nie zrobisz; oddalisz się i zaczynamy od nowa.',
+    'Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Zapłać opłatę, a gdy dam znak, przywołaj treningowego Valorsteeda i wsiądź do siodła. Potem przejedź parkur: podążaj za znacznikiem do łuku startowego, weź każdą przeszkodę czysto i ponownie przekrocz linię, zanim przesypie się piasek. Uda ci się i siodło jest twoje. Wyjedziesz poza zagrodę i zaczynamy od nowa.',
   'entities.quests.q_riding_lessons.completion':
     'No, właśnie tak. W siodle za jednym płynnym ruchem i pewnie usadzony. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Ujeżdżenie Valorsteeda',
@@ -6622,6 +6622,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': 'Kluczyk zapłonu: eterowy ścigacz kopijnika',
   'entities.items.reins_shadowjump_toad.name': 'Wodze Kama-Kage, ropuchy cienioskoku',
   'entities.items.reins_stormfeather_griffin.name': 'Wodze Burzopióra Podniebnego',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Wodze Gromostępa, Wielkiego Indora',
   'entities.quests.q_prof_intro.completion':
     'Widzisz? Ruda w torbie i odciski na dłoniach. Dalej zajmuj się górnictwem, wyrębem i zielarstwem podczas wędrówek, a gdy wrócisz do miasta, pamiętaj o tablicy Priorytetów miasta przy targu i pobliskim stole rzemieślniczym. Na tym wszystkim można uczciwie zarobić, jeśli zechcesz.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Kawałek rudy',

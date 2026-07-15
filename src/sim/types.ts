@@ -1654,6 +1654,15 @@ export interface ZonePropsDef {
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
   delveMarkers?: { x: number; z: number; delveId: string }[];
+  // The show-jumping race fixtures (the Highwatch stables): the start/finish
+  // arch and one jump per course gate, placed from content/mounts
+  // MOUNT_RACE_COURSE so the props can never drift from the course. colliders.ts
+  // gives each jump a matching fence-like OBB: grounded riders stop at the rail,
+  // while a deliberate airborne jump clears it. `dir` is the riding heading.
+  raceCourse?: {
+    arch: { x: number; z: number; dir: number };
+    jumps: { x: number; z: number; dir: number; kind: 'vertical' | 'oxer' }[];
+  };
 }
 
 export function emptyZoneProps(): ZonePropsDef {
@@ -2123,6 +2132,35 @@ export interface MountTrainingSession {
    *  stray check never rescans the entity map for her. */
   anchor: { x: number; z: number };
   state: 'IN_PROGRESS' | 'SUCCESS' | 'ABANDONED';
+  /** Lesson phase while IN_PROGRESS: 'mount' before the player has climbed onto
+   *  the training steed, 'ride' once mounted (ride the course to the start line
+   *  and finish a race to pass). Mounting no longer completes the lesson; a race
+   *  finished while the lesson is live is what credits the quest. */
+  phase: 'mount' | 'ride';
+}
+
+// A player's own active show-jumping race (src/sim/mount_race.ts), kept on
+// PlayerMeta.mountRace. Session-only: never persisted/serialized, so a
+// save/load never resumes a half-run race. Strictly per-player by design (the
+// online-concurrency requirement): no field references any other player or any
+// shared course state. The lap starts on the 'mount_race_start' command at the
+// arch, counts down, then runs a timed lap in which the seven jumps may be
+// cleared in ANY order (a bit per jump), finishing on the next arch crossing once
+// all bits are set. No rng.
+export interface MountRaceSession {
+  raceId: string;
+  ownerId: number;
+  /** 'countdown' from the start command until GO (gates inert), then 'racing'. */
+  phase: 'countdown' | 'racing';
+  /** The tick the countdown ends and the timed lap begins (the 3..2..1..GO
+   *  boundary); the elapsed time and the deadline both measure from here. */
+  goTick: number;
+  /** The tick the timed lap times out (goTick + budget); only checked while racing. */
+  deadlineTick: number;
+  /** Bitmask of cleared jumps (bit i = MOUNT_RACE_COURSE.jumps[i]); the lap
+   *  finishes when every bit is set and the rider re-crosses the arch. jumpsTotal
+   *  is <= 31, so a number bitmask suffices. */
+  clearedMask: number;
 }
 
 // `pid` (when present) marks a personal event that should only be delivered to
@@ -2482,17 +2520,58 @@ export type SimEvent = { pid?: number } & (
         | 'not_at_hub';
     }
   // Riding lesson (src/sim/mounts_training.ts). Both personal (pid-scoped).
-  // mountTrainSession announces a fresh attempt (the client toasts the
-  // Mount/Dismount hint); mountTrainEnd reports the terminal outcome.
+  // mountTrainSession announces a fresh attempt or a phase change: `phase` is
+  // 'mount' at begin (the client toasts the Mount/Dismount hint) and re-emitted
+  // as 'ride' once the player climbs on (toast: follow the marker to the start
+  // line). mountTrainEnd reports the terminal outcome.
   | {
       type: 'mountTrainSession';
       sessionId: string;
+      phase: 'mount' | 'ride';
       pid: number;
     }
   | {
       type: 'mountTrainEnd';
       sessionId: string;
       outcome: 'success' | 'abandoned';
+      pid: number;
+    }
+  // Show-jumping race (src/sim/mount_race.ts). ALL personal (pid-scoped): each
+  // rider only ever hears about their own race, so concurrent racers never
+  // interfere. mountRaceCountdown fires on the start command with the pre-GO
+  // budget (the client shows 3..2..1..GO); mountRaceStart fires at GO and arms
+  // the lap timer; mountRaceJump reports one jump cleared any-order (`jump` is the
+  // gate index just marked, `cleared` the running count, `mask` the full bitset);
+  // mountRaceEnd reports the terminal outcome with the elapsed ticks from GO
+  // (meaningful on 'finished'). Gate positions are NOT on the wire: the client
+  // derives them from the shared MOUNT_RACE_COURSE content.
+  | {
+      type: 'mountRaceCountdown';
+      raceId: string;
+      countdownTicks: number;
+      pid: number;
+    }
+  | {
+      type: 'mountRaceStart';
+      raceId: string;
+      timeLimitTicks: number;
+      jumpsTotal: number;
+      pid: number;
+    }
+  | {
+      type: 'mountRaceJump';
+      raceId: string;
+      jump: number;
+      cleared: number;
+      mask: number;
+      jumpsTotal: number;
+      pid: number;
+    }
+  | {
+      type: 'mountRaceEnd';
+      raceId: string;
+      outcome: 'finished' | 'timeout' | 'abandoned';
+      timeTicks: number;
       pid: number;
     }
 );

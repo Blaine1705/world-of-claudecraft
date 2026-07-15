@@ -4653,7 +4653,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každý jezdec sem přijde po svých, {className}. Otěže nedostaneš, dokud neusedneš na Valorsteeda, aniž bys skončil v blátě, a Highwatch nemá ranhojiče nazbyt pro zlomené kosti.',
   'entities.quests.q_riding_lessons.title': 'Jezdecké lekce',
   'entities.quests.q_riding_lessons.text':
-    'Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Sedět v sedle je to, co učím, ne co prodávám. Zaplať poplatek, a až dám pokyn, přivolej cvičného Valorsteeda a vylez do sedla. Zůstaň přitom u mě na dvoře; když se zatouláš, začínáme znovu.',
+    'Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Zaplať poplatek, a až dám pokyn, přivolej cvičného Valorsteeda a vylez do sedla. Pak projeď parkur: sleduj značku ke startovnímu oblouku, vezmi každý skok čistě a znovu projeď cílem, než se přesýpací hodiny vyprázdní. Dokážeš to, a sedlo je tvoje. Zatouláš se z ohrady a začínáme znovu.',
   'entities.quests.q_riding_lessons.completion':
     'Tak. Nahoru jedním plynulým pohybem a v sedle pevně jako skála. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Zkroť Valorsteeda',
@@ -6512,6 +6512,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': 'Startovací klíč: Éterové vznášecí kolo',
   'entities.items.reins_shadowjump_toad.name': 'Otěže Kama-Kageho, ropuchy stínového skoku',
   'entities.items.reins_stormfeather_griffin.name': 'Otěže Bouřopera Nebedosahujícího',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Otěže Hromokroka, velkého krocana',
   'entities.quests.q_prof_intro.completion':
     'Vidíš? Rudu v batohu a mozoly na rukou. Pokračuj v těžbě, kácení dřeva a sběru bylin, když cestuješ po cestách, a až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a řemeslnický ponk poblíž. V tom všem čeká poctivé živobytí, pokud o něj stojíš.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Kus rudy',

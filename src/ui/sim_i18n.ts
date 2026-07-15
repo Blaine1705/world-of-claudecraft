@@ -56,6 +56,7 @@ const baseEnTable = {
   'error.mountTrainLevel': 'You must be level 20 to take riding lessons.',
   'error.mountTrainNeedsQuest': 'You need to accept the riding lesson quest first.',
   'error.mountTrainInProgress': 'A riding lesson is already in progress.',
+  'error.mountTrainDismountFirst': 'Dismount first.',
   // Riding-lesson notices (log-type), emitted from the per-tick driver.
   // Placeholder-free, so they register in the EXACT matcher automatically.
   'log.mountTrainSuccess': "Marla takes the Valorsteed's reins. Well ridden.",

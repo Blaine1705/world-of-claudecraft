@@ -3560,7 +3560,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ogni cavaliere arriva sulle proprie gambe, {className}. Non ti darò le redini finché non saprai restare in sella al Destriero del Valore senza baciare il fango, e a Highwatch non abbondano i guaritori per le ossa rotte.',
   'entities.quests.q_riding_lessons.title': 'Lezioni di equitazione',
   'entities.quests.q_riding_lessons.text':
-    'Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Restare in sella è ciò che insegno, non ciò che vendo. Paga la quota e, quando te lo dico, chiama a te il Destriero del Valore da addestramento e sali in sella. Resta con me nel cortile mentre lo fai; se ti allontani, si ricomincia.',
+    'Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Paga la quota e, quando te lo dico, chiama a te il Destriero del Valore da addestramento e sali in sella. Poi affronta il percorso: segui il segnale fino all’arco di partenza, supera pulito ogni ostacolo e taglia di nuovo il traguardo prima che la sabbia si esaurisca. Riuscirci, e la sella è tua. Esci dal recinto e si ricomincia.',
   'entities.quests.q_riding_lessons.completion':
     'Ecco, così. Su con un solo movimento pulito e ben saldo in sella. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Doma il Destriero del Valore',
@@ -6716,6 +6716,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Chiave di accensione: Aerociclo del Giostratore d’Etere',
   'entities.items.reins_shadowjump_toad.name': 'Redini di Kama-Kage, il Rospo Saltombra',
   'entities.items.reins_stormfeather_griffin.name': 'Redini del Piumatempesta Toccacielo',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Redini di Passotuono, il Gran Tacchino',
   'entities.quests.q_prof_intro.completion':
     'Vedi? Minerale nello zaino e calli sulle mani. Continua a estrarre minerali, tagliare legna e raccogliere erbe mentre percorri le strade. Quando torni in città, tieni d’occhio il tabellone delle Priorità della città vicino al mercato e il banco da lavoro lì accanto. C’è un mestiere onesto in tutto questo, se ti interessa.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Pezzo di Minerale',
@@ -6773,6 +6774,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Aerociclo del Giostratore d’Etere',
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, il Rospo Saltombra',
   'hudChrome.mounts.name_stormfeather_griffin': 'Piumatempesta Toccacielo',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Passotuono, il Gran Tacchino',
   'hudChrome.mounts.desc_valorsteed':
     'Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6785,6 +6787,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.',
   'hudChrome.mounts.emptyTitle': 'Nessuna cavalcatura ottenuta',
   'hudChrome.mounts.emptyStableHint':
     'Raggiungi il livello 20 e prendi lezioni di equitazione dalla Stalliera capo Marla alle stalle a ovest di Highwatch.',

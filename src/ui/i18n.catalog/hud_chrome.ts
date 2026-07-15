@@ -462,6 +462,7 @@ export const hudChromeStrings = {
     name_aether_hover_cycle: 'Aether-Jouster Hover-Cycle',
     name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
     name_stormfeather_griffin: 'Sky-Reach Stormfeather',
+    name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -471,17 +472,38 @@ export const hudChromeStrings = {
       'A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.',
     desc_stormfeather_griffin:
       'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
+    desc_thunderstrut_gobbler:
+      'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
-  // Marla has the player climb onto a training Valorsteed with the Mount/Dismount
-  // keybind, which succeeds the lesson. Sim-side gameplay lives in
-  // src/sim/mounts_training.ts. begin is her gossip-dialog button; mountPrompt the
-  // transient toast ({key} is the live Mount/Dismount keycap); success the
-  // lesson-passed banner.
+  // Marla lends the player a training Valorsteed for the paddock race. Finishing
+  // the course succeeds the lesson. Sim-side gameplay lives in
+  // src/sim/mounts_training.ts. mountPrompt is retained for the legacy command;
+  // the current flow starts on the glowing race platform.
   mountTraining: {
     mountPrompt: 'Press {key} to mount the training Valorsteed.',
+    ownedMountPrompt: 'Press {key} to mount',
+    ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
     begin: 'Begin Lesson',
     success: 'You have tamed the Valorsteed.',
+    returnToMarla: 'Return to Marla at the stables to adopt a stable horse.',
+  },
+  // The show-jumping race in the stables paddock (src/sim/mount_race.ts): ride to
+  // the glowing platform and press Start Race, watch the countdown, then clear
+  // every jump (in any order) and ride back through the arch in time. countdown/
+  // go are the center-screen count; startButton is the button; start/finished/
+  // timeout are the banners; timeLeft is the bottom strip's only text.
+  // {seconds} is a formatNumber-rendered count.
+  mountRace: {
+    startButton: 'Start Race',
+    cancelButton: 'Cancel Race',
+    go: 'GO!',
+    start: 'Go! Clear every jump, then ride back through the arch.',
+    toFinish: 'Ride back through the arch!',
+    finished: 'Finished in {seconds}s!',
+    timeout: 'Race Failed',
+    progress: 'Gates {n} of {total}',
+    timeLeft: '{seconds}s',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
   // the persistent indicator button, the in-match score strip, and the event

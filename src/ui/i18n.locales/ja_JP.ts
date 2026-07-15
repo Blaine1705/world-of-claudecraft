@@ -2629,7 +2629,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '騎手はみな二本足で歩いてくる、{className}よ。ヴァロースティードにまたがって泥にまみれずにいられるようになるまで、手綱は渡さない。ハイウォッチには骨折を治せる者もそう余っていないのでね。',
   'entities.quests.q_riding_lessons.title': '乗馬の稽古',
   'entities.quests.q_riding_lessons.text':
-    '騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。教えるのは鞍にまたがる術であって、売り物ではない。謝礼を払い、わたしが合図したら、調教用のヴァロースティードを呼び寄せて鞍にまたがるのだ。その間はわたしのそばの庭にいろ。離れれば、また最初からやり直しだ。',
+    '騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。謝礼を払い、わたしが合図したら、調教用のヴァロースティードを呼び寄せて騎乗しろ。それからコースを走れ。目印をたどってスタートアーチへ向かい、どの障害もきれいに跳び越え、砂が落ちきる前にもう一度ラインを越えるのだ。やり遂げれば、その鞍はお前のものだ。パドックの外へさまよい出れば、また最初からやり直しだ。',
   'entities.quests.q_riding_lessons.completion':
     'よし、それでいい。ひと息にまたがり、上でも堂々と座っていたな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。',
   'entities.quests.q_riding_lessons.objectives.0.label': 'ヴァロースティードを乗りこなす',
@@ -5981,6 +5981,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': '起動キー：エーテルジャウスター・ホバーサイクル',
   'entities.items.reins_shadowjump_toad.name': '影跳びのカマカゲの手綱',
   'entities.items.reins_stormfeather_griffin.name': 'スカイリーチ・ストームフェザーの手綱',
+  'entities.items.reins_thunderstrut_gobbler.name': '大七面鳥サンダーストラットの手綱',
   'entities.mobs.drowned_cantor.name': '溺れた聖歌者',
   'entities.mobs.reedbound_acolyte.name': '葦縛りの信徒',
   'entities.mobs.deepfen_spearjaw.name': '深淵沼の槍顎',
@@ -6565,6 +6566,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'エーテルジャウスター・ホバーサイクル',
   'hudChrome.mounts.name_shadowjump_toad': '影跳びのカマカゲ',
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
+  'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
   'hudChrome.mounts.desc_grag_bear': '頑健で足取り確かな熊。移動速度を高める。',
   'hudChrome.mounts.desc_stalkglider_snail': '粘り強くゆっくり燃えるカタツムリ。移動速度を高める。',
@@ -6574,6 +6576,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    '嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。',
   'hudChrome.mounts.emptyTitle': 'マウントは未入手',
   'hudChrome.mounts.emptyStableHint':
     'レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。',
@@ -6581,6 +6585,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'より希少なマウントはダンジョンやレイドのボスがドロップします。',
   'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
   'hudChrome.mountTraining.mountPrompt': '{key} キーを押して訓練用ヴァロースティードに騎乗する。',
+  'hudChrome.mountTraining.ownedMountPrompt': '{key} キーを押して騎乗する',
+  'hudChrome.mountTraining.ridePrompt':
+    '光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。',
   'hudChrome.mountTraining.begin': 'レッスン開始',
   'hudChrome.mountTraining.success': 'ヴァロースティードを乗りこなした。',
+  'hudChrome.mountTraining.returnToMarla': '厩舎のマーラのもとへ戻り、厩舎の馬を引き取ろう。',
+  'hudChrome.mountRace.cancelButton': 'レースをキャンセル',
+  'hudChrome.mountRace.startButton': 'レース開始',
+  'hudChrome.mountRace.start': 'スタート！すべての障害を跳び越え、アーチへ戻って駆け抜けろ。',
+  'hudChrome.mountRace.toFinish': 'アーチへ戻って駆け抜けろ！',
+  'hudChrome.mountRace.finished': '{seconds}秒でゴール！',
+  'hudChrome.mountRace.timeout': 'レース失敗',
+  'hudChrome.mountRace.progress': '障害 {n} / {total}',
 };

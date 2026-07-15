@@ -442,17 +442,33 @@ export const es_ES: EnTranslations = {
       "name_aether_hover_cycle": "Aerocicleta Justadora del Éter",
       "name_shadowjump_toad": "Kama-Kage, el Sapo Saltasombras",
       "name_stormfeather_griffin": "Plumatormenta Alcanzacielos",
+      "name_thunderstrut_gobbler": "Pavoneatruenos, el Gran Pavo",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
       "desc_aether_hover_cycle": "Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.",
       "desc_shadowjump_toad": "Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.",
-      "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas."
+      "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.",
+      "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed."
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "La Copa del Valle",
@@ -7108,6 +7124,9 @@ export const es_ES: EnTranslations = {
       },
       "reins_stormfeather_griffin": {
         "name": "Riendas del Plumatormenta Alcanzacielos"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Riendas de Pavoneatruenos, el Gran Pavo"
       }
     },
     "mobs": {
@@ -8432,7 +8451,7 @@ export const es_ES: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Lecciones de equitación",
-        "text": "Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Sentarse bien es lo que enseño, no lo que vendo. Paga la cuota y, cuando te dé la orden, llama al Corcel del Valor de entrenamiento y sube a la silla. Quédate conmigo en el patio mientras tanto; si te alejas, empezamos de nuevo.",
+        "text": "Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Paga la cuota y, cuando te dé la orden, llama al Corcel del Valor de entrenamiento y sube a la silla. Luego haz el recorrido: sigue la señal hasta el arco de salida, salta limpio cada obstáculo y cruza la línea de nuevo antes de que se acabe la arena. Hazlo y la silla es tuya. Si te sales del corral, empezamos de nuevo.",
         "completion": "Así, muy bien. Arriba de un solo impulso y bien firme en la silla. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.",
         "objectives": {
           "0": {

@@ -6,12 +6,15 @@
 // rest * delta, so the pose can never leave the authored bind space.
 //
 //   node scripts/bake_mount_gaits.mjs            (all rigged mounts)
-//   node scripts/bake_mount_gaits.mjs valorsteed (one)
+//   node scripts/bake_mount_gaits.mjs grag_bear  (one)
 //
 // Rewrites public/models/mounts/<key>.glb in place. Idempotent: existing
 // animations are dropped and regenerated from the (unchanged) bind data.
-// The clipless prop-lane mounts (snail, hover cycle, griffin) keep their
-// procedural bob (src/render/mount_visuals.ts) and are not touched here.
+// The clipless prop-lane mounts (snail, hover cycle) keep their procedural
+// bob (src/render/mount_visuals.ts) and are not touched here. The valorsteed
+// and thunderstrut_gobbler GLBs ship AUTHORED clips from their source models
+// (renamed to Idle/Walk/Run/Death at import) and MUST NOT be baked over: they
+// have no RIGS entry.
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
@@ -58,27 +61,6 @@ const AXES = { pitch: [1, 0, 0], yaw: [0, 1, 0], roll: [0, 0, 1] };
 // legs: [upperBone, lowerBone|null, phase (cycle fraction), ampScale, 'rear'?]
 // ---------------------------------------------------------------------------
 const RIGS = {
-  valorsteed: {
-    root: 'tripo::Root',
-    fwd: 1,
-    // proper trot on diagonal pairs (FR+RL, FL+RR). The auto-rig welded one
-    // leg's shin vertices to bone_12 (the whole head/front-assembly root),
-    // so swinging its thigh (bone_22) stretched the leg against a
-    // ground-stuck foot: the reweight below moves those shin vertices onto
-    // bone_22 so the whole leg swings as one rigid limb.
-    reweight: [{ from: 'bone_12', to: 'bone_22', yMax: 0.35 }],
-    legs: [
-      ['tripo::0_Left_Limb_0', 'tripo::0_Left_Limb_1', 0, 1], // front right
-      ['bone_10', 'tripo::1_Left_Limb_0', 0, 1], // rear left
-      ['bone_22', null, 0.5, 1], // front left (single-joint whole-leg swing)
-      ['tripo::Spine_3', 'tripo::0_Right_Limb_0', 0.5, 1], // rear right
-    ],
-    rock: { bone: 'tripo::Root', walk: 1.5, run: 2.5 },
-    head: { bone: 'bone_13', amp: 4 },
-    // bone_5 carries the braid; its parent bone_4 also holds saddle-bag
-    // vertices, which must not wag with the tail.
-    tail: { bone: 'bone_5', axis: 'yaw', amp: 10 },
-  },
   grag_bear: {
     root: 'tripo::Root',
     fwd: -1,

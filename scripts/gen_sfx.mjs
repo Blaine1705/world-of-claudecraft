@@ -7,15 +7,16 @@
 //   public/audio/sfx/<key>.mp3            the audio (served at /audio/sfx/…)
 //   src/game/sfx_manifest.generated.ts    key -> public path + loop flag
 //
-// Idempotent: existing files are skipped unless --force. Offline-only; the key is
-// read from the environment / local .env and never committed.
+// Idempotent: existing files and custom/open-source clips are skipped unless
+// --force. A key is required only when an ElevenLabs clip is actually missing.
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { SFX } from './sfx/sfx_prompts.mjs';
 
 const API = 'https://api.elevenlabs.io';
 const OUTPUT_FORMAT = 'mp3_44100_128';
+const MODEL_ID = 'eleven_text_to_sound_v2';
 const PROMPT_INFLUENCE = 0.4; // adhere to the prompt but allow some character
 const root = process.cwd();
 const sfxDir = path.join(root, 'public/audio/sfx');
@@ -29,10 +30,6 @@ try {
   /* no .env, rely on the ambient env */
 }
 const KEY = process.env.ELEVENLABS_API_KEY;
-if (!KEY) {
-  console.error('ELEVENLABS_API_KEY is not set (env or .env). Aborting.');
-  process.exit(1);
-}
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -41,11 +38,11 @@ async function generate(entry, { retries = 4 } = {}) {
     text: entry.prompt,
     duration_seconds: entry.duration,
     prompt_influence: PROMPT_INFLUENCE,
-    output_format: OUTPUT_FORMAT,
+    model_id: MODEL_ID,
   };
   if (entry.loop) body.loop = true;
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(`${API}/v1/sound-generation`, {
+    const res = await fetch(`${API}/v1/sound-generation?output_format=${OUTPUT_FORMAT}`, {
       method: 'POST',
       headers: { 'xi-api-key': KEY, 'content-type': 'application/json' },
       body: JSON.stringify(body),
@@ -70,7 +67,8 @@ let seconds = 0;
 const failed = [];
 
 for (const entry of SFX) {
-  const dest = path.join(sfxDir, `${entry.key}.mp3`);
+  const file = entry.file ?? `${entry.key}.mp3`;
+  const dest = path.join(sfxDir, file);
   if (entry.custom) {
     skipped++;
     continue;
@@ -78,6 +76,12 @@ for (const entry of SFX) {
   if (existsSync(dest) && !force) {
     skipped++;
     continue;
+  }
+  if (!KEY) {
+    console.error(`ELEVENLABS_API_KEY is required to generate missing clip: ${entry.key}`);
+    failed.push(entry.key);
+    process.exitCode = 1;
+    break;
   }
   process.stdout.write(`sfx  ${entry.key} (${entry.duration}s${entry.loop ? ', loop' : ''})… `);
   try {
@@ -101,8 +105,9 @@ for (const entry of SFX) {
 // which clips are seamless loops.
 const entries = {};
 for (const entry of SFX) {
-  if (existsSync(path.join(sfxDir, `${entry.key}.mp3`))) {
-    entries[entry.key] = { url: `/audio/sfx/${entry.key}.mp3`, loop: !!entry.loop };
+  const file = entry.file ?? `${entry.key}.mp3`;
+  if (existsSync(path.join(sfxDir, file))) {
+    entries[entry.key] = { url: `/audio/sfx/${file}`, loop: !!entry.loop };
   }
 }
 const sorted = Object.fromEntries(

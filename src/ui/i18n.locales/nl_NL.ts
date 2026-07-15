@@ -2520,7 +2520,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Elke ruiter komt op twee benen binnen, {className}. De teugels krijg je pas als je op de Valorsteed kunt blijven zitten zonder in de modder te belanden, en Highwatch heeft geen genezers over voor gebroken botten.',
   'entities.quests.q_riding_lessons.title': 'Rijlessen',
   'entities.quests.q_riding_lessons.text':
-    'Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Blijven zitten is wat ik leer, niet wat ik verkoop. Betaal het lesgeld, en als ik het teken geef, roep je de oefen-Valorsteed bij je en klim je in het zadel. Blijf ondertussen bij mij op het erf; dwaal je weg, dan beginnen we opnieuw.',
+    'Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Betaal het lesgeld, en als ik het teken geef, roep je de oefen-Valorsteed bij je en klim je in het zadel. Rijd dan het parcours: volg de markering naar de startboog, neem elke sprong schoon en kruis de lijn opnieuw voor de zandloper leeg is. Lukt dat, dan is het zadel van jou. Dwaal je de wei uit, dan beginnen we opnieuw.',
   'entities.quests.q_riding_lessons.completion':
     'Zo, ja. In één vloeiende beweging omhoog en daarboven rustig blijven zitten. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.',
   'entities.quests.q_riding_lessons.objectives.0.label': 'Tem de Valorsteed',
@@ -6670,6 +6670,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': 'Contactsleutel: zweefcykel van de Etherkamper',
   'entities.items.reins_shadowjump_toad.name': 'Teugels van Kama-Kage de schaduwsprongpad',
   'entities.items.reins_stormfeather_griffin.name': 'Teugels van de hemelreikende Stormveder',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Teugels van Donderpronker, de Grote Kalkoen',
   'entities.quests.q_prof_intro.completion':
     'Zie je? Erts in je tas en eelt op je handen. Blijf mijnen, houthakken en kruiden plukken terwijl je over de wegen reist. Wanneer je terug in de stad bent, kijk dan naar het bord met de Stadsfocus bij de markt en de werkbank ernaast. Er valt met alles een eerlijke boterham te verdienen, als je dat wilt.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Brok erts',

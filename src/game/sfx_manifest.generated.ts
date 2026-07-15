@@ -207,6 +207,18 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
     "url": "/audio/sfx/mob_boar_death.mp3",
     "loop": false
   },
+  "mob_burrower_aggro": {
+    "url": "/audio/sfx/mob_burrower_aggro.mp3",
+    "loop": false
+  },
+  "mob_burrower_attack": {
+    "url": "/audio/sfx/mob_burrower_attack.mp3",
+    "loop": false
+  },
+  "mob_burrower_death": {
+    "url": "/audio/sfx/mob_burrower_death.mp3",
+    "loop": false
+  },
   "mob_demon_aggro": {
     "url": "/audio/sfx/mob_demon_aggro.mp3",
     "loop": false
@@ -253,18 +265,6 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
   },
   "mob_humanoid_death": {
     "url": "/audio/sfx/mob_humanoid_death.mp3",
-    "loop": false
-  },
-  "mob_burrower_aggro": {
-    "url": "/audio/sfx/mob_burrower_aggro.mp3",
-    "loop": false
-  },
-  "mob_burrower_attack": {
-    "url": "/audio/sfx/mob_burrower_attack.mp3",
-    "loop": false
-  },
-  "mob_burrower_death": {
-    "url": "/audio/sfx/mob_burrower_death.mp3",
     "loop": false
   },
   "mob_mudfin_aggro": {
@@ -327,6 +327,34 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
     "url": "/audio/sfx/mob_undead_death.mp3",
     "loop": false
   },
+  "mount_run_aether_hover_cycle": {
+    "url": "/audio/sfx/mount_run_aether_hover_cycle.mp3",
+    "loop": false
+  },
+  "mount_run_grag_bear": {
+    "url": "/audio/sfx/mount_run_grag_bear.mp3",
+    "loop": false
+  },
+  "mount_run_shadowjump_toad": {
+    "url": "/audio/sfx/mount_run_shadowjump_toad.mp3",
+    "loop": false
+  },
+  "mount_run_stalkglider_snail": {
+    "url": "/audio/sfx/mount_run_stalkglider_snail.mp3",
+    "loop": false
+  },
+  "mount_run_stormfeather_griffin": {
+    "url": "/audio/sfx/mount_run_stormfeather_griffin.mp3",
+    "loop": false
+  },
+  "mount_run_thunderstrut_gobbler": {
+    "url": "/audio/sfx/mount_run_thunderstrut_gobbler.mp3",
+    "loop": false
+  },
+  "mount_run_valorsteed": {
+    "url": "/audio/sfx/mount_run_valorsteed.mp3",
+    "loop": false
+  },
   "move_jump": {
     "url": "/audio/sfx/move_jump.mp3",
     "loop": false
@@ -375,9 +403,18 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
     "url": "/audio/sfx/proj_shadow.mp3",
     "loop": false
   },
-  "quest_accept":   { "url": "/audio/sfx/quest_accept.mp3",   "loop": false },
-  "quest_complete": { "url": "/audio/sfx/quest_complete.mp3", "loop": false },
-  "quest_ready":    { "url": "/audio/sfx/quest_ready.mp3",    "loop": false },
+  "quest_accept": {
+    "url": "/audio/sfx/quest_accept.mp3",
+    "loop": false
+  },
+  "quest_complete": {
+    "url": "/audio/sfx/quest_complete.mp3",
+    "loop": false
+  },
+  "quest_ready": {
+    "url": "/audio/sfx/quest_ready.mp3",
+    "loop": false
+  },
   "spell_nova": {
     "url": "/audio/sfx/spell_nova.mp3",
     "loop": false

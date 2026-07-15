@@ -470,6 +470,20 @@
      re-tuned per layout tier (see the tiers section); --btn-scale
      (actionButtonScale) and --touch-opacity (touchOpacity) are reused
      directly, not forked. */
+  /* The race timer and pre-GO button sit higher on touch so they clear the
+     mobile controls at the bottom of the screen. */
+  body.mobile-touch #mount-race-strip,
+  body.mobile-touch #race-start-btn {
+    bottom: max(34vh, calc(220px + env(safe-area-inset-bottom)));
+  }
+  body.mobile-touch #mount-race-strip {
+    max-width: calc(100vw - 24px);
+    padding: 8px 14px;
+    font-size: 16px;
+  }
+  body.mobile-touch #mount-race-strip .mr-timer {
+    width: 110px;
+  }
   body.mobile-touch #mobile-action-ring {
     /* Chrome-scale folded into every ring size var (the arc offsets below are
        expressed in these vars, so the whole cluster shrinks proportionally and keeps

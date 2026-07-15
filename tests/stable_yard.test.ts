@@ -25,7 +25,7 @@ const stableFences = ZONE3_PROPS.fences.filter(
 
 // The north pasture: inside the paddock and NORTH of (i.e. at or beyond) the divider.
 const inNorthSection = (x: number, z: number): boolean =>
-  x >= PADDOCK.x1 && x <= PADDOCK.x2 && z >= DIVIDER.z && z <= PADDOCK.z2;
+  x >= PADDOCK.pasture.x1 && x <= PADDOCK.x2 && z >= DIVIDER.z && z <= PADDOCK.z2;
 
 function horses(sim: Sim): Entity[] {
   return [...sim.entities.values()].filter((e) => e.templateId === STABLE_HORSE);
@@ -33,42 +33,63 @@ function horses(sim: Sim): Entity[] {
 
 describe('STABLE_PADDOCK geometry contract', () => {
   it('documents the paddock and its divider', () => {
-    expect(PADDOCK.x1).toBe(78);
-    expect(PADDOCK.x2).toBe(126);
-    expect(PADDOCK.z1).toBe(668);
+    expect(PADDOCK.x1).toBe(54);
+    expect(PADDOCK.x2).toBe(150);
+    expect(PADDOCK.z1).toBe(646);
     expect(PADDOCK.z2).toBe(706);
-    expect(PADDOCK.opening).toEqual({ x1: 88, x2: 94 });
-    expect(DIVIDER).toEqual({ z: 688, opening: { x1: 98, x2: 106 } });
+    expect(PADDOCK.pasture).toEqual({ x1: 104 });
+    expect(PADDOCK.entrance).toEqual({ x1: 84, x2: 94 });
+    expect(DIVIDER).toEqual({ z: 688 });
   });
 
   it('derives the pasture from the paddock (north of the divider, inset)', () => {
-    expect(STABLE_PASTURE.xMin).toBeGreaterThan(PADDOCK.x1);
+    expect(STABLE_PASTURE.xMin).toBeGreaterThan(PADDOCK.pasture.x1);
     expect(STABLE_PASTURE.xMax).toBeLessThan(PADDOCK.x2);
     expect(STABLE_PASTURE.zMin).toBeGreaterThan(DIVIDER.z);
     expect(STABLE_PASTURE.zMax).toBeLessThan(PADDOCK.z2);
   });
 
-  it('fences the full perimeter: 5 runs with the rider opening on the north side', () => {
-    // The 5 perimeter runs (north split around the opening) plus the 2 divider runs.
+  it('follows the L-shaped perimeter around the narrower north pasture', () => {
     expect(stableFences.length).toBe(7);
     const north = stableFences.filter((f) => f.z1 === PADDOCK.z2 && f.z2 === PADDOCK.z2);
-    expect(north).toHaveLength(2);
-    const west = north.find((f) => f.x1 === PADDOCK.x1);
-    const east = north.find((f) => f.x2 === PADDOCK.x2);
-    expect(west?.x2).toBe(PADDOCK.opening.x1);
-    expect(east?.x1).toBe(PADDOCK.opening.x2);
+    expect(north).toEqual([
+      { x1: PADDOCK.pasture.x1, z1: PADDOCK.z2, x2: PADDOCK.x2, z2: PADDOCK.z2 },
+    ]);
+    const west = stableFences.find((f) => f.x1 === PADDOCK.x1 && f.x2 === PADDOCK.x1);
+    expect(west?.z2).toBe(DIVIDER.z);
+    const notch = stableFences.find(
+      (f) => f.x1 === PADDOCK.pasture.x1 && f.x2 === PADDOCK.pasture.x1,
+    );
+    expect(notch?.z1).toBe(DIVIDER.z);
+    expect(notch?.z2).toBe(PADDOCK.z2);
   });
 
-  it('has a real divider fence split into two runs around the rider gap', () => {
+  it('places the barn cluster in the opened northwest notch', () => {
+    expect(ZONE3_PROPS.buildings).toContainEqual({
+      kind: 'inn',
+      x: 76,
+      z: 698,
+      w: 10,
+      d: 8,
+      rot: 2.7,
+    });
+    expect(ZONE3_PROPS.tents).toContainEqual({ x: 99, z: 712, rot: 2.2, scale: 1 });
+    expect(ZONE3_PROPS.stalls).toContainEqual({ x: 89, z: 703, rot: 1.2, r: 1.6 });
+    expect(ZONE3_PROPS.wells).toContainEqual({ x: 99, z: 703, r: 1.5 });
+  });
+
+  it('fully closes the horse pasture and leaves one entrance beside the barn', () => {
     const dividerRuns = stableFences.filter((f) => f.z1 === DIVIDER.z && f.z2 === DIVIDER.z);
     expect(dividerRuns).toHaveLength(2);
-    // The two runs together cover the paddock width except the opening gap.
+    // The two runs cover the yard's north edge except for its intentional entrance.
+    // The east run continues across the whole pasture divider, leaving no horse gap.
     const west = dividerRuns.find((f) => f.x1 === PADDOCK.x1);
     const east = dividerRuns.find((f) => f.x2 === PADDOCK.x2);
     expect(west).toBeDefined();
     expect(east).toBeDefined();
-    expect(west!.x2).toBe(DIVIDER.opening.x1);
-    expect(east!.x1).toBe(DIVIDER.opening.x2);
+    expect(west!.x2).toBe(PADDOCK.entrance.x1);
+    expect(east!.x1).toBe(PADDOCK.entrance.x2);
+    expect(east!.x1).toBeLessThan(PADDOCK.pasture.x1);
   });
 });
 
