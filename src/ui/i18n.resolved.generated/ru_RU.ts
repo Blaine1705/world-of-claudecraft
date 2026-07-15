@@ -1839,7 +1839,8 @@ export const ru_RU: EnTranslations = {
       "title": "Собирательство",
       "mining": "Горное дело",
       "logging": "Лесозаготовка",
-      "herbalism": "Травничество"
+      "herbalism": "Травничество",
+      "notReady": "Этот ресурсный узел еще не восстановился для вас."
     },
     "archetypeTitle": {
       "label": "Титул",

@@ -1839,7 +1839,8 @@ export const vi_VN: EnTranslations = {
       "title": "Thu thập",
       "mining": "Khai mỏ",
       "logging": "Đốn gỗ",
-      "herbalism": "Thảo dược học"
+      "herbalism": "Thảo dược học",
+      "notReady": "This resource node has not respawned for you yet."
     },
     "archetypeTitle": {
       "label": "Danh hiệu",

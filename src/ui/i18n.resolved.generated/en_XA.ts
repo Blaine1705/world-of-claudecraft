@@ -1839,7 +1839,8 @@ export const en_XA: EnTranslations = {
       "title": "[Ĝáţĥéŕíñĝ]",
       "mining": "[Ɱíñíñĝ]",
       "logging": "[Ļóĝĝíñĝ]",
-      "herbalism": "[Ĥéŕƀáļíšɱ]"
+      "herbalism": "[Ĥéŕƀáļíšɱ]",
+      "notReady": "[Ţĥíš ŕéšóúŕçé ñóðé ĥáš ñóţ ŕéšþáŵñéð ƒóŕ ýóú ýéţ.]"
     },
     "archetypeTitle": {
       "label": "[Ţíţļé]",

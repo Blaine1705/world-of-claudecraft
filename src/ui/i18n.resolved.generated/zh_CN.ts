@@ -1839,7 +1839,8 @@ export const zh_CN: EnTranslations = {
       "title": "采集",
       "mining": "采矿",
       "logging": "伐木",
-      "herbalism": "草药学"
+      "herbalism": "草药学",
+      "notReady": "这个资源节点尚未为你重新生成。"
     },
     "archetypeTitle": {
       "label": "称号",

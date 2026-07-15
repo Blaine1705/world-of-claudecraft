@@ -1839,7 +1839,8 @@ export const cs_CZ: EnTranslations = {
       "title": "Sběr",
       "mining": "Těžba",
       "logging": "Dřevorubectví",
-      "herbalism": "Bylinkářství"
+      "herbalism": "Bylinkářství",
+      "notReady": "This resource node has not respawned for you yet."
     },
     "archetypeTitle": {
       "label": "Titul",

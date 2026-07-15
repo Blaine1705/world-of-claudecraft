@@ -1839,7 +1839,8 @@ export const tr_TR: EnTranslations = {
       "title": "Toplama",
       "mining": "Madencilik",
       "logging": "Ağaç kesme",
-      "herbalism": "Bitkicilik"
+      "herbalism": "Bitkicilik",
+      "notReady": "This resource node has not respawned for you yet."
     },
     "archetypeTitle": {
       "label": "Unvan",

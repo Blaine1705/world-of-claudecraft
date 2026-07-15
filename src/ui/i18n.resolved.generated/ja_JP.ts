@@ -1839,7 +1839,8 @@ export const ja_JP: EnTranslations = {
       "title": "採集",
       "mining": "採掘",
       "logging": "伐採",
-      "herbalism": "薬草学"
+      "herbalism": "薬草学",
+      "notReady": "この資源ノードはまだあなたのために再生していません。"
     },
     "archetypeTitle": {
       "label": "称号",

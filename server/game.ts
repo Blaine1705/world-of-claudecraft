@@ -5027,6 +5027,21 @@ export class GameServer {
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
+    // Per-player gather-node respawn cooldowns (#1866), same shape/semantics as
+    // `cds` above: remaining seconds AS OF THIS TICK, ticking down tick over
+    // tick (so `maybe` re-ships it while any node is still cooling down and
+    // drops a node's key the tick it clears), matching
+    // PlayerMeta.nodeHarvestReadyAt's own "absent means ready" contract (see
+    // src/sim/professions/gathering.ts isNodeHarvestableBy). Only entries with
+    // remaining time survive the filter, an already-elapsed timer reads as ready.
+    maybe(
+      'ncd',
+      Object.fromEntries(
+        Object.entries(meta.nodeHarvestReadyAt)
+          .filter(([, until]) => until > this.sim.time)
+          .map(([k, until]) => [k, round2(until - this.sim.time)]),
+      ),
+    );
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
     maybe('party', this.partyWire(anchorSession.pid));

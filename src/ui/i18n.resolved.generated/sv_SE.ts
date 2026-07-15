@@ -1839,7 +1839,8 @@ export const sv_SE: EnTranslations = {
       "title": "Insamling",
       "mining": "Gruvdrift",
       "logging": "Skogsavverkning",
-      "herbalism": "Örtkunskap"
+      "herbalism": "Örtkunskap",
+      "notReady": "This resource node has not respawned for you yet."
     },
     "archetypeTitle": {
       "label": "Titel",

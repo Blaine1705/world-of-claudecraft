@@ -2048,6 +2048,9 @@ export const hudChromeStrings = {
     mining: 'Mining',
     logging: 'Logging',
     herbalism: 'Herbalism',
+    // #1866: click/tap/interact-key error when a targeted node's per-viewer
+    // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
+    notReady: 'This resource node has not respawned for you yet.',
   },
   // Archetype title (#1130): the named title granted by a character's currently
   // active craft archetype (see src/sim/professions/archetype.ts). `none` is shown

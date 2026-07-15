@@ -1839,7 +1839,8 @@ export const id_ID: EnTranslations = {
       "title": "Pengumpulan",
       "mining": "Penambangan",
       "logging": "Penebangan",
-      "herbalism": "Herbalisme"
+      "herbalism": "Herbalisme",
+      "notReady": "This resource node has not respawned for you yet."
     },
     "archetypeTitle": {
       "label": "Gelar",

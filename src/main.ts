@@ -32,6 +32,7 @@ import { installDevTeleports } from './game/dev_shortcuts';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
+import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import {
@@ -132,7 +133,14 @@ import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { ITEMS, isDelvePos, isRiftPos, setActiveWorldContent, ZONES } from './sim/data';
+import {
+  GATHER_NODES,
+  ITEMS,
+  isDelvePos,
+  isRiftPos,
+  setActiveWorldContent,
+  ZONES,
+} from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
@@ -2124,6 +2132,18 @@ async function startGame(
     // emit its precise "move closer to the chest/passage" hint.
     let bestDelve: number | null = null,
       bestDelveD = INTERACT_RANGE + 1;
+    // Gather nodes (#1866) are static content (src/sim/data GATHER_NODES), not
+    // entities, so they get their own nearest-in-range scan alongside the
+    // entity loop below rather than living inside it.
+    let bestNode: (typeof GATHER_NODES)[number] | null = null,
+      bestNodeD = INTERACT_RANGE;
+    for (const node of GATHER_NODES) {
+      const d = dist2d(p.pos, { x: node.pos.x, y: p.pos.y, z: node.pos.z });
+      if (d < bestNodeD) {
+        bestNode = node;
+        bestNodeD = d;
+      }
+    }
     for (const e of world.entities.values()) {
       const d = dist2d(p.pos, e.pos);
       if (e.kind === 'mob' && e.lootable && d < bestCorpseD) {
@@ -2139,7 +2159,11 @@ async function startGame(
         bestObj = e.id;
         bestObjD = d;
       }
-      if (e.kind === 'npc' && d < bestNpcD) {
+      // The graveyard angel is hidden from (and not interactable by) the living,
+      // same filter renderer.pick() applies to the click path: skip it here too
+      // unless the local player is a released spirit, so it cannot starve a
+      // node sharing its graveyard's interact range for keyboard/gamepad/mobile.
+      if (e.kind === 'npc' && d < bestNpcD && (e.templateId !== 'spirit_healer' || p.ghost)) {
         bestNpc = e.id;
         bestNpcD = d;
       }
@@ -2173,6 +2197,18 @@ async function startGame(
       const npc = world.entities.get(bestNpc);
       if (npc?.kind === 'npc' && npc.templateId === 'brother_halven') hud.openDelveBoard(bestNpc);
       else hud.openQuestDialog(bestNpc);
+      return;
+    }
+    if (bestNode !== null) {
+      handleGatherNodeInteract(
+        world,
+        hud,
+        p.pos,
+        bestNode.id,
+        bestNode.pos,
+        t('questUi.errors.tooFar'),
+        t('hudChrome.gathering.notReady'),
+      );
       return;
     }
     hud.showError(t('errors.nothingInteract'));
@@ -2244,7 +2280,31 @@ async function startGame(
         return;
       }
     }
-    const id = renderer.pick(x, y);
+    // Gather nodes (#1866) are static content, not entities, so they get their
+    // own raycast rather than living in `renderer.pick()`. Ordered: a direct
+    // entity hit always wins (it must not be overridden by a nearby node), then
+    // a direct node hit (it must not be stolen by the sloppy assist below when
+    // a mob/player camps the node), then the sloppy character assist, then the
+    // ground-click/click-to-move fallback. A click that lands on a node
+    // harvests it; it does not also walk you there or deselect your target.
+    let id = renderer.pickDirect(x, y);
+    if (id === null) {
+      const nodeId = renderer.pickGatherNode(x, y);
+      const node = nodeId !== null ? GATHER_NODES.find((n) => n.id === nodeId) : undefined;
+      if (node) {
+        handleGatherNodeInteract(
+          world,
+          hud,
+          world.player.pos,
+          node.id,
+          node.pos,
+          t('questUi.errors.tooFar'),
+          t('hudChrome.gathering.notReady'),
+        );
+        return;
+      }
+      id = renderer.pickSloppy(x, y);
+    }
     // OSRS-style click feedback (its own toggle): a brief ground marker, gold for a
     // neutral click and red on a hostile. Both reference games only mark a real action,
     // so the marker stamps where a click actually does something: the click-to-move

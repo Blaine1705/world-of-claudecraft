@@ -1839,7 +1839,8 @@ export const it_IT: EnTranslations = {
       "title": "Raccolta",
       "mining": "Estrazione mineraria",
       "logging": "Taglio del legname",
-      "herbalism": "Erbalismo"
+      "herbalism": "Erbalismo",
+      "notReady": "This resource node has not respawned for you yet."
     },
     "archetypeTitle": {
       "label": "Titolo",

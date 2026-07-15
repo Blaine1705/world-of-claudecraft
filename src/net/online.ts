@@ -1224,15 +1224,16 @@ export class ClientWorld implements IWorld {
   professionsState: PlayerProfessionsView = { skills: [] };
   // #1143: persistent town focus allocation, mirrored from the self-wire `tfocus`.
   townFocus: Record<string, number> = {};
-  // Stub for #1121: per-node respawn state is server-authoritative and not yet
-  // wired onto the snapshot (see src/sim/professions/CLAUDE.md), so the client
-  // cannot know another player's, or even its own, real per-node timer yet.
-  // Always reports harvestable; the server re-validates and denies via a
-  // normal error event on an actual attempt, same as every other authoritative
-  // action (see src/net/CLAUDE.md "Never predict an outcome"). Wiring the real
-  // per-player timer is future work once the snapshot carries it.
-  nodeHarvestableByMe(_nodeId: string): boolean {
-    return true;
+  // Per-node respawn readiness (#1121, wired #1866): mirrored from the `ncd`
+  // self-wire delta below, same shape/semantics as `cooldowns` (remaining
+  // seconds as of the last snapshot that changed it; a node with no entry is
+  // ready). The server remains authoritative and re-validates on the actual
+  // `harvest_node` command; this is purely the client's own read of its own
+  // per-player timer, not a prediction of the harvest outcome (src/net/CLAUDE.md
+  // "Never predict an outcome").
+  private nodeCooldowns: Map<string, number> | undefined = new Map();
+  nodeHarvestableByMe(nodeId: string): boolean {
+    return !this.nodeCooldowns?.has(nodeId);
   }
   // Static content read (#1127, extended #1132): the full recipe list (common
   // tier plus combo recipes) ships with the client bundle like every other
@@ -2026,6 +2027,13 @@ export class ClientWorld implements IWorld {
         // intermediate entry arrays and no Map churn on the 20 Hz self record
         e.cooldowns.clear();
         for (const k in s.cds) e.cooldowns.set(k, Number(s.cds[k]));
+      }
+      // Reassigns rather than clear()+rebuild: unlike the per-Entity `cooldowns`
+      // Map (always constructed by the shared entity factory), this field lives
+      // on ClientWorld itself, and a hand-built test fixture (`Object.create`,
+      // see tests/CLAUDE.md) may not have pre-initialized it.
+      if (s.ncd !== undefined) {
+        this.nodeCooldowns = new Map(Object.entries(s.ncd).map(([k, v]) => [k, Number(v)]));
       }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
