@@ -73,6 +73,8 @@ describe('show-jumping race UI wiring', () => {
     expect(hudTs).toContain("ev.questId === 'q_riding_lessons'");
     expect(hudTs).toContain("t('hudChrome.mountTraining.ownedMountPrompt'");
     expect(hudTs).toContain('key: this.mountKey()');
+    expect(hudTs).toContain("this.keybinds.primaryLabel('mount') || t('hud.options.unbound')");
+    expect(hudTs).not.toContain("this.keybinds.primaryLabel('mount') || 'Z'");
   });
 
   it('wraps long race banners within the viewport', () => {

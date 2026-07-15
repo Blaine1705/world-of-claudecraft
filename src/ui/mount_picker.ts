@@ -4,8 +4,8 @@
 // retired Mounts window: it renders ONLY the mounts the player owns as pickable
 // cards (a level-locked one shown dimmed, not pickable), the pick is written
 // through IWorldMounts.selectMount (re-validated server-side), and riding is
-// the Z keybind's job, never a button here. A player who owns no mount yet sees
-// an empty state telling them how to earn a first one.
+// the Mount / Dismount keybind's job, never a button here. A player who owns no
+// mount yet sees an empty state telling them how to earn a first one.
 //
 // Also the shared home of the mount name/description i18n key maps (the bag
 // tooltip for reins items reuses them).
@@ -85,17 +85,20 @@ function cardHtml(row: MountPickerRow, highlightKey: string): string {
     : `<div class="mp-sub">${mountSpecLines(row)
         .map((p) => `<span class="mp-spec">${esc(p)}</span>`)
         .join('')}</div>`;
-  // A pickable card is a real button (its own role, no list semantics layered
-  // on top); the rest stay inert divs so the keyboard order only visits
-  // actionable cards.
+  // A pickable card is a real button. Selected and level-locked cards stay
+  // non-actionable divs, but remain keyboard focusable so their shared tooltip
+  // is available without a pointer and a post-selection rebuild has a stable
+  // focus target.
   const tag = row.pickable ? 'button' : 'div';
   const typeAttr = row.pickable ? ' type="button"' : '';
+  const focusAttr = row.pickable ? '' : ' tabindex="0"';
+  const disabledAttr = row.locked ? ' aria-disabled="true"' : '';
   // The rendered 3D face icon (the reins item's image; every catalog mount has
   // a reins item, so the id is always resolvable through the item-icon seam).
   const face = `<img class="mp-face" src="${iconDataUrl('item', `reins_${row.key}`)}" alt="" draggable="false">`;
   return (
-    `<${tag}${typeAttr} class="${classes.join(' ')}" data-mount-key="${esc(row.key)}"` +
-    `${row.selected ? ' aria-current="true"' : ''}>` +
+    `<${tag}${typeAttr}${focusAttr} class="${classes.join(' ')}" data-mount-key="${esc(row.key)}"` +
+    `${row.selected ? ' aria-current="true"' : ''}${disabledAttr}>` +
     face +
     `<div class="mp-info"><div class="mp-name" style="color:${color}">${esc(mountDisplayName(row.key))}${stateChip(row)}</div>` +
     sub +
@@ -147,8 +150,10 @@ export function mountTooltipHtml(row: MountPickerRow): string {
 export interface MountPickerWireDeps {
   /** Pick a mount (IWorldMounts.selectMount; re-validated server-side). */
   selectMount(key: string): void;
-  /** Re-render the hosting sheet after a pick so the cards reflect it. */
-  rerender(): void;
+  /** Re-render the hosting sheet after a pick so the cards reflect it, then
+   *  restore focus to the newly selected card. Keyboard activation keeps the
+   *  focus tooltip open; pointer activation may dismiss it after refocusing. */
+  rerender(key: string, keyboardInitiated: boolean): void;
   /** The shared HUD tooltip (PainterHostPresentation.attachTooltip). */
   attachTooltip(el: HTMLElement, html: () => string): void;
 }
@@ -166,9 +171,9 @@ export function wireMountPicker(
     if (!row) continue;
     deps.attachTooltip(card, () => mountTooltipHtml(row));
     if (row.pickable) {
-      card.addEventListener('click', () => {
+      card.addEventListener('click', (event) => {
         deps.selectMount(row.key);
-        deps.rerender();
+        deps.rerender(row.key, event.detail === 0);
       });
     }
   }

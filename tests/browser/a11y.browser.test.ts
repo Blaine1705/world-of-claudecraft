@@ -478,21 +478,24 @@ describe('axe: social window', () => {
 // ---------------------------------------------------------------------------
 
 describe('axe: character window', () => {
-  it('paperdoll sheet is clean (dialog role + role=img preview host)', async () => {
+  it('paperdoll and populated mount picker are clean and preserve keyboard focus', async () => {
     const root = host('char-window');
     root.style.display = 'none';
+    let selectedMount = 'grag_bear';
     const win = new CharWindow(
       stubDeps({
         root: () => root,
         world: () =>
           ({
             cfg: { playerClass: 'warrior' },
-            player: { name: 'Aurelia', level: 60, skin: 0 },
+            player: { name: 'Aurelia', level: 12, skin: 0, mountKey: '' },
             equipment: {},
             professionsState: { skills: [] },
-            selectedMount: () => '',
-            ownedMounts: () => [],
-            selectMount: () => {},
+            selectedMount: () => selectedMount,
+            ownedMounts: () => ['valorsteed', 'grag_bear', 'stalkglider_snail'],
+            selectMount: (key: string) => {
+              selectedMount = key;
+            },
           }) as never,
         statCellHtml: () => '',
         statTooltipHtml: () => '',
@@ -505,6 +508,11 @@ describe('axe: character window', () => {
         renderSkinPicker: () => {
           const row = root.querySelector('#char-skin-row');
           if (row) row.innerHTML = '<button type="button" role="listitem">1</button>';
+        },
+        attachTooltip: (el: HTMLElement) => {
+          el.addEventListener('focusin', () => {
+            el.dataset.tooltipOpened = 'true';
+          });
         },
         captureFocus: () => null,
       }),
@@ -520,6 +528,23 @@ describe('axe: character window', () => {
     const titleSubtitle = root.querySelector('#char-title .panel-subtitle')?.textContent ?? '';
     expect(previewName).toBe(t('hudChrome.character.modelPreview'));
     expect(previewName).not.toBe(titleSubtitle);
+
+    const selected = root.querySelector<HTMLElement>('[data-mount-key="grag_bear"]');
+    const locked = root.querySelector<HTMLElement>('[data-mount-key="valorsteed"]');
+    const pickable = root.querySelector<HTMLElement>('[data-mount-key="stalkglider_snail"]');
+    expect(selected?.tagName).toBe('DIV');
+    expect(selected?.tabIndex).toBe(0);
+    expect(locked?.tagName).toBe('DIV');
+    expect(locked?.tabIndex).toBe(0);
+    locked?.focus();
+    expect(locked?.dataset.tooltipOpened).toBe('true');
+
+    pickable?.focus();
+    pickable?.click();
+    expect(selectedMount).toBe('stalkglider_snail');
+    const freshSelected = root.querySelector<HTMLElement>('[data-mount-key="stalkglider_snail"]');
+    expect(document.activeElement).toBe(freshSelected);
+    expect(freshSelected?.dataset.tooltipOpened).toBe('true');
     await expectClean(root);
   });
 });

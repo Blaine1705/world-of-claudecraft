@@ -288,7 +288,16 @@ export class CharWindow {
           audio.click();
           this.deps.hideTooltip();
         },
-        rerender: () => this.render(),
+        rerender: (key, keyboardInitiated) => {
+          const scrollTop = el.scrollTop;
+          this.render();
+          el.scrollTop = scrollTop;
+          const selected = Array.from(el.querySelectorAll<HTMLElement>('[data-mount-key]')).find(
+            (card) => card.dataset.mountKey === key,
+          );
+          selected?.focus({ preventScroll: true });
+          if (!keyboardInitiated) this.deps.hideTooltip();
+        },
         attachTooltip: (cardEl, htmlFn) => this.deps.attachTooltip(cardEl, htmlFn),
       });
     }

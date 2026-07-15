@@ -2434,7 +2434,7 @@
   button.mp-card:hover {
     border-color: #cc9a3c;
   }
-  button.mp-card:focus-visible {
+  .mp-card:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }

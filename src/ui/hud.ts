@@ -8349,9 +8349,10 @@ export class Hud {
   // ---------------------------------------------------------------------------
 
   private mountKey(): string {
-    // The live Mount/Dismount binding label (a physical keycap, shown verbatim), or
-    // the default 'Z' when unbound.
-    return this.keybinds.primaryLabel('mount') || 'Z';
+    // The live Mount/Dismount binding label (a physical keycap, shown verbatim).
+    // A player may deliberately clear both slots, so never invent a default that
+    // could trigger a different action (Z sheathes the weapon on this release).
+    return this.keybinds.primaryLabel('mount') || t('hud.options.unbound');
   }
 
   // A mountTrainSession event announces a fresh attempt or a phase change: at
