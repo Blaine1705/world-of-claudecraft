@@ -1456,21 +1456,21 @@ export const SFX_CLIPS =
     ]
   },
   "mob_demon_hurt": {
-    "url": "/audio/sfx/mob_demon_hurt.mp3?v=9e8aea3c7a8b",
+    "url": "/audio/sfx/mob_demon_hurt.mp3?v=fde183ef8bfa",
     "loop": false,
     "category": "voices",
     "preload": "lazy",
     "spatial": true,
     "gain": 1,
     "playbackRate": 1,
-    "bytes": 25120,
-    "hash": "9e8aea3c7a8b",
+    "bytes": 27001,
+    "hash": "fde183ef8bfa",
     "variants": [
       {
         "id": "main",
-        "url": "/audio/sfx/mob_demon_hurt.mp3?v=9e8aea3c7a8b",
-        "bytes": 25120,
-        "sha256": "9e8aea3c7a8b5070fbef72b85aee3e450e51809a062f335691823ad2cc6f984f"
+        "url": "/audio/sfx/mob_demon_hurt.mp3?v=fde183ef8bfa",
+        "bytes": 27001,
+        "sha256": "fde183ef8bfa2d5c56d86ceab82c82df2baff99aed52ba19437f9b091df1454a"
       }
     ]
   },
@@ -1708,9 +1708,9 @@ export const SFX_CLIPS =
       },
       {
         "id": "2",
-        "url": "/audio/sfx/mob_humanoid_hurt_2.mp3?v=b45ec788da25",
-        "bytes": 25120,
-        "sha256": "b45ec788da258c9058463e3efe4933ee0121bdede8b24cbc5940227683191009"
+        "url": "/audio/sfx/mob_humanoid_hurt_2.mp3?v=8cd0ac388987",
+        "bytes": 27001,
+        "sha256": "8cd0ac388987d6474728cfd01a3c956c4e7df0c4c38b5bb3149e685653e97957"
       }
     ]
   },
@@ -1941,9 +1941,9 @@ export const SFX_CLIPS =
       },
       {
         "id": "2",
-        "url": "/audio/sfx/mob_reptile_death_2.mp3?v=b5c13fa6c936",
-        "bytes": 25120,
-        "sha256": "b5c13fa6c936f59a021b89da5aec6e1f2d2496769d6b1b26ee6b3afe03ef22ce"
+        "url": "/audio/sfx/mob_reptile_death_2.mp3?v=19a10e14ec3f",
+        "bytes": 27628,
+        "sha256": "19a10e14ec3f44dd6205db23cd6d0a37661867dbc53985ea1b9d065aef8b2c30"
       }
     ]
   },
@@ -2125,21 +2125,21 @@ export const SFX_CLIPS =
     ]
   },
   "mob_troll_hurt": {
-    "url": "/audio/sfx/mob_troll_hurt.mp3?v=c5218cdfa7b7",
+    "url": "/audio/sfx/mob_troll_hurt.mp3?v=aeae9df380a0",
     "loop": false,
     "category": "voices",
     "preload": "lazy",
     "spatial": true,
     "gain": 1,
     "playbackRate": 1,
-    "bytes": 25120,
-    "hash": "c5218cdfa7b7",
+    "bytes": 27001,
+    "hash": "aeae9df380a0",
     "variants": [
       {
         "id": "main",
-        "url": "/audio/sfx/mob_troll_hurt.mp3?v=c5218cdfa7b7",
-        "bytes": 25120,
-        "sha256": "c5218cdfa7b74c5578ea7c561c19612e57d01642cdcafa07f70f05729c740fb5"
+        "url": "/audio/sfx/mob_troll_hurt.mp3?v=aeae9df380a0",
+        "bytes": 27001,
+        "sha256": "aeae9df380a0ffc594baf39c90c54101d747c765393244da52816ea6767658ee"
       }
     ]
   },
