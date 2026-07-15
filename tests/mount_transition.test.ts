@@ -339,6 +339,15 @@ describe('mounted deep-water wall (kernel)', () => {
 });
 
 describe('mount transition on the entity wire', () => {
+  it('keeps the active mount on the identity mnt field', () => {
+    const sim = makeSim();
+    const pid = joinRider(sim);
+    const e = sim.entities.get(pid)!;
+    e.mountKey = 'grag_bear';
+
+    expect(wireEntity(e).mnt).toBe('grag_bear');
+  });
+
   it('carries mcr/mck during a summon and omits them when idle', () => {
     const sim = makeSim();
     const pid = joinRider(sim);

@@ -809,8 +809,9 @@ function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
-  // Active rideable mount ('' omitted). Identity ride = a mount/dismount bumps
-  // idVer and pushes a fresh full record to everyone who can see the player.
+  // Active rideable mount ('' omitted). This identity field is intentionally
+  // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
+  // made the appended self delta overwrite the live riding state in JSON.
   if (e.mountKey) out.mnt = e.mountKey;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
@@ -5025,14 +5026,20 @@ export class GameServer {
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
     // The persisted mount pick (IWorldMounts.selectedMount; always a valid
     // catalog key, the horse by default). Kept per-tick like the other small
-    // scalars: one short string, negligible diff. Wire key `mnt`; see
+    // scalars: one short string, negligible diff. Wire key `mntSel`; `mnt`
+    // remains the separate active-mount identity field. See
     // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
-    maybe('mnt', meta.selectedMount);
+    maybe('mntSel', meta.selectedMount);
     // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
     // every mount whose reins item sits in bags or bank. A handful of short
     // strings whose serialized form only changes on a loot/bank move, so the
     // per-tick diff is negligible. Wire key `mntOwn`.
     maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+    // Session-only lesson and race state must still reconcile after linkdead:
+    // events sent while the socket is absent are not replayed on resume. These
+    // self deltas are authoritative and clear stale client mirrors with false/null.
+    maybe('mntLesson', this.sim.mountLessonActiveFor(anchorSession.pid));
+    maybe('mntRace', this.sim.mountRaceViewFor(anchorSession.pid));
     // Book of Deeds: the Renown total and the selected title id, cheap
     // scalars diffed per tick (grants land from sim sites that never mark
     // this session dirty, and the title echo must not wait on the heavy gate).

@@ -30,6 +30,7 @@ import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
+import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
@@ -1441,7 +1442,12 @@ async function startGame(
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
-    isPointerMode: () => hud.isWindowOpen() || cameraPromptOpen(),
+    isPointerMode: () =>
+      shouldUseGamepadPointerMode(
+        hud.isWindowOpen(),
+        cameraPromptOpen(),
+        document.getElementById('race-start-btn')?.style.display === 'block',
+      ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
   });

@@ -2449,9 +2449,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 44 `maybe(...)` delta keys, sorted. Cross-checked below
-// against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 47th unregistered delta key reddens this gate.
+// The pinned `maybe(...)` delta keys, sorted. Cross-checked below against the
+// live calls scraped from server/game.ts source, so any unregistered key
+// reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'atitle',
@@ -2485,8 +2485,10 @@ const ALL_DELTA_KEYS = [
   'market',
   'marks',
   'milestones',
-  'mnt',
+  'mntLesson',
   'mntOwn',
+  'mntRace',
+  'mntSel',
   'ncd',
   'party',
   'prof',
@@ -2540,8 +2542,10 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   market: 'marketInfo',
   marks: 'markers',
   milestones: 'unlockedMilestones',
-  mnt: 'selectedMount',
+  mntLesson: 'mountLessonActive',
   mntOwn: 'ownedMounts',
+  mntRace: 'mountRaceView',
+  mntSel: 'selectedMount',
   mres: 'maxResource',
   party: 'partyInfo',
   prk: 'prestigeRank',
@@ -2650,6 +2654,21 @@ function dirtyEveryDeltaField(): {
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
   meta.selectedMount = 'grag_bear';
+  meta.mountTraining = {
+    sessionId: 'mt_wire_fixture',
+    ownerId: lp,
+    anchor: { x: p.pos.x, z: p.pos.z },
+    state: 'IN_PROGRESS',
+    phase: 'ride',
+  };
+  meta.mountRace = {
+    raceId: 'race_wire_fixture',
+    ownerId: lp,
+    phase: 'racing',
+    goTick: sim.tickCount,
+    deadlineTick: sim.tickCount + 200,
+    clearedMask: 3,
+  };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
   // sets, and a clear record, a renown total, and an active title
@@ -2770,12 +2789,22 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.unlockedMilestones).toEqual(['milestone_test']); // milestones -> unlockedMilestones
     // lockouts -> selfLockouts (private), via the raidLockouts() accessor
     expect(client.raidLockouts().map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
-    // mnt -> selfSelectedMount (private), via the selectedMount() accessor
+    // mnt is active identity only: a persisted pick must not make a dismounted
+    // online player render or move as mounted.
+    expect(client.player.mountKey).toBe('');
+    // mntSel -> selfSelectedMount (private), via the selectedMount() accessor
     expect(client.selectedMount()).toBe('grag_bear');
     // mntOwn -> selfOwnedMounts (private), via the ownedMounts() accessor. The
     // horse is no longer auto-owned, so the collection is exactly what the reins
     // item in the seeded inventory grants (server ownedMountsFor -> wire -> mirror).
     expect(client.ownedMounts()).toEqual(['grag_bear']);
+    expect(client.mountLessonActive()).toBe(true);
+    expect(client.mountRaceView()).toMatchObject({
+      raceId: 'race_wire_fixture',
+      phase: 'racing',
+      clearedMask: 3,
+      cleared: 2,
+    });
     expect(client.partyInfo).not.toBeNull(); // party -> partyInfo
     expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
     expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()
@@ -2837,6 +2866,20 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.activeLoadout).toBe(0);
   });
 
+  it('keeps the live ride distinct from the persisted mount pick on self snapshots', () => {
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    server.sim.entities.get(leader.pid)!.mountKey = 'valorsteed';
+    broadcast(server);
+    const snapshot = lastSnap(fc.sent);
+    expect(snapshot.self.mnt).toBe('valorsteed');
+    expect(snapshot.self.mntSel).toBe('grag_bear');
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snapshot);
+    expect(client.player.mountKey).toBe('valorsteed');
+    expect(client.selectedMount()).toBe('grag_bear');
+  });
+
   it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
     const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
     broadcast(server);
@@ -2875,6 +2918,28 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.lifetimeHonor).toBe(654);
     expect(client.companionState?.companionId).toBe('companion_tessa');
   });
+
+  it('authoritatively clears stale race and lesson mirrors after a missed end event', () => {
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    broadcast(server);
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.mountLessonActive()).toBe(true);
+    expect(client.mountRaceView()).not.toBeNull();
+
+    const meta = server.sim.meta(leader.pid)!;
+    meta.mountTraining = null;
+    meta.mountRace = null;
+    fc.sent.length = 0;
+    broadcast(server);
+    const ended = lastSnap(fc.sent);
+    expect(ended.self.mntLesson).toBe(false);
+    expect(ended.self.mntRace).toBeNull();
+
+    (client as any).applySnapshot(ended);
+    expect(client.mountLessonActive()).toBe(false);
+    expect(client.mountRaceView()).toBeNull();
+  });
 });
 
 describe('gather node cooldown wire round trip (ncd)', () => {
@@ -2911,9 +2976,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 47 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(47);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(47);
+  it('ALL_DELTA_KEYS contains exactly 49 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(49);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(49);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2925,7 +2990,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(47);
+    expect(scraped.size).toBe(49);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2947,6 +3012,9 @@ describe('delta-key contract pins (anti-drift)', () => {
       atitle: 'activeTitle',
       deeds: 'deedsEarned',
       dstats: 'deedStats',
+      mntLesson: 'mountLessonActive',
+      mntRace: 'mountRaceView',
+      mntSel: 'selectedMount',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);

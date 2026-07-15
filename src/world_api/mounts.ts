@@ -34,14 +34,14 @@ export interface IWorldMounts {
    *  emits the normal abandoned race end and leaves a riding lesson retryable. */
   mountRaceCancel(): void;
   /** Whether the player has a live riding lesson in progress. Retained for
-   *  compatibility and rebuilt client-side from mountTrain* events
-   *  (no snapshot field). */
+   *  compatibility; events update it immediately and the authoritative self
+   *  snapshot reconciles it after reconnects. */
   mountLessonActive(): boolean;
   /** The player's OWN active show-jumping race in the stables paddock, or null
    *  when not racing. The HUD strip, the countdown, and the ground racing line
    *  all key off this read. Server-authoritative; rules live in
-   *  src/sim/mount_race.ts. Rebuilt client-side from the mountRace* events (no
-   *  snapshot field), the lockpickState precedent. */
+   *  src/sim/mount_race.ts. Events update it immediately and the authoritative
+   *  self snapshot reconciles it after reconnects. */
   mountRaceView(): MountRaceView | null;
 }
 
