@@ -111,6 +111,39 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('password_set');
   });
 
+  it('applies payout void metadata and append-only moderation audit storage', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS void_reason TEXT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_id TEXT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_username TEXT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_at TIMESTAMPTZ',
+    );
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS daily_reward_payout_moderation_audit');
+    expect(applied).toContain("action TEXT NOT NULL CHECK (action IN ('void', 'restore'))");
+    expect(applied).toContain('actor_id TEXT NOT NULL');
+    expect(applied).toContain('actor_username TEXT NOT NULL');
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS signed_transaction TEXT',
+    );
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS daily_reward_payout_attempts');
+    expect(applied).toContain("kind TEXT NOT NULL CHECK (kind IN ('payout', 'resend'))");
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payout_attempts ADD COLUMN IF NOT EXISTS operation_id TEXT',
+    );
+    expect(applied).toContain(
+      'CREATE UNIQUE INDEX IF NOT EXISTS daily_reward_payout_attempts_operation',
+    );
+    expect(applied).toContain('tx_signature TEXT NOT NULL UNIQUE');
+  });
+
   it('applies the bank-system tables (character_leases, bank_ledger) idempotently', async () => {
     // Bank system tables: the per-character load lease and the append-only
     // bank op ledger both live inline in the core SCHEMA string. Pin them by name so
@@ -139,6 +172,40 @@ describe('ensureSchema wires every schema module at boot', () => {
       expect(ddl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
       expect(ddl).not.toMatch(/ADD COLUMN (?!IF NOT EXISTS)/i);
     }
+  });
+
+  it('applies the deeds records table and the broadcast opt-out column idempotently', async () => {
+    // The earned-deed index table and the accounts opt-out column live inline
+    // in the core SCHEMA string. Pin them by name so they can never regress to
+    // defined-but-unwired (the DISCORD_SCHEMA lesson), and boot twice to pin
+    // that a re-boot re-applies the same additive statements.
+    await ensureSchema();
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS character_deeds');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS character_deeds_account');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS character_deeds_character_earned');
+    // The retired deed_id index: the CREATE is gone and the boot DDL converges
+    // deployed databases with an idempotent DROP INDEX IF EXISTS.
+    expect(applied).not.toContain('CREATE INDEX IF NOT EXISTS character_deeds_deed');
+    expect(applied).toContain('DROP INDEX IF EXISTS character_deeds_deed;');
+    expect(applied).toContain(
+      'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS deed_broadcasts BOOLEAN NOT NULL DEFAULT TRUE',
+    );
+    // Additive-only within the block (the bank-tables slicing idiom above),
+    // save for the ONE sanctioned reconcile: the DROP INDEX IF EXISTS that
+    // retires the deed_id index is index-only and idempotent, so strip that
+    // exact line before the destructive-token scan and the scan still catches
+    // any UNsanctioned DROP/TRUNCATE/ALTER COLUMN in the block.
+    const coreCall = h.calls.find((c) => c.includes('CREATE TABLE IF NOT EXISTS character_deeds'));
+    expect(coreCall).toBeDefined();
+    const start = (coreCall as string).indexOf('CREATE TABLE IF NOT EXISTS character_deeds');
+    const rest = (coreCall as string).slice(start + 1);
+    const end = rest.indexOf('CREATE TABLE');
+    const ddl = rest.slice(0, end === -1 ? undefined : end);
+    const sansReconcile = ddl.replace('DROP INDEX IF EXISTS character_deeds_deed;', '');
+    expect(sansReconcile).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+    expect(sansReconcile).not.toMatch(/ADD COLUMN (?!IF NOT EXISTS)/i);
   });
 
   it('applies the tier-2 rate-limit schema under the advisory lock', async () => {

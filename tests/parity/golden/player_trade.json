@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
+      "nextId": 408,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 411,
-      "state": "ec1ecc29",
-      "events": "3f5adef6",
+      "nextId": 410,
+      "state": "4b00196b",
+      "events": "ba30f9b1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -56,9 +56,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -78,7 +88,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -103,9 +112,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 410,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -125,7 +144,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -145,7 +163,7 @@
           "fallStartY": -3.129532,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -193,7 +211,7 @@
           "fallStartY": -3.128605,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 410,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -237,9 +255,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 411,
-      "state": "e8c9b4f4",
-      "events": "fc335963",
+      "nextId": 410,
+      "state": "70902f05",
+      "events": "7f3f495d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -264,9 +282,21 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -286,7 +316,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -311,9 +340,22 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water",
+              "wolf_fang"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 410,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -337,7 +379,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -357,7 +398,7 @@
           "fallStartY": -3.129532,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -405,7 +446,7 @@
           "fallStartY": -3.128605,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 410,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -449,9 +490,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 411,
-      "state": "e8c9b4f4",
-      "events": "3ea5d4bb",
+      "nextId": 410,
+      "state": "70902f05",
+      "events": "1f48659f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -476,9 +517,21 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -498,7 +551,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -523,9 +575,22 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water",
+              "wolf_fang"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 410,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -549,7 +614,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -569,7 +633,7 @@
           "fallStartY": -3.129532,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -617,7 +681,7 @@
           "fallStartY": -3.128605,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 410,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -661,9 +725,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 411,
-      "state": "e8c9b4f4",
-      "events": "25e3b715",
+      "nextId": 410,
+      "state": "70902f05",
+      "events": "2b1faa76",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -688,9 +752,21 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -710,7 +786,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -735,9 +810,22 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water",
+              "wolf_fang"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 410,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -761,7 +849,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -781,7 +868,7 @@
           "fallStartY": -3.129532,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -829,7 +916,7 @@
           "fallStartY": -3.128605,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 410,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -873,9 +960,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 411,
-      "state": "2ae5e34b",
-      "events": "c8f9ca73",
+      "nextId": 410,
+      "state": "66c8cc2e",
+      "events": "8ee5f5bf",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -900,9 +987,27 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "soc_first_trade",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -922,7 +1027,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
+          "renown": 5,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -947,9 +1052,28 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water",
+              "wolf_fang"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "soc_first_trade",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 410,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -973,7 +1097,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
+          "renown": 5,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -993,7 +1117,7 @@
           "fallStartY": -3.129532,
           "fiveSecondRule": 99.05,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1041,7 +1165,7 @@
           "fallStartY": 1.465152,
           "fiveSecondRule": 99.05,
           "hp": 54,
-          "id": 410,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1085,8 +1209,8 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 411,
-      "state": "2ae5e34b",
+      "nextId": 410,
+      "state": "66c8cc2e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1112,9 +1236,27 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "soc_first_trade",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1134,7 +1276,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
+          "renown": 5,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1159,9 +1301,28 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "tradesCompleted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water",
+              "wolf_fang"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "soc_first_trade",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 410,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1185,7 +1346,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
+          "renown": 5,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1205,7 +1366,7 @@
           "fallStartY": -3.129532,
           "fiveSecondRule": 99.05,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1253,7 +1414,7 @@
           "fallStartY": 1.465152,
           "fiveSecondRule": 99.05,
           "hp": 54,
-          "id": 410,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

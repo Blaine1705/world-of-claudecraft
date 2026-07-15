@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "76a712a0",
+      "nextId": 409,
+      "state": "6bd4c62d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -43,9 +43,18 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -61,7 +70,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -81,7 +89,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -124,9 +132,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 411,
-      "state": "62aa5897",
-      "events": "13c1bd63",
+      "nextId": 410,
+      "state": "add14712",
+      "events": "2e38065a",
       "rng": {
         "draws": 6,
         "digest": "93f0e12e"
@@ -135,8 +143,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 411,
-      "state": "94a5fff4",
+      "nextId": 410,
+      "state": "b19ee1f5",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -146,9 +154,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 411,
-      "state": "7e545fdc",
-      "events": "c1ac5730",
+      "nextId": 410,
+      "state": "394c217a",
+      "events": "102a1c1c",
       "rng": {
         "draws": 98,
         "digest": "92f0a886"
@@ -157,9 +165,9 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 411,
-      "state": "75819bf7",
-      "events": "d4a3b00d",
+      "nextId": 410,
+      "state": "09e5f6bd",
+      "events": "562870d3",
       "rng": {
         "draws": 154,
         "digest": "8ab416f5"
@@ -188,9 +196,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 7074,
+              "kills": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -207,7 +244,7 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -227,7 +264,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
           "hp": 49989,
-          "id": 409,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -261,7 +298,7 @@
             "str": 41
           },
           "swingTimer": 0.45,
-          "targetId": 410,
+          "targetId": 409,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -281,7 +318,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 410,
+          "id": 409,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -295,7 +332,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            409
+            408
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -319,8 +356,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 409,
-          "targetId": 409,
+          "tappedById": 408,
+          "targetId": 408,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -333,9 +370,9 @@
     {
       "tick": 76,
       "time": 3.8,
-      "nextId": 411,
-      "state": "5b854d7f",
-      "events": "741638a5",
+      "nextId": 410,
+      "state": "1f1e8f3c",
+      "events": "0ad05ac8",
       "rng": {
         "draws": 172,
         "digest": "ae90daa0"
@@ -364,9 +401,42 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 7074,
+              "kills": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -383,7 +453,7 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
+          "renown": 25,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -404,7 +474,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
           "hp": 49989,
-          "id": 409,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -438,7 +508,7 @@
             "str": 41
           },
           "swingTimer": 0.25,
-          "targetId": 410,
+          "targetId": 409,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -458,7 +528,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 410,
+          "id": 409,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -472,7 +542,7 @@
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [
-            409
+            408
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -496,8 +566,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 409,
-          "targetId": 409,
+          "tappedById": 408,
+          "targetId": 408,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

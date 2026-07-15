@@ -9,7 +9,7 @@ import { CharacterVisual } from './visual';
 export { CharacterPreview } from './preview';
 export type { PreviewAppearance } from './preview_appearance';
 export type { AnimState } from './visual';
-export { CharacterVisual } from './visual';
+export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 
 /** Build a rideable mount's visual: no skin, no held weapon, authored colours
  *  (mount defs carry no tint). The caller gates on mountAssetsReady() first:

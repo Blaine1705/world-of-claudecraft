@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "904aff71",
+      "nextId": 409,
+      "state": "7bae8020",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -41,9 +41,18 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -59,7 +68,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -79,7 +87,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -122,9 +130,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "7e264179",
-      "events": "b0cd5bd6",
+      "nextId": 409,
+      "state": "2ce1b790",
+      "events": "11e0c53a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -148,9 +156,18 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -178,7 +195,6 @@
               }
             ]
           ],
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -198,7 +214,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -241,9 +257,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "28481a5a",
-      "events": "70664743",
+      "nextId": 409,
+      "state": "cc655682",
+      "events": "ddaa436f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -269,9 +285,19 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "boar_hide",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -303,7 +329,6 @@
               }
             ]
           ],
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -323,7 +348,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -366,9 +391,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "877d9dc3",
-      "events": "7ac569c6",
+      "nextId": 409,
+      "state": "9a18562b",
+      "events": "6a2eee27",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -394,9 +419,19 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "boar_hide",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -428,7 +463,6 @@
               }
             ]
           ],
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -448,7 +482,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -491,9 +525,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "6f06d503",
-      "events": "929c3027",
+      "nextId": 409,
+      "state": "b68e5541",
+      "events": "82536917",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -519,9 +553,19 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "boar_hide",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -553,7 +597,6 @@
               }
             ]
           ],
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -573,7 +616,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -616,9 +659,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "9bb63630",
-      "events": "db3611b2",
+      "nextId": 409,
+      "state": "b2e82dc2",
+      "events": "dcefb227",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -647,9 +690,19 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "boar_hide",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -669,7 +722,6 @@
           "questsDone": [
             "q_boars"
           ],
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -690,7 +742,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -733,8 +785,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 410,
-      "state": "372001e6",
+      "nextId": 409,
+      "state": "b3dc7428",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -764,9 +816,19 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "boar_hide",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -786,7 +848,6 @@
           "questsDone": [
             "q_boars"
           ],
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -807,7 +868,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.1,
           "hp": 90,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

@@ -16,10 +16,14 @@
 import { type AssistCandidate, resolveAssist } from '../assist';
 import { MOUNT_KEYS, MOUNTS, TRAINING_MOUNT_KEY } from '../content/mounts';
 import { GATHERING_PROFESSIONS } from '../content/professions';
+import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { CLASSES, ITEMS, NPCS, zoneAt } from '../data';
+import * as deedsMod from '../deeds';
 import { graveyardReadout } from '../entity_roster';
+import { enterDungeon } from '../instances/dungeons';
 import { mountItemId, mountOwned } from '../mounts';
 import { isGatheringProfessionId, queueGatheringGrant } from '../professions/gathering';
+import { completeAllQuestsForDev } from '../quests/dev_quest_commands';
 import {
   type AwayStatus,
   JOINABLE_CHANNELS,
@@ -36,6 +40,15 @@ import * as readouts from './chat_readouts';
 const CHAT_BURST = 8; // messages a player may send back-to-back...
 const CHAT_REFILL = 2; // ...then this many more per second (caps spam amplifiers)
 const OVERHEAD_EMOTE_DURATION = 3.2;
+
+// The speaker's selected Book of Deeds title, spread into every PLAYER-sourced
+// chat emit as the optional `fromTitle` field: a deed id the client localizes
+// through deed_i18n, never display text. Untitled players omit the key
+// entirely (the event stays byte-identical to the pre-title shape), and the
+// mob/boss yell emitters (mob/yells.ts, encounters/*) never call this.
+function speakerTitle(meta: PlayerMeta): { fromTitle?: string } {
+  return meta.activeTitle ? { fromTitle: meta.activeTitle } : {};
+}
 
 // Predefined social emotes. Each entry maps a command (and its aliases) to the
 // third-person action text shown to everyone in /say range. `solo` is used with
@@ -196,6 +209,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       return null;
     }
     const result = ctx.rng.int(lo, hi);
+    deedsMod.onChatRollForDeeds(ctx, r.meta.entityId, lo, hi, result);
     const text = `${result} (${lo}-${hi})`;
     const party = ctx.partyOf(r.meta.entityId);
     if (party) {
@@ -204,6 +218,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           type: 'chat',
           fromPid: r.meta.entityId,
           from: r.meta.name,
+          ...speakerTitle(r.meta),
           text,
           channel: 'roll',
           pid: mPid,
@@ -217,6 +232,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           type: 'chat',
           fromPid: r.meta.entityId,
           from: r.meta.name,
+          ...speakerTitle(r.meta),
           text,
           channel: 'roll',
           pid: meta.entityId,
@@ -668,6 +684,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           type: 'chat',
           fromPid: r.meta.entityId,
           from: r.meta.name,
+          ...speakerTitle(r.meta),
           to: target.name,
           text: msg,
           channel: 'whisper',
@@ -688,6 +705,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         type: 'chat',
         fromPid: r.meta.entityId,
         from: r.meta.name,
+        ...speakerTitle(r.meta),
         text: msg,
         channel: 'whisper',
         pid: target.entityId,
@@ -696,6 +714,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       type: 'chat',
       fromPid: r.meta.entityId,
       from: r.meta.name,
+      ...speakerTitle(r.meta),
       to: target.name,
       text: msg,
       channel: 'whisper',
@@ -712,6 +731,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         type: 'chat',
         fromPid: target.entityId,
         from: target.name,
+        ...speakerTitle(target),
         text: reply,
         channel: 'whisper',
         pid: r.meta.entityId,
@@ -734,6 +754,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         type: 'chat',
         fromPid: r.meta.entityId,
         from: r.meta.name,
+        ...speakerTitle(r.meta),
         text: clean,
         channel: 'party',
         pid: mPid,
@@ -750,6 +771,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       type: 'chat',
       fromPid: r.meta.entityId,
       from: r.meta.name,
+      ...speakerTitle(r.meta),
       text: clean,
       channel: 'general',
     });
@@ -789,6 +811,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           type: 'chat',
           fromPid: r.meta.entityId,
           from: r.meta.name,
+          ...speakerTitle(r.meta),
           text: clean,
           channel,
           pid: subPid,
@@ -838,6 +861,8 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         if (t) text = def.target.replace('%t', t.name === r.meta.name ? 'themselves' : t.name);
       }
       broadcastEmote(ctx, r.meta, r.e, text);
+      // A cheer with a live Yumi in earshot counts; range matches the /say emote.
+      if (key === 'cheer') deedsMod.onCheerForDeeds(ctx, r.meta, r.e, YUMI_TEMPLATE_ID, SAY_RANGE);
       return null;
     }
   }
@@ -864,6 +889,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       type: 'chat',
       fromPid: r.meta.entityId,
       from: r.meta.name,
+      ...speakerTitle(r.meta),
       text: clean,
       channel,
       entityId: r.e.id,
@@ -1035,6 +1061,66 @@ export function handleDevChat(
     else ctx.emit({ type: 'log', text: okText, pid });
     return null;
   }
+  const lfgM = /^\/(?:dev\s+lfg|devlfg)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (lfgM) {
+    const mode = (lfgM[1] ?? 'queue').toLowerCase();
+    // Dev-only English diagnostics, routed through vars so they read as
+    // dev-channel text (matching the /dev bot arm above).
+    if (mode !== 'queue' && mode !== 'raid' && mode !== 'board') {
+      const usageText = '[dev] Usage: /dev lfg [queue|raid|board].';
+      ctx.error(pid, usageText);
+      return null;
+    }
+    const res = ctx.seedDungeonFinderDev(mode, pid);
+    const okText = `[dev] Spawned ${res.spawned} finder bots (${mode}). Open the Dungeon Finder to play the flow.`;
+    const rolesText =
+      '[dev] Pick your Dungeon Finder role first (Quick Match tab), then rerun /dev lfg.';
+    const noneText = '[dev] No finder activity matches your current level band.';
+    const text =
+      res.note === 'needRoles' ? rolesText : res.note === 'noneEligible' ? noneText : okText;
+    if (res.note === 'ok') ctx.emit({ type: 'log', text, pid });
+    else ctx.error(pid, text);
+    return null;
+  }
+  if (/^\/(?:dev\s+attune|devattune)\s*$/i.test(raw)) {
+    // [dev] Mark every quest complete so all attunement / requiresQuest gates open.
+    completeAllQuestsForDev(ctx, pid);
+    return null;
+  }
+  // [dev] /dev raid [heroic|normal|reset] (also accepts "/dev tp raid <n> heroic").
+  // Zones a lone tester straight into the Nythraxis raid, bypassing the raid-group
+  // and attunement gates; "reset" clears the raid lockouts so it can be re-run.
+  const raidM = /^\/(?:dev\s+)(?:tp\s+)?raid\b\s*(.*)$/i.exec(raw);
+  if (raidM) {
+    const rest = raidM[1].toLowerCase();
+    const meta = ctx.players.get(pid);
+    if (/\breset\b/.test(rest)) {
+      if (meta) meta.raidLockouts.clear();
+      ctx.emit({ type: 'log', text: '[dev] Raid lockouts cleared.', pid });
+      return null;
+    }
+    const difficulty = /\bnormal\b/.test(rest) ? 'normal' : 'heroic';
+    ctx.setDungeonDifficulty(difficulty, pid);
+    enterDungeon(ctx, 'nythraxis_boss_arena', pid, true);
+    ctx.emit({ type: 'log', text: `[dev] Entering Nythraxis raid (${difficulty}).`, pid });
+    return null;
+  }
+  if (/^\/(?:dev\s+god|devgod)\s*$/i.test(raw)) {
+    // [dev] Toggle god mode: invulnerable (target.devGod in dealDamage) and 100x
+    // outgoing damage (dev-gated), so a solo tester can survive and down raid bosses
+    // to inspect their drops. Enabling also tops off health and resource. Uses its
+    // OWN devGod flag, never the production gm flag, so it can never touch a real GM.
+    const e = ctx.entities.get(pid);
+    if (e) {
+      e.devGod = !e.devGod;
+      if (e.devGod) {
+        e.hp = e.maxHp;
+        e.resource = e.maxResource;
+      }
+      ctx.emit({ type: 'log', text: `[dev] God mode ${e.devGod ? 'ON' : 'OFF'}.`, pid });
+    }
+    return null;
+  }
   if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
     // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
     // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
@@ -1046,7 +1132,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev mounts, /dev mountquest, /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev mounts, /dev mountquest, /dev gold N, /dev quest questId, /dev quests, /dev attune, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev god, /dev raid [heroic|normal|reset], /dev kill',
     );
     return null;
   }
@@ -1126,6 +1212,7 @@ export function broadcastEmote(
       type: 'chat',
       fromPid: actor.entityId,
       from: actor.name,
+      ...speakerTitle(actor),
       text: body,
       channel: 'emote',
       entityId: actorEntity.id,
@@ -1149,6 +1236,7 @@ export function helpLines(): string[] {
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
+    'Hide a player: /ignore <name> hides their public chat only. /block <name> also stops their whispers, invites and mail. Also /unignore, /unblock, /ignorelist, /blocklist.',
     'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',

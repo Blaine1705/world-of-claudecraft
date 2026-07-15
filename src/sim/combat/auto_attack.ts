@@ -44,6 +44,7 @@ import {
   normAngle,
   swingMissChance,
 } from '../types';
+import { drawWeapon } from '../weapon_stow';
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
@@ -71,6 +72,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     return;
   }
   if (p.sitting) ctx.standUp(p);
+  if (p.weaponStowed) drawWeapon(p);
   p.autoAttack = true;
   r.meta.lastActiveTick = ctx.tickCount; // starting auto-attack is a deliberate action
   // Engaging MELEE auto-attack seeds aggro at once, because the swing lands almost
@@ -174,6 +176,8 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   p.swingTimer = (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) / (1 + p.meleeHaste);
 }
 
+export const AUTO_SHOT_LABEL = 'Auto Shot';
+
 export function rangedSwing(
   ctx: SimContext,
   attacker: Entity,
@@ -181,13 +185,14 @@ export function rangedSwing(
   ranged: { min: number; max: number; speed: number; wand?: boolean; school?: string },
 ): void {
   const school = ranged.wand ? (ranged.school ?? 'arcane') : 'physical';
-  const label = ranged.wand ? 'Wand' : 'Auto Shot';
+  const label = ranged.wand ? 'Wand' : AUTO_SHOT_LABEL;
   ctx.emit({
     type: 'spellfx',
     sourceId: attacker.id,
     targetId: target.id,
     school,
     fx: 'projectile',
+    ...(ranged.wand ? {} : { attackAnimation: 'ranged-shot' as const }),
   });
   // The shot/bolt is in flight: its miss roll and damage land when it reaches the
   // target (projectile_travel), and fizzle if the target dies before impact.
@@ -203,6 +208,7 @@ export function rangedSwing(
         school,
         ability: label,
         kind: 'miss',
+        ...(ranged.wand ? {} : { attackAnimationStarted: true as const }),
       });
       ctx.enterCombat(atk, tgt);
       return;
@@ -217,10 +223,22 @@ export function rangedSwing(
     // ranged white hits suffer the same higher-level crit suppression as melee
     const critChance = Math.max(0.005, atk.critChance - Math.max(0, tgt.level - atk.level) * 0.002);
     const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, atk) ? 1 : critChance);
-    if (crit) dmg *= 2;
+    if (crit) dmg *= 2 + atk.critDmgPhysBonus;
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
-    ctx.dealDamage(atk, tgt, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
+    ctx.dealDamage(
+      atk,
+      tgt,
+      Math.max(1, Math.round(dmg)),
+      crit,
+      school,
+      label,
+      'hit',
+      false,
+      undefined,
+      true,
+      !ranged.wand,
+    );
     // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
     // inside applySetProcs, so proc-less players draw no rng.
     if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');
@@ -301,7 +319,7 @@ export function meleeSwing(
     attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
   );
   const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
-  if (crit) dmg *= 2;
+  if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
   // Mounted melee block (rare+ mounts, src/sim/content/mounts.ts): a flat
   // fraction shaved off melee swings only, applied with the other upstream

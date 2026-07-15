@@ -7,6 +7,7 @@
 //      same name, and the seam leaves same-seed-same-world determinism intact.
 
 import { describe, expect, it, vi } from 'vitest';
+import { createDeedRuntime } from '../src/sim/deeds';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
@@ -71,6 +72,7 @@ const CALLBACK_KEYS = [
   'partyOf',
   'removeFromParty',
   'dropPartyMarkers',
+  'formDungeonFinderGroup',
   // Q1 quest-credit trio + the countItem it consumes.
   'onMobKilledForQuests',
   'onInventoryChangedForQuests',
@@ -198,6 +200,7 @@ const CALLBACK_KEYS = [
   'setPlayerLevel',
   'notice',
   'spawnDevBot',
+  'seedDungeonFinderDev',
   // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
   'startFishing',
   'unlockMechChromaFromItem',
@@ -285,6 +288,16 @@ function makeFakeHost() {
     marketListings: [],
     bankerIds: [],
     vcup: createVcState(),
+    deedDirtyPids: new Set<number>(),
+    deedDirtyKeys: new Map<number, Set<string>>(),
+    worldBossEntityIds: [],
+    deedRuntime: createDeedRuntime(),
+    fiestaBotPids: [],
+    bumpDeedStat: vi.fn(),
+    markItemDiscovered: vi.fn(),
+    markVisited: vi.fn(),
+    markDeedsDirty: vi.fn(),
+    grantDeed: vi.fn(() => true),
     emit: vi.fn(),
     error: vi.fn(),
     dealDamage: vi.fn(),
@@ -339,6 +352,7 @@ function makeFakeHost() {
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
     dropPartyMarkers: vi.fn(),
+    formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
@@ -463,6 +477,7 @@ function makeFakeHost() {
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
+    seedDungeonFinderDev: vi.fn(() => ({ spawned: 0, note: 'ok' as const })),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),

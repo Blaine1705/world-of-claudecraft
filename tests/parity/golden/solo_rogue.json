@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "62f9a985",
+      "nextId": 409,
+      "state": "20380ff5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -41,9 +41,18 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -59,7 +68,6 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -79,7 +87,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 409,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -124,9 +132,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 411,
-      "state": "64b2f525",
-      "events": "e4c67d05",
+      "nextId": 410,
+      "state": "b051edc2",
+      "events": "c1a0a368",
       "rng": {
         "draws": 9,
         "digest": "8ecad8de"
@@ -135,9 +143,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 411,
-      "state": "1e33382d",
-      "events": "5b3425b4",
+      "nextId": 410,
+      "state": "3d0710ec",
+      "events": "c835dfbb",
       "rng": {
         "draws": 15,
         "digest": "843b3bf7"
@@ -146,9 +154,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 411,
-      "state": "237f7703",
-      "events": "c5bf7b3e",
+      "nextId": 410,
+      "state": "c62c9e97",
+      "events": "f84ddf9f",
       "rng": {
         "draws": 90,
         "digest": "0f3d4b16"
@@ -157,8 +165,8 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 411,
-      "state": "7fd18401",
+      "nextId": 410,
+      "state": "48e6a803",
       "events": "741638a5",
       "rng": {
         "draws": 143,
@@ -187,9 +195,37 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 79
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 408,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -206,7 +242,7 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "selectedMount": "valorsteed",
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -229,7 +265,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
           "hp": 49991,
-          "id": 409,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -263,7 +299,7 @@
             "str": 26
           },
           "swingTimer": 0.05,
-          "targetId": 410,
+          "targetId": 409,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -273,7 +309,7 @@
           }
         },
         {
-          "aggroTargetId": 409,
+          "aggroTargetId": 408,
           "aiState": "attack",
           "combatTimer": 1.2,
           "comboUntil": -1,
@@ -285,7 +321,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8921,
-          "id": 410,
+          "id": 409,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -315,12 +351,12 @@
             "armor": 40
           },
           "swingTimer": 0.45,
-          "tappedById": 409,
-          "targetId": 409,
+          "tappedById": 408,
+          "targetId": 408,
           "templateId": "forest_wolf",
           "threat": [
             [
-              409,
+              408,
               80
             ]
           ],

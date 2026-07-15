@@ -20,6 +20,7 @@ import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
+import { deedTitleText } from '../ui/deed_i18n';
 import {
   devTierBadgeDataUrl,
   devTierByIndex,
@@ -33,7 +34,7 @@ import {
   holderTierByIndex,
   holderTierDisplayName,
 } from '../ui/holder_tier';
-import { formatNumber, t } from '../ui/i18n';
+import { formatNumber, getLanguage, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
@@ -221,9 +222,13 @@ export class NameplatePainter {
         // plate, and when the player has turned developer badges off.
         const devOutline =
           suppressSelf || !showDevBadges ? null : devTierNameOutlineColor(e.devTier ?? 0);
+        // Operator-set AI-account tag. It rides the SIGNATURE (like every other
+        // static field): without it, an admin flipping the flag on a live account
+        // would never repaint the plate, because nothing else in the sig changed.
+        const isAi = !suppressSelf && e.aiAccount === true;
         this.setNameplateStatic(
           v,
-          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}`,
+          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}|${isAi ? 1 : 0}`,
           displayName,
           roleColor ?? '#7fb8ff',
           hpDisplay,
@@ -233,6 +238,7 @@ export class NameplatePainter {
           '',
           guild,
           devOutline,
+          isAi,
         );
         v.nameEl.style.display = nameDisplay;
         // $WOC holder-tier flair (hidden only on a suppressed self plate).
@@ -241,6 +247,8 @@ export class NameplatePainter {
         this.setNameplateDevTier(v, suppressSelf || !showDevBadges ? 0 : (e.devTier ?? 0));
         // Linked-Discord PFP indicator.
         this.setNameplateDiscord(v, suppressSelf ? undefined : e.discordAvatar, e.discordName);
+        // Book of Deeds title subtitle (the `title` wire field, a deed id).
+        this.setNameplateTitle(v, suppressSelf ? undefined : e.title);
         this.setNameplateHp(v, e);
       } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
         const npcName =
@@ -358,6 +366,7 @@ export class NameplatePainter {
     frame = '',
     guild = '',
     devOutline: string | null = null,
+    isAi = false,
   ): void {
     if (sig === v.nameplateSig) return;
     v.nameplateSig = sig;
@@ -386,6 +395,13 @@ export class NameplatePainter {
       v.nameEl.style.removeProperty('--dev-outline');
       v.nameEl.classList.remove('np-sig-dev');
     }
+    // Operator-set AI-account tag: a class toggle on its own span (the same shape as
+    // the --dev-outline outline above, so the colours stay in CSS and no hex literal
+    // enters this file). Nameplates are positioned DOM divs, so this is a toggle, not
+    // a repaint. .np-ai collapses on its own; .ai-tag is the shared gradient mark.
+    // (No title here: the plate is pointer-events:none, so nothing could hover it.)
+    v.aiEl.textContent = isAi ? t('hudChrome.playerMenu.aiTag') : '';
+    v.aiEl.classList.toggle('ai-tag', isAi);
   }
 
   // Show/hide the $WOC holder-tier badge on a player's nameplate. Cheap-diffed
@@ -417,6 +433,24 @@ export class NameplatePainter {
     } else {
       v.devTierEl.removeAttribute('src');
       v.devTierEl.style.display = 'none';
+    }
+  }
+
+  // Show/hide the Book of Deeds title subtitle under a player's name (the
+  // entity `title` wire field, a deed id; empty means untitled). Cheap-diffed
+  // per (language, title id) so the id-to-text resolution and the DOM write
+  // only run when either changes: no per-frame string work.
+  private setNameplateTitle(v: EntityView, titleId: string | null | undefined): void {
+    const sig = titleId ? `${getLanguage()}|${titleId}` : '';
+    if (sig === v.titleSig) return;
+    v.titleSig = sig;
+    // A stale/unknown deed id (content drift) resolves to '' and hides the line.
+    const text = titleId ? deedTitleText(titleId) : '';
+    if (text !== '') {
+      v.titleEl.textContent = text;
+      v.titleEl.style.display = '';
+    } else {
+      v.titleEl.style.display = 'none';
     }
   }
 

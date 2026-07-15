@@ -159,6 +159,10 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // on by default: slot 0 shows the classic fixed Attack (auto-attack) toggle.
+  // Turning it off (or right-clicking the Attack button) removes it from the bar,
+  // freeing slot 0 and its keybind to hold a normal assignable action.
+  showAttackButton: { def: true },
   // off by default: walk-by proximity autoloot (loot corpses just by walking
   // past them). Auto-grabbing loot can feel jarring, so it is opt-in and classic
   // deliberate looting stays the default. Gates the client AutoLoot pass in
@@ -207,11 +211,11 @@ export const BOOL_SETTINGS = {
   // Purely a local display preference: the badge is still earned and broadcast
   // either way, this only controls whether THIS client renders it.
   showDevBadges: { def: true },
-  // off by default (the classic self-view keeps no plate over your head): when
-  // on, render your OWN overhead nameplate (name, level, guild, hp, $WOC holder
-  // tier, dev badge, linked-Discord PFP) exactly as other players see it, so you
-  // can see how your character presents. Purely a local display preference.
-  showOwnNameplate: { def: false },
+  // on by default: render your OWN overhead nameplate (name, level, guild, hp,
+  // $WOC holder tier, dev badge, linked-Discord PFP) exactly as other players see
+  // it, so Discord linking and other flair changes have immediate visual feedback.
+  // Purely a local display preference; players can turn it off for the classic view.
+  showOwnNameplate: { def: true },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },
@@ -237,6 +241,10 @@ export const BOOL_SETTINGS = {
   // to just its "Quests (N)" header. Toggled by clicking the tracker header; kept
   // here so the choice persists across sessions like the other HUD preferences.
   questTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the on-screen Book of Deeds watchlist
+  // tracker is collapsed to just its header. Toggled by clicking the tracker
+  // header (the quest-tracker convention); kept here so the choice persists.
+  deedTrackerCollapsed: { def: false },
   // off by default: append an "Item Level N" (plus power score) line to every item
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.

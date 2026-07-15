@@ -23,8 +23,8 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; never trust stale prose).
-const EXPECTED_SEND_COUNT = 136; // +mount_race_start (the show-jumping race)
-const EXPECTED_DISPATCH_COUNT = 147; // +mount_race_start (client-sent + server-dispatched)
+const EXPECTED_SEND_COUNT = 152; // release/v0.26.0 plus the five mount commands
+const EXPECTED_DISPATCH_COUNT = 163; // release/v0.26.0 plus the seven mount dispatch commands
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch
