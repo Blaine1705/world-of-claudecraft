@@ -20,6 +20,154 @@ export const da_DK: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Center for Udviklerkommandoer",
+    "kicker": "Udviklingsværktøjer",
+    "title": "Kommandocenter",
+    "subtitle": "Serverstyrede testfunktioner til den aktive verden.",
+    "closeAria": "Luk udviklerkommandoer",
+    "categoryNavAria": "Kategorier for udviklerkommandoer",
+    "categories": {
+      "player": "Spiller",
+      "spawns": "Oprettede væsner",
+      "inventory": "Inventar",
+      "progress": "Fremskridt",
+      "travel": "Rejser",
+      "scenarios": "Scenarier"
+    },
+    "filterLabel": "Filtrér kommandoer",
+    "filterPlaceholder": "Søg i denne kategori",
+    "noMatches": "Ingen matchende kommandoer.",
+    "serverRequirement": "Serverfusk kræver stadig ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Vælg gyldige værdier, før du kører kommandoen.",
+    "sent": "Sendt: {command}",
+    "run": "Kør",
+    "fields": {
+      "level": "Niveau",
+      "mob": "Væsen",
+      "count": "Antal",
+      "item": "Genstand",
+      "gold": "Guld",
+      "quest": "Opgave",
+      "profession": "Fag",
+      "amount": "Mængde",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Fangekælder",
+      "difficulty": "Sværhedsgrad",
+      "name": "Navn"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroisk"
+    },
+    "actions": {
+      "heal": {
+        "label": "Gendan helbred",
+        "description": "Fyld hele helbredspuljen."
+      },
+      "resource": {
+        "label": "Gendan ressource",
+        "description": "Fyld mana, raseri eller energi."
+      },
+      "cooldowns": {
+        "label": "Ryd nedkølingstider",
+        "description": "Nulstil evne-, GCD- og eliksirtimere."
+      },
+      "god": {
+        "label": "Slå gudetilstand til eller fra",
+        "description": "Slå usårlighed og forøget skade til eller fra."
+      },
+      "revive": {
+        "label": "Genopliv",
+        "description": "Genopliv gennem den normale genopstandelsesproces."
+      },
+      "kill": {
+        "label": "Dræb spilleren",
+        "description": "Test forløb for død, spøgelse og lig."
+      },
+      "combatreset": {
+        "label": "Nulstil kamp",
+        "description": "Ryd kampstatus og fjendtlig trussel."
+      },
+      "level": {
+        "label": "Angiv niveau",
+        "description": "Angiv figurens aktuelle niveau."
+      },
+      "spawn": {
+        "label": "Opret væsen",
+        "description": "Opret et bestemt væsen nær spilleren."
+      },
+      "killtarget": {
+        "label": "Dræb målet",
+        "description": "Dræb det valgte levende væsen."
+      },
+      "despawntarget": {
+        "label": "Fjern målet",
+        "description": "Fjern et valgt væsen, der er oprettet med dette værktøj."
+      },
+      "despawnall": {
+        "label": "Ryd mine oprettede væsner",
+        "description": "Fjern alle væsner, som denne udvikler har oprettet."
+      },
+      "give": {
+        "label": "Giv genstand",
+        "description": "Føj en genstand til spillerens inventar."
+      },
+      "gold": {
+        "label": "Tilføj guld",
+        "description": "Føj guld til den aktuelle pung."
+      },
+      "quest": {
+        "label": "Fuldfør opgave",
+        "description": "Fuldfør en bestemt opgave ud fra id."
+      },
+      "quests": {
+        "label": "Fuldfør aktive opgaver",
+        "description": "Fuldfør alle opgaver i den aktuelle log."
+      },
+      "attune": {
+        "label": "Lås indstillinger op",
+        "description": "Markér alle indstillingskrav som fuldførte."
+      },
+      "gather": {
+        "label": "Giv indsamlingsfærdighed",
+        "description": "Forøg færdigheden i et indsamlingsfag."
+      },
+      "teleport": {
+        "label": "Teleportér",
+        "description": "Flyt til præcise verdenskoordinater."
+      },
+      "dungeon": {
+        "label": "Gå ind i fangekælder",
+        "description": "Gå ind i en fangekælder uden udviklerspærren."
+      },
+      "raid": {
+        "label": "Gå ind i raid",
+        "description": "Gå direkte ind i Nythraxis-arenaen."
+      },
+      "raidreset": {
+        "label": "Nulstil raidlåsning",
+        "description": "Ryd de aktuelle raidlåsninger."
+      },
+      "bot": {
+        "label": "Opret social bot",
+        "description": "Opret en stillestående spiller, der kan modtage hvisken."
+      },
+      "lfgqueue": {
+        "label": "Klargør søgekøen",
+        "description": "Opret et scenarie for køen til fangekældersøgeren."
+      },
+      "lfgraid": {
+        "label": "Klargør raidsøgeren",
+        "description": "Opret et scenarie for raidsøgeren."
+      },
+      "lfgboard": {
+        "label": "Klargør opslagstavlen",
+        "description": "Opret et scenarie med et færdigt gruppeopslag."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -229,6 +377,7 @@ export const da_DK: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}t {minutes}m",
+      "remainingDaysHours": "{days} dage {hours} timer",
       "score": "Score",
       "walletValue": "Wallet-værdi (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const da_DK: EnTranslations = {
         "no_wallet": "Forbind en wallet med mindst 20 USD i WOC.",
         "under_minimum": "Wallet er under WOC-minimummet på 20 USD.",
         "price_unavailable": "WOC-prisen er utilgængelig, belønninger er midlertidigt låst.",
-        "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}"
+        "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}",
+        "bannedUntil": "Du er udelukket fra daglige belønninger i yderligere {remaining}. Adgangen vender tilbage {until}. Begrundelse: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const da_DK: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Claudium-butikken er ikke tilgængelig lige nu. Din saldo og dine køb er ikke påvirket. Prøv igen om lidt.",
       "disclosure": "Claudium er en virtuel valuta, der kun går én vej: Køb den for penge, og brug den på kosmetik. Den kan ikke indløses, overføres eller udbetales.",
@@ -499,6 +650,7 @@ export const da_DK: EnTranslations = {
       "railLabel": "Betalingsmetode",
       "railStripe": "Kort",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% rabat",
       "railWocUnavailable": "WOC-priser er ikke tilgængelige lige nu.",
@@ -870,6 +1022,7 @@ export const da_DK: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto vælger skrivebords- eller touchstyring ud fra din enhed. Vælg Skrivebord for at tvinge tastatur og mus (nyttigt på en tablet med tastatur), eller Touch for skærmstyringen.",
       "footstepSounds": "Fodtrinslyde",
+      "interfaceSounds": "Brugerflade- og feedbacklyde",
       "clickFeedback": "Klikmarkør",
       "lockCursorOnRotate": "Lås markør under drejning",
       "keybindHelpLockCursorOnRotate": "Holder musemarkøren inde i vinduet, mens du trækker for at dreje kameraet, så den ikke kan nå skærmkanten eller flytte til en anden skærm. Slå fra, hvis du foretrækker en fri markør.",
@@ -1309,7 +1462,20 @@ export const da_DK: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Indstil fangekældersværhedsgrad: Heroisk",
-      "setNormal": "Indstil fangekældersværhedsgrad: Normal"
+      "setNormal": "Indstil fangekældersværhedsgrad: Normal",
+      "resetAll": "Nulstil alle instanser",
+      "resetDone": "Alle instanser er blevet nulstillet.",
+      "resetNone": "Du har ingen instanser at nulstille.",
+      "resetOccupied": "Du kan ikke nulstille instanser, mens nogen stadig er derinde.",
+      "resetSameDifficulty": "Skift fangekældersværhedsgrad, før du nulstiller disse instanser. Tomme instanser nulstilles automatisk efter 5 minutter.",
+      "resetLoot": "Du kan ikke nulstille instanser, mens der stadig er bytte derinde.",
+      "resetConfirmTitle": "Nulstil alle instanser?",
+      "resetConfirmBody": "Dette forlader tomme instanser fra din tidligere valgte sværhedsgrad. Uhentet bytte forhindrer nulstillingen.",
+      "resetConfirm": "Nulstil instanser",
+      "resetCooldown": "Instanser kan kun nulstilles én gang hvert 5. minut.",
+      "resetUsage": "Brug /dungeon reset til at forlade dine tomme instanser efter at have ændret sværhedsgrad.",
+      "entryMismatchNormal": "Denne instans er indstillet til Normal sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Heroisk gennemspilning.",
+      "entryMismatchHeroic": "Denne instans er indstillet til Heroisk sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Normal gennemspilning."
     },
     "bags": {
       "cannotDestroy": "Denne genstand kan ikke ødelægges.",
@@ -1478,6 +1644,33 @@ export const da_DK: EnTranslations = {
     "playerFrame": {
       "unlock": "Flyt spillerrammen",
       "lock": "Lås spillerrammen"
+    },
+    "partyFrames": {
+      "section": "Gruppe- og raidrammer",
+      "unlock": "Flyt gruppe- og raidrammer",
+      "lock": "Lås gruppe- og raidrammer",
+      "style": "Rammestil",
+      "styleAutomatic": "Automatisk",
+      "styleClassic": "Klassiske grupperammer",
+      "styleRaid": "Raidrammer",
+      "scale": "Rammeskalering",
+      "width": "Rammebredde",
+      "height": "Rammehøjde",
+      "spacing": "Rammeafstand",
+      "columns": "Raidkolonner",
+      "healthText": "Helbredstekst",
+      "healthNone": "Ingen",
+      "healthPercent": "Procent",
+      "healthCurrent": "Nuværende",
+      "healthCurrentMax": "Nuværende / maks.",
+      "sort": "Sortér spillere",
+      "sortGroup": "Gruppe",
+      "sortRole": "Rolle",
+      "sortName": "Navn",
+      "showResource": "Vis mana, raseri og energi",
+      "showAbsorbs": "Vis absorberingsskjolde",
+      "showAuras": "Vis styrkelser og svækkelser",
+      "showSelf": "Vis din ramme"
     },
     "frameReset": {
       "label": "Nulstil rammepositioner"
@@ -2141,6 +2334,9 @@ export const da_DK: EnTranslations = {
       "already_linked": "Din konto har allerede en tilknyttet Steam-konto.",
       "account_taken": "Den Steam-konto er allerede knyttet til en anden konto.",
       "upstream": "Steam svarede ikke. Prøv igen om et øjeblik."
+    },
+    "welcome": {
+      "invalid_input": "Ugyldig indtastning."
     }
   },
   "guide": {
@@ -4928,6 +5124,29 @@ export const da_DK: EnTranslations = {
     "body": "Vi genstarter spiltjenesten og forventer, at Claudemoon vender tilbage om kort tid. Denne side bliver ved med at tjekke automatisk.",
     "status": "Tilbage snart"
   },
+  "welcome": {
+    "back": "Velkommen tilbage, {name}",
+    "level": "Niveau {level}",
+    "lastPlayed": "Sidst spillet: {when}",
+    "continue": "Træd ind i verden",
+    "continueHint": "Enter for at fortsætte, Esc for at springe over",
+    "continueHintTouch": "Tryk for at fortsætte",
+    "discord": {
+      "title": "Fællesskabet lever på Discord",
+      "sub": "Forhåndsvisninger af patches, begivenheder, udviklerchat og 2 bonuspladser i banken, når du forbinder din Discord-konto.",
+      "join": "Tilslut dig vores Discord"
+    },
+    "chest": {
+      "ready": "Kisten med daglige belønninger er klar"
+    },
+    "armory": {
+      "cta": "Træd ind i verden, og udforsk Våbenhuset"
+    },
+    "news": {
+      "new": "Ny",
+      "viewAll": "Se alle opdateringer på GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -6458,7 +6677,7 @@ export const da_DK: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Ulveblod",
-        "description": "Øger angrebskraft med 40 i 6 sek. Kun i Ulveform."
+        "description": "Øger angrebskraft med {buff} i {duration} sek. Kun i Ulveform."
       },
       "rip": {
         "name": "Sønderriv",
@@ -6749,6 +6968,24 @@ export const da_DK: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Østbæk Uldbukser"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Østbæks Ritualegevandter"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Østbæk-druidens Skind"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Østbæks Beskyttede Benklæder"
+      },
+      "wardweave_cowl": {
+        "name": "Værnevævet Hætte"
+      },
+      "duskhide_wraps": {
+        "name": "Skumringsskindsbind"
+      },
+      "sootscale_mantle": {
+        "name": "Sodskælskappe"
       },
       "gravecaller_blade": {
         "name": "Gravkalderens Bredklinge"

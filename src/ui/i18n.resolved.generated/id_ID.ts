@@ -20,6 +20,154 @@ export const id_ID: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Pusat Perintah Pengembang",
+    "kicker": "Alat pengembangan",
+    "title": "Pusat Perintah",
+    "subtitle": "Kontrol pengujian otoritatif untuk dunia aktif.",
+    "closeAria": "Tutup perintah pengembang",
+    "categoryNavAria": "Kategori perintah pengembang",
+    "categories": {
+      "player": "Pemain",
+      "spawns": "Kemunculan",
+      "inventory": "Inventaris",
+      "progress": "Kemajuan",
+      "travel": "Perjalanan",
+      "scenarios": "Skenario"
+    },
+    "filterLabel": "Saring perintah",
+    "filterPlaceholder": "Cari dalam kategori ini",
+    "noMatches": "Tidak ada perintah yang cocok.",
+    "serverRequirement": "Perintah curang server tetap memerlukan ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Pilih nilai yang valid sebelum menjalankan perintah ini.",
+    "sent": "Terkirim: {command}",
+    "run": "Jalankan",
+    "fields": {
+      "level": "Tingkat",
+      "mob": "Makhluk",
+      "count": "Hitungan",
+      "item": "Barang",
+      "gold": "Emas",
+      "quest": "Misi",
+      "profession": "Profesi",
+      "amount": "Jumlah",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Tingkat kesulitan",
+      "name": "Nama"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroik"
+    },
+    "actions": {
+      "heal": {
+        "label": "Pulihkan kesehatan",
+        "description": "Penuhi seluruh bar kesehatan."
+      },
+      "resource": {
+        "label": "Pulihkan sumber daya",
+        "description": "Isi mana, amukan, atau energi."
+      },
+      "cooldowns": {
+        "label": "Hapus waktu tunggu",
+        "description": "Atur ulang pewaktu kemampuan, GCD, dan ramuan."
+      },
+      "god": {
+        "label": "Alihkan mode dewa",
+        "description": "Aktifkan atau nonaktifkan kekebalan dan peningkatan kerusakan."
+      },
+      "revive": {
+        "label": "Hidupkan kembali",
+        "description": "Hidupkan kembali melalui jalur kebangkitan normal."
+      },
+      "kill": {
+        "label": "Bunuh pemain",
+        "description": "Uji alur kematian, hantu, dan mayat."
+      },
+      "combatreset": {
+        "label": "Atur ulang pertempuran",
+        "description": "Hapus status pertempuran dan ancaman musuh."
+      },
+      "level": {
+        "label": "Atur level",
+        "description": "Atur level karakter saat ini."
+      },
+      "spawn": {
+        "label": "Munculkan makhluk",
+        "description": "Munculkan makhluk tertentu di dekat pemain."
+      },
+      "killtarget": {
+        "label": "Bunuh target",
+        "description": "Bunuh makhluk hidup yang dipilih."
+      },
+      "despawntarget": {
+        "label": "Hilangkan target",
+        "description": "Hapus makhluk terpilih yang dibuat dengan alat ini."
+      },
+      "despawnall": {
+        "label": "Hapus semua kemunculanku",
+        "description": "Hapus semua makhluk yang dimunculkan oleh pengembang ini."
+      },
+      "give": {
+        "label": "Berikan barang",
+        "description": "Tambahkan barang ke inventaris pemain."
+      },
+      "gold": {
+        "label": "Tambah emas",
+        "description": "Tambahkan emas ke dompet saat ini."
+      },
+      "quest": {
+        "label": "Selesaikan misi",
+        "description": "Selesaikan misi tertentu berdasarkan id."
+      },
+      "quests": {
+        "label": "Selesaikan misi aktif",
+        "description": "Selesaikan setiap misi dalam catatan saat ini."
+      },
+      "attune": {
+        "label": "Buka penyelarasan",
+        "description": "Tandai semua persyaratan penyelarasan sebagai selesai."
+      },
+      "gather": {
+        "label": "Berikan keterampilan mengumpulkan",
+        "description": "Tingkatkan profesi pengumpulan."
+      },
+      "teleport": {
+        "label": "Teleportasi",
+        "description": "Pindah ke koordinat dunia yang tepat."
+      },
+      "dungeon": {
+        "label": "Masuk dungeon",
+        "description": "Masuki penjara bawah tanah dengan melewati persyaratan masuk mode pengembang."
+      },
+      "raid": {
+        "label": "Masuk raid",
+        "description": "Masuki arena Nythraxis secara langsung."
+      },
+      "raidreset": {
+        "label": "Atur ulang penguncian raid",
+        "description": "Hapus penguncian raid saat ini."
+      },
+      "bot": {
+        "label": "Munculkan bot sosial",
+        "description": "Buat pemain diam yang dapat menerima pesan bisikan."
+      },
+      "lfgqueue": {
+        "label": "Isi antrean pencari",
+        "description": "Buat skenario antrean Pencari Dungeon."
+      },
+      "lfgraid": {
+        "label": "Isi pencari raid",
+        "description": "Buat skenario pencari raid."
+      },
+      "lfgboard": {
+        "label": "Isi papan daftar",
+        "description": "Buat skenario daftar grup siap pakai."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -229,6 +377,7 @@ export const id_ID: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}j {minutes}m",
+      "remainingDaysHours": "{days} hari {hours} jam",
       "score": "Skor",
       "walletValue": "Nilai Dompet (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const id_ID: EnTranslations = {
         "no_wallet": "Hubungkan dompet dengan setidaknya $20 USD dalam WOC.",
         "under_minimum": "Dompet di bawah batas minimum $20 USD WOC.",
         "price_unavailable": "Harga WOC tidak tersedia, hadiah terkunci sementara.",
-        "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}"
+        "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}",
+        "bannedUntil": "Kamu dilarang mengikuti Hadiah Harian selama {remaining} lagi. Akses kembali pada {until}. Alasan: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const id_ID: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Toko Claudium tidak tersedia saat ini. Saldo dan pembelian Anda tidak terpengaruh; harap segera periksa kembali.",
       "disclosure": "Claudium adalah mata uang lunak satu arah: beli dengan uang dan belanjakan untuk kosmetik. Itu tidak dapat ditebus, ditransfer, atau diuangkan.",
@@ -499,6 +650,7 @@ export const id_ID: EnTranslations = {
       "railLabel": "Metode pembayaran",
       "railStripe": "Kartu",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Diskon 20%.",
       "railWocUnavailable": "Harga WOC tidak tersedia saat ini.",
@@ -870,6 +1022,7 @@ export const id_ID: EnTranslations = {
       "interfaceModeTouch": "Sentuh",
       "interfaceModeNote": "Otomatis memilih kontrol desktop atau sentuh dari perangkat Anda. Pilih Desktop untuk memaksa keyboard dan mouse (berguna pada tablet dengan keyboard), atau Sentuh untuk kontrol di layar.",
       "footstepSounds": "Suara Langkah Kaki",
+      "interfaceSounds": "Suara Antarmuka dan Umpan Balik",
       "clickFeedback": "Penanda Klik",
       "lockCursorOnRotate": "Kunci Kursor Saat Memutar",
       "keybindHelpLockCursorOnRotate": "Menjaga kursor mouse tetap di dalam jendela saat Anda menyeret untuk memutar kamera, sehingga tidak mencapai tepi layar atau berpindah ke monitor lain. Matikan jika Anda lebih suka kursor bebas.",
@@ -1309,7 +1462,20 @@ export const id_ID: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Atur Kesulitan Dungeon: Heroik",
-      "setNormal": "Atur Kesulitan Dungeon: Normal"
+      "setNormal": "Atur Kesulitan Dungeon: Normal",
+      "resetAll": "Reset Semua Instans",
+      "resetDone": "Semua instans telah direset.",
+      "resetNone": "Tidak ada instans yang dapat kamu reset.",
+      "resetOccupied": "Kamu tidak dapat mereset instans selama masih ada seseorang di dalamnya.",
+      "resetSameDifficulty": "Ubah kesulitan dungeon sebelum mereset instans ini. Instans kosong akan direset otomatis setelah 5 menit.",
+      "resetLoot": "Kamu tidak dapat mereset instans selama masih ada jarahan di dalamnya.",
+      "resetConfirmTitle": "Reset Semua Instans?",
+      "resetConfirmBody": "Tindakan ini meninggalkan instans kosong dari kesulitan yang sebelumnya dipilih. Jarahan yang belum diambil akan mencegah reset.",
+      "resetConfirm": "Reset Instans",
+      "resetCooldown": "Instans hanya dapat direset sekali setiap 5 menit.",
+      "resetUsage": "Gunakan /dungeon reset untuk meninggalkan instans kosong setelah mengubah kesulitan.",
+      "entryMismatchNormal": "Instans ini diatur ke kesulitan Normal. Gunakan Reset Semua Instans untuk memulai perjalanan Heroik baru.",
+      "entryMismatchHeroic": "Instans ini diatur ke kesulitan Heroik. Gunakan Reset Semua Instans untuk memulai perjalanan Normal baru."
     },
     "bags": {
       "cannotDestroy": "Item ini tidak dapat dihancurkan.",
@@ -1478,6 +1644,33 @@ export const id_ID: EnTranslations = {
     "playerFrame": {
       "unlock": "Pindahkan bingkai pemain",
       "lock": "Kunci bingkai pemain"
+    },
+    "partyFrames": {
+      "section": "Bingkai Grup dan Raid",
+      "unlock": "Pindahkan bingkai grup dan raid",
+      "lock": "Kunci bingkai grup dan raid",
+      "style": "Gaya Bingkai",
+      "styleAutomatic": "Otomatis",
+      "styleClassic": "Bingkai Grup Klasik",
+      "styleRaid": "Bingkai Raid",
+      "scale": "Skala Bingkai",
+      "width": "Lebar Bingkai",
+      "height": "Tinggi Bingkai",
+      "spacing": "Jarak Bingkai",
+      "columns": "Kolom Raid",
+      "healthText": "Teks Kesehatan",
+      "healthNone": "Tidak Ada",
+      "healthPercent": "Persen",
+      "healthCurrent": "Saat Ini",
+      "healthCurrentMax": "Saat Ini / Maksimum",
+      "sort": "Urutkan Pemain",
+      "sortGroup": "Grup",
+      "sortRole": "Peran",
+      "sortName": "Nama",
+      "showResource": "Tampilkan Mana, Amukan, dan Energi",
+      "showAbsorbs": "Tampilkan Perisai Serap",
+      "showAuras": "Tampilkan Buff dan Debuff",
+      "showSelf": "Tampilkan Bingkaimu"
     },
     "frameReset": {
       "label": "Atur Ulang Posisi Bingkai"
@@ -2141,6 +2334,9 @@ export const id_ID: EnTranslations = {
       "already_linked": "Akunmu sudah memiliki akun Steam yang tertaut.",
       "account_taken": "Akun Steam itu sudah tertaut ke akun lain.",
       "upstream": "Steam tidak merespons. Coba lagi dalam beberapa saat."
+    },
+    "welcome": {
+      "invalid_input": "Data yang dimasukkan tidak valid."
     }
   },
   "guide": {
@@ -4928,6 +5124,29 @@ export const id_ID: EnTranslations = {
     "body": "Kami sedang memulai ulang layanan game dan memperkirakan Claudemoon akan kembali sebentar lagi. Halaman ini akan terus memeriksa secara otomatis.",
     "status": "Segera kembali"
   },
+  "welcome": {
+    "back": "Selamat datang kembali, {name}",
+    "level": "Level {level}",
+    "lastPlayed": "Terakhir dimainkan: {when}",
+    "continue": "Masuki Dunia",
+    "continueHint": "Tekan Enter untuk melanjutkan, Esc untuk melewati",
+    "continueHintTouch": "Ketuk untuk melanjutkan",
+    "discord": {
+      "title": "Komunitas berkumpul di Discord",
+      "sub": "Pratinjau pembaruan, acara, obrolan pengembang, serta 2 slot bank bonus saat Discord ditautkan.",
+      "join": "Gabung ke Discord kami"
+    },
+    "chest": {
+      "ready": "Peti harian siap dibuka"
+    },
+    "armory": {
+      "cta": "Masuki dunia dan jelajahi Gudang Senjata"
+    },
+    "news": {
+      "new": "Baru",
+      "viewAll": "Lihat semua pembaruan di GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -6458,7 +6677,7 @@ export const id_ID: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolfsblood",
-        "description": "Meningkatkan daya serang sebesar 40 selama 6 detik. Hanya Wujud Serigala."
+        "description": "Meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
       },
       "rip": {
         "name": "Robekan",
@@ -6749,6 +6968,24 @@ export const id_ID: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Celana Wol Eastbrook"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Jubah Ritual Eastbrook"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Kulit Druid Eastbrook"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Celana Pelindung Eastbrook"
+      },
+      "wardweave_cowl": {
+        "name": "Tudung Tenun Pelindung"
+      },
+      "duskhide_wraps": {
+        "name": "Balutan Kulit Senja"
+      },
+      "sootscale_mantle": {
+        "name": "Mantel Sisik Jelaga"
       },
       "gravecaller_blade": {
         "name": "Bilah Lebar Gravecaller"

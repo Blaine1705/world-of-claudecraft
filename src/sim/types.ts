@@ -297,6 +297,25 @@ export type AuraKind =
   | 'buff_armor_pct'
   | 'buff_ap_pct';
 
+// The shapeshift/stance aura kinds toggled by casting their granting ability (see the
+// isFormKind toggle in combat/effect_dispatch.ts): mutually exclusive, never expire on
+// their own, and cancel on their own when the granting ability stops being known (see
+// stripOrphanedFormAuras in progression/talents.ts). The single source of truth for this
+// kind set: combat/effect_dispatch.ts, combat/casting_lifecycle.ts, social/chat_readouts.ts,
+// and progression/talents.ts all consume isFormAuraKind/FORM_AURA_KINDS from here instead
+// of repeating the five-kind list, so it cannot drift out of sync between call sites.
+export const FORM_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+  'form_bear',
+  'form_cat',
+  'form_travel',
+  'form_moonkin',
+  'form_shadow',
+]);
+
+export function isFormAuraKind(kind: AuraKind): boolean {
+  return FORM_AURA_KINDS.has(kind);
+}
+
 export interface Aura {
   id: string; // ability id that applied it
   name: string;
@@ -2198,6 +2217,8 @@ export interface Entity {
   // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
   // real game master (who could otherwise deal 100x or have their invuln toggled).
   devGod?: boolean;
+  /** Owner of a mob created by /dev spawn. Server-private and never persisted. */
+  devSpawnOwnerId?: number;
   /** Moderation-jailed player: prisoners are mutually hostile (the jail brawl,
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
@@ -2780,6 +2801,10 @@ export type SimEvent = { pid?: number } & (
       // Stable presentation discriminator; renderers must not infer a player
       // attack animation from school or an English ability label.
       attackAnimation?: 'ranged-shot';
+      // True for a wand auto-attack projectile, so combat_sfx.ts can pick the
+      // dedicated wand_<school> cue instead of the real-spell proj_<school>
+      // one: a passive auto-attack must not sound identical to an actual cast.
+      wand?: true;
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
