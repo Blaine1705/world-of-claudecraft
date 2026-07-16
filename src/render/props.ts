@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { BUILDING_COLLIDER_HEIGHTS } from '../sim/colliders';
+import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
 import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
   DOCK_SECTION_LOCAL_Z,
@@ -126,6 +127,13 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // No yaw here: the geometry is CACHED and shared by every delve marker, so a
   // per-delve flip is applied to the placed group in buildProps, never baked.
   delveEntrance2: { url: '/models/dungeon/delve_entrance_2.glb', kit: 'dungeon' },
+  // Show-jumping race fixtures (Highwatch stables paddock): the start/finish
+  // arch and the two jump styles, placed from props.raceCourse (which mirrors
+  // the MOUNT_RACE_COURSE content). Tripo-generated CC-authored set; their long
+  // axis (the crossbar / arch face) is local +z.
+  courseArch: { url: '/models/props/course_arch.glb', kit: 'stable' },
+  jumpVertical: { url: '/models/props/jump_vertical.glb', kit: 'stable' },
+  jumpOxer: { url: '/models/props/jump_oxer.glb', kit: 'stable' },
   // Veiled Hollow hand-placed decor, all user-made models: the Tripo pixie
   // house (pipeline-normalized: world scale, front on +z) and the flora
   // GLBs realm_flora.ts also scatters (near unit size, so decor entries set
@@ -182,6 +190,12 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'crateWooden',
   'barrel',
   'delveEntrance2', // delve entrance portal, a landmark, so keep it on low gfx too
+  // The race fixtures are GAMEPLAY landmarks (players ride a timed course
+  // against them), so every tier renders them: hiding one on low gfx would
+  // break the gameplay-neutral graphics invariant.
+  'courseArch',
+  'jumpVertical',
+  'jumpOxer',
 ];
 
 /**
@@ -1574,6 +1588,62 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     face.position.set(dm.x, slabY, slabZ + faceSign * 0.1);
     if (faceSign < 0) face.rotation.y = Math.PI;
     group.add(face);
+  }
+
+  // ---- show-jumping race fixtures (Highwatch Stables) -----------------------
+  // The start/finish arch and the jumps, permanent landmarks placed from
+  // props.raceCourse (zone content mirroring MOUNT_RACE_COURSE), so the visible
+  // course can never drift from the gates the race system detects. Rendered on
+  // EVERY tier (riders race against these; no tier may hide them). colliders.ts
+  // builds matching fence-like OBBs from the same raceCourse and fixture-size
+  // data, so grounded riders stop and deliberate jumps clear. Merged static.
+  const raceCourse = getActiveWorldContent().props.raceCourse;
+  if (raceCourse) {
+    // The models' long axis (crossbar / arch face) is local +z; yawing by
+    // dir + PI/2 turns it perpendicular to the riding heading, so every gate is
+    // ridden face-on. The gates are deliberately BIG (a proper arena): wide jumps
+    // whose bar sits a touch higher now that mounts jump higher. Each jump carries
+    // a height cap on the WHOLE model; the jumpable rail reads a bit below that, so
+    // capping the vertical model at ~1.7 and the oxer at ~1.85 lands the main bar
+    // below each model's top. A mounted hop apexes near ~1.76yd (JUMP_VELOCITY * MOUNT_JUMP_MULT
+    // over GRAVITY in sim/player_motion), clearing even the standard tops, so the
+    // ~7.5-8yd span fills the gate while every jump still reads as hoppable. The
+    // arch is an imposing ~10.5yd start/finish gate at natural proportions.
+    const fixtures: {
+      x: number;
+      z: number;
+      dir: number;
+      key: PropKey;
+      width: number;
+      maxHeight?: number;
+    }[] = [
+      { ...raceCourse.arch, key: 'courseArch', width: 10.5 },
+      ...raceCourse.jumps.map((j) => {
+        const fixture = MOUNT_RACE_JUMP_FIXTURES[j.kind];
+        return {
+          x: j.x,
+          z: j.z,
+          dir: j.dir,
+          key: (j.kind === 'oxer' ? 'jumpOxer' : 'jumpVertical') as PropKey,
+          width: fixture.width,
+          maxHeight: fixture.maxHeight,
+        };
+      }),
+    ];
+    for (const f of fixtures) {
+      const a = propAsset(f.key);
+      // Uniform scale to the target width (long axis is +z), then clamp the
+      // height: for a model taller than maxHeight this lowers only the vertical
+      // axis (never a stretch, min() keeps it a cap). Sunk 0.08yd like the delve
+      // rubble so a wide base never floats on the paddock's gentle slopes.
+      const s = f.width / a.size.z;
+      const sy = f.maxHeight != null ? Math.min(s, f.maxHeight / a.size.y) : s;
+      const g = new THREE.Group();
+      addParts(g, f.key, { scale: [s, sy, s] });
+      g.position.set(f.x, ground(f.x, f.z) - 0.08, f.z);
+      g.rotation.y = f.dir + Math.PI / 2;
+      group.add(shadowed(g));
+    }
   }
 
   // ---- flush instanced batches ---------------------------------------------

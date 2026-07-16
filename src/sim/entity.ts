@@ -1,3 +1,4 @@
+import { mountCritPct } from './content/mounts';
 import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
@@ -174,6 +175,9 @@ function baseEntity(id: number, pos: Vec3): Entity {
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
+    mountKey: '',
+    mountCastRemaining: 0,
+    mountCastKey: '',
     mainhandItemId: null,
     weaponSkinLoadout: {},
     weaponSkinId: null,
@@ -499,13 +503,16 @@ export function recalcPlayerStats(
   e.spellHaste = hasteFrac + (mods?.global.spellHastePct ?? 0);
   e.setProcs = setEff.procs;
   if (e.setProcs.length > 0 && !e.procReadyAt) e.procReadyAt = {};
-  // Crit: ~1% per 20 agi at low level
+  // Crit: ~1% per 20 agi at low level. The active mount's bonus (epic tier)
+  // rides here so it covers melee, ranged, and ability crit uniformly; mount
+  // and dismount recalc stats (src/sim/mounts.ts) exactly like an equip does.
   e.critChance =
     0.05 +
     s.agi * 0.0005 +
     (mods?.stats.crit ?? 0) +
     setEff.crit +
-    critFractionFromRating(e.critRating);
+    critFractionFromRating(e.critRating) +
+    mountCritPct(e.mountKey);
   // Extra crit damage from a spec mastery, per output channel (e.g. Fire mage: SPELL
   // crits deal more; Holy paladin: HEAL crits; Subtlety/Arms: PHYSICAL crits).
   e.critDmgSpellBonus = mods?.global.critDmgSpellPct ?? 0;

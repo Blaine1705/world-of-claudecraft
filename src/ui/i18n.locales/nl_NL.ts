@@ -1064,6 +1064,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Spinnen-Eierzak',
   'entities.mobs.sump_troll_devourer.name': 'Zomptrol-Verslinder',
   'entities.mobs.thunzharr_stormling.name': 'Gewekte Stormling',
+  'entities.mobs.stable_horse.name': 'Stalpaard',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, de Ontwakende Piek',
   'entities.mobs.tolling_bell.name': 'Luidende Klok',
   'entities.mobs.vale_cup_ball.name': 'Zwijnenbal',
@@ -2795,6 +2796,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Houd je zwaard dichtbij, {className}. Het Dal is niet meer wat het was.',
   'entities.npcs.marshal_redbrook.name': 'Maarschalk Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Stalmeesteres',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Elke ruiter komt op twee benen binnen, {className}. De teugels krijg je pas als je op de Valorsteed kunt blijven zitten zonder in de modder te belanden, en Highwatch heeft geen genezers over voor gebroken botten.',
+  'entities.quests.q_riding_lessons.title': 'Rijlessen',
+  'entities.quests.q_riding_lessons.text':
+    'Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Betaal het lesgeld, en als ik het teken geef, roep je de oefen-Valorsteed bij je en klim je in het zadel. Rijd dan het parcours: volg de markering naar de startboog, neem elke sprong schoon en kruis de lijn opnieuw voor de zandloper leeg is. Lukt dat, dan is het zadel van jou. Dwaal je de wei uit, dan beginnen we opnieuw.',
+  'entities.quests.q_riding_lessons.completion':
+    'Zo, ja. In één vloeiende beweging omhoog en daarboven rustig blijven zitten. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Tem de Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Stadsmaarschalk',
   'entities.npcs.provisioner_hale.greeting':
     'Droge laarzen, droog brood, droog kruit, bij Fenbridge krijg je er op een goede dag twee van de drie.',
@@ -3347,6 +3358,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Wyrmcultus-Tenten',
   'entities.zones.thornpeak_heights.pois.8.label': 'Revenantenvelden',
   'entities.zones.thornpeak_heights.pois.9.label': 'Grafwurm-Heiligdom',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Stallen van Highwatch',
   'entities.zones.thornpeak_heights.welcome':
     'Kapitein Thessaly houdt de muur bij Hoogwacht, ternauwernood.',
   'errors.api.accountBanned': 'Dit account is verbannen.',
@@ -5251,6 +5263,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Verbruiksartikelen',
   'hudChrome.bags.filterGroupAria': 'Tassen filteren op categorie',
   'hudChrome.bags.filterMaterial': 'Materialen',
+  'hudChrome.bags.filterMount': 'Rijdieren',
   'hudChrome.bags.filterQuest': 'Quest',
   'hudChrome.bags.filterWeapon': 'Wapens',
   'hudChrome.bags.noMatch': 'Geen items komen overeen met je filters.',
@@ -7063,6 +7076,13 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Steam ontkoppelen',
   'entities.items.chunk_of_ore.name': 'Brok erts',
+  'entities.items.reins_grag_bear.name': 'Teugels van de Goliath Grag-beer',
+  'entities.items.reins_valorsteed.name': 'Teugels van de Valorsteed',
+  'entities.items.reins_stalkglider_snail.name': 'Teugels van de mosschelp-steelglijder',
+  'entities.items.reins_aether_hover_cycle.name': 'Contactsleutel: zweefcykel van de Etherkamper',
+  'entities.items.reins_shadowjump_toad.name': 'Teugels van Kama-Kage de schaduwsprongpad',
+  'entities.items.reins_stormfeather_griffin.name': 'Teugels van de hemelreikende Stormveder',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Teugels van Donderpronker, de Grote Kalkoen',
   'entities.quests.q_prof_intro.completion':
     'Zie je? Erts in je tas en eelt op je handen. Blijf mijnen, houthakken en kruiden plukken terwijl je over de wegen reist. Wanneer je terug in de stad bent, kijk dan naar het bord met de Stadsfocus bij de markt en de werkbank ernaast. Er valt met alles een eerlijke boterham te verdienen, als je dat wilt.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Brok erts',

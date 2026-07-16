@@ -754,6 +754,7 @@ export const nl_NL: EnTranslations = {
       "leaderboard": "Ranglijst",
       "dailyRewards": "Winkel",
       "deeds": "Daden",
+      "mounts": "Mounts",
       "nameplates": "Namen",
       "haptics": "Haptiek",
       "hapticsOff": "Haptiek uit",
@@ -868,7 +869,63 @@ export const nl_NL: EnTranslations = {
       "petStop": "Huisdier: Stoppen",
       "petTaunt": "Huisdier: Uitdagen",
       "petDefensive": "Huisdier: Verdedigend",
-      "petAggressive": "Huisdier: Agressief"
+      "petAggressive": "Huisdier: Agressief",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "De Dalbeker",
@@ -1490,6 +1547,7 @@ export const nl_NL: EnTranslations = {
       "filterConsumable": "Verbruiksartikelen",
       "filterMaterial": "Materialen",
       "filterQuest": "Quest",
+      "filterMount": "Rijdieren",
       "sortAria": "Tasitems sorteren",
       "sortRecent": "Recent",
       "sortQuality": "Kwaliteit",
@@ -5884,7 +5942,8 @@ export const nl_NL: EnTranslations = {
       "tool": "Gereedschap",
       "potion": "Toverdrank",
       "elixir": "Elixer",
-      "bag": "Tas"
+      "bag": "Tas",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Pantser",
@@ -8410,6 +8469,27 @@ export const nl_NL: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Lendenbescherming van de Stormroeper"
+      },
+      "reins_valorsteed": {
+        "name": "Teugels van de Valorsteed"
+      },
+      "reins_grag_bear": {
+        "name": "Teugels van de Goliath Grag-beer"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Teugels van de mosschelp-steelglijder"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Contactsleutel: zweefcykel van de Etherkamper"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Teugels van Kama-Kage de schaduwsprongpad"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Teugels van de hemelreikende Stormveder"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Teugels van Donderpronker, de Grote Kalkoen"
       }
     },
     "mobs": {
@@ -8658,6 +8738,9 @@ export const nl_NL: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Gewekte Stormling"
+      },
+      "stable_horse": {
+        "name": "Stalpaard"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -9060,6 +9143,11 @@ export const nl_NL: EnTranslations = {
         "name": "Voorman Odell",
         "title": "Mijnvoorman",
         "greeting": "De hele opgraving krioelt van dat modderbesmeurde ongedierte!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stalmeesteres",
+        "greeting": "Elke ruiter komt op twee benen binnen, {className}. De teugels krijg je pas als je op de Valorsteed kunt blijven zitten zonder in de modder te belanden, en Highwatch heeft geen genezers over voor gebroken botten."
       },
       "warden_fenwick": {
         "name": "Wachter Fenwick",
@@ -10060,6 +10148,16 @@ export const nl_NL: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Rijlessen",
+        "text": "Elke ruiter komt op twee benen binnen, {playerName}, precies zoals ik je vertelde op de dag dat we elkaar ontmoetten. Betaal het lesgeld, en als ik het teken geef, roep je de oefen-Valorsteed bij je en klim je in het zadel. Rijd dan het parcours: volg de markering naar de startboog, neem elke sprong schoon en kruis de lijn opnieuw voor de zandloper leeg is. Lukt dat, dan is het zadel van jou. Dwaal je de wei uit, dan beginnen we opnieuw.",
+        "completion": "Zo, ja. In één vloeiende beweging omhoog en daarboven rustig blijven zitten. De Valorsteed is van jou, {playerName}: zadel, teugels, en de status van een ruiter die het zadel verdiende in plaats van het te kopen.",
+        "objectives": {
+          "0": {
+            "label": "Tem de Valorsteed"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10376,6 +10474,9 @@ export const nl_NL: EnTranslations = {
           },
           "9": {
             "label": "Grafwurm-Heiligdom"
+          },
+          "10": {
+            "label": "Stallen van Highwatch"
           }
         }
       },

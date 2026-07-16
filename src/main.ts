@@ -32,6 +32,7 @@ import { installDevTeleports } from './game/dev_shortcuts';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
+import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
@@ -1369,6 +1370,11 @@ async function startGame(
           case 'valecup':
             hud.toggleValeCup();
             break;
+          case 'mount':
+            // Ride the pick immediately (every player always has one; the
+            // character sheet's picker is where the pick changes).
+            world.toggleMounted();
+            break;
           case 'leaderboard':
             hud.toggleLeaderboard();
             break;
@@ -1448,6 +1454,7 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
+    onMountToggle: () => world.toggleMounted(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
       music.setEnabled(!music.enabled);
@@ -1536,6 +1543,9 @@ async function startGame(
       case 'valecup':
         hud.toggleValeCup();
         break;
+      case 'mount':
+        world.toggleMounted();
+        break;
       case 'leaderboard':
         hud.toggleLeaderboard();
         break;
@@ -1556,7 +1566,12 @@ async function startGame(
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
-    isPointerMode: () => hud.isWindowOpen() || cameraPromptOpen(),
+    isPointerMode: () =>
+      shouldUseGamepadPointerMode(
+        hud.isWindowOpen(),
+        cameraPromptOpen(),
+        document.getElementById('race-start-btn')?.style.display === 'block',
+      ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
   });
@@ -2600,6 +2615,7 @@ async function startGame(
   let acc = 0;
   let onlineInputEchoMs = 0;
   let playerWasDead = world.player.dead;
+  let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
   // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
   // perf overlay's Jitter row.
   let onlineJitterMs = 0;
@@ -2940,11 +2956,23 @@ async function startGame(
     perf.frame(frameDt);
     syncPerfOverlay(frameDt, now);
 
-    // freeze movement while the game menu is up so WASD doesn't walk the
-    // character behind it (other windows stay non-modal, as before); the
-    // first-spawn intro cinematic holds movement the same way until it lands
+    // Freeze movement while the game menu is up, during the first-spawn intro,
+    // the camera prompt, and through the race countdown. The sim independently
+    // enforces the same countdown lock, so online latency cannot move the
+    // authoritative rider.
+    const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
+    if (raceMovementLocked && !raceMovementWasLocked) {
+      input.clearClickMove();
+      input.setAutorun(false);
+      mobileControls.syncAutorun(false);
+    }
+    raceMovementWasLocked = raceMovementLocked;
     input.setSuspendMovement(
-      !gameInputReady || hud.isModalOpen() || cameraPromptOpen() || intro !== null,
+      !gameInputReady ||
+        hud.isModalOpen() ||
+        cameraPromptOpen() ||
+        intro !== null ||
+        raceMovementLocked,
     );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {

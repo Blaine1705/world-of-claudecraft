@@ -61,6 +61,7 @@ function view(): EntityView {
   return {
     group,
     height: 2,
+    mountLift: 0,
     nameplate,
     nameEl: div('np-name'),
     titleEl: div('np-title'),

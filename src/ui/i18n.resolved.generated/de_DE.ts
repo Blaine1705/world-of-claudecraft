@@ -754,6 +754,7 @@ export const de_DE: EnTranslations = {
       "leaderboard": "Rangliste",
       "dailyRewards": "Shop",
       "deeds": "Taten",
+      "mounts": "Reittiere",
       "nameplates": "Namen",
       "haptics": "Haptik",
       "hapticsOff": "Haptik aus",
@@ -868,7 +869,63 @@ export const de_DE: EnTranslations = {
       "petStop": "Begleiter: Stopp",
       "petTaunt": "Begleiter: Verspotten",
       "petDefensive": "Begleiter: Defensiv",
-      "petAggressive": "Begleiter: Aggressiv"
+      "petAggressive": "Begleiter: Aggressiv",
+      "mount": "Aufsitzen / Absitzen"
+    },
+    "mounts": {
+      "title": "Reittiere",
+      "close": "Schließen",
+      "select": "Auswählen",
+      "selected": "Ausgewählt",
+      "riding": "Im Sattel",
+      "mount": "Aufsitzen",
+      "dismount": "Absitzen",
+      "requiresLevel": "Benötigt Stufe {level}",
+      "pickFirst": "Wählt ein Reittier zum Reiten.",
+      "keybindHint": "Drückt die Aufsitzen-/Absitzen-Taste, um zu reiten.",
+      "emptyTitle": "Keine Reittiere gesammelt",
+      "emptyStableHint": "Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.",
+      "emptyDropHint": "Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.",
+      "clickManage": "Anklicken, um Euer Reittier zu wählen",
+      "rarity_common": "Verbreitet",
+      "rarity_rare": "Selten",
+      "rarity_epic": "Episch",
+      "spec_speed": "+{pct}% zusätzliche Mobilität",
+      "spec_block": "+{pct}% Nahkampfschadensblock",
+      "spec_crit": "+{pct}% kritische Trefferchance",
+      "name_valorsteed": "Valorross",
+      "name_grag_bear": "Goliath-Gragbär",
+      "name_stalkglider_snail": "Moosschalen-Stielgleiter",
+      "name_aether_hover_cycle": "Ätherlanzen-Schwebrad",
+      "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
+      "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
+      "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
+      "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
+      "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
+      "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
+      "desc_aether_hover_cycle": "Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.",
+      "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
+      "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
+      "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Der Talpokal",
@@ -1490,6 +1547,7 @@ export const de_DE: EnTranslations = {
       "filterConsumable": "Verbrauchbares",
       "filterMaterial": "Materialien",
       "filterQuest": "Quest",
+      "filterMount": "Reittiere",
       "sortAria": "Taschengegenstände sortieren",
       "sortRecent": "Neueste",
       "sortQuality": "Qualität",
@@ -5884,7 +5942,8 @@ export const de_DE: EnTranslations = {
       "tool": "Werkzeug",
       "potion": "Trank",
       "elixir": "Elixier",
-      "bag": "Tasche"
+      "bag": "Tasche",
+      "mount": "Reittier"
     },
     "stats": {
       "armor": "Rüstung",
@@ -8410,6 +8469,27 @@ export const de_DE: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Gürtelschutz des Sturmrufers"
+      },
+      "reins_valorsteed": {
+        "name": "Zügel des Valorross"
+      },
+      "reins_grag_bear": {
+        "name": "Zügel des Goliath-Gragbären"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Zügel des Moosschalen-Stielgleiters"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Zündschlüssel: Ätherlanzen-Schwebrad"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Zügel von Kama-Kage der Schattensprungkröte"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Zügel des Himmelsgreifs Sturmfeder"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Zügel von Donnerstolz, dem Großen Puter"
       }
     },
     "mobs": {
@@ -8658,6 +8738,9 @@ export const de_DE: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Geweckter Sturmling"
+      },
+      "stable_horse": {
+        "name": "Stallpferd"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -9060,6 +9143,11 @@ export const de_DE: EnTranslations = {
         "name": "Vorarbeiter Odell",
         "title": "Minenvorarbeiter",
         "greeting": "Der ganze Stollen wimmelt von diesem schlammverkrusteten Ungeziefer!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stallmeisterin",
+        "greeting": "Jeder Reiter kommt auf zwei Beinen herein, {className}. Die Zügel gebe ich erst, wenn Ihr den Valorross reiten könnt, ohne im Dreck zu landen, und Highwatch hat keine Heiler für gebrochene Knochen übrig."
       },
       "warden_fenwick": {
         "name": "Wärter Fenwick",
@@ -10060,6 +10148,16 @@ export const de_DE: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Reitstunden",
+        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Zahlt die Gebühr, und wenn ich das Wort gebe, ruft das Übungs-Valorross zu Euch und steigt auf. Dann reitet den Parcours: folgt der Markierung zum Startbogen, nehmt jeden Sprung sauber und überquert die Linie erneut, ehe die Sanduhr leerläuft. Schafft Ihr das, gehört Euch der Sattel. Verlasst Ihr die Koppel, fangen wir von vorn an.",
+        "completion": "So, ja. In einer einzigen sauberen Bewegung hinauf und oben ruhig gesessen. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.",
+        "objectives": {
+          "0": {
+            "label": "Bezähmt den Valorross"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10376,6 +10474,9 @@ export const de_DE: EnTranslations = {
           },
           "9": {
             "label": "Gravewyrm-Heiligtum"
+          },
+          "10": {
+            "label": "Highwatch-Stallungen"
           }
         }
       },

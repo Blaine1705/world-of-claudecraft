@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "fe534c8b892d397623b8507a8a8905b959bea13ad5af631f18bda22439958c5a",
-  "catalogHash": "5868b2591d61f6a71a3eb56807d09269a0b83da0f9ca899663b2768af16da3b2",
+  "bundleId": "db670ee8a3b5aef71af110d84b49735dbf95091086d275d0b4018e189e25099d",
+  "catalogHash": "7ec6d29a523ad18262d342220b46f6848928af7d1d61f7542b698a31c1e334ee",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1397,6 +1397,90 @@
           "url": "/audio/sfx/mob_undead_hurt.mp3?v=cbf985f15b74",
           "bytes": 15089,
           "sha256": "cbf985f15b74fac21f267cae0c8a9c4b6f2c836cfafa211fa2a74c943267d3fb"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_aether_hover_cycle": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_aether_hover_cycle.mp3?v=355a7b665113",
+          "bytes": 17102,
+          "sha256": "355a7b6651139d8737500829ebd23ae3d0dba02fb2d3ccb8b3506864346b8c3c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_grag_bear": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_grag_bear.mp3?v=eba127f1f821",
+          "bytes": 18224,
+          "sha256": "eba127f1f8219e5d6a7512c4797735399e154e9f129bfc8c67a187941cb59fe7"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_shadowjump_toad": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_shadowjump_toad.mp3?v=4d7e8c7bbb5b",
+          "bytes": 13835,
+          "sha256": "4d7e8c7bbb5bb2a6b90f0908c2bb0b7883cf591278a7665f479d2e0f5c5ee91d"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_stalkglider_snail": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_stalkglider_snail.mp3?v=b1caf932cd8a",
+          "bytes": 15089,
+          "sha256": "b1caf932cd8aca0472fdfdcf5159e4ed5defb33536e1fd3c46cc59a6618e5092"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_stormfeather_griffin": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_stormfeather_griffin.mp3?v=9fb6a774e864",
+          "bytes": 13835,
+          "sha256": "9fb6a774e864979c3410e939f13943dea8bca2b61ba0c37aca490cf797ffa734"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_thunderstrut_gobbler": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_thunderstrut_gobbler.mp3?v=b01e419b8171",
+          "bytes": 11328,
+          "sha256": "b01e419b817154035271ee47bf23e051fda675a6ab9ef61ebefbfabbf3379e2c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_valorsteed": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_valorsteed.mp3?v=d4e79277b2cb",
+          "bytes": 10701,
+          "sha256": "d4e79277b2cb1da5d5941c6116136f2ca7104376e12d455c6306919a3e862002"
         }
       ],
       "gain": 1,

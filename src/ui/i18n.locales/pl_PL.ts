@@ -1052,6 +1052,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Pajęczy Kokon Jaj',
   'entities.mobs.sump_troll_devourer.name': 'Troll Pożeracz z Topieli',
   'entities.mobs.thunzharr_stormling.name': 'Zbudzony Burzowiec',
+  'entities.mobs.stable_horse.name': 'Koń stajenny',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Budzący się Szczyt',
   'entities.mobs.tolling_bell.name': 'Bijący Dzwon',
   'entities.mobs.vale_cup_ball.name': 'Dziczy Balon',
@@ -2765,6 +2766,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Trzymaj broń przy boku, {className}. Dolina nie jest już tym, czym była.',
   'entities.npcs.marshal_redbrook.name': 'Marszałek Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Zarządczyni stajni',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Każdy jeździec przychodzi na dwóch nogach, {className}. Wodzy nie dostaniesz, dopóki nie utrzymasz się na Valorsteedzie bez całowania błota, a Highwatch nie ma zbyt wielu uzdrowicieli na złamane kości.',
+  'entities.quests.q_riding_lessons.title': 'Lekcje jazdy konnej',
+  'entities.quests.q_riding_lessons.text':
+    'Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Zapłać opłatę, a gdy dam znak, przywołaj treningowego Valorsteeda i wsiądź do siodła. Potem przejedź parkur: podążaj za znacznikiem do łuku startowego, weź każdą przeszkodę czysto i ponownie przekrocz linię, zanim przesypie się piasek. Uda ci się i siodło jest twoje. Wyjedziesz poza zagrodę i zaczynamy od nowa.',
+  'entities.quests.q_riding_lessons.completion':
+    'No, właśnie tak. W siodle za jednym płynnym ruchem i pewnie usadzony. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Ujeżdżenie Valorsteeda',
   'entities.npcs.marshal_redbrook.title': 'Marszałek Miasta',
   'entities.npcs.provisioner_hale.greeting':
     'Suche buty, suchy chleb, suchy proch - w Fenbridge w dobry dzień dostaniesz dwa z trzech.',
@@ -3312,6 +3323,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Namioty Kultu Żmija',
   'entities.zones.thornpeak_heights.pois.8.label': 'Pola Upiorów',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanktuarium Grobowego Żmija',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Stajnie Highwatch',
   'entities.zones.thornpeak_heights.welcome':
     'Kapitan Thessaly utrzymuje mur w Wysokiej Strażnicy, ledwie.',
   'errors.api.accountBanned': 'To konto zostało zbanowane.',
@@ -5208,6 +5220,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Konsumpcyjne',
   'hudChrome.bags.filterGroupAria': 'Filtruj torby według kategorii',
   'hudChrome.bags.filterMaterial': 'Surowce',
+  'hudChrome.bags.filterMount': 'Wierzchowce',
   'hudChrome.bags.filterQuest': 'Zadania',
   'hudChrome.bags.filterWeapon': 'Bronie',
   'hudChrome.bags.noMatch': 'Żaden przedmiot nie pasuje do filtrów.',
@@ -7016,6 +7029,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Odłącz Steam',
   'entities.items.chunk_of_ore.name': 'Kawałek rudy',
+  'entities.items.reins_grag_bear.name': 'Wodze Goliata Grag-niedźwiedzia',
+  'entities.items.reins_valorsteed.name': 'Wodze Valorsteeda',
+  'entities.items.reins_stalkglider_snail.name': 'Wodze mchoskorupego szybownika',
+  'entities.items.reins_aether_hover_cycle.name': 'Kluczyk zapłonu: eterowy ścigacz kopijnika',
+  'entities.items.reins_shadowjump_toad.name': 'Wodze Kama-Kage, ropuchy cienioskoku',
+  'entities.items.reins_stormfeather_griffin.name': 'Wodze Burzopióra Podniebnego',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Wodze Gromostępa, Wielkiego Indora',
   'entities.quests.q_prof_intro.completion':
     'Widzisz? Ruda w torbie i odciski na dłoniach. Dalej zajmuj się górnictwem, wyrębem i zielarstwem podczas wędrówek, a gdy wrócisz do miasta, pamiętaj o tablicy Priorytetów miasta przy targu i pobliskim stole rzemieślniczym. Na tym wszystkim można uczciwie zarobić, jeśli zechcesz.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Kawałek rudy',

@@ -8,6 +8,7 @@ import type {
   DelveCompanionInfo,
   DelveRunInfo,
   LockpickView,
+  MountRaceView,
   PlayerProfessionsView,
 } from '../world_api';
 import * as bagsMod from './bags';
@@ -70,6 +71,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import { MAILBOXES } from './content/mailboxes';
+import { DEFAULT_MOUNT, type MountKey, normalizeSelectedMount } from './content/mounts';
 import type { GatheringProfessionId } from './content/professions';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
@@ -231,6 +233,24 @@ import {
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
+import {
+  cancelMountRace as cancelMountRaceImpl,
+  mountRaceViewFor as mountRaceViewForImpl,
+  startMountRace as startMountRaceImpl,
+  tickMountRace as tickMountRaceImpl,
+} from './mount_race';
+import {
+  ownedMounts as ownedMountsImpl,
+  selectMount as selectMountImpl,
+  toggleMount as toggleMountImpl,
+  updateMountTransition,
+} from './mounts';
+import {
+  abandonMountTraining as abandonMountTrainingImpl,
+  mountTrainAbort as mountTrainAbortImpl,
+  mountTrainBegin as mountTrainBeginImpl,
+  tickMountTraining as tickMountTrainingImpl,
+} from './mounts_training';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -494,6 +514,8 @@ import {
   type MasterLootThreshold,
   MELEE_RANGE,
   type MobFamily,
+  type MountRaceSession,
+  type MountTrainingSession,
   type MoveInput,
   type OverheadEmoteId,
   PARTY_XP_RANGE,
@@ -933,6 +955,26 @@ export interface PlayerMeta {
   pendingSkinRank: SkinRank | null;
   pendingSkinCatalog: SkinCatalog | null;
   pendingSkinItemId: string | null;
+  // Rideable ground mount pick (always a valid catalog key; the horse by
+  // default, since every player owns it). Persisted; the live "riding right
+  // now" state is Entity.mountKey, which starts '' on login and clears on
+  // death. Collection + rules live in src/sim/mounts.ts.
+  selectedMount: MountKey;
+  // The active riding-lesson attempt, or null. Session state, never persisted:
+  // src/sim/mounts_training.ts owns the rules; this is the same
+  // optional-plus-null shape as other transient session fields below (e.g.
+  // `away`), initialized to null in createPlayer.
+  mountTraining?: MountTrainingSession | null;
+  // The player's own active show-jumping race, or null. Session state, never
+  // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
+  // simultaneous racers never share or contend on anything.
+  mountRace?: MountRaceSession | null;
+  // One-time riding-lesson fee (100g), charged when the first lesson race starts
+  // (or through the legacy mount_train_begin command). Optional so absent === false (pre-feature saves and a
+  // fresh character stay byte-equal): never explicitly set to false, only ever
+  // flipped true, mirroring the selectedMount-omitted-while-default convention
+  // in serializeCharacter below.
+  mountTrainingFeePaid?: boolean;
   moveInput: MoveInput;
   // Monotonic counter bumped when a bulky, rarely-changing wire field (the
   // inventory, and the collection-quest progress derived from it) mutates, so a
@@ -1273,6 +1315,14 @@ export interface CharacterState {
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;
   pendingSkinItemId?: string | null;
+  // Rideable mount pick (JSONB; optional AND absent while on the default
+  // horse, so pre-mount saves stay byte-equal and load as the horse).
+  selectedMount?: string;
+  // One-time riding-lesson training fee (100g), charged when the first lesson
+  // race starts (or through legacy mount_train_begin). Optional and absent until
+  // paid, so pre-mount-training saves (and every save before the fee is ever
+  // charged) stay byte-equal.
+  mountTrainingFeePaid?: boolean;
   delveMarks?: number;
   delveClears?: Record<string, number>;
   companionUpgrades?: Record<string, number>;
@@ -1617,10 +1667,12 @@ export class Sim {
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
       for (let i = 0; i < camp.count; i++) {
-        if (template.dummy) {
-          // A practice dummy is a fixed, deterministic prop (no scatter, fixed level,
-          // never wanders): spawn it WITHOUT drawing any RNG so adding one never
-          // perturbs the world's seed-stable spawns and rolls.
+        if (template.dummy || template.ambient) {
+          // A practice dummy or an ambient decoration (the stable horses) is a
+          // fixed, deterministic prop (no scatter, fixed level): spawn it WITHOUT
+          // drawing any RNG so adding one never perturbs the world's seed-stable
+          // spawns and rolls. (The horses do wander, but off a PRIVATE Rng
+          // sub-stream in mob/ambient.ts, never the shared ctx.rng.)
           const safe = this.findSafePos(camp.center.x, camp.center.z, minHeight);
           const mob = createMob(
             this.nextId++,
@@ -2037,6 +2089,7 @@ export class Sim {
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
+      selectedMount: normalizeSelectedMount(savedState?.selectedMount),
       moveInput: emptyMoveInput(),
       wireRev: 0,
       inventory: [],
@@ -2095,6 +2148,8 @@ export class Sim {
       activeLoadout: -1,
       raidLockouts: new Map(),
       away: null,
+      mountTraining: null,
+      mountRace: null,
       marketFilter: '',
       craftSkills: emptyCraftSkills(),
       knownRecipes: new Set(),
@@ -2237,6 +2292,9 @@ export class Sim {
       if (s.knownRecipes) meta.knownRecipes = new Set(s.knownRecipes);
       meta.archetype = normalizeArchetypeState(s.archetype);
       meta.mailWelcomed = s.mailWelcomed === true;
+      // Never explicitly set false: absent stays absent so a pre-feature save
+      // (or one where the fee was never charged) round-trips byte-equal.
+      if (s.mountTrainingFeePaid === true) meta.mountTrainingFeePaid = true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -2410,6 +2468,9 @@ export class Sim {
     const leavingRun = this.delveRunForPlayer(pid);
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
+    // A leaving player's riding-lesson session is likewise abandoned (never
+    // silently left IN_PROGRESS); the one-time fee stays paid either way.
+    if (meta.mountTraining?.state === 'IN_PROGRESS') this.ctx.abandonMountTraining(meta);
     this.preparePlayerLeave(pid);
     despawnMobsForDev(this.ctx, pid, 'spawned');
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
@@ -2663,6 +2724,11 @@ export class Sim {
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
+      // Absent while on the default horse (back-compat: legacy no-pick saves
+      // and horse-pick saves load identically, as the horse).
+      ...(meta.selectedMount !== DEFAULT_MOUNT ? { selectedMount: meta.selectedMount } : {}),
+      // Absent until the fee is actually charged (back-compat + parity-stable saves).
+      ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       craftSkills: { ...meta.craftSkills },
       knownRecipes: [...meta.knownRecipes],
       archetype: { ...meta.archetype },
@@ -2712,6 +2778,87 @@ export class Sim {
 
   changeSkin(skin: number, catalog: SkinCatalog = 'class'): void {
     this.setPlayerSkin(this.primaryId, skin, catalog);
+  }
+
+  /** Per-pid mount selection + toggle (the server command path); the IWorld
+   *  members below ride primaryId. Rules live in src/sim/mounts.ts. */
+  selectMountFor(pid: number, key: string): boolean {
+    return selectMountImpl(this.ctx, pid, key);
+  }
+  toggleMountFor(pid: number): boolean {
+    return toggleMountImpl(this.ctx, pid);
+  }
+
+  /** The owned subset of the catalog for a player (the server wire path). */
+  ownedMountsFor(pid: number): MountKey[] {
+    const meta = this.players.get(pid);
+    return meta ? ownedMountsImpl(meta) : [DEFAULT_MOUNT];
+  }
+
+  // --- IWorldMounts ---
+  selectedMount(): MountKey {
+    return this.players.get(this.primaryId)?.selectedMount ?? DEFAULT_MOUNT;
+  }
+  ownedMounts(): readonly MountKey[] {
+    return this.ownedMountsFor(this.primaryId);
+  }
+  selectMount(key: MountKey): void {
+    this.selectMountFor(this.primaryId, key);
+  }
+  toggleMounted(): void {
+    this.toggleMountFor(this.primaryId);
+  }
+
+  /** Per-pid riding-lesson command surface (the server path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/mounts_training.ts.
+   *  mountTrainAbortFor stays server-reachable (the append-only wire token
+   *  mount_train_abort) even though no HUD surface sends it anymore. */
+  mountTrainBeginFor(pid: number): void {
+    mountTrainBeginImpl(this.ctx, pid);
+  }
+  mountTrainAbortFor(pid: number): void {
+    mountTrainAbortImpl(this.ctx, pid);
+  }
+
+  // --- IWorldMounts: the riding lesson ---
+  mountTrainBegin(): void {
+    this.mountTrainBeginFor(this.primaryId);
+  }
+
+  /** Per-pid show-jumping race start (the server wire path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/mount_race.ts. */
+  mountRaceStartFor(pid: number): void {
+    startMountRaceImpl(this.ctx, pid);
+  }
+
+  mountRaceCancelFor(pid: number): void {
+    cancelMountRaceImpl(this.ctx, pid);
+  }
+
+  /** Read-only projection of a player's own active show-jumping race
+   *  (src/sim/mount_race.ts); null when not racing. */
+  mountRaceViewFor(pid?: number): MountRaceView | null {
+    return mountRaceViewForImpl(this.ctx, pid);
+  }
+
+  /** Whether a player has a live riding lesson in progress. Retained for online
+   *  parity and legacy consumers; offline rides primaryId below. */
+  mountLessonActiveFor(pid: number): boolean {
+    return this.players.get(pid)?.mountTraining?.state === 'IN_PROGRESS';
+  }
+
+  // --- IWorldMounts: the show-jumping race (offline rides primaryId) ---
+  mountRaceStart(): void {
+    this.mountRaceStartFor(this.primaryId);
+  }
+  mountRaceCancel(): void {
+    this.mountRaceCancelFor(this.primaryId);
+  }
+  mountLessonActive(): boolean {
+    return this.mountLessonActiveFor(this.primaryId);
+  }
+  mountRaceView(): MountRaceView | null {
+    return this.mountRaceViewFor(this.primaryId);
   }
 
   /** Replace a player's whole weapon-skin loadout (host seed: the server pushes
@@ -3708,6 +3855,9 @@ export class Sim {
       maybeCompanionBark: (run, pid, barkId) => sim.maybeCompanionBark(run, pid, barkId),
       abandonLockpick: (run) => lockpickMod.abandonLockpick(sim.ctx, run),
       tickLockpickTimeout: (run) => lockpickMod.tickLockpickTimeout(sim.ctx, run),
+      tickMountTraining: (meta) => tickMountTrainingImpl(sim.ctx, meta),
+      tickMountRace: (meta) => tickMountRaceImpl(sim.ctx, meta),
+      abandonMountTraining: (meta) => abandonMountTrainingImpl(sim.ctx, meta),
       delveRunForMob: (mobId) => sim.delveRunForMob(mobId),
       onDelveBossDefeated: (run) => sim.onDelveBossDefeated(run),
       delveDetectMult: (player) => sim.delveDetectMult(player),
@@ -4060,6 +4210,11 @@ export class Sim {
           // Proficiency just became visible; the gathering predicates re-check.
           deedsMod.markDeedsDirty(this.ctx, p.id);
         }
+        // Mount summon/dismount transition: decrement the timer, cancel a summon
+        // on combat/swim, complete a mount/dismount, and force-dismount a mounted
+        // swimmer. Live players only (a dead player is already force-dismounted by
+        // handleDeath). Draws no rng, so the tick-phase draw order is unchanged.
+        updateMountTransition(this.ctx, p, this.isSwimming(p));
         lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not
@@ -4071,6 +4226,14 @@ export class Sim {
         this.updateRiftTriggers(p);
         lap?.('p.move');
       }
+      // Riding-lesson driver: server-authoritative; tracks the training-steed
+      // phase and ends a dead/ghost player's IN_PROGRESS lesson, so death never
+      // strands the session. Finishing the race credits success. Draws no rng,
+      // so the tick-phase draw order is unchanged.
+      this.ctx.tickMountTraining(meta);
+      // Show-jumping race driver: per-player, server-authoritative, rng-free
+      // (runs after movement so prevPos -> pos is this tick's ridden segment).
+      this.ctx.tickMountRace(meta);
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);
@@ -4528,6 +4691,9 @@ export class Sim {
     ) {
       meta.lastActiveTick = this.tickCount;
     }
+    // The race countdown is a real start lock, not just a client animation.
+    // Hold every forced/manual locomotion mode until the authoritative GO tick.
+    if (meta.mountRace?.phase === 'countdown') return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
     if (this.updateFearMovement(p)) return;

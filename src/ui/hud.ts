@@ -33,6 +33,7 @@ import {
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
+import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { MECH_CHROMAS } from '../sim/content/skins';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import type { ZoneDef } from '../sim/data';
@@ -91,6 +92,7 @@ import {
   MILESTONES,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
+  TICK_RATE,
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
@@ -349,6 +351,9 @@ import {
   nextMinimapZoom,
 } from './minimap_zoom';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
+import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_picker';
+import { MountRaceControls } from './mount_race_controls';
+import { MountRaceStrip } from './mount_race_strip';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -742,6 +747,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
   bag: 'itemUi.kind.bag',
+  mount: 'itemUi.kind.mount',
 };
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
   armor: 'itemUi.stats.armor',
@@ -1018,6 +1024,7 @@ export class Hud {
   private errorTimer: number | undefined;
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
+  private mountRaceInstructionTimer: number | undefined;
   private bannerSource: 'unstuck' | null = null;
   private pfLevelEl = $('#pf-level');
   private pfHpEl = $('#pf-hp');
@@ -1174,6 +1181,23 @@ export class Hud {
   private readonly lootRolls: LootRollController;
   private openVendorNpcId: number | null = null;
   private openHeroicVendorNpcId: number | null = null;
+  // The show-jumping race: a slim, non-interactive bottom strip painted from the
+  // authoritative world.mountRaceView() (never a cached copy). hud.ts keeps only
+  // the event routing, the start/finish banners, and show/hide.
+  private readonly mountRaceStrip = new MountRaceStrip({
+    getState: () => this.sim.mountRaceView(),
+  });
+  // The Start/Cancel Race button above the player frame + 3..2..1..GO countdown.
+  // Start appears on the shared glowing square; active-quest riders may start
+  // dismounted because the authoritative command lends the training horse.
+  private readonly mountRaceControls = new MountRaceControls({
+    getState: () => this.sim.mountRaceView(),
+    canStart: () =>
+      isOnMountRaceStartPlatform(this.sim.player.pos) &&
+      (this.sim.questState('q_riding_lessons') === 'active' || !!this.sim.player.mountKey),
+    startRace: () => this.sim.mountRaceStart(),
+    cancelRace: () => this.sim.mountRaceCancel(),
+  });
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
   private readonly lockpickController: LockpickController;
@@ -3391,6 +3415,7 @@ export class Hud {
     stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
     stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
+    openMountPicker: (mountKey) => this.openCharacterWithMount(mountKey),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {
       this.pendingPetFeed = active;
@@ -4385,6 +4410,23 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
+    // Collectible mount reins: the mount's flavor + specialty numbers + its
+    // ride-level gate (red below the gate, like gear's requires-level line).
+    if (item.kind === 'mount') {
+      const mountDef = MOUNTS[item.mount];
+      if (mountDef) {
+        const descKey = MOUNT_DESC_KEYS[mountDef.key];
+        if (descKey) html += `<div class="tt-desc">${esc(t(descKey))}</div>`;
+        for (const line of mountSpecLines({
+          speedPct: Math.round(mountDef.moveSpeedPct * 100),
+          blockPct: Math.round(mountDef.meleeBlockPct * 100),
+          critPct: Math.round(mountDef.critPct * 100),
+        }))
+          html += `<div class="tt-green">${esc(line)}</div>`;
+        const meets = this.sim.player.level >= mountDef.level;
+        html += `<div class="${meets ? 'tt-sub' : 'tt-red'}">${esc(t('hudChrome.mounts.requiresLevel', { level: mountDef.level }))}</div>`;
+      }
+    }
     const requiredClasses = requiredClassesForTooltip(item);
     if (requiredClasses) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
@@ -6418,6 +6460,8 @@ export class Hud {
 
     this.questDialog.updateVoice();
     this.meters.update();
+    this.mountRaceStrip.repaintIfChanged();
+    this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.lootRolls.update(now);
@@ -7118,6 +7162,80 @@ export class Hud {
 
   private closeLockpick(restoreFocus = true): void {
     this.lockpickController.close(restoreFocus);
+  }
+
+  // ---------------------------------------------------------------------------
+  // "Riding Lessons": the glowing square's Start Race action opens the lesson,
+  // lends the training Valorsteed, and arms the countdown in one deliberate step.
+  // The mountTrainSession/End events retain the quest guidance and completion UI.
+  // ---------------------------------------------------------------------------
+
+  private mountKey(): string {
+    // The live Mount/Dismount binding label (a physical keycap, shown verbatim).
+    // A player may deliberately clear both slots, so never invent a default that
+    // could trigger a different action (Z sheathes the weapon on this release).
+    return this.keybinds.primaryLabel('mount') || t('hud.options.unbound');
+  }
+
+  // A mountTrainSession event announces a fresh attempt or a phase change: at
+  // 'mount' toast the Mount/Dismount hint; at 'ride' (climbed aboard) point the
+  // rider at the start line.
+  private onMountTrainSession(phase: 'mount' | 'ride'): void {
+    if (phase === 'ride') {
+      this.showBanner(t('hudChrome.mountTraining.ridePrompt'));
+    } else {
+      this.showBanner(t('hudChrome.mountTraining.mountPrompt', { key: this.mountKey() }));
+    }
+  }
+
+  private endMountTraining(outcome: 'success' | 'abandoned'): void {
+    // Abandoning is the player's own doing (the sim posts its own notice where one
+    // helps), so it gets no banner; success gets a banner + log line.
+    if (outcome === 'success') {
+      const summary = t('hudChrome.mountTraining.success');
+      this.showBanner(summary, t('hudChrome.mountTraining.returnToMarla'), 6000);
+      this.log(summary, '#7fdc4f');
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Show-jumping race: the always-open paddock course (src/sim/mount_race.ts).
+  // The bottom control sends the explicit start/cancel commands; mountRace*
+  // events show the bottom strip + a go banner, repaint cleared jumps, and
+  // announce the outcome. Player text renders through hudChrome.mountRace.*.
+  // ---------------------------------------------------------------------------
+
+  private openMountRace(): void {
+    $('#mount-race-strip').style.display = 'flex';
+    this.mountRaceStrip.show();
+    // The large GO flash occupies the center first. Wait until it clears before
+    // showing the course instruction in the upper banner slot.
+    clearTimeout(this.mountRaceInstructionTimer);
+    this.mountRaceInstructionTimer = window.setTimeout(() => {
+      if (this.sim.mountRaceView()?.phase === 'racing') {
+        this.showBanner(t('hudChrome.mountRace.start'));
+      }
+    }, 900);
+  }
+
+  private endMountRace(outcome: 'finished' | 'timeout' | 'abandoned', timeTicks: number): void {
+    clearTimeout(this.mountRaceInstructionTimer);
+    // Abandoning is the player's own dismount/exit, so it gets no banner; a
+    // finish or a timeout gets a banner + log line.
+    if (outcome === 'finished') {
+      const seconds = formatNumber(timeTicks / TICK_RATE, { maximumFractionDigits: 1 });
+      const summary = t('hudChrome.mountRace.finished', { seconds });
+      this.showBanner(summary);
+      this.log(summary, '#7fdc4f');
+    } else if (outcome === 'timeout') {
+      const summary = t('hudChrome.mountRace.timeout');
+      this.showBanner(summary);
+      this.log(summary, '#ff7a6a');
+      audio.error();
+    }
+    $('#mount-race-strip').style.display = 'none';
+    this.mountRaceStrip.hide();
+    this.mountRaceControls.hide();
   }
 
   // Drowned Reliquary Rite: the difficulty popup opens when a player interacts
@@ -8514,6 +8632,13 @@ export class Hud {
         }
         case 'questDone':
           sfx.playUi('quest_complete', { gain: 1.8 });
+          if (ev.questId === 'q_riding_lessons') {
+            this.showBanner(
+              t('hudChrome.mountTraining.ownedMountPrompt', { key: this.mountKey() }),
+              undefined,
+              6000,
+            );
+          }
           this.questDialog.refresh();
           break;
         case 'chat': {
@@ -9177,6 +9302,28 @@ export class Hud {
           sfx.playUi('lockpick_bonus');
           break;
         }
+        case 'mountTrainSession':
+          this.onMountTrainSession(ev.phase);
+          break;
+        case 'mountTrainEnd':
+          this.endMountTraining(ev.outcome);
+          break;
+        case 'mountRaceCountdown':
+          // The 3..2..1 countdown paints from the per-frame view; nudge it now so
+          // it appears the instant the race arms. Clear any lingering lesson
+          // instruction immediately so the two center-screen messages cannot overlap.
+          this.hideBannerImmediately();
+          this.mountRaceControls.update();
+          break;
+        case 'mountRaceStart':
+          this.openMountRace();
+          break;
+        case 'mountRaceJump':
+          this.mountRaceStrip.repaintIfChanged();
+          break;
+        case 'mountRaceEnd':
+          this.endMountRace(ev.outcome, ev.timeTicks);
+          break;
         case 'delveRiteChoosePrompt':
           this.openRitePanel();
           break;
@@ -9294,7 +9441,12 @@ export class Hud {
           }
           if (feedback.banner) {
             const bannerText = t(feedback.bannerKey ?? feedback.key, feedback.values);
-            this.showBanner(bannerText, feedback.kind === 'progress' ? 'unstuck' : null);
+            this.showBanner(
+              bannerText,
+              undefined,
+              2600,
+              feedback.kind === 'progress' ? 'unstuck' : null,
+            );
           }
           if (feedback.log) this.log(text, feedback.kind === 'success' ? '#7fdc4f' : '#ffd100');
           break;
@@ -10034,19 +10186,46 @@ export class Hud {
     clearTimeout(this.bannerTimer);
     this.bannerTimer = undefined;
     this.bannerSource = null;
-    this.bannerEl.textContent = '';
+    this.bannerEl.replaceChildren();
+    this.bannerEl.classList.remove('has-subtext');
     this.bannerEl.style.opacity = '0';
   }
 
-  showBanner(text: string, source: 'unstuck' | null = null): void {
-    this.bannerEl.textContent = text;
+  showBanner(
+    text: string,
+    subtext?: string,
+    durationMs = 2600,
+    source: 'unstuck' | null = null,
+  ): void {
+    this.bannerEl.style.removeProperty('display');
+    this.bannerEl.replaceChildren();
+    this.bannerEl.classList.toggle('has-subtext', !!subtext);
+    if (subtext) {
+      const title = document.createElement('span');
+      title.className = 'banner-title';
+      title.textContent = text;
+      const detail = document.createElement('span');
+      detail.className = 'banner-subtext';
+      detail.textContent = subtext;
+      this.bannerEl.append(title, detail);
+    } else {
+      this.bannerEl.textContent = text;
+    }
     this.bannerEl.style.opacity = '1';
     this.bannerSource = source;
     clearTimeout(this.bannerTimer);
     this.bannerTimer = window.setTimeout(() => {
       this.bannerEl.style.opacity = '0';
       this.bannerSource = null;
-    }, 2600);
+    }, durationMs);
+  }
+
+  private hideBannerImmediately(): void {
+    clearTimeout(this.bannerTimer);
+    this.bannerTimer = undefined;
+    this.bannerSource = null;
+    this.bannerEl.style.opacity = '0';
+    this.bannerEl.style.display = 'none';
   }
 
   showSubzone(text: string): void {
@@ -10609,6 +10788,12 @@ export class Hud {
       vendorOpen: this.vendorOpen,
     });
     document.body.classList.toggle('char-bags-paired', paired);
+  }
+
+  /** Open the character sheet with one mount picker card highlighted (the bag
+   *  click on a collected reins item routes here). */
+  openCharacterWithMount(key: string): void {
+    this.charWindow.openHighlightingMount(key);
   }
 
   private renderCharPreview(): void {

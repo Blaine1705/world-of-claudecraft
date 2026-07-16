@@ -1,3 +1,4 @@
+import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import {
   CAMPS,
   COLUMN_ZONES,
@@ -2388,6 +2389,20 @@ export function sowfieldFlattenWeight(x: number, z: number): number {
   return 1 - smoothstep(0, 1, d / f.falloff);
 }
 
+// The Highwatch stables paddock plateau (STABLE_FLAT): the worked yard leveled
+// to one height so the show-jumping course sits on fair, flat ground. The
+// smooth apron keeps movement, collision, props, and terrain rendering on the
+// same continuous heightfield.
+export function stableFlattenWeight(x: number, z: number): number {
+  const f = STABLE_FLAT;
+  const dx = Math.max(0, f.x1 - x, x - f.x2);
+  const dz = Math.max(0, f.z1 - z, z - f.z2);
+  if (dx === 0 && dz === 0) return 1;
+  const d = Math.sqrt(dx * dx + dz * dz);
+  if (d >= f.falloff) return 0;
+  return 1 - smoothstep(0, 1, d / f.falloff);
+}
+
 // The renderer seats each dock section relative to its shore anchor, then uses
 // the plank top as a raised walkable surface. Return the matching absolute
 // surface height, or -Infinity outside every deck footprint.
@@ -2844,6 +2859,10 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyLakeShoreGrading(x, z, h);
   const sow = sowfieldFlattenWeight(x, z);
   if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
+  // The Highwatch paddock is another authored level pull. It sits deep inside
+  // Thornpeak, so it does not compete with a realm border or coast.
+  const stable = stableFlattenWeight(x, z);
+  if (stable > 0) h = lerp(h, STABLE_FLAT.height, stable);
   // The custom-map sculpt edits are the LAST word over the finished overworld
   // height (the editor's height stamps; a no-op for the built-in world, which has
   // no terrainEdits). Kept in terrainHeight so the render mesh (which samples
@@ -3320,6 +3339,17 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   // The Sowfield stadium footprint grows no trees or rocks (hash-based
   // placement, so skipping here shifts no other decoration or rng draw).
   if (isInSowfieldShell(x, z)) return null;
+  // The Highwatch paddock is a worked yard and race course. Keep the same
+  // deterministic decoration field out of its apron so no tree becomes an
+  // invisible obstacle across a jump line.
+  if (
+    x > STABLE_PADDOCK.x1 - 1 &&
+    x < STABLE_PADDOCK.x2 + 1 &&
+    z > STABLE_PADDOCK.z1 - 1 &&
+    z < STABLE_PADDOCK.z2 + 1
+  ) {
+    return null;
+  }
   for (const zone of ZONES) {
     const dx = x - zone.hub.x,
       dz = z - zone.hub.z;

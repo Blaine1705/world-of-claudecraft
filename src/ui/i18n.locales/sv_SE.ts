@@ -1043,6 +1043,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Spindeläggsäck',
   'entities.mobs.sump_troll_devourer.name': 'Slukande sumptroll',
   'entities.mobs.thunzharr_stormling.name': 'Väckt stormyngel',
+  'entities.mobs.stable_horse.name': 'Stallhäst',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, den vaknande toppen',
   'entities.mobs.tolling_bell.name': 'Klämtande klocka',
   'entities.mobs.vale_cup_ball.name': 'Vildsvinsboll',
@@ -2749,6 +2750,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Håll ditt svärd nära, {className}. Dalen är inte vad den en gång var.',
   'entities.npcs.marshal_redbrook.name': 'Marskalk Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Stallmästare',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Varje ryttare kommer in på två ben, {className}. Tyglarna får du inte förrän du kan sitta kvar på Valorsteed utan att kyssa leran, och Highwatch har inga läkare att avvara för brutna ben.',
+  'entities.quests.q_riding_lessons.title': 'Ridlektioner',
+  'entities.quests.q_riding_lessons.text':
+    'Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Betala avgiften, och när jag ger tecken kallar du till dig övnings-Valorsteeden och kliver upp i sadeln. Rid sedan banan: följ markören till startbågen, ta varje hinder rent och korsa linjen igen innan sanden runnit ut. Klarar du det är sadeln din. Vandrar du ut ur hagen börjar vi om.',
+  'entities.quests.q_riding_lessons.completion':
+    'Så där ja. Upp i en enda mjuk rörelse och stadigt sittande där uppe. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Tämj Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Stadsmarskalk',
   'entities.npcs.provisioner_hale.greeting':
     'Torra stövlar, torrt bröd, torrt krut - vid Kärrbron får du två av tre en bra dag.',
@@ -3295,6 +3306,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Lindormskultens tält',
   'entities.zones.thornpeak_heights.pois.8.label': 'Gengångarfälten',
   'entities.zones.thornpeak_heights.pois.9.label': 'Gravlindormens helgedom',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Highwatchs stall',
   'entities.zones.thornpeak_heights.welcome':
     'Kapten Thessaly håller muren vid Högvakten - knappt.',
   'errors.api.accountBanned': 'Detta konto har bannlysts.',
@@ -5184,6 +5196,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Förbrukningsvaror',
   'hudChrome.bags.filterGroupAria': 'Filtrera väskor efter kategori',
   'hudChrome.bags.filterMaterial': 'Material',
+  'hudChrome.bags.filterMount': 'Riddjur',
   'hudChrome.bags.filterQuest': 'Uppdrag',
   'hudChrome.bags.filterWeapon': 'Vapen',
   'hudChrome.bags.noMatch': 'Inga föremål matchar dina filter.',
@@ -6975,6 +6988,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Koppla bort Steam',
   'entities.items.chunk_of_ore.name': 'Malmklump',
+  'entities.items.reins_grag_bear.name': 'Tyglar till Goliat Grag-björnen',
+  'entities.items.reins_valorsteed.name': 'Tyglar till Valorsteed',
+  'entities.items.reins_stalkglider_snail.name': 'Tyglar till mosskal-stjälkglidaren',
+  'entities.items.reins_aether_hover_cycle.name': 'Tändningsnyckel: eterriddarens svävarcykel',
+  'entities.items.reins_shadowjump_toad.name': 'Tyglar till Kama-Kage, skuggsprångspaddan',
+  'entities.items.reins_stormfeather_griffin.name': 'Tyglar till den himlanående Stormfjädern',
+  'entities.items.reins_thunderstrut_gobbler.name':
+    'Tyglar till Åskstoltseraren, den stora kalkonen',
   'entities.quests.q_prof_intro.completion':
     'Ser du? Malm i packningen och valkar på händerna. Fortsätt med gruvdrift, skogsavverkning och örtplockning medan du färdas längs vägarna. När du är tillbaka i staden, kom ihåg Stadsfokus-tavlan vid marknaden och arbetsbänken i närheten. Det går att försörja sig hederligt på alltihop, om du vill.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmklump',

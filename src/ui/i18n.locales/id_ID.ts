@@ -1102,6 +1102,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Kantung Telur Laba-laba',
   'entities.mobs.sump_troll_devourer.name': 'Troll Kubangan Pelahap',
   'entities.mobs.thunzharr_stormling.name': 'Anak Badai Terjaga',
+  'entities.mobs.stable_horse.name': 'Kuda Kandang',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Puncak yang Terjaga',
   'entities.mobs.tolling_bell.name': 'Lonceng Berdentang',
   'entities.mobs.vale_cup_ball.name': 'Bola Babi Hutan',
@@ -2686,6 +2687,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmshadow_treads.name': 'Sepatu Nightfang',
   'entities.items.ysols_pearl_greaves.name': 'Pelindung Betis Mutiara Ysolei',
   'entities.items.zealotsbane_blade.name': 'Bilah Petaka Zelot',
+  'entities.items.reins_grag_bear.name': 'Tali Kekang Beruang Grag Goliat',
+  'entities.items.reins_valorsteed.name': 'Tali Kekang Valorsteed',
+  'entities.items.reins_stalkglider_snail.name': 'Tali Kekang Siput Peluncur Cangkang Lumut',
+  'entities.items.reins_aether_hover_cycle.name': 'Kunci Kontak: Sepeda Layang Penunggang Eter',
+  'entities.items.reins_shadowjump_toad.name': 'Tali Kekang Kama-Kage si Kodok Lompat Bayangan',
+  'entities.items.reins_stormfeather_griffin.name': 'Tali Kekang Bulu Badai Penggapai Langit',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Tali Kekang Kalkun Agung Penderap Guntur',
   'entities.items.duskwisp_essence.name': 'Sari api senja',
   'entities.items.spore_heart.name': 'Jantung spora',
   'entities.items.gleaming_antler.name': 'Tanduk berkilau',
@@ -2856,6 +2864,16 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Jaga pedangmu tetap dekat, {className}. Lembah ini sudah tak seperti dulu.',
   'entities.npcs.marshal_redbrook.name': 'Marsekal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Kepala Kandang',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Setiap penunggang datang dengan dua kaki, {className}. Kendali baru kuberikan setelah kau sanggup menunggangi Valorsteed tanpa jatuh tersungkur, dan Highwatch tak punya tabib lebih untuk tulang yang patah.',
+  'entities.quests.q_riding_lessons.title': 'Pelajaran Menunggang Kuda',
+  'entities.quests.q_riding_lessons.text':
+    'Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Bayar biayanya, dan saat kuberi aba-aba, panggil Valorsteed latihan itu dan naiklah ke pelana. Lalu tempuh lintasannya: ikuti penanda ke gerbang start, lewati tiap rintangan dengan bersih, dan lintasi garis lagi sebelum pasir habis. Berhasil, dan pelana itu milikmu. Kalau kau keluar dari padok, kita mulai lagi dari awal.',
+  'entities.quests.q_riding_lessons.completion':
+    'Nah, begitu. Naik dengan satu gerakan mulus dan duduk mantap di atas. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Jinakkan Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Marsekal Kota',
   'entities.npcs.provisioner_hale.greeting':
     'Sepatu kering, roti kering, bubuk mesiu kering - di Fenbridge kau dapat dua dari tiga di hari yang baik.',
@@ -3406,6 +3424,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Tenda Wyrmcult',
   'entities.zones.thornpeak_heights.pois.8.label': 'Padang Arwah Gentayangan',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanktum Gravewyrm',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Kandang Kuda Highwatch',
   'entities.zones.thornpeak_heights.welcome':
     'Kapten Thessaly mempertahankan tembok di Menara Pengawas, nyaris saja.',
   'errors.api.accountBanned': 'Akun ini telah diblokir.',
@@ -5312,6 +5331,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Konsumsi',
   'hudChrome.bags.filterGroupAria': 'Saring tas menurut kategori',
   'hudChrome.bags.filterMaterial': 'Bahan',
+  'hudChrome.bags.filterMount': 'Tunggangan',
   'hudChrome.bags.filterQuest': 'Misi',
   'hudChrome.bags.filterWeapon': 'Senjata',
   'hudChrome.bags.noMatch': 'Tidak ada barang yang cocok dengan saringanmu.',

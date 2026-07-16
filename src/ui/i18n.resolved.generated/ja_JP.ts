@@ -754,6 +754,7 @@ export const ja_JP: EnTranslations = {
       "leaderboard": "ランキング",
       "dailyRewards": "ストア",
       "deeds": "功績",
+      "mounts": "マウント",
       "nameplates": "ネームプレート",
       "haptics": "振動",
       "hapticsOff": "振動オフ",
@@ -868,7 +869,63 @@ export const ja_JP: EnTranslations = {
       "petStop": "ペット：停止",
       "petTaunt": "ペット：挑発",
       "petDefensive": "ペット：防御",
-      "petAggressive": "ペット：攻撃的"
+      "petAggressive": "ペット：攻撃的",
+      "mount": "騎乗 / 降車"
+    },
+    "mounts": {
+      "title": "マウント",
+      "close": "閉じる",
+      "select": "選択",
+      "selected": "選択中",
+      "riding": "騎乗中",
+      "mount": "騎乗",
+      "dismount": "降りる",
+      "requiresLevel": "レベル{level}が必要",
+      "pickFirst": "騎乗するマウントを選んでください。",
+      "keybindHint": "騎乗 / 降車キーで騎乗します。",
+      "emptyTitle": "マウントは未入手",
+      "emptyStableHint": "レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。",
+      "emptyDropHint": "より希少なマウントはダンジョンやレイドのボスがドロップします。",
+      "clickManage": "クリックしてマウントを選択",
+      "rarity_common": "コモン",
+      "rarity_rare": "レア",
+      "rarity_epic": "エピック",
+      "spec_speed": "+{pct}% 移動力上昇",
+      "spec_block": "+{pct}% 近接ダメージブロック",
+      "spec_crit": "+{pct}% クリティカル率",
+      "name_valorsteed": "ヴァロースティード",
+      "name_grag_bear": "ゴリアテ・グラグベア",
+      "name_stalkglider_snail": "モスシェル・ストークグライダー",
+      "name_aether_hover_cycle": "エーテルジャウスター・ホバーサイクル",
+      "name_shadowjump_toad": "影跳びのカマカゲ",
+      "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
+      "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
+      "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
+      "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
+      "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
+      "desc_aether_hover_cycle": "低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。",
+      "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
+      "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
+      "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。"
+    },
+    "mountTraining": {
+      "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
+      "ownedMountPrompt": "{key} キーを押して騎乗する",
+      "ridePrompt": "光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。",
+      "begin": "レッスン開始",
+      "success": "ヴァロースティードを乗りこなした。",
+      "returnToMarla": "厩舎のマーラのもとへ戻り、厩舎の馬を引き取ろう。"
+    },
+    "mountRace": {
+      "startButton": "レース開始",
+      "cancelButton": "レースをキャンセル",
+      "go": "GO!",
+      "start": "スタート！すべての障害を跳び越え、アーチへ戻って駆け抜けろ。",
+      "toFinish": "アーチへ戻って駆け抜けろ！",
+      "finished": "{seconds}秒でゴール！",
+      "timeout": "レース失敗",
+      "progress": "障害 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -1490,6 +1547,7 @@ export const ja_JP: EnTranslations = {
       "filterConsumable": "消耗品",
       "filterMaterial": "素材",
       "filterQuest": "クエスト",
+      "filterMount": "マウント",
       "sortAria": "バッグのアイテムを並べ替える",
       "sortRecent": "最近",
       "sortQuality": "品質",
@@ -5884,7 +5942,8 @@ export const ja_JP: EnTranslations = {
       "tool": "道具",
       "potion": "ポーション",
       "elixir": "エリクサー",
-      "bag": "バッグ"
+      "bag": "バッグ",
+      "mount": "マウント"
     },
     "stats": {
       "armor": "防御力",
@@ -8410,6 +8469,27 @@ export const ja_JP: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "嵐呼びの腰当て"
+      },
+      "reins_valorsteed": {
+        "name": "ヴァロースティードの手綱"
+      },
+      "reins_grag_bear": {
+        "name": "ゴリアテ・グラグベアの手綱"
+      },
+      "reins_stalkglider_snail": {
+        "name": "モスシェル・ストークグライダーの手綱"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "起動キー：エーテルジャウスター・ホバーサイクル"
+      },
+      "reins_shadowjump_toad": {
+        "name": "影跳びのカマカゲの手綱"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "スカイリーチ・ストームフェザーの手綱"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "大七面鳥サンダーストラットの手綱"
       }
     },
     "mobs": {
@@ -8658,6 +8738,9 @@ export const ja_JP: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
+      },
+      "stable_horse": {
+        "name": "厩舎の馬"
       },
       "rift_spawnling": {
         "name": "リフトの落とし子"
@@ -9060,6 +9143,11 @@ export const ja_JP: EnTranslations = {
         "name": "監督官オデル",
         "title": "鉱山監督",
         "greeting": "坑道全体が泥まみれの害虫どもでうごめいています！"
+      },
+      "stablemaster_marla": {
+        "name": "マーラ・ヒッチェン",
+        "title": "厩舎長",
+        "greeting": "騎手はみな二本足で歩いてくる、{className}よ。ヴァロースティードにまたがって泥にまみれずにいられるようになるまで、手綱は渡さない。ハイウォッチには骨折を治せる者もそう余っていないのでね。"
       },
       "warden_fenwick": {
         "name": "番人フェンウィック",
@@ -10060,6 +10148,16 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "乗馬の稽古",
+        "text": "騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。謝礼を払い、わたしが合図したら、調教用のヴァロースティードを呼び寄せて騎乗しろ。それからコースを走れ。目印をたどってスタートアーチへ向かい、どの障害もきれいに跳び越え、砂が落ちきる前にもう一度ラインを越えるのだ。やり遂げれば、その鞍はお前のものだ。パドックの外へさまよい出れば、また最初からやり直しだ。",
+        "completion": "よし、それでいい。ひと息にまたがり、上でも堂々と座っていたな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。",
+        "objectives": {
+          "0": {
+            "label": "ヴァロースティードを乗りこなす"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "薄れゆく帳",
         "text": "洞窟がそなたに開いたか。ならば封印は思ったより弱っている、{playerName}。帳が裂ける場所で、ウィスプは冷たく暗く変わる。ダスクウィスプの精髄を八つ持ってきておくれ。傷の深さを読み取ろう。",
@@ -10376,6 +10474,9 @@ export const ja_JP: EnTranslations = {
           },
           "9": {
             "label": "墓ワームの聖所"
+          },
+          "10": {
+            "label": "ハイウォッチの厩舎"
           }
         }
       },

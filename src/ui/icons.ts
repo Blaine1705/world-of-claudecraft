@@ -2536,6 +2536,8 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['sparkle'],
   ),
+  // Collectible mount reins ship rendered 3D face icons (WebP) via ITEM_IMAGE_IDS +
+  // scripts/render_mount_icons.mjs, so they need no procedural recipe here.
   worn_sword: r('steel', 'steel', ['sword']),
   gnarled_staff: r('wood', 'earthBrown', [{ p: 'staff', pal: 'earthBrown' }]),
   rusty_dagger: r('steel', 'earthBrown', [{ p: 'dagger', pal: 'earthBrown' }]),
@@ -3675,6 +3677,16 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'ogre_war_totem',
   'sanctum_key_shard',
   'unknown_alien_weaponry',
+  // mount (rideable) reins: 3D face/front icons rendered from the mount GLBs via
+  // scripts/render_mount_icons.mjs (a headless-Chrome front three-quarter head close-up),
+  // committed as transparent WebP. These win over the procedural recipe in iconDataUrl.
+  'reins_valorsteed',
+  'reins_grag_bear',
+  'reins_stalkglider_snail',
+  'reins_aether_hover_cycle',
+  'reins_shadowjump_toad',
+  'reins_stormfeather_griffin',
+  'reins_thunderstrut_gobbler',
 ]);
 
 // UI-only icon ids that ship painted art under /ui/items/<id>.webp but are NOT ITEMS

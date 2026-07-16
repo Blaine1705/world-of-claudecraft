@@ -1092,6 +1092,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Örümcek Yumurta Kesesi',
   'entities.mobs.sump_troll_devourer.name': 'Obur Batak Trolü',
   'entities.mobs.thunzharr_stormling.name': 'Uyanmış Fırtına Dölü',
+  'entities.mobs.stable_horse.name': 'Ahır Atı',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Uyanan Zirve',
   'entities.mobs.tolling_bell.name': 'Çalan Çan',
   'entities.mobs.vale_cup_ball.name': 'Yaban Domuzu Topu',
@@ -2649,6 +2650,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmshadow_treads.name': 'Nightfang Postalları',
   'entities.items.ysols_pearl_greaves.name': "Ysolei'nin İnci Dizlikleri",
   'entities.items.zealotsbane_blade.name': 'Bağnazbelası Kılıcı',
+  'entities.items.reins_grag_bear.name': 'Golyat Grag-Ayısının Dizginleri',
+  'entities.items.reins_valorsteed.name': 'Valorsteed Dizginleri',
+  'entities.items.reins_stalkglider_snail.name': 'Yosun Kabuklu Sap Süzülgeninin Dizginleri',
+  'entities.items.reins_aether_hover_cycle.name':
+    'Kontak Anahtarı: Eter Şövalyesinin Uçan Motosikleti',
+  'entities.items.reins_shadowjump_toad.name': 'Gölge Sıçrayışlı Kurbağa Kama-Kage’nin Dizginleri',
+  'entities.items.reins_stormfeather_griffin.name': 'Göğe Uzanan Fırtına Tüyünün Dizginleri',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Yıldırım Adımlı Büyük Hindinin Dizginleri',
   'entities.items.duskwisp_essence.name': 'Alacakaranlık ruh ışığı özü',
   'entities.items.spore_heart.name': 'Spor kalbi',
   'entities.items.gleaming_antler.name': 'Işıldayan boynuz',
@@ -2818,6 +2827,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Kılıcını yakın tut, {className}. Vadi eskisi gibi değil.',
   'entities.npcs.marshal_redbrook.name': 'Mareşal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Ahır Ustası',
+  'entities.npcs.stablemaster_marla.greeting':
+    "Her binici buraya iki ayağıyla gelir, {className}. Çamura yüz üstü düşmeden Valorsteed'e oturana dek dizginleri sana vermem, çünkü Highwatch'ta kırık kemiklere bakacak fazladan şifacı yok.",
+  'entities.quests.q_riding_lessons.title': 'Binicilik Dersleri',
+  'entities.quests.q_riding_lessons.text':
+    "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Ücreti öde, işaret verdiğimde eğitim Valorsteed'ini yanına çağır ve eyere çık. Sonra parkuru koş: işareti izleyip başlangıç kemerine git, her engeli temiz al ve kum bitmeden çizgiyi yeniden geç. Bunu başarırsan eyer senindir. Padoktan uzaklaşırsan baştan başlarız.",
+  'entities.quests.q_riding_lessons.completion':
+    'İşte böyle. Tek hamlede eyere çıktın ve yukarıda dimdik oturdun. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.',
+  'entities.quests.q_riding_lessons.objectives.0.label': "Valorsteed'i evcilleştir",
   'entities.npcs.marshal_redbrook.title': 'Kasaba Mareşali',
   'entities.npcs.provisioner_hale.greeting':
     "Kuru çizme, kuru ekmek, kuru barut, Fenbridge'de iyi bir günde üçünden ikisini bulursun.",
@@ -3361,6 +3380,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Ejder Tarikatı Çadırları',
   'entities.zones.thornpeak_heights.pois.8.label': 'Hortlak Tarlaları',
   'entities.zones.thornpeak_heights.pois.9.label': 'Mezarejderi Mabedi',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Highwatch Ahırları',
   'entities.zones.thornpeak_heights.welcome':
     "Yüzbaşı Thessaly, Yüksek Gözcü'deki duvarı tutuyor, zar zor.",
   'errors.api.accountBanned': 'Bu hesap yasaklandı.',
@@ -5241,6 +5261,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Sarf Malzemeleri',
   'hudChrome.bags.filterGroupAria': 'Çantaları kategoriye göre filtrele',
   'hudChrome.bags.filterMaterial': 'Malzemeler',
+  'hudChrome.bags.filterMount': 'Binekler',
   'hudChrome.bags.filterQuest': 'Görev',
   'hudChrome.bags.filterWeapon': 'Silahlar',
   'hudChrome.bags.noMatch': 'Filtrelerinizle eşleşen öge yok.',

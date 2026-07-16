@@ -498,6 +498,7 @@ const mergeStringsEn = {
       potion: 'Potion',
       elixir: 'Elixir',
       bag: 'Bag',
+      mount: 'Mount',
     },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,
@@ -675,6 +676,7 @@ export const mergeStrings = {
         potion: 'Poción',
         elixir: 'Elixir',
         bag: 'Bolsa',
+        mount: 'Montura',
       },
       tooltip: {
         ...itemNames.es.itemUi.tooltip,
@@ -843,6 +845,7 @@ export const mergeStrings = {
         potion: 'Potion',
         elixir: 'Élixir',
         bag: 'Sac',
+        mount: 'Monture',
       },
       tooltip: {
         ...itemNames.fr_FR.itemUi.tooltip,
@@ -1012,6 +1015,7 @@ export const mergeStrings = {
         potion: 'Pozione',
         elixir: 'Elisir',
         bag: 'Borsa',
+        mount: 'Cavalcatura',
       },
       tooltip: {
         ...itemNames.it_IT.itemUi.tooltip,
@@ -1174,6 +1178,7 @@ export const mergeStrings = {
         potion: 'Trank',
         elixir: 'Elixier',
         bag: 'Tasche',
+        mount: 'Reittier',
       },
       tooltip: {
         ...itemNames.de_DE.itemUi.tooltip,
@@ -1336,6 +1341,7 @@ export const mergeStrings = {
         potion: '药水',
         elixir: '药剂',
         bag: '背包',
+        mount: '坐骑',
       },
       tooltip: {
         ...itemNames.zh_CN.itemUi.tooltip,
@@ -1495,6 +1501,7 @@ export const mergeStrings = {
         potion: '藥水',
         elixir: '藥劑',
         bag: '背包',
+        mount: '坐騎',
       },
       tooltip: {
         ...itemNames.zh_TW.itemUi.tooltip,
@@ -1654,6 +1661,7 @@ export const mergeStrings = {
         potion: '물약',
         elixir: '비약',
         bag: '가방',
+        mount: '탈것',
       },
       tooltip: {
         ...itemNames.ko_KR.itemUi.tooltip,
@@ -1816,6 +1824,7 @@ export const mergeStrings = {
         potion: 'ポーション',
         elixir: 'エリクサー',
         bag: 'バッグ',
+        mount: 'マウント',
       },
       tooltip: {
         ...itemNames.ja_JP.itemUi.tooltip,
@@ -1981,6 +1990,7 @@ export const mergeStrings = {
         potion: 'Poção',
         elixir: 'Elixir',
         bag: 'Bolsa',
+        mount: 'Montaria',
       },
       tooltip: {
         ...itemNames.pt_BR.itemUi.tooltip,
@@ -2148,6 +2158,7 @@ export const mergeStrings = {
         potion: 'Зелье',
         elixir: 'Эликсир',
         bag: 'Сумка',
+        mount: 'Транспорт',
       },
       tooltip: {
         ...itemNames.ru_RU.itemUi.tooltip,

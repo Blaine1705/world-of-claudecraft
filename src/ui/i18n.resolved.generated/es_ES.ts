@@ -754,6 +754,7 @@ export const es_ES: EnTranslations = {
       "leaderboard": "Clasificación",
       "dailyRewards": "Tienda",
       "deeds": "Gestas",
+      "mounts": "Monturas",
       "nameplates": "Nombres",
       "haptics": "Vibración",
       "hapticsOff": "Vibración desactivada",
@@ -868,7 +869,63 @@ export const es_ES: EnTranslations = {
       "petStop": "Mascota: detenerse",
       "petTaunt": "Mascota: provocar",
       "petDefensive": "Mascota: defensiva",
-      "petAggressive": "Mascota: agresiva"
+      "petAggressive": "Mascota: agresiva",
+      "mount": "Montar / Desmontar"
+    },
+    "mounts": {
+      "title": "Monturas",
+      "close": "Cerrar",
+      "select": "Elegir",
+      "selected": "Elegida",
+      "riding": "Montada",
+      "mount": "Montar",
+      "dismount": "Desmontar",
+      "requiresLevel": "Requiere nivel {level}",
+      "pickFirst": "Elige una montura para montar.",
+      "keybindHint": "Pulsa la tecla Montar / Desmontar para montar.",
+      "emptyTitle": "Ninguna montura obtenida",
+      "emptyStableHint": "Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.",
+      "emptyDropHint": "Las monturas más raras las sueltan los jefes de mazmorras y bandas.",
+      "clickManage": "Haz clic para elegir tu montura",
+      "rarity_common": "Común",
+      "rarity_rare": "Rara",
+      "rarity_epic": "Épica",
+      "spec_speed": "+{pct}% de movilidad adicional",
+      "spec_block": "+{pct}% de bloqueo de daño cuerpo a cuerpo",
+      "spec_crit": "+{pct}% de probabilidad de golpe crítico",
+      "name_valorsteed": "Corcel del Valor",
+      "name_grag_bear": "Oso Grag Goliat",
+      "name_stalkglider_snail": "Deslizador de Caparazón Musgoso",
+      "name_aether_hover_cycle": "Aerocicleta Justadora del Éter",
+      "name_shadowjump_toad": "Kama-Kage, el Sapo Saltasombras",
+      "name_stormfeather_griffin": "Plumatormenta Alcanzacielos",
+      "name_thunderstrut_gobbler": "Pavoneatruenos, el Gran Pavo",
+      "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
+      "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
+      "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
+      "desc_aether_hover_cycle": "Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.",
+      "desc_shadowjump_toad": "Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.",
+      "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.",
+      "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "La Copa del Valle",
@@ -1490,6 +1547,7 @@ export const es_ES: EnTranslations = {
       "filterConsumable": "Consumibles",
       "filterMaterial": "Materiales",
       "filterQuest": "Misión",
+      "filterMount": "Monturas",
       "sortAria": "Ordenar objetos de la bolsa",
       "sortRecent": "Recientes",
       "sortQuality": "Calidad",
@@ -5884,7 +5942,8 @@ export const es_ES: EnTranslations = {
       "tool": "Herramienta",
       "potion": "Poción",
       "elixir": "Elixir",
-      "bag": "Bolsa"
+      "bag": "Bolsa",
+      "mount": "Montura"
     },
     "stats": {
       "armor": "Armadura",
@@ -8410,6 +8469,27 @@ export const es_ES: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guardacintura del Invocatormentas"
+      },
+      "reins_valorsteed": {
+        "name": "Riendas del Corcel del Valor"
+      },
+      "reins_grag_bear": {
+        "name": "Riendas del Oso Grag Goliat"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Riendas del Deslizador de Caparazón Musgoso"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Llave de encendido: Aerocicleta Justadora del Éter"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Riendas de Kama-Kage, el Sapo Saltasombras"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Riendas del Plumatormenta Alcanzacielos"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Riendas de Pavoneatruenos, el Gran Pavo"
       }
     },
     "mobs": {
@@ -8658,6 +8738,9 @@ export const es_ES: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Elemental de tormenta despierto"
+      },
+      "stable_horse": {
+        "name": "Caballo de establo"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -9060,6 +9143,11 @@ export const es_ES: EnTranslations = {
         "name": "Capataz Odell",
         "title": "Capataz de la mina",
         "greeting": "¡Toda la excavación está llena de esas alimañas cubiertas de tierra!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Caballeriza mayor",
+        "greeting": "Cada jinete llega a pie, {className}. No te daré las riendas hasta que puedas montar al Corcel del Valor sin besar el barro, y en Highwatch no sobran sanadores para huesos rotos."
       },
       "warden_fenwick": {
         "name": "Guardián Fenwick",
@@ -10060,6 +10148,16 @@ export const es_ES: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Lecciones de equitación",
+        "text": "Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Paga la cuota y, cuando te dé la orden, llama al Corcel del Valor de entrenamiento y sube a la silla. Luego haz el recorrido: sigue la señal hasta el arco de salida, salta limpio cada obstáculo y cruza la línea de nuevo antes de que se acabe la arena. Hazlo y la silla es tuya. Si te sales del corral, empezamos de nuevo.",
+        "completion": "Así, muy bien. Arriba de un solo impulso y bien firme en la silla. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.",
+        "objectives": {
+          "0": {
+            "label": "Doma al Corcel del Valor"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10376,6 +10474,9 @@ export const es_ES: EnTranslations = {
           },
           "9": {
             "label": "Santuario del Gravewyrm"
+          },
+          "10": {
+            "label": "Establos de Highwatch"
           }
         }
       },

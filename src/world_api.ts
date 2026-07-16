@@ -42,6 +42,7 @@
 //   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
 //                                            deposit/withdraw/buy-slots)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
+//   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
@@ -73,6 +74,7 @@ import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
 import type { IWorldMail } from './world_api/mail';
 import type { IWorldMarket } from './world_api/market';
+import type { IWorldMounts } from './world_api/mounts';
 import type { IWorldParty } from './world_api/party';
 import type { IWorldPet } from './world_api/pet';
 import type { IWorldProfessions } from './world_api/professions';
@@ -152,6 +154,7 @@ export type {
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
+export type { MountRaceView } from './world_api/mounts';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
 export type {
@@ -213,7 +216,8 @@ export interface IWorld
     IWorldBank,
     IWorldValeCup,
     IWorldDungeonFinder,
-    IWorldDeeds {}
+    IWorldDeeds,
+    IWorldMounts {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -377,6 +381,13 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
+  'mount_select',
+  'mount_toggle',
+  'mount_train_begin',
+  'mount_train_answer',
+  'mount_train_abort',
+  'mount_race_start',
+  'mount_race_cancel',
   'df_roles',
   'df_queue',
   'df_queue_leave',
@@ -420,6 +431,13 @@ export const DISPATCH_ONLY_COMMANDS = [
   'leave_crypt',
   'social_refresh',
   'targetNearest',
+  // Riding-lesson leftovers: 'mount_train_answer' (the removed lean-cue arm) and
+  // 'mount_train_abort' (the removed course minigame's cancel) no longer have a
+  // ClientWorld sender, but the wire strings ARE the protocol (append-only), so
+  // the server keeps dispatching them: answer as a no-op, abort as a session
+  // abandon.
+  'mount_train_answer',
+  'mount_train_abort',
 ] as const satisfies readonly CommandName[];
 
 export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];
@@ -465,7 +483,8 @@ export type WorldFacet =
   | 'IWorldBank'
   | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
-  | 'IWorldDeeds';
+  | 'IWorldDeeds'
+  | 'IWorldMounts';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -632,6 +651,18 @@ export const COMMAND_FACETS = {
   vcup_ready: 'IWorldValeCup',
   vcup_bet: 'IWorldValeCup',
   vcup_practice: 'IWorldValeCup',
+  // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
+  // selectedMount is a self-snapshot read (terse `mnt`, no send, untagged).
+  // mount_train_begin is the legacy riding-lesson entry point; its feedback
+  // rides the mountTrain* events (no snapshot field).
+  mount_select: 'IWorldMounts',
+  mount_toggle: 'IWorldMounts',
+  mount_train_begin: 'IWorldMounts',
+  // mount_race_start begins a show-jumping race from the glowing platform;
+  // mount_race_cancel exits it. Both are validated server-side and feed the
+  // mountRace* events.
+  mount_race_start: 'IWorldMounts',
+  mount_race_cancel: 'IWorldMounts',
   // IWorldDungeonFinder: the group finder (snake_case wire strings, by design).
   // dungeonFinderInfo / dungeonFinderBoard are snapshot reads (no send, untagged).
   df_roles: 'IWorldDungeonFinder',

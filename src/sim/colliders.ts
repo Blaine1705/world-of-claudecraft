@@ -1,3 +1,4 @@
+import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
   DUNGEON_X_THRESHOLD,
@@ -250,6 +251,24 @@ function staticWorldColliders(seed: number): Collider[] {
     });
   }
 
+  // Highwatch show-jumps: grounded riders collide with the visible fixture,
+  // while the movement kernel's airborne `ignoreFences` path clears it during a
+  // deliberate jump. The dimensions are the same data props.ts uses to scale
+  // each GLB, preserving the what-you-see-is-what-you-collide-with contract.
+  for (const jump of PROPS.raceCourse?.jumps ?? []) {
+    const fixture = MOUNT_RACE_JUMP_FIXTURES[jump.kind];
+    out.push({
+      type: 'obb',
+      x: jump.x,
+      z: jump.z,
+      hw: fixture.depth / 2,
+      hd: fixture.width / 2,
+      rot: jump.dir + Math.PI / 2,
+      cameraTopY: topY(seed, jump.x, jump.z, fixture.maxHeight),
+      camGhost: true,
+      isFence: true,
+    });
+  }
   // Editor-placed assets with a collide footprint (custom maps only; the
   // built-in world has no placements). The ONE placement record drives both the
   // renderer and this collider, so what you see is what you collide with.
@@ -635,30 +654,43 @@ export function resolvePosition(
 }
 
 function crossesFence(fromX: number, fromZ: number, toX: number, toZ: number, r: number): boolean {
-  for (const f of getActiveWorldContent().props.fences) {
-    const dx = f.x2 - f.x1,
-      dz = f.z2 - f.z1;
+  const crossesSegment = (x1: number, z1: number, x2: number, z2: number): boolean => {
+    const dx = x2 - x1,
+      dz = z2 - z1;
     const len = Math.hypot(dx, dz);
-    if (len < 1e-6) continue;
+    if (len < 1e-6) return false;
     const ux = dx / len,
       uz = dz / len;
     const nx = -uz,
       nz = ux;
-    const fromRelX = fromX - f.x1,
-      fromRelZ = fromZ - f.z1;
-    const toRelX = toX - f.x1,
-      toRelZ = toZ - f.z1;
+    const fromRelX = fromX - x1,
+      fromRelZ = fromZ - z1;
+    const toRelX = toX - x1,
+      toRelZ = toZ - z1;
     const fromSide = fromRelX * nx + fromRelZ * nz;
     const toSide = toRelX * nx + toRelZ * nz;
-    if (fromSide === 0 && toSide === 0) continue;
-    if (fromSide * toSide > 0) continue;
+    if (fromSide === 0 && toSide === 0) return false;
+    if (fromSide * toSide > 0) return false;
     const denom = fromSide - toSide;
     const t = Math.abs(denom) < 1e-6 ? 0 : fromSide / denom;
-    if (t < 0 || t > 1) continue;
+    if (t < 0 || t > 1) return false;
     const hitX = fromX + (toX - fromX) * t;
     const hitZ = fromZ + (toZ - fromZ) * t;
-    const along = (hitX - f.x1) * ux + (hitZ - f.z1) * uz;
-    if (along >= -FENCE_END_PAD - r && along <= len + FENCE_END_PAD + r) return true;
+    const along = (hitX - x1) * ux + (hitZ - z1) * uz;
+    return along >= -FENCE_END_PAD - r && along <= len + FENCE_END_PAD + r;
+  };
+
+  const props = getActiveWorldContent().props;
+  for (const f of props.fences) {
+    if (crossesSegment(f.x1, f.z1, f.x2, f.z2)) return true;
+  }
+  // Click-to-move uses this same query to auto-jump a rail. Include the race
+  // fixtures so its route behaves like keyboard movement instead of walking
+  // into the new collider and stalling.
+  for (const jump of props.raceCourse?.jumps ?? []) {
+    const halfWidth = MOUNT_RACE_JUMP_FIXTURES[jump.kind].width / 2;
+    const segment = raceGateSegment(jump, halfWidth);
+    if (crossesSegment(segment.ax, segment.az, segment.bx, segment.bz)) return true;
   }
   return false;
 }
