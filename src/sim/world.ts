@@ -1495,15 +1495,20 @@ function applyRowMeres(x: number, z: number, h: number): number {
 // soft-floor into dry mudflats instead of sea.
 function applyNorthBay(x: number, z: number, h: number): number {
   if (z <= FROST_ZMAX - 20 || Math.abs(x) > STRIP_MAX_X + 8) return h;
+  const xWin = 1 - smoothstep(172, 188, Math.abs(x));
+  // The headlands the bay leaves dry taper into low spits: the Reach's coast
+  // can stand 20yd tall right at the zone line, and untapered those lobes
+  // ended in sheer walls over the bay (the reported Reach-north cliffs). The
+  // cap starts above the tallest coastal ground at the line, so the seam
+  // itself never steps (tests/world_edge_coast.test.ts sweeps the bay).
+  const dune = 22 - 26 * smoothstep(FROST_ZMAX, FROST_ZMAX + 40, z);
+  if (h > dune && xWin > 0) h = h + (dune - h) * xWin;
   // follow the Reach's own coastline north of the cap: the frost lobes that
   // poke past z1960 stay dry headlands, the gaps between them open as coves,
   // so the north shore is lobed, not a ruled z-parallel line
   const land = frostLandness(x, z);
   const shoreT = 1 - smoothstep(-0.04, 0.14, land);
-  const t =
-    smoothstep(FROST_ZMAX - 20, FROST_ZMAX + 44, z) *
-    (1 - smoothstep(172, 188, Math.abs(x))) *
-    shoreT;
+  const t = smoothstep(FROST_ZMAX - 20, FROST_ZMAX + 44, z) * xWin * shoreT;
   if (t <= 0) return h;
   const sea = Math.min(h, WATER_LEVEL - 6);
   return h + (sea - h) * t;
@@ -1519,15 +1524,39 @@ function applyNorthBay(x: number, z: number, h: number): number {
 // end in open coast, so they are left to their own appliers.
 function applyWorldEdgeSea(x: number, z: number, h: number): number {
   if (z <= 1250 || Math.abs(x) > 560) return h;
-  const xb = worldXBoundsAt(z);
-  const dEdge = Math.min(x - xb.min, xb.max - x, WORLD_MAX_Z - z);
-  if (dEdge > 100) return h;
+  // Each column's sea margin measures against ITS OWN outer perimeter: the
+  // west column ends at the world's west bound and the Amberfall's zMax,
+  // the east column at the east bound and the world's north end, and the
+  // strip's flanks face sibling columns (interior, no margin; its far north
+  // is the bay's water, applyNorthBay). The old row-union bounds
+  // (worldXBoundsAt) are a STEP function of z, and consuming them here
+  // stood the whole z = 2380 line up as an instant 16yd wall into the sunk
+  // sea. tests/world_edge_coast.test.ts sweeps the margins.
+  const dX = x < STRIP_MIN_X ? x - WORLD_MIN_X : x > STRIP_MAX_X ? WORLD_MAX_X - x : Infinity;
+  // ...blended across the west column seam so the margin's own onset never
+  // steps at the Amberfall's northeast corner
+  const northEnd =
+    AMBER_ZMAX + (WORLD_MAX_Z - AMBER_ZMAX) * smoothstep(STRIP_MIN_X - 12, STRIP_MIN_X + 12, x);
+  const dEdge = Math.min(dX, northEnd - z);
+  if (dEdge > 190) return h;
   // two octaves of fixed-seed noise bend the shoreline into deep coves and
   // headlands so the ocean margin reads as a natural coast, not a ruled band
   const wob =
     (fbm2(x * 0.015, z * 0.015, 9311, 3) - 0.5) * 54 +
     (fbm2(x * 0.044, z * 0.044, 9313, 2) - 0.5) * 18;
   const band = 50 + wob;
+  // Pull the land back from the margin: ground standing tall near the
+  // shoreline is shaved to a 0.55 rise/run bank climbing inland from the
+  // beach, so the world ends in shores and headland slopes, never a plateau
+  // cliff (the report: sheer walls at the Drakelands' east shore and the
+  // Amberfall's west and north). The cone clears the Drakemaw Caldera and
+  // every hub/POI standing near a margin; the authority fade releases well
+  // inside the early-out above so neither edge seams.
+  const capW = 1 - smoothstep(band + 40, band + 90, dEdge);
+  if (capW > 0) {
+    const cap = WATER_LEVEL + 1.1 + 0.55 * Math.max(0, dEdge - (band - 30));
+    if (h > cap) h = h + (cap - h) * capW;
+  }
   const seaT = 1 - smoothstep(band - 34, band, dEdge);
   if (seaT <= 0) return h;
   const floor = Math.min(h, WATER_LEVEL - 6);
