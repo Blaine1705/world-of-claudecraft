@@ -1625,7 +1625,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 679,
-      "state": "fe9b4aaf",
+      "state": "00ad9fa3",
       "events": "9680eded",
       "rng": {
         "draws": 10,
@@ -1636,7 +1636,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 679,
-      "state": "9fa9037a",
+      "state": "be238cdc",
       "events": "9680eded",
       "rng": {
         "draws": 10,
@@ -2296,7 +2296,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 88.16492,
-            "y": -1.939104,
+            "y": -1.928089,
             "z": 87.378458
           },
           "potionCooldownUntil": -1,
