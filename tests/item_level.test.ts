@@ -251,9 +251,11 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
   it('the raid boss set pieces and legendaries upgrade to raid-tier heroic variants (33/37)', () => {
     // These are not listed in the explicit table: they come from the normal-loot
     // heroic swap (heroic_<base>), rescaled to the raid tier (source 27).
-    const raidBases = (MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) =>
-      e.itemId ? [e.itemId] : [],
-    );
+    const raidBases = (MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) => {
+      if (!e.itemId) return [];
+      const item = ITEMS[e.itemId];
+      return item?.slot && (item.kind === 'armor' || item.kind === 'weapon') ? [e.itemId] : [];
+    });
     expect(raidBases.length).toBeGreaterThanOrEqual(8);
     let epics = 0;
     let legendaries = 0;
@@ -356,5 +358,41 @@ describe('heroic set: class coverage', () => {
       // Every class has at least one usable weapon.
       expect(slots.has('mainhand'), `${cls} has a weapon`).toBe(true);
     }
+  });
+});
+
+describe('item level: crafted gear derives its level from the recipe (content/recipes.ts)', () => {
+  // The three level-20, hub-gated caster pieces (issue #1965 review): budgeted at
+  // ITEM level (recipe level 20 + the rare QUALITY_ILVL_BONUS of 3 = 23), matching
+  // the level-20 rares in the same slots (boundstone_helm, gravewyrm_gauntlets,
+  // gravewyrm_mantle).
+  const CASTER_HUB_IDS = ['wardweave_cowl', 'duskhide_wraps', 'sootscale_mantle'];
+  const CASTER_COMMON_IDS = [
+    'eastbrook_ritual_vestments',
+    'eastbrook_druids_hide',
+    'eastbrook_warded_leggings',
+  ];
+
+  it('registers a source level for every crafted item with primary stats', () => {
+    for (const id of [...CASTER_HUB_IDS, ...CASTER_COMMON_IDS]) {
+      expect(itemSourceLevel(id), `${id} has a source level`).not.toBeUndefined();
+      expect(itemLevel(ITEMS[id]), `${id} has an item level`).not.toBeUndefined();
+    }
+  });
+
+  it('the hub caster pieces land at item level 23 and carry their exact stat budget', () => {
+    for (const id of CASTER_HUB_IDS) {
+      const item = ITEMS[id];
+      expect(itemLevel(item), `${id} item level`).toBe(23);
+      const budget = expectedStatBudget(item);
+      expect(budget, `${id} has a derivable budget`).not.toBeUndefined();
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(budget);
+    }
+  });
+
+  it('matches the existing level-20 rares sharing its slot (helmet 11, gloves 9, shoulder 10)', () => {
+    expect(primaryStatSum(ITEMS.wardweave_cowl)).toBe(primaryStatSum(ITEMS.boundstone_helm));
+    expect(primaryStatSum(ITEMS.duskhide_wraps)).toBe(primaryStatSum(ITEMS.gravewyrm_gauntlets));
+    expect(primaryStatSum(ITEMS.sootscale_mantle)).toBe(primaryStatSum(ITEMS.gravewyrm_mantle));
   });
 });

@@ -112,6 +112,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/broadcasts',
   '/api/steam/link',
   '/api/steam/status',
+  '/api/welcome/flags',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -257,6 +258,8 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/woc/balance' },
     { method: 'POST', path: '/api/card' },
     { method: 'GET', path: '/api/referrals' },
+    // The Welcome Screen server flags surface (server/welcome.ts).
+    { method: 'GET', path: '/api/welcome/flags' },
     // The reports + telemetry surface (server/reports.ts). All POST; the
     // two public beacons (perf-report, site-presence) are registered POST-only so a
     // non-POST delegates to the retained legacy arm (perf-report's 404 fall-through,
@@ -321,6 +324,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/claudium/native/rails' },
     { method: 'GET', path: '/api/claudium/native/price/:rail' },
     { method: 'GET', path: '/api/claudium/native/balance/sol/:owner' },
+    { method: 'GET', path: '/api/claudium/native/balance/usdc/:owner' },
     { method: 'GET', path: '/api/claudium/store' },
     { method: 'GET', path: '/api/claudium/history' },
     { method: 'POST', path: '/api/claudium/purchase' },
@@ -557,9 +561,10 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
   it('derives the expected non-empty ladders', () => {
     expect(oauthPostLadder.length).toBe(5);
     expect(oauthGetLadder.length).toBe(2);
-    // 17 = the handleInternalApi eleven (restart-countdown + the 10 Discord-bot routes)
-    // plus the six-route payout and moderation ops family below.
-    expect(internalLadder.length).toBe(17);
+    // 18 = the handleInternalApi twelve (restart-countdown + the 11 Discord-bot
+    // routes, flaired-ids included) plus the six-route payout and moderation ops
+    // family below.
+    expect(internalLadder.length).toBe(18);
     expect(opsFamilyRows.length).toBe(6);
   });
 

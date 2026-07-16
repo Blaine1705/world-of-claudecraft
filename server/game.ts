@@ -41,6 +41,13 @@ import {
 import type { PickAction } from '../src/sim/lockpick';
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
+import {
+  partyFrameAbsorb,
+  partyFrameAggroTargets,
+  partyFrameAuras,
+  partyFrameIncomingHeals,
+  partyFrameRole,
+} from '../src/sim/party_frame_info';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import { populateCommunityRiftPortals } from '../src/sim/rift/portals';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
@@ -401,6 +408,7 @@ type ClientMessage = Record<string, unknown> & {
   mode?: string;
   n?: string;
   name?: string;
+  mount?: string;
   nation?: string;
   node?: string;
   npc?: number;
@@ -544,6 +552,8 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
+  'mount_select',
+  'mount_toggle',
   'change_weapon_skin',
   'prestige',
   'market_list',
@@ -859,6 +869,10 @@ function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
+  // Active rideable mount ('' omitted). This identity field is intentionally
+  // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
+  // made the appended self delta overwrite the live riding state in JSON.
+  if (e.mountKey) out.mnt = e.mountKey;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
   // Full worn set, for the inspect-another-player window. Players only and only
@@ -982,6 +996,13 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     out.castTot = round2(e.castTotal);
     if (e.channeling) out.chan = 1;
   }
+  // Mount summon/dismount transition, so every client can time the summon FX / call
+  // pose and the self-extrapolator can root the local player in lockstep. Volatile
+  // (rides the per-tick dynamic fields, not identity): mcr omitted when idle (0), mck
+  // omitted while dismounting or idle (''). The sim reads mountCastRemaining (movement
+  // root), so it is actionable and always rides when non-zero.
+  if (e.mountCastRemaining) out.mcr = round2(e.mountCastRemaining);
+  if (e.mountCastKey) out.mck = e.mountCastKey;
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
   if (e.riftSliding) out.sld = 1; // ice-slide: render a frozen gliding pose
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
@@ -1137,6 +1158,15 @@ export class GameServer {
   readonly social: SocialService;
   private readonly moderation: ModerationService<ClientSession>;
   private wireCache = new Map<number, EntityWireCache>();
+  // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
+  // are GLOBAL (identical for every grouped session), yet partyWire runs once per
+  // grouped session per tick. Memoize both once per tick so a 40-raid does one scan,
+  // not one per member. (see review #1864, finding 1)
+  private partyFrameGlobalsCache: {
+    tick: number;
+    aggroTargets: ReturnType<typeof partyFrameAggroTargets>;
+    incomingHeals: ReturnType<typeof partyFrameIncomingHeals>;
+  } | null = null;
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
   private draining = false;
@@ -4067,6 +4097,37 @@ export class GameServer {
       case 'unequip_mech_chroma':
         if (typeof msg.chroma === 'string') this.unequipAccountMechChroma(session, msg.chroma);
         break;
+      // Rideable mounts: the Sim re-validates everything (catalog key, level
+      // gate, combat gate); the entity mirror + self `mnt` field carry the result.
+      case 'mount_select':
+        if (typeof msg.mount === 'string') sim.selectMountFor(pid, msg.mount);
+        break;
+      case 'mount_toggle':
+        sim.toggleMountFor(pid);
+        break;
+      // Riding lesson: the Sim re-validates everything (level, range, quest
+      // state, fee, session state).
+      case 'mount_train_begin':
+        sim.mountTrainBeginFor(pid);
+        break;
+      case 'mount_train_answer':
+        // Deprecated no-op (the removed lean-cue lesson's answer command). The
+        // token stays in COMMAND_NAMES (append-only, dispatch-only); the server
+        // ignores it and a modern client never sends it.
+        break;
+      case 'mount_train_abort':
+        // Dispatch-only (no HUD sends it anymore): abandons an active lesson,
+        // the fee stays paid.
+        sim.mountTrainAbortFor(pid);
+        break;
+      // Show-jumping race: the Sim re-validates the glowing platform, lesson or
+      // mount eligibility, and liveness before arming the countdown.
+      case 'mount_race_start':
+        sim.mountRaceStartFor(pid);
+        break;
+      case 'mount_race_cancel':
+        sim.mountRaceCancelFor(pid);
+        break;
       // Season 1 Armory: apply (skin: string) or detach (skin: null + wtype) a
       // purchased weapon skin. Ownership is checked against account cosmetics
       // here; the Sim re-validates the equipped-weapon-type match.
@@ -5271,6 +5332,22 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
+    // The persisted mount pick (IWorldMounts.selectedMount; always a valid
+    // catalog key, the horse by default). Kept per-tick like the other small
+    // scalars: one short string, negligible diff. Wire key `mntSel`; `mnt`
+    // remains the separate active-mount identity field. See
+    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
+    maybe('mntSel', meta.selectedMount);
+    // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
+    // every mount whose reins item sits in bags or bank. A handful of short
+    // strings whose serialized form only changes on a loot/bank move, so the
+    // per-tick diff is negligible. Wire key `mntOwn`.
+    maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+    // Session-only lesson and race state must still reconcile after linkdead:
+    // events sent while the socket is absent are not replayed on resume. These
+    // self deltas are authoritative and clear stale client mirrors with false/null.
+    maybe('mntLesson', this.sim.mountLessonActiveFor(anchorSession.pid));
+    maybe('mntRace', this.sim.mountRaceViewFor(anchorSession.pid));
     // Book of Deeds: the Renown total and the selected title id, cheap
     // scalars diffed per tick (grants land from sim sites that never mark
     // this session dirty, and the title echo must not wait on the heavy gate).
@@ -5333,9 +5410,30 @@ export class GameServer {
     return extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
   }
 
+  // Global party-frame aggregates (aggro holders + incoming heals), scanned once
+  // per tick and shared by every partyWire call in that tick.
+  private partyFrameGlobals(): {
+    aggroTargets: ReturnType<typeof partyFrameAggroTargets>;
+    incomingHeals: ReturnType<typeof partyFrameIncomingHeals>;
+  } {
+    const tick = this.sim.tickCount;
+    const cache = this.partyFrameGlobalsCache;
+    if (cache && cache.tick === tick) return cache;
+    const fresh = {
+      tick,
+      aggroTargets: partyFrameAggroTargets(this.sim.entities.values()),
+      incomingHeals: partyFrameIncomingHeals(this.sim.entities.values(), (abilityId, casterId) =>
+        this.sim.resolvedAbility(abilityId, casterId),
+      ),
+    };
+    this.partyFrameGlobalsCache = fresh;
+    return fresh;
+  }
+
   private partyWire(pid: number): unknown {
     const party = this.sim.partyOf(pid);
     if (!party) return null;
+    const { aggroTargets, incomingHeals } = this.partyFrameGlobals();
     return {
       leader: party.leader,
       raid: party.raid,
@@ -5361,15 +5459,12 @@ export class GameServer {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
-                // The mini aura strip under the member's party row (mirrors
-                // Sim.partyInfo): first N in aura order, id + kind + sap flag
-                // only, no countdown, so this payload changes only when the
-                // aura SET changes and the party delta elision keeps working.
-                auras: e.auras.slice(0, PARTY_MEMBER_AURA_CAP).map((a) => ({
-                  id: a.id,
-                  kind: a.kind,
-                  ...(a.value < 0 ? { neg: 1 } : {}),
-                })),
+                absorb: partyFrameAbsorb(e.auras),
+                role: partyFrameRole(meta.talentMods.role),
+                connected: this.clients.get(mPid)?.linkdead ? 0 : 1,
+                hasAggro: aggroTargets.has(mPid) ? 1 : 0,
+                incomingHeal: incomingHeals.get(mPid) ?? 0,
+                auras: partyFrameAuras(e.auras),
               }
             : null;
         })

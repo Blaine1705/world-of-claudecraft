@@ -8,6 +8,7 @@ import type {
   DelveCompanionInfo,
   DelveRunInfo,
   LockpickView,
+  MountRaceView,
   PlayerProfessionsView,
 } from '../world_api';
 import * as bagsMod from './bags';
@@ -70,6 +71,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import { MAILBOXES } from './content/mailboxes';
+import { DEFAULT_MOUNT, type MountKey, normalizeSelectedMount } from './content/mounts';
 import type { GatheringProfessionId } from './content/professions';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
@@ -147,6 +149,7 @@ import {
 import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
+import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
@@ -230,6 +233,24 @@ import {
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
+import {
+  cancelMountRace as cancelMountRaceImpl,
+  mountRaceViewFor as mountRaceViewForImpl,
+  startMountRace as startMountRaceImpl,
+  tickMountRace as tickMountRaceImpl,
+} from './mount_race';
+import {
+  ownedMounts as ownedMountsImpl,
+  selectMount as selectMountImpl,
+  toggleMount as toggleMountImpl,
+  updateMountTransition,
+} from './mounts';
+import {
+  abandonMountTraining as abandonMountTrainingImpl,
+  mountTrainAbort as mountTrainAbortImpl,
+  mountTrainBegin as mountTrainBeginImpl,
+  tickMountTraining as tickMountTrainingImpl,
+} from './mounts_training';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -342,6 +363,7 @@ import {
   awardHeroicMarks as awardHeroicMarksImpl,
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
+  inheritDungeonResetLocks as inheritDungeonResetLocksImpl,
   instanceClaimIdAt as instanceClaimIdAtImpl,
   instanceInfoAt as instanceInfoAtImpl,
   instanceKeyFor as instanceKeyForImpl,
@@ -349,6 +371,7 @@ import {
   instanceSlotAt as instanceSlotAtImpl,
   leaveCrypt as leaveCryptImpl,
   leaveDungeon as leaveDungeonImpl,
+  resetDungeonInstances as resetDungeonInstancesImpl,
   updateDoorTriggers as updateDoorTriggersImpl,
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
@@ -410,6 +433,13 @@ import * as yumiMod from './social/yumi';
 export { eloDelta } from './social/arena';
 
 import { FINDER_ACTIVITIES, type FinderListingTag } from './content/dungeon_finder';
+import {
+  partyFrameAbsorb,
+  partyFrameAggroTargets,
+  partyFrameAuras,
+  partyFrameIncomingHeals,
+  partyFrameRole,
+} from './party_frame_info';
 import { DungeonFinderMachine } from './social/dungeon_finder';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
@@ -484,9 +514,10 @@ import {
   type MasterLootThreshold,
   MELEE_RANGE,
   type MobFamily,
+  type MountRaceSession,
+  type MountTrainingSession,
   type MoveInput,
   type OverheadEmoteId,
-  PARTY_MEMBER_AURA_CAP,
   PARTY_XP_RANGE,
   type PetMode,
   type PlayerClass,
@@ -835,6 +866,10 @@ export interface InstanceSlot {
   objectIds: number[];
   exitId: number | null;
   emptyFor: number;
+  // Sim-time until this live claim may be manually replaced again. Claim-owned
+  // authority prevents party roster or leadership churn from rotating away the
+  // reset cooldown; cleared whenever the slot returns to the free pool.
+  resetAvailableAt: number;
   // Sim-time (seconds) this slot was claimed, cleared with the claim. Session
   // state (instances never persist); the Sanctum speed deed reads it.
   claimedAt?: number;
@@ -843,6 +878,12 @@ export interface InstanceSlot {
   // exception admits only these: a player locked by an earlier run can never
   // treat someone else's cleared claim as their own loot run.
   clearedBy: Set<number>;
+  // Players who stepped through this claim's door during this run (enterDungeon).
+  // Session-only like clearedBy, cleared with the claim. The heroic mail arm
+  // (instances/dungeons awardHeroicMarks) pays a locked-but-absent player only
+  // when they actually entered this run: a door-camper or a member parked in
+  // town takes the lockout without turning roster membership into mailed income.
+  enteredBy: Set<number>;
 }
 
 export interface ResolvedAbility {
@@ -914,6 +955,26 @@ export interface PlayerMeta {
   pendingSkinRank: SkinRank | null;
   pendingSkinCatalog: SkinCatalog | null;
   pendingSkinItemId: string | null;
+  // Rideable ground mount pick (always a valid catalog key; the horse by
+  // default, since every player owns it). Persisted; the live "riding right
+  // now" state is Entity.mountKey, which starts '' on login and clears on
+  // death. Collection + rules live in src/sim/mounts.ts.
+  selectedMount: MountKey;
+  // The active riding-lesson attempt, or null. Session state, never persisted:
+  // src/sim/mounts_training.ts owns the rules; this is the same
+  // optional-plus-null shape as other transient session fields below (e.g.
+  // `away`), initialized to null in createPlayer.
+  mountTraining?: MountTrainingSession | null;
+  // The player's own active show-jumping race, or null. Session state, never
+  // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
+  // simultaneous racers never share or contend on anything.
+  mountRace?: MountRaceSession | null;
+  // One-time riding-lesson fee (100g), charged when the first lesson race starts
+  // (or through the legacy mount_train_begin command). Optional so absent === false (pre-feature saves and a
+  // fresh character stay byte-equal): never explicitly set to false, only ever
+  // flipped true, mirroring the selectedMount-omitted-while-default convention
+  // in serializeCharacter below.
+  mountTrainingFeePaid?: boolean;
   moveInput: MoveInput;
   // Monotonic counter bumped when a bulky, rarely-changing wire field (the
   // inventory, and the collection-quest progress derived from it) mutates, so a
@@ -1254,6 +1315,14 @@ export interface CharacterState {
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;
   pendingSkinItemId?: string | null;
+  // Rideable mount pick (JSONB; optional AND absent while on the default
+  // horse, so pre-mount saves stay byte-equal and load as the horse).
+  selectedMount?: string;
+  // One-time riding-lesson training fee (100g), charged when the first lesson
+  // race starts (or through legacy mount_train_begin). Optional and absent until
+  // paid, so pre-mount-training saves (and every save before the fee is ever
+  // charged) stay byte-equal.
+  mountTrainingFeePaid?: boolean;
   delveMarks?: number;
   delveClears?: Record<string, number>;
   companionUpgrades?: Record<string, number>;
@@ -1433,6 +1502,7 @@ export class Sim {
   private channelSubs = new Map<number, Set<JoinableChannel>>();
   // dungeon instances
   instances: InstanceSlot[] = [];
+  dungeonResetLocks = new Map<string, { availableAt: number; claimId: number }>();
   // procedural rift instances (separate slot pool + coordinate band from dungeons)
   riftInstances: RiftInstance[] = [];
   // Shared natural-world events. Group instances point here by eventId and race
@@ -1597,10 +1667,12 @@ export class Sim {
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
       for (let i = 0; i < camp.count; i++) {
-        if (template.dummy) {
-          // A practice dummy is a fixed, deterministic prop (no scatter, fixed level,
-          // never wanders): spawn it WITHOUT drawing any RNG so adding one never
-          // perturbs the world's seed-stable spawns and rolls.
+        if (template.dummy || template.ambient) {
+          // A practice dummy or an ambient decoration (the stable horses) is a
+          // fixed, deterministic prop (no scatter, fixed level): spawn it WITHOUT
+          // drawing any RNG so adding one never perturbs the world's seed-stable
+          // spawns and rolls. (The horses do wander, but off a PRIVATE Rng
+          // sub-stream in mob/ambient.ts, never the shared ctx.rng.)
           const safe = this.findSafePos(camp.center.x, camp.center.z, minHeight);
           const mob = createMob(
             this.nextId++,
@@ -1681,7 +1753,9 @@ export class Sim {
             objectIds: [],
             exitId: null,
             emptyFor: 0,
+            resetAvailableAt: 0,
             clearedBy: new Set(),
+            enteredBy: new Set(),
           });
         }
         continue;
@@ -1708,7 +1782,9 @@ export class Sim {
           objectIds: [],
           exitId: null,
           emptyFor: 0,
+          resetAvailableAt: 0,
           clearedBy: new Set(),
+          enteredBy: new Set(),
         });
       }
     }
@@ -2013,6 +2089,7 @@ export class Sim {
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
+      selectedMount: normalizeSelectedMount(savedState?.selectedMount),
       moveInput: emptyMoveInput(),
       wireRev: 0,
       inventory: [],
@@ -2071,6 +2148,8 @@ export class Sim {
       activeLoadout: -1,
       raidLockouts: new Map(),
       away: null,
+      mountTraining: null,
+      mountRace: null,
       marketFilter: '',
       craftSkills: emptyCraftSkills(),
       knownRecipes: new Set(),
@@ -2213,6 +2292,9 @@ export class Sim {
       if (s.knownRecipes) meta.knownRecipes = new Set(s.knownRecipes);
       meta.archetype = normalizeArchetypeState(s.archetype);
       meta.mailWelcomed = s.mailWelcomed === true;
+      // Never explicitly set false: absent stays absent so a pre-feature save
+      // (or one where the fee was never charged) round-trips byte-equal.
+      if (s.mountTrainingFeePaid === true) meta.mountTrainingFeePaid = true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -2386,7 +2468,11 @@ export class Sim {
     const leavingRun = this.delveRunForPlayer(pid);
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
+    // A leaving player's riding-lesson session is likewise abandoned (never
+    // silently left IN_PROGRESS); the one-time fee stays paid either way.
+    if (meta.mountTraining?.state === 'IN_PROGRESS') this.ctx.abandonMountTraining(meta);
     this.preparePlayerLeave(pid);
+    despawnMobsForDev(this.ctx, pid, 'spawned');
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
     // teardown position (must run while the leaver is still in players/entities).
@@ -2638,6 +2724,11 @@ export class Sim {
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
+      // Absent while on the default horse (back-compat: legacy no-pick saves
+      // and horse-pick saves load identically, as the horse).
+      ...(meta.selectedMount !== DEFAULT_MOUNT ? { selectedMount: meta.selectedMount } : {}),
+      // Absent until the fee is actually charged (back-compat + parity-stable saves).
+      ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       craftSkills: { ...meta.craftSkills },
       knownRecipes: [...meta.knownRecipes],
       archetype: { ...meta.archetype },
@@ -2687,6 +2778,87 @@ export class Sim {
 
   changeSkin(skin: number, catalog: SkinCatalog = 'class'): void {
     this.setPlayerSkin(this.primaryId, skin, catalog);
+  }
+
+  /** Per-pid mount selection + toggle (the server command path); the IWorld
+   *  members below ride primaryId. Rules live in src/sim/mounts.ts. */
+  selectMountFor(pid: number, key: string): boolean {
+    return selectMountImpl(this.ctx, pid, key);
+  }
+  toggleMountFor(pid: number): boolean {
+    return toggleMountImpl(this.ctx, pid);
+  }
+
+  /** The owned subset of the catalog for a player (the server wire path). */
+  ownedMountsFor(pid: number): MountKey[] {
+    const meta = this.players.get(pid);
+    return meta ? ownedMountsImpl(meta) : [DEFAULT_MOUNT];
+  }
+
+  // --- IWorldMounts ---
+  selectedMount(): MountKey {
+    return this.players.get(this.primaryId)?.selectedMount ?? DEFAULT_MOUNT;
+  }
+  ownedMounts(): readonly MountKey[] {
+    return this.ownedMountsFor(this.primaryId);
+  }
+  selectMount(key: MountKey): void {
+    this.selectMountFor(this.primaryId, key);
+  }
+  toggleMounted(): void {
+    this.toggleMountFor(this.primaryId);
+  }
+
+  /** Per-pid riding-lesson command surface (the server path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/mounts_training.ts.
+   *  mountTrainAbortFor stays server-reachable (the append-only wire token
+   *  mount_train_abort) even though no HUD surface sends it anymore. */
+  mountTrainBeginFor(pid: number): void {
+    mountTrainBeginImpl(this.ctx, pid);
+  }
+  mountTrainAbortFor(pid: number): void {
+    mountTrainAbortImpl(this.ctx, pid);
+  }
+
+  // --- IWorldMounts: the riding lesson ---
+  mountTrainBegin(): void {
+    this.mountTrainBeginFor(this.primaryId);
+  }
+
+  /** Per-pid show-jumping race start (the server wire path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/mount_race.ts. */
+  mountRaceStartFor(pid: number): void {
+    startMountRaceImpl(this.ctx, pid);
+  }
+
+  mountRaceCancelFor(pid: number): void {
+    cancelMountRaceImpl(this.ctx, pid);
+  }
+
+  /** Read-only projection of a player's own active show-jumping race
+   *  (src/sim/mount_race.ts); null when not racing. */
+  mountRaceViewFor(pid?: number): MountRaceView | null {
+    return mountRaceViewForImpl(this.ctx, pid);
+  }
+
+  /** Whether a player has a live riding lesson in progress. Retained for online
+   *  parity and legacy consumers; offline rides primaryId below. */
+  mountLessonActiveFor(pid: number): boolean {
+    return this.players.get(pid)?.mountTraining?.state === 'IN_PROGRESS';
+  }
+
+  // --- IWorldMounts: the show-jumping race (offline rides primaryId) ---
+  mountRaceStart(): void {
+    this.mountRaceStartFor(this.primaryId);
+  }
+  mountRaceCancel(): void {
+    this.mountRaceCancelFor(this.primaryId);
+  }
+  mountLessonActive(): boolean {
+    return this.mountLessonActiveFor(this.primaryId);
+  }
+  mountRaceView(): MountRaceView | null {
+    return this.mountRaceViewFor(this.primaryId);
   }
 
   /** Replace a player's whole weapon-skin loadout (host seed: the server pushes
@@ -3272,6 +3444,9 @@ export class Sim {
       set riftPortalIds(v) {
         sim.riftPortalIds = v;
       },
+      get dungeonResetLocks() {
+        return sim.dungeonResetLocks;
+      },
       get arenaMatches() {
         return sim.arenaMatches;
       },
@@ -3555,6 +3730,8 @@ export class Sim {
       enterRift: sim.enterRift.bind(sim),
       leaveRift: sim.leaveRift.bind(sim),
       riftOpenTreasure: sim.riftOpenTreasure.bind(sim),
+      resetDungeonInstances: sim.resetDungeonInstances.bind(sim),
+      inheritDungeonResetLocks: sim.inheritDungeonResetLocks.bind(sim),
       dungeonDifficulty: sim.dungeonDifficulty.bind(sim),
       setDungeonDifficulty: sim.setDungeonDifficulty.bind(sim),
       awardHeroicMarks: sim.awardHeroicMarks.bind(sim),
@@ -3678,6 +3855,9 @@ export class Sim {
       maybeCompanionBark: (run, pid, barkId) => sim.maybeCompanionBark(run, pid, barkId),
       abandonLockpick: (run) => lockpickMod.abandonLockpick(sim.ctx, run),
       tickLockpickTimeout: (run) => lockpickMod.tickLockpickTimeout(sim.ctx, run),
+      tickMountTraining: (meta) => tickMountTrainingImpl(sim.ctx, meta),
+      tickMountRace: (meta) => tickMountRaceImpl(sim.ctx, meta),
+      abandonMountTraining: (meta) => abandonMountTrainingImpl(sim.ctx, meta),
       delveRunForMob: (mobId) => sim.delveRunForMob(mobId),
       onDelveBossDefeated: (run) => sim.onDelveBossDefeated(run),
       delveDetectMult: (player) => sim.delveDetectMult(player),
@@ -3756,6 +3936,7 @@ export class Sim {
       partyCapacity: (party) => sim.party.partyCapacity(party),
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
       queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
+      mailHeroicMarks: (pid, itemId, count) => sim.postOffice.mailHeroicMarks(pid, itemId, count),
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
       // sim.ctx resolves at call time (the Q1 pattern).
       bumpDeedStat: (meta, stat, delta) => deedsMod.bumpDeedStat(sim.ctx, meta, stat, delta),
@@ -4029,6 +4210,11 @@ export class Sim {
           // Proficiency just became visible; the gathering predicates re-check.
           deedsMod.markDeedsDirty(this.ctx, p.id);
         }
+        // Mount summon/dismount transition: decrement the timer, cancel a summon
+        // on combat/swim, complete a mount/dismount, and force-dismount a mounted
+        // swimmer. Live players only (a dead player is already force-dismounted by
+        // handleDeath). Draws no rng, so the tick-phase draw order is unchanged.
+        updateMountTransition(this.ctx, p, this.isSwimming(p));
         lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not
@@ -4040,6 +4226,14 @@ export class Sim {
         this.updateRiftTriggers(p);
         lap?.('p.move');
       }
+      // Riding-lesson driver: server-authoritative; tracks the training-steed
+      // phase and ends a dead/ghost player's IN_PROGRESS lesson, so death never
+      // strands the session. Finishing the race credits success. Draws no rng,
+      // so the tick-phase draw order is unchanged.
+      this.ctx.tickMountTraining(meta);
+      // Show-jumping race driver: per-player, server-authoritative, rng-free
+      // (runs after movement so prevPos -> pos is this tick's ridden segment).
+      this.ctx.tickMountRace(meta);
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);
@@ -4497,6 +4691,9 @@ export class Sim {
     ) {
       meta.lastActiveTick = this.tickCount;
     }
+    // The race countdown is a real start lock, not just a client animation.
+    // Hold every forced/manual locomotion mode until the authoritative GO tick.
+    if (meta.mountRace?.phase === 'countdown') return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
     if (this.updateFearMovement(p)) return;
@@ -6719,8 +6916,8 @@ export class Sim {
     revivePlayerAt(this.ctx, pid, pos, hpFrac);
   }
 
-  // chatAllowed / handleDevChat / whisperMessageForName / resolveWhisperTarget
-  // moved to social/chat.ts (G2). The chat() router below dispatches to them via
+  // chatAllowed / whisperMessageForName / resolveWhisperTarget moved to social/chat.ts;
+  // handleDevChat moved to dev_commands.ts. The chat() router dispatches via
   // chatMod.*(this.ctx, ...); they had no callers outside chat().
 
   chat(text: string, pid?: number): SentChat | null {
@@ -7809,6 +8006,14 @@ export class Sim {
     leaveDungeonImpl(this.ctx, pid);
   }
 
+  resetDungeonInstances(pid?: number): void {
+    resetDungeonInstancesImpl(this.ctx, pid);
+  }
+
+  inheritDungeonResetLocks(pid: number): void {
+    inheritDungeonResetLocksImpl(this.ctx, pid);
+  }
+
   // Procedural rift delegates (dev command + interaction click + tick drivers).
   enterRift(
     seed: number,
@@ -7906,6 +8111,10 @@ export class Sim {
   get partyInfo(): import('../world_api').PartyInfo | null {
     const party = this.partyOf(this.primaryId);
     if (!party) return null;
+    const aggroTargets = partyFrameAggroTargets(this.entities.values());
+    const incomingHeals = partyFrameIncomingHeals(this.entities.values(), (abilityId, casterId) =>
+      this.resolvedAbility(abilityId, casterId),
+    );
     return {
       leader: party.leader,
       raid: party.raid,
@@ -7930,14 +8139,12 @@ export class Sim {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
-                // The mini aura strip under the member's party row: first N in
-                // aura order (buffs and debuffs alike), id + kind + sap flag
-                // only, no countdown (see PartyMemberAura in world_api/party.ts).
-                auras: e.auras.slice(0, PARTY_MEMBER_AURA_CAP).map((a) => ({
-                  id: a.id,
-                  kind: a.kind,
-                  ...(a.value < 0 ? { neg: 1 as const } : {}),
-                })),
+                absorb: partyFrameAbsorb(e.auras),
+                role: partyFrameRole(meta.talentMods.role),
+                connected: 1,
+                hasAggro: aggroTargets.has(mPid) ? 1 : 0,
+                incomingHeal: incomingHeals.get(mPid) ?? 0,
+                auras: partyFrameAuras(e.auras),
               },
             ]
           : [];

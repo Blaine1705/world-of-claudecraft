@@ -20,6 +20,154 @@ export const pl_PL: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Centrum poleceń deweloperskich",
+    "kicker": "Narzędzia deweloperskie",
+    "title": "Centrum poleceń",
+    "subtitle": "Autorytatywne narzędzia testowe dla aktywnego świata.",
+    "closeAria": "Zamknij polecenia deweloperskie",
+    "categoryNavAria": "Kategorie poleceń deweloperskich",
+    "categories": {
+      "player": "Gracz",
+      "spawns": "Przywołania",
+      "inventory": "Ekwipunek",
+      "progress": "Postęp",
+      "travel": "Podróż",
+      "scenarios": "Scenariusze"
+    },
+    "filterLabel": "Filtruj polecenia",
+    "filterPlaceholder": "Przeszukaj tę kategorię",
+    "noMatches": "Brak pasujących poleceń.",
+    "serverRequirement": "Cheaty serwera nadal wymagają ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Wybierz prawidłowe wartości przed uruchomieniem tego polecenia.",
+    "sent": "Wysłano: {command}",
+    "run": "Uruchom",
+    "fields": {
+      "level": "Poziom",
+      "mob": "Mob",
+      "count": "Liczba",
+      "item": "Przedmiot",
+      "gold": "Złoto",
+      "quest": "Zadanie",
+      "profession": "Profesja",
+      "amount": "Ilość",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Loch",
+      "difficulty": "Poziom trudności",
+      "name": "Nazwa"
+    },
+    "difficulty": {
+      "normal": "Normalny",
+      "heroic": "Heroiczny"
+    },
+    "actions": {
+      "heal": {
+        "label": "Przywróć zdrowie",
+        "description": "Uzupełnij całe zdrowie."
+      },
+      "resource": {
+        "label": "Przywróć zasób",
+        "description": "Uzupełnij manę, szał lub energię."
+      },
+      "cooldowns": {
+        "label": "Wyczyść czasy odnowienia",
+        "description": "Zresetuj czasy odnowienia umiejętności, GCD i mikstur."
+      },
+      "god": {
+        "label": "Przełącz tryb boga",
+        "description": "Przełącz niewrażliwość i zwiększone obrażenia."
+      },
+      "revive": {
+        "label": "Wskrześ",
+        "description": "Wskrześ przez zwykły proces wskrzeszenia."
+      },
+      "kill": {
+        "label": "Zabij gracza",
+        "description": "Przetestuj przebieg śmierci, ducha i zwłok."
+      },
+      "combatreset": {
+        "label": "Zresetuj walkę",
+        "description": "Wyczyść stan walki i wrogie zagrożenie."
+      },
+      "level": {
+        "label": "Ustaw poziom",
+        "description": "Ustaw bieżący poziom postaci."
+      },
+      "spawn": {
+        "label": "Przywołaj moba",
+        "description": "Utwórz konkretnego moba w pobliżu gracza."
+      },
+      "killtarget": {
+        "label": "Zabij cel",
+        "description": "Zabij wybranego żywego moba."
+      },
+      "despawntarget": {
+        "label": "Usuń cel",
+        "description": "Usuń wybranego moba utworzonego tym narzędziem."
+      },
+      "despawnall": {
+        "label": "Usuń moje przywołania",
+        "description": "Usuń wszystkie moby przywołane przez tego dewelopera."
+      },
+      "give": {
+        "label": "Daj przedmiot",
+        "description": "Dodaj przedmiot do ekwipunku gracza."
+      },
+      "gold": {
+        "label": "Dodaj złoto",
+        "description": "Dodaj złoto do obecnej sakiewki."
+      },
+      "quest": {
+        "label": "Ukończ zadanie",
+        "description": "Ukończ konkretne zadanie według identyfikatora."
+      },
+      "quests": {
+        "label": "Ukończ aktywne zadania",
+        "description": "Ukończ wszystkie zadania w bieżącym dzienniku."
+      },
+      "attune": {
+        "label": "Odblokuj dostrojenia",
+        "description": "Oznacz wszystkie wymagania dostrojenia jako spełnione."
+      },
+      "gather": {
+        "label": "Dodaj umiejętność zbierania",
+        "description": "Zwiększ poziom profesji zbierackiej."
+      },
+      "teleport": {
+        "label": "Teleportuj",
+        "description": "Przenieś się do dokładnych współrzędnych świata."
+      },
+      "dungeon": {
+        "label": "Wejdź do lochu",
+        "description": "Wejdź do lochu z pominięciem blokady deweloperskiej."
+      },
+      "raid": {
+        "label": "Wejdź do rajdu",
+        "description": "Wejdź bezpośrednio na arenę Nythraxis."
+      },
+      "raidreset": {
+        "label": "Zresetuj blokadę rajdu",
+        "description": "Wyczyść bieżące blokady rajdu."
+      },
+      "bot": {
+        "label": "Przywołaj bota społecznościowego",
+        "description": "Utwórz nieruchomego gracza, do którego można szeptać."
+      },
+      "lfgqueue": {
+        "label": "Wypełnij kolejkę wyszukiwarki",
+        "description": "Utwórz scenariusz kolejki Znajdywacza Lochów."
+      },
+      "lfgraid": {
+        "label": "Wypełnij wyszukiwarkę rajdów",
+        "description": "Utwórz scenariusz wyszukiwarki rajdów."
+      },
+      "lfgboard": {
+        "label": "Wypełnij tablicę ogłoszeń",
+        "description": "Utwórz scenariusz gotowego ogłoszenia grupy."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "PD",
@@ -229,6 +377,7 @@ export const pl_PL: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} godz. {minutes} min",
+      "remainingDaysHours": "{days} d {hours} godz.",
       "score": "Wynik",
       "walletValue": "Wartość portfela (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const pl_PL: EnTranslations = {
         "no_wallet": "Podłącz portfel z co najmniej 20 USD w WOC.",
         "under_minimum": "Portfel jest poniżej minimum 20 USD w WOC.",
         "price_unavailable": "Cena WOC jest niedostępna, nagrody są tymczasowo zablokowane.",
-        "banned": "Masz zakaz udziału w codziennych nagrodach. Powód: {reason}"
+        "banned": "Masz zakaz udziału w codziennych nagrodach. Powód: {reason}",
+        "bannedUntil": "Masz zablokowany dostęp do codziennych nagród jeszcze przez {remaining}. Dostęp powróci {until}. Powód: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const pl_PL: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Klaudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Sklep Claudium jest obecnie niedostępny. Nie ma to wpływu na Twoje saldo i zakupy; sprawdź ponownie wkrótce.",
       "disclosure": "Claudium to jednokierunkowa miękka waluta: kup ją za pieniądze i wydawaj na kosmetyki. Nie można go wymienić, przenieść ani wypłacić.",
@@ -499,6 +650,7 @@ export const pl_PL: EnTranslations = {
       "railLabel": "Metoda płatności",
       "railStripe": "Karta",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% zniżki",
       "railWocUnavailable": "Ceny WOC są obecnie niedostępne.",
@@ -602,6 +754,7 @@ export const pl_PL: EnTranslations = {
       "leaderboard": "Rankingi",
       "dailyRewards": "Sklep",
       "deeds": "Czyny",
+      "mounts": "Mounts",
       "nameplates": "Nazwy",
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",
@@ -716,7 +869,63 @@ export const pl_PL: EnTranslations = {
       "petStop": "Zwierzę: Zatrzymaj",
       "petTaunt": "Zwierzę: Prowokacja",
       "petDefensive": "Zwierzę: Obronne",
-      "petAggressive": "Zwierzę: Agresywne"
+      "petAggressive": "Zwierzę: Agresywne",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Puchar Doliny",
@@ -870,6 +1079,7 @@ export const pl_PL: EnTranslations = {
       "interfaceModeTouch": "Dotyk",
       "interfaceModeNote": "Tryb Auto dobiera sterowanie komputerowe lub dotykowe na podstawie urządzenia. Wybierz Komputer, aby wymusić klawiaturę i mysz (przydatne na tablecie z klawiaturą), lub Dotyk, aby korzystać ze sterowania ekranowego.",
       "footstepSounds": "Dźwięki kroków",
+      "interfaceSounds": "Dźwięki interfejsu i reakcji",
       "clickFeedback": "Znacznik kliknięcia",
       "lockCursorOnRotate": "Blokuj kursor podczas obracania",
       "keybindHelpLockCursorOnRotate": "Utrzymuje kursor myszy wewnątrz okna podczas przeciągania w celu obracania kamery, aby nie mógł dotrzeć do krawędzi ekranu ani przejść na inny monitor. Wyłącz, jeśli wolisz swobodny kursor.",
@@ -1309,7 +1519,20 @@ export const pl_PL: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Ustaw trudność podziemia: Heroiczna",
-      "setNormal": "Ustaw trudność podziemia: Normalna"
+      "setNormal": "Ustaw trudność podziemia: Normalna",
+      "resetAll": "Zresetuj wszystkie instancje",
+      "resetDone": "Wszystkie instancje zostały zresetowane.",
+      "resetNone": "Nie masz żadnych instancji do zresetowania.",
+      "resetOccupied": "Nie możesz zresetować instancji, dopóki ktoś nadal znajduje się w środku.",
+      "resetSameDifficulty": "Zmień trudność podziemia przed zresetowaniem tych instancji. Puste instancje resetują się automatycznie po 5 minutach.",
+      "resetLoot": "Nie możesz zresetować instancji, dopóki w środku pozostaje łup.",
+      "resetConfirmTitle": "Zresetować wszystkie instancje?",
+      "resetConfirmBody": "Spowoduje to porzucenie pustych instancji z poprzednio wybranego poziomu trudności. Nieodebrany łup uniemożliwi reset.",
+      "resetConfirm": "Zresetuj instancje",
+      "resetCooldown": "Instancje można resetować tylko raz na 5 minut.",
+      "resetUsage": "Po zmianie trudności użyj /dungeon reset, aby porzucić puste instancje.",
+      "entryMismatchNormal": "Ta instancja ma ustawioną normalną trudność. Użyj opcji Zresetuj wszystkie instancje, aby rozpocząć nowy heroiczny przebieg.",
+      "entryMismatchHeroic": "Ta instancja ma ustawioną heroiczną trudność. Użyj opcji Zresetuj wszystkie instancje, aby rozpocząć nowy normalny przebieg."
     },
     "bags": {
       "cannotDestroy": "Tego przedmiotu nie można zniszczyć.",
@@ -1324,6 +1547,7 @@ export const pl_PL: EnTranslations = {
       "filterConsumable": "Konsumpcyjne",
       "filterMaterial": "Surowce",
       "filterQuest": "Zadania",
+      "filterMount": "Wierzchowce",
       "sortAria": "Sortuj przedmioty w torbie",
       "sortRecent": "Ostatnie",
       "sortQuality": "Jakość",
@@ -1478,6 +1702,33 @@ export const pl_PL: EnTranslations = {
     "playerFrame": {
       "unlock": "Przesuń ramkę gracza",
       "lock": "Zablokuj ramkę gracza"
+    },
+    "partyFrames": {
+      "section": "Ramki grupy i rajdu",
+      "unlock": "Przenieś ramki grupy i rajdu",
+      "lock": "Zablokuj ramki grupy i rajdu",
+      "style": "Styl ramki",
+      "styleAutomatic": "Automatyczny",
+      "styleClassic": "Klasyczne ramki grupy",
+      "styleRaid": "Ramki rajdu",
+      "scale": "Skala ramki",
+      "width": "Szerokość ramki",
+      "height": "Wysokość ramki",
+      "spacing": "Odstępy ramek",
+      "columns": "Kolumny rajdu",
+      "healthText": "Tekst zdrowia",
+      "healthNone": "Brak",
+      "healthPercent": "Procent",
+      "healthCurrent": "Bieżące",
+      "healthCurrentMax": "Bieżące / Maksymalne",
+      "sort": "Sortuj graczy",
+      "sortGroup": "Grupa",
+      "sortRole": "Rola",
+      "sortName": "Nazwa",
+      "showResource": "Pokaż manę, szał i energię",
+      "showAbsorbs": "Pokaż tarcze absorpcji",
+      "showAuras": "Pokaż wzmocnienia i osłabienia",
+      "showSelf": "Pokaż własną ramkę"
     },
     "frameReset": {
       "label": "Resetuj pozycje ramek"
@@ -2141,6 +2392,9 @@ export const pl_PL: EnTranslations = {
       "already_linked": "Twoje konto ma już połączone konto Steam.",
       "account_taken": "To konto Steam jest już połączone z innym kontem.",
       "upstream": "Steam nie odpowiada. Spróbuj ponownie za chwilę."
+    },
+    "welcome": {
+      "invalid_input": "Nieprawidłowe dane."
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const pl_PL: EnTranslations = {
       "effectsTitle": "Wzmocnienia, osłabienia i kontrola tłumu",
       "effectsBody": "Wiele zdolności nakłada utrzymujący się efekt. Korzystne (wzmocnienia) zwiększają twoje cechy, osłaniają cię lub leczą po trochu; szkodliwe (osłabienia) wysysają twoje zdrowie obrażeniami w czasie albo cię osłabiają. Obserwuj małe ikony w górnym rogu ekranu, obok minimapy, by zobaczyć, co na tobie działa i jak długo.",
       "ccBody": "Kontrola tłumu to szczególny rodzaj osłabienia, które ogranicza możliwości celu: ogłuszenia, unieruchomienia i spowolnienia, uciszenia powstrzymujące rzucanie zaklęć, rozbrojenia, efekty strachu oraz przemiany, które na chwilę czynią wroga nieszkodliwym. Wobec innych graczy kontrola słabnie z każdym powtórzeniem: ten sam jej rodzaj nałożony zbyt szybko ponownie traci moc, a w końcu w ogóle zawodzi, a ogłuszenie otwierające ze skrytości liczone jest osobno od ogłuszeń, które następują po nim, więc nikogo nie da się w nieskończoność trzymać bezbronnym. Stworzenia tego świata nie chowają takiej urazy: na nie kontrola nigdy nie słabnie z powtórzeniem, choć wielu najpotężniejszych wrogów, nazwanych elit i najsilniejszych bossów wśród nich, nie da się kontrolować wcale.",
-      "metersBody": "Ciekawi cię, jak poszła walka? Naciśnij Z, aby otworzyć liczniki drużyny, które zliczają obrażenia, leczenie i zagrożenie twojej grupy, starcie po starciu.",
+      "metersBody": "Ciekawi cię, jak poszła walka? Naciśnij Shift+H, aby otworzyć liczniki drużyny, które zliczają obrażenia, leczenie i zagrożenie twojej grupy, starcie po starciu.",
       "queueTitle": "Twój następny ruch jest już gotowy",
       "queueBody": "Nie musisz wstrzeliwać się z naciśnięciami co do klatki. Naciśnij następną zdolność w ostatnich chwilach obecnego rzucania, a zostanie zakolejkowana i odpali w momencie, gdy rzucanie dobiegnie końca, dzięki czemu wprawna gra płynie bez przerw. Naciśnięcie zbyt wczesne jest po prostu odrzucane, więc nic się nie marnuje. Niektóre ciosy w zwarciu działają tak samo, wychodząc wraz z twoim następnym zamachem bronią.",
       "deathTitle": "Gdy padniesz",
@@ -2505,7 +2759,7 @@ export const pl_PL: EnTranslations = {
       "petBarTerm": "Pasek zwierzęcia",
       "petBarDef": "Rząd komend, który dodaje zwierzę łowcy lub czarnoksiężnika: Atak, Stój, Prowokacja, Obronny i Agresywny, domyślnie przypisany do Ctrl plus 1 do 5.",
       "metersTerm": "Liczniki obrażeń",
-      "metersDef": "Okno tablicy wyników drużyny dla bieżącej walki: zadane obrażenia, wykonane leczenie i kto dzierży najwięcej zagrożenia, liczone dla każdego starcia. Otwórz je przypisanym klawiszem (domyślnie Z).",
+      "metersDef": "Okno tablicy wyników drużyny dla bieżącej walki: zadane obrażenia, wykonane leczenie i kto dzierży najwięcej zagrożenia, liczone dla każdego starcia. Otwórz je przypisanym klawiszem (domyślnie Shift+H).",
       "targetMarkerTerm": "Znacznik celu",
       "targetMarkerDef": "Symbol, który dowolny członek drużyny lub rajdu może przypiąć nad celem, aby wszyscy skupiali się na tym samym lub go unikali. Osiem symboli, jeden cel na symbol.",
       "loadoutTerm": "Układ",
@@ -2886,6 +3140,8 @@ export const pl_PL: EnTranslations = {
       "heroicRewardsTitle": "Znaki Heroiczne i ulepszone zdobycze",
       "heroicRewardsBody": "Heroiczni bossowie upuszczają znany ci łup, ulepszony i oznaczony jako Heroiczny w podpowiedzi, a ostatni boss każdego przebiegu dorzuca epiki, których nie znajdziesz nigdzie indziej. To ostatnie zabójstwo zostawia też każdemu uczestnikowi Znaki Heroiczne: walutę wydawaną u Kwatermistrza Vexa w Highwatch, którego zapas pierścieni i naszyjników to jedyna biżuteria w królestwie.",
       "heroicLockoutBody": "Normalne lochy można przemierzać bez końca. Tryb heroiczny wymaga cierpliwości: zabicie ostatniego bossa blokuje wszystkim w przebiegu więcej niż jedno heroiczne ukończenie tego lochu na dzień, a rajd prowadzi osobną dzienną blokadę dla każdej trudności. Ukończony przebieg dla pięciu graczy pozostaje otwarty dla własnej drużyny, na powroty po ciało i łupy, więc nikt nie zostaje odcięty od tego, co tam zdobył. Rajd jest surowszy: gdy jego zabójstwo cię zablokuje, drzwi pozostają zamknięte aż do dziennego resetu, więc zbierz swoje zdobycze, zanim opuścisz arenę.",
+      "resetTitle": "Resetowanie instancji",
+      "resetBody": "Jeśli zmienisz trudność, gdy grupa wciąż ma zajęte podejścia, stare przypisania pozostaną przez pewien czas. Przywódca może porzucić je natychmiast, wybierając Resetuj wszystkie instancje w menu własnego portretu albo wpisując /dungeon reset. Trudność musi faktycznie zostać zmieniona, wewnątrz nie może pozostać nikt żywy ani poległy, a kolejne resety dzieli krótki czas odnowienia. Przy wejściu na złej trudności gra ostrzeże przed rozpoczęciem. Rajdu nie resetuje się w ten sposób; obowiązują jego własne zasady blokady.",
       "templeLoreTitle": "Zatopiona Świątynia, nieco głębiej",
       "templeLoreBody": "Świątynia ma własną legendę, starszą niż kult, którego tropisz gdzie indziej. Na brzegu Migotliwego Stawu, jeziorka, które pije światło księżyca i oddaje utopionych, samotny strażnik pilnuje bramy bladego światła. Pod powierzchnią schody z zimnego kamienia zbiegają w dół do niej. Lud, który tam zatonął, nie utonął przez nieszczęśliwy wypadek: byli to członkowie Bladego Chóru, którzy zeszli pod wodę w modlitwie i nigdy nie przestali śpiewać. Dawni strażnicy wydrapali jedno ostrzeżenie w skałach, zanim woda ich pochłonęła, modlitwę do czegoś, co nazwali Utopionym Księżycem, a pewniejsza ręka dopisała pod nią dwa słowa: ono tylko śpi.",
       "cryptLeadTitle": "Drzwi, które zmarli mieli trzymać zamknięte",
@@ -3093,7 +3349,7 @@ export const pl_PL: EnTranslations = {
       "qualityNote": "Wyższa jakość zwykle oznacza lepsze statystyki, ale jakość to wskazówka, nie reguła. Dobrze dobrany przedmiot do twojej klasy i poziomu może pokonać bardziej efektowny.",
       "upgradeTitle": "Trzymaj wyposażenie na bieżąco",
       "upgradeBody": "Zastąpienie starego elementu świeżym ulepszeniem daje ci więcej niż perfekcyjna gra w wyposażeniu, z którego wyrosłeś. Gdy coś lepszego wypadnie lub zaoferuje to zadanie, weź to. Nie odkładaj dobrych przedmiotów na później.",
-      "itemLevelBody": "Jeśli chcesz szybkiego sposobu na porównanie dwóch elementów, włącz w opcjach Pokaż poziom przedmiotu. Ekwipunek zdobyty w świecie, od wrogów i z zadań, pokaże wtedy poziom przedmiotu, jedną liczbę określającą z grubsza jego potęgę na podstawie tego, skąd pochodzi, dzięki czemu na pierwszy rzut oka poznasz, które ulepszenie waży więcej, nawet w różnych slotach. Przedmioty bez takiego źródła, jak zwykłe podstawy od sprzedawców i ekwipunek startowy, nie pokazują poziomu przedmiotu, więc brak liczby jest czymś normalnym, nie usterką.",
+      "itemLevelBody": "Aby szybko porównać dwa przedmioty, włącz w opcjach Pokaż poziom przedmiotu. Wyposażenie o znanym źródle, zdobyte z wrogów, zadań i profesji rzemieślniczych, pokazuje wtedy poziom przedmiotu: jedną liczbę przybliżającą jego moc na podstawie pochodzenia, co ułatwia ocenę ulepszeń nawet między różnymi miejscami. Przedmioty bez takiego źródła, jak podstawowe towary kupców i sprzęt startowy, nie pokazują poziomu; brak liczby jest normalny.",
       "sourcesTitle": "Skąd pochodzi wyposażenie",
       "sourcesBody": "Większość twoich wczesnych ulepszeń to nagrody za zadania, więc opłaca się kończyć zadania zamiast młócić wrogów. Wrogowie upuszczają wyposażenie, gdy ich pokonasz, sprzedawcy w mieście oferują solidne podstawy, rzemieślnicy przerabiają zebrane materiały na noszalne części, a rynek graczy pozwala kupować od innych poszukiwaczy przygód. Na samym szczycie dwie waluty znaków kupują ekwipunek nieosiągalny nigdzie indziej: Znaki Wypraw u opiekuna wypraw oraz Znaki heroiczne u heroicznego kwatermistrza.",
       "soulboundTitle": "Związany z duszą: tylko i wyłącznie twój",
@@ -3137,7 +3393,7 @@ export const pl_PL: EnTranslations = {
       "craftRecipesTitle": "Przepisy i składniki",
       "craftRecipesBody": "Każdy przepis wymaga konkretnych składników, które zbierasz lub kupujesz. Najprostsze przepisy potrzebują wyłącznie pospolitych materiałów i są dostępne od samego początku, więc możesz zacząć pracę w fachu od chwili, gdy go podejmiesz. Listy przepisów wciąż się zapełniają: kilka fachów czeka na swoje pierwsze przepisy, a kolejne pojawiają się wraz z rozwojem rzemiosł.",
       "craftHowTitle": "Okno wytwarzania",
-      "craftHowBody": "Otwórz okno Wytwarzania (domyślnie klawisz T), aby zobaczyć każdy znany ci przepis, czego wymaga i co masz pod ręką; gdy materiały są na miejscu, jedno kliknięcie wykonuje pracę. Pospolite przepisy można wytwarzać wszędzie w świecie. Garść zaawansowanych przepisów na narzędzia wymaga natomiast, byś stanął przy warsztacie rzemieślniczym w Highwatch.",
+      "craftHowBody": "Otwórz okno Rzemiosła (domyślnie klawisz T), aby zobaczyć wszystkie znane receptury, ich wymagania i posiadane materiały; gdy masz składniki, wystarczy jedno kliknięcie. Zwykłe receptury można tworzyć wszędzie. Niektóre zaawansowane, w tym narzędzia wyższego poziomu i rzadkie pancerze dla czarujących, wymagają centrum rzemiosła w Highwatch.",
       "craftMasteryTitle": "Umiejętność i biegłość",
       "craftMasteryBody": "Udane wytwarzanie buduje umiejętność w danym fachu, a umiejętność nigdy nie zamyka przepisów rzemiosła: jeśli znasz przepis i masz jego materiały, możesz spróbować. To, co daje ci umiejętność, to jakość, wprawna ręka wykonuje lepszą robotę. Jedynym wyjątkiem są przepisy łączone, które wymagają, byś wykazał się w obu ich fachach, zanim się otworzą.",
       "craftComboTitle": "Przepisy łączone",
@@ -4928,6 +5184,29 @@ export const pl_PL: EnTranslations = {
     "body": "Ponownie uruchamiamy usługę gry i spodziewamy się, że Claudemoon wkrótce wróci. Ta strona będzie automatycznie sprawdzać stan.",
     "status": "Niedługo wracamy"
   },
+  "welcome": {
+    "back": "Witaj ponownie, {name}",
+    "level": "Poziom {level}",
+    "lastPlayed": "Ostatnio w grze: {when}",
+    "continue": "Wejdź do świata",
+    "continueHint": "Enter, aby kontynuować, Esc, aby pominąć",
+    "continueHintTouch": "Dotknij, aby kontynuować",
+    "discord": {
+      "title": "Społeczność żyje na Discordzie",
+      "sub": "Zapowiedzi aktualizacji, wydarzenia, czat z twórcami i 2 dodatkowe miejsca w banku za połączenie konta z Discordem.",
+      "join": "Dołącz do naszego Discorda"
+    },
+    "chest": {
+      "ready": "Dzienna skrzynia jest gotowa"
+    },
+    "armory": {
+      "cta": "Wejdź i przejrzyj Zbrojownię"
+    },
+    "news": {
+      "new": "Nowe",
+      "viewAll": "Zobacz wszystkie aktualizacje na GitHubie"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITA",
@@ -5663,7 +5942,8 @@ export const pl_PL: EnTranslations = {
       "tool": "Narzędzie",
       "potion": "Mikstura",
       "elixir": "Eliksir",
-      "bag": "Torba"
+      "bag": "Torba",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Pancerz",
@@ -6458,7 +6738,7 @@ export const pl_PL: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wilcza krew",
-        "description": "Zwiększa moc ataku o 40 na 6 sek. Tylko w Postaci wilka."
+        "description": "Zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci wilka."
       },
       "rip": {
         "name": "Rozszarpanie",
@@ -6749,6 +7029,24 @@ export const pl_PL: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Wełniane spodnie ze Wschodniego Strumienia"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Rytualne Szaty ze Wschodniego Strumienia"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Skóra Druida ze Wschodniego Strumienia"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Chronione Nogawice ze Wschodniego Strumienia"
+      },
+      "wardweave_cowl": {
+        "name": "Kaptur z Ochronnej Tkaniny"
+      },
+      "duskhide_wraps": {
+        "name": "Owijki ze Zmierzchowej Skóry"
+      },
+      "sootscale_mantle": {
+        "name": "Płaszcz z Sadzołusek"
       },
       "gravecaller_blade": {
         "name": "Szerokie ostrze Grobowego Przyzywacza"
@@ -8171,6 +8469,27 @@ export const pl_PL: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Ochraniacz pasa przywoływacza burz"
+      },
+      "reins_valorsteed": {
+        "name": "Wodze Valorsteeda"
+      },
+      "reins_grag_bear": {
+        "name": "Wodze Goliata Grag-niedźwiedzia"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Wodze mchoskorupego szybownika"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Kluczyk zapłonu: eterowy ścigacz kopijnika"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Wodze Kama-Kage, ropuchy cienioskoku"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Wodze Burzopióra Podniebnego"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Wodze Gromostępa, Wielkiego Indora"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const pl_PL: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Zbudzony Burzowiec"
+      },
+      "stable_horse": {
+        "name": "Koń stajenny"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -8821,6 +9143,11 @@ export const pl_PL: EnTranslations = {
         "name": "Sztygar Odell",
         "title": "Sztygar Kopalni",
         "greeting": "Cały wykop roi się od tego oblepionego błotem robactwa!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Zarządczyni stajni",
+        "greeting": "Każdy jeździec przychodzi na dwóch nogach, {className}. Wodzy nie dostaniesz, dopóki nie utrzymasz się na Valorsteedzie bez całowania błota, a Highwatch nie ma zbyt wielu uzdrowicieli na złamane kości."
       },
       "warden_fenwick": {
         "name": "Strażnik Fenwick",
@@ -9821,6 +10148,16 @@ export const pl_PL: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Lekcje jazdy konnej",
+        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Zapłać opłatę, a gdy dam znak, przywołaj treningowego Valorsteeda i wsiądź do siodła. Potem przejedź parkur: podążaj za znacznikiem do łuku startowego, weź każdą przeszkodę czysto i ponownie przekrocz linię, zanim przesypie się piasek. Uda ci się i siodło jest twoje. Wyjedziesz poza zagrodę i zaczynamy od nowa.",
+        "completion": "No, właśnie tak. W siodle za jednym płynnym ruchem i pewnie usadzony. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.",
+        "objectives": {
+          "0": {
+            "label": "Ujeżdżenie Valorsteeda"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10137,6 +10474,9 @@ export const pl_PL: EnTranslations = {
           },
           "9": {
             "label": "Sanktuarium Grobowego Żmija"
+          },
+          "10": {
+            "label": "Stajnie Highwatch"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const pl_PL: EnTranslations = {
         "sender": "Brat Aldric",
         "subject": "To, czego dokonałeś w mroku",
         "body": "Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Heroiczny kwatermistrz",
+        "subject": "Twoje heroiczne znaki",
+        "body": "Twoja grupa pokonała heroiczną próbę, gdy walczyłeś na tyłach lub leżałeś pokonany. Twoja blokada również została zapisana, dlatego należna część heroicznych znaków trafiła tutaj, zamiast przepaść. Dobrze je wykorzystaj.\n\n- Heroiczny kwatermistrz"
       }
     },
     "itemSets": {

@@ -20,6 +20,154 @@ export const de_DE: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Entwicklerbefehlszentrale",
+    "kicker": "Entwicklungswerkzeuge",
+    "title": "Befehlszentrale",
+    "subtitle": "Autoritative Teststeuerung für die aktive Welt.",
+    "closeAria": "Entwicklerbefehle schließen",
+    "categoryNavAria": "Kategorien der Entwicklerbefehle",
+    "categories": {
+      "player": "Spieler",
+      "spawns": "Spawns",
+      "inventory": "Inventar",
+      "progress": "Fortschritt",
+      "travel": "Reisen",
+      "scenarios": "Szenarien"
+    },
+    "filterLabel": "Befehle filtern",
+    "filterPlaceholder": "Diese Kategorie durchsuchen",
+    "noMatches": "Keine passenden Befehle.",
+    "serverRequirement": "Server-Cheats erfordern weiterhin ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Wähle gültige Werte, bevor du diesen Befehl ausführst.",
+    "sent": "Gesendet: {command}",
+    "run": "Ausführen",
+    "fields": {
+      "level": "Stufe",
+      "mob": "Mob",
+      "count": "Anzahl",
+      "item": "Gegenstand",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Beruf",
+      "amount": "Menge",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Schwierigkeitsgrad",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroisch"
+    },
+    "actions": {
+      "heal": {
+        "label": "Gesundheit wiederherstellen",
+        "description": "Gesundheit vollständig auffüllen."
+      },
+      "resource": {
+        "label": "Ressource wiederherstellen",
+        "description": "Mana, Wut oder Energie auffüllen."
+      },
+      "cooldowns": {
+        "label": "Abklingzeiten zurücksetzen",
+        "description": "Fähigkeits-, GCD- und Tranktimer zurücksetzen."
+      },
+      "god": {
+        "label": "Gottmodus umschalten",
+        "description": "Unverwundbarkeit und erhöhten Schaden umschalten."
+      },
+      "revive": {
+        "label": "Wiederbeleben",
+        "description": "Über den normalen Wiederbelebungsablauf zurückkehren."
+      },
+      "kill": {
+        "label": "Spieler töten",
+        "description": "Abläufe für Tod, Geist und Leiche testen."
+      },
+      "combatreset": {
+        "label": "Kampf zurücksetzen",
+        "description": "Kampfstatus und feindliche Bedrohung zurücksetzen."
+      },
+      "level": {
+        "label": "Stufe festlegen",
+        "description": "Die aktuelle Charakterstufe festlegen."
+      },
+      "spawn": {
+        "label": "Mob spawnen",
+        "description": "Einen konkreten Mob in der Nähe des Spielers erstellen."
+      },
+      "killtarget": {
+        "label": "Ziel töten",
+        "description": "Den ausgewählten lebenden Mob töten."
+      },
+      "despawntarget": {
+        "label": "Ziel despawnen",
+        "description": "Einen mit diesem Werkzeug erstellten, ausgewählten Mob entfernen."
+      },
+      "despawnall": {
+        "label": "Eigene Spawns entfernen",
+        "description": "Alle von diesem Entwickler erzeugten Mobs entfernen."
+      },
+      "give": {
+        "label": "Gegenstand geben",
+        "description": "Einen Gegenstand zum Inventar des Spielers hinzufügen."
+      },
+      "gold": {
+        "label": "Gold hinzufügen",
+        "description": "Gold zum aktuellen Geldbeutel hinzufügen."
+      },
+      "quest": {
+        "label": "Quest abschließen",
+        "description": "Eine bestimmte Quest anhand ihrer ID abschließen."
+      },
+      "quests": {
+        "label": "Aktive Quests abschließen",
+        "description": "Jede Quest im aktuellen Logbuch abschließen."
+      },
+      "attune": {
+        "label": "Abstimmungen freischalten",
+        "description": "Alle Abstimmungsanforderungen als erfüllt markieren."
+      },
+      "gather": {
+        "label": "Sammelfertigkeit erhöhen",
+        "description": "Die Fertigkeit eines Sammelberufs erhöhen."
+      },
+      "teleport": {
+        "label": "Teleportieren",
+        "description": "Zu exakten Weltkoordinaten bewegen."
+      },
+      "dungeon": {
+        "label": "Dungeon betreten",
+        "description": "Einen Dungeon unter Umgehung der Entwicklersperre betreten."
+      },
+      "raid": {
+        "label": "Schlachtzug betreten",
+        "description": "Die Nythraxis-Arena direkt betreten."
+      },
+      "raidreset": {
+        "label": "Schlachtzugssperren zurücksetzen",
+        "description": "Aktuelle Schlachtzugssperren zurücksetzen."
+      },
+      "bot": {
+        "label": "Sozialen Bot spawnen",
+        "description": "Einen stationären Spieler erstellen, dem man zuflüstern kann."
+      },
+      "lfgqueue": {
+        "label": "Finder-Warteschlange befüllen",
+        "description": "Ein Szenario für die Dungeonfinder-Warteschlange erstellen."
+      },
+      "lfgraid": {
+        "label": "Schlachtzugssuche befüllen",
+        "description": "Ein Szenario für die Schlachtzugssuche erstellen."
+      },
+      "lfgboard": {
+        "label": "Angebotstafel befüllen",
+        "description": "Ein Szenario mit einer vorgefertigten Gruppensuche erstellen."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "EP",
@@ -229,6 +377,7 @@ export const de_DE: EnTranslations = {
       "remainingLessThanMinute": "<1Min",
       "remainingMinutes": "{minutes}Min",
       "remainingHoursMinutes": "{hours}Std {minutes}Min",
+      "remainingDaysHours": "{days} T {hours} Std",
       "score": "Punktzahl",
       "walletValue": "Wallet-Wert (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const de_DE: EnTranslations = {
         "no_wallet": "Verbinde eine Wallet mit mindestens 20 USD in WOC.",
         "under_minimum": "Deine Wallet liegt unter dem Mindestwert von 20 USD in WOC.",
         "price_unavailable": "Der WOC-Preis ist nicht verfügbar, Belohnungen sind vorübergehend gesperrt.",
-        "banned": "Du bist von den täglichen Belohnungen ausgeschlossen. Grund: {reason}"
+        "banned": "Du bist von den täglichen Belohnungen ausgeschlossen. Grund: {reason}",
+        "bannedUntil": "Du bist noch für {remaining} von den täglichen Belohnungen ausgeschlossen. Der Zugang wird am {until} wiederhergestellt. Grund: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const de_DE: EnTranslations = {
       "balanceLabel": "Guthaben",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Der Claudium-Shop ist derzeit nicht verfügbar. Dein Guthaben und deine Käufe bleiben davon unberührt. Bitte versuche es gleich noch einmal.",
       "disclosure": "Claudium ist eine nicht rücktauschbare Spielwährung: Du kaufst es mit echtem Geld und gibst es für kosmetische Inhalte aus. Es kann weder eingelöst noch übertragen oder ausgezahlt werden.",
@@ -499,6 +650,7 @@ export const de_DE: EnTranslations = {
       "railLabel": "Zahlungsart",
       "railStripe": "Karte",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% Rabatt",
       "railWocUnavailable": "WOC-Preise sind derzeit nicht verfügbar.",
@@ -602,6 +754,7 @@ export const de_DE: EnTranslations = {
       "leaderboard": "Rangliste",
       "dailyRewards": "Shop",
       "deeds": "Taten",
+      "mounts": "Reittiere",
       "nameplates": "Namen",
       "haptics": "Haptik",
       "hapticsOff": "Haptik aus",
@@ -716,7 +869,63 @@ export const de_DE: EnTranslations = {
       "petStop": "Begleiter: Stopp",
       "petTaunt": "Begleiter: Verspotten",
       "petDefensive": "Begleiter: Defensiv",
-      "petAggressive": "Begleiter: Aggressiv"
+      "petAggressive": "Begleiter: Aggressiv",
+      "mount": "Aufsitzen / Absitzen"
+    },
+    "mounts": {
+      "title": "Reittiere",
+      "close": "Schließen",
+      "select": "Auswählen",
+      "selected": "Ausgewählt",
+      "riding": "Im Sattel",
+      "mount": "Aufsitzen",
+      "dismount": "Absitzen",
+      "requiresLevel": "Benötigt Stufe {level}",
+      "pickFirst": "Wählt ein Reittier zum Reiten.",
+      "keybindHint": "Drückt die Aufsitzen-/Absitzen-Taste, um zu reiten.",
+      "emptyTitle": "Keine Reittiere gesammelt",
+      "emptyStableHint": "Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.",
+      "emptyDropHint": "Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.",
+      "clickManage": "Anklicken, um Euer Reittier zu wählen",
+      "rarity_common": "Verbreitet",
+      "rarity_rare": "Selten",
+      "rarity_epic": "Episch",
+      "spec_speed": "+{pct}% zusätzliche Mobilität",
+      "spec_block": "+{pct}% Nahkampfschadensblock",
+      "spec_crit": "+{pct}% kritische Trefferchance",
+      "name_valorsteed": "Valorross",
+      "name_grag_bear": "Goliath-Gragbär",
+      "name_stalkglider_snail": "Moosschalen-Stielgleiter",
+      "name_aether_hover_cycle": "Ätherlanzen-Schwebrad",
+      "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
+      "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
+      "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
+      "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
+      "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
+      "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
+      "desc_aether_hover_cycle": "Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.",
+      "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
+      "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
+      "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Der Talpokal",
@@ -870,6 +1079,7 @@ export const de_DE: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto wählt je nach Gerät die Desktop- oder Touch-Steuerung. Wähle Desktop, um Tastatur und Maus zu erzwingen (praktisch bei einem Tablet mit Tastatur), oder Touch für die Bildschirmsteuerung.",
       "footstepSounds": "Schrittgeräusche",
+      "interfaceSounds": "Interface- und Feedback-Sounds",
       "clickFeedback": "Klickmarkierung",
       "lockCursorOnRotate": "Cursor beim Drehen sperren",
       "keybindHelpLockCursorOnRotate": "Hält den Mauszeiger im Fenster, während Ihr zum Drehen der Kamera zieht, damit er nicht den Bildschirmrand erreicht oder auf einen anderen Monitor wandert. Schaltet dies aus, wenn Ihr einen freien Cursor bevorzugt.",
@@ -1309,7 +1519,20 @@ export const de_DE: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Dungeon-Schwierigkeit festlegen: Heroisch",
-      "setNormal": "Dungeon-Schwierigkeit festlegen: Normal"
+      "setNormal": "Dungeon-Schwierigkeit festlegen: Normal",
+      "resetAll": "Alle Instanzen zurücksetzen",
+      "resetDone": "Alle Instanzen wurden zurückgesetzt.",
+      "resetNone": "Du hast keine Instanzen zum Zurücksetzen.",
+      "resetOccupied": "Du kannst Instanzen nicht zurücksetzen, solange sich noch jemand darin befindet.",
+      "resetSameDifficulty": "Ändere die Dungeon-Schwierigkeit, bevor du diese Instanzen zurücksetzt. Leere Instanzen werden nach 5 Minuten automatisch zurückgesetzt.",
+      "resetLoot": "Du kannst Instanzen nicht zurücksetzen, solange sich noch Beute darin befindet.",
+      "resetConfirmTitle": "Alle Instanzen zurücksetzen?",
+      "resetConfirmBody": "Dadurch werden leere Instanzen deiner zuvor gewählten Schwierigkeit aufgegeben. Nicht beanspruchte Beute verhindert das Zurücksetzen.",
+      "resetConfirm": "Instanzen zurücksetzen",
+      "resetCooldown": "Instanzen können nur einmal alle 5 Minuten zurückgesetzt werden.",
+      "resetUsage": "Verwende /dungeon reset, um deine leeren Instanzen nach einer Schwierigkeitsänderung aufzugeben.",
+      "entryMismatchNormal": "Diese Instanz ist auf die Schwierigkeit Normal eingestellt. Verwende Alle Instanzen zurücksetzen, um einen neuen heroischen Durchlauf zu starten.",
+      "entryMismatchHeroic": "Diese Instanz ist auf die Schwierigkeit Heroisch eingestellt. Verwende Alle Instanzen zurücksetzen, um einen neuen normalen Durchlauf zu starten."
     },
     "bags": {
       "cannotDestroy": "Dieser Gegenstand kann nicht zerstört werden.",
@@ -1324,6 +1547,7 @@ export const de_DE: EnTranslations = {
       "filterConsumable": "Verbrauchbares",
       "filterMaterial": "Materialien",
       "filterQuest": "Quest",
+      "filterMount": "Reittiere",
       "sortAria": "Taschengegenstände sortieren",
       "sortRecent": "Neueste",
       "sortQuality": "Qualität",
@@ -1478,6 +1702,33 @@ export const de_DE: EnTranslations = {
     "playerFrame": {
       "unlock": "Spielerfenster verschieben",
       "lock": "Spielerfenster sperren"
+    },
+    "partyFrames": {
+      "section": "Gruppen- und Schlachtzugsrahmen",
+      "unlock": "Gruppen- und Schlachtzugsrahmen verschieben",
+      "lock": "Gruppen- und Schlachtzugsrahmen sperren",
+      "style": "Rahmenstil",
+      "styleAutomatic": "Automatisch",
+      "styleClassic": "Klassische Gruppenrahmen",
+      "styleRaid": "Schlachtzugsrahmen",
+      "scale": "Rahmenskalierung",
+      "width": "Rahmenbreite",
+      "height": "Rahmenhöhe",
+      "spacing": "Rahmenabstand",
+      "columns": "Schlachtzugsspalten",
+      "healthText": "Gesundheitstext",
+      "healthNone": "Kein Text",
+      "healthPercent": "Prozent",
+      "healthCurrent": "Aktuell",
+      "healthCurrentMax": "Aktuell / Maximum",
+      "sort": "Spieler sortieren",
+      "sortGroup": "Gruppe",
+      "sortRole": "Rolle",
+      "sortName": "Name",
+      "showResource": "Mana, Wut und Energie anzeigen",
+      "showAbsorbs": "Absorptionsschilde anzeigen",
+      "showAuras": "Stärkungs- und Schwächungseffekte anzeigen",
+      "showSelf": "Eigenen Rahmen anzeigen"
     },
     "frameReset": {
       "label": "Fensterpositionen zurücksetzen"
@@ -2141,6 +2392,9 @@ export const de_DE: EnTranslations = {
       "already_linked": "Dein Konto ist bereits mit einem Steam-Konto verknüpft.",
       "account_taken": "Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.",
       "upstream": "Steam hat nicht geantwortet. Versuch es gleich noch einmal."
+    },
+    "welcome": {
+      "invalid_input": "Ungültige Eingabe."
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const de_DE: EnTranslations = {
       "effectsTitle": "Stärkungen, Schwächungen und Massenkontrolle",
       "effectsBody": "Viele Fähigkeiten legen einen Effekt an, der nachwirkt. Hilfreiche (Stärkungszauber) erhöhen deine Werte, schirmen dich ab oder heilen dich nach und nach; schädliche (Schwächungszauber) zehren deine Gesundheit durch Schaden über Zeit auf oder schwächen dich. Achte auf die kleinen Symbole in der oberen Ecke des Bildschirms, neben der Minikarte, um zu sehen, was auf dir liegt und wie lange es anhält.",
       "ccBody": "Massenkontrolle ist eine besondere Art von Schwächungszauber, die einschränkt, was ein Ziel tun kann: Betäubungen, Verwurzelungen und Verlangsamungen, Stille, die das Zaubern unterbindet, Entwaffnungen, Furchteffekte und Verwandlungen, die einen Feind für einen Moment harmlos machen. Gegen andere Spieler nutzt sich Kontrolle mit Wiederholung ab: dieselbe Art zu schnell erneut angewandt schwächt sich ab und versagt dann ganz, und eine Betäubung, die aus der Verstohlenheit heraus eröffnet, wird getrennt von den darauf folgenden Betäubungen gezählt, sodass niemand für immer wehrlos aneinandergereiht werden kann. Die Kreaturen der Welt hegen keinen solchen Groll: Bei ihnen schwächt sich Kontrolle mit Wiederholung nie ab, wenngleich viele der mächtigsten Feinde, benannte Elitegegner und die stärksten Bosse unter ihnen, sich überhaupt nicht kontrollieren lassen.",
-      "metersBody": "Neugierig, wie ein Kampf gelaufen ist? Drücke Z, um die Gruppenmesswerte zu öffnen, die Schaden, Heilung und Bedrohung deiner Gruppe zählen, Begegnung für Begegnung.",
+      "metersBody": "Neugierig, wie ein Kampf gelaufen ist? Drücke Shift+H, um die Gruppenmesswerte zu öffnen, die Schaden, Heilung und Bedrohung deiner Gruppe zählen, Begegnung für Begegnung.",
       "queueTitle": "Dein nächster Zug ist schon geladen",
       "queueBody": "Du musst deine Tastendrücke nicht auf den Frame genau abpassen. Drücke deine nächste Fähigkeit in den letzten Momenten des laufenden Zaubers, und sie wird in die Warteschlange gestellt und löst im selben Augenblick aus, in dem der Zauber endet, sodass geübtes Spiel ohne Lücken fließt. Ein zu früher Druck wird einfach abgewiesen, es geht also nichts verloren. Manche Nahkampfschläge funktionieren genauso und reiten auf deinem nächsten Waffenschwung aus.",
       "deathTitle": "Wenn du fällst",
@@ -2505,7 +2759,7 @@ export const de_DE: EnTranslations = {
       "petBarTerm": "Begleiterleiste",
       "petBarDef": "Die Befehlsreihe, die ein Jäger- oder Hexenmeister-Begleiter hinzufügt: Angriff, Stopp, Spott, Defensiv und Aggressiv, standardmäßig auf Strg plus 1 bis 5 belegt.",
       "metersTerm": "Schadensmesser",
-      "metersDef": "Das Anzeigefenster der Gruppe für den aktuellen Kampf: verursachter Schaden, gewirkte Heilung und wer die meiste Bedrohung hält, je Begegnung geführt. Öffne es mit seiner Tastenbelegung (standardmäßig Z).",
+      "metersDef": "Das Anzeigefenster der Gruppe für den aktuellen Kampf: verursachter Schaden, gewirkte Heilung und wer die meiste Bedrohung hält, je Begegnung geführt. Öffne es mit seiner Tastenbelegung (standardmäßig Shift+H).",
       "targetMarkerTerm": "Zielmarkierung",
       "targetMarkerDef": "Ein Symbol, das jedes Gruppen- oder Schlachtzugsmitglied über einem Ziel anbringen kann, damit alle sich auf dasselbe konzentrieren oder es meiden. Acht Symbole, ein Ziel je Symbol.",
       "loadoutTerm": "Loadout",
@@ -2886,6 +3140,8 @@ export const de_DE: EnTranslations = {
       "heroicRewardsTitle": "Heroische Marken und verbesserte Beute",
       "heroicRewardsBody": "Heroische Bosse lassen die Beute fallen, die du kennst, verbessert und im Tooltip als Heroisch gekennzeichnet, und der Endboss jedes Durchgangs fügt Epics hinzu, die es sonst nirgends gibt. Diese letzte Tötung hinterlässt zudem für jeden Teilnehmer Heroische Marken: eine Währung, die du bei Quartiermeister Vex in Highwatch ausgibst, dessen Vorrat an Ringen und Halsketten der einzige Schmuck im Reich ist.",
       "heroicLockoutBody": "Normale Dungeons lassen sich den ganzen Tag lang laufen. Der heroische Modus verlangt Geduld: Die Tötung des Endbosses beschränkt alle im Durchgang auf einen heroischen Abschluss dieses Dungeons pro Tag, und der Schlachtzug führt für jeden Schwierigkeitsgrad eine eigene Tagessperre. Ein abgeschlossener Fünf-Spieler-Durchgang bleibt seiner eigenen Gruppe für Leichenläufe und Beute offen, sodass niemand von dem ausgesperrt wird, was er dort verdient hat. Der Schlachtzug ist strenger: Hat seine Tötung dich einmal gesperrt, bleibt die Tür bis zur täglichen Zurücksetzung verschlossen, sammle also deine Beute ein, bevor du die Arena verlässt.",
+      "resetTitle": "Instanzen zurücksetzen",
+      "resetBody": "Wenn ihr die Schwierigkeit wechselt, während eure Gruppe noch beanspruchte Läufe hält, bleiben die alten Ansprüche eine Weile bestehen. Der Gruppenleiter kann sie sofort aufgeben: Wählt im Menü des eigenen Porträts Alle Instanzen zurücksetzen oder gebt /dungeon reset ein. Das funktioniert erst nach einem tatsächlichen Schwierigkeitswechsel, nur wenn niemand, ob lebend oder gefallen, drinnen ist, und zwischen Rücksetzungen gilt eine kurze Abklingzeit. Bei falscher Schwierigkeit warnt euch das Spiel vor dem Start. Der Schlachtzug wird so niemals zurückgesetzt; seine eigenen Bindungsregeln bleiben bestehen.",
       "templeLoreTitle": "Der Ertränkte Tempel, ein wenig tiefer",
       "templeLoreBody": "Der Tempel hat seine eigene Legende, älter als der Kult, den du anderswo verfolgst. Am Ufer des Glimmermere, eines Bergsees, der das Mondlicht trinkt und die Ertrunkenen zurückgibt, hütet ein einsamer Wächter ein Tor aus fahlem Licht. Unter der Oberfläche führt eine Treppe aus kaltem Stein zu ihm hinab. Die Leute, die dort versanken, ertranken nicht durch ein Unglück: Sie waren der Bleiche Chor, der im Gebet untertauchte und niemals zu singen aufhörte. Die alten Wärter kratzten eine einzige Warnung in die Felsen, bevor das Wasser sie holte, ein Gebet an etwas, das sie den Ertränkten Mond nannten, mit einer ruhigeren Hand, die zwei Worte darunter setzte: er schläft nur.",
       "cryptLeadTitle": "Eine Tür, die die Toten verschlossen halten sollten",
@@ -3093,7 +3349,7 @@ export const de_DE: EnTranslations = {
       "qualityNote": "Höhere Qualität bedeutet meist bessere Werte, doch Qualität ist ein Hinweis, keine Regel. Ein gut zu deiner Klasse und Stufe passendes Stück kann ein protzigeres schlagen.",
       "upgradeTitle": "Halte deine Ausrüstung aktuell",
       "upgradeBody": "Ein altes Stück durch eine frische Verbesserung zu ersetzen, bringt dir mehr, als in Ausrüstung, der du entwachsen bist, perfekt zu spielen. Wenn etwas Besseres fällt oder eine Quest es anbietet, nimm es. Spare deine guten Gegenstände nicht für später auf.",
-      "itemLevelBody": "Wenn du zwei Teile schnell vergleichen willst, aktiviere in den Optionen Gegenstandsstufe anzeigen. Ausrüstung, die du in der Welt erringst, von Feinden und aus Quests, zeigt dann eine Gegenstandsstufe, eine einzelne Zahl dafür, wie mächtig sie ungefähr ist, je nachdem, woher sie stammt, sodass du auf einen Blick erkennst, welche Verbesserung mehr Gewicht hat, sogar über verschiedene Ausrüstungsplätze hinweg. Teile ohne eine solche Herkunft, etwa schlichte Händlerware und Startausrüstung, zeigen keine Gegenstandsstufe, eine fehlende Zahl ist also normal und kein Fehler.",
+      "itemLevelBody": "Aktiviere Gegenstandsstufe anzeigen in den Optionen, um zwei Ausrüstungsteile schnell zu vergleichen. Ausrüstung bekannter Herkunft, von Gegnern, Quests und Handwerksberufen, zeigt dann eine Gegenstandsstufe: eine einzelne Zahl, die ihre Stärke anhand der Quelle grob angibt und Verbesserungen auch über verschiedene Plätze hinweg vergleichbar macht. Teile ohne solche Herkunft, etwa einfache Händlerware und Startausrüstung, zeigen keine Gegenstandsstufe; eine fehlende Zahl ist normal.",
       "sourcesTitle": "Woher Ausrüstung kommt",
       "sourcesBody": "Die meisten deiner frühen Verbesserungen sind Questbelohnungen, es zahlt sich also aus, Quests abzuschließen, statt zu grinden. Feinde lassen Ausrüstung fallen, wenn du sie bezwingst, Händler in der Stadt verkaufen solide Grundausstattung, Handwerker verwandeln gesammelte Materialien in tragbare Stücke, und der Spielermarkt lässt dich von anderen Abenteurern kaufen. Ganz oben auf dem Berg kaufen zwei Marken-Währungen Ausrüstung, die es sonst nirgends gibt: Tiefgang-Marken beim Tiefgang-Hüter und Heroische Marken beim heroischen Quartiermeister.",
       "soulboundTitle": "Seelengebunden: dein und nur dein",
@@ -3137,7 +3393,7 @@ export const de_DE: EnTranslations = {
       "craftRecipesTitle": "Rezepte und Reagenzien",
       "craftRecipesBody": "Jedes Rezept verlangt bestimmte Reagenzien, die du sammelst oder kaufst. Die einfachsten Rezepte brauchen nichts als gewöhnliche Materialien und lassen sich von Anfang an herstellen, sodass du ein Gewerbe in dem Moment aufnehmen kannst, in dem du es erlernst. Die Rezeptlisten füllen sich noch: Ein paar Gewerbe warten noch auf ihre ersten Rezepte, und weitere kommen hinzu, während die Handwerke wachsen.",
       "craftHowTitle": "Das Handwerksfenster",
-      "craftHowBody": "Öffne das Handwerksfenster (Standardtaste T), um jedes Rezept zu sehen, das du kennst, was jedes braucht und was du zur Hand hast; sind die Materialien da, erledigt ein Klick die Arbeit. Gewöhnliche Rezepte lassen sich überall in der Welt herstellen. Eine Handvoll fortgeschrittener Werkzeugrezepte verlangt stattdessen, dass du am Handwerksplatz in Highwatch stehst.",
+      "craftHowBody": "Öffne das Handwerksfenster (Standardtaste T), um alle bekannten Rezepte, ihre Zutaten und deinen Vorrat zu sehen; sind die Materialien vorhanden, genügt ein Klick. Gewöhnliche Rezepte lassen sich überall herstellen. Einige fortgeschrittene Rezepte, darunter höherstufige Werkzeuge und seltene Zaubererrüstung, erfordern dagegen das Handwerkszentrum in Highwatch.",
       "craftMasteryTitle": "Fertigkeit und Meisterschaft",
       "craftMasteryBody": "Erfolgreiches Herstellen steigert deine Fertigkeit in diesem Gewerbe, und Fertigkeit sperrt niemals die Rezepte eines Handwerks weg: Kennst du ein Rezept und hältst seine Materialien, kannst du es versuchen. Was Fertigkeit dir stattdessen einbringt, ist Güte, eine geübte Hand liefert feinere Arbeit. Die eine Ausnahme sind Kombinationsrezepte, die verlangen, dass du dich in beiden ihrer Handwerke bewährt hast, bevor sie sich öffnen.",
       "craftComboTitle": "Kombinationsrezepte",
@@ -4928,6 +5184,29 @@ export const de_DE: EnTranslations = {
     "body": "Wir starten den Spieldienst neu und erwarten, dass Claudemoon bald zurückkehrt. Diese Seite prüft automatisch weiter.",
     "status": "Bald zurück"
   },
+  "welcome": {
+    "back": "Willkommen zurück, {name}",
+    "level": "Stufe {level}",
+    "lastPlayed": "Zuletzt gespielt: {when}",
+    "continue": "Welt betreten",
+    "continueHint": "Enter zum Fortfahren, Esc zum Überspringen",
+    "continueHintTouch": "Tippe, um fortzufahren",
+    "discord": {
+      "title": "Die Gemeinschaft lebt auf Discord",
+      "sub": "Patch-Vorschauen, Events, Entwicklerchat und 2 Bonusfächer in der Bank, wenn du dein Discord-Konto verknüpfst.",
+      "join": "Tritt unserem Discord bei"
+    },
+    "chest": {
+      "ready": "Truhe der täglichen Belohnungen ist bereit"
+    },
+    "armory": {
+      "cta": "Welt betreten und die Waffenkammer durchstöbern"
+    },
+    "news": {
+      "new": "Neu",
+      "viewAll": "Alle Updates auf GitHub ansehen"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -5663,7 +5942,8 @@ export const de_DE: EnTranslations = {
       "tool": "Werkzeug",
       "potion": "Trank",
       "elixir": "Elixier",
-      "bag": "Tasche"
+      "bag": "Tasche",
+      "mount": "Reittier"
     },
     "stats": {
       "armor": "Rüstung",
@@ -6458,7 +6738,7 @@ export const de_DE: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolfsblood",
-        "description": "Erhöht die Angriffskraft 6 Sek. lang um 40. Nur in Wolfsgestalt."
+        "description": "Erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Wolfsgestalt."
       },
       "rip": {
         "name": "Zerfetzen",
@@ -6749,6 +7029,24 @@ export const de_DE: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Eastbrook-Wollhose"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Eastbrook-Ritualgewänder"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Eastbrook-Druidenhaut"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Eastbrook-Schutzbeinlinge"
+      },
+      "wardweave_cowl": {
+        "name": "Banngewebe-Gugel"
+      },
+      "duskhide_wraps": {
+        "name": "Dämmerfell-Wickel"
+      },
+      "sootscale_mantle": {
+        "name": "Rußschuppenmantel"
       },
       "gravecaller_blade": {
         "name": "Gravecallers Breitschwert"
@@ -8171,6 +8469,27 @@ export const de_DE: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Gürtelschutz des Sturmrufers"
+      },
+      "reins_valorsteed": {
+        "name": "Zügel des Valorross"
+      },
+      "reins_grag_bear": {
+        "name": "Zügel des Goliath-Gragbären"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Zügel des Moosschalen-Stielgleiters"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Zündschlüssel: Ätherlanzen-Schwebrad"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Zügel von Kama-Kage der Schattensprungkröte"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Zügel des Himmelsgreifs Sturmfeder"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Zügel von Donnerstolz, dem Großen Puter"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const de_DE: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Geweckter Sturmling"
+      },
+      "stable_horse": {
+        "name": "Stallpferd"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -8821,6 +9143,11 @@ export const de_DE: EnTranslations = {
         "name": "Vorarbeiter Odell",
         "title": "Minenvorarbeiter",
         "greeting": "Der ganze Stollen wimmelt von diesem schlammverkrusteten Ungeziefer!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stallmeisterin",
+        "greeting": "Jeder Reiter kommt auf zwei Beinen herein, {className}. Die Zügel gebe ich erst, wenn Ihr den Valorross reiten könnt, ohne im Dreck zu landen, und Highwatch hat keine Heiler für gebrochene Knochen übrig."
       },
       "warden_fenwick": {
         "name": "Wärter Fenwick",
@@ -9821,6 +10148,16 @@ export const de_DE: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Reitstunden",
+        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Zahlt die Gebühr, und wenn ich das Wort gebe, ruft das Übungs-Valorross zu Euch und steigt auf. Dann reitet den Parcours: folgt der Markierung zum Startbogen, nehmt jeden Sprung sauber und überquert die Linie erneut, ehe die Sanduhr leerläuft. Schafft Ihr das, gehört Euch der Sattel. Verlasst Ihr die Koppel, fangen wir von vorn an.",
+        "completion": "So, ja. In einer einzigen sauberen Bewegung hinauf und oben ruhig gesessen. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.",
+        "objectives": {
+          "0": {
+            "label": "Bezähmt den Valorross"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10137,6 +10474,9 @@ export const de_DE: EnTranslations = {
           },
           "9": {
             "label": "Gravewyrm-Heiligtum"
+          },
+          "10": {
+            "label": "Highwatch-Stallungen"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const de_DE: EnTranslations = {
         "sender": "Bruder Aldric",
         "subject": "Was Ihr im Dunkeln vollbracht habt",
         "body": "Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Heroischer Quartiermeister",
+        "subject": "Deine heroischen Marken",
+        "body": "Deine Gruppe hat die heroische Prüfung gemeistert, während du in der Nachhut gekämpft hast oder bereits am Boden lagst. Auch deine Instanzbindung wurde aktiviert, daher ist dein Anteil an heroischen Marken hier angekommen, statt verloren zu gehen. Setze sie klug ein.\n\n- Heroischer Quartiermeister"
       }
     },
     "itemSets": {

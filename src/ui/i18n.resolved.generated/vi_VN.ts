@@ -20,6 +20,154 @@ export const vi_VN: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Trung Tâm Lệnh Nhà Phát Triển",
+    "kicker": "Công cụ phát triển",
+    "title": "Trung Tâm Lệnh",
+    "subtitle": "Điều khiển kiểm thử phía máy chủ cho thế giới hiện tại.",
+    "closeAria": "Đóng lệnh nhà phát triển",
+    "categoryNavAria": "Danh mục lệnh nhà phát triển",
+    "categories": {
+      "player": "Người Chơi",
+      "spawns": "Quái Đã Tạo",
+      "inventory": "Túi Đồ",
+      "progress": "Tiến Trình",
+      "travel": "Di Chuyển",
+      "scenarios": "Kịch Bản"
+    },
+    "filterLabel": "Lọc lệnh",
+    "filterPlaceholder": "Tìm trong danh mục này",
+    "noMatches": "Không có lệnh phù hợp.",
+    "serverRequirement": "Lệnh gian lận phía máy chủ vẫn cần ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Hãy chọn giá trị hợp lệ trước khi chạy lệnh này.",
+    "sent": "Đã gửi: {command}",
+    "run": "Chạy",
+    "fields": {
+      "level": "Cấp",
+      "mob": "Quái",
+      "count": "Số Lượng",
+      "item": "Vật Phẩm",
+      "gold": "Vàng",
+      "quest": "Nhiệm Vụ",
+      "profession": "Nghề",
+      "amount": "Số Lượng",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Hầm Ngục",
+      "difficulty": "Độ Khó",
+      "name": "Tên"
+    },
+    "difficulty": {
+      "normal": "Thường",
+      "heroic": "Anh Hùng"
+    },
+    "actions": {
+      "heal": {
+        "label": "Hồi phục máu",
+        "description": "Hồi đầy thanh máu."
+      },
+      "resource": {
+        "label": "Hồi phục tài nguyên",
+        "description": "Hồi đầy mana, nộ khí hoặc năng lượng."
+      },
+      "cooldowns": {
+        "label": "Xóa hồi chiêu",
+        "description": "Đặt lại bộ đếm kỹ năng, GCD và bình thuốc."
+      },
+      "god": {
+        "label": "Bật tắt chế độ bất tử",
+        "description": "Bật hoặc tắt bất tử và sát thương tăng cường."
+      },
+      "revive": {
+        "label": "Hồi sinh",
+        "description": "Hồi sinh qua quy trình hồi sinh thông thường."
+      },
+      "kill": {
+        "label": "Giết người chơi",
+        "description": "Kiểm thử quy trình chết, hồn ma và xác chết."
+      },
+      "combatreset": {
+        "label": "Đặt lại chiến đấu",
+        "description": "Xóa trạng thái chiến đấu và mức đe dọa của kẻ địch."
+      },
+      "level": {
+        "label": "Đặt cấp",
+        "description": "Đặt cấp hiện tại của nhân vật."
+      },
+      "spawn": {
+        "label": "Tạo quái",
+        "description": "Tạo một quái vật cụ thể gần người chơi."
+      },
+      "killtarget": {
+        "label": "Giết mục tiêu",
+        "description": "Giết quái vật còn sống được chọn."
+      },
+      "despawntarget": {
+        "label": "Xóa mục tiêu",
+        "description": "Xóa quái vật được chọn đã tạo bằng công cụ này."
+      },
+      "despawnall": {
+        "label": "Xóa quái đã tạo",
+        "description": "Xóa mọi quái vật do nhà phát triển này tạo ra."
+      },
+      "give": {
+        "label": "Trao vật phẩm",
+        "description": "Thêm một vật phẩm vào túi đồ của người chơi."
+      },
+      "gold": {
+        "label": "Thêm vàng",
+        "description": "Thêm vàng vào túi tiền hiện tại."
+      },
+      "quest": {
+        "label": "Hoàn thành nhiệm vụ",
+        "description": "Hoàn thành một nhiệm vụ cụ thể theo mã."
+      },
+      "quests": {
+        "label": "Hoàn thành nhiệm vụ đang làm",
+        "description": "Hoàn thành mọi nhiệm vụ trong nhật ký hiện tại."
+      },
+      "attune": {
+        "label": "Mở khóa đồng điệu",
+        "description": "Đánh dấu hoàn tất mọi yêu cầu đồng điệu."
+      },
+      "gather": {
+        "label": "Tăng kỹ năng thu thập",
+        "description": "Tăng cấp một nghề thu thập."
+      },
+      "teleport": {
+        "label": "Dịch chuyển",
+        "description": "Di chuyển đến tọa độ chính xác trong thế giới."
+      },
+      "dungeon": {
+        "label": "Vào hầm ngục",
+        "description": "Vào hầm ngục và bỏ qua điều kiện dành cho nhà phát triển."
+      },
+      "raid": {
+        "label": "Vào raid",
+        "description": "Vào thẳng đấu trường Nythraxis."
+      },
+      "raidreset": {
+        "label": "Đặt lại khóa raid",
+        "description": "Xóa các khóa raid hiện tại."
+      },
+      "bot": {
+        "label": "Tạo bot xã hội",
+        "description": "Tạo một người chơi đứng yên có thể nhận tin nhắn riêng."
+      },
+      "lfgqueue": {
+        "label": "Tạo dữ liệu hàng chờ",
+        "description": "Tạo kịch bản hàng chờ Tìm Hầm Ngục."
+      },
+      "lfgraid": {
+        "label": "Tạo dữ liệu tìm raid",
+        "description": "Tạo kịch bản tìm đội raid."
+      },
+      "lfgboard": {
+        "label": "Tạo dữ liệu bảng đăng nhóm",
+        "description": "Tạo kịch bản đăng nhóm lập sẵn."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -229,6 +377,7 @@ export const vi_VN: EnTranslations = {
       "remainingLessThanMinute": "<1p",
       "remainingMinutes": "{minutes}p",
       "remainingHoursMinutes": "{hours}h {minutes}p",
+      "remainingDaysHours": "{days} ngày {hours} giờ",
       "score": "Điểm",
       "walletValue": "Giá Trị Ví (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const vi_VN: EnTranslations = {
         "no_wallet": "Kết nối một ví có ít nhất 20 USD WOC.",
         "under_minimum": "Ví thấp hơn mức tối thiểu 20 USD WOC.",
         "price_unavailable": "Giá WOC hiện không có sẵn, phần thưởng tạm thời bị khóa.",
-        "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}"
+        "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}",
+        "bannedUntil": "Bạn bị cấm nhận Phần Thưởng Hằng Ngày thêm {remaining}. Quyền truy cập trở lại vào {until}. Lý do: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const vi_VN: EnTranslations = {
       "balanceLabel": "Số dư",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Cửa hàng Claudium hiện không có sẵn. Số dư và giao dịch mua hàng của bạn không bị ảnh hưởng; vui lòng kiểm tra lại trong thời gian ngắn.",
       "disclosure": "Claudium là loại tiền mềm một chiều: mua bằng tiền và tiêu vào mỹ phẩm. Nó không thể được đổi, chuyển nhượng hoặc rút tiền mặt.",
@@ -499,6 +650,7 @@ export const vi_VN: EnTranslations = {
       "railLabel": "Phương thức thanh toán",
       "railStripe": "Thẻ",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Giảm 20%",
       "railWocUnavailable": "Giá WOC hiện không có sẵn.",
@@ -602,6 +754,7 @@ export const vi_VN: EnTranslations = {
       "leaderboard": "Xếp Hạng",
       "dailyRewards": "Cửa hàng",
       "deeds": "Kỳ Công",
+      "mounts": "Mounts",
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
       "hapticsOff": "Tắt Phản Hồi Rung",
@@ -716,7 +869,63 @@ export const vi_VN: EnTranslations = {
       "petStop": "Thú Cưng: Dừng",
       "petTaunt": "Thú Cưng: Khiêu Khích",
       "petDefensive": "Thú Cưng: Phòng Thủ",
-      "petAggressive": "Thú Cưng: Hung Hăng"
+      "petAggressive": "Thú Cưng: Hung Hăng",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Cúp Thung Lũng",
@@ -870,6 +1079,7 @@ export const vi_VN: EnTranslations = {
       "interfaceModeTouch": "Cảm Ứng",
       "interfaceModeNote": "Tự Động chọn điều khiển máy tính hoặc cảm ứng theo thiết bị của bạn. Chọn Máy Tính để buộc dùng bàn phím và chuột (hữu ích trên máy tính bảng có bàn phím), hoặc Cảm Ứng để dùng các điều khiển trên màn hình.",
       "footstepSounds": "Âm Thanh Bước Chân",
+      "interfaceSounds": "Âm Thanh Giao Diện và Phản Hồi",
       "clickFeedback": "Dấu Nhấp Chuột",
       "lockCursorOnRotate": "Khóa Con Trỏ Khi Xoay",
       "keybindHelpLockCursorOnRotate": "Giữ con trỏ chuột bên trong cửa sổ khi bạn kéo để xoay camera, để nó không thể chạm tới mép màn hình hoặc di chuyển sang màn hình khác. Hãy tắt nếu bạn thích con trỏ tự do.",
@@ -1309,7 +1519,20 @@ export const vi_VN: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Đặt Độ Khó Hầm Ngục: Anh Hùng",
-      "setNormal": "Đặt Độ Khó Hầm Ngục: Thường"
+      "setNormal": "Đặt Độ Khó Hầm Ngục: Thường",
+      "resetAll": "Đặt Lại Tất Cả Phụ Bản",
+      "resetDone": "Tất cả phụ bản đã được đặt lại.",
+      "resetNone": "Bạn không có phụ bản nào để đặt lại.",
+      "resetOccupied": "Bạn không thể đặt lại phụ bản khi vẫn còn người ở bên trong.",
+      "resetSameDifficulty": "Hãy đổi độ khó hầm ngục trước khi đặt lại các phụ bản này. Phụ bản trống sẽ tự đặt lại sau 5 phút.",
+      "resetLoot": "Bạn không thể đặt lại phụ bản khi vẫn còn chiến lợi phẩm bên trong.",
+      "resetConfirmTitle": "Đặt Lại Tất Cả Phụ Bản?",
+      "resetConfirmBody": "Thao tác này sẽ từ bỏ các phụ bản trống thuộc độ khó bạn đã chọn trước đó. Chiến lợi phẩm chưa nhận sẽ ngăn việc đặt lại.",
+      "resetConfirm": "Đặt Lại Phụ Bản",
+      "resetCooldown": "Chỉ có thể đặt lại phụ bản một lần mỗi 5 phút.",
+      "resetUsage": "Dùng /dungeon reset để từ bỏ các phụ bản trống sau khi đổi độ khó.",
+      "entryMismatchNormal": "Phụ bản này được đặt ở độ khó Thường. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Anh Hùng mới.",
+      "entryMismatchHeroic": "Phụ bản này được đặt ở độ khó Anh Hùng. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Thường mới."
     },
     "bags": {
       "cannotDestroy": "Không thể phá hủy vật phẩm này.",
@@ -1324,6 +1547,7 @@ export const vi_VN: EnTranslations = {
       "filterConsumable": "Vật phẩm tiêu hao",
       "filterMaterial": "Nguyên liệu",
       "filterQuest": "Nhiệm vụ",
+      "filterMount": "Vật cưỡi",
       "sortAria": "Sắp xếp vật phẩm trong túi",
       "sortRecent": "Gần đây",
       "sortQuality": "Phẩm chất",
@@ -1478,6 +1702,33 @@ export const vi_VN: EnTranslations = {
     "playerFrame": {
       "unlock": "Di chuyển khung người chơi",
       "lock": "Khóa khung người chơi"
+    },
+    "partyFrames": {
+      "section": "Khung Tổ Đội và Raid",
+      "unlock": "Di chuyển khung tổ đội và raid",
+      "lock": "Khóa khung tổ đội và raid",
+      "style": "Kiểu Khung",
+      "styleAutomatic": "Tự Động",
+      "styleClassic": "Khung Tổ Đội Cổ Điển",
+      "styleRaid": "Khung Raid",
+      "scale": "Tỷ Lệ Khung",
+      "width": "Chiều Rộng Khung",
+      "height": "Chiều Cao Khung",
+      "spacing": "Khoảng Cách Khung",
+      "columns": "Cột Raid",
+      "healthText": "Chữ Máu",
+      "healthNone": "Không Có",
+      "healthPercent": "Phần Trăm",
+      "healthCurrent": "Hiện Tại",
+      "healthCurrentMax": "Hiện Tại / Tối Đa",
+      "sort": "Sắp Xếp Người Chơi",
+      "sortGroup": "Nhóm",
+      "sortRole": "Vai Trò",
+      "sortName": "Tên",
+      "showResource": "Hiện Mana, Nộ Khí và Năng Lượng",
+      "showAbsorbs": "Hiện Khiên Hấp Thụ",
+      "showAuras": "Hiện Buff và Debuff",
+      "showSelf": "Hiện Khung Của Bạn"
     },
     "frameReset": {
       "label": "Đặt Lại Vị Trí Các Khung"
@@ -2141,6 +2392,9 @@ export const vi_VN: EnTranslations = {
       "already_linked": "Tài khoản của bạn đã liên kết với một tài khoản Steam.",
       "account_taken": "Tài khoản Steam đó đã được liên kết với một tài khoản khác.",
       "upstream": "Steam không phản hồi. Hãy thử lại sau giây lát."
+    },
+    "welcome": {
+      "invalid_input": "Dữ liệu nhập không hợp lệ."
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const vi_VN: EnTranslations = {
       "effectsTitle": "Buff, debuff và khống chế",
       "effectsBody": "Nhiều kỹ năng áp một hiệu ứng lưu lại. Những hiệu ứng có lợi (buff) tăng chỉ số, che chắn, hoặc hồi máu cho bạn từng chút một; những hiệu ứng có hại (debuff) rút máu bạn bằng sát thương theo thời gian hoặc làm bạn suy yếu. Hãy để mắt đến những biểu tượng nhỏ ở góc trên màn hình, cạnh bản đồ nhỏ, để biết những gì đang trên người bạn và còn kéo dài bao lâu.",
       "ccBody": "Khống chế là một dạng debuff đặc biệt giới hạn những gì mục tiêu có thể làm: choáng, trói và làm chậm, câm lặng ngăn niệm phép, tước vũ khí, gieo sợ hãi, và biến hình khiến kẻ thù vô hại trong chốc lát. Khi dùng lên người chơi khác, khống chế mòn dần khi lặp lại: cùng một loại áp lại quá nhanh sẽ yếu đi rồi thất bại hẳn, và một đòn choáng mở màn từ ẩn thân được tính riêng khỏi những đòn choáng nối theo, nên không ai có thể bị trói buộc bất lực mãi mãi. Sinh vật của thế giới không hề để bụng như vậy: khống chế không bao giờ yếu đi khi lặp lại lên chúng, dù nhiều kẻ thù hùng mạnh nhất, gồm những kẻ tinh nhuệ có tên và các trùm mạnh nhất trong số đó, hoàn toàn không thể bị khống chế.",
-      "metersBody": "Tò mò xem một trận đấu diễn ra thế nào? Nhấn Z để mở bảng thống kê tổ đội, ghi lại sát thương, hồi máu và đe dọa của cả nhóm, theo từng trận một.",
+      "metersBody": "Tò mò xem một trận đấu diễn ra thế nào? Nhấn Shift+H để mở bảng thống kê tổ đội, ghi lại sát thương, hồi máu và đe dọa của cả nhóm, theo từng trận một.",
       "queueTitle": "Nước đi kế tiếp của bạn đã sẵn sàng",
       "queueBody": "Bạn không cần canh chính xác từng khung hình để nhấn phím. Hãy nhấn kỹ năng kế tiếp trong những khoảnh khắc cuối của lượt niệm hiện tại và nó sẽ được xếp hàng, kích hoạt ngay khi lượt niệm hoàn tất, nên lối chơi thuần thục trôi chảy không hở nhịp. Một cú nhấn quá sớm chỉ đơn giản bị từ chối, nên không có gì lãng phí. Một số đòn cận chiến cũng hoạt động y như vậy, phát ra theo nhát vung vũ khí kế tiếp của bạn.",
       "deathTitle": "Khi bạn ngã xuống",
@@ -2505,7 +2759,7 @@ export const vi_VN: EnTranslations = {
       "petBarTerm": "Thanh Thú Cưng",
       "petBarDef": "Hàng lệnh mà thú cưng của Thợ Săn hoặc Thuật Sĩ Hắc Ám thêm vào: Tấn Công, Dừng, Khiêu Khích, Phòng Thủ, và Hung Hăng, mặc định gán vào Ctrl cộng 1 tới 5.",
       "metersTerm": "Bảng Sát Thương",
-      "metersDef": "Cửa sổ bảng điểm tổ đội cho trận đấu hiện tại: sát thương gây ra, hồi máu đã làm, và ai đang giữ nhiều đe dọa nhất, lưu theo từng trận. Mở nó bằng phím gán của nó (mặc định là Z).",
+      "metersDef": "Cửa sổ bảng điểm tổ đội cho trận đấu hiện tại: sát thương gây ra, hồi máu đã làm, và ai đang giữ nhiều đe dọa nhất, lưu theo từng trận. Mở nó bằng phím gán của nó (mặc định là Shift+H).",
       "targetMarkerTerm": "Dấu Mục Tiêu",
       "targetMarkerDef": "Một biểu tượng mà bất kỳ thành viên tổ đội hay raid nào cũng có thể ghim lên một mục tiêu để mọi người cùng tập trung, hoặc cùng tránh, đúng mục tiêu ấy. Tám biểu tượng, mỗi biểu tượng một mục tiêu.",
       "loadoutTerm": "Bố Cục",
@@ -2886,6 +3140,8 @@ export const vi_VN: EnTranslations = {
       "heroicRewardsTitle": "Dấu Ấn Anh Hùng và chiến lợi phẩm nâng cấp",
       "heroicRewardsBody": "Trùm Anh Hùng rơi ra thứ chiến lợi phẩm bạn đã quen, được nâng cấp và gắn nhãn Anh Hùng trên chú giải, còn trùm cuối của mỗi lượt chạy thêm những món sử thi không tìm thấy ở đâu khác. Cú hạ cuối cùng đó cũng để lại Dấu Ấn Anh Hùng cho mọi người tham gia: một loại tiền tệ dùng để giao dịch với Quân Nhu Trưởng Vex ở Highwatch, người có kho nhẫn và dây chuyền là món trang sức duy nhất trong cả vương quốc.",
       "heroicLockoutBody": "Hầm ngục thường có thể chạy cả ngày. Chế độ Anh Hùng đòi hỏi kiên nhẫn: cú hạ trùm cuối khóa mọi người trong lượt chạy lại còn một lần dọn sạch Anh Hùng của hầm ngục đó mỗi ngày, và raid giữ một khóa lượt hằng ngày riêng cho từng độ khó. Một lượt chạy năm người đã dọn xong vẫn mở cho chính tổ đội ấy để chạy xác và nhặt đồ, nên không ai bị khóa khỏi thứ họ đã giành được ở đó. Raid thì nghiêm hơn: một khi cú hạ trùm của nó khóa bạn lại, cánh cửa vẫn đóng cho tới lần đặt lại hằng ngày, nên hãy thu chiến lợi phẩm trước khi rời đấu trường.",
+      "resetTitle": "Đặt lại phụ bản của bạn",
+      "resetBody": "Nếu đổi độ khó khi đội vẫn giữ các lượt đã nhận, quyền cũ sẽ tồn tại một lúc rồi tự xóa. Trưởng nhóm có thể bỏ chúng ngay bằng cách chọn Đặt Lại Tất Cả Phụ Bản trong menu chân dung của mình hoặc gõ /dungeon reset. Độ khó phải thực sự đã đổi, không ai dù còn sống hay đã ngã xuống được ở bên trong, và có thời gian chờ ngắn giữa các lần đặt lại. Nếu đến cửa với độ khó sai, trò chơi sẽ báo trước khi bắt đầu. Raid không bao giờ được đặt lại theo cách này; quy tắc khóa riêng vẫn áp dụng.",
       "templeLoreTitle": "Ngôi Đền Chết Chìm, sâu hơn một chút",
       "templeLoreBody": "Ngôi đền có truyền thuyết riêng của nó, cổ xưa hơn cả giáo phái bạn đuổi theo ở nơi khác. Bên bờ Hồ Lung Linh, một hồ băng uống ánh trăng và trả lại những kẻ chết chìm, một người canh gác cô độc giữ một cánh cổng ánh sáng nhợt nhạt. Bên dưới mặt nước, một bậc thang đá lạnh chạy xuống đó. Những kẻ chìm xuống nơi ấy không chết chìm vì tai nạn: họ là Dàn Đồng Ca Nhợt Nhạt, những kẻ chìm xuống trong sự thờ phụng và không bao giờ ngừng ca hát. Những người canh giữ xưa cào một lời cảnh báo duy nhất lên đá trước khi nước nuốt lấy họ, một lời cầu nguyện gửi đến thứ họ gọi là Mặt Trăng Chết Chìm, với một bàn tay vững vàng hơn thêm hai chữ bên dưới: nó chỉ đang ngủ.",
       "cryptLeadTitle": "Một cánh cửa mà người chết được giao nhiệm vụ giữ kín",
@@ -3093,7 +3349,7 @@ export const vi_VN: EnTranslations = {
       "qualityNote": "Chất lượng cao hơn thường có nghĩa là chỉ số tốt hơn, nhưng chất lượng là một gợi ý, không phải quy tắc. Một món hợp với lớp và cấp của bạn có thể thắng một món hào nhoáng hơn.",
       "upgradeTitle": "Giữ trang bị luôn cập nhật",
       "upgradeBody": "Thay một món cũ bằng một món nâng cấp mới giúp ích cho bạn nhiều hơn là chơi hoàn hảo trong bộ đồ bạn đã vượt qua. Khi thứ gì đó tốt hơn rơi ra hoặc một nhiệm vụ trao tặng nó, hãy nhận lấy. Đừng để dành những món tốt của bạn cho sau này.",
-      "itemLevelBody": "Nếu bạn muốn một cách nhanh để so hai món đồ, hãy bật Hiện Cấp Vật Phẩm trong tùy chọn. Trang bị giành được ngoài thế giới, từ kẻ địch và nhiệm vụ, khi đó sẽ hiện một cấp vật phẩm, một con số duy nhất cho biết đại khái món đó mạnh cỡ nào dựa trên nơi nó đến, nên bạn có thể nhìn thoáng qua là biết món nâng cấp nào nặng ký hơn, kể cả khi khác ô trang bị. Những món không có nguồn như vậy, như hàng cơ bản trơn của người bán và trang bị khởi đầu, không hiện cấp vật phẩm, nên một con số vắng mặt là chuyện thường, không phải lỗi.",
+      "itemLevelBody": "Để so sánh nhanh hai món, hãy bật Hiện Cấp Vật Phẩm trong tùy chọn. Trang bị có nguồn rõ ràng từ kẻ địch, nhiệm vụ và nghề chế tạo sẽ hiện cấp vật phẩm: một con số ước lượng sức mạnh theo nguồn gốc, giúp nhận ra nâng cấp tốt hơn ngay cả giữa các ô khác nhau. Các món không có nguồn như vậy, chẳng hạn hàng cơ bản của thương nhân và trang bị khởi đầu, không hiện cấp; thiếu con số là bình thường.",
       "sourcesTitle": "Trang bị đến từ đâu",
       "sourcesBody": "Phần lớn đồ nâng cấp thuở đầu là phần thưởng nhiệm vụ, nên hoàn thành nhiệm vụ đáng giá hơn là cày cuốc. Kẻ địch rơi trang bị khi bạn đánh bại chúng, người bán trong thị trấn bán những món cơ bản chắc chắn, thợ chế tác biến nguyên liệu thu thập thành những món mặc được, và chợ người chơi cho phép bạn mua từ những nhà phiêu lưu khác. Ở đỉnh cao, hai loại tiền huy hiệu mua được trang bị không tìm thấy ở đâu khác: Huy Hiệu Hang Sâu ở chỗ người giữ hang sâu, và Dấu Ấn Anh Hùng ở chỗ Quân Nhu Trưởng Anh Hùng.",
       "soulboundTitle": "Ràng Buộc Linh Hồn: của bạn và chỉ của riêng bạn",
@@ -3137,7 +3393,7 @@ export const vi_VN: EnTranslations = {
       "craftRecipesTitle": "Công thức và nguyên liệu",
       "craftRecipesBody": "Mỗi công thức đòi hỏi những nguyên liệu cụ thể bạn thu thập hoặc mua. Các công thức đơn giản nhất chẳng cần gì ngoài nguyên liệu thường và chế được ngay từ đầu, nên bạn có thể bắt tay vào một nghề ngay khoảnh khắc nhận nó. Các danh sách công thức vẫn đang được bổ sung: một vài nghề còn đang chờ những công thức đầu tiên, và sẽ có thêm khi các nghề lớn dần.",
       "craftHowTitle": "Cửa sổ chế tác",
-      "craftHowBody": "Mở cửa sổ Chế Tác (phím mặc định T) để xem mọi công thức bạn biết, mỗi công thức cần gì, và bạn đang có sẵn những gì; khi đủ nguyên liệu, một cú bấm là xong việc. Các công thức thông thường có thể chế tác ở bất cứ đâu trên thế giới. Một số ít công thức dụng cụ cao cấp thì lại yêu cầu bạn đứng tại trạm chế tác ở Highwatch.",
+      "craftHowBody": "Mở cửa sổ Chế Tạo (phím mặc định T) để xem mọi công thức đã biết, nguyên liệu cần thiết và số bạn đang có; khi đủ nguyên liệu, chỉ cần một lần nhấp. Công thức thường có thể chế tạo ở bất cứ đâu. Một số công thức nâng cao, gồm công cụ cấp cao và giáp hiếm cho người thi triển, yêu cầu đứng tại trung tâm chế tạo ở Highwatch.",
       "craftMasteryTitle": "Kỹ năng và tinh thông",
       "craftMasteryBody": "Chế tác thành công sẽ tích lũy kỹ năng trong nghề đó, và kỹ năng không bao giờ khóa các công thức của một nghề lại: nếu bạn biết một công thức và có nguyên liệu của nó, bạn có thể thử làm. Thứ mà kỹ năng mang lại cho bạn thay vào đó là phẩm chất, một đôi tay lành nghề cho ra sản phẩm tinh xảo hơn. Ngoại lệ duy nhất là các công thức kết hợp, vốn đòi hỏi bạn phải chứng tỏ mình trong cả hai nghề của chúng trước khi chúng mở ra.",
       "craftComboTitle": "Công thức kết hợp",
@@ -4928,6 +5184,29 @@ export const vi_VN: EnTranslations = {
     "body": "Chúng tôi đang khởi động lại dịch vụ trò chơi và dự kiến Claudemoon sẽ trở lại trong giây lát. Trang này sẽ tự động tiếp tục kiểm tra.",
     "status": "Sớm trở lại"
   },
+  "welcome": {
+    "back": "Mừng bạn trở lại, {name}",
+    "level": "Cấp {level}",
+    "lastPlayed": "Lần chơi gần nhất: {when}",
+    "continue": "Vào Thế Giới",
+    "continueHint": "Nhấn Enter để tiếp tục, Esc để bỏ qua",
+    "continueHintTouch": "Chạm để tiếp tục",
+    "discord": {
+      "title": "Cộng đồng tụ hội trên Discord",
+      "sub": "Xem trước các bản cập nhật, tham gia sự kiện, trò chuyện cùng nhà phát triển và nhận 2 ô ngân hàng thưởng khi liên kết Discord.",
+      "join": "Tham gia Discord của chúng tôi"
+    },
+    "chest": {
+      "ready": "Rương thưởng hằng ngày đã sẵn sàng"
+    },
+    "armory": {
+      "cta": "Vào thế giới và khám phá Kho Vũ Khí"
+    },
+    "news": {
+      "new": "Mới",
+      "viewAll": "Xem tất cả cập nhật trên GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "TINH ANH",
@@ -5663,7 +5942,8 @@ export const vi_VN: EnTranslations = {
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược",
-      "bag": "Túi"
+      "bag": "Túi",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Giáp",
@@ -6458,7 +6738,7 @@ export const vi_VN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Huyết Sói",
-        "description": "Tăng 40 sức mạnh tấn công trong 6 giây. Chỉ dùng được ở Hình Sói."
+        "description": "Tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói."
       },
       "rip": {
         "name": "Xé Rách",
@@ -6749,6 +7029,24 @@ export const vi_VN: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Quần Len Đông Khê"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Lễ Phục Đông Khê"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Da Druid Đông Khê"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Quần Bảo Hộ Đông Khê"
+      },
+      "wardweave_cowl": {
+        "name": "Mũ Trùm Dệt Hộ Mệnh"
+      },
+      "duskhide_wraps": {
+        "name": "Băng Cuốn Da Hoàng Hôn"
+      },
+      "sootscale_mantle": {
+        "name": "Áo Choàng Vảy Muội"
       },
       "gravecaller_blade": {
         "name": "Đại Đao Của Triệu Mộ Giả"
@@ -8171,6 +8469,27 @@ export const vi_VN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Hộ Yêu của Triệu Bão Sư"
+      },
+      "reins_valorsteed": {
+        "name": "Dây cương Valorsteed"
+      },
+      "reins_grag_bear": {
+        "name": "Dây cương Gấu Grag Goliath"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Dây cương Ốc Lướt Vỏ Rêu"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Chìa khóa khởi động: Xe Bay Kỵ Sĩ Aether"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Dây cương Kama-Kage, Cóc Nhảy Bóng"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Dây cương Vũ Bão Vươn Trời"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Dây cương Gà Tây Chúa Sải Bước Sấm"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const vi_VN: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Tinh Linh Bão Trỗi Dậy"
+      },
+      "stable_horse": {
+        "name": "Ngựa chuồng"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -8821,6 +9143,11 @@ export const vi_VN: EnTranslations = {
         "name": "Quản Đốc Odell",
         "title": "Quản Đốc Hầm Mỏ",
         "greeting": "Cả khu khai quật bò lúc nhúc lũ sâu bọ bám đầy bùn đất đó!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Quản Mã",
+        "greeting": "Kỵ sĩ nào cũng bước vào bằng hai chân, {className}. Ta chỉ trao dây cương khi nào ngươi ngồi vững trên lưng Valorsteed mà không lăn xuống bùn, vì Highwatch chẳng dư thầy thuốc để chữa xương gãy."
       },
       "warden_fenwick": {
         "name": "Vệ Quan Fenwick",
@@ -9821,6 +10148,16 @@ export const vi_VN: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Bài Học Cưỡi Ngựa",
+        "text": "Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Trả lệ phí, rồi khi ta ra hiệu, hãy gọi con Valorsteed huấn luyện đến và leo lên yên. Rồi chạy hết đường đua: theo dấu hiệu tới cổng vòm xuất phát, vượt sạch từng chướng ngại, và băng qua vạch lần nữa trước khi cát chảy hết. Làm được vậy thì yên ngựa là của ngươi. Đi khỏi bãi quây là ta bắt đầu lại từ đầu.",
+        "completion": "Đấy, được rồi. Lên yên bằng một động tác gọn gàng và ngồi thật vững. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.",
+        "objectives": {
+          "0": {
+            "label": "Thuần Hóa Valorsteed"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10137,6 +10474,9 @@ export const vi_VN: EnTranslations = {
           },
           "9": {
             "label": "Thánh Đường Mộ Long"
+          },
+          "10": {
+            "label": "Chuồng ngựa Highwatch"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const vi_VN: EnTranslations = {
         "sender": "Tu Huynh Aldric",
         "subject": "Điều bạn đã làm trong bóng tối",
         "body": "Hiếm ai sẽ biết thứ gì từng bị chôn dưới lòng chảo ấy, và càng hiếm ai tin. Tôi biết, và tôi sẽ không quên.\n\nMong con đường của bạn luôn sáng tỏ.\n- Tu Huynh Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Quân nhu Anh Hùng",
+        "subject": "Dấu Ấn Anh Hùng của bạn",
+        "body": "Đội của bạn đã vượt qua thử thách Anh Hùng khi bạn chiến đấu ở hậu tuyến hoặc đã ngã xuống. Khóa lượt của bạn vẫn được ghi nhận, vì vậy phần Dấu Ấn Anh Hùng của bạn được gửi đến đây thay vì thất lạc. Hãy sử dụng chúng thật tốt.\n\n- Quân nhu Anh Hùng"
       }
     },
     "itemSets": {

@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "e1c24959",
+      "nextId": 671,
+      "state": "b7cfe5fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,7 +53,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -69,6 +69,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -88,7 +89,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -131,9 +132,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 669,
-      "state": "a38f6da7",
-      "events": "5ad924f4",
+      "nextId": 673,
+      "state": "2bcf6e92",
+      "events": "fcf53366",
       "rng": {
         "draws": 4,
         "digest": "76d802bc"
@@ -142,8 +143,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 669,
-      "state": "ac15c819",
+      "nextId": 673,
+      "state": "bdfd3e44",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -153,8 +154,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 669,
-      "state": "afaf2c1d",
+      "nextId": 673,
+      "state": "6a3bc7f8",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -205,7 +206,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -223,6 +224,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 20,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -242,7 +244,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 50000,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -285,8 +287,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 669,
-      "state": "89871c3a",
+      "nextId": 673,
+      "state": "b6c1534d",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -337,7 +339,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -355,6 +357,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 20,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -381,7 +384,7 @@
           "fiveSecondRule": 99.25,
           "ghost": true,
           "hp": 432,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -424,9 +427,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 669,
-      "state": "765c0b34",
-      "events": "45829f3e",
+      "nextId": 673,
+      "state": "51ceedec",
+      "events": "926f1c32",
       "rng": {
         "draws": 4,
         "digest": "76d802bc"
@@ -476,7 +479,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -494,6 +497,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 20,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -513,7 +517,7 @@
               "name": "Resurrection Sickness",
               "remaining": 60,
               "school": "shadow",
-              "sourceId": 666,
+              "sourceId": 670,
               "value": -0.75
             }
           ],
@@ -525,7 +529,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 44,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -568,8 +572,8 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 669,
-      "state": "0217a377",
+      "nextId": 673,
+      "state": "2199c65f",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -579,8 +583,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 669,
-      "state": "9dff8f2b",
+      "nextId": 673,
+      "state": "07b5f92f",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -631,7 +635,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -649,6 +653,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 20,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -668,7 +673,7 @@
               "name": "Resurrection Sickness",
               "remaining": 59.9,
               "school": "shadow",
-              "sourceId": 666,
+              "sourceId": 670,
               "value": -0.75
             }
           ],
@@ -680,7 +685,7 @@
           "fallStartY": 1.511848,
           "fiveSecondRule": 99.35,
           "hp": 44,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",

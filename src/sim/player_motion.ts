@@ -18,6 +18,7 @@
 // by the extraction.
 
 import { isRooted, isStunned } from './combat/cc';
+import { mountMoveSpeedPct } from './content/mounts';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { isSubmergedAt, rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { GHOST_RUN_MULT } from './spirit';
@@ -27,6 +28,11 @@ import { groundHeight, terrainDownhill, terrainWallStandoff, waterLevelAt } from
 export const BACKPEDAL_MULT = 0.65;
 export const GRAVITY = 16;
 export const JUMP_VELOCITY = 6; // apex = v^2/2g ≈ 1.125 yd
+// A mounted rider springs higher so a paddock show-jump reads as clearable: the
+// apex rises to (JUMP_VELOCITY * MOUNT_JUMP_MULT)^2 / 2g ≈ 1.76 yd. Applied in
+// jumpMult, so it flows through the one shared movement kernel (offline, server,
+// and the online self-extrapolator all agree, pinned by player_motion.test.ts).
+export const MOUNT_JUMP_MULT = 1.25;
 // Re-exported by sim.ts for social/chat_readouts.ts (the /falling readout shares
 // the landing-damage threshold with the fall-damage model below).
 export const FALL_SAFE_DISTANCE = 12; // yards of free fall before damage
@@ -56,6 +62,11 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     // buff_speed and form_travel both carry a 1+fraction multiplier (1.4 = +40%).
     if (a.kind === 'buff_speed' || a.kind === 'form_travel') speed = Math.max(speed, a.value);
   }
+  // Mounted travel: the active ground mount rides the entity mirror (mountKey,
+  // synced over the wire like skin), so the online self-extrapolator predicts
+  // mounted speed in lockstep with the server. Additive with buff_speed like
+  // the Fiesta augment below; slows still bite multiplicatively.
+  if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
   return slow * speed;
@@ -65,6 +76,9 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
 export function jumpMult(e: Entity): number {
   let m = 1;
   for (const a of e.auras) if (a.kind === 'buff_jump') m = Math.max(m, a.value);
+  // Mounted riders spring higher (multiplicative with any jump-buff aura), so the
+  // show-jumping course reads as hoppable on horseback.
+  if (e.mountKey) m *= MOUNT_JUMP_MULT;
   return m;
 }
 
@@ -138,7 +152,11 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // slides it back into deep water.
   const steepGround =
     p.onGround && !swimming && rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
-  const moving = hasMoveInput && !isRooted(p) && !steepGround;
+  // A mount summon/dismount transition holds the player in place: walk, strafe, and
+  // both jumps are blocked while mountCastRemaining > 0 (keyboard turning stays, above).
+  // The field syncs on the wire, so the online self-extrapolator roots in lockstep.
+  const mountLocked = p.mountCastRemaining > 0;
+  const moving = hasMoveInput && !isRooted(p) && !steepGround && !mountLocked;
   let wishX = 0,
     wishZ = 0,
     wishSpeed = 0;
@@ -228,6 +246,25 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         }
       }
     }
+    // While mounted the deep-water line is a wall: a ground mount will not step
+    // off dry land into swimming depth. Wading stays allowed (the gate keys on
+    // swim depth, not water presence), and a player who is ALREADY swimming is
+    // force-dismounted by updateMountTransition, so this only bites the entry
+    // from land. Reset the candidate to the current pose (and kill horizontal
+    // velocity when airborne, matching the steep-wall airborne gate) so the body
+    // stops at the shore instead of clipping into the water.
+    if (
+      p.mountKey &&
+      !swimming &&
+      groundHeight(nx, nz, deps.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH
+    ) {
+      nx = p.pos.x;
+      nz = p.pos.z;
+      if (!p.onGround) {
+        p.vx = 0;
+        p.vz = 0;
+      }
+    }
     // Slide along buildings, trees, crypt walls; but while airborne from a
     // jump, pass through fences for the whole arc. Keying off the jump itself
     // (not a height threshold) makes this independent of slope: an uphill
@@ -254,7 +291,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     p.onGround = true;
     p.jumping = false;
     p.fallStartY = p.pos.y;
-    if (inp.jump && !isRooted(p)) {
+    if (inp.jump && !isRooted(p) && !mountLocked) {
       // small hop to climb onto shores and docks
       p.vy = JUMP_VELOCITY * 0.7 * jumpMult(p);
       p.vx = wishX * wishSpeed;
@@ -264,7 +301,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     }
     return;
   }
-  if (inp.jump && p.onGround && !isRooted(p) && !steepGround) {
+  if (inp.jump && p.onGround && !isRooted(p) && !steepGround && !mountLocked) {
     p.vy = JUMP_VELOCITY * jumpMult(p);
     p.vx = wishX * wishSpeed;
     p.vz = wishZ * wishSpeed;

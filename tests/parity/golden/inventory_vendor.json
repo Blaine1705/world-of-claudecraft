@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 666,
+      "nextId": 670,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "5878c00e",
+      "nextId": 671,
+      "state": "193cd8a3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,7 +72,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -88,6 +88,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -107,7 +108,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -150,9 +151,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "2f086dd5",
-      "events": "f25b58b5",
+      "nextId": 671,
+      "state": "d7a0a654",
+      "events": "8eba70b3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -190,7 +191,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -214,6 +215,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -233,7 +235,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -276,9 +278,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "d535cb35",
-      "events": "bd993c45",
+      "nextId": 671,
+      "state": "977f7c16",
+      "events": "336ba230",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -318,7 +320,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
@@ -347,6 +349,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -366,7 +369,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 120,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -409,9 +412,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "efd4d2cd",
-      "events": "7b1f3245",
+      "nextId": 671,
+      "state": "c56b359a",
+      "events": "c26b7c9e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -451,7 +454,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
@@ -480,6 +483,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -499,7 +503,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 110,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -542,9 +546,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "52bb3955",
-      "events": "fff24e90",
+      "nextId": 671,
+      "state": "f3568e44",
+      "events": "23162d6b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -584,7 +588,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -616,6 +620,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -635,7 +640,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -678,9 +683,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "f3866e17",
-      "events": "83930cb5",
+      "nextId": 671,
+      "state": "875d0880",
+      "events": "2ef699b9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -720,7 +725,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -752,6 +757,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -783,7 +789,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -827,9 +833,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "b9ce6bc4",
-      "events": "82831608",
+      "nextId": 671,
+      "state": "1590f3f3",
+      "events": "6afa4a82",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -869,7 +875,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -897,6 +903,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -928,7 +935,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -972,9 +979,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "0a8271af",
-      "events": "0ef0926e",
+      "nextId": 671,
+      "state": "d1c3fb6d",
+      "events": "5e68ac15",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1015,7 +1022,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1043,6 +1050,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1062,7 +1070,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 666,
+              "sourceId": 670,
               "value": 12
             }
           ],
@@ -1086,7 +1094,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1130,9 +1138,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "53a604f0",
-      "events": "df94f788",
+      "nextId": 671,
+      "state": "d4c2ec56",
+      "events": "a776f49a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1174,7 +1182,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1206,6 +1214,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1225,7 +1234,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 666,
+              "sourceId": 670,
               "value": 12
             }
           ],
@@ -1249,7 +1258,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1293,9 +1302,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "c1c4a1a1",
-      "events": "67911710",
+      "nextId": 671,
+      "state": "4a7ac5b9",
+      "events": "5d817ea8",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1337,7 +1346,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1369,6 +1378,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1394,7 +1404,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 666,
+              "sourceId": 670,
               "value": 12
             }
           ],
@@ -1418,7 +1428,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1462,9 +1472,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "1e6dd49c",
-      "events": "5e8a715d",
+      "nextId": 671,
+      "state": "fa5f1662",
+      "events": "eea6016c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1507,7 +1517,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1535,6 +1545,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1564,7 +1575,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 666,
+              "sourceId": 670,
               "value": 12
             }
           ],
@@ -1588,7 +1599,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1632,9 +1643,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "4ef56cd4",
-      "events": "f47e188d",
+      "nextId": 671,
+      "state": "7dc567ca",
+      "events": "0f1077dd",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1677,7 +1688,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1709,6 +1720,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1738,7 +1750,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 666,
+              "sourceId": 670,
               "value": 12
             }
           ],
@@ -1762,7 +1774,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1806,8 +1818,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "4ef56cd4",
+      "nextId": 671,
+      "state": "7dc567ca",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1851,7 +1863,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1883,6 +1895,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1912,7 +1925,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 666,
+              "sourceId": 670,
               "value": 12
             }
           ],
@@ -1936,7 +1949,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

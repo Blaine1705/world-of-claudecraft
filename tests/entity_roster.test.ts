@@ -104,6 +104,7 @@ function makeCtx() {
     instances: [],
     riftInstances: [],
     riftPortalIds: null,
+    dungeonResetLocks: new Map(),
     get arenaMatches() {
       return arenaMatches;
     },
@@ -211,6 +212,8 @@ function makeCtx() {
     enterRift: vi.fn(),
     leaveRift: vi.fn(),
     riftOpenTreasure: vi.fn(),
+    resetDungeonInstances: vi.fn(),
+    inheritDungeonResetLocks: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
@@ -306,6 +309,9 @@ function makeCtx() {
     abandonLockpick: vi.fn(),
     tickLockpickTimeout: vi.fn(),
     startDelveRaiseDeadChannel: vi.fn(() => false),
+    tickMountTraining: vi.fn(),
+    tickMountRace: vi.fn(),
+    abandonMountTraining: vi.fn(),
     resolvedAbility: vi.fn(() => null),
     playerGcdFor: vi.fn(() => 1.5),
     isFriendlyTo: vi.fn(() => false),
@@ -349,6 +355,7 @@ function makeCtx() {
     marketListingBelongsTo: vi.fn(() => false),
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
+    mailHeroicMarks: vi.fn(),
     applySetProcs: vi.fn(),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),

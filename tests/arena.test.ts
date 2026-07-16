@@ -659,28 +659,26 @@ describe('arena: class ability target filters', () => {
     },
   ];
 
-  it.each(aoeCases)('lets $cls $ability hit active arena opponents', ({
-    cls,
-    ability,
-    level,
-    setup,
-  }) => {
-    const { sim, a, b } = queueDuo(cls, 'warrior');
-    startBout(sim);
-    const caster = sim.entities.get(a)!;
-    const target = sim.entities.get(b)!;
-    sim.setPlayerLevel(level, a);
-    sim.setPlayerLevel(level, b);
-    teleport(sim, b, caster.pos.x, caster.pos.z + 3);
-    caster.resource = caster.maxResource;
-    caster.gcdRemaining = 0;
-    setup?.(sim, a);
+  it.each(aoeCases)(
+    'lets $cls $ability hit active arena opponents',
+    ({ cls, ability, level, setup }) => {
+      const { sim, a, b } = queueDuo(cls, 'warrior');
+      startBout(sim);
+      const caster = sim.entities.get(a)!;
+      const target = sim.entities.get(b)!;
+      sim.setPlayerLevel(level, a);
+      sim.setPlayerLevel(level, b);
+      teleport(sim, b, caster.pos.x, caster.pos.z + 3);
+      caster.resource = caster.maxResource;
+      caster.gcdRemaining = 0;
+      setup?.(sim, a);
 
-    const startHp = target.hp;
-    sim.castAbility(ability, a);
+      const startHp = target.hp;
+      sim.castAbility(ability, a);
 
-    expect(target.hp).toBeLessThan(startHp);
-  });
+      expect(target.hp).toBeLessThan(startHp);
+    },
+  );
 });
 
 describe('arena: enclosing walls', () => {

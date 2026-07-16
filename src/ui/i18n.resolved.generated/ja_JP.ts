@@ -20,6 +20,154 @@ export const ja_JP: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "開発者コマンドセンター",
+    "kicker": "開発ツール",
+    "title": "コマンドセンター",
+    "subtitle": "現在のワールドをサーバー権限でテストするための操作です。",
+    "closeAria": "開発者コマンドを閉じる",
+    "categoryNavAria": "開発者コマンドのカテゴリ",
+    "categories": {
+      "player": "プレイヤー",
+      "spawns": "出現物",
+      "inventory": "インベントリ",
+      "progress": "進行",
+      "travel": "移動",
+      "scenarios": "シナリオ"
+    },
+    "filterLabel": "コマンドを絞り込む",
+    "filterPlaceholder": "このカテゴリを検索",
+    "noMatches": "一致するコマンドはありません。",
+    "serverRequirement": "サーバーのチート機能には引き続き ALLOW_DEV_COMMANDS=1 が必要です。",
+    "invalidValues": "実行する前に有効な値を選択してください。",
+    "sent": "送信済み：{command}",
+    "run": "実行",
+    "fields": {
+      "level": "レベル",
+      "mob": "モブ",
+      "count": "個数",
+      "item": "アイテム",
+      "gold": "ゴールド",
+      "quest": "クエスト",
+      "profession": "専門職",
+      "amount": "数量",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "ダンジョン",
+      "difficulty": "難易度",
+      "name": "名前"
+    },
+    "difficulty": {
+      "normal": "ノーマル",
+      "heroic": "ヒロイック"
+    },
+    "actions": {
+      "heal": {
+        "label": "体力を回復",
+        "description": "体力を全回復します。"
+      },
+      "resource": {
+        "label": "リソースを回復",
+        "description": "マナ、怒り、またはエネルギーを全回復します。"
+      },
+      "cooldowns": {
+        "label": "クールダウンを消去",
+        "description": "アビリティ、GCD、ポーションのタイマーをリセットします。"
+      },
+      "god": {
+        "label": "無敵モードを切り替え",
+        "description": "無敵状態と強化ダメージを切り替えます。"
+      },
+      "revive": {
+        "label": "復活",
+        "description": "通常の蘇生経路で復活します。"
+      },
+      "kill": {
+        "label": "プレイヤーを死亡させる",
+        "description": "死亡、霊体、死体の流れをテストします。"
+      },
+      "combatreset": {
+        "label": "戦闘をリセット",
+        "description": "戦闘状態と敵の脅威値を消去します。"
+      },
+      "level": {
+        "label": "レベルを設定",
+        "description": "現在のキャラクターレベルを設定します。"
+      },
+      "spawn": {
+        "label": "モブを出現",
+        "description": "プレイヤーの近くに指定したモブを作成します。"
+      },
+      "killtarget": {
+        "label": "ターゲットを倒す",
+        "description": "選択中の生きているモブを倒します。"
+      },
+      "despawntarget": {
+        "label": "ターゲットを消去",
+        "description": "このツールで作成した選択中のモブを削除します。"
+      },
+      "despawnall": {
+        "label": "自分の出現物を消去",
+        "description": "この開発者が出現させたすべてのモブを削除します。"
+      },
+      "give": {
+        "label": "アイテムを付与",
+        "description": "プレイヤーのインベントリにアイテムを追加します。"
+      },
+      "gold": {
+        "label": "ゴールドを追加",
+        "description": "現在の所持金にゴールドを追加します。"
+      },
+      "quest": {
+        "label": "クエストを完了",
+        "description": "IDを指定してクエストを完了します。"
+      },
+      "quests": {
+        "label": "進行中のクエストを完了",
+        "description": "現在のクエストログにある全クエストを完了します。"
+      },
+      "attune": {
+        "label": "前提条件を解除",
+        "description": "すべての前提条件を完了済みにします。"
+      },
+      "gather": {
+        "label": "採集スキルを付与",
+        "description": "採集専門職のスキルを上げます。"
+      },
+      "teleport": {
+        "label": "テレポート",
+        "description": "正確なワールド座標へ移動します。"
+      },
+      "dungeon": {
+        "label": "ダンジョンに入る",
+        "description": "開発者用の制限を無視してダンジョンに入ります。"
+      },
+      "raid": {
+        "label": "レイドに入る",
+        "description": "ナイスラクシスのレイドアリーナへ直接入ります。"
+      },
+      "raidreset": {
+        "label": "レイドロックアウトをリセット",
+        "description": "現在のレイドロックアウトを消去します。"
+      },
+      "bot": {
+        "label": "ソーシャルボットを出現",
+        "description": "ウィスパー可能な静止プレイヤーを作成します。"
+      },
+      "lfgqueue": {
+        "label": "ファインダー待機列を準備",
+        "description": "ダンジョンファインダーの待機列シナリオを作成します。"
+      },
+      "lfgraid": {
+        "label": "レイドファインダーを準備",
+        "description": "レイドファインダーのシナリオを作成します。"
+      },
+      "lfgboard": {
+        "label": "募集掲示板を準備",
+        "description": "事前編成の募集掲示シナリオを作成します。"
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "経験値",
@@ -229,6 +377,7 @@ export const ja_JP: EnTranslations = {
       "remainingLessThanMinute": "1分未満",
       "remainingMinutes": "{minutes}分",
       "remainingHoursMinutes": "{hours}時間{minutes}分",
+      "remainingDaysHours": "{days}日{hours}時間",
       "score": "スコア",
       "walletValue": "ウォレット価値 (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const ja_JP: EnTranslations = {
         "no_wallet": "$20 USD 相当以上のWOCを保有するウォレットを接続してください。",
         "under_minimum": "ウォレットが最低額の $20 USD 相当のWOCを下回っています。",
         "price_unavailable": "WOCの価格を取得できないため、報酬は一時的にロックされています。",
-        "banned": "デイリー報酬への参加が禁止されています。理由: {reason}"
+        "banned": "デイリー報酬への参加が禁止されています。理由: {reason}",
+        "bannedUntil": "デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const ja_JP: EnTranslations = {
       "balanceLabel": "残高",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL：{amount}",
+      "usdcBalance": "USDC：{amount}",
       "wocBalance": "WOC：{amount}",
       "unavailable": "Claudiumストアは現在利用できません。残高と購入内容に影響はありません。しばらくしてからお試しください。",
       "disclosure": "Claudiumは一方向のゲーム内通貨です。現金で購入して外見アイテムに使用でき、換金、譲渡、払い戻しはできません。",
@@ -499,6 +650,7 @@ export const ja_JP: EnTranslations = {
       "railLabel": "支払い方法",
       "railStripe": "カード",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20%オフ",
       "railWocUnavailable": "WOC価格は現在利用できません。",
@@ -602,6 +754,7 @@ export const ja_JP: EnTranslations = {
       "leaderboard": "ランキング",
       "dailyRewards": "ストア",
       "deeds": "功績",
+      "mounts": "マウント",
       "nameplates": "ネームプレート",
       "haptics": "振動",
       "hapticsOff": "振動オフ",
@@ -716,7 +869,63 @@ export const ja_JP: EnTranslations = {
       "petStop": "ペット：停止",
       "petTaunt": "ペット：挑発",
       "petDefensive": "ペット：防御",
-      "petAggressive": "ペット：攻撃的"
+      "petAggressive": "ペット：攻撃的",
+      "mount": "騎乗 / 降車"
+    },
+    "mounts": {
+      "title": "マウント",
+      "close": "閉じる",
+      "select": "選択",
+      "selected": "選択中",
+      "riding": "騎乗中",
+      "mount": "騎乗",
+      "dismount": "降りる",
+      "requiresLevel": "レベル{level}が必要",
+      "pickFirst": "騎乗するマウントを選んでください。",
+      "keybindHint": "騎乗 / 降車キーで騎乗します。",
+      "emptyTitle": "マウントは未入手",
+      "emptyStableHint": "レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。",
+      "emptyDropHint": "より希少なマウントはダンジョンやレイドのボスがドロップします。",
+      "clickManage": "クリックしてマウントを選択",
+      "rarity_common": "コモン",
+      "rarity_rare": "レア",
+      "rarity_epic": "エピック",
+      "spec_speed": "+{pct}% 移動力上昇",
+      "spec_block": "+{pct}% 近接ダメージブロック",
+      "spec_crit": "+{pct}% クリティカル率",
+      "name_valorsteed": "ヴァロースティード",
+      "name_grag_bear": "ゴリアテ・グラグベア",
+      "name_stalkglider_snail": "モスシェル・ストークグライダー",
+      "name_aether_hover_cycle": "エーテルジャウスター・ホバーサイクル",
+      "name_shadowjump_toad": "影跳びのカマカゲ",
+      "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
+      "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
+      "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
+      "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
+      "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
+      "desc_aether_hover_cycle": "低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。",
+      "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
+      "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
+      "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。"
+    },
+    "mountTraining": {
+      "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
+      "ownedMountPrompt": "{key} キーを押して騎乗する",
+      "ridePrompt": "光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。",
+      "begin": "レッスン開始",
+      "success": "ヴァロースティードを乗りこなした。",
+      "returnToMarla": "厩舎のマーラのもとへ戻り、厩舎の馬を引き取ろう。"
+    },
+    "mountRace": {
+      "startButton": "レース開始",
+      "cancelButton": "レースをキャンセル",
+      "go": "GO!",
+      "start": "スタート！すべての障害を跳び越え、アーチへ戻って駆け抜けろ。",
+      "toFinish": "アーチへ戻って駆け抜けろ！",
+      "finished": "{seconds}秒でゴール！",
+      "timeout": "レース失敗",
+      "progress": "障害 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -870,6 +1079,7 @@ export const ja_JP: EnTranslations = {
       "interfaceModeTouch": "タッチ",
       "interfaceModeNote": "自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。",
       "footstepSounds": "足音",
+      "interfaceSounds": "インターフェースとフィードバック音",
       "clickFeedback": "クリックマーカー",
       "lockCursorOnRotate": "回転中はカーソルを固定",
       "keybindHelpLockCursorOnRotate": "ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。",
@@ -1309,7 +1519,20 @@ export const ja_JP: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "ダンジョン難易度をヒロイックに設定",
-      "setNormal": "ダンジョン難易度をノーマルに設定"
+      "setNormal": "ダンジョン難易度をノーマルに設定",
+      "resetAll": "すべてのインスタンスをリセット",
+      "resetDone": "すべてのインスタンスをリセットしました。",
+      "resetNone": "リセットできるインスタンスがありません。",
+      "resetOccupied": "中にプレイヤーがいる間はインスタンスをリセットできません。",
+      "resetSameDifficulty": "インスタンスをリセットする前にダンジョン難易度を変更してください。空のインスタンスは5分後に自動的にリセットされます。",
+      "resetLoot": "中に戦利品が残っている間はインスタンスをリセットできません。",
+      "resetConfirmTitle": "すべてのインスタンスをリセットしますか？",
+      "resetConfirmBody": "以前選択していた難易度の空のインスタンスを放棄します。未取得の戦利品がある場合はリセットできません。",
+      "resetConfirm": "インスタンスをリセット",
+      "resetCooldown": "インスタンスをリセットできるのは5分に1回だけです。",
+      "resetUsage": "難易度を変更した後、/dungeon reset で空のインスタンスを放棄できます。",
+      "entryMismatchNormal": "このインスタンスはノーマル難易度に設定されています。ヒロイックで新しく始めるには「すべてのインスタンスをリセット」を使用してください。",
+      "entryMismatchHeroic": "このインスタンスはヒロイック難易度に設定されています。ノーマルで新しく始めるには「すべてのインスタンスをリセット」を使用してください。"
     },
     "bags": {
       "cannotDestroy": "このアイテムは破壊できません。",
@@ -1324,6 +1547,7 @@ export const ja_JP: EnTranslations = {
       "filterConsumable": "消耗品",
       "filterMaterial": "素材",
       "filterQuest": "クエスト",
+      "filterMount": "マウント",
       "sortAria": "バッグのアイテムを並べ替える",
       "sortRecent": "最近",
       "sortQuality": "品質",
@@ -1478,6 +1702,33 @@ export const ja_JP: EnTranslations = {
     "playerFrame": {
       "unlock": "プレイヤーフレームを移動",
       "lock": "プレイヤーフレームを固定"
+    },
+    "partyFrames": {
+      "section": "パーティ・レイドフレーム",
+      "unlock": "パーティ・レイドフレームを移動",
+      "lock": "パーティ・レイドフレームを固定",
+      "style": "フレームスタイル",
+      "styleAutomatic": "自動",
+      "styleClassic": "クラシックパーティフレーム",
+      "styleRaid": "レイドフレーム",
+      "scale": "フレームスケール",
+      "width": "フレームの幅",
+      "height": "フレームの高さ",
+      "spacing": "フレームの間隔",
+      "columns": "レイドの列数",
+      "healthText": "体力テキスト",
+      "healthNone": "なし",
+      "healthPercent": "パーセント",
+      "healthCurrent": "現在値",
+      "healthCurrentMax": "現在値 / 最大値",
+      "sort": "プレイヤーの並び順",
+      "sortGroup": "グループ",
+      "sortRole": "ロール",
+      "sortName": "名前",
+      "showResource": "マナ・怒り・エネルギーを表示",
+      "showAbsorbs": "吸収シールドを表示",
+      "showAuras": "バフとデバフを表示",
+      "showSelf": "自分のフレームを表示"
     },
     "frameReset": {
       "label": "フレーム位置をリセット"
@@ -2141,6 +2392,9 @@ export const ja_JP: EnTranslations = {
       "already_linked": "このアカウントには既にSteamアカウントが連携されています。",
       "account_taken": "そのSteamアカウントは既に別のアカウントに連携されています。",
       "upstream": "Steamから応答がありません。しばらくしてからもう一度お試しください。"
+    },
+    "welcome": {
+      "invalid_input": "入力が無効です。"
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const ja_JP: EnTranslations = {
       "effectsTitle": "バフ、デバフ、群衆制御",
       "effectsBody": "多くのアビリティは、しばらく残る効果を付与します。有益なもの（バフ）はステータスを上げ、盾を張り、少しずつ回復させてくれます。有害なもの（デバフ）は継続ダメージで体力を削り、あるいはあなたを弱体化させます。画面の上隅、ミニマップの脇にある小さなアイコンを見れば、何が付いていて、あとどれくらい続くのかがわかります。",
       "ccBody": "群衆制御は、対象にできることを制限する特殊なデバフです。スタン、根縛りや減速、呪文詠唱を止めるサイレンス、武装解除、フィアー、そして一瞬だけ敵を無害にする変身系があります。相手が他のプレイヤーの場合、制御は繰り返すほど利きが薄れます。同じ種類をあまりに早く再付与すると弱まり、やがて完全に効かなくなり、またステルスから仕掛けるスタンはその後に続くスタンとは別に数えられるので、誰も永遠に無力なまま連鎖され続けることはありません。世界のクリーチャーたちはそのような恨みを抱かず、彼らには繰り返しても制御が弱まることはありません。ただし最強の敵たちの多く、名前を持つエリートやその中でも最強のボスたちは、そもそも制御がまったく効きません。",
-      "metersBody": "戦いの首尾が気になりますか。Zキーを押すとパーティメーターが開き、グループのダメージ、回復、脅威を戦闘ごとに集計してくれます。",
+      "metersBody": "戦いの首尾が気になりますか。Shift+Hキーを押すとパーティメーターが開き、グループのダメージ、回復、脅威を戦闘ごとに集計してくれます。",
       "queueTitle": "次の一手はもう装填済み",
       "queueBody": "ボタンを押す瞬間をフレーム単位で合わせる必要はありません。今のアビリティを詠唱している間に次のアビリティを押せば先行入力として蓄えられ、詠唱が完了した瞬間に発動します。だから練達のプレイは途切れなく流れていきます。一部の近接攻撃も同じ仕組みで、次の武器の一振りに乗って繰り出されます。",
       "deathTitle": "倒れたとき",
@@ -2505,7 +2759,7 @@ export const ja_JP: EnTranslations = {
       "petBarTerm": "ペットバー",
       "petBarDef": "ハンターやウォーロックのペットが追加する操作の列です。攻撃、停止、挑発、防御、攻撃的の五つで、初期設定ではCtrl+1から5に割り当てられています。",
       "metersTerm": "ダメージメーター",
-      "metersDef": "現在の戦いのパーティ用スコアボードのウィンドウです。与えたダメージ、行った回復、そして誰が最も脅威を抱えているかを、戦闘ごとに記録します。キー割り当て（初期設定はZ）で開けます。",
+      "metersDef": "現在の戦いのパーティ用スコアボードのウィンドウです。与えたダメージ、行った回復、そして誰が最も脅威を抱えているかを、戦闘ごとに記録します。キー割り当て（初期設定はShift+H）で開けます。",
       "targetMarkerTerm": "ターゲットマーカー",
       "targetMarkerDef": "パーティやレイドのメンバーが誰でも対象の上に付けられる記号で、全員が同じ相手に集中したり、逆に避けたりできます。記号は八種類で、一つの記号につき一体の対象に付けられます。",
       "loadoutTerm": "保存ビルド",
@@ -2886,6 +3140,8 @@ export const ja_JP: EnTranslations = {
       "heroicRewardsTitle": "英雄の証と強化された戦利品",
       "heroicRewardsBody": "ヒロイックのボスは、おなじみの戦利品を強化し、ツールチップにヒロイックの表記を添えて落とします。さらに各ランの最後のボスは、ほかでは見つからないエピックを加えてくれます。その最後の討伐は、参加者全員に英雄の証も残します。ハイウォッチの補給係ヴェックスのもとで使う通貨で、彼の扱う指輪と首飾りは、このレルムで手に入る唯一の装身具です。",
       "heroicLockoutBody": "ノーマルのダンジョンは一日中回れます。ヒロイックは辛抱を求めます。各ダンジョンが報酬を出すヒロイッククリアは一日に一度で、レイドは難易度ごとに一日のロックアウトを保ちます。クリア済みのランはそのパーティに常に開かれたままなので、勝ち取った戦利品から締め出される者はいません。",
+      "resetTitle": "インスタンスのリセット",
+      "resetBody": "グループがインスタンスを確保したまま難易度を切り替えると、古い確保はしばらく残ってから自然に消えます。パーティリーダーならすぐに手放すこともできます。自分のポートレートメニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力しましょう。リセットできるのは難易度を実際に変更したあとだけで、生死を問わず誰もインスタンス内に残っていないことが条件になり、リセットとリセットのあいだには短いクールダウンが挟まります。間違った難易度のまま扉に着けば、ランが始まる前にゲームがそう告げてくれます。レイドはこの方法ではリセットされません。レイドには独自のロックアウトのルールがあります。",
       "templeLoreTitle": "水没の神殿、もう少し深く",
       "templeLoreBody": "神殿には、あなたが他所で追うカルトよりも古い、それ自身の伝説があります。月明かりを飲み込み、溺れた者を返すという山上の湖グリマーミアの岸辺で、一人の見張り役が淡い光の門を守っています。水面の下には、そこへ続く冷たい石の階段が伸びています。そこに沈んだ者たちは不運で溺れたのではありません。彼らは礼拝のうちに沈み、決して歌うのをやめなかった蒼白の聖歌隊でした。古き守り人たちは水に呑まれる前に、岩へただ一つの警告を刻みました。彼らが溺れし月と呼ぶものへの祈りです。そしてその下に、より落ち着いた手が二つの言葉を書き添えていました。それはただ眠っているだけだ、と。",
       "cryptLeadTitle": "死者が閉ざしておくべきだった扉",
@@ -3093,7 +3349,7 @@ export const ja_JP: EnTranslations = {
       "qualityNote": "品質が高いほど、たいていステータスも良くなりますが、品質は目安であって決まりではありません。クラスとレベルにうまく合った一品は、より派手なものを上回ることもあります。",
       "upgradeTitle": "ギアは常に最新に",
       "upgradeBody": "古い一品を新たなアップグレードに替えるほうが、もう手に余る装備で完璧に立ち回るより効果があります。より良いものがドロップしたり、クエストで提示されたりしたら、受け取りましょう。良いアイテムを後のために取っておいてはいけません。",
-      "itemLevelBody": "2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。敵やクエストなど、世界で勝ち取った装備にはアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。商人で売っている素の基本装備や初期装備のように、そうした入手元を持たない品にはアイテムレベルが表示されません。数値がないのは異常ではなく、正常なことです。",
+      "itemLevelBody": "2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。敵やクエスト、生産職といった入手元がはっきりしている装備にはアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。商人で売っている素の基本装備や初期装備のように、そうした入手元を持たない品にはアイテムレベルが表示されません。数値がないのは異常ではなく、正常なことです。",
       "sourcesTitle": "ギアの入手先",
       "sourcesBody": "序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵は倒されると装備を落とし、町の商人は手堅い基本装備を売り、職人は採集した素材を身につけられる品へと変え、プレイヤーマーケットでは他の冒険者から買えます。そして頂の上では、二つの刻印通貨が、ほかでは見つからない装備を買わせてくれます。デルヴの番人のもとではデルヴの刻印、英雄補給係のもとでは英雄の証です。",
       "soulboundTitle": "魂縛：あなただけのもの",
@@ -3137,7 +3393,7 @@ export const ja_JP: EnTranslations = {
       "craftRecipesTitle": "レシピと材料",
       "craftRecipesBody": "どのレシピにも、採集または購入して手に入れる特定の材料が必要です。最も単純なレシピは一般的な材料だけで作れ、最初から製作できるので、その職を手に入れた瞬間から作業を始められます。レシピ一覧はまだ充実の途中です。いくつかの職は最初のレシピを待っている状態で、職が育つにつれてさらに増えていきます。",
       "craftHowTitle": "製作ウィンドウ",
-      "craftHowBody": "製作ウィンドウ（初期設定はTキー）を開くと、あなたが知っているすべてのレシピ、それぞれに必要なもの、そして手持ちの材料が確認できます。材料がそろっていれば、クリック一つで作業が完了します。一般的なレシピは世界のどこでも製作できます。一部の高度な道具レシピだけは、ハイウォッチの製作拠点に立って作る必要があります。",
+      "craftHowBody": "製作ウィンドウ（初期設定はTキー）を開くと、あなたが知っているすべてのレシピ、それぞれに必要なもの、そして手持ちの材料が確認できます。材料がそろっていれば、クリック一つで作業が完了します。一般的なレシピは世界のどこでも製作できます。一部の高度なレシピ、上位の道具や希少なキャスター防具などは、ハイウォッチの製作拠点に立って作る必要があります。",
       "craftMasteryTitle": "技能と熟達",
       "craftMasteryBody": "製作に成功するとその職の技能が上がりますが、技能がレシピを閉ざしてしまうことはありません。レシピを知っていて材料を持っていれば、いつでも挑戦できます。技能が高まって得られるのは品質です。熟練した手ほど、より上等な品を作り上げます。唯一の例外は組み合わせレシピで、これは解放される前に、その両方の職で腕前を証明しておくことを求めます。",
       "craftComboTitle": "組み合わせレシピ",
@@ -4928,6 +5184,29 @@ export const ja_JP: EnTranslations = {
     "body": "ゲームサービスを再起動しています。Claudemoonはまもなく戻る予定です。このページは自動的に確認を続けます。",
     "status": "まもなく復帰"
   },
+  "welcome": {
+    "back": "おかえりなさい、{name}さん",
+    "level": "レベル {level}",
+    "lastPlayed": "最終プレイ：{when}",
+    "continue": "ワールドに入る",
+    "continueHint": "Enterで続行、Escでスキップ",
+    "continueHintTouch": "タップして続行",
+    "discord": {
+      "title": "コミュニティはDiscordで活動しています",
+      "sub": "パッチプレビュー、イベント、開発者チャット、連携でボーナス銀行スロット2枠。",
+      "join": "Discordに参加する"
+    },
+    "chest": {
+      "ready": "デイリーチェストの準備ができました"
+    },
+    "armory": {
+      "cta": "武器庫を見に行く"
+    },
+    "news": {
+      "new": "新着",
+      "viewAll": "GitHubですべての更新を見る"
+    }
+  },
   "hud": {
     "core": {
       "elite": "エリート",
@@ -5663,7 +5942,8 @@ export const ja_JP: EnTranslations = {
       "tool": "道具",
       "potion": "ポーション",
       "elixir": "エリクサー",
-      "bag": "バッグ"
+      "bag": "バッグ",
+      "mount": "マウント"
     },
     "stats": {
       "armor": "防御力",
@@ -6458,7 +6738,7 @@ export const ja_JP: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼の血",
-        "description": "攻撃力を6秒間40上昇させます。ウルフフォーム専用。"
+        "description": "攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。"
       },
       "rip": {
         "name": "リップ",
@@ -6749,6 +7029,24 @@ export const ja_JP: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "イーストブルックの羊毛ズボン"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "イーストブルックの儀式衣装"
+      },
+      "eastbrook_druids_hide": {
+        "name": "イーストブルックのドルイドの皮"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "イーストブルックの守護レギンス"
+      },
+      "wardweave_cowl": {
+        "name": "ワードウィーヴのフード"
+      },
+      "duskhide_wraps": {
+        "name": "ダスクハイドの手甲"
+      },
+      "sootscale_mantle": {
+        "name": "ススウロコのマント"
       },
       "gravecaller_blade": {
         "name": "グレイブコーラーの大刃"
@@ -8171,6 +8469,27 @@ export const ja_JP: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "嵐呼びの腰当て"
+      },
+      "reins_valorsteed": {
+        "name": "ヴァロースティードの手綱"
+      },
+      "reins_grag_bear": {
+        "name": "ゴリアテ・グラグベアの手綱"
+      },
+      "reins_stalkglider_snail": {
+        "name": "モスシェル・ストークグライダーの手綱"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "起動キー：エーテルジャウスター・ホバーサイクル"
+      },
+      "reins_shadowjump_toad": {
+        "name": "影跳びのカマカゲの手綱"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "スカイリーチ・ストームフェザーの手綱"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "大七面鳥サンダーストラットの手綱"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const ja_JP: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
+      },
+      "stable_horse": {
+        "name": "厩舎の馬"
       },
       "rift_spawnling": {
         "name": "リフトの落とし子"
@@ -8821,6 +9143,11 @@ export const ja_JP: EnTranslations = {
         "name": "監督官オデル",
         "title": "鉱山監督",
         "greeting": "坑道全体が泥まみれの害虫どもでうごめいています！"
+      },
+      "stablemaster_marla": {
+        "name": "マーラ・ヒッチェン",
+        "title": "厩舎長",
+        "greeting": "騎手はみな二本足で歩いてくる、{className}よ。ヴァロースティードにまたがって泥にまみれずにいられるようになるまで、手綱は渡さない。ハイウォッチには骨折を治せる者もそう余っていないのでね。"
       },
       "warden_fenwick": {
         "name": "番人フェンウィック",
@@ -9821,6 +10148,16 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "乗馬の稽古",
+        "text": "騎手はみな二本足で歩いてくる、{playerName}よ、出会った日にも言った通りだ。謝礼を払い、わたしが合図したら、調教用のヴァロースティードを呼び寄せて騎乗しろ。それからコースを走れ。目印をたどってスタートアーチへ向かい、どの障害もきれいに跳び越え、砂が落ちきる前にもう一度ラインを越えるのだ。やり遂げれば、その鞍はお前のものだ。パドックの外へさまよい出れば、また最初からやり直しだ。",
+        "completion": "よし、それでいい。ひと息にまたがり、上でも堂々と座っていたな。ヴァロースティードはお前のものだ、{playerName}。鞍も手綱も、そして買うのではなく勝ち取った騎手としての誇りもな。",
+        "objectives": {
+          "0": {
+            "label": "ヴァロースティードを乗りこなす"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "薄れゆく帳",
         "text": "洞窟がそなたに開いたか。ならば封印は思ったより弱っている、{playerName}。帳が裂ける場所で、ウィスプは冷たく暗く変わる。ダスクウィスプの精髄を八つ持ってきておくれ。傷の深さを読み取ろう。",
@@ -10137,6 +10474,9 @@ export const ja_JP: EnTranslations = {
           },
           "9": {
             "label": "墓ワームの聖所"
+          },
+          "10": {
+            "label": "ハイウォッチの厩舎"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const ja_JP: EnTranslations = {
         "sender": "アルドリック修道士",
         "subject": "あなたが暗闇で成したこと",
         "body": "あの窪地に何が葬られていたのかを知る者はごくわずかで、信じる者はさらに少ないでしょう。私は知っています。そして忘れません。\n\nあなたの道に光がありますように。\n- アルドリック修道士"
+      },
+      "heroic_marks_reward": {
+        "sender": "英雄級補給官",
+        "subject": "あなたの英雄の印",
+        "body": "あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官"
       }
     },
     "itemSets": {

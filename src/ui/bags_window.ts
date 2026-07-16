@@ -51,7 +51,7 @@ import { itemDisplayName } from './entity_i18n';
 import { dropRequiredLevel, isPaperdollDraggable, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
-import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
+import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
@@ -92,6 +92,7 @@ const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   consumable: 'hudChrome.bags.filterConsumable',
   material: 'hudChrome.bags.filterMaterial',
   quest: 'hudChrome.bags.filterQuest',
+  mount: 'hudChrome.bags.filterMount',
 };
 const BAG_SORT_LABEL_KEYS: Record<BagSort, TranslationKey> = {
   recent: 'hudChrome.bags.sortRecent',
@@ -158,6 +159,9 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   stageMailParcel(itemId: string): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
+  /** Open the character sheet's mount picker highlighting this mount (a click
+   *  on a collected kind:'mount' reins item). */
+  openMountPicker(mountKey: string): void;
   showError(text: string): void;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;
@@ -801,6 +805,10 @@ export class BagsWindow {
         this.deps.world().equipBag(s.itemId);
         this.deps.hideTooltip();
         this.render();
+        break;
+      case 'openMountPicker':
+        this.deps.hideTooltip();
+        this.deps.openMountPicker(item.kind === 'mount' ? item.mount : '');
         break;
       case 'use':
         this.deps.world().useItem(s.itemId);

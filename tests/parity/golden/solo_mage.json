@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "7d1175c1",
+      "nextId": 671,
+      "state": "3eb8183e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,7 +53,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -73,6 +73,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -92,7 +93,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -136,9 +137,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 668,
-      "state": "abb1c9bf",
-      "events": "b2236166",
+      "nextId": 672,
+      "state": "b75203ff",
+      "events": "9e7dbd25",
       "rng": {
         "draws": 2,
         "digest": "b934be18"
@@ -147,9 +148,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 668,
-      "state": "7b517059",
-      "events": "7033d40d",
+      "nextId": 672,
+      "state": "15997b80",
+      "events": "09843d4f",
       "rng": {
         "draws": 2,
         "digest": "b934be18"
@@ -158,9 +159,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 668,
-      "state": "3657ab11",
-      "events": "b07ccc8b",
+      "nextId": 672,
+      "state": "fd2d8b98",
+      "events": "f739b0ea",
       "rng": {
         "draws": 127,
         "digest": "7fb9aa8d"
@@ -169,9 +170,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 668,
-      "state": "bff5f9b7",
-      "events": "b07ccc8b",
+      "nextId": 672,
+      "state": "25ecdfce",
+      "events": "f739b0ea",
       "rng": {
         "draws": 279,
         "digest": "31b8c362"
@@ -180,9 +181,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 668,
-      "state": "9ac5a0e1",
-      "events": "db83f049",
+      "nextId": 672,
+      "state": "23abf638",
+      "events": "5e106d1b",
       "rng": {
         "draws": 482,
         "digest": "e67d1422"
@@ -191,9 +192,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 668,
-      "state": "caaf2373",
-      "events": "b07ccc8b",
+      "nextId": 672,
+      "state": "6f24f8e2",
+      "events": "f739b0ea",
       "rng": {
         "draws": 659,
         "digest": "d7d7ed41"
@@ -202,8 +203,8 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 668,
-      "state": "51537e6d",
+      "nextId": 672,
+      "state": "4c4b3310",
       "events": "741638a5",
       "rng": {
         "draws": 753,
@@ -258,7 +259,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -280,6 +281,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 20,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -301,7 +303,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 105.4,
           "hp": 50000,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -333,7 +335,7 @@
             "sta": 23,
             "str": 10
           },
-          "targetId": 667,
+          "targetId": 671,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -353,7 +355,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 9000,
-          "id": 667,
+          "id": 671,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",

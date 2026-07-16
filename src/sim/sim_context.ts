@@ -108,6 +108,9 @@ export interface SimContextPrimitives {
   // reads/finds/iterates it and mutates slot fields in place; the array identity
   // stays Sim-owned (like delayedEvents/groundAoEs), so this is a live read-only view.
   readonly instances: InstanceSlot[];
+  // Session-only manual-reset cooldowns keyed by durable character identity and
+  // dungeon id. Unlike party instance keys, these survive relogs and party reforming.
+  readonly dungeonResetLocks: Map<string, { availableAt: number; claimId: number }>;
   // Procedural Rift instance pool (seeded in the Sim ctor). Live view: the backing
   // array stays Sim-owned; rift/runs.ts mutates slot fields in place.
   readonly riftInstances: RiftInstance[];
@@ -272,6 +275,8 @@ export interface SimContextCallbacks {
   instanceClaimIdAt(pos: Vec3): number | null;
   enterDungeon(dungeonId: string, pid?: number): void;
   leaveDungeon(pid?: number): void;
+  resetDungeonInstances(pid?: number): void;
+  inheritDungeonResetLocks(pid: number): void;
   // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
   // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
   // these two are on the seam so foreign callers reach them through ctx.
@@ -638,6 +643,24 @@ export interface SimContextCallbacks {
   tickLockpickTimeout(run: DelveRun): void;
   startDelveRaiseDeadChannel(run: DelveRun, boss: Entity, mobId: string, count: number): boolean;
 
+  // Riding lesson (src/sim/mounts_training.ts): a session that lives directly on
+  // PlayerMeta rather than a shared DelveRun. tickMountTraining is the per-tick
+  // driver (called next to updateMountTransition in the coordinator's per-player
+  // loop: it succeeds the lesson once the player is in the training steed's
+  // saddle); abandonMountTraining tears down a leaving player's IN_PROGRESS
+  // session (called from the removePlayer leave path, mirroring abandonLockpick).
+  tickMountTraining(meta: PlayerMeta): void;
+  abandonMountTraining(meta: PlayerMeta): void;
+
+  // Show-jumping race (src/sim/mount_race.ts): a strictly per-player session on
+  // PlayerMeta.mountRace. tickMountRace is the per-tick driver (called from the
+  // coordinator's per-player loop after movement, so the tick's prevPos -> pos
+  // segment is what gate crossings are detected on). There is no abandon
+  // callback: the driver voids a run itself on death/dismount/leaving, and a
+  // leaving player's session simply dies with their PlayerMeta (nothing external
+  // references it).
+  tickMountRace(meta: PlayerMeta): void;
+
   // C4a casting lifecycle (src/sim/combat/casting_lifecycle.ts) consumes these; all
   // still on Sim. `runEffects` is the C4b boundary (the moved applyAbility +
   // applyChannelTick reach the actual ability resolution only through here).
@@ -707,7 +730,7 @@ export interface SimContextCallbacks {
   // are M2's decls above, points-at Sim. Not re-declared here (dedupe).
 
   // G2 social plumbing. `setPlayerLevel` backs the /dev level cheat (handleDevChat in
-  // social/chat.ts); `notice` is the positive chat-log line the /join /leave handler
+  // dev_commands.ts); `notice` is the positive chat-log line the /join /leave handler
   // emits. Both stay on Sim. (hasPendingSocialInvite is already declared above; isRooted/
   // moveSpeedMult/swingIntervalMult are M2 decls above -> all deduped.)
   setPlayerLevel(level: number, pid?: number): void;
@@ -716,7 +739,7 @@ export interface SimContextCallbacks {
   // devCommands). Adds a stationary whisperable player near the primary; returns the
   // new pid, or -1 if the name is blank or already taken. Stays on Sim.
   spawnDevBot(name: string): number;
-  // Dev-only Dungeon Finder scenario seeding backing "/dev lfg" (social/chat.ts,
+  // Dev-only Dungeon Finder scenario seeding backing "/dev lfg" (dev_commands.ts,
   // gated by devCommands). Spawns finder dev bots around the caller. Stays on Sim.
   seedDungeonFinderDev(
     mode: 'queue' | 'raid' | 'board',
@@ -765,6 +788,11 @@ export interface SimContextCallbacks {
   // (quests/quest_commands.ts) queues the giver's authored thank-you letter
   // through this; the binding points at the PostOffice instance on Sim.
   queueQuestLetter(questId: string, pid: number): void;
+
+  // Ravenpost mail: posts Heroic Marks to a heroic final-boss participant who took
+  // the daily lockout but was not at the corpse to loot them (awardHeroicMarks in
+  // instances/dungeons.ts). Binding points at the PostOffice instance on Sim.
+  mailHeroicMarks(pid: number, itemId: string, count: number): void;
 
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
@@ -876,6 +904,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get instances() {
       return host.instances;
+    },
+    get dungeonResetLocks() {
+      return host.dungeonResetLocks;
     },
     get riftInstances() {
       return host.riftInstances;
@@ -1045,6 +1076,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     enterRift: host.enterRift,
     leaveRift: host.leaveRift,
     riftOpenTreasure: host.riftOpenTreasure,
+    resetDungeonInstances: host.resetDungeonInstances,
+    inheritDungeonResetLocks: host.inheritDungeonResetLocks,
     dungeonDifficulty: host.dungeonDifficulty,
     setDungeonDifficulty: host.setDungeonDifficulty,
     awardHeroicMarks: host.awardHeroicMarks,
@@ -1193,6 +1226,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     abandonLockpick: host.abandonLockpick,
     tickLockpickTimeout: host.tickLockpickTimeout,
     startDelveRaiseDeadChannel: host.startDelveRaiseDeadChannel,
+    tickMountTraining: host.tickMountTraining,
+    abandonMountTraining: host.abandonMountTraining,
+    tickMountRace: host.tickMountRace,
     resolvedAbility: host.resolvedAbility,
     playerGcdFor: host.playerGcdFor,
     isFriendlyTo: host.isFriendlyTo,
@@ -1236,6 +1272,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     canAddItem: host.canAddItem,
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
+    mailHeroicMarks: host.mailHeroicMarks,
     applySetProcs: host.applySetProcs,
     // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
     bumpDeedStat: host.bumpDeedStat,

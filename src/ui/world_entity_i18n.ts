@@ -1,4 +1,9 @@
-import { type LetterDef, QUEST_LETTERS, WELCOME_LETTER } from '../sim/content/letters';
+import {
+  HEROIC_MARK_LETTER,
+  type LetterDef,
+  QUEST_LETTERS,
+  WELCOME_LETTER,
+} from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
@@ -103,6 +108,8 @@ const MOB_IDS = [
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
   'thunzharr_stormling',
+  // Ambient Highwatch Stables horse (zone 3)
+  'stable_horse',
   // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless
   // content; English names come from the MOBS table like every other id here.
   'rift_spawnling',
@@ -202,6 +209,7 @@ const NPC_IDS = [
   'smith_haldren',
   'fisherman_brandt',
   'foreman_odell',
+  'stablemaster_marla', // the stablemaster: teaches riding lessons (Highwatch, zone 3)
   'warden_fenwick',
   'brother_aldric_fen',
   'provisioner_hale',
@@ -320,6 +328,7 @@ const QUEST_IDS = [
   'q_mogger',
   'q_archetype_acceptance',
   'q_prof_make_amends',
+  'q_riding_lessons',
   // the Veiled Hollow
   'q_veil_thinned',
   'q_gleaming_antlers',
@@ -368,6 +377,7 @@ const LETTER_IDS = [
   'letter_q_wolves',
   'letter_q_greyjaw',
   'letter_q_hollow',
+  'heroic_marks_reward',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -500,7 +510,10 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     };
   });
 
-  const lettersById: Record<string, LetterDef> = { [WELCOME_LETTER.letterId]: WELCOME_LETTER };
+  const lettersById: Record<string, LetterDef> = {
+    [WELCOME_LETTER.letterId]: WELCOME_LETTER,
+    [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
+  };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
   const letters = {} as LetterTranslations;
   orderedValues(LETTER_IDS, lettersById).forEach((letter) => {

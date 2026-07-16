@@ -40,10 +40,10 @@ import {
 } from '../game/settings';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
-import type { ChatClock } from './chat_timestamp';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import type { BugReportHooks, OptionsHooks } from './hud';
+import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
   formatNumber,
   getLanguage,
@@ -172,6 +172,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   leaderboard: 'game.leaderboard.title',
   calendar: 'hudChrome.calendar.keybindLabel',
   crafting: 'hudChrome.crafting.title',
+  mount: 'hudChrome.keybinds.mount',
   deeds: 'hudChrome.deeds.title',
 };
 

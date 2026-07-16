@@ -103,6 +103,7 @@ export const hudChromeStrings = {
     remainingLessThanMinute: '<1m',
     remainingMinutes: '{minutes}m',
     remainingHoursMinutes: '{hours}h {minutes}m',
+    remainingDaysHours: '{days}d {hours}h',
     score: 'Score',
     walletValue: 'Wallet Value (WOC)',
     usd: '{amount} USD',
@@ -143,6 +144,8 @@ export const hudChromeStrings = {
       under_minimum: 'Wallet is below the $20 USD WOC minimum.',
       price_unavailable: 'WOC price is unavailable, rewards are temporarily locked.',
       banned: 'You are banned from Daily Rewards. Reason: {reason}',
+      bannedUntil:
+        'You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}',
     },
   },
   wocStore: {
@@ -223,6 +226,7 @@ export const hudChromeStrings = {
     balanceLabel: 'Balance',
     balanceUnit: '{amount} Claudium',
     solBalance: 'SOL: {amount}',
+    usdcBalance: 'USDC: {amount}',
     wocBalance: 'WOC: {amount}',
     unavailable:
       'The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.',
@@ -232,10 +236,11 @@ export const hudChromeStrings = {
     railLabel: 'Payment method',
     railStripe: 'Card',
     railSol: 'SOL',
+    railUsdc: 'USDC',
     railWoc: 'WOC',
     railWocDiscount: '20% off',
     railWocUnavailable: 'WOC pricing is unavailable right now.',
-    railNativeUnavailable: 'SOL/WOC off.',
+    railNativeUnavailable: 'Crypto off.',
     amountLabel: 'Amount',
     showAmounts: 'Show all Claudium amounts',
     hideAmounts: 'Hide extra Claudium amounts',
@@ -396,6 +401,7 @@ export const hudChromeStrings = {
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
     deeds: 'Deeds',
+    mounts: 'Mounts',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
@@ -617,6 +623,87 @@ export const hudChromeStrings = {
     petTaunt: 'Pet: Taunt',
     petDefensive: 'Pet: Defensive',
     petAggressive: 'Pet: Aggressive',
+    // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
+    mount: 'Mount / Dismount',
+  },
+  // The character sheet's mount picker (mount_picker.ts; the old Mounts window
+  // is retired, its keys stay per the retired-but-translated chrome precedent).
+  // Names and descriptions come from the reference cards
+  // (src/sim/content/mounts.ts carries the canonical English names for the sim
+  // side); clickManage is the bag tooltip hint on a collected reins item.
+  mounts: {
+    title: 'Mounts',
+    close: 'Close',
+    select: 'Select',
+    selected: 'Selected',
+    riding: 'Riding',
+    mount: 'Mount',
+    dismount: 'Dismount',
+    requiresLevel: 'Requires level {level}',
+    pickFirst: 'Pick a mount to ride.',
+    keybindHint: 'Press the Mount / Dismount key to ride.',
+    // The empty state, shown when the player owns no mount yet: a heading plus
+    // how to earn a first one (the stablemaster's riding lessons) and the rarer
+    // boss-drop mounts.
+    emptyTitle: 'No mounts collected',
+    emptyStableHint:
+      'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
+    emptyDropHint: 'Rarer mounts drop from dungeon and raid bosses.',
+    clickManage: 'Click to choose your mount',
+    rarity_common: 'Common',
+    rarity_rare: 'Rare',
+    rarity_epic: 'Epic',
+    spec_speed: '+{pct}% extra mobility',
+    spec_block: '+{pct}% melee damage block',
+    spec_crit: '+{pct}% critical strike chance',
+    name_valorsteed: 'Valorsteed',
+    name_grag_bear: 'Goliath Grag-Bear',
+    name_stalkglider_snail: 'Moss-Shell Stalk-Glider',
+    name_aether_hover_cycle: 'Aether-Jouster Hover-Cycle',
+    name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
+    name_stormfeather_griffin: 'Sky-Reach Stormfeather',
+    name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
+    desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
+    desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
+    desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
+    desc_aether_hover_cycle:
+      'A powerful magitech bike designed for swift, low-hovering combat traversal.',
+    desc_shadowjump_toad:
+      'A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.',
+    desc_stormfeather_griffin:
+      'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
+    desc_thunderstrut_gobbler:
+      'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
+  },
+  // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
+  // Marla lends the player a training Valorsteed for the paddock race. Finishing
+  // the course succeeds the lesson. Sim-side gameplay lives in
+  // src/sim/mounts_training.ts. mountPrompt is retained for the legacy command;
+  // the current flow starts on the glowing race platform.
+  mountTraining: {
+    mountPrompt: 'Press {key} to mount the training Valorsteed.',
+    ownedMountPrompt: 'Press {key} to mount',
+    ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
+    begin: 'Begin Lesson',
+    success: 'You have tamed the Valorsteed.',
+    returnToMarla: 'Return to Marla at the stables to adopt a stable horse.',
+  },
+  // The show-jumping race in the stables paddock (src/sim/mount_race.ts): ride to
+  // the glowing platform and press Start Race, watch the countdown, then clear
+  // every jump (in any order) and ride back through the arch in time. countdown/
+  // go are the center-screen count; startButton is the button; start/finished/
+  // timeout are the banners; timeLeft is the bottom strip's only text.
+  // {seconds} is a formatNumber-rendered count.
+  mountRace: {
+    startButton: 'Start Race',
+    cancelButton: 'Cancel Race',
+    go: 'GO!',
+    start: 'Go! Clear every jump, then ride back through the arch.',
+    toFinish: 'Ride back through the arch!',
+    finished: 'Finished in {seconds}s!',
+    timeout: 'Race Failed',
+    progress: 'Gates {n} of {total}',
+    timeLeft: '{seconds}s',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
   // the persistent indicator button, the in-match score strip, and the event
@@ -811,6 +898,10 @@ export const hudChromeStrings = {
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
+    // Audio panel toggle for the discrete interface and feedback cues (loot, level,
+    // quest, whisper, and the combat miss/dodge/parry beeps; on by default). Off
+    // silences just those without touching the SFX volume or the world sounds.
+    interfaceSounds: 'Interface and Feedback Sounds',
     // Toggle for the OSRS-style click-feedback marker: entity targets and
     // click-to-move destinations (on by default).
     clickFeedback: 'Click Marker',
@@ -1404,6 +1495,23 @@ export const hudChromeStrings = {
   dungeonDifficulty: {
     setHeroic: 'Set Dungeon Difficulty: Heroic',
     setNormal: 'Set Dungeon Difficulty: Normal',
+    resetAll: 'Reset All Instances',
+    resetDone: 'All instances have been reset.',
+    resetNone: 'You have no instances to reset.',
+    resetOccupied: 'You cannot reset instances while someone is still inside.',
+    resetSameDifficulty:
+      'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
+    resetLoot: 'You cannot reset instances while loot remains inside.',
+    resetConfirmTitle: 'Reset All Instances?',
+    resetConfirmBody:
+      'This abandons empty instances from your previously selected difficulty. Unclaimed loot will prevent the reset.',
+    resetConfirm: 'Reset Instances',
+    resetCooldown: 'Instances can only be reset once every 5 minutes.',
+    resetUsage: 'Use /dungeon reset to abandon your empty instances after changing difficulty.',
+    entryMismatchNormal:
+      'This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.',
+    entryMismatchHeroic:
+      'This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run.',
   },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
@@ -1433,6 +1541,7 @@ export const hudChromeStrings = {
     filterConsumable: 'Consumables',
     filterMaterial: 'Materials',
     filterQuest: 'Quest',
+    filterMount: 'Mounts',
     sortAria: 'Sort bag items',
     sortRecent: 'Recent',
     sortQuality: 'Quality',
@@ -1541,7 +1650,7 @@ export const hudChromeStrings = {
     imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
     stealth: 'Concealed; movement speed reduced by {pct}%',
     formBear: 'Bruin Form: increased health and armor',
-    formCat: 'Cat Form: melee damage and energy',
+    formCat: 'Wolf Form: melee damage and energy',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
     righteousFury: 'Burning Oath: greatly increased threat from Holy damage',
@@ -1644,6 +1753,33 @@ export const hudChromeStrings = {
   playerFrame: {
     unlock: 'Move player frame',
     lock: 'Lock player frame',
+  },
+  partyFrames: {
+    section: 'Party and Raid Frames',
+    unlock: 'Move party and raid frames',
+    lock: 'Lock party and raid frames',
+    style: 'Frame Style',
+    styleAutomatic: 'Automatic',
+    styleClassic: 'Classic Party Frames',
+    styleRaid: 'Raid Frames',
+    scale: 'Frame Scale',
+    width: 'Frame Width',
+    height: 'Frame Height',
+    spacing: 'Frame Spacing',
+    columns: 'Raid Columns',
+    healthText: 'Health Text',
+    healthNone: 'None',
+    healthPercent: 'Percent',
+    healthCurrent: 'Current',
+    healthCurrentMax: 'Current / Max',
+    sort: 'Sort Players',
+    sortGroup: 'Group',
+    sortRole: 'Role',
+    sortName: 'Name',
+    showResource: 'Show Mana, Rage, and Energy',
+    showAbsorbs: 'Show Absorb Shields',
+    showAuras: 'Show Buffs and Debuffs',
+    showSelf: 'Show Your Frame',
   },
   // Interface panel row: snap both movable unit frames back to their stock
   // spots (the button reuses chatWindow.resetAction). Wordy (M16): the five

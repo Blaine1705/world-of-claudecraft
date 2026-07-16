@@ -20,6 +20,154 @@ export const en_CA: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -229,6 +377,7 @@ export const en_CA: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Score",
       "walletValue": "Wallet Value (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const en_CA: EnTranslations = {
         "no_wallet": "Connect a wallet with at least $20 USD in WOC.",
         "under_minimum": "Wallet is below the $20 USD WOC minimum.",
         "price_unavailable": "WOC price is unavailable, rewards are temporarily locked.",
-        "banned": "You are banned from Daily Rewards. Reason: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const en_CA: EnTranslations = {
       "balanceLabel": "Balance",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.",
       "disclosure": "Claudium is a one-way soft currency: buy it with money and spend it on cosmetics. It cannot be redeemed, transferred, or cashed out.",
@@ -499,10 +650,11 @@ export const en_CA: EnTranslations = {
       "railLabel": "Payment method",
       "railStripe": "Card",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% off",
       "railWocUnavailable": "WOC pricing is unavailable right now.",
-      "railNativeUnavailable": "SOL/WOC off.",
+      "railNativeUnavailable": "Crypto off.",
       "amountLabel": "Amount",
       "showAmounts": "Show all Claudium amounts",
       "hideAmounts": "Hide extra Claudium amounts",
@@ -602,6 +754,7 @@ export const en_CA: EnTranslations = {
       "leaderboard": "Ranks",
       "dailyRewards": "Store",
       "deeds": "Deeds",
+      "mounts": "Mounts",
       "nameplates": "Names",
       "haptics": "Haptics",
       "hapticsOff": "Haptics Off",
@@ -716,7 +869,63 @@ export const en_CA: EnTranslations = {
       "petStop": "Pet: Stop",
       "petTaunt": "Pet: Taunt",
       "petDefensive": "Pet: Defensive",
-      "petAggressive": "Pet: Aggressive"
+      "petAggressive": "Pet: Aggressive",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "The Vale Cup",
@@ -870,6 +1079,7 @@ export const en_CA: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
       "footstepSounds": "Footstep Sounds",
+      "interfaceSounds": "Interface and Feedback Sounds",
       "clickFeedback": "Click Marker",
       "lockCursorOnRotate": "Lock Cursor While Rotating",
       "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
@@ -1309,7 +1519,20 @@ export const en_CA: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Set Dungeon Difficulty: Heroic",
-      "setNormal": "Set Dungeon Difficulty: Normal"
+      "setNormal": "Set Dungeon Difficulty: Normal",
+      "resetAll": "Reset All Instances",
+      "resetDone": "All instances have been reset.",
+      "resetNone": "You have no instances to reset.",
+      "resetOccupied": "You cannot reset instances while someone is still inside.",
+      "resetSameDifficulty": "Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.",
+      "resetLoot": "You cannot reset instances while loot remains inside.",
+      "resetConfirmTitle": "Reset All Instances?",
+      "resetConfirmBody": "This abandons empty instances from your previously selected difficulty. Unclaimed loot will prevent the reset.",
+      "resetConfirm": "Reset Instances",
+      "resetCooldown": "Instances can only be reset once every 5 minutes.",
+      "resetUsage": "Use /dungeon reset to abandon your empty instances after changing difficulty.",
+      "entryMismatchNormal": "This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.",
+      "entryMismatchHeroic": "This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run."
     },
     "bags": {
       "cannotDestroy": "This item cannot be destroyed.",
@@ -1324,6 +1547,7 @@ export const en_CA: EnTranslations = {
       "filterConsumable": "Consumables",
       "filterMaterial": "Materials",
       "filterQuest": "Quest",
+      "filterMount": "Mounts",
       "sortAria": "Sort bag items",
       "sortRecent": "Recent",
       "sortQuality": "Quality",
@@ -1414,7 +1638,7 @@ export const en_CA: EnTranslations = {
       "imbueRange": "Weapon imbued: {min} to {max} bonus damage on Verdict",
       "stealth": "Concealed; movement speed reduced by {pct}%",
       "formBear": "Bruin Form: increased health and armor",
-      "formCat": "Cat Form: melee damage and energy",
+      "formCat": "Wolf Form: melee damage and energy",
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "defensiveStance": "Guarded Stance: reduced damage taken, more threat",
       "righteousFury": "Burning Oath: greatly increased threat from Holy damage",
@@ -1478,6 +1702,33 @@ export const en_CA: EnTranslations = {
     "playerFrame": {
       "unlock": "Move player frame",
       "lock": "Lock player frame"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Reset Frame Positions"
@@ -2141,6 +2392,9 @@ export const en_CA: EnTranslations = {
       "already_linked": "Your account already has a linked Steam account.",
       "account_taken": "That Steam account is already linked to another account.",
       "upstream": "Steam did not respond. Try again in a moment."
+    },
+    "welcome": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const en_CA: EnTranslations = {
       "effectsTitle": "Buffs, debuffs, and crowd control",
       "effectsBody": "Many abilities apply an effect that lingers. Helpful ones (buffs) raise your stats, shield you, or heal you a little at a time; harmful ones (debuffs) drain your health with damage over time or weaken you. Watch the small icons in the top corner of the screen, beside the minimap, to see what is on you and how long it lasts.",
       "ccBody": "Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and transformations that turn a foe harmless for a moment. Against other players, control wears thin with repetition: the same kind reapplied too quickly weakens and then fails outright, and a stun that opens from stealth is counted apart from the stuns that follow, so nobody can be chained helpless forever. The creatures of the world hold no such grudge: control never weakens with repetition against them, though many of the mightiest foes, named elites and the strongest bosses among them, cannot be controlled at all.",
-      "metersBody": "Curious how a fight went? Press Z to open the party meters, which tally damage, healing, and threat for your group, encounter by encounter.",
+      "metersBody": "Curious how a fight went? Press Shift+H to open the party meters, which tally damage, healing, and threat for your group, encounter by encounter.",
       "queueTitle": "Your next move is already loaded",
       "queueBody": "You do not have to time your presses to the frame. Press your next ability in the closing moments of the current cast and it is queued, firing the instant the cast completes, so practiced play flows without gaps. A press too early is simply refused, so nothing is wasted. Some melee strikes work the same way, riding out on your next weapon swing.",
       "deathTitle": "When you fall",
@@ -2505,7 +2759,7 @@ export const en_CA: EnTranslations = {
       "petBarTerm": "Pet bar",
       "petBarDef": "The command row a hunter or warlock pet adds: Attack, Stop, Taunt, Defensive, and Aggressive, bound to Ctrl plus 1 through 5 by default.",
       "metersTerm": "Damage meters",
-      "metersDef": "The party scoreboard window for the current fight: damage dealt, healing done, and who holds the most threat, kept per encounter. Open it with its keybind (Z by default).",
+      "metersDef": "The party scoreboard window for the current fight: damage dealt, healing done, and who holds the most threat, kept per encounter. Open it with its keybind (Shift+H by default).",
       "targetMarkerTerm": "Target marker",
       "targetMarkerDef": "A symbol any party or raid member can pin over a target so everyone focuses, or avoids, the same one. Eight symbols, one target per symbol.",
       "loadoutTerm": "Loadout",
@@ -2886,6 +3140,8 @@ export const en_CA: EnTranslations = {
       "heroicRewardsTitle": "Heroic Marks and upgraded spoils",
       "heroicRewardsBody": "Heroic bosses drop the loot you know, upgraded and tagged Heroic on the tooltip, and the final boss of each run adds epics found nowhere else. That last kill also leaves Heroic Marks for every participant: a currency spent with Quartermaster Vex in Highwatch, whose stock of rings and necklaces is the only jewelry in the realm.",
       "heroicLockoutBody": "Normal dungeons can be run all day. Heroic asks patience: the final boss kill locks everyone in the run to one heroic clear of that dungeon per day, and the raid keeps a daily lockout for each difficulty. A cleared five-player run stays open to its own party for corpse runs and loot, so nobody is locked away from what they earned there. The raid is stricter: once its kill locks you, the door stays shut until the daily reset, so collect your spoils before you leave the arena.",
+      "resetTitle": "Resetting your instances",
+      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
       "templeLoreTitle": "The Drowned Temple, a little deeper",
       "templeLoreBody": "The temple has its own legend, older than the cult you chase elsewhere. On the shore of the Glimmermere, a tarn that drinks the moonlight and gives back the drowned, a lone watcher keeps a gate of pale light. Beneath the surface, a stair of cold stone runs down to it. The folk who sank there did not drown by misadventure: they were the Pale Choir, who went under in worship and never stopped singing. The old wardens scratched a single warning into the rocks before the water took them, a prayer to something they called the Drowned Moon, with a steadier hand adding two words beneath it: it only sleeps.",
       "cryptLeadTitle": "A door the dead were meant to keep shut",
@@ -3093,7 +3349,7 @@ export const en_CA: EnTranslations = {
       "qualityNote": "Higher quality usually means better stats, but quality is a hint, not a rule. A well-matched piece for your class and level can beat a flashier one.",
       "upgradeTitle": "Keep your gear current",
       "upgradeBody": "Replacing an old piece with a fresh upgrade does more for you than playing perfectly in gear you have outgrown. When something better drops or a quest offers it, take it. Do not save your good items for later.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear won out in the world, from enemies and quests, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
       "sourcesTitle": "Where gear comes from",
       "sourcesBody": "Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, crafters turn gathered materials into wearable pieces, and the player market lets you buy from other adventurers. At the top of the hill, two mark currencies buy gear found nowhere else: Delve Marks at the delve keeper, and Heroic Marks at the heroic quartermaster.",
       "soulboundTitle": "Soulbound: yours and yours alone",
@@ -3137,7 +3393,7 @@ export const en_CA: EnTranslations = {
       "craftRecipesTitle": "Recipes and reagents",
       "craftRecipesBody": "Every recipe calls for specific reagents you gather or buy. The simplest recipes ask for nothing but common materials and are craftable from the very start, so you can begin working a trade the moment you pick it up. The recipe lists are still filling in: a few trades are waiting on their first recipes, and more arrive as the crafts grow.",
       "craftHowTitle": "The crafting window",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced tool recipes instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
       "craftMasteryTitle": "Skill and mastery",
       "craftMasteryBody": "Crafting successfully builds skill in that trade, and skill never locks a craft's recipes away: if you know a recipe and hold its materials, you can attempt it. What skill buys you instead is quality, a practiced hand turns out finer work. The one exception is combination recipes, which ask you to have proven yourself in both of their crafts before they open up.",
       "craftComboTitle": "Combination recipes",
@@ -4928,6 +5184,29 @@ export const en_CA: EnTranslations = {
     "body": "We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.",
     "status": "Back soon"
   },
+  "welcome": {
+    "back": "Welcome back, {name}",
+    "level": "Level {level}",
+    "lastPlayed": "Last played {when}",
+    "continue": "Enter World",
+    "continueHint": "Enter to continue, Esc to skip",
+    "continueHintTouch": "Tap to continue",
+    "discord": {
+      "title": "The community lives on Discord",
+      "sub": "Patch previews, events, dev chat, and 2 bonus bank slots for linking.",
+      "join": "Join our Discord"
+    },
+    "chest": {
+      "ready": "Daily chest ready"
+    },
+    "armory": {
+      "cta": "Enter and browse the Armory"
+    },
+    "news": {
+      "new": "New",
+      "viewAll": "View all updates on GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -5663,7 +5942,8 @@ export const en_CA: EnTranslations = {
       "tool": "Tool",
       "potion": "Potion",
       "elixir": "Elixir",
-      "bag": "Bag"
+      "bag": "Bag",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Armour",
@@ -6458,7 +6738,7 @@ export const en_CA: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolfsblood",
-        "description": "Increases attack power by 40 for 6 sec. Wolf Form only."
+        "description": "Increases attack power by {buff} for {duration} sec. Wolf Form only."
       },
       "rip": {
         "name": "Rip",
@@ -6749,6 +7029,24 @@ export const en_CA: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Eastbrook Wool Trousers"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Eastbrook Ritual Vestments"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Eastbrook Druid's Hide"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Eastbrook Warded Leggings"
+      },
+      "wardweave_cowl": {
+        "name": "Wardweave Cowl"
+      },
+      "duskhide_wraps": {
+        "name": "Duskhide Wraps"
+      },
+      "sootscale_mantle": {
+        "name": "Sootscale Mantle"
       },
       "gravecaller_blade": {
         "name": "Gravecaller's Broadblade"
@@ -8171,6 +8469,27 @@ export const en_CA: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Galecall Waistguard"
+      },
+      "reins_valorsteed": {
+        "name": "Reins of the Valorsteed"
+      },
+      "reins_grag_bear": {
+        "name": "Reins of the Goliath Grag-Bear"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Reins of the Moss-Shell Stalk-Glider"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Ignition Key: Aether-Jouster Hover-Cycle"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Reins of Kama-Kage the Shadow-Jump Toad"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Reins of the Sky-Reach Stormfeather"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Reins of Thunderstrut the Grand Gobbler"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const en_CA: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Roused Stormling"
+      },
+      "stable_horse": {
+        "name": "Stable Horse"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -8821,6 +9143,11 @@ export const en_CA: EnTranslations = {
         "name": "Foreman Odell",
         "title": "Mine Foreman",
         "greeting": "Whole dig's crawling with those dirt-caked vermin!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stablemaster",
+        "greeting": "Every rider walks in on two legs, {className}. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and Highwatch has no menders to spare for broken bones."
       },
       "warden_fenwick": {
         "name": "Warden Fenwick",
@@ -9821,6 +10148,16 @@ export const en_CA: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Riding Lessons",
+        "text": "Every rider walks in on two legs, {playerName}, same as I told you the day we met. Pay the fee, and when I give the word, call the training Valorsteed and climb aboard. Then ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the seat is yours. Wander out of the paddock and we start over.",
+        "completion": "There, now. Up in one clean motion and a steady seat at the top. The Valorsteed is yours, {playerName}: saddle, reins, and the standing of a rider who earned the seat instead of buying it.",
+        "objectives": {
+          "0": {
+            "label": "Tame the Valorsteed"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10137,6 +10474,9 @@ export const en_CA: EnTranslations = {
           },
           "9": {
             "label": "Gravewyrm Sanctum"
+          },
+          "10": {
+            "label": "Highwatch Stables"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const en_CA: EnTranslations = {
         "sender": "Brother Aldric",
         "subject": "What you did in the dark",
         "body": "Few will ever know what was buried in that hollow, and fewer still would believe it. I know, and I will not forget.\n\nMay your road stay lit.\n- Brother Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Heroic Marks",
+        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
       }
     },
     "itemSets": {

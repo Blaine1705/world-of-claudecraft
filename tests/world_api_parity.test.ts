@@ -59,6 +59,7 @@ import type { IWorldInventory } from '../src/world_api/inventory';
 import type { IWorldLoot } from '../src/world_api/loot';
 import type { IWorldMail } from '../src/world_api/mail';
 import type { IWorldMarket } from '../src/world_api/market';
+import type { IWorldMounts } from '../src/world_api/mounts';
 import type { IWorldParty } from '../src/world_api/party';
 import type { IWorldPet } from '../src/world_api/pet';
 import type { IWorldProfessions } from '../src/world_api/professions';
@@ -320,6 +321,18 @@ export const IWORLD_MEMBERS = [
   { name: 'saveLoadout', kind: 'method' },
   { name: 'switchLoadout', kind: 'method' },
   { name: 'deleteLoadout', kind: 'method' },
+  // --- rideable ground mounts (IWorldMounts) ---
+  { name: 'selectedMount', kind: 'method' }, // read-returning
+  { name: 'ownedMounts', kind: 'method' }, // read-returning
+  { name: 'selectMount', kind: 'method' },
+  { name: 'toggleMounted', kind: 'method' },
+  // --- the riding lesson (IWorldMounts) ---
+  { name: 'mountTrainBegin', kind: 'method' },
+  { name: 'mountLessonActive', kind: 'method' }, // read-returning
+  // --- the show-jumping race (IWorldMounts) ---
+  { name: 'mountRaceStart', kind: 'method' },
+  { name: 'mountRaceCancel', kind: 'method' },
+  { name: 'mountRaceView', kind: 'method' }, // read-returning
   // --- Dungeon Finder facet (IWorldDungeonFinder) ---
   { name: 'dungeonFinderInfo', kind: 'data' },
   { name: 'dungeonFinderBoard', kind: 'data' },
@@ -442,9 +455,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(241);
+    expect(IWORLD_MEMBERS.length).toBe(250);
     expect(DATA_MEMBERS.length).toBe(65);
-    expect(METHOD_MEMBERS.length).toBe(176);
+    expect(METHOD_MEMBERS.length).toBe(185);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -453,7 +466,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   // Sorted-name `toEqual` snapshots: a dropped, renamed, or kind-flipped member reddens
   // these deliberately, forcing a reviewed edit. NOT length-only.
-  it('the full sorted member set is exactly the pinned 241', () => {
+  it('the full sorted member set is exactly the pinned 250', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -606,10 +619,16 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketInfo',
       'marketList',
       'marketSearch',
+      'mountLessonActive',
+      'mountRaceCancel',
+      'mountRaceStart',
+      'mountRaceView',
+      'mountTrainBegin',
       'moveInput',
       'moveInventoryItem',
       'moveRaidMember',
       'nodeHarvestableByMe',
+      'ownedMounts',
       'partyAccept',
       'partyDecline',
       'partyInfo',
@@ -647,6 +666,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'salvageItem',
       'saveLoadout',
       'searchCharacters',
+      'selectMount',
+      'selectedMount',
       'sellAllJunk',
       'sellItem',
       'setActiveTitle',
@@ -672,6 +693,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talents',
       'targetEntity',
       'targetNearestFriendly',
+      'toggleMounted',
       'toggleWeaponStow',
       'townFocus',
       'tradeAccept',
@@ -769,7 +791,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted method-kind set is exactly the pinned 176', () => {
+  it('the sorted method-kind set is exactly the pinned 185', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -880,9 +902,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollect',
       'marketList',
       'marketSearch',
+      'mountLessonActive',
+      'mountRaceCancel',
+      'mountRaceStart',
+      'mountRaceView',
+      'mountTrainBegin',
       'moveInventoryItem',
       'moveRaidMember',
       'nodeHarvestableByMe',
+      'ownedMounts',
       'partyAccept',
       'partyDecline',
       'partyInvite',
@@ -907,6 +935,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'salvageItem',
       'saveLoadout',
       'searchCharacters',
+      'selectMount',
+      'selectedMount',
       'sellAllJunk',
       'sellItem',
       'setActiveTitle',
@@ -928,6 +958,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentPoints',
       'targetEntity',
       'targetNearestFriendly',
+      'toggleMounted',
       'toggleWeaponStow',
       'tradeAccept',
       'tradeCancel',
@@ -1324,6 +1355,18 @@ const FACET_VALE_CUP = [
 ] as const satisfies readonly (keyof IWorldValeCup)[];
 type _ExhaustValeCup = AssertNever<Exclude<keyof IWorldValeCup, (typeof FACET_VALE_CUP)[number]>>;
 
+const FACET_MOUNTS = [
+  'selectedMount',
+  'ownedMounts',
+  'selectMount',
+  'toggleMounted',
+  'mountTrainBegin',
+  'mountLessonActive',
+  'mountRaceStart',
+  'mountRaceCancel',
+  'mountRaceView',
+] as const satisfies readonly (keyof IWorldMounts)[];
+type _ExhaustMounts = AssertNever<Exclude<keyof IWorldMounts, (typeof FACET_MOUNTS)[number]>>;
 const FACET_DUNGEON_FINDER = [
   'dungeonFinderInfo',
   'dungeonFinderBoard',
@@ -1373,7 +1416,7 @@ const FACET_DEEDS = [
 ] as const satisfies readonly (keyof IWorldDeeds)[];
 type _ExhaustDeeds = AssertNever<Exclude<keyof IWorldDeeds, (typeof FACET_DEEDS)[number]>>;
 
-// The 26-facet partition, keyed by facet for legible failure messages.
+// The 28-facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   entityRoster: FACET_ENTITY_ROSTER,
   combat: FACET_COMBAT,
@@ -1400,13 +1443,14 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   telemetry: FACET_TELEMETRY,
   professions: FACET_PROFESSIONS,
   valeCup: FACET_VALE_CUP,
+  mounts: FACET_MOUNTS,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
 };
 
-describe('W1: aggregate IWorld member set equals the disjoint union of the 27 facets', () => {
-  it('pins the facet count at 27', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(27);
+describe('W1: aggregate IWorld member set equals the disjoint union of the 28 facets', () => {
+  it('pins the facet count at 28', () => {
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(28);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1416,7 +1460,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 27 fa
     }
   });
 
-  it('the 27 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the 28 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
@@ -1432,10 +1476,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 27 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 27 facets equals the pinned 241-member IWORLD_MEMBERS set', () => {
+  it('the union of the 28 facets equals the pinned 250-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(241);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(241);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(250);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(250);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -872,6 +872,27 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Développeur principal',
   'hudChrome.dungeonDifficulty.setHeroic': 'Définir la difficulté du donjon : Héroïque',
   'hudChrome.dungeonDifficulty.setNormal': 'Définir la difficulté du donjon : Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Réinitialiser toutes les instances',
+  'hudChrome.dungeonDifficulty.resetDone': 'Toutes les instances ont été réinitialisées.',
+  'hudChrome.dungeonDifficulty.resetNone': "Vous n'avez aucune instance à réinitialiser.",
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    "Vous ne pouvez pas réinitialiser les instances tant qu'une personne s'y trouve.",
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    "Changez la difficulté du donjon avant de réinitialiser ces instances. Les instances vides se réinitialisent d'elles-mêmes après 5 minutes.",
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Utilisez /dungeon reset pour abandonner vos instances vides après avoir changé la difficulté.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    "Vous ne pouvez pas réinitialiser les instances tant qu'il reste du butin à l'intérieur.",
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Réinitialiser toutes les instances ?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Cette action abandonne les instances vides de la difficulté précédemment sélectionnée. Tout butin non récupéré empêchera la réinitialisation.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Réinitialiser les instances',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Les instances ne peuvent être réinitialisées qu’une fois toutes les 5 minutes.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Cette instance est réglée sur la difficulté Normal. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Héroïque.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Cette instance est réglée sur la difficulté Héroïque. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Normal.',
   'hudChrome.itemProc.attackSlow':
     "et ralentit la vitesse d'attaque de la cible de {pct}% pendant {duration} s",
   'hudChrome.itemProc.chainArc':
@@ -1940,6 +1961,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.clickMoveLeft': 'Clic gauche',
   'hudChrome.options.clickMoveRight': 'Clic droit',
   'hudChrome.options.footstepSounds': 'Sons de pas',
+  'hudChrome.options.interfaceSounds': 'Sons d’interface et retours sonores',
   'hudChrome.options.showWalletOnCharacterScreen':
     'Afficher le portefeuille sur l’écran des personnages',
   'hudChrome.options.showWalletOnPlayerCard': 'Afficher le portefeuille sur la carte de joueur',
@@ -3141,6 +3163,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Outil',
   'itemUi.kind.potion': 'Potion',
   'itemUi.kind.elixir': 'Élixir',
+  'itemUi.kind.mount': 'Monture',
   'itemUi.stats.armor': 'Armure',
   'itemUi.stats.str': 'Force',
   'itemUi.stats.agi': 'Agilité',
@@ -3712,7 +3735,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
   'entities.abilities.tigers_fury.name': 'Wolfsblood',
   'entities.abilities.tigers_fury.description':
-    "Augmente la puissance d'attaque de 40 pendant 6 s. Forme de loup uniquement.",
+    "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement.",
   'entities.abilities.rip.name': 'Lacération',
   'entities.abilities.rip.description':
     'Coup de grâce qui inflige {damage} points de dégâts de saignement sur 12 s. Consomme les points de combo. Forme de loup uniquement.',
@@ -4185,6 +4208,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Bienvenue au Marché mondial, {className}. Achetez aux aventuriers du royaume ou proposez vos propres marchandises.',
   'entities.npcs.marshal_redbrook.name': 'Maréchal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Maîtresse d’écurie',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Tout cavalier arrive sur ses deux jambes, {className}. Je ne te donnerai les rênes que lorsque tu sauras tenir en selle sur le Destrier de Bravoure sans mordre la boue, et Highwatch n’a pas de guérisseurs de trop pour les os brisés.',
+  'entities.quests.q_riding_lessons.title': 'Leçons d’équitation',
+  'entities.quests.q_riding_lessons.text':
+    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Paie les frais, et quand j’en donne l’ordre, appelle à toi le Destrier de Bravoure d’entraînement et mets-toi en selle. Puis fais le parcours : suis le repère jusqu’à l’arche de départ, franchis chaque obstacle proprement et repasse la ligne avant que le sable ne s’écoule. Réussis, et la selle est à toi. Sors de l’enclos et l’on recommence.',
+  'entities.quests.q_riding_lessons.completion':
+    'Voilà. En selle d’un seul mouvement, et bien stable une fois là-haut. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Dompter le Destrier de Bravoure',
   'entities.npcs.marshal_redbrook.title': 'Maréchal de la ville',
   'entities.npcs.marshal_redbrook.greeting':
     "Gardez votre lame près de vous, {className}. Le Val n'est plus ce qu'il était.",
@@ -4732,6 +4765,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Tentes du Culte du Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Champs des revenants',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanctuaire du Gravewyrm',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Écuries de Highwatch',
   'entities.dungeons.hollow_crypt.name': 'La Crypte creuse',
   'entities.dungeons.hollow_crypt.enterText': 'Vous descendez dans la Crypte creuse...',
   'entities.dungeons.hollow_crypt.leaveText': 'Vous remontez à la lumière du jour.',
@@ -5210,6 +5244,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': "Protège-taille d'Appel-tempête",
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, le Pic Éveillé',
   'entities.mobs.thunzharr_stormling.name': 'Élémentaire de tempête éveillé',
+  'entities.mobs.stable_horse.name': "Cheval d'écurie",
   'hudChrome.worldBoss.spawn': '{name} se dresse sur les Hauteurs de Thornpeak !',
   'entities.items.stormcallers_spaulders.name': 'Spallières de Galecall',
   'hud.chat.context.convertToRaid': 'Convertir en raid',
@@ -5283,6 +5318,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Armure',
   'hudChrome.bags.filterConsumable': 'Consommables',
   'hudChrome.bags.filterMaterial': 'Matériaux',
+  'hudChrome.bags.filterMount': 'Montures',
   'hudChrome.bags.filterQuest': 'Quête',
   'hudChrome.bags.sortAria': 'Trier les objets du sac',
   'hudChrome.bags.sortRecent': 'Récents',
@@ -6110,11 +6146,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Pêche',
   'guide.gear.intro':
     "L'équipement, ce sont les pièces que porte votre personnage et les objets que vous transportez. Un meilleur équipement est la voie la plus sûre vers la puissance, et vous en ramassez l'essentiel rien qu'en jouant.",
-  'guide.gear.itemLevelBody':
-    "Si vous voulez un moyen rapide de comparer deux pièces, activez Afficher le niveau d'objet dans les options. L'équipement gagné dans le monde, auprès des ennemis et des quêtes, affiche alors un niveau d'objet, un chiffre unique indiquant grossièrement sa puissance selon sa provenance, pour que vous voyiez d'un coup d'œil quelle amélioration pèse le plus, même d'un emplacement à l'autre. Les pièces sans une telle origine, comme les articles de base des marchands et l'équipement de départ, n'affichent aucun niveau d'objet : un chiffre absent est donc normal, pas un défaut.",
-  'guide.gear.qualityBody':
-    "Chaque objet a une qualité, et son nom est coloré en conséquence pour que vous lisiez sa valeur d'un coup d'œil. Du plus commun au plus convoité :",
-  'guide.gear.qualityCommon': 'Commun',
   'guide.gear.qualityEpic': 'Épique',
   'guide.gear.qualityLegendary': 'Légendaire',
   'guide.gear.qualityNote':
@@ -7513,6 +7544,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Essence arcanique',
   'entities.items.arcane_shard.name': 'Éclat arcanique',
   'entities.items.chunk_of_ore.name': 'Morceau de minerai',
+  'entities.items.reins_grag_bear.name': 'Rênes de l’Ours-Grag Goliath',
+  'entities.items.reins_valorsteed.name': 'Rênes du Destrier de Bravoure',
+  'entities.items.reins_stalkglider_snail.name': 'Rênes du Glisseur à Coquille Moussue',
+  'entities.items.reins_aether_hover_cycle.name': 'Clé de contact : Aérocycle du Jouteur d’Éther',
+  'entities.items.reins_shadowjump_toad.name': 'Rênes de Kama-Kage, le Crapaud Saute-Ombre',
+  'entities.items.reins_stormfeather_griffin.name': 'Rênes du Plume-d’Orage Toise-Ciel',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Rênes de Pavane-Tonnerre, le Grand Dindon',
   'entities.quests.q_prof_intro.completion':
     'Vous voyez ? Du minerai dans votre sac et des cals aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l’établi d’artisanat juste à côté. Tout cela peut vous offrir un gagne-pain honorable, si le cœur vous en dit.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Morceau de minerai',
@@ -7546,10 +7584,56 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Vous devez être dans un groupe pour lancer une vérification de disponibilité.',
   'hudChrome.readyCheck.inProgressError': 'Une vérification de disponibilité est déjà en cours.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Monter / Descendre',
+  'hudChrome.mobile.mounts': 'Montures',
+  'hudChrome.mounts.title': 'Montures',
+  'hudChrome.mounts.close': 'Fermer',
+  'hudChrome.mounts.select': 'Choisir',
+  'hudChrome.mounts.selected': 'Choisie',
+  'hudChrome.mounts.riding': 'En selle',
+  'hudChrome.mounts.mount': 'Monter',
+  'hudChrome.mounts.dismount': 'Descendre',
+  'hudChrome.mounts.requiresLevel': 'Niveau {level} requis',
+  'hudChrome.mounts.pickFirst': 'Choisissez une monture à chevaucher.',
+  'hudChrome.mounts.keybindHint': 'Appuyez sur la touche Monter / Descendre pour chevaucher.',
+  'hudChrome.mounts.rarity_common': 'Commune',
+  'hudChrome.mounts.rarity_rare': 'Rare',
+  'hudChrome.mounts.rarity_epic': 'Épique',
+  'hudChrome.mounts.spec_speed': '+{pct}% de mobilité supplémentaire',
+  'hudChrome.mounts.spec_block': '+{pct}% de blocage des dégâts de mêlée',
+  'hudChrome.mounts.spec_crit': '+{pct}% de chances de coup critique',
+  'hudChrome.mounts.name_valorsteed': 'Destrier de Bravoure',
+  'hudChrome.mounts.name_grag_bear': 'Ours-Grag Goliath',
+  'hudChrome.mounts.name_stalkglider_snail': 'Glisseur à Coquille Moussue',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Aérocycle du Jouteur d’Éther',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, le Crapaud Saute-Ombre',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Plume-d’Orage Toise-Ciel',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavane-Tonnerre, le Grand Dindon',
+  'hudChrome.mounts.desc_valorsteed':
+    'Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Un ours robuste au pied sûr qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.',
+  'hudChrome.mounts.emptyTitle': 'Aucune monture collectée',
+  'hudChrome.mounts.emptyStableHint':
+    'Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.',
+  'hudChrome.mounts.emptyDropHint':
+    'Les montures plus rares sont lâchées par les boss de donjon et de raid.',
+  'hudChrome.mounts.clickManage': 'Cliquez pour choisir votre monture',
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpent d'une pâleur d'os qui glisse dans les profondeurs du Glimmermere, gardien silencieux de l'eau qu'il a faite sienne. Les nageurs qui partagent le lac avec lui refont rarement surface.",
   'guide.combat.metersBody':
-    "Envie de savoir comment un combat s'est déroulé ? Appuyez sur Z pour ouvrir les compteurs de groupe, qui totalisent les dégâts, les soins et la menace de votre groupe, rencontre par rencontre.",
+    "Envie de savoir comment un combat s'est déroulé ? Appuyez sur Shift+H pour ouvrir les compteurs de groupe, qui totalisent les dégâts, les soins et la menace de votre groupe, rencontre par rencontre.",
   'guide.combat.queueBody':
     "Nul besoin de caler vos pressions à la frame près. Appuyez sur votre prochaine capacité dans les derniers instants de l'incantation en cours et elle se met en file d'attente, se déclenchant à la seconde où l'incantation s'achève, si bien qu'un jeu rodé s'enchaîne sans temps mort. Une pression trop hâtive est simplement refusée, donc rien n'est gâché. Certaines attaques de mêlée fonctionnent de la même manière, en s'exécutant sur votre prochain coup d'arme.",
   'guide.combat.queueTitle': 'Votre prochain geste est déjà armé',
@@ -7605,7 +7689,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un plafond quotidien sur les plus grosses récompenses répétables. Chaque donjon héroïque n'accorde qu'un nettoyage par jour, le raid suit le normal et l'héroïque séparément, et piller un boss de monde déclenche le vôtre. Une expédition à cinq joueurs déjà nettoyée reste ouverte à son propre groupe ; la porte verrouillée du raid ne se rouvre qu'à la réinitialisation.",
   'guide.glossary.lockoutTerm': 'Verrouillage',
   'guide.glossary.metersDef':
-    'La fenêtre de tableau de bord du groupe pour le combat en cours : dégâts infligés, soins prodigués et qui détient le plus de menace, conservés par rencontre. Ouvrez-la avec son raccourci (Z par défaut).',
+    'La fenêtre de tableau de bord du groupe pour le combat en cours : dégâts infligés, soins prodigués et qui détient le plus de menace, conservés par rencontre. Ouvrez-la avec son raccourci (Shift+H par défaut).',
   'guide.glossary.metersTerm': 'Compteurs de dégâts',
   'guide.glossary.petBarDef':
     "La rangée de commandes qu'ajoute un familier de chasseur ou de démoniste : Attaquer, Arrêter, Provoquer, Défensif et Agressif, assignés par défaut à Ctrl plus 1 à 5.",
@@ -7636,12 +7720,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Forme de Fleet',
   'guide.models.groupForms': 'Formes de druide',
   'guide.nav.sidebarLabel': 'Rubriques du guide',
-  'guide.professions.craftHowBody':
-    "Ouvrez la fenêtre d'Artisanat (touche T par défaut) pour voir toutes les recettes que vous connaissez, ce que chacune réclame et ce que vous avez sous la main ; quand les matériaux sont là, un clic suffit. Les recettes courantes se fabriquent partout dans le monde. Une poignée de recettes d'outils avancées vous demandent en revanche de vous tenir à l'atelier d'artisanat de Highwatch.",
-  'guide.professions.craftHowTitle': "La fenêtre d'artisanat",
-  'guide.professions.focusBody':
-    "Chaque ville principale tient un panneau de Priorités de la ville pour les récolteurs de passage : tenez-vous en ville, ouvrez-le à côté de la minicarte, et affectez un petit budget de points de priorité aux types de composants qui vous importent. Plus vous accordez de priorité à un composant, plus il ressort fin et riche de chaque cadavre ultérieur ; votre répartition suit votre personnage où qu'il aille, et vous pouvez la remanier, gratuitement, à chaque passage ultérieur en ville.",
-  'guide.professions.focusTitle': 'Priorités de la ville',
   'guide.professions.harvestBody':
     "La récolte ne s'arrête pas aux gisements. Certaines bêtes abattues peuvent être dépecées pour des composants, cuirs, crocs, soie et choses plus étranges encore, directement sur le cadavre en plus de son butin ordinaire. Un seul récolteur par proie : le premier à dépecer rafle tout. Le choix vous appartient à chaque fois : prélevez tout ce que le cadavre offre, ou concentrez-vous sur un seul composant pour en tirer une qualité plus fine. N'importe quel personnage peut récolter, sans métier ni apprentissage requis, et un composant particulièrement fin porte même le nom de celui qui l'a récolté.",
   'guide.professions.harvestTitle': 'Dépecer la chasse elle-même',
@@ -7688,4 +7766,169 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     "Tout là-haut sur Thornpeak, la tempête au-dessus de Stormcrag prend parfois forme. Thunzharr, le Pic éveillé s'y dresse à un rythme régulier, un élémentaire de la puissance d'un raid affronté en monde ouvert par quiconque répond à l'appel, et il devient d'autant plus redoutable que les prétendants se dressent nombreux contre lui. Chacun de ceux qui rejoignent le combat gagne son propre tirage de son butin, honoré selon les règles de verrouillage de raid, et sa chute s'attarde assez longtemps pour que les tombés reviennent en courant réclamer leur dû. Rassemblez plus d'épées que vous ne le pensez nécessaire.",
   'guide.worldPage.worldBossTitle': "Quand le pic s'éveille : le boss de monde",
+  'devCommand.actions.attune.description':
+    'Marque toutes les conditions d’harmonisation comme remplies.',
+  'devCommand.actions.attune.label': 'Déverrouiller les harmonisations',
+  'devCommand.actions.bot.description':
+    'Crée un joueur immobile auquel il est possible de chuchoter.',
+  'devCommand.actions.bot.label': 'Faire apparaître un bot social',
+  'devCommand.actions.combatreset.description': 'Efface l’état de combat et la menace hostile.',
+  'devCommand.actions.combatreset.label': 'Réinitialiser le combat',
+  'devCommand.actions.cooldowns.description':
+    'Réinitialise les temps de recharge des capacités, du GCD et des potions.',
+  'devCommand.actions.cooldowns.label': 'Réinitialiser les temps de recharge',
+  'devCommand.actions.despawnall.description':
+    'Supprime toutes les créatures invoquées par ce développeur.',
+  'devCommand.actions.despawnall.label': 'Supprimer mes créatures',
+  'devCommand.actions.despawntarget.description':
+    'Supprime une créature sélectionnée créée avec cet outil.',
+  'devCommand.actions.despawntarget.label': 'Faire disparaître la cible',
+  'devCommand.actions.dungeon.description':
+    'Entre dans un donjon sans tenir compte de la restriction de développement.',
+  'devCommand.actions.dungeon.label': 'Entrer dans un donjon',
+  'devCommand.actions.gather.description': 'Augmente la compétence d’un métier de récolte.',
+  'devCommand.actions.gather.label': 'Augmenter la compétence de récolte',
+  'devCommand.actions.give.description': 'Ajoute un objet à l’inventaire du joueur.',
+  'devCommand.actions.give.label': 'Donner un objet',
+  'devCommand.actions.god.description':
+    'Active ou désactive l’invulnérabilité et les dégâts augmentés.',
+  'devCommand.actions.god.label': 'Activer ou désactiver le mode divin',
+  'devCommand.actions.gold.description': 'Ajoute de l’or à la bourse actuelle.',
+  'devCommand.actions.gold.label': 'Ajouter de l’or',
+  'devCommand.actions.heal.description': 'Restaure tous les points de vie.',
+  'devCommand.actions.heal.label': 'Rétablir les points de vie',
+  'devCommand.actions.kill.description': 'Teste les séquences de mort, de fantôme et de cadavre.',
+  'devCommand.actions.kill.label': 'Tuer le joueur',
+  'devCommand.actions.killtarget.description': 'Tue la créature vivante sélectionnée.',
+  'devCommand.actions.killtarget.label': 'Tuer la cible',
+  'devCommand.actions.level.description': 'Définit le niveau du personnage actuel.',
+  'devCommand.actions.level.label': 'Définir le niveau',
+  'devCommand.actions.lfgboard.description': 'Crée un scénario d’annonce de groupe prédéfini.',
+  'devCommand.actions.lfgboard.label': 'Préparer le tableau des annonces',
+  'devCommand.actions.lfgqueue.description': 'Crée un scénario de file de recherche de donjons.',
+  'devCommand.actions.lfgqueue.label': 'Préparer la file de recherche',
+  'devCommand.actions.lfgraid.description': 'Crée un scénario de recherche de raids.',
+  'devCommand.actions.lfgraid.label': 'Préparer la recherche de raids',
+  'devCommand.actions.quest.description': 'Accomplit une quête précise par son ID.',
+  'devCommand.actions.quest.label': 'Accomplir la quête',
+  'devCommand.actions.quests.description': 'Accomplit toutes les quêtes du journal actuel.',
+  'devCommand.actions.quests.label': 'Accomplir les quêtes actives',
+  'devCommand.actions.raid.description': 'Entre directement dans l’arène de Nythraxis.',
+  'devCommand.actions.raid.label': 'Entrer dans le raid',
+  'devCommand.actions.raidreset.description': 'Efface les verrouillages de raid actuels.',
+  'devCommand.actions.raidreset.label': 'Réinitialiser le verrouillage de raid',
+  'devCommand.actions.resource.description': 'Restaure le mana, la rage ou l’énergie.',
+  'devCommand.actions.resource.label': 'Rétablir la ressource',
+  'devCommand.actions.revive.description':
+    'Réanime en suivant le processus normal de résurrection.',
+  'devCommand.actions.revive.label': 'Réanimer',
+  'devCommand.actions.spawn.description': 'Fait apparaître une créature précise près du joueur.',
+  'devCommand.actions.spawn.label': 'Faire apparaître une créature',
+  'devCommand.actions.teleport.description':
+    'Déplace le joueur vers des coordonnées exactes du monde.',
+  'devCommand.actions.teleport.label': 'Téléporter',
+  'devCommand.categories.inventory': 'Inventaire',
+  'devCommand.categories.player': 'Joueur',
+  'devCommand.categories.progress': 'Progression',
+  'devCommand.categories.scenarios': 'Scénarios',
+  'devCommand.categories.spawns': 'Apparitions',
+  'devCommand.categories.travel': 'Déplacement',
+  'devCommand.categoryNavAria': 'Catégories de commandes de développement',
+  'devCommand.closeAria': 'Fermer les commandes de développement',
+  'devCommand.dialogLabel': 'Centre de commandes de développement',
+  'devCommand.difficulty.heroic': 'Héroïque',
+  'devCommand.difficulty.normal': 'Normal',
+  'devCommand.fields.amount': 'Quantité',
+  'devCommand.fields.count': 'Nombre',
+  'devCommand.fields.difficulty': 'Difficulté',
+  'devCommand.fields.dungeon': 'Donjon',
+  'devCommand.fields.gold': 'Or',
+  'devCommand.fields.item': 'Objet',
+  'devCommand.fields.level': 'Niveau',
+  'devCommand.fields.mob': 'Créature',
+  'devCommand.fields.name': 'Nom',
+  'devCommand.fields.profession': 'Métier',
+  'devCommand.fields.quest': 'Quête',
+  'devCommand.fields.x': 'X',
+  'devCommand.fields.z': 'Z',
+  'devCommand.filterLabel': 'Filtrer les commandes',
+  'devCommand.filterPlaceholder': 'Rechercher dans cette catégorie',
+  'devCommand.invalidValues': 'Choisissez des valeurs valides avant d’exécuter cette commande.',
+  'devCommand.kicker': 'Outils de développement',
+  'devCommand.noMatches': 'Aucune commande correspondante.',
+  'devCommand.run': 'Exécuter',
+  'devCommand.sent': 'Envoyé : {command}',
+  'devCommand.serverRequirement':
+    'Les commandes de triche du serveur exigent toujours ALLOW_DEV_COMMANDS=1.',
+  'devCommand.subtitle': 'Commandes de test autoritatives pour le monde actif.',
+  'devCommand.title': 'Centre de commandes',
+  'entities.items.duskhide_wraps.name': 'Bandelettes en cuir crépusculaire',
+  'entities.items.eastbrook_druids_hide.name': 'Peau du druide d’Eastbrook',
+  'entities.items.eastbrook_ritual_vestments.name': 'Habits rituels d’Eastbrook',
+  'entities.items.eastbrook_warded_leggings.name': 'Jambières protégées d’Eastbrook',
+  'entities.items.sootscale_mantle.name': 'Pèlerine en écailles de suie',
+  'entities.items.wardweave_cowl.name': 'Capuche de tissage protecteur',
+  'hudChrome.claudium.railUsdc': 'USDC',
+  'hudChrome.claudium.usdcBalance': 'USDC : {amount}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    'Vous êtes exclu des Récompenses quotidiennes pour encore {remaining}. L’accès sera rétabli {until}. Motif : {reason}',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days} j {hours} h',
+  'hudChrome.partyFrames.columns': 'Colonnes de raid',
+  'hudChrome.partyFrames.healthCurrent': 'Actuels',
+  'hudChrome.partyFrames.healthCurrentMax': 'Actuels / max.',
+  'hudChrome.partyFrames.healthNone': 'Aucun',
+  'hudChrome.partyFrames.healthPercent': 'Pourcentage',
+  'hudChrome.partyFrames.healthText': 'Texte des points de vie',
+  'hudChrome.partyFrames.height': 'Hauteur du cadre',
+  'hudChrome.partyFrames.lock': 'Verrouiller les cadres de groupe et de raid',
+  'hudChrome.partyFrames.scale': 'Échelle du cadre',
+  'hudChrome.partyFrames.section': 'Cadres de groupe et de raid',
+  'hudChrome.partyFrames.showAbsorbs': 'Afficher les boucliers d’absorption',
+  'hudChrome.partyFrames.showAuras': 'Afficher les améliorations et affaiblissements',
+  'hudChrome.partyFrames.showResource': 'Afficher le mana, la rage et l’énergie',
+  'hudChrome.partyFrames.showSelf': 'Afficher votre cadre',
+  'hudChrome.partyFrames.sort': 'Trier les joueurs',
+  'hudChrome.partyFrames.sortGroup': 'Groupe',
+  'hudChrome.partyFrames.sortName': 'Nom',
+  'hudChrome.partyFrames.sortRole': 'Rôle',
+  'hudChrome.partyFrames.spacing': 'Espacement des cadres',
+  'hudChrome.partyFrames.style': 'Style des cadres',
+  'hudChrome.partyFrames.styleAutomatic': 'Automatique',
+  'hudChrome.partyFrames.styleClassic': 'Cadres de groupe classiques',
+  'hudChrome.partyFrames.styleRaid': 'Cadres de raid',
+  'hudChrome.partyFrames.unlock': 'Déplacer les cadres de groupe et de raid',
+  'hudChrome.partyFrames.width': 'Largeur du cadre',
+  'apiError.welcome.invalid_input': 'Saisie invalide.',
+  'welcome.back': 'Bon retour parmi nous, {name}',
+  'welcome.level': 'Niveau {level}',
+  'welcome.lastPlayed': 'Dernière partie : {when}',
+  'welcome.continue': 'Entrer dans le monde',
+  'welcome.continueHint': 'Entrée pour continuer, Échap pour passer',
+  'welcome.continueHintTouch': 'Touchez pour continuer',
+  'welcome.discord.title': 'La communauté vit sur Discord',
+  'welcome.discord.sub':
+    'Aperçus des patchs, événements, discussions avec les développeurs et 2 emplacements de banque bonus en liant votre compte Discord.',
+  'welcome.discord.join': 'Rejoindre notre Discord',
+  'welcome.chest.ready': 'Coffre des récompenses quotidiennes prêt',
+  'welcome.armory.cta': 'Entrer dans le monde et parcourir l’Armurerie',
+  'welcome.news.new': 'Nouveau',
+  'welcome.news.viewAll': 'Voir toutes les mises à jour sur GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Intendant héroïque',
+  'entities.letters.heroic_marks_reward.subject': 'Vos Marques héroïques',
+  'entities.letters.heroic_marks_reward.body':
+    'Votre groupe a triomphé de l’épreuve héroïque pendant que vous combattiez à l’arrière ou gisiez à terre. Votre verrouillage a tout de même été enregistré, alors votre part de Marques héroïques vous est envoyée ici au lieu d’être perdue. Faites-en bon usage.\n\n- Intendant héroïque',
+  'guide.dungeonsPage.resetTitle': 'Réinitialiser vos instances',
+  'guide.dungeonsPage.resetBody':
+    'Si vous changez de difficulté alors que votre groupe détient encore des parcours revendiqués, les anciennes revendications persistent un moment avant de disparaître. Le chef de groupe peut les abandonner immédiatement : choisissez Réinitialiser toutes les instances dans le menu de son portrait, ou saisissez /dungeon reset. La difficulté doit réellement avoir changé, personne, vivant ou mort, ne doit rester à l’intérieur, et un court délai sépare deux réinitialisations. Si vous arrivez à l’entrée avec la mauvaise difficulté, le jeu vous avertit avant le début. Le raid n’est jamais réinitialisé ainsi ; ses propres règles de verrouillage restent en vigueur.',
+  'guide.gear.itemLevelBody':
+    'Pour comparer rapidement deux pièces, activez Afficher le niveau d’objet dans les options. L’équipement dont la provenance est connue, obtenu sur les ennemis, par les quêtes ou les métiers, affiche alors un niveau d’objet : une valeur unique qui estime sa puissance d’après sa source et permet de repérer la meilleure amélioration, même entre emplacements différents. Les pièces sans telle provenance, comme les articles de base des marchands et l’équipement de départ, n’en affichent pas ; cette absence est normale.',
+  'guide.professions.craftHowBody':
+    'Ouvrez la fenêtre d’artisanat (touche T par défaut) pour voir toutes vos recettes, leurs composants et ce que vous possédez ; lorsque les matériaux sont réunis, un clic suffit. Les recettes courantes se fabriquent partout. Quelques recettes avancées, dont des outils de haut niveau et de rares armures de lanceur de sorts, exigent toutefois le centre d’artisanat de Highwatch.',
+  'guide.gear.qualityBody':
+    'Chaque objet possède une qualité, et son nom prend la couleur correspondante afin que sa valeur soit lisible en un coup d’œil. Du plus courant au plus précieux :',
+  'guide.gear.qualityCommon': 'Commun',
+  'guide.professions.craftHowTitle': 'La fenêtre d’artisanat',
+  'guide.professions.focusTitle': 'Focalisation de la ville',
+  'guide.professions.focusBody':
+    'Chaque ville principale propose un panneau de Focalisation de la ville aux récolteurs de passage : restez en ville, ouvrez-le près de la minicarte et attribuez un petit capital de points aux types de composants qui vous intéressent. Plus un composant reçoit de focalisation, plus les dépouilles suivantes en fournissent une version fine et abondante. Cette répartition suit votre personnage et peut être modifiée gratuitement lors de chaque visite en ville.',
 };

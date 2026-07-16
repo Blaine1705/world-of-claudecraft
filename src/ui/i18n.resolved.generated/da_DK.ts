@@ -20,6 +20,154 @@ export const da_DK: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Center for Udviklerkommandoer",
+    "kicker": "Udviklingsværktøjer",
+    "title": "Kommandocenter",
+    "subtitle": "Serverstyrede testfunktioner til den aktive verden.",
+    "closeAria": "Luk udviklerkommandoer",
+    "categoryNavAria": "Kategorier for udviklerkommandoer",
+    "categories": {
+      "player": "Spiller",
+      "spawns": "Oprettede væsner",
+      "inventory": "Inventar",
+      "progress": "Fremskridt",
+      "travel": "Rejser",
+      "scenarios": "Scenarier"
+    },
+    "filterLabel": "Filtrér kommandoer",
+    "filterPlaceholder": "Søg i denne kategori",
+    "noMatches": "Ingen matchende kommandoer.",
+    "serverRequirement": "Serverfusk kræver stadig ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Vælg gyldige værdier, før du kører kommandoen.",
+    "sent": "Sendt: {command}",
+    "run": "Kør",
+    "fields": {
+      "level": "Niveau",
+      "mob": "Væsen",
+      "count": "Antal",
+      "item": "Genstand",
+      "gold": "Guld",
+      "quest": "Opgave",
+      "profession": "Fag",
+      "amount": "Mængde",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Fangekælder",
+      "difficulty": "Sværhedsgrad",
+      "name": "Navn"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroisk"
+    },
+    "actions": {
+      "heal": {
+        "label": "Gendan helbred",
+        "description": "Fyld hele helbredspuljen."
+      },
+      "resource": {
+        "label": "Gendan ressource",
+        "description": "Fyld mana, raseri eller energi."
+      },
+      "cooldowns": {
+        "label": "Ryd nedkølingstider",
+        "description": "Nulstil evne-, GCD- og eliksirtimere."
+      },
+      "god": {
+        "label": "Slå gudetilstand til eller fra",
+        "description": "Slå usårlighed og forøget skade til eller fra."
+      },
+      "revive": {
+        "label": "Genopliv",
+        "description": "Genopliv gennem den normale genopstandelsesproces."
+      },
+      "kill": {
+        "label": "Dræb spilleren",
+        "description": "Test forløb for død, spøgelse og lig."
+      },
+      "combatreset": {
+        "label": "Nulstil kamp",
+        "description": "Ryd kampstatus og fjendtlig trussel."
+      },
+      "level": {
+        "label": "Angiv niveau",
+        "description": "Angiv figurens aktuelle niveau."
+      },
+      "spawn": {
+        "label": "Opret væsen",
+        "description": "Opret et bestemt væsen nær spilleren."
+      },
+      "killtarget": {
+        "label": "Dræb målet",
+        "description": "Dræb det valgte levende væsen."
+      },
+      "despawntarget": {
+        "label": "Fjern målet",
+        "description": "Fjern et valgt væsen, der er oprettet med dette værktøj."
+      },
+      "despawnall": {
+        "label": "Ryd mine oprettede væsner",
+        "description": "Fjern alle væsner, som denne udvikler har oprettet."
+      },
+      "give": {
+        "label": "Giv genstand",
+        "description": "Føj en genstand til spillerens inventar."
+      },
+      "gold": {
+        "label": "Tilføj guld",
+        "description": "Føj guld til den aktuelle pung."
+      },
+      "quest": {
+        "label": "Fuldfør opgave",
+        "description": "Fuldfør en bestemt opgave ud fra id."
+      },
+      "quests": {
+        "label": "Fuldfør aktive opgaver",
+        "description": "Fuldfør alle opgaver i den aktuelle log."
+      },
+      "attune": {
+        "label": "Lås indstillinger op",
+        "description": "Markér alle indstillingskrav som fuldførte."
+      },
+      "gather": {
+        "label": "Giv indsamlingsfærdighed",
+        "description": "Forøg færdigheden i et indsamlingsfag."
+      },
+      "teleport": {
+        "label": "Teleportér",
+        "description": "Flyt til præcise verdenskoordinater."
+      },
+      "dungeon": {
+        "label": "Gå ind i fangekælder",
+        "description": "Gå ind i en fangekælder uden udviklerspærren."
+      },
+      "raid": {
+        "label": "Gå ind i raid",
+        "description": "Gå direkte ind i Nythraxis-arenaen."
+      },
+      "raidreset": {
+        "label": "Nulstil raidlåsning",
+        "description": "Ryd de aktuelle raidlåsninger."
+      },
+      "bot": {
+        "label": "Opret social bot",
+        "description": "Opret en stillestående spiller, der kan modtage hvisken."
+      },
+      "lfgqueue": {
+        "label": "Klargør søgekøen",
+        "description": "Opret et scenarie for køen til fangekældersøgeren."
+      },
+      "lfgraid": {
+        "label": "Klargør raidsøgeren",
+        "description": "Opret et scenarie for raidsøgeren."
+      },
+      "lfgboard": {
+        "label": "Klargør opslagstavlen",
+        "description": "Opret et scenarie med et færdigt gruppeopslag."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -229,6 +377,7 @@ export const da_DK: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}t {minutes}m",
+      "remainingDaysHours": "{days} dage {hours} timer",
       "score": "Score",
       "walletValue": "Wallet-værdi (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const da_DK: EnTranslations = {
         "no_wallet": "Forbind en wallet med mindst 20 USD i WOC.",
         "under_minimum": "Wallet er under WOC-minimummet på 20 USD.",
         "price_unavailable": "WOC-prisen er utilgængelig, belønninger er midlertidigt låst.",
-        "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}"
+        "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}",
+        "bannedUntil": "Du er udelukket fra daglige belønninger i yderligere {remaining}. Adgangen vender tilbage {until}. Begrundelse: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const da_DK: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Claudium-butikken er ikke tilgængelig lige nu. Din saldo og dine køb er ikke påvirket. Prøv igen om lidt.",
       "disclosure": "Claudium er en virtuel valuta, der kun går én vej: Køb den for penge, og brug den på kosmetik. Den kan ikke indløses, overføres eller udbetales.",
@@ -499,6 +650,7 @@ export const da_DK: EnTranslations = {
       "railLabel": "Betalingsmetode",
       "railStripe": "Kort",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% rabat",
       "railWocUnavailable": "WOC-priser er ikke tilgængelige lige nu.",
@@ -602,6 +754,7 @@ export const da_DK: EnTranslations = {
       "leaderboard": "Rangliste",
       "dailyRewards": "Butik",
       "deeds": "Bedrifter",
+      "mounts": "Mounts",
       "nameplates": "Navne",
       "haptics": "Haptik",
       "hapticsOff": "Haptik fra",
@@ -716,7 +869,63 @@ export const da_DK: EnTranslations = {
       "petStop": "Kæledyr: Stop",
       "petTaunt": "Kæledyr: Hån",
       "petDefensive": "Kæledyr: Defensiv",
-      "petAggressive": "Kæledyr: Aggressiv"
+      "petAggressive": "Kæledyr: Aggressiv",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Dalpokalen",
@@ -870,6 +1079,7 @@ export const da_DK: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto vælger skrivebords- eller touchstyring ud fra din enhed. Vælg Skrivebord for at tvinge tastatur og mus (nyttigt på en tablet med tastatur), eller Touch for skærmstyringen.",
       "footstepSounds": "Fodtrinslyde",
+      "interfaceSounds": "Brugerflade- og feedbacklyde",
       "clickFeedback": "Klikmarkør",
       "lockCursorOnRotate": "Lås markør under drejning",
       "keybindHelpLockCursorOnRotate": "Holder musemarkøren inde i vinduet, mens du trækker for at dreje kameraet, så den ikke kan nå skærmkanten eller flytte til en anden skærm. Slå fra, hvis du foretrækker en fri markør.",
@@ -1309,7 +1519,20 @@ export const da_DK: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Indstil fangekældersværhedsgrad: Heroisk",
-      "setNormal": "Indstil fangekældersværhedsgrad: Normal"
+      "setNormal": "Indstil fangekældersværhedsgrad: Normal",
+      "resetAll": "Nulstil alle instanser",
+      "resetDone": "Alle instanser er blevet nulstillet.",
+      "resetNone": "Du har ingen instanser at nulstille.",
+      "resetOccupied": "Du kan ikke nulstille instanser, mens nogen stadig er derinde.",
+      "resetSameDifficulty": "Skift fangekældersværhedsgrad, før du nulstiller disse instanser. Tomme instanser nulstilles automatisk efter 5 minutter.",
+      "resetLoot": "Du kan ikke nulstille instanser, mens der stadig er bytte derinde.",
+      "resetConfirmTitle": "Nulstil alle instanser?",
+      "resetConfirmBody": "Dette forlader tomme instanser fra din tidligere valgte sværhedsgrad. Uhentet bytte forhindrer nulstillingen.",
+      "resetConfirm": "Nulstil instanser",
+      "resetCooldown": "Instanser kan kun nulstilles én gang hvert 5. minut.",
+      "resetUsage": "Brug /dungeon reset til at forlade dine tomme instanser efter at have ændret sværhedsgrad.",
+      "entryMismatchNormal": "Denne instans er indstillet til Normal sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Heroisk gennemspilning.",
+      "entryMismatchHeroic": "Denne instans er indstillet til Heroisk sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Normal gennemspilning."
     },
     "bags": {
       "cannotDestroy": "Denne genstand kan ikke ødelægges.",
@@ -1324,6 +1547,7 @@ export const da_DK: EnTranslations = {
       "filterConsumable": "Forbrugsvarer",
       "filterMaterial": "Materialer",
       "filterQuest": "Quest",
+      "filterMount": "Ridedyr",
       "sortAria": "Sortér taskegenstande",
       "sortRecent": "Nyeste",
       "sortQuality": "Kvalitet",
@@ -1478,6 +1702,33 @@ export const da_DK: EnTranslations = {
     "playerFrame": {
       "unlock": "Flyt spillerrammen",
       "lock": "Lås spillerrammen"
+    },
+    "partyFrames": {
+      "section": "Gruppe- og raidrammer",
+      "unlock": "Flyt gruppe- og raidrammer",
+      "lock": "Lås gruppe- og raidrammer",
+      "style": "Rammestil",
+      "styleAutomatic": "Automatisk",
+      "styleClassic": "Klassiske grupperammer",
+      "styleRaid": "Raidrammer",
+      "scale": "Rammeskalering",
+      "width": "Rammebredde",
+      "height": "Rammehøjde",
+      "spacing": "Rammeafstand",
+      "columns": "Raidkolonner",
+      "healthText": "Helbredstekst",
+      "healthNone": "Ingen",
+      "healthPercent": "Procent",
+      "healthCurrent": "Nuværende",
+      "healthCurrentMax": "Nuværende / maks.",
+      "sort": "Sortér spillere",
+      "sortGroup": "Gruppe",
+      "sortRole": "Rolle",
+      "sortName": "Navn",
+      "showResource": "Vis mana, raseri og energi",
+      "showAbsorbs": "Vis absorberingsskjolde",
+      "showAuras": "Vis styrkelser og svækkelser",
+      "showSelf": "Vis din ramme"
     },
     "frameReset": {
       "label": "Nulstil rammepositioner"
@@ -2141,6 +2392,9 @@ export const da_DK: EnTranslations = {
       "already_linked": "Din konto har allerede en tilknyttet Steam-konto.",
       "account_taken": "Den Steam-konto er allerede knyttet til en anden konto.",
       "upstream": "Steam svarede ikke. Prøv igen om et øjeblik."
+    },
+    "welcome": {
+      "invalid_input": "Ugyldig indtastning."
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const da_DK: EnTranslations = {
       "effectsTitle": "Forstærkninger, svækkelser og massekontrol",
       "effectsBody": "Mange evner påfører en effekt der hænger ved. De gavnlige (forstærkninger) hæver dine egenskaber, skjolder dig eller helbreder dig lidt ad gangen; de skadelige (svækkelser) dræner dit helbred med skade over tid eller svækker dig. Hold øje med de små ikoner i skærmens øverste hjørne, ved siden af minikortet, for at se hvad der er på dig og hvor længe det varer.",
       "ccBody": "Massekontrol er en særlig slags svækkelse, der begrænser, hvad et mål kan gøre: lammelser, rødder og sløvninger, forstummelser der stopper besværgelser, afvæbninger, frygt og forvandlinger, der gør en fjende harmløs et øjeblik. Mod andre spillere slides kontrollen tynd ved gentagelse: den samme slags påført igen for hurtigt svækkes og svigter så helt, og en lammelse, der åbner fra snigen, tælles for sig, adskilt fra de lammelser der følger efter, så ingen kan lænkes hjælpeløs for evigt. Verdenens skabninger nærer intet sådant nag: kontrol svækkes aldrig ved gentagelse mod dem, selvom mange af de mægtigste fjender, navngivne eliter og de stærkeste bosser blandt dem, slet ikke kan kontrolleres.",
-      "metersBody": "Nysgerrig efter, hvordan en kamp gik? Tryk på Z for at åbne gruppens målere, der opgør skade, helbredelse og trussel for din gruppe, kamp for kamp.",
+      "metersBody": "Nysgerrig efter, hvordan en kamp gik? Tryk på Shift+H for at åbne gruppens målere, der opgør skade, helbredelse og trussel for din gruppe, kamp for kamp.",
       "queueTitle": "Dit næste træk er allerede ladt",
       "queueBody": "Du behøver ikke ramme dine tryk præcist på slaget. Tryk på din næste evne i de sidste øjeblikke af den igangværende besværgelse, så sættes den i kø og udløses i samme nu, besværgelsen er færdig, så øvet spil flyder uden huller. Et tryk for tidligt bliver simpelthen afvist, så intet går til spilde. Nogle nærkampsslag virker på samme måde og rider med på dit næste våbensving.",
       "deathTitle": "Når du falder",
@@ -2505,7 +2759,7 @@ export const da_DK: EnTranslations = {
       "petBarTerm": "Kæledyrsbjælke",
       "petBarDef": "Den kommandorække, som et jæger- eller heksemesterkæledyr føjer til: Angrib, Stop, Ægge, Defensiv og Aggressiv, bundet til Ctrl plus 1 til 5 som standard.",
       "metersTerm": "Skadesmålere",
-      "metersDef": "Gruppens pointtavle for den aktuelle kamp: skade givet, helbredelse ydet, og hvem der bærer mest trussel, ført pr. kamp. Åbn det med dets tastebinding (Z som standard).",
+      "metersDef": "Gruppens pointtavle for den aktuelle kamp: skade givet, helbredelse ydet, og hvem der bærer mest trussel, ført pr. kamp. Åbn det med dets tastebinding (Shift+H som standard).",
       "targetMarkerTerm": "Målmarkør",
       "targetMarkerDef": "Et symbol, som ethvert gruppe- eller raidmedlem kan fæstne over et mål, så alle fokuserer på, eller undgår, det samme. Otte symboler, ét mål pr. symbol.",
       "loadoutTerm": "Opsæt",
@@ -2886,6 +3140,8 @@ export const da_DK: EnTranslations = {
       "heroicRewardsTitle": "Heroiske Mærker og opgraderet bytte",
       "heroicRewardsBody": "Heroiske bosser taber det bytte, du kender, opgraderet og mærket Heroisk i værktøjstippet, og den sidste boss i hver tur føjer episke genstande til, som ikke findes nogen andre steder. Det sidste drab efterlader også Heroiske Mærker til hver deltager: en valuta, du bruger hos Kvartermester Vex i Highwatch, hvis lager af ringe og halskæder er de eneste smykker i riget.",
       "heroicLockoutBody": "Normale fangekældre kan løbes hele dagen. Heroisk kræver tålmodighed: drabet på den sidste boss spærrer alle i turen til én heroisk gennemførelse af den fangekælder om dagen, og raidet holder en daglig spærring for hver sværhedsgrad. En gennemført tur for fem spillere står stadig åben for dens egen gruppe til ligløb og bytte, så ingen bliver låst ude fra det, de har optjent der. Raidet er strengere: når først dets drab spærrer dig, forbliver døren lukket indtil den daglige nulstilling, så saml dit bytte, før du forlader arenaen.",
+      "resetTitle": "Nulstilling af dine instanser",
+      "resetBody": "Hvis du skifter sværhedsgrad, mens gruppen stadig har krævede gennemløb, bliver de gamle krav stående et stykke tid. Gruppelederen kan straks opgive dem ved at vælge Nulstil alle instanser i menuen på sit eget portræt eller skrive /dungeon reset. Sværhedsgraden skal faktisk være ændret, ingen levende eller faldne må være indenfor, og der er en kort nedkøling mellem nulstillinger. Ved døren på forkert sværhedsgrad advarer spillet før start. Raidet nulstilles aldrig sådan; dets egne låsningsregler gælder.",
       "templeLoreTitle": "Det Druknede Tempel, en smule dybere",
       "templeLoreBody": "Templet har sit eget sagn, ældre end den kult, du jagter andetsteds. På bredden af Glimmertjernet, en tjern der drikker måneskinnet og giver de druknede tilbage, holder en ensom vogter en port af blegt lys. Under overfladen løber en trappe af kold sten ned til den. De folk, der sank dér, druknede ikke ved et uheld: de var Det Blege Kor, der gik under i tilbedelse og aldrig holdt op med at synge. De gamle vogtere ridsede en enkelt advarsel i klipperne, før vandet tog dem, en bøn til noget, de kaldte Den Druknede Måne, med en mere fast hånd, der tilføjede to ord nedenunder: den sover blot.",
       "cryptLeadTitle": "En dør, de døde skulle holde lukket",
@@ -3093,7 +3349,7 @@ export const da_DK: EnTranslations = {
       "qualityNote": "Højere kvalitet betyder normalt bedre egenskaber, men kvalitet er et fingerpeg, ikke en regel. Et godt matchet stykke til din klasse og dit niveau kan slå et mere prangende et.",
       "upgradeTitle": "Hold dit udstyr opdateret",
       "upgradeBody": "At udskifte et gammelt stykke med en frisk opgradering gør mere for dig end at spille perfekt i udstyr, du er vokset fra. Når noget bedre falder, eller en opgave tilbyder det, så tag det. Gem ikke dine gode genstande til senere.",
-      "itemLevelBody": "Hvis du vil have en hurtig måde at sammenligne to genstande på, så slå Vis genstandsniveau til i indstillingerne. Udstyr vundet ude i verden, fra fjender og opdrag, viser så et genstandsniveau, et enkelt tal for nogenlunde hvor stærkt det er ud fra, hvor det kom fra, så du med et blik kan se, hvilken opgradering der vejer tungest, selv på tværs af forskellige pladser. Stykker uden en sådan kilde, som simple butiksvarer og startudstyr, viser intet genstandsniveau, så et manglende tal er normalt, ikke en fejl.",
+      "itemLevelBody": "Slå Vis genstandsniveau til i indstillingerne for hurtigt at sammenligne to dele. Udstyr med en kendt kilde, fra fjender, opgaver og håndværksfag, viser derefter et genstandsniveau: et enkelt tal, der omtrent angiver styrken ud fra oprindelsen og gør opgraderinger sammenlignelige, selv på tværs af pladser. Dele uden en sådan kilde, som simple handelsvarer og startudstyr, viser intet niveau; et manglende tal er normalt.",
       "sourcesTitle": "Hvor udstyr kommer fra",
       "sourcesBody": "De fleste af dine tidlige opgraderinger er opgavebelønninger, så det betaler sig at gøre opgaver færdige frem for at grinde. Fjender taber udstyr, når du besejrer dem, handlende i byen sælger solide basisvarer, håndværkere forvandler indsamlede materialer til bærbare stykker, og spillermarkedet lader dig købe fra andre eventyrere. På toppen af bakken køber to mærkevalutaer udstyr, som ikke findes andre steder: Delve-Mærker hos delve-vogteren og Heroiske Mærker hos den heroiske kvartermester.",
       "soulboundTitle": "Sjælebundet: din og din alene",
@@ -3137,7 +3393,7 @@ export const da_DK: EnTranslations = {
       "craftRecipesTitle": "Opskrifter og reagenser",
       "craftRecipesBody": "Hver opskrift kræver bestemte reagenser, du samler eller køber. De simpleste opskrifter beder ikke om andet end almindelige materialer og kan laves fra allerførste færd, så du kan begynde at arbejde med et fag i samme øjeblik, du tager det op. Opskriftslisterne er stadig ved at fylde sig ud: nogle få fag venter på deres første opskrifter, og flere kommer til, efterhånden som håndværkene vokser.",
       "craftHowTitle": "Håndværksvinduet",
-      "craftHowBody": "Åbn Håndværksvinduet (standardtast T) for at se hver opskrift, du kender, hvad hver enkelt kræver, og hvad du har ved hånden; når materialerne er der, klarer ét klik arbejdet. Almindelige opskrifter kan laves hvor som helst i verden. En håndfuld avancerede værktøjsopskrifter beder dig i stedet om at stå ved håndværksknudepunktet i Highwatch.",
+      "craftHowBody": "Åbn håndværksvinduet (standardtast T) for at se alle kendte opskrifter, deres krav og dine materialer; når materialerne er der, er ét klik nok. Almindelige opskrifter kan fremstilles overalt. Nogle avancerede opskrifter, herunder værktøj på højt niveau og sjældne rustninger til magikere, kræver håndværkscentret i Highwatch.",
       "craftMasteryTitle": "Færdighed og mesterskab",
       "craftMasteryBody": "Vellykket håndværk opbygger færdighed i faget, og færdighed låser aldrig et håndværks opskrifter væk: kender du en opskrift og har dens materialer, kan du forsøge dig. Hvad færdighed i stedet giver dig, er kvalitet, en øvet hånd frembringer finere arbejde. Den ene undtagelse er kombinationsopskrifter, der beder dig bevise dig selv i begge deres håndværk, før de åbner sig.",
       "craftComboTitle": "Kombinationsopskrifter",
@@ -4928,6 +5184,29 @@ export const da_DK: EnTranslations = {
     "body": "Vi genstarter spiltjenesten og forventer, at Claudemoon vender tilbage om kort tid. Denne side bliver ved med at tjekke automatisk.",
     "status": "Tilbage snart"
   },
+  "welcome": {
+    "back": "Velkommen tilbage, {name}",
+    "level": "Niveau {level}",
+    "lastPlayed": "Sidst spillet: {when}",
+    "continue": "Træd ind i verden",
+    "continueHint": "Enter for at fortsætte, Esc for at springe over",
+    "continueHintTouch": "Tryk for at fortsætte",
+    "discord": {
+      "title": "Fællesskabet lever på Discord",
+      "sub": "Forhåndsvisninger af patches, begivenheder, udviklerchat og 2 bonuspladser i banken, når du forbinder din Discord-konto.",
+      "join": "Tilslut dig vores Discord"
+    },
+    "chest": {
+      "ready": "Kisten med daglige belønninger er klar"
+    },
+    "armory": {
+      "cta": "Træd ind i verden, og udforsk Våbenhuset"
+    },
+    "news": {
+      "new": "Ny",
+      "viewAll": "Se alle opdateringer på GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -5663,7 +5942,8 @@ export const da_DK: EnTranslations = {
       "tool": "Værktøj",
       "potion": "Eliksir",
       "elixir": "Eliksir",
-      "bag": "Taske"
+      "bag": "Taske",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Rustning",
@@ -6458,7 +6738,7 @@ export const da_DK: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Ulveblod",
-        "description": "Øger angrebskraft med 40 i 6 sek. Kun i Ulveform."
+        "description": "Øger angrebskraft med {buff} i {duration} sek. Kun i Ulveform."
       },
       "rip": {
         "name": "Sønderriv",
@@ -6749,6 +7029,24 @@ export const da_DK: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Østbæk Uldbukser"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Østbæks Ritualegevandter"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Østbæk-druidens Skind"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Østbæks Beskyttede Benklæder"
+      },
+      "wardweave_cowl": {
+        "name": "Værnevævet Hætte"
+      },
+      "duskhide_wraps": {
+        "name": "Skumringsskindsbind"
+      },
+      "sootscale_mantle": {
+        "name": "Sodskælskappe"
       },
       "gravecaller_blade": {
         "name": "Gravkalderens Bredklinge"
@@ -8171,6 +8469,27 @@ export const da_DK: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Stormkalderens Livværn"
+      },
+      "reins_valorsteed": {
+        "name": "Tøjler til Valorsteed"
+      },
+      "reins_grag_bear": {
+        "name": "Tøjler til Goliat Grag-bjørnen"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Tøjler til mosskal-stilkglideren"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Tændingsnøgle: Æterridderens svævecykel"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Tøjler til Kama-Kage, skyggespringstudsen"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Tøjler til den himmelrækkende Stormfjer"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Tøjler til Tordenspankeren, den store kalkun"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const da_DK: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Vækket Stormling"
+      },
+      "stable_horse": {
+        "name": "Staldhest"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -8821,6 +9143,11 @@ export const da_DK: EnTranslations = {
         "name": "Formand Odell",
         "title": "Mineformand",
         "greeting": "Hele udgravningen vrimler med de jordklistrede skadedyr!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Staldmester",
+        "greeting": "Enhver rytter kommer ind på to ben, {className}. Du får ikke tøjlerne, før du kan sidde Valorsteed uden at kysse jorden, og Highwatch har ingen healere til overs til brækkede knogler."
       },
       "warden_fenwick": {
         "name": "Vogter Fenwick",
@@ -9821,6 +10148,16 @@ export const da_DK: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Ridelektioner",
+        "text": "Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Betal gebyret, og når jeg giver ordet, så kald trænings-Valorsteeden til dig og kravl op i sadlen. Rid så banen: følg markøren til startbuen, tag hvert spring rent, og kryds linjen igen, før sandet er løbet ud. Klarer du det, er sadlen din. Vandrer du ud af folden, starter vi forfra.",
+        "completion": "Sådan, ja. Op i én glidende bevægelse og et roligt sæde deroppe. Valorsteed er din, {playerName}: sadel, tøjler og ry som en rytter, der har fortjent sædet i stedet for at købe det.",
+        "objectives": {
+          "0": {
+            "label": "Tæm Valorsteed"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10137,6 +10474,9 @@ export const da_DK: EnTranslations = {
           },
           "9": {
             "label": "Gravormens Helligdom"
+          },
+          "10": {
+            "label": "Highwatch-stalden"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const da_DK: EnTranslations = {
         "sender": "Broder Aldric",
         "subject": "Det, du gjorde i mørket",
         "body": "Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Heroisk kvartermester",
+        "subject": "Dine heroiske mærker",
+        "body": "Din gruppe klarede den heroiske prøve, mens du kæmpede i bagtroppen eller lå faldet. Din låsning blev også registreret, så din andel af de heroiske mærker blev sendt hertil i stedet for at gå tabt. Brug dem godt.\n\n- Heroisk kvartermester"
       }
     },
     "itemSets": {

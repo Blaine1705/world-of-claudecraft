@@ -20,6 +20,154 @@ export const it_IT: EnTranslations = {
     "rp": "GdR",
     "rpPvp": "GdR-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Centro comandi di sviluppo",
+    "kicker": "Strumenti di sviluppo",
+    "title": "Centro comandi",
+    "subtitle": "Controlli di test autoritativi per il mondo attivo.",
+    "closeAria": "Chiudi comandi di sviluppo",
+    "categoryNavAria": "Categorie dei comandi di sviluppo",
+    "categories": {
+      "player": "Giocatore",
+      "spawns": "Entità generate",
+      "inventory": "Inventario",
+      "progress": "Progresso",
+      "travel": "Viaggio",
+      "scenarios": "Scenari"
+    },
+    "filterLabel": "Filtra comandi",
+    "filterPlaceholder": "Cerca in questa categoria",
+    "noMatches": "Nessun comando corrispondente.",
+    "serverRequirement": "I trucchi del server richiedono comunque ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Scegli valori validi prima di eseguire questo comando.",
+    "sent": "Inviato: {command}",
+    "run": "Esegui",
+    "fields": {
+      "level": "Livello",
+      "mob": "Creatura",
+      "count": "Conteggio",
+      "item": "Oggetto",
+      "gold": "Oro",
+      "quest": "Missione",
+      "profession": "Mestiere",
+      "amount": "Quantità",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficoltà",
+      "name": "Nome"
+    },
+    "difficulty": {
+      "normal": "Normale",
+      "heroic": "Eroica"
+    },
+    "actions": {
+      "heal": {
+        "label": "Ripristina salute",
+        "description": "Ripristina tutta la salute."
+      },
+      "resource": {
+        "label": "Ripristina risorsa",
+        "description": "Ripristina mana, rabbia o energia."
+      },
+      "cooldowns": {
+        "label": "Azzera tempi di recupero",
+        "description": "Azzera i timer delle abilità, del GCD e delle pozioni."
+      },
+      "god": {
+        "label": "Attiva o disattiva modalità dio",
+        "description": "Attiva o disattiva l’invulnerabilità e i danni aumentati."
+      },
+      "revive": {
+        "label": "Rianima",
+        "description": "Rianima seguendo il normale processo di resurrezione."
+      },
+      "kill": {
+        "label": "Uccidi giocatore",
+        "description": "Prova le sequenze di morte, fantasma e cadavere."
+      },
+      "combatreset": {
+        "label": "Reimposta combattimento",
+        "description": "Azzera lo stato di combattimento e la minaccia ostile."
+      },
+      "level": {
+        "label": "Imposta livello",
+        "description": "Imposta il livello del personaggio attuale."
+      },
+      "spawn": {
+        "label": "Genera creatura",
+        "description": "Genera una creatura specifica vicino al giocatore."
+      },
+      "killtarget": {
+        "label": "Uccidi bersaglio",
+        "description": "Uccide la creatura vivente selezionata."
+      },
+      "despawntarget": {
+        "label": "Rimuovi bersaglio",
+        "description": "Rimuove una creatura selezionata e creata con questo strumento."
+      },
+      "despawnall": {
+        "label": "Rimuovi le mie creature",
+        "description": "Rimuove tutte le creature generate da questo sviluppatore."
+      },
+      "give": {
+        "label": "Dai oggetto",
+        "description": "Aggiunge un oggetto all’inventario del giocatore."
+      },
+      "gold": {
+        "label": "Aggiungi oro",
+        "description": "Aggiunge oro alla borsa attuale."
+      },
+      "quest": {
+        "label": "Completa missione",
+        "description": "Completa una missione specifica tramite ID."
+      },
+      "quests": {
+        "label": "Completa missioni attive",
+        "description": "Completa tutte le missioni nel registro attuale."
+      },
+      "attune": {
+        "label": "Sblocca le sintonie",
+        "description": "Contrassegna come soddisfatti tutti i requisiti di sintonia."
+      },
+      "gather": {
+        "label": "Aumenta abilità di raccolta",
+        "description": "Aumenta l’abilità in un mestiere di raccolta."
+      },
+      "teleport": {
+        "label": "Teletrasporta",
+        "description": "Sposta il giocatore a coordinate esatte del mondo."
+      },
+      "dungeon": {
+        "label": "Entra nel dungeon",
+        "description": "Entra in un dungeon ignorando il vincolo di sviluppo."
+      },
+      "raid": {
+        "label": "Entra nell’incursione",
+        "description": "Entra direttamente nell’arena di Nythraxis."
+      },
+      "raidreset": {
+        "label": "Reimposta blocco incursione",
+        "description": "Azzera i blocchi incursione attuali."
+      },
+      "bot": {
+        "label": "Genera bot sociale",
+        "description": "Crea un giocatore immobile a cui è possibile inviare sussurri."
+      },
+      "lfgqueue": {
+        "label": "Prepara coda del cercatore",
+        "description": "Crea uno scenario di coda del Cercatore di Dungeon."
+      },
+      "lfgraid": {
+        "label": "Prepara cercatore di incursioni",
+        "description": "Crea uno scenario del cercatore di incursioni."
+      },
+      "lfgboard": {
+        "label": "Prepara bacheca dei gruppi",
+        "description": "Crea uno scenario di annuncio per un gruppo organizzato."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "PE",
@@ -229,6 +377,7 @@ export const it_IT: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingDaysHours": "{days} g {hours} h",
       "score": "Punteggio",
       "walletValue": "Valore del portafoglio (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const it_IT: EnTranslations = {
         "no_wallet": "Collega un portafoglio con almeno 20 USD in WOC.",
         "under_minimum": "Il portafoglio è sotto il minimo di 20 USD in WOC.",
         "price_unavailable": "Il prezzo di WOC non è disponibile, le ricompense sono temporaneamente bloccate.",
-        "banned": "Sei escluso dalle Ricompense giornaliere. Motivo: {reason}"
+        "banned": "Sei escluso dalle Ricompense giornaliere. Motivo: {reason}",
+        "bannedUntil": "Sei escluso dalle Ricompense giornaliere per altri {remaining}. L’accesso sarà ripristinato {until}. Motivo: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const it_IT: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "Saldo USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Il negozio Claudium non è disponibile al momento. Il tuo saldo e i tuoi acquisti non subiranno modifiche. Riprova tra poco.",
       "disclosure": "Claudium è una valuta virtuale a senso unico: puoi acquistarlo con denaro reale e spenderlo in cosmetici. Non può essere riscattato, trasferito o convertito in denaro.",
@@ -499,6 +650,7 @@ export const it_IT: EnTranslations = {
       "railLabel": "Metodo di pagamento",
       "railStripe": "Carta",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% di sconto",
       "railWocUnavailable": "I prezzi WOC non sono disponibili al momento.",
@@ -602,6 +754,7 @@ export const it_IT: EnTranslations = {
       "leaderboard": "Classifica",
       "dailyRewards": "Negozio",
       "deeds": "Imprese",
+      "mounts": "Cavalcature",
       "nameplates": "Nomi",
       "haptics": "Vibrazione",
       "hapticsOff": "Vibrazione disattivata",
@@ -716,7 +869,63 @@ export const it_IT: EnTranslations = {
       "petStop": "Famiglio: fermo",
       "petTaunt": "Famiglio: provoca",
       "petDefensive": "Famiglio: difensivo",
-      "petAggressive": "Famiglio: aggressivo"
+      "petAggressive": "Famiglio: aggressivo",
+      "mount": "Monta / Smonta"
+    },
+    "mounts": {
+      "title": "Cavalcature",
+      "close": "Chiudi",
+      "select": "Scegli",
+      "selected": "Scelta",
+      "riding": "In sella",
+      "mount": "Monta",
+      "dismount": "Smonta",
+      "requiresLevel": "Richiede livello {level}",
+      "pickFirst": "Scegli una cavalcatura da cavalcare.",
+      "keybindHint": "Premi il tasto Monta / Smonta per cavalcare.",
+      "emptyTitle": "Nessuna cavalcatura ottenuta",
+      "emptyStableHint": "Raggiungi il livello 20 e prendi lezioni di equitazione dalla Stalliera capo Marla alle stalle a ovest di Highwatch.",
+      "emptyDropHint": "Le cavalcature più rare sono bottino dei boss di spedizione e incursione.",
+      "clickManage": "Clicca per scegliere la tua cavalcatura",
+      "rarity_common": "Comune",
+      "rarity_rare": "Rara",
+      "rarity_epic": "Epica",
+      "spec_speed": "+{pct}% di mobilità extra",
+      "spec_block": "+{pct}% di blocco dei danni in mischia",
+      "spec_crit": "+{pct}% di probabilità di colpo critico",
+      "name_valorsteed": "Destriero del Valore",
+      "name_grag_bear": "Orso Grag Golia",
+      "name_stalkglider_snail": "Aliante dal Guscio Muschioso",
+      "name_aether_hover_cycle": "Aerociclo del Giostratore d’Etere",
+      "name_shadowjump_toad": "Kama-Kage, il Rospo Saltombra",
+      "name_stormfeather_griffin": "Piumatempesta Toccacielo",
+      "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
+      "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
+      "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
+      "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
+      "desc_aether_hover_cycle": "Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.",
+      "desc_shadowjump_toad": "Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.",
+      "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.",
+      "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "La Coppa della Valle",
@@ -870,6 +1079,7 @@ export const it_IT: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto sceglie i controlli Desktop o Touch in base al tuo dispositivo. Scegli Desktop per forzare tastiera e mouse (utile su un tablet con tastiera), oppure Touch per i controlli a schermo.",
       "footstepSounds": "Suoni dei passi",
+      "interfaceSounds": "Suoni dell'interfaccia e di risposta",
       "clickFeedback": "Indicatore di clic",
       "lockCursorOnRotate": "Blocca cursore durante la rotazione",
       "keybindHelpLockCursorOnRotate": "Mantiene il cursore del mouse dentro la finestra mentre trascini per ruotare la telecamera, così non può raggiungere il bordo dello schermo o passare a un altro monitor. Disattiva l'opzione se preferisci un cursore libero.",
@@ -1309,7 +1519,20 @@ export const it_IT: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Imposta difficoltà del dungeon: Eroica",
-      "setNormal": "Imposta difficoltà del dungeon: Normale"
+      "setNormal": "Imposta difficoltà del dungeon: Normale",
+      "resetAll": "Reimposta tutte le istanze",
+      "resetDone": "Tutte le istanze sono state reimpostate.",
+      "resetNone": "Non hai istanze da reimpostare.",
+      "resetOccupied": "Non puoi reimpostare le istanze mentre c'è ancora qualcuno all'interno.",
+      "resetSameDifficulty": "Cambia la difficoltà del dungeon prima di reimpostare queste istanze. Le istanze vuote si reimpostano automaticamente dopo 5 minuti.",
+      "resetLoot": "Non puoi reimpostare le istanze mentre c'è ancora del bottino all'interno.",
+      "resetConfirmTitle": "Reimpostare tutte le istanze?",
+      "resetConfirmBody": "Questo abbandona le istanze vuote della difficoltà selezionata in precedenza. Il bottino non raccolto impedirà la reimpostazione.",
+      "resetConfirm": "Reimposta istanze",
+      "resetCooldown": "Le istanze possono essere reimpostate solo una volta ogni 5 minuti.",
+      "resetUsage": "Usa /dungeon reset per abbandonare le istanze vuote dopo aver cambiato difficoltà.",
+      "entryMismatchNormal": "Questa istanza è impostata sulla difficoltà Normale. Usa Reimposta tutte le istanze per iniziare una nuova sessione Eroica.",
+      "entryMismatchHeroic": "Questa istanza è impostata sulla difficoltà Eroica. Usa Reimposta tutte le istanze per iniziare una nuova sessione Normale."
     },
     "bags": {
       "cannotDestroy": "Questo oggetto non può essere distrutto.",
@@ -1324,6 +1547,7 @@ export const it_IT: EnTranslations = {
       "filterConsumable": "Consumabili",
       "filterMaterial": "Materiali",
       "filterQuest": "Missione",
+      "filterMount": "Cavalcature",
       "sortAria": "Ordina gli oggetti della borsa",
       "sortRecent": "Recenti",
       "sortQuality": "Qualità",
@@ -1478,6 +1702,33 @@ export const it_IT: EnTranslations = {
     "playerFrame": {
       "unlock": "Sposta il riquadro del giocatore",
       "lock": "Blocca il riquadro del giocatore"
+    },
+    "partyFrames": {
+      "section": "Riquadri gruppo e incursione",
+      "unlock": "Sposta i riquadri di gruppo e incursione",
+      "lock": "Blocca i riquadri di gruppo e incursione",
+      "style": "Stile riquadri",
+      "styleAutomatic": "Automatico",
+      "styleClassic": "Riquadri gruppo classici",
+      "styleRaid": "Riquadri incursione",
+      "scale": "Scala riquadro",
+      "width": "Larghezza riquadro",
+      "height": "Altezza riquadro",
+      "spacing": "Spaziatura riquadri",
+      "columns": "Colonne incursione",
+      "healthText": "Testo salute",
+      "healthNone": "Nessuno",
+      "healthPercent": "Percentuale",
+      "healthCurrent": "Attuale",
+      "healthCurrentMax": "Attuale / max",
+      "sort": "Ordina giocatori",
+      "sortGroup": "Gruppo",
+      "sortRole": "Ruolo",
+      "sortName": "Nome",
+      "showResource": "Mostra mana, rabbia ed energia",
+      "showAbsorbs": "Mostra scudi di assorbimento",
+      "showAuras": "Mostra potenziamenti e penalità",
+      "showSelf": "Mostra il tuo riquadro"
     },
     "frameReset": {
       "label": "Ripristina le posizioni dei riquadri"
@@ -2141,6 +2392,9 @@ export const it_IT: EnTranslations = {
       "already_linked": "Il tuo account ha già un account Steam collegato.",
       "account_taken": "Quell'account Steam è già collegato a un altro account.",
       "upstream": "Steam non ha risposto. Riprova tra un istante."
+    },
+    "welcome": {
+      "invalid_input": "Dati non validi."
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const it_IT: EnTranslations = {
       "effectsTitle": "Potenziamenti, malus e controllo della folla",
       "effectsBody": "Molte abilità applicano un effetto che permane. Quelli benefici (potenziamenti) aumentano le tue statistiche, ti proteggono o ti curano un po' alla volta; quelli dannosi (malus) ti prosciugano la salute con danno nel tempo o ti indeboliscono. Tieni d'occhio le piccole icone nell'angolo in alto dello schermo, accanto alla minimappa, per vedere cosa hai addosso e quanto dura.",
       "ccBody": "Il controllo della folla è un tipo speciale di malus che limita ciò che un bersaglio può fare: stordimenti, radicamenti e rallentamenti, silenzi che fermano il lancio di incantesimi, disarmi, paure e trasformazioni che rendono un nemico inoffensivo per un momento. Contro gli altri giocatori, il controllo si logora con la ripetizione: lo stesso tipo riapplicato troppo in fretta si indebolisce e poi fallisce del tutto, e uno stordimento che apre dalla furtività viene conteggiato a parte rispetto agli stordimenti che seguono, così nessuno può essere incatenato indifeso per sempre. Le creature del mondo non serbano un tale rancore: su di loro il controllo non si indebolisce mai con la ripetizione, anche se molti dei nemici più possenti, gli elite dotati di nome e i boss più forti tra loro, non possono essere controllati affatto.",
-      "metersBody": "Curioso di sapere com'è andato uno scontro? Premi Z per aprire i misuratori del gruppo, che tengono il conto di danno, cure e minaccia della tua squadra, scontro per scontro.",
+      "metersBody": "Curioso di sapere com'è andato uno scontro? Premi Shift+H per aprire i misuratori del gruppo, che tengono il conto di danno, cure e minaccia della tua squadra, scontro per scontro.",
       "queueTitle": "La tua prossima mossa è già pronta",
       "queueBody": "Non devi cronometrare le pressioni al singolo istante. Premi la prossima abilità negli attimi finali del lancio in corso e viene messa in coda, scattando nell'istante in cui il lancio si completa, così il gioco esperto scorre senza pause. Una pressione troppo anticipata viene semplicemente rifiutata, quindi nulla va sprecato. Alcuni colpi in mischia funzionano allo stesso modo, partendo con il tuo prossimo fendente.",
       "deathTitle": "Quando cadi",
@@ -2505,7 +2759,7 @@ export const it_IT: EnTranslations = {
       "petBarTerm": "Barra del famiglio",
       "petBarDef": "La fila di comandi che aggiunge un famiglio del cacciatore o dello stregone: Attacca, Ferma, Provoca, Difensivo e Aggressivo, associati a Ctrl più 1-5 di default.",
       "metersTerm": "Misuratori di danno",
-      "metersDef": "La finestra tabellone del gruppo per lo scontro in corso: danno inflitto, cure prestate e chi regge più minaccia, tenuti scontro per scontro. Aprila con la sua scorciatoia (Z di default).",
+      "metersDef": "La finestra tabellone del gruppo per lo scontro in corso: danno inflitto, cure prestate e chi regge più minaccia, tenuti scontro per scontro. Aprila con la sua scorciatoia (Shift+H di default).",
       "targetMarkerTerm": "Simbolo bersaglio",
       "targetMarkerDef": "Un simbolo che qualsiasi membro del gruppo o dell'incursione può fissare su un bersaglio così tutti si concentrano, o evitano, lo stesso. Otto simboli, un bersaglio per simbolo.",
       "loadoutTerm": "Configurazione",
@@ -2886,6 +3140,8 @@ export const it_IT: EnTranslations = {
       "heroicRewardsTitle": "Marchi Eroici e bottino potenziato",
       "heroicRewardsBody": "I boss eroici lasciano cadere il bottino che conosci, potenziato e contrassegnato come Eroico nel suggerimento, e il boss finale di ogni spedizione aggiunge oggetti epici introvabili altrove. Quell'ultima uccisione lascia anche Marchi Eroici a ogni partecipante: una valuta da spendere con il Quartiermastro Vex a Highwatch, la cui scorta di anelli e collane è l'unica gioielleria del reame.",
       "heroicLockoutBody": "I dungeon normali si possono affrontare tutto il giorno. L'eroica chiede pazienza: l'uccisione del boss finale blocca tutti i presenti a una sola conquista eroica di quel dungeon al giorno, e l'incursione mantiene un blocco giornaliero per ciascuna difficoltà. Una spedizione a cinque giocatori già completata resta aperta al suo stesso gruppo per le corse al cadavere e il bottino, così nessuno viene escluso da ciò che vi ha guadagnato. L'incursione è più severa: una volta che la sua uccisione ti blocca, la porta resta chiusa fino al ripristino giornaliero, perciò raccogli il tuo bottino prima di lasciare l'arena.",
+      "resetTitle": "Reimpostare le istanze",
+      "resetBody": "Se cambi difficoltà mentre il gruppo conserva ancora delle spedizioni assegnate, le vecchie assegnazioni restano per un po’ prima di svanire. Il capogruppo può abbandonarle subito scegliendo Reimposta tutte le istanze dal menu del proprio ritratto oppure digitando /dungeon reset. La difficoltà deve essere stata davvero cambiata, nessuno, vivo o caduto, può trovarsi all’interno e tra due ripristini passa un breve tempo di recupero. Se arrivi all’ingresso con la difficoltà sbagliata, il gioco ti avvisa prima dell’inizio. L’incursione non viene mai reimpostata così e mantiene le proprie regole di vincolo.",
       "templeLoreTitle": "Il Tempio Annegato, un po' più a fondo",
       "templeLoreBody": "Il tempio ha una sua leggenda, più antica del culto che insegui altrove. Sulla riva del Glimmermere, un laghetto che beve la luce della luna e restituisce gli annegati, un solitario guardiano custodisce una porta di pallida luce. Sotto la superficie, una scalinata di pietra fredda scende fino ad esso. Coloro che vi affondarono non annegarono per disgrazia: erano il Coro Pallido, che si immerse in preghiera e non smise mai di cantare. I vecchi custodi incisero un solo avvertimento nelle rocce prima che l'acqua li prendesse, una preghiera a qualcosa che chiamavano la Luna Annegata, con una mano più ferma che aggiunse due parole sotto di essa: dorme soltanto.",
       "cryptLeadTitle": "Una porta che i morti dovevano tenere chiusa",
@@ -3083,7 +3339,7 @@ export const it_IT: EnTranslations = {
       "bagsTitle": "Borse e spazio di carico",
       "bagsBody": "Tutto ciò che raccogli viaggia in un unico zaino condiviso, che ingrandisci equipaggiando borse. La finestra delle borse tiene quattro slot per borse: clicca una borsa nello zaino per infilarla in uno slot libero, e ogni borsa che indossi aggiunge il proprio spazio. Le borse semplici sono merce da poco dei venditori, quelle più capienti cadono dalle bestie, e le migliori vengono dai boss dei dungeon, così il tuo spazio di carico cresce di pari passo con il tuo equipaggiamento.",
       "qualityTitle": "La qualità, a colpo d'occhio",
-      "qualityBody": "Ogni oggetto ha una qualità, e il suo nome è colorato di conseguenza così puoi leggerne il valore a colpo d'occhio. Dal più comune al più pregiato:",
+      "qualityBody": "Ogni oggetto ha una qualità e il suo nome assume il colore corrispondente, così puoi capirne il valore a colpo d’occhio. Dal più comune al più prezioso:",
       "qualityPoor": "Scadente",
       "qualityCommon": "Comune",
       "qualityUncommon": "Non comune",
@@ -3093,7 +3349,7 @@ export const it_IT: EnTranslations = {
       "qualityNote": "Una qualità superiore di solito significa statistiche migliori, ma la qualità è un indizio, non una regola. Un pezzo ben adatto alla tua classe e al tuo livello può battere uno più appariscente.",
       "upgradeTitle": "Tieni il tuo equipaggiamento aggiornato",
       "upgradeBody": "Sostituire un vecchio pezzo con un miglioramento fresco fa di più per te che giocare alla perfezione con un equipaggiamento che hai superato. Quando cade qualcosa di migliore o una missione te lo offre, prendilo. Non conservare i tuoi oggetti buoni per dopo.",
-      "itemLevelBody": "Se vuoi un modo rapido per confrontare due pezzi, attiva Mostra livello oggetto nelle opzioni. L'equipaggiamento conquistato nel mondo, da nemici e missioni, mostra allora un livello oggetto, un singolo numero che indica all'incirca quanto è potente in base alla sua provenienza, così puoi capire a colpo d'occhio quale miglioramento conta di più, anche tra slot diversi. I pezzi privi di tale origine, come le basi comuni dei venditori e l'equipaggiamento iniziale, non mostrano alcun livello oggetto, perciò un numero mancante è normale, non un difetto.",
+      "itemLevelBody": "Per confrontare rapidamente due pezzi, attiva Mostra livello oggetto nelle opzioni. L’equipaggiamento di provenienza nota, ottenuto da nemici, missioni e mestieri, mostra un livello oggetto: un unico valore che ne indica approssimativamente la potenza in base alla fonte e rende immediata la scelta del miglior potenziamento, anche tra slot diversi. I pezzi senza tale provenienza, come gli articoli base dei mercanti e l’equipaggiamento iniziale, non mostrano alcun livello; è normale.",
       "sourcesTitle": "Da dove arriva l'equipaggiamento",
       "sourcesBody": "Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, gli artigiani trasformano i materiali raccolti in pezzi indossabili, e il mercato dei giocatori ti permette di comprare da altri avventurieri. In cima alla scalata, due valute in marchi comprano equipaggiamento introvabile altrove: i Sigilli d'Incursione presso il custode delle incursioni, e i Marchi Eroici presso il Quartiermastro Eroico.",
       "soulboundTitle": "Vincolato all'anima: tuo e tuo soltanto",
@@ -3137,7 +3393,7 @@ export const it_IT: EnTranslations = {
       "craftRecipesTitle": "Ricette e reagenti",
       "craftRecipesBody": "Ogni ricetta richiede reagenti specifici da raccogliere o comprare. Le ricette più semplici non chiedono altro che materiali comuni e si possono creare fin dall'inizio, così puoi cominciare a esercitare un mestiere nel momento in cui lo scegli. Le liste delle ricette si stanno ancora completando: alcuni mestieri sono in attesa delle loro prime ricette, e altre ne arrivano man mano che i mestieri crescono.",
       "craftHowTitle": "La finestra di creazione",
-      "craftHowBody": "Apri la finestra di Creazione (tasto predefinito T) per vedere ogni ricetta che conosci, cosa richiede ciascuna e cosa hai a disposizione; quando i materiali ci sono, un clic fa il lavoro. Le ricette comuni si possono creare ovunque nel mondo. Una manciata di ricette avanzate per attrezzi ti chiede invece di trovarti alla postazione artigiana di Highwatch.",
+      "craftHowBody": "Apri la finestra Creazione (tasto predefinito T) per vedere tutte le ricette note, i loro requisiti e ciò che possiedi; quando hai i materiali basta un clic. Le ricette comuni si possono creare ovunque. Alcune ricette avanzate, tra cui strumenti di livello superiore e rare armature da incantatore, richiedono invece il centro di creazione di Highwatch.",
       "craftMasteryTitle": "Abilità e maestria",
       "craftMasteryBody": "Creare con successo accresce l'abilità in quel mestiere, e l'abilità non blocca mai le ricette di un mestiere: se conosci una ricetta e ne possiedi i materiali, puoi tentarla. Ciò che l'abilità ti dà è invece la qualità, una mano esperta produce lavori più fini. L'unica eccezione sono le ricette combinate, che ti chiedono di esserti dimostrato valido in entrambi i loro mestieri prima di aprirsi.",
       "craftComboTitle": "Ricette combinate",
@@ -4928,6 +5184,29 @@ export const it_IT: EnTranslations = {
     "body": "Stiamo riavviando il servizio di gioco e prevediamo che Claudemoon torni a breve. Questa pagina continuerà a controllare automaticamente.",
     "status": "Torna presto"
   },
+  "welcome": {
+    "back": "Bentornato, {name}",
+    "level": "Livello {level}",
+    "lastPlayed": "Ultima partita: {when}",
+    "continue": "Entra nel mondo",
+    "continueHint": "Invio per continuare, Esc per saltare",
+    "continueHintTouch": "Tocca per continuare",
+    "discord": {
+      "title": "La community vive su Discord",
+      "sub": "Anteprime delle patch, eventi, chat con gli sviluppatori e 2 spazi bonus in banca collegando il tuo account Discord.",
+      "join": "Unisciti al nostro Discord"
+    },
+    "chest": {
+      "ready": "Forziere delle ricompense giornaliere pronto"
+    },
+    "armory": {
+      "cta": "Entra nel mondo ed esplora l’Armeria"
+    },
+    "news": {
+      "new": "Novità",
+      "viewAll": "Vedi tutti gli aggiornamenti su GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ÉLITE",
@@ -5663,7 +5942,8 @@ export const it_IT: EnTranslations = {
       "tool": "Strumento",
       "potion": "Pozione",
       "elixir": "Elisir",
-      "bag": "Borsa"
+      "bag": "Borsa",
+      "mount": "Cavalcatura"
     },
     "stats": {
       "armor": "Armatura",
@@ -6458,7 +6738,7 @@ export const it_IT: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sangue di Lupo",
-        "description": "Aumenta la potenza d'attacco di 40 per 6 sec. Solo Forma del Lupo."
+        "description": "Aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo."
       },
       "rip": {
         "name": "Squartare",
@@ -6749,6 +7029,24 @@ export const it_IT: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Pantaloni di lana di Eastbrook"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Vesti rituali di Eastbrook"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Pelle del druido di Eastbrook"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Gambali protetti di Eastbrook"
+      },
+      "wardweave_cowl": {
+        "name": "Cappuccio di tessuto protettivo"
+      },
+      "duskhide_wraps": {
+        "name": "Fasce di pelle del crepuscolo"
+      },
+      "sootscale_mantle": {
+        "name": "Mantello di scaglie fuligginose"
       },
       "gravecaller_blade": {
         "name": "Lama larga di Gravecaller"
@@ -8171,6 +8469,27 @@ export const it_IT: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guardacintura del Chiamatempeste"
+      },
+      "reins_valorsteed": {
+        "name": "Redini del Destriero del Valore"
+      },
+      "reins_grag_bear": {
+        "name": "Redini dell’Orso Grag Golia"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Redini dell’Aliante dal Guscio Muschioso"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Chiave di accensione: Aerociclo del Giostratore d’Etere"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Redini di Kama-Kage, il Rospo Saltombra"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Redini del Piumatempesta Toccacielo"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Redini di Passotuono, il Gran Tacchino"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const it_IT: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Elementale di tempesta ridestato"
+      },
+      "stable_horse": {
+        "name": "Cavallo da stalla"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -8821,6 +9143,11 @@ export const it_IT: EnTranslations = {
         "name": "Caposquadra Odell",
         "title": "Caposquadra della miniera",
         "greeting": "Tutta la galleria brulica di quei parassiti incrostati di fango!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stalliera capo",
+        "greeting": "Ogni cavaliere arriva sulle proprie gambe, {className}. Non ti darò le redini finché non saprai restare in sella al Destriero del Valore senza baciare il fango, e a Highwatch non abbondano i guaritori per le ossa rotte."
       },
       "warden_fenwick": {
         "name": "Custode Fenwick",
@@ -9821,6 +10148,16 @@ export const it_IT: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Lezioni di equitazione",
+        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Paga la quota e, quando te lo dico, chiama a te il Destriero del Valore da addestramento e sali in sella. Poi affronta il percorso: segui il segnale fino all’arco di partenza, supera pulito ogni ostacolo e taglia di nuovo il traguardo prima che la sabbia si esaurisca. Riuscirci, e la sella è tua. Esci dal recinto e si ricomincia.",
+        "completion": "Ecco, così. Su con un solo movimento pulito e ben saldo in sella. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.",
+        "objectives": {
+          "0": {
+            "label": "Doma il Destriero del Valore"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10137,6 +10474,9 @@ export const it_IT: EnTranslations = {
           },
           "9": {
             "label": "Santuario del Gravewyrm"
+          },
+          "10": {
+            "label": "Stalle di Highwatch"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const it_IT: EnTranslations = {
         "sender": "Fratello Aldric",
         "subject": "Ciò che hai compiuto nel buio",
         "body": "Pochi sapranno mai cosa giaceva sepolto in quella conca, e ancora meno ci crederebbero. Io lo so, e non lo dimenticherò.\n\nChe la tua strada resti illuminata.\n- Fratello Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Quartiermastro eroico",
+        "subject": "I tuoi Marchi eroici",
+        "body": "Il tuo gruppo ha superato la prova eroica mentre combattevi nelle retrovie o giacevi a terra. Anche il tuo vincolo è stato registrato, quindi la tua parte di Marchi eroici è arrivata qui invece di andare perduta. Usali bene.\n\n- Quartiermastro eroico"
       }
     },
     "itemSets": {

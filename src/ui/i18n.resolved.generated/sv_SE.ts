@@ -20,6 +20,154 @@ export const sv_SE: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Central för utvecklarkommandon",
+    "kicker": "Utvecklingsverktyg",
+    "title": "Kommandocentral",
+    "subtitle": "Serverstyrda testkontroller för den aktiva världen.",
+    "closeAria": "Stäng utvecklarkommandon",
+    "categoryNavAria": "Kategorier för utvecklarkommandon",
+    "categories": {
+      "player": "Spelare",
+      "spawns": "Skapade varelser",
+      "inventory": "Inventarium",
+      "progress": "Framsteg",
+      "travel": "Resor",
+      "scenarios": "Scenarier"
+    },
+    "filterLabel": "Filtrera kommandon",
+    "filterPlaceholder": "Sök i den här kategorin",
+    "noMatches": "Inga matchande kommandon.",
+    "serverRequirement": "Serverfusk kräver fortfarande ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Välj giltiga värden innan du kör kommandot.",
+    "sent": "Skickat: {command}",
+    "run": "Kör",
+    "fields": {
+      "level": "Nivå",
+      "mob": "Varelse",
+      "count": "Antal",
+      "item": "Föremål",
+      "gold": "Guld",
+      "quest": "Uppdrag",
+      "profession": "Yrke",
+      "amount": "Mängd",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Fängelsehåla",
+      "difficulty": "Svårighetsgrad",
+      "name": "Namn"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroisk"
+    },
+    "actions": {
+      "heal": {
+        "label": "Återställ hälsa",
+        "description": "Fyll hela hälsomätaren."
+      },
+      "resource": {
+        "label": "Återställ resurs",
+        "description": "Fyll på mana, raseri eller energi."
+      },
+      "cooldowns": {
+        "label": "Rensa återhämtningstider",
+        "description": "Återställ förmåge-, GCD- och dryckestimers."
+      },
+      "god": {
+        "label": "Växla gudaläge",
+        "description": "Slå på eller av osårbarhet och förstärkt skada."
+      },
+      "revive": {
+        "label": "Återuppliva",
+        "description": "Återuppliva genom den vanliga återuppståndelsevägen."
+      },
+      "kill": {
+        "label": "Döda spelaren",
+        "description": "Testa flöden för död, spöke och lik."
+      },
+      "combatreset": {
+        "label": "Återställ strid",
+        "description": "Rensa stridstillstånd och fientligt hot."
+      },
+      "level": {
+        "label": "Ange nivå",
+        "description": "Ange den aktuella karaktärsnivån."
+      },
+      "spawn": {
+        "label": "Skapa varelse",
+        "description": "Skapa en bestämd varelse nära spelaren."
+      },
+      "killtarget": {
+        "label": "Döda målet",
+        "description": "Döda den valda levande varelsen."
+      },
+      "despawntarget": {
+        "label": "Ta bort målet",
+        "description": "Ta bort en vald varelse som skapats med det här verktyget."
+      },
+      "despawnall": {
+        "label": "Rensa mina skapade varelser",
+        "description": "Ta bort alla varelser som den här utvecklaren har skapat."
+      },
+      "give": {
+        "label": "Ge föremål",
+        "description": "Lägg till ett föremål i spelarens inventarium."
+      },
+      "gold": {
+        "label": "Lägg till guld",
+        "description": "Lägg till guld i den aktuella börsen."
+      },
+      "quest": {
+        "label": "Slutför uppdrag",
+        "description": "Slutför ett särskilt uppdrag via id."
+      },
+      "quests": {
+        "label": "Slutför aktiva uppdrag",
+        "description": "Slutför alla uppdrag i den aktuella loggen."
+      },
+      "attune": {
+        "label": "Lås upp länkningar",
+        "description": "Markera alla länkningskrav som slutförda."
+      },
+      "gather": {
+        "label": "Ge insamlingsfärdighet",
+        "description": "Höj färdigheten i ett insamlingsyrke."
+      },
+      "teleport": {
+        "label": "Teleportera",
+        "description": "Flytta till exakta världskoordinater."
+      },
+      "dungeon": {
+        "label": "Gå in i fängelsehåla",
+        "description": "Gå in i en fängelsehåla utan utvecklarspärren."
+      },
+      "raid": {
+        "label": "Gå in i raid",
+        "description": "Gå direkt in i Nythraxis arena."
+      },
+      "raidreset": {
+        "label": "Återställ raidlåsning",
+        "description": "Rensa de aktuella raidlåsningarna."
+      },
+      "bot": {
+        "label": "Skapa social bot",
+        "description": "Skapa en stillastående spelare som kan ta emot viskningar."
+      },
+      "lfgqueue": {
+        "label": "Förbered sökkön",
+        "description": "Skapa ett scenario för kön till instanssökaren."
+      },
+      "lfgraid": {
+        "label": "Förbered raidsökaren",
+        "description": "Skapa ett scenario för raidsökaren."
+      },
+      "lfgboard": {
+        "label": "Förbered annonstavlan",
+        "description": "Skapa ett scenario med en färdig gruppannons."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -229,6 +377,7 @@ export const sv_SE: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} h {minutes} min",
+      "remainingDaysHours": "{days} dagar {hours} timmar",
       "score": "Poäng",
       "walletValue": "Plånbokens värde (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const sv_SE: EnTranslations = {
         "no_wallet": "Anslut en plånbok med minst 20 USD i WOC.",
         "under_minimum": "Plånboken är under WOC-miniminivån på 20 USD.",
         "price_unavailable": "WOC-priset är otillgängligt, belöningar är tillfälligt låsta.",
-        "banned": "Du är avstängd från dagliga belöningar. Orsak: {reason}"
+        "banned": "Du är avstängd från dagliga belöningar. Orsak: {reason}",
+        "bannedUntil": "Du är avstängd från dagliga belöningar i ytterligare {remaining}. Åtkomsten återkommer {until}. Orsak: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const sv_SE: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Claudium-butiken är inte tillgänglig just nu. Ditt saldo och dina köp påverkas inte. Försök igen om en stund.",
       "disclosure": "Claudium är en virtuell valuta som bara går åt ett håll: köp den för pengar och använd den till kosmetika. Den kan inte växlas in, överföras eller betalas ut.",
@@ -499,6 +650,7 @@ export const sv_SE: EnTranslations = {
       "railLabel": "Betalningsmetod",
       "railStripe": "Kort",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% rabatt",
       "railWocUnavailable": "WOC-priser är inte tillgängliga just nu.",
@@ -602,6 +754,7 @@ export const sv_SE: EnTranslations = {
       "leaderboard": "Ranking",
       "dailyRewards": "Butik",
       "deeds": "Bedrifter",
+      "mounts": "Mounts",
       "nameplates": "Namn",
       "haptics": "Haptik",
       "hapticsOff": "Haptik av",
@@ -716,7 +869,63 @@ export const sv_SE: EnTranslations = {
       "petStop": "Djur: Stanna",
       "petTaunt": "Djur: Provocera",
       "petDefensive": "Djur: Defensivt",
-      "petAggressive": "Djur: Aggressivt"
+      "petAggressive": "Djur: Aggressivt",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Dalcupen",
@@ -870,6 +1079,7 @@ export const sv_SE: EnTranslations = {
       "interfaceModeTouch": "Pek",
       "interfaceModeNote": "Auto väljer skrivbords- eller pekkontroller utifrån din enhet. Välj Skrivbord för att tvinga fram tangentbord och mus (användbart på en surfplatta med tangentbord), eller Pek för skärmkontrollerna.",
       "footstepSounds": "Fotstegsljud",
+      "interfaceSounds": "Gränssnitts- och responsljud",
       "clickFeedback": "Klickmarkör",
       "lockCursorOnRotate": "Lås pekare under rotation",
       "keybindHelpLockCursorOnRotate": "Håller muspekaren inuti fönstret medan du drar för att rotera kameran, så att den inte kan nå skärmkanten eller flytta till en annan skärm. Stäng av om du föredrar en fri pekare.",
@@ -1309,7 +1519,20 @@ export const sv_SE: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Ställ in fängelsehålans svårighetsgrad: Heroisk",
-      "setNormal": "Ställ in fängelsehålans svårighetsgrad: Normal"
+      "setNormal": "Ställ in fängelsehålans svårighetsgrad: Normal",
+      "resetAll": "Återställ alla instanser",
+      "resetDone": "Alla instanser har återställts.",
+      "resetNone": "Du har inga instanser att återställa.",
+      "resetOccupied": "Du kan inte återställa instanser medan någon fortfarande är kvar inuti.",
+      "resetSameDifficulty": "Ändra fängelsehålans svårighetsgrad innan du återställer dessa instanser. Tomma instanser återställs automatiskt efter 5 minuter.",
+      "resetLoot": "Du kan inte återställa instanser medan byte finns kvar inuti.",
+      "resetConfirmTitle": "Återställ alla instanser?",
+      "resetConfirmBody": "Detta överger tomma instanser från din tidigare valda svårighetsgrad. Outhämtat byte förhindrar återställningen.",
+      "resetConfirm": "Återställ instanser",
+      "resetCooldown": "Instanser kan bara återställas en gång var 5:e minut.",
+      "resetUsage": "Använd /dungeon reset för att överge dina tomma instanser efter att du har ändrat svårighetsgraden.",
+      "entryMismatchNormal": "Den här instansen är inställd på Normal svårighetsgrad. Använd Återställ alla instanser för att starta en ny Heroisk omgång.",
+      "entryMismatchHeroic": "Den här instansen är inställd på Heroisk svårighetsgrad. Använd Återställ alla instanser för att starta en ny Normal omgång."
     },
     "bags": {
       "cannotDestroy": "Det här föremålet kan inte förstöras.",
@@ -1324,6 +1547,7 @@ export const sv_SE: EnTranslations = {
       "filterConsumable": "Förbrukningsvaror",
       "filterMaterial": "Material",
       "filterQuest": "Uppdrag",
+      "filterMount": "Riddjur",
       "sortAria": "Sortera väskföremål",
       "sortRecent": "Senaste",
       "sortQuality": "Kvalitet",
@@ -1478,6 +1702,33 @@ export const sv_SE: EnTranslations = {
     "playerFrame": {
       "unlock": "Flytta spelarramen",
       "lock": "Lås spelarramen"
+    },
+    "partyFrames": {
+      "section": "Grupp- och raidramar",
+      "unlock": "Flytta grupp- och raidramar",
+      "lock": "Lås grupp- och raidramar",
+      "style": "Ramstil",
+      "styleAutomatic": "Automatisk",
+      "styleClassic": "Klassiska gruppramar",
+      "styleRaid": "Raidramar",
+      "scale": "Ramskala",
+      "width": "Rambredd",
+      "height": "Ramhöjd",
+      "spacing": "Ramavstånd",
+      "columns": "Raidkolumner",
+      "healthText": "Hälsotext",
+      "healthNone": "Ingen",
+      "healthPercent": "Procent",
+      "healthCurrent": "Nuvarande",
+      "healthCurrentMax": "Nuvarande / max",
+      "sort": "Sortera spelare",
+      "sortGroup": "Grupp",
+      "sortRole": "Roll",
+      "sortName": "Namn",
+      "showResource": "Visa mana, raseri och energi",
+      "showAbsorbs": "Visa absorptionssköldar",
+      "showAuras": "Visa positiva och negativa effekter",
+      "showSelf": "Visa din ram"
     },
     "frameReset": {
       "label": "Återställ ramarnas positioner"
@@ -2141,6 +2392,9 @@ export const sv_SE: EnTranslations = {
       "already_linked": "Ditt konto har redan ett länkat Steam-konto.",
       "account_taken": "Det Steam-kontot är redan länkat till ett annat konto.",
       "upstream": "Steam svarade inte. Försök igen om en stund."
+    },
+    "welcome": {
+      "invalid_input": "Ogiltig indata."
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const sv_SE: EnTranslations = {
       "effectsTitle": "Förstärkningar, försvagningar och masskontroll",
       "effectsBody": "Många förmågor lägger på en effekt som dröjer kvar. Hjälpsamma (förstärkningar) höjer dina egenskaper, skyddar dig eller läker dig lite i taget; skadliga (försvagningar) tömmer din hälsa med skada över tid eller försvagar dig. Håll koll på de små ikonerna i skärmens övre hörn, bredvid minikartan, för att se vad som ligger på dig och hur länge det varar.",
       "ccBody": "Masskontroll är ett särskilt slags försvagning som begränsar vad ett mål kan göra: bedövningar, rötter och nedsaktningar, tystnader som stoppar besvärjelser, avväpningar, skräckeffekter, och förvandlingar som gör en fiende ofarlig för ett ögonblick. Mot andra spelare tunnas kontrollen ut av upprepning: samma slag som läggs på igen för snabbt försvagas och slutar sedan verka helt, och en bedövning som inleds från smygläge räknas skilt från de bedövningar som följer, så ingen kan kedjas hjälplös i all evighet. Världens varelser hyser inget sådant agg: kontroll försvagas aldrig av upprepning mot dem, även om många av de mäktigaste fienderna, namngivna eliter och de starkaste bossarna bland dem, inte kan kontrolleras alls.",
-      "metersBody": "Nyfiken på hur en strid gick? Tryck på Z för att öppna gruppmätarna, som räknar skada, läkning och hot för din grupp, drabbning för drabbning.",
+      "metersBody": "Nyfiken på hur en strid gick? Tryck på Shift+H för att öppna gruppmätarna, som räknar skada, läkning och hot för din grupp, drabbning för drabbning.",
       "queueTitle": "Ditt nästa drag är redan laddat",
       "queueBody": "Du behöver inte tajma dina tryck till bildrutan. Tryck på din nästa förmåga under de sista ögonblicken av den pågående besvärjelsen, så köas den och avfyras i samma stund som besvärjelsen är klar, så att inövat spel flyter utan luckor. Ett tryck för tidigt avvisas helt enkelt, så inget går till spillo. Vissa närstridshugg fungerar likadant och rider ut på din nästa vapensving.",
       "deathTitle": "När du faller",
@@ -2505,7 +2759,7 @@ export const sv_SE: EnTranslations = {
       "petBarTerm": "Djurrad",
       "petBarDef": "Kommandoraden som ett jägar- eller häxmästardjur lägger till: Anfall, Stopp, Håna, Defensiv och Aggressiv, bundna till Ctrl plus 1 till 5 som standard.",
       "metersTerm": "Skademätare",
-      "metersDef": "Gruppens resultattavla för den pågående striden: skada given, läkning utförd och vem som håller mest hot, sparat per drabbning. Öppna den med dess tangentbindning (Z som standard).",
+      "metersDef": "Gruppens resultattavla för den pågående striden: skada given, läkning utförd och vem som håller mest hot, sparat per drabbning. Öppna den med dess tangentbindning (Shift+H som standard).",
       "targetMarkerTerm": "Målmarkör",
       "targetMarkerDef": "En symbol som vilken grupp- eller raidmedlem som helst kan fästa över ett mål så att alla fokuserar på, eller undviker, samma. Åtta symboler, ett mål per symbol.",
       "loadoutTerm": "Uppsättning",
@@ -2886,6 +3140,8 @@ export const sv_SE: EnTranslations = {
       "heroicRewardsTitle": "Heroiska märken och uppgraderat byte",
       "heroicRewardsBody": "Heroiska bossar släpper bytet du känner igen, uppgraderat och märkt Heroisk i verktygstipset, och den sista bossen i varje pass lägger till episka föremål som inte finns någon annanstans. Det sista dråpet lämnar också Heroiska märken åt varje deltagare: en valuta du spenderar hos Kvartersmästare Vex i Highwatch, vars lager av ringar och halsband är rikets enda smycken.",
       "heroicLockoutBody": "Normala fängelsehålor går att köra hela dagen. Heroiskt kräver tålamod: dråpet på den sista bossen låser alla i passet till en heroisk rensning av den fängelsehålan per dag, och raiden håller en daglig spärr för varje svårighetsgrad. Ett rensat pass för fem spelare förblir öppet för den egna gruppen för likfärder och byte, så att ingen låses ute från det de förtjänat där. Raiden är strängare: så snart dess dråp låser dig förblir dörren stängd fram till den dagliga återställningen, så samla dina byten innan du lämnar arenan.",
+      "resetTitle": "Återställa dina instanser",
+      "resetBody": "Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.",
       "templeLoreTitle": "Det dränkta templet, lite djupare",
       "templeLoreBody": "Templet har sin egen legend, äldre än kulten du jagar på andra håll. Vid stranden av Glimmertjärnen, en tjärn som dricker månljuset och ger tillbaka de dränkta, vaktar en ensam väktare en port av blekt ljus. Under ytan löper en trappa av kall sten ner till den. Folket som sjönk där dränktes inte av olyckshändelse: de var Den bleka kören, som gick under i tillbedjan och aldrig slutade sjunga. De gamla väktarna ristade en enda varning i klipporna innan vattnet tog dem, en bön till något de kallade Den dränkta månen, med en stadigare hand som lade till två ord under den: den bara sover.",
       "cryptLeadTitle": "En dörr de döda var menade att hålla stängd",
@@ -3093,7 +3349,7 @@ export const sv_SE: EnTranslations = {
       "qualityNote": "Högre kvalitet betyder oftast bättre egenskaper, men kvalitet är en ledtråd, inte en regel. En välmatchad pjäs för din klass och nivå kan slå en flashigare.",
       "upgradeTitle": "Håll din utrustning aktuell",
       "upgradeBody": "Att byta ut en gammal pjäs mot en ny uppgradering gör mer för dig än att spela perfekt i utrustning du vuxit ur. När något bättre släpps eller ett uppdrag erbjuder det, ta det. Spara inte dina goda föremål till senare.",
-      "itemLevelBody": "Om du vill ha ett snabbt sätt att jämföra två pjäser, slå på Visa föremålsnivå i alternativen. Utrustning som vunnits ute i världen, från fiender och uppdrag, visar då en föremålsnivå, en enda siffra för ungefär hur kraftfull den är utifrån var den kom ifrån, så att du på ett ögonkast kan se vilken uppgradering som väger tyngst, även mellan olika platser. Pjäser utan en sådan källa, som enkla handlarvaror och nybörjarutrustning, visar ingen föremålsnivå, så en saknad siffra är normalt, inte ett fel.",
+      "itemLevelBody": "Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.",
       "sourcesTitle": "Var utrustning kommer ifrån",
       "sourcesBody": "Det mesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender släpper utrustning när du besegrar dem, handlare i staden säljer solida basvaror, hantverkare förvandlar insamlade material till bärbara pjäser, och spelarmarknaden låter dig köpa från andra äventyrare. Högst upp på kullen köper två märkesvalutor utrustning som inte finns någon annanstans: Delve-märken hos delvevaktaren, och heroiska märken hos den heroiska kvartersmästaren.",
       "soulboundTitle": "Själsbunden: din och endast din",
@@ -3137,7 +3393,7 @@ export const sv_SE: EnTranslations = {
       "craftRecipesTitle": "Recept och reagenser",
       "craftRecipesBody": "Varje recept kräver särskilda reagenser du samlar eller köper. De enklaste recepten ber inte om annat än vanliga material och kan tillverkas från allra första början, så du kan börja utöva ett yrke i samma stund du tar upp det. Receptlistorna fylls fortfarande på: några yrken väntar på sina första recept, och fler kommer i takt med att hantverken växer.",
       "craftHowTitle": "Hantverksfönstret",
-      "craftHowBody": "Öppna Hantverksfönstret (standardtangent T) för att se varje recept du kan, vad vart och ett kräver och vad du har till hands; när materialen finns där gör ett klick jobbet. Vanliga recept kan tillverkas var som helst i världen. En handfull avancerade verktygsrecept ber dig i stället att stå vid hantverksnavet i Highwatch.",
+      "craftHowBody": "Öppna hantverksfönstret (standardtangent T) för att se alla recept du kan, vad de kräver och vad du har; när materialen finns räcker ett klick. Vanliga recept kan tillverkas var som helst. Några avancerade recept, däribland verktyg på hög nivå och sällsynta rustningar för besvärjare, kräver hantverksnavet i Highwatch.",
       "craftMasteryTitle": "Skicklighet och mästerskap",
       "craftMasteryBody": "Lyckade hantverk bygger skicklighet i det yrket, och skicklighet låser aldrig bort ett hantverks recept: kan du ett recept och har dess material, kan du försöka dig på det. Vad skicklighet i stället köper dig är kvalitet, en övad hand gör finare arbete. Det enda undantaget är kombinationsrecept, som ber dig ha bevisat dig i båda sina hantverk innan de öppnas.",
       "craftComboTitle": "Kombinationsrecept",
@@ -4928,6 +5184,29 @@ export const sv_SE: EnTranslations = {
     "body": "Vi startar om speltjänsten och förväntar oss att Claudemoon är tillbaka inom kort. Den här sidan fortsätter att kontrollera automatiskt.",
     "status": "Tillbaka snart"
   },
+  "welcome": {
+    "back": "Välkommen tillbaka, {name}",
+    "level": "Nivå {level}",
+    "lastPlayed": "Senast spelad: {when}",
+    "continue": "Träd in i världen",
+    "continueHint": "Enter för att fortsätta, Esc för att hoppa över",
+    "continueHintTouch": "Tryck för att fortsätta",
+    "discord": {
+      "title": "Gemenskapen lever på Discord",
+      "sub": "Förhandsvisningar av patchar, evenemang, utvecklarchatt och 2 bonusfack i banken när du länkar ditt Discord-konto.",
+      "join": "Gå med i vår Discord"
+    },
+    "chest": {
+      "ready": "Kistan för dagliga belöningar är klar"
+    },
+    "armory": {
+      "cta": "Träd in i världen och utforska Vapenhuset"
+    },
+    "news": {
+      "new": "Ny",
+      "viewAll": "Se alla uppdateringar på GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELIT",
@@ -5663,7 +5942,8 @@ export const sv_SE: EnTranslations = {
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir",
-      "bag": "Väska"
+      "bag": "Väska",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Rustning",
@@ -6458,7 +6738,7 @@ export const sv_SE: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Vargblod",
-        "description": "Ökar attackstyrkan med 40 i 6 sek. Endast vargform."
+        "description": "Ökar attackstyrkan med {buff} i {duration} sek. Endast vargform."
       },
       "rip": {
         "name": "Riv upp",
@@ -6749,6 +7029,24 @@ export const sv_SE: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Östbäcks ullbyxor"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Östbäcks Rituella Skrud"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Östbäcksdruidens Hud"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Östbäcks Beskyddade Benkläder"
+      },
+      "wardweave_cowl": {
+        "name": "Skyddsvävd Huva"
+      },
+      "duskhide_wraps": {
+        "name": "Skymningshudslindor"
+      },
+      "sootscale_mantle": {
+        "name": "Sotfjällsmantel"
       },
       "gravecaller_blade": {
         "name": "Gravkallarens bredklinga"
@@ -8171,6 +8469,27 @@ export const sv_SE: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Stormkallarens midjeskydd"
+      },
+      "reins_valorsteed": {
+        "name": "Tyglar till Valorsteed"
+      },
+      "reins_grag_bear": {
+        "name": "Tyglar till Goliat Grag-björnen"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Tyglar till mosskal-stjälkglidaren"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Tändningsnyckel: eterriddarens svävarcykel"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Tyglar till Kama-Kage, skuggsprångspaddan"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Tyglar till den himlanående Stormfjädern"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Tyglar till Åskstoltseraren, den stora kalkonen"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const sv_SE: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Väckt stormyngel"
+      },
+      "stable_horse": {
+        "name": "Stallhäst"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -8821,6 +9143,11 @@ export const sv_SE: EnTranslations = {
         "name": "Förman Odell",
         "title": "Gruvförman",
         "greeting": "Hela utgrävningen kryllar av de där lerinkrustade skadedjuren!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stallmästare",
+        "greeting": "Varje ryttare kommer in på två ben, {className}. Tyglarna får du inte förrän du kan sitta kvar på Valorsteed utan att kyssa leran, och Highwatch har inga läkare att avvara för brutna ben."
       },
       "warden_fenwick": {
         "name": "Väktaren Fenwick",
@@ -9821,6 +10148,16 @@ export const sv_SE: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Ridlektioner",
+        "text": "Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Betala avgiften, och när jag ger tecken kallar du till dig övnings-Valorsteeden och kliver upp i sadeln. Rid sedan banan: följ markören till startbågen, ta varje hinder rent och korsa linjen igen innan sanden runnit ut. Klarar du det är sadeln din. Vandrar du ut ur hagen börjar vi om.",
+        "completion": "Så där ja. Upp i en enda mjuk rörelse och stadigt sittande där uppe. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.",
+        "objectives": {
+          "0": {
+            "label": "Tämj Valorsteed"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10137,6 +10474,9 @@ export const sv_SE: EnTranslations = {
           },
           "9": {
             "label": "Gravlindormens helgedom"
+          },
+          "10": {
+            "label": "Highwatchs stall"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const sv_SE: EnTranslations = {
         "sender": "Broder Aldric",
         "subject": "Det du gjorde i mörkret",
         "body": "Få kommer någonsin att veta vad som låg begravet i den sänkan, och ännu färre skulle tro det. Jag vet, och jag kommer inte att glömma.\n\nMå din väg förbli upplyst.\n- Broder Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Heroisk kvartermästare",
+        "subject": "Dina heroiska märken",
+        "body": "Din grupp klarade den heroiska prövningen medan du kämpade i eftertruppen eller låg fallen. Din låsning registrerades ändå, så din andel heroiska märken skickades hit i stället för att gå förlorad. Använd dem väl.\n\n- Heroisk kvartermästare"
       }
     },
     "itemSets": {

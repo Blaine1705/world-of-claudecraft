@@ -741,6 +741,15 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   if (e.kind === 'player') {
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
+    // Death force-dismounts (the mount bolts); the persisted selection stays,
+    // so remounting after the corpse run is one keypress. Stats recalc on the
+    // next mount toggle / resurrect recalc, and a dead player draws no swings,
+    // so the stale crit mirror is inert. Draws no rng. Any in-flight summon or
+    // dismount transition is cancelled too, so a mid-cast death does not leave a
+    // rooted, half-summoned player.
+    e.mountKey = '';
+    e.mountCastRemaining = 0;
+    e.mountCastKey = '';
     // The Book of Deeds death hook (lifetime deaths counter, the Keeper's Toll
     // delight, perfection-window taints, the world-boss survival record) already
     // ran above, before the hate tables were cleared.

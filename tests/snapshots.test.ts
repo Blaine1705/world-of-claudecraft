@@ -25,7 +25,9 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
+import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES } from '../src/sim/data';
+import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -150,6 +152,10 @@ function bareClient(pid: number): ClientWorld {
   c.pendingSpectateFacing = null;
   c.nodeCooldowns = new Map();
   return c;
+}
+
+function feedEventFrame(client: ClientWorld, frame: unknown): void {
+  (client as any).onMessage(JSON.stringify(frame));
 }
 
 describe('self stat wire round-trip', () => {
@@ -996,6 +1002,37 @@ describe('raid party wire', () => {
     expect(client.partyInfo).not.toBeNull();
     expect(client.partyInfo?.raid).toBe(true);
     expect(client.partyInfo?.members.find((m) => m.pid === member.pid)?.group).toBe(2);
+  });
+
+  it('ships tactical frame fields and the authoritative connection state', () => {
+    const entity = server.sim.entities.get(member.pid)!;
+    const meta = server.sim.meta(member.pid)!;
+    meta.talentMods.role = 'healer';
+    entity.auras.push({
+      id: 'power_word_shield',
+      name: 'Psalm of Warding',
+      kind: 'absorb',
+      remaining: 6,
+      duration: 12,
+      value: 90,
+      sourceId: member.pid,
+      school: 'holy',
+    });
+    member.linkdead = true;
+
+    broadcast(server);
+    const snap = lastSnap(fcLeader.sent);
+    const wired = snap.self.party.members.find((m: any) => m.pid === member.pid);
+    expect(wired).toMatchObject({ absorb: 90, role: 'healer', connected: 0 });
+    expect(wired.auras).toEqual([{ id: 'power_word_shield', kind: 'absorb', remaining: 6 }]);
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.partyInfo?.members.find((m) => m.pid === member.pid)).toMatchObject({
+      absorb: 90,
+      role: 'healer',
+      connected: 0,
+    });
   });
 });
 
@@ -2474,6 +2511,107 @@ describe('lockpick view rebuilds from events on the online client', () => {
   });
 });
 
+describe('online mount command and race-event transport', () => {
+  it('round-trips client frames through actor-scoped server dispatch and mirrors the race lifecycle', () => {
+    const server = new GameServer();
+    const actorWire = fakeWs();
+    const actor = joinServer(server, actorWire, 1, 'Rider');
+    const otherWire = fakeWs();
+    const other = joinServer(server, otherWire, 2, 'Bystander');
+    const sim = server.sim;
+    const actorMeta = sim.players.get(actor.pid)!;
+    const otherMeta = sim.players.get(other.pid)!;
+    const actorEntity = sim.entities.get(actor.pid)!;
+    const otherEntity = sim.entities.get(other.pid)!;
+    sim.setPlayerLevel(20, actor.pid);
+    sim.setPlayerLevel(20, other.pid);
+    sim.addItem('reins_grag_bear', 1, actor.pid);
+
+    // Drive the real ClientWorld command adapter. The select payload is the
+    // fragile arm: both the command token and the `mount` field must arrive
+    // unchanged at the server dispatch.
+    const outbox: string[] = [];
+    const commandClient = bareClient(actor.pid);
+    (commandClient as any).connected = true;
+    (commandClient as any).ws = { readyState: 1, send: (payload: string) => outbox.push(payload) };
+    (commandClient as any).entities.set(actor.pid, { level: 20 });
+    const owned: MountKey[] = ['grag_bear'];
+    (commandClient as any).selfOwnedMounts = owned;
+    commandClient.selectMount('grag_bear');
+    commandClient.toggleMounted();
+    commandClient.mountRaceStart();
+    commandClient.mountRaceCancel();
+    expect(outbox.map((payload) => JSON.parse(payload))).toEqual([
+      { t: 'cmd', cmd: 'mount_select', mount: 'grag_bear' },
+      { t: 'cmd', cmd: 'mount_toggle' },
+      { t: 'cmd', cmd: 'mount_race_start' },
+      { t: 'cmd', cmd: 'mount_race_cancel' },
+    ]);
+
+    server.handleMessage(actor, outbox[0]);
+    expect(actorMeta.selectedMount).toBe('grag_bear');
+    expect(otherMeta.selectedMount).toBe('valorsteed');
+    server.handleMessage(actor, outbox[1]);
+    expect(actorEntity.mountCastKey).toBe('grag_bear');
+    expect(otherEntity.mountCastKey).toBe('');
+
+    // Put the actor at the course on the selected mount, then start through the
+    // client-built frame. The bystander must never gain a session or receive
+    // the actor's personal race events.
+    actorEntity.mountCastRemaining = 0;
+    actorEntity.mountCastKey = '';
+    actorEntity.mountKey = 'grag_bear';
+    actorEntity.inCombat = false;
+    actorEntity.onGround = true;
+    actorEntity.pos.x = MOUNT_RACE_START_PLATFORM.x;
+    actorEntity.pos.z = MOUNT_RACE_START_PLATFORM.z;
+    actorEntity.pos.y = terrainHeight(actorEntity.pos.x, actorEntity.pos.z, sim.cfg.seed);
+    actorEntity.prevPos = { ...actorEntity.pos };
+    server.handleMessage(actor, outbox[2]);
+    expect(actorMeta.mountRace?.phase).toBe('countdown');
+    expect(otherMeta.mountRace ?? null).toBeNull();
+
+    const mirror = bareClient(actor.pid);
+    const routeTick = (): void => {
+      const events = sim.tick();
+      (server as any).routeEvents(events);
+    };
+    const feedNewActorFrames = (): void => {
+      for (const frame of actorWire.sent.splice(0)) {
+        if (
+          frame.t === 'events' &&
+          frame.list.some((event: { type?: string }) => event.type?.startsWith('mountRace'))
+        ) {
+          feedEventFrame(mirror, frame);
+        }
+      }
+    };
+
+    routeTick();
+    feedNewActorFrames();
+    expect(mirror.mountRaceView()).toMatchObject({ phase: 'countdown', cleared: 0 });
+
+    for (let i = 1; i < MOUNT_RACE_COUNTDOWN_TICKS; i++) routeTick();
+    feedNewActorFrames();
+    expect(actorMeta.mountRace?.phase).toBe('racing');
+    expect(mirror.mountRaceView()).toMatchObject({ phase: 'racing', cleared: 0 });
+
+    server.handleMessage(actor, outbox[3]);
+    routeTick();
+    feedNewActorFrames();
+    expect(actorMeta.mountRace ?? null).toBeNull();
+    expect(mirror.mountRaceView()).toBeNull();
+    expect(otherMeta.mountRace ?? null).toBeNull();
+    expect(
+      otherWire.sent.some(
+        (frame) =>
+          frame.t === 'events' &&
+          frame.list.some((event: { type?: string }) => event.type?.startsWith('mountRace')),
+      ),
+    ).toBe(false);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // W0a: full self-snapshot delta round-trip gate.
 //
@@ -2488,9 +2626,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 45 `maybe(...)` delta keys, sorted. Cross-checked below
-// against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 46th unregistered delta key reddens this gate.
+// The pinned `maybe(...)` delta keys, sorted. Cross-checked below against the
+// live calls scraped from server/game.ts source, so any unregistered key
+// reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'atitle',
@@ -2525,6 +2663,10 @@ const ALL_DELTA_KEYS = [
   'market',
   'marks',
   'milestones',
+  'mntLesson',
+  'mntOwn',
+  'mntRace',
+  'mntSel',
   'ncd',
   'party',
   'prof',
@@ -2579,6 +2721,10 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   market: 'marketInfo',
   marks: 'markers',
   milestones: 'unlockedMilestones',
+  mntLesson: 'mountLessonActive',
+  mntOwn: 'ownedMounts',
+  mntRace: 'mountRaceView',
+  mntSel: 'selectedMount',
   mres: 'maxResource',
   party: 'partyInfo',
   prk: 'prestigeRank',
@@ -2658,7 +2804,13 @@ function dirtyEveryDeltaField(): {
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
 
   // Direct PlayerMeta fields.
-  meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
+  // The reins item both dirties `inv` further and flips `mntOwn` (the owned
+  // mount collection) to a non-default value, which is what lets the pick
+  // below land on a non-horse mount.
+  meta.inventory = [
+    { itemId: 'baked_bread', count: 3 },
+    { itemId: 'reins_grag_bear', count: 1 },
+  ];
   meta.vendorBuyback = [{ itemId: 'apprentice_staff', count: 1 }];
   meta.equipment = { ...meta.equipment, mainhand: 'zealotsbane_blade' };
   meta.equipmentInstance = {
@@ -2683,6 +2835,22 @@ function dirtyEveryDeltaField(): {
   meta.nodeHarvestReadyAt[GATHER_NODES[0].id] = sim.time + 30;
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
+  meta.selectedMount = 'grag_bear';
+  meta.mountTraining = {
+    sessionId: 'mt_wire_fixture',
+    ownerId: lp,
+    anchor: { x: p.pos.x, z: p.pos.z },
+    state: 'IN_PROGRESS',
+    phase: 'ride',
+  };
+  meta.mountRace = {
+    raceId: 'race_wire_fixture',
+    ownerId: lp,
+    phase: 'racing',
+    goTick: sim.tickCount,
+    deadlineTick: sim.tickCount + 200,
+    clearedMask: 3,
+  };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
   // sets, and a clear record, a renown total, and an active title
@@ -2782,7 +2950,10 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.prestigeRank).toBe(3); // prk -> prestigeRank
 
     // --- fields that decode onto the client ---
-    expect(client.inventory).toEqual([{ itemId: 'baked_bread', count: 3 }]); // inv -> inventory
+    expect(client.inventory).toEqual([
+      { itemId: 'baked_bread', count: 3 },
+      { itemId: 'reins_grag_bear', count: 1 },
+    ]); // inv -> inventory
     expect(client.vendorBuyback).toEqual([{ itemId: 'apprentice_staff', count: 1 }]); // buyback -> vendorBuyback
     expect(client.equipment).toMatchObject({ mainhand: 'zealotsbane_blade' }); // equip -> equipment
     expect(client.equipmentInstances.ring1?.rolled?.stats).toEqual({ str: 2 });
@@ -2801,6 +2972,22 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.unlockedMilestones).toEqual(['milestone_test']); // milestones -> unlockedMilestones
     // lockouts -> selfLockouts (private), via the raidLockouts() accessor
     expect(client.raidLockouts().map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
+    // mnt is active identity only: a persisted pick must not make a dismounted
+    // online player render or move as mounted.
+    expect(client.player.mountKey).toBe('');
+    // mntSel -> selfSelectedMount (private), via the selectedMount() accessor
+    expect(client.selectedMount()).toBe('grag_bear');
+    // mntOwn -> selfOwnedMounts (private), via the ownedMounts() accessor. The
+    // horse is no longer auto-owned, so the collection is exactly what the reins
+    // item in the seeded inventory grants (server ownedMountsFor -> wire -> mirror).
+    expect(client.ownedMounts()).toEqual(['grag_bear']);
+    expect(client.mountLessonActive()).toBe(true);
+    expect(client.mountRaceView()).toMatchObject({
+      raceId: 'race_wire_fixture',
+      phase: 'racing',
+      clearedMask: 3,
+      cleared: 2,
+    });
     expect(client.partyInfo).not.toBeNull(); // party -> partyInfo
     expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
     expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()
@@ -2862,6 +3049,20 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.activeLoadout).toBe(0);
   });
 
+  it('keeps the live ride distinct from the persisted mount pick on self snapshots', () => {
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    server.sim.entities.get(leader.pid)!.mountKey = 'valorsteed';
+    broadcast(server);
+    const snapshot = lastSnap(fc.sent);
+    expect(snapshot.self.mnt).toBe('valorsteed');
+    expect(snapshot.self.mntSel).toBe('grag_bear');
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snapshot);
+    expect(client.player.mountKey).toBe('valorsteed');
+    expect(client.selectedMount()).toBe('grag_bear');
+  });
+
   it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
     const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
     broadcast(server);
@@ -2900,6 +3101,28 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.lifetimeHonor).toBe(654);
     expect(client.companionState?.companionId).toBe('companion_tessa');
   });
+
+  it('authoritatively clears stale race and lesson mirrors after a missed end event', () => {
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    broadcast(server);
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.mountLessonActive()).toBe(true);
+    expect(client.mountRaceView()).not.toBeNull();
+
+    const meta = server.sim.meta(leader.pid)!;
+    meta.mountTraining = null;
+    meta.mountRace = null;
+    fc.sent.length = 0;
+    broadcast(server);
+    const ended = lastSnap(fc.sent);
+    expect(ended.self.mntLesson).toBe(false);
+    expect(ended.self.mntRace).toBeNull();
+
+    (client as any).applySnapshot(ended);
+    expect(client.mountLessonActive()).toBe(false);
+    expect(client.mountRaceView()).toBeNull();
+  });
 });
 
 describe('gather node cooldown wire round trip (ncd)', () => {
@@ -2936,9 +3159,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 46 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(46);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(46);
+  it('ALL_DELTA_KEYS contains exactly 50 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(50);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(50);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2950,7 +3173,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(46);
+    expect(scraped.size).toBe(50);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2972,6 +3195,9 @@ describe('delta-key contract pins (anti-drift)', () => {
       atitle: 'activeTitle',
       deeds: 'deedsEarned',
       dstats: 'deedStats',
+      mntLesson: 'mountLessonActive',
+      mntRace: 'mountRaceView',
+      mntSel: 'selectedMount',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);

@@ -20,6 +20,154 @@ export const cs_CZ: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Centrum vývojářských příkazů",
+    "kicker": "Vývojářské nástroje",
+    "title": "Centrum příkazů",
+    "subtitle": "Autoritativní testovací ovládání aktivního světa.",
+    "closeAria": "Zavřít vývojářské příkazy",
+    "categoryNavAria": "Kategorie vývojářských příkazů",
+    "categories": {
+      "player": "Hráč",
+      "spawns": "Spawny",
+      "inventory": "Inventář",
+      "progress": "Postup",
+      "travel": "Cestování",
+      "scenarios": "Scénáře"
+    },
+    "filterLabel": "Filtrovat příkazy",
+    "filterPlaceholder": "Prohledat tuto kategorii",
+    "noMatches": "Žádné odpovídající příkazy.",
+    "serverRequirement": "Serverové cheaty stále vyžadují ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Před spuštěním tohoto příkazu vyber platné hodnoty.",
+    "sent": "Odesláno: {command}",
+    "run": "Spustit",
+    "fields": {
+      "level": "Úroveň",
+      "mob": "Mob",
+      "count": "Počet",
+      "item": "Předmět",
+      "gold": "Zlato",
+      "quest": "Úkol",
+      "profession": "Povolání",
+      "amount": "Množství",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Obtížnost",
+      "name": "Jméno"
+    },
+    "difficulty": {
+      "normal": "Normální",
+      "heroic": "Hrdinská"
+    },
+    "actions": {
+      "heal": {
+        "label": "Obnovit zdraví",
+        "description": "Doplň celé zdraví."
+      },
+      "resource": {
+        "label": "Obnovit zdroj",
+        "description": "Doplň manu, vztek nebo energii."
+      },
+      "cooldowns": {
+        "label": "Vynulovat doby obnovy",
+        "description": "Resetuj časovače schopností, GCD a lektvarů."
+      },
+      "god": {
+        "label": "Přepnout božský režim",
+        "description": "Přepni nezranitelnost a zvýšené poškození."
+      },
+      "revive": {
+        "label": "Oživit",
+        "description": "Oživ postavu běžným způsobem vzkříšení."
+      },
+      "kill": {
+        "label": "Zabít hráče",
+        "description": "Otestuj průběh smrti, ducha a mrtvoly."
+      },
+      "combatreset": {
+        "label": "Resetovat boj",
+        "description": "Vymaž stav boje a nepřátelskou hrozbu."
+      },
+      "level": {
+        "label": "Nastavit úroveň",
+        "description": "Nastav aktuální úroveň postavy."
+      },
+      "spawn": {
+        "label": "Vyvolat moba",
+        "description": "Vytvoř konkrétního moba poblíž hráče."
+      },
+      "killtarget": {
+        "label": "Zabít cíl",
+        "description": "Zabij vybraného živého moba."
+      },
+      "despawntarget": {
+        "label": "Odstranit cíl",
+        "description": "Odstraň vybraného moba vytvořeného tímto nástrojem."
+      },
+      "despawnall": {
+        "label": "Odstranit mé spawny",
+        "description": "Odstraň všechny moby vyvolané tímto vývojářem."
+      },
+      "give": {
+        "label": "Dát předmět",
+        "description": "Přidej předmět do hráčova inventáře."
+      },
+      "gold": {
+        "label": "Přidat zlato",
+        "description": "Přidej zlato do aktuálního měšce."
+      },
+      "quest": {
+        "label": "Dokončit úkol",
+        "description": "Dokonči konkrétní úkol podle ID."
+      },
+      "quests": {
+        "label": "Dokončit aktivní úkoly",
+        "description": "Dokonči všechny úkoly v aktuálním deníku."
+      },
+      "attune": {
+        "label": "Odemknout naladění",
+        "description": "Označ všechny požadavky na naladění jako splněné."
+      },
+      "gather": {
+        "label": "Přidat sběračskou dovednost",
+        "description": "Zvyš úroveň sběračského povolání."
+      },
+      "teleport": {
+        "label": "Teleportovat",
+        "description": "Přesuň se na přesné souřadnice světa."
+      },
+      "dungeon": {
+        "label": "Vstoupit do dungeonu",
+        "description": "Vstup do dungeonu s obejitím vývojářského omezení."
+      },
+      "raid": {
+        "label": "Vstoupit do raidu",
+        "description": "Vstup přímo do arény Nythraxis."
+      },
+      "raidreset": {
+        "label": "Resetovat uzamčení raidu",
+        "description": "Vymaž aktuální uzamčení raidů."
+      },
+      "bot": {
+        "label": "Vyvolat sociálního bota",
+        "description": "Vytvoř nehybného hráče, kterému lze šeptat."
+      },
+      "lfgqueue": {
+        "label": "Naplnit frontu hledače",
+        "description": "Vytvoř scénář fronty Hledače dungeonů."
+      },
+      "lfgraid": {
+        "label": "Naplnit hledač raidů",
+        "description": "Vytvoř scénář hledače raidů."
+      },
+      "lfgboard": {
+        "label": "Naplnit tabuli nabídek",
+        "description": "Vytvoř scénář s předem sestavenou nabídkou skupiny."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -229,6 +377,7 @@ export const cs_CZ: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} h {minutes} min",
+      "remainingDaysHours": "{days} d {hours} h",
       "score": "Skóre",
       "walletValue": "Hodnota peněženky (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const cs_CZ: EnTranslations = {
         "no_wallet": "Připoj peněženku s alespoň 20 USD ve WOC.",
         "under_minimum": "Peněženka je pod minimem 20 USD ve WOC.",
         "price_unavailable": "Cena WOC není dostupná, odměny jsou dočasně uzamčené.",
-        "banned": "Máš zákaz účasti v denních odměnách. Důvod: {reason}"
+        "banned": "Máš zákaz účasti v denních odměnách. Důvod: {reason}",
+        "bannedUntil": "Ještě {remaining} máš zákaz přístupu k denním odměnám. Přístup se vrátí {until}. Důvod: {reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const cs_CZ: EnTranslations = {
       "balanceLabel": "Zůstatek",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Obchod Claudium nyní není dostupný. Tvůj zůstatek ani nákupy to neovlivní, zkus to za chvíli znovu.",
       "disclosure": "Claudium je jednosměrná herní měna: kupuje se za peníze a utrácí za kosmetické předměty. Nelze ji směnit zpět, převést ani vyplatit v hotovosti.",
@@ -499,6 +650,7 @@ export const cs_CZ: EnTranslations = {
       "railLabel": "Způsob platby",
       "railStripe": "Karta",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Sleva 20 %",
       "railWocUnavailable": "Cena ve WOC nyní není dostupná.",
@@ -602,6 +754,7 @@ export const cs_CZ: EnTranslations = {
       "leaderboard": "Žebříčky",
       "dailyRewards": "Obchod",
       "deeds": "Skutky",
+      "mounts": "Mounts",
       "nameplates": "Jména",
       "haptics": "Haptika",
       "hapticsOff": "Haptika vypnuta",
@@ -716,7 +869,63 @@ export const cs_CZ: EnTranslations = {
       "petStop": "Mazlíček: Zastavit",
       "petTaunt": "Mazlíček: Provokace",
       "petDefensive": "Mazlíček: Obranný",
-      "petAggressive": "Mazlíček: Agresivní"
+      "petAggressive": "Mazlíček: Agresivní",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -870,6 +1079,7 @@ export const cs_CZ: EnTranslations = {
       "interfaceModeTouch": "Dotyk",
       "interfaceModeNote": "Automatika vybere desktopové nebo dotykové ovládání podle zařízení. Zvol Desktop pro vynucení klávesnice a myši (užitečné na tabletu s klávesnicí), nebo Dotyk pro ovládání na obrazovce.",
       "footstepSounds": "Zvuky kroků",
+      "interfaceSounds": "Zvuky rozhraní a odezvy",
       "clickFeedback": "Značka kliknutí",
       "lockCursorOnRotate": "Zamknout kurzor při otáčení",
       "keybindHelpLockCursorOnRotate": "Drží kurzor myši uvnitř okna při tažení pro otáčení kamery, takže nemůže dojet k okraji obrazovky ani na jiný monitor. Vypni, pokud chceš volný kurzor.",
@@ -1309,7 +1519,20 @@ export const cs_CZ: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Nastavit obtížnost dungeonu: Hrdinská",
-      "setNormal": "Nastavit obtížnost dungeonu: Normální"
+      "setNormal": "Nastavit obtížnost dungeonu: Normální",
+      "resetAll": "Resetovat všechny instance",
+      "resetDone": "Všechny instance byly resetovány.",
+      "resetNone": "Nemáš žádné instance k resetování.",
+      "resetOccupied": "Instance nelze resetovat, dokud je někdo stále uvnitř.",
+      "resetSameDifficulty": "Před resetováním těchto instancí změň obtížnost dungeonu. Prázdné instance se po 5 minutách resetují samy.",
+      "resetLoot": "Instance nelze resetovat, dokud uvnitř zůstává kořist.",
+      "resetConfirmTitle": "Resetovat všechny instance?",
+      "resetConfirmBody": "Tím opustíš prázdné instance z dříve vybrané obtížnosti. Nevyzvednutá kořist zabrání resetování.",
+      "resetConfirm": "Resetovat instance",
+      "resetCooldown": "Instance lze resetovat pouze jednou za 5 minut.",
+      "resetUsage": "Po změně obtížnosti použij /dungeon reset k opuštění prázdných instancí.",
+      "entryMismatchNormal": "Tato instance je nastavena na normální obtížnost. Použij Resetovat všechny instance a začni nový hrdinský průchod.",
+      "entryMismatchHeroic": "Tato instance je nastavena na hrdinskou obtížnost. Použij Resetovat všechny instance a začni nový normální průchod."
     },
     "bags": {
       "cannotDestroy": "Tento předmět nelze zničit.",
@@ -1324,6 +1547,7 @@ export const cs_CZ: EnTranslations = {
       "filterConsumable": "Spotřební",
       "filterMaterial": "Materiály",
       "filterQuest": "Úkolové",
+      "filterMount": "Jezdecká zvířata",
       "sortAria": "Řadit předměty v batozích",
       "sortRecent": "Nedávné",
       "sortQuality": "Kvalita",
@@ -1478,6 +1702,33 @@ export const cs_CZ: EnTranslations = {
     "playerFrame": {
       "unlock": "Přesunout rám hráče",
       "lock": "Zamknout rám hráče"
+    },
+    "partyFrames": {
+      "section": "Rámečky skupiny a raidu",
+      "unlock": "Přesunout rámečky skupiny a raidu",
+      "lock": "Zamknout rámečky skupiny a raidu",
+      "style": "Styl rámečku",
+      "styleAutomatic": "Automatický",
+      "styleClassic": "Klasické rámečky skupiny",
+      "styleRaid": "Rámečky raidu",
+      "scale": "Měřítko rámečku",
+      "width": "Šířka rámečku",
+      "height": "Výška rámečku",
+      "spacing": "Rozestupy rámečků",
+      "columns": "Sloupce raidu",
+      "healthText": "Text zdraví",
+      "healthNone": "Žádný",
+      "healthPercent": "Procenta",
+      "healthCurrent": "Aktuální",
+      "healthCurrentMax": "Aktuální / Maximum",
+      "sort": "Seřadit hráče",
+      "sortGroup": "Skupina",
+      "sortRole": "Role",
+      "sortName": "Jméno",
+      "showResource": "Zobrazit manu, vztek a energii",
+      "showAbsorbs": "Zobrazit absorpční štíty",
+      "showAuras": "Zobrazit posílení a oslabení",
+      "showSelf": "Zobrazit vlastní rámeček"
     },
     "frameReset": {
       "label": "Resetovat pozice rámů"
@@ -2141,6 +2392,9 @@ export const cs_CZ: EnTranslations = {
       "already_linked": "Tvůj účet už má propojený účet Steam.",
       "account_taken": "Tento účet Steam už je propojený s jiným účtem.",
       "upstream": "Steam neodpověděl. Zkus to za chvíli znovu."
+    },
+    "welcome": {
+      "invalid_input": "Neplatný vstup."
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const cs_CZ: EnTranslations = {
       "effectsTitle": "Buffy, debuffy a crowd control",
       "effectsBody": "Mnoho schopností zanechá přetrvávající efekt. Užitečné efekty, buffy, zvedají statistiky, štítí tě nebo tě postupně léčí; škodlivé efekty, debuffy, vysávají zdraví poškozením v čase nebo tě oslabují. Sleduj malé ikony v horním rohu obrazovky vedle minimapy, ať víš, co na tobě je a jak dlouho to trvá.",
       "ccBody": "Crowd control je zvláštní druh debuffu, který omezuje, co cíl dokáže: omráčení, zakořenění a zpomalení, umlčení zastavující sesílání, odzbrojení, strach a proměny, které z protivníka na chvíli udělají neškodný cíl. Proti ostatním hráčům se ovládání opakováním ztenčuje: stejný druh nasazený příliš rychle po sobě slábne a nakonec selže úplně, a omráčení otevřené ze stealthu se počítá zvlášť od těch, která následují, takže nikoho nelze držet bezmocného navěky. Bytosti světa žádnou takovou zášť nechovají: na ně se ovládání opakováním nikdy neztenčuje, ačkoli mnohé z nejmocnějších protivníků, jmenované elity a nejsilnější bossové mezi nimi, nelze ovládat vůbec.",
-      "metersBody": "Zajímá tě, jak boj dopadl? Stiskni Z a otevři měřiče party, které pro tvou skupinu sčítají poškození, léčení a hrozbu, souboj po souboji.",
+      "metersBody": "Zajímá tě, jak boj dopadl? Stiskni Shift+H a otevři měřiče party, které pro tvou skupinu sčítají poškození, léčení a hrozbu, souboj po souboji.",
       "queueTitle": "Tvůj další tah je už nabitý",
       "queueBody": "Nemusíš mačkat tlačítka přesně na snímek. Stiskni další schopnost v posledních okamžicích probíhajícího sesílání a zařadí se do fronty, spustí se v okamžiku, kdy sesílání skončí, takže sehraná hra plyne bez mezer. Stisk příliš brzy se prostě odmítne, takže nic nepřijde nazmar. Některé údery na blízko fungují stejně, vyjedou s tvým dalším švihem zbraně.",
       "deathTitle": "Když padneš",
@@ -2505,7 +2759,7 @@ export const cs_CZ: EnTranslations = {
       "petBarTerm": "Lišta mazlíčka",
       "petBarDef": "Řada příkazů, kterou přidá mazlíček lovce nebo černokněžníka: Útok, Stát, Provokace, Obranný a Útočný, ve výchozím stavu vázané na Ctrl plus 1 až 5.",
       "metersTerm": "Měřiče poškození",
-      "metersDef": "Okno se skóre party pro aktuální boj: způsobené poškození, odvedené léčení a kdo drží nejvíc hrozby, vedené pro každý souboj. Otevřeš ho jeho klávesou (ve výchozím stavu Z).",
+      "metersDef": "Okno se skóre party pro aktuální boj: způsobené poškození, odvedené léčení a kdo drží nejvíc hrozby, vedené pro každý souboj. Otevřeš ho jeho klávesou (ve výchozím stavu Shift+H).",
       "targetMarkerTerm": "Značka cíle",
       "targetMarkerDef": "Symbol, který kterýkoli člen party nebo raidu může připnout nad cíl, aby se všichni soustředili na tentýž, nebo se mu vyhnuli. Osm symbolů, jeden cíl na symbol.",
       "loadoutTerm": "Rozložení",
@@ -2886,6 +3140,8 @@ export const cs_CZ: EnTranslations = {
       "heroicRewardsTitle": "Hrdinské známky a vylepšená kořist",
       "heroicRewardsBody": "Hrdinští bossové upouštějí kořist, kterou znáš, vylepšenou a v popisku označenou jako Heroic, a poslední boss každého běhu přidává epické předměty, které jinde nenajdeš. To poslední zabití zanechá všem účastníkům i Hrdinské známky: měnu, kterou utratíš u zásobovače Vexe v Highwatchi, jehož zásoba prstenů a náhrdelníků je jediným šperkem v celé říši.",
       "heroicLockoutBody": "Normální dungeony můžeš běhat celý den. Hrdinský žádá trpělivost: zabití posledního bosse uzamkne všechny v běhu na jedno hrdinské vyčištění toho dungeonu za den a raid si drží denní zámek pro každou obtížnost zvlášť. Vyčištěný pětičlenný běh zůstává otevřený vlastní partě pro doběhy k tělu a kořist, takže nikdo nezůstane odříznut od toho, co si tam vydobyl. Raid je přísnější: jakmile tě jeho zabití uzamkne, dveře zůstanou zavřené až do denního resetu, takže si posbírej kořist, než opustíš arénu.",
+      "resetTitle": "Resetování instancí",
+      "resetBody": "Když změníte obtížnost, zatímco skupina stále drží přidělené průchody, staré nároky chvíli zůstanou a pak samy zmizí. Vůdce skupiny je může opustit okamžitě volbou Resetovat všechny instance v nabídce vlastního portrétu nebo příkazem /dungeon reset. Obtížnost musí být skutečně změněna, uvnitř nesmí zůstat nikdo živý ani padlý a mezi resety je krátká prodleva. U dveří na špatné obtížnosti vás hra varuje před začátkem. Raid se takto nikdy neresetuje; platí pro něj vlastní pravidla uzamčení.",
       "templeLoreTitle": "Utopený chrám, o trochu hlouběji",
       "templeLoreBody": "Chrám má vlastní legendu, starší než kult, který pronásleduješ jinde. Na břehu Třpytivého plesa, horského jezera, které pije měsíční světlo a vrací utopené, drží osamělý hlídač bránu bledého světla. Pod hladinou k ní vede schodiště studeného kamene. Lidé, kteří tam klesli, se neutopili nešťastnou náhodou: byli Bledý sbor, který sestoupil pod vodu v uctívání a nikdy nepřestal zpívat. Staří strážci vyryli do skal jediné varování, než je voda vzala, modlitbu k něčemu, čemu říkali Utopený měsíc, a pevnější ruka pod ni přidala dvě slova: jen spí.",
       "cryptLeadTitle": "Dveře, které měli mrtví udržet zavřené",
@@ -3093,7 +3349,7 @@ export const cs_CZ: EnTranslations = {
       "qualityNote": "Vyšší kvalita obvykle znamená lepší statistiky, ale kvalita je vodítko, ne pravidlo. Dobře padnoucí kus pro tvoji třídu a úroveň může porazit okázalejší předmět.",
       "upgradeTitle": "Udržuj výbavu aktuální",
       "upgradeBody": "Výměna starého kusu za čerstvé vylepšení udělá víc než dokonalá hra ve výbavě, ze které jsi vyrostl. Když padne něco lepšího nebo to nabídne úkol, vezmi to. Neschovávej dobré předměty na později.",
-      "itemLevelBody": "Chceš-li rychle porovnat dva kusy, zapni v nastavení Zobrazit úroveň předmětu. Výbava vydobytá ve světě, od nepřátel a z úkolů, pak ukazuje item level, jedno číslo pro přibližnou sílu podle toho, odkud pochází, takže na první pohled poznáš, které vylepšení má větší váhu, i napříč různými sloty. Kusy bez takového původu, jako prosté základy od obchodníků a startovní výbava, žádný item level neukazují, takže chybějící číslo je normální, ne chyba.",
+      "itemLevelBody": "Pro rychlé porovnání dvou kusů zapněte v možnostech Zobrazit úroveň předmětu. Výbava se známým původem, od nepřátel, z úkolů a řemesel, pak ukazuje úroveň předmětu: jediné číslo, které přibližně vyjadřuje sílu podle zdroje a umožňuje poznat lepší vylepšení i mezi různými sloty. Kusy bez takového původu, například základní zboží obchodníků a počáteční výbava, úroveň neukazují; chybějící číslo je normální.",
       "sourcesTitle": "Odkud výbava pochází",
       "sourcesBody": "Většina raných vylepšení jsou odměny z úkolů, takže se vyplatí úkoly dokončovat, ne grindit. Nepřátelé pouštějí výbavu po porážce, prodejci ve městě prodávají solidní základy, řemeslníci mění nasbírané suroviny v nositelné kusy a hráčský trh ti dovolí nakupovat od ostatních dobrodruhů. Na vrcholu kopce kupují výbavu, kterou nikde jinde nenajdeš, dvě známkové měny: Známky výprav u správce výprav a Hrdinské značky u hrdinského zásobovače.",
       "soulboundTitle": "Vázané k duši: tvé a jen tvé",
@@ -3137,7 +3393,7 @@ export const cs_CZ: EnTranslations = {
       "craftRecipesTitle": "Recepty a přísady",
       "craftRecipesBody": "Každý recept vyžaduje konkrétní přísady, které nasbíráš nebo koupíš. Nejjednodušší recepty žádají jen běžné materiály a lze je vyrábět od samého začátku, takže se do oboru můžeš pustit hned, jak si ho osvojíš. Seznamy receptů se stále doplňují: pár řemesel čeká na své první recepty a další přibývají, jak řemesla rostou.",
       "craftHowTitle": "Okno výroby",
-      "craftHowBody": "Otevři okno Výroby (výchozí klávesa T) a uvidíš každý recept, který znáš, co který potřebuje a co máš po ruce; když jsou materiály připravené, práci obstará jediné kliknutí. Běžné recepty lze vyrábět kdekoli ve světě. Hrstka pokročilých receptů na nástroje tě naopak žádá, aby ses postavil k výrobnímu centru v Highwatchi.",
+      "craftHowBody": "Otevřete okno Výroba (výchozí klávesa T) a uvidíte všechny známé recepty, jejich požadavky i své zásoby; máte-li materiály, stačí jedno kliknutí. Běžné recepty lze vyrábět kdekoli. Některé pokročilé recepty, včetně nástrojů vyšší úrovně a vzácné zbroje pro sesilatele, vyžadují výrobní centrum v Highwatchi.",
       "craftMasteryTitle": "Dovednost a mistrovství",
       "craftMasteryBody": "Úspěšná výroba zvyšuje dovednost v daném řemesle a dovednost nikdy nezamyká recepty řemesla: pokud recept znáš a máš jeho materiály, můžeš se o něj pokusit. Co ti dovednost místo toho kupuje, je kvalita, zkušená ruka odvede jemnější práci. Jedinou výjimkou jsou kombinované recepty, které tě žádají, aby ses osvědčil v obou jejich řemeslech, než se otevřou.",
       "craftComboTitle": "Kombinované recepty",
@@ -4928,6 +5184,29 @@ export const cs_CZ: EnTranslations = {
     "body": "Restartujeme herní službu a očekáváme, že se Claudemoon brzy vrátí. Tato stránka bude stav automaticky kontrolovat.",
     "status": "Brzy zpět"
   },
+  "welcome": {
+    "back": "Vítej zpět, {name}",
+    "level": "Úroveň {level}",
+    "lastPlayed": "Naposledy ve hře: {when}",
+    "continue": "Vstoupit do světa",
+    "continueHint": "Enter pro pokračování, Esc pro přeskočení",
+    "continueHintTouch": "Klepnutím pokračuj",
+    "discord": {
+      "title": "Komunita žije na Discordu",
+      "sub": "Ukázky aktualizací, události, chat s vývojáři a 2 bonusové sloty v bance za propojení účtu s Discordem.",
+      "join": "Připojit se na náš Discord"
+    },
+    "chest": {
+      "ready": "Denní truhla je připravená"
+    },
+    "armory": {
+      "cta": "Vstoupit a prohlédnout si Zbrojnici"
+    },
+    "news": {
+      "new": "Nové",
+      "viewAll": "Zobrazit všechny aktualizace na GitHubu"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITA",
@@ -5663,7 +5942,8 @@ export const cs_CZ: EnTranslations = {
       "tool": "Nástroj",
       "potion": "Lektvar",
       "elixir": "Elixír",
-      "bag": "Batoh"
+      "bag": "Batoh",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Brnění",
@@ -6458,7 +6738,7 @@ export const cs_CZ: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Vlčí krev",
-        "description": "Zvýší sílu útoku o 40 na 6 s. Pouze ve vlčí podobě."
+        "description": "Zvýší sílu útoku o {buff} na {duration} s. Pouze ve vlčí podobě."
       },
       "rip": {
         "name": "Roztržení",
@@ -6749,6 +7029,24 @@ export const cs_CZ: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Eastbrookské vlněné kalhoty"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Eastbrookská rituální roucha"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Kůže eastbrookského druida"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Eastbrookské chráněné nohavice"
+      },
+      "wardweave_cowl": {
+        "name": "Kápě z ochranné tkaniny"
+      },
+      "duskhide_wraps": {
+        "name": "Omotávky ze soumračné kůže"
+      },
+      "sootscale_mantle": {
+        "name": "Plášť ze sazových šupin"
       },
       "gravecaller_blade": {
         "name": "Široká čepel Hrobovolajícího"
@@ -8171,6 +8469,27 @@ export const cs_CZ: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Pás volajícího bouři"
+      },
+      "reins_valorsteed": {
+        "name": "Otěže Valorsteeda"
+      },
+      "reins_grag_bear": {
+        "name": "Otěže Goliáše Grag-medvěda"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Otěže mechokrunýřového plachtíka"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Startovací klíč: Éterové vznášecí kolo"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Otěže Kama-Kageho, ropuchy stínového skoku"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Otěže Bouřopera Nebedosahujícího"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Otěže Hromokroka, velkého krocana"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const cs_CZ: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Probuzený bouřník"
+      },
+      "stable_horse": {
+        "name": "Stájový kůň"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -8821,6 +9143,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Předák Odell",
         "title": "Důlní předák",
         "greeting": "Celý výkop se hemží tou špínou obalenou havětí!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Správkyně stájí",
+        "greeting": "Každý jezdec sem přijde po svých, {className}. Otěže nedostaneš, dokud neusedneš na Valorsteeda, aniž bys skončil v blátě, a Highwatch nemá ranhojiče nazbyt pro zlomené kosti."
       },
       "warden_fenwick": {
         "name": "Strážce Fenwick",
@@ -9821,6 +10148,16 @@ export const cs_CZ: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Jezdecké lekce",
+        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Zaplať poplatek, a až dám pokyn, přivolej cvičného Valorsteeda a vylez do sedla. Pak projeď parkur: sleduj značku ke startovnímu oblouku, vezmi každý skok čistě a znovu projeď cílem, než se přesýpací hodiny vyprázdní. Dokážeš to, a sedlo je tvoje. Zatouláš se z ohrady a začínáme znovu.",
+        "completion": "Tak. Nahoru jedním plynulým pohybem a v sedle pevně jako skála. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.",
+        "objectives": {
+          "0": {
+            "label": "Zkroť Valorsteeda"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10137,6 +10474,9 @@ export const cs_CZ: EnTranslations = {
           },
           "9": {
             "label": "Svatyně Hrobodraka"
+          },
+          "10": {
+            "label": "Stáje Highwatch"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const cs_CZ: EnTranslations = {
         "sender": "Bratr Aldric",
         "subject": "Tvůj čin v temnotě",
         "body": "Jen málokdo se kdy dozví, co bylo pohřbeno v té dutině, a ještě méně by tomu věřilo. Já to vím a nezapomenu.\n\nAť je tvá cesta osvětlena.\n- Bratr Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Hrdinský zásobovač",
+        "subject": "Vaše hrdinské marky",
+        "body": "Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač"
       }
     },
     "itemSets": {

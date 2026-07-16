@@ -146,6 +146,8 @@ const CALLBACK_KEYS = [
   'instanceClaimIdAt',
   'enterDungeon',
   'leaveDungeon',
+  'resetDungeonInstances',
+  'inheritDungeonResetLocks',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'awardHeroicMarks',
@@ -172,6 +174,9 @@ const CALLBACK_KEYS = [
   'abandonLockpick',
   'tickLockpickTimeout',
   'startDelveRaiseDeadChannel',
+  'tickMountTraining',
+  'abandonMountTraining',
+  'tickMountRace',
   // C4a casting-lifecycle surface.
   'resolvedAbility',
   'playerGcdFor',
@@ -214,6 +219,7 @@ const CALLBACK_KEYS = [
   'marketListingBelongsTo',
   // Ravenpost mail: the quest turn-in letter hook.
   'queueQuestLetter',
+  'mailHeroicMarks',
   // Set proc firing.
   'applySetProcs',
   // The Vale Cup sport-move arms (social/vale_cup.ts).
@@ -263,6 +269,7 @@ function makeFakeHost() {
     instances: [],
     riftInstances: [],
     riftPortalIds: null,
+    dungeonResetLocks: new Map(),
     arenaMatches: new Map(),
     duels: new Map(),
     cfg: { seed: 1 } as unknown as SimContextHost['cfg'],
@@ -380,6 +387,8 @@ function makeFakeHost() {
     enterRift: vi.fn(),
     leaveRift: vi.fn(),
     riftOpenTreasure: vi.fn(),
+    resetDungeonInstances: vi.fn(),
+    inheritDungeonResetLocks: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
@@ -458,6 +467,9 @@ function makeFakeHost() {
     abandonLockpick: vi.fn(),
     tickLockpickTimeout: vi.fn(),
     startDelveRaiseDeadChannel: vi.fn(() => false),
+    tickMountTraining: vi.fn(),
+    tickMountRace: vi.fn(),
+    abandonMountTraining: vi.fn(),
     resolvedAbility: vi.fn(() => null),
     playerGcdFor: vi.fn(() => 1.5),
     isFriendlyTo: vi.fn(() => false),
@@ -501,6 +513,7 @@ function makeFakeHost() {
     marketListingBelongsTo: vi.fn(() => false),
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
+    mailHeroicMarks: vi.fn(),
     applySetProcs: vi.fn(),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),

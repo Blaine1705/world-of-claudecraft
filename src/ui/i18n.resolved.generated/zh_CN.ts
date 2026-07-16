@@ -20,6 +20,154 @@ export const zh_CN: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "开发者命令中心",
+    "kicker": "开发工具",
+    "title": "命令中心",
+    "subtitle": "当前世界的服务器权威测试控制。",
+    "closeAria": "关闭开发者命令",
+    "categoryNavAria": "开发者命令类别",
+    "categories": {
+      "player": "玩家",
+      "spawns": "生成物",
+      "inventory": "物品栏",
+      "progress": "进度",
+      "travel": "移动",
+      "scenarios": "场景"
+    },
+    "filterLabel": "筛选命令",
+    "filterPlaceholder": "搜索此类别",
+    "noMatches": "没有匹配的命令。",
+    "serverRequirement": "服务器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
+    "invalidValues": "运行此命令前请选择有效值。",
+    "sent": "已发送：{command}",
+    "run": "运行",
+    "fields": {
+      "level": "等级",
+      "mob": "怪物",
+      "count": "数量",
+      "item": "物品",
+      "gold": "金币",
+      "quest": "任务",
+      "profession": "专业技能",
+      "amount": "数量",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "地下城",
+      "difficulty": "难度",
+      "name": "名称"
+    },
+    "difficulty": {
+      "normal": "普通",
+      "heroic": "英雄"
+    },
+    "actions": {
+      "heal": {
+        "label": "恢复生命值",
+        "description": "将生命值补满。"
+      },
+      "resource": {
+        "label": "恢复资源",
+        "description": "补满法力、怒气或能量。"
+      },
+      "cooldowns": {
+        "label": "清除冷却时间",
+        "description": "重置技能、公共冷却和药水计时器。"
+      },
+      "god": {
+        "label": "切换无敌模式",
+        "description": "切换无敌状态和强化伤害。"
+      },
+      "revive": {
+        "label": "复活",
+        "description": "通过正常复活流程复活。"
+      },
+      "kill": {
+        "label": "杀死玩家",
+        "description": "测试死亡、幽灵和尸体流程。"
+      },
+      "combatreset": {
+        "label": "重置战斗",
+        "description": "清除战斗状态和敌人的仇恨。"
+      },
+      "level": {
+        "label": "设置等级",
+        "description": "设置当前角色等级。"
+      },
+      "spawn": {
+        "label": "生成怪物",
+        "description": "在玩家附近创建一个指定怪物。"
+      },
+      "killtarget": {
+        "label": "杀死目标",
+        "description": "杀死选中的存活怪物。"
+      },
+      "despawntarget": {
+        "label": "移除目标",
+        "description": "移除此工具创建的已选中怪物。"
+      },
+      "despawnall": {
+        "label": "清除我的生成物",
+        "description": "移除此开发者生成的所有怪物。"
+      },
+      "give": {
+        "label": "给予物品",
+        "description": "向玩家物品栏添加一件物品。"
+      },
+      "gold": {
+        "label": "添加金币",
+        "description": "向当前钱袋添加金币。"
+      },
+      "quest": {
+        "label": "完成任务",
+        "description": "按 ID 完成特定任务。"
+      },
+      "quests": {
+        "label": "完成进行中的任务",
+        "description": "完成当前任务日志中的所有任务。"
+      },
+      "attune": {
+        "label": "解锁前置资格",
+        "description": "将所有前置资格要求标记为已完成。"
+      },
+      "gather": {
+        "label": "授予采集技能",
+        "description": "提高一项采集专业技能。"
+      },
+      "teleport": {
+        "label": "传送",
+        "description": "移动到精确的世界坐标。"
+      },
+      "dungeon": {
+        "label": "进入地下城",
+        "description": "绕过开发者模式的入场限制进入地下城。"
+      },
+      "raid": {
+        "label": "进入团队副本",
+        "description": "直接进入尼思拉克西斯竞技场。"
+      },
+      "raidreset": {
+        "label": "重置团队副本锁定",
+        "description": "清除当前团队副本锁定。"
+      },
+      "bot": {
+        "label": "生成社交机器人",
+        "description": "创建一个可接收密语的静止玩家。"
+      },
+      "lfgqueue": {
+        "label": "填充查找器队列",
+        "description": "创建地下城查找器队列场景。"
+      },
+      "lfgraid": {
+        "label": "填充团队副本查找器",
+        "description": "创建团队副本查找器场景。"
+      },
+      "lfgboard": {
+        "label": "填充组队公告板",
+        "description": "创建预组队公告场景。"
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "经验",
@@ -229,6 +377,7 @@ export const zh_CN: EnTranslations = {
       "remainingLessThanMinute": "<1分",
       "remainingMinutes": "{minutes}分",
       "remainingHoursMinutes": "{hours}小时{minutes}分",
+      "remainingDaysHours": "{days}天{hours}小时",
       "score": "得分",
       "walletValue": "钱包价值 (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const zh_CN: EnTranslations = {
         "no_wallet": "请连接一个持有至少价值 $20 USD 的 WOC 的钱包。",
         "under_minimum": "钱包低于 $20 USD WOC 的最低要求。",
         "price_unavailable": "WOC 价格不可用，奖励暂时锁定。",
-        "banned": "您已被禁止参加每日奖励。原因：{reason}"
+        "banned": "您已被禁止参加每日奖励。原因：{reason}",
+        "bannedUntil": "您还将被禁止参加每日奖励 {remaining}。恢复时间：{until}。原因：{reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const zh_CN: EnTranslations = {
       "balanceLabel": "余额",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL：{amount}",
+      "usdcBalance": "USDC：{amount}",
       "wocBalance": "WOC：{amount}",
       "unavailable": "Claudium 商店暂时不可用。您的余额和购买不会受到影响，请稍后再试。",
       "disclosure": "Claudium 是单向软货币：可用真钱购买并用于兑换外观物品，不能赎回、转让或兑现。",
@@ -499,6 +650,7 @@ export const zh_CN: EnTranslations = {
       "railLabel": "付款方式",
       "railStripe": "银行卡",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "优惠 20%",
       "railWocUnavailable": "WOC 定价暂时不可用。",
@@ -602,6 +754,7 @@ export const zh_CN: EnTranslations = {
       "leaderboard": "排行榜",
       "dailyRewards": "商店",
       "deeds": "功绩",
+      "mounts": "坐骑",
       "nameplates": "姓名板",
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
@@ -716,7 +869,63 @@ export const zh_CN: EnTranslations = {
       "petStop": "宠物：停止",
       "petTaunt": "宠物：嘲讽",
       "petDefensive": "宠物：防御",
-      "petAggressive": "宠物：攻击性"
+      "petAggressive": "宠物：攻击性",
+      "mount": "骑乘 / 下骑"
+    },
+    "mounts": {
+      "title": "坐骑",
+      "close": "关闭",
+      "select": "选择",
+      "selected": "已选择",
+      "riding": "骑乘中",
+      "mount": "骑乘",
+      "dismount": "下骑",
+      "requiresLevel": "需要等级{level}",
+      "pickFirst": "选择一个要骑乘的坐骑。",
+      "keybindHint": "按下骑乘 / 下骑键即可骑乘。",
+      "emptyTitle": "尚未收集坐骑",
+      "emptyStableHint": "升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。",
+      "emptyDropHint": "较稀有的坐骑由地下城和团队副本首领掉落。",
+      "clickManage": "点击选择坐骑",
+      "rarity_common": "普通",
+      "rarity_rare": "稀有",
+      "rarity_epic": "史诗",
+      "spec_speed": "+{pct}%额外移动力",
+      "spec_block": "+{pct}%近战伤害格挡",
+      "spec_crit": "+{pct}%致命一击几率",
+      "name_valorsteed": "英勇战马",
+      "name_grag_bear": "歌利亚格拉格巨熊",
+      "name_stalkglider_snail": "苔壳滑行蜗牛",
+      "name_aether_hover_cycle": "以太骑士悬浮机车",
+      "name_shadowjump_toad": "影跃蟾蜍卡玛影",
+      "name_stormfeather_griffin": "凌天风暴之羽",
+      "name_thunderstrut_gobbler": "雷霆阔步大火鸡",
+      "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
+      "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
+      "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
+      "desc_aether_hover_cycle": "一辆强大的魔导机车，专为快速贴地悬浮的战斗穿行而设计。",
+      "desc_shadowjump_toad": "一只体型庞大、步伐稳健的巨蟾，受训于闪电般的暗影跳跃，可跨越任何地形。",
+      "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。",
+      "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。"
+    },
+    "mountTraining": {
+      "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
+      "ownedMountPrompt": "按 {key} 键骑乘",
+      "ridePrompt": "跟随发光的标记前往起点线，然后点击开始比赛。",
+      "begin": "开始课程",
+      "success": "你已经驯服了英勇战马。",
+      "returnToMarla": "返回马厩找玛拉，领养一匹马厩里的马。"
+    },
+    "mountRace": {
+      "startButton": "开始比赛",
+      "cancelButton": "取消比赛",
+      "go": "GO!",
+      "start": "出发！跳过每一道障碍，再骑回拱门冲线。",
+      "toFinish": "骑回拱门冲线！",
+      "finished": "完成！用时 {seconds} 秒！",
+      "timeout": "比赛失败",
+      "progress": "障碍 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "溪谷杯",
@@ -870,6 +1079,7 @@ export const zh_CN: EnTranslations = {
       "interfaceModeTouch": "触控",
       "interfaceModeNote": "自动会根据你的设备选择桌面或触控操作。选择桌面可强制使用键盘和鼠标（适合带键盘的平板），选择触控则使用屏幕上的操作控件。",
       "footstepSounds": "脚步声",
+      "interfaceSounds": "界面与反馈音效",
       "clickFeedback": "点击标记",
       "lockCursorOnRotate": "旋转时锁定光标",
       "keybindHelpLockCursorOnRotate": "拖动旋转镜头时将鼠标光标保持在窗口内，使其无法到达屏幕边缘或移动到另一台显示器。如果你喜欢自由光标，请关闭此选项。",
@@ -1309,7 +1519,20 @@ export const zh_CN: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "设置地下城难度：英雄",
-      "setNormal": "设置地下城难度：普通"
+      "setNormal": "设置地下城难度：普通",
+      "resetAll": "重置所有副本",
+      "resetDone": "所有副本已重置。",
+      "resetNone": "你没有可重置的副本。",
+      "resetOccupied": "仍有人在副本内时无法重置副本。",
+      "resetSameDifficulty": "切换地下城难度后才能重置这些副本。空置副本会在5分钟后自动重置。",
+      "resetLoot": "副本内仍有战利品时无法重置。",
+      "resetConfirmTitle": "重置所有副本？",
+      "resetConfirmBody": "此操作会放弃先前所选难度下的空置副本。若有未拾取的战利品，则无法重置。",
+      "resetConfirm": "重置副本",
+      "resetCooldown": "每5分钟只能重置一次副本。",
+      "resetUsage": "切换难度后，使用 /dungeon reset 放弃你的空置副本。",
+      "entryMismatchNormal": "此副本的难度为普通。使用“重置所有副本”以开始全新的英雄难度副本。",
+      "entryMismatchHeroic": "此副本的难度为英雄。使用“重置所有副本”以开始全新的普通难度副本。"
     },
     "bags": {
       "cannotDestroy": "该物品无法销毁。",
@@ -1324,6 +1547,7 @@ export const zh_CN: EnTranslations = {
       "filterConsumable": "消耗品",
       "filterMaterial": "材料",
       "filterQuest": "任务",
+      "filterMount": "坐骑",
       "sortAria": "排序背包物品",
       "sortRecent": "最近",
       "sortQuality": "品质",
@@ -1478,6 +1702,33 @@ export const zh_CN: EnTranslations = {
     "playerFrame": {
       "unlock": "移动玩家框",
       "lock": "锁定玩家框"
+    },
+    "partyFrames": {
+      "section": "队伍和团队框体",
+      "unlock": "移动队伍和团队框体",
+      "lock": "锁定队伍和团队框体",
+      "style": "框体样式",
+      "styleAutomatic": "自动",
+      "styleClassic": "经典队伍框体",
+      "styleRaid": "团队框体",
+      "scale": "框体缩放",
+      "width": "框体宽度",
+      "height": "框体高度",
+      "spacing": "框体间距",
+      "columns": "团队列数",
+      "healthText": "生命值文字",
+      "healthNone": "无",
+      "healthPercent": "百分比",
+      "healthCurrent": "当前值",
+      "healthCurrentMax": "当前 / 最大",
+      "sort": "玩家排序",
+      "sortGroup": "小队",
+      "sortRole": "职责",
+      "sortName": "名称",
+      "showResource": "显示法力、怒气和能量",
+      "showAbsorbs": "显示吸收护盾",
+      "showAuras": "显示增益和减益",
+      "showSelf": "显示你的框体"
     },
     "frameReset": {
       "label": "重置框体位置"
@@ -2141,6 +2392,9 @@ export const zh_CN: EnTranslations = {
       "already_linked": "你的账号已关联一个 Steam 账号。",
       "account_taken": "该 Steam 账号已关联到另一个账号。",
       "upstream": "Steam 未响应。请稍后重试。"
+    },
+    "welcome": {
+      "invalid_input": "输入无效。"
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const zh_CN: EnTranslations = {
       "effectsTitle": "增益、减益与控制",
       "effectsBody": "许多技能会施加持续存在的效果。有益的（增益）会提升你的属性、为你护盾，或一点点地治疗你；有害的（减益）则以持续伤害消耗你的生命，或削弱你。留意屏幕顶角、小地图旁的那些小图标，便能看清你身上有哪些效果、还能持续多久。",
       "ccBody": "控制是一类特殊的减益，会限制目标能做的事：眩晕、定身与减速，让人无法施法的沉默，缴械，恐惧，以及能让敌人暂时无害的变形。对其他玩家使用时，控制会随着重复而失去锋芒：同一类控制若重复施加得太快，效果会先减弱、继而彻底失效；而从潜行中打出的开场眩晕，会与其后的眩晕分开计算，因此没有人能被无休止地连控。这个世界的生物则没有这般记性：控制落在它们身上，每一次都是十足威力；不过许多最强大的敌人，包括有名的精英和其中最强的首领，则根本无法被控制。",
-      "metersBody": "想知道一场战斗打得如何？按 Z 打开小队仪表盘，它会逐场统计你队伍的伤害、治疗与威胁。",
+      "metersBody": "想知道一场战斗打得如何？按 Shift+H 打开小队仪表盘，它会逐场统计你队伍的伤害、治疗与威胁。",
       "queueTitle": "你的下一招已经就绪",
       "queueBody": "你不必把按键时机掐到毫厘。当前技能还在施放时按下下一个技能，它便会进入队列，在施法完成的那一刻立即发动，让娴熟的操作行云流水、毫无间隙。一些近战打击也是同理，会随你的下一次武器挥击一并打出。",
       "deathTitle": "当你倒下时",
@@ -2505,7 +2759,7 @@ export const zh_CN: EnTranslations = {
       "petBarTerm": "宠物栏",
       "petBarDef": "猎人或术士的宠物会额外添加的指令栏：攻击、停止、嘲讽、防御和主动，默认绑定为 Ctrl 加 1 到 5。",
       "metersTerm": "伤害统计",
-      "metersDef": "当前战斗的小队记分板窗口：造成的伤害、完成的治疗，以及谁承受着最高威胁，均按遭遇战分别记录。用其快捷键打开（默认为 Z）。",
+      "metersDef": "当前战斗的小队记分板窗口：造成的伤害、完成的治疗，以及谁承受着最高威胁，均按遭遇战分别记录。用其快捷键打开（默认为 Shift+H）。",
       "targetMarkerTerm": "目标标记",
       "targetMarkerDef": "任何小队或团队成员都能标在目标头上的符号，让所有人集火或避开同一个目标。共八种符号，每种符号对应一个目标。",
       "loadoutTerm": "配置",
@@ -2886,6 +3140,8 @@ export const zh_CN: EnTranslations = {
       "heroicRewardsTitle": "英雄徽记与升级版战利品",
       "heroicRewardsBody": "英雄难度的首领掉落你熟悉的战利品，但经过升级，并在提示框中标注“英雄”；每次挑战的最终首领还会额外掉落别处找不到的史诗装备。最后这一击也会为每位参与者留下英雄徽记：一种在高守哨站的军需官维克斯处花费的货币，他所备的戒指和吊坠是这个王国里仅有的珠宝。",
       "heroicLockoutBody": "普通地下城一天想刷多少都行。英雄难度则需要耐心：每座地下城每天只奖励一次英雄通关，团队副本也按难度各自保留每日锁定。已经通关的副本对它自己的队伍始终开放，因此没有人会被挡在自己挣得的战利品之外。",
+      "resetTitle": "重置你的副本",
+      "resetBody": "在队伍仍持有已认领副本时切换难度，旧的认领会保留一段时间后自行清除。队长也可以立即放弃它们：在自己的头像菜单中选择“重置所有副本”，或输入 /dungeon reset。重置只有在难度确实更改之后才能进行，且副本内不能有任何人（无论生死）留守，两次重置之间还隔着一段短暂的冷却。带着错误的难度来到门口，游戏会在开打之前直接提醒你。团队副本永远不会以这种方式重置；它遵循自己的锁定规则。",
       "templeLoreTitle": "沉没神殿，更深一层",
       "templeLoreBody": "这座神殿有着自己的传说，比你在别处追查的邪教更为古老。在饮月之池的岸边，那是一汪饮尽月光、又交还溺亡者的小湖，一名孤独的守望者把守着一道苍白的光之门。水面之下，一道冰冷的石阶通向那里。沉入此处的人并非死于意外：他们是苍白唱诗班，在虔诚的礼拜中没入水底，从未停止歌唱。在湖水将他们吞没之前，古老的守护者在岩石上刻下了唯一一句警示，那是献给一个他们称之为溺月之物的祷词，又有一只更沉稳的手在其下添上了两个字：它只是沉睡。",
       "cryptLeadTitle": "一扇死者本该让它紧闭的门",
@@ -3093,7 +3349,7 @@ export const zh_CN: EnTranslations = {
       "qualityNote": "品质越高，属性通常越好，但品质只是参考，并非定律。一件契合你职业与等级的装备，可能胜过一件更华丽的。",
       "upgradeTitle": "让装备保持更新",
       "upgradeBody": "用一件全新的升级换下旧装备，比你穿着已经过时的行头打得再完美都更有意义。当有更好的东西掉落或任务给予时，拿下它。别把好物品留到以后。",
-      "itemLevelBody": "如果你想快速比较两件装备，可以在选项中开启“显示物品等级”。在世界中赢得的装备，无论来自敌人还是任务，都会显示一个物品等级，一个根据其来源大致衡量强度的单一数值，让你一眼就能看出哪件升级更有分量，即便是不同部位之间也能比较。没有这类来源的物品，比如普通的商人基础货和新手装备，则不显示物品等级，因此没有数值是正常现象，并非缺陷。",
+      "itemLevelBody": "如果你想快速比较两件装备，可以在选项中开启“显示物品等级”。有明确来源的装备，无论来自敌人、任务还是制作专业，都会显示一个物品等级，一个根据其来源大致衡量强度的单一数值，让你一眼就能看出哪件升级更有分量，即便是不同部位之间也能比较。没有这类来源的物品，比如普通的商人基础货和新手装备，则不显示物品等级，因此没有数值是正常现象，并非缺陷。",
       "sourcesTitle": "装备从何而来",
       "sourcesBody": "早期的升级大多来自任务奖励，所以与其刷怪，不如完成任务更划算。敌人被击败时会掉落装备，城镇里的商人贩售扎实的基础货色，制作者能把采集来的材料打造成可穿戴的装备，玩家市场则让你能从其他冒险者那里买东西。而在山顶，两种特殊货币能买到别处绝无仅有的装备：探秘看守人处的探秘印记，以及英雄军需官处的英雄徽记。",
       "soulboundTitle": "灵魂绑定：唯你独有",
@@ -3137,7 +3393,7 @@ export const zh_CN: EnTranslations = {
       "craftRecipesTitle": "配方与材料",
       "craftRecipesBody": "每个配方都需要你采集或购买的特定材料。最简单的配方只需要普通材料，从一开始就能制作，因此你拿起一门行业的那一刻就能着手打造。配方列表仍在不断充实：少数行业还在等待它们的第一批配方，随着这些行业的成长，更多配方会陆续到来。",
       "craftHowTitle": "制作窗口",
-      "craftHowBody": "打开制作窗口（默认按键 T），即可查看你已知的每个配方、各自所需的材料，以及你手头现有的材料；材料齐备时，点击一下即可完成制作。普通配方可以在世界的任何地方制作。少数进阶工具配方则要求你站在高守哨站的制作枢纽处。",
+      "craftHowBody": "打开制作窗口（默认按键 T），即可查看你已知的每个配方、各自所需的材料，以及你手头现有的材料；材料齐备时，点击一下即可完成制作。普通配方可以在世界的任何地方制作。少数进阶配方，包括高阶工具和稀有的施法者护甲，则要求你站在高守哨站的制作枢纽处。",
       "craftMasteryTitle": "技能与精通",
       "craftMasteryBody": "成功制作会提升你在该行业的技能，而技能绝不会把某个行业的配方锁起来：只要你知道一个配方并持有它的材料，你就可以尝试制作。技能为你换来的是品质，熟练的手艺能打造出更精良的作品。唯一的例外是组合配方，它们要求你在其涉及的两门行业中都证明过自己，才会向你开放。",
       "craftComboTitle": "组合配方",
@@ -4928,6 +5184,29 @@ export const zh_CN: EnTranslations = {
     "body": "我们正在重启游戏服务，Claudemoon 应会很快恢复。此页面会自动继续检查。",
     "status": "即将恢复"
   },
+  "welcome": {
+    "back": "欢迎回来，{name}",
+    "level": "等级 {level}",
+    "lastPlayed": "上次游玩：{when}",
+    "continue": "进入世界",
+    "continueHint": "按 Enter 继续，按 Esc 跳过",
+    "continueHintTouch": "点击继续",
+    "discord": {
+      "title": "社区活跃在 Discord",
+      "sub": "版本预告、活动、开发者聊天，绑定还可获得 2 个额外银行格。",
+      "join": "加入我们的 Discord"
+    },
+    "chest": {
+      "ready": "每日宝箱已就绪"
+    },
+    "armory": {
+      "cta": "进入并浏览军械库"
+    },
+    "news": {
+      "new": "新",
+      "viewAll": "在 GitHub 上查看全部更新"
+    }
+  },
   "hud": {
     "core": {
       "elite": "精英",
@@ -5663,7 +5942,8 @@ export const zh_CN: EnTranslations = {
       "tool": "工具",
       "potion": "药水",
       "elixir": "药剂",
-      "bag": "背包"
+      "bag": "背包",
+      "mount": "坐骑"
     },
     "stats": {
       "armor": "护甲",
@@ -6458,7 +6738,7 @@ export const zh_CN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼血",
-        "description": "使攻击强度提高 40，持续 6 秒。仅限狼形态。"
+        "description": "使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。"
       },
       "rip": {
         "name": "割裂",
@@ -6749,6 +7029,24 @@ export const zh_CN: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "东溪羊毛长裤"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "东溪仪典法衣"
+      },
+      "eastbrook_druids_hide": {
+        "name": "东溪德鲁伊兽皮"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "东溪护法护腿"
+      },
+      "wardweave_cowl": {
+        "name": "织卫兜帽"
+      },
+      "duskhide_wraps": {
+        "name": "暮影裹手"
+      },
+      "sootscale_mantle": {
+        "name": "灰鳞披肩"
       },
       "gravecaller_blade": {
         "name": "唤墓者宽刃剑"
@@ -8171,6 +8469,27 @@ export const zh_CN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "唤雷者腰甲"
+      },
+      "reins_valorsteed": {
+        "name": "英勇战马的缰绳"
+      },
+      "reins_grag_bear": {
+        "name": "歌利亚格拉格巨熊的缰绳"
+      },
+      "reins_stalkglider_snail": {
+        "name": "苔壳滑行蜗牛的缰绳"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "点火钥匙：以太骑士悬浮机车"
+      },
+      "reins_shadowjump_toad": {
+        "name": "影跃蟾蜍卡玛影的缰绳"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "凌天风暴之羽的缰绳"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "雷霆阔步大火鸡的缰绳"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const zh_CN: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
+      },
+      "stable_horse": {
+        "name": "厩马"
       },
       "rift_spawnling": {
         "name": "裂隙孽生体"
@@ -8821,6 +9143,11 @@ export const zh_CN: EnTranslations = {
         "name": "奥德尔工头",
         "title": "矿井工头",
         "greeting": "整条矿道都爬满了那些沾满泥污的害虫！"
+      },
+      "stablemaster_marla": {
+        "name": "玛拉·希琴",
+        "title": "马厩总管",
+        "greeting": "每个骑手都是两条腿走进来的，{className}。你能骑稳英勇战马、不摔进泥里之前，我是不会把缰绳交给你的，高望这儿可没有多余的医者去治断骨。"
       },
       "warden_fenwick": {
         "name": "芬威克守望者",
@@ -9821,6 +10148,16 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "骑术课",
+        "text": "每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。交上学费，等我发话，就把训练用的英勇战马唤到身边，翻身上鞍。然后跑完赛道：跟着标记到起点拱门，把每一道障碍都跳得干净利落，在沙子漏尽之前再次冲过终点线。做到了，这鞍子就是你的。要是跑出围场，我们就从头再来。",
+        "completion": "好了，就是这样。一个利落的动作上了鞍，坐得稳稳当当。英勇战马现在是你的了，{playerName}：马鞍、缰绳，还有靠本事挣来而不是买来的骑手身份。",
+        "objectives": {
+          "0": {
+            "label": "驯服英勇战马"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "稀薄的帷幕",
         "text": "洞穴竟为你敞开了。那么封印比我担心的还要脆弱，{playerName}。帷幕撕裂之处，光灵会变得阴冷黑暗。给我带来八份暮光灵的精华，我便能读出这道伤口有多深。",
@@ -10137,6 +10474,9 @@ export const zh_CN: EnTranslations = {
           },
           "9": {
             "label": "墓龙圣所"
+          },
+          "10": {
+            "label": "高望马厩"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const zh_CN: EnTranslations = {
         "sender": "奥德里克修士",
         "subject": "你在黑暗中所做的一切",
         "body": "很少有人会知道那处洼地里埋葬着什么，愿意相信的人更少。但我知道，而且我不会忘记。\n\n愿你的道路常明。\n- 奥德里克修士"
+      },
+      "heroic_marks_reward": {
+        "sender": "英勇军需官",
+        "subject": "你的英勇印记",
+        "body": "你的部队清剿了英勇试炼，而你在后排作战，或已倒在尘土之中。你的锁定同样已经生效，因此你那一份英勇印记飞到了这里，而非就此遗失。好好使用它们。\n\n- 英勇军需官"
       }
     },
     "itemSets": {

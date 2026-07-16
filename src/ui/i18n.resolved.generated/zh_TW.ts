@@ -20,6 +20,154 @@ export const zh_TW: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "開發者指令中心",
+    "kicker": "開發工具",
+    "title": "指令中心",
+    "subtitle": "目前世界的伺服器權威測試控制。",
+    "closeAria": "關閉開發者指令",
+    "categoryNavAria": "開發者指令類別",
+    "categories": {
+      "player": "玩家",
+      "spawns": "生成物",
+      "inventory": "物品欄",
+      "progress": "進度",
+      "travel": "移動",
+      "scenarios": "情境"
+    },
+    "filterLabel": "篩選指令",
+    "filterPlaceholder": "搜尋此類別",
+    "noMatches": "沒有符合的指令。",
+    "serverRequirement": "伺服器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
+    "invalidValues": "執行此指令前請選擇有效值。",
+    "sent": "已傳送：{command}",
+    "run": "執行",
+    "fields": {
+      "level": "等級",
+      "mob": "怪物",
+      "count": "數量",
+      "item": "物品",
+      "gold": "金幣",
+      "quest": "任務",
+      "profession": "專業技能",
+      "amount": "數量",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "地城",
+      "difficulty": "難度",
+      "name": "名稱"
+    },
+    "difficulty": {
+      "normal": "普通",
+      "heroic": "英雄"
+    },
+    "actions": {
+      "heal": {
+        "label": "恢復生命值",
+        "description": "將生命值補滿。"
+      },
+      "resource": {
+        "label": "恢復資源",
+        "description": "補滿法力、怒氣或能量。"
+      },
+      "cooldowns": {
+        "label": "清除冷卻時間",
+        "description": "重設技能、全域冷卻與藥水計時器。"
+      },
+      "god": {
+        "label": "切換無敵模式",
+        "description": "切換無敵狀態與強化傷害。"
+      },
+      "revive": {
+        "label": "復活",
+        "description": "透過正常復活流程復活。"
+      },
+      "kill": {
+        "label": "殺死玩家",
+        "description": "測試死亡、靈魂與屍體流程。"
+      },
+      "combatreset": {
+        "label": "重設戰鬥",
+        "description": "清除戰鬥狀態與敵人的仇恨。"
+      },
+      "level": {
+        "label": "設定等級",
+        "description": "設定目前角色等級。"
+      },
+      "spawn": {
+        "label": "生成怪物",
+        "description": "在玩家附近建立一個指定怪物。"
+      },
+      "killtarget": {
+        "label": "殺死目標",
+        "description": "殺死選取的存活怪物。"
+      },
+      "despawntarget": {
+        "label": "移除目標",
+        "description": "移除此工具建立的已選取怪物。"
+      },
+      "despawnall": {
+        "label": "清除我的生成物",
+        "description": "移除此開發者生成的所有怪物。"
+      },
+      "give": {
+        "label": "給予物品",
+        "description": "將一件物品加入玩家物品欄。"
+      },
+      "gold": {
+        "label": "新增金幣",
+        "description": "將金幣加入目前的錢袋。"
+      },
+      "quest": {
+        "label": "完成任務",
+        "description": "依 ID 完成特定任務。"
+      },
+      "quests": {
+        "label": "完成進行中的任務",
+        "description": "完成目前任務日誌中的所有任務。"
+      },
+      "attune": {
+        "label": "解鎖前置資格",
+        "description": "將所有前置資格要求標記為已完成。"
+      },
+      "gather": {
+        "label": "授予採集技能",
+        "description": "提高一項採集專業技能。"
+      },
+      "teleport": {
+        "label": "傳送",
+        "description": "移動到精確的世界座標。"
+      },
+      "dungeon": {
+        "label": "進入地城",
+        "description": "略過開發者模式的入場限制進入地城。"
+      },
+      "raid": {
+        "label": "進入團隊副本",
+        "description": "直接進入尼思拉克西斯競技場。"
+      },
+      "raidreset": {
+        "label": "重設團隊副本鎖定",
+        "description": "清除目前的團隊副本鎖定。"
+      },
+      "bot": {
+        "label": "生成社交機器人",
+        "description": "建立一名可接收密語的靜止玩家。"
+      },
+      "lfgqueue": {
+        "label": "填入搜尋器佇列",
+        "description": "建立地城搜尋器佇列情境。"
+      },
+      "lfgraid": {
+        "label": "填入團隊副本搜尋器",
+        "description": "建立團隊副本搜尋器情境。"
+      },
+      "lfgboard": {
+        "label": "填入組隊公告板",
+        "description": "建立預組隊公告情境。"
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "經驗",
@@ -229,6 +377,7 @@ export const zh_TW: EnTranslations = {
       "remainingLessThanMinute": "<1分",
       "remainingMinutes": "{minutes}分",
       "remainingHoursMinutes": "{hours}小時{minutes}分",
+      "remainingDaysHours": "{days}天{hours}小時",
       "score": "分數",
       "walletValue": "錢包價值 (WOC)",
       "usd": "{amount} USD",
@@ -267,7 +416,8 @@ export const zh_TW: EnTranslations = {
         "no_wallet": "請連接持有至少 $20 USD WOC 的錢包。",
         "under_minimum": "錢包低於 $20 USD 的 WOC 最低要求。",
         "price_unavailable": "無法取得 WOC 價格，獎勵暫時鎖定。",
-        "banned": "您已被禁止參加每日獎勵。原因：{reason}"
+        "banned": "您已被禁止參加每日獎勵。原因：{reason}",
+        "bannedUntil": "您還將被禁止參加每日獎勵 {remaining}。恢復時間：{until}。原因：{reason}"
       }
     },
     "wocStore": {
@@ -492,6 +642,7 @@ export const zh_TW: EnTranslations = {
       "balanceLabel": "餘額",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL：{amount}",
+      "usdcBalance": "USDC：{amount}",
       "wocBalance": "WOC：{amount}",
       "unavailable": "Claudium 商店目前無法使用。您的餘額與購買不受影響，請稍後再試。",
       "disclosure": "Claudium 是單向軟貨幣：可用金錢購買並用於兌換外觀物品，不能贖回、轉讓或兌現。",
@@ -499,6 +650,7 @@ export const zh_TW: EnTranslations = {
       "railLabel": "付款方式",
       "railStripe": "信用卡",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "優惠 20%",
       "railWocUnavailable": "WOC 定價目前無法使用。",
@@ -602,6 +754,7 @@ export const zh_TW: EnTranslations = {
       "leaderboard": "排行榜",
       "dailyRewards": "商店",
       "deeds": "功績",
+      "mounts": "坐騎",
       "nameplates": "名條",
       "haptics": "觸覺回饋",
       "hapticsOff": "觸覺回饋已關閉",
@@ -716,7 +869,63 @@ export const zh_TW: EnTranslations = {
       "petStop": "寵物：停止",
       "petTaunt": "寵物：嘲諷",
       "petDefensive": "寵物：防禦",
-      "petAggressive": "寵物：攻擊性"
+      "petAggressive": "寵物：攻擊性",
+      "mount": "騎乘 / 下騎"
+    },
+    "mounts": {
+      "title": "坐騎",
+      "close": "關閉",
+      "select": "選擇",
+      "selected": "已選擇",
+      "riding": "騎乘中",
+      "mount": "騎乘",
+      "dismount": "下騎",
+      "requiresLevel": "需要等級 {level}",
+      "pickFirst": "選擇一隻要騎乘的坐騎。",
+      "keybindHint": "按下騎乘 / 下騎鍵即可騎乘。",
+      "emptyTitle": "尚未收集坐騎",
+      "emptyStableHint": "升到 20 級，前往高望以西的馬廄，向馬廄總管瑪拉學習騎術。",
+      "emptyDropHint": "較稀有的坐騎由地城和團隊副本首領掉落。",
+      "clickManage": "點擊選擇坐騎",
+      "rarity_common": "普通",
+      "rarity_rare": "稀有",
+      "rarity_epic": "史詩",
+      "spec_speed": "+{pct}% 額外移動力",
+      "spec_block": "+{pct}% 近戰傷害格擋",
+      "spec_crit": "+{pct}% 致命一擊機率",
+      "name_valorsteed": "英勇戰馬",
+      "name_grag_bear": "歌利亞格拉格巨熊",
+      "name_stalkglider_snail": "苔殼滑行蝸牛",
+      "name_aether_hover_cycle": "乙太騎士懸浮機車",
+      "name_shadowjump_toad": "影躍蟾蜍卡瑪影",
+      "name_stormfeather_griffin": "凌天風暴之羽",
+      "name_thunderstrut_gobbler": "雷霆闊步大火雞",
+      "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
+      "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
+      "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
+      "desc_aether_hover_cycle": "一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。",
+      "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
+      "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
+      "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。"
+    },
+    "mountTraining": {
+      "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
+      "ownedMountPrompt": "按 {key} 鍵騎乘",
+      "ridePrompt": "跟隨發光的標記前往起點線，然後點擊開始比賽。",
+      "begin": "開始課程",
+      "success": "你已經馴服了英勇戰馬。",
+      "returnToMarla": "返回馬廄找瑪拉，領養一匹馬廄裡的馬。"
+    },
+    "mountRace": {
+      "startButton": "開始比賽",
+      "cancelButton": "取消比賽",
+      "go": "GO!",
+      "start": "出發！跳過每一道障礙，再騎回拱門衝線。",
+      "toFinish": "騎回拱門衝線！",
+      "finished": "完成！用時 {seconds} 秒！",
+      "timeout": "比賽失敗",
+      "progress": "障礙 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "溪谷盃",
@@ -870,6 +1079,7 @@ export const zh_TW: EnTranslations = {
       "interfaceModeTouch": "觸控",
       "interfaceModeNote": "自動會根據你的裝置選擇桌面或觸控操作。選擇桌面可強制使用鍵盤與滑鼠（適合有鍵盤的平板），選擇觸控則使用螢幕上的操作控制項。",
       "footstepSounds": "腳步聲",
+      "interfaceSounds": "介面與回饋音效",
       "clickFeedback": "點擊標記",
       "lockCursorOnRotate": "旋轉時鎖定游標",
       "keybindHelpLockCursorOnRotate": "拖曳旋轉鏡頭時將滑鼠游標保持在視窗內，使其無法到達螢幕邊緣或移動到另一台顯示器。若你偏好自由游標，請關閉此選項。",
@@ -1309,7 +1519,20 @@ export const zh_TW: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "設定地城難度：英雄",
-      "setNormal": "設定地城難度：普通"
+      "setNormal": "設定地城難度：普通",
+      "resetAll": "重置所有地城副本",
+      "resetDone": "所有地城副本已重置。",
+      "resetNone": "你沒有可重置的地城副本。",
+      "resetOccupied": "仍有人在地城副本內時無法重置。",
+      "resetSameDifficulty": "切換地城難度後才能重置這些副本。空置的地城副本會在5分鐘後自動重置。",
+      "resetLoot": "地城副本內仍有戰利品時無法重置。",
+      "resetConfirmTitle": "重置所有地城副本？",
+      "resetConfirmBody": "此操作會放棄先前所選難度下的空置副本。若有未拾取的戰利品，則無法重置。",
+      "resetConfirm": "重置副本",
+      "resetCooldown": "每5分鐘只能重置一次副本。",
+      "resetUsage": "切換難度後，使用 /dungeon reset 放棄你的空置地城副本。",
+      "entryMismatchNormal": "此地城副本的難度為普通。使用「重置所有地城副本」以開始全新的英雄難度副本。",
+      "entryMismatchHeroic": "此地城副本的難度為英雄。使用「重置所有地城副本」以開始全新的普通難度副本。"
     },
     "bags": {
       "cannotDestroy": "此物品無法銷毀。",
@@ -1324,6 +1547,7 @@ export const zh_TW: EnTranslations = {
       "filterConsumable": "消耗品",
       "filterMaterial": "材料",
       "filterQuest": "任務",
+      "filterMount": "坐騎",
       "sortAria": "排序背包物品",
       "sortRecent": "最近",
       "sortQuality": "品質",
@@ -1478,6 +1702,33 @@ export const zh_TW: EnTranslations = {
     "playerFrame": {
       "unlock": "移動玩家框",
       "lock": "鎖定玩家框"
+    },
+    "partyFrames": {
+      "section": "隊伍和團隊框體",
+      "unlock": "移動隊伍和團隊框體",
+      "lock": "鎖定隊伍和團隊框體",
+      "style": "框體樣式",
+      "styleAutomatic": "自動",
+      "styleClassic": "經典隊伍框體",
+      "styleRaid": "團隊框體",
+      "scale": "框體縮放",
+      "width": "框體寬度",
+      "height": "框體高度",
+      "spacing": "框體間距",
+      "columns": "團隊欄數",
+      "healthText": "生命值文字",
+      "healthNone": "無",
+      "healthPercent": "百分比",
+      "healthCurrent": "目前值",
+      "healthCurrentMax": "目前 / 最大",
+      "sort": "玩家排序",
+      "sortGroup": "小隊",
+      "sortRole": "職責",
+      "sortName": "名稱",
+      "showResource": "顯示法力、怒氣和能量",
+      "showAbsorbs": "顯示吸收護盾",
+      "showAuras": "顯示增益和減益",
+      "showSelf": "顯示你的框體"
     },
     "frameReset": {
       "label": "重置框體位置"
@@ -2141,6 +2392,9 @@ export const zh_TW: EnTranslations = {
       "already_linked": "你的帳號已連結一個 Steam 帳號。",
       "account_taken": "該 Steam 帳號已連結到另一個帳號。",
       "upstream": "Steam 未回應。請稍後重試。"
+    },
+    "welcome": {
+      "invalid_input": "輸入無效。"
     }
   },
   "guide": {
@@ -2444,7 +2698,7 @@ export const zh_TW: EnTranslations = {
       "effectsTitle": "增益、減益與控場",
       "effectsBody": "許多技能會施加一個會持續存在的效果。有益的（增益）能提升你的屬性、為你護盾，或一點一滴地治療你；有害的（減益）則以持續傷害消耗你的生命，或使你衰弱。留意畫面頂端角落、小地圖旁的小圖示，便能看出你身上有哪些效果以及還會持續多久。",
       "ccBody": "控場是一種特殊的減益，會限制目標所能做的事：昏迷、定身與緩速、阻斷施法的沉默、繳械、恐懼，還有能讓敵人短暫變得無害的變形。對上其他玩家時，控制會隨著重複而磨損：同一類控場重複施加得太快便會減弱、繼而完全失效，而一記從潛行中開場的昏迷會與其後的昏迷分開計算，因此沒有人能被永無止盡地連鎖控制。這個世界的生物則沒有這種記性：控場對牠們永遠不會因重複而減弱，不過許多最強大的敵人，包括具名的菁英與其中最強的首領，則完全無法被控制。",
-      "metersBody": "想知道一場戰鬥打得如何？按下 Z 即可開啟隊伍統計面板，它會逐場戰鬥為你的隊伍統計傷害、治療與威脅值。",
+      "metersBody": "想知道一場戰鬥打得如何？按下 Shift+H 即可開啟隊伍統計面板，它會逐場戰鬥為你的隊伍統計傷害、治療與威脅值。",
       "queueTitle": "你的下一招早已上膛",
       "queueBody": "你不必把按鍵時機掐準到每一格。在當前技能仍在施放時按下你的下一個技能，它便會排入佇列，在施法完成的那一瞬間立刻發動，讓熟練的操作流暢無間。有些近戰打擊也以同樣的方式運作，隨著你的下一次武器揮擊一併出手。",
       "deathTitle": "當你倒下時",
@@ -2505,7 +2759,7 @@ export const zh_TW: EnTranslations = {
       "petBarTerm": "寵物指令列",
       "petBarDef": "獵人或術士寵物會增添的指令列：攻擊、停止、挑釁、防禦與主動，預設綁定為 Ctrl 加 1 到 5。",
       "metersTerm": "傷害統計面板",
-      "metersDef": "當前戰鬥的隊伍計分視窗：造成的傷害、完成的治療，以及誰握有最高威脅值，皆逐場戰鬥記錄。以其快捷鍵（預設為 Z）開啟。",
+      "metersDef": "當前戰鬥的隊伍計分視窗：造成的傷害、完成的治療，以及誰握有最高威脅值，皆逐場戰鬥記錄。以其快捷鍵（預設為 Shift+H）開啟。",
       "targetMarkerTerm": "目標標記",
       "targetMarkerDef": "任何隊伍或團隊成員都能標記在目標頭上的符號，讓所有人集火，或避開，同一個目標。共有八種符號，每種符號對應一個目標。",
       "loadoutTerm": "配置",
@@ -2886,6 +3140,8 @@ export const zh_TW: EnTranslations = {
       "heroicRewardsTitle": "英雄徽記與升級版戰利品",
       "heroicRewardsBody": "英雄首領掉落你所熟悉的戰利品，經過升級並在提示框上標註「英雄」，而每趟征程的最終首領還會追加別處找不到的史詩裝備。那最後一擊也會為每位參與者留下英雄徽記：一種在高望的軍需官維克斯處花用的貨幣，他存貨中的戒指與項鍊是全王國唯一的珠寶。",
       "heroicLockoutBody": "普通地城可以整天連刷。英雄難度則講求耐心：每座地城每天只獎勵一次英雄通關，團隊副本也為每種難度各保有一個每日鎖定。已通關的征程對它自己的隊伍永遠敞開，所以沒有人會被擋在自己掙得的戰利品之外。",
+      "resetTitle": "重置你的地城副本",
+      "resetBody": "在隊伍仍持有已認領副本時切換難度，舊的認領會保留一段時間後自行清除。隊長也可以立即放棄它們：在自己的頭像選單中選擇「重置所有地城副本」，或輸入 /dungeon reset。重置只有在難度確實更改之後才能進行，且副本內不能有任何人（無論生死）留守，兩次重置之間還隔著一段短暫的冷卻。帶著錯誤的難度來到門口，遊戲會在開打之前直接提醒你。團隊副本永遠不會以這種方式重置；它遵循自己的鎖定規則。",
       "templeLoreTitle": "溺亡神殿，再深入一些",
       "templeLoreBody": "這座神殿有著自己的傳說，比你在別處追查的邪教更為古老。在微光湖的岸邊（那是一座飲下月光、又交還溺亡者的山中湖泊），一名孤獨的看守者守著一道蒼白光芒之門。在水面之下，一道冰冷的石階向下通往那裡。沉沒在此的人並非死於意外：他們是蒼白唱詩班，在禮拜中沉入水底，自此再未停止吟唱。古老的守衛在被湖水吞沒之前，在岩石上刻下了唯一一句警語，一段向他們稱之為溺月之物獻上的禱詞，其下另有一隻更沉穩的手添上了兩個字：它只是沉睡。",
       "cryptLeadTitle": "一道亡者本應永遠緊閉的門",
@@ -3093,7 +3349,7 @@ export const zh_TW: EnTranslations = {
       "qualityNote": "品質愈高通常代表屬性愈好，但品質只是一種提示，並非定則。一件與你職業和等級相配的裝備，可能勝過一件更花俏的。",
       "upgradeTitle": "保持裝備更新",
       "upgradeBody": "用一件全新的升級品換下舊裝備，對你的助益遠勝於穿著早已過時的裝備打得再完美。當有更好的東西掉落，或任務提供升級時，就收下吧。別把你的好物品留到以後。",
-      "itemLevelBody": "若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。在世界中贏得的裝備，來自敵人與任務者，便會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。沒有這類來源的物品，例如普通的商人基礎貨品與新手裝備，則不會顯示物品等級，因此缺少數值是正常現象，而非瑕疵。",
+      "itemLevelBody": "若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。有明確來源的裝備，無論來自敵人、任務還是製作專業，便會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。沒有這類來源的物品，例如普通的商人基礎貨品與新手裝備，則不會顯示物品等級，因此缺少數值是正常現象，而非瑕疵。",
       "sourcesTitle": "裝備從何而來",
       "sourcesBody": "你早期的升級大多來自任務獎勵，因此完成任務比刷怪更划算。敵人被你擊敗時會掉落裝備，城鎮裡的商人販售扎實的基本款，工匠會把採集來的材料製成可穿戴的裝備，玩家市場則讓你能向其他冒險者購買。而在攀上頂峰之後，兩種印記貨幣能買到別處找不到的裝備：秘探印記在秘探看守人處花用，英雄徽記則在英雄軍需官處花用。",
       "soulboundTitle": "靈魂綁定：屬於你，也僅屬於你",
@@ -3137,7 +3393,7 @@ export const zh_TW: EnTranslations = {
       "craftRecipesTitle": "配方與材料",
       "craftRecipesBody": "每個配方都需要你採集或購買的特定材料。最簡單的配方只需要普通材料，從一開始就能製作，因此你一拿起一門行業就能立刻上手。配方清單仍在持續補齊：少數行業還在等待它們的第一批配方，而隨著這些行業成長，會有更多配方登場。",
       "craftHowTitle": "製作視窗",
-      "craftHowBody": "開啟製作視窗（預設按鍵 T），即可看到你已學會的每一個配方、各自所需的材料，以及你手邊現有的材料；材料齊備時，一鍵即可完成製作。常見的配方可以在世界任何地方製作。少數進階的工具配方則要求你站在高守哨站的製作站前。",
+      "craftHowBody": "開啟製作視窗（預設按鍵 T），即可看到你已學會的每一個配方、各自所需的材料，以及你手邊現有的材料；材料齊備時，一鍵即可完成製作。常見的配方可以在世界任何地方製作。少數進階配方，包括高階工具與稀有的施法者護甲，則要求你站在高守哨站的製作站前。",
       "craftMasteryTitle": "技能與精通",
       "craftMasteryBody": "成功製作會提升你在該行業的技能，而技能從不會把行業的配方鎖起來：只要你會某個配方並持有其材料，就能嘗試製作。技能為你換來的其實是品質，熟練的手藝能做出更精良的作品。唯一的例外是組合配方，它們要求你先在兩門相關行業中都證明過自己，才會開放。",
       "craftComboTitle": "組合配方",
@@ -4928,6 +5184,29 @@ export const zh_TW: EnTranslations = {
     "body": "我們正在重新啟動遊戲服務，Claudemoon 應會很快恢復。此頁面會自動持續檢查。",
     "status": "即將恢復"
   },
+  "welcome": {
+    "back": "歡迎回來，{name}",
+    "level": "等級 {level}",
+    "lastPlayed": "上次遊玩：{when}",
+    "continue": "進入世界",
+    "continueHint": "按 Enter 繼續，按 Esc 跳過",
+    "continueHintTouch": "點擊繼續",
+    "discord": {
+      "title": "社群活躍在 Discord",
+      "sub": "版本預告、活動、開發者聊天，綁定還可獲得 2 個額外銀行格。",
+      "join": "加入我們的 Discord"
+    },
+    "chest": {
+      "ready": "每日寶箱已就緒"
+    },
+    "armory": {
+      "cta": "進入並瀏覽軍械庫"
+    },
+    "news": {
+      "new": "新",
+      "viewAll": "在 GitHub 上查看全部更新"
+    }
+  },
   "hud": {
     "core": {
       "elite": "精英",
@@ -5663,7 +5942,8 @@ export const zh_TW: EnTranslations = {
       "tool": "工具",
       "potion": "藥水",
       "elixir": "藥劑",
-      "bag": "背包"
+      "bag": "背包",
+      "mount": "坐騎"
     },
     "stats": {
       "armor": "護甲",
@@ -6458,7 +6738,7 @@ export const zh_TW: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼血之力",
-        "description": "使攻擊強度提高 40，持續 6 秒。僅限狼形態。"
+        "description": "使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。"
       },
       "rip": {
         "name": "割裂",
@@ -6749,6 +7029,24 @@ export const zh_TW: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "東溪羊毛長褲"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "東溪儀典法衣"
+      },
+      "eastbrook_druids_hide": {
+        "name": "東溪德魯伊獸皮"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "東溪護法護腿"
+      },
+      "wardweave_cowl": {
+        "name": "織衛兜帽"
+      },
+      "duskhide_wraps": {
+        "name": "暮影裹手"
+      },
+      "sootscale_mantle": {
+        "name": "灰鱗披肩"
       },
       "gravecaller_blade": {
         "name": "喚墓者寬刃劍"
@@ -8171,6 +8469,27 @@ export const zh_TW: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "喚雷者腰甲"
+      },
+      "reins_valorsteed": {
+        "name": "英勇戰馬的韁繩"
+      },
+      "reins_grag_bear": {
+        "name": "歌利亞格拉格巨熊的韁繩"
+      },
+      "reins_stalkglider_snail": {
+        "name": "苔殼滑行蝸牛的韁繩"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "點火鑰匙：乙太騎士懸浮機車"
+      },
+      "reins_shadowjump_toad": {
+        "name": "影躍蟾蜍卡瑪影的韁繩"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "凌天風暴之羽的韁繩"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "雷霆闊步大火雞的韁繩"
       }
     },
     "mobs": {
@@ -8419,6 +8738,9 @@ export const zh_TW: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "被驚醒的風暴元素"
+      },
+      "stable_horse": {
+        "name": "廄馬"
       },
       "rift_spawnling": {
         "name": "裂隙孽生體"
@@ -8821,6 +9143,11 @@ export const zh_TW: EnTranslations = {
         "name": "奧德爾工頭",
         "title": "礦井工頭",
         "greeting": "整條礦道都爬滿了那些滿身泥垢的害蟲！"
+      },
+      "stablemaster_marla": {
+        "name": "瑪拉·希琴",
+        "title": "馬廄總管",
+        "greeting": "每個騎手都是兩條腿走進來的，{className}。你能騎穩英勇戰馬、不摔進泥裡之前，我是不會把韁繩交給你的，高望這兒可沒有多餘的醫者去治斷骨。"
       },
       "warden_fenwick": {
         "name": "芬威克守望者",
@@ -9821,6 +10148,16 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "騎術課",
+        "text": "每個騎手都是兩條腿走進來的，{playerName}，就像我們初次見面那天我說的那樣。交上學費，等我發話，就把訓練用的英勇戰馬喚到身邊，翻身上鞍。然後跑完賽道：跟著標記到起點拱門，把每一道障礙都跳得乾淨俐落，在沙子漏盡之前再次衝過終點線。做到了，這鞍子就是你的。要是跑出圍場，我們就從頭再來。",
+        "completion": "好了，就是這樣。一個俐落的動作上了鞍，坐得穩穩當當。英勇戰馬現在是你的了，{playerName}：馬鞍、韁繩，還有靠本事掙來而不是買來的騎手身份。",
+        "objectives": {
+          "0": {
+            "label": "馴服英勇戰馬"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "稀薄的帷幕",
         "text": "洞穴竟為你敞開了。那麼封印比我擔心的還要脆弱，{playerName}。帷幕撕裂之處，光靈會變得陰冷黑暗。給我帶來八份暮光靈的精華，我便能讀出這道傷口有多深。",
@@ -10137,6 +10474,9 @@ export const zh_TW: EnTranslations = {
           },
           "9": {
             "label": "墓龍聖所"
+          },
+          "10": {
+            "label": "高望馬廄"
           }
         }
       },
@@ -10484,6 +10824,11 @@ export const zh_TW: EnTranslations = {
         "sender": "奧德里克修士",
         "subject": "你在黑暗中所做的一切",
         "body": "很少有人會知道那處窪地裡埋葬著什麼，願意相信的人更少。但我知道，而且我不會忘記。\n\n願你的道路常明。\n- 奧德里克修士"
+      },
+      "heroic_marks_reward": {
+        "sender": "英勇軍需官",
+        "subject": "你的英勇印記",
+        "body": "你的部隊清剿了英勇試煉，而你在後排作戰，或已倒在塵土之中。你的鎖定同樣已經生效，因此你那一份英勇印記飛到了這裡，而非就此遺失。好好使用它們。\n\n- 英勇軍需官"
       }
     },
     "itemSets": {

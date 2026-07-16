@@ -376,7 +376,7 @@ describe('Guide bestiary spoiler safety', () => {
 // The bestiary walks the canonical MOBS registry, and CAMPS is itself a growing merge.
 // These gates tie the published bestiary to the camp registry, so a camped creature a
 // player can walk into is never unlisted even as new world columns and mob modules land.
-// NOTE: the exclusion filters below (elite/boss, warlock_, vision, fixture) mirror the
+// NOTE: the exclusion filters below (elite/boss, ambient, warlock_, vision, fixture) mirror the
 // generator's own filters in scripts/wiki/build_content.mjs; the two lists must move
 // together, or this completeness gate and the published set silently diverge.
 describe('Guide bestiary completeness', () => {
@@ -402,6 +402,7 @@ describe('Guide bestiary completeness', () => {
     for (const camp of CAMPS) {
       const m = MOBS[camp.mobId];
       if (!m || m.elite || m.boss) continue;
+      if (m.ambient) continue; // ambient decoration (stable horses), not a wild creature
       if (camp.mobId.startsWith('warlock_')) continue;
       if (/vision/i.test(camp.mobId) || /^Vision\b/.test(m.name)) continue;
       if (isFixture(m)) continue; // inert practice fixtures (the training dummy)
@@ -930,10 +931,12 @@ describe('Guide deeds cross-page surfaces', () => {
       sub: 'dungeons',
       titleKey: 'guide.nav.dungeons',
     });
-    // The heroic explainer renders (difficulty, Marks economy, daily rhythm).
+    // The heroic explainer renders (difficulty, Marks economy, daily rhythm), and the
+    // difficulty-transition escape hatch renders beside it (Reset All Instances).
     expect(html).toContain('Heroic mode');
     expect(html).toContain('Heroic Marks');
     expect(html).toContain('/dungeon heroic');
+    expect(html).toContain('/dungeon reset');
     // Every generated dungeon card carries its deep-link anchor for site search.
     for (const d of GUIDE_DUNGEONS) {
       expect(html, `dungeon card missing anchor id "dungeon-${d.id}"`).toContain(
