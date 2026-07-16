@@ -45,6 +45,7 @@ import {
   dist2d,
   FACING_HOLD_DIST,
   FISHING_CAST_ID,
+  isFormAuraKind,
   MELEE_ARC,
   MELEE_RANGE,
   normAngle,
@@ -70,15 +71,7 @@ import { isSpellResisted } from './spell_resist';
 const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
 
 function isFormToggle(ability: AbilityDef): boolean {
-  return ability.effects.some(
-    (e) =>
-      e.type === 'selfBuff' &&
-      (e.kind === 'form_bear' ||
-        e.kind === 'form_cat' ||
-        e.kind === 'form_travel' ||
-        e.kind === 'form_moonkin' ||
-        e.kind === 'form_shadow'),
-  );
+  return ability.effects.some((e) => e.type === 'selfBuff' && isFormAuraKind(e.kind));
 }
 
 // Forms, stances and stealth are toggles: re-casting cancels the aura, and
@@ -88,13 +81,7 @@ function isToggleBuff(ability: AbilityDef): boolean {
   return ability.effects.some(
     (e) =>
       e.type === 'selfBuff' &&
-      (e.kind === 'form_bear' ||
-        e.kind === 'form_cat' ||
-        e.kind === 'form_travel' ||
-        e.kind === 'form_moonkin' ||
-        e.kind === 'form_shadow' ||
-        e.kind === 'defensive_stance' ||
-        e.kind === 'stealth'),
+      (isFormAuraKind(e.kind) || e.kind === 'defensive_stance' || e.kind === 'stealth'),
   );
 }
 
@@ -845,8 +832,12 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     // like a physical attack; a target can only fully RESIST them (classic-era
     // semantics), so a spell's on-impact roll uses isSpellResisted and emits a 'resist'.
     // A physical shot has no resist roll; its hit/crit resolve inside runEffects.
+    // Taunts (e.g. Sacred Goad) ALWAYS land: a resisted taunt would silently break
+    // tanking, so a taunt ability skips the resist roll entirely (physical taunts like
+    // Goad / Menace already never roll, since they resolve instantly below).
+    const isTaunt = res.effects.some((eff) => eff.type === 'taunt');
     scheduleProjectile(ctx, p, target, (src, tgt) => {
-      if (isSpell && isSpellResisted(ctx.rng, src.level, tgt.level)) {
+      if (isSpell && !isTaunt && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
         ctx.emit({
           type: 'damage',
           sourceId: src.id,

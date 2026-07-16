@@ -1,12 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { arenaOrigin, isArenaPos } from '../src/sim/data';
+import { arenaOrigin, BUILTIN_WORLD, isArenaPos } from '../src/sim/data';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { eloDelta, Sim } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
+import type { PlayerClass, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
+// Arena assertions exercise players and the private arena band. Spawning every
+// ambient realm mob makes each countdown tick scan unrelated overworld AI.
+const ARENA_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: ARENA_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -650,28 +659,26 @@ describe('arena: class ability target filters', () => {
     },
   ];
 
-  it.each(aoeCases)('lets $cls $ability hit active arena opponents', ({
-    cls,
-    ability,
-    level,
-    setup,
-  }) => {
-    const { sim, a, b } = queueDuo(cls, 'warrior');
-    startBout(sim);
-    const caster = sim.entities.get(a)!;
-    const target = sim.entities.get(b)!;
-    sim.setPlayerLevel(level, a);
-    sim.setPlayerLevel(level, b);
-    teleport(sim, b, caster.pos.x, caster.pos.z + 3);
-    caster.resource = caster.maxResource;
-    caster.gcdRemaining = 0;
-    setup?.(sim, a);
+  it.each(aoeCases)(
+    'lets $cls $ability hit active arena opponents',
+    ({ cls, ability, level, setup }) => {
+      const { sim, a, b } = queueDuo(cls, 'warrior');
+      startBout(sim);
+      const caster = sim.entities.get(a)!;
+      const target = sim.entities.get(b)!;
+      sim.setPlayerLevel(level, a);
+      sim.setPlayerLevel(level, b);
+      teleport(sim, b, caster.pos.x, caster.pos.z + 3);
+      caster.resource = caster.maxResource;
+      caster.gcdRemaining = 0;
+      setup?.(sim, a);
 
-    const startHp = target.hp;
-    sim.castAbility(ability, a);
+      const startHp = target.hp;
+      sim.castAbility(ability, a);
 
-    expect(target.hp).toBeLessThan(startHp);
-  });
+      expect(target.hp).toBeLessThan(startHp);
+    },
+  );
 });
 
 describe('arena: enclosing walls', () => {

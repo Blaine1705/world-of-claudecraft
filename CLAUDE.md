@@ -48,7 +48,8 @@ Most directories above have their own `CLAUDE.md` with local conventions; read i
 - `npm test`: Vitest. **Prefer a single file while iterating:** `npx vitest run tests/sim.test.ts`.
 - `npm run gate`: the full CI-equivalent pre-merge gate (i18n gen + freshness, malware scan,
   changed-files biome, SFX conformance, full tests with bounded workers, `tsc`, all builds;
-  release-tier automatically on a `release/**` branch; needs FFmpeg/ffprobe on PATH). Exit-code-safe;
+  release-tier automatically on a `release/**` branch; FFmpeg/ffprobe come from the bundled
+  ffmpeg-static/ffprobe-static packages, PATH is the fallback). Exit-code-safe;
   use it instead of an ad-hoc `&&` chain before calling a change done (piping `npm test` through
   `tail` masks its exit code, and an unbounded run flakes heavy suites under core contention).
 - `npm run build`: regen all generated artifacts (i18n, wiki content, sitemap, SFX + media
@@ -149,6 +150,14 @@ with `npm run gate` (above) before calling it done.
 
 ## Conventions
 - **ESM + TypeScript `strict`** everywhere. 2-space indent; match the surrounding file.
+- **TypeScript toolchain:** `tsc` is the TypeScript 7 native binary (installed as the
+  `@typescript/native` alias); a full-repo `npx tsc --noEmit` takes about 2 seconds, so run it
+  liberally as a check while working. `require('typescript')` deliberately resolves a
+  TypeScript 6 JS API wrapper because svelte-check needs that API; never collapse the dual
+  alias yourself (the collapse triggers live in CONTRIBUTING.md, "TypeScript toolchain", and
+  `tests/server/new_endpoint.test.ts` pins both arms). Regenerate `package-lock.json` ONLY
+  with `npx npm@10 install --package-lock-only`; plain `npm ci` is safe on any npm major
+  (rationale in CONTRIBUTING.md).
 - **Keep the dependency set tiny.** Don't add packages without a clear need. (Svelte
   and `@sveltejs/vite-plugin-svelte` are the one sanctioned exception, scoped to the
   `src/admin/` dashboard bundle; the game/guide/play entries stay framework-free.)

@@ -20,6 +20,154 @@ export const ja_JP: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "開発者コマンドセンター",
+    "kicker": "開発ツール",
+    "title": "コマンドセンター",
+    "subtitle": "現在のワールドをサーバー権限でテストするための操作です。",
+    "closeAria": "開発者コマンドを閉じる",
+    "categoryNavAria": "開発者コマンドのカテゴリ",
+    "categories": {
+      "player": "プレイヤー",
+      "spawns": "出現物",
+      "inventory": "インベントリ",
+      "progress": "進行",
+      "travel": "移動",
+      "scenarios": "シナリオ"
+    },
+    "filterLabel": "コマンドを絞り込む",
+    "filterPlaceholder": "このカテゴリを検索",
+    "noMatches": "一致するコマンドはありません。",
+    "serverRequirement": "サーバーのチート機能には引き続き ALLOW_DEV_COMMANDS=1 が必要です。",
+    "invalidValues": "実行する前に有効な値を選択してください。",
+    "sent": "送信済み：{command}",
+    "run": "実行",
+    "fields": {
+      "level": "レベル",
+      "mob": "モブ",
+      "count": "個数",
+      "item": "アイテム",
+      "gold": "ゴールド",
+      "quest": "クエスト",
+      "profession": "専門職",
+      "amount": "数量",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "ダンジョン",
+      "difficulty": "難易度",
+      "name": "名前"
+    },
+    "difficulty": {
+      "normal": "ノーマル",
+      "heroic": "ヒロイック"
+    },
+    "actions": {
+      "heal": {
+        "label": "体力を回復",
+        "description": "体力を全回復します。"
+      },
+      "resource": {
+        "label": "リソースを回復",
+        "description": "マナ、怒り、またはエネルギーを全回復します。"
+      },
+      "cooldowns": {
+        "label": "クールダウンを消去",
+        "description": "アビリティ、GCD、ポーションのタイマーをリセットします。"
+      },
+      "god": {
+        "label": "無敵モードを切り替え",
+        "description": "無敵状態と強化ダメージを切り替えます。"
+      },
+      "revive": {
+        "label": "復活",
+        "description": "通常の蘇生経路で復活します。"
+      },
+      "kill": {
+        "label": "プレイヤーを死亡させる",
+        "description": "死亡、霊体、死体の流れをテストします。"
+      },
+      "combatreset": {
+        "label": "戦闘をリセット",
+        "description": "戦闘状態と敵の脅威値を消去します。"
+      },
+      "level": {
+        "label": "レベルを設定",
+        "description": "現在のキャラクターレベルを設定します。"
+      },
+      "spawn": {
+        "label": "モブを出現",
+        "description": "プレイヤーの近くに指定したモブを作成します。"
+      },
+      "killtarget": {
+        "label": "ターゲットを倒す",
+        "description": "選択中の生きているモブを倒します。"
+      },
+      "despawntarget": {
+        "label": "ターゲットを消去",
+        "description": "このツールで作成した選択中のモブを削除します。"
+      },
+      "despawnall": {
+        "label": "自分の出現物を消去",
+        "description": "この開発者が出現させたすべてのモブを削除します。"
+      },
+      "give": {
+        "label": "アイテムを付与",
+        "description": "プレイヤーのインベントリにアイテムを追加します。"
+      },
+      "gold": {
+        "label": "ゴールドを追加",
+        "description": "現在の所持金にゴールドを追加します。"
+      },
+      "quest": {
+        "label": "クエストを完了",
+        "description": "IDを指定してクエストを完了します。"
+      },
+      "quests": {
+        "label": "進行中のクエストを完了",
+        "description": "現在のクエストログにある全クエストを完了します。"
+      },
+      "attune": {
+        "label": "前提条件を解除",
+        "description": "すべての前提条件を完了済みにします。"
+      },
+      "gather": {
+        "label": "採集スキルを付与",
+        "description": "採集専門職のスキルを上げます。"
+      },
+      "teleport": {
+        "label": "テレポート",
+        "description": "正確なワールド座標へ移動します。"
+      },
+      "dungeon": {
+        "label": "ダンジョンに入る",
+        "description": "開発者用の制限を無視してダンジョンに入ります。"
+      },
+      "raid": {
+        "label": "レイドに入る",
+        "description": "ナイスラクシスのレイドアリーナへ直接入ります。"
+      },
+      "raidreset": {
+        "label": "レイドロックアウトをリセット",
+        "description": "現在のレイドロックアウトを消去します。"
+      },
+      "bot": {
+        "label": "ソーシャルボットを出現",
+        "description": "ウィスパー可能な静止プレイヤーを作成します。"
+      },
+      "lfgqueue": {
+        "label": "ファインダー待機列を準備",
+        "description": "ダンジョンファインダーの待機列シナリオを作成します。"
+      },
+      "lfgraid": {
+        "label": "レイドファインダーを準備",
+        "description": "レイドファインダーのシナリオを作成します。"
+      },
+      "lfgboard": {
+        "label": "募集掲示板を準備",
+        "description": "事前編成の募集掲示シナリオを作成します。"
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "経験値",
@@ -167,6 +315,32 @@ export const ja_JP: EnTranslations = {
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
       "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。"
     },
+    "unstuck": {
+      "menuButton": "スタック解除",
+      "help": "復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。",
+      "helpAtGraveyard": "復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。",
+      "started": "{seconds}秒後にスタックを解除します。移動、戦闘、被ダメージ、別の行動を始めるとキャンセルされます。",
+      "countdown": "スタック解除：{seconds}",
+      "completed": "到達可能な最寄りの安全な場所へ移動しました。",
+      "completedAtGraveyard": "魂は最寄りの墓地へ戻りました。霊魂の癒し手に話しかけ、番人の代償を受けてください。",
+      "cancelledMoved": "移動したため、スタック解除をキャンセルしました。",
+      "cancelledDamaged": "ダメージを受けたため、スタック解除をキャンセルしました。",
+      "cancelledCombat": "戦闘に入ったため、スタック解除をキャンセルしました。",
+      "cancelledBusy": "別の行動を始めたため、スタック解除をキャンセルしました。",
+      "cancelledState": "状態が変化したため、スタック解除をキャンセルしました。",
+      "cancelledDisconnected": "接続が切れたため、スタック解除をキャンセルしました。",
+      "noSafePosition": "近くに到達可能な安全な場所がありません。移動は行われませんでした。",
+      "alreadyActive": "スタック解除のカウントダウンはすでに進行中です。",
+      "alreadySafe": "すでに安全で到達可能な場所にいます。",
+      "cooldown": "スタック解除はあと{seconds}秒で使用できます。",
+      "dead": "死亡中または霊体中はスタック解除を使用できません。",
+      "combat": "戦闘中はスタック解除を使用できません。",
+      "controlled": "移動を妨げられている間はスタック解除を使用できません。",
+      "standStill": "安定した地面で静止してからスタック解除を使用してください。",
+      "standStillAnywhere": "静止してからスタック解除を使用してください。",
+      "busy": "現在の行動を終えてからスタック解除を使用してください。",
+      "unavailable": "現在の状態ではスタック解除を使用できません。"
+    },
     "emotes": {
       "wave": "手を振る",
       "laugh": "大笑い",
@@ -203,6 +377,7 @@ export const ja_JP: EnTranslations = {
       "remainingLessThanMinute": "1分未満",
       "remainingMinutes": "{minutes}分",
       "remainingHoursMinutes": "{hours}時間{minutes}分",
+      "remainingDaysHours": "{days}日{hours}時間",
       "score": "スコア",
       "walletValue": "ウォレット価値 (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +416,8 @@ export const ja_JP: EnTranslations = {
         "no_wallet": "$20 USD 相当以上のWOCを保有するウォレットを接続してください。",
         "under_minimum": "ウォレットが最低額の $20 USD 相当のWOCを下回っています。",
         "price_unavailable": "WOCの価格を取得できないため、報酬は一時的にロックされています。",
-        "banned": "デイリー報酬への参加が禁止されています。理由: {reason}"
+        "banned": "デイリー報酬への参加が禁止されています。理由: {reason}",
+        "bannedUntil": "デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +642,7 @@ export const ja_JP: EnTranslations = {
       "balanceLabel": "残高",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL：{amount}",
+      "usdcBalance": "USDC：{amount}",
       "wocBalance": "WOC：{amount}",
       "unavailable": "Claudiumストアは現在利用できません。残高と購入内容に影響はありません。しばらくしてからお試しください。",
       "disclosure": "Claudiumは一方向のゲーム内通貨です。現金で購入して外見アイテムに使用でき、換金、譲渡、払い戻しはできません。",
@@ -473,6 +650,7 @@ export const ja_JP: EnTranslations = {
       "railLabel": "支払い方法",
       "railStripe": "カード",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20%オフ",
       "railWocUnavailable": "WOC価格は現在利用できません。",
@@ -901,6 +1079,7 @@ export const ja_JP: EnTranslations = {
       "interfaceModeTouch": "タッチ",
       "interfaceModeNote": "自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。",
       "footstepSounds": "足音",
+      "interfaceSounds": "インターフェースとフィードバック音",
       "clickFeedback": "クリックマーカー",
       "lockCursorOnRotate": "回転中はカーソルを固定",
       "keybindHelpLockCursorOnRotate": "ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。",
@@ -1036,6 +1215,7 @@ export const ja_JP: EnTranslations = {
         "spellPower": "呪文威力",
         "critRating": "クリティカルレーティング",
         "hasteRating": "ヘイストレーティング",
+        "hitRating": "命中レーティング",
         "warfare": "ウォーフェア"
       },
       "warfareValue": "与ダメージ +{increase}% / 被ダメージ -{reduction}%",
@@ -1053,6 +1233,7 @@ export const ja_JP: EnTranslations = {
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
         "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
+        "hitRating": "装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。",
         "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
       },
       "effects": {
@@ -1338,7 +1519,20 @@ export const ja_JP: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "ダンジョン難易度をヒロイックに設定",
-      "setNormal": "ダンジョン難易度をノーマルに設定"
+      "setNormal": "ダンジョン難易度をノーマルに設定",
+      "resetAll": "すべてのインスタンスをリセット",
+      "resetDone": "すべてのインスタンスをリセットしました。",
+      "resetNone": "リセットできるインスタンスがありません。",
+      "resetOccupied": "中にプレイヤーがいる間はインスタンスをリセットできません。",
+      "resetSameDifficulty": "インスタンスをリセットする前にダンジョン難易度を変更してください。空のインスタンスは5分後に自動的にリセットされます。",
+      "resetLoot": "中に戦利品が残っている間はインスタンスをリセットできません。",
+      "resetConfirmTitle": "すべてのインスタンスをリセットしますか？",
+      "resetConfirmBody": "以前選択していた難易度の空のインスタンスを放棄します。未取得の戦利品がある場合はリセットできません。",
+      "resetConfirm": "インスタンスをリセット",
+      "resetCooldown": "インスタンスをリセットできるのは5分に1回だけです。",
+      "resetUsage": "難易度を変更した後、/dungeon reset で空のインスタンスを放棄できます。",
+      "entryMismatchNormal": "このインスタンスはノーマル難易度に設定されています。ヒロイックで新しく始めるには「すべてのインスタンスをリセット」を使用してください。",
+      "entryMismatchHeroic": "このインスタンスはヒロイック難易度に設定されています。ノーマルで新しく始めるには「すべてのインスタンスをリセット」を使用してください。"
     },
     "bags": {
       "cannotDestroy": "このアイテムは破壊できません。",
@@ -1419,6 +1613,8 @@ export const ja_JP: EnTranslations = {
       },
       "dodge": "回避率を{pct}%上昇させる",
       "dodgeReduce": "回避率を{pct}%低下させる",
+      "damageReduction": "受けるすべてのダメージを{pct}%軽減する",
+      "guardianWard": "次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する",
       "armorFlat": "防御力を{value}低下させる",
       "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
       "armorPct": "防御力を{pct}%低下させる",
@@ -1507,11 +1703,41 @@ export const ja_JP: EnTranslations = {
       "unlock": "プレイヤーフレームを移動",
       "lock": "プレイヤーフレームを固定"
     },
+    "partyFrames": {
+      "section": "パーティ・レイドフレーム",
+      "unlock": "パーティ・レイドフレームを移動",
+      "lock": "パーティ・レイドフレームを固定",
+      "style": "フレームスタイル",
+      "styleAutomatic": "自動",
+      "styleClassic": "クラシックパーティフレーム",
+      "styleRaid": "レイドフレーム",
+      "scale": "フレームスケール",
+      "width": "フレームの幅",
+      "height": "フレームの高さ",
+      "spacing": "フレームの間隔",
+      "columns": "レイドの列数",
+      "healthText": "体力テキスト",
+      "healthNone": "なし",
+      "healthPercent": "パーセント",
+      "healthCurrent": "現在値",
+      "healthCurrentMax": "現在値 / 最大値",
+      "sort": "プレイヤーの並び順",
+      "sortGroup": "グループ",
+      "sortRole": "ロール",
+      "sortName": "名前",
+      "showResource": "マナ・怒り・エネルギーを表示",
+      "showAbsorbs": "吸収シールドを表示",
+      "showAuras": "バフとデバフを表示",
+      "showSelf": "自分のフレームを表示"
+    },
     "frameReset": {
       "label": "フレーム位置をリセット"
     },
     "itemTooltip": {
-      "requiresLevel": "必要レベル {level}"
+      "requiresLevel": "必要レベル {level}",
+      "riftTier": "{tier}ランク・リフト装備",
+      "riftUpgrade": "リフト強化 {level}/{max}",
+      "riftSockets": "リフト宝石 {used}/{total}"
     },
     "discord": {
       "title": "Discord",
@@ -1600,8 +1826,8 @@ export const ja_JP: EnTranslations = {
         "juniormods": "ジュニアモデレーター",
         "artists": "アーティスト",
         "contentcreator": "コンテンツクリエイター",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "legend": "レジェンド",
+        "shill": "サポーター"
       },
       "guildMember": "認証済みメンバー",
       "notMember": "まだサーバーに参加していません",
@@ -2166,6 +2392,9 @@ export const ja_JP: EnTranslations = {
       "already_linked": "このアカウントには既にSteamアカウントが連携されています。",
       "account_taken": "そのSteamアカウントは既に別のアカウントに連携されています。",
       "upstream": "Steamから応答がありません。しばらくしてからもう一度お試しください。"
+    },
+    "welcome": {
+      "invalid_input": "入力が無効です。"
     }
   },
   "guide": {
@@ -2286,7 +2515,17 @@ export const ja_JP: EnTranslations = {
         "marshName": "マイアフェン湿地",
         "marshBlurb": "沈んだ沼地と波に削られた遺跡。マッドフィンや、それ以上に厄介なものが棲む。",
         "peaksName": "ソーンピーク高地",
-        "peaksBlurb": "風に削られた尾根が、この世界で最も冷たい危険へと続いていく。"
+        "peaksBlurb": "風に削られた尾根が、この世界で最も冷たい危険へと続いていく。",
+        "duskName": "ヴェールの幽谷",
+        "duskBlurb": "山々の下に封じられた領域。入り口の噂がまことなら、だが。",
+        "emberName": "ドレイクランド",
+        "emberBlurb": "ペイル・コーズウェイを越えると緑は燃え殻に変わり、荒野には古きものが君臨する。",
+        "frostName": "フロストヴェイルの果て",
+        "frostBlurb": "どの地図にも載らない雪の高地。揺らめくオーロラの中にだけ垣間見える。",
+        "amberName": "アンバーフォール",
+        "amberBlurb": "西の断崖の向こうには終わらない秋があり、金色の湖にランタンが灯る。",
+        "fenName": "ウィローフェン",
+        "fenBlurb": "秋の冠を越えた先には、柳と静かな水の明るい湿原と、堀に守られた町がある。"
       },
       "group": {
         "heading": "難所は仲間と挑もう",
@@ -2746,6 +2985,18 @@ export const ja_JP: EnTranslations = {
       "reptile": {
         "name": "爬虫類",
         "desc": "独特の威嚇音と鋭い一撃を持つ、冷血のハンターたち。温血の獣たちとは一線を画します。"
+      },
+      "murloc": {
+        "name": "クロークフィン",
+        "desc": "湖岸や潮だまりに棲む、しわがれ声の魚人たち。近づきすぎた者には、すぐさま群れをなして襲いかかります。"
+      },
+      "kobold": {
+        "name": "いたずら小妖",
+        "desc": "林間や生け垣をちょろちょろと駆け回る、漁り屋の小妖たち。数が揃うまでは、脅威というより厄介者です。"
+      },
+      "demon": {
+        "name": "デーモン",
+        "desc": "裂け目の彼方から来た侵略者たち。その身は炎と悪意のかたまりです。一体がいるところ、次元の裂け目は決して遠くありません。"
       }
     },
     "worldPage": {
@@ -2759,15 +3010,55 @@ export const ja_JP: EnTranslations = {
       "valeBlurb": "緑あふれる始まりの谷。新たな英雄たちが、イーストブルックの町の周りでオオカミや盗賊を相手に腕を磨く場所です。",
       "marshBlurb": "霧と廃墟に沈んだ国。浅瀬にはマッドフィンが群れ、水の底ではより古き何かがうごめいています。橋の町フェンブリッジから見張られています。",
       "peaksBlurb": "風に削られた尾根と古い鉱山跡。この地で最も寒く、最も高所にある危険へと続いており、前哨地ハイウォッチが守っています。",
+      "duskBlurb": "エルダーグリームの大樹の下に広がる、永遠の黄昏に沈む谷。水晶の遺跡が輝き、大気は古の魔力に満ちて震えています。",
+      "emberBlurb": "嵐の光に照らされた灰と血硝子の荒れ地。カルデラの上空をドレイクが旋回し、砂丘のあいだにはトロルの篝火が燃えています。門の町ワームウォッチから見張られています。",
+      "frostBlurb": "オーロラの下、雪と暗い松の森が静まり返る地。寒さそのものが目覚めているかのようで、アイスマントルは絶やさず火を焚き続けています。",
+      "amberBlurb": "金と紅の葉が決して散らない、永遠の秋の国。ランタンの灯る町ランタンミアの周りに広がっています。",
+      "fenBlurb": "睡蓮とゆるやかな水をたたえた、明るく羽音に満ちた湿地。橋の町ブリッジミアから、古い板張りの道で渡っていきます。",
+      "nightBlurb": "星降る真夜中のレルム。花々が小道を照らし、ムーンレストは夢見る空の下で静かな見張りを続けています。",
+      "hauntBlurb": "巨大な樹冠に覆われた呪われた森。街道でまともな光といえば、ギャロウミアのランタンだけです。",
+      "galeBlurb": "風のやむことのない海崖と咆哮の丘陵。古き烽火台の火は決して消えず、ウィックハーバーは扉を固く閉ざしています。",
+      "jungleBlurb": "ヤシと白砂、騒がしい鳥たちの南国の密林。浜の町ドリフトヘイヴンが、渚に火を灯し続けています。",
+      "gardenBlurb": "誰も姿を見たことのない庭師によって、今も刈り込まれ続けている生け垣迷路の庭園のレルム。ヘッジウィックとその噴水の中庭を抜けて入ります。",
       "valeGreeting": "刃を手放すな。渓谷はかつての姿ではない。",
       "valeGreeter": "レッドブルック元帥、イーストブルック",
       "marshGreeting": "門で止まれ。あの葦の向こうでは、沼が我々の代わりに殺しをやってくれる。",
       "marshGreeter": "番人フェンウィック、フェンブリッジ",
       "peaksGreeting": "この壁は二百年立ち続けてきた。私が守る限り崩れはしないが、軋んでいる。",
       "peaksGreeter": "隊長テサリー、ハイウォッチ",
+      "duskGreeting": "そなたの同族でこの枝の下に立った者は少ない。静かに歩み、歓迎を受けるがよい。",
+      "duskGreeter": "守り手セルウィン、エルダーグリーム",
+      "emberGreeting": "荒れ地から吹く熱風、ドレイクモウの上を舞う竜、砂丘に燃えるトロルの篝火。外へ出る前に、一杯やっていけ。",
+      "emberGreeter": "門衛、ワームウォッチ",
+      "frostGreeting": "壁の外では、雪があらゆる音を飲み込む。空の光が踊り始めたら、声を潜め、火を絶やすな。",
+      "frostGreeter": "炉の守り手、アイスマントル",
+      "amberGreeting": "ここの葉はどれも金と紅に燃えているのに、一枚として散ることがない。ランタンはお前さんのために灯してある。登り道ではゴールドメルトに気をつけな。",
+      "amberGreeter": "ランタン職人、ランタンミア",
+      "fenGreeting": "この湿原はトンボと蜂の羽音でいっぱいだ。橋を渡って、しばし足を休めていくといい。池のそばでは板の道を外れるなよ。",
+      "fenGreeter": "橋守、ブリッジミア",
+      "nightGreeting": "ナイトゲートの先では、大気そのものが夢を見ている。花明かりをたどり、空に浮かぶ眠れる世界に心せよ。",
+      "nightGreeter": "不寝番の守り手、ムーンレスト",
+      "hauntGreeting": "ランタンのそばを離れるな、旅人よ。それから、道の外から森がお前の名を呼んでも、決して答えるな。",
+      "hauntGreeter": "点灯夫、ギャロウミア",
+      "galeGreeting": "ここでは風は一度たりともやんだことがなく、古き烽火台の火は一度たりとも消えたことがない。宿の扉はしっかり閉めてくれ。",
+      "galeGreeter": "烽火の番人、ウィックハーバー",
+      "jungleGreeting": "温かい砂、騒がしい鳥、そして地平線を飲み込むジャングル。浜辺には火を灯してある。必ずそこへ帰ってくるんだよ。",
+      "jungleGreeter": "港の女主人、ドリフトヘイヴン",
+      "gardenGreeting": "百年ものあいだ庭師の姿を見た者はいないのに、誰かが今も生け垣を刈り込んでいる。迷路には気をつけろ。向こうもこちらに気を配っているのだからな。",
+      "gardenGreeter": "門番、ヘッジウィック",
       "valePlaceNotes": "イーストブルックは最初の本拠地です。狼の道と猪の草地は穏やかな狩り場、鏡の湖は良い釣り場ですが、浅瀬にはマッドフィンが群れています。セイブルウェブと銅鉱山には蜘蛛と鉱石に貪欲な掘り手が隠れ、盗賊の野営地と倒れた礼拝堂にはより手荒い仕事があります。聖遺物庫の丘はレルム初のデルヴ、崩れた聖遺物庫へと落ち込み、ブライトウッドの林間は北にある静かな陽だまりの木立です。そしてソウフィールドはイーストブルックの壁に囲まれたボアボール場で、収穫休戦のもとヴェイルカップが行われます。",
       "marshPlaceNotes": "フェンブリッジは唯一の乾いた道を守っています。徘徊者の葦原とディープフェンの浅瀬は沼地の獣とマッドフィンでひしめき、寡婦蜘蛛の茂みは蜘蛛の糸が厚く張られています。沈んだ礼拝堂とトロルの塚にはより古き危険が潜み、塚のすぐ北には沼地自身のデルヴ、溺れし連祷が口を開けています。グレイブコーラーの野営地にはカルトが立てこもり、沈んだ砦は沼地のインスタンス化された中心地です。",
       "peaksPlaceNotes": "ハイウォッチは壁を守っています。ストーカー尾根とディープロックの巣穴は尾根猫と穴掘りのもの、オーガの丘陵とドログマーの戦営は雇われの荒くれ者のもの。ストームクラグはエレメンタルで弾け、その下にはグリマーミアが輝きます。その岸辺には、溺れし神殿へと下る蒼白い光の門があります。ワームカルトのテントとレヴェナントの野原がカルトの高所を囲み、その頂には墓ワームの聖所があります。",
+      "duskPlaceNotes": "エルダーグリームは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。",
+      "emberPlaceNotes": "ワームウォッチは門を守っています。ゲートウッドは荒れ地を前にした最後の緑地。燃えがらの砂丘には灰と、それより悪いものが吹き溜まります。トロルの集会場は砂丘のトロルたちが篝火を囲む場所、血硝子の野は剃刀のような破片できらめき、ドレイクモウ・カルデラはドレイクたちが旋回する、煙を上げる王冠です。",
+      "frostPlaceNotes": "アイスマントルは最後の温かな炉を守っています。雪線から先は吹き溜まりの領分。氷河の山湖は氷の下に黒く静まる水をたたえ、オーロラの階段は踊る光の下を登っていきます。シヴァーフェンは決して寝静まらない凍てついた泥沼で、咆哮の段丘は毎晩その名にふさわしい声を上げます。",
+      "amberPlaceNotes": "ランタンミアは実りの中心で輝いています。ゴールドメルトは琥珀に濡れた入り口の峠。金箔の果樹園と収穫の窪地には、いちばん甘い実りと、いちばん大胆な盗人たちがいます。グレートミアは燃える葉を映し、シンダーメイプルの丘は最も高く最も紅く立ち、傾いたモノリスは秋よりも古い何かを覚えています。",
+      "fenPlaceNotes": "ブリッジミアはゆるやかな水をまたいで座しています。アンバーフェンの階段は実りの国から下ってくる道。睡蓮の湿原と沼光の池はウィスプとトンボできらめき、ウィローウィープは湖面へと枝を垂らします。まどろみの平地は、この地でいちばん穏やかな場所です。",
+      "nightPlaceNotes": "ムーンレストは見張りを続けています。ナイトゲートは真夜中の国への入り口。月の泉にはそばに立てるほど近くに星明かりが湛えられ、宵闇の野は暗がりの中で花開きます。不動の見張りは微動だにせず見つめ続け、眠らずの塚はこの地でただ一つ、決して夢を見ない場所です。",
+      "hauntPlaceNotes": "ギャロウミアはランタンの内側に身を寄せ合っています。鴉の門は森の陰気な玄関口。寡婦蜘蛛の茂みは蜘蛛の糸が厚く張られています。首吊りの林間と嘆き石の礼拝堂は森の最も古い悲しみを抱え、狩人の空き地は、今もそこで狩りを続ける何者かのものです。",
+      "galePlaceNotes": "ウィックハーバーは風に身を傾けています。風の道は崖沿いの入り口の道。咆哮の丘陵は強風の下、木一本なくうねっています。古き烽火台は誰も知らぬ昔から燃え続け、断ち崖は水面まで垂直に落ち込み、難破船の野はこの海岸の油断ならなさを物語ります。そして鏡の山湖は、このレルムでただ一つ静止しているものです。",
+      "junglePlaceNotes": "ドリフトヘイヴンは浜辺の火を守っています。タングルマウスは川が緑の壁とぶつかる場所。パームストランドは白く温かな砂浜となって波打ち際に続きます。エメラルドの密林とヴァインフォールは内陸を飲み込み、サファイアの礁湖は澄んで深く輝き、沈んだ偶像は水の底からこちらを見つめています。",
+      "gardenPlaceNotes": "ヘッジウィックは庭園の門で待っています。彫像の小径には物言わぬ立ち姿が並び、野薔薇の原はとうの昔に花壇を飛び出しました。花びらの池は一年中桃色に漂い、大迷路は客が来るたびに作法を並べ替え、噴水の中庭は庭園の中心で今も澄んだ水を流し続けています。",
       "gladeTitle": "静かな一角：ブライトウッド・グレード",
       "gladeBody": "Valeの物語がすべて死者について語るわけではありません。北にはBrightwood Gladeと呼ばれる陽だまりの木立があり、静かな小道と枝々の下に揺れる木漏れ日とともに、穏やかな独自の調子を保っています。あなたが追う足跡への柔らかな対照であり、道に寄り道の余裕があるなら見る価値があります。",
       "worldBossTitle": "峰が目覚めるとき：ワールドボス",
@@ -3767,6 +4058,7 @@ export const ja_JP: EnTranslations = {
     "title": "デスクトップランチャーのダウンロード",
     "desc": "最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。",
     "macCta": "macOS版をダウンロード",
+    "windowsCta": "Windows版をダウンロード",
     "linuxCta": "Linux版をダウンロード",
     "linuxHint": "AppImage形式です。実行権限を付けてそのまま起動でき、インストールは不要です。",
     "windowsPending": "Windows版は準備中です。"
@@ -4068,6 +4360,35 @@ export const ja_JP: EnTranslations = {
     "chat": "チャットを開く"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "すべての裂け目が今は不安定だ。しばらくしてからもう一度試そう。",
+      "enterFloor": "裂け目をくぐり、{name}へ足を踏み入れた。",
+      "descendFloor": "{name}のさらに深くへ降りていく。",
+      "stepBack": "裂け目を通って元の場所へ戻った。",
+      "pylonLit": "ルーンの尖塔が光を放った（{lit}/{total}）。",
+      "wayDownOpens": "下層への道が裂け開いた。",
+      "exitOpens": "裂け目が震える。倒れた敵の後ろに帰り道が裂け開いた。",
+      "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
+      "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
+      "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",
+      "levelGate": "この裂け目に入れるのはレベル{level}以上の冒険者だけだ。",
+      "iceGoalLit": "霜の紋章が燃え上がる。道が動き出す。",
+      "socketsShut": "台座が音を立てて閉じる。道が動き出す。",
+      "seqProgress": "ルーンが順に応える（{step}/{total}）。",
+      "seqReset": "ルーンがすべて暗くなる。最初からやり直せ。",
+      "gateOpen": "門が音を立てて開いた。",
+      "orbSealed": "宝珠は下層の儀式によって封じられている。",
+      "orbWakes": "五芒星の炎が消えた。祭壇で何かが目覚める。",
+      "orbOpensGate": "血の宝珠が輝く。神殿の門が音を立てて開いた。",
+      "alreadyCleared": "このリフトはすでに {names} が攻略しました。",
+      "raceLost": "このリフトはすでに {names} が攻略しました。挑戦は終了します。",
+      "raceWorldWin": "{names} が {seconds}秒で{tier}ランク・リフトレースに勝利！",
+      "raceWinBanner": "リフトレース勝利 — {seconds}秒",
+      "raceLostBanner": "リフト攻略済み",
+      "forgeUpgraded": "{name} のリフト強化が完了しました。",
+      "forgeEnchanted": "{name} のリフト付与が完了しました。",
+      "forgeSocketed": "{name} にリフトの宝石をはめ込みました。"
+    },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",
       "leaveDungeonFirst": "まずダンジョンから出よ。",
@@ -4861,6 +5182,29 @@ export const ja_JP: EnTranslations = {
     "body": "ゲームサービスを再起動しています。Claudemoonはまもなく戻る予定です。このページは自動的に確認を続けます。",
     "status": "まもなく復帰"
   },
+  "welcome": {
+    "back": "おかえりなさい、{name}さん",
+    "level": "レベル {level}",
+    "lastPlayed": "最終プレイ：{when}",
+    "continue": "ワールドに入る",
+    "continueHint": "Enterで続行、Escでスキップ",
+    "continueHintTouch": "タップして続行",
+    "discord": {
+      "title": "コミュニティはDiscordで活動しています",
+      "sub": "パッチプレビュー、イベント、開発者チャット、連携でボーナス銀行スロット2枠。",
+      "join": "Discordに参加する"
+    },
+    "chest": {
+      "ready": "デイリーチェストの準備ができました"
+    },
+    "armory": {
+      "cta": "武器庫を見に行く"
+    },
+    "news": {
+      "new": "新着",
+      "viewAll": "GitHubですべての更新を見る"
+    }
+  },
   "hud": {
     "core": {
       "elite": "エリート",
@@ -4875,6 +5219,8 @@ export const ja_JP: EnTranslations = {
       "secondsRemaining": "残り {seconds} 秒",
       "enteringZone": "{zone}に入りました。",
       "welcomeZone": "{zone}へようこそ！",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "レベル {level}！",
       "levelLog": "レベル {level}になりました！",
       "xpGain": "{amount}の経験値を獲得しました。",
@@ -6340,6 +6686,18 @@ export const ja_JP: EnTranslations = {
         "name": "樫の肌",
         "description": "肌が樹皮のように硬くなり、15秒間アーマーが150増加します。"
       },
+      "ironhold": {
+        "name": "鉄壁",
+        "description": "堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。"
+      },
+      "sacred_bulwark": {
+        "name": "聖なる防壁",
+        "description": "{duration}秒間、次に敵から受ける致命的な一撃を無効化し、代わりに体力を最大値の35%まで回復します。"
+      },
+      "primal_reflexes": {
+        "name": "原始の反射",
+        "description": "本能が研ぎ澄まされ、6秒間、回避率が50%上昇します。"
+      },
       "starfire": {
         "name": "天墜",
         "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。"
@@ -6378,7 +6736,7 @@ export const ja_JP: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼の血",
-        "description": "攻撃力を6秒間40上昇させます。ウルフフォーム専用。"
+        "description": "攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。"
       },
       "rip": {
         "name": "リップ",
@@ -6669,6 +7027,24 @@ export const ja_JP: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "イーストブルックの羊毛ズボン"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "イーストブルックの儀式衣装"
+      },
+      "eastbrook_druids_hide": {
+        "name": "イーストブルックのドルイドの皮"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "イーストブルックの守護レギンス"
+      },
+      "wardweave_cowl": {
+        "name": "ワードウィーヴのフード"
+      },
+      "duskhide_wraps": {
+        "name": "ダスクハイドの手甲"
+      },
+      "sootscale_mantle": {
+        "name": "ススウロコのマント"
       },
       "gravecaller_blade": {
         "name": "グレイブコーラーの大刃"
@@ -7177,6 +7553,66 @@ export const ja_JP: EnTranslations = {
       "sunpetal_sickle": {
         "name": "陽花弁の鎌"
       },
+      "duskwisp_essence": {
+        "name": "ダスクウィスプの精髄"
+      },
+      "spore_heart": {
+        "name": "胞子の心臓"
+      },
+      "gleaming_antler": {
+        "name": "輝く鹿角"
+      },
+      "wisp_mote": {
+        "name": "星明かりの粒"
+      },
+      "starfall_shard": {
+        "name": "星降りの欠片"
+      },
+      "elder_bark": {
+        "name": "長老の樹皮"
+      },
+      "hollow_sealstone": {
+        "name": "幽谷の封印石"
+      },
+      "monument_overlook": {
+        "name": "風化した石碑"
+      },
+      "monument_court": {
+        "name": "沈んだ石碑"
+      },
+      "monument_north": {
+        "name": "忘れられた石碑"
+      },
+      "guardian_core": {
+        "name": "守護者の核"
+      },
+      "wardens_seal": {
+        "name": "監視者の印章"
+      },
+      "gleamstag_charm": {
+        "name": "グリームスタッグの護符"
+      },
+      "veilsteel_blade": {
+        "name": "ヴェール鋼の剣"
+      },
+      "duskfang_dirk": {
+        "name": "黄昏の牙の短剣"
+      },
+      "gleamwood_stave": {
+        "name": "輝き木の杖"
+      },
+      "wardens_oathband": {
+        "name": "監視者の誓いの篭手"
+      },
+      "wardplate_cuirass": {
+        "name": "守りの板金胸甲"
+      },
+      "nightweave_tunic": {
+        "name": "夜織りのチュニック"
+      },
+      "veilcloth_robe": {
+        "name": "ヴェール布のローブ"
+      },
       "thorium_ore": {
         "name": "トリウム鉱石"
       },
@@ -7314,6 +7750,27 @@ export const ja_JP: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "熾火硝子の戦杖"
+      },
+      "rift_essence": {
+        "name": "リフトエッセンス"
+      },
+      "rift_gem_crimson": {
+        "name": "深紅のリフト宝石"
+      },
+      "rift_gem_azure": {
+        "name": "紺碧のリフト宝石"
+      },
+      "rift_gem_verdant": {
+        "name": "翠緑のリフト宝石"
+      },
+      "riftbound_band_of_might": {
+        "name": "剛力のリフトバウンドリング"
+      },
+      "riftbound_band_of_insight": {
+        "name": "叡智のリフトバウンドリング"
+      },
+      "riftbound_band_of_guile": {
+        "name": "機略のリフトバウンドリング"
       },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"
@@ -8283,6 +8740,258 @@ export const ja_JP: EnTranslations = {
       "stable_horse": {
         "name": "厩舎の馬"
       },
+      "rift_spawnling": {
+        "name": "リフトの落とし子"
+      },
+      "rift_bonewalker": {
+        "name": "蘇りし骨歩き"
+      },
+      "rift_frost_revenant": {
+        "name": "氷縛の亡霊"
+      },
+      "rift_rime_elemental": {
+        "name": "樹氷のエレメンタル"
+      },
+      "rift_ember_fiend": {
+        "name": "燃え殻の魔物"
+      },
+      "rift_magma_brute": {
+        "name": "マグマの猛獣"
+      },
+      "rift_venom_weaver": {
+        "name": "毒織り"
+      },
+      "rift_thornback": {
+        "name": "茨背の追跡者"
+      },
+      "rift_boneclad": {
+        "name": "骨鎧の戦士"
+      },
+      "rift_marrow_troll": {
+        "name": "髄のトロル"
+      },
+      "rift_void_acolyte": {
+        "name": "虚空傷の侍祭"
+      },
+      "rift_dread_stalker": {
+        "name": "恐怖の追跡者"
+      },
+      "rift_storm_caller": {
+        "name": "嵐呼び"
+      },
+      "rift_stormscale": {
+        "name": "嵐鱗のドレイク"
+      },
+      "rift_tide_thrall": {
+        "name": "潮の下僕"
+      },
+      "rift_deep_lurker": {
+        "name": "深淵の潜伏者"
+      },
+      "rift_stone_ogre": {
+        "name": "石のオーガ"
+      },
+      "rift_boss_frost": {
+        "name": "樹氷の守護者"
+      },
+      "rift_boss_ember": {
+        "name": "燃え殻鍛冶の暴君"
+      },
+      "rift_boss_venom": {
+        "name": "母胎ヴィスカ"
+      },
+      "rift_boss_necro": {
+        "name": "骨王ザレス"
+      },
+      "rift_boss_brute": {
+        "name": "軍将グラスク"
+      },
+      "rift_boss_arcane": {
+        "name": "アルコン・ニクサリス"
+      },
+      "rift_boss_storm": {
+        "name": "嵐のヴァロク"
+      },
+      "rift_boss_tide": {
+        "name": "深淵の顎"
+      },
+      "glimmerwisp": {
+        "name": "グリマーウィスプ"
+      },
+      "duskwisp": {
+        "name": "ダスクウィスプ"
+      },
+      "veiled_stag": {
+        "name": "ヴェールの牡鹿"
+      },
+      "veiled_doe": {
+        "name": "ヴェールの雌鹿"
+      },
+      "gleamstag": {
+        "name": "グリームスタッグ"
+      },
+      "sporeling_gatherer": {
+        "name": "スポアリングの採集者"
+      },
+      "corrupted_sporeling": {
+        "name": "堕落したスポアリング"
+      },
+      "mushroom_pixie": {
+        "name": "グリームフォーク・ピクシー"
+      },
+      "treant_elder": {
+        "name": "トレントの長老"
+      },
+      "ancient_guardian": {
+        "name": "古代の守護者"
+      },
+      "waking_warden": {
+        "name": "目覚めし監視者"
+      },
+      "old_marrowshell": {
+        "name": "オールド・マロウシェル"
+      },
+      "aurelhorn": {
+        "name": "アウレルホーン、群れの長"
+      },
+      "snowdrift_wolf": {
+        "name": "スノードリフトウルフ"
+      },
+      "ice_wisp": {
+        "name": "アイスウィスプ"
+      },
+      "rime_elemental": {
+        "name": "霧氷の精霊"
+      },
+      "fen_sprite": {
+        "name": "フェンスプライト"
+      },
+      "frostmane_yeti": {
+        "name": "フロストメイン・イエティ"
+      },
+      "emberwing_drake": {
+        "name": "エンバーウィング・ドレイク"
+      },
+      "ashbone_raider": {
+        "name": "アッシュボーンの略奪者"
+      },
+      "ashbone_warcaller": {
+        "name": "アッシュボーンの戦呼び"
+      },
+      "dune_troll": {
+        "name": "デューントロール"
+      },
+      "gilded_stag": {
+        "name": "黄金の牡鹿"
+      },
+      "gloam_fox": {
+        "name": "グロームフォックス"
+      },
+      "orchard_treant": {
+        "name": "果樹園のトレント"
+      },
+      "harvest_sprite": {
+        "name": "ハーベストスプライト"
+      },
+      "mere_lurker": {
+        "name": "湖の潜み手"
+      },
+      "bogtoad": {
+        "name": "ボグトード"
+      },
+      "drowsy_croaker": {
+        "name": "まどろみのクローカー"
+      },
+      "lily_wisp": {
+        "name": "リリーウィスプ"
+      },
+      "willow_sprite": {
+        "name": "ウィロースプライト"
+      },
+      "moonfleece_grazer": {
+        "name": "ムーンフリース"
+      },
+      "gloam_strider": {
+        "name": "グロームストライダー"
+      },
+      "nightkin_stargazer": {
+        "name": "ナイトキンの星読み"
+      },
+      "barrow_king": {
+        "name": "塚の王"
+      },
+      "widowsilk_spinner": {
+        "name": "ウィドウシルク・スピナー"
+      },
+      "wood_wraith": {
+        "name": "ウッドレイス"
+      },
+      "gravenbark_shambler": {
+        "name": "グレイヴンバーク"
+      },
+      "pale_huntsman": {
+        "name": "蒼白の狩人"
+      },
+      "tide_scuttler": {
+        "name": "タイドスカトラー"
+      },
+      "thicket_boar": {
+        "name": "茂みの猪"
+      },
+      "canopy_weaver": {
+        "name": "キャノピーウィーバー"
+      },
+      "idol_guardian": {
+        "name": "神像の守護者"
+      },
+      "topiary_stag": {
+        "name": "トピアリーの雄鹿"
+      },
+      "topiary_wolf": {
+        "name": "トピアリーの狼"
+      },
+      "hedge_gnome": {
+        "name": "生け垣ノーム"
+      },
+      "the_topiary_bull": {
+        "name": "トピアリーの雄牛"
+      },
+      "moor_ram": {
+        "name": "ムーアラム"
+      },
+      "gale_wisp": {
+        "name": "ゲイルウィスプ"
+      },
+      "shoal_scuttler": {
+        "name": "ショールスカトラー"
+      },
+      "the_wreck_warden": {
+        "name": "レックウォーデン"
+      },
+      "riftspawn": {
+        "name": "裂け目の落とし子"
+      },
+      "breach_wretch": {
+        "name": "破れの成れの果て"
+      },
+      "void_stalker": {
+        "name": "虚無の忍び寄り"
+      },
+      "sundered_horror": {
+        "name": "引き裂かれし恐怖"
+      },
+      "rift_hellguard": {
+        "name": "ヘルガード"
+      },
+      "rift_pact_acolyte": {
+        "name": "契約の侍祭"
+      },
+      "rift_boss_ritualist": {
+        "name": "契約に縛られし魔導士ヴェルコル"
+      },
+      "rift_boss_pitlord": {
+        "name": "奈落の王アズゴラス"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },
@@ -8562,6 +9271,61 @@ export const ja_JP: EnTranslations = {
         "name": "年代記官ゼンジー",
         "title": "ソーンピーク高地の年代記",
         "greeting": "山は何ひとつ忘れない、{playerName}よ。私もだ。あなたの成したことを見せてもらおう。"
+      },
+      "keeper_saelwyn": {
+        "name": "守り手セルウィン",
+        "title": "幽谷の守り手",
+        "greeting": "そなたの同族でこの枝の下に立った者は少ない、{className}よ。静かに歩み、歓迎を受けるがよい。"
+      },
+      "loremother_bryn": {
+        "name": "ロアマザー・ブリン",
+        "title": "聖堂の声",
+        "greeting": "この谷の光はどれも何かを覚えている、{playerName}。共に耳を澄ませておくれ。"
+      },
+      "provisioner_fenna": {
+        "name": "補給係フェンナ",
+        "title": "エルダーグリームの補給係",
+        "greeting": "パンはまだ温かく、水はまだ甘い。幽谷は与えてくれる。わたしもね。"
+      },
+      "wardsmith_orun": {
+        "name": "ワードスミス・オルン",
+        "title": "古き炉の番人",
+        "greeting": "この炉が冷えたのは何世紀も前だ、{className}。だが打たれた刃は今も切れる。"
+      },
+      "archivist_tullo": {
+        "name": "アーキビスト・トゥッロ",
+        "title": "石を読む者",
+        "greeting": "外の石碑はもう長いこと誰にも語りかけていない。新しい耳を待っていたのかもしれん。"
+      },
+      "warden_coalfast": {
+        "name": "守将コールファスト",
+        "title": "要塞司令官",
+        "greeting": "裂け目は、カモメ港が小さいことなど気にもかけぬ、{className}。この岸を守り抜くか、さもなくば守るべき岸そのものが失われるかだ。我らと共に立て、そうすれば私はその恩を忘れはせぬ。"
+      },
+      "riftwatch_ollun": {
+        "name": "裂け目監視のオルン",
+        "title": "破れの学者",
+        "greeting": "裂け目はどれも、開く前に歌うのだ――耳を傾ける術さえあればな。いま島では三つが蠢いているのが聞こえる。そのうち一つは、すぐ近くだ。"
+      },
+      "quartermaster_edda": {
+        "name": "補給将校エッダ",
+        "title": "要塞武具方",
+        "greeting": "鋼と塩、それが手渡せる残り物のすべてさ、{className}。持って行きな。私の手が届くところで開いたことを、裂け目に後悔させてやれ。"
+      },
+      "mender_saul": {
+        "name": "癒し手サウル",
+        "title": "従軍外科医",
+        "greeting": "漁の転落を手当てした十年よりも、この一月のほうが多くの骨を接いだ。裂け目は、奪ったものをろくに残しはせぬ。できることなら、五体満足で戻ってきてくれ。"
+      },
+      "bellkeeper_tam": {
+        "name": "鐘守タム",
+        "title": "警鐘守り",
+        "greeting": "裂け目が我らに寄越す唯一の報せ、それがこの鐘だ、{className}。一打ちなら畑、二打ちなら崖、三打ちともなれば、もう逃げても間に合わぬほど近いということ。耳を離すな。さすれば鐘が、お前を五体満足のままにしてくれよう。"
+      },
+      "fisher_nell": {
+        "name": "怯えるネル",
+        "title": "カモメ港の漁師",
+        "greeting": "網を干す、まさにあの場所で開いたんだ。あそこだよ、私が生まれてからずっと毎朝立っていた場所さ。もう岸へは下りない。もう、どこへもろくに行かなくなっちまった。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
@@ -9392,6 +10156,152 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
+      "q_veil_thinned": {
+        "title": "薄れゆく帳",
+        "text": "洞窟がそなたに開いたか。ならば封印は思ったより弱っている、{playerName}。帳が裂ける場所で、ウィスプは冷たく暗く変わる。ダスクウィスプの精髄を八つ持ってきておくれ。傷の深さを読み取ろう。",
+        "completion": "どれも冷え切っている。裂け目が亀裂になるまで、幽谷に残された時はひと季節ほどだろう。そなたとわたしの仕事が始まる。",
+        "objectives": {
+          "0": {
+            "label": "ダスクウィスプの精髄"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "輝く鹿角",
+        "text": "ヴェールの牡鹿は草を食む場所に光を落とし、抜け落ちた角は何年もその光を保つ。星降りの盆地の群れから五本。それでわたしのランタンは油なしで冬を越せる。牡鹿を傷つける必要はないが、簡単には譲ってくれないよ。",
+        "completion": "見ておくれ、光をこんなに抱えて！炎も煙もなく、ただ光だけ。幽谷は与えてくれる。",
+        "objectives": {
+          "0": {
+            "label": "輝く鹿角"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "浅瀬の灯",
+        "text": "グリマーウィスプは、幽谷が封じられた時に降った古い星明かりの粒を運んでいる。六粒あれば聖堂の灯は一年もつ。消えかけたものからだけ取りなさい。幽谷は貪らずとも足りるだけ与えてくれる。",
+        "completion": "最初の星々のように柔らかい。祭壇のそばに置いておくれ。あとは聖堂がやってくれる。",
+        "objectives": {
+          "0": {
+            "label": "星明かりの粒"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "深みを鎮めて",
+        "text": "輝きの深みのスポアリングは、裂け目が輪に触れるまでは穏やかな民だった。穢れが奪ったものは還らない。堕ちた者たちに安らぎを、{playerName}。深みの北で、十体。",
+        "completion": "わたしにはできなかったことをしてくれた。南の輪では採集者たちがまだ歌っている。そなたのおかげで、歌い続けられる。",
+        "objectives": {
+          "0": {
+            "label": "堕落したスポアリングを鎮めた"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "輪の心臓",
+        "text": "闇に堕ちたスポアリングの心臓は、借り物の影で脈打ち続ける。その心臓を四つ、聖堂で清めれば、穢れの広がり方が分かるはずだ。むごい仕事だが、{playerName}、これは癒やしの仕事でもある。",
+        "completion": "これで清められ、静かになった。どの心臓にも同じ印がある。影は沈んだ宮廷から流れている。セルウィンに伝えておくれ。",
+        "objectives": {
+          "0": {
+            "label": "胞子の心臓"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "石が覚えていること",
+        "text": "封印より前の石碑が三つ残っている。ひとつはダスクフォールの見晴らし台、ひとつは沈んだ宮廷、もうひとつは誰も歩かぬ北東の果てだ。読んできておくれ、{playerName}。わたしの膝は二世紀前に階段を諦めた。",
+        "completion": "見晴らし台、宮廷、忘れられた片隅……封印の歌の三つの節が、歌われた日以来はじめて揃った。老いた読み手を心から喜ばせてくれたね。",
+        "objectives": {
+          "0": {
+            "label": "見晴らし台の石碑を読んだ"
+          },
+          "1": {
+            "label": "宮廷の石碑を読んだ"
+          },
+          "2": {
+            "label": "忘れられた石碑を読んだ"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "木立の脅威",
+        "text": "日が落ちるとダスクウィスプが屋台の間に漂い込んでくるんだ、{playerName}。あの冷気は触れたものを片端から駄目にする。間引いておくれ。帳の裂けた場所で、十体。",
+        "completion": "これで夜市を開けられる。生涯のお得意さんができたよ。少なくとも割引はしよう。",
+        "objectives": {
+          "0": {
+            "label": "ダスクウィスプを散らした"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "星降りの欠片",
+        "text": "ダスクウィスプが水晶の野を渡ると、古い星明かりの欠片が棘のように張り付く。欠片が六つあれば、{playerName}、封印が歌われた季節まで特定できる。",
+        "completion": "この縞模様を見よ！秋だ。幽谷は秋に封じられたのだ。二百年の論争が、六つの小石で決着した。",
+        "objectives": {
+          "0": {
+            "label": "星降りの欠片"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "トレントとの約定",
+        "text": "木立の長老たちは、根を穢れに齧られて外皮を落としている。樹皮が四片あれば、木立全体の軟膏を煎じられる。剥がす間は感謝されないだろうが、{playerName}、そのぶん彼らは百年長く立っていられる。",
+        "completion": "四片とも厚く、健やかだ。軟膏は煎じるのに一週間、効き終わるのに百年かかる。木々は優しさの尺度が違うのだよ。",
+        "objectives": {
+          "0": {
+            "label": "長老の樹皮"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "胞子の潮に抗して",
+        "text": "軟膏は木立を守っているが、穢れは夕暮れごとに深みへ強く押し寄せる。採集者たちが北の輪を取り戻すには、あと十二の堕ちた者に安らぎを、{playerName}。",
+        "completion": "今夜、北の輪がまた歌っている。小さく、けれど確かに。",
+        "objectives": {
+          "0": {
+            "label": "堕落したスポアリングを鎮めた"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "沈んだ宮廷",
+        "text": "ブリンの読みは正しかった。裂け目は東の古い宮廷を貫き、その守護者たちは狂って目覚めた。封印を守るために造られたものが、今は近づく者を砕こうとする。廃墟から八体を除いておくれ。",
+        "completion": "八体の守護者が、静まった。あれらが建てられた時をわたしは覚えているよ、{playerName}。驚くことはない。幽谷は守り手を長く生かすのだ。",
+        "objectives": {
+          "0": {
+            "label": "古代の守護者を静めた"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "監視者の残響",
+        "text": "主が黙しても、宮廷の守護者たちは最後の命令を、消えない残響のように繰り返している。封印が戻るまで、彼らは目覚め続ける、{playerName}。石工たちが封印石に届くよう、さらに十体を静めておくれ。",
+        "completion": "残響は繰り返すたびに薄れていく。じきに宮廷には風と蔦だけが残る。廃墟とはそうあるべきものだ。",
+        "objectives": {
+          "0": {
+            "label": "古代の守護者を静めた"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "目覚めし監視者",
+        "text": "宮廷は静かになったが、その主は違う。封印を守る監視者が歪んで目覚めた。あれが立っている限り、封印は繕えない。容易には倒れぬぞ。友を一人見つけられるなら連れて行け、{playerName}。二人見つかるなら二人だ。",
+        "completion": "あの鐘のような声が沈黙した。ここからでも感じたよ。谷全体から重石が取り除かれたようだった。",
+        "objectives": {
+          "0": {
+            "label": "目覚めし監視者を打ち倒した"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "封印の修復",
+        "text": "監視者の印章を宮廷の中心の封印石へ運び、打ち落とされた場所へ戻しておくれ。そうすれば幽谷は癒え始める。そしてそなたは、{playerName}、そなたの同族の誰も成しえなかったことを成すのだ。",
+        "completion": "ここから閉じるのを感じたよ。黄昏のように穏やかに。幽谷は友を忘れない、{playerName}。どれほど遠くへ旅しても、大樹の下にはいつでもそなたの灯りがある。",
+        "objectives": {
+          "0": {
+            "label": "封印を封印石に戻した"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "溺れし聖歌隊",
         "text": "渡り手どもは独りで動いているのではない。その中に溺れし信徒たちが歩いている——神殿とともに沈んだ教団だ。腐った祭服をまとったまま、岸の岩場から祈りを歌い続けている。八体を沈黙させ、奴らが携える供物を六つ持ち帰れ。奴らが女神に何を捧げようとしているのか、私は知りたいのだ。",
@@ -9493,6 +10403,9 @@ export const ja_JP: EnTranslations = {
           },
           "10": {
             "label": "ソウフィールド"
+          },
+          "11": {
+            "label": "遠つ岸の砂州道"
           }
         }
       },
@@ -9562,6 +10475,285 @@ export const ja_JP: EnTranslations = {
           },
           "10": {
             "label": "ハイウォッチの厩舎"
+          }
+        }
+      },
+      "veiled_hollow": {
+        "name": "ヴェールの幽谷",
+        "welcome": "大気は古の魔力に満ちて震えている。エルダーグリームの大樹の下で、守り手セルウィンを訪ねよ。",
+        "pois": {
+          "0": {
+            "label": "エルダーグリーム"
+          },
+          "1": {
+            "label": "ダスクフォール洞窟"
+          },
+          "2": {
+            "label": "ダスクフォールの見晴らし台"
+          },
+          "3": {
+            "label": "長老樹の森"
+          },
+          "4": {
+            "label": "星降りの盆地"
+          },
+          "5": {
+            "label": "沈んだ宮廷"
+          },
+          "6": {
+            "label": "水晶の浅瀬"
+          },
+          "7": {
+            "label": "輝きの深み"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "ドレイクランド",
+        "welcome": "熱風が荒野から吹きつける。ドラゴンはドレイクモウの上空を旋回し、砂丘にはトロールの焚き火が燃えている。",
+        "pois": {
+          "0": {
+            "label": "ワームウォッチ"
+          },
+          "1": {
+            "label": "ゲートウッドの森"
+          },
+          "2": {
+            "label": "シンダー砂丘"
+          },
+          "3": {
+            "label": "トロールムート"
+          },
+          "4": {
+            "label": "ブラッドグラスの平原"
+          },
+          "5": {
+            "label": "ドレイクモウ火口"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "フロストヴェイルの果て",
+        "welcome": "雪がすべての音を呑み込む。揺らめくオーロラの下で、寒さそのものが目覚めているかのようだ。",
+        "pois": {
+          "0": {
+            "label": "アイスマントル"
+          },
+          "1": {
+            "label": "スノーライン峠"
+          },
+          "2": {
+            "label": "氷河の湖"
+          },
+          "3": {
+            "label": "オーロラの階段"
+          },
+          "4": {
+            "label": "シヴァーフェン湿地"
+          },
+          "5": {
+            "label": "咆哮のテラス"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "アンバーフォール",
+        "welcome": "ここではどの葉も金と紅に燃え、決して散らない。ランタンミアの灯りが君を迎えている。",
+        "pois": {
+          "0": {
+            "label": "ランタンミア"
+          },
+          "1": {
+            "label": "ゴールドメルト峠"
+          },
+          "2": {
+            "label": "黄金の果樹園"
+          },
+          "3": {
+            "label": "ハーベスト谷"
+          },
+          "4": {
+            "label": "大いなる湖"
+          },
+          "5": {
+            "label": "シンダーメイプルの丘"
+          },
+          "6": {
+            "label": "傾いた石碑"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "ウィローフェン",
+        "welcome": "湿原にはトンボと蜂の羽音が満ちている。橋を渡ってブリッジミアに入り、しばし足を休めるといい。",
+        "pois": {
+          "0": {
+            "label": "ブリッジミア"
+          },
+          "1": {
+            "label": "アンバーフェンの石段"
+          },
+          "2": {
+            "label": "リリームーア"
+          },
+          "3": {
+            "label": "ボグシャインの池"
+          },
+          "4": {
+            "label": "ウィローウィープ"
+          },
+          "5": {
+            "label": "まどろみの浅瀬"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "ナイトブルーム",
+        "welcome": "夜門の先では、大気までもが夢を見ている。花明かりをたどってムーンレストへ。空に浮かぶ眠れる世界もお見逃しなく。",
+        "pois": {
+          "0": {
+            "label": "ムーンレスト"
+          },
+          "1": {
+            "label": "夜の門"
+          },
+          "2": {
+            "label": "月の井戸"
+          },
+          "3": {
+            "label": "宵闇の花野"
+          },
+          "4": {
+            "label": "見張りの石環"
+          },
+          "5": {
+            "label": "不眠の塚"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "レイスウッド",
+        "welcome": "梢が棺の蓋のように道の上で閉じていく。ガロウミアの灯りから離れるな。森が名前を呼んでも、決して答えるな。",
+        "pois": {
+          "0": {
+            "label": "ガロウミア"
+          },
+          "1": {
+            "label": "鴉の門"
+          },
+          "2": {
+            "label": "寡婦の茨"
+          },
+          "3": {
+            "label": "吊るしの林間地"
+          },
+          "4": {
+            "label": "哀石の礼拝堂"
+          },
+          "5": {
+            "label": "狩人の広場"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "パームリーチ",
+        "welcome": "暖かい砂浜、騒がしい鳥の声、そして地平線を呑み込むジャングル。ドリフトヘイヴンは浜辺に火を焚いて待っている。",
+        "pois": {
+          "0": {
+            "label": "ドリフトヘイヴン"
+          },
+          "1": {
+            "label": "絡み口"
+          },
+          "2": {
+            "label": "パームストランド"
+          },
+          "3": {
+            "label": "エメラルドの密林"
+          },
+          "4": {
+            "label": "蔓垂の森"
+          },
+          "5": {
+            "label": "サファイアの潟"
+          },
+          "6": {
+            "label": "沈んだ神像"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "エバーガーデン",
+        "welcome": "生け垣は今も刈り込まれているのに、庭師の姿は百年も見られていない。迷路には気をつけろ。迷路もお前を見ている。",
+        "pois": {
+          "0": {
+            "label": "ヘッジウィック"
+          },
+          "1": {
+            "label": "ガーデンゲート"
+          },
+          "2": {
+            "label": "彫像の並木道"
+          },
+          "3": {
+            "label": "野バラの茂み"
+          },
+          "4": {
+            "label": "花びらの池"
+          },
+          "5": {
+            "label": "大迷路"
+          },
+          "6": {
+            "label": "噴水の中庭"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "ゲイルクレスト",
+        "welcome": "ここでは風が一度も止んだことがなく、オールドビーコンの火も一度も消えたことがない。ウィックハーバーの願いはただひとつ、宿の扉をきちんと閉めてくれることだ。",
+        "pois": {
+          "0": {
+            "label": "ウィックハーバー"
+          },
+          "1": {
+            "label": "ウィンドウェイ"
+          },
+          "2": {
+            "label": "ハウリングダウンズ"
+          },
+          "3": {
+            "label": "オールドビーコン"
+          },
+          "4": {
+            "label": "ザ・シアー"
+          },
+          "5": {
+            "label": "レックフィールズ"
+          },
+          "6": {
+            "label": "ミラーターン"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "遠つ岸",
+        "welcome": "砂州を渡れば、町に着くより先にカモメ港の鐘があなたを見つけるだろう。裂け目は前触れもなく口を開き、この砦は流れ出るものすべてから己の岸を守り続けている。あなたのような者を、ここでは長らく待ちわびていたのだ。",
+        "pois": {
+          "0": {
+            "label": "カモメ港"
+          },
+          "1": {
+            "label": "船着き場"
+          },
+          "2": {
+            "label": "見張りの草原"
+          },
+          "3": {
+            "label": "引き裂かれた断崖"
+          },
+          "4": {
+            "label": "裂け目野"
           }
         }
       }

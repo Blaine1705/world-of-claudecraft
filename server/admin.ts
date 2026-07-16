@@ -5,6 +5,7 @@ import {
   classDistribution,
   clientPerfRaw,
   clientPerfSummary,
+  dailyRewardPointEvents,
   levelDistribution,
   listAccounts,
   listCharacters,
@@ -47,6 +48,7 @@ import {
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import { currentDailyRewardDay } from './daily_rewards';
 import {
   accountById,
   accountForToken,
@@ -96,12 +98,23 @@ import {
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
 import { rateLimited } from './ratelimit';
+import { REALM } from './realm';
 import {
   adminRolesForAccount,
   listStaff,
   roleChangeHistory,
   setAccountAdminRoles,
 } from './staff_db';
+import {
+  type UnstuckHotspotRow as DbUnstuckHotspotRow,
+  type UnstuckReportPage as DbUnstuckReportPage,
+  type UnstuckReportRow as DbUnstuckReportRow,
+  listUnstuckHotspots as listUnstuckHotspotsDb,
+  listUnstuckReports as listUnstuckReportsDb,
+  UNSTUCK_HOTSPOT_MAX_LIMIT,
+  UNSTUCK_REPORT_MAX_DAYS,
+  UNSTUCK_REPORT_MAX_LIMIT,
+} from './unstuck_db';
 import { PgUserAssetsDb } from './user_assets_db';
 
 // Admin API: everything under /admin/api/*. Auth is a bearer token whose
@@ -116,6 +129,8 @@ const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
 const ANTIBOT_CONFIG_NOTE_MAX = 500;
+const UNSTUCK_DEFAULT_DAYS = 30;
+const UNSTUCK_DEFAULT_LIMIT = 50;
 
 const IP_BLOCK_KICK_MESSAGE = 'Connection to the server was lost.';
 
@@ -128,6 +143,113 @@ const AI_FLAG_REQUIRED = 'ai must be a boolean';
 const STREAMER_FLAG_REQUIRED = 'streamer must be a boolean';
 const STREAMER_LINKS_REQUIRED = 'a links object is required';
 const ACCOUNT_FLAIR_FAILED = 'failed to update account flair';
+const DAILY_REWARD_EVENT_DAY_REQUIRED = 'a valid daily rewards date is required';
+
+async function dailyRewardEventDay(value: string | null): Promise<string | null> {
+  if (value === null) return currentDailyRewardDay();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+    ? value
+    : null;
+}
+
+function boundedPositiveParam(raw: string | null, fallback: number, max: number): number {
+  const value = Number(raw ?? fallback);
+  return Number.isFinite(value) ? Math.min(max, Math.max(1, Math.floor(value))) : fallback;
+}
+
+function unstuckQuery(params: URLSearchParams): {
+  days: number;
+  limit: number;
+  beforeId?: number;
+} {
+  const days = boundedPositiveParam(
+    params.get('days'),
+    UNSTUCK_DEFAULT_DAYS,
+    UNSTUCK_REPORT_MAX_DAYS,
+  );
+  const limit = boundedPositiveParam(
+    params.get('limit'),
+    UNSTUCK_DEFAULT_LIMIT,
+    UNSTUCK_REPORT_MAX_LIMIT,
+  );
+  const rawBeforeId = Number(params.get('beforeId'));
+  return {
+    days,
+    limit,
+    ...(Number.isSafeInteger(rawBeforeId) && rawBeforeId > 0 ? { beforeId: rawBeforeId } : {}),
+  };
+}
+
+function adminUnstuckReport(row: DbUnstuckReportRow): unknown {
+  const destination =
+    row.destinationRawX === null ||
+    row.destinationRawY === null ||
+    row.destinationRawZ === null ||
+    row.destinationLocalX === null ||
+    row.destinationLocalZ === null
+      ? null
+      : {
+          x: row.destinationRawX,
+          y: row.destinationRawY,
+          z: row.destinationRawZ,
+          localX: row.destinationLocalX,
+          localY: row.destinationLocalY,
+          localZ: row.destinationLocalZ,
+        };
+  return {
+    id: row.id,
+    characterId: row.characterId,
+    characterName: row.characterName,
+    area: {
+      kind: row.areaKind,
+      id: row.areaId,
+      instanceId: row.instanceId,
+      slot: row.instanceSlot,
+    },
+    origin: {
+      x: row.originRawX,
+      y: row.originRawY,
+      z: row.originRawZ,
+      localX: row.originLocalX,
+      localY: row.originLocalY,
+      localZ: row.originLocalZ,
+    },
+    destination,
+    outcome: row.outcome,
+    reason: row.reason,
+    invokedAt: row.invokedAt,
+    resolvedAt: row.resolvedAt,
+  };
+}
+
+function adminUnstuckHotspot(row: DbUnstuckHotspotRow): unknown {
+  return {
+    area: { kind: row.areaKind, id: row.areaId, instanceId: null, slot: null },
+    bucket: { x: row.bucketLocalX, y: row.bucketLocalY, z: row.bucketLocalZ },
+    count: row.reportCount,
+    completed: row.completedCount,
+    cancelled: row.cancelledCount,
+    failed: row.failedCount,
+    lastUsedAt: row.lastResolvedAt,
+  };
+}
+
+function adminUnstuckPayload(
+  page: DbUnstuckReportPage,
+  hotspots: DbUnstuckHotspotRow[],
+  query: { days: number; limit: number },
+): unknown {
+  return {
+    reports: page.rows.map(adminUnstuckReport),
+    hotspots: hotspots.map(adminUnstuckHotspot),
+    days: query.days,
+    limit: query.limit,
+    hasMore: page.hasMore,
+    nextBeforeId: page.nextBeforeId,
+  };
+}
 
 /**
  * Decode the request's `links` bag, three-valued:
@@ -533,6 +655,7 @@ export async function handleAdminApi(
           adminAccountId: accountId,
           banned: dailyRewardsBanMatch[2] === 'ban',
           reason: body.reason,
+          durationHours: body.durationHours,
         });
         return ok(res, { ok: true });
       } catch (err) {
@@ -945,6 +1068,20 @@ export async function handleAdminApi(
       const { rows, total } = await listBugReports(limit, (page - 1) * limit);
       return ok(res, { rows, total, page, limit });
     }
+    if (path === '/admin/api/unstuck-reports') {
+      const query = unstuckQuery(url.searchParams);
+      const [page, hotspots] = await Promise.all([
+        listUnstuckReportsDb(pool, { realm: REALM, ...query }),
+        query.beforeId === undefined
+          ? listUnstuckHotspotsDb(pool, {
+              realm: REALM,
+              days: query.days,
+              limit: UNSTUCK_HOTSPOT_MAX_LIMIT,
+            })
+          : Promise.resolve<DbUnstuckHotspotRow[]>([]),
+      ]);
+      return ok(res, adminUnstuckPayload(page, hotspots, query));
+    }
     const bugScreenshotMatch = /^\/admin\/api\/bug-reports\/(\d+)\/screenshot$/.exec(path);
     if (bugScreenshotMatch) {
       // The list query omits the (potentially large) screenshot; fetch it per report.
@@ -968,6 +1105,15 @@ export async function handleAdminApi(
         chat,
         blockedIps: getBlockedIpsForAccount(game, detail),
       });
+    }
+    const dailyRewardEventsMatch = /^\/admin\/api\/accounts\/(\d+)\/daily-rewards-events$/.exec(
+      path,
+    );
+    if (dailyRewardEventsMatch) {
+      const day = await dailyRewardEventDay(url.searchParams.get('day'));
+      if (!day) return fail(res, 400, DAILY_REWARD_EVENT_DAY_REQUIRED);
+      const limit = Number(url.searchParams.get('limit') ?? '100');
+      return ok(res, await dailyRewardPointEvents(Number(dailyRewardEventsMatch[1]), day, limit));
     }
     const detailMatch = /^\/admin\/api\/accounts\/(\d+)$/.exec(path);
     if (detailMatch) {
@@ -1141,6 +1287,7 @@ function makeRealAdminDb() {
     classDistribution,
     clientPerfRaw,
     clientPerfSummary,
+    dailyRewardPointEvents,
     levelDistribution,
     listAccounts,
     listCharacters,
@@ -1152,6 +1299,10 @@ function makeRealAdminDb() {
     sessionsByDay,
     listBugReports,
     getBugReportScreenshot,
+    listUnstuckReports: (options: Parameters<typeof listUnstuckReportsDb>[1]) =>
+      listUnstuckReportsDb(pool, options),
+    listUnstuckHotspots: (options: Parameters<typeof listUnstuckHotspotsDb>[1]) =>
+      listUnstuckHotspotsDb(pool, options),
     listFilterWords,
     addFilterWord,
     removeFilterWord,
@@ -1672,6 +1823,7 @@ async function dailyRewardsBanHandler(ctx: Ctx): Promise<void> {
       adminAccountId: ctxAccountId(ctx),
       banned,
       reason: body.reason,
+      durationHours: body.durationHours,
     });
     return ok(ctx.res, { ok: true });
   } catch (err) {
@@ -1820,6 +1972,14 @@ async function accountDetailHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { ...detail, online: rt.liveAccountIds().has(id) });
 }
 
+/** GET /admin/api/accounts/:id/daily-rewards-events: bounded point-award ledger. */
+async function dailyRewardPointEventsHandler(ctx: Ctx): Promise<void> {
+  const day = await dailyRewardEventDay(ctx.url.searchParams.get('day'));
+  if (!day) return fail(ctx.res, 400, DAILY_REWARD_EVENT_DAY_REQUIRED);
+  const limit = Number(ctx.url.searchParams.get('limit') ?? '100');
+  ok(ctx.res, await adminDb().dailyRewardPointEvents(adminTargetId(ctx), day, limit));
+}
+
 /**
  * POST /admin/api/accounts/:id/reset-password: set a new password on any account.
  * Audit row first (no live effect without its record), then the credential write,
@@ -1962,6 +2122,22 @@ async function bugReportsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const { rows, total } = await adminDb().listBugReports(limit, (page - 1) * limit);
   ok(ctx.res, { rows, total, page, limit });
+}
+
+/** GET /admin/api/unstuck-reports: bounded reports plus content-local hotspots. */
+async function unstuckReportsHandler(ctx: Ctx): Promise<void> {
+  const query = unstuckQuery(ctx.url.searchParams);
+  const [page, hotspots] = await Promise.all([
+    adminDb().listUnstuckReports({ realm: REALM, ...query }),
+    query.beforeId === undefined
+      ? adminDb().listUnstuckHotspots({
+          realm: REALM,
+          days: query.days,
+          limit: UNSTUCK_HOTSPOT_MAX_LIMIT,
+        })
+      : Promise.resolve<DbUnstuckHotspotRow[]>([]),
+  ]);
+  ok(ctx.res, adminUnstuckPayload(page, hotspots, query));
 }
 
 /** GET /admin/api/bug-reports/:id/screenshot: one report's screenshot on demand. */
@@ -2166,6 +2342,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: accountDetailHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/accounts/:id/daily-rewards-events',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardPointEventsHandler,
   },
   {
     method: 'POST',
@@ -2429,6 +2613,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: bugReportsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/unstuck-reports',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: unstuckReportsHandler,
   },
   {
     method: 'GET',

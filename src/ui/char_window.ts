@@ -100,6 +100,7 @@ const STAT_GRID: readonly StatId[] = [
   'spellPower',
   'critRating',
   'hasteRating',
+  'hitRating',
   'warfare',
 ];
 
@@ -346,7 +347,7 @@ export class CharWindow {
       this.deps.attachTooltip(
         row,
         () =>
-          `${this.deps.itemTooltip(item)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`,
+          `${this.deps.itemTooltip(item, this.deps.world().equipmentInstances[slot])}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`,
       );
       // Corner x: a styled glyph control (not an in-game icon), revealed on
       // hover/focus and always shown on touch where right-click is unavailable.

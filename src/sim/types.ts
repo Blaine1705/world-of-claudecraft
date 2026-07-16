@@ -41,11 +41,18 @@ export const GCD = 1.5; // seconds
 // Combat ratings are gear-facing stats converted to fractions in recalcPlayerStats.
 export const HASTE_RATING_PER_PCT = 10; // 10 haste rating = 1% faster
 export const CRIT_RATING_PER_PCT = 10; // 10 crit rating = +1% crit chance
+export const HIT_RATING_PER_PCT = 10; // 10 hit rating = +1% hit (less miss/resist)
 export function hasteFractionFromRating(rating: number): number {
   return rating / (HASTE_RATING_PER_PCT * 100);
 }
 export function critFractionFromRating(rating: number): number {
   return rating / (CRIT_RATING_PER_PCT * 100);
+}
+// Hit rating converts to a hit fraction that reduces both physical miss and spell
+// resist by the same amount (both share the above-level penalty table). One unified
+// stat: a warrior and a mage both want hit. Applied in recalcPlayerStats.
+export function hitFractionFromRating(rating: number): number {
+  return rating / (HIT_RATING_PER_PCT * 100);
 }
 
 export type HonorReason = 'arena_win' | 'fiesta_kill' | 'fiesta_complete' | 'fiesta_win';
@@ -214,6 +221,13 @@ export type AuraKind =
   | 'hot'
   | 'absorb'
   | 'imbue'
+  // Warrior Ironhold: a big, short, all-school damage-taken reduction (value =
+  // fraction less, e.g. 0.4 = 40% less), applied in damage.ts.
+  | 'shield_wall'
+  // Paladin Sacred Bulwark: a divine cheat-death ward. While it holds, a lethal
+  // enemy hit is denied in damage.ts and the wearer is restored by value (a
+  // fraction of max health, e.g. 0.35 = 35%) before the ward is consumed.
+  | 'guardian_ward'
   | 'buff_sta'
   | 'buff_allstats'
   // Percentage drain on the whole stat block (value is a signed fraction, e.g.
@@ -283,6 +297,25 @@ export type AuraKind =
   | 'buff_sta_pct'
   | 'buff_armor_pct'
   | 'buff_ap_pct';
+
+// The shapeshift/stance aura kinds toggled by casting their granting ability (see the
+// isFormKind toggle in combat/effect_dispatch.ts): mutually exclusive, never expire on
+// their own, and cancel on their own when the granting ability stops being known (see
+// stripOrphanedFormAuras in progression/talents.ts). The single source of truth for this
+// kind set: combat/effect_dispatch.ts, combat/casting_lifecycle.ts, social/chat_readouts.ts,
+// and progression/talents.ts all consume isFormAuraKind/FORM_AURA_KINDS from here instead
+// of repeating the five-kind list, so it cannot drift out of sync between call sites.
+export const FORM_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+  'form_bear',
+  'form_cat',
+  'form_travel',
+  'form_moonkin',
+  'form_shadow',
+]);
+
+export function isFormAuraKind(kind: AuraKind): boolean {
+  return FORM_AURA_KINDS.has(kind);
+}
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -436,9 +469,13 @@ interface BaseItemDef {
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
   spellPower?: number;
-  // Combat ratings, converted to crit%/haste% in recalcPlayerStats.
+  // Combat ratings, converted to crit%/haste%/hit% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
+  // Hit rating: reduces melee/ranged miss AND spell resist by the same percent.
+  // The endgame differentiator (jewelry + ilvl 31+/heroic gear); off the primary
+  // stat budget like spellPower.
+  hitRating?: number;
   // PvP-only ratings. recalcPlayerStats converts them into Stats fractions;
   // combat clamps them again at the PvP caps before applying damage.
   pvpOffenseRating?: number;
@@ -537,6 +574,7 @@ export interface SetBonusEffect {
   // (folded into Entity.meleeHaste/rangedHaste/spellHaste in recalcPlayerStats).
   haste?: number;
   hasteRating?: number; // haste rating (converted to % in recalcPlayerStats)
+  hitRating?: number; // hit rating (converted to % in recalcPlayerStats): less miss/resist
   castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
   knockbackResistance?: number; // 0..1: fraction of on-hit knockback distance resisted (1 = immune)
   proc?: SetProc;
@@ -660,6 +698,45 @@ export interface ItemInstancePayload {
   rolled?: { quality?: string; stats?: Record<string, number> };
   /** Player id (Entity id) this specific copy is bound to. */
   boundTo?: number;
+  /** Long-term Rift gear progression. `rolled.stats` is the authoritative
+   * aggregate bonus consumed by recalcPlayerStats; this record explains how it
+   * was earned and lets forge operations rebuild it deterministically. */
+  rift?: {
+    sourceEventId: string;
+    tier: RiftTier;
+    power: number;
+    upgradeLevel: number;
+    maxUpgradeLevel: number;
+    baseStats: Record<string, number>;
+    enchant?: { stat: string; value: number };
+    gemSlots: number;
+    gems: string[];
+  };
+}
+
+// A shallow `{ ...instance }` aliases the mutable `charges`/`rolled.stats`/`rift`
+// maps between a live payload and a serialized/loaded copy: decrementing a charge
+// on one would silently mutate the other. Deep-clones at every save/load boundary
+// instead. Shared by cloneInvSlot below and the equipped-instance map (an
+// enchanted piece's payload, src/sim/professions/enchanting.ts, or a Rift gear
+// piece's, src/sim/rift/progression.ts), so all copy through the exact same rules.
+export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
+  const instance: ItemInstancePayload = { ...src };
+  if (src.charges) instance.charges = { ...src.charges };
+  if (src.rolled)
+    instance.rolled = {
+      ...src.rolled,
+      ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
+    };
+  if (src.rift) {
+    instance.rift = {
+      ...src.rift,
+      baseStats: { ...src.rift.baseStats },
+      ...(src.rift.enchant && { enchant: { ...src.rift.enchant } }),
+      gems: [...src.rift.gems],
+    };
+  }
+  return instance;
 }
 
 export interface InvSlot {
@@ -675,25 +752,9 @@ export interface InvSlot {
   slot?: number;
 }
 
-// A shallow `{ ...instance }` aliases the mutable `charges`/`rolled.stats` maps
-// between a live payload and a serialized/loaded copy: decrementing a charge on
-// one would silently mutate the other. Deep-clones at every save/load boundary
-// instead. Shared by cloneInvSlot below and the equipped-instance map (an
-// enchanted piece's payload, src/sim/professions/enchanting.ts), so both copy
-// through the exact same rules.
-export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
-  const instance: ItemInstancePayload = { ...src };
-  if (src.charges) instance.charges = { ...src.charges };
-  if (src.rolled)
-    instance.rolled = {
-      ...src.rolled,
-      ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
-    };
-  return instance;
-}
-
 // A shallow `{ ...slot }` aliases `instance` between the live slot and a
-// serialized/loaded copy; see cloneItemInstancePayload above for why that is
+// serialized/loaded copy; see cloneItemInstancePayload above (shared with the
+// equipped-instance map, src/sim/professions/enchanting.ts) for why that is
 // unsafe and what this clones instead.
 export function cloneInvSlot<T extends InvSlot>(slot: T): T {
   if (!slot.instance) return { ...slot };
@@ -795,6 +856,8 @@ export type MobFamily =
   | 'elemental'
   | 'dragonkin'
   | 'demon'
+  | 'kobold'
+  | 'murloc'
   | 'reptile';
 export type PetMode = 'passive' | 'defensive' | 'aggressive';
 export type PetRole = 'melee_tank' | 'ranged_dps';
@@ -1736,12 +1799,50 @@ export interface DungeonDef {
   leaveText: string;
 }
 
-export type BiomeId = 'vale' | 'marsh' | 'peaks' | 'beach' | 'desert' | 'volcano' | 'cave';
+export type BiomeId =
+  | 'vale'
+  | 'marsh'
+  | 'peaks'
+  | 'beach'
+  | 'desert'
+  | 'volcano'
+  | 'cave'
+  | 'dusk'
+  | 'ember'
+  | 'frost'
+  | 'amber'
+  | 'fen'
+  | 'night'
+  | 'haunt'
+  | 'jungle'
+  | 'garden'
+  | 'gale';
 
 export interface ZoneDef {
   id: string;
   name: string;
+  /** Natural Rift portals may only select zones explicitly opted in. */
+  riftPortalEligible?: boolean;
+  /** Relative C/B/A/S weights for portals in this zone. Missing/zero ranks are
+   * never selected. Kept on content data so adding/reordering zones cannot
+   * silently change endgame difficulty. */
+  riftTierWeights?: Partial<Record<RiftTier, number>>;
   zMin: number;
+  /**
+   * Optional east-west extent (a world GRID column). Omitted = the original
+   * full-width strip [-WORLD_SIZE/2, WORLD_SIZE/2]. Zones are rectangles;
+   * zoneAt(x, z) picks by rect, so side-by-side columns can share a z band
+   * and meet at a real walkable border, exactly like the north passes.
+   */
+  xMin?: number;
+  xMax?: number;
+  /**
+   * Road passes through a COLUMN border (a shared vertical edge with the
+   * neighbor east or west), the sideways twin of southPassX: the z where
+   * the border ridge opens. Only read when such an edge exists.
+   */
+  eastPassZ?: number;
+  westPassZ?: number;
   zMax: number;
   levelRange: [number, number];
   biome: BiomeId;
@@ -1755,10 +1856,49 @@ export interface ZoneDef {
   pois: { x: number; z: number; label: string; id?: string }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
+  // The zone's southern border ridge has NO road pass and is raised past the
+  // climbable slope: the zone is reachable only by portal (see world.ts).
+  sealedSouthBorder?: boolean;
+  // Where the road pass through the zone's SOUTHERN border ridge sits (x).
+  // Defaults to 0 (the original zones' central road); the Drakelands set it
+  // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
+  southPassX?: number;
+}
+
+// One end of a paired overworld portal. Walking within the pair's trigger
+// radius of this side teleports the player to the OTHER side's landing;
+// `landing` is where a traveler coming out of this side arrives, placed
+// outside this side's own trigger radius so arrivals never bounce back.
+export interface PortalSide {
+  x: number;
+  z: number;
+  landing: { x: number; z: number; facing: number };
+}
+
+// A two-way positional portal between overworld locations (the Veiled Hollow
+// cave). Purely data: src/sim/portals.ts checks these in the tick, in every
+// host, with no entities and no rng.
+export interface PortalDef {
+  id: string;
+  a: PortalSide;
+  b: PortalSide;
+  radius: number;
+  enterText: string; // flavor line for a -> b
+  leaveText: string; // flavor line for b -> a
 }
 
 export interface BuildingDef {
-  kind: 'house' | 'inn' | 'chapel';
+  // hollow* kinds are the Veiled Hollow town set: KayKit medieval buildings
+  // recolored to the dusk palette (render/props.ts maps kind -> asset)
+  kind:
+    | 'house'
+    | 'inn'
+    | 'chapel'
+    | 'hollowHouse'
+    | 'hollowInn'
+    | 'hollowChapel'
+    | 'hollowSmith'
+    | 'hollowMarket';
   x: number;
   z: number;
   w: number;
@@ -1798,6 +1938,26 @@ export interface ZonePropsDef {
     arch: { x: number; z: number; dir: number };
     jumps: { x: number; z: number; dir: number; kind: 'vertical' | 'oxer' }[];
   };
+  // Hand-placed giant trees (the Eldergleam centerpiece): solid trunk
+  // colliders here, rendered by render/realm_flora.ts from the same record.
+  greatTrees?: { x: number; z: number; r: number }[];
+  // Hand-placed one-off GLB props (the generated storybook set). `key` names a
+  // PROP_ASSET_DEFS entry (render/props.ts); the GLB is authored at world scale
+  // with its front on +z, so `rot` alone orients it. r > 0 adds a circle
+  // collider of that radius (keep it matched to the model's measured footprint,
+  // or to the trunk for canopy trees); r 0/absent is walk-through dressing.
+  // h is the visual height, used only for the camera-ghost top. scale is a
+  // uniform visual multiplier over the authored world-scale model; when set,
+  // keep r and h matched to the SCALED footprint by hand.
+  decorProps?: {
+    key: string;
+    x: number;
+    z: number;
+    rot?: number;
+    r?: number;
+    h?: number;
+    scale?: number;
+  }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {
@@ -1912,6 +2072,7 @@ export interface Entity {
   // Lets a jump clear fences for the whole arc, independent of slope.
   jumping: boolean;
   fallStartY: number;
+  fatigueTicks: number; // ticks spent past the open-sea fatigue line (sim/fatigue.ts)
   hp: number;
   maxHp: number;
   resource: number;
@@ -1935,6 +2096,8 @@ export interface Entity {
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
   hasteRating: number; // accumulated haste rating from gear + set bonuses
+  hitRating: number; // accumulated hit rating from gear + set bonuses
+  hitBonus: number; // hit fraction (hitRating converted): reduces miss/resist, 0..1
   // Extra critical-strike damage from a spec mastery (0 = none), split by OUTPUT CHANNEL
   // so a mastery only strengthens the crits it is meant to. Added to the matching base
   // crit multiplier at the crit site: spell crits deal 1.5 + critDmgSpellBonus, physical
@@ -2077,9 +2240,14 @@ export interface Entity {
   /** GM character: invulnerable (dealDamage no-ops). Server-set from the
    *  characters.is_gm column; never user-settable. */
   gm?: boolean;
+  /** Dev "smite" mode: this player's damage one-shots any mob it hits. Toggled by
+   *  the dev command /dev smite (gated by ALLOW_DEV_COMMANDS); never set otherwise. */
+  oneShot?: boolean;
   // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
   // real game master (who could otherwise deal 100x or have their invuln toggled).
   devGod?: boolean;
+  /** Owner of a mob created by /dev spawn. Server-private and never persisted. */
+  devSpawnOwnerId?: number;
   /** Moderation-jailed player: prisoners are mutually hostile (the jail brawl,
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
@@ -2110,6 +2278,39 @@ export interface Entity {
   // object (ground interactable)
   objectItemId: string | null;
   dungeonId: string | null; // set on dungeon door/exit portals
+  // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
+  // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
+  riftSeed?: number;
+  riftBaseLevel?: number;
+  // Stable identity of the shared natural Rift event. Two groups entering the
+  // same portal receive separate instances tied to this one race record.
+  // Absent on legacy/dev portals that are not global events.
+  riftEventId?: string;
+  // Rank of a world-spawned rift portal (rift/portals.ts); drives the rank badge
+  // both hosts render above the portal and the Heroic Mark payout on sealing.
+  // Absent on dev-spawned portals.
+  riftTier?: RiftTier;
+  // Sim time of the last "level too low" rift denial shown to this player, so
+  // standing inside the portal trigger radius does not spam the toast per tick.
+  riftDeniedAt?: number;
+  // Sim time of the last "the orb is sealed" nudge shown to this player at a
+  // dormant Blood Orb (authored citadel), throttled the same way.
+  riftOrbNoticeAt?: number;
+  // Walk-in portal grace after leaving a rift: until this sim time the player
+  // does not auto-enter portals, so being returned near the entry portal can
+  // never bounce them straight back in (clicking the portal still works).
+  riftReentryGraceUntil?: number;
+  // Locked glide heading while ice-sliding on a rift frost sheet (unit vector);
+  // both 0/undefined means not sliding. The slide advances a fixed step along this
+  // each tick, ignoring steering input, until a wall or the sheet edge stops it.
+  riftSlideDirX?: number;
+  riftSlideDirZ?: number;
+  // True while the ice slide is carrying the player: the renderer holds a frozen
+  // braced pose (no run cycle) so they read as gliding, not sprinting. Wired (`sld`).
+  riftSliding?: boolean;
+  // Cooldown gate (sim time) between rolling-boulder knockbacks, so a single pass
+  // shoves + chips once rather than every tick of overlap.
+  riftRollerUntil?: number;
   // misc
   dead: boolean;
   // Ghost/spirit state for the WoW-style death -> corpse-run -> resurrect loop.
@@ -2340,6 +2541,80 @@ export interface MountRaceSession {
   clearedMask: number;
 }
 
+// Structured, player-safe recovery telemetry. The sim captures both raw world
+// coordinates and content-local coordinates at invocation time so operators can
+// group repeated problem spots across separate instance slots. Stable codes only:
+// player-facing prose is assembled by the client i18n catalog.
+export type UnstuckAreaKind = 'overworld' | 'dungeon' | 'delve' | 'rift';
+
+export interface UnstuckArea {
+  kind: UnstuckAreaKind;
+  id: string;
+  instanceId?: string;
+  slot?: number;
+}
+
+export interface UnstuckPosition extends Vec3 {
+  localX: number;
+  localZ: number;
+}
+
+export type UnstuckBlockedReason =
+  | 'already_active'
+  | 'already_safe'
+  | 'cooldown'
+  | 'dead'
+  | 'ghost'
+  | 'jailed'
+  | 'combat'
+  | 'controlled'
+  | 'falling'
+  | 'moving'
+  | 'busy'
+  | 'spectating'
+  | 'competitive'
+  | 'trading'
+  | 'invalid_area';
+
+export type UnstuckCancelReason =
+  | 'moved'
+  | 'damaged'
+  | 'combat'
+  | 'busy'
+  | 'state_changed'
+  | 'disconnected';
+
+export type UnstuckEvent =
+  | { type: 'unstuck'; phase: 'started'; seconds: number }
+  | { type: 'unstuck'; phase: 'countdown'; seconds: number }
+  | { type: 'unstuck'; phase: 'blocked'; reason: UnstuckBlockedReason; seconds?: number }
+  | {
+      type: 'unstuck';
+      phase: 'cancelled';
+      reason: UnstuckCancelReason;
+      area: UnstuckArea;
+      origin: UnstuckPosition;
+      duration: number;
+    }
+  | {
+      type: 'unstuck';
+      phase: 'failed';
+      reason: 'no_safe_position';
+      area: UnstuckArea;
+      origin: UnstuckPosition;
+      duration: number;
+    }
+  | {
+      type: 'unstuck';
+      phase: 'completed';
+      reason: 'nearest_safe_position' | 'nearest_graveyard';
+      area: UnstuckArea;
+      origin: UnstuckPosition;
+      destination: UnstuckPosition;
+      duration: number;
+      distance: number;
+    };
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -2400,6 +2675,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'comboPoint'; points: number }
   | { type: 'playerDeath' }
   | { type: 'respawn' }
+  | UnstuckEvent
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
   | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId?: string }
@@ -2618,6 +2894,10 @@ export type SimEvent = { pid?: number } & (
       // Stable presentation discriminator; renderers must not infer a player
       // attack animation from school or an English ability label.
       attackAnimation?: 'ranged-shot';
+      // True for a wand auto-attack projectile, so combat_sfx.ts can pick the
+      // dedicated wand_<school> cue instead of the real-spell proj_<school>
+      // one: a passive auto-attack must not sound identical to an actual cast.
+      wand?: true;
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
@@ -2787,6 +3067,63 @@ export type SimEvent = { pid?: number } & (
       timeTicks: number;
       pid: number;
     }
+  // Procedural Rift state, pushed to the entering player so the client can
+  // regenerate the current floor's geometry + visual style from the descriptor
+  // (the same pure generator the server ran). `active:false` clears it on leave.
+  // Text-free structured fields (like skinEvent/craftResult): the client renders
+  // its own localized floor label from name/themeName.
+  | {
+      type: 'riftState';
+      pid: number;
+      active: boolean;
+      eventId: string | null;
+      instanceId: number;
+      seed: number;
+      baseLevel: number;
+      floorIndex: number;
+      floorCount: number;
+      origin: { x: number; z: number };
+      contentId: string;
+      contentHash: string;
+      upgrade: import('./rift/types').RiftUpgradeManifest | null;
+      name: string;
+      themeName: string;
+      tier: RiftTier | null;
+    }
+  | {
+      type: 'riftRaceResult';
+      pid: number;
+      eventId: string;
+      outcome: 'won' | 'lost';
+      tier: RiftTier;
+      winnerNames: string[];
+      clearTime: number;
+      rewardMarks: number;
+    }
+  | {
+      type: 'riftRaceWorld';
+      eventId: string;
+      tier: RiftTier;
+      winnerNames: string[];
+      clearTime: number;
+    }
+  | {
+      type: 'riftForgeResult';
+      pid: number;
+      ok: boolean;
+      action: 'upgrade' | 'enchant' | 'socket';
+      itemId: string;
+      reason?:
+        | 'not_found'
+        | 'not_rift_gear'
+        | 'max_upgrade'
+        | 'insufficient_essence'
+        | 'invalid_stat'
+        | 'invalid_gem'
+        | 'sockets_full';
+      upgradeLevel?: number;
+      essenceSpent?: number;
+    }
   // Gather-node harvest outcome (#1729): a successful resource harvest emits
   // this so the client can play a gathering audio cue for the acting player.
   // Personal (carries pid), delivered only to the harvester. Emitted only on a
@@ -2914,6 +3251,13 @@ export interface SimConfig {
   // Offline worlds and parity traces keep the default (first rise after one
   // interval), so this never fires inside a short deterministic scenario.
   worldBossAtBoot?: boolean;
+  // Live worlds (server + offline client): enable the natural ranked rift portal
+  // scheduler (rift/portals.ts). Default OFF so deterministic tests, parity
+  // traces, and the RL env keep a portal-free world unless they opt in.
+  riftPortals?: boolean;
+  // Public test realms may opt into a denser natural-portal policy and a larger
+  // instance pool. Default OFF so all existing hosts retain their current policy.
+  communityRifts?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
@@ -2988,6 +3332,19 @@ export const XP_TABLE = [
   400, 900, 1400, 2100, 2800, 3600, 4500, 5400, 6500, 7600, 8800, 10100, 11400, 12900, 14400, 16000,
   17700, 19400, 21300, 23200,
 ];
+// Procedural Rift rank ladder (C lowest, S highest); tuning per rank lives in
+// rift/portals.ts (RIFT_TIER_INFO). Declared here so Entity can carry it.
+export type RiftTier = 'C' | 'B' | 'A' | 'S';
+
+// Rank badge colours, shared by the sim tuning table and the renderer's
+// floating rank badge (single source so the two can never drift).
+export const RIFT_TIER_COLORS: Record<RiftTier, number> = {
+  C: 0x3fbf5f,
+  B: 0x3f7fff,
+  A: 0xb04fff,
+  S: 0xffb020,
+};
+
 export const MAX_LEVEL = 20;
 
 // Shared sim constants relocated here (C1) so both sim.ts and the extracted damage
@@ -3350,20 +3707,25 @@ export function rageFromTaking(damage: number, attackerLevel: number): number {
   return damage / (Math.max(1, attackerLevel) * 1.5);
 }
 
-// Attacking a target ABOVE your level adds a steep miss penalty (extra miss %),
-// tuned so +2 is ~19% and +4 is ~85% miss: fighting way-above-level enemies is meant
-// to be near-futile. The curve approximates 2.5 * diff^2.5, but is stored as an integer
+// Attacking a target ABOVE your level adds a miss/resist penalty (extra %) on top of
+// the base miss (5%) / resist (4%). It ramps with the level gap but is CAPPED so even
+// far-above content (Heroic is +3) never feels like a coin flip: the penalty tops out
+// at 21, so melee miss maxes at ~26% and spell resist at ~25%. Stored as an integer
 // table (level diffs are always integers) so it stays bit-for-bit deterministic across
-// engines — Math.pow with a fractional exponent is not guaranteed identical browser vs node.
-//   +1 -> 2.5   +2 -> 14   +3 -> 39   +4 -> 80   (+5 and beyond saturate past the clamp)
-const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 14, 39, 80];
+// engines. Beyond the last entry the penalty SATURATES at the cap (does not blow up).
+// Preserve the established +1/+2 leveling curve; only the old +3 cliff is softened.
+//   +1 -> 2.5   +2 -> 14   +3 -> 21   (+4 and beyond hold at 21)
+const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 14, 21];
 function aboveLevelMissPct(diff: number): number {
   if (diff <= 0) return 0;
-  return diff < ABOVE_LEVEL_MISS_PCT.length ? ABOVE_LEVEL_MISS_PCT[diff] : 100;
+  return diff < ABOVE_LEVEL_MISS_PCT.length
+    ? ABOVE_LEVEL_MISS_PCT[diff]
+    : ABOVE_LEVEL_MISS_PCT[ABOVE_LEVEL_MISS_PCT.length - 1];
 }
 
 // Spell hit by level difference (target - caster): 96% at equal level, a gentle
-// +1%/level bonus below you, and the steep above-level penalty above. cap 99%, floor 5%.
+// +1%/level bonus below you, and the capped above-level penalty above (resist tops
+// out at ~25%). cap 99%, floor 5%.
 export function spellHitChance(casterLevel: number, targetLevel: number): number {
   const diff = targetLevel - casterLevel;
   const hit = diff <= 0 ? 96 + -diff * 1 : 96 - aboveLevelMissPct(diff);
@@ -3371,7 +3733,7 @@ export function spellHitChance(casterLevel: number, targetLevel: number): number
 }
 
 // Melee miss vs target by level difference: 5% base, a gentle -0.2%/level below you,
-// and the steep above-level penalty above. cap 95%, floor 0.5%.
+// and the capped above-level penalty above (miss tops out at ~26%). cap 95%, floor 0.5%.
 export function meleeMissChance(attackerLevel: number, targetLevel: number): number {
   const diff = targetLevel - attackerLevel;
   const miss = diff > 0 ? 5 + aboveLevelMissPct(diff) : 5 + diff * 0.2;
@@ -3393,7 +3755,11 @@ export function swingMissChance(attacker: Entity, target: Entity): number {
   const miss = meleeMissChance(attacker.level, target.level);
   const mobAttacker = attacker.kind === 'mob' && attacker.hostile && attacker.ownerId === null;
   const playerSide = target.kind === 'player' || target.ownerId !== null;
-  return mobAttacker && playerSide ? Math.min(miss, MOB_VS_PLAYER_MAX_MISS) : miss;
+  if (mobAttacker && playerSide) return Math.min(miss, MOB_VS_PLAYER_MAX_MISS);
+  // Player/pet -> mob keeps the full above-level scaling, minus gear Hit rating
+  // (attacker.hitBonus, 0 for anything without hit gear so parity is unchanged),
+  // floored at 0 so a hit-capped attacker can reach 0% miss.
+  return Math.max(0, miss - attacker.hitBonus);
 }
 
 export function armorReduction(armor: number, attackerLevel: number): number {

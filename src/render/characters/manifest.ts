@@ -233,12 +233,31 @@ const FLOATING: ClipMap = {
   death: 'Death',
 };
 
+// 2023 enemy rig variant with a bite attack and no run clip (yeti)
+const ENEMY_BITE: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Bite_Front'],
+  hit: ['HitRecieve'],
+  death: 'Death',
+};
+
 const SPIDER: ClipMap = {
   idle: 'Spider_Idle',
   walk: 'Spider_Walk',
   run: 'Spider_Walk',
   attack: ['Spider_Attack'],
   death: 'Spider_Death', // no hit-react in asset
+};
+
+// Velociraptor rig (velociraptor.glb): like the spider, no hit-react clips
+const RAPTOR: ClipMap = {
+  idle: 'Velociraptor_Idle',
+  walk: 'Velociraptor_Walk',
+  run: 'Velociraptor_Run',
+  attack: ['Velociraptor_Attack'],
+  death: 'Velociraptor_Death',
 };
 
 // Chicken-cow rig (chicken_cow.glb, procedurally authored — see
@@ -356,49 +375,70 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/knight/alt_a.png`,
     `${SKINS_DIR}/knight/alt_b.png`,
     `${SKINS_DIR}/knight/alt_c.png`,
+    `${SKINS_DIR}/knight/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/knight/alt_suit_chrome.png`,
   ],
-  player_paladin: [null, `${SKINS_DIR}/paladin/alt_a.png`],
+  player_paladin: [
+    null,
+    `${SKINS_DIR}/paladin/alt_a.png`,
+    `${SKINS_DIR}/paladin/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/paladin/alt_suit_chrome.png`,
+  ],
   player_hunter: [
     null,
     `${SKINS_DIR}/ranger/alt_a.png`,
     `${SKINS_DIR}/ranger/alt_b.png`,
     `${SKINS_DIR}/ranger/alt_c.png`,
+    `${SKINS_DIR}/ranger/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/ranger/alt_suit_chrome.png`,
   ],
   player_rogue: [
     null,
     `${SKINS_DIR}/rogue/alt_a.png`,
     `${SKINS_DIR}/rogue/alt_b.png`,
     `${SKINS_DIR}/rogue/alt_c.png`,
+    `${SKINS_DIR}/rogue/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/rogue/alt_suit_chrome.png`,
   ],
   player_priest: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_mage: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_warlock: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_shaman: [
     null,
     `${SKINS_DIR}/barbarian/alt_a.png`,
     `${SKINS_DIR}/barbarian/alt_b.png`,
     `${SKINS_DIR}/barbarian/alt_c.png`,
+    `${SKINS_DIR}/barbarian/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/barbarian/alt_suit_chrome.png`,
   ],
   player_druid: [
     null,
     `${SKINS_DIR}/druid/alt_a.png`,
     `${SKINS_DIR}/druid/alt_b.png`,
     `${SKINS_DIR}/druid/alt_c.png`,
+    `${SKINS_DIR}/druid/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/druid/alt_suit_chrome.png`,
   ],
   // Combat Mech chromas — every index is a real full-model texture (no null
   // default; the embedded base texture is not one of the rewards).
@@ -686,6 +726,28 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // The Gleamfolk pixie villager (Veiled Hollow): Tripo biped from the user's
+  // game-style concept, auto-rigged, clips renamed to the game vocabulary at
+  // bake time. A light entity tint gives individual villagers variety.
+  mob_mushroom_pixie: {
+    url: `${CREATURES}/mushroom_pixie.glb`,
+    height: HUMANOID_H, // villagers stand player-height, cap and all
+    // The Tripo rig rests facing +x; yaw swings the model onto the game's
+    // +z-forward convention so walking and combat face the right way.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
   greyjaw: {
     // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton;
     // clips renamed to the animal() names at bake time. Baked texture, no tint.
@@ -746,6 +808,33 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // the Veiled Hollow stags: the shipped stag rig repainted to the approved
+  // concepts (tmp/make_hollow_stags.mjs): dusk coats baked into the materials
+  // and the antlers split onto their own emissive amethyst material, so no
+  // entity tint (a wash would muddy the baked palette and the antler glow)
+  mob_veiled_stag: {
+    url: `${CREATURES}/veiled_stag.glb`,
+    height: 1.9,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  mob_gleamstag: {
+    url: `${CREATURES}/gleamstag.glb`,
+    height: 1.9,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  // the does: the same rig with the antler mesh removed and a softer coat
+  mob_veiled_doe: {
+    url: `${CREATURES}/veiled_doe.glb`,
+    height: 1.6,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  // Aurelhorn keeps the bull's bulk (height) but joins the herd's species:
+  // the same repainted stag rig in the patriarch's gold
+  mob_aurelhorn: {
+    url: `${CREATURES}/aurelhorn.glb`,
+    height: 2.1,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
   // Deepfen Spearjaw (The Drowned Litany): unused Quaternius raptor rig, a
   // toothy quadruped that reads far more like a swamp predator than the
   // generic wolf fallback (docs/prd/drowned-litany-asset-generation-plan.md).
@@ -763,6 +852,14 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: BIPED14,
     tint: 0x5a4030,
     tintStrength: 0.5,
+  },
+  // the same rig worn honestly: an ice-white yeti for the Frostveil
+  mob_yeti: {
+    url: `${CREATURES}/yetialt.glb`,
+    height: 2.5,
+    clips: BIPED14,
+    tint: 'entity',
+    tintStrength: 0.55,
   },
   mob_spider: {
     url: `${CREATURES}/spider.glb`,
@@ -860,6 +957,100 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.25,
+  },
+  // the Nightbloom's realm-only rigs, all first appearances: the moonfleece
+  // herds (alpaca), the gloam striders (velociraptor), and the hovering
+  // masked nightkin (tribal, a flying rig: they drift rather than walk)
+  mob_alpaca: {
+    url: `${CREATURES}/alpaca.glb`,
+    height: 1.7,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_raptor: {
+    url: `${CREATURES}/velociraptor.glb`,
+    height: 1.6,
+    clips: RAPTOR,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_nightkin: {
+    url: `${CREATURES}/tribal.glb`,
+    height: 1.9,
+    hover: 0.3,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  // the Veiled Hollow's spirits: the ghost rig, entity-tinted (teal hollow
+  // remnants and the ice wisp still wear it)
+  mob_ghost: {
+    url: `${CREATURES}/ghost.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
+  // the Hollow wisps: bespoke static meshes from the approved concepts
+  // (user-generated via Tripo). No rig on purpose: they drift and hover,
+  // and every clip lookup null-guards, so FLOATING names simply no-op.
+  // Baked palettes, so no entity tint. Front faces +x off the generator;
+  // yaw turns it to the +z game convention.
+  mob_glimmerwisp: {
+    url: `${CREATURES}/glimmerwisp.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    yaw: -Math.PI / 2,
+  },
+  mob_duskwisp: {
+    url: `${CREATURES}/duskwisp.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    yaw: -Math.PI / 2,
+  },
+  // spore-borne mushroom folk: the glub blob drifting just above the glade
+  mob_glub: {
+    url: `${CREATURES}/glubevolved.glb`,
+    height: 1.4,
+    hover: 0.15,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.45,
+  },
+  // the Hollow's wandering bosses: two more rigs no other zone uses
+  mob_crab: {
+    url: `${CREATURES}/crabenemy.glb`,
+    height: 1.7,
+    clips: ENEMY_BITE,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_bull: {
+    url: `${CREATURES}/bull.glb`,
+    height: 2.1,
+    // the bull rig has no plain Idle clip; grazing IS its idle
+    clips: {
+      idle: 'Eating',
+      walk: 'Walk',
+      run: 'Gallop',
+      attack: ['Attack_Headbutt', 'Attack_Kick'],
+      hit: ['Idle_HitReact_Left', 'Idle_HitReact_Right'],
+      death: 'Death',
+    },
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  // mossy treant: the shaggy yeti under a bark-green entity wash
+  mob_treant: {
+    url: `${CREATURES}/yeti.glb`,
+    height: 2.6,
+    clips: ENEMY_BITE,
+    tint: 'entity',
+    tintStrength: 0.72, // the white pelt needs a heavy wash to read as moss
   },
   mob_demonalt: {
     url: `${CREATURES}/demonalt.glb`,
@@ -963,6 +1154,16 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: skeletonClips(['2H_Melee_Attack_Chop']),
     tint: 'entity',
     tintStrength: 0.25,
+  },
+  // The Infernal Citadel's Magus Vel'Kor: the same necromancer rig, but drenched in
+  // its entity colour (the shared skel_necromancer tints at 0.25 and stays
+  // bone-white, which reads as a snowdrift under the citadel's blood-red grade).
+  rift_ritualist: {
+    url: `${ENEMIES}/necromancer.glb`,
+    height: 2.5,
+    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    tint: 'entity',
+    tintStrength: 0.8,
   },
   skel_golem: {
     url: `${ENEMIES}/skeleton_golem.glb`,
@@ -1221,9 +1422,66 @@ const MOB_KEYS: Record<string, string> = {
   fallen_captain_aldren: 'skel_warrior',
   corrupted_priest_malric: 'skel_necromancer',
   deathstalker_voss: 'skel_rogue',
+  // The Nythraxis phase-2 heroic court is Aldren / Malric / Voss risen again, so
+  // the "Spirit of X" adds reuse each character's crypt visual above. Without these
+  // the ids fall through to FAMILY_KEYS.undead (skel_minion) and the whole court
+  // renders as identical generic skeletons. See spawnNythraxisHeroicAdds.
+  nythraxis_heroic_warrior_add: 'skel_warrior', // Spirit of Aldren
+  nythraxis_heroic_priest_add: 'skel_necromancer', // Spirit of Malric
+  nythraxis_heroic_rogue_add: 'skel_rogue', // Spirit of Voss
   vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
+  // the Veiled Hollow: stags use the real stag rig instead of the beast-family
+  // wolf; the court guardians borrow the golem rig as stone constructs; the
+  // spirits, mushroom folk, and treants get realm-only rigs (ghost, glub,
+  // yeti) that appear nowhere in the outer three zones
+  veiled_stag: 'mob_veiled_stag',
+  veiled_doe: 'mob_veiled_doe',
+  gleamstag: 'mob_gleamstag',
+  gilded_stag: 'mob_stag',
+  gloam_fox: 'mob_fox',
+  orchard_treant: 'mob_treant',
+  lily_wisp: 'mob_ghost',
+  ancient_guardian: 'skel_golem',
+  waking_warden: 'skel_golem',
+  glimmerwisp: 'mob_glimmerwisp',
+  duskwisp: 'mob_duskwisp',
+  ice_wisp: 'mob_ghost',
+  frostmane_yeti: 'mob_yeti',
+  sporeling_gatherer: 'mob_glub',
+  corrupted_sporeling: 'mob_glub',
+  mushroom_pixie: 'mob_mushroom_pixie',
+  treant_elder: 'mob_treant',
+  old_marrowshell: 'mob_crab',
+  aurelhorn: 'mob_aurelhorn',
+  // the Nightbloom: silver herds, night-running raptors, hovering star folk;
+  // the Barrow King borrows the armored skeleton the other revenants wear
+  moonfleece_grazer: 'mob_alpaca',
+  gloam_strider: 'mob_raptor',
+  nightkin_stargazer: 'mob_nightkin',
+  barrow_king: 'skel_warrior',
+  // the Wraithwood: drifting wraiths on the ghost rig, walking haunted
+  // trees on the treant's, and the hooded Huntsman on the crypt rogue's
+  // (the widowsilk spinners take the spider family default)
+  wood_wraith: 'mob_ghost',
+  gravenbark_shambler: 'mob_treant',
+  pale_huntsman: 'skel_rogue',
+  // the Palmreach: coral crabs, jungle boars, and the carved-stone guardian
+  // (the canopy weavers take the spider family default)
+  tide_scuttler: 'mob_crab',
+  thicket_boar: 'mob_boar',
+  idol_guardian: 'skel_golem',
+  topiary_stag: 'mob_stag',
+  the_topiary_bull: 'mob_bull',
+  moor_ram: 'mob_alpaca',
+  shoal_scuttler: 'mob_crab',
+  the_wreck_warden: 'skel_golem',
+  // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
+  // family's default skeleton minion. Its demons keep the family fallback
+  // (mob_demonalt), re-tinted deep red by the templates.
+  rift_pact_acolyte: 'mob_dark_caster',
+  rift_boss_ritualist: 'rift_ritualist',
 };
 
 const FAMILY_KEYS: Record<string, string> = {
@@ -1271,6 +1529,12 @@ const NPC_KEYS: Record<string, string> = {
   // The graveyard angel: a robed figure, rendered translucent (ethereal) with a
   // holy shimmer by the renderer (see the spirit_healer branches there).
   spirit_healer: 'npc_villager_robed',
+  // Eldergleam, the Veiled Hollow
+  keeper_saelwyn: 'npc_mage',
+  loremother_bryn: 'npc_villager_robed',
+  provisioner_fenna: 'npc_villager',
+  wardsmith_orun: 'npc_smith',
+  archivist_tullo: 'npc_villager_robed',
 };
 
 export function visualKeyFor(e: Entity): string {

@@ -149,6 +149,24 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('password_set');
   });
 
+  it('applies the unstuck reporting schema after the core identity tables', async () => {
+    await ensureSchema();
+    const coreIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS accounts'),
+    );
+    const unstuckIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS unstuck_reports'),
+    );
+    expect(coreIndex).toBeGreaterThanOrEqual(0);
+    expect(unstuckIndex).toBeGreaterThan(coreIndex);
+    const ddl = h.calls[unstuckIndex];
+    expect(ddl).toContain('CREATE INDEX IF NOT EXISTS unstuck_reports_realm_id');
+    expect(ddl).toContain('attempt_id UUID NOT NULL UNIQUE');
+    expect(ddl).toContain('CREATE INDEX IF NOT EXISTS unstuck_reports_created');
+    expect(ddl).toContain('ON DELETE SET NULL');
+    expect(ddl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+  });
+
   it('disables the statement timeout for the boot transaction before the advisory lock', async () => {
     // Boot DDL serializes on the advisory lock across concurrent realm processes and
     // may legitimately wait far past any request budget, so the boot transaction runs
@@ -193,6 +211,17 @@ describe('ensureSchema wires every schema module at boot', () => {
       'CREATE UNIQUE INDEX IF NOT EXISTS daily_reward_payout_attempts_operation',
     );
     expect(applied).toContain('tx_signature TEXT NOT NULL UNIQUE');
+  });
+
+  it('applies timed Daily Rewards bans without changing the exclusion-view shape', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_bans ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ',
+    );
+    expect(applied).toContain('CREATE OR REPLACE VIEW daily_reward_excluded_accounts AS');
+    expect(applied).toContain('expires_at IS NULL OR expires_at > now()');
+    expect(applied).toContain('SELECT account_id, reason');
   });
 
   it('applies the bank-system tables (character_leases, bank_ledger) idempotently', async () => {
@@ -314,6 +343,14 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(carcassCheck).toBeGreaterThan(sessionLock);
     expect(carcassCheck).toBeLessThan(concurrentIndex);
     expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);
+    const rewardEventsIndex = h.calls.findIndex((sql) =>
+      sql.includes(
+        'CREATE INDEX CONCURRENTLY IF NOT EXISTS daily_reward_events_account_day_created_id',
+      ),
+    );
+    expect(rewardEventsIndex).toBeGreaterThan(concurrentIndex);
+    expect(rewardEventsIndex).toBeLessThan(sessionUnlock);
+    expect(h.calls[rewardEventsIndex]).toContain('WHERE points > 0');
   });
 
   it('drops an INVALID metrics-index carcass before rebuilding it (a killed CONCURRENTLY build self-heals)', async () => {

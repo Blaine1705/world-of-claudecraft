@@ -19,6 +19,8 @@ import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { PendingProjectile } from './projectile_travel';
+import type { NaturalRiftPortal } from './rift/portals';
+import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
 import type {
   ArenaMatch,
@@ -106,6 +108,27 @@ export interface SimContextPrimitives {
   // reads/finds/iterates it and mutates slot fields in place; the array identity
   // stays Sim-owned (like delayedEvents/groundAoEs), so this is a live read-only view.
   readonly instances: InstanceSlot[];
+  // Session-only manual-reset cooldowns keyed by durable character identity and
+  // dungeon id. Unlike party instance keys, these survive relogs and party reforming.
+  readonly dungeonResetLocks: Map<string, { availableAt: number; claimId: number }>;
+  // Procedural Rift instance pool (seeded in the Sim ctor). Live view: the backing
+  // array stays Sim-owned; rift/runs.ts mutates slot fields in place.
+  readonly riftInstances: RiftInstance[];
+  // Shared natural-world Rift events. Multiple group instances can point at one
+  // eventId; race.ts performs the authoritative first-clear claim in place.
+  readonly riftEvents: RiftEvent[];
+  nextRiftInstanceId: number;
+  // rift-portal registry, appended to on rift_portal spawn; null until built.
+  // Read-write: rift/runs.ts lazily assigns the array on first build (like dungeonDoorIds).
+  riftPortalIds: number[] | null;
+  // Open world-spawned ranked rift portals (rift/portals.ts scheduler). Live view:
+  // the backing array stays Sim-owned, mutated in place (push/splice).
+  readonly naturalRiftPortals: NaturalRiftPortal[];
+  // Natural-portal spawn ordinal: seeds each spawn's dedicated Rng and paces the
+  // sim-time cadence. Read-write (the scheduler increments it).
+  riftPortalSpawnCount: number;
+  // Deterministically sampled next scheduler deadline (sim seconds).
+  riftPortalNextAt: number;
   // live arena bouts keyed by every participant pid (A2); release-spirit early-bails
   // when the dead player is mid-bout.
   readonly arenaMatches: Map<number, ArenaMatch>;
@@ -119,6 +142,10 @@ export interface SimContextPrimitives {
   // temporary host-owned tick profiler probe); the rest defaulted.
   readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
     Pick<SimConfig, 'world' | 'perfLap'>;
+  // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
+  // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
+  // not per seed: two same-seed Sims in one process must stay isolated.
+  readonly riftCollisionToken: number;
   // A2 duel + arena state. Live views: the backing fields stay on Sim (mutated in
   // place / reassigned), like E1's delayedEvents. The three queues are REASSIGNED by
   // the matchmaker's filter, so they are read-write; the maps/set and the match-id
@@ -248,6 +275,21 @@ export interface SimContextCallbacks {
   instanceClaimIdAt(pos: Vec3): number | null;
   enterDungeon(dungeonId: string, pid?: number): void;
   leaveDungeon(pid?: number): void;
+  resetDungeonInstances(pid?: number): void;
+  inheritDungeonResetLocks(pid: number): void;
+  // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
+  // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
+  // these two are on the seam so foreign callers reach them through ctx.
+  enterRift(
+    seed: number,
+    baseLevel: number,
+    pid?: number,
+    returnPos?: { x: number; z: number },
+    portal?: Entity,
+  ): void;
+  leaveRift(pid?: number): void;
+  /** Open an off-path hidden rift treasure chest (interact -> loot, no lockpick). */
+  riftOpenTreasure(objectId: number, pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
   awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
@@ -525,6 +567,18 @@ export interface SimContextCallbacks {
   swingIntervalMult(e: Entity): number;
   mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean;
   resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number };
+  // Exact swept player movement resolver, exposed for the local unstuck search.
+  // Keeping the from-point and fence flag preserves the normal movement rules,
+  // including delve bounds/doors and thin-wall anti-tunnelling.
+  resolvePlayerMove(
+    fromX: number,
+    fromZ: number,
+    nx: number,
+    nz: number,
+    r: number,
+    e: Entity,
+    ignoreFences?: boolean,
+  ): { x: number; z: number };
   // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1) ---
   updatePet(pet: Entity): void;
   isDelveCompanionMob(mob: Entity): boolean;
@@ -676,7 +730,7 @@ export interface SimContextCallbacks {
   // are M2's decls above, points-at Sim. Not re-declared here (dedupe).
 
   // G2 social plumbing. `setPlayerLevel` backs the /dev level cheat (handleDevChat in
-  // social/chat.ts); `notice` is the positive chat-log line the /join /leave handler
+  // dev_commands.ts); `notice` is the positive chat-log line the /join /leave handler
   // emits. Both stay on Sim. (hasPendingSocialInvite is already declared above; isRooted/
   // moveSpeedMult/swingIntervalMult are M2 decls above -> all deduped.)
   setPlayerLevel(level: number, pid?: number): void;
@@ -685,7 +739,7 @@ export interface SimContextCallbacks {
   // devCommands). Adds a stationary whisperable player near the primary; returns the
   // new pid, or -1 if the name is blank or already taken. Stays on Sim.
   spawnDevBot(name: string): number;
-  // Dev-only Dungeon Finder scenario seeding backing "/dev lfg" (social/chat.ts,
+  // Dev-only Dungeon Finder scenario seeding backing "/dev lfg" (dev_commands.ts,
   // gated by devCommands). Spawns finder dev bots around the caller. Stays on Sim.
   seedDungeonFinderDev(
     mode: 'queue' | 'raid' | 'board',
@@ -846,6 +900,42 @@ export function createSimContext(host: SimContextHost): SimContext {
     get instances() {
       return host.instances;
     },
+    get dungeonResetLocks() {
+      return host.dungeonResetLocks;
+    },
+    get riftInstances() {
+      return host.riftInstances;
+    },
+    get riftEvents() {
+      return host.riftEvents;
+    },
+    get nextRiftInstanceId() {
+      return host.nextRiftInstanceId;
+    },
+    set nextRiftInstanceId(v) {
+      host.nextRiftInstanceId = v;
+    },
+    get riftPortalIds() {
+      return host.riftPortalIds;
+    },
+    set riftPortalIds(v) {
+      host.riftPortalIds = v;
+    },
+    get naturalRiftPortals() {
+      return host.naturalRiftPortals;
+    },
+    get riftPortalSpawnCount() {
+      return host.riftPortalSpawnCount;
+    },
+    set riftPortalSpawnCount(v) {
+      host.riftPortalSpawnCount = v;
+    },
+    get riftPortalNextAt() {
+      return host.riftPortalNextAt;
+    },
+    set riftPortalNextAt(v) {
+      host.riftPortalNextAt = v;
+    },
     get arenaMatches() {
       return host.arenaMatches;
     },
@@ -854,6 +944,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get cfg() {
       return host.cfg;
+    },
+    get riftCollisionToken() {
+      return host.riftCollisionToken;
     },
     get trades() {
       return host.trades;
@@ -975,6 +1068,11 @@ export function createSimContext(host: SimContextHost): SimContext {
     instanceClaimIdAt: host.instanceClaimIdAt,
     enterDungeon: host.enterDungeon,
     leaveDungeon: host.leaveDungeon,
+    enterRift: host.enterRift,
+    leaveRift: host.leaveRift,
+    riftOpenTreasure: host.riftOpenTreasure,
+    resetDungeonInstances: host.resetDungeonInstances,
+    inheritDungeonResetLocks: host.inheritDungeonResetLocks,
     dungeonDifficulty: host.dungeonDifficulty,
     setDungeonDifficulty: host.setDungeonDifficulty,
     awardHeroicMarks: host.awardHeroicMarks,
@@ -1086,6 +1184,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     swingIntervalMult: host.swingIntervalMult,
     mobCanSwim: host.mobCanSwim,
     resolveMovePoint: host.resolveMovePoint,
+    resolvePlayerMove: host.resolvePlayerMove,
     updatePet: host.updatePet,
     isDelveCompanionMob: host.isDelveCompanionMob,
     updateDelveCompanion: host.updateDelveCompanion,

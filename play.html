@@ -223,6 +223,10 @@
         <!-- Ravenpost envelope: visible while unread letters wait (role=status so
              arrivals are announced; reading them still requires a mailbox). -->
         <div id="mail-indicator" role="status" hidden data-icon="mail"><span class="mail-indicator-count">0</span></div>
+        <!-- Decorative day/night dial: paints the 12h world cycle as a ring of sky
+             colors with a "now" marker. aria-hidden like the minimap; the accessible
+             time surface is #minimap-clock. -->
+        <canvas id="minimap-daynight" width="60" height="60" aria-hidden="true"></canvas>
       </div>
       <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
       <div id="minimap-coords" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
@@ -269,7 +273,7 @@
     <div id="bottom-bar">
       <div id="actionbar-row">
         <div id="actionbar-stack">
-          <div id="player-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
+          <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
             <div class="portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
               <div class="level-chip" id="pf-level">1</div>
@@ -865,11 +869,17 @@
           <div class="desktop-download-actions">
             <a
               class="btn btn-primary desktop-download-link"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.25.0-mac-universal.dmg"
+              data-platform="mac"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.27.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
+            <a
+              class="btn btn-primary desktop-download-link"
+              data-platform="win"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.27.0-win.exe"
+              data-i18n="download.windowsCta"
+            >Download for Windows</a>
           </div>
-          <div class="desktop-download-status" data-i18n="download.windowsPending">Windows build pending.</div>
         </div>
       </section>
     </div>
@@ -906,7 +916,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.25.0</div>
+      <div id="game-version">v0.27.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>

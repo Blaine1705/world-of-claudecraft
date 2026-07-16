@@ -97,10 +97,16 @@ export function dealDamage(
   const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
   // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
   // through raid bosses to inspect drops without one-shotting them past their phase
-  // transitions. Gated on devCommands so it can NEVER apply in production (where gm
+  // transitions. Gated on devCommands so it can never apply in production (where gm
   // marks real, non-fighting game masters). Draws no rng.
   if (source?.devGod && source.kind === 'player' && ctx.devCommands)
     amount = Math.round(amount * 100);
+  // Dev "smite" mode: a flagged player's hit one-shots any mob (overrides the
+  // rolled amount before mitigation, so armor/absorb can't save the target). Only
+  // the player's own damage, only vs mobs; never touches players/NPCs/PvP.
+  if (source?.oneShot && source.kind === 'player' && target.kind === 'mob' && ctx.devCommands) {
+    amount = target.maxHp * 1000 + 1_000_000;
+  }
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (
@@ -117,6 +123,14 @@ export function dealDamage(
     target.auras.some((a) => a.kind === 'defensive_stance')
   ) {
     amount = Math.round(amount * 0.9);
+  }
+
+  // Ironhold (Shield Wall): a big defensive cooldown, fraction less damage from any
+  // source, any school, DoT ticks included. Non-stacking: the strongest ward wins.
+  if (amount > 0) {
+    let ward = 0;
+    for (const a of target.auras) if (a.kind === 'shield_wall') ward = Math.max(ward, a.value);
+    if (ward > 0) amount = Math.round(amount * (1 - ward));
   }
 
   // Expose: a cracked-guard debuff amplifies the physical damage the victim
@@ -242,9 +256,38 @@ export function dealDamage(
     }
   }
 
+  // Sacred Bulwark (Guardian Ward): an enemy lethal hit spends the ward, clamps
+  // overkill to the health actually lost, and restores the wearer from the aura's
+  // data value. The damage still falls through the shared tail below so combat,
+  // counters, CC/stealth breaks, consumption, pushback, rage, and deeds all run.
+  // Sourceless and self damage do not spend this enemy-hit defensive.
+  let guardianWardRestore = 0;
+  const guardianWardEnemyHit =
+    source?.kind === 'mob' && source.ownerId === null
+      ? source.hostile
+      : !!source && ctx.isHostileTo(source, target);
+  if (
+    amount > 0 &&
+    target.kind === 'player' &&
+    source &&
+    source.id !== target.id &&
+    guardianWardEnemyHit &&
+    target.hp - amount <= 0
+  ) {
+    const wardIdx = target.auras.findIndex((a) => a.kind === 'guardian_ward');
+    if (wardIdx >= 0) {
+      const ward = target.auras[wardIdx];
+      target.auras.splice(wardIdx, 1);
+      ctx.emit({ type: 'aura', targetId: target.id, name: ward.name, gained: false });
+      amount = Math.max(0, target.hp);
+      guardianWardRestore = Math.max(1, Math.round(target.maxHp * ward.value));
+    }
+  }
+
   // duels end at 1 hp, nobody dies
   const duel = target.kind === 'player' ? ctx.duels.get(target.id) : undefined;
   if (
+    guardianWardRestore === 0 &&
     duel &&
     duel.state === 'active' &&
     sourcePlayer &&
@@ -291,6 +334,7 @@ export function dealDamage(
     }
   }
   if (
+    guardianWardRestore === 0 &&
     match?.fiesta &&
     match.state === 'active' &&
     sourcePlayer &&
@@ -320,6 +364,7 @@ export function dealDamage(
   // Protect Yumi downs bench the victim on a flat respawn timer, like Fiesta:
   // never the permanent ranked elimination below. MUST stay above that arm.
   if (
+    guardianWardRestore === 0 &&
     match?.yumi &&
     match.state === 'active' &&
     sourcePlayer &&
@@ -349,6 +394,7 @@ export function dealDamage(
   // Ranked arena eliminations use normal death state so clients and combat
   // logic see a real 0 HP defeat. The return timer revives everyone after.
   if (
+    guardianWardRestore === 0 &&
     match &&
     !match.fiesta &&
     !match.yumi &&
@@ -404,7 +450,7 @@ export function dealDamage(
     }
   }
 
-  target.hp = Math.max(0, target.hp - amount);
+  target.hp = guardianWardRestore || Math.max(0, target.hp - amount);
   ctx.emit({
     type: 'damage',
     sourceId: source?.id ?? -1,
@@ -416,6 +462,9 @@ export function dealDamage(
     kind,
     ...attackAnimation,
   });
+  if (guardianWardRestore > 0) {
+    ctx.emit({ type: 'heal', targetId: target.id, amount: guardianWardRestore });
+  }
 
   if (amount > 0) {
     if (target.kind === 'mob' && DAMAGE_IDLE_DESPAWN_MOB_IDS.has(target.templateId)) {

@@ -210,8 +210,8 @@ so the full-universe locale slices auto-merge byte-perfectly; the global aggrega
 (`i18n.status.summary.json`, `i18n.resolved.sha256`) are no longer committed. One slice can
 still conflict: `pending.ts` is a small sorted per-locale list, so two concurrent new-key PRs
 often insert at the same tail line. That conflict is expected, resolves with the exact recipe
-above (take either side, regen, add), and a durable fix is specced in the toolchain packet
-(docs/toolchain-modernization/state.md, OPEN item 8). The output is
+above (take either side, regen, add), and a durable fix (the same-as-English
+inversion) is specced in the toolchain packet's close-out summary on issue #1868. The output is
 deterministic, so a second `i18n:gen` must leave the tree clean (your proof; CI's freshness
 step checks the same). A rising `pending` count after merging a `release/**` branch is
 expected and fine at PR tier.

@@ -215,6 +215,13 @@ For off-box safety, sync the directory to S3 occasionally:
 
 - **Secrets**: the Postgres password is generated at first boot into
   `/opt/eastbrook/.env` (mode 600, gitignored). Nothing else to manage.
+- **Timed Daily Rewards ban rollback**: releases with timed bans retain expired rows in
+  `daily_reward_bans` and exclude them with an `expires_at` predicate. Before rolling
+  back to a release that predates timed bans, stop every game process and remove expired
+  rows with `DELETE FROM daily_reward_bans WHERE expires_at <= now();`. The older release
+  cannot honor future expiry times. Operators must either remove still-active timed bans
+  before rollback or explicitly accept that they will become permanent until manually
+  unbanned. Do not alter the nullable `expires_at` column during rollback.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state
   and exits non-zero on any discrepancy. Run it after an economy incident or a restore.
@@ -281,6 +288,23 @@ For off-box safety, sync the directory to S3 occasionally:
   URL instead.
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the
   level/teleport cheats used by the test bots.
+- **Community test profile**: on a disposable public test realm, set both
+  `PROVISION_TEST_ACCOUNTS=1` and `COMMUNITY_TEST_RIFTS=1` in the host `.env`,
+  then restart the game container. The first flag gives newly created accounts
+  nine level-20 characters, one per class, with complete Warfare gear
+  and four maximum-size bags. It does not backfill existing accounts. The Rift
+  flag restores persisted events before filling eight distinct eligible regions,
+  uses six-hour portal lifetimes and one-minute replacements, and raises capacity
+  to 24 concurrent groups. Both flags are off by default and neither enables dev
+  commands, so keep `ALLOW_DEV_COMMANDS=0` on a public realm.
+
+  For the initial community test, leave `RIFT_UPGRADER_URL` and
+  `RIFT_UPGRADER_MODEL` unset and keep `RIFT_RUNTIME_ASSETS=0` unless remote AI
+  and asset-job costs are explicitly part of the test. Monitor tick performance
+  before opening the realm. To roll back, set both community flags to `0` and
+  restart the game container. Disabling stops future roster seeding and dense
+  Rift refill; characters already created remain, and persisted portals close
+  through their normal clear or expiry lifecycle.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
   (`server/bot_detector/stub.ts`). Detection hooks are wired in, but they observe
   nothing and never act. To bundle the real behavioral detector, clone the private

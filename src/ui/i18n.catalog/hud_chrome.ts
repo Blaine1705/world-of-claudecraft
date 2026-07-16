@@ -31,6 +31,38 @@ export const hudChromeStrings = {
     resurrectAtHealer: "The Pale Keeper (Keeper's Toll)",
     spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
   },
+  // Countdown-to-graveyard recovery. Stable event phases/reasons come from the
+  // authoritative sim; new semantics use new keys so stale safe-spot translations
+  // cannot be shown while locale fills catch up.
+  unstuck: {
+    menuButton: 'Unstuck',
+    help: 'Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.',
+    helpAtGraveyard:
+      "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
+    started:
+      'Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.',
+    countdown: 'Unstuck: {seconds}',
+    completed: 'Moved to the nearest reachable safe spot.',
+    completedAtGraveyard:
+      "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
+    cancelledMoved: 'Unstuck cancelled because you moved.',
+    cancelledDamaged: 'Unstuck cancelled because you took damage.',
+    cancelledCombat: 'Unstuck cancelled because you entered combat.',
+    cancelledBusy: 'Unstuck cancelled because you started another action.',
+    cancelledState: 'Unstuck cancelled because your state changed.',
+    cancelledDisconnected: 'Unstuck cancelled because you disconnected.',
+    noSafePosition: 'No reachable safe spot was found nearby. You were not moved.',
+    alreadyActive: 'Unstuck is already counting down.',
+    alreadySafe: 'You are already in a safe, reachable position.',
+    cooldown: 'Unstuck will be ready in {seconds} seconds.',
+    dead: 'You cannot use Unstuck while dead or in spirit form.',
+    combat: 'You cannot use Unstuck during combat.',
+    controlled: 'You cannot use Unstuck while movement is impaired.',
+    standStill: 'Stand still on solid ground before using Unstuck.',
+    standStillAnywhere: 'Stand still before using Unstuck.',
+    busy: 'Finish your current action before using Unstuck.',
+    unavailable: 'Unstuck is unavailable in your current state.',
+  },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
   // bubble text). Source ids/order mirror OVERHEAD_EMOTES in world_api.ts.
   emotes: {
@@ -71,6 +103,7 @@ export const hudChromeStrings = {
     remainingLessThanMinute: '<1m',
     remainingMinutes: '{minutes}m',
     remainingHoursMinutes: '{hours}h {minutes}m',
+    remainingDaysHours: '{days}d {hours}h',
     score: 'Score',
     walletValue: 'Wallet Value (WOC)',
     usd: '{amount} USD',
@@ -111,6 +144,8 @@ export const hudChromeStrings = {
       under_minimum: 'Wallet is below the $20 USD WOC minimum.',
       price_unavailable: 'WOC price is unavailable, rewards are temporarily locked.',
       banned: 'You are banned from Daily Rewards. Reason: {reason}',
+      bannedUntil:
+        'You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}',
     },
   },
   wocStore: {
@@ -191,6 +226,7 @@ export const hudChromeStrings = {
     balanceLabel: 'Balance',
     balanceUnit: '{amount} Claudium',
     solBalance: 'SOL: {amount}',
+    usdcBalance: 'USDC: {amount}',
     wocBalance: 'WOC: {amount}',
     unavailable:
       'The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.',
@@ -200,10 +236,11 @@ export const hudChromeStrings = {
     railLabel: 'Payment method',
     railStripe: 'Card',
     railSol: 'SOL',
+    railUsdc: 'USDC',
     railWoc: 'WOC',
     railWocDiscount: '20% off',
     railWocUnavailable: 'WOC pricing is unavailable right now.',
-    railNativeUnavailable: 'SOL/WOC off.',
+    railNativeUnavailable: 'Crypto off.',
     amountLabel: 'Amount',
     showAmounts: 'Show all Claudium amounts',
     hideAmounts: 'Hide extra Claudium amounts',
@@ -861,6 +898,10 @@ export const hudChromeStrings = {
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
+    // Audio panel toggle for the discrete interface and feedback cues (loot, level,
+    // quest, whisper, and the combat miss/dodge/parry beeps; on by default). Off
+    // silences just those without touching the SFX volume or the world sounds.
+    interfaceSounds: 'Interface and Feedback Sounds',
     // Toggle for the OSRS-style click-feedback marker: entity targets and
     // click-to-move destinations (on by default).
     clickFeedback: 'Click Marker',
@@ -1055,6 +1096,7 @@ export const hudChromeStrings = {
       spellPower: 'Spell Power',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
+      hitRating: 'Hit Rating',
       warfare: 'Warfare',
     },
     warfareValue: '+{increase}% dealt / -{reduction}% taken',
@@ -1076,6 +1118,8 @@ export const hudChromeStrings = {
         'Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.',
       hasteRating:
         'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.',
+      hitRating:
+        'Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.',
       warfare:
         'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.',
     },
@@ -1451,6 +1495,23 @@ export const hudChromeStrings = {
   dungeonDifficulty: {
     setHeroic: 'Set Dungeon Difficulty: Heroic',
     setNormal: 'Set Dungeon Difficulty: Normal',
+    resetAll: 'Reset All Instances',
+    resetDone: 'All instances have been reset.',
+    resetNone: 'You have no instances to reset.',
+    resetOccupied: 'You cannot reset instances while someone is still inside.',
+    resetSameDifficulty:
+      'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
+    resetLoot: 'You cannot reset instances while loot remains inside.',
+    resetConfirmTitle: 'Reset All Instances?',
+    resetConfirmBody:
+      'This abandons empty instances from your previously selected difficulty. Unclaimed loot will prevent the reset.',
+    resetConfirm: 'Reset Instances',
+    resetCooldown: 'Instances can only be reset once every 5 minutes.',
+    resetUsage: 'Use /dungeon reset to abandon your empty instances after changing difficulty.',
+    entryMismatchNormal:
+      'This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.',
+    entryMismatchHeroic:
+      'This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run.',
   },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
@@ -1563,6 +1624,8 @@ export const hudChromeStrings = {
     },
     dodge: 'Increases dodge chance by {pct}%',
     dodgeReduce: 'Reduces dodge chance by {pct}%',
+    damageReduction: 'Reduces all damage taken by {pct}%',
+    guardianWard: 'The next lethal enemy hit restores you to {pct}% health instead',
     armorFlat: 'Reduces armor by {value}',
     armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
     // Sunder Armor / Faerie Fire: percent armor reductions (Sunder stacks).
@@ -1587,7 +1650,7 @@ export const hudChromeStrings = {
     imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
     stealth: 'Concealed; movement speed reduced by {pct}%',
     formBear: 'Bruin Form: increased health and armor',
-    formCat: 'Cat Form: melee damage and energy',
+    formCat: 'Wolf Form: melee damage and energy',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
     righteousFury: 'Burning Oath: greatly increased threat from Holy damage',
@@ -1691,6 +1754,33 @@ export const hudChromeStrings = {
     unlock: 'Move player frame',
     lock: 'Lock player frame',
   },
+  partyFrames: {
+    section: 'Party and Raid Frames',
+    unlock: 'Move party and raid frames',
+    lock: 'Lock party and raid frames',
+    style: 'Frame Style',
+    styleAutomatic: 'Automatic',
+    styleClassic: 'Classic Party Frames',
+    styleRaid: 'Raid Frames',
+    scale: 'Frame Scale',
+    width: 'Frame Width',
+    height: 'Frame Height',
+    spacing: 'Frame Spacing',
+    columns: 'Raid Columns',
+    healthText: 'Health Text',
+    healthNone: 'None',
+    healthPercent: 'Percent',
+    healthCurrent: 'Current',
+    healthCurrentMax: 'Current / Max',
+    sort: 'Sort Players',
+    sortGroup: 'Group',
+    sortRole: 'Role',
+    sortName: 'Name',
+    showResource: 'Show Mana, Rage, and Energy',
+    showAbsorbs: 'Show Absorb Shields',
+    showAuras: 'Show Buffs and Debuffs',
+    showSelf: 'Show Your Frame',
+  },
   // Interface panel row: snap both movable unit frames back to their stock
   // spots (the button reuses chatWindow.resetAction). Wordy (M16): the five
   // non-Latin fills land in this same change.
@@ -1702,6 +1792,9 @@ export const hudChromeStrings = {
   // through formatNumber.
   itemTooltip: {
     requiresLevel: 'Requires Level {level}',
+    riftTier: '{tier}-rank Rift item',
+    riftUpgrade: 'Rift upgrade {level}/{max}',
+    riftSockets: 'Rift gems {used}/{total}',
   },
   discord: {
     title: 'Discord',

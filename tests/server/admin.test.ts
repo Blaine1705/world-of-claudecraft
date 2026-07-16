@@ -597,6 +597,128 @@ describe('page/limit pagination contract', () => {
       error: null,
     });
   });
+
+  it('unstuck-reports returns bounded cursor rows and content-local hotspots', async () => {
+    const listUnstuckReports = vi.fn(async () => ({
+      rows: [
+        {
+          id: 9,
+          realm: 'test',
+          accountId: 4,
+          characterId: 5,
+          characterName: 'Aleph',
+          areaKind: 'rift',
+          areaId: 'seed:42:floor:1',
+          instanceId: '7',
+          instanceSlot: 2,
+          originRawX: 100,
+          originRawY: 3,
+          originRawZ: 200,
+          originLocalX: 4,
+          originLocalY: 3,
+          originLocalZ: 8,
+          destinationRawX: 101,
+          destinationRawY: 3,
+          destinationRawZ: 200,
+          destinationLocalX: 5,
+          destinationLocalY: 3,
+          destinationLocalZ: 8,
+          outcome: 'completed',
+          reason: 'nearest_safe_position',
+          invokedAt: '2026-01-01T00:00:00.000Z',
+          resolvedAt: '2026-01-01T00:00:10.000Z',
+          createdAt: '2026-01-01T00:00:10.000Z',
+        },
+      ],
+      hasMore: true,
+      nextBeforeId: 9,
+    }));
+    const listUnstuckHotspots = vi.fn(async () => [
+      {
+        areaKind: 'rift',
+        areaId: 'seed:42:floor:1',
+        instanceId: null,
+        bucketLocalX: 0,
+        bucketLocalY: 0,
+        bucketLocalZ: 5,
+        reportCount: 3,
+        completedCount: 1,
+        cancelledCount: 1,
+        failedCount: 1,
+        firstInvokedAt: '2026-01-01T00:00:00.000Z',
+        lastResolvedAt: '2026-01-02T00:00:00.000Z',
+      },
+    ]);
+    authedAdminDb({ listUnstuckReports, listUnstuckHotspots });
+    installAdminRuntime();
+
+    const r = await runRoute('GET', '/admin/api/unstuck-reports', {
+      url: '/admin/api/unstuck-reports?days=999&limit=999',
+      headers: { authorization: BEARER },
+    });
+
+    expect(listUnstuckReports).toHaveBeenCalledWith(
+      expect.objectContaining({ days: 90, limit: 200 }),
+    );
+    expect(listUnstuckHotspots).toHaveBeenCalledWith(
+      expect.objectContaining({ days: 90, limit: 50 }),
+    );
+    expect(r.body).toMatchObject({
+      success: true,
+      data: {
+        reports: [
+          {
+            id: 9,
+            characterName: 'Aleph',
+            area: { kind: 'rift', id: 'seed:42:floor:1', instanceId: '7', slot: 2 },
+            origin: { x: 100, y: 3, z: 200, localX: 4, localY: 3, localZ: 8 },
+            destination: { x: 101, y: 3, z: 200, localX: 5, localY: 3, localZ: 8 },
+            outcome: 'completed',
+          },
+        ],
+        hotspots: [
+          {
+            bucket: { x: 0, y: 0, z: 5 },
+            count: 3,
+            completed: 1,
+            cancelled: 1,
+            failed: 1,
+          },
+        ],
+        days: 90,
+        limit: 200,
+        hasMore: true,
+        nextBeforeId: 9,
+      },
+      error: null,
+    });
+  });
+
+  it('unstuck-reports skips the hotspot aggregate on cursor pages', async () => {
+    const listUnstuckReports = vi.fn(async () => ({
+      rows: [],
+      hasMore: false,
+      nextBeforeId: null,
+    }));
+    const listUnstuckHotspots = vi.fn(async () => []);
+    authedAdminDb({ listUnstuckReports, listUnstuckHotspots });
+    installAdminRuntime();
+
+    const r = await runRoute('GET', '/admin/api/unstuck-reports', {
+      url: '/admin/api/unstuck-reports?days=14&limit=25&beforeId=9',
+      headers: { authorization: BEARER },
+    });
+
+    expect(listUnstuckReports).toHaveBeenCalledWith(
+      expect.objectContaining({ days: 14, limit: 25, beforeId: 9 }),
+    );
+    expect(listUnstuckHotspots).not.toHaveBeenCalled();
+    expect(r.body).toMatchObject({
+      success: true,
+      data: { reports: [], hotspots: [], hasMore: false, nextBeforeId: null },
+      error: null,
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -652,7 +774,7 @@ describe('game.* side effects preserved', () => {
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/daily-rewards-ban', {
       headers: { authorization: BEARER },
       params: { id: '5' },
-      body: { reason: 'automated play' },
+      body: { reason: 'automated play', durationHours: 12 },
     });
     expect(r.status).toBe(200);
     expect(setDailyRewardsBan).toHaveBeenCalledWith({
@@ -660,6 +782,7 @@ describe('game.* side effects preserved', () => {
       adminAccountId: ADMIN_ACCOUNT_ID,
       banned: true,
       reason: 'automated play',
+      durationHours: 12,
     });
   });
 
@@ -680,6 +803,65 @@ describe('game.* side effects preserved', () => {
       banned: true,
       reason: 'multi-account abuse',
     });
+  });
+
+  it('returns a bounded Daily Rewards point event log for a validated date', async () => {
+    const dailyRewardPointEvents = vi.fn(async () => ({
+      day: '2026-07-16',
+      rows: [],
+      total: 0,
+      truncated: false,
+    }));
+    authedAdminDb({ dailyRewardPointEvents });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/accounts/:id/daily-rewards-events', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      url: '/admin/api/accounts/5/daily-rewards-events?day=2026-07-16&limit=100',
+    });
+
+    expect(response.status).toBe(200);
+    expect(dailyRewardPointEvents).toHaveBeenCalledWith(5, '2026-07-16', 100);
+  });
+
+  it('defaults the Daily Rewards point event log to the server reward day', async () => {
+    const dailyRewardPointEvents = vi.fn(async (_accountId: number, day: string) => ({
+      day,
+      rows: [],
+      total: 0,
+      truncated: false,
+    }));
+    authedAdminDb({ dailyRewardPointEvents });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/accounts/:id/daily-rewards-events', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      url: '/admin/api/accounts/5/daily-rewards-events?limit=100',
+    });
+
+    expect(response.status).toBe(200);
+    expect(dailyRewardPointEvents).toHaveBeenCalledWith(
+      5,
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      100,
+    );
+  });
+
+  it('rejects an invalid Daily Rewards point event date', async () => {
+    const dailyRewardPointEvents = vi.fn();
+    authedAdminDb({ dailyRewardPointEvents });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/accounts/:id/daily-rewards-events', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      url: '/admin/api/accounts/5/daily-rewards-events?day=2026-02-30',
+    });
+
+    expect(response.status).toBe(400);
+    expect(dailyRewardPointEvents).not.toHaveBeenCalled();
   });
 
   it('force-rename disconnects the character owner', async () => {

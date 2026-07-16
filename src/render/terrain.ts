@@ -1,12 +1,22 @@
 import * as THREE from 'three';
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
+import {
+  COLUMN_ZONES,
+  columnBlendAt,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  STRIP_ZONES,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+  ZONES,
+} from '../sim/data';
 import { fbm2 } from '../sim/rng';
-import type { BiomeId } from '../sim/types';
-import { biomeAt, roadDistance, terrainHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
+import type { BiomeId, ZoneDef } from '../sim/types';
+import { inGardenMaze, roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
-import { runIdleQueue } from './idle_queue';
+import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import { chunkIntersectsRegion, normalTexelBounds } from './terrain_region_core';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
@@ -34,6 +44,9 @@ import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textu
 const CHUNK_SIZE = 60;
 const SKIRT_DROP = 0.3;
 const SLOPE_EPS = 1.5; // matches the legacy color pass so tints don't shift
+// An 'idle'-paced zone build waits for a browser idle slot between batches;
+// this timeout forces one batch through anyway under sustained frame load.
+const IDLE_BUILD_TIMEOUT_MS = 200;
 
 // ---------------------------------------------------------------------------
 // Real PBR splat layers (ambientCG 1K, shipped under public/textures/terrain).
@@ -116,9 +129,13 @@ const LOD_BANDS = {
 const WALL_LOD_RIDGE_HALF = 30;
 const WALL_LOD_RIM_MARGIN = 40;
 
-// terrain normal map resolution (~0.56u per texel over 360x1080)
-const NORMAL_TEX_W = 640;
-const NORMAL_TEX_H = 1920;
+// Macro relief only needs to carry broad slopes: vertex normals and the four
+// tiled material normals own close detail. The atlas spans the whole expanded
+// world but is baked sparsely by zone, so keep it compact enough that entering
+// a new region never turns tens of thousands of terrainHeight samples into a
+// second boot. At the current bounds this is roughly 3yd/texel.
+const NORMAL_TEX_W = 320;
+const NORMAL_TEX_H = 960;
 const NORMAL_TEX_STRENGTH = 1.35;
 
 // Ground colors per biome; boundaries blend across the same window as the
@@ -135,25 +152,19 @@ const BIOME_PALETTE: Record<
     dirt: 0x8a6f47,
     sand: 0xc2b283,
   },
-  // Darker, murkier and more desaturated than the vale so the swamp reads as
-  // gloomy lowland rather than "vale but slightly duller". Pushed further
-  // toward drab olive/brown than a first pass so it reads at a glance.
   marsh: {
-    grass: 0x3f4d28,
-    grassDark: 0x2c3a1e,
-    grassYellow: 0x505c34,
-    dirt: 0x4f4028,
-    sand: 0x655741,
+    grass: 0x596d36,
+    grassDark: 0x41522b,
+    grassYellow: 0x71764a,
+    dirt: 0x6e5a3e,
+    sand: 0x8f7f5c,
   },
-  // Cooler and greyer than the vale/marsh's warm greens, pushing toward sage
-  // and stone since altitude thins out the lush growth. Pushed further blue-
-  // grey than a first pass so peaks are unmistakably a different biome.
   peaks: {
-    grass: 0x7a8878,
-    grassDark: 0x5c6862,
-    grassYellow: 0x9aa192,
-    dirt: 0x8a7d6a,
-    sand: 0xbdb49c,
+    grass: 0x687a55,
+    grassDark: 0x4d5c45,
+    grassYellow: 0x8d9168,
+    dirt: 0x7d6a50,
+    sand: 0xb0a486,
   },
   // Paint-only biomes (editor brush): flat palettes, no zone-band blend.
   // Coastal green-blue, brighter sand than the desert's.
@@ -191,6 +202,84 @@ const BIOME_PALETTE: Record<
     dirt: 0x484e56,
     sand: 0x767c86,
   },
+  // dusk: violet-cast glade greens with dusty rose soil
+  dusk: {
+    grass: 0x6d7566,
+    grassDark: 0x4c4e58,
+    grassYellow: 0x8c8078,
+    dirt: 0x6e5a68,
+    sand: 0xa593a2,
+  },
+  ember: {
+    grass: 0xc9a86a,
+    grassDark: 0xa8854f,
+    grassYellow: 0xd8bc80,
+    dirt: 0x9a6a44,
+    sand: 0xe0c088,
+  },
+  frost: {
+    grass: 0xeef4fa,
+    grassDark: 0xd8e4f0,
+    grassYellow: 0xcfdce8,
+    dirt: 0x9fb0c0,
+    sand: 0xdfe8f2,
+  },
+  amber: {
+    grass: 0xc9a44e,
+    grassDark: 0xa88438,
+    grassYellow: 0xe0c060,
+    dirt: 0x8a6a42,
+    sand: 0xd8bc84,
+  },
+  fen: {
+    grass: 0x7cab68,
+    grassDark: 0x5c8a52,
+    grassYellow: 0xa2c47a,
+    dirt: 0x6e6448,
+    sand: 0xb8bc8e,
+  },
+  // night: the Nightbloom dreams in violet. The splat textures are
+  // green-authored, so these run hot and saturated or the meadow reads
+  // green anyway (the amber realm's fire-orange needed the same push)
+  night: {
+    grass: 0xc06cf2,
+    grassDark: 0x8f4ecc,
+    grassYellow: 0xe08cf8,
+    dirt: 0x8a5cb8,
+    sand: 0xd8a8f0,
+  },
+  // haunt: dead mossy floor, cold wet earth, everything a shade too dark
+  haunt: {
+    grass: 0x46543e,
+    grassDark: 0x2e382c,
+    grassYellow: 0x5a6644,
+    dirt: 0x453c34,
+    sand: 0x6b6754,
+  },
+  // jungle: saturated tropical green over bright coral sand
+  jungle: {
+    grass: 0x3f9448,
+    grassDark: 0x2c7038,
+    grassYellow: 0x74b04e,
+    dirt: 0x8a6e4a,
+    sand: 0xf2e2b4,
+  },
+  // garden: mown lawn over warm gravel, tidy even where it has run wild
+  garden: {
+    grass: 0x58a04e,
+    grassDark: 0x3f7e3c,
+    grassYellow: 0x86b85c,
+    dirt: 0x8a7a5a,
+    sand: 0xd8cca8,
+  },
+  // gale: wind-dried sage downs over grey shingle
+  gale: {
+    grass: 0x6a9a62,
+    grassDark: 0x4c7a4e,
+    grassYellow: 0x9ab070,
+    dirt: 0x7a6e58,
+    sand: 0xd8d0b8,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -202,6 +291,16 @@ const ROCK_SLOPE_START: Record<BiomeId, number> = {
   desert: 0.55,
   volcano: 0.35,
   cave: 0.4,
+  dusk: 0.52,
+  ember: 0.5,
+  frost: 0.5,
+  amber: 0.52,
+  fen: 0.6,
+  night: 0.55,
+  haunt: 0.58,
+  jungle: 0.6,
+  garden: 0.6,
+  gale: 0.5, // the cliffs crag early
 };
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
@@ -228,6 +327,14 @@ const wetRockC = new THREE.Color(0x3f4442); // dark wet-rock shoreline (peaks/vo
 const impactAshC = new THREE.Color(0x18110d);
 const impactScorchC = new THREE.Color(0x2a160c);
 const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
+const emberForestC = new THREE.Color(0x729a4e); // the Drakelands' green gatewood
+const emberScorchC = new THREE.Color(0x6a4a40); // volcanic ground near the Drakemaw
+const emberBasaltC = new THREE.Color(0x4e3c34); // the cones' dark volcanic rock
+const cobbleC = new THREE.Color(0x8f8c86); // the Amberfall's laid stone
+const cobbleDarkC = new THREE.Color(0x6e6b66); // ...its mortar-shadow cells
+const duskCliffC = new THREE.Color(0x544d58); // dark weathered sea-cliff stone
+const hedgeC = new THREE.Color(0x2e5c30); // the Great Maze's clipped hedge walls
+const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
 const snowCapC = new THREE.Color(0xedf3fa);
 const lowSunC = new THREE.Color(0xe7d9a5);
 const lowShadeC = new THREE.Color(0x60745b);
@@ -242,68 +349,52 @@ const zonePalettes = ZONES.map((zn) => {
   };
 });
 
-// Per-biome palettes for painted cells (a flat lookup, no z-blend).
-const biomePalettes: Record<BiomeId, (typeof zonePalettes)[number]> = {
-  vale: makeBiomePalette('vale'),
-  marsh: makeBiomePalette('marsh'),
-  peaks: makeBiomePalette('peaks'),
-  beach: makeBiomePalette('beach'),
-  desert: makeBiomePalette('desert'),
-  volcano: makeBiomePalette('volcano'),
-  cave: makeBiomePalette('cave'),
-};
-function makeBiomePalette(b: BiomeId): (typeof zonePalettes)[number] {
-  const p = BIOME_PALETTE[b];
-  return {
-    grass: new THREE.Color(p.grass),
-    grassDark: new THREE.Color(p.grassDark),
-    grassYellow: new THREE.Color(p.grassYellow),
-    dirt: new THREE.Color(p.dirt),
-    sand: new THREE.Color(p.sand),
-  };
-}
-
-// Palette at a point. A painted cell (biome differs from its zone band) uses that
-// biome's flat palette; otherwise the smooth zone-band blend. With no paint layer
-// `biome === zoneBiomeAt(z)` always, so this is the original z-blend exactly.
-function paletteAt(_x: number, z: number, biome: BiomeId): void {
-  if (biome !== zoneBiomeAt(z)) {
-    const p = biomePalettes[biome];
-    grassC.copy(p.grass);
-    grassDarkC.copy(p.grassDark);
-    grassYellowC.copy(p.grassYellow);
-    dirtC.copy(p.dirt);
-    sandC.copy(p.sand);
-    return;
-  }
-  grassC.copy(zonePalettes[0].grass);
-  grassDarkC.copy(zonePalettes[0].grassDark);
-  grassYellowC.copy(zonePalettes[0].grassYellow);
-  dirtC.copy(zonePalettes[0].dirt);
-  sandC.copy(zonePalettes[0].sand);
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const b = ZONES[i].zMax;
+function paletteAt(x: number, z: number): void {
+  const stripPalette = (zn: (typeof ZONES)[number]) =>
+    zonePalettes[ZONES.indexOf(zn)] ?? zonePalettes[0];
+  grassC.copy(stripPalette(STRIP_ZONES[0]).grass);
+  grassDarkC.copy(stripPalette(STRIP_ZONES[0]).grassDark);
+  grassYellowC.copy(stripPalette(STRIP_ZONES[0]).grassYellow);
+  dirtC.copy(stripPalette(STRIP_ZONES[0]).dirt);
+  sandC.copy(stripPalette(STRIP_ZONES[0]).sand);
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const b = STRIP_ZONES[i].zMax;
     const t = clamp01((z - (b - 30)) / 65);
     const tt = t * t * (3 - 2 * t);
     if (tt <= 0) break;
-    grassC.lerp(zonePalettes[i + 1].grass, tt);
-    grassDarkC.lerp(zonePalettes[i + 1].grassDark, tt);
-    grassYellowC.lerp(zonePalettes[i + 1].grassYellow, tt);
-    dirtC.lerp(zonePalettes[i + 1].dirt, tt);
-    sandC.lerp(zonePalettes[i + 1].sand, tt);
+    const next = stripPalette(STRIP_ZONES[i + 1]);
+    grassC.lerp(next.grass, tt);
+    grassDarkC.lerp(next.grassDark, tt);
+    grassYellowC.lerp(next.grassYellow, tt);
+    dirtC.lerp(next.dirt, tt);
+    sandC.lerp(next.sand, tt);
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t <= 0) continue;
+    const p = stripPalette(col);
+    grassC.lerp(p.grass, t);
+    grassDarkC.lerp(p.grassDark, t);
+    grassYellowC.lerp(p.grassYellow, t);
+    dirtC.lerp(p.dirt, t);
+    sandC.lerp(p.sand, t);
   }
 }
 
 // How "marsh" a given z is — mirrors the palette/heightfield blend windows so
 // the mud texture fades in exactly where the marsh palette does.
-function marshWeightAt(z: number): number {
-  let w = ZONES[0].biome === 'marsh' ? 1 : 0;
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const b = ZONES[i].zMax;
+function marshWeightAt(x: number, z: number): number {
+  let w = STRIP_ZONES[0].biome === 'marsh' ? 1 : 0;
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const b = STRIP_ZONES[i].zMax;
     const t = clamp01((z - (b - 30)) / 65);
     const tt = t * t * (3 - 2 * t);
     if (tt <= 0) break;
-    w += ((ZONES[i + 1].biome === 'marsh' ? 1 : 0) - w) * tt;
+    w += ((STRIP_ZONES[i + 1].biome === 'marsh' ? 1 : 0) - w) * tt;
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t > 0) w += ((col.biome === 'marsh' ? 1 : 0) - w) * t;
   }
   return w;
 }
@@ -332,19 +423,9 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     -(hz / (2 * SLOPE_EPS)) * invLen,
   ];
 
-  const biome = biomeAt(x, z);
-  paletteAt(x, z, biome);
+  paletteAt(x, z);
+  const biome = zoneBiomeAt(x, z);
   const w: [number, number, number, number] = [1, 0, 0, 0];
-  // A painted cell re-bases the splat mix on its biome's dominant ground layer;
-  // without this the splat tier keeps the grass texture everywhere and the
-  // biome override only reads as the gentle vertex tint (invisible in practice).
-  // Shore/road/slope/snow blends below still layer on top, matching zone bands.
-  const painted = biome !== zoneBiomeAt(z);
-  if (painted) {
-    if (biome === 'marsh' || biome === 'cave') lerpSplat(w, 1, 0.8);
-    else if (biome === 'peaks' || biome === 'volcano') lerpSplat(w, 2, 0.75);
-    else if (biome === 'beach' || biome === 'desert') lerpSplat(w, 3, 0.9);
-  }
   const impact = impactCraterTerrainBlend(x, z);
 
   // base grass with patchy variation: a coarse fbm layer for dry/lush
@@ -355,15 +436,34 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   cTmp.copy(grassC).lerp(grassDarkC, v);
   const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
   cTmp.lerp(grassYellowC, v2 * 0.35);
+  if (biome === 'ember') {
+    // the gatewood is green in the south near Wyrmwatch and dries into sand
+    // northward; the volcanic belt then darkens toward scorched basalt
+    const forest = 1 - clamp01((z - 1925) / 145);
+    if (forest > 0) cTmp.lerp(emberForestC, forest * 0.85);
+    const sandT = clamp01((z - 1925) / 145);
+    lerpSplat(w, 3, sandT * 0.75);
+    // the Wyrmroad: a sheltered green corridor along x 404 through the
+    // volcanic belt toward the south crossing, the realm's second gradient
+    const passT = 1 - clamp01((Math.abs(x - 404) - 26) / 26);
+    const valley = passT * clamp01((z - 2310) / 80);
+    const scorch = clamp01((z - 2260) / 100) * (1 - valley);
+    if (scorch > 0) {
+      cTmp.lerp(emberScorchC, scorch * 0.55);
+      lerpSplat(w, 2, scorch * 0.5);
+    }
+    if (valley > 0) {
+      cTmp.lerp(emberForestC, valley * 0.8);
+      lerpSplat(w, 0, valley * 0.6);
+    }
+  }
   // the marsh reads muddier: patches of wet dirt across the lowland
   if (biome === 'marsh') lerpSplat(w, 1, 0.3 * v2 * clamp01((4 - h) / 6));
   // shoreline blend, biome-specific: marsh has no sandy beach (wet mud
   // instead), rocky/ashen biomes get a darker wet-rock tint, everywhere else
   // keeps the classic sandy bank. Color and splat weight share one feathered
   // falloff so the shore blends out instead of cutting a razor-hard edge.
-  // waterLevelAt(x, z) (not the flat const) so the beach only tracks water inside
-  // a declared lake's footprint; a dry sunken feature elsewhere gets no shore tint.
-  const wl = waterLevelAt(x, z);
+  const wl = WATER_LEVEL;
   const shore = clamp01((wl + 1.6 - h) / 1.6);
   if (biome === 'marsh') {
     cTmp.lerp(dirtDarkC, shore);
@@ -381,19 +481,38 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     const dHub = Math.hypot(x - zn.hub.x, z - zn.hub.z);
     if (dHub < 14) {
       const hubT = clamp01((14 - dHub) / 3);
-      cTmp.lerp(dirtDarkC, 0.7 * hubT);
-      lerpSplat(w, 1, 0.75 * hubT);
+      if (zn.biome === 'amber') {
+        // Lanternmere's plaza is paved like its roads
+        const cell =
+          (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
+        cTmp.lerp(cobbleC, 0.85 * hubT);
+        cTmp.lerp(cobbleDarkC, cell * 0.45 * hubT);
+        lerpSplat(w, 2, 0.75 * hubT);
+      } else {
+        cTmp.lerp(dirtDarkC, 0.7 * hubT);
+        lerpSplat(w, 1, 0.75 * hubT);
+      }
       break;
     }
   }
   const rd = roadDistance(x, z);
+  // the Amberfall paves its ways: cobblestone, cell-jittered so the vertex
+  // grid reads as laid stones rather than one grey ribbon (rock splat)
+  const cobbles = biome === 'amber';
   if (rd < 2.0) {
-    cTmp.lerp(dirtC, 0.85);
-    lerpSplat(w, 1, 0.85);
+    if (cobbles) {
+      const cell = (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
+      cTmp.lerp(cobbleC, 0.9);
+      cTmp.lerp(cobbleDarkC, cell * 0.5);
+      lerpSplat(w, 2, 0.85);
+    } else {
+      cTmp.lerp(dirtC, 0.85);
+      lerpSplat(w, 1, 0.85);
+    }
   } else if (rd < 3.4) {
     const t = 0.85 * (1 - (rd - 2.0) / 1.4);
-    cTmp.lerp(dirtC, t);
-    lerpSplat(w, 1, t);
+    cTmp.lerp(cobbles ? cobbleC : dirtC, t);
+    lerpSplat(w, cobbles ? 2 : 1, t);
   }
   // Break up the rock/snow blend so cliffs read as striated stone and snow
   // reads as patchy drifts instead of a single flat tone / a clean cutoff.
@@ -405,17 +524,54 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     cTmp.lerp(rockC, t);
     cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.35);
     lerpSplat(w, 2, t);
+    // the Great Maze's walls are hedges, not cliffs: inside the maze the
+    // steep faces take clipped evergreen instead of rock
+    if (biome === 'garden' && inGardenMaze(x, z)) {
+      cTmp.lerp(hedgeC, t);
+      lerpSplat(w, 0, t * 0.7); // lean back toward the grass splat
+    }
+    // dusk sea cliffs read as dark weathered stone with pale strata bands, so
+    // the coast walls look like rugged wave-cut rock instead of smooth clay
+    if (biome === 'dusk') {
+      const nearSea = clamp01((16 - h) / 12);
+      const band = (Math.sin(h * 1.7 + x * 0.06 + z * 0.045) + 1) / 2;
+      cTmp.lerp(duskCliffC, t * nearSea * (0.45 + band * 0.35));
+      cTmp.lerp(duskStrataC, t * nearSea * (1 - band) * 0.3);
+    }
   }
-  // high ground (ridges, peaks) goes rocky then snowy. The snow ramp is wide
-  // (26u, over four terrace bands) with a strong patch-noise term: the terraced
-  // heightfield steps 6u at a time, and a ramp comparable to the step paints
-  // alternate treads fully white / fully bare, which reads as a repetitive
-  // checkerboard from a distance.
+  // high ground (ridges, peaks) goes rocky then snowy (the Drakelands' high
+  // rock reads as dark basalt instead, and its peaks never take snow). The snow
+  // ramp is wide (26u, over four terrace bands) with a strong patch-noise term:
+  // the terraced heightfield steps 6u at a time, and a ramp comparable to the
+  // step paints alternate treads fully white / fully bare, which reads as a
+  // repetitive checkerboard from a distance. The grid world terraces too, so it
+  // keeps the release's wide ramp; only the snow LINE (h - 34) stays tuned to
+  // the grid's own peak heights.
   let snow = 0;
+  if (biome === 'ember') {
+    const t2 = Math.max(
+      slope > rockStart ? Math.min(1, (slope - rockStart) * 2) : 0,
+      clamp01((h - 18) / 8) * 0.75,
+    );
+    if (t2 > 0) cTmp.lerp(emberBasaltC, t2 * 0.85);
+  }
+  if (biome === 'frost') {
+    // the Reach is snowbound from the shore up, not just on its crowns; the
+    // Snowline and the Goldmelt (the sideways crossings) both sit at z 1890
+    // on opposite borders, so the green valley floors fade under the snow
+    // toward the interior instead of flipping white at the borders
+    const passT = 1 - clamp01((Math.abs(z - 1890) - 26) / 26);
+    const green = passT * clamp01((Math.abs(x) - 95) / 85);
+    const snowline = 1 - green;
+    if (green > 0) cTmp.lerp(emberForestC, green * 0.8);
+    const blanket = clamp01((h - (WATER_LEVEL + 1.2)) / 3) * snowline;
+    cTmp.lerp(snowCapC, 0.8 * blanket);
+    snow = Math.max(snow, 0.85 * blanket);
+  }
   if (h > 22) {
     const rockT = clamp01((h - 22) / 10) * (0.6 + rockStreak * 0.25);
-    cTmp.lerp(rockC, rockT);
-    snow = clamp01((h - 28 + (snowPatch - 0.5) * 14) / 26) * 0.85;
+    cTmp.lerp(biome === 'ember' ? emberBasaltC : rockC, rockT);
+    snow = biome === 'ember' ? 0 : clamp01((h - 34 + (snowPatch - 0.5) * 14) / 26) * 0.85;
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
   }
@@ -445,10 +601,8 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     snow = Math.max(snow, rimSnow);
     lerpSplat(w, 2, rim * 0.85);
   }
-  // mud rides the dirt layer wherever the marsh palette is active; a painted
-  // cell overrides the z-band weight (painted marsh is fully wet, any other
-  // painted biome suppresses band mud that would bleed into it)
-  const mud = painted ? (biome === 'marsh' ? 1 : 0) : marshWeightAt(z);
+  // mud rides the dirt layer wherever the marsh palette is active
+  const mud = marshWeightAt(x, z);
   if (GFX.lowPlus && !GFX.terrainSplat) {
     const ridge = clamp01((slope - 0.22) * 1.6);
     const lowland = clamp01((wl + 7 - h) / 12);
@@ -657,9 +811,16 @@ function bakeNormalRegion(
   }
 }
 
-function terrainNormalTexture(seed: number): THREE.DataTexture {
+function terrainNormalTexture(): THREE.DataTexture {
   const data = new Uint8Array(NORMAL_TEX_W * NORMAL_TEX_H * 4);
-  bakeNormalRegion(data, seed, 0, NORMAL_TEX_W - 1, 0, NORMAL_TEX_H - 1);
+  // Zone texels are baked on demand. Unloaded areas remain a flat normal and
+  // have no geometry, so they cannot be sampled on screen.
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = 128;
+    data[i + 1] = 128;
+    data[i + 2] = 255;
+    data[i + 3] = 255;
+  }
   const tex = new THREE.DataTexture(data, NORMAL_TEX_W, NORMAL_TEX_H, THREE.RGBAFormat);
   tex.colorSpace = THREE.NoColorSpace;
   tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
@@ -913,8 +1074,27 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
 // Entry point
 // ---------------------------------------------------------------------------
 
+export interface EnsureZoneOptions {
+  /** Build the cells nearest this point first (e.g. the entry position).
+   *  Falls back to buildTerrain's priorityPoint when omitted. */
+  priority?: { x: number; z: number };
+  /** 'fast' (default): the caller is gating on the result (boot, a teleport
+   *  behind the loading screen), so yield only between small batches.
+   *  'idle': a background prepare; every batch waits for a browser idle slot
+   *  (requestIdleCallback with a forced-progress timeout) so the build never
+   *  steals time an interactive frame needs. */
+  pace?: 'fast' | 'idle';
+}
+
 export interface TerrainView {
   group: THREE.Group;
+  /** Materialize one overworld zone. Repeated calls share the cached task. */
+  ensureZone(
+    zone: ZoneDef,
+    onProgress?: (done: number, total: number) => void,
+    opts?: EnsureZoneOptions,
+  ): Promise<void>;
+  isZoneLoaded(zoneId: string): boolean;
   /** hides chunks that sit entirely past the fog far plane */
   update(camX: number, camZ: number, fogFar: number): void;
   /**
@@ -941,29 +1121,17 @@ export interface TerrainView {
   /** Editor-only: hide the brush ring. */
   clearBrush(): void;
   /**
-   * Resolves once every streamed-in far chunk (see buildTerrain) has been
-   * added to `group`. Only the near ring around the world's zone hubs is
-   * built synchronously; everything else streams in across idle slots so
-   * first paint isn't gated on the whole map's geometry. Most callers don't
-   * need this - `chunks` is a live array shared with update()/rebuildRegion(),
-   * so those already see streamed chunks as they arrive. Use this only when a
-   * caller needs the FULL map built before doing something else (e.g. a
-   * screenshot tour), and call cancelStreaming() before discarding this view.
+   * Stops any in-flight ensureZone build from adding further chunks. Call
+   * before discarding this view (see renderer rebuildTerrain), or the
+   * abandoned zone builds keep running on a setTimeout chain.
    */
-  streamingDone: Promise<void>;
-  /** Stops any in-flight far-chunk streaming. Call before discarding this view (see rebuildTerrain). */
   cancelStreaming(): void;
 }
-
-// Chunks farther than the near ring stream in this many at a time per idle
-// slot, forced forward even under sustained load by the timeout.
-const STREAM_BATCH_SIZE = 4;
-const STREAM_TIMEOUT_MS = 200;
 
 export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
   const lowGfx = !GFX.terrainSplat || !hasTerrainSplatAssets();
   const brush = makeBrushUniforms();
-  const normalTex = lowGfx ? null : terrainNormalTexture(seed);
+  const normalTex = lowGfx ? null : terrainNormalTexture();
   const mat = normalTex ? buildSplatMaterial(normalTex, brush) : buildLambertMaterial(brush);
   const bands = lowGfx ? LOD_BANDS.low : LOD_BANDS.high;
   const group = new THREE.Group();
@@ -1049,103 +1217,206 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     });
   };
 
-  // Collect every chunk to build as a job first, instead of building inline,
-  // so the near ring (around the zone hubs, i.e. where a fresh character
-  // actually stands) can build synchronously while the rest streams in
-  // across idle slots below. bandIndexAt returns 0 only for the densest,
-  // closest-to-a-hub band, which is what we treat as "near".
-  interface ChunkJob {
-    x0: number;
-    z0: number;
-    size: number;
-    spacing: number;
-    near: boolean;
-  }
-  const jobs: ChunkJob[] = [];
-
   // far-LOD cells merge 2x2 into super-chunks: the far field is where draw
   // count hurts and culling granularity matters least
   const farBand = bands.length - 1;
   const built = new Set<number>();
-  for (let cz = 0; cz < chunksZ; cz++) {
-    for (let cx = 0; cx < chunksX; cx++) {
-      if (built.has(cz * chunksX + cx)) continue;
-      const superOk =
-        cx % 2 === 0 &&
-        cz % 2 === 0 &&
-        cx + 1 < chunksX &&
-        cz + 1 < chunksZ &&
-        bandIndexAt(cx, cz) === farBand &&
-        bandIndexAt(cx + 1, cz) === farBand &&
-        bandIndexAt(cx, cz + 1) === farBand &&
-        bandIndexAt(cx + 1, cz + 1) === farBand;
-      if (superOk) {
-        for (const [dx, dz] of [
-          [0, 0],
-          [1, 0],
-          [0, 1],
-          [1, 1],
-        ]) {
-          built.add((cz + dz) * chunksX + (cx + dx));
-        }
-        // a merged super-chunk only forms from four far-band cells, so it's
-        // never near
-        jobs.push({
-          x0: -WORLD_MAX_X + cx * CHUNK_SIZE,
-          z0: WORLD_MIN_Z + cz * CHUNK_SIZE,
-          size: CHUNK_SIZE * 2,
-          spacing: bands[farBand].spacing,
-          near: false,
-        });
-      } else {
-        built.add(cz * chunksX + cx);
-        const bandIdx = bandIndexAt(cx, cz);
-        jobs.push({
-          x0: -WORLD_MAX_X + cx * CHUNK_SIZE,
-          z0: WORLD_MIN_Z + cz * CHUNK_SIZE,
-          size: CHUNK_SIZE,
-          spacing: bands[bandIdx].spacing,
-          near: bandIdx === 0,
-        });
+  const loadedZones = new Set<string>();
+  const pendingZones = new Map<string, Promise<void>>();
+  // Set by cancelStreaming(): every in-flight ensureZone loop bails at its next
+  // yield point without marking its zone loaded, so a discarded view (see
+  // renderer rebuildTerrain) stops adding chunks instead of building on a
+  // setTimeout chain for the rest of the session.
+  let cancelled = false;
+  const cellOwnerId = (cx: number, cz: number): string | null => {
+    const x = -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE;
+    const z = WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE;
+    // zoneAt deliberately clamps gaps/out-of-bounds positions to the nearest
+    // playable zone. Terrain ownership must not: otherwise asking for one
+    // column can accidentally materialize chunks in an empty neighbouring
+    // column merely because that zone is the fallback for the same z band.
+    return (
+      ZONES.find(
+        (candidate) =>
+          z >= candidate.zMin &&
+          z < candidate.zMax &&
+          x >= (candidate.xMin ?? STRIP_MIN_X) &&
+          x < (candidate.xMax ?? STRIP_MAX_X),
+      )?.id ?? null
+    );
+  };
+  const zoneCells = (zone: ZoneDef): [number, number][] => {
+    const out: [number, number][] = [];
+    for (let cz = 0; cz < chunksZ; cz++) {
+      for (let cx = 0; cx < chunksX; cx++) {
+        if (cellOwnerId(cx, cz) === zone.id) out.push([cx, cz]);
       }
     }
-  }
-
-  for (const job of jobs) {
-    if (job.near) addChunk(job.x0, job.z0, job.size, job.spacing);
-  }
-  const farJobs = jobs.filter((job) => !job.near);
-  // A returning character can log out anywhere, not just at a zone hub, so
-  // the near ring alone can leave them standing on not-yet-streamed terrain.
-  // Ordering the far queue by distance to the actual entry point (falling
-  // back to world center when none is given) guarantees the chunk directly
-  // underfoot streams in first rather than landing wherever row-major order
-  // happens to reach it.
-  if (priorityPoint) {
-    const centerX = (job: (typeof farJobs)[number]): number => job.x0 + job.size / 2;
-    const centerZ = (job: (typeof farJobs)[number]): number => job.z0 + job.size / 2;
-    farJobs.sort(
-      (a, b) =>
-        Math.hypot(centerX(a) - priorityPoint.x, centerZ(a) - priorityPoint.z) -
-        Math.hypot(centerX(b) - priorityPoint.x, centerZ(b) - priorityPoint.z),
+    return out;
+  };
+  const yieldBuild = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+  // Background ('idle') builds advance one batch per idle slot instead: the
+  // timeout still forces progress under sustained load, so a later gating
+  // caller awaiting the same shared task is never starved indefinitely.
+  const yieldIdle = (): Promise<void> => idleSlot(IDLE_BUILD_TIMEOUT_MS);
+  const normalBoundsFor = (zone: ZoneDef) =>
+    normalTexelBounds(
+      zone.xMin ?? STRIP_MIN_X,
+      zone.zMin,
+      zone.xMax ?? STRIP_MAX_X,
+      zone.zMax,
+      -WORLD_MAX_X,
+      WORLD_MIN_Z,
+      WORLD_MAX_X * 2,
+      WORLD_MAX_Z - WORLD_MIN_Z,
+      NORMAL_TEX_W,
+      NORMAL_TEX_H,
+      1,
     );
-  }
-  let cancelled = false;
-  const streamingDone = runIdleQueue(
-    farJobs,
-    (job) => {
-      addChunk(job.x0, job.z0, job.size, job.spacing);
-    },
-    {
-      batchSize: STREAM_BATCH_SIZE,
-      timeoutMs: STREAM_TIMEOUT_MS,
-      cancelled: () => cancelled,
-    },
-  );
-
+  const ensureZone = (
+    zone: ZoneDef,
+    onProgress?: (done: number, total: number) => void,
+    opts?: EnsureZoneOptions,
+  ): Promise<void> => {
+    if (loadedZones.has(zone.id)) {
+      onProgress?.(1, 1);
+      return Promise.resolve();
+    }
+    const pending = pendingZones.get(zone.id);
+    if (pending) return pending;
+    const idlePace = opts?.pace === 'idle';
+    const yieldSlice = idlePace ? yieldIdle : yieldBuild;
+    // An idle build works one cell per idle slot (a gating build races in
+    // batches of four): measured on the walked-crossing harness, dense-band
+    // 60 yd chunks cost ~75 ms of main-thread geometry each, so idle pace
+    // additionally quarters them below (4 x 30 yd sub-chunks of ~20 ms).
+    const cellsPerSlice = idlePace ? 1 : 4;
+    const task = (async () => {
+      const cells = zoneCells(zone);
+      // A player can enter a zone anywhere, not just at its hub (a returning
+      // character's logout spot, a walked boundary crossing), so row-major
+      // order alone can leave them standing on not-yet-built terrain. Pull the
+      // cells around the actual entry point (this call's priority, falling
+      // back to the view's construction point) to the front, sorted by
+      // distance, so the chunk directly underfoot builds first. Only that
+      // bounded neighbourhood is reordered: the rest keeps row-major order so
+      // the far-band 2x2 super-chunk merge still forms.
+      const entryPoint = opts?.priority ?? priorityPoint;
+      if (entryPoint) {
+        const cellDist = ([cx, cz]: [number, number]): number =>
+          Math.hypot(
+            -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE - entryPoint.x,
+            WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE - entryPoint.z,
+          );
+        const nearby = cells.filter((cell) => cellDist(cell) <= CHUNK_SIZE * 3);
+        if (nearby.length > 0) {
+          nearby.sort((a, b) => cellDist(a) - cellDist(b));
+          const nearbySet = new Set(nearby);
+          const rest = cells.filter((cell) => !nearbySet.has(cell));
+          cells.length = 0;
+          cells.push(...nearby, ...rest);
+        }
+      }
+      const normalBounds = normalTex ? normalBoundsFor(zone) : null;
+      const rowsPerSlice = 12;
+      const normalSlices = normalBounds
+        ? Math.ceil((normalBounds.j1 - normalBounds.j0 + 1) / rowsPerSlice)
+        : 0;
+      const total = Math.max(1, normalSlices + cells.length);
+      let done = 0;
+      if (normalTex && normalBounds) {
+        for (let j = normalBounds.j0; j <= normalBounds.j1; j += rowsPerSlice) {
+          if (cancelled) return;
+          bakeNormalRegion(
+            normalTex.image.data as Uint8Array,
+            seed,
+            normalBounds.i0,
+            normalBounds.i1,
+            j,
+            Math.min(normalBounds.j1, j + rowsPerSlice - 1),
+          );
+          onProgress?.(++done, total);
+          await yieldSlice();
+        }
+        normalTex.needsUpdate = true;
+      }
+      for (const [cx, cz] of cells) {
+        if (cancelled) return;
+        const cell = cz * chunksX + cx;
+        // Idle pace splits a dense-band (near or mid LOD) cell into four
+        // half-size sub-chunks, one per idle slot: a full dense 60 yd chunk
+        // costs ~75 ms of geometry on the main thread (the walked-crossing
+        // hitch), a 30 yd quarter ~20 ms. Skirts make the extra seams
+        // invisible, exactly like the far-band super-chunk merge in reverse;
+        // only the handful of dense cells per zone pay the extra draw calls.
+        const bandIdx = bandIndexAt(cx, cz);
+        if (idlePace && bandIdx < farBand && !built.has(cell)) {
+          built.add(cell);
+          const half = CHUNK_SIZE / 2;
+          const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+          const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+          for (const [qx, qz] of [
+            [0, 0],
+            [1, 0],
+            [0, 1],
+            [1, 1],
+          ] as const) {
+            if (cancelled) return;
+            addChunk(x0 + qx * half, z0 + qz * half, half, bands[bandIdx].spacing);
+            await yieldSlice();
+          }
+          onProgress?.(++done, total);
+          continue;
+        }
+        if (!built.has(cell)) {
+          const superCells = [
+            [cx, cz],
+            [cx + 1, cz],
+            [cx, cz + 1],
+            [cx + 1, cz + 1],
+          ] as const;
+          const superOk =
+            cx % 2 === 0 &&
+            cz % 2 === 0 &&
+            cx + 1 < chunksX &&
+            cz + 1 < chunksZ &&
+            superCells.every(
+              ([sx, sz]) =>
+                cellOwnerId(sx, sz) === zone.id &&
+                !built.has(sz * chunksX + sx) &&
+                bandIndexAt(sx, sz) === farBand,
+            );
+          if (superOk) {
+            for (const [sx, sz] of superCells) built.add(sz * chunksX + sx);
+            addChunk(
+              -WORLD_MAX_X + cx * CHUNK_SIZE,
+              WORLD_MIN_Z + cz * CHUNK_SIZE,
+              CHUNK_SIZE * 2,
+              bands[farBand].spacing,
+            );
+          } else {
+            built.add(cell);
+            addChunk(
+              -WORLD_MAX_X + cx * CHUNK_SIZE,
+              WORLD_MIN_Z + cz * CHUNK_SIZE,
+              CHUNK_SIZE,
+              bands[bandIndexAt(cx, cz)].spacing,
+            );
+          }
+        }
+        onProgress?.(++done, total);
+        if (done % cellsPerSlice === 0) await yieldSlice();
+      }
+      loadedZones.add(zone.id);
+      onProgress?.(total, total);
+    })().finally(() => pendingZones.delete(zone.id));
+    pendingZones.set(zone.id, task);
+    return task;
+  };
   return {
     group,
-    streamingDone,
+    ensureZone,
+    isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
     cancelStreaming(): void {
       cancelled = true;
     },

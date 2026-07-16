@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { BUILDING_COLLIDER_HEIGHTS } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
 import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
@@ -10,6 +11,7 @@ import {
   dockSurfaceYAt,
 } from '../sim/dock_layout';
 import { hash2 } from '../sim/rng';
+import type { BuildingDef } from '../sim/types';
 import { terrainHeight, waterLevel } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -74,6 +76,17 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   house1: { url: '/models/props/house_1.glb', kit: 'village' },
   house2: { url: '/models/props/house_2.glb', kit: 'village', yaw: -Math.PI / 2 },
   house3: { url: '/models/props/house_3.glb', kit: 'village' },
+  // Veiled Hollow town: KayKit Medieval Hexagon Pack buildings (CC0) with the
+  // blue-colorway palette texture shifted to the Hollow's dusk violet (baked
+  // into the *_hollow.glb files by tmp/make_kmed_hollow.mjs). Placed via the
+  // BuildingDef kinds hollowHouse / hollowInn / hollowChapel / hollowSmith /
+  // hollowMarket.
+  kmedHomeA: { url: '/models/props/kmed_home_A_hollow.glb', kit: 'kmed' },
+  kmedHomeB: { url: '/models/props/kmed_home_B_hollow.glb', kit: 'kmed' },
+  kmedTavern: { url: '/models/props/kmed_tavern_hollow.glb', kit: 'kmed' },
+  kmedChurch: { url: '/models/props/kmed_church_hollow.glb', kit: 'kmed' },
+  kmedBlacksmith: { url: '/models/props/kmed_blacksmith_hollow.glb', kit: 'kmed' },
+  kmedMarket: { url: '/models/props/kmed_market_hollow.glb', kit: 'kmed' },
   blacksmith: { url: '/models/props/blacksmith.glb', kit: 'village' },
   inn: { url: '/models/props/inn.glb', kit: 'village' },
   bellTower: { url: '/models/props/bell_tower.glb', kit: 'village' },
@@ -121,6 +134,23 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   courseArch: { url: '/models/props/course_arch.glb', kit: 'stable' },
   jumpVertical: { url: '/models/props/jump_vertical.glb', kit: 'stable' },
   jumpOxer: { url: '/models/props/jump_oxer.glb', kit: 'stable' },
+  // Veiled Hollow hand-placed decor, all user-made models: the Tripo pixie
+  // house (pipeline-normalized: world scale, front on +z) and the flora
+  // GLBs realm_flora.ts also scatters (near unit size, so decor entries set
+  // an explicit scale; propAsset re-bases min-y to 0 at extraction).
+  // Consumed via ZonePropsDef.decorProps.
+  pixieMushroomHouse: { url: '/models/props/pixie_mushroom_house.glb', kit: 'hollow' },
+  crystalAmethystCluster: { url: '/models/props/crystal_amethyst_cluster.glb', kit: 'hollow' },
+  crystalMoundCave: { url: '/models/props/crystal_mound_cave.glb', kit: 'hollow' },
+  starHeartCrystal: { url: '/models/props/star_heart_crystal.glb', kit: 'hollow' },
+  kkWall: { url: '/models/dungeon/wall.glb', kit: 'dungeon' },
+  kkWallCracked: { url: '/models/dungeon/wall_cracked.glb', kit: 'dungeon' },
+  kkPillar: { url: '/models/dungeon/pillar.glb', kit: 'dungeon' },
+  stagShrine: { url: '/models/props/stag_shrine.glb', kit: 'hollow' },
+  mushroomGiantPurple: { url: '/models/props/mushroom_giant_purple.glb', kit: 'hollow' },
+  mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },
+  flowerGlow: { url: '/models/props/flower_glow.glb', kit: 'hollow' },
+  shrubFlowering: { url: '/models/props/shrub_flowering.glb', kit: 'hollow' },
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
@@ -292,28 +322,39 @@ function convertMaterial(
       ? new THREE.Color(ov.color)
       : (s.color?.clone() ?? new THREE.Color(0xffffff));
   const map = s.map ?? null;
+  // Tripo-generated 'hollow' kit: one baked painterly albedo per model, glow
+  // painted in, smooth normals. Two nudges make them sit beside the
+  // hand-authored kits: flat shading (faceted low-poly light response) and a
+  // soft albedo re-emit (the realm_flora mushroom trick) so painted windows,
+  // lanterns, and crystals actually shine under the permanent dusk.
+  const hollow = kit === 'hollow';
+  const hollowEmissive = hollow && map;
   let mat: THREE.Material;
   if (GFX.standardMaterials) {
     mat = new THREE.MeshStandardMaterial({
       color,
       map,
       vertexColors: hasVertexColors,
+      flatShading: hollow,
       normalMap: s.normalMap ?? null,
       roughnessMap: s.roughnessMap ?? null,
       metalnessMap: s.metalnessMap ?? null,
       aoMap: s.aoMap ?? null,
-      roughness: ov?.roughness ?? (s.isMeshStandardMaterial ? s.roughness : 0.9),
+      roughness: ov?.roughness ?? (hollow ? 0.85 : s.isMeshStandardMaterial ? s.roughness : 0.9),
       metalness: ov?.metalness ?? (s.isMeshStandardMaterial ? Math.min(s.metalness, 0.85) : 0),
-      emissive: new THREE.Color(ov?.emissive ?? 0x000000),
-      emissiveIntensity: ov?.emissiveIntensity ?? 1,
+      emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
+      emissiveMap: hollowEmissive ? map : null,
+      emissiveIntensity: hollowEmissive ? 0.3 : (ov?.emissiveIntensity ?? 1),
     });
   } else {
     mat = new THREE.MeshLambertMaterial({
       color,
       map,
       vertexColors: hasVertexColors,
-      emissive: new THREE.Color(ov?.emissive ?? 0x000000),
-      emissiveIntensity: (ov?.emissiveIntensity ?? 1) * 0.6,
+      flatShading: hollow,
+      emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
+      emissiveMap: hollowEmissive ? map : null,
+      emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
   mat.name = `${kit}:${s.name}`;
@@ -800,18 +841,33 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
 
   // ---- buildings: village houses / inn / composed chapel ------------------
   const housePool: PropKey[] = ['house1', 'house2', 'blacksmith'];
+  const hollowPool: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
   const houseHeight: Record<string, number> = {
     house1: 8.0,
     house2: 7.6,
     blacksmith: 6.6,
     inn: 7.6,
+    kmedHomeA: 8.0,
+    kmedHomeB: 8.8,
+    kmedTavern: 8.5,
+    kmedChurch: 10.5,
+    kmedBlacksmith: 6.2,
+    kmedMarket: 5.2,
+  };
+  // single-asset (non-pool) building kinds
+  const kindAsset: Partial<Record<BuildingDef['kind'], PropKey>> = {
+    inn: 'inn',
+    hollowInn: 'kmedTavern',
+    hollowChapel: 'kmedChurch',
+    hollowSmith: 'kmedBlacksmith',
+    hollowMarket: 'kmedMarket',
   };
 
   for (const b of getActiveWorldContent().props.buildings) {
     const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
     // roof Y mirrors the camera collider height in colliders.ts
-    const roofY = y + (b.kind === 'chapel' ? 10.8 : b.kind === 'inn' ? 7.8 : 8.0);
+    const roofY = y + (BUILDING_COLLIDER_HEIGHTS[b.kind] ?? 8.0);
     if (b.kind === 'chapel') {
       // composed chapel: tall bell tower at the rear + squat stone entry hall
       // in front; the hall door lands on the footprint's +z edge.
@@ -832,8 +888,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       registerHideable(g, obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, roofY));
       continue;
     }
+    const pool = b.kind === 'hollowHouse' ? hollowPool : housePool;
     const asset: PropKey =
-      b.kind === 'inn' ? 'inn' : housePool[Math.floor(keyRand(key, 3) * 0.999 * housePool.length)];
+      kindAsset[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
     const a = propAsset(asset);
     const g = new THREE.Group();
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
@@ -841,6 +898,25 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.rotation.y = b.rot;
     group.add(shadowed(g));
     registerHideable(g, obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, roofY));
+  }
+
+  // ---- hand-placed GLB decor (the generated storybook set) -----------------
+  // World-scale, front-on-+z models: place at scale 1, orient with rot alone.
+  // r > 0 entries mirror the circle collider in colliders.ts and camera-ghost;
+  // r 0 dressing stays always-visible (small silhouettes, nothing to hide).
+  for (const d of getActiveWorldContent().props.decorProps ?? []) {
+    if (!(d.key in PROP_ASSET_DEFS)) {
+      console.warn(`decorProps: unknown prop key "${d.key}" skipped`);
+      continue;
+    }
+    const g = new THREE.Group();
+    addParts(g, d.key as PropKey, { scale: d.scale ?? 1 });
+    g.position.set(d.x, ground(d.x, d.z) - 0.05, d.z);
+    g.rotation.y = d.rot ?? 0;
+    group.add(shadowed(g));
+    if (d.r) {
+      registerHideable(g, circleFootprint(d.x, d.z, d.r, ground(d.x, d.z) + (d.h ?? 4)));
+    }
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
@@ -1220,12 +1296,22 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         scale: [0.78, 0.52, zScale],
       });
     }
-    const hut = propAsset('house3');
-    addParts(g, 'house3', {
-      x: d.hutLocal.x,
-      z: d.hutLocal.z,
-      scale: [(d.hutLocal.hw * 2) / hut.size.x, 2.6 / hut.size.y, (d.hutLocal.hd * 2) / hut.size.z],
-    });
+    // hw/hd 0 means this dock carries no stone hut (e.g. the Farshore Landing).
+    // Skip it entirely: a zero-scale mesh has a degenerate (non-invertible)
+    // transform, which reads as NaN normals and flickers as a black square.
+    const hasHut = d.hutLocal.hw > 0 && d.hutLocal.hd > 0;
+    if (hasHut) {
+      const hut = propAsset('house3');
+      addParts(g, 'house3', {
+        x: d.hutLocal.x,
+        z: d.hutLocal.z,
+        scale: [
+          (d.hutLocal.hw * 2) / hut.size.x,
+          2.6 / hut.size.y,
+          (d.hutLocal.hd * 2) / hut.size.z,
+        ],
+      });
+    }
     if (!lowProps) {
       addParts(g, 'barrel', {
         x: 0.55,
@@ -1260,14 +1346,16 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.rotation.y = d.rot;
     group.add(shadowed(g));
     // stone hut OBB — same offset/extents/rotation as the collider
-    const hc = Math.cos(d.rot),
-      hs = Math.sin(d.rot);
-    const hx = d.x + d.hutLocal.x * hc + d.hutLocal.z * hs;
-    const hz = d.z - d.hutLocal.x * hs + d.hutLocal.z * hc;
-    registerHideable(
-      g,
-      obbFootprint(hx, hz, d.hutLocal.hw, d.hutLocal.hd, d.rot, ground(hx, hz) + 2.9),
-    );
+    if (hasHut) {
+      const hc = Math.cos(d.rot),
+        hs = Math.sin(d.rot);
+      const hx = d.x + d.hutLocal.x * hc + d.hutLocal.z * hs;
+      const hz = d.z - d.hutLocal.x * hs + d.hutLocal.z * hc;
+      registerHideable(
+        g,
+        obbFootprint(hx, hz, d.hutLocal.hw, d.hutLocal.hd, d.rot, ground(hx, hz) + 2.9),
+      );
+    }
   }
 
   // ---- delve entrance: Meshy portal-door + animated void + carved name lintel -

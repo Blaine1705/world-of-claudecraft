@@ -1,19 +1,32 @@
 // Classic threat mechanics + the class kit that drives them (stances/forms,
 // stealth, pets).
 import { describe, expect, it } from 'vitest';
-import { abilitiesKnownAt } from '../src/sim/data';
+import { abilitiesKnownAt, BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   BEAR_FORM_THREAT_MULT,
   DEFENSIVE_STANCE_THREAT_MULT,
   RIGHTEOUS_FURY_THREAT_MULT,
 } from '../src/sim/threat';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 import { dist2d, SUNDER_ARMOR_PCT_PER_STACK } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
+// These suites only ever reach for wolves, boars, and murlocs (plus dungeon
+// content, which the spread keeps), so drop every other ambient camp and all
+// npcs/ground objects to keep sim.tick() cheap (subsystem-world pattern from
+// tests/fiesta.test.ts).
+const THREAT_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) =>
+    ['forest_wolf', 'wild_boar', 'mudfin_murloc'].includes(camp.mobId),
+  ),
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeSim(cls: Parameters<typeof simClass>[0] = 'warrior', seed = 42) {
-  return new Sim({ seed, playerClass: cls, autoEquip: true });
+  return new Sim({ seed, playerClass: cls, autoEquip: true, world: THREAT_TEST_WORLD });
 }
 // type helper only — keeps makeSim's signature honest without importing PlayerClass
 function simClass(
@@ -167,7 +180,12 @@ describe('threat from damage', () => {
 
 describe('healing threat', () => {
   function partyOfTwo() {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const tank = sim.addPlayer('warrior', 'Tank');
     const healer = sim.addPlayer('priest', 'Healer');
     sim.partyInvite(healer, tank);
@@ -220,7 +238,12 @@ describe('healing threat', () => {
   });
 
   it('healing a non-party player creates threat on mobs already fighting them', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const tank = sim.entities.get(sim.addPlayer('warrior', 'Tank'))!;
     const healer = sim.entities.get(sim.addPlayer('priest', 'OutsideHealer'))!;
     const wolf = nearestMob(sim, 'forest_wolf', tank);
@@ -244,7 +267,12 @@ describe('healing threat', () => {
 
 describe('classic pull-over rules (110% melee / 130% ranged)', () => {
   function aggroSetup() {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const a = sim.entities.get(sim.addPlayer('warrior', 'A'))!;
     const b = sim.entities.get(sim.addPlayer('mage', 'B'))!;
     const wolf = nearestMob(sim, 'forest_wolf', a);
@@ -367,7 +395,12 @@ describe('classic pull-over rules (110% melee / 130% ranged)', () => {
 
 describe('taunt and growl', () => {
   it('taunt matches the top threat and forces 3 seconds of attention', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const tank = sim.entities.get(sim.addPlayer('warrior', 'Tank'))!;
     const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
     sim.setPlayerLevel(10, tank.id);
@@ -412,6 +445,40 @@ describe('taunt and growl', () => {
     expect(wolf.threat.get(tank.id)).toBe(1000);
     expect(wolf.aggroTargetId).toBe(tank.id);
     expect(wolf.forcedTargetTimer).toBeGreaterThan(0);
+  });
+
+  it('Sacred Goad always lands (never resists), even against a higher-level mob', () => {
+    // The paladin taunt is holy-school (a spell), so on impact it used to roll a full
+    // resist. A resisted taunt silently breaks tanking, so taunts now skip the roll.
+    // Against a +3 mob the old roll would resist a large fraction of the time; across
+    // many seeds the taunt must now land every time and never emit a 'resist'.
+    for (let seed = 1; seed <= 40; seed++) {
+      const sim = new Sim({ seed, playerClass: 'paladin', noPlayer: true });
+      const tank = sim.entities.get(sim.addPlayer('paladin', 'Tank'))!;
+      const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
+      sim.setPlayerLevel(10, tank.id);
+      const wolf = nearestMob(sim, 'forest_wolf', tank);
+      wolf.level = tank.level + 3; // a wide level gap: a spell would often fully resist
+      teleport(sim, tank, wolf.pos.x + 25, wolf.pos.z);
+      teleport(sim, dps, wolf.pos.x - 2, wolf.pos.z);
+      wolf.threat.set(dps.id, 1000);
+      wolf.aggroTargetId = dps.id;
+      wolf.aiState = 'chase';
+      wolf.inCombat = true;
+      sim.targetEntity(wolf.id, tank.id);
+      tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
+
+      sim.castAbility('holy_taunt', tank.id);
+      let resisted = false;
+      for (let i = 0; i < 25; i++) {
+        for (const ev of sim.tick()) {
+          if (ev.type === 'damage' && ev.kind === 'resist' && ev.ability === 'Sacred Goad')
+            resisted = true;
+        }
+      }
+      expect(resisted, `seed ${seed}`).toBe(false);
+      expect(wolf.aggroTargetId, `seed ${seed}`).toBe(tank.id);
+    }
   });
 
   it('growl requires bear form', () => {
@@ -507,7 +574,12 @@ describe('rogue stealth', () => {
     // A stealthed player standing closest shrank the detection radius and, being
     // nearest, was the only candidate considered — so a visible groupmate well
     // inside the normal aggro radius was silently ignored.
-    const sim = new Sim({ seed: 42, playerClass: 'rogue', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'rogue',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const rogue = sim.entities.get(sim.addPlayer('rogue', 'Sneak'))!;
     const warrior = sim.entities.get(sim.addPlayer('warrior', 'Visible'))!;
     sim.setPlayerLevel(5, rogue.id);
@@ -600,7 +672,7 @@ describe('hunter pets', () => {
         (e) => e.kind === 'mob' && e.ownerId === null && e.templateId === 'forest_wolf',
       ),
     ).toBe(true);
-  });
+  }, 90_000);
 
   it('friendly target spells can affect controlled pets', () => {
     const { sim, wolf: pet } = tamedSetup();
@@ -691,7 +763,7 @@ describe('hunter pets', () => {
 
     sim.setPetAutoTaunt(true);
     expect(pet.petAutoTaunt).toBe(true);
-    for (let i = 0; i < 20 * 5 && boar.forcedTargetId !== pet.id; i++) sim.tick();
+    for (let i = 0; i < 20 * 12 && boar.forcedTargetId !== pet.id; i++) sim.tick();
     expect(boar.forcedTargetId).toBe(pet.id);
     expect(pet.petTauntTimer).toBeGreaterThan(0);
 
@@ -746,7 +818,13 @@ describe('hunter pets', () => {
   });
 
   it('a tamed beast that dies stays owned until revived or abandoned', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'hunter', respawnSeconds: 2, autoEquip: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'hunter',
+      respawnSeconds: 2,
+      autoEquip: true,
+      world: THREAT_TEST_WORLD,
+    });
     sim.setPlayerLevel(10);
     const wolf = nearestMob(sim, 'forest_wolf');
     const originalWolfId = wolf.id;
@@ -805,7 +883,13 @@ describe('hunter pets', () => {
       autoTaunt: true,
     });
 
-    const restored = new Sim({ seed: 42, playerClass: 'hunter', noPlayer: true, autoEquip: true });
+    const restored = new Sim({
+      seed: 42,
+      playerClass: 'hunter',
+      noPlayer: true,
+      autoEquip: true,
+      world: THREAT_TEST_WORLD,
+    });
     const pid = restored.addPlayer('hunter', 'Hunter', { state });
     const pet = restored.petOf(pid, true)!;
     expect(pet).toBeTruthy();
@@ -1189,8 +1273,14 @@ describe('druid forms', () => {
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     for (let i = 0; i < 32; i++) sim.tick();
     sim.player.resource = 100;
+    // pin the opener's rolls: the wolf can dodge the direct component
+    // (rng-stream dependent), which applies the bleed but skips the combo
+    // award; a mid-range draw is always a clean non-crit hit
+    const realNext = (sim as any).rng.next.bind((sim as any).rng);
+    (sim as any).rng.next = () => 0.5;
     sim.castAbility('rake');
     sim.tick();
+    (sim as any).rng.next = realNext;
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(false);
     expect(wolf.auras.some((a) => a.id === 'rake' && a.kind === 'dot')).toBe(true);
     expect(sim.player.comboPoints).toBeGreaterThanOrEqual(1);

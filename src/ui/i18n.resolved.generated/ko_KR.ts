@@ -20,6 +20,154 @@ export const ko_KR: EnTranslations = {
     "rp": "롤플레잉",
     "rpPvp": "롤플레잉 PvP"
   },
+  "devCommand": {
+    "dialogLabel": "개발자 명령 센터",
+    "kicker": "개발 도구",
+    "title": "명령 센터",
+    "subtitle": "현재 세계를 서버 권한으로 시험하는 제어 기능입니다.",
+    "closeAria": "개발자 명령어 닫기",
+    "categoryNavAria": "개발자 명령어 범주",
+    "categories": {
+      "player": "플레이어",
+      "spawns": "생성물",
+      "inventory": "소지품",
+      "progress": "진행",
+      "travel": "이동",
+      "scenarios": "시나리오"
+    },
+    "filterLabel": "명령어 필터",
+    "filterPlaceholder": "이 범주 검색",
+    "noMatches": "일치하는 명령어가 없습니다.",
+    "serverRequirement": "서버 치트 기능에는 여전히 ALLOW_DEV_COMMANDS=1이 필요합니다.",
+    "invalidValues": "명령을 실행하기 전에 올바른 값을 선택하세요.",
+    "sent": "전송됨: {command}",
+    "run": "실행",
+    "fields": {
+      "level": "레벨",
+      "mob": "몹",
+      "count": "개수",
+      "item": "아이템",
+      "gold": "골드",
+      "quest": "퀘스트",
+      "profession": "전문 기술",
+      "amount": "수량",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "던전",
+      "difficulty": "난이도",
+      "name": "이름"
+    },
+    "difficulty": {
+      "normal": "일반",
+      "heroic": "영웅"
+    },
+    "actions": {
+      "heal": {
+        "label": "생명력 회복",
+        "description": "생명력을 가득 채웁니다."
+      },
+      "resource": {
+        "label": "자원 회복",
+        "description": "마나, 분노 또는 기력을 가득 채웁니다."
+      },
+      "cooldowns": {
+        "label": "재사용 대기시간 초기화",
+        "description": "기술, 전역 재사용 대기시간, 물약 타이머를 초기화합니다."
+      },
+      "god": {
+        "label": "무적 모드 전환",
+        "description": "무적 상태와 강화된 피해를 전환합니다."
+      },
+      "revive": {
+        "label": "부활",
+        "description": "정상적인 부활 경로로 되살아납니다."
+      },
+      "kill": {
+        "label": "플레이어 처치",
+        "description": "사망, 유령, 시체 흐름을 시험합니다."
+      },
+      "combatreset": {
+        "label": "전투 초기화",
+        "description": "전투 상태와 적의 위협 수준을 초기화합니다."
+      },
+      "level": {
+        "label": "레벨 설정",
+        "description": "현재 캐릭터 레벨을 설정합니다."
+      },
+      "spawn": {
+        "label": "몹 생성",
+        "description": "플레이어 근처에 지정된 몹을 생성합니다."
+      },
+      "killtarget": {
+        "label": "대상 처치",
+        "description": "선택한 살아 있는 몹을 처치합니다."
+      },
+      "despawntarget": {
+        "label": "대상 제거",
+        "description": "이 도구로 만든 선택된 몹을 제거합니다."
+      },
+      "despawnall": {
+        "label": "내 생성물 제거",
+        "description": "이 개발자가 생성한 모든 몹을 제거합니다."
+      },
+      "give": {
+        "label": "아이템 지급",
+        "description": "플레이어 소지품에 아이템을 추가합니다."
+      },
+      "gold": {
+        "label": "골드 추가",
+        "description": "현재 소지금에 골드를 추가합니다."
+      },
+      "quest": {
+        "label": "퀘스트 완료",
+        "description": "ID로 특정 퀘스트를 완료합니다."
+      },
+      "quests": {
+        "label": "진행 중인 퀘스트 완료",
+        "description": "현재 퀘스트 목록의 모든 퀘스트를 완료합니다."
+      },
+      "attune": {
+        "label": "선행 조건 해제",
+        "description": "모든 선행 조건을 완료 처리합니다."
+      },
+      "gather": {
+        "label": "채집 기술 부여",
+        "description": "채집 전문 기술을 올립니다."
+      },
+      "teleport": {
+        "label": "순간이동",
+        "description": "정확한 세계 좌표로 이동합니다."
+      },
+      "dungeon": {
+        "label": "던전 입장",
+        "description": "개발자 제한을 우회해 던전에 입장합니다."
+      },
+      "raid": {
+        "label": "공격대 입장",
+        "description": "니트락시스 투기장에 바로 입장합니다."
+      },
+      "raidreset": {
+        "label": "공격대 잠금 초기화",
+        "description": "현재 공격대 잠금을 초기화합니다."
+      },
+      "bot": {
+        "label": "소셜 봇 생성",
+        "description": "귓속말을 받을 수 있는 정지 플레이어를 생성합니다."
+      },
+      "lfgqueue": {
+        "label": "찾기 대기열 채우기",
+        "description": "던전 찾기 대기열 시나리오를 만듭니다."
+      },
+      "lfgraid": {
+        "label": "공격대 찾기 채우기",
+        "description": "공격대 찾기 시나리오를 만듭니다."
+      },
+      "lfgboard": {
+        "label": "모집 게시판 채우기",
+        "description": "사전 구성 파티 모집 시나리오를 만듭니다."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "경험치",
@@ -167,6 +315,32 @@ export const ko_KR: EnTranslations = {
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
       "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다."
     },
+    "unstuck": {
+      "menuButton": "갇힘 탈출",
+      "help": "탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.",
+      "helpAtGraveyard": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.",
+      "started": "{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.",
+      "countdown": "갇힘 탈출: {seconds}",
+      "completed": "도달할 수 있는 가장 가까운 안전한 위치로 이동했습니다.",
+      "completedAtGraveyard": "영혼이 가장 가까운 묘지로 돌아왔습니다. 영혼 치유사에게 말을 걸어 수호자의 대가를 받으세요.",
+      "cancelledMoved": "이동해서 갇힘 탈출이 취소되었습니다.",
+      "cancelledDamaged": "피해를 받아 갇힘 탈출이 취소되었습니다.",
+      "cancelledCombat": "전투에 진입해 갇힘 탈출이 취소되었습니다.",
+      "cancelledBusy": "다른 행동을 시작해 갇힘 탈출이 취소되었습니다.",
+      "cancelledState": "상태가 바뀌어 갇힘 탈출이 취소되었습니다.",
+      "cancelledDisconnected": "연결이 끊겨서 갇힘 탈출이 취소되었습니다.",
+      "noSafePosition": "주변에 도달할 수 있는 안전한 위치가 없습니다. 이동하지 않았습니다.",
+      "alreadyActive": "갇힘 탈출 카운트다운이 이미 진행 중입니다.",
+      "alreadySafe": "이미 안전하고 접근 가능한 위치에 있습니다.",
+      "cooldown": "{seconds}초 후 갇힘 탈출을 다시 사용할 수 있습니다.",
+      "dead": "죽었거나 영혼 상태일 때는 갇힘 탈출을 사용할 수 없습니다.",
+      "combat": "전투 중에는 갇힘 탈출을 사용할 수 없습니다.",
+      "controlled": "이동이 제한된 동안에는 갇힘 탈출을 사용할 수 없습니다.",
+      "standStill": "단단한 지면에 멈춰 선 뒤 갇힘 탈출을 사용하세요.",
+      "standStillAnywhere": "제자리에 멈춘 뒤 갇힘 탈출을 사용하세요.",
+      "busy": "현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.",
+      "unavailable": "현재 상태에서는 갇힘 탈출을 사용할 수 없습니다."
+    },
     "emotes": {
       "wave": "손인사",
       "laugh": "ㅋㅋ",
@@ -203,6 +377,7 @@ export const ko_KR: EnTranslations = {
       "remainingLessThanMinute": "1분 미만",
       "remainingMinutes": "{minutes}분",
       "remainingHoursMinutes": "{hours}시간 {minutes}분",
+      "remainingDaysHours": "{days}일 {hours}시간",
       "score": "점수",
       "walletValue": "지갑 가치 (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +416,8 @@ export const ko_KR: EnTranslations = {
         "no_wallet": "$20 USD 상당 이상의 WOC를 보유한 지갑을 연결하세요.",
         "under_minimum": "지갑이 최소 $20 USD WOC 기준에 미치지 못합니다.",
         "price_unavailable": "WOC 가격을 확인할 수 없어 보상이 일시적으로 잠겨 있습니다.",
-        "banned": "일일 보상 참여가 금지되었습니다. 사유: {reason}"
+        "banned": "일일 보상 참여가 금지되었습니다. 사유: {reason}",
+        "bannedUntil": "일일 보상 참여가 앞으로 {remaining} 동안 금지됩니다. 해제 시각: {until}. 사유: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +642,7 @@ export const ko_KR: EnTranslations = {
       "balanceLabel": "잔액",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "현재 Claudium 상점을 이용할 수 없습니다. 잔액과 구매 내역에는 영향이 없으니 잠시 후 다시 확인해 주세요.",
       "disclosure": "Claudium은 단방향 게임 화폐입니다. 현금으로 구매해 꾸미기 상품에 사용할 수 있으며 환전, 양도 또는 현금화할 수 없습니다.",
@@ -473,6 +650,7 @@ export const ko_KR: EnTranslations = {
       "railLabel": "결제 수단",
       "railStripe": "카드",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% 할인",
       "railWocUnavailable": "현재 WOC 가격을 이용할 수 없습니다.",
@@ -901,6 +1079,7 @@ export const ko_KR: EnTranslations = {
       "interfaceModeTouch": "터치",
       "interfaceModeNote": "자동은 기기에 따라 데스크톱 또는 터치 조작을 선택합니다. 데스크톱을 선택하면 키보드와 마우스로 고정되며(키보드가 있는 태블릿 등에 유용), 터치를 선택하면 화면 조작이 됩니다.",
       "footstepSounds": "발소리",
+      "interfaceSounds": "인터페이스 및 피드백 소리",
       "clickFeedback": "클릭 표시",
       "lockCursorOnRotate": "회전 중 커서 고정",
       "keybindHelpLockCursorOnRotate": "드래그하여 카메라를 회전하는 동안 마우스 커서를 창 안에 유지하여 화면 가장자리에 닿거나 다른 모니터로 이동하지 않도록 합니다. 자유로운 커서를 원하면 끄세요.",
@@ -1036,6 +1215,7 @@ export const ko_KR: EnTranslations = {
         "spellPower": "주문력",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
+        "hitRating": "명중 등급",
         "warfare": "워페어"
       },
       "warfareValue": "주는 피해 +{increase}% / 받는 피해 -{reduction}%",
@@ -1053,6 +1233,7 @@ export const ko_KR: EnTranslations = {
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
         "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
+        "hitRating": "장비와 세트 보너스에서 얻는 명중 등급으로 공격이 빗나가거나 주문이 저항되는 빈도를 줄이며, 특히 더 높은 레벨의 적에게 효과적입니다. 약 10등급당 1% 명중.",
         "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다."
       },
       "effects": {
@@ -1338,7 +1519,20 @@ export const ko_KR: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "던전 난이도 설정: 영웅",
-      "setNormal": "던전 난이도 설정: 일반"
+      "setNormal": "던전 난이도 설정: 일반",
+      "resetAll": "모든 인스턴스 초기화",
+      "resetDone": "모든 인스턴스가 초기화되었습니다.",
+      "resetNone": "초기화할 인스턴스가 없습니다.",
+      "resetOccupied": "아직 안에 플레이어가 있으면 인스턴스를 초기화할 수 없습니다.",
+      "resetSameDifficulty": "인스턴스를 초기화하기 전에 던전 난이도를 변경하세요. 비어 있는 인스턴스는 5분 후 자동으로 초기화됩니다.",
+      "resetLoot": "안에 전리품이 남아 있으면 인스턴스를 초기화할 수 없습니다.",
+      "resetConfirmTitle": "모든 인스턴스를 초기화할까요?",
+      "resetConfirmBody": "이전에 선택한 난이도의 빈 인스턴스를 포기합니다. 획득하지 않은 전리품이 있으면 초기화할 수 없습니다.",
+      "resetConfirm": "인스턴스 초기화",
+      "resetCooldown": "인스턴스는 5분마다 한 번만 초기화할 수 있습니다.",
+      "resetUsage": "난이도를 변경한 후 /dungeon reset 으로 빈 인스턴스를 포기할 수 있습니다.",
+      "entryMismatchNormal": "이 인스턴스는 일반 난이도로 설정되어 있습니다. 영웅 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요.",
+      "entryMismatchHeroic": "이 인스턴스는 영웅 난이도로 설정되어 있습니다. 일반 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요."
     },
     "bags": {
       "cannotDestroy": "이 아이템은 파괴할 수 없습니다.",
@@ -1419,6 +1613,8 @@ export const ko_KR: EnTranslations = {
       },
       "dodge": "회피 확률을 {pct}% 증가시킵니다",
       "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
+      "damageReduction": "받는 모든 피해가 {pct}% 감소합니다",
+      "guardianWard": "다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다",
       "armorFlat": "방어도를 {value} 감소시킵니다",
       "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
       "armorPct": "방어도를 {pct}% 감소시킵니다",
@@ -1507,11 +1703,41 @@ export const ko_KR: EnTranslations = {
       "unlock": "플레이어 프레임 이동",
       "lock": "플레이어 프레임 고정"
     },
+    "partyFrames": {
+      "section": "파티 및 공격대 프레임",
+      "unlock": "파티 및 공격대 프레임 이동",
+      "lock": "파티 및 공격대 프레임 고정",
+      "style": "프레임 스타일",
+      "styleAutomatic": "자동",
+      "styleClassic": "클래식 파티 프레임",
+      "styleRaid": "공격대 프레임",
+      "scale": "프레임 배율",
+      "width": "프레임 너비",
+      "height": "프레임 높이",
+      "spacing": "프레임 간격",
+      "columns": "공격대 열 수",
+      "healthText": "생명력 텍스트",
+      "healthNone": "없음",
+      "healthPercent": "백분율",
+      "healthCurrent": "현재 값",
+      "healthCurrentMax": "현재 / 최대",
+      "sort": "플레이어 정렬",
+      "sortGroup": "그룹",
+      "sortRole": "역할",
+      "sortName": "이름",
+      "showResource": "마나, 분노, 에너지 표시",
+      "showAbsorbs": "흡수 보호막 표시",
+      "showAuras": "버프 및 디버프 표시",
+      "showSelf": "내 프레임 표시"
+    },
     "frameReset": {
       "label": "프레임 위치 초기화"
     },
     "itemTooltip": {
-      "requiresLevel": "필요 레벨 {level}"
+      "requiresLevel": "필요 레벨 {level}",
+      "riftTier": "{tier} 등급 균열 아이템",
+      "riftUpgrade": "균열 강화 {level}/{max}",
+      "riftSockets": "균열 보석 {used}/{total}"
     },
     "discord": {
       "title": "Discord",
@@ -1600,8 +1826,8 @@ export const ko_KR: EnTranslations = {
         "juniormods": "수습 운영자",
         "artists": "아티스트",
         "contentcreator": "콘텐츠 크리에이터",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "legend": "전설",
+        "shill": "홍보대사"
       },
       "guildMember": "인증된 멤버",
       "notMember": "아직 서버에 없음",
@@ -2166,6 +2392,9 @@ export const ko_KR: EnTranslations = {
       "already_linked": "계정에 이미 연동된 Steam 계정이 있습니다.",
       "account_taken": "해당 Steam 계정은 이미 다른 계정에 연결되어 있습니다.",
       "upstream": "Steam이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "welcome": {
+      "invalid_input": "입력이 올바르지 않습니다."
     }
   },
   "guide": {
@@ -2286,7 +2515,17 @@ export const ko_KR: EnTranslations = {
         "marshName": "진흙늪 습지",
         "marshBlurb": "가라앉은 늪지와 조수에 닳은 폐허, 진흙지느러미를 비롯한 더한 것들의 보금자리.",
         "peaksName": "가시봉우리 고원",
-        "peaksBlurb": "왕국에서 가장 차가운 위험을 향해 솟아오른, 바람에 깎인 능선."
+        "peaksBlurb": "왕국에서 가장 차가운 위험을 향해 솟아오른, 바람에 깎인 능선.",
+        "duskName": "장막의 골짜기",
+        "duskBlurb": "산맥 아래 봉인된 세계. 들어가는 길이 있다는 소문이 사실이라면.",
+        "emberName": "드레이크랜드",
+        "emberBlurb": "창백한 둑길을 건너면 초록은 재에 자리를 내주고, 오래된 존재가 황무지를 다스린다.",
+        "frostName": "서리장막 봉우리",
+        "frostBlurb": "어떤 지도에도 없는 눈 덮인 고지. 춤추는 오로라 속에서만 언뜻 보인다.",
+        "amberName": "호박빛 가을터",
+        "amberBlurb": "서쪽 절벽 너머에는 끝나지 않는 가을이 있고, 금빛 호수 위에 등불이 떠 있다.",
+        "fenName": "버들늪",
+        "fenBlurb": "가을의 왕관 너머, 버드나무와 고요한 물의 밝은 늪과 해자 뒤의 마을이 있다."
       },
       "group": {
         "heading": "어려운 구간은 함께",
@@ -2746,6 +2985,18 @@ export const ko_KR: EnTranslations = {
       "reptile": {
         "name": "파충류",
         "desc": "쉭쉭거리는 소리와 날카로운 물어뜯기를 지닌 냉혈 사냥꾼들로, 온혈 야수들과는 뚜렷이 다릅니다."
+      },
+      "murloc": {
+        "name": "개굴지느러미족",
+        "desc": "호숫가와 조수 웅덩이에 사는 개골거리는 물고기 인간들로, 물가에 너무 가까이 들어오는 것은 무엇이든 재빨리 떼 지어 덮칩니다."
+      },
+      "kobold": {
+        "name": "장난꾸러기 정령",
+        "desc": "숲속 공터와 산울타리를 종종거리며 뒤지는 약탈꾼과 요정들로, 수가 모이기 전까지는 위협이라기보다 골칫거리에 가깝습니다."
+      },
+      "demon": {
+        "name": "악마",
+        "desc": "균열 너머에서 온 침략자들로, 온통 불길과 악의뿐입니다. 악마 하나가 서 있는 곳이라면, 균열이 결코 멀지 않습니다."
       }
     },
     "worldPage": {
@@ -2759,15 +3010,55 @@ export const ko_KR: EnTranslations = {
       "valeBlurb": "새내기 영웅들이 동개울 마을 주변에서 늑대와 산적을 상대로 실력을 갈고닦는 푸른 시작의 골짜기.",
       "marshBlurb": "안개와 폐허에 잠긴 땅. 진흙지느러미가 얕은 물가에 떼지어 모이고 물밑에서는 더 오래된 무언가가 꿈틀거리며, 펜브리지 다리 마을에서 이를 지켜봅니다.",
       "peaksBlurb": "왕국에서 가장 차갑고 높은 위험을 향해 솟아오른, 바람에 깎인 능선과 오래된 광산 터. 높은감시 전초기지가 이곳을 지킵니다.",
+      "duskBlurb": "수정 폐허가 빛나고 대기가 오래된 마법으로 웅웅거리는, 엘더글림의 큰 나무 아래 영원한 황혼에 잠긴 골짜기.",
+      "emberBlurb": "드레이크가 화산구 위를 맴돌고 모래 언덕 사이에 트롤의 모닥불이 타오르는, 재와 핏빛유리로 뒤덮인 뇌우 치는 황무지. 관문 마을 와이름 감시탑이 이곳을 지켜봅니다.",
+      "frostBlurb": "오로라 아래 눈과 검은 소나무가 이루는 고요. 추위 그 자체가 깨어 있는 듯한 이곳에서 아이스맨틀은 불씨를 꺼뜨리지 않습니다.",
+      "amberBlurb": "등불 켜진 마을 랜턴미어를 중심으로 모여든, 금빛과 붉은 잎이 결코 지지 않는 영원한 가을.",
+      "fenBlurb": "다리 마을 브리지미어에서 오래된 널판 잔교를 따라 건너는, 수련과 느린 물이 웅웅거리는 밝은 습지.",
+      "nightBlurb": "꽃들이 길을 밝히는 별 가득한 한밤의 세계. 문레스트가 꿈꾸는 하늘 아래 조용히 불침번을 섭니다.",
+      "hauntBlurb": "거대한 나무우듬지 아래 유령 들린 숲. 길 위에서는 갈로미어의 등불만이 유일하게 정직한 빛입니다.",
+      "galeBlurb": "바람이 한시도 쉬지 않는 바다 절벽과 울부짖는 구릉. 올드 비컨은 결코 꺼지지 않고, 윅하버는 문을 굳게 걸어 잠급니다.",
+      "jungleBlurb": "야자수와 백사장, 요란한 새들이 뒤엉킨 열대의 밀림. 해변 마을 드리프트헤이븐이 물가에 불을 피워 둡니다.",
+      "gardenBlurb": "아무도 본 적 없는 정원사가 여전히 다듬고 있는 산울타리 미로의 정원 세계. 헤지윅과 그 분수 안뜰을 지나 들어섭니다.",
       "valeGreeting": "칼을 가까이 두시오. 골짜기는 예전 같지 않으니.",
       "valeGreeter": "레드브룩 원수, 이스트브룩",
       "marshGreeting": "문에서 멈추시오. 저 갈대밭 너머에서는, 습지가 우리 대신 죽이는 일을 하니까.",
       "marshGreeter": "감시관 펜윅, 펜브리지",
       "peaksGreeting": "이 성벽이 이백 년을 버텨 왔소. 내가 지키는 한 무너지지 않겠지만, 신음하고 있긴 하지.",
       "peaksGreeter": "대장 테살리, 하이워치",
+      "duskGreeting": "그대의 동족이 이 가지 아래 선 일은 드물다. 조심스레 걸으라, 그리고 환영받으라.",
+      "duskGreeter": "수호자 샐윈, 엘더글림",
+      "emberGreeting": "황무지에서 뜨거운 바람이 불고, 드레이크모 위엔 용들이, 모래 언덕엔 트롤의 모닥불이 있소. 저기로 나가기 전에 물부터 마셔 두시오.",
+      "emberGreeter": "성문 감시관, 와이름 감시탑",
+      "frostGreeting": "성벽 너머에서는 눈이 모든 소리를 삼킨다오. 빛이 춤추기 시작하거든, 목소리를 낮추고 불씨를 꺼뜨리지 마시오.",
+      "frostGreeter": "화로지기, 아이스맨틀",
+      "amberGreeting": "이곳의 잎은 모두 금빛과 붉은빛으로 타오르지만 결코 지지 않는다오. 등불은 그대를 위해 켜 두었으니, 올라가는 길에 금빛눈녹이 고개를 조심하시오.",
+      "amberGreeter": "등불장인, 랜턴미어",
+      "fenGreeting": "늪에는 잠자리와 벌의 날갯소리가 가득하다오. 다리를 건너 잠시 발을 쉬어 가시오. 웅덩이를 지날 때는 널판 위를 벗어나지 말고.",
+      "fenGreeter": "다리지기, 브리지미어",
+      "nightGreeting": "밤의 문 너머에서는 공기마저 꿈을 꾼다오. 꽃빛을 따라가되, 하늘에 걸린 잠든 세계를 조심하시오.",
+      "nightGreeter": "불침번 감시관, 문레스트",
+      "hauntGreeting": "등불 곁을 떠나지 마시오, 여행자여. 그리고 길 밖에서 숲이 그대의 이름을 부르거든, 절대 대답하지 마시오.",
+      "hauntGreeter": "등불지기, 갈로미어",
+      "galeGreeting": "이곳의 바람은 단 한 번도 멎은 적이 없고, 올드 비컨은 단 한 번도 꺼진 적이 없다오. 여관 문은 들어온 뒤에 꼭 닫으시오.",
+      "galeGreeter": "봉화지기, 윅하버",
+      "jungleGreeting": "따뜻한 모래, 요란한 새들, 그리고 지평선을 삼키는 정글이라오. 해변에 불을 피워 두었으니, 부디 그 불가로 돌아오시오.",
+      "jungleGreeter": "항구의 여주인, 드리프트헤이븐",
+      "gardenGreeting": "정원사를 본 사람이 백 년째 없는데도, 누군가는 여전히 산울타리를 다듬고 있다오. 미로를 조심하시오. 미로도 그대를 눈여겨보고 있으니.",
+      "gardenGreeter": "문지기, 헤지윅",
       "valePlaceNotes": "이스트브룩은 여러분의 첫 본거지입니다. 늑대길과 멧돼지 초원은 무난한 사냥터이고, 거울호수는 낚시하기 좋은 물이지만 얕은 물가에는 진흙지느러미가 우글거립니다. 흑거미줄과 구리 광산에는 거미와 광석에 굶주린 굴착꾼이 숨어 있고, 도적 야영지와 무너진 예배당은 한층 거친 일거리를 품습니다. 성물실 언덕은 왕국 최초의 탐굴인 무너진 성물실로 내려가는 길이고, 브라이트우드 숲은 북쪽의 고요하고 햇살 드는 숲입니다. 그리고 소우필드는 담장을 두른 이스트브룩의 보어볼 경기장으로, 수확 휴전 아래 베일 컵이 열리는 곳입니다.",
       "marshPlaceNotes": "펜브리지는 유일하게 마른 길을 지킵니다. 배회자 갈대밭과 딥펜 얕은 물에는 습지 짐승과 진흙지느러미가 들끓고, 과부거미 덤불은 거미줄로 빽빽이 얽혀 있습니다. 가라앉은 예배당과 트롤 봉분은 한층 오래된 위험을 품고 있으며, 봉분 바로 북쪽에서는 습지의 탐굴인 익사한 연도가 열립니다. 무덤부름 야영지는 교단이 자리를 틀고 박힌 곳이고, 가라앉은 요새는 습지의 인스턴스 심장부입니다.",
       "peaksPlaceNotes": "하이워치가 성벽을 지킵니다. 추적자 능선과 깊은바위 굴은 능선 들고양이와 굴착꾼의 차지이고, 오우거 산기슭과 드로그마르의 전쟁 야영지는 고용된 흉포한 자들의 것입니다. 스톰크래그는 정령들로 들끓고 그 아래에서 글리머미어가 빛나는데, 그 물가에는 익사한 신전으로 내려가는 창백한 빛의 문이 자리합니다. 고룡교단 천막과 망령의 들판이 교단의 높은 거점을 에워싸고, 그 정점에 무덤고룡 성소가 있습니다.",
+      "duskPlaceNotes": "엘더글림은 큰 나무 아래 모여 있다. 황혼 동굴과 그 전망대는 들어가는 길이자 골짜기를 처음 내려다보는 곳이다. 고대나무 숲과 별내림 분지는 고요한 남쪽을 지키고, 가라앉은 궁정은 동쪽에 수풀 우거진 폐허를 품으며, 빛나는 심처와 수정 여울은 북쪽에서 은은히 빛난다.",
+      "emberPlaceNotes": "와이름 감시탑이 관문을 지킵니다. 관문숲은 황무지 앞의 마지막 푸른 땅이고, 잿빛 사구에는 재와 그보다 고약한 것들이 떠다닙니다. 트롤무트는 모래언덕 트롤들이 모닥불을 피우고 모이는 곳이며, 핏빛유리 벌판은 면도날 같은 파편으로 반짝이고, 드레이크모 화산구는 드레이크들이 맴도는 연기 오르는 왕관입니다.",
+      "frostPlaceNotes": "아이스맨틀은 마지막 따뜻한 화롯불을 지킵니다. 설선 고개부터는 눈더미가 땅을 차지하고, 빙하 호수는 얼음 아래 검고 고요한 물입니다. 오로라 계단은 춤추는 빛 아래로 오르고, 떨림늪은 결코 완전히 잠들지 않는 얼어붙은 수렁이며, 울부짖는 단구는 밤마다 제 이름값을 합니다.",
+      "amberPlaceNotes": "랜턴미어는 수확의 한가운데서 빛납니다. 금빛눈녹이 고개는 호박빛으로 미끄러운 들어오는 길이고, 금빛 과수원과 수확 골짜기에는 가장 달콤한 수확물과 가장 대담한 도둑들이 있습니다. 큰 호수는 불타는 잎을 비추고, 잿단풍 언덕은 가장 높고 가장 붉게 서 있으며, 기운 비석은 가을보다 오래된 무언가를 기억합니다.",
+      "fenPlaceNotes": "브리지미어는 느린 물 위에 걸터앉아 있습니다. 호박늪 돌계단은 수확의 땅에서 내려오는 길이고, 수련 습지와 늪빛 웅덩이는 위습과 잠자리로 반짝입니다. 수양버들 만은 가지를 호수에 드리우고, 나른한 여울은 이 땅에서 가장 온순한 곳입니다.",
+      "nightPlaceNotes": "문레스트는 불침번을 섭니다. 밤의 문은 한밤의 나라로 들어가는 길이고, 달우물은 곁에 설 수 있는 별빛을 담고 있습니다. 어스름 꽃벌판은 어둠 속에서 피어나고, 불침번 선돌은 한 발짝도 움직이지 않은 채 지켜보며, 잠들지 않는 봉분은 이곳에서 유일하게 꿈꾸지 않는 자리입니다.",
+      "hauntPlaceNotes": "갈로미어는 제 등불 안에 웅크리고 있습니다. 까마귀 문은 이 숲의 음산한 정문이고, 과부의 덤불은 거미줄로 빽빽이 얽혀 있습니다. 교수대 공터와 애도석 예배당은 숲의 가장 오래된 슬픔을 간직하며, 사냥꾼의 공터는 아직도 그곳에서 사냥하는 무언가의 차지입니다.",
+      "galePlaceNotes": "윅하버는 바람에 몸을 기울인 채 서 있습니다. 바람길은 절벽을 따라 들어오는 길이고, 울부짖는 구릉은 강풍 아래 나무 한 그루 없이 굽이칩니다. 올드 비컨은 누구도 기억하지 못할 만큼 오래 타올랐고, 절단 절벽은 물까지 곧장 떨어지며, 난파선 벌판은 이 해안을 정직하게 만듭니다. 그리고 거울 호수는 이 지역 전체에서 유일하게 고요한 것입니다.",
+      "junglePlaceNotes": "드리프트헤이븐은 해변에 불을 피워 둡니다. 덩굴 어귀는 강이 초록 장벽과 만나는 곳이고, 야자 백사장은 파도를 따라 희고 따뜻하게 이어집니다. 에메랄드 밀림과 덩굴폭포 숲은 내륙을 삼키고, 사파이어 석호는 맑고 깊게 빛나며, 가라앉은 신상은 물밑에서 지켜봅니다.",
+      "gardenPlaceNotes": "헤지윅은 정원 문 앞에서 기다립니다. 조각상 산책로는 말없는 동행을 지키고, 들장미 수풀은 화단을 벗어난 지 오래입니다. 꽃잎 연못은 일 년 내내 분홍빛으로 떠다니고, 대미로는 손님이 올 때마다 제 예법을 새로 고쳐 짜며, 분수 안뜰은 정원의 심장에서 여전히 맑게 흐릅니다.",
       "gladeTitle": "고요한 한구석: 브라이트우드 숲",
       "gladeBody": "계곡의 모든 이야기가 죽은 자들에 관한 것은 아닙니다. 북쪽에는 브라이트우드 숲이라 불리는 햇살 드는 숲이 있어, 가지 아래로 어른거리는 빛과 조용한 길과 함께 더 부드러운 고유한 리듬을 지킵니다. 당신이 따라가는 흔적에 대한 차분한 대비이며, 길이 잠시 여유를 줄 때 둘러볼 만한 곳입니다.",
       "worldBossTitle": "봉우리가 깨어날 때: 월드 보스",
@@ -3767,6 +4058,7 @@ export const ko_KR: EnTranslations = {
     "title": "데스크톱 런처 다운로드",
     "desc": "최적화된 성능과 전체 화면 플레이를 위해 독립형 런처를 다운로드하세요.",
     "macCta": "macOS용 다운로드",
+    "windowsCta": "Windows용 다운로드",
     "linuxCta": "Linux용 다운로드",
     "linuxHint": "AppImage 형식입니다. 실행 권한만 부여하면 바로 실행되며, 설치는 필요 없습니다.",
     "windowsPending": "Windows 빌드는 준비 중입니다."
@@ -4068,6 +4360,35 @@ export const ko_KR: EnTranslations = {
     "chat": "채팅창 열기"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "모든 균열이 지금은 불안정합니다. 잠시 후 다시 시도하세요.",
+      "enterFloor": "균열을 통과해 {name}에 들어섰습니다.",
+      "descendFloor": "{name}의 더 깊은 곳으로 내려갑니다.",
+      "stepBack": "균열을 통해 원래 자리로 돌아왔습니다.",
+      "pylonLit": "룬 첨탑이 빛을 발합니다 ({lit}/{total}).",
+      "wayDownOpens": "아래로 향하는 길이 찢겨 열립니다.",
+      "exitOpens": "균열이 요동칩니다. 쓰러진 적 너머로 귀환의 길이 열립니다.",
+      "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
+      "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
+      "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",
+      "levelGate": "레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다.",
+      "iceGoalLit": "서리 문양이 타오릅니다. 길이 꿈틀거립니다.",
+      "socketsShut": "받침대가 갈리며 닫힙니다. 길이 꿈틀거립니다.",
+      "seqProgress": "룬이 차례로 응답합니다 ({step}/{total}).",
+      "seqReset": "룬이 모두 어두워집니다. 처음부터 다시 시작하세요.",
+      "gateOpen": "문이 삐걱거리며 열립니다.",
+      "orbSealed": "구슬은 아래의 의식에 봉인되어 있습니다.",
+      "orbWakes": "펜타그램의 불꽃이 꺼집니다. 제단에서 무언가가 깨어납니다.",
+      "orbOpensGate": "피의 구슬이 타오릅니다. 신전의 문이 삐걱거리며 열립니다.",
+      "alreadyCleared": "이 균열은 이미 {names} 님이 정복했습니다.",
+      "raceLost": "이 균열은 이미 {names} 님이 정복했습니다. 도전이 종료됩니다.",
+      "raceWorldWin": "{names} 님이 {seconds}초 만에 {tier} 등급 균열 경주에서 승리했습니다!",
+      "raceWinBanner": "균열 경주 승리 — {seconds}초",
+      "raceLostBanner": "이미 정복된 균열",
+      "forgeUpgraded": "{name}의 균열 강화가 완료되었습니다.",
+      "forgeEnchanted": "{name}의 균열 마법부여가 완료되었습니다.",
+      "forgeSocketed": "{name}에 균열 보석을 장착했습니다."
+    },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
       "leaveDungeonFirst": "먼저 던전에서 나가세요.",
@@ -4861,6 +5182,29 @@ export const ko_KR: EnTranslations = {
     "body": "게임 서비스를 재시작하고 있으며 Claudemoon은 곧 돌아올 예정입니다. 이 페이지는 자동으로 계속 확인합니다.",
     "status": "곧 돌아옵니다"
   },
+  "welcome": {
+    "back": "다시 오신 것을 환영합니다, {name}",
+    "level": "레벨 {level}",
+    "lastPlayed": "마지막 플레이: {when}",
+    "continue": "월드 입장",
+    "continueHint": "Enter로 계속, Esc로 건너뛰기",
+    "continueHintTouch": "탭하여 계속",
+    "discord": {
+      "title": "커뮤니티는 Discord에서 활동합니다",
+      "sub": "패치 미리보기, 이벤트, 개발자 채팅, 연동 시 보너스 은행 슬롯 2개.",
+      "join": "Discord에 참여하기"
+    },
+    "chest": {
+      "ready": "일일 상자 준비 완료"
+    },
+    "armory": {
+      "cta": "무기고 둘러보기"
+    },
+    "news": {
+      "new": "신규",
+      "viewAll": "GitHub에서 모든 업데이트 보기"
+    }
+  },
   "hud": {
     "core": {
       "elite": "정예",
@@ -4875,6 +5219,8 @@ export const ko_KR: EnTranslations = {
       "secondsRemaining": "{seconds}초 남음",
       "enteringZone": "{zone}에 진입합니다.",
       "welcomeZone": "{zone}에 오신 것을 환영합니다!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "{level} 레벨!",
       "levelLog": "{level} 레벨이 되었습니다!",
       "xpGain": "경험치 {amount}을 획득했습니다.",
@@ -6340,6 +6686,18 @@ export const ko_KR: EnTranslations = {
         "name": "참나무 가죽",
         "description": "피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다."
       },
+      "ironhold": {
+        "name": "철벽",
+        "description": "굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다."
+      },
+      "sacred_bulwark": {
+        "name": "신성한 방벽",
+        "description": "{duration}초 동안 다음 적의 치명적인 공격을 무효화하고, 대신 생명력을 최대치의 35%까지 회복합니다."
+      },
+      "primal_reflexes": {
+        "name": "원시의 반사",
+        "description": "본능이 예리해져 6초 동안 회피율이 50% 증가합니다."
+      },
       "starfire": {
         "name": "창공 낙하",
         "description": "별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다."
@@ -6378,7 +6736,7 @@ export const ko_KR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "늑대의 피",
-        "description": "전투력을 6초 동안 40만큼 증가시킵니다. 늑대 변신 전용."
+        "description": "전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용."
       },
       "rip": {
         "name": "찢기",
@@ -6669,6 +7027,24 @@ export const ko_KR: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "이스트브룩 양모 바지"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "이스트브룩 의식 예복"
+      },
+      "eastbrook_druids_hide": {
+        "name": "이스트브룩 드루이드 가죽"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "이스트브룩 방호 각반"
+      },
+      "wardweave_cowl": {
+        "name": "워드위브 두건"
+      },
+      "duskhide_wraps": {
+        "name": "더스크하이드 손목보호대"
+      },
+      "sootscale_mantle": {
+        "name": "수트스케일 망토"
       },
       "gravecaller_blade": {
         "name": "무덤부름 넓은날검"
@@ -7177,6 +7553,66 @@ export const ko_KR: EnTranslations = {
       "sunpetal_sickle": {
         "name": "태양꽃잎 낫"
       },
+      "duskwisp_essence": {
+        "name": "황혼 위습의 정수"
+      },
+      "spore_heart": {
+        "name": "포자 심장"
+      },
+      "gleaming_antler": {
+        "name": "빛나는 가지뿔"
+      },
+      "wisp_mote": {
+        "name": "별빛 티끌"
+      },
+      "starfall_shard": {
+        "name": "별내림 파편"
+      },
+      "elder_bark": {
+        "name": "원로의 나무껍질"
+      },
+      "hollow_sealstone": {
+        "name": "골짜기 봉인석"
+      },
+      "monument_overlook": {
+        "name": "풍화된 비석"
+      },
+      "monument_court": {
+        "name": "가라앉은 비석"
+      },
+      "monument_north": {
+        "name": "잊힌 비석"
+      },
+      "guardian_core": {
+        "name": "수호자의 핵"
+      },
+      "wardens_seal": {
+        "name": "감시자의 인장"
+      },
+      "gleamstag_charm": {
+        "name": "빛사슴 부적"
+      },
+      "veilsteel_blade": {
+        "name": "장막강철 검"
+      },
+      "duskfang_dirk": {
+        "name": "황혼송곳니 단검"
+      },
+      "gleamwood_stave": {
+        "name": "빛나무 지팡이"
+      },
+      "wardens_oathband": {
+        "name": "감시자의 서약 장갑"
+      },
+      "wardplate_cuirass": {
+        "name": "수호 판금 흉갑"
+      },
+      "nightweave_tunic": {
+        "name": "밤엮음 튜닉"
+      },
+      "veilcloth_robe": {
+        "name": "장막천 로브"
+      },
       "thorium_ore": {
         "name": "토륨 광석"
       },
@@ -7314,6 +7750,27 @@ export const ko_KR: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "불씨유리 전투지팡이"
+      },
+      "rift_essence": {
+        "name": "균열 정수"
+      },
+      "rift_gem_crimson": {
+        "name": "진홍빛 균열 보석"
+      },
+      "rift_gem_azure": {
+        "name": "푸른빛 균열 보석"
+      },
+      "rift_gem_verdant": {
+        "name": "초록빛 균열 보석"
+      },
+      "riftbound_band_of_might": {
+        "name": "힘의 균열결속 반지"
+      },
+      "riftbound_band_of_insight": {
+        "name": "통찰의 균열결속 반지"
+      },
+      "riftbound_band_of_guile": {
+        "name": "기민함의 균열결속 반지"
       },
       "bristleback_maul": {
         "name": "갤로글래스 망치"
@@ -8283,6 +8740,258 @@ export const ko_KR: EnTranslations = {
       "stable_horse": {
         "name": "마구간 말"
       },
+      "rift_spawnling": {
+        "name": "균열의 산물"
+      },
+      "rift_bonewalker": {
+        "name": "되살아난 뼈걷는자"
+      },
+      "rift_frost_revenant": {
+        "name": "서리에 묶인 망령"
+      },
+      "rift_rime_elemental": {
+        "name": "상고대 정령"
+      },
+      "rift_ember_fiend": {
+        "name": "잉걸불 마귀"
+      },
+      "rift_magma_brute": {
+        "name": "용암 야수"
+      },
+      "rift_venom_weaver": {
+        "name": "독액 직조자"
+      },
+      "rift_thornback": {
+        "name": "가시등 추적자"
+      },
+      "rift_boneclad": {
+        "name": "뼈갑옷 전사"
+      },
+      "rift_marrow_troll": {
+        "name": "골수 트롤"
+      },
+      "rift_void_acolyte": {
+        "name": "공허상흔 시종"
+      },
+      "rift_dread_stalker": {
+        "name": "공포의 추적자"
+      },
+      "rift_storm_caller": {
+        "name": "폭풍 소환사"
+      },
+      "rift_stormscale": {
+        "name": "폭풍비늘 드레이크"
+      },
+      "rift_tide_thrall": {
+        "name": "조수의 노예"
+      },
+      "rift_deep_lurker": {
+        "name": "심연의 잠복자"
+      },
+      "rift_stone_ogre": {
+        "name": "돌 오우거"
+      },
+      "rift_boss_frost": {
+        "name": "서리 파수꾼"
+      },
+      "rift_boss_ember": {
+        "name": "잉걸불 대장간의 폭군"
+      },
+      "rift_boss_venom": {
+        "name": "어미 비스카"
+      },
+      "rift_boss_necro": {
+        "name": "뼈군주 자레스"
+      },
+      "rift_boss_brute": {
+        "name": "군주 그라스크"
+      },
+      "rift_boss_arcane": {
+        "name": "집정관 닉사리스"
+      },
+      "rift_boss_storm": {
+        "name": "폭풍 바로크"
+      },
+      "rift_boss_tide": {
+        "name": "심연의 아가리"
+      },
+      "glimmerwisp": {
+        "name": "미광 위습"
+      },
+      "duskwisp": {
+        "name": "황혼 위습"
+      },
+      "veiled_stag": {
+        "name": "장막 수사슴"
+      },
+      "veiled_doe": {
+        "name": "장막 암사슴"
+      },
+      "gleamstag": {
+        "name": "빛나는 수사슴"
+      },
+      "sporeling_gatherer": {
+        "name": "포자꾼 채집꾼"
+      },
+      "corrupted_sporeling": {
+        "name": "타락한 포자꾼"
+      },
+      "mushroom_pixie": {
+        "name": "글림포크 픽시"
+      },
+      "treant_elder": {
+        "name": "나무정령 원로"
+      },
+      "ancient_guardian": {
+        "name": "고대 수호자"
+      },
+      "waking_warden": {
+        "name": "깨어난 감시자"
+      },
+      "old_marrowshell": {
+        "name": "늙은 골수껍질"
+      },
+      "aurelhorn": {
+        "name": "아우렐혼, 무리의 첫째"
+      },
+      "snowdrift_wolf": {
+        "name": "눈더미 늑대"
+      },
+      "ice_wisp": {
+        "name": "얼음 위습"
+      },
+      "rime_elemental": {
+        "name": "서리 정령"
+      },
+      "fen_sprite": {
+        "name": "늪 요정"
+      },
+      "frostmane_yeti": {
+        "name": "서리갈기 예티"
+      },
+      "emberwing_drake": {
+        "name": "잿불날개 드레이크"
+      },
+      "ashbone_raider": {
+        "name": "잿빛뼈 약탈자"
+      },
+      "ashbone_warcaller": {
+        "name": "잿빛뼈 전쟁소집꾼"
+      },
+      "dune_troll": {
+        "name": "모래언덕 트롤"
+      },
+      "gilded_stag": {
+        "name": "금빛 수사슴"
+      },
+      "gloam_fox": {
+        "name": "어스름여우"
+      },
+      "orchard_treant": {
+        "name": "과수원 나무정령"
+      },
+      "harvest_sprite": {
+        "name": "수확 요정"
+      },
+      "mere_lurker": {
+        "name": "호수 잠복자"
+      },
+      "bogtoad": {
+        "name": "늪두꺼비"
+      },
+      "drowsy_croaker": {
+        "name": "졸음 개구리왕"
+      },
+      "lily_wisp": {
+        "name": "수련 위습"
+      },
+      "willow_sprite": {
+        "name": "버들 요정"
+      },
+      "moonfleece_grazer": {
+        "name": "달양털 짐승"
+      },
+      "gloam_strider": {
+        "name": "어스름 질주자"
+      },
+      "nightkin_stargazer": {
+        "name": "밤일족 별지기"
+      },
+      "barrow_king": {
+        "name": "봉분의 왕"
+      },
+      "widowsilk_spinner": {
+        "name": "과부비단 거미"
+      },
+      "wood_wraith": {
+        "name": "숲 망령"
+      },
+      "gravenbark_shambler": {
+        "name": "무덤껍질 괴목"
+      },
+      "pale_huntsman": {
+        "name": "창백한 사냥꾼"
+      },
+      "tide_scuttler": {
+        "name": "조수 게"
+      },
+      "thicket_boar": {
+        "name": "덤불 멧돼지"
+      },
+      "canopy_weaver": {
+        "name": "수관 거미"
+      },
+      "idol_guardian": {
+        "name": "신상 수호자"
+      },
+      "topiary_stag": {
+        "name": "토피어리 수사슴"
+      },
+      "topiary_wolf": {
+        "name": "토피어리 늑대"
+      },
+      "hedge_gnome": {
+        "name": "산울타리 노움"
+      },
+      "the_topiary_bull": {
+        "name": "토피어리 황소"
+      },
+      "moor_ram": {
+        "name": "황무지 숫양"
+      },
+      "gale_wisp": {
+        "name": "돌풍 정령"
+      },
+      "shoal_scuttler": {
+        "name": "여울 게"
+      },
+      "the_wreck_warden": {
+        "name": "난파선 감시자"
+      },
+      "riftspawn": {
+        "name": "균열의 산물"
+      },
+      "breach_wretch": {
+        "name": "균열의 비루한 것"
+      },
+      "void_stalker": {
+        "name": "공허 추적자"
+      },
+      "sundered_horror": {
+        "name": "찢겨진 공포"
+      },
+      "rift_hellguard": {
+        "name": "지옥 수호병"
+      },
+      "rift_pact_acolyte": {
+        "name": "계약의 수련사제"
+      },
+      "rift_boss_ritualist": {
+        "name": "서약에 묶인 마구스 벨코르"
+      },
+      "rift_boss_pitlord": {
+        "name": "구렁의 군주 아즈고라스"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -8562,6 +9271,61 @@ export const ko_KR: EnTranslations = {
         "name": "연대기 기록관 젠지",
         "title": "쏜피크 고지 연대기",
         "greeting": "산은 아무것도 잊지 않네, {playerName}. 나도 마찬가지지. 자네가 이룬 일을 보여 주게."
+      },
+      "keeper_saelwyn": {
+        "name": "수호자 샐윈",
+        "title": "골짜기의 수호자",
+        "greeting": "그대의 동족이 이 가지 아래 선 일은 드물다, {className}. 조심스레 걸으라, 그리고 환영받으라."
+      },
+      "loremother_bryn": {
+        "name": "로어마더 브린",
+        "title": "성소의 목소리",
+        "greeting": "이 골짜기의 빛은 저마다 무언가를 기억하고 있다네, {playerName}. 함께 귀 기울여 주게."
+      },
+      "provisioner_fenna": {
+        "name": "보급상 펜나",
+        "title": "엘더글림 보급상",
+        "greeting": "빵은 아직 따끈하고 물은 여전히 달아요. 골짜기가 베풀고, 저도 베풀지요."
+      },
+      "wardsmith_orun": {
+        "name": "수호기술자 오룬",
+        "title": "옛 대장간의 관리인",
+        "greeting": "이 화로들은 수백 년 전에 식었지만, {className}, 여기서 벼려진 날은 아직도 서슬이 퍼렇다네."
+      },
+      "archivist_tullo": {
+        "name": "기록관 툴로",
+        "title": "돌을 읽는 자",
+        "greeting": "바깥의 비석들은 한 시대가 지나도록 누구에게도 말을 걸지 않았지. 새 귀를 기다렸는지도 모르네."
+      },
+      "warden_coalfast": {
+        "name": "숯불 워든",
+        "title": "보루 지휘관",
+        "greeting": "균열은 걸헤이븐이 작은 마을이라는 걸 신경 쓰지 않는다네, {className}. 우리가 이 해안을 지키거나, 아니면 지킬 해안조차 남지 않을 걸세. 우리 곁에 서 주게. 그러면 나는 그 은혜를 잊지 않겠네."
+      },
+      "riftwatch_ollun": {
+        "name": "균열감시자 올룬",
+        "title": "균열 학자",
+        "greeting": "모든 균열은 열리기 전에 노래하지, 귀를 기울일 줄만 안다면 말일세. 지금 이 섬에서 셋이 꿈틀대는 소리가 들리는데, 그중 하나는 아주 가깝다네."
+      },
+      "quartermaster_edda": {
+        "name": "병참관 에다",
+        "title": "보루 무기담당",
+        "greeting": "강철과 소금뿐이야, {className}. 내가 나눠 줄 수 있는 건 이제 그게 전부라네. 이걸 받아서, 균열들이 내 손 닿는 곳에서 열린 걸 후회하게 만들어 주게."
+      },
+      "mender_saul": {
+        "name": "치료사 사울",
+        "title": "야전 군의관",
+        "greeting": "지난 한 달 동안 맞춘 뼈가, 십 년간 고깃배 사고를 치료하며 맞춘 것보다 많다네. 균열은 앗아간 것을 온전히 남겨 두지 않지. 할 수 있거든, 성한 몸으로 돌아와 주게."
+      },
+      "bellkeeper_tam": {
+        "name": "종지기 탐",
+        "title": "경종지기",
+        "greeting": "이 종이야말로 균열이 우리에게 주는 유일한 경고라오, {className}. 한 번 울리면 들판, 두 번이면 절벽, 세 번 울리면 이미 코앞이라 달아나도 소용없을 만큼 가까이 온 것이오. 늘 귀를 기울이시오, 그리하면 종이 그대를 온전히 지켜 줄지도 모르니."
+      },
+      "fisher_nell": {
+        "name": "겁먹은 넬",
+        "title": "걸헤이븐 어부",
+        "greeting": "그물을 말리던 바로 그 자리에서 열렸어요. 바로 거기, 제가 평생 매일 아침 서 있던 그 자리에서요. 이제 저는 해안으로 내려가지 않아요. 이제는 어디로도 잘 가지 않는답니다."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -9392,6 +10156,152 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_veil_thinned": {
+        "title": "얇아진 장막",
+        "text": "동굴이 그대에게 열렸군. 그렇다면 봉인은 내 걱정보다 약해져 있다는 뜻이야, {playerName}. 장막이 찢긴 곳에서 위습들은 어둡고 차갑게 변한다네. 황혼 위습의 정수 여덟 개를 가져오면 상처가 얼마나 깊은지 읽어 보겠네.",
+        "completion": "하나같이 차갑군. 찢긴 자리가 균열이 되기까지 골짜기에 남은 시간은 한 계절 남짓일 게야. 그대와 내가 할 일이 생겼네.",
+        "objectives": {
+          "0": {
+            "label": "황혼 위습의 정수"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "빛나는 가지뿔",
+        "text": "장막 수사슴은 풀을 뜯는 자리마다 빛을 흘리고, 떨어진 가지뿔은 그 빛을 몇 해나 간직하지요. 별내림 분지의 무리에게서 다섯 개만 구해 오면 제 등불은 기름 없이 겨울을 나요. 사슴을 해칠 필요는 없지만, 순순히 내주지도 않을 거예요.",
+        "completion": "빛을 이렇게나 담고 있다니! 불꽃도 연기도 없이, 오직 빛뿐. 골짜기는 베푸는군요.",
+        "objectives": {
+          "0": {
+            "label": "빛나는 가지뿔"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "여울의 불빛",
+        "text": "미광 위습들은 골짜기가 봉인되던 날 떨어진 옛 별빛의 티끌을 지니고 다니지. 여섯 톨이면 성소의 등불이 일 년을 버틴다네. 스러져 가는 것들에게서만 취하게. 골짜기는 욕심부리지 않아도 넉넉히 베푸니.",
+        "completion": "첫 별들처럼 은은하군. 제단 곁에 두게. 나머지는 성소가 알아서 할 걸세.",
+        "objectives": {
+          "0": {
+            "label": "별빛 티끌"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "깊은 숲 달래기",
+        "text": "빛나는 심처의 포자꾼들은 찢긴 자리가 그들의 고리에 닿기 전까진 온순한 이들이었다네. 타락이 앗아간 것은 돌아오지 않아. 타락한 이들에게 안식을 주게, {playerName}. 심처 북쪽에서 열이라네.",
+        "completion": "내가 차마 못 할 일을 해 주었군. 남쪽 고리의 채집꾼들은 아직 노래하고 있네. 그대 덕에 계속 노래할 걸세.",
+        "objectives": {
+          "0": {
+            "label": "타락한 포자꾼에게 안식을 주었다"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "고리의 심장",
+        "text": "어둠에 떨어진 포자꾼의 심장은 빌려 온 그림자로 계속 뛴다네. 그 심장 넷을 성소에서 정화하면 타락이 어떻게 번지는지 배울 수 있을 게야. 궂은일이지만, {playerName}, 고치는 일이기도 하지.",
+        "completion": "되었네. 정화되어 고요해졌어. 하나같이 같은 표식이 보이는군. 그림자는 가라앉은 궁정에서 흘러나오고 있네. 샐윈에게 전하게.",
+        "objectives": {
+          "0": {
+            "label": "포자 심장"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "돌이 기억하는 것",
+        "text": "봉인 이전의 비석이 아직 셋 서 있네. 하나는 황혼 전망대, 하나는 가라앉은 궁정, 하나는 아무도 걷지 않는 북동쪽 끝에 잊혀 있지. 대신 읽어 주게, {playerName}. 내 무릎은 이백 년 전에 계단을 포기했다네.",
+        "completion": "전망대, 궁정, 잊힌 구석이라… 봉인가의 세 절이 불린 그날 이후 처음으로 한자리에 모였군. 늙은 독서가를 참으로 기쁘게 해 주었네.",
+        "objectives": {
+          "0": {
+            "label": "전망대 비석을 읽었다"
+          },
+          "1": {
+            "label": "궁정 비석을 읽었다"
+          },
+          "2": {
+            "label": "잊힌 비석을 읽었다"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "숲의 골칫거리",
+        "text": "해가 지면 황혼 위습들이 제 좌판 사이로 흘러들어요, {playerName}. 그 냉기는 닿는 족족 상하게 하죠. 좀 솎아 주세요. 장막이 찢긴 곳이라면 어디든, 열 마리요.",
+        "completion": "이제 밤장을 다시 열 수 있겠어요. 평생 단골이 생긴 셈 치세요. 적어도 할인은 해 드릴게요.",
+        "objectives": {
+          "0": {
+            "label": "황혼 위습을 흩어 놓았다"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "별내림의 파편",
+        "text": "황혼 위습이 수정 들판 위를 지나면 옛 별빛 조각이 가시처럼 들러붙지. 파편 여섯이면, {playerName}, 봉인이 불린 계절까지 짚어낼 수 있다네.",
+        "completion": "이 결을 보게! 가을일세. 골짜기는 가을에 봉인되었어. 이백 년 묵은 논쟁이 작은 돌 여섯으로 끝났군.",
+        "objectives": {
+          "0": {
+            "label": "별내림 파편"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "나무정령과의 언약",
+        "text": "숲의 원로들은 타락이 뿌리를 갉을수록 겉껍질을 벗어 던진다네. 네 장이면 숲 전체에 바를 연고를 달일 수 있어. 껍질을 떼는 동안 고맙단 말은 못 듣겠지만, {playerName}, 그 덕에 그들은 한 세기를 더 서 있을 걸세.",
+        "completion": "넷 다 두껍고 성하군. 연고는 달이는 데 일주일, 다 듣는 데 백 년이 걸리지. 나무는 친절을 재는 잣대가 다르다네.",
+        "objectives": {
+          "0": {
+            "label": "원로의 나무껍질"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "포자의 물결에 맞서",
+        "text": "연고가 숲은 지키고 있지만, 타락은 황혼마다 심처를 더 세게 밀어붙인다네. 채집꾼들이 북쪽 고리를 되찾으려면 타락한 이들 열둘에게 더 안식을 주어야 해, {playerName}.",
+        "completion": "오늘 밤 북쪽 고리가 다시 노래하고 있네. 나직하게, 그러나 분명하게.",
+        "objectives": {
+          "0": {
+            "label": "타락한 포자꾼에게 안식을 주었다"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "가라앉은 궁정",
+        "text": "브린이 옳게 읽었네. 찢긴 자리는 동쪽의 옛 궁정을 관통하고, 그곳의 수호자들은 잘못 깨어났어. 봉인을 지키라고 세운 것들이 이제는 다가서는 자를 짓뭉개려 든다네. 폐허에서 여덟을 쓰러뜨리게.",
+        "completion": "수호자 여덟이 잠잠해졌군. 나는 저들이 세워지던 때를 기억한다네, {playerName}. 놀랄 것 없어. 골짜기는 제 수호자들을 오래 살게 하지.",
+        "objectives": {
+          "0": {
+            "label": "고대 수호자를 잠재웠다"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "감시자의 메아리",
+        "text": "주인이 침묵했는데도 궁정의 수호자들은 사그라들지 않는 메아리처럼 마지막 명령을 되풀이하고 있네. 봉인이 제자리로 돌아갈 때까지 저들은 계속 깨어날 걸세, {playerName}. 석공들이 봉인석에 닿도록 열을 더 잠재워 주게.",
+        "completion": "메아리는 되풀이될수록 옅어지는군. 머잖아 궁정에는 바람과 담쟁이만 남을 걸세. 폐허란 본래 그래야 하는 법이지.",
+        "objectives": {
+          "0": {
+            "label": "고대 수호자를 잠재웠다"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "깨어난 감시자",
+        "text": "궁정은 조용해졌지만 그 주인은 아니라네. 봉인을 지키던 감시자가 뒤틀린 채 깨어났고, 저것이 서 있는 한 봉인은 기울 수 없어. 쉽게 쓰러지지 않을 걸세. 친구를 하나 구할 수 있다면 데려가게, {playerName}. 둘을 구할 수 있다면 둘을 데려가게.",
+        "completion": "그 종소리 같던 목소리가 침묵했네. 여기서도 느꼈다네. 골짜기 전체에서 무거운 짐이 내려앉는 듯했지.",
+        "objectives": {
+          "0": {
+            "label": "깨어난 감시자를 물리쳤다"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "봉인의 복원",
+        "text": "감시자의 인장을 궁정 한가운데의 봉인석으로 가져가, 떨어져 나온 자리에 도로 끼우게. 그러면 골짜기는 아물기 시작할 것이고, 그대는, {playerName}, 그대의 동족 누구도 해내지 못한 일을 이루는 걸세.",
+        "completion": "여기서도 닫히는 것이 느껴졌네. 황혼처럼 부드럽게. 골짜기는 벗을 기억한다네, {playerName}. 아무리 멀리 떠나도 큰 나무 아래에는 언제나 그대를 위한 불빛이 있을 걸세.",
+        "objectives": {
+          "0": {
+            "label": "봉인을 봉인석에 되돌려 놓았다"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "익사한 성가대",
         "text": "물거리들은 홀로 움직이지 않는다네. 그들 사이를 익사한 신도들이 걷고 있지 — 신전과 함께 가라앉은 그 광신도들은, 썩어버린 제의를 여전히 걸친 채 물가 바위에서 부르던 기도를 아직도 노래하고 있네. 그들 중 여덟을 침묵시키고, 그들이 지닌 제물 여섯 개를 내게 가져오게. 그들이 그 여신에게 무엇을 바치려는지 알고 싶네.",
@@ -9493,6 +10403,9 @@ export const ko_KR: EnTranslations = {
           },
           "10": {
             "label": "소우필드"
+          },
+          "11": {
+            "label": "먼바다 해안 모래톱 둑길"
           }
         }
       },
@@ -9562,6 +10475,285 @@ export const ko_KR: EnTranslations = {
           },
           "10": {
             "label": "하이워치 마구간"
+          }
+        }
+      },
+      "veiled_hollow": {
+        "name": "장막의 골짜기",
+        "welcome": "대기가 오래된 마법으로 웅웅거린다. 엘더글림의 큰 나무 아래에서 수호자 샐윈을 찾아가라.",
+        "pois": {
+          "0": {
+            "label": "엘더글림"
+          },
+          "1": {
+            "label": "황혼 동굴"
+          },
+          "2": {
+            "label": "황혼 전망대"
+          },
+          "3": {
+            "label": "고대나무 숲"
+          },
+          "4": {
+            "label": "별내림 분지"
+          },
+          "5": {
+            "label": "가라앉은 궁정"
+          },
+          "6": {
+            "label": "수정 여울"
+          },
+          "7": {
+            "label": "빛나는 심처"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "드레이크랜드",
+        "welcome": "뜨거운 바람이 황무지에서 불어온다. 용들이 드레이크모 위를 맴돌고, 모래 언덕에는 트롤의 모닥불이 타오른다.",
+        "pois": {
+          "0": {
+            "label": "와이름 감시탑"
+          },
+          "1": {
+            "label": "관문숲"
+          },
+          "2": {
+            "label": "잿빛 사구"
+          },
+          "3": {
+            "label": "트롤무트"
+          },
+          "4": {
+            "label": "핏빛유리 벌판"
+          },
+          "5": {
+            "label": "드레이크모 화산구"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "서리장막 봉우리",
+        "welcome": "눈이 모든 소리를 삼킨다. 춤추는 오로라 아래, 추위 그 자체가 깨어 있는 듯하다.",
+        "pois": {
+          "0": {
+            "label": "아이스맨틀"
+          },
+          "1": {
+            "label": "설선 고개"
+          },
+          "2": {
+            "label": "빙하 호수"
+          },
+          "3": {
+            "label": "오로라 계단"
+          },
+          "4": {
+            "label": "떨림늪"
+          },
+          "5": {
+            "label": "울부짖는 단구"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "호박빛 가을터",
+        "welcome": "이곳의 잎은 모두 금빛과 붉은빛으로 타오르지만 결코 지지 않는다. 랜턴미어의 등불이 너를 위해 켜져 있다.",
+        "pois": {
+          "0": {
+            "label": "랜턴미어"
+          },
+          "1": {
+            "label": "금빛눈녹이 고개"
+          },
+          "2": {
+            "label": "금빛 과수원"
+          },
+          "3": {
+            "label": "수확 골짜기"
+          },
+          "4": {
+            "label": "큰 호수"
+          },
+          "5": {
+            "label": "잿단풍 언덕"
+          },
+          "6": {
+            "label": "기운 비석"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "버들늪",
+        "welcome": "늪에는 잠자리와 벌의 날갯소리가 가득하다. 다리를 건너 브리지미어에 들어가 잠시 쉬어 가라.",
+        "pois": {
+          "0": {
+            "label": "브리지미어"
+          },
+          "1": {
+            "label": "호박늪 돌계단"
+          },
+          "2": {
+            "label": "수련 습지"
+          },
+          "3": {
+            "label": "늪빛 웅덩이"
+          },
+          "4": {
+            "label": "수양버들 만"
+          },
+          "5": {
+            "label": "나른한 여울"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "밤꽃 평원",
+        "welcome": "밤의 문 너머에서는 공기마저 꿈을 꾼다. 꽃빛을 따라 문레스트로 가라. 하늘에 걸린 잠든 세계도 놓치지 말고.",
+        "pois": {
+          "0": {
+            "label": "문레스트"
+          },
+          "1": {
+            "label": "밤의 문"
+          },
+          "2": {
+            "label": "달우물"
+          },
+          "3": {
+            "label": "어스름 꽃벌판"
+          },
+          "4": {
+            "label": "불침번 선돌"
+          },
+          "5": {
+            "label": "잠들지 않는 봉분"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "망령숲",
+        "welcome": "나무우듬지가 관 뚜껑처럼 길 위로 닫힌다. 갈로미어의 등불 곁을 떠나지 마라. 숲이 네 이름을 불러도 절대 대답하지 마라.",
+        "pois": {
+          "0": {
+            "label": "갈로미어"
+          },
+          "1": {
+            "label": "까마귀 문"
+          },
+          "2": {
+            "label": "과부의 덤불"
+          },
+          "3": {
+            "label": "교수대 공터"
+          },
+          "4": {
+            "label": "애도석 예배당"
+          },
+          "5": {
+            "label": "사냥꾼의 공터"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "야자 해안",
+        "welcome": "따뜻한 모래, 요란한 새소리, 지평선을 삼키는 정글. 드리프트헤이븐이 해변에 불을 피워 두고 너를 기다린다.",
+        "pois": {
+          "0": {
+            "label": "드리프트헤이븐"
+          },
+          "1": {
+            "label": "덩굴 어귀"
+          },
+          "2": {
+            "label": "야자 백사장"
+          },
+          "3": {
+            "label": "에메랄드 밀림"
+          },
+          "4": {
+            "label": "덩굴폭포 숲"
+          },
+          "5": {
+            "label": "사파이어 석호"
+          },
+          "6": {
+            "label": "가라앉은 신상"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "상록 정원",
+        "welcome": "산울타리는 여전히 다듬어지고 있지만, 정원사를 본 사람은 백 년 동안 없었다. 미로를 조심하라. 미로도 너를 지켜보고 있다.",
+        "pois": {
+          "0": {
+            "label": "헤지윅"
+          },
+          "1": {
+            "label": "정원 문"
+          },
+          "2": {
+            "label": "조각상 산책로"
+          },
+          "3": {
+            "label": "들장미 수풀"
+          },
+          "4": {
+            "label": "꽃잎 연못"
+          },
+          "5": {
+            "label": "대미로"
+          },
+          "6": {
+            "label": "분수 안뜰"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "게일크레스트",
+        "welcome": "이곳의 바람은 단 한 번도 멈춘 적이 없고, 올드 비컨의 불도 단 한 번도 꺼진 적이 없다. 윅하버의 부탁은 하나뿐이다. 여관 문을 꼭 닫아 달라는 것.",
+        "pois": {
+          "0": {
+            "label": "윅하버"
+          },
+          "1": {
+            "label": "바람길"
+          },
+          "2": {
+            "label": "울부짖는 구릉"
+          },
+          "3": {
+            "label": "올드 비컨"
+          },
+          "4": {
+            "label": "절단 절벽"
+          },
+          "5": {
+            "label": "난파선 벌판"
+          },
+          "6": {
+            "label": "거울 호수"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "먼바다 해안",
+        "welcome": "모래톱을 건너면, 마을보다 먼저 걸헤이븐의 종소리가 그대를 맞이할 것이오. 균열은 아무 예고도 없이 찢어지듯 열리고, 이 보루는 그 틈으로 쏟아지는 무엇이든 맞서며 제 해안을 지켜 왔소. 그대 같은 이를 오래도록 기다려 왔다오.",
+        "pois": {
+          "0": {
+            "label": "걸헤이븐"
+          },
+          "1": {
+            "label": "선착장"
+          },
+          "2": {
+            "label": "감시 초원"
+          },
+          "3": {
+            "label": "찢겨진 절벽"
+          },
+          "4": {
+            "label": "균열의 들판"
           }
         }
       }

@@ -10,13 +10,13 @@
     "companionUpgrade rank bump + refreshDelveDaily day rollover"
   ],
   "draws": 3,
-  "drawDigest": "e3485a8b",
+  "drawDigest": "b2888ddc",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 413,
-      "state": "856c5fe4",
+      "nextId": 671,
+      "state": "b7cfe5fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,7 +53,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 412,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -89,7 +89,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 412,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -132,23 +132,23 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 434,
-      "state": "7844cff6",
-      "events": "9ddc17d5",
+      "nextId": 688,
+      "state": "47e9f5bf",
+      "events": "339f4e21",
       "rng": {
         "draws": 1,
-        "digest": "5eb1ea5d"
+        "digest": "58e5301b"
       }
     },
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 434,
-      "state": "d01779dc",
+      "nextId": 688,
+      "state": "df2caaa1",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "e3485a8b"
+        "digest": "b2888ddc"
       },
       "label": "advanced-to-finale",
       "players": [
@@ -191,7 +191,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 412,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -228,7 +228,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 50000,
-          "id": 412,
+          "id": 670,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -239,7 +239,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1127
           },
           "potionCooldownUntil": -1,
@@ -270,12 +270,12 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 434,
-      "state": "498dfff8",
-      "events": "de742329",
+      "nextId": 688,
+      "state": "d57bab03",
+      "events": "a443d481",
       "rng": {
         "draws": 3,
-        "digest": "e3485a8b"
+        "digest": "b2888ddc"
       },
       "label": "shop-daily",
       "players": [
@@ -325,7 +325,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 412,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -363,7 +363,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 338,
-          "id": 412,
+          "id": 670,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -374,7 +374,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1127
           },
           "potionCooldownUntil": -1,
@@ -405,12 +405,12 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 434,
-      "state": "c90a6176",
+      "nextId": 688,
+      "state": "8e3889bd",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "e3485a8b"
+        "digest": "b2888ddc"
       },
       "label": "final",
       "players": [
@@ -460,7 +460,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 412,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -498,7 +498,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.45,
           "hp": 338,
-          "id": 412,
+          "id": 670,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -509,7 +509,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1127
           },
           "potionCooldownUntil": -1,

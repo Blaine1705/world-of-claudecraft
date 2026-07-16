@@ -18,6 +18,7 @@ import {
   critFractionFromRating,
   EQUIP_SLOTS,
   hasteFractionFromRating,
+  hitFractionFromRating,
   SPELL_POWER_PER_INT,
 } from './types';
 
@@ -38,6 +39,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     onGround: true,
     jumping: false,
     fallStartY: pos.y,
+    fatigueTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
@@ -68,6 +70,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
+    hitRating: 0,
+    hitBonus: 0,
     critDmgSpellBonus: 0,
     critDmgPhysBonus: 0,
     critDmgHealBonus: 0,
@@ -197,6 +201,7 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
 }
 
 export type PlayerEquipment = Partial<Record<EquipSlot, string>>;
+export type PlayerEquipmentInstances = Partial<Record<EquipSlot, ItemInstancePayload>>;
 
 // Classic-era rules: first 20 stamina gives 1 hp each, the rest 10 hp each.
 // First 20 intellect gives 1 mana each, the rest 15 mana each.
@@ -221,7 +226,7 @@ export function recalcPlayerStats(
   cls: PlayerClass,
   equipment: PlayerEquipment,
   mods: TalentModifiers | undefined,
-  equipmentInstance: Partial<Record<EquipSlot, ItemInstancePayload>>,
+  equipmentInstance: PlayerEquipmentInstances,
 ): void {
   const def = CLASSES[cls];
   const lvl = e.level;
@@ -239,6 +244,7 @@ export function recalcPlayerStats(
   let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
   let bonusCritRating = 0;
   let bonusHasteRating = 0;
+  let bonusHitRating = 0;
   let bonusPvpOffenseRating = 0;
   let bonusPvpDefenseRating = 0;
   for (const slot of EQUIP_SLOTS) {
@@ -256,6 +262,7 @@ export function recalcPlayerStats(
     bonusSp += item.spellPower ?? 0;
     bonusCritRating += item.critRating ?? 0;
     bonusHasteRating += item.hasteRating ?? 0;
+    bonusHitRating += item.hitRating ?? 0;
     bonusPvpOffenseRating += item.pvpOffenseRating ?? 0;
     bonusPvpDefenseRating += item.pvpDefenseRating ?? 0;
     if (item.stats) {
@@ -266,18 +273,22 @@ export function recalcPlayerStats(
       s.spi += item.stats.spi ?? 0;
       s.armor += item.stats.armor ?? 0;
     }
-    // Enchant bonus (Enchanting profession): additive on top of the item's own
-    // base stats, from this specific instance's rolled.stats (see
-    // src/sim/professions/enchanting.ts applyEnchant). A plain, unenchanted
-    // piece has no entry here, so this is a no-op for the common case.
-    const enchantStats = equipmentInstance?.[slot]?.rolled?.stats;
-    if (enchantStats) {
-      s.str += enchantStats.str ?? 0;
-      s.agi += enchantStats.agi ?? 0;
-      s.sta += enchantStats.sta ?? 0;
-      s.int += enchantStats.int ?? 0;
-      s.spi += enchantStats.spi ?? 0;
-      s.armor += enchantStats.armor ?? 0;
+    // Instance bonus, additive on top of the item's own base stats, from this
+    // specific instance's rolled.stats: an enchanted piece (Enchanting,
+    // src/sim/professions/enchanting.ts applyEnchant) or a rift-forged upgrade
+    // (the rift payload keeps rolled.stats as its authoritative aggregate).
+    // A plain piece has no entry here, so this is a no-op for the common case.
+    const rolled = equipmentInstance?.[slot]?.rolled?.stats;
+    if (rolled) {
+      s.str += Number.isFinite(rolled.str) ? rolled.str : 0;
+      s.agi += Number.isFinite(rolled.agi) ? rolled.agi : 0;
+      s.sta += Number.isFinite(rolled.sta) ? rolled.sta : 0;
+      s.int += Number.isFinite(rolled.int) ? rolled.int : 0;
+      s.spi += Number.isFinite(rolled.spi) ? rolled.spi : 0;
+      s.armor += Number.isFinite(rolled.armor) ? rolled.armor : 0;
+      bonusSp += Number.isFinite(rolled.spellPower) ? rolled.spellPower : 0;
+      bonusCritRating += Number.isFinite(rolled.critRating) ? rolled.critRating : 0;
+      bonusHasteRating += Number.isFinite(rolled.hasteRating) ? rolled.hasteRating : 0;
     }
   }
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear
@@ -475,6 +486,11 @@ export function recalcPlayerStats(
   e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
   e.critRating = bonusCritRating + setEff.critRating;
   e.hasteRating = bonusHasteRating + setEff.hasteRating;
+  // Hit rating (gear + set bonuses) folds into a hit fraction that combat subtracts
+  // from miss (swingMissChance) and spell resist (spell_resist.ts). It answers the
+  // Heroic +3 above-level penalty; unlike crit it has no higher-level suppression.
+  e.hitRating = bonusHitRating + setEff.hitRating;
+  e.hitBonus = hitFractionFromRating(e.hitRating);
   const hasteFrac = setEff.haste + hasteFractionFromRating(e.hasteRating);
   // Haste drives all three channels: faster melee and ranged auto-attack swings
   // AND shorter spell casts/channels.

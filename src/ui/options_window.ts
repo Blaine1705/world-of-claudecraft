@@ -40,10 +40,10 @@ import {
 } from '../game/settings';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
-import type { ChatClock } from './chat_timestamp';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import type { BugReportHooks, OptionsHooks } from './hud';
+import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
   formatNumber,
   getLanguage,
@@ -186,7 +186,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
 export interface OptionsWindowDeps {
   /** The #options-menu root (Hud owns the id; the painter stays instance-parameterized). */
   root(): HTMLElement;
-  /** The live world (offline Sim or online ClientWorld mirror); read only for the bug-report info. */
+  /** The live world (offline Sim or online ClientWorld mirror); reads bug-report info and dispatches recovery. */
   world(): IWorld;
   /** The options seam main.ts wires after Input exists (null until attached). */
   options(): OptionsHooks | null;
@@ -467,6 +467,9 @@ export class OptionsWindow {
           this.render();
         } else if (a.kind === 'logout') {
           this.deps.options()?.logout();
+        } else if (a.kind === 'unstuck') {
+          this.deps.world().unstuck();
+          this.close();
         } else {
           this.close();
         }

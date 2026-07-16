@@ -11,7 +11,10 @@ import {
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isRiftPos,
   isYumiMazePos,
+  RIFT_REGION_HALF_X,
+  RIFT_REGION_HALF_Z,
   yumiMazeOriginAt,
 } from './data';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
@@ -24,9 +27,16 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
-import type { WorldContent } from './types';
+import type { BuildingDef, WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
-import { generateDecorations, groundHeight } from './world';
+import {
+  crossesGardenHedge,
+  crossesSealedBorder,
+  type Decoration,
+  generateDecorationsInBounds,
+  groundHeight,
+  reachPalmSpots,
+} from './world';
 import { yumiMazeColliders } from './yumi_maze_layout';
 
 // Static world collision. Prop placement comes from the per-zone content
@@ -85,6 +95,17 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
 // Collider sets
 // ---------------------------------------------------------------------------
 
+// Per-kind building heights: the camera-collider top AND the renderer's roof
+// line (render/props.ts imports this so the two can never drift apart).
+export const BUILDING_COLLIDER_HEIGHTS: Partial<Record<BuildingDef['kind'], number>> = {
+  chapel: 10.8,
+  inn: 7.8,
+  hollowInn: 8.5,
+  hollowChapel: 10.5,
+  hollowSmith: 6.2,
+  hollowMarket: 5.2,
+};
+
 function staticWorldColliders(seed: number): Collider[] {
   const out: Collider[] = [];
   const content = getActiveWorldContent();
@@ -94,7 +115,7 @@ function staticWorldColliders(seed: number): Collider[] {
   // chase cam no longer pulls in for them; the renderer hides whichever one
   // crosses the eye-to-camera segment instead.
   for (const b of PROPS.buildings) {
-    const height = b.kind === 'chapel' ? 10.8 : b.kind === 'inn' ? 7.8 : 8.0;
+    const height = BUILDING_COLLIDER_HEIGHTS[b.kind] ?? 8.0;
     out.push({
       type: 'obb',
       x: b.x,
@@ -115,6 +136,28 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, w.x, w.z, 3.7),
       camGhost: true,
     });
+  for (const t of PROPS.greatTrees ?? [])
+    out.push({
+      type: 'circle',
+      x: t.x,
+      z: t.z,
+      r: t.r,
+      cameraTopY: topY(seed, t.x, t.z, 7),
+      camGhost: true,
+    });
+  // The Palmreach strand: a slim trunk collider at the base of every beach
+  // palm, from the same deterministic list the renderer instances the models
+  // from (world.ts). camGhost so the chase cam passes through instead of
+  // slamming in when a palm crosses the eye line.
+  for (const p of reachPalmSpots(seed))
+    out.push({
+      type: 'circle',
+      x: p.x,
+      z: p.z,
+      r: p.r,
+      cameraTopY: topY(seed, p.x, p.z, 7),
+      camGhost: true,
+    });
   for (const s of PROPS.stalls)
     out.push({
       type: 'circle',
@@ -125,6 +168,20 @@ function staticWorldColliders(seed: number): Collider[] {
       camGhost: true,
     });
 
+  // hand-placed GLB decor: circle collider matched to the model footprint;
+  // r 0/absent entries are walk-through dressing and add no collider
+  for (const d of PROPS.decorProps ?? []) {
+    if (!d.r) continue;
+    out.push({
+      type: 'circle',
+      x: d.x,
+      z: d.z,
+      r: d.r,
+      cameraTopY: topY(seed, d.x, d.z, d.h ?? 4),
+      camGhost: true,
+    });
+  }
+
   // mines: mound behind the timber portal
   for (const m of PROPS.mines) {
     const mound = rotY(0, -3.4, m.rot);
@@ -133,8 +190,9 @@ function staticWorldColliders(seed: number): Collider[] {
     out.push({ type: 'circle', x, z, r: 5, cameraTopY: topY(seed, x, z, 5.2), camGhost: true });
   }
 
-  // Dock decks are raised walkable ground in world.ts; only the hut blocks.
+  // Dock decks are raised walkable ground in world.ts; only a non-empty hut blocks.
   for (const d of PROPS.docks) {
+    if (d.hutLocal.hw <= 0 || d.hutLocal.hd <= 0) continue;
     const hut = rotY(d.hutLocal.x, d.hutLocal.z, d.rot);
     const x = d.x + hut.x,
       z = d.z + hut.z;
@@ -211,31 +269,6 @@ function staticWorldColliders(seed: number): Collider[] {
       isFence: true,
     });
   }
-
-  // trees & large rocks from the deterministic decoration field
-  for (const d of generateDecorations(seed)) {
-    if (d.kind === 'rock') {
-      if (d.scale >= 0.8)
-        out.push({
-          type: 'circle',
-          x: d.x,
-          z: d.z,
-          r: 0.7 * d.scale,
-          cameraTopY: topY(seed, d.x, d.z, 1.25 * d.scale),
-        });
-    } else {
-      // tree trunks only — canopies don't block
-      out.push({
-        type: 'circle',
-        x: d.x,
-        z: d.z,
-        r: 0.55 * d.scale,
-        cameraTopY: topY(seed, d.x, d.z, 7.5 * d.scale),
-        camGhost: true,
-      });
-    }
-  }
-
   // Editor-placed assets with a collide footprint (custom maps only; the
   // built-in world has no placements). The ONE placement record drives both the
   // renderer and this collider, so what you see is what you collide with.
@@ -329,6 +362,12 @@ const FENCE_RAIL_HEIGHT = 0.95;
 
 interface ColliderGrid {
   cells: Map<string, Collider[]>;
+  // The authored prop grid above is cheap and eager. The multi-realm
+  // decoration field is generated one queried cell at a time, then combined
+  // with that authored list. This keeps collision identical without making a
+  // cold Sim enumerate the whole continent before its first spawn.
+  decorationCells: Map<string, Collider[]>;
+  combinedCells: Map<string, Collider[]>;
 }
 
 // Grids are cached per (active world content, seed). The WeakMap keeps the
@@ -359,7 +398,7 @@ function gridFor(seed: number): ColliderGrid {
   }
   let grid = perContent.get(seed);
   if (grid) return grid;
-  grid = { cells: new Map() };
+  grid = { cells: new Map(), decorationCells: new Map(), combinedCells: new Map() };
   for (const c of staticWorldColliders(seed)) {
     const b = colliderBounds(c);
     const x0 = Math.floor((b.minX - MAX_BODY_RADIUS) / GRID_CELL);
@@ -377,6 +416,74 @@ function gridFor(seed: number): ColliderGrid {
   }
   perContent.set(seed, grid);
   return grid;
+}
+
+// Decoration scale is `0.7 + hash * 0.9` (world.ts), and rocks have the
+// largest collision multiplier at 0.7. This conservative bound selects every
+// candidate whose circle could be assigned to a queried grid cell.
+const MAX_DECORATION_COLLIDER_RADIUS = 1.6 * 0.7;
+
+function decorationCollider(seed: number, d: Decoration): Collider | null {
+  if (d.kind === 'rock') {
+    if (d.scale < 0.8) return null;
+    return {
+      type: 'circle',
+      x: d.x,
+      z: d.z,
+      r: 0.7 * d.scale,
+      cameraTopY: topY(seed, d.x, d.z, 1.25 * d.scale),
+    };
+  }
+  // tree trunks only; canopies don't block
+  return {
+    type: 'circle',
+    x: d.x,
+    z: d.z,
+    r: 0.55 * d.scale,
+    cameraTopY: topY(seed, d.x, d.z, 7.5 * d.scale),
+    camGhost: true,
+  };
+}
+
+function collidersInCell(grid: ColliderGrid, seed: number, gx: number, gz: number): Collider[] {
+  const key = `${gx},${gz}`;
+  const cached = grid.combinedCells.get(key);
+  if (cached) return cached;
+
+  let decorations = grid.decorationCells.get(key);
+  if (!decorations) {
+    decorations = [];
+    const minX = gx * GRID_CELL;
+    const maxX = (gx + 1) * GRID_CELL;
+    const minZ = gz * GRID_CELL;
+    const maxZ = (gz + 1) * GRID_CELL;
+    const pad = MAX_BODY_RADIUS + MAX_DECORATION_COLLIDER_RADIUS;
+    for (const decoration of generateDecorationsInBounds(seed, {
+      minX: minX - pad,
+      maxX: maxX + pad,
+      minZ: minZ - pad,
+      maxZ: maxZ + pad,
+    })) {
+      const collider = decorationCollider(seed, decoration);
+      if (!collider) continue;
+      const bounds = colliderBounds(collider);
+      const x0 = Math.floor((bounds.minX - MAX_BODY_RADIUS) / GRID_CELL);
+      const x1 = Math.floor((bounds.maxX + MAX_BODY_RADIUS) / GRID_CELL);
+      const z0 = Math.floor((bounds.minZ - MAX_BODY_RADIUS) / GRID_CELL);
+      const z1 = Math.floor((bounds.maxZ + MAX_BODY_RADIUS) / GRID_CELL);
+      if (gx >= x0 && gx <= x1 && gz >= z0 && gz <= z1) decorations.push(collider);
+    }
+    grid.decorationCells.set(key, decorations);
+  }
+
+  const authored = grid.cells.get(key);
+  const combined = authored?.length
+    ? decorations.length
+      ? [...authored, ...decorations]
+      : authored
+    : decorations;
+  grid.combinedCells.set(key, combined);
+  return combined;
 }
 
 // Push (x,z) out of one collider. Returns the corrected point, or null if clear.
@@ -431,6 +538,57 @@ function resolveAgainst(
   return { x: px, z: pz };
 }
 
+// ---------------------------------------------------------------------------
+// Procedural Rift regions. A rift floor's collision comes from its GENERATED
+// DungeonLayout, so it cannot be a static INTERIOR_COLLIDERS entry. rift/runs.ts
+// publishes the active floor's instance-local collider set here on spawn/descent
+// and clears it on free; every region-aware collision function below reads it, so
+// movement, mob pathing, line-of-sight and camera occlusion all respect the
+// generated geometry uniformly. Keyed by a per-Sim COLLISION TOKEN (allocated
+// once per world via allocRiftCollisionToken, NOT the world seed: two Sims in
+// one process can share a seed) plus the instance origin, so concurrent rifts
+// and multiple Sims stay isolated. Token 0 means "no rift regions".
+interface RiftRegion {
+  ox: number;
+  oz: number;
+  colliders: Collider[];
+}
+const RIFT_REGIONS = new Map<number, RiftRegion[]>();
+let NEXT_RIFT_TOKEN = 1;
+
+export function allocRiftCollisionToken(): number {
+  return NEXT_RIFT_TOKEN++;
+}
+
+export function setRiftRegion(token: number, ox: number, oz: number, colliders: Collider[]): void {
+  let list = RIFT_REGIONS.get(token);
+  if (!list) {
+    list = [];
+    RIFT_REGIONS.set(token, list);
+  }
+  const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
+  if (i >= 0) list[i] = { ox, oz, colliders };
+  else list.push({ ox, oz, colliders });
+}
+
+export function clearRiftRegion(token: number, ox: number, oz: number): void {
+  const list = RIFT_REGIONS.get(token);
+  if (!list) return;
+  const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
+  if (i >= 0) list.splice(i, 1);
+}
+
+function riftRegionAt(token: number, x: number, z: number): RiftRegion | null {
+  const list = RIFT_REGIONS.get(token);
+  if (!list) return null;
+  for (const r of list) {
+    if (Math.abs(x - r.ox) <= RIFT_REGION_HALF_X && Math.abs(z - r.oz) <= RIFT_REGION_HALF_Z) {
+      return r;
+    }
+  }
+  return null;
+}
+
 function instanceLocal(x: number, z: number): { ox: number; oz: number; interior: string } {
   const dungeon = dungeonAt(x);
   const index = dungeon?.index ?? 0;
@@ -457,6 +615,7 @@ export function resolvePosition(
   r = 0.5,
   ignoreFences = false,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): { x: number; z: number } {
   if (isYumiMazePos(x)) {
     const o = yumiMazeOriginAt(z);
@@ -476,6 +635,12 @@ export function resolvePosition(
     const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
     return { x: local.x + o.x, z: local.z + o.z };
   }
+  if (isRiftPos(x)) {
+    const region = riftRegionAt(riftToken, x, z);
+    if (!region) return { x, z };
+    const local = resolveAgainst(region.colliders, x - region.ox, z - region.oz, r, ignoreFences);
+    return { x: local.x + region.ox, z: local.z + region.oz };
+  }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);
     const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
@@ -483,9 +648,8 @@ export function resolvePosition(
     return { x: local.x + ox, z: local.z + oz };
   }
   const grid = gridFor(seed);
-  const key = `${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`;
-  const list = grid.cells.get(key);
-  if (!list) return { x, z };
+  const list = collidersInCell(grid, seed, Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
+  if (list.length === 0) return { x, z };
   return resolveAgainst(list, x, z, r, ignoreFences);
 }
 
@@ -540,20 +704,38 @@ export function resolveMovement(
   r = 0.5,
   ignoreFences = false,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): { x: number; z: number } {
   const dx = toX - fromX;
   const dz = toZ - fromZ;
   const d = Math.hypot(dx, dz);
-  if (d < 1e-6) return resolvePosition(seed, toX, toZ, r, ignoreFences, delveModules);
+  if (d < 1e-6) return resolvePosition(seed, toX, toZ, r, ignoreFences, delveModules, riftToken);
   const steps = Math.max(1, Math.ceil(d / 0.2));
   let x = fromX,
     z = fromZ;
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
-    const nextX = fromX + dx * t;
-    const nextZ = fromZ + dz * t;
+    let nextX = fromX + dx * t;
+    // A sealed zone border is a hard wall regardless of terrain slope (the
+    // climb gate projects rise along the movement direction, so a shallow
+    // diagonal would otherwise sneak over the crest). Clamp z at the crest
+    // and keep the x component, so pushing into the wall slides along it.
+    let nextZ = crossesSealedBorder(x, z, fromZ + dz * t) ? z : fromZ + dz * t;
+    // The Great Maze's hedges are hard walls for the same reason, tested as
+    // a segment crossing (an endpoint-only test teleports a stalled mover
+    // across once its target passes the wall). The faces are axis-aligned,
+    // so slide by dropping whichever axis component pushes into the hedge.
+    if (crossesGardenHedge(x, z, nextX, nextZ)) {
+      if (!crossesGardenHedge(x, z, x, nextZ)) nextX = x;
+      else if (!crossesGardenHedge(x, z, nextX, z)) nextZ = z;
+      else break; // cornered against the hedge
+    }
     if (!ignoreFences && crossesFence(x, z, nextX, nextZ, r)) break;
-    const resolved = resolvePosition(seed, nextX, nextZ, r, ignoreFences, delveModules);
+    const resolved = resolvePosition(seed, nextX, nextZ, r, ignoreFences, delveModules, riftToken);
+    // ...and a static-collider slide (a tree hugging the crest) must not
+    // shove the resolved position across it either
+    if (crossesSealedBorder(x, z, resolved.z)) break;
+    if (crossesGardenHedge(x, z, resolved.x, resolved.z)) break;
     x = resolved.x;
     z = resolved.z;
     if (Math.hypot(x - nextX, z - nextZ) > r * 0.25) {
@@ -574,8 +756,9 @@ export function isBlocked(
   r = 0.5,
   ignoreFences = false,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): boolean {
-  const res = resolvePosition(seed, x, z, r, ignoreFences, delveModules);
+  const res = resolvePosition(seed, x, z, r, ignoreFences, delveModules, riftToken);
   return Math.abs(res.x - x) > 1e-4 || Math.abs(res.z - z) > 1e-4;
 }
 
@@ -719,6 +902,7 @@ export function cameraOcclusion(
   bz: number,
   pad = 0.35,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): number {
   if (isYumiMazePos(ax)) {
     const o = yumiMazeOriginAt(az);
@@ -765,6 +949,21 @@ export function cameraOcclusion(
       true,
     );
   }
+  if (isRiftPos(ax)) {
+    const region = riftRegionAt(riftToken, ax, az);
+    if (!region) return 1;
+    return sweepColliders(
+      region.colliders,
+      ax - region.ox,
+      ay,
+      az - region.oz,
+      bx - region.ox,
+      by,
+      bz - region.oz,
+      pad,
+      true,
+    );
+  }
   if (ax > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(ax, az);
     const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
@@ -778,8 +977,9 @@ export function cameraOcclusion(
   let best = 1;
   for (let gx = gx0; gx <= gx1; gx++) {
     for (let gz = gz0; gz <= gz1; gz++) {
-      const list = grid.cells.get(`${gx},${gz}`);
-      if (list) best = Math.min(best, sweepColliders(list, ax, ay, az, bx, by, bz, pad, false));
+      const list = collidersInCell(grid, seed, gx, gz);
+      if (list.length > 0)
+        best = Math.min(best, sweepColliders(list, ax, ay, az, bx, by, bz, pad, false));
     }
   }
   return best;
@@ -798,7 +998,14 @@ export const SIGHT_HEIGHT = 1.6;
 // sight line at that sample)? Mirrors resolvePosition's zone routing so
 // interiors, delves and the arena keep their wall sets, but tests pure overlap
 // (no push-out) and applies the low-obstacle skip only where tops are known.
-function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: number): boolean {
+function sightBlockedAt(
+  seed: number,
+  x: number,
+  z: number,
+  r: number,
+  sightY: number,
+  riftToken = 0,
+): boolean {
   const overlapsAny = (list: Collider[], lx: number, lz: number, skipLow: boolean): boolean => {
     for (const c of list) {
       if (skipLow && c.cameraTopY !== undefined && c.cameraTopY <= sightY) continue;
@@ -825,13 +1032,17 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
     const o = arenaOriginAt(z);
     return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
   }
+  if (isRiftPos(x)) {
+    const region = riftRegionAt(riftToken, x, z);
+    return region ? overlapsAny(region.colliders, x - region.ox, z - region.oz, false) : false;
+  }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);
     return overlapsAny(INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS, x - ox, z - oz, false);
   }
   const grid = gridFor(seed);
-  const list = grid.cells.get(`${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`);
-  return list ? overlapsAny(list, x, z, true) : false;
+  const list = collidersInCell(grid, seed, Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
+  return list.length > 0 ? overlapsAny(list, x, z, true) : false;
 }
 
 export function lineOfSightClear(
@@ -840,6 +1051,7 @@ export function lineOfSightClear(
   to: { x: number; z: number },
   r = 0.05,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): boolean {
   const dx = to.x - from.x;
   const dz = to.z - from.z;
@@ -872,7 +1084,7 @@ export function lineOfSightClear(
     const t = i / steps;
     const x = from.x + dx * t;
     const z = from.z + dz * t;
-    if (sightBlockedAt(seed, x, z, r, eyeFrom + (eyeTo - eyeFrom) * t)) return false;
+    if (sightBlockedAt(seed, x, z, r, eyeFrom + (eyeTo - eyeFrom) * t, riftToken)) return false;
   }
   return true;
 }

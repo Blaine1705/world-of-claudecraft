@@ -23,8 +23,8 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; never trust stale prose).
-const EXPECTED_SEND_COUNT = 152; // release/v0.26.0 plus the five mount commands
-const EXPECTED_DISPATCH_COUNT = 163; // release/v0.26.0 plus the seven mount dispatch commands
+const EXPECTED_SEND_COUNT = 157;
+const EXPECTED_DISPATCH_COUNT = 168;
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch
@@ -108,6 +108,11 @@ describe('command schema parity (W0b)', () => {
     // handshake) but is dispatched server-side, so it must count.
     expect(sendSet.has('challengeResponse')).toBe(true);
     expect(dispatchSet.has('challengeResponse')).toBe(true);
+  });
+
+  it('pins unstuck in both the client send-set and authoritative dispatch-set', () => {
+    expect(sendSet.has('unstuck')).toBe(true);
+    expect(dispatchSet.has('unstuck')).toBe(true);
   });
 
   it('every ClientWorld send has a matching server dispatch case (send-set is a subset)', () => {

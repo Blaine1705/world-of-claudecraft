@@ -20,6 +20,154 @@ export const nl_NL: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Centrum voor ontwikkelaarsopdrachten",
+    "kicker": "Ontwikkelaarshulpmiddelen",
+    "title": "Opdrachtencentrum",
+    "subtitle": "Autoritatieve testbesturing voor de actieve wereld.",
+    "closeAria": "Ontwikkelaarsopdrachten sluiten",
+    "categoryNavAria": "Categorieën met ontwikkelaarsopdrachten",
+    "categories": {
+      "player": "Speler",
+      "spawns": "Spawns",
+      "inventory": "Inventaris",
+      "progress": "Voortgang",
+      "travel": "Reizen",
+      "scenarios": "Scenario's"
+    },
+    "filterLabel": "Opdrachten filteren",
+    "filterPlaceholder": "Deze categorie doorzoeken",
+    "noMatches": "Geen overeenkomende opdrachten.",
+    "serverRequirement": "Servercheats vereisen nog steeds ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Kies geldige waarden voordat je deze opdracht uitvoert.",
+    "sent": "Verzonden: {command}",
+    "run": "Uitvoeren",
+    "fields": {
+      "level": "Niveau",
+      "mob": "Mob",
+      "count": "Aantal",
+      "item": "Voorwerp",
+      "gold": "Goud",
+      "quest": "Missie",
+      "profession": "Beroep",
+      "amount": "Hoeveelheid",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Kerker",
+      "difficulty": "Moeilijkheidsgraad",
+      "name": "Naam"
+    },
+    "difficulty": {
+      "normal": "Normaal",
+      "heroic": "Heroïsch"
+    },
+    "actions": {
+      "heal": {
+        "label": "Gezondheid herstellen",
+        "description": "Vul de gezondheid volledig aan."
+      },
+      "resource": {
+        "label": "Hulpbron herstellen",
+        "description": "Vul mana, woede of energie aan."
+      },
+      "cooldowns": {
+        "label": "Afkoeltijden wissen",
+        "description": "Reset timers voor vaardigheden, GCD en drankjes."
+      },
+      "god": {
+        "label": "Godmodus omschakelen",
+        "description": "Schakel onkwetsbaarheid en verhoogde schade in of uit."
+      },
+      "revive": {
+        "label": "Tot leven wekken",
+        "description": "Breng de speler tot leven via het normale herrijzenisproces."
+      },
+      "kill": {
+        "label": "Speler doden",
+        "description": "Test de processen voor dood, geest en lijk."
+      },
+      "combatreset": {
+        "label": "Gevecht resetten",
+        "description": "Wis de gevechtsstatus en vijandelijke dreiging."
+      },
+      "level": {
+        "label": "Niveau instellen",
+        "description": "Stel het huidige personageniveau in."
+      },
+      "spawn": {
+        "label": "Mob spawnen",
+        "description": "Maak een specifieke mob aan in de buurt van de speler."
+      },
+      "killtarget": {
+        "label": "Doel doden",
+        "description": "Dood de geselecteerde levende mob."
+      },
+      "despawntarget": {
+        "label": "Doel despawnen",
+        "description": "Verwijder een geselecteerde mob die met dit hulpmiddel is gemaakt."
+      },
+      "despawnall": {
+        "label": "Mijn spawns wissen",
+        "description": "Verwijder elke mob die door deze ontwikkelaar is gespawnd."
+      },
+      "give": {
+        "label": "Voorwerp geven",
+        "description": "Voeg een voorwerp toe aan de inventaris van de speler."
+      },
+      "gold": {
+        "label": "Goud toevoegen",
+        "description": "Voeg goud toe aan de huidige beurs."
+      },
+      "quest": {
+        "label": "Missie voltooien",
+        "description": "Voltooi een specifieke missie op ID."
+      },
+      "quests": {
+        "label": "Actieve missies voltooien",
+        "description": "Voltooi elke missie in het huidige logboek."
+      },
+      "attune": {
+        "label": "Afstemmingen ontgrendelen",
+        "description": "Markeer alle afstemmingsvereisten als voltooid."
+      },
+      "gather": {
+        "label": "Verzamelvaardigheid verhogen",
+        "description": "Verhoog de vaardigheid van een verzamelberoep."
+      },
+      "teleport": {
+        "label": "Teleporteren",
+        "description": "Ga naar exacte coördinaten in de wereld."
+      },
+      "dungeon": {
+        "label": "Kerker binnengaan",
+        "description": "Ga een kerker binnen zonder de ontwikkelaarsvergrendeling."
+      },
+      "raid": {
+        "label": "Raid binnengaan",
+        "description": "Ga rechtstreeks de Nythraxis-arena binnen."
+      },
+      "raidreset": {
+        "label": "Raidvergrendeling resetten",
+        "description": "Wis de huidige raidvergrendelingen."
+      },
+      "bot": {
+        "label": "Sociale bot spawnen",
+        "description": "Maak een stilstaande speler die fluisterberichten kan ontvangen."
+      },
+      "lfgqueue": {
+        "label": "Zoekerwachtrij vullen",
+        "description": "Maak een scenario voor de wachtrij van de kerkerzoeker."
+      },
+      "lfgraid": {
+        "label": "Raidzoeker vullen",
+        "description": "Maak een scenario voor de raidzoeker."
+      },
+      "lfgboard": {
+        "label": "Advertentiebord vullen",
+        "description": "Maak een scenario met een vooraf samengestelde groepsadvertentie."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -167,6 +315,32 @@ export const nl_NL: EnTranslations = {
       "resurrectAtHealer": "De Bleke Hoeder (Tol van de Hoeder)",
       "spiritHealerAlive": "De Bleke Hoeder waakt over de doden. Jij bent nog onder de levenden."
     },
+    "unstuck": {
+      "menuButton": "Unstuck",
+      "help": "Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.",
+      "helpAtGraveyard": "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
+      "started": "Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.",
+      "countdown": "Unstuck: {seconds}",
+      "completed": "Moved to the nearest reachable safe spot.",
+      "completedAtGraveyard": "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
+      "cancelledMoved": "Unstuck cancelled because you moved.",
+      "cancelledDamaged": "Unstuck cancelled because you took damage.",
+      "cancelledCombat": "Unstuck cancelled because you entered combat.",
+      "cancelledBusy": "Unstuck cancelled because you started another action.",
+      "cancelledState": "Unstuck cancelled because your state changed.",
+      "cancelledDisconnected": "Unstuck cancelled because you disconnected.",
+      "noSafePosition": "No reachable safe spot was found nearby. You were not moved.",
+      "alreadyActive": "Unstuck is already counting down.",
+      "alreadySafe": "You are already in a safe, reachable position.",
+      "cooldown": "Unstuck will be ready in {seconds} seconds.",
+      "dead": "You cannot use Unstuck while dead or in spirit form.",
+      "combat": "You cannot use Unstuck during combat.",
+      "controlled": "You cannot use Unstuck while movement is impaired.",
+      "standStill": "Stand still on solid ground before using Unstuck.",
+      "standStillAnywhere": "Stand still before using Unstuck.",
+      "busy": "Finish your current action before using Unstuck.",
+      "unavailable": "Unstuck is unavailable in your current state."
+    },
     "emotes": {
       "wave": "Zwaaien",
       "laugh": "LOL",
@@ -203,6 +377,7 @@ export const nl_NL: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} u {minutes} min",
+      "remainingDaysHours": "{days} d {hours} u",
       "score": "Score",
       "walletValue": "Portemonneewaarde (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +416,8 @@ export const nl_NL: EnTranslations = {
         "no_wallet": "Verbind een portemonnee met minstens $20 USD aan WOC.",
         "under_minimum": "Portemonnee ligt onder het WOC-minimum van $20 USD.",
         "price_unavailable": "WOC-prijs is niet beschikbaar, beloningen zijn tijdelijk vergrendeld.",
-        "banned": "Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}"
+        "banned": "Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}",
+        "bannedUntil": "Je bent nog {remaining} uitgesloten van dagelijkse beloningen. De toegang wordt hersteld op {until}. Reden: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +642,7 @@ export const nl_NL: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "De Claudium-winkel is momenteel niet beschikbaar. Je saldo en aankopen zijn niet aangetast. Probeer het binnenkort opnieuw.",
       "disclosure": "Claudium is een virtuele valuta die maar één kant op gaat: koop het met geld en besteed het aan cosmetica. Het kan niet worden ingewisseld, overgedragen of uitbetaald.",
@@ -473,6 +650,7 @@ export const nl_NL: EnTranslations = {
       "railLabel": "Betaalmethode",
       "railStripe": "Kaart",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% korting",
       "railWocUnavailable": "WOC-prijzen zijn momenteel niet beschikbaar.",
@@ -619,13 +797,13 @@ export const nl_NL: EnTranslations = {
       "update": "Bijwerken"
     },
     "cameraPrompt": {
-      "title": "Choose Your Camera",
-      "intro": "Pick how the camera follows your character.",
-      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
-      "classicTitle": "Classic Camera",
-      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
-      "changeLater": "You can change this later under Esc, Key Bindings.",
-      "confirm": "Confirm"
+      "title": "Kies je Camera",
+      "intro": "Kies hoe de camera je personage volgt.",
+      "mouseDesc": "Beweeg de muis om de camera te draaien zonder een knop ingedrukt te houden.",
+      "classicTitle": "Klassieke Camera",
+      "classicDesc": "Houd rechts klikken ingedrukt en beweeg de muis om de camera te draaien.",
+      "changeLater": "Je kunt dit later wijzigen via Esc, Sneltoetsen.",
+      "confirm": "Bevestigen"
     },
     "castBar": {
       "playerAria": "Jouw Spreukbalk",
@@ -673,11 +851,11 @@ export const nl_NL: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+      "autoShowHint": "Rijen verschijnen automatisch zodra je groep schade aanricht of geneest, en dit segment sluit een paar seconden na het einde van het gevecht."
     },
     "petFeed": {
-      "disabledFullHp": "Pet is at full health",
-      "disabledNoFood": "No food in your bags will heal your pet"
+      "disabledFullHp": "Huisdier heeft volledige gezondheid",
+      "disabledNoFood": "Geen voedsel in je tassen dat je huisdier kan genezen"
     },
     "keybinds": {
       "emoteWheel": "Emotewiel",
@@ -685,7 +863,7 @@ export const nl_NL: EnTranslations = {
       "targetFriendlyNext": "Door Bondgenoten Bladeren",
       "discord": "Discord",
       "valecup": "Dalbeker",
-      "sheathe": "Sheathe/Unsheathe Weapon",
+      "sheathe": "Wapen Schede In/Uit",
       "categoryPet": "Huisdier",
       "petAttack": "Huisdier: Aanvallen",
       "petStop": "Huisdier: Stoppen",
@@ -901,6 +1079,7 @@ export const nl_NL: EnTranslations = {
       "interfaceModeTouch": "Aanraking",
       "interfaceModeNote": "Automatisch kiest desktop- of aanraakbesturing op basis van je apparaat. Kies Desktop om toetsenbord en muis af te dwingen (handig op een tablet met toetsenbord), of Aanraking voor de besturing op het scherm.",
       "footstepSounds": "Voetstapgeluiden",
+      "interfaceSounds": "Interface- en feedbackgeluiden",
       "clickFeedback": "Klikmarkering",
       "lockCursorOnRotate": "Aanwijzer vergrendelen tijdens draaien",
       "keybindHelpLockCursorOnRotate": "Houdt de muisaanwijzer binnen het venster terwijl je sleept om de camera te draaien, zodat deze de schermrand niet kan bereiken of naar een ander beeldscherm kan gaan. Schakel uit als je liever een vrije aanwijzer hebt.",
@@ -914,7 +1093,7 @@ export const nl_NL: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs op het spelerframe",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
-      "showAttackButton": "Show Attack Button",
+      "showAttackButton": "Aanvalsknop Tonen",
       "walkByAutoloot": "Buit oprapen in het voorbijgaan",
       "groundReticle": "Grondrichtkruis",
       "showItemLevel": "Itemniveau tonen",
@@ -1036,6 +1215,7 @@ export const nl_NL: EnTranslations = {
         "spellPower": "Spreukkracht",
         "critRating": "Crit-waardering",
         "hasteRating": "Snelheidswaardering",
+        "hitRating": "Raakwaarde",
         "warfare": "Oorlogvoering"
       },
       "warfareValue": "+{increase}% toegebracht / -{reduction}% opgelopen",
@@ -1053,6 +1233,7 @@ export const nl_NL: EnTranslations = {
         "dodge": "Je kans om een inkomende slagaanval volledig te ontwijken, zonder schade op te lopen.",
         "critRating": "Crit-waardering van je uitrusting en setbonussen, die je kans op een kritieke treffer verhoogt. Ongeveer 10 waardering verleent 1% crit.",
         "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid.",
+        "hitRating": "Raakwaarde van je uitrusting en setbonussen, waardoor je aanvallen minder vaak missen en je spreuken minder weerstand ondervinden, vooral tegen vijanden van een hoger niveau. Ongeveer 10 raakwaarde geeft 1% raakkans.",
         "warfare": "Verhoogt de schade die aan spelers wordt toegebracht met {increase}% en vermindert de schade die aan spelers wordt toegebracht met {reduction}%."
       },
       "effects": {
@@ -1128,10 +1309,10 @@ export const nl_NL: EnTranslations = {
         "other": "je bent {rank}, {count} leden"
       },
       "finderPartySize": {
-        "one": "{count} player",
-        "few": "{count} players",
-        "many": "{count} players",
-        "other": "{count} players"
+        "one": "{count} speler",
+        "few": "{count} spelers",
+        "many": "{count} spelers",
+        "other": "{count} spelers"
       },
       "characterCount": {
         "one": "{count} personage",
@@ -1338,14 +1519,27 @@ export const nl_NL: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Kerkermoeilijkheid instellen: Heroïsch",
-      "setNormal": "Kerkermoeilijkheid instellen: Normaal"
+      "setNormal": "Kerkermoeilijkheid instellen: Normaal",
+      "resetAll": "Alle instanties resetten",
+      "resetDone": "Alle instanties zijn gereset.",
+      "resetNone": "Je hebt geen instanties om te resetten.",
+      "resetOccupied": "Je kunt instanties niet resetten zolang er nog iemand binnen is.",
+      "resetSameDifficulty": "Wijzig de kerkermoeilijkheid voordat je deze instanties reset. Lege instanties resetten zichzelf na 5 minuten.",
+      "resetLoot": "Je kunt instanties niet resetten zolang er nog buit binnen ligt.",
+      "resetConfirmTitle": "Alle instanties resetten?",
+      "resetConfirmBody": "Hiermee verlaat je lege instanties van je eerder geselecteerde moeilijkheid. Niet-opgeëiste buit voorkomt de reset.",
+      "resetConfirm": "Instanties resetten",
+      "resetCooldown": "Instanties kunnen slechts eenmaal per 5 minuten worden gereset.",
+      "resetUsage": "Gebruik /dungeon reset om je lege instanties te verlaten nadat je de moeilijkheid hebt gewijzigd.",
+      "entryMismatchNormal": "Deze instantie is ingesteld op de moeilijkheid Normaal. Gebruik Alle instanties resetten om een nieuwe Heroïsche run te starten.",
+      "entryMismatchHeroic": "Deze instantie is ingesteld op de moeilijkheid Heroïsch. Gebruik Alle instanties resetten om een nieuwe Normale run te starten."
     },
     "bags": {
       "cannotDestroy": "Dit voorwerp kan niet worden vernietigd.",
-      "rightClickDestroy": "Right-click to destroy",
-      "dragEquipHint": "Drag onto your character to equip",
-      "dragDestroyHint": "Drag out into the world to destroy",
-      "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
+      "rightClickDestroy": "Klik met rechts om te vernietigen",
+      "dragEquipHint": "Sleep naar je personage om uit te rusten",
+      "dragDestroyHint": "Sleep naar buiten in de wereld om te vernietigen",
+      "reorderNeedsRecent": "Verwijder het filter en sorteer op Recent om je tassen opnieuw te rangschikken",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
       "filterWeapon": "Wapens",
@@ -1419,6 +1613,8 @@ export const nl_NL: EnTranslations = {
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
+      "damageReduction": "Vermindert alle schade die je oploopt met {pct}%",
+      "guardianWard": "De volgende dodelijke vijandelijke treffer herstelt je in plaats daarvan naar {pct}% gezondheid",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Vermindert pantser met {pct}%",
@@ -1507,11 +1703,41 @@ export const nl_NL: EnTranslations = {
       "unlock": "Spelerframe verplaatsen",
       "lock": "Spelerframe vergrendelen"
     },
+    "partyFrames": {
+      "section": "Groeps- en raidframes",
+      "unlock": "Groeps- en raidframes verplaatsen",
+      "lock": "Groeps- en raidframes vergrendelen",
+      "style": "Framestijl",
+      "styleAutomatic": "Automatisch",
+      "styleClassic": "Klassieke groepsframes",
+      "styleRaid": "Raidframes",
+      "scale": "Frameschaal",
+      "width": "Framebreedte",
+      "height": "Framehoogte",
+      "spacing": "Frameafstand",
+      "columns": "Raidkolommen",
+      "healthText": "Gezondheidstekst",
+      "healthNone": "Geen",
+      "healthPercent": "Percentage",
+      "healthCurrent": "Huidig",
+      "healthCurrentMax": "Huidig / Maximum",
+      "sort": "Spelers sorteren",
+      "sortGroup": "Groep",
+      "sortRole": "Rol",
+      "sortName": "Naam",
+      "showResource": "Mana, woede en energie tonen",
+      "showAbsorbs": "Absorptieschilden tonen",
+      "showAuras": "Versterkingen en verzwakkingen tonen",
+      "showSelf": "Je eigen frame tonen"
+    },
     "frameReset": {
       "label": "Frameposities herstellen"
     },
     "itemTooltip": {
-      "requiresLevel": "Vereist niveau {level}"
+      "requiresLevel": "Vereist niveau {level}",
+      "riftTier": "{tier}-rank Rift item",
+      "riftUpgrade": "Rift upgrade {level}/{max}",
+      "riftSockets": "Rift gems {used}/{total}"
     },
     "discord": {
       "title": "Discord",
@@ -1547,7 +1773,7 @@ export const nl_NL: EnTranslations = {
         "benefits": "Koppel je Discord om punten te verdienen door spelen en gemeenschapsactiviteit, en klim door de statusrangen.",
         "error": "Kon Discord niet koppelen. Probeer het opnieuw.",
         "success": "Discord gekoppeld.",
-        "joinServer": "Just join the Discord server"
+        "joinServer": "Doe gewoon mee met de Discord-server"
       },
       "choice": {
         "title": "Doorgaan met Discord",
@@ -1599,9 +1825,9 @@ export const nl_NL: EnTranslations = {
         "mods": "Mod",
         "juniormods": "Junior Mod",
         "artists": "Artiest",
-        "contentcreator": "Content Creator",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "contentcreator": "Contentmaker",
+        "legend": "LEGENDE",
+        "shill": "PROMOTOR"
       },
       "guildMember": "Geverifieerd lid",
       "notMember": "Nog niet in de server",
@@ -1869,7 +2095,7 @@ export const nl_NL: EnTranslations = {
       "mining": "Mijnbouw",
       "logging": "Houtkap",
       "herbalism": "Kruidenkunde",
-      "notReady": "This resource node has not respawned for you yet."
+      "notReady": "Dit grondstoffenpunt is voor jou nog niet teruggekeerd."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -1903,104 +2129,104 @@ export const nl_NL: EnTranslations = {
       "recipeNotLearned": "Je hebt dat recept nog niet geleerd."
     },
     "finder": {
-      "title": "Dungeon Finder",
-      "close": "Close",
-      "back": "Back",
-      "syncing": "Waiting for the realm...",
-      "tabCatalogue": "Catalogue",
-      "tabQueue": "Quick Match",
-      "tabBoard": "Premade Groups",
-      "normal": "Normal",
-      "heroic": "Heroic",
-      "kindDungeon": "Dungeon",
+      "title": "Kerkerzoekmachine",
+      "close": "Sluiten",
+      "back": "Terug",
+      "syncing": "Wachten op het rijk...",
+      "tabCatalogue": "Catalogus",
+      "tabQueue": "Snelle Koppeling",
+      "tabBoard": "Voorgemaakte Groepen",
+      "normal": "Normaal",
+      "heroic": "Heroïsch",
+      "kindDungeon": "Kerker",
       "kindRaid": "Raid",
-      "kindSolo": "Solo adventure",
-      "levels": "Levels {min} to {max}",
-      "levelOne": "Level {level}",
+      "kindSolo": "Soloavontuur",
+      "levels": "Niveaus {min} tot {max}",
+      "levelOne": "Niveau {level}",
       "clock": "{minutes}:{seconds}",
       "roleCount": "{count} {role}",
       "roleTank": "Tank",
-      "roleHealer": "Healer",
-      "roleDps": "Damage",
-      "freeRoles": "Any roles welcome",
-      "lockoutDaily": "Daily lockout on the final boss",
-      "lockoutNone": "No lockout",
-      "lockedFor": "Locked for about {minutes} min",
-      "attunement": "Requires attunement: {quest}",
-      "heroicMarks": "Heroic Marks: {count} per player",
-      "entrance": "Entrance: {zone}",
-      "showOnMap": "Show on Map",
-      "encounters": "Encounters",
-      "finalBoss": "Final boss",
-      "summoned": "Summoned guardian",
-      "lootGuaranteed": "One of these always drops:",
-      "lootMaybe": "At most one of these may drop:",
-      "lootChance": "Additional chance drops:",
-      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "roleHealer": "Genezer",
+      "roleDps": "Schade",
+      "freeRoles": "Alle rollen welkom",
+      "lockoutDaily": "Dagelijkse vergrendeling op de eindbaas",
+      "lockoutNone": "Geen vergrendeling",
+      "lockedFor": "Vergrendeld voor ongeveer {minutes} min",
+      "attunement": "Vereist afstemming: {quest}",
+      "heroicMarks": "Heroïsche Merktekens: {count} per speler",
+      "entrance": "Ingang: {zone}",
+      "showOnMap": "Tonen op Kaart",
+      "encounters": "Ontmoetingen",
+      "finalBoss": "Eindbaas",
+      "summoned": "Opgeroepen wachter",
+      "lootGuaranteed": "Een van deze valt altijd:",
+      "lootMaybe": "Maximaal een van deze kan vallen:",
+      "lootChance": "Extra kansen op buit:",
+      "lootHeroic": "Heroïsche bonus, een van deze valt altijd:",
       "pct": "{pct}%",
-      "blockedLevel": "Levels {min} to {max} only",
-      "blockedSpec": "Requires a specialization",
-      "yourRoles": "Your roles",
-      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
-      "leaderNote": "Only your party leader can queue the group.",
-      "chooseActivities": "Choose activities",
-      "joinQueue": "Join queue",
-      "leaveQueue": "Leave queue",
-      "waited": "Time in queue: {time}",
-      "cooldownNote": "You may queue again in {seconds}s.",
-      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
-      "proposalTitle": "Group found: {name}",
-      "proposalRole": "Your role: {role}",
-      "accepted": "{accepted} of {size} confirmed",
-      "remaining": "{seconds}s to answer",
-      "accept": "Accept",
-      "decline": "Decline",
-      "acceptedWait": "Waiting for the others...",
-      "slotState": "{role}: {accepted} of {total} ready",
-      "openListings": "Open listings",
-      "boardEmpty": "No listings right now. Publish one!",
-      "boardLeaderGate": "Only your party leader can publish a listing.",
-      "publishListing": "Publish a listing",
-      "activity": "Activity",
-      "publish": "Publish",
-      "yourListing": "Your listing",
-      "closeListing": "Close listing",
-      "applicants": "Applicants",
-      "noApplicants": "No applicants yet.",
-      "acceptApplicantAria": "Accept {name}",
-      "declineApplicantAria": "Decline {name}",
-      "levelClass": "Lv {level} {className}",
-      "leader": "Leader: {name}",
-      "needs": "Needs {roles}",
+      "blockedLevel": "Alleen niveaus {min} tot {max}",
+      "blockedSpec": "Vereist een specialisatie",
+      "yourRoles": "Jouw rollen",
+      "needsSpec": "Kies een specialisatie om de Kerkerzoekmachine te gebruiken.",
+      "leaderNote": "Alleen je groepsleider kan de groep in de wachtrij plaatsen.",
+      "chooseActivities": "Kies activiteiten",
+      "joinQueue": "Wachtrij betreden",
+      "leaveQueue": "Wachtrij verlaten",
+      "waited": "Tijd in wachtrij: {time}",
+      "cooldownNote": "Je kunt je over {seconds}s opnieuw aanmelden.",
+      "travelNote": "De groep vormt zich waar iedereen staat. Reis samen naar de ingang; niemand wordt geteleporteerd.",
+      "proposalTitle": "Groep gevonden: {name}",
+      "proposalRole": "Jouw rol: {role}",
+      "accepted": "{accepted} van {size} bevestigd",
+      "remaining": "{seconds}s om te antwoorden",
+      "accept": "Accepteren",
+      "decline": "Afwijzen",
+      "acceptedWait": "Wachten op de anderen...",
+      "slotState": "{role}: {accepted} van {total} gereed",
+      "openListings": "Open vermeldingen",
+      "boardEmpty": "Momenteel geen vermeldingen. Plaats er een!",
+      "boardLeaderGate": "Alleen je groepsleider kan een vermelding plaatsen.",
+      "publishListing": "Een vermelding publiceren",
+      "activity": "Activiteit",
+      "publish": "Publiceren",
+      "yourListing": "Jouw vermelding",
+      "closeListing": "Vermelding sluiten",
+      "applicants": "Aanvragers",
+      "noApplicants": "Nog geen aanvragers.",
+      "acceptApplicantAria": "{name} accepteren",
+      "declineApplicantAria": "{name} afwijzen",
+      "levelClass": "Niv {level} {className}",
+      "leader": "Leider: {name}",
+      "needs": "Heeft {roles} nodig",
       "slots": "{size}/{capacity}",
-      "apply": "Apply",
-      "withdraw": "Withdraw application",
-      "tagFirstRun": "First run",
-      "tagQuestRun": "Quest run",
-      "tagFullClear": "Full clear",
-      "tagLearning": "Learning welcome",
-      "tagFastRun": "Fast run",
+      "apply": "Aanmelden",
+      "withdraw": "Aanmelding intrekken",
+      "tagFirstRun": "Eerste run",
+      "tagQuestRun": "Questrunn",
+      "tagFullClear": "Volledig leegmaken",
+      "tagLearning": "Beginners welkom",
+      "tagFastRun": "Snelle run",
       "mech": {
-        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
-        "reaping_arc": "Reaping Arc (frontal cleave)",
-        "mist_surge": "Mist Surge (pulsing area damage)",
-        "summons_adds": "Summons reinforcements",
-        "lunar_tide": "Lunar Tide (pulsing area damage)",
-        "enrage": "Enrages at low health",
-        "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
-        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
-        "shadow_nova": "Shadow Nova (area burst)",
-        "profane_mending": "Profane Mending (heals its allies)",
-        "mana_burn": "Withered Benediction (burns mana)",
-        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
-        "mortal_wound": "Forgotten Wound (reduces healing taken)",
-        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
-        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
-        "raise_fallen": "Raise Fallen (periodic waves of adds)",
-        "soul_rend": "Soul Rend (marked players must spread and be healed)",
-        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
-        "wardstones": "Wardstone channels (phase transition)"
+        "shadow_pulse": "Schaduwpuls (pulserende gebiedsschade)",
+        "reaping_arc": "Maaiboog (frontale maaislaan)",
+        "mist_surge": "Mistgolf (pulserende gebiedsschade)",
+        "summons_adds": "Roept versterkingen op",
+        "lunar_tide": "Maantij (pulserende gebiedsschade)",
+        "enrage": "Razend bij weinig gezondheid",
+        "shuddering_stomp": "Huiverende Stamp (gebiedsverdoving)",
+        "necrotic_shockwave": "Necrotische Schokgolf (zware gebiedsschade)",
+        "grave_cleaver": "Grafsplijter (frontale maaislaan)",
+        "shadow_nova": "Schaduw-Nova (gebiedsexplosie)",
+        "profane_mending": "Onheilige Heling (geneest zijn bondgenoten)",
+        "mana_burn": "Verdorde Zegening (verbrandt mana)",
+        "deathstalker_cleave": "Doodstalker-Maaislaan (frontale maaislaan)",
+        "mortal_wound": "Vergeten Wond (vermindert ontvangen heling)",
+        "sealbreak_shockwave": "Zegelbreuk Schokgolf (gebiedsexplosie)",
+        "gravebreaker": "Grafbreker (frontale kegel, keer het weg van de raid)",
+        "raise_fallen": "Gevallenen Herrijzen (periodieke golven van toevoegingen)",
+        "soul_rend": "Zielenscheur (gemarkeerde spelers moeten spreiden en worden genezen)",
+        "deathless_rage": "Doodloze Razernij (onderbroken bij de wardstones)",
+        "wardstones": "Wardstone-kanalen (faseovergang)"
       }
     },
     "deeds": {
@@ -2166,6 +2392,9 @@ export const nl_NL: EnTranslations = {
       "already_linked": "Je account heeft al een gekoppeld Steam-account.",
       "account_taken": "Dat Steam-account is al aan een ander account gekoppeld.",
       "upstream": "Steam reageerde niet. Probeer het zo meteen opnieuw."
+    },
+    "welcome": {
+      "invalid_input": "Ongeldige invoer."
     }
   },
   "guide": {
@@ -2286,7 +2515,17 @@ export const nl_NL: EnTranslations = {
         "marshName": "Slijkveenmoeras",
         "marshBlurb": "Verzonken venen en door het tij verweerde ruïnes, thuis van mudfins en erger.",
         "peaksName": "Doorntop-Hoogten",
-        "peaksBlurb": "Door de wind geschuurde bergkammen die opklimmen naar de koudste gevaren van het rijk."
+        "peaksBlurb": "Door de wind geschuurde bergkammen die opklimmen naar de koudste gevaren van het rijk.",
+        "duskName": "The Veiled Hollow",
+        "duskBlurb": "A realm sealed beneath the mountains, if the whispers of a way in are true.",
+        "emberName": "The Drakelands",
+        "emberBlurb": "Across the Pale Causeway the green gives way to cinder, and something old rules the wastes.",
+        "frostName": "The Frostveil Reach",
+        "frostBlurb": "A snowbound height beyond every map, glimpsed only in the dancing lights.",
+        "amberName": "The Amberfall",
+        "amberBlurb": "Behind the western cliffs an autumn that never ends, and lanterns on a golden mere.",
+        "fenName": "The Willowfen",
+        "fenBlurb": "Past the autumn crown, a bright fen of willows and still water, and a town behind a moat."
       },
       "group": {
         "heading": "Sluit je aaneen voor de zware delen",
@@ -2744,8 +2983,20 @@ export const nl_NL: EnTranslations = {
         "desc": "Geschubde, slangachtige wezens uit de oude diepten. Zeldzaam, trots en veel sterker dan ze eruitzien."
       },
       "reptile": {
-        "name": "Reptiles",
-        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
+        "name": "Reptielen",
+        "desc": "Koudbloedige jagers met een eigen sis en snap, onderscheiden van de warmbloedige dieren."
+      },
+      "murloc": {
+        "name": "Croakfins",
+        "desc": "Croaking fish-folk of lake shore and tide pool, quick to swarm anything that wades too close."
+      },
+      "kobold": {
+        "name": "Scamps",
+        "desc": "Skittering scavengers and sprites of glade and hedgerow, more nuisance than menace until they gather in numbers."
+      },
+      "demon": {
+        "name": "Demons",
+        "desc": "Invaders from beyond the rifts, all fire and spite. Where one stands, a breach is never far."
       }
     },
     "worldPage": {
@@ -2759,15 +3010,55 @@ export const nl_NL: EnTranslations = {
       "valeBlurb": "Het groene begindal, waar nieuwe helden hun tanden scherpen op wolven en bandieten rond de stad Eastbrook.",
       "marshBlurb": "Een verdronken land van mist en ruïnes. Mudfins zwermen door de ondiepten en iets ouders roert zich onder het water, gadegeslagen vanuit het brugdorp Fenbridge.",
       "peaksBlurb": "Door wind geschuurde bergkammen en oude mijnwerken klimmen op naar de koudste, hoogste gevaren van het rijk, in handen van de buitenpost Highwatch.",
+      "duskBlurb": "A valley of permanent dusk beneath the great tree of Eldergleam, where crystal ruins glow and the air hums with old magic.",
+      "emberBlurb": "Storm-lit wastes of ash and bloodglass where drakes wheel over the caldera and troll fires burn among the dunes, watched from the gate-town of Wyrmwatch.",
+      "frostBlurb": "A hush of snow and dark pines under the aurora, where the cold itself feels awake and Icemantle keeps its fires burning.",
+      "amberBlurb": "An eternal autumn of gold and red leaves that never fall, gathered around the lantern-lit town of Lanternmere.",
+      "fenBlurb": "A bright, humming wetland of lilies and slow water, crossed on old boardwalks from the bridge-town of Bridgemere.",
+      "nightBlurb": "A realm of starry midnight where flowers light the paths and Moonrest keeps a quiet vigil under a dreaming sky.",
+      "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.",
+      "galeBlurb": "Sea-cliffs and howling downs where the wind never rests, the Old Beacon never goes out, and Wickharbor shuts its doors tight.",
+      "jungleBlurb": "A tropical tangle of palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.",
+      "gardenBlurb": "A hedge-maze garden realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.",
       "valeGreeting": "Houd je kling dichtbij. Het Dal is niet meer wat het was.",
       "valeGreeter": "Marshal Redbrook, Eastbrook",
       "marshGreeting": "Houd halt bij de poort. Voorbij dat riet doet het veen het doden voor ons.",
       "marshGreeter": "Warden Fenwick, Fenbridge",
       "peaksGreeting": "Tweehonderd jaar heeft deze muur standgehouden. Hij breekt niet onder mijn wacht, maar hij kreunt.",
       "peaksGreeter": "Captain Thessaly, Highwatch",
+      "duskGreeting": "Few of your kind have stood beneath these boughs. Walk gently, and be welcome.",
+      "duskGreeter": "Keeper Saelwyn, Eldergleam",
+      "emberGreeting": "Hot wind off the wastes, dragons over the Drakemaw, and troll fires in the dunes. Drink before you walk out there.",
+      "emberGreeter": "The gatewarden, Wyrmwatch",
+      "frostGreeting": "Snow swallows every sound out past the wall. If the lights start dancing, keep your voice down and your fire lit.",
+      "frostGreeter": "The hearthkeeper, Icemantle",
+      "amberGreeting": "Every leaf here burns gold and red, yet none ever fall. The lanterns are lit for you; mind the Goldmelt on your way up.",
+      "amberGreeter": "The lanternwright, Lanternmere",
+      "fenGreeting": "The fen hums with dragonflies and bees. Cross the bridge, rest your feet awhile, and stay on the boards past the pools.",
+      "fenGreeter": "The bridgekeeper, Bridgemere",
+      "nightGreeting": "Past the Nightgate the air itself dreams. Follow the flower-light, and mind the sleeping world that hangs in the sky.",
+      "nightGreeter": "The vigil-warden, Moonrest",
+      "hauntGreeting": "Keep to the lanterns, traveler. And if the wood calls your name from off the road, do not answer it.",
+      "hauntGreeter": "The lamplighter, Gallowmere",
+      "galeGreeting": "The wind has never once stopped here, and the Old Beacon has never once gone out. Close the inn door behind you.",
+      "galeGreeter": "The beacon-keeper, Wickharbor",
+      "jungleGreeting": "Warm sand, loud birds, and a jungle that eats the horizon. We keep a fire lit on the beach; try to come back to it.",
+      "jungleGreeter": "The harbormistress, Drifthaven",
+      "gardenGreeting": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
+      "gardenGreeter": "The gatekeeper, Hedgewick",
       "valePlaceNotes": "Oostbeek is je eerste thuisbasis. Wolvenloop en Everweide zijn rustig jachtgebied; Spiegelmeer is fijn viswater, al krioelen modderfinnen in de ondiepten; het Sableweb en de Kopergroeve verbergen spinnen en ertsbeluste delvers; een Bandietenkamp en de Gevallen Kapel bieden ruwer werk; Reliekschrijnheuvel leidt naar het Ingestorte Reliekschrijn, de eerste delve van het rijk; Lichtwoudgaarde is een kalm, zonovergoten bosje in het noorden; en het Zeugveld is Oostbeeks ommuurde zwijnenbalveld, waar De Dalbeker onder een oogstbestand wordt gespeeld.",
       "marshPlaceNotes": "Veenbrug bewaakt de enige droge weg. Het Sluipersriet en de Diepveen-Ondiepten wemelen van moerasbeesten en mudfins; het Weduwestruweel zit dik onder het web; de Verdronken Kapel en de Trollenheuvels bergen oudere gevaren, met De Verdronken Litanie, de eigen delve van het moeras, die net ten noorden van de heuvels opengaat; het Grafroeper-Kampement is de ingegraven sekte, en het Verzonken Bastion is het instantiehart van het moeras.",
       "peaksPlaceNotes": "Highwatch houdt de muur. Stalker Ridge en de Dieprots-Holen behoren tot bergkatten en gravers; de Ogre Foothills en Drogmar's War-Camp tot ingehuurde bruten; Stormcrag knettert van de elementalen, en daaronder gloeit De Glinstermeer, het bergmeer waarvan de oever de poort van bleek licht bewaart naar De Verdronken Tempel; de Wyrmcult Tents en Revenant Fields omsluiten het hoge terrein van de sekte, met het Grafwurm-Heiligdom op de top.",
+      "duskPlaceNotes": "Eldergleam gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
+      "emberPlaceNotes": "Wyrmwatch holds the gate. The Gatewood is the last green before the waste; the Cinder Dunes drift with ash and worse; the Trollmoot is where the dune trolls gather their fires; the Bloodglass Fields glitter with razor shards; and the Drakemaw Caldera is the smoking crown the drakes circle.",
+      "frostPlaceNotes": "Icemantle keeps the last warm hearth. The Snowline marks where the drifts take over; Glacier Tarn is black, still water under the ice; the Aurora Steps climb beneath the dancing lights; the Shiverfen is a frozen mire that never quite sleeps; and the Howling Terraces earn their name every night.",
+      "amberPlaceNotes": "Lanternmere glows at the heart of the harvest. The Goldmelt is the amber-slick pass in; the Gilded Orchard and Harvest Hollow keep the sweetest pickings and the boldest thieves; the Great Mere mirrors the burning leaves; Cindermaple Rise stands tallest and reddest; and the Leaning Monolith remembers something older than autumn.",
+      "fenPlaceNotes": "Bridgemere sits astride the slow water. The Amberfen Steps come down from the harvest country; the Lilymoors and Bogshine Pools glitter with wisps and dragonflies; Willowweep trails its branches into the mere; and the Drowsy Flats are as gentle as this land gets.",
+      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonwell holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
+      "hauntPlaceNotes": "Gallowmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
+      "galePlaceNotes": "Wickharbor leans into the wind. The Windway is the cliff road in; the Howling Downs roll treeless under the gale; the Old Beacon has burned for as long as anyone can say; the Shear drops sheer to the water; the Wreckfields keep the coast honest; and the Mirror Tarn is the one still thing in the whole realm.",
+      "junglePlaceNotes": "Drifthaven keeps its fire on the beach. The Tanglemouth is where the river meets the green wall; the Palmstrand runs white and warm along the surf; the Emerald Tangle and the Vinefall swallow the interior; the Sapphire Lagoon glows clear and deep; and the Sunken Idol watches from beneath the water.",
+      "gardenPlaceNotes": "Hedgewick waits at the Garden Gate. The Statuary Walk keeps its silent company; the Rose Wilds have long outgrown their beds; the Petal Pond drifts pink the year round; the Great Maze rearranges its manners for every guest; and the Fountain Court still runs clear at the garden heart.",
       "gladeTitle": "Een rustig hoekje: Brightwood Glade",
       "gladeBody": "Niet elk verhaal in the Vale gaat over de doden. In het noorden houdt een zonovergoten bosje genaamd Brightwood Glade zijn eigen, zachtere ritme aan, met enkel stille paden en gevlekt licht onder het loof. Het is een zacht tegenwicht voor het spoor dat je volgt, en de moeite waard als de weg je ruimte geeft om te dwalen.",
       "worldBossTitle": "Wanneer de piek ontwaakt: de wereldbaas",
@@ -3767,6 +4058,7 @@ export const nl_NL: EnTranslations = {
     "title": "Desktop-launcher downloaden",
     "desc": "Download de losse launcher voor optimale prestaties en schermvullend spelen.",
     "macCta": "Download voor macOS",
+    "windowsCta": "Downloaden voor Windows",
     "linuxCta": "Downloaden voor Linux",
     "linuxHint": "AppImage: maak het uitvoerbaar en voer het vervolgens uit. Geen installatie nodig.",
     "windowsPending": "Windows-build volgt later."
@@ -4068,6 +4360,35 @@ export const nl_NL: EnTranslations = {
     "chat": "Chat openen"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "All rifts are unstable right now. Try again soon.",
+      "enterFloor": "You step through the rift into {name}.",
+      "descendFloor": "You descend deeper into {name}.",
+      "stepBack": "You step back through the rift.",
+      "pylonLit": "A rune pylon flares to life ({lit}/{total}).",
+      "wayDownOpens": "The way down tears open.",
+      "exitOpens": "The rift shudders. A way home tears open behind the fallen.",
+      "portalOpens": "A {tier}-rank rift tears open in {zone}!",
+      "portalSealed": "The {tier}-rank rift in {zone} has been sealed.",
+      "portalCollapses": "The {tier}-rank rift in {zone} collapses.",
+      "levelGate": "Only adventurers of level {level} or higher may enter this rift.",
+      "iceGoalLit": "The frost sigil blazes. The way stirs.",
+      "socketsShut": "The sockets grind shut. The way stirs.",
+      "seqProgress": "The runes answer in turn ({step}/{total}).",
+      "seqReset": "The runes go dark. Begin again.",
+      "gateOpen": "The gate grinds open.",
+      "orbSealed": "The orb is sealed by the ritual below.",
+      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
+      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open.",
+      "alreadyCleared": "This rift has already been cleared by {names}.",
+      "raceLost": "The rift has already been cleared by {names}. Your run ends.",
+      "raceWorldWin": "{names} won the {tier}-rank Rift race in {seconds}s!",
+      "raceWinBanner": "Rift Race Won - {seconds}s",
+      "raceLostBanner": "Rift Already Cleared",
+      "forgeUpgraded": "Rift upgrade completed for {name}.",
+      "forgeEnchanted": "Rift enchant completed for {name}.",
+      "forgeSocketed": "Rift gem socketed for {name}."
+    },
     "delve": {
       "cannotEnterNow": "Je kunt nu geen delve betreden.",
       "leaveDungeonFirst": "Verlaat eerst de kerker.",
@@ -4654,8 +4975,8 @@ export const nl_NL: EnTranslations = {
     "connectionLost": "De verbinding met de server is verbroken.",
     "reconnecting": "Verbinding verbroken. Opnieuw verbinding maken...",
     "connectionRejected": "De server heeft de verbinding gesloten.",
-    "realmFull": "This world is full right now. Please try again in a few minutes.",
-    "tooManyConnections": "Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.",
+    "realmFull": "Deze wereld is op dit moment vol. Probeer het over een paar minuten opnieuw.",
+    "tooManyConnections": "Er komen te veel verbindingen naar deze wereld vanuit jouw netwerk. Sluit extra spelvensters of probeer het over een paar minuten opnieuw.",
     "tips": {
       "classes": "Tip: elk van de 9 klassen speelt anders. Probeer er een paar voordat je er een kiest.",
       "talents": "Tip: je kunt je talenten buiten gevechten altijd herstellen, dus een vroege keuze is nooit een valstrik.",
@@ -4861,6 +5182,29 @@ export const nl_NL: EnTranslations = {
     "body": "We herstarten de gameservice en verwachten dat Claudemoon binnenkort weer terug is. Deze pagina blijft automatisch controleren.",
     "status": "Snel terug"
   },
+  "welcome": {
+    "back": "Welkom terug, {name}",
+    "level": "Niveau {level}",
+    "lastPlayed": "Laatst gespeeld: {when}",
+    "continue": "Wereld betreden",
+    "continueHint": "Enter om door te gaan, Esc om over te slaan",
+    "continueHintTouch": "Tik om door te gaan",
+    "discord": {
+      "title": "De community leeft op Discord",
+      "sub": "Voorproefjes van patches, evenementen, chat met de ontwikkelaars en 2 bonusvakken in de bank als je je Discord-account koppelt.",
+      "join": "Word lid van onze Discord"
+    },
+    "chest": {
+      "ready": "Kist met dagelijkse beloningen staat klaar"
+    },
+    "armory": {
+      "cta": "Wereld betreden en het Arsenaal bekijken"
+    },
+    "news": {
+      "new": "Nieuw",
+      "viewAll": "Bekijk alle updates op GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -4875,6 +5219,8 @@ export const nl_NL: EnTranslations = {
       "secondsRemaining": "{seconds} seconden resterend",
       "enteringZone": "{zone} betreden.",
       "welcomeZone": "Welkom in {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Niveau {level}!",
       "levelLog": "Je hebt niveau {level} bereikt!",
       "xpGain": "Je krijgt {amount} ervaring.",
@@ -5422,7 +5768,7 @@ export const nl_NL: EnTranslations = {
     "actionBar": {
       "attackName": "Aanvallen",
       "attackTooltip": "Schakel auto-aanval op je doelwit in of uit. Rechtsklikken op een vijand valt ook aan.",
-      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
+      "attackRemoveHint": "Klik met rechts om het van de balk te verwijderen en de plek vrij te maken.",
       "emptySlot": "Lege sleuf",
       "slotAria": "Actiesleuf {slot}: {ability}",
       "emptySlotAria": "Actiesleuf {slot}: leeg",
@@ -6340,6 +6686,18 @@ export const nl_NL: EnTranslations = {
         "name": "Eikenhuid",
         "description": "Je huid verhardt als schors, waardoor je pantser met 150 toeneemt gedurende 15 sec."
       },
+      "ironhold": {
+        "name": "IJzeren Bolwerk",
+        "description": "Verschans je achter je schild en verminder alle schade die je oploopt met 40% gedurende 8 sec."
+      },
+      "sacred_bulwark": {
+        "name": "Heilige Verschansing",
+        "description": "Gedurende {duration} sec wordt de volgende vijandelijke treffer die je zou doden afgeweerd en herstel je in plaats daarvan 35% gezondheid."
+      },
+      "primal_reflexes": {
+        "name": "Oerreflexen",
+        "description": "Je instincten verscherpen, waardoor je kans om aan te wijken met 50% stijgt gedurende 6 sec."
+      },
       "starfire": {
         "name": "Hemelval",
         "description": "Roept een bout van sterrenvuur naar beneden, die {damage} Arcane schade veroorzaakt."
@@ -6378,7 +6736,7 @@ export const nl_NL: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolvenbloed",
-        "description": "Verhoogt de aanvalskracht met 40 gedurende 6 sec. Alleen in Wolfsgedaante."
+        "description": "Verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante."
       },
       "rip": {
         "name": "Verscheuren",
@@ -6669,6 +7027,24 @@ export const nl_NL: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Oostbeek-Wollen Broek"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Rituele gewaden uit Oostbeek"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Druïdenhuid uit Oostbeek"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Beschermde beenstukken uit Oostbeek"
+      },
+      "wardweave_cowl": {
+        "name": "Kap van beschermweefsel"
+      },
+      "duskhide_wraps": {
+        "name": "Schemerhuid-wikkels"
+      },
+      "sootscale_mantle": {
+        "name": "Roetschubmantel"
       },
       "gravecaller_blade": {
         "name": "Grafroepers Breedkling"
@@ -7177,6 +7553,66 @@ export const nl_NL: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Zonneblaadjessikkel"
       },
+      "duskwisp_essence": {
+        "name": "Essence van schemerdwaallicht"
+      },
+      "spore_heart": {
+        "name": "Sporenhart"
+      },
+      "gleaming_antler": {
+        "name": "Glinsterend gewei"
+      },
+      "wisp_mote": {
+        "name": "Dwaallichtstofje"
+      },
+      "starfall_shard": {
+        "name": "Sterrenvalscherf"
+      },
+      "elder_bark": {
+        "name": "Oudstenschors"
+      },
+      "hollow_sealstone": {
+        "name": "De Zegelsteen van de Kom"
+      },
+      "monument_overlook": {
+        "name": "Verweerd monument"
+      },
+      "monument_court": {
+        "name": "Verzonken monument"
+      },
+      "monument_north": {
+        "name": "Vergeten monument"
+      },
+      "guardian_core": {
+        "name": "Wachterskern"
+      },
+      "wardens_seal": {
+        "name": "Het Zegel van de Wachter"
+      },
+      "gleamstag_charm": {
+        "name": "Glansherttalisman"
+      },
+      "veilsteel_blade": {
+        "name": "Sluierstalen kling"
+      },
+      "duskfang_dirk": {
+        "name": "Schemertand-dolk"
+      },
+      "gleamwood_stave": {
+        "name": "Glanshouten staf"
+      },
+      "wardens_oathband": {
+        "name": "Eedband van de Wachter"
+      },
+      "wardplate_cuirass": {
+        "name": "Wachtplaten-kuras"
+      },
+      "nightweave_tunic": {
+        "name": "Nachtweefsel-tuniek"
+      },
+      "veilcloth_robe": {
+        "name": "Sluierdoek-gewaad"
+      },
       "thorium_ore": {
         "name": "Thoriumerts"
       },
@@ -7314,6 +7750,27 @@ export const nl_NL: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "Sintelglazen Oorlogsstaf"
+      },
+      "rift_essence": {
+        "name": "Rift Essence"
+      },
+      "rift_gem_crimson": {
+        "name": "Crimson Rift Gem"
+      },
+      "rift_gem_azure": {
+        "name": "Azure Rift Gem"
+      },
+      "rift_gem_verdant": {
+        "name": "Verdant Rift Gem"
+      },
+      "riftbound_band_of_might": {
+        "name": "Riftbound Band of Might"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Riftbound Band of Insight"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Riftbound Band of Guile"
       },
       "bristleback_maul": {
         "name": "Gallowglass-Hamer"
@@ -8283,6 +8740,258 @@ export const nl_NL: EnTranslations = {
       "stable_horse": {
         "name": "Stalpaard"
       },
+      "rift_spawnling": {
+        "name": "Rift Spawnling"
+      },
+      "rift_bonewalker": {
+        "name": "Risen Bonewalker"
+      },
+      "rift_frost_revenant": {
+        "name": "Frostbound Revenant"
+      },
+      "rift_rime_elemental": {
+        "name": "Rime Elemental"
+      },
+      "rift_ember_fiend": {
+        "name": "Ember Fiend"
+      },
+      "rift_magma_brute": {
+        "name": "Magma Brute"
+      },
+      "rift_venom_weaver": {
+        "name": "Venom Weaver"
+      },
+      "rift_thornback": {
+        "name": "Thornback Stalker"
+      },
+      "rift_boneclad": {
+        "name": "Boneclad Warrior"
+      },
+      "rift_marrow_troll": {
+        "name": "Marrow Troll"
+      },
+      "rift_void_acolyte": {
+        "name": "Voidscar Acolyte"
+      },
+      "rift_dread_stalker": {
+        "name": "Dread Stalker"
+      },
+      "rift_storm_caller": {
+        "name": "Storm Caller"
+      },
+      "rift_stormscale": {
+        "name": "Stormscale Drake"
+      },
+      "rift_tide_thrall": {
+        "name": "Tide Thrall"
+      },
+      "rift_deep_lurker": {
+        "name": "Deep Lurker"
+      },
+      "rift_stone_ogre": {
+        "name": "Stone Ogre"
+      },
+      "rift_boss_frost": {
+        "name": "Hoarfrost Warden"
+      },
+      "rift_boss_ember": {
+        "name": "Emberforge Tyrant"
+      },
+      "rift_boss_venom": {
+        "name": "Broodmother Vysska"
+      },
+      "rift_boss_necro": {
+        "name": "Bonelord Xarreth"
+      },
+      "rift_boss_brute": {
+        "name": "Warlord Grask"
+      },
+      "rift_boss_arcane": {
+        "name": "Archon Nyxaris"
+      },
+      "rift_boss_storm": {
+        "name": "Tempest Vharok"
+      },
+      "rift_boss_tide": {
+        "name": "Abyssal Maw"
+      },
+      "glimmerwisp": {
+        "name": "Glimmerwisp"
+      },
+      "duskwisp": {
+        "name": "Duskwisp"
+      },
+      "veiled_stag": {
+        "name": "Veiled Stag"
+      },
+      "veiled_doe": {
+        "name": "Veiled Doe"
+      },
+      "gleamstag": {
+        "name": "The Gleamstag"
+      },
+      "sporeling_gatherer": {
+        "name": "Sporeling Gatherer"
+      },
+      "corrupted_sporeling": {
+        "name": "Corrupted Sporeling"
+      },
+      "mushroom_pixie": {
+        "name": "Gleamfolk Pixie"
+      },
+      "treant_elder": {
+        "name": "Treant Elder"
+      },
+      "ancient_guardian": {
+        "name": "Ancient Guardian"
+      },
+      "waking_warden": {
+        "name": "The Waking Warden"
+      },
+      "old_marrowshell": {
+        "name": "Old Marrowshell"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, First of the Herd"
+      },
+      "snowdrift_wolf": {
+        "name": "Snowdrift Wolf"
+      },
+      "ice_wisp": {
+        "name": "Ice Wisp"
+      },
+      "rime_elemental": {
+        "name": "Rime Elemental"
+      },
+      "fen_sprite": {
+        "name": "Fen Sprite"
+      },
+      "frostmane_yeti": {
+        "name": "Frostmane Yeti"
+      },
+      "emberwing_drake": {
+        "name": "Emberwing Drake"
+      },
+      "ashbone_raider": {
+        "name": "Ashbone Raider"
+      },
+      "ashbone_warcaller": {
+        "name": "Ashbone Warcaller"
+      },
+      "dune_troll": {
+        "name": "Dune Troll"
+      },
+      "gilded_stag": {
+        "name": "Gilded Stag"
+      },
+      "gloam_fox": {
+        "name": "Gloam Fox"
+      },
+      "orchard_treant": {
+        "name": "Orchard Treant"
+      },
+      "harvest_sprite": {
+        "name": "Harvest Sprite"
+      },
+      "mere_lurker": {
+        "name": "Mere Lurker"
+      },
+      "bogtoad": {
+        "name": "Bogtoad"
+      },
+      "drowsy_croaker": {
+        "name": "The Drowsy Croaker"
+      },
+      "lily_wisp": {
+        "name": "Lily Wisp"
+      },
+      "willow_sprite": {
+        "name": "Willow Sprite"
+      },
+      "moonfleece_grazer": {
+        "name": "Moonfleece Grazer"
+      },
+      "gloam_strider": {
+        "name": "Gloam Strider"
+      },
+      "nightkin_stargazer": {
+        "name": "Nightkin Stargazer"
+      },
+      "barrow_king": {
+        "name": "The Barrow King"
+      },
+      "widowsilk_spinner": {
+        "name": "Widowsilk Spinner"
+      },
+      "wood_wraith": {
+        "name": "Wood Wraith"
+      },
+      "gravenbark_shambler": {
+        "name": "Gravenbark Shambler"
+      },
+      "pale_huntsman": {
+        "name": "The Pale Huntsman"
+      },
+      "tide_scuttler": {
+        "name": "Tide Scuttler"
+      },
+      "thicket_boar": {
+        "name": "Thicket Boar"
+      },
+      "canopy_weaver": {
+        "name": "Canopy Weaver"
+      },
+      "idol_guardian": {
+        "name": "The Idol Guardian"
+      },
+      "topiary_stag": {
+        "name": "Topiary Stag"
+      },
+      "topiary_wolf": {
+        "name": "Topiary Wolf"
+      },
+      "hedge_gnome": {
+        "name": "Hedge Gnome"
+      },
+      "the_topiary_bull": {
+        "name": "The Topiary Bull"
+      },
+      "moor_ram": {
+        "name": "Moor Ram"
+      },
+      "gale_wisp": {
+        "name": "Gale Wisp"
+      },
+      "shoal_scuttler": {
+        "name": "Shoal Scuttler"
+      },
+      "the_wreck_warden": {
+        "name": "The Wreck Warden"
+      },
+      "riftspawn": {
+        "name": "Riftspawn"
+      },
+      "breach_wretch": {
+        "name": "Breach Wretch"
+      },
+      "void_stalker": {
+        "name": "Void Stalker"
+      },
+      "sundered_horror": {
+        "name": "The Sundered Horror"
+      },
+      "rift_hellguard": {
+        "name": "Hellguard"
+      },
+      "rift_pact_acolyte": {
+        "name": "Pact Acolyte"
+      },
+      "rift_boss_ritualist": {
+        "name": "Magus Vel'Kor the Pactbound"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Lord of the Pit"
+      },
       "ironvein_foreman": {
         "name": "IJzerader-Voorman"
       },
@@ -8562,6 +9271,61 @@ export const nl_NL: EnTranslations = {
         "name": "Kroniekschrijver Zenzie",
         "title": "De Toppenkroniek",
         "greeting": "De berg vergeet niets, {playerName}, en ik evenmin. Laten we eens kijken wat je hebt gedaan."
+      },
+      "keeper_saelwyn": {
+        "name": "Keeper Saelwyn",
+        "title": "Keeper of the Hollow",
+        "greeting": "Few of your kind have stood beneath these boughs, {className}. Walk gently, and be welcome."
+      },
+      "loremother_bryn": {
+        "name": "Loremother Bryn",
+        "title": "Voice of the Shrine",
+        "greeting": "Every light in this valley remembers something, {playerName}. Help me listen."
+      },
+      "provisioner_fenna": {
+        "name": "Provisioner Fenna",
+        "title": "Eldergleam Provisioner",
+        "greeting": "Bread still warm, water still sweet. The Hollow provides, and so do I."
+      },
+      "wardsmith_orun": {
+        "name": "Wardsmith Orun",
+        "title": "Keeper of the Old Forges",
+        "greeting": "These forges cooled centuries ago, {className}, but their work still holds an edge."
+      },
+      "archivist_tullo": {
+        "name": "Archivist Tullo",
+        "title": "Reader of Stones",
+        "greeting": "The monuments out there have not spoken to anyone in an age. Perhaps they were waiting for fresh ears."
+      },
+      "warden_coalfast": {
+        "name": "Warden Coalfast",
+        "title": "Redoubt Commander",
+        "greeting": "The breaks do not care that Gullhaven is small, {className}. We hold this shore, or there is no shore left to hold. Stand with us and I will not forget it."
+      },
+      "riftwatch_ollun": {
+        "name": "Riftwatch Ollun",
+        "title": "Breach Scholar",
+        "greeting": "Every break sings before it opens, if you have the ear for it. I can hear three of them stirring on the island right now, and one of them is close."
+      },
+      "quartermaster_edda": {
+        "name": "Quartermaster Edda",
+        "title": "Redoubt Armorer",
+        "greeting": "Steel and salt, {className}, it is all I have left to hand out. Take it and make the breaks regret opening where I could reach them."
+      },
+      "mender_saul": {
+        "name": "Mender Saul",
+        "title": "Field Surgeon",
+        "greeting": "I have set more bones this one month than in ten years of mending fishing falls. The breaks do not leave much of what they take. Come back to me whole, if you can manage it."
+      },
+      "bellkeeper_tam": {
+        "name": "Bellkeeper Tam",
+        "title": "Watchbell Keeper",
+        "greeting": "The bell is the only warning the breaks give us, {className}. One toll for the fields, two for the cliffs, three when it is close enough that running will not help. Keep an ear on it, and it may keep you whole."
+      },
+      "fisher_nell": {
+        "name": "Frightened Nell",
+        "title": "Gullhaven Fisher",
+        "greeting": "It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -9392,6 +10156,152 @@ export const nl_NL: EnTranslations = {
           }
         }
       },
+      "q_veil_thinned": {
+        "title": "The Thinned Veil",
+        "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
+        "completion": "Cold, every one of them. The Hollow has perhaps a season before the tear becomes a rift. We have work to do, you and I.",
+        "objectives": {
+          "0": {
+            "label": "Duskwisp Essence"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "Gleaming Antlers",
+        "text": "The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds in the open glade at the heart of the valley, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.",
+        "completion": "Look how they hold the light! No flame, no smoke, just the glow. The Hollow provides.",
+        "objectives": {
+          "0": {
+            "label": "Gleaming Antler"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "Lights of the Shallows",
+        "text": "The glimmerwisps carry motes of the old starlight that fell here when the Hollow was sealed. Six motes, and the shrine lamps will burn for a year. Take only from those that fade; the Hollow gives enough without greed.",
+        "completion": "Soft as the first stars. Set them here by the altar; the shrine will do the rest.",
+        "objectives": {
+          "0": {
+            "label": "Wisp Mote"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "Calming the Deep",
+        "text": "The sporelings of the Gleaming Deep were gentle folk before the tear touched their rings. What the corruption takes, it does not give back. Grant the corrupted ones rest, {playerName}: ten of them, in the north of the Deep.",
+        "completion": "You did what I could not bear to. The gatherers still sing in the south rings; because of you, they will keep singing.",
+        "objectives": {
+          "0": {
+            "label": "Corrupted Sporeling laid to rest"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "Hearts of the Ring",
+        "text": "When a sporeling falls to the dark, its heart keeps beating with borrowed shadow. Four of those hearts, cleansed at the shrine, may teach us how the corruption spreads. It is grim work, {playerName}, but it is mending work.",
+        "completion": "There. Cleansed, and quiet. Each one shows the same mark: the shadow flows FROM the Sunken Court. Tell Saelwyn.",
+        "objectives": {
+          "0": {
+            "label": "Spore Heart"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "What the Stones Remember",
+        "text": "Three monuments still stand from before the sealing: one at the Duskfall Overlook, one in the Sunken Court, and one lost in the far northeast where nobody walks. Read them for me, {playerName}. My knees gave out two centuries of stairs ago.",
+        "completion": "An overlook, a court, and a forgotten corner... and all three verses of the sealing song, together for the first time since it was sung. You have made an old reader very happy.",
+        "objectives": {
+          "0": {
+            "label": "The Overlook monument read"
+          },
+          "1": {
+            "label": "The Court monument read"
+          },
+          "2": {
+            "label": "The forgotten monument read"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "Menace in the Glade",
+        "text": "Duskwisps have started drifting in among my stalls after dark, {playerName}, and their chill spoils everything it touches. Thin them out for me: ten of them, wherever the veil has torn.",
+        "completion": "The night market can open again. You have a customer for life, or at least a discount.",
+        "objectives": {
+          "0": {
+            "label": "Duskwisp dispersed"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "Shards of Starfall",
+        "text": "When the duskwisps pass over the crystal fields, slivers of old starlight cling to them like burrs. Six shards, {playerName}, and I can date the sealing to the very season it was sung.",
+        "completion": "Look at the striations! Autumn. The Hollow was sealed in autumn. Two hundred years of argument, settled by six little stones.",
+        "objectives": {
+          "0": {
+            "label": "Starfall Shard"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "The Treant Accord",
+        "text": "The elders of the Grove shed their outer bark as the corruption gnaws at their roots. Four lengths of it, and I can brew a salve for the whole Grove. They will not thank you while you pry it loose, {playerName}, but they will stand a century longer for it.",
+        "completion": "Thick and sound, all four. The salve will take a week to brew and a hundred years to finish its work. Trees measure kindness differently.",
+        "objectives": {
+          "0": {
+            "label": "Elder Bark"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "Against the Spore Tide",
+        "text": "The salve holds the Grove, but the corruption presses harder at the Deep with every dusk. Twelve more of the corrupted must be laid to rest before the gatherers can reclaim their north rings, {playerName}.",
+        "completion": "The rings in the north are singing again tonight. Quietly, but singing.",
+        "objectives": {
+          "0": {
+            "label": "Corrupted Sporeling laid to rest"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "The Sunken Court",
+        "text": "Bryn read the hearts true: the tear runs through the old court in the east, and its guardians have woken wrong. They were built to protect the seal; now they will crush anyone who nears it. Clear eight of them from the ruins.",
+        "completion": "Eight guardians, stilled. I remember when they were raised, {playerName}. Do not look so surprised; the Hollow keeps its keepers a long time.",
+        "objectives": {
+          "0": {
+            "label": "Ancient Guardian stilled"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "Echoes of the Warden",
+        "text": "Even with their master silenced, the court guardians repeat its last command like an echo that will not fade. Until the seal is set back, they will keep waking, {playerName}. Still ten more of them so the masons can reach the sealstone.",
+        "completion": "The echo grows fainter each time. Soon the court will hold nothing but wind and ivy, the way a ruin should.",
+        "objectives": {
+          "0": {
+            "label": "Ancient Guardian stilled"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "The Waking Warden",
+        "text": "The court is quiet, but its master is not. The Warden that holds the seal has woken twisted, and while it stands, the seal cannot be mended. It will not fall easily; bring a friend if you can find one, {playerName}. Bring two if you can find two.",
+        "completion": "The bell of its voice is silent. I felt it from here, like a weight lifted off the whole valley.",
+        "objectives": {
+          "0": {
+            "label": "The Waking Warden defeated"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "The Seal Restored",
+        "text": "Take the Warden's seal to the sealstone at the heart of the court and set it back where it was struck loose. Then the Hollow can begin to heal, and you, {playerName}, will have done what no one of your kind has done before.",
+        "completion": "I felt it close from here, gentle as dusk. The Hollow remembers its friends, {playerName}. However far you travel, there will always be a light for you beneath the great tree.",
+        "objectives": {
+          "0": {
+            "label": "The seal set back in the sealstone"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Het Verdronken Koor",
         "text": "De waders handelen niet alleen. Tussen hen lopen de Verdronken Aanbidders, de sekte die met de tempel zonk, nog in hun verrotte gewaden, nog steeds het gebed zingend vanaf de oeverrotsen. Breng er acht tot zwijgen, en breng me zes van de offergaven die ze dragen. Ik wil weten wat ze hun godin willen geven.",
@@ -9493,6 +10403,9 @@ export const nl_NL: EnTranslations = {
           },
           "10": {
             "label": "Het Zeugveld"
+          },
+          "11": {
+            "label": "The Farshore Causeway"
           }
         }
       },
@@ -9562,6 +10475,285 @@ export const nl_NL: EnTranslations = {
           },
           "10": {
             "label": "Stallen van Highwatch"
+          }
+        }
+      },
+      "veiled_hollow": {
+        "name": "The Veiled Hollow",
+        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.",
+        "pois": {
+          "0": {
+            "label": "Eldergleam"
+          },
+          "1": {
+            "label": "Duskfall Cave"
+          },
+          "2": {
+            "label": "Duskfall Overlook"
+          },
+          "3": {
+            "label": "Elder Grove"
+          },
+          "4": {
+            "label": "Starfall Basin"
+          },
+          "5": {
+            "label": "The Sunken Court"
+          },
+          "6": {
+            "label": "Crystalline Shallows"
+          },
+          "7": {
+            "label": "The Gleaming Deep"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "The Drakelands",
+        "welcome": "Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.",
+        "pois": {
+          "0": {
+            "label": "Wyrmwatch"
+          },
+          "1": {
+            "label": "The Gatewood"
+          },
+          "2": {
+            "label": "Cinder Dunes"
+          },
+          "3": {
+            "label": "Trollmoot"
+          },
+          "4": {
+            "label": "Bloodglass Fields"
+          },
+          "5": {
+            "label": "Drakemaw Caldera"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "The Frostveil Reach",
+        "welcome": "Snow swallows every sound. Under the dancing lights, the cold itself feels awake.",
+        "pois": {
+          "0": {
+            "label": "Icemantle"
+          },
+          "1": {
+            "label": "The Snowline"
+          },
+          "2": {
+            "label": "Glacier Tarn"
+          },
+          "3": {
+            "label": "The Aurora Steps"
+          },
+          "4": {
+            "label": "The Shiverfen"
+          },
+          "5": {
+            "label": "The Howling Terraces"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "The Amberfall",
+        "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.",
+        "pois": {
+          "0": {
+            "label": "Lanternmere"
+          },
+          "1": {
+            "label": "The Goldmelt"
+          },
+          "2": {
+            "label": "The Gilded Orchard"
+          },
+          "3": {
+            "label": "Harvest Hollow"
+          },
+          "4": {
+            "label": "The Great Mere"
+          },
+          "5": {
+            "label": "Cindermaple Rise"
+          },
+          "6": {
+            "label": "The Leaning Monolith"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "The Willowfen",
+        "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.",
+        "pois": {
+          "0": {
+            "label": "Bridgemere"
+          },
+          "1": {
+            "label": "The Amberfen Steps"
+          },
+          "2": {
+            "label": "The Lilymoors"
+          },
+          "3": {
+            "label": "Bogshine Pools"
+          },
+          "4": {
+            "label": "Willowweep"
+          },
+          "5": {
+            "label": "The Drowsy Flats"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "The Nightbloom",
+        "welcome": "Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky.",
+        "pois": {
+          "0": {
+            "label": "Moonrest"
+          },
+          "1": {
+            "label": "The Nightgate"
+          },
+          "2": {
+            "label": "The Moonwell"
+          },
+          "3": {
+            "label": "Gloamfield"
+          },
+          "4": {
+            "label": "The Standing Vigil"
+          },
+          "5": {
+            "label": "The Sleepless Barrow"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "The Wraithwood",
+        "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.",
+        "pois": {
+          "0": {
+            "label": "Gallowmere"
+          },
+          "1": {
+            "label": "The Crowgate"
+          },
+          "2": {
+            "label": "Widow's Thicket"
+          },
+          "3": {
+            "label": "The Hanging Glade"
+          },
+          "4": {
+            "label": "The Mournstone Chapel"
+          },
+          "5": {
+            "label": "The Huntsman's Clearing"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "The Palmreach",
+        "welcome": "Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fire lit on the beach for you.",
+        "pois": {
+          "0": {
+            "label": "Drifthaven"
+          },
+          "1": {
+            "label": "The Tanglemouth"
+          },
+          "2": {
+            "label": "The Palmstrand"
+          },
+          "3": {
+            "label": "The Emerald Tangle"
+          },
+          "4": {
+            "label": "The Vinefall"
+          },
+          "5": {
+            "label": "The Sapphire Lagoon"
+          },
+          "6": {
+            "label": "The Sunken Idol"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "The Evergarden",
+        "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
+        "pois": {
+          "0": {
+            "label": "Hedgewick"
+          },
+          "1": {
+            "label": "The Garden Gate"
+          },
+          "2": {
+            "label": "The Statuary Walk"
+          },
+          "3": {
+            "label": "The Rose Wilds"
+          },
+          "4": {
+            "label": "The Petal Pond"
+          },
+          "5": {
+            "label": "The Great Maze"
+          },
+          "6": {
+            "label": "The Fountain Court"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "The Galecrest",
+        "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.",
+        "pois": {
+          "0": {
+            "label": "Wickharbor"
+          },
+          "1": {
+            "label": "The Windway"
+          },
+          "2": {
+            "label": "The Howling Downs"
+          },
+          "3": {
+            "label": "The Old Beacon"
+          },
+          "4": {
+            "label": "The Shear"
+          },
+          "5": {
+            "label": "The Wreckfields"
+          },
+          "6": {
+            "label": "The Mirror Tarn"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "The Farshore",
+        "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
+        "pois": {
+          "0": {
+            "label": "Gullhaven"
+          },
+          "1": {
+            "label": "The Landing"
+          },
+          "2": {
+            "label": "The Watch Meadow"
+          },
+          "3": {
+            "label": "The Sundered Cliffs"
+          },
+          "4": {
+            "label": "The Riftfields"
           }
         }
       }

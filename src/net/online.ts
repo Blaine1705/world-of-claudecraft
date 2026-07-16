@@ -59,6 +59,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type RiftTier,
   type RiteIntensity,
   type SimEvent,
   type SportRole,
@@ -104,6 +105,7 @@ import {
   type PresenceStatus,
   type RaidLockout,
   type RecipeDef,
+  type RiftFloorView,
   type SocialInfo,
   type TradeInfo,
 } from '../world_api';
@@ -781,6 +783,18 @@ export class Api {
     return this.get('/api/discord');
   }
 
+  // Server-side Welcome Screen flags (today: the Season 1 Armory promo gate).
+  async welcomeFlags(): Promise<{ armoryPromoEnabled: boolean }> {
+    return this.get('/api/welcome/flags');
+  }
+
+  // Daily rewards status (bearer-only, no world/character needed): the Welcome
+  // Screen's chest-tile readiness read reuses the same endpoint the in-world
+  // daily rewards window polls via ClientWorld.dailyRewards().
+  async dailyRewards(): Promise<DailyRewardStatus> {
+    return this.get('/api/daily-rewards');
+  }
+
   // Unlink Discord. A Discord-provisioned account (no real password yet) must send a
   // `password` so it stays reachable after unlinking; the server 400s with
   // 'password_required' otherwise. A normal account passes nothing.
@@ -961,6 +975,7 @@ function blankEntity(id: number): Entity {
     onGround: true,
     jumping: false,
     fallStartY: 0,
+    fatigueTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
@@ -991,6 +1006,8 @@ function blankEntity(id: number): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
+    hitRating: 0,
+    hitBonus: 0,
     critDmgSpellBonus: 0,
     critDmgPhysBonus: 0,
     critDmgHealBonus: 0,
@@ -1119,6 +1136,7 @@ export class ClientWorld implements IWorld {
   bags: (string | null)[] = [null, null, null, null];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
+  equipmentInstances: import('../sim/entity').PlayerEquipmentInstances = {};
   copper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
@@ -1211,6 +1229,12 @@ export class ClientWorld implements IWorld {
   // applyLockpickEvent. delveClears is a NON-IWorld mirror behind delveShopOffers. ---
   delveRun: DelveRunInfo | null = null;
   companionState: DelveCompanionInfo | null = null;
+  // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
+  // field). The renderer regenerates geometry/style from this descriptor.
+  riftFloor: RiftFloorView | null = null;
+  // The online client never registers rift collision regions (the server owns
+  // collision); 0 keeps rift camera occlusion a no-op here.
+  readonly riftCollisionToken = 0;
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
@@ -1517,7 +1541,7 @@ export class ClientWorld implements IWorld {
 
   setMoveInput(input: unknown, facing?: unknown): void {
     Object.assign(this.moveInput, sanitizeMoveInput(input));
-    if (arguments.length > 1) this.setMouselookFacing(facing);
+    if (facing !== undefined) this.setMouselookFacing(facing);
   }
 
   setMouselookFacing(facing: unknown): void {
@@ -1726,7 +1750,9 @@ export class ClientWorld implements IWorld {
         this.applyMountRaceEvent(ev as SimEvent);
         this.applyMountTrainEvent(ev as SimEvent);
         this.applyCraftResultEvent(ev as SimEvent);
+        this.applyRiftStateEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
+        this.applyUnstuckEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
       return;
@@ -1880,6 +1906,7 @@ export class ClientWorld implements IWorld {
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
+        e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
         e.title = w.title ?? null; // Book of Deeds active title (a deed id)
@@ -1980,6 +2007,7 @@ export class ClientWorld implements IWorld {
       e.mountCastRemaining = w.mcr ?? 0;
       e.mountCastKey = w.mck ?? '';
       e.sitting = !!w.sit;
+      e.riftSliding = !!w.sld;
       e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
       e.tappedById = w.tap ?? null;
@@ -2132,11 +2160,13 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
-      // Crit/haste RATING are informational paper-doll stats (combat values ride
-      // crit/sh above); sent always like the other self stats so the online
-      // character sheet shows them instead of the blankEntity 0. Server-recomputed.
+      // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
+      // crit/sh above, and hit resolves server-side); sent always like the other self
+      // stats so the online character sheet shows them instead of the blankEntity 0.
+      // Server-recomputed.
       e.critRating = s.crat ?? 0;
       e.hasteRating = s.hrat ?? 0;
+      e.hitRating = s.hirat ?? 0;
       e.weapon = s.weapon ?? e.weapon;
       e.eating = s.eat
         ? { itemId: '', kind: 'food', hpPer2s: 0, manaPer2s: 0, remaining: s.eat.remaining }
@@ -2171,6 +2201,7 @@ export class ClientWorld implements IWorld {
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
+      if (s.einst !== undefined) this.equipmentInstances = s.einst;
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
       // missing field keeps the prior mirror); normalizeAccountCosmetics rebuilds it.
       if (s.cosmetics !== undefined) {
@@ -2413,6 +2444,9 @@ export class ClientWorld implements IWorld {
   stopAutoAttack(): void {
     this.cmd({ cmd: 'stopattack' });
   }
+  unstuck(): void {
+    this.cmd({ cmd: 'unstuck' });
+  }
   releaseSpirit(): void {
     this.cmd({ cmd: 'release' });
   }
@@ -2514,6 +2548,18 @@ export class ClientWorld implements IWorld {
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
+  }
+  salvageItem(itemId: string): void {
+    this.cmd({ cmd: 'salvage_item', item: itemId });
+  }
+  upgradeRiftItem(itemId: string): void {
+    this.cmd({ cmd: 'rift_upgrade_item', item: itemId });
+  }
+  enchantRiftItem(itemId: string, stat: string): void {
+    this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat });
+  }
+  socketRiftGem(itemId: string, gemId: string): void {
+    this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
   }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
@@ -3235,6 +3281,27 @@ export class ClientWorld implements IWorld {
   }
   // Mirror the authoritative craftResult event into lastCraftResult (#1127).
   // The event still flows to the HUD (drainEvents) for a toast/log line.
+  private applyRiftStateEvent(ev: SimEvent): void {
+    if (ev.type !== 'riftState') return;
+    this.riftFloor = ev.active
+      ? {
+          eventId: ev.eventId,
+          instanceId: ev.instanceId,
+          seed: ev.seed,
+          baseLevel: ev.baseLevel,
+          floorIndex: ev.floorIndex,
+          floorCount: ev.floorCount,
+          origin: ev.origin,
+          contentId: ev.contentId,
+          contentHash: ev.contentHash,
+          upgrade: ev.upgrade,
+          name: ev.name,
+          themeName: ev.themeName,
+          tier: ev.tier,
+        }
+      : null;
+  }
+
   private applyCraftResultEvent(ev: SimEvent): void {
     if (ev.type !== 'craftResult') return;
     this.lastCraftResult = {
@@ -3245,6 +3312,24 @@ export class ClientWorld implements IWorld {
       quality: ev.quality as MaterialRarity | undefined,
       reason: ev.reason,
     };
+  }
+
+  // A successful recovery is intentionally shorter than the normal large-delta
+  // snapshot snap threshold. Mirror its authoritative event immediately so an
+  // eight-yard correction never spends a frame interpolating back into the wall.
+  private applyUnstuckEvent(ev: SimEvent): void {
+    if (ev.type !== 'unstuck' || ev.phase !== 'completed') return;
+    const p = this.entities.get(ev.pid ?? this.playerId);
+    if (!p) return;
+    p.pos = {
+      x: ev.destination.x,
+      y: ev.destination.y,
+      z: ev.destination.z,
+    };
+    p.prevPos = { ...p.pos };
+    p.vx = 0;
+    p.vy = 0;
+    p.vz = 0;
   }
   delveRiteChoose(intensity: RiteIntensity): void {
     this.cmd({ cmd: 'delve_rite_choose', intensity });

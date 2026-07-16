@@ -285,7 +285,7 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
-  dailyRewardsBan?: { reason: string; createdAt: string } | null;
+  dailyRewardsBan?: { reason: string; createdAt: string; expiresAt: string | null } | null;
   dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
   lastLoginIp: string | null;
   playtimeSeconds: number;
@@ -309,6 +309,22 @@ export interface AccountDetail {
     ip: string | null;
   }[];
   moderationHistory: ModerationHistoryEntry[];
+}
+
+export interface DailyRewardPointEventRow {
+  id: number;
+  createdAt: string;
+  kind: string;
+  points: number;
+  totalPoints: number;
+  meta: Record<string, unknown>;
+}
+
+export interface DailyRewardPointEventLog {
+  day: string;
+  rows: DailyRewardPointEventRow[];
+  total: number;
+  truncated: boolean;
 }
 
 export interface ModerationHistoryEntry {
@@ -358,6 +374,56 @@ export interface BugReportRow {
   meta: unknown;
   status: string;
   created_at: string;
+}
+
+export interface UnstuckArea {
+  kind: string;
+  id: string;
+  instanceId: string | null;
+  slot: number | null;
+}
+
+export interface UnstuckPosition {
+  x: number;
+  y: number;
+  z: number;
+  localX: number;
+  localY: number;
+  localZ: number;
+}
+
+export type UnstuckOutcome = 'completed' | 'cancelled' | 'failed';
+
+export interface UnstuckReportRow {
+  id: number;
+  characterId: number | null;
+  characterName: string | null;
+  area: UnstuckArea;
+  origin: UnstuckPosition;
+  destination: UnstuckPosition | null;
+  outcome: UnstuckOutcome;
+  reason: string;
+  invokedAt: string;
+  resolvedAt: string | null;
+}
+
+export interface UnstuckHotspot {
+  area: UnstuckArea;
+  bucket: { x: number; y: number; z: number };
+  count: number;
+  completed: number;
+  cancelled: number;
+  failed: number;
+  lastUsedAt: string;
+}
+
+export interface UnstuckReportsData {
+  reports: UnstuckReportRow[];
+  hotspots: UnstuckHotspot[];
+  days: number;
+  limit: number;
+  hasMore: boolean;
+  nextBeforeId: number | null;
 }
 
 export interface ReportDetail {
