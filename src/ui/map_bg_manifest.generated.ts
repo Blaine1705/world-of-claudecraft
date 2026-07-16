@@ -35,12 +35,12 @@ export const BAKED_MAP_BG = {
   "frostveil": {
     "w": 480,
     "h": 693,
-    "rowHash": "0d738108"
+    "rowHash": "435eb65f"
   },
   "amberfall": {
     "w": 480,
     "h": 747,
-    "rowHash": "c2286c6a"
+    "rowHash": "f54a6cc1"
   },
   "willowfen": {
     "w": 480,
@@ -80,7 +80,7 @@ export const BAKED_MAP_BG = {
   "world_strip": {
     "w": 140,
     "h": 337,
-    "rowHash": "f5f45a5d"
+    "rowHash": "59243dd2"
   }
 },
 } as const;
