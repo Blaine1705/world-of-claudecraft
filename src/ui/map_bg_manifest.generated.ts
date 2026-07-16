@@ -10,7 +10,7 @@ export const BAKED_MAP_BG = {
   "eastbrook_vale": {
     "w": 480,
     "h": 480,
-    "rowHash": "c2cea6f1"
+    "rowHash": "ab8b5dee"
   },
   "mirefen_marsh": {
     "w": 480,
@@ -35,7 +35,7 @@ export const BAKED_MAP_BG = {
   "frostveil": {
     "w": 480,
     "h": 693,
-    "rowHash": "ca34af23"
+    "rowHash": "0d738108"
   },
   "amberfall": {
     "w": 480,
@@ -75,7 +75,7 @@ export const BAKED_MAP_BG = {
   "farshore_isle": {
     "w": 480,
     "h": 480,
-    "rowHash": "e0be782a"
+    "rowHash": "c5d89b51"
   },
   "world_strip": {
     "w": 140,
