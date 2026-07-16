@@ -50,15 +50,15 @@ const impostors = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
   windowFor({ centerDist, minAtDetail: true, ...over });
 
 describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
-  it.each(shippedBiomeFog())('biome $biome: the swap only happens under heavy fog', ({
-    near,
-    far,
-  }) => {
-    // Worst case for the player: a starved frame budget, which used to drag the
-    // swap toward the camera.
-    const detailFar = treeDetailDistance(LOD_HIGH.treeDetailFar, near, far, WORST_SCALE);
-    expect(fogBlendAt(detailFar, near, far)).toBeGreaterThanOrEqual(IMPOSTOR_MIN_FOG_BLEND);
-  });
+  it.each(shippedBiomeFog())(
+    'biome $biome: the swap only happens under heavy fog',
+    ({ near, far }) => {
+      // Worst case for the player: a starved frame budget, which used to drag the
+      // swap toward the camera.
+      const detailFar = treeDetailDistance(LOD_HIGH.treeDetailFar, near, far, WORST_SCALE);
+      expect(fogBlendAt(detailFar, near, far)).toBeGreaterThanOrEqual(IMPOSTOR_MIN_FOG_BLEND);
+    },
+  );
 
   it('regression: a build-time 300u swap left cones half-clear in the long-fog zones', () => {
     // This is the reported bug, not the fix's own arithmetic. The Vale opens to

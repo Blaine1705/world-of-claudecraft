@@ -276,27 +276,21 @@ describe('recordUnstuckEvent queue isolation', () => {
     expect(delay.mock.calls.map(([ms]) => ms)).toEqual([...UNSTUCK_RECORD_RETRY_DELAYS_MS]);
   });
 
-  it.each([
-    '08006',
-    '40001',
-    '53300',
-    '57P01',
-    '57P02',
-    '57P03',
-    'ECONNRESET',
-    'ETIMEDOUT',
-  ])('retries the transient database or network code %s', async (code) => {
-    const delay = vi.fn(async (_ms: number) => {});
-    setUnstuckRecordsDepsForTests({ insert, delay, now: () => nowMs });
-    insert.mockRejectedValueOnce(codedError(code)).mockResolvedValueOnce(undefined);
+  it.each(['08006', '40001', '53300', '57P01', '57P02', '57P03', 'ECONNRESET', 'ETIMEDOUT'])(
+    'retries the transient database or network code %s',
+    async (code) => {
+      const delay = vi.fn(async (_ms: number) => {});
+      setUnstuckRecordsDepsForTests({ insert, delay, now: () => nowMs });
+      insert.mockRejectedValueOnce(codedError(code)).mockResolvedValueOnce(undefined);
 
-    recordUnstuckEvent(identity, completedEvent());
-    await unstuckRecordsIdle();
+      recordUnstuckEvent(identity, completedEvent());
+      await unstuckRecordsIdle();
 
-    expect(insert).toHaveBeenCalledTimes(2);
-    expect(delay).toHaveBeenCalledTimes(1);
-    expect(delay.mock.calls[0][0]).toBe(UNSTUCK_RECORD_RETRY_DELAYS_MS[0]);
-  });
+      expect(insert).toHaveBeenCalledTimes(2);
+      expect(delay).toHaveBeenCalledTimes(1);
+      expect(delay.mock.calls[0][0]).toBe(UNSTUCK_RECORD_RETRY_DELAYS_MS[0]);
+    },
+  );
 
   it('keeps later FIFO items and the idle drain blocked during a retry delay', async () => {
     let releaseRetry: () => void = () => {};
