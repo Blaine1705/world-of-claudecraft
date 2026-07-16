@@ -2547,7 +2547,15 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   for (const edge of BORDER_EDGES) {
     const sigma = edge.sealed ? SEALED_RIDGE_SIGMA : RIDGE_SIGMA;
     const dPerp = Math.abs((edge.kind === 'h' ? z : x) - edge.at);
-    if (dPerp < sigma * 3) {
+    // The window used to cut hard at 3 sigma, but the gaussian tail there is
+    // still 0.2yd for a classic ridge, 0.6 to 1.3yd for the tall peaks and
+    // sealed walls: an instant knee-high cliff along the whole cutoff line
+    // that the movement gate (rise over one tick's run) refuses, an invisible
+    // straight wall across open country (the Thornpeak x = -102 report). The
+    // skirt below keeps every height inside 3 sigma bit-identical and fades
+    // the tail smoothly to zero across [3, 4] sigma, so the window edge
+    // cannot step (tests/border_ridge_skirt.test.ts sweeps every edge).
+    if (dPerp < sigma * 4) {
       const along = edge.kind === 'h' ? x : z;
       let profile = Math.exp(-(dPerp * dPerp) / (2 * sigma * sigma));
       const pass = edge.sealed ? 1 : ridgePassWeight(along - edge.passAt);
@@ -2639,11 +2647,15 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       const craterGate = smoothstep(34, 56, dCrater);
       if (!edge.sealed && lakeGate < 0) lakeGate = lakeRidgeGateAt(x, z);
       const waterGate = edge.sealed ? 1 : lakeGate;
+      // the tail skirt: full weight through the classic 3-sigma window, easing
+      // to exactly zero by 4 sigma (keyed on the unmeandered dPerp so the fade
+      // band itself never wanders)
+      const skirt = 1 - smoothstep(sigma * 3, sigma * 4, dPerp);
       // where two borders meet, the TALLER range wins instead of stacking
       // (summed corners built unclimbable knots at every junction)
       wallAdd = Math.max(
         wallAdd,
-        height * crest * profile * pass * seaGate * end * craterGate * waterGate,
+        height * crest * profile * pass * seaGate * end * craterGate * waterGate * skirt,
       );
     }
   }
