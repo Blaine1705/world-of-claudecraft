@@ -1202,14 +1202,26 @@ export function valeLandness(x: number, z: number): number {
 }
 
 // The vale coast: gentle green shores meeting the sea. Runs on the vale's own
-// band only (its north edge stays the Mirefen land border, untouched).
+// band only (its north edge stays the Mirefen land border, untouched). The
+// window edges are FADES, not cuts: the carve used to stop dead at x = 178
+// and z = 178 while still pulling partial-landness ground several yards
+// toward the sea floor, leaving an instant cliff wall along both lines (the
+// strait wall north of the causeway, and the border-corner steps). The east
+// edge fades OUT into the strait (where the starter moat's own carve is
+// already ramping in), so everything at x <= 178 keeps its exact height; the
+// north edge fades IN before the border, releasing the ground back to the
+// raw band so the vale meets the Mirefen as continuous land, which is what
+// the border-corner fill lobes always intended.
+// (tests/terrain_window_seams.test.ts pins both lines.)
 function applyValeCoast(x: number, z: number, h: number): number {
-  if (z > 178 || z < -215 || x > 178) return h;
+  if (z > 178 || z < -215 || x > 190) return h;
+  const w = (1 - smoothstep(178, 190, x)) * (1 - smoothstep(162, 178, z));
+  if (w <= 0) return h;
   const land = valeLandness(x, z);
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = WATER_LEVEL - 3.4 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.4)) * shelf;
-  return h + (floor + (h - floor) * t - h);
+  return h + (floor + (h - floor) * t - h) * w;
 }
 
 // The Ferrywalk: a natural sandbar causeway from the vale's east point across
@@ -1241,7 +1253,11 @@ function causewayDistance(x: number, z: number): number {
   return best;
 }
 export function onCauseway(x: number, z: number): boolean {
-  return z < 60 && z > -80 && x > 140 && x < 262 && causewayDistance(x, z) < 22;
+  // The bbox must CONTAIN the distance test's full support (every point with
+  // d < 22 of the spit): the old x > 140 edge clipped the sandbar lift mid
+  // slope near the mainland root at (150, -46), leaving a step wall along
+  // x = 140 (tests/terrain_window_seams.test.ts).
+  return z < 60 && z > -80 && x > 126 && x < 280 && causewayDistance(x, z) < 22;
 }
 function applyCauseway(x: number, z: number, h: number): number {
   if (!onCauseway(x, z)) return h;
@@ -1262,22 +1278,34 @@ function applyCauseway(x: number, z: number, h: number): number {
 function applyStarterMoat(x: number, z: number, h: number): number {
   // the vale/island border strait (x~177..190): clear any crest sitting on
   // the border line over the open water on either side of the Ferrywalk, so
-  // the only dry link is the causeway. Skipped on the causeway itself and
-  // north of z150 (the vale's own north-corner land).
-  if (x >= 177 && x <= 194 && z < 150 && z > -184 && !onCauseway(x, z)) {
-    const wb = smoothstep(177, 182, x) * (1 - smoothstep(188, 196, x));
+  // the only dry link is the causeway. Skipped on the causeway itself. Every
+  // window edge is a fade, never a cut (the old hard z < 150 and x <= 194
+  // edges left step walls along both lines; the seabed now ramps up onto the
+  // vale's north-corner land instead): tests/terrain_window_seams.test.ts.
+  if (x >= 177 && x <= 196 && z < 158 && z > -184 && !onCauseway(x, z)) {
+    // the north fade starts at z = 148 so the carve keeps FULL depth through
+    // every guarded strait row (the deep-water barrier must not shallow),
+    // then ramps out as a continuous bank under the vale's north-corner land
+    const wb =
+      smoothstep(177, 182, x) *
+      (1 - smoothstep(188, 196, x)) *
+      (1 - smoothstep(148, 158, z)) *
+      smoothstep(-184, -172, z);
     if (wb > 0) {
       const sea2 = Math.min(h, WATER_LEVEL - 5);
       h = h + (sea2 - h) * wb;
     }
   }
-  if (x < 184 || x > 548) return h;
+  if (x < 172 || x > 548) return h;
+  // the west end eases up onto the strip's border headland instead of
+  // starting as a vertical channel wall at x = 184
+  const xw = smoothstep(172, 184, x);
   // the north channel: the border band with the Galecrest (z 164..186),
   // fading back to the Galecrest's own coast north of z 200
   const north = smoothstep(150, 164, z) * (1 - smoothstep(186, 200, z));
   // the south: open sea below the island's headland, out to the map edge
   const south = smoothstep(-150, -166, z);
-  const w = Math.max(north, south);
+  const w = Math.max(north, south) * xw;
   if (w <= 0) return h;
   const sea = Math.min(h, WATER_LEVEL - 5);
   return h + (sea - h) * w;
@@ -1510,9 +1538,19 @@ function applyWorldEdgeSea(x: number, z: number, h: number): number {
 // moat, never cuts a marginal sliver out of interior land or the Tablecrag;
 // the isthmus crossings at z1890 are left as land bridges.
 function applyStripFlankCoast(x: number, z: number, h: number): number {
+  // The z window fades INSIDE the old hard 940..1925 edges (which left step
+  // walls where the carve was still several yards deep at the line): the
+  // carve releases to zero AT the edges, so nothing outside the window is
+  // ever touched. Fading outward instead would carve the meres' enclosing
+  // cap land (the Veilmelt north cap pin in tests/world_grid.test.ts). The
+  // inland x edge fades outward, guarded by the lowGate (the wavy band can
+  // still reach dEdge 48 at the old ax < 132 cut).
+  // tests/terrain_window_seams.test.ts pins the lines.
   if (z < 940 || z > 1925) return h;
   const ax = Math.abs(x);
-  if (ax > 180 || ax < 132) return h;
+  if (ax > 180 || ax < 124) return h;
+  const zWin = smoothstep(940, 956, z) * (1 - smoothstep(1909, 1925, z));
+  const xWin = smoothstep(124, 132, ax);
   const dEdge = 180 - ax;
   const nearPass = 1 - smoothstep(20, 48, Math.abs(z - 1890));
   const wob =
@@ -1520,7 +1558,7 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
     (fbm2(z * 0.05, Math.sign(x) * 31, 9323, 2) - 0.5) * 12;
   const band = 28 + wob;
   const lowGate = 1 - smoothstep(6, 22, h);
-  const seaT = (1 - smoothstep(band - 22, band, dEdge)) * (1 - nearPass) * lowGate;
+  const seaT = (1 - smoothstep(band - 22, band, dEdge)) * (1 - nearPass) * lowGate * zWin * xWin;
   if (seaT <= 0) return h;
   const floor = Math.min(h, WATER_LEVEL - 5);
   return h + (floor - h) * seaT;
@@ -1874,13 +1912,29 @@ function applyFrostTerraces(x: number, z: number, h: number): number {
   if (h < WATER_LEVEL + 2) return h;
   const road = roadDistance(x, z);
   if (road < 5) return h;
+  // Every band and corridor edge above is matched by a smooth fade below, so
+  // the terracing eases in and out instead of switching on along a straight
+  // line: the old hard edges left knee-high step walls running the width of
+  // the realm at z = 1460 and around the crossing corridors at z = 1856,
+  // z = 1924, and x = +-92 (tests/terrain_window_seams.test.ts).
+  const zBand = smoothstep(1460, 1476, z) * (1 - smoothstep(FROST_ZMAX - 16, FROST_ZMAX, z));
+  const xBand =
+    smoothstep(STRIP_MIN_X + 2, STRIP_MIN_X + 18, x) *
+    (1 - smoothstep(STRIP_MAX_X - 18, STRIP_MAX_X - 2, x));
+  const corridor = (1 - smoothstep(34, 46, Math.abs(z - 1890))) * smoothstep(80, 92, Math.abs(x));
   const step = 6.5;
   const jit = (noise2(x * 0.045, z * 0.045, 88) - 0.5) * 3.4;
   const hh = h + jit;
   const base = Math.floor(hh / step) * step;
   const frac = (hh - base) / step;
   const ledge = base + step * Math.min(1, Math.max(0, (frac - 0.26) / 0.42));
-  const w = 0.55 * smoothstep(WATER_LEVEL + 2, WATER_LEVEL + 5.5, h) * smoothstep(5, 12, road);
+  const w =
+    0.55 *
+    smoothstep(WATER_LEVEL + 2, WATER_LEVEL + 5.5, h) *
+    smoothstep(5, 12, road) *
+    zBand *
+    xBand *
+    (1 - corridor);
   return h + (ledge - h) * w;
 }
 
