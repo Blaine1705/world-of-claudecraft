@@ -40,7 +40,7 @@ export const BAKED_MAP_BG = {
   "amberfall": {
     "w": 480,
     "h": 747,
-    "rowHash": "5bcd3f43"
+    "rowHash": "c2286c6a"
   },
   "willowfen": {
     "w": 480,
@@ -80,7 +80,7 @@ export const BAKED_MAP_BG = {
   "world_strip": {
     "w": 140,
     "h": 337,
-    "rowHash": "6008eb5a"
+    "rowHash": "f5f45a5d"
   }
 },
 } as const;
