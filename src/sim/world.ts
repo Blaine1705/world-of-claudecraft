@@ -1253,11 +1253,15 @@ function causewayDistance(x: number, z: number): number {
   return best;
 }
 export function onCauseway(x: number, z: number): boolean {
-  // The bbox must CONTAIN the distance test's full support (every point with
-  // d < 22 of the spit): the old x > 140 edge clipped the sandbar lift mid
-  // slope near the mainland root at (150, -46), leaving a step wall along
-  // x = 140 (tests/terrain_window_seams.test.ts).
-  return z < 60 && z > -80 && x > 126 && x < 280 && causewayDistance(x, z) < 22;
+  // The WEST edge must contain the distance test's full support (every point
+  // with d < 22 of the spit): the old x > 140 edge clipped the sandbar lift
+  // mid slope near the mainland root at (150, -46), leaving a step wall
+  // along x = 140 (tests/terrain_window_seams.test.ts). The EAST x < 262
+  // edge is a deliberate trim, kept: it ends the spit's no-fatigue water and
+  // lift just past the Landing so the open sea beyond guards the island
+  // (tests/fixes.test.ts, the open-shore fatigue pin); the surrounding isle
+  // shelf sits near the bar height there, so the trim never steps.
+  return z < 60 && z > -80 && x > 126 && x < 262 && causewayDistance(x, z) < 22;
 }
 function applyCauseway(x: number, z: number, h: number): number {
   if (!onCauseway(x, z)) return h;
