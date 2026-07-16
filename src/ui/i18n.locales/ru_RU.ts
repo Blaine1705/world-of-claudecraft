@@ -2023,6 +2023,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Инструмент',
   'itemUi.kind.potion': 'Зелье',
   'itemUi.kind.elixir': 'Эликсир',
+  'itemUi.kind.mount': 'Транспорт',
   'itemUi.stats.armor': 'Броня',
   'itemUi.stats.str': 'Сила',
   'itemUi.stats.agi': 'Ловкость',
@@ -3092,6 +3093,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Добро пожаловать на Мировой рынок, {className}. Покупайте у искателей приключений всего королевства или выставляйте свои товары.',
   'entities.npcs.marshal_redbrook.name': 'Маршал Редбрук',
+  'entities.npcs.stablemaster_marla.name': 'Марла Хитчен',
+  'entities.npcs.stablemaster_marla.title': 'Старшая конюшая',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Каждый всадник приходит на своих двоих, {className}. Поводья я отдам не раньше, чем ты научишься держаться на Доблестном скакуне, не целуя грязь, а лекарей на все сломанные кости в Хайвотче не напасёшься.',
+  'entities.quests.q_riding_lessons.title': 'Уроки верховой езды',
+  'entities.quests.q_riding_lessons.text':
+    'Каждый всадник приходит на своих двоих, {playerName}, как я и сказала в день нашей встречи. Заплати за обучение, и когда я подам знак, подзови учебного Доблестного скакуна и заберись в седло. Потом пройди маршрут: следуй за меткой к стартовой арке, бери каждое препятствие чисто и снова пересеки черту, пока не высыпался песок. Справишься — седло твоё. Выйдешь за пределы загона — начнём заново.',
+  'entities.quests.q_riding_lessons.completion':
+    'Вот так, хорошо. Взлетел в седло одним движением и сидишь уверенно. Доблестный скакун теперь твой, {playerName}: седло, поводья и репутация всадника, который заслужил место в седле, а не купил его.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Приручить Доблестного скакуна',
   'entities.npcs.marshal_redbrook.title': 'Городской маршал',
   'entities.npcs.marshal_redbrook.greeting':
     'Держите клинок рядом, {className}. Долина уже не та, что прежде.',
@@ -3670,6 +3681,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Шатры Культа Вирма',
   'entities.zones.thornpeak_heights.pois.8.label': 'Поля ревенантов',
   'entities.zones.thornpeak_heights.pois.9.label': 'Святилище Могильного Вирма',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Конюшни Хайвотча',
   'entities.zones.veiled_hollow.name': 'Сокрытая лощина',
   'entities.zones.veiled_hollow.welcome':
     'Воздух гудит от древней магии. Найдите хранительницу Сэльвин под великим древом Элдерглима.',
@@ -4540,6 +4552,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Поясная защита призывателя бурь',
   'entities.mobs.thunzharr_waking_peak.name': 'Тунзарр, Пробуждающийся пик',
   'entities.mobs.thunzharr_stormling.name': 'Пробуждённый элементаль бури',
+  'entities.mobs.stable_horse.name': 'Конюшенная лошадь',
   'hudChrome.worldBoss.spawn': '{name} поднимается над Терновыми высотами!',
   'entities.items.stormcallers_spaulders.name': 'Наплечники Зова Бури',
   'hud.chat.context.convertToRaid': 'Преобразовать в рейд',
@@ -4660,6 +4673,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Броня',
   'hudChrome.bags.filterConsumable': 'Расходники',
   'hudChrome.bags.filterMaterial': 'Материалы',
+  'hudChrome.bags.filterMount': 'Транспорт',
   'hudChrome.bags.filterQuest': 'Задания',
   'hudChrome.bags.sortAria': 'Сортировать предметы в сумках',
   'hudChrome.bags.sortRecent': 'Недавние',
@@ -7086,6 +7100,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': 'Капюшон Утопшего Реликвария',
   'entities.items.sister_nhalia_choir_plate.name': 'Хоровая Кованая Броня Сестры Нхалии',
   'entities.items.drowned_choir_fang.name': 'Клык Утопшего Хора',
+  'entities.items.reins_grag_bear.name': 'Поводья Голиафа Граг-медведя',
+  'entities.items.reins_valorsteed.name': 'Поводья Доблестного скакуна',
+  'entities.items.reins_stalkglider_snail.name': 'Поводья мохопанцирного скользня',
+  'entities.items.reins_aether_hover_cycle.name':
+    'Ключ зажигания: эфирный ховерцикл турнирного бойца',
+  'entities.items.reins_shadowjump_toad.name': 'Поводья Кама-Кагэ, жабы теневых прыжков',
+  'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Поводья Громоступа, великого индюка',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -7957,6 +7979,67 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.',
   'loading.tips.pvp':
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Сесть / Спешиться',
+  'hudChrome.mobile.mounts': 'Транспорт',
+  'hudChrome.mounts.title': 'Транспорт',
+  'hudChrome.mounts.close': 'Закрыть',
+  'hudChrome.mounts.select': 'Выбрать',
+  'hudChrome.mounts.selected': 'Выбран',
+  'hudChrome.mounts.riding': 'Верхом',
+  'hudChrome.mounts.mount': 'Сесть',
+  'hudChrome.mounts.dismount': 'Спешиться',
+  'hudChrome.mounts.requiresLevel': 'Требуется {level} уровень',
+  'hudChrome.mounts.pickFirst': 'Выберите транспорт для езды.',
+  'hudChrome.mounts.keybindHint': 'Нажмите клавишу «Сесть / Спешиться», чтобы поехать.',
+  'hudChrome.mounts.rarity_common': 'Обычный',
+  'hudChrome.mounts.rarity_rare': 'Редкий',
+  'hudChrome.mounts.rarity_epic': 'Эпический',
+  'hudChrome.mounts.spec_speed': '+{pct}% к скорости передвижения',
+  'hudChrome.mounts.spec_block': '+{pct}% блока урона в ближнем бою',
+  'hudChrome.mounts.spec_crit': '+{pct}% к шансу критического удара',
+  'hudChrome.mounts.name_valorsteed': 'Доблестный скакун',
+  'hudChrome.mounts.name_grag_bear': 'Голиаф Граг-медведь',
+  'hudChrome.mounts.name_stalkglider_snail': 'Мохопанцирный скользень',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Эфирный ховерцикл турнирного бойца',
+  'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
+  'hudChrome.mounts.desc_valorsteed':
+    'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Стойкая неторопливая улитка, повышающая скорость передвижения.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Мощный магитех-байк для быстрых боевых рейдов на бреющем ходу.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Огромная устойчивая жаба, обученная молниеносным теневым прыжкам по любой местности.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
+  'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
+  'hudChrome.mounts.emptyStableHint':
+    'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
+  'hudChrome.mounts.emptyDropHint': 'Более редких скакунов выбивают боссы подземелий и рейдов.',
+  'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
+  'hudChrome.mountTraining.mountPrompt':
+    'Нажми {key}, чтобы оседлать учебного Доблестного скакуна.',
+  'hudChrome.mountTraining.ownedMountPrompt': 'Нажми {key}, чтобы оседлать скакуна',
+  'hudChrome.mountTraining.ridePrompt':
+    'Следуй за светящейся меткой к линии старта и нажми «Начать заезд».',
+  'hudChrome.mountTraining.begin': 'Начать урок',
+  'hudChrome.mountTraining.success': 'Ты приручил Доблестного скакуна.',
+  'hudChrome.mountTraining.returnToMarla':
+    'Вернись к Марле в конюшни, чтобы взять себе конюшенную лошадь.',
+  'hudChrome.mountRace.cancelButton': 'Отменить заезд',
+  'hudChrome.mountRace.startButton': 'Начать заезд',
+  'hudChrome.mountRace.start': 'Вперёд! Бери все препятствия и скачи назад через арку.',
+  'hudChrome.mountRace.toFinish': 'Скачи назад через арку!',
+  'hudChrome.mountRace.finished': 'Финиш за {seconds} с!',
+  'hudChrome.mountRace.timeout': 'Заезд провален',
+  'hudChrome.mountRace.progress': 'Барьеры {n} из {total}',
   // Baseline class interrupts.
   'entities.abilities.pummel.name': 'Челюстолом',
   'entities.abilities.pummel.description':

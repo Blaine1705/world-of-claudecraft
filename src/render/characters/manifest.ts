@@ -165,6 +165,23 @@ const animal = (attack: string[]): ClipMap => ({
   death: 'Death',
 });
 
+// Rideable mounts. The Tripo-lane rigs (bear, toad, griffin) ship clips baked
+// locally by scripts/bake_mount_gaits.mjs (the Tripo quadruped retarget was
+// near-static, 4-5 animated joints), which authors Idle/Walk/Run/Death gait
+// cycles directly against each rig's bind pose. The horse and the gobbler
+// ship AUTHORED clips from their source models, renamed to these same four
+// names at import time. The clipless prop-lane mounts resolve no actions from
+// this map and rest in their generated standing pose (procedural bob in
+// src/render/mount_visuals.ts). No attack one-shots: the RIDER swings, the
+// mount does not.
+const MOUNT_RIGGED: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: [],
+  death: 'Death',
+};
+
 // Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
 // animal() core plus the donor's Sit/Fall clips so player wolf forms sit and
 // jump properly, and a Walk swim base (a paddling gait at the gentle clip
@@ -288,6 +305,7 @@ const PLAYERS = 'models/chars/players';
 const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
+const MOUNTS_DIR = 'models/mounts';
 
 /** GLB url for an equipped mainhand item's held weapon model, or null if the item
  *  has no mapped model (then the class default attach is kept). Mirrors the bag
@@ -610,6 +628,90 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/chicken_cow.glb`,
     height: 2.3,
     clips: CHICKEN_COW,
+  },
+
+  // -- rideable mounts (src/sim/content/mounts.ts catalog) -------------------
+  // All lazyPreload: fetched on the first sight of a mounted player
+  // (preloadMountAssets in assets.ts), never in the boot sweep. Baked
+  // textures, no tint. Seat heights + procedural bob live in
+  // src/render/mount_visuals.ts. Heights are deliberately imposing (a mount
+  // should tower over the 2.6 humanoid the way a horse towers over a person);
+  // walkRef/runRef foot-match each model's Walk/Run cycle cadence (baked or
+  // authored) to mounted ground speed.
+  // The horse ships AUTHORED gait clips (Idle/Walk/Run baked from the source
+  // model's own animation set, Sleep repurposed as Death), not the procedural
+  // bake_mount_gaits.mjs cycles the Tripo mounts carry; walkRef/runRef are
+  // re-matched to its 1.03s walk / 0.40s gallop cadence.
+  mount_valorsteed: {
+    url: `${MOUNTS_DIR}/valorsteed.glb`,
+    height: 3.8,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.3,
+    runRef: 12,
+    lazyPreload: true,
+  },
+  mount_grag_bear: {
+    url: `${MOUNTS_DIR}/grag_bear.glb`,
+    height: 4.0,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
+    lazyPreload: true,
+  },
+  mount_stalkglider_snail: {
+    url: `${MOUNTS_DIR}/stalkglider_snail.glb`,
+    height: 3.1,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  mount_aether_hover_cycle: {
+    url: `${MOUNTS_DIR}/aether_hover_cycle.glb`,
+    height: 2.3,
+    clips: MOUNT_RIGGED,
+    hover: 0.6,
+    lazyPreload: true,
+  },
+  mount_shadowjump_toad: {
+    url: `${MOUNTS_DIR}/shadowjump_toad.glb`,
+    height: 3.2,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
+    lazyPreload: true,
+  },
+  mount_stormfeather_griffin: {
+    url: `${MOUNTS_DIR}/stormfeather_griffin.glb`,
+    height: 4.1,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
+    lazyPreload: true,
+  },
+  // Epic world-boss turkey: one authored strut cycle serves as BOTH Walk and
+  // Run (plus a baked breathing Idle), so the run reference is deliberately
+  // low; at full mounted speed the strut plays fast, which is the joke.
+  mount_thunderstrut_gobbler: {
+    url: `${MOUNTS_DIR}/thunderstrut_gobbler.glb`,
+    height: 3.5,
+    clips: MOUNT_RIGGED,
+    walkRef: 1.8,
+    runRef: 4.5,
+    lazyPreload: true,
+  },
+
+  // Ambient Highwatch stable horse (sim mob 'stable_horse', MOB_KEYS below). Reuses
+  // the Valorsteed GLB + its authored gait clips so it renders and ambles as a real
+  // horse through the STANDARD mob-visual path, never a humanoid capsule. Unlike the
+  // rider mounts this is NOT lazyPreload: a mob body is built synchronously by
+  // createCharacterVisual (which throws on a not-yet-fetched asset), so it must be
+  // in the boot sweep. Shorter than the imposing 3.8 ridden Valorsteed so loose
+  // paddock horses read at a natural size; no tint (authored colours).
+  mob_stable_horse: {
+    url: `${MOUNTS_DIR}/valorsteed.glb`,
+    height: 2.9,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.3,
+    runRef: 12,
   },
 
   // -- mob families --------------------------------------------------------
@@ -1255,6 +1357,9 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
+  // above) so it renders as an animated horse, not a humanoid.
+  stable_horse: 'mob_stable_horse',
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',

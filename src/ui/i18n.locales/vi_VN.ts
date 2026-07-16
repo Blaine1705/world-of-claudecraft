@@ -1091,6 +1091,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Bọc Trứng Nhện',
   'entities.mobs.sump_troll_devourer.name': 'Troll Vũng Lầy Háu Ăn',
   'entities.mobs.thunzharr_stormling.name': 'Tinh Linh Bão Trỗi Dậy',
+  'entities.mobs.stable_horse.name': 'Ngựa chuồng',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Đỉnh Núi Thức Giấc',
   'entities.mobs.tolling_bell.name': 'Chuông Ngân Vang',
   'entities.mobs.vale_cup_ball.name': 'Bóng Da Heo Rừng',
@@ -2654,6 +2655,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmshadow_treads.name': 'Giày Nightfang',
   'entities.items.ysols_pearl_greaves.name': 'Giáp Ống Quyển Ngọc Trai của Ysolei',
   'entities.items.zealotsbane_blade.name': 'Kiếm Diệt Cuồng Tín',
+  'entities.items.reins_grag_bear.name': 'Dây cương Gấu Grag Goliath',
+  'entities.items.reins_valorsteed.name': 'Dây cương Valorsteed',
+  'entities.items.reins_stalkglider_snail.name': 'Dây cương Ốc Lướt Vỏ Rêu',
+  'entities.items.reins_aether_hover_cycle.name': 'Chìa khóa khởi động: Xe Bay Kỵ Sĩ Aether',
+  'entities.items.reins_shadowjump_toad.name': 'Dây cương Kama-Kage, Cóc Nhảy Bóng',
+  'entities.items.reins_stormfeather_griffin.name': 'Dây cương Vũ Bão Vươn Trời',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Dây cương Gà Tây Chúa Sải Bước Sấm',
   'entities.items.duskwisp_essence.name': 'Tinh chất ma trơi hoàng hôn',
   'entities.items.spore_heart.name': 'Trái tim bào tử',
   'entities.items.gleaming_antler.name': 'Gạc hươu lấp lánh',
@@ -2826,6 +2834,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Giữ chặt lưỡi kiếm, {className}. Thung Lũng không còn như xưa nữa.',
   'entities.npcs.marshal_redbrook.name': 'Cảnh Trưởng Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Quản Mã',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Kỵ sĩ nào cũng bước vào bằng hai chân, {className}. Ta chỉ trao dây cương khi nào ngươi ngồi vững trên lưng Valorsteed mà không lăn xuống bùn, vì Highwatch chẳng dư thầy thuốc để chữa xương gãy.',
+  'entities.quests.q_riding_lessons.title': 'Bài Học Cưỡi Ngựa',
+  'entities.quests.q_riding_lessons.text':
+    'Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Trả lệ phí, rồi khi ta ra hiệu, hãy gọi con Valorsteed huấn luyện đến và leo lên yên. Rồi chạy hết đường đua: theo dấu hiệu tới cổng vòm xuất phát, vượt sạch từng chướng ngại, và băng qua vạch lần nữa trước khi cát chảy hết. Làm được vậy thì yên ngựa là của ngươi. Đi khỏi bãi quây là ta bắt đầu lại từ đầu.',
+  'entities.quests.q_riding_lessons.completion':
+    'Đấy, được rồi. Lên yên bằng một động tác gọn gàng và ngồi thật vững. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Thuần Hóa Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Cảnh Trưởng Thị Trấn',
   'entities.npcs.provisioner_hale.greeting':
     'Giày khô, bánh khô, thuốc súng khô, ở Fenbridge ngày đẹp trời lắm thì được hai trong ba.',
@@ -3380,6 +3398,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Lều Giáo Phái Cuồng Long',
   'entities.zones.thornpeak_heights.pois.8.label': 'Cánh Đồng Vong Linh',
   'entities.zones.thornpeak_heights.pois.9.label': 'Thánh Đường Mộ Long',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Chuồng ngựa Highwatch',
   'entities.zones.thornpeak_heights.welcome':
     'Đội Trưởng Thessaly đang trấn giữ bức tường ở Vọng Đài Cao, vất vả lắm mới giữ nổi.',
   'errors.api.accountBanned': 'Tài khoản này đã bị cấm.',
@@ -5277,6 +5296,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Vật phẩm tiêu hao',
   'hudChrome.bags.filterGroupAria': 'Lọc túi đồ theo danh mục',
   'hudChrome.bags.filterMaterial': 'Nguyên liệu',
+  'hudChrome.bags.filterMount': 'Vật cưỡi',
   'hudChrome.bags.filterQuest': 'Nhiệm vụ',
   'hudChrome.bags.filterWeapon': 'Vũ khí',
   'hudChrome.bags.noMatch': 'Không có vật phẩm nào khớp với bộ lọc của bạn.',

@@ -754,6 +754,7 @@ export const sv_SE: EnTranslations = {
       "leaderboard": "Ranking",
       "dailyRewards": "Butik",
       "deeds": "Bedrifter",
+      "mounts": "Mounts",
       "nameplates": "Namn",
       "haptics": "Haptik",
       "hapticsOff": "Haptik av",
@@ -868,7 +869,63 @@ export const sv_SE: EnTranslations = {
       "petStop": "Djur: Stanna",
       "petTaunt": "Djur: Provocera",
       "petDefensive": "Djur: Defensivt",
-      "petAggressive": "Djur: Aggressivt"
+      "petAggressive": "Djur: Aggressivt",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Dalcupen",
@@ -1490,6 +1547,7 @@ export const sv_SE: EnTranslations = {
       "filterConsumable": "Förbrukningsvaror",
       "filterMaterial": "Material",
       "filterQuest": "Uppdrag",
+      "filterMount": "Riddjur",
       "sortAria": "Sortera väskföremål",
       "sortRecent": "Senaste",
       "sortQuality": "Kvalitet",
@@ -5882,7 +5940,8 @@ export const sv_SE: EnTranslations = {
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir",
-      "bag": "Väska"
+      "bag": "Väska",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Rustning",
@@ -8408,6 +8467,27 @@ export const sv_SE: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Stormkallarens midjeskydd"
+      },
+      "reins_valorsteed": {
+        "name": "Tyglar till Valorsteed"
+      },
+      "reins_grag_bear": {
+        "name": "Tyglar till Goliat Grag-björnen"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Tyglar till mosskal-stjälkglidaren"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Tändningsnyckel: eterriddarens svävarcykel"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Tyglar till Kama-Kage, skuggsprångspaddan"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Tyglar till den himlanående Stormfjädern"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Tyglar till Åskstoltseraren, den stora kalkonen"
       }
     },
     "mobs": {
@@ -8656,6 +8736,9 @@ export const sv_SE: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Väckt stormyngel"
+      },
+      "stable_horse": {
+        "name": "Stallhäst"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -9058,6 +9141,11 @@ export const sv_SE: EnTranslations = {
         "name": "Förman Odell",
         "title": "Gruvförman",
         "greeting": "Hela utgrävningen kryllar av de där lerinkrustade skadedjuren!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stallmästare",
+        "greeting": "Varje ryttare kommer in på två ben, {className}. Tyglarna får du inte förrän du kan sitta kvar på Valorsteed utan att kyssa leran, och Highwatch har inga läkare att avvara för brutna ben."
       },
       "warden_fenwick": {
         "name": "Väktaren Fenwick",
@@ -10058,6 +10146,16 @@ export const sv_SE: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Ridlektioner",
+        "text": "Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Betala avgiften, och när jag ger tecken kallar du till dig övnings-Valorsteeden och kliver upp i sadeln. Rid sedan banan: följ markören till startbågen, ta varje hinder rent och korsa linjen igen innan sanden runnit ut. Klarar du det är sadeln din. Vandrar du ut ur hagen börjar vi om.",
+        "completion": "Så där ja. Upp i en enda mjuk rörelse och stadigt sittande där uppe. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.",
+        "objectives": {
+          "0": {
+            "label": "Tämj Valorsteed"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10374,6 +10472,9 @@ export const sv_SE: EnTranslations = {
           },
           "9": {
             "label": "Gravlindormens helgedom"
+          },
+          "10": {
+            "label": "Highwatchs stall"
           }
         }
       },

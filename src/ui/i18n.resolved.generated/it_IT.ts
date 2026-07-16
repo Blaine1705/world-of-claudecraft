@@ -754,6 +754,7 @@ export const it_IT: EnTranslations = {
       "leaderboard": "Classifica",
       "dailyRewards": "Negozio",
       "deeds": "Imprese",
+      "mounts": "Cavalcature",
       "nameplates": "Nomi",
       "haptics": "Vibrazione",
       "hapticsOff": "Vibrazione disattivata",
@@ -868,7 +869,63 @@ export const it_IT: EnTranslations = {
       "petStop": "Famiglio: fermo",
       "petTaunt": "Famiglio: provoca",
       "petDefensive": "Famiglio: difensivo",
-      "petAggressive": "Famiglio: aggressivo"
+      "petAggressive": "Famiglio: aggressivo",
+      "mount": "Monta / Smonta"
+    },
+    "mounts": {
+      "title": "Cavalcature",
+      "close": "Chiudi",
+      "select": "Scegli",
+      "selected": "Scelta",
+      "riding": "In sella",
+      "mount": "Monta",
+      "dismount": "Smonta",
+      "requiresLevel": "Richiede livello {level}",
+      "pickFirst": "Scegli una cavalcatura da cavalcare.",
+      "keybindHint": "Premi il tasto Monta / Smonta per cavalcare.",
+      "emptyTitle": "Nessuna cavalcatura ottenuta",
+      "emptyStableHint": "Raggiungi il livello 20 e prendi lezioni di equitazione dalla Stalliera capo Marla alle stalle a ovest di Highwatch.",
+      "emptyDropHint": "Le cavalcature più rare sono bottino dei boss di spedizione e incursione.",
+      "clickManage": "Clicca per scegliere la tua cavalcatura",
+      "rarity_common": "Comune",
+      "rarity_rare": "Rara",
+      "rarity_epic": "Epica",
+      "spec_speed": "+{pct}% di mobilità extra",
+      "spec_block": "+{pct}% di blocco dei danni in mischia",
+      "spec_crit": "+{pct}% di probabilità di colpo critico",
+      "name_valorsteed": "Destriero del Valore",
+      "name_grag_bear": "Orso Grag Golia",
+      "name_stalkglider_snail": "Aliante dal Guscio Muschioso",
+      "name_aether_hover_cycle": "Aerociclo del Giostratore d’Etere",
+      "name_shadowjump_toad": "Kama-Kage, il Rospo Saltombra",
+      "name_stormfeather_griffin": "Piumatempesta Toccacielo",
+      "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
+      "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
+      "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
+      "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
+      "desc_aether_hover_cycle": "Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.",
+      "desc_shadowjump_toad": "Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.",
+      "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.",
+      "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "La Coppa della Valle",
@@ -1490,6 +1547,7 @@ export const it_IT: EnTranslations = {
       "filterConsumable": "Consumabili",
       "filterMaterial": "Materiali",
       "filterQuest": "Missione",
+      "filterMount": "Cavalcature",
       "sortAria": "Ordina gli oggetti della borsa",
       "sortRecent": "Recenti",
       "sortQuality": "Qualità",
@@ -5882,7 +5940,8 @@ export const it_IT: EnTranslations = {
       "tool": "Strumento",
       "potion": "Pozione",
       "elixir": "Elisir",
-      "bag": "Borsa"
+      "bag": "Borsa",
+      "mount": "Cavalcatura"
     },
     "stats": {
       "armor": "Armatura",
@@ -8408,6 +8467,27 @@ export const it_IT: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guardacintura del Chiamatempeste"
+      },
+      "reins_valorsteed": {
+        "name": "Redini del Destriero del Valore"
+      },
+      "reins_grag_bear": {
+        "name": "Redini dell’Orso Grag Golia"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Redini dell’Aliante dal Guscio Muschioso"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Chiave di accensione: Aerociclo del Giostratore d’Etere"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Redini di Kama-Kage, il Rospo Saltombra"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Redini del Piumatempesta Toccacielo"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Redini di Passotuono, il Gran Tacchino"
       }
     },
     "mobs": {
@@ -8656,6 +8736,9 @@ export const it_IT: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Elementale di tempesta ridestato"
+      },
+      "stable_horse": {
+        "name": "Cavallo da stalla"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -9058,6 +9141,11 @@ export const it_IT: EnTranslations = {
         "name": "Caposquadra Odell",
         "title": "Caposquadra della miniera",
         "greeting": "Tutta la galleria brulica di quei parassiti incrostati di fango!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stalliera capo",
+        "greeting": "Ogni cavaliere arriva sulle proprie gambe, {className}. Non ti darò le redini finché non saprai restare in sella al Destriero del Valore senza baciare il fango, e a Highwatch non abbondano i guaritori per le ossa rotte."
       },
       "warden_fenwick": {
         "name": "Custode Fenwick",
@@ -10058,6 +10146,16 @@ export const it_IT: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Lezioni di equitazione",
+        "text": "Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Paga la quota e, quando te lo dico, chiama a te il Destriero del Valore da addestramento e sali in sella. Poi affronta il percorso: segui il segnale fino all’arco di partenza, supera pulito ogni ostacolo e taglia di nuovo il traguardo prima che la sabbia si esaurisca. Riuscirci, e la sella è tua. Esci dal recinto e si ricomincia.",
+        "completion": "Ecco, così. Su con un solo movimento pulito e ben saldo in sella. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.",
+        "objectives": {
+          "0": {
+            "label": "Doma il Destriero del Valore"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10374,6 +10472,9 @@ export const it_IT: EnTranslations = {
           },
           "9": {
             "label": "Santuario del Gravewyrm"
+          },
+          "10": {
+            "label": "Stalle di Highwatch"
           }
         }
       },

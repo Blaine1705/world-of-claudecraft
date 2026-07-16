@@ -754,6 +754,7 @@ export const fr_CA: EnTranslations = {
       "leaderboard": "Classement",
       "dailyRewards": "Boutique",
       "deeds": "Hauts faits",
+      "mounts": "Montures",
       "nameplates": "Noms",
       "haptics": "Vibrations",
       "hapticsOff": "Vibrations désactivées",
@@ -868,7 +869,63 @@ export const fr_CA: EnTranslations = {
       "petStop": "Familier : arrêter",
       "petTaunt": "Familier : provoquer",
       "petDefensive": "Familier : défensif",
-      "petAggressive": "Familier : agressif"
+      "petAggressive": "Familier : agressif",
+      "mount": "Monter / Descendre"
+    },
+    "mounts": {
+      "title": "Montures",
+      "close": "Fermer",
+      "select": "Choisir",
+      "selected": "Choisie",
+      "riding": "En selle",
+      "mount": "Monter",
+      "dismount": "Descendre",
+      "requiresLevel": "Niveau {level} requis",
+      "pickFirst": "Choisissez une monture à chevaucher.",
+      "keybindHint": "Appuyez sur la touche Monter / Descendre pour chevaucher.",
+      "emptyTitle": "Aucune monture collectée",
+      "emptyStableHint": "Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.",
+      "emptyDropHint": "Les montures plus rares sont lâchées par les boss de donjon et de raid.",
+      "clickManage": "Cliquez pour choisir votre monture",
+      "rarity_common": "Commune",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Épique",
+      "spec_speed": "+{pct}% de mobilité supplémentaire",
+      "spec_block": "+{pct}% de blocage des dégâts de mêlée",
+      "spec_crit": "+{pct}% de chances de coup critique",
+      "name_valorsteed": "Destrier de Bravoure",
+      "name_grag_bear": "Ours-Grag Goliath",
+      "name_stalkglider_snail": "Glisseur à Coquille Moussue",
+      "name_aether_hover_cycle": "Aérocycle du Jouteur d’Éther",
+      "name_shadowjump_toad": "Kama-Kage, le Crapaud Saute-Ombre",
+      "name_stormfeather_griffin": "Plume-d’Orage Toise-Ciel",
+      "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
+      "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
+      "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
+      "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
+      "desc_aether_hover_cycle": "Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.",
+      "desc_shadowjump_toad": "Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.",
+      "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
+      "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "La Coupe du Val",
@@ -1490,6 +1547,7 @@ export const fr_CA: EnTranslations = {
       "filterConsumable": "Consommables",
       "filterMaterial": "Matériaux",
       "filterQuest": "Quête",
+      "filterMount": "Montures",
       "sortAria": "Trier les objets du sac",
       "sortRecent": "Récents",
       "sortQuality": "Qualité",
@@ -5882,7 +5940,8 @@ export const fr_CA: EnTranslations = {
       "tool": "Outil",
       "potion": "Potion",
       "elixir": "Élixir",
-      "bag": "Sac"
+      "bag": "Sac",
+      "mount": "Monture"
     },
     "stats": {
       "armor": "Armure",
@@ -8408,6 +8467,27 @@ export const fr_CA: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Protège-taille d'Appel-tempête"
+      },
+      "reins_valorsteed": {
+        "name": "Rênes du Destrier de Bravoure"
+      },
+      "reins_grag_bear": {
+        "name": "Rênes de l’Ours-Grag Goliath"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Rênes du Glisseur à Coquille Moussue"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Clé de contact : Aérocycle du Jouteur d’Éther"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Rênes de Kama-Kage, le Crapaud Saute-Ombre"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Rênes du Plume-d’Orage Toise-Ciel"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Rênes de Pavane-Tonnerre, le Grand Dindon"
       }
     },
     "mobs": {
@@ -8656,6 +8736,9 @@ export const fr_CA: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Élémentaire de tempête éveillé"
+      },
+      "stable_horse": {
+        "name": "Cheval d'écurie"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -9058,6 +9141,11 @@ export const fr_CA: EnTranslations = {
         "name": "Contremaître Odell",
         "title": "Contremaître de la mine",
         "greeting": "Toute la mine grouille de ces vermines couvertes de terre !"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Maîtresse d’écurie",
+        "greeting": "Tout cavalier arrive sur ses deux jambes, {className}. Je ne te donnerai les rênes que lorsque tu sauras tenir en selle sur le Destrier de Bravoure sans mordre la boue, et Highwatch n’a pas de guérisseurs de trop pour les os brisés."
       },
       "warden_fenwick": {
         "name": "Gardien Fenwick",
@@ -10058,6 +10146,16 @@ export const fr_CA: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Leçons d’équitation",
+        "text": "Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Paie les frais, et quand j’en donne l’ordre, appelle à toi le Destrier de Bravoure d’entraînement et mets-toi en selle. Puis fais le parcours : suis le repère jusqu’à l’arche de départ, franchis chaque obstacle proprement et repasse la ligne avant que le sable ne s’écoule. Réussis, et la selle est à toi. Sors de l’enclos et l’on recommence.",
+        "completion": "Voilà. En selle d’un seul mouvement, et bien stable une fois là-haut. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.",
+        "objectives": {
+          "0": {
+            "label": "Dompter le Destrier de Bravoure"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10374,6 +10472,9 @@ export const fr_CA: EnTranslations = {
           },
           "9": {
             "label": "Sanctuaire du Gravewyrm"
+          },
+          "10": {
+            "label": "Écuries de Highwatch"
           }
         }
       },

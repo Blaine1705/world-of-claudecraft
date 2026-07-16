@@ -1520,12 +1520,13 @@ describe('client HTML shell', () => {
     );
     expect(html).toContain('id="mobile-more-close"');
     expect(html).toContain('<div id="mobile-extra-grid">');
-    // Daily Rewards, the Book of Deeds, and Crafting ride the More grid in BOTH
+    // Daily Rewards, the Book of Deeds, Mount / Dismount, and Crafting ride the More grid in BOTH
     // entries (play.html historically lags index.html; these pins keep them in
     // step).
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="mobile-daily-rewards"');
       expect(entry).toContain('id="mobile-deeds"');
+      expect(entry).toContain('id="mobile-mounts"');
       expect(entry).toContain('id="mobile-crafting"');
     }
     expect(hudMobileCss).toContain(

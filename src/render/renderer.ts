@@ -51,9 +51,15 @@ import {
   type AnimState,
   type CharacterVisual,
   createCharacterVisual,
+  createMountVisual,
   setWeaponVfxViewportHeight,
 } from './characters';
-import { mechAssetsReady, preloadMechAssets } from './characters/assets';
+import {
+  mechAssetsReady,
+  mountAssetsReady,
+  preloadMechAssets,
+  preloadMountAssets,
+} from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import {
   playerRangedAttackAlreadyStarted,
@@ -117,6 +123,8 @@ import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features'
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
+import { MountBeacon } from './mount_beacon';
+import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -136,6 +144,7 @@ import { buildComposer, type PostPipeline } from './post';
 import { runBackgroundPrewarm } from './prewarm_pass';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
+import { RaceLine } from './race_line';
 import { isOwnedPetHostile } from './reaction';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
@@ -249,6 +258,9 @@ const SFX_MOVE_RANGE_SQ = 42 * 42;
 // Stride length (world units travelled) between footfalls — longer at a run.
 const FOOT_STRIDE_WALK = 0.95;
 const FOOT_STRIDE_RUN = 1.55;
+// Mount clips contain a full gait beat (usually two contacts), so their cadence
+// is intentionally longer than an on-foot stride and leaves the one-shot tail clear.
+const MOUNT_STRIDE_RUN = 5.8;
 const SWIM_STRIDE = 2.4;
 const FOOT_RUN_SPEED = 4.5; // u/s — matches the run threshold in characters/anim_state.ts
 // fire/torch point lights beyond this never shine (their falloff range is
@@ -601,6 +613,11 @@ export interface EntityView {
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
+  mountVisual: CharacterVisual | null; // rideable mount under a player, built lazily
+  mountVisualKey: string; // '' = none; diffed each frame for live mount swaps
+  /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
+   *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
+  mountLift: number;
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
@@ -668,6 +685,13 @@ export interface EntityView {
   wasSwimming: boolean;
   // consecutive frames the foot-height heuristic read airborne (debounce)
   airborneHeurFrames: number;
+  // mount summon/dismount transition edge-detects. lastMountKey fires the summon
+  // glow when e.mountKey changes (a dedicated tracker: mountVisualKey above lags
+  // asset loading). wasMountCasting fires the rider's call pose on the idle ->
+  // summoning edge. Both seeded from the entity's current state so an already-
+  // mounted login does not flash a spurious glow or pose.
+  lastMountKey: string;
+  wasMountCasting: boolean;
 }
 
 function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
@@ -937,6 +961,20 @@ export class Renderer {
     swimming: false,
     sitting: false,
   };
+  // Second scratch for the mount rig: the rider's state minus the rider-only
+  // facts (casting/sitting/dead never reach the mount's locomotion clips).
+  private readonly mountAnimScratch: AnimState = {
+    speed: 0,
+    moving: false,
+    running: false,
+    airborne: false,
+    backwards: false,
+    reverseBackpedal: false,
+    dead: false,
+    casting: false,
+    swimming: false,
+    sitting: false,
+  };
   private selfRenderPosition = new THREE.Vector3();
   private selfRenderPositionReady = false;
   // Online display-only self extrapolation (see src/render/self_motion.ts).
@@ -1078,6 +1116,8 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
+  private raceLine: RaceLine;
+  private mountBeacon: MountBeacon;
   private weather: Weather;
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
@@ -1677,6 +1717,12 @@ export class Renderer {
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
     });
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+
+    // Show-jumping racing line: self-scoped course guidance, hidden outside the
+    // player's own race (driven per frame from world.mountRaceView() below).
+    this.raceLine = new RaceLine(this.scene, this.groundSample);
+    // Riding-lesson start platform: the glowing square behind the start arch.
+    this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -4222,6 +4268,9 @@ export class Renderer {
       bearVisual: null,
       catVisual: null,
       travelVisual: null,
+      mountVisual: null,
+      mountVisualKey: '',
+      mountLift: 0,
       height,
       clickTarget,
       nameplate: np,
@@ -4279,6 +4328,8 @@ export class Renderer {
       wasAirborne: false,
       wasSwimming: false,
       airborneHeurFrames: 0,
+      lastMountKey: e.mountKey,
+      wasMountCasting: e.mountCastRemaining > 0,
     });
     const view = this.views.get(e.id);
     // Never gate the player's OWN view: it must be on screen immediately, its
@@ -5042,6 +5093,7 @@ export class Renderer {
       v.bearVisual?.dispose();
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
+      v.mountVisual?.dispose();
     } else {
       if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
         this.storePooledObject(v.objectPoolKey, { group: v.objectMesh, height: v.height });
@@ -5309,9 +5361,11 @@ export class Renderer {
           v.visual.setShadow(wantShadow);
           v.isFar = d2 > lodRangeSq;
           // past the articulated gate the static-pose proxy carries the
-          // shadow; an active form's own rig keeps casting instead
+          // shadow; an active form's own rig keeps casting instead. A mounted
+          // rider also skips the proxy: its baked ground-level idle silhouette
+          // would render under the raised body.
           v.visual.setProxyShadow(
-            !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel,
+            !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel && !v.mountVisual,
           );
           // sheep/forms keep articulated shadows through the whole proxy band —
           // a frozen humanoid proxy silhouette would be wrong under a form
@@ -5320,6 +5374,7 @@ export class Renderer {
           v.bearVisual?.setShadow(wantFormShadow);
           v.catVisual?.setShadow(wantFormShadow);
           v.travelVisual?.setShadow(wantFormShadow);
+          v.mountVisual?.setShadow(wantFormShadow);
         } else if (wantShadow !== v.shadowOn) {
           v.shadowOn = wantShadow;
           for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
@@ -5546,6 +5601,37 @@ export class Renderer {
       if (v.bearVisual) v.bearVisual.root.visible = bear;
       if (v.catVisual) v.catVisual.root.visible = cat;
       if (v.travelVisual) v.travelVisual.root.visible = travel;
+      // rideable mount under the player (the lazy form-visual pattern). Mount
+      // GLBs are lazyPreload: the first sight of a rider kicks the fetch and
+      // the visual appears once ready. A druid form replaces the whole body,
+      // so the form wins visually and the mount hides (the sim's speed math
+      // is untouched either way).
+      const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
+      const mountShown = !!mountSpec && !(polyed || bear || cat || travel) && !e.dead;
+      if (mountSpec && v.mountVisualKey !== mountSpec.visualKey) {
+        if (v.mountVisual) {
+          v.group.remove(v.mountVisual.root);
+          v.mountVisual.dispose();
+          v.mountVisual = null;
+        }
+        v.mountVisualKey = '';
+        if (mountAssetsReady(mountSpec.visualKey)) {
+          v.mountVisual = createMountVisual(mountSpec.visualKey);
+          v.group.add(v.mountVisual.root); // group.scale already carries e.scale
+          v.mountVisualKey = mountSpec.visualKey;
+        } else {
+          void preloadMountAssets(mountSpec.visualKey).catch((err) =>
+            console.error('Failed to preload mount model:', err),
+          );
+        }
+      } else if (!mountSpec && v.mountVisual) {
+        v.group.remove(v.mountVisual.root);
+        v.mountVisual.dispose();
+        v.mountVisual = null;
+        v.mountVisualKey = '';
+      }
+      if (v.mountVisual) v.mountVisual.root.visible = mountShown;
+      v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
       const active =
         polyed && v.sheepVisual
           ? v.sheepVisual
@@ -5571,6 +5657,12 @@ export class Renderer {
       active.setMoonkin(hasMoonkin);
       active.setMetamorph(hasMetamorph);
       v.visual.root.visible = active === v.visual;
+      // saddle lift: the rider (click proxy included, a root child) sits at
+      // the seat height while mounted; 0 whenever the mount is absent/hidden.
+      // seatFwd slides the rider along facing onto saddles that sit off the
+      // model origin (the toad's is well back toward the tail).
+      v.visual.root.position.y = v.mountLift;
+      v.visual.root.position.z = v.mountLift > 0 && mountSpec ? mountSpec.seatFwd : 0;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
 
@@ -5640,13 +5732,23 @@ export class Renderer {
       st.speed = loco.speed;
       st.moving = moving;
       st.running = loco.running;
-      st.airborne = airborne;
+      // A mounted rider stays planted in the saddle: the MOUNT carries the
+      // jump arc (its anim scratch below keeps the real airborne flag), while
+      // the rider holds the seated pose instead of replaying the jump clip.
+      const logicallyMounted = e.mountKey !== '';
+      const riderMounted = v.mountLift > 0;
+      st.airborne = airborne && !riderMounted;
       st.backwards = loco.backwards;
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
       st.casting = e.castingAbility !== null && !visuallyDead;
       st.swimming = swimming;
-      st.sitting = e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null);
+      // A mounted rider holds the seated pose (the sit loop reads as riding);
+      // swim/cast still outrank it in desiredBaseState, so mounted casting
+      // and swimming animate normally.
+      st.sitting =
+        e.kind === 'player' &&
+        (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
       // Ice slide: the sim glides the player at speed but they should read as
       // FROZEN (gliding stiff on the ice), not sprinting. Suppress locomotion +
       // airborne so the state machine holds the static idle pose while they slide.
@@ -5666,13 +5768,23 @@ export class Renderer {
         if (swimming && !v.wasSwimming && !visuallyDead)
           sink.movement('splash', ax, ay, az, isSelf);
         // footfalls / swim strokes via a distance accumulator (no timers)
-        if (visuallyDead || st.sitting) {
+        if (visuallyDead || (st.sitting && !riderMounted)) {
           v.stepAccum = 0;
         } else if (swimming) {
           v.stepAccum += loco.speed * dt;
           if (v.stepAccum >= SWIM_STRIDE) {
             v.stepAccum = 0;
             sink.movement('swim', ax, ay, az, isSelf);
+          }
+        } else if (logicallyMounted && moving && !airborne) {
+          if (loco.speed >= FOOT_RUN_SPEED) {
+            v.stepAccum += loco.speed * dt;
+            if (v.stepAccum >= MOUNT_STRIDE_RUN) {
+              v.stepAccum = 0;
+              sink.mountRun(ax, ay, az, e.mountKey, isSelf);
+            }
+          } else {
+            v.stepAccum = MOUNT_STRIDE_RUN * 0.6;
           }
         } else if (moving && !airborne) {
           v.stepAccum += loco.speed * dt;
@@ -5718,6 +5830,35 @@ export class Renderer {
       // skin VFX point light on it) is rebuilt inside update(), not at the diff.
       if (v.visual.consumeWeaponGraphDirty()) this.reconcileViewLights(v);
 
+      // The mount animates from the same locomotion inputs as its rider: the
+      // rigged quadrupeds run their baked gait clips (a live Idle loop while
+      // standing, Walk/Run on the move, scripts/bake_mount_gaits.mjs), and
+      // the clipless mounts bob procedurally (the hover cycle floats, the
+      // griffin canters, the snail glides flat). `airborne` here is the real
+      // flag, not the rider's suppressed one: the mount carries the jump.
+      if (v.mountVisual && mountSpec && mountShown) {
+        const mst = this.mountAnimScratch;
+        mst.speed = st.speed;
+        mst.moving = st.moving;
+        mst.running = st.running;
+        mst.airborne = airborne;
+        mst.backwards = st.backwards;
+        mst.swimming = st.swimming;
+        v.mountVisual.update(dt, mst, animate);
+        // the rider floats WITH the procedural bob (the hover cycle's idle
+        // float), not just the mount body
+        const bob = mountBobY(mountSpec, this.time, moving);
+        v.mountVisual.root.position.y = bob;
+        v.visual.root.position.y = v.mountLift + bob;
+        // ambient mount particles: the snail paints its slime path while
+        // gliding, the hover cycle streams aether exhaust off its tail
+        if (mountSpec.fx === 'slime') {
+          if (moving) this.vfx.mountSlimeTrail(v.group.position, dt);
+        } else if (mountSpec.fx === 'exhaust') {
+          this.vfx.mountExhaust(v.group.position, facing, dt, moving);
+        }
+      }
+
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
       const emoteKey = emoteId ? `${emoteId}:${e.overheadEmoteSeq}` : null;
@@ -5729,6 +5870,35 @@ export class Renderer {
           v.lastOverheadEmoteKey = emoteKey;
         } else if (!emoteId) {
           v.lastOverheadEmoteKey = null;
+        }
+      }
+
+      // Mount summon/dismount transition FX (render-only; the wire fields carry
+      // the state to every client, so no SimEvent is needed). The rider throws up
+      // a call pose the instant a summon begins, and a yellow-orange shimmer rings
+      // them when the mount actually appears, swaps, or clears.
+      if (e.kind === 'player') {
+        const mountCasting = e.mountCastRemaining > 0;
+        // idle -> summoning edge (mountCastKey set): play the arm-raise call pose
+        // for ~the transition window. A dismount (mountCastKey === '') gets no
+        // pose; its effect is the completion glow below. Gated like the emote path
+        // (the sim roots the player, so moving/airborne is unlikely regardless).
+        if (
+          mountCasting &&
+          !v.wasMountCasting &&
+          e.mountCastKey !== '' &&
+          !visuallyDead &&
+          !swimming
+        ) {
+          active.playCallPose(e.mountCastRemaining);
+        }
+        v.wasMountCasting = mountCasting;
+        // mountKey change = summon completed, dismount completed, or a live swap:
+        // fire the shimmer at the rider. Tracked separately from mountVisualKey,
+        // which lags async asset loading.
+        if (e.mountKey !== v.lastMountKey) {
+          v.lastMountKey = e.mountKey;
+          this.vfx.mountSummonGlow(e.id);
         }
       }
 
@@ -5915,6 +6085,13 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    // Racing line (cosmetic; reads the self race view only).
+    this.raceLine.update(this.sim.mountRaceView(), this.time, dt);
+    // Start platform: visible while the riding quest is active and no race is live.
+    this.mountBeacon.update(
+      this.sim.questState('q_riding_lessons') === 'active' && !this.sim.mountRaceView(),
+      this.time,
+    );
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
     this.tickFiestaGlows(dt);
@@ -6619,7 +6796,7 @@ export class Renderer {
       // fall back to the live entity position when the rig isn't being drawn
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
-      this.tmpV.y += v.height * e.scale + 1.0;
+      this.tmpV.y += (v.height + v.mountLift) * e.scale + 1.0;
       if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
         b.el.style.display = 'none';
         continue;
@@ -6763,7 +6940,7 @@ export class Renderer {
       let topY = midY;
       if (!dead) {
         this.tmpV2.copy(v.group.position);
-        this.tmpV2.y += v.height * e.scale + 1.0;
+        this.tmpV2.y += (v.height + v.mountLift) * e.scale + 1.0;
         if (isProjectedNameplateAnchorVisible(this.camera, this.tmpV2, this.tmpV3)) {
           this.tmpV2.project(this.camera);
           if (this.tmpV2.z <= 1) {

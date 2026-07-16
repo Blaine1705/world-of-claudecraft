@@ -401,6 +401,7 @@ export const hudChromeStrings = {
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
     deeds: 'Deeds',
+    mounts: 'Mounts',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
@@ -622,6 +623,87 @@ export const hudChromeStrings = {
     petTaunt: 'Pet: Taunt',
     petDefensive: 'Pet: Defensive',
     petAggressive: 'Pet: Aggressive',
+    // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
+    mount: 'Mount / Dismount',
+  },
+  // The character sheet's mount picker (mount_picker.ts; the old Mounts window
+  // is retired, its keys stay per the retired-but-translated chrome precedent).
+  // Names and descriptions come from the reference cards
+  // (src/sim/content/mounts.ts carries the canonical English names for the sim
+  // side); clickManage is the bag tooltip hint on a collected reins item.
+  mounts: {
+    title: 'Mounts',
+    close: 'Close',
+    select: 'Select',
+    selected: 'Selected',
+    riding: 'Riding',
+    mount: 'Mount',
+    dismount: 'Dismount',
+    requiresLevel: 'Requires level {level}',
+    pickFirst: 'Pick a mount to ride.',
+    keybindHint: 'Press the Mount / Dismount key to ride.',
+    // The empty state, shown when the player owns no mount yet: a heading plus
+    // how to earn a first one (the stablemaster's riding lessons) and the rarer
+    // boss-drop mounts.
+    emptyTitle: 'No mounts collected',
+    emptyStableHint:
+      'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
+    emptyDropHint: 'Rarer mounts drop from dungeon and raid bosses.',
+    clickManage: 'Click to choose your mount',
+    rarity_common: 'Common',
+    rarity_rare: 'Rare',
+    rarity_epic: 'Epic',
+    spec_speed: '+{pct}% extra mobility',
+    spec_block: '+{pct}% melee damage block',
+    spec_crit: '+{pct}% critical strike chance',
+    name_valorsteed: 'Valorsteed',
+    name_grag_bear: 'Goliath Grag-Bear',
+    name_stalkglider_snail: 'Moss-Shell Stalk-Glider',
+    name_aether_hover_cycle: 'Aether-Jouster Hover-Cycle',
+    name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
+    name_stormfeather_griffin: 'Sky-Reach Stormfeather',
+    name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
+    desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
+    desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
+    desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
+    desc_aether_hover_cycle:
+      'A powerful magitech bike designed for swift, low-hovering combat traversal.',
+    desc_shadowjump_toad:
+      'A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.',
+    desc_stormfeather_griffin:
+      'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
+    desc_thunderstrut_gobbler:
+      'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
+  },
+  // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
+  // Marla lends the player a training Valorsteed for the paddock race. Finishing
+  // the course succeeds the lesson. Sim-side gameplay lives in
+  // src/sim/mounts_training.ts. mountPrompt is retained for the legacy command;
+  // the current flow starts on the glowing race platform.
+  mountTraining: {
+    mountPrompt: 'Press {key} to mount the training Valorsteed.',
+    ownedMountPrompt: 'Press {key} to mount',
+    ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
+    begin: 'Begin Lesson',
+    success: 'You have tamed the Valorsteed.',
+    returnToMarla: 'Return to Marla at the stables to adopt a stable horse.',
+  },
+  // The show-jumping race in the stables paddock (src/sim/mount_race.ts): ride to
+  // the glowing platform and press Start Race, watch the countdown, then clear
+  // every jump (in any order) and ride back through the arch in time. countdown/
+  // go are the center-screen count; startButton is the button; start/finished/
+  // timeout are the banners; timeLeft is the bottom strip's only text.
+  // {seconds} is a formatNumber-rendered count.
+  mountRace: {
+    startButton: 'Start Race',
+    cancelButton: 'Cancel Race',
+    go: 'GO!',
+    start: 'Go! Clear every jump, then ride back through the arch.',
+    toFinish: 'Ride back through the arch!',
+    finished: 'Finished in {seconds}s!',
+    timeout: 'Race Failed',
+    progress: 'Gates {n} of {total}',
+    timeLeft: '{seconds}s',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
   // the persistent indicator button, the in-match score strip, and the event
@@ -1459,6 +1541,7 @@ export const hudChromeStrings = {
     filterConsumable: 'Consumables',
     filterMaterial: 'Materials',
     filterQuest: 'Quest',
+    filterMount: 'Mounts',
     sortAria: 'Sort bag items',
     sortRecent: 'Recent',
     sortQuality: 'Quality',

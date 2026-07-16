@@ -643,6 +643,24 @@ export interface SimContextCallbacks {
   tickLockpickTimeout(run: DelveRun): void;
   startDelveRaiseDeadChannel(run: DelveRun, boss: Entity, mobId: string, count: number): boolean;
 
+  // Riding lesson (src/sim/mounts_training.ts): a session that lives directly on
+  // PlayerMeta rather than a shared DelveRun. tickMountTraining is the per-tick
+  // driver (called next to updateMountTransition in the coordinator's per-player
+  // loop: it succeeds the lesson once the player is in the training steed's
+  // saddle); abandonMountTraining tears down a leaving player's IN_PROGRESS
+  // session (called from the removePlayer leave path, mirroring abandonLockpick).
+  tickMountTraining(meta: PlayerMeta): void;
+  abandonMountTraining(meta: PlayerMeta): void;
+
+  // Show-jumping race (src/sim/mount_race.ts): a strictly per-player session on
+  // PlayerMeta.mountRace. tickMountRace is the per-tick driver (called from the
+  // coordinator's per-player loop after movement, so the tick's prevPos -> pos
+  // segment is what gate crossings are detected on). There is no abandon
+  // callback: the driver voids a run itself on death/dismount/leaving, and a
+  // leaving player's session simply dies with their PlayerMeta (nothing external
+  // references it).
+  tickMountRace(meta: PlayerMeta): void;
+
   // C4a casting lifecycle (src/sim/combat/casting_lifecycle.ts) consumes these; all
   // still on Sim. `runEffects` is the C4b boundary (the moved applyAbility +
   // applyChannelTick reach the actual ability resolution only through here).
@@ -1203,6 +1221,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     abandonLockpick: host.abandonLockpick,
     tickLockpickTimeout: host.tickLockpickTimeout,
     startDelveRaiseDeadChannel: host.startDelveRaiseDeadChannel,
+    tickMountTraining: host.tickMountTraining,
+    abandonMountTraining: host.abandonMountTraining,
+    tickMountRace: host.tickMountRace,
     resolvedAbility: host.resolvedAbility,
     playerGcdFor: host.playerGcdFor,
     isFriendlyTo: host.isFriendlyTo,

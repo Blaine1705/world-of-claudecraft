@@ -295,7 +295,11 @@ describe('Nythraxis raid encounter', () => {
   });
 
   it('defines four Nythraxis equipment drops with 3 percent legendary rolls', () => {
-    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter((entry) => entry.itemId);
+    // Equipment drops only: the collectible mount reins (kind 'mount') is its
+    // own independent draw outside the four roll groups, pinned by tests/mounts.test.ts.
+    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
+      (entry) => entry.itemId && ITEMS[entry.itemId]?.kind !== 'mount',
+    );
     const groups = new Map<string, typeof loot>();
     for (const entry of loot) {
       expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-4]$/);

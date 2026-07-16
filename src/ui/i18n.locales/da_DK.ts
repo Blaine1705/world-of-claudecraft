@@ -1036,6 +1036,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Edderkoppe-Ægsæk',
   'entities.mobs.sump_troll_devourer.name': 'Sumptrold-Fortærer',
   'entities.mobs.thunzharr_stormling.name': 'Vækket Stormling',
+  'entities.mobs.stable_horse.name': 'Staldhest',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, den Vågnende Tinde',
   'entities.mobs.tolling_bell.name': 'Klemtende Klokke',
   'entities.mobs.vale_cup_ball.name': 'Vildsvinebold',
@@ -2742,6 +2743,16 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Hold din klinge nær, {className}. Dalen er ikke hvad den var.',
   'entities.npcs.marshal_redbrook.name': 'Marskal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Staldmester',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Enhver rytter kommer ind på to ben, {className}. Du får ikke tøjlerne, før du kan sidde Valorsteed uden at kysse jorden, og Highwatch har ingen healere til overs til brækkede knogler.',
+  'entities.quests.q_riding_lessons.title': 'Ridelektioner',
+  'entities.quests.q_riding_lessons.text':
+    'Enhver rytter kommer ind på to ben, {playerName}, ligesom jeg sagde den dag, vi mødtes. Betal gebyret, og når jeg giver ordet, så kald trænings-Valorsteeden til dig og kravl op i sadlen. Rid så banen: følg markøren til startbuen, tag hvert spring rent, og kryds linjen igen, før sandet er løbet ud. Klarer du det, er sadlen din. Vandrer du ud af folden, starter vi forfra.',
+  'entities.quests.q_riding_lessons.completion':
+    'Sådan, ja. Op i én glidende bevægelse og et roligt sæde deroppe. Valorsteed er din, {playerName}: sadel, tøjler og ry som en rytter, der har fortjent sædet i stedet for at købe det.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Tæm Valorsteed',
   'entities.npcs.marshal_redbrook.title': 'Bymarskal',
   'entities.npcs.provisioner_hale.greeting':
     'Tørre støvler, tørt brød, tørt krudt - i Fenbridge får du to ud af tre på en god dag.',
@@ -3287,6 +3298,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Ormekultens Telte',
   'entities.zones.thornpeak_heights.pois.8.label': 'Genfærdsmarkerne',
   'entities.zones.thornpeak_heights.pois.9.label': 'Gravormens Helligdom',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Highwatch-stalden',
   'entities.zones.thornpeak_heights.welcome':
     'Kaptajn Thessaly holder muren ved Højvagten, knap nok.',
   'errors.api.accountBanned': 'Denne konto er blevet udelukket.',
@@ -5173,6 +5185,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Forbrugsvarer',
   'hudChrome.bags.filterGroupAria': 'Filtrér tasker efter kategori',
   'hudChrome.bags.filterMaterial': 'Materialer',
+  'hudChrome.bags.filterMount': 'Ridedyr',
   'hudChrome.bags.filterQuest': 'Quest',
   'hudChrome.bags.filterWeapon': 'Våben',
   'hudChrome.bags.noMatch': 'Ingen genstande matcher dine filtre.',
@@ -6961,6 +6974,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Fjern Steam-tilknytning',
   'entities.items.chunk_of_ore.name': 'Malmklump',
+  'entities.items.reins_grag_bear.name': 'Tøjler til Goliat Grag-bjørnen',
+  'entities.items.reins_valorsteed.name': 'Tøjler til Valorsteed',
+  'entities.items.reins_stalkglider_snail.name': 'Tøjler til mosskal-stilkglideren',
+  'entities.items.reins_aether_hover_cycle.name': 'Tændingsnøgle: Æterridderens svævecykel',
+  'entities.items.reins_shadowjump_toad.name': 'Tøjler til Kama-Kage, skyggespringstudsen',
+  'entities.items.reins_stormfeather_griffin.name': 'Tøjler til den himmelrækkende Stormfjer',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Tøjler til Tordenspankeren, den store kalkun',
   'entities.quests.q_prof_intro.completion':
     'Kan du se? Malm i din taske og hård hud på dine hænder. Fortsæt med minedrift, skovhugst og urtesamling, mens du rejser ad vejene. Når du er tilbage i byen, så husk Byfokus-tavlen ved markedet og arbejdsbænken i nærheden. Der er et hæderligt levebrød i det alt sammen, hvis du ønsker det.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmklump',

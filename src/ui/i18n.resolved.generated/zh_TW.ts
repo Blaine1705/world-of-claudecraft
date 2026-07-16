@@ -754,6 +754,7 @@ export const zh_TW: EnTranslations = {
       "leaderboard": "排行榜",
       "dailyRewards": "商店",
       "deeds": "功績",
+      "mounts": "坐騎",
       "nameplates": "名條",
       "haptics": "觸覺回饋",
       "hapticsOff": "觸覺回饋已關閉",
@@ -868,7 +869,63 @@ export const zh_TW: EnTranslations = {
       "petStop": "寵物：停止",
       "petTaunt": "寵物：嘲諷",
       "petDefensive": "寵物：防禦",
-      "petAggressive": "寵物：攻擊性"
+      "petAggressive": "寵物：攻擊性",
+      "mount": "騎乘 / 下騎"
+    },
+    "mounts": {
+      "title": "坐騎",
+      "close": "關閉",
+      "select": "選擇",
+      "selected": "已選擇",
+      "riding": "騎乘中",
+      "mount": "騎乘",
+      "dismount": "下騎",
+      "requiresLevel": "需要等級 {level}",
+      "pickFirst": "選擇一隻要騎乘的坐騎。",
+      "keybindHint": "按下騎乘 / 下騎鍵即可騎乘。",
+      "emptyTitle": "尚未收集坐騎",
+      "emptyStableHint": "升到 20 級，前往高望以西的馬廄，向馬廄總管瑪拉學習騎術。",
+      "emptyDropHint": "較稀有的坐騎由地城和團隊副本首領掉落。",
+      "clickManage": "點擊選擇坐騎",
+      "rarity_common": "普通",
+      "rarity_rare": "稀有",
+      "rarity_epic": "史詩",
+      "spec_speed": "+{pct}% 額外移動力",
+      "spec_block": "+{pct}% 近戰傷害格擋",
+      "spec_crit": "+{pct}% 致命一擊機率",
+      "name_valorsteed": "英勇戰馬",
+      "name_grag_bear": "歌利亞格拉格巨熊",
+      "name_stalkglider_snail": "苔殼滑行蝸牛",
+      "name_aether_hover_cycle": "乙太騎士懸浮機車",
+      "name_shadowjump_toad": "影躍蟾蜍卡瑪影",
+      "name_stormfeather_griffin": "凌天風暴之羽",
+      "name_thunderstrut_gobbler": "雷霆闊步大火雞",
+      "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
+      "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
+      "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
+      "desc_aether_hover_cycle": "一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。",
+      "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
+      "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
+      "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。"
+    },
+    "mountTraining": {
+      "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
+      "ownedMountPrompt": "按 {key} 鍵騎乘",
+      "ridePrompt": "跟隨發光的標記前往起點線，然後點擊開始比賽。",
+      "begin": "開始課程",
+      "success": "你已經馴服了英勇戰馬。",
+      "returnToMarla": "返回馬廄找瑪拉，領養一匹馬廄裡的馬。"
+    },
+    "mountRace": {
+      "startButton": "開始比賽",
+      "cancelButton": "取消比賽",
+      "go": "GO!",
+      "start": "出發！跳過每一道障礙，再騎回拱門衝線。",
+      "toFinish": "騎回拱門衝線！",
+      "finished": "完成！用時 {seconds} 秒！",
+      "timeout": "比賽失敗",
+      "progress": "障礙 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "溪谷盃",
@@ -1490,6 +1547,7 @@ export const zh_TW: EnTranslations = {
       "filterConsumable": "消耗品",
       "filterMaterial": "材料",
       "filterQuest": "任務",
+      "filterMount": "坐騎",
       "sortAria": "排序背包物品",
       "sortRecent": "最近",
       "sortQuality": "品質",
@@ -5882,7 +5940,8 @@ export const zh_TW: EnTranslations = {
       "tool": "工具",
       "potion": "藥水",
       "elixir": "藥劑",
-      "bag": "背包"
+      "bag": "背包",
+      "mount": "坐騎"
     },
     "stats": {
       "armor": "護甲",
@@ -8408,6 +8467,27 @@ export const zh_TW: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "喚雷者腰甲"
+      },
+      "reins_valorsteed": {
+        "name": "英勇戰馬的韁繩"
+      },
+      "reins_grag_bear": {
+        "name": "歌利亞格拉格巨熊的韁繩"
+      },
+      "reins_stalkglider_snail": {
+        "name": "苔殼滑行蝸牛的韁繩"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "點火鑰匙：乙太騎士懸浮機車"
+      },
+      "reins_shadowjump_toad": {
+        "name": "影躍蟾蜍卡瑪影的韁繩"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "凌天風暴之羽的韁繩"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "雷霆闊步大火雞的韁繩"
       }
     },
     "mobs": {
@@ -8656,6 +8736,9 @@ export const zh_TW: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "被驚醒的風暴元素"
+      },
+      "stable_horse": {
+        "name": "廄馬"
       },
       "rift_spawnling": {
         "name": "裂隙孽生體"
@@ -9058,6 +9141,11 @@ export const zh_TW: EnTranslations = {
         "name": "奧德爾工頭",
         "title": "礦井工頭",
         "greeting": "整條礦道都爬滿了那些滿身泥垢的害蟲！"
+      },
+      "stablemaster_marla": {
+        "name": "瑪拉·希琴",
+        "title": "馬廄總管",
+        "greeting": "每個騎手都是兩條腿走進來的，{className}。你能騎穩英勇戰馬、不摔進泥裡之前，我是不會把韁繩交給你的，高望這兒可沒有多餘的醫者去治斷骨。"
       },
       "warden_fenwick": {
         "name": "芬威克守望者",
@@ -10058,6 +10146,16 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "騎術課",
+        "text": "每個騎手都是兩條腿走進來的，{playerName}，就像我們初次見面那天我說的那樣。交上學費，等我發話，就把訓練用的英勇戰馬喚到身邊，翻身上鞍。然後跑完賽道：跟著標記到起點拱門，把每一道障礙都跳得乾淨俐落，在沙子漏盡之前再次衝過終點線。做到了，這鞍子就是你的。要是跑出圍場，我們就從頭再來。",
+        "completion": "好了，就是這樣。一個俐落的動作上了鞍，坐得穩穩當當。英勇戰馬現在是你的了，{playerName}：馬鞍、韁繩，還有靠本事掙來而不是買來的騎手身份。",
+        "objectives": {
+          "0": {
+            "label": "馴服英勇戰馬"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "稀薄的帷幕",
         "text": "洞穴竟為你敞開了。那麼封印比我擔心的還要脆弱，{playerName}。帷幕撕裂之處，光靈會變得陰冷黑暗。給我帶來八份暮光靈的精華，我便能讀出這道傷口有多深。",
@@ -10374,6 +10472,9 @@ export const zh_TW: EnTranslations = {
           },
           "9": {
             "label": "墓龍聖所"
+          },
+          "10": {
+            "label": "高望馬廄"
           }
         }
       },

@@ -38,6 +38,7 @@ provided as a courtesy.
 | Biome backdrop panoramas (vale_backdrop.webp, marsh_backdrop.webp, peaks_backdrop.webp and 4K variants) | World of ClaudeCraft | Project-generated procedural painterly sky panorama art | Project asset |
 | Elite dragon rank emblem (`public/ui/ranks/elite-dragon-frame.webp`) | World of ClaudeCraft | Project-generated with OpenAI image generation and optimized locally | Project asset |
 | Meshy creature models (edda_reedhand, reedbound_acolyte, tolling_bell, spider_egg_sac from the Drowned Litany, yumi_cat from Protect Yumi, in `public/models/creatures/`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D; the humanoids and yumi_cat rigged and animated), owned under the Meshy paid-plan license | Project asset |
+| Rideable mount models (valorsteed, grag_bear, stalkglider_snail, aether_hover_cycle, shadowjump_toad, stormfeather_griffin, in `public/models/mounts/`) | World of ClaudeCraft | Project-generated via the Tripo API asset pipeline (scripts/asset_pipeline; the quadrupeds auto-rigged, gait clips baked locally via scripts/bake_mount_gaits.mjs), owned under the Tripo paid-plan license | Project asset |
 | Rift dimensional gate model (`public/models/props/rift_portal.glb`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D), owned under the Meshy paid-plan license | Project asset |
 | Rift arcane flame + rune monolith props (`public/models/props/rift_flame.glb`, `rift_rune.glb`) | World of ClaudeCraft | Project-generated via Tripo AI (text-to-3D), owned under the Tripo paid-plan license | Project asset |
 | Realm sky HDRIs (hollow_dusk, ember_storm, frost_twilight, amber_sunset, fen_day, nightbloom_dream, wraithwood_gloom; 2k and 1k) | World of ClaudeCraft | Project-generated equirect sky panoramas, converted to RGBE with HDR sun re-injection | Project asset |
@@ -68,6 +69,13 @@ same way.
 
 | Assets | Author | Source | License |
 |---|---|---|---|
+| Generated world, combat, creature, and ambience sound effects (`public/audio/sfx/*.mp3`, excluding `quest_*.mp3` and `mount_*.mp3`) | World of ClaudeCraft | Project-generated with the ElevenLabs Sound Effects API from `scripts/sfx/sfx_prompts.mjs` | Project asset |
+| Valorsteed gallop layer (`mount_run_valorsteed.mp3`) | D4XX, adapted by congusbongus | [Horse gallop on different surfaces](https://opengameart.org/content/horse-gallop-on-different-surfaces), individual `ground.mp3` source identified as CC0 in the included credits | CC0 1.0 |
+| Mount footfall layers (`mount_run_grag_bear.mp3`, `mount_run_shadowjump_toad.mp3`, `mount_run_stormfeather_griffin.mp3`, `mount_run_thunderstrut_gobbler.mp3`) | Fantozzi, extracted by qubodup | [Fantozzi's Footsteps](https://opengameart.org/content/fantozzis-footsteps-grasssand-stone) | CC0 1.0 |
+| Stalk-Glider slime layer (`mount_run_stalkglider_snail.mp3`) | RandomUser | [Slime ultimate the best](https://opengameart.org/content/slime-ultimate-the-best) | CC0 1.0 |
+| Shadow-Jump Toad slime layer (`mount_run_shadowjump_toad.mp3`) | KobatoGames | [Slime jump effect](https://opengameart.org/content/slime-jump-effect) | CC0 1.0 |
+| Hover-Cycle movement layer (`mount_run_aether_hover_cycle.mp3`) | Umplix | [Hovermobile SFX](https://opengameart.org/content/hovermobile-sfx) | CC0 1.0 |
+| Stormfeather and Grand Gobbler wing layers (`mount_run_stormfeather_griffin.mp3`, `mount_run_thunderstrut_gobbler.mp3`) | AntumDeluge, derived from dave.des | [Large Wings Flap](https://opengameart.org/content/large-wings-flap) | CC0 1.0 |
 | Quest event sound effects (`public/audio/sfx/quest_*.mp3`); original compositions | @jamiecypher | Original work | CC0 1.0 |
 | Lockpick minigame sound effects (`public/audio/sfx/lockpick_*.mp3`); original sound design edited and layered in Reaper from CC0 source samples | @jamiecypher | https://freesound.org | CC0 1.0 |
 | Generated prop model (marsh_plank_bridge) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |

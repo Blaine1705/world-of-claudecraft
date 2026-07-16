@@ -251,9 +251,11 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
   it('the raid boss set pieces and legendaries upgrade to raid-tier heroic variants (33/37)', () => {
     // These are not listed in the explicit table: they come from the normal-loot
     // heroic swap (heroic_<base>), rescaled to the raid tier (source 27).
-    const raidBases = (MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) =>
-      e.itemId ? [e.itemId] : [],
-    );
+    const raidBases = (MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) => {
+      if (!e.itemId) return [];
+      const item = ITEMS[e.itemId];
+      return item?.slot && (item.kind === 'armor' || item.kind === 'weapon') ? [e.itemId] : [];
+    });
     expect(raidBases.length).toBeGreaterThanOrEqual(8);
     let epics = 0;
     let legendaries = 0;

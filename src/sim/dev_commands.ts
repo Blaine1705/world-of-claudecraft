@@ -1,7 +1,9 @@
+import { MOUNT_KEYS, MOUNTS, TRAINING_MOUNT_KEY } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
-import { DUNGEONS, ITEMS, MOBS } from './data';
+import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
+import { mountItemId, mountOwned } from './mounts';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
@@ -188,6 +190,54 @@ export function handleDevChat(
     const count = clampInteger(Number(giveMatch[2] ?? 1), 1, 20);
     if (!ITEMS[itemId]) ctx.error(pid, `[dev] Unknown item '${itemId}'.`);
     else ctx.addItem(itemId, count, pid);
+    return null;
+  }
+
+  if (/^\/(?:dev\s+mounts?|devmounts?)\s*$/i.test(raw)) {
+    const meta = ctx.players.get(pid);
+    const entity = ctx.entities.get(pid);
+    if (meta && entity) {
+      const maxGate = Math.max(...MOUNT_KEYS.map((key) => MOUNTS[key].level));
+      const leveled = entity.level < maxGate;
+      if (leveled) ctx.setPlayerLevel(maxGate, pid);
+      let granted = 0;
+      for (const key of MOUNT_KEYS) {
+        if (mountOwned(meta, key)) continue;
+        const itemId = mountItemId(key);
+        if (!itemId) continue;
+        ctx.addItem(itemId, 1, pid);
+        granted += 1;
+      }
+      const levelNote = leveled ? `, level raised to ${maxGate} for the riding gates` : '';
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Granted ${granted} mount reins (${MOUNT_KEYS.length} owned)${levelNote}. Press Z to ride.`,
+      );
+    }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+(?:mountquest|startmount)|devmountquest)\s*$/i.test(raw)) {
+    const meta = ctx.players.get(pid);
+    const entity = ctx.entities.get(pid);
+    const marla = NPCS.stablemaster_marla;
+    if (meta && entity && marla) {
+      const gate = MOUNTS[TRAINING_MOUNT_KEY].level;
+      const leveled = entity.level < gate;
+      if (leveled) ctx.setPlayerLevel(gate, pid);
+      meta.copper += 100 * 10000;
+      const pos = ctx.groundPos(marla.pos.x + 2, marla.pos.z + 1);
+      entity.pos = pos;
+      entity.prevPos = { ...pos };
+      ctx.rebucket(entity);
+      const levelNote = leveled ? `level ${gate}, ` : '';
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] ${levelNote}100g added, teleported to the Highwatch Stables. Talk to Stablemaster Marla to begin the riding lesson.`,
+      );
+    }
     return null;
   }
 
@@ -432,7 +482,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev gold, /dev quest, /dev quests, /dev attune, /dev gather, /dev bot, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev gather, /dev bot, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

@@ -3163,6 +3163,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Outil',
   'itemUi.kind.potion': 'Potion',
   'itemUi.kind.elixir': 'Élixir',
+  'itemUi.kind.mount': 'Monture',
   'itemUi.stats.armor': 'Armure',
   'itemUi.stats.str': 'Force',
   'itemUi.stats.agi': 'Agilité',
@@ -4207,6 +4208,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Bienvenue au Marché mondial, {className}. Achetez aux aventuriers du royaume ou proposez vos propres marchandises.',
   'entities.npcs.marshal_redbrook.name': 'Maréchal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Maîtresse d’écurie',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Tout cavalier arrive sur ses deux jambes, {className}. Je ne te donnerai les rênes que lorsque tu sauras tenir en selle sur le Destrier de Bravoure sans mordre la boue, et Highwatch n’a pas de guérisseurs de trop pour les os brisés.',
+  'entities.quests.q_riding_lessons.title': 'Leçons d’équitation',
+  'entities.quests.q_riding_lessons.text':
+    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Paie les frais, et quand j’en donne l’ordre, appelle à toi le Destrier de Bravoure d’entraînement et mets-toi en selle. Puis fais le parcours : suis le repère jusqu’à l’arche de départ, franchis chaque obstacle proprement et repasse la ligne avant que le sable ne s’écoule. Réussis, et la selle est à toi. Sors de l’enclos et l’on recommence.',
+  'entities.quests.q_riding_lessons.completion':
+    'Voilà. En selle d’un seul mouvement, et bien stable une fois là-haut. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Dompter le Destrier de Bravoure',
   'entities.npcs.marshal_redbrook.title': 'Maréchal de la ville',
   'entities.npcs.marshal_redbrook.greeting':
     "Gardez votre lame près de vous, {className}. Le Val n'est plus ce qu'il était.",
@@ -4754,6 +4765,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Tentes du Culte du Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Champs des revenants',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanctuaire du Gravewyrm',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Écuries de Highwatch',
   'entities.dungeons.hollow_crypt.name': 'La Crypte creuse',
   'entities.dungeons.hollow_crypt.enterText': 'Vous descendez dans la Crypte creuse...',
   'entities.dungeons.hollow_crypt.leaveText': 'Vous remontez à la lumière du jour.',
@@ -5232,6 +5244,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': "Protège-taille d'Appel-tempête",
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, le Pic Éveillé',
   'entities.mobs.thunzharr_stormling.name': 'Élémentaire de tempête éveillé',
+  'entities.mobs.stable_horse.name': "Cheval d'écurie",
   'hudChrome.worldBoss.spawn': '{name} se dresse sur les Hauteurs de Thornpeak !',
   'entities.items.stormcallers_spaulders.name': 'Spallières de Galecall',
   'hud.chat.context.convertToRaid': 'Convertir en raid',
@@ -5305,6 +5318,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Armure',
   'hudChrome.bags.filterConsumable': 'Consommables',
   'hudChrome.bags.filterMaterial': 'Matériaux',
+  'hudChrome.bags.filterMount': 'Montures',
   'hudChrome.bags.filterQuest': 'Quête',
   'hudChrome.bags.sortAria': 'Trier les objets du sac',
   'hudChrome.bags.sortRecent': 'Récents',
@@ -7535,6 +7549,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Essence arcanique',
   'entities.items.arcane_shard.name': 'Éclat arcanique',
   'entities.items.chunk_of_ore.name': 'Morceau de minerai',
+  'entities.items.reins_grag_bear.name': 'Rênes de l’Ours-Grag Goliath',
+  'entities.items.reins_valorsteed.name': 'Rênes du Destrier de Bravoure',
+  'entities.items.reins_stalkglider_snail.name': 'Rênes du Glisseur à Coquille Moussue',
+  'entities.items.reins_aether_hover_cycle.name': 'Clé de contact : Aérocycle du Jouteur d’Éther',
+  'entities.items.reins_shadowjump_toad.name': 'Rênes de Kama-Kage, le Crapaud Saute-Ombre',
+  'entities.items.reins_stormfeather_griffin.name': 'Rênes du Plume-d’Orage Toise-Ciel',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Rênes de Pavane-Tonnerre, le Grand Dindon',
   'entities.quests.q_prof_intro.completion':
     'Vous voyez ? Du minerai dans votre sac et des cals aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l’établi d’artisanat juste à côté. Tout cela peut vous offrir un gagne-pain honorable, si le cœur vous en dit.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Morceau de minerai',
@@ -7568,6 +7589,52 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Vous devez être dans un groupe pour lancer une vérification de disponibilité.',
   'hudChrome.readyCheck.inProgressError': 'Une vérification de disponibilité est déjà en cours.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Monter / Descendre',
+  'hudChrome.mobile.mounts': 'Montures',
+  'hudChrome.mounts.title': 'Montures',
+  'hudChrome.mounts.close': 'Fermer',
+  'hudChrome.mounts.select': 'Choisir',
+  'hudChrome.mounts.selected': 'Choisie',
+  'hudChrome.mounts.riding': 'En selle',
+  'hudChrome.mounts.mount': 'Monter',
+  'hudChrome.mounts.dismount': 'Descendre',
+  'hudChrome.mounts.requiresLevel': 'Niveau {level} requis',
+  'hudChrome.mounts.pickFirst': 'Choisissez une monture à chevaucher.',
+  'hudChrome.mounts.keybindHint': 'Appuyez sur la touche Monter / Descendre pour chevaucher.',
+  'hudChrome.mounts.rarity_common': 'Commune',
+  'hudChrome.mounts.rarity_rare': 'Rare',
+  'hudChrome.mounts.rarity_epic': 'Épique',
+  'hudChrome.mounts.spec_speed': '+{pct}% de mobilité supplémentaire',
+  'hudChrome.mounts.spec_block': '+{pct}% de blocage des dégâts de mêlée',
+  'hudChrome.mounts.spec_crit': '+{pct}% de chances de coup critique',
+  'hudChrome.mounts.name_valorsteed': 'Destrier de Bravoure',
+  'hudChrome.mounts.name_grag_bear': 'Ours-Grag Goliath',
+  'hudChrome.mounts.name_stalkglider_snail': 'Glisseur à Coquille Moussue',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Aérocycle du Jouteur d’Éther',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, le Crapaud Saute-Ombre',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Plume-d’Orage Toise-Ciel',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavane-Tonnerre, le Grand Dindon',
+  'hudChrome.mounts.desc_valorsteed':
+    'Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Un ours robuste au pied sûr qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.',
+  'hudChrome.mounts.emptyTitle': 'Aucune monture collectée',
+  'hudChrome.mounts.emptyStableHint':
+    'Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.',
+  'hudChrome.mounts.emptyDropHint':
+    'Les montures plus rares sont lâchées par les boss de donjon et de raid.',
+  'hudChrome.mounts.clickManage': 'Cliquez pour choisir votre monture',
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpent d'une pâleur d'os qui glisse dans les profondeurs du Glimmermere, gardien silencieux de l'eau qu'il a faite sienne. Les nageurs qui partagent le lac avec lui refont rarement surface.",
   'guide.combat.metersBody':

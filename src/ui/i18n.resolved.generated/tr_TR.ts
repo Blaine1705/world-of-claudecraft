@@ -754,6 +754,7 @@ export const tr_TR: EnTranslations = {
       "leaderboard": "Sıralama",
       "dailyRewards": "Mağaza",
       "deeds": "Yiğitlikler",
+      "mounts": "Mounts",
       "nameplates": "İsimler",
       "haptics": "Dokunsal Geri Bildirim",
       "hapticsOff": "Dokunsal Kapalı",
@@ -868,7 +869,63 @@ export const tr_TR: EnTranslations = {
       "petStop": "Yoldaş: Dur",
       "petTaunt": "Yoldaş: Kışkırt",
       "petDefensive": "Yoldaş: Savunmacı",
-      "petAggressive": "Yoldaş: Saldırgan"
+      "petAggressive": "Yoldaş: Saldırgan",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Vadi Kupası",
@@ -1490,6 +1547,7 @@ export const tr_TR: EnTranslations = {
       "filterConsumable": "Sarf Malzemeleri",
       "filterMaterial": "Malzemeler",
       "filterQuest": "Görev",
+      "filterMount": "Binekler",
       "sortAria": "Çanta ögelerini sırala",
       "sortRecent": "En son",
       "sortQuality": "Kalite",
@@ -5882,7 +5940,8 @@ export const tr_TR: EnTranslations = {
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir",
-      "bag": "Çanta"
+      "bag": "Çanta",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Zırh",
@@ -8408,6 +8467,27 @@ export const tr_TR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Fırtınaçağıranın Bel Koruyucusu"
+      },
+      "reins_valorsteed": {
+        "name": "Valorsteed Dizginleri"
+      },
+      "reins_grag_bear": {
+        "name": "Golyat Grag-Ayısının Dizginleri"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Yosun Kabuklu Sap Süzülgeninin Dizginleri"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Kontak Anahtarı: Eter Şövalyesinin Uçan Motosikleti"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Gölge Sıçrayışlı Kurbağa Kama-Kage’nin Dizginleri"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Göğe Uzanan Fırtına Tüyünün Dizginleri"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Yıldırım Adımlı Büyük Hindinin Dizginleri"
       }
     },
     "mobs": {
@@ -8656,6 +8736,9 @@ export const tr_TR: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Uyanmış Fırtına Dölü"
+      },
+      "stable_horse": {
+        "name": "Ahır Atı"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -9058,6 +9141,11 @@ export const tr_TR: EnTranslations = {
         "name": "Ustabaşı Odell",
         "title": "Maden Ustabaşısı",
         "greeting": "Bütün kazı şu toprağa bulanmış haşaratla kaynıyor!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Ahır Ustası",
+        "greeting": "Her binici buraya iki ayağıyla gelir, {className}. Çamura yüz üstü düşmeden Valorsteed'e oturana dek dizginleri sana vermem, çünkü Highwatch'ta kırık kemiklere bakacak fazladan şifacı yok."
       },
       "warden_fenwick": {
         "name": "Muhafız Fenwick",
@@ -10058,6 +10146,16 @@ export const tr_TR: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Binicilik Dersleri",
+        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Ücreti öde, işaret verdiğimde eğitim Valorsteed'ini yanına çağır ve eyere çık. Sonra parkuru koş: işareti izleyip başlangıç kemerine git, her engeli temiz al ve kum bitmeden çizgiyi yeniden geç. Bunu başarırsan eyer senindir. Padoktan uzaklaşırsan baştan başlarız.",
+        "completion": "İşte böyle. Tek hamlede eyere çıktın ve yukarıda dimdik oturdun. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.",
+        "objectives": {
+          "0": {
+            "label": "Valorsteed'i evcilleştir"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10374,6 +10472,9 @@ export const tr_TR: EnTranslations = {
           },
           "9": {
             "label": "Mezarejderi Mabedi"
+          },
+          "10": {
+            "label": "Highwatch Ahırları"
           }
         }
       },

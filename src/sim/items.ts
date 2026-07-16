@@ -23,6 +23,7 @@ import { canEquipItem, resolveEquipSlot, slotAcceptsItem } from './equipment_rul
 import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
+import { mountOwned } from './mounts';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -364,6 +365,19 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) {
     ctx.error(meta.entityId, 'Too far away.');
     return;
+  }
+  // Mount purchase gates (the stablemaster's reins): a hard level-20 requirement
+  // and a one-per-account ownership check (owning the reins item IS owning the
+  // mount). Placed after the vendor stock/price checks, before payment.
+  if (def.kind === 'mount') {
+    if (p.level < 20) {
+      ctx.error(meta.entityId, 'You must be level 20 to buy a mount.');
+      return;
+    }
+    if (mountOwned(meta, def.mount)) {
+      ctx.error(meta.entityId, 'You already own that mount.');
+      return;
+    }
   }
   // Food and drink are handed over in a stack (vendorStackSize); the player pays
   // the per-unit buyValue for every unit, so the per-unit price stays classic and

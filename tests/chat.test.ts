@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
-import { BUILTIN_WORLD, MOBS, zoneAt } from '../src/sim/data';
+import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
+import { BUILTIN_WORLD, MOBS, NPCS, zoneAt } from '../src/sim/data';
 import { grantDeed } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
 import { emitMobYell } from '../src/sim/mob/yells';
+import { ownedMounts } from '../src/sim/mounts';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import * as chatMod from '../src/sim/social/chat';
@@ -1191,6 +1193,66 @@ describe('chat module (direct, no Sim)', () => {
     expect(chatMod.handleDevChat(ctx, '/dev bot ASASAS', 1)).toBe(null);
     expect(calls).toContainEqual(['bot', 'ASASAS']);
     expect(chatMod.handleDevChat(ctx, 'hello world', 1)).toBe(undefined);
+  });
+
+  it('/dev mounts grants every catalog reins and raises the level to the riding gate', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    sim.drainEvents();
+    sim.chat('/dev mounts', pid);
+    const events = sim.drainEvents();
+    const meta = sim.meta(pid);
+    expect(meta).toBeDefined();
+    // Every catalog mount is owned (the reins item is in the bags)...
+    expect(ownedMounts(meta as any)).toEqual([...MOUNT_KEYS]);
+    // ...and the level 1 rider was raised to the highest riding gate (20), so
+    // every granted mount is ridable immediately.
+    const maxGate = Math.max(...MOUNT_KEYS.map((k) => MOUNTS[k].level));
+    expect(sim.entities.get(pid)?.level).toBe(maxGate);
+    expect(
+      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 7 mount reins/.test(e.text)),
+    ).toBe(true);
+    // A second run is idempotent: everything already owned, nothing granted twice.
+    sim.chat('/dev mounts', pid);
+    const again = sim.drainEvents();
+    expect(
+      again.some((e: any) => e.type === 'log' && /^\[dev\] Granted 0 mount reins/.test(e.text)),
+    ).toBe(true);
+    for (const key of MOUNT_KEYS) {
+      const itemId = `reins_${key}`;
+      const held = (meta as any).inventory.filter((s: any) => s.itemId === itemId);
+      expect(held.length, `${itemId} granted exactly once`).toBe(1);
+    }
+  });
+
+  it('/dev mountquest levels to the lesson gate, funds 100g, and teleports to the stables', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const pid = sim.addPlayer('warrior', 'Pupil');
+    sim.drainEvents();
+    const copperBefore = sim.meta(pid)?.copper ?? 0;
+    sim.chat('/dev mountquest', pid);
+    const events = sim.drainEvents();
+    const e = sim.entities.get(pid);
+    // Level 20 (the riding-lesson gate), exactly 100g richer, standing in
+    // Marla's yard beside her authored position.
+    expect(e?.level).toBe(MOUNTS.valorsteed.level);
+    expect(sim.meta(pid)?.copper).toBe(copperBefore + 100 * 10000);
+    const marla = NPCS.stablemaster_marla;
+    expect(Math.hypot((e?.pos.x ?? 0) - marla.pos.x, (e?.pos.z ?? 0) - marla.pos.z)).toBeLessThan(
+      6,
+    );
+    expect(
+      events.some((ev: any) => ev.type === 'log' && /^\[dev\] level 20, 100g added/.test(ev.text)),
+    ).toBe(true);
+    // Already at the gate (20 is also the level cap): a re-run adds gold but
+    // never re-levels, and the [dev] line drops the level note.
+    sim.chat('/dev mountquest', pid);
+    const again = sim.drainEvents();
+    expect(sim.entities.get(pid)?.level).toBe(MOUNTS.valorsteed.level);
+    expect(sim.meta(pid)?.copper).toBe(copperBefore + 2 * 100 * 10000);
+    expect(again.some((ev: any) => ev.type === 'log' && /^\[dev\] 100g added/.test(ev.text))).toBe(
+      true,
+    );
   });
 
   it('a handled /dev command never falls through to the unknown-command error', () => {

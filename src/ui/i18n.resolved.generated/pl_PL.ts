@@ -754,6 +754,7 @@ export const pl_PL: EnTranslations = {
       "leaderboard": "Rankingi",
       "dailyRewards": "Sklep",
       "deeds": "Czyny",
+      "mounts": "Mounts",
       "nameplates": "Nazwy",
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",
@@ -868,7 +869,63 @@ export const pl_PL: EnTranslations = {
       "petStop": "Zwierzę: Zatrzymaj",
       "petTaunt": "Zwierzę: Prowokacja",
       "petDefensive": "Zwierzę: Obronne",
-      "petAggressive": "Zwierzę: Agresywne"
+      "petAggressive": "Zwierzę: Agresywne",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Puchar Doliny",
@@ -1490,6 +1547,7 @@ export const pl_PL: EnTranslations = {
       "filterConsumable": "Konsumpcyjne",
       "filterMaterial": "Surowce",
       "filterQuest": "Zadania",
+      "filterMount": "Wierzchowce",
       "sortAria": "Sortuj przedmioty w torbie",
       "sortRecent": "Ostatnie",
       "sortQuality": "Jakość",
@@ -5882,7 +5940,8 @@ export const pl_PL: EnTranslations = {
       "tool": "Narzędzie",
       "potion": "Mikstura",
       "elixir": "Eliksir",
-      "bag": "Torba"
+      "bag": "Torba",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Pancerz",
@@ -8408,6 +8467,27 @@ export const pl_PL: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Ochraniacz pasa przywoływacza burz"
+      },
+      "reins_valorsteed": {
+        "name": "Wodze Valorsteeda"
+      },
+      "reins_grag_bear": {
+        "name": "Wodze Goliata Grag-niedźwiedzia"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Wodze mchoskorupego szybownika"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Kluczyk zapłonu: eterowy ścigacz kopijnika"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Wodze Kama-Kage, ropuchy cienioskoku"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Wodze Burzopióra Podniebnego"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Wodze Gromostępa, Wielkiego Indora"
       }
     },
     "mobs": {
@@ -8656,6 +8736,9 @@ export const pl_PL: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Zbudzony Burzowiec"
+      },
+      "stable_horse": {
+        "name": "Koń stajenny"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -9058,6 +9141,11 @@ export const pl_PL: EnTranslations = {
         "name": "Sztygar Odell",
         "title": "Sztygar Kopalni",
         "greeting": "Cały wykop roi się od tego oblepionego błotem robactwa!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Zarządczyni stajni",
+        "greeting": "Każdy jeździec przychodzi na dwóch nogach, {className}. Wodzy nie dostaniesz, dopóki nie utrzymasz się na Valorsteedzie bez całowania błota, a Highwatch nie ma zbyt wielu uzdrowicieli na złamane kości."
       },
       "warden_fenwick": {
         "name": "Strażnik Fenwick",
@@ -10058,6 +10146,16 @@ export const pl_PL: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Lekcje jazdy konnej",
+        "text": "Każdy jeździec przychodzi na dwóch nogach, {playerName}, dokładnie jak mówiłam ci w dniu, gdy się poznałyśmy. Zapłać opłatę, a gdy dam znak, przywołaj treningowego Valorsteeda i wsiądź do siodła. Potem przejedź parkur: podążaj za znacznikiem do łuku startowego, weź każdą przeszkodę czysto i ponownie przekrocz linię, zanim przesypie się piasek. Uda ci się i siodło jest twoje. Wyjedziesz poza zagrodę i zaczynamy od nowa.",
+        "completion": "No, właśnie tak. W siodle za jednym płynnym ruchem i pewnie usadzony. Valorsteed jest twój, {playerName}: siodło, wodze i pozycja jeźdźca, który zapracował na to miejsce, zamiast je kupić.",
+        "objectives": {
+          "0": {
+            "label": "Ujeżdżenie Valorsteeda"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10374,6 +10472,9 @@ export const pl_PL: EnTranslations = {
           },
           "9": {
             "label": "Sanktuarium Grobowego Żmija"
+          },
+          "10": {
+            "label": "Stajnie Highwatch"
           }
         }
       },

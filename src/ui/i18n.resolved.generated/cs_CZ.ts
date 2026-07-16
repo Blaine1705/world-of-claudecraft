@@ -754,6 +754,7 @@ export const cs_CZ: EnTranslations = {
       "leaderboard": "Žebříčky",
       "dailyRewards": "Obchod",
       "deeds": "Skutky",
+      "mounts": "Mounts",
       "nameplates": "Jména",
       "haptics": "Haptika",
       "hapticsOff": "Haptika vypnuta",
@@ -868,7 +869,63 @@ export const cs_CZ: EnTranslations = {
       "petStop": "Mazlíček: Zastavit",
       "petTaunt": "Mazlíček: Provokace",
       "petDefensive": "Mazlíček: Obranný",
-      "petAggressive": "Mazlíček: Agresivní"
+      "petAggressive": "Mazlíček: Agresivní",
+      "mount": "Mount / Dismount"
+    },
+    "mounts": {
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
+      "mount": "Mount",
+      "dismount": "Dismount",
+      "requiresLevel": "Requires level {level}",
+      "pickFirst": "Pick a mount to ride.",
+      "keybindHint": "Press the Mount / Dismount key to ride.",
+      "emptyTitle": "No mounts collected",
+      "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
+      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "clickManage": "Click to choose your mount",
+      "rarity_common": "Common",
+      "rarity_rare": "Rare",
+      "rarity_epic": "Epic",
+      "spec_speed": "+{pct}% extra mobility",
+      "spec_block": "+{pct}% melee damage block",
+      "spec_crit": "+{pct}% critical strike chance",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Goliath Grag-Bear",
+      "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
+      "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
+      "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
+      "name_stormfeather_griffin": "Sky-Reach Stormfeather",
+      "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
+      "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
+      "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
+      "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
+      "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+    },
+    "mountTraining": {
+      "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "ownedMountPrompt": "Press {key} to mount",
+      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
+      "begin": "Begin Lesson",
+      "success": "You have tamed the Valorsteed.",
+      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+    },
+    "mountRace": {
+      "startButton": "Start Race",
+      "cancelButton": "Cancel Race",
+      "go": "GO!",
+      "start": "Go! Clear every jump, then ride back through the arch.",
+      "toFinish": "Ride back through the arch!",
+      "finished": "Finished in {seconds}s!",
+      "timeout": "Race Failed",
+      "progress": "Gates {n} of {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -1490,6 +1547,7 @@ export const cs_CZ: EnTranslations = {
       "filterConsumable": "Spotřební",
       "filterMaterial": "Materiály",
       "filterQuest": "Úkolové",
+      "filterMount": "Jezdecká zvířata",
       "sortAria": "Řadit předměty v batozích",
       "sortRecent": "Nedávné",
       "sortQuality": "Kvalita",
@@ -5882,7 +5940,8 @@ export const cs_CZ: EnTranslations = {
       "tool": "Nástroj",
       "potion": "Lektvar",
       "elixir": "Elixír",
-      "bag": "Batoh"
+      "bag": "Batoh",
+      "mount": "Mount"
     },
     "stats": {
       "armor": "Brnění",
@@ -8408,6 +8467,27 @@ export const cs_CZ: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Pás volajícího bouři"
+      },
+      "reins_valorsteed": {
+        "name": "Otěže Valorsteeda"
+      },
+      "reins_grag_bear": {
+        "name": "Otěže Goliáše Grag-medvěda"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Otěže mechokrunýřového plachtíka"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Startovací klíč: Éterové vznášecí kolo"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Otěže Kama-Kageho, ropuchy stínového skoku"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Otěže Bouřopera Nebedosahujícího"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Otěže Hromokroka, velkého krocana"
       }
     },
     "mobs": {
@@ -8656,6 +8736,9 @@ export const cs_CZ: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Probuzený bouřník"
+      },
+      "stable_horse": {
+        "name": "Stájový kůň"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"
@@ -9058,6 +9141,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Předák Odell",
         "title": "Důlní předák",
         "greeting": "Celý výkop se hemží tou špínou obalenou havětí!"
+      },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Správkyně stájí",
+        "greeting": "Každý jezdec sem přijde po svých, {className}. Otěže nedostaneš, dokud neusedneš na Valorsteeda, aniž bys skončil v blátě, a Highwatch nemá ranhojiče nazbyt pro zlomené kosti."
       },
       "warden_fenwick": {
         "name": "Strážce Fenwick",
@@ -10058,6 +10146,16 @@ export const cs_CZ: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Jezdecké lekce",
+        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Zaplať poplatek, a až dám pokyn, přivolej cvičného Valorsteeda a vylez do sedla. Pak projeď parkur: sleduj značku ke startovnímu oblouku, vezmi každý skok čistě a znovu projeď cílem, než se přesýpací hodiny vyprázdní. Dokážeš to, a sedlo je tvoje. Zatouláš se z ohrady a začínáme znovu.",
+        "completion": "Tak. Nahoru jedním plynulým pohybem a v sedle pevně jako skála. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.",
+        "objectives": {
+          "0": {
+            "label": "Zkroť Valorsteeda"
+          }
+        }
+      },
       "q_veil_thinned": {
         "title": "The Thinned Veil",
         "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
@@ -10374,6 +10472,9 @@ export const cs_CZ: EnTranslations = {
           },
           "9": {
             "label": "Svatyně Hrobodraka"
+          },
+          "10": {
+            "label": "Stáje Highwatch"
           }
         }
       },

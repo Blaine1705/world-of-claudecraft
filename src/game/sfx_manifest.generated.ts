@@ -19,8 +19,8 @@ export interface SfxEntry {
   hash: string;
   variants: readonly SfxVariant[];
 }
-export const SFX_CATALOG_HASH = '5868b2591d61f6a71a3eb56807d09269a0b83da0f9ca899663b2768af16da3b2';
-export const SFX_FIXED_CATALOG_KEYS = ["amb_birds","amb_campfire","amb_dungeon","amb_forge","amb_rain","amb_snow","amb_water","amb_wind_marsh","amb_wind_peaks","amb_wind_vale","buff_apply","cast_arcane","cast_chain_heal","cast_fire","cast_frost","cast_holy","cast_lightning_bolt","cast_nature","cast_shadow","combat_block","combat_crit","combat_dodge","combat_parry","debuff_apply","foot_dirt","foot_grass","foot_snow","foot_stone","foot_water","foot_wood","heal_impact","impact_arcane","impact_bone","impact_fire","impact_flesh","impact_frost","impact_holy","impact_leather","impact_metal","impact_nature","impact_shadow","lockpick_advanced_1","lockpick_advanced_2","lockpick_advanced_3","lockpick_advanced_4","lockpick_begin","lockpick_bind","lockpick_bonus","lockpick_end","lockpick_fail","lockpick_page_cleared","lockpick_retry","lockpick_slip","lockpick_success","lockpick_trap","melee_bow","melee_swing_blade","melee_swing_heavy","melee_swing_light","melee_unarmed","mob_beast_aggro","mob_beast_attack","mob_beast_death","mob_beast_hurt","mob_boar_aggro","mob_boar_attack","mob_boar_death","mob_boar_hurt","mob_burrower_aggro","mob_burrower_attack","mob_burrower_death","mob_burrower_hurt","mob_demon_aggro","mob_demon_attack","mob_demon_death","mob_demon_hurt","mob_dragonkin_aggro","mob_dragonkin_attack","mob_dragonkin_death","mob_dragonkin_hurt","mob_elemental_aggro","mob_elemental_attack","mob_elemental_death","mob_elemental_hurt","mob_humanoid_aggro","mob_humanoid_attack","mob_humanoid_death","mob_humanoid_hurt","mob_mudfin_aggro","mob_mudfin_attack","mob_mudfin_death","mob_mudfin_hurt","mob_ogre_aggro","mob_ogre_attack","mob_ogre_death","mob_ogre_hurt","mob_reptile_aggro","mob_reptile_attack","mob_reptile_death","mob_reptile_hurt","mob_reptile_idle","mob_spider_aggro","mob_spider_attack","mob_spider_death","mob_spider_hurt","mob_troll_aggro","mob_troll_attack","mob_troll_death","mob_troll_hurt","mob_undead_aggro","mob_undead_attack","mob_undead_death","mob_undead_hurt","move_jump","move_land","move_splash","move_swim","player_death","player_hurt","proj_arcane","proj_fire","proj_frost","proj_holy","proj_nature","proj_shadow","quest_accept","quest_complete","quest_ready","spell_nova","ui_achievement","ui_bag_close","ui_bag_open","ui_click","ui_coin","ui_death","ui_duel_challenge","ui_duel_countdown","ui_duel_end","ui_duel_start","ui_error","ui_fiesta_augment","ui_fiesta_down","ui_fiesta_revive","ui_fiesta_score_mine","ui_fiesta_score_other","ui_fiesta_wave","ui_fiesta_word_0","ui_fiesta_word_1","ui_fiesta_word_2","ui_fiesta_word_3","ui_level_up","ui_loot_item","ui_quest_accept","ui_quest_done","ui_sheep","ui_whisper","wand_arcane","wand_holy","wand_shadow"] as const;
+export const SFX_CATALOG_HASH = '7ec6d29a523ad18262d342220b46f6848928af7d1d61f7542b698a31c1e334ee';
+export const SFX_FIXED_CATALOG_KEYS = ["amb_birds","amb_campfire","amb_dungeon","amb_forge","amb_rain","amb_snow","amb_water","amb_wind_marsh","amb_wind_peaks","amb_wind_vale","buff_apply","cast_arcane","cast_chain_heal","cast_fire","cast_frost","cast_holy","cast_lightning_bolt","cast_nature","cast_shadow","combat_block","combat_crit","combat_dodge","combat_parry","debuff_apply","foot_dirt","foot_grass","foot_snow","foot_stone","foot_water","foot_wood","heal_impact","impact_arcane","impact_bone","impact_fire","impact_flesh","impact_frost","impact_holy","impact_leather","impact_metal","impact_nature","impact_shadow","lockpick_advanced_1","lockpick_advanced_2","lockpick_advanced_3","lockpick_advanced_4","lockpick_begin","lockpick_bind","lockpick_bonus","lockpick_end","lockpick_fail","lockpick_page_cleared","lockpick_retry","lockpick_slip","lockpick_success","lockpick_trap","melee_bow","melee_swing_blade","melee_swing_heavy","melee_swing_light","melee_unarmed","mob_beast_aggro","mob_beast_attack","mob_beast_death","mob_beast_hurt","mob_boar_aggro","mob_boar_attack","mob_boar_death","mob_boar_hurt","mob_burrower_aggro","mob_burrower_attack","mob_burrower_death","mob_burrower_hurt","mob_demon_aggro","mob_demon_attack","mob_demon_death","mob_demon_hurt","mob_dragonkin_aggro","mob_dragonkin_attack","mob_dragonkin_death","mob_dragonkin_hurt","mob_elemental_aggro","mob_elemental_attack","mob_elemental_death","mob_elemental_hurt","mob_humanoid_aggro","mob_humanoid_attack","mob_humanoid_death","mob_humanoid_hurt","mob_mudfin_aggro","mob_mudfin_attack","mob_mudfin_death","mob_mudfin_hurt","mob_ogre_aggro","mob_ogre_attack","mob_ogre_death","mob_ogre_hurt","mob_reptile_aggro","mob_reptile_attack","mob_reptile_death","mob_reptile_hurt","mob_reptile_idle","mob_spider_aggro","mob_spider_attack","mob_spider_death","mob_spider_hurt","mob_troll_aggro","mob_troll_attack","mob_troll_death","mob_troll_hurt","mob_undead_aggro","mob_undead_attack","mob_undead_death","mob_undead_hurt","mount_run_aether_hover_cycle","mount_run_grag_bear","mount_run_shadowjump_toad","mount_run_stalkglider_snail","mount_run_stormfeather_griffin","mount_run_thunderstrut_gobbler","mount_run_valorsteed","move_jump","move_land","move_splash","move_swim","player_death","player_hurt","proj_arcane","proj_fire","proj_frost","proj_holy","proj_nature","proj_shadow","quest_accept","quest_complete","quest_ready","spell_nova","ui_achievement","ui_bag_close","ui_bag_open","ui_click","ui_coin","ui_death","ui_duel_challenge","ui_duel_countdown","ui_duel_end","ui_duel_start","ui_error","ui_fiesta_augment","ui_fiesta_down","ui_fiesta_revive","ui_fiesta_score_mine","ui_fiesta_score_other","ui_fiesta_wave","ui_fiesta_word_0","ui_fiesta_word_1","ui_fiesta_word_2","ui_fiesta_word_3","ui_level_up","ui_loot_item","ui_quest_accept","ui_quest_done","ui_sheep","ui_whisper","wand_arcane","wand_holy","wand_shadow"] as const;
 export const SFX_MOB_EXTENSION_FAMILIES = ["beast","boar","burrower","demon","dragonkin","elemental","humanoid","mudfin","ogre","reptile","spider","troll","undead"] as const;
 export const SFX_MOB_EXTENSION_KEY_SOURCE = "^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt|idle)$";
 export const SFX_RUNTIME_PACK_URL = '/audio/sfx/runtime-pack.json';
@@ -2216,6 +2216,139 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/mob_undead_hurt.mp3?v=cbf985f15b74",
         "bytes": 15089,
         "sha256": "cbf985f15b74fac21f267cae0c8a9c4b6f2c836cfafa211fa2a74c943267d3fb"
+      }
+    ]
+  },
+  "mount_run_aether_hover_cycle": {
+    "url": "/audio/sfx/mount_run_aether_hover_cycle.mp3?v=355a7b665113",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 17102,
+    "hash": "355a7b665113",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_run_aether_hover_cycle.mp3?v=355a7b665113",
+        "bytes": 17102,
+        "sha256": "355a7b6651139d8737500829ebd23ae3d0dba02fb2d3ccb8b3506864346b8c3c"
+      }
+    ]
+  },
+  "mount_run_grag_bear": {
+    "url": "/audio/sfx/mount_run_grag_bear.mp3?v=eba127f1f821",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 18224,
+    "hash": "eba127f1f821",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_run_grag_bear.mp3?v=eba127f1f821",
+        "bytes": 18224,
+        "sha256": "eba127f1f8219e5d6a7512c4797735399e154e9f129bfc8c67a187941cb59fe7"
+      }
+    ]
+  },
+  "mount_run_shadowjump_toad": {
+    "url": "/audio/sfx/mount_run_shadowjump_toad.mp3?v=4d7e8c7bbb5b",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 13835,
+    "hash": "4d7e8c7bbb5b",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_run_shadowjump_toad.mp3?v=4d7e8c7bbb5b",
+        "bytes": 13835,
+        "sha256": "4d7e8c7bbb5bb2a6b90f0908c2bb0b7883cf591278a7665f479d2e0f5c5ee91d"
+      }
+    ]
+  },
+  "mount_run_stalkglider_snail": {
+    "url": "/audio/sfx/mount_run_stalkglider_snail.mp3?v=b1caf932cd8a",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 15089,
+    "hash": "b1caf932cd8a",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_run_stalkglider_snail.mp3?v=b1caf932cd8a",
+        "bytes": 15089,
+        "sha256": "b1caf932cd8aca0472fdfdcf5159e4ed5defb33536e1fd3c46cc59a6618e5092"
+      }
+    ]
+  },
+  "mount_run_stormfeather_griffin": {
+    "url": "/audio/sfx/mount_run_stormfeather_griffin.mp3?v=9fb6a774e864",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 13835,
+    "hash": "9fb6a774e864",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_run_stormfeather_griffin.mp3?v=9fb6a774e864",
+        "bytes": 13835,
+        "sha256": "9fb6a774e864979c3410e939f13943dea8bca2b61ba0c37aca490cf797ffa734"
+      }
+    ]
+  },
+  "mount_run_thunderstrut_gobbler": {
+    "url": "/audio/sfx/mount_run_thunderstrut_gobbler.mp3?v=b01e419b8171",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 11328,
+    "hash": "b01e419b8171",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_run_thunderstrut_gobbler.mp3?v=b01e419b8171",
+        "bytes": 11328,
+        "sha256": "b01e419b817154035271ee47bf23e051fda675a6ab9ef61ebefbfabbf3379e2c"
+      }
+    ]
+  },
+  "mount_run_valorsteed": {
+    "url": "/audio/sfx/mount_run_valorsteed.mp3?v=d4e79277b2cb",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 10701,
+    "hash": "d4e79277b2cb",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_run_valorsteed.mp3?v=d4e79277b2cb",
+        "bytes": 10701,
+        "sha256": "d4e79277b2cb1da5d5941c6116136f2ca7104376e12d455c6306919a3e862002"
       }
     ]
   },

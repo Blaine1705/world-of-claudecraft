@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "e1c24959",
+      "nextId": 671,
+      "state": "b7cfe5fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,7 +53,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -69,6 +69,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -88,7 +89,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -131,9 +132,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 667,
-      "state": "ce83732c",
-      "events": "4ba7f663",
+      "nextId": 671,
+      "state": "b3dd7ead",
+      "events": "0b2cbe19",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -169,7 +170,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -198,6 +199,7 @@
               }
             ]
           ],
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -217,7 +219,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 666,
+          "id": 670,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -260,9 +262,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 675,
-      "state": "f5c0755b",
-      "events": "66a5b054",
+      "nextId": 679,
+      "state": "c7d7ebd6",
+      "events": "03d35a75",
       "rng": {
         "draws": 40,
         "digest": "4798028d"
@@ -327,7 +329,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -357,6 +359,7 @@
             ]
           ],
           "renown": 30,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -376,7 +379,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 666,
+          "id": 670,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -420,9 +423,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 675,
-      "state": "35d27a52",
-      "events": "d678dd7f",
+      "nextId": 679,
+      "state": "9e5e5a73",
+      "events": "5432850f",
       "rng": {
         "draws": 40,
         "digest": "4798028d"
@@ -490,7 +493,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -511,6 +514,7 @@
             "q_wolves"
           ],
           "renown": 30,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -531,7 +535,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 666,
+          "id": 670,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -575,8 +579,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 675,
-      "state": "fad0dfda",
+      "nextId": 679,
+      "state": "7298436b",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -645,7 +649,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 666,
+          "entityId": 670,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -666,6 +670,7 @@
             "q_wolves"
           ],
           "renown": 30,
+          "selectedMount": "valorsteed",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -686,7 +691,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 666,
+          "id": 670,
           "inCombat": true,
           "kind": "player",
           "level": 10,
