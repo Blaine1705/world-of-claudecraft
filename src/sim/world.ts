@@ -1494,21 +1494,25 @@ function applyRowMeres(x: number, z: number, h: number): number {
 // the Reach's coast. No zone owns that gap, and untouched it would
 // soft-floor into dry mudflats instead of sea.
 function applyNorthBay(x: number, z: number, h: number): number {
-  if (z <= FROST_ZMAX - 20 || Math.abs(x) > STRIP_MAX_X + 8) return h;
-  const xWin = 1 - smoothstep(172, 188, Math.abs(x));
-  // The headlands the bay leaves dry taper into low spits: the Reach's coast
-  // can stand 20yd tall right at the zone line, and untapered those lobes
-  // ended in sheer walls over the bay (the reported Reach-north cliffs). The
-  // cap starts above the tallest coastal ground at the line, so the seam
-  // itself never steps (tests/world_edge_coast.test.ts sweeps the bay).
-  const dune = 22 - 26 * smoothstep(FROST_ZMAX, FROST_ZMAX + 40, z);
-  if (h > dune && xWin > 0) h = h + (dune - h) * xWin;
-  // follow the Reach's own coastline north of the cap: the frost lobes that
-  // poke past z1960 stay dry headlands, the gaps between them open as coves,
-  // so the north shore is lobed, not a ruled z-parallel line
-  const land = frostLandness(x, z);
-  const shoreT = 1 - smoothstep(-0.04, 0.14, land);
-  const t = smoothstep(FROST_ZMAX - 20, FROST_ZMAX + 44, z) * xWin * shoreT;
+  if (z <= FROST_ZMAX - 60 || Math.abs(x) > STRIP_MAX_X + 20) return h;
+  const ax = Math.abs(x);
+  // The Reach's north shore ends INSIDE its own band. The old lobed
+  // headlands ran dry land past the zone line into the no-zone gap, where
+  // zoneAt falls back to the Amberfall and the map loses its tiles (the
+  // reported glitch). The shoreline now wobbles just south of the boundary,
+  // the approach is a walkable bank, and everything past it is the bay's
+  // open water shore to shore (tests/world_edge_coast.test.ts sweeps the
+  // whole gap for dry ground). The window widens toward the boundary so the
+  // gap drowns fully, while south of the widening the meres' enclosing cap
+  // land keeps its designed dry ground (the world_grid cap pins).
+  const widen = 12 * smoothstep(FROST_ZMAX - 14, FROST_ZMAX, z);
+  const xWin = 1 - smoothstep(172 + widen, 188 + widen, ax);
+  if (xWin <= 0) return h;
+  const wob = (fbm2(x * 0.03, 61.7, 9331, 2) - 0.5) * 14;
+  const zShore = FROST_ZMAX - 12 + wob; // 1941 to 1955: strictly inside the band
+  const bank = WATER_LEVEL - 0.2 + 0.65 * Math.max(0, zShore - z);
+  if (h > bank) h = h + (bank - h) * xWin;
+  const t = smoothstep(zShore, zShore + 24, z) * xWin;
   if (t <= 0) return h;
   const sea = Math.min(h, WATER_LEVEL - 6);
   return h + (sea - h) * t;

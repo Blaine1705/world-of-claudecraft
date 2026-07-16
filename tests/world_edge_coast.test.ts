@@ -14,7 +14,7 @@
 // step): underwater canyons are invisible and legal; dry walls are not.
 
 import { describe, expect, it } from 'vitest';
-import { groundHeight, waterLevelAt } from '../src/sim/world';
+import { groundHeight, WATER_LEVEL, waterLevelAt } from '../src/sim/world';
 
 // The production seed: the reported cliffs are seed-pinned world geometry.
 const SEED = 20061;
@@ -31,6 +31,22 @@ describe('the world edges end in coast, not cliff', () => {
       if (step > 0.35) bad.push(`x=${x}: step ${step.toFixed(2)}`);
     }
     expect(bad, bad.slice(0, 8).join('\n')).toEqual([]);
+  });
+
+  it('no dry land survives past the Reach north boundary (z = 1960)', () => {
+    // Land past the zone line stands in no-zone space, where zoneAt falls
+    // back to the Amberfall: the HUD shows the wrong realm and the map has
+    // no tiles there (the reported glitch). The Reach's north shore must end
+    // inside its own band; everything beyond is the bay's open water. The
+    // two isthmus crossings at z 1890 sit south of this sweep, untouched.
+    const bad: string[] = [];
+    for (let x = -179; x <= 179; x += 1) {
+      for (let z = 1960; z <= 2100; z += 2) {
+        const h = groundHeight(x, z, SEED);
+        if (h > WATER_LEVEL - 0.05) bad.push(`(${x}, ${z}): h ${h.toFixed(2)}`);
+      }
+    }
+    expect(bad, bad.slice(0, 10).join('\n')).toEqual([]);
   });
 
   it('no sheer face rises straight out of the shore on the named margins', () => {
