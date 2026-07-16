@@ -41,6 +41,20 @@ const MOTE_TINT: Record<BiomeId, number> = {
   gale: 0xeef6ff, // wind-torn sea spray
 };
 
+// Realms that drift NO motes: the northern columns and headlands read cleaner
+// without the airborne glints (Palmreach, Willowfen, Galecrest, Evergarden,
+// Drakelands, Nightbloom, Wraithwood). A mote landing on one of these biomes
+// simply parks until the player carries the ring somewhere that drifts.
+const MOTELESS_BIOMES: ReadonlySet<BiomeId> = new Set([
+  'jungle',
+  'fen',
+  'gale',
+  'garden',
+  'ember',
+  'night',
+  'haunt',
+]);
+
 const RADIUS = 26; // motes live within this ring of the player
 const FLOOR = 0.6; // min height above the sampled ground
 const CEIL = 3.4; // max height above the sampled ground
@@ -105,6 +119,8 @@ export function buildMotes(seed: number): MotesView {
     const z = pz + Math.sin(ang) * r;
     if (Math.abs(x) > WORLD_MAX_X - 8 || z < WORLD_MIN_Z + 8 || z > WORLD_MAX_Z - 8) return false;
     if (isInSowfieldShell(x, z)) return false; // no pollen drifting over the mown pitch
+    const biome = zoneBiomeAt(x, z);
+    if (MOTELESS_BIOMES.has(biome)) return false; // these realms drift no motes
     const h = terrainHeight(x, z, seed);
     if (h < WATER_LEVEL + 0.5) return false; // no motes hovering over open water
     homeX[i] = x;
@@ -115,7 +131,7 @@ export function buildMotes(seed: number): MotesView {
     positions[i * 3] = x;
     positions[i * 3 + 1] = h + bobAmp[i];
     positions[i * 3 + 2] = z;
-    tmpColor.setHex(MOTE_TINT[zoneBiomeAt(x, z)]);
+    tmpColor.setHex(MOTE_TINT[biome]);
     colors[i * 3] = tmpColor.r;
     colors[i * 3 + 1] = tmpColor.g;
     colors[i * 3 + 2] = tmpColor.b;

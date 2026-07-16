@@ -64,6 +64,21 @@ const GRASS_CHUNK_BUILD_BUDGET_MS = 2.2;
 const GRASS_CHUNK_MAX_BUILDS_PER_FRAME = 1;
 const GRASS_DENSITY_LOW = 0.38;
 const GRASS_DENSITY_HIGH = 0.5;
+// Per-biome grass density multipliers over the base above. The Reach is bare
+// snow (no blades, and with them no ground flowers); the Wraithwood's floor is
+// deep grass instead of flowers, so its forest reads lush, not decorated.
+const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
+  frost: 0,
+  haunt: 1.55,
+};
+const GRASS_DENSITY_MULT_MAX = Math.max(1, ...Object.values(GRASS_BIOME_DENSITY));
+// Ground flowers never grow in these biomes (the Reach loses them with its
+// grass anchors; the Wraithwood keeps grass but blooms nothing).
+const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt']);
+// Field biomes bloom in coarse drifts (the dusk realm's original treatment,
+// extended to the flower-field realms): dense hash-cell fields instead of the
+// sparse one-in-nine anchor blooms.
+const FIELD_BIOMES: ReadonlySet<BiomeId> = new Set(['dusk', 'amber', 'night', 'garden', 'fen']);
 const GRASS_CHUNK_CACHE_LIMIT_LOW = 96;
 const GRASS_CHUNK_CACHE_LIMIT_HIGH = 128;
 const TREE_WIND_STRENGTH = 0.06;
@@ -1649,6 +1664,24 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       { p: [248, 205, 70], c: [160, 100, 25] },
       { p: [248, 244, 235], c: [230, 170, 60] },
     ],
+    // Nightbloom: the namesake pale luminous petals, whites and moon violets
+    night: [
+      { p: [235, 225, 255], c: [190, 160, 240] },
+      { p: [210, 180, 250], c: [245, 240, 200] },
+      { p: [250, 240, 250], c: [230, 200, 255] },
+    ],
+    // Evergarden: parkland roses, pinks and creams
+    garden: [
+      { p: [240, 120, 150], c: [200, 60, 90] },
+      { p: [250, 200, 220], c: [220, 140, 170] },
+      { p: [245, 245, 240], c: [240, 200, 90] },
+    ],
+    // Willowfen: wetland wildflowers, buttercream, lavender, white
+    fen: [
+      { p: [250, 245, 210], c: [210, 170, 60] },
+      { p: [200, 170, 230], c: [160, 120, 200] },
+      { p: [245, 250, 255], c: [220, 220, 150] },
+    ],
   };
   const flowerMatCache = new Map<string, THREE.Material>();
   const flowerMatFor = (biome: BiomeId): THREE.Material => {
@@ -1668,7 +1701,9 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   };
   // build every palette texture up front: a first-visit texture generation
   // plus shader compile mid-walk reads as a lag spike
-  for (const b of ['vale', 'dusk', 'ember', 'amber'] as BiomeId[]) flowerMatFor(b);
+  for (const b of ['vale', 'dusk', 'ember', 'amber', 'night', 'garden', 'fen'] as BiomeId[]) {
+    flowerMatFor(b);
+  }
 
   const chunks = new Map<string, GrassChunk>();
   const buildQueue: GrassChunk[] = [];
@@ -1707,14 +1742,17 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   const buildChunk = (chunk: GrassChunk): void => {
     const started = performance.now();
     let n = 0;
-    const im = new THREE.InstancedMesh(geo, mat, maxChunkCount);
+    const chunkBiome = zoneBiomeAt(chunk.centerX, chunk.centerZ);
+    // dense-grass biomes get a matching buffer so the extra tufts are never
+    // clipped by the base cap (allocation is per chunk, biome known here)
+    const chunkCap = Math.ceil(maxChunkCount * Math.max(1, GRASS_BIOME_DENSITY[chunkBiome] ?? 1));
+    const im = new THREE.InstancedMesh(geo, mat, chunkCap);
     im.userData.renderCategory = 'grass';
     im.frustumCulled = true;
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
-    const chunkBiome = zoneBiomeAt(chunk.centerX, chunk.centerZ);
-    const duskFields = chunkBiome === 'dusk';
-    const flowerCap = Math.max(8, Math.floor(maxChunkCount * (duskFields ? 0.45 : 0.14)));
+    const fieldChunk = FIELD_BIOMES.has(chunkBiome);
+    const flowerCap = Math.max(8, Math.floor(maxChunkCount * (fieldChunk ? 0.45 : 0.14)));
     const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
     fm.userData.renderCategory = 'grass';
     fm.frustumCulled = true;
@@ -1731,22 +1769,29 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const j0 = Math.floor(minZ / step) - 1;
     const j1 = Math.ceil(maxZ / step) + 1;
     // authored flower meadows overlapping this chunk (dusk realm only)
-    const meadowsInChunk = duskFields
-      ? REALM_FLOWER_MEADOWS.filter(
-          (mw) =>
-            mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
-        )
-      : [];
+    const meadowsInChunk =
+      chunkBiome === 'dusk'
+        ? REALM_FLOWER_MEADOWS.filter(
+            (mw) =>
+              mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
+          )
+        : [];
 
-    for (let i = i0; i <= i1 && n < maxChunkCount; i++) {
-      for (let j = j0; j <= j1 && n < maxChunkCount; j++) {
+    for (let i = i0; i <= i1 && n < chunkCap; i++) {
+      for (let j = j0; j <= j1 && n < chunkCap; j++) {
         const r = hashAt(i, j, 0);
-        if (r > (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW)) continue;
+        // biome-scaled density: the anchor position decides its biome, so the
+        // Reach stays bare and the Wraithwood thickens right up to its border
+        if (r > (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW) * GRASS_DENSITY_MULT_MAX) continue;
         const x = i * step + (hashAt(i, j, 1) - 0.5) * step * 1.4;
         const z = j * step + (hashAt(i, j, 2) - 0.5) * step * 1.4;
         if (x < minX || x >= maxX || z < minZ || z >= maxZ) continue;
         if (Math.abs(x) > WORLD_MAX_X - 16 || z < WORLD_MIN_Z + 16 || z > WORLD_MAX_Z - 16)
           continue;
+        const tuftBiome = zoneBiomeAt(x, z);
+        const density =
+          (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW) * (GRASS_BIOME_DENSITY[tuftBiome] ?? 1);
+        if (r > density) continue;
         const h = terrainHeight(x, z, seed);
         if (h < WATER_LEVEL + 1.6) continue;
         // no blades pasted onto cliff faces
@@ -1765,7 +1810,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         q.setFromAxisAngle(up, r * 12.4);
         m.compose(v.set(x, h, z), q, sv.set(s, s, s));
         im.setMatrixAt(n, m);
-        c.setHex(GRASS_TINT[zoneBiomeAt(x, z)]);
+        c.setHex(GRASS_TINT[tuftBiome]);
         c.offsetHSL(
           (hashAt(i, j, 3) - 0.5) * 0.05,
           (hashAt(i, j, 4) - 0.5) * 0.12,
@@ -1773,10 +1818,11 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         );
         im.setColorAt(n, c);
         n++;
+        if (FLOWERLESS_BIOMES.has(tuftBiome)) continue;
         // roughly one tuft in nine sprouts a flower cluster beside it; in
-        // the dusk realm, coarse field cells bloom into dense drifts, and the
-        // authored meadow circles (REALM_FLOWER_MEADOWS) always bloom
-        const fieldCell = duskFields ? hashAt(Math.floor(x / 22), Math.floor(z / 22), 13) : 1;
+        // the field realms, coarse field cells bloom into dense drifts, and
+        // the authored meadow circles (REALM_FLOWER_MEADOWS) always bloom
+        const fieldCell = fieldChunk ? hashAt(Math.floor(x / 22), Math.floor(z / 22), 13) : 1;
         const inMeadow = meadowsInChunk.some((mw) => {
           const mdx = x - mw.x;
           const mdz = z - mw.z;
@@ -1784,8 +1830,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         });
         // meadows bloom harder than hash fields: their ground carries fewer
         // grass tufts (each tuft is a flower anchor), so density compensates
-        const inField = duskFields && fieldCell < 0.42;
-        const flowerChance = inMeadow ? 0.9 : inField ? 0.6 : duskFields ? 0.05 : 0.11;
+        const inField = fieldChunk && fieldCell < 0.42;
+        const flowerChance = inMeadow ? 0.9 : inField ? 0.6 : fieldChunk ? 0.05 : 0.11;
         const reps = inMeadow ? 4 : inField ? 3 : 1;
         if (hashAt(i, j, 6) < flowerChance) {
           for (let rep = 0; rep < reps && fn < flowerCap; rep++) {
