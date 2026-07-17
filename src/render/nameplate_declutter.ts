@@ -55,14 +55,17 @@ function cellCoord(v: number, size: number): number {
 const order: number[] = [];
 const cluster: number[] = [];
 const cells = new Map<number, number[]>();
+const activeBuckets: number[][] = [];
 const bucketPool: number[][] = [];
 let visited = new Uint8Array(64);
 
 function releaseCells(): void {
-  for (const bucket of cells.values()) {
+  for (let i = 0; i < activeBuckets.length; i++) {
+    const bucket = activeBuckets[i];
     bucket.length = 0;
     bucketPool.push(bucket);
   }
+  activeBuckets.length = 0;
   cells.clear();
 }
 
@@ -97,6 +100,7 @@ export function declutterNameplatesInPlace(
     if (!bucket) {
       bucket = bucketPool.pop() ?? [];
       cells.set(key, bucket);
+      activeBuckets.push(bucket);
     }
     bucket.push(i);
   }
@@ -115,7 +119,8 @@ export function declutterNameplatesInPlace(
       for (let dy = -1; dy <= 1; dy++) {
         const bucket = cells.get((cx + dx) * CELL_STRIDE + (cy + dy));
         if (!bucket) continue;
-        for (const j of bucket) {
+        for (let b = 0; b < bucket.length; b++) {
+          const j = bucket[b];
           if (visited[j]) continue;
           if (Math.abs(anchors[j].sx - ax) > OVERLAP_THRESHOLD_X_PX) continue;
           if (Math.abs(anchors[j].sy - ay) > OVERLAP_THRESHOLD_Y_PX) continue;
@@ -132,7 +137,7 @@ export function declutterNameplatesInPlace(
     cluster.sort((a, b) => anchors[a].id - anchors[b].id);
 
     let sum = 0;
-    for (const j of cluster) sum += anchors[j].sy;
+    for (let k = 0; k < cluster.length; k++) sum += anchors[cluster[k]].sy;
     const baseSy = sum / cluster.length;
     const mid = (cluster.length - 1) / 2;
     for (let k = 0; k < cluster.length; k++) {
