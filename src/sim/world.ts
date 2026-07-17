@@ -1801,6 +1801,51 @@ function emberShapingOffset(x: number, z: number, seed: number): number {
   return dh;
 }
 
+// The Drakemaw's breached south rim: the caldera wall climbs past the
+// movement gate at every azimuth, so anyone stepping over the lip was
+// stranded on the vent floor (the player report: three stranded attempts,
+// and the world's ONLY closed basin in the trap scan). Volcanoes breach:
+// an old outflow channel now cuts the south face, a walkable 0.5 rise/run
+// gorge from just above the melt lip down to the open waste. Applied
+// AFTER the cone shaping and the basin lip so it clamps both; it starts
+// above the pool floor, so the melt never drains into the channel.
+// tests/terrain_escape.test.ts walks a real player out through it.
+const DRAKEMAW_BREACH = {
+  x: 390,
+  z: 2320,
+  // due south, out the crater's low approach
+  angle: -Math.PI / 2,
+  mouthR: 14, // the pool's melt radius: the channel begins at its edge
+  mouthH: 12.4, // just above the rendered melt surface
+  slope: 0.5,
+  floorH: 5.4, // the south plain's height: the channel grades onto it, never below
+  endR: 54,
+} as const;
+function applyDrakemawBreach(x: number, z: number, h: number): number {
+  const b = DRAKEMAW_BREACH;
+  const dx = x - b.x;
+  const dz = z - b.z;
+  // corridor coordinates along the outflow ray: a constant-width channel
+  // (perpendicular distance, not a widening cone) so the mouth is a real
+  // walkable gate, not a slit
+  const along = dx * Math.cos(b.angle) + dz * Math.sin(b.angle);
+  const perp = Math.abs(dx * Math.sin(b.angle) - dz * Math.cos(b.angle));
+  if (along < 7 || along > b.endR || perp > 8) return h;
+  // the window opens right at the pool edge: the ramp value exceeds the melt
+  // floor inside the pool, so the clamp is a no-op there, and the basin lip
+  // can never stack a doorstep across the channel mouth
+  const wedge =
+    (1 - smoothstep(4, 8, perp)) *
+    smoothstep(5, 8, along) *
+    (1 - smoothstep(b.endR - 8, b.endR, along));
+  if (wedge <= 0) return h;
+  // flat shelf across the whole mouth (held just above the melt surface, so
+  // the channel floor stays dry of lava), then the 0.5 rise/run descent
+  const ramp = Math.max(b.mouthH - b.slope * Math.max(0, along - b.mouthR), b.floorH);
+  if (h <= ramp) return h;
+  return h + (ramp - h) * wedge;
+}
+
 // Real craters, carved after the cones: a raised rock lip rings each pool
 // and the floor sinks genuinely below the surrounding ground, so the melt
 // sits down INSIDE its bowl the way lake water does (the floors stay above
@@ -2793,6 +2838,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyRowMeres(x, z, h);
   h = applyNorthBay(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
+  h = applyDrakemawBreach(x, z, h);
   h = applyFrostTerraces(x, z, h);
   h = applyFenBraids(x, z, h);
   // The Great Maze rises out of the finished lawn: walls are pure additive
