@@ -1565,11 +1565,14 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "pois": [
       "Hedgewick",
       "The Garden Gate",
-      "The Statuary Walk",
-      "The Rose Wilds",
+      "The Parterre Walk",
+      "Dawnhold Castle",
       "The Petal Pond",
       "The Great Maze",
-      "The Fountain Court"
+      "The Fountain Court",
+      "The Old Mill",
+      "The North Watch",
+      "The Lily Basin"
     ],
     "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
     "families": [

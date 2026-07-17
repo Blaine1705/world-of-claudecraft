@@ -911,10 +911,10 @@ const GARDEN_LAND_LOBES = [
   { x: 410, z: 740, r: 55 }, // the Garden Gate's approach lawn
   { x: 378, z: 765, r: 45 }, // the gate road's lawn, bridging to the hub
   { x: 320, z: 810, r: 70 }, // Hedgewick and the gate lawns
-  { x: 360, z: 880, r: 80 }, // the Statuary Walk
+  { x: 360, z: 880, r: 80 }, // the Parterre Walk
   { x: 440, z: 850, r: 55 }, // the Petal Pond's basin
   { x: 290, z: 870, r: 40 }, // the rose road's shoulder
-  { x: 270, z: 910, r: 60 }, // the Rose Wilds
+  { x: 270, z: 910, r: 60 }, // Dawnhold Castle's lawn
   { x: 360, z: 1016, r: 95 }, // the Great Maze's terrace...
   { x: 305, z: 960, r: 60 }, // ...and its four corners, kept well ashore
   { x: 415, z: 960, r: 60 },

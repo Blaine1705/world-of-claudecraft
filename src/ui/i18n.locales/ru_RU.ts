@@ -3805,11 +3805,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Кто-то до сих пор подстригает живые изгороди, хотя садовника не видели уже сто лет. Берегись лабиринта: он тоже следит за тобой.',
   'entities.zones.evergarden.pois.0.label': 'Хеджвик',
   'entities.zones.evergarden.pois.1.label': 'Садовые Врата',
-  'entities.zones.evergarden.pois.2.label': 'Аллея Статуй',
-  'entities.zones.evergarden.pois.3.label': 'Дикие Розы',
+  'entities.zones.evergarden.pois.2.label': 'Аллея Цветников',
+  'entities.zones.evergarden.pois.3.label': 'Замок Донхолд',
   'entities.zones.evergarden.pois.4.label': 'Лепестковый Пруд',
   'entities.zones.evergarden.pois.5.label': 'Великий Лабиринт',
   'entities.zones.evergarden.pois.6.label': 'Фонтанный Двор',
+  'entities.zones.evergarden.pois.7.label': 'Старая Мельница',
+  'entities.zones.evergarden.pois.8.label': 'Северный Дозор',
+  'entities.zones.evergarden.pois.9.label': 'Лилейная Заводь',
   'entities.mobs.topiary_stag.name': 'Фигурный олень',
   'entities.mobs.topiary_wolf.name': 'Фигурный волк',
   'entities.mobs.hedge_gnome.name': 'Гном живой изгороди',
@@ -5980,7 +5983,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.junglePlaceNotes':
     'Дрифтхейвен держит костёр на берегу. Заросшее Устье, это место, где река встречает зелёную стену; Пальмовая Коса тянется белой тёплой полосой вдоль прибоя; Изумрудная Чаща и Лианопад поглощают всё, что дальше от берега; Сапфировая Лагуна светится, прозрачная и глубокая; а Затонувший Идол наблюдает из-под воды.',
   'guide.worldPage.gardenPlaceNotes':
-    'Хеджвик ждёт у Садовых Врат. Аллея Статуй хранит своё безмолвное общество; Дикие Розы давно переросли свои клумбы; Лепестковый Пруд круглый год розовеет от лепестков; Великий Лабиринт меняет свои манеры под каждого гостя; а Фонтанный Двор всё так же бежит чистой водой в самом сердце сада.',
+    'Хеджвик ждёт у Садовых Врат. Аллея Цветников цветёт подстриженными красками; Замок Донхолд муштрует рыцарей за новыми стенами; Лепестковый Пруд круглый год розовеет от лепестков; Старая Мельница вертится над собственными кольцевыми клумбами; Великий Лабиринт меняет свои манеры под каждого гостя, а за его арками следят лиственные лисы; Северный Дозор стережёт дорогу от выхода; Лилейная Заводь покоится за всем этим; а Фонтанный Двор всё так же бежит чистой водой в самом сердце сада.',
   'guide.worldPage.valeGreeter': 'Маршал Редбрук, Истврук',
   'guide.worldPage.valeGreeting': 'Держите клинок наготове. Долина уже не та, что прежде.',
   'guide.worldPage.valePlaceNotes':

@@ -1,15 +1,17 @@
 // The Evergarden (level 20). North past the Palmreach's warm sand the road
 // climbs through the Garden Gate onto clipped lawn: a vast formal garden
-// gone a hundred years without its gardener, yet still trimmed. Marble
-// statues line the Statuary Walk, roses run wild in the west, the Petal
-// Pond mirrors the east lawn, and at the realm's heart stands the Great
-// Maze: a true hedge labyrinth grown from the terrain itself, with the
-// Fountain Court (and something horned that guards it) at the center. The
-// hamlet of Hedgewick keeps its lamps lit by the gate lawns. Terrain: the
-// GARDEN_* tables and the maze grid in world.ts (the hedge walls ARE the
-// heightfield, so the sim, the renderer, and the map all agree); statues,
-// topiary, and the fountain live in render/garden_features.ts (the
-// greatTrees records below give the sim its solid trunk colliders).
+// gone a hundred years without its gardener, yet still trimmed. Parterre
+// beds bloom along the Parterre Walk, Dawnhold castle holds the west lawn
+// behind its walls, windmills turn at the Old Mill, the Petal Pond mirrors
+// the east lawn, and at the realm's heart stands the Great Maze: a true
+// hedge labyrinth of modeled walls over flat lawn, its entrance and exit
+// arched and fox-guarded, with the Fountain Court (and something horned
+// that guards it) at the center. The hamlet of Hedgewick keeps its lamps
+// lit by the gate lawns. Terrain: the GARDEN_* tables and the maze grid in
+// world.ts (movement blocks on the grid's piece boxes, so the sim, the
+// renderer, and the map all agree); the maze hedges, watchers, and the
+// fountain live in render/garden_features.ts (the greatTrees records below
+// give the sim its solid trunk colliders).
 
 import type {
   CampDef,
@@ -45,14 +47,21 @@ export const EVERGARDEN_ZONE: ZoneDef = {
     { x: 440, z: 850, radius: 11 }, // the Petal Pond
     { x: 340, z: 1170, radius: 10 }, // the Lily Basin
   ],
+  // Labels track the living garden (ids stay FROZEN: exploration marks key
+  // on them, so a renamed area keeps its old id): the Statuary Walk became
+  // the parterre-bed promenade when the colonnade came down, and Dawnhold
+  // castle claimed the Rose Wilds lawn for its walls and knights.
   pois: [
     { x: 320, z: 810, label: 'Hedgewick', id: 'hedgewick' },
     { x: 410, z: 732, label: 'The Garden Gate', id: 'the_garden_gate' },
-    { x: 360, z: 875, label: 'The Statuary Walk', id: 'the_statuary_walk' },
-    { x: 270, z: 910, label: 'The Rose Wilds', id: 'the_rose_wilds' },
+    { x: 360, z: 875, label: 'The Parterre Walk', id: 'the_statuary_walk' },
+    { x: 263, z: 889, label: 'Dawnhold Castle', id: 'the_rose_wilds' },
     { x: 440, z: 850, label: 'The Petal Pond', id: 'the_petal_pond' },
     { x: 360, z: 946, label: 'The Great Maze', id: 'the_great_maze' },
     { x: 360, z: 1016, label: 'The Fountain Court', id: 'the_fountain_court' },
+    { x: 504, z: 754, label: 'The Old Mill', id: 'the_old_mill' },
+    { x: 412, z: 1112, label: 'The North Watch', id: 'the_north_watch' },
+    { x: 340, z: 1170, label: 'The Lily Basin', id: 'the_lily_basin' },
   ],
   welcome:
     'Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.',
@@ -70,7 +79,7 @@ export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
     { x: 344, z: 844 },
     { x: 360, z: 875 },
     { x: 360, z: 936 },
-  ], // Hedgewick -> the Statuary Walk -> dead-aligned with the entrance arch
+  ], // Hedgewick -> the Parterre Walk -> dead-aligned with the entrance arch
   [
     { x: 320, z: 810 },
     { x: 298, z: 852 },

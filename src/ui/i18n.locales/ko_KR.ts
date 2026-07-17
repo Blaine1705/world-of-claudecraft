@@ -3757,11 +3757,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '산울타리는 여전히 다듬어지고 있지만, 정원사를 본 사람은 백 년 동안 없었다. 미로를 조심하라. 미로도 너를 지켜보고 있다.',
   'entities.zones.evergarden.pois.0.label': '헤지윅',
   'entities.zones.evergarden.pois.1.label': '정원 문',
-  'entities.zones.evergarden.pois.2.label': '조각상 산책로',
-  'entities.zones.evergarden.pois.3.label': '들장미 수풀',
+  'entities.zones.evergarden.pois.2.label': '화단 산책로',
+  'entities.zones.evergarden.pois.3.label': '던홀드 성',
   'entities.zones.evergarden.pois.4.label': '꽃잎 연못',
   'entities.zones.evergarden.pois.5.label': '대미로',
   'entities.zones.evergarden.pois.6.label': '분수 안뜰',
+  'entities.zones.evergarden.pois.7.label': '오래된 풍차',
+  'entities.zones.evergarden.pois.8.label': '북쪽 감시초소',
+  'entities.zones.evergarden.pois.9.label': '수련 연못',
   'entities.mobs.topiary_stag.name': '토피어리 수사슴',
   'entities.mobs.topiary_wolf.name': '토피어리 늑대',
   'entities.mobs.hedge_gnome.name': '산울타리 노움',
@@ -5882,7 +5885,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.junglePlaceNotes':
     '드리프트헤이븐은 해변에 불을 피워 둡니다. 덩굴 어귀는 강이 초록 장벽과 만나는 곳이고, 야자 백사장은 파도를 따라 희고 따뜻하게 이어집니다. 에메랄드 밀림과 덩굴폭포 숲은 내륙을 삼키고, 사파이어 석호는 맑고 깊게 빛나며, 가라앉은 신상은 물밑에서 지켜봅니다.',
   'guide.worldPage.gardenPlaceNotes':
-    '헤지윅은 정원 문 앞에서 기다립니다. 조각상 산책로는 말없는 동행을 지키고, 들장미 수풀은 화단을 벗어난 지 오래입니다. 꽃잎 연못은 일 년 내내 분홍빛으로 떠다니고, 대미로는 손님이 올 때마다 제 예법을 새로 고쳐 짜며, 분수 안뜰은 정원의 심장에서 여전히 맑게 흐릅니다.',
+    '헤지윅은 정원 문 앞에서 기다립니다. 화단 산책로는 잘 다듬어진 빛깔로 피어나고, 던홀드 성은 새 성벽 뒤에서 기사들을 조련합니다. 꽃잎 연못은 일 년 내내 분홍빛으로 떠다니고, 오래된 풍차는 제 둘레의 고리 화단 위에서 돌아갑니다. 대미로는 손님이 올 때마다 제 예법을 새로 고쳐 짜며, 그 아치는 잎사귀 여우들이 지킵니다. 북쪽 감시초소는 출구 길을 지키고, 수련 연못은 그 너머에 고요히 쉬며, 분수 안뜰은 정원의 심장에서 여전히 맑게 흐릅니다.',
   'guide.worldPage.valeGreeter': '레드브룩 원수, 이스트브룩',
   'guide.worldPage.valeGreeting': '칼을 가까이 두시오. 골짜기는 예전 같지 않으니.',
   'guide.worldPage.valePlaceNotes':

@@ -3058,7 +3058,7 @@ export const da_DK: EnTranslations = {
       "hauntPlaceNotes": "Gallowmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
       "galePlaceNotes": "Wickharbor leans into the wind. The Windway is the cliff road in; the Howling Downs roll treeless under the gale; the Old Beacon has burned for as long as anyone can say; the Shear drops sheer to the water; the Wreckfields keep the coast honest; and the Mirror Tarn is the one still thing in the whole realm.",
       "junglePlaceNotes": "Drifthaven keeps its fire on the beach. The Tanglemouth is where the river meets the green wall; the Palmstrand runs white and warm along the surf; the Emerald Tangle and the Vinefall swallow the interior; the Sapphire Lagoon glows clear and deep; and the Sunken Idol watches from beneath the water.",
-      "gardenPlaceNotes": "Hedgewick waits at the Garden Gate. The Statuary Walk keeps its silent company; the Rose Wilds have long outgrown their beds; the Petal Pond drifts pink the year round; the Great Maze rearranges its manners for every guest; and the Fountain Court still runs clear at the garden heart.",
+      "gardenPlaceNotes": "Hedgewick waits at the Garden Gate. The Parterre Walk blooms in clipped color; Dawnhold Castle drills its knights behind new walls; the Petal Pond drifts pink the year round; the Old Mill turns over its own ring beds; the Great Maze rearranges its manners for every guest, its arches watched by leafy foxes; the North Watch keeps the exit road; the Lily Basin rests beyond it all; and the Fountain Court still runs clear at the garden heart.",
       "gladeTitle": "Et stille hjørne: Brightwood Glade",
       "gladeBody": "Ikke hver historie i the Vale handler om de døde. Mod nord holder en solbeskinnet lund kaldet Brightwood Glade sin egen blidere rytme, med lutter stille stier og spættet lys under grenene. Den er en blød modvægt til det spor, du følger, og værd at se, når vejen giver dig plads til at vandre.",
       "worldBossTitle": "Når tinden vågner: verdensbossen",
@@ -10698,10 +10698,10 @@ export const da_DK: EnTranslations = {
             "label": "The Garden Gate"
           },
           "2": {
-            "label": "The Statuary Walk"
+            "label": "The Parterre Walk"
           },
           "3": {
-            "label": "The Rose Wilds"
+            "label": "Dawnhold Castle"
           },
           "4": {
             "label": "The Petal Pond"
@@ -10711,6 +10711,15 @@ export const da_DK: EnTranslations = {
           },
           "6": {
             "label": "The Fountain Court"
+          },
+          "7": {
+            "label": "The Old Mill"
+          },
+          "8": {
+            "label": "The North Watch"
+          },
+          "9": {
+            "label": "The Lily Basin"
           }
         }
       },

@@ -3776,11 +3776,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '生け垣は今も刈り込まれているのに、庭師の姿は百年も見られていない。迷路には気をつけろ。迷路もお前を見ている。',
   'entities.zones.evergarden.pois.0.label': 'ヘッジウィック',
   'entities.zones.evergarden.pois.1.label': 'ガーデンゲート',
-  'entities.zones.evergarden.pois.2.label': '彫像の並木道',
-  'entities.zones.evergarden.pois.3.label': '野バラの茂み',
+  'entities.zones.evergarden.pois.2.label': '花壇の散歩道',
+  'entities.zones.evergarden.pois.3.label': 'ドーンホールド城',
   'entities.zones.evergarden.pois.4.label': '花びらの池',
   'entities.zones.evergarden.pois.5.label': '大迷路',
   'entities.zones.evergarden.pois.6.label': '噴水の中庭',
+  'entities.zones.evergarden.pois.7.label': '古い風車小屋',
+  'entities.zones.evergarden.pois.8.label': '北の見張り台',
+  'entities.zones.evergarden.pois.9.label': '睡蓮の泉水',
   'entities.mobs.topiary_stag.name': 'トピアリーの雄鹿',
   'entities.mobs.topiary_wolf.name': 'トピアリーの狼',
   'entities.mobs.hedge_gnome.name': '生け垣ノーム',
@@ -5887,7 +5890,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.junglePlaceNotes':
     'ドリフトヘイヴンは浜辺の火を守っています。タングルマウスは川が緑の壁とぶつかる場所。パームストランドは白く温かな砂浜となって波打ち際に続きます。エメラルドの密林とヴァインフォールは内陸を飲み込み、サファイアの礁湖は澄んで深く輝き、沈んだ偶像は水の底からこちらを見つめています。',
   'guide.worldPage.gardenPlaceNotes':
-    'ヘッジウィックは庭園の門で待っています。彫像の小径には物言わぬ立ち姿が並び、野薔薇の原はとうの昔に花壇を飛び出しました。花びらの池は一年中桃色に漂い、大迷路は客が来るたびに作法を並べ替え、噴水の中庭は庭園の中心で今も澄んだ水を流し続けています。',
+    'ヘッジウィックは庭園の門で待っています。花壇の散歩道は刈り込まれた彩りに咲き、ドーンホールド城は新しい城壁の内で騎士を鍛えています。花びらの池は一年中桃色に漂い、古い風車小屋は自らの環状花壇の上で回り続けます。大迷路は客が来るたびに作法を並べ替え、そのアーチは葉の狐たちが見張っています。北の見張り台は出口の道を守り、睡蓮の泉水はそのすべての先に静かに横たわり、噴水の中庭は庭園の中心で今も澄んだ水を流し続けています。',
   'guide.worldPage.valeGreeter': 'レッドブルック元帥、イーストブルック',
   'guide.worldPage.valeGreeting': '刃を手放すな。渓谷はかつての姿ではない。',
   'guide.worldPage.valePlaceNotes':

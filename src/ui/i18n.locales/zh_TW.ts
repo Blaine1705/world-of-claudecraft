@@ -3625,11 +3625,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '樹籬仍有人在修剪，可百年來無人見過園丁。當心迷宮：它也在留意你。',
   'entities.zones.evergarden.pois.0.label': '籬苑鎮',
   'entities.zones.evergarden.pois.1.label': '花園之門',
-  'entities.zones.evergarden.pois.2.label': '雕像步道',
-  'entities.zones.evergarden.pois.3.label': '野薔薇叢',
+  'entities.zones.evergarden.pois.2.label': '花壇步道',
+  'entities.zones.evergarden.pois.3.label': '晨曦堡',
   'entities.zones.evergarden.pois.4.label': '花瓣池',
   'entities.zones.evergarden.pois.5.label': '大迷宮',
   'entities.zones.evergarden.pois.6.label': '噴泉庭院',
+  'entities.zones.evergarden.pois.7.label': '老磨坊',
+  'entities.zones.evergarden.pois.8.label': '北望哨',
+  'entities.zones.evergarden.pois.9.label': '睡蓮池',
   'entities.mobs.topiary_stag.name': '綠雕雄鹿',
   'entities.mobs.topiary_wolf.name': '綠雕之狼',
   'entities.mobs.hedge_gnome.name': '樹籬地精',
@@ -5621,7 +5624,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.junglePlaceNotes':
     '漂流港在海灘上燃著火堆。纏木隘口是河流與綠牆相會之處；棕櫚長灘沿著浪花鋪展，潔白而溫暖；翠綠叢林與垂藤林吞沒了內陸；藍寶石潟湖清澈幽深地發著光；沉沒神像則自水下注視著一切。',
   'guide.worldPage.gardenPlaceNotes':
-    '籬苑鎮候在花園之門前。雕像步道有它沉默的同伴相隨；野薔薇叢早已蔓生出花圃之外；花瓣池終年飄著粉色花瓣；大迷宮會為每位訪客重新安排它的規矩；噴泉庭院則仍在花園中心流淌著清澈的泉水。',
+    '籬苑鎮候在花園之門前。花壇步道綻放著修剪齊整的色彩；晨曦堡在新築的城牆後操練騎士；花瓣池終年飄著粉色花瓣；老磨坊在自己的環形花壇上轉動；大迷宮會為每位訪客重新安排它的規矩，拱門有綠葉狐狸守望；北望哨守著出口之路；睡蓮池在這一切之外靜臥；噴泉庭院則仍在花園中心流淌著清澈的泉水。',
   'guide.worldPage.valeGreeter': '雷德布魯克元帥，東溪鎮',
   'guide.worldPage.valeGreeting': '把你的劍帶在身邊。谷地已不復昔日。',
   'guide.worldPage.valePlaceNotes':
