@@ -2190,7 +2190,11 @@ export function buildFoliage(seed: number): FoliageView {
       modelVisibleByLod = {};
       modelVisibleDrawsByLod = {};
       modelVisibleTrianglesByLod = {};
-      for (const b of bucketMeshes) {
+      // This walks 1k+ buckets every frame. Keep it indexed: the iterator/result
+      // churn from `for...of` remained the dominant foliage allocation after the
+      // cull input itself became reusable.
+      for (let i = 0; i < bucketMeshes.length; i++) {
+        const b = bucketMeshes[i];
         const revealScale =
           GFX.leanFoliage && (b.lod === 'core' || b.lod === 'near-fill')
             ? 0.94 + hashAt(b.x, b.z, 109) * 0.06
