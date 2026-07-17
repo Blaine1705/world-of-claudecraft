@@ -1027,6 +1027,7 @@ export const tr_TR: EnTranslations = {
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",

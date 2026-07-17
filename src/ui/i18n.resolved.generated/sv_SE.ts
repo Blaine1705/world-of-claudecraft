@@ -1027,6 +1027,7 @@ export const sv_SE: EnTranslations = {
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Visa målets mål",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",

@@ -1027,6 +1027,7 @@ export const vi_VN: EnTranslations = {
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",

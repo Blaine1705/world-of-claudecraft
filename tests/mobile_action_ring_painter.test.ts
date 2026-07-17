@@ -306,6 +306,52 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     painter.paint(view.tick(idleWorld()), 1, 2);
     expect(counts.writes).toBeGreaterThan(writesAfterFirst);
   });
+
+  it('paints page 7 with third-row slots 31 to 33 followed by two empty buttons', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const indicator = { tag: 'indicator' } as unknown as HTMLElement;
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        pageToggle: { tag: 'toggle' } as unknown as HTMLElement,
+        pageIndicator: indicator,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+    );
+    const pageBox = { page: 6 };
+    const view = createActionBarView(
+      {
+        slots: ringDescriptor(
+          pageBox,
+          new Map([
+            [31, ability('slot31')],
+            [32, ability('slot32')],
+            [33, ability('slot33')],
+          ]),
+        ),
+      },
+      fakeDeps(),
+    );
+    const state = view.tick(idleWorld());
+
+    expect(state.slots.slice(1).map((slot) => slot.abilityId)).toEqual([
+      'slot31',
+      'slot32',
+      'slot33',
+      null,
+      null,
+    ]);
+    painter.paint(state, 6, 7);
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":7,"count":7}'],
+    });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [els[4].btn, 'empty', true] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [els[5].btn, 'empty', true] });
+  });
 });
 
 describe('MobileActionRingPainter: removable attack control', () => {

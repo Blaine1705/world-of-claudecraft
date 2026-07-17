@@ -97,7 +97,7 @@ into a pure module if needed), then the smallest change that turns it green.
   (`kind: 'held'` for movement polled in `readMoveInput`, else `'edge'`). For an
   edge action, extend `InputCallbacks.onUiKey`'s union and add a `case` in
   `Input.dispatchEdge`, then wire it where `new Input(...)` is constructed in
-  `main.ts`. Action-bar slots (`slot0..11`) already route to `onAbility`.
+  `main.ts`. Action-bar slots (`slot0..33`) already route to `onAbility`.
 - **A new SFX:** add the catalog entry and sampled asset, regenerate
   `sfx_manifest.generated.ts`, and route the typed key through `sfx.ts`. Personal
   UI/event call surfaces stay on `GameAudio`, and choose the cue's gate

@@ -1027,6 +1027,7 @@ export const id_ID: EnTranslations = {
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",

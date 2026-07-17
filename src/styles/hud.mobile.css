@@ -456,9 +456,9 @@
   /* Phase 1 of the mobile combat HUD rework: a bottom-right thumb cluster that
      makes the existing hotbar castable on touch (desktop drag/drop keybinds are
      unusable on a phone). One fixed primary Attack toggle (castSlot(0), unpaged),
-     5 paged action buttons (2 pages of 5 covering hotbar source slots 1-10, see
+     5 paged action buttons (7 pages covering hotbar source slots 1-33, see
      mobile_action_page_view.ts), a page-cycle toggle, and the Target swap
-     helper. The ring supersedes the desktop #actionbar/#actionbar2 rows under
+     helper. The ring supersedes the desktop #actionbar/#actionbar2/#actionbar3 rows under
      body.mobile-touch (hidden below); xpbar/player-frame/petbar keep rendering
      (their own mobile rules are untouched).
 
@@ -1350,16 +1350,19 @@
       transition: none;
     }
   }
-  /* The second action bar is desktop-only (the mobile action ring above owns
-     ability casting on touch). */
+  /* The optional action bars are desktop-only. The mobile action ring above
+     owns ability casting on touch and pages through all three rows. */
+  body.mobile-touch #actionbar3 {
+    display: none;
+  }
   body.mobile-touch #actionbar2 {
     display: none;
   }
-  /* The mobile action ring (above) supersedes both desktop bars: it makes the
+  /* The mobile action ring (above) supersedes every desktop bar: it makes the
      hotbar castable on touch, so the scaled desktop rows would only duplicate
      it. #actionbar-stack siblings (xpbar/player-frame/petbar) are untouched and
      keep rendering via their own existing mobile rules elsewhere in this file.
-     Both bars stay display:none, so no layout/sizing/drag/hover/state rule for
+     All bars stay display:none, so no layout/sizing/drag/hover/state rule for
      their contents is reachable here; that styling lives only in hud.css. */
   body.mobile-touch #actionbar {
     display: none;

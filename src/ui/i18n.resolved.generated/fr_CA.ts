@@ -1027,6 +1027,7 @@ export const fr_CA: EnTranslations = {
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Afficher la cible de la cible",
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",

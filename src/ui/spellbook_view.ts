@@ -17,7 +17,8 @@
 //
 // Phase 4 of the mobile combat HUD rework adds an optional `mobilePage` per row:
 // which mobile action-ring page (Phase 1, mobile_action_page_view.ts) the row's
-// bar slot falls on, so the touch-only painter can label it ("Page 1"/"Page 2").
+// bar slot falls on, so the touch-only painter can label it ("Page 1" through
+// "Page 7").
 // The page math is NOT duplicated here: sourceSlotsForMobilePage is imported
 // from mobile_action_page_view.ts and this module only looks up which page's
 // slot set contains the row's barSlot.
@@ -45,7 +46,7 @@ export interface SpellbookRow {
   toggleDisabled: boolean;
   /** The mobile action-ring page (0-indexed) this row's bar slot falls on, or
    *  null when the row is off-bar or its slot is outside the ring's reachable
-   *  span (slot 0 / the attack toggle, slot 11, or the secondary bar). Touch-only
+   *  span (slot 0 / the attack toggle or beyond slot 33). Touch-only
    *  presentation; desktop rendering ignores this field. */
   mobilePage: number | null;
 }
@@ -145,7 +146,7 @@ export function buildSpellbookView(input: SpellbookInput): SpellbookView {
  * The mobile action-ring page (0-indexed) whose source slots
  * (sourceSlotsForMobilePage) contain this ability's bar slot, or null when the
  * slot lookup is missing, the ability isn't on the bar, or its slot sits outside
- * every page's span (slot 0's attack toggle, slot 11, or the secondary bar).
+ * every page's span (slot 0's attack toggle or beyond slot 33).
  */
 function mobilePageForAbility(
   abilityId: string,

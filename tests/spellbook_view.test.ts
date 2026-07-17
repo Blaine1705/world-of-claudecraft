@@ -15,6 +15,7 @@ import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
+import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
 import { buildSpellbookView, type SpellbookInput } from '../src/ui/spellbook_view';
 
 // A class whose kit has at least two abilities, so we can exercise known/locked.
@@ -108,7 +109,7 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
   // abilityIdByBarSlot index 0 = barSlot 1 (hotbarActions' own index = barSlot-1
   // convention). Build a slot array with KIT[0] parked on a given 1-indexed slot.
   const slotsWith = (abilityId: string, barSlot: number): (string | null)[] => {
-    const slots: (string | null)[] = new Array(22).fill(null);
+    const slots: (string | null)[] = new Array(ACTION_BAR_ABILITY_SLOTS).fill(null);
     slots[barSlot - 1] = abilityId;
     return slots;
   };
@@ -139,15 +140,22 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
     }
   });
 
-  it('assigns null for slot 11 (outside the ring pages)', () => {
-    const v = buildSpellbookView(
-      input({
-        known: [known('sim', KIT[0])],
-        barAbilityIds: [KIT[0]],
-        abilityIdByBarSlot: slotsWith(KIT[0], 11),
-      }),
-    );
-    expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();
+  it('assigns pages 2 through 6 for the remaining three action-bar rows', () => {
+    for (const [slot, page] of [
+      [11, 2],
+      [23, 4],
+      [31, 6],
+      [33, 6],
+    ] as const) {
+      const v = buildSpellbookView(
+        input({
+          known: [known('sim', KIT[0])],
+          barAbilityIds: [KIT[0]],
+          abilityIdByBarSlot: slotsWith(KIT[0], slot),
+        }),
+      );
+      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(page);
+    }
   });
 
   it('assigns null for a row that is off-bar even if abilityIdByBarSlot is provided', () => {
@@ -155,7 +163,7 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
       input({
         known: [known('sim', KIT[0])],
         barAbilityIds: [],
-        abilityIdByBarSlot: new Array(22).fill(null),
+        abilityIdByBarSlot: new Array(ACTION_BAR_ABILITY_SLOTS).fill(null),
       }),
     );
     expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();

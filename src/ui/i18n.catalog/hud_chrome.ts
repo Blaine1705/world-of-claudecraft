@@ -846,6 +846,9 @@ export const hudChromeStrings = {
     // Interface panel toggle that reveals the optional second action bar row (off
     // by default). The abilities bound to its slots stay castable via their keybinds.
     showSecondaryActionBar: 'Show Secondary Action Bar',
+    // Enabled only while the secondary row is visible. Slots remain reachable
+    // through keybinds and the mobile action-ring pages while this row is hidden.
+    showThirdActionBar: 'Show Third Action Bar',
     // Interface panel toggle for the classic "target of target" mini-frame (off by
     // default): a small unit frame under the target frame showing who your target
     // is targeting.

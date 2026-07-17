@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  ACTION_BAR_SLOTS,
   actionAllowsShared,
   actionKind,
   BIND_ACTIONS,
@@ -72,13 +73,17 @@ describe('registry', () => {
     expect(actionKind('nope')).toBe(null);
   });
 
-  it('covers the expected categories and 23 action-bar slots (attack + 11 primary + 11 secondary)', () => {
+  it('covers attack plus three rows of 11 configurable action-bar slots', () => {
     expect(BIND_CATEGORIES).toContain('Movement');
     expect(BIND_CATEGORIES).toContain('Action Bar');
-    expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(23);
+    expect(ACTION_BAR_SLOTS).toBe(34);
+    expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(34);
     // The secondary bar's slots exist and default to the numpad row.
     expect(BIND_ACTIONS.find((a) => a.id === 'slot12')?.defaults).toEqual(['Numpad1']);
     expect(BIND_ACTIONS.find((a) => a.id === 'slot22')?.defaults).toEqual(['NumpadDecimal']);
+    // The third row uses shifted numpad bindings so it remains distinct.
+    expect(BIND_ACTIONS.find((a) => a.id === 'slot23')?.defaults).toEqual(['Shift+Numpad1']);
+    expect(BIND_ACTIONS.find((a) => a.id === 'slot33')?.defaults).toEqual(['Shift+NumpadDecimal']);
     // Discord is a rebindable Interface window toggle (default U).
     const discord = BIND_ACTIONS.find((a) => a.id === 'discord');
     expect(discord?.category).toBe('Interface');

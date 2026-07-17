@@ -1027,6 +1027,7 @@ export const en_CA: EnTranslations = {
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Show Target of Target",
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",

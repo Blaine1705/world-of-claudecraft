@@ -1472,24 +1472,36 @@
       inset 0 0 0 1px #ffd10066,
       0 0 6px #ffd10033;
   }
+  /* A third action row adds 58px to the stack. Lift the cast and swing timers
+     by the same amount so 720p layouts keep both timers clear of the stack. */
+  body.show-actionbar3 #castbar {
+    bottom: 318px;
+  }
+  body.show-actionbar3 #swingbar {
+    bottom: 292px;
+  }
   #actionbar,
-  #actionbar2 {
+  #actionbar2,
+  #actionbar3 {
     display: flex;
     gap: 4px;
     padding: 6px;
   }
-  /* The optional second action bar (second-action-bar feature) sits just under the
-     primary one; a tighter bottom pad keeps the pair compact. It is OFF by default
-     (a single classic bar): the Interface option "Show Secondary Action Bar" adds
-     body.show-actionbar2 to reveal it. The slots stay keybind-reachable either way.
-     Mobile keeps a single bar regardless (see body.mobile-touch rule in hud.mobile.css):
-     it lives in @layer hud-mobile, ordered after @layer components where this reveal rule
-     sits, so it wins by layer precedence regardless of specificity. */
-  #actionbar2 {
+  /* The optional rows stack above the primary action bar. Tighter bottom padding
+     keeps the group compact. Both are off by default; Interface options add
+     body.show-actionbar2 and body.show-actionbar3. The third-row option depends
+     on the secondary row, so the visible order is always primary, secondary,
+     then third from bottom to top. Hidden slots remain keybind-reachable.
+     Mobile uses the paged action ring regardless of these desktop options. */
+  #actionbar2,
+  #actionbar3 {
     padding-bottom: 2px;
     display: none;
   }
   body.show-actionbar2 #actionbar2 {
+    display: flex;
+  }
+  body.show-actionbar3 #actionbar3 {
     display: flex;
   }
   .action-btn {

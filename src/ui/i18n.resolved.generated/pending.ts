@@ -66,6 +66,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.elementalConvergencePrimed",
     "hudChrome.auraEffect.formFireball",
     "hudChrome.auraEffect.heatingUp",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -125,6 +126,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.elementalConvergencePrimed",
     "hudChrome.auraEffect.formFireball",
     "hudChrome.auraEffect.heatingUp",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -206,6 +208,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.sanguine",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -287,6 +290,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.sanguine",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -369,6 +373,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.sanguine",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -449,6 +454,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -541,6 +547,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -622,6 +629,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -700,6 +708,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -778,6 +787,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -856,6 +866,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -934,6 +945,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -1012,6 +1024,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -1090,6 +1103,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"
@@ -1168,6 +1182,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.overloadNext",
     "hudChrome.auraEffect.powerEchoNext",
     "hudChrome.auraEffect.temporalHourglass",
+    "hudChrome.options.showThirdActionBar",
     "hudChrome.specPanel.specUnlockBanner",
     "hudChrome.specPanel.specUnlockHint",
     "itemUi.stats.parry"

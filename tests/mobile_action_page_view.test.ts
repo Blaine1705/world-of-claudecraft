@@ -11,9 +11,10 @@ import {
 } from '../src/ui/hud/action_bar/mobile_action_page_view';
 
 describe('mobilePageCount', () => {
-  it('defaults to 2 pages for the default 10-slot span', () => {
-    expect(mobilePageCount()).toBe(2);
-    expect(mobilePageCount(MOBILE_ACTION_SOURCE_SLOT_COUNT)).toBe(2);
+  it('defaults to 7 pages for all 33 configurable action slots', () => {
+    expect(MOBILE_ACTION_SOURCE_SLOT_COUNT).toBe(33);
+    expect(mobilePageCount()).toBe(7);
+    expect(mobilePageCount(MOBILE_ACTION_SOURCE_SLOT_COUNT)).toBe(7);
   });
 
   it('is parameterized: a different total slot count rounds up', () => {
@@ -28,7 +29,7 @@ describe('mobilePageCount', () => {
 describe('clampMobilePage', () => {
   it('leaves an in-range page unchanged', () => {
     expect(clampMobilePage(0)).toBe(0);
-    expect(clampMobilePage(1)).toBe(1);
+    expect(clampMobilePage(6)).toBe(6);
   });
 
   it('clamps a negative page to 0', () => {
@@ -37,8 +38,8 @@ describe('clampMobilePage', () => {
   });
 
   it('clamps an overflowing page to the last page', () => {
-    expect(clampMobilePage(2)).toBe(1);
-    expect(clampMobilePage(999)).toBe(1);
+    expect(clampMobilePage(7)).toBe(6);
+    expect(clampMobilePage(999)).toBe(6);
   });
 
   it('falls back to 0 for NaN', () => {
@@ -58,6 +59,10 @@ describe('sourceSlotForMobileButton', () => {
 
   it('page 1 index 4 maps to source slot 10', () => {
     expect(sourceSlotForMobileButton(1, 4)).toBe(10);
+  });
+
+  it('page 6 maps its first three buttons to the third row tail', () => {
+    expect(sourceSlotsForMobilePage(6)).toEqual([31, 32, 33, 34, 35]);
   });
 
   it('never returns slot 0 across every page/button combination', () => {
@@ -80,17 +85,23 @@ describe('sourceSlotsForMobilePage', () => {
     expect(sourceSlotsForMobilePage(1)).toEqual([6, 7, 8, 9, 10]);
   });
 
-  it('the two default pages are disjoint and jointly cover slots 1-10', () => {
-    const all = [...sourceSlotsForMobilePage(0), ...sourceSlotsForMobilePage(1)];
+  it('the default pages expose every configurable slot, with two empty tail positions', () => {
+    const all = Array.from({ length: MOBILE_ACTION_PAGE_COUNT }, (_, page) =>
+      sourceSlotsForMobilePage(page),
+    ).flat();
     expect(new Set(all).size).toBe(all.length);
-    expect(all.sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(all.slice(0, MOBILE_ACTION_SOURCE_SLOT_COUNT)).toEqual(
+      Array.from({ length: 33 }, (_, index) => index + 1),
+    );
+    expect(all.slice(MOBILE_ACTION_SOURCE_SLOT_COUNT)).toEqual([34, 35]);
   });
 });
 
 describe('nextMobilePage', () => {
-  it('wraps 0 -> 1 -> 0 for the default 2-page span', () => {
+  it('advances through the default span and wraps after page 6', () => {
     expect(nextMobilePage(0)).toBe(1);
-    expect(nextMobilePage(1)).toBe(0);
+    expect(nextMobilePage(5)).toBe(6);
+    expect(nextMobilePage(6)).toBe(0);
   });
 
   it('clamps an out-of-range page before advancing', () => {
