@@ -1,14 +1,23 @@
 // The Evergarden's dressing, render-only: the four marble watchers in the
-// Fountain Court, the tiered fountain itself at the maze's heart (the hedge
-// maze is terrain, world.ts owns it), and the specimen elders at the
-// greatTrees spots (the same records the sim's trunk colliders use). Same
-// contract as the sibling realm modules: build once, update(time) animates.
+// Fountain Court, the tiered fountain itself at the maze's heart, the Great
+// Maze's modeled hedge walls and arches (planned by garden_maze_core over
+// the wall grid world.ts owns, the same cells movement blocking reads), and
+// the specimen elders at the greatTrees spots (the same records the sim's
+// trunk colliders use). Same contract as the sibling realm modules: build
+// once, update(time) animates.
 import * as THREE from 'three';
 import { EVERGARDEN_PROPS } from '../sim/content/evergarden';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import {
+  MAZE_ARCH_SCALE,
+  MAZE_WALL_SCALE,
+  MAZE_Z1,
+  type MazePieceSpot,
+  planGardenMazePieces,
+} from './garden_maze_core';
 import { GFX } from './gfx';
 
 export interface GardenFeaturesView {
@@ -29,6 +38,28 @@ registerPreload(
     greatTreeScene = gltf.scene;
   }),
 );
+
+// The Great Maze's modeled hedge walls and entry arches (user-authored
+// models). The wall grid, cell geometry, and the movement-blocking bands
+// all live in sim/world.ts; this module only DRAWS that same data.
+const MAZE_WALL_URL = '/models/props/maze_hedge_wall.glb';
+const MAZE_ARCH_URL = '/models/props/maze_hedge_arch.glb';
+let mazeWallScene: THREE.Group | null = null;
+let mazeArchScene: THREE.Group | null = null;
+registerPreload(
+  loadGltf(MAZE_WALL_URL).then((gltf) => {
+    mazeWallScene = gltf.scene;
+  }),
+);
+registerPreload(
+  loadGltf(MAZE_ARCH_URL).then((gltf) => {
+    mazeArchScene = gltf.scene;
+  }),
+);
+
+export const gardenFeaturesPreloadInternalsForTest = {
+  mazeAssetUrl: { wall: MAZE_WALL_URL, arch: MAZE_ARCH_URL },
+};
 
 function mat(color: number, rough = 0.85): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
   return GFX.standardMaterials
@@ -171,6 +202,47 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
   {
     const y = terrainHeight(360, 1016.5, seed);
     if (y > WATER_LEVEL) group.add(buildFountain(360, 1016.5, y - 0.1));
+  }
+
+  // --- the Great Maze's modeled hedge walls and entry arches ---
+  // The plan comes from garden_maze_core (which reads the sim's wall grid),
+  // so the drawn hedges, the movement-blocking boxes, and the map painter
+  // all derive from the same cells. Instances split into north-south bands
+  // so the far half of the maze frustum-culls from inside it.
+  {
+    const instanceModel = (scene: THREE.Group | null, spots: MazePieceSpot[], s: number) => {
+      if (!scene || spots.length === 0) return;
+      scene.updateMatrixWorld(true);
+      const bandOf = (sp: MazePieceSpot) => Math.min(3, Math.floor((MAZE_Z1 - sp.z) / 40));
+      const bands: MazePieceSpot[][] = [[], [], [], []];
+      for (const sp of spots) bands[bandOf(sp)].push(sp);
+      scene.traverse((obj) => {
+        const src = obj as THREE.Mesh;
+        if (!src.isMesh) return;
+        for (const band of bands) {
+          if (band.length === 0) continue;
+          const mesh = new THREE.InstancedMesh(src.geometry, src.material, band.length);
+          const m = new THREE.Matrix4();
+          const q = new THREE.Quaternion();
+          const up = new THREE.Vector3(0, 1, 0);
+          const v = new THREE.Vector3();
+          const sc = new THREE.Vector3(s, s, s);
+          band.forEach((sp, i) => {
+            q.setFromAxisAngle(up, sp.rot);
+            v.set(sp.x, terrainHeight(sp.x, sp.z, seed) - 0.15, sp.z);
+            mesh.setMatrixAt(i, m.compose(v, q, sc).multiply(src.matrixWorld));
+          });
+          mesh.instanceMatrix.needsUpdate = true;
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          mesh.computeBoundingSphere();
+          group.add(mesh);
+        }
+      });
+    };
+    const plan = planGardenMazePieces();
+    instanceModel(mazeWallScene, plan.walls, MAZE_WALL_SCALE);
+    instanceModel(mazeArchScene, plan.arches, MAZE_ARCH_SCALE);
   }
 
   // (The topiary forms retired entirely: even the clipped ball read as a

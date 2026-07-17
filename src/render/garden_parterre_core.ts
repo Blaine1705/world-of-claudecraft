@@ -30,9 +30,10 @@ export interface ParterrePlot {
   z: number;
   r: number;
   kind: ParterreKind;
-  /** 'windmill': a decor prop stands at the heart instead of the big bush
-   * (the prop itself is placed via EVERGARDEN_PROPS.decorProps) */
-  centerpiece?: 'windmill';
+  /** a decor prop stands at the heart instead of the big bush: 'windmill'
+   * (the mill lawn) or 'statue' (the leafy fox topiary); the prop itself
+   * is placed via EVERGARDEN_PROPS.decorProps */
+  centerpiece?: 'windmill' | 'statue';
 }
 
 export interface ParterreBushSpot {
@@ -54,9 +55,10 @@ export const PARTERRE_PLOTS: readonly ParterrePlot[] = [
   { x: 300, z: 872, r: 5, kind: 'concentric' },
   { x: 306, z: 894, r: 5, kind: 'knot' },
   { x: 334, z: 896, r: 5, kind: 'quatrefoil' },
-  { x: 400, z: 866, r: 9, kind: 'quatrefoil' }, // east of the Statuary Walk
+  // east of the Statuary Walk, the leafy fox watching the walk
+  { x: 400, z: 866, r: 9, kind: 'quatrefoil', centerpiece: 'statue' },
   // (the Rose Wilds lawn now belongs to Dawnhold castle and its knights)
-  { x: 256, z: 952, r: 9, kind: 'knot' }, // west maze forecourt
+  { x: 256, z: 952, r: 9, kind: 'knot', centerpiece: 'statue' }, // west maze forecourt
   // two smaller knots squaring off the forecourt
   { x: 244, z: 938, r: 4.5, kind: 'knot' },
   { x: 270, z: 940, r: 4.5, kind: 'knot' },
@@ -66,9 +68,11 @@ export const PARTERRE_PLOTS: readonly ParterrePlot[] = [
   { x: 516, z: 750, r: 6.5, kind: 'concentric', centerpiece: 'windmill' },
   // east of the Garden Gate road, clear of the new gate-wall towers
   { x: 430, z: 756, r: 7.5, kind: 'quatrefoil' },
-  { x: 476, z: 1010, r: 7.5, kind: 'knot' }, // east of the maze road
+  // east of the maze road, a fox guarding the exit lawn
+  { x: 476, z: 1010, r: 7.5, kind: 'knot', centerpiece: 'statue' },
   { x: 466, z: 996, r: 4.5, kind: 'knot' }, // its smaller companion square
-  { x: 300, z: 1118, r: 6, kind: 'concentric' }, // the north lawn
+  // the north lawn, the fourth fox beyond the maze exit
+  { x: 300, z: 1118, r: 6, kind: 'concentric', centerpiece: 'statue' },
 ] as const;
 
 // The bed colorways: a much wider wheel than the old three-rose palette.

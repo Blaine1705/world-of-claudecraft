@@ -96,6 +96,7 @@ project assets, and no endorsement or affiliation is implied.
 | Generated prop model (yumi_brazier_stand) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (yumi_torch_handle) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (dungeon_door_arch) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Great Maze prop models (`public/models/props/maze_hedge_wall.glb`, `maze_hedge_arch.glb`, `leafy_fox_statue.glb`) | World of ClaudeCraft | Maintainer-authored generated models, optimized via `scripts/assets/specs/evergarden_maze.json` | Project asset |
 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not

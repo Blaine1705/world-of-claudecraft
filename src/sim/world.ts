@@ -975,14 +975,16 @@ function applyGardenCoast(x: number, z: number, h: number): number {
   return h + (out - h) * seam * zSeam;
 }
 
-// The Great Maze. '#' cells are hedge walls raised straight out of the
-// heightfield; '.' cells are gravel corridors. Row 0 is the NORTH row (the
-// map's top), the entrance is the gap in the south row, and the open 3x3
-// court at the center is the Fountain Court. Solvability (entrance to
-// court) is asserted by tests/evergarden.test.ts, so an edit here that
-// bricks the maze fails CI instead of stranding players.
+// The Great Maze. '#' cells are modeled hedge walls; '.' cells are lawn
+// corridors. Row 0 is the NORTH row (the map's top): the entrance is the
+// gap in the south row, the exit the gap in the north row, and the open
+// 3x3 court at the center is the Fountain Court. Solvability (entrance to
+// court to exit) is asserted by tests/evergarden.test.ts, so an edit here
+// that bricks the maze fails CI instead of stranding players.
 const GARDEN_MAZE = [
-  '###############',
+  // the exit sits at column 10: straight north of column 7 lies the garden
+  // pond, so the way out opens onto the dry east lawn instead
+  '##########.####',
   '#.....#.......#',
   '#.###.#####.###',
   '#.#.#.....#...#',
@@ -1007,9 +1009,15 @@ export const MAZE_ROWS = 17;
 export const MAZE_X0 = 360 - (MAZE_COLS * MAZE_CELL) / 2; // west edge, x 292.5
 export const MAZE_Z1 = 1093; // north edge (row 0); south edge z 940
 export const MAZE_Z0 = MAZE_Z1 - MAZE_ROWS * MAZE_CELL;
-const MAZE_WALL_H = 12;
-const MAZE_SKIRT = 2.2; // yd of wall flank beyond the inset face
-const MAZE_FACE_INSET = 1.2; // corridor-facing faces pull into the wall cell
+// The hedge walls are MODELED now (the user's hedge GLB, rendered by
+// garden_features.ts from this same grid), not terrain: the ground through
+// the maze is flat lawn and the walls block movement as crisp solid boxes.
+// Each wall cell carries a hedge piece along each axis that continues into
+// a neighboring wall cell: a piece spans its full cell along the run and
+// MAZE_WALL_DEPTH across it, so runs read as continuous clipped hedges and
+// corners/junctions read as crossing pieces. Collision is the union of the
+// same boxes, so the blocked ground IS the modeled hedge's footprint.
+export const MAZE_WALL_DEPTH = 3.6; // yd across a hedge piece
 
 /** Inside the maze footprint (small margin), where dressing must not spawn. */
 export function inGardenMaze(x: number, z: number): boolean {
@@ -1018,54 +1026,44 @@ export function inGardenMaze(x: number, z: number): boolean {
   );
 }
 
-// Is a grid position open ground? Out-of-bounds counts as open (the lawn
-// beyond the maze), so the outer wall's outward face behaves like any other.
-function mazeOpenAt(c: number, r: number): boolean {
-  if (r < 0 || r >= MAZE_ROWS || c < 0 || c >= MAZE_COLS) return true;
-  return GARDEN_MAZE[r].charCodeAt(c) === 46; // '.'
+// Is a grid position a wall? Out-of-bounds counts as open (the lawn beyond
+// the maze), so the outer ring's pieces run along the perimeter only.
+function mazeWallAt(c: number, r: number): boolean {
+  if (r < 0 || r >= MAZE_ROWS || c < 0 || c >= MAZE_COLS) return false;
+  return GARDEN_MAZE[r].charCodeAt(c) === 35; // '#'
 }
 
-// How much hedge stands at a point, 0..1 of full height. Each wall cell is
-// a square block whose corridor-facing faces are inset into the cell (so
-// lanes stay wide) while wall-facing edges are NOT inset (so runs tile with
-// no seam), and the union is a MAX over blocks: a shared edge inside a run
-// is interior to both blocks and stays at full height. Chebyshev distance
-// gives square height contours, so a run's END keeps its corners tall
-// right to the block edge instead of tapering into the see-through notch a
-// round distance field cuts at every junction corner.
-function gardenMazeHedgeFactor(x: number, z: number): number {
+/**
+ * Which hedge pieces a wall cell carries: h runs east-west, v runs
+ * north-south, both at a junction. An isolated wall cell (no wall
+ * neighbors) reads as a single east-west piece. Shared by the movement
+ * wall test, the modeled-hedge renderer, and the map painter, so all
+ * three always agree exactly. Returns null for corridor cells.
+ */
+export function gardenMazeCellPieces(c: number, r: number): { h: boolean; v: boolean } | null {
+  if (!mazeWallAt(c, r)) return null;
+  const h = mazeWallAt(c - 1, r) || mazeWallAt(c + 1, r);
+  const v = mazeWallAt(c, r - 1) || mazeWallAt(c, r + 1);
+  if (!h && !v) return { h: true, v: false };
+  return { h, v };
+}
+
+// Movement treats the hedge pieces as hard walls (see colliders
+// .resolveMovement). A piece never reaches outside its own cell, so only
+// the containing cell is tested.
+export function inGardenMazeWall(x: number, z: number): boolean {
   const w = MAZE_COLS * MAZE_CELL;
-  if (x < MAZE_X0 - 1 || x > MAZE_X0 + w + 1) return 0;
-  if (z < MAZE_Z0 - 1 || z > MAZE_Z1 + 1) return 0;
+  if (x < MAZE_X0 || x > MAZE_X0 + w) return false;
+  if (z < MAZE_Z0 || z > MAZE_Z1) return false;
   const ci = Math.floor((x - MAZE_X0) / MAZE_CELL);
   const ri = Math.floor((MAZE_Z1 - z) / MAZE_CELL);
-  let best = 0;
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      const r = ri + dr;
-      const c = ci + dc;
-      if (r < 0 || r >= MAZE_ROWS || c < 0 || c >= MAZE_COLS) continue;
-      if (GARDEN_MAZE[r].charCodeAt(c) !== 35) continue; // '#' wall cells
-      const x0 = MAZE_X0 + c * MAZE_CELL + (mazeOpenAt(c - 1, r) ? MAZE_FACE_INSET : 0);
-      const x1 = MAZE_X0 + (c + 1) * MAZE_CELL - (mazeOpenAt(c + 1, r) ? MAZE_FACE_INSET : 0);
-      const zTop = MAZE_Z1 - r * MAZE_CELL - (mazeOpenAt(c, r - 1) ? MAZE_FACE_INSET : 0);
-      const zBot = MAZE_Z1 - (r + 1) * MAZE_CELL + (mazeOpenAt(c, r + 1) ? MAZE_FACE_INSET : 0);
-      const ddx = Math.max(x0 - x, x - x1, 0);
-      const ddz = Math.max(zBot - z, z - zTop, 0);
-      const d = Math.max(ddx, ddz); // Chebyshev: square contours
-      const f = 1 - smoothstep(0, MAZE_SKIRT, d);
-      if (f > best) best = f;
-    }
-  }
-  return best;
-}
-
-// A hedge tall enough to block: movement treats it as a hard wall (see
-// colliders.resolveMovement); the slope gate alone is not enough, a shallow
-// diagonal walk sneaks over any gradient. Knee height, just inside the face.
-const MAZE_WALL_SOLID = 0.12; // of full hedge height
-export function inGardenMazeWall(x: number, z: number): boolean {
-  return gardenMazeHedgeFactor(x, z) > MAZE_WALL_SOLID;
+  const p = gardenMazeCellPieces(ci, ri);
+  if (!p) return false;
+  const half = MAZE_CELL / 2;
+  const d = MAZE_WALL_DEPTH / 2;
+  const lx = x - (MAZE_X0 + ci * MAZE_CELL) - half; // offset from cell center
+  const lz = MAZE_Z1 - ri * MAZE_CELL - z - half;
+  return (p.h && Math.abs(lz) <= d) || (p.v && Math.abs(lx) <= d);
 }
 
 // Does the segment pass through hedge? The endpoint test alone is not
@@ -1090,12 +1088,6 @@ export function crossesGardenHedge(
     if (inGardenMazeWall(fromX + (toX - fromX) * t, fromZ + (toZ - fromZ) * t)) return true;
   }
   return false;
-}
-
-// The hedge heightfield: sheer faces (well past the climb gate) whose skirt
-// mostly eats into the wall cells, not the corridors.
-function gardenMazeOffset(x: number, z: number): number {
-  return MAZE_WALL_H * gardenMazeHedgeFactor(x, z);
 }
 
 // ---------------------------------------------------------------------------
@@ -2858,10 +2850,9 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyDrakemawEscape(x, z, h);
   h = applyFrostTerraces(x, z, h);
   h = applyFenBraids(x, z, h);
-  // The Great Maze rises out of the finished lawn: walls are pure additive
-  // hedge over whatever the garden terrain does beneath them, so corridors
-  // follow the ground and the walls stay a constant unclimbable height.
-  h += gardenMazeOffset(x, z);
+  // (The Great Maze no longer shapes terrain: its hedge walls are modeled
+  // props over flat lawn, blocked by inGardenMazeWall in the movement pass
+  // and drawn by garden_features.ts from the same grid.)
   // World rims AFTER the coast, so the border ranges rise out of the sea
   // (mountains dipping into the ocean at the flanks) instead of being sunk
   // by it. The NORTH rim is suppressed over the Hollow's open sea: looking

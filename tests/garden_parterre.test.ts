@@ -197,6 +197,11 @@ describe('the bush and topiary plan', () => {
       if (p.centerpiece) {
         // a built centerpiece stands here instead (EVERGARDEN_PROPS.decorProps)
         expect(center.length, `plot (${p.x},${p.z}) keeps its heart clear`).toBe(0);
+        const key = p.centerpiece === 'windmill' ? 'hexWindmill' : 'leafyFoxStatue';
+        const prop = (EVERGARDEN_PROPS.decorProps ?? []).filter(
+          (d) => d.key === key && Math.hypot(d.x - p.x, d.z - p.z) < 1,
+        );
+        expect(prop.length, `plot (${p.x},${p.z}) ${p.centerpiece} prop`).toBe(1);
       } else {
         expect(center.length, `plot (${p.x},${p.z}) centerpiece`).toBe(1);
         expect(center[0].scale, 'the big bush').toBeGreaterThanOrEqual(1.8);

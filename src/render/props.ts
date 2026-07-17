@@ -176,6 +176,9 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   gardenIronPillar: { url: '/models/props/garden_iron_pillar.glb', kit: 'kiron' },
   gardenIronGate: { url: '/models/props/garden_iron_gate.glb', kit: 'kiron' },
   gardenArch: { url: '/models/props/garden_arch.glb', kit: 'kiron' },
+  // the user-authored leafy fox: a clipped-topiary statue crowning the
+  // Evergarden's grandest flower beds (sibling models to the maze hedges)
+  leafyFoxStatue: { url: '/models/props/leafy_fox_statue.glb', kit: 'kiron' },
   stagShrine: { url: '/models/props/stag_shrine.glb', kit: 'hollow' },
   mushroomGiantPurple: { url: '/models/props/mushroom_giant_purple.glb', kit: 'hollow' },
   mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },
@@ -270,6 +273,9 @@ export const propPreloadInternalsForTest = {
   allPropKeys: ALL_PROP_KEYS,
   lowTierPropKeys: LOW_TIER_PROP_KEYS,
   preloadPropKeys,
+  propAssetUrl: Object.fromEntries(
+    Object.entries(PROP_ASSET_DEFS).map(([key, def]) => [key, def.url]),
+  ) as Record<string, string>,
 };
 
 // Per-material look overrides, keyed `${kit}:${name}` (falls back to name).

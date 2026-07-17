@@ -335,8 +335,9 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'hexMarket', x: 310, z: 844, rot: Math.PI, scale: 6, r: 4.5, h: 7 },
     // the Garden Gate: a grand doubled arch over the entry road, flanked by
     // flush stone walls (colliders on), with the parterre core's hedge line
-    // and flower border along their garden face; the maze mouth keeps its
-    // smaller arch (both arches stay walk-through: they span the walks)
+    // and flower border along their garden face (the arch stays walk-through:
+    // it spans the walk; the maze's own entry/exit arches are the modeled
+    // hedge arches garden_features.ts raises over the grid openings)
     { key: 'gardenArch', x: 391, z: 747, rot: 2.97, scale: 2.8 },
     { key: 'hexWall', x: 378.7, z: 744.9, rot: 2.97, scale: 7, r: 6, h: 8 },
     { key: 'hexWall', x: 370, z: 743.5, rot: 2.97, scale: 7, r: 6, h: 8 },
@@ -350,7 +351,13 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'oakTree', x: 412, z: 738, rot: 2.1, scale: 1.4, r: 0.8, h: 9 },
     { key: 'oakTree', x: 408, z: 760, rot: -1.3, scale: 1.2, r: 0.8, h: 9 },
     { key: 'oakTree', x: 376, z: 732, rot: 0.2, scale: 1.35, r: 0.8, h: 9 },
-    { key: 'gardenArch', x: 360, z: 933, rot: 0, scale: 1.4 },
+    // the leafy fox statues: the user-authored topiary fox crowning the four
+    // grandest flower beds (the beds mark centerpiece: 'statue' in
+    // garden_parterre_core.ts, which clears the big rose from the heart)
+    { key: 'leafyFoxStatue', x: 400, z: 866, rot: -2.6, scale: 4.5, r: 1.6, h: 4.5 },
+    { key: 'leafyFoxStatue', x: 256, z: 952, rot: 1.1, scale: 4.5, r: 1.6, h: 4.5 },
+    { key: 'leafyFoxStatue', x: 476, z: 1010, rot: -0.6, scale: 4.5, r: 1.6, h: 4.5 },
+    { key: 'leafyFoxStatue', x: 300, z: 1118, rot: 2.4, scale: 4.5, r: 1.6, h: 4.5 },
     // watchtowers on the walks: one over the Garden Gate, one at the north
     // knights' post
     { key: 'hexWatchtower', x: 402, z: 720, rot: -2.2, scale: 6.5, r: 3, h: 8 },

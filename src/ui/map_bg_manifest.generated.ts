@@ -20,7 +20,7 @@ export const BAKED_MAP_BG = {
   "thornpeak_heights": {
     "w": 480,
     "h": 480,
-    "rowHash": "9e86b1e9"
+    "rowHash": "4b6ba10a"
   },
   "veiled_hollow": {
     "w": 480,
@@ -70,7 +70,7 @@ export const BAKED_MAP_BG = {
   "galecrest": {
     "w": 480,
     "h": 693,
-    "rowHash": "77f67a2c"
+    "rowHash": "e619e8e5"
   },
   "farshore_isle": {
     "w": 480,

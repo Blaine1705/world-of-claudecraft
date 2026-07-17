@@ -11,8 +11,10 @@ import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_
 import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
 import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
+import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
+import { propPreloadInternalsForTest } from '../src/render/props';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 
 const publicDir = path.join(__dirname, '..', 'public');
@@ -67,5 +69,17 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('dungeon door arch asset', () => {
     expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.doorArchAssetUrl);
+  });
+
+  it('Great Maze hedge wall and arch assets', () => {
+    for (const url of Object.values(gardenFeaturesPreloadInternalsForTest.mazeAssetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('every decor prop asset (the full PROP_ASSET_DEFS catalog)', () => {
+    for (const url of Object.values(propPreloadInternalsForTest.propAssetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
   });
 });
