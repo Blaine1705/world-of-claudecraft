@@ -1798,6 +1798,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.openTrade': 'Открыть обмен',
   'hud.prompts.duelRequest': '{name} вызвал вас на дуэль!',
   'hud.prompts.acceptDuel': 'Принять дуэль',
+  'hud.prompts.resurrectionOffer': '{name} предлагает воскресить вас. Принять?',
+  'hud.prompts.acceptResurrection': 'Принять воскрешение',
   'hud.prompts.decline': 'Отклонить',
   'hud.combat.floatingMiss': 'Промах',
   'hud.combat.floatingDodge': 'Уклон',
@@ -2368,10 +2370,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     'Мощная атака, увеличивающая урон в ближнем бою на {damage}. Срабатывает при следующем взмахе оружием.',
   'entities.abilities.battle_shout.name': 'Железный рёв',
-  'entities.abilities.battle_shout.description': 'Повышает вашу силу атаки на {buff} на 2 мин.',
+  'entities.abilities.battle_shout.description':
+    'Боевой крик, повышающий силу атаки всех членов группы на {buff}% на 30 мин.',
   'entities.abilities.demoralizing_shout.name': 'Зловещий вой',
   'entities.abilities.demoralizing_shout.description':
-    'Издает устрашающий крик, снижая силу атаки всех противников поблизости на {buff} на 30 сек.',
+    'Издает устрашающий крик, снижая наносимый всеми противниками поблизости урон на {buff}% на 20 сек.',
   'entities.abilities.charge.name': 'Натиск',
   'entities.abilities.charge.description':
     'Вы бросаетесь к врагу, накапливаете 9 ярости и оглушаете его на 1 сек. Дальность 8-25 м.',
@@ -6035,6 +6038,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': 'Повышает скорость атаки и произнесения заклинаний на {pct}%',
   'hudChrome.auraEffect.dmgDone': 'Повышает наносимый урон на {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': 'Снижает наносимый урон на {pct}%',
+  'hudChrome.auraEffect.heatingUp':
+    'Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»',
   'hudChrome.auraEffect.tongues': 'Увеличивает время произнесения заклинаний на {pct}%',
   'hudChrome.auraEffect.damageReduction': 'Уменьшает весь получаемый урон на {pct}%',
   'hudChrome.auraEffect.guardianWard':
@@ -7865,7 +7870,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avatar.description':
     'Превращает вас в колосса на 20 сек., снимая с вас все эффекты контроля и повышая наносимый урон на 20%.',
   'entities.abilities.bladestorm.description':
-    'Становится вихрем стали, поражая всех врагов в радиусе 8 м на {damage} ед. урона каждую секунду в течение 4 сек.',
+    'Становится вихрем стали, поражая всех врагов в радиусе 6 м на {damage} ед. урона каждую секунду в течение 4 сек.',
   'guide.abilityHook.ice_lance':
     'Мгновенный осколок, расходующий ледяные эффекты и наносящий намного больше урона замороженной цели.',
   'guide.abilityHook.flurry':

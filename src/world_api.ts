@@ -398,6 +398,7 @@ export const COMMAND_NAMES = [
   'stow_weapon',
   // Append-only protocol addition for the canonical Talents V2 row mutation.
   'selectTalentRow',
+  'resurrect_respond',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -481,6 +482,7 @@ export const COMMAND_FACETS = {
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',
   resurrect_healer: 'IWorldCombat',
+  resurrect_respond: 'IWorldCombat',
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',

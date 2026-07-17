@@ -1537,6 +1537,7 @@ export const zh_CN: EnTranslations = {
       "haste": "攻击速度和施法速度提高 {pct}%",
       "dmgDone": "造成的伤害提高 {pct}%",
       "dmgDoneReduce": "造成的伤害降低 {pct}%",
+      "heatingUp": "你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发",
       "battleStance": "战斗姿态：怒气产生提高 10%",
       "berserkerStance": "狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%",
       "crit": "暴击几率提高 {pct}%",
@@ -5360,6 +5361,8 @@ export const zh_CN: EnTranslations = {
       "openTrade": "打开交易",
       "duelRequest": "{name} 向你发起了决斗挑战！",
       "acceptDuel": "接受决斗",
+      "resurrectionOffer": "{name}想让你复活。是否接受？",
+      "acceptResurrection": "接受复活",
       "decline": "拒绝"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const zh_CN: EnTranslations = {
       },
       "battle_shout": {
         "name": "铁血怒吼",
-        "description": "使你的攻击强度提高 {buff}，持续 2 分钟。"
+        "description": "发出一声怒吼，使所有队伍成员的攻击强度提高 {buff}%，持续 30 分钟。"
       },
       "demoralizing_shout": {
         "name": "恐怖嚎叫",
-        "description": "发出可怕的怒吼，使附近所有敌人的攻击强度降低 {buff}，持续 30 秒。"
+        "description": "发出可怕的怒吼，使附近所有敌人造成的伤害降低 {buff}%，持续 20 秒。"
       },
       "charge": {
         "name": "突进",
@@ -7002,7 +7005,7 @@ export const zh_CN: EnTranslations = {
       },
       "bladestorm": {
         "name": "剑刃风暴",
-        "description": "化身为一道旋转的钢铁风暴，在 4 秒内每秒对 8 码内的所有敌人造成 {damage} 点伤害。"
+        "description": "化身为一道旋转的钢铁风暴，在 4 秒内每秒对 6 码内的所有敌人造成 {damage} 点伤害。"
       },
       "blink": {
         "name": "闪烁步",

@@ -235,6 +235,7 @@ import {
   createGroundAimState,
   enterGroundAim,
   type GroundAimState,
+  shouldUseGroundAim,
 } from './hud/action_bar/ground_aim';
 import {
   applyLoadoutBar as applyLoadoutBarActions,
@@ -1118,6 +1119,8 @@ export class Hud {
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
   private ghostPromptEl = $('#ghost-prompt');
+  private resurrectionPromptEl: HTMLElement | null = null;
+  private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
   private resurrectHealerBtnEl = $('#resurrect-healer-btn');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
@@ -4988,9 +4991,12 @@ export class Hud {
     this.vcupCharge.update(view);
   }
 
-  private groundReticleEnabled(): boolean {
-    if (document.body.classList.contains('mobile-touch')) return false;
-    return this.optionsHooks?.settings.get('groundReticle') ?? true;
+  private groundReticleEnabled(abilityId: string): boolean {
+    return shouldUseGroundAim(
+      abilityId,
+      document.body.classList.contains('mobile-touch'),
+      this.optionsHooks?.settings.get('groundReticle') ?? true,
+    );
   }
 
   isGroundAimActive(): boolean {
@@ -5121,7 +5127,7 @@ export class Hud {
           if (this.isSportAbilityId(action.id)) {
             // Sport moves autocast toward facing (no reticle, no point-and-click).
             this.castSportTap(action.id, resolved.def.range);
-          } else if (this.groundReticleEnabled()) {
+          } else if (this.groundReticleEnabled(action.id)) {
             this.beginGroundAim(action.id, barSlot);
           } else {
             this.sim.castAbilityAt(action.id, this.groundTargetAim());
@@ -5351,6 +5357,7 @@ export class Hud {
         btn.addEventListener('dragover', (e) => {
           const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
           if (!dragged) return;
+          if (!this.actionBarController.isAssignableAction(dragged)) return;
           if (this.dragAction?.sourceIndex === slot - 1) return;
           e.preventDefault(); // required to permit the drop
           if (e.dataTransfer)
@@ -5374,6 +5381,7 @@ export class Hud {
           this.dragAction = null;
           const action = dragged.action;
           if (!action) return;
+          if (!this.actionBarController.isAssignableAction(action)) return;
           if (dragged.sourceIndex !== null)
             this.hotbarActions = swapHotbarSlots(this.hotbarActions, dragged.sourceIndex, slot - 1);
           else if (
@@ -5441,6 +5449,7 @@ export class Hud {
           if (this.dragAction?.sourceAttackSlot) return;
           const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
           if (!dragged) return;
+          if (!this.actionBarController.isAssignableAction(dragged)) return;
           e.preventDefault();
           btn.classList.add('drop-target');
         });
@@ -5455,6 +5464,7 @@ export class Hud {
             sourceAttackSlot: false,
           };
           if (!dragged.action) return;
+          if (!this.actionBarController.isAssignableAction(dragged.action)) return;
           const assigned = assignAttackSlotAction(dragged.action, dragged.sourceIndex);
           this.attackSlotAction = assigned.action;
           this.saveAttackSlotAction();
@@ -7060,6 +7070,7 @@ export class Hud {
     // Healer, carrying just the relevant button. The server re-checks both ranges.
     const ghost = p.dead && p.ghost;
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
+    if (!p.dead) this.closeResurrectionPrompt();
     document.body.classList.toggle('spirit-mode', ghost);
     this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
     if (ghost) {
@@ -8843,6 +8854,31 @@ export class Hud {
             // Ignoring the prompt must read as "no response", not "not ready":
             // let the sim's own 30s timeout bucket the straggler.
             () => {},
+          );
+          break;
+        case 'resurrectionOffer':
+          audio.questAccept();
+          // The sim keeps one authoritative latest offer per dead player. Mirror
+          // that singleton in the HUD so an older prompt can never answer a newer
+          // Chronomancer's offer.
+          this.closeResurrectionPrompt();
+          this.resurrectionPromptEl = this.showPrompt(
+            t('hud.prompts.resurrectionOffer', { name: `<b>${esc(ev.fromName)}</b>` }),
+            t('hud.prompts.acceptResurrection'),
+            () => {
+              this.resurrectionPromptEl = null;
+              this.sim.respondToResurrection(true);
+            },
+            () => {
+              this.resurrectionPromptEl = null;
+              this.sim.respondToResurrection(false);
+            },
+            t('hud.prompts.decline'),
+            () => {
+              this.resurrectionPromptEl = null;
+              this.sim.respondToResurrection(false);
+            },
+            true,
           );
           break;
         case 'guildInvite':
@@ -12400,6 +12436,11 @@ export class Hud {
   // Prompts (party invite / trade request / duel challenge)
   // -------------------------------------------------------------------------
 
+  private closeResurrectionPrompt(): void {
+    this.resurrectionPromptEl?.remove();
+    this.resurrectionPromptEl = null;
+  }
+
   private showPrompt(
     text: string,
     acceptLabel: string,
@@ -12411,16 +12452,24 @@ export class Hud {
     // want an ignored prompt to mean "no response" (ready check) pass a no-op and
     // let their own server-side timeout own the outcome.
     onTimeout: () => void = onDecline,
-  ): void {
+    focusFirst = false,
+  ): HTMLElement {
     const stack = $('#prompt-stack');
     const prompt = document.createElement('div');
     prompt.className = 'prompt panel';
     prompt.innerHTML = `<div class="prompt-text">${text}</div>`;
+    prompt.setAttribute('role', 'alertdialog');
+    prompt.setAttribute('aria-modal', 'false');
+    const promptText = prompt.querySelector('.prompt-text') as HTMLElement;
+    promptText.id = `hud-prompt-title-${this.promptSequence++}`;
+    prompt.setAttribute('aria-labelledby', promptText.id);
     const accept = document.createElement('button');
     accept.className = 'btn';
+    accept.type = 'button';
     accept.textContent = acceptLabel;
     const decline = document.createElement('button');
     decline.className = 'btn';
+    decline.type = 'button';
     decline.textContent = declineLabel;
     accept.addEventListener('click', () => {
       prompt.remove();
@@ -12432,12 +12481,14 @@ export class Hud {
     });
     prompt.append(accept, decline);
     stack.appendChild(prompt);
+    if (focusFirst) accept.focus();
     window.setTimeout(() => {
       if (prompt.isConnected) {
         prompt.remove();
         onTimeout();
       }
     }, 28000);
+    return prompt;
   }
 
   // -------------------------------------------------------------------------

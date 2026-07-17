@@ -62,6 +62,19 @@ describe('cooldown_persist leaf', () => {
     expect(until).toBe(-1);
   });
 
+  it('drops cooldowns for abilities removed from the current kit during restore', () => {
+    const fresh = new Map<string, number>();
+    applyCooldowns(
+      { abilities: { sprint: 12, ironhold: 180 } },
+      fresh,
+      0,
+      undefined,
+      undefined,
+      (id) => id !== 'ironhold',
+    );
+    expect([...fresh]).toEqual([['sprint', 12]]);
+  });
+
   it('applyCooldowns(undefined) leaves an empty map and no potion cooldown', () => {
     const fresh = new Map<string, number>();
     expect(applyCooldowns(undefined, fresh, 0)).toBe(-1);
@@ -144,6 +157,18 @@ describe('Sim cooldown persistence round-trip (anti-relog-reset)', () => {
     expect(e2.potionCooldownUntil).toBe(sim2.time + 30);
   });
 
+  it('a removed Ironhold cooldown is scrubbed from a legacy character on load', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Legacy Tank');
+    const state = sim.serializeCharacter(pid)!;
+    state.cooldowns = { abilities: { sprint: 25, ironhold: 180 } };
+
+    const sim2 = makeWorld();
+    const pid2 = sim2.addPlayer('warrior', 'Legacy Tank', { state });
+    expect([...sim2.entities.get(pid2)!.cooldowns]).toEqual([['sprint', 25]]);
+    expect(sim2.serializeCharacter(pid2)?.cooldowns).toEqual({ abilities: { sprint: 25 } });
+  });
+
   it('re-anchors the derived potion display copy (potionCdRemaining) on load', () => {
     // Regression: load restored the authoritative potionCooldownUntil but left the
     // derived display copy at 0, so after a relog inside the shared potion cooldown the
@@ -170,11 +195,11 @@ describe('Sim cooldown persistence round-trip (anti-relog-reset)', () => {
     const pid = sim.addPlayer('warrior', 'Onco');
     const e = sim.entities.get(pid)!;
     e.cooldowns.set('sprint', 25);
-    e.cooldowns.set('shield_wall', 180);
+    e.cooldowns.set('battle_shout', 180);
     e.potionCooldownUntil = sim.time + 30;
 
     const s1 = sim.serializeCharacter(pid)!;
-    expect(s1.cooldowns).toEqual({ abilities: { sprint: 25, shield_wall: 180 }, potion: 30 });
+    expect(s1.cooldowns).toEqual({ abilities: { sprint: 25, battle_shout: 180 }, potion: 30 });
     const sim2 = makeWorld();
     const pid2 = sim2.addPlayer('warrior', 'Onco', { state: s1 });
     expect(sim2.serializeCharacter(pid2)).toEqual(s1);

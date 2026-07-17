@@ -1934,7 +1934,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Meşe Derisi',
   'entities.abilities.bash.description': 'Hedefi 2 saniye sersemletir. Yalnızca Bruin Formu.',
   'entities.abilities.bash.name': 'Sarsma',
-  'entities.abilities.battle_shout.description': 'Saldırı gücünü 2 dakika boyunca {buff} artırır.',
+  'entities.abilities.battle_shout.description':
+    'Tüm grup üyelerinin saldırı gücünü 30 dakika boyunca %{buff} artıran bir nara.',
   'entities.abilities.battle_shout.name': 'Demir Nara',
   'entities.abilities.bear_charge.description':
     'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil. Yalnızca Bruin Formu.',
@@ -2008,7 +2009,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yakındaki düşmanların moralini bozarak saldırı güçlerini 20 saniye boyunca 20 azaltır. Yalnızca Bruin Formu.',
   'entities.abilities.demoralizing_roar.name': 'Sindiren Kükreme',
   'entities.abilities.demoralizing_shout.description':
-    'Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır.',
+    'Korkunç bir nara atarak yakındaki tüm düşmanların verdiği hasarı 20 saniye boyunca %{buff} azaltır.',
   'entities.abilities.demoralizing_shout.name': 'Vahim Uluma',
   'entities.abilities.devotion_aura.description': 'Zırhını 30 dakika boyunca {buff} artırır.',
   'entities.abilities.devotion_aura.name': 'Sarsılmaz Aura',
@@ -7670,7 +7671,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Saldırı gücünü 15 sn. boyunca 70 artırır. (Druid yeteneği)',
   'entities.abilities.bladestorm.name': 'Kılıç Fırtınası',
   'entities.abilities.bladestorm.description':
-    'Dönen bir çelik fırtınasına dönüşerek 4 sn boyunca 8 metre içindeki tüm düşmanlara her saniye {damage} hasar verirsin.',
+    'Dönen bir çelik fırtınasına dönüşerek 4 sn boyunca 6 metre içindeki tüm düşmanlara her saniye {damage} hasar verirsin.',
   'entities.abilities.blink.description':
     'Seni 15 m ileri ışınlar ve kök salma etkilerini bozar. (Büyücü yeteneği)',
   'entities.abilities.bloodlust.description':

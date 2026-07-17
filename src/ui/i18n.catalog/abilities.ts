@@ -1633,7 +1633,7 @@ const classAbilityNamesEn = {
       [
         'bladestorm',
         'Bladestorm',
-        'Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec.',
+        'Become a whirling storm of steel, striking all enemies within 6 yards for {damage} every second for 4 sec.',
       ],
       ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
       [

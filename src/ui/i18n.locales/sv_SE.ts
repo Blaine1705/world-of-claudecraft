@@ -1866,7 +1866,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Ekhud',
   'entities.abilities.bash.description': 'Bedövar målet i 2 sek. Endast i Bruinform.',
   'entities.abilities.bash.name': 'Omtumla',
-  'entities.abilities.battle_shout.description': 'Ökar din attackkraft med {buff} i 2 min.',
+  'entities.abilities.battle_shout.description':
+    'Ett rop som ökar attackkraften hos alla gruppmedlemmar med {buff}% i 30 min.',
   'entities.abilities.battle_shout.name': 'Järnvrål',
   'entities.abilities.bear_charge.description':
     'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. 8-25 m räckvidd. Endast i Bruinform.',
@@ -1940,7 +1941,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Demoraliserar närliggande fiender och sänker deras anfallskraft med 20 i 20 sek. Endast i Bruinform.',
   'entities.abilities.demoralizing_roar.name': 'Fegt vrål',
   'entities.abilities.demoralizing_shout.description':
-    'Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med {buff} i 30 sek.',
+    'Utstöter ett skräckinjagande rop som minskar skadan som alla närliggande fiender orsakar med {buff}% i 20 sek.',
   'entities.abilities.demoralizing_shout.name': 'Fasans tjut',
   'entities.abilities.devotion_aura.description': 'Ökar din rustning med {buff} i 30 min.',
   'entities.abilities.devotion_aura.name': 'Ståndaktig aura',
@@ -7665,7 +7666,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.description': 'Ökar din attackkraft med 70 i 15 sek. (druidtalang)',
   'entities.abilities.bladestorm.name': 'Klingstorm',
   'entities.abilities.bladestorm.description':
-    'Bli en virvlande storm av stål och träffa alla fiender inom 8 meter för {damage} skada varje sekund i 4 sek.',
+    'Bli en virvlande storm av stål och träffa alla fiender inom 6 meter för {damage} skada varje sekund i 4 sek.',
   'entities.abilities.blink.description':
     'Teleporterar dig 15 m framåt och bryter rotningseffekter. (magikertalang)',
   'entities.abilities.bloodlust.description':

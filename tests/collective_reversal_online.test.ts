@@ -26,8 +26,10 @@ function fakeWs(): Parameters<GameServer['join']>[0] {
 describe('Collective Reversal authoritative online path', () => {
   it('accepts the standard cast command and revives the dead group on the server sim', () => {
     const server = new GameServer();
-    const mageSession = server.join(fakeWs(), 1, 1, 'Chrona', 'mage', null);
-    const allySession = server.join(fakeWs(), 2, 2, 'Fallen', 'priest', null);
+    const mageWs = fakeWs();
+    const allyWs = fakeWs();
+    const mageSession = server.join(mageWs, 1, 1, 'Chrona', 'mage', null);
+    const allySession = server.join(allyWs, 2, 2, 'Fallen', 'priest', null);
     if ('error' in mageSession || 'error' in allySession) throw new Error('join failed');
 
     server.sim.setPlayerLevel(10, mageSession.pid);
@@ -50,9 +52,36 @@ describe('Collective Reversal authoritative online path', () => {
     );
     expect(mage.castingAbility).toBe('collective_reversal');
 
-    for (let tick = 0; tick < 140; tick++) server.sim.tick();
+    for (let tick = 0; tick < 140; tick++) {
+      (
+        server as unknown as { routeEvents(events: ReturnType<typeof server.sim.tick>): void }
+      ).routeEvents(server.sim.tick());
+    }
 
+    expect(ally.dead).toBe(true);
+    const sent = (allyWs.send as ReturnType<typeof vi.fn>).mock.calls.map(([raw]) =>
+      JSON.parse(String(raw)),
+    );
+    expect(sent).toContainEqual(
+      expect.objectContaining({
+        t: 'events',
+        list: expect.arrayContaining([
+          expect.objectContaining({
+            type: 'resurrectionOffer',
+            pid: ally.id,
+            fromName: mage.name,
+          }),
+        ]),
+      }),
+    );
+    const destination = { x: mage.pos.x, z: mage.pos.z };
+    server.handleMessage(
+      allySession,
+      JSON.stringify({ t: 'cmd', cmd: 'resurrect_respond', accept: true }),
+    );
     expect(ally.dead).toBe(false);
+    expect(ally.pos.x).toBe(destination.x);
+    expect(ally.pos.z).toBe(destination.z);
     expect(ally.hp).toBe(Math.round(ally.maxHp * 0.3));
     expect(ally.resource).toBe(Math.round(ally.maxResource * 0.3));
   });

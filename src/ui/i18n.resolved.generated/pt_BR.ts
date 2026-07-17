@@ -1537,6 +1537,7 @@ export const pt_BR: EnTranslations = {
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Postura de Batalha: 10% mais geração de raiva",
       "berserkerStance": "Postura de Berserker: críticos 3% mais frequentes e 3% mais fortes",
       "crit": "Aumenta a chance de acerto crítico em {pct}%",
@@ -5360,6 +5361,8 @@ export const pt_BR: EnTranslations = {
       "openTrade": "Abrir troca",
       "duelRequest": "{name} desafiou você para um duelo!",
       "acceptDuel": "Aceitar duelo",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Recusar"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const pt_BR: EnTranslations = {
       },
       "battle_shout": {
         "name": "Brado de Ferro",
-        "description": "Aumenta seu poder de ataque em {buff} por 2 min."
+        "description": "Um grito que aumenta o poder de ataque de todos os membros do grupo em {buff}% por 30 min."
       },
       "demoralizing_shout": {
         "name": "Uivo Sinistro",
-        "description": "Solta um grito apavorante, reduzindo o poder de ataque de todos os inimigos próximos em {buff} por 30 s."
+        "description": "Solta um grito apavorante, reduzindo em {buff}% o dano causado por todos os inimigos próximos por 20 s."
       },
       "charge": {
         "name": "Arremetida",
@@ -7002,7 +7005,7 @@ export const pt_BR: EnTranslations = {
       },
       "bladestorm": {
         "name": "Tempestade de Lâminas",
-        "description": "Transforma você em uma tempestade de aço giratória, atingindo todos os inimigos em um raio de 8 m e causando {damage} de dano a cada segundo por 4 s."
+        "description": "Transforma você em uma tempestade de aço giratória, atingindo todos os inimigos em um raio de 6 m e causando {damage} de dano a cada segundo por 4 s."
       },
       "blink": {
         "name": "Passo Cintilante",

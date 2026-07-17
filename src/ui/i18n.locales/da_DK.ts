@@ -1859,7 +1859,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Egehud',
   'entities.abilities.bash.description': 'Bedøver målet i 2 sek. Kun i Bruin-form.',
   'entities.abilities.bash.name': 'Chokslag',
-  'entities.abilities.battle_shout.description': 'Øger din angrebskraft med {buff} i 2 min.',
+  'entities.abilities.battle_shout.description':
+    'Et råb, der øger angrebskraften hos alle gruppemedlemmer med {buff}% i 30 min.',
   'entities.abilities.battle_shout.name': 'Jernbrøl',
   'entities.abilities.bear_charge.description':
     'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde. Kun i Bruin-form.',
@@ -1933,7 +1934,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Demoraliserer nærliggende fjender og sænker deres angrebsstyrke med 20 i 20 sek. Kun i Bruin-form.',
   'entities.abilities.demoralizing_roar.name': 'Fejt Brøl',
   'entities.abilities.demoralizing_shout.description':
-    'Udstøder et frygtindgydende råb, der sænker angrebsstyrken hos alle nærliggende fjender med {buff} i 30 sek.',
+    'Udstøder et frygtindgydende råb, der reducerer skaden, som alle nærliggende fjender forvolder, med {buff}% i 20 sek.',
   'entities.abilities.demoralizing_shout.name': 'Rædselshyl',
   'entities.abilities.devotion_aura.description': 'Øger din rustning med {buff} i 30 min.',
   'entities.abilities.devotion_aura.name': 'Standhaftig Aura',
@@ -7649,7 +7650,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Øger din angrebskraft med 70 i 15 sek. (druidentalent)',
   'entities.abilities.bladestorm.name': 'Klingestorm',
   'entities.abilities.bladestorm.description':
-    'Bliv til en hvirvlende storm af stål, og ram alle fjender inden for 8 meter for {damage} skade hvert sekund i 4 sek.',
+    'Bliv til en hvirvlende storm af stål, og ram alle fjender inden for 6 meter for {damage} skade hvert sekund i 4 sek.',
   'entities.abilities.blink.description':
     'Teleporterer dig 15 m fremad og bryder forankringseffekter. (magikertalent)',
   'entities.abilities.bloodlust.description':

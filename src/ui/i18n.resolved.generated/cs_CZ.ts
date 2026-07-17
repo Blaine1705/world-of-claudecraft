@@ -1537,6 +1537,7 @@ export const cs_CZ: EnTranslations = {
       "haste": "Zvyšuje rychlost útoku a sesílání o {pct} %",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Bojový postoj: o 10 % vyšší generování vzteku",
       "berserkerStance": "Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší",
       "crit": "Zvyšuje šanci na kritický zásah o {pct} %",
@@ -5360,6 +5361,8 @@ export const cs_CZ: EnTranslations = {
       "openTrade": "Otevřít obchod",
       "duelRequest": "{name} tě vyzval(a) k duelu!",
       "acceptDuel": "Přijmout duel",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Odmítnout"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const cs_CZ: EnTranslations = {
       },
       "battle_shout": {
         "name": "Železný řev",
-        "description": "Zvýší tvoji sílu útoku o {buff} na 2 min."
+        "description": "Výkřik, který zvýší sílu útoku všech členů družiny o {buff}% na 30 min."
       },
       "demoralizing_shout": {
         "name": "Děsivé vytí",
-        "description": "Vypustíš děsivý řev, který sníží sílu útoku všech blízkých nepřátel o {buff} na 30 s."
+        "description": "Vypustíš děsivý řev, který sníží poškození způsobované všemi blízkými nepřáteli o {buff}% na 20 s."
       },
       "charge": {
         "name": "Nápor",
@@ -7002,7 +7005,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bladestorm": {
         "name": "Bouře čepelí",
-        "description": "Proměníš se ve vířící bouři oceli a po dobu 4 s každou sekundu zasáhneš všechny nepřátele do 8 metrů za {damage} poškození."
+        "description": "Proměníš se ve vířící bouři oceli a po dobu 4 s každou sekundu zasáhneš všechny nepřátele do 6 metrů za {damage} poškození."
       },
       "blink": {
         "name": "Mihokrok",

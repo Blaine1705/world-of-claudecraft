@@ -1537,6 +1537,7 @@ export const ja_JP: EnTranslations = {
       "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
       "dmgDone": "与えるダメージを{pct}%上昇させる",
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
+      "heatingUp": "次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
       "crit": "クリティカル率を{pct}%上昇させる",
@@ -5360,6 +5361,8 @@ export const ja_JP: EnTranslations = {
       "openTrade": "取引を開く",
       "duelRequest": "{name}があなたに決闘を申し込みました！",
       "acceptDuel": "決闘を受ける",
+      "resurrectionOffer": "{name}があなたを蘇生しようとしています。受け入れますか？",
+      "acceptResurrection": "蘇生を受け入れる",
       "decline": "断る"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const ja_JP: EnTranslations = {
       },
       "battle_shout": {
         "name": "鉄の咆哮",
-        "description": "2分間、攻撃力が{buff}増加します。"
+        "description": "雄叫びを上げ、30分間、パーティメンバー全員の攻撃力を{buff}%増加させます。"
       },
       "demoralizing_shout": {
         "name": "戦慄の遠吠え",
-        "description": "恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を{buff}低下させます。"
+        "description": "恐ろしい雄叫びを上げ、20秒間、周囲の敵すべてが与えるダメージを{buff}%低下させます。"
       },
       "charge": {
         "name": "突撃",
@@ -7002,7 +7005,7 @@ export const ja_JP: EnTranslations = {
       },
       "bladestorm": {
         "name": "剣の嵐",
-        "description": "鋼の嵐と化し、4秒間、8ヤード以内のすべての敵に毎秒{damage}のダメージを与えます。"
+        "description": "鋼の嵐と化し、4秒間、6ヤード以内のすべての敵に毎秒{damage}のダメージを与えます。"
       },
       "blink": {
         "name": "瞬き歩み",

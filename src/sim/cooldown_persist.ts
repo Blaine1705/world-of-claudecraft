@@ -137,17 +137,18 @@ export function applyCooldowns(
   now: number,
   abilityCharges?: Record<string, AbilityChargeState>,
   legacyChargeCaps?: LegacyChargeCaps,
+  isKnownAbility: (id: string) => boolean = () => true,
 ): number {
   if (!saved) return -1;
   if (saved.abilities) {
     for (const [id, remaining] of Object.entries(saved.abilities)) {
-      if (positive(remaining)) cooldowns.set(id, remaining);
+      if (isKnownAbility(id) && positive(remaining)) cooldowns.set(id, remaining);
     }
   }
   if (abilityCharges) {
     if (saved.abilityCharges) {
       for (const [id, state] of Object.entries(saved.abilityCharges)) {
-        if (!validChargeState(state)) continue;
+        if (!isKnownAbility(id) || !validChargeState(state)) continue;
         const restored: AbilityChargeState = {
           charges: state.charges,
           maxCharges: state.maxCharges,
@@ -160,6 +161,7 @@ export function applyCooldowns(
       }
     } else if (saved.charges && legacyChargeCaps) {
       for (const [id, legacy] of Object.entries(saved.charges)) {
+        if (!isKnownAbility(id)) continue;
         const converted = convertLegacyCharge(id, legacy, legacyChargeCaps, cooldowns);
         if (!converted) continue;
         abilityCharges[id] = converted;

@@ -27,8 +27,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // mage line's pickRowTalent) plus the mage line's empowered-cast release and pet
 // Water Jet commands, on top of Season 1 Armory skin, ignore_add/ignore_remove,
 // stow_weapon, Dungeon Finder, and inv_move.
-const EXPECTED_SEND_COUNT = 151;
-const EXPECTED_DISPATCH_COUNT = 160;
+const EXPECTED_SEND_COUNT = 152;
+const EXPECTED_DISPATCH_COUNT = 161;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

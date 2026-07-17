@@ -24,7 +24,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '化身为巨像，持续 20 秒，解除你身上的所有控制效果，并使你造成的伤害提高 20%。',
   'entities.abilities.bladestorm.name': '剑刃风暴',
   'entities.abilities.bladestorm.description':
-    '化身为一道旋转的钢铁风暴，在 4 秒内每秒对 8 码内的所有敌人造成 {damage} 点伤害。',
+    '化身为一道旋转的钢铁风暴，在 4 秒内每秒对 6 码内的所有敌人造成 {damage} 点伤害。',
   'entities.abilities.battle_stance.description':
     '一种具有侵略性的战斗姿态：你产生的怒气提高 10%。武器和防护专精的默认姿态。',
   'entities.abilities.battle_stance.name': '战斗姿态',
@@ -1704,6 +1704,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.openTrade': '打开交易',
   'hud.prompts.duelRequest': '{name} 向你发起了决斗挑战！',
   'hud.prompts.acceptDuel': '接受决斗',
+  'hud.prompts.resurrectionOffer': '{name}想让你复活。是否接受？',
+  'hud.prompts.acceptResurrection': '接受复活',
   'hud.prompts.decline': '拒绝',
   'hud.combat.floatingMiss': '未命中',
   'hud.combat.floatingDodge': '闪避',
@@ -2254,10 +2256,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     '一次强力攻击，使近战伤害提高 {damage}。在你的下一次挥击时触发。',
   'entities.abilities.battle_shout.name': '铁血怒吼',
-  'entities.abilities.battle_shout.description': '使你的攻击强度提高 {buff}，持续 2 分钟。',
+  'entities.abilities.battle_shout.description':
+    '发出一声怒吼，使所有队伍成员的攻击强度提高 {buff}%，持续 30 分钟。',
   'entities.abilities.demoralizing_shout.name': '恐怖嚎叫',
   'entities.abilities.demoralizing_shout.description':
-    '发出可怕的怒吼，使附近所有敌人的攻击强度降低 {buff}，持续 30 秒。',
+    '发出可怕的怒吼，使附近所有敌人造成的伤害降低 {buff}%，持续 20 秒。',
   'entities.abilities.charge.name': '突进',
   'entities.abilities.charge.description':
     '向一名敌人冲锋，产生 9 点怒气并使其昏迷 1 秒。8-25 码距离。',
@@ -5671,6 +5674,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '攻击速度和施法速度提高 {pct}%',
   'hudChrome.auraEffect.dmgDone': '造成的伤害提高 {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': '造成的伤害降低 {pct}%',
+  'hudChrome.auraEffect.heatingUp':
+    '你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发',
   'hudChrome.auraEffect.tongues': '施法时间延长 {pct}%',
   'hudChrome.auraEffect.damageReduction': '受到的所有伤害降低 {pct}%',
   'hudChrome.auraEffect.guardianWard': '下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%',

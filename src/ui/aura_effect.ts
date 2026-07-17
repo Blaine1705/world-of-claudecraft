@@ -69,6 +69,9 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
     return { key: `${KEY}.temporalHourglass`, nums: {} };
   }
+  if (a.id === 'heating_up' && a.kind === 'internal_cd') {
+    return { key: `${KEY}.heatingUp`, nums: {} };
+  }
   switch (a.kind) {
     case 'dot':
       return {

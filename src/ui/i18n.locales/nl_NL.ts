@@ -1898,7 +1898,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verdooft het doelwit gedurende 2 sec. Alleen in Bruingedaante.',
   'entities.abilities.bash.name': 'Bedwelmen',
   'entities.abilities.battle_shout.description':
-    'Verhoogt je aanvalskracht met {buff} gedurende 2 min.',
+    'Een kreet die de aanvalskracht van alle groepsleden met {buff}% verhoogt gedurende 30 min.',
   'entities.abilities.battle_shout.name': 'IJzeren Gebrul',
   'entities.abilities.bear_charge.description':
     'Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Bereik 8-25 m. Alleen in Bruingedaante.',
@@ -1972,7 +1972,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Demoraliseert nabije vijanden en verlaagt hun aanvalskracht met 20 gedurende 20 sec. Alleen in Bruingedaante.',
   'entities.abilities.demoralizing_roar.name': 'Laf Gebrul',
   'entities.abilities.demoralizing_shout.description':
-    'Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met {buff} verlaagt gedurende 30 sec.',
+    'Slaakt een angstaanjagende kreet die de schade die alle nabije vijanden aanrichten met {buff}% verlaagt gedurende 20 sec.',
   'entities.abilities.demoralizing_shout.name': 'Grimmig Gehuil',
   'entities.abilities.devotion_aura.description':
     'Verhoogt je pantser met {buff} gedurende 30 min.',
@@ -7760,7 +7760,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt je aanvalskracht met 70 gedurende 15 sec. (druïdetalent)',
   'entities.abilities.bladestorm.name': 'Messenstorm',
   'entities.abilities.bladestorm.description':
-    'Word een wervelende storm van staal en tref 4 sec. lang elke seconde alle vijanden binnen 8 meter voor {damage} schade.',
+    'Word een wervelende storm van staal en tref 4 sec. lang elke seconde alle vijanden binnen 6 meter voor {damage} schade.',
   'entities.abilities.blink.description':
     'Teleporteert je 15 m vooruit en verbreekt worteleffecten. (magiërtalent)',
   'entities.abilities.bloodlust.description':

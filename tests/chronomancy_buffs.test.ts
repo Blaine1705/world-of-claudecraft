@@ -222,6 +222,7 @@ describe('Temporal Reversal: combat resurrection', () => {
   it('is defined as a dead-target arcane res', () => {
     const rez = ABILITIES.temporal_reversal;
     expect(rez.targetsDead).toBe(true);
+    expect(rez.cooldown).toBe(600);
     expect(rez.effects.some((e) => e.type === 'resurrectAlly')).toBe(true);
   });
 
@@ -237,22 +238,75 @@ describe('Temporal Reversal: combat resurrection', () => {
     ally.corpsePos = { ...ally.pos };
     ally.hp = 0;
 
-    const setTarget = (id: number) => {
-      (p as unknown as { targetId: number | null }).targetId = id;
-    };
     // Refuse on a LIVING target (self): no revive, cast not started, no cost.
     const mana0 = p.resource;
-    setTarget(p.id);
+    sim.targetEntity(p.id);
     sim.castAbility('temporal_reversal');
     expect((p as unknown as { castingAbility: string | null }).castingAbility).toBeNull();
     expect(p.resource).toBe(mana0);
 
-    // Cast on the DEAD ally: completes and revives them with a fraction of health.
-    setTarget(allyId);
+    // Cast on the DEAD ally: completes and offers the resurrection. The target
+    // remains dead until their client explicitly accepts it.
+    sim.targetEntity(allyId);
     sim.castAbility('temporal_reversal');
-    for (let t = 0; t < 60; t++) sim.tick();
+    const events = [];
+    for (let t = 0; t < 60; t++) events.push(...sim.tick());
+    expect(ally.dead).toBe(true);
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'resurrectionOffer', pid: allyId, fromName: p.name }),
+    );
+    p.pos.x += 50;
+    p.pos.z += 50;
+    const currentCasterPosition = { x: p.pos.x, z: p.pos.z };
+    sim.respondToResurrection(true, allyId);
     expect(ally.dead).toBe(false);
-    expect(ally.hp).toBeGreaterThan(0);
-    expect(ally.hp).toBeLessThan(ally.maxHp); // revived at a fraction, not full
+    expect(ally.pos.x).toBe(currentCasterPosition.x);
+    expect(ally.pos.z).toBe(currentCasterPosition.z);
+    expect(ally.hp).toBe(Math.round(ally.maxHp * 0.35));
+  });
+
+  it('keeps a declined or expired combat resurrection dead', () => {
+    const castOffer = () => {
+      const { sim, p } = chronoMage();
+      const allyId = sim.addPlayer('warrior', 'Fallen');
+      const ally = sim.entities.get(allyId)!;
+      ally.pos = { x: p.pos.x + 3, y: p.pos.y, z: p.pos.z };
+      sim.partyInvite(allyId, p.id);
+      sim.partyAccept(allyId);
+      ally.dead = true;
+      ally.corpsePos = { ...ally.pos };
+      ally.hp = 0;
+      sim.targetEntity(allyId);
+      sim.castAbility('temporal_reversal');
+      for (let tick = 0; tick < 60; tick++) sim.tick();
+      return { sim, ally, allyId };
+    };
+
+    const declined = castOffer();
+    declined.sim.respondToResurrection(false, declined.allyId);
+    expect(declined.ally.dead).toBe(true);
+
+    const expired = castOffer();
+    for (let tick = 0; tick < 20 * 30; tick++) expired.sim.tick();
+    expired.sim.respondToResurrection(true, expired.allyId);
+    expect(expired.ally.dead).toBe(true);
+  });
+
+  it('measures a released spirit from its nearby corpse, not the distant graveyard', () => {
+    const { sim, p } = chronoMage();
+    const allyId = sim.addPlayer('warrior', 'Released');
+    const ally = sim.entities.get(allyId)!;
+    sim.partyInvite(allyId, p.id);
+    sim.partyAccept(allyId);
+    ally.dead = true;
+    ally.ghost = true;
+    ally.hp = 0;
+    ally.corpsePos = { x: p.pos.x + 3, y: p.pos.y, z: p.pos.z };
+    ally.pos = { x: p.pos.x + 200, y: p.pos.y, z: p.pos.z + 200 };
+
+    sim.targetEntity(allyId);
+    sim.castAbility('temporal_reversal');
+
+    expect(p.castingAbility).toBe('temporal_reversal');
   });
 });

@@ -96,6 +96,11 @@ export function applyHeal(
   // critico"). Passing false SKIPS the crit roll entirely, so it draws NO rng and
   // keeps the shared stream in the same order as if the heal had not fired at all.
   canCrit = true,
+  // Derived copies such as Power Echo must not behave like a second healing
+  // action for equipped-weapon procs. Keep this separate from canCrit: callers
+  // can suppress either source of rng independently without bypassing normal
+  // healing, threat, absorbs, or emitted combat text.
+  canTriggerWeaponProcs = true,
   // Returns the effective heal applied (post-crit, post-mult, post-overheal-clamp,
   // the same number emitted). Callers that ignore it are unaffected; Power Echo
   // reads it to repeat a direct heal at a fraction of the resolved amount.
@@ -124,7 +129,7 @@ export function applyHeal(
   if (crit && source.kind === 'player') onSpellCrit(ctx, source, abilityId, target);
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
-  runWeaponProcs(ctx, source, target, 'heal');
+  if (canTriggerWeaponProcs) runWeaponProcs(ctx, source, target, 'heal');
   return healed;
 }
 

@@ -215,4 +215,11 @@ describe('auraEffectDescriptor', () => {
       nums: { pct: 20 },
     });
   });
+
+  it('explains how Heating Up becomes Hot Streak', () => {
+    expect(desc({ id: 'heating_up', kind: 'internal_cd', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.heatingUp',
+      nums: {},
+    });
+  });
 });

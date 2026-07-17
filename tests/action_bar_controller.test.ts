@@ -348,4 +348,65 @@ describe('ActionBarController: passives never occupy an action slot', () => {
     controller.syncKnownAbilities();
     expect(controller.actions).toEqual(bar('sunder_armor'));
   });
+
+  it('rejects every warrior passive through direct normal-bar replacement', () => {
+    const passives = [
+      'diabolical_twinstrike',
+      'cleaving_blows',
+      'enrage_passive',
+      'measured_fury',
+      'seasoned_soldier',
+      'sudden_death',
+      'deep_wounds',
+    ];
+    const { controller } = makeHarness('warrior', passives, bar());
+
+    controller.replaceActions(bar(...passives));
+
+    expect(controller.actions).toEqual(bar());
+  });
+
+  it('cleans and persists a passive from an old saved normal bar during init', () => {
+    const storage = new MemoryStorage();
+    const key = 'woc_hotbar_warrior_ActionbarTester';
+    storage.setItem(key, JSON.stringify(bar('sunder_armor', 'measured_fury')));
+    const { controller } = makeHarness(
+      'warrior',
+      ['sunder_armor', 'measured_fury'],
+      bar(),
+      storage,
+    );
+
+    controller.init();
+
+    expect(controller.actions).toEqual(bar('sunder_armor'));
+    expect(JSON.parse(storage.getItem(key) ?? 'null')).toEqual(bar('sunder_armor'));
+  });
+
+  it('rejects direct slot 0 assignment of a passive', () => {
+    const { controller } = makeHarness('warrior', ['measured_fury'], bar());
+
+    controller.replaceAttackAction({ type: 'ability', id: 'measured_fury' });
+
+    expect(controller.attackAction).toBeNull();
+  });
+
+  it('rejects passive drag payloads for both normal and configurable slot 0 drops', () => {
+    const { controller } = makeHarness('warrior', ['measured_fury', 'sunder_armor'], bar());
+
+    expect(controller.isAssignableAction({ type: 'ability', id: 'measured_fury' })).toBe(false);
+    expect(controller.isAssignableAction({ type: 'ability', id: 'sunder_armor' })).toBe(true);
+  });
+
+  it('cleans a passive persisted in configurable slot 0 during init', () => {
+    const storage = new MemoryStorage();
+    const key = 'woc_hotbar_warrior_ActionbarTester:s0';
+    storage.setItem(key, JSON.stringify({ type: 'ability', id: 'measured_fury' }));
+    const { controller } = makeHarness('warrior', ['measured_fury'], bar(), storage);
+
+    controller.init();
+
+    expect(controller.attackAction).toBeNull();
+    expect(storage.getItem(key)).toBeNull();
+  });
 });

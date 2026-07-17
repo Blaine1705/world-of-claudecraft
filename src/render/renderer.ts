@@ -6072,7 +6072,7 @@ export class Renderer {
     for (const [id, v] of this.views) {
       if (id === this.sim.playerId || !v.visual || !v.group.visible) continue;
       const e = this.sim.entities.get(id);
-      if (!e || (e.dead && !e.lootable)) continue;
+      if (!e || (e.kind === 'mob' && e.dead && !e.lootable)) continue;
       // A lying corpse (dead + lootable) has no upright body: collapse its sloppy
       // column to a ground-level point so a near-eye click above/behind the flat
       // body no longer snaps to it (issue 1486). Like the flattened pick proxy, this

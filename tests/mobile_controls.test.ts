@@ -562,8 +562,78 @@ function mobileCallbacks() {
     onNameplates: () => false,
     onMusic: () => true,
     onRecenterCamera: noop,
+    onGroundAimTap: () => false,
   };
 }
+
+describe('MobileControls ground placement tap', () => {
+  const inputWithoutLook = () =>
+    ({
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: () => {},
+    }) as unknown as Input;
+
+  it('commits a stationary canvas tap but never a camera swipe', () => {
+    const { canvas } = installMobileControlDom();
+    const taps: Array<{ x: number; y: number }> = [];
+    const callbacks = {
+      ...mobileCallbacks(),
+      onGroundAimTap: (x: number, y: number) => {
+        taps.push({ x, y });
+        return true;
+      },
+    };
+    new MobileControls(inputWithoutLook(), callbacks).start();
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 70,
+        pointerType: 'touch',
+        clientX: 320,
+        clientY: 180,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerup', {
+        pointerId: 70,
+        pointerType: 'touch',
+        clientX: 322,
+        clientY: 181,
+      }),
+    );
+    expect(taps).toEqual([{ x: 322, y: 181 }]);
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 71,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 160,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 71,
+        pointerType: 'touch',
+        clientX: 260,
+        clientY: 160,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerup', {
+        pointerId: 71,
+        pointerType: 'touch',
+        clientX: 260,
+        clientY: 160,
+      }),
+    );
+    expect(taps).toEqual([{ x: 322, y: 181 }]);
+  });
+});
 
 describe('MobileControls setActive draft survival', () => {
   const noopInputForActive = () =>

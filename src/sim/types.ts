@@ -2924,6 +2924,16 @@ export interface ReadyCheck {
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
 }
 
+// A player resurrection that has been offered but not yet accepted. The Sim owns
+// one authoritative offer per dead target. The cast-time destination is retained
+// only as a fallback if the caster no longer exists when the target accepts.
+export interface PendingResurrection {
+  casterId: number;
+  hpFrac: number;
+  fallbackDestination: Vec3;
+  expiresAt: number;
+}
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -3052,6 +3062,9 @@ export type SimEvent = { pid?: number } & (
   // The party/raid leader started a ready check: the recipient's client plays a
   // sound and shows a yes/no prompt (social/ready_check.ts). Personal (pid set).
   | { type: 'readyCheckStart'; fromName: string }
+  // A player resurrection is never automatic: the dead recipient chooses whether
+  // to return. Personal (pid set), with all visible copy composed client-side.
+  | { type: 'resurrectionOffer'; fromName: string }
   // a guild invitation from an online guild officer/leader; resolved by name
   // server-side so it carries no pid
   | { type: 'guildInvite'; fromName: string; guildName: string }

@@ -72,6 +72,19 @@ describe('fire spec kit', () => {
 });
 
 describe('guaranteed crits and Ignition', () => {
+  it('Cinderfall killing its target makes the follow-up auto-engage a silent no-op', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim, 5, 1);
+    sim.castAbility('fire_blast');
+    expect(mob.dead).toBe(true);
+    sim.startAutoAttack();
+    const events = sim.tick();
+    expect(events.some((e) => e.type === 'error' && e.text === 'Invalid attack target.')).toBe(
+      false,
+    );
+    expect(p.autoAttack).toBe(false);
+  });
+
   it('Fire Blast always crits for committed fire and banks an Ignite burn', () => {
     const { sim, p } = mageWithSpec('fire');
     const mob = addDummy(sim);

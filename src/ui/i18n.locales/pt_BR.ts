@@ -3102,10 +3102,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     'Um ataque forte que aumenta o dano corpo a corpo em {damage}. Ativa no seu próximo golpe.',
   'entities.abilities.battle_shout.name': 'Brado de Ferro',
-  'entities.abilities.battle_shout.description': 'Aumenta seu poder de ataque em {buff} por 2 min.',
+  'entities.abilities.battle_shout.description':
+    'Um grito que aumenta o poder de ataque de todos os membros do grupo em {buff}% por 30 min.',
   'entities.abilities.demoralizing_shout.name': 'Uivo Sinistro',
   'entities.abilities.demoralizing_shout.description':
-    'Solta um grito apavorante, reduzindo o poder de ataque de todos os inimigos próximos em {buff} por 30 s.',
+    'Solta um grito apavorante, reduzindo em {buff}% o dano causado por todos os inimigos próximos por 20 s.',
   'entities.abilities.charge.name': 'Arremetida',
   'entities.abilities.charge.description':
     'Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Alcance de 8-25 m.',
@@ -7806,7 +7807,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta seu poder de ataque em 70 por 15 s. (talento de Druida)',
   'entities.abilities.bladestorm.name': 'Tempestade de Lâminas',
   'entities.abilities.bladestorm.description':
-    'Transforma você em uma tempestade de aço giratória, atingindo todos os inimigos em um raio de 8 m e causando {damage} de dano a cada segundo por 4 s.',
+    'Transforma você em uma tempestade de aço giratória, atingindo todos os inimigos em um raio de 6 m e causando {damage} de dano a cada segundo por 4 s.',
   'entities.abilities.blink.description':
     'Teletransporta você 15 m para a frente e rompe efeitos de enraizamento. (talento de Mago)',
   'entities.abilities.bloodlust.description':

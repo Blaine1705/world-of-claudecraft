@@ -289,6 +289,7 @@ function makeFakeHost() {
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
+    pendingResurrections: new Map(),
     chatTokens: new Map(),
     channelSubs: new Map(),
     pendingLootRolls: new Map(),

@@ -2201,8 +2201,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ---- Chronomancy combat resurrection: Temporal Reversal. Rewinds a DEAD group/raid
   // member's timeline back to life at their corpse, IN COMBAT, with a fraction of their
   // pools and no resurrection sickness (targetsDead + the resurrectAlly effect, reusing
-  // spirit.ts revivePlayerAt). The long cooldown keeps a death costly. PLAYTEST cooldown
-  // (owner 2026-07-12): a short 120s for testing; a real battle res would be 5-10 min.
+  // spirit.ts revivePlayerAt). The ten-minute cooldown keeps a death costly.
   temporal_reversal: {
     id: 'temporal_reversal',
     name: 'Temporal Reversal',
@@ -2211,7 +2210,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['arcane'],
     cost: 60,
     castTime: 2,
-    cooldown: 120,
+    cooldown: 600,
     range: 30,
     school: 'arcane',
     requiresTarget: true,
@@ -5064,9 +5063,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     uninterruptible: true,
     castWhileMoving: true,
     channel: { duration: 4, ticks: 4 },
-    effects: [{ type: 'aoeDamage', min: 16, max: 22, radius: 8 }],
+    effects: [{ type: 'aoeDamage', min: 16, max: 22, radius: 6 }],
     description:
-      'Become a whirling storm of steel, striking all enemies within 8 yards for $d every second for 4 sec.',
+      'Become a whirling storm of steel, striking all enemies within 6 yards for $d every second for 4 sec.',
   },
   victory_rush: {
     id: 'victory_rush',

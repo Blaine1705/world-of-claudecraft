@@ -1537,6 +1537,7 @@ export const fr_FR: EnTranslations = {
       "haste": "Augmente la vitesse d'attaque et d'incantation de {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Posture de combat : 10% de génération de rage en plus",
       "berserkerStance": "Posture berserker : coups critiques 3% plus fréquents et 3% plus puissants",
       "crit": "Augmente les chances de coup critique de {pct}%",
@@ -5360,6 +5361,8 @@ export const fr_FR: EnTranslations = {
       "openTrade": "Ouvrir l'échange",
       "duelRequest": "{name} vous a provoqué en duel !",
       "acceptDuel": "Accepter le duel",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Refuser"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const fr_FR: EnTranslations = {
       },
       "battle_shout": {
         "name": "Beuglement de fer",
-        "description": "Augmente votre puissance d'attaque de {buff} pendant 2 min."
+        "description": "Un cri qui augmente de {buff}% la puissance d'attaque de tous les membres du groupe pendant 30 min."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Pousse un cri terrifiant qui réduit la puissance d'attaque de tous les ennemis proches de {buff} pendant 30 s."
+        "description": "Pousse un cri terrifiant qui réduit de {buff}% les dégâts infligés par tous les ennemis proches pendant 20 s."
       },
       "charge": {
         "name": "Ruée",
@@ -7002,7 +7005,7 @@ export const fr_FR: EnTranslations = {
       },
       "bladestorm": {
         "name": "Tempête de lames",
-        "description": "Vous devenez une tempête d’acier tourbillonnante qui inflige {damage} points de dégâts chaque seconde pendant 4 s à tous les ennemis à moins de 8 mètres."
+        "description": "Vous devenez une tempête d’acier tourbillonnante qui inflige {damage} points de dégâts chaque seconde pendant 4 s à tous les ennemis à moins de 6 mètres."
       },
       "blink": {
         "name": "Pas scintillant",

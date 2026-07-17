@@ -64,6 +64,7 @@ import {
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
 import { advanceHeroicLeap } from './combat/heroic_leap';
+import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
@@ -117,6 +118,7 @@ import {
 } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
+  ABILITIES,
   ALL_RECIPES,
   abilitiesKnownAt,
   arenaOrigin,
@@ -475,6 +477,7 @@ import {
   type MoveInput,
   type OverheadEmoteId,
   PARTY_XP_RANGE,
+  type PendingResurrection,
   type PetMode,
   type PlayerClass,
   type QuestProgress,
@@ -1377,6 +1380,9 @@ export class Sim {
   // Active party/raid ready checks, keyed by party id (social/ready_check.ts). Swept
   // in the end-of-tick block by updateReadyChecks. Exposed to the seam as ctx.readyChecks.
   readyChecks = new Map<number, ReadyCheck>();
+  // Player-cast resurrection offers are transient authoritative combat state.
+  // They are intentionally not persisted and expire on the deterministic Sim clock.
+  pendingResurrections = new Map<number, PendingResurrection>();
   // Player target selection + the party-scoped raid-marker store (T1): owns
   // partyMarkers and the tab/nearest/friendly selectors, moved off Sim behind
   // SimContext. Built in the ctor after `ctx`. Sim keeps thin delegates (the nine
@@ -2253,6 +2259,7 @@ export class Sim {
       this.time,
       restoredAbilityCharges,
       legacyChargeCaps,
+      (id) => ABILITIES[id] !== undefined,
     );
     if (Object.keys(restoredAbilityCharges).length > 0) {
       player.abilityCharges = restoredAbilityCharges;
@@ -2579,6 +2586,7 @@ export class Sim {
       const e = this.entities.get(other.entityId);
       if (e && e.targetId === pid) e.targetId = null;
     }
+    resurrectionOfferMod.dropResurrectionOffer(this.ctx, pid);
     this.dropEntity(pid);
     this.players.delete(pid);
     this.chatTokens.delete(pid);
@@ -3478,6 +3486,9 @@ export class Sim {
       get readyChecks() {
         return sim.readyChecks;
       },
+      get pendingResurrections() {
+        return sim.pendingResurrections;
+      },
       get chatTokens() {
         return sim.chatTokens;
       },
@@ -4251,6 +4262,7 @@ export class Sim {
     lap?.('arena');
     this.updateTradesAndInvites();
     this.updateReadyChecks();
+    resurrectionOfferMod.updateResurrectionOffers(this.ctx);
     lap?.('trades');
     this.updateLootRolls();
     lap?.('lootRolls');
@@ -4329,6 +4341,22 @@ export class Sim {
   }
   private isControlAura(kind: AuraKind): boolean {
     return kind === 'stun' || kind === 'root' || kind === 'incapacitate' || kind === 'polymorph';
+  }
+  private isIceBlockCrowdControlAura(kind: AuraKind): boolean {
+    return (
+      this.isControlAura(kind) ||
+      kind === 'silence' ||
+      kind === 'blind' ||
+      kind === 'disarm' ||
+      kind === 'slow' ||
+      kind === 'lockout' ||
+      kind === 'tongues'
+    );
+  }
+  private isIceBlocked(target: Entity): boolean {
+    return target.auras.some(
+      (existing) => existing.id === 'ice_block' && existing.kind === 'stasis',
+    );
   }
   // Nythraxis CC-immunity predicates moved to encounters/nythraxis.ts (N1); Sim keeps
   // thin delegates because the hot applyAura immunity path reads them via this.X
@@ -4855,8 +4883,18 @@ export class Sim {
     ability: string,
     abilityId: string | null = null,
     canCrit = true,
+    canTriggerWeaponProcs = true,
   ): number {
-    return applyHealImpl(this.ctx, source, target, amount, ability, abilityId, canCrit);
+    return applyHealImpl(
+      this.ctx,
+      source,
+      target,
+      amount,
+      ability,
+      abilityId,
+      canCrit,
+      canTriggerWeaponProcs,
+    );
   }
 
   private healingThreat(source: Entity, target: Entity, healed: number): void {
@@ -4878,6 +4916,12 @@ export class Sim {
 
   private applyAura(target: Entity, aura: Aura): void {
     if (target.kind === 'npc' && isRejectedFriendlyNpcAura(aura)) return;
+    if (
+      this.isIceBlocked(target) &&
+      this.isIceBlockCrowdControlAura(aura.kind) &&
+      aura.sourceId !== target.id
+    )
+      return;
     if (
       this.isNythraxisRaidEnemy(target) &&
       !nythraxis.isNythraxisControllableAdd(target) && // priest + stalker are meant to be CC'd
@@ -4988,6 +5032,7 @@ export class Sim {
   // it tunnel through in one coarse hop. Returns the yards actually moved (0 if
   // blocked immediately).
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
+    if (source.id !== target.id && this.isIceBlocked(target)) return 0;
     // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
     // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
     // and never displaces the victim, so a caster keeps casting through it.
@@ -6966,6 +7011,10 @@ export class Sim {
 
   resurrectAtSpiritHealer(pid?: number): void {
     resurrectAtSpiritHealer(this.ctx, pid);
+  }
+
+  respondToResurrection(accept: boolean, pid?: number): void {
+    resurrectionOfferMod.respondToResurrection(this.ctx, accept, pid);
   }
 
   revivePlayerAt(pid: number, pos: Vec3, hpFrac = 1): void {

@@ -9,6 +9,7 @@ import {
   createGroundAimState,
   DEFAULT_GROUND_AOE_RADIUS,
   enterGroundAim,
+  shouldUseGroundAim,
 } from '../src/ui/hud/action_bar/ground_aim';
 
 function casterAt(x: number, z: number): Pick<Entity, 'pos'> {
@@ -16,6 +17,17 @@ function casterAt(x: number, z: number): Pick<Entity, 'pos'> {
 }
 
 describe('ground_aim', () => {
+  it('opens touch placement for Meteor without changing other mobile ground casts', () => {
+    expect(shouldUseGroundAim('meteor', true, false)).toBe(true);
+    expect(shouldUseGroundAim('flamestrike', true, true)).toBe(false);
+  });
+
+  it('keeps desktop ground placement controlled by its preference', () => {
+    expect(shouldUseGroundAim('meteor', false, true)).toBe(true);
+    expect(shouldUseGroundAim('meteor', false, false)).toBe(false);
+    expect(shouldUseGroundAim('flamestrike', false, true)).toBe(true);
+  });
+
   it('passes through points inside range', () => {
     const aim = clampAimToRange(casterAt(10, -4), { x: 16, z: -4 }, 8);
     expect(aim).toEqual({ point: { x: 16, z: -4 }, clamped: false });

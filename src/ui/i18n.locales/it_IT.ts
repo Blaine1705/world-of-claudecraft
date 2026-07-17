@@ -3112,10 +3112,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un attacco potente che aumenta i danni in mischia di {damage}. Si attiva al tuo prossimo colpo.',
   'entities.abilities.battle_shout.name': 'Urlo di Ferro',
   'entities.abilities.battle_shout.description':
-    "Aumenta la tua potenza d'attacco di {buff} per 2 min.",
+    "Un urlo che aumenta del {buff}% la potenza d'attacco di tutti i membri del gruppo per 30 min.",
   'entities.abilities.demoralizing_shout.name': 'Ululato Sinistro',
   'entities.abilities.demoralizing_shout.description':
-    "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di {buff} per 30 sec.",
+    'Emette un urlo terrificante, riducendo del {buff}% i danni inflitti da tutti i nemici vicini per 20 sec.',
   'entities.abilities.charge.name': 'Irruzione',
   'entities.abilities.charge.description':
     'Carica un nemico, genera 9 rabbia e lo stordisce per 1 s. Portata 8-25 m.',
@@ -7831,7 +7831,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Aumenta la tua potenza d’attacco di 70 per 15 sec. (talento del Druido)',
   'entities.abilities.bladestorm.name': 'Tempesta di Lame',
   'entities.abilities.bladestorm.description':
-    'Diventi una tempesta d’acciaio vorticante che colpisce tutti i nemici entro 8 m, infliggendo {damage} danni ogni secondo per 4 s.',
+    'Diventi una tempesta d’acciaio vorticante che colpisce tutti i nemici entro 6 m, infliggendo {damage} danni ogni secondo per 4 s.',
   'entities.abilities.blink.description':
     'Ti teletrasporta di 15 m in avanti e spezza gli effetti di immobilizzazione. (talento del Mago)',
   'entities.abilities.bloodlust.description':

@@ -1366,6 +1366,12 @@ async function startGame(
       return music.enabled;
     },
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
+    onGroundAimTap: (x, y) => {
+      if (!hud.isGroundAimActive()) return false;
+      const point = renderer.groundPoint(x, y, world.player.pos.y);
+      if (point) hud.commitGroundAimAt(point);
+      return true;
+    },
   });
   mobileControls.start();
   // reflect the current music state on the touch toggle (it may already be off

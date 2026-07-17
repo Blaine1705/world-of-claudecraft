@@ -11,6 +11,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { auraEffectDescriptor } from '../src/ui/aura_effect';
 
 function rig(rows: Record<number, string>, level = 20) {
   const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
@@ -353,6 +354,52 @@ describe('mage choice rows (owner tree)', () => {
     expect(p.auras.some((a) => a.kind === 'power_echo')).toBe(false); // consumed
   });
 
+  it('Power Echo repeats Temporal Echo healing once and still places its mark', () => {
+    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: 'arcane', rows: { 14: 'mag_r14_power_echo' } })).toBe(true);
+    const p = sim.player;
+    p.resource = p.maxResource;
+    p.maxHp = 100000;
+    p.hp = 1;
+    sim.castAbility('power_echo');
+    (p as { gcdRemaining: number }).gcdRemaining = 0;
+    sim.targetEntity(p.id);
+    sim.castAbility('temporal_echo');
+    const heals = sim
+      .tick()
+      .filter((e) => e.type === 'heal2' && e.targetId === p.id)
+      .map((e) => (e as { amount: number }).amount);
+    expect(heals).toHaveLength(2);
+    expect(heals[1]).toBe(Math.max(1, Math.round(heals[0] * 0.5)));
+    expect(p.auras.some((a) => a.kind === 'temporal_echo' && a.sourceId === p.id)).toBe(true);
+  });
+
+  it('Power Echo heal copy does not roll a second on-heal weapon proc', () => {
+    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: 'arcane', rows: { 14: 'mag_r14_power_echo' } })).toBe(true);
+    const p = sim.player;
+    p.resource = p.maxResource;
+    p.maxHp = 100000;
+    p.hp = 1;
+    // Equip through the authoritative inventory path: cast setup refreshes stats
+    // from PlayerMeta, so changing only the entity's display copy would be reset
+    // to the starter staff before the heal resolves.
+    sim.addItem('deathless_heartwood', 1);
+    sim.equipItem('deathless_heartwood');
+    sim.castAbility('power_echo');
+    (p as { gcdRemaining: number }).gcdRemaining = 0;
+    sim.targetEntity(p.id);
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    sim.castAbility('temporal_echo');
+    sim.rng.setObserver(null);
+    // One amount roll, one crit roll, and one Lifebloom proc roll. The echoed
+    // heal reuses the resolved amount and must add no fourth draw.
+    expect(draws).toBe(3);
+  });
+
   it('Elemental Convergence opens the surge on a Fire-Frost alternation, once per 30 sec', () => {
     const { sim, p } = rig({ 17: 'mag_r17_convergence' });
     addTargetMob(sim, 100000, 5);
@@ -366,6 +413,10 @@ describe('mage choice rows (owner tree)', () => {
     const surge = p.auras.find((a) => a.id === 'elemental_convergence');
     expect(surge?.kind).toBe('buff_dmg_done');
     expect(surge?.value).toBeCloseTo(0.15);
+    expect(surge && auraEffectDescriptor(surge)).toEqual({
+      key: 'hudChrome.auraEffect.dmgDone',
+      nums: { pct: 15 },
+    });
     expect(p.auras.some((a) => a.id === 'convergence_cd')).toBe(true);
     // Another alternation inside the internal cooldown re-arms nothing new.
     (p as { gcdRemaining: number }).gcdRemaining = 0;
@@ -391,6 +442,30 @@ describe('mage choice rows (owner tree)', () => {
     p.prevPos = { ...p.pos };
     tickFor(sim, 4);
     expect(p.auras.some((a) => a.id === 'rune_of_power')).toBe(false);
+  });
+
+  it('overlapping Runes of Power refresh one shared buff instead of stacking', () => {
+    const sim = new Sim({ seed: 18, playerClass: 'mage', noPlayer: true });
+    const first = sim.addPlayer('mage', 'First');
+    const second = sim.addPlayer('mage', 'Second');
+    for (const pid of [first, second]) {
+      sim.setPlayerLevel(20, pid);
+      expect(sim.setSpec('frost', pid)).toBe(true);
+      expect(sim.selectTalentRow(20, 'mag_r20_rune_of_power', pid)).toBe(true);
+      const entity = sim.entities.get(pid);
+      if (entity) entity.resource = entity.maxResource;
+    }
+    sim.partyInvite(second, first);
+    sim.partyAccept(second);
+    sim.castAbility('rune_of_power', first);
+    sim.castAbility('rune_of_power', second);
+    tickFor(sim, 2);
+
+    const recipient = sim.entities.get(first);
+    expect(recipient?.auras.filter((aura) => aura.id === 'rune_of_power')).toHaveLength(1);
+    expect(recipient?.auras.find((aura) => aura.id === 'rune_of_power')?.remaining).toBeGreaterThan(
+      2,
+    );
   });
 });
 

@@ -3502,10 +3502,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Une attaque puissante qui augmente les dégâts de mêlée de {damage}. S'active lors de votre prochaine frappe.",
   'entities.abilities.battle_shout.name': 'Beuglement de fer',
   'entities.abilities.battle_shout.description':
-    "Augmente votre puissance d'attaque de {buff} pendant 2 min.",
+    "Un cri qui augmente de {buff}% la puissance d'attaque de tous les membres du groupe pendant 30 min.",
   'entities.abilities.demoralizing_shout.name': 'Direhowl',
   'entities.abilities.demoralizing_shout.description':
-    "Pousse un cri terrifiant qui réduit la puissance d'attaque de tous les ennemis proches de {buff} pendant 30 s.",
+    'Pousse un cri terrifiant qui réduit de {buff}% les dégâts infligés par tous les ennemis proches pendant 20 s.',
   'entities.abilities.charge.name': 'Ruée',
   'entities.abilities.charge.description':
     "Charge un ennemi, génère 9 rage et l'étourdit pendant 1 s. Portée de 8-25 m.",
@@ -7897,7 +7897,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente votre puissance d'attaque de 70 pendant 15 s. (talent de Druide)",
   'entities.abilities.bladestorm.name': 'Tempête de lames',
   'entities.abilities.bladestorm.description':
-    'Vous devenez une tempête d’acier tourbillonnante qui inflige {damage} points de dégâts chaque seconde pendant 4 s à tous les ennemis à moins de 8 mètres.',
+    'Vous devenez une tempête d’acier tourbillonnante qui inflige {damage} points de dégâts chaque seconde pendant 4 s à tous les ennemis à moins de 6 mètres.',
   'entities.abilities.blink.description':
     "Vous téléporte de 15 m vers l'avant et brise les immobilisations. (talent de Mage)",
   'entities.abilities.bloodlust.description':

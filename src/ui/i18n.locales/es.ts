@@ -3125,10 +3125,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe.',
   'entities.abilities.battle_shout.name': 'Bramido de Hierro',
   'entities.abilities.battle_shout.description':
-    'Aumenta tu poder de ataque en {buff} durante 2 min.',
+    'Un grito que aumenta el poder de ataque de todos los miembros del grupo un {buff}% durante 30 min.',
   'entities.abilities.demoralizing_shout.name': 'Aullido Pavoroso',
   'entities.abilities.demoralizing_shout.description':
-    'Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en {buff} durante 30 s.',
+    'Lanza un grito aterrador que reduce un {buff}% el daño infligido por todos los enemigos cercanos durante 20 s.',
   'entities.abilities.charge.name': 'Arremetida',
   'entities.abilities.charge.description':
     'Carga contra un enemigo, genera 9 de ira y lo aturde durante 1 s. Alcance de 8-25 m.',
@@ -7889,7 +7889,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta tu poder de ataque en 70 durante 15 s. (talento de Druida)',
   'entities.abilities.bladestorm.name': 'Tormenta de cuchillas',
   'entities.abilities.bladestorm.description':
-    'Te conviertes en una tormenta giratoria de acero y golpeas a todos los enemigos en un radio de 8 m, infligiéndoles {damage} de daño cada segundo durante 4 s.',
+    'Te conviertes en una tormenta giratoria de acero y golpeas a todos los enemigos en un radio de 6 m, infligiéndoles {damage} de daño cada segundo durante 4 s.',
   'entities.abilities.blink.description':
     'Te teletransporta 15 m hacia delante y rompe los efectos de inmovilización. (talento de Mago)',
   'entities.abilities.bloodlust.description':

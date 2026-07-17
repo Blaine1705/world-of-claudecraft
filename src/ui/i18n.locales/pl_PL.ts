@@ -1876,7 +1876,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Dębowa skóra',
   'entities.abilities.bash.description': 'Ogłusza cel na 2 sek. Tylko w postaci Bruina.',
   'entities.abilities.bash.name': 'Wstrząśnienie',
-  'entities.abilities.battle_shout.description': 'Zwiększa twoją moc ataku o {buff} na 2 min.',
+  'entities.abilities.battle_shout.description':
+    'Okrzyk, który zwiększa moc ataku wszystkich członków drużyny o {buff}% na 30 min.',
   'entities.abilities.battle_shout.name': 'Żelazny ryk',
   'entities.abilities.bear_charge.description':
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina.',
@@ -1950,7 +1951,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Demoralizuje pobliskich wrogów, zmniejszając ich moc ataku o 20 na 20 sek. Tylko w postaci Bruina.',
   'entities.abilities.demoralizing_roar.name': 'Tchórzliwy ryk',
   'entities.abilities.demoralizing_shout.description':
-    'Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o {buff} na 30 sek.',
+    'Wydaje przerażający okrzyk, zmniejszając obrażenia zadawane przez wszystkich pobliskich wrogów o {buff}% na 20 sek.',
   'entities.abilities.demoralizing_shout.name': 'Złowieszcze wycie',
   'entities.abilities.devotion_aura.description': 'Zwiększa twój pancerz o {buff} na 30 min.',
   'entities.abilities.devotion_aura.name': 'Aura niezłomności',
@@ -7710,7 +7711,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zwiększa twoją siłę ataku o 70 na 15 sek. (talent Druida)',
   'entities.abilities.bladestorm.name': 'Burza Ostrzy',
   'entities.abilities.bladestorm.description':
-    'Stajesz się wirującą burzą stali i przez 4 sek. co sekundę zadajesz {damage} pkt. obrażeń wszystkim wrogom w promieniu 8 m.',
+    'Stajesz się wirującą burzą stali i przez 4 sek. co sekundę zadajesz {damage} pkt. obrażeń wszystkim wrogom w promieniu 6 m.',
   'entities.abilities.blink.description':
     'Teleportuje cię o 15 m do przodu i usuwa efekty unieruchomienia. (talent Maga)',
   'entities.abilities.bloodlust.description':

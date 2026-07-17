@@ -1776,6 +1776,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.openTrade': '取引を開く',
   'hud.prompts.duelRequest': '{name}があなたに決闘を申し込みました！',
   'hud.prompts.acceptDuel': '決闘を受ける',
+  'hud.prompts.resurrectionOffer': '{name}があなたを蘇生しようとしています。受け入れますか？',
+  'hud.prompts.acceptResurrection': '蘇生を受け入れる',
   'hud.prompts.decline': '断る',
   'hud.combat.floatingMiss': 'ミス',
   'hud.combat.floatingDodge': '回避',
@@ -2346,10 +2348,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     '強力な攻撃で近接ダメージが {damage} 増加します。次のスイングで発動します。',
   'entities.abilities.battle_shout.name': '鉄の咆哮',
-  'entities.abilities.battle_shout.description': '2分間、攻撃力が{buff}増加します。',
+  'entities.abilities.battle_shout.description':
+    '雄叫びを上げ、30分間、パーティメンバー全員の攻撃力を{buff}%増加させます。',
   'entities.abilities.demoralizing_shout.name': '戦慄の遠吠え',
   'entities.abilities.demoralizing_shout.description':
-    '恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を{buff}低下させます。',
+    '恐ろしい雄叫びを上げ、20秒間、周囲の敵すべてが与えるダメージを{buff}%低下させます。',
   'entities.abilities.charge.name': '突撃',
   'entities.abilities.charge.description':
     '敵に突撃し、怒りを9生成して1秒間スタンさせます。射程8-25yd。',
@@ -5936,6 +5939,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '攻撃速度と詠唱速度を{pct}%上昇させる',
   'hudChrome.auraEffect.dmgDone': '与えるダメージを{pct}%上昇させる',
   'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージを{pct}%低下させる',
+  'hudChrome.auraEffect.heatingUp':
+    '次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます',
   'hudChrome.auraEffect.tongues': '詠唱時間を{pct}%増加させる',
   'hudChrome.auraEffect.damageReduction': '受けるすべてのダメージを{pct}%軽減する',
   'hudChrome.auraEffect.guardianWard':
@@ -7721,7 +7726,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cone_of_cold.description':
     '周囲の敵を冷気で撃ち、{damage}の氷ダメージを与えます。（氷シグネチャー）',
   'entities.abilities.bladestorm.description':
-    '鋼の嵐と化し、4秒間、8ヤード以内のすべての敵に毎秒{damage}のダメージを与えます。',
+    '鋼の嵐と化し、4秒間、6ヤード以内のすべての敵に毎秒{damage}のダメージを与えます。',
   'guide.abilityHook.ice_lance':
     '氷の効果を消費する即時発動の氷片。凍結した対象には大幅に高いダメージを与えます。',
   'guide.abilityHook.flurry':

@@ -312,4 +312,65 @@ describe('v0.26 winning Warrior authored row and mastery runtime', () => {
     sim.dealDamage(warriorEntity, target, 100, false, 'physical', 'Test Ability', 'hit', true);
     expect(hpBefore - target.hp).toBe(110);
   });
+
+  it('Sanguine Aura from a second Warrior refreshes one shared party buff', () => {
+    const sim = harness(new Sim({ seed: 2628, playerClass: 'warrior', noPlayer: true }));
+    const first = sim.addPlayer('warrior', 'First');
+    const second = sim.addPlayer('warrior', 'Second');
+    const recipient = sim.addPlayer('paladin', 'Recipient');
+    for (const pid of [first, second, recipient]) sim.setPlayerLevel(20, pid);
+    sim.partyInvite(second, first);
+    sim.partyAccept(second);
+    sim.partyInvite(recipient, first);
+    sim.partyAccept(recipient);
+    expect(sim.selectTalentRow(20, 'war_row_sanguine_aura', first)).toBe(true);
+    expect(sim.selectTalentRow(20, 'war_row_sanguine_aura', second)).toBe(true);
+
+    sim.castAbility('sanguine_aura', first);
+    const recipientEntity = entityOf(sim, recipient);
+    const firstAura = recipientEntity.auras.find((aura) => aura.id === 'sanguine_aura');
+    expect(firstAura).toBeTruthy();
+    if (firstAura) firstAura.remaining = 3;
+    sim.castAbility('sanguine_aura', second);
+
+    expect(recipientEntity.auras.filter((aura) => aura.id === 'sanguine_aura')).toEqual([
+      expect.objectContaining({ sourceId: second, remaining: 20, duration: 20 }),
+    ]);
+  });
+
+  it('Bladestorm follows the moving Warrior and uses the smaller 6 yard radius', () => {
+    const sim = warriorAtCap(2629);
+    expect(sim.selectTalentRow(20, 'war_row_bladestorm')).toBe(true);
+    const player = sim.player;
+    player.resource = player.maxResource;
+    const spawnDummy = (x: number, z: number): Entity => {
+      const dummy = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+        x,
+        y: player.pos.y,
+        z,
+      });
+      dummy.hostile = true;
+      dummy.maxHp = dummy.hp = 100_000;
+      sim.addEntity(dummy);
+      return dummy;
+    };
+    const oldCenterTarget = spawnDummy(player.pos.x, player.pos.z + 5.5);
+    const movedCenterTarget = spawnDummy(player.pos.x + 7, player.pos.z);
+    const outsideRadius = spawnDummy(player.pos.x, player.pos.z + 6.5);
+    const bladestorm = sim.resolvedAbility('bladestorm');
+    expect(bladestorm?.effects).toEqual([
+      expect.objectContaining({ type: 'aoeDamage', radius: 6 }),
+    ]);
+
+    sim.castAbility('bladestorm');
+    for (let i = 0; i < 20; i++) sim.tick();
+    expect(oldCenterTarget.hp).toBeLessThan(oldCenterTarget.maxHp);
+    expect(movedCenterTarget.hp).toBe(movedCenterTarget.maxHp);
+    expect(outsideRadius.hp).toBe(outsideRadius.maxHp);
+    metaOf(sim).moveInput.strafeLeft = true;
+    for (let i = 0; i < 40; i++) sim.tick();
+    metaOf(sim).moveInput.strafeLeft = false;
+    expect(player.pos.x).toBeGreaterThan(oldCenterTarget.pos.x + 6);
+    expect(movedCenterTarget.hp).toBeLessThan(movedCenterTarget.maxHp);
+  });
 });

@@ -1934,7 +1934,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Làm choáng mục tiêu trong 2 giây. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.bash.name': 'Chấn Choáng',
   'entities.abilities.battle_shout.description':
-    'Tăng sức mạnh tấn công của ngươi thêm {buff} trong 2 phút.',
+    'Một tiếng hô làm tăng {buff}% sức mạnh tấn công của tất cả thành viên tổ đội trong 30 phút.',
   'entities.abilities.battle_shout.name': 'Tiếng Gầm Thép',
   'entities.abilities.bear_charge.description':
     'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form.',
@@ -2008,7 +2008,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Áp chế kẻ địch xung quanh, giảm sức tấn công của chúng đi 20 trong 20 giây. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.demoralizing_roar.name': 'Tiếng Gầm Khiếp Đảm',
   'entities.abilities.demoralizing_shout.description':
-    'Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi {buff} trong 30 giây.',
+    'Phát ra tiếng hô đáng sợ, giảm {buff}% sát thương do tất cả kẻ địch xung quanh gây ra trong 20 giây.',
   'entities.abilities.demoralizing_shout.name': 'Tiếng Hú Hung Hiểm',
   'entities.abilities.devotion_aura.description': 'Tăng giáp của bạn thêm {buff} trong 30 phút.',
   'entities.abilities.devotion_aura.name': 'Hào Quang Kiên Định',
@@ -7687,7 +7687,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tăng 70 sức mạnh công kích của bạn trong 15 giây. (thiên phú Druid)',
   'entities.abilities.bladestorm.name': 'Bão Kiếm',
   'entities.abilities.bladestorm.description':
-    'Hóa thành một cơn bão thép cuồng xoáy, đánh trúng mọi kẻ địch trong phạm vi 8 mét với {damage} sát thương mỗi giây trong 4 giây.',
+    'Hóa thành một cơn bão thép cuồng xoáy, đánh trúng mọi kẻ địch trong phạm vi 6 mét với {damage} sát thương mỗi giây trong 4 giây.',
   'entities.abilities.blink.description':
     'Dịch chuyển bạn 15 m về phía trước và phá hiệu ứng trói chân. (thiên phú Pháp sư)',
   'entities.abilities.bloodlust.description':

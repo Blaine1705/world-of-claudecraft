@@ -1537,6 +1537,7 @@ export const id_ID: EnTranslations = {
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Kuda-kuda Tempur: penghasilan amarah 10% lebih banyak",
       "berserkerStance": "Kuda-kuda Berserker: kritis 3% lebih sering dan menghantam 3% lebih keras",
       "crit": "Meningkatkan peluang serangan kritis sebesar {pct}%",
@@ -5360,6 +5361,8 @@ export const id_ID: EnTranslations = {
       "openTrade": "Buka Perdagangan",
       "duelRequest": "{name} menantang Anda untuk berduel!",
       "acceptDuel": "Terima Duel",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Tolak"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const id_ID: EnTranslations = {
       },
       "battle_shout": {
         "name": "Raungan Besi",
-        "description": "Meningkatkan daya serangmu sebesar {buff} selama 2 menit."
+        "description": "Teriakan yang meningkatkan daya serang semua anggota kelompok sebesar {buff}% selama 30 menit."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar {buff} selama 30 detik."
+        "description": "Melepaskan pekikan mengerikan yang mengurangi kerusakan yang ditimbulkan semua musuh di sekitar sebesar {buff}% selama 20 detik."
       },
       "charge": {
         "name": "Serbuan",
@@ -7002,7 +7005,7 @@ export const id_ID: EnTranslations = {
       },
       "bladestorm": {
         "name": "Badai Pedang",
-        "description": "Menjadi badai baja yang berputar, menghantam semua musuh dalam jarak 8 meter sebesar {damage} setiap detik selama 4 detik."
+        "description": "Menjadi badai baja yang berputar, menghantam semua musuh dalam jarak 6 meter sebesar {damage} setiap detik selama 4 detik."
       },
       "blink": {
         "name": "Langkah Kilat",

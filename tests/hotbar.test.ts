@@ -551,6 +551,16 @@ describe('loadoutKnownAbilityIds', () => {
     expect(known.has('lightning_bolt')).toBe(true);
   });
 
+  it('excludes passive traits from saved loadout action-bar eligibility', () => {
+    const armsKnown = loadoutKnownAbilityIds('warrior', { ...emptyAllocation(), spec: 'arms' }, 20);
+
+    expect(armsKnown.has('measured_fury')).toBe(false);
+    expect(armsKnown.has('seasoned_soldier')).toBe(false);
+    expect(armsKnown.has('sudden_death')).toBe(false);
+    expect(armsKnown.has('deep_wounds')).toBe(false);
+    expect(armsKnown.has('battle_shout')).toBe(true);
+  });
+
   // Pins the actual applyLoadoutBar call site wiring, not just the predicate in
   // isolation: reverting the predicate to `(id) => !!ABILITIES[id]` would let
   // stormstrike survive a switch to a Restoration loadout without failing this.

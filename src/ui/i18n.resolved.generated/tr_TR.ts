@@ -1537,6 +1537,7 @@ export const tr_TR: EnTranslations = {
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Savaş Duruşu: %10 daha fazla öfke üretimi",
       "berserkerStance": "Berserker Duruşu: kritikler %3 daha sık gerçekleşir ve %3 daha sert vurur",
       "crit": "Kritik vuruş şansını %{pct} artırır",
@@ -5360,6 +5361,8 @@ export const tr_TR: EnTranslations = {
       "openTrade": "Takas Aç",
       "duelRequest": "{name} seni bir düelloya davet etti!",
       "acceptDuel": "Düelloyu Kabul Et",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Reddet"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const tr_TR: EnTranslations = {
       },
       "battle_shout": {
         "name": "Demir Nara",
-        "description": "Saldırı gücünü 2 dakika boyunca {buff} artırır."
+        "description": "Tüm grup üyelerinin saldırı gücünü 30 dakika boyunca %{buff} artıran bir nara."
       },
       "demoralizing_shout": {
         "name": "Vahim Uluma",
-        "description": "Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır."
+        "description": "Korkunç bir nara atarak yakındaki tüm düşmanların verdiği hasarı 20 saniye boyunca %{buff} azaltır."
       },
       "charge": {
         "name": "Atılım",
@@ -7002,7 +7005,7 @@ export const tr_TR: EnTranslations = {
       },
       "bladestorm": {
         "name": "Kılıç Fırtınası",
-        "description": "Dönen bir çelik fırtınasına dönüşerek 4 sn boyunca 8 metre içindeki tüm düşmanlara her saniye {damage} hasar verirsin."
+        "description": "Dönen bir çelik fırtınasına dönüşerek 4 sn boyunca 6 metre içindeki tüm düşmanlara her saniye {damage} hasar verirsin."
       },
       "blink": {
         "name": "Titreşim Adımı",

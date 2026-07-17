@@ -1537,6 +1537,7 @@ export const de_DE: EnTranslations = {
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Kampfhaltung: 10% mehr Wuterzeugung",
       "berserkerStance": "Berserkerhaltung: Kritische Treffer gelingen 3% öfter und treffen 3% härter",
       "crit": "Erhöht kritische Trefferchance um {pct}%",
@@ -5360,6 +5361,8 @@ export const de_DE: EnTranslations = {
       "openTrade": "Handel öffnen",
       "duelRequest": "{name} hat Euch zu einem Duell herausgefordert!",
       "acceptDuel": "Duell annehmen",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Ablehnen"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const de_DE: EnTranslations = {
       },
       "battle_shout": {
         "name": "Eisernes Gebrüll",
-        "description": "Erhöht eure Angriffskraft 2 Min. lang um {buff}."
+        "description": "Ein Ruf, der die Angriffskraft aller Gruppenmitglieder 30 Min. lang um {buff}% erhöht."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um {buff}."
+        "description": "Stößt einen furchterregenden Ruf aus und verringert den verursachten Schaden aller nahen Gegner 20 Sek. lang um {buff}%."
       },
       "charge": {
         "name": "Vorpreschen",
@@ -7002,7 +7005,7 @@ export const de_DE: EnTranslations = {
       },
       "bladestorm": {
         "name": "Klingensturm",
-        "description": "Werdet zu einem wirbelnden Sturm aus Stahl und trefft 4 Sek. lang jede Sekunde alle Gegner im Umkreis von 8 Metern für {damage} Schaden."
+        "description": "Werdet zu einem wirbelnden Sturm aus Stahl und trefft 4 Sek. lang jede Sekunde alle Gegner im Umkreis von 6 Metern für {damage} Schaden."
       },
       "blink": {
         "name": "Flimmerschritt",

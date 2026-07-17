@@ -3126,10 +3126,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     'Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
   'entities.abilities.battle_shout.name': 'Eisernes Gebrüll',
-  'entities.abilities.battle_shout.description': 'Erhöht eure Angriffskraft 2 Min. lang um {buff}.',
+  'entities.abilities.battle_shout.description':
+    'Ein Ruf, der die Angriffskraft aller Gruppenmitglieder 30 Min. lang um {buff}% erhöht.',
   'entities.abilities.demoralizing_shout.name': 'Direhowl',
   'entities.abilities.demoralizing_shout.description':
-    'Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um {buff}.',
+    'Stößt einen furchterregenden Ruf aus und verringert den verursachten Schaden aller nahen Gegner 20 Sek. lang um {buff}%.',
   'entities.abilities.charge.name': 'Vorpreschen',
   'entities.abilities.charge.description':
     'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m.',
@@ -7872,7 +7873,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht Eure Angriffskraft 15 Sek. lang um 70. (Druidentalent)',
   'entities.abilities.bladestorm.name': 'Klingensturm',
   'entities.abilities.bladestorm.description':
-    'Werdet zu einem wirbelnden Sturm aus Stahl und trefft 4 Sek. lang jede Sekunde alle Gegner im Umkreis von 8 Metern für {damage} Schaden.',
+    'Werdet zu einem wirbelnden Sturm aus Stahl und trefft 4 Sek. lang jede Sekunde alle Gegner im Umkreis von 6 Metern für {damage} Schaden.',
   'entities.abilities.blink.description':
     'Teleportiert Euch 15 m nach vorn und löst Bewegungsunfähigkeitseffekte. (Magiertalent)',
   'entities.abilities.bloodlust.description':

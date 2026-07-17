@@ -1537,6 +1537,7 @@ export const nl_NL: EnTranslations = {
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Strijdhouding: 10% meer woedeopbouw",
       "berserkerStance": "Berserkerhouding: kritieke treffers landen 3% vaker en raken 3% harder",
       "crit": "Verhoogt kans op kritieke treffers met {pct}%",
@@ -5360,6 +5361,8 @@ export const nl_NL: EnTranslations = {
       "openTrade": "Handel openen",
       "duelRequest": "{name} heeft je uitgedaagd tot een duel!",
       "acceptDuel": "Duel aanvaarden",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Weigeren"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const nl_NL: EnTranslations = {
       },
       "battle_shout": {
         "name": "IJzeren Gebrul",
-        "description": "Verhoogt je aanvalskracht met {buff} gedurende 2 min."
+        "description": "Een kreet die de aanvalskracht van alle groepsleden met {buff}% verhoogt gedurende 30 min."
       },
       "demoralizing_shout": {
         "name": "Grimmig Gehuil",
-        "description": "Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met {buff} verlaagt gedurende 30 sec."
+        "description": "Slaakt een angstaanjagende kreet die de schade die alle nabije vijanden aanrichten met {buff}% verlaagt gedurende 20 sec."
       },
       "charge": {
         "name": "Bestorming",
@@ -7002,7 +7005,7 @@ export const nl_NL: EnTranslations = {
       },
       "bladestorm": {
         "name": "Messenstorm",
-        "description": "Word een wervelende storm van staal en tref 4 sec. lang elke seconde alle vijanden binnen 8 meter voor {damage} schade."
+        "description": "Word een wervelende storm van staal en tref 4 sec. lang elke seconde alle vijanden binnen 6 meter voor {damage} schade."
       },
       "blink": {
         "name": "Flikkerstap",

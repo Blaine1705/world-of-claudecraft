@@ -261,6 +261,8 @@ const hudStringsEn = {
       openTrade: 'Open Trade',
       duelRequest: '{name} has challenged you to a duel!',
       acceptDuel: 'Accept Duel',
+      resurrectionOffer: '{name} wants to return you to life. Do you accept?',
+      acceptResurrection: 'Accept Resurrection',
       decline: 'Decline',
     },
     combat: {

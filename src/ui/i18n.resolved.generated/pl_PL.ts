@@ -1537,6 +1537,7 @@ export const pl_PL: EnTranslations = {
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Postawa bojowa: generowanie wściekłości zwiększone o 10%",
       "berserkerStance": "Postawa berserkera: trafienia krytyczne o 3% częstsze i o 3% silniejsze",
       "crit": "Zwiększa szansę na trafienie krytyczne o {pct}%",
@@ -5360,6 +5361,8 @@ export const pl_PL: EnTranslations = {
       "openTrade": "Otwórz handel",
       "duelRequest": "{name} wyzwał cię na pojedynek!",
       "acceptDuel": "Przyjmij pojedynek",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Odrzuć"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const pl_PL: EnTranslations = {
       },
       "battle_shout": {
         "name": "Żelazny ryk",
-        "description": "Zwiększa twoją moc ataku o {buff} na 2 min."
+        "description": "Okrzyk, który zwiększa moc ataku wszystkich członków drużyny o {buff}% na 30 min."
       },
       "demoralizing_shout": {
         "name": "Złowieszcze wycie",
-        "description": "Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o {buff} na 30 sek."
+        "description": "Wydaje przerażający okrzyk, zmniejszając obrażenia zadawane przez wszystkich pobliskich wrogów o {buff}% na 20 sek."
       },
       "charge": {
         "name": "Natarcie",
@@ -7002,7 +7005,7 @@ export const pl_PL: EnTranslations = {
       },
       "bladestorm": {
         "name": "Burza Ostrzy",
-        "description": "Stajesz się wirującą burzą stali i przez 4 sek. co sekundę zadajesz {damage} pkt. obrażeń wszystkim wrogom w promieniu 8 m."
+        "description": "Stajesz się wirującą burzą stali i przez 4 sek. co sekundę zadajesz {damage} pkt. obrażeń wszystkim wrogom w promieniu 6 m."
       },
       "blink": {
         "name": "Migotliwy Krok",

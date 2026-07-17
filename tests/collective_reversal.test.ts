@@ -77,7 +77,7 @@ describe('Collective Reversal content', () => {
 });
 
 describe('Collective Reversal behavior', () => {
-  it('finishes after seven seconds and revives every dead raid member, but nobody else', () => {
+  it('finishes after seven seconds and offers every dead raid member a resurrection', () => {
     const { sim, mage } = chronomancer();
     const fallenWarrior = addToGroup(sim, mage, 'warrior', 'Fallen Warrior');
     const fallenPriest = addToGroup(sim, mage, 'priest', 'Fallen Priest');
@@ -110,16 +110,25 @@ describe('Collective Reversal behavior', () => {
     expect(fallenMage.dead).toBe(true);
 
     const completionEvents = sim.tick();
-    for (const revived of [fallenWarrior, fallenPriest, fallenMage]) {
-      expect(revived.dead).toBe(false);
-      expect(revived.ghost).toBe(false);
-      expect(revived.corpsePos).toBeNull();
-      expect(revived.hp).toBe(Math.round(revived.maxHp * 0.3));
-      if (revived.resourceType === 'mana') {
-        expect(revived.resource).toBe(Math.round(revived.maxResource * 0.3));
-      } else {
-        expect(revived.resource).toBe(0);
-      }
+    mage.pos.x += 50;
+    mage.pos.z += 50;
+    const currentCasterPosition = { x: mage.pos.x, z: mage.pos.z };
+    for (const offered of [fallenWarrior, fallenPriest, fallenMage]) {
+      expect(offered.dead).toBe(true);
+      expect(completionEvents).toContainEqual(
+        expect.objectContaining({
+          type: 'resurrectionOffer',
+          pid: offered.id,
+          fromName: mage.name,
+        }),
+      );
+      sim.respondToResurrection(true, offered.id);
+      expect(offered.dead).toBe(false);
+      expect(offered.ghost).toBe(false);
+      expect(offered.corpsePos).toBeNull();
+      expect(offered.pos.x).toBe(currentCasterPosition.x);
+      expect(offered.pos.z).toBe(currentCasterPosition.z);
+      expect(offered.hp).toBe(Math.round(offered.maxHp * 0.3));
     }
     expect(livingMage.hp).toBe(livingHp);
     expect(stranger.dead).toBe(true);
@@ -202,5 +211,17 @@ describe('Collective Reversal online command path', () => {
     client.castAbility(ABILITY_ID);
 
     expect(client.cmd).toHaveBeenCalledWith({ cmd: 'cast', ability: ABILITY_ID });
+  });
+
+  it('sends the resurrection response over the dedicated combat command', () => {
+    const client = Object.create(ClientWorld.prototype) as {
+      respondToResurrection(accept: boolean): void;
+      cmd: ReturnType<typeof vi.fn>;
+    };
+    client.cmd = vi.fn();
+
+    client.respondToResurrection(true);
+
+    expect(client.cmd).toHaveBeenCalledWith({ cmd: 'resurrect_respond', accept: true });
   });
 });

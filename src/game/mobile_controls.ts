@@ -152,6 +152,9 @@ export interface MobileControlCallbacks {
   onMusic(): boolean;
   /** Double-tap the camera joystick: snap the camera back behind the character. */
   onRecenterCamera(): void;
+  /** Commit an active ground-target spell at a stationary canvas tap. Returns
+   * true when targeting consumed the tap, so it cannot also recenter camera. */
+  onGroundAimTap(x: number, y: number): boolean;
 }
 
 /**
@@ -1070,6 +1073,11 @@ export class MobileControls {
     // quick succession recenter the camera, mirroring the joystick logic.
     const now = this.now();
     const quickTap = !this.swipeLookActive && now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    if (quickTap && this.callbacks.onGroundAimTap(e.clientX, e.clientY)) {
+      this.lastSwipeTapAt = 0;
+      this.releaseSwipeLook();
+      return;
+    }
     if (quickTap && isRecenterDoubleTap(this.lastSwipeTapAt, now, this.swipeLookActive)) {
       this.callbacks.onRecenterCamera();
       this.lastSwipeTapAt = 0;

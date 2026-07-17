@@ -192,3 +192,20 @@ describe('Frost phoenix visual progression', () => {
     }
   });
 });
+
+describe('Phoenix mobile size', () => {
+  it('scales the shared proc overlay down only in touch layout', () => {
+    const desktopCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const mobileCss = readFileSync(
+      new URL('../src/styles/hud.mobile.css', import.meta.url),
+      'utf8',
+    );
+    const baseRule = desktopCss.match(/#proc-overlay\s*\{([^}]*)\}/)?.[1] ?? '';
+    const mobileRule = mobileCss.match(/body\.mobile-touch #proc-overlay\s*\{([^}]*)\}/)?.[1] ?? '';
+
+    expect(baseRule).toContain('width: 300px');
+    expect(baseRule).toContain('height: 232px');
+    expect(baseRule).not.toContain('scale: 0.65');
+    expect(mobileRule).toContain('scale: 0.65');
+  });
+});

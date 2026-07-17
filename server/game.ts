@@ -3994,6 +3994,9 @@ export class GameServer {
       case 'resurrect_healer':
         sim.resurrectAtSpiritHealer(pid);
         break;
+      case 'resurrect_respond':
+        if (typeof msg.accept === 'boolean') sim.respondToResurrection(msg.accept, pid);
+        break;
       case 'challengeResponse':
         if (typeof msg.n === 'string' && typeof msg.r === 'string' && typeof msg.sig === 'string') {
           if (!verifyChallenge(msg.n, msg.r, msg.sig, session.clientSeed)) break;

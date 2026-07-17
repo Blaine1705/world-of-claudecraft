@@ -1537,6 +1537,7 @@ export const en_CA: EnTranslations = {
       "haste": "Increases attack and casting speed by {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Battle Stance: 10% more rage generation",
       "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
       "crit": "Increases critical strike chance by {pct}%",
@@ -5360,6 +5361,8 @@ export const en_CA: EnTranslations = {
       "openTrade": "Open Trade",
       "duelRequest": "{name} has challenged you to a duel!",
       "acceptDuel": "Accept Duel",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Decline"
     },
     "combat": {
@@ -7002,7 +7005,7 @@ export const en_CA: EnTranslations = {
       },
       "bladestorm": {
         "name": "Bladestorm",
-        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
+        "description": "Become a whirling storm of steel, striking all enemies within 6 yards for {damage} every second for 4 sec."
       },
       "blink": {
         "name": "Flickerstep",

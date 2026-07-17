@@ -17,6 +17,7 @@ import {
 import { MAX_LEVEL } from '../src/sim/types';
 import {
   type AbilityScaling,
+  abilityBuffValue,
   abilityDamageBonus,
   abilityTemporalHourglassValues,
 } from '../src/ui/ability_damage';
@@ -34,8 +35,16 @@ function required<T>(value: T | undefined): T {
 
 const SC: AbilityScaling = { spellPower: 80, rangedPower: 200, attackPower: 140 };
 const ARCANE_MODS = { ...emptyModifiers(), spec: 'arcane' as const };
+const PROT_MODS = computeTalentModifiers('warrior', {
+  ...emptyAllocation(),
+  spec: 'prot',
+} as never);
 
 describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
+  it('renders Direhowl from its percentage damage reduction, not the retired AP amount', () => {
+    expect(abilityBuffValue(known('warrior', 'demoralizing_shout', PROT_MODS))).toBe(20);
+  });
+
   it('reads Hourglass healing and cooldown percentages from the resolved effect', () => {
     const mods = computeTalentModifiers('mage', {
       ...emptyAllocation(),

@@ -1537,6 +1537,7 @@ export const es: EnTranslations = {
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Actitud de Batalla: un 10% más de generación de ira",
       "berserkerStance": "Actitud Rabiosa: los críticos aciertan un 3% más a menudo y golpean un 3% más fuerte",
       "crit": "Aumenta la probabilidad de golpe crítico un {pct}%",
@@ -5360,6 +5361,8 @@ export const es: EnTranslations = {
       "openTrade": "Abrir comercio",
       "duelRequest": "¡{name} te ha desafiado a un duelo!",
       "acceptDuel": "Aceptar duelo",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Rechazar"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const es: EnTranslations = {
       },
       "battle_shout": {
         "name": "Bramido de Hierro",
-        "description": "Aumenta tu poder de ataque en {buff} durante 2 min."
+        "description": "Un grito que aumenta el poder de ataque de todos los miembros del grupo un {buff}% durante 30 min."
       },
       "demoralizing_shout": {
         "name": "Aullido Pavoroso",
-        "description": "Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en {buff} durante 30 s."
+        "description": "Lanza un grito aterrador que reduce un {buff}% el daño infligido por todos los enemigos cercanos durante 20 s."
       },
       "charge": {
         "name": "Arremetida",
@@ -7002,7 +7005,7 @@ export const es: EnTranslations = {
       },
       "bladestorm": {
         "name": "Tormenta de cuchillas",
-        "description": "Te conviertes en una tormenta giratoria de acero y golpeas a todos los enemigos en un radio de 8 m, infligiéndoles {damage} de daño cada segundo durante 4 s."
+        "description": "Te conviertes en una tormenta giratoria de acero y golpeas a todos los enemigos en un radio de 6 m, infligiéndoles {damage} de daño cada segundo durante 4 s."
       },
       "blink": {
         "name": "Paso Fugaz",

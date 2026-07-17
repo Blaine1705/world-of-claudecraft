@@ -128,6 +128,7 @@ function makeCtx() {
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
+    pendingResurrections: new Map(),
     chatTokens: new Map(),
     channelSubs: new Map(),
     emit,

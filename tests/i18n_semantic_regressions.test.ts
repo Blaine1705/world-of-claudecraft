@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { TranslationKey } from '../src/ui/i18n.catalog';
+import { cs_CZ } from '../src/ui/i18n.locales/cs_CZ';
 import { da_DK } from '../src/ui/i18n.locales/da_DK';
+import { de_DE } from '../src/ui/i18n.locales/de_DE';
 import { es } from '../src/ui/i18n.locales/es';
 import { fr_FR } from '../src/ui/i18n.locales/fr_FR';
 import { id_ID } from '../src/ui/i18n.locales/id_ID';
@@ -18,7 +20,9 @@ import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
 import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
 
 const locales: Record<string, Partial<Record<TranslationKey, string>>> = {
+  cs_CZ,
   da_DK,
+  de_DE,
   es,
   fr_FR,
   id_ID,
@@ -95,4 +99,53 @@ describe('reviewed localization semantics', () => {
   it('pl_PL labels a heroic item rather than heroic mode', () => {
     expect(translation('pl_PL', 'hudChrome.itemHeroicTag')).toBe('[HEROICZNY]');
   });
+
+  const warriorTooltipTerms: Record<string, { group: string; damage: string }> = {
+    cs_CZ: { group: 'všech členů družiny', damage: 'poškození' },
+    da_DK: { group: 'alle gruppemedlemmer', damage: 'skaden' },
+    de_DE: { group: 'aller gruppenmitglieder', damage: 'schaden' },
+    es: { group: 'todos los miembros del grupo', damage: 'daño' },
+    fr_FR: { group: 'tous les membres du groupe', damage: 'dégâts' },
+    id_ID: { group: 'semua anggota kelompok', damage: 'kerusakan' },
+    it_IT: { group: 'tutti i membri del gruppo', damage: 'danni' },
+    ja_JP: { group: 'パーティメンバー全員', damage: 'ダメージ' },
+    ko_KR: { group: '모든 파티원', damage: '피해' },
+    nl_NL: { group: 'alle groepsleden', damage: 'schade' },
+    pl_PL: { group: 'wszystkich członków drużyny', damage: 'obrażenia' },
+    pt_BR: { group: 'todos os membros do grupo', damage: 'dano' },
+    ru_RU: { group: 'всех членов группы', damage: 'урон' },
+    sv_SE: { group: 'alla gruppmedlemmar', damage: 'skadan' },
+    tr_TR: { group: 'tüm grup üyelerinin', damage: 'hasarı' },
+    vi_VN: { group: 'tất cả thành viên tổ đội', damage: 'sát thương' },
+    zh_CN: { group: '所有队伍成员', damage: '伤害' },
+    zh_TW: { group: '所有隊伍成員', damage: '傷害' },
+  };
+
+  for (const [locale, terms] of Object.entries(warriorTooltipTerms)) {
+    it(`${locale} keeps the changed Warrior tooltips aligned with current mechanics`, () => {
+      const ironBellow = translation(
+        locale,
+        'entities.abilities.battle_shout.description',
+      ).toLocaleLowerCase(locale.replace('_', '-'));
+      expect(ironBellow).toContain(terms.group);
+      expect(ironBellow).toContain('{buff}');
+      expect(ironBellow).toContain('%');
+      expect(ironBellow).toContain('30');
+      expect(ironBellow).not.toMatch(/(^|\D)2(\D|$)/);
+
+      const direhowl = translation(
+        locale,
+        'entities.abilities.demoralizing_shout.description',
+      ).toLocaleLowerCase(locale.replace('_', '-'));
+      expect(direhowl).toContain(terms.damage);
+      expect(direhowl).toContain('{buff}');
+      expect(direhowl).toContain('%');
+      expect(direhowl).toContain('20');
+      expect(direhowl).not.toContain('30');
+
+      const bladestorm = translation(locale, 'entities.abilities.bladestorm.description');
+      expect(bladestorm).toMatch(/(^|\D)6(\D|$)/);
+      expect(bladestorm).not.toMatch(/(^|\D)8(\D|$)/);
+    });
+  }
 });

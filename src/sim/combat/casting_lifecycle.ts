@@ -598,7 +598,7 @@ export function castAbility(
       ctx.error(p.id, 'You must target a dead ally in your group.');
       return;
     }
-    if (dist2d(p.pos, dead.pos) > ability.range) {
+    if (dist2d(p.pos, dead.corpsePos ?? dead.pos) > ability.range) {
       ctx.error(p.id, 'Out of range.');
       return;
     }
@@ -1080,7 +1080,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   // the ability's aoeDamage at the aimed point (clamped at cast start, held in
   // castAim for the channel's life), independent of any entity target.
   if (res.def.targetMode === 'position') {
-    const center = p.castAim ?? p.pos;
+    const center = res.def.selfCentered ? p.pos : (p.castAim ?? p.pos);
     const isSpell = res.def.school !== 'physical';
     const radius = res.effects.find((eff) => eff.type === 'aoeDamage')?.radius;
     ctx.emit({

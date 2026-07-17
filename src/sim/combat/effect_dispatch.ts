@@ -31,7 +31,6 @@ import {
   dotTickBonus,
   hotTickBonus,
 } from '../spell_scaling';
-import { revivePlayerAt } from '../spirit';
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
@@ -84,6 +83,7 @@ import { applyGroupHaste } from './haste_burst';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
 import { spawnHunterTrap } from './hunter_trap';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
+import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
 import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
@@ -610,8 +610,8 @@ export function runEffects(
         // Temporal Reversal: rewind a dead group/raid member to life at their corpse
         // (resolved upstream as a dead party/raid member), no resurrection sickness.
         const ally = target;
-        if (!ally || !ally.dead) break;
-        revivePlayerAt(ctx, ally.id, ally.corpsePos ?? ally.pos, eff.hpFrac);
+        if (!ally?.dead) break;
+        offerResurrection(ctx, p, ally, eff.hpFrac);
         ctx.emit({
           type: 'spellfx',
           sourceId: p.id,
@@ -671,7 +671,7 @@ export function runEffects(
             ctx.emit({ type: 'aura', targetId: p.id, name: echoAura.name, gained: false });
             if (!healTarget.dead && healed > 0) {
               const echoHeal = Math.max(1, Math.round(healed * echoAura.value));
-              ctx.applyHeal(p, healTarget, echoHeal, ability.name, ability.id, false);
+              ctx.applyHeal(p, healTarget, echoHeal, ability.name, ability.id, false, false);
             }
           }
         }

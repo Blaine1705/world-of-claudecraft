@@ -49,4 +49,6 @@ export interface IWorldCombat {
   releaseSpirit(): void;
   resurrectAtCorpse(): void;
   resurrectAtSpiritHealer(): void;
+  /** Accept or decline the currently pending player-cast resurrection offer. */
+  respondToResurrection(accept: boolean): void;
 }

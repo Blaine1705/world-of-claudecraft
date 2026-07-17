@@ -58,6 +58,12 @@
   body.mobile-touch #game-canvas {
     touch-action: none;
   }
+  /* The shared Fire, Chronomancy and Frost phoenix keeps its desktop artwork
+     proportions while taking less of the phone battlefield. The root is
+     already draggable, and scale composes with its independent translate. */
+  body.mobile-touch #proc-overlay {
+    scale: 0.65;
+  }
   /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
      chain, so `none` here would block child scroll containers and a child's

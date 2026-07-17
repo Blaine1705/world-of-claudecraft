@@ -1766,6 +1766,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.openTrade': '거래 열기',
   'hud.prompts.duelRequest': '{name}님이 결투를 신청했습니다!',
   'hud.prompts.acceptDuel': '결투 수락',
+  'hud.prompts.resurrectionOffer': '{name}님이 당신을 부활시키려 합니다. 수락하시겠습니까?',
+  'hud.prompts.acceptResurrection': '부활 수락',
   'hud.prompts.decline': '거절',
   'hud.combat.floatingMiss': '빗나감',
   'hud.combat.floatingDodge': '회피',
@@ -2332,10 +2334,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     '강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다.',
   'entities.abilities.battle_shout.name': '강철의 외침',
-  'entities.abilities.battle_shout.description': '2분 동안 전투력이 {buff}만큼 증가합니다.',
+  'entities.abilities.battle_shout.description':
+    '외침을 질러 30분 동안 모든 파티원의 전투력을 {buff}%만큼 증가시킵니다.',
   'entities.abilities.demoralizing_shout.name': '흉포한 울부짖음',
   'entities.abilities.demoralizing_shout.description':
-    '무시무시한 외침을 내질러 30초 동안 주위 모든 적의 전투력을 {buff}만큼 감소시킵니다.',
+    '무시무시한 외침을 내질러 20초 동안 주위 모든 적이 입히는 피해를 {buff}%만큼 감소시킵니다.',
   'entities.abilities.charge.name': '쇄도',
   'entities.abilities.charge.description':
     '적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd.',
@@ -5939,6 +5942,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '공격 속도와 시전 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.dmgDone': '입히는 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.dmgDoneReduce': '입히는 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.heatingUp':
+    '다음 화염 생성기가 연속으로 치명타를 적중하면 몰아치는 열기를 얻고, 치명타가 아니면 달아오름이 제거됩니다',
   'hudChrome.auraEffect.tongues': '시전 시간을 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.damageReduction': '받는 모든 피해가 {pct}% 감소합니다',
   'hudChrome.auraEffect.guardianWard':
@@ -7711,7 +7716,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cone_of_cold.description':
     '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 입힙니다. (냉기 대표 기술)',
   'entities.abilities.bladestorm.description':
-    '소용돌이치는 강철의 폭풍이 되어 4초 동안 매초 8미터 이내의 모든 적에게 {damage}의 피해를 입힙니다.',
+    '소용돌이치는 강철의 폭풍이 되어 4초 동안 매초 6미터 이내의 모든 적에게 {damage}의 피해를 입힙니다.',
   'guide.abilityHook.ice_lance':
     '냉기 발동 효과를 소모하는 즉시 시전 얼음 파편으로, 얼어붙은 대상에게 훨씬 큰 피해를 줍니다.',
   'guide.abilityHook.flurry':

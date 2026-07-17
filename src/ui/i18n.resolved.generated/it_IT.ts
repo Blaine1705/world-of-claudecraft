@@ -1537,6 +1537,7 @@ export const it_IT: EnTranslations = {
       "haste": "Aumenta la velocità di attacco e lancio del {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Posizione di Battaglia: 10% di generazione di rabbia in più",
       "berserkerStance": "Posizione del Berserker: colpi critici il 3% più frequenti e il 3% più potenti",
       "crit": "Aumenta la probabilità di colpo critico del {pct}%",
@@ -5360,6 +5361,8 @@ export const it_IT: EnTranslations = {
       "openTrade": "Apri scambio",
       "duelRequest": "{name} ti ha sfidato a duello!",
       "acceptDuel": "Accetta duello",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Rifiuta"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const it_IT: EnTranslations = {
       },
       "battle_shout": {
         "name": "Urlo di Ferro",
-        "description": "Aumenta la tua potenza d'attacco di {buff} per 2 min."
+        "description": "Un urlo che aumenta del {buff}% la potenza d'attacco di tutti i membri del gruppo per 30 min."
       },
       "demoralizing_shout": {
         "name": "Ululato Sinistro",
-        "description": "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di {buff} per 30 sec."
+        "description": "Emette un urlo terrificante, riducendo del {buff}% i danni inflitti da tutti i nemici vicini per 20 sec."
       },
       "charge": {
         "name": "Irruzione",
@@ -7002,7 +7005,7 @@ export const it_IT: EnTranslations = {
       },
       "bladestorm": {
         "name": "Tempesta di Lame",
-        "description": "Diventi una tempesta d’acciaio vorticante che colpisce tutti i nemici entro 8 m, infliggendo {damage} danni ogni secondo per 4 s."
+        "description": "Diventi una tempesta d’acciaio vorticante che colpisce tutti i nemici entro 6 m, infliggendo {damage} danni ogni secondo per 4 s."
       },
       "blink": {
         "name": "Passo Baleno",

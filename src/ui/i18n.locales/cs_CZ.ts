@@ -4044,7 +4044,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Dubová kůže',
   'entities.abilities.bash.description': 'Omráčí cíl na 2 s. Pouze v medvědí podobě.',
   'entities.abilities.bash.name': 'Otřes',
-  'entities.abilities.battle_shout.description': 'Zvýší tvoji sílu útoku o {buff} na 2 min.',
+  'entities.abilities.battle_shout.description':
+    'Výkřik, který zvýší sílu útoku všech členů družiny o {buff}% na 30 min.',
   'entities.abilities.battle_shout.name': 'Železný řev',
   'entities.abilities.bear_charge.name': 'Medvědí výpad',
   'entities.abilities.bear_form.description':
@@ -4114,7 +4115,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Demoralizuje blízké nepřátele a sníží jejich sílu útoku o 20 na 20 s. Pouze v medvědí podobě.',
   'entities.abilities.demoralizing_roar.name': 'Zbabělý řev',
   'entities.abilities.demoralizing_shout.description':
-    'Vypustíš děsivý řev, který sníží sílu útoku všech blízkých nepřátel o {buff} na 30 s.',
+    'Vypustíš děsivý řev, který sníží poškození způsobované všemi blízkými nepřáteli o {buff}% na 20 s.',
   'entities.abilities.demoralizing_shout.name': 'Děsivé vytí',
   'entities.abilities.devotion_aura.description': 'Zvýší tvoji zbroj o {buff} na 30 min.',
   'entities.abilities.devotion_aura.name': 'Neochvějná aura',
@@ -4833,7 +4834,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Na 15 s vám zvýší útočnou sílu o 70. (druidský talent)',
   'entities.abilities.bladestorm.name': 'Bouře čepelí',
   'entities.abilities.bladestorm.description':
-    'Proměníš se ve vířící bouři oceli a po dobu 4 s každou sekundu zasáhneš všechny nepřátele do 8 metrů za {damage} poškození.',
+    'Proměníš se ve vířící bouři oceli a po dobu 4 s každou sekundu zasáhneš všechny nepřátele do 6 metrů za {damage} poškození.',
   'entities.abilities.blink.description':
     'Teleportuje vás o 15 m vpřed a zruší účinky zakořenění. (mágský talent)',
   'entities.abilities.bloodlust.description':

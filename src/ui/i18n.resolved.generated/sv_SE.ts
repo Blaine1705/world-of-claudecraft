@@ -1537,6 +1537,7 @@ export const sv_SE: EnTranslations = {
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Stridsställning: 10% mer raserigenerering",
       "berserkerStance": "Bärsärkaställning: kritiska träffar sker 3% oftare och slår 3% hårdare",
       "crit": "Ökar kritisk träffchans med {pct}%",
@@ -5360,6 +5361,8 @@ export const sv_SE: EnTranslations = {
       "openTrade": "Öppna byteshandel",
       "duelRequest": "{name} har utmanat dig på en duell!",
       "acceptDuel": "Anta duell",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Avböj"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const sv_SE: EnTranslations = {
       },
       "battle_shout": {
         "name": "Järnvrål",
-        "description": "Ökar din attackkraft med {buff} i 2 min."
+        "description": "Ett rop som ökar attackkraften hos alla gruppmedlemmar med {buff}% i 30 min."
       },
       "demoralizing_shout": {
         "name": "Fasans tjut",
-        "description": "Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med {buff} i 30 sek."
+        "description": "Utstöter ett skräckinjagande rop som minskar skadan som alla närliggande fiender orsakar med {buff}% i 20 sek."
       },
       "charge": {
         "name": "Anstormning",
@@ -7002,7 +7005,7 @@ export const sv_SE: EnTranslations = {
       },
       "bladestorm": {
         "name": "Klingstorm",
-        "description": "Bli en virvlande storm av stål och träffa alla fiender inom 8 meter för {damage} skada varje sekund i 4 sek."
+        "description": "Bli en virvlande storm av stål och träffa alla fiender inom 6 meter för {damage} skada varje sekund i 4 sek."
       },
       "blink": {
         "name": "Flimmersteg",

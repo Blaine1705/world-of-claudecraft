@@ -49,6 +49,7 @@ import type {
   Entity,
   ErrorReason,
   ItemInstancePayload,
+  PendingResurrection,
   PlayerClass,
   QuestProgress,
   ReadyCheck,
@@ -168,6 +169,9 @@ export interface SimContextPrimitives {
   // Active party/raid ready checks (social/ready_check.ts), keyed by party id. Swept
   // in the end-of-tick block by updateReadyChecks. Sim-internal, never wired.
   readonly readyChecks: Map<number, ReadyCheck>;
+  // Player-cast resurrection offers, keyed by the dead recipient. The spell and
+  // response paths share this live authoritative map across all three hosts.
+  readonly pendingResurrections: Map<number, PendingResurrection>;
   readonly chatTokens: Map<number, { tokens: number; at: number }>;
   readonly channelSubs: Map<number, Set<JoinableChannel>>;
   // L1 loot-distribution state. The pending need-greed rolls map is mutated in
@@ -363,6 +367,7 @@ export interface SimContextCallbacks {
     ability: string,
     abilityId?: string | null,
     canCrit?: boolean,
+    canTriggerWeaponProcs?: boolean,
   ): number;
   // Spell crit chance from intellect. STAYS on Sim (shared: the casting/ability
   // paths read it too); exposed here so the extracted heal core can draw its crit.
@@ -963,6 +968,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get readyChecks() {
       return host.readyChecks;
+    },
+    get pendingResurrections() {
+      return host.pendingResurrections;
     },
     get chatTokens() {
       return host.chatTokens;

@@ -2,8 +2,8 @@
 // authoritative party roster and is kept deterministic by preserving roster order.
 
 import type { SimContext } from '../sim_context';
-import { revivePlayerAt } from '../spirit';
 import type { AbilityDef, Entity } from '../types';
+import { offerResurrection } from './resurrection_offer';
 
 export function isMassResurrectionAbility(ability: Pick<AbilityDef, 'effects'>): boolean {
   return ability.effects.some((effect) => effect.type === 'massResurrectGroup');
@@ -26,7 +26,7 @@ export function resurrectDeadGroupMembers(ctx: SimContext, caster: Entity, hpFra
     const member = ctx.entities.get(memberId);
     if (member?.kind !== 'player' || (!member.dead && !member.ghost)) continue;
     const body = member.corpsePos ?? member.pos;
-    revivePlayerAt(ctx, member.id, body, hpFrac);
+    offerResurrection(ctx, caster, member, hpFrac);
     ctx.emit({
       type: 'spellfxAt',
       x: body.x,

@@ -5,6 +5,7 @@
 // tests/auras_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
+import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import {
   type AuraInput,
   type AuraMode,
@@ -165,6 +166,25 @@ describe('createAurasView: derivation per mode', () => {
     expect(s.stacksText).toBe('5');
     expect(s.name).toBe('name:Gaping Wounds');
     expect(s.remaining).toBe(4.2);
+  });
+
+  it('renders Elemental Convergence effect text through the real top-right buff view path', () => {
+    const convergence = aura({
+      id: 'elemental_convergence',
+      name: 'Elemental Convergence',
+      kind: 'buff_dmg_done',
+      value: 0.15,
+    });
+    const viewDeps: AurasDeps = {
+      ...deps(),
+      auraEffectHtml: (input) => {
+        const descriptor = auraEffectDescriptor(input);
+        return descriptor ? `${descriptor.key}:${descriptor.nums?.pct ?? ''}` : '';
+      },
+    };
+
+    const slot = createAurasView('buffs', viewDeps).tick(entity([convergence])).slots[0];
+    expect(slot.effectHtml).toBe('hudChrome.auraEffect.dmgDone:15');
   });
 
   it('derives the debuff school for the border tint (physical fallback; buffs carry none)', () => {

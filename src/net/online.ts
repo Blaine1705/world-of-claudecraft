@@ -2473,6 +2473,9 @@ export class ClientWorld implements IWorld {
   resurrectAtSpiritHealer(): void {
     this.cmd({ cmd: 'resurrect_healer' });
   }
+  respondToResurrection(accept: boolean): void {
+    this.cmd({ cmd: 'resurrect_respond', accept });
+  }
 
   // --- IWorldTargeting: target selection + tab cycling ---
   targetEntity(id: number | null): void {

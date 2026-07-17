@@ -107,6 +107,57 @@ describe('Ice Block: immunity + cleanse + control', () => {
     }
   });
 
+  it('rejects every incoming external crowd-control aura until Ice Block ends', () => {
+    const { sim, p } = rigMage();
+    const mob = addTargetMob(sim);
+    const crowdControlKinds: Aura['kind'][] = [
+      'polymorph',
+      'stun',
+      'root',
+      'incapacitate',
+      'silence',
+      'blind',
+      'disarm',
+      'slow',
+    ];
+    const applyCrowdControl = (kind: Aura['kind']) => {
+      const incoming = debuff(`incoming_${kind}`, kind, kind === 'slow' ? 0.5 : 0);
+      incoming.sourceId = mob.id;
+      (sim as unknown as { applyAura(target: Entity, aura: Aura): void }).applyAura(p, incoming);
+    };
+    sim.castAbility('ice_block');
+    for (const kind of crowdControlKinds) applyCrowdControl(kind);
+    for (const kind of crowdControlKinds) {
+      expect(p.auras.some((aura) => aura.id === `incoming_${kind}`)).toBe(false);
+    }
+
+    sim.castAbility('ice_block');
+    applyCrowdControl('polymorph');
+    applyCrowdControl('slow');
+    expect(p.auras.some((aura) => aura.id === 'incoming_polymorph')).toBe(true);
+    expect(p.auras.some((aura) => aura.id === 'incoming_slow')).toBe(true);
+  });
+
+  it('rejects incoming knockback until Ice Block ends', () => {
+    const { sim, p } = rigMage();
+    const mob = addTargetMob(sim);
+    const applyKnockback = () =>
+      (
+        sim as unknown as {
+          applyKnockback(source: Entity, target: Entity, distance: number): number;
+        }
+      ).applyKnockback(mob, p, 4);
+
+    sim.castAbility('ice_block');
+    const blockedPosition = { ...p.pos };
+    expect(applyKnockback()).toBe(0);
+    expect(p.pos).toEqual(blockedPosition);
+
+    sim.castAbility('ice_block');
+    expect(applyKnockback()).toBeGreaterThan(0);
+    expect(p.pos).not.toEqual(blockedPosition);
+  });
+
   it('recast cancels the stasis early', () => {
     const { sim, p } = rigMage();
     sim.castAbility('ice_block');

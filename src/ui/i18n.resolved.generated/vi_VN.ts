@@ -1537,6 +1537,7 @@ export const vi_VN: EnTranslations = {
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Thế Công: tạo nộ khí nhiều hơn 10%",
       "berserkerStance": "Thế Cuồng Chiến: chí mạng thường xuyên hơn 3% và mạnh hơn 3%",
       "crit": "Tăng tỉ lệ chí mạng thêm {pct}%",
@@ -5360,6 +5361,8 @@ export const vi_VN: EnTranslations = {
       "openTrade": "Mở Giao Dịch",
       "duelRequest": "{name} đã thách đấu tay đôi với bạn!",
       "acceptDuel": "Chấp Nhận Đấu Tay Đôi",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Từ Chối"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const vi_VN: EnTranslations = {
       },
       "battle_shout": {
         "name": "Tiếng Gầm Thép",
-        "description": "Tăng sức mạnh tấn công của ngươi thêm {buff} trong 2 phút."
+        "description": "Một tiếng hô làm tăng {buff}% sức mạnh tấn công của tất cả thành viên tổ đội trong 30 phút."
       },
       "demoralizing_shout": {
         "name": "Tiếng Hú Hung Hiểm",
-        "description": "Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi {buff} trong 30 giây."
+        "description": "Phát ra tiếng hô đáng sợ, giảm {buff}% sát thương do tất cả kẻ địch xung quanh gây ra trong 20 giây."
       },
       "charge": {
         "name": "Xông Tới",
@@ -7002,7 +7005,7 @@ export const vi_VN: EnTranslations = {
       },
       "bladestorm": {
         "name": "Bão Kiếm",
-        "description": "Hóa thành một cơn bão thép cuồng xoáy, đánh trúng mọi kẻ địch trong phạm vi 8 mét với {damage} sát thương mỗi giây trong 4 giây."
+        "description": "Hóa thành một cơn bão thép cuồng xoáy, đánh trúng mọi kẻ địch trong phạm vi 6 mét với {damage} sát thương mỗi giây trong 4 giây."
       },
       "blink": {
         "name": "Bước Chớp",

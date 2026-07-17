@@ -1960,7 +1960,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyetrum target selama 2 detik. Hanya dalam Wujud Bruin.',
   'entities.abilities.bash.name': 'Guncangan',
   'entities.abilities.battle_shout.description':
-    'Meningkatkan daya serangmu sebesar {buff} selama 2 menit.',
+    'Teriakan yang meningkatkan daya serang semua anggota kelompok sebesar {buff}% selama 30 menit.',
   'entities.abilities.battle_shout.name': 'Raungan Besi',
   'entities.abilities.bear_charge.description':
     'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard. Hanya dalam Wujud Bruin.',
@@ -2034,7 +2034,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melemahkan semangat musuh di sekitar, mengurangi kekuatan serang mereka sebesar 20 selama 20 detik. Hanya dalam Wujud Bruin.',
   'entities.abilities.demoralizing_roar.name': 'Auman Pengecut',
   'entities.abilities.demoralizing_shout.description':
-    'Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar {buff} selama 30 detik.',
+    'Melepaskan pekikan mengerikan yang mengurangi kerusakan yang ditimbulkan semua musuh di sekitar sebesar {buff}% selama 20 detik.',
   'entities.abilities.demoralizing_shout.name': 'Direhowl',
   'entities.abilities.devotion_aura.description':
     'Meningkatkan zirahmu sebesar {buff} selama 30 menit.',
@@ -7754,7 +7754,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan daya serangmu sebesar 70 selama 15 detik. (talenta Druid)',
   'entities.abilities.bladestorm.name': 'Badai Pedang',
   'entities.abilities.bladestorm.description':
-    'Menjadi badai baja yang berputar, menghantam semua musuh dalam jarak 8 meter sebesar {damage} setiap detik selama 4 detik.',
+    'Menjadi badai baja yang berputar, menghantam semua musuh dalam jarak 6 meter sebesar {damage} setiap detik selama 4 detik.',
   'entities.abilities.blink.description':
     'Menteleportasimu 15 m ke depan dan membebaskan efek pengakaran. (talenta Mage)',
   'entities.abilities.bloodlust.description':

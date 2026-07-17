@@ -1537,6 +1537,7 @@ export const da_DK: EnTranslations = {
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "battleStance": "Kampstilling: 10% mere raserigenerering",
       "berserkerStance": "Berserkerstilling: kritiske slag rammer 3% oftere og slår 3% hårdere",
       "crit": "Øger chancen for kritiske slag med {pct}%",
@@ -5360,6 +5361,8 @@ export const da_DK: EnTranslations = {
       "openTrade": "Åbn handel",
       "duelRequest": "{name} har udfordret dig til en duel!",
       "acceptDuel": "Accepter duel",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Afvis"
     },
     "combat": {
@@ -6094,11 +6097,11 @@ export const da_DK: EnTranslations = {
       },
       "battle_shout": {
         "name": "Jernbrøl",
-        "description": "Øger din angrebskraft med {buff} i 2 min."
+        "description": "Et råb, der øger angrebskraften hos alle gruppemedlemmer med {buff}% i 30 min."
       },
       "demoralizing_shout": {
         "name": "Rædselshyl",
-        "description": "Udstøder et frygtindgydende råb, der sænker angrebsstyrken hos alle nærliggende fjender med {buff} i 30 sek."
+        "description": "Udstøder et frygtindgydende råb, der reducerer skaden, som alle nærliggende fjender forvolder, med {buff}% i 20 sek."
       },
       "charge": {
         "name": "Fremstorm",
@@ -7002,7 +7005,7 @@ export const da_DK: EnTranslations = {
       },
       "bladestorm": {
         "name": "Klingestorm",
-        "description": "Bliv til en hvirvlende storm af stål, og ram alle fjender inden for 8 meter for {damage} skade hvert sekund i 4 sek."
+        "description": "Bliv til en hvirvlende storm af stål, og ram alle fjender inden for 6 meter for {damage} skade hvert sekund i 4 sek."
       },
       "blink": {
         "name": "Flimmertrin",

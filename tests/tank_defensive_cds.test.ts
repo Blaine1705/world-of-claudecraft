@@ -126,6 +126,29 @@ describe('Tank defensive cooldowns: known by their class at 20', () => {
   });
 });
 
+describe('Generic shield-wall ward infrastructure', () => {
+  it('reduces all-school damage without depending on a specific ability id', () => {
+    const { sim, p } = make('warrior');
+    p.maxHp = p.hp = 1_000_000;
+    p.auras.push({
+      id: 'test_generic_wall',
+      name: 'Test Generic Wall',
+      kind: 'shield_wall',
+      remaining: 8,
+      duration: 8,
+      value: 0.4,
+      sourceId: p.id,
+      school: 'physical',
+    });
+    const mob = spawnMob(sim, p, 3);
+    for (const school of ['physical', 'fire', 'shadow'] as const) {
+      const before = p.hp;
+      (sim as any).dealDamage(mob, p, 100, false, school, null, 'hit');
+      expect(before - p.hp).toBe(60);
+    }
+  });
+});
+
 describe('Sacred Bulwark (paladin): divine cheat-death', () => {
   it('denies a lethal blow and restores 35% health, consuming the ward', () => {
     const { sim, p, pid } = make('paladin');
