@@ -12,6 +12,7 @@ import { enterOfflineGame } from '../enter_offline_game.mjs';
 import { attributeFreezes, frameStats, normalizeReport } from './metrics.mjs';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const BOT_JOIN_CONCURRENCY = 8;
 const CLASSES = [
   'warrior',
   'paladin',
@@ -23,6 +24,13 @@ const CLASSES = [
   'druid',
   'shaman',
 ];
+
+function characterNameToken(value) {
+  return String(value)
+    .replace(/\d/g, (digit) => 'abcdefghij'[Number(digit)])
+    .replace(/[^a-z]/gi, 'a')
+    .toLowerCase();
+}
 
 // Injected once per session. A rAF loop records per-frame {dt, programs, views}
 // plus longtasks (so the profiler gets real 1%/0.1% lows + freeze attribution),
@@ -160,11 +168,11 @@ class Bot {
       .split('')
       .map((d) => 'abcdefghij'[+d])
       .join('');
-    this.name = `Pb${uniq}${li}`;
+    this.name = `Pb${characterNameToken(uniq)}${li}`;
     this.uniq = uniq;
+    this.ip = `9.${(i >> 8) & 255}.${i & 255}.7`;
   }
   async join() {
-    const xff = `172.16.${Math.floor(this.i / 254)}.${(this.i % 254) + 1}`;
     const reg = await api(
       this.server,
       '/api/register',
@@ -174,7 +182,7 @@ class Bot {
         email: `prof_${this.uniq}_${this.i}@example.com`,
       },
       undefined,
-      xff,
+      this.ip,
     );
     this.token = reg.body.token;
     if (!this.token)
@@ -184,25 +192,43 @@ class Bot {
       '/api/characters',
       { name: this.name, class: this.cls },
       this.token,
-      xff,
+      this.ip,
     );
     this.charId = char.body.id;
     if (!this.charId)
       throw new Error(`charcreate ${this.i}: ${JSON.stringify(char.body).slice(0, 80)}`);
     await new Promise((resolve, reject) => {
-      this.ws = new WebSocket(`${this.wsBase}/ws`);
-      const to = setTimeout(() => reject(new Error('join timeout')), 12000);
+      this.ws = new WebSocket(`${this.wsBase}/ws`, {
+        headers: { 'X-Forwarded-For': this.ip },
+      });
+      let settled = false;
+      let to;
+      const finish = (error) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(to);
+        if (error) {
+          this.close();
+          reject(error);
+        } else {
+          resolve();
+        }
+      };
+      to = setTimeout(() => finish(new Error('join timeout')), 30000);
       this.ws.on('open', () =>
         this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId })),
       );
       this.ws.on('message', (data) => {
-        const m = JSON.parse(String(data));
-        if (m.t === 'hello') {
-          clearTimeout(to);
-          resolve();
+        try {
+          const m = JSON.parse(String(data));
+          if (m.t === 'hello') finish();
+          else if (m.t === 'error') finish(new Error(m.error || 'websocket authentication failed'));
+        } catch (error) {
+          finish(error);
         }
       });
-      this.ws.on('error', reject);
+      this.ws.on('error', finish);
+      this.ws.on('close', () => finish(new Error('socket closed before hello')));
     });
   }
   cmd(p) {
@@ -234,10 +260,11 @@ export class Profiler {
     this.targetFps = opts.targetFps ?? 60;
     this.browserPath = opts.browserPath ?? process.env.BROWSER_PATH ?? BROWSER_PATH;
     this.shotDir = opts.shotDir ?? process.env.PROF_SHOT ?? null; // screenshot each sample (overlay visible)
-    this.uniq = (process.env.PROF_UNIQ ?? String(Math.floor(performance.now())) + 'x')
+    this.uniq = (process.env.PROF_UNIQ ?? `${Date.now().toString(36)}${process.pid.toString(36)}`)
       .replace(/[^a-z0-9]/gi, '')
-      .slice(-6);
+      .slice(-10);
     this.bots = [];
+    this.nextBotIndex = 0;
     this.mode = 'offline';
   }
 
@@ -334,7 +361,10 @@ export class Profiler {
         timeout: 12000,
         polling: 200,
       });
-      const nm = `Pcam${this.uniq}`;
+      // Character names accept letters only; the profiler uniqueness token is
+      // timestamp-derived and normally contains digits. Map those digits to
+      // stable letters so the real client validation reaches createCharacter.
+      const nm = `Pcam${characterNameToken(this.uniq)}`;
       await page.evaluate(
         (nm, cls) => {
           const n = document.querySelector('#new-char-name');
@@ -509,19 +539,26 @@ export class Profiler {
     if (this.mode !== 'online') throw new Error('spawnCrowd needs online mode');
     const c = this.center;
     const batch = [];
-    for (let i = this.bots.length; i < n; i++)
-      batch.push(new Bot(this.server, this.wsBase, this.uniq, i));
-    await Promise.all(
-      batch.map((b) =>
-        b
-          .join()
-          .then(() => {
-            b.place(c.x, c.z, radius);
-            this.bots.push(b);
-          })
-          .catch((e) => this.log(`  bot ${b.i}: ${String(e).slice(0, 60)}`)),
-      ),
-    );
+    const missing = Math.max(0, n - this.bots.length);
+    for (let count = 0; count < missing; count++)
+      batch.push(new Bot(this.server, this.wsBase, this.uniq, this.nextBotIndex++));
+    for (let start = 0; start < batch.length; start += BOT_JOIN_CONCURRENCY) {
+      const chunk = batch.slice(start, start + BOT_JOIN_CONCURRENCY);
+      await Promise.all(
+        chunk.map((b) =>
+          b
+            .join()
+            .then(() => {
+              b.place(c.x, c.z, radius);
+              this.bots.push(b);
+            })
+            .catch((e) => {
+              b.close();
+              this.log(`  bot ${b.i}: ${String(e).slice(0, 60)}`);
+            }),
+        ),
+      );
+    }
     for (const b of this.bots) b.place(c.x, c.z, radius);
     return this.bots.length;
   }
