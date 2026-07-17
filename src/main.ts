@@ -143,19 +143,25 @@ import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
+import { HEROIC_VENDOR_STOCK } from './sim/content/heroic_vendor';
+import { talentsFor } from './sim/content/talents';
 import {
   GATHER_NODES,
   ITEMS,
   isDelvePos,
   isRiftPos,
+  QUESTS,
+  questRewardItem,
   setActiveWorldContent,
   ZONES,
 } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
+import { MARKET_HOUSE_STOCK } from './sim/market';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
+  ALL_CLASSES,
   DT,
   dist2d,
   INTERACT_RANGE,
@@ -208,6 +214,7 @@ import {
   setDiscordUiEnabled,
 } from './ui/discord_status';
 import { renderDiscordWidget } from './ui/discord_widget';
+import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { type ClaudiumHooks, Hud } from './ui/hud';
@@ -233,7 +240,7 @@ import {
   t,
   tPlural,
 } from './ui/i18n';
-import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
+import { defaultIconPrewarmPlan, type IconPrewarmEntry, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { applyNativeDeviceLanguage } from './ui/native_language';
@@ -248,6 +255,7 @@ import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overl
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { shouldShowStorePromo } from './ui/store_promo_card';
+import { talentChoiceIconRef, talentNodeIconRef } from './ui/talent_icons';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
   classifyAuthCode,
@@ -1047,6 +1055,57 @@ async function startGame(
     // opening the map right after a crossing never pays the terrain render.
     renderer.onZonePrepared = (zoneId) => hud.queueMapBgPrewarm(zoneId);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
+    hud.prewarmStaticUiAssets();
+
+    // Start the worker-backed procedural icon warmup while the loading screen
+    // is still opaque. Player-specific windows get a small eager prefix; the
+    // rest of the catalog stays in the idle lane. This removes synchronous PNG
+    // encoding from the first bags/character/spellbook/vendor open without
+    // moving that work onto the main thread.
+    const iconPriorities: IconPrewarmEntry[] = [];
+    const prioritizeItem = (id: string | null | undefined): void => {
+      if (id) iconPriorities.push({ kind: 'item', id });
+    };
+    for (const id of Object.values(world.equipment)) prioritizeItem(id);
+    // Party frames render compact 20px crests, while profile/Inspect chips use
+    // 96px badges. Cache keys include size, so warm both exact consumer
+    // dimensions; otherwise the first inspected player synchronously encodes a
+    // procedural crest even though its 3D portrait is already cached.
+    for (const cls of ALL_CLASSES) {
+      iconPriorities.push({ kind: 'crest', id: `class_${cls}`, size: 20 });
+      iconPriorities.push({ kind: 'crest', id: `class_${cls}`, size: 96 });
+    }
+    for (const slot of world.inventory) prioritizeItem(slot.itemId);
+    for (const id of world.bags) prioritizeItem(id);
+    for (const ability of world.known) iconPriorities.push({ kind: 'ability', id: ability.def.id });
+    // Spellbook paints the whole class kit, including not-yet-learned rows.
+    for (const id of CLASSES[world.cfg.playerClass].abilities)
+      iconPriorities.push({ kind: 'ability', id });
+    // Talent nodes also use procedural crest ids that are absent from ABILITIES,
+    // plus talent-granted abilities not guaranteed to be in the base kit.
+    const classTalents = talentsFor(world.cfg.playerClass);
+    for (const node of classTalents?.nodes ?? []) {
+      iconPriorities.push(talentNodeIconRef(node));
+      for (const choice of node.choices ?? []) iconPriorities.push(talentChoiceIconRef(choice));
+    }
+    for (const recipe of world.recipeList) prioritizeItem(recipe.resultItemId);
+    for (const id of finderLootItemIds()) prioritizeItem(id);
+    // Gossip/quest-log reward rows and the heroic marks shop can be opened from
+    // navigation chrome before the all-items idle sweep reaches their ids.
+    for (const entity of world.entities.values()) {
+      for (const questId of entity.questIds) {
+        const quest = QUESTS[questId];
+        if (quest) prioritizeItem(questRewardItem(quest, world.cfg.playerClass));
+      }
+    }
+    for (const offer of HEROIC_VENDOR_STOCK) prioritizeItem(offer.itemId);
+    for (const listing of world.marketInfo?.listings ?? []) prioritizeItem(listing.itemId);
+    for (const slot of world.marketInfo?.collectionItems ?? []) prioritizeItem(slot.itemId);
+    for (const listing of MARKET_HOUSE_STOCK) prioritizeItem(listing.itemId);
+    for (const entity of world.entities.values())
+      for (const id of entity.vendorItems) prioritizeItem(id);
+    const iconPrewarm = defaultIconPrewarmPlan(iconPriorities);
+    prewarmIconCache(iconPrewarm.entries, { eagerCount: iconPrewarm.priorityCount });
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
     // loading screen up forever
@@ -2019,7 +2078,7 @@ async function startGame(
         api.reportPlayerByName(online.characterId, targetName, reason, details),
     });
     hud.attachBugReporting({
-      capture: async () => (renderer ? await renderer.captureScreenshot() : null),
+      capture: () => renderer?.captureScreenshot() ?? Promise.resolve(null),
       collectMeta: () =>
         assembleBugReportMeta({
           build: `${__APP_VERSION__} (${__APP_BUILD_ID__})`,
@@ -3388,6 +3447,20 @@ async function startGame(
     // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
   }
+  try {
+    await hud.prewarmCharacterPreview();
+  } catch (err) {
+    // The paperdoll preview is optional UI. If its secondary WebGL context
+    // cannot prewarm, opening the window can still take the normal lazy path.
+    console.warn('Character preview prewarm failed', err);
+  }
+  try {
+    await hud.prewarmArmoryPreview();
+  } catch (err) {
+    // The store is optional and online-only. A secondary-context failure must
+    // never prevent entering the world; opening it can retain the lazy path.
+    console.warn('Armory preview prewarm failed', err);
+  }
   setLoadingPercent(100, t('loading.enteringWorld'));
   await nextPaint();
   last = performance.now();
@@ -3408,10 +3481,6 @@ async function startGame(
           tokenProvider: () => api.token,
           characterIdProvider: () => online?.characterId ?? null,
         });
-        // Warm the procedural icon cache during idle time so the first
-        // bags/vendor/loot open never pays the compose burst synchronously
-        // (icon_prewarm.ts). Re-entry is a fast no-op: the cache is module-global.
-        prewarmIconCache(defaultIconPrewarmEntries());
         // First-run camera-mode prompt (issue #1727): show once per browser on a
         // mouse-driven interface, after any spawn cinematic has finished. Applies
         // the choice through the same applySetting path as the Key Bindings toggle.

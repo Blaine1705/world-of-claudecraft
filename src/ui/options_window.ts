@@ -1157,10 +1157,6 @@ export class OptionsWindow {
       infoRow(t('hudChrome.bugReport.position'), coords);
     body.appendChild(infoEl);
 
-    // Start the capture as soon as the form opens so it reflects what the player
-    // saw, but do not hold the form's first paint while JPEG encoding runs.
-    const shotPromise = hooks.capture();
-
     const descLabel = document.createElement('label');
     descLabel.className = 'bug-label';
     descLabel.setAttribute('for', 'bug-desc');
@@ -1173,45 +1169,59 @@ export class OptionsWindow {
     desc.setAttribute('aria-describedby', 'bug-error');
     body.append(descLabel, desc);
 
-    let shot: string | null = null;
-    let includeShot = false;
-    const shotWrap = document.createElement('div');
-    shotWrap.className = 'bug-shot';
-    body.appendChild(shotWrap);
-    void shotPromise
-      .then((captured) => {
-        if (!captured || this.view !== 'bugreport' || !shotWrap.isConnected) return;
-        shot = captured;
-        includeShot = true;
-        const img = document.createElement('img');
-        img.className = 'bug-shot-img';
-        img.src = captured;
-        img.alt = t('hudChrome.bugReport.screenshotAlt');
-        const toggle = document.createElement('button');
-        toggle.type = 'button';
-        toggle.className = 'btn set-toggle';
-        const syncToggle = () => {
-          toggle.textContent = includeShot ? t('hud.options.on') : t('hud.options.off');
-          toggle.classList.toggle('off', !includeShot);
-          toggle.setAttribute('aria-pressed', String(includeShot));
-          toggle.setAttribute('aria-label', t('hudChrome.bugReport.includeScreenshot'));
-          img.style.display = includeShot ? '' : 'none';
-        };
-        toggle.addEventListener('click', () => {
-          audio.click();
-          includeShot = !includeShot;
-          syncToggle();
-        });
+    // Start the framebuffer copy in an idle slot after the form itself can paint.
+    // Renderer.captureScreenshot copies the live WebGL frame synchronously inside
+    // that slot, then JPEG-encodes asynchronously. The promise is also the submit
+    // gate, so a very fast submit cannot silently omit a capture still in flight.
+    let includeShot = true;
+    const shotHost = document.createElement('div');
+    shotHost.hidden = true;
+    body.appendChild(shotHost);
+    const capturePromise = new Promise<string | null>((resolve) => {
+      const capture = (): void => {
+        void hooks.capture().then(resolve, () => resolve(null));
+      };
+      const idleWindow = window as typeof window & {
+        requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
+      };
+      if (idleWindow.requestIdleCallback) idleWindow.requestIdleCallback(capture, { timeout: 500 });
+      else window.setTimeout(capture, 0);
+    }).then((shot) => {
+      includeShot = shot !== null;
+      if (!shot || !shotHost.isConnected) return shot;
+      const shotWrap = document.createElement('div');
+      shotWrap.className = 'bug-shot';
+      const img = document.createElement('img');
+      img.className = 'bug-shot-img';
+      img.src = shot;
+      img.alt = t('hudChrome.bugReport.screenshotAlt');
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'btn set-toggle';
+      const syncToggle = () => {
+        toggle.textContent = includeShot ? t('hud.options.on') : t('hud.options.off');
+        toggle.classList.toggle('off', !includeShot);
+        toggle.setAttribute('aria-pressed', String(includeShot));
+        toggle.setAttribute('aria-label', t('hudChrome.bugReport.includeScreenshot'));
+        img.style.display = includeShot ? '' : 'none';
+      };
+      toggle.addEventListener('click', () => {
+        audio.click();
+        includeShot = !includeShot;
         syncToggle();
-        const toggleRow = document.createElement('div');
-        toggleRow.className = 'set-row';
-        const name = document.createElement('span');
-        name.className = 'set-name';
-        name.textContent = t('hudChrome.bugReport.includeScreenshot');
-        toggleRow.append(name, toggle);
-        shotWrap.append(toggleRow, img);
-      })
-      .catch(() => undefined);
+      });
+      syncToggle();
+      const toggleRow = document.createElement('div');
+      toggleRow.className = 'set-row';
+      const name = document.createElement('span');
+      name.className = 'set-name';
+      name.textContent = t('hudChrome.bugReport.includeScreenshot');
+      toggleRow.append(name, toggle);
+      shotWrap.append(toggleRow, img);
+      shotHost.hidden = false;
+      shotHost.replaceChildren(shotWrap);
+      return shot;
+    });
 
     const error = document.createElement('div');
     error.className = 'report-error';
@@ -1243,24 +1253,29 @@ export class OptionsWindow {
       }
       submit.disabled = true;
       error.textContent = '';
-      const sentShot = includeShot && shot !== null;
-      hooks
-        .submit({ description, screenshot: includeShot ? shot : null, meta: hooks.collectMeta() })
-        .then(({ screenshotStored }) => {
-          // Be honest when the server dropped a screenshot the player asked to send.
-          const droppedShot = sentShot && !screenshotStored;
-          this.deps.log(
-            t(
-              droppedShot ? 'hudChrome.bugReport.submittedNoShot' : 'hudChrome.bugReport.submitted',
-            ),
-          );
-          this.view = 'main';
-          this.render();
-        })
-        .catch((err: unknown) => {
-          submit.disabled = false;
-          error.textContent = this.localizeBugReportError(err);
-        });
+      void capturePromise.then((shot) => {
+        if (!body.isConnected) return;
+        const sentShot = includeShot && shot !== null;
+        hooks
+          .submit({ description, screenshot: includeShot ? shot : null, meta: hooks.collectMeta() })
+          .then(({ screenshotStored }) => {
+            // Be honest when the server dropped a screenshot the player asked to send.
+            const droppedShot = sentShot && !screenshotStored;
+            this.deps.log(
+              t(
+                droppedShot
+                  ? 'hudChrome.bugReport.submittedNoShot'
+                  : 'hudChrome.bugReport.submitted',
+              ),
+            );
+            this.view = 'main';
+            this.render();
+          })
+          .catch((err: unknown) => {
+            submit.disabled = false;
+            error.textContent = this.localizeBugReportError(err);
+          });
+      });
     });
 
     this.deps

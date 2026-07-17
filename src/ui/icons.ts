@@ -3070,14 +3070,23 @@ function itemFallback(id: string): IconRecipe | null {
 
 const SPECK_COUNT = 40;
 
-function getCanvas2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-  const ctx = canvas.getContext('2d');
+type PaintCanvas = HTMLCanvasElement | OffscreenCanvas;
+
+function getCanvas2d(canvas: PaintCanvas): CanvasRenderingContext2D {
+  // OffscreenCanvasRenderingContext2D implements every operation used by the
+  // procedural recipes. The DOM type has a few extra methods, so keep the
+  // renderer's existing narrow context type after this boundary.
+  const ctx = (canvas as HTMLCanvasElement).getContext('2d');
   if (!ctx) throw new Error('2D canvas context is unavailable');
   return ctx;
 }
 
-function compose(recipe: IconRecipe, seedKey: string, size: number): HTMLCanvasElement {
-  const canvas = document.createElement('canvas');
+function paintIconCanvas(
+  canvas: PaintCanvas,
+  recipe: IconRecipe,
+  seedKey: string,
+  size: number,
+): void {
   canvas.width = size;
   canvas.height = size;
   const ctx = getCanvas2d(canvas);
@@ -3148,7 +3157,11 @@ function compose(recipe: IconRecipe, seedKey: string, size: number): HTMLCanvasE
   ctx.strokeStyle = withAlpha(bgc[0], 0.22);
   rrPath(ctx, 3.6, 3.6, 92.8, 92.8, 9);
   ctx.stroke();
+}
 
+function compose(recipe: IconRecipe, seedKey: string, size: number): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  paintIconCanvas(canvas, recipe, seedKey, size);
   return canvas;
 }
 
@@ -3776,10 +3789,7 @@ export function iconCanvas(
   return canvas;
 }
 
-// Returns the icon URL for an ability/item/aura/crest id — a static image URL
-// for weapons that have a rendered thumbnail, otherwise a cached procedural PNG
-// data URL. Both forms work as an <img src> or CSS background-image.
-export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): string {
+function staticIconUrl(kind: IconKind, id: string): string | null {
   if (kind === 'item') {
     const weapon = weaponIconUrl(id);
     if (weapon) return weapon;
@@ -3799,10 +3809,53 @@ export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_I
   // (that is class-crest portraits only, unit_portrait_painter.ts), so no canvas is needed. Every
   // other crest id (class/talent crests, the deed_cat_* bases, bespoke procedural recipes) returns
   // null here and falls through to the composited canvas below.
-  if (kind === 'crest') {
-    const img = deedImageUrl(id);
-    if (img) return img;
+  if (kind === 'crest') return deedImageUrl(id);
+  return null;
+}
+
+/** Internal bridge for the worker-backed idle warmer. */
+export function needsIconDataUrlWarm(
+  kind: IconKind,
+  id: string,
+  size: number = DEFAULT_ICON_SIZE,
+): boolean {
+  return staticIconUrl(kind, id) === null && !urlCache.has(`${kind}|${id}|${size}`);
+}
+
+/** Internal bridge for the worker-backed idle warmer. */
+export function storePrewarmedIconDataUrl(
+  kind: IconKind,
+  id: string,
+  size: number,
+  url: string,
+): void {
+  const key = `${kind}|${id}|${size}`;
+  // A foreground request may have populated the cache while the worker was
+  // encoding. Its synchronous result remains authoritative.
+  if (!urlCache.has(key)) urlCache.set(key, url);
+}
+
+/** Worker-only renderer: no DOM access and no work on the gameplay thread. */
+export function renderProceduralIconPng(
+  kind: IconKind,
+  id: string,
+  size: number = DEFAULT_ICON_SIZE,
+): Promise<Blob> {
+  if (typeof OffscreenCanvas === 'undefined') {
+    return Promise.reject(new Error('OffscreenCanvas is unavailable'));
   }
+  const key = `${kind}|${id}|${size}`;
+  const canvas = new OffscreenCanvas(size, size);
+  paintIconCanvas(canvas, resolveRecipe(kind, id), key, size);
+  return canvas.convertToBlob({ type: 'image/png' });
+}
+
+// Returns the icon URL for an ability/item/aura/crest id - a static image URL
+// for weapons that have a rendered thumbnail, otherwise a cached procedural PNG
+// data URL. Both forms work as an <img src> or CSS background-image.
+export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): string {
+  const staticUrl = staticIconUrl(kind, id);
+  if (staticUrl) return staticUrl;
   const key = `${kind}|${id}|${size}`;
   const cached = urlCache.get(key);
   if (cached) return cached;

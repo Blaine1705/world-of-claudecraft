@@ -2350,7 +2350,9 @@
     }
     body.mobile-touch .armory-card {
       width: 100%;
-      max-width: 116px;
+      /* 112px keeps the square art + copy fully inside a 390px landscape
+         store viewport (the previous 116px card overran it by 3.625px). */
+      max-width: 112px;
       justify-self: center;
     }
     body.mobile-touch .armory-card-copy {

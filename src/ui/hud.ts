@@ -19,8 +19,8 @@ import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { mechHeldWeaponOverride } from '../render/characters/manifest';
-import { onPortraitsReady } from '../render/characters/portrait';
+import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
+import { onPortraitsReady, playerPortraitDataUrl } from '../render/characters/portrait';
 import { currentDayNightPhase } from '../render/day_night_clock';
 import { globalDayness, skyTintForDayness } from '../render/day_night_core';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
@@ -80,6 +80,7 @@ import type {
 } from '../sim/types';
 import {
   type AbilityEffect,
+  ALL_CLASSES,
   CONSUME_DURATION,
   canPrestige,
   dist2d,
@@ -284,6 +285,7 @@ import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
+import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
 import { parseChatSegments } from './hud/quest/quest_link';
@@ -549,9 +551,8 @@ export interface BugReportHooks {
   // is false when the server dropped the screenshot), rejects with a server error
   // message the hud maps via localizeBugReportError.
   submit(payload: BugReportPayload): Promise<{ screenshotStored: boolean }>;
-  // Grab a JPEG data URL of the current frame, or null if capture failed/unavailable.
-  // Compression stays asynchronous so opening the report form never blocks on
-  // canvas encoding.
+  // Grab a JPEG data URL of the current frame asynchronously, or null if capture
+  // failed/unavailable. Encoding must not block the options window's main thread.
   capture(): Promise<string | null>;
   // Auto-collected context (build, userAgent, viewport, zone, level/class, camera).
   collectMeta(): unknown;
@@ -10762,6 +10763,54 @@ export class Hud {
 
   private renderCharIfOpen(): void {
     this.charWindow.renderIfOpen();
+  }
+
+  /** Build and GPU-warm the shared paperdoll preview before the loading screen
+   *  fades. The character painter remains hidden; its ResizeObserver keeps the
+   *  preview loop dormant until a real preview host becomes visible. */
+  async prewarmCharacterPreview(): Promise<void> {
+    if (!this.charPreview) this.charWindow.render();
+    const cls = this.sim.cfg.playerClass;
+    const skins = Array.from({ length: skinCount(`player_${cls}`) }, (_, index) => index);
+    await this.charPreview?.prewarm(skins);
+    await this.charPreview?.prewarmCloseupPoses(CARD_POSES);
+    // Character chips use a separate offscreen renderer/cache from the live
+    // turntable. Generate the same bounded class set under loading too. Both
+    // framings are distinct cache entries: lists use headshots while Inspect
+    // uses a full-body portrait, so warming only the former still leaves a
+    // synchronous WebGL readback + PNG encode on the first inspected player.
+    for (const portraitClass of ALL_CLASSES) {
+      const portraitSkins = Array.from(
+        { length: skinCount(`player_${portraitClass}`) },
+        (_, index) => index,
+      );
+      for (const skin of portraitSkins) {
+        for (const framing of ['headshot', 'body'] as const) {
+          playerPortraitDataUrl(portraitClass, skin, framing);
+          // PNG serialization is a bounded few milliseconds per portrait.
+          // Yield between captures so the loading UI stays responsive instead
+          // of combining the complete class catalog into one long task.
+          await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+        }
+      }
+    }
+  }
+
+  /** Compile the online Armory's persistent WebGL context and all Season 1
+   *  skin variants while the world loading screen is still opaque. */
+  async prewarmArmoryPreview(): Promise<void> {
+    if (!this.claudiumHooks) return;
+    await this.dailyRewardsWindow.prewarmArmoryPreview();
+  }
+
+  /** Populate the small synchronous Canvas caches used by contextual HUD
+   *  surfaces while the loading screen still covers the world. Raid markers
+   *  are otherwise encoded one-by-one the first time a party member opens the
+   *  target marker menu. */
+  prewarmStaticUiAssets(): void {
+    for (let marker = 0; marker < RAID_MARKER_LABEL_KEYS.length; marker++) {
+      raidMarkerDataUrl(marker);
+    }
   }
 
   renderBags(): void {

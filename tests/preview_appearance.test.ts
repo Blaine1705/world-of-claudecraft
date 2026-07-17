@@ -14,6 +14,8 @@ const mechAssets = vi.hoisted(() => ({
   resolve: null as (() => void) | null,
 }));
 
+const visualInstances = vi.hoisted(() => [] as Array<{ dispose: ReturnType<typeof vi.fn> }>);
+
 vi.mock('../src/render/characters/assets', () => ({
   mechAssetsReady: () => mechAssets.ready,
   preloadMechAssets: vi.fn(() => {
@@ -30,7 +32,15 @@ vi.mock('../src/render/characters/assets', () => ({
 }));
 
 vi.mock('../src/render/characters/visual', () => ({
-  CharacterVisual: class {},
+  CharacterVisual: class {
+    root = {};
+    dispose = vi.fn();
+    setSkin = vi.fn();
+
+    constructor() {
+      visualInstances.push(this);
+    }
+  },
 }));
 
 const appearance = (over: Partial<PreviewAppearance>): PreviewAppearance => ({
@@ -66,6 +76,7 @@ beforeEach(() => {
   mechAssets.promise = null;
   mechAssets.resolve = null;
   vi.mocked(preloadMechAssets).mockClear();
+  visualInstances.length = 0;
 });
 
 describe('previewAppearanceVisual', () => {
@@ -155,5 +166,46 @@ describe('CharacterPreview.setAppearance', () => {
 
     expect(setVisualKey).toHaveBeenCalledTimes(2);
     expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null);
+  });
+});
+
+describe('CharacterPreview visual reuse', () => {
+  function livePreview(): CharacterPreview {
+    const preview = Object.create(CharacterPreview.prototype) as CharacterPreview;
+    Object.assign(preview, {
+      destroyed: false,
+      currentVisual: null,
+      currentVisualSig: null,
+      currentSkin: 0,
+      closeupCache: new Map(),
+      characterGroup: { add: vi.fn() },
+    });
+    return preview;
+  }
+
+  it('keeps the warm rig and closeup cache when an identical sheet repaint remounts it', () => {
+    const preview = livePreview();
+    preview.setVisualKey('player_warrior', 'sword_a');
+    const state = preview as unknown as { closeupCache: Map<string, HTMLCanvasElement> };
+    state.closeupCache.set('hero', {} as HTMLCanvasElement);
+
+    preview.setVisualKey('player_warrior', 'sword_a');
+
+    expect(visualInstances).toHaveLength(1);
+    expect(state.closeupCache.has('hero')).toBe(true);
+  });
+
+  it('disposes the owned skeleton resources and invalidates captures on a real change', () => {
+    const preview = livePreview();
+    preview.setVisualKey('player_warrior', 'sword_a');
+    const first = visualInstances[0];
+    const state = preview as unknown as { closeupCache: Map<string, HTMLCanvasElement> };
+    state.closeupCache.set('hero', {} as HTMLCanvasElement);
+
+    preview.setVisualKey('player_warrior', 'sword_b');
+
+    expect(visualInstances).toHaveLength(2);
+    expect(first.dispose).toHaveBeenCalledOnce();
+    expect(state.closeupCache.size).toBe(0);
   });
 });
