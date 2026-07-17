@@ -8956,7 +8956,7 @@ export const ja_JP: EnTranslations = {
         "name": "生け垣ノーム"
       },
       "hedge_knight": {
-        "name": "Dawnhold Knight"
+        "name": "ドーンホールドの騎士"
       },
       "the_topiary_bull": {
         "name": "トピアリーの雄牛"

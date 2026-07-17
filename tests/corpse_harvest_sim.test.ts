@@ -257,8 +257,10 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 // exact setup() shape (two players, seeded before the harvest's rolls) to land on
 // each side of the rarity floor.
 describe('signed materials (#1145)', () => {
-  it('a rare-or-better harvest stamps the item with the harvester name (seed 9)', () => {
-    const { sim, internals, a, mob } = setup(9);
+  // seed re-hunted after the Dawnhold knight camps shifted the world-gen rng
+  // stream (seed 9 stopped landing rare; 21 does, and seed 4 below stays plain)
+  it('a rare-or-better harvest stamps the item with the harvester name (seed 21)', () => {
+    const { sim, internals, a, mob } = setup(21);
     sim.harvestCorpse(mob.id, ['hide'], a);
     const meta = internals.players.get(a)!;
     const slot = meta.inventory.find((s) => s.itemId === 'boar_hide');

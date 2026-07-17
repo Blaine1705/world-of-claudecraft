@@ -3765,6 +3765,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.topiary_stag.name': '토피어리 수사슴',
   'entities.mobs.topiary_wolf.name': '토피어리 늑대',
   'entities.mobs.hedge_gnome.name': '산울타리 노움',
+  'entities.mobs.hedge_knight.name': '던홀드 기사',
   'entities.mobs.the_topiary_bull.name': '토피어리 황소',
   'entities.zones.galecrest.name': '게일크레스트',
   'entities.zones.galecrest.welcome':

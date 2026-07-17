@@ -8956,7 +8956,7 @@ export const ko_KR: EnTranslations = {
         "name": "산울타리 노움"
       },
       "hedge_knight": {
-        "name": "Dawnhold Knight"
+        "name": "던홀드 기사"
       },
       "the_topiary_bull": {
         "name": "토피어리 황소"

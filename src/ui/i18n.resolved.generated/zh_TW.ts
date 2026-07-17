@@ -8956,7 +8956,7 @@ export const zh_TW: EnTranslations = {
         "name": "樹籬地精"
       },
       "hedge_knight": {
-        "name": "Dawnhold Knight"
+        "name": "晨曦堡騎士"
       },
       "the_topiary_bull": {
         "name": "綠雕公牛"

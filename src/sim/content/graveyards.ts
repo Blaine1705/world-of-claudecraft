@@ -45,7 +45,9 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   { id: 'gy_willowfen', name: 'Willowfen Barrow', x: -346, z: 338 },
   { id: 'gy_galecrest', name: 'Galecrest Rest', x: 404, z: 344 },
   { id: 'gy_palmreach', name: 'Palmreach Rest', x: -318, z: 802 },
-  { id: 'gy_evergarden', name: 'Evergarden Rest', x: 302, z: 792 },
+  // inside Hedgewick's churchyard, east of the chapel so the Pale Keeper
+  // hovers over the headstones clear of the chapel's collider
+  { id: 'gy_evergarden', name: 'Evergarden Rest', x: 309, z: 793 },
   { id: 'gy_nightbloom', name: 'Nightbloom Rest', x: -388, z: 1402 },
   { id: 'gy_wraithwood', name: 'Wraithwood Graves', x: 378, z: 1412 },
   { id: 'gy_frostveil', name: 'Frostveil Barrow', x: -34, z: 1576 },

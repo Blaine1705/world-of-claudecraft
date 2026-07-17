@@ -3813,6 +3813,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.topiary_stag.name': 'Фигурный олень',
   'entities.mobs.topiary_wolf.name': 'Фигурный волк',
   'entities.mobs.hedge_gnome.name': 'Гном живой изгороди',
+  'entities.mobs.hedge_knight.name': 'Рыцарь Донхолда',
   'entities.mobs.the_topiary_bull.name': 'Фигурный бык',
   'entities.zones.galecrest.name': 'Гейлкрест',
   'entities.zones.galecrest.welcome':

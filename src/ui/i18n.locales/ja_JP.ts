@@ -3784,6 +3784,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.topiary_stag.name': 'トピアリーの雄鹿',
   'entities.mobs.topiary_wolf.name': 'トピアリーの狼',
   'entities.mobs.hedge_gnome.name': '生け垣ノーム',
+  'entities.mobs.hedge_knight.name': 'ドーンホールドの騎士',
   'entities.mobs.the_topiary_bull.name': 'トピアリーの雄牛',
   'entities.zones.galecrest.name': 'ゲイルクレスト',
   'entities.zones.galecrest.welcome':

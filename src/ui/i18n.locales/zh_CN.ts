@@ -3629,6 +3629,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.topiary_stag.name': '绿雕雄鹿',
   'entities.mobs.topiary_wolf.name': '绿雕之狼',
   'entities.mobs.hedge_gnome.name': '树篱地精',
+  'entities.mobs.hedge_knight.name': '晨曦堡骑士',
   'entities.mobs.the_topiary_bull.name': '绿雕公牛',
   'entities.zones.galecrest.name': '疾风崖',
   'entities.zones.galecrest.welcome':

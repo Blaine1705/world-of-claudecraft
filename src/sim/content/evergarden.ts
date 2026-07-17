@@ -38,7 +38,9 @@ export const EVERGARDEN_ZONE: ZoneDef = {
   southPassX: 400, // the Garden Gate: where the headland road meets the lawns
   westPassZ: 800, // the Gardenwalk: down from the heights onto the lawns
   hub: { x: 320, z: 810, radius: 16, name: 'Hedgewick' },
-  graveyard: { x: 302, z: 792 },
+  // inside the churchyard, east of the chapel (matched to PROPS.graveyards
+  // so the Pale Keeper hovers over the headstones, clear of the chapel)
+  graveyard: { x: 309, z: 793 },
   lakes: [
     { x: 440, z: 850, radius: 11 }, // the Petal Pond
     { x: 340, z: 1170, radius: 10 }, // the Lily Basin
@@ -260,7 +262,8 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { x: 400, z: 1182, ringR: 6, columns: 5 },
   ],
   // the gardener's own plot, unweeded and unnamed, inside the churchyard
-  graveyards: [{ x: 306, z: 792 }],
+  // (east of the chapel so the Pale Keeper hovers clear of its collider)
+  graveyards: [{ x: 309, z: 793 }],
   // The specimen elders on the lawns: solid trunk colliders in the sim,
   // evergreen crowns drawn by render/garden_features.ts. Kept off every
   // road and clear of the maze.

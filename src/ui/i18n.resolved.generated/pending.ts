@@ -2447,28 +2447,24 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "zh_CN": [
-    "entities.mobs.hedge_knight.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
     "hudChrome.mountRace.timeLeft"
   ],
   "zh_TW": [
-    "entities.mobs.hedge_knight.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
     "hudChrome.mountRace.timeLeft"
   ],
   "ko_KR": [
-    "entities.mobs.hedge_knight.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
     "hudChrome.mountRace.timeLeft"
   ],
   "ja_JP": [
-    "entities.mobs.hedge_knight.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
@@ -2881,7 +2877,6 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "ru_RU": [
-    "entities.mobs.hedge_knight.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
