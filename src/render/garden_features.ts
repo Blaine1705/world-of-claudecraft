@@ -18,7 +18,6 @@ import {
   type MazePieceSpot,
   planGardenMazePieces,
 } from './garden_maze_core';
-import { type ParterreBedModel, parterreBedSpots } from './garden_parterre_core';
 import { GFX } from './gfx';
 
 export interface GardenFeaturesView {
@@ -58,25 +57,12 @@ registerPreload(
   }),
 );
 
-// The modeled flower beds (the same maintainer-authored set): the plan of
-// which plot grows which model lives in garden_parterre_core.
-const BED_MODEL_URLS: Record<ParterreBedModel, string> = {
-  squareA: '/models/props/flower_bed_square_a.glb',
-  squareB: '/models/props/flower_bed_square_b.glb',
-  round: '/models/props/flower_bed_round.glb',
-};
-const bedScenes: Partial<Record<ParterreBedModel, THREE.Group>> = {};
-for (const key of Object.keys(BED_MODEL_URLS) as ParterreBedModel[]) {
-  registerPreload(
-    loadGltf(BED_MODEL_URLS[key]).then((gltf) => {
-      bedScenes[key] = gltf.scene;
-    }),
-  );
-}
+// (The modeled flower beds render and collide as decorProps through the
+// props system now: PROP_ASSET_DEFS flowerBed* keys, placed by
+// content/evergarden with world.ts GARDEN_BED_PADS leveling their ground.)
 
 export const gardenFeaturesPreloadInternalsForTest = {
   mazeAssetUrl: { wall: MAZE_WALL_URL, arch: MAZE_ARCH_URL },
-  bedAssetUrl: BED_MODEL_URLS,
 };
 
 function mat(color: number, rough = 0.85): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
@@ -263,30 +249,6 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
     const plan = planGardenMazePieces();
     instanceModel(mazeWallScene, plan.walls, MAZE_WALL_SCALE);
     instanceModel(mazeArchScene, plan.arches, MAZE_ARCH_SCALE);
-  }
-
-  // --- the modeled flower beds on the parterre plots ---
-  // One ornamental-garden model per stand-alone plot (the mill lawn's ring
-  // beds stay procedural); the plan, model choice, and scales come from
-  // garden_parterre_core so the paired test pins them.
-  {
-    const spots = parterreBedSpots();
-    for (const sp of spots) {
-      const scene = bedScenes[sp.model];
-      if (!scene) continue;
-      const bed = scene.clone(true);
-      bed.position.set(sp.x, terrainHeight(sp.x, sp.z, seed) - 0.1, sp.z);
-      bed.scale.setScalar(sp.scale);
-      bed.rotation.y = sp.rot;
-      bed.traverse((obj) => {
-        const mesh = obj as THREE.Mesh;
-        if (mesh.isMesh) {
-          mesh.castShadow = true;
-          mesh.receiveShadow = true;
-        }
-      });
-      group.add(bed);
-    }
   }
 
   // (The topiary forms retired entirely: even the clipped ball read as a

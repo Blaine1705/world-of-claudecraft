@@ -77,12 +77,6 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
     }
   });
 
-  it('Evergarden modeled flower bed assets', () => {
-    for (const url of Object.values(gardenFeaturesPreloadInternalsForTest.bedAssetUrl)) {
-      expectAssetExistsAndManifested(url);
-    }
-  });
-
   it('every decor prop asset (the full PROP_ASSET_DEFS catalog)', () => {
     for (const url of Object.values(propPreloadInternalsForTest.propAssetUrl)) {
       expectAssetExistsAndManifested(url);

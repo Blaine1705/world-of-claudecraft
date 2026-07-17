@@ -27,27 +27,21 @@ import {
   WATER_LEVEL,
 } from '../sim/world';
 
-export type ParterreKind = 'quatrefoil' | 'concentric' | 'knot';
+export type ParterreKind = 'square' | 'round' | 'ring';
 
 export interface ParterrePlot {
   x: number;
   z: number;
   r: number;
+  /** 'square': a large ornamental square bed model; 'round': a small round
+   * bed model orbiting a large bed; 'ring': a mill-lawn procedural ring
+   * planting with a windmill at its heart. The modeled beds render and
+   * collide as decorProps (content/evergarden), stand on level pads
+   * (world.ts GARDEN_BED_PADS), and this table drives the planting
+   * exclusions; the paired test pins all three lists against each other. */
   kind: ParterreKind;
-  /** 'windmill': the plot is a mill-lawn ring bed with a windmill at its
-   * heart (placed via EVERGARDEN_PROPS.decorProps). These stay procedural
-   * plantings; every other plot is drawn as a modeled bed instead. */
+  /** 'windmill': the ring plots' built centerpiece (a decorProps entry) */
   centerpiece?: 'windmill';
-}
-
-export type ParterreBedModel = 'squareA' | 'squareB' | 'round';
-
-export interface ParterreBedSpot {
-  x: number;
-  z: number;
-  rot: number;
-  scale: number;
-  model: ParterreBedModel;
 }
 
 export interface ParterreBushSpot {
@@ -59,31 +53,52 @@ export interface ParterreBushSpot {
   bloomTint?: number;
 }
 
-// Hand-placed beds, one to three per lawn: compact plantings pulled in tight
-// around their centerpieces. Every site sits on flat dry lawn clear of the
-// maze, the hamlet, the walks, camps, nodes, and great trees (the paired
-// test re-validates all of that against the live terrain).
+// The bed layout: six large square ornamental gardens, each orbited by
+// three or four small round beds at its outer edges (a formal satellite
+// pattern), plus the mill lawn's three procedural ring beds. Every site
+// sits on flat dry lawn clear of the maze, the hamlet, the walks, camps,
+// nodes, and great trees (the paired test re-validates all of that against
+// the live terrain), and every modeled bed stands on a level pad.
 export const PARTERRE_PLOTS: readonly ParterrePlot[] = [
-  { x: 322, z: 878, r: 10, kind: 'quatrefoil' }, // west of the Statuary Walk
-  // three smaller satellite beds orbiting the grand west quatrefoil
-  { x: 300, z: 872, r: 5, kind: 'concentric' },
-  { x: 306, z: 894, r: 5, kind: 'knot' },
-  { x: 334, z: 896, r: 5, kind: 'quatrefoil' },
-  { x: 400, z: 866, r: 9, kind: 'quatrefoil' }, // east of the Statuary Walk
-  // (the Rose Wilds lawn now belongs to Dawnhold castle and its knights)
-  { x: 256, z: 952, r: 9, kind: 'knot' }, // west maze forecourt
-  // two smaller knots squaring off the forecourt
-  { x: 244, z: 938, r: 4.5, kind: 'knot' },
-  { x: 270, z: 940, r: 4.5, kind: 'knot' },
+  // west of the Parterre Walk: the grand garden and its four satellites
+  { x: 322, z: 878, r: 10, kind: 'square' },
+  { x: 322, z: 892.8, r: 3.25, kind: 'round' },
+  { x: 322, z: 863.2, r: 3.25, kind: 'round' },
+  { x: 336.8, z: 878, r: 3.25, kind: 'round' },
+  { x: 307.2, z: 878, r: 3.25, kind: 'round' },
+  // east of the Parterre Walk
+  { x: 400, z: 866, r: 9, kind: 'square' },
+  { x: 400, z: 879.8, r: 3.25, kind: 'round' },
+  { x: 400, z: 852.2, r: 3.25, kind: 'round' },
+  { x: 413.8, z: 866, r: 3.25, kind: 'round' },
+  { x: 386.2, z: 866, r: 3.25, kind: 'round' },
+  // the west maze forecourt
+  { x: 256, z: 952, r: 9, kind: 'square' },
+  { x: 256, z: 965.8, r: 3.25, kind: 'round' },
+  { x: 256, z: 938.2, r: 3.25, kind: 'round' },
+  { x: 269.8, z: 952, r: 3.25, kind: 'round' },
+  { x: 242.2, z: 952, r: 3.25, kind: 'round' },
+  // east of the maze road (the east water bites off the fourth satellite)
+  { x: 476, z: 1010, r: 7.5, kind: 'square' },
+  { x: 476, z: 1022.3, r: 3.25, kind: 'round' },
+  { x: 476, z: 997.7, r: 3.25, kind: 'round' },
+  { x: 463.7, z: 1010, r: 3.25, kind: 'round' },
+  // east of the Garden Gate road (the gate towers and the pond channel
+  // squeeze this one to a triangle of satellites)
+  { x: 430, z: 756, r: 7.5, kind: 'square' },
+  { x: 438.7, z: 764.7, r: 3.25, kind: 'round' },
+  { x: 421.3, z: 764.7, r: 3.25, kind: 'round' },
+  { x: 430, z: 743.7, r: 3.25, kind: 'round' },
+  // the north lawn
+  { x: 300, z: 1118, r: 6, kind: 'square' },
+  { x: 300, z: 1128.8, r: 3.25, kind: 'round' },
+  { x: 300, z: 1107.3, r: 3.25, kind: 'round' },
+  { x: 310.8, z: 1118, r: 3.25, kind: 'round' },
+  { x: 289.2, z: 1118, r: 3.25, kind: 'round' },
   // the mill lawn: three windmills turning over their own ring beds
-  { x: 504, z: 760, r: 8.5, kind: 'concentric', centerpiece: 'windmill' },
-  { x: 492, z: 744, r: 7, kind: 'concentric', centerpiece: 'windmill' },
-  { x: 516, z: 750, r: 6.5, kind: 'concentric', centerpiece: 'windmill' },
-  // east of the Garden Gate road, clear of the new gate-wall towers
-  { x: 430, z: 756, r: 7.5, kind: 'quatrefoil' },
-  { x: 476, z: 1010, r: 7.5, kind: 'knot' }, // east of the maze road
-  { x: 466, z: 996, r: 4.5, kind: 'knot' }, // its smaller companion square
-  { x: 300, z: 1118, r: 6, kind: 'concentric' }, // the north lawn
+  { x: 504, z: 760, r: 8.5, kind: 'ring', centerpiece: 'windmill' },
+  { x: 492, z: 744, r: 7, kind: 'ring', centerpiece: 'windmill' },
+  { x: 516, z: 750, r: 6.5, kind: 'ring', centerpiece: 'windmill' },
 ] as const;
 
 // The bed colorways: a much wider wheel than the old three-rose palette.
@@ -130,37 +145,10 @@ function smoothstep(e0: number, e1: number, v: number): number {
   return t * t * (3 - 2 * t);
 }
 
-// The modeled beds' source footprint (each GLB is ~0.98 wide at unit scale)
-// and the round model's size cap: it is authored as a SMALL round garden
-// with a tall tiered heart, so on the grand plots it sits as a centerpiece
-// garden on the lawn rather than stretching into a giant.
-const BED_MODEL_WIDTH = 0.98;
-const ROUND_BED_MAX_SPAN = 14;
-
-/**
- * The modeled-bed plan: one ornamental bed model per stand-alone plot
- * (square models fill the knot squares edge to edge; the round model takes
- * the circular plots, capped at its authored proportions). Mill-lawn plots
- * (centerpiece 'windmill') keep their procedural ring plantings instead.
- * Square beds stay axis-aligned the way a formal garden reads; the hash
- * picks their facing and which of the two square models each plot grows.
- */
-export function parterreBedSpots(): ParterreBedSpot[] {
-  const out: ParterreBedSpot[] = [];
-  for (const p of PARTERRE_PLOTS) {
-    if (p.centerpiece) continue;
-    if (p.kind === 'knot') {
-      const model = hash2(p.x, p.z, 7401) < 0.5 ? 'squareA' : 'squareB';
-      const facing = Math.floor(hash2(p.x, p.z, 7411) * 4) * (Math.PI / 2);
-      out.push({ x: p.x, z: p.z, rot: facing, scale: (p.r * 2) / BED_MODEL_WIDTH, model });
-    } else {
-      const span = Math.min(p.r * 2, ROUND_BED_MAX_SPAN);
-      const rot = hash2(p.x, p.z, 7421) * Math.PI * 2;
-      out.push({ x: p.x, z: p.z, rot, scale: span / BED_MODEL_WIDTH, model: 'round' });
-    }
-  }
-  return out;
-}
+// The modeled beds' source footprint: each GLB is ~0.98 wide at unit scale,
+// so a decor entry's scale spans 2r as scale = 2r / 0.98 (pinned by the
+// paired test against the content/evergarden entries).
+export const BED_MODEL_WIDTH = 0.98;
 
 // Visual footprints of the garden's built structures, so no planting grows
 // through a wall or floor. Walls use their thin VISUAL depth, not their fat

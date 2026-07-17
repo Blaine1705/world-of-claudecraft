@@ -179,6 +179,11 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // the user-authored leafy fox: a clipped-topiary statue crowning the
   // Evergarden's grandest flower beds (sibling models to the maze hedges)
   leafyFoxStatue: { url: '/models/props/leafy_fox_statue.glb', kit: 'kiron' },
+  // the Evergarden's modeled flower beds (same maintainer-authored set);
+  // their own kit so material dedupe never crosses into the iron props
+  flowerBedSquareA: { url: '/models/props/flower_bed_square_a.glb', kit: 'kbeds' },
+  flowerBedSquareB: { url: '/models/props/flower_bed_square_b.glb', kit: 'kbeds' },
+  flowerBedRound: { url: '/models/props/flower_bed_round.glb', kit: 'kbeds' },
   stagShrine: { url: '/models/props/stag_shrine.glb', kit: 'hollow' },
   mushroomGiantPurple: { url: '/models/props/mushroom_giant_purple.glb', kit: 'hollow' },
   mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },

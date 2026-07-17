@@ -938,6 +938,63 @@ const GARDEN_LAND_LOBES = [
   { x: 522, z: 726, r: 50 }, // the Moonmere's east cap, garden side
   { x: 488, z: 786, r: 46 }, // ...joined to the Petal Pond's basin
 ] as const;
+
+// Level pads under the Evergarden's modeled flower beds: one per bed (the
+// six large square gardens and their small round satellites), consumed by
+// the pad-flattening loop in terrainHeight so no bed sinks into a slope.
+// Every satellite ANCHORS to its parent square bed (ax, az), so a whole
+// ensemble levels to one shared terrace height and overlapping pads never
+// fight. The render plan (garden_parterre_core PARTERRE_PLOTS) and the
+// collide decor entries (content/evergarden decorProps) carry the SAME
+// sites; the parterre test pins all three against each other.
+export interface GardenBedPad {
+  x: number;
+  z: number;
+  r: number;
+  /** the pad's height anchor; satellites point at their parent bed */
+  ax: number;
+  az: number;
+}
+const bedGroup = (ax: number, az: number, r: number, sats: [number, number][]): GardenBedPad[] => [
+  { x: ax, z: az, r, ax, az },
+  ...sats.map(([x, z]) => ({ x, z, r: 3.25, ax, az })),
+];
+export const GARDEN_BED_PADS: readonly GardenBedPad[] = [
+  ...bedGroup(322, 878, 10, [
+    [322, 892.8],
+    [322, 863.2],
+    [336.8, 878],
+    [307.2, 878],
+  ]),
+  ...bedGroup(400, 866, 9, [
+    [400, 879.8],
+    [400, 852.2],
+    [413.8, 866],
+    [386.2, 866],
+  ]),
+  ...bedGroup(256, 952, 9, [
+    [256, 965.8],
+    [256, 938.2],
+    [269.8, 952],
+    [242.2, 952],
+  ]),
+  ...bedGroup(476, 1010, 7.5, [
+    [476, 1022.3],
+    [476, 997.7],
+    [463.7, 1010],
+  ]),
+  ...bedGroup(430, 756, 7.5, [
+    [438.7, 764.7],
+    [421.3, 764.7],
+    [430, 743.7],
+  ]),
+  ...bedGroup(300, 1118, 6, [
+    [300, 1128.8],
+    [300, 1107.3],
+    [310.8, 1118],
+    [289.2, 1118],
+  ]),
+] as const;
 const GARDEN_BAYS = [
   { x: 190, z: 940, r: 50 }, // the west water
   { x: 535, z: 860, r: 45 }, // the east water
@@ -2679,6 +2736,28 @@ export function groundHeight(x: number, z: number, seed: number): number {
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
+  let h = terrainHeightUnpadded(x, z, seed);
+  // Level pads under the Evergarden's modeled flower beds, applied over the
+  // FINISHED height (the garden seam reshapes the lawn per position, so an
+  // early flatten would drift apart again): each bed ensemble sits flush on
+  // one terrace at its anchor's finished height. The garden bounding box
+  // gates the loop so the rest of the world never pays for it.
+  if (x > 180 && x < 540 && z > 700 && z < 1260) {
+    for (const pad of GARDEN_BED_PADS) {
+      const dx = x - pad.x,
+        dz = z - pad.z;
+      const padGate = pad.r + 4;
+      if (dx * dx + dz * dz >= padGate * padGate) continue;
+      const d = Math.sqrt(dx * dx + dz * dz);
+      const ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      const blend = smoothstep(pad.r + 1, pad.r + 4, d);
+      h = h * blend + ch * (1 - blend);
+    }
+  }
+  return h;
+}
+
+function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   let h = baseHeight(x, z, seed);
 
   // Flatten each camp a little so mobs don't stand on cliffs. The squared

@@ -1,25 +1,28 @@
 // The Evergarden's formal planting plan (src/render/garden_parterre_core.ts):
 // every authored plot must sit on flat dry lawn clear of the Great Maze, the
 // hamlet, the walks, the camps, the gather nodes, and the great tree trunks.
-// The stand-alone beds are MODELED (parterreBedSpots plans one ornamental
-// bed model per plot, square on the knots, round on the circles); only the
-// mill lawn's ring beds, the walk ribbons, and the clipped path hedges stay
-// procedural, and the plan must keep reading as a designed garden.
+// The beds are MODELED decor in a satellite pattern (six large square
+// gardens, each orbited by 3-4 small round beds, mirrored across the decor
+// entries, the world.ts level pads, and these plots); only the mill lawn's
+// ring beds, the walk ribbons, and the clipped path hedges stay procedural,
+// and the plan must keep reading as a designed garden.
 
 import { describe, expect, it } from 'vitest';
 import {
+  BED_MODEL_WIDTH,
   clearOfGardenBuildings,
   GARDEN_BED_TINTS,
   gardenMeadowTintAt,
   inParterrePlot,
   PARTERRE_PLOTS,
-  parterreBedSpots,
   parterreBushSpots,
   parterreFlowerTintAt,
 } from '../src/render/garden_parterre_core';
+import { resolveMovement } from '../src/sim/colliders';
 import { EVERGARDEN_CAMPS, EVERGARDEN_PROPS, EVERGARDEN_ZONE } from '../src/sim/content/evergarden';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import {
+  GARDEN_BED_PADS,
   gardenLandness,
   MAZE_CELL,
   MAZE_COLS,
@@ -126,31 +129,91 @@ describe('the flower plan', () => {
     expect(parterreFlowerTintAt(300, 745)).toBe(-1);
   });
 
-  it('plans one modeled bed per stand-alone plot, shaped to its kind', () => {
-    const spots = parterreBedSpots();
-    const standalone = PARTERRE_PLOTS.filter((p) => !p.centerpiece);
-    expect(spots.length).toBe(standalone.length);
-    const models = new Set<string>();
-    for (const p of standalone) {
-      const here = spots.filter((s) => s.x === p.x && s.z === p.z);
-      expect(here.length, `plot (${p.x},${p.z}) bed`).toBe(1);
-      const bed = here[0];
-      models.add(bed.model);
-      if (p.kind === 'knot') {
-        // square beds fill the knot square edge to edge, axis-aligned
-        expect(bed.model === 'squareA' || bed.model === 'squareB', 'square model').toBe(true);
-        expect(bed.scale * 0.98).toBeCloseTo(p.r * 2, 5);
-        expect(bed.rot % (Math.PI / 2), 'axis-aligned').toBeCloseTo(0, 10);
+  it('mirrors every modeled bed across decor, pads, and plots in a satellite pattern', () => {
+    const decor = (EVERGARDEN_PROPS.decorProps ?? []).filter((d) => d.key.startsWith('flowerBed'));
+    const modeled = PARTERRE_PLOTS.filter((p) => p.kind !== 'ring');
+    expect(decor.length).toBe(modeled.length);
+    expect(GARDEN_BED_PADS.length).toBe(modeled.length);
+    const keys = new Set<string>();
+    for (const p of modeled) {
+      const here = decor.filter((e) => Math.hypot(e.x - p.x, e.z - p.z) < 0.01);
+      expect(here.length, `plot (${p.x},${p.z}) decor entry`).toBe(1);
+      const e = here[0];
+      keys.add(e.key);
+      if (p.kind === 'square') {
+        // the large beds are the detailed square gardens, axis-aligned
+        expect(e.key === 'flowerBedSquareA' || e.key === 'flowerBedSquareB', 'square key').toBe(
+          true,
+        );
+        expect(e.rot === 0 || e.rot === Math.PI / 2, `plot (${p.x},${p.z}) axis-aligned`).toBe(
+          true,
+        );
       } else {
-        // circular plots grow the round model, capped at its authored span
-        expect(bed.model).toBe('round');
-        expect(bed.scale * 0.98).toBeCloseTo(Math.min(p.r * 2, 14), 5);
+        expect(e.key, `plot (${p.x},${p.z}) round key`).toBe('flowerBedRound');
+      }
+      // the model spans the plot, the collider fills it, the pad levels it
+      expect(e.scale ?? 0, `plot (${p.x},${p.z}) scale`).toBeCloseTo(
+        (p.r * 2) / BED_MODEL_WIDTH,
+        1,
+      );
+      expect(e.r ?? 0, `plot (${p.x},${p.z}) collider`).toBeGreaterThan(p.r - 0.3);
+      expect(e.r ?? 0, `plot (${p.x},${p.z}) collider`).toBeLessThanOrEqual(p.r);
+      const pad = GARDEN_BED_PADS.filter(
+        (g) => Math.hypot(g.x - p.x, g.z - p.z) < 0.01 && g.r === p.r,
+      );
+      expect(pad.length, `plot (${p.x},${p.z}) pad`).toBe(1);
+    }
+    // the pattern: every large square bed keeps 3 or 4 small round beds at
+    // its outer edge, each satellite anchored to exactly one square (and
+    // its pad anchored to that square's center)
+    const squares = modeled.filter((p) => p.kind === 'square');
+    const rounds = modeled.filter((p) => p.kind === 'round');
+    let claimed = 0;
+    for (const s of squares) {
+      const sats = rounds.filter((q) => {
+        const d = Math.hypot(q.x - s.x, q.z - s.z);
+        return d > s.r && d < s.r + 8;
+      });
+      expect(sats.length, `square (${s.x},${s.z}) satellites`).toBeGreaterThanOrEqual(3);
+      expect(sats.length, `square (${s.x},${s.z}) satellites`).toBeLessThanOrEqual(4);
+      claimed += sats.length;
+      for (const q of sats) {
+        const pad = GARDEN_BED_PADS.find((g) => Math.hypot(g.x - q.x, g.z - q.z) < 0.01);
+        expect(pad?.ax, `satellite (${q.x},${q.z}) anchor`).toBe(s.x);
+        expect(pad?.az, `satellite (${q.x},${q.z}) anchor`).toBe(s.z);
       }
     }
-    // both square variants and the round model all appear across the garden
-    expect(models.has('round')).toBe(true);
-    expect(models.has('squareA') || models.has('squareB')).toBe(true);
-    expect(parterreBedSpots()).toEqual(parterreBedSpots()); // deterministic
+    expect(claimed, 'every round bed orbits exactly one square').toBe(rounds.length);
+    // both square designs and the round model all appear across the garden
+    expect(keys.has('flowerBedSquareA')).toBe(true);
+    expect(keys.has('flowerBedSquareB')).toBe(true);
+    expect(keys.has('flowerBedRound')).toBe(true);
+  });
+
+  it('levels the ground under every modeled bed to its ensemble terrace', () => {
+    for (const p of PARTERRE_PLOTS) {
+      if (p.kind === 'ring') continue;
+      const hc = terrainHeight(p.x, p.z, SEED);
+      for (let a = 0; a < 8; a++) {
+        const x = p.x + Math.sin((a * Math.PI) / 4) * p.r;
+        const z = p.z + Math.cos((a * Math.PI) / 4) * p.r;
+        expect(
+          Math.abs(terrainHeight(x, z, SEED) - hc),
+          `plot (${p.x},${p.z}) rim a${a}`,
+        ).toBeLessThan(0.35);
+      }
+    }
+  });
+
+  it('blocks walking into a modeled bed', () => {
+    const p = PARTERRE_PLOTS.find((q) => q.kind === 'square');
+    expect(p).toBeDefined();
+    if (!p) return;
+    const end = resolveMovement(SEED, p.x - p.r - 4, p.z, p.x, p.z, 0.5);
+    expect(
+      Math.hypot(end.x - p.x, end.z - p.z),
+      'the bed collider stops the walk at its edge',
+    ).toBeGreaterThan(p.r - 1);
   });
 
   it('lays ribbon beds along the walks but not in the maze or hamlet', () => {
