@@ -228,8 +228,10 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
           const v = new THREE.Vector3();
           const sc = new THREE.Vector3(s, s, s);
           band.forEach((sp, i) => {
+            // sunk a quarter yard so overlapped piece ends seat into the
+            // lawn together on the garden's gentle slopes
             q.setFromAxisAngle(up, sp.rot);
-            v.set(sp.x, terrainHeight(sp.x, sp.z, seed) - 0.15, sp.z);
+            v.set(sp.x, terrainHeight(sp.x, sp.z, seed) - 0.25, sp.z);
             mesh.setMatrixAt(i, m.compose(v, q, sc).multiply(src.matrixWorld));
           });
           mesh.instanceMatrix.needsUpdate = true;

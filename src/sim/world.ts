@@ -1017,7 +1017,7 @@ export const MAZE_Z0 = MAZE_Z1 - MAZE_ROWS * MAZE_CELL;
 // MAZE_WALL_DEPTH across it, so runs read as continuous clipped hedges and
 // corners/junctions read as crossing pieces. Collision is the union of the
 // same boxes, so the blocked ground IS the modeled hedge's footprint.
-export const MAZE_WALL_DEPTH = 3.6; // yd across a hedge piece
+export const MAZE_WALL_DEPTH = 4.2; // yd across a hedge piece (tracks the modeled hedge scale)
 
 /** Inside the maze footprint (small margin), where dressing must not spawn. */
 export function inGardenMaze(x: number, z: number): boolean {

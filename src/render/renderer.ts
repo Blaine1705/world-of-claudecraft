@@ -103,6 +103,7 @@ import {
 import { buildFrostSky, type FrostSkyView } from './frost_sky';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
+import { gardenMazeCameraLift } from './garden_maze_core';
 import { buildGatherNodes } from './gather_nodes';
 import {
   GFX,
@@ -6721,6 +6722,10 @@ export class Renderer {
       const floor = generateRiftFloor(rfCam.seed, rfCam.baseLevel, rfCam.floorIndex, rfCam.upgrade);
       groundY += riftLiftAt(floor, cx - rfCam.origin.x, cz - rfCam.origin.z);
     }
+    // The Great Maze's modeled hedges are not terrain, so the ground clamp
+    // alone would sit the camera inside their leaves: ride over them the
+    // way the old terrain walls lifted it.
+    groundY += gardenMazeCameraLift(cx, cz);
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
     if (Math.abs(this.camera.fov - this.camOcclusion.fov) > 0.01) {
       this.camera.fov = this.camOcclusion.fov;

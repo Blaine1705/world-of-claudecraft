@@ -7,11 +7,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   GARDEN_MAZE_GRID,
+  gardenMazeCameraLift,
   MAZE_ARCH_SCALE,
   MAZE_CELL,
   MAZE_COLS,
   MAZE_ROWS,
   MAZE_WALL_DEPTH,
+  MAZE_WALL_HEIGHT,
+  MAZE_WALL_OVERLAP,
   MAZE_WALL_SCALE,
   MAZE_X0,
   MAZE_Z1,
@@ -23,6 +26,9 @@ const cellCenter = (c: number, r: number) => ({
   x: MAZE_X0 + (c + 0.5) * MAZE_CELL,
   z: MAZE_Z1 - (r + 0.5) * MAZE_CELL,
 });
+
+// rot 0 / PI both run east-west (the parity flip that breaks joint tiling)
+const runsEastWest = (rot: number) => Math.abs(Math.sin(rot)) < 1e-9;
 
 describe('the modeled-hedge plan', () => {
   it('places exactly the pieces the sim grid carries', () => {
@@ -40,12 +46,12 @@ describe('the modeled-hedge plan', () => {
         expect(here.length, `pieces at ${c},${r}`).toBe((p.h ? 1 : 0) + (p.v ? 1 : 0));
         if (p.h)
           expect(
-            here.some((w) => w.rot === 0),
+            here.some((w) => runsEastWest(w.rot)),
             `h piece at ${c},${r}`,
           ).toBe(true);
         if (p.v) {
           expect(
-            here.some((w) => w.rot === Math.PI / 2),
+            here.some((w) => !runsEastWest(w.rot)),
             `v piece at ${c},${r}`,
           ).toBe(true);
         }
@@ -73,9 +79,11 @@ describe('the modeled-hedge plan', () => {
     }
   });
 
-  it('spans each piece across its cell with leaves just inside the collide box', () => {
-    // the source models are 0.98 wide x 0.38 deep at unit scale
-    expect(MAZE_WALL_SCALE * 0.98).toBeCloseTo(MAZE_CELL, 5);
+  it('overlaps each piece past its cell with leaves just inside the collide box', () => {
+    // the source models are 0.98 wide x 0.38 deep at unit scale; each piece
+    // reaches MAZE_WALL_OVERLAP into both neighbors so runs read seamless
+    expect(MAZE_WALL_SCALE * 0.98).toBeCloseTo(MAZE_CELL + 2 * MAZE_WALL_OVERLAP, 5);
+    expect(MAZE_WALL_OVERLAP).toBeGreaterThan(0.4); // enough for the leafy ends to interlock
     const visualDepth = MAZE_WALL_SCALE * 0.38;
     expect(visualDepth).toBeLessThanOrEqual(MAZE_WALL_DEPTH);
     expect(visualDepth).toBeGreaterThan(MAZE_WALL_DEPTH - 0.5);
@@ -86,12 +94,38 @@ describe('the modeled-hedge plan', () => {
     expect(planGardenMazePieces()).toEqual(planGardenMazePieces());
   });
 
+  it('lifts the camera over hedges and leaves corridor centers untouched', () => {
+    // full hedge height standing inside any wall piece...
+    for (let r = 0; r < MAZE_ROWS; r++) {
+      for (let c = 0; c < MAZE_COLS; c++) {
+        const center = cellCenter(c, r);
+        if (GARDEN_MAZE_GRID[r][c] === '#') {
+          expect(gardenMazeCameraLift(center.x, center.z), `lift in wall ${c},${r}`).toBeCloseTo(
+            MAZE_WALL_HEIGHT,
+            5,
+          );
+        } else {
+          // ...zero at corridor centers (6.9yd from the nearest face, far
+          // outside the ramp) so the maze floor camera stays low
+          expect(gardenMazeCameraLift(center.x, center.z), `lift in corridor ${c},${r}`).toBe(0);
+        }
+      }
+    }
+    // the ramp eases: partway up 1yd outside a piece face, gone far away
+    const wall = cellCenter(8, 15); // a wall cell with a north-south piece
+    expect(gardenMazeCellPieces(8, 15)?.v).toBe(true);
+    const nearFace = gardenMazeCameraLift(wall.x - MAZE_WALL_DEPTH / 2 - 1, wall.z);
+    expect(nearFace).toBeGreaterThan(0);
+    expect(nearFace).toBeLessThan(MAZE_WALL_HEIGHT);
+    expect(gardenMazeCameraLift(MAZE_X0 - 30, MAZE_Z1 + 30)).toBe(0);
+  });
+
   it('agrees with the movement blocker along every piece centerline', () => {
     const plan = planGardenMazePieces();
     for (const w of plan.walls) {
       for (const t of [-0.45, 0, 0.45]) {
-        const x = w.x + (w.rot === 0 ? t * MAZE_CELL : 0);
-        const z = w.z + (w.rot === 0 ? 0 : t * MAZE_CELL);
+        const x = w.x + (runsEastWest(w.rot) ? t * MAZE_CELL : 0);
+        const z = w.z + (runsEastWest(w.rot) ? 0 : t * MAZE_CELL);
         expect(inGardenMazeWall(x, z), `piece at ${w.x},${w.z} rot ${w.rot} t ${t}`).toBe(true);
       }
     }
