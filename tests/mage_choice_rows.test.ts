@@ -45,13 +45,12 @@ function tickFor(sim: Sim, seconds: number): void {
 }
 
 describe('mage base kit', () => {
-  it('Flickerstep (blink) is a BASE ability at level 10, no row pick needed', () => {
-    // Owner leveling pass 2026-07-14: blink moved 5 -> 10. NOTE the level-5 row
-    // still offers two blink-modifying picks; they simply come online at 10.
+  it('Flickerstep (blink) is a BASE ability from level 5, matching its level-5 row modifiers', () => {
+    // The level-5 choice row offers two blink-modifying picks (Double Blink, Blink
+    // cast), so Blink must exist by level 5, not 10: they must not bank against an
+    // ability the player cannot yet learn.
     const at5 = abilitiesKnownAt('mage', 5).map((k) => k.def.id);
-    expect(at5).not.toContain('blink');
-    const at10 = abilitiesKnownAt('mage', 10).map((k) => k.def.id);
-    expect(at10).toContain('blink');
+    expect(at5).toContain('blink');
   });
 });
 
@@ -326,6 +325,31 @@ describe('mage choice rows (owner tree)', () => {
     const [hit, echo] = events as { amount: number }[];
     expect(echo.amount).toBe(Math.max(1, Math.round(hit.amount * 0.5)));
     expect(mob.hp).toBe(hp0 - hit.amount - echo.amount);
+    expect(p.auras.some((a) => a.kind === 'power_echo')).toBe(false); // consumed
+  });
+
+  it('Power Echo also repeats a direct HEAL (Temporal Mend) at 50% on the same target, once', () => {
+    // Arcane rig: Temporal Mend is the arcane-spec direct heal; Power Echo is the
+    // class-wide row-14 grant. The echo must fire for heals, not only damage.
+    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: 'arcane', rows: { 14: 'mag_r14_power_echo' } })).toBe(true);
+    const p = sim.player;
+    p.resource = p.maxResource;
+    // Deep HP hole so neither the heal nor its echo overheals (which would clamp).
+    p.maxHp = 100000;
+    p.hp = 1;
+    sim.castAbility('power_echo');
+    (p as { gcdRemaining: number }).gcdRemaining = 0;
+    sim.targetEntity(p.id); // Temporal Mend targets a friendly; heal self.
+    sim.castAbility('temporal_mend');
+    // Ride the 2s hard cast to completion, collecting heal events.
+    const collected: { type: string; amount?: number; targetId?: number }[] = [];
+    for (let i = 0; i < 60; i++) collected.push(...(sim.tick() as never[]));
+    const heals = collected.filter((e) => e.type === 'heal2' && e.targetId === p.id);
+    expect(heals).toHaveLength(2); // the heal and its echo
+    const [heal, echo] = heals as { amount: number }[];
+    expect(echo.amount).toBe(Math.max(1, Math.round(heal.amount * 0.5)));
     expect(p.auras.some((a) => a.kind === 'power_echo')).toBe(false); // consumed
   });
 

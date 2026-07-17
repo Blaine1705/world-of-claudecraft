@@ -6672,10 +6672,6 @@ export const vi_VN: EnTranslations = {
         "name": "Da Sồi",
         "description": "Da ngươi rắn lại như vỏ cây, tăng 150 giáp trong 15 giây."
       },
-      "ironhold": {
-        "name": "Thiết Lũy",
-        "description": "Ẩn sau lá chắn bảo vệ, giảm 40% sát thương nhận vào trong 8 giây."
-      },
       "sacred_bulwark": {
         "name": "Phòng Bị Thánh Thần",
         "description": "Trong {duration} giây, đòn tấn công tiếp theo của kẻ địch vốn sẽ giết chết bạn sẽ bị vô hiệu hóa, thay vào đó hồi phục bạn lên 35% máu."

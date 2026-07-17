@@ -236,6 +236,12 @@ describe('createAurasView: derivation per mode', () => {
       v.tick(entity([aura({ id: 'sprint', kind: 'buff_speed', remaining: 15 })])).slots[0]
         .durationText,
     ).toBe('15s');
+    // Greater Invisibility rides the stealth kind for its vanish but is a fixed
+    // 20s timed buff, so it overrides the kind suppression and shows its countdown.
+    expect(
+      v.tick(entity([aura({ id: 'greater_invisibility', kind: 'stealth', remaining: 20 })]))
+        .slots[0].durationText,
+    ).toBe('20s');
   });
 
   it('compactAuraDuration boundaries: seconds round UP, larger units to nearest', () => {

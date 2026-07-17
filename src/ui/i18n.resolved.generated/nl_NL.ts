@@ -6672,10 +6672,6 @@ export const nl_NL: EnTranslations = {
         "name": "Eikenhuid",
         "description": "Je huid verhardt als schors, waardoor je pantser met 150 toeneemt gedurende 15 sec."
       },
-      "ironhold": {
-        "name": "IJzeren Bolwerk",
-        "description": "Verschans je achter je schild en verminder alle schade die je oploopt met 40% gedurende 8 sec."
-      },
       "sacred_bulwark": {
         "name": "Heilige Verschansing",
         "description": "Gedurende {duration} sec wordt de volgende vijandelijke treffer die je zou doden afgeweerd en herstel je in plaats daarvan 35% gezondheid."

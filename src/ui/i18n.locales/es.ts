@@ -13,9 +13,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Te parapetas tras tu guardia, reduciendo el dano recibido en un 40% durante 8 segundos.',
-  'entities.abilities.ironhold.name': 'Bastion de Hierro',
   'entities.abilities.primal_reflexes.description':
     'Tus instintos se agudizan, aumentando tu probabilidad de esquivar un 50% durante 6 segundos.',
   'entities.abilities.primal_reflexes.name': 'Reflejos Primigenios',

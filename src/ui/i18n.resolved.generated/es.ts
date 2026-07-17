@@ -6672,10 +6672,6 @@ export const es: EnTranslations = {
         "name": "Piel de Roble",
         "description": "Tu piel se endurece como corteza y aumenta la armadura en 150 durante 15 s."
       },
-      "ironhold": {
-        "name": "Bastion de Hierro",
-        "description": "Te parapetas tras tu guardia, reduciendo el dano recibido en un 40% durante 8 segundos."
-      },
       "sacred_bulwark": {
         "name": "Baluarte Sagrado",
         "description": "Durante {duration} segundos, el siguiente golpe enemigo que te mataria es anulado y recuperas el 35% de tu salud en su lugar."

@@ -2,9 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Verschans je achter je schild en verminder alle schade die je oploopt met 40% gedurende 8 sec.',
-  'entities.abilities.ironhold.name': 'IJzeren Bolwerk',
   'entities.abilities.primal_reflexes.description':
     'Je instincten verscherpen, waardoor je kans om aan te wijken met 50% stijgt gedurende 6 sec.',
   'entities.abilities.primal_reflexes.name': 'Oerreflexen',

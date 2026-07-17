@@ -6672,10 +6672,6 @@ export const sv_SE: EnTranslations = {
         "name": "Ekhud",
         "description": "Din hud hårdnar som bark och ökar rustning med 150 i 15 sek."
       },
-      "ironhold": {
-        "name": "Järngrepp",
-        "description": "Forsar dig bakom ditt skydd och minskar all inkommande skada med 40% i 8 sek."
-      },
       "sacred_bulwark": {
         "name": "Helig Bålverk",
         "description": "I {duration} sek nekas nästa fiendeträff som annars skulle döda dig, och du återfår 35% av dina livspunkter i stället."

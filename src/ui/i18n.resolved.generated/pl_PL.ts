@@ -6672,10 +6672,6 @@ export const pl_PL: EnTranslations = {
         "name": "Dębowa skóra",
         "description": "Twoja skóra twardnieje niczym kora, zwiększając pancerz o 150 na 15 sek."
       },
-      "ironhold": {
-        "name": "Żelazny Uchwyt",
-        "description": "Chronisz się za tarczą, zmniejszając wszelkie otrzymywane obrażenia o 40% przez 8 sek."
-      },
       "sacred_bulwark": {
         "name": "Święty Bastion",
         "description": "Przez {duration} sek. kolejny cios wroga, który miałby cię zabić, zostaje odparty, a twoje zdrowie jest przywracane do 35%."

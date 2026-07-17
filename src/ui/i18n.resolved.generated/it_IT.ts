@@ -6672,10 +6672,6 @@ export const it_IT: EnTranslations = {
         "name": "Scorza di Quercia",
         "description": "La tua pelle si indurisce come corteccia, aumentando l'armatura di 150 per 15 s."
       },
-      "ironhold": {
-        "name": "Fortezza di Ferro",
-        "description": "Ti ripari dietro la guardia, riducendo tutti i danni subiti del 40% per 8 sec."
-      },
       "sacred_bulwark": {
         "name": "Bastione Sacro",
         "description": "Per {duration} sec, il prossimo colpo nemico che ti ucciderebbe viene negato, ripristinandoti invece al 35% della salute."

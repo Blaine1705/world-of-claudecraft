@@ -491,6 +491,17 @@ describe('auto_attack start/stopAutoAttack', () => {
     expect(mob.aggroTargetId).toBe(p.id); // idle mob pulled into combat (ctx.aggroMob)
   });
 
+  it('silently no-ops on a target that just died (no spurious "Invalid attack target." toast)', () => {
+    const { sim, p } = makeSim('warrior', 12);
+    const mob = spawnDummy(sim, p, 5, 2);
+    mob.dead = true; // the engaging spell landed the killing blow this same tick
+    p.targetId = mob.id;
+    const events = capture(sim);
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(false); // no engage on a corpse
+    expect(events.some((e) => e.type === 'error')).toBe(false); // and NO error toast
+  });
+
   it('stopAutoAttack clears the flag', () => {
     const { sim, p } = makeSim('warrior', 12);
     p.autoAttack = true;

@@ -107,7 +107,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'intimidating_shout',
       'sunder_armor',
       'taunt',
-      'ironhold',
       'measured_fury',
       'seasoned_soldier',
       'sudden_death',
@@ -1238,24 +1237,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'selfBuff', kind: 'defensive_stance', value: 0.9, duration: 3600 }],
     description:
       'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast Battle Stance to return to the offensive.',
-  },
-  // Warrior tank cooldown: a flat mitigation wall (the `shield_wall` aura, read in
-  // damage.ts). One of three distinct tank cooldowns (paladin Sacred Bulwark is a
-  // cheat-death, druid Primal Reflexes is dodge-based).
-  ironhold: {
-    id: 'ironhold',
-    name: 'Ironhold',
-    class: 'warrior',
-    learnLevel: 20,
-    cost: 10,
-    castTime: 0,
-    cooldown: 180,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.4, duration: 8 }],
-    description: 'Brace behind your guard, reducing all damage taken by 40% for 8 sec.',
   },
   sunder_armor: {
     id: 'sunder_armor',
@@ -5612,7 +5593,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'blink',
     name: 'Flickerstep',
     class: 'mage',
-    learnLevel: 10,
+    // Joins the base kit at 5 (see the 'blink' entry in the mage kit list): two
+    // level-5 choice-row options modify it, so it must exist by then, not at 10.
+    learnLevel: 5,
     cost: 40,
     castTime: 0,
     cooldown: 15,

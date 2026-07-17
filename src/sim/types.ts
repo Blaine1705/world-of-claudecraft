@@ -258,8 +258,8 @@ export type AuraKind =
   | 'hot'
   | 'absorb'
   | 'imbue'
-  // Warrior Ironhold: a big, short, all-school damage-taken reduction (value =
-  // fraction less, e.g. 0.4 = 40% less), applied in damage.ts.
+  // A big, short, all-school damage-taken reduction ward (value = fraction less,
+  // e.g. 0.4 = 40% less), applied in damage.ts. The strongest active ward wins.
   | 'shield_wall'
   // Paladin Sacred Bulwark: a divine cheat-death ward. While it holds, a lethal
   // enemy hit is denied in damage.ts and the wearer is restored by value (a

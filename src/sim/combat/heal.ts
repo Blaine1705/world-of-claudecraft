@@ -96,8 +96,11 @@ export function applyHeal(
   // critico"). Passing false SKIPS the crit roll entirely, so it draws NO rng and
   // keeps the shared stream in the same order as if the heal had not fired at all.
   canCrit = true,
-): void {
-  if (target.dead) return;
+  // Returns the effective heal applied (post-crit, post-mult, post-overheal-clamp,
+  // the same number emitted). Callers that ignore it are unaffected; Power Echo
+  // reads it to repeat a direct heal at a fraction of the resolved amount.
+): number {
+  if (target.dead) return 0;
   const crit = canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
   let healed = Math.round(
     amount *
@@ -122,6 +125,7 @@ export function applyHeal(
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
   runWeaponProcs(ctx, source, target, 'heal');
+  return healed;
 }
 
 // Classic healing threat: 0.5 per point of EFFECTIVE healing (overheal is

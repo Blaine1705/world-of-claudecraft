@@ -2,9 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Chronisz się za tarczą, zmniejszając wszelkie otrzymywane obrażenia o 40% przez 8 sek.',
-  'entities.abilities.ironhold.name': 'Żelazny Uchwyt',
   'entities.abilities.primal_reflexes.description':
     'Twoje instynkty wyostrzają się, zwiększając szansę na unik o 50% przez 6 sek.',
   'entities.abilities.primal_reflexes.name': 'Pierwotne Odruchy',

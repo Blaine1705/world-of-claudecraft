@@ -2,9 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Forsar dig bakom ditt skydd och minskar all inkommande skada med 40% i 8 sek.',
-  'entities.abilities.ironhold.name': 'Järngrepp',
   'entities.abilities.primal_reflexes.description':
     'Dina instinkter skärps och ökar din chans att undvika anfall med 50% i 6 sek.',
   'entities.abilities.primal_reflexes.name': 'Ursinnesreflexer',

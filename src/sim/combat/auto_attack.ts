@@ -78,7 +78,15 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   if (isInStasis(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  if (!t || t.dead || !ctx.isHostileTo(p, t)) {
+  // A target that just DIED (commonly the mob the engaging spell killed) is not a
+  // user error: engaging a corpse is a silent no-op. This stops the "Attack on
+  // Ability Use" QoL from popping a spurious "Invalid attack target." toast on a
+  // killing blow (e.g. a Fire mage's Cinderfall). Because this runs in the shared
+  // sim, the authoritative server drops a client engage sent against a stale
+  // still-alive snapshot just as quietly. A genuinely invalid target (none, or a
+  // friendly) still reports the error.
+  if (t?.dead) return;
+  if (!t || !ctx.isHostileTo(p, t)) {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }

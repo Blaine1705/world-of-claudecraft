@@ -13,9 +13,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Ti ripari dietro la guardia, riducendo tutti i danni subiti del 40% per 8 sec.',
-  'entities.abilities.ironhold.name': 'Fortezza di Ferro',
   'entities.abilities.primal_reflexes.description':
     'I tuoi istinti si affilano, aumentando la possibilita di schivata del 50% per 6 sec.',
   'entities.abilities.primal_reflexes.name': 'Riflessi Primordiali',

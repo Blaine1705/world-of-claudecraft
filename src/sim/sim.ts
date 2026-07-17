@@ -4855,8 +4855,8 @@ export class Sim {
     ability: string,
     abilityId: string | null = null,
     canCrit = true,
-  ): void {
-    applyHealImpl(this.ctx, source, target, amount, ability, abilityId, canCrit);
+  ): number {
+    return applyHealImpl(this.ctx, source, target, amount, ability, abilityId, canCrit);
   }
 
   private healingThreat(source: Entity, target: Entity, healed: number): void {

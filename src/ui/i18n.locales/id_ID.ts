@@ -2,9 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Bertahan di balik perlindunganmu, mengurangi semua kerusakan yang diterima sebesar 40% selama 8 detik.',
-  'entities.abilities.ironhold.name': 'Cengkeraman Besi',
   'entities.abilities.primal_reflexes.description':
     'Nalurimu menajam, meningkatkan peluang menghindar sebesar 50% selama 6 detik.',
   'entities.abilities.primal_reflexes.name': 'Refleks Purba',

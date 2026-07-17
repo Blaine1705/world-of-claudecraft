@@ -2,9 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Zapři se za svůj štít a sniž veškeré utrpěné poškození o 40 % po dobu 8 sekund.',
-  'entities.abilities.ironhold.name': 'Železný hmat',
   'entities.abilities.primal_reflexes.description':
     'Tvoje instinkty se zostří a tvá šance na vyhnutí se útoku vzroste o 50 % po dobu 6 sekund.',
   'entities.abilities.primal_reflexes.name': 'Prvotní reflexy',

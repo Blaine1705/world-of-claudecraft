@@ -6094,11 +6094,11 @@ export const en: EnTranslations = {
       },
       "battle_shout": {
         "name": "Iron Bellow",
-        "description": "A shout that increases the attack power of all party members by {buff}% for 2 min."
+        "description": "A shout that increases the attack power of all party members by {buff}% for 30 min."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Lets out a fearsome shout, reducing the attack power of all nearby enemies by {buff} for 30 sec."
+        "description": "Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by {buff}% for 20 sec."
       },
       "charge": {
         "name": "Onrush",
@@ -6671,10 +6671,6 @@ export const en: EnTranslations = {
       "barkskin": {
         "name": "Oakhide",
         "description": "Your skin hardens like bark, increasing armor by 150 for 15 sec."
-      },
-      "ironhold": {
-        "name": "Ironhold",
-        "description": "Brace behind your guard, reducing all damage taken by 40% for 8 sec."
       },
       "sacred_bulwark": {
         "name": "Sacred Bulwark",

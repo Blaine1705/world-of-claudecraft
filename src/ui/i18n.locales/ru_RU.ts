@@ -2736,9 +2736,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Дубовая шкура',
   'entities.abilities.barkskin.description':
     'Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек.',
-  'entities.abilities.ironhold.name': 'Железная стена',
-  'entities.abilities.ironhold.description':
-    'Укрывшись за щитом, вы снижаете весь получаемый урон на 40% на 8 сек.',
   'entities.abilities.sacred_bulwark.name': 'Священный оплот',
   'entities.abilities.sacred_bulwark.description':
     'В течение {duration} сек. следующий смертельный удар противника не убьет вас, а восстановит здоровье до 35% от максимума.',

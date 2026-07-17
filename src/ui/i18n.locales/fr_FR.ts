@@ -13,9 +13,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Vous vous retranchez derrière votre garde, réduisant tous les dégâts subis de 40 % pendant 8 sec.',
-  'entities.abilities.ironhold.name': 'Rempart de fer',
   'entities.abilities.primal_reflexes.description':
     "Vos instincts s'aiguisent, augmentant votre chance d'esquiver de 50 % pendant 6 sec.",
   'entities.abilities.primal_reflexes.name': 'Réflexes primordiaux',

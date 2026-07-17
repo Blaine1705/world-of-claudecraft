@@ -2711,9 +2711,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
     '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
-  'entities.abilities.ironhold.name': '鉄壁',
-  'entities.abilities.ironhold.description':
-    '堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。',
   'entities.abilities.sacred_bulwark.name': '聖なる防壁',
   'entities.abilities.sacred_bulwark.description':
     '{duration}秒間、次に敵から受ける致命的な一撃を無効化し、代わりに体力を最大値の35%まで回復します。',

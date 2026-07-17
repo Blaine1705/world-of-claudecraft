@@ -6672,10 +6672,6 @@ export const pt_BR: EnTranslations = {
         "name": "Pele de Carvalho",
         "description": "Sua pele endurece como casca, aumentando a armadura em 150 por 15 s."
       },
-      "ironhold": {
-        "name": "Bastião de Ferro",
-        "description": "Proteja-se atrás de sua guarda, reduzindo em 40% o dano recebido por 8 seg."
-      },
       "sacred_bulwark": {
         "name": "Baluarte Sagrado",
         "description": "Por {duration} seg, o próximo golpe inimigo que te mataria é negado, restaurando sua vida para 35% em vez disso."

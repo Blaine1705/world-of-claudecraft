@@ -2,9 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Kalkanının arkasına sığınarak 8 sn boyunca aldığın tüm hasarı %40 azaltırsın.',
-  'entities.abilities.ironhold.name': 'Demir Tutuş',
   'entities.abilities.primal_reflexes.description':
     'İçgüdülerin keskinleşerek 6 sn boyunca savurma şansını %50 artırır.',
   'entities.abilities.primal_reflexes.name': 'Yaban Refleksleri',

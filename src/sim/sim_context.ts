@@ -354,6 +354,8 @@ export interface SimContextCallbacks {
   rollWorldBossLoot(mob: Entity, contributors: PlayerMeta[]): void;
 
   // C2/C3/C4b heal, aura, knockback, and crowd-control surface.
+  // Returns the effective heal applied (post-crit/mult/overheal-clamp). Callers
+  // that ignore the return are unaffected; Power Echo reads it to repeat a heal.
   applyHeal(
     source: Entity,
     target: Entity,
@@ -361,7 +363,7 @@ export interface SimContextCallbacks {
     ability: string,
     abilityId?: string | null,
     canCrit?: boolean,
-  ): void;
+  ): number;
   // Spell crit chance from intellect. STAYS on Sim (shared: the casting/ability
   // paths read it too); exposed here so the extracted heal core can draw its crit.
   spellCrit(p: Entity): number;

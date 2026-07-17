@@ -281,10 +281,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Goad"
       },
       {
-        "id": "ironhold",
-        "name": "Ironhold"
-      },
-      {
         "id": "measured_fury",
         "name": "Measured Fury"
       },

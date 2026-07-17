@@ -633,12 +633,12 @@ const classAbilityNamesEn = {
       [
         'battle_shout',
         'Iron Bellow',
-        'A shout that increases the attack power of all party members by {buff}% for 2 min.',
+        'A shout that increases the attack power of all party members by {buff}% for 30 min.',
       ],
       [
         'demoralizing_shout',
         'Direhowl',
-        'Lets out a fearsome shout, reducing the attack power of all nearby enemies by {buff} for 30 sec.',
+        'Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by {buff}% for 20 sec.',
       ],
       [
         'charge',
@@ -1235,12 +1235,7 @@ const classAbilityNamesEn = {
         'Heals a friendly target for {damage} and an additional amount over 21 sec.',
       ],
       ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 150 for 15 sec.'],
-      // Tank defensive cooldowns (warrior / paladin / druid), one distinct mechanic each.
-      [
-        'ironhold',
-        'Ironhold',
-        'Brace behind your guard, reducing all damage taken by 40% for 8 sec.',
-      ],
+      // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
       [
         'sacred_bulwark',
         'Sacred Bulwark',

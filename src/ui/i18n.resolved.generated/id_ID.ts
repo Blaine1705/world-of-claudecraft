@@ -6672,10 +6672,6 @@ export const id_ID: EnTranslations = {
         "name": "Kulit Ek",
         "description": "Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar 150 selama 15 detik."
       },
-      "ironhold": {
-        "name": "Cengkeraman Besi",
-        "description": "Bertahan di balik perlindunganmu, mengurangi semua kerusakan yang diterima sebesar 40% selama 8 detik."
-      },
       "sacred_bulwark": {
         "name": "Benteng Suci",
         "description": "Selama {duration} detik, serangan musuh berikutnya yang seharusnya membunuhmu ditolak, dan kamu dipulihkan menjadi 35% kesehatan."

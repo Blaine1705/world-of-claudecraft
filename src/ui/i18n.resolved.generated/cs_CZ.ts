@@ -6672,10 +6672,6 @@ export const cs_CZ: EnTranslations = {
         "name": "Dubová kůže",
         "description": "Tvoje kůže ztvrdne jako kůra a zvýší zbroj o 150 na 15 s."
       },
-      "ironhold": {
-        "name": "Železný hmat",
-        "description": "Zapři se za svůj štít a sniž veškeré utrpěné poškození o 40 % po dobu 8 sekund."
-      },
       "sacred_bulwark": {
         "name": "Posvátná hradba",
         "description": "Po dobu {duration} sekund je odvrácen příští nepřátelský úder, který by tě zabil, a místo toho ti obnoví 35 % zdraví."

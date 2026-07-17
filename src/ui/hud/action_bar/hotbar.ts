@@ -285,13 +285,18 @@ export function syncHotbarActions(
   actions: readonly HotbarAction[],
   knownAbilityIds: readonly string[],
   autoPlaceAbilityIds: ReadonlySet<string>,
+  // A passive ability is never castable, so it must never occupy an action slot:
+  // this sweeps a passive left on a bar saved by an older build (and, with the
+  // auto-place set already excluding passives, blocks it from ever re-landing).
+  isPassive: (id: string) => boolean = () => false,
 ): { actions: HotbarAction[]; changed: boolean } {
   const known = new Set(knownAbilityIds);
   const next = actions.map((action) =>
-    action?.type === 'ability' && !known.has(action.id) ? null : action,
+    action?.type === 'ability' && (!known.has(action.id) || isPassive(action.id)) ? null : action,
   );
   let changed = next.some((action, i) => action !== actions[i]);
   for (const id of knownAbilityIds) {
+    if (isPassive(id)) continue;
     if (next.some((action) => action?.type === 'ability' && action.id === id)) continue;
     if (!autoPlaceAbilityIds.has(id)) continue;
     const empty = next.indexOf(null);

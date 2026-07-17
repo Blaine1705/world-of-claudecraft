@@ -330,3 +330,22 @@ describe('ActionBarController attack slot', () => {
     expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'claw' });
   });
 });
+
+describe('ActionBarController: passives never occupy an action slot', () => {
+  it('rejects adding a passive ability (measured_fury), leaving the bar empty', () => {
+    const { controller } = makeHarness('warrior', ['measured_fury'], bar());
+    expect(controller.addAbility('measured_fury')).toBe(false);
+    expect(controller.actions).toEqual(bar());
+  });
+
+  it('sweeps a passive left on the bar by an older build when abilities sync', () => {
+    // sunder_armor is castable, measured_fury is passive: only the passive is cleared.
+    const { controller } = makeHarness(
+      'warrior',
+      ['sunder_armor', 'measured_fury'],
+      bar('sunder_armor', 'measured_fury'),
+    );
+    controller.syncKnownAbilities();
+    expect(controller.actions).toEqual(bar('sunder_armor'));
+  });
+});

@@ -6672,10 +6672,6 @@ export const fr_FR: EnTranslations = {
         "name": "Peau de chêne",
         "description": "Votre peau durcit comme de l'écorce et augmente l'armure de 150 pendant 15 s."
       },
-      "ironhold": {
-        "name": "Rempart de fer",
-        "description": "Vous vous retranchez derrière votre garde, réduisant tous les dégâts subis de 40 % pendant 8 sec."
-      },
       "sacred_bulwark": {
         "name": "Rempart sacré",
         "description": "Pendant {duration} sec, le prochain coup ennemi qui vous tuerait est annulé, vous restaurant à 35 % de vos points de vie à la place."

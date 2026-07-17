@@ -6672,10 +6672,6 @@ export const de_DE: EnTranslations = {
         "name": "Eichenhaut",
         "description": "Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um 150."
       },
-      "ironhold": {
-        "name": "Eisenbastion",
-        "description": "Du verschanzt dich hinter deiner Deckung und verringerst allen erlittenen Schaden um 40% fur 8 Sek."
-      },
       "sacred_bulwark": {
         "name": "Heiliges Bollwerk",
         "description": "Fur {duration} Sek. wird der naechste feindliche Treffer, der dich toeten wurde, abgewehrt und stellt stattdessen 35% deiner Gesundheit wieder her."

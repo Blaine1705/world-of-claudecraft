@@ -2529,7 +2529,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   slam: r('fury', 'steel', ['mace'], ['motion']),
   cleave: r('fury', 'steel', ['axe'], ['arcs']),
   defensive_stance: r('steel', 'steel', ['shield'], ['arcs']),
-  ironhold: r('steel', 'steel', ['shield', { p: 'chestplate', ...BR }], ['glow']),
   sunder_armor: r('steel', 'steel', ['chestplate', { p: 'mace', ...BR }]),
   taunt: r('fury', 'blood', ['fist'], ['arcs']),
   mortal_strike: r('blood', 'blood', ['sword', { p: 'claw_slash', ...BR }]),

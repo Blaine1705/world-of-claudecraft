@@ -13,9 +13,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Du verschanzt dich hinter deiner Deckung und verringerst allen erlittenen Schaden um 40% fur 8 Sek.',
-  'entities.abilities.ironhold.name': 'Eisenbastion',
   'entities.abilities.primal_reflexes.description':
     'Deine Instinkte schaerfen sich und erhoehen deine Ausweichschance fur 6 Sek. um 50%.',
   'entities.abilities.primal_reflexes.name': 'Urreflexe',

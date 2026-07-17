@@ -13,9 +13,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Proteja-se atrás de sua guarda, reduzindo em 40% o dano recebido por 8 seg.',
-  'entities.abilities.ironhold.name': 'Bastião de Ferro',
   'entities.abilities.primal_reflexes.description':
     'Seus instintos se aguçam, aumentando sua chance de esquivar em 50% por 6 seg.',
   'entities.abilities.primal_reflexes.name': 'Reflexos Primais',

@@ -6672,10 +6672,6 @@ export const zh_CN: EnTranslations = {
         "name": "橡树皮",
         "description": "你的皮肤硬化如树皮，使护甲提高 150，持续 15 秒。"
       },
-      "ironhold": {
-        "name": "铁壁",
-        "description": "以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。"
-      },
       "sacred_bulwark": {
         "name": "神圣壁垒",
         "description": "在 {duration} 秒内，下一次会杀死你的敌人攻击将被抵消，转而将你恢复至 35% 生命值。"

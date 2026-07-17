@@ -176,7 +176,7 @@ export function dealDamage(
     amount = Math.round(amount * 0.9);
   }
 
-  // Ironhold (Shield Wall): a big defensive cooldown, fraction less damage from any
+  // Shield Wall ward: a big defensive cooldown, fraction less damage from any
   // source, any school, DoT ticks included. Non-stacking: the strongest ward wins.
   if (amount > 0) {
     let ward = 0;

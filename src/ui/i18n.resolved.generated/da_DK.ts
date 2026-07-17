@@ -6672,10 +6672,6 @@ export const da_DK: EnTranslations = {
         "name": "Egehud",
         "description": "Din hud hærder som bark, og øger rustning med 150 i 15 sek."
       },
-      "ironhold": {
-        "name": "Jernhold",
-        "description": "Slut dig bag dit skjold og reducer al skade med 40% i 8 sek."
-      },
       "sacred_bulwark": {
         "name": "Hellig Bolværk",
         "description": "I {duration} sek. nægtes det næste fjendtlige ramte slag, der ville dræbe dig, og du genvinder 35% helbred i stedet."

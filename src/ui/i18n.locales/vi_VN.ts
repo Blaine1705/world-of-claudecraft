@@ -2,9 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Ẩn sau lá chắn bảo vệ, giảm 40% sát thương nhận vào trong 8 giây.',
-  'entities.abilities.ironhold.name': 'Thiết Lũy',
   'entities.abilities.primal_reflexes.description':
     'Bản năng của bạn trở nên sắc bén, tăng 50% cơ hội né đòn trong 6 giây.',
   'entities.abilities.primal_reflexes.name': 'Phản Xạ Nguyên Thủy',

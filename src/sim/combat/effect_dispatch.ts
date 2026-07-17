@@ -656,7 +656,25 @@ export function runEffects(
         // healing mirror of the direct-nuke rider (applyHeal fires the crit).
         const healAmount =
           ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
-        ctx.applyHeal(p, healTarget, healAmount, ability.name, ability.id);
+        const healed = ctx.applyHeal(p, healTarget, healAmount, ability.name, ability.id);
+        // Power Echo (mage choice row): the armed echo also repeats a direct HEAL
+        // (Temporal Mend, Temporal Echo) at its fraction of the RESOLVED heal on
+        // the same target, consumed BEFORE the repeat so a copy can never re-echo.
+        // The direct-nuke path above does the same for damage. The echo itself
+        // cannot crit (canCrit false): it draws no new rng, mirroring the damage
+        // echo reusing its already-rolled amount.
+        if (isSpell) {
+          const echoIdx = p.auras.findIndex((a) => a.kind === 'power_echo');
+          if (echoIdx >= 0) {
+            const echoAura = p.auras[echoIdx];
+            p.auras.splice(echoIdx, 1);
+            ctx.emit({ type: 'aura', targetId: p.id, name: echoAura.name, gained: false });
+            if (!healTarget.dead && healed > 0) {
+              const echoHeal = Math.max(1, Math.round(healed * echoAura.value));
+              ctx.applyHeal(p, healTarget, echoHeal, ability.name, ability.id, false);
+            }
+          }
+        }
         break;
       }
       case 'chainHeal': {

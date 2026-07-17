@@ -118,13 +118,21 @@ export class ActionBarController {
     }
     const formToggle = this.formToggleAbilityId();
     if (formToggle && knownAbilityIds.includes(formToggle)) autoPlaceAbilityIds.add(formToggle);
-    const synced = syncHotbarActions(this.actionState, knownAbilityIds, autoPlaceAbilityIds);
+    const synced = syncHotbarActions(
+      this.actionState,
+      knownAbilityIds,
+      autoPlaceAbilityIds,
+      (id) => !!ABILITIES[id]?.passive,
+    );
     this.actionState = synced.actions;
     if (synced.changed) this.saveActions();
     this.knownAbilityIdsAtLastSync = new Set(knownAbilityIds);
   }
 
   addAbility(abilityId: string): boolean {
+    // A passive is never castable: reject a manual drag/spellbook add so it
+    // cannot occupy a dead action slot (auto-place already skips passives).
+    if (ABILITIES[abilityId]?.passive) return false;
     if (this.actionState.some((action) => action?.type === 'ability' && action.id === abilityId)) {
       return false;
     }
@@ -214,6 +222,8 @@ export class ActionBarController {
   }
 
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
+    // Passives never castable: keep them off every seeded/form kit bar too.
+    if (ABILITIES[id]?.passive) return false;
     if (form === 'sport') return !!SPORT_ABILITIES[id];
     if (SPORT_ABILITIES[id]) return false;
     if (this.isStealthForm(form)) return false;

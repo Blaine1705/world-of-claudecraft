@@ -166,7 +166,13 @@ export function abilityBuffValue(res: ResolvedAbility): number | null {
       if (eff.kind === 'form_fireball') return (eff.value - 1) * 100;
       return eff.value;
     }
-    if (eff.type === 'aoeAttackPower') return eff.amount ?? null;
+    if (eff.type === 'aoeAttackPower') {
+      // The reworked shout (Direhowl) is a percentage damage cut (pct) rather than
+      // the old flat attack-power drain (amount): show the whole-percent value the
+      // player feels, so $b never renders the now-zero legacy amount.
+      if (eff.pct != null) return Math.round(eff.pct * 100);
+      return eff.amount ?? null;
+    }
   }
   return null;
 }

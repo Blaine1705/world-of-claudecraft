@@ -184,7 +184,7 @@ export const TALENT_ABILITIES_V2_A = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    // Balance pass: also cuts all damage taken (buff_dr, the Ironhold kind)
+    // Balance pass: also cuts all damage taken (buff_dr, an all-school reduction)
     // so the wall works against casters, not just melee swings.
     effects: [
       { type: 'selfBuff', kind: 'buff_dodge', value: 0.5, duration: 10 },

@@ -464,6 +464,26 @@ describe('hotbar slot sync', () => {
       { type: 'ability', id: 'blink' },
     ]);
   });
+
+  it('sweeps a passive left on the bar by an older build, and never re-places it', () => {
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'ability' as const, id: 'measured_fury' }, // passive saved by an older build
+      { type: 'ability' as const, id: 'blink' },
+    ];
+    const known = ['fireball', 'measured_fury', 'blink'];
+    const isPassive = (id: string) => id === 'measured_fury';
+
+    // measured_fury is known but passive: its slot is cleared, and it is NOT
+    // re-added even if the auto-place set (defensively) contains it.
+    const synced = syncHotbarActions(slots, known, new Set(['measured_fury']), isPassive);
+    expect(synced.actions).toEqual([
+      { type: 'ability', id: 'fireball' },
+      null,
+      { type: 'ability', id: 'blink' },
+    ]);
+    expect(synced.changed).toBe(true);
+  });
 });
 
 describe('applying a saved talent loadout bar', () => {

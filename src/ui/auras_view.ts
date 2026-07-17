@@ -56,6 +56,11 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
 // Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
 // Sprint also uses, 15s and very much worth a countdown), so it hides by id.
 const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
+// The inverse override: an aura that rides a TOGGLE_KIND but is a genuine timed
+// buff worth a countdown. Greater Invisibility reuses the rogue-stealth machinery
+// for its vanish (kind 'stealth' with full move speed), but it is a fixed 20s
+// buff, not a toggle, so it must show its remaining time like any other buff.
+const TIMED_IDS: ReadonlySet<string> = new Set(['greater_invisibility']);
 
 /** The localized single-letter unit suffixes the compact duration label uses. */
 export interface DurationUnits {
@@ -283,7 +288,7 @@ export function createAurasView(
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
         slot.durationText =
-          TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)
+          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id)
             ? ''
             : compactAuraDuration(a.remaining, units);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the

@@ -6672,10 +6672,6 @@ export const ko_KR: EnTranslations = {
         "name": "참나무 가죽",
         "description": "피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다."
       },
-      "ironhold": {
-        "name": "철벽",
-        "description": "굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다."
-      },
       "sacred_bulwark": {
         "name": "신성한 방벽",
         "description": "{duration}초 동안 다음 적의 치명적인 공격을 무효화하고, 대신 생명력을 최대치의 35%까지 회복합니다."

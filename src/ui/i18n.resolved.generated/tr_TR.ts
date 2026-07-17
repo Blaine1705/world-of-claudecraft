@@ -6672,10 +6672,6 @@ export const tr_TR: EnTranslations = {
         "name": "Meşe Derisi",
         "description": "Derin ağaç kabuğu gibi sertleşir, zırhı 15 saniye boyunca 150 artırır."
       },
-      "ironhold": {
-        "name": "Demir Tutuş",
-        "description": "Kalkanının arkasına sığınarak 8 sn boyunca aldığın tüm hasarı %40 azaltırsın."
-      },
       "sacred_bulwark": {
         "name": "Kutsal Siper",
         "description": "{duration} sn boyunca, seni öldürebilecek bir sonraki düşman darbesi engellenir ve bunun yerine canın %35'e geri döner."

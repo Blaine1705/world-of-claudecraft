@@ -36,9 +36,6 @@ const WINNING_WARRIOR_KIT = [
   'intimidating_shout',
   'sunder_armor',
   'taunt',
-  // v0.27 base addition kept through the port: the warrior mitigation wall
-  // (main added it after the overhaul revert; the redesign keeps it).
-  'ironhold',
   'measured_fury',
   'seasoned_soldier',
   'sudden_death',

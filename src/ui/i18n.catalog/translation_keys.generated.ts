@@ -1218,8 +1218,6 @@ export type TranslationKeyFlat =
   | 'entities.abilities.intimidating_shout.name'
   | 'entities.abilities.iron_resolve.description'
   | 'entities.abilities.iron_resolve.name'
-  | 'entities.abilities.ironhold.description'
-  | 'entities.abilities.ironhold.name'
   | 'entities.abilities.judgement.description'
   | 'entities.abilities.judgement.name'
   | 'entities.abilities.kick.description'

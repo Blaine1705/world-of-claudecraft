@@ -6672,10 +6672,6 @@ export const ja_JP: EnTranslations = {
         "name": "樫の肌",
         "description": "肌が樹皮のように硬くなり、15秒間アーマーが150増加します。"
       },
-      "ironhold": {
-        "name": "鉄壁",
-        "description": "堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。"
-      },
       "sacred_bulwark": {
         "name": "聖なる防壁",
         "description": "{duration}秒間、次に敵から受ける致命的な一撃を無効化し、代わりに体力を最大値の35%まで回復します。"
