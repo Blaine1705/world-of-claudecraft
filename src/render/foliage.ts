@@ -2086,11 +2086,15 @@ function updateTreeHides(
   camY: number,
   camZ: number,
 ): void {
-  for (const t of trees) {
+  // This scans every world tree each frame (3k+ in the shipped field). An
+  // indexed loop avoids one iterator result allocation per tree per frame.
+  for (let i = 0; i < trees.length; i++) {
+    const t = trees[i];
     const hide = cameraSegmentHitsTree(t, eyeX, eyeY, eyeZ, camX, camY, camZ);
     if (hide === t.hidden) continue;
     t.hidden = hide;
-    for (const part of t.parts) {
+    for (let j = 0; j < t.parts.length; j++) {
+      const part = t.parts[j];
       part.mesh.setMatrixAt(part.index, hide ? part.hiddenMatrix : part.visibleMatrix);
       part.mesh.instanceMatrix.needsUpdate = true;
     }
