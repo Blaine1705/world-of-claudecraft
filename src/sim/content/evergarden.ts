@@ -74,17 +74,22 @@ export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
   [
     { x: 320, z: 810 },
     { x: 298, z: 852 },
-    { x: 276, z: 894 },
-    { x: 272, z: 890 },
+    { x: 290, z: 872 },
+    { x: 288, z: 887 },
   ], // Hedgewick -> the Rose Wilds -> Dawnhold's gate
   [
+    // skirts SOUTH around the bluff dip by the pond inlet: the old straight
+    // line ran down a steep bank; these waypoints hold the flat shelf
     { x: 320, z: 810 },
     { x: 366, z: 818 },
-    { x: 408, z: 832 },
+    { x: 376, z: 826 },
+    { x: 388, z: 832 },
+    { x: 398, z: 839 },
+    { x: 410, z: 836 },
     { x: 422, z: 835 },
-  ], // Hedgewick -> the Petal Pond's west shore
+  ], // Hedgewick -> around the inlet -> the Petal Pond's west shore
   [
-    { x: 408, z: 832 },
+    { x: 410, z: 836 },
     { x: 438, z: 833 },
     { x: 466, z: 827 },
     { x: 480, z: 812 },
@@ -238,29 +243,28 @@ export const EVERGARDEN_OBJECTS: GroundObjectDef[] = [];
 export const EVERGARDEN_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Hedgewick: the groundskeepers' hamlet by the gate lawns
+  // full-size buildings: the hamlet used to read doll-scale next to a player
   buildings: [
-    { kind: 'inn', x: 312, z: 804, w: 6, d: 7, rot: 0.7 },
-    { kind: 'house', x: 328, z: 818, w: 5, d: 5, rot: -1.0 },
-    { kind: 'house', x: 314, z: 820, w: 5, d: 5, rot: 2.1 },
+    { kind: 'inn', x: 312, z: 804, w: 12, d: 14, rot: 0.7 },
+    { kind: 'house', x: 330, z: 818, w: 10, d: 10, rot: -1.0 },
+    { kind: 'house', x: 312, z: 822, w: 10, d: 10, rot: 2.1 },
   ],
-  wells: [{ x: 320, z: 812, r: 1.5 }],
-  stalls: [{ x: 324, z: 804, rot: 0.5, r: 1.6 }],
+  wells: [{ x: 321, z: 812, r: 1.5 }],
+  stalls: [{ x: 326, z: 802, rot: 0.5, r: 1.6 }],
   crates: [
-    [309, 810],
-    [327, 810],
+    [300, 808],
+    [330, 806],
   ],
   campfires: [
-    [320, 806],
+    [324, 798],
     [388, 716], // the Garden Gate's waycamp
   ],
   // no wooden hedgerow fences: the hamlet opens onto the lawns, and the
   // churchyard's wrought-iron enclosure (decorProps below) is the one border
   fences: [],
-  // the Statuary Walk's marble colonnade, and a folly on the north lawn
-  ruinRings: [
-    { x: 360, z: 875, ringR: 7, columns: 6 },
-    { x: 400, z: 1182, ringR: 6, columns: 5 },
-  ],
+  // a marble folly on the north lawn (the old Statuary Walk colonnade ring
+  // came down: it read as rubble among the flower borders)
+  ruinRings: [{ x: 400, z: 1182, ringR: 6, columns: 5 }],
   // the gardener's own plot, unweeded and unnamed, inside the churchyard
   // (east of the chapel so the Pale Keeper hovers clear of its collider)
   graveyards: [{ x: 309, z: 793 }],
@@ -279,41 +283,56 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
   // against terrain, roads, camps, and the parterre plan by
   // tests/garden_parterre.test.ts.
   decorProps: [
-    // the Old Mill: centerpiece of the southeast lawn's ring bed at the end
-    // of the lakeshore walk (garden_parterre_core skips its center bush)
-    { key: 'hexWindmill', x: 504, z: 760, rot: -0.3, scale: 6, r: 3.5, h: 9 },
-    // Dawnhold: the walled garden castle on the Rose Wilds lawn. The keep
-    // holds the west side; cannon towers flank the iron-arched east gate,
-    // plain towers watch the rear, and curtain walls close the courtyard.
-    // The wolves' knights patrol the gate lawn outside.
-    { key: 'hexCastle', x: 250, z: 889, rot: Math.PI / 2, scale: 6.5, r: 8, h: 24 },
-    { key: 'hexCannonTower', x: 268, z: 876, rot: Math.PI / 2, scale: 5.5, r: 3, h: 13 },
-    { key: 'hexCannonTower', x: 268, z: 902, rot: Math.PI / 2, scale: 5.5, r: 3, h: 13 },
-    { key: 'hexTower', x: 244, z: 876, rot: Math.PI / 2, scale: 5.5, r: 3, h: 12 },
-    { key: 'hexTower', x: 244, z: 902, rot: Math.PI / 2, scale: 5.5, r: 3, h: 12 },
-    { key: 'hexWall', x: 268, z: 882.5, rot: Math.PI / 2, scale: 5, r: 4, h: 6 },
-    { key: 'hexWall', x: 268, z: 895.5, rot: Math.PI / 2, scale: 5, r: 4, h: 6 },
-    { key: 'hexWall', x: 252, z: 902, rot: 0, scale: 4.5, r: 3.6, h: 6 },
-    { key: 'hexWall', x: 261, z: 902, rot: 0, scale: 4.5, r: 3.6, h: 6 },
-    { key: 'hexWall', x: 252, z: 876, rot: 0, scale: 4.5, r: 3.6, h: 6 },
-    { key: 'hexWall', x: 261, z: 876, rot: 0, scale: 4.5, r: 3.6, h: 6 },
-    { key: 'gardenArch', x: 268, z: 889, rot: Math.PI / 2, scale: 1.4 },
-    { key: 'hexFlag', x: 268, z: 885.6, scale: 3 },
-    { key: 'hexFlag', x: 268, z: 892.4, scale: 3 },
-    { key: 'hexCannonballs', x: 259, z: 897, scale: 5 },
-    { key: 'hexWeaponRack', x: 259, z: 881, rot: 1.2, scale: 8 },
-    { key: 'hexBarracks', x: 278, z: 872, rot: -0.5, scale: 5, r: 4, h: 8 },
-    // Hedgewick's medieval quarter: chapel by the churchyard, tavern on the
-    // pond road, smithy and new homes filling out the hamlet
-    { key: 'hexChurch', x: 300, z: 788, rot: Math.PI / 2, scale: 6, r: 4.2, h: 10 },
-    { key: 'hexTavern', x: 352, z: 806, rot: -1.45, scale: 5.5, r: 4.2, h: 8 },
-    { key: 'hexBlacksmith', x: 296, z: 822, rot: 2.03, scale: 5, r: 3.8, h: 6 },
-    { key: 'hexHomeA', x: 322, z: 828, rot: Math.PI, scale: 5, r: 3.5, h: 7 },
-    { key: 'hexHomeB', x: 334, z: 790, rot: 0.6, scale: 5, r: 3.5, h: 7 },
-    { key: 'hexMarket', x: 318, z: 834, rot: Math.PI, scale: 4, r: 3, h: 5 },
-    // garden arches over the two grand approaches: the Garden Gate road and
-    // the maze mouth (walk-through: no collider, they span the walks)
-    { key: 'gardenArch', x: 391, z: 747, rot: 2.97, scale: 1.4 },
+    // the mill lawn: three windmills turning over their own ring beds at the
+    // end of the lakeshore walk (garden_parterre_core skips their center
+    // bushes; the Old Mill at 504,760 stands tallest)
+    { key: 'hexWindmill', x: 504, z: 760, rot: -0.3, scale: 9, r: 5, h: 13 },
+    { key: 'hexWindmill', x: 492, z: 744, rot: 0.4, scale: 8, r: 4.5, h: 12 },
+    { key: 'hexWindmill', x: 516, z: 750, rot: -1.1, scale: 8, r: 4.5, h: 12 },
+    // Dawnhold: the walled garden castle on the Rose Wilds lawn, built at
+    // full scale. The keep holds the west side; cannon towers flank the
+    // stone-arched east gate, plain towers watch the rear, and curtain
+    // walls close the courtyard. The wolves' knights hold the courtyard
+    // and the gate lawn.
+    { key: 'hexCastle', x: 257, z: 889, rot: Math.PI / 2, scale: 13, r: 15, h: 48 },
+    { key: 'hexCannonTower', x: 282, z: 868, rot: Math.PI / 2, scale: 11, r: 5.5, h: 26 },
+    { key: 'hexCannonTower', x: 282, z: 910, rot: Math.PI / 2, scale: 11, r: 5.5, h: 26 },
+    { key: 'hexTower', x: 242, z: 868, rot: Math.PI / 2, scale: 11, r: 5.5, h: 24 },
+    { key: 'hexTower', x: 242, z: 910, rot: Math.PI / 2, scale: 11, r: 5.5, h: 24 },
+    { key: 'hexWall', x: 282, z: 877, rot: Math.PI / 2, scale: 9, r: 7, h: 10 },
+    { key: 'hexWall', x: 282, z: 901, rot: Math.PI / 2, scale: 9, r: 7, h: 10 },
+    { key: 'hexWall', x: 252, z: 910, rot: 0, scale: 9, r: 7, h: 10 },
+    { key: 'hexWall', x: 270, z: 910, rot: 0, scale: 9, r: 7, h: 10 },
+    { key: 'hexWall', x: 252, z: 868, rot: 0, scale: 9, r: 7, h: 10 },
+    { key: 'hexWall', x: 270, z: 868, rot: 0, scale: 9, r: 7, h: 10 },
+    { key: 'gardenArch', x: 282, z: 889, rot: Math.PI / 2, scale: 2.2 },
+    { key: 'hexFlag', x: 282, z: 884, scale: 4 },
+    { key: 'hexFlag', x: 282, z: 894, scale: 4 },
+    { key: 'hexCannonballs', x: 275, z: 903, scale: 7 },
+    { key: 'hexWeaponRack', x: 275, z: 875, rot: 1.2, scale: 10 },
+    { key: 'hexBarracks', x: 296, z: 870, rot: -0.6, scale: 10, r: 7.5, h: 16 },
+    // Hedgewick's medieval quarter at full scale: chapel by the churchyard,
+    // tavern on the pond road, smithy, homes, and the market stall
+    { key: 'hexChurch', x: 302, z: 788, rot: Math.PI / 2, scale: 10, r: 7, h: 18 },
+    { key: 'hexTavern', x: 352, z: 806, rot: -1.45, scale: 11, r: 8, h: 16 },
+    { key: 'hexBlacksmith', x: 296, z: 822, rot: 2.03, scale: 10, r: 7.6, h: 12 },
+    { key: 'hexHomeA', x: 322, z: 828, rot: Math.PI, scale: 10, r: 7, h: 14 },
+    { key: 'hexHomeB', x: 334, z: 790, rot: 0.6, scale: 10, r: 7, h: 14 },
+    { key: 'hexMarket', x: 316, z: 840, rot: Math.PI, scale: 8, r: 6, h: 9 },
+    // the Garden Gate: a grand doubled arch over the entry road, flanked by
+    // flush stone walls (colliders on), with the parterre core's hedge line
+    // and flower border along their garden face; the maze mouth keeps its
+    // smaller arch (both arches stay walk-through: they span the walks)
+    { key: 'gardenArch', x: 391, z: 747, rot: 2.97, scale: 2.8 },
+    { key: 'hexWall', x: 378.7, z: 744.9, rot: 2.97, scale: 7, r: 6, h: 8 },
+    { key: 'hexWall', x: 370, z: 743.5, rot: 2.97, scale: 7, r: 6, h: 8 },
+    { key: 'hexWall', x: 403.3, z: 749.1, rot: 2.97, scale: 7, r: 6, h: 8 },
+    { key: 'hexWall', x: 415.5, z: 751.2, rot: 2.97, scale: 7, r: 6, h: 8 },
+    // oaks shading the gate lawns
+    { key: 'oakTree', x: 372, z: 760, rot: 0.8, scale: 1.3, r: 0.8, h: 9 },
+    { key: 'oakTree', x: 412, z: 738, rot: 2.1, scale: 1.4, r: 0.8, h: 9 },
+    { key: 'oakTree', x: 408, z: 760, rot: -1.3, scale: 1.2, r: 0.8, h: 9 },
+    { key: 'oakTree', x: 376, z: 732, rot: 0.2, scale: 1.35, r: 0.8, h: 9 },
     { key: 'gardenArch', x: 360, z: 933, rot: 0, scale: 1.4 },
     // watchtowers on the walks: one over the Garden Gate, one at the north
     // knights' post

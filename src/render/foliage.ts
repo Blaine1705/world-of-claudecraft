@@ -24,6 +24,7 @@ import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { bucketVisible, type LodDists, lodDistsFor, treeDetailDistance } from './foliage_lod';
 import {
+  gardenLushGrassAt,
   gardenMeadowTintAt,
   inParterrePlot,
   parterreBushSpots,
@@ -1815,9 +1816,11 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (Math.abs(x) > WORLD_MAX_X - 16 || z < WORLD_MIN_Z + 16 || z > WORLD_MAX_Z - 16)
           continue;
         const tuftBiome = zoneBiomeAt(x, z);
-        // the Evergarden lawn is mown bare, but INSIDE a parterre bed grass
-        // fills the gaps between blooms the way a real planting grows in
-        const gardenBedTuft = tuftBiome === 'garden' && inParterrePlot(x, z, -1.2);
+        // the Evergarden lawn is mown bare, but around the plantings grass
+        // grows back the way a real bed does: through every parterre bed
+        // and slightly past its hedge line, and across the meadow patches a
+        // little beyond where the flowers stop
+        const gardenBedTuft = tuftBiome === 'garden' && gardenLushGrassAt(x, z);
         const density =
           (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW) *
           (gardenBedTuft ? 0.9 : (GRASS_BIOME_DENSITY[tuftBiome] ?? 1));

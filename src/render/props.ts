@@ -169,6 +169,9 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexWeaponRack: { url: '/models/biome/hex_weaponrack.glb', kit: 'khex' },
   hexFlag: { url: '/models/biome/hex_flag.glb', kit: 'khex' },
   hexWheelbarrow: { url: '/models/biome/hex_wheelbarrow.glb', kit: 'khex' },
+  // a placeable oak (the foliage kit's biggest crown) for authored shade
+  // spots like the Garden Gate lawns; decor entries set scale, r is trunk
+  oakTree: { url: '/models/foliage/oak_4.glb', kit: 'kfol' },
   gardenIronFence: { url: '/models/props/garden_iron_fence.glb', kit: 'kiron' },
   gardenIronPillar: { url: '/models/props/garden_iron_pillar.glb', kit: 'kiron' },
   gardenIronGate: { url: '/models/props/garden_iron_gate.glb', kit: 'kiron' },

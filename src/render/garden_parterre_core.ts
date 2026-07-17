@@ -59,11 +59,17 @@ export interface TopiarySpot {
 // test re-validates all of that against the live terrain).
 export const PARTERRE_PLOTS: readonly ParterrePlot[] = [
   { x: 322, z: 878, r: 10, kind: 'quatrefoil' }, // west of the Statuary Walk
+  // three smaller satellite beds orbiting the grand west quatrefoil
+  { x: 300, z: 872, r: 5, kind: 'concentric' },
+  { x: 306, z: 894, r: 5, kind: 'knot' },
+  { x: 334, z: 896, r: 5, kind: 'quatrefoil' },
   { x: 400, z: 866, r: 9, kind: 'quatrefoil' }, // east of the Statuary Walk
   // (the Rose Wilds lawn now belongs to Dawnhold castle and its knights)
   { x: 256, z: 952, r: 9, kind: 'knot' }, // west maze forecourt
-  // the far southeast lawn: the old mill turns at the heart of its rings
+  // the mill lawn: three windmills turning over their own ring beds
   { x: 504, z: 760, r: 8.5, kind: 'concentric', centerpiece: 'windmill' },
+  { x: 492, z: 744, r: 7, kind: 'concentric', centerpiece: 'windmill' },
+  { x: 516, z: 750, r: 6.5, kind: 'concentric', centerpiece: 'windmill' },
   { x: 420, z: 750, r: 7.5, kind: 'quatrefoil' }, // east of the Garden Gate road
   { x: 476, z: 1010, r: 7.5, kind: 'knot' }, // east of the maze road
   { x: 300, z: 1118, r: 6, kind: 'concentric' }, // the north lawn
@@ -99,7 +105,18 @@ const GARDEN_Z1 = EVERGARDEN_ZONE.zMax;
 const MAZE_MARGIN = 6;
 const MAZE_X1 = MAZE_X0 + MAZE_COLS * MAZE_CELL;
 // the Statuary Walk keeps its marble pairs: no avenue topiary between them
+// (its path hedges DO run: the clipped line reads well at the statues' feet)
 const STATUE_LANE = { x0: 343, x1: 377, z0: 830, z1: 935 } as const;
+
+// The Garden Gate's welcome front: the doubled stone arch at the zone entry
+// with flanking walls (EVERGARDEN_PROPS.decorProps), dressed on the garden
+// side with a clipped hedge line and a flower border. Wall-line coordinates:
+// u runs along the wall line, v is the offset toward the garden (north).
+const GATE = { x: 391, z: 747, rot: 2.97 } as const;
+const GATE_P = { x: Math.cos(GATE.rot), z: -Math.sin(GATE.rot) } as const; // wall line dir
+const GATE_N = { x: -Math.sin(GATE.rot), z: -Math.cos(GATE.rot) } as const; // garden side
+const GATE_HALF = 24; // the dressed frontage on each side of the arch
+const GATE_MOUTH = 7; // clear of the arch opening
 
 function smoothstep(e0: number, e1: number, v: number): number {
   const t = Math.min(1, Math.max(0, (v - e0) / (e1 - e0)));
@@ -169,6 +186,17 @@ export function parterreFlowerTintAt(x: number, z: number): number {
     const s = u / stripeW + 8; // shift positive so floor() is stable
     const stripe = Math.floor(s) % 3;
     return stripe === 0 ? ca : stripe === 1 ? cb : cd;
+  }
+  // the Garden Gate's flower border, along the garden face of its walls
+  {
+    const gdx = x - GATE.x;
+    const gdz = z - GATE.z;
+    const u = gdx * GATE_P.x + gdz * GATE_P.z;
+    const v = gdx * GATE_N.x + gdz * GATE_N.z;
+    if (Math.abs(u) > GATE_MOUTH && Math.abs(u) < GATE_HALF && v > 2.8 && v < 4.6) {
+      const block = Math.abs(Math.floor((u + 60) / 6));
+      return RIBBON_TINTS[block % RIBBON_TINTS.length];
+    }
   }
   // the walk ribbons: continuous border beds behind the path hedges
   if (x > GARDEN_X0 + 12 && x < GARDEN_X1 - 12 && z > GARDEN_Z0 + 10 && z < GARDEN_Z1 - 10) {
@@ -317,8 +345,6 @@ export function parterreBushSpots(seed: number): ParterreBushSpot[] {
           const x = cx - uz * side * HEDGE_OFFSET;
           const z = cz + ux * side * HEDGE_OFFSET;
           if (inMazeRect(x, z)) continue;
-          if (x > STATUE_LANE.x0 && x < STATUE_LANE.x1 && z > STATUE_LANE.z0 && z < STATUE_LANE.z1)
-            continue;
           if (Math.hypot(x - hub.x, z - hub.z) < hub.radius + 4) continue;
           // a crossing road runs closer than this spot's own: a junction gap
           if (roadDistance(x, z) < HEDGE_OFFSET - 0.8) continue;
@@ -330,7 +356,34 @@ export function parterreBushSpots(seed: number): ParterreBushSpot[] {
       if (carry >= HEDGE_STEP) carry -= HEDGE_STEP;
     }
   }
+  // the Garden Gate's hedge line, hugging the garden face of its walls
+  for (const side of [-1, 1]) {
+    for (let u = GATE_MOUTH + 1; u <= GATE_HALF - 1; u += HEDGE_STEP) {
+      const x = GATE.x + GATE_P.x * u * side + GATE_N.x * 2.0;
+      const z = GATE.z + GATE_P.z * u * side + GATE_N.z * 2.0;
+      hedge(x, z);
+    }
+  }
   return out;
+}
+
+/**
+ * True where lawn grass should grow back around the plantings: inside and
+ * just beyond every bed's hedge line, and across the meadow patches a bit
+ * past where the flowers stop, so both read lush instead of clipped edges.
+ */
+export function gardenLushGrassAt(x: number, z: number): boolean {
+  if (inParterrePlot(x, z, 1.8)) return true;
+  if (x < GARDEN_X0 + 12 || x > GARDEN_X1 - 12 || z < GARDEN_Z0 + 10 || z > GARDEN_Z1 - 10) {
+    return false;
+  }
+  if (inMazeRect(x, z)) return false;
+  const hub = EVERGARDEN_ZONE.hub;
+  if (Math.hypot(x - hub.x, z - hub.z) < hub.radius + 10) return false;
+  if (roadDistance(x, z) < 6.5) return false;
+  // the meadow patch shape at a looser threshold than the flowers (0.62), so
+  // the grass halo runs a little beyond the blooms
+  return fbm2(x * 0.045, z * 0.045, 7301, 2) >= 0.58;
 }
 
 /**
