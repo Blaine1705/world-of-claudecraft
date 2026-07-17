@@ -5,17 +5,12 @@
 // spots (the same records the sim's trunk colliders use). Same contract as
 // the sibling realm modules: build once, update(time) animates gently.
 import * as THREE from 'three';
-import { EVERGARDEN_PROPS, EVERGARDEN_ZONE } from '../sim/content/evergarden';
+import { EVERGARDEN_PROPS } from '../sim/content/evergarden';
 import { hash2 } from '../sim/rng';
-import {
-  gardenLandness,
-  inGardenMaze,
-  roadDistance,
-  terrainHeight,
-  WATER_LEVEL,
-} from '../sim/world';
+import { inGardenMaze, terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { gardenAvenueSpots } from './garden_parterre_core';
 import { GFX } from './gfx';
 
 export interface GardenFeaturesView {
@@ -217,35 +212,27 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
     if (y > WATER_LEVEL) group.add(buildFountain(360, 1016.5, y - 0.1));
   }
 
-  // --- the topiary forms: a deterministic scatter over the open lawns,
-  // clear of the maze, the hamlet, the roads, and the water ---
+  // --- the topiary forms: formal avenue pairs flanking the walks plus cone
+  // sentinels at the parterre plot corners (the planting plan lives in
+  // garden_parterre_core.ts), never a random lawn scatter: the Evergarden
+  // reads as a designed palace garden ---
   {
     const geos = topiaryGeos();
     const spotSets: { x: number; z: number; y: number; s: number; rot: number; tint: number }[][] =
       [[], [], []];
-    const hub = EVERGARDEN_ZONE.hub;
-    for (let gx = 184; gx <= 536; gx += 12) {
-      for (let gz = GARDEN_ZMIN + 14; gz <= GARDEN_ZMAX - 10; gz += 12) {
-        const r = hash2(gx, gz, seed + 6201);
-        if (r > 0.34) continue;
-        const x = gx + (hash2(gx, gz, seed + 6211) - 0.5) * 9;
-        const z = gz + (hash2(gz, gx, seed + 6221) - 0.5) * 9;
-        if (inGardenMaze(x, z)) continue;
-        if (Math.hypot(x - hub.x, z - hub.z) < hub.radius + 8) continue;
-        if (gardenLandness(x, z) < 0.22) continue;
-        if (roadDistance(x, z) < 8) continue;
-        const y = terrainHeight(x, z, seed);
-        if (y < WATER_LEVEL + 1.2 || y > 12) continue;
-        const kind = Math.floor(hash2(x, z, seed + 6231) * 3) % 3;
-        spotSets[kind].push({
-          x,
-          z,
-          y: y - 0.12,
-          s: 0.8 + hash2(z, x, seed + 6241) * 0.6,
-          rot: hash2(x + 3, z - 3, seed + 6251) * Math.PI * 2,
-          tint: TOPIARY_TINTS[Math.floor(hash2(x, z, seed + 6261) * 3) % 3],
-        });
-      }
+    for (const sp of gardenAvenueSpots(seed)) {
+      if (inGardenMaze(sp.x, sp.z)) continue;
+      const y = terrainHeight(sp.x, sp.z, seed);
+      if (y < WATER_LEVEL + 1.2 || y > 12) continue;
+      spotSets[sp.form].push({
+        x: sp.x,
+        z: sp.z,
+        y: y - 0.12,
+        // clipped to a standard: uniform size, only the faintest drift
+        s: 1.0 + (hash2(sp.x, sp.z, seed + 6241) - 0.5) * 0.12,
+        rot: sp.rot,
+        tint: TOPIARY_TINTS[sp.form % TOPIARY_TINTS.length],
+      });
     }
     const leafMat = mat(0xffffff, 0.85);
     for (let k = 0; k < 3; k++) instance(geos[k], leafMat, spotSets[k], true);

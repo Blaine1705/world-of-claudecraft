@@ -23,6 +23,7 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { bucketVisible, type LodDists, lodDistsFor, treeDetailDistance } from './foliage_lod';
+import { inParterrePlot, parterreBushSpots, parterreFlowerTintAt } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
@@ -70,6 +71,9 @@ const GRASS_DENSITY_HIGH = 0.5;
 const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
   frost: 0,
   haunt: 1.55,
+  // the Evergarden is mown lawn: no wild tufts, its flowers grow in the
+  // authored parterre beds instead (garden_parterre_core.ts)
+  garden: 0,
 };
 const GRASS_DENSITY_MULT_MAX = Math.max(1, ...Object.values(GRASS_BIOME_DENSITY));
 // Ground flowers never grow in these biomes (the Reach loses them with its
@@ -233,8 +237,10 @@ const AMBER_BLOOM_TINTS = [0xffffff, 0xfaf6ec, 0xf4eedd];
 // the Nightbloom's namesake flowers: pale luminous petals that read as
 // glowing under the moon (ice-blue, star-white, violet, mint)
 const NIGHT_BLOOM_TINTS = [0x9fdcff, 0xffffff, 0xc8a8ff, 0xa0ffd8];
-// the Evergarden blooms roses: crimson, blush, white, and tea
-const GARDEN_BLOOM_TINTS = [0xe84a6a, 0xf2a8c8, 0xffffff, 0xf2d0a0];
+// the Evergarden blooms roses in the full bed wheel: crimson, blush, white,
+// tea, gold, violet, and coral (parterre roses carry their bed's tint; this
+// list backs any garden bush without an authored tint)
+const GARDEN_BLOOM_TINTS = [0xe84a6a, 0xf2a8c8, 0xffffff, 0xf2d0a0, 0xf2c94c, 0xb07bd8, 0xf27b62];
 // the Galecrest blooms sea thrift and campion: pink, white, pale violet
 const GALE_BLOOM_TINTS = [0xf29ab0, 0xffffff, 0xd8b0f2];
 const DRESS_TINT: Record<BiomeId, number> = {
@@ -963,7 +969,9 @@ function buildTrees(
   registry: BucketMesh[],
   hideRegistry: TreeHideable[],
 ): void {
-  const decos = generateDecorations(seed);
+  // no random trees or boulders inside a parterre bed: the Evergarden's
+  // formal plots stay clear the way a tended garden would
+  const decos = generateDecorations(seed).filter((d) => !inParterrePlot(d.x, d.z, 6));
   const sourceDecos = !GFX.leanFoliage
     ? decos
     : decos.filter((d) => {
@@ -1184,6 +1192,8 @@ interface DressingSpot {
   z: number;
   kind: DressKind;
   scale: number;
+  /** authored bloom tint (parterre roses); unset spots pick by biome hash */
+  bloomTint?: number;
 }
 
 const DRESS_STEP_HIGH = 12;
@@ -1316,6 +1326,9 @@ function generateDressing(seed: number): DressingSpot[] {
     for (let gz = WORLD_MIN_Z + 16; gz < WORLD_MAX_Z - 16; gz += step) {
       const r = hashAt(gx, gz, 41);
       const biome = zoneBiomeAt(gx, gz);
+      // the Evergarden takes NO random dressing: every bush there belongs to
+      // an authored parterre arrangement (appended after this scatter loop)
+      if (biome === 'garden') continue;
       const density = DRESS_DENSITY[biome] * (GFX.leanFoliage ? DRESS_DENSITY_LOW_SCALE : 1);
       if (r > density) continue;
       const x = gx + (hashAt(gx, gz, 42) - 0.5) * step;
@@ -1344,6 +1357,9 @@ function generateDressing(seed: number): DressingSpot[] {
       out.push({ x, z, kind, scale: (sMin + hashAt(gx, gz, 45) * sRange) * scaleBoost });
     }
   }
+  // the Evergarden's clipped hedges and rose centerpieces, laid out by the
+  // parterre plan instead of the hash scatter above
+  out.push(...parterreBushSpots(seed));
   return out;
 }
 
@@ -1413,8 +1429,10 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
               NIGHT_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * NIGHT_BLOOM_TINTS.length)];
             im.setColorAt(i, c.set(tint));
           } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'garden') {
-            // the roses take their tint raw too: a rose bed should read red
+            // the roses take their tint raw too: a rose bed should read red.
+            // Parterre roses carry their bed's authored color.
             const tint =
+              s.bloomTint ??
               GARDEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GARDEN_BLOOM_TINTS.length)];
             im.setColorAt(i, c.set(tint));
           } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'gale') {
@@ -1670,12 +1688,10 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       { p: [210, 180, 250], c: [245, 240, 200] },
       { p: [250, 240, 250], c: [230, 200, 255] },
     ],
-    // Evergarden: parkland roses, pinks and creams
-    garden: [
-      { p: [240, 120, 150], c: [200, 60, 90] },
-      { p: [250, 200, 220], c: [220, 140, 170] },
-      { p: [245, 245, 240], c: [240, 200, 90] },
-    ],
+    // Evergarden: near-white petals on the card; the parterre beds paint
+    // each instance with its bed color (a colored texture would multiply
+    // against the tint and muddy every hue)
+    garden: [{ p: [244, 242, 240], c: [252, 226, 140] }],
     // Willowfen: wetland wildflowers, buttercream, lavender, white
     fen: [
       { p: [250, 245, 210], c: [210, 170, 60] },
@@ -1752,7 +1768,12 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
     const fieldChunk = FIELD_BIOMES.has(chunkBiome);
-    const flowerCap = Math.max(8, Math.floor(maxChunkCount * (fieldChunk ? 0.45 : 0.14)));
+    // the Evergarden's parterre beds are dense solid plantings, so its
+    // chunks carry a larger flower buffer than the drift fields
+    const flowerCap = Math.max(
+      8,
+      Math.floor(maxChunkCount * (chunkBiome === 'garden' ? 0.85 : fieldChunk ? 0.45 : 0.14)),
+    );
     const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
     fm.userData.renderCategory = 'grass';
     fm.frustumCulled = true;
@@ -1880,6 +1901,33 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           c.offsetHSL((hashAt(i, j, 19) - 0.5) * 0.04, 0, (hashAt(j, i, 19) - 0.5) * 0.12);
           fm.setColorAt(fn, c);
           fn++;
+        }
+      }
+    }
+    // The Evergarden: no grass anchors exist (mown lawn), so the parterre
+    // beds and walk ribbons plant directly from the authored plan. Two
+    // jittered samples per grid cell keep the beds reading solid.
+    if (chunkBiome === 'garden') {
+      for (let i = i0; i <= i1 && fn < flowerCap; i++) {
+        for (let j = j0; j <= j1 && fn < flowerCap; j++) {
+          for (let rep = 0; rep < 2 && fn < flowerCap; rep++) {
+            const fx = i * step + (hashAt(i + rep * 37, j, 15) - 0.5) * step * 1.5;
+            const fz = j * step + (hashAt(i, j + rep * 37, 16) - 0.5) * step * 1.5;
+            if (fx < minX || fx >= maxX || fz < minZ || fz >= maxZ) continue;
+            const tint = parterreFlowerTintAt(fx, fz);
+            if (tint < 0) continue;
+            const fh = terrainHeight(fx, fz, seed);
+            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed)) continue;
+            const fs = 0.6 + hashAt(i + rep, j, 17) * 0.4;
+            q.setFromAxisAngle(up, hashAt(i, j, 18 + rep) * 12.4);
+            m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
+            fm.setMatrixAt(fn, m);
+            // the bed color rides the tint over the near-white petal card
+            c.setHex(tint);
+            c.offsetHSL(0, 0, (hashAt(j + rep, i, 19) - 0.5) * 0.08);
+            fm.setColorAt(fn, c);
+            fn++;
+          }
         }
       }
     }
