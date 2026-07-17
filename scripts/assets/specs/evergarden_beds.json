@@ -5,14 +5,14 @@
       "src": "/Users/demihenderson/Downloads/evergarden-maze/flower-beds/ornamental+garden+v1+3d+model.glb",
       "out": "models/props/flower_bed_square_a.glb",
       "type": "static",
-      "maxTex": 512,
+      "maxTex": 1024,
       "simplify": 0.001
     },
     {
       "src": "/Users/demihenderson/Downloads/evergarden-maze/flower-beds/ornamental+garden+v2+3d+model.glb",
       "out": "models/props/flower_bed_square_b.glb",
       "type": "static",
-      "maxTex": 512,
+      "maxTex": 1024,
       "simplify": 0.001
     },
     {

@@ -1,17 +1,16 @@
 // The Evergarden's formal planting plan (pure core, no Three/DOM). The realm
 // reads as a Victorian palace garden: every flower and bush belongs to an
-// authored arrangement instead of a random scatter. The stand-alone beds
-// are MODELED now (the maintainer's ornamental-garden GLBs, planned by
-// parterreBedSpots and drawn by garden_features.ts): square models on the
-// knot plots, the round model on the circular plots. Only the mill lawn's
-// three ring beds stay procedural (a solid bed model would bury the
-// windmill bases), plus the low ribbon beds flanking the walks and the
-// clipped hedge lines edging every road. Consumers: foliage.ts (ground
-// flowers via parterreFlowerTintAt, hedge and rose bushes via
-// parterreBushSpots) and garden_features.ts (the bed models). Placement is
-// deterministic; the plot sites are validated against terrain, water,
-// roads, the Great Maze, camps, gather nodes, and the great trees by
-// tests/garden_parterre.test.ts.
+// authored arrangement instead of a random scatter. The beds are MODELED
+// decor in a satellite pattern (large square ornamental gardens, each
+// orbited by small round beds; they render and collide as decorProps in
+// content/evergarden, on level pads from world.ts GARDEN_BED_PADS). Only
+// the mill lawn's three ring beds stay procedural (a solid bed model would
+// bury the windmill bases), plus the low ribbon beds flanking the walks
+// and the clipped hedge lines edging every road. Consumer: foliage.ts
+// (ground flowers via parterreFlowerTintAt, hedge and rose bushes via
+// parterreBushSpots). Placement is deterministic; the plot sites are
+// validated against terrain, water, roads, the Great Maze, camps, gather
+// nodes, and the great trees by tests/garden_parterre.test.ts.
 
 import { EVERGARDEN_PROPS, EVERGARDEN_ROADS, EVERGARDEN_ZONE } from '../sim/content/evergarden';
 import { fbm2, hash2 } from '../sim/rng';
@@ -83,12 +82,8 @@ export const PARTERRE_PLOTS: readonly ParterrePlot[] = [
   { x: 476, z: 1022.3, r: 3.25, kind: 'round' },
   { x: 476, z: 997.7, r: 3.25, kind: 'round' },
   { x: 463.7, z: 1010, r: 3.25, kind: 'round' },
-  // east of the Garden Gate road (the gate towers and the pond channel
-  // squeeze this one to a triangle of satellites)
-  { x: 430, z: 756, r: 7.5, kind: 'square' },
-  { x: 438.7, z: 764.7, r: 3.25, kind: 'round' },
-  { x: 421.3, z: 764.7, r: 3.25, kind: 'round' },
-  { x: 430, z: 743.7, r: 3.25, kind: 'round' },
+  // (no bed east of the Garden Gate road: the extended gate wall and its
+  // channel-bank tower hold that lawn now)
   // the north lawn
   { x: 300, z: 1118, r: 6, kind: 'square' },
   { x: 300, z: 1128.8, r: 3.25, kind: 'round' },
@@ -137,7 +132,10 @@ const MAZE_X1 = MAZE_X0 + MAZE_COLS * MAZE_CELL;
 const GATE = { x: 391, z: 747, rot: 2.97 } as const;
 const GATE_P = { x: Math.cos(GATE.rot), z: -Math.sin(GATE.rot) } as const; // wall line dir
 const GATE_N = { x: -Math.sin(GATE.rot), z: -Math.cos(GATE.rot) } as const; // garden side
-const GATE_HALF = 24; // the dressed frontage on each side of the arch
+const GATE_HALF = 24; // the dressed frontage west of the arch (positive u)
+// the east arm (negative u) runs longer: the wall extension to the channel
+// bank replaced the old gate flower bed, and its dressing follows it
+const GATE_EAST_HALF = 45;
 const GATE_MOUTH = 7; // clear of the arch opening
 
 function smoothstep(e0: number, e1: number, v: number): number {
@@ -226,7 +224,8 @@ export function parterreFlowerTintAt(x: number, z: number): number {
     const gdz = z - GATE.z;
     const u = gdx * GATE_P.x + gdz * GATE_P.z;
     const v = gdx * GATE_N.x + gdz * GATE_N.z;
-    if (Math.abs(u) > GATE_MOUTH && Math.abs(u) < GATE_HALF && v > 2.8 && v < 4.6) {
+    const onArm = (u > GATE_MOUTH && u < GATE_HALF) || (-u > GATE_MOUTH && -u < GATE_EAST_HALF);
+    if (onArm && v > 2.8 && v < 4.6) {
       if (!clearOfGardenBuildings(x, z, 0.5)) return -1;
       const block = Math.abs(Math.floor((u + 60) / 6));
       return RIBBON_TINTS[block % RIBBON_TINTS.length];
@@ -365,8 +364,10 @@ export function parterreBushSpots(seed: number): ParterreBushSpot[] {
     }
   }
   // the Garden Gate's hedge line, hugging the garden face of its walls
+  // (the east arm, side -1, follows the longer wall to the channel bank)
   for (const side of [-1, 1]) {
-    for (let u = GATE_MOUTH + 1; u <= GATE_HALF - 1; u += HEDGE_STEP) {
+    const armEnd = side === -1 ? GATE_EAST_HALF : GATE_HALF;
+    for (let u = GATE_MOUTH + 1; u <= armEnd - 1; u += HEDGE_STEP) {
       const x = GATE.x + GATE_P.x * u * side + GATE_N.x * 2.0;
       const z = GATE.z + GATE_P.z * u * side + GATE_N.z * 2.0;
       hedge(x, z);

@@ -983,11 +983,8 @@ export const GARDEN_BED_PADS: readonly GardenBedPad[] = [
     [476, 997.7],
     [463.7, 1010],
   ]),
-  ...bedGroup(430, 756, 7.5, [
-    [438.7, 764.7],
-    [421.3, 764.7],
-    [430, 743.7],
-  ]),
+  // (the Garden Gate group came out: its lawn belongs to the extended gate
+  // wall and its channel-bank tower now)
   ...bedGroup(300, 1118, 6, [
     [300, 1128.8],
     [300, 1107.3],

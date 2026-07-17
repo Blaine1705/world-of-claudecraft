@@ -358,9 +358,14 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'hexWall', x: 370, z: 743.5, rot: 2.97, scale: 7, r: 6, h: 8 },
     { key: 'hexWall', x: 403.3, z: 749.1, rot: 2.97, scale: 7, r: 6, h: 8 },
     { key: 'hexWall', x: 415.5, z: 751.2, rot: 2.97, scale: 7, r: 6, h: 8 },
-    // towers anchoring the outer ends of the gate walls
+    // ...continuing east where the gate flower bed used to sit, so the wall
+    // runs all the way to the pond channel's bank
+    { key: 'hexWall', x: 427.7, z: 753.3, rot: 2.97, scale: 7, r: 6, h: 8 },
+    // towers anchoring the outer ends of the gate walls (the east tower
+    // stands at the channel bank, closing the longer run)
     { key: 'hexTower', x: 365.4, z: 742.6, rot: 2.97, scale: 8, r: 4, h: 17 },
     { key: 'hexTower', x: 416.6, z: 751.4, rot: 2.97, scale: 8, r: 4, h: 17 },
+    { key: 'hexTower', x: 437.3, z: 755, rot: 2.97, scale: 8, r: 4, h: 17 },
     // oaks shading the gate lawns
     { key: 'oakTree', x: 372, z: 760, rot: 0.8, scale: 1.3, r: 0.8, h: 9 },
     { key: 'oakTree', x: 412, z: 738, rot: 2.1, scale: 1.4, r: 0.8, h: 9 },
@@ -384,7 +389,6 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'flowerBedSquareB', x: 400, z: 866, rot: Math.PI / 2, scale: 18.37, r: 9, h: 3 },
     { key: 'flowerBedSquareA', x: 256, z: 952, rot: Math.PI / 2, scale: 18.37, r: 9, h: 3 },
     { key: 'flowerBedSquareB', x: 476, z: 1010, rot: 0, scale: 15.31, r: 7.5, h: 3 },
-    { key: 'flowerBedSquareA', x: 430, z: 756, rot: 0, scale: 15.31, r: 7.5, h: 3 },
     { key: 'flowerBedSquareB', x: 300, z: 1118, rot: Math.PI / 2, scale: 12.24, r: 6, h: 3 },
     { key: 'flowerBedRound', x: 322, z: 892.8, rot: 0.4, scale: 6.63, r: 3.1, h: 3 },
     { key: 'flowerBedRound', x: 322, z: 863.2, rot: 1.7, scale: 6.63, r: 3.1, h: 3 },
@@ -401,9 +405,6 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'flowerBedRound', x: 476, z: 1022.3, rot: 1.5, scale: 6.63, r: 3.1, h: 3 },
     { key: 'flowerBedRound', x: 476, z: 997.7, rot: 4.9, scale: 6.63, r: 3.1, h: 3 },
     { key: 'flowerBedRound', x: 463.7, z: 1010, rot: 0.2, scale: 6.63, r: 3.1, h: 3 },
-    { key: 'flowerBedRound', x: 438.7, z: 764.7, rot: 2.1, scale: 6.63, r: 3.1, h: 3 },
-    { key: 'flowerBedRound', x: 421.3, z: 764.7, rot: 5.9, scale: 6.63, r: 3.1, h: 3 },
-    { key: 'flowerBedRound', x: 430, z: 743.7, rot: 3.6, scale: 6.63, r: 3.1, h: 3 },
     { key: 'flowerBedRound', x: 300, z: 1128.8, rot: 0.8, scale: 6.63, r: 3.1, h: 3 },
     { key: 'flowerBedRound', x: 300, z: 1107.3, rot: 2.4, scale: 6.63, r: 3.1, h: 3 },
     { key: 'flowerBedRound', x: 310.8, z: 1118, rot: 4.1, scale: 6.63, r: 3.1, h: 3 },
