@@ -29,6 +29,7 @@ import {
 } from './manifest';
 import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
+import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
@@ -335,6 +336,7 @@ function attachProp(
   stowed = false,
 ): THREE.Object3D {
   const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
+  primeSkinnedSortSpheres(payload);
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
   });
@@ -568,6 +570,7 @@ function optimizedScene(url: string): THREE.Object3D {
   if (hit) return hit;
   const root = cloneSkinned(resolvedGltf(url).scene);
   mergeSkinnedParts(root);
+  primeSkinnedSortSpheres(root);
   optimizedSceneCache.set(url, root);
   return root;
 }
