@@ -1,12 +1,16 @@
 // The Evergarden's formal planting plan (pure core, no Three/DOM). The realm
 // reads as a Victorian palace garden: every flower and bush belongs to an
-// authored arrangement instead of a random scatter. Three bed archetypes
-// (quatrefoil, concentric rings, knot stripes) sit on hand-placed plots
-// across the lawns, low ribbon beds flank the walks, and clipped hedge
-// lines edge every road. Consumer: foliage.ts (ground flowers via
-// parterreFlowerTintAt, hedge and rose bushes via parterreBushSpots).
-// Placement is deterministic; the plot sites are validated against terrain,
-// water, roads, the Great Maze, camps, gather nodes, and the great trees by
+// authored arrangement instead of a random scatter. The stand-alone beds
+// are MODELED now (the maintainer's ornamental-garden GLBs, planned by
+// parterreBedSpots and drawn by garden_features.ts): square models on the
+// knot plots, the round model on the circular plots. Only the mill lawn's
+// three ring beds stay procedural (a solid bed model would bury the
+// windmill bases), plus the low ribbon beds flanking the walks and the
+// clipped hedge lines edging every road. Consumers: foliage.ts (ground
+// flowers via parterreFlowerTintAt, hedge and rose bushes via
+// parterreBushSpots) and garden_features.ts (the bed models). Placement is
+// deterministic; the plot sites are validated against terrain, water,
+// roads, the Great Maze, camps, gather nodes, and the great trees by
 // tests/garden_parterre.test.ts.
 
 import { EVERGARDEN_PROPS, EVERGARDEN_ROADS, EVERGARDEN_ZONE } from '../sim/content/evergarden';
@@ -30,10 +34,20 @@ export interface ParterrePlot {
   z: number;
   r: number;
   kind: ParterreKind;
-  /** a decor prop stands at the heart instead of the big bush: 'windmill'
-   * (the mill lawn) or 'statue' (the leafy fox topiary); the prop itself
-   * is placed via EVERGARDEN_PROPS.decorProps */
-  centerpiece?: 'windmill' | 'statue';
+  /** 'windmill': the plot is a mill-lawn ring bed with a windmill at its
+   * heart (placed via EVERGARDEN_PROPS.decorProps). These stay procedural
+   * plantings; every other plot is drawn as a modeled bed instead. */
+  centerpiece?: 'windmill';
+}
+
+export type ParterreBedModel = 'squareA' | 'squareB' | 'round';
+
+export interface ParterreBedSpot {
+  x: number;
+  z: number;
+  rot: number;
+  scale: number;
+  model: ParterreBedModel;
 }
 
 export interface ParterreBushSpot {
@@ -116,6 +130,38 @@ function smoothstep(e0: number, e1: number, v: number): number {
   return t * t * (3 - 2 * t);
 }
 
+// The modeled beds' source footprint (each GLB is ~0.98 wide at unit scale)
+// and the round model's size cap: it is authored as a SMALL round garden
+// with a tall tiered heart, so on the grand plots it sits as a centerpiece
+// garden on the lawn rather than stretching into a giant.
+const BED_MODEL_WIDTH = 0.98;
+const ROUND_BED_MAX_SPAN = 14;
+
+/**
+ * The modeled-bed plan: one ornamental bed model per stand-alone plot
+ * (square models fill the knot squares edge to edge; the round model takes
+ * the circular plots, capped at its authored proportions). Mill-lawn plots
+ * (centerpiece 'windmill') keep their procedural ring plantings instead.
+ * Square beds stay axis-aligned the way a formal garden reads; the hash
+ * picks their facing and which of the two square models each plot grows.
+ */
+export function parterreBedSpots(): ParterreBedSpot[] {
+  const out: ParterreBedSpot[] = [];
+  for (const p of PARTERRE_PLOTS) {
+    if (p.centerpiece) continue;
+    if (p.kind === 'knot') {
+      const model = hash2(p.x, p.z, 7401) < 0.5 ? 'squareA' : 'squareB';
+      const facing = Math.floor(hash2(p.x, p.z, 7411) * 4) * (Math.PI / 2);
+      out.push({ x: p.x, z: p.z, rot: facing, scale: (p.r * 2) / BED_MODEL_WIDTH, model });
+    } else {
+      const span = Math.min(p.r * 2, ROUND_BED_MAX_SPAN);
+      const rot = hash2(p.x, p.z, 7421) * Math.PI * 2;
+      out.push({ x: p.x, z: p.z, rot, scale: span / BED_MODEL_WIDTH, model: 'round' });
+    }
+  }
+  return out;
+}
+
 // Visual footprints of the garden's built structures, so no planting grows
 // through a wall or floor. Walls use their thin VISUAL depth, not their fat
 // movement collider circle (a hedge alongside a wall face is the whole
@@ -166,46 +212,26 @@ function plotPalette(p: ParterrePlot): [number, number, number, number] {
 
 /**
  * The ground-flower plan: returns the raw tint for a flower at (x, z), or -1
- * where no bed reaches. Beds fill their whole hedge line edge to edge, the
- * way a real planting does: the pattern (lobes, rings, stripes) reads in
- * color blocks and the filler color carries every gap.
+ * where no planting reaches. The stand-alone beds are modeled now (see
+ * parterreBedSpots), so the only bed flowers left here are the mill lawn's
+ * procedural ring beds; the gate border and walk ribbons carry on unchanged.
  */
 export function parterreFlowerTintAt(x: number, z: number): number {
   for (const p of PARTERRE_PLOTS) {
+    if (!p.centerpiece) continue; // modeled beds paint nothing on the ground
     const dx = x - p.x;
     const dz = z - p.z;
     if (Math.abs(dx) > p.r || Math.abs(dz) > p.r) continue;
-    const [ca, cb, cc, cd] = plotPalette(p);
-    if (p.kind === 'quatrefoil') {
-      const d = Math.hypot(dx, dz);
-      if (d > p.r * 0.9) continue; // outside the hedge line
-      if (d < p.r * 0.2) return cc; // the center boss
-      const lr = p.r * 0.55;
-      const lobeR = p.r * 0.34;
-      // four petal lobes on the diagonals, opposite pairs sharing a color
-      if (Math.hypot(dx - lr * 0.707, dz - lr * 0.707) < lobeR) return ca;
-      if (Math.hypot(dx + lr * 0.707, dz + lr * 0.707) < lobeR) return ca;
-      if (Math.hypot(dx - lr * 0.707, dz + lr * 0.707) < lobeR) return cb;
-      if (Math.hypot(dx + lr * 0.707, dz - lr * 0.707) < lobeR) return cb;
-      return cd; // filler blooms between the lobes: no bare soil
-    }
-    if (p.kind === 'concentric') {
-      const d = Math.hypot(dx, dz);
-      if (d > p.r * 0.9) continue;
-      if (d < p.r * 0.16) return cc; // the center boss
-      // solid alternating rings edge to edge
-      const band = Math.floor((d - p.r * 0.16) / (p.r * 0.15));
-      return band % 2 === 0 ? ca : cb;
-    }
-    // knot: solid diagonal color stripes filling the hedge square
-    if (Math.abs(dx) > p.r * 0.76 || Math.abs(dz) > p.r * 0.76) continue;
-    if (Math.hypot(dx, dz) < p.r * 0.18) return cc; // the center boss
-    const u = (dx + dz) * 0.7071;
-    const stripeW = p.r * 0.3;
-    const s = u / stripeW + 8; // shift positive so floor() is stable
-    const stripe = Math.floor(s) % 3;
-    return stripe === 0 ? ca : stripe === 1 ? cb : cd;
+    const [ca, cb, cc] = plotPalette(p);
+    const d = Math.hypot(dx, dz);
+    if (d > p.r * 0.9) continue;
+    if (d < p.r * 0.16) return cc; // the center boss under the mill
+    // solid alternating rings edge to edge
+    const band = Math.floor((d - p.r * 0.16) / (p.r * 0.15));
+    return band % 2 === 0 ? ca : cb;
   }
+  // never under a modeled bed: those plots carry their own planting
+  if (inParterrePlot(x, z, 0.5)) return -1;
   // the Garden Gate's flower border, along the garden face of its walls
   {
     const gdx = x - GATE.x;
@@ -289,10 +315,9 @@ function flatDryLawn(x: number, z: number, seed: number): boolean {
 }
 
 /**
- * The bush plan: clipped hedge rings and edges (plain bush, uniform scale,
- * the gardener's shears) packed shoulder to shoulder so the bed outline
- * reads solid, one BIG rose centerpiece per bed, lobe/corner roses in the
- * bed palette, and continuous hedge lines edging every walk.
+ * The bush plan: the mill lawn's clipped hedge rings and cardinal roses
+ * (the stand-alone beds are modeled and bring their own edging), plus
+ * continuous hedge lines edging every walk and the gate front.
  */
 export function parterreBushSpots(seed: number): ParterreBushSpot[] {
   const out: ParterreBushSpot[] = [];
@@ -312,43 +337,14 @@ export function parterreBushSpots(seed: number): ParterreBushSpot[] {
     }
   };
   for (const p of PARTERRE_PLOTS) {
-    const [ca, cb, cc] = plotPalette(p);
-    if (p.kind === 'quatrefoil') {
-      // solid hedge circle around the whole bed, roses on the lobe hearts
-      hedgeRing(p.x, p.z, p.r);
-      const lr = p.r * 0.55 * 0.707;
-      rose(p.x + lr, p.z + lr, 1.0, ca);
-      rose(p.x - lr, p.z - lr, 1.0, ca);
-      rose(p.x + lr, p.z - lr, 1.0, cb);
-      rose(p.x - lr, p.z + lr, 1.0, cb);
-    } else if (p.kind === 'concentric') {
-      // solid hedge ring outside the flower rings, roses at the cardinals
-      hedgeRing(p.x, p.z, p.r * 0.98);
-      for (let i = 0; i < 4; i++) {
-        const a = (i / 4) * Math.PI * 2;
-        rose(p.x + Math.sin(a) * p.r * 0.62, p.z + Math.cos(a) * p.r * 0.62, 0.95, i % 2 ? ca : cb);
-      }
-    } else {
-      // knot: tight hedge square with roses on the corners
-      const half = p.r * 0.84;
-      const per = Math.max(4, Math.round((half * 2) / 2.0));
-      for (let i = 0; i <= per; i++) {
-        const t = -half + (i / per) * half * 2;
-        hedge(p.x + t, p.z - half);
-        hedge(p.x + t, p.z + half);
-        if (i > 0 && i < per) {
-          hedge(p.x - half, p.z + t);
-          hedge(p.x + half, p.z + t);
-        }
-      }
-      rose(p.x - half, p.z - half, 1.1, ca);
-      rose(p.x + half, p.z + half, 1.1, ca);
-      rose(p.x - half, p.z + half, 1.1, cb);
-      rose(p.x + half, p.z - half, 1.1, cb);
+    if (!p.centerpiece) continue; // modeled beds carry their own edging
+    const [ca, cb] = plotPalette(p);
+    // solid hedge ring outside the flower rings, roses at the cardinals
+    hedgeRing(p.x, p.z, p.r * 0.98);
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2;
+      rose(p.x + Math.sin(a) * p.r * 0.62, p.z + Math.cos(a) * p.r * 0.62, 0.95, i % 2 ? ca : cb);
     }
-    // the centerpiece: one big rose bush at the heart of every bed (unless
-    // a built centerpiece such as the windmill stands there instead)
-    if (!p.centerpiece) rose(p.x, p.z, 1.85, cc);
   }
   // the walk hedges: clipped lines flanking every road, broken at junctions,
   // the hamlet, the statue lane, and the maze mouth
@@ -392,12 +388,13 @@ export function parterreBushSpots(seed: number): ParterreBushSpot[] {
 }
 
 /**
- * True where lawn grass should grow back around the plantings: inside and
- * just beyond every bed's hedge line, and across the meadow patches a bit
- * past where the flowers stop, so both read lush instead of clipped edges.
+ * True where lawn grass should grow back around the plantings: a lush halo
+ * just beyond every bed (but not under the modeled beds themselves, whose
+ * bases carry their own ground), and across the meadow patches a bit past
+ * where the flowers stop, so both read lush instead of clipped edges.
  */
 export function gardenLushGrassAt(x: number, z: number): boolean {
-  if (inParterrePlot(x, z, 1.8)) return true;
+  if (inParterrePlot(x, z, 1.8)) return !inParterrePlot(x, z, -1);
   if (x < GARDEN_X0 + 12 || x > GARDEN_X1 - 12 || z < GARDEN_Z0 + 10 || z > GARDEN_Z1 - 10) {
     return false;
   }

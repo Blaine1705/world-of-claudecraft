@@ -1,8 +1,10 @@
 // The Evergarden's formal planting plan (src/render/garden_parterre_core.ts):
 // every authored plot must sit on flat dry lawn clear of the Great Maze, the
-// hamlet, the walks, the camps, the gather nodes, and the great tree trunks,
-// and the plan itself must read as a designed garden: solid color beds, a
-// wide color wheel, clipped uniform hedges, and topiary avenues on the roads.
+// hamlet, the walks, the camps, the gather nodes, and the great tree trunks.
+// The stand-alone beds are MODELED (parterreBedSpots plans one ornamental
+// bed model per plot, square on the knots, round on the circles); only the
+// mill lawn's ring beds, the walk ribbons, and the clipped path hedges stay
+// procedural, and the plan must keep reading as a designed garden.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -11,6 +13,7 @@ import {
   gardenMeadowTintAt,
   inParterrePlot,
   PARTERRE_PLOTS,
+  parterreBedSpots,
   parterreBushSpots,
   parterreFlowerTintAt,
 } from '../src/render/garden_parterre_core';
@@ -98,7 +101,7 @@ describe('parterre plot sites', () => {
 });
 
 describe('the flower plan', () => {
-  it('fills every bed edge to edge like a real planting', () => {
+  it('paints only the mill ring beds: the modeled beds keep their own ground', () => {
     for (const p of PARTERRE_PLOTS) {
       let painted = 0;
       let inside = 0;
@@ -110,12 +113,44 @@ describe('the flower plan', () => {
           if (parterreFlowerTintAt(p.x + dx, p.z + dz) >= 0) painted++;
         }
       }
-      // full-fill beds: the filler color carries every pattern gap
-      expect(painted / inside, `plot (${p.x},${p.z}) interior coverage`).toBeGreaterThan(0.9);
+      if (p.centerpiece === 'windmill') {
+        // the mill lawn's procedural rings still fill edge to edge
+        expect(painted / inside, `plot (${p.x},${p.z}) interior coverage`).toBeGreaterThan(0.9);
+      } else {
+        // a modeled bed stands here: no procedural ground flowers beneath it
+        expect(painted, `plot (${p.x},${p.z}) stays unpainted`).toBe(0);
+      }
     }
     // far from every plot and road: bare lawn (meadow drifts are separate)
     expect(parterreFlowerTintAt(210, 795)).toBe(-1);
     expect(parterreFlowerTintAt(300, 745)).toBe(-1);
+  });
+
+  it('plans one modeled bed per stand-alone plot, shaped to its kind', () => {
+    const spots = parterreBedSpots();
+    const standalone = PARTERRE_PLOTS.filter((p) => !p.centerpiece);
+    expect(spots.length).toBe(standalone.length);
+    const models = new Set<string>();
+    for (const p of standalone) {
+      const here = spots.filter((s) => s.x === p.x && s.z === p.z);
+      expect(here.length, `plot (${p.x},${p.z}) bed`).toBe(1);
+      const bed = here[0];
+      models.add(bed.model);
+      if (p.kind === 'knot') {
+        // square beds fill the knot square edge to edge, axis-aligned
+        expect(bed.model === 'squareA' || bed.model === 'squareB', 'square model').toBe(true);
+        expect(bed.scale * 0.98).toBeCloseTo(p.r * 2, 5);
+        expect(bed.rot % (Math.PI / 2), 'axis-aligned').toBeCloseTo(0, 10);
+      } else {
+        // circular plots grow the round model, capped at its authored span
+        expect(bed.model).toBe('round');
+        expect(bed.scale * 0.98).toBeCloseTo(Math.min(p.r * 2, 14), 5);
+      }
+    }
+    // both square variants and the round model all appear across the garden
+    expect(models.has('round')).toBe(true);
+    expect(models.has('squareA') || models.has('squareB')).toBe(true);
+    expect(parterreBedSpots()).toEqual(parterreBedSpots()); // deterministic
   });
 
   it('lays ribbon beds along the walks but not in the maze or hamlet', () => {
@@ -155,9 +190,10 @@ describe('the flower plan', () => {
     expect(gardenMeadowTintAt(EVERGARDEN_ZONE.hub.x + 4, EVERGARDEN_ZONE.hub.z)).toBe(-1);
   });
 
-  it('uses a wide color wheel across the beds', () => {
+  it('draws the mill ring beds from the shared color wheel', () => {
     const seen = new Set<number>();
     for (const p of PARTERRE_PLOTS) {
+      if (p.centerpiece !== 'windmill') continue;
       for (let dx = -p.r; dx <= p.r; dx += 0.8) {
         for (let dz = -p.r; dz <= p.r; dz += 0.8) {
           const tint = parterreFlowerTintAt(p.x + dx, p.z + dz);
@@ -165,7 +201,7 @@ describe('the flower plan', () => {
         }
       }
     }
-    expect(seen.size, 'distinct bed colors in use').toBeGreaterThanOrEqual(6);
+    expect(seen.size, 'distinct mill-bed colors in use').toBeGreaterThanOrEqual(4);
     for (const tint of seen) {
       if (![0xffffff, 0xf27ba6, 0xf2c94c].includes(tint)) {
         expect(GARDEN_BED_TINTS).toContain(tint);
@@ -175,12 +211,11 @@ describe('the flower plan', () => {
 });
 
 describe('the bush and topiary plan', () => {
-  it('plants tight clipped hedges, tinted roses, and big bed centerpieces', () => {
+  it('plants the walk hedges, mill rings, and cardinal roses', () => {
     const spots = parterreBushSpots(SEED);
     const hedges = spots.filter((s) => s.kind === 'bush');
     const roses = spots.filter((s) => s.kind === 'bushFlowers');
-    expect(hedges.length).toBeGreaterThan(300); // bed rings plus the walk lines
-    expect(roses.length).toBeGreaterThanOrEqual(PARTERRE_PLOTS.length * 3);
+    expect(hedges.length).toBeGreaterThan(250); // the walk lines plus mill rings
     for (const s of hedges) expect(s.scale).toBe(0.82); // the gardener's shears
     for (const s of roses) {
       expect(s.bloomTint).toBeDefined();
@@ -192,30 +227,32 @@ describe('the bush and topiary plan', () => {
       );
       expect(slopeAt(s.x, s.z), `bush slope at (${s.x},${s.z})`).toBeLessThan(0.65);
     }
+    let millRoses = 0;
     for (const p of PARTERRE_PLOTS) {
       const center = roses.filter((s) => Math.hypot(s.x - p.x, s.z - p.z) < 1);
-      if (p.centerpiece) {
-        // a built centerpiece stands here instead (EVERGARDEN_PROPS.decorProps)
-        expect(center.length, `plot (${p.x},${p.z}) keeps its heart clear`).toBe(0);
-        const key = p.centerpiece === 'windmill' ? 'hexWindmill' : 'leafyFoxStatue';
+      // no plot keeps a rose at its heart: the modeled beds bring their own
+      // planting and the mills stand on theirs
+      expect(center.length, `plot (${p.x},${p.z}) heart`).toBe(0);
+      if (p.centerpiece === 'windmill') {
         const prop = (EVERGARDEN_PROPS.decorProps ?? []).filter(
-          (d) => d.key === key && Math.hypot(d.x - p.x, d.z - p.z) < 1,
+          (d) => d.key === 'hexWindmill' && Math.hypot(d.x - p.x, d.z - p.z) < 1,
         );
-        expect(prop.length, `plot (${p.x},${p.z}) ${p.centerpiece} prop`).toBe(1);
-      } else {
-        expect(center.length, `plot (${p.x},${p.z}) centerpiece`).toBe(1);
-        expect(center[0].scale, 'the big bush').toBeGreaterThanOrEqual(1.8);
-      }
-      // the bed hedge line is packed shoulder to shoulder: gaps under ~2.2yd
-      const ring = hedges.filter(
-        (s) => Math.abs(Math.hypot(s.x - p.x, s.z - p.z) - p.r * 0.98) < p.r * 0.12,
-      );
-      if (p.kind !== 'knot') {
+        expect(prop.length, `plot (${p.x},${p.z}) windmill prop`).toBe(1);
+        // the mill ring bed keeps its packed hedge ring and cardinal roses
+        const ring = hedges.filter(
+          (s) => Math.abs(Math.hypot(s.x - p.x, s.z - p.z) - p.r * 0.98) < p.r * 0.12,
+        );
         expect(ring.length, `plot (${p.x},${p.z}) hedge ring density`).toBeGreaterThanOrEqual(
           Math.floor((Math.PI * 2 * p.r) / 2.3),
         );
+        millRoses += roses.filter((s) => Math.hypot(s.x - p.x, s.z - p.z) < p.r + 1).length;
+      } else {
+        // modeled beds grow no procedural bushes at all
+        const inPlot = spots.filter((s) => Math.hypot(s.x - p.x, s.z - p.z) < p.r * 0.9);
+        expect(inPlot.length, `plot (${p.x},${p.z}) stays clear for its model`).toBe(0);
       }
     }
+    expect(millRoses, 'cardinal roses on the mill beds').toBeGreaterThanOrEqual(10);
   });
 
   it('lines every walk with a clipped hedge, broken at junctions', () => {
