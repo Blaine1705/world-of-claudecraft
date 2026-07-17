@@ -1691,13 +1691,17 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       eyeZ: number,
       fogFar: number,
     ): void {
-      for (const c of cullables) {
-        c.obj.visible = cullableVisible(c, camX, camZ, fogFar);
+      const fogFarSq = fogFar * fogFar;
+      for (let i = 0; i < cullables.length; i++) {
+        const c = cullables[i];
+        c.obj.visible = cullableVisible(c, camX, camZ, fogFar, fogFarSq);
       }
-      for (const h of hideables) {
+      for (let i = 0; i < hideables.length; i++) {
+        const h = hideables[i];
         const dx = camX - h.x,
           dz = camZ - h.z;
-        if (Math.hypot(dx, dz) - h.cull >= fogFar) {
+        const reach = fogFar + h.cull;
+        if (dx * dx + dz * dz >= reach * reach) {
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
         }
@@ -1712,7 +1716,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         h.group.visible = true;
         if (hide !== h.hidden) {
           h.hidden = hide;
-          for (const m of h.mats) {
+          for (let j = 0; j < h.mats.length; j++) {
+            const m = h.mats[j];
             m.mat.colorWrite = !hide;
             m.mat.depthWrite = hide ? false : m.depthWrite;
           }
@@ -1914,12 +1919,21 @@ function cullableBounds(
   };
 }
 
-function cullableVisible(c: PropCullable, camX: number, camZ: number, fogFar: number): boolean {
+function cullableVisible(
+  c: PropCullable,
+  camX: number,
+  camZ: number,
+  fogFar: number,
+  fogFarSq: number,
+): boolean {
   const dx = camX < c.minX ? c.minX - camX : camX > c.maxX ? camX - c.maxX : 0;
   const dz = camZ < c.minZ ? c.minZ - camZ : camZ > c.maxZ ? camZ - c.maxZ : 0;
-  if (Math.hypot(dx, dz) < fogFar) return true;
+  if (dx * dx + dz * dz < fogFarSq) return true;
   if (c.hasBox) return false;
-  return Math.hypot(c.cx - camX, c.cz - camZ) - c.r < fogFar;
+  const centerDx = c.cx - camX;
+  const centerDz = c.cz - camZ;
+  const reach = fogFar + c.r;
+  return centerDx * centerDx + centerDz * centerDz < reach * reach;
 }
 
 // Bake every static prop mesh into world space and merge per
