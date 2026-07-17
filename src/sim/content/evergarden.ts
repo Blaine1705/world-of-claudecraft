@@ -69,8 +69,8 @@ export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
     { x: 320, z: 810 },
     { x: 344, z: 844 },
     { x: 360, z: 875 },
-    { x: 360, z: 926 },
-  ], // Hedgewick -> the Statuary Walk -> the maze mouth
+    { x: 360, z: 936 },
+  ], // Hedgewick -> the Statuary Walk -> dead-aligned with the entrance arch
   [
     { x: 320, z: 810 },
     { x: 298, z: 852 },
@@ -116,6 +116,12 @@ export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
     { x: 224, z: 802 },
     { x: 186, z: 800 },
   ], // Hedgewick -> west down the Gardenwalk (onto the heights)
+  [
+    { x: 387, z: 1098 },
+    { x: 400, z: 1102 },
+    { x: 420, z: 1104 },
+    { x: 440, z: 1110 },
+  ], // the maze exit (dead-aligned with the exit arch) -> east to the long walk
 ] as { x: number; z: number }[][];
 
 // No portals: walked into through the Garden Gate.
@@ -351,13 +357,15 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'oakTree', x: 412, z: 738, rot: 2.1, scale: 1.4, r: 0.8, h: 9 },
     { key: 'oakTree', x: 408, z: 760, rot: -1.3, scale: 1.2, r: 0.8, h: 9 },
     { key: 'oakTree', x: 376, z: 732, rot: 0.2, scale: 1.35, r: 0.8, h: 9 },
-    // the leafy fox statues: the user-authored topiary fox crowning the four
-    // grandest flower beds (the beds mark centerpiece: 'statue' in
-    // garden_parterre_core.ts, which clears the big rose from the heart)
-    { key: 'leafyFoxStatue', x: 400, z: 866, rot: -2.6, scale: 4.5, r: 1.6, h: 4.5 },
-    { key: 'leafyFoxStatue', x: 256, z: 952, rot: 1.1, scale: 4.5, r: 1.6, h: 4.5 },
-    { key: 'leafyFoxStatue', x: 476, z: 1010, rot: -0.6, scale: 4.5, r: 1.6, h: 4.5 },
-    { key: 'leafyFoxStatue', x: 300, z: 1118, rot: 2.4, scale: 4.5, r: 1.6, h: 4.5 },
+    // the leafy fox statues: the maintainer's topiary fox as gatekeepers,
+    // one pair flanking the maze entrance arch and one pair flanking the
+    // exit arch, each turned a little toward the walk between them
+    { key: 'leafyFoxStatue', x: 352.5, z: 938, rot: Math.PI - 0.35, scale: 4.5, r: 1.6, h: 4.5 },
+    { key: 'leafyFoxStatue', x: 367.5, z: 938, rot: Math.PI + 0.35, scale: 4.5, r: 1.6, h: 4.5 },
+    // (the exit pair hugs the mouth corners: the lawn northwest of the exit
+    // drops to the pond bank, so wider flanks would stand on the slope)
+    { key: 'leafyFoxStatue', x: 381, z: 1095.5, rot: 0.35, scale: 4.5, r: 1.6, h: 4.5 },
+    { key: 'leafyFoxStatue', x: 393, z: 1095.5, rot: -0.35, scale: 4.5, r: 1.6, h: 4.5 },
     // watchtowers on the walks: one over the Garden Gate, one at the north
     // knights' post
     { key: 'hexWatchtower', x: 402, z: 720, rot: -2.2, scale: 6.5, r: 3, h: 8 },
