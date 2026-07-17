@@ -975,9 +975,13 @@ function buildTrees(
   registry: BucketMesh[],
   hideRegistry: TreeHideable[],
 ): void {
-  // no random trees or boulders inside a parterre bed: the Evergarden's
-  // formal plots stay clear the way a tended garden would
-  const decos = generateDecorations(seed).filter((d) => !inParterrePlot(d.x, d.z, 6));
+  // The Evergarden curates its trees: no random trees or boulders inside a
+  // parterre bed, and NO wild pines anywhere on the lawns (kind 'tree' is
+  // the pine; the realm keeps its oaks, topiary, and specimen elders)
+  const decos = generateDecorations(seed).filter(
+    (d) =>
+      !inParterrePlot(d.x, d.z, 6) && !(d.kind === 'tree' && zoneBiomeAt(d.x, d.z) === 'garden'),
+  );
   const sourceDecos = !GFX.leanFoliage
     ? decos
     : decos.filter((d) => {

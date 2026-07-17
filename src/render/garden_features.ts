@@ -169,25 +169,11 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
     group.add(mesh);
   };
 
-  // --- the Statuary Walk: paired statues flanking the road to the maze,
-  // plus four watchers inside the Fountain Court ---
+  // --- the four marble watchers inside the Fountain Court (the old paired
+  // walk statues came down: the white figures read as rubble pillars among
+  // the new hedge and flower borders) ---
   {
     const spots: { x: number; z: number; y: number; s: number; rot: number }[] = [];
-    for (let i = 0; i < 6; i++) {
-      const z = 840 + i * 17;
-      for (const x of [353, 367]) {
-        const y = terrainHeight(x, z, seed);
-        if (y < WATER_LEVEL + 0.5) continue;
-        spots.push({
-          x,
-          z,
-          y: y - 0.1,
-          s: 0.95 + hash2(x, z, seed + 6101) * 0.15,
-          // each faces the walk, weathered a few degrees off true
-          rot: (x < 360 ? 1 : -1) * (Math.PI / 2) + (hash2(z, x, seed + 6111) - 0.5) * 0.3,
-        });
-      }
-    }
     for (const [x, z] of [
       [350, 1008],
       [370, 1008],

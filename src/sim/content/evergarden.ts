@@ -222,7 +222,8 @@ export const EVERGARDEN_ITEMS: Record<string, ItemDef> = {};
 export const EVERGARDEN_CAMPS: CampDef[] = [
   { mobId: 'topiary_stag', center: { x: 364, z: 898 }, radius: 10, count: 3 },
   { mobId: 'topiary_stag', center: { x: 326, z: 1146 }, radius: 10, count: 3 },
-  { mobId: 'topiary_wolf', center: { x: 272, z: 912 }, radius: 10, count: 3 },
+  // the castle pack prowls the gate lawn outside Dawnhold's east wall
+  { mobId: 'topiary_wolf', center: { x: 294, z: 906 }, radius: 10, count: 3 },
   { mobId: 'topiary_wolf', center: { x: 418, z: 1124 }, radius: 10, count: 3 },
   { mobId: 'hedge_gnome', center: { x: 268, z: 1002 }, radius: 10, count: 3 },
   { mobId: 'hedge_gnome', center: { x: 456, z: 942 }, radius: 10, count: 2 },
@@ -243,11 +244,12 @@ export const EVERGARDEN_OBJECTS: GroundObjectDef[] = [];
 export const EVERGARDEN_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Hedgewick: the groundskeepers' hamlet by the gate lawns
-  // full-size buildings: the hamlet used to read doll-scale next to a player
+  // mid-size buildings (bigger than the old doll scale, smaller than the
+  // full-scale pass), spread so every road corridor out of the square walks
   buildings: [
-    { kind: 'inn', x: 312, z: 804, w: 12, d: 14, rot: 0.7 },
-    { kind: 'house', x: 330, z: 818, w: 10, d: 10, rot: -1.0 },
-    { kind: 'house', x: 312, z: 822, w: 10, d: 10, rot: 2.1 },
+    { kind: 'inn', x: 310, z: 802, w: 9, d: 10, rot: 0.7 },
+    { kind: 'house', x: 344, z: 826, w: 8, d: 8, rot: -1.0 },
+    { kind: 'house', x: 318, z: 828, w: 8, d: 8, rot: 2.1 },
   ],
   wells: [{ x: 321, z: 812, r: 1.5 }],
   stalls: [{ x: 326, z: 802, rot: 0.5, r: 1.6 }],
@@ -289,36 +291,39 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'hexWindmill', x: 504, z: 760, rot: -0.3, scale: 9, r: 5, h: 13 },
     { key: 'hexWindmill', x: 492, z: 744, rot: 0.4, scale: 8, r: 4.5, h: 12 },
     { key: 'hexWindmill', x: 516, z: 750, rot: -1.1, scale: 8, r: 4.5, h: 12 },
-    // Dawnhold: the walled garden castle on the Rose Wilds lawn, built at
-    // full scale. The keep holds the west side; cannon towers flank the
-    // stone-arched east gate, plain towers watch the rear, and curtain
-    // walls close the courtyard. The wolves' knights hold the courtyard
-    // and the gate lawn.
-    { key: 'hexCastle', x: 257, z: 889, rot: Math.PI / 2, scale: 13, r: 15, h: 48 },
-    { key: 'hexCannonTower', x: 282, z: 868, rot: Math.PI / 2, scale: 11, r: 5.5, h: 26 },
-    { key: 'hexCannonTower', x: 282, z: 910, rot: Math.PI / 2, scale: 11, r: 5.5, h: 26 },
-    { key: 'hexTower', x: 242, z: 868, rot: Math.PI / 2, scale: 11, r: 5.5, h: 24 },
-    { key: 'hexTower', x: 242, z: 910, rot: Math.PI / 2, scale: 11, r: 5.5, h: 24 },
-    { key: 'hexWall', x: 282, z: 877, rot: Math.PI / 2, scale: 9, r: 7, h: 10 },
-    { key: 'hexWall', x: 282, z: 901, rot: Math.PI / 2, scale: 9, r: 7, h: 10 },
-    { key: 'hexWall', x: 252, z: 910, rot: 0, scale: 9, r: 7, h: 10 },
-    { key: 'hexWall', x: 270, z: 910, rot: 0, scale: 9, r: 7, h: 10 },
-    { key: 'hexWall', x: 252, z: 868, rot: 0, scale: 9, r: 7, h: 10 },
-    { key: 'hexWall', x: 270, z: 868, rot: 0, scale: 9, r: 7, h: 10 },
-    { key: 'gardenArch', x: 282, z: 889, rot: Math.PI / 2, scale: 2.2 },
-    { key: 'hexFlag', x: 282, z: 884, scale: 4 },
-    { key: 'hexFlag', x: 282, z: 894, scale: 4 },
-    { key: 'hexCannonballs', x: 275, z: 903, scale: 7 },
-    { key: 'hexWeaponRack', x: 275, z: 875, rot: 1.2, scale: 10 },
-    { key: 'hexBarracks', x: 296, z: 870, rot: -0.6, scale: 10, r: 7.5, h: 16 },
-    // Hedgewick's medieval quarter at full scale: chapel by the churchyard,
-    // tavern on the pond road, smithy, homes, and the market stall
-    { key: 'hexChurch', x: 302, z: 788, rot: Math.PI / 2, scale: 10, r: 7, h: 18 },
-    { key: 'hexTavern', x: 352, z: 806, rot: -1.45, scale: 11, r: 8, h: 16 },
-    { key: 'hexBlacksmith', x: 296, z: 822, rot: 2.03, scale: 10, r: 7.6, h: 12 },
-    { key: 'hexHomeA', x: 322, z: 828, rot: Math.PI, scale: 10, r: 7, h: 14 },
-    { key: 'hexHomeB', x: 334, z: 790, rot: 0.6, scale: 10, r: 7, h: 14 },
-    { key: 'hexMarket', x: 316, z: 840, rot: Math.PI, scale: 8, r: 6, h: 9 },
+    // Dawnhold: the walled garden castle on the Rose Wilds lawn. The keep
+    // holds the west side with a WIDE courtyard before the east gate wall
+    // (cannon towers flanking the stone arch, plain towers at the rear),
+    // and the Rose Wilds road runs right to the gate. The knights garrison
+    // the courtyard; their wolves prowl the gate lawn outside.
+    { key: 'hexCastle', x: 252, z: 889, rot: Math.PI / 2, scale: 11, r: 12.5, h: 42 },
+    { key: 'hexCannonTower', x: 286, z: 866, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 22 },
+    { key: 'hexCannonTower', x: 286, z: 912, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 22 },
+    { key: 'hexTower', x: 240, z: 866, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 20 },
+    { key: 'hexTower', x: 240, z: 912, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 20 },
+    { key: 'hexWall', x: 286, z: 876, rot: Math.PI / 2, scale: 8, r: 6.2, h: 9 },
+    { key: 'hexWall', x: 286, z: 902, rot: Math.PI / 2, scale: 8, r: 6.2, h: 9 },
+    { key: 'hexWall', x: 250, z: 912, rot: 0, scale: 8, r: 6.2, h: 9 },
+    { key: 'hexWall', x: 266, z: 912, rot: 0, scale: 8, r: 6.2, h: 9 },
+    { key: 'hexWall', x: 278, z: 912, rot: 0, scale: 7, r: 5.4, h: 9 },
+    { key: 'hexWall', x: 250, z: 866, rot: 0, scale: 8, r: 6.2, h: 9 },
+    { key: 'hexWall', x: 266, z: 866, rot: 0, scale: 8, r: 6.2, h: 9 },
+    { key: 'hexWall', x: 278, z: 866, rot: 0, scale: 7, r: 5.4, h: 9 },
+    { key: 'gardenArch', x: 286, z: 889, rot: Math.PI / 2, scale: 2.2 },
+    { key: 'hexFlag', x: 286, z: 884.5, scale: 4 },
+    { key: 'hexFlag', x: 286, z: 893.5, scale: 4 },
+    { key: 'hexCannonballs', x: 272, z: 905, scale: 7 },
+    { key: 'hexWeaponRack', x: 272, z: 873, rot: 1.2, scale: 9 },
+    { key: 'hexBarracks', x: 306, z: 860, rot: -0.9, scale: 8, r: 6, h: 13 },
+    // Hedgewick's medieval quarter, spread for easy walking: chapel by the
+    // churchyard, tavern on the pond road, smithy west, homes and the
+    // market ringing the square with every road corridor kept clear
+    { key: 'hexChurch', x: 302, z: 788, rot: Math.PI / 2, scale: 8, r: 5.6, h: 15 },
+    { key: 'hexTavern', x: 352, z: 806, rot: -1.45, scale: 8, r: 6, h: 13 },
+    { key: 'hexBlacksmith', x: 290, z: 824, rot: 2.03, scale: 7.5, r: 5.6, h: 10 },
+    { key: 'hexHomeA', x: 328, z: 838, rot: Math.PI, scale: 7.5, r: 5.2, h: 11 },
+    { key: 'hexHomeB', x: 334, z: 790, rot: 0.6, scale: 7.5, r: 5.2, h: 11 },
+    { key: 'hexMarket', x: 310, z: 844, rot: Math.PI, scale: 6, r: 4.5, h: 7 },
     // the Garden Gate: a grand doubled arch over the entry road, flanked by
     // flush stone walls (colliders on), with the parterre core's hedge line
     // and flower border along their garden face; the maze mouth keeps its
