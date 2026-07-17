@@ -54,8 +54,8 @@
       "state": "d83d0554",
       "events": "cab62aee",
       "rng": {
-        "draws": 129,
-        "digest": "bbf82459"
+        "draws": 128,
+        "digest": "643914ee"
       }
     },
     {
@@ -65,8 +65,8 @@
       "state": "b049825e",
       "events": "ff2a2d05",
       "rng": {
-        "draws": 143,
-        "digest": "941d99a0"
+        "draws": 142,
+        "digest": "9654ff3b"
       },
       "label": "duel-active",
       "players": [
@@ -294,8 +294,8 @@
       "state": "7f9a2c69",
       "events": "d660a646",
       "rng": {
-        "draws": 143,
-        "digest": "941d99a0"
+        "draws": 142,
+        "digest": "9654ff3b"
       },
       "label": "duel-ended",
       "players": [
@@ -528,8 +528,8 @@
       "state": "f6c572fe",
       "events": "e8be977d",
       "rng": {
-        "draws": 290,
-        "digest": "a331b4c3"
+        "draws": 291,
+        "digest": "ecc40cad"
       }
     },
     {
@@ -539,8 +539,8 @@
       "state": "c4202eee",
       "events": "741638a5",
       "rng": {
-        "draws": 485,
-        "digest": "3c3ab10a"
+        "draws": 484,
+        "digest": "d660fe69"
       }
     },
     {
