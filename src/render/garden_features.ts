@@ -1,16 +1,14 @@
-// The Evergarden's dressing, render-only: marble statues down the Statuary
-// Walk and in the Fountain Court, the tiered fountain itself at the maze's
-// heart, clipped topiary forms scattered over the lawns (the hedge maze is
-// terrain, world.ts owns it), and the specimen elders at the greatTrees
-// spots (the same records the sim's trunk colliders use). Same contract as
-// the sibling realm modules: build once, update(time) animates gently.
+// The Evergarden's dressing, render-only: the four marble watchers in the
+// Fountain Court, the tiered fountain itself at the maze's heart (the hedge
+// maze is terrain, world.ts owns it), and the specimen elders at the
+// greatTrees spots (the same records the sim's trunk colliders use). Same
+// contract as the sibling realm modules: build once, update(time) animates.
 import * as THREE from 'three';
 import { EVERGARDEN_PROPS } from '../sim/content/evergarden';
 import { hash2 } from '../sim/rng';
-import { inGardenMaze, terrainHeight, WATER_LEVEL } from '../sim/world';
+import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { gardenAvenueSpots } from './garden_parterre_core';
 import { GFX } from './gfx';
 
 export interface GardenFeaturesView {
@@ -75,30 +73,7 @@ function statueGeo(): THREE.BufferGeometry {
   return mergeGeos(parts);
 }
 
-// Three clipped topiary forms for the lawns: a ball on a stem, a tiered
-// triple-ball, and a garden cone. The living topiary (the mobs) are the
-// creature rigs; these are the ones still holding their shape.
-function topiaryGeos(): THREE.BufferGeometry[] {
-  const stem = (h: number): THREE.BufferGeometry => {
-    const g = new THREE.CylinderGeometry(0.09, 0.12, h, 5);
-    g.translate(0, h / 2, 0);
-    return g.toNonIndexed();
-  };
-  const ball = (r: number, y: number): THREE.BufferGeometry => {
-    const g = new THREE.SphereGeometry(r, 7, 6);
-    g.translate(0, y, 0);
-    return g.toNonIndexed();
-  };
-  const single = mergeGeos([stem(1.0), ball(0.85, 1.6)]);
-  const tiered = mergeGeos([stem(2.4), ball(0.75, 1.0), ball(0.55, 2.0), ball(0.38, 2.75)]);
-  const coneG = new THREE.ConeGeometry(0.85, 2.6, 7);
-  coneG.translate(0, 1.3 + 0.3, 0);
-  const cone = mergeGeos([stem(0.5), coneG.toNonIndexed()]);
-  return [single, tiered, cone];
-}
-
 const MARBLE = 0xcfcdc2;
-const TOPIARY_TINTS = [0x3f7e3c, 0x4a8a4e, 0x356e34];
 
 // The Fountain Court's centerpiece: a two-tier stone fountain with a still
 // water disc in each basin (the shimmer is the water shader's job elsewhere;
@@ -198,31 +173,9 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
     if (y > WATER_LEVEL) group.add(buildFountain(360, 1016.5, y - 0.1));
   }
 
-  // --- the topiary forms: formal avenue pairs flanking the walks plus cone
-  // sentinels at the parterre plot corners (the planting plan lives in
-  // garden_parterre_core.ts), never a random lawn scatter: the Evergarden
-  // reads as a designed palace garden ---
-  {
-    const geos = topiaryGeos();
-    const spotSets: { x: number; z: number; y: number; s: number; rot: number; tint: number }[][] =
-      [[], [], []];
-    for (const sp of gardenAvenueSpots(seed)) {
-      if (inGardenMaze(sp.x, sp.z)) continue;
-      const y = terrainHeight(sp.x, sp.z, seed);
-      if (y < WATER_LEVEL + 1.2 || y > 12) continue;
-      spotSets[sp.form].push({
-        x: sp.x,
-        z: sp.z,
-        y: y - 0.12,
-        // clipped to a standard: uniform size, only the faintest drift
-        s: 1.0 + (hash2(sp.x, sp.z, seed + 6241) - 0.5) * 0.12,
-        rot: sp.rot,
-        tint: TOPIARY_TINTS[sp.form % TOPIARY_TINTS.length],
-      });
-    }
-    const leafMat = mat(0xffffff, 0.85);
-    for (let k = 0; k < 3; k++) instance(geos[k], leafMat, spotSets[k], true);
-  }
+  // (The topiary forms retired entirely: even the clipped ball read as a
+  // lollipop tree beside the walks. The garden's greenery is now the hedge
+  // lines, the oaks, and the specimen elders below.)
 
   // --- the specimen elders: the twisted giant regrown clipped and green ---
   {

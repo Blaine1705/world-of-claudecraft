@@ -2,13 +2,12 @@
 // reads as a Victorian palace garden: every flower and bush belongs to an
 // authored arrangement instead of a random scatter. Three bed archetypes
 // (quatrefoil, concentric rings, knot stripes) sit on hand-placed plots
-// across the lawns, low ribbon beds flank the walks, and clipped topiary
-// stands in avenue pairs along the roads and as sentinels at plot corners.
-// Consumers: foliage.ts (ground flowers via parterreFlowerTintAt, hedge and
-// rose bushes via parterreBushSpots) and garden_features.ts (topiary via
-// gardenAvenueSpots + parterrePlots). Placement is deterministic; the plot
-// sites are validated against terrain, water, roads, the Great Maze, camps,
-// gather nodes, and the great trees by tests/garden_parterre.test.ts.
+// across the lawns, low ribbon beds flank the walks, and clipped hedge
+// lines edge every road. Consumer: foliage.ts (ground flowers via
+// parterreFlowerTintAt, hedge and rose bushes via parterreBushSpots).
+// Placement is deterministic; the plot sites are validated against terrain,
+// water, roads, the Great Maze, camps, gather nodes, and the great trees by
+// tests/garden_parterre.test.ts.
 
 import { EVERGARDEN_PROPS, EVERGARDEN_ROADS, EVERGARDEN_ZONE } from '../sim/content/evergarden';
 import { fbm2, hash2 } from '../sim/rng';
@@ -43,16 +42,6 @@ export interface ParterreBushSpot {
   scale: number;
   /** raw instance tint for bushFlowers; hedges (plain bush) leave it unset */
   bloomTint?: number;
-}
-
-export interface TopiarySpot {
-  x: number;
-  z: number;
-  rot: number;
-  /** index into the consumer's topiary form set. Always 0 (the clipped
-   * ball): the cone and tiered "snowman" forms were retired from the
-   * Evergarden by request. */
-  form: number;
 }
 
 // Hand-placed beds, one to three per lawn: compact plantings pulled in tight
@@ -111,10 +100,6 @@ const GARDEN_Z0 = EVERGARDEN_ZONE.zMin;
 const GARDEN_Z1 = EVERGARDEN_ZONE.zMax;
 const MAZE_MARGIN = 6;
 const MAZE_X1 = MAZE_X0 + MAZE_COLS * MAZE_CELL;
-// the Statuary Walk keeps its marble pairs: no avenue topiary between them
-// (its path hedges DO run: the clipped line reads well at the statues' feet)
-const STATUE_LANE = { x0: 343, x1: 377, z0: 830, z1: 935 } as const;
-
 // The Garden Gate's welcome front: the doubled stone arch at the zone entry
 // with flanking walls (EVERGARDEN_PROPS.decorProps), dressed on the garden
 // side with a clipped hedge line and a flower border. Wall-line coordinates:
@@ -425,63 +410,6 @@ export function gardenLushGrassAt(x: number, z: number): boolean {
   return fbm2(x * 0.045, z * 0.045, 7301, 2) >= 0.58;
 }
 
-/**
- * Avenue topiary: clipped pairs flanking every garden road at a steady
- * interval (alternating tiered and cone forms), plus four cone sentinels at
- * each plot's cardinal points. The Statuary Walk keeps its marble instead.
- */
-export function gardenAvenueSpots(seed: number): TopiarySpot[] {
-  const out: TopiarySpot[] = [];
-  const hub = EVERGARDEN_ZONE.hub;
-  const AVENUE_STEP = 18;
-  // behind the path hedge and the ribbon bed: hedge 4.15, ribbon to 6.6
-  const AVENUE_OFFSET = 7.6;
-  for (const road of EVERGARDEN_ROADS) {
-    let carry = AVENUE_STEP * 0.5;
-    for (let s = 0; s < road.length - 1; s++) {
-      const a = road[s];
-      const b = road[s + 1];
-      const segLen = Math.hypot(b.x - a.x, b.z - a.z);
-      if (segLen < 1e-6) continue;
-      const ux = (b.x - a.x) / segLen;
-      const uz = (b.z - a.z) / segLen;
-      for (let t = carry; t <= segLen; t += AVENUE_STEP) {
-        const cx = a.x + ux * t;
-        const cz = a.z + uz * t;
-        for (const side of [-1, 1]) {
-          const x = cx - uz * side * AVENUE_OFFSET;
-          const z = cz + ux * side * AVENUE_OFFSET;
-          if (inMazeRect(x, z)) continue;
-          if (
-            x > STATUE_LANE.x0 &&
-            x < STATUE_LANE.x1 &&
-            z > STATUE_LANE.z0 &&
-            z < STATUE_LANE.z1
-          ) {
-            continue;
-          }
-          if (Math.hypot(x - hub.x, z - hub.z) < hub.radius + 6) continue;
-          if (!flatDryLawn(x, z, seed)) continue;
-          out.push({
-            x,
-            z,
-            rot: Math.atan2(ux, uz) + (side < 0 ? Math.PI : 0),
-            form: 0,
-          });
-        }
-      }
-      carry = ((carry - segLen) % AVENUE_STEP) + AVENUE_STEP;
-      if (carry >= AVENUE_STEP) carry -= AVENUE_STEP;
-    }
-  }
-  for (const p of PARTERRE_PLOTS) {
-    for (let i = 0; i < 4; i++) {
-      const a = (i / 4) * Math.PI * 2;
-      const x = p.x + Math.sin(a) * (p.r + 2.4);
-      const z = p.z + Math.cos(a) * (p.r + 2.4);
-      if (!flatDryLawn(x, z, seed)) continue;
-      out.push({ x, z, rot: a, form: 0 });
-    }
-  }
-  return out;
-}
+// (The avenue and sentinel topiary retired entirely: even the last clipped
+// ball form read as a lollipop tree by the walks. The garden's greenery is
+// now hedges, oaks, and the specimen elders alone.)

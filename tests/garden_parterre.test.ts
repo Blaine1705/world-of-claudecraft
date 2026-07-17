@@ -6,8 +6,8 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  clearOfGardenBuildings,
   GARDEN_BED_TINTS,
-  gardenAvenueSpots,
   gardenMeadowTintAt,
   inParterrePlot,
   PARTERRE_PLOTS,
@@ -229,27 +229,22 @@ describe('the bush and topiary plan', () => {
     }
   });
 
-  it('lines the walks with avenue topiary clear of the statue lane and maze', () => {
-    const spots = gardenAvenueSpots(SEED);
-    expect(spots.length).toBeGreaterThan(30);
-    const mazeX1 = MAZE_X0 + MAZE_COLS * MAZE_CELL;
+  it('never grows a hedge through a built structure', () => {
+    // the built-footprint check: no hedge inside any collidered decor,
+    // village building, well, or stall (walls use their thin visual depth;
+    // bed roses are exempt: a mill bed's cardinal roses sit inside the
+    // mill's generous collider circle but clear of its visual base)
+    const spots = parterreBushSpots(SEED);
     for (const s of spots) {
-      const inStatueLane = s.x > 343 && s.x < 377 && s.z > 830 && s.z < 935;
-      expect(inStatueLane, `topiary in the statue lane at (${s.x},${s.z})`).toBe(false);
-      const inMaze =
-        s.x > MAZE_X0 - 4 && s.x < mazeX1 + 4 && s.z > MAZE_Z0 - 4 && s.z < MAZE_Z1 + 4;
-      expect(inMaze, `topiary in the maze at (${s.x},${s.z})`).toBe(false);
-      // only the clipped ball form remains: cones and tiered "snowman"
-      // topiary were retired from the Evergarden
-      expect(s.form).toBe(0);
+      if (s.kind !== 'bush') continue;
+      expect(
+        clearOfGardenBuildings(s.x, s.z, 0.7),
+        `hedge inside a structure at (${s.x.toFixed(1)},${s.z.toFixed(1)})`,
+      ).toBe(true);
     }
-    // avenue pairs exist along the Rose Wilds walk
-    const nearWalk = spots.filter((s) => Math.hypot(s.x - 287, s.z - 873) < 30);
-    expect(nearWalk.length).toBeGreaterThan(2);
   });
 
   it('is deterministic', () => {
     expect(parterreBushSpots(SEED)).toEqual(parterreBushSpots(SEED));
-    expect(gardenAvenueSpots(SEED)).toEqual(gardenAvenueSpots(SEED));
   });
 });
