@@ -8,8 +8,8 @@
     "updateRangedPetAttack friendly pet arm (~8093/8217)",
     "updateRangedPetAttack hostile-mob arm (~6776)"
   ],
-  "draws": 690,
-  "drawDigest": "ed91d9d3",
+  "draws": 692,
+  "drawDigest": "f655f238",
   "frames": [
     {
       "tick": 0,
@@ -197,8 +197,8 @@
       "state": "a4124754",
       "events": "741638a5",
       "rng": {
-        "draws": 690,
-        "digest": "ed91d9d3"
+        "draws": 692,
+        "digest": "f655f238"
       }
     },
     {
@@ -208,8 +208,8 @@
       "state": "a4124754",
       "events": "741638a5",
       "rng": {
-        "draws": 690,
-        "digest": "ed91d9d3"
+        "draws": 692,
+        "digest": "f655f238"
       },
       "label": "final",
       "players": [

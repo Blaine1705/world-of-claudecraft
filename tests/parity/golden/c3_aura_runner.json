@@ -10,8 +10,8 @@
     "pulseGroundAoE over 2+ in-radius hostiles: rng.range per target, stable order",
     "class:paladin"
   ],
-  "draws": 1378,
-  "drawDigest": "a3a1e919",
+  "draws": 1375,
+  "drawDigest": "50f7b123",
   "frames": [
     {
       "tick": 0,
@@ -912,8 +912,8 @@
       "state": "084e0160",
       "events": "741638a5",
       "rng": {
-        "draws": 1165,
-        "digest": "bff25085"
+        "draws": 1164,
+        "digest": "244918b9"
       }
     },
     {
@@ -923,8 +923,8 @@
       "state": "4b91e046",
       "events": "741638a5",
       "rng": {
-        "draws": 1225,
-        "digest": "12a4e838"
+        "draws": 1224,
+        "digest": "dcca726c"
       }
     },
     {
@@ -934,8 +934,8 @@
       "state": "97104e6f",
       "events": "741638a5",
       "rng": {
-        "draws": 1293,
-        "digest": "ab2249de"
+        "draws": 1292,
+        "digest": "44a9313b"
       }
     },
     {
@@ -945,8 +945,8 @@
       "state": "afebc3cd",
       "events": "741638a5",
       "rng": {
-        "draws": 1356,
-        "digest": "55167416"
+        "draws": 1355,
+        "digest": "e87652fd"
       }
     },
     {
@@ -956,8 +956,8 @@
       "state": "61c032cc",
       "events": "0279f821",
       "rng": {
-        "draws": 1378,
-        "digest": "a3a1e919"
+        "draws": 1375,
+        "digest": "50f7b123"
       },
       "label": "final",
       "players": [

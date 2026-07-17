@@ -8,8 +8,8 @@
     "updateGroundAoEs first-in-tick (~2256)",
     "pulseGroundAoE both callers (immediate ~4097 + deferred ~3052)"
   ],
-  "draws": 1616,
-  "drawDigest": "cf1dc85b",
+  "draws": 1625,
+  "drawDigest": "4cb30c37",
   "frames": [
     {
       "tick": 0,
@@ -229,8 +229,8 @@
       "state": "cbd5075c",
       "events": "5fcde5e0",
       "rng": {
-        "draws": 1364,
-        "digest": "7174eb43"
+        "draws": 1366,
+        "digest": "75d5146c"
       }
     },
     {
@@ -240,8 +240,8 @@
       "state": "46101891",
       "events": "741638a5",
       "rng": {
-        "draws": 1611,
-        "digest": "dc75ae79"
+        "draws": 1622,
+        "digest": "ee722889"
       }
     },
     {
@@ -251,8 +251,8 @@
       "state": "93b256b5",
       "events": "741638a5",
       "rng": {
-        "draws": 1616,
-        "digest": "cf1dc85b"
+        "draws": 1625,
+        "digest": "4cb30c37"
       },
       "label": "final",
       "players": [
