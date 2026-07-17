@@ -8955,6 +8955,9 @@ export const en_XA: EnTranslations = {
       "hedge_gnome": {
         "name": "[Ĥéðĝé Ĝñóɱé]"
       },
+      "hedge_knight": {
+        "name": "[Ðáŵñĥóļð Ķñíĝĥţ]"
+      },
       "the_topiary_bull": {
         "name": "[Ţĥé Ţóþíáŕý Ɓúļļ]"
       },

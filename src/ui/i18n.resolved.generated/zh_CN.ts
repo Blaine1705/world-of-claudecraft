@@ -8955,6 +8955,9 @@ export const zh_CN: EnTranslations = {
       "hedge_gnome": {
         "name": "树篱地精"
       },
+      "hedge_knight": {
+        "name": "Dawnhold Knight"
+      },
       "the_topiary_bull": {
         "name": "绿雕公牛"
       },

@@ -1944,6 +1944,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.grubjaw.name'
   | 'entities.mobs.harvest_sprite.name'
   | 'entities.mobs.hedge_gnome.name'
+  | 'entities.mobs.hedge_knight.name'
   | 'entities.mobs.hollow_acolyte.name'
   | 'entities.mobs.ice_wisp.name'
   | 'entities.mobs.idol_guardian.name'

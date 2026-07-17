@@ -24,6 +24,54 @@
       "out": "models/props/garden_arch.glb",
       "type": "static",
       "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/green/building_watchtower_green.gltf",
+      "out": "models/biome/hex_watchtower.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/green/building_tower_cannon_green.gltf",
+      "out": "models/biome/hex_tower_cannon.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/green/building_barracks_green.gltf",
+      "out": "models/biome/hex_barracks.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/cannonball_pallet.gltf",
+      "out": "models/biome/hex_cannonballs.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/resource_lumber.gltf",
+      "out": "models/biome/hex_lumber.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/weaponrack.gltf",
+      "out": "models/biome/hex_weaponrack.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/flag_green.gltf",
+      "out": "models/biome/hex_flag.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/wheelbarrow.gltf",
+      "out": "models/biome/hex_wheelbarrow.glb",
+      "type": "static",
+      "maxTex": 512
     }
   ]
 }

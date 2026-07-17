@@ -1360,6 +1360,9 @@ const MOB_KEYS: Record<string, string> = {
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',
+  // Dawnhold's garrison: the armored knight body (helmet, cape, sword), not
+  // the humanoid family's hooded outlaw fallback.
+  hedge_knight: 'npc_knight',
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',

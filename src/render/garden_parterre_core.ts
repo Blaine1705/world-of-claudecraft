@@ -11,7 +11,7 @@
 // gather nodes, and the great trees by tests/garden_parterre.test.ts.
 
 import { EVERGARDEN_ROADS, EVERGARDEN_ZONE } from '../sim/content/evergarden';
-import { hash2 } from '../sim/rng';
+import { fbm2, hash2 } from '../sim/rng';
 import {
   gardenLandness,
   MAZE_CELL,
@@ -53,21 +53,20 @@ export interface TopiarySpot {
   form: number;
 }
 
-// Hand-placed beds, one to three per lawn. Every site sits on flat dry lawn
-// clear of the maze, the hamlet, the walks, camps, nodes, and great trees
-// (the paired test re-validates all of that against the live terrain).
+// Hand-placed beds, one to three per lawn: compact plantings pulled in tight
+// around their centerpieces. Every site sits on flat dry lawn clear of the
+// maze, the hamlet, the walks, camps, nodes, and great trees (the paired
+// test re-validates all of that against the live terrain).
 export const PARTERRE_PLOTS: readonly ParterrePlot[] = [
-  { x: 322, z: 878, r: 12, kind: 'quatrefoil' }, // west of the Statuary Walk
-  { x: 400, z: 866, r: 11, kind: 'quatrefoil' }, // east of the Statuary Walk
-  // the Rose Wilds lawn: the old mill turns at the heart of this one
-  { x: 252, z: 880, r: 11, kind: 'concentric', centerpiece: 'windmill' },
-  { x: 256, z: 952, r: 11, kind: 'knot' }, // west maze forecourt
-  // (the far southeast lawn's second bed made way for Dawnhold castle: the
-  // knot below and the castle grounds now share that pocket)
-  { x: 504, z: 760, r: 10, kind: 'knot' }, // the far southeast lawn
-  { x: 420, z: 750, r: 9, kind: 'quatrefoil' }, // east of the Garden Gate road
-  { x: 476, z: 1010, r: 9, kind: 'knot' }, // east of the maze road
-  { x: 300, z: 1118, r: 7, kind: 'concentric' }, // the north lawn
+  { x: 322, z: 878, r: 10, kind: 'quatrefoil' }, // west of the Statuary Walk
+  { x: 400, z: 866, r: 9, kind: 'quatrefoil' }, // east of the Statuary Walk
+  // (the Rose Wilds lawn now belongs to Dawnhold castle and its knights)
+  { x: 256, z: 952, r: 9, kind: 'knot' }, // west maze forecourt
+  // the far southeast lawn: the old mill turns at the heart of its rings
+  { x: 504, z: 760, r: 8.5, kind: 'concentric', centerpiece: 'windmill' },
+  { x: 420, z: 750, r: 7.5, kind: 'quatrefoil' }, // east of the Garden Gate road
+  { x: 476, z: 1010, r: 7.5, kind: 'knot' }, // east of the maze road
+  { x: 300, z: 1118, r: 6, kind: 'concentric' }, // the north lawn
 ] as const;
 
 // The bed colorways: a much wider wheel than the old three-rose palette.
@@ -101,6 +100,11 @@ const MAZE_MARGIN = 6;
 const MAZE_X1 = MAZE_X0 + MAZE_COLS * MAZE_CELL;
 // the Statuary Walk keeps its marble pairs: no avenue topiary between them
 const STATUE_LANE = { x0: 343, x1: 377, z0: 830, z1: 935 } as const;
+
+function smoothstep(e0: number, e1: number, v: number): number {
+  const t = Math.min(1, Math.max(0, (v - e0) / (e1 - e0)));
+  return t * t * (3 - 2 * t);
+}
 
 function inMazeRect(x: number, z: number): boolean {
   return (
@@ -181,14 +185,15 @@ export function parterreFlowerTintAt(x: number, z: number): number {
   return -1;
 }
 
-// Open-lawn meadow tints: soft pastels, one color per coarse cell so the
-// drifts still read as planted swathes, never confetti.
+// Open-lawn meadow tints: soft pastels growing mixed through one another,
+// the way the Veiled Hollow's wild meadows read.
 const MEADOW_TINTS = [0xffffff, 0xf7c6d9, 0xf2c94c, 0xc9b8e8, 0xf27ba6, 0x7b9bd8] as const;
 
 /**
- * Flower fields on the open lawns: coarse hash cells bloom into airy drifts
- * between the formal features, keeping clear of walks, beds, the maze, and
- * the hamlet. Returns a tint or -1, sampled per candidate flower position.
+ * Flower fields on the open lawns: irregular noise-shaped patches bloom
+ * between the formal features, colors mixed per flower inside each patch,
+ * keeping clear of walks, beds, the maze, and the hamlet. Returns a tint or
+ * -1, sampled per candidate flower position.
  */
 export function gardenMeadowTintAt(x: number, z: number): number {
   if (x < GARDEN_X0 + 12 || x > GARDEN_X1 - 12 || z < GARDEN_Z0 + 10 || z > GARDEN_Z1 - 10) {
@@ -198,13 +203,18 @@ export function gardenMeadowTintAt(x: number, z: number): number {
   if (inParterrePlot(x, z, 4)) return -1;
   const hub = EVERGARDEN_ZONE.hub;
   if (Math.hypot(x - hub.x, z - hub.z) < hub.radius + 10) return -1;
-  const cx = Math.floor(x / 20);
-  const cz = Math.floor(z / 20);
-  if (hash2(cx, cz, 7301) > 0.34) return -1; // most cells stay lawn
-  // airy drift: roughly half the candidate spots inside a blooming cell
-  if (hash2(x * 3.1, z * 3.1, 7311) > 0.55) return -1;
+  // patchy blob fields: two noise octaves shape ragged meadow edges instead
+  // of square cells, so drifts wander the lawn the way wild growth does
+  const patch = fbm2(x * 0.045, z * 0.045, 7301, 2);
+  if (patch < 0.62) return -1;
+  // denser toward each patch heart, airy at the ragged edge
+  const density = 0.35 + smoothstep(0.62, 0.8, patch) * 0.4;
+  if (hash2(x * 3.1, z * 3.1, 7311) > density) return -1;
   if (roadDistance(x, z) < 7.5) return -1; // clear of walks, hedges, ribbons
-  return MEADOW_TINTS[Math.floor(hash2(cx, cz, 7321) * MEADOW_TINTS.length) % MEADOW_TINTS.length];
+  // colors grow mixed within the patch, flower by flower
+  return MEADOW_TINTS[
+    Math.floor(hash2(x * 7.3, z * 7.3, 7321) * MEADOW_TINTS.length) % MEADOW_TINTS.length
+  ];
 }
 
 /**

@@ -8955,6 +8955,9 @@ export const ru_RU: EnTranslations = {
       "hedge_gnome": {
         "name": "Гном живой изгороди"
       },
+      "hedge_knight": {
+        "name": "Dawnhold Knight"
+      },
       "the_topiary_bull": {
         "name": "Фигурный бык"
       },

@@ -184,6 +184,7 @@ const MOB_IDS = [
   'topiary_stag',
   'topiary_wolf',
   'hedge_gnome',
+  'hedge_knight',
   'the_topiary_bull',
   'moor_ram',
   'gale_wisp',

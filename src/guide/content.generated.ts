@@ -1574,7 +1574,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
     "families": [
       "beast",
-      "kobold"
+      "kobold",
+      "humanoid"
     ]
   },
   {
@@ -2216,6 +2217,15 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_dark_caster",
         "tint": "#533566",
         "still": "/guide-stills/mob_dark_caster__533566.webp"
+      },
+      {
+        "name": "Dawnhold Knight",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "hedge_knight",
+        "model": "npc_knight",
+        "still": "/guide-stills/npc_knight.webp"
       }
     ]
   },
@@ -4368,5 +4378,20 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 1.7,
     "tintStrength": 0.35
+  },
+  "npc_knight": {
+    "url": "models/chars/players/knight.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "show": [
+      "Knight_Helmet",
+      "Knight_Cape"
+    ],
+    "attach": [
+      {
+        "url": "models/weapons/sword_1handed.glb",
+        "bone": "handslot.r"
+      }
+    ]
   }
 };

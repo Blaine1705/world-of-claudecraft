@@ -65,6 +65,7 @@ import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_ITEMS,
+  EVERGARDEN_KNIGHT_CAMPS,
   EVERGARDEN_MOBS,
   EVERGARDEN_NPCS,
   EVERGARDEN_OBJECTS,
@@ -460,6 +461,10 @@ export const CAMPS: CampDef[] = [
   ...EVERGARDEN_CAMPS,
   ...GALECREST_CAMPS,
   ...FARSHORE_CAMPS,
+  // Dawnhold's knights arrived after every camp above shipped: they spread
+  // LAST so no earlier camp's world-gen rng draw moves (see the draw-order
+  // comment at the top of this array).
+  ...EVERGARDEN_KNIGHT_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [

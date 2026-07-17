@@ -1914,18 +1914,19 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       }
     }
     // The Evergarden: no grass anchors exist (mown lawn), so the parterre
-    // beds and walk ribbons plant directly from the authored plan. Two
-    // jittered samples per grid cell keep the beds reading solid.
+    // beds and walk ribbons plant directly from the authored plan. Beds get
+    // a third jittered sample per grid cell so the compact plantings read
+    // lush and full; meadows stay at two (airy by design).
     if (chunkBiome === 'garden') {
       for (let i = i0; i <= i1 && fn < flowerCap; i++) {
         for (let j = j0; j <= j1 && fn < flowerCap; j++) {
-          for (let rep = 0; rep < 2 && fn < flowerCap; rep++) {
+          for (let rep = 0; rep < 3 && fn < flowerCap; rep++) {
             const fx = i * step + (hashAt(i + rep * 37, j, 15) - 0.5) * step * 1.5;
             const fz = j * step + (hashAt(i, j + rep * 37, 16) - 0.5) * step * 1.5;
             if (fx < minX || fx >= maxX || fz < minZ || fz >= maxZ) continue;
             // beds and walk ribbons first, then the open-lawn meadow drifts
             let tint = parterreFlowerTintAt(fx, fz);
-            if (tint < 0) tint = gardenMeadowTintAt(fx, fz);
+            if (tint < 0 && rep < 2) tint = gardenMeadowTintAt(fx, fz);
             if (tint < 0) continue;
             const fh = terrainHeight(fx, fz, seed);
             if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed)) continue;
