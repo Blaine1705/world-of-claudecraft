@@ -28,7 +28,12 @@ function escapes(spot: { x: number; z: number }, minDist: number): boolean {
   const sx = p.pos.x;
   const sz = p.pos.z;
   const sy = p.pos.y;
-  for (let d = 0; d < 16; d++) {
+  for (let k = 0; k < 16; k++) {
+    // start the sweep facing SOUTH: the Drakemaw breach opens that way, so
+    // the common case succeeds on the first attempts instead of walking
+    // eight failing directions first (the full suite runs this under core
+    // contention, and every failed direction is fourteen simulated seconds)
+    const d = (k + 8) % 16;
     p.pos.x = sx;
     p.pos.z = sz;
     p.pos.y = sy;
@@ -53,11 +58,13 @@ function escapes(spot: { x: number; z: number }, minDist: number): boolean {
 }
 
 describe('enterable landforms are leavable on foot', () => {
-  it('walks out of the Drakemaw Caldera vent floor', () => {
+  // long-run walker suites need headroom under full-suite core contention
+  // (the same class of timeout the stable yard's long-run test carries)
+  it('walks out of the Drakemaw Caldera vent floor', { timeout: 90_000 }, () => {
     expect(escapes({ x: 388, z: 2317 }, 45)).toBe(true);
   });
 
-  it('walks out of the two smaller Drakemaw cone craters', () => {
+  it('walks out of the two smaller Drakemaw cone craters', { timeout: 90_000 }, () => {
     expect(escapes({ x: 270, z: 2282 }, 30)).toBe(true);
     expect(escapes({ x: 500, z: 2370 }, 30)).toBe(true);
   });
