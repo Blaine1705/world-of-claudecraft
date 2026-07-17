@@ -130,16 +130,15 @@ describe('progressive terrain build', () => {
 
     // No requestIdleCallback in plain Node, so idleSlot falls back to
     // setTimeout(0); fake timers drain it the same way. The pin is that the
-    // idle-paced arm reaches full coverage (zone marked loaded) without
-    // stalling or dropping work; it emits MORE meshes than the fast arm
-    // because dense-band cells split into four half-size sub-chunks (the
-    // per-idle-slot hitch bound), never fewer.
+    // idle-paced arm reaches byte-identical/full mesh coverage (zone marked
+    // loaded) without stalling or dropping work. Geometry rows are time-sliced
+    // now, so it no longer needs extra meshes merely to bound each idle task.
     const idle = buildTerrain(20061);
     const idleTask = idle.ensureZone(zone, undefined, { pace: 'idle' });
     await vi.runAllTimersAsync();
     await idleTask;
 
-    expect(idle.group.children.length).toBeGreaterThanOrEqual(fast.group.children.length);
+    expect(idle.group.children.length).toBe(fast.group.children.length);
     expect(idle.isZoneLoaded(zone.id)).toBe(true);
     fast.cancelStreaming();
     idle.cancelStreaming();

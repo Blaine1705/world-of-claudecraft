@@ -1035,8 +1035,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     flames.push(flame);
     noShadow.add(flame);
     const light = new THREE.PointLight(0xff8830, 12, 16, 2);
-    light.position.y = 1.2;
-    g.add(light);
+    // Root-level, world-positioned: the light must NOT live inside the hideable
+    // campfire group. A parent visibility toggle (fog cull / camera ghost) would
+    // change numPointLights and recompile every lit material mid-travel (the
+    // open-world shader-compile freeze). The fireLights budget owns its shine.
+    light.position.set(x, y + 1.2, z);
+    group.add(light);
     fireLights.push(light);
     g.position.set(x, y, z);
     group.add(shadowed(g));

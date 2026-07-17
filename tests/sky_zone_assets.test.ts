@@ -27,13 +27,19 @@ describe('zone-scoped sky assets', () => {
 
     expect(loadHdr).not.toHaveBeenCalled();
     await ensureSkyBiomeAssets(['vale', 'vale']);
-    expect(loadHdr).toHaveBeenCalledTimes(1);
-    expect(loadTexture).toHaveBeenCalledTimes(1);
+    // The visible dome keeps its high-resolution HDR while PMREM uses a
+    // separate 1k source, so one biome intentionally requests two HDR assets.
+    expect(loadHdr).toHaveBeenCalledTimes(2);
+    expect(loadHdr).toHaveBeenNthCalledWith(1, '/env/vale_day_2k.hdr');
+    expect(loadHdr).toHaveBeenNthCalledWith(2, '/env/vale_day_1k.hdr', { maxWidth: 512 });
+    // All shipped backdrop strengths are zero: dead 8k panoramas must not be
+    // fetched merely because their biome's HDRI is requested.
+    expect(loadTexture).not.toHaveBeenCalled();
     expect(hasSkyHdriAssets(['vale'])).toBe(true);
     expect(hasSkyHdriAssets(['marsh'])).toBe(false);
 
     await ensureSkyBiomeAssets(['vale']);
-    expect(loadHdr).toHaveBeenCalledTimes(1);
-    expect(loadTexture).toHaveBeenCalledTimes(1);
+    expect(loadHdr).toHaveBeenCalledTimes(2);
+    expect(loadTexture).not.toHaveBeenCalled();
   });
 });

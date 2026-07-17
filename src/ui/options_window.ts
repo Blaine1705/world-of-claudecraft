@@ -1157,9 +1157,9 @@ export class OptionsWindow {
       infoRow(t('hudChrome.bugReport.position'), coords);
     body.appendChild(infoEl);
 
-    // Capture once when the form opens so the screenshot reflects what the player
-    // saw, not a later frame. null when capture is unavailable/failed.
-    const shot = hooks.capture();
+    // Start the capture as soon as the form opens so it reflects what the player
+    // saw, but do not hold the form's first paint while JPEG encoding runs.
+    const shotPromise = hooks.capture();
 
     const descLabel = document.createElement('label');
     descLabel.className = 'bug-label';
@@ -1173,39 +1173,45 @@ export class OptionsWindow {
     desc.setAttribute('aria-describedby', 'bug-error');
     body.append(descLabel, desc);
 
-    let includeShot = shot !== null;
-    if (shot) {
-      const shotWrap = document.createElement('div');
-      shotWrap.className = 'bug-shot';
-      const img = document.createElement('img');
-      img.className = 'bug-shot-img';
-      img.src = shot;
-      img.alt = t('hudChrome.bugReport.screenshotAlt');
-      const toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'btn set-toggle';
-      const syncToggle = () => {
-        toggle.textContent = includeShot ? t('hud.options.on') : t('hud.options.off');
-        toggle.classList.toggle('off', !includeShot);
-        toggle.setAttribute('aria-pressed', String(includeShot));
-        toggle.setAttribute('aria-label', t('hudChrome.bugReport.includeScreenshot'));
-        img.style.display = includeShot ? '' : 'none';
-      };
-      toggle.addEventListener('click', () => {
-        audio.click();
-        includeShot = !includeShot;
+    let shot: string | null = null;
+    let includeShot = false;
+    const shotWrap = document.createElement('div');
+    shotWrap.className = 'bug-shot';
+    body.appendChild(shotWrap);
+    void shotPromise
+      .then((captured) => {
+        if (!captured || this.view !== 'bugreport' || !shotWrap.isConnected) return;
+        shot = captured;
+        includeShot = true;
+        const img = document.createElement('img');
+        img.className = 'bug-shot-img';
+        img.src = captured;
+        img.alt = t('hudChrome.bugReport.screenshotAlt');
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'btn set-toggle';
+        const syncToggle = () => {
+          toggle.textContent = includeShot ? t('hud.options.on') : t('hud.options.off');
+          toggle.classList.toggle('off', !includeShot);
+          toggle.setAttribute('aria-pressed', String(includeShot));
+          toggle.setAttribute('aria-label', t('hudChrome.bugReport.includeScreenshot'));
+          img.style.display = includeShot ? '' : 'none';
+        };
+        toggle.addEventListener('click', () => {
+          audio.click();
+          includeShot = !includeShot;
+          syncToggle();
+        });
         syncToggle();
-      });
-      syncToggle();
-      const toggleRow = document.createElement('div');
-      toggleRow.className = 'set-row';
-      const name = document.createElement('span');
-      name.className = 'set-name';
-      name.textContent = t('hudChrome.bugReport.includeScreenshot');
-      toggleRow.append(name, toggle);
-      shotWrap.append(toggleRow, img);
-      body.appendChild(shotWrap);
-    }
+        const toggleRow = document.createElement('div');
+        toggleRow.className = 'set-row';
+        const name = document.createElement('span');
+        name.className = 'set-name';
+        name.textContent = t('hudChrome.bugReport.includeScreenshot');
+        toggleRow.append(name, toggle);
+        shotWrap.append(toggleRow, img);
+      })
+      .catch(() => undefined);
 
     const error = document.createElement('div');
     error.className = 'report-error';

@@ -167,6 +167,18 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
     expect(bug).toContain('submit.disabled = false');
     expect(bug).toContain('this.localizeBugReportError(err)');
   });
+
+  it('paints the form before the asynchronous screenshot encoding completes', () => {
+    const bug = painter.slice(
+      painter.indexOf('private renderBugReport'),
+      painter.indexOf('private localizeBugReportError'),
+    );
+    expect(bug).toContain('const shotPromise = hooks.capture()');
+    expect(bug).toContain('void shotPromise');
+    expect(bug.indexOf('body.append(descLabel, desc)')).toBeLessThan(
+      bug.indexOf('void shotPromise'),
+    );
+  });
 });
 
 describe('options_window: keybind rebind dispatch (cluster 5)', () => {

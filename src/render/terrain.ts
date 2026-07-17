@@ -626,7 +626,29 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
 // vertices sit on the chunk border but 0.3u lower, hiding LOD cracks.
 // ---------------------------------------------------------------------------
 
-function buildChunkGeometry(
+interface ChunkGeometryBuildState {
+  nx: number;
+  nz: number;
+  gw: number;
+  gh: number;
+  x0: number;
+  z0: number;
+  stepX: number;
+  stepZ: number;
+  seed: number;
+  skirtSpan: number;
+  worldDepth: number;
+  positions: Float32Array;
+  normals: Float32Array;
+  colors: Float32Array;
+  uvs: Float32Array;
+  splats: Float32Array | null;
+  extras: Float32Array | null;
+  indices: Uint32Array;
+  sampleCache: Map<number, VertexSample>;
+}
+
+function beginChunkGeometry(
   x0: number,
   z0: number,
   size: number,
@@ -634,7 +656,7 @@ function buildChunkGeometry(
   seed: number,
   withSplat: boolean,
   skirtSpan: number,
-): THREE.BufferGeometry {
+): ChunkGeometryBuildState {
   const nx = Math.max(4, Math.round(size / spacing));
   const nz = nx;
   const stepX = size / nx;
@@ -649,103 +671,167 @@ function buildChunkGeometry(
   const uvs = new Float32Array(count * 2);
   const splats = withSplat ? new Float32Array(count * 4) : null;
   const extras = withSplat ? new Float32Array(count * 4) : null;
-
-  const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
-  const sampleCache = new Map<number, VertexSample>();
-  for (let gj = 0; gj < gh; gj++) {
-    for (let gi = 0; gi < gw; gi++) {
-      const i = gi - 1,
-        j = gj - 1; // interior indices; -1 / n+1 are skirt
-      const ci = Math.max(0, Math.min(nx, i));
-      const cj = Math.max(0, Math.min(nz, j));
-      const isSkirt = i !== ci || j !== cj;
-      const x = x0 + ci * stepX;
-      const z = z0 + cj * stepZ;
-      // skirt verts share the border sample — cache by clamped grid index
-      const cacheKey = cj * gw + ci;
-      let s = sampleCache.get(cacheKey);
-      if (!s) {
-        s = sampleVertex(x, z, seed);
-        sampleCache.set(cacheKey, s);
-      }
-      const vi = gj * gw + gi;
-      positions[vi * 3] = x;
-      // Slope-aware drop: a T-junction hole under a coarse neighbor's chord is
-      // bounded by the local gradient times that neighbor's vertex spacing, so
-      // a flat cliff-side skirt must deepen with the slope or the hole shows
-      // sky (skirtSpan is the coarsest spacing any neighbor can have).
-      positions[vi * 3 + 1] = s.height - (isSkirt ? SKIRT_DROP + s.slope * skirtSpan : 0);
-      positions[vi * 3 + 2] = z;
-      normals[vi * 3] = s.normal[0];
-      normals[vi * 3 + 1] = s.normal[1];
-      normals[vi * 3 + 2] = s.normal[2];
-      colors[vi * 3] = s.color[0];
-      colors[vi * 3 + 1] = s.color[1];
-      colors[vi * 3 + 2] = s.color[2];
-      uvs[vi * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
-      uvs[vi * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
-      if (splats) {
-        splats[vi * 4] = s.splat[0];
-        splats[vi * 4 + 1] = s.splat[1];
-        splats[vi * 4 + 2] = s.splat[2];
-        splats[vi * 4 + 3] = s.splat[3];
-      }
-      if (extras) {
-        extras[vi * 4] = s.extra[0];
-        extras[vi * 4 + 1] = s.extra[1];
-        extras[vi * 4 + 2] = s.extra[2];
-        extras[vi * 4 + 3] = s.extra[3];
-      }
-    }
-  }
-
   const quadsX = gw - 1,
     quadsZ = gh - 1;
   const indices = new Uint32Array(quadsX * quadsZ * 6);
-  let k = 0;
-  for (let gj = 0; gj < quadsZ; gj++) {
-    for (let gi = 0; gi < quadsX; gi++) {
-      const a = gj * gw + gi;
-      const b = a + 1;
-      const c = a + gw;
-      const d = c + 1;
-      // Split each quad along the diagonal whose endpoints are closest in
-      // height, so the fold line follows a ridge/terrace edge instead of
-      // cutting across it (a fixed diagonal saws terraced cliffs into
-      // alternating shards). Both windings keep the +y face up.
-      const ha = positions[a * 3 + 1];
-      const hb = positions[b * 3 + 1];
-      const hc = positions[c * 3 + 1];
-      const hd = positions[d * 3 + 1];
-      if (Math.abs(hb - hc) <= Math.abs(ha - hd)) {
-        indices[k++] = a;
-        indices[k++] = c;
-        indices[k++] = b;
-        indices[k++] = b;
-        indices[k++] = c;
-        indices[k++] = d;
-      } else {
-        indices[k++] = a;
-        indices[k++] = c;
-        indices[k++] = d;
-        indices[k++] = a;
-        indices[k++] = d;
-        indices[k++] = b;
-      }
+  return {
+    nx,
+    nz,
+    gw,
+    gh,
+    x0,
+    z0,
+    stepX,
+    stepZ,
+    seed,
+    skirtSpan,
+    worldDepth: WORLD_MAX_Z - WORLD_MIN_Z,
+    positions,
+    normals,
+    colors,
+    uvs,
+    splats,
+    extras,
+    indices,
+    sampleCache: new Map<number, VertexSample>(),
+  };
+}
+
+function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): void {
+  const { nx, nz, gw, x0, z0, stepX, stepZ, seed, skirtSpan, worldDepth } = state;
+  for (let gi = 0; gi < gw; gi++) {
+    const i = gi - 1,
+      j = gj - 1; // interior indices; -1 / n+1 are skirt
+    const ci = Math.max(0, Math.min(nx, i));
+    const cj = Math.max(0, Math.min(nz, j));
+    const isSkirt = i !== ci || j !== cj;
+    const x = x0 + ci * stepX;
+    const z = z0 + cj * stepZ;
+    // Skirt verts share the border sample - cache by clamped grid index.
+    const cacheKey = cj * gw + ci;
+    let s = state.sampleCache.get(cacheKey);
+    if (!s) {
+      s = sampleVertex(x, z, seed);
+      state.sampleCache.set(cacheKey, s);
+    }
+    const vi = gj * gw + gi;
+    state.positions[vi * 3] = x;
+    // Slope-aware drop: a T-junction hole under a coarse neighbor's chord is
+    // bounded by the local gradient times that neighbor's vertex spacing.
+    state.positions[vi * 3 + 1] = s.height - (isSkirt ? SKIRT_DROP + s.slope * skirtSpan : 0);
+    state.positions[vi * 3 + 2] = z;
+    state.normals[vi * 3] = s.normal[0];
+    state.normals[vi * 3 + 1] = s.normal[1];
+    state.normals[vi * 3 + 2] = s.normal[2];
+    state.colors[vi * 3] = s.color[0];
+    state.colors[vi * 3 + 1] = s.color[1];
+    state.colors[vi * 3 + 2] = s.color[2];
+    state.uvs[vi * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
+    state.uvs[vi * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
+    if (state.splats) {
+      state.splats[vi * 4] = s.splat[0];
+      state.splats[vi * 4 + 1] = s.splat[1];
+      state.splats[vi * 4 + 2] = s.splat[2];
+      state.splats[vi * 4 + 3] = s.splat[3];
+    }
+    if (state.extras) {
+      state.extras[vi * 4] = s.extra[0];
+      state.extras[vi * 4 + 1] = s.extra[1];
+      state.extras[vi * 4 + 2] = s.extra[2];
+      state.extras[vi * 4 + 3] = s.extra[3];
     }
   }
+}
 
+function fillChunkIndexRow(state: ChunkGeometryBuildState, gj: number): void {
+  const quadsX = state.gw - 1;
+  let k = gj * quadsX * 6;
+  for (let gi = 0; gi < quadsX; gi++) {
+    const a = gj * state.gw + gi;
+    const b = a + 1;
+    const c = a + state.gw;
+    const d = c + 1;
+    // Split along the diagonal whose endpoints are closest in height, so the
+    // fold follows ridge/terrace edges. Both windings keep the +y face up.
+    const ha = state.positions[a * 3 + 1];
+    const hb = state.positions[b * 3 + 1];
+    const hc = state.positions[c * 3 + 1];
+    const hd = state.positions[d * 3 + 1];
+    if (Math.abs(hb - hc) <= Math.abs(ha - hd)) {
+      state.indices[k++] = a;
+      state.indices[k++] = c;
+      state.indices[k++] = b;
+      state.indices[k++] = b;
+      state.indices[k++] = c;
+      state.indices[k++] = d;
+    } else {
+      state.indices[k++] = a;
+      state.indices[k++] = c;
+      state.indices[k++] = d;
+      state.indices[k++] = a;
+      state.indices[k++] = d;
+      state.indices[k++] = b;
+    }
+  }
+}
+
+function finishChunkGeometry(state: ChunkGeometryBuildState): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geo.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-  if (splats) geo.setAttribute('aSplat', new THREE.BufferAttribute(splats, 4));
-  if (extras) geo.setAttribute('aExtra', new THREE.BufferAttribute(extras, 4));
-  geo.setIndex(new THREE.BufferAttribute(indices, 1));
+  geo.setAttribute('position', new THREE.BufferAttribute(state.positions, 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(state.normals, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(state.colors, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(state.uvs, 2));
+  if (state.splats) geo.setAttribute('aSplat', new THREE.BufferAttribute(state.splats, 4));
+  if (state.extras) geo.setAttribute('aExtra', new THREE.BufferAttribute(state.extras, 4));
+  geo.setIndex(new THREE.BufferAttribute(state.indices, 1));
   geo.computeBoundingBox();
   geo.computeBoundingSphere();
   return geo;
+}
+
+function buildChunkGeometry(
+  x0: number,
+  z0: number,
+  size: number,
+  spacing: number,
+  seed: number,
+  withSplat: boolean,
+  skirtSpan: number,
+): THREE.BufferGeometry {
+  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan);
+  for (let row = 0; row < state.gh; row++) fillChunkVertexRow(state, row);
+  for (let row = 0; row < state.gh - 1; row++) fillChunkIndexRow(state, row);
+  return finishChunkGeometry(state);
+}
+
+const IDLE_GEOMETRY_SLICE_MS = 6;
+
+async function buildChunkGeometryIdle(
+  x0: number,
+  z0: number,
+  size: number,
+  spacing: number,
+  seed: number,
+  withSplat: boolean,
+  skirtSpan: number,
+  yieldSlice: () => Promise<void>,
+  cancelled: () => boolean,
+): Promise<THREE.BufferGeometry | null> {
+  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan);
+  const drainRows = async (rows: number, fill: (row: number) => void): Promise<boolean> => {
+    let row = 0;
+    while (row < rows) {
+      await yieldSlice();
+      if (cancelled()) return false;
+      const started = performance.now();
+      do fill(row++);
+      while (row < rows && performance.now() - started < IDLE_GEOMETRY_SLICE_MS);
+    }
+    return true;
+  };
+  if (!(await drainRows(state.gh, (row) => fillChunkVertexRow(state, row)))) return null;
+  if (!(await drainRows(state.gh - 1, (row) => fillChunkIndexRow(state, row)))) return null;
+  return finishChunkGeometry(state);
 }
 
 // ---------------------------------------------------------------------------
@@ -1191,8 +1277,13 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   // neighbor's chord (and vice versa)
   const skirtSpan = bands[bands.length - 1].spacing;
 
-  const addChunk = (x0: number, z0: number, size: number, spacing: number): void => {
-    const geo = buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan);
+  const attachChunk = (
+    geo: THREE.BufferGeometry,
+    x0: number,
+    z0: number,
+    size: number,
+    spacing: number,
+  ): void => {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
     group.add(mesh);
@@ -1215,6 +1306,37 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       size,
       spacing,
     });
+  };
+  const addChunk = (x0: number, z0: number, size: number, spacing: number): void => {
+    attachChunk(
+      buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan),
+      x0,
+      z0,
+      size,
+      spacing,
+    );
+  };
+  const addChunkIdle = async (
+    x0: number,
+    z0: number,
+    size: number,
+    spacing: number,
+    yieldSlice: () => Promise<void>,
+  ): Promise<boolean> => {
+    const geo = await buildChunkGeometryIdle(
+      x0,
+      z0,
+      size,
+      spacing,
+      seed,
+      !lowGfx,
+      skirtSpan,
+      yieldSlice,
+      () => cancelled,
+    );
+    if (!geo) return false;
+    attachChunk(geo, x0, z0, size, spacing);
+    return true;
   };
 
   // far-LOD cells merge 2x2 into super-chunks: the far field is where draw
@@ -1286,11 +1408,10 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     if (pending) return pending;
     const idlePace = opts?.pace === 'idle';
     const yieldSlice = idlePace ? yieldIdle : yieldBuild;
-    // An idle build works one cell per idle slot (a gating build races in
-    // batches of four): measured on the walked-crossing harness, dense-band
-    // 60 yd chunks cost ~75 ms of main-thread geometry each, so idle pace
-    // additionally quarters them below (4 x 30 yd sub-chunks of ~20 ms).
-    const cellsPerSlice = idlePace ? 1 : 4;
+    // Gating builds race in batches of four. Idle geometry has its own
+    // row/time-sliced builder, preserving one mesh per cell without a blocking
+    // 60 yd build or the old four-mesh subdivision workaround.
+    const cellsPerSlice = 4;
     const task = (async () => {
       const cells = zoneCells(zone);
       // A player can enter a zone anywhere, not just at its hub (a returning
@@ -1343,31 +1464,6 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       for (const [cx, cz] of cells) {
         if (cancelled) return;
         const cell = cz * chunksX + cx;
-        // Idle pace splits a dense-band (near or mid LOD) cell into four
-        // half-size sub-chunks, one per idle slot: a full dense 60 yd chunk
-        // costs ~75 ms of geometry on the main thread (the walked-crossing
-        // hitch), a 30 yd quarter ~20 ms. Skirts make the extra seams
-        // invisible, exactly like the far-band super-chunk merge in reverse;
-        // only the handful of dense cells per zone pay the extra draw calls.
-        const bandIdx = bandIndexAt(cx, cz);
-        if (idlePace && bandIdx < farBand && !built.has(cell)) {
-          built.add(cell);
-          const half = CHUNK_SIZE / 2;
-          const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
-          const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
-          for (const [qx, qz] of [
-            [0, 0],
-            [1, 0],
-            [0, 1],
-            [1, 1],
-          ] as const) {
-            if (cancelled) return;
-            addChunk(x0 + qx * half, z0 + qz * half, half, bands[bandIdx].spacing);
-            await yieldSlice();
-          }
-          onProgress?.(++done, total);
-          continue;
-        }
         if (!built.has(cell)) {
           const superCells = [
             [cx, cz],
@@ -1388,24 +1484,28 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
             );
           if (superOk) {
             for (const [sx, sz] of superCells) built.add(sz * chunksX + sx);
-            addChunk(
-              -WORLD_MAX_X + cx * CHUNK_SIZE,
-              WORLD_MIN_Z + cz * CHUNK_SIZE,
-              CHUNK_SIZE * 2,
-              bands[farBand].spacing,
-            );
+            const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+            const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+            if (idlePace) {
+              if (!(await addChunkIdle(x0, z0, CHUNK_SIZE * 2, bands[farBand].spacing, yieldSlice)))
+                return;
+            } else {
+              addChunk(x0, z0, CHUNK_SIZE * 2, bands[farBand].spacing);
+            }
           } else {
             built.add(cell);
-            addChunk(
-              -WORLD_MAX_X + cx * CHUNK_SIZE,
-              WORLD_MIN_Z + cz * CHUNK_SIZE,
-              CHUNK_SIZE,
-              bands[bandIndexAt(cx, cz)].spacing,
-            );
+            const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+            const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+            const spacing = bands[bandIndexAt(cx, cz)].spacing;
+            if (idlePace) {
+              if (!(await addChunkIdle(x0, z0, CHUNK_SIZE, spacing, yieldSlice))) return;
+            } else {
+              addChunk(x0, z0, CHUNK_SIZE, spacing);
+            }
           }
         }
         onProgress?.(++done, total);
-        if (done % cellsPerSlice === 0) await yieldSlice();
+        if (!idlePace && done % cellsPerSlice === 0) await yieldSlice();
       }
       loadedZones.add(zone.id);
       onProgress?.(total, total);

@@ -2019,7 +2019,7 @@ async function startGame(
         api.reportPlayerByName(online.characterId, targetName, reason, details),
     });
     hud.attachBugReporting({
-      capture: () => renderer?.captureScreenshot() ?? null,
+      capture: async () => (renderer ? await renderer.captureScreenshot() : null),
       collectMeta: () =>
         assembleBugReportMeta({
           build: `${__APP_VERSION__} (${__APP_BUILD_ID__})`,

@@ -550,7 +550,9 @@ export interface BugReportHooks {
   // message the hud maps via localizeBugReportError.
   submit(payload: BugReportPayload): Promise<{ screenshotStored: boolean }>;
   // Grab a JPEG data URL of the current frame, or null if capture failed/unavailable.
-  capture(): string | null;
+  // Compression stays asynchronous so opening the report form never blocks on
+  // canvas encoding.
+  capture(): Promise<string | null>;
   // Auto-collected context (build, userAgent, viewport, zone, level/class, camera).
   collectMeta(): unknown;
 }

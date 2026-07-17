@@ -5,6 +5,7 @@ import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, SUN_DIR, sharedUniforms } from './gfx';
+import { idleSlot, runIdleQueue } from './idle_queue';
 import { waterNormalish, waterNormalMaps } from './textures';
 
 // Water for the whole zone strip.
@@ -19,6 +20,13 @@ import { waterNormalish, waterNormalMaps } from './textures';
 // swell normal map for textured speculars.
 
 const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing, enough for the foam band
+// terrainHeight is deliberately rich and sampling all 32k water vertices in
+// one timer was a measured 170-260ms live-play freeze. Background zone loads
+// fill a handful of rows per idle callback instead; four rows stay around the
+// 6ms cooperative-work budget on the profiling machine.
+const WATER_ROWS_PER_IDLE_SLICE = 4;
+const WATER_IDLE_TIMEOUT_MS = 200;
+const WATER_VERTEX_ROWS = Array.from({ length: SEGMENTS_PER_ZONE + 1 }, (_, row) => row);
 
 // Real water normal maps, fetched at module import and gated by the boot
 // preload only for the shader tier. Low/mobile uses generated canvas water
@@ -51,7 +59,7 @@ const SUN_COLOR = new THREE.Color(0xfff0d4);
 export interface WaterView {
   group: THREE.Group;
   meshes: THREE.Mesh[];
-  ensureZone(zone: ZoneDef): Promise<THREE.Mesh[]>;
+  ensureZone(zone: ZoneDef, opts?: { pace?: 'fast' | 'idle' }): Promise<THREE.Mesh[]>;
   isZoneLoaded(zoneId: string): boolean;
   /** advances the legacy texture scroll (low tier); high tier uses uTime */
   update(time: number): void;
@@ -194,7 +202,7 @@ function buildShaderWater(seed: number): WaterView {
       apron.position.y = WATER_LEVEL - 0.06;
     });
   }
-  const buildZone = (zone: ZoneDef): THREE.Mesh => {
+  const buildZone = async (zone: ZoneDef, idlePace: boolean): Promise<THREE.Mesh> => {
     const depth = zone.zMax - zone.zMin;
     // each plane covers its zone's own rect: the side columns live at
     // x beyond the strip, and a strip-centered plane would leave their
@@ -211,17 +219,34 @@ function buildShaderWater(seed: number): WaterView {
     geo.translate((x0 + x1) / 2, 0, (zone.zMin + zone.zMax) / 2);
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const shoreDepth = new Float32Array(pos.count);
-    const fill = (): void => {
-      for (let i = 0; i < pos.count; i++) {
+    const columns = SEGMENTS_PER_ZONE + 1;
+    const fillRow = (row: number): void => {
+      const start = row * columns;
+      const end = Math.min(pos.count, start + columns);
+      for (let i = start; i < end; i++) {
         shoreDepth[i] = WATER_LEVEL - terrainHeight(pos.getX(i), pos.getZ(i), seed);
       }
     };
-    fill();
+    const fill = (): void => {
+      for (const row of WATER_VERTEX_ROWS) fillRow(row);
+    };
+    if (idlePace) {
+      await runIdleQueue(WATER_VERTEX_ROWS, fillRow, {
+        batchSize: WATER_ROWS_PER_IDLE_SLICE,
+        timeoutMs: WATER_IDLE_TIMEOUT_MS,
+      });
+    } else {
+      fill();
+    }
     geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(shoreDepth, 1));
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
     const mesh = new THREE.Mesh(geo, material);
     mesh.position.y = WATER_LEVEL;
+    // The renderer compiles a background zone's material while this mesh is
+    // hidden, then reveals it. Adding it visible here lets the next rAF draw
+    // (and synchronously upload/link) it before prepareZoneAt can prewarm it.
+    mesh.visible = !idlePace;
     meshes.push(mesh);
     group.add(mesh);
     refits.push(() => {
@@ -234,13 +259,17 @@ function buildShaderWater(seed: number): WaterView {
   return {
     group,
     meshes,
-    ensureZone(zone: ZoneDef): Promise<THREE.Mesh[]> {
+    ensureZone(zone: ZoneDef, opts?: { pace?: 'fast' | 'idle' }): Promise<THREE.Mesh[]> {
       if (loadedZones.has(zone.id)) return Promise.resolve([]);
       const pending = pendingZones.get(zone.id);
       if (pending) return pending;
-      const task = new Promise<void>((resolve) => setTimeout(resolve, 0))
-        .then(() => {
-          const mesh = buildZone(zone);
+      const idlePace = opts?.pace === 'idle';
+      const scheduled = idlePace
+        ? idleSlot(WATER_IDLE_TIMEOUT_MS)
+        : new Promise<void>((resolve) => setTimeout(resolve, 0));
+      const task = scheduled
+        .then(async () => {
+          const mesh = await buildZone(zone, idlePace);
           loadedZones.add(zone.id);
           return [mesh];
         })

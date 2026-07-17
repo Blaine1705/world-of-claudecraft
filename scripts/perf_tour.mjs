@@ -124,6 +124,19 @@ async function bootOffline(page, viewport) {
   );
   await page.$eval('#offline-select .mini-class[data-class="warrior"]', (el) => el.click());
   await page.$eval('#btn-start-offline', (el) => el.click());
+  // The post-login Welcome Screen gates world entry since the v0.27.0 merge:
+  // click Continue through it (enabled immediately offline). No-op where the
+  // DOM has no #welcome-screen (e.g. /play).
+  await page
+    .waitForSelector('#ws-continue:not([disabled])', { visible: true, timeout: 5000 })
+    .catch(() => {});
+  await page.evaluate(() => {
+    const btn = document.querySelector('#ws-continue');
+    if (btn && !btn.disabled) btn.click();
+  });
+  // Skip the first-spawn intro cinematic (Escape is its documented skip): it
+  // suspends movement and drives the camera, which would corrupt the tour.
+  await page.keyboard.press('Escape').catch(() => {});
   if (viewport.isMobile) {
     // The touch boot raises the #mobile-preflight "play in landscape fullscreen"
     // overlay, and prepareWorldEntry() awaits its Continue button before entering the
