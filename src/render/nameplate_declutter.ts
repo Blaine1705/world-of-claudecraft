@@ -54,19 +54,70 @@ function cellCoord(v: number, size: number): number {
 // ---------------------------------------------------------------------------
 const order: number[] = [];
 const cluster: number[] = [];
-const cells = new Map<number, number[]>();
-const activeBuckets: number[][] = [];
-const bucketPool: number[][] = [];
 let visited = new Uint8Array(64);
+let cellKeys = new Uint32Array(64);
+let cellHeads = new Int32Array(64);
+let cellGenerations = new Uint32Array(64);
+let cellNext = new Int32Array(64);
+let cellGeneration = 0;
 
-function releaseCells(): void {
-  for (let i = 0; i < activeBuckets.length; i++) {
-    const bucket = activeBuckets[i];
-    bucket.length = 0;
-    bucketPool.push(bucket);
+function sortIndicesByAnchorId(indices: number[], anchors: NameplateAnchor[]): void {
+  // Insertion sort is allocation-free and fast here: view-map order is stable
+  // between frames, while collision clusters normally contain only 2-3 plates.
+  for (let i = 1; i < indices.length; i++) {
+    const value = indices[i];
+    const id = anchors[value].id;
+    let j = i - 1;
+    while (j >= 0 && anchors[indices[j]].id > id) {
+      indices[j + 1] = indices[j];
+      j--;
+    }
+    indices[j + 1] = value;
   }
-  activeBuckets.length = 0;
-  cells.clear();
+}
+
+function beginCellFrame(anchorCount: number): void {
+  let capacity = cellKeys.length;
+  while (capacity < anchorCount * 2) capacity *= 2;
+  if (capacity !== cellKeys.length) {
+    cellKeys = new Uint32Array(capacity);
+    cellHeads = new Int32Array(capacity);
+    cellGenerations = new Uint32Array(capacity);
+    cellNext = new Int32Array(capacity);
+    cellGeneration = 0;
+  } else if (cellNext.length < anchorCount) {
+    cellNext = new Int32Array(capacity);
+  }
+  cellGeneration = (cellGeneration + 1) >>> 0;
+  if (cellGeneration === 0) {
+    cellGenerations.fill(0);
+    cellGeneration = 1;
+  }
+}
+
+function cellSlot(key: number): number {
+  const mask = cellKeys.length - 1;
+  let slot = Math.imul((key ^ (key >>> 16)) >>> 0, 0x45d9f3b) & mask;
+  while (cellGenerations[slot] === cellGeneration && cellKeys[slot] !== key) {
+    slot = (slot + 1) & mask;
+  }
+  return slot;
+}
+
+function insertCellAnchor(key: number, anchorIndex: number): void {
+  const slot = cellSlot(key);
+  if (cellGenerations[slot] !== cellGeneration) {
+    cellGenerations[slot] = cellGeneration;
+    cellKeys[slot] = key;
+    cellHeads[slot] = -1;
+  }
+  cellNext[anchorIndex] = cellHeads[slot];
+  cellHeads[slot] = anchorIndex;
+}
+
+function firstCellAnchor(key: number): number {
+  const slot = cellSlot(key);
+  return cellGenerations[slot] === cellGeneration ? cellHeads[slot] : -1;
 }
 
 /**
@@ -90,19 +141,14 @@ export function declutterNameplatesInPlace(
 
   order.length = 0;
   for (let i = 0; i < n; i++) order.push(i);
-  order.sort((a, b) => anchors[a].id - anchors[b].id);
+  sortIndicesByAnchorId(order, anchors);
 
+  beginCellFrame(n);
   for (let i = 0; i < n; i++) {
     const cx = cellCoord(anchors[i].sx, OVERLAP_THRESHOLD_X_PX);
     const cy = cellCoord(anchors[i].sy, OVERLAP_THRESHOLD_Y_PX);
     const key = cx * CELL_STRIDE + cy;
-    let bucket = cells.get(key);
-    if (!bucket) {
-      bucket = bucketPool.pop() ?? [];
-      cells.set(key, bucket);
-      activeBuckets.push(bucket);
-    }
-    bucket.push(i);
+    insertCellAnchor(key, i);
   }
 
   for (let o = 0; o < n; o++) {
@@ -117,10 +163,13 @@ export function declutterNameplatesInPlace(
     const cy = cellCoord(ay, OVERLAP_THRESHOLD_Y_PX);
     for (let dx = -1; dx <= 1; dx++) {
       for (let dy = -1; dy <= 1; dy++) {
-        const bucket = cells.get((cx + dx) * CELL_STRIDE + (cy + dy));
-        if (!bucket) continue;
-        for (let b = 0; b < bucket.length; b++) {
-          const j = bucket[b];
+        const neighbourX = cx + dx;
+        const neighbourY = cy + dy;
+        if (neighbourX < 0 || neighbourX > 0xffff || neighbourY < 0 || neighbourY > 0xffff) {
+          continue;
+        }
+        const key = neighbourX * CELL_STRIDE + neighbourY;
+        for (let j = firstCellAnchor(key); j !== -1; j = cellNext[j]) {
           if (visited[j]) continue;
           if (Math.abs(anchors[j].sx - ax) > OVERLAP_THRESHOLD_X_PX) continue;
           if (Math.abs(anchors[j].sy - ay) > OVERLAP_THRESHOLD_Y_PX) continue;
@@ -134,7 +183,7 @@ export function declutterNameplatesInPlace(
       continue;
     }
     // the whole pass stacks in ascending id order
-    cluster.sort((a, b) => anchors[a].id - anchors[b].id);
+    sortIndicesByAnchorId(cluster, anchors);
 
     let sum = 0;
     for (let k = 0; k < cluster.length; k++) sum += anchors[cluster[k]].sy;
@@ -147,7 +196,6 @@ export function declutterNameplatesInPlace(
     }
   }
 
-  releaseCells();
   return anchors;
 }
 
