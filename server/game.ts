@@ -747,6 +747,9 @@ export interface ClientSession {
 interface SentEntityVersions {
   idVer: number;
   dynVer: number;
+  // Last broadcast tick where this entity remained inside this viewer's
+  // interest set. Replaces a throwaway Set allocation per client per tick.
+  seenAtTick: number;
   // sim tick of the last full/lite record, so distance-tiered rates hold
   // even when one broadcast covers several catch-up sim ticks
   sentAtTick: number;
@@ -1158,6 +1161,12 @@ export class GameServer {
   readonly social: SocialService;
   private readonly moderation: ModerationService<ClientSession>;
   private wireCache = new Map<number, EntityWireCache>();
+  // broadcastSnapshots is synchronous and visits one client at a time, so its
+  // bounded interest buffers can be reused instead of allocating two arrays per
+  // client on every 20 Hz pass. sendRaw receives the completed string before the
+  // next client clears these buffers.
+  private readonly broadcastEntsScratch: string[] = [];
+  private readonly broadcastKeepScratch: number[] = [];
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once per
   // grouped session per tick. Memoize both once per tick so a 40-raid does one scan,
@@ -5040,9 +5049,11 @@ export class GameServer {
             anchorSession = target;
           }
         }
-        const ents: string[] = [];
-        const keep: number[] = [];
-        const present = new Set<number>();
+        const ents = this.broadcastEntsScratch;
+        const keep = this.broadcastKeepScratch;
+        ents.length = 0;
+        keep.length = 0;
+        const sentEnts = session.sentEnts;
         const gridStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         this.sim.grid.forEachInRadius(
           anchorEntity.pos.x,
@@ -5052,7 +5063,7 @@ export class GameServer {
             if (this.perfDetailActive) this.bcVisits++;
             if (e.id === anchorEntity.id) return;
             if (!this.canObserveEntity(anchorEntity, e, d2)) return;
-            const known = session.sentEnts.get(e.id);
+            const known = sentEnts.get(e.id);
             // the viewer's current target stays in interest to the widest drop
             // radius so its unit frame doesn't vanish mid-chase
             const limitSq =
@@ -5060,15 +5071,16 @@ export class GameServer {
                 ? NPC_DROP_RADIUS * NPC_DROP_RADIUS
                 : interestLimitSq(e, known !== undefined);
             if (d2 > limitSq) return;
-            present.add(e.id);
+            if (known) known.seenAtTick = tick;
             const cache = this.wireCacheFor(e);
             if (known === undefined) {
               // first sight carries the at-rest state exactly, so no settle
               // record is owed until it moves again
               ents.push(cache.fullJson);
-              session.sentEnts.set(e.id, {
+              sentEnts.set(e.id, {
                 idVer: cache.idVer,
                 dynVer: cache.dynVer,
+                seenAtTick: tick,
                 sentAtTick: tick,
                 settled: true,
               });
@@ -5099,8 +5111,8 @@ export class GameServer {
           },
         );
         // forget entities that left interest, so a re-entry sends identity again
-        for (const id of session.sentEnts.keys()) {
-          if (!present.has(id)) session.sentEnts.delete(id);
+        for (const [id, known] of sentEnts) {
+          if (known.seenAtTick !== tick) sentEnts.delete(id);
         }
         const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         if (this.perfDetailActive) this.bcastGridNs += selfStart - gridStart;
