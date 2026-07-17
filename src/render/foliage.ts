@@ -22,7 +22,13 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { bucketVisible, type LodDists, lodDistsFor, treeDetailDistance } from './foliage_lod';
+import {
+  type BucketWindowInput,
+  bucketVisible,
+  type LodDists,
+  lodDistsFor,
+  treeDetailDistance,
+} from './foliage_lod';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
@@ -2108,6 +2114,21 @@ export function buildFoliage(seed: number): FoliageView {
   let modelVisibleTrianglesByLod: Record<string, number> = {};
   let modelDraws = 0;
   let modelTriangles = 0;
+  // Reused by the per-frame bucket cull below. Allocating this input inside the
+  // loop generated one short-lived object per foliage bucket per frame (well
+  // over 100 MB of garbage in a 12-second gameplay sample).
+  const bucketWindow: BucketWindowInput = {
+    centerDist: 0,
+    radius: 0,
+    minDist: undefined,
+    maxDist: undefined,
+    minAtDetail: undefined,
+    maxAtDetail: undefined,
+    distanceScale: 1,
+    detailFar: 0,
+    revealScale: 1,
+    fogLimit: 0,
+  };
   buildTrees(group, seed, bucketMeshes, treeHideables);
   buildDressing(group, seed, bucketMeshes);
   for (const b of bucketMeshes) {
@@ -2174,18 +2195,19 @@ export function buildFoliage(seed: number): FoliageView {
           GFX.leanFoliage && (b.lod === 'core' || b.lod === 'near-fill')
             ? 0.94 + hashAt(b.x, b.z, 109) * 0.06
             : 1;
-        b.mesh.visible = bucketVisible({
-          centerDist: Math.hypot(b.x - camX, b.z - camZ),
-          radius: b.radius,
-          minDist: b.minDist,
-          maxDist: b.maxDist,
-          minAtDetail: b.minAtDetail,
-          maxAtDetail: b.maxAtDetail,
-          distanceScale,
-          detailFar,
-          revealScale,
-          fogLimit,
-        });
+        const dx = b.x - camX;
+        const dz = b.z - camZ;
+        bucketWindow.centerDist = Math.sqrt(dx * dx + dz * dz);
+        bucketWindow.radius = b.radius;
+        bucketWindow.minDist = b.minDist;
+        bucketWindow.maxDist = b.maxDist;
+        bucketWindow.minAtDetail = b.minAtDetail;
+        bucketWindow.maxAtDetail = b.maxAtDetail;
+        bucketWindow.distanceScale = distanceScale;
+        bucketWindow.detailFar = detailFar;
+        bucketWindow.revealScale = revealScale;
+        bucketWindow.fogLimit = fogLimit;
+        b.mesh.visible = bucketVisible(bucketWindow);
         if (b.mesh.visible) {
           modelVisibleBuckets++;
           modelVisibleDraws += b.draws;
