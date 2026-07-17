@@ -1,0 +1,29 @@
+{
+  "comment": "The Evergarden's garden ironwork: wrought-iron fence runs, pillars, a gate, and the stone garden arch from KayKit Halloween Bits (CC0). Sourced from the user's local KayKit collection; world-scale already (fence 4yd runs, arch 4.2yd span).",
+  "items": [
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Halloween Bits 1.0/Assets/gltf/fence.gltf",
+      "out": "models/props/garden_iron_fence.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Halloween Bits 1.0/Assets/gltf/fence_pillar.gltf",
+      "out": "models/props/garden_iron_pillar.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Halloween Bits 1.0/Assets/gltf/fence_gate.gltf",
+      "out": "models/props/garden_iron_gate.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Halloween Bits 1.0/Assets/gltf/arch.gltf",
+      "out": "models/props/garden_arch.glb",
+      "type": "static",
+      "maxTex": 512
+    }
+  ]
+}

@@ -236,4 +236,59 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { x: 462, z: 1068, r: 2.6 },
     { x: 244, z: 1034, r: 2.6 },
   ],
+  // The built garden (KayKit Medieval Hexagon buildings + the wrought-iron
+  // garden set; PROP_ASSET_DEFS keys in render/props.ts). Sites validated
+  // against terrain, roads, camps, and the parterre plan by
+  // tests/garden_parterre.test.ts.
+  decorProps: [
+    // the Old Mill: centerpiece of the Rose Wilds parterre (the bed's flower
+    // rings circle it; garden_parterre_core skips its center bush there)
+    { key: 'hexWindmill', x: 252, z: 880, rot: Math.PI / 2, scale: 6, r: 3.5, h: 9 },
+    // Dawnhold: the garden castle on the southeast lawn, its west curtain
+    // wall broken by an iron-arched gate facing the grounds
+    { key: 'hexCastle', x: 502, z: 790, rot: -Math.PI / 2, scale: 6.5, r: 8.5, h: 24 },
+    { key: 'hexTower', x: 490, z: 776, rot: -Math.PI / 2, scale: 5.5, r: 3, h: 12 },
+    { key: 'hexTower', x: 490, z: 804, rot: -Math.PI / 2, scale: 5.5, r: 3, h: 12 },
+    { key: 'hexWall', x: 490, z: 783, rot: Math.PI / 2, scale: 5.5, r: 4.5, h: 6 },
+    { key: 'hexWall', x: 490, z: 797, rot: Math.PI / 2, scale: 5.5, r: 4.5, h: 6 },
+    { key: 'gardenArch', x: 490, z: 790, rot: Math.PI / 2, scale: 1.3 },
+    // Hedgewick's medieval quarter: chapel, tavern, and smithy around the
+    // hamlet, in the hexagon kit's garden-green colorway
+    { key: 'hexChurch', x: 292, z: 786, rot: 0.54, scale: 6, r: 4.2, h: 10 },
+    { key: 'hexTavern', x: 352, z: 806, rot: -1.45, scale: 5.5, r: 4.2, h: 8 },
+    { key: 'hexBlacksmith', x: 296, z: 822, rot: 2.03, scale: 5, r: 3.8, h: 6 },
+    // garden arches over the two grand approaches: the Garden Gate road and
+    // the maze mouth (walk-through: no collider, they span the walks)
+    { key: 'gardenArch', x: 391, z: 747, rot: 2.97, scale: 1.4 },
+    { key: 'gardenArch', x: 360, z: 933, rot: 0, scale: 1.4 },
+    // the churchyard's wrought-iron enclosure (walk-through dressing) around
+    // the gardener's plot and the chapel: pillars, rails, an east gate
+    { key: 'gardenIronPillar', x: 283, z: 777 },
+    { key: 'gardenIronPillar', x: 307, z: 777 },
+    { key: 'gardenIronPillar', x: 283, z: 803 },
+    { key: 'gardenIronPillar', x: 307, z: 803 },
+    { key: 'gardenIronFence', x: 285.5, z: 777 },
+    { key: 'gardenIronFence', x: 289.5, z: 777 },
+    { key: 'gardenIronFence', x: 293.5, z: 777 },
+    { key: 'gardenIronFence', x: 297.5, z: 777 },
+    { key: 'gardenIronFence', x: 301.5, z: 777 },
+    { key: 'gardenIronFence', x: 305.5, z: 777 },
+    { key: 'gardenIronFence', x: 285.5, z: 803 },
+    { key: 'gardenIronFence', x: 289.5, z: 803 },
+    { key: 'gardenIronFence', x: 293.5, z: 803 },
+    { key: 'gardenIronFence', x: 297.5, z: 803 },
+    { key: 'gardenIronFence', x: 301.5, z: 803 },
+    { key: 'gardenIronFence', x: 305.5, z: 803 },
+    { key: 'gardenIronFence', x: 283, z: 779.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: 283, z: 783.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: 283, z: 787.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: 283, z: 791.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: 283, z: 795.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: 283, z: 799.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: 307, z: 779.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: 307, z: 783.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: 307, z: 796.5, rot: Math.PI / 2 },
+    { key: 'gardenIronFence', x: 307, z: 800.5, rot: Math.PI / 2 },
+    { key: 'gardenIronGate', x: 307, z: 790, rot: Math.PI / 2 },
+  ],
 };

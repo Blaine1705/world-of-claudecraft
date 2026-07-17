@@ -8,6 +8,8 @@ import { describe, expect, it } from 'vitest';
 import {
   GARDEN_BED_TINTS,
   gardenAvenueSpots,
+  gardenMeadowTintAt,
+  inParterrePlot,
   PARTERRE_PLOTS,
   parterreBushSpots,
   parterreFlowerTintAt,
@@ -96,32 +98,34 @@ describe('parterre plot sites', () => {
 });
 
 describe('the flower plan', () => {
-  it('paints solid beds inside every plot and nothing on the open lawn', () => {
+  it('fills every bed edge to edge like a real planting', () => {
     for (const p of PARTERRE_PLOTS) {
       let painted = 0;
-      let samples = 0;
+      let inside = 0;
       for (let dx = -p.r; dx <= p.r; dx += 1) {
         for (let dz = -p.r; dz <= p.r; dz += 1) {
-          samples++;
+          // sample the bed interior (inside the hedge line)
+          if (Math.hypot(dx, dz) > p.r * 0.7) continue;
+          inside++;
           if (parterreFlowerTintAt(p.x + dx, p.z + dz) >= 0) painted++;
         }
       }
-      // every archetype fills a substantial share of its plot square
-      expect(painted / samples, `plot (${p.x},${p.z}) coverage`).toBeGreaterThan(0.2);
+      // full-fill beds: the filler color carries every pattern gap
+      expect(painted / inside, `plot (${p.x},${p.z}) interior coverage`).toBeGreaterThan(0.9);
     }
-    // far from every plot and road: bare lawn
+    // far from every plot and road: bare lawn (meadow drifts are separate)
     expect(parterreFlowerTintAt(210, 795)).toBe(-1);
     expect(parterreFlowerTintAt(300, 745)).toBe(-1);
   });
 
   it('lays ribbon beds along the walks but not in the maze or hamlet', () => {
-    // mid-segment points on the Hedgewick -> Rose Wilds walk, offset ~4.7yd
+    // mid-segment points on the Hedgewick -> Rose Wilds walk, in the ribbon
+    // band behind the path hedge line (5.2 to 6.6 off the road center)
     let ribbon = 0;
     for (let t = 0; t <= 1; t += 0.1) {
       const cx = 298 + (276 - 298) * t;
       const cz = 852 + (894 - 852) * t;
-      // walk outward from the road center to the ribbon band
-      for (let off = 4.1; off < 5.3; off += 0.3) {
+      for (let off = 5.3; off < 6.5; off += 0.3) {
         if (parterreFlowerTintAt(cx + off, cz) >= 0) ribbon++;
       }
     }
@@ -129,6 +133,26 @@ describe('the flower plan', () => {
     // no ribbons inside the maze rect or the hamlet ring
     expect(parterreFlowerTintAt(360, 1016)).toBe(-1);
     expect(parterreFlowerTintAt(EVERGARDEN_ZONE.hub.x + 3, EVERGARDEN_ZONE.hub.z)).toBe(-1);
+  });
+
+  it('blooms meadow drifts on the open lawns, clear of walks and features', () => {
+    // the big southeast lawn holds open ground: some cells must bloom
+    let blooms = 0;
+    for (let x = 440; x <= 530; x += 2) {
+      for (let z = 740; z <= 810; z += 2) {
+        const tint = gardenMeadowTintAt(x, z);
+        if (tint >= 0) {
+          blooms++;
+          // a drift never sits on a walk, in a bed, or in the maze
+          expect(roadDistance(x, z)).toBeGreaterThan(7.4);
+          expect(inParterrePlot(x, z, 3.9)).toBe(false);
+        }
+      }
+    }
+    expect(blooms, 'southeast lawn meadow blooms').toBeGreaterThan(20);
+    // never inside the maze or the hamlet
+    expect(gardenMeadowTintAt(360, 1016)).toBe(-1);
+    expect(gardenMeadowTintAt(EVERGARDEN_ZONE.hub.x + 4, EVERGARDEN_ZONE.hub.z)).toBe(-1);
   });
 
   it('uses a wide color wheel across the beds', () => {
@@ -151,11 +175,11 @@ describe('the flower plan', () => {
 });
 
 describe('the bush and topiary plan', () => {
-  it('plants uniform clipped hedges and tinted roses on dry flat ground', () => {
+  it('plants tight clipped hedges, tinted roses, and big bed centerpieces', () => {
     const spots = parterreBushSpots(SEED);
     const hedges = spots.filter((s) => s.kind === 'bush');
     const roses = spots.filter((s) => s.kind === 'bushFlowers');
-    expect(hedges.length).toBeGreaterThan(100);
+    expect(hedges.length).toBeGreaterThan(300); // bed rings plus the walk lines
     expect(roses.length).toBeGreaterThanOrEqual(PARTERRE_PLOTS.length * 3);
     for (const s of hedges) expect(s.scale).toBe(0.82); // the gardener's shears
     for (const s of roses) {
@@ -167,6 +191,41 @@ describe('the bush and topiary plan', () => {
         WATER_LEVEL + 1.6,
       );
       expect(slopeAt(s.x, s.z), `bush slope at (${s.x},${s.z})`).toBeLessThan(0.65);
+    }
+    for (const p of PARTERRE_PLOTS) {
+      const center = roses.filter((s) => Math.hypot(s.x - p.x, s.z - p.z) < 1);
+      if (p.centerpiece) {
+        // a built centerpiece stands here instead (EVERGARDEN_PROPS.decorProps)
+        expect(center.length, `plot (${p.x},${p.z}) keeps its heart clear`).toBe(0);
+      } else {
+        expect(center.length, `plot (${p.x},${p.z}) centerpiece`).toBe(1);
+        expect(center[0].scale, 'the big bush').toBeGreaterThanOrEqual(1.8);
+      }
+      // the bed hedge line is packed shoulder to shoulder: gaps under ~2.2yd
+      const ring = hedges.filter(
+        (s) => Math.abs(Math.hypot(s.x - p.x, s.z - p.z) - p.r * 0.98) < p.r * 0.12,
+      );
+      if (p.kind !== 'knot') {
+        expect(ring.length, `plot (${p.x},${p.z}) hedge ring density`).toBeGreaterThanOrEqual(
+          Math.floor((Math.PI * 2 * p.r) / 2.3),
+        );
+      }
+    }
+  });
+
+  it('lines every walk with a clipped hedge, broken at junctions', () => {
+    const spots = parterreBushSpots(SEED);
+    // mid-segment of the Rose Wilds walk: hedge lines flank at ~4.15yd
+    const nearWalk = spots.filter(
+      (s) =>
+        s.kind === 'bush' &&
+        Math.hypot(s.x - 287, s.z - 873) < 16 &&
+        Math.abs(roadDistance(s.x, s.z) - 4.15) < 0.9,
+    );
+    expect(nearWalk.length, 'path hedge presence').toBeGreaterThan(8);
+    // no hedge sits ON a walk
+    for (const s of spots) {
+      expect(roadDistance(s.x, s.z), `bush on the road at (${s.x},${s.z})`).toBeGreaterThan(3.3);
     }
   });
 

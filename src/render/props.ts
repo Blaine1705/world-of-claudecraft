@@ -146,6 +146,22 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   kkWall: { url: '/models/dungeon/wall.glb', kit: 'dungeon' },
   kkWallCracked: { url: '/models/dungeon/wall_cracked.glb', kit: 'dungeon' },
   kkPillar: { url: '/models/dungeon/pillar.glb', kit: 'dungeon' },
+  // The Evergarden's built garden: KayKit Medieval Hexagon Pack buildings in
+  // their green colorway (shipped by scripts/assets/specs/biome_packs.json,
+  // authored at hex-tile scale so decorProps entries carry a scale) plus the
+  // wrought-iron garden fence/arch set from KayKit Halloween Bits (world
+  // scale; specs/garden_town.json). All placed via EVERGARDEN_PROPS.decorProps.
+  hexWindmill: { url: '/models/biome/hex_windmill.glb', kit: 'khex' },
+  hexCastle: { url: '/models/biome/hex_castle.glb', kit: 'khex' },
+  hexTower: { url: '/models/biome/hex_tower.glb', kit: 'khex' },
+  hexWall: { url: '/models/biome/hex_wall.glb', kit: 'khex' },
+  hexChurch: { url: '/models/biome/hex_church.glb', kit: 'khex' },
+  hexTavern: { url: '/models/biome/hex_tavern.glb', kit: 'khex' },
+  hexBlacksmith: { url: '/models/biome/hex_blacksmith.glb', kit: 'khex' },
+  gardenIronFence: { url: '/models/props/garden_iron_fence.glb', kit: 'kiron' },
+  gardenIronPillar: { url: '/models/props/garden_iron_pillar.glb', kit: 'kiron' },
+  gardenIronGate: { url: '/models/props/garden_iron_gate.glb', kit: 'kiron' },
+  gardenArch: { url: '/models/props/garden_arch.glb', kit: 'kiron' },
   stagShrine: { url: '/models/props/stag_shrine.glb', kit: 'hollow' },
   mushroomGiantPurple: { url: '/models/props/mushroom_giant_purple.glb', kit: 'hollow' },
   mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },

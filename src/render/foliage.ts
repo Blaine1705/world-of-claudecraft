@@ -23,7 +23,12 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { bucketVisible, type LodDists, lodDistsFor, treeDetailDistance } from './foliage_lod';
-import { inParterrePlot, parterreBushSpots, parterreFlowerTintAt } from './garden_parterre_core';
+import {
+  gardenMeadowTintAt,
+  inParterrePlot,
+  parterreBushSpots,
+  parterreFlowerTintAt,
+} from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
@@ -1768,11 +1773,11 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
     const fieldChunk = FIELD_BIOMES.has(chunkBiome);
-    // the Evergarden's parterre beds are dense solid plantings, so its
-    // chunks carry a larger flower buffer than the drift fields
+    // the Evergarden's parterre beds are dense solid plantings edge to edge,
+    // plus meadow drifts, so its chunks carry the largest flower buffer
     const flowerCap = Math.max(
       8,
-      Math.floor(maxChunkCount * (chunkBiome === 'garden' ? 0.85 : fieldChunk ? 0.45 : 0.14)),
+      Math.floor(maxChunkCount * (chunkBiome === 'garden' ? 1.2 : fieldChunk ? 0.45 : 0.14)),
     );
     const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
     fm.userData.renderCategory = 'grass';
@@ -1810,8 +1815,12 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (Math.abs(x) > WORLD_MAX_X - 16 || z < WORLD_MIN_Z + 16 || z > WORLD_MAX_Z - 16)
           continue;
         const tuftBiome = zoneBiomeAt(x, z);
+        // the Evergarden lawn is mown bare, but INSIDE a parterre bed grass
+        // fills the gaps between blooms the way a real planting grows in
+        const gardenBedTuft = tuftBiome === 'garden' && inParterrePlot(x, z, -1.2);
         const density =
-          (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW) * (GRASS_BIOME_DENSITY[tuftBiome] ?? 1);
+          (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW) *
+          (gardenBedTuft ? 0.9 : (GRASS_BIOME_DENSITY[tuftBiome] ?? 1));
         if (r > density) continue;
         const h = terrainHeight(x, z, seed);
         if (h < WATER_LEVEL + 1.6) continue;
@@ -1914,7 +1923,9 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
             const fx = i * step + (hashAt(i + rep * 37, j, 15) - 0.5) * step * 1.5;
             const fz = j * step + (hashAt(i, j + rep * 37, 16) - 0.5) * step * 1.5;
             if (fx < minX || fx >= maxX || fz < minZ || fz >= maxZ) continue;
-            const tint = parterreFlowerTintAt(fx, fz);
+            // beds and walk ribbons first, then the open-lawn meadow drifts
+            let tint = parterreFlowerTintAt(fx, fz);
+            if (tint < 0) tint = gardenMeadowTintAt(fx, fz);
             if (tint < 0) continue;
             const fh = terrainHeight(fx, fz, seed);
             if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed)) continue;
