@@ -10,8 +10,8 @@
     "pulseGroundAoE over 2+ in-radius hostiles: rng.range per target, stable order",
     "class:paladin"
   ],
-  "draws": 1380,
-  "drawDigest": "618f85dc",
+  "draws": 1378,
+  "drawDigest": "a3a1e919",
   "frames": [
     {
       "tick": 0,
@@ -923,8 +923,8 @@
       "state": "4b91e046",
       "events": "741638a5",
       "rng": {
-        "draws": 1226,
-        "digest": "070be6ef"
+        "draws": 1225,
+        "digest": "12a4e838"
       }
     },
     {
@@ -934,8 +934,8 @@
       "state": "97104e6f",
       "events": "741638a5",
       "rng": {
-        "draws": 1295,
-        "digest": "da610afe"
+        "draws": 1293,
+        "digest": "ab2249de"
       }
     },
     {
@@ -945,19 +945,19 @@
       "state": "afebc3cd",
       "events": "741638a5",
       "rng": {
-        "draws": 1358,
-        "digest": "5b6a495f"
+        "draws": 1356,
+        "digest": "55167416"
       }
     },
     {
       "tick": 182,
       "time": 9.1,
       "nextId": 679,
-      "state": "60485451",
-      "events": "7a2a4af7",
+      "state": "61c032cc",
+      "events": "0279f821",
       "rng": {
-        "draws": 1380,
-        "digest": "618f85dc"
+        "draws": 1378,
+        "digest": "a3a1e919"
       },
       "label": "final",
       "players": [
@@ -1175,7 +1175,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 39867,
+          "hp": 39868,
           "id": 677,
           "inCombat": true,
           "kind": "mob",
@@ -1208,7 +1208,7 @@
           "threat": [
             [
               675,
-              134
+              133
             ]
           ],
           "weapon": {
@@ -1229,7 +1229,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 39870,
+          "hp": 39869,
           "id": 678,
           "inCombat": true,
           "kind": "mob",
@@ -1262,7 +1262,7 @@
           "threat": [
             [
               675,
-              131
+              132
             ]
           ],
           "weapon": {
