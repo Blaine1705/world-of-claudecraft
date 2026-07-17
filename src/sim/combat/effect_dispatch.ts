@@ -79,6 +79,7 @@ import {
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
 import { glacialFrontContains } from './glacial_front';
+import { livingGroupRaidInRadius } from './group_targeting';
 import { applyGroupHaste } from './haste_burst';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
 import { spawnHunterTrap } from './hunter_trap';
@@ -1854,7 +1855,7 @@ export function runEffects(
         // Mass Barrier: an absorb shield on the caster and friendlies in radius.
         // When eff.maxTargets is set (owner 2026-07-13: 5), only the NEAREST that
         // many are shielded (the caster is distance 0, so always covered). Draws no rng.
-        let recipients = ctx.friendliesInRadius(p, p.pos, eff.radius);
+        let recipients = livingGroupRaidInRadius(ctx, p, eff.radius);
         if (eff.maxTargets && recipients.length > eff.maxTargets) {
           recipients = [...recipients]
             .sort((a, b) => {

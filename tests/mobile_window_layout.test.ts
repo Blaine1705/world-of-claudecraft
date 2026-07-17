@@ -46,13 +46,19 @@ describe('mobile window layout CSS', () => {
     expect(block).toContain('max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 32px);');
   });
 
-  it('uses the full mobile Talents width instead of splitting the window into CSS columns', () => {
+  it('shows all three mobile specializations in one compact grid without horizontal drag', () => {
     expect(mobileCss).not.toMatch(/body\.mobile-touch #talents-window \{[^}]*column-count: 2;/);
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #talents-window \{[^}]*column-count: auto;[^}]*overflow-x: hidden;[^}]*overflow-y: hidden;/,
+      /body\.mobile-touch #talents-window \{[^}]*width: min\(620px,[^}]*transform: translate\(-50%, -50%\);[^}]*overflow-x: hidden;/,
     );
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #talents-window #tal-body \{[^}]*width: 100%;[^}]*min-height: 0;[^}]*max-height: calc\(100% - 150px\);[^}]*overflow: auto;/,
+      /body\.mobile-touch #talents-window \.ts-specs-grid \{[^}]*display: grid;[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/,
+    );
+    expect(mobileCss).not.toMatch(
+      /body\.mobile-touch #talents-window \.ts-specs-grid \{[^}]*flex-direction: column;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #talents-window \.ts-panel \{[^}]*min-height: 150px;/,
     );
   });
 });

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 
+function joinParty(sim: Sim, leaderId: number, memberId: number): void {
+  sim.partyInvite(memberId, leaderId);
+  sim.partyAccept(memberId);
+}
+
 describe('Mass Barrier specialization theme', () => {
   for (const [spec, personalBarrierId, personalBarrierCooldown] of [
     ['arcane', 'temporal_barrier', 12],
@@ -33,6 +38,7 @@ describe('Mass Barrier specialization theme', () => {
       ally.pos = { ...player.pos };
       ally.prevPos = { ...player.pos };
       player.resource = player.maxResource;
+      joinParty(sim, player.id, ally.id);
 
       sim.castAbility('mass_barrier');
       sim.tick();
@@ -43,6 +49,29 @@ describe('Mass Barrier specialization theme', () => {
       expect(allyBarrier?.school).toBe(school);
     });
   }
+
+  it('shields nearby group members but never unrelated friendly players', () => {
+    const sim = new Sim({ seed: 89, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: 'frost', rows: { 17: 'mag_r17_mass_barrier' } })).toBe(true);
+    const caster = sim.player;
+    const memberId = sim.addPlayer('warrior', 'Grouped');
+    const outsiderId = sim.addPlayer('warrior', 'Outsider');
+    const member = sim.entities.get(memberId)!;
+    const outsider = sim.entities.get(outsiderId)!;
+    for (const ally of [member, outsider]) {
+      ally.pos = { ...caster.pos };
+      ally.prevPos = { ...caster.pos };
+    }
+    joinParty(sim, caster.id, member.id);
+
+    sim.castAbility('mass_barrier');
+    sim.tick();
+
+    expect(caster.auras.some((aura) => aura.id === 'mass_barrier')).toBe(true);
+    expect(member.auras.some((aura) => aura.id === 'mass_barrier')).toBe(true);
+    expect(outsider.auras.some((aura) => aura.id === 'mass_barrier')).toBe(false);
+  });
 
   it('always includes a higher-id caster when five allies are co-located', () => {
     const sim = new Sim({ seed: 88, playerClass: 'warrior', autoEquip: true });
@@ -61,6 +90,10 @@ describe('Mass Barrier specialization theme', () => {
       ally.pos = { ...caster.pos };
       ally.prevPos = { ...caster.pos };
     }
+    for (const ally of lowerIdAllies.slice(0, 4)) joinParty(sim, caster.id, ally.id);
+    sim.convertPartyToRaid(caster.id);
+    joinParty(sim, caster.id, lowerIdAllies[4].id);
+    expect(sim.partyOf(caster.id)?.raid).toBe(true);
     caster.resource = caster.maxResource;
 
     sim.castAbility('mass_barrier', casterId);

@@ -62,7 +62,7 @@
      proportions while taking less of the phone battlefield. The root is
      already draggable, and scale composes with its independent translate. */
   body.mobile-touch #proc-overlay {
-    scale: 0.5;
+    scale: 0.2;
   }
   /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
@@ -3394,23 +3394,19 @@
   body.mobile-touch .perf-footer .btn {
     min-height: 44px;
   }
-  /* Full-screen landscape-first overlay (issue 1577 char/talents redo, see
-     #char-window above): the old partial sheet left too little height for a
-     full talent tree to read on a real landscape phone even before the
-     fit-to-view scale (talent_tree_fit.ts / fitTreeToMobileViewport in
-     talents_window.ts) kicks in, so #tal-body gets the whole screen to work
-     with instead of a reserved player-frame band. */
+  /* Compact centered Talents sheet. The specialization picker is intentionally
+     three-up in every orientation so all specs remain visible and tappable
+     without a horizontal or vertical selection gesture. */
   body.mobile-touch #talents-window {
     position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: auto;
-    max-width: none;
-    max-height: none;
-    transform: none;
-    column-count: auto;
+    left: 50%;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    width: min(620px, calc(var(--app-vw) / var(--window-scale, 1) - 20px));
+    max-width: calc(var(--app-vw) / var(--window-scale, 1) - 20px);
+    max-height: calc(var(--app-vh) / var(--window-scale, 1) - 20px);
+    transform: translate(-50%, -50%);
     overflow-x: hidden;
     overflow-y: hidden;
     z-index: 95 !important;
@@ -3418,134 +3414,66 @@
   body.mobile-touch #talents-window #tal-body {
     width: 100%;
     min-height: 0;
-    max-height: calc(100% - 150px);
+    max-height: max(150px, min(360px, calc(var(--app-vh) / var(--window-scale, 1) - 180px)));
     overflow: auto;
   }
-  /* The class/spec tab switch already exists on desktop (tal-tabs); on mobile
-     it is the mechanism issue 1577's redo leans on to see one tree at a time
-     at a bigger fit-to-view scale, instead of a taller stacked layout. Bigger
-     touch targets for the tab strip itself. */
+  body.mobile-touch #talents-window .panel-title {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    font-size: 13px;
+  }
+  body.mobile-touch #talents-window .tal-tabs {
+    margin: 4px 0;
+  }
   body.mobile-touch #talents-window .tal-tab {
     min-height: 40px;
     display: flex;
     align-items: center;
+    padding: 4px 6px;
   }
-  /* Talents/Specialization on touch: the three spec panels are far too cramped
-     side by side on a phone, so STACK them vertically and let the window scroll
-     (the base .window is overflow-y:auto). Kill the horizontal scroll the wide
-     row would otherwise force, and give the tabs/buttons comfortable >=44px
-     touch targets. Works in portrait and landscape (landscape just scrolls). */
   body.mobile-touch #talents-window .ts-specs-grid {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     min-height: 0;
-    gap: 12px;
+    gap: 6px;
+    margin: 6px 0;
   }
   body.mobile-touch #talents-window .ts-panel {
-    padding: 14px;
+    padding: 8px 4px;
     aspect-ratio: auto;
-    min-height: 360px;
+    min-height: 150px;
+  }
+  body.mobile-touch #talents-window .ts-panel-head {
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  body.mobile-touch #talents-window .ts-panel .ts-icon {
+    width: 36px;
+    height: 36px;
+  }
+  body.mobile-touch #talents-window .ts-name {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+  body.mobile-touch #talents-window .ts-role {
+    font-size: 8px;
+  }
+  body.mobile-touch #talents-window .ts-det-desc,
+  body.mobile-touch #talents-window .ts-det-meta,
+  body.mobile-touch #talents-window .ts-det-mastery,
+  body.mobile-touch #talents-window .ts-ex-block {
+    display: none;
   }
   body.mobile-touch #talents-window .ts-view-talents {
-    min-height: 44px;
-  }
-  body.mobile-touch #talents-window .tal-tab {
-    min-height: 44px;
+    min-height: 40px;
+    margin-top: auto;
+    padding: 4px 3px;
+    font-size: 9px;
+    line-height: 1.15;
   }
   body.mobile-touch #talents-window .tal-loadout-btn {
-    min-height: 44px;
-  }
-  /* Example-ability chips: keep the whole chip a comfortable tap target. */
-  body.mobile-touch #talents-window .ts-ex {
-    min-height: 44px;
-    width: 72px;
-  }
-  /* Stacked panels are full width, so the small print can breathe. */
-  body.mobile-touch #talents-window .ts-ex-name {
-    font-size: 11px;
-  }
-  body.mobile-touch #talents-window .ts-det-desc {
-    font-size: 13px;
-  }
-  /* Landscape phones are wide but SHORT (~390px tall): keep the three panels
-     side by side to use the width, but aggressively compact the chrome (title +
-     tabs) and the card internals so a whole card fits with little or no scroll.
-     Without this the title/tabs eat half the height and the View talents button
-     falls below the fold. */
-  @media (orientation: landscape) {
-    body.mobile-touch #talents-window .panel-title {
-      font-size: 13px;
-      padding-bottom: 4px;
-      margin-bottom: 5px;
-    }
-    body.mobile-touch #talents-window .tal-tabs {
-      margin: 4px 0;
-    }
-    body.mobile-touch #talents-window .tal-tab {
-      min-height: 40px;
-      padding: 4px 8px;
-    }
-    body.mobile-touch #talents-window .ts-specs-grid {
-      flex-direction: row;
-      gap: 8px;
-      margin: 6px 0;
-    }
-    body.mobile-touch #talents-window .ts-panel {
-      padding: 9px;
-      min-height: 260px;
-    }
-    body.mobile-touch #talents-window .ts-panel-head {
-      margin-bottom: 4px;
-    }
-    body.mobile-touch #talents-window .ts-panel .ts-icon {
-      width: 38px;
-      height: 38px;
-    }
-    body.mobile-touch #talents-window .ts-name {
-      font-size: 14px;
-    }
-    body.mobile-touch #talents-window .ts-det-desc {
-      font-size: 13px;
-      line-height: 1.35;
-      margin-bottom: 6px;
-    }
-    body.mobile-touch #talents-window .ts-det-meta {
-      gap: 4px;
-      margin-bottom: 6px;
-    }
-    body.mobile-touch #talents-window .ts-det-attr {
-      padding: 3px 8px;
-    }
-    body.mobile-touch #talents-window .ts-det-mastery {
-      margin-bottom: 5px;
-      padding: 5px 8px;
-    }
-    body.mobile-touch #talents-window .ts-ex-list {
-      margin: 3px 0 6px;
-      gap: 6px;
-    }
-    body.mobile-touch #talents-window .ts-ex {
-      width: 58px;
-    }
-    body.mobile-touch #talents-window .ts-ex-icon {
-      width: 34px;
-      height: 34px;
-    }
-    /* Short landscape height can't fit all card sections plus the button, so
-       drop the two SECONDARY blocks here (mastery + the example-abilities strip)
-       and keep the decision info (role, description, primary attribute,
-       complexity) with the View talents action visible without scrolling.
-       Portrait and desktop keep mastery and examples. The example strip (label +
-       icons) is one .ts-ex-block; the primary attribute and complexity use
-       .ts-det-attr / .ts-det-cx and are untouched. */
-    body.mobile-touch #talents-window .ts-det-mastery,
-    body.mobile-touch #talents-window .ts-ex-block {
-      display: none;
-    }
-    /* With the example block hidden, it can no longer pin the bottom group, so the
-       action button reclaims its auto top margin to stay at the card's bottom. */
-    body.mobile-touch #talents-window .ts-view-talents.has-ex {
-      margin-top: auto;
-    }
+    min-height: 40px;
+    padding: 5px 9px;
   }
   body.mobile-touch #spellbook [data-close] {
     min-width: 40px;
