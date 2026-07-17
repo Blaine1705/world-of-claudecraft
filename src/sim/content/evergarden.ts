@@ -247,11 +247,12 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
   // mid-size buildings (bigger than the old doll scale, smaller than the
   // full-scale pass), spread so every road corridor out of the square walks
   buildings: [
-    { kind: 'inn', x: 310, z: 802, w: 9, d: 10, rot: 0.7 },
+    // the inn stands clear northeast of the churchyard rails
+    { kind: 'inn', x: 318, z: 808, w: 9, d: 10, rot: 0.7 },
     { kind: 'house', x: 344, z: 826, w: 8, d: 8, rot: -1.0 },
     { kind: 'house', x: 318, z: 828, w: 8, d: 8, rot: 2.1 },
   ],
-  wells: [{ x: 321, z: 812, r: 1.5 }],
+  wells: [{ x: 324, z: 814, r: 1.5 }],
   stalls: [{ x: 326, z: 802, rot: 0.5, r: 1.6 }],
   crates: [
     [300, 808],
@@ -301,14 +302,22 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'hexCannonTower', x: 286, z: 912, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 22 },
     { key: 'hexTower', x: 240, z: 866, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 20 },
     { key: 'hexTower', x: 240, z: 912, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 20 },
-    { key: 'hexWall', x: 286, z: 876, rot: Math.PI / 2, scale: 8, r: 6.2, h: 9 },
-    { key: 'hexWall', x: 286, z: 902, rot: Math.PI / 2, scale: 8, r: 6.2, h: 9 },
-    { key: 'hexWall', x: 250, z: 912, rot: 0, scale: 8, r: 6.2, h: 9 },
-    { key: 'hexWall', x: 266, z: 912, rot: 0, scale: 8, r: 6.2, h: 9 },
-    { key: 'hexWall', x: 278, z: 912, rot: 0, scale: 7, r: 5.4, h: 9 },
-    { key: 'hexWall', x: 250, z: 866, rot: 0, scale: 8, r: 6.2, h: 9 },
-    { key: 'hexWall', x: 266, z: 866, rot: 0, scale: 8, r: 6.2, h: 9 },
-    { key: 'hexWall', x: 278, z: 866, rot: 0, scale: 7, r: 5.4, h: 9 },
+    // curtain walls in short overlapping runs so their circle colliders
+    // leave no walk-through seams anywhere along a wall line
+    { key: 'hexWall', x: 286, z: 872, rot: Math.PI / 2, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 286, z: 880, rot: Math.PI / 2, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 286, z: 898, rot: Math.PI / 2, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 286, z: 906, rot: Math.PI / 2, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 250, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 258, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 266, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 274, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 281, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 250, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 258, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 266, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 274, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
+    { key: 'hexWall', x: 281, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
     { key: 'gardenArch', x: 286, z: 889, rot: Math.PI / 2, scale: 2.2 },
     { key: 'hexFlag', x: 286, z: 884.5, scale: 4 },
     { key: 'hexFlag', x: 286, z: 893.5, scale: 4 },
@@ -333,6 +342,9 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'hexWall', x: 370, z: 743.5, rot: 2.97, scale: 7, r: 6, h: 8 },
     { key: 'hexWall', x: 403.3, z: 749.1, rot: 2.97, scale: 7, r: 6, h: 8 },
     { key: 'hexWall', x: 415.5, z: 751.2, rot: 2.97, scale: 7, r: 6, h: 8 },
+    // towers anchoring the outer ends of the gate walls
+    { key: 'hexTower', x: 365.4, z: 742.6, rot: 2.97, scale: 8, r: 4, h: 17 },
+    { key: 'hexTower', x: 416.6, z: 751.4, rot: 2.97, scale: 8, r: 4, h: 17 },
     // oaks shading the gate lawns
     { key: 'oakTree', x: 372, z: 760, rot: 0.8, scale: 1.3, r: 0.8, h: 9 },
     { key: 'oakTree', x: 412, z: 738, rot: 2.1, scale: 1.4, r: 0.8, h: 9 },

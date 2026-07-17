@@ -10,7 +10,7 @@
 // sites are validated against terrain, water, roads, the Great Maze, camps,
 // gather nodes, and the great trees by tests/garden_parterre.test.ts.
 
-import { EVERGARDEN_ROADS, EVERGARDEN_ZONE } from '../sim/content/evergarden';
+import { EVERGARDEN_PROPS, EVERGARDEN_ROADS, EVERGARDEN_ZONE } from '../sim/content/evergarden';
 import { fbm2, hash2 } from '../sim/rng';
 import {
   gardenLandness,
@@ -49,7 +49,9 @@ export interface TopiarySpot {
   x: number;
   z: number;
   rot: number;
-  /** index into the consumer's topiary form set (0 ball, 1 tiered, 2 cone) */
+  /** index into the consumer's topiary form set. Always 0 (the clipped
+   * ball): the cone and tiered "snowman" forms were retired from the
+   * Evergarden by request. */
   form: number;
 }
 
@@ -66,12 +68,17 @@ export const PARTERRE_PLOTS: readonly ParterrePlot[] = [
   { x: 400, z: 866, r: 9, kind: 'quatrefoil' }, // east of the Statuary Walk
   // (the Rose Wilds lawn now belongs to Dawnhold castle and its knights)
   { x: 256, z: 952, r: 9, kind: 'knot' }, // west maze forecourt
+  // two smaller knots squaring off the forecourt
+  { x: 244, z: 938, r: 4.5, kind: 'knot' },
+  { x: 270, z: 940, r: 4.5, kind: 'knot' },
   // the mill lawn: three windmills turning over their own ring beds
   { x: 504, z: 760, r: 8.5, kind: 'concentric', centerpiece: 'windmill' },
   { x: 492, z: 744, r: 7, kind: 'concentric', centerpiece: 'windmill' },
   { x: 516, z: 750, r: 6.5, kind: 'concentric', centerpiece: 'windmill' },
-  { x: 420, z: 750, r: 7.5, kind: 'quatrefoil' }, // east of the Garden Gate road
+  // east of the Garden Gate road, clear of the new gate-wall towers
+  { x: 430, z: 756, r: 7.5, kind: 'quatrefoil' },
   { x: 476, z: 1010, r: 7.5, kind: 'knot' }, // east of the maze road
+  { x: 466, z: 996, r: 4.5, kind: 'knot' }, // its smaller companion square
   { x: 300, z: 1118, r: 6, kind: 'concentric' }, // the north lawn
 ] as const;
 
@@ -121,6 +128,32 @@ const GATE_MOUTH = 7; // clear of the arch opening
 function smoothstep(e0: number, e1: number, v: number): number {
   const t = Math.min(1, Math.max(0, (v - e0) / (e1 - e0)));
   return t * t * (3 - 2 * t);
+}
+
+// Visual footprints of the garden's built structures, so no planting grows
+// through a wall or floor. Walls use their thin VISUAL depth, not their fat
+// movement collider circle (a hedge alongside a wall face is the whole
+// point); everything else uses its collider footprint.
+const BUILT_FOOTPRINTS: { x: number; z: number; r: number }[] = (() => {
+  const out: { x: number; z: number; r: number }[] = [];
+  for (const d of EVERGARDEN_PROPS.decorProps ?? []) {
+    if (d.key === 'hexWall') out.push({ x: d.x, z: d.z, r: 1.8 });
+    else if (d.r) out.push({ x: d.x, z: d.z, r: d.r });
+  }
+  for (const b of EVERGARDEN_PROPS.buildings) {
+    out.push({ x: b.x, z: b.z, r: Math.max(b.w, b.d) * 0.6 });
+  }
+  for (const w of EVERGARDEN_PROPS.wells) out.push({ x: w.x, z: w.z, r: w.r });
+  for (const s of EVERGARDEN_PROPS.stalls) out.push({ x: s.x, z: s.z, r: s.r });
+  return out;
+})();
+
+/** True when (x, z) stands clear of every built structure by the margin. */
+export function clearOfGardenBuildings(x: number, z: number, margin = 0.8): boolean {
+  for (const f of BUILT_FOOTPRINTS) {
+    if (Math.hypot(x - f.x, z - f.z) < f.r + margin) return false;
+  }
+  return true;
 }
 
 function inMazeRect(x: number, z: number): boolean {
@@ -194,6 +227,7 @@ export function parterreFlowerTintAt(x: number, z: number): number {
     const u = gdx * GATE_P.x + gdz * GATE_P.z;
     const v = gdx * GATE_N.x + gdz * GATE_N.z;
     if (Math.abs(u) > GATE_MOUTH && Math.abs(u) < GATE_HALF && v > 2.8 && v < 4.6) {
+      if (!clearOfGardenBuildings(x, z, 0.5)) return -1;
       const block = Math.abs(Math.floor((u + 60) / 6));
       return RIBBON_TINTS[block % RIBBON_TINTS.length];
     }
@@ -205,6 +239,7 @@ export function parterreFlowerTintAt(x: number, z: number): number {
     if (Math.hypot(x - hub.x, z - hub.z) < hub.radius + 5) return -1;
     const rd = roadDistance(x, z);
     if (rd >= RIBBON_NEAR && rd < RIBBON_FAR) {
+      if (!clearOfGardenBuildings(x, z, 0.5)) return -1;
       // color repeats in fixed blocks down the walk, a stitched border
       const block = Math.abs(Math.floor((x + z * 0.618) / 8));
       return RIBBON_TINTS[block % RIBBON_TINTS.length];
@@ -239,6 +274,7 @@ export function gardenMeadowTintAt(x: number, z: number): number {
   const density = 0.35 + smoothstep(0.62, 0.8, patch) * 0.4;
   if (hash2(x * 3.1, z * 3.1, 7311) > density) return -1;
   if (roadDistance(x, z) < 7.5) return -1; // clear of walks, hedges, ribbons
+  if (!clearOfGardenBuildings(x, z, 0.5)) return -1;
   // colors grow mixed within the patch, flower by flower
   return MEADOW_TINTS[
     Math.floor(hash2(x * 7.3, z * 7.3, 7321) * MEADOW_TINTS.length) % MEADOW_TINTS.length
@@ -275,6 +311,8 @@ function flatDryLawn(x: number, z: number, seed: number): boolean {
 export function parterreBushSpots(seed: number): ParterreBushSpot[] {
   const out: ParterreBushSpot[] = [];
   const hedge = (x: number, z: number): void => {
+    // never grow a hedge through a wall, floor, or well
+    if (!clearOfGardenBuildings(x, z, 0.8)) return;
     if (flatDryLawn(x, z, seed)) out.push({ x, z, kind: 'bush', scale: 0.82 });
   };
   const rose = (x: number, z: number, scale: number, tint: number): void => {
@@ -381,6 +419,7 @@ export function gardenLushGrassAt(x: number, z: number): boolean {
   const hub = EVERGARDEN_ZONE.hub;
   if (Math.hypot(x - hub.x, z - hub.z) < hub.radius + 10) return false;
   if (roadDistance(x, z) < 6.5) return false;
+  if (!clearOfGardenBuildings(x, z, 0.5)) return false;
   // the meadow patch shape at a looser threshold than the flowers (0.62), so
   // the grass halo runs a little beyond the blooms
   return fbm2(x * 0.045, z * 0.045, 7301, 2) >= 0.58;
@@ -397,7 +436,6 @@ export function gardenAvenueSpots(seed: number): TopiarySpot[] {
   const AVENUE_STEP = 18;
   // behind the path hedge and the ribbon bed: hedge 4.15, ribbon to 6.6
   const AVENUE_OFFSET = 7.6;
-  let pairIndex = 0;
   for (const road of EVERGARDEN_ROADS) {
     let carry = AVENUE_STEP * 0.5;
     for (let s = 0; s < road.length - 1; s++) {
@@ -410,7 +448,6 @@ export function gardenAvenueSpots(seed: number): TopiarySpot[] {
       for (let t = carry; t <= segLen; t += AVENUE_STEP) {
         const cx = a.x + ux * t;
         const cz = a.z + uz * t;
-        pairIndex++;
         for (const side of [-1, 1]) {
           const x = cx - uz * side * AVENUE_OFFSET;
           const z = cz + ux * side * AVENUE_OFFSET;
@@ -429,7 +466,7 @@ export function gardenAvenueSpots(seed: number): TopiarySpot[] {
             x,
             z,
             rot: Math.atan2(ux, uz) + (side < 0 ? Math.PI : 0),
-            form: pairIndex % 2 === 0 ? 1 : 2,
+            form: 0,
           });
         }
       }
@@ -443,7 +480,7 @@ export function gardenAvenueSpots(seed: number): TopiarySpot[] {
       const x = p.x + Math.sin(a) * (p.r + 2.4);
       const z = p.z + Math.cos(a) * (p.r + 2.4);
       if (!flatDryLawn(x, z, seed)) continue;
-      out.push({ x, z, rot: a, form: 2 });
+      out.push({ x, z, rot: a, form: 0 });
     }
   }
   return out;

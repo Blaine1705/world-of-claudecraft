@@ -239,7 +239,9 @@ describe('the bush and topiary plan', () => {
       const inMaze =
         s.x > MAZE_X0 - 4 && s.x < mazeX1 + 4 && s.z > MAZE_Z0 - 4 && s.z < MAZE_Z1 + 4;
       expect(inMaze, `topiary in the maze at (${s.x},${s.z})`).toBe(false);
-      expect([1, 2]).toContain(s.form);
+      // only the clipped ball form remains: cones and tiered "snowman"
+      // topiary were retired from the Evergarden
+      expect(s.form).toBe(0);
     }
     // avenue pairs exist along the Rose Wilds walk
     const nearWalk = spots.filter((s) => Math.hypot(s.x - 287, s.z - 873) < 30);
