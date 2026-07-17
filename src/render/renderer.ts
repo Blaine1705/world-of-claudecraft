@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { NumberSampleRing } from '../game/sample_ring';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
 import {
@@ -1203,13 +1204,13 @@ export class Renderer {
   private glRenderer = '';
   private contextLostCount = 0;
   private contextRestoredCount = 0;
-  private phaseSamples: Record<RendererPhase, number[]> = {
-    setup: [],
-    entities: [],
-    world: [],
-    nameplates: [],
-    submit: [],
-    total: [],
+  private phaseSamples: Record<RendererPhase, NumberSampleRing> = {
+    setup: new NumberSampleRing(RENDERER_PHASE_SAMPLE_LIMIT),
+    entities: new NumberSampleRing(RENDERER_PHASE_SAMPLE_LIMIT),
+    world: new NumberSampleRing(RENDERER_PHASE_SAMPLE_LIMIT),
+    nameplates: new NumberSampleRing(RENDERER_PHASE_SAMPLE_LIMIT),
+    submit: new NumberSampleRing(RENDERER_PHASE_SAMPLE_LIMIT),
+    total: new NumberSampleRing(RENDERER_PHASE_SAMPLE_LIMIT),
   };
   private lastFrameStats: RendererFrameStats = {
     phaseMs: emptyFramePhaseMs(),
@@ -2494,20 +2495,17 @@ export class Renderer {
 
   private recordRendererPhase(phase: RendererPhase, ms: number): void {
     if (!Number.isFinite(ms) || ms < 0) return;
-    const samples = this.phaseSamples[phase];
-    samples.push(Math.min(250, ms));
-    if (samples.length > RENDERER_PHASE_SAMPLE_LIMIT)
-      samples.splice(0, samples.length - RENDERER_PHASE_SAMPLE_LIMIT);
+    this.phaseSamples[phase].push(Math.min(250, ms));
   }
 
   private rendererPhaseStats(): RendererPhaseStats {
     return {
-      setup: summarizeMs(this.phaseSamples.setup),
-      entities: summarizeMs(this.phaseSamples.entities),
-      world: summarizeMs(this.phaseSamples.world),
-      nameplates: summarizeMs(this.phaseSamples.nameplates),
-      submit: summarizeMs(this.phaseSamples.submit),
-      total: summarizeMs(this.phaseSamples.total),
+      setup: summarizeMs(this.phaseSamples.setup.toArray()),
+      entities: summarizeMs(this.phaseSamples.entities.toArray()),
+      world: summarizeMs(this.phaseSamples.world.toArray()),
+      nameplates: summarizeMs(this.phaseSamples.nameplates.toArray()),
+      submit: summarizeMs(this.phaseSamples.submit.toArray()),
+      total: summarizeMs(this.phaseSamples.total.toArray()),
     };
   }
 
