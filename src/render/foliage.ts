@@ -1735,15 +1735,16 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     // each instance with its bed color (a colored texture would multiply
     // against the tint and muddy every hue)
     garden: [{ p: [244, 242, 240], c: [252, 226, 140] }],
-    // Willowfen: wetland wildflower fields in mixed colours, buttercream,
-    // lavender, white, marsh pink, cornflower blue, coral
+    // Willowfen: wetland wildflower fields in mixed colours; its card is
+    // built in balanced mode (flowerMatFor below), cycling this list so
+    // the blue and orange heads are guaranteed a place among the pastels
     fen: [
+      { p: [130, 160, 235], c: [230, 236, 250] },
       { p: [250, 245, 210], c: [210, 170, 60] },
+      { p: [242, 150, 110], c: [180, 90, 50] },
       { p: [200, 170, 230], c: [160, 120, 200] },
       { p: [245, 250, 255], c: [220, 220, 150] },
       { p: [244, 168, 200], c: [200, 110, 150] },
-      { p: [130, 160, 235], c: [230, 236, 250] },
-      { p: [242, 150, 110], c: [180, 90, 50] },
     ],
     // Galecrest: harebells lean into the wind among the daisies and
     // buttercups; the list is weighted so blue heads edge out each of the
@@ -1766,7 +1767,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const key = FLOWER_PALETTES[biome] ? biome : 'default';
     let fmMat = flowerMatCache.get(key);
     if (!fmMat) {
-      const tex = flowerTuftTexture(FLOWER_PALETTES[biome]);
+      const tex = flowerTuftTexture(FLOWER_PALETTES[biome], biome === 'fen');
       fmMat = configureMaskedDoubleSidedVegetationMaterial(
         lush
           ? new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.3, roughness: 0.85 })
@@ -1961,7 +1962,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         // grass tufts (each tuft is a flower anchor), so density compensates
         // the fen's field cells run broader and bloom harder: with its grass
         // gone, the flowers alone carry the ground cover
-        const inField = fieldChunk && fieldCell < (fenTuft ? 0.62 : 0.42);
+        const inField = fieldChunk && fieldCell < (fenTuft ? 0.68 : 0.42);
         // the downs ringing the stable paddock bloom into full flower fields
         const stableBloom = tuftBiome === 'gale' && stableMeadowBand(x, z);
         const flowerChance = inMeadow
@@ -1970,11 +1971,11 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
             ? 0.65
             : inField
               ? fenTuft
-                ? 0.8
+                ? 0.85
                 : 0.6
               : fieldChunk
                 ? fenTuft
-                  ? 0.25
+                  ? 0.32
                   : 0.05
                 : 0.11;
         const reps = inMeadow ? 4 : stableBloom ? 3 : inField ? (fenTuft ? 4 : 3) : 1;

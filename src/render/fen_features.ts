@@ -6,9 +6,14 @@
 // fidelity recipe; scripts/assets/build_willowfen_props.mjs). Same contract
 // as the sibling realm modules: build once, update(time) animates gently.
 import * as THREE from 'three';
-import { WILLOWFEN_ZONE } from '../sim/content/willowfen';
+import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from '../sim/content/willowfen';
 import { hash2 } from '../sim/rng';
-import { roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
+import {
+  generateDecorationsInBounds,
+  roadDistance,
+  terrainHeight,
+  WATER_LEVEL,
+} from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 
@@ -121,6 +126,50 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
 
   const hub = WILLOWFEN_ZONE.hub;
 
+  // --- placement obstacles: authored props and the terrain's own scattered
+  // rocks; nothing modeled may stand on any of them (only trees overlap) ---
+  const zp = WILLOWFEN_PROPS;
+  const zoneProps = {
+    campfires: zp.campfires ?? [],
+    buildings: zp.buildings ?? [],
+    decorProps: (zp.decorProps ?? []).map((d) => ({ x: d.x, z: d.z, r: d.r ?? 3 })),
+    stalls: zp.stalls ?? [],
+    wells: zp.wells ?? [],
+    crates: zp.crates ?? [],
+    fences: zp.fences ?? [],
+  };
+  const fenRocks = generateDecorationsInBounds(seed, {
+    minX: -540,
+    maxX: -180,
+    minZ: FEN_ZMIN,
+    maxZ: FEN_ZMAX,
+  }).filter((d) => d.kind === 'rock');
+  const segDist = (x: number, z: number, f: { x1: number; z1: number; x2: number; z2: number }) => {
+    const dx = f.x2 - f.x1;
+    const dz = f.z2 - f.z1;
+    const t = Math.max(
+      0,
+      Math.min(1, ((x - f.x1) * dx + (z - f.z1) * dz) / (dx * dx + dz * dz || 1)),
+    );
+    return Math.hypot(x - (f.x1 + dx * t), z - (f.z1 + dz * t));
+  };
+  const clearOfProps = (x: number, z: number, pad: number): boolean => {
+    for (const f of zoneProps.campfires) if (Math.hypot(x - f[0], z - f[1]) < 8 + pad) return false;
+    for (const b of zoneProps.buildings) if (Math.hypot(x - b.x, z - b.z) < 8 + pad) return false;
+    for (const d of zoneProps.decorProps)
+      if (Math.hypot(x - d.x, z - d.z) < d.r + 2 + pad) return false;
+    for (const st of zoneProps.stalls) if (Math.hypot(x - st.x, z - st.z) < 4 + pad) return false;
+    for (const w of zoneProps.wells) if (Math.hypot(x - w.x, z - w.z) < 3 + pad) return false;
+    for (const cr of zoneProps.crates)
+      if (Math.hypot(x - cr[0], z - cr[1]) < 2.5 + pad) return false;
+    for (const f of zoneProps.fences) if (segDist(x, z, f) < 2.2 + pad) return false;
+    return true;
+  };
+  const clearOfRocks = (x: number, z: number, pad: number): boolean => {
+    for (const r of fenRocks) if (Math.hypot(x - r.x, z - r.z) < 2.2 * r.scale + pad) return false;
+    return true;
+  };
+
   // --- the willows: the modeled weeping willow, ringing every pool and the
   // town moat (kept off the roads, out of the town's own lanes, and off
   // slopes: a willow only roots on level ground), with a slightly larger
@@ -140,6 +189,8 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
       if (!level(x, z)) return false;
       if (Math.hypot(x - hub.x, z - hub.z) < 15) return false;
       if (roadDistance(x, z) < 5) return false;
+      if (!clearOfProps(x, z, 2)) return false;
+      if (!clearOfRocks(x, z, 1)) return false;
       spots.push({ x, z, y: y - 0.15, s, rot });
       return true;
     };
@@ -147,7 +198,7 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
       const count = 2 + Math.floor(hash2(lake.x, lake.z, seed + 2101) * 3);
       for (let k = 0; k < count; k++) {
         const ang = hash2(k, lake.x + lake.z, seed + 2111) * Math.PI * 2;
-        const dist = lake.radius + 5 + hash2(lake.x, k, seed + 2121) * 6;
+        const dist = lake.radius + 10 + hash2(lake.x, k, seed + 2121) * 7;
         const x = lake.x + Math.sin(ang) * dist;
         const z = lake.z + Math.cos(ang) * dist;
         const ok = tryWillow(
@@ -167,6 +218,24 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
             hash2(z, x + 1, seed + 2191) * Math.PI * 2,
           );
         }
+      }
+    }
+    // the inland willows: a loose scatter across the open moor between the
+    // pools, well away from any lake so the fen reads willow-grown all over
+    for (let gx = -515; gx <= -205; gx += 24) {
+      for (let gz = FEN_ZMIN + 26; gz <= FEN_ZMAX - 40; gz += 24) {
+        if (hash2(gx, gz, seed + 2301) > 0.3) continue;
+        const x = gx + (hash2(gx + 1, gz, seed + 2311) - 0.5) * 14;
+        const z = gz + (hash2(gx, gz + 1, seed + 2321) - 0.5) * 14;
+        if (WILLOWFEN_ZONE.lakes.some((l) => Math.hypot(x - l.x, z - l.z) < l.radius + 14)) {
+          continue;
+        }
+        tryWillow(
+          x,
+          z,
+          7.5 + hash2(x, z, seed + 2331) * 3.5,
+          hash2(z, x, seed + 2341) * Math.PI * 2,
+        );
       }
     }
     instanceProp('willow', spots);
@@ -243,6 +312,11 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
           if (y < WATER_LEVEL + 0.8) continue;
           if (roadDistance(x, z) < 4.5) continue;
           if (Math.hypot(x - hub.x, z - hub.z) < 22) continue;
+          if (!clearOfProps(x, z, 0)) continue;
+          if (!clearOfRocks(x, z, 0.6)) continue;
+          // clusters never stand on one another: each keeps its own ground
+          if (mushroomSpots.some((sp) => Math.hypot(sp.x - x, sp.z - z) < 3.2)) continue;
+          if (logSpots.some((sp) => Math.hypot(sp.x - x, sp.z - z) < 3.2)) continue;
           const spot: Placement = {
             x,
             z,

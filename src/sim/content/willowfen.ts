@@ -255,6 +255,12 @@ export const WILLOWFEN_PROPS: ZonePropsDef = {
     { key: 'hexbHomeA', x: -392, z: 266, rot: 1.7, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexbHomeA', x: -258, z: 473, rot: 0.9, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexbHomeB', x: -383, z: 587, rot: -2.0, scale: 7.5, r: 5, h: 10 },
+    // the Steps' waycamp: three traveller tents ringing the fire, each on
+    // probed level ground, spaced clear of the road, the scatter rock east
+    // of the fire, and one another
+    { key: 'hexrTent', x: -372.3, z: 222, rot: -2.55, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: -374.4, z: 200.9, rot: -0.39, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: -390.8, z: 214.3, rot: 1.76, scale: 7, r: 4.5, h: 5 },
   ],
   // the Fenway: rail fences flanking the causeway's south approach (the
   // crossing itself is dry ground between the moat pools, kept clear of
