@@ -1264,6 +1264,9 @@ function drownedLitany(): Scenario {
           true,
         );
         for (let round = 0; round < 15; round++) {
+          // the recording driver keeps its rider alive through the volleys:
+          // a shifted damage roll must never end the run before the rite
+          p.hp = p.maxHp;
           rec.tick(20);
           if (!boss.dead) face(p, boss);
         }
@@ -1278,6 +1281,7 @@ function drownedLitany(): Scenario {
           const m = sim.entities.get(id) as AnyEntity | undefined;
           if (m && !m.dead && m.templateId === 'drowned_cantor') lethal(sim, p, m);
         }
+        p.hp = p.maxHp;
         rec.tick(20);
         sim.dealDamage(
           p,
@@ -1289,6 +1293,7 @@ function drownedLitany(): Scenario {
           'hit',
           true,
         );
+        p.hp = p.maxHp;
         rec.tick(40);
         sim.dealDamage(
           p,
@@ -1300,6 +1305,7 @@ function drownedLitany(): Scenario {
           'hit',
           true,
         );
+        p.hp = p.maxHp;
         rec.tick(40);
         lethal(sim, p, boss);
       }

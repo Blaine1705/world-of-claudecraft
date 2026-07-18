@@ -8,12 +8,12 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "3622f73e",
+  "drawDigest": "32ad0392",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 678,
+      "nextId": 684,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,12 +27,12 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 681,
-      "state": "5ad85003",
-      "events": "244d9b92",
+      "nextId": 687,
+      "state": "e4840ed8",
+      "events": "be74f4bf",
       "rng": {
         "draws": 2,
-        "digest": "3622f73e"
+        "digest": "32ad0392"
       },
       "label": "final",
       "players": [
@@ -73,7 +73,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 678,
+          "entityId": 684,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -138,7 +138,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 679,
+          "entityId": 685,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -179,7 +179,7 @@
           "fallStartY": 0.860353,
           "fiveSecondRule": 99.15,
           "hp": 90,
-          "id": 678,
+          "id": 684,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -228,7 +228,7 @@
           "fallStartY": 0.639595,
           "fiveSecondRule": 99.15,
           "hp": 54,
-          "id": 679,
+          "id": 685,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -280,7 +280,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 680,
+          "id": 686,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -305,7 +305,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 678,
+          "tappedById": 684,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

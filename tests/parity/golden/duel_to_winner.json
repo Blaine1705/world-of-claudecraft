@@ -8,13 +8,13 @@
     "updateDuels countdown -> active + duelStart",
     "endDuel on a PvP finishing blow (winner/loser + this.duels cleared)"
   ],
-  "draws": 496,
-  "drawDigest": "cd551994",
+  "draws": 498,
+  "drawDigest": "5924d9e6",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 678,
+      "nextId": 684,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 680,
-      "state": "1d0c7a16",
-      "events": "2c824131",
+      "nextId": 686,
+      "state": "ad567e08",
+      "events": "7c02628c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 680,
-      "state": "db1cb106",
-      "events": "67c9eeac",
+      "nextId": 686,
+      "state": "11f382d0",
+      "events": "cd8d0e32",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -50,23 +50,23 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 680,
-      "state": "38687e5e",
-      "events": "aefa9346",
+      "nextId": 686,
+      "state": "7f185094",
+      "events": "5b42ec64",
       "rng": {
-        "draws": 131,
-        "digest": "da45d233"
+        "draws": 130,
+        "digest": "7e387dad"
       }
     },
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 680,
-      "state": "c0a53f10",
-      "events": "344a9c79",
+      "nextId": 686,
+      "state": "4162b91a",
+      "events": "a021e069",
       "rng": {
         "draws": 145,
-        "digest": "5d059dd4"
+        "digest": "8c488c6f"
       },
       "label": "duel-active",
       "players": [
@@ -102,7 +102,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 678,
+          "entityId": 684,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -158,7 +158,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 679,
+          "entityId": 685,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -198,7 +198,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 678,
+          "id": 684,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -246,7 +246,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 54,
-          "id": 679,
+          "id": 685,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -290,12 +290,12 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 680,
-      "state": "5daa22b7",
-      "events": "7545388e",
+      "nextId": 686,
+      "state": "55a24cb9",
+      "events": "c40c17c4",
       "rng": {
         "draws": 145,
-        "digest": "5d059dd4"
+        "digest": "8c488c6f"
       },
       "label": "duel-ended",
       "players": [
@@ -334,7 +334,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 678,
+          "entityId": 684,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -392,7 +392,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 679,
+          "entityId": 685,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -432,7 +432,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 678,
+          "id": 684,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -480,7 +480,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 1,
-          "id": 679,
+          "id": 685,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -524,34 +524,34 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 680,
-      "state": "471ada1e",
-      "events": "38acbd77",
+      "nextId": 686,
+      "state": "13eeb362",
+      "events": "0838c89b",
       "rng": {
-        "draws": 292,
-        "digest": "8ed3e551"
+        "draws": 289,
+        "digest": "fb99a754"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 680,
-      "state": "bf9110c6",
+      "nextId": 686,
+      "state": "3825bf76",
       "events": "741638a5",
       "rng": {
-        "draws": 485,
-        "digest": "9951f96e"
+        "draws": 491,
+        "digest": "d2209a68"
       }
     },
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 680,
-      "state": "c406bfdc",
+      "nextId": 686,
+      "state": "c1e3a99c",
       "events": "741638a5",
       "rng": {
-        "draws": 496,
-        "digest": "cd551994"
+        "draws": 498,
+        "digest": "5924d9e6"
       },
       "label": "final",
       "players": [
@@ -596,7 +596,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 678,
+          "entityId": 684,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -661,7 +661,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 679,
+          "entityId": 685,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -702,7 +702,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 104.05,
           "hp": 90,
-          "id": 678,
+          "id": 684,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -750,7 +750,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 104.05,
           "hp": 7,
-          "id": 679,
+          "id": 685,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
