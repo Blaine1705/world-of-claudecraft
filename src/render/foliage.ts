@@ -1708,6 +1708,21 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       { p: [200, 170, 230], c: [160, 120, 200] },
       { p: [245, 250, 255], c: [220, 220, 150] },
     ],
+    // Galecrest: harebells lean into the wind among the daisies and
+    // buttercups; the list is weighted so blue heads edge out each of the
+    // white and gold (4 blue to 3 white to 3 gold)
+    gale: [
+      { p: [116, 148, 235], c: [235, 240, 252] }, // harebell blue
+      { p: [116, 148, 235], c: [235, 240, 252] },
+      { p: [96, 126, 220], c: [225, 232, 250] }, // deeper cornflower
+      { p: [96, 126, 220], c: [225, 232, 250] },
+      { p: [246, 246, 250], c: [244, 200, 70] }, // daisy white
+      { p: [246, 246, 250], c: [244, 200, 70] },
+      { p: [246, 246, 250], c: [244, 200, 70] },
+      { p: [245, 195, 60], c: [150, 90, 20] }, // buttercup gold
+      { p: [245, 195, 60], c: [150, 90, 20] },
+      { p: [245, 195, 60], c: [150, 90, 20] },
+    ],
   };
   const flowerMatCache = new Map<string, THREE.Material>();
   const flowerMatFor = (biome: BiomeId): THREE.Material => {
@@ -1727,7 +1742,16 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   };
   // build every palette texture up front: a first-visit texture generation
   // plus shader compile mid-walk reads as a lag spike
-  for (const b of ['vale', 'dusk', 'ember', 'amber', 'night', 'garden', 'fen'] as BiomeId[]) {
+  for (const b of [
+    'vale',
+    'dusk',
+    'ember',
+    'amber',
+    'night',
+    'garden',
+    'fen',
+    'gale',
+  ] as BiomeId[]) {
     flowerMatFor(b);
   }
 

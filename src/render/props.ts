@@ -12,7 +12,7 @@ import {
 } from '../sim/dock_layout';
 import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
-import { terrainHeight, waterLevel } from '../sim/world';
+import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
@@ -170,6 +170,32 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexWeaponRack: { url: '/models/biome/hex_weaponrack.glb', kit: 'khex' },
   hexFlag: { url: '/models/biome/hex_flag.glb', kit: 'khex' },
   hexWheelbarrow: { url: '/models/biome/hex_wheelbarrow.glb', kit: 'khex' },
+  // the Wickharbor city set (blue colorway) plus the harbor line: ships,
+  // docks, and the stackable tower drums the Old Beacon rebuilds from
+  hexbHomeA: { url: '/models/biome/hexb_home_a.glb', kit: 'khex' },
+  hexbHomeB: { url: '/models/biome/hexb_home_b.glb', kit: 'khex' },
+  hexbTavern: { url: '/models/biome/hexb_tavern.glb', kit: 'khex' },
+  hexbTownhall: { url: '/models/biome/hexb_townhall.glb', kit: 'khex' },
+  hexbWorkshop: { url: '/models/biome/hexb_workshop.glb', kit: 'khex' },
+  hexbMarket: { url: '/models/biome/hexb_market.glb', kit: 'khex' },
+  hexbDocks: { url: '/models/biome/hexb_docks.glb', kit: 'khex' },
+  hexbShipyard: { url: '/models/biome/hexb_shipyard.glb', kit: 'khex' },
+  hexbStables: { url: '/models/biome/hexb_stables.glb', kit: 'khex' },
+  hexbTowerBase: { url: '/models/biome/hexb_tower_base.glb', kit: 'khex' },
+  hexbTowerA: { url: '/models/biome/hexb_tower_a.glb', kit: 'khex' },
+  hexrTowerA: { url: '/models/biome/hexr_tower_a.glb', kit: 'khex' },
+  hexbTowerB: { url: '/models/biome/hexb_tower_b.glb', kit: 'khex' },
+  hexShipBlue: { url: '/models/biome/hex_ship_blue.glb', kit: 'khex' },
+  hexShipRed: { url: '/models/biome/hex_ship_red.glb', kit: 'khex' },
+  hexShipGreen: { url: '/models/biome/hex_ship_green.glb', kit: 'khex' },
+  hexBoat: { url: '/models/biome/hex_boat.glb', kit: 'khex' },
+  hexBoatrack: { url: '/models/biome/hex_boatrack.glb', kit: 'khex' },
+  hexAnchor: { url: '/models/biome/hex_anchor.glb', kit: 'khex' },
+  hexSack: { url: '/models/biome/hex_sack.glb', kit: 'khex' },
+  hexCrateBig: { url: '/models/biome/hex_crate_big.glb', kit: 'khex' },
+  hexCrateOpen: { url: '/models/biome/hex_crate_open.glb', kit: 'khex' },
+  hexHaybale: { url: '/models/biome/hex_haybale.glb', kit: 'khex' },
+  hexTrough: { url: '/models/biome/hex_trough.glb', kit: 'khex' },
   // a placeable oak (the foliage kit's biggest crown) for authored shade
   // spots like the Garden Gate lawns; decor entries set scale, r is trunk
   oakTree: { url: '/models/foliage/oak_4.glb', kit: 'kfol' },
@@ -975,11 +1001,17 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         windmillFans.push(pivot);
       }
     }
-    g.position.set(d.x, ground(d.x, d.z) - 0.05, d.z);
+    // floating decor (moored ships) rides the waterline at its draft depth
+    // instead of standing on the seabed
+    const baseY =
+      d.float !== undefined
+        ? Math.max(ground(d.x, d.z), WATER_LEVEL - d.float)
+        : ground(d.x, d.z) - 0.05;
+    g.position.set(d.x, baseY, d.z);
     g.rotation.y = d.rot ?? 0;
     group.add(shadowed(g));
     if (d.r) {
-      registerHideable(g, circleFootprint(d.x, d.z, d.r, ground(d.x, d.z) + (d.h ?? 4)));
+      registerHideable(g, circleFootprint(d.x, d.z, d.r, baseY + (d.h ?? 4)));
     }
   }
 

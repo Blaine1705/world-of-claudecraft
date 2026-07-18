@@ -1957,6 +1957,9 @@ export interface ZonePropsDef {
     r?: number;
     h?: number;
     scale?: number;
+    /** ride the water surface instead of the seabed (moored ships/boats);
+     * sunk this many yd below the waterline (the hull's draft) */
+    float?: number;
   }[];
 }
 

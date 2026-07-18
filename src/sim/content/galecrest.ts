@@ -185,31 +185,82 @@ export const GALECREST_OBJECTS: GroundObjectDef[] = [];
 
 export const GALECREST_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Wickharbor: a fishing town in the lee of the harbor cove
+  // Wickharbor: grown from a fishing village into the coast's medieval
+  // harbor city: the old timber houses keep their lanes, and the blue-roofed
+  // KayKit quarter (decorProps below) climbs the plateau behind them
   buildings: [
     { kind: 'inn', x: 412, z: 352, w: 6, d: 7, rot: 0.4 },
     { kind: 'house', x: 428, z: 368, w: 5, d: 5, rot: -1.2 },
     { kind: 'house', x: 410, z: 370, w: 5, d: 5, rot: 2.2 },
+    { kind: 'house', x: 400, z: 378, w: 5, d: 5, rot: 1.2 },
+    { kind: 'house', x: 442, z: 364, w: 5, d: 6, rot: -0.7 },
+    { kind: 'house', x: 436, z: 388, w: 5, d: 5, rot: 2.6 },
+    { kind: 'house', x: 404, z: 394, w: 5, d: 6, rot: 0.3 },
   ],
   wells: [{ x: 420, z: 362, r: 1.5 }],
   stalls: [
     { x: 426, z: 354, rot: 0.6, r: 1.6 },
     { x: 414, z: 360, rot: -1.4, r: 1.6 },
+    // the harbor market: vendors trading off the pier road, seaward side
+    { x: 462, z: 348, rot: -0.9, r: 1.6 },
+    { x: 460, z: 340, rot: -0.5, r: 1.6 },
+    { x: 456, z: 333, rot: 2.2, r: 1.6 },
   ],
   crates: [
     [432, 356],
     [408, 358],
+    [466, 354],
+    [468, 338],
   ],
   campfires: [
     [420, 356],
     [196, 434], // the Windway's waycamp
+    [465, 335], // the dockers' brazier
   ],
-  // the harbor: a working dock running into the cove east of town (hw/hd 0: no hut)
-  docks: [{ x: 436, z: 372, rot: 2.2, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
+  // the harbor: the old cove dock plus the two bay piers of the new dock
+  // district under the Beacon (hw/hd 0: no hut)
+  docks: [
+    { x: 436, z: 372, rot: 2.2, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
+    { x: 470, z: 350, rot: 0.9, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
+    { x: 494, z: 334, rot: 0.6, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
+  ],
   fences: [
     // windbreak lines, the only fences that matter here
     { x1: 406, z1: 346, x2: 434, z2: 346 },
     { x1: 406, z1: 376, x2: 434, z2: 376 },
+  ],
+  // the blue-roofed medieval quarter, the shipwright's yard, and the moored
+  // fleet (float: hulls ride the waterline at their draft)
+  decorProps: [
+    // the city: the townhall holds the south square, homes climb north
+    { key: 'hexbTownhall', x: 424, z: 332, rot: Math.PI, scale: 8, r: 6.5, h: 15 },
+    { key: 'hexbTavern', x: 444, z: 376, rot: -2.0, scale: 7.5, r: 5.5, h: 11 },
+    { key: 'hexbWorkshop', x: 398, z: 360, rot: Math.PI / 2, scale: 7, r: 6, h: 8 },
+    { key: 'hexbMarket', x: 416, z: 378, rot: Math.PI, scale: 6, r: 4.5, h: 7 },
+    { key: 'hexbHomeA', x: 442, z: 394, rot: 0.8, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 432, z: 398, rot: -1.9, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: 408, z: 404, rot: 2.4, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 394, z: 386, rot: 0.4, scale: 7.5, r: 5, h: 10 },
+    // the dock district: the shipwright's yard on the bay shore
+    { key: 'hexbShipyard', x: 470, z: 342, rot: 0.9, scale: 7, r: 6.5, h: 10 },
+    { key: 'hexbDocks', x: 462, z: 356, rot: 0.9, scale: 6, r: 4, h: 7 },
+    // the moored fleet, riding the bay at anchor
+    { key: 'hexShipBlue', x: 500, z: 358, rot: -1.2, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipRed', x: 492, z: 368, rot: 2.6, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipGreen', x: 512, z: 344, rot: 0.4, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 486, z: 384, rot: 1.9, scale: 6, r: 5, h: 9, float: 0.55 },
+    // dinghies: two on the water, one hauled out on the shingle
+    { key: 'hexBoat', x: 482, z: 346, rot: 0.7, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 472, z: 358, rot: -1.8, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 466, z: 349, rot: 2.3, scale: 6 },
+    { key: 'hexBoatrack', x: 464, z: 344, rot: 0.9, scale: 6 },
+    // harbor dressing: the great anchor at the pier root, cargo everywhere
+    { key: 'hexAnchor', x: 469, z: 349, rot: -0.6, scale: 7 },
+    { key: 'hexCrateBig', x: 471, z: 336, rot: 0.4, scale: 5 },
+    { key: 'hexCrateOpen', x: 464, z: 331, rot: 1.7, scale: 5 },
+    { key: 'hexSack', x: 467, z: 356, rot: 2.8, scale: 5 },
+    { key: 'hexSack', x: 430, z: 358, rot: 0.9, scale: 5 },
+    { key: 'hexCrateBig', x: 446, z: 380, rot: 2.1, scale: 5 },
   ],
   // an old watch ruin on the Howling Downs, and the beacon's fallen forecourt
   ruinRings: [
