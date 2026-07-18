@@ -9,11 +9,13 @@ import { describe, expect, it } from 'vitest';
 import { resolveMovement } from '../src/sim/colliders';
 import {
   EVERGARDEN_CAMPS,
+  EVERGARDEN_KNIGHT_CAMPS,
   EVERGARDEN_PROPS,
   EVERGARDEN_ROADS,
   EVERGARDEN_ZONE,
 } from '../src/sim/content/evergarden';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import { Sim } from '../src/sim/sim';
 import {
   crossesGardenHedge,
   GARDEN_MAZE_GRID,
@@ -325,5 +327,54 @@ describe('the hedge walls are hard colliders', () => {
     const to = cellCenter(entranceCol, MAZE_ROWS - 3);
     const end = resolveMovement(SEED, from.x, from.z, to.x, to.z, 0.5);
     expect(Math.hypot(end.x - to.x, end.z - to.z)).toBeLessThan(1);
+  });
+});
+
+describe('the maze patrol', () => {
+  it('posts each patrol knight in a dead-end corridor, leashed to its cell', () => {
+    const patrols = EVERGARDEN_KNIGHT_CAMPS.filter((c) => inGardenMaze(c.center.x, c.center.z));
+    expect(patrols.length).toBeGreaterThanOrEqual(2);
+    expect(patrols.length).toBeLessThanOrEqual(3);
+    for (const camp of patrols) {
+      const c = Math.floor((camp.center.x - MAZE_X0) / MAZE_CELL);
+      const r = Math.floor((MAZE_Z1 - camp.center.z) / MAZE_CELL);
+      expect(GARDEN_MAZE_GRID[r][c], `camp (${camp.center.x},${camp.center.z}) corridor`).toBe('.');
+      const openNeighbors = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ].filter(([dc, dr]) => GARDEN_MAZE_GRID[r + dr]?.[c + dc] === '.').length;
+      expect(openNeighbors, `camp (${camp.center.x},${camp.center.z}) dead end`).toBe(1);
+      expect(camp.radius, 'leash stays inside the corridor').toBeLessThanOrEqual(3);
+      expect(camp.count).toBe(1);
+    }
+  });
+
+  it('keeps the patrol out of the hedges while it paces', () => {
+    // the live sim: the knights idle-wander their dead ends for 30 seconds
+    // and must never stand inside a wall piece (moveToward consults
+    // crossesGardenHedge, the same barrier players hit)
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+    const entities = (
+      sim as unknown as {
+        entities: Map<number, { templateId?: string; pos: { x: number; z: number } }>;
+      }
+    ).entities;
+    const knights = [...entities.values()].filter(
+      (e) => e.templateId === 'hedge_knight' && inGardenMaze(e.pos.x, e.pos.z),
+    );
+    expect(knights.length).toBeGreaterThanOrEqual(2);
+    for (let i = 0; i < 20 * 30; i++) {
+      sim.tick();
+      if (i % 20 === 0) {
+        for (const k of knights) {
+          expect(
+            inGardenMazeWall(k.pos.x, k.pos.z),
+            `knight in a hedge at (${k.pos.x.toFixed(1)},${k.pos.z.toFixed(1)}) t${i}`,
+          ).toBe(false);
+        }
+      }
+    }
   });
 });

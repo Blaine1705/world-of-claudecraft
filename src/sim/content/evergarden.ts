@@ -253,6 +253,12 @@ export const EVERGARDEN_CAMPS: CampDef[] = [
 export const EVERGARDEN_KNIGHT_CAMPS: CampDef[] = [
   { mobId: 'hedge_knight', center: { x: 276, z: 886 }, radius: 8, count: 3 }, // Dawnhold gate
   { mobId: 'hedge_knight', center: { x: 410, z: 1118 }, radius: 8, count: 2 }, // the north watch
+  // the maze patrol: lone knights pacing three of the Great Maze's dead-end
+  // corridors (tight radius keeps each on its corridor cell; mob movement
+  // honors the hedge walls, so they pace instead of drifting through)
+  { mobId: 'hedge_knight', center: { x: 414, z: 1079.5 }, radius: 3, count: 1 },
+  { mobId: 'hedge_knight', center: { x: 324, z: 1007.5 }, radius: 3, count: 1 },
+  { mobId: 'hedge_knight', center: { x: 396, z: 971.5 }, radius: 3, count: 1 },
 ];
 export const EVERGARDEN_OBJECTS: GroundObjectDef[] = [];
 

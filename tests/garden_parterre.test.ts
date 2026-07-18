@@ -26,6 +26,7 @@ import {
   gardenLandness,
   MAZE_CELL,
   MAZE_COLS,
+  MAZE_WALL_DEPTH,
   MAZE_X0,
   MAZE_Z0,
   MAZE_Z1,
@@ -214,6 +215,38 @@ describe('the flower plan', () => {
       Math.hypot(end.x - p.x, end.z - p.z),
       'the bed collider stops the walk at its edge',
     ).toBeGreaterThan(p.r - 1);
+  });
+
+  it('edges the maze hedges with white and gold blooms', () => {
+    // a corridor point just off a hedge face blooms white or gold; the
+    // corridor center and the hedge interior stay bare. Face positions
+    // derive from the wall grid: the (8,15) piece's west face edges the
+    // entrance corridor.
+    const faceX = MAZE_X0 + 8 * MAZE_CELL + (MAZE_CELL - MAZE_WALL_DEPTH) / 2;
+    const midZ = MAZE_Z1 - 15.5 * MAZE_CELL;
+    let blooms = 0;
+    for (let dz = -3; dz <= 3; dz += 0.5) {
+      const tint = parterreFlowerTintAt(faceX - 0.8, midZ + dz);
+      if (tint >= 0) {
+        blooms++;
+        expect([0xffffff, 0xf2c94c]).toContain(tint);
+      }
+    }
+    expect(blooms, 'the border band blooms along the face').toBeGreaterThan(9);
+    // the outer perimeter blooms too (south of the south wall's outer face)
+    const southOuterZ = MAZE_Z1 - 16.5 * MAZE_CELL - MAZE_WALL_DEPTH / 2 - 0.8;
+    let outer = 0;
+    for (let x = MAZE_X0 + 10; x < MAZE_X0 + 55; x += 0.7) {
+      const tint = parterreFlowerTintAt(x, southOuterZ);
+      if (tint >= 0) {
+        outer++;
+        expect([0xffffff, 0xf2c94c]).toContain(tint);
+      }
+    }
+    expect(outer, 'the outer edge blooms').toBeGreaterThan(30);
+    // bare where it should be bare
+    expect(parterreFlowerTintAt(MAZE_X0 + 7.5 * MAZE_CELL, midZ), 'corridor center').toBe(-1);
+    expect(parterreFlowerTintAt(MAZE_X0 + 8.5 * MAZE_CELL, midZ), 'inside the hedge').toBe(-1);
   });
 
   it('lays ribbon beds along the walks but not in the maze or hamlet', () => {

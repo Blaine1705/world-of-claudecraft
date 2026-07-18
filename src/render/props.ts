@@ -37,6 +37,7 @@ import { GFX, sharedUniforms, surfaceMat } from './gfx';
 export interface PropsResult {
   group: THREE.Group;
   flames: THREE.Mesh[]; // animated campfire flames
+  windmillFans: THREE.Object3D[]; // live sail pivots the renderer spins
   fireLights: THREE.PointLight[];
   /**
    * Hides merged/instanced prop bands that sit entirely past the fog far plane,
@@ -322,6 +323,8 @@ const MAT_OVERRIDES: Record<
 interface AssetPart {
   geo: THREE.BufferGeometry;
   mat: THREE.Material;
+  /** source mesh name (picks out animated parts like the windmill fan) */
+  name: string;
 }
 interface PropAsset {
   parts: AssetPart[];
@@ -442,7 +445,7 @@ function propAsset(key: PropKey): PropAsset {
     geo.applyMatrix4(mesh.matrixWorld);
     if (yawM) geo.applyMatrix4(yawM);
     if (!geo.getAttribute('normal')) geo.computeVertexNormals();
-    parts.push({ geo, mat: convertMaterial(srcMat, def.kit, !!col) });
+    parts.push({ geo, mat: convertMaterial(srcMat, def.kit, !!col), name: mesh.name });
   });
   if (!parts.length) throw new Error(`prop asset has no meshes: ${key}`);
   // normalize origin: xz-center at 0, base at y=0
@@ -769,6 +772,7 @@ function buildDelveEmbers(
 export function buildProps(seed: number, delveLabel?: (delveId: string) => string): PropsResult {
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
+  const windmillFans: THREE.Object3D[] = [];
   const fireLights: THREE.PointLight[] = [];
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
@@ -951,7 +955,26 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       continue;
     }
     const g = new THREE.Group();
-    addParts(g, d.key as PropKey, { scale: d.scale ?? 1 });
+    const holder = addParts(g, d.key as PropKey, { scale: d.scale ?? 1 });
+    // the windmill's sail cross is a distinct authored mesh: reparent it onto
+    // a pivot at its axle so the renderer can spin it (kept out of the static
+    // merge, the campfire-flame idiom)
+    if (d.key === 'hexWindmill') {
+      const a = propAsset('hexWindmill');
+      const fanIdx = a.parts.findIndex((part) => /fan/i.test(part.name));
+      if (fanIdx >= 0) {
+        const fanMesh = holder.children[fanIdx] as THREE.Mesh;
+        const axle = (a.parts[fanIdx].geo.boundingBox as THREE.Box3).getCenter(new THREE.Vector3());
+        const pivot = new THREE.Group();
+        pivot.position.copy(axle);
+        fanMesh.position.set(-axle.x, -axle.y, -axle.z);
+        holder.remove(fanMesh);
+        pivot.add(fanMesh);
+        holder.add(pivot);
+        keepFromMerge.add(fanMesh);
+        windmillFans.push(pivot);
+      }
+    }
     g.position.set(d.x, ground(d.x, d.z) - 0.05, d.z);
     g.rotation.y = d.rot ?? 0;
     group.add(shadowed(g));
@@ -1718,6 +1741,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   return {
     group,
     flames,
+    windmillFans,
     fireLights,
     update(
       camX: number,

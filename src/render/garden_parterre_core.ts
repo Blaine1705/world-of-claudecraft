@@ -16,8 +16,10 @@ import { EVERGARDEN_PROPS, EVERGARDEN_ROADS, EVERGARDEN_ZONE } from '../sim/cont
 import { fbm2, hash2 } from '../sim/rng';
 import {
   gardenLandness,
+  gardenMazeCellPieces,
   MAZE_CELL,
   MAZE_COLS,
+  MAZE_WALL_DEPTH,
   MAZE_X0,
   MAZE_Z0,
   MAZE_Z1,
@@ -125,6 +127,10 @@ const GARDEN_Z0 = EVERGARDEN_ZONE.zMin;
 const GARDEN_Z1 = EVERGARDEN_ZONE.zMax;
 const MAZE_MARGIN = 6;
 const MAZE_X1 = MAZE_X0 + MAZE_COLS * MAZE_CELL;
+// the maze bloom band: how far off a hedge face the white and gold border
+// grows (NEAR keeps flowers out of the hedge itself)
+export const MAZE_BLOOM_NEAR = 0.15;
+export const MAZE_BLOOM_FAR = 1.5;
 // The Garden Gate's welcome front: the doubled stone arch at the zone entry
 // with flanking walls (EVERGARDEN_PROPS.decorProps), dressed on the garden
 // side with a clipped hedge line and a flower border. Wall-line coordinates:
@@ -215,6 +221,40 @@ export function parterreFlowerTintAt(x: number, z: number): number {
     // solid alternating rings edge to edge
     const band = Math.floor((d - p.r * 0.16) / (p.r * 0.15));
     return band % 2 === 0 ? ca : cb;
+  }
+  // the Great Maze's borders: white and gold blooms edging every hedge face,
+  // along the corridor walls inside and around the outer perimeter, mixed
+  // flower by flower the way a gardener under-plants a hedge line
+  {
+    const m = MAZE_BLOOM_FAR + 1;
+    if (x > MAZE_X0 - m && x < MAZE_X1 + m && z > MAZE_Z0 - m && z < MAZE_Z1 + m) {
+      const ci = Math.floor((x - MAZE_X0) / MAZE_CELL);
+      const ri = Math.floor((MAZE_Z1 - z) / MAZE_CELL);
+      const half = MAZE_CELL / 2;
+      const deep = MAZE_WALL_DEPTH / 2;
+      let dist = Number.POSITIVE_INFINITY;
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          const p = gardenMazeCellPieces(ci + dc, ri + dr);
+          if (!p) continue;
+          const cx = MAZE_X0 + (ci + dc + 0.5) * MAZE_CELL;
+          const cz = MAZE_Z1 - (ri + dr + 0.5) * MAZE_CELL;
+          if (p.h) {
+            const ox = Math.max(0, Math.abs(x - cx) - half);
+            const oz = Math.max(0, Math.abs(z - cz) - deep);
+            dist = Math.min(dist, Math.hypot(ox, oz));
+          }
+          if (p.v) {
+            const ox = Math.max(0, Math.abs(x - cx) - deep);
+            const oz = Math.max(0, Math.abs(z - cz) - half);
+            dist = Math.min(dist, Math.hypot(ox, oz));
+          }
+        }
+      }
+      if (dist > MAZE_BLOOM_NEAR && dist < MAZE_BLOOM_FAR) {
+        return hash2(x * 5.1, z * 5.1, 7501) < 0.5 ? 0xffffff : 0xf2c94c;
+      }
+    }
   }
   // never under a modeled bed: those plots carry their own planting
   if (inParterrePlot(x, z, 0.5)) return -1;

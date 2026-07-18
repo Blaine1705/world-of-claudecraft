@@ -1051,6 +1051,7 @@ export class Renderer {
   private dnColorScratch = new THREE.Color();
   private dnMoonScratch = new THREE.Color();
   private flames: THREE.Mesh[];
+  private windmillFans: THREE.Object3D[] = [];
   private fireLights: THREE.PointLight[];
   // Point lights owned by entity views (e.g. the quest-object glow). These stream
   // in/out with interest, so they are budgeted into the SAME constant count as the
@@ -1518,12 +1519,15 @@ export class Renderer {
     setRenderCategory(props.group, 'props');
     this.scene.add(props.group);
     this.flames = props.flames;
-    this.fireLights = props.fireLights;
+    this.windmillFans = props.windmillFans;
     // Props are baked into world space at build and their update() only toggles
     // visibility, so the whole tree is matrix-static, EXCEPT the campfire
-    // flames, whose flicker rescales them every frame: re-enable those.
+    // flames, whose flicker rescales them every frame, and the windmill sail
+    // pivots, which turn: re-enable those.
     freezeStaticMatrices(props.group);
     for (const flame of this.flames) flame.matrixAutoUpdate = true;
+    for (const fan of this.windmillFans) fan.matrixAutoUpdate = true;
+    this.fireLights = props.fireLights;
     // The impact-site light rides the campfire point-light budget so the visible
     // point-light count stays constant as the player travels (constant
     // numPointLights -> materials never recompile for a light-count change).
@@ -6061,6 +6065,11 @@ export class Renderer {
     }
 
     let worldStart = performance.now();
+
+    // the mill sails turn in the garden breeze, each at its own phase
+    for (let i = 0; i < this.windmillFans.length; i++) {
+      this.windmillFans[i].rotation.z = this.time * 0.55 + i * 2.1;
+    }
 
     // fire flicker + rising embers
     for (let i = 0; i < this.flames.length; i++) {
