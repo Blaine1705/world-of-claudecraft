@@ -2063,6 +2063,60 @@ function applyDrakemawEscape(x: number, z: number, h: number): number {
   return out;
 }
 
+// The modeled lava network's ground (render/ember_features.ts): a LEVEL pad
+// under each render-only pool and a smooth constant-gradient bed under each
+// connecting river run, so every modeled piece sits flush instead of
+// sinking into the dunes. Pure blend toward authored heights.
+const EMBER_LAVA_PADS = [
+  { x: 330, z: 2250, r: 10, h: 3.4 },
+  { x: 344, z: 2233, r: 8, h: 3.4 },
+  { x: 418, z: 2196, r: 9, h: 5.4 },
+] as const;
+const EMBER_LAVA_RUNS = [
+  { x0: 330, z0: 2250, x1: 344, z1: 2233, h0: 3.4, h1: 3.4 },
+  { x0: 330, z0: 2250, x1: 302, z1: 2328, h0: 3.4, h1: 2.0 },
+  { x0: 294, z0: 2318, x1: 302, z1: 2328, h0: 0.8, h1: 1.9 },
+  { x0: 418, z0: 2196, x1: 446, z1: 2220, h0: 5.4, h1: 2.4 },
+] as const;
+function emberRunDistance(x: number, z: number): number {
+  let best = Infinity;
+  for (const run of EMBER_LAVA_RUNS) {
+    const dx = run.x1 - run.x0;
+    const dz = run.z1 - run.z0;
+    const t = Math.max(
+      0,
+      Math.min(1, ((x - run.x0) * dx + (z - run.z0) * dz) / (dx * dx + dz * dz)),
+    );
+    best = Math.min(best, Math.hypot(x - (run.x0 + dx * t), z - (run.z0 + dz * t)));
+  }
+  return best;
+}
+
+function applyEmberLavaRuns(x: number, z: number, h: number): number {
+  if (z < DRAKE_ZMIN || z > DRAKE_ZMAX) return h;
+  let out = h;
+  for (const pad of EMBER_LAVA_PADS) {
+    const d = Math.hypot(x - pad.x, z - pad.z);
+    if (d < pad.r + 7) {
+      const w = 1 - smoothstep(pad.r, pad.r + 7, d);
+      out = out + (pad.h - out) * w;
+    }
+  }
+  for (const run of EMBER_LAVA_RUNS) {
+    const dx = run.x1 - run.x0;
+    const dz = run.z1 - run.z0;
+    const len2 = dx * dx + dz * dz;
+    const t = Math.max(0, Math.min(1, ((x - run.x0) * dx + (z - run.z0) * dz) / len2));
+    const d = Math.hypot(x - (run.x0 + dx * t), z - (run.z0 + dz * t));
+    if (d < 6 + 8) {
+      const w = 1 - smoothstep(6, 14, d);
+      const target = run.h0 + (run.h1 - run.h0) * t;
+      out = out + (target - out) * w;
+    }
+  }
+  return out;
+}
+
 // Real craters, carved after the cones: a raised rock lip rings each pool
 // and the floor sinks genuinely below the surrounding ground, so the melt
 // sits down INSIDE its bowl the way lake water does (the floors stay above
@@ -2073,11 +2127,13 @@ function applyEmberLavaBasins(x: number, z: number, h: number): number {
   for (const pool of EMBER_LAVA_POOLS) {
     const d = Math.hypot(x - pool.x, z - pool.z);
     if (d < pool.r * 2.2) {
-      // the lip: rises from the bowl edge, falls away outward
+      // the lip: rises from the bowl edge, falls away outward; it parts
+      // where a modeled river run crosses it, so the melt flows in flush
       const lip =
         2.4 *
         smoothstep(pool.r * 0.7, pool.r * 1.05, d) *
-        (1 - smoothstep(pool.r * 1.05, pool.r * 2.2, d));
+        (1 - smoothstep(pool.r * 1.05, pool.r * 2.2, d)) *
+        smoothstep(4, 9, emberRunDistance(x, z));
       // the bowl: flat melt floor inside, blending up to the lip
       const blend = smoothstep(pool.r * 0.55, pool.r * 1.05, d);
       out = out * blend + pool.floor * (1 - blend) + lip;
@@ -3175,6 +3231,7 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   h = applyStripFlankCoast(x, z, h);
   h = applyRowMeres(x, z, h);
   h = applyNorthBay(x, z, h);
+  h = applyEmberLavaRuns(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyDrakemawEscape(x, z, h);
   h = applyFrostTerraces(x, z, h);
