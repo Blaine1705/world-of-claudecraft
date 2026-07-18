@@ -10477,9 +10477,6 @@ export const vi_VN: EnTranslations = {
           },
           "9": {
             "label": "Thánh Đường Mộ Long"
-          },
-          "10": {
-            "label": "Chuồng ngựa Highwatch"
           }
         }
       },

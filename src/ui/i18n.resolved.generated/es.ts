@@ -10477,9 +10477,6 @@ export const es: EnTranslations = {
           },
           "9": {
             "label": "Santuario del Gravewyrm"
-          },
-          "10": {
-            "label": "Establos de Highwatch"
           }
         }
       },

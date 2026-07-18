@@ -10477,9 +10477,6 @@ export const ko_KR: EnTranslations = {
           },
           "9": {
             "label": "무덤고룡 성소"
-          },
-          "10": {
-            "label": "하이워치 마구간"
           }
         }
       },

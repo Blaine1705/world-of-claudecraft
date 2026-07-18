@@ -10477,9 +10477,6 @@ export const sv_SE: EnTranslations = {
           },
           "9": {
             "label": "Gravlindormens helgedom"
-          },
-          "10": {
-            "label": "Highwatchs stall"
           }
         }
       },

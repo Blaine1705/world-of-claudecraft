@@ -3633,7 +3633,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': '고룡교단 천막',
   'entities.zones.thornpeak_heights.pois.8.label': '망령 들판',
   'entities.zones.thornpeak_heights.pois.9.label': '무덤고룡 성소',
-  'entities.zones.thornpeak_heights.pois.10.label': '하이워치 마구간',
   'entities.zones.veiled_hollow.name': '장막의 골짜기',
   'entities.zones.veiled_hollow.welcome':
     '대기가 오래된 마법으로 웅웅거린다. 엘더글림의 큰 나무 아래에서 수호자 샐윈을 찾아가라.',

@@ -10477,9 +10477,6 @@ export const zh_CN: EnTranslations = {
           },
           "9": {
             "label": "墓龙圣所"
-          },
-          "10": {
-            "label": "高望马厩"
           }
         }
       },

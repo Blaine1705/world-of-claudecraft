@@ -3652,7 +3652,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'ワーム教団の天幕',
   'entities.zones.thornpeak_heights.pois.8.label': '亡霊の野',
   'entities.zones.thornpeak_heights.pois.9.label': '墓ワームの聖所',
-  'entities.zones.thornpeak_heights.pois.10.label': 'ハイウォッチの厩舎',
   'entities.zones.veiled_hollow.name': 'ヴェールの幽谷',
   'entities.zones.veiled_hollow.welcome':
     '大気は古の魔力に満ちて震えている。エルダーグリームの大樹の下で、守り手セルウィンを訪ねよ。',

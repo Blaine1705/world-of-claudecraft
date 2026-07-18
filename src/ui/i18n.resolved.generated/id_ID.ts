@@ -10477,9 +10477,6 @@ export const id_ID: EnTranslations = {
           },
           "9": {
             "label": "Sanktum Gravewyrm"
-          },
-          "10": {
-            "label": "Kandang Kuda Highwatch"
           }
         }
       },

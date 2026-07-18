@@ -10477,9 +10477,6 @@ export const zh_TW: EnTranslations = {
           },
           "9": {
             "label": "墓龍聖所"
-          },
-          "10": {
-            "label": "高望馬廄"
           }
         }
       },

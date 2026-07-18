@@ -10477,9 +10477,6 @@ export const da_DK: EnTranslations = {
           },
           "9": {
             "label": "Gravormens Helligdom"
-          },
-          "10": {
-            "label": "Highwatch-stalden"
           }
         }
       },

@@ -10477,9 +10477,6 @@ export const de_DE: EnTranslations = {
           },
           "9": {
             "label": "Gravewyrm-Heiligtum"
-          },
-          "10": {
-            "label": "Highwatch-Stallungen"
           }
         }
       },

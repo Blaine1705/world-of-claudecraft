@@ -10477,9 +10477,6 @@ export const tr_TR: EnTranslations = {
           },
           "9": {
             "label": "Mezarejderi Mabedi"
-          },
-          "10": {
-            "label": "Highwatch Ahırları"
           }
         }
       },

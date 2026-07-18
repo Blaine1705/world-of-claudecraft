@@ -10477,9 +10477,6 @@ export const fr_CA: EnTranslations = {
           },
           "9": {
             "label": "Sanctuaire du Gravewyrm"
-          },
-          "10": {
-            "label": "Écuries de Highwatch"
           }
         }
       },

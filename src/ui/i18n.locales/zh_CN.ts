@@ -3502,7 +3502,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': '龙教帐篷',
   'entities.zones.thornpeak_heights.pois.8.label': '亡魂战场',
   'entities.zones.thornpeak_heights.pois.9.label': '墓龙圣所',
-  'entities.zones.thornpeak_heights.pois.10.label': '高望马厩',
   'entities.zones.veiled_hollow.name': '帷幕幽谷',
   'entities.zones.veiled_hollow.welcome':
     '空气中回荡着古老魔法的低鸣。到古辉镇的巨树下寻找守护者塞尔文吧。',

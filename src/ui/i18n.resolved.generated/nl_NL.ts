@@ -10477,9 +10477,6 @@ export const nl_NL: EnTranslations = {
           },
           "9": {
             "label": "Grafwurm-Heiligdom"
-          },
-          "10": {
-            "label": "Stallen van Highwatch"
           }
         }
       },

@@ -10477,9 +10477,6 @@ export const ja_JP: EnTranslations = {
           },
           "9": {
             "label": "墓ワームの聖所"
-          },
-          "10": {
-            "label": "ハイウォッチの厩舎"
           }
         }
       },

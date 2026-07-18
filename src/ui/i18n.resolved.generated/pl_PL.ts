@@ -10477,9 +10477,6 @@ export const pl_PL: EnTranslations = {
           },
           "9": {
             "label": "Sanktuarium Grobowego Żmija"
-          },
-          "10": {
-            "label": "Stajnie Highwatch"
           }
         }
       },

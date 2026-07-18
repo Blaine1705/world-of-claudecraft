@@ -10477,9 +10477,6 @@ export const cs_CZ: EnTranslations = {
           },
           "9": {
             "label": "Svatyně Hrobodraka"
-          },
-          "10": {
-            "label": "Stáje Highwatch"
           }
         }
       },

@@ -3506,7 +3506,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': '龍教帳篷',
   'entities.zones.thornpeak_heights.pois.8.label': '亡魂戰場',
   'entities.zones.thornpeak_heights.pois.9.label': '墓龍聖所',
-  'entities.zones.thornpeak_heights.pois.10.label': '高望馬廄',
   'entities.zones.veiled_hollow.name': '帷幕幽谷',
   'entities.zones.veiled_hollow.welcome':
     '空氣中迴盪著古老魔法的低鳴。到古輝鎮的巨樹下尋找守護者塞爾文吧。',

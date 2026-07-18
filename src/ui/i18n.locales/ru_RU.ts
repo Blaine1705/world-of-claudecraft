@@ -3681,7 +3681,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Шатры Культа Вирма',
   'entities.zones.thornpeak_heights.pois.8.label': 'Поля ревенантов',
   'entities.zones.thornpeak_heights.pois.9.label': 'Святилище Могильного Вирма',
-  'entities.zones.thornpeak_heights.pois.10.label': 'Конюшни Хайвотча',
   'entities.zones.veiled_hollow.name': 'Сокрытая лощина',
   'entities.zones.veiled_hollow.welcome':
     'Воздух гудит от древней магии. Найдите хранительницу Сэльвин под великим древом Элдерглима.',
