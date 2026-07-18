@@ -258,8 +258,8 @@
       "state": "4eec55cb",
       "events": "9dfe2c52",
       "rng": {
-        "draws": 589,
-        "digest": "b50aa169"
+        "draws": 590,
+        "digest": "1fa624e3"
       }
     },
     {
@@ -269,8 +269,8 @@
       "state": "b673d02d",
       "events": "8cb5e16b",
       "rng": {
-        "draws": 644,
-        "digest": "cf6659ab"
+        "draws": 645,
+        "digest": "fd3b8543"
       }
     },
     {
@@ -291,8 +291,8 @@
       "state": "956cd51e",
       "events": "933ea02f",
       "rng": {
-        "draws": 759,
-        "digest": "1fcd7538"
+        "draws": 760,
+        "digest": "f59fa992"
       }
     },
     {
@@ -302,8 +302,8 @@
       "state": "956cd51e",
       "events": "741638a5",
       "rng": {
-        "draws": 759,
-        "digest": "1fcd7538"
+        "draws": 760,
+        "digest": "f59fa992"
       },
       "label": "swings",
       "players": [
@@ -1282,8 +1282,8 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 694,
-      "state": "a72f3910",
-      "events": "088cbf4a",
+      "state": "2161639e",
+      "events": "55e04c2d",
       "rng": {
         "draws": 812,
         "digest": "97c5a50b"
@@ -1293,7 +1293,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 694,
-      "state": "05e1cb40",
+      "state": "56d666de",
       "events": "741638a5",
       "rng": {
         "draws": 823,
@@ -1469,7 +1469,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 72,
-            "damageTaken": 15
+            "damageTaken": 8
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1811,14 +1811,14 @@
           "aiState": "idle",
           "attackPower": 95,
           "autoAttack": true,
-          "combatTimer": 0.25,
+          "combatTimer": 1.9,
           "comboUntil": -1,
           "critChance": 0.0835,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0835,
           "fallStartY": -3.063027,
           "fiveSecondRule": 6.3,
-          "hp": 79985,
+          "hp": 79992,
           "id": 686,
           "inCombat": true,
           "kind": "player",
@@ -2087,7 +2087,7 @@
         {
           "aggroTargetId": 686,
           "aiState": "attack",
-          "combatTimer": 0.25,
+          "combatTimer": 1.9,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2268,7 +2268,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 694,
-      "state": "05e1cb40",
+      "state": "56d666de",
       "events": "741638a5",
       "rng": {
         "draws": 823,
@@ -2444,7 +2444,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 72,
-            "damageTaken": 15
+            "damageTaken": 8
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2786,14 +2786,14 @@
           "aiState": "idle",
           "attackPower": 95,
           "autoAttack": true,
-          "combatTimer": 0.25,
+          "combatTimer": 1.9,
           "comboUntil": -1,
           "critChance": 0.0835,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0835,
           "fallStartY": -3.063027,
           "fiveSecondRule": 6.3,
-          "hp": 79985,
+          "hp": 79992,
           "id": 686,
           "inCombat": true,
           "kind": "player",
@@ -3062,7 +3062,7 @@
         {
           "aggroTargetId": 686,
           "aiState": "attack",
-          "combatTimer": 0.25,
+          "combatTimer": 1.9,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",

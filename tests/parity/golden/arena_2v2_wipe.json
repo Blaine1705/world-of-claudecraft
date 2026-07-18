@@ -1470,8 +1470,8 @@
       "state": "a2effe2e",
       "events": "741638a5",
       "rng": {
-        "draws": 1604,
-        "digest": "c8765c69"
+        "draws": 1605,
+        "digest": "b7afc0d2"
       }
     },
     {
@@ -1481,8 +1481,8 @@
       "state": "27bd6dd8",
       "events": "3814e25d",
       "rng": {
-        "draws": 1786,
-        "digest": "8421ad33"
+        "draws": 1787,
+        "digest": "ff9c9678"
       }
     },
     {
