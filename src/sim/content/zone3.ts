@@ -3290,9 +3290,6 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE3_PROPS: ZonePropsDef = {
-  // the old mine working beside the Duskfall Passage's crystal gate, on the
-  // same flat shelf in the northwest cliffs (render: the KayKit cave mine)
-  decorProps: [{ key: 'caveMine', x: -158, z: 824, rot: -2.21, scale: 5, r: 4.6, h: 8 }],
   buildings: [
     { kind: 'house', x: 14, z: 671, w: 7, d: 6, rot: -0.5 },
     { kind: 'house', x: 8, z: 650, w: 6, d: 5, rot: 0.4 },

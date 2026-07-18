@@ -34,6 +34,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "env/space_galaxy.jpg": "/media/env/space_galaxy.dd78358b9e62.jpg",
   "env/vale_backdrop.webp": "/media/env/vale_backdrop.1a566508b624.webp",
   "env/vale_backdrop_4k.webp": "/media/env/vale_backdrop_4k.18384c888f93.webp",
+  "env/vale_cup_1k.hdr": "/media/env/vale_cup_1k.a33bca4e2580.hdr",
+  "env/vale_cup_2k.hdr": "/media/env/vale_cup_2k.307e9a5f38ae.hdr",
   "env/vale_day_1k.hdr": "/media/env/vale_day_1k.0e03309f35d1.hdr",
   "env/vale_day_2k.hdr": "/media/env/vale_day_2k.9700c158eb52.hdr",
   "env/wraithwood_gloom_1k.hdr": "/media/env/wraithwood_gloom_1k.6f301c0144a7.hdr",

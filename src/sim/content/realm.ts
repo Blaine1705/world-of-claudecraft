@@ -124,17 +124,18 @@ export const REALM_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
   { x: 80, z: 1002, r: 18 }, // the glimmerwisp meadow at the northwest inlet
 ];
 
-// The way in. Side a is the crystal cave standing on the flat shelf in the
-// northwest Thornpeak cliffs (moved off the old cliff-face pocket onto
-// probed LEVEL ground, ringed with pink flowers; the mouth is the modeled
-// gate render/hollow_gates.ts draws); side b is the Duskfall tree cave on
-// the realm's southern wall. Landings sit ~5yd outside the opposite
-// trigger so arrivals never bounce straight back.
+// The way in. Side a is the crystal cave on a probed LEVEL bench high on
+// the central Thornpeak Heights, well clear of every mob camp, its mouth
+// facing northwest out toward the Gravewyrm road (ringed with pink
+// flowers; the modeled gate is render/hollow_gates.ts). Side b is the
+// Duskfall tree cave on its own level shelf off the realm's southern
+// wall. Landings sit ~5yd outside the opposite trigger so arrivals never
+// bounce straight back.
 export const REALM_PORTALS: PortalDef[] = [
   {
     id: 'duskfall_passage',
-    a: { x: -170, z: 815, landing: { x: -174.6, z: 817, facing: -1.16 } },
-    b: { x: -140, z: 950, landing: { x: -140, z: 955, facing: 0 } },
+    a: { x: 10, z: 770, landing: { x: 6.5, z: 773.5, facing: -0.79 } },
+    b: { x: -122, z: 959, landing: { x: -126.9, z: 957.9, facing: -1.79 } },
     radius: 2.0,
     enterText: 'A veil of dusk parts before you, and the Hollow opens ahead.',
     leaveText: 'The veil closes behind you, and the mountain air bites again.',
