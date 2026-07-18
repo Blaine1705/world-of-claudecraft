@@ -8970,6 +8970,12 @@ export const ko_KR: EnTranslations = {
       "shoal_scuttler": {
         "name": "여울 게"
       },
+      "downs_bandit": {
+        "name": "Downs Bandit"
+      },
+      "wreck_thief": {
+        "name": "Wreckfield Thief"
+      },
       "the_wreck_warden": {
         "name": "난파선 감시자"
       },

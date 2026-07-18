@@ -8970,6 +8970,12 @@ export const ja_JP: EnTranslations = {
       "shoal_scuttler": {
         "name": "ショールスカトラー"
       },
+      "downs_bandit": {
+        "name": "Downs Bandit"
+      },
+      "wreck_thief": {
+        "name": "Wreckfield Thief"
+      },
       "the_wreck_warden": {
         "name": "レックウォーデン"
       },

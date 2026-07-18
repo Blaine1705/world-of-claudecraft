@@ -8970,6 +8970,12 @@ export const en_XA: EnTranslations = {
       "shoal_scuttler": {
         "name": "[Šĥóáļ Šçúţţļéŕ]"
       },
+      "downs_bandit": {
+        "name": "[Ðóŵñš Ɓáñðíţ]"
+      },
+      "wreck_thief": {
+        "name": "[Ŵŕéçķƒíéļð Ţĥíéƒ]"
+      },
       "the_wreck_warden": {
         "name": "[Ţĥé Ŵŕéçķ Ŵáŕðéñ]"
       },

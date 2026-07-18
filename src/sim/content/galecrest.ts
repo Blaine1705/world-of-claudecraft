@@ -100,6 +100,8 @@ export const GALECREST_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
   { x: 439, z: 331, r: 2 },
   { x: 471, z: 308, r: 2.2 },
   { x: 286, z: 556, r: 7 },
+  { x: 292, z: 541, r: 5 },
+  { x: 306, z: 540, r: 5 },
   { x: 310, z: 548, r: 7 },
   { x: 306, z: 572, r: 7 },
   { x: 290, z: 572, r: 7 },
@@ -164,6 +166,42 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     scale: 1.2,
     color: 0x8898a8,
   },
+  downs_bandit: {
+    id: 'downs_bandit',
+    name: 'Downs Bandit',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'kobold',
+    hpBase: 52,
+    hpPerLevel: 18,
+    dmgBase: 11,
+    dmgPerLevel: 2.2,
+    attackSpeed: 1.8,
+    armorPerLevel: 10,
+    moveSpeed: 8.5,
+    aggroRadius: 10, // squatting the old raider tents, and keeping them
+    loot: [],
+    scale: 0.95,
+    color: 0x5a8a46,
+  },
+  wreck_thief: {
+    id: 'wreck_thief',
+    name: 'Wreckfield Thief',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'kobold',
+    hpBase: 52,
+    hpPerLevel: 18,
+    dmgBase: 11,
+    dmgPerLevel: 2.2,
+    attackSpeed: 1.8,
+    armorPerLevel: 10,
+    moveSpeed: 8.5,
+    aggroRadius: 10, // every beached cargo on this coast is theirs by claim
+    loot: [],
+    scale: 0.95,
+    color: 0x5a8a46,
+  },
   the_wreck_warden: {
     id: 'the_wreck_warden',
     name: 'The Wreck Warden',
@@ -195,14 +233,14 @@ export const GALECREST_CAMPS: CampDef[] = [
   // the pack hunts the open downs northwest of the Mirror Tarn, well clear
   // of the hamlet and the stables
   { mobId: 'topiary_wolf', center: { x: 266, z: 546 }, radius: 8, count: 3 },
-  { mobId: 'hedge_gnome', center: { x: 444, z: 438 }, radius: 10, count: 3 },
-  { mobId: 'hedge_gnome', center: { x: 386, z: 622 }, radius: 9, count: 2 },
+  { mobId: 'wreck_thief', center: { x: 444, z: 438 }, radius: 10, count: 3 },
+  { mobId: 'moor_ram', center: { x: 386, z: 622 }, radius: 9, count: 2 },
   { mobId: 'the_wreck_warden', center: { x: 330, z: 638 }, radius: 5, count: 1 },
   // the outskirt raider camps (appended: camp order is world-gen rng order):
-  // hedge gnomes squat in whatever the raiders left behind
-  { mobId: 'hedge_gnome', center: { x: 252, z: 250 }, radius: 4, count: 2 },
-  { mobId: 'hedge_gnome', center: { x: 210, z: 410 }, radius: 4, count: 2 },
-  { mobId: 'hedge_gnome', center: { x: 354, z: 664 }, radius: 4, count: 2 },
+  // bandits hold the north and Windway camps, thieves the coast road camps
+  { mobId: 'downs_bandit', center: { x: 252, z: 250 }, radius: 4, count: 2 },
+  { mobId: 'downs_bandit', center: { x: 210, z: 410 }, radius: 4, count: 2 },
+  { mobId: 'wreck_thief', center: { x: 354, z: 664 }, radius: 4, count: 2 },
 ];
 export const GALECREST_OBJECTS: GroundObjectDef[] = [];
 
@@ -229,7 +267,6 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { x: 419, z: 352, rot: -2.2, r: 1.6 },
     // the harbor market: vendors working the shore behind the boardwalk
     { x: 464, z: 345, rot: 1.2, r: 1.6 },
-    { x: 462, z: 361, rot: 0.9, r: 1.6 },
     { x: 452, z: 370, rot: -0.7, r: 1.6 },
   ],
   crates: [
@@ -265,8 +302,6 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { x1: 436, z1: 327, x2: 436, z2: 336 },
     { x1: 466, z1: 305, x2: 475, z2: 305 },
     { x1: 475, z1: 305, x2: 475, z2: 313 },
-    // the Beacon keepers' yard wall on the headland
-    { x1: 505, z1: 304, x2: 513, z2: 304, kind: 'stone' },
     // the stables' walled south yard: stone runs close the barn yard's open
     // side, leaving a gateway in line with the race-yard gate (Marla's post)
     { x1: 332, z1: 606, x2: 360, z2: 606, kind: 'stone' },
@@ -329,18 +364,19 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexbWorkshop', x: 515, z: 305, rot: -1.57, scale: 6.5, r: 6, h: 8 },
     { key: 'hexbHomeB', x: 498, z: 294, rot: 0.2, scale: 7, r: 5, h: 10 },
     // the harbor gun, watching the eastern water from the lighthouse lawn
-    { key: 'hexCannon', x: 504, z: 315, rot: 1.2, scale: 6, r: 1.8, h: 3 },
+    { key: 'hexCannon', x: 488, z: 296, rot: 0.7, scale: 6, r: 1.8, h: 3 },
     // the golden horse rears beside the stables' race-yard entrance
     { key: 'goldenHorseStatue', x: 374, z: 591.5, rot: Math.PI, scale: 5.5, r: 2.4, h: 6 },
-    // the grooms' hamlet on the downs west of the paddock: two long barns,
-    // the grooms' cottage, and the farrier's shop off the south fence
-    { key: 'hexbStables', x: 315, z: 570, rot: Math.PI / 2, scale: 7, r: 5.5, h: 9 },
-    { key: 'hexbStables', x: 315, z: 584, rot: Math.PI / 2, scale: 7, r: 5.5, h: 9 },
+    // the stable barns on the Mirror Tarn's level north bank (across the
+    // lake from the beach), the grooms' cottage by the paddock, and the
+    // farrier's shop off the south fence
+    { key: 'hexbStables', x: 293, z: 531, rot: 0.15, scale: 7, r: 5.5, h: 9 },
+    { key: 'hexbStables', x: 305, z: 529, rot: -0.2, scale: 7, r: 5.5, h: 9 },
     { key: 'hexbHomeA', x: 317, z: 598, rot: 0.6, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexbWorkshop', x: 346, z: 620, rot: -0.4, scale: 6, r: 5, h: 8 },
-    { key: 'hexHaybale', x: 323, z: 576, rot: 0.7, scale: 5 },
-    { key: 'hexHaybale', x: 322, z: 589, rot: 2.1, scale: 5 },
-    { key: 'hexTrough', x: 326, z: 571, rot: Math.PI / 2, scale: 5 },
+    { key: 'hexHaybale', x: 299, z: 536, rot: 0.7, scale: 5 },
+    { key: 'hexHaybale', x: 309, z: 533, rot: 2.1, scale: 5 },
+    { key: 'hexTrough', x: 297, z: 527, rot: Math.PI / 2, scale: 5 },
     // and the road side of the stables: homes and a third barn spread
     // evenly along the Wreckfields road, east and south of the paddock
     { key: 'hexbHomeA', x: 448, z: 558, rot: -1.5, scale: 7.5, r: 4.5, h: 8 },

@@ -1479,7 +1479,8 @@ const MOB_KEYS: Record<string, string> = {
   the_topiary_bull: 'mob_bull',
   moor_ram: 'mob_alpaca',
   shoal_scuttler: 'mob_crab',
-  the_wreck_warden: 'skel_golem',
+  // The Wreck Warden walks as Mogger's hulking bruiser body, not a skeleton.
+  the_wreck_warden: 'mob_bruiser',
   // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
   // family's default skeleton minion. Its demons keep the family fallback
   // (mob_demonalt), re-tinted deep red by the templates.

@@ -189,6 +189,8 @@ const MOB_IDS = [
   'moor_ram',
   'gale_wisp',
   'shoal_scuttler',
+  'downs_bandit',
+  'wreck_thief',
   'the_wreck_warden',
   'riftspawn',
   'breach_wretch',

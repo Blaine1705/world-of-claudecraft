@@ -1600,7 +1600,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.",
     "families": [
       "beast",
-      "elemental"
+      "kobold"
     ]
   },
   {
@@ -1892,16 +1892,6 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_alpaca__d8d0c0.webp"
       },
       {
-        "name": "Shoal Scuttler",
-        "min": 20,
-        "max": 20,
-        "rare": false,
-        "templateId": "shoal_scuttler",
-        "model": "mob_crab",
-        "tint": "#8898a8",
-        "still": "/guide-stills/mob_crab__8898a8.webp"
-      },
-      {
         "name": "Thicket Boar",
         "min": 20,
         "max": 20,
@@ -2147,11 +2137,31 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_bandit__6b3a32.webp"
       },
       {
+        "name": "Downs Bandit",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "downs_bandit",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
         "name": "Hedge Gnome",
         "min": 20,
         "max": 20,
         "rare": false,
         "templateId": "hedge_gnome",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Wreckfield Thief",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "wreck_thief",
         "model": "mob_bandit",
         "tint": "#6b3a32",
         "still": "/guide-stills/mob_bandit__6b3a32.webp"
@@ -2427,16 +2437,6 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_ghost",
         "tint": "#d0f2c8",
         "still": "/guide-stills/mob_ghost__d0f2c8.webp"
-      },
-      {
-        "name": "Gale Wisp",
-        "min": 20,
-        "max": 20,
-        "rare": false,
-        "templateId": "gale_wisp",
-        "model": "mob_elemental",
-        "tint": "#bfe0e8",
-        "still": "/guide-stills/mob_elemental__bfe0e8.webp"
       },
       {
         "name": "Nightkin Stargazer",

@@ -2765,20 +2765,9 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   }
   // The Galecrest's shaping, over the finished height like the bed pads:
   if (x > 180 && x < 540 && z > 180 && z < 700) {
-    // level pads under the raider encampments (the built-in camp flatten
-    // only reaches the mob spawn ring; the tents pitch wider than that)
-    for (const pad of GALE_CAMP_PADS) {
-      const dx = x - pad.x,
-        dz = z - pad.z;
-      const padGate = pad.r + 5;
-      if (dx * dx + dz * dz >= padGate * padGate) continue;
-      const d = Math.sqrt(dx * dx + dz * dz);
-      const ch = terrainHeightUnpadded(pad.x, pad.z, seed);
-      const blend = smoothstep(pad.r, pad.r + 5, d);
-      h = h * blend + ch * (1 - blend);
-    }
-    // the Mirror Tarn's bathing shore: pull the carved banks down onto one
-    // long gentle sandy ramp, so the water is waded into, never fallen into
+    // the Mirror Tarn's bathing shore FIRST: pull the carved banks down onto
+    // one long gentle sandy ramp, so the water is waded into, never fallen
+    // into (the level pads below then win wherever the two overlap)
     const tdx = x - 300,
       tdz = z - 560;
     if (tdx * tdx + tdz * tdz < 32 * 32) {
@@ -2787,18 +2776,57 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       const w = 1 - smoothstep(26, 32, d);
       if (h > target) h = h * (1 - w) + target * w;
     }
+    // level pads under the raider encampments and the tarn's north-bank
+    // stable barns (the built-in camp flatten only reaches the mob spawn
+    // ring; tents and barns stand wider than that)
+    for (const pad of GALE_LEVEL_PADS) {
+      const dx = x - pad.x,
+        dz = z - pad.z;
+      const padGate = pad.r + 5;
+      if (dx * dx + dz * dz >= padGate * padGate) continue;
+      const d = Math.sqrt(dx * dx + dz * dz);
+      const ch = pad.h ?? terrainHeightUnpadded(pad.x, pad.z, seed);
+      const blend = smoothstep(pad.r, pad.r + 5, d);
+      h = h * blend + ch * (1 - blend);
+    }
+    // the Beacon dock stair's cutting: the headland face is carved down to
+    // the stair's ramp line so the treads climb an open notch instead of
+    // vanishing inside the cliff (mirror of the beacon stair deck in
+    // sim/gale_harbor.ts: center 509.2,317.5 rot 0.785 hl 5.8)
+    const sdx = x - 509.2,
+      sdz = z - 317.5;
+    if (sdx * sdx + sdz * sdz < 9.5 * 9.5) {
+      const dirx = 0.7068251811053661; // sin(0.785)
+      const dirz = 0.7073882691671998; // cos(0.785)
+      const along = sdx * dirx + sdz * dirz;
+      const across = sdx * dirz - sdz * dirx;
+      if (along > -7.3 && along < 7.3 && Math.abs(across) < 4.4) {
+        const topY = terrainHeightUnpadded(504, 314, seed) + 0.1;
+        const botY = Math.max(terrainHeightUnpadded(514, 321, seed), WATER_LEVEL + 0.55) + 0.1;
+        const t = Math.min(1, Math.max(0, (along + 5.8) / 11.6));
+        const rampY = topY + (botY - topY) * t - 0.25;
+        const w =
+          (1 - smoothstep(1.4, 4.4, Math.abs(across))) *
+          (1 - smoothstep(5.8, 7.3, Math.abs(along)));
+        if (h > rampY) h = h * (1 - w) + rampY * w;
+      }
+    }
   }
   return h;
 }
 
-// The raider encampments' level ground (terrainHeight above): each pad
-// blends the finished height to the camp center's, wide enough that every
-// tent, tower, and palisade run sits flush instead of sinking into a rise.
-const GALE_CAMP_PADS = [
+// The Galecrest's level ground (terrainHeight above): each pad blends the
+// finished height to its center's, wide enough that every tent, tower,
+// palisade run, and barn sits flush instead of sinking into a rise.
+const GALE_LEVEL_PADS: { x: number; z: number; r: number; h?: number }[] = [
   { x: 252, z: 250, r: 14 },
   { x: 210, z: 410, r: 14 },
   { x: 354, z: 664, r: 14 },
-] as const;
+  // the stable barns' lakeside terrace on the Mirror Tarn's north bank: an
+  // explicit height keeps it a low shelf above the beach, the downs rising
+  // behind it, instead of a high pad with a sheer rim over the water
+  { x: 299, z: 531, r: 12, h: WATER_LEVEL + 3.2 },
+];
 
 function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   let h = baseHeight(x, z, seed);
@@ -3639,7 +3667,7 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     const bdx = x - 498,
       bdz = z - 308;
     if (bdx * bdx + bdz * bdz < 20 * 20) return null;
-    for (const camp of GALE_CAMP_PADS) {
+    for (const camp of GALE_LEVEL_PADS) {
       const cdx = x - camp.x,
         cdz = z - camp.z;
       if (cdx * cdx + cdz * cdz < 13 * 13) return null;

@@ -8970,6 +8970,12 @@ export const id_ID: EnTranslations = {
       "shoal_scuttler": {
         "name": "Shoal Scuttler"
       },
+      "downs_bandit": {
+        "name": "Downs Bandit"
+      },
+      "wreck_thief": {
+        "name": "Wreckfield Thief"
+      },
       "the_wreck_warden": {
         "name": "The Wreck Warden"
       },

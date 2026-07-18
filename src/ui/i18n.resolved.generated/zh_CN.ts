@@ -8970,6 +8970,12 @@ export const zh_CN: EnTranslations = {
       "shoal_scuttler": {
         "name": "浅滩蟹"
       },
+      "downs_bandit": {
+        "name": "Downs Bandit"
+      },
+      "wreck_thief": {
+        "name": "Wreckfield Thief"
+      },
       "the_wreck_warden": {
         "name": "沉船守卫"
       },

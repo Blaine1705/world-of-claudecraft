@@ -8970,6 +8970,12 @@ export const ru_RU: EnTranslations = {
       "shoal_scuttler": {
         "name": "Отмельный краб"
       },
+      "downs_bandit": {
+        "name": "Downs Bandit"
+      },
+      "wreck_thief": {
+        "name": "Wreckfield Thief"
+      },
       "the_wreck_warden": {
         "name": "Страж Кораблекрушений"
       },
