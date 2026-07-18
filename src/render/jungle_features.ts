@@ -42,9 +42,16 @@ PALM_URLS.forEach((url, i) => {
   );
 });
 
-interface PalmPart {
+export interface PalmPart {
   geometry: THREE.BufferGeometry;
   material: THREE.Material | THREE.Material[];
+}
+
+/** Baked parts for one of the three beach-palm variants (null before the
+ * preload resolves); shared with render/farshore_features.ts. */
+export function bakedPalmVariant(variant: number): PalmPart[] | null {
+  const scene = palmScenes[variant];
+  return scene ? bakePalmParts(scene) : null;
 }
 
 // Bake a preloaded palm GLB into instanceable parts. The shipped models are

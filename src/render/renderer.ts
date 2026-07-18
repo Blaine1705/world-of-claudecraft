@@ -92,6 +92,7 @@ import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { objectDisplayName } from './entity_labels';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
+import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFish, type FishView } from './fish';
 import {
@@ -116,6 +117,7 @@ import {
   urlForcedTier,
 } from './gfx';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
+import { buildHollowGates } from './hollow_gates';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
@@ -177,6 +179,7 @@ import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { buildWater, type WaterView } from './water';
+import { buildWaterFlora } from './water_flora';
 import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
@@ -1518,6 +1521,18 @@ export class Renderer {
     );
     setRenderCategory(props.group, 'props');
     this.scene.add(props.group);
+    // world-spanning modeled dressing, all static: the Duskfall cave mouths,
+    // lily-and-reed water flora on every temperate lake, and the Farshore's
+    // palm strand (each module is a no-op away from its ground)
+    for (const staticFeature of [
+      buildHollowGates(this.sim.cfg.seed),
+      buildWaterFlora(this.sim.cfg.seed),
+      buildFarshoreFeatures(this.sim.cfg.seed),
+    ]) {
+      setRenderCategory(staticFeature.group, 'props');
+      this.scene.add(staticFeature.group);
+      freezeStaticMatrices(staticFeature.group);
+    }
     this.flames = props.flames;
     this.windmillFans = props.windmillFans;
     // Props are baked into world space at build and their update() only toggles

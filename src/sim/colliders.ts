@@ -13,6 +13,7 @@ import {
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
+  PORTALS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
   yumiMazeOriginAt,
@@ -34,6 +35,7 @@ import {
   crossesGardenHedge,
   crossesSealedBorder,
   type Decoration,
+  farshorePalmSpots,
   generateDecorationsInBounds,
   groundHeight,
   reachPalmSpots,
@@ -148,6 +150,33 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, t.x, t.z, 7),
       camGhost: true,
     });
+  // The Duskfall Passage's cave mouths: each portal side wears a modeled
+  // cave (render/hollow_gates.ts); two flank circles and a back circle
+  // shape the walk-in so the only way through the rock is the mouth itself.
+  for (const portal of PORTALS) {
+    for (const side of [portal.a, portal.b]) {
+      const f = Math.atan2(side.landing.x - side.x, side.landing.z - side.z);
+      const fx = Math.sin(f);
+      const fz = Math.cos(f);
+      for (const flank of [1, -1])
+        out.push({
+          type: 'circle',
+          x: side.x + fz * 3.4 * flank + fx * 0.6,
+          z: side.z - fx * 3.4 * flank + fz * 0.6,
+          r: 2.3,
+          cameraTopY: topY(seed, side.x, side.z, 9),
+          camGhost: true,
+        });
+      out.push({
+        type: 'circle',
+        x: side.x - fx * 3.8,
+        z: side.z - fz * 3.8,
+        r: 3.2,
+        cameraTopY: topY(seed, side.x, side.z, 9),
+        camGhost: true,
+      });
+    }
+  }
   // The Willowfen's willows: a trunk collider at the base of every weeping
   // willow, from the same deterministic list the renderer instances the
   // models from (sim/fen_willows.ts).
@@ -165,6 +194,16 @@ function staticWorldColliders(seed: number): Collider[] {
   // from (world.ts). camGhost so the chase cam passes through instead of
   // slamming in when a palm crosses the eye line.
   for (const p of reachPalmSpots(seed))
+    out.push({
+      type: 'circle',
+      x: p.x,
+      z: p.z,
+      r: p.r,
+      cameraTopY: topY(seed, p.x, p.z, 7),
+      camGhost: true,
+    });
+  // ...and the Farshore strand's palms, the same one-list contract
+  for (const p of farshorePalmSpots(seed))
     out.push({
       type: 'circle',
       x: p.x,

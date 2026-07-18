@@ -179,8 +179,10 @@ export const DRAKELANDS_CAMPS: CampDef[] = [
   { mobId: 'ashbone_raider', center: { x: 356, z: 2086 }, radius: 10, count: 3 },
   { mobId: 'ashbone_raider', center: { x: 296, z: 2184 }, radius: 10, count: 3 },
   { mobId: 'ashbone_warcaller', center: { x: 448, z: 2106 }, radius: 8, count: 2 },
-  { mobId: 'emberwing_drake', center: { x: 408, z: 2292 }, radius: 8, count: 1 },
-  { mobId: 'emberwing_drake', center: { x: 284, z: 2268 }, radius: 8, count: 1 },
+  // the dens sit on the probed level shelves at the volcano feet, so the
+  // hoard and egg clutches (render/ember_features.ts) rest on flat ground
+  { mobId: 'emberwing_drake', center: { x: 419, z: 2266 }, radius: 8, count: 1 },
+  { mobId: 'emberwing_drake', center: { x: 302, z: 2258 }, radius: 8, count: 1 },
 ];
 export const DRAKELANDS_OBJECTS: GroundObjectDef[] = [];
 

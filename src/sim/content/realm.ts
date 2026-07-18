@@ -124,14 +124,16 @@ export const REALM_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
   { x: 80, z: 1002, r: 18 }, // the glimmerwisp meadow at the northwest inlet
 ];
 
-// The hidden way in. Side a is the concealed cave in the northwest Thornpeak
-// cliffs (no POI, no map marker: found by exploring); side b is the Duskfall
-// Cave on the realm's southern wall. Landings sit ~5yd outside the opposite
+// The way in. Side a is the crystal cave standing on the flat shelf in the
+// northwest Thornpeak cliffs (moved off the old cliff-face pocket onto
+// probed LEVEL ground, ringed with pink flowers; the mouth is the modeled
+// gate render/hollow_gates.ts draws); side b is the Duskfall tree cave on
+// the realm's southern wall. Landings sit ~5yd outside the opposite
 // trigger so arrivals never bounce straight back.
 export const REALM_PORTALS: PortalDef[] = [
   {
     id: 'duskfall_passage',
-    a: { x: -140, z: 845, landing: { x: -140, z: 841, facing: Math.PI } },
+    a: { x: -170, z: 815, landing: { x: -174.6, z: 817, facing: -1.16 } },
     b: { x: -140, z: 950, landing: { x: -140, z: 955, facing: 0 } },
     radius: 2.0,
     enterText: 'A veil of dusk parts before you, and the Hollow opens ahead.',

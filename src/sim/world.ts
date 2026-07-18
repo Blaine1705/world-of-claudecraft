@@ -910,6 +910,46 @@ export function reachPalmSpots(seed: number): ReachPalm[] {
   return spots;
 }
 
+// The Farshore strand: the same three beach-palm models scattered over the
+// isle's beach apron (the reachPalmSpots idiom): one deterministic list
+// feeds the renderer (render/farshore_features.ts) and the trunk colliders
+// (sim/colliders.ts). Memoized per seed.
+let farshorePalmCache: { seed: number; spots: ReachPalm[] } | null = null;
+
+export function farshorePalmSpots(seed: number): ReachPalm[] {
+  if (farshorePalmCache && farshorePalmCache.seed === seed) return farshorePalmCache.spots;
+  const spots: ReachPalm[] = [];
+  for (let gx = 186; gx <= 556; gx += 9) {
+    for (let gz = -170; gz <= 170; gz += 9) {
+      if (hash2(gx, gz, seed + 5501) > 0.6) continue;
+      const x = gx + (hash2(gx, gz, seed + 5511) - 0.5) * 8;
+      const z = gz + (hash2(gz, gx, seed + 5521) - 0.5) * 8;
+      const land = isleLandness(x, z);
+      if (land < 0.045 || land > 0.22) continue; // the beach apron only
+      const y = terrainHeight(x, z, seed);
+      if (y < WATER_LEVEL + 0.5 || y > 3.8) continue;
+      if (roadDistance(x, z) < 4.5) continue;
+      if (Math.hypot(x - 305, z - 70) < 22) continue; // Gullhaven's lanes
+      if (Math.hypot(x - 290, z - 86) < 12) continue; // the graveyard
+      const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
+      const grand = hash2(x + 3, z, seed + 5531) < 0.08 ? 1.35 : 1;
+      const scale =
+        (PALM_TARGET_H / PALM_NATIVE_H[variant]) * (0.85 + hash2(x, z, seed + 5131) * 0.5) * grand;
+      spots.push({
+        x,
+        z,
+        y: y - 0.15,
+        rot: hash2(z, x, seed + 5141) * Math.PI * 2,
+        variant,
+        scale,
+        r: PALM_TRUNK_R * scale,
+      });
+    }
+  }
+  farshorePalmCache = { seed, spots };
+  return spots;
+}
+
 // The tropical coast: the fen recipe, then every low shore flattened into a
 // broad sand shelf (the beach cap) so the strand runs wide and walkable.
 function applyReachCoast(x: number, z: number, h: number): number {
