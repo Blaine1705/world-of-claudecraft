@@ -3644,6 +3644,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.4.label': '断崖',
   'entities.zones.galecrest.pois.5.label': '沉船滩',
   'entities.zones.galecrest.pois.6.label': '镜湖',
+  'entities.zones.galecrest.pois.7.label': '疾风崖马厩',
   'entities.npcs.warden_coalfast.name': '守望者·煤耐',
   'entities.npcs.warden_coalfast.title': '堡垒指挥官',
   'entities.npcs.warden_coalfast.greeting':

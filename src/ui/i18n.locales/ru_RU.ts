@@ -3828,6 +3828,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.4.label': 'Отвесный Срез',
   'entities.zones.galecrest.pois.5.label': 'Поля Кораблекрушений',
   'entities.zones.galecrest.pois.6.label': 'Зеркальное Озеро',
+  'entities.zones.galecrest.pois.7.label': 'Конюшни Гейлкреста',
   'entities.npcs.warden_coalfast.name': 'Смотритель Хладоуголь',
   'entities.npcs.warden_coalfast.title': 'Комендант редута',
   'entities.npcs.warden_coalfast.greeting':

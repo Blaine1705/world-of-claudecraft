@@ -3780,6 +3780,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.4.label': '절단 절벽',
   'entities.zones.galecrest.pois.5.label': '난파선 벌판',
   'entities.zones.galecrest.pois.6.label': '거울 호수',
+  'entities.zones.galecrest.pois.7.label': '게일크레스트 마구간',
   'entities.npcs.warden_coalfast.name': '숯불 워든',
   'entities.npcs.warden_coalfast.title': '보루 지휘관',
   'entities.npcs.warden_coalfast.greeting':

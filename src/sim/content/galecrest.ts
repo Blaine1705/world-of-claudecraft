@@ -47,6 +47,7 @@ export const GALECREST_ZONE: ZoneDef = {
     { x: 455, z: 535, label: 'The Shear', id: 'the_shear' },
     { x: 340, z: 645, label: 'The Wreckfields', id: 'the_wreckfields' },
     { x: 300, z: 560, label: 'The Mirror Tarn', id: 'the_mirror_tarn' },
+    { x: 378, z: 598, label: 'The Galecrest Stables', id: 'the_galecrest_stables' },
   ],
   welcome:
     'The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.',
@@ -69,9 +70,11 @@ export const GALECREST_ROADS: { x: number; z: number }[][] = [
     { x: 420, z: 360 },
     { x: 432, z: 440 },
     { x: 446, z: 512 },
-    { x: 410, z: 588 },
+    { x: 438, z: 552 },
+    { x: 434, z: 610 },
+    { x: 390, z: 634 },
     { x: 352, z: 636 },
-  ], // Wickharbor -> above the Shear -> the Wreckfields
+  ], // Wickharbor -> above the Shear -> past the stables' east fence -> the Wreckfields
   [
     { x: 420, z: 360 },
     { x: 352, z: 342 },
@@ -176,7 +179,7 @@ export const GALECREST_CAMPS: CampDef[] = [
   { mobId: 'moor_ram', center: { x: 292, z: 312 }, radius: 11, count: 3 },
   { mobId: 'moor_ram', center: { x: 262, z: 360 }, radius: 10, count: 3 },
   { mobId: 'gale_wisp', center: { x: 302, z: 522 }, radius: 11, count: 3 },
-  { mobId: 'gale_wisp', center: { x: 366, z: 570 }, radius: 10, count: 3 },
+  { mobId: 'gale_wisp', center: { x: 312, z: 588 }, radius: 10, count: 3 },
   { mobId: 'shoal_scuttler', center: { x: 444, z: 438 }, radius: 10, count: 3 },
   { mobId: 'shoal_scuttler', center: { x: 386, z: 622 }, radius: 9, count: 2 },
   { mobId: 'the_wreck_warden', center: { x: 330, z: 638 }, radius: 5, count: 1 },
@@ -257,6 +260,8 @@ export const GALECREST_PROPS: ZonePropsDef = {
     // the ship monument: the harbor's memorial to every hull the Wreckfields
     // keep, on the plaza between the market stalls and the piers
     { key: 'shipMonument', x: 458, z: 344, rot: 0.9, scale: 7, r: 3.4, h: 7 },
+    // the golden horse rears beside the stables' race-yard entrance
+    { key: 'goldenHorseStatue', x: 374, z: 591.5, rot: Math.PI, scale: 5.5, r: 2.4, h: 6 },
     // harbor dressing: the great anchor at the pier root, cargo everywhere
     { key: 'hexAnchor', x: 469, z: 349, rot: -0.6, scale: 7 },
     { key: 'hexCrateBig', x: 471, z: 336, rot: 0.4, scale: 5 },

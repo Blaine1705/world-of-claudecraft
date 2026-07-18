@@ -10747,6 +10747,9 @@ export const ko_KR: EnTranslations = {
           },
           "6": {
             "label": "거울 호수"
+          },
+          "7": {
+            "label": "게일크레스트 마구간"
           }
         }
       },

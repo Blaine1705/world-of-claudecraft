@@ -10747,6 +10747,9 @@ export const ru_RU: EnTranslations = {
           },
           "6": {
             "label": "Зеркальное Озеро"
+          },
+          "7": {
+            "label": "Конюшни Гейлкреста"
           }
         }
       },

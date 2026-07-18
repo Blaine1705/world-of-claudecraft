@@ -10747,6 +10747,9 @@ export const zh_TW: EnTranslations = {
           },
           "6": {
             "label": "鏡湖"
+          },
+          "7": {
+            "label": "疾風崖馬廄"
           }
         }
       },

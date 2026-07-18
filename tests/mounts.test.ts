@@ -622,14 +622,23 @@ describe('mount specialty stats', () => {
         ride(sim, target);
         expect(te.mountKey).toBe('shadowjump_toad');
       }
-      const hpBefore = te.hp;
-      meleeSwing(sim.ctx, sim.entities.get(attacker)!, te, 0, null, {});
-      damages.push(hpBefore - te.hp);
+      // Sum several swings: a single swing's rounded 5% cut can collapse to
+      // the same integer at unlucky weapon rolls (world-gen rng position
+      // shifts move the roll), while a summed cut stays strictly separated.
+      let total = 0;
+      for (let i = 0; i < 5; i++) {
+        te.hp = te.maxHp;
+        const hpBefore = te.hp;
+        meleeSwing(sim.ctx, sim.entities.get(attacker)!, te, 0, null, {});
+        total += hpBefore - te.hp;
+      }
+      damages.push(total);
     }
     const [unmounted, mounted] = damages;
     expect(unmounted).toBeGreaterThan(0);
-    // Rounded post-multiplier: within a point of the exact 5% cut, and strictly less.
-    expect(Math.abs(mounted - unmounted * 0.95)).toBeLessThanOrEqual(1);
+    // Rounded post-multiplier: within a point per swing of the exact 5% cut,
+    // and strictly less over the summed swings.
+    expect(Math.abs(mounted - unmounted * 0.95)).toBeLessThanOrEqual(5);
     expect(mounted).toBeLessThan(unmounted);
   });
 });

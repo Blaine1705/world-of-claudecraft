@@ -9150,7 +9150,7 @@ export const en_CA: EnTranslations = {
       "stablemaster_marla": {
         "name": "Marla Hitchen",
         "title": "Stablemaster",
-        "greeting": "Every rider walks in on two legs, {className}. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and Highwatch has no menders to spare for broken bones."
+        "greeting": "Every rider walks in on two legs, {className}. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and the Galecrest wind shows no mercy to a bad seat."
       },
       "warden_fenwick": {
         "name": "Warden Fenwick",
@@ -10477,9 +10477,6 @@ export const en_CA: EnTranslations = {
           },
           "9": {
             "label": "Gravewyrm Sanctum"
-          },
-          "10": {
-            "label": "Highwatch Stables"
           }
         }
       },
@@ -10747,6 +10744,9 @@ export const en_CA: EnTranslations = {
           },
           "6": {
             "label": "The Mirror Tarn"
+          },
+          "7": {
+            "label": "The Galecrest Stables"
           }
         }
       },

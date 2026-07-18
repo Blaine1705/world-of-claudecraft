@@ -1363,8 +1363,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Glimmermere",
       "Wyrmcult Tents",
       "Revenant Fields",
-      "Gravewyrm Sanctum",
-      "Highwatch Stables"
+      "Gravewyrm Sanctum"
     ],
     "welcome": "Captain Thessaly holds the wall at Highwatch - barely.",
     "families": [
@@ -1595,7 +1594,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Old Beacon",
       "The Shear",
       "The Wreckfields",
-      "The Mirror Tarn"
+      "The Mirror Tarn",
+      "The Galecrest Stables"
     ],
     "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.",
     "families": [

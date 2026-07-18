@@ -3799,6 +3799,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.4.label': 'ザ・シアー',
   'entities.zones.galecrest.pois.5.label': 'レックフィールズ',
   'entities.zones.galecrest.pois.6.label': 'ミラーターン',
+  'entities.zones.galecrest.pois.7.label': 'ゲイルクレストの厩舎',
   'entities.npcs.warden_coalfast.name': '守将コールファスト',
   'entities.npcs.warden_coalfast.title': '要塞司令官',
   'entities.npcs.warden_coalfast.greeting':

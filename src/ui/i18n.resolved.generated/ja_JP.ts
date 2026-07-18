@@ -10747,6 +10747,9 @@ export const ja_JP: EnTranslations = {
           },
           "6": {
             "label": "ミラーターン"
+          },
+          "7": {
+            "label": "ゲイルクレストの厩舎"
           }
         }
       },
