@@ -179,7 +179,8 @@ export const GALECREST_CAMPS: CampDef[] = [
   { mobId: 'moor_ram', center: { x: 292, z: 312 }, radius: 11, count: 3 },
   { mobId: 'moor_ram', center: { x: 262, z: 360 }, radius: 10, count: 3 },
   { mobId: 'gale_wisp', center: { x: 302, z: 522 }, radius: 11, count: 3 },
-  { mobId: 'gale_wisp', center: { x: 312, z: 588 }, radius: 10, count: 3 },
+  // west of the stables hamlet, out on the open downs past the Mirror Tarn
+  { mobId: 'gale_wisp', center: { x: 284, z: 578 }, radius: 10, count: 3 },
   { mobId: 'shoal_scuttler', center: { x: 444, z: 438 }, radius: 10, count: 3 },
   { mobId: 'shoal_scuttler', center: { x: 386, z: 622 }, radius: 9, count: 2 },
   { mobId: 'the_wreck_warden', center: { x: 330, z: 638 }, radius: 5, count: 1 },
@@ -188,92 +189,123 @@ export const GALECREST_OBJECTS: GroundObjectDef[] = [];
 
 export const GALECREST_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Wickharbor: grown from a fishing village into the coast's medieval
-  // harbor city: the old timber houses keep their lanes, and the blue-roofed
-  // KayKit quarter (decorProps below) climbs the plateau behind them
+  // Wickharbor: the coast's medieval harbor city, laid out along its four
+  // street spokes (the roads above): every house fronts a street with open
+  // ground around it, the blue-roofed KayKit quarter (decorProps below)
+  // holds the square and the corners, and the walkable stilt piers of the
+  // harbor (sim/gale_harbor.ts) run out over the bay from the dock district
   buildings: [
-    { kind: 'inn', x: 412, z: 352, w: 6, d: 7, rot: 0.4 },
-    { kind: 'house', x: 428, z: 368, w: 5, d: 5, rot: -1.2 },
-    { kind: 'house', x: 410, z: 370, w: 5, d: 5, rot: 2.2 },
-    { kind: 'house', x: 400, z: 378, w: 5, d: 5, rot: 1.2 },
-    { kind: 'house', x: 442, z: 364, w: 5, d: 6, rot: -0.7 },
-    { kind: 'house', x: 436, z: 388, w: 5, d: 5, rot: 2.6 },
-    { kind: 'house', x: 404, z: 394, w: 5, d: 6, rot: 0.3 },
+    // the inn on the south square's west side, timber houses down the roads
+    { kind: 'inn', x: 405, z: 371, w: 6, d: 7, rot: Math.PI },
+    { kind: 'house', x: 376, z: 371, w: 5, d: 5, rot: Math.PI },
+    { kind: 'house', x: 413, z: 381, w: 5, d: 5, rot: 1.62 },
+    { kind: 'house', x: 434, z: 390, w: 5, d: 5, rot: -1.48 },
+    { kind: 'house', x: 417, z: 405, w: 5, d: 6, rot: 1.52 },
+    { kind: 'house', x: 409, z: 394, w: 5, d: 5, rot: 1.68 },
   ],
-  wells: [{ x: 420, z: 362, r: 1.5 }],
+  wells: [{ x: 427, z: 362, r: 1.5 }],
   stalls: [
-    { x: 426, z: 354, rot: 0.6, r: 1.6 },
-    { x: 414, z: 360, rot: -1.4, r: 1.6 },
-    // the harbor market: vendors trading off the pier road, seaward side
-    { x: 462, z: 348, rot: -0.9, r: 1.6 },
-    { x: 460, z: 340, rot: -0.5, r: 1.6 },
-    { x: 456, z: 333, rot: 2.2, r: 1.6 },
+    // the square market, flanking the south road out of the junction
+    { x: 415, z: 373, rot: 0.7, r: 1.6 },
+    { x: 419, z: 352, rot: -2.2, r: 1.6 },
+    // the harbor market: vendors working the boardwalk roots and pier gates
+    { x: 465, z: 349, rot: 1.2, r: 1.6 },
+    { x: 461, z: 362, rot: 0.9, r: 1.6 },
+    { x: 450, z: 366, rot: -0.7, r: 1.6 },
   ],
   crates: [
-    [432, 356],
-    [408, 358],
-    [466, 354],
-    [468, 338],
+    [437, 365],
+    [402, 366],
   ],
   campfires: [
-    [420, 356],
+    [432, 361], // the square's fire, in the lee of the market hall
     [196, 434], // the Windway's waycamp
-    [465, 335], // the dockers' brazier
+    [476, 344], // the dockers' brazier above the north boardwalk
   ],
-  // the harbor: the old cove dock plus the two bay piers of the new dock
-  // district under the Beacon (hw/hd 0: no hut)
-  docks: [
-    { x: 436, z: 372, rot: 2.2, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
-    { x: 470, z: 350, rot: 0.9, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
-    { x: 494, z: 334, rot: 0.6, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } },
-  ],
+  // (no pirate-kit mini docks here: Wickharbor's piers are the walkable
+  // stilt decks in sim/gale_harbor.ts, drawn by render/gale_features.ts)
+  docks: [],
   fences: [
-    // windbreak lines, the only fences that matter here
-    { x1: 406, z1: 346, x2: 434, z2: 346 },
-    { x1: 406, z1: 376, x2: 434, z2: 376 },
+    // Wickharbor's stone garden walls (the KayKit scalloped fence): the
+    // townhall's back wall, the walled churchyard, the West Street edging
+    // by the inn, and the road-side house gardens down the south road
+    { x1: 406, z1: 334, x2: 422, z2: 334, kind: 'stone' },
+    { x1: 394, z1: 336, x2: 394, z2: 348, kind: 'stone' },
+    { x1: 394, z1: 348, x2: 406, z2: 348, kind: 'stone' },
+    { x1: 396, z1: 366, x2: 402, z2: 366, kind: 'stone' },
+    { x1: 408, z1: 366, x2: 414, z2: 366, kind: 'stone' },
+    { x1: 409, z1: 376, x2: 409, z2: 386, kind: 'stone' },
+    { x1: 430, z1: 385, x2: 430, z2: 394, kind: 'stone' },
+    // the Beacon keepers' yard wall on the headland
+    { x1: 505, z1: 304, x2: 513, z2: 304, kind: 'stone' },
+    // the stables' walled south yard: stone runs close the barn yard's open
+    // side, leaving a gateway in line with the race-yard gate (Marla's post)
+    { x1: 332, z1: 606, x2: 360, z2: 606, kind: 'stone' },
+    { x1: 372, z1: 606, x2: 378, z2: 606, kind: 'stone' },
+    // the grooms' hamlet garden, facing the paddock across the lane
+    { x1: 322, z1: 592, x2: 322, z2: 603, kind: 'stone' },
   ],
-  // the blue-roofed medieval quarter, the shipwright's yard, and the moored
-  // fleet (float: hulls ride the waterline at their draft)
+  // the blue-roofed medieval quarter, the dock district, the Beacon's
+  // keepers, and the stables hamlet (float: hulls ride at their draft)
   decorProps: [
-    // the city: the townhall holds the south square, homes climb north
-    { key: 'hexbTownhall', x: 424, z: 332, rot: Math.PI, scale: 8, r: 6.5, h: 15 },
-    { key: 'hexbTavern', x: 444, z: 376, rot: -2.0, scale: 7.5, r: 5.5, h: 11 },
-    { key: 'hexbWorkshop', x: 398, z: 360, rot: Math.PI / 2, scale: 7, r: 6, h: 8 },
-    { key: 'hexbMarket', x: 416, z: 378, rot: Math.PI, scale: 6, r: 4.5, h: 7 },
-    { key: 'hexbHomeA', x: 442, z: 394, rot: 0.8, scale: 7.5, r: 4.5, h: 8 },
-    { key: 'hexbHomeB', x: 432, z: 398, rot: -1.9, scale: 7.5, r: 5, h: 10 },
-    { key: 'hexbHomeA', x: 408, z: 404, rot: 2.4, scale: 7.5, r: 4.5, h: 8 },
-    { key: 'hexbHomeB', x: 394, z: 386, rot: 0.4, scale: 7.5, r: 5, h: 10 },
-    // the dock district: the shipwright's yard on the bay shore
-    { key: 'hexbShipyard', x: 470, z: 342, rot: 0.9, scale: 7, r: 6.5, h: 10 },
-    { key: 'hexbDocks', x: 462, z: 356, rot: 0.9, scale: 6, r: 4, h: 7 },
-    // the moored fleet, riding the bay at anchor
-    { key: 'hexShipBlue', x: 500, z: 358, rot: -1.2, scale: 6, r: 5, h: 9, float: 0.55 },
-    { key: 'hexShipRed', x: 492, z: 368, rot: 2.6, scale: 6, r: 5, h: 9, float: 0.55 },
-    { key: 'hexShipGreen', x: 512, z: 344, rot: 0.4, scale: 6, r: 5, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 486, z: 384, rot: 1.9, scale: 6, r: 5, h: 9, float: 0.55 },
-    // dinghies: two on the water, one hauled out on the shingle
-    { key: 'hexBoat', x: 482, z: 346, rot: 0.7, scale: 6, float: 0.1 },
-    { key: 'hexBoat', x: 472, z: 358, rot: -1.8, scale: 6, float: 0.1 },
-    { key: 'hexBoat', x: 466, z: 349, rot: 2.3, scale: 6 },
-    { key: 'hexBoatrack', x: 464, z: 344, rot: 0.9, scale: 6 },
-    // the ship monument: the harbor's memorial to every hull the Wreckfields
-    // keep, on the plaza between the market stalls and the piers
-    { key: 'shipMonument', x: 458, z: 344, rot: 0.9, scale: 7, r: 3.4, h: 7 },
+    // the square: townhall north, market hall east, tavern by the shore
+    { key: 'hexbTownhall', x: 414, z: 342, rot: 0.5, scale: 8, r: 6.5, h: 15 },
+    { key: 'hexbMarket', x: 433, z: 369, rot: -1.9, scale: 6, r: 4.5, h: 7 },
+    { key: 'hexbTavern', x: 441, z: 380, rot: -1.45, scale: 7.5, r: 5.5, h: 11 },
+    { key: 'hexbWorkshop', x: 390, z: 373, rot: Math.PI, scale: 7, r: 6, h: 8 },
+    // homes fronting the beacon road and the downs road
+    { key: 'hexbHomeA', x: 429, z: 342, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 442, z: 356, rot: -2.5, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: 441, z: 332, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 386, z: 336, rot: -0.28, scale: 7.5, r: 5, h: 10 },
+    // the dock district: the shipwright's yard and the harbormaster's office
+    { key: 'hexbShipyard', x: 468, z: 338, rot: 1.35, scale: 7, r: 6.5, h: 10 },
+    { key: 'hexbDocks', x: 455, z: 357, rot: 1.55, scale: 6, r: 4, h: 7 },
+    // the fleet, moored bow-to-stern along the pier sides (berths verified
+    // against the deck rectangles in sim/gale_harbor.ts)
+    { key: 'hexShipBlue', x: 488.4, z: 349.9, rot: -1.64, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 491.6, z: 361.4, rot: 1.5, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 481.2, z: 368.5, rot: 1.62, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 459.5, z: 370.5, rot: 1.18, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 470.6, z: 375.1, rot: -1.96, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 463.4, z: 384.9, rot: 1.18, scale: 6, r: 5, h: 9, float: 0.55 },
+    // the Beacon dock's pair, alongside the lighthouse pier
+    { key: 'hexShipBlue', x: 518.7, z: 318.9, rot: 1.15, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 521.8, z: 334.1, rot: -1.99, scale: 6, r: 5, h: 9, float: 0.55 },
+    // dinghies: two on the water, one hauled out by the rack on the shingle
+    { key: 'hexBoat', x: 476, z: 351, rot: 0.7, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 482, z: 357, rot: -1.8, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 485, z: 339, rot: 2.3, scale: 6 },
+    { key: 'hexBoatrack', x: 478, z: 336, rot: 0.9, scale: 6 },
+    // the ship monument on the harbor plaza, the anchor at its side
+    { key: 'shipMonument', x: 452, z: 346, rot: 0.9, scale: 7, r: 3.4, h: 7 },
+    { key: 'hexAnchor', x: 459, z: 344, rot: -0.6, scale: 7 },
+    // harbor cargo around the office and the stalls
+    { key: 'hexCrateBig', x: 457, z: 362, rot: 0.4, scale: 5 },
+    { key: 'hexCrateOpen', x: 447, z: 362, rot: 1.7, scale: 5 },
+    { key: 'hexSack', x: 462, z: 357, rot: 2.8, scale: 5 },
+    { key: 'hexSack', x: 437, z: 372, rot: 0.9, scale: 5 },
+    { key: 'hexCrateBig', x: 446, z: 383, rot: 2.1, scale: 5 },
+    // the Beacon's keepers: cottage on the road, store and home on the head
+    { key: 'hexbHomeA', x: 483, z: 328, rot: -0.9, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbWorkshop', x: 508, z: 312, rot: -2.2, scale: 6.5, r: 6, h: 8 },
+    { key: 'hexbHomeB', x: 502, z: 298, rot: 2.7, scale: 7, r: 5, h: 10 },
     // the golden horse rears beside the stables' race-yard entrance
     { key: 'goldenHorseStatue', x: 374, z: 591.5, rot: Math.PI, scale: 5.5, r: 2.4, h: 6 },
-    // harbor dressing: the great anchor at the pier root, cargo everywhere
-    { key: 'hexAnchor', x: 469, z: 349, rot: -0.6, scale: 7 },
-    { key: 'hexCrateBig', x: 471, z: 336, rot: 0.4, scale: 5 },
-    { key: 'hexCrateOpen', x: 464, z: 331, rot: 1.7, scale: 5 },
-    { key: 'hexSack', x: 467, z: 356, rot: 2.8, scale: 5 },
-    { key: 'hexSack', x: 430, z: 358, rot: 0.9, scale: 5 },
-    { key: 'hexCrateBig', x: 446, z: 380, rot: 2.1, scale: 5 },
+    // the grooms' hamlet on the downs west of the paddock: two long barns,
+    // the grooms' cottage, and the farrier's shop off the south fence
+    { key: 'hexbStables', x: 315, z: 570, rot: Math.PI / 2, scale: 7, r: 5.5, h: 9 },
+    { key: 'hexbStables', x: 315, z: 584, rot: Math.PI / 2, scale: 7, r: 5.5, h: 9 },
+    { key: 'hexbHomeA', x: 317, z: 598, rot: 0.6, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbWorkshop', x: 346, z: 620, rot: -0.4, scale: 6, r: 5, h: 8 },
+    { key: 'hexHaybale', x: 323, z: 576, rot: 0.7, scale: 5 },
+    { key: 'hexHaybale', x: 322, z: 589, rot: 2.1, scale: 5 },
+    { key: 'hexTrough', x: 326, z: 571, rot: Math.PI / 2, scale: 5 },
   ],
   // an old watch ruin on the Howling Downs, and the beacon's fallen forecourt
   ruinRings: [
     { x: 288, z: 328, ringR: 7, columns: 5 },
-    { x: 492, z: 316, ringR: 6, columns: 4 },
+    { x: 486, z: 300, ringR: 6, columns: 4 },
   ],
   graveyards: [{ x: 400, z: 342 }],
 };

@@ -80,7 +80,7 @@
       "maxTex": 512
     },
     {
-      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/units/blue/ship_blue_full.gltf",
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/units/blue/ship_blue_accent.gltf",
       "out": "models/biome/hex_ship_blue.glb",
       "type": "static",
       "maxTex": 512
@@ -142,6 +142,12 @@
     {
       "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/trough.gltf",
       "out": "models/biome/hex_trough.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/neutral/fence_stone_straight.gltf",
+      "out": "models/biome/hexn_fence_stone.glb",
       "type": "static",
       "maxTex": 512
     }

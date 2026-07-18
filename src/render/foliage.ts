@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { STABLE_PADDOCK } from '../sim/content/mounts';
 import { REALM_FLOWER_MEADOWS } from '../sim/content/realm';
 import {
   CAMPS,
@@ -10,6 +11,7 @@ import {
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
+import { galeDeckSurface } from '../sim/gale_harbor';
 import type { BiomeId } from '../sim/types';
 import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import type { Decoration } from '../sim/world';
@@ -1319,6 +1321,30 @@ const DRESS_SCALE: Record<DressKind, [number, number]> = {
   mushroom: [0.9, 0.8],
 };
 
+// The Galecrest stable paddock is a worked dirt yard: no grass, flowers, or
+// scrub inside the fences, while the downs immediately around it bloom hard
+// (the flower fields ringing the yard).
+function inStableYard(x: number, z: number): boolean {
+  return (
+    x > STABLE_PADDOCK.x1 - 1.5 &&
+    x < STABLE_PADDOCK.x2 + 1.5 &&
+    z > STABLE_PADDOCK.z1 - 1.5 &&
+    z < STABLE_PADDOCK.z2 + 1.5
+  );
+}
+
+function stableMeadowBand(x: number, z: number): boolean {
+  const dx = Math.max(STABLE_PADDOCK.x1 - x, 0, x - STABLE_PADDOCK.x2);
+  const dz = Math.max(STABLE_PADDOCK.z1 - z, 0, z - STABLE_PADDOCK.z2);
+  const dist = Math.hypot(dx, dz);
+  return dist > 1.5 && dist <= 18;
+}
+
+// nothing sprouts up through Wickharbor's boardwalk and pier planks
+function onHarborDeck(x: number, z: number, seed: number): boolean {
+  return galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity;
+}
+
 function tooSteep(x: number, z: number, seed: number): boolean {
   const hx =
     terrainHeight(x + GRASS_SLOPE_EPS, z, seed) - terrainHeight(x - GRASS_SLOPE_EPS, z, seed);
@@ -1362,6 +1388,8 @@ function generateDressing(seed: number): DressingSpot[] {
       if (terrainHeight(x, z, seed) < WATER_LEVEL + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
       if (isInSowfieldShell(x, z)) continue; // keep bushes/plants off the football ground
+      // no scrub in the worked stable yard or up through the harbor decks
+      if (biome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
       const kind = dressKindFor(biome, hashAt(gx, gz, 44));
       const [sMin, sRange] = DRESS_SCALE[kind];
       out.push({ x, z, kind, scale: (sMin + hashAt(gx, gz, 45) * sRange) * scaleBoost });
@@ -1802,11 +1830,19 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
     const fieldChunk = FIELD_BIOMES.has(chunkBiome);
+    // a gale chunk that reaches the stable paddock's bloom band needs a
+    // field-sized buffer, or the band's drifts hit the cap and vanish
+    const dxs = Math.max(STABLE_PADDOCK.x1 - chunk.centerX, 0, chunk.centerX - STABLE_PADDOCK.x2);
+    const dzs = Math.max(STABLE_PADDOCK.z1 - chunk.centerZ, 0, chunk.centerZ - STABLE_PADDOCK.z2);
+    const stableBandChunk = chunkBiome === 'gale' && Math.hypot(dxs, dzs) < 18 + chunkHalfDiag;
     // the Evergarden's parterre beds are dense solid plantings edge to edge,
     // plus meadow drifts, so its chunks carry the largest flower buffer
     const flowerCap = Math.max(
       8,
-      Math.floor(maxChunkCount * (chunkBiome === 'garden' ? 1.2 : fieldChunk ? 0.45 : 0.14)),
+      Math.floor(
+        maxChunkCount *
+          (chunkBiome === 'garden' ? 1.2 : fieldChunk || stableBandChunk ? 0.45 : 0.14),
+      ),
     );
     const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
     fm.userData.renderCategory = 'grass';
@@ -1867,6 +1903,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (nearHub) continue;
         if (roadDistance(x, z) < 3.2) continue;
         if (isInSowfieldShell(x, z)) continue; // the Sowfield is a mown pitch, not meadow
+        // the stable yard is worked dirt; deck planks grow nothing through
+        if (tuftBiome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
         const s = (lush ? 0.55 : 0.45) + r * (lush ? 1.1 : 1);
         q.setFromAxisAngle(up, r * 12.4);
         m.compose(v.set(x, h, z), q, sv.set(s, s, s));
@@ -1892,8 +1930,18 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         // meadows bloom harder than hash fields: their ground carries fewer
         // grass tufts (each tuft is a flower anchor), so density compensates
         const inField = fieldChunk && fieldCell < 0.42;
-        const flowerChance = inMeadow ? 0.9 : inField ? 0.6 : fieldChunk ? 0.05 : 0.11;
-        const reps = inMeadow ? 4 : inField ? 3 : 1;
+        // the downs ringing the stable paddock bloom into full flower fields
+        const stableBloom = tuftBiome === 'gale' && stableMeadowBand(x, z);
+        const flowerChance = inMeadow
+          ? 0.9
+          : stableBloom
+            ? 0.65
+            : inField
+              ? 0.6
+              : fieldChunk
+                ? 0.05
+                : 0.11;
+        const reps = inMeadow ? 4 : stableBloom ? 3 : inField ? 3 : 1;
         if (hashAt(i, j, 6) < flowerChance) {
           for (let rep = 0; rep < reps && fn < flowerCap; rep++) {
             const fx = x + (hashAt(i + rep, j, 7) - 0.5) * (1.4 + rep * 1.3);
@@ -1902,6 +1950,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
             if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
               continue;
             }
+            // a band-edge bloom must not stray into the worked yard
+            if (tuftBiome === 'gale' && inStableYard(fx, fz)) continue;
             const fs = 0.55 + hashAt(i + rep, j + rep, 9) * 0.5;
             q.setFromAxisAngle(up, hashAt(i, j, 10 + rep) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));

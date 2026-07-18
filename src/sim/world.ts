@@ -20,6 +20,7 @@ import {
   ZONES,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
+import { galeDeckSurface } from './gale_harbor';
 import { fbm2, hash2, noise2 } from './rng';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
@@ -2607,7 +2608,14 @@ export function stableFlattenWeight(x: number, z: number): number {
 // the plank top as a raised walkable surface. Return the matching absolute
 // surface height, or -Infinity outside every deck footprint.
 function dockSurfaceHeight(x: number, z: number, seed: number): number {
-  let surface = -Infinity;
+  // Wickharbor's stilt piers and boardwalk ride the same raised-surface arm
+  // (an absolute plank plane, never a terrain lift; see sim/gale_harbor.ts).
+  let surface = galeDeckSurface(
+    x,
+    z,
+    (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
+    WATER_LEVEL,
+  );
   for (const dock of getActiveWorldContent().props.docks) {
     const local = dockLocalPoint(dock, x, z);
     if (dockSectionAtLocal(local.x, local.z) < 0) continue;
@@ -3576,7 +3584,7 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   // The Sowfield stadium footprint grows no trees or rocks (hash-based
   // placement, so skipping here shifts no other decoration or rng draw).
   if (isInSowfieldShell(x, z)) return null;
-  // The Highwatch paddock is a worked yard and race course. Keep the same
+  // The Galecrest paddock is a worked yard and race course. Keep the same
   // deterministic decoration field out of its apron so no tree becomes an
   // invisible obstacle across a jump line.
   if (
@@ -3585,6 +3593,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     z > STABLE_PADDOCK.z1 - 1 &&
     z < STABLE_PADDOCK.z2 + 1
   ) {
+    return null;
+  }
+  // No rock or stunted tree grows up through Wickharbor's boardwalk planks.
+  if (galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
     return null;
   }
   for (const zone of ZONES) {

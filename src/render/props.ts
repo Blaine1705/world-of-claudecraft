@@ -196,6 +196,9 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexCrateOpen: { url: '/models/biome/hex_crate_open.glb', kit: 'khex' },
   hexHaybale: { url: '/models/biome/hex_haybale.glb', kit: 'khex' },
   hexTrough: { url: '/models/biome/hex_trough.glb', kit: 'khex' },
+  // the low scalloped stone wall (fences with kind 'stone'; length runs
+  // along local +z in the authored piece)
+  hexFenceStone: { url: '/models/biome/hexn_fence_stone.glb', kit: 'khex' },
   // the Galecrest monuments (maintainer-authored generated models): the
   // ship memorial on the Wickharbor dock plaza, the golden horse for the
   // stable yard
@@ -256,6 +259,7 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'dockPlatform',
   'rowboat',
   'graveRound',
+  'hexFenceStone',
   'timberPillar',
   'crateWooden',
   'barrel',
@@ -1080,12 +1084,18 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- town fences: village fence module repeated along the run ------------
+  // (kind 'stone': the low scalloped KayKit wall instead of the wood rail;
+  // its authored length runs along local +z, the wood rail's along local +x)
+  const STONE_WALL_SCALE = 4.2;
+  const STONE_MODULE_LEN = 1.155 * STONE_WALL_SCALE;
   for (const f of getActiveWorldContent().props.fences) {
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
-    const n = Math.max(1, Math.round(len / 2.35));
+    const stone = f.kind === 'stone';
+    const n = Math.max(1, Math.round(len / (stone ? STONE_MODULE_LEN : 2.35)));
     const dirx = (f.x2 - f.x1) / len,
       dirz = (f.z2 - f.z1) / len;
-    const yaw = Math.atan2(-dirz, dirx); // module length runs along local +x
+    // module length runs along local +x (wood) or local +z (stone)
+    const yaw = stone ? Math.atan2(dirx, dirz) : Math.atan2(-dirz, dirx);
     for (let i = 0; i < n; i++) {
       const x0 = f.x1 + (f.x2 - f.x1) * (i / n),
         z0 = f.z1 + (f.z2 - f.z1) * (i / n);
@@ -1096,6 +1106,20 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       const pitch = Math.atan2(g1 - g0, len / n);
       const mx = (x0 + x1) / 2,
         mz = (z0 + z1) / 2;
+      if (stone) {
+        // stretch the module to close the run exactly; sink a touch so the
+        // base course follows sloped ground without floating
+        const segScale = (len / n / STONE_MODULE_LEN) * STONE_WALL_SCALE;
+        addInstance(
+          'hexFenceStone',
+          mx,
+          (g0 + g1) / 2 - 0.12,
+          mz,
+          new THREE.Euler(-pitch, yaw, 0, 'YXZ'),
+          [STONE_WALL_SCALE, STONE_WALL_SCALE, segScale],
+        );
+        continue;
+      }
       const sy = 2.9 + (propRand(mx, mz, 1) - 0.5) * 0.5;
       addInstance('fence', mx, (g0 + g1) / 2 - 0.05, mz, new THREE.Euler(0, yaw, pitch, 'YZX'), [
         3.0,
