@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { GALECREST_FLOWER_MEADOWS } from '../sim/content/galecrest';
 import { STABLE_PADDOCK } from '../sim/content/mounts';
 import { REALM_FLOWER_MEADOWS } from '../sim/content/realm';
 import {
@@ -1859,14 +1860,20 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const i1 = Math.ceil(maxX / step) + 1;
     const j0 = Math.floor(minZ / step) - 1;
     const j1 = Math.ceil(maxZ / step) + 1;
-    // authored flower meadows overlapping this chunk (dusk realm only)
-    const meadowsInChunk =
+    // authored flower meadows overlapping this chunk (the dusk realm's
+    // meadow bowls, and the Galecrest's house gardens + tarn shore rings)
+    const meadowSource =
       chunkBiome === 'dusk'
-        ? REALM_FLOWER_MEADOWS.filter(
-            (mw) =>
-              mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
-          )
-        : [];
+        ? REALM_FLOWER_MEADOWS
+        : chunkBiome === 'gale'
+          ? GALECREST_FLOWER_MEADOWS
+          : null;
+    const meadowsInChunk = meadowSource
+      ? meadowSource.filter(
+          (mw) =>
+            mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
+        )
+      : [];
 
     for (let i = i0; i <= i1 && n < chunkCap; i++) {
       for (let j = j0; j <= j1 && n < chunkCap; j++) {

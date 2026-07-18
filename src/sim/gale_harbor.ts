@@ -50,12 +50,17 @@ export const GALE_HARBOR_DECKS: GaleDeckDef[] = [
   { x: 479.9, z: 362.6, rot: 1.45, hl: 13, hw: 2.0, ax: 465, az: 354 },
   // the deepwater pier off the south shore, reaching the drowned channel
   { x: 464.1, z: 378.0, rot: 1.3, hl: 12, hw: 2.0, ax: 451, az: 375 },
-  // the shore boardwalk, laid right along the waterline (never inland); the
-  // south stretch ramps gently up to the higher southern shore
+  // the shore boardwalk, laid right along the waterline (never inland)
   { x: 467.5, z: 358.0, rot: -0.124, hl: 8.1, hw: 1.7, ax: 465, az: 354 },
   { x: 459.75, z: 371.25, rot: -0.91, hl: 8.6, hw: 1.7, ax: 465, az: 354, ax2: 451, az2: 375 },
-  // the Beacon dock, running seaward off the headland's low shore bench
-  { x: 520.1, z: 328.1, rot: 0.785, hl: 10, hw: 2.2, ax: 511, az: 320 },
+  // the two wooden stairs climbing the bluff from the boardwalk to level
+  // land (steep ramps; the renderer draws them as stepped treads)
+  { x: 462.7, z: 361.7, rot: -1.648, hl: 3.3, hw: 1.3, ax: 465, az: 354, ax2: 458, az2: 361 },
+  { x: 464.5, z: 352.75, rot: -1.816, hl: 3.1, hw: 1.3, ax: 465, az: 354, ax2: 460, az2: 352 },
+  // the Beacon dock: long and low off the headland's bench at the
+  // waterline, with its own stair climbing the slope to the lighthouse lawn
+  { x: 524.4, z: 331.4, rot: 0.785, hl: 14, hw: 2.2, ax: 514, az: 321 },
+  { x: 509.2, z: 317.5, rot: 0.785, hl: 5.8, hw: 1.4, ax: 504, az: 314, ax2: 514, az2: 321 },
 ];
 
 /**

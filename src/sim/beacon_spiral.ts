@@ -27,10 +27,11 @@ export const BEACON_SPIRAL = {
   /** deck heights of the two balconies (flight tops) */
   deck1: 9.5,
   deck2: 19,
-  /** the climb's angular plan, unwrapped from the foot (fractions of 2PI) */
-  flight1End: Math.PI * 2 * 0.34,
-  balcony1End: Math.PI * 2 * 0.5,
-  flight2End: Math.PI * 2 * 0.84,
+  /** the climb's angular plan, unwrapped from the foot (fractions of 2PI);
+   * the top balcony takes the largest share, wrapping far around the tower */
+  flight1End: Math.PI * 2 * 0.3,
+  balcony1End: Math.PI * 2 * 0.42,
+  flight2End: Math.PI * 2 * 0.76,
   balcony2End: Math.PI * 2 * 0.98,
   /** balcony outer radius (both balconies reach wider than the stair) */
   balconyOut: 7.2,

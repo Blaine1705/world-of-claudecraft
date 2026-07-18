@@ -130,6 +130,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/biome/hex_boat.glb": "/media/models/biome/hex_boat.988c943b64ad.glb",
   "models/biome/hex_boatrack.glb": "/media/models/biome/hex_boatrack.6e23cd7ee2aa.glb",
   "models/biome/hex_bridge.glb": "/media/models/biome/hex_bridge.d23af55f7680.glb",
+  "models/biome/hex_cannon.glb": "/media/models/biome/hex_cannon.eac9b81da5b1.glb",
   "models/biome/hex_cannonballs.glb": "/media/models/biome/hex_cannonballs.686bc7848c67.glb",
   "models/biome/hex_castle.glb": "/media/models/biome/hex_castle.ebbd80001d3e.glb",
   "models/biome/hex_church.glb": "/media/models/biome/hex_church.0558f98eb5a4.glb",

@@ -4,8 +4,8 @@
 // the downs, plus the grey stone stair the sim's beaconSpiralLift makes
 // walkable, hugging the column up to the C balcony), the stilt piers and
 // boardwalk of Wickharbor's harbor (drawn from the SAME sim/gale_harbor.ts
-// decks the player walks), sea stacks standing off the Shear, and the ribs
-// of old hulls half-buried on the Wreckfields. Same contract as the sibling
+// decks the player walks, with steep ramps drawn as stepped stairs), and
+// the ribs of old hulls half-buried on the Wreckfields. Same contract as the sibling
 // realm modules: build once, update(time) turns the beacon.
 import * as THREE from 'three';
 import { BEACON_SPIRAL, beaconSpiralLift } from '../sim/beacon_spiral';
@@ -47,15 +47,6 @@ export interface GaleFeaturesView {
 }
 
 const BEACON = { x: 498, z: 308 };
-// stacks stand in the water off the Shear's cliffs
-const SEA_STACKS = [
-  { x: 496, z: 512, r: 4.2, h: 22 },
-  { x: 510, z: 546, r: 3.4, h: 17 },
-  { x: 488, z: 576, r: 5.0, h: 26 },
-  { x: 522, z: 492, r: 2.8, h: 13 },
-  { x: 504, z: 608, r: 3.8, h: 19 },
-  { x: 474, z: 616, r: 3.0, h: 15 },
-] as const;
 // hull ribs on the Wreckfields beach: position, heading, rib count, size
 const WRECKS = [
   { x: 322, z: 656, rot: 0.7, ribs: 7, r: 5.2 },
@@ -105,7 +96,7 @@ function beamBetween(
   const len = Math.hypot(lenH, dy);
   if (len < 1e-4) return;
   const g = new THREE.BoxGeometry(w, h, len + w * 0.6);
-  g.rotateX(Math.atan2(dy, lenH));
+  g.rotateX(-Math.atan2(dy, lenH));
   g.rotateY(Math.atan2(dx, dz));
   g.translate((p0.x + p1.x) / 2, (p0.y + p1.y) / 2, (p0.z + p1.z) / 2);
   parts.push(g.toNonIndexed());
@@ -275,13 +266,15 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
       const pzu = -dirx;
       const yAt = (along: number): number => galeDeckSurfaceAt(d, along, terrain, WATER_LEVEL);
       const ramp = Math.atan2(yAt(d.hl) - yAt(-d.hl), d.hl * 2);
-      // plank courses laid across the walking direction
-      const step = 1.05;
+      const stair = Math.abs(ramp) > 0.25;
+      // plank courses laid across the walking direction; a steep ramp is
+      // drawn as stepped stair treads instead, each flat at its own height
+      const step = stair ? 0.55 : 1.05;
       for (let along = -d.hl + step / 2; along < d.hl; along += step) {
         const cx = d.x + dirx * along;
         const cz = d.z + dirz * along;
-        const g = new THREE.BoxGeometry(d.hw * 2, 0.16, 0.88);
-        g.rotateX(ramp);
+        const g = new THREE.BoxGeometry(d.hw * 2, stair ? 0.2 : 0.16, stair ? 0.62 : 0.88);
+        if (!stair) g.rotateX(-ramp);
         g.rotateY(d.rot);
         g.translate(cx, yAt(along) - 0.08, cz);
         planks.push(g.toNonIndexed());
@@ -318,30 +311,6 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
     }
     group.add(mergeBoxes(planks, wood));
     group.add(mergeBoxes(posts, postWood));
-  }
-
-  // --- the sea stacks off the Shear ---
-  {
-    const stackGeo = new THREE.CylinderGeometry(0.55, 1, 1, 7);
-    const stackMat = mat(0x74787c, 0.95);
-    const mesh = new THREE.InstancedMesh(stackGeo.toNonIndexed(), stackMat, SEA_STACKS.length);
-    const m = new THREE.Matrix4();
-    const q = new THREE.Quaternion();
-    const up = new THREE.Vector3(0, 1, 0);
-    const v = new THREE.Vector3();
-    const sc = new THREE.Vector3();
-    SEA_STACKS.forEach((s, i) => {
-      const bed = Math.min(terrainHeight(s.x, s.z, seed), WATER_LEVEL - 1);
-      q.setFromAxisAngle(up, hash2(s.x, s.z, seed + 7301) * Math.PI * 2);
-      v.set(s.x, bed + s.h / 2, s.z);
-      sc.set(s.r, s.h, s.r);
-      mesh.setMatrixAt(i, m.compose(v, q, sc));
-    });
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    mesh.computeBoundingSphere();
-    group.add(mesh);
   }
 
   // --- the Wreckfields: hull ribs arcing out of the shingle ---

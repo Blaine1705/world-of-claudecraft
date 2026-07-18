@@ -2763,8 +2763,42 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       h = h * blend + ch * (1 - blend);
     }
   }
+  // The Galecrest's shaping, over the finished height like the bed pads:
+  if (x > 180 && x < 540 && z > 180 && z < 700) {
+    // level pads under the raider encampments (the built-in camp flatten
+    // only reaches the mob spawn ring; the tents pitch wider than that)
+    for (const pad of GALE_CAMP_PADS) {
+      const dx = x - pad.x,
+        dz = z - pad.z;
+      const padGate = pad.r + 5;
+      if (dx * dx + dz * dz >= padGate * padGate) continue;
+      const d = Math.sqrt(dx * dx + dz * dz);
+      const ch = terrainHeightUnpadded(pad.x, pad.z, seed);
+      const blend = smoothstep(pad.r, pad.r + 5, d);
+      h = h * blend + ch * (1 - blend);
+    }
+    // the Mirror Tarn's bathing shore: pull the carved banks down onto one
+    // long gentle sandy ramp, so the water is waded into, never fallen into
+    const tdx = x - 300,
+      tdz = z - 560;
+    if (tdx * tdx + tdz * tdz < 32 * 32) {
+      const d = Math.sqrt(tdx * tdx + tdz * tdz);
+      const target = WATER_LEVEL - 2.2 + smoothstep(5, 26, d) * 8.2;
+      const w = 1 - smoothstep(26, 32, d);
+      if (h > target) h = h * (1 - w) + target * w;
+    }
+  }
   return h;
 }
+
+// The raider encampments' level ground (terrainHeight above): each pad
+// blends the finished height to the camp center's, wide enough that every
+// tent, tower, and palisade run sits flush instead of sinking into a rise.
+const GALE_CAMP_PADS = [
+  { x: 252, z: 250, r: 14 },
+  { x: 210, z: 410, r: 14 },
+  { x: 354, z: 664, r: 14 },
+] as const;
 
 function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   let h = baseHeight(x, z, seed);
@@ -3559,10 +3593,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     if (r > 0.3) return null;
     kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
   } else if (biome === 'gale') {
-    // wind-scoured downs: rock outcrops everywhere, trees almost never
-    // (what survives grows stunted in the render dressing)
+    // wind-scoured downs: rock outcrops everywhere, and hardy windbreak
+    // trees scattered across the open land between them
     if (r > 0.22) return null;
-    kind = r < 0.04 ? 'tree' : r < 0.07 ? 'tree2' : 'rock';
+    kind = r < 0.09 ? 'tree' : r < 0.14 ? 'tree2' : 'rock';
   } else {
     if (r > 0.44) return null;
     kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
@@ -3598,6 +3632,18 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   // No rock or stunted tree grows up through Wickharbor's boardwalk planks.
   if (galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
     return null;
+  }
+  // The Old Beacon's lawn stays clear (nothing crowds the lighthouse stair),
+  // and the raider encampments keep trees and rocks off their level pads.
+  {
+    const bdx = x - 498,
+      bdz = z - 308;
+    if (bdx * bdx + bdz * bdz < 20 * 20) return null;
+    for (const camp of GALE_CAMP_PADS) {
+      const cdx = x - camp.x,
+        cdz = z - camp.z;
+      if (cdx * cdx + cdz * cdz < 13 * 13) return null;
+    }
   }
   for (const zone of ZONES) {
     const dx = x - zone.hub.x,

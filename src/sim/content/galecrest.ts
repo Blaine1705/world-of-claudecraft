@@ -4,10 +4,9 @@
 // the shared edge (no teleport; the border ridge is real ground, opened at
 // westPassZ). Salt-silvered downs roll to grey sea cliffs; the fishing town
 // of Wickharbor keeps its boats in the lee of the harbor cove; the Old
-// Beacon burns on the highest head, sea stacks stand off the Shear, and the
-// Wreckfields beach its bones in the north. Terrain: the GALE_* tables in
-// world.ts; the lighthouse, sea stacks, and wreck ribs live in
-// render/gale_features.ts.
+// Beacon burns on the highest head, and the Wreckfields beach their bones
+// in the north. Terrain: the GALE_* tables in world.ts; the lighthouse,
+// harbor decks, and wreck ribs live in render/gale_features.ts.
 
 import type {
   CampDef,
@@ -91,6 +90,20 @@ export const GALECREST_ROADS: { x: number; z: number }[][] = [
     { x: 396, z: 698 },
   ], // the Wreckfields -> up to the Garden Gate (onto the lawns)
 ] as { x: number; z: number }[][];
+
+// Authored always-bloom flower circles (render/foliage.ts reads these the
+// way the dusk realm reads REALM_FLOWER_MEADOWS): the little fenced gardens
+// behind the beacon-road houses, and the Mirror Tarn's flowering banks.
+export const GALECREST_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
+  { x: 428.5, z: 340, r: 2.2 },
+  { x: 444, z: 354, r: 2.2 },
+  { x: 439, z: 331, r: 2 },
+  { x: 471, z: 308, r: 2.2 },
+  { x: 286, z: 556, r: 7 },
+  { x: 310, z: 548, r: 7 },
+  { x: 306, z: 572, r: 7 },
+  { x: 290, z: 572, r: 7 },
+];
 
 // No portals: walked into through the Windway.
 export const GALECREST_PORTALS: PortalDef[] = [];
@@ -178,17 +191,18 @@ export const GALECREST_ITEMS: Record<string, ItemDef> = {};
 export const GALECREST_CAMPS: CampDef[] = [
   { mobId: 'moor_ram', center: { x: 292, z: 312 }, radius: 11, count: 3 },
   { mobId: 'moor_ram', center: { x: 262, z: 360 }, radius: 10, count: 3 },
-  { mobId: 'gale_wisp', center: { x: 302, z: 522 }, radius: 11, count: 3 },
-  // west of the stables hamlet, out on the open downs past the Mirror Tarn
-  { mobId: 'gale_wisp', center: { x: 284, z: 578 }, radius: 10, count: 3 },
-  { mobId: 'shoal_scuttler', center: { x: 444, z: 438 }, radius: 10, count: 3 },
-  { mobId: 'shoal_scuttler', center: { x: 386, z: 622 }, radius: 9, count: 2 },
+  { mobId: 'topiary_wolf', center: { x: 302, z: 522 }, radius: 11, count: 3 },
+  // the pack hunts the open downs northwest of the Mirror Tarn, well clear
+  // of the hamlet and the stables
+  { mobId: 'topiary_wolf', center: { x: 266, z: 546 }, radius: 8, count: 3 },
+  { mobId: 'hedge_gnome', center: { x: 444, z: 438 }, radius: 10, count: 3 },
+  { mobId: 'hedge_gnome', center: { x: 386, z: 622 }, radius: 9, count: 2 },
   { mobId: 'the_wreck_warden', center: { x: 330, z: 638 }, radius: 5, count: 1 },
   // the outskirt raider camps (appended: camp order is world-gen rng order):
-  // whatever raised these tents is gone, and the wind moved in behind them
-  { mobId: 'gale_wisp', center: { x: 252, z: 250 }, radius: 4, count: 2 },
-  { mobId: 'gale_wisp', center: { x: 210, z: 410 }, radius: 4, count: 2 },
-  { mobId: 'moor_ram', center: { x: 250, z: 320 }, radius: 5, count: 2 },
+  // hedge gnomes squat in whatever the raiders left behind
+  { mobId: 'hedge_gnome', center: { x: 252, z: 250 }, radius: 4, count: 2 },
+  { mobId: 'hedge_gnome', center: { x: 210, z: 410 }, radius: 4, count: 2 },
+  { mobId: 'hedge_gnome', center: { x: 354, z: 664 }, radius: 4, count: 2 },
 ];
 export const GALECREST_OBJECTS: GroundObjectDef[] = [];
 
@@ -241,6 +255,16 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { x1: 408, z1: 366, x2: 414, z2: 366, kind: 'stone' },
     { x1: 409, z1: 376, x2: 409, z2: 386, kind: 'stone' },
     { x1: 430, z1: 385, x2: 430, z2: 394, kind: 'stone' },
+    // little fenced flower gardens behind the beacon-road houses (wood
+    // rails; the matching bloom circles live in GALECREST_FLOWER_MEADOWS)
+    { x1: 424, z1: 337, x2: 433, z2: 337 },
+    { x1: 424, z1: 337, x2: 424, z2: 344 },
+    { x1: 438, z1: 351, x2: 447, z2: 351 },
+    { x1: 447, z1: 351, x2: 447, z2: 360 },
+    { x1: 436, z1: 327, x2: 443, z2: 327 },
+    { x1: 436, z1: 327, x2: 436, z2: 336 },
+    { x1: 466, z1: 305, x2: 475, z2: 305 },
+    { x1: 475, z1: 305, x2: 475, z2: 313 },
     // the Beacon keepers' yard wall on the headland
     { x1: 505, z1: 304, x2: 513, z2: 304, kind: 'stone' },
     // the stables' walled south yard: stone runs close the barn yard's open
@@ -255,8 +279,8 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { x1: 238, z1: 242, x2: 242, z2: 251, kind: 'palisade' },
     { x1: 198, z1: 398, x2: 212, z2: 395, kind: 'palisade' },
     { x1: 194, z1: 403, x2: 197, z2: 412, kind: 'palisade' },
-    { x1: 242, z1: 308, x2: 256, z2: 306, kind: 'palisade' },
-    { x1: 237, z1: 312, x2: 240, z2: 321, kind: 'palisade' },
+    { x1: 344, z1: 650, x2: 356, z2: 648, kind: 'palisade' },
+    { x1: 341, z1: 654, x2: 344, z2: 663, kind: 'palisade' },
   ],
   // the blue-roofed medieval quarter, the dock district, the Beacon's
   // keepers, and the stables hamlet (float: hulls ride at their draft)
@@ -272,13 +296,11 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexbHomeA', x: 441, z: 332, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexbHomeB', x: 386, z: 336, rot: -0.28, scale: 7.5, r: 5, h: 10 },
     // the dock district, breathing room on both sides of the beacon road:
-    // the shipwright's yard by the north shingle, the harbormaster's office
-    // back from the boardwalk, and the ship monument ACROSS the road on the
-    // inland rise, the great anchor at its side
-    { key: 'hexbShipyard', x: 474, z: 338, rot: 1.3, scale: 7, r: 6.5, h: 10 },
-    { key: 'hexbDocks', x: 458, z: 354, rot: 1.4, scale: 6, r: 4, h: 7 },
-    { key: 'shipMonument', x: 446, z: 326, rot: 2.2, scale: 7, r: 3.4, h: 7 },
-    { key: 'hexAnchor', x: 451, z: 331, rot: -0.6, scale: 7 },
+    // the shipwright's yard alone by the north shingle, and the ship
+    // monument ACROSS the road on the inland rise, the anchor at its side
+    { key: 'hexbShipyard', x: 477, z: 336, rot: 1.3, scale: 7, r: 6.5, h: 10 },
+    { key: 'shipMonument', x: 447, z: 321, rot: 2.2, scale: 7, r: 3.4, h: 7 },
+    { key: 'hexAnchor', x: 452, z: 326, rot: -0.6, scale: 7 },
     // the fleet, moored on the piers' open sides only (berths verified
     // against the deck rectangles in sim/gale_harbor.ts; the r4 collider
     // stays clear of every walkway so nobody wedges between hull and rail)
@@ -288,8 +310,8 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexShipBlue', x: 456.6, z: 382.8, rot: 1.3, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 468.1, z: 386, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
     // the Beacon dock's pair, alongside the lighthouse pier
-    { key: 'hexShipBlue', x: 523.5, z: 321.9, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 519.5, z: 337.2, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 526.4, z: 323.8, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 523.8, z: 340.4, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
     // dinghies: two on the water, one hauled out by the rack on the shingle
     { key: 'hexBoat', x: 474, z: 354, rot: 0.7, scale: 6, float: 0.1 },
     { key: 'hexBoat', x: 479, z: 357.5, rot: -1.8, scale: 6, float: 0.1 },
@@ -304,8 +326,10 @@ export const GALECREST_PROPS: ZonePropsDef = {
     // the Beacon's keepers, spread across the head: the cottage across the
     // road on the inland side, the store and home wide on the headland
     { key: 'hexbHomeA', x: 470, z: 310, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
-    { key: 'hexbWorkshop', x: 512, z: 308, rot: -1.57, scale: 6.5, r: 6, h: 8 },
+    { key: 'hexbWorkshop', x: 515, z: 305, rot: -1.57, scale: 6.5, r: 6, h: 8 },
     { key: 'hexbHomeB', x: 498, z: 294, rot: 0.2, scale: 7, r: 5, h: 10 },
+    // the harbor gun, watching the eastern water from the lighthouse lawn
+    { key: 'hexCannon', x: 504, z: 315, rot: 1.2, scale: 6, r: 1.8, h: 3 },
     // the golden horse rears beside the stables' race-yard entrance
     { key: 'goldenHorseStatue', x: 374, z: 591.5, rot: Math.PI, scale: 5.5, r: 2.4, h: 6 },
     // the grooms' hamlet on the downs west of the paddock: two long barns,
@@ -347,20 +371,18 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexFlagRed', x: 216, z: 412, rot: -0.4, scale: 5 },
     { key: 'hexBarrel', x: 214, z: 399, rot: 2.3, scale: 5 },
     { key: 'hexTarget', x: 220, z: 416, rot: 0.6, scale: 5 },
-    // camp C on the Howling Downs' west rim
-    { key: 'hexrTent', x: 243, z: 315, rot: 1.1, scale: 7, r: 4.5, h: 5 },
-    { key: 'hexrTent', x: 257, z: 316, rot: -0.9, scale: 7, r: 4.5, h: 5 },
-    { key: 'hexrTent', x: 252, z: 329, rot: 2.6, scale: 7, r: 4.5, h: 5 },
-    { key: 'hexrWatchtower', x: 241, z: 326, rot: 0.9, scale: 6, r: 2.6, h: 9 },
-    { key: 'hexFlagRed', x: 247, z: 322, rot: 1.9, scale: 5 },
-    { key: 'hexFlagRed', x: 257, z: 323, rot: -0.7, scale: 5 },
-    { key: 'hexBarrel', x: 254, z: 312, rot: 1.4, scale: 5 },
-    { key: 'hexTarget', x: 261, z: 328, rot: 2.2, scale: 5 },
+    // camp C on the downs above the Wreckfields, watching the Garden Gate
+    // road from its west shoulder
+    { key: 'hexrTent', x: 347, z: 659, rot: 1.1, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 361, z: 660, rot: -0.9, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 356, z: 673, rot: 2.6, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrWatchtower', x: 345, z: 670, rot: 0.9, scale: 6, r: 2.6, h: 9 },
+    { key: 'hexFlagRed', x: 351, z: 666, rot: 1.9, scale: 5 },
+    { key: 'hexFlagRed', x: 361, z: 667, rot: -0.7, scale: 5 },
+    { key: 'hexBarrel', x: 358, z: 656, rot: 1.4, scale: 5 },
+    { key: 'hexTarget', x: 365, z: 672, rot: 2.2, scale: 5 },
   ],
-  // an old watch ruin on the Howling Downs, and the beacon's fallen forecourt
-  ruinRings: [
-    { x: 288, z: 328, ringR: 7, columns: 5 },
-    { x: 486, z: 300, ringR: 6, columns: 4 },
-  ],
+  // an old watch ruin out on the Howling Downs
+  ruinRings: [{ x: 288, z: 328, ringR: 7, columns: 5 }],
   graveyards: [{ x: 400, z: 342 }],
 };

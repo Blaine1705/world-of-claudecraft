@@ -178,7 +178,6 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexbTownhall: { url: '/models/biome/hexb_townhall.glb', kit: 'khex' },
   hexbWorkshop: { url: '/models/biome/hexb_workshop.glb', kit: 'khex' },
   hexbMarket: { url: '/models/biome/hexb_market.glb', kit: 'khex' },
-  hexbDocks: { url: '/models/biome/hexb_docks.glb', kit: 'khex' },
   hexbShipyard: { url: '/models/biome/hexb_shipyard.glb', kit: 'khex' },
   hexbStables: { url: '/models/biome/hexb_stables.glb', kit: 'khex' },
   hexbTowerBase: { url: '/models/biome/hexb_tower_base.glb', kit: 'khex' },
@@ -207,6 +206,7 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexBarrel: { url: '/models/biome/hex_barrel.glb', kit: 'khex' },
   hexTarget: { url: '/models/biome/hex_target.glb', kit: 'khex' },
   hexFlagRed: { url: '/models/biome/hex_flag_red.glb', kit: 'khex' },
+  hexCannon: { url: '/models/biome/hex_cannon.glb', kit: 'khex' },
   // the Galecrest monuments (maintainer-authored generated models): the
   // ship memorial on the Wickharbor dock plaza, the golden horse for the
   // stable yard
