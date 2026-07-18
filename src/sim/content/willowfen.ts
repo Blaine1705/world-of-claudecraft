@@ -249,12 +249,18 @@ export const WILLOWFEN_PROPS: ZonePropsDef = {
     { key: 'hexbHomeB', x: -390, z: 560, rot: 0.3, scale: 7.5, r: 5, h: 10 },
     { key: 'hexbTowerBase', x: -382, z: 296, rot: 0.4, scale: 5, r: 2.8, h: 8 },
     { key: 'hexbTowerBase', x: -388, z: 608, rot: 1.2, scale: 5, r: 2.8, h: 8 },
+    // the second wave: one more neighbour spaced out from each homestead,
+    // every site probed level (spread under 1.2) and well above the water
+    { key: 'hexbHomeB', x: -428, z: 417, rot: -0.5, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: -392, z: 266, rot: 1.7, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeA', x: -258, z: 473, rot: 0.9, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: -383, z: 587, rot: -2.0, scale: 7.5, r: 5, h: 10 },
   ],
-  // the Fenway: dock planks spanning the moat neck as the town bridge
-  // (hutLocal pushed far off-plank so no hut renders on the crossing)
-  docks: [{ x: -360, z: 330, rot: 0, hutLocal: { x: 40, z: 40, hw: 0.1, hd: 0.1 } }],
+  // the Fenway: rail fences flanking the causeway's south approach (the
+  // crossing itself is dry ground between the moat pools, kept clear of
+  // props so nothing stands on the path)
   fences: [
-    { x1: -364, z1: 325, x2: -364, z2: 336 }, // bridge rails
+    { x1: -364, z1: 325, x2: -364, z2: 336 },
     { x1: -356, z1: 325, x2: -356, z2: 336 },
   ],
 };

@@ -1735,11 +1735,15 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     // each instance with its bed color (a colored texture would multiply
     // against the tint and muddy every hue)
     garden: [{ p: [244, 242, 240], c: [252, 226, 140] }],
-    // Willowfen: wetland wildflowers, buttercream, lavender, white
+    // Willowfen: wetland wildflower fields in mixed colours, buttercream,
+    // lavender, white, marsh pink, cornflower blue, coral
     fen: [
       { p: [250, 245, 210], c: [210, 170, 60] },
       { p: [200, 170, 230], c: [160, 120, 200] },
       { p: [245, 250, 255], c: [220, 220, 150] },
+      { p: [244, 168, 200], c: [200, 110, 150] },
+      { p: [130, 160, 235], c: [230, 236, 250] },
+      { p: [242, 150, 110], c: [180, 90, 50] },
     ],
     // Galecrest: harebells lean into the wind among the daisies and
     // buttercups; the list is weighted so blue heads edge out each of the
@@ -1842,11 +1846,19 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const stableBandChunk = chunkBiome === 'gale' && Math.hypot(dxs, dzs) < 18 + chunkHalfDiag;
     // the Evergarden's parterre beds are dense solid plantings edge to edge,
     // plus meadow drifts, so its chunks carry the largest flower buffer
+    // the Willowfen floor is all flower field (its grass is suppressed
+    // below), so its chunks carry a near-garden flower buffer
     const flowerCap = Math.max(
       8,
       Math.floor(
         maxChunkCount *
-          (chunkBiome === 'garden' ? 1.2 : fieldChunk || stableBandChunk ? 0.45 : 0.14),
+          (chunkBiome === 'garden'
+            ? 1.2
+            : chunkBiome === 'fen'
+              ? 0.8
+              : fieldChunk || stableBandChunk
+                ? 0.45
+                : 0.14),
       ),
     );
     const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
@@ -1916,18 +1928,25 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (isInSowfieldShell(x, z)) continue; // the Sowfield is a mown pitch, not meadow
         // the stable yard is worked dirt; deck planks grow nothing through
         if (tuftBiome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
-        const s = (lush ? 0.55 : 0.45) + r * (lush ? 1.1 : 1);
-        q.setFromAxisAngle(up, r * 12.4);
-        m.compose(v.set(x, h, z), q, sv.set(s, s, s));
-        im.setMatrixAt(n, m);
-        c.setHex(GRASS_TINT[tuftBiome]);
-        c.offsetHSL(
-          (hashAt(i, j, 3) - 0.5) * 0.05,
-          (hashAt(i, j, 4) - 0.5) * 0.12,
-          (hashAt(i, j, 5) - 0.5) * 0.1,
-        );
-        im.setColorAt(n, c);
-        n++;
+        // the Willowfen grows no grass blades: each would-be tuft stays an
+        // unseen flower anchor (the bloom pass below), so the fen floor
+        // reads as open flower fields instead (density 0 would kill the
+        // anchors too, the frost/garden idiom, which is not what fen wants)
+        const fenTuft = tuftBiome === 'fen';
+        if (!fenTuft) {
+          const s = (lush ? 0.55 : 0.45) + r * (lush ? 1.1 : 1);
+          q.setFromAxisAngle(up, r * 12.4);
+          m.compose(v.set(x, h, z), q, sv.set(s, s, s));
+          im.setMatrixAt(n, m);
+          c.setHex(GRASS_TINT[tuftBiome]);
+          c.offsetHSL(
+            (hashAt(i, j, 3) - 0.5) * 0.05,
+            (hashAt(i, j, 4) - 0.5) * 0.12,
+            (hashAt(i, j, 5) - 0.5) * 0.1,
+          );
+          im.setColorAt(n, c);
+          n++;
+        }
         if (FLOWERLESS_BIOMES.has(tuftBiome)) continue;
         // roughly one tuft in nine sprouts a flower cluster beside it; in
         // the field realms, coarse field cells bloom into dense drifts, and
@@ -1940,7 +1959,9 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         });
         // meadows bloom harder than hash fields: their ground carries fewer
         // grass tufts (each tuft is a flower anchor), so density compensates
-        const inField = fieldChunk && fieldCell < 0.42;
+        // the fen's field cells run broader and bloom harder: with its grass
+        // gone, the flowers alone carry the ground cover
+        const inField = fieldChunk && fieldCell < (fenTuft ? 0.62 : 0.42);
         // the downs ringing the stable paddock bloom into full flower fields
         const stableBloom = tuftBiome === 'gale' && stableMeadowBand(x, z);
         const flowerChance = inMeadow
@@ -1948,11 +1969,15 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           : stableBloom
             ? 0.65
             : inField
-              ? 0.6
+              ? fenTuft
+                ? 0.8
+                : 0.6
               : fieldChunk
-                ? 0.05
+                ? fenTuft
+                  ? 0.25
+                  : 0.05
                 : 0.11;
-        const reps = inMeadow ? 4 : stableBloom ? 3 : inField ? 3 : 1;
+        const reps = inMeadow ? 4 : stableBloom ? 3 : inField ? (fenTuft ? 4 : 3) : 1;
         if (hashAt(i, j, 6) < flowerChance) {
           for (let rep = 0; rep < reps && fn < flowerCap; rep++) {
             const fx = x + (hashAt(i + rep, j, 7) - 0.5) * (1.4 + rep * 1.3);

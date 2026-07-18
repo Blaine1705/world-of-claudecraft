@@ -1,7 +1,7 @@
 // The Willowfen's dressing, render-only: the maintainer's generated willow
 // trees trailing over the pools, water-lily rafts on the still water, river
-// reeds rooted along every shoreline, clumped mushroom-and-log patches out
-// on the fen floor, and the old flowering hedge tufts. All the modeled
+// reeds rooted along every shoreline, and clumped mushroom-and-log patches
+// out on the fen floor. All the modeled
 // pieces are GPU-instanced from five optimized GLBs (the flower-bed
 // fidelity recipe; scripts/assets/build_willowfen_props.mjs). Same contract
 // as the sibling realm modules: build once, update(time) animates gently.
@@ -11,7 +11,6 @@ import { hash2 } from '../sim/rng';
 import { roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { GFX } from './gfx';
 
 export interface FenFeaturesView {
   group: THREE.Group;
@@ -20,7 +19,6 @@ export interface FenFeaturesView {
 
 const FEN_ZMIN = 180;
 const FEN_ZMAX = 700;
-const BLOOM_TINTS = [0xf2a8c8, 0xf2e0a0, 0xd8b8f2, 0xffffff, 0xf2a88f];
 
 // the five Willowfen prop models (built by build_willowfen_props.mjs)
 const FEN_PROP_URLS = {
@@ -43,20 +41,6 @@ for (const key of Object.keys(FEN_PROP_URLS) as FenPropKey[]) {
 export const fenFeaturesPreloadInternalsForTest = {
   propUrls: Object.values(FEN_PROP_URLS),
 };
-
-function mat(opts: {
-  color: number;
-  roughness?: number;
-  flatShading?: boolean;
-}): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
-  return GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({
-        color: opts.color,
-        roughness: opts.roughness ?? 0.85,
-        flatShading: opts.flatShading ?? true,
-      })
-    : new THREE.MeshLambertMaterial({ color: opts.color, flatShading: opts.flatShading ?? true });
-}
 
 interface Placement {
   x: number;
@@ -138,9 +122,27 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
   const hub = WILLOWFEN_ZONE.hub;
 
   // --- the willows: the modeled weeping willow, ringing every pool and the
-  // town moat (kept off the roads and out of the town's own lanes) ---
+  // town moat (kept off the roads, out of the town's own lanes, and off
+  // slopes: a willow only roots on level ground), with a slightly larger
+  // companion tree rising beside many of them ---
   {
+    const level = (x: number, z: number): boolean => {
+      const e = 0.9;
+      const hx = terrainHeight(x + e, z, seed) - terrainHeight(x - e, z, seed);
+      const hz = terrainHeight(x, z + e, seed) - terrainHeight(x, z - e, seed);
+      return Math.hypot(hx, hz) / (2 * e) < 0.34;
+    };
     const spots: Placement[] = [];
+    const tryWillow = (x: number, z: number, s: number, rot: number): boolean => {
+      if (z < FEN_ZMIN + 8 || z > FEN_ZMAX - 8) return false;
+      const y = terrainHeight(x, z, seed);
+      if (y < WATER_LEVEL + 0.6) return false;
+      if (!level(x, z)) return false;
+      if (Math.hypot(x - hub.x, z - hub.z) < 15) return false;
+      if (roadDistance(x, z) < 5) return false;
+      spots.push({ x, z, y: y - 0.15, s, rot });
+      return true;
+    };
     for (const lake of WILLOWFEN_ZONE.lakes) {
       const count = 2 + Math.floor(hash2(lake.x, lake.z, seed + 2101) * 3);
       for (let k = 0; k < count; k++) {
@@ -148,18 +150,23 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
         const dist = lake.radius + 5 + hash2(lake.x, k, seed + 2121) * 6;
         const x = lake.x + Math.sin(ang) * dist;
         const z = lake.z + Math.cos(ang) * dist;
-        if (z < FEN_ZMIN + 8 || z > FEN_ZMAX - 8) continue;
-        const y = terrainHeight(x, z, seed);
-        if (y < WATER_LEVEL + 0.6) continue;
-        if (Math.hypot(x - hub.x, z - hub.z) < 15) continue;
-        if (roadDistance(x, z) < 5) continue;
-        spots.push({
+        const ok = tryWillow(
           x,
           z,
-          y: y - 0.15,
-          s: 7 + hash2(k, lake.z, seed + 2131) * 3.5,
-          rot: hash2(lake.x + k, k, seed + 2141) * Math.PI * 2,
-        });
+          7 + hash2(k, lake.z, seed + 2131) * 3.5,
+          hash2(lake.x + k, k, seed + 2141) * Math.PI * 2,
+        );
+        // the companion: a bigger elder willow a few strides on
+        if (ok && hash2(x, z, seed + 2161) < 0.55) {
+          const ang2 = hash2(z, x, seed + 2171) * Math.PI * 2;
+          const off = 8 + hash2(x + 1, z, seed + 2181) * 4;
+          tryWillow(
+            x + Math.sin(ang2) * off,
+            z + Math.cos(ang2) * off,
+            (7 + hash2(k, lake.z, seed + 2131) * 3.5) * 1.28,
+            hash2(z, x + 1, seed + 2191) * Math.PI * 2,
+          );
+        }
       }
     }
     instanceProp('willow', spots);
@@ -251,34 +258,6 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
     }
     instanceProp('mushrooms', mushroomSpots);
     instanceProp('log', logSpots);
-  }
-
-  // --- flowering hedges: puffball bushes with bloom tints, near roadsides
-  // and shores across the whole band ---
-  {
-    const bloomGeo = new THREE.IcosahedronGeometry(0.8, 0);
-    bloomGeo.scale(1, 0.7, 1);
-    const geo = bloomGeo.toNonIndexed();
-    const spots: Placement[] = [];
-    for (let gx = -520; gx <= -200; gx += 11) {
-      for (let gz = FEN_ZMIN + 30; gz <= FEN_ZMAX - 60; gz += 11) {
-        const r = hash2(gx, gz, seed + 2301);
-        if (r > 0.42) continue;
-        const x = gx + (hash2(gx, gz, seed + 2311) - 0.5) * 10;
-        const z = gz + (hash2(gz, gx, seed + 2321) - 0.5) * 10;
-        const y = terrainHeight(x, z, seed);
-        if (y < WATER_LEVEL + 0.8) continue;
-        spots.push({
-          x,
-          z,
-          y: y + 0.3,
-          s: 0.6 + hash2(gx + 1, gz, seed + 2331) * 1.1,
-          rot: hash2(gx, gz + 1, seed + 2341) * Math.PI * 2,
-          tint: BLOOM_TINTS[Math.floor(hash2(gx - 1, gz, seed + 2351) * BLOOM_TINTS.length)],
-        });
-      }
-    }
-    instance(geo, mat({ color: 0xffffff, roughness: 0.85 }), spots, true);
   }
 
   return {
