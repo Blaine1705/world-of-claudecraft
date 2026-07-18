@@ -254,6 +254,9 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexBoat', x: 472, z: 358, rot: -1.8, scale: 6, float: 0.1 },
     { key: 'hexBoat', x: 466, z: 349, rot: 2.3, scale: 6 },
     { key: 'hexBoatrack', x: 464, z: 344, rot: 0.9, scale: 6 },
+    // the ship monument: the harbor's memorial to every hull the Wreckfields
+    // keep, on the plaza between the market stalls and the piers
+    { key: 'shipMonument', x: 458, z: 344, rot: 0.9, scale: 7, r: 3.4, h: 7 },
     // harbor dressing: the great anchor at the pier root, cargo everywhere
     { key: 'hexAnchor', x: 469, z: 349, rot: -0.6, scale: 7 },
     { key: 'hexCrateBig', x: 471, z: 336, rot: 0.4, scale: 5 },

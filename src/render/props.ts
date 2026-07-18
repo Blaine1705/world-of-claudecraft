@@ -196,6 +196,11 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexCrateOpen: { url: '/models/biome/hex_crate_open.glb', kit: 'khex' },
   hexHaybale: { url: '/models/biome/hex_haybale.glb', kit: 'khex' },
   hexTrough: { url: '/models/biome/hex_trough.glb', kit: 'khex' },
+  // the Galecrest monuments (maintainer-authored generated models): the
+  // ship memorial on the Wickharbor dock plaza, the golden horse for the
+  // stable yard
+  shipMonument: { url: '/models/props/ship_monument.glb', kit: 'kgale' },
+  goldenHorseStatue: { url: '/models/props/golden_horse_statue.glb', kit: 'kgale' },
   // a placeable oak (the foliage kit's biggest crown) for authored shade
   // spots like the Garden Gate lawns; decor entries set scale, r is trunk
   oakTree: { url: '/models/foliage/oak_4.glb', kit: 'kfol' },
