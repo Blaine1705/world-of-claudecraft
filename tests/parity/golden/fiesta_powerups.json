@@ -8,8 +8,8 @@
     "hazard ring burn (fiestaRingDamage) outside the closing ring",
     "down + respawn-timer revive (fiestaRevive)"
   ],
-  "draws": 4745,
-  "drawDigest": "028f3403",
+  "draws": 4743,
+  "drawDigest": "60645614",
   "frames": [
     {
       "tick": 0,
@@ -604,8 +604,8 @@
       "state": "d92be940",
       "events": "6eff6596",
       "rng": {
-        "draws": 4363,
-        "digest": "894a0b0f"
+        "draws": 4364,
+        "digest": "6ad7477b"
       }
     },
     {
@@ -637,8 +637,8 @@
       "state": "8e3523e1",
       "events": "7d8435ee",
       "rng": {
-        "draws": 4631,
-        "digest": "cbe1b678"
+        "draws": 4628,
+        "digest": "898ad24c"
       }
     },
     {
@@ -659,8 +659,8 @@
       "state": "ff97453f",
       "events": "741638a5",
       "rng": {
-        "draws": 4745,
-        "digest": "028f3403"
+        "draws": 4743,
+        "digest": "60645614"
       },
       "label": "final",
       "players": [
