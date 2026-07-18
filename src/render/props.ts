@@ -1184,9 +1184,13 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.rotation.y = m.rot;
     group.add(shadowed(g));
     // mound circle behind the portal — same offset/radius as the collider
-    const mx = m.x - 3.4 * Math.sin(m.rot),
-      mz = m.z - 3.4 * Math.cos(m.rot);
-    registerHideable(g, circleFootprint(mx, mz, 5, ground(mx, mz) + 5.2));
+    // (src/sim/colliders.ts), read from the same per-entry fields so the two
+    // can never drift apart again
+    const moundOffset = m.moundOffset ?? 3.4,
+      moundRadius = m.moundRadius ?? 5;
+    const mx = m.x - moundOffset * Math.sin(m.rot),
+      mz = m.z - moundOffset * Math.cos(m.rot);
+    registerHideable(g, circleFootprint(mx, mz, moundRadius, ground(mx, mz) + moundRadius + 0.2));
   }
 
   // ---- fishing docks: pirate-kit platforms, moored rowboat, stone hut ------
