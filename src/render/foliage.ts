@@ -1223,7 +1223,7 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   ember: 0.18,
   frost: 0.08,
   amber: 0.34,
-  fen: 0.38,
+  fen: 0.8,
   night: 0.32,
   haunt: 0.3,
   jungle: 0.5,
@@ -1391,6 +1391,10 @@ function generateDressing(seed: number): DressingSpot[] {
       if (isInSowfieldShell(x, z)) continue; // keep bushes/plants off the football ground
       // no scrub in the worked stable yard or up through the harbor decks
       if (biome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
+      // the fen's floor dressing grows in CLUMPED patches, not an even
+      // scatter: a coarse cell gate keeps most cells bare and the density
+      // boost below packs the surviving patches tight
+      if (biome === 'fen' && hashAt(Math.floor(x / 16), Math.floor(z / 16), 97) > 0.4) continue;
       const kind = dressKindFor(biome, hashAt(gx, gz, 44));
       const [sMin, sRange] = DRESS_SCALE[kind];
       out.push({ x, z, kind, scale: (sMin + hashAt(gx, gz, 45) * sRange) * scaleBoost });

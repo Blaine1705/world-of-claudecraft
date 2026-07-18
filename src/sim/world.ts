@@ -2763,6 +2763,19 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       h = h * blend + ch * (1 - blend);
     }
   }
+  // The Bridgemere island: one level pad inside the widened moat ring,
+  // over the finished height, so the doubled town floor stays dry wall to
+  // wall (the natural fen dips below the waterline inside the wider ring;
+  // the pad's rim fades into the moat's carved banks without drying them).
+  if (x > -540 && x < -180 && z > 180 && z < 700) {
+    const bdx = x + 360,
+      bdz = z - 362;
+    if (bdx * bdx + bdz * bdz < 19 * 19) {
+      const d = Math.sqrt(bdx * bdx + bdz * bdz);
+      const w = 1 - smoothstep(15, 19, d);
+      h = h * (1 - w) + 2.0 * w;
+    }
+  }
   // The Galecrest's shaping, over the finished height like the bed pads:
   if (x > 180 && x < 540 && z > 180 && z < 700) {
     // the Mirror Tarn's bathing shore FIRST: pull the carved banks down onto
