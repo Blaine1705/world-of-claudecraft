@@ -1,5 +1,6 @@
 import { beaconSpiralLift } from './beacon_spiral';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
+import { PALMREACH_PROPS } from './content/palmreach';
 import {
   CAMPS,
   COLUMN_ZONES,
@@ -21,6 +22,7 @@ import {
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { galeDeckSurface } from './gale_harbor';
+import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
@@ -841,27 +843,67 @@ let reachPalmCache: { seed: number; spots: ReachPalm[] } | null = null;
 export function reachPalmSpots(seed: number): ReachPalm[] {
   if (reachPalmCache && reachPalmCache.seed === seed) return reachPalmCache.spots;
   const spots: ReachPalm[] = [];
+  // props a palm must never stand in (the village, the camps, the walkways)
+  const rp = PALMREACH_PROPS;
+  const propClear = (x: number, z: number): boolean => {
+    for (const b of rp.buildings ?? []) if (Math.hypot(x - b.x, z - b.z) < 9) return false;
+    for (const m of rp.mudHuts ?? []) if (Math.hypot(x - m[0], z - m[1]) < 5) return false;
+    for (const t of rp.tents ?? []) if (Math.hypot(x - t.x, z - t.z) < 5) return false;
+    for (const f of rp.campfires ?? []) if (Math.hypot(x - f[0], z - f[1]) < 8) return false;
+    for (const st of rp.stalls ?? []) if (Math.hypot(x - st.x, z - st.z) < 5) return false;
+    for (const d of rp.decorProps ?? [])
+      if (Math.hypot(x - d.x, z - d.z) < (d.r ?? 3) + 3) return false;
+    for (const g of rp.greatTrees ?? []) if (Math.hypot(x - g.x, z - g.z) < g.r + 6) return false;
+    for (const ring of rp.ruinRings ?? [])
+      if (Math.hypot(x - ring.x, z - ring.z) < ring.ringR + 4) return false;
+    return reachDeckClear(x, z, 1.5);
+  };
+  const push = (x: number, z: number, y: number, sizeF: number): void => {
+    const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
+    const scale = (PALM_TARGET_H / PALM_NATIVE_H[variant]) * sizeF;
+    spots.push({
+      x,
+      z,
+      y: y - 0.15,
+      rot: hash2(z, x, seed + 5141) * Math.PI * 2,
+      variant,
+      scale,
+      r: PALM_TRUNK_R * scale,
+    });
+  };
   for (let gx = -536; gx <= -184; gx += 8) {
     for (let gz = REACH_ZMIN + 10; gz <= REACH_ZMAX - 10; gz += 8) {
-      if (hash2(gx, gz, seed + 5101) > 0.62) continue; // thin the grid (~38% kept)
+      if (hash2(gx, gz, seed + 5101) > 0.7) continue; // thin the grid (~30% dropped)
       const x = gx + (hash2(gx, gz, seed + 5111) - 0.5) * 7;
       const z = gz + (hash2(gz, gx, seed + 5121) - 0.5) * 7;
       const land = reachLandness(x, z);
       if (land < 0.045 || land > 0.24) continue; // the beach band only
       const y = terrainHeight(x, z, seed);
       if (y < WATER_LEVEL + 0.5 || y > 3.6) continue; // out of the surf, off the bluff
-      const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
-      const scale =
-        (PALM_TARGET_H / PALM_NATIVE_H[variant]) * (0.85 + hash2(x, z, seed + 5131) * 0.5);
-      spots.push({
-        x,
-        z,
-        y: y - 0.15,
-        rot: hash2(z, x, seed + 5141) * Math.PI * 2,
-        variant,
-        scale,
-        r: PALM_TRUNK_R * scale,
-      });
+      if (roadDistance(x, z) < 4) continue;
+      if (Math.hypot(x + 300, z - 820) < 18) continue; // Drifthaven's lanes stay open
+      if (!propClear(x, z)) continue;
+      // a few of the strand's palms grow into towering elders
+      const grand = hash2(x + 3, z, seed + 5161) < 0.09 ? 1.4 : 1;
+      push(x, z, y, (0.85 + hash2(x, z, seed + 5131) * 0.5) * grand);
+    }
+  }
+  // the inland palms: a sparser scatter through the jungle interior, so the
+  // green runs palm-crowned all the way across the realm, not just the shore
+  for (let gx = -530; gx <= -190; gx += 14) {
+    for (let gz = REACH_ZMIN + 16; gz <= REACH_ZMAX - 16; gz += 14) {
+      if (hash2(gx, gz, seed + 5171) > 0.34) continue;
+      const x = gx + (hash2(gx + 1, gz, seed + 5181) - 0.5) * 11;
+      const z = gz + (hash2(gx, gz + 1, seed + 5191) - 0.5) * 11;
+      if (reachLandness(x, z) <= 0.24) continue; // the interior only
+      const y = terrainHeight(x, z, seed);
+      if (y < WATER_LEVEL + 0.6 || y > 9) continue;
+      if (roadDistance(x, z) < 5) continue;
+      if (reachRiverDistance(x, z) < 9) continue;
+      if (Math.hypot(x + 300, z - 820) < 22) continue;
+      if (!propClear(x, z)) continue;
+      const grand = hash2(x + 5, z, seed + 5162) < 0.12 ? 1.35 : 1;
+      push(x, z, y, (0.95 + hash2(x, z, seed + 5131) * 0.6) * grand);
     }
   }
   reachPalmCache = { seed, spots };
@@ -897,7 +939,77 @@ function applyReachCoast(x: number, z: number, h: number): number {
   // ...and the Nightgate's south ramp, meeting the dream's pass cap
   const passN = (1 - smoothstep(26, 52, Math.abs(x + 330))) * smoothstep(1200, 1245, z);
   if (passN > 0) out = out + (6 + (out - 6) * 0.15 - out) * passN;
+  // the jungle rivers: each run lies in a gentle valley (banks eased down
+  // to just above the waterline so boats beach naturally and bridges sit
+  // low) with the swimmable channel carved along the center-line; both
+  // blends only ever LOWER ground (min), so the open seabed is never raised
+  for (const river of REACH_RIVERS) {
+    const d = riverDistance(river.pts, x, z);
+    if (d >= river.hw + 16) continue;
+    const tv = 1 - smoothstep(river.hw, river.hw + 16, d);
+    out = Math.min(out, out + (WATER_LEVEL + 1.1 - out) * tv);
+    if (d < river.hw + 2) {
+      const tc = 1 - smoothstep(river.hw * 0.4, river.hw + 2, d);
+      out = Math.min(out, out + (WATER_LEVEL - 1.6 - out) * tc);
+    }
+  }
   return h + (out - h) * seam * zSeam;
+}
+
+// The Palmreach's rivers, polyline center-lines with a half-width; every
+// run keeps clear of the road net (the road-water guard samples raw
+// terrain, so a road never dips into a channel).
+const REACH_RIVERS: { pts: { x: number; z: number }[]; hw: number }[] = [
+  {
+    // the Emerald Run: out of the jungle pool, west to the sea
+    pts: [
+      { x: -374, z: 1006 },
+      { x: -408, z: 1000 },
+      { x: -446, z: 988 },
+      { x: -482, z: 972 },
+      { x: -520, z: 956 },
+    ],
+    hw: 4.5,
+  },
+  {
+    // the Tanglewash: the northern tarn's outflow to the north bight
+    pts: [
+      { x: -336, z: 1166 },
+      { x: -350, z: 1192 },
+      { x: -366, z: 1220 },
+      { x: -384, z: 1246 },
+    ],
+    hw: 4,
+  },
+  {
+    // the West Arm stream, a short run off the west arm's shoulder
+    pts: [
+      { x: -466, z: 1052 },
+      { x: -492, z: 1034 },
+      { x: -518, z: 1014 },
+    ],
+    hw: 3.5,
+  },
+];
+
+function riverDistance(pts: { x: number; z: number }[], x: number, z: number): number {
+  let best = Infinity;
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const ax = pts[i].x;
+    const az = pts[i].z;
+    const dx = pts[i + 1].x - ax;
+    const dz = pts[i + 1].z - az;
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz)));
+    best = Math.min(best, Math.hypot(x - (ax + dx * t), z - (az + dz * t)));
+  }
+  return best;
+}
+
+/** Distance from (x, z) to the nearest Palmreach river center-line. */
+export function reachRiverDistance(x: number, z: number): number {
+  let best = Infinity;
+  for (const river of REACH_RIVERS) best = Math.min(best, riverDistance(river.pts, x, z));
+  return best;
 }
 
 // ---------------------------------------------------------------------------
@@ -2616,6 +2728,16 @@ function dockSurfaceHeight(x: number, z: number, seed: number): number {
     (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
     WATER_LEVEL,
   );
+  // ...and the Palmreach's river bridges and lagoon decks, the same idiom
+  surface = Math.max(
+    surface,
+    reachDeckSurface(
+      x,
+      z,
+      (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
+      WATER_LEVEL,
+    ),
+  );
   for (const dock of getActiveWorldContent().props.docks) {
     const local = dockLocalPoint(dock, x, z);
     if (dockSectionAtLocal(local.x, local.z) < 0) continue;
@@ -3690,6 +3812,7 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   if (galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
     return null;
   }
+  if (!reachDeckClear(x, z, 1)) return null;
   // The Old Beacon's lawn stays clear (nothing crowds the lighthouse stair),
   // and the raider encampments keep trees and rocks off their level pads.
   {

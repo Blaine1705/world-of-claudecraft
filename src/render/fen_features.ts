@@ -7,6 +7,7 @@
 // as the sibling realm modules: build once, update(time) animates gently.
 import * as THREE from 'three';
 import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from '../sim/content/willowfen';
+import { fenWillowSpots } from '../sim/fen_willows';
 import { hash2 } from '../sim/rng';
 import {
   generateDecorationsInBounds,
@@ -170,76 +171,13 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
     return true;
   };
 
-  // --- the willows: the modeled weeping willow, ringing every pool and the
-  // town moat (kept off the roads, out of the town's own lanes, and off
-  // slopes: a willow only roots on level ground), with a slightly larger
-  // companion tree rising beside many of them ---
-  {
-    const level = (x: number, z: number): boolean => {
-      const e = 0.9;
-      const hx = terrainHeight(x + e, z, seed) - terrainHeight(x - e, z, seed);
-      const hz = terrainHeight(x, z + e, seed) - terrainHeight(x, z - e, seed);
-      return Math.hypot(hx, hz) / (2 * e) < 0.34;
-    };
-    const spots: Placement[] = [];
-    const tryWillow = (x: number, z: number, s: number, rot: number): boolean => {
-      if (z < FEN_ZMIN + 8 || z > FEN_ZMAX - 8) return false;
-      const y = terrainHeight(x, z, seed);
-      if (y < WATER_LEVEL + 0.6) return false;
-      if (!level(x, z)) return false;
-      if (Math.hypot(x - hub.x, z - hub.z) < 15) return false;
-      if (roadDistance(x, z) < 5) return false;
-      if (!clearOfProps(x, z, 2)) return false;
-      if (!clearOfRocks(x, z, 1)) return false;
-      spots.push({ x, z, y: y - 0.15, s, rot });
-      return true;
-    };
-    for (const lake of WILLOWFEN_ZONE.lakes) {
-      const count = 2 + Math.floor(hash2(lake.x, lake.z, seed + 2101) * 3);
-      for (let k = 0; k < count; k++) {
-        const ang = hash2(k, lake.x + lake.z, seed + 2111) * Math.PI * 2;
-        const dist = lake.radius + 10 + hash2(lake.x, k, seed + 2121) * 7;
-        const x = lake.x + Math.sin(ang) * dist;
-        const z = lake.z + Math.cos(ang) * dist;
-        const ok = tryWillow(
-          x,
-          z,
-          7 + hash2(k, lake.z, seed + 2131) * 3.5,
-          hash2(lake.x + k, k, seed + 2141) * Math.PI * 2,
-        );
-        // the companion: a bigger elder willow a few strides on
-        if (ok && hash2(x, z, seed + 2161) < 0.55) {
-          const ang2 = hash2(z, x, seed + 2171) * Math.PI * 2;
-          const off = 8 + hash2(x + 1, z, seed + 2181) * 4;
-          tryWillow(
-            x + Math.sin(ang2) * off,
-            z + Math.cos(ang2) * off,
-            (7 + hash2(k, lake.z, seed + 2131) * 3.5) * 1.28,
-            hash2(z, x + 1, seed + 2191) * Math.PI * 2,
-          );
-        }
-      }
-    }
-    // the inland willows: a loose scatter across the open moor between the
-    // pools, well away from any lake so the fen reads willow-grown all over
-    for (let gx = -515; gx <= -205; gx += 24) {
-      for (let gz = FEN_ZMIN + 26; gz <= FEN_ZMAX - 40; gz += 24) {
-        if (hash2(gx, gz, seed + 2301) > 0.3) continue;
-        const x = gx + (hash2(gx + 1, gz, seed + 2311) - 0.5) * 14;
-        const z = gz + (hash2(gx, gz + 1, seed + 2321) - 0.5) * 14;
-        if (WILLOWFEN_ZONE.lakes.some((l) => Math.hypot(x - l.x, z - l.z) < l.radius + 14)) {
-          continue;
-        }
-        tryWillow(
-          x,
-          z,
-          7.5 + hash2(x, z, seed + 2331) * 3.5,
-          hash2(z, x, seed + 2341) * Math.PI * 2,
-        );
-      }
-    }
-    instanceProp('willow', spots);
-  }
+  // --- the willows: instanced at the shared sim placements (fenWillowSpots
+  // in sim/fen_willows.ts), so every trunk the renderer draws is exactly a
+  // trunk the sim's colliders block ---
+  instanceProp(
+    'willow',
+    fenWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
+  );
 
   // --- the water lilies: modeled lily rafts drifting on every pool ---
   {

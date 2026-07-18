@@ -703,6 +703,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/dock_platform.glb": "/media/models/props/dock_platform.e8ddba57f493.glb",
   "models/props/dungeon_door_arch.glb": "/media/models/props/dungeon_door_arch.1372d8c06714.glb",
   "models/props/fallback_crate.glb": "/media/models/props/fallback_crate.b469bf8d1ba3.glb",
+  "models/props/fallen_coconuts.glb": "/media/models/props/fallen_coconuts.da4d416c603a.glb",
   "models/props/farmcrate_apple.glb": "/media/models/props/farmcrate_apple.18a006c1149b.glb",
   "models/props/fen_lilies.glb": "/media/models/props/fen_lilies.b51c17717d74.glb",
   "models/props/fen_log.glb": "/media/models/props/fen_log.f556d89bf2fb.glb",

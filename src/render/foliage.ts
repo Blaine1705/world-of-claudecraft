@@ -1746,6 +1746,16 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       { p: [245, 250, 255], c: [220, 220, 150] },
       { p: [244, 168, 200], c: [200, 110, 150] },
     ],
+    // the Palmreach: tropical blooms, hibiscus orange and morning-glory
+    // blue leading the mix over plumeria white and jungle pink
+    jungle: [
+      { p: [245, 120, 60], c: [200, 70, 30] },
+      { p: [100, 150, 240], c: [225, 235, 252] },
+      { p: [245, 120, 60], c: [200, 70, 30] },
+      { p: [100, 150, 240], c: [225, 235, 252] },
+      { p: [250, 248, 240], c: [245, 200, 80] },
+      { p: [240, 130, 170], c: [200, 80, 120] },
+    ],
     // Galecrest: harebells lean into the wind among the daisies and
     // buttercups; the list is weighted so blue heads edge out each of the
     // white and gold (4 blue to 3 white to 3 gold)
@@ -1789,6 +1799,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     'garden',
     'fen',
     'gale',
+    'jungle',
   ] as BiomeId[]) {
     flowerMatFor(b);
   }
@@ -1977,7 +1988,9 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
                 ? fenTuft
                   ? 0.32
                   : 0.05
-                : 0.11;
+                : tuftBiome === 'jungle'
+                  ? 0.2
+                  : 0.11;
         const reps = inMeadow ? 4 : stableBloom ? 3 : inField ? (fenTuft ? 4 : 3) : 1;
         if (hashAt(i, j, 6) < flowerChance) {
           for (let rep = 0; rep < reps && fn < flowerCap; rep++) {

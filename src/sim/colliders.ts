@@ -27,6 +27,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import { fenWillowSpots } from './fen_willows';
 import type { BuildingDef, WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import {
@@ -143,6 +144,18 @@ function staticWorldColliders(seed: number): Collider[] {
       z: t.z,
       r: t.r,
       cameraTopY: topY(seed, t.x, t.z, 7),
+      camGhost: true,
+    });
+  // The Willowfen's willows: a trunk collider at the base of every weeping
+  // willow, from the same deterministic list the renderer instances the
+  // models from (sim/fen_willows.ts).
+  for (const w of fenWillowSpots(seed))
+    out.push({
+      type: 'circle',
+      x: w.x,
+      z: w.z,
+      r: w.r,
+      cameraTopY: topY(seed, w.x, w.z, 6),
       camGhost: true,
     });
   // The Palmreach strand: a slim trunk collider at the base of every beach
