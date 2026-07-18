@@ -28,11 +28,14 @@ export const BEACON_SPIRAL = {
   deck1: 9.5,
   deck2: 19,
   /** the climb's angular plan, unwrapped from the foot (fractions of 2PI);
-   * the top balcony takes the largest share, wrapping far around the tower */
+   * the top balcony takes the largest share, wrapping far around the tower,
+   * but stops well short of the full turn: the mouth over the stair foot
+   * must stay wide, or the balcony's rim stands as an invisible wall right
+   * beside the first treads and pinches the approach */
   flight1End: Math.PI * 2 * 0.3,
   balcony1End: Math.PI * 2 * 0.42,
   flight2End: Math.PI * 2 * 0.76,
-  balcony2End: Math.PI * 2 * 0.98,
+  balcony2End: Math.PI * 2 * 0.94,
   /** balcony outer radius (both balconies reach wider than the stair) */
   balconyOut: 7.2,
 } as const;
