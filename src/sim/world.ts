@@ -3185,10 +3185,22 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
 // travel direction. Movement gates on this (not just the slope along the step)
 // so a diagonal switchback approach cannot beat the straight-line climb limit.
 export const STEEPNESS_SAMPLE = 0.35; // yards; about one movement tick of run
+// The steepness field reads the NATURAL walking surface: the designed raised
+// decks (the Beacon's spiral stair, the harbor piers) are deliberately left
+// out. Their tall rims are honest DROPS that the movement kernel's step-rise
+// gate already handles; sampling them here would smear each rim across a
+// whole cached steepness cell and wall the deck off as a fake cliff face
+// (the bug that made the lighthouse stair unclimbable for a real player).
+function steepnessGroundHeight(x: number, z: number, seed: number): number {
+  if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
+  return terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+}
 export function terrainSteepness(x: number, z: number, seed: number): number {
   const e = STEEPNESS_SAMPLE;
-  const hx = (groundHeight(x + e, z, seed) - groundHeight(x - e, z, seed)) / (2 * e);
-  const hz = (groundHeight(x, z + e, seed) - groundHeight(x, z - e, seed)) / (2 * e);
+  const hx =
+    (steepnessGroundHeight(x + e, z, seed) - steepnessGroundHeight(x - e, z, seed)) / (2 * e);
+  const hz =
+    (steepnessGroundHeight(x, z + e, seed) - steepnessGroundHeight(x, z - e, seed)) / (2 * e);
   return Math.hypot(hx, hz);
 }
 

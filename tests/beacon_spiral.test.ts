@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { BEACON_SPIRAL, beaconDeckHeightAt, beaconSpiralLift } from '../src/sim/beacon_spiral';
 import { resolveMovement } from '../src/sim/colliders';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
 
 const SEED = 20061;
@@ -89,6 +90,39 @@ describe('the Beacon stair surface', () => {
     expect(beaconSpiralLift(S.x + 20, S.z)).toBe(0);
     expect(beaconSpiralLift(420, 360)).toBe(0);
     expect(beaconSpiralLift(S.x, S.z + S.balconyOut + 1)).toBe(0);
+  });
+
+  it('a REAL player (the live kernel through Sim.tick) climbs to the upper balcony', () => {
+    // The regression that motivated this: the movement kernel's destination
+    // steepness gate sampled the raised deck itself, so the stair's tall rims
+    // poisoned whole steepness cells and walled the climb off. Drive the
+    // actual per-tick player path: facing + forward intent, full Sim ticks.
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+    const p = sim.player;
+    p.pos.x = 505;
+    p.pos.z = 300;
+    p.pos.y = groundHeight(505, 300, SEED);
+    p.prevPos = { ...p.pos };
+    const goalRel = S.flight2End + (S.balcony2End - S.flight2End) * 0.4;
+    const waypoints: { x: number; z: number }[] = [pathPoint(0.02)];
+    for (let rel = 0.08; rel < goalRel; rel += 0.07) waypoints.push(pathPoint(rel));
+    waypoints.push(pathPoint(goalRel));
+    const mv = sim.moveInput;
+    for (const wp of waypoints) {
+      for (let i = 0; i < 20 * 6; i++) {
+        p.facing = Math.atan2(wp.x - p.pos.x, wp.z - p.pos.z);
+        mv.forward = true;
+        sim.tick();
+        if (Math.hypot(p.pos.x - wp.x, p.pos.z - wp.z) < 0.7) break;
+      }
+    }
+    mv.forward = false;
+    const lawnH = groundHeight(S.x + 12, S.z, SEED);
+    const finalH = groundHeight(p.pos.x, p.pos.z, SEED);
+    expect(finalH - lawnH, 'the live kernel reached the upper balcony').toBeGreaterThan(
+      S.deck2 - 2.5,
+    );
+    expect(Math.hypot(p.pos.x - S.x, p.pos.z - S.z)).toBeLessThan(S.balconyOut + 0.6);
   });
 
   it('a player can walk from the lawn all the way to the upper balcony', () => {
