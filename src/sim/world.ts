@@ -2108,8 +2108,8 @@ function applyEmberLavaRuns(x: number, z: number, h: number): number {
     const len2 = dx * dx + dz * dz;
     const t = Math.max(0, Math.min(1, ((x - run.x0) * dx + (z - run.z0) * dz) / len2));
     const d = Math.hypot(x - (run.x0 + dx * t), z - (run.z0 + dz * t));
-    if (d < 6 + 8) {
-      const w = 1 - smoothstep(6, 14, d);
+    if (d < 8 + 8) {
+      const w = 1 - smoothstep(8, 16, d);
       const target = run.h0 + (run.h1 - run.h0) * t;
       out = out + (target - out) * w;
     }

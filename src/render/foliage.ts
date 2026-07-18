@@ -79,6 +79,7 @@ const GRASS_DENSITY_HIGH = 0.5;
 // deep grass instead of flowers, so its forest reads lush, not decorated.
 const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
   frost: 0,
+  ember: 0, // the Drakelands are scorched waste: no blades in the cinders
   haunt: 1.55,
   // the Evergarden is mown lawn: no wild tufts, its flowers grow in the
   // authored parterre beds instead (garden_parterre_core.ts)

@@ -208,6 +208,7 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexFlagRed: { url: '/models/biome/hex_flag_red.glb', kit: 'khex' },
   hexCannon: { url: '/models/biome/hex_cannon.glb', kit: 'khex' },
   hexbWindmill: { url: '/models/biome/hexb_windmill.glb', kit: 'khex' },
+  caveMine: { url: '/models/biome/cave_mine_entrance.glb', kit: 'khex' },
   // the Galecrest monuments (maintainer-authored generated models): the
   // ship memorial on the Wickharbor dock plaza, the golden horse for the
   // stable yard

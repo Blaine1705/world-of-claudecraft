@@ -154,20 +154,49 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
       rot,
     });
     // a connecting run: alternating river variants laid nose to tail from
-    // just outside one pool's rim to just outside the other's
+    // just outside one pool's rim to just outside the other's. Each model's
+    // channel runs along its own axis (variant A along +z, B/C and the end
+    // piece along +x, measured from the shipped GLBs), so every piece takes
+    // a per-variant yaw offset that lands its channel ON the run bearing;
+    // every other piece also flips end-for-end so the mouths meet flush
+    // instead of repeating the same closed end down the run.
+    const AXIS_OFFSET = [0, -Math.PI / 2, -Math.PI / 2]; // riverA, riverB, riverC
     const riverSegs: PropPlacement[][] = [[], [], []];
     const endSegs: PropPlacement[] = [];
+    // the run MEANDERS: a deterministic lateral sway bends the chain so the
+    // curved pieces read as one long winding river rather than a ruler line;
+    // each piece takes the local tangent's yaw, and the graded terrain bed
+    // (world.ts EMBER_LAVA_RUNS) is wide enough to carry the whole wiggle
     const chain = (x0: number, z0: number, x1: number, z1: number, fp: number): void => {
       const len = Math.hypot(x1 - x0, z1 - z0);
-      const rot = Math.atan2(x1 - x0, z1 - z0);
-      const step = fp * 0.82;
+      const dirx = (x1 - x0) / len;
+      const dirz = (z1 - z0) / len;
+      const px = -dirz; // lateral unit
+      const pz = dirx;
+      const phase = hash2(x0, z1, seed + 806) * Math.PI * 2;
+      const amp = Math.min(3.4, len * 0.12);
+      const wave = (Math.PI * 2) / (fp * 3.2);
+      const at = (d: number): { x: number; z: number } => {
+        // sway fades to zero at both ends so the mouths stay on the pools
+        const fade = Math.sin(Math.min(Math.PI, (d / len) * Math.PI));
+        const off = Math.sin(d * wave + phase) * amp * fade;
+        return { x: x0 + dirx * d + px * off, z: z0 + dirz * d + pz * off };
+      };
+      const step = fp * 0.72;
       let k = 0;
       for (let d = step * 0.5; d < len - step * 0.4; d += step) {
-        const t = d / len;
-        riverSegs[k % 3].push(seg(x0 + (x1 - x0) * t, z0 + (z1 - z0) * t, rot, fp));
+        const here = at(d);
+        const ahead = at(Math.min(len, d + 1.5));
+        const yaw = Math.atan2(ahead.x - here.x, ahead.z - here.z);
+        const variant = k % 3;
+        const flip = k % 2 === 1 ? Math.PI : 0;
+        riverSegs[variant].push(seg(here.x, here.z, yaw + AXIS_OFFSET[variant] + flip, fp));
         k++;
       }
-      endSegs.push(seg(x1 - Math.sin(rot) * step * 0.3, z1 - Math.cos(rot) * step * 0.3, rot, fp));
+      const rot = Math.atan2(x1 - x0, z1 - z0);
+      endSegs.push(
+        seg(x1 - Math.sin(rot) * step * 0.3, z1 - Math.cos(rot) * step * 0.3, rot - Math.PI / 2, fp),
+      );
     };
     chain(330, 2250, 344, 2233, 9); // the twin pools' own link
     chain(330, 2250, 302, 2328, 10); // the long run south into the waste basin
@@ -180,8 +209,8 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
     // east cone's foot
     instanceProp('riverEnd', [
       ...endSegs,
-      seg(428, 2335, Math.atan2(438 - 418, 2326 - 2342), 11),
-      seg(480, 2343, Math.atan2(-14, -15), 9),
+      seg(428, 2335, Math.atan2(438 - 418, 2326 - 2342) - Math.PI / 2, 11),
+      seg(480, 2343, Math.atan2(-14, -15) - Math.PI / 2, 9),
     ]);
     // the terraces, stepped down the flanks toward the pools below
     const terr = (x: number, z: number, tx: number, tz: number): PropPlacement => ({
