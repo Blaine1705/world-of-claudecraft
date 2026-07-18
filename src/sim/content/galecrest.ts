@@ -101,6 +101,8 @@ export const GALECREST_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
   { x: 471, z: 308, r: 2.2 },
   { x: 286, z: 556, r: 7 },
   { x: 292, z: 541, r: 5 },
+  { x: 458, z: 606, r: 6 },
+  { x: 462, z: 613, r: 5 },
   { x: 306, z: 540, r: 5 },
   { x: 310, z: 548, r: 7 },
   { x: 306, z: 572, r: 7 },
@@ -230,9 +232,9 @@ export const GALECREST_CAMPS: CampDef[] = [
   { mobId: 'moor_ram', center: { x: 292, z: 312 }, radius: 11, count: 3 },
   { mobId: 'moor_ram', center: { x: 262, z: 360 }, radius: 10, count: 3 },
   { mobId: 'topiary_wolf', center: { x: 302, z: 522 }, radius: 11, count: 3 },
-  // the pack hunts the open downs northwest of the Mirror Tarn, well clear
-  // of the hamlet and the stables
-  { mobId: 'topiary_wolf', center: { x: 266, z: 546 }, radius: 8, count: 3 },
+  // the pack hunts the empty downs southwest of the tarn, far from the
+  // lakeside barns and every building
+  { mobId: 'topiary_wolf', center: { x: 250, z: 505 }, radius: 8, count: 3 },
   { mobId: 'wreck_thief', center: { x: 444, z: 438 }, radius: 10, count: 3 },
   { mobId: 'moor_ram', center: { x: 386, z: 622 }, radius: 9, count: 2 },
   { mobId: 'the_wreck_warden', center: { x: 330, z: 638 }, radius: 5, count: 1 },
@@ -345,8 +347,8 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexShipBlue', x: 456.6, z: 382.8, rot: 1.3, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 468.1, z: 386, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
     // the Beacon dock's pair, alongside the lighthouse pier
-    { key: 'hexShipBlue', x: 526.4, z: 323.8, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 523.8, z: 340.4, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 519.2, z: 329.6, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 515.9, z: 345.5, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
     // dinghies: two on the water, one hauled out by the rack on the shingle
     { key: 'hexBoat', x: 474, z: 354, rot: 0.7, scale: 6, float: 0.1 },
     { key: 'hexBoat', x: 479, z: 357.5, rot: -1.8, scale: 6, float: 0.1 },
@@ -359,12 +361,10 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexSack', x: 437, z: 372, rot: 0.9, scale: 5 },
     { key: 'hexCrateBig', x: 446, z: 383, rot: 2.1, scale: 5 },
     // the Beacon's keepers, spread across the head: the cottage across the
-    // road on the inland side, the store and home wide on the headland
+    // road on the inland side, the store wide on the headland
     { key: 'hexbHomeA', x: 470, z: 310, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexbWorkshop', x: 515, z: 305, rot: -1.57, scale: 6.5, r: 6, h: 8 },
-    { key: 'hexbHomeB', x: 498, z: 294, rot: 0.2, scale: 7, r: 5, h: 10 },
-    // the harbor gun, watching the eastern water from the lighthouse lawn
-    { key: 'hexCannon', x: 488, z: 296, rot: 0.7, scale: 6, r: 1.8, h: 3 },
+
     // the golden horse rears beside the stables' race-yard entrance
     { key: 'goldenHorseStatue', x: 374, z: 591.5, rot: Math.PI, scale: 5.5, r: 2.4, h: 6 },
     // the stable barns on the Mirror Tarn's level north bank (across the
@@ -384,6 +384,10 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexbHomeB', x: 368, z: 624, rot: Math.PI, scale: 7.5, r: 5, h: 10 },
     { key: 'hexbHomeA', x: 394, z: 620, rot: 2.9, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexbStables', x: 404, z: 612, rot: 0.5, scale: 7, r: 5.5, h: 9 },
+    // the flower mill on the southeast downs above the Shear: a turning
+    // windmill and a cottage ringed in blooms (meadow circles below)
+    { key: 'hexWindmill', x: 460, z: 618, rot: 0.5, scale: 7, r: 4, h: 12 },
+    { key: 'hexbHomeA', x: 458, z: 606, rot: -0.4, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexHaybale', x: 446, z: 581, rot: 1.3, scale: 5 },
     { key: 'hexHaybale', x: 409, z: 618, rot: 0.2, scale: 5 },
     { key: 'hexTrough', x: 453, z: 570, rot: 0.1, scale: 5 },

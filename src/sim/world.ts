@@ -2792,22 +2792,22 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     // the Beacon dock stair's cutting: the headland face is carved down to
     // the stair's ramp line so the treads climb an open notch instead of
     // vanishing inside the cliff (mirror of the beacon stair deck in
-    // sim/gale_harbor.ts: center 509.2,317.5 rot 0.785 hl 5.8)
-    const sdx = x - 509.2,
-      sdz = z - 317.5;
-    if (sdx * sdx + sdz * sdz < 9.5 * 9.5) {
-      const dirx = 0.7068251811053661; // sin(0.785)
-      const dirz = 0.7073882691671998; // cos(0.785)
+    // sim/gale_harbor.ts: center 503.3,325.3 rot 0.99 hl 6.94)
+    const sdx = x - 503.3,
+      sdz = z - 325.3;
+    if (sdx * sdx + sdz * sdz < 10.6 * 10.6) {
+      const dirx = 0.8360259786005205; // sin(0.99)
+      const dirz = 0.5486979929717658; // cos(0.99)
       const along = sdx * dirx + sdz * dirz;
       const across = sdx * dirz - sdz * dirx;
-      if (along > -7.3 && along < 7.3 && Math.abs(across) < 4.4) {
-        const topY = terrainHeightUnpadded(504, 314, seed) + 0.1;
-        const botY = Math.max(terrainHeightUnpadded(514, 321, seed), WATER_LEVEL + 0.55) + 0.1;
-        const t = Math.min(1, Math.max(0, (along + 5.8) / 11.6));
+      if (along > -8.4 && along < 8.4 && Math.abs(across) < 4.4) {
+        const topY = terrainHeightUnpadded(497, 321, seed) + 0.1;
+        const botY = Math.max(terrainHeightUnpadded(507, 327, seed), WATER_LEVEL + 0.55) + 0.1;
+        const t = Math.min(1, Math.max(0, (along + 6.94) / 13.88));
         const rampY = topY + (botY - topY) * t - 0.25;
         const w =
           (1 - smoothstep(1.4, 4.4, Math.abs(across))) *
-          (1 - smoothstep(5.8, 7.3, Math.abs(along)));
+          (1 - smoothstep(6.94, 8.4, Math.abs(along)));
         if (h > rampY) h = h * (1 - w) + rampY * w;
       }
     }

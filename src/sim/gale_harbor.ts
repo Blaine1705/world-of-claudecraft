@@ -57,10 +57,12 @@ export const GALE_HARBOR_DECKS: GaleDeckDef[] = [
   // land (steep ramps; the renderer draws them as stepped treads)
   { x: 462.7, z: 361.7, rot: -1.648, hl: 3.3, hw: 1.3, ax: 465, az: 354, ax2: 458, az2: 361 },
   { x: 464.5, z: 352.75, rot: -1.816, hl: 3.1, hw: 1.3, ax: 465, az: 354, ax2: 460, az2: 352 },
-  // the Beacon dock: long and low off the headland's bench at the
-  // waterline, with its own stair climbing the slope to the lighthouse lawn
-  { x: 524.4, z: 331.4, rot: 0.785, hl: 14, hw: 2.2, ax: 514, az: 321 },
-  { x: 509.2, z: 317.5, rot: 0.785, hl: 5.8, hw: 1.4, ax: 504, az: 314, ax2: 514, az2: 321 },
+  // the Beacon dock: long and low off the headland's bench, shifted well
+  // SOUTH-EAST of the lighthouse so its stair never crowds the tower's own;
+  // the stair's bottom end overlaps INTO the pier root so the two decks
+  // share walkable ground at the junction (no dead wedge between rects)
+  { x: 517.2, z: 337.2, rot: 0.785, hl: 13, hw: 2.2, ax: 507, az: 327 },
+  { x: 503.3, z: 325.3, rot: 0.99, hl: 6.94, hw: 1.4, ax: 497, az: 321, ax2: 507, az2: 327 },
 ];
 
 /**
