@@ -8,8 +8,8 @@
     "first kill does not end the match; team wipe (isArenaTeamWiped) does",
     "endArenaMatch ranked Elo on both teams (arena2v2 standings) + returnFromArena"
   ],
-  "draws": 1942,
-  "drawDigest": "6e313f06",
+  "draws": 1945,
+  "drawDigest": "d04aec1c",
   "frames": [
     {
       "tick": 0,
@@ -1470,8 +1470,8 @@
       "state": "a2effe2e",
       "events": "741638a5",
       "rng": {
-        "draws": 1605,
-        "digest": "b7afc0d2"
+        "draws": 1604,
+        "digest": "c8765c69"
       }
     },
     {
@@ -1481,8 +1481,8 @@
       "state": "27bd6dd8",
       "events": "3814e25d",
       "rng": {
-        "draws": 1787,
-        "digest": "ff9c9678"
+        "draws": 1786,
+        "digest": "8421ad33"
       }
     },
     {
@@ -1492,8 +1492,8 @@
       "state": "bcf04b38",
       "events": "741638a5",
       "rng": {
-        "draws": 1942,
-        "digest": "6e313f06"
+        "draws": 1945,
+        "digest": "d04aec1c"
       },
       "label": "returned",
       "players": [
@@ -2009,8 +2009,8 @@
       "state": "bcf04b38",
       "events": "741638a5",
       "rng": {
-        "draws": 1942,
-        "digest": "6e313f06"
+        "draws": 1945,
+        "digest": "d04aec1c"
       },
       "label": "final",
       "players": [
