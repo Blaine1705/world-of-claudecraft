@@ -49,9 +49,9 @@ describe('the harbor decks', () => {
   it('joins the north shore network flush: no step taller than a stride', () => {
     // walk the seam points where piers meet the boardwalk
     const seams: [number, number][] = [
-      [468.5, 354], // north pier root on the boardwalk
-      [465, 362.5], // mid pier root at the boardwalk elbow
-      [452.2, 371.7], // ramp's south end at the deepwater pier root
+      [469.5, 351], // north pier root on the boardwalk
+      [467, 361.5], // mid pier root near the boardwalk elbow
+      [453.5, 375.5], // ramp's south end at the deepwater pier root
     ];
     for (const [x, z] of seams) {
       const here = groundHeight(x, z, SEED);
@@ -71,12 +71,12 @@ describe('the harbor decks', () => {
     const pier = GALE_HARBOR_DECKS[0];
     const dirx = Math.sin(pier.rot);
     const dirz = Math.cos(pier.rot);
-    // start on dry land at the boardwalk root
-    let x = 471;
-    let z = 348;
+    // start on dry land behind the boardwalk root
+    let x = 468;
+    let z = 347.5;
     const tip = { x: pier.x + dirx * (pier.hl - 1), z: pier.z + dirz * (pier.hl - 1) };
-    // first make for the pier root, then out along the centerline
-    const waypoints = [{ x: 468.5, z: 354 }, { x: pier.x, z: pier.z }, tip];
+    // onto the boardwalk, then out along the pier centerline
+    const waypoints = [{ x: 468.5, z: 351 }, { x: pier.x, z: pier.z }, tip];
     for (const wp of waypoints) {
       for (let i = 0; i < 60; i++) {
         const step = resolveMovement(SEED, x, z, wp.x, wp.z, 0.5);

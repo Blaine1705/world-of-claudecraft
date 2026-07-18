@@ -53,7 +53,12 @@
       "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_stables_blue.gltf",
       "out": "models/biome/hexb_stables.glb",
       "type": "static",
-      "maxTex": 512
+      "maxTex": 512,
+      "dropIslands": {
+        "minTris": 200,
+        "maxDim": 0.8
+      },
+      "comment": "dropIslands strips the three yard horses baked into the merged mesh"
     },
     {
       "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_tower_base_blue.gltf",

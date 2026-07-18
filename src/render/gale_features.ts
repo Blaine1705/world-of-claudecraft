@@ -139,8 +139,9 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
       lift += TOWER_STACK[i].h;
     }
     const lampY = beaconY + lift - 3.5;
-    // the stone stair and C balcony: drawn from the SAME beaconSpiralLift
-    // samples the sim walks on, so deck and footing never disagree
+    // the stone stair, two flights and two C balconies: drawn from the SAME
+    // beaconSpiralLift samples the sim walks on, so deck and footing never
+    // disagree
     {
       const s = BEACON_SPIRAL;
       const stone = mat(0x8f959c, 0.95);
@@ -156,68 +157,80 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
         g.translate(x, h - 0.18, z);
         slabs.push(g.toNonIndexed());
       };
-      // the winding stair: wide treads butted against the column face
-      const stairMid = (s.coreR + s.stairOut) / 2;
-      const stairW = s.stairOut - s.coreR;
-      const steps = 72;
-      for (let i = 0; i <= steps; i++) {
-        const a = s.a0 + (i / steps) * s.sweep;
-        // sample just off the band edges so the tread takes the tread height
-        slab(s.x + Math.sin(a) * stairMid, s.z + Math.cos(a) * stairMid, 0.62, stairW, a);
+      // whether an unwrapped angle sits on a balcony (wide band) or a flight
+      const onBalcony = (a: number): boolean =>
+        (a > s.flight1End && a <= s.balcony1End) || (a > s.flight2End && a <= s.balcony2End);
+      // slabs along the whole climb: treads on the flights, wider boards on
+      // the balconies, every one butted against the column face
+      const total = s.balcony2End - 0.03;
+      const slabsN = 130;
+      for (let i = 0; i <= slabsN; i++) {
+        const rel = (i / slabsN) * total;
+        const balc = onBalcony(rel);
+        const outR = balc ? s.balconyOut : s.stairOut;
+        const midR = (s.coreR + outR) / 2;
+        const a = s.a0 + rel;
+        slab(
+          s.x + Math.sin(a) * midR,
+          s.z + Math.cos(a) * midR,
+          balc ? 0.95 : 0.62,
+          outR - s.coreR,
+          a,
+        );
       }
-      // the C balcony, hugging the tower on from the stair top
-      const balcMid = (s.coreR + s.balconyOut) / 2;
-      const balcW = s.balconyOut - s.coreR;
-      const sectors = 26;
-      for (let i = 0; i <= sectors; i++) {
-        const a = s.a0 + s.sweep + (i / sectors) * (s.balconyArc - 0.03);
-        slab(s.x + Math.sin(a) * balcMid, s.z + Math.cos(a) * balcMid, 0.95, balcW, a);
+      // the handrail: posts along the outer edge, and a continuous helical
+      // double rail sampled finely so it runs DIAGONALLY up the flights and
+      // levels off around each balcony
+      const railPts: THREE.Vector3[] = [];
+      const railN = 96;
+      for (let i = 0; i <= railN; i++) {
+        const rel = (i / railN) * (s.balcony2End - 0.04);
+        const outR = (onBalcony(rel) ? s.balconyOut : s.stairOut) - 0.2;
+        const a = s.a0 + rel;
+        const x = s.x + Math.sin(a) * outR;
+        const z = s.z + Math.cos(a) * outR;
+        railPts.push(new THREE.Vector3(x, deckAt(x, z), z));
       }
-      // railings: posts and a double rail along every open edge (the outer
-      // stair edge, the balcony rim, and the balcony's far end)
-      const post = (x: number, z: number): THREE.Vector3 => {
-        const deckH = deckAt(x, z);
-        const g = new THREE.BoxGeometry(0.16, 1.12, 0.16);
-        g.translate(x, deckH + 0.52, z);
-        rails.push(g.toNonIndexed());
-        return new THREE.Vector3(x, deckH, z);
-      };
-      const railRun = (pts: THREE.Vector3[]): void => {
-        for (let i = 0; i + 1 < pts.length; i++) {
-          for (const lift2 of [1.02, 0.56]) {
-            beamBetween(
-              rails,
-              new THREE.Vector3(pts[i].x, pts[i].y + lift2, pts[i].z),
-              new THREE.Vector3(pts[i + 1].x, pts[i + 1].y + lift2, pts[i + 1].z),
-              0.09,
-              0.11,
-            );
-          }
+      for (let i = 0; i + 1 < railPts.length; i++) {
+        for (const lift2 of [1.04, 0.56]) {
+          beamBetween(
+            rails,
+            new THREE.Vector3(railPts[i].x, railPts[i].y + lift2, railPts[i].z),
+            new THREE.Vector3(railPts[i + 1].x, railPts[i + 1].y + lift2, railPts[i + 1].z),
+            0.08,
+            0.1,
+          );
         }
-      };
-      const stairEdge: THREE.Vector3[] = [];
-      for (let i = 0; i <= 20; i++) {
-        const a = s.a0 + (i / 20) * s.sweep;
-        stairEdge.push(
-          post(s.x + Math.sin(a) * (s.stairOut - 0.2), s.z + Math.cos(a) * (s.stairOut - 0.2)),
-        );
       }
-      railRun(stairEdge);
-      const balcEdge: THREE.Vector3[] = [];
-      for (let i = 0; i <= 12; i++) {
-        const a = s.a0 + s.sweep + (i / 12) * (s.balconyArc - 0.04);
-        balcEdge.push(
-          post(s.x + Math.sin(a) * (s.balconyOut - 0.2), s.z + Math.cos(a) * (s.balconyOut - 0.2)),
-        );
+      for (let i = 0; i <= 32; i++) {
+        const p = railPts[Math.round((i / 32) * railN)];
+        const g = new THREE.BoxGeometry(0.16, 1.12, 0.16);
+        g.translate(p.x, p.y + 0.52, p.z);
+        rails.push(g.toNonIndexed());
       }
-      railRun(balcEdge);
-      // the balcony's far end: a short radial rail back to the tower wall
-      const endA = s.a0 + s.sweep + s.balconyArc - 0.04;
-      const endRun: THREE.Vector3[] = [];
+      // the top balcony's far end: a short radial rail back to the tower
+      const endA = s.a0 + s.balcony2End - 0.04;
+      const endPts: THREE.Vector3[] = [];
       for (const r of [s.balconyOut - 0.2, (s.balconyOut + s.coreR) / 2, s.coreR + 0.25]) {
-        endRun.push(post(s.x + Math.sin(endA) * r, s.z + Math.cos(endA) * r));
+        const x = s.x + Math.sin(endA) * r;
+        const z = s.z + Math.cos(endA) * r;
+        const h = deckAt(x, z);
+        const g = new THREE.BoxGeometry(0.16, 1.12, 0.16);
+        g.translate(x, h + 0.52, z);
+        rails.push(g.toNonIndexed());
+        endPts.push(new THREE.Vector3(x, h, z));
       }
-      railRun(endRun);
+      for (let i = 0; i + 1 < endPts.length; i++) {
+        for (const lift2 of [1.04, 0.56]) {
+          beamBetween(
+            rails,
+            new THREE.Vector3(endPts[i].x, endPts[i].y + lift2, endPts[i].z),
+            new THREE.Vector3(endPts[i + 1].x, endPts[i + 1].y + lift2, endPts[i + 1].z),
+            0.08,
+            0.1,
+          );
+        }
+      }
       group.add(mergeBoxes(slabs, stone));
       group.add(mergeBoxes(rails, iron));
     }

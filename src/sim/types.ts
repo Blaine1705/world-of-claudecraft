@@ -1924,9 +1924,10 @@ export interface ZonePropsDef {
   campfires: [number, number][];
   mudHuts: [number, number][];
   ruinRings: { x: number; z: number; ringR: number; columns: number }[];
-  // kind 'stone': the low scalloped KayKit stone wall (garden/path walls)
-  // instead of the wood rail; same run geometry and the same jumpable OBB
-  fences: { x1: number; z1: number; x2: number; z2: number; kind?: 'stone' }[];
+  // kind 'stone': the low scalloped KayKit stone wall (garden/path walls);
+  // kind 'palisade': the spiked KayKit log wall (raider camps); both keep
+  // the wood rail's run geometry and the same jumpable OBB
+  fences: { x1: number; z1: number; x2: number; z2: number; kind?: 'stone' | 'palisade' }[];
   graveyards: { x: number; z: number }[]; // 6-headstone cluster anchor
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.

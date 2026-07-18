@@ -43,19 +43,19 @@ const DECKS_Z1 = 312;
 const DECKS_Z2 = 392;
 
 export const GALE_HARBOR_DECKS: GaleDeckDef[] = [
-  // the three harbor piers off Wickharbor's dock district, north to south
+  // the three harbor piers, rooted on the boardwalk and fanned wide along
+  // the bay so each has open water and breathing room, north to south
   // (the north shore's decks all share one anchor so the network runs flush)
-  { x: 481, z: 355, rot: 1.5, hl: 13, hw: 1.9, ax: 464, az: 352 },
-  { x: 476, z: 363.5, rot: 1.62, hl: 11, hw: 1.6, ax: 464, az: 352 },
-  // the deepwater pier, reaching the drowned channel where the big hulls ride
-  { x: 461, z: 377.5, rot: 1.18, hl: 13, hw: 2.2, ax: 449, az: 371 },
-  // the shore boardwalk decking the bluff edge between the roots; the south
-  // stretch is a ramp, climbing with the shore to the deepwater pier's level
-  { x: 468, z: 355.5, rot: -0.42, hl: 7.6, hw: 1.7, ax: 464, az: 352 },
-  { x: 458.5, z: 367, rot: -0.92, hl: 8.4, hw: 1.7, ax: 464, az: 352, ax2: 449, az2: 371 },
-  // the Beacon dock: the lighthouse's own wide pier plus its shore apron
-  { x: 518, z: 325.5, rot: 1.15, hl: 12, hw: 2.6, ax: 506, az: 320 },
-  { x: 506, z: 321, rot: 1.15, hl: 4.5, hw: 4.2, ax: 506, az: 320 },
+  { x: 481.6, z: 353.7, rot: 1.3, hl: 12, hw: 1.8, ax: 465, az: 354 },
+  { x: 479.9, z: 362.6, rot: 1.45, hl: 13, hw: 2.0, ax: 465, az: 354 },
+  // the deepwater pier off the south shore, reaching the drowned channel
+  { x: 464.1, z: 378.0, rot: 1.3, hl: 12, hw: 2.0, ax: 451, az: 375 },
+  // the shore boardwalk, laid right along the waterline (never inland); the
+  // south stretch ramps gently up to the higher southern shore
+  { x: 467.5, z: 358.0, rot: -0.124, hl: 8.1, hw: 1.7, ax: 465, az: 354 },
+  { x: 459.75, z: 371.25, rot: -0.91, hl: 8.6, hw: 1.7, ax: 465, az: 354, ax2: 451, az2: 375 },
+  // the Beacon dock, running seaward off the headland's low shore bench
+  { x: 520.1, z: 328.1, rot: 0.785, hl: 10, hw: 2.2, ax: 511, az: 320 },
 ];
 
 /**

@@ -184,6 +184,11 @@ export const GALECREST_CAMPS: CampDef[] = [
   { mobId: 'shoal_scuttler', center: { x: 444, z: 438 }, radius: 10, count: 3 },
   { mobId: 'shoal_scuttler', center: { x: 386, z: 622 }, radius: 9, count: 2 },
   { mobId: 'the_wreck_warden', center: { x: 330, z: 638 }, radius: 5, count: 1 },
+  // the outskirt raider camps (appended: camp order is world-gen rng order):
+  // whatever raised these tents is gone, and the wind moved in behind them
+  { mobId: 'gale_wisp', center: { x: 252, z: 250 }, radius: 4, count: 2 },
+  { mobId: 'gale_wisp', center: { x: 210, z: 410 }, radius: 4, count: 2 },
+  { mobId: 'moor_ram', center: { x: 250, z: 320 }, radius: 5, count: 2 },
 ];
 export const GALECREST_OBJECTS: GroundObjectDef[] = [];
 
@@ -208,10 +213,10 @@ export const GALECREST_PROPS: ZonePropsDef = {
     // the square market, flanking the south road out of the junction
     { x: 415, z: 373, rot: 0.7, r: 1.6 },
     { x: 419, z: 352, rot: -2.2, r: 1.6 },
-    // the harbor market: vendors working the boardwalk roots and pier gates
-    { x: 465, z: 349, rot: 1.2, r: 1.6 },
-    { x: 461, z: 362, rot: 0.9, r: 1.6 },
-    { x: 450, z: 366, rot: -0.7, r: 1.6 },
+    // the harbor market: vendors working the shore behind the boardwalk
+    { x: 464, z: 345, rot: 1.2, r: 1.6 },
+    { x: 462, z: 361, rot: 0.9, r: 1.6 },
+    { x: 452, z: 370, rot: -0.7, r: 1.6 },
   ],
   crates: [
     [437, 365],
@@ -220,7 +225,7 @@ export const GALECREST_PROPS: ZonePropsDef = {
   campfires: [
     [432, 361], // the square's fire, in the lee of the market hall
     [196, 434], // the Windway's waycamp
-    [476, 344], // the dockers' brazier above the north boardwalk
+    [455, 363], // the dockers' brazier behind the boardwalk
   ],
   // (no pirate-kit mini docks here: Wickharbor's piers are the walkable
   // stilt decks in sim/gale_harbor.ts, drawn by render/gale_features.ts)
@@ -244,6 +249,14 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { x1: 372, z1: 606, x2: 378, z2: 606, kind: 'stone' },
     // the grooms' hamlet garden, facing the paddock across the lane
     { x1: 322, z1: 592, x2: 322, z2: 603, kind: 'stone' },
+    // the raider camps' spiked palisades (two runs guarding each camp's
+    // open flank; layouts mirror the KayKit encampment reference)
+    { x1: 243, z1: 238, x2: 257, z2: 236, kind: 'palisade' },
+    { x1: 238, z1: 242, x2: 242, z2: 251, kind: 'palisade' },
+    { x1: 198, z1: 398, x2: 212, z2: 395, kind: 'palisade' },
+    { x1: 194, z1: 403, x2: 197, z2: 412, kind: 'palisade' },
+    { x1: 242, z1: 308, x2: 256, z2: 306, kind: 'palisade' },
+    { x1: 237, z1: 312, x2: 240, z2: 321, kind: 'palisade' },
   ],
   // the blue-roofed medieval quarter, the dock district, the Beacon's
   // keepers, and the stables hamlet (float: hulls ride at their draft)
@@ -258,38 +271,41 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexbHomeB', x: 442, z: 356, rot: -2.5, scale: 7.5, r: 5, h: 10 },
     { key: 'hexbHomeA', x: 441, z: 332, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexbHomeB', x: 386, z: 336, rot: -0.28, scale: 7.5, r: 5, h: 10 },
-    // the dock district: the shipwright's yard and the harbormaster's office
-    { key: 'hexbShipyard', x: 468, z: 338, rot: 1.35, scale: 7, r: 6.5, h: 10 },
-    { key: 'hexbDocks', x: 455, z: 357, rot: 1.55, scale: 6, r: 4, h: 7 },
-    // the fleet, moored bow-to-stern along the pier sides (berths verified
-    // against the deck rectangles in sim/gale_harbor.ts)
-    { key: 'hexShipBlue', x: 488.4, z: 349.9, rot: -1.64, scale: 6, r: 5, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 491.6, z: 361.4, rot: 1.5, scale: 6, r: 5, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 481.2, z: 368.5, rot: 1.62, scale: 6, r: 5, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 459.5, z: 370.5, rot: 1.18, scale: 6, r: 5, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 470.6, z: 375.1, rot: -1.96, scale: 6, r: 5, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 463.4, z: 384.9, rot: 1.18, scale: 6, r: 5, h: 9, float: 0.55 },
+    // the dock district, breathing room on both sides of the beacon road:
+    // the shipwright's yard by the north shingle, the harbormaster's office
+    // back from the boardwalk, and the ship monument ACROSS the road on the
+    // inland rise, the great anchor at its side
+    { key: 'hexbShipyard', x: 474, z: 338, rot: 1.3, scale: 7, r: 6.5, h: 10 },
+    { key: 'hexbDocks', x: 458, z: 354, rot: 1.4, scale: 6, r: 4, h: 7 },
+    { key: 'shipMonument', x: 446, z: 326, rot: 2.2, scale: 7, r: 3.4, h: 7 },
+    { key: 'hexAnchor', x: 451, z: 331, rot: -0.6, scale: 7 },
+    // the fleet, moored on the piers' open sides only (berths verified
+    // against the deck rectangles in sim/gale_harbor.ts; the r4 collider
+    // stays clear of every walkway so nobody wedges between hull and rail)
+    { key: 'hexShipBlue', x: 492.9, z: 350.2, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 475.1, z: 368.7, rot: 1.45, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 487, z: 370.1, rot: -1.69, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 456.6, z: 382.8, rot: 1.3, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 468.1, z: 386, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
     // the Beacon dock's pair, alongside the lighthouse pier
-    { key: 'hexShipBlue', x: 518.7, z: 318.9, rot: 1.15, scale: 6, r: 5, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 521.8, z: 334.1, rot: -1.99, scale: 6, r: 5, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 523.5, z: 321.9, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 519.5, z: 337.2, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
     // dinghies: two on the water, one hauled out by the rack on the shingle
-    { key: 'hexBoat', x: 476, z: 351, rot: 0.7, scale: 6, float: 0.1 },
-    { key: 'hexBoat', x: 482, z: 357, rot: -1.8, scale: 6, float: 0.1 },
-    { key: 'hexBoat', x: 485, z: 339, rot: 2.3, scale: 6 },
-    { key: 'hexBoatrack', x: 478, z: 336, rot: 0.9, scale: 6 },
-    // the ship monument on the harbor plaza, the anchor at its side
-    { key: 'shipMonument', x: 452, z: 346, rot: 0.9, scale: 7, r: 3.4, h: 7 },
-    { key: 'hexAnchor', x: 459, z: 344, rot: -0.6, scale: 7 },
+    { key: 'hexBoat', x: 474, z: 354, rot: 0.7, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 479, z: 357.5, rot: -1.8, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 484, z: 346, rot: 2.3, scale: 6 },
+    { key: 'hexBoatrack', x: 486, z: 340, rot: 0.9, scale: 6 },
     // harbor cargo around the office and the stalls
     { key: 'hexCrateBig', x: 457, z: 362, rot: 0.4, scale: 5 },
     { key: 'hexCrateOpen', x: 447, z: 362, rot: 1.7, scale: 5 },
     { key: 'hexSack', x: 462, z: 357, rot: 2.8, scale: 5 },
     { key: 'hexSack', x: 437, z: 372, rot: 0.9, scale: 5 },
     { key: 'hexCrateBig', x: 446, z: 383, rot: 2.1, scale: 5 },
-    // the Beacon's keepers: cottage on the road, store and home on the head
-    { key: 'hexbHomeA', x: 483, z: 328, rot: -0.9, scale: 7.5, r: 4.5, h: 8 },
-    { key: 'hexbWorkshop', x: 508, z: 312, rot: -2.2, scale: 6.5, r: 6, h: 8 },
-    { key: 'hexbHomeB', x: 502, z: 298, rot: 2.7, scale: 7, r: 5, h: 10 },
+    // the Beacon's keepers, spread across the head: the cottage across the
+    // road on the inland side, the store and home wide on the headland
+    { key: 'hexbHomeA', x: 470, z: 310, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbWorkshop', x: 512, z: 308, rot: -1.57, scale: 6.5, r: 6, h: 8 },
+    { key: 'hexbHomeB', x: 498, z: 294, rot: 0.2, scale: 7, r: 5, h: 10 },
     // the golden horse rears beside the stables' race-yard entrance
     { key: 'goldenHorseStatue', x: 374, z: 591.5, rot: Math.PI, scale: 5.5, r: 2.4, h: 6 },
     // the grooms' hamlet on the downs west of the paddock: two long barns,
@@ -301,6 +317,45 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexHaybale', x: 323, z: 576, rot: 0.7, scale: 5 },
     { key: 'hexHaybale', x: 322, z: 589, rot: 2.1, scale: 5 },
     { key: 'hexTrough', x: 326, z: 571, rot: Math.PI / 2, scale: 5 },
+    // and the road side of the stables: homes and a third barn spread
+    // evenly along the Wreckfields road, east and south of the paddock
+    { key: 'hexbHomeA', x: 448, z: 558, rot: -1.5, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbStables', x: 450, z: 576, rot: -1.57, scale: 7, r: 5.5, h: 9 },
+    { key: 'hexbHomeB', x: 368, z: 624, rot: Math.PI, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: 394, z: 620, rot: 2.9, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbStables', x: 404, z: 612, rot: 0.5, scale: 7, r: 5.5, h: 9 },
+    { key: 'hexHaybale', x: 446, z: 581, rot: 1.3, scale: 5 },
+    { key: 'hexHaybale', x: 409, z: 618, rot: 0.2, scale: 5 },
+    { key: 'hexTrough', x: 453, z: 570, rot: 0.1, scale: 5 },
+    // the raider encampments on the outer downs (KayKit hide tents, spiked
+    // palisades, and watchtowers; the wind keeps what the raiders left):
+    // camp A on the far north downs
+    { key: 'hexrTent', x: 245, z: 245, rot: 0.9, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 259, z: 246, rot: -0.8, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 254, z: 259, rot: 2.4, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrWatchtower', x: 243, z: 256, rot: 0.7, scale: 6, r: 2.6, h: 9 },
+    { key: 'hexFlagRed', x: 249, z: 252, rot: 0.3, scale: 5 },
+    { key: 'hexFlagRed', x: 259, z: 253, rot: 2.1, scale: 5 },
+    { key: 'hexBarrel', x: 256, z: 242, rot: 0.8, scale: 5 },
+    { key: 'hexTarget', x: 263, z: 258, rot: -1.2, scale: 5 },
+    // camp B on the rise above the Windway road
+    { key: 'hexrTent', x: 204, z: 404, rot: 0.4, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 217, z: 405, rot: -1.3, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 212, z: 417, rot: 2.9, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrWatchtower', x: 201, z: 417, rot: 1.2, scale: 6, r: 2.6, h: 9 },
+    { key: 'hexFlagRed', x: 208, z: 411, rot: 1.1, scale: 5 },
+    { key: 'hexFlagRed', x: 216, z: 412, rot: -0.4, scale: 5 },
+    { key: 'hexBarrel', x: 214, z: 399, rot: 2.3, scale: 5 },
+    { key: 'hexTarget', x: 220, z: 416, rot: 0.6, scale: 5 },
+    // camp C on the Howling Downs' west rim
+    { key: 'hexrTent', x: 243, z: 315, rot: 1.1, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 257, z: 316, rot: -0.9, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 252, z: 329, rot: 2.6, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrWatchtower', x: 241, z: 326, rot: 0.9, scale: 6, r: 2.6, h: 9 },
+    { key: 'hexFlagRed', x: 247, z: 322, rot: 1.9, scale: 5 },
+    { key: 'hexFlagRed', x: 257, z: 323, rot: -0.7, scale: 5 },
+    { key: 'hexBarrel', x: 254, z: 312, rot: 1.4, scale: 5 },
+    { key: 'hexTarget', x: 261, z: 328, rot: 2.2, scale: 5 },
   ],
   // an old watch ruin on the Howling Downs, and the beacon's fallen forecourt
   ruinRings: [

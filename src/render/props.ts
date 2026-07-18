@@ -199,6 +199,14 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // the low scalloped stone wall (fences with kind 'stone'; length runs
   // along local +z in the authored piece)
   hexFenceStone: { url: '/models/biome/hexn_fence_stone.glb', kit: 'khex' },
+  // the raider encampment set: spiked log wall (fences with kind
+  // 'palisade'; length along local +x), red hide tents, and camp dressing
+  hexnPalisade: { url: '/models/biome/hexn_palisade.glb', kit: 'khex' },
+  hexrTent: { url: '/models/biome/hexr_tent.glb', kit: 'khex' },
+  hexrWatchtower: { url: '/models/biome/hexr_watchtower.glb', kit: 'khex' },
+  hexBarrel: { url: '/models/biome/hex_barrel.glb', kit: 'khex' },
+  hexTarget: { url: '/models/biome/hex_target.glb', kit: 'khex' },
+  hexFlagRed: { url: '/models/biome/hex_flag_red.glb', kit: 'khex' },
   // the Galecrest monuments (maintainer-authored generated models): the
   // ship memorial on the Wickharbor dock plaza, the golden horse for the
   // stable yard
@@ -260,6 +268,7 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'rowboat',
   'graveRound',
   'hexFenceStone',
+  'hexnPalisade',
   'timberPillar',
   'crateWooden',
   'barrel',
@@ -1084,17 +1093,24 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- town fences: village fence module repeated along the run ------------
-  // (kind 'stone': the low scalloped KayKit wall instead of the wood rail;
-  // its authored length runs along local +z, the wood rail's along local +x)
+  // (kind 'stone': the low scalloped KayKit wall, its authored length along
+  // local +z; kind 'palisade': the spiked KayKit log wall, length along
+  // local +x like the wood rail)
   const STONE_WALL_SCALE = 4.2;
   const STONE_MODULE_LEN = 1.155 * STONE_WALL_SCALE;
+  const PALISADE_MODULE_LEN = 2.0; // authored length before scaling
+  const PALISADE_SEG = 6.4; // target module length in the world
   for (const f of getActiveWorldContent().props.fences) {
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
     const stone = f.kind === 'stone';
-    const n = Math.max(1, Math.round(len / (stone ? STONE_MODULE_LEN : 2.35)));
+    const palisade = f.kind === 'palisade';
+    const n = Math.max(
+      1,
+      Math.round(len / (stone ? STONE_MODULE_LEN : palisade ? PALISADE_SEG : 2.35)),
+    );
     const dirx = (f.x2 - f.x1) / len,
       dirz = (f.z2 - f.z1) / len;
-    // module length runs along local +x (wood) or local +z (stone)
+    // module length runs along local +x (wood, palisade) or local +z (stone)
     const yaw = stone ? Math.atan2(dirx, dirz) : Math.atan2(-dirz, dirx);
     for (let i = 0; i < n; i++) {
       const x0 = f.x1 + (f.x2 - f.x1) * (i / n),
@@ -1117,6 +1133,17 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
           mz,
           new THREE.Euler(-pitch, yaw, 0, 'YXZ'),
           [STONE_WALL_SCALE, STONE_WALL_SCALE, segScale],
+        );
+        continue;
+      }
+      if (palisade) {
+        addInstance(
+          'hexnPalisade',
+          mx,
+          (g0 + g1) / 2 - 0.15,
+          mz,
+          new THREE.Euler(0, yaw, pitch, 'YZX'),
+          [len / n / PALISADE_MODULE_LEN, 3.2, 1.8],
         );
         continue;
       }
