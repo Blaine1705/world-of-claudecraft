@@ -28,7 +28,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
-import { fenWillowSpots } from './fen_willows';
+import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import type { BuildingDef, WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import {
@@ -181,6 +181,16 @@ function staticWorldColliders(seed: number): Collider[] {
   // willow, from the same deterministic list the renderer instances the
   // models from (sim/fen_willows.ts).
   for (const w of fenWillowSpots(seed))
+    out.push({
+      type: 'circle',
+      x: w.x,
+      z: w.z,
+      r: w.r,
+      cameraTopY: topY(seed, w.x, w.z, 6),
+      camGhost: true,
+    });
+  // ...and the Veiled Hollow's willows, same one-list contract
+  for (const w of hollowWillowSpots(seed))
     out.push({
       type: 'circle',
       x: w.x,

@@ -7,6 +7,7 @@
 // roads, props, and the terrain's own scatter rocks. Pure leaf:
 // deterministic, memoized, no SimContext.
 
+import { REALM_PROPS, REALM_ZONE } from './content/realm';
 import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from './content/willowfen';
 import { hash2 } from './rng';
 import { generateDecorationsInBounds, roadDistance, terrainHeight, WATER_LEVEL } from './world';
@@ -24,6 +25,73 @@ export interface FenWillow {
 }
 
 let fenWillowCache: { seed: number; spots: FenWillow[] } | null = null;
+let hollowWillowCache: { seed: number; spots: FenWillow[] } | null = null;
+
+/**
+ * The Veiled Hollow's willows: shoreline rings around the realm's pools
+ * plus a light meadow scatter, the same level-dry-clear rules as the fen's
+ * (and the same one-list contract: render/water_flora.ts draws these,
+ * sim/colliders.ts blocks their trunks).
+ */
+export function hollowWillowSpots(seed: number): FenWillow[] {
+  if (hollowWillowCache && hollowWillowCache.seed === seed) return hollowWillowCache.spots;
+  const hub = REALM_ZONE.hub;
+  const rocks = generateDecorationsInBounds(seed, {
+    minX: -180,
+    maxX: 180,
+    minZ: 910,
+    maxZ: 1290,
+  }).filter((d) => d.kind === 'rock');
+  const zp = REALM_PROPS;
+  const buildings = zp.buildings ?? [];
+  const decor = (zp.decorProps ?? []).map((d) => ({ x: d.x, z: d.z, r: d.r ?? 3 }));
+  const level = (x: number, z: number): boolean => {
+    const e = 0.9;
+    const hx = terrainHeight(x + e, z, seed) - terrainHeight(x - e, z, seed);
+    const hz = terrainHeight(x, z + e, seed) - terrainHeight(x, z - e, seed);
+    return Math.hypot(hx, hz) / (2 * e) < 0.34;
+  };
+  const spots: FenWillow[] = [];
+  const tryWillow = (x: number, z: number, s: number, rot: number): boolean => {
+    if (z < 918 || z > 1250) return false;
+    const y = terrainHeight(x, z, seed);
+    if (y < WATER_LEVEL + 0.6) return false;
+    if (!level(x, z)) return false;
+    if (Math.hypot(x - hub.x, z - hub.z) < hub.radius + 6) return false;
+    if (Math.hypot(x + 60, z - 1004) < 14) return false; // the graveyard
+    if (roadDistance(x, z) < 5) return false;
+    for (const b of buildings) if (Math.hypot(x - b.x, z - b.z) < 9) return false;
+    for (const d of decor) if (Math.hypot(x - d.x, z - d.z) < d.r + 4) return false;
+    for (const r of rocks) if (Math.hypot(x - r.x, z - r.z) < 2.2 * r.scale + 1) return false;
+    spots.push({ x, z, y: y - 0.15, s, rot, r: Math.max(0.85, s * 0.14) });
+    return true;
+  };
+  for (const lake of REALM_ZONE.lakes) {
+    const count = 2 + Math.floor(hash2(lake.x, lake.z, seed + 2601) * 3);
+    for (let k = 0; k < count; k++) {
+      const ang = hash2(k, lake.x + lake.z, seed + 2611) * Math.PI * 2;
+      const dist = lake.radius + 9 + hash2(lake.x, k, seed + 2621) * 7;
+      tryWillow(
+        lake.x + Math.sin(ang) * dist,
+        lake.z + Math.cos(ang) * dist,
+        6.5 + hash2(k, lake.z, seed + 2631) * 3,
+        hash2(lake.x + k, k, seed + 2641) * Math.PI * 2,
+      );
+    }
+  }
+  // the meadow scatter between the pools
+  for (let gx = -160; gx <= 170; gx += 26) {
+    for (let gz = 930; gz <= 1240; gz += 26) {
+      if (hash2(gx, gz, seed + 2651) > 0.24) continue;
+      const x = gx + (hash2(gx + 1, gz, seed + 2661) - 0.5) * 15;
+      const z = gz + (hash2(gx, gz + 1, seed + 2671) - 0.5) * 15;
+      if (REALM_ZONE.lakes.some((l) => Math.hypot(x - l.x, z - l.z) < l.radius + 12)) continue;
+      tryWillow(x, z, 7 + hash2(x, z, seed + 2681) * 3, hash2(z, x, seed + 2691) * Math.PI * 2);
+    }
+  }
+  hollowWillowCache = { seed, spots };
+  return spots;
+}
 
 export function fenWillowSpots(seed: number): FenWillow[] {
   if (fenWillowCache && fenWillowCache.seed === seed) return fenWillowCache.spots;

@@ -195,7 +195,12 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
       }
       const rot = Math.atan2(x1 - x0, z1 - z0);
       endSegs.push(
-        seg(x1 - Math.sin(rot) * step * 0.3, z1 - Math.cos(rot) * step * 0.3, rot - Math.PI / 2, fp),
+        seg(
+          x1 - Math.sin(rot) * step * 0.3,
+          z1 - Math.cos(rot) * step * 0.3,
+          rot - Math.PI / 2,
+          fp,
+        ),
       );
     };
     chain(330, 2250, 344, 2233, 9); // the twin pools' own link

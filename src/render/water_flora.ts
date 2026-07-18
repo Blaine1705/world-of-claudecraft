@@ -5,6 +5,7 @@
 // ZONES at build time; same placement walk as the originals, render-only.
 import * as THREE from 'three';
 import { ZONES } from '../sim/data';
+import { hollowWillowSpots } from '../sim/fen_willows';
 import { hash2 } from '../sim/rng';
 import { roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -18,6 +19,7 @@ export interface WaterFloraView {
 const FLORA_URLS = {
   lilies: '/models/props/fen_lilies.glb',
   reeds: '/models/props/fen_reeds.glb',
+  willow: '/models/props/willow_tree.glb',
 } as const;
 type FloraKey = keyof typeof FLORA_URLS;
 const floraScenes: Partial<Record<FloraKey, THREE.Group>> = {};
@@ -142,6 +144,13 @@ export function buildWaterFlora(seed: number): WaterFloraView {
   }
   instanceProp('lilies', lilySpots);
   instanceProp('reeds', reedSpots);
+
+  // the Veiled Hollow's willows: drawn from the shared sim list so every
+  // trunk the renderer shows is a trunk the colliders block
+  instanceProp(
+    'willow',
+    hollowWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
+  );
 
   return {
     group,
