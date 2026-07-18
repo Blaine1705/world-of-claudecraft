@@ -15,8 +15,8 @@
     "cancelCast fishing arm via dealDamage (FISHING_CAST_ID, not pushback)",
     "multi-class casters: mage/priest/warlock"
   ],
-  "draws": 1947,
-  "drawDigest": "2af1da22",
+  "draws": 1944,
+  "drawDigest": "a5157ec9",
   "frames": [
     {
       "tick": 0,
@@ -1910,8 +1910,8 @@
       "state": "3aa0d21e",
       "events": "e30235b5",
       "rng": {
-        "draws": 1703,
-        "digest": "73e6e364"
+        "draws": 1702,
+        "digest": "ba8456be"
       }
     },
     {
@@ -1921,8 +1921,8 @@
       "state": "68f205ef",
       "events": "741638a5",
       "rng": {
-        "draws": 1737,
-        "digest": "350f8a91"
+        "draws": 1736,
+        "digest": "48221052"
       }
     },
     {
@@ -1932,8 +1932,8 @@
       "state": "b525a5f8",
       "events": "741638a5",
       "rng": {
-        "draws": 1782,
-        "digest": "8cf2e60b"
+        "draws": 1780,
+        "digest": "f34d62ce"
       }
     },
     {
@@ -1954,8 +1954,8 @@
       "state": "1b29cfb3",
       "events": "20241c01",
       "rng": {
-        "draws": 1839,
-        "digest": "084cd873"
+        "draws": 1837,
+        "digest": "fb542578"
       },
       "label": "warlock-channel-pushback",
       "players": [
@@ -2456,8 +2456,8 @@
       "state": "736221aa",
       "events": "2e7f5428",
       "rng": {
-        "draws": 1849,
-        "digest": "d31d94ec"
+        "draws": 1847,
+        "digest": "e1268b6a"
       }
     },
     {
@@ -2467,8 +2467,8 @@
       "state": "fbc2dd76",
       "events": "fa11e5dd",
       "rng": {
-        "draws": 1893,
-        "digest": "e4df9926"
+        "draws": 1890,
+        "digest": "bd87593d"
       }
     },
     {
@@ -2478,8 +2478,8 @@
       "state": "d42f81bd",
       "events": "106a295a",
       "rng": {
-        "draws": 1902,
-        "digest": "dbc6b3d5"
+        "draws": 1900,
+        "digest": "13d520a9"
       },
       "label": "warlock-fishing-cancel",
       "players": [
@@ -2981,8 +2981,8 @@
       "state": "2a7de2a4",
       "events": "741638a5",
       "rng": {
-        "draws": 1940,
-        "digest": "5fe8a6ae"
+        "draws": 1938,
+        "digest": "c1b9d913"
       }
     },
     {
@@ -2992,8 +2992,8 @@
       "state": "228de3ea",
       "events": "741638a5",
       "rng": {
-        "draws": 1947,
-        "digest": "2af1da22"
+        "draws": 1944,
+        "digest": "a5157ec9"
       },
       "label": "final",
       "players": [

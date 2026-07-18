@@ -7,8 +7,8 @@
     "Hit rating from authored gear vs a +3 target",
     "same shared-RNG draw count/order as the ungeared spell-resist path"
   ],
-  "draws": 735,
-  "drawDigest": "b39554fc",
+  "draws": 734,
+  "drawDigest": "12572f49",
   "frames": [
     {
       "tick": 0,
@@ -249,8 +249,8 @@
       "state": "5d549602",
       "events": "741638a5",
       "rng": {
-        "draws": 639,
-        "digest": "9961eab9"
+        "draws": 638,
+        "digest": "1a41d75e"
       }
     },
     {
@@ -260,8 +260,8 @@
       "state": "4faab739",
       "events": "741638a5",
       "rng": {
-        "draws": 735,
-        "digest": "b39554fc"
+        "draws": 734,
+        "digest": "12572f49"
       }
     },
     {
@@ -271,8 +271,8 @@
       "state": "4faab739",
       "events": "741638a5",
       "rng": {
-        "draws": 735,
-        "digest": "b39554fc"
+        "draws": 734,
+        "digest": "12572f49"
       },
       "label": "fireball-landed",
       "players": [
@@ -500,8 +500,8 @@
       "state": "4faab739",
       "events": "741638a5",
       "rng": {
-        "draws": 735,
-        "digest": "b39554fc"
+        "draws": 734,
+        "digest": "12572f49"
       },
       "label": "final",
       "players": [
