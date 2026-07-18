@@ -137,12 +137,14 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, w.x, w.z, 3.7),
       camGhost: true,
     });
+  // the collider runs wider than the data radius: the modeled trunks flare
+  // at the base, and the r that sizes the tree understates the bark line
   for (const t of PROPS.greatTrees ?? [])
     out.push({
       type: 'circle',
       x: t.x,
       z: t.z,
-      r: t.r,
+      r: t.r * 1.45,
       cameraTopY: topY(seed, t.x, t.z, 7),
       camGhost: true,
     });

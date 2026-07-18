@@ -204,6 +204,12 @@ export const PALMREACH_PROPS: ZonePropsDef = {
     { kind: 'house', x: -380, z: 795, w: 5, d: 5, rot: 0.2 },
     { kind: 'house', x: -370, z: 1045, w: 5, d: 5, rot: 2.9 },
     { kind: 'house', x: -280, z: 1055, w: 5, d: 5, rot: 1.4 },
+    // the second wave: lone homesteads spread wide (every site probed level
+    // and dry, 18-plus yards clear of every other structure)
+    { kind: 'house', x: -320, z: 780, w: 5, d: 5, rot: 1.8 },
+    { kind: 'house', x: -270, z: 820, w: 5, d: 5, rot: -1.1 },
+    { kind: 'house', x: -440, z: 900, w: 5, d: 5, rot: 0.6 },
+    { kind: 'house', x: -410, z: 1130, w: 5, d: 5, rot: 2.2 },
   ],
   wells: [{ x: -300, z: 822, r: 1.5 }],
   stalls: [
@@ -253,6 +259,9 @@ export const PALMREACH_PROPS: ZonePropsDef = {
     [-363, 1052],
     [-287, 1063],
     [-273, 1062],
+    // lone huts on the far moors, each well away from everything else
+    [-250, 1000],
+    [-220, 1210],
   ],
   // beached rowboats along the river banks, the pool, and the lagoon shore
   decorProps: [

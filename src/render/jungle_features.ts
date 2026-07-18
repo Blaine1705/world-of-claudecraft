@@ -238,11 +238,11 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
   {
     const spots: Placement[] = [];
     for (const sp of reachPalmSpots(seed)) {
-      if (hash2(sp.x, sp.z, seed + 5301) > 0.33) continue;
-      const n = 1 + Math.floor(hash2(sp.z, sp.x, seed + 5311) * 2);
+      if (hash2(sp.x, sp.z, seed + 5301) > 0.55) continue;
+      const n = 2 + Math.floor(hash2(sp.z, sp.x, seed + 5311) * 2);
       for (let k = 0; k < n; k++) {
         const ang = hash2(sp.x + k, sp.z, seed + 5321) * Math.PI * 2;
-        const dist = 1.6 + hash2(sp.x, sp.z + k, seed + 5331) * 1.6;
+        const dist = 2.6 + hash2(sp.x, sp.z + k, seed + 5331) * 2.2;
         const x = sp.x + Math.sin(ang) * dist;
         const z = sp.z + Math.cos(ang) * dist;
         const y = terrainHeight(x, z, seed);
@@ -253,7 +253,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
           x,
           z,
           y: y - 0.04,
-          s: 0.34 + hash2(k, sp.x, seed + 5341) * 0.16,
+          s: 3.0 + hash2(k, sp.x, seed + 5341) * 1.75,
           rot: hash2(z, x, seed + 5351) * Math.PI * 2,
         });
       }

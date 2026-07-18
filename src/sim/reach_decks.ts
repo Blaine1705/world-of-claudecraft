@@ -29,11 +29,13 @@ export const REACH_DECKS: GaleDeckDef[] = [
   // the Sapphire Lagoon boardwalk: a shore deck on the west rim with a
   // railed pier running out over the turquoise water (one shared anchor)
   { x: -302.5, z: 953, rot: 0, hl: 6.5, hw: 2.0, ax: -302, az: 947 },
-  { x: -293, z: 950, rot: Math.PI / 2, hl: 8, hw: 1.8, ax: -302, az: 947 },
+  { x: -295.5, z: 950, rot: Math.PI / 2, hl: 8.5, hw: 2.2, ax: -302, az: 947 },
   // the jungle-pool deck: a small viewing platform off the pool's east rim,
   // with a stair climbing the tangle-side rise behind it
   { x: -372, z: 1004, rot: 0.5, hl: 4.5, hw: 2.2, ax: -368, az: 1000 },
-  { x: -364.5, z: 997, rot: 0.95, hl: 4.2, hw: 1.3, ax: -368, az: 1000, ax2: -361, az2: 994 },
+  // the stair's bottom end runs INTO the platform rect so the two decks
+  // share walkable ground at the junction (no dead wedge, the harbor rule)
+  { x: -366.69, z: 998.99, rot: 2.265, hl: 7.3, hw: 1.8, ax: -368, az: 1000, ax2: -361, az2: 994 },
 ];
 
 // bounding box for the cheap early-out, grown from the deck list itself

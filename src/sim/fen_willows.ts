@@ -84,7 +84,7 @@ export function fenWillowSpots(seed: number): FenWillow[] {
     if (roadDistance(x, z) < 5) return false;
     if (!clearOfProps(x, z, 2)) return false;
     if (!clearOfRocks(x, z, 1)) return false;
-    spots.push({ x, z, y: y - 0.15, s, rot, r: Math.max(0.55, s * 0.09) });
+    spots.push({ x, z, y: y - 0.15, s, rot, r: Math.max(0.85, s * 0.14) });
     return true;
   };
   // the shoreline rings, with a bigger elder companion beside many
