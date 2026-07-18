@@ -172,6 +172,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/biome/hexb_tower_b.glb": "/media/models/biome/hexb_tower_b.67462328c82b.glb",
   "models/biome/hexb_tower_base.glb": "/media/models/biome/hexb_tower_base.657493d8eafd.glb",
   "models/biome/hexb_townhall.glb": "/media/models/biome/hexb_townhall.93723cdfc7a4.glb",
+  "models/biome/hexb_windmill.glb": "/media/models/biome/hexb_windmill.efda23cbf513.glb",
   "models/biome/hexb_workshop.glb": "/media/models/biome/hexb_workshop.37a1821ef635.glb",
   "models/biome/hexn_fence_stone.glb": "/media/models/biome/hexn_fence_stone.fda54085d4f7.glb",
   "models/biome/hexn_palisade.glb": "/media/models/biome/hexn_palisade.8a4fac668009.glb",

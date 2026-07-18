@@ -299,6 +299,30 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
           g.translate(px, (top + bed - 0.4) / 2 + 0.2, pz);
           posts.push(g.toNonIndexed());
         }
+        // stairs get a handrail: posts and a double rail following the climb
+        if (stair) {
+          const railPts: THREE.Vector3[] = [];
+          for (let along = -d.hl + 0.4; along <= d.hl - 0.2; along += 1.4) {
+            const px = d.x + dirx * along + pxu * (d.hw - 0.12) * side;
+            const pz = d.z + dirz * along + pzu * (d.hw - 0.12) * side;
+            const y = yAt(along);
+            railPts.push(new THREE.Vector3(px, y, pz));
+            const g = new THREE.BoxGeometry(0.14, 1.06, 0.14);
+            g.translate(px, y + 0.5, pz);
+            posts.push(g.toNonIndexed());
+          }
+          for (let i = 0; i + 1 < railPts.length; i++) {
+            for (const lift of [0.98, 0.54]) {
+              beamBetween(
+                posts,
+                new THREE.Vector3(railPts[i].x, railPts[i].y + lift, railPts[i].z),
+                new THREE.Vector3(railPts[i + 1].x, railPts[i + 1].y + lift, railPts[i + 1].z),
+                0.08,
+                0.1,
+              );
+            }
+          }
+        }
       }
       // mooring bollards on the two tip corners of each pier
       for (const side of [1, -1]) {

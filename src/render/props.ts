@@ -207,6 +207,7 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexTarget: { url: '/models/biome/hex_target.glb', kit: 'khex' },
   hexFlagRed: { url: '/models/biome/hex_flag_red.glb', kit: 'khex' },
   hexCannon: { url: '/models/biome/hex_cannon.glb', kit: 'khex' },
+  hexbWindmill: { url: '/models/biome/hexb_windmill.glb', kit: 'khex' },
   // the Galecrest monuments (maintainer-authored generated models): the
   // ship memorial on the Wickharbor dock plaza, the golden horse for the
   // stable yard
@@ -1003,8 +1004,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     // the windmill's sail cross is a distinct authored mesh: reparent it onto
     // a pivot at its axle so the renderer can spin it (kept out of the static
     // merge, the campfire-flame idiom)
-    if (d.key === 'hexWindmill') {
-      const a = propAsset('hexWindmill');
+    if (d.key === 'hexWindmill' || d.key === 'hexbWindmill') {
+      const a = propAsset(d.key);
       const fanIdx = a.parts.findIndex((part) => /fan/i.test(part.name));
       if (fanIdx >= 0) {
         const fanMesh = holder.children[fanIdx] as THREE.Mesh;

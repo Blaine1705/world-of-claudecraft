@@ -42,6 +42,12 @@
       "out": "models/biome/hex_cannon.glb",
       "type": "static",
       "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_windmill_blue.gltf",
+      "out": "models/biome/hexb_windmill.glb",
+      "type": "static",
+      "maxTex": 512
     }
   ]
 }

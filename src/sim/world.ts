@@ -2826,6 +2826,10 @@ const GALE_LEVEL_PADS: { x: number; z: number; r: number; h?: number }[] = [
   // explicit height keeps it a low shelf above the beach, the downs rising
   // behind it, instead of a high pad with a sheer rim over the water
   { x: 299, z: 531, r: 12, h: WATER_LEVEL + 3.2 },
+  // the Old Beacon's lawn: one flat disc under the whole tower and spiral
+  // stair, so the stair foot always meets level ground (a sloping lawn left
+  // the first tread hovering and broke click-to-move approaches)
+  { x: 498, z: 308, r: 11 },
 ];
 
 function terrainHeightUnpadded(x: number, z: number, seed: number): number {

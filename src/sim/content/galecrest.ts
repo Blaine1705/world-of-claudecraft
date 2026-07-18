@@ -103,6 +103,8 @@ export const GALECREST_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
   { x: 292, z: 541, r: 5 },
   { x: 458, z: 606, r: 6 },
   { x: 462, z: 613, r: 5 },
+  { x: 452, z: 599, r: 4 },
+  { x: 467, z: 625, r: 4 },
   { x: 306, z: 540, r: 5 },
   { x: 310, z: 548, r: 7 },
   { x: 306, z: 572, r: 7 },
@@ -386,8 +388,11 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'hexbStables', x: 404, z: 612, rot: 0.5, scale: 7, r: 5.5, h: 9 },
     // the flower mill on the southeast downs above the Shear: a turning
     // windmill and a cottage ringed in blooms (meadow circles below)
-    { key: 'hexWindmill', x: 460, z: 618, rot: 0.5, scale: 7, r: 4, h: 12 },
+    { key: 'hexbWindmill', x: 460, z: 618, rot: 0.5, scale: 7, r: 4, h: 12 },
     { key: 'hexbHomeA', x: 458, z: 606, rot: -0.4, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 452, z: 596, rot: 0.9, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: 446, z: 630, rot: -0.6, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 468, z: 628, rot: 2.3, scale: 7.5, r: 5, h: 10 },
     { key: 'hexHaybale', x: 446, z: 581, rot: 1.3, scale: 5 },
     { key: 'hexHaybale', x: 409, z: 618, rot: 0.2, scale: 5 },
     { key: 'hexTrough', x: 453, z: 570, rot: 0.1, scale: 5 },
