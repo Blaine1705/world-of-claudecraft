@@ -8,8 +8,8 @@
     "updateGroundAoEs first-in-tick (~2256)",
     "pulseGroundAoE both callers (immediate ~4097 + deferred ~3052)"
   ],
-  "draws": 1652,
-  "drawDigest": "b6d62ad9",
+  "draws": 1649,
+  "drawDigest": "cd31aa85",
   "frames": [
     {
       "tick": 0,
@@ -174,16 +174,16 @@
       "state": "327102bd",
       "events": "741638a5",
       "rng": {
-        "draws": 339,
-        "digest": "16aa0ad7"
+        "draws": 338,
+        "digest": "0c6c8bf4"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 686,
-      "state": "109e395e",
-      "events": "2f0a4d4c",
+      "state": "86cd501e",
+      "events": "91388b3b",
       "rng": {
         "draws": 518,
         "digest": "589b508e"
@@ -193,7 +193,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 686,
-      "state": "ea795437",
+      "state": "1e91c3a7",
       "events": "741638a5",
       "rng": {
         "draws": 719,
@@ -204,7 +204,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 686,
-      "state": "221dd500",
+      "state": "c85348c0",
       "events": "cd1790c3",
       "rng": {
         "draws": 918,
@@ -215,44 +215,44 @@
       "tick": 160,
       "time": 8,
       "nextId": 686,
-      "state": "1f0f4d10",
+      "state": "e8419e90",
       "events": "741638a5",
       "rng": {
-        "draws": 1150,
-        "digest": "9b8f05fc"
+        "draws": 1147,
+        "digest": "bd0e1528"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 686,
-      "state": "32f68d59",
-      "events": "311d4c30",
+      "state": "27f7671a",
+      "events": "46e15d1c",
       "rng": {
-        "draws": 1405,
-        "digest": "54892912"
+        "draws": 1401,
+        "digest": "3ef0715e"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 686,
-      "state": "2849cb62",
+      "state": "9c2806f9",
       "events": "741638a5",
       "rng": {
-        "draws": 1644,
-        "digest": "20413b14"
+        "draws": 1647,
+        "digest": "0cc096c1"
       }
     },
     {
       "tick": 201,
       "time": 10.05,
       "nextId": 686,
-      "state": "b19d45f6",
+      "state": "1cb12c3b",
       "events": "741638a5",
       "rng": {
-        "draws": 1652,
-        "digest": "b6d62ad9"
+        "draws": 1649,
+        "digest": "cd31aa85"
       },
       "label": "final",
       "players": [
@@ -272,14 +272,14 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 168,
+            "damageDealt": 169,
             "damageTaken": 28
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 168
+              "damageDealt": 169
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -415,7 +415,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 39832,
+          "hp": 39831,
           "id": 685,
           "inCombat": true,
           "kind": "mob",
@@ -451,7 +451,7 @@
           "threat": [
             [
               684,
-              169
+              170
             ]
           ],
           "wanderTarget": {

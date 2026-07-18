@@ -7,8 +7,8 @@
     "Hit rating from authored gear vs a +3 target",
     "same shared-RNG draw count/order as the ungeared spell-resist path"
   ],
-  "draws": 736,
-  "drawDigest": "706b7487",
+  "draws": 735,
+  "drawDigest": "b39554fc",
   "frames": [
     {
       "tick": 0,
@@ -227,8 +227,8 @@
       "state": "f7772c21",
       "events": "2ad2cb26",
       "rng": {
-        "draws": 439,
-        "digest": "9713a267"
+        "draws": 440,
+        "digest": "b80a86c5"
       }
     },
     {
@@ -238,8 +238,8 @@
       "state": "522d8b26",
       "events": "741638a5",
       "rng": {
-        "draws": 523,
-        "digest": "6eec6b51"
+        "draws": 524,
+        "digest": "1230f4c9"
       }
     },
     {
@@ -249,8 +249,8 @@
       "state": "8e2cde05",
       "events": "741638a5",
       "rng": {
-        "draws": 640,
-        "digest": "1020f939"
+        "draws": 639,
+        "digest": "9961eab9"
       }
     },
     {
@@ -260,8 +260,8 @@
       "state": "77a7d7ec",
       "events": "741638a5",
       "rng": {
-        "draws": 736,
-        "digest": "706b7487"
+        "draws": 735,
+        "digest": "b39554fc"
       }
     },
     {
@@ -271,8 +271,8 @@
       "state": "77a7d7ec",
       "events": "741638a5",
       "rng": {
-        "draws": 736,
-        "digest": "706b7487"
+        "draws": 735,
+        "digest": "b39554fc"
       },
       "label": "fireball-landed",
       "players": [
@@ -518,8 +518,8 @@
       "state": "77a7d7ec",
       "events": "741638a5",
       "rng": {
-        "draws": 736,
-        "digest": "706b7487"
+        "draws": 735,
+        "digest": "b39554fc"
       },
       "label": "final",
       "players": [

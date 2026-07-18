@@ -10,8 +10,8 @@
     "updatePet melee arm: close + auto-taunt + mobSwing (PET_COMBAT_LINGER owner inCombat)",
     "petFollow heel transition (pets return to a moved owner)"
   ],
-  "draws": 1385,
-  "drawDigest": "f06caaf7",
+  "draws": 1384,
+  "drawDigest": "1e8c6195",
   "frames": [
     {
       "tick": 0,
@@ -575,8 +575,8 @@
       "state": "be1dd42b",
       "events": "741638a5",
       "rng": {
-        "draws": 914,
-        "digest": "c39c364b"
+        "draws": 913,
+        "digest": "2127d3d5"
       }
     },
     {
@@ -586,8 +586,8 @@
       "state": "bfc230ce",
       "events": "741638a5",
       "rng": {
-        "draws": 1135,
-        "digest": "021f9b0c"
+        "draws": 1136,
+        "digest": "ec8984f1"
       }
     },
     {
@@ -597,8 +597,8 @@
       "state": "258e21ab",
       "events": "741638a5",
       "rng": {
-        "draws": 1385,
-        "digest": "f06caaf7"
+        "draws": 1384,
+        "digest": "1e8c6195"
       }
     },
     {
@@ -608,8 +608,8 @@
       "state": "258e21ab",
       "events": "741638a5",
       "rng": {
-        "draws": 1385,
-        "digest": "f06caaf7"
+        "draws": 1384,
+        "digest": "1e8c6195"
       },
       "label": "final",
       "players": [

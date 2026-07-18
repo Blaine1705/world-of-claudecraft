@@ -8,8 +8,8 @@
     "casting lifecycle (C4a)",
     "effect dispatch + spell damage (C4b/C1)"
   ],
-  "draws": 755,
-  "drawDigest": "5b55a50e",
+  "draws": 766,
+  "drawDigest": "15ae4b55",
   "frames": [
     {
       "tick": 0,
@@ -185,8 +185,8 @@
       "state": "149e5e92",
       "events": "3f1ce206",
       "rng": {
-        "draws": 485,
-        "digest": "3b2cc127"
+        "draws": 486,
+        "digest": "1d218d61"
       }
     },
     {
@@ -196,19 +196,19 @@
       "state": "8b13cf33",
       "events": "7bc62a7f",
       "rng": {
-        "draws": 661,
-        "digest": "5e66c0db"
+        "draws": 666,
+        "digest": "92ed4635"
       }
     },
     {
       "tick": 128,
       "time": 6.4,
       "nextId": 686,
-      "state": "2ef32a65",
-      "events": "fde7eb67",
+      "state": "b1ed4bea",
+      "events": "d1f01055",
       "rng": {
-        "draws": 755,
-        "digest": "5b55a50e"
+        "draws": 766,
+        "digest": "15ae4b55"
       },
       "label": "final",
       "players": [
@@ -228,13 +228,13 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 90
+            "damageDealt": 88
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 90
+              "damageDealt": 88
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -384,7 +384,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 8910,
+          "hp": 8912,
           "id": 685,
           "inCombat": true,
           "kind": "mob",
@@ -420,7 +420,7 @@
           "threat": [
             [
               684,
-              91
+              89
             ]
           ],
           "wanderTimer": 5.316236,
