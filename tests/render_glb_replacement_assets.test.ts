@@ -11,6 +11,7 @@ import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_
 import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
 import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
+import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features';
 import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
@@ -73,6 +74,12 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('Great Maze hedge wall and arch assets', () => {
     for (const url of Object.values(gardenFeaturesPreloadInternalsForTest.mazeAssetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('Old Beacon tower drum assets', () => {
+    for (const url of galeFeaturesPreloadInternalsForTest.towerAssetUrl) {
       expectAssetExistsAndManifested(url);
     }
   });

@@ -1,3 +1,4 @@
+import { beaconSpiralLift } from './beacon_spiral';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import {
   CAMPS,
@@ -2728,7 +2729,10 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // ramp just raises where the player stands. Zero outside the stand footprints,
   // so the pitch stays flat. (The custom-map edit layer is applied inside
   // terrainHeight, so it never touches the flat instance/rift floor above.)
-  const terrain = terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  // The Old Beacon's stair rides the same idiom: beaconSpiralLift raises the
+  // walkable plank helix and gallery ring around the lighthouse (and its
+  // sheer core plug is what blocks walking through the tower).
+  const terrain = terrainHeight(x, z, seed) + sowfieldStandLift(x, z) + beaconSpiralLift(x, z);
   return Math.max(terrain, dockSurfaceHeight(x, z, seed));
 }
 

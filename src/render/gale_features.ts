@@ -1,12 +1,38 @@
 // The Galecrest's dressing, render-only: the Old Beacon lighthouse on its
-// head (with a slowly turning light, the realm's landmark from anywhere on
-// the downs), sea stacks standing off the Shear, and the ribs of old hulls
-// half-buried on the Wreckfields. Same contract as the sibling realm
-// modules: build once, update(time) turns the beacon.
+// head (stacked KayKit tower drums with a slowly turning light, the realm's
+// landmark from anywhere on the downs, plus the plank stair the sim's
+// beaconSpiralLift makes walkable), sea stacks standing off the Shear, and
+// the ribs of old hulls half-buried on the Wreckfields. Same contract as
+// the sibling realm modules: build once, update(time) turns the beacon.
 import * as THREE from 'three';
+import { BEACON_SPIRAL, beaconSpiralLift } from '../sim/beacon_spiral';
 import { hash2 } from '../sim/rng';
 import { galeLandness, terrainHeight, WATER_LEVEL } from '../sim/world';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
+
+// The lighthouse drums, bottom to top: blue base, blue drum, red drum (the
+// stripe), blue-roofed cap. Stacked at build; scales tuned so each drum
+// seats on the one below.
+const TOWER_STACK = [
+  { url: '/models/biome/hexb_tower_base.glb', scale: 5.5, h: 8.25 },
+  { url: '/models/biome/hexb_tower_a.glb', scale: 5, h: 10.95 },
+  { url: '/models/biome/hexr_tower_a.glb', scale: 4.5, h: 9.86 },
+  { url: '/models/biome/hexb_tower_b.glb', scale: 4, h: 9.96 },
+] as const;
+const towerScenes: (THREE.Group | null)[] = TOWER_STACK.map(() => null);
+for (let i = 0; i < TOWER_STACK.length; i++) {
+  registerPreload(
+    loadGltf(TOWER_STACK[i].url).then((gltf) => {
+      towerScenes[i] = gltf.scene;
+    }),
+  );
+}
+
+export const galeFeaturesPreloadInternalsForTest = {
+  towerAssetUrl: TOWER_STACK.map((t) => t.url),
+};
 
 export interface GaleFeaturesView {
   group: THREE.Group;
@@ -42,48 +68,93 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
   group.name = 'gale-features';
   const glowLights: THREE.PointLight[] = [];
 
-  // --- the Old Beacon: a tapered stone tower, gallery, and lamp room ---
+  // --- the Old Beacon: stacked tower drums, striped like a lighthouse ---
   const beaconY = terrainHeight(BEACON.x, BEACON.z, seed);
   const beam = new THREE.Group();
   {
-    const stone = mat(0xe8e4da, 0.85);
-    const trim = mat(0x8a4438, 0.8);
-    const tower = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 3.4, 16, 10), stone);
-    tower.position.set(BEACON.x, beaconY + 8, BEACON.z);
-    group.add(tower);
-    // two painted bands so the tower reads as a lighthouse, not a chimney
-    for (const [by, br] of [
-      [4.5, 3.06],
-      [10.5, 2.68],
-    ]) {
-      const band = new THREE.Mesh(new THREE.CylinderGeometry(br + 0.06, br + 0.14, 1.6, 10), trim);
-      band.position.set(BEACON.x, beaconY + by, BEACON.z);
-      group.add(band);
+    let lift = 0;
+    for (let i = 0; i < TOWER_STACK.length; i++) {
+      const scene = towerScenes[i];
+      if (!scene) continue;
+      const drum = scene.clone(true);
+      drum.position.set(BEACON.x, beaconY + lift - (i === 0 ? 0.15 : 0.05), BEACON.z);
+      drum.scale.setScalar(TOWER_STACK[i].scale);
+      drum.rotation.y = i * 0.9; // stagger the drum details around the column
+      drum.traverse((obj) => {
+        const mesh = obj as THREE.Mesh;
+        if (mesh.isMesh) {
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+        }
+      });
+      group.add(drum);
+      lift += TOWER_STACK[i].h;
     }
-    const gallery = new THREE.Mesh(new THREE.CylinderGeometry(3.1, 3.1, 0.5, 10), trim);
-    gallery.position.set(BEACON.x, beaconY + 16.2, BEACON.z);
-    group.add(gallery);
-    const lampRoom = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.6, 1.6, 2.2, 8),
-      new THREE.MeshStandardMaterial({
-        color: 0xfff2c0,
-        emissive: 0xffc860,
-        emissiveIntensity: 1.6,
-        roughness: 0.4,
-      }),
-    );
-    lampRoom.position.set(BEACON.x, beaconY + 17.6, BEACON.z);
-    group.add(lampRoom);
-    const cap = new THREE.Mesh(new THREE.ConeGeometry(2.0, 1.6, 8), trim);
-    cap.position.set(BEACON.x, beaconY + 19.5, BEACON.z);
-    group.add(cap);
-    group.traverse((obj) => {
-      const mesh = obj as THREE.Mesh;
-      if (mesh.isMesh) {
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
+    const lampY = beaconY + lift - 3.2;
+    // the plank stair and gallery ring: drawn from the SAME beaconSpiralLift
+    // samples the sim walks on, so deck and footing never disagree
+    {
+      const s = BEACON_SPIRAL;
+      const wood = mat(0x8a6a4a, 0.9);
+      const parts: THREE.BufferGeometry[] = [];
+      const plank = (x: number, z: number, w: number, len: number, yaw: number): void => {
+        const h = terrainHeight(x, z, seed) + beaconSpiralLift(x, z);
+        const g2 = new THREE.BoxGeometry(w, 0.32, len);
+        g2.rotateY(yaw);
+        g2.translate(x, h - 0.14, z);
+        parts.push(g2.toNonIndexed());
+      };
+      // the winding stair: planks laid along the sweep
+      const steps = 64;
+      const rMid = (s.stairIn + s.stairOut) / 2;
+      for (let i = 0; i <= steps; i++) {
+        const a = s.a0 + (i / steps) * s.sweep;
+        plank(s.x + Math.sin(a) * rMid, s.z + Math.cos(a) * rMid, s.stairOut - s.stairIn, 0.72, a);
       }
-    });
+      // the gallery ring around the drum
+      const ringMid = (s.coreR + s.ringR) / 2;
+      for (let i = 0; i < 40; i++) {
+        const a = (i / 40) * Math.PI * 2;
+        plank(s.x + Math.sin(a) * ringMid, s.z + Math.cos(a) * ringMid, s.ringR - s.coreR, 0.8, a);
+      }
+      // the bridge from stair top to ring
+      for (const rb of [s.ringR + 0.2, (s.ringR + s.stairIn) / 2, s.stairIn - 0.1]) {
+        const a = s.a0 + s.sweep;
+        plank(s.x + Math.sin(a) * rb, s.z + Math.cos(a) * rb, 1.9, 0.85, a);
+      }
+      // outer railing posts along the stair and ring edges
+      const post = (x: number, z: number): void => {
+        const deckH = terrainHeight(x, z, seed) + beaconSpiralLift(x, z);
+        const g2 = new THREE.BoxGeometry(0.22, 1.15, 0.22);
+        g2.translate(x, deckH + 0.45, z);
+        parts.push(g2.toNonIndexed());
+      };
+      for (let i = 0; i <= 16; i++) {
+        const a = s.a0 + (i / 16) * s.sweep;
+        post(s.x + Math.sin(a) * (s.stairOut - 0.25), s.z + Math.cos(a) * (s.stairOut - 0.25));
+      }
+      for (let i = 0; i < 14; i++) {
+        const a = (i / 14) * Math.PI * 2;
+        post(s.x + Math.sin(a) * (s.ringR - 0.2), s.z + Math.cos(a) * (s.ringR - 0.2));
+      }
+      let total = 0;
+      for (const g2 of parts) total += g2.getAttribute('position').count;
+      const pos = new Float32Array(total * 3);
+      const norm = new Float32Array(total * 3);
+      let off = 0;
+      for (const g2 of parts) {
+        pos.set(g2.getAttribute('position').array as Float32Array, off);
+        norm.set(g2.getAttribute('normal').array as Float32Array, off);
+        off += g2.getAttribute('position').count * 3;
+      }
+      const merged = new THREE.BufferGeometry();
+      merged.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      merged.setAttribute('normal', new THREE.BufferAttribute(norm, 3));
+      const deck = new THREE.Mesh(merged, wood);
+      deck.castShadow = true;
+      deck.receiveShadow = true;
+      group.add(deck);
+    }
     // the turning light: two opposed additive cones riding a pivot
     const beamMat = new THREE.MeshBasicMaterial({
       color: 0xffe9a8,
@@ -100,10 +171,10 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
       cone.position.x = flip * 30;
       beam.add(cone);
     }
-    beam.position.set(BEACON.x, beaconY + 17.6, BEACON.z);
+    beam.position.set(BEACON.x, lampY, BEACON.z);
     group.add(beam);
     const light = new THREE.PointLight(0xffd890, 5, 40, 2);
-    light.position.set(BEACON.x, beaconY + 17.6, BEACON.z);
+    light.position.set(BEACON.x, lampY, BEACON.z);
     light.userData.baseIntensity = 5;
     glowLights.push(light);
     group.add(light);
