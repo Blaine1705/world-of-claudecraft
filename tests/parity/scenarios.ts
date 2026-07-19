@@ -3686,6 +3686,7 @@ function c5AutoAttack(): Scenario {
       const mage = sim.addPlayer('mage', 'Mg') as number;
       const ids = [warrior, rogue, hunterM, hunterR, mage];
       for (const pid of ids) sim.setPlayerLevel(15, pid);
+      sim.setSpec('survival', hunterM);
       const eWarrior = sim.entities.get(warrior) as AnyEntity;
       const eRogue = sim.entities.get(rogue) as AnyEntity;
       const eHunterM = sim.entities.get(hunterM) as AnyEntity;

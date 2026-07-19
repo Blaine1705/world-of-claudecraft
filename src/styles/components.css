@@ -3454,6 +3454,100 @@
   .tal-head b {
     color: var(--gold);
   }
+  .hun-choice-rows {
+    display: grid;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .hun-choice-row {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 8px;
+    align-items: stretch;
+  }
+  .hun-choice-level {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 62px;
+    color: var(--gold);
+    background: #15110a;
+    border: 1px solid #5a4a22;
+    border-radius: 5px;
+    font: 700 11px / 1 var(--title-font);
+    text-align: center;
+  }
+  .hun-choice-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .hun-choice-option {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    min-width: 0;
+    min-height: 62px;
+    padding: 7px;
+    color: #c8b888;
+    background: #171208;
+    border: 1px solid #463a1c;
+    border-radius: 5px;
+    cursor: var(--cursor-point);
+    font-family: var(--body-font);
+    text-align: left;
+  }
+  .hun-choice-option:hover,
+  .hun-choice-option:focus-visible {
+    background: #211a0c;
+    border-color: #8f7025;
+  }
+  .hun-choice-option:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  .hun-choice-option.sel {
+    color: #fff6d5;
+    background: #2c2410;
+    border-color: var(--gold);
+    box-shadow:
+      inset 0 0 0 1px #ffd10044,
+      0 0 8px #b8902a55;
+  }
+  .hun-choice-option:disabled {
+    opacity: 0.42;
+    filter: grayscale(0.75);
+    cursor: not-allowed;
+  }
+  .hco-icon {
+    width: 34px;
+    height: 34px;
+    flex: none;
+    display: block;
+    background-color: #15110a;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 1px solid #5a4a22;
+    border-radius: 4px;
+  }
+  .hun-choice-option.sel .hco-icon {
+    border-color: var(--gold);
+  }
+  .hco-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    font-size: 10.5px;
+    line-height: 1.25;
+  }
+  .hco-copy b {
+    color: #fff;
+    font-family: var(--title-font);
+    font-size: 11px;
+  }
   #tal-body {
     overflow-x: auto;
     overflow-y: visible;
@@ -3965,6 +4059,12 @@
       flex-direction: column;
     }
     .tal-foot {
+      grid-template-columns: 1fr;
+    }
+    .hun-choice-row {
+      grid-template-columns: 42px minmax(0, 1fr);
+    }
+    .hun-choice-options {
       grid-template-columns: 1fr;
     }
     .tal-specs {

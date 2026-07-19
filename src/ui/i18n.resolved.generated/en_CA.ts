@@ -306,6 +306,14 @@ export const en_CA: EnTranslations = {
     "spectate": {
       "banner": "Spectating {name}"
     },
+    "resource": {
+      "focus": "Focus",
+      "lowFocus": "Low Focus",
+      "notEnoughFocus": "Not enough focus!"
+    },
+    "hunter": {
+      "turtleAttackError": "You can't attack while protected by Aspect of the Turtle."
+    },
     "readyCheck": {
       "prompt": "{name} has started a ready check. Are you ready?",
       "ready": "Ready",
@@ -2900,7 +2908,8 @@ export const en_CA: EnTranslations = {
     "resourceName": {
       "rage": "Rage",
       "mana": "Mana",
-      "energy": "Energy"
+      "energy": "Energy",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "All classes",
@@ -2964,6 +2973,8 @@ export const en_CA: EnTranslations = {
       "blessing_of_might": "Raises a friendly target's attack power, good to cast before a pull.",
       "divine_protection": "A quick protective ward to soak damage when things get rough.",
       "raptor_strike": "A hard melee swing for when something closes the gap on you.",
+      "hunters_mark": "Marks one priority target so you and your pet can pressure it harder.",
+      "disengage": "Leaps backwards to quickly open space when an enemy gets too close.",
       "aspect_of_the_hawk": "A stance you keep up to sharpen your ranged attack power.",
       "serpent_sting": "Lands a venom that bleeds nature damage over time.",
       "arcane_shot": "An instant shot from range for quick extra damage.",
@@ -6628,6 +6639,14 @@ export const en_CA: EnTranslations = {
         "name": "Gutting Strike",
         "description": "A strong melee attack that increases damage by {damage}. Activates on your next swing."
       },
+      "hunters_mark": {
+        "name": "Hunter's Mark",
+        "description": "Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%."
+      },
+      "disengage": {
+        "name": "Disengage",
+        "description": "Leap backwards up to 15 yd, quickly creating distance from nearby enemies."
+      },
       "aspect_of_the_hawk": {
         "name": "Harrier's Guise",
         "description": "Take on the harrier's guise, increasing attack power by {buff} for 30 min."
@@ -6640,9 +6659,17 @@ export const en_CA: EnTranslations = {
         "name": "Fell Shot",
         "description": "An instant shot that deals {damage} Arcane damage."
       },
+      "exhilaration": {
+        "name": "Exhilaration",
+        "description": "Instantly restores 30% of your maximum health."
+      },
       "concussive_shot": {
         "name": "Rattling Shot",
         "description": "Dazes the target for {damage} damage, slowing movement by 50% for 4 sec."
+      },
+      "freezing_trap": {
+        "name": "Freezing Trap",
+        "description": "Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect."
       },
       "mongoose_bite": {
         "name": "Counterfang",
@@ -6656,17 +6683,49 @@ export const en_CA: EnTranslations = {
         "name": "Marten's Guise",
         "description": "Take on the marten's guise, increasing your dodge chance by 8% for 30 min."
       },
+      "feign_death": {
+        "name": "Feign Death",
+        "description": "Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect."
+      },
       "aspect_of_the_cheetah": {
-        "name": "Courser's Guise",
-        "description": "Take on the courser's guise, increasing movement speed by 30% for 30 min."
+        "name": "Aspect of the Cheetah",
+        "description": "Increases your movement speed by 90% for 3 sec."
+      },
+      "steady_shot": {
+        "name": "Steady Shot",
+        "description": "A moving shot that deals Physical damage and generates 20 Focus."
+      },
+      "explosive_shot": {
+        "name": "Explosive Shot",
+        "description": "Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd."
+      },
+      "kill_shot": {
+        "name": "Kill Shot",
+        "description": "A ranged finishing shot usable only against enemies below 20% health."
       },
       "aimed_shot": {
-        "name": "Long Draw",
-        "description": "A carefully drawn shot that deals {damage} damage."
+        "name": "Aimed Shot",
+        "description": "A carefully aimed shot that deals {damage} Physical damage."
+      },
+      "aspect_of_the_turtle": {
+        "name": "Aspect of the Turtle",
+        "description": "Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active."
       },
       "rapid_fire": {
-        "name": "Fevered Draw",
-        "description": "Increases your attack speed by 40% for 15 sec."
+        "name": "Rapid Fire",
+        "description": "Channels 7 shots over 1.9 sec. Each shot generates 3 Focus, and the channel can continue while moving."
+      },
+      "multi_shot": {
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
+      },
+      "trueshot": {
+        "name": "Trueshot",
+        "description": "For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster."
+      },
+      "powerful_shot": {
+        "name": "Powershot",
+        "description": "Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire."
       },
       "smite": {
         "name": "Smite",
@@ -7355,10 +7414,6 @@ export const en_CA: EnTranslations = {
       "mind_sear": {
         "name": "Thoughtburn",
         "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
-      },
-      "multi_shot": {
-        "name": "Splitshot",
-        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
         "name": "Choirmend",

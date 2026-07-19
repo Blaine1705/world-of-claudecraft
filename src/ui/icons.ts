@@ -2594,7 +2594,17 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // hunter
   raptor_strike: r('earth', 'blood', ['claw_slash']),
   aspect_of_the_hawk: r('storm', 'sky', ['wing'], ['glow']),
-  aspect_of_the_monkey: r('nature', 'leafGreen', ['paw'], ['motion']),
+  hunters_mark: r('storm', 'gold', ['crosshair', { p: 'eye', ...BR }], ['glow']),
+  disengage: r('steel', 'sky', ['boot', { p: 'arrow', ...TL }], ['motion']),
+  exhilaration: r('nature', 'leafGreen', ['heart', { p: 'sunburst', ...BR }], ['glow']),
+  freezing_trap: r('frost', 'ice', ['snowflake', { p: 'crosshair', ...BR }], ['arcs']),
+  feign_death: r('shadow', 'bone', ['skull', { p: 'heart', ...BR }], ['arcs']),
+  aspect_of_the_turtle: r('nature', 'ice', ['shield', { p: 'paw', ...BR }], ['glow']),
+  steady_shot: r('nature', 'gold', ['arrow', { p: 'crosshair', ...TR }]),
+  explosive_shot: r('fire', 'gold', ['arrow', { p: 'flame', ...BR }], ['sparkle']),
+  kill_shot: r('blood', 'steel', ['crosshair', { p: 'arrow', ...BR }], ['glow']),
+  trueshot: r('storm', 'gold', ['crosshair', { p: 'arrow', ...BR }], ['glow']),
+  powerful_shot: r('fury', 'gold', ['arrow', { p: 'sunburst', ...TR }], ['motion']),
   serpent_sting: r('nature', 'venom', ['fang', { p: 'arrow', ...BR }], ['drips']),
   arcane_shot: r('arcane', 'arcanePink', ['arrow'], ['glow', 'sparkle']),
   concussive_shot: r('storm', 'sky', ['arrow'], ['arcs']),
@@ -2810,7 +2820,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   holy_shock: r('holy', 'holyGold', ['bolt', { p: 'cross', ...BR }], ['glow']),
   holy_shield: r('holy', 'gold', ['shield', { p: 'sunburst', ...BR }]),
   bestial_wrath: r('fury', 'blood', ['paw'], ['glow']),
-  trueshot_aura: r('storm', 'gold', ['arrow'], ['arcs']),
   wyvern_sting: r('nature', 'venom', ['wing', { p: 'fang', ...BR }], ['drips']),
   arcane_power: r('arcane', 'arcanePink', ['sigil_rune'], ['glow']),
   combustion: r('fire', 'ember', ['flame'], ['sparkle']),
@@ -3667,7 +3676,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'retribution_aura',
   // hunter (CraftPix premium "RPG Archer skill icons" pack). The archer pack is
   // arrows/bows/traps only — the beast/aspect-animal abilities (aspect_of_the_hawk,
-  // aspect_of_the_monkey, tame_beast, dismiss_pet, revive_pet) have no fitting art
+  // tame_beast, dismiss_pet, revive_pet) have no fitting art
   // here and intentionally stay on their procedural recipes until a beast pack lands.
   'raptor_strike',
   'mongoose_bite',
@@ -3905,7 +3914,6 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'demoralizing_roar',
   'insect_swarm', // druid
   // final bespoke fills from per-ability "_Missing_*" packs — completes every class.
-  'aspect_of_the_monkey',
   'revive_pet', // hunter
   'mind_flay', // priest
   'garrote',

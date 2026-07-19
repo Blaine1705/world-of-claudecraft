@@ -13,6 +13,14 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  resource: {
+    focus: 'Focus',
+    lowFocus: 'Low Focus',
+    notEnoughFocus: 'Not enough focus!',
+  },
+  hunter: {
+    turtleAttackError: "You can't attack while protected by Aspect of the Turtle.",
+  },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {

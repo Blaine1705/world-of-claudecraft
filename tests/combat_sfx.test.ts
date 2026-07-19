@@ -163,6 +163,38 @@ describe('combat SFX policy', () => {
         fx: 'projectile',
       }),
     ).toEqual({ key: 'melee_bow', anchorId: 10 });
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'projectile',
+        abilityId: 'kill_shot',
+      }),
+    ).toEqual({ key: 'melee_bow', anchorId: 10 });
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'projectile',
+        abilityId: 'aimed_shot',
+      }),
+    ).toEqual({ key: 'combat_hunter_aimed_shot', anchorId: 10 });
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'projectile',
+        abilityId: 'auto_shot',
+      }),
+    ).toEqual({ key: 'combat_hunter_auto_shot', anchorId: 10 });
+    expect('combat_hunter_aimed_shot' in SFX_CLIPS).toBe(true);
+    expect('combat_hunter_auto_shot' in SFX_CLIPS).toBe(true);
     for (const school of ['fire', 'frost', 'arcane', 'shadow', 'holy', 'nature']) {
       const cue = spellFxCue({
         type: 'spellfx',
@@ -256,6 +288,21 @@ describe('combat SFX policy', () => {
     expect(
       impactCueForDamage(damage({ school: 'chaos' }), target('mob', 'crypt_shambler')),
     ).toBeNull();
+  });
+
+  it('uses the dedicated arrow impact for Hunter Auto Shot hits', () => {
+    expect(
+      impactCueForDamage(
+        damage({ ability: 'Auto Shot', school: 'physical' }),
+        target('mob', 'forest_wolf'),
+      ),
+    ).toBe('impact_hunter_arrow');
+    expect(
+      impactCueForDamage(
+        damage({ ability: 'Attack', school: 'physical' }),
+        target('mob', 'forest_wolf'),
+      ),
+    ).toBe('impact_flesh');
   });
 
   it('preserves v0.25 mob families and loaded subfamily overrides', () => {
@@ -390,11 +437,17 @@ describe('combat SFX policy', () => {
     expect(weaponSwingCue(druid)).toBe('melee_unarmed');
   });
 
-  it('plays attempted physical swings for avoidance but not magic or Auto Shot impact', () => {
+  it('plays attempted physical swings for avoidance but not magic or ranged launch impacts', () => {
     const warrior = target('player', 'warrior');
     expect(playerSwingCueForDamage(damage({ kind: 'miss' }), warrior)).toBe('melee_swing_blade');
     expect(playerSwingCueForDamage(damage({ kind: 'dodge' }), warrior)).toBe('melee_swing_blade');
     expect(playerSwingCueForDamage(damage({ school: 'fire' }), warrior)).toBeNull();
     expect(playerSwingCueForDamage(damage({ ability: 'Auto Shot' }), warrior)).toBeNull();
+    expect(
+      playerSwingCueForDamage(
+        damage({ ability: 'Aimed Shot', attackAnimationStarted: true }),
+        warrior,
+      ),
+    ).toBeNull();
   });
 });

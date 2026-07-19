@@ -190,7 +190,7 @@ export const ALL_CLASSES: PlayerClass[] = [
   'warlock',
   'druid',
 ];
-export type ResourceType = 'rage' | 'mana' | 'energy';
+export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus';
 export const OVERHEAD_EMOTE_IDS = [
   'wave',
   'laugh',
@@ -336,6 +336,7 @@ export type AuraKind =
   | 'critvuln'
   | 'next_cast_instant'
   | 'next_cast_free'
+  | 'next_cast_free_instant'
   | 'next_execute_free'
   | 'next_cast_cheap'
   // Lifesap (druid): flat resource restored on each classic 2-sec regen tick,
@@ -378,6 +379,12 @@ export type AuraKind =
   | 'victory_rush'
   | 'aoe_echo'
   | 'sure_crit'
+  | 'feign_death'
+  | 'hunter_mark'
+  | 'trueshot'
+  | 'hunter_ricochet'
+  | 'hunter_execute_override'
+  | 'explosive_shot'
   // Ice Floes (mage choice row): `value` = cast-time spells left that may be
   // cast while moving. player_motion skips its cancel while worn; finishing a
   // hard cast decrements the value and removes the aura at 0
@@ -2043,6 +2050,31 @@ export type AbilityEffect =
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
+  | { type: 'huntersMark'; damageAmp: number; duration: number }
+  | { type: 'disengage'; distance: number }
+  | { type: 'aspectTurtle'; reduction: number; duration: number }
+  | { type: 'healPctMax'; percent: number }
+  | { type: 'feignDeath'; duration: number }
+  | {
+      type: 'freezingTrap';
+      radius: number;
+      trapDuration: number;
+      incapacitateDuration: number;
+    }
+  | { type: 'trueshot'; duration: number; critChance: number; critDamage: number }
+  | { type: 'explosiveShot'; delay: number; min: number; max: number; radius: number }
+  | { type: 'hunterMultiShot'; min: number; max: number; radius: number; softCap: number }
+  | {
+      type: 'powerfulShot';
+      min: number;
+      max: number;
+      minLength: number;
+      maxLength: number;
+      minWidth: number;
+      maxWidth: number;
+      minDamageScale: number;
+      maxDamageScale: number;
+    }
   | { type: 'selfHealPctMax'; pct: number }
   | { type: 'selfHotPctMax'; pct: number; duration: number; interval: number }
   | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
@@ -3401,7 +3433,9 @@ export type SimEvent = { pid?: number } & (
       level?: number;
       // Stable presentation discriminator; renderers must not infer a player
       // attack animation from school or an English ability label.
+      abilityId?: string;
       attackAnimation?: 'ranged-shot';
+      projectileStyle?: 'hunter-arrow';
       // True for a wand auto-attack projectile, so combat_sfx.ts can pick the
       // dedicated wand_<school> cue instead of the real-spell proj_<school>
       // one: a passive auto-attack must not sound identical to an actual cast.
@@ -3437,6 +3471,8 @@ export type SimEvent = { pid?: number } & (
       // (one orb per caster: the cooldown far outlasts the flight).
       sourceId?: number;
     }
+  // A targetless directional projectile travelling to a fixed world point.
+  | { type: 'powerfulShotFx'; sourceId: number; x: number; z: number }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
   // `telegraph` marks an entityId-anchored line as an actionable mechanic cue

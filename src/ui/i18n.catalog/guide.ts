@@ -554,6 +554,7 @@ export const guideStrings = {
     rage: 'Rage',
     mana: 'Mana',
     energy: 'Energy',
+    focus: 'Focus',
   },
   classPage: {
     back: 'All classes',
@@ -637,6 +638,8 @@ export const guideStrings = {
     blessing_of_might: "Raises a friendly target's attack power, good to cast before a pull.",
     divine_protection: 'A quick protective ward to soak damage when things get rough.',
     raptor_strike: 'A hard melee swing for when something closes the gap on you.',
+    hunters_mark: 'Marks one priority target so you and your pet can pressure it harder.',
+    disengage: 'Leaps backwards to quickly open space when an enemy gets too close.',
     aspect_of_the_hawk: 'A stance you keep up to sharpen your ranged attack power.',
     serpent_sting: 'Lands a venom that bleeds nature damage over time.',
     arcane_shot: 'An instant shot from range for quick extra damage.',

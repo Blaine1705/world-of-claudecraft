@@ -542,6 +542,8 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('de_DE');
     expect(localizeSimAuraName('Tamed')).not.toBeNull();
     expect(localizeSimAuraName('Tamed')).not.toBe('Tamed');
+    expect(localizeSimAuraName('Lock and Load')).not.toBeNull();
+    expect(localizeSimAuraName('Deathblow')).not.toBeNull();
     expect(localizeSimAuraName('not-an-aura')).toBeNull();
     setLanguage('en');
   });

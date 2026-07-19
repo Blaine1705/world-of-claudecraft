@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "6356e133aee9c5ba2024269c399d70488cb071421fad7b8e8074cdb31c7acb03",
-  "catalogHash": "4b1d98a68cf3a2759583c1da903648130ef74ecce4486e324c247a1180d95b01",
+  "bundleId": "0bfd20821d3c614e150a99ab8325df80d8aa1b88a4bc551ce63bc1a6b8379e73",
+  "catalogHash": "fc7ba7ec085d0ef1ab69cfc54ce622b108e8ef6feba1a22c8f868baafe5c341b",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -302,6 +302,30 @@
         }
       ],
       "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "combat_hunter_aimed_shot": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/combat_hunter_aimed_shot.mp3?v=bf01726ef7ab",
+          "bytes": 37033,
+          "sha256": "bf01726ef7ab5b8660d37b840ad2dd6c2f758e8fce70a57989ef41e30512673f"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "combat_hunter_auto_shot": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/combat_hunter_auto_shot.mp3?v=a9554bbfcc47",
+          "bytes": 25748,
+          "sha256": "a9554bbfcc47bcda96aee9c5482c885996d4021be52fa140e8c49f18ed68b2b9"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "combat_parry": {
@@ -674,6 +698,18 @@
         }
       ],
       "gain": 1.717908,
+      "playbackRate": 1
+    },
+    "impact_hunter_arrow": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_hunter_arrow.mp3?v=58d0a5b2eae8",
+          "bytes": 10075,
+          "sha256": "58d0a5b2eae83729a1149131d8a9461aa013253ca53f1ff2f8c3b9125a2e9b48"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "impact_leather": {

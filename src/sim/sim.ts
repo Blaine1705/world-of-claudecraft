@@ -190,6 +190,7 @@ import {
 import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import { breakFeignDeath } from './hunter_base_abilities';
 import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -1599,6 +1600,7 @@ export class Sim {
       resolvedAbility: (abilityId, pid) => this.resolvedAbility(abilityId, pid),
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
+      onDeliberateMove: (p) => breakFeignDeath(this.ctx, p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
         // The one sim-side observer of a lethal fall (hid_fall_death): the
@@ -2259,7 +2261,7 @@ export class Sim {
       player.resource =
         classDef.resourceType === 'mana'
           ? Math.min(player.maxResource, Math.max(0, savedState.resource))
-          : classDef.resourceType === 'energy'
+          : classDef.resourceType === 'energy' || classDef.resourceType === 'focus'
             ? 100
             : 0;
     } else {
@@ -2267,7 +2269,7 @@ export class Sim {
       player.resource =
         classDef.resourceType === 'mana'
           ? player.maxResource
-          : classDef.resourceType === 'energy'
+          : classDef.resourceType === 'energy' || classDef.resourceType === 'focus'
             ? 100
             : 0;
     }

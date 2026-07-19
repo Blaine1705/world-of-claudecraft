@@ -306,6 +306,14 @@ export const zh_TW: EnTranslations = {
     "spectate": {
       "banner": "正在觀察 {name}"
     },
+    "resource": {
+      "focus": "Focus",
+      "lowFocus": "Low Focus",
+      "notEnoughFocus": "Not enough focus!"
+    },
+    "hunter": {
+      "turtleAttackError": "You can't attack while protected by Aspect of the Turtle."
+    },
     "readyCheck": {
       "prompt": "{name} 發起了準備確認。你準備好了嗎？",
       "ready": "準備就緒",
@@ -2900,7 +2908,8 @@ export const zh_TW: EnTranslations = {
     "resourceName": {
       "rage": "怒氣",
       "mana": "法力",
-      "energy": "能量"
+      "energy": "能量",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "所有職業",
@@ -2964,6 +2973,8 @@ export const zh_TW: EnTranslations = {
       "blessing_of_might": "提升友方目標的攻擊強度，適合在開怪前施放。",
       "divine_protection": "快速的守護結界，在情勢危急時吸收傷害。",
       "raptor_strike": "在有東西貼上你時可用的一記重力近戰揮擊。",
+      "hunters_mark": "Marks one priority target so you and your pet can pressure it harder.",
+      "disengage": "Leaps backwards to quickly open space when an enemy gets too close.",
       "aspect_of_the_hawk": "持續維持的姿態，用來強化你的遠程攻擊強度。",
       "serpent_sting": "施加毒液，隨時間造成持續的自然傷害。",
       "arcane_shot": "從遠處射出的瞬發一擊，迅速造成額外傷害。",
@@ -6628,6 +6639,14 @@ export const zh_TW: EnTranslations = {
         "name": "剖膛打擊",
         "description": "一次強力近戰攻擊，使傷害提高 {damage}。在你的下一次揮擊時觸發。"
       },
+      "hunters_mark": {
+        "name": "Hunter's Mark",
+        "description": "Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%."
+      },
+      "disengage": {
+        "name": "Disengage",
+        "description": "Leap backwards up to 15 yd, quickly creating distance from nearby enemies."
+      },
       "aspect_of_the_hawk": {
         "name": "獵鷂之姿",
         "description": "化為獵鷂之姿，使攻擊強度提高 {buff}，持續 30 分鐘。"
@@ -6640,9 +6659,17 @@ export const zh_TW: EnTranslations = {
         "name": "凶厲射擊",
         "description": "瞬發射擊，造成 {damage} 點秘法傷害。"
       },
+      "exhilaration": {
+        "name": "Exhilaration",
+        "description": "Instantly restores 30% of your maximum health."
+      },
       "concussive_shot": {
         "name": "震顫射擊",
         "description": "使目標暈眩遲緩，造成 {damage} 點傷害，並使移動速度降低 50%，持續 4 秒。"
+      },
+      "freezing_trap": {
+        "name": "Freezing Trap",
+        "description": "Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect."
       },
       "mongoose_bite": {
         "name": "反噬獠牙",
@@ -6656,17 +6683,49 @@ export const zh_TW: EnTranslations = {
         "name": "靈貂之姿",
         "description": "化為靈貂之姿，使閃躲機率提高 8%，持續 30 分鐘。"
       },
+      "feign_death": {
+        "name": "Feign Death",
+        "description": "Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect."
+      },
       "aspect_of_the_cheetah": {
         "name": "駿馬之姿",
         "description": "化為駿馬之姿，使移動速度提高 30%，持續 30 分鐘。"
+      },
+      "steady_shot": {
+        "name": "Steady Shot",
+        "description": "A moving shot that deals Physical damage and generates 20 Focus."
+      },
+      "explosive_shot": {
+        "name": "Explosive Shot",
+        "description": "Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd."
+      },
+      "kill_shot": {
+        "name": "Kill Shot",
+        "description": "A ranged finishing shot usable only against enemies below 20% health."
       },
       "aimed_shot": {
         "name": "長弓引射",
         "description": "一次仔細引弓的射擊，造成 {damage} 點傷害。"
       },
+      "aspect_of_the_turtle": {
+        "name": "Aspect of the Turtle",
+        "description": "Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active."
+      },
       "rapid_fire": {
         "name": "狂熱連射",
         "description": "使你的攻擊速度提高 40%，持續 15 秒。"
+      },
+      "multi_shot": {
+        "name": "分裂射擊",
+        "description": "向目標區域射出散射箭，對8碼內的敵人造成{damage}點物理傷害。（獵人天賦）"
+      },
+      "trueshot": {
+        "name": "Trueshot",
+        "description": "For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster."
+      },
+      "powerful_shot": {
+        "name": "強力射擊",
+        "description": "Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire."
       },
       "smite": {
         "name": "懲擊",
@@ -7355,10 +7414,6 @@ export const zh_TW: EnTranslations = {
       "mind_sear": {
         "name": "灼思",
         "description": "在目標區域引導暗影能量，每秒對附近的敵人造成{damage}點傷害。（牧師天賦）"
-      },
-      "multi_shot": {
-        "name": "分裂射擊",
-        "description": "向目標區域射出散射箭，對8碼內的敵人造成{damage}點物理傷害。（獵人天賦）"
       },
       "prayer_of_healing": {
         "name": "聖歌癒療",

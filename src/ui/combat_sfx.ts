@@ -164,6 +164,9 @@ export function materialImpactCue(target: Entity): SfxId {
 }
 
 export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | null {
+  if (event.ability === 'Auto Shot' && event.school === 'physical') {
+    return 'impact_hunter_arrow';
+  }
   if (!event.school || event.school === 'physical') return materialImpactCue(target);
   const school = magicSchool(event.school);
   return school ? SCHOOL_CUES[school].impact : null;
@@ -171,7 +174,15 @@ export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | 
 
 export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number } | null {
   if (event.fx === 'projectile') {
-    if (event.school === 'physical') return { key: 'melee_bow', anchorId: event.sourceId };
+    if (event.school === 'physical') {
+      const key =
+        event.abilityId === 'aimed_shot'
+          ? 'combat_hunter_aimed_shot'
+          : event.abilityId === 'auto_shot'
+            ? 'combat_hunter_auto_shot'
+            : 'melee_bow';
+      return { key, anchorId: event.sourceId };
+    }
     const school = magicSchool(event.school);
     if (!school) return null;
     const key = event.wand
@@ -212,7 +223,8 @@ export function playerSwingCueForDamage(event: DamageEvent, source: Entity | nul
   if (
     source?.kind !== 'player' ||
     (event.school && event.school !== 'physical') ||
-    event.ability === 'Auto Shot'
+    event.ability === 'Auto Shot' ||
+    event.attackAnimationStarted === true
   ) {
     return null;
   }

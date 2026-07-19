@@ -204,6 +204,7 @@ until that loop stops.
 | key | dur | prompt summary |
 |---|---|---|
 | `impact_flesh` | 0.4 | a blade striking flesh, wet meaty thud |
+| `impact_hunter_arrow` | 0.4 | a short, crisp arrowhead impact used by Hunter Auto Shot |
 | `impact_metal` | 0.4 | a weapon clanging hard against steel plate armor, bright ring |
 | `impact_leather` | 0.4 | a weapon striking leather armor and hide, dull padded thud |
 | `impact_bone` | 0.4 | a weapon cracking dry bone, sharp brittle crack |

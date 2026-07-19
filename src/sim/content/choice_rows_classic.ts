@@ -535,13 +535,10 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           // a level-5 row from modifying a later-learned ability.
           id: 'hun_r5_aspect_mastery',
           name: 'Guisecraft',
-          description: "Harrier's Guise and Marten's Guise effects are 25% stronger.",
+          description: "Harrier's Guise is 25% stronger.",
           icon: 'aspect_of_the_hawk',
           effect: {
-            ability: [
-              { ability: 'aspect_of_the_hawk', buffPct: 0.25 },
-              { ability: 'aspect_of_the_monkey', buffPct: 0.25 },
-            ],
+            ability: [{ ability: 'aspect_of_the_hawk', buffPct: 0.25 }],
           },
         },
       ],
@@ -625,7 +622,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Deathless Will',
           description:
             'Taking a hit for at least 30% of your maximum health grants 40% movement speed for 4 sec. 30 sec internal cooldown.',
-          icon: 'aspect_of_the_monkey',
+          icon: 'aspect_of_the_turtle',
           effect: {
             proc: {
               id: 'hun_deathless_will',
@@ -653,8 +650,8 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r14_multi_shot',
-          name: 'Splitshot',
-          description: 'Grants Splitshot.',
+          name: 'Multi-Shot',
+          description: 'Grants Multi-Shot.',
           icon: 'multi_shot',
           effect: { grant: { ability: 'multi_shot' } },
         },
@@ -663,8 +660,8 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           // (every Rattling Shot reset Fell Shot AND made it free). Now the
           // Long Draw lane: a plain cast-speed talent.
           id: 'hun_r14_sniper_training',
-          name: 'Steady Draw',
-          description: "Long Draw's cast time is reduced by 20%.",
+          name: 'Sniper Training',
+          description: "Aimed Shot's cast time is reduced by 20%.",
           icon: 'aimed_shot',
           effect: { ability: [{ ability: 'aimed_shot', castPct: -0.2 }] },
         },
@@ -719,7 +716,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r17_thick_hide',
           name: 'Fieldhardy',
           description: 'Increases your maximum health by 10%.',
-          icon: 'aspect_of_the_monkey',
+          icon: 'aspect_of_the_turtle',
           effect: { stats: { maxHpPct: 0.1 } },
         },
       ],
@@ -730,14 +727,12 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       decision: 'steadfast Arrowfall vs shot-fed burst uptime vs party attack rally',
       options: [
         {
-          id: 'hun_r20_improved_volley',
-          name: 'Steady Rain',
+          id: 'hun_r20_powershot',
+          name: 'Powershot',
           description:
-            'Arrowfall deals 50% more damage, and taking damage cannot shorten its channel.',
-          icon: 'volley',
-          effect: {
-            ability: [{ ability: 'volley', dmgPct: 0.5, damagePushbackImmune: true }],
-          },
+            'Hold to prepare a devastating shot, then release it through a narrow line, damaging every enemy it crosses.',
+          icon: 'powerful_shot',
+          effect: { grant: { ability: 'powerful_shot' } },
         },
         {
           // Balance pass: was 15 sec per proc with no gate (free shots fed it

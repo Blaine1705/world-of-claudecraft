@@ -306,6 +306,14 @@ export const ru_RU: EnTranslations = {
     "spectate": {
       "banner": "Наблюдение за {name}"
     },
+    "resource": {
+      "focus": "Focus",
+      "lowFocus": "Low Focus",
+      "notEnoughFocus": "Not enough focus!"
+    },
+    "hunter": {
+      "turtleAttackError": "You can't attack while protected by Aspect of the Turtle."
+    },
     "readyCheck": {
       "prompt": "{name} начал проверку готовности. Вы готовы?",
       "ready": "Готов",
@@ -2900,7 +2908,8 @@ export const ru_RU: EnTranslations = {
     "resourceName": {
       "rage": "Ярость",
       "mana": "Мана",
-      "energy": "Энергия"
+      "energy": "Энергия",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Все классы",
@@ -2964,6 +2973,8 @@ export const ru_RU: EnTranslations = {
       "blessing_of_might": "Повышает силу атаки дружественной цели, удобно наложить перед началом боя.",
       "divine_protection": "Быстрый защитный оберег, поглощающий урон, когда становится туго.",
       "raptor_strike": "Тяжелый удар в ближнем бою на случай, когда кто-то сократил с вами дистанцию.",
+      "hunters_mark": "Marks one priority target so you and your pet can pressure it harder.",
+      "disengage": "Leaps backwards to quickly open space when an enemy gets too close.",
       "aspect_of_the_hawk": "Стойка, которую вы держите постоянно, чтобы повысить силу дальних атак.",
       "serpent_sting": "Поражает цель ядом, наносящим урон силами природы со временем.",
       "arcane_shot": "Мгновенный выстрел с дистанции для быстрого дополнительного урона.",
@@ -6628,6 +6639,14 @@ export const ru_RU: EnTranslations = {
         "name": "Потрошащий удар",
         "description": "Сильная атака в ближнем бою, увеличивающая урон на {damage}. Срабатывает при следующем взмахе оружием."
       },
+      "hunters_mark": {
+        "name": "Hunter's Mark",
+        "description": "Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%."
+      },
+      "disengage": {
+        "name": "Disengage",
+        "description": "Leap backwards up to 15 yd, quickly creating distance from nearby enemies."
+      },
       "aspect_of_the_hawk": {
         "name": "Облик луня",
         "description": "Вы принимаете облик луня, повышая силу атаки на {buff} на 30 мин."
@@ -6640,9 +6659,17 @@ export const ru_RU: EnTranslations = {
         "name": "Зловещий выстрел",
         "description": "Мгновенный выстрел, наносящий {damage} ед. урона от тайной магии."
       },
+      "exhilaration": {
+        "name": "Exhilaration",
+        "description": "Instantly restores 30% of your maximum health."
+      },
       "concussive_shot": {
         "name": "Сотрясающий выстрел",
         "description": "Ошеломляет цель, нанося {damage} ед. урона и снижая скорость передвижения на 50% на 4 сек."
+      },
+      "freezing_trap": {
+        "name": "Freezing Trap",
+        "description": "Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect."
       },
       "mongoose_bite": {
         "name": "Ответный клык",
@@ -6656,17 +6683,49 @@ export const ru_RU: EnTranslations = {
         "name": "Облик куницы",
         "description": "Вы принимаете облик куницы, повышая вероятность уклонения на 8% на 30 мин."
       },
+      "feign_death": {
+        "name": "Feign Death",
+        "description": "Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect."
+      },
       "aspect_of_the_cheetah": {
         "name": "Облик скакуна",
         "description": "Вы принимаете облик скакуна, повышая скорость передвижения на 30% на 30 мин."
+      },
+      "steady_shot": {
+        "name": "Steady Shot",
+        "description": "A moving shot that deals Physical damage and generates 20 Focus."
+      },
+      "explosive_shot": {
+        "name": "Explosive Shot",
+        "description": "Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd."
+      },
+      "kill_shot": {
+        "name": "Kill Shot",
+        "description": "A ranged finishing shot usable only against enemies below 20% health."
       },
       "aimed_shot": {
         "name": "Долгий натяг",
         "description": "Тщательно натянутый выстрел, наносящий {damage} ед. урона."
       },
+      "aspect_of_the_turtle": {
+        "name": "Aspect of the Turtle",
+        "description": "Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active."
+      },
       "rapid_fire": {
         "name": "Лихорадочный натяг",
         "description": "Повышает скорость атаки на 40% на 15 сек."
+      },
+      "multi_shot": {
+        "name": "Раздвоенный выстрел",
+        "description": "Выпускает веер стрел в выбранную область, нанося противникам в радиусе 8 м {damage} ед. физического урона. (талант охотника)"
+      },
+      "trueshot": {
+        "name": "Trueshot",
+        "description": "For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster."
+      },
+      "powerful_shot": {
+        "name": "Powershot",
+        "description": "Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire."
       },
       "smite": {
         "name": "Кара",
@@ -7355,10 +7414,6 @@ export const ru_RU: EnTranslations = {
       "mind_sear": {
         "name": "Выжигание мыслей",
         "description": "Поддерживает поток темной энергии в выбранной области, нанося ближайшим противникам {damage} ед. урона каждую секунду. (талант жреца)"
-      },
-      "multi_shot": {
-        "name": "Раздвоенный выстрел",
-        "description": "Выпускает веер стрел в выбранную область, нанося противникам в радиусе 8 м {damage} ед. физического урона. (талант охотника)"
       },
       "prayer_of_healing": {
         "name": "Хоровое исцеление",

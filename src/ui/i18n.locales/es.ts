@@ -3631,15 +3631,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'Aspecto de la Marta',
   'entities.abilities.aspect_of_the_monkey.description':
     'Adoptas el aspecto de la marta y aumentas tu probabilidad de esquivar un 8% durante 30 min.',
-  'entities.abilities.aspect_of_the_cheetah.name': 'Aspecto del Corcel',
+  'entities.abilities.aspect_of_the_cheetah.name': 'Aspecto del guepardo',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Adoptas el aspecto del corcel y aumentas la velocidad de movimiento un 30% durante 30 min.',
-  'entities.abilities.aimed_shot.name': 'Tensado Largo',
+    'Aumenta tu velocidad de movimiento un 90% durante 3 s.',
+  'entities.abilities.aimed_shot.name': 'Disparo de puntería',
   'entities.abilities.aimed_shot.description':
-    'Un disparo cuidadosamente tensado que inflige {damage} de daño.',
-  'entities.abilities.rapid_fire.name': 'Tensado Febril',
+    'Un disparo cuidadosamente apuntado que inflige {damage} de daño físico.',
+  'entities.abilities.rapid_fire.name': 'Fuego rápido',
   'entities.abilities.rapid_fire.description':
-    'Aumenta tu velocidad de ataque un 40% durante 15 s.',
+    'Canaliza 7 disparos durante 1,9 s. Cada disparo genera 3 p. de enfoque y la canalización continúa mientras te mueves.',
   'entities.abilities.smite.name': 'Punición',
   'entities.abilities.smite.description': 'Castiga al enemigo por {damage} de daño Sagrado.',
   'entities.abilities.lesser_heal.name': 'Plegaria Susurrada',

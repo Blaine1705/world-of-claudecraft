@@ -154,6 +154,18 @@ export const SFX = [
     prompt:
       'A bowstring releasing with a twang and an arrow zipping away fast. Single shot, no music.',
   },
+  {
+    key: 'combat_hunter_aimed_shot',
+    duration: 1.5,
+    prompt:
+      'A powerful, carefully aimed fantasy bow shot with a forceful release and arrow flight. Single shot, no impact, no music.',
+  },
+  {
+    key: 'combat_hunter_auto_shot',
+    duration: 1.04,
+    prompt:
+      'A quick fantasy hunter bow auto-shot with a crisp release and short arrow flight. Single shot, no impact, no music.',
+  },
 
   // --- Physical impacts & defenses -----------------------------------------
   {
@@ -161,6 +173,11 @@ export const SFX = [
     custom: true,
     duration: 0.5,
     prompt: 'A blade striking flesh, a wet meaty thud. Single hit, no music.',
+  },
+  {
+    key: 'impact_hunter_arrow',
+    duration: 0.34,
+    prompt: 'A short arrowhead impact, crisp and immediate. Single hit, no music.',
   },
   {
     key: 'impact_metal',
