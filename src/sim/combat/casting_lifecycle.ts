@@ -31,6 +31,7 @@ import { isDispellableAura } from '../aura_classify';
 import { ITEMS, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
+import { instanceInfoAt } from '../instances/dungeons';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -179,6 +180,34 @@ function hasAbilityCharge(
   return !!state && state.charges > 0;
 }
 
+type ActiveCastRestriction = 'combat' | 'instance';
+
+function activeCastRestriction(
+  ctx: SimContext,
+  player: Entity,
+  ability: AbilityDef,
+): ActiveCastRestriction | null {
+  if (ability.requiresOutOfCombat && player.inCombat) {
+    return 'combat';
+  }
+  if (ability.requiresOutsideInstance && instanceInfoAt(ctx, player.pos)) {
+    return 'instance';
+  }
+  return null;
+}
+
+function emitActiveCastRestrictionError(
+  ctx: SimContext,
+  playerId: number,
+  restriction: ActiveCastRestriction,
+): void {
+  if (restriction === 'combat') {
+    ctx.error(playerId, "You can't do that while in combat.");
+  } else {
+    ctx.error(playerId, 'Leave the dungeon first.');
+  }
+}
+
 export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (!p.castingAbility) {
     // a queued press held back by a still-running GCD (see fireQueuedCast) retries
@@ -192,6 +221,14 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     return;
   }
   const activeCast = ctx.resolvedAbility(p.castingAbility, p.id);
+  if (activeCast) {
+    const restriction = activeCastRestriction(ctx, p, activeCast.def);
+    if (restriction) {
+      cancelCast(ctx, p);
+      emitActiveCastRestrictionError(ctx, p.id, restriction);
+      return;
+    }
+  }
   if (activeCast && isMassResurrectionAbility(activeCast.def)) {
     if (p.inCombat) {
       cancelCast(ctx, p);
@@ -502,6 +539,7 @@ export function castAbility(
   const sharedCooldown = isShamanShock(ability.id)
     ? SHAMAN_SHOCK_COOLDOWN_IDS.find((id) => p.cooldowns.has(id))
     : undefined;
+  const leavingRestrictedToggle = togglingOff && ability.requiresOutsideInstance;
   // Charge-limited abilities (the abilityCharges recharge model, driven by
   // bonusCharges: Double Charge, extra Blink/Frost Nova/Ice Block): a running
   // cooldown is only the RECHARGE timer; the cast is blocked only once every
@@ -582,8 +620,9 @@ export function castAbility(
     ctx.error(p.id, 'You must be stealthed.');
     return;
   }
-  if (ability.requiresOutOfCombat && p.inCombat) {
-    ctx.error(p.id, "You can't do that while in combat.");
+  const restriction = leavingRestrictedToggle ? null : activeCastRestriction(ctx, p, ability);
+  if (restriction) {
+    emitActiveCastRestrictionError(ctx, p.id, restriction);
     return;
   }
   if (isMassResurrectionAbility(ability) && !hasDeadGroupMember(ctx, p)) {
