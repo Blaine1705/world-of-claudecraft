@@ -1546,6 +1546,8 @@ export const en: EnTranslations = {
     "auraEffect": {
       "dot": "Deals {value} {school} damage every {interval} sec",
       "hot": "Restores {value} health every {interval} sec",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "Absorbs {value} damage",
       "healAbsorb": "Absorbs {value} incoming healing",
       "thorns": "Deals {value} {school} damage to attackers",
@@ -3022,7 +3024,7 @@ export const en: EnTranslations = {
       "flame_shock": "An instant burn that hits up front and keeps searing over time.",
       "galeheart_weapon": "Imbues both weapons with storm winds that reward a steady dual-wield rhythm.",
       "lifespring_weapon": "Imbues your weapon with restorative water that strengthens your healing flow.",
-      "tidecall": "Calls the tide to empower your next sequence of restorative casts.",
+      "tidecall": "Immediately heals an ally and deposits a full Mending Current pool.",
       "stoneward": "Raises a charged stone shield that turns incoming damage into recovery.",
       "primal_exaltation": "Unleashes a short specialization-specific surge of elemental power.",
       "fireball": "Your main fire nuke, lands a hit and leaves the target burning.",
@@ -6979,8 +6981,28 @@ export const en: EnTranslations = {
         "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
+        "name": "Cascading Mend",
+        "description": "Heals a friendly target for 120 to 145, then jumps to up to 2 nearby allies for 50% less healing per jump. Each ally reached consumes your Mending Current for an additional burst. (Spiritmend signature)"
+      },
+      "galeheart_weapon": {
+        "name": "Galeheart Weapon",
+        "description": "Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast."
+      },
+      "lifespring_weapon": {
+        "name": "Lifespring Weapon",
+        "description": "Imbues your weapon with living water, increasing Mending Current deposits by 20%."
+      },
+      "primal_exaltation": {
+        "name": "Primal Exaltation",
+        "description": "Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)"
+      },
+      "stoneward": {
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+      },
+      "tidecall": {
+        "name": "Tidecall",
+        "description": "Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current."
       },
       "metamorphosis": {
         "name": "Dread Aspect",

@@ -1546,6 +1546,8 @@ export const vi_VN: EnTranslations = {
     "auraEffect": {
       "dot": "Gây {value} sát thương {school} mỗi {interval} giây",
       "hot": "Hồi {value} máu mỗi {interval} giây",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "Hấp thụ {value} sát thương",
       "healAbsorb": "Hấp thụ {value} hồi máu nhận vào",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
@@ -6981,6 +6983,26 @@ export const vi_VN: EnTranslations = {
       "chain_heal": {
         "name": "Hồi Máu Liên Hoàn",
         "description": "Hồi phục một lượng lớn máu cho một mục tiêu đồng minh, sau đó lan sang tối đa 2 đồng minh ở gần; lượng hồi phục giảm 50% sau mỗi lần lan. (Kỹ năng chủ lực của Hồi Phục)"
+      },
+      "galeheart_weapon": {
+        "name": "Galeheart Weapon",
+        "description": "Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast."
+      },
+      "lifespring_weapon": {
+        "name": "Lifespring Weapon",
+        "description": "Imbues your weapon with living water, increasing Mending Current deposits by 20%."
+      },
+      "primal_exaltation": {
+        "name": "Primal Exaltation",
+        "description": "Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)"
+      },
+      "stoneward": {
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+      },
+      "tidecall": {
+        "name": "Tidecall",
+        "description": "Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current."
       },
       "metamorphosis": {
         "name": "Biến Hình",

@@ -665,7 +665,7 @@ export const guideStrings = {
       'Imbues both weapons with storm winds that reward a steady dual-wield rhythm.',
     lifespring_weapon:
       'Imbues your weapon with restorative water that strengthens your healing flow.',
-    tidecall: 'Calls the tide to empower your next sequence of restorative casts.',
+    tidecall: 'Immediately heals an ally and deposits a full Mending Current pool.',
     stoneward: 'Raises a charged stone shield that turns incoming damage into recovery.',
     primal_exaltation: 'Unleashes a short specialization-specific surge of elemental power.',
     fireball: 'Your main fire nuke, lands a hit and leaves the target burning.',

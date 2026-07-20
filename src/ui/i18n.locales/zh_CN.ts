@@ -2570,9 +2570,24 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以大地之怒灌注你的武器：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。',
   'entities.abilities.healing_wave.name': '治愈之水',
   'entities.abilities.healing_wave.description': '为一个友方目标恢复 {damage} 点生命值。',
-  'entities.abilities.chain_heal.name': '治疗链',
+  'entities.abilities.chain_heal.name': '湍流愈合',
   'entities.abilities.chain_heal.description':
-    '大量治疗一个友方目标，然后跳跃至多2个附近的盟友，每次跳跃的治疗量降低50%。（恢复专精招牌）',
+    '为一个友方目标恢复120至145点生命值，随后跳跃至多2个附近盟友，每次跳跃的治疗量减半。每个被波及的盟友都会消耗你的愈合水流，造成额外治疗。（灵愈招牌）',
+  'entities.abilities.galeheart_weapon.name': '风心武器',
+  'entities.abilities.galeheart_weapon.description':
+    '为武器灌注疾风。每第三次命中的武器攻击会回响两次，并触发风暴施法。',
+  'entities.abilities.lifespring_weapon.name': '活泉武器',
+  'entities.abilities.lifespring_weapon.description':
+    '为武器灌注生命之水，使愈合水流的注入量提高20%。',
+  'entities.abilities.primal_exaltation.name': '原初升华',
+  'entities.abilities.primal_exaltation.description':
+    '解放你的专精力量，持续12秒，强化其常规循环。（萨满祭司天赋）',
+  'entities.abilities.stoneward.name': '石之守护',
+  'entities.abilities.stoneward.description':
+    '使一名盟友获得6层、持续60秒的保护。受到伤害时消耗一层，恢复5%最大生命值，每3秒最多触发一次。（萨满祭司天赋）',
+  'entities.abilities.tidecall.name': '潮汐召唤',
+  'entities.abilities.tidecall.description':
+    '召来迅捷的复苏潮汐，治疗一名盟友，并将计算后的治疗量注入愈合水流。',
   'entities.abilities.earth_shock.name': '大地震击',
   'entities.abilities.earth_shock.description':
     '立即以震荡之力冲击目标，造成 {damage} 点自然伤害。',
@@ -4931,7 +4946,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.flame_shock': '瞬发的灼烧，先打出一记，并持续灼烧目标。',
   'guide.abilityHook.galeheart_weapon': '为双持武器灌注风暴之风，以稳定的攻击节奏获取回报。',
   'guide.abilityHook.lifespring_weapon': '为武器灌注复苏之水，强化持续的治疗节奏。',
-  'guide.abilityHook.tidecall': '召来潮汐，强化接下来的一系列治疗法术。',
+  'guide.abilityHook.tidecall': '立即治疗一名盟友，并注入满额愈合水流。',
   'guide.abilityHook.stoneward': '升起充能石盾，将受到的伤害转化为恢复。',
   'guide.abilityHook.primal_exaltation': '短暂释放与你专精相符的元素力量。',
   'guide.abilityHook.frost_armor': '持续的自我增益，开战前先硬化你的护甲。',
@@ -5766,6 +5781,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '锁甲',
   'hudChrome.auraEffect.dot': '每 {interval} 秒造成 {value} 点{school}伤害',
   'hudChrome.auraEffect.hot': '每 {interval} 秒恢复 {value} 点生命值',
+  'hudChrome.auraEffect.mendingCurrent': '储存 {value} 点治疗量，随时间释放或由湍流愈合消耗',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    '储存相当于最大生命值 {pct}% 的治疗量，供湍流愈合消耗',
   'hudChrome.auraEffect.absorb': '吸收 {value} 点伤害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 点受到的治疗',
   'hudChrome.auraEffect.thorns': '对攻击者造成 {value} 点{school}伤害',

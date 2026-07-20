@@ -1546,6 +1546,8 @@ export const cs_CZ: EnTranslations = {
     "auraEffect": {
       "dot": "Způsobuje {value} {school} poškození každých {interval} s",
       "hot": "Obnovuje {value} zdraví každých {interval} s",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "Absorbuje {value} poškození",
       "healAbsorb": "Absorbuje {value} příchozího léčení",
       "thorns": "Způsobuje útočníkům {value} {school} poškození",
@@ -6981,6 +6983,26 @@ export const cs_CZ: EnTranslations = {
       "chain_heal": {
         "name": "Řetězové léčení",
         "description": "Vyléčí spojenecký cíl za velké množství zdraví, poté přeskočí až na 2 další blízké spojence. Každý další skok léčí o 50 % méně. (klíčová schopnost Obnovy)"
+      },
+      "galeheart_weapon": {
+        "name": "Galeheart Weapon",
+        "description": "Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast."
+      },
+      "lifespring_weapon": {
+        "name": "Lifespring Weapon",
+        "description": "Imbues your weapon with living water, increasing Mending Current deposits by 20%."
+      },
+      "primal_exaltation": {
+        "name": "Primal Exaltation",
+        "description": "Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)"
+      },
+      "stoneward": {
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+      },
+      "tidecall": {
+        "name": "Tidecall",
+        "description": "Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current."
       },
       "metamorphosis": {
         "name": "Děsivý zjev",

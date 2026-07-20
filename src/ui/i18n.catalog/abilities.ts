@@ -1321,8 +1321,33 @@ const classAbilityNamesEn = {
       ],
       [
         'chain_heal',
-        'Chain Heal',
-        'Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
+        'Cascading Mend',
+        'Heals a friendly target for 120 to 145, then jumps to up to 2 nearby allies for 50% less healing per jump. Each ally reached consumes your Mending Current for an additional burst. (Spiritmend signature)',
+      ],
+      [
+        'galeheart_weapon',
+        'Galeheart Weapon',
+        'Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast.',
+      ],
+      [
+        'lifespring_weapon',
+        'Lifespring Weapon',
+        'Imbues your weapon with living water, increasing Mending Current deposits by 20%.',
+      ],
+      [
+        'primal_exaltation',
+        'Primal Exaltation',
+        'Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)',
+      ],
+      [
+        'stoneward',
+        'Stoneward',
+        'Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)',
+      ],
+      [
+        'tidecall',
+        'Tidecall',
+        'Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current.',
       ],
       [
         'metamorphosis',

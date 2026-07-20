@@ -2709,9 +2709,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Насыщает ваше оружие яростью камня: каждый удар наносит {damage} ед. дополнительного урона в течение 5 мин.',
   'entities.abilities.healing_wave.name': 'Целебные воды',
   'entities.abilities.healing_wave.description': 'Исцеляет дружественную цель на {damage}.',
-  'entities.abilities.chain_heal.name': 'Цепное исцеление',
+  'entities.abilities.chain_heal.name': 'Каскадное исцеление',
   'entities.abilities.chain_heal.description':
-    'Исцеляет дружественную цель на большую величину, затем перескакивает на 2 ближайших союзников, исцеляя на 50% меньше с каждым прыжком. (Специализация Исцеление)',
+    'Исцеляет дружественную цель на 120-145, затем перескакивает на 2 ближайших союзников, снижая исцеление вдвое с каждым прыжком. Каждый задетый союзник расходует ваш Поток исцеления для дополнительного всплеска. (Фирменное умение Исцеления духа)',
+  'entities.abilities.galeheart_weapon.name': 'Оружие сердца бури',
+  'entities.abilities.galeheart_weapon.description':
+    'Наполняет оружие шквалом. Каждая третья попавшая атака оружием дважды отзывается эхом и актирует Буревое колдовство.',
+  'entities.abilities.lifespring_weapon.name': 'Оружие живого источника',
+  'entities.abilities.lifespring_weapon.description':
+    'Наполняет оружие живой водой, увеличивая накопление Потока исцеления на 20%.',
+  'entities.abilities.primal_exaltation.name': 'Первозданное возвышение',
+  'entities.abilities.primal_exaltation.description':
+    'На 12 сек. высвобождает силу вашей специализации, усиливая ее обычную ротацию. (Талант шамана)',
+  'entities.abilities.stoneward.name': 'Каменный оберег',
+  'entities.abilities.stoneward.description':
+    'Защищает одного союзника на 60 сек. и имеет 6 зарядов. Урон расходует заряд, исцеляя 5% от максимума здоровья не чаще раза в 3 сек. (Талант шамана)',
+  'entities.abilities.tidecall.name': 'Зов прилива',
+  'entities.abilities.tidecall.description':
+    'Призывает быструю целительную волну, исцеляя союзника и добавляя рассчитанное исцеление к Потоку исцеления.',
   'entities.abilities.earth_shock.name': 'Земной толчок',
   'entities.abilities.earth_shock.description':
     'Мгновенно поражает цель ударной силой, нанося {damage} ед. урона от сил природы.',
@@ -5246,8 +5261,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Наполняет оба оружия штормовым ветром и вознаграждает ровный ритм атак.',
   'guide.abilityHook.lifespring_weapon':
     'Наполняет оружие целебной водой и усиливает непрерывный поток исцеления.',
-  'guide.abilityHook.tidecall':
-    'Призывает прилив, усиливая следующую череду исцеляющих заклинаний.',
+  'guide.abilityHook.tidecall': 'Мгновенно исцеляет союзника и наполняет его Поток исцеления.',
   'guide.abilityHook.stoneward':
     'Поднимает заряженный каменный щит, превращающий полученный урон в исцеление.',
   'guide.abilityHook.primal_exaltation':
@@ -6149,6 +6163,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': 'Кольчуга',
   'hudChrome.auraEffect.dot': 'Наносит {value} единиц урона ({school}) каждые {interval} сек',
   'hudChrome.auraEffect.hot': 'Восстанавливает {value} здоровья каждые {interval} сек',
+  'hudChrome.auraEffect.mendingCurrent':
+    'Накапливает {value} исцеления, которое высвобождается со временем или расходуется Каскадным исцелением',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Накапливает исцеление в размере {pct}% от максимума здоровья для Каскадного исцеления',
   'hudChrome.auraEffect.absorb': 'Поглощает {value} единиц урона',
   'hudChrome.auraEffect.healAbsorb': 'Поглощает {value} единиц входящего исцеления',
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',

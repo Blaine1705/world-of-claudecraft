@@ -1546,6 +1546,8 @@ export const it_IT: EnTranslations = {
     "auraEffect": {
       "dot": "Infligge {value} danni da {school} ogni {interval} s",
       "hot": "Ripristina {value} salute ogni {interval} s",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "Assorbe {value} danni",
       "healAbsorb": "Assorbe {value} cure ricevute",
       "thorns": "Infligge {value} danni da {school} agli attaccanti",
@@ -6981,6 +6983,26 @@ export const it_IT: EnTranslations = {
       "chain_heal": {
         "name": "Guarigione a Catena",
         "description": "Cura abbondantemente un bersaglio alleato, poi si propaga a un massimo di altri 2 alleati vicini, curando il 50% in meno a ogni salto. (Abilità distintiva di Rigenerazione)"
+      },
+      "galeheart_weapon": {
+        "name": "Galeheart Weapon",
+        "description": "Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast."
+      },
+      "lifespring_weapon": {
+        "name": "Lifespring Weapon",
+        "description": "Imbues your weapon with living water, increasing Mending Current deposits by 20%."
+      },
+      "primal_exaltation": {
+        "name": "Primal Exaltation",
+        "description": "Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)"
+      },
+      "stoneward": {
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+      },
+      "tidecall": {
+        "name": "Tidecall",
+        "description": "Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current."
       },
       "metamorphosis": {
         "name": "Metamorfosi",

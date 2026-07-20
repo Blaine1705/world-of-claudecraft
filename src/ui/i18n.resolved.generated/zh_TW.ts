@@ -1546,6 +1546,8 @@ export const zh_TW: EnTranslations = {
     "auraEffect": {
       "dot": "每 {interval} 秒造成 {value} 點{school}傷害",
       "hot": "每 {interval} 秒恢復 {value} 點生命值",
+      "mendingCurrent": "儲存 {value} 點治療量，隨時間釋放或由湧流癒合消耗",
+      "mendingCurrentPercent": "儲存相當於最大生命值 {pct}% 的治療量，供湧流癒合消耗",
       "absorb": "吸收 {value} 點傷害",
       "healAbsorb": "吸收 {value} 點受到的治療",
       "thorns": "對攻擊者造成 {value} 點{school}傷害",
@@ -3022,7 +3024,7 @@ export const zh_TW: EnTranslations = {
       "flame_shock": "瞬發灼燒，先給予一記前置傷害並持續灼燒。",
       "galeheart_weapon": "為雙持武器灌注風暴之風，以穩定的攻擊節奏獲得回報。",
       "lifespring_weapon": "為武器灌注復甦之水，強化持續的治療節奏。",
-      "tidecall": "召來潮汐，強化接下來的一連串治療法術。",
+      "tidecall": "立即治療一名盟友，並注入滿額癒合水流。",
       "stoneward": "升起充能石盾，將受到的傷害轉化為恢復。",
       "primal_exaltation": "短暫釋放符合你專精的元素力量。",
       "fireball": "你主要的火焰核彈，命中後讓目標持續燃燒。",
@@ -6979,8 +6981,28 @@ export const zh_TW: EnTranslations = {
         "description": "打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）"
       },
       "chain_heal": {
-        "name": "治療鏈",
-        "description": "大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低50%。（恢復專精招牌）"
+        "name": "湧流癒合",
+        "description": "為一個友方目標恢復120至145點生命值，隨後跳躍至多2個附近盟友，每次跳躍的治療量減半。每個被波及的盟友都會消耗你的癒合水流，造成額外治療。（靈癒招牌）"
+      },
+      "galeheart_weapon": {
+        "name": "風心武器",
+        "description": "為武器灌注疾風。每第三次命中的武器攻擊會回響兩次，並觸發風暴施法。"
+      },
+      "lifespring_weapon": {
+        "name": "活泉武器",
+        "description": "為武器灌注生命之水，使癒合水流的注入量提高20%。"
+      },
+      "primal_exaltation": {
+        "name": "原初昇華",
+        "description": "解放你的專精力量，持續12秒，強化其常規循環。（薩滿祭司天賦）"
+      },
+      "stoneward": {
+        "name": "石之守護",
+        "description": "使一名盟友獲得6層、持續60秒的保護。受到傷害時消耗一層，恢復5%最大生命值，每3秒最多觸發一次。（薩滿祭司天賦）"
+      },
+      "tidecall": {
+        "name": "潮汐召喚",
+        "description": "召來迅捷的復甦潮汐，治療一名盟友，並將計算後的治療量注入癒合水流。"
       },
       "metamorphosis": {
         "name": "惡魔變形",

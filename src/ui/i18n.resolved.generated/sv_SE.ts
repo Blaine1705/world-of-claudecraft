@@ -1546,6 +1546,8 @@ export const sv_SE: EnTranslations = {
     "auraEffect": {
       "dot": "Gör {value} {school}-skada var {interval}:e s",
       "hot": "Återställer {value} hälsa var {interval}:e s",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "Absorberar {value} skada",
       "healAbsorb": "Absorberar {value} inkommande läkning",
       "thorns": "Verursacht bei Angreifern {value} {school}schaden",
@@ -6981,6 +6983,26 @@ export const sv_SE: EnTranslations = {
       "chain_heal": {
         "name": "Kedjeläkning",
         "description": "Läker ett vänligt mål för en stor mängd och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp läker för 50% mindre. (Återställningssignatur)"
+      },
+      "galeheart_weapon": {
+        "name": "Galeheart Weapon",
+        "description": "Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast."
+      },
+      "lifespring_weapon": {
+        "name": "Lifespring Weapon",
+        "description": "Imbues your weapon with living water, increasing Mending Current deposits by 20%."
+      },
+      "primal_exaltation": {
+        "name": "Primal Exaltation",
+        "description": "Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)"
+      },
+      "stoneward": {
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+      },
+      "tidecall": {
+        "name": "Tidecall",
+        "description": "Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current."
       },
       "metamorphosis": {
         "name": "Metamorfos",
