@@ -4242,6 +4242,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.gravewyrm_sanctum.enterText':
     '空気が冷たくなります。下で巨大な何かが息をしています...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': '山風の中へよろめき戻ります。',
+  'entities.mobs.orkadia_grunt.name': '血牙の兵卒',
+  'entities.mobs.orkadia_marauder.name': '鉄皮の略奪者',
+  'entities.mobs.orkadia_warlord.name': '軍団長グロモク・スカルクリーヴァー',
+  'entities.dungeons.orkadia.name': 'オルカディア',
+  'entities.dungeons.orkadia.enterText':
+    '戦火が緑に燃え上がる。オルカディアの戦営はお前の来訪を知った。',
+  'entities.dungeons.orkadia.leaveText':
+    '斬り開いて外へ出ると、ドレイクランドの灰混じりの風が吹きつけた。',
   'entities.dungeons.drowned_temple.name': '溺れし神殿',
   'entities.dungeons.drowned_temple.enterText':
     '月の門をくぐり抜けると——大気は冷たい水と蒼白の光に変わり、歌声が頭上で閉ざされていく。',
@@ -5449,6 +5457,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': 'インスタンスのリセット',
   'guide.dungeonsPage.sanctumBody':
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
+  'guide.dungeonsPage.orkadiaBody':
+    'ドレイクランドの黒い火山岩を穿って築かれた残虐なオークの戦営。広間は毒々しい緑の戦火に照らされている。血牙の兵卒と鉄皮の略奪者を斬り伏せ、髑髏の壇上に鎮座する軍団長グロモク・スカルクリーヴァーへと至れ。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
   'guide.dungeonsPage.raidBody':
     '封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。',

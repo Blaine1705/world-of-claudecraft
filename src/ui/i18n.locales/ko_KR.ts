@@ -4226,6 +4226,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.gravewyrm_sanctum.enterText':
     '공기가 차가워집니다. 아래에서 거대한 무언가가 숨 쉽니다...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': '산바람 속으로 비틀거리며 돌아옵니다.',
+  'entities.mobs.orkadia_grunt.name': '피엄니 병졸',
+  'entities.mobs.orkadia_marauder.name': '무쇠가죽 약탈자',
+  'entities.mobs.orkadia_warlord.name': '전쟁군주 그로목 해골분쇄자',
+  'entities.dungeons.orkadia.name': '오르카디아',
+  'entities.dungeons.orkadia.enterText':
+    '전화가 녹색으로 타오른다. 오르카디아의 전쟁 야영지가 그대의 도래를 알아챘다.',
+  'entities.dungeons.orkadia.leaveText':
+    '베어 헤치고 나와 잿빛 드레이크랜드의 바람 속으로 돌아선다.',
   'entities.dungeons.drowned_temple.name': '익사한 신전',
   'entities.dungeons.drowned_temple.enterText':
     '당신은 달의 관문을 지나갑니다 — 공기가 차가운 물과 창백한 빛으로 변하고, 노랫소리가 당신의 머리 위로 닫혀 옵니다.',
@@ -5444,6 +5452,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': '인스턴스 초기화',
   'guide.dungeonsPage.sanctumBody':
     '가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.',
+  'guide.dungeonsPage.orkadiaBody':
+    '드레이크랜드의 검은 화산암을 깎아 만든 잔혹한 오크 전쟁 야영지로, 그 회랑은 유독한 녹색 전화(戰火)로 밝혀져 있다. 피엄니 병졸과 무쇠가죽 약탈자를 베어 넘기고 해골 단상에 앉은 전쟁군주 그로목 해골분쇄자에게 이르라.',
   'guide.dungeonsPage.raidName': '최종 단계 공격대',
   'guide.dungeonsPage.raidBody':
     '봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.',

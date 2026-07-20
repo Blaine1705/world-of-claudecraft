@@ -3361,7 +3361,7 @@ export const ja_JP: EnTranslations = {
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
-      "orkadiaBody": "A brutal orc war-camp hewn into the black volcanic rock of the Drakelands, its halls lit by toxic-green warpyres. Cut through the Bloodtusk grunts and Ironhide marauders to reach Warlord Grommok Skullcleaver on his dais of skulls.",
+      "orkadiaBody": "ドレイクランドの黒い火山岩を穿って築かれた残虐なオークの戦営。広間は毒々しい緑の戦火に照らされている。血牙の兵卒と鉄皮の略奪者を斬り伏せ、髑髏の壇上に鎮座する軍団長グロモク・スカルクリーヴァーへと至れ。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -10021,13 +10021,13 @@ export const ja_JP: EnTranslations = {
         "name": "奈落の王アズゴラス"
       },
       "orkadia_grunt": {
-        "name": "Bloodtusk Grunt"
+        "name": "血牙の兵卒"
       },
       "orkadia_marauder": {
-        "name": "Ironhide Marauder"
+        "name": "鉄皮の略奪者"
       },
       "orkadia_warlord": {
-        "name": "Warlord Grommok Skullcleaver"
+        "name": "軍団長グロモク・スカルクリーヴァー"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
@@ -11870,9 +11870,9 @@ export const ja_JP: EnTranslations = {
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
       "orkadia": {
-        "name": "Orkadia",
-        "enterText": "The warpyres flare green. The war-camp of Orkadia knows you have come.",
-        "leaveText": "You cut your way back out into the ashen Drakelands wind."
+        "name": "オルカディア",
+        "enterText": "戦火が緑に燃え上がる。オルカディアの戦営はお前の来訪を知った。",
+        "leaveText": "斬り開いて外へ出ると、ドレイクランドの灰混じりの風が吹きつけた。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

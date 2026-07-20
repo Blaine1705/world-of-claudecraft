@@ -3361,7 +3361,7 @@ export const ko_KR: EnTranslations = {
       "bastionBody": "습지에 삼켜진 침수된 요새로, 물에 빠진 수호자들과 차오르는 밀물 그 자체가 지키고 있습니다.",
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
       "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
-      "orkadiaBody": "A brutal orc war-camp hewn into the black volcanic rock of the Drakelands, its halls lit by toxic-green warpyres. Cut through the Bloodtusk grunts and Ironhide marauders to reach Warlord Grommok Skullcleaver on his dais of skulls.",
+      "orkadiaBody": "드레이크랜드의 검은 화산암을 깎아 만든 잔혹한 오크 전쟁 야영지로, 그 회랑은 유독한 녹색 전화(戰火)로 밝혀져 있다. 피엄니 병졸과 무쇠가죽 약탈자를 베어 넘기고 해골 단상에 앉은 전쟁군주 그로목 해골분쇄자에게 이르라.",
       "raidName": "최종 단계 공격대",
       "raidBody": "봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.",
       "heroicTitle": "영웅 난이도",
@@ -10021,13 +10021,13 @@ export const ko_KR: EnTranslations = {
         "name": "구렁의 군주 아즈고라스"
       },
       "orkadia_grunt": {
-        "name": "Bloodtusk Grunt"
+        "name": "피엄니 병졸"
       },
       "orkadia_marauder": {
-        "name": "Ironhide Marauder"
+        "name": "무쇠가죽 약탈자"
       },
       "orkadia_warlord": {
-        "name": "Warlord Grommok Skullcleaver"
+        "name": "전쟁군주 그로목 해골분쇄자"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"
@@ -11870,9 +11870,9 @@ export const ko_KR: EnTranslations = {
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
       },
       "orkadia": {
-        "name": "Orkadia",
-        "enterText": "The warpyres flare green. The war-camp of Orkadia knows you have come.",
-        "leaveText": "You cut your way back out into the ashen Drakelands wind."
+        "name": "오르카디아",
+        "enterText": "전화가 녹색으로 타오른다. 오르카디아의 전쟁 야영지가 그대의 도래를 알아챘다.",
+        "leaveText": "베어 헤치고 나와 잿빛 드레이크랜드의 바람 속으로 돌아선다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

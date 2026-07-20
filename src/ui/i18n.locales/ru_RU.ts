@@ -4269,6 +4269,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.gravewyrm_sanctum.name': 'Святилище Могильного Вирма',
   'entities.dungeons.gravewyrm_sanctum.enterText': 'Воздух холодеет. Внизу дышит нечто огромное...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': 'Вы пошатываясь выходите на горный ветер.',
+  'entities.mobs.orkadia_grunt.name': 'Пехотинец Кровавого Клыка',
+  'entities.mobs.orkadia_marauder.name': 'Мародёр Железношкурый',
+  'entities.mobs.orkadia_warlord.name': 'Полководец Громмок Черепокол',
+  'entities.dungeons.orkadia.name': 'Оркадия',
+  'entities.dungeons.orkadia.enterText':
+    'Боевые костры вспыхивают зелёным. Военный лагерь Оркадии знает о вашем приходе.',
+  'entities.dungeons.orkadia.leaveText':
+    'Прорубаясь, вы выбираетесь обратно на пепельный ветер Дрейкленда.',
   'entities.dungeons.drowned_temple.name': 'Утонувший храм',
   'entities.dungeons.drowned_temple.enterText':
     'Ты проходишь сквозь лунные врата — воздух обращается в холодную воду и бледный свет, и пение смыкается над твоей головой.',
@@ -5510,6 +5518,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': 'Сброс инстансов',
   'guide.dungeonsPage.sanctumBody':
     'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
+  'guide.dungeonsPage.orkadiaBody':
+    'Жестокий орочий военный лагерь, вырубленный в чёрном вулканическом камне Дрейкленда; его залы освещены ядовито-зелёными боевыми кострами. Прорубитесь сквозь пехотинцев Кровавого Клыка и мародёров Железношкурых, чтобы добраться до полководца Громмока Черепокола на его помосте из черепов.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
   'guide.dungeonsPage.raidBody':
     'За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.',

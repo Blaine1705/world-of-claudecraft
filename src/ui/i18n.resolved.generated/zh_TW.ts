@@ -3361,7 +3361,7 @@ export const zh_TW: EnTranslations = {
       "bastionBody": "一座沉入沼澤、被遺忘的要塞，由溺亡的守軍與不斷上漲的潮水本身所據守。",
       "templeBody": "沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。",
-      "orkadiaBody": "A brutal orc war-camp hewn into the black volcanic rock of the Drakelands, its halls lit by toxic-green warpyres. Cut through the Bloodtusk grunts and Ironhide marauders to reach Warlord Grommok Skullcleaver on his dais of skulls.",
+      "orkadiaBody": "一座鑿入德雷克蘭黑色火山岩中的殘暴獸人戰營，殿堂由劇毒的綠色戰火照亮。殺穿血牙兵卒與鐵皮劫掠者，直取盤踞在頭骨高台上的督軍格羅莫克·碎顱者。",
       "raidName": "最終團隊副本",
       "raidBody": "在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。",
       "heroicTitle": "英雄模式",
@@ -10021,13 +10021,13 @@ export const zh_TW: EnTranslations = {
         "name": "深淵之主阿茲戈拉斯"
       },
       "orkadia_grunt": {
-        "name": "Bloodtusk Grunt"
+        "name": "血牙兵卒"
       },
       "orkadia_marauder": {
-        "name": "Ironhide Marauder"
+        "name": "鐵皮劫掠者"
       },
       "orkadia_warlord": {
-        "name": "Warlord Grommok Skullcleaver"
+        "name": "督軍格羅莫克·碎顱者"
       },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
@@ -11870,9 +11870,9 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你回到荊峰的寒冷空氣中。"
       },
       "orkadia": {
-        "name": "Orkadia",
-        "enterText": "The warpyres flare green. The war-camp of Orkadia knows you have come.",
-        "leaveText": "You cut your way back out into the ashen Drakelands wind."
+        "name": "奧卡迪亞",
+        "enterText": "戰火驟然泛起綠光。奧卡迪亞的戰營已知你到來。",
+        "leaveText": "你殺出重圍，回到德雷克蘭灰燼瀰漫的勁風之中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

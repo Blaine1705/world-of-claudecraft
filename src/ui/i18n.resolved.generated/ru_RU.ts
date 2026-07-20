@@ -3361,7 +3361,7 @@ export const ru_RU: EnTranslations = {
       "bastionBody": "Затопленная крепость, поглощенная топью, что удерживают утонувшие защитники и сам прибывающий прилив.",
       "templeBody": "Утонувшее святилище в стороне от болотной дороги, ответвление для любопытных и хорошо подготовленных.",
       "sanctumBody": "Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.",
-      "orkadiaBody": "A brutal orc war-camp hewn into the black volcanic rock of the Drakelands, its halls lit by toxic-green warpyres. Cut through the Bloodtusk grunts and Ironhide marauders to reach Warlord Grommok Skullcleaver on his dais of skulls.",
+      "orkadiaBody": "Жестокий орочий военный лагерь, вырубленный в чёрном вулканическом камне Дрейкленда; его залы освещены ядовито-зелёными боевыми кострами. Прорубитесь сквозь пехотинцев Кровавого Клыка и мародёров Железношкурых, чтобы добраться до полководца Громмока Черепокола на его помосте из черепов.",
       "raidName": "Финальный рейд",
       "raidBody": "За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.",
       "heroicTitle": "Героический режим",
@@ -10021,13 +10021,13 @@ export const ru_RU: EnTranslations = {
         "name": "Азгорат, Владыка Бездны"
       },
       "orkadia_grunt": {
-        "name": "Bloodtusk Grunt"
+        "name": "Пехотинец Кровавого Клыка"
       },
       "orkadia_marauder": {
-        "name": "Ironhide Marauder"
+        "name": "Мародёр Железношкурый"
       },
       "orkadia_warlord": {
-        "name": "Warlord Grommok Skullcleaver"
+        "name": "Полководец Громмок Черепокол"
       },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"
@@ -11870,9 +11870,9 @@ export const ru_RU: EnTranslations = {
         "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
       },
       "orkadia": {
-        "name": "Orkadia",
-        "enterText": "The warpyres flare green. The war-camp of Orkadia knows you have come.",
-        "leaveText": "You cut your way back out into the ashen Drakelands wind."
+        "name": "Оркадия",
+        "enterText": "Боевые костры вспыхивают зелёным. Военный лагерь Оркадии знает о вашем приходе.",
+        "leaveText": "Прорубаясь, вы выбираетесь обратно на пепельный ветер Дрейкленда."
       },
       "drowned_temple": {
         "name": "Утонувший храм",

@@ -4076,6 +4076,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.gravewyrm_sanctum.name': '墓龙圣所',
   'entities.dungeons.gravewyrm_sanctum.enterText': '空气变得冰冷。下方有庞然之物在呼吸...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': '你踉跄回到山风之中。',
+  'entities.mobs.orkadia_grunt.name': '血牙兵卒',
+  'entities.mobs.orkadia_marauder.name': '铁皮劫掠者',
+  'entities.mobs.orkadia_warlord.name': '督军格罗莫克·碎颅者',
+  'entities.dungeons.orkadia.name': '奥卡迪亚',
+  'entities.dungeons.orkadia.enterText': '战火骤然泛起绿光。奥卡迪亚的战营已知你到来。',
+  'entities.dungeons.orkadia.leaveText': '你杀出重围，回到德雷克兰灰烬弥漫的劲风之中。',
   'entities.dungeons.drowned_temple.name': '溺亡神殿',
   'entities.dungeons.drowned_temple.enterText':
     '你踏过那道月门——空气化作冰冷的水与苍白的光，歌声在你头顶合拢。',
@@ -5216,6 +5222,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在队伍仍持有已认领副本时切换难度，旧的认领会保留一段时间后自行清除。队长也可以立即放弃它们：在自己的头像菜单中选择“重置所有副本”，或输入 /dungeon reset。重置只有在难度确实更改之后才能进行，且副本内不能有任何人（无论生死）留守，两次重置之间还隔着一段短暂的冷却。带着错误的难度来到门口，游戏会在开打之前直接提醒你。团队副本永远不会以这种方式重置；它遵循自己的锁定规则。',
   'guide.dungeonsPage.resetTitle': '重置你的副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。',
+  'guide.dungeonsPage.orkadiaBody':
+    '一座凿入德雷克兰黑色火山岩中的残暴兽人战营，殿堂由剧毒的绿色战火照亮。杀穿血牙兵卒与铁皮劫掠者，直取盘踞在头骨高台上的督军格罗莫克·碎颅者。',
   'guide.dungeonsPage.raidName': '终局团队副本',
   'guide.dungeonsPage.raidBody':
     '在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。',
