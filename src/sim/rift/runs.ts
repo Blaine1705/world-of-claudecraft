@@ -259,7 +259,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.orbId = null;
   inst.orbActive = false;
 
-  // A- and S-rank rifts are heroic scaled: a spawn-time stat transform plus the
+  // B-, A- and S-rank rifts are heroic scaled: a spawn-time stat transform plus the
   // per-entity mechanic multipliers, mirroring instances/difficulty.ts. The rank
   // derives from the descriptor's baseLevel, so every host regenerates it.
   const rank = riftRankForBaseLevel(inst.baseLevel);

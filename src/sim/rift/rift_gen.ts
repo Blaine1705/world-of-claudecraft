@@ -78,16 +78,16 @@ export function isSetPieceSeed(seed: number): boolean {
 }
 
 /** Whether this seed+rank opens the citadel. The 2-floor authored set-piece is
- * C/B content only: A and S rank dungeons are guaranteed 3+ floors, so a
- * heroic-rank portal always runs the procedural descent, even on a set-piece
- * seed. Pure over the descriptor, so every host agrees. */
+ * C content only: B, A and S rank dungeons are heroic scaled and guaranteed
+ * 3+ floors, so a heroic-rank portal always runs the procedural descent, even
+ * on a set-piece seed. Pure over the descriptor, so every host agrees. */
 export function isSetPieceRift(seed: number, baseLevel: number): boolean {
   return isSetPieceSeed(seed) && riftHeroicTuningFor(baseLevel) === null;
 }
 
 /** How many floors this rift runs (deterministic from the descriptor). The
  * authored set-piece descends from the citadel halls into the pit; every
- * procedural rift (including any A/S run) is 3 to 6 floors. `baseLevel`
+ * procedural rift (including any B/A/S run) is 3 to 6 floors. `baseLevel`
  * defaults to the C-rank baseline for legacy seed-only callers. */
 export function riftFloorCount(seed: number, baseLevel: number = RIFT_RANK_BASE_LEVEL.C): number {
   if (isSetPieceRift(seed, baseLevel)) return INFERNAL_FLOOR_COUNT;

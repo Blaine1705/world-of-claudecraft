@@ -240,8 +240,8 @@ describe('retro fallback proof sets stay anchored to the real tables', () => {
   it('the creditable mob-level ceiling is the S-rank rift pin', () => {
     // Giantslayer's stranded heal keys on the highest level a creditable mob
     // can ever spawn at. S-rank rift floors run mobs up to RIFT_MAX_MOB_LEVEL
-    // (the game-wide ceiling; at 25 the +5-level kill is legitimately earnable
-    // at the level-20 cap, so the stranded retro-grant no longer fires there);
+    // (the game-wide ceiling; at 23 the +5-level kill is out of reach at the
+    // level-20 cap, so capped players take the stranded retro-grant instead);
     // heroic instances pin every mob to one shared level below it; outside
     // those no spawnable template exceeds the player cap. The only templates
     // authored above the ceiling can never be credited: warlock and mage pets

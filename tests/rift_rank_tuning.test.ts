@@ -294,6 +294,61 @@ describe('rift ranks: rank-gated summons + the boss-add level pin', () => {
       expect(add.weapon.min, 'add swings at the add multiplier').toBe(Math.round(swing * 0.8));
     }
   });
+
+  it('the heroic tuning table carries the approved literals', () => {
+    // The transform tests above assert WIRING against this table (field on the
+    // mob === field in the table), so the numbers themselves must be pinned
+    // here as literals or a silent retune of any multiplier passes every test.
+    expect(RIFT_HEROIC_TUNING).toEqual({
+      B: {
+        healthMultiplier: 1.5,
+        damageMultiplier: 1.35,
+        addDamageMultiplier: 1.12,
+        armorMultiplier: 1.12,
+      },
+      A: {
+        healthMultiplier: 1.9,
+        damageMultiplier: 1.6,
+        addDamageMultiplier: 1.25,
+        armorMultiplier: 1.25,
+      },
+      S: {
+        healthMultiplier: 2.5,
+        damageMultiplier: 2,
+        addDamageMultiplier: 1.5,
+        armorMultiplier: 1.4,
+      },
+    });
+  });
+
+  it('B-rank boss adds take the softer 1.12 multiplier (venom summons in budget)', () => {
+    const seed = seedWithFinalBoss('rift_boss_venom');
+    const b = enterAtBossFloor(seed, 22);
+    const bBoss = b.entities.get(active(b).bossId!)!;
+    b.player.gm = true; // survive the heroic boss so the summoned wave persists
+    b.player.pos = { ...bBoss.pos, z: bBoss.pos.z - 4 };
+    b.player.prevPos = { ...b.player.pos };
+    (b as unknown as { dealDamage: Function }).dealDamage(
+      b.player,
+      bBoss,
+      Math.round(bBoss.maxHp * 0.5),
+      false,
+      'physical',
+      'test',
+      'hit',
+      true,
+    );
+    tickAlive(b, 3);
+    expect(bBoss.summonedIds.length, 'B summons (venom slot 1 fits budget 2)').toBeGreaterThan(0);
+    for (const addId of bBoss.summonedIds) {
+      const add = b.entities.get(addId)!;
+      expect(add.level, 'adds match the boss level').toBe(bBoss.level);
+      expect(add.mechanicDamageMult, 'softer add multiplier, literal').toBe(1.12);
+      const t = MOBS[add.templateId];
+      const swing = t.dmgBase * 1.12 + t.dmgPerLevel * 1.12 * (add.level - 1);
+      expect(add.weapon.min, 'add swings at the softer multiplier').toBe(Math.round(swing * 0.8));
+    }
+  });
 });
 
 describe('rift ranks: A/S one-shot rolling boulder', () => {
