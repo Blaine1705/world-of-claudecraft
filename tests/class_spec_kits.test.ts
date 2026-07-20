@@ -32,13 +32,7 @@ const KITS = [
   },
   {
     spec: 'survival',
-    owns: [
-      'bloodhook',
-      'raptor_strike',
-      'mongoose_bite',
-      'shrapnel_charge',
-      'bloodtrail_assault',
-    ],
+    owns: ['bloodhook', 'raptor_strike', 'mongoose_bite', 'shrapnel_charge', 'bloodtrail_assault'],
     excludes: [
       'pack_command',
       'bestial_wrath',
