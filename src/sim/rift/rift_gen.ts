@@ -45,9 +45,9 @@ import { applyRiftUpgrade } from './upgrade';
 const MIN_FLOORS = 3;
 const MAX_FLOORS = 6;
 
-// Mob levels are rank-banded in rift/ranks.ts: C/B ramp under the classic
-// fairness cap (22), A holds 22 and gets its bite from the heroic stat
-// transform, and S-rank floors run 23 to 25 by design (re-exported here for
+// Mob levels are rank-banded in rift/ranks.ts: C ramps under the classic
+// fairness cap (22), B/A hold 22 and get their bite from the heroic stat
+// transform, and S-rank floors are a flat 23 by design (re-exported here for
 // the callers that historically read the cap off the generator).
 export { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from './ranks';
 

@@ -1278,7 +1278,7 @@ function tickRiftHazards(
 }
 
 // Roll one lane's boulder forward a tick and bowl over anyone it overtakes.
-// C/B ranks chip a chunk of max HP; on the heroic A/S ranks a boulder is a
+// C rank chips a chunk of max HP; on the heroic B/A/S ranks a boulder is a
 // ONE-SHOT mechanic (an unblockable killing blow), so the lane must be dodged
 // or jumped, never tanked. Lava deliberately stays damage-over-time at every
 // rank (tickRiftHazards): a burn is a mistake tax, a boulder is an execution.

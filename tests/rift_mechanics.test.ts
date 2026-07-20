@@ -271,7 +271,8 @@ describe('rift mechanics: switch-gate', () => {
 });
 
 describe('rift generator: rank level bands', () => {
-  it('C/B/A floors cap mob level at 22; S-rank floors run 23 to 25', () => {
+  it('C/B/A floors cap mob level at 22; S-rank floors are flat 23', () => {
+    // S-rank is no longer a 23-25 ramp; it is a flat 23 on every floor.
     let maxNonS = 0;
     let maxS = 0;
     let minS = Infinity;
@@ -293,8 +294,9 @@ describe('rift generator: rank level bands', () => {
     }
     expect(maxNonS, 'C/B/A floors still cap mob level at 22').toBeLessThanOrEqual(22);
     expect(maxNonS, 'sanity: the 22 cap is actually reached').toBeGreaterThanOrEqual(22);
-    expect(minS, 'every S-rank mob is level 23 or higher').toBeGreaterThanOrEqual(23);
-    expect(maxS, 'S-rank depth ramps to the 25 ceiling').toBe(25);
+    expect(minS, 'every S-rank mob is level 23').toBeGreaterThanOrEqual(23);
+    // S-rank is flat 23 (no ramp to 25).
+    expect(maxS, 'S-rank is flat 23, no ramp to 25').toBe(23);
   });
 });
 

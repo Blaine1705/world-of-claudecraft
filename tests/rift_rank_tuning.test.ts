@@ -109,11 +109,12 @@ describe('rift ranks: derivation and level bands', () => {
     expect(RIFT_RANK_MECHANIC_BUDGET).toEqual({ C: 1, B: 2, A: 3, S: 4 });
   });
 
-  it('C ramps 20..22, B/A hold 22, S runs 23..25', () => {
+  it('C ramps 20..22, B/A hold 22, S is flat 23', () => {
     expect([0, 1, 2, 3, 5].map((i) => riftFloorLevel(20, i))).toEqual([20, 21, 22, 22, 22]);
     expect([0, 3, 5].map((i) => riftFloorLevel(22, i))).toEqual([22, 22, 22]);
     expect([0, 3, 5].map((i) => riftFloorLevel(25, i))).toEqual([22, 22, 22]);
-    expect([0, 1, 2, 3, 5].map((i) => riftFloorLevel(28, i))).toEqual([23, 24, 25, 25, 25]);
+    // S-rank mobs are flat 23 on every floor (no ramp to 25).
+    expect([0, 1, 2, 3, 5].map((i) => riftFloorLevel(28, i))).toEqual([23, 23, 23, 23, 23]);
   });
 });
 
@@ -167,16 +168,37 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
   });
 });
 
-describe('rift ranks: A/S heroic spawn scaling', () => {
-  it('A/S trash takes the heroic stat transform + mechanic multipliers; C/B does not', () => {
-    for (const baseLevel of [20, 22]) {
+describe('rift ranks: A/S/B heroic spawn scaling', () => {
+  it('B/A/S trash takes the heroic stat transform + mechanic multipliers; C does not', () => {
+    // C is the only rank without the heroic transform.
+    for (const baseLevel of [20]) {
       const sim = makeSim();
       sim.enterRift(SEED, baseLevel, sim.player.id);
       const inst = active(sim);
       for (const id of inst.mobIds) {
         const m = sim.entities.get(id)!;
-        expect(m.mechanicDamageMult, `C/B mob ${m.templateId}`).toBeUndefined();
+        expect(m.mechanicDamageMult, `C mob ${m.templateId}`).toBeUndefined();
         expect(m.riftMechanicLimit, 'trash carries no mechanic budget').toBeUndefined();
+      }
+    }
+    // B-rank mobs DO carry the 1.5/1.35 heroic transform (new in B-rank tuning).
+    {
+      const sim = makeSim();
+      sim.enterRift(SEED, 22, sim.player.id);
+      const inst = active(sim);
+      const tuning = RIFT_HEROIC_TUNING.B!;
+      expect(inst.mobIds.length).toBeGreaterThan(0);
+      for (const id of inst.mobIds) {
+        const m = sim.entities.get(id)!;
+        const t = MOBS[m.templateId];
+        expect(m.mechanicDamageMult, `B mob ${m.templateId}`).toBe(tuning.damageMultiplier);
+        expect(m.mechanicHealMult).toBe(tuning.healthMultiplier);
+        expect(m.moveSpeed, 'anti-kite move-speed floor').toBeGreaterThanOrEqual(
+          RIFT_HEROIC_MIN_MOVE_SPEED,
+        );
+        const hm = tuning.healthMultiplier;
+        const expected = Math.round((t.hpBase * hm + t.hpPerLevel * hm * (m.level - 1)) * 2.3);
+        expect(m.maxHp, `B ${m.templateId} hp`).toBe(expected);
       }
     }
     for (const baseLevel of [25, 28]) {
@@ -212,7 +234,8 @@ describe('rift ranks: A/S heroic spawn scaling', () => {
     const s = enterAtBossFloor(seed, 28);
     const sBoss = s.entities.get(active(s).bossId!)!;
     expect(sBoss.riftMechanicLimit).toBe(4);
-    expect(sBoss.level, 'S boss reaches the 25 ceiling').toBe(25);
+    // S-rank is flat 23 on every floor (no ramp to 25).
+    expect(sBoss.level, 'S boss is flat 23').toBe(23);
   });
 });
 
@@ -296,7 +319,7 @@ describe('rift ranks: A/S one-shot rolling boulder', () => {
     sim.player.prevPos = { ...sim.player.pos };
   }
 
-  it('C chips a fraction of max hp; A executes outright (lava stays a burn)', () => {
+  it('C chips a fraction of max hp; B/A/S execute outright (lava stays a burn)', () => {
     const seed = rollerSeed();
 
     const c = makeSim(seed);
@@ -309,6 +332,17 @@ describe('rift ranks: A/S one-shot rolling boulder', () => {
     }
     expect(c.player.dead, 'a C-rank boulder is survivable').toBe(false);
     expect(c.player.hp, 'but it hurts').toBeLessThan(c.player.maxHp);
+
+    // B-rank boulders are lethal (B now has heroic tuning).
+    const b = makeSim(seed);
+    b.enterRift(seed, 22, b.player.id);
+    parkInLane(b);
+    b.player.hp = b.player.maxHp;
+    for (let i = 0; i < 20 * 30 && !b.player.dead; i++) {
+      parkInLane(b);
+      b.tick();
+    }
+    expect(b.player.dead, 'a B-rank boulder is a one-shot kill').toBe(true);
 
     const a = makeSim(seed);
     a.enterRift(seed, 25, a.player.id);
@@ -474,16 +508,22 @@ describe('rift ranks: rune-reset notice rate limit', () => {
   });
 });
 
-describe('rift ranks: A/S rifts are never shorter than 3 floors', () => {
-  it('a set-piece seed opens the 2-floor citadel at C/B but runs procedural 3+ at A/S', () => {
+describe('rift ranks: B/A/S rifts are never shorter than 3 floors', () => {
+  it('a set-piece seed opens the 2-floor citadel at C only; B/A/S run procedural 3+', () => {
+    // B now has the heroic transform, so isSetPieceRift gates on tuning !== null.
+    // The citadel is C-only content; B/A/S all run the procedural descent.
     let seed = -1;
     for (let s = 1; s < 400 && seed < 0; s++) if (isSetPieceSeed(s)) seed = s;
     expect(seed).toBeGreaterThan(0);
-    // C/B: the citadel (2 authored floors).
+    // C: the citadel (2 authored floors).
     expect(riftFloorCount(seed)).toBe(2);
     expect(riftFloorCount(seed, 20)).toBe(2);
-    expect(riftFloorCount(seed, 22)).toBe(2);
     expect(generateRiftFloor(seed, 20, 0).authored).toBe(true);
+    // B on a citadel seed now runs procedural 3+ (B has heroic tuning).
+    expect(riftFloorCount(seed, 22), 'B runs procedural').toBeGreaterThanOrEqual(3);
+    const bFloor = generateRiftFloor(seed, 22, 0);
+    expect(bFloor.authored, 'B never opens the 2-floor set-piece').toBeUndefined();
+    expect(bFloor.floorCount).toBeGreaterThanOrEqual(3);
     // A/S: guaranteed 3+ procedural floors, never the 2-floor set-piece.
     for (const baseLevel of [25, 28]) {
       expect(riftFloorCount(seed, baseLevel), `base ${baseLevel}`).toBeGreaterThanOrEqual(3);
@@ -500,11 +540,12 @@ describe('rift ranks: A/S rifts are never shorter than 3 floors', () => {
     }
   });
 
-  it('an S-rank citadel-seed run fields S-band mobs on its procedural floors', () => {
+  it('an S-rank citadel-seed run fields S-band mobs (flat 23) on its procedural floors', () => {
     let seed = -1;
     for (let s = 1; s < 400 && seed < 0; s++) if (isSetPieceSeed(s)) seed = s;
     const floor = generateRiftFloor(seed, 28, 0);
-    for (const sp of floor.spawns) expect(sp.level).toBeGreaterThanOrEqual(23);
+    // S-rank is flat 23 on every floor.
+    for (const sp of floor.spawns) expect(sp.level).toBe(23);
   });
 });
 

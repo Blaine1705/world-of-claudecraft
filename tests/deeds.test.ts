@@ -694,27 +694,32 @@ describe('retro on join', () => {
     expect(sim2.players.get(pid2)!.deedsEarned.has('exp_something_shiny')).toBe(false);
   });
 
-  it('Giantslayer never auto-heals now that S-rank rift mobs reach level 25', () => {
-    // MAX_CREDITABLE_MOB_LEVEL is the S-rank rift ceiling (25): a capped
-    // player (20) can meet a mob exactly five levels up inside an S-rank
-    // rift, so the deed is never permanently stranded and the retro heal must
-    // not fire at ANY reachable level. The live kill site stays the only path.
+  it('Giantslayer auto-heals for capped players now that S-rank is flat 23 (deed stranded)', () => {
+    // MAX_CREDITABLE_MOB_LEVEL was lowered from 25 to 23 when S-rank was
+    // re-tuned to a flat level 23 (no ramp to 25). A capped player (level 20)
+    // can never be hit by a mob five levels up (20+5=25>23), so the deed is
+    // permanently stranded and retroFallbackGrants auto-heals it at join time.
+    // Giantslayer is no longer earnable inside S-rank rifts (maintainer-accepted).
     const sim = makeSim();
     const capped = sim.addPlayer('warrior', 'Capped', {
       state: { ...veteranState(), level: 20 },
     });
-    expect(sim.players.get(capped)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
+    // Auto-heal fires at join for the capped player (level 20+5=25 > 23).
+    expect(sim.players.get(capped)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
+    // A level-17 player (17+5=22 <= 23) is still below the threshold: not yet stranded.
+    const notStranded = sim.addPlayer('warrior', 'NotStranded', {
+      state: { ...veteranState(), level: 17 },
+    });
+    expect(sim.players.get(notStranded)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
+    // A level-18 player (18+5=23, not strictly greater) is also not stranded yet.
     const edge = sim.addPlayer('warrior', 'Edge', { state: { ...veteranState(), level: 18 } });
     expect(sim.players.get(edge)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
-    const evs = deedEvents(sim.tick());
-    expect(evs.some((e) => e.deedId === 'cmb_giantslayer')).toBe(false);
-    // The live site: a killing blow on a mob five levels up (the S-rank rift
-    // ceiling against a capped player) grants it on the spot.
-    const cappedEntity = sim.entities.get(capped)!;
+    // The live kill site still grants on a killing blow five levels up (for sub-cap players).
+    const edgeEntity = sim.entities.get(edge)!;
     const wolf = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
-    wolf.level = cappedEntity.level + 5;
+    wolf.level = edgeEntity.level + 5;
     (sim as unknown as { dealDamage: Function }).dealDamage(
-      cappedEntity,
+      edgeEntity,
       wolf,
       wolf.hp + 10,
       false,
@@ -723,7 +728,7 @@ describe('retro on join', () => {
       'hit',
       true,
     );
-    expect(sim.players.get(capped)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
+    expect(sim.players.get(edge)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
   });
 
   it('the heals unlock feat_book_complete in the same join for an otherwise complete book', () => {
