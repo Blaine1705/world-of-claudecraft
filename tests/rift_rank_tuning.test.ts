@@ -622,3 +622,162 @@ describe('rift exit: the way home is never anchored in water', () => {
     expect(isInWaterBody(inst.returnPos.x, inst.returnPos.z), 'return point is dry').toBe(false);
   });
 });
+
+// ---- Walk-in throttle pins ---------------------------------------------------
+// These pin the rate-limit behavior of the four repeating messages that fire on
+// the 20 Hz walk-in path without a throttle. Counting emitted messages over a
+// fixed tick window proves they stay within the cooldown cadence.
+
+describe('rift throttle: pool-full error fires at most once per cooldown window', () => {
+  it('standing in a full-pool portal emits the error once per 4 s, not every call', () => {
+    const sim = makeSim();
+    // Fill every rift slot so no free slot exists.
+    for (const inst of sim.riftInstances) {
+      inst.partyKey = 'party:occupied';
+    }
+    // A fake portal entity carrying the fields enterRift's portal-gate checks read.
+    const fakePortal = {
+      id: 9999,
+      riftSeed: SEED,
+      riftBaseLevel: 20,
+      pos: { x: 0, y: 0, z: 0 },
+    } as unknown as import('../src/sim/types').Entity;
+    sim.player.level = 20;
+    const drainPoolFull = (): number => {
+      sim.enterRift(SEED, 20, sim.player.id, undefined, fakePortal);
+      return (sim as unknown as { drainEvents(): import('../src/sim/types').SimEvent[] })
+        .drainEvents()
+        .filter(
+          (ev) =>
+            ev.type === 'error' &&
+            (ev as { text: string }).text === 'All rifts are unstable right now. Try again soon.',
+        ).length;
+    };
+    // First call: one error.
+    expect(drainPoolFull(), 'first call emits the error').toBe(1);
+    // Immediate re-call: silenced by cooldown.
+    expect(drainPoolFull(), 'immediate re-call is silenced').toBe(0);
+    // After 100 ticks (> 4 s), the cooldown has elapsed: one more error.
+    tickAlive(sim, 100);
+    expect(drainPoolFull(), 'error fires again after cooldown').toBe(1);
+  });
+});
+
+describe('rift throttle: level-denial error fires at most once per 4 s', () => {
+  it('low-level player re-entering a portal sees the denial once per cooldown', () => {
+    const sim = makeSim();
+    const fakePortal = {
+      id: 9998,
+      riftSeed: SEED,
+      riftBaseLevel: 20,
+      pos: { x: 0, y: 0, z: 0 },
+    } as unknown as import('../src/sim/types').Entity;
+    sim.player.level = 1;
+    const deny = 'Only adventurers of level 20 or higher may enter this rift.';
+    const drainDeny = (): number => {
+      sim.enterRift(SEED, 20, sim.player.id, undefined, fakePortal);
+      return (sim as unknown as { drainEvents(): import('../src/sim/types').SimEvent[] })
+        .drainEvents()
+        .filter((ev) => ev.type === 'error' && (ev as { text: string }).text === deny).length;
+    };
+    expect(drainDeny(), 'first call emits the denial').toBe(1);
+    expect(drainDeny(), 'immediate re-call is silenced').toBe(0);
+    tickAlive(sim, 100);
+    expect(drainDeny(), 'denial fires again after 4 s cooldown').toBe(1);
+  });
+});
+
+describe('rift throttle: orb-notice fires at most once per 6 s cooldown', () => {
+  it('standing at a dormant Blood Orb nudges at most once per 6 s, not every tick', () => {
+    let setPieceSeed = -1;
+    for (let s = 1; s < 400 && setPieceSeed < 0; s++) {
+      if (isSetPieceSeed(s)) setPieceSeed = s;
+    }
+    expect(setPieceSeed, 'found a set-piece seed').toBeGreaterThan(0);
+    const sim = makeSim(setPieceSeed);
+    sim.enterRift(setPieceSeed, 20, sim.player.id);
+    const inst = active(sim);
+    expect(inst.orbId, 'authored floor has an orb').not.toBeNull();
+    const orb = sim.entities.get(inst.orbId!)!;
+    sim.player.gm = true;
+    const countOrb = (ticks: number): number => {
+      let n = 0;
+      for (let i = 0; i < ticks; i++) {
+        sim.player.pos = { ...orb.pos };
+        sim.player.prevPos = { ...sim.player.pos };
+        sim.player.hp = sim.player.maxHp;
+        for (const ev of sim.tick()) {
+          if (
+            ev.type === 'log' &&
+            (ev as { text?: string }).text === 'The orb is sealed by the ritual below.'
+          )
+            n++;
+        }
+      }
+      return n;
+    };
+    // 120 ticks = 6 s: one nudge on arrival, then silence for the rest.
+    expect(countOrb(120), 'one nudge per 6 s window').toBe(1);
+    expect(countOrb(120), 'one more nudge in the next window').toBe(1);
+  });
+});
+
+describe('rift throttle: seq-reset notice is instance-level, not per-player', () => {
+  it('two party members standing on a wrong rune produce one broadcast per window', () => {
+    let seqSeed = -1;
+    for (let s = 1; s < 800 && seqSeed < 0; s++) {
+      const f = generateRiftFloor(s, 20, 0);
+      if (
+        !f.isBoss &&
+        f.puzzle.kind === 'sequence' &&
+        f.objects.filter((o) => o.kind === 'seq_rune').length >= 2
+      )
+        seqSeed = s;
+    }
+    expect(seqSeed, 'found a multi-rune sequence floor').toBeGreaterThan(0);
+    const sim = makeSim(seqSeed);
+    sim.player.level = 20;
+    // Add a second player and form a party with the primary.
+    const pid2 = sim.addPlayer('warrior', 'P2', { autoEquip: true });
+    const p2 = sim.entities.get(pid2)!;
+    p2.level = 20;
+    sim.partyInvite(pid2, sim.player.id);
+    sim.partyAccept(pid2);
+    // Both enter the rift (they share the same instance because they are in a party).
+    sim.enterRift(seqSeed, 20, sim.player.id);
+    sim.enterRift(seqSeed, 20, pid2);
+    const inst = active(sim);
+    killTrash(sim);
+    sim.player.gm = true;
+    p2.gm = true;
+    // Both stand on the SECOND rune (wrong: the sequence requires rune 0 first).
+    const wrongRune = sim.entities.get(inst.seqRuneIds[1])!;
+    const countNotices = (ticks: number): number => {
+      let n = 0;
+      for (let i = 0; i < ticks; i++) {
+        sim.player.pos = { ...wrongRune.pos };
+        sim.player.prevPos = { ...sim.player.pos };
+        p2.pos = { ...wrongRune.pos };
+        p2.prevPos = { ...p2.pos };
+        sim.player.hp = sim.player.maxHp;
+        p2.hp = p2.maxHp;
+        for (const ev of sim.tick()) {
+          if (
+            ev.type === 'log' &&
+            (ev as { text?: string }).text === 'The runes go dark. Begin again.'
+          )
+            n++;
+        }
+      }
+      return n;
+    };
+    // The instance-level stamp means exactly ONE broadcast fires per 4 s window.
+    // Each broadcast sends the log to every member: 2 players = 2 log events.
+    // With the old per-player stamp, BOTH players would trigger a broadcast on the
+    // same tick = up to 4 log events in the first tick (2 players x 2 recipients).
+    const first80 = countNotices(80);
+    expect(first80, 'one broadcast per window (2 recipients)').toBe(2);
+    const next80 = countNotices(80);
+    expect(next80, 'one broadcast in the next window').toBe(2);
+  });
+});

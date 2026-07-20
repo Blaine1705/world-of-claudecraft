@@ -3045,9 +3045,15 @@ export interface Entity {
   // Sim time of the last "level too low" rift denial shown to this player, so
   // standing inside the portal trigger radius does not spam the toast per tick.
   riftDeniedAt?: number;
+  // Sim time of the last "pool full" / "event already cleared" denial shown to
+  // this player on walk-in, so a 20 Hz trigger does not spam the error toast.
+  riftPoolFullAt?: number;
   // Sim time of the last "the orb is sealed" nudge shown to this player at a
   // dormant Blood Orb (authored citadel), throttled the same way.
   riftOrbNoticeAt?: number;
+  // Sim time of the last lockpickOffer emitted to this player from a
+  // rift_locked_chest click, so repeated F-key presses don't spam the UI.
+  riftLockpickOfferAt?: number;
   // Walk-in portal grace after leaving a rift: until this sim time the player
   // does not auto-enter portals, so being returned near the entry portal can
   // never bounce them straight back in (clicking the portal still works).
@@ -3063,10 +3069,6 @@ export interface Entity {
   // Cooldown gate (sim time) between rolling-boulder knockbacks, so a single pass
   // shoves + chips once rather than every tick of overlap.
   riftRollerUntil?: number;
-  // Sim time of the last "the runes go dark" sequence-reset notice shown to this
-  // player, so standing on a wrong rune re-announces at most once per cooldown
-  // instead of every tick (rift/runs.ts).
-  riftSeqResetAt?: number;
   // Rift boss rank budget: how many entries of the template's `rankMechanics`
   // list are live on THIS spawn (C=1, B=2, A=3, S=4; rift/ranks.ts). Undefined
   // (every non-rift mob, and rift trash) suppresses nothing.

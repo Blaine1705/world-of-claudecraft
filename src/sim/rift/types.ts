@@ -336,6 +336,10 @@ export interface RiftInstance {
    * `lockpick` engine + the shared HUD/wire), or null. Rift-hosted, so the delve
    * lockpick controller stays untouched. */
   lockpick: LockSession | null;
+  /** Sim time of the last "the runes go dark" sequence-reset notice broadcast to
+   * this instance. Instance-level (not per-player) so N party members standing on
+   * a wrong rune together still produce only one notice per cooldown window. */
+  seqResetAt: number;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

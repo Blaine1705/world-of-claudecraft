@@ -231,10 +231,21 @@ describe('rift generator: objectives are never inside (or hidden by) a wall', ()
   // body). Every objective must clear every collider by its prop radius, and no
   // layout may carry a phantom (illusion) wall, so collider clearance IS visual
   // clearance: a rune can never render embedded in, or tucked behind, a wall.
+  // Per-kind prop clearance radii: the three values below match the explicit
+  // toClear margin the generator passes; the rest use the player body radius
+  // (BODY_R = 0.6) because they are placed on the always-clear spine or within
+  // the obstacle-free AISLE_HALF band (|x| <= 5.5) by construction.
   const PROP_R: Record<string, number> = {
     rune_pylon: 1.7,
     seq_rune: 1.5,
     treasure: 1.0,
+    chest: 0.6,
+    descent: 0.6,
+    gate: 0.6,
+    switch: 0.6,
+    boulder: 0.6,
+    boulder_pad: 0.6,
+    ice_goal: 0.6,
   };
 
   it('every interactable clears the walls by its prop radius, at every rank', () => {
