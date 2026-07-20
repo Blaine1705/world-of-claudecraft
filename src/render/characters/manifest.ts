@@ -225,16 +225,18 @@ const BIPED14: ClipMap = {
 };
 
 // Tripo orc rig (Orkadia dungeon: black/blue/red orc GLBs). Ships Idle_Loop,
-// Walk_Loop, Sprint_Loop, Punch_Jab, Sword_Attack (Red also Sword_Idle); it has
-// no death or hit-react clip, so death maps to the neutral idle pose (visual.ts
-// clamps a one-shot on its last frame) and `hit` is omitted (spider/raptor rigs
-// do the same).
+// Walk_Loop, Sprint_Loop, Punch_Jab, Sword_Attack (Red also Sword_Idle). The
+// batch had no death or hit-react take, so `Death` (a hips-driven topple that
+// clamps flat) and `Hit` (a short spine/neck flinch) are synthesized onto the
+// shipped Mixamo skeleton by scripts/_add_orc_death_anim.mjs (the Stone Cantor
+// precedent, _add_cantor_hit_anim.mjs); re-run it if the GLBs are regenerated.
 const ORC_TRIPO: ClipMap = {
   idle: 'Idle_Loop',
   walk: 'Walk_Loop',
   run: 'Sprint_Loop',
   attack: ['Sword_Attack', 'Punch_Jab'],
-  death: 'Idle_Loop',
+  hit: ['Hit'],
+  death: 'Death',
 };
 
 // 2023 enemy rig (goblin/giant)
