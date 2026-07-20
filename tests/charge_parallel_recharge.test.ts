@@ -14,7 +14,7 @@ import type { Entity } from '../src/sim/types';
 function setup(): { sim: Sim; p: Entity; mob: Entity } {
   const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
   sim.setPlayerLevel(10);
-  expect(sim.applyTalents({ spec: null, rows: { 8: 'pal_r8_fist_of_justice' } })).toBe(true);
+  expect(sim.applyTalents({ spec: null, rows: { 8: 'pal_r8_twin_gavels' } })).toBe(true);
   const p = sim.player;
   const mob = createMob(20_000, MOBS.forest_wolf, 8, {
     x: p.pos.x + 3,

@@ -81,12 +81,12 @@ const CLASS_PLAN = {
     spec: 'retribution',
     name: 'Rowpal',
     rows: {
-      5: 'pal_r5_vengeful_exorcism', // Vengeful Exorcism (proc: judgement resets exorcism)
-      8: 'pal_r8_rebuke', // Reproach (grant rebuke)
-      11: 'pal_r11_divine_wisdom', // Divine Wisdom (proc: instant Holy Light)
-      14: 'pal_r14_holy_wrath', // Saint's Ire (grant holy_wrath)
-      17: 'pal_r17_divine_shield', // Lightward (grant divine_shield)
-      20: 'pal_r20_avenging_wrath', // Wrathwing (grant avenging_wrath)
+      5: 'pal_r5_pilgrims_light', // Pilgrim's Light (Mending Light while moving)
+      8: 'pal_r8_twin_gavels', // Twin Gavels (Sundering Gavel stores 2 uses)
+      11: 'pal_r11_ardent_renewal', // Ardent Renewal (heavy hit self-heal)
+      14: 'pal_r14_lightward', // Lightward (grant divine_shield)
+      17: 'pal_r17_wrathwing', // Wrathwing (grant avenging_wrath)
+      20: 'pal_r20_tolling_hammer', // Tolling Hammer (grant hammer_of_wrath)
     },
     moment: 'avenging_wrath',
     momentIsSelfBuff: true,
