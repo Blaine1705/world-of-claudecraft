@@ -228,7 +228,7 @@ export const ko_KR: EnTranslations = {
     "hud": {
       "lowMana": "마나 부족",
       "lowEnergy": "기력 부족",
-      "lowFocus": "Low Focus"
+      "lowFocus": "집중 부족"
     },
     "talents": {
       "title": "특성",
@@ -2998,6 +2998,8 @@ export const ko_KR: EnTranslations = {
       "blessing_of_might": "아군 대상의 공격력을 높여 주며, 전투를 시작하기 전에 시전하면 좋습니다.",
       "divine_protection": "상황이 험해질 때 피해를 흡수하는 신속한 보호의 결계입니다.",
       "raptor_strike": "무언가가 거리를 좁혀 왔을 때 강하게 휘두르는 근접 일격입니다.",
+      "pack_command": "동료에게 공격을 명령하고, 야수 해방에 필요한 흉포함을 쌓습니다.",
+      "measured_shot": "신중하게 조준한 원거리 사격으로, 강력한 공격에 쓸 집중을 회복합니다.",
       "aspect_of_the_hawk": "유지해 두면 원거리 공격력을 높여 주는 상입니다.",
       "serpent_sting": "독을 묻혀 시간이 지나며 자연 피해의 출혈을 입힙니다.",
       "arcane_shot": "원거리에서 즉시 날리는 사격으로, 빠르게 추가 피해를 줍니다.",
@@ -5237,7 +5239,7 @@ export const ko_KR: EnTranslations = {
       "mana": "마나",
       "energy": "기력",
       "rage": "분노",
-      "focus": "Focus"
+      "focus": "집중"
     },
     "roles": {
       "warrior": "탱커 / 근접 DPS",
@@ -5944,7 +5946,7 @@ export const ko_KR: EnTranslations = {
       "mana": "마나",
       "rage": "분노",
       "energy": "기력",
-      "focus": "Focus"
+      "focus": "집중"
     },
     "forms": {
       "bear": "곰",
@@ -6309,52 +6311,52 @@ export const ko_KR: EnTranslations = {
         "description": "지정한 지역에 3초 동안 화살을 쏟아부어 그 안의 적에게 0.5초마다 {damage}의 피해를 입힙니다."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+        "name": "무리 명령",
+        "description": "살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다."
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+        "name": "야수 해방",
+        "description": "최대로 쌓인 무리 흉포를 해방해 주 대상과 주변을 강타한 뒤, 소환수를 잠시 휩쓸기 광란에 빠뜨립니다."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+        "name": "정밀 사격",
+        "description": "신중하게 조준한 사격으로 {damage}의 물리 피해를 주고, 적중 시 집중 20을 얻습니다."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+        "name": "냉정한 집중",
+        "description": "12초 동안 정밀 사격이 더 많은 집중을 생성하고, 장궁 당기기가 더 빠르고 저렴해집니다. (냉철한 시야 상징)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+        "name": "피갈고리",
+        "description": "8에서 25미터 떨어진 적에게 돌진해 주 상처를 내고, 12초에 걸쳐 24의 출혈 피해를 줍니다. (야전술 상징)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+        "name": "파편 폭약",
+        "description": "대상과 주변 적을 파편으로 폭파한 뒤, 주 대상에게서 짧은 출혈을 퍼뜨립니다."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+        "name": "핏길 습격",
+        "description": "12초 동안 피갈고리, 상처 찢기, 파편 폭약과 소환수의 후속 공격을 강화합니다."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+        "name": "흔적 끊기",
+        "description": "전문화 상태를 잃지 않고 뒤로 도약합니다. 야전술은 다음 재진입도 준비합니다."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "야생의 심장",
+        "description": "최대 생명력의 30%를 즉시 회복합니다."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "갑각 피부",
+        "description": "8초 동안 받는 피해가 60% 감소하지만, 효과가 지속되는 동안 공격할 수 없습니다."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+        "name": "서리턱 덫",
+        "description": "선택한 적의 위치나 발밑에 작동 준비된 덫을 놓습니다. 처음 발동시킨 적을 이동 불가로 만들고 주변 적을 느리게 합니다."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "무리 결집",
+        "description": "준마의 상을 취하고 주변 아군을 독려해 10초 동안 이동 속도를 30%, 공격 및 시전 속도를 10% 높입니다."
       },
       "hurricane": {
         "name": "폭풍우",

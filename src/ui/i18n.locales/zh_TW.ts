@@ -1010,6 +1010,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': '該語言無法使用。',
   'game.hud.lowMana': '法力不足',
   'game.hud.lowEnergy': '能量不足',
+  'game.hud.lowFocus': '集中值不足',
   'game.talents.title': '天賦',
   'game.talents.classTab': '職業',
   'game.talents.specTab': '專精',
@@ -1489,6 +1490,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': '法力',
   'classDetails.resources.energy': '能量',
   'classDetails.resources.rage': '怒氣',
+  'classDetails.resources.focus': '集中值',
   'classDetails.roles.warrior': '坦克 / 近戰 DPS',
   'classDetails.roles.paladin': '治療 / 坦克 / 近戰 DPS',
   'classDetails.roles.hunter': '遠程 DPS',
@@ -2057,6 +2059,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': '法力',
   'abilityUi.resources.rage': '怒氣',
   'abilityUi.resources.energy': '能量',
+  'abilityUi.resources.focus': '集中值',
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '釣魚',
@@ -2366,6 +2369,40 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': '亂射',
   'entities.abilities.volley.description':
     '向目標區域射出箭雨，持續 3 秒，每 0.5 秒對其中的敵人造成 {damage} 點傷害。',
+  'entities.abilities.pack_command.name': '獸群號令',
+  'entities.abilities.pack_command.description':
+    '命令你的活體寵物發動攻擊。命中後產生 20 點集中值和一層獸群兇性。',
+  'entities.abilities.unleash_beast.name': '釋放野獸',
+  'entities.abilities.unleash_beast.description':
+    '釋放滿層獸群兇性，對主要目標發動重擊並拍擊周圍敵人，隨後使寵物短暫進入順劈狂亂。',
+  'entities.abilities.measured_shot.name': '審慎射擊',
+  'entities.abilities.measured_shot.description':
+    '一記從容瞄準的射擊，造成 {damage} 點物理傷害，並在命中時產生 20 點集中值。',
+  'entities.abilities.cold_focus.name': '冷靜專注',
+  'entities.abilities.cold_focus.description':
+    '持續 12 秒，審慎射擊產生更多集中值，蓄力長射的速度更快、消耗更低。（冷視招牌技能）',
+  'entities.abilities.bloodhook.name': '血鉤',
+  'entities.abilities.bloodhook.description':
+    '衝向 8 至 25 碼外的敵人，撕開一道主要傷口，在 12 秒內造成 24 點流血傷害。（野戰技藝招牌技能）',
+  'entities.abilities.shrapnel_charge.name': '榴片炸彈',
+  'entities.abilities.shrapnel_charge.description':
+    '用榴片轟擊目標及其附近敵人，隨後從主要目標擴散一道短暫的流血。',
+  'entities.abilities.bloodtrail_assault.name': '血跡突襲',
+  'entities.abilities.bloodtrail_assault.description':
+    '持續 12 秒，強化血鉤、撕傷、榴片炸彈以及寵物的後續攻擊。',
+  'entities.abilities.trailbreak.name': '斷跡',
+  'entities.abilities.trailbreak.description':
+    '向後躍開且不失去專精狀態。野戰技藝還會為下一次重返戰場做好準備。',
+  'entities.abilities.wildheart.name': '野性之心',
+  'entities.abilities.wildheart.description': '立即恢復最大生命值的 30%。',
+  'entities.abilities.shellskin.name': '甲殼之膚',
+  'entities.abilities.shellskin.description': '受到的傷害降低 60%，持續 8 秒，但生效期間無法攻擊。',
+  'entities.abilities.frostjaw_trap.name': '霜顎陷阱',
+  'entities.abilities.frostjaw_trap.description':
+    '在選中的敵人處或腳下放置已啟動的陷阱。它會定身第一個觸發的敵人，並減速附近敵人。',
+  'entities.abilities.pack_rally.name': '獸群集結',
+  'entities.abilities.pack_rally.description':
+    '進入駿馬之姿，並激勵附近友方，使其移動速度提高 30%、攻擊與施法速度提高 10%，持續 10 秒。',
   'entities.abilities.hurricane.name': '颶風',
   'entities.abilities.hurricane.description':
     '在目標區域召喚颶風，持續 6 秒，每秒重擊敵人造成 {damage} 點自然傷害。',
@@ -4959,8 +4996,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lightning_bolt': '施放遠程的自然傷害，是你從遠處的慣用招式。',
   'guide.abilityHook.lightning_shield': '為自己充能，攻擊者打中你時會受到自然傷害。',
   'guide.abilityHook.mark_of_the_wild': '戰鬥前替自己或友方施加的持久祝福。',
+  'guide.abilityHook.measured_shot': '一記從容瞄準的遠程射擊，為你的強力攻擊恢復集中值。',
   'guide.abilityHook.mongoose_bite': '在敵人閃躲後立刻可用的反擊。',
   'guide.abilityHook.moonfire': '瞬間命中並讓目標持續燃燒，移動時也很好用。',
+  'guide.abilityHook.pack_command': '命令你的夥伴發動攻擊，並累積兇性以釋放野獸。',
   'guide.abilityHook.power_word_fortitude': '提升友方的生命上限，開怪前先施放並隨時維持。',
   'guide.abilityHook.power_word_shield': '為友方罩上護盾，在傷害落下前先行吸收。',
   'guide.abilityHook.raptor_strike': '在有東西貼上你時可用的一記重力近戰揮擊。',

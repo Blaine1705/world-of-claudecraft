@@ -1041,6 +1041,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': '해당 언어를 사용할 수 없습니다.',
   'game.hud.lowMana': '마나 부족',
   'game.hud.lowEnergy': '기력 부족',
+  'game.hud.lowFocus': '집중 부족',
   'game.talents.title': '특성',
   'game.talents.classTab': '직업',
   'game.talents.specTab': '전문화',
@@ -1546,6 +1547,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': '마나',
   'classDetails.resources.energy': '기력',
   'classDetails.resources.rage': '분노',
+  'classDetails.resources.focus': '집중',
   'classDetails.roles.warrior': '탱커 / 근접 DPS',
   'classDetails.roles.paladin': '치유 / 탱커 / 근접 DPS',
   'classDetails.roles.hunter': '원거리 DPS',
@@ -2130,6 +2132,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': '마나',
   'abilityUi.resources.rage': '분노',
   'abilityUi.resources.energy': '기력',
+  'abilityUi.resources.focus': '집중',
   'abilityUi.forms.bear': '곰',
   'abilityUi.forms.cat': '늑대',
   'abilityUi.cast.fishing': '낚시',
@@ -2447,6 +2450,41 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': '일제 사격',
   'entities.abilities.volley.description':
     '지정한 지역에 3초 동안 화살을 쏟아부어 그 안의 적에게 0.5초마다 {damage}의 피해를 입힙니다.',
+  'entities.abilities.pack_command.name': '무리 명령',
+  'entities.abilities.pack_command.description':
+    '살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다.',
+  'entities.abilities.unleash_beast.name': '야수 해방',
+  'entities.abilities.unleash_beast.description':
+    '최대로 쌓인 무리 흉포를 해방해 주 대상과 주변을 강타한 뒤, 소환수를 잠시 휩쓸기 광란에 빠뜨립니다.',
+  'entities.abilities.measured_shot.name': '정밀 사격',
+  'entities.abilities.measured_shot.description':
+    '신중하게 조준한 사격으로 {damage}의 물리 피해를 주고, 적중 시 집중 20을 얻습니다.',
+  'entities.abilities.cold_focus.name': '냉정한 집중',
+  'entities.abilities.cold_focus.description':
+    '12초 동안 정밀 사격이 더 많은 집중을 생성하고, 장궁 당기기가 더 빠르고 저렴해집니다. (냉철한 시야 상징)',
+  'entities.abilities.bloodhook.name': '피갈고리',
+  'entities.abilities.bloodhook.description':
+    '8에서 25미터 떨어진 적에게 돌진해 주 상처를 내고, 12초에 걸쳐 24의 출혈 피해를 줍니다. (야전술 상징)',
+  'entities.abilities.shrapnel_charge.name': '파편 폭약',
+  'entities.abilities.shrapnel_charge.description':
+    '대상과 주변 적을 파편으로 폭파한 뒤, 주 대상에게서 짧은 출혈을 퍼뜨립니다.',
+  'entities.abilities.bloodtrail_assault.name': '핏길 습격',
+  'entities.abilities.bloodtrail_assault.description':
+    '12초 동안 피갈고리, 상처 찢기, 파편 폭약과 소환수의 후속 공격을 강화합니다.',
+  'entities.abilities.trailbreak.name': '흔적 끊기',
+  'entities.abilities.trailbreak.description':
+    '전문화 상태를 잃지 않고 뒤로 도약합니다. 야전술은 다음 재진입도 준비합니다.',
+  'entities.abilities.wildheart.name': '야생의 심장',
+  'entities.abilities.wildheart.description': '최대 생명력의 30%를 즉시 회복합니다.',
+  'entities.abilities.shellskin.name': '갑각 피부',
+  'entities.abilities.shellskin.description':
+    '8초 동안 받는 피해가 60% 감소하지만, 효과가 지속되는 동안 공격할 수 없습니다.',
+  'entities.abilities.frostjaw_trap.name': '서리턱 덫',
+  'entities.abilities.frostjaw_trap.description':
+    '선택한 적의 위치나 발밑에 작동 준비된 덫을 놓습니다. 처음 발동시킨 적을 이동 불가로 만들고 주변 적을 느리게 합니다.',
+  'entities.abilities.pack_rally.name': '무리 결집',
+  'entities.abilities.pack_rally.description':
+    '준마의 상을 취하고 주변 아군을 독려해 10초 동안 이동 속도를 30%, 공격 및 시전 속도를 10% 높입니다.',
   'entities.abilities.hurricane.name': '폭풍우',
   'entities.abilities.hurricane.description':
     '지정한 지역에 6초 동안 폭풍우를 일으켜 매초 적에게 {damage}의 자연 피해를 입힙니다.',
@@ -5186,8 +5224,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lightning_shield':
     '몸에 전하를 둘러 공격자가 당신을 칠 때 자연 피해를 받게 합니다.',
   'guide.abilityHook.mark_of_the_wild': '전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.',
+  'guide.abilityHook.measured_shot':
+    '신중하게 조준한 원거리 사격으로, 강력한 공격에 쓸 집중을 회복합니다.',
   'guide.abilityHook.mongoose_bite': '적이 회피한 직후에 사용할 수 있게 열리는 반격기입니다.',
   'guide.abilityHook.moonfire': '즉시 타격하고 대상을 계속 불태우므로, 이동 중에 쓰기 좋습니다.',
+  'guide.abilityHook.pack_command':
+    '동료에게 공격을 명령하고, 야수 해방에 필요한 흉포함을 쌓습니다.',
   'guide.abilityHook.power_word_fortitude':
     '아군의 생명력을 높여 주므로, 전투를 시작하기 전에 시전하고 유지하세요.',
   'guide.abilityHook.power_word_shield': '아군을 보호막으로 감싸 타격이 닿기 전에 흡수합니다.',

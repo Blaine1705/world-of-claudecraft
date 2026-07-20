@@ -228,7 +228,7 @@ export const zh_CN: EnTranslations = {
     "hud": {
       "lowMana": "法力不足",
       "lowEnergy": "能量不足",
-      "lowFocus": "Low Focus"
+      "lowFocus": "集中值不足"
     },
     "talents": {
       "title": "天赋",
@@ -2998,6 +2998,8 @@ export const zh_CN: EnTranslations = {
       "blessing_of_might": "提升友方目标的攻击强度，开怪前施放正合适。",
       "divine_protection": "一道快速的守护结界，在局势吃紧时吸收伤害。",
       "raptor_strike": "一记沉重的近战挥击，用于有东西贴近你时。",
+      "pack_command": "命令你的伙伴发动攻击，并积攒凶性以释放野兽。",
+      "measured_shot": "一记从容瞄准的远程射击，为你的强力攻击恢复集中值。",
       "aspect_of_the_hawk": "持续保持的姿态，强化你的远程攻击强度。",
       "serpent_sting": "施加一道毒液，随时间造成自然流血伤害。",
       "arcane_shot": "一次远程的瞬发射击，迅速打出额外伤害。",
@@ -5237,7 +5239,7 @@ export const zh_CN: EnTranslations = {
       "mana": "法力",
       "energy": "能量",
       "rage": "怒气",
-      "focus": "Focus"
+      "focus": "集中值"
     },
     "roles": {
       "warrior": "坦克 / 近战 DPS",
@@ -5944,7 +5946,7 @@ export const zh_CN: EnTranslations = {
       "mana": "法力",
       "rage": "怒气",
       "energy": "能量",
-      "focus": "Focus"
+      "focus": "集中值"
     },
     "forms": {
       "bear": "熊",
@@ -6309,52 +6311,52 @@ export const zh_CN: EnTranslations = {
         "description": "向目标区域射出箭雨，持续 3 秒，每 0.5 秒对其中的敌人造成 {damage} 点伤害。"
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+        "name": "兽群号令",
+        "description": "命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+        "name": "释放野兽",
+        "description": "释放满层兽群凶性，对主要目标发动重击并拍击周围敌人，随后使宠物短暂进入顺劈狂乱。"
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+        "name": "审慎射击",
+        "description": "一记从容瞄准的射击，造成 {damage} 点物理伤害，并在命中时产生 20 点集中值。"
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+        "name": "冷静专注",
+        "description": "持续 12 秒，审慎射击产生更多集中值，蓄力长射的速度更快、消耗更低。（冷视招牌技能）"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+        "name": "血钩",
+        "description": "冲向 8 至 25 码外的敌人，撕开一道主要伤口，在 12 秒内造成 24 点流血伤害。（野战技艺招牌技能）"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+        "name": "榴片炸弹",
+        "description": "用榴片轰击目标及其附近敌人，随后从主要目标扩散一道短暂的流血。"
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+        "name": "血迹突袭",
+        "description": "持续 12 秒，强化血钩、撕伤、榴片炸弹以及宠物的后续攻击。"
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+        "name": "断迹",
+        "description": "向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。"
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "野性之心",
+        "description": "立即恢复最大生命值的 30%。"
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "甲壳之肤",
+        "description": "受到的伤害降低 60%，持续 8 秒，但生效期间无法攻击。"
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+        "name": "霜颚陷阱",
+        "description": "在选中的敌人处或脚下放置已启动的陷阱。它会定身第一个触发的敌人，并减速附近敌人。"
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "兽群集结",
+        "description": "进入骏马之姿，并激励附近盟友，使其移动速度提高 30%、攻击与施法速度提高 10%，持续 10 秒。"
       },
       "hurricane": {
         "name": "飓风",

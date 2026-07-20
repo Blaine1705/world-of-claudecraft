@@ -228,7 +228,7 @@ export const ja_JP: EnTranslations = {
     "hud": {
       "lowMana": "マナ低下",
       "lowEnergy": "エネルギー低下",
-      "lowFocus": "Low Focus"
+      "lowFocus": "集中値低下"
     },
     "talents": {
       "title": "タレント",
@@ -2998,6 +2998,8 @@ export const ja_JP: EnTranslations = {
       "blessing_of_might": "味方の攻撃力を上げます。プルの前に唱えておくとよいでしょう。",
       "divine_protection": "状況が厳しいときにダメージを吸収する、素早い守りの結界です。",
       "raptor_strike": "敵に距離を詰められたときに使う、重い近接の一撃です。",
+      "pack_command": "相棒に攻撃を命じ、獣の解放に必要な獰猛さを蓄えます。",
+      "measured_shot": "慎重に狙う遠距離射撃で、強力な攻撃に使う集中値を回復します。",
       "aspect_of_the_hawk": "維持し続けることで遠隔攻撃力を高めるスタンスです。",
       "serpent_sting": "毒を浴びせ、継続してネイチャーダメージを与えます。",
       "arcane_shot": "遠距離からの即時ショットで、手早く追加ダメージを与えます。",
@@ -5237,7 +5239,7 @@ export const ja_JP: EnTranslations = {
       "mana": "マナ",
       "energy": "エネルギー",
       "rage": "怒り",
-      "focus": "Focus"
+      "focus": "集中値"
     },
     "roles": {
       "warrior": "タンク / 近接DPS",
@@ -5944,7 +5946,7 @@ export const ja_JP: EnTranslations = {
       "mana": "マナ",
       "rage": "怒り",
       "energy": "エネルギー",
-      "focus": "Focus"
+      "focus": "集中値"
     },
     "forms": {
       "bear": "熊",
@@ -6309,52 +6311,52 @@ export const ja_JP: EnTranslations = {
         "description": "対象地点に3秒間、矢を降らせ、範囲内の敵に0.5秒ごとに{damage}のダメージを与えます。"
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+        "name": "群れの指令",
+        "description": "生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+        "name": "獣の解放",
+        "description": "最大まで高まった群れの獰猛さを解放し、主対象を強打して周囲も叩きます。その後、ペットを短時間の範囲攻撃狂乱に駆り立てます。"
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+        "name": "精密射撃",
+        "description": "慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。"
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+        "name": "冷徹集中",
+        "description": "12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+        "name": "血鉤",
+        "description": "8から25ヤード離れた敵へ突進して主傷口を開き、12秒間で24の出血ダメージを与えます。（野戦術のシグネチャ）"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+        "name": "榴散弾装薬",
+        "description": "対象と周囲の敵を榴散弾で吹き飛ばし、主対象から短時間の出血を広げます。"
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+        "name": "血跡強襲",
+        "description": "12秒間、血鉤、裂傷、榴散弾装薬、そしてペットの追撃を強化します。"
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+        "name": "離脱跳躍",
+        "description": "専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。"
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "野生の心",
+        "description": "最大体力の30%を即座に回復します。"
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "甲殻の皮膚",
+        "description": "8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。"
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+        "name": "霜顎の罠",
+        "description": "選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。"
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "群れの結集",
+        "description": "駿馬の相をまとい、周囲の味方を鼓舞します。10秒間、移動速度を30%、攻撃速度と詠唱速度を10%上昇させます。"
       },
       "hurricane": {
         "name": "ハリケーン",

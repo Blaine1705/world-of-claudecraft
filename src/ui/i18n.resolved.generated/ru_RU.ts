@@ -228,7 +228,7 @@ export const ru_RU: EnTranslations = {
     "hud": {
       "lowMana": "Мало маны",
       "lowEnergy": "Мало энергии",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Мало концентрации"
     },
     "talents": {
       "title": "Таланты",
@@ -2998,6 +2998,8 @@ export const ru_RU: EnTranslations = {
       "blessing_of_might": "Повышает силу атаки дружественной цели, удобно наложить перед началом боя.",
       "divine_protection": "Быстрый защитный оберег, поглощающий урон, когда становится туго.",
       "raptor_strike": "Тяжелый удар в ближнем бою на случай, когда кто-то сократил с вами дистанцию.",
+      "pack_command": "Приказывает вашему спутнику атаковать и накапливает Свирепость стаи для Высвобождения зверя.",
+      "measured_shot": "Выверенный дальний выстрел, восстанавливающий концентрацию для более мощных атак.",
       "aspect_of_the_hawk": "Стойка, которую вы держите постоянно, чтобы повысить силу дальних атак.",
       "serpent_sting": "Поражает цель ядом, наносящим урон силами природы со временем.",
       "arcane_shot": "Мгновенный выстрел с дистанции для быстрого дополнительного урона.",
@@ -5237,7 +5239,7 @@ export const ru_RU: EnTranslations = {
       "mana": "Мана",
       "energy": "Энергия",
       "rage": "Ярость",
-      "focus": "Focus"
+      "focus": "Концентрация"
     },
     "roles": {
       "warrior": "Танк / ближний DPS",
@@ -5944,7 +5946,7 @@ export const ru_RU: EnTranslations = {
       "mana": "маны",
       "rage": "ярости",
       "energy": "энергии",
-      "focus": "Focus"
+      "focus": "концентрации"
     },
     "forms": {
       "bear": "медведя",
@@ -6309,52 +6311,52 @@ export const ru_RU: EnTranslations = {
         "description": "Осыпает указанную область стрелами в течение 3 сек., нанося {damage} ед. урона каждые 0.5 сек. врагам в ней."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+        "name": "Команда стае",
+        "description": "Приказывает вашему живому питомцу атаковать. Успешное попадание дает 20 ед. концентрации и один уровень Свирепости стаи."
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+        "name": "Высвободить зверя",
+        "description": "Высвобождает полную Свирепость стаи в мощном ударе по основной цели и по области, а затем ненадолго приводит питомца в неистовство с рассекающими атаками."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+        "name": "Выверенный выстрел",
+        "description": "Выверенный выстрел наносит {damage} ед. физического урона и при попадании дает 20 ед. концентрации."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+        "name": "Холодная сосредоточенность",
+        "description": "На 12 сек. Выверенный выстрел дает больше концентрации, а Дальний натяг становится быстрее и дешевле. (Фирменная способность Холодного взора)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+        "name": "Кровавый крюк",
+        "description": "Рывок к врагу на расстоянии от 8 до 25 м, открывающий основную рану с кровотечением на 24 ед. урона за 12 сек. (Фирменная способность Полевой выучки)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+        "name": "Шрапнельный заряд",
+        "description": "Поражает цель и ближайших врагов шрапнелью, затем распространяет с основной цели короткое кровотечение."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+        "name": "Натиск по кровавому следу",
+        "description": "На 12 сек. усиливает Кровавый крюк, Разрыв раны, Шрапнельный заряд и последующие атаки питомца."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+        "name": "Разрыв следа",
+        "description": "Отпрыгивает назад, не теряя состояние специализации. Полевая выучка также подготавливает следующее возвращение в бой."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Дикое сердце",
+        "description": "Мгновенно восстанавливает 30% от максимального запаса здоровья."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Панцирная кожа",
+        "description": "Снижает получаемый урон на 60% на 8 сек., но во время действия запрещает атаковать."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+        "name": "Капкан ледяной пасти",
+        "description": "Устанавливает взведенную ловушку у выбранного врага или у ваших ног. Она обездвиживает первого сработавшего на ней врага и замедляет врагов рядом."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "Сбор стаи",
+        "description": "Принимает Облик скакуна и воодушевляет ближайших союзников, повышая на 10 сек. скорость передвижения на 30%, а скорость атак и применения способностей на 10%."
       },
       "hurricane": {
         "name": "Ураган",

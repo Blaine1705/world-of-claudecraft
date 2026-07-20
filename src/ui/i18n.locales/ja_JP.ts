@@ -1040,6 +1040,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': 'その言語は利用できません。',
   'game.hud.lowMana': 'マナ低下',
   'game.hud.lowEnergy': 'エネルギー低下',
+  'game.hud.lowFocus': '集中値低下',
   'game.talents.title': 'タレント',
   'game.talents.classTab': 'クラス',
   'game.talents.specTab': '専門化',
@@ -1558,6 +1559,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': 'マナ',
   'classDetails.resources.energy': 'エネルギー',
   'classDetails.resources.rage': '怒り',
+  'classDetails.resources.focus': '集中値',
   'classDetails.roles.warrior': 'タンク / 近接DPS',
   'classDetails.roles.paladin': 'ヒーラー / タンク / 近接DPS',
   'classDetails.roles.hunter': '遠隔DPS',
@@ -2147,6 +2149,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': 'マナ',
   'abilityUi.resources.rage': '怒り',
   'abilityUi.resources.energy': 'エネルギー',
+  'abilityUi.resources.focus': '集中値',
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '釣り',
@@ -2468,6 +2471,41 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': '乱射',
   'entities.abilities.volley.description':
     '対象地点に3秒間、矢を降らせ、範囲内の敵に0.5秒ごとに{damage}のダメージを与えます。',
+  'entities.abilities.pack_command.name': '群れの指令',
+  'entities.abilities.pack_command.description':
+    '生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。',
+  'entities.abilities.unleash_beast.name': '獣の解放',
+  'entities.abilities.unleash_beast.description':
+    '最大まで高まった群れの獰猛さを解放し、主対象を強打して周囲も叩きます。その後、ペットを短時間の範囲攻撃狂乱に駆り立てます。',
+  'entities.abilities.measured_shot.name': '精密射撃',
+  'entities.abilities.measured_shot.description':
+    '慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。',
+  'entities.abilities.cold_focus.name': '冷徹集中',
+  'entities.abilities.cold_focus.description':
+    '12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）',
+  'entities.abilities.bloodhook.name': '血鉤',
+  'entities.abilities.bloodhook.description':
+    '8から25ヤード離れた敵へ突進して主傷口を開き、12秒間で24の出血ダメージを与えます。（野戦術のシグネチャ）',
+  'entities.abilities.shrapnel_charge.name': '榴散弾装薬',
+  'entities.abilities.shrapnel_charge.description':
+    '対象と周囲の敵を榴散弾で吹き飛ばし、主対象から短時間の出血を広げます。',
+  'entities.abilities.bloodtrail_assault.name': '血跡強襲',
+  'entities.abilities.bloodtrail_assault.description':
+    '12秒間、血鉤、裂傷、榴散弾装薬、そしてペットの追撃を強化します。',
+  'entities.abilities.trailbreak.name': '離脱跳躍',
+  'entities.abilities.trailbreak.description':
+    '専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。',
+  'entities.abilities.wildheart.name': '野生の心',
+  'entities.abilities.wildheart.description': '最大体力の30%を即座に回復します。',
+  'entities.abilities.shellskin.name': '甲殻の皮膚',
+  'entities.abilities.shellskin.description':
+    '8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。',
+  'entities.abilities.frostjaw_trap.name': '霜顎の罠',
+  'entities.abilities.frostjaw_trap.description':
+    '選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。',
+  'entities.abilities.pack_rally.name': '群れの結集',
+  'entities.abilities.pack_rally.description':
+    '駿馬の相をまとい、周囲の味方を鼓舞します。10秒間、移動速度を30%、攻撃速度と詠唱速度を10%上昇させます。',
   'entities.abilities.hurricane.name': 'ハリケーン',
   'entities.abilities.hurricane.description':
     '対象地点に6秒間、ハリケーンを呼び起こし、敵を打ちのめして毎秒{damage}の自然ダメージを与えます。',
@@ -5192,8 +5230,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lightning_shield':
     '身にまとい、攻撃してきた相手にネイチャーダメージを与えます。',
   'guide.abilityHook.mark_of_the_wild': '戦闘の前に自分や味方に付与する、持続する祝福です。',
+  'guide.abilityHook.measured_shot': '慎重に狙う遠距離射撃で、強力な攻撃に使う集中値を回復します。',
   'guide.abilityHook.mongoose_bite': '敵の回避の直後に使える反撃です。',
   'guide.abilityHook.moonfire': '即座に当たり標的を燃焼させるため、移動中にも向いています。',
+  'guide.abilityHook.pack_command': '相棒に攻撃を命じ、獣の解放に必要な獰猛さを蓄えます。',
   'guide.abilityHook.power_word_fortitude':
     '味方の体力総量を上げます。プルの前に唱え、維持し続けましょう。',
   'guide.abilityHook.power_word_shield': '味方をシールドで包み、攻撃が当たる前に吸収します。',

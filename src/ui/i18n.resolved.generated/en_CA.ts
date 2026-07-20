@@ -2998,6 +2998,8 @@ export const en_CA: EnTranslations = {
       "blessing_of_might": "Raises a friendly target's attack power, good to cast before a pull.",
       "divine_protection": "A quick protective ward to soak damage when things get rough.",
       "raptor_strike": "A hard melee swing for when something closes the gap on you.",
+      "pack_command": "Orders your companion to strike, building Pack Ferocity for Unleash Beast.",
+      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
       "aspect_of_the_hawk": "A stance you keep up to sharpen your ranged attack power.",
       "serpent_sting": "Lands a venom that bleeds nature damage over time.",
       "arcane_shot": "An instant shot from range for quick extra damage.",
