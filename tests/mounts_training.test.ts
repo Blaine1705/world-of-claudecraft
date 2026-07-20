@@ -450,14 +450,20 @@ describe('new-player path: buy riding at Marla, then complete the lesson', () =>
     meta.copper = 810_000;
     const marla = marlaOf(sim);
 
-    // (a) Trying to accept the riding-lesson quest before buying riding fails:
-    //     the player is not near Marla yet (initial spawn position).
+    // (a) Trying to accept the riding-lesson quest before buying riding fails
+    //     even standing at Marla: the requiresRidingTrained gate refuses with
+    //     the dedicated error and the quest never enters the log.
+    standAtMarla(sim);
     sim.acceptQuest(RIDING_LESSONS_QUEST_ID, sim.playerId);
     const rejectEvents = sim.tick();
-    expect(rejectEvents.some((e) => e.type === 'error')).toBe(true);
+    expect(
+      rejectEvents.some(
+        (e) => e.type === 'error' && e.text === 'You must learn Riding before taking this lesson.',
+      ),
+    ).toBe(true);
     expect(meta.questLog.has(RIDING_LESSONS_QUEST_ID)).toBe(false);
 
-    // (b) Stand at Marla. buyItem riding_training deducts exactly 800_000
+    // (b) buyItem riding_training deducts exactly 800_000
     //     and grants ridingTrained; leaves exactly 10_000 copper.
     standAtMarla(sim);
     sim.buyItem(marla.id, 'riding_training', sim.playerId);

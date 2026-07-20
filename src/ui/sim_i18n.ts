@@ -66,6 +66,7 @@ const baseEnTable = {
   // Riding lesson (src/sim/mounts_training.ts). The shared "Too far away." /
   // "Not enough money." / "You can't do that while dead." refusals are reused
   // verbatim and already registered above.
+  'error.ridingQuestUntrained': 'You must learn Riding before taking this lesson.',
   'error.mountTrainLevel': 'You must be level 20 to take riding lessons.',
   'error.mountTrainNeedsQuest': 'You need to accept the riding lesson quest first.',
   'error.mountTrainInProgress': 'A riding lesson is already in progress.',
