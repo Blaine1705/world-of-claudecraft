@@ -3464,7 +3464,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'aspect_of_the_cheetah',
     name: "Courser's Guise",
     class: 'hunter',
-    learnLevel: 14,
+    learnLevel: 5,
     cost: 20,
     castTime: 0,
     cooldown: 0,

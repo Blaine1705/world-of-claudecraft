@@ -283,9 +283,9 @@ The designated scalable axis per spec (base value = shipped magnitude):
 | paladin/holy | heal crit damage (critDmgPct on heals) | +50% (2x) |
 | paladin/protection | threat (threatPct) | 50% |
 | paladin/retribution | Holy + physical ability damage (paired meleeDmgPct + spellDmgPct, scale together) | 20% |
-| hunter/beast_mastery | pet damage (petDmgPct) | 35% |
-| hunter/marksmanship | physical ability damage (meleeDmgPct) | 20% |
-| hunter/survival | physical ability damage (meleeDmgPct) | 15% |
+| hunter/beast_mastery | pet damage (petDmgPct) | 25% |
+| hunter/marksmanship | physical ability damage (meleeDmgPct) | 12% |
+| hunter/survival | Agility (agiPct) | 15% |
 | mage/arcane | spell damage (spellDmgPct) | 15% |
 | mage/fire | spell crit damage (critDmgPct) | +50% (2x) |
 | mage/frost | Frost spell damage (frost-kit ability dmgPct) | 25% |

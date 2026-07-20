@@ -88,7 +88,7 @@ describe('spec masteries', () => {
       stats: { armorPct: 0.1 },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'beast_mastery')?.mastery.effect).toEqual({
-      global: { petDmgPct: 0.35 },
+      global: { petDmgPct: 0.25 },
       stats: { maxHpPct: 0.08 },
     });
     // Balance pass: the penalty is gone; the Sword Specialization extra-attack
@@ -111,7 +111,7 @@ describe('spec masteries', () => {
       global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'marksmanship')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.2 },
+      global: { meleeDmgPct: 0.12 },
       stats: { crit: 0.03 },
     });
     // Balance pass: Quickblood is the evasive-skirmisher mastery.
@@ -190,8 +190,9 @@ describe('spec masteries', () => {
   it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
     // Drive the actual damage sites (a regression that drops `dmg *= petDamageMult` at
     // either would still pass a helper-only assertion). Same seed + fixed rolls + an
-    // identical dummy (armor cancels in the ratio) isolate the multiplier: BM's Packbond (petDmgPct 0.35)
-    // must deal exactly 1.35x what a no-pet-mastery spec's identical pet deals.
+    // identical dummy (armor cancels in the ratio) isolate the multiplier: Packlord's
+    // Packbond (petDmgPct 0.25) must deal exactly 1.25x what a no-pet-mastery spec's
+    // identical pet deals.
     const setup = (spec: string) => {
       const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
       sim.setPlayerLevel(20);
@@ -235,12 +236,12 @@ describe('spec masteries', () => {
     const meleeBm = dealtMelee('beast_mastery');
     const meleeNone = dealtMelee('marksmanship');
     expect(meleeNone).toBeGreaterThan(0);
-    expect(meleeBm / meleeNone).toBeCloseTo(1.35, 2);
+    expect(meleeBm / meleeNone).toBeCloseTo(1.25, 2);
 
     const rangedBm = dealtRanged('beast_mastery');
     const rangedNone = dealtRanged('marksmanship');
     expect(rangedNone).toBeGreaterThan(0);
-    expect(rangedBm / rangedNone).toBeCloseTo(1.35, 2);
+    expect(rangedBm / rangedNone).toBeCloseTo(1.25, 2);
   });
 
   it('Veinleech (siphon_life) leeches: the affliction dot tick heals the caster', () => {
@@ -284,7 +285,7 @@ describe('spec masteries', () => {
     hunterPet.ownerId = hunter.player.id;
     expect(
       (hunter as unknown as { petDamageMult(e: Entity): number }).petDamageMult(hunterPet),
-    ).toBeCloseTo(1.35);
+    ).toBeCloseTo(1.25);
 
     const paladin = new Sim({ seed: 6, playerClass: 'paladin', autoEquip: true });
     paladin.setPlayerLevel(20);
@@ -404,8 +405,8 @@ describe('spec masteries', () => {
         retribution: { global: 'meleeDmgPct', value: 0.2 },
       },
       hunter: {
-        beast_mastery: { global: 'petDmgPct', value: 0.35 },
-        marksmanship: { global: 'meleeDmgPct', value: 0.2 },
+        beast_mastery: { global: 'petDmgPct', value: 0.25 },
+        marksmanship: { global: 'meleeDmgPct', value: 0.12 },
         survival: { stat: 'agiPct', value: 0.15 },
       },
       mage: {

@@ -62,6 +62,8 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Patch Up's dead-pet revive fraction is owned by the pet lifecycle branch;
   // the living-pet HoT remains fully data-driven by the ability effect.
   revive_pet: [35],
+  // Gutting Strike's 15 Focus award is applied by hunter_fieldcraft.ts after a hit.
+  raptor_strike: [15],
 };
 
 // Every resolved rank of every class ability (deduped by rank).
