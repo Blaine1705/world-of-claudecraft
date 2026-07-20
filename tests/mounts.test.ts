@@ -174,11 +174,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
       ).toBeUndefined();
     }
 
-    // Blue (rare) mounts: heroic-only on their paired five-man boss (0.6%) plus
-    // a secondary path on the heroic Nythraxis raid (0.1%).
+    // Blue (rare) mounts: heroic-only at 0.1% on their paired five-man boss and
+    // on the heroic Nythraxis raid; the 0.6% blue roll is A/S rift clears only.
     const blueDrops: Array<[string, string, number]> = [
-      ['ysolei', 'reins_aether_hover_cycle', 0.006],
-      ['korzul_the_gravewyrm', 'reins_shadowjump_toad', 0.006],
+      ['ysolei', 'reins_aether_hover_cycle', 0.001],
+      ['korzul_the_gravewyrm', 'reins_shadowjump_toad', 0.001],
     ];
     for (const [bossId, itemId, chance] of blueDrops) {
       const entries = HEROIC_BOSS_LOOT[bossId] ?? [];

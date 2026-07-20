@@ -484,10 +484,11 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
 // roll-group draws so the gear draw-order stays byte-identical to non-mount runs.
 // Green (common) mounts: 0.5% per heroic clear on their single boss.
 const HEROIC_GREEN_MOUNT_CHANCE = 0.005;
-// Blue (rare) mounts: 0.6% per heroic clear on their single boss; 0.1% on the
-// Nythraxis heroic raid (the raid adds both blues so every heroic-raider has a
-// path to each, spread across the same boss since the raid has one final boss).
-const HEROIC_BLUE_MOUNT_CHANCE = 0.006;
+// Blue (rare) mounts: 0.1% per heroic clear everywhere (their paired five-man
+// boss and the Nythraxis heroic raid, which adds both blues so every
+// heroic-raider has a path to each). The generous 0.6% blue roll lives on A/S
+// rift clears only (rift/progression.ts), the maintainer-decided split.
+const HEROIC_BLUE_MOUNT_CHANCE = 0.001;
 const HEROIC_RAID_BLUE_MOUNT_CHANCE = 0.001;
 
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
