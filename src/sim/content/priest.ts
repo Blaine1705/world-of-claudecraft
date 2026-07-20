@@ -67,6 +67,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
+    requiresAuraKind: 'gloomtithe',
     effects: [],
     description:
       'Consumes Gloomtithe to call a temporary Tithefiend that hunts your Effigy. Vespers signature.',

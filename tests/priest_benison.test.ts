@@ -44,11 +44,37 @@ function castVigil(sim: Sim, priest: Entity, ally: Entity): void {
 describe('Benison baseline loop', () => {
   it('pins Choirmend and Sunburst Canticle as group recovery spells', () => {
     expect(ABILITIES.prayer_of_healing.name).toBe('Choirmend');
+    expect(ABILITIES.prayer_of_healing.castTime).toBe(3);
     expect(ABILITIES.prayer_of_healing.effects.some((effect) => effect.type === 'aoeHeal')).toBe(
       true,
     );
     expect(ABILITIES.holy_nova.name).toBe('Sunburst Canticle');
+    expect(ABILITIES.holy_nova.castTime).toBe(0);
     expect(ABILITIES.holy_nova.effects.some((effect) => effect.type === 'aoeHeal')).toBe(true);
+  });
+
+  it('executes Choirmend as a committed cast and Sunburst as immediate recovery', () => {
+    const { sim, priest } = benisonPriest();
+    const ally = addAlly(sim, 'Choir Ally', 4);
+    sim.partyInvite(ally.id, priest.id);
+    sim.partyAccept(ally.id);
+    ally.hp = Math.floor(ally.maxHp * 0.3);
+    const beforeChoir = ally.hp;
+
+    priest.gcdRemaining = 0;
+    priest.resource = priest.maxResource;
+    sim.castAbility('prayer_of_healing', priest.id);
+    expect(priest.castingAbility).toBe('prayer_of_healing');
+    for (let tick = 0; tick < 61; tick++) sim.tick();
+    expect(ally.hp).toBeGreaterThan(beforeChoir);
+
+    ally.hp = Math.floor(ally.maxHp * 0.3);
+    const beforeSunburst = ally.hp;
+    priest.gcdRemaining = 0;
+    priest.resource = priest.maxResource;
+    sim.castAbility('holy_nova', priest.id);
+    expect(priest.castingAbility).toBeNull();
+    expect(ally.hp).toBeGreaterThan(beforeSunburst);
   });
 
   it('moves one source-owned Seraphic Vigil between allies', () => {
@@ -91,5 +117,17 @@ describe('Benison baseline loop', () => {
     expect(ally.auras.some((a) => a.id === 'seraphic_vigil' && a.sourceId === priest.id)).toBe(
       false,
     );
+
+    const afterTrigger = ally.hp;
+    (sim as unknown as { dealDamage: DealDamage }).dealDamage(
+      priest,
+      ally,
+      1,
+      false,
+      'shadow',
+      'Second Test Hit',
+      'hit',
+    );
+    expect(ally.hp).toBe(afterTrigger - 1);
   });
 });

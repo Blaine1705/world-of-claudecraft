@@ -1043,4 +1043,26 @@ describe('coverage: each scenario fires its subsystem', () => {
     );
     expect(signed.length).toBeGreaterThanOrEqual(rareGather!.qty);
   });
+
+  it('priest_codex: all three baseline loops fire and respec cleanup completes', () => {
+    const rec = run('priest_codex');
+    const ev = rec.allEvents as Ev[];
+    expect(ev.some((event) => event.type === 'heal2' && event.ability === 'Doctrine')).toBe(true);
+    expect(ev.some((event) => event.type === 'heal2' && event.ability === 'Seraphic Vigil')).toBe(
+      true,
+    );
+    expect(ev.some((event) => event.type === 'heal2' && event.ability === 'Choirmend')).toBe(true);
+    expect(
+      ev.some((event) => event.type === 'heal2' && event.ability === 'Sunburst Canticle'),
+    ).toBe(true);
+    expect(ev.some((event) => event.type === 'damage' && event.ability === 'Effigy Echo')).toBe(
+      true,
+    );
+    expect(
+      ev.some((event) => event.type === 'damage' && event.ability === 'Tithefiend Strike'),
+    ).toBe(true);
+    expect(rec.notes.guardianId).not.toBeNull();
+    expect(rec.notes.respecSucceeded).toBe(true);
+    expect(rec.notes.cleanupComplete).toBe(true);
+  });
 });

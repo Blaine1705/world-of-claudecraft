@@ -84,6 +84,8 @@ export function summonGuardian(ctx: SimContext, owner: Entity, config: GuardianC
     abilityName: config.abilityName,
     preferredTargetId: config.preferredTargetId,
     maxRange: config.maxRange,
+    requiredTargetAuraId: config.requiredTargetAuraId,
+    dismissWhenUntargeted: config.dismissWhenUntargeted,
   };
   ctx.addEntity(guardian);
   ctx.emit({
@@ -99,19 +101,21 @@ export function summonGuardian(ctx: SimContext, owner: Entity, config: GuardianC
 function guardianTarget(ctx: SimContext, guardian: Entity, owner: Entity): Entity | null {
   const state = guardian.guardianState;
   if (!state) return null;
+  const validTarget = (target: Entity): boolean =>
+    !target.dead &&
+    ctx.isHostileTo(owner, target) &&
+    dist2d(owner.pos, target.pos) <= state.maxRange &&
+    (state.requiredTargetAuraId === undefined ||
+      target.auras.some(
+        (aura) => aura.id === state.requiredTargetAuraId && aura.sourceId === owner.id,
+      ));
   const preferred =
     state.preferredTargetId === null ? null : (ctx.entities.get(state.preferredTargetId) ?? null);
-  if (
-    preferred &&
-    !preferred.dead &&
-    ctx.isHostileTo(owner, preferred) &&
-    dist2d(owner.pos, preferred.pos) <= state.maxRange
-  )
-    return preferred;
+  if (preferred && validTarget(preferred)) return preferred;
 
   const candidates = ctx
     .hostilesInRadius(owner, owner.pos, state.maxRange)
-    .filter((entity) => !entity.dead)
+    .filter(validTarget)
     .map((entity) => ({
       entity,
       distance: dist2d(owner.pos, entity.pos),
@@ -135,6 +139,10 @@ export function updateGuardian(ctx: SimContext, guardian: Entity): boolean {
   if (state.attackTimer > 0) return true;
   const target = guardianTarget(ctx, guardian, owner);
   if (!target) {
+    if (state.dismissWhenUntargeted) {
+      dismissGuardian(ctx, guardian);
+      return false;
+    }
     state.attackTimer = Math.min(0.25, state.attackInterval);
     return true;
   }

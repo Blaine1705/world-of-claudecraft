@@ -13,6 +13,7 @@ export interface PriestMarkerAura {
 export interface PriestMarkerState {
   doctrine: boolean;
   vigil: boolean;
+  dirge: boolean;
   effigy: boolean;
   gloomtitheStacks: number;
   summonReady: boolean;
@@ -22,6 +23,7 @@ export function emptyPriestMarkerState(): PriestMarkerState {
   return {
     doctrine: false,
     vigil: false,
+    dirge: false,
     effigy: false,
     gloomtitheStacks: 0,
     summonReady: false,
@@ -35,11 +37,13 @@ export function priestMarkerStateForAuras(
 ): PriestMarkerState {
   out.doctrine = false;
   out.vigil = false;
+  out.dirge = false;
   out.effigy = false;
   out.gloomtitheStacks = 0;
   for (const aura of auras) {
     if (aura.id === DOCTRINE_AURA_ID) out.doctrine = true;
     else if (aura.id === SERAPHIC_VIGIL_ID) out.vigil = true;
+    else if (aura.id === 'shadow_word_pain' && aura.kind === 'dot') out.dirge = true;
     else if (aura.id === EFFIGY_AURA_ID) out.effigy = true;
     else if (aura.id === GLOOMTITHE_AURA_ID || aura.kind === 'gloomtithe') {
       out.gloomtitheStacks = Math.max(

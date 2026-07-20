@@ -8,6 +8,7 @@ import { hasPriestTalent, PRIEST_TALENT_IDS } from './talents';
 export { EFFIGY_AURA_ID, GLOOMTITHE_AURA_ID, GLOOMTITHE_MAX_STACKS } from './presentation';
 export const GLOOMTITHE_GRACE = 15;
 export const EFFIGY_ECHO_RATE = 0.3;
+export const TITHEFIEND_ECHO_RATE = 0.15;
 export const TITHEFIEND_KEY = 'tithefiend';
 export const TITHEFIEND_STRIKE_ID = 'tithefiend_strike';
 
@@ -23,9 +24,14 @@ function ownEffigy(target: Entity, priestId: number): Aura | undefined {
 
 export function effigyTarget(ctx: SimContext, priestId: number): Entity | null {
   for (const entity of ctx.entities.values()) {
-    if (!entity.dead && ownEffigy(entity, priestId)) return entity;
+    if (!entity.dead && ownEffigy(entity, priestId) && ownDirge(entity, priestId)) return entity;
   }
   return null;
+}
+
+/** Gloomtithe's grace timer starts only after its eligible Effigy is gone. */
+export function preservesGloomtithe(ctx: SimContext, priestId: number): boolean {
+  return effigyTarget(ctx, priestId) !== null;
 }
 
 export function stripEffigy(ctx: SimContext, priestId: number): void {
@@ -131,6 +137,8 @@ function summonTithefiend(ctx: SimContext, priest: Entity, stacks: number): void
     abilityName: 'Tithefiend Strike',
     preferredTargetId: effigyTarget(ctx, priest.id)?.id ?? null,
     maxRange: 35,
+    requiredTargetAuraId: 'shadow_word_pain',
+    dismissWhenUntargeted: true,
   });
 }
 
@@ -145,14 +153,12 @@ export function vespersAfterAbility(
   ctx: SimContext,
   priest: Entity,
   meta: PlayerMeta,
-  target: Entity | null,
+  _target: Entity | null,
   abilityId: string,
   gloomtitheStacks: number,
 ): void {
   if (meta.cls !== 'priest' || meta.talents.spec !== 'shadow') return;
-  if (abilityId === 'mind_blast' && target && !target.dead && bindEffigy(ctx, priest, target)) {
-    addGloomtithe(ctx, priest);
-  } else if (abilityId === 'summon_tithefiend') {
+  if (abilityId === 'summon_tithefiend') {
     summonTithefiend(ctx, priest, gloomtitheStacks);
     if (gloomtitheStacks > 0) consumeGloomtithe(ctx, priest);
   }
@@ -189,14 +195,24 @@ export function vespersEchoDamage(
   const meta = ctx.players.get(priest.id);
   if (meta?.cls !== 'priest' || meta.talents.spec !== 'shadow') return;
 
+  // Mindfracture establishes or moves Effigy only after it actually lands.
+  // Keeping this on the post-damage seam prevents misses, invalid casts, and
+  // cancellations from creating relationship state or Gloomtithe.
+  if (abilityId === 'mind_blast') {
+    if (!bindEffigy(ctx, priest, target)) return;
+    addGloomtithe(ctx, priest);
+  }
+
+  const eligibleTarget =
+    abilityId === 'mind_blast' ? ownEffigy(target, priest.id) : ownDirge(target, priest.id);
+  if (!eligibleTarget) return;
+
   if (abilityId === TITHEFIEND_STRIKE_ID && priest.resourceType === 'mana') {
     priest.resource = Math.min(
       priest.maxResource,
       priest.resource + Math.max(1, Math.round(priest.maxResource * 0.02)),
     );
   }
-  if (!ownEffigy(target, priest.id)) return;
-
   const candidates: { entity: Entity; distance: number }[] = [];
   for (const entity of ctx.entities.values()) {
     if (entity.id === target.id || entity.dead || !ownDirge(entity, priest.id)) continue;
@@ -205,7 +221,8 @@ export function vespersEchoDamage(
     candidates.push({ entity, distance: dx * dx + dz * dz });
   }
   candidates.sort((a, b) => a.distance - b.distance || a.entity.id - b.entity.id);
-  const echoDamage = Math.max(1, Math.round(dealt * EFFIGY_ECHO_RATE));
+  const echoRate = abilityId === TITHEFIEND_STRIKE_ID ? TITHEFIEND_ECHO_RATE : EFFIGY_ECHO_RATE;
+  const echoDamage = Math.max(1, Math.round(dealt * echoRate));
   for (const { entity } of candidates.slice(0, 3)) {
     const dirge = ownDirge(entity, priest.id);
     if (

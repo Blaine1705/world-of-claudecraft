@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { summonGuardian } from '../src/sim/combat/guardians';
 import { placeDoctrineLink } from '../src/sim/combat/priest/doctrine';
-import { bindEffigy, vespersOnEntityDeath } from '../src/sim/combat/priest/vespers';
+import { addGloomtithe, bindEffigy, vespersOnEntityDeath } from '../src/sim/combat/priest/vespers';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -76,6 +76,17 @@ function seedTransientState(
   });
   mob.auras.push(dirge(priest.id));
   bindEffigy(ctx, priest, mob);
+  priest.auras.push({
+    id: 'priest_gloomtithe',
+    name: 'Gloomtithe',
+    kind: 'gloomtithe',
+    remaining: 15,
+    duration: 15,
+    value: 0,
+    stacks: 3,
+    sourceId: priest.id,
+    school: 'shadow',
+  });
   summonGuardian(ctx, priest, {
     key: 'tithefiend',
     name: 'Tithefiend',
@@ -104,6 +115,7 @@ function expectCleared(sim: Sim, priest: Entity, ally: Entity, mob: Entity): voi
   expect(mob.auras.some((aura) => aura.sourceId === priest.id && aura.id === 'priest_effigy')).toBe(
     false,
   );
+  expect(priest.auras.some((aura) => aura.kind === 'gloomtithe')).toBe(false);
   expect(
     [...sim.entities.values()].some(
       (entity) => entity.ownerId === priest.id && entity.guardianState,
@@ -126,6 +138,49 @@ describe('Priest transient lifecycle', () => {
     expectCleared(sim, priest, ally, mob);
   });
 
+  it('clears the same state on priest death', () => {
+    const { sim, priest, ctx } = setup();
+    const { ally, mob } = seedTransientState(sim, priest, ctx);
+
+    (
+      sim as unknown as {
+        dealDamage(
+          source: Entity | null,
+          target: Entity,
+          amount: number,
+          crit: boolean,
+          school: string,
+          ability: string,
+          kind: 'hit',
+        ): void;
+      }
+    ).dealDamage(mob, priest, priest.maxHp * 2, false, 'shadow', 'Cleanup Test', 'hit');
+
+    expect(priest.dead).toBe(true);
+    expectCleared(sim, priest, ally, mob);
+  });
+
+  it('persists the selected spec but never reconnects transient Priest relationships', () => {
+    const { sim, priest, ctx } = setup();
+    seedTransientState(sim, priest, ctx);
+    const state = sim.serializeCharacter(priest.id);
+    if (!state) throw new Error('priest state missing');
+
+    sim.preparePlayerLeave(priest.id);
+    const reconnected = new Sim({ seed: 2921, playerClass: 'priest', noPlayer: true });
+    const reconnectedId = reconnected.addPlayer('priest', 'Reconnected Priest', { state });
+    const loaded = reconnected.entities.get(reconnectedId);
+    if (!loaded) throw new Error('reconnected priest missing');
+
+    expect(reconnected.meta(reconnectedId)?.talents.spec).toBe('discipline');
+    expect(loaded.auras.some((aura) => aura.kind === 'gloomtithe')).toBe(false);
+    expect(
+      [...reconnected.entities.values()].some(
+        (entity) => entity.ownerId === reconnectedId && entity.guardianState,
+      ),
+    ).toBe(false);
+  });
+
   it('transfers a dying Effigy to the nearest own-Dirge target by distance then id', () => {
     const { sim, priest, ctx } = setup();
     expect(sim.setSpec('shadow')).toBe(true);
@@ -139,5 +194,38 @@ describe('Priest transient lifecycle', () => {
 
     expect(lowerIdTie.auras.some((aura) => aura.id === 'priest_effigy')).toBe(true);
     expect(higherIdTie.auras.some((aura) => aura.id === 'priest_effigy')).toBe(false);
+  });
+
+  it('clears a dead final Effigy while preserving the Gloomtithe grace bank', () => {
+    const { sim, priest, ctx } = setup();
+    expect(sim.setSpec('shadow')).toBe(true);
+    const dying = addMob(sim, 9983, 8);
+    dying.auras.push(dirge(priest.id));
+    bindEffigy(ctx, priest, dying);
+    addGloomtithe(ctx, priest, 3);
+
+    (
+      sim as unknown as {
+        dealDamage(
+          source: Entity | null,
+          target: Entity,
+          amount: number,
+          crit: boolean,
+          school: string,
+          ability: string,
+          kind: 'hit',
+        ): void;
+      }
+    ).dealDamage(priest, dying, dying.maxHp * 2, false, 'holy', 'Cleanup Test', 'hit');
+
+    expect(dying.dead).toBe(true);
+    expect(
+      [...sim.entities.values()].some((entity) =>
+        entity.auras.some(
+          (effect) => effect.id === 'priest_effigy' && effect.sourceId === priest.id,
+        ),
+      ),
+    ).toBe(false);
+    expect(priest.auras.find((aura) => aura.kind === 'gloomtithe')?.stacks).toBe(3);
   });
 });

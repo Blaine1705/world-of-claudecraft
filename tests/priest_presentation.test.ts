@@ -12,6 +12,7 @@ describe('Priest relationship presentation', () => {
       [
         { id: 'priest_doctrine', kind: 'doctrine' },
         { id: 'seraphic_vigil', kind: 'heal_echo' },
+        { id: 'shadow_word_pain', kind: 'dot' },
         { id: 'priest_effigy', kind: 'hex' },
         { id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 5 },
       ],
@@ -22,6 +23,7 @@ describe('Priest relationship presentation', () => {
     expect(state).toEqual({
       doctrine: true,
       vigil: true,
+      dirge: true,
       effigy: true,
       gloomtitheStacks: 5,
       summonReady: true,

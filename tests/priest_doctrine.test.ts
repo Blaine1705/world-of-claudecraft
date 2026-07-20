@@ -114,7 +114,7 @@ describe('Doctrine baseline loop', () => {
     expect(ally.hp - before).toBe(30);
   });
 
-  it('lets Scouring Mercy directly heal a friendly target', () => {
+  it('lets Scouring Mercy directly heal a friendly target with no enemy present', () => {
     const { sim, priest } = doctrinePriest();
     const ally = addAlly(sim, 'Mercy Ally', 4);
     ally.hp = Math.floor(ally.maxHp * 0.5);
@@ -123,5 +123,103 @@ describe('Doctrine baseline loop', () => {
     castOn(sim, priest, ally, 'scouring_mercy');
 
     expect(ally.hp).toBeGreaterThan(before);
+  });
+
+  it('resolves Scouring Mercy once according to target allegiance', () => {
+    const { sim, priest } = doctrinePriest();
+    const ally = addAlly(sim, 'Mercy Choice', 4);
+    const dummy = addDummy(sim);
+    ally.hp = Math.floor(ally.maxHp * 0.5);
+    const allyBefore = ally.hp;
+    const enemyBefore = dummy.hp;
+
+    castOn(sim, priest, ally, 'scouring_mercy');
+    expect(ally.hp).toBeGreaterThan(allyBefore);
+    expect(dummy.hp).toBe(enemyBefore);
+
+    sim.drainEvents();
+    castOn(sim, priest, dummy, 'scouring_mercy');
+    for (let tick = 0; tick < 100; tick++) sim.tick();
+    expect(dummy.hp).toBeLessThan(enemyBefore);
+    expect(
+      sim
+        .drainEvents()
+        .filter(
+          (event) =>
+            event.type === 'heal2' &&
+            event.targetId === ally.id &&
+            event.ability === 'Scouring Mercy',
+        ),
+    ).toHaveLength(0);
+  });
+
+  it('uses the bounded 15% lowest-health fallback only when no Doctrine link exists', () => {
+    const { sim, priest } = doctrinePriest();
+    const first = addAlly(sim, 'Fallback One', 4);
+    const second = addAlly(sim, 'Fallback Two', 6);
+    sim.partyInvite(first.id, priest.id);
+    sim.partyAccept(first.id);
+    sim.partyInvite(second.id, priest.id);
+    sim.partyAccept(second.id);
+    first.hp = Math.floor(first.maxHp * 0.7);
+    second.hp = Math.floor(second.maxHp * 0.4);
+    const firstBefore = first.hp;
+    const secondBefore = second.hp;
+
+    deal(
+      sim,
+      priest,
+      addDummy(sim),
+      100,
+      false,
+      'holy',
+      'Scouring Hymn',
+      'hit',
+      false,
+      undefined,
+      true,
+      false,
+      true,
+      'smite',
+      false,
+    );
+
+    expect(first.hp).toBe(firstBefore);
+    expect(second.hp - secondBefore).toBe(15);
+  });
+
+  it('emits one readable damage event and one non-recursive Doctrine heal', () => {
+    const { sim, priest } = doctrinePriest();
+    const ally = addAlly(sim, 'Event Ally', 4);
+    const dummy = addDummy(sim);
+    castOn(sim, priest, ally, 'power_word_shield');
+    ally.hp = Math.floor(ally.maxHp * 0.5);
+    sim.drainEvents();
+
+    deal(
+      sim,
+      priest,
+      dummy,
+      100,
+      false,
+      'holy',
+      'Scouring Hymn',
+      'hit',
+      false,
+      undefined,
+      true,
+      false,
+      true,
+      'smite',
+      false,
+    );
+
+    const events = sim.drainEvents();
+    expect(
+      events.filter((event) => event.type === 'damage' && event.ability === 'Scouring Hymn'),
+    ).toHaveLength(1);
+    expect(
+      events.filter((event) => event.type === 'heal2' && event.ability === 'Doctrine'),
+    ).toHaveLength(1);
   });
 });

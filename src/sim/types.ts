@@ -2568,6 +2568,10 @@ export interface GuardianState {
   abilityName: string;
   preferredTargetId: number | null;
   maxRange: number;
+  /** Optional owner-scoped aura required on every valid target. */
+  requiredTargetAuraId?: string;
+  /** Fire-and-forget guardians may dismiss when their target contract is exhausted. */
+  dismissWhenUntargeted?: boolean;
 }
 
 export interface Entity {

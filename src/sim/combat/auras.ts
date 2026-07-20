@@ -34,7 +34,7 @@ import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
 import { priestOnAuraEnded } from './priest/talents';
-import { vespersOnDotTick } from './priest/vespers';
+import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
@@ -198,7 +198,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   tickProcState(e, DT);
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
-    a.remaining -= DT;
+    if (a.kind !== 'gloomtithe' || !preservesGloomtithe(ctx, e.id)) a.remaining -= DT;
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
     if (a.kind === 'thorns') tickThornsCooldown(a);
