@@ -21,7 +21,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "es_ES": [
     "entities.abilities.choir_of_deliverance.description",
@@ -35,7 +37,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "fr_FR": [
     "entities.abilities.choir_of_deliverance.description",
@@ -49,7 +53,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "fr_CA": [
     "entities.abilities.choir_of_deliverance.description",
@@ -63,7 +69,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "en_CA": [],
   "it_IT": [
@@ -78,7 +86,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "de_DE": [
     "entities.abilities.choir_of_deliverance.description",
@@ -92,7 +102,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -110,7 +122,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -125,7 +139,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "nl_NL": [
     "entities.abilities.choir_of_deliverance.description",
@@ -139,7 +155,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "pl_PL": [
     "entities.abilities.choir_of_deliverance.description",
@@ -153,7 +171,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "id_ID": [
     "entities.abilities.choir_of_deliverance.description",
@@ -167,7 +187,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "tr_TR": [
     "entities.abilities.choir_of_deliverance.description",
@@ -181,7 +203,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "sv_SE": [
     "entities.abilities.choir_of_deliverance.description",
@@ -195,7 +219,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "vi_VN": [
     "entities.abilities.choir_of_deliverance.description",
@@ -209,7 +235,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ],
   "da_DK": [
     "entities.abilities.choir_of_deliverance.description",
@@ -223,6 +251,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.summon_tithefiend.description",
     "entities.abilities.summon_tithefiend.name",
     "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
+    "entities.abilities.veilstep.name",
+    "hudChrome.gathering.catchLine",
+    "hudChrome.gathering.fishing"
   ]
 };

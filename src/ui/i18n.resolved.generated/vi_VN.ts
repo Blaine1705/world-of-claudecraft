@@ -2089,9 +2089,11 @@ export const vi_VN: EnTranslations = {
       "mining": "Khai mỏ",
       "logging": "Đốn gỗ",
       "herbalism": "Thảo dược học",
+      "fishing": "Fishing",
       "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn.",
       "gatherLine": "Bạn tập hợp: {name}.",
-      "gatherLineQty": "Bạn tập hợp: {name} x{qty}."
+      "gatherLineQty": "Bạn tập hợp: {name} x{qty}.",
+      "catchLine": "You reel in: {name}"
     },
     "archetypeTitle": {
       "label": "Danh hiệu",

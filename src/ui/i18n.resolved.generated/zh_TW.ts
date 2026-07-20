@@ -2089,9 +2089,11 @@ export const zh_TW: EnTranslations = {
       "mining": "採礦",
       "logging": "伐木",
       "herbalism": "藥草學",
+      "fishing": "釣魚",
       "notReady": "這個資源節點尚未為你重新生成。",
       "gatherLine": "你採集了：{name}。",
-      "gatherLineQty": "你採集了：{name} x{qty}。"
+      "gatherLineQty": "你採集了：{name} x{qty}。",
+      "catchLine": "你釣上了：{name}"
     },
     "archetypeTitle": {
       "label": "稱號",

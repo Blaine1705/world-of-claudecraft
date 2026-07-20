@@ -5462,6 +5462,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.finder.yourListing'
   | 'hudChrome.finder.yourRoles'
   | 'hudChrome.frameReset.label'
+  | 'hudChrome.gathering.catchLine'
+  | 'hudChrome.gathering.fishing'
   | 'hudChrome.gathering.gatherLine'
   | 'hudChrome.gathering.gatherLineQty'
   | 'hudChrome.gathering.herbalism'

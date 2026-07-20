@@ -2089,9 +2089,11 @@ export const cs_CZ: EnTranslations = {
       "mining": "Těžba",
       "logging": "Dřevorubectví",
       "herbalism": "Bylinkářství",
+      "fishing": "Fishing",
       "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
       "gatherLine": "Shromažďujete: {name}.",
-      "gatherLineQty": "Shromažďujete: {name} x{qty}."
+      "gatherLineQty": "Shromažďujete: {name} x{qty}.",
+      "catchLine": "You reel in: {name}"
     },
     "archetypeTitle": {
       "label": "Titul",

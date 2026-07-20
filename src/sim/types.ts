@@ -3633,6 +3633,21 @@ export type SimEvent = { pid?: number } & (
       // The rare event this harvest rolled (resolveHarvest draw #2), or null.
       rareEvent: GatherRareEventFlavor | null;
     }
+  // Fishing catch outcome (Professions 2.0 Phase 11): a landed catch emits
+  // this so the client can log the reel-in feedback line for the acting
+  // player. Personal (carries pid = the angler), emitted only on the
+  // landed-catch path (never on the no-bite, bags-full, or codfather quest
+  // branches), so every field is always present. Text-free on purpose (like
+  // gatherResult above): the client renders its own localized copy off the
+  // structured fields, so no sim/server i18n matcher rule is needed.
+  // `quality` is the caught ItemDef's quality (poor for junk catches,
+  // uncommon for the rare koi) so the line colors like an item name.
+  | {
+      type: 'fishingResult';
+      pid: number;
+      itemId: string;
+      quality: NonNullable<ItemDef['quality']>;
+    }
   // Rare gather event (Professions 2.0 Phase 4): a harvest struck a pristine
   // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is
   // emitted per player currently in the node's zone, `pid` being the RECIPIENT

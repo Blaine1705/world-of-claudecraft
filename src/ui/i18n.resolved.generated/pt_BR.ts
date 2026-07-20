@@ -2089,9 +2089,11 @@ export const pt_BR: EnTranslations = {
       "mining": "Mineração",
       "logging": "Lenharia",
       "herbalism": "Herborismo",
+      "fishing": "Fishing",
       "notReady": "Este nó de recursos ainda não se regenerou para você.",
       "gatherLine": "Você coleta: {name}.",
-      "gatherLineQty": "Você coleta: {name} x{qty}."
+      "gatherLineQty": "Você coleta: {name} x{qty}.",
+      "catchLine": "You reel in: {name}"
     },
     "archetypeTitle": {
       "label": "Título",

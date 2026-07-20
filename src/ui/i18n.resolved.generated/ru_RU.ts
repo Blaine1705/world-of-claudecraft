@@ -2089,9 +2089,11 @@ export const ru_RU: EnTranslations = {
       "mining": "Горное дело",
       "logging": "Лесозаготовка",
       "herbalism": "Травничество",
+      "fishing": "Рыбная ловля",
       "notReady": "Этот ресурсный узел еще не восстановился для вас.",
       "gatherLine": "Вы добываете: {name}.",
-      "gatherLineQty": "Вы добываете: {name} x{qty}."
+      "gatherLineQty": "Вы добываете: {name} x{qty}.",
+      "catchLine": "Вы выуживаете: {name}"
     },
     "archetypeTitle": {
       "label": "Титул",

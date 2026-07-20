@@ -2089,9 +2089,11 @@ export const en_XA: EnTranslations = {
       "mining": "[Ɱíñíñĝ]",
       "logging": "[Ļóĝĝíñĝ]",
       "herbalism": "[Ĥéŕƀáļíšɱ]",
+      "fishing": "[Ƒíšĥíñĝ]",
       "notReady": "[Ţĥíš ŕéšóúŕçé ñóðé ĥáš ñóţ ŕéšþáŵñéð ƒóŕ ýóú ýéţ.]",
       "gatherLine": "[Ýóú ĝáţĥéŕ: {name}.]",
-      "gatherLineQty": "[Ýóú ĝáţĥéŕ: {name} ẋ{qty}.]"
+      "gatherLineQty": "[Ýóú ĝáţĥéŕ: {name} ẋ{qty}.]",
+      "catchLine": "[Ýóú ŕééļ íñ: {name}]"
     },
     "archetypeTitle": {
       "label": "[Ţíţļé]",

@@ -2089,9 +2089,11 @@ export const ja_JP: EnTranslations = {
       "mining": "採掘",
       "logging": "伐採",
       "herbalism": "薬草学",
+      "fishing": "釣り",
       "notReady": "この資源ノードはまだあなたのために再生していません。",
       "gatherLine": "{name}を採集した。",
-      "gatherLineQty": "{name}を{qty}個採集した。"
+      "gatherLineQty": "{name}を{qty}個採集した。",
+      "catchLine": "{name}を釣り上げた"
     },
     "archetypeTitle": {
       "label": "称号",

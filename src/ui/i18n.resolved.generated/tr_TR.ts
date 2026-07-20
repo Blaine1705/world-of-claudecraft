@@ -2089,9 +2089,11 @@ export const tr_TR: EnTranslations = {
       "mining": "Madencilik",
       "logging": "Ağaç kesme",
       "herbalism": "Bitkicilik",
+      "fishing": "Fishing",
       "notReady": "Bu kaynak noktası senin için henüz yeniden oluşmadı.",
       "gatherLine": "Topladığınız şey: {name}.",
-      "gatherLineQty": "Şunu toplarsınız: {name} x{qty}."
+      "gatherLineQty": "Şunu toplarsınız: {name} x{qty}.",
+      "catchLine": "You reel in: {name}"
     },
     "archetypeTitle": {
       "label": "Unvan",

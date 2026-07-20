@@ -134,7 +134,6 @@ import {
   abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
-  DEEPFEN_SHALLOWS_LAKE,
   DELVE_COMPANIONS,
   DELVE_LIST,
   DELVE_SLOT_COUNT,
@@ -143,8 +142,6 @@ import {
   delveAt,
   delveOrigin,
   dungeonAt,
-  FISHING_RARE_ID,
-  FISHING_TABLES,
   getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   ITEMS,
@@ -295,6 +292,7 @@ import {
   disenchantItem as disenchantItemImpl,
   isEnchantedInstance,
 } from './professions/enchanting';
+import * as fishing from './professions/fishing';
 import * as professionsFocus from './professions/focus';
 import { announceMasterworkZone } from './professions/gather_events';
 import {
@@ -481,8 +479,6 @@ import {
   type ErrorReason,
   emptyMoveInput,
   FAERIE_FIRE_ARMOR_PCT,
-  FISHING_CAST_ID,
-  FISHING_CAST_TIME,
   GCD,
   type HonorArenaDailyState,
   type InvSlot,
@@ -673,10 +669,6 @@ const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
 // (follow trailing + the mob/pet water paths still read them here). swimSurfaceY
 // carries v0.22.0's location-aware form (waterLevelAt) in its new home.
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
-const FISHING_SAMPLE_DISTANCES = [4, 8, 12, 16, 20, 24];
-const DEEPFEN_FISHING_SHORE_MARGIN = 10;
-const THE_CODFATHER_ITEM_ID = 'the_codfather';
-const THE_CODFATHER_QUEST_ID = 'q_the_codfather';
 // DOOR_TRIGGER_RADIUS moved to instances/dungeons.ts (I1: read only by updateDoorTriggers).
 // NYTHRAXIS_PARTY_INTERACT_RANGE / NYTHRAXIS_VISION_LINE_DELAY moved to
 // encounters/nythraxis.ts (N1) with the crypt-quest helpers that read them.
@@ -3944,7 +3936,7 @@ export class Sim {
       breakGhostWolf: sim.breakGhostWolf.bind(sim),
       startAutoAttack: sim.startAutoAttack.bind(sim),
       revivePet: sim.revivePet.bind(sim),
-      completeFishing: sim.completeFishing.bind(sim),
+      completeFishing: (p, meta) => fishing.completeFishing(sim.ctx, p, meta),
       applyDemonHealTick: sim.applyDemonHealTick.bind(sim),
       // C4b effect-dispatch surface: the per-effect switch the cast lifecycle hands
       // off to. awardCombo, the stat/LoS helpers, and meleeSwing STAY on Sim
@@ -3978,12 +3970,14 @@ export class Sim {
       startCascadePlaytest: sim.startCascadePlaytest.bind(sim),
       startDevSandbox: sim.startDevSandbox.bind(sim),
       seedDungeonFinderDev: sim.seedDungeonFinderDev.bind(sim),
-      // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved items.useItem
-      // dispatches to. Late-bound arrows (looked up at call time, not `.bind`d at ctor)
-      // so they preserve the pre-move `this.X` dynamic-dispatch semantics, including tests
-      // that reassign a Sim method post-construction. startFishing/unlockMechChromaFromItem/
+      // L2 inventory/vendor (W2): the helpers the moved items.useItem dispatches to.
+      // Late-bound arrows (looked up at call time, not `.bind`d at ctor) so they preserve
+      // the pre-move `this.X` dynamic-dispatch semantics, including tests that reassign a
+      // Sim method post-construction. startFishing/completeFishing flip points-at to the
+      // fishing module (Professions 2.0 Phase 11), called with the live ctx the same way
+      // runEffects is above; no Sim fishing method remains. unlockMechChromaFromItem /
       // openSkinSelect are private on Sim; isSwimming is public. The owning facets stay TBD.
-      startFishing: (p, meta) => sim.startFishing(p, meta),
+      startFishing: (p, meta) => fishing.startFishing(sim.ctx, p, meta),
       unlockMechChromaFromItem: (meta, itemId, chromaId) =>
         sim.unlockMechChromaFromItem(meta, itemId, chromaId),
       openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
@@ -6661,111 +6655,6 @@ export class Sim {
     return items.unequipItem(this.ctx, slot, pid);
   }
 
-  private hasFishableWaterAhead(p: Entity): boolean {
-    const sin = Math.sin(p.facing);
-    const cos = Math.cos(p.facing);
-    return FISHING_SAMPLE_DISTANCES.some((d) => {
-      const x = p.pos.x + sin * d;
-      const z = p.pos.z + cos * d;
-      return groundHeight(x, z, this.cfg.seed) < waterLevelAt(x, z) - SWIM_DEPTH;
-    });
-  }
-
-  private isAtDeepfenShallowsFishingSpot(p: Entity): boolean {
-    const d = Math.hypot(p.pos.x - DEEPFEN_SHALLOWS_LAKE.x, p.pos.z - DEEPFEN_SHALLOWS_LAKE.z);
-    return d <= DEEPFEN_SHALLOWS_LAKE.radius + DEEPFEN_FISHING_SHORE_MARGIN;
-  }
-
-  private shouldCatchCodfather(p: Entity, meta: PlayerMeta): boolean {
-    const qp = meta.questLog.get(THE_CODFATHER_QUEST_ID);
-    return (
-      qp?.state === 'active' &&
-      this.countItem(THE_CODFATHER_ITEM_ID, meta.entityId) === 0 &&
-      this.isAtDeepfenShallowsFishingSpot(p)
-    );
-  }
-
-  private startFishing(p: Entity, meta: PlayerMeta): void {
-    if (p.dead) {
-      this.error(meta.entityId, "You can't do that while dead.");
-      return;
-    }
-    if (p.inCombat) {
-      this.error(meta.entityId, "You can't do that while in combat.");
-      return;
-    }
-    if (this.isSwimming(p)) {
-      this.error(meta.entityId, "You can't do that while swimming.");
-      return;
-    }
-    if (p.castingAbility || isConsuming(p)) {
-      this.error(meta.entityId, 'You are busy.');
-      return;
-    }
-    if (!this.hasFishableWaterAhead(p)) {
-      this.error(meta.entityId, 'You need to face fishable water.');
-      return;
-    }
-    if (p.sitting) this.standUp(p);
-    p.castingAbility = FISHING_CAST_ID;
-    p.castTotal = FISHING_CAST_TIME;
-    p.castRemaining = FISHING_CAST_TIME;
-    p.castTargetId = null;
-    p.channeling = false;
-    this.emit({
-      type: 'castStart',
-      entityId: p.id,
-      ability: FISHING_CAST_ID,
-      time: FISHING_CAST_TIME,
-    });
-  }
-
-  private completeFishing(p: Entity, meta: PlayerMeta): void {
-    if (this.shouldCatchCodfather(p, meta)) {
-      // Deliberately NOT capacity-gated: this once-ever quest catch is guarded
-      // to a single copy by shouldCatchCodfather, and losing it to full bags
-      // could soft-lock the quest chain. Force-add (over-capacity tolerated).
-      this.addItem(THE_CODFATHER_ITEM_ID, 1, meta.entityId);
-      return;
-    }
-    // The catch depends on which zone's water you're fishing — each has its own
-    // weighted table (src/sim/content/items.ts). Fall back to the Vale table for
-    // any spot without its own (e.g. fishable water inside a dungeon zone).
-    const table = FISHING_TABLES[zoneAt(p.pos.z).id] ?? FISHING_TABLES.eastbrook_vale;
-    const total = table.reduce((sum, e) => sum + e.weight, 0);
-    let roll = this.rng.next() * total;
-    let caught: string | null = null;
-    for (const entry of table) {
-      roll -= entry.weight;
-      if (roll < 0) {
-        caught = entry.itemId;
-        break;
-      }
-    }
-    if (caught === null) {
-      this.emit({ type: 'log', text: 'No fish are biting.', color: '#999', pid: p.id });
-      return;
-    }
-    // Capacity gate AFTER the table roll so the rng draw order never depends
-    // on bag state; a catch with no room to land simply gets away.
-    if (!this.canAddItem(caught, 1, meta.entityId)) {
-      this.error(meta.entityId, 'Your bags are full.');
-      return;
-    }
-    if (caught === FISHING_RARE_ID) {
-      this.emit({
-        type: 'log',
-        text: 'A rare catch! Something gleams on your line.',
-        color: '#1eff00',
-        pid: p.id,
-      });
-    }
-    this.addItem(caught, 1, meta.entityId);
-    // Book of Deeds: a real fish (never weeds or boots) from this zone's
-    // waters feeds the per-zone first-cast mark.
-    deedsMod.onFishCaughtForDeeds(this.ctx, meta, zoneAt(p.pos.z).id, caught);
-  }
-
   useItem(itemId: string, pid?: number): ItemUseResult | undefined {
     return items.useItem(this.ctx, itemId, pid);
   }
@@ -7972,8 +7861,15 @@ export class Sim {
     valeCupMod.vcupResolveDesertion(this.ctx, pid);
   }
 
-  cupInfoFor(pid: number): import('../world_api/vale_cup').CupInfo | null {
-    return valeCupMod.cupInfoFor(this.ctx, pid);
+  cupInfoFor(
+    pid: number,
+    shared?: import('../world_api/vale_cup').VcSharedCupInfo,
+  ): import('../world_api/vale_cup').CupInfo | null {
+    return valeCupMod.cupInfoFor(this.ctx, pid, shared);
+  }
+
+  cupSharedInfoFor(): import('../world_api/vale_cup').VcSharedCupInfo {
+    return valeCupMod.cupSharedInfoFor(this.ctx);
   }
 
   get cupInfo(): import('../world_api/vale_cup').CupInfo | null {

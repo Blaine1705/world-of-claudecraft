@@ -2089,9 +2089,11 @@ export const id_ID: EnTranslations = {
       "mining": "Penambangan",
       "logging": "Penebangan",
       "herbalism": "Herbalisme",
+      "fishing": "Fishing",
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
       "gatherLine": "Anda mengumpulkan: {name}.",
-      "gatherLineQty": "Anda mengumpulkan: {name} x{qty}."
+      "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
+      "catchLine": "You reel in: {name}"
     },
     "archetypeTitle": {
       "label": "Gelar",

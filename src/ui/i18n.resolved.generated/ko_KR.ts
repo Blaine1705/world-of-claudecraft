@@ -2089,9 +2089,11 @@ export const ko_KR: EnTranslations = {
       "mining": "채광",
       "logging": "벌목",
       "herbalism": "약초학",
+      "fishing": "낚시",
       "notReady": "이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다.",
       "gatherLine": "{name}을(를) 채집했습니다.",
-      "gatherLineQty": "{name}을(를) {qty}개 채집했습니다."
+      "gatherLineQty": "{name}을(를) {qty}개 채집했습니다.",
+      "catchLine": "{name}을(를) 낚아 올렸습니다"
     },
     "archetypeTitle": {
       "label": "칭호",
