@@ -7464,28 +7464,28 @@ export const ru_RU: EnTranslations = {
         "description": "Поглощает один магический эффект (положительный с врага или отрицательный с союзника) и восстанавливает 6% от максимального запаса здоровья."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "Шаг сквозь завесу",
+        "description": "Перемещает сквозь завесу в направлении взгляда."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Scours an enemy with holy power or delivers immediate mercy to a friendly target. Doctrine signature."
+        "name": "Карающее милосердие",
+        "description": "Поражает противника силой Света или мгновенно исцеляет союзника. Особая способность Доктрины."
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Places a watchful blessing on one ally, restoring them when they become unsafe. Benison signature."
+        "name": "Серафическое бдение",
+        "description": "Накладывает на союзника оберегающее благословение, исцеляющее его при опасном падении здоровья. Особая способность Благословения."
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consumes Gloomtithe to call a temporary Tithefiend that hunts your Effigy. Vespers signature."
+        "name": "Призыв демона десятины",
+        "description": "Поглощает Мрачную десятину и призывает временного демона, преследующего ваше Изваяние. Особая способность Вечерни."
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "name": "Эгида мученика",
+        "description": "Уменьшает получаемый союзником урон на 40% на 8 сек."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "name": "Хор избавления",
+        "description": "Поддерживается 6 сек., исцеляя ближайших участников группы раз в 2 сек."
       },
       "bear_charge": {
         "name": "Натиск бурого",

@@ -94,54 +94,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.veilstep.description",
     "entities.abilities.veilstep.name"
   ],
-  "zh_CN": [
-    "entities.abilities.choir_of_deliverance.description",
-    "entities.abilities.martyrs_aegis.description",
-    "entities.abilities.scouring_mercy.description",
-    "entities.abilities.scouring_mercy.name",
-    "entities.abilities.seraphic_vigil.description",
-    "entities.abilities.seraphic_vigil.name",
-    "entities.abilities.summon_tithefiend.description",
-    "entities.abilities.summon_tithefiend.name",
-    "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
-  ],
-  "zh_TW": [
-    "entities.abilities.choir_of_deliverance.description",
-    "entities.abilities.martyrs_aegis.description",
-    "entities.abilities.scouring_mercy.description",
-    "entities.abilities.scouring_mercy.name",
-    "entities.abilities.seraphic_vigil.description",
-    "entities.abilities.seraphic_vigil.name",
-    "entities.abilities.summon_tithefiend.description",
-    "entities.abilities.summon_tithefiend.name",
-    "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
-  ],
-  "ko_KR": [
-    "entities.abilities.choir_of_deliverance.description",
-    "entities.abilities.martyrs_aegis.description",
-    "entities.abilities.scouring_mercy.description",
-    "entities.abilities.scouring_mercy.name",
-    "entities.abilities.seraphic_vigil.description",
-    "entities.abilities.seraphic_vigil.name",
-    "entities.abilities.summon_tithefiend.description",
-    "entities.abilities.summon_tithefiend.name",
-    "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
-  ],
-  "ja_JP": [
-    "entities.abilities.choir_of_deliverance.description",
-    "entities.abilities.martyrs_aegis.description",
-    "entities.abilities.scouring_mercy.description",
-    "entities.abilities.scouring_mercy.name",
-    "entities.abilities.seraphic_vigil.description",
-    "entities.abilities.seraphic_vigil.name",
-    "entities.abilities.summon_tithefiend.description",
-    "entities.abilities.summon_tithefiend.name",
-    "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.abilities.choir_of_deliverance.description",
     "entities.abilities.choir_of_deliverance.name",
@@ -156,20 +112,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.veilstep.description",
     "entities.abilities.veilstep.name"
   ],
-  "ru_RU": [
-    "entities.abilities.choir_of_deliverance.description",
-    "entities.abilities.choir_of_deliverance.name",
-    "entities.abilities.martyrs_aegis.description",
-    "entities.abilities.martyrs_aegis.name",
-    "entities.abilities.scouring_mercy.description",
-    "entities.abilities.scouring_mercy.name",
-    "entities.abilities.seraphic_vigil.description",
-    "entities.abilities.seraphic_vigil.name",
-    "entities.abilities.summon_tithefiend.description",
-    "entities.abilities.summon_tithefiend.name",
-    "entities.abilities.veilstep.description",
-    "entities.abilities.veilstep.name"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.choir_of_deliverance.description",
     "entities.abilities.choir_of_deliverance.name",

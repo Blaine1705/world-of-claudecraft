@@ -134,6 +134,13 @@ function summonTithefiend(ctx: SimContext, priest: Entity, stacks: number): void
   });
 }
 
+function consumeGloomtithe(ctx: SimContext, priest: Entity): void {
+  const index = priest.auras.findIndex((aura) => aura.kind === 'gloomtithe');
+  if (index < 0) return;
+  const [aura] = priest.auras.splice(index, 1);
+  ctx.emit({ type: 'aura', targetId: priest.id, name: aura.name, gained: false });
+}
+
 export function vespersAfterAbility(
   ctx: SimContext,
   priest: Entity,
@@ -147,6 +154,7 @@ export function vespersAfterAbility(
     addGloomtithe(ctx, priest);
   } else if (abilityId === 'summon_tithefiend') {
     summonTithefiend(ctx, priest, gloomtitheStacks);
+    if (gloomtitheStacks > 0) consumeGloomtithe(ctx, priest);
   }
 }
 

@@ -8343,6 +8343,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_mana_draught.name': 'サンペタルのマナ薬',
   'entities.items.elixir_of_the_serpent.name': '蛇のエリクサー',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.veilstep.name': 'ヴェイルステップ',
+  'entities.abilities.veilstep.description': '向いている方向へ帷をすり抜ける。',
+  'entities.abilities.scouring_mercy.name': '浄罪の慈悲',
+  'entities.abilities.scouring_mercy.description':
+    '敵を聖なる力で浄化するか、味方1体を即座に癒す。ドクトリン固有能力。',
+  'entities.abilities.seraphic_vigil.name': '熾天使の見守り',
+  'entities.abilities.seraphic_vigil.description':
+    '味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。',
+  'entities.abilities.summon_tithefiend.name': 'タイスフィーンド招来',
+  'entities.abilities.summon_tithefiend.description':
+    'グルームタイスを消費し、あなたのエフィジーを狙う一時的なタイスフィーンドを呼び出す。ヴェスパー固有能力。',
   'entities.abilities.martyrs_aegis.name': '殉教者の盾',
+  'entities.abilities.martyrs_aegis.description': '味方1体が受けるダメージを8秒間40%軽減する。',
   'entities.abilities.choir_of_deliverance.name': '救済の聖歌隊',
+  'entities.abilities.choir_of_deliverance.description':
+    '6秒間詠唱し、2秒ごとに周囲のパーティメンバーを回復する。',
 };

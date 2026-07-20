@@ -8500,4 +8500,21 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_mana_draught.name': 'Настой маны солнцелепеста',
   'entities.items.elixir_of_the_serpent.name': 'Эликсир змея',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.veilstep.name': 'Шаг сквозь завесу',
+  'entities.abilities.veilstep.description': 'Перемещает сквозь завесу в направлении взгляда.',
+  'entities.abilities.scouring_mercy.name': 'Карающее милосердие',
+  'entities.abilities.scouring_mercy.description':
+    'Поражает противника силой Света или мгновенно исцеляет союзника. Особая способность Доктрины.',
+  'entities.abilities.seraphic_vigil.name': 'Серафическое бдение',
+  'entities.abilities.seraphic_vigil.description':
+    'Накладывает на союзника оберегающее благословение, исцеляющее его при опасном падении здоровья. Особая способность Благословения.',
+  'entities.abilities.summon_tithefiend.name': 'Призыв демона десятины',
+  'entities.abilities.summon_tithefiend.description':
+    'Поглощает Мрачную десятину и призывает временного демона, преследующего ваше Изваяние. Особая способность Вечерни.',
+  'entities.abilities.martyrs_aegis.name': 'Эгида мученика',
+  'entities.abilities.martyrs_aegis.description':
+    'Уменьшает получаемый союзником урон на 40% на 8 сек.',
+  'entities.abilities.choir_of_deliverance.name': 'Хор избавления',
+  'entities.abilities.choir_of_deliverance.description':
+    'Поддерживается 6 сек., исцеляя ближайших участников группы раз в 2 сек.',
 };

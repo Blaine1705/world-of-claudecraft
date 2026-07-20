@@ -7464,28 +7464,28 @@ export const ja_JP: EnTranslations = {
         "description": "魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。"
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "ヴェイルステップ",
+        "description": "向いている方向へ帷をすり抜ける。"
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Scours an enemy with holy power or delivers immediate mercy to a friendly target. Doctrine signature."
+        "name": "浄罪の慈悲",
+        "description": "敵を聖なる力で浄化するか、味方1体を即座に癒す。ドクトリン固有能力。"
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Places a watchful blessing on one ally, restoring them when they become unsafe. Benison signature."
+        "name": "熾天使の見守り",
+        "description": "味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。"
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consumes Gloomtithe to call a temporary Tithefiend that hunts your Effigy. Vespers signature."
+        "name": "タイスフィーンド招来",
+        "description": "グルームタイスを消費し、あなたのエフィジーを狙う一時的なタイスフィーンドを呼び出す。ヴェスパー固有能力。"
       },
       "martyrs_aegis": {
         "name": "殉教者の盾",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "description": "味方1体が受けるダメージを8秒間40%軽減する。"
       },
       "choir_of_deliverance": {
         "name": "救済の聖歌隊",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "description": "6秒間詠唱し、2秒ごとに周囲のパーティメンバーを回復する。"
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",

@@ -7947,6 +7947,20 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_mana_draught.name': '阳瓣法力药水',
   'entities.items.elixir_of_the_serpent.name': '巨蛇药剂',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.veilstep.name': '帷幕步',
+  'entities.abilities.veilstep.description': '朝面向的方向穿越帷幕。',
+  'entities.abilities.scouring_mercy.name': '涤罪慈悲',
+  'entities.abilities.scouring_mercy.description':
+    '以神圣之力净化一名敌人，或立即救治一名友方目标。教义专属技能。',
+  'entities.abilities.seraphic_vigil.name': '炽天使守望',
+  'entities.abilities.seraphic_vigil.description':
+    '为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。',
+  'entities.abilities.summon_tithefiend.name': '召唤什一魔',
+  'entities.abilities.summon_tithefiend.description':
+    '消耗幽暗什一来召唤一只临时存在的什一魔，追猎你的塑像。晚祷专属技能。',
   'entities.abilities.martyrs_aegis.name': '殉道者圣盾',
+  'entities.abilities.martyrs_aegis.description': '使一名盟友受到的伤害降低 40%，持续 8 秒。',
   'entities.abilities.choir_of_deliverance.name': '救赎圣咏团',
+  'entities.abilities.choir_of_deliverance.description':
+    '引导 6 秒，每 2 秒为附近的队伍成员恢复生命值。',
 };

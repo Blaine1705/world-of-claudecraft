@@ -8328,6 +8328,21 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_mana_draught.name': '태양꽃잎 마나 물약',
   'entities.items.elixir_of_the_serpent.name': '뱀의 비약',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.veilstep.name': '장막걸음',
+  'entities.abilities.veilstep.description': '바라보는 방향으로 장막을 통과합니다.',
+  'entities.abilities.scouring_mercy.name': '정화의 자비',
+  'entities.abilities.scouring_mercy.description':
+    '적을 신성한 힘으로 정화하거나 아군 대상을 즉시 치유합니다. 교리 고유 능력입니다.',
+  'entities.abilities.seraphic_vigil.name': '치천사의 수호',
+  'entities.abilities.seraphic_vigil.description':
+    '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 회복시킵니다. 축복 고유 능력입니다.',
+  'entities.abilities.summon_tithefiend.name': '십일조 악마 소환',
+  'entities.abilities.summon_tithefiend.description':
+    '어둠의 십일조를 소모해 당신의 형상을 사냥하는 일시적인 십일조 악마를 소환합니다. 만과 고유 능력입니다.',
   'entities.abilities.martyrs_aegis.name': '순교자의 방패',
+  'entities.abilities.martyrs_aegis.description':
+    '아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다.',
   'entities.abilities.choir_of_deliverance.name': '구원의 성가대',
+  'entities.abilities.choir_of_deliverance.description':
+    '6초 동안 정신을 집중해 2초마다 주위 파티원을 치유합니다.',
 };
