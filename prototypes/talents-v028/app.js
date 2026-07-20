@@ -1,6 +1,4 @@
-(function () {
-  'use strict';
-
+(() => {
   const data = window.TALENT_LAB_DATA;
   if (!data?.classes) throw new Error('Talent Lab data is unavailable.');
 
@@ -175,14 +173,18 @@
     const spec = currentSpec();
     const stepElements = elements.rotationSteps.querySelectorAll('.rotation-step');
     const actionElements = elements.actionBar.querySelectorAll('.action');
-    stepElements.forEach((step, index) => step.classList.toggle('active', index === state.rotationIndex));
+    stepElements.forEach((step, index) => {
+      step.classList.toggle('active', index === state.rotationIndex);
+    });
 
     const activeName = state.rotationIndex >= 0 ? spec.loop[state.rotationIndex][0] : null;
     actionElements.forEach((action) => {
       const actionName = action.dataset.actionName;
       const isRelated =
         activeName !== null &&
-        (actionName === activeName || activeName.includes(actionName) || actionName.includes(activeName));
+        (actionName === activeName ||
+          activeName.includes(actionName) ||
+          actionName.includes(activeName));
       action.classList.toggle('active', isRelated);
     });
 
@@ -305,9 +307,9 @@
     const optionIndex = Number(button.dataset.optionIndex);
     state.talents[state.classId][level] = optionIndex;
     const row = button.closest('.talent-row');
-    row.querySelectorAll('.talent-option').forEach((option) =>
-      option.setAttribute('aria-pressed', String(option === button)),
-    );
+    row.querySelectorAll('.talent-option').forEach((option) => {
+      option.setAttribute('aria-pressed', String(option === button));
+    });
     updateBuildCount();
   });
 
