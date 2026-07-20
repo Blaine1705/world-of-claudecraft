@@ -3769,6 +3769,14 @@ export class ClientWorld implements IWorld {
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
   }
+  // Live lethal death zones on the current rift boss floor. The online client
+  // receives these via the cast bar (bigCast wire) which is sufficient as the
+  // primary telegraph; the sim-side zones live on RiftInstance.bossDeathZones and
+  // are read directly by the offline renderer. A future wire enhancement can
+  // mirror zones per-snapshot for online rendering.
+  riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
+    return [];
+  }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};

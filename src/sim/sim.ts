@@ -9593,6 +9593,14 @@ export class Sim {
     };
   }
 
+  riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
+    const p = this.entities.get(this.primaryId);
+    if (!p) return [];
+    const inst = riftInstanceAtPos(this.ctx, p.pos);
+    if (!inst || inst.partyKey === null) return [];
+    return inst.bossDeathZones;
+  }
+
   get delveRun(): DelveRunInfo | null {
     return this.delveRunWire(this.primaryId) as DelveRunInfo | null;
   }

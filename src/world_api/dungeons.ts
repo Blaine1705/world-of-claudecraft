@@ -30,6 +30,16 @@ export interface RiftFloorView {
   tier: import('../sim/types').RiftTier | null;
 }
 
+/** A live lethal boss death zone on the current rift boss floor. Players inside
+ * the radius when `remaining` reaches zero take flat lethal damage. The renderer
+ * draws a pulsing red decal ring at (x, z). */
+export interface RiftBossDeathZoneView {
+  x: number;
+  z: number;
+  radius: number;
+  remaining: number;
+}
+
 export interface IWorldDungeons {
   enterDungeon(dungeonId: string): WorldInteractionOutcome;
   leaveDungeon(): WorldInteractionOutcome;
@@ -42,6 +52,10 @@ export interface IWorldDungeons {
   // renderer's camera occlusion inside a rift. Per world INSTANCE, not per seed;
   // 0 where no rift regions are registered (the online ClientWorld).
   riftCollisionToken: number;
+  // Live lethal death zones on the current rift boss floor (empty outside a rift or
+  // before the A-rank mechanic fires). The renderer draws a pulsing red decal ring
+  // at each zone position so players can see and react to the telegraph.
+  riftBossDeathZones(): RiftBossDeathZoneView[];
   dungeonDifficulty(): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty): void;
   // Buy one Heroic Quartermaster offer (src/sim/content/heroic_vendor.ts),
