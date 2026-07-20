@@ -45,8 +45,8 @@ import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import {
   characterRecklessnessActive,
-  characterSanguineAuraActive,
   characterSoulRendActive,
+  characterWeaponAuraMode,
 } from './character_effects';
 import {
   type AnimState,
@@ -5115,7 +5115,7 @@ export class Renderer {
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(characterSanguineAuraActive(e));
+      v.visual.setWeaponAura(characterWeaponAuraMode(e));
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)

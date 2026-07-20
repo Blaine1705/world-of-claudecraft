@@ -61,6 +61,10 @@ const DUP_KEY_SEP = '#';
 // appended the badge only when stacks > 1).
 const STACKS_SHOWN = '';
 const STACKS_HIDDEN = 'none';
+const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
+  'shaman_thunder_charges',
+  'shaman_warspirit_cadence',
+]);
 
 /** What the pool needs from the Hud: the icon-URL resolver, the tooltip renderer, and
  *  the tooltip-attach helper. All injected so a Node test drives the pool without the
@@ -169,7 +173,7 @@ export class AurasPainter {
     let rendered = 0;
     for (let i = 0; i < count; i++) {
       const s = slots[i];
-      if (!s.isDebuff && rendered >= cap) continue; // shed buff overflow; never a debuff
+      if (!s.isDebuff && rendered >= cap && !ALWAYS_VISIBLE_AURA_IDS.has(s.key)) continue;
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the
       // base key directly. If the base key is already claimed THIS frame, this is a

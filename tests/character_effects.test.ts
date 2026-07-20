@@ -3,6 +3,7 @@ import {
   characterRecklessnessActive,
   characterSanguineAuraActive,
   characterSoulRendActive,
+  characterWeaponAuraMode,
 } from '../src/render/character_effects';
 import type { Entity } from '../src/sim/types';
 
@@ -124,5 +125,31 @@ describe('character visual effects', () => {
     expect(characterRecklessnessActive(entity({ auras: [reckless] }))).toBe(true);
     expect(characterSanguineAuraActive(entity({ auras: [reckless] }))).toBe(false);
     expect(characterRecklessnessActive(entity({ auras: [sanguine] }))).toBe(false);
+  });
+
+  it('keeps Stonebound structurally visible and gives it priority over color-only auras', () => {
+    const stonebound = {
+      id: 'shaman_stonebound_armor',
+      name: 'Stonebound Armor',
+      kind: 'buff_armor_pct',
+      remaining: 300,
+      duration: 300,
+      value: 30,
+      sourceId: 1,
+      school: 'nature',
+    } as const;
+    const sanguine = {
+      id: 'sanguine_aura',
+      name: 'Sanguine Aura',
+      kind: 'sanguine',
+      remaining: 12,
+      duration: 12,
+      value: 0.1,
+      sourceId: 1,
+      school: 'physical',
+    } as const;
+    expect(characterWeaponAuraMode(entity({ auras: [] }))).toBe('none');
+    expect(characterWeaponAuraMode(entity({ auras: [sanguine] }))).toBe('sanguine');
+    expect(characterWeaponAuraMode(entity({ auras: [stonebound, sanguine] }))).toBe('stonebound');
   });
 });
