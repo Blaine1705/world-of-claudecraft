@@ -199,6 +199,10 @@ const MOB_IDS = [
   'rift_pact_acolyte',
   'rift_boss_ritualist',
   'rift_boss_pitlord',
+  // The Orkadia orc war-camp dungeon (src/sim/content/orkadia.ts).
+  'orkadia_grunt',
+  'orkadia_marauder',
+  'orkadia_warlord',
 ] as const;
 
 const NPC_IDS = [
@@ -377,6 +381,7 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
+  'orkadia',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

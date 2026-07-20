@@ -61,6 +61,7 @@ import {
   DRAKELANDS_ZONE,
 } from './content/drakelands';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { ORKADIA_DUNGEON_DEFS, ORKADIA_MOBS } from './content/orkadia';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_ITEMS,
@@ -347,6 +348,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...YUMI_MOBS,
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
+  ...ORKADIA_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,
@@ -797,7 +799,11 @@ export function instanceOrigin(dungeonIndex: number, slot: number): { x: number;
   return { x: INSTANCE_X_BASE + 900 + dungeonIndex * 600, z: -1250 + slot * 500 };
 }
 
-export const DUNGEONS: Record<string, DungeonDef> = { ...DUNGEON_DEFS, ...TEMPLE_DUNGEON_DEFS };
+export const DUNGEONS: Record<string, DungeonDef> = {
+  ...DUNGEON_DEFS,
+  ...TEMPLE_DUNGEON_DEFS,
+  ...ORKADIA_DUNGEON_DEFS,
+};
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
 

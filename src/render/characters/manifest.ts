@@ -224,6 +224,19 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// Tripo orc rig (Orkadia dungeon: black/blue/red orc GLBs). Ships Idle_Loop,
+// Walk_Loop, Sprint_Loop, Punch_Jab, Sword_Attack (Red also Sword_Idle); it has
+// no death or hit-react clip, so death maps to the neutral idle pose (visual.ts
+// clamps a one-shot on its last frame) and `hit` is omitted (spider/raptor rigs
+// do the same).
+const ORC_TRIPO: ClipMap = {
+  idle: 'Idle_Loop',
+  walk: 'Walk_Loop',
+  run: 'Sprint_Loop',
+  attack: ['Sword_Attack', 'Punch_Jab'],
+  death: 'Idle_Loop',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -1021,6 +1034,29 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2, // skin washes pink fast
   },
+  // Orkadia orc war-camp (Tripo GLBs). Low tint strength so each orc keeps its
+  // own baked black/blue/red identity; the mob `color` only nudges it.
+  mob_orc_grunt: {
+    url: `${CREATURES}/black_orc.glb`,
+    height: 2.3,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_orc_marauder: {
+    url: `${CREATURES}/blue_orc.glb`,
+    height: 2.4,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_orc_warlord: {
+    url: `${CREATURES}/red_orc.glb`,
+    height: 2.6,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
   mob_elemental: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.2,
@@ -1488,6 +1524,10 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Orkadia orc war-camp: each orc template renders its own Tripo GLB.
+  orkadia_grunt: 'mob_orc_grunt',
+  orkadia_marauder: 'mob_orc_marauder',
+  orkadia_warlord: 'mob_orc_warlord',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',
