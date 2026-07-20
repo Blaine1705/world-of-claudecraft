@@ -87,7 +87,7 @@ function healingFor(events: readonly SimEvent[], sourceId: number, targetId: num
   return total;
 }
 
-describe('Shaman v0.28 Spiritmend', () => {
+describe('Shaman v0.29 Spiritmend', () => {
   it('creates, enlarges, refreshes, and caps one owner-scoped Mending Current', () => {
     const { sim, healer, healerId, ally, allyId } = setup();
     castAndResolve(sim, healer, 'healing_wave', allyId);

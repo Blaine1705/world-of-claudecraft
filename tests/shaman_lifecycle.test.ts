@@ -20,7 +20,7 @@ function player(sim: Sim, pid: number): Entity {
   return entity;
 }
 
-describe('Shaman v0.28 state lifecycle', () => {
+describe('Shaman v0.29 state lifecycle', () => {
   it('clears every foreign spec engine on authoritative spec changes', () => {
     const sim = new Sim({ seed: 2841, playerClass: 'shaman' });
     sim.setPlayerLevel(20);

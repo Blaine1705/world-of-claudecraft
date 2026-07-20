@@ -1,10 +1,10 @@
-# Shaman Warspirit v0.28.0 PRD
+# Shaman Warspirit v0.29.0 PRD
 
 Status: Levy-approved owner design direction, pre-implementation
 Owner: Ryze
-Target: `release/v0.28.0`, PBE Wave A
+Target: `release/v0.29.0`, PBE Wave A
 Approval: Levy, confirmed 2026-07-20
-Parent design: [Shaman v0.28.0 Class Design](../design/shaman-v028-class-design.md)
+Parent design: [Shaman v0.29.0 Class Design](../design/shaman-v028-class-design.md)
 
 ## Specialization gate
 
@@ -171,7 +171,7 @@ The exact 18 class-wide choices are defined in the parent Shaman design.
 - Tier-independent aura, weapon, action-bar, and threat cues.
 
 PR #1980 is source material for Skyrend and shared proc primitives only. Every implementation slice
-targets and reconciles against `release/v0.28.0`.
+targets and reconciles against `release/v0.29.0`.
 
 ## Balance knobs
 

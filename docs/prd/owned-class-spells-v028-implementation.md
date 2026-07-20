@@ -6,12 +6,14 @@
 
 Status: owner implementation plan; Shaman slice approved, Hunter and Priest pending
 Owner: Ryze
-Target: `release/v0.28.0`, then the assigned PBE wave for each class
+Target: Shaman on `release/v0.29.0`; Hunter and Priest remain on their separately approved target,
+then the assigned PBE wave for each class
 
 ## Base and relationship to PR #2163
 
-This work is based on `release/v0.28.0` after PR #2163. The release branch contains merge commit
-`32415eb61509113731633b51f396c7c3c2dae222`, and this implementation branch descends from it.
+The approved Shaman implementation is based on `release/v0.29.0`, which retains PR #2163's
+specialization power floor. The original design companion was authored against v0.28.0; Shaman was
+retargeted to v0.29.0 before gameplay integration.
 
 PR #2163 remains the passive specialization power floor. This program does not fold new spells,
 rotation mechanics, procs, or talent rows into `SPEC_BASELINES`. The layers remain:

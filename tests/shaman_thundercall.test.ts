@@ -84,7 +84,7 @@ function earthenJoltDamage(
   return total;
 }
 
-describe('Shaman v0.28 Thundercall', () => {
+describe('Shaman v0.29 Thundercall', () => {
   it('builds one offensive charge on a valid Arc Bolt impact without changing Ward charges', () => {
     const { sim, shaman } = setup();
     sim.castAbility('lightning_shield', shaman.id);

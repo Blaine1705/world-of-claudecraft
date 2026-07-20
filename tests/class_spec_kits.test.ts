@@ -39,7 +39,7 @@ const SHARED_BACKBONE = [
   'ghost_wolf',
 ] as const;
 
-describe('Shaman v0.28 specialization ownership', () => {
+describe('Shaman v0.29 specialization ownership', () => {
   it('grants each exclusive action only to its owning specialization', () => {
     for (const owner of SHAMAN_SPECS) {
       const ownerKnown = knownAt(owner, 20);

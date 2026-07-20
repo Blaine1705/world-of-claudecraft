@@ -1,8 +1,8 @@
-# Shaman v0.28.0 Class Design
+# Shaman v0.29.0 Class Design
 
 Status: Levy-approved owner design direction, pre-implementation
 Owner: Ryze
-Target: v0.28.0, PBE Wave A
+Target: v0.29.0, PBE Wave A
 Approval: Levy, confirmed 2026-07-20
 
 ## Purpose
@@ -28,7 +28,7 @@ presentation, balance knobs, and PBE acceptance criteria:
 - [Spiritmend](../prd/shaman-spiritmend-restoration-v028.md)
 
 When a shared rule and a specialization PRD disagree, this class document wins. Existing ability
-behavior on `release/v0.28.0` remains canonical unless a PRD explicitly identifies an approved
+behavior on `release/v0.29.0` remains canonical unless a PRD explicitly identifies an approved
 change.
 
 ## Owner review decisions

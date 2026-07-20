@@ -1,10 +1,10 @@
-# Shaman Spiritmend v0.28.0 PRD
+# Shaman Spiritmend v0.29.0 PRD
 
 Status: Levy-approved owner design direction, pre-implementation
 Owner: Ryze
-Target: `release/v0.28.0`, PBE Wave A
+Target: `release/v0.29.0`, PBE Wave A
 Approval: Levy, confirmed 2026-07-20
-Parent design: [Shaman v0.28.0 Class Design](../design/shaman-v028-class-design.md)
+Parent design: [Shaman v0.29.0 Class Design](../design/shaman-v028-class-design.md)
 
 ## Specialization gate
 
@@ -147,7 +147,7 @@ The exact 18 class-wide choices are defined in the parent Shaman design.
 
 ## Implementation dependencies
 
-- Canonical Mending Waters and bouncing Cascading Mend from `release/v0.28.0`.
+- Canonical Mending Waters and bouncing Cascading Mend from `release/v0.29.0`.
 - One authoritative owner-scoped healing pool per Shaman and ally pair.
 - Deterministic ticking, addition, cap, refresh, expiry, and full consumption.
 - Cascading Mend hooks that preserve canonical bounce selection and consume each reached pool once.
@@ -156,7 +156,7 @@ The exact 18 class-wide choices are defined in the parent Shaman design.
 
 Returning Current is replaced by this Mending Current design. PR #1980 remains source material for generic
 bank, consume, cleanup, observation, and cue primitives only. Implementation targets and reconciles
-against `release/v0.28.0`.
+against `release/v0.29.0`.
 
 ## Balance knobs
 

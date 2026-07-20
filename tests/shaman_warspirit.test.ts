@@ -66,7 +66,7 @@ function galeheartEchoes(events: readonly SimEvent[]): SimEvent[] {
   );
 }
 
-describe('Shaman v0.28 Warspirit', () => {
+describe('Shaman v0.29 Warspirit', () => {
   it('triggers two non-recursive Galeheart echoes and one Stormcast every third landed step', () => {
     const { sim, shaman, target } = setup();
     castInstant(sim, shaman, GALEHEART_ID);
