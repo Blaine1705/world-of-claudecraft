@@ -8494,6 +8494,36 @@ export const zh_TW: EnTranslations = {
       "riftbound_band_of_guile": {
         "name": "詭詐裂隙之戒"
       },
+      "hoarfrost_edge": {
+        "name": "白霜之鋒"
+      },
+      "emberforge_gauntlets": {
+        "name": "燼爐護手"
+      },
+      "broodmother_carapace": {
+        "name": "育母甲殼"
+      },
+      "bonelord_mantle": {
+        "name": "骸骨領主襯肩"
+      },
+      "graskbreaker_girdle": {
+        "name": "格拉斯克碎擊腰帶"
+      },
+      "voidscar_handwraps": {
+        "name": "虛痕裹手"
+      },
+      "stormscale_treads": {
+        "name": "風暴鱗之靴"
+      },
+      "abyssal_loop": {
+        "name": "深淵之環"
+      },
+      "pactbound_vestments": {
+        "name": "縛約法袍"
+      },
+      "pitlords_cleaver": {
+        "name": "深淵領主的劈斧"
+      },
       "copper_ore": {
         "name": "銅礦石"
       },

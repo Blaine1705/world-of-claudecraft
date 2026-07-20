@@ -150,6 +150,7 @@ import {
   ITEMS,
   isArenaPos,
   isDelvePos,
+  isRiftPos,
   MOBS,
   migrateLegacyInstancePos,
   NPCS,
@@ -437,6 +438,7 @@ import {
   socketRiftGem as socketRiftGemImpl,
   upgradeRiftItem as upgradeRiftItemImpl,
 } from './rift/progression';
+import { riftHeroicTemplate, riftHeroicTuningFor, riftMechanicSuppressed } from './rift/ranks';
 import { generateRiftFloor } from './rift/rift_gen';
 import {
   riftLockpickAbort as riftLockpickAbortImpl,
@@ -6461,7 +6463,10 @@ export class Sim {
     )
       return;
     const hpFrac = mob.hp / Math.max(1, mob.maxHp);
-    if (tmpl.summonAdds) {
+    // Rank-gated rift boss kits: a mechanic listed in the template's
+    // rankMechanics past the spawn's budget never fires (rift/ranks.ts).
+    // Inert for every non-rift mob (no riftMechanicLimit on the entity).
+    if (tmpl.summonAdds && !riftMechanicSuppressed(mob, 'summonAdds')) {
       const thresholds = tmpl.summonAdds.atHpPct;
       while (mob.firedSummons < thresholds.length && hpFrac <= thresholds[mob.firedSummons]) {
         mob.firedSummons++;
@@ -6502,7 +6507,12 @@ export class Sim {
         fx: 'nova',
       });
     }
-    if (tmpl.desperateHeal && !mob.healedThisPull && hpFrac <= tmpl.desperateHeal.belowHpPct) {
+    if (
+      tmpl.desperateHeal &&
+      !riftMechanicSuppressed(mob, 'desperateHeal') &&
+      !mob.healedThisPull &&
+      hpFrac <= tmpl.desperateHeal.belowHpPct
+    ) {
       mob.healedThisPull = true;
       const heal = Math.min(mob.maxHp - mob.hp, Math.round(mob.maxHp * tmpl.desperateHeal.healPct));
       if (heal > 0) {
@@ -6815,23 +6825,41 @@ export class Sim {
     // 1yd cluster spread only enough to not stack on one point); ordinary summoners keep
     // the wider 3.5yd ring beside the boss.
     const spawnRadius = MOBS[boss.templateId]?.worldBoss ? 1 : 3.5;
+    // A rift boss's adds always match the dungeon: spawn at the BOSS's own
+    // level (the floor level, ~20s), never a roll of the template band, and on
+    // the heroic A/S ranks take the rift add tuning (rift/ranks.ts). The rank
+    // derives from the instance descriptor, so all hosts agree.
+    const riftInst = isRiftPos(boss.pos.x) ? riftInstanceAtPos(this.ctx, boss.pos) : null;
+    const riftTuning = riftInst ? riftHeroicTuningFor(riftInst.baseLevel) : null;
     for (let k = 0; k < count; k++) {
       const ang = (k / count) * Math.PI * 2 + 0.7;
       const pos = this.groundPos(
         boss.pos.x + Math.sin(ang) * spawnRadius,
         boss.pos.z + Math.cos(ang) * spawnRadius,
       );
+      // The band roll stays even when a rift overrides the level below, so the
+      // rng draw count and order never depend on where the boss stands.
       const rolledLevel = this.rng.int(template.minLevel, template.maxLevel);
       const difficulty = inst?.difficulty ?? 'normal';
-      const addTemplate = mobTemplateForDungeonDifficulty(
+      let addTemplate = mobTemplateForDungeonDifficulty(
         template,
         inst?.dungeonId ?? '',
         difficulty,
-        { summonedAdd: true },
+        {
+          summonedAdd: true,
+        },
       );
-      const level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
+      let level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
+      if (riftInst) {
+        level = boss.level;
+        if (riftTuning) addTemplate = riftHeroicTemplate(template, riftTuning);
+      }
       const add = createMob(this.nextId++, addTemplate, level, pos);
       applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty, { summonedAdd: true });
+      if (riftTuning) {
+        add.mechanicDamageMult = riftTuning.addDamageMultiplier;
+        add.mechanicHealMult = riftTuning.healthMultiplier;
+      }
       // The add is anchored where it ERUPTED (createMob already set spawnPos to the
       // spawn point beside the boss): a boss kited far from HIS original spawn must
       // not hatch adds that are instantly past their own leash and evade home without

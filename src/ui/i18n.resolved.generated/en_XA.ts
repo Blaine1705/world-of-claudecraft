@@ -8494,6 +8494,36 @@ export const en_XA: EnTranslations = {
       "riftbound_band_of_guile": {
         "name": "[Ŕíƒţƀóúñð Ɓáñð óƒ Ĝúíļé]"
       },
+      "hoarfrost_edge": {
+        "name": "[Ĥóáŕƒŕóšţ Éðĝé]"
+      },
+      "emberforge_gauntlets": {
+        "name": "[Éɱƀéŕƒóŕĝé Ĝáúñţļéţš]"
+      },
+      "broodmother_carapace": {
+        "name": "[Ɓŕóóðɱóţĥéŕ Çáŕáþáçé]"
+      },
+      "bonelord_mantle": {
+        "name": "[Ɓóñéļóŕð Ɱáñţļé]"
+      },
+      "graskbreaker_girdle": {
+        "name": "[Ĝŕášķƀŕéáķéŕ Ĝíŕðļé]"
+      },
+      "voidscar_handwraps": {
+        "name": "[Ʋóíðšçáŕ Ĥáñðŵŕáþš]"
+      },
+      "stormscale_treads": {
+        "name": "[Šţóŕɱšçáļé Ţŕéáðš]"
+      },
+      "abyssal_loop": {
+        "name": "[Áƀýššáļ Ļóóþ]"
+      },
+      "pactbound_vestments": {
+        "name": "[Þáçţƀóúñð Ʋéšţɱéñţš]"
+      },
+      "pitlords_cleaver": {
+        "name": "[Þíţ Ļóŕð'š Çļéáʋéŕ]"
+      },
       "copper_ore": {
         "name": "[Çóþþéŕ Óŕé]"
       },

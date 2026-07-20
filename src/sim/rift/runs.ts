@@ -29,6 +29,12 @@ import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
 import { addRiftProgressionLoot } from './progression';
 import { claimRiftFirstClear, markRiftEventActive } from './race';
+import {
+  RIFT_RANK_MECHANIC_BUDGET,
+  riftHeroicTemplate,
+  riftHeroicTuningFor,
+  riftRankForBaseLevel,
+} from './ranks';
 import { generateRiftFloor, riftLiftAt } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
 import type { RiftInstance, RiftRoller } from './types';
@@ -41,6 +47,7 @@ const SEQ_TRIGGER_RADIUS = 2.6; // walk this close to step a sequence rune
 // Reach the Blood Orb from outside its altar's collider (altar r 1.8 + body 0.6).
 const ORB_TRIGGER_RADIUS = 3.2;
 const ORB_NOTICE_COOLDOWN = 6; // seconds between "the orb is sealed" nudges
+const SEQ_RESET_NOTICE_COOLDOWN = 4; // seconds between "the runes go dark" reset notices
 const BOULDER_PUSH_RADIUS = 2.0; // shove a boulder when this close and moving into it
 const PAD_RADIUS = 2.2; // a boulder counts as socketed within this of its pad
 const ICE_SLIDE_SPEED = 13; // yd/s glide across the ice (~1.85x run: frictionless momentum)
@@ -232,16 +239,31 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.orbId = null;
   inst.orbActive = false;
 
+  // A- and S-rank rifts are heroic scaled: a spawn-time stat transform plus the
+  // per-entity mechanic multipliers, mirroring instances/difficulty.ts. The rank
+  // derives from the descriptor's baseLevel, so every host regenerates it.
+  const rank = riftRankForBaseLevel(inst.baseLevel);
+  const heroic = riftHeroicTuningFor(inst.baseLevel);
   for (const spawn of floor.spawns) {
     const template = MOBS[spawn.templateId];
     if (!template) continue;
     const mob = createMob(
       ctx.nextId++,
-      template,
+      heroic ? riftHeroicTemplate(template, heroic) : template,
       spawn.level,
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
     if (spawn.name) mob.name = spawn.name;
+    if (heroic) {
+      // Mechanic damage/heal numbers are read from the base MOBS table at fire
+      // time, so the template transform cannot reach them; the per-entity
+      // multipliers apply AFTER each rng draw (draw order identical across ranks).
+      mob.mechanicDamageMult = heroic.damageMultiplier;
+      mob.mechanicHealMult = heroic.healthMultiplier;
+    }
+    // Rank-gated boss kits: how many entries of the template's rankMechanics
+    // list are live on this spawn (C=1 .. S=4). Trash carries no budget.
+    if (spawn.boss || spawn.miniboss) mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
     // Per-run re-grade: a fresh tint (and a little scale variance) so the same
     // template reads as a different creature across rifts. Model + mechanics are
     // unchanged (both read from the static template by id).
@@ -288,7 +310,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
         spawnObj('rift_boulder_pad', obj.name, obj.x, obj.z);
         break;
       case 'treasure': {
-        // Hidden reward chest behind an illusion wall. Lootable so the interact
+        // Off-path reward chest tucked against a wall. Lootable so the interact
         // F-scan finds it; opening it (interaction.ts) rolls loot, not a lockpick.
         const tid = spawnObj('rift_treasure', obj.name, obj.x, obj.z);
         const t = ctx.entities.get(tid);
@@ -790,14 +812,30 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
             });
           }
         } else if (i > inst.seqStep) {
-          inst.seqStep = 0;
-          for (const rid of inst.seqRuneIds) {
-            const rr = ctx.entities.get(rid);
-            if (rr) rr.templateId = 'rift_seq_rune';
+          // A wrong (skipped-ahead) step wipes the progress. Announce a real
+          // wipe always, but rate limit the no-progress case: a player simply
+          // STANDING on a later rune re-enters this branch every tick, and the
+          // un-throttled version chanted "begin again" 20 times a second.
+          const hadProgress = inst.seqStep > 0;
+          if (hadProgress) {
+            inst.seqStep = 0;
+            for (const rid of inst.seqRuneIds) {
+              const rr = ctx.entities.get(rid);
+              if (rr) rr.templateId = 'rift_seq_rune';
+            }
           }
-          riftFx(ctx, rune.pos.x, rune.pos.z, 'shadow'); // the runes snuff out
-          for (const pid of instancePlayerIds(ctx, inst)) {
-            ctx.emit({ type: 'log', text: 'The runes go dark. Begin again.', color: '#a9c', pid });
+          const throttled = ctx.time < (p.riftSeqResetAt ?? -Infinity) + SEQ_RESET_NOTICE_COOLDOWN;
+          if (hadProgress || !throttled) {
+            p.riftSeqResetAt = ctx.time;
+            riftFx(ctx, rune.pos.x, rune.pos.z, 'shadow'); // the runes snuff out
+            for (const pid of instancePlayerIds(ctx, inst)) {
+              ctx.emit({
+                type: 'log',
+                text: 'The runes go dark. Begin again.',
+                color: '#a9c',
+                pid,
+              });
+            }
           }
         }
         break;
@@ -941,9 +979,9 @@ function openDescent(ctx: SimContext, inst: RiftInstance): void {
   }
 }
 
-/** Open an off-path hidden treasure chest on interact: roll real item loot (scaled
+/** Open an off-path treasure chest on interact: roll real item loot (scaled
  * by the run's rank), grant it to the picker, and pop the shared loot overlay. No
- * lockpick minigame - just the reward for exploring behind an illusion wall. */
+ * lockpick minigame - just the reward for exploring off the main aisle. */
 export function riftOpenTreasure(ctx: SimContext, objectId: number, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -1217,12 +1255,17 @@ function tickRiftHazards(
 }
 
 // Roll one lane's boulder forward a tick and bowl over anyone it overtakes.
+// C/B ranks chip a chunk of max HP; on the heroic A/S ranks a boulder is a
+// ONE-SHOT mechanic (an unblockable killing blow), so the lane must be dodged
+// or jumped, never tanked. Lava deliberately stays damage-over-time at every
+// rank (tickRiftHazards): a burn is a mistake tax, a boulder is an execution.
 function tickRiftRollers(
   ctx: SimContext,
   inst: RiftInstance,
   origin: { x: number; z: number },
   rollers: RiftRoller[],
 ): void {
+  const lethal = riftHeroicTuningFor(inst.baseLevel) !== null;
   for (let i = 0; i < inst.rollerIds.length && i < rollers.length; i++) {
     const e = ctx.entities.get(inst.rollerIds[i]);
     if (!e) continue;
@@ -1260,7 +1303,7 @@ function tickRiftRollers(
       ctx.dealDamage(
         null,
         p,
-        Math.max(1, Math.round(p.maxHp * 0.07)),
+        lethal ? p.hp + p.maxHp : Math.max(1, Math.round(p.maxHp * 0.07)),
         false,
         'physical',
         'Rolling Boulder',

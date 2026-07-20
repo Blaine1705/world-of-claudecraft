@@ -117,6 +117,10 @@ describe('infernal citadel: seed selection', () => {
   // ORDER) would silently reshape every procedural rift with every other test green.
   // This digest was captured on the BASE branch, before the set-piece existed: it must
   // never change unless procedural rift geometry is deliberately re-tuned.
+  // DELIBERATE re-pin (phantom-wall removal): the treasure pocket keeps the same
+  // draws but no longer emits an illusion wall into the layout, so the serialized
+  // floors changed while every collider, spawn, and object position stayed put
+  // (the objective-placement sweep in rift_gen.test.ts pins those directly).
   it('regenerates procedural floors byte-identically to the pre-set-piece baseline', () => {
     // Hand-picked on the base branch, so the seed list itself cannot drift with the
     // set-piece roll.
@@ -132,7 +136,7 @@ describe('infernal citadel: seed selection', () => {
       }
     }
     expect(h.digest('hex')).toBe(
-      '592d530c3c35c9c621513460fb5b1d6ee94e6fc9bd6e83f4b259bc444bc06c71',
+      '572a8fe4d5a0e7dcd28679ff5bcd4e303f87c0c50c444c3827d15ab84e839145',
     );
   });
 });
@@ -379,11 +383,10 @@ describe('infernal citadel: authored geometry', () => {
     expect(Math.hypot(0, (orb as { z: number }).z - standZ)).toBeLessThan(3.2);
   });
 
-  it('gives the illusion wall no collider (you walk through to the cache)', () => {
-    const panel = floor.layout.illusionWalls?.[0];
-    expect(panel).toBeDefined();
-    const p = panel as { x: number; z: number };
-    expect(clears(colliders, p.x, p.z, 0.1)).toBe(true);
+  it('has no phantom walls, and the relic cache stands reachable in the open', () => {
+    // Every citadel wall is solid: the relic gallery's collider-less illusion
+    // panel is gone rift-wide (a wall that renders solid must BE solid).
+    expect(floor.layout.illusionWalls ?? []).toHaveLength(0);
     const cache = floor.objects.find((o) => o.kind === 'treasure' && o.x > 30);
     expect(cache).toBeDefined();
     expect(clears(colliders, (cache as { x: number }).x, (cache as { z: number }).z)).toBe(true);

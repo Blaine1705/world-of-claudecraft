@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5174';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -27,19 +28,10 @@ page.on('console', (m) => {
 
 console.log('loading + entering offline...');
 await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
-await sleep(800);
-// Offline flow: reveal the offline panel, name the character, enter the world.
-await page.evaluate(() => {
-  document.querySelector('#btn-offline')?.click();
-});
-await sleep(400);
-await page.evaluate(() => {
-  const n = document.querySelector('#char-name');
-  if (n) n.value = 'Rifter';
-  document.querySelector('#btn-start-offline')?.click();
-});
-
-await page.waitForFunction(() => !!window.__game?.world?.player, { timeout: 20000, polling: 200 });
+// The one canonical pre-game entry flow (offline click-through, class card, the
+// Welcome Screen continue, intro/tutorial/camera-prompt dismissal).
+await enterOfflineGame(page, { charName: 'Rifter' });
+await page.waitForFunction(() => !!window.__game?.world?.player, { timeout: 60000, polling: 200 });
 await sleep(2500); // let assets + first frames settle
 // God mode so the tester survives the group-tuned elites long enough to shoot.
 await page.evaluate(() => window.__game.world.chat('/dev god', window.__game.world.player.id));

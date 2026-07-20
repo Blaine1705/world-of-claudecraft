@@ -225,6 +225,40 @@ describe('rift generator: playability', () => {
   });
 });
 
+describe('rift generator: objectives are never inside (or hidden by) a wall', () => {
+  // Per-kind prop clearance radii mirroring the toClear margins the generator
+  // passes when it places each interactable (a rune monolith is fatter than a
+  // body). Every objective must clear every collider by its prop radius, and no
+  // layout may carry a phantom (illusion) wall, so collider clearance IS visual
+  // clearance: a rune can never render embedded in, or tucked behind, a wall.
+  const PROP_R: Record<string, number> = {
+    rune_pylon: 1.7,
+    seq_rune: 1.5,
+    treasure: 1.0,
+  };
+
+  it('every interactable clears the walls by its prop radius, at every rank', () => {
+    for (const baseLevel of [20, 22, 25, 28]) {
+      for (let s = 0; s < 60; s++) {
+        if (isSetPieceSeed(s)) continue;
+        const n = riftFloorCount(s);
+        for (let f = 0; f < n; f++) {
+          const fl = generateRiftFloor(s, baseLevel, f);
+          const colliders = riftFloorColliders(s, baseLevel, f);
+          expect(fl.layout.illusionWalls ?? [], `phantom wall seed ${s} f${f}`).toHaveLength(0);
+          for (const ob of fl.objects) {
+            const r = PROP_R[ob.kind] ?? BODY_R;
+            expect(
+              clears(colliders, ob.x, ob.z, r),
+              `${ob.kind} seed ${s} f${f} base ${baseLevel} @${ob.x},${ob.z}`,
+            ).toBe(true);
+          }
+        }
+      }
+    }
+  });
+});
+
 describe('rift generator: balance', () => {
   it('floor level rises monotonically with depth and stays in band', () => {
     for (let s = 0; s < 60; s++) {

@@ -8494,6 +8494,36 @@ export const ru_RU: EnTranslations = {
       "riftbound_band_of_guile": {
         "name": "Кольцо разлома хитрости"
       },
+      "hoarfrost_edge": {
+        "name": "Инеистый клинок"
+      },
+      "emberforge_gauntlets": {
+        "name": "Рукавицы Пепельной кузни"
+      },
+      "broodmother_carapace": {
+        "name": "Панцирь матки выводка"
+      },
+      "bonelord_mantle": {
+        "name": "Наплечье костяного владыки"
+      },
+      "graskbreaker_girdle": {
+        "name": "Пояс сокрушителя Граска"
+      },
+      "voidscar_handwraps": {
+        "name": "Обмотки Пустотного шрама"
+      },
+      "stormscale_treads": {
+        "name": "Ботинки грозовой чешуи"
+      },
+      "abyssal_loop": {
+        "name": "Кольцо бездны"
+      },
+      "pactbound_vestments": {
+        "name": "Облачение пакта"
+      },
+      "pitlords_cleaver": {
+        "name": "Тесак повелителя преисподней"
+      },
       "copper_ore": {
         "name": "Медная руда"
       },

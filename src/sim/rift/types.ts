@@ -130,7 +130,7 @@ export type RiftObjectKind =
   | 'exit'
   | 'rune_pylon'
   | 'chest'
-  | 'treasure' // an off-path reward chest hidden behind an illusion wall (interact -> loot)
+  | 'treasure' // an off-path reward chest tucked against a wall (interact -> loot)
   | 'gate' // a portcullis blocking the nave until its switch is thrown
   | 'switch' // a pressure plate that raises the linked gate (Pokemon-style)
   // Puzzle nodes:

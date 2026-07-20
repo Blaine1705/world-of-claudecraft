@@ -8494,6 +8494,36 @@ export const ko_KR: EnTranslations = {
       "riftbound_band_of_guile": {
         "name": "기민함의 균열결속 반지"
       },
+      "hoarfrost_edge": {
+        "name": "서리서린 칼날"
+      },
+      "emberforge_gauntlets": {
+        "name": "잉걸불 화로 건틀릿"
+      },
+      "broodmother_carapace": {
+        "name": "무리어미 갑각"
+      },
+      "bonelord_mantle": {
+        "name": "뼈군주 어깨걸이"
+      },
+      "graskbreaker_girdle": {
+        "name": "그라스크 분쇄 허리띠"
+      },
+      "voidscar_handwraps": {
+        "name": "공허상흔 손싸개"
+      },
+      "stormscale_treads": {
+        "name": "폭풍비늘 장화"
+      },
+      "abyssal_loop": {
+        "name": "심연의 고리"
+      },
+      "pactbound_vestments": {
+        "name": "서약의 예복"
+      },
+      "pitlords_cleaver": {
+        "name": "구덩이 군주의 도끼"
+      },
       "copper_ore": {
         "name": "구리 광석"
       },

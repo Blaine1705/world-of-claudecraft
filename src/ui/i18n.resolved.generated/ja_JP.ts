@@ -8494,6 +8494,36 @@ export const ja_JP: EnTranslations = {
       "riftbound_band_of_guile": {
         "name": "機略のリフトバウンドリング"
       },
+      "hoarfrost_edge": {
+        "name": "白霜の刃"
+      },
+      "emberforge_gauntlets": {
+        "name": "燼炉の籠手"
+      },
+      "broodmother_carapace": {
+        "name": "ブルードマザーの甲殻"
+      },
+      "bonelord_mantle": {
+        "name": "ボーンロードのマント"
+      },
+      "graskbreaker_girdle": {
+        "name": "グラスク砕きの腰帯"
+      },
+      "voidscar_handwraps": {
+        "name": "ヴォイドスカーの手巻き"
+      },
+      "stormscale_treads": {
+        "name": "ストームスケイルの靴"
+      },
+      "abyssal_loop": {
+        "name": "深淵の輪"
+      },
+      "pactbound_vestments": {
+        "name": "盟約の法衣"
+      },
+      "pitlords_cleaver": {
+        "name": "ピットロードの大鉈"
+      },
       "copper_ore": {
         "name": "銅鉱石"
       },

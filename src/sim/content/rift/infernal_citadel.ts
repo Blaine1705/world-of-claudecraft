@@ -19,7 +19,7 @@
 //     R6 Stairhead         -> take the Rift Descent down to the pit
 //     P2 The Pit           -> kill Azgorath; the way home tears open
 //   R2 (relic gallery) and R5 (bone chamber) are optional side rooms; the relic
-//   cache hides behind an illusion wall, the pit's forge wing holds another.
+//   gallery and the pit's forge wing each hold an off-path reward cache.
 
 import type { AuthoredDecor, AuthoredDoor, AuthoredRoom } from '../../dungeon_layout';
 import { layoutColliders } from '../../dungeon_layout';
@@ -313,10 +313,10 @@ export function buildInfernalCitadelFloor(
     rooms: (pit ? INFERNAL_PIT_ROOMS : INFERNAL_ROOMS).map((r) => ({ ...r })),
     doors: (pit ? INFERNAL_PIT_DOORS : INFERNAL_DOORS).map((d) => ({ ...d })),
     decor: (pit ? INFERNAL_PIT_DECOR : INFERNAL_DECOR).map((d) => ({ ...d })),
-    // The relic gallery's alcove hides behind a wall panel that renders solid but
-    // carries no collider (layoutColliders never emits illusion walls), so pushing
-    // into the "dead end" reveals the cache behind it.
-    illusionWalls: pit ? [] : [{ x: 31, z: 16, hw: 0.6, hd: 3.2 }],
+    // Every citadel wall is solid: the relic gallery's cache used to hide behind
+    // a collider-less illusion panel, but phantom walls are gone rift-wide, so
+    // the alcove and its cache now stand in the open.
+    illusionWalls: [],
   };
 
   const spawns: RiftSpawn[] = (pit ? PIT_TRASH_PLAN : TRASH_PLAN).map(([templateId, x, z]) => ({

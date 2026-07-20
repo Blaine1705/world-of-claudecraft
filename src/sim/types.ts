@@ -1178,6 +1178,15 @@ export interface MobTemplate {
   yells?: { engage?: string; summon?: string; enrage?: string };
   // Boss mechanic: spawn adds when hp first drops below each threshold (descending fractions).
   summonAdds?: { mobId: string; count: number; atHpPct: number[] };
+  // Rift rank gating: the boss's headline mechanics in unlock order. A rift boss
+  // spawned at rank C runs only the first entry, B the first two, A three, S all
+  // four (src/sim/rift/ranks.ts riftMechanicSuppressed, consulted at each fire
+  // site). Absent (every non-rift template) or on an entity with no
+  // riftMechanicLimit, nothing is suppressed. Keys name MobTemplate mechanic
+  // fields driven by the timed/threshold runners (aoePulse, aoeSlow, bigCast,
+  // stoneskin, stomp, terrify, summonAdds, desperateHeal); on-hit affixes stay
+  // ungated flavor.
+  rankMechanics?: readonly string[];
   // Boss mechanic: damage multiplier (and optional swing-speed haste) once hp
   // drops below the threshold. hasteMult > 1 makes the enraged mob swing faster.
   enrage?: { belowHpPct: number; dmgMult: number; hasteMult?: number };
@@ -3054,6 +3063,14 @@ export interface Entity {
   // Cooldown gate (sim time) between rolling-boulder knockbacks, so a single pass
   // shoves + chips once rather than every tick of overlap.
   riftRollerUntil?: number;
+  // Sim time of the last "the runes go dark" sequence-reset notice shown to this
+  // player, so standing on a wrong rune re-announces at most once per cooldown
+  // instead of every tick (rift/runs.ts).
+  riftSeqResetAt?: number;
+  // Rift boss rank budget: how many entries of the template's `rankMechanics`
+  // list are live on THIS spawn (C=1, B=2, A=3, S=4; rift/ranks.ts). Undefined
+  // (every non-rift mob, and rift trash) suppresses nothing.
+  riftMechanicLimit?: number;
   // misc
   dead: boolean;
   // Ghost/spirit state for the WoW-style death -> corpse-run -> resurrect loop.

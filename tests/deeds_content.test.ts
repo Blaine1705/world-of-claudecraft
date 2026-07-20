@@ -32,7 +32,7 @@ import {
   MILESTONE_DEED_TO_LEGACY,
   VISITED_MARK_NAMESPACES,
 } from '../src/sim/deeds';
-import { RIFT_LEVEL_CAP } from '../src/sim/rift/rift_gen';
+import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
@@ -237,17 +237,21 @@ describe('retro fallback proof sets stay anchored to the real tables', () => {
     }
   });
 
-  it('the creditable mob-level ceiling is the heroic pin', () => {
+  it('the creditable mob-level ceiling is the S-rank rift pin', () => {
     // Giantslayer's stranded heal keys on the highest level a creditable mob
-    // can ever spawn at. Heroic instances pin every mob to one shared level;
-    // outside heroic no spawnable template exceeds the player cap. The only
-    // templates authored above the ceiling can never be credited: warlock
-    // and mage pets sync to their owner's level and die outside kill credit
-    // (combat/damage.ts owned-pet early return), and the Yumi cat's damage
-    // is intercepted before the death path (social/yumi.ts).
+    // can ever spawn at. S-rank rift floors run mobs up to RIFT_MAX_MOB_LEVEL
+    // (the game-wide ceiling; at 25 the +5-level kill is legitimately earnable
+    // at the level-20 cap, so the stranded retro-grant no longer fires there);
+    // heroic instances pin every mob to one shared level below it; outside
+    // those no spawnable template exceeds the player cap. The only templates
+    // authored above the ceiling can never be credited: warlock and mage pets
+    // sync to their owner's level and die outside kill credit (combat/damage.ts
+    // owned-pet early return), and the Yumi cat's damage is intercepted before
+    // the death path (social/yumi.ts).
     const heroicLevels = Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.level);
-    expect(Math.max(...heroicLevels)).toBe(MAX_CREDITABLE_MOB_LEVEL);
-    expect(RIFT_LEVEL_CAP).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(RIFT_MAX_MOB_LEVEL).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(Math.max(...heroicLevels)).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
+    expect(RIFT_LEVEL_CAP).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     const neverCreditable = new Set([
       ...Object.keys(WARLOCK_PET_MOBS),
       ...Object.keys(MAGE_PET_MOBS),

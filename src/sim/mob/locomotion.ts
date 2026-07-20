@@ -32,6 +32,7 @@ import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { riftMechanicSuppressed } from '../rift/ranks';
 import type { SimContext } from '../sim_context';
 import { clearThreat, stealthDetectionRadius } from '../threat';
 import {
@@ -439,9 +440,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 }
 
 function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
+  // Every driver below consults riftMechanicSuppressed: a rift boss spawned at
+  // a low rank runs only the head of its template's rankMechanics list (C=1 ..
+  // S=4, rift/ranks.ts). Inert for every non-rift mob.
   // Boss/miniboss pulse mechanic.
   const pulse = MOBS[mob.templateId]?.aoePulse;
-  if (pulse) {
+  if (pulse && !riftMechanicSuppressed(mob, 'aoePulse')) {
     mob.pulseTimer -= DT;
     if (mob.pulseTimer <= 0) {
       mob.pulseTimer = pulse.every;
@@ -470,7 +474,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // damages nearby players. Telegraphed via createMob, which seeds stompTimer to
   // one full interval so the first slam never lands the instant combat opens.
   const stomp = MOBS[mob.templateId]?.stomp;
-  if (stomp) {
+  if (stomp && !riftMechanicSuppressed(mob, 'stomp')) {
     mob.stompTimer -= DT;
     if (mob.stompTimer <= 0) {
       mob.stompTimer = stomp.every;
@@ -511,7 +515,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // keeps meleeing while the bar fills, then the spell lands as an AoE nova on
   // every living player in radius.
   const bigCast = MOBS[mob.templateId]?.bigCast;
-  if (bigCast) {
+  if (bigCast && !riftMechanicSuppressed(mob, 'bigCast')) {
     if (mob.castingAbility === bigCast.castId) {
       mob.castRemaining = Math.max(0, mob.castRemaining - DT);
       if (mob.castRemaining <= 0) {
@@ -555,7 +559,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // seeds stoneskinTimer to one full interval so the first barrier never snaps up
   // the instant combat opens.
   const stoneskin = MOBS[mob.templateId]?.stoneskin;
-  if (stoneskin) {
+  if (stoneskin && !riftMechanicSuppressed(mob, 'stoneskin')) {
     mob.stoneskinTimer -= DT;
     if (mob.stoneskinTimer <= 0) {
       mob.stoneskinTimer = stoneskin.every;
@@ -583,7 +587,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // Banshee's Wail: a periodic, telegraphed scream that terrifies nearby players
   // into fleeing. It applies the `fear_incap` aura that `updateFearMovement` drives.
   const terrify = MOBS[mob.templateId]?.terrify;
-  if (terrify) {
+  if (terrify && !riftMechanicSuppressed(mob, 'terrify')) {
     mob.terrifyTimer -= DT;
     if (mob.terrifyTimer <= 0) {
       mob.terrifyTimer = terrify.every;
@@ -630,7 +634,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
 // cadence timer advances exactly once per tick.
 function pulseAntiKiteSnare(ctx: SimContext, mob: Entity): void {
   const aoeSlow = MOBS[mob.templateId]?.aoeSlow;
-  if (!aoeSlow) return;
+  if (!aoeSlow || riftMechanicSuppressed(mob, 'aoeSlow')) return;
   mob.aoeSlowTimer -= DT;
   if (mob.aoeSlowTimer > 0) return;
   mob.aoeSlowTimer = aoeSlow.every;

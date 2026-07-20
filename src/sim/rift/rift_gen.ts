@@ -26,6 +26,7 @@ import {
 import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '../geometry2d';
 import { Rng } from '../rng';
 import { authoredLiftAt } from './authored';
+import { riftFloorLevel } from './ranks';
 import { buildStyle, mixSeed } from './style';
 import type {
   RiftFloorPlan,
@@ -43,11 +44,13 @@ import { applyRiftUpgrade } from './upgrade';
 // ---- Tuning -----------------------------------------------------------------
 const MIN_FLOORS = 3;
 const MAX_FLOORS = 6;
-// Rift mobs never exceed this level, even on a deep S-rank floor. The player cap is
-// MAX_LEVEL (20) and 24+ is effectively unreachable, so an S-rank baseLevel (28) +
-// deep floorIndex would spawn mobs the player can never match; clamp so the hardest
-// rift tops out a hair above the cap (22) and stays a fair, if brutal, fight.
-export const RIFT_LEVEL_CAP = 22;
+
+// Mob levels are rank-banded in rift/ranks.ts: C/B ramp under the classic
+// fairness cap (22), A holds 22 and gets its bite from the heroic stat
+// transform, and S-rank floors run 23 to 25 by design (re-exported here for
+// the callers that historically read the cap off the generator).
+export { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from './ranks';
+
 const ENTRY_Z_OFFSET = 8; // player arrival, past the entrance porch
 const AISLE_HALF = 5.5; // centre column kept clear of all obstacles (walkable spine)
 const BODY_R = 0.6; // player body radius used for clearance checks
@@ -521,21 +524,18 @@ function planObjects(
     }
   }
 
-  // Off-path hidden treasure: ~45% of non-boss floors tuck a reward chest into a
-  // wall pocket behind an illusion (fake) wall you walk THROUGH to reach it. The
-  // fake wall renders as solid stone but carries no collider (see layoutColliders),
-  // so a curious explorer who pushes into the "dead end" is rewarded.
+  // Off-path treasure: ~45% of non-boss floors tuck a reward chest against a wall
+  // off the main aisle. It used to hide behind an illusion (fake) wall, but every
+  // rift wall is solid now (phantom walls confused more than they delighted and
+  // could visually swallow objectives), so the chest simply sits in the open as a
+  // reward for hugging the walls.
   if (rng.chance(0.45)) {
     const side = rng.chance(0.5) ? -1 : 1;
     const zT = Math.round(layout.zMin + rng.range(32, Math.max(32, layout.dais.z - 26)));
     const localW = halfWidthAt(zT);
     if (localW >= AISLE_HALF + 8) {
-      // Chest sits in the pocket (toClear guarantees it is off the wall); the fake
-      // wall stands between it and the aisle (nearer the spine), so you push through
-      // the fake wall to reach the chest against the real wall.
+      // toClear guarantees the chest is off the wall (and every other collider).
       const chest = toClear(colliders, side * (localW - 4), zT, 1.0);
-      layout.illusionWalls = layout.illusionWalls ?? [];
-      layout.illusionWalls.push({ x: side * (localW - 6.5), z: zT, hw: 2.6, hd: 2.4 });
       out.push({ kind: 'treasure', x: chest.x, z: chest.z, name: 'Hidden Cache' });
     }
   }
@@ -716,7 +716,7 @@ function upgradedFloor(base: RiftFloorPlan, upgrade?: RiftUpgradeManifest | null
 const CACHE_LIMIT = 128;
 
 function floorLevelFor(baseLevel: number, floorIndex: number): number {
-  return Math.max(1, Math.min(RIFT_LEVEL_CAP, Math.round(baseLevel) + floorIndex));
+  return riftFloorLevel(baseLevel, floorIndex);
 }
 
 /** The rift as a whole: name + floor count (derived from seed + baseLevel). */

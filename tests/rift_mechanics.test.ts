@@ -158,36 +158,40 @@ describe('rift mechanics: ice-slide goal', () => {
   });
 });
 
-describe('rift mechanics: off-path treasure behind an illusion wall', () => {
-  it('some floors hide a treasure chest fronted by a collider-less illusion wall', () => {
+describe('rift mechanics: off-path treasure (every wall is solid)', () => {
+  it('some floors carry an off-path treasure chest and NO floor carries a phantom wall', () => {
     let withTreasure = 0;
-    let withIllusion = 0;
-    for (let s = 1; s <= 200; s++) {
-      const f = generateRiftFloor(s, 20, 0);
-      if (f.objects.some((o) => o.kind === 'treasure')) withTreasure++;
-      if ((f.layout.illusionWalls?.length ?? 0) > 0) withIllusion++;
+    for (const baseLevel of [20, 28]) {
+      for (let s = 1; s <= 200; s++) {
+        const fc = generateRiftFloor(s, baseLevel, 0).floorCount;
+        for (let fi = 0; fi < fc; fi++) {
+          const f = generateRiftFloor(s, baseLevel, fi);
+          if (f.objects.some((o) => o.kind === 'treasure')) withTreasure++;
+          // Phantom (illusion) walls are gone rift-wide: a wall that renders
+          // solid must BE solid, so no generated layout may carry one.
+          expect(f.layout.illusionWalls ?? [], `seed ${s} floor ${fi}`).toHaveLength(0);
+        }
+      }
     }
-    expect(withTreasure, 'some floors hide a treasure').toBeGreaterThan(0);
-    // Every treasure floor also gets its concealing illusion wall.
-    expect(withIllusion).toBe(withTreasure);
+    expect(withTreasure, 'some floors still carry an off-path treasure').toBeGreaterThan(0);
   });
 
-  it('illusion walls are render-only: no collider backs them, so they are walk-through', () => {
-    const seed = seedWithFloor0((f) => (f.layout.illusionWalls?.length ?? 0) > 0);
+  it('every treasure chest stands in the open, clear of all wall/prop colliders', () => {
+    const seed = seedWithFloor0((f) => f.objects.some((o) => o.kind === 'treasure'));
     const floor = generateRiftFloor(seed, 20, 0);
-    const wall = floor.layout.illusionWalls![0];
+    const chest = floor.objects.find((o) => o.kind === 'treasure')!;
     const colliders = layoutColliders(floor.layout);
-    // The fake wall's centre must be clear (a regression that pushed illusionWalls
-    // into layoutColliders would wall the treasure off while passing every other test).
     const covered = colliders.some((c) => {
-      if (c.type === 'circle') return Math.hypot(wall.x - c.x, wall.z - c.z) < c.r;
-      const dx = wall.x - c.x;
-      const dz = wall.z - c.z;
+      if (c.type === 'circle') return Math.hypot(chest.x - c.x, chest.z - c.z) < c.r + 0.6;
+      const dx = chest.x - c.x;
+      const dz = chest.z - c.z;
       const cos = Math.cos(c.rot);
       const sin = Math.sin(c.rot);
-      return Math.abs(dx * cos - dz * sin) < c.hw && Math.abs(dx * sin + dz * cos) < c.hd;
+      return (
+        Math.abs(dx * cos - dz * sin) < c.hw + 0.6 && Math.abs(dx * sin + dz * cos) < c.hd + 0.6
+      );
     });
-    expect(covered, 'illusion wall centre must be walkable (no collider)').toBe(false);
+    expect(covered, 'treasure chest must be reachable (not embedded in a wall)').toBe(false);
   });
 
   it('opening a treasure on interact marks it open + no longer lootable (no lockpick)', () => {
@@ -266,20 +270,31 @@ describe('rift mechanics: switch-gate', () => {
   });
 });
 
-describe('rift generator: level cap', () => {
-  it('no rift floor (any rank baseLevel, any depth) exceeds level 22', () => {
-    let maxSeen = 0;
+describe('rift generator: rank level bands', () => {
+  it('C/B/A floors cap mob level at 22; S-rank floors run 23 to 25', () => {
+    let maxNonS = 0;
+    let maxS = 0;
+    let minS = Infinity;
     for (const baseLevel of [20, 22, 25, 28]) {
       for (let s = 1; s <= 120; s++) {
         const fc = generateRiftFloor(s, baseLevel, 0).floorCount;
         for (let fi = 0; fi < fc; fi++) {
           const floor = generateRiftFloor(s, baseLevel, fi);
-          for (const sp of floor.spawns) maxSeen = Math.max(maxSeen, sp.level);
+          for (const sp of floor.spawns) {
+            if (baseLevel >= 28) {
+              maxS = Math.max(maxS, sp.level);
+              minS = Math.min(minS, sp.level);
+            } else {
+              maxNonS = Math.max(maxNonS, sp.level);
+            }
+          }
         }
       }
     }
-    expect(maxSeen, 'S-rank deep floors must still cap mob level at 22').toBeLessThanOrEqual(22);
-    expect(maxSeen, 'sanity: the cap is actually being reached').toBeGreaterThanOrEqual(22);
+    expect(maxNonS, 'C/B/A floors still cap mob level at 22').toBeLessThanOrEqual(22);
+    expect(maxNonS, 'sanity: the 22 cap is actually reached').toBeGreaterThanOrEqual(22);
+    expect(minS, 'every S-rank mob is level 23 or higher').toBeGreaterThanOrEqual(23);
+    expect(maxS, 'S-rank depth ramps to the 25 ceiling').toBe(25);
   });
 });
 
