@@ -1547,6 +1547,8 @@ export const id_ID: EnTranslations = {
     "auraEffect": {
       "dot": "Memberikan {value} kerusakan {school} setiap {interval} dtk",
       "hot": "Memulihkan {value} kesehatan setiap {interval} dtk",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "Menyerap {value} kerusakan",
       "healAbsorb": "Menyerap {value} penyembuhan masuk",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
@@ -3023,6 +3025,11 @@ export const id_ID: EnTranslations = {
       "earth_shock": "Kejutan seketika untuk kerusakan Alam cepat saat kamu membutuhkannya sekarang.",
       "lightning_shield": "Mengisi tubuhmu sehingga penyerang menerima kerusakan Alam saat mereka memukulmu.",
       "flame_shock": "Bakaran seketika yang menghantam di awal dan terus menghanguskan seiring waktu.",
+      "galeheart_weapon": "Mengilhami kedua senjata dengan angin badai dan menghadiahi ritme serangan yang stabil.",
+      "lifespring_weapon": "Mengilhami senjatamu dengan air pemulih dan memperkuat aliran penyembuhan berkelanjutan.",
+      "tidecall": "Memanggil pasang untuk memperkuat rangkaian mantra penyembuhan berikutnya.",
+      "stoneward": "Mendirikan perisai batu bermuatan yang mengubah damage diterima menjadi pemulihan.",
+      "primal_exaltation": "Melepaskan kekuatan elemen spesialisasimu untuk sesaat.",
       "fireball": "Serangan api utamamu, menghantam sekaligus meninggalkan sasaran terbakar.",
       "fireball_form": "Jadilah bara hidup untuk melintasi medan terbuka dengan kecepatan tinggi.",
       "frost_armor": "Penguat-diri tahan lama yang mengeraskan zirahmu sebelum pertarungan.",
@@ -7029,6 +7036,26 @@ export const id_ID: EnTranslations = {
       "chain_heal": {
         "name": "Penyembuhan Berantai",
         "description": "Menyembuhkan target sekutu dalam jumlah besar, lalu melompat ke hingga 2 sekutu terdekat lainnya dengan penyembuhan 50% lebih sedikit pada setiap lompatan. (Kemampuan khas Pemulihan)"
+      },
+      "galeheart_weapon": {
+        "name": "Galeheart Weapon",
+        "description": "Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast."
+      },
+      "lifespring_weapon": {
+        "name": "Lifespring Weapon",
+        "description": "Imbues your weapon with living water, increasing Mending Current deposits by 20%."
+      },
+      "primal_exaltation": {
+        "name": "Primal Exaltation",
+        "description": "Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)"
+      },
+      "stoneward": {
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+      },
+      "tidecall": {
+        "name": "Tidecall",
+        "description": "Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current."
       },
       "metamorphosis": {
         "name": "Metamorfosis",

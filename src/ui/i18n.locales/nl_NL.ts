@@ -4047,6 +4047,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je belangrijkste vuurnuke, raakt hard en laat het doelwit branden.',
   'guide.abilityHook.flame_shock':
     'Een directe brand die vooraan inslaat en blijft schroeien na verloop van tijd.',
+  'guide.abilityHook.galeheart_weapon':
+    'Doordrenkt beide wapens met stormwind en beloont een stabiel aanvalsritme.',
+  'guide.abilityHook.lifespring_weapon':
+    'Doordrenkt je wapen met herstellend water en versterkt je aanhoudende genezingsstroom.',
+  'guide.abilityHook.tidecall':
+    'Roept het getij op en versterkt je volgende reeks genezingsspreuken.',
+  'guide.abilityHook.stoneward':
+    'Richt een geladen stenen schild op dat opgelopen schade in genezing omzet.',
+  'guide.abilityHook.primal_exaltation':
+    'Ontketent kort de elementaire kracht van je specialisatie.',
   'guide.abilityHook.frost_armor':
     'Een blijvende zelfbuff die je pantser verhardt voor een gevecht.',
   'guide.abilityHook.frostbolt':

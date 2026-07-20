@@ -36,6 +36,10 @@ import { stripTemporalEchoes } from '../combat/chronomancy';
 import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
 import { clearPacklordState } from '../combat/hunter_packlord';
 import { clearHunterTalentState } from '../combat/hunter_shared';
+import { clearSpiritmendState } from '../combat/shaman_spiritmend';
+import { clearShamanTalentState } from '../combat/shaman_talents';
+import { clearThundercallState } from '../combat/shaman_thundercall';
+import { clearWarspiritState } from '../combat/shaman_warspirit';
 import { abilitiesKnownAt } from '../content/classes';
 import {
   cloneAllocation,
@@ -261,9 +265,19 @@ function commitTalentAllocation(
   if (allocationsEqual(meta.talents, sanitized)) return true;
 
   const previousSpec = meta.talents.spec;
+  if (meta.cls === 'shaman') clearShamanTalentState(ctx, player);
+  if (previousSpec !== sanitized.spec) {
+    // Remove old spec auras before the single stat recomputation below. In
+    // particular, Stonebound's armor must not be baked into the new spec.
+    clearThundercallState(ctx, player);
+    clearWarspiritState(ctx, player);
+    clearSpiritmendState(ctx, player);
+  }
   meta.talents = sanitized;
   recomputeTalents(ctx, meta);
-  if (previousSpec !== sanitized.spec) ctx.revalidateOffhandForSpec(player.id);
+  if (previousSpec !== sanitized.spec) {
+    ctx.revalidateOffhandForSpec(player.id);
+  }
   // A spec-locked pet outlives its spec otherwise (owner report: the frost
   // Water Elemental kept fighting for a fire mage): if the ability that
   // summons the ACTIVE pet is no longer in the new build's known list, the

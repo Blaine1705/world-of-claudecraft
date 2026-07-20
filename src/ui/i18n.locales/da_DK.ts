@@ -3987,6 +3987,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Din primære ildbombe, rammer et slag og efterlader målet brændende.',
   'guide.abilityHook.flame_shock':
     'En øjeblikkelig brand der rammer med det samme og bliver ved med at svide over tid.',
+  'guide.abilityHook.galeheart_weapon':
+    'Gennemstrømmer begge våben med stormvind og belønner en stabil angrebsrytme.',
+  'guide.abilityHook.lifespring_weapon':
+    'Gennemstrømmer dit våben med helbredende vand og styrker dit vedvarende helingsflow.',
+  'guide.abilityHook.tidecall':
+    'Kalder tidevandet frem og styrker den næste række helbredende besværgelser.',
+  'guide.abilityHook.stoneward':
+    'Rejser et opladet stenskjold, der omdanner indkommende skade til heling.',
+  'guide.abilityHook.primal_exaltation': 'Frigør kortvarigt elementkraften fra din specialisering.',
   'guide.abilityHook.frost_armor':
     'En vedvarende selvforstærkning der hærder din rustning før en kamp.',
   'guide.abilityHook.frostbolt':

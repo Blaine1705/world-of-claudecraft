@@ -2725,9 +2725,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '石の怒りを武器に込めます。5分間、各スイングが{damage}の追加ダメージを与えます。',
   'entities.abilities.healing_wave.name': '癒しの水流',
   'entities.abilities.healing_wave.description': '味方対象の体力を {damage} 回復します。',
-  'entities.abilities.chain_heal.name': 'チェインヒール',
+  'entities.abilities.chain_heal.name': '流転の癒し',
   'entities.abilities.chain_heal.description':
-    '味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）',
+    '味方1体の体力を120から145回復し、近くの味方最大2体に連鎖します。連鎖ごとに回復量は半減し、届いた味方ごとに癒しの水流を消費して追加回復を発生させます。（スピリットメンド固有）',
+  'entities.abilities.galeheart_weapon.name': '疾風の武器',
+  'entities.abilities.galeheart_weapon.description':
+    '武器に疾風を宿します。3回目の命中ごとに武器攻撃が2度反響し、ストームキャストを発動します。',
+  'entities.abilities.lifespring_weapon.name': '命泉の武器',
+  'entities.abilities.lifespring_weapon.description':
+    '武器に生命の水を宿し、癒しの水流への蓄積量を20%増加させます。',
+  'entities.abilities.primal_exaltation.name': '原初の高揚',
+  'entities.abilities.primal_exaltation.description':
+    '専門分野の力を12秒間解放し、通常のローテーションを強化します。（シャーマンのタレント）',
+  'entities.abilities.stoneward.name': '石の守り',
+  'entities.abilities.stoneward.description':
+    '味方1体を6チャージで60秒間守ります。ダメージを受けると1チャージを消費し、3秒に1回、最大体力の5%を回復します。（シャーマンのタレント）',
+  'entities.abilities.tidecall.name': '潮呼び',
+  'entities.abilities.tidecall.description':
+    '素早い癒しの潮を呼び、味方1体を回復して計算後の回復量を癒しの水流に加えます。',
   'entities.abilities.earth_shock.name': '大地の衝撃',
   'entities.abilities.earth_shock.description':
     '衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。',
@@ -5212,6 +5227,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball': '主力のファイア火力。一撃を当て、標的を燃焼させ続けます。',
   'guide.abilityHook.fireball_form': '生きた火球へと姿を変え、開けた場所を高速で駆け抜けます。',
   'guide.abilityHook.flame_shock': '前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。',
+  'guide.abilityHook.galeheart_weapon': '二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。',
+  'guide.abilityHook.lifespring_weapon': '武器に癒やしの水を宿し、継続する回復の流れを強めます。',
+  'guide.abilityHook.tidecall': '味方1体を即時に回復し、癒しの水流を最大まで蓄えます。',
+  'guide.abilityHook.stoneward': '力を蓄えた石の盾を掲げ、受けたダメージを回復に変えます。',
+  'guide.abilityHook.primal_exaltation': '専門分野に応じた元素の力を短時間解き放ちます。',
   'guide.abilityHook.frost_armor': '戦闘の前にアーマーを固める、持続する自己強化です。',
   'guide.abilityHook.frostbolt': '遠距離から攻撃し、標的を減速させて近づけなくします。',
   'guide.abilityHook.garrote': 'ステルスから仕掛け、ワイヤーで標的を継続的に出血させます。',
@@ -6078,6 +6098,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '鎖',
   'hudChrome.auraEffect.dot': '{interval}秒ごとに{value}の{school}ダメージを与える',
   'hudChrome.auraEffect.hot': '{interval}秒ごとに体力を{value}回復する',
+  'hudChrome.auraEffect.mendingCurrent':
+    '{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する',
+  'hudChrome.auraEffect.mendingCurrentPercent': '最大体力の{pct}%分の回復量を流転の癒し用に蓄える',
   'hudChrome.auraEffect.absorb': '{value}のダメージを吸収する',
   'hudChrome.auraEffect.healAbsorb': '受ける回復を{value}吸収する',
   'hudChrome.auraEffect.thorns': '攻撃者に{value}の{school}ダメージを与える',

@@ -43,6 +43,8 @@ export type { AnimState, BaseState } from './anim_state';
 // Current canvas height in device pixels, pushed by the renderer on resolution
 // changes so newly created weapon-skin VFX rigs size their point sprites right.
 let weaponVfxViewportHeight = 1080;
+const STONEBOUND_SHARD_GEOMETRY = new THREE.OctahedronGeometry(1, 0);
+type WeaponAuraMode = 'none' | 'sanguine' | 'stonebound';
 
 export function setWeaponVfxViewportHeight(heightPx: number): void {
   weaponVfxViewportHeight = Math.max(1, Math.round(heightPx));
@@ -202,7 +204,7 @@ export class CharacterVisual {
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   private weaponAuraMeshes: THREE.Mesh[] = [];
-  private weaponAuraOn = false;
+  private weaponAuraMode: WeaponAuraMode = 'none';
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
@@ -831,44 +833,78 @@ export class CharacterVisual {
     this.rebuildWeaponAura();
   }
 
-  setWeaponAura(on: boolean): void {
-    if (on === this.weaponAuraOn) return;
-    this.weaponAuraOn = on;
+  setWeaponAura(mode: WeaponAuraMode): void {
+    if (mode === this.weaponAuraMode) return;
+    this.weaponAuraMode = mode;
     this.rebuildWeaponAura();
   }
 
   private rebuildWeaponAura(): void {
     this.disposeWeaponAura();
-    if (!this.weaponAuraOn) return;
+    if (this.weaponAuraMode === 'none') return;
 
     const weaponHolders: THREE.Object3D[] = [];
     this.model.traverse((o) => {
       if (o.userData.swapWeaponHolder) weaponHolders.push(o);
     });
-    const mainhand = weaponHolders.find((o) => o.userData.heldSlot === 0) ?? weaponHolders[0];
-    if (!mainhand) return;
-    mainhand.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
-      const aura = new THREE.Mesh(
-        mesh.geometry,
+    const holders =
+      this.weaponAuraMode === 'stonebound'
+        ? weaponHolders
+        : [weaponHolders.find((o) => o.userData.heldSlot === 0) ?? weaponHolders[0]];
+    for (const holder of holders) {
+      holder?.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
+        const stonebound = this.weaponAuraMode === 'stonebound';
+        const aura = new THREE.Mesh(
+          mesh.geometry,
+          new THREE.MeshBasicMaterial({
+            color: stonebound ? 0x9a9384 : 0x45ff9a,
+            transparent: true,
+            opacity: stonebound ? 0.72 : 0.42,
+            depthWrite: false,
+            blending: stonebound ? THREE.NormalBlending : THREE.AdditiveBlending,
+            side: THREE.DoubleSide,
+            wireframe: stonebound,
+          }),
+        );
+        aura.position.copy(mesh.position);
+        aura.quaternion.copy(mesh.quaternion);
+        aura.scale.copy(mesh.scale).multiplyScalar(stonebound ? 1.14 : 1.08);
+        aura.renderOrder = 3;
+        aura.userData.weaponVfxMesh = true;
+        mesh.parent.add(aura);
+        this.weaponAuraMeshes.push(aura);
+      });
+    }
+    if (this.weaponAuraMode === 'stonebound') this.buildStoneboundArmorShards();
+  }
+
+  private buildStoneboundArmorShards(): void {
+    const placements = [
+      { x: -0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: -0.35 },
+      { x: 0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: 0.35 },
+      { x: 0, y: this.height * 0.53, z: 0.2, sx: 0.24, sy: 0.18, rz: 0 },
+    ];
+    for (const placement of placements) {
+      const shard = new THREE.Mesh(
+        STONEBOUND_SHARD_GEOMETRY,
         new THREE.MeshBasicMaterial({
-          color: 0x45ff9a,
+          color: 0x777065,
           transparent: true,
-          opacity: 0.42,
+          opacity: 0.82,
+          wireframe: true,
           depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          side: THREE.DoubleSide,
         }),
       );
-      aura.position.copy(mesh.position);
-      aura.quaternion.copy(mesh.quaternion);
-      aura.scale.copy(mesh.scale).multiplyScalar(1.08);
-      aura.renderOrder = 3;
-      aura.userData.weaponVfxMesh = true;
-      mesh.parent.add(aura);
-      this.weaponAuraMeshes.push(aura);
-    });
+      shard.position.set(placement.x, placement.y, placement.z);
+      shard.rotation.z = placement.rz;
+      shard.scale.set(placement.sx, placement.sy, 0.11);
+      shard.renderOrder = 3;
+      shard.userData.weaponVfxMesh = true;
+      this.poseWrap.add(shard);
+      this.weaponAuraMeshes.push(shard);
+    }
   }
 
   private disposeWeaponAura(): void {

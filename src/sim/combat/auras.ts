@@ -33,6 +33,9 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
+import { tickMendingCurrent } from './shaman_spiritmend';
+import { tickShamanTalentAura } from './shaman_talents';
+import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
@@ -151,7 +154,11 @@ export function updateTimers(p: Entity): void {
         );
       }
       // Parallel per-charge recharge: every running timer ticks at once.
-      const delta = temporalHourglassCooldownDelta(p, abilityId);
+      const primalExaltationRate =
+        abilityId === 'tidecall' && p.auras.some((aura) => aura.id === 'shaman_primal_exaltation')
+          ? 2
+          : 1;
+      const delta = temporalHourglassCooldownDelta(p, abilityId) * primalExaltationRate;
       state.recharges = state.recharges.map((t) => t - delta);
       while (state.recharges.length > 0 && state.recharges[0] <= 0) {
         state.recharges.shift();
@@ -200,6 +207,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
     a.remaining -= DT;
+    tickShamanTalentAura(a);
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
     if (a.kind === 'thorns') tickThornsCooldown(a);
@@ -210,6 +218,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
           tickTemporalHourglassHealing(ctx, e, a);
         } else if (a.kind === 'dot') {
+          const dotSource = ctx.entities.get(a.sourceId) ?? null;
           let tickDamage = a.value;
           if (a.school === 'physical') {
             let bleedAmp = 0;
@@ -226,7 +235,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             fx: 'tick',
           });
           ctx.dealDamage(
-            ctx.entities.get(a.sourceId) ?? null,
+            dotSource,
             e,
             tickDamage,
             false,
@@ -234,13 +243,13 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.name,
             'hit',
             true,
-            undefined,
+            dotSource ? { mult: stoneboundThreatMultiplier(ctx, dotSource) } : undefined,
             // Periodic (DoT) ticks are not a direct attack: they must not walk a
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
           );
           if (a.leechPct !== undefined) {
-            const src = ctx.entities.get(a.sourceId);
+            const src = dotSource;
             if (src && !src.dead) {
               const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
               if (healed > 0) {
@@ -258,7 +267,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
           }
           if (e.dead) return;
-        } else if (a.kind === 'hot') {
+        } else if (a.kind === 'hot' && !tickMendingCurrent(ctx, e, a)) {
           const healed = Math.min(Math.round(a.value * ctx.healingTakenMult(e)), e.maxHp - e.hp);
           if (healed > 0) {
             e.hp += healed;

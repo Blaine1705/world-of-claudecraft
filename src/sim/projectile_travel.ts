@@ -68,6 +68,7 @@ export type PendingProjectile = {
   targetId: number;
   ttl: number; // seconds of flight remaining before the bolt gives up and fizzles
   resolve: (source: Entity, target: Entity) => void;
+  fizzle?: () => void;
 };
 
 /** Queue a projectile launched now from `source` at `target`; `resolve` runs at the
@@ -78,6 +79,7 @@ export function scheduleProjectile(
   source: Entity,
   target: Entity,
   resolve: (source: Entity, target: Entity) => void,
+  fizzle?: () => void,
 ): void {
   ctx.pendingProjectiles.push({
     x: source.pos.x,
@@ -86,6 +88,7 @@ export function scheduleProjectile(
     targetId: target.id,
     ttl: PROJECTILE_MAX_FLIGHT,
     resolve,
+    fizzle,
   });
 }
 
@@ -103,7 +106,10 @@ export function advancePendingProjectiles(ctx: SimContext): void {
   for (const proj of ctx.pendingProjectiles) {
     const source = ctx.entities.get(proj.sourceId);
     const target = ctx.entities.get(proj.targetId);
-    if (!source || source.dead || !target || target.dead) continue; // fizzle
+    if (!source || source.dead || !target || target.dead) {
+      proj.fizzle?.();
+      continue;
+    }
     const next = stepProjectile(proj.x, proj.z, target.pos.x, target.pos.z, step);
     if (next.hit) {
       proj.resolve(source, target);

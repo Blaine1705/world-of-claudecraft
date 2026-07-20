@@ -6264,6 +6264,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Votre frappe de feu principale: elle inflige un coup et laisse la cible en flammes.',
   'guide.abilityHook.flame_shock':
     "Une brûlure instantanée qui frappe d'emblée et continue de consumer dans la durée.",
+  'guide.abilityHook.galeheart_weapon':
+    "Imprègne vos deux armes de vents d'orage et récompense un rythme d'attaque régulier.",
+  'guide.abilityHook.lifespring_weapon':
+    "Imprègne votre arme d'eau réparatrice et renforce votre flux de soins continu.",
+  'guide.abilityHook.tidecall':
+    'Appelle la marée pour renforcer votre prochaine série de sorts de soins.',
+  'guide.abilityHook.stoneward':
+    'Dresse un bouclier de pierre chargé qui transforme les dégâts subis en soins.',
+  'guide.abilityHook.primal_exaltation':
+    'Libère brièvement la puissance élémentaire propre à votre spécialisation.',
   'guide.abilityHook.frost_armor':
     'Une amélioration personnelle durable qui renforce votre armure avant un combat.',
   'guide.abilityHook.frostbolt':

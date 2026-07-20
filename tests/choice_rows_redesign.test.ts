@@ -1,4 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import {
+  FLOW_STATE_READY_ID,
+  onShamanManaSpent,
+  shamanManaCost,
+} from '../src/sim/combat/shaman_talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -164,68 +169,52 @@ describe('priest redesign', () => {
 });
 
 describe('shaman redesign', () => {
-  it('Fault Line: every 3rd Arc Bolt makes the next shock free', () => {
+  it('Wolfstep makes Shadewolf instant and clears movement control on entry', () => {
     const { sim, p } = rig('shaman', 20, { 5: 'sha_r5_concussion' });
-    addTargetMob(sim, 100000, 8);
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'lightning_bolt');
-    expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
-    const before = p.maxResource;
-    p.resource = before;
-    sim.castAbility('earth_shock');
-    for (let i = 0; i < 20; i++) sim.tick();
-    expect(p.resource).toBe(before);
-  });
-
-  it('Improved Cinder Jolt: Earthen Jolt detonates the Cinder Jolt DoT', () => {
-    const { sim } = rig('shaman', 20, {
-      8: 'sha_r8_shock_efficiency',
-      14: 'sha_r14_improved_flame_shock',
+    expect(sim.resolvedAbility('ghost_wolf')?.castTime).toBe(0);
+    p.auras.push({
+      id: 'test_root',
+      name: 'Test Root',
+      kind: 'root',
+      value: 0,
+      remaining: 10,
+      duration: 10,
+      sourceId: 999,
+      school: 'frost',
     });
-    const mob = addTargetMob(sim, 100000, 8);
-    castAndSettle(sim, 'flame_shock', 7); // the shocks share a cooldown; wait it out
-    expect(mob.auras.some((a) => a.kind === 'dot' && a.id === 'flame_shock')).toBe(true);
-    castAndSettle(sim, 'earth_shock', 1);
-    expect(mob.auras.some((a) => a.kind === 'dot' && a.id === 'flame_shock')).toBe(false);
+    sim.castAbility('ghost_wolf');
+    expect(p.auras.some((aura) => aura.id === 'ghost_wolf')).toBe(true);
+    expect(p.auras.some((aura) => aura.kind === 'root')).toBe(false);
   });
 
-  it('Weapon Fury: imbued swings shave the shock cooldowns', () => {
-    const { sim, p } = rig('shaman', 20, { 14: 'sha_r14_weapon_fury' });
-    const mob = addTargetMob(sim);
-    castAndSettle(sim, 'rockbiter_weapon', 2);
-    castAndSettle(sim, 'earth_shock', 1);
-    const cds = p.cooldowns;
-    const before = cds.get('earth_shock');
-    expect(before).toBeGreaterThan(0);
-    sim.startAutoAttack();
-    let swings = 0;
-    for (let i = 0; i < 20 * 10 && swings === 0; i++) {
-      for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.sourceId === p.id && ev.school === 'physical') swings++;
-      }
+  it('the control row resolves a four-second interrupt or two-second root', () => {
+    const { sim } = rig('shaman', 20, {
+      11: 'sha_r11_ancestral_guidance',
+    });
+    expect(sim.resolvedAbility('earth_shock')?.effects).toContainEqual({
+      type: 'interrupt',
+      lockout: 4,
+    });
+    expect(
+      rig('shaman', 20, { 11: 'sha_r11_elemental_attunement' }).sim.resolvedAbility('frost_shock')
+        ?.effects,
+    ).toContainEqual({ type: 'root', duration: 2 });
+  });
+
+  it('Flow State arms after 120 Mana and discounts the next mana action by 40', () => {
+    const { sim, p } = rig('shaman', 20, { 14: 'sha_r14_chain_lightning' });
+    onShamanManaSpent(sim.ctx, p, 70);
+    expect(p.auras.some((aura) => aura.id === FLOW_STATE_READY_ID)).toBe(false);
+    onShamanManaSpent(sim.ctx, p, 50);
+    expect(p.auras.some((aura) => aura.id === FLOW_STATE_READY_ID)).toBe(true);
+    expect(shamanManaCost(sim.ctx, p, 65)).toBe(25);
+  });
+
+  it('the level-20 row contains no additional action grants', () => {
+    for (const optionId of ['sha_r20_bloodlust', 'sha_r20_elemental_fury', 'sha_r20_tidal_waves']) {
+      const { sim } = rig('shaman', 20, { 20: optionId });
+      expect(sim.meta(sim.playerId)?.talentMods.grants).toEqual([]);
     }
-    expect(swings).toBeGreaterThan(0);
-    const after = cds.get('earth_shock') ?? 0;
-    // Natural decay over N ticks plus the 0.5 sec shave per landed swing.
-    expect(mob.dead).toBe(false);
-    expect(before! - after).toBeGreaterThan(0.5);
-  });
-
-  it('Undertow Promise: every 3rd Mending Waters leaves an emergency heal echo', () => {
-    // The #1756 choice pass rebuilt this row off chain_heal (never obtainable)
-    // onto baseline Mending Waters: every 3rd cast stores an 80-heal echo that
-    // fires when the target drops below 35% inside its 10 sec window.
-    const { sim, p } = rig('shaman', 20, { 20: 'sha_r20_tidal_waves' });
-    p.hp = 1;
-    sim.targetEntity(sim.playerId);
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'healing_wave', 5);
-    expect(p.auras.some((a) => a.id === 'sha_undertow_promise' && a.kind === 'heal_echo')).toBe(
-      true,
-    );
-    p.hp = Math.ceil(p.maxHp * 0.4);
-    const before = p.hp;
-    sim.ctx.dealDamage(null, p, Math.ceil(p.maxHp * 0.1), false, 'physical', null, 'hit');
-    expect(p.hp).toBeGreaterThan(before - Math.ceil(p.maxHp * 0.1));
-    expect(p.auras.some((a) => a.id === 'sha_undertow_promise')).toBe(false);
   });
 });
 

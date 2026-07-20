@@ -2610,9 +2610,24 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以大地之怒灌注你的武器：每次揮擊額外造成 {damage} 點傷害，持續 5 分鐘。',
   'entities.abilities.healing_wave.name': '療癒之水',
   'entities.abilities.healing_wave.description': '為一個友方目標恢復 {damage} 點生命值。',
-  'entities.abilities.chain_heal.name': '治療鏈',
+  'entities.abilities.chain_heal.name': '湧流癒合',
   'entities.abilities.chain_heal.description':
-    '大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低50%。（恢復專精招牌）',
+    '為一個友方目標恢復120至145點生命值，隨後跳躍至多2個附近盟友，每次跳躍的治療量減半。每個被波及的盟友都會消耗你的癒合水流，造成額外治療。（靈癒招牌）',
+  'entities.abilities.galeheart_weapon.name': '風心武器',
+  'entities.abilities.galeheart_weapon.description':
+    '為武器灌注疾風。每第三次命中的武器攻擊會回響兩次，並觸發風暴施法。',
+  'entities.abilities.lifespring_weapon.name': '活泉武器',
+  'entities.abilities.lifespring_weapon.description':
+    '為武器灌注生命之水，使癒合水流的注入量提高20%。',
+  'entities.abilities.primal_exaltation.name': '原初昇華',
+  'entities.abilities.primal_exaltation.description':
+    '解放你的專精力量，持續12秒，強化其常規循環。（薩滿祭司天賦）',
+  'entities.abilities.stoneward.name': '石之守護',
+  'entities.abilities.stoneward.description':
+    '使一名盟友獲得6層、持續60秒的保護。受到傷害時消耗一層，恢復5%最大生命值，每3秒最多觸發一次。（薩滿祭司天賦）',
+  'entities.abilities.tidecall.name': '潮汐召喚',
+  'entities.abilities.tidecall.description':
+    '召來迅捷的復甦潮汐，治療一名盟友，並將計算後的治療量注入癒合水流。',
   'entities.abilities.earth_shock.name': '大地震擊',
   'entities.abilities.earth_shock.description':
     '立即以震盪之力衝擊目標，造成 {damage} 點自然傷害。',
@@ -4981,6 +4996,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball': '你主要的火焰核彈，命中後讓目標持續燃燒。',
   'guide.abilityHook.fireball_form': '化身為活體火球，高速穿越開闊地帶。',
   'guide.abilityHook.flame_shock': '瞬發灼燒，先給予一記前置傷害並持續灼燒。',
+  'guide.abilityHook.galeheart_weapon': '為雙持武器灌注風暴之風，以穩定的攻擊節奏獲得回報。',
+  'guide.abilityHook.lifespring_weapon': '為武器灌注復甦之水，強化持續的治療節奏。',
+  'guide.abilityHook.tidecall': '立即治療一名盟友，並注入滿額癒合水流。',
+  'guide.abilityHook.stoneward': '升起充能石盾，將受到的傷害轉化為恢復。',
+  'guide.abilityHook.primal_exaltation': '短暫釋放符合你專精的元素力量。',
   'guide.abilityHook.frost_armor': '持續的自我增益，在戰鬥前強化你的護甲。',
   'guide.abilityHook.frostbolt': '從遠處攻擊並使目標減速，讓它無法逼近你。',
   'guide.abilityHook.garrote': '從潛行中開場，以鋼絲使目標持續流血。',
@@ -5802,6 +5822,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '鎖甲',
   'hudChrome.auraEffect.dot': '每 {interval} 秒造成 {value} 點{school}傷害',
   'hudChrome.auraEffect.hot': '每 {interval} 秒恢復 {value} 點生命值',
+  'hudChrome.auraEffect.mendingCurrent': '儲存 {value} 點治療量，隨時間釋放或由湧流癒合消耗',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    '儲存相當於最大生命值 {pct}% 的治療量，供湧流癒合消耗',
   'hudChrome.auraEffect.absorb': '吸收 {value} 點傷害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 點受到的治療',
   'hudChrome.auraEffect.thorns': '對攻擊者造成 {value} 點{school}傷害',

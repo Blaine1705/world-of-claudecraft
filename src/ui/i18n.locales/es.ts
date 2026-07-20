@@ -5834,6 +5834,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu principal hechizo de fuego: golpea con fuerza y deja al objetivo ardiendo.',
   'guide.abilityHook.flame_shock':
     'Una quemadura instantánea que golpea de inmediato y sigue abrasando con el tiempo.',
+  'guide.abilityHook.galeheart_weapon':
+    'Imbuye ambas armas con vientos de tormenta y premia un ritmo de ataques constante.',
+  'guide.abilityHook.lifespring_weapon':
+    'Imbuye tu arma con agua reparadora y refuerza tu flujo continuo de sanación.',
+  'guide.abilityHook.tidecall':
+    'Invoca la marea y potencia la siguiente secuencia de hechizos de sanación.',
+  'guide.abilityHook.stoneward':
+    'Alza un escudo de piedra cargado que convierte el daño recibido en sanación.',
+  'guide.abilityHook.primal_exaltation':
+    'Desata brevemente el poder elemental propio de tu especialización.',
   'guide.abilityHook.frost_armor':
     'Una mejora propia y duradera que refuerza tu armadura antes de un combate.',
   'guide.abilityHook.frostbolt':

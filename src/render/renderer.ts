@@ -45,8 +45,8 @@ import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import {
   characterRecklessnessActive,
-  characterSanguineAuraActive,
   characterSoulRendActive,
+  characterWeaponAuraMode,
   hunterPetFerocityStage,
   hunterPetFrenzyActive,
   hunterPetVisualScale,
@@ -5118,7 +5118,7 @@ export class Renderer {
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(characterSanguineAuraActive(e));
+      v.visual.setWeaponAura(characterWeaponAuraMode(e));
       const petOwner = e.ownerId === null ? null : (sim.entities.get(e.ownerId) ?? null);
       const ferocityStage = hunterPetFerocityStage(e, petOwner);
       const petFrenzy = hunterPetFrenzyActive(e, petOwner);

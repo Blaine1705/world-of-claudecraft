@@ -6511,6 +6511,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lightning_shield':
     'Nabije tě, takže útočníci dostanou přírodní poškození, když tě zasáhnou.',
   'guide.abilityHook.flame_shock': 'Okamžité spálení, které zasáhne hned a dál pálí v čase.',
+  'guide.abilityHook.galeheart_weapon':
+    'Naplní obě zbraně bouřlivým větrem a odměňuje stálý rytmus útoků.',
+  'guide.abilityHook.lifespring_weapon':
+    'Naplní zbraň léčivou vodou a posílí plynulý proud léčení.',
+  'guide.abilityHook.tidecall': 'Přivolá příliv a posílí následující sérii léčivých kouzel.',
+  'guide.abilityHook.stoneward':
+    'Vztyčí nabitý kamenný štít, který mění utržené poškození v léčení.',
+  'guide.abilityHook.primal_exaltation': 'Krátce uvolní živelnou sílu odpovídající specializaci.',
   'guide.abilityHook.fireball': 'Tvoje hlavní ohnivá rána, zasáhne a nechá cíl hořet.',
   'guide.abilityHook.frost_armor': 'Trvalý self-buff, který před bojem zpevní tvoji zbroj.',
   'guide.abilityHook.arcane_intellect':

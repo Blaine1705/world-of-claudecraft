@@ -260,6 +260,7 @@ export function createPartyRow(
         kind: a.kind,
         remaining: a.remaining ?? Number.POSITIVE_INFINITY,
         value: a.neg ? -1 : 1,
+        poolPct: a.poolPct,
       });
     }
     aurasPainter.paint(aurasView.tick(aurasEntity));

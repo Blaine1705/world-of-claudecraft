@@ -5837,6 +5837,16 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Sua principal magia de fogo, acerta um golpe e deixa o alvo em chamas.',
   'guide.abilityHook.flame_shock':
     'Uma queimadura instantânea que acerta de cara e continua escaldando ao longo do tempo.',
+  'guide.abilityHook.galeheart_weapon':
+    'Imbui as duas armas com ventos de tempestade e recompensa um ritmo constante de ataques.',
+  'guide.abilityHook.lifespring_weapon':
+    'Imbui sua arma com água restauradora e fortalece o fluxo contínuo de cura.',
+  'guide.abilityHook.tidecall':
+    'Invoca a maré e fortalece a próxima sequência de feitiços de cura.',
+  'guide.abilityHook.stoneward':
+    'Ergue um escudo de pedra carregado que transforma dano recebido em cura.',
+  'guide.abilityHook.primal_exaltation':
+    'Libera brevemente o poder elemental da sua especialização.',
   'guide.abilityHook.frost_armor':
     'Um aprimoramento próprio duradouro que endurece sua armadura antes da luta.',
   'guide.abilityHook.frostbolt':

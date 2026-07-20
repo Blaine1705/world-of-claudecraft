@@ -663,6 +663,13 @@ export const guideStrings = {
     earth_shock: 'An instant shock for quick Nature damage when you need it now.',
     lightning_shield: 'Charges you so attackers take Nature damage when they hit you.',
     flame_shock: 'An instant burn that hits up front and keeps searing over time.',
+    galeheart_weapon:
+      'Imbues both weapons with storm winds that reward a steady dual-wield rhythm.',
+    lifespring_weapon:
+      'Imbues your weapon with restorative water that strengthens your healing flow.',
+    tidecall: 'Immediately heals an ally and deposits a full Mending Current pool.',
+    stoneward: 'Raises a charged stone shield that turns incoming damage into recovery.',
+    primal_exaltation: 'Unleashes a short specialization-specific surge of elemental power.',
     fireball: 'Your main fire nuke, lands a hit and leaves the target burning.',
     fireball_form: 'Become a living ember to cross open ground at high speed.',
     frost_armor: 'A lasting self-buff that hardens your armor before a fight.',

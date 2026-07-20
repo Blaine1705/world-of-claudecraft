@@ -1547,6 +1547,8 @@ export const ja_JP: EnTranslations = {
     "auraEffect": {
       "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
       "hot": "{interval}秒ごとに体力を{value}回復する",
+      "mendingCurrent": "{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する",
+      "mendingCurrentPercent": "最大体力の{pct}%分の回復量を流転の癒し用に蓄える",
       "absorb": "{value}のダメージを吸収する",
       "healAbsorb": "受ける回復を{value}吸収する",
       "thorns": "攻撃者に{value}の{school}ダメージを与える",
@@ -3023,6 +3025,11 @@ export const ja_JP: EnTranslations = {
       "earth_shock": "今すぐ必要なときに手早くネイチャーダメージを与える即時のショックです。",
       "lightning_shield": "身にまとい、攻撃してきた相手にネイチャーダメージを与えます。",
       "flame_shock": "前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。",
+      "galeheart_weapon": "二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。",
+      "lifespring_weapon": "武器に癒やしの水を宿し、継続する回復の流れを強めます。",
+      "tidecall": "味方1体を即時に回復し、癒しの水流を最大まで蓄えます。",
+      "stoneward": "力を蓄えた石の盾を掲げ、受けたダメージを回復に変えます。",
+      "primal_exaltation": "専門分野に応じた元素の力を短時間解き放ちます。",
       "fireball": "主力のファイア火力。一撃を当て、標的を燃焼させ続けます。",
       "fireball_form": "生きた火球へと姿を変え、開けた場所を高速で駆け抜けます。",
       "frost_armor": "戦闘の前にアーマーを固める、持続する自己強化です。",
@@ -7027,8 +7034,28 @@ export const ja_JP: EnTranslations = {
         "description": "対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）"
       },
       "chain_heal": {
-        "name": "チェインヒール",
-        "description": "味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）"
+        "name": "流転の癒し",
+        "description": "味方1体の体力を120から145回復し、近くの味方最大2体に連鎖します。連鎖ごとに回復量は半減し、届いた味方ごとに癒しの水流を消費して追加回復を発生させます。（スピリットメンド固有）"
+      },
+      "galeheart_weapon": {
+        "name": "疾風の武器",
+        "description": "武器に疾風を宿します。3回目の命中ごとに武器攻撃が2度反響し、ストームキャストを発動します。"
+      },
+      "lifespring_weapon": {
+        "name": "命泉の武器",
+        "description": "武器に生命の水を宿し、癒しの水流への蓄積量を20%増加させます。"
+      },
+      "primal_exaltation": {
+        "name": "原初の高揚",
+        "description": "専門分野の力を12秒間解放し、通常のローテーションを強化します。（シャーマンのタレント）"
+      },
+      "stoneward": {
+        "name": "石の守り",
+        "description": "味方1体を6チャージで60秒間守ります。ダメージを受けると1チャージを消費し、3秒に1回、最大体力の5%を回復します。（シャーマンのタレント）"
+      },
+      "tidecall": {
+        "name": "潮呼び",
+        "description": "素早い癒しの潮を呼び、味方1体を回復して計算後の回復量を癒しの水流に加えます。"
       },
       "metamorphosis": {
         "name": "悪魔変身",

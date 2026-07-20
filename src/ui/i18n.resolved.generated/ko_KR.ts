@@ -1547,6 +1547,8 @@ export const ko_KR: EnTranslations = {
     "auraEffect": {
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
+      "mendingCurrent": "치유량 {value}를 저장하여 시간에 따라 방출하거나 쇄도하는 치유로 소모합니다",
+      "mendingCurrentPercent": "최대 생명력의 {pct}%에 해당하는 치유량을 쇄도하는 치유용으로 저장합니다",
       "absorb": "{value}의 피해를 흡수합니다",
       "healAbsorb": "들어오는 치유를 {value}만큼 흡수합니다",
       "thorns": "공격자에게 {value}의 {school} 피해를 입힙니다",
@@ -3023,6 +3025,11 @@ export const ko_KR: EnTranslations = {
       "earth_shock": "지금 당장 필요한 자연 피해를 즉시 주는 충격기입니다.",
       "lightning_shield": "몸에 전하를 둘러 공격자가 당신을 칠 때 자연 피해를 받게 합니다.",
       "flame_shock": "즉시 타격을 입히고 시간이 지나며 계속 불태우는 점화기입니다.",
+      "galeheart_weapon": "쌍수 무기에 폭풍의 바람을 불어넣어 안정적인 공격 리듬을 보상합니다.",
+      "lifespring_weapon": "무기에 치유의 물을 불어넣어 이어지는 회복 흐름을 강화합니다.",
+      "tidecall": "아군을 즉시 치유하고 치유의 물결을 최대로 저장합니다.",
+      "stoneward": "충전된 돌 방패를 세워 받는 피해를 회복으로 바꿉니다.",
+      "primal_exaltation": "전문화에 맞는 원소의 힘을 짧은 시간 폭발시킵니다.",
       "fireball": "주력 화염 공격기로, 타격을 입히고 대상을 계속 불태웁니다.",
       "fireball_form": "살아 있는 화염구로 변해 탁 트인 지형을 빠르게 가로지릅니다.",
       "frost_armor": "전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.",
@@ -7027,8 +7034,28 @@ export const ko_KR: EnTranslations = {
         "description": "대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)"
       },
       "chain_heal": {
-        "name": "연쇄 치유",
-        "description": "아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)"
+        "name": "쇄도하는 치유",
+        "description": "아군 대상의 생명력을 120~145 회복시킨 후 근처 아군 최대 2명에게 도약하며, 도약할 때마다 치유량이 절반으로 줄어듭니다. 영향을 받은 아군마다 치유의 물결을 소모해 추가로 회복시킵니다. (영혼 치유 고유)"
+      },
+      "galeheart_weapon": {
+        "name": "질풍의 무기",
+        "description": "무기에 질풍을 불어넣습니다. 적중한 세 번째 무기 공격마다 두 번 반향하고 폭풍 시전을 활성화합니다."
+      },
+      "lifespring_weapon": {
+        "name": "생명의 샘 무기",
+        "description": "무기에 생명의 물을 불어넣어 치유의 물결 저장량을 20% 늘립니다."
+      },
+      "primal_exaltation": {
+        "name": "원시적 승천",
+        "description": "12초 동안 전문화의 힘을 해방해 기본 순환을 강화합니다. (주술사 특성)"
+      },
+      "stoneward": {
+        "name": "돌 수호",
+        "description": "아군 하나를 6회 충전으로 60초 동안 보호합니다. 피해를 받으면 충전 1회를 소모해 3초마다 한 번 최대 생명력의 5%를 회복합니다. (주술사 특성)"
+      },
+      "tidecall": {
+        "name": "해일 부름",
+        "description": "빠른 회복의 해일을 불러 아군을 치유하고 계산된 치유량을 치유의 물결에 더합니다."
       },
       "metamorphosis": {
         "name": "악마 변신",

@@ -107,17 +107,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(verdict.bonusCharges ?? 0).toBe(0);
 
     const recall = rowOption('shaman', 'sha_r20_elemental_fury');
-    expect(recall.name).toBe('Storm Recall');
-    expect(recall.effect.proc).toEqual({
-      id: 'sha_storm_recall',
-      name: 'Storm Recall',
-      school: 'nature',
-      trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
-      responses: [
-        { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 'reset' },
-        { kind: 'empowerNext', aura: 'next_cast_free', abilities: ['earth_shock'], duration: 8 },
-      ],
-    });
+    expect(recall.name).toBe('Echoing Elements');
+    expect(recall.effect.proc).toBeUndefined();
+    expect(recall.effect.runtime).toEqual({ echoPercent: 40, damageDelay: 1, healingDelay: 2 });
     const bolt = resolved('shaman', 'lightning_bolt', { 20: 'sha_r20_elemental_fury' });
     const jolt = resolved('shaman', 'earth_shock', { 20: 'sha_r20_elemental_fury' });
     expect(effect(bolt, 'directDamage')).toEqual(
@@ -128,8 +120,10 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     );
 
     const skyEcho = rowOption('shaman', 'sha_r11_elemental_attunement');
-    expect(skyEcho.name).toBe('Sky Echo');
-    expect(skyEcho.effect.proc?.name).toBe('Sky Echo');
+    expect(skyEcho.name).toBe('Rime Lock');
+    expect(skyEcho.effect.ability).toEqual([
+      { ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] },
+    ]);
 
     const bruin = rowOption('druid', 'dru_r8_brutal_bash');
     expect(bruin.name).toBe('Bruin Rebound');

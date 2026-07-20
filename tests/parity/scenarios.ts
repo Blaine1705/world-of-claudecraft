@@ -4403,6 +4403,87 @@ function professionsGather(seed = 3): Scenario {
   };
 }
 
+// Shaman v0.29: one seed-pinned run carries all three spec engines through the
+// shared recorder so their aura state, events, stored healing values, and RNG
+// draw order are covered by the same deterministic golden as every other sim.
+function shamanEngines(): Scenario {
+  return {
+    name: 'shaman_engines',
+    coverage: [
+      'class:shaman (Thundercall, Warspirit, Spiritmend)',
+      'Thundercall Arc Bolt build and Earthen Jolt vent',
+      'Warspirit dual-wield cadence and Stormcast state',
+      'Spiritmend Tidecall deposit and Cascading Mend consumption',
+      'Shaman spec state in deterministic headless snapshots',
+    ],
+    build: () => new Sim({ seed: 2929, playerClass: 'shaman', noPlayer: true, autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const elementalId = sim.addPlayer('shaman', 'Stormbank');
+      const warspiritId = sim.addPlayer('shaman', 'Cadence');
+      const spiritmendId = sim.addPlayer('shaman', 'Current');
+      const allyId = sim.addPlayer('warrior', 'Anchor');
+      for (const pid of [elementalId, warspiritId, spiritmendId, allyId]) {
+        sim.setPlayerLevel(20, pid);
+      }
+      sim.setSpec('elemental', elementalId);
+      sim.setSpec('enhancement', warspiritId);
+      sim.setSpec('restoration', spiritmendId);
+      const elemental = sim.entities.get(elementalId) as AnyEntity;
+      const warspirit = sim.entities.get(warspiritId) as AnyEntity;
+      const spiritmend = sim.entities.get(spiritmendId) as AnyEntity;
+      const ally = sim.entities.get(allyId) as AnyEntity;
+      const dummy = spawnMob(
+        sim,
+        'training_dummy',
+        20,
+        elemental.pos.x,
+        elemental.pos.y,
+        elemental.pos.z + 8,
+      );
+      beef(dummy, 1_000_000);
+      rec.track(dummy.id);
+
+      for (const shaman of [elemental, warspirit]) {
+        teleport(sim, shaman, dummy.pos.x, dummy.pos.z - 3);
+        face(shaman, dummy);
+        sim.targetEntity(dummy.id, shaman.id);
+      }
+      elemental.resource = elemental.maxResource;
+      sim.castAbility('lightning_bolt', elemental.id);
+      rec.tick(80);
+      elemental.resource = elemental.maxResource;
+      elemental.gcdRemaining = 0;
+      sim.castAbility('earth_shock', elemental.id);
+      rec.tick(20);
+      rec.snapshot('thundercall-vent');
+
+      sim.addItem('training_mace', 1, warspirit.id);
+      sim.equipItem('training_mace', warspirit.id);
+      warspirit.resource = warspirit.maxResource;
+      sim.castAbility('galeheart_weapon', warspirit.id);
+      rec.tick(2);
+      warspirit.autoAttack = true;
+      warspirit.swingTimer = 0;
+      warspirit.offhandSwingTimer = 0;
+      rec.tick(80);
+      rec.snapshot('warspirit-cadence');
+
+      teleport(sim, spiritmend, ally.pos.x, ally.pos.z - 2);
+      ally.hp = Math.round(ally.maxHp * 0.35);
+      spiritmend.resource = spiritmend.maxResource;
+      sim.targetEntity(ally.id, spiritmend.id);
+      sim.castAbility('tidecall', spiritmend.id);
+      rec.tick(2);
+      spiritmend.resource = spiritmend.maxResource;
+      spiritmend.gcdRemaining = 0;
+      sim.castAbility('chain_heal', spiritmend.id);
+      rec.tick(80);
+      rec.snapshot('spiritmend-consume');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4460,4 +4541,5 @@ export const SCENARIOS: Scenario[] = [
   chatSocial(),
   professionsCraft(),
   professionsGather(),
+  shamanEngines(),
 ];

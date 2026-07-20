@@ -203,7 +203,7 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     enhancement: {
       primaryStat: 'str',
       complexity: 'medium',
-      examples: ['stormstrike', 'rockbiter_weapon', 'flametongue_weapon', 'lightning_shield'],
+      examples: ['stormstrike', 'rockbiter_weapon', 'galeheart_weapon', 'lightning_shield'],
     },
     restoration: {
       primaryStat: 'int',

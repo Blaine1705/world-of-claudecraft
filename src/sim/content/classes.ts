@@ -15,6 +15,7 @@ import {
   TEMPORAL_HOURGLASS_SELF_RADIUS,
   type WeaponInfo,
 } from '../types';
+import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
 import type { TalentModifiers } from './talents';
 import { SPORT_ABILITIES } from './vale_cup';
@@ -368,15 +369,18 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     abilities: [
       'lightning_bolt',
       'rockbiter_weapon',
+      'galeheart_weapon',
+      'lifespring_weapon',
       'healing_wave',
+      'tidecall',
       'earth_shock',
       'lightning_shield',
       'flame_shock',
       'flametongue_weapon',
       'frost_shock',
-      'frostbrand_weapon',
       'ghost_wolf',
       'earthquake',
+      'bloodlust',
     ],
     color: 0x0070de,
   },
@@ -2010,8 +2014,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   earthquake: {
     id: 'earthquake',
-    name: 'Earthquake',
+    name: 'Faultwake',
     class: 'shaman',
+    specs: ['elemental'],
     learnLevel: 18,
     cost: 80,
     castTime: 0,
@@ -3902,6 +3907,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rockbiter_weapon',
     name: 'Stonebound Weapon',
     class: 'shaman',
+    excludeSpecs: ['elemental', 'restoration'],
+    excludeSpecsAtLevel: 5,
     learnLevel: 1,
     cost: 20,
     castTime: 0,
@@ -3917,12 +3924,42 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Imbues your weapon with the fury of stone: each swing deals $d additional damage for 5 min.',
   },
-  // Restoration shaman signature (granted only via the Restoration spec, not in the base
-  // kit). v1 is a strong single-target heal; the multi-target "chain" bounce is a
-  // follow-up once a bounce/jump primitive exists.
+  galeheart_weapon: {
+    id: 'galeheart_weapon',
+    name: 'Galeheart Weapon',
+    class: 'shaman',
+    specs: ['enhancement'],
+    learnLevel: 5,
+    cost: 25,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'imbue', bonus: 0, duration: 300 }],
+    description:
+      'Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast.',
+  },
+  lifespring_weapon: {
+    id: 'lifespring_weapon',
+    name: 'Lifespring Weapon',
+    class: 'shaman',
+    specs: ['restoration'],
+    learnLevel: 5,
+    cost: 25,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'imbue', bonus: 0, duration: 300 }],
+    description:
+      'Imbues your weapon with living water, increasing Mending Current deposits by 20%.',
+  },
+  // Restoration Shaman signature, granted only by the Spiritmend spec.
   chain_heal: {
     id: 'chain_heal',
-    name: 'Chain Heal',
+    name: 'Cascading Mend',
     class: 'shaman',
     learnLevel: 10,
     cost: 60,
@@ -3934,14 +3971,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.5, radius: 12 }],
     description:
-      'Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
+      'Heals a friendly target for 120 to 145, then jumps to up to 2 nearby allies for 50% less healing per jump. Each ally reached consumes your Mending Current for an additional burst. (Spiritmend signature)',
   },
   healing_wave: {
     id: 'healing_wave',
     name: 'Mending Waters',
     class: 'shaman',
     learnLevel: 1,
-    cost: 25,
+    cost: MENDING_WATERS_MANA_COST,
     castTime: 1.5,
     cooldown: 0,
     range: 30,
@@ -3967,6 +4004,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description: 'Heals a friendly target for $d.',
+  },
+  tidecall: {
+    id: 'tidecall',
+    name: 'Tidecall',
+    class: 'shaman',
+    specs: ['restoration'],
+    learnLevel: 10,
+    cost: TIDECALL_MANA_COST,
+    castTime: 0,
+    cooldown: 12,
+    maxCharges: 2,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'heal', min: 58, max: 72 }],
+    description:
+      'Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current.',
   },
   earth_shock: {
     id: 'earth_shock',
@@ -4074,6 +4129,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'flametongue_weapon',
     name: 'Pyrebrand Weapon',
     class: 'shaman',
+    specs: ['elemental'],
     learnLevel: 5,
     cost: 25,
     castTime: 0,
@@ -4128,7 +4184,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ghost_wolf',
     name: 'Shadewolf',
     class: 'shaman',
-    learnLevel: 16,
+    learnLevel: 5,
     cost: 35,
     castTime: 2.0,
     cooldown: 0,
@@ -5834,12 +5890,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 45,
     castTime: 0,
-    cooldown: 120,
+    cooldown: 90,
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
-    description: 'Calls on primal mastery, making your next spell instant. (Elemental signature)',
+    effects: [],
+    description:
+      'For 12 sec, your next Arc Bolt is instant and valid Arc Bolt impacts grant two Thunder charges. (Thundercall signature)',
   },
   siphon_life: {
     id: 'siphon_life',

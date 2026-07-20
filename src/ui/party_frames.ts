@@ -125,7 +125,9 @@ export function partyFrameSignature(
     // The aura strip, appended inline (no intermediate array): a joined/left aura,
     // a kind flip, or a sap-sign flip changes the string and repaints the row.
     if (m.auras) {
-      for (const a of m.auras) sig += `${a.id},${a.kind},${a.neg ? 1 : 0},${a.remaining ?? ''};`;
+      for (const a of m.auras) {
+        sig += `${a.id},${a.kind},${a.neg ? 1 : 0},${a.remaining ?? ''},${a.poolPct ?? ''};`;
+      }
     }
     sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}|`;
   }

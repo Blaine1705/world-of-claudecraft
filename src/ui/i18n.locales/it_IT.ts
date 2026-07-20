@@ -5858,6 +5858,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il tuo principale colpo di fuoco, infligge un danno e lascia il bersaglio in fiamme.',
   'guide.abilityHook.flame_shock':
     "Un'ustione istantanea che colpisce subito e continua a bruciare nel tempo.",
+  'guide.abilityHook.galeheart_weapon':
+    "Infonda entrambe le armi di venti tempestosi e premia un ritmo d'attacco costante.",
+  'guide.abilityHook.lifespring_weapon':
+    'Infonda la tua arma di acqua risanatrice e rafforza il flusso continuo delle cure.',
+  'guide.abilityHook.tidecall':
+    'Richiama la marea e potenzia la successiva sequenza di incantesimi curativi.',
+  'guide.abilityHook.stoneward':
+    'Erige uno scudo di pietra carico che trasforma i danni subiti in cure.',
+  'guide.abilityHook.primal_exaltation':
+    'Scatena brevemente il potere elementale della tua specializzazione.',
   'guide.abilityHook.frost_armor':
     'Un potenziamento personale duraturo che indurisce la tua corazza prima di uno scontro.',
   'guide.abilityHook.frostbolt':

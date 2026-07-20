@@ -1547,6 +1547,8 @@ export const fr_CA: EnTranslations = {
     "auraEffect": {
       "dot": "Cause {value} points de dégâts de {school} toutes les {interval} s",
       "hot": "Redonne {value} points de vie toutes les {interval} s",
+      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
+      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
       "absorb": "Bloque {value} points de dégâts",
       "healAbsorb": "Bloque {value} points de soins reçus",
       "thorns": "Cause {value} points de dégâts de {school} aux attaquants",
@@ -3023,6 +3025,11 @@ export const fr_CA: EnTranslations = {
       "earth_shock": "Un horion instantané pour des dégâts de Nature rapides quand il les faut tout de suite.",
       "lightning_shield": "Vous charge pour que les attaquants subissent des dégâts de Nature quand ils vous frappent.",
       "flame_shock": "Une brûlure instantanée qui frappe d'emblée et continue de consumer dans la durée.",
+      "galeheart_weapon": "Imprègne vos deux armes de vents d'orage et récompense un rythme d'attaque régulier.",
+      "lifespring_weapon": "Imprègne votre arme d'eau réparatrice et renforce votre flux de soins continu.",
+      "tidecall": "Appelle la marée pour renforcer votre prochaine série de sorts de soins.",
+      "stoneward": "Dresse un bouclier de pierre chargé qui transforme les dégâts subis en soins.",
+      "primal_exaltation": "Libère brièvement la puissance élémentaire propre à votre spécialisation.",
       "fireball": "Votre frappe de feu principale: elle inflige un coup et laisse la cible en flammes.",
       "fireball_form": "Devenez une braise vivante pour traverser un terrain dégagé à grande vitesse.",
       "frost_armor": "Une amélioration personnelle durable qui renforce votre armure avant un combat.",
@@ -7029,6 +7036,26 @@ export const fr_CA: EnTranslations = {
       "chain_heal": {
         "name": "Salve de guérison",
         "description": "Rend une grande quantité de points de vie à une cible alliée, puis rebondit sur un maximum de 2 autres alliés proches, avec des soins réduits de 50 % à chaque rebond. (signature Restauration)"
+      },
+      "galeheart_weapon": {
+        "name": "Galeheart Weapon",
+        "description": "Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast."
+      },
+      "lifespring_weapon": {
+        "name": "Lifespring Weapon",
+        "description": "Imbues your weapon with living water, increasing Mending Current deposits by 20%."
+      },
+      "primal_exaltation": {
+        "name": "Primal Exaltation",
+        "description": "Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)"
+      },
+      "stoneward": {
+        "name": "Stoneward",
+        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+      },
+      "tidecall": {
+        "name": "Tidecall",
+        "description": "Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current."
       },
       "metamorphosis": {
         "name": "Métamorphose",

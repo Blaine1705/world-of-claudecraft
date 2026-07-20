@@ -45,6 +45,13 @@ export function hasNextCastFree(e: Entity, abilityId?: string): boolean {
   );
 }
 
+/** The movement-cast aura eligible for this exact ability. Unscoped Ice
+ *  Floes and Wayfarer Grace remain universal; Flowing Elements names its two
+ *  allowed casts. */
+export function iceFloesAuraForAbility(e: Entity, abilityId: string): Aura | undefined {
+  return e.auras.find((aura) => aura.kind === 'ice_floes' && matches(aura, abilityId));
+}
+
 export function hasNextExecuteFree(e: Entity, abilityId: string): boolean {
   return e.auras.some(
     (aura) =>
@@ -105,8 +112,16 @@ export function consumeFreeCostFor(ctx: SimContext, e: Entity, abilityId: string
   return REVENGE_FREE_ABILITIES.has(abilityId) && consumeAuraKind(ctx, e, 'revenge_free') !== null;
 }
 
+export function consumeNextCastInstantAura(
+  ctx: SimContext,
+  e: Entity,
+  abilityId?: string,
+): Aura | null {
+  return consumeAuraKind(ctx, e, 'next_cast_instant', abilityId);
+}
+
 export function consumeNextCastInstant(ctx: SimContext, e: Entity, abilityId?: string): boolean {
-  return consumeAuraKind(ctx, e, 'next_cast_instant', abilityId) !== null;
+  return consumeNextCastInstantAura(ctx, e, abilityId) !== null;
 }
 
 export function hasScopedNextCastInstant(e: Entity, abilityId: string): boolean {
@@ -123,8 +138,16 @@ export function consumeNextCastCheap(
   e: Entity,
   abilityId?: string,
 ): number | null {
-  const aura = consumeAuraKind(ctx, e, 'next_cast_cheap', abilityId);
+  const aura = consumeNextCastCheapAura(ctx, e, abilityId);
   return aura?.value ?? null;
+}
+
+export function consumeNextCastCheapAura(
+  ctx: SimContext,
+  e: Entity,
+  abilityId?: string,
+): Aura | null {
+  return consumeAuraKind(ctx, e, 'next_cast_cheap', abilityId);
 }
 
 export function consumeNextAttackCrit(ctx: SimContext, e: Entity): boolean {
