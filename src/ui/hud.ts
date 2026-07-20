@@ -17,7 +17,7 @@ import {
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
-import { castBarState, consumeBarState } from '../render/cast_bar';
+import { castBarState, consumeBarState, mountSummonBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
@@ -4667,8 +4667,6 @@ export class Hud {
         if (descKey) html += `<div class="tt-desc">${esc(t(descKey))}</div>`;
         for (const line of mountSpecLines({
           speedPct: Math.round(mountDef.moveSpeedPct * 100),
-          blockPct: Math.round(mountDef.meleeBlockPct * 100),
-          critPct: Math.round(mountDef.critPct * 100),
         }))
           html += `<div class="tt-green">${esc(line)}</div>`;
         const meets = this.sim.player.level >= mountDef.level;
@@ -7232,10 +7230,13 @@ export class Hud {
     }
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
-    // the player-only eat/drink overlay (consumeBarState), and clears on hide.
+    // the mount summon channel (mountSummonBarState) and the player-only eat/drink
+    // overlay (consumeBarState), and clears on hide. Priority: spell cast > mount
+    // summon > eat/drink (you cannot cast while mounting, but the painter guards it).
     this.playerCastBarPainter.paint({
       cast: castBarState(p),
       castRemaining: p.castRemaining,
+      mountSummon: mountSummonBarState(p.mountCastRemaining, p.mountCastKey),
       consume: consumeBarState(p.eating, p.drinking),
     });
 
