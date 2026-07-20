@@ -4,6 +4,7 @@
 // the party-shared instance, the claim -> free empty-reset, and the raid-lockout gate.
 
 import { describe, expect, it } from 'vitest';
+import { resolvePosition } from '../src/sim/colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
@@ -130,6 +131,16 @@ function expectedHeroicStats(template: MobTemplate, dungeonId: string) {
 }
 
 describe('dungeons: door-trigger entry/exit', () => {
+  it('reports whether direct dungeon entry and exit changed the world', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Solo');
+
+    expect(enterDungeon(sim.ctx, 'missing_dungeon', pid)).toBe(false);
+    expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
+    expect(leaveDungeon(sim.ctx, pid)).toBe(true);
+    expect(leaveDungeon(sim.ctx, pid)).toBe(false);
+  });
+
   it('walking onto a dungeon door teleports the player into a freshly claimed instance', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Solo');
@@ -185,6 +196,62 @@ describe('dungeons: door-trigger entry/exit', () => {
     updateDoorTriggers(sim.ctx, p);
 
     expect(sim.instanceSlotAt(p.pos)).toBeNull(); // back outside the instance
+  });
+
+  it('leaving the dungeon scrubs the leaver from every inside hate table (no exit dancing)', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Dancer');
+    const p = sim.entities.get(pid) as AnyEntity;
+    enterDungeon(sim.ctx, 'hollow_crypt', pid);
+    const inst = claimedHollow(sim);
+
+    // Pull the first pack mob: real threat + aggro + a taunt-style forced lock.
+    const mob = mobInInstance(sim, inst, 'crypt_shambler');
+    teleport(sim, p, mob.pos.x + 3, mob.pos.z);
+    p.maxHp = p.hp = 1_000_000;
+    sim.dealDamage(p, mob, 25, false, 'physical', 'Strike', 'hit', true);
+    mob.forcedTargetId = pid;
+    mob.forcedTargetTimer = 3;
+    expect(mob.threat.get(pid)).toBeGreaterThan(0);
+    expect(mob.aggroTargetId).toBe(pid);
+
+    leaveDungeon(sim.ctx, pid);
+
+    expect(sim.instanceSlotAt(p.pos)).toBeNull(); // actually outside
+    expect(mob.threat.has(pid)).toBe(false);
+    expect(mob.aggroTargetId).toBeNull();
+    expect(mob.forcedTargetId).toBeNull();
+  });
+
+  it('the mob re-targets a remaining party member instead of chasing the leaver', () => {
+    const sim = makeSim();
+    const a = sim.addPlayer('warrior', 'Leaver');
+    const b = sim.addPlayer('mage', 'Stayer');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    const ea = sim.entities.get(a) as AnyEntity;
+    const eb = sim.entities.get(b) as AnyEntity;
+    enterDungeon(sim.ctx, 'hollow_crypt', a);
+    enterDungeon(sim.ctx, 'hollow_crypt', b);
+    const inst = claimedHollow(sim);
+
+    const mob = mobInInstance(sim, inst, 'crypt_shambler');
+    teleport(sim, ea, mob.pos.x + 3, mob.pos.z);
+    teleport(sim, eb, mob.pos.x - 3, mob.pos.z);
+    ea.maxHp = ea.hp = 1_000_000;
+    eb.maxHp = eb.hp = 1_000_000;
+    // The leaver pulls first and out-threats the stayer, so the mob locks on
+    // the leaver; the stayer is on the table with a sliver of threat.
+    sim.dealDamage(ea, mob, 100, false, 'physical', 'Strike', 'hit', true);
+    sim.dealDamage(eb, mob, 10, false, 'fire', 'Bolt', 'hit', true);
+    expect(mob.aggroTargetId).toBe(a);
+
+    leaveDungeon(sim.ctx, a);
+    sim.tick();
+
+    expect(mob.threat.has(a)).toBe(false);
+    expect(mob.threat.get(b)).toBeGreaterThan(0);
+    expect(mob.aggroTargetId).toBe(b);
   });
 });
 
@@ -964,7 +1031,10 @@ describe('dungeons: heroic difficulty', () => {
       expect(add.templateId).toBe('drowned_thrall');
       expect(add.level).toBe(22);
       expect(add.maxHp).toBe(pins.maxHp);
-      expect(add.mechanicDamageMult).toBe(HEROIC_DUNGEON_TUNING.sunken_bastion.damageMultiplier);
+      // Boss-SUMMONED adds swing and fire mechanics at the softer add
+      // multiplier, not the dungeon-wide one (see tests/boss_add_leash.test.ts
+      // for the weapon pins).
+      expect(add.mechanicDamageMult).toBe(HEROIC_DUNGEON_TUNING.sunken_bastion.addDamageMultiplier);
     }
   });
 
@@ -2255,6 +2325,39 @@ describe('dungeons: ghost corpse-run re-entry', () => {
     expect(p.dead).toBe(false);
     expect(p.ghost).toBe(false);
     expect(sim.instanceSlotAt(p.pos)).not.toBeNull(); // back inside, alive
+  });
+
+  it('pulls a ghost back into the Abandoned Crypt from a realistic (collision-resolved) approach', () => {
+    // A ghost can only re-enter through the walk-in proximity trigger (interact()
+    // refuses it while dead), so the door's own world position must be reachable
+    // through the FULL collider stack, not just teleportable onto directly. The
+    // crypt door reuses the "mine entrance" decorative prop for its visual, and
+    // that prop's rock-mound collider used to bleed forward far enough to swallow
+    // the door tile itself, stranding every ghost outside the 2.0yd trigger.
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'CryptRunner');
+    const p = sim.entities.get(pid) as AnyEntity;
+    enterDungeon(sim.ctx, 'nythraxis_crypt', pid);
+    expect(sim.instanceSlotAt(p.pos)).not.toBeNull();
+    p.dead = true;
+    sim.releaseSpirit(pid);
+    expect(p.ghost).toBe(true);
+    expect(sim.instanceSlotAt(p.pos)).toBeNull();
+
+    const door = [...sim.entities.values()].find(
+      (e: AnyEntity) => e.templateId === 'dungeon_door' && e.dungeonId === 'nythraxis_crypt',
+    ) as AnyEntity;
+    // The door's own world position must itself be walkable (not buried inside
+    // the mound's collider); resolving it against the full collider stack must
+    // be a no-op, proving a real approach can actually reach the trigger.
+    const resolved = resolvePosition(sim.cfg.seed, door.pos.x, door.pos.z, 0.5);
+    expect(dist2d({ ...resolved, y: 0 }, door.pos)).toBeLessThan(1e-6);
+    teleport(sim, p, resolved.x, resolved.z);
+    sim.tick();
+
+    expect(p.dead).toBe(false);
+    expect(p.ghost).toBe(false);
+    expect(sim.instanceSlotAt(p.pos)).not.toBeNull();
   });
 });
 

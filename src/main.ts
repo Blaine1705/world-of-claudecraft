@@ -30,18 +30,27 @@ import { initDesktopDownload } from './game/desktop_download';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
+import {
+  clearEntryProbe,
+  ENTRY_PROBE_STABLE_MS,
+  planEntryCrashRecovery,
+  readEntryProbeRaw,
+  stampEntryProbe,
+} from './game/entry_crash_guard';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
+import { stopAutorunForInteraction } from './game/interaction_autorun';
 import {
   activePvpOpponentIds,
   HoverPickGate,
   handlePickedEntity,
   hoverCursorKind,
   isAttackableEntity,
+  shouldApproachPickedEntity,
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
@@ -60,6 +69,7 @@ import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
+import { tryNearbyInteraction } from './game/nearby_interaction';
 import { createPerfMonitor } from './game/perf';
 import { startPerfReporter } from './game/perf_reporter';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
@@ -70,12 +80,14 @@ import {
   Settings,
 } from './game/settings';
 import { sfx } from './game/sfx';
+import { initSoftwareRenderNotice } from './game/software_render_notice';
 import {
   recordSkipTap,
   type SpawnCinematic,
   spawnCinematicFor,
   spawnCinematicPose,
 } from './game/spawn_cinematic';
+import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
@@ -87,7 +99,16 @@ import {
   sortCharacters,
 } from './net/char_sort';
 import { charselectPrimaryAction } from './net/charselect_action';
+import { performDesktopWalletHandoff } from './net/desktop_wallet_handoff';
+import {
+  desktopWalletManagerAction,
+  desktopWalletManagerView,
+  disconnectDesktopWalletSession,
+} from './net/desktop_wallet_manager';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
+// The wallet module is loaded lazily via dynamic import() in the wallet
+// controller below, so it stays out of the main entry chunk and only loads when
+// the feature is enabled + used.
 import {
   isAppleAuthorizationCancellation,
   isNativeIos,
@@ -121,10 +142,9 @@ import {
   savePlayMarker,
 } from './net/resume_play';
 import { openStripeCheckout } from './net/stripe_checkout';
-// The wallet module is loaded lazily via dynamic import() in the wallet
-// controller below, so it stays out of the main entry chunk and only loads when
-// the feature is enabled + used.
-import type { WalletOption } from './net/wallet';
+import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
+import { resolveWalletCapability } from './net/wallet_capability';
+import { installWalletResumeHandlers } from './net/wallet_resume';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import { preloadMechAssets } from './render/characters/assets';
@@ -144,7 +164,7 @@ import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
 import { HEROIC_VENDOR_STOCK } from './sim/content/heroic_vendor';
-import { talentsFor } from './sim/content/talents';
+import { rowTreeFor } from './sim/content/talents';
 import {
   GATHER_NODES,
   ITEMS,
@@ -164,7 +184,6 @@ import {
   ALL_CLASSES,
   DT,
   dist2d,
-  INTERACT_RANGE,
   MELEE_RANGE,
   type PlayerClass,
   RUN_SPEED,
@@ -196,6 +215,7 @@ import {
 import { deleteCharButtonHtml } from './ui/char_delete_button';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
+import { claudiumBalanceAddress } from './ui/claudium_view';
 import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
@@ -216,8 +236,10 @@ import {
 import { renderDiscordWidget } from './ui/discord_widget';
 import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
+import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { type ClaudiumHooks, Hud } from './ui/hud';
+import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
 import { chatInputSize } from './ui/hud/chat/chat_input_autosize';
 import { wireSkinPicker } from './ui/hud/cosmetics/skin_picker';
 import {
@@ -242,7 +264,13 @@ import {
 } from './ui/i18n';
 import { defaultIconPrewarmPlan, type IconPrewarmEntry, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
+import {
+  noteLoadingProgress,
+  startSlowConnectionWatch,
+  stopSlowConnectionWatch,
+} from './ui/loading_slow_hint';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
+import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
@@ -255,7 +283,7 @@ import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overl
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { shouldShowStorePromo } from './ui/store_promo_card';
-import { talentChoiceIconRef, talentNodeIconRef } from './ui/talent_icons';
+import { talentRowOptionIconRef } from './ui/talent_icons';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
   classifyAuthCode,
@@ -267,11 +295,14 @@ import { UiEffectsApplier } from './ui/ui_effects_applier';
 import { hydrateIcons } from './ui/ui_icons';
 import {
   resolveWocBalanceUpdate,
+  setWalletConnectionAddresses,
   setWalletDisplayAvailable,
   setWalletUiEnabled,
   setWocBalance,
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
+import { buildWalletConnectionView } from './ui/wallet_connection_view';
+import { mountWelcomeStage } from './ui/welcome_screen_stage';
 import {
   mountWelcomeScreen,
   takeArmoryOpenIntent,
@@ -796,6 +827,7 @@ function showLoadingScreen(statusText: string): void {
   if (!wasVisible) $('#ls-fill').style.width = '0%';
   setLoadingStatus(statusText);
   startLoadingTips();
+  startSlowConnectionWatch();
 }
 
 function setLoadingStatus(text: string): void {
@@ -812,6 +844,7 @@ function setLoadingProgressRange(
   const percent = rangeStart + (rangeEnd - rangeStart) * fraction;
   $('#ls-fill').style.width = `${Math.round(percent)}%`;
   setLoadingStatus(t('loading.worldProgress', { done, total }));
+  noteLoadingProgress();
 }
 
 function setLoadingPercent(percent: number, statusText: string): void {
@@ -847,6 +880,7 @@ function hideLoadingScreen(): void {
   if (!el.classList.contains('visible')) return;
   el.classList.add('fade');
   stopLoadingTips();
+  stopSlowConnectionWatch();
   loadingHideTimer = window.setTimeout(() => {
     el.classList.remove('visible', 'fade');
     loadingHideTimer = null;
@@ -965,6 +999,10 @@ async function startGame(
     fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
     return;
   }
+  // Assets are the only network-bound phase the slow-connection hint can
+  // speak to; everything after this is synchronous CPU-bound scene build, so
+  // stop watching here rather than leaving it armed through hideLoadingScreen.
+  stopSlowConnectionWatch();
   const spectateBadge = createSpectateBadge();
   setLoadingStatus(t('loading.enteringWorld'));
   // Let the final status + full progress bar paint before the synchronous
@@ -993,12 +1031,21 @@ async function startGame(
     settings.set('graphicsPreset', autoPreset);
     settings.set('graphicsDefaultApplied', true);
   }
-  // Native iOS WebKit can terminate the WebContent process during Ultra world
-  // startup on recent phones, which reloads back to the start screen before the
-  // in-game options menu is reachable. Persist the safe startup tier so a saved
-  // Ultra/Advanced choice cannot trap the native app in that reload loop.
-  if (isNativeRuntime() && settings.get('graphicsPreset') >= GRAPHICS_PRESET_ULTRA) {
-    settings.set('graphicsPreset', GRAPHICS_PRESET_HIGH);
+  // iOS WebKit can terminate the tab's WebContent process during Ultra world
+  // startup on recent phones (native app shell AND iOS Safari alike, same
+  // engine/process limits), reloading back to the start screen before the
+  // in-game options menu is reachable. See startup_graphics_safety.ts.
+  const startupBrowserEnv = readBrowserEnv();
+  const safePreset = safeStartupGraphicsPreset(
+    isNativeRuntime(),
+    startupBrowserEnv.engine,
+    startupBrowserEnv.mobile,
+    settings.get('graphicsPreset'),
+    GRAPHICS_PRESET_ULTRA,
+    GRAPHICS_PRESET_HIGH,
+  );
+  if (safePreset !== settings.get('graphicsPreset')) {
+    settings.set('graphicsPreset', safePreset);
   }
   // UI theming: apply the persisted theme's CSS variables to :root, then keep a
   // hook so the Options panel can switch preset / override colours live.
@@ -1031,6 +1078,19 @@ async function startGame(
   let hud!: Hud;
   const autoLoot = new AutoLoot();
   const perf = createPerfMonitor(null);
+  // World-entry crash guard: persist a probe RIGHT BEFORE the synchronous scene build.
+  // If phone WebKit kills the WebContent process during the build (no event, no error,
+  // just a reload), the next boot finds the probe still armed and steps the graphics
+  // preset down one tier (see the recovery block in wireStartScreens). Cleared once the
+  // entry demonstrably survives, on the handled failure path below, and whenever the
+  // page is hidden (a backgrounded eviction is NOT an entry crash).
+  stampEntryProbe(settings.get('graphicsPreset'), Date.now());
+  // Dev-channel diagnostic (English on purpose): grep "[entry-guard]" in the WebView
+  // inspector / device console to isolate crash-at-entry causes on real hardware.
+  console.info(
+    `[entry-guard] world entry: preset=${settings.get('graphicsPreset')} ` +
+      `(${graphicsPresetLabel(settings.get('graphicsPreset'))}) native=${isNativeRuntime()}`,
+  );
   try {
     setLoadingPercent(37, t('loading.enteringWorld'));
     await ensureSkyAssetsAt(world.player.pos.x, world.player.pos.z);
@@ -1045,6 +1105,15 @@ async function startGame(
       renderer.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
     perf.setRenderer(renderer);
+    // Dev-channel diagnostic: the ctor ran initGfxTier, so this is the tier the scene
+    // was ACTUALLY built at (vs the preset logged above), plus the memory-profile knobs.
+    console.info(
+      `[entry-guard] scene built: tier=${GFX.tier} constrainedMemory=${GFX.constrainedMemory} ` +
+        `shadowMap=${GFX.shadowMap} msaa=${GFX.msaaSamples} dprCap=${GFX.pixelRatioCap}`,
+    );
+    // One-time software-rendering notice (WARP/SwiftShader): the Renderer
+    // constructor ran initGfxTier, so the adapter verdict is resolved by now.
+    initSoftwareRenderNotice(DESKTOP_APP);
     hud = new Hud(world, renderer, keybinds, {
       dailyRewardsEnabled: !NATIVE_APP,
       devCommandsEnabled: import.meta.env.DEV,
@@ -1081,12 +1150,10 @@ async function startGame(
     // Spellbook paints the whole class kit, including not-yet-learned rows.
     for (const id of CLASSES[world.cfg.playerClass].abilities)
       iconPriorities.push({ kind: 'ability', id });
-    // Talent nodes also use procedural crest ids that are absent from ABILITIES,
-    // plus talent-granted abilities not guaranteed to be in the base kit.
-    const classTalents = talentsFor(world.cfg.playerClass);
-    for (const node of classTalents?.nodes ?? []) {
-      iconPriorities.push(talentNodeIconRef(node));
-      for (const choice of node.choices ?? []) iconPriorities.push(talentChoiceIconRef(choice));
+    // Talent row options also use procedural crest ids that are absent from
+    // ABILITIES, plus granted abilities not guaranteed to be in the base kit.
+    for (const row of rowTreeFor(world.cfg.playerClass) ?? []) {
+      for (const option of row.options) iconPriorities.push(talentRowOptionIconRef(option));
     }
     for (const recipe of world.recipeList) prioritizeItem(recipe.resultItemId);
     for (const id of finderLootItemIds()) prioritizeItem(id);
@@ -1108,10 +1175,19 @@ async function startGame(
     prewarmIconCache(iconPrewarm.entries, { eagerCount: iconPrewarm.priorityCount });
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
-    // loading screen up forever
+    // loading screen up forever. A HANDLED failure is not a process kill, so the
+    // crash probe must not survive to cost the player a graphics tier next boot.
+    clearEntryProbe();
+    console.warn('[entry-guard] scene build failed with a handled error; probe cleared', err);
     fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
     return;
   }
+  // The build survived; give the post-build tail (first-frame texture uploads and
+  // shader compiles) time to settle before declaring the entry stable.
+  window.setTimeout(() => {
+    clearEntryProbe();
+    console.info('[entry-guard] world entry stable; probe cleared');
+  }, ENTRY_PROBE_STABLE_MS);
 
   // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
   if (offlineSim) hud.setFiestaPracticeHook(() => offlineSim.startFiestaPractice());
@@ -1446,6 +1522,9 @@ async function startGame(
           case 'deeds':
             hud.toggleDeeds();
             break;
+          case 'professions':
+            hud.toggleProfessions();
+            break;
           case 'sheathe': {
             // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
             // combat auto-unsheathe); play the cue only when the state moved.
@@ -1514,14 +1593,29 @@ async function startGame(
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
     onMountToggle: () => world.toggleMounted(),
+    onProfessions: () => hud.toggleProfessions(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
       music.setEnabled(!music.enabled);
       return music.enabled;
     },
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
+    onGroundAimMove: (x, y) => {
+      if (!hud.isGroundAimActive()) return false;
+      hud.updateGroundAimPoint(renderer.groundPoint(x, y, world.player.pos.y));
+      return true;
+    },
+    onGroundAimTap: (x, y) => {
+      if (!hud.isGroundAimActive()) return false;
+      const point = renderer.groundPoint(x, y, world.player.pos.y);
+      if (point) hud.commitGroundAimAt(point);
+      return true;
+    },
   });
   mobileControls.start();
+  hud.onResurrectAtSpiritHealer = () => {
+    void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);
+  };
   // reflect the current music state on the touch toggle (it may already be off
   // from a prior session, persisted in localStorage)
   document.getElementById('mobile-music')?.classList.toggle('mm-muted', !music.enabled);
@@ -1617,6 +1711,9 @@ async function startGame(
       case 'deeds':
         hud.toggleDeeds();
         break;
+      case 'professions':
+        hud.toggleProfessions();
+        break;
       case 'chat':
         openChat();
         break;
@@ -1697,7 +1794,20 @@ async function startGame(
     const body = document.body.classList;
     body.remove(...BROWSER_BODY_CLASSES);
     body.add(...browserBodyClasses(browserEnv, tier));
+    // Dev-channel diagnostic: which CSS-effects tier is live in-world (fx-minimal
+    // is what strips backdrop-filter compositing on phone WebKit).
+    console.info(`[entry-guard] browser effects stamped: fx=${tier} engine=${browserEnv.engine}`);
   }
+  // The landing stamp ran with a conservative 'high' render tier (no renderer
+  // existed yet, see wireStartScreens); this is the in-world re-stamp with the
+  // REAL GFX.tier that the landing comment promises but which had been lost
+  // (its only caller was the Esc-menu setting handler). Without it the fx tier
+  // in-world is whatever the landing guessed: correct for phones (minimal
+  // either way), too generous for e.g. desktop Safari on a medium GPU. Stamping
+  // here makes the in-game state deterministic, which matters on iOS where the
+  // fx-minimal cut is what keeps backdrop-filter (the More tray's glass blur
+  // snapshots the live WebGL canvas) out of an already memory-tight scene.
+  applyBrowserEffects(settings.get('browserEffects'));
 
   function applySetting(key: keyof GameSettings, value: number | boolean): void {
     if (key === 'mouseCamera') {
@@ -1788,11 +1898,23 @@ async function startGame(
       document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
       return;
     }
-    if (key === 'showSecondaryActionBar') {
-      document.body.classList.toggle(
-        'show-actionbar2',
-        settings.set('showSecondaryActionBar', !!value),
+    if (key === 'showSecondaryActionBar' || key === 'showThirdActionBar') {
+      const visibility = resolveActionBarVisibility(
+        {
+          secondary: settings.get('showSecondaryActionBar'),
+          third: settings.get('showThirdActionBar'),
+        },
+        key,
+        !!value,
       );
+      settings.set('showSecondaryActionBar', visibility.secondary);
+      settings.set('showThirdActionBar', visibility.third);
+      document.body.classList.toggle('show-actionbar2', visibility.secondary);
+      document.body.classList.toggle('show-actionbar3', visibility.third);
+      return;
+    }
+    if (key === 'showTargetOfTarget') {
+      hud.setShowTargetOfTarget(settings.set('showTargetOfTarget', !!value));
       return;
     }
     if (key === 'showDailyRewardsChest') {
@@ -2148,9 +2270,39 @@ async function startGame(
             nativeRails: pack.nativeRails,
           };
         }
-        const { balance, skus, nativeRails } = pack;
+        const { balance, skus } = pack;
+        const walletEnabled = await walletCapabilityReady;
+        const nativeRails = walletEnabled
+          ? pack.nativeRails
+          : { ...pack.nativeRails, sol: false, usdc: false, woc: false };
+        if (!walletEnabled) {
+          return {
+            available: true,
+            balance,
+            skus,
+            nativeRails,
+            walletBalances: { solLamports: null, usdcBaseUnits: null, wocBaseUnits: null },
+            nativePrices: skus.map((row) => ({
+              sku: row.sku,
+              solAmountBase: null,
+              usdcAmountBase: null,
+              wocAmountBase: null,
+            })),
+          };
+        }
         const wallet = await loadWallet();
-        const walletAddress = wallet.currentWallet().address;
+        // Read the crypto-rail balances from the actively connected wallet, but fall back
+        // to the account's LINKED (verified) wallet when nothing is connected this session.
+        // The player card shows the linked balance even while the extension is disconnected,
+        // so without this fallback a linked-but-disconnected player sees "130k $WOC" yet
+        // every SOL/USDC/WOC buy button stays disabled (null balance => unaffordable). With
+        // it the button enables on the linked balance; the buy click then surfaces the
+        // existing "connect a wallet first" prompt so they connect to sign, instead of
+        // hitting a dead button. Selection pinned by tests/claudium_view.test.ts.
+        const walletAddress = claudiumBalanceAddress(
+          wallet.currentWallet().address,
+          linkedWalletPubkey,
+        );
         const [solBalance, usdcBalance, wocBalance] = walletAddress
           ? await Promise.all([
               economy.solBalance(walletAddress),
@@ -2192,6 +2344,10 @@ async function startGame(
             void hud.refreshClaudium();
           };
           const result = await startClaudiumPurchase(economy, rail, sku, {
+            nativePayer:
+              desktopWalletBrowserHandoffAvailable() && linkedWalletPubkey
+                ? linkedWalletPubkey
+                : undefined,
             stripe: (intent) =>
               openStripeCheckout(
                 intent,
@@ -2210,7 +2366,21 @@ async function startGame(
                   },
                 },
               ),
-            nativeSignAndSend: async (transactionBase64) => {
+            nativeSignAndSend: async (transactionBase64, _rail, reference) => {
+              if (desktopWalletBrowserHandoffAvailable()) {
+                if (!linkedWalletPubkey) throw new Error('connect a wallet first');
+                const result = await authorizeDesktopWalletInBrowser({
+                  kind: 'transaction',
+                  reference,
+                  expectedAddress: linkedWalletPubkey,
+                });
+                if (result.kind !== 'transaction') {
+                  throw new Error('wallet returned an invalid transaction authorization');
+                }
+                desktopWalletBrowserSessionActive = true;
+                updateWalletButton();
+                return result.signature;
+              }
               const wallet = await loadWallet();
               return wallet.signAndSendTransactionBase64(transactionBase64);
             },
@@ -2266,100 +2436,18 @@ async function startGame(
     }
   }
   function interactKey(): void {
-    const p = world.player;
-    let bestCorpse: number | null = null,
-      bestCorpseD = INTERACT_RANGE;
-    let bestObj: number | null = null,
-      bestObjD = INTERACT_RANGE;
-    let bestNpc: number | null = null,
-      bestNpcD = INTERACT_RANGE + 1;
-    // Delve interactables (warded chest, cracked grave, sealed/tombstone passage,
-    // surface stairs) are driven through delveInteract, not the generic pickup
-    // path, the sim owns their per-object proximity + state gating and the
-    // lockpick offer. Selected a touch wider than INTERACT_RANGE so the sim can
-    // emit its precise "move closer to the chest/passage" hint.
-    let bestDelve: number | null = null,
-      bestDelveD = INTERACT_RANGE + 1;
-    // Gather nodes (#1866) are static content (src/sim/data GATHER_NODES), not
-    // entities, so they get their own nearest-in-range scan alongside the
-    // entity loop below rather than living inside it.
-    let bestNode: (typeof GATHER_NODES)[number] | null = null,
-      bestNodeD = INTERACT_RANGE;
-    for (const node of GATHER_NODES) {
-      const d = dist2d(p.pos, { x: node.pos.x, y: p.pos.y, z: node.pos.z });
-      if (d < bestNodeD) {
-        bestNode = node;
-        bestNodeD = d;
-      }
-    }
-    for (const e of world.entities.values()) {
-      const d = dist2d(p.pos, e.pos);
-      if (e.kind === 'mob' && e.lootable && d < bestCorpseD) {
-        bestCorpse = e.id;
-        bestCorpseD = d;
-      }
-      if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
-        if (d < bestDelveD) {
-          bestDelve = e.id;
-          bestDelveD = d;
-        }
-      } else if (e.kind === 'object' && e.lootable && d < bestObjD) {
-        bestObj = e.id;
-        bestObjD = d;
-      }
-      // The graveyard angel is hidden from (and not interactable by) the living,
-      // same filter renderer.pick() applies to the click path: skip it here too
-      // unless the local player is a released spirit, so it cannot starve a
-      // node sharing its graveyard's interact range for keyboard/gamepad/mobile.
-      if (e.kind === 'npc' && d < bestNpcD && (e.templateId !== 'spirit_healer' || p.ghost)) {
-        bestNpc = e.id;
-        bestNpcD = d;
-      }
-    }
-    if (bestCorpse !== null) {
-      world.lootCorpse(bestCorpse);
-      return;
-    }
-    if (bestDelve !== null) {
-      world.delveInteract(bestDelve);
-      return;
-    }
-    if (bestObj !== null) {
-      const obj = world.entities.get(bestObj)!;
-      if (obj.templateId === 'dungeon_door' && obj.dungeonId) {
-        world.enterDungeon(obj.dungeonId);
-        return;
-      }
-      if (obj.templateId === 'dungeon_exit') {
-        world.leaveDungeon();
-        return;
-      }
-      if (obj.templateId === 'mailbox') {
-        hud.openMailbox();
-        return;
-      }
-      world.pickUpObject(bestObj);
-      return;
-    }
-    if (bestNpc !== null) {
-      const npc = world.entities.get(bestNpc);
-      if (npc?.kind === 'npc' && npc.templateId === 'brother_halven') hud.openDelveBoard(bestNpc);
-      else hud.openQuestDialog(bestNpc);
-      return;
-    }
-    if (bestNode !== null) {
-      handleGatherNodeInteract(
+    stopAutorunForInteraction(
+      tryNearbyInteraction(
         world,
         hud,
-        p.pos,
-        bestNode.id,
-        bestNode.pos,
+        GATHER_NODES,
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
-      );
-      return;
-    }
-    hud.showError(t('errors.nothingInteract'));
+        t('errors.nothingInteract'),
+      ),
+      input,
+      mobileControls,
+    );
   }
 
   function attackNearest(): void {
@@ -2400,9 +2488,15 @@ async function startGame(
       renderer.setGroundAimReticle(null);
       return;
     }
-    const cursor = input.cursorPoint();
-    const g = cursor ? renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y) : null;
-    hud.updateGroundAimPoint(g);
+    // Touch placement is updated directly by MobileControls. Some mobile
+    // Chromium builds also expose a synthetic hover cursor parked at (0, 0);
+    // reading it here would erase the finger-owned point every render frame.
+    if (!document.body.classList.contains('mobile-touch')) {
+      const cursor = input.cursorPoint();
+      hud.updateGroundAimPoint(
+        cursor ? renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y) : null,
+      );
+    }
     const reticle = hud.groundAimReticle();
     renderer.setGroundAimReticle(
       reticle
@@ -2440,14 +2534,18 @@ async function startGame(
       const nodeId = renderer.pickGatherNode(x, y);
       const node = nodeId !== null ? GATHER_NODES.find((n) => n.id === nodeId) : undefined;
       if (node) {
-        handleGatherNodeInteract(
-          world,
-          hud,
-          world.player.pos,
-          node.id,
-          node.pos,
-          t('questUi.errors.tooFar'),
-          t('hudChrome.gathering.notReady'),
+        stopAutorunForInteraction(
+          handleGatherNodeInteract(
+            world,
+            hud,
+            world.player.pos,
+            node.id,
+            node.pos,
+            t('questUi.errors.tooFar'),
+            t('hudChrome.gathering.notReady'),
+          ),
+          input,
+          mobileControls,
         );
         return;
       }
@@ -2479,6 +2577,8 @@ async function startGame(
       return;
     }
     const e = world.entities.get(id);
+    const interactionOutcome = handlePickedEntity(world, hud, id, button, x, y);
+    const didInteractImmediately = interactionOutcome === true;
     if (e && e.id !== world.player.id) {
       // Mark the entity when you engage it: a left-click target, or the click-to-move
       // button that walks you to it, so both routes read the same (red on a hostile,
@@ -2489,12 +2589,15 @@ async function startGame(
       }
       // The configured click-to-move mouse button approaches the entity while the
       // regular click handler still performs target/interact behavior.
-      if (isClickMoveButton) {
+      if (
+        isClickMoveButton &&
+        shouldApproachPickedEntity(world.player, e, didInteractImmediately)
+      ) {
         const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
         input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
       }
     }
-    handlePickedEntity(world, hud, id, button, x, y);
+    stopAutorunForInteraction(interactionOutcome, input, mobileControls);
   }
 
   // Attack Move (MOBA-style): the Attack Move key walks the player toward the
@@ -3559,6 +3662,12 @@ async function startOffline(
   if (welcomeRoot) {
     await new Promise<void>((resolve) => {
       welcomeScreen = mountWelcomeScreen(welcomeRoot, {
+        mountStage: (el) =>
+          mountWelcomeStage(
+            el,
+            () => characterPreview,
+            () => window.matchMedia('(min-width: 861px) and (pointer: fine)').matches,
+          ),
         // offline: true already forces every store/chest/discord-desktop tile off in the
         // gating matrix regardless of platform, but mobileTouch/nativeApp still drive the
         // touch-vs-keyboard Continue hint ("Tap to continue"), so derive them for real
@@ -5116,6 +5225,12 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   };
   if (welcomeRoot) {
     welcomeScreen = mountWelcomeScreen(welcomeRoot, {
+      mountStage: (el) =>
+        mountWelcomeStage(
+          el,
+          () => characterPreview,
+          () => window.matchMedia('(min-width: 861px) and (pointer: fine)').matches,
+        ),
       platform: {
         nativeApp: NATIVE_APP,
         desktopApp: DESKTOP_APP,
@@ -5204,7 +5319,8 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // an unexpected drop is not fatal: the server holds the character in-world
   // (linkdead) while ClientWorld auto-reconnects, so just veil the game until
   // the world resumes; onDisconnect above fires if the retries run out
-  world.onConnectionLost = () => showReconnectOverlay();
+  world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) =>
+    showReconnectOverlay(attempt, maxAttempts, nextRetryAtMs);
   world.onReconnected = () => hideReconnectOverlay();
 }
 
@@ -5220,6 +5336,7 @@ function charselectAppearance(c: CharacterSummary): PreviewAppearance {
     skin: c.skin ?? 0,
     skinCatalog: c.skinCatalog ?? 'class',
     mainhandItemId: c.mainhandItemId ?? null,
+    offhandItemId: c.offhandItemId ?? null,
   };
 }
 
@@ -5930,14 +6047,44 @@ let walletVerifyTimeout: number | null = null;
 let walletVerifyModalUnsubscribe: (() => void) | null = null;
 let walletFlowStatus: 'connect' | 'sign' | 'verify' | null = null;
 let walletHiddenNoticeTimeout: number | null = null;
+let desktopWalletBrowserSessionActive = false;
 
-// Feature flag: Wallet Standard support needs no project id. Keep an escape
-// hatch for deploys that want to hide the wallet UI entirely. Native and desktop
-// app builds intentionally exclude wallet verification for now.
-// client_shell.test guards the native exclusion:
-// const WALLET_ENABLED = !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
-const WALLET_ENABLED =
-  !NATIVE_APP && !DESKTOP_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
+function desktopWalletBrowserHandoffAvailable(): boolean {
+  const bridge = DESKTOP_APP ? desktopBridge() : null;
+  return !!bridge?.openWalletBrowser;
+}
+
+async function authorizeDesktopWalletInBrowser(
+  action: { kind: 'link' } | { kind: 'transaction'; reference: string; expectedAddress: string },
+) {
+  const bridge = desktopBridge();
+  const openWalletBrowser = bridge?.openWalletBrowser;
+  if (!openWalletBrowser) throw new Error('desktop wallet browser is unavailable');
+  const takeWalletHandoffCode = bridge.takeWalletHandoffCode;
+  const onWalletHandoffCode = bridge.onWalletHandoffCode;
+  const result = await performDesktopWalletHandoff(action, api, {
+    openWalletBrowser: (code) => openWalletBrowser(code),
+    takeWalletHandoffCode: takeWalletHandoffCode ? () => takeWalletHandoffCode() : undefined,
+    onWalletHandoffCode: onWalletHandoffCode
+      ? (callback) => onWalletHandoffCode(callback)
+      : undefined,
+  });
+  return result;
+}
+
+// Resolve the runtime distribution before loading wallet code. Website and
+// mobile web are supported; Capacitor and Steam remain fail-closed. The
+// website-distributed Electron shell opts in through a trusted IPC probe.
+let WALLET_ENABLED = false;
+const walletCapabilityReady = resolveWalletCapability({
+  disabled: String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() === '1',
+  nativeApp: NATIVE_APP,
+  desktopApp: DESKTOP_APP,
+  bridge: DESKTOP_APP ? desktopBridge() : null,
+}).then((enabled) => {
+  WALLET_ENABLED = enabled;
+  return enabled;
+});
 
 function walletCharacterScreenVisible(): boolean {
   try {
@@ -5982,17 +6129,28 @@ function loadWallet(): Promise<typeof import('./net/wallet')> {
     ? Promise.resolve(walletMod)
     : import('./net/wallet').then((m) => {
         walletMod = m;
+        walletMod.configureWalletConnect(
+          String(import.meta.env.VITE_REOWN_PROJECT_ID ?? '').trim() || null,
+        );
         walletMod.setWalletPicker(showWalletPicker);
+        walletMod.setMobileWalletLauncher((request) =>
+          showMobileWalletLauncher(request, walletFocusManager),
+        );
         return walletMod;
       });
 }
+
+installWalletResumeHandlers(() => {
+  if (!walletMod) return;
+  void walletMod.resumeWalletConnection().catch(() => {});
+});
 
 const shortenAddress = (a: string): string => `${a.slice(0, 4)}…${a.slice(-4)}`;
 const formatWoc = (n: number): string => formatNumber(n, { maximumFractionDigits: 2 });
 const walletBalanceText = (n: number): string =>
   t('wallet.balanceAmount', { amount: formatWoc(n) });
 let walletPickerModal: HTMLDivElement | null = null;
-let walletPickerResolve: ((id: string | null) => void) | null = null;
+let walletPickerResolve: ((result: WalletPickerResult) => void) | null = null;
 // One module-local FocusManager INSTANCE for the pre-game wallet-picker modal:
 // the shared focus-trap implementation, not a second hand-rolled one. It is an instance, NOT
 // a module singleton exported from focus_manager, mirroring
@@ -6008,7 +6166,7 @@ let walletPickerFocusHandle: FocusTrapHandle | null = null;
 // re-reading document.activeElement at the new open would record body, not the real opener.
 let walletPickerOpener: HTMLElement | null = null;
 
-function closeWalletPicker(id: string | null, returnFocus = true): void {
+function closeWalletPicker(result: WalletPickerResult, returnFocus = true): void {
   const modal = walletPickerModal;
   const resolve = walletPickerResolve;
   const focusHandle = walletPickerFocusHandle;
@@ -6025,7 +6183,7 @@ function closeWalletPicker(id: string | null, returnFocus = true): void {
   // picker still returns to where the flow started.
   focusHandle?.release(returnFocus);
   if (returnFocus) walletPickerOpener = null;
-  if (resolve) resolve(id);
+  if (resolve) resolve(result);
 }
 
 // The wallet picker uses the shared src/ui/focus_manager FocusManager, so there
@@ -6035,10 +6193,11 @@ function closeWalletPicker(id: string | null, returnFocus = true): void {
 function showWalletPicker(
   wallets: readonly WalletOption[],
   selectedId: string | null,
-): Promise<string | null> {
+  mode: WalletPickerMode,
+): Promise<WalletPickerResult> {
   const reentrant = walletPickerResolve !== null;
   if (reentrant) closeWalletPicker(null, false);
-  return new Promise((resolve) => {
+  return new Promise<WalletPickerResult>((resolve) => {
     walletPickerResolve = resolve;
     // Capture the opener BEFORE focus moves into the modal; the FocusManager returns focus here
     // on release(). On a re-entrant re-open keep the FIRST opener (the re-entrant close already
@@ -6058,7 +6217,12 @@ function showWalletPicker(
     panel.setAttribute('role', 'dialog');
     panel.setAttribute('aria-modal', 'true');
     panel.setAttribute('aria-labelledby', 'wallet-picker-title');
-    panel.setAttribute('aria-describedby', 'wallet-picker-help wallet-picker-extension-help');
+    panel.setAttribute(
+      'aria-describedby',
+      mode === 'standalone'
+        ? 'wallet-picker-extension-help'
+        : 'wallet-picker-help wallet-picker-extension-help',
+    );
 
     const titleRow = document.createElement('div');
     titleRow.className = 'panel-title';
@@ -6080,12 +6244,17 @@ function showWalletPicker(
     const extensionHelp = document.createElement('p');
     extensionHelp.className = 'wallet-picker-help wallet-picker-extension-help';
     extensionHelp.id = 'wallet-picker-extension-help';
-    extensionHelp.textContent = t('wallet.extensionHelp');
+    extensionHelp.textContent =
+      mode === 'standalone'
+        ? t('wallet.standaloneAppHelp')
+        : mode === 'mobile'
+          ? t('wallet.mobileAppHelp')
+          : t('wallet.extensionHelp');
 
     const list = document.createElement('div');
     list.className = 'wallet-picker-list';
 
-    if (wallets.length === 0) {
+    if (wallets.length === 0 && mode !== 'standalone') {
       const empty = document.createElement('p');
       empty.className = 'wallet-picker-empty';
       empty.textContent = t('wallet.helpDisconnected');
@@ -6120,7 +6289,21 @@ function showWalletPicker(
       }
     }
 
-    panel.append(titleRow, help, extensionHelp, list);
+    panel.appendChild(titleRow);
+    if (mode !== 'standalone') panel.appendChild(help);
+    panel.append(extensionHelp, list);
+    if (wallets.some((option) => option.connected)) {
+      const disconnectBtn = document.createElement('button');
+      disconnectBtn.type = 'button';
+      disconnectBtn.className = 'wallet-mini wallet-picker-disconnect';
+      disconnectBtn.title = t('wallet.signOutTitle');
+      disconnectBtn.setAttribute('aria-label', t('wallet.signOutAria'));
+      disconnectBtn.textContent = t('wallet.signOut');
+      disconnectBtn.addEventListener('click', () => {
+        closeWalletPicker({ action: 'disconnect' });
+      });
+      panel.appendChild(disconnectBtn);
+    }
     back.appendChild(panel);
     document.body.appendChild(back);
     walletPickerModal = back;
@@ -6249,6 +6432,7 @@ function updateWalletButton(): void {
   if (!WALLET_ENABLED) {
     setWocBalance(null, false);
     setWalletDisplayAvailable(false);
+    setWalletConnectionAddresses(null, null, false);
     return;
   }
   syncWalletCharacterScreenVisibility();
@@ -6256,16 +6440,31 @@ function updateWalletButton(): void {
   const { address, isConnected } = walletMod
     ? walletMod.currentWallet()
     : { address: null, isConnected: false };
-  const connected = isConnected && !!address;
-  const linked = connected && linkedWalletPubkey === address;
-  const verifiedBalance = linkedWalletPubkey
-    ? (linkedWocBalance ?? (linked ? connectedWocBalance : null))
-    : null;
-  const previewBalance = connected && !linkedWalletPubkey ? connectedWocBalance : null;
+  const browserConnectedAddress = isConnected && address ? address : null;
+  const connectionView = buildWalletConnectionView({
+    enabled: true,
+    linkedAddress: linkedWalletPubkey,
+    connectedAddress: browserConnectedAddress,
+    linkedBalance: linkedWocBalance,
+    connectedBalance: connectedWocBalance,
+    externalSignerAvailable: desktopWalletBrowserSessionActive,
+  });
+  const connectedAddress = connectionView.connectedAddress;
+  const connected = connectedAddress !== null;
+  const linked = connectionView.kind === 'linked_connected';
+  const verifiedBalance = connectionView.balanceVerified ? connectionView.balance : null;
+  const previewBalance =
+    connectionView.kind === 'connected_unlinked' ? connectionView.balance : null;
   // Mirror the balance into the HUD store so the bag footer stays in sync. Only
   // a balance for the linked wallet may drive verified holder claims.
   setWocBalance(verifiedBalance ?? previewBalance, verifiedBalance !== null);
   setWalletDisplayAvailable(connected || linkedWalletPubkey !== null);
+  const externalSignerAvailable = desktopWalletBrowserSessionActive;
+  setWalletConnectionAddresses(
+    linkedWalletPubkey,
+    browserConnectedAddress,
+    externalSignerAvailable,
+  );
   const btn = document.getElementById('btn-wallet');
   const label = document.getElementById('wallet-label');
   if (!btn || !label) return;
@@ -6308,31 +6507,32 @@ function updateWalletButton(): void {
     setWalletHelp(t('wallet.helpDisconnected'), 'default');
     return;
   }
+  if (!connectedAddress) return;
   // $WOC balance sits to the left of the address once it has loaded.
   if (linked) {
     btn.classList.add('is-linked');
     label.textContent = t('wallet.appConnected');
     btn.title = t('wallet.linkedTitle');
     btn.setAttribute('aria-label', t('wallet.linkedTitle'));
-    setWalletStatus(walletAddressLabel(address, true, verifiedBalance));
-    setWalletHelp(walletHelpText(address, true, verifiedBalance), 'verified');
+    setWalletStatus(walletAddressLabel(connectedAddress, true, verifiedBalance));
+    setWalletHelp(walletHelpText(connectedAddress, true, verifiedBalance), 'verified');
   } else if (api.token) {
     btn.classList.add('needs-link');
     label.textContent = linkedWalletPubkey ? t('wallet.verifyNew') : t('wallet.verify');
     btn.title = t('wallet.verifyTitle');
     btn.setAttribute(
       'aria-label',
-      t('wallet.verifyAddressAria', { address: shortenAddress(address) }),
+      t('wallet.verifyAddressAria', { address: shortenAddress(connectedAddress) }),
     );
     setWalletStatus(null);
-    setWalletHelp(walletHelpText(address, false, connectedWocBalance), 'attention');
+    setWalletHelp(walletHelpText(connectedAddress, false, connectedWocBalance), 'attention');
   } else {
     btn.classList.add('is-connected');
-    label.textContent = walletAddressLabel(address, false, connectedWocBalance);
+    label.textContent = walletAddressLabel(connectedAddress, false, connectedWocBalance);
     btn.title = t('wallet.connectedTitle');
     btn.setAttribute('aria-label', t('wallet.connectedTitle'));
     setWalletStatus(null);
-    setWalletHelp(walletHelpText(address, false, connectedWocBalance), 'default');
+    setWalletHelp(walletHelpText(connectedAddress, false, connectedWocBalance), 'default');
   }
 }
 
@@ -7133,10 +7333,11 @@ function clearDiscordChoice(): void {
 }
 
 async function refreshWalletLinkStatus(): Promise<void> {
-  if (!WALLET_ENABLED) {
+  if (!(await walletCapabilityReady)) {
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     connectedWocBalance = null;
+    desktopWalletBrowserSessionActive = false;
     walletLinkStatusPending = false;
     updateWalletButton();
     return;
@@ -7144,6 +7345,7 @@ async function refreshWalletLinkStatus(): Promise<void> {
   if (!api.token) {
     linkedWalletPubkey = null;
     linkedWocBalance = null;
+    desktopWalletBrowserSessionActive = false;
     walletLinkStatusPending = false;
     updateWalletButton();
     return;
@@ -7214,8 +7416,51 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
   }
 }
 
+async function completeDesktopWalletVerifyFlow(): Promise<void> {
+  if (!api.token || walletVerifyInProgress) return;
+  walletVerifyPending = false;
+  walletVerifyInProgress = true;
+  let verificationFailed = false;
+  try {
+    setWalletFlowStatus('connect');
+    const authorization = await authorizeDesktopWalletInBrowser({ kind: 'link' });
+    if (authorization.kind !== 'link') throw new Error('invalid wallet link authorization');
+    setWalletFlowStatus('verify');
+    const result = await api.linkWallet(
+      authorization.address,
+      authorization.signature,
+      authorization.nonce,
+    );
+    desktopWalletBrowserSessionActive = true;
+    linkedWalletPubkey = result.pubkey;
+    connectedWocBalance = null;
+    updateWalletButton();
+    try {
+      const wallet = await loadWallet();
+      linkedWocBalance = await wallet.fetchWocBalance(result.pubkey, true);
+      updateWalletButton();
+    } catch (error) {
+      console.error('[wallet] linked wallet balance hydration failed', error);
+    }
+  } catch (err) {
+    console.error('[wallet] desktop browser verification failed', err);
+    desktopWalletBrowserSessionActive = false;
+    updateWalletButton();
+    verificationFailed = true;
+  } finally {
+    walletVerifyPending = false;
+    walletVerifyInProgress = false;
+    setWalletFlowStatus(null);
+    if (verificationFailed) flashWalletError(t('wallet.verifyFailed'));
+  }
+}
+
 async function startWalletVerifyFlow(forcePicker = false): Promise<void> {
   if (!api.token || walletVerifyPending || walletVerifyInProgress) return;
+  if (desktopWalletBrowserHandoffAvailable()) {
+    await completeDesktopWalletVerifyFlow();
+    return;
+  }
   const wallet = await loadWallet();
   if (forcePicker) {
     await wallet.disconnectWallet();
@@ -7247,6 +7492,10 @@ async function startWalletVerifyFlow(forcePicker = false): Promise<void> {
 }
 
 async function onWalletButtonClick(): Promise<void> {
+  if (desktopWalletBrowserHandoffAvailable()) {
+    await openDesktopWalletManager();
+    return;
+  }
   const wallet = await loadWallet();
   const { address, isConnected } = wallet.currentWallet();
   if (linkedWalletPubkey && (!isConnected || linkedWalletPubkey === address)) {
@@ -7256,11 +7505,50 @@ async function onWalletButtonClick(): Promise<void> {
   await startWalletVerifyFlow(false);
 }
 
+async function openDesktopWalletManager(): Promise<void> {
+  const wallet = await loadWallet();
+  const available = wallet.availableWallets();
+  const options =
+    available.length > 0
+      ? available
+      : [
+          {
+            id: wallet.WALLET_CONNECT_ID,
+            name: wallet.WALLET_CONNECT_NAME,
+            icon: wallet.WALLET_CONNECT_ICON,
+            connected: false,
+          },
+        ];
+  const view = desktopWalletManagerView(options, desktopWalletBrowserSessionActive);
+  const result = await showWalletPicker(view.options, view.selectedId, 'desktop');
+  switch (desktopWalletManagerAction(result)) {
+    case 'authorize':
+      await startWalletVerifyFlow(false);
+      return;
+    case 'disconnect':
+      await disconnectDesktopWalletSession(
+        wallet.currentWallet().isConnected ? () => wallet.disconnectWallet() : async () => {},
+        () => {
+          desktopWalletBrowserSessionActive = false;
+          updateWalletButton();
+        },
+      );
+      return;
+    case 'cancel':
+      return;
+  }
+}
+
 // Disconnect the browser wallet-app session. The account↔wallet link persists
 // server-side, so reconnecting the same wallet re-shows the verified state.
 async function signOutWallet(): Promise<void> {
   const wallet = await loadWallet();
-  await wallet.disconnectWallet();
+  try {
+    await wallet.disconnectWallet();
+  } finally {
+    desktopWalletBrowserSessionActive = false;
+    updateWalletButton();
+  }
 }
 
 async function unlinkVerifiedWallet(): Promise<void> {
@@ -7282,7 +7570,9 @@ async function switchWallet(): Promise<void> {
   await startWalletVerifyFlow(true);
 }
 
-function wireWallet(): void {
+async function wireWallet(): Promise<void> {
+  setWalletUiEnabled(false);
+  await walletCapabilityReady;
   setWalletUiEnabled(WALLET_ENABLED);
   // Feature-gate: when explicitly disabled, remove the wallet row entirely and
   // never download the wallet chunk.
@@ -7334,7 +7624,7 @@ function wireWallet(): void {
 
 window.addEventListener('woc:wallet-verify', () => {
   if (!WALLET_ENABLED || !api.token) return;
-  startWalletVerifyFlow(false).catch((err) => {
+  onWalletButtonClick().catch((err) => {
     console.error('[wallet] daily rewards verification failed', err);
   });
 });
@@ -7452,7 +7742,7 @@ function wireStartScreens(): void {
   void loadProjectStats();
   wireContractAddressCopy();
   wireHomepageMusicToggle();
-  wireWallet();
+  void wireWallet();
   wireGithubLink();
   wireSteamLink(api);
 
@@ -8732,6 +9022,43 @@ function wireStartScreens(): void {
     DISCORD_BUILD_ENABLED && document.getElementById('discord-choice-panel')
       ? readDiscordChoice()
       : null;
+  // World-entry crash recovery: a probe still armed from the previous boot means the last
+  // entry attempt died mid scene-build (phone WebKit kills the WebContent process with no
+  // event when the tab crosses its per-process memory ceiling, then the shell reloads).
+  // Step the persisted preset down ONE tier and pin it (graphicsDefaultApplied) so the
+  // auto default can never re-select a tier this device has proven it cannot enter the
+  // world at, drop the active-play resume marker so this boot lands HERE (a screen with a
+  // reachable graphics control) instead of auto-reentering the world through the welcome
+  // screen in a crash loop, and tell the player what happened. Scoped to iOS/native
+  // runtimes, the environments where the OS reload makes the crash otherwise invisible;
+  // elsewhere the probe is only logged (and cleared: it is a one-shot signal).
+  const entryRecovery = planEntryCrashRecovery(readEntryProbeRaw(), Date.now());
+  clearEntryProbe();
+  if (entryRecovery) {
+    if (isNativeRuntime() || mobilePlatform() === 'ios') {
+      const recoverySettings = new Settings();
+      if (entryRecovery.to < entryRecovery.from) {
+        recoverySettings.set('graphicsPreset', entryRecovery.to);
+      }
+      recoverySettings.set('graphicsDefaultApplied', true);
+      clearPlayMarker();
+      console.warn(
+        `[entry-guard] previous world entry crashed ${Math.round(entryRecovery.ageMs / 1000)}s ` +
+          `ago at preset=${entryRecovery.from}; graphics now preset=${entryRecovery.to}, ` +
+          'resume marker cleared',
+      );
+      // Wait for the boot locale so the banner body never paints in the wrong language.
+      void ensureLocaleLoaded(getLanguage()).then(
+        () => showEntryGuardBanner(entryRecovery.to),
+        () => showEntryGuardBanner(entryRecovery.to),
+      );
+    } else {
+      console.warn(
+        '[entry-guard] previous world entry did not complete (probe was still armed); ' +
+          'automatic downgrade is scoped to iOS/native runtimes',
+      );
+    }
+  }
   // Restore a persisted session: show the Account tab immediately, then confirm
   // the stored token is still valid against the server (clearing it if not).
   if (RESET_TOKEN && document.getElementById('reset-panel')) {
@@ -8798,10 +9125,19 @@ function wireStartScreens(): void {
   // resumes into the world on the reload that follows an OS WebView eviction. A
   // no-op when no session is in play, so it is safe to register unconditionally.
   const restampResumeMarker = () => {
-    if (document.visibilityState === 'hidden') refreshPlayMarker(Date.now());
+    if (document.visibilityState === 'hidden') {
+      refreshPlayMarker(Date.now());
+      // A page that leaves the foreground mid-entry was not killed by a foreground
+      // memory spike: a later eviction while backgrounded (or a deliberate reload,
+      // which also fires pagehide) must not read as an entry crash next boot.
+      clearEntryProbe();
+    }
   };
   document.addEventListener('visibilitychange', restampResumeMarker);
-  window.addEventListener('pagehide', () => refreshPlayMarker(Date.now()));
+  window.addEventListener('pagehide', () => {
+    refreshPlayMarker(Date.now());
+    clearEntryProbe();
+  });
 
   // Header Logo click listener to return to homepage
   const headerLogoBtn = $('#header-logo-btn');

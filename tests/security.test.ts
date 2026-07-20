@@ -97,6 +97,7 @@ describe('websocket authentication', () => {
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: '',
+      timerWire: 2,
     });
   });
 
@@ -106,6 +107,7 @@ describe('websocket authentication', () => {
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: 'seed-123',
+      timerWire: 2,
     });
   });
 });

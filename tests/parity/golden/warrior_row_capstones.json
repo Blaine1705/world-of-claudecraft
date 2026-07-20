@@ -1,0 +1,2700 @@
+{
+  "scenario": "warrior_row_capstones",
+  "seed": 1015,
+  "sampleEvery": 4,
+  "ticks": 128,
+  "coverage": [
+    "double charge: two spends while one recharge runs",
+    "aoeFear headings + Lingering Dread breakThreshold",
+    "victory rush on-kill window + selfHealPctMax",
+    "bladestorm self-centered channel ticks"
+  ],
+  "draws": 783,
+  "drawDigest": "ca6355ce",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 678,
+      "state": "0aa4799e",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 677,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "selectedMount": "valorsteed",
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 677
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 677,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 4,
+      "time": 0.2,
+      "nextId": 680,
+      "state": "bd65a8ea",
+      "events": "52d2c357",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      }
+    },
+    {
+      "tick": 8,
+      "time": 0.4,
+      "nextId": 680,
+      "state": "5b5e0ab3",
+      "events": "4b779811",
+      "rng": {
+        "draws": 6,
+        "digest": "16ed3a21"
+      }
+    },
+    {
+      "tick": 8,
+      "time": 0.4,
+      "nextId": 680,
+      "state": "0f5aa855",
+      "events": "50f16156",
+      "rng": {
+        "draws": 6,
+        "digest": "16ed3a21"
+      },
+      "label": "double-charge-spent",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 7
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_deep_roots",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_talented",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 677,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 70,
+          "selectedMount": "valorsteed",
+          "talents": {
+            "rows": {
+              "5": "war_row_double_charge",
+              "8": "war_row_victory_rush",
+              "11": "war_row_lingering_dread",
+              "20": "war_row_bladestorm"
+            }
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "abilityCharges": {
+            "charge": {
+              "maxCharges": 2,
+              "recharge": 14.6,
+              "rechargeLength": 15,
+              "recharges": [
+                14.6,
+                15
+              ]
+            }
+          },
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.6,
+              "school": "physical",
+              "sourceId": 677
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "chargePath": [
+            {
+              "x": -11.643476,
+              "z": 60.864524
+            }
+          ],
+          "chargeTargetId": 679,
+          "chargeTimeLeft": 3,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "charge",
+              14.6
+            ]
+          ],
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "facing": 1.570796,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 99.4,
+          "hp": 49993,
+          "id": 677,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -23.643476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "resource": 22.6875,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "targetId": 679,
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "chase",
+          "auras": [
+            {
+              "duration": 1,
+              "id": "charge_stun",
+              "kind": "stun",
+              "name": "Onrush",
+              "remaining": 0.6,
+              "school": "physical",
+              "sourceId": 677
+            }
+          ],
+          "combatTimer": 0.4,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 678,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              1
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 1,
+              "id": "charge_stun",
+              "kind": "stun",
+              "name": "Onrush",
+              "remaining": 1,
+              "school": "physical",
+              "sourceId": 677
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 679,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.643476,
+            "y": -3.174701,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -11.643476,
+            "y": -3.174701,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -8.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "swingTimer": 1.95,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              1
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 12,
+      "time": 0.6,
+      "nextId": 680,
+      "state": "b69d66c9",
+      "events": "741638a5",
+      "rng": {
+        "draws": 6,
+        "digest": "16ed3a21"
+      }
+    },
+    {
+      "tick": 16,
+      "time": 0.8,
+      "nextId": 680,
+      "state": "628d1c53",
+      "events": "741638a5",
+      "rng": {
+        "draws": 6,
+        "digest": "16ed3a21"
+      }
+    },
+    {
+      "tick": 16,
+      "time": 0.8,
+      "nextId": 680,
+      "state": "2fa4fd74",
+      "events": "10c85fef",
+      "rng": {
+        "draws": 9,
+        "digest": "3ce5595b"
+      },
+      "label": "feared",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 7
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_deep_roots",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_talented",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 677,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 70,
+          "selectedMount": "valorsteed",
+          "talents": {
+            "rows": {
+              "5": "war_row_double_charge",
+              "8": "war_row_victory_rush",
+              "11": "war_row_lingering_dread",
+              "20": "war_row_bladestorm"
+            }
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "abilityCharges": {
+            "charge": {
+              "maxCharges": 2,
+              "recharge": 14.2,
+              "rechargeLength": 15,
+              "recharges": [
+                14.2,
+                14.6
+              ]
+            }
+          },
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.2,
+              "school": "physical",
+              "sourceId": 677
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "chargePath": [
+            {
+              "x": -11.643476,
+              "z": 60.864524
+            }
+          ],
+          "chargeTargetId": 679,
+          "chargeTimeLeft": 2.6,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "charge",
+              14.2
+            ],
+            [
+              "intimidating_shout",
+              120
+            ]
+          ],
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "facing": 1.570796,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 99.8,
+          "gcdRemaining": 1.5,
+          "hp": 49993,
+          "id": 677,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -14.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "resource": 50,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "targetId": 679,
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "chase",
+          "auras": [
+            {
+              "duration": 1,
+              "id": "charge_stun",
+              "kind": "stun",
+              "name": "Onrush",
+              "remaining": 0.2,
+              "school": "physical",
+              "sourceId": 677
+            },
+            {
+              "breakChanceScale": 0.1,
+              "breakThreshold": 1600,
+              "breaksOnDamage": true,
+              "duration": 8,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Intimidating Shout",
+              "remaining": 8,
+              "school": "physical",
+              "sourceId": 677,
+              "value": 3.076115
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 678,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              11
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 1,
+              "id": "charge_stun",
+              "kind": "stun",
+              "name": "Onrush",
+              "remaining": 0.6,
+              "school": "physical",
+              "sourceId": 677
+            },
+            {
+              "breakChanceScale": 0.1,
+              "breakThreshold": 1600,
+              "breaksOnDamage": true,
+              "duration": 8,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Intimidating Shout",
+              "remaining": 8,
+              "school": "physical",
+              "sourceId": 677,
+              "value": 0.486582
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 679,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.643476,
+            "y": -3.174701,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -11.643476,
+            "y": -3.174701,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -8.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "swingTimer": 1.95,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              11
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 680,
+      "state": "a4f251be",
+      "events": "3a004cb5",
+      "rng": {
+        "draws": 10,
+        "digest": "22f325d1"
+      }
+    },
+    {
+      "tick": 24,
+      "time": 1.2,
+      "nextId": 680,
+      "state": "bc5e555c",
+      "events": "741638a5",
+      "rng": {
+        "draws": 10,
+        "digest": "22f325d1"
+      }
+    },
+    {
+      "tick": 24,
+      "time": 1.2,
+      "nextId": 682,
+      "state": "8aafb644",
+      "events": "3db1baf5",
+      "rng": {
+        "draws": 19,
+        "digest": "9997fa5a"
+      },
+      "label": "victory-rush",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 1083,
+            "damageTaken": 7,
+            "kills": 1
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 1083,
+              "kills": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:wolf_run"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_deep_roots",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_talented",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 677,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 70,
+          "selectedMount": "valorsteed",
+          "talents": {
+            "rows": {
+              "5": "war_row_double_charge",
+              "8": "war_row_victory_rush",
+              "11": "war_row_lingering_dread",
+              "20": "war_row_bladestorm"
+            }
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "abilityCharges": {
+            "charge": {
+              "maxCharges": 2,
+              "recharge": 13.8,
+              "rechargeLength": 15,
+              "recharges": [
+                13.8,
+                14.2
+              ]
+            }
+          },
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3598.8,
+              "school": "physical",
+              "sourceId": 677
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "chargeTimeLeft": 2.55,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "charge",
+              13.8
+            ],
+            [
+              "intimidating_shout",
+              119.6
+            ]
+          ],
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "facing": 1.570796,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 100.2,
+          "gcdRemaining": 1.5,
+          "hp": 657,
+          "id": 677,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 822,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": 5.85,
+          "petMode": "defensive",
+          "pos": {
+            "x": -14.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "resource": 50,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "swingTimer": 1.65,
+          "targetId": 681,
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "chase",
+          "auras": [
+            {
+              "breakChanceScale": 0.1,
+              "breakThreshold": 1600,
+              "breaksOnDamage": true,
+              "duration": 8,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Intimidating Shout",
+              "remaining": 7.6,
+              "school": "physical",
+              "sourceId": 677,
+              "value": 3.076115
+            },
+            {
+              "duration": 8,
+              "id": "pack_frenzy",
+              "kind": "buff_haste",
+              "name": "Pack Frenzy",
+              "remaining": 8,
+              "school": "physical",
+              "sourceId": 678,
+              "value": 1.3
+            }
+          ],
+          "combatTimer": 0.4,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.076115,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 678,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -11.724391,
+            "y": -3.194067,
+            "z": 59.048424
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              31.5
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 1,
+              "id": "charge_stun",
+              "kind": "stun",
+              "name": "Onrush",
+              "remaining": 0.2,
+              "school": "physical",
+              "sourceId": 677
+            },
+            {
+              "breakChanceScale": 0.1,
+              "breakThreshold": 1600,
+              "breaksOnDamage": true,
+              "duration": 8,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Intimidating Shout",
+              "remaining": 7.6,
+              "school": "physical",
+              "sourceId": 677,
+              "value": 0.486582
+            },
+            {
+              "duration": 8,
+              "id": "pack_frenzy",
+              "kind": "buff_haste",
+              "name": "Pack Frenzy",
+              "remaining": 8,
+              "school": "physical",
+              "sourceId": 679,
+              "value": 1.3
+            }
+          ],
+          "combatTimer": 0.4,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 0.486582,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 679,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.643476,
+            "y": -3.174701,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -10.79243,
+            "y": -3.1263,
+            "z": 62.473288
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -8.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "swingTimer": 1.95,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              32.5
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "dead",
+          "comboUntil": -1,
+          "corpseTimer": 60,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 680,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -12.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "level": 2,
+          "loot": {
+            "copper": 9,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
+          },
+          "lootFfaTimer": 60,
+          "lootRecipientIds": [
+            677
+          ],
+          "lootable": true,
+          "maxHp": 54,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -12.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 25,
+          "spawnPos": {
+            "x": -12.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 10
+          },
+          "tappedById": 677,
+          "templateId": "forest_wolf",
+          "weapon": {
+            "max": 6,
+            "min": 4,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "chase",
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8971,
+          "id": 681,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -12.343476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 9000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -12.343476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -12.343476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "tappedById": 677,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              50.5
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 28,
+      "time": 1.4,
+      "nextId": 682,
+      "state": "e39e462c",
+      "events": "bdf0d9f1",
+      "rng": {
+        "draws": 22,
+        "digest": "eee1f93f"
+      }
+    },
+    {
+      "tick": 32,
+      "time": 1.6,
+      "nextId": 682,
+      "state": "f43f913f",
+      "events": "741638a5",
+      "rng": {
+        "draws": 22,
+        "digest": "eee1f93f"
+      }
+    },
+    {
+      "tick": 36,
+      "time": 1.8,
+      "nextId": 682,
+      "state": "43067a89",
+      "events": "741638a5",
+      "rng": {
+        "draws": 22,
+        "digest": "eee1f93f"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 682,
+      "state": "445c350a",
+      "events": "741638a5",
+      "rng": {
+        "draws": 22,
+        "digest": "eee1f93f"
+      }
+    },
+    {
+      "tick": 44,
+      "time": 2.2,
+      "nextId": 682,
+      "state": "71a4e88d",
+      "events": "853a1db6",
+      "rng": {
+        "draws": 45,
+        "digest": "4f5ce4a4"
+      }
+    },
+    {
+      "tick": 48,
+      "time": 2.4,
+      "nextId": 682,
+      "state": "e47d0aad",
+      "events": "741638a5",
+      "rng": {
+        "draws": 79,
+        "digest": "75d42e50"
+      }
+    },
+    {
+      "tick": 52,
+      "time": 2.6,
+      "nextId": 682,
+      "state": "9d91a87a",
+      "events": "741638a5",
+      "rng": {
+        "draws": 103,
+        "digest": "0873cd79"
+      }
+    },
+    {
+      "tick": 56,
+      "time": 2.8,
+      "nextId": 682,
+      "state": "19892dc2",
+      "events": "741638a5",
+      "rng": {
+        "draws": 127,
+        "digest": "344b2347"
+      }
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 682,
+      "state": "f5c544ac",
+      "events": "741638a5",
+      "rng": {
+        "draws": 149,
+        "digest": "de29ad5f"
+      }
+    },
+    {
+      "tick": 64,
+      "time": 3.2,
+      "nextId": 682,
+      "state": "d312fdcc",
+      "events": "853a1db6",
+      "rng": {
+        "draws": 195,
+        "digest": "ee30a308"
+      }
+    },
+    {
+      "tick": 68,
+      "time": 3.4,
+      "nextId": 682,
+      "state": "bab238d9",
+      "events": "e5c9d83c",
+      "rng": {
+        "draws": 226,
+        "digest": "a534e2ef"
+      }
+    },
+    {
+      "tick": 72,
+      "time": 3.6,
+      "nextId": 682,
+      "state": "d4598241",
+      "events": "741638a5",
+      "rng": {
+        "draws": 253,
+        "digest": "78b8f2fd"
+      }
+    },
+    {
+      "tick": 76,
+      "time": 3.8,
+      "nextId": 682,
+      "state": "437b53a7",
+      "events": "741638a5",
+      "rng": {
+        "draws": 284,
+        "digest": "5904b733"
+      }
+    },
+    {
+      "tick": 80,
+      "time": 4,
+      "nextId": 682,
+      "state": "127f3c4e",
+      "events": "741638a5",
+      "rng": {
+        "draws": 312,
+        "digest": "03192e5d"
+      }
+    },
+    {
+      "tick": 84,
+      "time": 4.2,
+      "nextId": 682,
+      "state": "284f37c1",
+      "events": "56e6fd67",
+      "rng": {
+        "draws": 342,
+        "digest": "0b1cf605"
+      }
+    },
+    {
+      "tick": 88,
+      "time": 4.4,
+      "nextId": 682,
+      "state": "1e90afe6",
+      "events": "741638a5",
+      "rng": {
+        "draws": 380,
+        "digest": "ad53d70f"
+      }
+    },
+    {
+      "tick": 92,
+      "time": 4.6,
+      "nextId": 682,
+      "state": "d64f9745",
+      "events": "741638a5",
+      "rng": {
+        "draws": 431,
+        "digest": "60290168"
+      }
+    },
+    {
+      "tick": 96,
+      "time": 4.8,
+      "nextId": 682,
+      "state": "3314fb83",
+      "events": "741638a5",
+      "rng": {
+        "draws": 467,
+        "digest": "acf5c372"
+      }
+    },
+    {
+      "tick": 100,
+      "time": 5,
+      "nextId": 682,
+      "state": "ad6c1ca1",
+      "events": "741638a5",
+      "rng": {
+        "draws": 504,
+        "digest": "d03e1fff"
+      }
+    },
+    {
+      "tick": 104,
+      "time": 5.2,
+      "nextId": 682,
+      "state": "cfc6ae4a",
+      "events": "7486c26e",
+      "rng": {
+        "draws": 535,
+        "digest": "b6a2dc26"
+      }
+    },
+    {
+      "tick": 108,
+      "time": 5.4,
+      "nextId": 682,
+      "state": "f943ae93",
+      "events": "4c075908",
+      "rng": {
+        "draws": 575,
+        "digest": "639468b9"
+      }
+    },
+    {
+      "tick": 112,
+      "time": 5.6,
+      "nextId": 682,
+      "state": "deb56c50",
+      "events": "741638a5",
+      "rng": {
+        "draws": 619,
+        "digest": "3932ed9e"
+      }
+    },
+    {
+      "tick": 116,
+      "time": 5.8,
+      "nextId": 682,
+      "state": "f8a20ac8",
+      "events": "741638a5",
+      "rng": {
+        "draws": 667,
+        "digest": "1502394f"
+      }
+    },
+    {
+      "tick": 120,
+      "time": 6,
+      "nextId": 682,
+      "state": "c9b79262",
+      "events": "741638a5",
+      "rng": {
+        "draws": 698,
+        "digest": "5561533c"
+      }
+    },
+    {
+      "tick": 124,
+      "time": 6.2,
+      "nextId": 682,
+      "state": "984b1a23",
+      "events": "741638a5",
+      "rng": {
+        "draws": 743,
+        "digest": "707946f6"
+      }
+    },
+    {
+      "tick": 124,
+      "time": 6.2,
+      "nextId": 682,
+      "state": "984b1a23",
+      "events": "741638a5",
+      "rng": {
+        "draws": 743,
+        "digest": "707946f6"
+      },
+      "label": "bladestorm-done",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 1180,
+            "damageTaken": 28,
+            "kills": 1
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 1180,
+              "kills": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:wolf_run"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_deep_roots",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_talented",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 677,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 75,
+          "selectedMount": "valorsteed",
+          "talents": {
+            "rows": {
+              "5": "war_row_double_charge",
+              "8": "war_row_victory_rush",
+              "11": "war_row_lingering_dread",
+              "20": "war_row_bladestorm"
+            }
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "abilityCharges": {
+            "charge": {
+              "maxCharges": 2,
+              "recharge": 8.8,
+              "rechargeLength": 15,
+              "recharges": [
+                8.8,
+                9.2
+              ]
+            }
+          },
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.8,
+              "school": "physical",
+              "sourceId": 677
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castTotal": 4,
+          "channelTickEvery": 1,
+          "channelTickTimer": 1,
+          "chargeTimeLeft": 2.55,
+          "combatTimer": 0.95,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "bladestorm",
+              85
+            ],
+            [
+              "charge",
+              8.8
+            ],
+            [
+              "intimidating_shout",
+              114.6
+            ]
+          ],
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "facing": 1.570796,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 105.2,
+          "hp": 636,
+          "id": 677,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 822,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": 5.85,
+          "petMode": "defensive",
+          "pos": {
+            "x": -14.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "resource": 77.8875,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "targetId": 681,
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "chase",
+          "auras": [
+            {
+              "breakChanceScale": 0.1,
+              "breakThreshold": 1600,
+              "breaksOnDamage": true,
+              "duration": 8,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Intimidating Shout",
+              "remaining": 2.6,
+              "school": "physical",
+              "sourceId": 677,
+              "value": 3.076115
+            },
+            {
+              "duration": 8,
+              "id": "pack_frenzy",
+              "kind": "buff_haste",
+              "name": "Pack Frenzy",
+              "remaining": 3,
+              "school": "physical",
+              "sourceId": 678,
+              "value": 1.3
+            }
+          ],
+          "combatTimer": 5.4,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.076115,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 678,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -10.235835,
+            "y": -3.191163,
+            "z": 36.347175
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              31.5
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "attack",
+          "auras": [
+            {
+              "breakChanceScale": 0.1,
+              "breakThreshold": 1600,
+              "breaksOnDamage": true,
+              "duration": 8,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Intimidating Shout",
+              "remaining": 2.6,
+              "school": "physical",
+              "sourceId": 677,
+              "value": 0.486582
+            },
+            {
+              "duration": 8,
+              "id": "pack_frenzy",
+              "kind": "buff_haste",
+              "name": "Pack Frenzy",
+              "remaining": 3,
+              "school": "physical",
+              "sourceId": 679,
+              "value": 1.3
+            }
+          ],
+          "combatTimer": 5.4,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 0.486582,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 679,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.643476,
+            "y": -3.174701,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -0.154356,
+            "y": -2.540495,
+            "z": 82.582834
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -8.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "swingTimer": 1.95,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              32.5
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "dead",
+          "comboUntil": -1,
+          "corpseTimer": 55,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 680,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -12.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "level": 2,
+          "loot": {
+            "copper": 9,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
+          },
+          "lootFfaTimer": 55,
+          "lootRecipientIds": [
+            677
+          ],
+          "lootable": true,
+          "maxHp": 54,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -12.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 20,
+          "spawnPos": {
+            "x": -12.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 10
+          },
+          "tappedById": 677,
+          "templateId": "forest_wolf",
+          "weapon": {
+            "max": 6,
+            "min": 4,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "attack",
+          "combatTimer": 0.95,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8874,
+          "id": 681,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -12.343476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 9000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -12.343476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -12.343476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "swingTimer": 1.05,
+          "tappedById": 677,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              147.5
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 128,
+      "time": 6.4,
+      "nextId": 682,
+      "state": "a2797241",
+      "events": "741638a5",
+      "rng": {
+        "draws": 783,
+        "digest": "ca6355ce"
+      }
+    },
+    {
+      "tick": 128,
+      "time": 6.4,
+      "nextId": 682,
+      "state": "a2797241",
+      "events": "741638a5",
+      "rng": {
+        "draws": 783,
+        "digest": "ca6355ce"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 1180,
+            "damageTaken": 28,
+            "kills": 1
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 1180,
+              "kills": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:wolf_run"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_deep_roots",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_talented",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 677,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 75,
+          "selectedMount": "valorsteed",
+          "talents": {
+            "rows": {
+              "5": "war_row_double_charge",
+              "8": "war_row_victory_rush",
+              "11": "war_row_lingering_dread",
+              "20": "war_row_bladestorm"
+            }
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "abilityCharges": {
+            "charge": {
+              "maxCharges": 2,
+              "recharge": 8.6,
+              "rechargeLength": 15,
+              "recharges": [
+                8.6,
+                9
+              ]
+            }
+          },
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.6,
+              "school": "physical",
+              "sourceId": 677
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castTotal": 4,
+          "channelTickEvery": 1,
+          "channelTickTimer": 1,
+          "chargeTimeLeft": 2.55,
+          "combatTimer": 1.15,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "bladestorm",
+              84.8
+            ],
+            [
+              "charge",
+              8.6
+            ],
+            [
+              "intimidating_shout",
+              114.4
+            ]
+          ],
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "facing": 1.570796,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 105.4,
+          "hp": 636,
+          "id": 677,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 822,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": 5.85,
+          "petMode": "defensive",
+          "pos": {
+            "x": -14.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "resource": 77.8875,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "targetId": 681,
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "chase",
+          "auras": [
+            {
+              "breakChanceScale": 0.1,
+              "breakThreshold": 1600,
+              "breaksOnDamage": true,
+              "duration": 8,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Intimidating Shout",
+              "remaining": 2.4,
+              "school": "physical",
+              "sourceId": 677,
+              "value": 3.076115
+            },
+            {
+              "duration": 8,
+              "id": "pack_frenzy",
+              "kind": "buff_haste",
+              "name": "Pack Frenzy",
+              "remaining": 2.8,
+              "school": "physical",
+              "sourceId": 678,
+              "value": 1.3
+            }
+          ],
+          "combatTimer": 5.6,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.076115,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 678,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -10.176293,
+            "y": -3.122318,
+            "z": 35.439125
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -11.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              31.5
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "attack",
+          "auras": [
+            {
+              "breakChanceScale": 0.1,
+              "breakThreshold": 1600,
+              "breaksOnDamage": true,
+              "duration": 8,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Intimidating Shout",
+              "remaining": 2.4,
+              "school": "physical",
+              "sourceId": 677,
+              "value": 0.486582
+            },
+            {
+              "duration": 8,
+              "id": "pack_frenzy",
+              "kind": "buff_haste",
+              "name": "Pack Frenzy",
+              "remaining": 2.8,
+              "school": "physical",
+              "sourceId": 679,
+              "value": 1.3
+            }
+          ],
+          "combatTimer": 5.6,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 0.486582,
+          "fallStartY": -3.181042,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8000,
+          "id": 679,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -11.643476,
+            "y": -3.174701,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 8000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 0.271167,
+            "y": -2.519236,
+            "z": 83.387216
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -8.843476,
+            "y": -3.181042,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "swingTimer": 1.95,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              32.5
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "dead",
+          "comboUntil": -1,
+          "corpseTimer": 54.8,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 680,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -12.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "level": 2,
+          "loot": {
+            "copper": 9,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
+          },
+          "lootFfaTimer": 54.8,
+          "lootRecipientIds": [
+            677
+          ],
+          "lootable": true,
+          "maxHp": 54,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -12.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 19.8,
+          "spawnPos": {
+            "x": -12.843476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 10
+          },
+          "tappedById": 677,
+          "templateId": "forest_wolf",
+          "weapon": {
+            "max": 6,
+            "min": 4,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 677,
+          "aiState": "attack",
+          "combatTimer": 1.15,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": -3.22972,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 8874,
+          "id": 681,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -12.343476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 9000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -12.343476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -12.343476,
+            "y": -3.22972,
+            "z": 60.864524
+          },
+          "stats": {
+            "armor": 70
+          },
+          "swingTimer": 0.85,
+          "tappedById": 677,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              677,
+              147.5
+            ]
+          ],
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

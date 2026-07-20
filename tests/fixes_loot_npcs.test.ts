@@ -588,7 +588,8 @@ describe('aoe damage vs armor', () => {
   // other spell in the game.
   function aoeSetup(ability: string) {
     const sim = makeSim('mage');
-    (sim as any).grantXp(99999); // level up far past Arcane Explosion (lvl 14)
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('arcane')).toBe(true);
     const p = sim.player;
     const wolf = [...sim.entities.values()].find(
       (e) => e.kind === 'mob' && e.templateId === 'forest_wolf' && !e.dead,

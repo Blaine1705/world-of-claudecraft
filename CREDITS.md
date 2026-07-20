@@ -44,10 +44,10 @@ provided as a courtesy.
 | Realm sky HDRIs (hollow_dusk, ember_storm, frost_twilight, amber_sunset, fen_day, nightbloom_dream, wraithwood_gloom; 2k and 1k) | World of ClaudeCraft | Project-generated equirect sky panoramas, converted to RGBE with HDR sun re-injection | Project asset |
 | Zone map overlays (`public/map_art/*.png`) | World of ClaudeCraft | Project-generated painterly map overlay art derived from local zone reference plates | Project asset |
 | Infernal Citadel props (`public/models/props/infernal_brazier.glb`, `infernal_altar.glb`, `demon_idol.glb`, `hell_forge.glb`, `hanging_cage.glb`, `bone_pile.glb`, `obsidian_fang.glb`, `infernal_statue.glb`, `slag_cauldron.glb`, `bone_throne.glb`) | World of ClaudeCraft | Project-generated via `scripts/asset_pipeline` (Tripo AI text-to-3D), owned under the Tripo paid-plan license | Project asset |
-| Sampled interface and event sound effects (`public/audio/sfx/ui_*.mp3`) | World of ClaudeCraft | Project-generated deterministic FFmpeg synthesis via `scripts/gen_ui_sfx.mjs` | Project asset |
 | Legacy Claudium prototype weapon models and source images (emberfang, Red Skull, and Purple sets, in `public/models/weapons/` and `public/ui/weapons/`) | World of ClaudeCraft | Project-generated and normalized through the PR 1405 asset pipeline | Project asset |
 | Bag icons (`public/ui/items/{backpack,linen_pouch,travelers_knapsack,wolfhide_satchel,gravewoven_bag,mistcallers_duffel}.webp`, encoded to 128px WebP via `scripts/convert_item_icons_webp.mjs`) | World of ClaudeCraft | Project art created for this game; provenance per icon in `public/ui/items/mapping.json` | Project asset |
-| Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets; all 152 abilities across the 9 classes covered) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) |
+| Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) |
+| Collective Reversal and Hourglass of Suspension ability icons (`public/ui/skills/mage/collective_reversal.webp`, `public/ui/skills/mage/temporal_hourglass.webp`) | World of ClaudeCraft project owner | Owner-provided original artwork | Project asset |
 | Season 1 Armory weapon models, source images, generated store thumbnails, and promotional card (Guildmark, Emberwrought, Hoarfrost, and Fallen Star collections, in `public/models/weapons/`, `public/ui/weapons/`, and `public/ui/store/`) | World of ClaudeCraft | Project-generated via `scripts/asset_pipeline` (Tripo AI 3D); storefront renders composited locally, with the text-free promo background derived through OpenAI image editing | Project asset |
 | Generated class skin-suit set "Prismatic Vanguard" (suit_prismatic, all classes, `public/textures/skins/<class>/alt_suit_prismatic.png`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (procedural gradient-map atlas) | Project asset |
 | Generated class skin-suit set "Liquid Chrome" (suit_chrome, all classes, `public/textures/skins/<class>/alt_suit_chrome.png`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (procedural gradient-map atlas) | Project asset |
@@ -55,6 +55,8 @@ provided as a courtesy.
 | Sampled interface and event sound effects (`public/audio/sfx/ui_*.mp3`, except `ui_level_up.mp3` and `ui_achievement.mp3`, credited under Audio below) | World of ClaudeCraft | Project-generated deterministic FFmpeg synthesis via `scripts/gen_ui_sfx.mjs` | Project asset |
 | Book of Deeds achievement icons (`public/ui/deeds/*.webp`, one per earnable deed, downscaled from the maintainer's 512px source set to 128px WebP via `scripts/convert_deed_icons_webp.mjs`) | World of ClaudeCraft | Maintainer-commissioned bespoke art, owned by the project | Project asset |
 | Guide webfonts (`public/fonts/*.woff2`: Cinzel by Natanael Gama; Alegreya and Alegreya Sans by Juan Pablo del Peral, Huerta Tipografica; woff2 subsets latin/latin-ext/cyrillic/vietnamese as served by Google Fonts, self-hosted for the /wiki guide) | Natanael Gama; Huerta Tipografica | https://fonts.google.com/specimen/Cinzel , https://fonts.google.com/specimen/Alegreya , https://fonts.google.com/specimen/Alegreya+Sans | SIL OFL 1.1 |
+| Owner-provided Mage artwork (`fireball_form.webp`, `counterspell.webp`) | Levy Street account | Owner-provided artwork | Used with permission |
+| Temporal clock sound effect (`public/audio/sfx/temporal_clock.mp3`) | World of ClaudeCraft | User-provided source recording | Project asset |
 
 ## Brand marks
 
@@ -73,19 +75,33 @@ project assets, and no endorsement or affiliation is implied.
 
 ## Audio
 
+All sampled sound effects credited to @jamiecypher below (`public/audio/sfx/`)
+are original recordings and sound design, reworked using original sounds and
+licensed source material from EastWest Composer Cloud, Epic Stock Media, and
+Freesound.org (CC0). @jamiecypher retains copyright and publishes this work
+under CC BY-NC 4.0 (Creative Commons Attribution-NonCommercial 4.0
+International): free to use and share non-commercially with attribution.
+@jamiecypher separately grants World of ClaudeCraft (Levy Street) a
+perpetual, royalty-free license to use these assets commercially, including
+in official releases and the Claudium store.
+
 | Assets | Author | Source | License |
 |---|---|---|---|
-| Generated world, combat, creature, and ambience sound effects (`public/audio/sfx/*.mp3`, excluding `quest_*.mp3` and `mount_*.mp3`) | World of ClaudeCraft | Project-generated with the ElevenLabs Sound Effects API from `scripts/sfx/sfx_prompts.mjs` | Project asset |
+| Remaining generated world, interface, event, and ambience sound effects not attributed below (`public/audio/sfx/*.mp3`, excluding `quest_*.mp3` and `mount_*.mp3`) | World of ClaudeCraft | Project-generated with the ElevenLabs Sound Effects API from `scripts/sfx/sfx_prompts.mjs` or deterministic FFmpeg synthesis via `scripts/gen_ui_sfx.mjs` | Project asset |
 | Valorsteed gallop layer (`mount_run_valorsteed.mp3`) | D4XX, adapted by congusbongus | [Horse gallop on different surfaces](https://opengameart.org/content/horse-gallop-on-different-surfaces), individual `ground.mp3` source identified as CC0 in the included credits | CC0 1.0 |
 | Mount footfall layers (`mount_run_grag_bear.mp3`, `mount_run_shadowjump_toad.mp3`, `mount_run_stormfeather_griffin.mp3`, `mount_run_thunderstrut_gobbler.mp3`) | Fantozzi, extracted by qubodup | [Fantozzi's Footsteps](https://opengameart.org/content/fantozzis-footsteps-grasssand-stone) | CC0 1.0 |
 | Stalk-Glider slime layer (`mount_run_stalkglider_snail.mp3`) | RandomUser | [Slime ultimate the best](https://opengameart.org/content/slime-ultimate-the-best) | CC0 1.0 |
 | Shadow-Jump Toad slime layer (`mount_run_shadowjump_toad.mp3`) | KobatoGames | [Slime jump effect](https://opengameart.org/content/slime-jump-effect) | CC0 1.0 |
 | Hover-Cycle movement layer (`mount_run_aether_hover_cycle.mp3`) | Umplix | [Hovermobile SFX](https://opengameart.org/content/hovermobile-sfx) | CC0 1.0 |
 | Stormfeather and Grand Gobbler wing layers (`mount_run_stormfeather_griffin.mp3`, `mount_run_thunderstrut_gobbler.mp3`) | AntumDeluge, derived from dave.des | [Large Wings Flap](https://opengameart.org/content/large-wings-flap) | CC0 1.0 |
-| Quest event sound effects (`public/audio/sfx/quest_*.mp3`); original compositions | @jamiecypher | Original work | CC0 1.0 |
-| Lockpick minigame sound effects (`public/audio/sfx/lockpick_*.mp3`); original sound design edited and layered in Reaper from CC0 source samples | @jamiecypher | https://freesound.org | CC0 1.0 |
-| Wand auto-attack sound effects (`public/audio/sfx/wand_*.mp3`); original recordings | @jamiecypher | Original work | CC0 1.0 |
-| Level-up and Book of Deeds achievement chimes (`public/audio/sfx/ui_level_up.mp3`, `public/audio/sfx/ui_achievement.mp3`); original recordings | @jamiecypher | Original work | CC0 1.0 |
+| Quest event sounds (`quest_accept`, `quest_ready`, `quest_complete`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) |
+| Lockpick minigame sounds (`lockpick_*`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) |
+| Wand auto-attack sounds (`wand_*`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) |
+| Level-up and Book of Deeds achievement chimes (`ui_level_up`, `ui_achievement`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) |
+| Magic-school impact and casting-support one-shots (`impact_*`, `heal_impact`, `buff_apply`, `debuff_apply`, `spell_nova`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) |
+| Magic-school projectile launches (`proj_*`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) |
+| Melee, footstep, movement, combat-reaction, and player-state sounds (`melee_*`, `foot_*`, `move_*`, `combat_*`, `player_death*`, `player_hurt*`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) |
+| Creature vocalizations, every mob family (`mob_*`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) |
 | Generated prop model (marsh_plank_bridge) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (marsh_shrine_fragment) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (marsh_corpse_candle) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
@@ -96,6 +112,26 @@ project assets, and no endorsement or affiliation is implied.
 | Generated prop model (yumi_brazier_stand) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (yumi_torch_handle) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (dungeon_door_arch) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (crypt_ritual_circle) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (delve_module_exit) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (delve_surface_exit) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (delve_rite_shrine_bell) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (delve_rite_shrine_candle) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (delve_rite_shrine_reed) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (delve_rite_shrine_skull) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (delve_pressure_plate) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (marsh_root_wall) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated creature model + animations (training_dummy) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset |
+| Generated prop model (engineering_workbench) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (alchemy_cauldron) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (cooking_spit) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (leatherworking_rack) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (tailoring_loom) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (inscription_lectern) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (enchanting_altar) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (jewelcrafting_bench) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (mining_ore_cart) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (herbalism_drying_rack) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not

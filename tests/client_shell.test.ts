@@ -223,6 +223,25 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('carries the loading-screen element set, including #ls-slow-hint, in BOTH entries', () => {
+    // main.ts is shared by index.html and play.html (src/CLAUDE.md: "index.html
+    // AND play.html both load src/main.ts"). setSlowConnectionHintVisible is
+    // hit on every 1s tick of the slow-connection watch during the whole
+    // loading screen, so a missing element on either entry throws (or, with
+    // the null-guard, silently never shows) on that entry. #2106's review
+    // caught play.html shipping the reconnect countdown work without this
+    // element; pin both entries so it cannot regress unnoticed.
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="loading-screen"');
+      expect(entry).toContain('id="ls-fill"');
+      expect(entry).toContain('id="ls-status"');
+      expect(entry).toContain('id="ls-tip"');
+      expect(entry).toContain(
+        '<div id="ls-slow-hint" data-i18n="loading.slowConnection" role="status" aria-live="polite">',
+      );
+    }
+  });
+
   it('places skip links as the first focusable elements in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
       const skipMain = entry.indexOf('class="hud-skip" href="#ui"');
@@ -511,7 +530,7 @@ describe('client HTML shell', () => {
 
   it('ships the mobile party-chip CSS with a 40px touch floor, scoped to body.mobile-touch', () => {
     // The chip meets the mobile touch floor and reveals the frames only under the
-    // painter-driven .party-expanded class (collapsed by default hides the rows + Leave).
+    // painter-driven .party-expanded class (collapsed by default hides the rows).
     const chipRule = hudMobileCss.match(/body\.mobile-touch #party-chip \{([^}]*)\}/)?.[1] ?? '';
     expect(chipRule).toMatch(/min-width:\s*40px/);
     expect(chipRule).toMatch(/min-height:\s*40px/);
@@ -802,22 +821,26 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("'DiscordClick'");
   });
 
-  it('excludes wallet verification surfaces from native and desktop app builds', () => {
+  it('excludes wallet surfaces from native and Steam builds while allowing website desktop', () => {
     expect(hudCss).toContain('body.native-app #nav-btn-download,');
     expect(hudCss).toContain(
       'body.native-app .cs-wallet,\n  body.native-app .cs-wallet-hidden-note,\n  body.native-app .account-wallet-card',
     );
     expect(hudCss).toContain('body.native-app #performance-tip,');
-    expect(hudCss).toContain(
-      'body.desktop-app #token-ca,\n  body.desktop-app .cs-wallet,\n  body.desktop-app .cs-wallet-hidden-note,\n  body.desktop-app .account-wallet-card,\n  body.desktop-app .official-site-copy',
-    );
+    expect(hudCss).toContain('body.desktop-app #token-ca,\n  body.desktop-app .official-site-copy');
+    expect(hudCss).not.toContain('body.desktop-app .cs-wallet');
     expect(html).toContain('<section class="account-card account-wallet-card">');
     expect(mainTs).toContain("document.body.classList.toggle('desktop-app', DESKTOP_APP);");
-    expect(mainTs).toContain(
-      "!NATIVE_APP && !DESKTOP_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';",
-    );
+    expect(mainTs).toContain('const walletCapabilityReady = resolveWalletCapability({');
+    expect(mainTs).toContain('nativeApp: NATIVE_APP,');
+    expect(mainTs).toContain('desktopApp: DESKTOP_APP,');
+    expect(mainTs).toContain('bridge: DESKTOP_APP ? desktopBridge() : null,');
     expect(mainTs).toContain("document.querySelector('.cs-wallet')?.remove();");
     expect(mainTs).toContain("document.querySelector('.account-wallet-card')?.remove();");
+    expect(mainTs).toContain("disconnectBtn.className = 'wallet-mini wallet-picker-disconnect';");
+    expect(mainTs).toContain("closeWalletPicker({ action: 'disconnect' });");
+    expect(mainTs).toContain('await openDesktopWalletManager();');
+    expect(shellCss).toContain('.wallet-picker-disconnect {');
   });
 
   it('skips the web mobile preflight in native builds and hard-gates portrait gameplay', () => {
@@ -1042,6 +1065,7 @@ describe('client HTML shell', () => {
 
   it('carries identical mobile-action-ring markup in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="actionbar3"');
       expect(entry).toContain('id="mobile-action-ring"');
       expect(entry).toContain('id="mobile-action-attack"');
       expect(entry).toContain('id="mobile-action-page-toggle"');
@@ -1052,6 +1076,30 @@ describe('client HTML shell', () => {
       const indices = slotMatches.map((m) => m[1]).sort();
       expect(indices).toEqual(['0', '1', '2', '3', '4']);
     }
+  });
+
+  it('stacks the optional third desktop row above the secondary row in both entries', () => {
+    for (const entry of [html, playHtml]) {
+      const third = entry.indexOf('id="actionbar3"');
+      const secondary = entry.indexOf('id="actionbar2"');
+      const primary = entry.indexOf('id="actionbar"');
+      expect(third).toBeGreaterThan(-1);
+      expect(third).toBeLessThan(secondary);
+      expect(secondary).toBeLessThan(primary);
+    }
+    expect(hudCss).toContain('body.show-actionbar3 #actionbar3 {\n    display: flex;\n  }');
+    expect(hudCss).toContain('body.show-actionbar3 #castbar {\n    bottom: 318px;\n  }');
+    expect(hudCss).toContain('body.show-actionbar3 #swingbar {\n    bottom: 292px;\n  }');
+    expect(hudTs).toContain("const bar3 = $('#actionbar3');");
+    expect(hudTs).toContain('const container = bars[actionBarRowForSlot(i) - 1];');
+    expect(hudTs).toContain('keyCapLabel(this.keybinds.primaryLabel(slotKey))');
+  });
+
+  it('applies the pure visibility dependency to both optional desktop rows', () => {
+    expect(mainTs).toContain("key === 'showThirdActionBar'");
+    expect(mainTs).toContain('resolveActionBarVisibility(');
+    expect(mainTs).toContain("classList.toggle('show-actionbar2', visibility.secondary)");
+    expect(mainTs).toContain("classList.toggle('show-actionbar3', visibility.third)");
   });
 
   it('carries the same community-tray links in BOTH entries, with no duplicate Discord entry', () => {
@@ -1200,7 +1248,10 @@ describe('client HTML shell', () => {
       'bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());',
     );
     expect(hudTs).toContain(
-      'bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());',
+      'bindTouchTap(this.resurrectHealerBtnEl, () => this.onResurrectAtSpiritHealer?.());',
+    );
+    expect(mainTs).toContain(
+      'hud.onResurrectAtSpiritHealer = () => {\n    void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);\n  };',
     );
     expect(hudTs).not.toMatch(
       /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
@@ -1321,6 +1372,7 @@ describe('client HTML shell', () => {
     // per-row button to the self portrait context menu, so the row no longer builds
     // a #party-leave button.)
     expect(partyFrameRowTs).toContain("row.className = 'party-frame panel';");
+    expect(hudTs).toContain("else if (act === 'leave-party') this.sim.partyLeave();");
 
     // Aura slots: one node per aura id, held in a keyed pool and built once in
     // createNode() as .buff > .dur + .stacks. The hud.ts-wiring assertion (mirroring the
@@ -1887,6 +1939,31 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('top: -104px;');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.near,');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.locked {');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-autorun-target.locked {\n    top: 50%;\n    z-index: 1;\n    transform: translate(-50%, -50%) scale(1);',
+    );
+    expect(hudMobileCss).toContain(
+      '@media (prefers-reduced-motion: reduce) {\n    body.mobile-touch #mobile-autorun-target {\n      transition: none;',
+    );
+    expect(mainTs).toContain(
+      "import { stopAutorunForInteraction } from './game/interaction_autorun';",
+    );
+    expect(mainTs).toContain("import { tryNearbyInteraction } from './game/nearby_interaction';");
+    expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
+    // Phase 4 open-gate flip: the trailing (online === null) override is gone,
+    // so the helpers default harvestStateReliable = true (trusting the hcb
+    // corpse-claim mirror online); the call now closes right after the
+    // nothing-to-interact string.
+    expect(mainTs).toContain("t('errors.nothingInteract'),\n      ),");
+    expect(mainTs).not.toContain('online === null');
+    expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
+    expect(mainTs).toContain(
+      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteractImmediately)',
+    );
+    expect(mainTs).toContain(
+      'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',
+    );
+    expect(mainTs).toContain('stopAutorunForInteraction(\n          handleGatherNodeInteract(');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
     // The cast bar sits at the classic centre seat above the bottom-centre
@@ -2079,9 +2156,10 @@ describe('client HTML shell', () => {
 
   it('hides the desktop action bars on touch: the mobile action ring supersedes them', () => {
     // The paged mobile action ring (bcc5fa53) replaced the scrollable desktop
-    // #actionbar row on touch, so both desktop bars (and their .action-btn
+    // #actionbar row on touch, so all desktop bars (and their .action-btn
     // sizing/drag/hover rules, only ever reachable while a bar is visible) stay
     // display:none rather than also being scaled/laid out for touch.
+    expect(hudMobileCss).toContain('body.mobile-touch #actionbar3 {\n    display: none;\n  }');
     expect(hudMobileCss).toContain('body.mobile-touch #actionbar2 {\n    display: none;\n  }');
     expect(hudMobileCss).toContain('body.mobile-touch #actionbar {\n    display: none;\n  }');
     expect(hudMobileCss).not.toContain('body.mobile-touch #actionbar {\n    display: flex;');

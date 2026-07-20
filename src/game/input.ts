@@ -10,6 +10,7 @@ import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
 import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
 import {
+  inForcedPointerLockCooldown,
   pointerLockNeedsSyncGesture,
   shouldEngagePointerLock,
   shouldEngagePointerLockOnMouseDown,
@@ -87,6 +88,7 @@ export interface InputCallbacks {
       | 'calendar'
       | 'discord'
       | 'deeds'
+      | 'professions'
       | 'crafting'
       | 'sheathe'
       | 'mount',
@@ -177,6 +179,9 @@ export class Input {
   private lookPitchSign = 1;
   private downButton = -1;
   private pointerLockRequestedForDrag = false;
+  // Set when the browser itself force-unlocks the pointer (Escape, focus
+  // loss) while a drag button was still held; see inForcedPointerLockCooldown.
+  private forcedUnlockAt: number | null = null;
   // Firefox rejects requestPointerLock() when it is deferred to a later
   // mousemove; computed once since the browser cannot change mid-session.
   private readonly needsSyncPointerLockGesture = detectPointerLockNeedsSyncGesture();
@@ -189,6 +194,10 @@ export class Input {
   private controllerMoveInput: MoveInput | null = null;
   private controllerFacing: number | null = null;
   private emoteWheelHeldCodes = new Set<string>();
+  // Advances only when the player starts or replaces movement. Releasing a held
+  // key/stick is not newer travel intent and must not invalidate a delayed
+  // successful interaction that should stop autorun.
+  private movementIntentRevision = 0;
   // Physical key code -> action-bar slot currently held down, so key UP (or a
   // blur) releases the matching slot (drives the hold-to-charge shoot).
   private heldSlotCodes = new Map<string, number>();
@@ -239,6 +248,21 @@ export class Input {
     window.addEventListener('pointercancel', (e) => this.onMouseUp(e));
     document.addEventListener('pointerlockchange', () => {
       if (!document.pointerLockElement) {
+        // A forced unlock (Escape, or losing focus while locked) fires with a
+        // drag button still physically down: the ordinary end-of-drag
+        // exitPointerLock() call only ever runs after mouseup has already
+        // cleared leftDown/rightDown. This is not a hard guarantee though:
+        // setLockCursorOnRotate()/setMouseCameraEnabled() call
+        // exitPointerLock() directly and can fire mid-drag with a button
+        // still held, which reads here as a forced unlock too. The fallout is
+        // small (toggling one of those settings mid-drag suppresses the lock
+        // for the next ~1.3s on Firefox) and self-corrects once the drag
+        // ends, so it is an accepted trade-off rather than something worth
+        // threading extra state through to distinguish. Remember the forced
+        // unlock so the next requestPointerLock() attempt can skip Firefox's
+        // post-forced-unlock cooldown instead of failing silently mid-drag
+        // (#1834 recurrence).
+        if (this.leftDown || this.rightDown) this.forcedUnlockAt = performance.now();
         this.releaseCapture('pointerlock');
         return;
       }
@@ -256,6 +280,23 @@ export class Input {
       ) {
         document.exitPointerLock();
       }
+    });
+    // A denied request (e.g. the forced-unlock cooldown above, or any other
+    // rejection) otherwise leaves pointerLockRequestedForDrag wrongly set to
+    // true with no lock actually granted; without this the drag never
+    // reconsiders requesting the lock again for the rest of that press.
+    document.addEventListener('pointerlockerror', () => {
+      this.pointerLockRequestedForDrag = false;
+      // A denial is itself the strongest available evidence that we are
+      // inside Firefox's forced-unlock cooldown, whatever caused it: the
+      // pointerlockchange handler above only records forcedUnlockAt when a
+      // drag button happens to still be held at unlock time, which misses
+      // orderings where focus loss clears leftDown/rightDown before the
+      // unlock event fires (blur landing ahead of pointerlockchange, the
+      // likely ordering for a focus-loss forced unlock). Recording it here
+      // too makes the mechanism self-healing: the next drag attempt within
+      // the window skips the doomed request regardless of event ordering.
+      this.forcedUnlockAt = performance.now();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) this.releaseCapture('hidden');
@@ -466,9 +507,13 @@ export class Input {
       move.back !== this.touchMove.back ||
       move.strafeLeft !== this.touchMove.strafeLeft ||
       move.strafeRight !== this.touchMove.strafeRight;
+    const moving = move.forward || move.back || move.strafeLeft || move.strafeRight;
     this.touchMove = move;
     if (move.forward || move.back) this.autorun = false;
-    if (changed) this.noteIntent('move');
+    if (changed) {
+      if (moving) this.noteMovementIntent();
+      else this.noteIntent('move');
+    }
   }
 
   clearTouchMove(): void {
@@ -492,14 +537,20 @@ export class Input {
   // Returns the new state so the on-screen button can reflect it.
   toggleAutorun(): boolean {
     this.autorun = !this.autorun;
+    this.noteMovementIntent();
     return this.autorun;
   }
 
   // Idempotent autorun latch for analog inputs that have a one-way "engage"
   // gesture, such as the mobile move joystick's top band.
   setAutorun(on: boolean): boolean {
+    if (this.autorun !== on) this.noteMovementIntent();
     this.autorun = on;
     return this.autorun;
+  }
+
+  movementIntentVersion(): number {
+    return this.movementIntentRevision;
   }
 
   setTouchLook(active: boolean): void {
@@ -537,9 +588,13 @@ export class Input {
       move.back !== this.gamepadMove.back ||
       move.strafeLeft !== this.gamepadMove.strafeLeft ||
       move.strafeRight !== this.gamepadMove.strafeRight;
+    const moving = move.forward || move.back || move.strafeLeft || move.strafeRight;
     this.gamepadMove = move;
     if (move.forward || move.back) this.autorun = false;
-    if (changed) this.noteIntent('move');
+    if (changed) {
+      if (moving) this.noteMovementIntent();
+      else this.noteIntent('move');
+    }
   }
 
   clearGamepadMove(): void {
@@ -624,7 +679,7 @@ export class Input {
     this.clickMovePulseTarget = target;
     this.clickMovePulse++;
     this.autorun = false;
-    this.noteIntent('move');
+    this.noteMovementIntent();
   }
 
   rerouteClickMoveTarget(
@@ -672,6 +727,10 @@ export class Input {
 
   controllerFacingOverride(): number | null {
     return this.controllerFacing;
+  }
+
+  private msSinceForcedUnlock(): number | null {
+    return this.forcedUnlockAt === null ? null : performance.now() - this.forcedUnlockAt;
   }
 
   private releaseCapture(reason: string): void {
@@ -774,7 +833,7 @@ export class Input {
       // edge) so a fast tap survives until a grounded movement tick samples it.
       if (held === 'jump')
         this.keyJumpUntil = Math.max(this.keyJumpUntil, performance.now() + KEY_JUMP_LATCH_MS);
-      this.noteIntent('move');
+      this.noteMovementIntent();
     }
     const edge = combo ? this.keybinds.edgeActionForCombo(combo) : null;
     if (edge !== null) {
@@ -836,7 +895,7 @@ export class Input {
     switch (action) {
       case 'autorun':
         this.autorun = !this.autorun;
-        this.noteIntent('move');
+        this.noteMovementIntent();
         return;
       case 'target':
         this.cb.onTab();
@@ -919,6 +978,9 @@ export class Input {
       case 'deeds':
         this.cb.onUiKey('deeds');
         return;
+      case 'professions':
+        this.cb.onUiKey('professions');
+        return;
       case 'chat':
         this.cb.onUiKey('chat');
         return;
@@ -962,6 +1024,10 @@ export class Input {
         needsSyncGesture: this.needsSyncPointerLockGesture,
         lockOnRotate: this.lockCursorOnRotate,
         alreadyLocked: document.pointerLockElement === this.canvas,
+      }) &&
+      !inForcedPointerLockCooldown({
+        needsSyncGesture: this.needsSyncPointerLockGesture,
+        msSinceForcedUnlock: this.msSinceForcedUnlock(),
       })
     ) {
       this.pointerLockRequestedForDrag = true;
@@ -1041,6 +1107,10 @@ export class Input {
           lockOnRotate: this.lockCursorOnRotate,
           isFullscreen: this.isBrowserFullscreen(),
           alreadyLocked: document.pointerLockElement === this.canvas,
+        }) &&
+        !inForcedPointerLockCooldown({
+          needsSyncGesture: this.needsSyncPointerLockGesture,
+          msSinceForcedUnlock: this.msSinceForcedUnlock(),
         })
       ) {
         this.pointerLockRequestedForDrag = true;
@@ -1060,6 +1130,11 @@ export class Input {
 
   private noteIntent(kind: 'move' | 'look' | 'zoom'): void {
     this.cb.onInputIntent?.(kind);
+  }
+
+  private noteMovementIntent(): void {
+    this.movementIntentRevision++;
+    this.noteIntent('move');
   }
 
   private isAttackMoveReservedCode(code: string): boolean {

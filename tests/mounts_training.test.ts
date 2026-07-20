@@ -226,7 +226,13 @@ describe('riding lesson: mounting advances to ride; a finished race completes it
     const events = completeRace(sim);
     expect(events.some((e) => e.type === 'mountRaceEnd' && e.outcome === 'finished')).toBe(true);
     expect(events.some((e) => e.type === 'mountTrainEnd' && e.outcome === 'success')).toBe(true);
-    expect(events.some((e) => e.type === 'questProgress')).toBe(true);
+    expect(events.find((e) => e.type === 'questProgress')).toMatchObject({
+      questId: RIDING_LESSONS_QUEST_ID,
+      objectiveIndex: 0,
+      current: 1,
+      required: 1,
+      text: 'Tame the Valorsteed: 1/1',
+    });
     // Marla takes the unowned steed back.
     expect(sim.player.mountKey).toBe('');
     expect(metaOf(sim).mountTraining ?? null).toBeNull();

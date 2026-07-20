@@ -201,6 +201,14 @@ export const en = {
   },
   game: gameStrings,
   hudChrome: hudChromeStrings,
+  // Rare gather events (Professions 2.0 Phase 4): the zone-broadcast lines
+  // rendered from the id-based gatherRareEvent SimEvent; {finder} is the
+  // harvester's player name and splices verbatim.
+  gatherEvent: {
+    pristineVein: '{finder} struck a pristine vein!',
+    ancientHeartwood: '{finder} felled an ancient heartwood!',
+    moonlitBloom: '{finder} discovered a moonlit bloom!',
+  },
   apiError: apiErrorStrings,
   guide: guideStrings,
   editor: editorStrings,
@@ -376,8 +384,8 @@ export const en = {
   wallet: {
     label: '$WOC Wallet',
     connect: 'Verify Wallet',
-    connectTitle: 'Verify your Solana wallet',
-    connectAria: 'Verify your Solana wallet',
+    connectTitle: 'Connect a Solana wallet',
+    connectAria: 'Connect a Solana wallet',
     verify: 'Verify Wallet',
     verifyNew: 'Verify New Wallet',
     verifyTitle: 'Choose a wallet and sign once to verify ownership.',
@@ -415,6 +423,9 @@ export const en = {
     balancePreviewAria:
       'Connected wallet balance preview: {balance}. Link the wallet to verify holder flair.',
     balanceAmount: '{amount} $WOC',
+    bagConnect: 'Link wallet',
+    bagLink: 'Verify wallet',
+    bagReconnect: 'Reconnect wallet',
     connected: 'Connected: {address}',
     connectedWithBalance: 'Connected: {balance} - {address}',
     connectedLinked: 'Verified: {address}',
@@ -435,13 +446,46 @@ export const en = {
     helpLinkedDisconnectedWithBalance:
       'Holder perks are active. Connect the app when you need to sign or spend.',
     extensionHelp:
-      'To see a wallet here, keep a browser wallet extension such as Solflare Wallet active.',
+      'Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.',
+    mobileAppHelp:
+      'Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.',
+    standaloneAppHelp:
+      'Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.',
+    openAppTitle: 'Continue in {wallet}',
+    openAppHelp:
+      'Open {wallet} to review this request. Keep this game tab open while the wallet app is active.',
+    openAppButton: 'Open {wallet}',
+    manualReturnBrowserHelp:
+      'After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.',
+    manualReturnStandaloneHelp:
+      'After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.',
+    preparingAppButton: 'Preparing {wallet}...',
+    walletAppUnavailable: '{wallet} could not be prepared. Close this window and try again.',
     flowConnect: 'Choose a wallet. Verification continues automatically.',
     flowSign: 'Sign the verification message in your wallet app. No transaction or SOL required.',
     flowVerify: 'Verifying wallet ownership...',
     linkFailed: 'Wallet verification failed.',
     verifyFailed: 'Wallet verification failed.',
     unlinkFailed: 'Could not unlink wallet.',
+    browser: {
+      eyebrow: 'Desktop wallet authorization',
+      title: 'Connect a Solana Wallet',
+      linkBody:
+        'Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.',
+      paymentBody:
+        'Choose the wallet linked to your account and approve the transaction in this browser.',
+      extensionHelp:
+        'No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.',
+      safety: 'World of ClaudeCraft never asks for your recovery phrase or private key.',
+      continueWith: 'Continue with {wallet}',
+      reviewTitle: 'Review in your wallet',
+      reviewBody: 'Follow the prompt from {wallet}. Keep this browser page open.',
+      completeTitle: 'Wallet authorization complete',
+      completeBody: 'You can return to the World of ClaudeCraft desktop app.',
+      returnButton: 'Return to desktop app',
+      failed: 'Wallet authorization failed or expired. Return to the desktop app and try again.',
+      retry: 'Retry',
+    },
     holder: '$WOC holder',
     holderTierTitle: '{tier} $WOC holder',
     holderTiers: {
@@ -771,6 +815,26 @@ export const en = {
     // delve-shop keys; only the marks-specific strings live here.
     balance: 'Heroic Marks: {count}',
     buyAria: 'Buy {item} for {marks} Heroic Marks',
+  },
+  // The Card Master window (Card Duel minigame): queue join/leave affordance
+  // plus the in-match hand strip + round-score panel.
+  cardDuel: {
+    title: 'Card Duel',
+    close: 'Close',
+    join: 'Join Queue',
+    joinAria: 'Join the Card Duel queue',
+    leave: 'Leave Queue',
+    leaveAria: 'Leave the Card Duel queue',
+    forfeit: 'Forfeit',
+    forfeitAria: 'Forfeit the Card Duel',
+    queued: 'Waiting for an opponent...',
+    unavailable: 'Card Duel requires another player online.',
+    vsOpponent: 'vs {name}',
+    round: 'Round score: {mine} - {theirs}',
+    counts: 'Deck: {deck} · Discard: {discard}',
+    playCardAria: 'Play the {value} card',
+    waitingOnOpponent: "Waiting on your opponent's card...",
+    yourTurn: 'Play a card',
   },
   delveUi: {
     board: {
@@ -1220,6 +1284,10 @@ export const en = {
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
       heroic_mark: { name: 'Heroic Mark' },
+      eastbrook_buckler: { name: 'Eastbrook Buckler' },
+      eastbrook_greatsword: { name: 'Eastbrook Greatsword' },
+      highwatch_greatsword: { name: 'Highwatch Greatsword' },
+      highwatch_wallshield: { name: 'Highwatch Wallshield' },
       morthens_cryptforged_hauberk: { name: "Morthen's Cryptforged Hauberk" },
       shadowpulse_handwraps: { name: 'Shadowpulse Handwraps' },
       bonechill_striders: { name: 'Bonechill Striders' },
@@ -1271,6 +1339,11 @@ export const en = {
       soulflame_mantle: { name: 'Wraithfire Mantle' },
       stormcallers_crown: { name: 'Galecall Crown' },
       stormcallers_spaulders: { name: 'Galecall Spaulders' },
+      // Nythraxis raid (normal): the offhand-slot + two-hander epics.
+      bonewrought_greatsword: { name: 'Bonewrought Greatsword' },
+      direfang_greatblade: { name: 'Direfang Greatblade' },
+      bonewrought_bulwark: { name: 'Bonewrought Bulwark' },
+      wraithfire_orb: { name: 'Wraithfire Orb' },
       unknown_alien_weaponry: { name: 'Unknown Alien Weaponry' },
       alien_armor_plate: { name: 'Alien Armor Plate' },
       amber_crimson_armor_plate: { name: 'Amber Crimson' },
@@ -1308,7 +1381,12 @@ export const en = {
       reins_thunderstrut_gobbler: { name: 'Reins of Thunderstrut the Grand Gobbler' },
     },
     itemSets: itemSetEntityText,
-    mobs: { ...worldNames.en.entities.mobs, ...mergeEntities.en.mobs, ...mergeExtra.en.mobs },
+    mobs: {
+      ...worldNames.en.entities.mobs,
+      ...mergeEntities.en.mobs,
+      ...mergeExtra.en.mobs,
+      water_elemental: { name: 'Water Elemental' },
+    },
     npcs: { ...worldNames.en.entities.npcs, ...mergeExtra.en.npcs },
     quests: {
       ...worldNames.en.entities.quests,

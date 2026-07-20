@@ -165,7 +165,10 @@ describe('footstep audio', () => {
 // true, otherwise the family-level key mob_${fam}_${action} is used.
 describe('hasVariants', () => {
   it('returns false for an unloaded key', () => {
-    expect(sfx.hasVariants('mob_beast_wolf_attack')).toBe(false);
+    // mob_beast_wolf_attack now has real discovered takes (a genuine
+    // subfamily voice, not a placeholder), so it no longer demonstrates
+    // "unloaded"; a key with no catalog or discovered entry at all does.
+    expect(sfx.hasVariants('mob_nonexistent_family_action')).toBe(false);
   });
 
   it('recognizes a release-discovered subfamily entry before its lazy audio loads', () => {
@@ -298,6 +301,29 @@ describe('mount running audio', () => {
     const before = sources.length;
     sfx.mountRun(0, 0, 0, 'unknown_mount', true);
     expect(sources.length).toBe(before);
+  });
+});
+
+// playAt's boolean return is the load-bearing contract behind the mob
+// idle-bark per-entity cooldown (src/ui/mob_idle_sfx.ts, hud.ts): a caller
+// stamps its own cooldown only when this returns true, so a false positive
+// here (returning true on a cooldown-blocked or unbuffered attempt) would
+// silently bench a mob for the full cooldown window over a bark that never
+// actually played, the exact bug the design's own doc comment warns about.
+describe('playAt return value', () => {
+  it('returns false for an unbuffered key (kicks off the async load instead)', () => {
+    expect(sfx.playAt('mob_beast_idle', 0, 0, 0)).toBe(false);
+  });
+
+  it('returns true for a scheduled play, then false for an immediate repeat blocked by the per-key cooldown', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('foot_stone', { duration: 0.3 });
+
+    expect(sfx.playAt('foot_stone', 0, 0, 0)).toBe(true);
+    expect(sfx.playAt('foot_stone', 0, 0, 0)).toBe(false); // same instant, default 0.03s cooldown blocks it
+
+    nowT += 1; // clear the cooldown
+    expect(sfx.playAt('foot_stone', 0, 0, 0)).toBe(true);
   });
 });
 

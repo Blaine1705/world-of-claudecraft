@@ -62,6 +62,7 @@ export type UiIconName =
   | 'mail'
   | 'ball'
   | 'book'
+  | 'cards'
   | 'trash'
   | 'mount'
   | 'crafting';
@@ -177,6 +178,10 @@ const ICONS: Record<UiIconName, string> = {
   // matching the bar glyph weight
   mount:
     '<path d="M120 140 A176 176 0 1 0 392 140 L340 188 A104 104 0 1 1 172 188 Z"/><path d="M96 108h84v36H96zM332 108h84v36h-84z"/>',
+  // hand-authored playing card (the Card Duel minigame): a solid card body
+  // with a hollowed diamond pip so the glyph reads as "a card" at
+  // micro-button size (evenodd punches the pip through the body)
+  cards: '<path fill-rule="evenodd" d="M176 72h160v336H176zM256 110l40 40-40 40-40-40z"/>',
   // hand-authored anvil (the Crafting window): a horned top slab over a waisted
   // body and flared base, one solid silhouette so it reads at micro-button size
   crafting: '<path d="M60 102l90-11h300v85h-100l-30 92v97h68v54H124v-54h68v-97l-30-92h-12z"/>',

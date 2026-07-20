@@ -100,7 +100,6 @@ function deedsRow(rank: number): DeedsLeaderboardEntry {
     cls: 'warrior' as DeedsLeaderboardEntry['cls'],
     level: 20,
     renown: 500 - rank,
-    deedCount: 40 - rank,
     title: rank === 1 ? 'prog_veteran' : null,
   };
 }
@@ -292,8 +291,18 @@ describe('response builders (convention B deferred: leaders key preserved)', () 
     const first = (body.leaders as Record<string, unknown>[])[0];
     expect(first.name).toBe('Chronicler1');
     expect(first.renown).toBe(499);
-    expect(first.deedCount).toBe(39);
     expect(first.title).toBe('prog_veteran');
+    // The exact wire key set: Renown is the one ranked number the entry
+    // carries (the ranked-surface rule; the retired count output is gone).
+    expect(Object.keys(first).sort()).toEqual([
+      'cls',
+      'level',
+      'name',
+      'rank',
+      'realm',
+      'renown',
+      'title',
+    ]);
     expect('accountId' in first).toBe(false);
   });
 
@@ -703,7 +712,8 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
     configureLeaderboardRuntime(
       fakeRuntime({
         getDeedsLeaderboard: async () => [deedsRow(1)],
-        deedsSelfRank: async (accountId) => (accountId === 77 ? { rank: 12, topPercent: 4 } : null),
+        deedsSelfRank: async (accountId) =>
+          accountId === 77 ? { rank: 12, topPercent: 4, renown: 1620 } : null,
       }),
     );
     const ctx = fakeCtx({
@@ -714,7 +724,9 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
     });
     await handlerFor('/api/leaderboard')(ctx);
     const b = captured(ctx.res).body as Record<string, unknown>;
-    expect(b.self).toEqual({ rank: 12, topPercent: 4 });
+    // The account's renown rides the self line verbatim (the client renders
+    // the Renown-carrying arm from it).
+    expect(b.self).toEqual({ rank: 12, topPercent: 4, renown: 1620 });
   });
 
   it('serves an authenticated but UNRANKED caller the board with no self key', async () => {

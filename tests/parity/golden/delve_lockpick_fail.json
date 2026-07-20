@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 671,
-      "state": "0dfa8b8c",
+      "nextId": 678,
+      "state": "9208ef41",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,10 +53,11 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 670,
+          "entityId": 677,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -69,10 +70,10 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "selectedMount": "valorsteed",
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -86,16 +87,24 @@
           "critChance": 0.0625,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
+          "dualWielding": true,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 670,
+          "id": 677,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -134,9 +143,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 682,
-      "state": "0d0ee252",
-      "events": "f279304f",
+      "nextId": 689,
+      "state": "fba40ec8",
+      "events": "040d9712",
       "rng": {
         "draws": 3,
         "digest": "917d01aa"
@@ -145,9 +154,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 682,
-      "state": "07d2fb32",
-      "events": "f254b1d4",
+      "nextId": 689,
+      "state": "9daa662e",
+      "events": "7dd54605",
       "rng": {
         "draws": 3,
         "digest": "917d01aa"
@@ -156,8 +165,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 682,
-      "state": "b7858ac8",
+      "nextId": 689,
+      "state": "7e1c6e20",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -167,8 +176,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 682,
-      "state": "4f90bc42",
+      "nextId": 689,
+      "state": "51c325c2",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -178,8 +187,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 682,
-      "state": "7abe786c",
+      "nextId": 689,
+      "state": "9b4bdca8",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -189,8 +198,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 682,
-      "state": "903ff16e",
+      "nextId": 689,
+      "state": "ad2e791e",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -200,9 +209,9 @@
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 683,
-      "state": "071044c8",
-      "events": "d3011926",
+      "nextId": 690,
+      "state": "2a7b2c0a",
+      "events": "805a17e8",
       "rng": {
         "draws": 3,
         "digest": "917d01aa"
@@ -263,10 +272,11 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 670,
+          "entityId": 677,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -280,11 +290,11 @@
           "lifetimeXp": 11398,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "renown": 25,
           "selectedMount": "valorsteed",
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 198
@@ -299,9 +309,10 @@
           "critChance": 0.0715,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
+          "dualWielding": true,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 670,
+          "id": 677,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -309,6 +320,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -351,7 +369,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 681,
+          "id": 688,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -384,8 +402,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 683,
-      "state": "f3b537f8",
+      "nextId": 690,
+      "state": "eeb8dab4",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -395,8 +413,8 @@
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 683,
-      "state": "ad7aaeac",
+      "nextId": 690,
+      "state": "d068a412",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -458,10 +476,11 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 670,
+          "entityId": 677,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -475,11 +494,11 @@
           "lifetimeXp": 11398,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "renown": 25,
           "selectedMount": "valorsteed",
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 198
@@ -494,9 +513,10 @@
           "critChance": 0.0715,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
+          "dualWielding": true,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 670,
+          "id": 677,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -504,6 +524,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -546,7 +573,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 681,
+          "id": 688,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

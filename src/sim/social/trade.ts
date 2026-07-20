@@ -2,10 +2,9 @@
 // SimContext. The trade SESSION + INVITE state stay Sim-owned fields (live ctx
 // views: `trades`, `tradeInvites`), like E1's delayedEvents; the leave-path
 // cleanup + the joint invite-expiry sweep reach them through the same seam. The
-// inventory hub (addItem/removeFungibleItem/countFungibleItem) stays on Sim and
-// is consumed via ctx. Per-instance payloads are intentionally ineligible: the
-// wire offer identifies only an item id, so it cannot safely identify or preserve
-// a particular signed/rolled/bound copy. This is a MOVE: the statements, branches, and iteration order are
+// inventory hub stays on Sim and is consumed via ctx. Instanced payloads cross
+// intact through removeOffer/grantOffer; Rift gear remains owner-bound and is
+// excluded explicitly. This is a MOVE: the statements, branches, and iteration order are
 // byte-identical to the pre-move methods (the immutability waiver applies, so the
 // in-place mutation of the shared TradeSession / PlayerMeta.copper is preserved).
 //
@@ -13,16 +12,18 @@
 // + leave-path + tick() call sites resolve unchanged; this module draws no rng.
 
 import type { TradeInfo } from '../../world_api';
-import { bagCapacity, fitsAll } from '../bags';
+import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
+import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { removePreferFungible } from '../items';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type InvSlot } from '../types';
+import { dist2d, type InvSlot, type ItemInstancePayload } from '../types';
 
 // A trade is only offered/kept while both parties are within this many yards;
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
 const TRADE_RANGE = 10;
+const RIFT_GEAR_ITEMS = new Set<string>(RIFT_GEAR_ITEM_IDS);
 
 export function tradeRequest(ctx: SimContext, targetPid: number, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -104,12 +105,14 @@ export function tradeSetOffer(
     if (!slot || typeof slot.itemId !== 'string' || !Number.isFinite(slot.count)) continue;
     const count = Math.max(1, Math.floor(slot.count));
     const def = ITEMS[slot.itemId];
-    if (!def || def.kind === 'quest' || def.soulbound) continue; // quest + soulbound items never trade
+    if (!def || def.kind === 'quest' || def.soulbound || RIFT_GEAR_ITEMS.has(slot.itemId)) {
+      continue;
+    }
     merged.set(slot.itemId, (merged.get(slot.itemId) ?? 0) + count);
   }
   const cleaned: InvSlot[] = [];
   for (const [itemId, count] of merged) {
-    if (ctx.countFungibleItem(itemId, r.meta.entityId) < count) continue;
+    if (ctx.countItem(itemId, r.meta.entityId) < count) continue;
     cleaned.push({ itemId, count });
   }
   const offer = {
@@ -120,6 +123,40 @@ export function tradeSetOffer(
   else session.offerB = offer;
   session.acceptedA = false;
   session.acceptedB = false;
+}
+
+// Removal phase of the swap: consumes one side's offer out of their bags,
+// preserving each slot's ItemInstancePayload (enchants, signed materials,
+// rolled quality, boundTo) for grantOffer instead of re-granting plain copies.
+// removePreferFungible already reports exactly which consumed slots carried an
+// instance; grantOffer only had to route those payloads back in through
+// addItemInstance rather than discarding them, the same way discardItem never
+// needed to because a discarded item's payload does not need to reappear
+// anywhere. sellItem is NOT the same case: it records vendor buyback (items.ts
+// sellItem), and buyback re-grants a plain copy today, so a sold instanced item
+// still loses its payload there; that is a pre-existing sibling of this bug,
+// not fixed by this change.
+// BOTH removals must run before EITHER grant: when the two offers share an
+// itemId, granting first inflates the counter-party's stock, so their removal
+// consumes just-received copies (removeItem scans highest-index-first, exactly
+// where addItemInstance pushes) and a swapped instance bounces straight back
+// to its owner, or gets spared while a plain copy crosses in its place.
+type PendingGrant = { itemId: string; plainCount: number; instances: ItemInstancePayload[] };
+
+function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
+  const grants: PendingGrant[] = [];
+  for (const s of items) {
+    const instances = removePreferFungible(ctx, s.itemId, s.count, fromPid);
+    grants.push({ itemId: s.itemId, plainCount: s.count - instances.length, instances });
+  }
+  return grants;
+}
+
+function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): void {
+  for (const g of grants) {
+    if (g.plainCount > 0) ctx.addItem(g.itemId, g.plainCount, toPid);
+    for (const instance of g.instances) ctx.addItemInstance(g.itemId, instance, toPid);
+  }
 }
 
 export function tradeConfirm(ctx: SimContext, pid?: number): void {
@@ -150,15 +187,42 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     return;
   }
   // capacity gate: each side must fit what they RECEIVE after what they GIVE
-  // leaves their bags (simulated on a scratch copy; nothing moved yet)
-  const fitsAfterSwap = (meta: PlayerMeta, gives: InvSlot[], receives: InvSlot[]): boolean => {
+  // leaves their bags (simulated on a scratch copy; nothing moved yet). A
+  // receive is not uniformly fungible: grantOffer (below) grants each
+  // instanced copy via addItemInstance, which always takes a fresh slot and
+  // never merges into a plain stack of the same itemId (bags.ts addStacked
+  // skips slots with `.instance`). fitsAll alone assumes every unit of a
+  // receive can stack, which under-predicts slot usage whenever the giver's
+  // stock for that item is (partly) instanced copies, letting a receiver end
+  // up over capacity. Mirror removePreferFungible's own split here: only the
+  // giver's fungible stock can stack on arrival; the rest needs one free slot
+  // each, exactly like the real transfer.
+  const fitsAfterSwap = (
+    meta: PlayerMeta,
+    giverPid: number,
+    gives: InvSlot[],
+    receives: InvSlot[],
+  ): boolean => {
     const scratch = meta.inventory.map((s) => ({ ...s }));
-    for (const s of gives) removeFungibleStacked(scratch, s.itemId, s.count);
-    return fitsAll(scratch, bagCapacity(meta.bags), receives);
+    for (const s of gives) removeStacked(scratch, s.itemId, s.count);
+    const capacity = bagCapacity(meta.bags);
+    for (const s of receives) {
+      const instancedCount = Math.max(0, s.count - ctx.countFungibleItem(s.itemId, giverPid));
+      const plainCount = s.count - instancedCount;
+      if (plainCount > 0) {
+        if (countFit(scratch, capacity, s.itemId, plainCount) < plainCount) return false;
+        addStacked(scratch, s.itemId, plainCount);
+      }
+      for (let i = 0; i < instancedCount; i++) {
+        if (scratch.length >= capacity) return false;
+        scratch.push({ itemId: s.itemId, count: 1, instance: {} });
+      }
+    }
+    return true;
   };
   if (
-    !fitsAfterSwap(metaA, session.offerA.items, session.offerB.items) ||
-    !fitsAfterSwap(metaB, session.offerB.items, session.offerA.items)
+    !fitsAfterSwap(metaA, session.b, session.offerA.items, session.offerB.items) ||
+    !fitsAfterSwap(metaB, session.a, session.offerB.items, session.offerA.items)
   ) {
     for (const tPid of [session.a, session.b])
       ctx.error(tPid, 'Trade failed: not enough bag space.');
@@ -168,14 +232,10 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   // swap
   metaA.copper = metaA.copper - session.offerA.copper + session.offerB.copper;
   metaB.copper = metaB.copper - session.offerB.copper + session.offerA.copper;
-  for (const s of session.offerA.items) {
-    removePreferFungible(ctx, s.itemId, s.count, session.a);
-    ctx.addItem(s.itemId, s.count, session.b);
-  }
-  for (const s of session.offerB.items) {
-    removePreferFungible(ctx, s.itemId, s.count, session.b);
-    ctx.addItem(s.itemId, s.count, session.a);
-  }
+  const grantsToB = removeOffer(ctx, session.offerA.items, session.a);
+  const grantsToA = removeOffer(ctx, session.offerB.items, session.b);
+  grantOffer(ctx, grantsToB, session.b);
+  grantOffer(ctx, grantsToA, session.a);
   for (const tPid of [session.a, session.b]) {
     ctx.emit({ type: 'log', text: 'Trade complete.', color: '#8df', pid: tPid });
     ctx.emit({ type: 'tradeDone', pid: tPid });
@@ -213,23 +273,9 @@ function offerCovered(ctx: SimContext, items: InvSlot[], pid: number): boolean {
   const totals = new Map<string, number>();
   for (const s of items) totals.set(s.itemId, (totals.get(s.itemId) ?? 0) + s.count);
   for (const [itemId, count] of totals) {
-    if (ctx.countFungibleItem(itemId, pid) < count) return false;
+    if (ctx.countItem(itemId, pid) < count) return false;
   }
   return true;
-}
-
-// Capacity simulation counterpart to Sim.removeFungibleItem. The generic
-// removeStacked helper deliberately includes instance slots, which would make a
-// trade appear to free space by consuming a copy the real swap must not touch.
-function removeFungibleStacked(inventory: InvSlot[], itemId: string, count: number): void {
-  for (let i = inventory.length - 1; i >= 0 && count > 0; i--) {
-    const slot = inventory[i];
-    if (slot.itemId !== itemId || slot.instance) continue;
-    const take = Math.min(slot.count, count);
-    slot.count -= take;
-    count -= take;
-    if (slot.count <= 0) inventory.splice(i, 1);
-  }
 }
 
 function closeTrade(ctx: SimContext, session: TradeSession): void {

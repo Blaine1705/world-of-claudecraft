@@ -47,7 +47,7 @@ const MAX_FLOORS = 6;
 // MAX_LEVEL (20) and 24+ is effectively unreachable, so an S-rank baseLevel (28) +
 // deep floorIndex would spawn mobs the player can never match; clamp so the hardest
 // rift tops out a hair above the cap (22) and stays a fair, if brutal, fight.
-const RIFT_LEVEL_CAP = 22;
+export const RIFT_LEVEL_CAP = 22;
 const ENTRY_Z_OFFSET = 8; // player arrival, past the entrance porch
 const AISLE_HALF = 5.5; // centre column kept clear of all obstacles (walkable spine)
 const BODY_R = 0.6; // player body radius used for clearance checks

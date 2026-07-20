@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
+import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
 import { Keybinds } from '../src/game/keybinds';
 
 function installStorage(): void {
@@ -150,6 +151,43 @@ describe('Input autorun', () => {
     input.setTouchMove({ forward: false, back: false, strafeLeft: true, strafeRight: false });
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true);
+  });
+
+  it('preserves newer click-to-move intent when a delayed interaction succeeds', async () => {
+    const { input } = makeInput();
+    input.setAutorun(true);
+    let resolveOutcome!: (succeeded: boolean) => void;
+    const outcome = new Promise<boolean>((resolve) => {
+      resolveOutcome = resolve;
+    });
+    const syncAutorun = vi.fn();
+    const stopped = stopAutorunForInteraction(outcome, input, { syncAutorun });
+
+    input.setClickMoveTarget({ x: 4, z: 2 }, 0.5);
+    resolveOutcome(true);
+
+    await expect(stopped).resolves.toBe(false);
+    expect(input.clickMoveGoal).toEqual({ x: 4, z: 2 });
+    expect(syncAutorun).not.toHaveBeenCalled();
+  });
+
+  it('still stops autorun when a held strafe is released before the interaction outcome', async () => {
+    const { input } = makeInput();
+    input.setAutorun(true);
+    input.setTouchMove({ forward: false, back: false, strafeLeft: true, strafeRight: false });
+    let resolveOutcome!: (succeeded: boolean) => void;
+    const outcome = new Promise<boolean>((resolve) => {
+      resolveOutcome = resolve;
+    });
+    const syncAutorun = vi.fn();
+    const stopped = stopAutorunForInteraction(outcome, input, { syncAutorun });
+
+    input.clearTouchMove();
+    resolveOutcome(true);
+
+    await expect(stopped).resolves.toBe(true);
+    expect(input.autorun).toBe(false);
+    expect(syncAutorun).toHaveBeenCalledWith(false);
   });
 
   it('keeps autorun running while the Escape menu is open, then keeps running after close', () => {
@@ -491,6 +529,40 @@ describe('Input pointer lock', () => {
     });
 
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('on Firefox, a pointerlockerror alone starts the forced-unlock cooldown (review followup on #2131)', () => {
+    // A denied requestPointerLock() is itself the strongest evidence we are in
+    // Firefox's post-forced-unlock cooldown, even when the pointerlockchange
+    // handler never got a chance to record it (e.g. the drag flags were
+    // already cleared, such as by a blur ordering ahead of the unlock event).
+    // The pointerlockerror handler must record forcedUnlockAt too, so the very
+    // next synchronous mousedown request during the cooldown is skipped
+    // instead of firing again and getting denied a second time.
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const { canvas, documentListeners, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    documentListeners.get('pointerlockerror')!({});
+
+    now += 200;
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
   });
 
   it('on Chrome, does not request pointer lock synchronously on mousedown (deferred path keeps #116 fixed)', () => {

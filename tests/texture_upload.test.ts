@@ -4,12 +4,22 @@ import { uploadDataTextureInChunks } from '../src/render/texture_upload';
 
 describe('chunked DataTexture upload', () => {
   it('uploads complete rows in bounded batches and yields before each batch', async () => {
-    const texture = new THREE.DataTexture(new Uint16Array(8 * 5 * 4), 8, 5);
+    const updateRanges: { start: number; count: number }[] = [];
+    const texture = Object.assign(new THREE.DataTexture(new Uint16Array(8 * 5 * 4), 8, 5), {
+      updateRanges,
+      clearUpdateRanges: () => {
+        updateRanges.length = 0;
+      },
+      addUpdateRange: (start: number, count: number) => {
+        updateRanges.push({ start, count });
+      },
+    });
     const calls: { start: number; count: number }[][] = [];
     const target = {
       initTexture: (candidate: THREE.Texture) => {
-        calls.push(candidate.updateRanges.map((range) => ({ ...range })));
-        candidate.clearUpdateRanges();
+        expect(candidate).toBe(texture);
+        calls.push(texture.updateRanges.map((range) => ({ ...range })));
+        texture.clearUpdateRanges();
       },
     };
     const beforeChunk = vi.fn(async () => undefined);
@@ -32,6 +42,21 @@ describe('chunked DataTexture upload', () => {
       ],
       [{ start: 128, count: 32 }],
     ]);
+  });
+
+  it('uses one valid upload when the pinned Three version has no texture ranges', async () => {
+    const texture = new THREE.DataTexture(new Uint16Array(8 * 5 * 4), 8, 5);
+    const initTexture = vi.fn();
+    const beforeChunk = vi.fn(async () => undefined);
+    const chunks = await uploadDataTextureInChunks({ initTexture }, texture, {
+      maxChunkBytes: 128,
+      beforeChunk,
+    });
+
+    expect(chunks).toBe(1);
+    expect(beforeChunk).toHaveBeenCalledOnce();
+    expect(initTexture).toHaveBeenCalledOnce();
+    expect(initTexture).toHaveBeenCalledWith(texture);
   });
 
   it('falls back to one normal upload for non-data textures', async () => {

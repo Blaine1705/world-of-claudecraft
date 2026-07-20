@@ -215,7 +215,7 @@ function snapshot(): PerfSnapshot {
     },
     mainMs: { renderer: { count: 1, avg: 5, p95: 5, max: 5 } },
     renderer: {
-      graphicsConfigVersion: 14,
+      graphicsConfigVersion: 15,
       tier: 'high',
       qualityBuckets: qualityBuckets(),
       autoGovernor: true,
@@ -363,7 +363,7 @@ describe('perf reporter payload', () => {
     // reports medium; first-run device detection (main.ts) would persist a device tier, but
     // this unit constructs Settings directly with no persisted value.
     expect(body.graphicsPreset).toBe('medium');
-    expect(body.graphicsConfigVersion).toBe(14);
+    expect(body.graphicsConfigVersion).toBe(15);
     expect(body.gfxTier).toBe('high');
     expect(body.autoGovernor).toBe(true);
     expect(body.effectiveRenderScale).toBe(0.9);
@@ -373,7 +373,7 @@ describe('perf reporter payload', () => {
     expect(body.source).toBe('benchmark');
     expect(body.zoneOrScenario).toBe('bench_dense_foliage');
     expect(JSON.stringify(body.rawSummary)).not.toContain('Safari/605');
-    expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(14);
+    expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(15);
     expect(
       (body.rawSummary as { rendererQualityBuckets?: { levels?: { foliage?: number } } })
         .rendererQualityBuckets?.levels?.foliage,
@@ -544,5 +544,31 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererDiagnostics?: { enabled?: boolean } }).rendererDiagnostics
         ?.enabled,
     ).toBe(false);
+  });
+});
+
+describe('gpuBucket software classification', () => {
+  const { gpuBucket } = perfReporterInternalsForTest;
+
+  it('buckets WARP and other software rasterizers as software (WARP was missed before)', () => {
+    // WARP: the Windows D3D11 software fallback Chromium 141 switched to after removing SwiftShader.
+    expect(
+      gpuBucket('ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)'),
+    ).toBe('software');
+    expect(gpuBucket('Google SwiftShader')).toBe('software');
+    expect(gpuBucket('Mesa/X.org llvmpipe (LLVM 15.0.6, 256 bits)')).toBe('software');
+  });
+
+  it('keeps real GPUs in their own hardware buckets', () => {
+    expect(
+      gpuBucket(
+        'ANGLE (NVIDIA, NVIDIA GeForce RTX 3090 (0x00002204) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+      ),
+    ).toBe('nvidia');
+    expect(
+      gpuBucket(
+        'ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+      ),
+    ).toBe('intel-uhd');
   });
 });

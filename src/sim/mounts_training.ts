@@ -148,6 +148,9 @@ function creditRidingLessonObjective(ctx: SimContext, meta: PlayerMeta): void {
       ctx.emit({
         type: 'questProgress',
         questId: qp.questId,
+        objectiveIndex: i,
+        current: qp.counts[i],
+        required: objective.count,
         text: `${objective.label}: ${qp.counts[i]}/${objective.count}`,
         pid: meta.entityId,
       });

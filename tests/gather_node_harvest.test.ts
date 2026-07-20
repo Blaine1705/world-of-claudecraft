@@ -4,6 +4,7 @@ import { GATHER_NODES } from '../src/sim/data';
 import {
   MATERIAL_RARITY_MAX_PROFICIENCY,
   NODE_HARVEST_TABLE,
+  nodeMaterialFor,
 } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -15,8 +16,8 @@ function mustMeta(sim: Sim, pid: number) {
   return meta;
 }
 
-function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+function makeWorld(seed = 42) {
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true });
 }
 
 function mustEntity(sim: Sim, pid: number): Entity {
@@ -45,6 +46,10 @@ function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
 
 const NODE_ID = GATHER_NODES[0].id;
 
+// Which material this node grants since Phase 4 (zone x type matrix): the
+// harvest tuning row (NODE_HARVEST_TABLE) no longer carries an itemId.
+const NODE_MATERIAL = nodeMaterialFor(GATHER_NODES[0].type, GATHER_NODES[0].zoneId);
+
 describe('gather node harvest (#1121)', () => {
   it('a player near a node receives the material item on harvest', () => {
     const sim = makeWorld();
@@ -54,10 +59,10 @@ describe('gather node harvest (#1121)', () => {
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
 
-    const before = sim.countItem(entry.itemId, pid);
-    sim.harvestNode(NODE_ID, pid);
+    const before = sim.countItem(NODE_MATERIAL.itemId, pid);
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pid)).toBe(before + 1);
+    expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(before + 1);
   });
 
   it('denies harvest when the player is too far from the node', () => {
@@ -71,14 +76,16 @@ describe('gather node harvest (#1121)', () => {
 
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
-    const before = sim.countItem(entry.itemId, pid);
-    sim.harvestNode(NODE_ID, pid);
+    const before = sim.countItem(NODE_MATERIAL.itemId, pid);
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(false);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pid)).toBe(before);
+    expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(before);
   });
 
   it("two players harvesting the same node each get their own respawn timer: A's harvest never blocks B", () => {
-    const sim = makeWorld();
+    // Seed 1 keeps both harvests on the ordinary one-item outcome. That keeps
+    // this timer-isolation case independent of the valid five-item rare event.
+    const sim = makeWorld(1);
     const pidA = sim.addPlayer('warrior', 'PlayerA');
     const pidB = sim.addPlayer('warrior', 'PlayerB');
     teleportOntoNode(sim, pidA, NODE_ID);
@@ -90,7 +97,7 @@ describe('gather node harvest (#1121)', () => {
     // Player A harvests first.
     sim.harvestNode(NODE_ID, pidA);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pidA)).toBe(1);
+    expect(sim.countItem(NODE_MATERIAL.itemId, pidA)).toBe(1);
     // Player A's own node is now on cooldown for A.
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pidA)).toBe(false);
 
@@ -99,7 +106,7 @@ describe('gather node harvest (#1121)', () => {
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pidB)).toBe(true);
     sim.harvestNode(NODE_ID, pidB);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pidB)).toBe(1);
+    expect(sim.countItem(NODE_MATERIAL.itemId, pidB)).toBe(1);
     // B is now on cooldown for B; A's cooldown is unaffected by B harvesting:
     // it stays on the same denial it already had before B ever harvested.
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pidB)).toBe(false);
@@ -115,13 +122,13 @@ describe('gather node harvest (#1121)', () => {
 
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pid)).toBe(1);
+    expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(1);
 
     // Immediately harvesting again is denied: this player's own timer has not
     // elapsed yet.
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pid)).toBe(1);
+    expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(1);
 
     // Fast-forward past the node's respawn window by advancing the sim clock
     // directly (sim.time, not wall-clock) rather than looping thousands of
@@ -132,7 +139,7 @@ describe('gather node harvest (#1121)', () => {
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pid)).toBe(true);
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pid)).toBe(2);
+    expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(2);
   });
 
   it('determinism: the same seed and same sequence of harvests yields the same result', () => {
@@ -161,7 +168,7 @@ describe('gather node harvest (#1121)', () => {
         .professionsStateFor(pid)
         .skills.find((s) => s.professionId === entry.professionId)?.skill;
       return {
-        count: sim.countItem(entry.itemId, pid),
+        count: sim.countItem(NODE_MATERIAL.itemId, pid),
         notYetReady,
         nowReady,
         skill,
@@ -173,7 +180,7 @@ describe('gather node harvest (#1121)', () => {
   it('an unknown node id is denied without throwing', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Unknown');
-    expect(() => sim.harvestNode('not_a_real_node', pid)).not.toThrow();
+    expect(sim.harvestNode('not_a_real_node', pid)).toBe(false);
     sim.tick();
     expect(sim.nodeHarvestableByMeFor('not_a_real_node', pid)).toBe(false);
   });
@@ -235,10 +242,10 @@ describe('gather node harvest (#1121)', () => {
 
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
-    const before = sim.countItem(entry.itemId, pid);
+    const before = sim.countItem(NODE_MATERIAL.itemId, pid);
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pid)).toBe(before);
+    expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(before);
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pid)).toBe(true);
   });
 
@@ -258,14 +265,14 @@ describe('gather node harvest (#1121)', () => {
     for (let i = 0; i < capacity; i++) {
       meta.inventory.push({ itemId: 'bone_fragments', count: 1, instance: { boundTo: pid } });
     }
-    expect(sim.canAddItem(entry.itemId, 1, pid)).toBe(false);
+    expect(sim.canAddItem(NODE_MATERIAL.itemId, 1, pid)).toBe(false);
 
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pid)).toBe(true);
   });
 
-  it('spends exactly one rng draw on a granted harvest and none on any denial path', () => {
+  it('spends exactly two rng draws on a granted harvest and none on any denial path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'DrawCount');
     const fullBagsPid = sim.addPlayer('warrior', 'DrawCountFull');
@@ -286,19 +293,22 @@ describe('gather node harvest (#1121)', () => {
         instance: { boundTo: fullBagsPid },
       });
     }
-    expect(sim.canAddItem(entry.itemId, 1, fullBagsPid)).toBe(false);
+    expect(sim.canAddItem(NODE_MATERIAL.itemId, 1, fullBagsPid)).toBe(false);
 
-    // The rarity roll (#1122) pulls from the SHARED sim rng, so a draw on a
-    // denial would advance the whole sim's stream and desync every downstream
-    // roll. harvestNode dispatches synchronously and nothing ticks inside
-    // this bracket, so every counted draw belongs to the harvest path.
+    // The harvest rolls pull from the SHARED sim rng, so a draw on a denial
+    // would advance the whole sim's stream and desync every downstream roll.
+    // harvestNode dispatches synchronously and nothing ticks inside this
+    // bracket, so every counted draw belongs to the harvest path. Phase 4
+    // pinned contract: a granted harvest is exactly TWO draws, draw #1 the
+    // rarity roll (#1122), draw #2 the rare-event roll (gather_events.ts),
+    // regardless of the outcome of either.
     let draws = 0;
     (sim as unknown as { rng: { setObserver(fn: () => void): void } }).rng.setObserver(() => {
       draws++;
     });
 
-    sim.harvestNode(NODE_ID, pid); // granted: exactly the one rarity draw
-    expect(draws).toBe(1);
+    sim.harvestNode(NODE_ID, pid); // granted: the rarity draw plus the rare-event draw
+    expect(draws).toBe(2);
 
     draws = 0;
     sim.harvestNode(NODE_ID, pid); // denied: not respawned for this player yet
@@ -336,10 +346,14 @@ describe('gather-completion event for audio (#1729)', () => {
     expect(gather.nodeId).toBe(node.id);
     expect(gather.nodeType).toBe(node.type);
     expect(gather.professionId).toBe(entry.professionId);
-    expect(gather.itemId).toBe(entry.itemId);
+    expect(gather.itemId).toBe(NODE_MATERIAL.itemId);
     // A proficiency-0 harvest always rolls common (the rarity ladder puts all
     // weight on common at proficiency 0), so this exact value is seed-independent.
     expect(gather.rarity).toBe('common');
+    // Phase 4 payload fields: seed 42's rare-event draw misses here, so the
+    // yield is the common row's single unit and the event says so explicitly.
+    expect(gather.rareEvent).toBeNull();
+    expect(gather.qty).toBe(1);
   });
 
   it('the emitted rarity reflects the actual roll: a max-proficiency harvest never reports common', () => {

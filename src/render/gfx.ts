@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
+import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
 // scattered LOW_GFX ternaries.
@@ -14,7 +15,7 @@ import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 //      anything unrecognized -> medium), so the 3D tier matches the medium data-fx-level fallback
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra';
-export const GFX_CONFIG_VERSION = 14;
+export const GFX_CONFIG_VERSION = 15;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -88,6 +89,16 @@ export interface GfxSettings {
   readonly terrainSplat: boolean;
   readonly windSway: boolean;
   readonly maxPointLights: number;
+  /**
+   * Memory-ceiling profile for phone-class browsers (see isConstrainedBrowser). iOS WebKit
+   * (Safari AND the native WKWebView shell: every iOS browser shares the engine) kills the
+   * whole WebContent process when a tab crosses its per-process memory limit, and the world
+   * entry's synchronous scene build is the allocation spike that crosses it. When set, the
+   * tier sheds the biggest one-shot GPU allocations (shadow-map resolution, composer MSAA,
+   * pixel-ratio cap, backdrop mips, deferred IBL prefilter) WITHOUT changing what the player
+   * can see or react to: every knob here is cosmetic sharpness only (fairness rule).
+   */
+  readonly constrainedMemory: boolean;
 }
 
 export interface GfxRuntimeBudget {
@@ -316,21 +327,19 @@ export function configureMaskedDoubleSidedVegetationMaterial<T extends THREE.Mat
   return mat;
 }
 
-function settingsFor(
-  tier: GfxTier,
-  hints?: Pick<
-    GfxRuntimeHints,
-    | 'search'
-    | 'graphicsPreset'
-    | 'terrainDetail'
-    | 'foliageDensity'
-    | 'effectsQuality'
-    | 'shadowQuality'
-    | 'gpuRenderer'
-  >,
-): GfxSettings {
+function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettings {
   const bucketBands = GFX_BUCKET_BANDS[tier];
   const weakIntegratedGpu = isWeakIntegratedGpu(hints?.gpuRenderer);
+  // Phone-class browsers live under a hard per-process memory ceiling (iOS WebKit evicts the
+  // WebContent process outright); shed the largest one-shot GPU allocations there. Shadow-map
+  // texels, MSAA, and DPR are cosmetic sharpness only, so this never crosses the
+  // graphics-settings fairness line.
+  const constrainedMemory = isConstrainedBrowser({
+    deviceMemory: hints?.deviceMemory,
+    maxTouchPoints: hints?.maxTouchPoints ?? 0,
+    coarsePointer: hints?.coarsePointer ?? false,
+    narrowViewport: hints?.narrowViewport ?? false,
+  });
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -342,9 +351,24 @@ function settingsFor(
     // N8AO runs on both composer tiers: half-res + Low quality on high keeps
     // it ~1ms-class on real GPUs; ultra gets full-res Medium
     ao: tier === 'high' || tier === 'ultra',
-    msaaSamples: tier === 'high' || tier === 'ultra' ? 4 : 0,
-    pixelRatioCap: tier === 'low' ? 1.48 : tier === 'medium' ? 1.48 : tier === 'high' ? 1.75 : 2.5,
-    shadowMap: tier === 'low' ? 2048 : tier === 'medium' ? 2560 : 4096,
+    msaaSamples: (tier === 'high' || tier === 'ultra') && !constrainedMemory ? 4 : 0,
+    pixelRatioCap: constrainedMemory
+      ? 1.48
+      : tier === 'low' || tier === 'medium'
+        ? 1.48
+        : tier === 'high'
+          ? 1.75
+          : 2.5,
+    shadowMap:
+      tier === 'low'
+        ? 2048
+        : tier === 'medium'
+          ? constrainedMemory
+            ? 1536
+            : 2560
+          : constrainedMemory
+            ? 2048
+            : 4096,
     standardMaterials: tier === 'medium' || tier === 'high' || tier === 'ultra',
     lowPlus: tier === 'low',
     leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
@@ -353,6 +377,7 @@ function settingsFor(
     terrainSplat: tier === 'medium' || tier === 'high' || tier === 'ultra',
     windSway: true,
     maxPointLights: 6,
+    constrainedMemory,
   };
   if (hints?.graphicsPreset === PRESET_ADVANCED) {
     if ((hints.terrainDetail ?? 1) < 0.5) settings = { ...settings, terrainSplat: false };
@@ -450,7 +475,12 @@ function runtimeHints(): GfxRuntimeHints {
   };
 }
 
-export function isConstrainedBrowser(hints: GfxRuntimeHints): boolean {
+export function isConstrainedBrowser(
+  hints: Pick<
+    GfxRuntimeHints,
+    'deviceMemory' | 'maxTouchPoints' | 'coarsePointer' | 'narrowViewport'
+  >,
+): boolean {
   if (hints.deviceMemory !== undefined && hints.deviceMemory <= 4) return true;
   return hints.maxTouchPoints > 0 && (hints.coarsePointer || hints.narrowViewport);
 }
@@ -477,12 +507,13 @@ export type GpuClass =
 export function classifyGpuRenderer(name: string | undefined): GpuClass {
   const n = (name ?? '').toLowerCase();
   if (!n) return 'unknown';
-  // Software rasterizers (no real GPU): always the lowest tier. The bare "software" token is kept
-  // in lockstep with isSoftwareGL below so the two software detectors never disagree: a string like
-  // "Apple Software Renderer" must classify as software here (-> low) so the device-aware 3D tier and
-  // the data-fx-level HUD tier both land on low, never one low and one medium.
-  if (/swiftshader|llvmpipe|basic render|softpipe|microsoft basic|software/.test(n))
-    return 'software';
+  // Software rasterizers (no real GPU): always the lowest tier. The token set lives in
+  // src/render/software_renderer.ts (SOFTWARE_RENDERER_PATTERN), shared by every adapter-name
+  // software detector (this, isSoftwareGL below, perf_doctor, perf_reporter) so they never disagree:
+  // a string like "Apple Software Renderer" or the WARP "Microsoft Basic Render Driver" must classify
+  // as software here (-> low) so the device-aware 3D tier and the data-fx-level HUD tier both land on
+  // low, never one low and one medium. (n is already lowercased; the /i pattern makes that fine.)
+  if (isSoftwareRendererName(n)) return 'software';
   // The older Intel integrated parts the codebase already names as weak (kept AHEAD of the
   // mid-integrated bucket so an Iris Plus 6xx / UHD 6xx / HD 5xx-6xx stays weak, consistent with
   // the existing leanFoliage treatment in settingsFor).
@@ -638,7 +669,7 @@ function rendererName(webgl: THREE.WebGLRenderer): string {
 }
 
 export function isSoftwareGL(webgl: THREE.WebGLRenderer): boolean {
-  return /swiftshader|llvmpipe|software/i.test(rendererName(webgl));
+  return isSoftwareRendererName(rendererName(webgl));
 }
 
 export function isWeakIntegratedGpu(name: string | undefined): boolean {
@@ -651,6 +682,16 @@ export function isWeakIntegratedGpu(name: string | undefined): boolean {
   );
 }
 
+// The resolved software-GL verdict from the live GL context, cached at initGfxTier
+// so a player-facing "no real GPU" notice can consume it without re-probing. False
+// until initGfxTier runs (module-load best-guess never had a context).
+let softwareGlDetected = false;
+
+/** True when the live WebGL context resolved to a software rasterizer (set in initGfxTier). */
+export function gfxSoftwareRendering(): boolean {
+  return softwareGlDetected;
+}
+
 // Best-guess settings from the URL alone (so module-load consumers see sane
 // values); initGfxTier() re-resolves once the GL context exists. The renderer
 // MUST call initGfxTier() right after creating its WebGLRenderer and before
@@ -659,7 +700,8 @@ export let GFX: GfxSettings = settingsFor(tierFromHints(runtimeHints(), false), 
 
 export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
   const hints = { ...runtimeHints(), gpuRenderer: rendererName(webgl) };
-  const tier = tierFromHints(hints, isSoftwareGL(webgl));
+  softwareGlDetected = isSoftwareGL(webgl);
+  const tier = tierFromHints(hints, softwareGlDetected);
   GFX = settingsFor(tier, hints);
   return tier;
 }
@@ -670,6 +712,7 @@ export const gfxInternalsForTest = {
   resetGpuRendererProbe: () => {
     gpuRendererProbed = false;
     probedGpuRenderer = undefined;
+    softwareGlDetected = false;
   },
 };
 

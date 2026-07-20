@@ -271,6 +271,7 @@ describe('mount purchase (the stablemaster teaches, no longer sells)', () => {
     expect(quest.objectives).toHaveLength(1);
     const obj = quest.objectives[0];
     expect(obj.type).toBe('interact');
+    if (obj.type !== 'interact') throw new Error('riding lesson objective must be interact');
     expect(obj.targetObjectItemId).toBe('train_valorsteed');
     expect(obj.count).toBe(1);
   });
@@ -606,8 +607,8 @@ describe('mount specialty stats', () => {
   });
 
   it('shaves 5% off an identical melee swing when the target rides a rare mount', () => {
-    // Twin sims on the same seed: the rng stream (miss/dodge/crit/weapon rolls)
-    // is identical, so the only divergence is the mounted melee block.
+    // Pin a large fixed swing so integer rounding cannot erase the 5% reduction.
+    // Twin sims still exercise the real melee path, with only the mount differing.
     const damages: number[] = [];
     for (const mounted of [false, true]) {
       const sim = makeWorld();
@@ -615,22 +616,28 @@ describe('mount specialty stats', () => {
       const target = sim.addPlayer('warrior', 'Tank');
       sim.tick();
       sim.setPlayerLevel(20, target);
+      const ae = sim.entities.get(attacker)!;
       const te = sim.entities.get(target)!;
+      ae.weapon = { min: 100, max: 100, speed: 2 };
+      ae.attackPower = 0;
+      ae.critChance = 0;
+      sim.rng.next = () => 0.5;
       if (mounted) {
         sim.addItem('reins_shadowjump_toad', 1, target);
         selectMount(sim.ctx, target, 'shadowjump_toad');
         ride(sim, target);
         expect(te.mountKey).toBe('shadowjump_toad');
       }
+      // Mounting recalculates derived stats, so normalize mitigation afterward.
+      te.stats.armor = 0;
+      te.dodgeChance = 0;
       const hpBefore = te.hp;
-      meleeSwing(sim.ctx, sim.entities.get(attacker)!, te, 0, null, {});
+      meleeSwing(sim.ctx, ae, te, 0, null, { cannotBeDodged: true });
       damages.push(hpBefore - te.hp);
     }
     const [unmounted, mounted] = damages;
-    expect(unmounted).toBeGreaterThan(0);
-    // Rounded post-multiplier: within a point of the exact 5% cut, and strictly less.
-    expect(Math.abs(mounted - unmounted * 0.95)).toBeLessThanOrEqual(1);
-    expect(mounted).toBeLessThan(unmounted);
+    expect(unmounted).toBe(100);
+    expect(mounted).toBe(95);
   });
 });
 

@@ -7,6 +7,28 @@ interface TexturePixelData extends ArrayBufferView {
   readonly length: number;
 }
 
+interface TextureUpdateRange {
+  start: number;
+  count: number;
+}
+
+interface RangeUpdatableDataTexture extends THREE.DataTexture {
+  readonly updateRanges: TextureUpdateRange[];
+  clearUpdateRanges(): void;
+  addUpdateRange(start: number, count: number): void;
+}
+
+function supportsUpdateRanges(texture: THREE.DataTexture): texture is RangeUpdatableDataTexture {
+  return (
+    'updateRanges' in texture &&
+    Array.isArray(texture.updateRanges) &&
+    'clearUpdateRanges' in texture &&
+    typeof texture.clearUpdateRanges === 'function' &&
+    'addUpdateRange' in texture &&
+    typeof texture.addUpdateRange === 'function'
+  );
+}
+
 export const DEFAULT_TEXTURE_UPLOAD_CHUNK_BYTES = 512 * 1024;
 
 export interface TextureUploadTarget {
@@ -57,6 +79,16 @@ export async function uploadDataTextureInChunks(
     Math.floor(options.maxChunkBytes ?? DEFAULT_TEXTURE_UPLOAD_CHUNK_BYTES),
   );
   const rowsPerChunk = Math.max(1, Math.floor(maxChunkBytes / rowBytes));
+
+  // Three r165, pinned by the v0.28 release, predates texture update ranges.
+  // Preserve a valid upload there and retain bounded uploads when the active
+  // Three version exposes the range API.
+  if (!supportsUpdateRanges(dataTexture)) {
+    await options.beforeChunk?.();
+    target.initTexture(dataTexture);
+    return 1;
+  }
+
   let chunks = 0;
 
   dataTexture.clearUpdateRanges();

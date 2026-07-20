@@ -174,6 +174,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   crafting: 'hudChrome.crafting.title',
   mount: 'hudChrome.keybinds.mount',
   deeds: 'hudChrome.deeds.title',
+  professions: 'hudChrome.professions.title',
 };
 
 /**
@@ -510,7 +511,7 @@ export class OptionsWindow {
     parent: HTMLElement,
     controls: OptionsControl[],
     hooks: OptionsHooks,
-    rerender: () => void,
+    rerender: (focusKey?: BoolSettingKey) => void,
   ): void {
     for (const c of controls) {
       switch (c.control) {
@@ -521,7 +522,7 @@ export class OptionsWindow {
           this.settingToggle(parent, c, hooks);
           break;
         case 'boolToggle':
-          this.settingBoolToggle(parent, c, hooks);
+          this.settingBoolToggle(parent, c, hooks, c.rerender ? (key) => rerender(key) : undefined);
           break;
         case 'choice':
           this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined);
@@ -636,7 +637,12 @@ export class OptionsWindow {
   }
 
   // A true/false BOOL_SETTINGS toggle.
-  private settingBoolToggle(parent: HTMLElement, c: BoolToggleControl, hooks: OptionsHooks): void {
+  private settingBoolToggle(
+    parent: HTMLElement,
+    c: BoolToggleControl,
+    hooks: OptionsHooks,
+    onChange?: (key: BoolSettingKey) => void,
+  ): void {
     const key = c.key as BoolSettingKey;
     const label = t(c.labelKey);
     const row = document.createElement('div');
@@ -646,6 +652,8 @@ export class OptionsWindow {
     name.textContent = label;
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
+    toggle.dataset.settingKey = key;
+    toggle.disabled = c.disabled ?? false;
     const sync = () => {
       const on = hooks.settings.get(key);
       toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');
@@ -661,6 +669,7 @@ export class OptionsWindow {
         hooks.settings.set(key, boolToggleNextValue(hooks.settings.get(key))),
       );
       sync();
+      onChange?.(key);
     });
     row.append(name, toggle);
     parent.appendChild(row);
@@ -985,8 +994,18 @@ export class OptionsWindow {
     this.renderThemeControls(body);
     const hooks = this.deps.options();
     if (hooks)
-      this.applyControls(body, buildInterfaceControls(this.settingsSource(hooks)), hooks, () =>
-        this.renderInterface(),
+      this.applyControls(
+        body,
+        buildInterfaceControls(this.settingsSource(hooks)),
+        hooks,
+        (focusKey) => {
+          this.renderInterface();
+          if (focusKey)
+            this.deps
+              .root()
+              .querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)
+              ?.focus();
+        },
       );
 
     // On/off toggle for chat timestamps.

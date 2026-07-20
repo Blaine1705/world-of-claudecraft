@@ -9,7 +9,11 @@ import {
   weaponSkinCollectionLabel,
   weaponTypeLabel,
 } from './armory_labels';
-import { buildDailyRewardsView, type DailyRewardsView } from './daily_rewards_view';
+import {
+  buildDailyRewardsView,
+  type DailyRewardsView,
+  dailyRewardTaskDescription,
+} from './daily_rewards_view';
 import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
@@ -674,9 +678,20 @@ export class DailyRewardsWindow {
   }
 
   private loadingHtml(storeEnabled: boolean): string {
+    // A visible loading state until the first snapshot paints: the window shows
+    // an opaque body the moment it opens, and the snapshot fetch has no
+    // deadline, so an empty body would read as a large black box. The store
+    // variant is aria-hidden because the tab strip's data-woc-store-loading
+    // indicator already announces busy; the rewards-only variant has no tab
+    // strip, so its loading block is the live status itself.
+    const spinner = (label: string, live: boolean): string =>
+      `<div class="cl-loading"${live ? ' role="status" aria-live="polite"' : ' aria-hidden="true"'}>` +
+      `<span class="cl-spinner" aria-hidden="true"></span>` +
+      `<span>${esc(label)}</span>` +
+      `</div>`;
     return storeEnabled
-      ? '<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store"></div>'
-      : '<div class="dr-body woc-store-body"></div>';
+      ? `<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store">${spinner(t('hudChrome.wocStore.loading'), false)}</div>`
+      : `<div class="dr-body woc-store-body">${spinner(t('hudChrome.dailyRewards.loading'), true)}</div>`;
   }
 
   private syncStoreLoading(): void {
@@ -849,7 +864,12 @@ export class DailyRewardsWindow {
           typeof task.multiplier === 'number' && Number.isFinite(task.multiplier)
             ? `<em>${esc(t('hudChrome.dailyRewards.taskMultiplier', { multiplier: formatNumber(task.multiplier, { maximumFractionDigits: 2 }) }))}</em>`
             : '';
-        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(task.description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
+        const description = dailyRewardTaskDescription(
+          task.type,
+          task.description,
+          t('hudChrome.dailyRewards.oneVsOneExcluded'),
+        );
+        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
       })
       .join('');
     return (

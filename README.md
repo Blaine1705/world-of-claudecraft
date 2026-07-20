@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.27.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.27.2-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -364,4 +364,4 @@ Contributions of every kind are welcome: code, translations, bug reports, and do
 
 The code is [MIT licensed](LICENSE), so fork it, remix it, and host your own world.
 
-The bundled third-party art assets (models, textures, HDRIs, fonts) keep their own licenses, mostly CC0 public domain, documented per pack in [CREDITS.md](CREDITS.md).
+The bundled third-party art assets (models, textures, HDRIs, fonts) keep their own licenses, mostly CC0 public domain, documented per pack in [CREDITS.md](CREDITS.md). Original sound recordings contributed by individual authors may carry their own terms (see the Audio section of [CREDITS.md](CREDITS.md)) rather than the project's default license.

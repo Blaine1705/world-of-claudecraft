@@ -4,7 +4,7 @@
 // so level, derived stats, equipment rules, bags, and persistence stay canonical.
 
 import { type CharacterState, Sim } from '../src/sim/sim';
-import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, ALL_EQUIP_SLOTS, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 import { validCharName } from './auth';
 
 const TEMPLATE_SEED = 20061;
@@ -119,6 +119,10 @@ function templateStates(): ReadonlyMap<PlayerClass, CharacterState> {
   for (const cls of ALL_CLASSES) {
     const pid = sim.addPlayer(cls, `${cls}template`);
     sim.setPlayerLevel(MAX_LEVEL, pid);
+    // Remove starter gear before applying the curated loadout. With live
+    // offhands and dual wielding, leaving it equipped can route the intended
+    // mainhand into the offhand or retain an obsolete shield beside a two-hander.
+    for (const slot of ALL_EQUIP_SLOTS) sim.unequipItem(slot, pid);
     for (const itemId of WARFARE_LOADOUTS[cls]) {
       sim.addItem(itemId, 1, pid);
       sim.equipItem(itemId, pid);

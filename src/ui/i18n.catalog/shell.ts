@@ -30,6 +30,11 @@ export const shellStrings = {
       discordCommunity: 'Join the World of ClaudeCraft Discord community',
       donateProject: 'Donate to support World of ClaudeCraft',
     },
+    entryGuard: {
+      title: 'Graphics lowered',
+      body: 'The game closed unexpectedly while entering the world, so graphics are now set to {preset}. You can change this in the graphics selector below or in the in-game Options.',
+      dismiss: 'Dismiss',
+    },
     loading: {
       world: 'Loading world...',
       worldProgress: 'Loading world... {done}/{total}',
@@ -39,7 +44,10 @@ export const shellStrings = {
       rendererFailed: 'Could not start the renderer: try reloading. {error}',
       enterTimeout: 'Could not enter world. The connection timed out. Is the game server running?',
       connectionLost: 'Connection to the server was lost.',
-      reconnecting: 'Connection lost. Reconnecting...',
+      reconnectingAttempt:
+        'Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)',
+      reconnectingNow: 'Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})',
+      slowConnection: 'This is taking longer than usual. Check your internet connection.',
       connectionRejected: 'The server closed the connection.',
       realmFull: 'This world is full right now. Please try again in a few minutes.',
       tooManyConnections:
@@ -118,6 +126,18 @@ export const shellStrings = {
         quit: 'Quit',
         fatalBody: 'World of ClaudeCraft hit an unexpected error and needs to close.',
       },
+    },
+    // Software-rendering notice (src/ui/gpu_notice_toast.ts): shown once when
+    // the session runs on a software rasterizer (WARP/SwiftShader). Two body
+    // variants because the fix differs: inside the desktop shell there is no
+    // "browser setting" to enable, so that copy points at drivers and the
+    // Windows per-app graphics setting instead.
+    gpuNotice: {
+      bodyDesktop:
+        'The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
+      bodyWeb:
+        'The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
+      dismiss: 'Dismiss',
     },
     realm: {
       noRealms: 'No worlds available.',

@@ -365,9 +365,10 @@ export function ensureSkyBiomeAssets(biomes: readonly BiomeId[]): Promise<void> 
             .then((tex) => {
               tex.wrapS = THREE.RepeatWrapping;
               tex.wrapT = THREE.ClampToEdgeWrapping;
-              tex.minFilter = THREE.LinearMipmapLinearFilter;
+              const mips = !GFX.constrainedMemory;
+              tex.minFilter = mips ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter;
               tex.magFilter = THREE.LinearFilter;
-              tex.generateMipmaps = true;
+              tex.generateMipmaps = mips;
               backdropStore[biome] = tex;
             })
             .catch(() => undefined)

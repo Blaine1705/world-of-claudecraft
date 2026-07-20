@@ -1,9 +1,10 @@
 // Tests for the Renown-tab pure core (deeds_leaderboard_view.ts):
 //  - the async state machine: loading / error / empty / ranked discriminators,
 //  - row derivation (rank, name, realm, class + knownClass, level, renown,
-//    deedCount, and the TITLE passed through as a DEED ID, never text),
+//    and the TITLE passed through as a DEED ID, never text),
 //  - the viewer's own row flagged `me` by the server-resolved account rank,
-//  - the server-resolved `self` standing passed through (null when absent),
+//  - the server-resolved `self` standing passed through (null when absent;
+//    renown rides it from a current server and is absent from an older one),
 //  - the pager state and the server page-clamp passthrough,
 //  - parity: a Sim-shaped empty page (the offline sandbox has no account
 //    population) and same-input determinism.
@@ -27,7 +28,6 @@ function entry(over: Partial<DeedsLeaderboardEntry> = {}): DeedsLeaderboardEntry
     cls: 'warrior',
     level: 20,
     renown: 425,
-    deedCount: 37,
     title: 'prog_veteran',
     ...over,
   };
@@ -59,7 +59,7 @@ describe('buildDeedsLeaderboardView', () => {
       kind: 'page',
       page: page({
         leaders: [
-          entry({ rank: 1, name: 'Aldwin', renown: 425, deedCount: 37, title: 'prog_veteran' }),
+          entry({ rank: 1, name: 'Aldwin', renown: 425, title: 'prog_veteran' }),
           entry({ rank: 2, name: 'Berrin', realm: 'Duskhold', renown: 300, title: null }),
         ],
         total: 2,
@@ -68,6 +68,8 @@ describe('buildDeedsLeaderboardView', () => {
     const view = buildDeedsLeaderboardView(input);
     expect(view.kind).toBe('ranked');
     if (view.kind !== 'ranked') return;
+    // toEqual is exact: a row carries Renown as its one ranked number and
+    // nothing beyond the pinned shape (the ranked-surface rule).
     expect(view.rows).toEqual([
       {
         rank: 1,
@@ -77,7 +79,6 @@ describe('buildDeedsLeaderboardView', () => {
         knownClass: true,
         level: 20,
         renown: 425,
-        deedCount: 37,
         // Never localized here: the painter resolves through deed_i18n.ts.
         title: 'prog_veteran',
         me: false,
@@ -90,7 +91,6 @@ describe('buildDeedsLeaderboardView', () => {
         knownClass: true,
         level: 20,
         renown: 300,
-        deedCount: 37,
         title: null,
         me: false,
       },
@@ -166,13 +166,26 @@ describe('buildDeedsLeaderboardView', () => {
     expect(offPage.rows.every((r) => !r.me)).toBe(true);
   });
 
-  it('passes the server-resolved self standing through, null when absent', () => {
+  it('decides the self-line arm in the core: account with renown, rank without, null absent', () => {
+    // A current server sends the account's renown: the CORE picks the
+    // 'account' arm, so the choice is behaviorally pinned here (the painter
+    // only maps each kind to its t() key; swapping the keys between arms
+    // fails the painter's arm-bound source pin, not just a scan).
+    const withRenown = buildDeedsLeaderboardView({
+      kind: 'page',
+      page: page({ self: { rank: 12, topPercent: 4, renown: 1620 } }),
+    });
+    if (withRenown.kind !== 'ranked') throw new Error('expected ranked');
+    expect(withRenown.self).toEqual({ kind: 'account', rank: 12, topPercent: 4, renown: 1620 });
+
+    // An OLDER server (rolling deploy, self-hosted) omits renown: the core
+    // falls back to the rank-only arm rather than dropping the standing.
     const withSelf = buildDeedsLeaderboardView({
       kind: 'page',
       page: page({ self: { rank: 12, topPercent: 4 } }),
     });
     if (withSelf.kind !== 'ranked') throw new Error('expected ranked');
-    expect(withSelf.self).toEqual({ rank: 12, topPercent: 4 });
+    expect(withSelf.self).toEqual({ kind: 'rank', rank: 12, topPercent: 4 });
 
     const withoutSelf = buildDeedsLeaderboardView({ kind: 'page', page: page() });
     if (withoutSelf.kind !== 'ranked') throw new Error('expected ranked');

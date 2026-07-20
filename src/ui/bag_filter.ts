@@ -58,7 +58,7 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
     case 'weapon':
       return item.kind === 'weapon';
     case 'armor':
-      return item.kind === 'armor';
+      return item.kind === 'armor' || item.kind === 'held_offhand';
     case 'consumable':
       return (
         item.kind === 'food' ||

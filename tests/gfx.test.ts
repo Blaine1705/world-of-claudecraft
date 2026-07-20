@@ -12,6 +12,7 @@ import {
   gfxInternalsForTest,
   graphicsPresetLabel,
   isConstrainedBrowser,
+  isSoftwareGL,
   isWeakIntegratedGpu,
   resolveDefaultGraphicsPreset,
   shouldUseAutoGovernor,
@@ -202,6 +203,49 @@ describe('graphics tier resolution', () => {
     );
   });
 
+  it('sheds the memory-spike knobs on constrained (phone-class) browsers, cosmetics only', () => {
+    // A phone-class hint set (touch + coarse pointer): matches iOS WebKit, whose
+    // per-process memory ceiling kills the WebContent process at world entry.
+    const phone = { maxTouchPoints: 5, coarsePointer: true, narrowViewport: true };
+    const medium = gfxInternalsForTest.settingsFor('medium', phone);
+    const high = gfxInternalsForTest.settingsFor('high', phone);
+    const ultra = gfxInternalsForTest.settingsFor('ultra', phone);
+    const desktopMedium = gfxInternalsForTest.settingsFor('medium');
+    const desktopHigh = gfxInternalsForTest.settingsFor('high');
+
+    expect(medium.constrainedMemory).toBe(true);
+    expect(desktopMedium.constrainedMemory).toBe(false);
+
+    // The big one-shot GPU allocations shrink...
+    expect(medium.shadowMap).toBe(1536);
+    expect(high.shadowMap).toBe(2048);
+    expect(ultra.shadowMap).toBe(2048);
+    expect(high.msaaSamples).toBe(0);
+    expect(ultra.msaaSamples).toBe(0);
+    expect(high.pixelRatioCap).toBe(1.48);
+    expect(ultra.pixelRatioCap).toBe(1.48);
+
+    // ...while everything a player can SEE OR REACT TO is untouched (fairness rule):
+    // materials, splat, composer availability, grass density, and view behavior all
+    // match the unconstrained tier.
+    expect(medium.standardMaterials).toBe(desktopMedium.standardMaterials);
+    expect(medium.terrainSplat).toBe(desktopMedium.terrainSplat);
+    expect(medium.grassRadius).toBe(desktopMedium.grassRadius);
+    expect(medium.grassStep).toBe(desktopMedium.grassStep);
+    expect(high.composer).toBe(desktopHigh.composer);
+    expect(high.ao).toBe(desktopHigh.ao);
+
+    // Low deviceMemory alone (Chromium's clamped signal) also lands constrained.
+    const lowMem = gfxInternalsForTest.settingsFor('medium', {
+      maxTouchPoints: 0,
+      coarsePointer: false,
+      narrowViewport: false,
+      deviceMemory: 4,
+    });
+    expect(lowMem.constrainedMemory).toBe(true);
+    expect(lowMem.shadowMap).toBe(1536);
+  });
+
   it('detects older Intel integrated GPUs and lows the unset 3D tier instead of defaulting ultra', () => {
     expect(
       isWeakIntegratedGpu(
@@ -241,6 +285,13 @@ describe('graphics tier resolution', () => {
     expect(classifyGpuRenderer('Google SwiftShader')).toBe('software');
     expect(classifyGpuRenderer('Mesa llvmpipe (LLVM 15.0.7, 256 bits)')).toBe('software');
     expect(classifyGpuRenderer('Apple Software Renderer')).toBe('software');
+    // WARP, the Windows D3D11 software fallback Chromium 141 switched to after removing the
+    // SwiftShader WebGL path: caught via its "Microsoft Basic Render" tokens, not a bare "warp".
+    expect(
+      classifyGpuRenderer(
+        'ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)',
+      ),
+    ).toBe('software');
     // the codebase's named weak-integrated parts stay weak (checked before mid-integrated)
     expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)')).toBe('weak');
     expect(classifyGpuRenderer('Adreno (TM) 330')).toBe('weak');
@@ -268,6 +319,26 @@ describe('graphics tier resolution', () => {
     expect(classifyGpuRenderer('Apple GPU')).toBe('unknown');
     expect(classifyGpuRenderer(undefined)).toBe('unknown');
     expect(classifyGpuRenderer('')).toBe('unknown');
+  });
+
+  it('isSoftwareGL reads the live GL context and flags WARP + SwiftShader, not a real GPU', () => {
+    const fakeRenderer = (rendererString: string): THREE.WebGLRenderer => {
+      const getParameter = vi.fn(() => rendererString);
+      const getExtension = vi.fn((name: string) =>
+        name === 'WEBGL_debug_renderer_info' ? { UNMASKED_RENDERER_WEBGL: 0x9246 } : null,
+      );
+      const gl = { getExtension, getParameter };
+      return { getContext: () => gl } as unknown as THREE.WebGLRenderer;
+    };
+    // WARP is now caught here too (the narrow /swiftshader|llvmpipe|software/ used to miss it).
+    expect(
+      isSoftwareGL(
+        fakeRenderer('ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)'),
+      ),
+    ).toBe(true);
+    expect(isSoftwareGL(fakeRenderer('Google SwiftShader'))).toBe(true);
+    expect(isSoftwareGL(fakeRenderer('Mesa/X.org llvmpipe (LLVM 15.0.6, 256 bits)'))).toBe(true);
+    expect(isSoftwareGL(fakeRenderer('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)'))).toBe(false);
   });
 
   describe('resolveDefaultGraphicsPreset: device-aware first-run default (medium fallback)', () => {

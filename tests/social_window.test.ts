@@ -7,6 +7,42 @@ import { describe, expect, it } from 'vitest';
 // delegation: social repaints on the slow-HUD divider, so a content refresh must NOT
 // re-attach per-row handlers (one delegated listener on the persistent body does it).
 const painter = readFileSync(new URL('../src/ui/social_window.ts', import.meta.url), 'utf8');
+const componentsCss = readFileSync(
+  new URL('../src/styles/components.css', import.meta.url),
+  'utf8',
+);
+
+describe('social_window: .soc-body layout never uses CSS multicol', () => {
+  // Regression for a review finding on the wide-landscape relayout: `.soc-body` is a
+  // flex item inside `#social-window`, which has a DEFINED height (`height: 480px`). A
+  // multicol container (`columns:`/`column-count:`) with a bounded, non-auto block size
+  // does not grow vertically: it spills rows past the box into extra INLINE columns
+  // instead, and `overflow-x: hidden` (also set here) clips them with no scroll path to
+  // reach them, so friends/guild/ignored/blocked rows past roughly the first two columns
+  // silently vanish and are unreachable. `overflow-y: auto` on a grid, by contrast, keeps
+  // working because grid rows wrap and grow the scrollable block axis. Pin the fix as
+  // grid, not multicol, so this cannot regress back to `columns:`.
+  const body = (() => {
+    const start = componentsCss.indexOf('.soc-body {');
+    expect(start, '.soc-body rule not found in components.css').toBeGreaterThan(-1);
+    const end = componentsCss.indexOf('}', start);
+    return componentsCss.slice(start, end);
+  })();
+
+  it('lays friend/guild/ignore/block rows out with CSS grid', () => {
+    expect(body).toContain('display: grid');
+    expect(body).toContain('grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))');
+  });
+
+  it('never declares columns or column-count (the bug: overflow columns get clipped, not scrolled)', () => {
+    expect(body).not.toMatch(/(?:^|[;{\s])columns\s*:/);
+    expect(body).not.toMatch(/(?:^|[;{\s])column-count\s*:/);
+  });
+
+  it('keeps overflow-y auto so the grid rows remain reachable by scroll', () => {
+    expect(body).toContain('overflow-y: auto');
+  });
+});
 
 describe('social_window: no magic values', () => {
   it('carries no literal hex color in TS (status dots are CSS-classed)', () => {
@@ -30,15 +66,26 @@ describe('social_window: no magic values', () => {
 });
 
 describe('social_window: WAI-ARIA tabs', () => {
-  it('renders the tab strip as a role=tablist with role=tab + aria-selected + roving tabindex', () => {
-    expect(painter).toContain('role="tablist"');
-    // Exactly five real tabs (friends / guild / ignore / block / raid), each a role=tab:
-    // ignore and block are two distinct tiers and get a tab each. The closing quote in
-    // /role="tab"/ does NOT match role="tablist" / role="tabpanel".
-    expect(painter.match(/role="tab"/g)?.length).toBe(5);
-    expect(painter).toContain('aria-selected="${tab ===');
-    expect(painter).toContain('tabindex="${tab ===');
-    expect(painter).toContain('aria-controls="soc-body-panel"');
+  // The tab-strip markup (role=tablist/tab, aria-selected, roving tabindex) and the
+  // roving Arrow/Home/End wiring both moved onto the shared tab_strip_view.ts /
+  // tab_strip_painter.ts building blocks (their own contracts are pinned in
+  // tab_strip_view.test.ts / tab_strip_painter.test.ts); this file now pins that
+  // social_window composes them with its five real tabs (friends / guild / ignore /
+  // block / raid: ignore and block are two distinct tiers and get a tab each) instead
+  // of hand-rolling the markup or the keyboard handler itself.
+  it('builds its tab strip from the shared tab_strip_view / tab_strip_painter modules', () => {
+    expect(painter).toContain("from './tab_strip_view'");
+    expect(painter).toContain("from './tab_strip_painter'");
+    expect(painter).toContain('tabStripHtml(');
+    expect(painter).toContain('tabStripModel(');
+    expect(painter).toContain('wireTabStrip(');
+    expect(painter).toContain("panelId: 'soc-body-panel'");
+    expect(painter).toContain("stripClass: 'soc-tabs'");
+    expect(painter).toContain("tabClass: 'soc-tab'");
+    expect(painter).toContain("selectedClass: 'on'");
+    for (const id of ['friends', 'guild', 'ignore', 'block', 'raid']) {
+      expect(painter).toContain(`{ id: '${id}',`);
+    }
   });
 
   it('makes .soc-body the labelled tabpanel (refreshList still queries it by class)', () => {
@@ -51,9 +98,9 @@ describe('social_window: WAI-ARIA tabs', () => {
     expect(painter).not.toContain('aria-pressed');
   });
 
-  it('wires the roving Arrow/Home/End handler via the shared roving_index core', () => {
-    expect(painter).toContain("from './roving_index'");
-    expect(painter).toContain('rovingTarget(');
+  it('refocuses the newly active tab only on a keyboard move, matching the shared wiring contract', () => {
+    expect(painter).toContain('(id, focusFollow) => {');
+    expect(painter).toContain('if (focusFollow) focusActiveTab(el,');
   });
 });
 
