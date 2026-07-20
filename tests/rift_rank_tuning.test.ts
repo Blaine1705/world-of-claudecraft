@@ -7,7 +7,15 @@ import {
 import { RIFT_BOSS_IDS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
 import { BUILTIN_WORLD, ITEMS, MOBS, riftInstanceOrigin } from '../src/sim/data';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
-import { addRiftClearGearLoot } from '../src/sim/rift/progression';
+import {
+  addRiftClearGearLoot,
+  RIFT_BLUE_MOUNT_REINS,
+  RIFT_COIN_BONUS_A,
+  RIFT_COIN_BONUS_B,
+  RIFT_COIN_BONUS_C,
+  RIFT_COIN_BONUS_S,
+  RIFT_EPIC_MOUNT_REINS,
+} from '../src/sim/rift/progression';
 import {
   RIFT_HEROIC_MIN_MOVE_SPEED,
   RIFT_HEROIC_TUNING,
@@ -520,11 +528,13 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
 
   it('C pays nothing, B rolls a slim chance, A guarantees an epic, S guarantees plus rolls more', () => {
     const epicIds = new Set<string>(RIFT_EPIC_ITEM_IDS);
+    const mountIds = new Set<string>([...RIFT_BLUE_MOUNT_REINS, ...RIFT_EPIC_MOUNT_REINS]);
+    // Returns only the gear (non-mount) items from a clear.
     const run = (baseLevel: number, rngSeed: number) => {
       const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
       const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
       addRiftClearGearLoot(ctx, boss, baseLevel);
-      return boss.loot!.items.map((i) => i.itemId);
+      return boss.loot!.items.map((i) => i.itemId).filter((id) => !mountIds.has(id!));
     };
     for (let s = 1; s <= 40; s++) {
       expect(run(20, s), 'C never pays clear gear').toHaveLength(0);
@@ -532,7 +542,7 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
       expect(a.length, 'A guarantees exactly one epic').toBe(1);
       expect(epicIds.has(a[0]!), 'A pays from the epic pool').toBe(true);
       const b = run(22, s);
-      expect(b.length, 'B is a slim roll').toBeLessThanOrEqual(1);
+      expect(b.length, 'B is a slim gear roll').toBeLessThanOrEqual(1);
       const sDrops = run(28, s);
       expect(sDrops.length, 'S guarantees one epic').toBeGreaterThanOrEqual(1);
       expect(sDrops.length).toBeLessThanOrEqual(3);
@@ -603,6 +613,31 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
       cItems.some((id) => epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID),
       'C corpse never carries clear gear',
     ).toBe(false);
+  });
+
+  it('rank coin bonus: C pays none, B/A/S each pay the correct copper bonus', () => {
+    const runCopper = (baseLevel: number, rngSeed: number): number => {
+      const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
+      const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
+      addRiftClearGearLoot(ctx, boss, baseLevel);
+      return boss.loot!.copper;
+    };
+    // C gets no bonus (baseLevel 20).
+    for (let s = 1; s <= 10; s++) {
+      expect(runCopper(20, s), 'C rank: no coin bonus').toBe(RIFT_COIN_BONUS_C);
+    }
+    // B always gets exactly RIFT_COIN_BONUS_B regardless of other draws.
+    for (let s = 1; s <= 10; s++) {
+      expect(runCopper(22, s), 'B rank: flat 10 000c bonus').toBe(RIFT_COIN_BONUS_B);
+    }
+    // A always gets exactly RIFT_COIN_BONUS_A.
+    for (let s = 1; s <= 10; s++) {
+      expect(runCopper(25, s), 'A rank: flat 35 000c bonus').toBe(RIFT_COIN_BONUS_A);
+    }
+    // S always gets exactly RIFT_COIN_BONUS_S.
+    for (let s = 1; s <= 10; s++) {
+      expect(runCopper(28, s), 'S rank: flat 50 000c bonus').toBe(RIFT_COIN_BONUS_S);
+    }
   });
 });
 

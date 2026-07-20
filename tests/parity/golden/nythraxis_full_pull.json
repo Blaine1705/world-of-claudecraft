@@ -13,8 +13,8 @@
     "Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue",
     "class:warrior"
   ],
-  "draws": 5796,
-  "drawDigest": "9ce150f0",
+  "draws": 5799,
+  "drawDigest": "2969b280",
   "frames": [
     {
       "tick": 0,
@@ -9238,8 +9238,8 @@
       "state": "68601813",
       "events": "c09b72fa",
       "rng": {
-        "draws": 5252,
-        "digest": "e7bcac38"
+        "draws": 5251,
+        "digest": "6e709914"
       },
       "label": "death",
       "players": [
@@ -10501,8 +10501,8 @@
       "state": "02a2e633",
       "events": "741638a5",
       "rng": {
-        "draws": 5275,
-        "digest": "95f1f3b1"
+        "draws": 5274,
+        "digest": "bc889e81"
       }
     },
     {
@@ -10512,8 +10512,8 @@
       "state": "2c248d95",
       "events": "741638a5",
       "rng": {
-        "draws": 5371,
-        "digest": "c92ae8cb"
+        "draws": 5370,
+        "digest": "61508975"
       }
     },
     {
@@ -10523,8 +10523,8 @@
       "state": "c95ee9d1",
       "events": "741638a5",
       "rng": {
-        "draws": 5492,
-        "digest": "352f4175"
+        "draws": 5491,
+        "digest": "c34e1bfa"
       }
     },
     {
@@ -10534,8 +10534,8 @@
       "state": "c3f3cab7",
       "events": "741638a5",
       "rng": {
-        "draws": 5563,
-        "digest": "9c3ec80d"
+        "draws": 5566,
+        "digest": "ce91ea2e"
       }
     },
     {
@@ -10545,8 +10545,8 @@
       "state": "345a0ed3",
       "events": "741638a5",
       "rng": {
-        "draws": 5660,
-        "digest": "47a24e55"
+        "draws": 5664,
+        "digest": "cc6625ce"
       }
     },
     {
@@ -10556,8 +10556,8 @@
       "state": "b3e5e429",
       "events": "741638a5",
       "rng": {
-        "draws": 5730,
-        "digest": "982ba906"
+        "draws": 5733,
+        "digest": "68ec861a"
       }
     },
     {
@@ -10567,8 +10567,8 @@
       "state": "a0153a15",
       "events": "a8ba491e",
       "rng": {
-        "draws": 5796,
-        "digest": "9ce150f0"
+        "draws": 5799,
+        "digest": "2969b280"
       },
       "label": "final",
       "players": [

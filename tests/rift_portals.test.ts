@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
-import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
+import {
+  RIFT_ESSENCE_ITEM_ID,
+  RIFT_GEAR_ITEM_IDS,
+  RIFT_GEM_IDS,
+} from '../src/sim/content/rift/items';
 import { ZONES } from '../src/sim/data';
 import {
   RIFT_MIN_LEVEL,
@@ -279,5 +283,63 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     ).toBe(false);
     expect(rewardItems.some((item) => item.instance?.rift !== undefined)).toBe(false);
     expect(sim.players.get(sim.player.id)?.heroicDaily.marked.size).toBe(0);
+  });
+
+  it('natural ranked first-clear: boss corpse carries a personal riftbound ring, essence, and A/S gem', () => {
+    // This is the POSITIVE pin for addRiftProgressionLoot. The dev-portal negative
+    // (above) already pins the "no progression loot on unranked runs" path. This
+    // test confirms that the first ranked clear actually deposits ring + essence +
+    // gem personalFor the winning player on the boss corpse.
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-08';
+    // Force an A-rank portal (baseLevel 25) so the gem arm triggers.
+    spawnDuePortal(sim);
+    // If the spawned portal is not A or S, override to A via dev command.
+    const portal0 = sim.naturalRiftPortals[0];
+    if (!portal0 || (portal0.tier !== 'A' && portal0.tier !== 'S')) {
+      // Seed a new portal at the right rank via the dev command.
+      sim.chat('/dev portal 99 25 A', sim.player.id);
+      const portalEntity = [...sim.entities.values()].find(
+        (e) => e.templateId === 'rift_portal' && e.riftSeed === 99,
+      )!;
+      sim.player.pos = { ...portalEntity.pos };
+      sim.player.prevPos = { ...portalEntity.pos };
+    } else {
+      const portalEntity = sim.entities.get(portal0.id)!;
+      sim.player.pos = { ...portalEntity.pos };
+      sim.player.prevPos = { ...portalEntity.pos };
+    }
+    sim.tick();
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    expect(inst, 'entered a rift').toBeDefined();
+
+    const boss = clearRiftToBossKill(sim, inst);
+    tickSeconds(sim, 1.2); // let the 1 Hz reward sweep fire
+    expect(inst.rewarded, 'rift marked rewarded').toBe(true);
+
+    const pid = sim.player.id;
+    const items = boss.loot?.items ?? [];
+
+    // Personal riftbound ring: personalFor the winner.
+    const ringItem = items.find(
+      (i) =>
+        (RIFT_GEAR_ITEM_IDS as readonly string[]).includes(i.itemId) &&
+        i.personalFor?.includes(pid),
+    );
+    expect(ringItem, 'riftbound ring is personal to the winner').toBeDefined();
+    expect(ringItem?.instance?.rift, 'ring has a rift instance payload').toBeDefined();
+
+    // Rift Essence: at least one personal essence drop.
+    const essenceItems = items.filter(
+      (i) => i.itemId === RIFT_ESSENCE_ITEM_ID && i.personalFor?.includes(pid),
+    );
+    expect(essenceItems.length, 'at least one essence dropped').toBeGreaterThanOrEqual(1);
+
+    // A/S gem: exactly one gem from the RIFT_GEM_IDS pool, personal to the winner.
+    const gemItem = items.find(
+      (i) => (RIFT_GEM_IDS as readonly string[]).includes(i.itemId) && i.personalFor?.includes(pid),
+    );
+    expect(gemItem, 'A/S gem is personal to the winner').toBeDefined();
   });
 });

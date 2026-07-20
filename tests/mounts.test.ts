@@ -15,6 +15,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { meleeSwing } from '../src/sim/combat/auto_attack';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import {
   DEFAULT_MOUNT,
   MOUNT_KEYS,
@@ -36,6 +37,12 @@ import {
   updateMountTransition,
 } from '../src/sim/mounts';
 import { moveSpeedMult } from '../src/sim/player_motion';
+import {
+  RIFT_BLUE_MOUNT_CHANCE,
+  RIFT_BLUE_MOUNT_REINS,
+  RIFT_EPIC_MOUNT_CHANCE,
+  RIFT_EPIC_MOUNT_REINS,
+} from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
 import { DT, type MountItemDef, type SimEvent } from '../src/sim/types';
 
@@ -144,22 +151,77 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it('pins each reins item to its boss drop (a sub-1% independent draw, no roll group)', () => {
-    const drops: Array<[string, string, number]> = [
-      ['morthen', 'reins_grag_bear', 0.009],
-      ['vael_the_mistcaller', 'reins_stalkglider_snail', 0.009],
-      ['ysolei', 'reins_aether_hover_cycle', 0.005],
-      ['korzul_the_gravewyrm', 'reins_shadowjump_toad', 0.005],
-      ['nythraxis_scourge_of_thornpeak', 'reins_stormfeather_griffin', 0.002],
-      ['thunzharr_waking_peak', 'reins_thunderstrut_gobbler', 0.003],
+  it('pins each reins item to its acquisition path (all heroic-gated or rift-clear-only)', () => {
+    // Green mounts (0.5%) and blue mounts (0.6%) are now heroic-gated appends in
+    // HEROIC_BOSS_LOOT, never on normal mob loot tables. Epic mounts are rift
+    // S-clear-only (rift/progression.ts), not on any static table.
+
+    // Green (common) mounts: heroic-only independent draws on their paired boss.
+    const greenDrops: Array<[string, string, number]> = [
+      ['morthen', 'reins_grag_bear', 0.005],
+      ['vael_the_mistcaller', 'reins_stalkglider_snail', 0.005],
     ];
-    for (const [mobId, itemId, chance] of drops) {
-      const entry = MOBS[mobId].loot.find((l) => l.itemId === itemId);
-      expect(entry, `${mobId} drops ${itemId}`).toBeDefined();
-      expect(entry?.chance).toBe(chance);
-      expect(entry?.rollGroup).toBeUndefined();
-      expect(entry?.questId).toBeUndefined();
+    for (const [bossId, itemId, chance] of greenDrops) {
+      const entries = HEROIC_BOSS_LOOT[bossId] ?? [];
+      const entry = entries.find((l) => l.itemId === itemId);
+      expect(entry, `heroic ${bossId} drops ${itemId}`).toBeDefined();
+      expect(entry?.chance, `${itemId} heroic chance`).toBe(chance);
+      expect(entry?.rollGroup, `${itemId} not in a roll group`).toBeUndefined();
+      // Not on the normal loot table.
+      expect(
+        MOBS[bossId].loot.find((l) => l.itemId === itemId),
+        `${itemId} off normal table`,
+      ).toBeUndefined();
     }
+
+    // Blue (rare) mounts: heroic-only on their paired five-man boss (0.6%) plus
+    // a secondary path on the heroic Nythraxis raid (0.1%).
+    const blueDrops: Array<[string, string, number]> = [
+      ['ysolei', 'reins_aether_hover_cycle', 0.006],
+      ['korzul_the_gravewyrm', 'reins_shadowjump_toad', 0.006],
+    ];
+    for (const [bossId, itemId, chance] of blueDrops) {
+      const entries = HEROIC_BOSS_LOOT[bossId] ?? [];
+      const entry = entries.find((l) => l.itemId === itemId);
+      expect(entry, `heroic ${bossId} drops ${itemId}`).toBeDefined();
+      expect(entry?.chance, `${itemId} heroic chance`).toBe(chance);
+      expect(entry?.rollGroup, `${itemId} not in a roll group`).toBeUndefined();
+      expect(
+        MOBS[bossId].loot.find((l) => l.itemId === itemId),
+        `${itemId} off normal table`,
+      ).toBeUndefined();
+    }
+    // Both blues also appear on the heroic Nythraxis raid at 0.1%.
+    const nythEntries = HEROIC_BOSS_LOOT['nythraxis_scourge_of_thornpeak'] ?? [];
+    for (const itemId of ['reins_aether_hover_cycle', 'reins_shadowjump_toad']) {
+      const entry = nythEntries.find((l) => l.itemId === itemId);
+      expect(entry, `heroic Nythraxis also drops ${itemId}`).toBeDefined();
+      expect(entry?.chance, `${itemId} raid heroic chance`).toBe(0.001);
+    }
+
+    // Epic mounts: rift S-clear only (RIFT_EPIC_MOUNT_REINS), NOT on any static table.
+    for (const itemId of ['reins_stormfeather_griffin', 'reins_thunderstrut_gobbler']) {
+      for (const mob of Object.values(MOBS)) {
+        expect(
+          mob.loot.find((l) => l.itemId === itemId),
+          `${itemId} must not be on any normal mob table (${mob.id})`,
+        ).toBeUndefined();
+      }
+      for (const [, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
+        expect(
+          entries.find((l) => l.itemId === itemId),
+          `${itemId} must not be in heroic boss loot`,
+        ).toBeUndefined();
+      }
+      // Verify they appear in the rift epic mount reins list.
+      expect(RIFT_EPIC_MOUNT_REINS).toContain(itemId);
+      expect(RIFT_EPIC_MOUNT_CHANCE).toBe(0.003);
+    }
+
+    // Blue mounts also in the rift blue mount reins list (A/S clear path).
+    expect(RIFT_BLUE_MOUNT_REINS).toContain('reins_aether_hover_cycle');
+    expect(RIFT_BLUE_MOUNT_REINS).toContain('reins_shadowjump_toad');
+    expect(RIFT_BLUE_MOUNT_CHANCE).toBe(0.006);
   });
 
   it('ownership: a fresh player owns nothing; a mount only while its reins is held', () => {
