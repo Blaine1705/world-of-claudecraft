@@ -1,9 +1,9 @@
-# Hunter Packlord v0.28.0 PRD
+# Hunter Packlord v0.29.0 PRD
 
-Status: owner design direction, pre-approval and pre-implementation
+Status: owner-approved implementation, PBE validation pending
 Owner: Ryze
-Target: `release/v0.28.0`, PBE Wave C
-Parent design: [Hunter v0.28.0 Class Design](../design/hunter-v028-class-design.md)
+Target: `release/v0.29.0`, PBE Wave C
+Parent design: [Hunter v0.29.0 Class Design](../design/hunter-v028-class-design.md)
 
 ## Specialization gate
 
@@ -29,7 +29,7 @@ frenzy, then watches it calm before beginning the cycle again.
 ## Non-goals
 
 - Multiple simultaneous combat pets or a pet stable.
-- Family-specific rotations or Unleash attacks in v0.28.0.
+- Family-specific rotations or Unleash attacks in v0.29.0.
 - Manual high-frequency pet abilities.
 - Pet growth that changes collision, reach, targeting, pathing, or camera behavior.
 - An autonomous pet that reaches maximum Ferocity without Hunter commands.
@@ -136,7 +136,7 @@ The exact 18 class-wide choices remain defined in the parent Hunter design.
   settings.
 
 PR #2165 is implementation reference material only. Work must reconcile against and target
-`release/v0.28.0`, which remains canonical.
+`release/v0.29.0`, which remains canonical.
 
 ## Balance knobs
 

@@ -1,16 +1,16 @@
-# Hunter, Shaman, and Priest v0.28.0 Spell Implementation Plan
+# Hunter, Shaman, and Priest v0.29.0 Spell Implementation Plan
 
 > Review companion: use the standalone
 > [Talents 2.0 class design lab](../../prototypes/talents-v028/index.html) for a mobile-first comparison
 > of all nine specializations. This document and the linked class PRDs remain authoritative.
 
-Status: owner implementation plan, pending maintainer approval for gameplay slices
+Status: owner implementation plan; Hunter approved, other gameplay slices pending
 Owner: Ryze
-Target: `release/v0.28.0`, then the assigned PBE wave for each class
+Target: `release/v0.29.0`, then the assigned PBE wave for each class
 
 ## Base and relationship to PR #2163
 
-This work is based on `release/v0.28.0` after PR #2163. The release branch contains merge commit
+This work is based on `release/v0.29.0` after PR #2163. The release branch contains merge commit
 `32415eb61509113731633b51f396c7c3c2dae222`, and this implementation branch descends from it.
 
 PR #2163 remains the passive specialization power floor. This program does not fold new spells,
@@ -21,8 +21,9 @@ rotation mechanics, procs, or talent rows into `SPEC_BASELINES`. The layers rema
 3. Spec-specific spell kit and rotation mechanics from this program.
 4. Class-wide Talents 2.0 choices.
 
-The class redesign is a large content feature. Gameplay slices require approval from Levy or
-Fernando before implementation and must pass through the listed PBE waves. Documentation and
+The class redesign is a large content feature. Levy approved the Hunter gameplay slice for
+implementation. Other gameplay slices still require approval from Levy or Fernando, and every
+class must pass through the listed PBE waves. Documentation and
 fail-first test scaffolding may land independently.
 
 ## Non-negotiable implementation rules
@@ -264,7 +265,7 @@ Add focused tests paired with the Priest system modules:
 4. Run the parity suite and review every intentional state or combat-event change.
 5. Run `npx tsc --noEmit` and the changed-file checks.
 6. Run `npm run gate` before the PR is called ready.
-7. Keep the PR current with `release/v0.28.0` through review and PBE feedback.
+7. Keep the PR current with `release/v0.29.0` through review and PBE feedback.
 
 ## Definition of done
 
