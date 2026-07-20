@@ -253,9 +253,13 @@ describe('rift ranks: rank-gated summons + the boss-add level pin', () => {
       // The level-50 bug: adds rolled the template band (18..60 before the fix)
       // instead of matching the dungeon. They must spawn AT the boss's level.
       expect(add.level, 'adds match the boss level').toBe(sBoss.level);
-      expect(add.mechanicDamageMult, 'adds take the softer add multiplier').toBe(
-        RIFT_HEROIC_TUNING.S?.addDamageMultiplier,
-      );
+      const addMult = RIFT_HEROIC_TUNING.S?.addDamageMultiplier;
+      expect(add.mechanicDamageMult, 'add mechanics take the softer multiplier').toBe(addMult);
+      // The auto-attack takes the SAME softer multiplier via the spawn-time
+      // template transform (never the full boss damageMultiplier).
+      const t = MOBS[add.templateId];
+      const swing = t.dmgBase * addMult! + t.dmgPerLevel * addMult! * (add.level - 1);
+      expect(add.weapon.min, 'add swings at the add multiplier').toBe(Math.round(swing * 0.8));
     }
   });
 });

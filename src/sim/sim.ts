@@ -6852,7 +6852,15 @@ export class Sim {
       let level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
       if (riftInst) {
         level = boss.level;
-        if (riftTuning) addTemplate = riftHeroicTemplate(template, riftTuning);
+        // The add wave lands on top of the boss's own output, so BOTH its
+        // auto-attack (via the template transform) and its mechanics (via
+        // mechanicDamageMult below) take the softer addDamageMultiplier.
+        if (riftTuning) {
+          addTemplate = riftHeroicTemplate(template, {
+            ...riftTuning,
+            damageMultiplier: riftTuning.addDamageMultiplier,
+          });
+        }
       }
       const add = createMob(this.nextId++, addTemplate, level, pos);
       applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty, { summonedAdd: true });
