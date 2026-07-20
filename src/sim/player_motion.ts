@@ -169,7 +169,8 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         casting != null &&
         (casting.def.castWhileMoving ||
           casting.castWhileMoving ||
-          iceFloesAuraForAbility(p, p.castingAbility) !== undefined);
+          iceFloesAuraForAbility(p, p.castingAbility) !== undefined ||
+          p.auras.some((a) => a.kind === 'processional_grace'));
       if (!mobile) deps.cancelCast(p);
     }
     const len = Math.hypot(mx, mz);

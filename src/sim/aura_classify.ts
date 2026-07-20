@@ -72,7 +72,11 @@ const PARTY_FRAME_HELPFUL_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
 
 // Evasion and Deterrence share buff_dodge with long-lived maintenance buffs, so
 // their stable ability ids distinguish the major defensives from passive upkeep.
-const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set(['evasion', 'deterrence']);
+const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set([
+  'evasion',
+  'deterrence',
+  'priest_doctrine',
+]);
 
 /** Effects worth surfacing on a compact party/raid frame. Generic maintenance
  * buffs, forms, stances, and personal damage procs remain on the normal aura UI. */

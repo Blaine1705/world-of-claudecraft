@@ -45,49 +45,40 @@ function castAndSettle(sim: Sim, ability: string, seconds = 4): void {
 }
 
 describe('priest redesign', () => {
-  it('Searing Light: every 3rd Smite makes the next heal free', () => {
+  it('Veil Unbound makes Veilstep a control break and speed burst', () => {
     const { sim, p } = rig('priest', 20, { 5: 'pri_r5_searing_light' });
-    addTargetMob(sim);
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'smite');
-    expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
-    sim.targetEntity(sim.playerId);
-    const before = p.resource;
-    sim.castAbility('flash_heal');
-    for (let i = 0; i < 20 * 2; i++) sim.tick(); // cast-time heals bill at completion
-    expect(p.resource).toBeGreaterThanOrEqual(before - 1); // the heal billed nothing
-    expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(false); // consumed
+    p.auras.push({
+      id: 'test_slow',
+      name: 'Test Slow',
+      kind: 'slow',
+      value: 0.5,
+      remaining: 10,
+      duration: 10,
+      sourceId: 999,
+      school: 'shadow',
+    });
+    castAndSettle(sim, 'veilstep', 0);
+    expect(p.auras.some((a) => a.kind === 'slow')).toBe(false);
+    expect(p.auras).toContainEqual(
+      expect.objectContaining({ id: 'priest_veil_unbound', kind: 'buff_speed', value: 1.5 }),
+    );
   });
 
-  it('Improved Whispered Prayer: every third cast wards its target', () => {
-    // The #1756 choice pass turned this row into Warding Refrain: every 3rd
-    // Whispered Prayer wards, replacing the full-duration-Renew trigger.
+  it('Sheltering Step gives Psalm of Warding a target speed burst', () => {
     const { sim, p } = rig('priest', 20, { 5: 'pri_r5_improved_renew' });
-    p.hp = Math.round(p.maxHp * 0.5);
     sim.targetEntity(sim.playerId);
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'lesser_heal', 3);
-    expect(p.auras.some((a) => a.kind === 'absorb' && a.id === 'pri_lingering_ward')).toBe(true);
+    castAndSettle(sim, 'power_word_shield', 0);
+    expect(p.auras).toContainEqual(
+      expect.objectContaining({ id: 'priest_sheltering_step', kind: 'buff_speed', value: 1.4 }),
+    );
   });
 
-  it('Twisted Faith: Mindfracture hits harder on a DoT-afflicted target', () => {
-    const run = (withDot: boolean) => {
-      const { sim } = rig('priest', 20, { 5: 'pri_r5_twisted_faith' });
-      const mob = addTargetMob(sim);
-      if (withDot) castAndSettle(sim, 'shadow_word_pain', 2);
-      const before = mob.hp;
-      let dmg = 0;
-      sim.player.resource = sim.player.maxResource;
-      sim.castAbility('mind_blast');
-      for (let i = 0; i < 20 * 3; i++) {
-        for (const ev of sim.tick()) {
-          if (ev.type === 'damage' && ev.ability === 'Mindfracture') dmg += ev.amount;
-        }
-      }
-      expect(mob.hp).toBeLessThan(before);
-      return dmg;
-    };
-    // Same seed and cast pattern either way; the DoT-afflicted hit must be
-    // visibly larger (25% before crit variance; the seed draws no crit here).
-    expect(run(true)).toBeGreaterThan(run(false) * 1.2);
+  it('Processional Grace enables casting while moving after Veilstep', () => {
+    const { sim, p } = rig('priest', 20, { 5: 'pri_r5_twisted_faith' });
+    castAndSettle(sim, 'veilstep', 0);
+    expect(p.auras).toContainEqual(
+      expect.objectContaining({ kind: 'processional_grace', remaining: 4 }),
+    );
   });
 
   it('Improved Shield: a fully consumed Psalm of Warding heals its owner', () => {
@@ -115,34 +106,16 @@ describe('priest redesign', () => {
     expect(p.hp).toBeGreaterThanOrEqual(before + 45 - 1); // burst heal landed
   });
 
-  it('Greater Heal echo: dropping below 35% inside the window triggers the stored heal', () => {
-    const { sim, p } = rig('priest', 20, { 14: 'pri_r14_greater_heal' });
-    p.hp = Math.round(p.maxHp * 0.6);
-    sim.targetEntity(sim.playerId);
-    castAndSettle(sim, 'heal', 4);
-    expect(p.auras.some((a) => a.kind === 'heal_echo')).toBe(true);
-    const crash = Math.round(p.maxHp * 0.7);
-    const beforeCrash = p.hp;
-    (
-      sim as unknown as {
-        dealDamage(
-          s: Entity | null,
-          t: Entity,
-          n: number,
-          c: boolean,
-          sc: string,
-          a: string | null,
-          k: string,
-        ): void;
-      }
-    ).dealDamage(null, p, crash, false, 'physical', null, 'hit');
-    // The echo consumed and healed 60 on top of the post-crash floor.
-    expect(p.auras.some((a) => a.kind === 'heal_echo')).toBe(false);
-    expect(p.hp).toBeGreaterThanOrEqual(beforeCrash - crash + 59);
+  it('Last Prayer restores 30% maximum health', () => {
+    const { sim, p } = rig('priest', 20, { 8: 'pri_r17_desperate_prayer' });
+    p.hp = Math.round(p.maxHp * 0.4);
+    const before = p.hp;
+    castAndSettle(sim, 'desperate_prayer', 0);
+    expect(p.hp).toBe(before + Math.round(p.maxHp * 0.3));
   });
 
-  it('Inner Fire: a hit above 15% max health kindles a ward, once per 20 sec', () => {
-    const { sim, p } = rig('priest', 20, { 17: 'pri_r17_inner_fire' });
+  it('Wounded Halo: a hit above 15% max health kindles a ward, once per 20 sec', () => {
+    const { sim, p } = rig('priest', 20, { 8: 'pri_r17_inner_fire' });
     const hit = Math.round(p.maxHp * 0.2);
     const deal = (
       sim as unknown as {
@@ -276,7 +249,7 @@ describe('paladin redesign', () => {
 
   it('replay determinism: the proc-heavy priest run is bit-identical', () => {
     const run = () => {
-      const { sim, p } = rig('priest', 20, { 5: 'pri_r5_searing_light', 17: 'pri_r17_inner_fire' });
+      const { sim, p } = rig('priest', 20, { 5: 'pri_r5_searing_light', 8: 'pri_r17_inner_fire' });
       addTargetMob(sim);
       for (let i = 0; i < 3; i++) castAndSettle(sim, 'smite');
       return { hp: p.hp, mana: p.resource, auras: p.auras.map((a) => [a.id, a.kind]) };

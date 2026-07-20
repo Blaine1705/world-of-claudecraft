@@ -18,6 +18,7 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
 import { PERSONAL_BARRIER_IDS } from './fire_mage';
+import { priestOnCastCompleted } from './priest/talents';
 import { onShamanCastCompleted } from './shaman_talents';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
@@ -174,6 +175,7 @@ export function onCastCompleted(
   abilityId: string,
   target?: Entity | null,
 ): void {
+  priestOnCastCompleted(ctx, player);
   // G1 guard: a cast that consumed an empower aura (flag set at the consume
   // funnel in empower_next.ts) never advances a castNth counter, so free-cast
   // relay procs cannot feed cast-counter procs. The flag covers exactly one

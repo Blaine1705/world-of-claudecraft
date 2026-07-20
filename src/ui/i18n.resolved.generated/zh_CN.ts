@@ -7545,6 +7545,30 @@ export const zh_CN: EnTranslations = {
         "name": "虚空盛宴",
         "description": "吞噬一个魔法效果（敌人的增益或盟友的减益），并恢复你最大生命值的6%。"
       },
+      "veilstep": {
+        "name": "帷幕步",
+        "description": "朝面向的方向穿越帷幕。"
+      },
+      "scouring_mercy": {
+        "name": "涤罪慈悲",
+        "description": "以神圣之力净化一名敌人，或立即救治一名友方目标。教义专属技能。"
+      },
+      "seraphic_vigil": {
+        "name": "炽天使守望",
+        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。"
+      },
+      "summon_tithefiend": {
+        "name": "召唤什一魔",
+        "description": "消耗幽暗什一来召唤一只临时存在的什一魔，追猎你的塑像。晚祷专属技能。"
+      },
+      "martyrs_aegis": {
+        "name": "殉道者圣盾",
+        "description": "使一名盟友受到的伤害降低 40%，持续 8 秒。"
+      },
+      "choir_of_deliverance": {
+        "name": "救赎圣咏团",
+        "description": "引导 6 秒，每 2 秒为附近的队伍成员恢复生命值。"
+      },
       "bear_charge": {
         "name": "巨熊冲锋",
         "description": "冲向一名敌人，生成9点怒气并将其昏迷1秒。射程8-25码。仅限巨熊形态使用。"

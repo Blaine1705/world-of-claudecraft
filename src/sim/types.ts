@@ -220,6 +220,7 @@ export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 
 export type AuraKind =
   | 'dot'
+  | 'doctrine'
   | 'slow'
   | 'stun'
   | 'stasis'
@@ -303,6 +304,9 @@ export type AuraKind =
   | 'brain_freeze'
   | 'winters_chill'
   | 'icicles'
+  // Vespers Priest: source-owned self resource built by Mindfracture and
+  // Effigy-bound Dirge ticks, consumed whole by Call Tithefiend.
+  | 'gloomtithe'
   // Chronomancer offensive cooldown (combat/chronomancy.ts): while worn, Aether
   // Darts does not consume the caster's Arcane Charges.
   | 'perfect_moment'
@@ -364,6 +368,7 @@ export type AuraKind =
   | 'buff_armor_pct'
   | 'buff_ap_pct'
   | 'buff_dmg_done'
+  | 'buff_heal_done'
   | 'buff_crit'
   | 'buff_rage_gen'
   | 'buff_reckless'
@@ -391,6 +396,7 @@ export type AuraKind =
   // hard cast decrements the value and removes the aura at 0
   // (casting_lifecycle). Draws no rng.
   | 'ice_floes'
+  | 'processional_grace'
   // Overload (mage choice row): armed amplifier; the next mana spell is baked
   // 40% stronger and 50% costlier from a scaled copy of its resolved ability
   // (casting_lifecycle consumeOverload). value = the output fraction (0.4).
@@ -477,6 +483,9 @@ export interface Aura {
   // extendDot bookkeeping: seconds already added to this DoT application, so
   // the per-application maxBonus cap holds across channel ticks.
   extendedBy?: number;
+  // Vespers duplicate guard: one Dirge aura can mint at most one Gloomtithe
+  // stack in a simulation tick even if a hook is accidentally dispatched twice.
+  gloomtitheTick?: number;
   leechPct?: number; // dot only: fraction of tick damage healed back to source
   // Chronomancy Temporal Echo bookkeeping (temporal_echo auras only). echoGroup
   // marks the ORIGIN: false/undefined = the single-target Temporal Echo (35% ST /
@@ -2611,7 +2620,27 @@ export interface DamageTick {
   amount: number;
 }
 
+/** Transient, non-command guardian runtime. Never serialized or put on the pet bar. */
+export interface GuardianState {
+  key: string;
+  remaining: number;
+  attackTimer: number;
+  attackInterval: number;
+  minDamage: number;
+  maxDamage: number;
+  school: string;
+  abilityId: string;
+  abilityName: string;
+  preferredTargetId: number | null;
+  maxRange: number;
+  /** Optional owner-scoped aura required on every valid target. */
+  requiredTargetAuraId?: string;
+  /** Fire-and-forget guardians may dismiss when their target contract is exhausted. */
+  dismissWhenUntargeted?: boolean;
+}
+
 export interface Entity {
+  guardianState?: GuardianState;
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };

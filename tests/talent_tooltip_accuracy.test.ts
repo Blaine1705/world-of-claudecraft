@@ -164,6 +164,9 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
 // records that power specs, masteries, and the choice rows.
 
 const PCT_FIELDS = new Set([
+  // Class-owned intrinsic mechanic metadata uses `pct` for its player-facing
+  // fraction while runtime behavior stays in the class combat module.
+  'pct',
   'leechPct',
   'hpFrac',
   'belowFrac',

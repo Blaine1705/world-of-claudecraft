@@ -7545,6 +7545,30 @@ export const ja_JP: EnTranslations = {
         "name": "虚無の饗宴",
         "description": "魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。"
       },
+      "veilstep": {
+        "name": "ヴェイルステップ",
+        "description": "向いている方向へ帷をすり抜ける。"
+      },
+      "scouring_mercy": {
+        "name": "浄罪の慈悲",
+        "description": "敵を聖なる力で浄化するか、味方1体を即座に癒す。ドクトリン固有能力。"
+      },
+      "seraphic_vigil": {
+        "name": "熾天使の見守り",
+        "description": "味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。"
+      },
+      "summon_tithefiend": {
+        "name": "タイスフィーンド招来",
+        "description": "グルームタイスを消費し、あなたのエフィジーを狙う一時的なタイスフィーンドを呼び出す。ヴェスパー固有能力。"
+      },
+      "martyrs_aegis": {
+        "name": "殉教者の盾",
+        "description": "味方1体が受けるダメージを8秒間40%軽減する。"
+      },
+      "choir_of_deliverance": {
+        "name": "救済の聖歌隊",
+        "description": "6秒間詠唱し、2秒ごとに周囲のパーティメンバーを回復する。"
+      },
       "bear_charge": {
         "name": "ブルーインラッシュ",
         "description": "敵に突進して激怒を9獲得し、1秒間スタンさせる。射程7～23メートル。ブルーインフォーム時のみ使用可能。"

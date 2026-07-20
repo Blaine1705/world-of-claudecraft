@@ -49,22 +49,21 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
   });
 
-  it('Resolve Unbroken strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
-    // The active Talents V2 row buffs a percent stat buff; with damage mods no longer
-    // scaling percent buffs, it must ride buffPct. The row's 50% modifier scales the
-    // +5% base buff to the authored +7.5%, without rounding the percentage to 8%.
+  it('Guisecraft strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
+    // The active Hunter row buffs a flat attack-power aura; with damage mods no
+    // longer scaling utility buffs, it must ride buffPct.
     const mods = computeTalentModifiers(
-      'priest',
-      { spec: null, rows: { 17: 'pri_r17_improved_fortitude' } },
+      'hunter',
+      { spec: null, rows: { 5: 'hun_r5_aspect_mastery' } },
       20,
     );
-    const fortitude = abilitiesKnownAt('priest', 20, mods).find(
-      (a) => a.def.id === 'power_word_fortitude',
+    const guise = abilitiesKnownAt('hunter', 20, mods).find(
+      (a) => a.def.id === 'aspect_of_the_hawk',
     );
-    const buff = fortitude?.effects.find(
-      (e) => e.type === 'buffTarget' && e.kind === 'buff_sta_pct',
-    );
-    expect(buff && 'value' in buff ? buff.value : null).toBe(7.5);
+    const buff = guise?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'buff_ap');
+    // Rank 3 is +50 AP at level 20; Guisecraft raises it by 25% and the
+    // resolved flat magnitude rounds to 63.
+    expect(buff && 'value' in buff ? buff.value : null).toBe(63);
   });
 });
 

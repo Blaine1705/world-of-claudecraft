@@ -15,6 +15,7 @@ import {
   TEMPORAL_HOURGLASS_SELF_RADIUS,
   type WeaponInfo,
 } from '../types';
+import { PRIEST_ABILITIES } from './priest';
 import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
 import type { TalentModifiers } from './talents';
@@ -350,6 +351,14 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'heal',
       'mind_flay',
       'flash_heal',
+      'veilstep',
+      'psychic_scream',
+      'scouring_mercy',
+      'prayer_of_healing',
+      'holy_nova',
+      'seraphic_vigil',
+      'shadowform',
+      'summon_tithefiend',
     ],
     color: 0xfffff0,
   },
@@ -3659,7 +3668,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== PRIEST ======================
   smite: {
     id: 'smite',
-    name: 'Smite',
+    name: 'Scouring Hymn',
     class: 'priest',
     learnLevel: 1,
     cost: 20,
@@ -5846,14 +5855,19 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'buffTarget', kind: 'buff_spellhaste', value: 0.2, duration: 15 }],
+    effects: [
+      { type: 'buffTarget', kind: 'buff_spellhaste', value: 0.2, duration: 15 },
+      { type: 'buffTarget', kind: 'buff_dmg_done', value: 0.2, duration: 15 },
+      { type: 'buffTarget', kind: 'buff_heal_done', value: 0.2, duration: 15 },
+    ],
     description:
-      'Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)',
+      'Anoints a friendly target, increasing damage, healing, and casting speed by 20% for 15 sec.',
   },
   holy_nova: {
     id: 'holy_nova',
-    name: 'Holy Nova',
+    name: 'Sunburst Canticle',
     class: 'priest',
+    specs: ['holy'],
     learnLevel: 10,
     cost: 70,
     castTime: 0,
@@ -5866,12 +5880,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'aoeDamage', min: 24, max: 30, radius: 10 },
     ],
     description:
-      'Causes an explosion of Mending Light, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
+      'Releases an instant canticle, healing nearby allies for $d and damaging nearby enemies. (Benison baseline)',
   },
   shadowform: {
     id: 'shadowform',
     name: 'Gloamveil',
     class: 'priest',
+    specs: ['shadow'],
     learnLevel: 10,
     cost: 60,
     castTime: 0,
@@ -6475,6 +6490,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // Canonical Talents V2 active grants. These are absent from baseline class kits
   // and become known only through the selected row's `grant` effect.
   ...TALENT_ABILITIES_V2,
+  ...PRIEST_ABILITIES,
 
   // The Vale Cup sport kit (class-agnostic; docs/prd/vale-cup.md). Merged here
   // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)

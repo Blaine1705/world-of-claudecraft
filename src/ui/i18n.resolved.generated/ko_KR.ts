@@ -7545,6 +7545,30 @@ export const ko_KR: EnTranslations = {
         "name": "공허의 포식",
         "description": "마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 삼키고 최대 생명력의 6%를 회복합니다."
       },
+      "veilstep": {
+        "name": "장막걸음",
+        "description": "바라보는 방향으로 장막을 통과합니다."
+      },
+      "scouring_mercy": {
+        "name": "정화의 자비",
+        "description": "적을 신성한 힘으로 정화하거나 아군 대상을 즉시 치유합니다. 교리 고유 능력입니다."
+      },
+      "seraphic_vigil": {
+        "name": "치천사의 수호",
+        "description": "아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 회복시킵니다. 축복 고유 능력입니다."
+      },
+      "summon_tithefiend": {
+        "name": "십일조 악마 소환",
+        "description": "어둠의 십일조를 소모해 당신의 형상을 사냥하는 일시적인 십일조 악마를 소환합니다. 만과 고유 능력입니다."
+      },
+      "martyrs_aegis": {
+        "name": "순교자의 방패",
+        "description": "아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다."
+      },
+      "choir_of_deliverance": {
+        "name": "구원의 성가대",
+        "description": "6초 동안 정신을 집중해 2초마다 주위 파티원을 치유합니다."
+      },
       "bear_charge": {
         "name": "큰곰 돌진",
         "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd. 큰곰 변신 상태에서만 사용 가능."

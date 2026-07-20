@@ -68,6 +68,14 @@ import {
 import { clearFieldcraftState } from './hunter_fieldcraft';
 import { clearPacklordState } from './hunter_packlord';
 import { breakEnduringCourserBurst, hasHunterTalent } from './hunter_shared';
+import { doctrineConvertDamage } from './priest/doctrine';
+import { cleanupPriestState } from './priest/lifecycle';
+import {
+  priestOnAuraEnded,
+  priestOnShieldConsumed,
+  priestOnVigilTriggered,
+} from './priest/talents';
+import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { clearSpiritmendCurrents } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
@@ -405,6 +413,7 @@ export function dealDamage(
         const shielder = ctx.entities.get(a.sourceId);
         if (shielder && !shielder.dead && shielder.kind === 'player') {
           onShieldConsumed(ctx, shielder, a.id, target);
+          priestOnShieldConsumed(ctx, shielder, a, target, source);
         }
       }
     }
@@ -715,6 +724,8 @@ export function dealDamage(
   // above (duel/fiesta/arena) intentionally skip conversion (PRD 13.9 defers PvP
   // tuning to a later phase).
   chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe);
+  doctrineConvertDamage(ctx, source, preHp - target.hp, school, abilityId ?? null);
+  vespersEchoDamage(ctx, source, target, preHp - target.hp, abilityId ?? null);
 
   if (amount > 0) {
     if (target.kind === 'mob' && DAMAGE_IDLE_DESPAWN_MOB_IDS.has(target.templateId)) {
@@ -744,6 +755,7 @@ export function dealDamage(
           gained: false,
         });
         target.auras.splice(i, 1);
+        priestOnAuraEnded(ctx, target, breakable);
       }
     }
   }
@@ -759,7 +771,10 @@ export function dealDamage(
       ctx.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: false });
       const healer = ctx.entities.get(aura.sourceId);
       if (healer && !healer.dead) {
-        ctx.applyHeal(healer, target, aura.value, aura.name);
+        const healed = ctx.applyHeal(healer, target, aura.value, aura.name);
+        if (aura.id === 'seraphic_vigil') {
+          priestOnVigilTriggered(ctx, healer, target, healed);
+        }
         ctx.emit({
           type: 'spellfx',
           sourceId: aura.sourceId,
@@ -1023,6 +1038,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     clearSpiritmendCurrents(ctx, e.id);
     clearShamanTalentState(ctx, e);
   }
+  vespersOnEntityDeath(ctx, e);
   resetProcState(e);
   e.dead = true;
   e.hp = 0;
@@ -1063,6 +1079,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // shed by aurasSurvivingDeath above). Keyed by sourceId, so marks THIS player
     // carries from another chronomancer are left alone.
     stripTemporalEchoes(ctx, e.id);
+    cleanupPriestState(ctx, e.id);
     const meta = ctx.players.get(e.id);
     if (meta?.cls === 'hunter') {
       clearPacklordState(ctx, e);

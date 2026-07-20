@@ -4484,6 +4484,149 @@ function shamanEngines(): Scenario {
   };
 }
 
+// Priest Codex baseline loops: all three specializations execute through the
+// shared Sim host, including source-owned links, attached Vigil, Effigy echoes,
+// the Gloomtithe bank, autonomous Tithefiend strikes, and respec cleanup.
+function priestCodex(seed = 2929): Scenario {
+  return {
+    name: 'priest_codex',
+    coverage: [
+      'class:priest Doctrine linked damage conversion',
+      'class:priest Benison committed and immediate group healing plus Seraphic Vigil',
+      'class:priest Vespers Effigy, deterministic echo, Gloomtithe, and Tithefiend',
+      'Priest respec cleanup removes links, bank, and guardian',
+    ],
+    build: () => new Sim({ seed, playerClass: 'priest', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const doctrineId = sim.addPlayer('priest', 'Doctrine');
+      const doctrineAllyId = sim.addPlayer('warrior', 'Doctrine Ally');
+      const benisonId = sim.addPlayer('priest', 'Benison');
+      const benisonAllyId = sim.addPlayer('warrior', 'Benison Ally');
+      const vespersId = sim.addPlayer('priest', 'Vespers');
+      for (const pid of [doctrineId, doctrineAllyId, benisonId, benisonAllyId, vespersId]) {
+        sim.setPlayerLevel(20, pid);
+      }
+      sim.setSpec('discipline', doctrineId);
+      sim.setSpec('holy', benisonId);
+      sim.setSpec('shadow', vespersId);
+
+      const doctrine = sim.entities.get(doctrineId) as AnyEntity;
+      const doctrineAlly = sim.entities.get(doctrineAllyId) as AnyEntity;
+      const benison = sim.entities.get(benisonId) as AnyEntity;
+      const benisonAlly = sim.entities.get(benisonAllyId) as AnyEntity;
+      const vespers = sim.entities.get(vespersId) as AnyEntity;
+      const origin = doctrine.pos;
+      for (const [index, entity] of [
+        doctrine,
+        doctrineAlly,
+        benison,
+        benisonAlly,
+        vespers,
+      ].entries()) {
+        teleport(sim, entity, origin.x + index, origin.z);
+        beef(entity);
+      }
+      sim.partyInvite(doctrineAllyId, doctrineId);
+      sim.partyAccept(doctrineAllyId);
+      sim.partyInvite(benisonAllyId, benisonId);
+      sim.partyAccept(benisonAllyId);
+
+      const primary = spawnMob(sim, 'training_dummy', 20, origin.x, origin.y, origin.z + 8);
+      const secondary = spawnMob(sim, 'training_dummy', 20, origin.x + 3, origin.y, origin.z + 9);
+      const tertiary = spawnMob(sim, 'training_dummy', 20, origin.x - 4, origin.y, origin.z + 9);
+      const foreignOnly = spawnMob(
+        sim,
+        'training_dummy',
+        20,
+        origin.x + 1,
+        origin.y,
+        origin.z + 10,
+      );
+      for (const mob of [primary, secondary, tertiary, foreignOnly]) {
+        mob.hostile = true;
+        mob.aiState = 'idle';
+        beef(mob);
+        rec.track(mob.id);
+      }
+
+      const cast = (pid: number, targetId: number, abilityId: string, ticks: number): void => {
+        const caster = sim.entities.get(pid) as AnyEntity;
+        caster.gcdRemaining = 0;
+        caster.resource = caster.maxResource;
+        caster.cooldowns.delete(abilityId);
+        sim.targetEntity(targetId, pid);
+        sim.castAbility(abilityId, pid);
+        rec.tick(ticks);
+      };
+
+      doctrineAlly.hp = Math.floor(doctrineAlly.maxHp * 0.5);
+      cast(doctrineId, doctrineAllyId, 'power_word_shield', 2);
+      cast(doctrineId, primary.id, 'smite', 50);
+
+      benisonAlly.hp = Math.floor(benisonAlly.maxHp * 0.5);
+      cast(benisonId, benisonAllyId, 'seraphic_vigil', 2);
+      sim.dealDamage(
+        primary,
+        benisonAlly,
+        Math.ceil(benisonAlly.maxHp * 0.2),
+        false,
+        'shadow',
+        'Parity Hit',
+        'hit',
+      );
+      rec.snapshot('vigil-triggered');
+      benisonAlly.hp = Math.floor(benisonAlly.maxHp * 0.5);
+      cast(benisonId, benisonAllyId, 'prayer_of_healing', 65);
+      benisonAlly.hp = Math.floor(benisonAlly.maxHp * 0.5);
+      cast(benisonId, benisonAllyId, 'holy_nova', 2);
+
+      cast(vespersId, primary.id, 'shadow_word_pain', 30);
+      cast(vespersId, secondary.id, 'shadow_word_pain', 30);
+      cast(vespersId, tertiary.id, 'shadow_word_pain', 30);
+      cast(doctrineId, foreignOnly.id, 'shadow_word_pain', 30);
+      rec.notes.bankBeforeMindfracture =
+        vespers.auras.find((aura: Aura) => aura.kind === 'gloomtithe')?.stacks ?? 0;
+      const mindfractureEventStart = rec.allEvents.length;
+      cast(vespersId, primary.id, 'mind_blast', 60);
+      rec.notes.bankAfterMindfracture =
+        vespers.auras.find((aura: Aura) => aura.kind === 'gloomtithe')?.stacks ?? 0;
+      const mindfractureEchoTargets: number[] = [];
+      for (const event of rec.allEvents.slice(mindfractureEventStart)) {
+        if (event.type === 'damage' && event.ability === 'Effigy Echo') {
+          mindfractureEchoTargets.push(event.targetId);
+        }
+      }
+      rec.notes.mindfractureEchoTargets = mindfractureEchoTargets;
+      rec.notes.expectedEchoTargets = [secondary.id, tertiary.id];
+      rec.notes.foreignOwnerIsolated = !mindfractureEchoTargets.includes(foreignOnly.id);
+      rec.snapshot('effigy-banked');
+      cast(vespersId, primary.id, 'summon_tithefiend', 2);
+      rec.notes.manaAfterSummon = vespers.resource;
+      const guardian = [...sim.entities.values()].find(
+        (entity) => entity.ownerId === vespersId && entity.guardianState?.key === 'tithefiend',
+      );
+      if (guardian) rec.track(guardian.id);
+      rec.tick(90);
+      rec.notes.manaAfterGuardian = vespers.resource;
+
+      rec.notes.doctrineId = doctrineId;
+      rec.notes.doctrineAllyId = doctrineAllyId;
+      rec.notes.benisonId = benisonId;
+      rec.notes.benisonAllyId = benisonAllyId;
+      rec.notes.vespersId = vespersId;
+      rec.notes.guardianId = guardian?.id ?? null;
+      vespers.inCombat = false;
+      vespers.combatTimer = 10;
+      rec.notes.respecSucceeded = sim.setSpec('discipline', vespersId);
+      rec.snapshot('respec-cleanup');
+      rec.notes.cleanupComplete = ![...sim.entities.values()].some(
+        (entity) => entity.ownerId === vespersId && entity.guardianState?.key === 'tithefiend',
+      );
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4542,4 +4685,5 @@ export const SCENARIOS: Scenario[] = [
   professionsCraft(),
   professionsGather(),
   shamanEngines(),
+  priestCodex(),
 ];

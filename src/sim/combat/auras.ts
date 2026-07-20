@@ -33,6 +33,8 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
+import { priestOnAuraEnded } from './priest/talents';
+import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
 import { tickShamanTalentAura } from './shaman_talents';
 import { stoneboundThreatMultiplier } from './shaman_warspirit';
@@ -206,7 +208,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   tickProcState(e, DT);
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
-    a.remaining -= DT;
+    if (a.kind !== 'gloomtithe' || !preservesGloomtithe(ctx, e.id)) a.remaining -= DT;
     tickShamanTalentAura(a);
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
@@ -248,6 +250,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
           );
+          vespersOnDotTick(ctx, e, a);
           if (a.leechPct !== undefined) {
             const src = dotSource;
             if (src && !src.dead) {
@@ -290,6 +293,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     }
     if (a.remaining <= CAST_COMPLETE_EPS) {
       e.auras.splice(i, 1);
+      priestOnAuraEnded(ctx, e, a);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
       // A HoT that ran its FULL duration (this natural-expiry path, never a

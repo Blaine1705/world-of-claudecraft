@@ -132,6 +132,7 @@ export function petOf(ctx: SimContext, ownerPid: number, includeDead = false): E
     if (
       e.kind === 'mob' &&
       e.ownerId === ownerPid &&
+      !e.guardianState &&
       !ctx.isDelveCompanionMob(e) &&
       (includeDead || !e.dead)
     )

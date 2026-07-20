@@ -36,6 +36,7 @@ import { stripTemporalEchoes } from '../combat/chronomancy';
 import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
 import { clearPacklordState } from '../combat/hunter_packlord';
 import { clearHunterTalentState } from '../combat/hunter_shared';
+import { cleanupPriestState } from '../combat/priest/lifecycle';
 import { clearSpiritmendState } from '../combat/shaman_spiritmend';
 import { clearShamanTalentState } from '../combat/shaman_talents';
 import { clearThundercallState } from '../combat/shaman_thundercall';
@@ -278,6 +279,7 @@ function commitTalentAllocation(
   if (previousSpec !== sanitized.spec) {
     ctx.revalidateOffhandForSpec(player.id);
   }
+  if (meta.cls === 'priest') cleanupPriestState(ctx, player.id);
   // A spec-locked pet outlives its spec otherwise (owner report: the frost
   // Water Elemental kept fighting for a fire mage): if the ability that
   // summons the ACTIVE pet is no longer in the new build's known list, the

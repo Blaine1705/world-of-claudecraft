@@ -141,6 +141,12 @@ describe('character visual manifest', () => {
     ).toEqual([]);
   });
 
+  it('renders Tithefiend as a tinted shadow creature instead of a generic bandit', () => {
+    const key = visualKeyFor({ kind: 'mob', templateId: 'guardian_tithefiend' } as never);
+    expect(key).toBe('mob_demonalt');
+    expect(VISUALS[key].tint).toBe('entity');
+  });
+
   it('points the Combat Mech manifest at animation clips baked into the GLB', async () => {
     const visual = VISUALS.player_mech;
     const animationNames = await glbAnimationNames(`public/${visual.url}`);

@@ -36,6 +36,7 @@ import {
 } from '../ui/holder_tier';
 import { formatNumber, getLanguage, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
+import { localizeSimAuraName } from '../ui/sim_i18n';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
 import { castBarState } from './cast_bar';
@@ -307,7 +308,10 @@ export class NameplatePainter {
         const friendlyPet = isFriendlyPet(e, world.entities, this.isHostilePlayer);
         const color = mobNameColor(diff, e.dead, friendlyPet);
         this.setFriendlyPetState(v, friendlyPet);
-        const mobName = e.ownerId !== null ? e.name : mobDisplayName(e.templateId);
+        const mobName =
+          e.ownerId !== null
+            ? (localizeSimAuraName(e.name) ?? e.name)
+            : mobDisplayName(e.templateId);
         const levelText = e.dead
           ? ''
           : t(elite ? 'hudChrome.nameplate.mobEliteLevel' : 'hudChrome.nameplate.mobLevel', {

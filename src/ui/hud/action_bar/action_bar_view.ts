@@ -26,6 +26,7 @@
 
 import { freeCostAuraActive } from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
+import { priestActionGlowActive } from '../../../sim/combat/priest/presentation';
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
@@ -86,6 +87,7 @@ export interface ActionBarAbility {
   bonusCharges?: number;
 }
 
+/** The aura fields the bar reads to derive proc glows and next-cast empowerment. */
 export interface ActionBarAuraInput {
   id?: string;
   sourceId?: number;
@@ -489,7 +491,8 @@ export function createActionBarView(
           windowGlow ||
           frostProcGlowActive(player.auras ?? [], def.id) ||
           thundercallPayoffGlowActive(player.auras ?? [], def.id) ||
-          flowStateReady;
+          flowStateReady ||
+          priestActionGlowActive(player.auras ?? [], def.id);
         slot.empowered = hasEmpoweringAura(player.auras, ability) || tidecallTargetCapped;
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,
