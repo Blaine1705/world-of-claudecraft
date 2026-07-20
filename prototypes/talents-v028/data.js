@@ -22,14 +22,22 @@ window.TALENT_LAB_DATA = {
           name: 'Packlord',
           role: 'Pet damage',
           resource: 'Focus plus visible Pack Ferocity',
-          thesis: 'The beast is the weapon. Build it bigger and redder, unleash the clap, then watch it calm.',
-          decision: 'Spend Focus for immediate pressure, or continue empowering the beast for a stronger unleash.',
+          thesis:
+            'The beast is the weapon. Build it bigger and redder, unleash the clap, then watch it calm.',
+          decision:
+            'Spend Focus for immediate pressure, or continue empowering the beast for a stronger unleash.',
           exclusive: ['Pack Command', 'Pack Ferocity', 'Unleash Beast', 'Howling Rage'],
           loop: [
-            ['Pack Command', "The pet strikes, Focus rises, and the Hunter's Pack Ferocity buff gains a stage."],
+            [
+              'Pack Command',
+              "The pet strikes, Focus rises, and the Hunter's Pack Ferocity buff gains a stage.",
+            ],
             ['Grow', 'The pet becomes larger, redder, and gains stronger cleave.'],
             ['Spend', 'Fell Shot fills the gap and commands extra cleave during frenzy.'],
-            ['Unleash Beast', 'At full Ferocity, the command becomes a heavy clap and short frenzy.'],
+            [
+              'Unleash Beast',
+              'At full Ferocity, the command becomes a heavy clap and short frenzy.',
+            ],
             ['Calm', 'The pet returns to normal and the growth cycle begins again.'],
           ],
           actions: [
@@ -46,8 +54,10 @@ window.TALENT_LAB_DATA = {
           name: 'Coldsight',
           role: 'Ranged damage',
           resource: 'Focus',
-          thesis: 'Create room, build deliberately, and commit to the shot only when the position is safe.',
-          decision: 'Keep building while moving, or spend Focus on a high-value cast before the window closes.',
+          thesis:
+            'Create room, build deliberately, and commit to the shot only when the position is safe.',
+          decision:
+            'Keep building while moving, or spend Focus on a high-value cast before the window closes.',
           exclusive: ['Measured Shot', 'Long Draw', 'Fevered Draw', 'Cold Focus'],
           loop: [
             ['Measured Shot', 'A controlled hit builds Focus.'],
@@ -71,7 +81,8 @@ window.TALENT_LAB_DATA = {
           role: 'Melee damage',
           resource: 'Focus plus three Hunting Momentum stages',
           thesis: 'Close, wound, tear, detonate, disengage, and hunt again.',
-          decision: 'Remain in melee for a stronger Momentum payoff, or leave early and preserve the re-entry.',
+          decision:
+            'Remain in melee for a stronger Momentum payoff, or leave early and preserve the re-entry.',
           exclusive: [
             'Bloodhook',
             'Gutting Strike',
@@ -103,7 +114,10 @@ window.TALENT_LAB_DATA = {
           options: [
             ['Tactical Retreat', 'A second Trailbreak charge that also clears roots and slows.'],
             ['Enduring Courser', "Courser's Guise gains a predictable opening speed burst."],
-            ["Predator's Pace", 'A successful Focus generator grants frequent rotational movement.'],
+            [
+              "Predator's Pace",
+              'A successful Focus generator grants frequent rotational movement.',
+            ],
           ],
         },
         {
@@ -137,7 +151,10 @@ window.TALENT_LAB_DATA = {
           level: 17,
           theme: 'Major cooldown',
           options: [
-            ['Apex Instinct', 'The specialization cooldown primes three stronger, cheaper spenders.'],
+            [
+              'Apex Instinct',
+              'The specialization cooldown primes three stronger, cheaper spenders.',
+            ],
             ['Shell and Fang', 'Trade full Shellskin protection for attack-compatible defense.'],
             ['Pack Rally', 'Turn Courser into a party movement and pressure window.'],
           ],
@@ -174,7 +191,8 @@ window.TALENT_LAB_DATA = {
           name: 'Thundercall',
           role: 'Ranged damage',
           resource: 'Mana plus five visible Thunder charges',
-          thesis: 'Build electrical pressure and choose whether to vent it into one target or a group.',
+          thesis:
+            'Build electrical pressure and choose whether to vent it into one target or a group.',
           decision: 'Discharge now for urgency, or hold for a more efficient full-bank payoff.',
           exclusive: ['Pyrebrand Weapon', 'Thunder charges', 'Faultwake vent', 'Primal Mastery'],
           loop: [
@@ -198,8 +216,10 @@ window.TALENT_LAB_DATA = {
           name: 'Warspirit',
           role: 'Melee damage or off-tank',
           resource: 'Mana plus a three-hit Stormcast cadence',
-          thesis: 'Weapon hits earn spells. Galeheart deals damage, while Stonebound trades it for control and survival.',
-          decision: 'Choose the offensive or defensive posture, then spend each earned instant on damage, control, or healing.',
+          thesis:
+            'Weapon hits earn spells. Galeheart deals damage, while Stonebound trades it for control and survival.',
+          decision:
+            'Choose the offensive or defensive posture, then spend each earned instant on damage, control, or healing.',
           exclusive: [
             'Galeheart Weapon',
             'Stonebound Weapon',
@@ -228,8 +248,10 @@ window.TALENT_LAB_DATA = {
           name: 'Spiritmend',
           role: 'Healing',
           resource: 'Mana plus visible Mending Currents on allies',
-          thesis: 'Prepare efficient healing as currents, then collapse every reached pool into a large group recovery.',
-          decision: 'Leave currents ticking, enlarge them for expected damage, or consume them now to save the group.',
+          thesis:
+            'Prepare efficient healing as currents, then collapse every reached pool into a large group recovery.',
+          decision:
+            'Leave currents ticking, enlarge them for expected damage, or consume them now to save the group.',
           exclusive: ['Lifespring Weapon', 'Mending Current', 'Tidecall', 'Cascading Mend'],
           loop: [
             ['Mending Waters', 'Create or enlarge one Mending Current on the ally.'],
@@ -310,7 +332,8 @@ window.TALENT_LAB_DATA = {
       mark: 'P',
       color: '#d9c8ff',
       softColor: '#5b4c79',
-      summary: 'Spiritual links connecting offense, protection, group recovery, and sympathetic suffering.',
+      summary:
+        'Spiritual links connecting offense, protection, group recovery, and sympathetic suffering.',
       shared: [
         'Scouring Hymn',
         'Solemn Prayer',
@@ -328,8 +351,10 @@ window.TALENT_LAB_DATA = {
           name: 'Doctrine',
           role: 'Damage-linked healing',
           resource: 'Mana plus one protected ally link',
-          thesis: 'Ward one ally, then turn controlled offense into clean healing for that chosen person.',
-          decision: 'Choose who receives the link and whether the next cast should damage, ward, or heal directly.',
+          thesis:
+            'Ward one ally, then turn controlled offense into clean healing for that chosen person.',
+          decision:
+            'Choose who receives the link and whether the next cast should damage, ward, or heal directly.',
           exclusive: ['Scouring Mercy', 'Doctrine ally link'],
           loop: [
             ['Psalm of Warding', 'Protect one ally and establish the Doctrine link.'],
@@ -352,8 +377,10 @@ window.TALENT_LAB_DATA = {
           name: 'Benison',
           role: 'Group healing',
           resource: 'Mana plus attached Seraphic Vigils',
-          thesis: 'Commit to the largest immediate prayers and place visible angelic protection before danger arrives.',
-          decision: 'Choose between a large cast, immediate group recovery, or a vigil on one endangered ally.',
+          thesis:
+            'Commit to the largest immediate prayers and place visible angelic protection before danger arrives.',
+          decision:
+            'Choose between a large cast, immediate group recovery, or a vigil on one endangered ally.',
           exclusive: ['Choirmend', 'Sunburst Canticle', 'Seraphic Vigil', 'Attached angel state'],
           loop: [
             ['Solemn Prayer', 'Deliver large single-target triage.'],
@@ -376,8 +403,10 @@ window.TALENT_LAB_DATA = {
           name: 'Vespers',
           role: 'Shadow damage',
           resource: 'Mana plus five Gloomtithe stages',
-          thesis: 'Bind one Effigy, spread its suffering through linked enemies, then manifest the banked pain.',
-          decision: 'Spread Dirge for group echoes, focus the Effigy, or summon early for Mana and pressure.',
+          thesis:
+            'Bind one Effigy, spread its suffering through linked enemies, then manifest the banked pain.',
+          decision:
+            'Spread Dirge for group echoes, focus the Effigy, or summon early for Mana and pressure.',
           exclusive: ['Effigy', 'Gloomtithe', 'Tithefiend', 'Gloamveil', 'Suffering echoes'],
           loop: [
             ['Dirge of Decay', 'Prepare enemies as eligible suffering links.'],
@@ -438,7 +467,7 @@ window.TALENT_LAB_DATA = {
           theme: 'Major prayer',
           options: [
             ['Anointing', 'Increase one ally or the Priest through a concentrated power window.'],
-            ["Martyr's Aegis", 'Greatly reduce one ally\'s incoming damage.'],
+            ["Martyr's Aegis", "Greatly reduce one ally's incoming damage."],
             ['Choir of Deliverance', 'Channel repeated healing across the nearby party.'],
           ],
         },
@@ -448,7 +477,10 @@ window.TALENT_LAB_DATA = {
           options: [
             ['Twin Covenant', 'Manage two links, vigils, or Effigies instead of one.'],
             ['Second Verse', 'Repeat the specialization payoff once at reduced power.'],
-            ['Incarnate Spirit', 'Turn shields, angels, or Tithefiend into the defining manifestation.'],
+            [
+              'Incarnate Spirit',
+              'Turn shields, angels, or Tithefiend into the defining manifestation.',
+            ],
           ],
         },
       ],

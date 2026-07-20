@@ -31,13 +31,28 @@ const rogueFinisherAbilityIds = [
   'expose_armor',
 ];
 
-const priestManaHealingAbilityIds = [
+const priestManaSpellAbilityIds = [
+  'smite',
   'lesser_heal',
+  'power_word_fortitude',
+  'shadow_word_pain',
+  'power_word_shield',
   'renew',
+  'mind_blast',
   'heal',
+  'mind_flay',
   'flash_heal',
-  'holy_nova',
+  'scouring_mercy',
   'prayer_of_healing',
+  'holy_nova',
+  'seraphic_vigil',
+  'summon_tithefiend',
+  'silence',
+  'psychic_scream',
+  'veilstep',
+  'power_infusion',
+  'martyrs_aegis',
+  'choir_of_deliverance',
 ];
 
 const warlockDamagingFireSpellAbilityIds = [
@@ -1090,229 +1105,74 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'faith',
-      decision: 'Scouring Hymn cadence vs prayer-cadence ward vs Dirge-gated Mindfracture damage',
+      theme: 'movement',
+      decision: 'move a protected ally, escape control, or preserve casting while moving',
       options: [
         {
           id: 'pri_r5_improved_renew',
-          name: 'Warding Refrain',
-          description:
-            'Every 3rd Whispered Prayer hardens its target into a ward absorbing 40 damage for 10 sec.',
-          icon: 'lesser_heal',
+          name: 'Sheltering Step',
+          description: 'Psalm of Warding grants its target 40% movement speed for 3 sec.',
+          icon: 'power_word_shield',
           effect: {
-            proc: {
-              id: 'pri_lingering_ward',
-              name: 'Warding Refrain',
-              trigger: { on: 'castNth', n: 3, abilities: ['lesser_heal'] },
-              responses: [{ kind: 'absorb', amount: 40, duration: 10, name: 'Warding Refrain' }],
-            },
+            intrinsic: { mechanic: 'priest_sheltering_step', metrics: { pct: 0.4, duration: 3 } },
           },
         },
         {
           id: 'pri_r5_searing_light',
-          name: 'Third Verse',
+          name: 'Veil Unbound',
           description:
-            'Every 3rd Scouring Hymn makes your next mana-cost healing spell within 8 sec free.',
-          icon: 'smite',
+            'Veilstep removes roots and slows, then grants 50% movement speed for 3 sec.',
+          icon: 'veilstep',
           effect: {
-            proc: {
-              id: 'pri_searing_light',
-              name: 'Third Verse',
-              trigger: { on: 'castNth', n: 3, abilities: ['smite'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: priestManaHealingAbilityIds,
-                  duration: 8,
-                },
-              ],
-            },
+            intrinsic: { mechanic: 'priest_veil_unbound', metrics: { pct: 0.5, duration: 3 } },
           },
         },
         {
           id: 'pri_r5_twisted_faith',
-          name: 'Dirgebound Thought',
-          description:
-            'Mindfracture deals 25% more damage to targets afflicted by your Dirge of Decay.',
-          icon: 'shadow_word_pain',
+          name: 'Processional Grace',
+          description: 'Veilstep allows the Priest to cast while moving for 4 sec.',
+          icon: 'veilstep',
           effect: {
-            ability: [
-              {
-                ability: 'mind_blast',
-                dmgPctVsDotted: 0.25,
-                dmgPctVsDottedAbility: 'shadow_word_pain',
-              },
-            ],
+            intrinsic: { mechanic: 'priest_processional_grace', metrics: { duration: 4 } },
           },
         },
       ],
     },
     {
       level: 8,
-      theme: 'intercession',
-      decision: 'single-target silence vs area fear vs consumed-shield heal',
+      theme: 'defense',
+      decision: 'active self recovery, prepared ally recovery, or reactive protection',
       options: [
+        {
+          id: 'pri_r17_desperate_prayer',
+          name: 'Last Prayer',
+          description: 'Grants Last Prayer, an instant self-heal for 30% maximum health.',
+          icon: 'desperate_prayer',
+          effect: {
+            grant: { ability: 'desperate_prayer' },
+            intrinsic: { mechanic: 'priest_last_prayer', metrics: { pct: 0.3 } },
+          },
+        },
         {
           id: 'pri_r8_improved_shield',
           name: 'Shattered Psalm',
           description:
-            'When your Psalm of Warding is fully consumed, it bursts, healing its owner for 45.',
+            'When Psalm of Warding is fully consumed, it heals its target for 12% maximum health.',
           icon: 'power_word_shield',
           effect: {
             proc: {
               id: 'pri_shield_burst',
               name: 'Shattered Psalm',
               trigger: { on: 'shieldConsumed', ability: 'power_word_shield' },
-              responses: [{ kind: 'heal', amount: 45 }],
+              responses: [{ kind: 'heal', amountPctMaxHp: 0.12 }],
             },
           },
-        },
-        {
-          id: 'pri_r8_silence',
-          name: 'Hushword',
-          description: 'Grants Hushword.',
-          icon: 'silence',
-          effect: { grant: { ability: 'silence' } },
-        },
-        {
-          id: 'pri_r8_psychic_scream',
-          name: 'Terror Canticle',
-          description: 'Grants Terror Canticle.',
-          icon: 'psychic_scream',
-          effect: { grant: { ability: 'psychic_scream' } },
-        },
-      ],
-    },
-    {
-      level: 11,
-      theme: 'discipline',
-      decision: 'on-demand free cast vs healing-cadence discount vs Mindfracture leech',
-      options: [
-        {
-          id: 'pri_r11_inner_focus',
-          name: 'Stilled Mind',
-          description: 'Grants Stilled Mind.',
-          icon: 'inner_focus',
-          effect: { grant: { ability: 'inner_focus' } },
-        },
-        {
-          id: 'pri_r11_meditation',
-          name: 'Measured Mercy',
-          description:
-            'Every 3rd mana-cost healing spell makes your next mana-cost healing spell within 10 sec cost 50% less.',
-          icon: 'lesser_heal',
-          effect: {
-            proc: {
-              id: 'pri_nocturns',
-              name: 'Measured Mercy',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: priestManaHealingAbilityIds,
-              },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: priestManaHealingAbilityIds,
-                  duration: 10,
-                  costPct: 0.5,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'pri_r11_vampiric_embrace',
-          name: 'Gloam Siphon',
-          description:
-            'Mindfracture also afflicts the target for 30 damage over 3 sec, ticking every 1 sec and healing you for 100% of it.',
-          icon: 'mind_blast',
-          effect: {
-            ability: [
-              {
-                ability: 'mind_blast',
-                addEffects: [{ type: 'dot', total: 30, duration: 3, interval: 1, leechPct: 1 }],
-              },
-            ],
-          },
-        },
-      ],
-    },
-    {
-      level: 14,
-      theme: 'investment',
-      decision: 'banked Mindfractures vs emergency heal echo vs extended decay',
-      options: [
-        {
-          id: 'pri_r14_mind_melt',
-          name: 'Twin Fracture',
-          description: 'Mindfracture stores 2 uses.',
-          icon: 'mind_blast',
-          effect: { ability: [{ ability: 'mind_blast', bonusCharges: 1 }] },
-        },
-        {
-          id: 'pri_r14_greater_heal',
-          name: 'Mercy Deferred',
-          description:
-            'Solemn Prayer leaves an echo for 10 sec: if the target falls below 35% health, they are instantly healed for 60.',
-          icon: 'heal',
-          effect: {
-            proc: {
-              id: 'pri_heal_echo',
-              name: 'Mercy Deferred',
-              trigger: { on: 'castNth', n: 1, abilities: ['heal'] },
-              responses: [
-                { kind: 'echo', belowFrac: 0.35, window: 10, heal: 60, name: 'Mercy Deferred' },
-              ],
-            },
-          },
-        },
-        {
-          id: 'pri_r14_pain_and_suffering',
-          name: 'Endless Dirge',
-          description:
-            'Each Litany of Woe tick extends your Dirge of Decay on the target by 1 sec, up to 6 added sec.',
-          icon: 'mind_flay',
-          effect: {
-            ability: [
-              {
-                ability: 'mind_flay',
-                addEffects: [
-                  { type: 'extendDot', dot: 'shadow_word_pain', seconds: 1, maxBonus: 6 },
-                ],
-              },
-            ],
-          },
-        },
-      ],
-    },
-    {
-      level: 17,
-      theme: 'resilience',
-      decision: 'instant self-heal vs stronger party fortitude vs reactive ward',
-      options: [
-        {
-          id: 'pri_r17_desperate_prayer',
-          name: 'Last Prayer',
-          description: 'Grants Last Prayer.',
-          icon: 'desperate_prayer',
-          effect: { grant: { ability: 'desperate_prayer' } },
-        },
-        {
-          id: 'pri_r17_improved_fortitude',
-          name: 'Resolve Unbroken',
-          description:
-            'Litany of Resolve effect increased by 50%, granting your party 7.5% Stamina instead of 5%.',
-          icon: 'power_word_fortitude',
-          effect: { ability: [{ ability: 'power_word_fortitude', buffPct: 0.5 }] },
         },
         {
           id: 'pri_r17_inner_fire',
           name: 'Wounded Halo',
           description:
-            'Taking a hit for at least 15% of your maximum health kindles a ward absorbing 15% of your maximum health for 10 sec. 20 sec internal cooldown.',
+            'A hit for at least 15% maximum health grants a 15% absorb for 10 sec. 20 sec internal cooldown.',
           icon: 'power_word_shield',
           effect: {
             proc: {
@@ -1328,41 +1188,142 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
       ],
     },
     {
-      level: 20,
-      theme: 'prayer',
-      decision: 'party healing vs area shadow damage vs critical-heal wards',
+      level: 11,
+      theme: 'control',
+      decision: 'single-target stop, longer area control, or shield-fed pursuit control',
       options: [
         {
-          id: 'pri_r20_prayer_of_healing',
-          name: 'Choirmend',
-          description: 'Grants Choirmend.',
-          icon: 'prayer_of_healing',
-          effect: { grant: { ability: 'prayer_of_healing' } },
+          id: 'pri_r8_silence',
+          name: 'Hushword',
+          description: 'Grants Hushword, a 4 sec silence with a 30 sec cooldown.',
+          icon: 'silence',
+          effect: { grant: { ability: 'silence' } },
         },
         {
-          id: 'pri_r20_mind_sear',
-          name: 'Thoughtburn',
-          description: 'Grants Thoughtburn.',
-          icon: 'mind_sear',
-          effect: { grant: { ability: 'mind_sear' } },
-        },
-        {
-          id: 'pri_r20_blessed_recovery',
-          name: 'Halo Aftershock',
+          id: 'pri_r8_psychic_scream',
+          name: 'Lingering Dread',
           description:
-            'Critical heals from Whispered Prayer, Solemn Prayer, Urgent Prayer, Sunburst Canticle, and Choirmend also ward the target, absorbing 50 damage for 10 sec.',
-          icon: 'flash_heal',
+            "Reduces Terror Canticle's cooldown by 30%. Feared enemies remain 50% slowed for 4 sec.",
+          icon: 'psychic_scream',
+          effect: {
+            ability: [{ ability: 'psychic_scream', cooldownPct: -0.3 }],
+            intrinsic: { mechanic: 'priest_lingering_dread', metrics: { pct: 0.5, duration: 4 } },
+          },
+        },
+        {
+          id: 'pri_r11_vampiric_embrace',
+          name: 'Binding Psalm',
+          description:
+            'An enemy that fully consumes Psalm of Warding is rooted for 2 sec, once per enemy every 12 sec.',
+          icon: 'power_word_shield',
+          effect: {
+            intrinsic: { mechanic: 'priest_binding_psalm', metrics: { duration: 2, icd: 12 } },
+          },
+        },
+      ],
+    },
+    {
+      level: 14,
+      theme: 'management',
+      decision: 'protect one key spell, follow a mana rhythm, or deepen the spec relationship',
+      options: [
+        {
+          id: 'pri_r11_inner_focus',
+          name: 'Stilled Mind',
+          description: 'Grants Stilled Mind. Your next Priest spell is free and uninterruptible.',
+          icon: 'inner_focus',
+          effect: { grant: { ability: 'inner_focus' } },
+        },
+        {
+          id: 'pri_r11_meditation',
+          name: 'Measured Faith',
+          description:
+            'Every 3rd Mana-spending Priest spell makes the next Priest spell within 10 sec cost 50% less Mana.',
+          icon: 'lesser_heal',
           effect: {
             proc: {
-              id: 'pri_blessed_recovery',
-              name: 'Halo Aftershock',
-              trigger: {
-                on: 'spellCrit',
-                abilities: ['lesser_heal', 'heal', 'flash_heal', 'holy_nova', 'prayer_of_healing'],
-              },
-              responses: [{ kind: 'absorb', amount: 50, duration: 10, name: 'Halo Aftershock' }],
+              id: 'pri_measured_faith',
+              name: 'Measured Faith',
+              trigger: { on: 'castNth', n: 3, abilities: priestManaSpellAbilityIds },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: priestManaSpellAbilityIds,
+                  duration: 10,
+                  costPct: 0.5,
+                },
+              ],
             },
           },
+        },
+        {
+          id: 'pri_r14_pain_and_suffering',
+          name: 'Living Covenant',
+          description: "Strengthens Doctrine's link, Benison's group recovery, or Vespers' echoes.",
+          icon: 'power_word_shield',
+          effect: { intrinsic: { mechanic: 'priest_living_covenant', metrics: {} } },
+        },
+      ],
+    },
+    {
+      level: 17,
+      theme: 'major prayer',
+      decision: 'throughput, planned ally protection, or sustained group recovery',
+      options: [
+        {
+          id: 'pri_r17_anointing',
+          name: 'Anointing',
+          description: 'Grants Anointing.',
+          icon: 'power_infusion',
+          effect: { grant: { ability: 'power_infusion' } },
+        },
+        {
+          id: 'pri_r17_martyrs_aegis',
+          name: "Martyr's Aegis",
+          description: "Grants Martyr's Aegis.",
+          icon: 'martyrs_aegis',
+          effect: { grant: { ability: 'martyrs_aegis' } },
+        },
+        {
+          id: 'pri_r17_choir_of_deliverance',
+          name: 'Choir of Deliverance',
+          description: 'Grants Choir of Deliverance.',
+          icon: 'choir_of_deliverance',
+          effect: { grant: { ability: 'choir_of_deliverance' } },
+        },
+      ],
+    },
+    {
+      level: 20,
+      theme: 'capstone',
+      decision: 'widen the relationship, repeat its payoff, or manifest its spirit',
+      options: [
+        {
+          id: 'pri_r20_twin_covenant',
+          name: 'Twin Covenant',
+          description: 'Supports 2 spec relationships with one shared resource bank.',
+          icon: 'seraphic_vigil',
+          effect: {
+            ability: [{ ability: 'seraphic_vigil', bonusCharges: 1 }],
+            intrinsic: { mechanic: 'priest_twin_covenant', metrics: {} },
+          },
+        },
+        {
+          id: 'pri_r20_second_verse',
+          name: 'Second Verse',
+          description: 'Repeats the spec relationship payoff once at 40% after 2 sec.',
+          icon: 'smite',
+          effect: {
+            intrinsic: { mechanic: 'priest_second_verse', metrics: { pct: 0.4, delay: 2 } },
+          },
+        },
+        {
+          id: 'pri_r20_incarnate_spirit',
+          name: 'Incarnate Spirit',
+          description: 'Manifests the selected specialization spirit at full commitment.',
+          icon: 'summon_tithefiend',
+          effect: { intrinsic: { mechanic: 'priest_incarnate_spirit', metrics: {} } },
         },
       ],
     },

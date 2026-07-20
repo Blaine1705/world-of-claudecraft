@@ -150,9 +150,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
       { kind: 'cooldownRefund', ability: 'bash', seconds: 20 },
     ]);
 
-    expect(
-      effect(resolved('priest', 'mind_sear', { 20: 'pri_r20_mind_sear' }), 'aoeDamage'),
-    ).toMatchObject({ min: 24, max: 28 });
     const carnage = ROW_TREES.warlock
       .flatMap((row) => row.options)
       .find((option) => option.id === 'wlk_r20_grimoire_of_haste');
@@ -306,31 +303,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
     expect(castRemainingAfterHit(false)).toBeGreaterThan(2);
     expect(castRemainingAfterHit(true)).toBe(2);
-  });
-
-  it('fires and consumes Mercy Deferred when real damage crosses its health threshold', () => {
-    const sim = harness(new Sim({ seed: 2613, playerClass: 'priest', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(14, 'pri_r14_greater_heal')).toBe(true);
-    const player = sim.player;
-    const attacker = spawnTarget(sim, player, 4);
-
-    onCastCompleted(sim.ctx, player, 'heal', player);
-    expect(player.auras).toContainEqual(
-      expect.objectContaining({ kind: 'heal_echo', value: 60, value2: 0.35 }),
-    );
-    player.hp = Math.round(player.maxHp * 0.4);
-    const damage = Math.round(player.maxHp * 0.1);
-    const expectedHp = Math.min(player.maxHp, player.hp - damage + 60);
-    sim.events = [];
-
-    dealDamage(sim.ctx, attacker, player, damage, false, 'physical', 'Test Hit', 'hit');
-
-    expect(player.hp).toBe(expectedHp);
-    expect(player.auras.some((aura) => aura.kind === 'heal_echo')).toBe(false);
-    expect(sim.events).toContainEqual(
-      expect.objectContaining({ type: 'spellfx', fx: 'echoBurst', targetId: player.id }),
-    );
   });
 
   it('makes winning Lingering Dread absorb 20% max-health damage before fear breaks', () => {

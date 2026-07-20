@@ -166,7 +166,8 @@ describe('spell haste plumbing', () => {
     // content debt, so Discipline is the fractional-buff exemplar in the merged tree:
     // its absorb mastery (absorbPct 0.3) runs the resolver's effect-scaling pass over
     // the granted Anointing, whose 0.2 haste buff must pass through un-rounded.
-    const sim = makeSim('priest', 'discipline');
+    const sim = makeSim('priest');
+    expect(sim.applyTalents({ spec: 'discipline', rows: { 17: 'pri_r17_anointing' } })).toBe(true);
     const pi = sim.resolvedAbility('power_infusion');
     const haste = (pi?.effects ?? []).find(
       (e: any) => e.type === 'buffTarget' && e.kind === 'buff_spellhaste',

@@ -209,6 +209,10 @@ export interface TalentEffect {
   proc?: ProcDef;
   ability?: AbilityModEffect[];
   global?: GlobalModEffect;
+  // Class-owned mechanics that intentionally live behind a narrow combat hook
+  // rather than the generic modifier/proc engine. `values` keeps authored
+  // tooltip numbers mechanically auditable; the sim ignores this metadata.
+  intrinsic?: { mechanic: string; metrics: Record<string, number> };
 }
 
 export interface SpecDef {

@@ -168,7 +168,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         casting != null &&
         (casting.def.castWhileMoving ||
           casting.castWhileMoving ||
-          p.auras.some((a) => a.kind === 'ice_floes'));
+          p.auras.some((a) => a.kind === 'ice_floes' || a.kind === 'processional_grace'));
       if (!mobile) deps.cancelCast(p);
     }
     const len = Math.hypot(mx, mz);
