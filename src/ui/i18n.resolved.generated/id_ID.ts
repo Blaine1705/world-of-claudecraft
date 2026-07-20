@@ -8524,6 +8524,21 @@ export const id_ID: EnTranslations = {
       "pitlords_cleaver": {
         "name": "Pit Lord's Cleaver"
       },
+      "emberforged_bulwark": {
+        "name": "Emberforged Bulwark"
+      },
+      "stormsunder_hood": {
+        "name": "Stormsunder Hood"
+      },
+      "voidweave_mantle": {
+        "name": "Voidweave Mantle"
+      },
+      "abysswrought_band": {
+        "name": "Abysswrought Band"
+      },
+      "heart_of_the_rift": {
+        "name": "Heart of the Rift"
+      },
       "copper_ore": {
         "name": "Copper Ore"
       },

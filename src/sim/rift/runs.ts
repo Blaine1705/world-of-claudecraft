@@ -26,8 +26,9 @@ import { createGroundObject, createMob } from '../entity';
 import type { LootTier } from '../lockpick';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
+import { isInWaterBody } from '../world';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
-import { addRiftProgressionLoot } from './progression';
+import { addRiftClearGearLoot, addRiftProgressionLoot } from './progression';
 import { claimRiftFirstClear, markRiftEventActive } from './race';
 import {
   RIFT_RANK_MECHANIC_BUDGET,
@@ -96,6 +97,25 @@ function jitterColor(ctx: SimContext, hex: number, amt: number): number {
 function riftKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
   return party ? `party:${party.id}` : `solo:${pid}`;
+}
+
+/** The nearest dry point to (x, z): the point itself when it is not inside a
+ * declared water body, else a deterministic outward march (8 headings, growing
+ * radius). The rift return position must never anchor in water: the exit
+ * teleport would land the player swimming (the render pose keys on the water
+ * body), which reads as broken. Portals spawn on dry land, so the march almost
+ * always keeps the original spot. */
+function dryPointNear(x: number, z: number): { x: number; z: number } {
+  if (!isInWaterBody(x, z)) return { x, z };
+  for (let radius = 4; radius <= 48; radius += 4) {
+    for (let step = 0; step < 8; step++) {
+      const ang = (step / 8) * Math.PI * 2;
+      const cx = x + Math.sin(ang) * radius;
+      const cz = z + Math.cos(ang) * radius;
+      if (!isInWaterBody(cx, cz)) return { x: cx, z: cz };
+    }
+  }
+  return { x, z };
 }
 
 function floorForInstance(inst: RiftInstance, floorIndex = inst.floorIndex) {
@@ -515,7 +535,7 @@ export function enterRift(
         ret = { x: portal.pos.x + ux * SAFE, z: portal.pos.z + uz * SAFE };
       }
     }
-    inst.returnPos = ret;
+    inst.returnPos = dryPointNear(ret.x, ret.z);
     // Dev portals keep a cosmetic rank on the gate, but only a persisted natural
     // event is reward-ranked. This keeps the reward guard authoritative for the
     // real /dev portal path instead of paying Marks for a visual-only badge.
@@ -1146,6 +1166,9 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.rewarded = true;
   inst.outcome = 'won';
   inst.finishedAt = ctx.time;
+  // Rank-gated epic/legendary payout on the corpse (every winning clear, ranked
+  // or dev; C pays nothing here, its rares come from the static tables).
+  if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
   const raceWinner = claim.event !== null;
   const rewards = rewardRiftWinner(ctx, inst, boss, participants, raceWinner);
 

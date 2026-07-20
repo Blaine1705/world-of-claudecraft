@@ -10,6 +10,20 @@ export const RIFT_GEAR_ITEM_IDS = [
   'riftbound_band_of_guile',
 ] as const;
 
+/** The clear-time gear ladder above the rares: epics that only a B+ final-boss
+ * kill can shed (guaranteed on A, doubled-chance on S) and the one legendary
+ * chase item S-rank clears roll for. Granted by rift/progression.ts
+ * addRiftClearGearLoot at the moment the clear completes, NEVER from static
+ * loot tables, so a C-rank farm can never mint epics and the payout cadence is
+ * bound by the ranked portal spawns (the economy stays sane). */
+export const RIFT_EPIC_ITEM_IDS = [
+  'emberforged_bulwark',
+  'stormsunder_hood',
+  'voidweave_mantle',
+  'abysswrought_band',
+] as const;
+export const RIFT_LEGENDARY_ITEM_ID = 'heart_of_the_rift';
+
 /** The world-drop rares each rift environment can shed: one signature piece per
  * procedural theme plus the two Infernal Citadel pieces. Trash carries a slim
  * chance and the environment's boss a fat one (loot tables in ./mobs.ts), so a
@@ -226,5 +240,69 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     stats: { str: 9, sta: 6 },
     sellValue: 8500,
     requiredClass: HEAVY,
+  },
+  // ---- Clear-time epics (B+ final-boss kills only; see addRiftClearGearLoot) ----
+  // Stat lines sit in the ilvl-31 band between the heroic five-man epics (26-28)
+  // and the raid variants (33/37), matching the A/S heroic-plus difficulty that
+  // gates them. No combat ratings: the rating ladder is a heroic/raid-set
+  // signature (combat_rating tests pin the per-ilvl ladder).
+  emberforged_bulwark: {
+    id: 'emberforged_bulwark',
+    name: 'Emberforged Bulwark',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 360, str: 13, sta: 9 },
+    sellValue: 16000,
+    requiredClass: HEAVY,
+  },
+  stormsunder_hood: {
+    id: 'stormsunder_hood',
+    name: 'Stormsunder Hood',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'helmet',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 118, agi: 11, sta: 7 },
+    sellValue: 13000,
+    requiredClass: AGILE_WILD,
+  },
+  voidweave_mantle: {
+    id: 'voidweave_mantle',
+    name: 'Voidweave Mantle',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'shoulder',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 48, int: 10, spi: 6 },
+    sellValue: 13000,
+    requiredClass: CASTER,
+  },
+  abysswrought_band: {
+    id: 'abysswrought_band',
+    name: 'Abysswrought Band',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { sta: 7, spi: 5 },
+    sellValue: 12000,
+  },
+  // The one legendary chase item: an S-rank clear rolls a slim chance at it.
+  // Class-neutral jewelry so it is a chase for every archetype without
+  // touching any class's weapon dps ladder.
+  heart_of_the_rift: {
+    id: 'heart_of_the_rift',
+    name: 'Heart of the Rift',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'legendary',
+    requiredLevel: 20,
+    stats: { sta: 12, str: 6, agi: 6, int: 6 },
+    sellValue: 50000,
   },
 };

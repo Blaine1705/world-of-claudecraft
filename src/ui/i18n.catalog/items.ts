@@ -2096,6 +2096,11 @@ const ITEM_ENTITY_IDS = [
   'abyssal_loop',
   'pactbound_vestments',
   'pitlords_cleaver',
+  'emberforged_bulwark',
+  'stormsunder_hood',
+  'voidweave_mantle',
+  'abysswrought_band',
+  'heart_of_the_rift',
   'copper_ore',
   'iron_ore',
   'ironbark_log',
@@ -2126,6 +2131,11 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   abyssal_loop: 'Abyssal Loop',
   pactbound_vestments: 'Pactbound Vestments',
   pitlords_cleaver: "Pit Lord's Cleaver",
+  emberforged_bulwark: 'Emberforged Bulwark',
+  stormsunder_hood: 'Stormsunder Hood',
+  voidweave_mantle: 'Voidweave Mantle',
+  abysswrought_band: 'Abysswrought Band',
+  heart_of_the_rift: 'Heart of the Rift',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -8524,6 +8524,21 @@ export const ja_JP: EnTranslations = {
       "pitlords_cleaver": {
         "name": "ピットロードの大鉈"
       },
+      "emberforged_bulwark": {
+        "name": "燼鍛の重胸甲"
+      },
+      "stormsunder_hood": {
+        "name": "嵐断ちのフード"
+      },
+      "voidweave_mantle": {
+        "name": "虚無織りのマント"
+      },
+      "abysswrought_band": {
+        "name": "深淵細工の指輪"
+      },
+      "heart_of_the_rift": {
+        "name": "リフトの心臓"
+      },
       "copper_ore": {
         "name": "銅鉱石"
       },

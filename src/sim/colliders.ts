@@ -737,6 +737,20 @@ export function resolveMovement(
     // shove the resolved position across it either
     if (crossesSealedBorder(x, z, resolved.z)) break;
     if (crossesGardenHedge(x, z, resolved.x, resolved.z)) break;
+    // Rift interiors: a resolution is a SLIDE, never a teleport. When a wide
+    // obstacle abuts a thin wall (a chamber-waist stub reaching the side wall),
+    // chained pushOuts can walk the centre across the wall centreline and eject
+    // the mover OUTSIDE the room; any step that resolves further than a
+    // slide-scale distance from its target is that ejection, so treat it as a
+    // hard block (keep the last good position) instead of accepting it. Scoped
+    // to the rift band so no pre-existing space changes behavior.
+    if (
+      riftToken !== 0 &&
+      isRiftPos(nextX) &&
+      Math.hypot(resolved.x - nextX, resolved.z - nextZ) > 1.2
+    ) {
+      break;
+    }
     x = resolved.x;
     z = resolved.z;
     if (Math.hypot(x - nextX, z - nextZ) > r * 0.25) {

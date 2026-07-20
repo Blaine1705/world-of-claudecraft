@@ -2,11 +2,18 @@
 // operations (upgrade, enchant, gems). Static ItemDefs remain the combat-safe
 // shell; all per-copy progression lives in ItemInstancePayload.
 
-import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS, type RiftGemId } from '../content/rift/items';
+import {
+  RIFT_EPIC_ITEM_IDS,
+  RIFT_ESSENCE_ITEM_ID,
+  RIFT_GEM_IDS,
+  RIFT_LEGENDARY_ITEM_ID,
+  type RiftGemId,
+} from '../content/rift/items';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload, PlayerClass, RiftTier } from '../types';
+import { riftRankForBaseLevel } from './ranks';
 
 export const RIFT_ENCHANT_STATS = [
   'str',
@@ -161,6 +168,42 @@ export function createRiftGearInstance(
   };
   rebuildRolledStats(instance);
   return { itemId: shell.itemId, instance };
+}
+
+// Clear-time epic/legendary odds per rank. Economy rationale: these land ONLY
+// on a completed final-boss kill (never a static loot table), so nothing below
+// B pays epics, a C farm cannot mint them, and the cadence is bound by the
+// ranked portal spawns. B tastes the tier, A guarantees one epic for the
+// heroic-scaled effort, S guarantees one with a real shot at a second, plus
+// the game's one legendary chase roll.
+const RIFT_EPIC_CHANCE_B = 0.15;
+const RIFT_SECOND_EPIC_CHANCE_S = 0.35;
+const RIFT_LEGENDARY_CHANCE_S = 0.04;
+
+/** Rank-gated gear payout on the winning clear: pushed onto the final boss's
+ * corpse as PLAIN drops, so the normal party loot rules (rolls) decide who
+ * takes them. Runs for every winning clear, ranked race or dev portal, with
+ * the rank derived from the descriptor baseLevel. */
+export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: number): void {
+  const rank = riftRankForBaseLevel(baseLevel);
+  if (rank === 'C') return;
+  const loot = boss.loot ?? { copper: 0, items: [] };
+  const epic = (): string => RIFT_EPIC_ITEM_IDS[ctx.rng.int(0, RIFT_EPIC_ITEM_IDS.length - 1)];
+  if (rank === 'B') {
+    if (ctx.rng.chance(RIFT_EPIC_CHANCE_B)) loot.items.push({ itemId: epic(), count: 1 });
+  } else {
+    loot.items.push({ itemId: epic(), count: 1 });
+    if (rank === 'S') {
+      if (ctx.rng.chance(RIFT_SECOND_EPIC_CHANCE_S)) {
+        loot.items.push({ itemId: epic(), count: 1 });
+      }
+      if (ctx.rng.chance(RIFT_LEGENDARY_CHANCE_S)) {
+        loot.items.push({ itemId: RIFT_LEGENDARY_ITEM_ID, count: 1 });
+      }
+    }
+  }
+  boss.loot = loot;
+  if (loot.items.length > 0) boss.lootable = true;
 }
 
 /** First-clear personal loot. Every winner gets a class-appropriate non-fungible

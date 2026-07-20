@@ -2265,6 +2265,28 @@ export class Renderer {
     return task;
   }
 
+  /** Blocking-path neighborhood prepare for a teleport ARRIVAL (the rift exit):
+   * materialize every overworld zone within `radius` of the landing point,
+   * nearest first, so the residency fog clamp is already OPEN when the loading
+   * screen lifts. Landing with unprepared neighbors pulls the fog into a tight
+   * wall that eases open over seconds and reads as "standing in water"; this
+   * pays that cost behind the screen instead. Cheap when the neighborhood is
+   * already resident (prepareZoneAt dedupes by zone id). */
+  async prepareZonesAround(
+    x: number,
+    z: number,
+    radius: number,
+    onProgress?: (done: number, total: number) => void,
+  ): Promise<void> {
+    const worldZones = this.sim.cfg.world?.zones ?? ZONES;
+    const zones = zonesWithinStreamingHorizon(worldZones, x, z, radius);
+    let done = 0;
+    for (const zone of zones) {
+      await this.prepareZoneAt(zone.hub.x, zone.hub.z);
+      onProgress?.(++done, zones.length);
+    }
+  }
+
   // Recompute the background prepare queue from the RELAXED fog horizon (the
   // biome preset request, not the clamped live fog: the clamp only engages
   // because a zone is unprepared, which is exactly what this lane fixes).

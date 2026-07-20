@@ -2786,6 +2786,15 @@ async function startGame(
 
   let lastWarmCheckX = Number.NaN;
   let lastWarmCheckZ = Number.NaN;
+  // Rift-band exit tracking. Leaving the instance band teleports back into an
+  // overworld zone that is usually still RESIDENT, so the ready-bail below
+  // would skip the loading screen entirely and drop the player inside the
+  // residency fog clamp while the surrounding zones stream back in: a tight
+  // teal fog wall easing open over seconds that reads as "standing in water".
+  // A rift exit therefore always takes the blocking path and streams the
+  // arrival NEIGHBORHOOD before the screen lifts.
+  let lastWarmInRiftBand = false;
+  const RIFT_EXIT_STREAM_RADIUS = 240;
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
     const displacement = Number.isFinite(lastWarmCheckX)
@@ -2793,10 +2802,14 @@ async function startGame(
       : 0;
     lastWarmCheckX = player.pos.x;
     lastWarmCheckZ = player.pos.z;
-    if (zoneWarmup || renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
+    const wasInRiftBand = lastWarmInRiftBand;
+    lastWarmInRiftBand = isRiftPos(player.pos.x);
+    const riftExit = wasInRiftBand && !lastWarmInRiftBand;
+    if (zoneWarmup) return;
+    if (!riftExit && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;
     const zoneZ = player.pos.z;
-    if (zoneWarmupMode(displacement) === 'background') {
+    if (!riftExit && zoneWarmupMode(displacement) === 'background') {
       // A walked crossing: the visible-zone streaming lane normally has the
       // destination resident long before the boundary, so landing here means
       // the build is still catching up (or a prepare failed). Finish it in the
@@ -2827,8 +2840,15 @@ async function startGame(
     zoneWarmup = nextPaint()
       .then(() =>
         renderer.prepareZoneAt(zoneX, zoneZ, (done, total) =>
-          setLoadingProgressRange(done, total, 0, 94),
+          setLoadingProgressRange(done, total, 0, riftExit ? 55 : 94),
         ),
+      )
+      .then(() =>
+        riftExit
+          ? renderer.prepareZonesAround(zoneX, zoneZ, RIFT_EXIT_STREAM_RADIUS, (done, total) =>
+              setLoadingProgressRange(done, total, 55, 94),
+            )
+          : undefined,
       )
       .then(async () => {
         setLoadingPercent(96, t('loading.enteringWorld'));

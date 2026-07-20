@@ -26,7 +26,7 @@ import {
 import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '../geometry2d';
 import { Rng } from '../rng';
 import { authoredLiftAt } from './authored';
-import { riftFloorLevel } from './ranks';
+import { RIFT_RANK_BASE_LEVEL, riftFloorLevel, riftHeroicTuningFor } from './ranks';
 import { buildStyle, mixSeed } from './style';
 import type {
   RiftFloorPlan,
@@ -71,17 +71,26 @@ const RIFT_SUFFIXES = [
  * shifts any draw the procedural generator makes. */
 const SET_PIECE_CHANCE = 0.15;
 
-/** Whether this rift seed opens the hand-authored Infernal Citadel. Pure and
- * independent of rank: the tier only sets baseLevel (marks/loot), so the citadel
- * can headline a C-rank or an S-rank portal alike. */
+/** Whether this SEED rolls the hand-authored Infernal Citadel (pure seed
+ * property; whether it actually OPENS depends on the rank, see isSetPieceRift). */
 export function isSetPieceSeed(seed: number): boolean {
   return new Rng(mixSeed(seed, 0x1f3e)).chance(SET_PIECE_CHANCE);
 }
 
-/** How many floors this rift runs (deterministic from the seed). The authored
- * set-piece descends from the citadel halls into the pit. */
-export function riftFloorCount(seed: number): number {
-  if (isSetPieceSeed(seed)) return INFERNAL_FLOOR_COUNT;
+/** Whether this seed+rank opens the citadel. The 2-floor authored set-piece is
+ * C/B content only: A and S rank dungeons are guaranteed 3+ floors, so a
+ * heroic-rank portal always runs the procedural descent, even on a set-piece
+ * seed. Pure over the descriptor, so every host agrees. */
+export function isSetPieceRift(seed: number, baseLevel: number): boolean {
+  return isSetPieceSeed(seed) && riftHeroicTuningFor(baseLevel) === null;
+}
+
+/** How many floors this rift runs (deterministic from the descriptor). The
+ * authored set-piece descends from the citadel halls into the pit; every
+ * procedural rift (including any A/S run) is 3 to 6 floors. `baseLevel`
+ * defaults to the C-rank baseline for legacy seed-only callers. */
+export function riftFloorCount(seed: number, baseLevel: number = RIFT_RANK_BASE_LEVEL.C): number {
+  if (isSetPieceRift(seed, baseLevel)) return INFERNAL_FLOOR_COUNT;
   return new Rng(mixSeed(seed, 0x510f)).int(MIN_FLOORS, MAX_FLOORS);
 }
 
@@ -721,7 +730,7 @@ function floorLevelFor(baseLevel: number, floorIndex: number): number {
 
 /** The rift as a whole: name + floor count (derived from seed + baseLevel). */
 export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
-  if (isSetPieceSeed(seed)) {
+  if (isSetPieceRift(seed, baseLevel)) {
     return {
       seed,
       baseLevel,
@@ -730,7 +739,7 @@ export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
       floorCount: INFERNAL_FLOOR_COUNT,
     };
   }
-  const floorCount = riftFloorCount(seed);
+  const floorCount = riftFloorCount(seed, baseLevel);
   const bossTheme = themeForFloor(seed, floorCount - 1);
   const nameRng = new Rng(mixSeed(seed, 0x9a3e));
   const noun = nameRng.pick(bossTheme.nouns as string[]);
@@ -756,9 +765,9 @@ export function generateRiftFloor(
   const cached = FLOOR_CACHE.get(key);
   if (cached) return upgradedFloor(cached, upgrade);
 
-  // Authored set-piece seeds short-circuit the whole procedural chain BEFORE any
-  // draw is made, so the procedural draw order for every other seed is untouched.
-  if (isSetPieceSeed(seed)) {
+  // Authored set-piece runs short-circuit the whole procedural chain BEFORE any
+  // draw is made, so the procedural draw order for every other run is untouched.
+  if (isSetPieceRift(seed, baseLevel)) {
     const setIndex = Math.max(0, Math.min(INFERNAL_FLOOR_COUNT - 1, floorIndex));
     const setPiece = buildInfernalCitadelFloor(
       seed,
@@ -771,7 +780,7 @@ export function generateRiftFloor(
     return upgradedFloor(setPiece, upgrade);
   }
 
-  const floorCount = riftFloorCount(seed);
+  const floorCount = riftFloorCount(seed, baseLevel);
   const clampedIndex = Math.max(0, Math.min(floorCount - 1, floorIndex));
   const isBoss = clampedIndex === floorCount - 1;
   const theme = themeForFloor(seed, clampedIndex);

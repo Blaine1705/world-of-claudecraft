@@ -76,16 +76,24 @@ describe('infernal citadel: seed selection', () => {
     expect(pct).toBeLessThan(0.22);
   });
 
-  it('is independent of rank: every tier baseLevel builds the same citadel layout', () => {
+  it('is C/B content: both low ranks build the same citadel; A/S run procedural', () => {
+    // The 2-floor set-piece may not headline a heroic rank: A and S dungeons
+    // are guaranteed 3+ floors, so their runs take the procedural generator
+    // even on a citadel seed (rift_gen.ts isSetPieceRift).
     const seed = setPieceSeeds(1)[0];
-    const layouts = (['C', 'B', 'A', 'S'] as const).map((tier) =>
+    const low = (['C', 'B'] as const).map((tier) =>
       JSON.stringify(generateRiftFloor(seed, RIFT_TIER_INFO[tier].baseLevel, 0).layout),
     );
-    expect(new Set(layouts).size).toBe(1);
-    // Only the mob level scales with the rank.
+    expect(new Set(low).size).toBe(1);
+    // Only the mob level scales between the citadel ranks.
     const cLvl = generateRiftFloor(seed, RIFT_TIER_INFO.C.baseLevel, 0).spawns[0].level;
-    const sLvl = generateRiftFloor(seed, RIFT_TIER_INFO.S.baseLevel, 0).spawns[0].level;
-    expect(sLvl).toBeGreaterThan(cLvl);
+    const bLvl = generateRiftFloor(seed, RIFT_TIER_INFO.B.baseLevel, 0).spawns[0].level;
+    expect(bLvl).toBeGreaterThan(cLvl);
+    for (const tier of ['A', 'S'] as const) {
+      const floor = generateRiftFloor(seed, RIFT_TIER_INFO[tier].baseLevel, 0);
+      expect(floor.authored, `${tier} never opens the 2-floor set-piece`).toBeUndefined();
+      expect(floor.floorCount).toBeGreaterThanOrEqual(3);
+    }
   });
 
   it('names the rift a Citadel and descends two floors (halls, then the pit)', () => {

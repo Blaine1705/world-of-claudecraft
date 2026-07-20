@@ -8524,6 +8524,21 @@ export const ru_RU: EnTranslations = {
       "pitlords_cleaver": {
         "name": "Тесак повелителя преисподней"
       },
+      "emberforged_bulwark": {
+        "name": "Пепелокованый бастион"
+      },
+      "stormsunder_hood": {
+        "name": "Клобук грозолома"
+      },
+      "voidweave_mantle": {
+        "name": "Наплечье пустотного плетения"
+      },
+      "abysswrought_band": {
+        "name": "Кольцо бездновой ковки"
+      },
+      "heart_of_the_rift": {
+        "name": "Сердце разлома"
+      },
       "copper_ore": {
         "name": "Медная руда"
       },

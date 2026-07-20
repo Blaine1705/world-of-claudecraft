@@ -8524,6 +8524,21 @@ export const ko_KR: EnTranslations = {
       "pitlords_cleaver": {
         "name": "구덩이 군주의 도끼"
       },
+      "emberforged_bulwark": {
+        "name": "잉걸불 벼림 흉갑"
+      },
+      "stormsunder_hood": {
+        "name": "폭풍쪼개기 두건"
+      },
+      "voidweave_mantle": {
+        "name": "공허직조 어깨걸이"
+      },
+      "abysswrought_band": {
+        "name": "심연세공 반지"
+      },
+      "heart_of_the_rift": {
+        "name": "균열의 심장"
+      },
       "copper_ore": {
         "name": "구리 광석"
       },

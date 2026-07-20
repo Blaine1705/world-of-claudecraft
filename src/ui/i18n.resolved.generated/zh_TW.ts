@@ -8524,6 +8524,21 @@ export const zh_TW: EnTranslations = {
       "pitlords_cleaver": {
         "name": "深淵領主的劈斧"
       },
+      "emberforged_bulwark": {
+        "name": "燼鑄壁壘胸甲"
+      },
+      "stormsunder_hood": {
+        "name": "裂風兜帽"
+      },
+      "voidweave_mantle": {
+        "name": "虛織襯肩"
+      },
+      "abysswrought_band": {
+        "name": "淵鑄指環"
+      },
+      "heart_of_the_rift": {
+        "name": "裂隙之心"
+      },
       "copper_ore": {
         "name": "銅礦石"
       },

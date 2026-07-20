@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { RIFT_RARE_ITEM_IDS } from '../src/sim/content/rift/items';
+import {
+  RIFT_EPIC_ITEM_IDS,
+  RIFT_LEGENDARY_ITEM_ID,
+  RIFT_RARE_ITEM_IDS,
+} from '../src/sim/content/rift/items';
 import { RIFT_BOSS_IDS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
 import { BUILTIN_WORLD, ITEMS, MOBS, riftInstanceOrigin } from '../src/sim/data';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
+import { addRiftClearGearLoot } from '../src/sim/rift/progression';
 import {
   RIFT_HEROIC_MIN_MOVE_SPEED,
   RIFT_HEROIC_TUNING,
@@ -12,8 +17,11 @@ import {
   riftRankForBaseLevel,
 } from '../src/sim/rift/ranks';
 import { generateRiftFloor, isSetPieceSeed, riftFloorCount } from '../src/sim/rift/rift_gen';
+import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, RiftTier, WorldContent } from '../src/sim/types';
+import { isInWaterBody } from '../src/sim/world';
 
 // Rank-driven rift difficulty (rift/ranks.ts): the C/B/A/S level bands, the A/S
 // heroic stat transform, the rank-gated boss mechanic kits (C=1 .. S=4), the
@@ -463,5 +471,154 @@ describe('rift ranks: rune-reset notice rate limit', () => {
     expect(
       events.some((e) => e.type === 'log' && e.text === 'The runes go dark. Begin again.'),
     ).toBe(true);
+  });
+});
+
+describe('rift ranks: A/S rifts are never shorter than 3 floors', () => {
+  it('a set-piece seed opens the 2-floor citadel at C/B but runs procedural 3+ at A/S', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) if (isSetPieceSeed(s)) seed = s;
+    expect(seed).toBeGreaterThan(0);
+    // C/B: the citadel (2 authored floors).
+    expect(riftFloorCount(seed)).toBe(2);
+    expect(riftFloorCount(seed, 20)).toBe(2);
+    expect(riftFloorCount(seed, 22)).toBe(2);
+    expect(generateRiftFloor(seed, 20, 0).authored).toBe(true);
+    // A/S: guaranteed 3+ procedural floors, never the 2-floor set-piece.
+    for (const baseLevel of [25, 28]) {
+      expect(riftFloorCount(seed, baseLevel), `base ${baseLevel}`).toBeGreaterThanOrEqual(3);
+      const f0 = generateRiftFloor(seed, baseLevel, 0);
+      expect(f0.authored, 'A/S runs the procedural generator').toBeUndefined();
+      expect(f0.floorCount).toBeGreaterThanOrEqual(3);
+    }
+    // And every procedural rift is 3+ floors at every rank anyway.
+    for (let s = 1; s <= 60; s++) {
+      if (isSetPieceSeed(s)) continue;
+      for (const baseLevel of [20, 22, 25, 28]) {
+        expect(riftFloorCount(s, baseLevel)).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+
+  it('an S-rank citadel-seed run fields S-band mobs on its procedural floors', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) if (isSetPieceSeed(s)) seed = s;
+    const floor = generateRiftFloor(seed, 28, 0);
+    for (const sp of floor.spawns) expect(sp.level).toBeGreaterThanOrEqual(23);
+  });
+});
+
+describe('rift ranks: clear-time epic and legendary payout', () => {
+  it('the declared epic/legendary shells resolve at the right quality', () => {
+    for (const id of RIFT_EPIC_ITEM_IDS) {
+      expect(ITEMS[id], id).toBeDefined();
+      expect(ITEMS[id].quality, id).toBe('epic');
+    }
+    expect(ITEMS[RIFT_LEGENDARY_ITEM_ID]).toBeDefined();
+    expect(ITEMS[RIFT_LEGENDARY_ITEM_ID].quality).toBe('legendary');
+  });
+
+  it('C pays nothing, B rolls a slim chance, A guarantees an epic, S guarantees plus rolls more', () => {
+    const epicIds = new Set<string>(RIFT_EPIC_ITEM_IDS);
+    const run = (baseLevel: number, rngSeed: number) => {
+      const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
+      const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
+      addRiftClearGearLoot(ctx, boss, baseLevel);
+      return boss.loot!.items.map((i) => i.itemId);
+    };
+    for (let s = 1; s <= 40; s++) {
+      expect(run(20, s), 'C never pays clear gear').toHaveLength(0);
+      const a = run(25, s);
+      expect(a.length, 'A guarantees exactly one epic').toBe(1);
+      expect(epicIds.has(a[0]!), 'A pays from the epic pool').toBe(true);
+      const b = run(22, s);
+      expect(b.length, 'B is a slim roll').toBeLessThanOrEqual(1);
+      const sDrops = run(28, s);
+      expect(sDrops.length, 'S guarantees one epic').toBeGreaterThanOrEqual(1);
+      expect(sDrops.length).toBeLessThanOrEqual(3);
+      expect(epicIds.has(sDrops[0]!)).toBe(true);
+      for (const id of sDrops) {
+        expect(epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID).toBe(true);
+      }
+    }
+    // Across many rolls, B pays SOMETIMES (neither never nor always), and the S
+    // legendary is reachable but rare.
+    let bHits = 0;
+    let sLegendaries = 0;
+    for (let s = 1; s <= 300; s++) {
+      if (run(22, s).length > 0) bHits++;
+      if (run(28, s).includes(RIFT_LEGENDARY_ITEM_ID)) sLegendaries++;
+    }
+    expect(bHits).toBeGreaterThan(0);
+    expect(bHits).toBeLessThan(150);
+    expect(sLegendaries).toBeGreaterThan(0);
+    expect(sLegendaries).toBeLessThan(60);
+  });
+
+  it('an S-rank clear leaves the epic on the boss corpse; a C clear does not', () => {
+    const seed = seedWithFinalBoss('rift_boss_ember');
+    const epicIds = new Set<string>(RIFT_EPIC_ITEM_IDS);
+
+    const s = enterAtBossFloor(seed, 28);
+    const sBoss = s.entities.get(active(s).bossId!)!;
+    s.player.gm = true;
+    s.player.pos = { ...sBoss.pos, z: sBoss.pos.z - 4 };
+    s.player.prevPos = { ...s.player.pos };
+    (s as unknown as { dealDamage: Function }).dealDamage(
+      s.player,
+      sBoss,
+      sBoss.hp + 100,
+      false,
+      'physical',
+      'test',
+      'hit',
+      true,
+    );
+    expect(sBoss.dead).toBe(true);
+    tickAlive(s, 25); // the 1 Hz sweep claims the clear and pays the gear
+    const sItems = (sBoss.loot?.items ?? []).map((i) => i.itemId);
+    expect(
+      sItems.some((id) => epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID),
+      `S corpse carries clear gear (got: ${sItems.join(',')})`,
+    ).toBe(true);
+
+    const c = enterAtBossFloor(seed, 20);
+    const cBoss = c.entities.get(active(c).bossId!)!;
+    c.player.gm = true;
+    c.player.pos = { ...cBoss.pos, z: cBoss.pos.z - 4 };
+    c.player.prevPos = { ...c.player.pos };
+    (c as unknown as { dealDamage: Function }).dealDamage(
+      c.player,
+      cBoss,
+      cBoss.hp + 100,
+      false,
+      'physical',
+      'test',
+      'hit',
+      true,
+    );
+    tickAlive(c, 25);
+    const cItems = (cBoss.loot?.items ?? []).map((i) => i.itemId);
+    expect(
+      cItems.some((id) => epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID),
+      'C corpse never carries clear gear',
+    ).toBe(false);
+  });
+});
+
+describe('rift exit: the way home is never anchored in water', () => {
+  it('entering from inside a water body dries out the return point', () => {
+    // Find a declared water point on the overworld.
+    let wet: { x: number; z: number } | null = null;
+    for (let x = -400; x <= 400 && !wet; x += 7) {
+      for (let z = -3000; z <= 3000 && !wet; z += 11) {
+        if (isInWaterBody(x, z)) wet = { x, z };
+      }
+    }
+    expect(wet, 'found a water point to test from').not.toBeNull();
+    const sim = makeSim();
+    sim.enterRift(SEED, 20, sim.player.id, wet!);
+    const inst = active(sim);
+    expect(isInWaterBody(inst.returnPos.x, inst.returnPos.z), 'return point is dry').toBe(false);
   });
 });

@@ -68,10 +68,12 @@ export function riftMechanicSuppressed(mob: Entity, key: string): boolean {
 // shape as instances/difficulty.ts mobTemplateForDungeonDifficulty) plus the
 // per-entity mechanicDamageMult/mechanicHealMult applied at each mechanic fire
 // site AFTER the rng draw (draw count and order stay identical across ranks).
-// The multipliers are deliberately far below the heroic five-man ladder
-// (damage x4-5): that ladder lifts level ~10 dungeons to a level-22 challenge,
-// while rift mobs are already group-tuned at 20+ and A/S stack these on top of
-// the rank's own level lift.
+// The multipliers stay below the heroic five-man ladder (damage x4-5, which
+// lifts level ~10 dungeons to a level-22 challenge) because rift mobs are
+// already group-tuned at 20+ and A/S stack these on top of the rank's own
+// level lift; the first playtest round still read as too easy, so this is the
+// RAISED second calibration (A roughly doubles trash HP, S swings for double
+// damage on top of the 23-25 level lift).
 export interface RiftHeroicTuning {
   healthMultiplier: number;
   damageMultiplier: number;
@@ -83,16 +85,16 @@ export interface RiftHeroicTuning {
 
 export const RIFT_HEROIC_TUNING: Partial<Record<RiftTier, RiftHeroicTuning>> = {
   A: {
-    healthMultiplier: 1.35,
-    damageMultiplier: 1.3,
-    addDamageMultiplier: 1.15,
-    armorMultiplier: 1.15,
+    healthMultiplier: 1.9,
+    damageMultiplier: 1.6,
+    addDamageMultiplier: 1.25,
+    armorMultiplier: 1.25,
   },
   S: {
-    healthMultiplier: 1.7,
-    damageMultiplier: 1.55,
-    addDamageMultiplier: 1.3,
-    armorMultiplier: 1.25,
+    healthMultiplier: 2.5,
+    damageMultiplier: 2.0,
+    addDamageMultiplier: 1.5,
+    armorMultiplier: 1.4,
   },
 };
 

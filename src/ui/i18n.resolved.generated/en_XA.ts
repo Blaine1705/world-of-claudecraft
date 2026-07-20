@@ -8524,6 +8524,21 @@ export const en_XA: EnTranslations = {
       "pitlords_cleaver": {
         "name": "[Þíţ Ļóŕð'š Çļéáʋéŕ]"
       },
+      "emberforged_bulwark": {
+        "name": "[Éɱƀéŕƒóŕĝéð Ɓúļŵáŕķ]"
+      },
+      "stormsunder_hood": {
+        "name": "[Šţóŕɱšúñðéŕ Ĥóóð]"
+      },
+      "voidweave_mantle": {
+        "name": "[Ʋóíðŵéáʋé Ɱáñţļé]"
+      },
+      "abysswrought_band": {
+        "name": "[Áƀýššŵŕóúĝĥţ Ɓáñð]"
+      },
+      "heart_of_the_rift": {
+        "name": "[Ĥéáŕţ óƒ ţĥé Ŕíƒţ]"
+      },
       "copper_ore": {
         "name": "[Çóþþéŕ Óŕé]"
       },
