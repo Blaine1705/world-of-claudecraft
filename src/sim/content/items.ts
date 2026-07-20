@@ -324,9 +324,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 140,
   },
   // The horse's reins: the ONLY purchasable mount, sold by Stablemaster Marla
-  // Hitchen in Eastbrook for 100 gold (buyValue in copper). Soulbound like every
-  // reins item, so owning it IS owning the horse (src/sim/mounts.ts mountOwned)
-  // and it never transfers. sellValue 0: bought, never sold back.
+  // Hitchen for 10 gold after the player has learned Riding (ridingTrained gate
+  // in items.ts buyItem). Soulbound like every reins item, so owning it IS owning
+  // the horse (src/sim/mounts.ts mountOwned) and it never transfers.
+  // sellValue 0: bought, never sold back.
   reins_valorsteed: {
     id: 'reins_valorsteed',
     name: 'Reins of the Valorsteed',
@@ -336,7 +337,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noDiscard: true,
     sellValue: 0,
-    buyValue: 1_000_000,
+    buyValue: 100_000, // 10 gold in copper
   },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the
   // reins item IS owning the mount (src/sim/mounts.ts mountOwned): soulbound,

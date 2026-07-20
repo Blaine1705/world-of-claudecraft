@@ -483,10 +483,15 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'Too far away.');
     return;
   }
-  // Mount purchase gates (the stablemaster's reins): a hard level-20 requirement
-  // and a one-per-account ownership check (owning the reins item IS owning the
-  // mount). Placed after the vendor stock/price checks, before payment.
+  // Mount purchase gates (the stablemaster's reins): a riding-skill requirement
+  // (ridingTrained, purchased from Marla for 80g), a hard level-20 gate, and a
+  // one-per-account ownership check (owning the reins item IS owning the mount).
+  // Placed after the vendor stock/price checks, before payment.
   if (def.kind === 'mount') {
+    if (!meta.ridingTrained) {
+      ctx.error(meta.entityId, 'You must learn to ride first. Find a riding trainer.');
+      return;
+    }
     if (p.level < 20) {
       ctx.error(meta.entityId, 'You must be level 20 to buy a mount.');
       return;

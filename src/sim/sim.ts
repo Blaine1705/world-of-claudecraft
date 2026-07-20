@@ -265,6 +265,7 @@ import {
   tickMountRace as tickMountRaceImpl,
 } from './mount_race';
 import {
+  forceDismount as forceDismountImpl,
   ownedMounts as ownedMountsImpl,
   selectMount as selectMountImpl,
   toggleMount as toggleMountImpl,
@@ -272,6 +273,7 @@ import {
 } from './mounts';
 import {
   abandonMountTraining as abandonMountTrainingImpl,
+  learnRiding as learnRidingImpl,
   mountTrainAbort as mountTrainAbortImpl,
   mountTrainBegin as mountTrainBeginImpl,
   tickMountTraining as tickMountTrainingImpl,
@@ -1031,6 +1033,10 @@ export interface PlayerMeta {
   // flipped true, mirroring the selectedMount-omitted-while-default convention
   // in serializeCharacter below.
   mountTrainingFeePaid?: boolean;
+  // Riding skill purchased from Marla (80g). Optional and absent until bought,
+  // so pre-feature saves load cleanly as un-trained. Grandfathered: any save
+  // that had mountTrainingFeePaid=true gets ridingTrained=true on load.
+  ridingTrained?: boolean;
   moveInput: MoveInput;
   // Monotonic counter bumped when a bulky, rarely-changing wire field (the
   // inventory, and the collection-quest progress derived from it) mutates, so a
@@ -1413,6 +1419,8 @@ export interface CharacterState {
   // paid, so pre-mount-training saves (and every save before the fee is ever
   // charged) stay byte-equal.
   mountTrainingFeePaid?: boolean;
+  // Riding skill purchased from Marla (80g). Optional and absent until bought.
+  ridingTrained?: boolean;
   delveMarks?: number;
   delveClears?: Record<string, number>;
   companionUpgrades?: Record<string, number>;
@@ -2456,6 +2464,8 @@ export class Sim {
       // Never explicitly set false: absent stays absent so a pre-feature save
       // (or one where the fee was never charged) round-trips byte-equal.
       if (s.mountTrainingFeePaid === true) meta.mountTrainingFeePaid = true;
+      // Grandfather: players who already paid the old 100g fee are riding-trained.
+      if (s.ridingTrained === true || s.mountTrainingFeePaid === true) meta.ridingTrained = true;
       meta.guildLetterSent = s.guildLetterSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
@@ -3111,6 +3121,8 @@ export class Sim {
       ...(meta.selectedMount !== DEFAULT_MOUNT ? { selectedMount: meta.selectedMount } : {}),
       // Absent until the fee is actually charged (back-compat + parity-stable saves).
       ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
+      // Absent until riding skill is purchased (back-compat).
+      ...(meta.ridingTrained ? { ridingTrained: true } : {}),
       craftSkills: { ...meta.craftSkills },
       knownRecipes: [...meta.knownRecipes],
       recipesGrandfathered: meta.recipesGrandfathered,
@@ -3186,11 +3198,25 @@ export class Sim {
   ownedMounts(): readonly MountKey[] {
     return this.ownedMountsFor(this.primaryId);
   }
+  ridingTrained(): boolean {
+    return this.players.get(this.primaryId)?.ridingTrained === true;
+  }
   selectMount(key: MountKey): void {
     this.selectMountFor(this.primaryId, key);
   }
   toggleMounted(): void {
     this.toggleMountFor(this.primaryId);
+  }
+
+  /** Purchase the riding skill from Marla (80g). Server path; IWorld member rides
+   *  primaryId. Rules live in src/sim/mounts_training.ts. */
+  learnRidingFor(npcId: number, pid: number): void {
+    learnRidingImpl(this.ctx, npcId, pid);
+  }
+
+  // --- IWorldMounts: learn riding ---
+  learnRiding(npcId: number): void {
+    this.learnRidingFor(npcId, this.primaryId);
   }
 
   /** Per-pid riding-lesson command surface (the server path); the IWorld member
@@ -4279,6 +4305,7 @@ export class Sim {
       tameError: sim.tameError.bind(sim),
       standUp: sim.standUp.bind(sim),
       breakGhostWolf: sim.breakGhostWolf.bind(sim),
+      forceDismount: sim.forceDismountPlayer.bind(sim),
       startAutoAttack: sim.startAutoAttack.bind(sim),
       revivePet: sim.revivePet.bind(sim),
       completeFishing: sim.completeFishing.bind(sim),
@@ -5700,6 +5727,10 @@ export class Sim {
     const name = e.auras[idx].name;
     e.auras.splice(idx, 1);
     this.emit({ type: 'aura', targetId: e.id, name, gained: false });
+  }
+
+  private forceDismountPlayer(e: Entity): void {
+    forceDismountImpl(this.ctx, e);
   }
 
   // Taunt/Growl, classic semantics: never misses, lifts the caster's threat to

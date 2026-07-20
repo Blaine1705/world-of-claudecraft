@@ -1,5 +1,4 @@
 import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
-import { mountCritPct } from './content/mounts';
 import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
@@ -582,11 +581,7 @@ export function recalcPlayerStats(
   // crit talents were dead weight to casters). The active mount's bonus rides
   // here too so it covers melee, ranged, and ability crit uniformly.
   e.sharedCritBonus =
-    bonusCrit +
-    (mods?.stats.crit ?? 0) +
-    setEff.crit +
-    critFractionFromRating(e.critRating) +
-    mountCritPct(e.mountKey);
+    bonusCrit + (mods?.stats.crit ?? 0) + setEff.crit + critFractionFromRating(e.critRating);
   // Crit: ~1% per 20 agi at low level
   e.critChance =
     0.05 +

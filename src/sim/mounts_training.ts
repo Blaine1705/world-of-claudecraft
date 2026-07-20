@@ -31,7 +31,11 @@ import { dist2d, type Entity, INTERACT_RANGE, type MountTrainingSession } from '
 
 // --- tuning (change numbers here, not inline) -------------------------------
 export const MOUNT_TRAIN_MIN_LEVEL = 20;
-export const MOUNT_TRAIN_FEE_COPPER = 1_000_000; // 100 gold, charged once, ever
+// Legacy fee for the old race-platform start (now effectively bypassed: ridingTrained
+// replaces the old flow, but the constant is kept for test compatibility).
+export const MOUNT_TRAIN_FEE_COPPER = 1_000_000; // 100 gold (legacy, see learnRiding below)
+// Riding skill purchase from Marla: 80 gold.
+export const RIDING_SKILL_FEE_COPPER = 800_000; // 80 gold in copper
 // The lesson's play area: the paddock rect plus a small margin (which also covers
 // Marla, who stands just north of the fence at z=708). Straying beyond it during
 // the lesson abandons the attempt. This replaces the old fixed radius around
@@ -62,12 +66,52 @@ export const TRAIN_SENTINEL_ITEM_ID = 'train_valorsteed';
 const NOTICE_SUCCESS = "Marla takes the Valorsteed's reins. Well ridden.";
 const NOTICE_LEFT_YARD =
   'You leave the paddock and the lesson ends. Come back to Marla to try again.';
+const NOTICE_RIDING_LEARNED = 'You have learned Riding. You can now summon and ride a mount.';
 
 function findStablemaster(ctx: SimContext): Entity | null {
   for (const e of ctx.entities.values()) {
     if (e.kind === 'npc' && e.templateId === STABLEMASTER_NPC_ID) return e;
   }
   return null;
+}
+
+/** Purchase the riding skill from Marla for 80 gold. Server-authoritative: checks
+ *  level 20, proximity to Marla, sufficient copper, and that the skill is not
+ *  already owned. On success sets ridingTrained = true, charges 80g, and emits
+ *  a notice toast. The npcId param identifies which NPC the client is interacting
+ *  with (validated against the stablemaster template). */
+export function learnRiding(ctx: SimContext, npcId: number, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e } = r;
+  if (meta.ridingTrained) {
+    ctx.error(meta.entityId, 'You have already learned Riding.');
+    return;
+  }
+  if (e.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
+  if (e.level < MOUNT_TRAIN_MIN_LEVEL) {
+    ctx.error(meta.entityId, 'You must be level 20 to learn Riding.');
+    return;
+  }
+  const npc = ctx.entities.get(npcId);
+  if (!npc || npc.kind !== 'npc' || npc.templateId !== STABLEMASTER_NPC_ID) {
+    ctx.error(meta.entityId, 'You must speak to Marla Hitchen to learn Riding.');
+    return;
+  }
+  if (dist2d(e.pos, npc.pos) > INTERACT_RANGE + 2) {
+    ctx.error(meta.entityId, 'Too far away.');
+    return;
+  }
+  if (meta.copper < RIDING_SKILL_FEE_COPPER) {
+    ctx.error(meta.entityId, 'Not enough money.');
+    return;
+  }
+  meta.copper -= RIDING_SKILL_FEE_COPPER;
+  meta.ridingTrained = true;
+  ctx.notice(meta.entityId, NOTICE_RIDING_LEARNED);
 }
 
 /** Whether this player still needs to clear the course for the accepted riding

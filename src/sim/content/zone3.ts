@@ -1219,6 +1219,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: Math.PI, // face -z, toward the race yard
     color: 0x8b5a2b,
     questIds: ['q_riding_lessons'],
+    // Marla sells the Valorsteed reins after the player has learned to ride.
+    // The riding-skill gate (ridingTrained) is enforced in buyItem (items.ts).
+    vendorItems: ['reins_valorsteed'],
     greeting:
       'Every rider walks in on two legs, $C. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and Highwatch has no menders to spare for broken bones.',
   },
@@ -1924,9 +1927,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Riding Lessons',
     giverNpcId: 'stablemaster_marla',
     turnInNpcId: 'stablemaster_marla',
-    text: 'Every rider walks in on two legs, $N, same as I told you the day we met. Pay the fee, and when I give the word, call the training Valorsteed and climb aboard. Then ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the seat is yours. Wander out of the paddock and we start over.',
+    text: 'You have paid your training fee. When I give the word, call the training Valorsteed and climb aboard. Ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the course is yours. Wander out of the paddock and we start over.',
     completionText:
-      'There, now. Up in one clean motion and a steady seat at the top. The Valorsteed is yours, $N: saddle, reins, and the standing of a rider who earned the seat instead of buying it.',
+      'Up in one clean motion and a steady seat at the top. Well ridden, $N. You have earned the rank of rider. Speak to me again to buy your own Valorsteed reins.',
     objectives: [
       {
         type: 'interact',
@@ -1936,12 +1939,10 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
       },
     ],
     xpReward: 3000,
-    copperReward: 1500,
-    itemRewards: {
-      warrior: 'reins_valorsteed',
-      mage: 'reins_valorsteed',
-      rogue: 'reins_valorsteed',
-    },
+    // The quest reward is gold and XP; the Valorsteed reins are purchased
+    // separately from Marla for 10 gold after the quest is complete.
+    copperReward: 5000,
+    itemRewards: {},
     minLevel: 20,
   },
 };

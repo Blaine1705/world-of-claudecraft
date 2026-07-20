@@ -342,8 +342,11 @@ export const IWORLD_MEMBERS = [
   // --- rideable ground mounts (IWorldMounts) ---
   { name: 'selectedMount', kind: 'method' }, // read-returning
   { name: 'ownedMounts', kind: 'method' }, // read-returning
+  { name: 'ridingTrained', kind: 'method' }, // read-returning
   { name: 'selectMount', kind: 'method' },
   { name: 'toggleMounted', kind: 'method' },
+  // --- riding skill purchase (IWorldMounts) ---
+  { name: 'learnRiding', kind: 'method' },
   // --- the riding lesson (IWorldMounts) ---
   { name: 'mountTrainBegin', kind: 'method' },
   { name: 'mountLessonActive', kind: 'method' }, // read-returning
@@ -478,9 +481,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, and Phase 8's mobile-station pair (placeMobileStation +
     // activeMobileStationCraft).
-    expect(IWORLD_MEMBERS.length).toBe(268);
+    expect(IWORLD_MEMBERS.length).toBe(270);
     expect(DATA_MEMBERS.length).toBe(71);
-    expect(METHOD_MEMBERS.length).toBe(197);
+    expect(METHOD_MEMBERS.length).toBe(199);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -627,6 +630,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'lastCraftResult',
       'lastMasterwork',
       'leaderboard',
+      'learnRiding',
       'leaveCardDuelQueue',
       'leaveDelve',
       'leaveDungeon',
@@ -699,6 +703,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
+      'ridingTrained',
       'riftCollisionToken',
       'riftFloor',
       'salvageItem',
@@ -935,6 +940,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'interact',
       'joinCardDuelQueue',
       'leaderboard',
+      'learnRiding',
       'leaveCardDuelQueue',
       'leaveDelve',
       'leaveDungeon',
@@ -988,6 +994,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
+      'ridingTrained',
       'salvageItem',
       'saveLoadout',
       'searchCharacters',
@@ -1436,8 +1443,10 @@ type _ExhaustValeCup = AssertNever<Exclude<keyof IWorldValeCup, (typeof FACET_VA
 const FACET_MOUNTS = [
   'selectedMount',
   'ownedMounts',
+  'ridingTrained',
   'selectMount',
   'toggleMounted',
+  'learnRiding',
   'mountTrainBegin',
   'mountLessonActive',
   'mountRaceStart',
@@ -1562,8 +1571,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(268);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(268);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(270);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(270);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

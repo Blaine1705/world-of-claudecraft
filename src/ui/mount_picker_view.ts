@@ -29,10 +29,8 @@ export interface MountPickerRow {
   active: boolean;
   /** Pickable right now (unlocked and not already the pick). */
   pickable: boolean;
-  /** Display percents (integers: 40 / 50 / 65, 0 / 5). */
+  /** Display percent integer (e.g. 60 for +60% extra mobility). */
   speedPct: number;
-  blockPct: number;
-  critPct: number;
 }
 
 export interface MountPickerView {
@@ -62,8 +60,6 @@ export function buildMountPickerView(
       active: key === activeKey,
       pickable: !locked && key !== selected,
       speedPct: Math.round(def.moveSpeedPct * 100),
-      blockPct: Math.round(def.meleeBlockPct * 100),
-      critPct: Math.round(def.critPct * 100),
     };
   });
   return { rows, selectedKey: selected, mounted: activeKey !== '' };

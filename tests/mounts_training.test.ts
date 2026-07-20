@@ -48,11 +48,14 @@ function metaOf(sim: Sim) {
 }
 
 /** Stand the player at the stablemaster, level 20, actively on the riding-lesson
- * quest. Copper stays 0 (the "cannot afford" fixture) unless funded. */
+ * quest. Copper stays 0 (the "cannot afford" fixture) unless funded.
+ * ridingTrained is set so tests that add a reins item and toggle outside a
+ * lesson are not blocked by the Req 5 skill gate. */
 function setupAtMarla(sim: Sim, opts: { copper?: number } = {}): void {
   sim.setPlayerLevel(20);
   standAtMarla(sim);
   const meta = sim.players.get(sim.playerId)!;
+  meta.ridingTrained = true;
   meta.questLog.set(RIDING_LESSONS_QUEST_ID, {
     questId: RIDING_LESSONS_QUEST_ID,
     counts: [0],
@@ -243,17 +246,20 @@ describe('riding lesson: mounting advances to ride; a finished race completes it
     expect(metaOf(sim).inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(false);
   }, 20000);
 
-  it('turning the quest in at Marla after passing grants reins_valorsteed', () => {
+  it('turning the quest in at Marla after passing grants gold/XP (not reins; buy separately)', () => {
     const sim = makeSim();
     setupAtMarla(sim, { copper: MOUNT_TRAIN_FEE_COPPER });
     beginLesson(sim);
     mountSteed(sim);
     completeRace(sim);
     standAtMarla(sim);
+    const copperBefore = metaOf(sim).copper;
     sim.turnInQuest(RIDING_LESSONS_QUEST_ID);
     sim.tick();
-    expect(metaOf(sim).inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(true);
-    expect(QUESTS[RIDING_LESSONS_QUEST_ID].itemRewards.warrior).toBe('reins_valorsteed');
+    // The quest no longer awards reins_valorsteed; it awards 5000 copper + XP.
+    expect(metaOf(sim).inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(false);
+    expect(QUESTS[RIDING_LESSONS_QUEST_ID].itemRewards).toEqual({});
+    expect(metaOf(sim).copper).toBeGreaterThan(copperBefore); // 5000 copper reward
   }, 20000);
 });
 
