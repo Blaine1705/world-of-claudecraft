@@ -161,7 +161,12 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   });
 
   it('a ground AoE pulse folds the AoE-penalised direct coefficient (combat spBonus)', () => {
-    const cons = known('paladin', 'consecration');
+    const protection = computeTalentModifiers(
+      'paladin',
+      { spec: 'protection', ranks: {}, choices: {} },
+      MAX_LEVEL,
+    );
+    const cons = known('paladin', 'consecration', protection);
     const eff = required(cons.effects.find((e) => e.type === 'groundAoE'));
     expect(abilityDamageBonus(cons, eff, SC)).toBe(
       directHitBonus(SC.spellPower, cons.def, cons.castTime, true),

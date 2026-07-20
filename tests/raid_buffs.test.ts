@@ -57,7 +57,6 @@ describe('standardized percent raid buffs', () => {
       ['arcane_intellect', 'buff_int_pct', 5],
       ['power_word_fortitude', 'buff_sta_pct', 5],
       ['mark_of_the_wild', 'buff_stats_pct', 5],
-      ['devotion_aura', 'buff_armor_pct', 10],
       ['blessing_of_might', 'buff_ap_pct', 10],
     ];
     for (const [id, kind, value] of cases) {
@@ -157,16 +156,25 @@ describe('standardized percent raid buffs', () => {
     expect(after.str).toBe(Math.round(before.str * 1.05));
   });
 
-  it('Devotion Aura raises party armor by 10%', () => {
+  it('Devotion Aura gives the party permanent 5% damage reduction without changing armor', () => {
     const sim = makeWorld();
     const pal = sim.addPlayer('paladin', 'Pal');
     const ally = sim.addPlayer('warrior', 'War');
+    sim.setPlayerLevel(2, pal);
     formParty(sim, pal, [ally]);
     const armorBefore = sim.entities.get(ally)!.stats.armor;
     ready(sim, pal);
-    sim.castAbility('devotion_aura', pal);
-    expect(sim.entities.get(ally)!.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(true);
-    expect(sim.entities.get(ally)!.stats.armor).toBe(Math.round(armorBefore * 1.1));
+    sim.castAbility('devotion_ward', pal);
+    expect(sim.entities.get(ally)!.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'devotion_ward',
+        kind: 'buff_dr',
+        value: 0.05,
+        permanent: true,
+        sourceId: pal,
+      }),
+    );
+    expect(sim.entities.get(ally)!.stats.armor).toBe(armorBefore);
   });
 
   it('replaces the previous Blessing of Might from another caster', () => {

@@ -26,6 +26,7 @@
 
 import { freeCostAuraActive } from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
+import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
   type AbilityDef,
   type AuraKind,
@@ -70,6 +71,7 @@ const NEXT_CAST_CHEAP: AuraKind = 'next_cast_cheap';
 const SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.slotAria';
 const EMPTY_SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.emptySlotAria';
 const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
+const ASCENSION_SPENDER_ARIA_KEY: TranslationKey = 'hudChrome.paladin.ascensionSpenderAria';
 
 /** The ability fields the core reads. A structural subset of ResolvedAbility that
  *  both worlds expose (def + the talent-resolved cost). */
@@ -180,6 +182,12 @@ export interface ActionBarPlayerInput {
    *  kill-window gate, and the next-cast empowerment read. Both worlds expose
    *  the live aura list. */
   auras: readonly ActionBarAuraInput[];
+  paladinDevotion?: {
+    value: number;
+    ascensionCharges: number;
+    ascensionRemaining: number;
+  };
+  paladinSpec?: string | null;
 }
 
 /** The target fields the bar reads; null when there is no current target. */
@@ -225,6 +233,12 @@ export interface ActionBarSlotState {
    *  NEVER shed by a graphics tier. */
   procGlow: boolean;
   empowered: boolean;
+  /** This ability will consume one Ascension charge if used now. Kept
+   *  separate from generic empowerment so the painter can show an explicit
+   *  cost marker instead of relying on glow alone. */
+  ascensionSpender: boolean;
+  /** Localized visual cost used by the CSS badge through a data attribute. */
+  ascensionCostLabel: string;
   ariaLabel: string;
   keybindLabel: string;
 }
@@ -259,6 +273,8 @@ function makeSlotState(): ActionBarSlotState {
     queued: false,
     procGlow: false,
     empowered: false,
+    ascensionSpender: false,
+    ascensionCostLabel: '',
     ariaLabel: '',
     keybindLabel: '',
   };
@@ -361,6 +377,8 @@ export function createActionBarView(
           slot.queued = player.autoAttack;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.ascensionSpender = false;
+          slot.ascensionCostLabel = '';
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.t(ATTACK_NAME_KEY),
@@ -389,6 +407,8 @@ export function createActionBarView(
           slot.queued = false;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.ascensionSpender = false;
+          slot.ascensionCostLabel = '';
           slot.ariaLabel = deps.t(EMPTY_SLOT_ARIA_KEY, { slot: slotLabel });
           slot.keybindLabel = sd.keybindLabel();
           continue;
@@ -423,6 +443,8 @@ export function createActionBarView(
           slot.queued = false;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.ascensionSpender = false;
+          slot.ascensionCostLabel = '';
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.itemName(item),
@@ -500,8 +522,13 @@ export function createActionBarView(
           }
           windowGlow = windowOpen;
         }
+        const ascensionReady =
+          def.id !== 'divine_ascension' ||
+          ((player.paladinDevotion?.value ?? 0) >= 20 &&
+            (player.paladinDevotion?.ascensionCharges ?? 0) <= 0);
         slot.usable =
           (!(player.resource < ability.cost) || freeByProc) &&
+          ascensionReady &&
           windowOpen &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
           (!def.requiresStealth || player.stealthed);
@@ -514,9 +541,20 @@ export function createActionBarView(
         // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
         // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
         // sim predicate idiom as freeCostAuraActive above).
-        slot.procGlow = freeByProc || windowGlow || frostProcGlowActive(player.auras ?? [], def.id);
-        slot.empowered = hasEmpoweringAura(player.auras, ability);
-        slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
+        const divineAscensionActive =
+          (player.paladinDevotion?.ascensionCharges ?? 0) > 0 &&
+          (player.paladinDevotion?.ascensionRemaining ?? 0) > 0;
+        const ascensionEmpowered =
+          divineAscensionActive && isAscensionEmpoweredAbility(player.paladinSpec ?? null, def.id);
+        slot.procGlow =
+          freeByProc ||
+          windowGlow ||
+          frostProcGlowActive(player.auras ?? [], def.id) ||
+          (def.id === 'divine_ascension' && ascensionReady);
+        slot.empowered = hasEmpoweringAura(player.auras, ability) || ascensionEmpowered;
+        slot.ascensionSpender = ascensionEmpowered;
+        slot.ascensionCostLabel = ascensionEmpowered ? deps.formatCount(-1) : '';
+        slot.ariaLabel = deps.t(ascensionEmpowered ? ASCENSION_SPENDER_ARIA_KEY : SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),
         });

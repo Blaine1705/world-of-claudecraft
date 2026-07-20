@@ -329,6 +329,13 @@ export class TalentsWindow {
   }
 
   private paintRowsTab(body: HTMLElement, view: TalentsView): void {
+    if (!view.hasRows) {
+      body.innerHTML =
+        `<div class="tal-empty tal-coming-soon" data-talents-coming-soon>` +
+        `<b>${t('game.talents.comingSoonTitle')}</b>` +
+        `<span>${t('game.talents.comingSoonBody')}</span></div>`;
+      return;
+    }
     const wrap = document.createElement('div');
     wrap.className = 'tal-rows';
     const soon = t('hudChrome.talentRows.comingSoon');

@@ -149,6 +149,53 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
 }
 
 describe('self stat wire round-trip', () => {
+  it('mirrors Paladin Devotion and Ascension state from the authoritative server', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Oathkeeper', 'paladin');
+    const player = (server as any).sim.entities.get(session.pid);
+    player.paladinDevotion.value = 7;
+    player.paladinDevotion.ascensionCharges = 3;
+    player.paladinDevotion.ascensionRemaining = 18.25;
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.pdev).toEqual({ value: 7, charges: 3, remaining: 18.25 });
+
+    const client = bareClient(session.pid, 'paladin');
+    (client as any).applySnapshot(snap);
+    expect(client.player.paladinDevotion).toMatchObject({
+      value: 7,
+      ascensionCharges: 3,
+      ascensionRemaining: 18.25,
+    });
+  });
+
+  it('mirrors compact Ascension charges for a remote Paladin visual', () => {
+    const sim = new Sim({ seed: 27, playerClass: 'paladin', autoEquip: true });
+    sim.player.paladinDevotion!.ascensionCharges = 4;
+    sim.player.paladinDevotion!.ascensionRemaining = 20;
+
+    const wire = wireEntity(sim.player);
+    expect(wire.pasc).toBe(4);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion).toMatchObject({
+      ascensionCharges: 4,
+      ascensionRemaining: 1,
+    });
+
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...wire, pasc: 0 }],
+    });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion).toMatchObject({
+      ascensionCharges: 0,
+      ascensionRemaining: 0,
+    });
+  });
+
   it('mirrors crit/haste rating from the self snapshot onto the paper-doll entity', () => {
     const client = bareClient(1);
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
@@ -4524,6 +4571,47 @@ describe('negotiated stable timer wire v2', () => {
     expect(second.self.auras[0].rem).toBeLessThan(10);
     expect(second.self.cds.legacy_cast).toBeLessThan(5);
     expect(second.self.ncd.legacy_node).toBeLessThan(30);
+  });
+
+  it('round-trips permanent auras through legacy and stable server snapshots', () => {
+    for (const stable of [false, true]) {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const session = joinServer(
+        server,
+        fc,
+        stable ? 21 : 20,
+        stable ? 'StablePermanent' : 'LegacyPermanent',
+        'paladin',
+        stable ? timerV2 : undefined,
+      );
+      const player = server.sim.entities.get(session.pid)!;
+      const permanent = testAura('devotion_ward', Number.POSITIVE_INFINITY, 0.05);
+      permanent.kind = 'buff_dr';
+      permanent.school = 'holy';
+      permanent.permanent = true;
+      player.auras = [permanent];
+
+      broadcast(server);
+      const snapshot = lastSnap(fc.sent);
+      expect(snapshot.self.auras[0]).toMatchObject({
+        id: 'devotion_ward',
+        dur: 0,
+        perm: 1,
+      });
+      expect(snapshot.self.auras[0]).not.toHaveProperty('exp');
+      if (stable) expect(snapshot.self.auras[0]).not.toHaveProperty('rem');
+      else expect(snapshot.self.auras[0].rem).toBe(0);
+
+      const client = bareClient(session.pid, 'paladin');
+      (client as any).applySnapshot(snapshot);
+      expect(client.player.auras[0]).toMatchObject({
+        id: 'devotion_ward',
+        permanent: true,
+        remaining: Number.POSITIVE_INFINITY,
+        duration: Number.POSITIVE_INFINITY,
+      });
+    }
   });
 
   it('sends a complete stable first snapshot, then ages omitted timers across skipped ticks', () => {

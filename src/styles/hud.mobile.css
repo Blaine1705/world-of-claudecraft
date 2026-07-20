@@ -874,6 +874,45 @@
       inset 0 0 0 1px #fff0a6aa;
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
   }
+  body.mobile-touch #mobile-action-ring button.ascension-spender::after {
+    content: attr(data-ascension-cost);
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    z-index: 7;
+    min-width: 16px;
+    height: 14px;
+    padding: 0 2px;
+    border: 1px solid var(--color-ascension);
+    border-radius: 7px;
+    background: var(--color-bg-dark);
+    color: var(--color-ascension);
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 12px;
+    text-align: center;
+    text-shadow: 0 1px var(--text-outline-color);
+    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--color-primary-glow-heavy);
+  }
+  body.mobile-touch:has(.paladin-devotion.last-charge) #mobile-action-ring button.empowered {
+    animation-duration: 0.55s;
+    filter: brightness(1.18);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-action-ring button.empowered {
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch #mobile-action-ring button.ascension-spender::after {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Canvas;
+      color: Highlight;
+      box-shadow: none;
+    }
+  }
   body.mobile-touch #mobile-action-ring button.used {
     border-color: var(--gold);
   }
@@ -1695,6 +1734,20 @@
   }
   body.mobile-touch #player-frame .portrait-wrap {
     z-index: 3;
+  }
+  /* XP owns the portrait's outer circumference on mobile. Devotion moves
+     inside the portrait so both progress cues stay readable at once. */
+  body.mobile-touch #player-frame .paladin-devotion {
+    inset: 1px;
+  }
+  body.mobile-touch #player-frame .paladin-ascension-charges {
+    top: 2px;
+    left: 5px;
+    width: 34px;
+  }
+  body.mobile-touch #player-frame .paladin-ascension-charges span {
+    width: 6px;
+    height: 6px;
   }
   body.mobile-touch #player-frame .uf-bars {
     position: relative;

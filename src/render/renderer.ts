@@ -144,6 +144,19 @@ import {
   nameplateScreenTransform,
 } from './nameplate_projection';
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
+import {
+  PALADIN_AEGIS_DOME_RADIUS,
+  type PaladinAegisVisual,
+  syncPaladinAegisVisual,
+} from './paladin_aegis_visual';
+import {
+  type PaladinAscensionVisualPlan,
+  paladinAscensionVisualPlanInto,
+} from './paladin_ascension_core';
+import {
+  type PaladinAscensionVisual,
+  syncPaladinAscensionVisual,
+} from './paladin_ascension_visual';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import {
@@ -625,6 +638,8 @@ export interface EntityView {
   temporalHourglassVisual: TemporalHourglassVisual | null;
   frostNovaRootVisual: FrostNovaRootVisual | null; // Atadura de Hielo restraint at the feet
   mageBarrierVisual: MageBarrierVisual | null; // personal mage absorb shell, built lazily
+  paladinAscensionVisual: PaladinAscensionVisual | null;
+  paladinAegisVisual: PaladinAegisVisual | null;
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
@@ -1115,6 +1130,11 @@ export class Renderer {
   private readonly mageBarrierStateScratch: MageBarrierState = {
     theme: 'frost',
     value: 0,
+  };
+  private readonly paladinAscensionPlanScratch: PaladinAscensionVisualPlan = {
+    active: false,
+    charges: 0,
+    lastCharge: false,
   };
   private glacialFrontVisual!: GlacialFrontVisual;
   private fishingBobbers!: FishingBobberVisual;
@@ -3482,6 +3502,14 @@ export class Renderer {
         } else if (ev.fx === 'detonate') {
           this.vfx.detonate(ev.targetId, ev.school);
           this.pulseAt(ev.targetId, ev.school, 9, 0.5);
+        } else if (ev.fx === 'paladinAscensionStart') {
+          this.vfx.paladinAscensionStart(ev.sourceId);
+          this.pulseAt(ev.sourceId, 'holy', 13, 0.75);
+          const view = this.views.get(ev.sourceId);
+          if (view) this.activeVisual(view)?.playEmote('salute', 1);
+        } else if (ev.fx === 'paladinAscensionImpact') {
+          this.vfx.paladinAscensionImpact(ev.sourceId, ev.targetId, ev.impact);
+          this.pulseAt(ev.impact === 'area' ? ev.sourceId : ev.targetId, 'holy', 10, 0.5);
         } else if (ev.fx === 'temporalGlyph') {
           // Chronomancy Temporal Echo apply: a brief temporal glyph blooms
           // directly OVER the marked ally (target-anchored, no projectile ever
@@ -4270,6 +4298,8 @@ export class Renderer {
       temporalHourglassVisual: null,
       frostNovaRootVisual: null,
       mageBarrierVisual: null,
+      paladinAscensionVisual: null,
+      paladinAegisVisual: null,
       height,
       clickTarget,
       nameplate: np,
@@ -4843,6 +4873,8 @@ export class Renderer {
     v.temporalHourglassVisual?.dispose();
     v.frostNovaRootVisual?.dispose();
     v.mageBarrierVisual?.dispose();
+    v.paladinAscensionVisual?.dispose();
+    v.paladinAegisVisual?.dispose();
     this.views.delete(id);
   }
 
@@ -5236,6 +5268,7 @@ export class Renderer {
         continue;
       }
       if (!v.visual) continue;
+      const ascensionPlan = paladinAscensionVisualPlanInto(e, this.paladinAscensionPlanScratch);
       v.iceBlockVisual = syncIceBlockVisual(v.iceBlockVisual, v.group, v.height, hasIceBlock, dt);
       v.temporalHourglassVisual = syncTemporalHourglassVisual(
         v.temporalHourglassVisual,
@@ -5258,6 +5291,23 @@ export class Renderer {
         mageBarrierState,
         dt,
       );
+      v.paladinAscensionVisual = syncPaladinAscensionVisual(
+        v.paladinAscensionVisual,
+        v.group,
+        v.height,
+        ascensionPlan,
+        dt,
+        this.reducedMotion(),
+      );
+      const paladinAegisActive = e.castingAbility === 'aegis_first_dawn' && e.channeling && !e.dead;
+      v.paladinAegisVisual = syncPaladinAegisVisual(
+        v.paladinAegisVisual,
+        v.group,
+        paladinAegisActive,
+        dt,
+        this.reducedMotion(),
+        e.scale,
+      );
       const iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
 
       this.updateBaseVisual(e, v);
@@ -5270,7 +5320,10 @@ export class Renderer {
       let charOnScreen = true;
       if (this.cullCharacters && id !== p.id) {
         this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
-        this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
+        const characterRadius = (v.height * 0.7 + 1.5) * e.scale;
+        this.cullSphere.radius = paladinAegisActive
+          ? Math.max(characterRadius, PALADIN_AEGIS_DOME_RADIUS + 1)
+          : characterRadius;
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
 
@@ -5386,6 +5439,7 @@ export class Renderer {
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
       active.setMetamorph(hasMetamorph);
+      active.setAscended(ascensionPlan.active);
       v.visual.root.visible = active === v.visual && !fireballForm;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && !fireballForm);

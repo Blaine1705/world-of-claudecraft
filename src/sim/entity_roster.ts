@@ -21,6 +21,8 @@
 // (enforced by tests/architecture.test.ts).
 
 import { tickHunterTrap } from './combat/hunter_trap';
+import { cleanupPaladinAegis } from './combat/paladin_aegis';
+import { stripPaladinDevotionsFromSource } from './combat/paladin_support';
 import { tickRingOfFrost } from './combat/ring_of_frost';
 import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
 import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
@@ -129,6 +131,8 @@ export function dropEntityFromRoster(ctx: SimContext, id: number): void {
   ctx.clearEntityMarker(id); // a despawned entity keeps no raid marker
   const e = ctx.entities.get(id);
   if (!e) return;
+  cleanupPaladinAegis(ctx, id);
+  stripPaladinDevotionsFromSource(ctx, id);
   // A despawned mob keeps no per-attempt Book of Deeds state: freeInstance,
   // freeDelveRun, and spawnDelveModule drop boss mobs without a kill, so a leaked
   // encounter/taint entry (entity ids are monotonic and never reused) would linger

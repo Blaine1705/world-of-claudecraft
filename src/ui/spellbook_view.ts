@@ -125,7 +125,9 @@ export function buildSpellbookView(input: SpellbookInput): SpellbookView {
   // An already-learned ability always keeps its row (it exists regardless of the
   // gate); only never-learnable trainable rows are dropped.
   const learnable = input.abilities.filter(
-    (id) => knownIds.has(id) || specCanLearn(id, input.spec, input.level),
+    (id) =>
+      ABILITIES[id]?.hiddenFromPlayer !== true &&
+      (knownIds.has(id) || specCanLearn(id, input.spec, input.level)),
   );
   const rows: SpellbookRow[] = learnable.map((abilityId) => {
     const known = input.known.find((k) => k.def.id === abilityId) ?? null;

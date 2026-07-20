@@ -713,6 +713,65 @@ const localeText: Record<SupportedLanguage, TalentLocaleText> = {
   fr_CA: localeTextByBase.fr_FR,
 };
 
+const CORE_TITLE_OVERRIDES: Partial<Record<SupportedLanguage, Record<string, string>>> = {
+  es: { Sunmender: 'Sanador solar', Faithwarden: 'Guardián de fe', Dawnreaver: 'Segador del alba' },
+  es_ES: {
+    Sunmender: 'Sanador solar',
+    Faithwarden: 'Guardián de fe',
+    Dawnreaver: 'Segador del alba',
+  },
+  fr_FR: {
+    Sunmender: 'Soigneur solaire',
+    Faithwarden: 'Gardien de la foi',
+    Dawnreaver: "Faucheur de l'aube",
+  },
+  fr_CA: {
+    Sunmender: 'Soigneur solaire',
+    Faithwarden: 'Gardien de la foi',
+    Dawnreaver: "Faucheur de l'aube",
+  },
+  it_IT: {
+    Sunmender: 'Curatore solare',
+    Faithwarden: 'Custode della fede',
+    Dawnreaver: "Mietitore dell'alba",
+  },
+  de_DE: {
+    Sunmender: 'Sonnenheiler',
+    Faithwarden: 'Glaubenswächter',
+    Dawnreaver: 'Dämmerungsreaver',
+  },
+  zh_CN: { Sunmender: '日愈者', Faithwarden: '信仰守卫', Dawnreaver: '破晓者' },
+  zh_TW: { Sunmender: '日癒者', Faithwarden: '信仰守衛', Dawnreaver: '破曉者' },
+  ko_KR: { Sunmender: '태양치유사', Faithwarden: '신앙수호자', Dawnreaver: '여명약탈자' },
+  ja_JP: { Sunmender: '陽癒し', Faithwarden: '信仰の守護者', Dawnreaver: '暁の刈り手' },
+  pt_BR: {
+    Sunmender: 'Curador solar',
+    Faithwarden: 'Guardião da fé',
+    Dawnreaver: 'Ceifador da alvorada',
+  },
+  ru_RU: { Sunmender: 'Солнцелекарь', Faithwarden: 'Страж веры', Dawnreaver: 'Жнец рассвета' },
+  cs_CZ: { Sunmender: 'Sluneční léčitel', Faithwarden: 'Strážce víry', Dawnreaver: 'Žnec úsvitu' },
+  nl_NL: { Sunmender: 'Zonnegenezer', Faithwarden: 'Geloofswachter', Dawnreaver: 'Dageraadmaaier' },
+  pl_PL: {
+    Sunmender: 'Słoneczny uzdrowiciel',
+    Faithwarden: 'Strażnik wiary',
+    Dawnreaver: 'Żniwiarz świtu',
+  },
+  id_ID: { Sunmender: 'Penyembuh surya', Faithwarden: 'Penjaga iman', Dawnreaver: 'Penuai fajar' },
+  tr_TR: {
+    Sunmender: 'Güneş şifacısı',
+    Faithwarden: 'İnanç muhafızı',
+    Dawnreaver: 'Şafak biçicisi',
+  },
+  sv_SE: { Sunmender: 'Solläkare', Faithwarden: 'Trosväktare', Dawnreaver: 'Gryningsskördare' },
+  vi_VN: {
+    Sunmender: 'Thầy thuốc mặt trời',
+    Faithwarden: 'Hộ vệ đức tin',
+    Dawnreaver: 'Kẻ gặt bình minh',
+  },
+  da_DK: { Sunmender: 'Solhelbreder', Faithwarden: 'Trosvogter', Dawnreaver: 'Daggryshøster' },
+};
+
 // Single authoritative table of per-name talent-title translations using official
 // classic-MMO terminology. translateTitle() consults this after ability-name
 // resolution. To add a talent or locale, add its localized name here for each
@@ -8935,6 +8994,8 @@ function translateTitle(source: string, lang: SupportedLanguage): string {
   }
   const retained = RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source];
   if (retained !== undefined) return retained;
+  const core = CORE_TITLE_OVERRIDES[lang]?.[source];
+  if (core !== undefined) return core;
   const override = titleOverrides[lang]?.[source];
   if (override !== undefined) return override;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
@@ -9259,6 +9320,7 @@ function addedEffectDescription(
 export function hasTalentTitleOverride(lang: SupportedLanguage, source: string): boolean {
   return (
     RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source] !== undefined ||
+    CORE_TITLE_OVERRIDES[lang]?.[source] !== undefined ||
     grantAbilityIdByTitle.has(source) ||
     titleOverrides[lang]?.[source] !== undefined
   );

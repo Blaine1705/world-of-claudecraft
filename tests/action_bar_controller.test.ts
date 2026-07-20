@@ -73,6 +73,18 @@ describe('ActionBarController form persistence', () => {
     expect(ACTION_BAR_ABILITY_SLOTS).toBe(33);
   });
 
+  it('keeps Paladin aura choices on the stance-style row instead of auto-placing them', () => {
+    const { controller } = makeHarness(
+      'paladin',
+      ['devotion_ward', 'retribution_aura', 'solar_step'],
+      bar(),
+    );
+
+    controller.syncKnownAbilities();
+
+    expect(controller.actions).toEqual(bar('solar_step'));
+  });
+
   it('extends a saved two-row bar with an empty third row without losing bindings', () => {
     const storage = new MemoryStorage();
     const legacy = Array.from(

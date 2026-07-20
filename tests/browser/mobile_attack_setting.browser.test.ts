@@ -44,6 +44,8 @@ function slot(kind: ActionBarSlotState['kind']): ActionBarSlotState {
     queued: false,
     procGlow: false,
     empowered: false,
+    ascensionSpender: false,
+    ascensionCostLabel: '',
     ariaLabel: kind,
     keybindLabel: '',
   };

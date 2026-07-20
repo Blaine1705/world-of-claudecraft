@@ -90,6 +90,7 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
 
   it('paladin consecration: the groundAoE case pushes a ground effect and fires the on-cast pulse', () => {
     const { sim, p, meta } = makeSim('paladin', 20);
+    expect(sim.setSpec('protection')).toBe(true);
     const mob = spawnTarget(sim, p, 8, 2); // within the 8yd consecration radius
     const before = sim.ctx.groundAoEs.length;
     mob.aiState = 'chase';

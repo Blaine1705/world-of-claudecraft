@@ -121,6 +121,7 @@ const MOONKIN_TINT = new THREE.Color(0x9d6bff);
 // (the fire aura around it comes from vfx.formAura, not the material). Kept
 // dark enough that the body still shades and the flames read against it.
 const METAMORPH_TINT = new THREE.Color(0x4f2170);
+const ASCENSION_TINT = new THREE.Color(0xffe49a);
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -201,6 +202,7 @@ export class CharacterVisual {
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
   private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
+  private ascensionMaterials = new Map<THREE.Material, THREE.Material>();
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
@@ -222,6 +224,7 @@ export class CharacterVisual {
   private shadowform = false;
   private moonkin = false;
   private metamorph = false;
+  private ascended = false;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -635,6 +638,12 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  setAscended(on: boolean): void {
+    if (on === this.ascended) return;
+    this.ascended = on;
+    this.applyVisualMaterials();
+  }
+
   private applyVisualMaterials(): void {
     for (const [mesh, original] of this.originalMaterials) {
       mesh.material = this.effectMaterial(original);
@@ -984,10 +993,18 @@ export class CharacterVisual {
     const materials = new Set<THREE.Material>([
       ...this.ghostMaterials.values(),
       ...this.soulRendMaterials.values(),
+      ...this.shadowformMaterials.values(),
+      ...this.moonkinMaterials.values(),
+      ...this.metamorphMaterials.values(),
+      ...this.ascensionMaterials.values(),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
     this.soulRendMaterials.clear();
+    this.shadowformMaterials.clear();
+    this.moonkinMaterials.clear();
+    this.metamorphMaterials.clear();
+    this.ascensionMaterials.clear();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -1105,6 +1122,7 @@ export class CharacterVisual {
     if (this.metamorph) return this.metamorphMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
+    if (this.ascended) return this.ascensionMaterial(material);
     return material;
   }
 
@@ -1200,6 +1218,24 @@ export class CharacterVisual {
       withColor.emissiveIntensity = 0.35;
     }
     this.metamorphMaterials.set(material, marked);
+    return marked;
+  }
+
+  private ascensionMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.ascensionMaterials.get(material);
+    if (cached) return cached;
+    const marked = material.clone();
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) withColor.color.lerp(ASCENSION_TINT, 0.38);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(0x9d690e);
+      withColor.emissiveIntensity = 0.48;
+    }
+    this.ascensionMaterials.set(material, marked);
     return marked;
   }
 

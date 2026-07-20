@@ -1058,6 +1058,124 @@
     box-shadow: 0 0 calc(5px * var(--fx-shadow, 1)) #ff5533aa;
     border-color: #ffad99;
   }
+  .paladin-devotion {
+    --devotion-fill: 0%;
+    position: absolute;
+    inset: -5px;
+    z-index: 2;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .paladin-devotion-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      from -90deg,
+      var(--color-ascension) 0 var(--devotion-fill),
+      var(--color-bg-dark) var(--devotion-fill) 100%
+    );
+    -webkit-mask: radial-gradient(circle, transparent 60%, #000 62% 72%, transparent 74%);
+    mask: radial-gradient(circle, transparent 60%, #000 62% 72%, transparent 74%);
+    filter: drop-shadow(0 0 calc(3px * var(--fx-shadow, 1)) var(--color-primary-glow-heavy));
+  }
+  .paladin-devotion-label {
+    position: absolute;
+    bottom: -5px;
+    right: -3px;
+    z-index: 4;
+    min-width: 38px;
+    padding: 1px 4px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    background: var(--color-bg-dark);
+    text-align: center;
+    color: var(--color-text-overlay);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 11px;
+    text-shadow: 0 1px var(--text-outline-color);
+  }
+  .paladin-devotion.ready {
+    animation: devotion-ready-pulse 1.2s ease-in-out infinite;
+  }
+  .paladin-devotion.ascended .paladin-devotion-fill {
+    filter: drop-shadow(0 0 calc(7px * var(--fx-shadow, 1)) var(--color-ascension));
+  }
+  .paladin-ascension-charges {
+    position: absolute;
+    top: -8px;
+    left: 2px;
+    z-index: 5;
+    display: none;
+    width: 44px;
+    height: 10px;
+    gap: 1px;
+  }
+  .paladin-devotion.ascended .paladin-ascension-charges {
+    display: flex;
+  }
+  .paladin-ascension-charges span {
+    position: relative;
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    transform: rotate(45deg);
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-dark);
+  }
+  .paladin-ascension-charges span.on {
+    border-color: var(--color-text-light);
+    background: var(--color-ascension);
+    box-shadow: 0 0 calc(7px * var(--fx-shadow, 1)) var(--color-ascension);
+  }
+  .paladin-devotion.last-charge .paladin-ascension-charges span.on,
+  .paladin-devotion.last-charge .paladin-devotion-label {
+    animation: devotion-last-charge 0.7s ease-in-out infinite;
+  }
+  @keyframes devotion-ready-pulse {
+    50% {
+      filter: brightness(1.45);
+    }
+  }
+  @keyframes devotion-last-charge {
+    50% {
+      border-color: var(--color-ascension);
+      box-shadow: 0 0 calc(12px * var(--fx-shadow, 1)) var(--color-ascension);
+      filter: brightness(1.5);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .paladin-devotion.ready,
+    .paladin-devotion.last-charge .paladin-ascension-charges span.on,
+    .paladin-devotion.last-charge .paladin-devotion-label {
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .paladin-devotion-fill {
+      forced-color-adjust: none;
+      background: conic-gradient(
+        from -90deg,
+        Highlight 0 var(--devotion-fill),
+        Canvas var(--devotion-fill) 100%
+      );
+    }
+    .paladin-ascension-charges span {
+      forced-color-adjust: none;
+      border: 1px solid CanvasText;
+      background: Canvas;
+      box-shadow: none;
+    }
+    .paladin-ascension-charges span.on {
+      border: 3px double CanvasText;
+      outline: 1px solid Highlight;
+      background: Highlight;
+    }
+  }
 
   /* ---------- buff bar ---------- */
   #buff-bar {
@@ -1520,8 +1638,8 @@
     font-weight: bold;
     pointer-events: none;
   }
-  /* Warrior stance bar: a small in-flow row of stance toggles above the action
-     bars, only for warriors (JS flips display to flex; hidden by default). */
+  /* Stance-style choice bar: warrior stances and paladin auras share this exact
+     in-flow row above the action bars (JS flips it to flex when applicable). */
   #stancebar {
     display: none;
     margin: 2px 0 0 0;
@@ -1757,6 +1875,40 @@
       inset 0 0 0 1px #fff0a6aa,
       inset 0 1px 0 #ffffff28;
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
+  }
+  .action-btn.ascension-spender::after {
+    content: attr(data-ascension-cost);
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    z-index: 7;
+    min-width: 14px;
+    height: 12px;
+    padding: 0 2px;
+    border: 1px solid var(--color-ascension);
+    border-radius: 6px;
+    background: var(--color-bg-dark);
+    color: var(--color-ascension);
+    font-family: var(--ui-font);
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 10px;
+    text-align: center;
+    text-shadow: 0 1px var(--text-outline-color);
+    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--color-primary-glow-heavy);
+  }
+  @media (forced-colors: active) {
+    button.ascension-spender::after {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Canvas;
+      color: Highlight;
+      box-shadow: none;
+    }
+  }
+  body:has(.paladin-devotion.last-charge) .action-btn.empowered {
+    animation-duration: 0.55s;
+    filter: brightness(1.18);
   }
   @keyframes action-empowered-pulse {
     0%,

@@ -36,6 +36,23 @@ describe('jsonWithField', () => {
 });
 
 describe('StableAuraWireCache', () => {
+  it('encodes permanent auras without non-finite JSON timer values', () => {
+    const cache = new StableAuraWireCache();
+    const permanent = aura('permanent', Number.POSITIVE_INFINITY);
+    permanent.duration = Number.POSITIVE_INFINITY;
+    permanent.permanent = true;
+
+    const first = cache.encode([permanent], 4, false);
+    expect(JSON.parse(first.json)).toEqual([
+      expect.objectContaining({ id: 'permanent', dur: 0, perm: 1 }),
+    ]);
+    expect(JSON.parse(first.json)[0]).not.toHaveProperty('exp');
+    expect(JSON.parse(first.json)[0]).not.toHaveProperty('rem');
+
+    expect(cache.encode([permanent], 400, false)).toBe(first);
+    expect(cache.rebuilds).toBe(1);
+  });
+
   it('does not rebuild while live remaining time and sim time advance together', () => {
     const cache = new StableAuraWireCache();
     const active = aura('long_buff', 10);

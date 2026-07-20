@@ -67,9 +67,14 @@ export function buildTalentsView(
   const tree = rowTreeFor(cls);
   if (!talents || !tree) return { ...EMPTY_VIEW };
 
+  // The Paladin keeps its release-era rows in the simulation registry only so
+  // old saves remain readable while this branch builds the replacement class.
+  // Do not expose those incompatible choices as part of the new foundation.
+  const visibleTree = cls === 'paladin' ? [] : tree;
+
   let pickedCount = 0;
   let unlockedCount = 0;
-  const rows = tree.map((row): TalentRowVM => {
+  const rows = visibleTree.map((row): TalentRowVM => {
     const unlocked = playerLevel >= row.level;
     if (unlocked) unlockedCount++;
     const selectedId = unlocked ? allocation.rows[row.level] : undefined;
@@ -93,7 +98,7 @@ export function buildTalentsView(
   });
 
   return {
-    hasRows: true,
+    hasRows: rows.length > 0,
     specs: talents.specs.map((spec) => {
       const selected = allocation.spec === spec.id;
       return { spec, selected, action: selected ? 'navigate' : 'commit' };

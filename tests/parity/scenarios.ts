@@ -760,6 +760,7 @@ function paladinConsecration(): Scenario {
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(20); // consecration learnLevel 18
+      sim.setSpec('protection');
       const p = sim.player as AnyEntity;
       beef(p);
       const mob = spawnMob(sim, 'forest_wolf', 5, p.pos.x, p.pos.y, p.pos.z + 3);
@@ -3073,6 +3074,7 @@ function c3AuraRunner(): Scenario {
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(20); // consecration learnLevel 18
+      sim.setSpec('protection');
       const p = sim.player as AnyEntity;
       beef(p);
 
@@ -3559,6 +3561,7 @@ function c4bEffectDispatch(): Scenario {
       // Armor Shear is an authored Protection ability in the winning Warrior
       // kit; make the scenario's intended dispatch arm reachable explicitly.
       sim.setSpec('prot', warrior);
+      sim.setSpec('protection', paladin);
       for (const [x, e] of cells) {
         teleport(sim, e, x, -45);
         beef(e, 50000);

@@ -196,7 +196,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   tickProcState(e, DT);
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
-    a.remaining -= DT;
+    if (!a.permanent) a.remaining -= DT;
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
     if (a.kind === 'thorns') tickThornsCooldown(a);
@@ -270,13 +270,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             const src = ctx.entities.get(a.sourceId);
             if (src) ctx.healingThreat(src, e, healed);
           }
+        } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
+          e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));
         } else if (a.kind === 'polymorph') {
           const heal = Math.round(e.maxHp * 0.1);
           e.hp = Math.min(e.maxHp, e.hp + heal);
         }
       }
     }
-    if (a.remaining <= CAST_COMPLETE_EPS) {
+    if (!a.permanent && a.remaining <= CAST_COMPLETE_EPS) {
       e.auras.splice(i, 1);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });

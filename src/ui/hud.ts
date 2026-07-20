@@ -403,6 +403,8 @@ import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
 import { PartyBelowTargetPainter } from './party_below_target_painter';
+import { PaladinDevotionPainter } from './paladin_devotion_painter';
+import { createPaladinDevotionView } from './paladin_devotion_view';
 import { loadPartyCollapsed, savePartyCollapsed } from './party_collapse';
 import type { PartyRowAuraDeps } from './party_frame_row';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
@@ -452,7 +454,11 @@ import { localizeServerText } from './server_i18n';
 import { localizeSimAuraName, localizeSimText } from './sim_i18n';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
-import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
+import {
+  activeStanceBarAbilityId,
+  isStanceBarAbilityGroup,
+  stanceBarView,
+} from './stance_bar_view';
 import {
   type BuffStatSource,
   buildStatTooltip,
@@ -1178,6 +1184,11 @@ export class Hud {
   // closure reads it from here).
   private targetPortraitSubject: Entity | null = null;
   private comboRowEl = $('#combo-row');
+  private paladinDevotionEl = $('#paladin-devotion');
+  private paladinDevotionFillEl = $('#paladin-devotion-fill');
+  private paladinDevotionLabelEl = $('#paladin-devotion-label');
+  private paladinAscensionCharges = $<HTMLElement>('.paladin-ascension-charges').children;
+  private paladinAscensionStatusEl = $('#paladin-ascension-status');
   private castbarEl = $('#castbar');
   private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
   private castbarLabelEl = this.castbarEl.querySelector('.label') as HTMLElement;
@@ -3203,6 +3214,24 @@ export class Hud {
     () => {
       this.hotDomSkippedWrites++;
     },
+  );
+  private readonly paladinDevotionView = createPaladinDevotionView(
+    (value) => formatNumber(value, { maximumFractionDigits: 0 }),
+    (value, max, charges, lastCharge) =>
+      lastCharge
+        ? t('hudChrome.paladin.devotionAscensionLast', { value, max })
+        : charges !== '0'
+          ? t('hudChrome.paladin.devotionAscensionCharges', { value, max, charges })
+          : t('hudChrome.paladin.devotionValue', { value, max }),
+    t('hudChrome.paladin.ascensionLastAnnouncement'),
+  );
+  private readonly paladinDevotionPainter = new PaladinDevotionPainter(
+    this.writerFacet,
+    this.paladinDevotionEl,
+    this.paladinDevotionFillEl,
+    this.paladinDevotionLabelEl,
+    this.paladinAscensionCharges,
+    this.paladinAscensionStatusEl,
   );
   private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
@@ -6523,21 +6552,19 @@ export class Hud {
     return null;
   }
 
-  // The warrior stance bar: a small row of stance toggles stacked above the
-  // action bars, shown only for warriors and only for the stances valid for the
-  // current spec (Battle + Guarded for Arms/Prot, Berserker for Fury, Battle only
-  // for no spec). Rebuilds only when the known-stance set or the active stance
-  // changes (sig elision, like the pet bar).
+  // The stance-style choice bar: one shared row above the action bars for
+  // warrior stances and paladin auras. Rebuilds only when the known choice set
+  // or active choice changes (sig elision, like the pet bar).
   private renderStanceBar(): void {
     const bar = $('#stancebar') as HTMLElement;
-    const isWarrior = this.sim.cfg.playerClass === 'warrior';
-    const knownStances = isWarrior
-      ? this.sim.known.filter((k) => k.def.exclusiveGroup === WARRIOR_STANCE_GROUP)
+    const playerClass = this.sim.cfg.playerClass;
+    const usesChoiceBar = playerClass === 'warrior' || playerClass === 'paladin';
+    const knownStances = usesChoiceBar
+      ? this.sim.known.filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
       : [];
     const knownIds = knownStances.map((k) => k.def.id);
-    const knownSet = new Set(knownIds);
-    const activeAura = this.sim.player.auras.find((a) => knownSet.has(a.id));
-    const model = stanceBarView(isWarrior, knownIds, activeAura ? activeAura.id : null);
+    const activeId = activeStanceBarAbilityId(knownIds, this.sim.player.auras, this.sim.player.id);
+    const model = stanceBarView(playerClass, knownIds, activeId);
     if (!model.visible) {
       bar.style.display = 'none';
       if (this.lastStanceBarSig !== '') {
@@ -7165,6 +7192,7 @@ export class Hud {
     } else {
       this.setDisplay(this.comboRowEl, 'none');
     }
+    this.paladinDevotionPainter.paint(this.paladinDevotionView.tick(p));
 
     // buff bar / debuff bar: the keyed-pool aura painter, driven by the auras_view core
     // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to
@@ -7434,7 +7462,11 @@ export class Hud {
     // client (see src/net/online.ts, server/game.ts). The auras ARE mirrored, so
     // this stays correct on both hosts. Shared by every action-bar-family view
     // below (desktop bar, mobile ring, consumables quick bar).
-    const abPlayer = { ...p, stealthed: playerStealthed(p.auras) };
+    const abPlayer = {
+      ...p,
+      stealthed: playerStealthed(p.auras),
+      paladinSpec: sim.talentSpec,
+    };
     this.renderPetBar();
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();

@@ -768,6 +768,7 @@ export interface AdminLiveAura {
   value: number;
   remaining: number;
   duration: number;
+  permanent?: boolean;
 }
 
 export interface AdminLiveLocation {
@@ -816,6 +817,7 @@ interface WireAura {
   kind: string;
   rem: number;
   dur: number;
+  perm?: 1;
   // The aura's magnitude, so buff/debuff hover tooltips show the REAL numbers online, exactly
   // as offline (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount,
   // slow/haste multiplier, dot/hot per-tick, absorb remaining, ...). Sent RAW (like `dur`, not
@@ -954,13 +956,15 @@ function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
 // measurable source of short-lived garbage. Output is byte-identical to the
 // prior spread chain; only the allocation shape changed.
 function wireAura(a: Aura): WireAura {
+  const permanent = a.permanent === true;
   const w: WireAura = {
     id: a.id,
     name: a.name,
     kind: a.kind,
-    rem: round2(a.remaining),
-    dur: a.duration,
+    rem: permanent ? 0 : round2(a.remaining),
+    dur: permanent ? 0 : a.duration,
   };
+  if (permanent) w.perm = 1;
   // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
   // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
   // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
@@ -1046,6 +1050,12 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     if (e.petAutoWaterJet) out.pw = 1;
   }
   if (e.rangedPower) out.rp = e.rangedPower;
+  // Remote Paladins need the compact active-charge count so every client can
+  // render Ascension's orbiting seals. Self snapshots additionally carry pdev
+  // with the exact Devotion value and remaining duration for the local HUD.
+  if (e.kind === 'player' && e.templateId === 'paladin') {
+    out.pasc = e.paladinDevotion?.ascensionCharges ?? 0;
+  }
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
   if (includeAuras && e.auras.length > 0) {
@@ -3621,8 +3631,9 @@ export class GameServer {
           name: a.name,
           kind: a.kind,
           value: a.value,
-          remaining: round2(a.remaining),
-          duration: a.duration,
+          remaining: a.permanent ? 0 : round2(a.remaining),
+          duration: a.permanent ? 0 : a.duration,
+          permanent: a.permanent,
         })),
       });
     }
@@ -5521,6 +5532,13 @@ export class GameServer {
       pcd: round2(p.potionCdRemaining),
       swing: round2(p.swingTimer),
       combo: p.comboPoints,
+      pdev: p.paladinDevotion
+        ? {
+            value: p.paladinDevotion.value,
+            charges: p.paladinDevotion.ascensionCharges,
+            remaining: round2(p.paladinDevotion.ascensionRemaining),
+          }
+        : null,
       target: p.targetId,
       auto: p.autoAttack,
       queued: p.queuedOnSwing,

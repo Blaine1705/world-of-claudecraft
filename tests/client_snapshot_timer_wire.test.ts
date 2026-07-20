@@ -130,6 +130,32 @@ describe('stable snapshot timer protocol', () => {
     expect(client.player.cooldowns.get('cast')).toBe(9);
   });
 
+  it('decodes permanent auras without countdown churn in stable and legacy snapshots', () => {
+    for (const stable of [false, true]) {
+      const client = bareClient(stable ? 11 : 12);
+      const pid = client.playerId;
+      apply(client, {
+        ...(stable ? { tw: 2 } : {}),
+        time: 10,
+        self: playerWire(pid, {
+          auras: [{ ...aura('permanent', {}), dur: 0, perm: 1 }],
+        }),
+      });
+
+      expect(client.player.auras[0]).toMatchObject({
+        id: 'permanent',
+        permanent: true,
+        remaining: Number.POSITIVE_INFINITY,
+        duration: Number.POSITIVE_INFINITY,
+      });
+
+      if (stable) {
+        apply(client, { tw: 2, time: 100, self: playerWire(pid) });
+        expect(client.player.auras[0].remaining).toBe(Number.POSITIVE_INFINITY);
+      }
+    }
+  });
+
   it('ages omitted v2 timers and preserves auras on moving lite records', () => {
     const client = bareClient(1);
     apply(client, {

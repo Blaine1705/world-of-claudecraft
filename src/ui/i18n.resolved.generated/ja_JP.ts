@@ -733,6 +733,14 @@ export const ja_JP: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "paladin": {
+      "devotion": "信仰",
+      "devotionValue": "信仰 {value}/{max}",
+      "devotionAscensionCharges": "信仰 {value}/{max}。昇華チャージ残り {charges}。",
+      "devotionAscensionLast": "信仰 {value}/{max}。昇華の最終チャージ。",
+      "ascensionLastAnnouncement": "昇華の最終チャージ",
+      "ascensionSpenderAria": "アクションスロット {slot}: {ability}。昇華チャージを1消費します。"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -7025,6 +7033,122 @@ export const ja_JP: EnTranslations = {
         "name": "癒しの光",
         "description": "味方対象の体力を {damage} 回復します。"
       },
+      "divine_ascension": {
+        "name": "聖なる昇華",
+        "description": "信仰を20消費し、最大25秒間持続する昇華の力を5回分得る。指定された能力は力を1回分消費し、追加効果を得る。"
+      },
+      "devotion_ward": {
+        "name": "献身のオーラ",
+        "description": "自身とパーティメンバーが受けるダメージを5%軽減する。死亡するか別の献身に切り替えるまで持続する。自身が与えられる献身は1種類だけだが、別の聖騎士の献身とは共存できる。"
+      },
+      "hammer_of_grace": {
+        "name": "恩寵の槌",
+        "description": "武器で敵を攻撃し、命中するとマナを70回復する。光の槌と再使用時間を共有する。"
+      },
+      "hammer_of_light": {
+        "name": "光の槌",
+        "description": "武器で敵を攻撃し、与えたダメージの50%に相当する体力を回復する。恩寵の槌と再使用時間を共有する。"
+      },
+      "hushbrand": {
+        "name": "静寂の刻印",
+        "description": "呪文詠唱を中断し、同じ系統の呪文を4秒間使用不能にする。"
+      },
+      "unbinding_blessing": {
+        "name": "解放の祝福",
+        "description": "味方1体の移動速度低下と移動不能効果を解除する。"
+      },
+      "guardian_covenant": {
+        "name": "守護の盟約",
+        "description": "味方1体を守り、受けるダメージを20%軽減する。8秒間持続する。"
+      },
+      "solar_step": {
+        "name": "陽光の歩み",
+        "description": "2秒間、高速で前進する。方向転換はできるが、途中で前進を止めることはできない。"
+      },
+      "solar_invocation": {
+        "name": "陽光の祈願",
+        "description": "聖なる光を呼び、40ヤード以内にいるすべての味方プレイヤーの体力を{damage}回復する。"
+      },
+      "radiant_devotion": {
+        "name": "輝きの献身",
+        "description": "自身とパーティメンバーの呪文威力を20増加させる。30分間持続する。"
+      },
+      "dawn_devotion": {
+        "name": "暁の献身",
+        "description": "自身とパーティメンバーの攻撃力を40増加させる。30分間持続する。この献身は戦士の雄叫びと共存する。"
+      },
+      "grace_devotion": {
+        "name": "恩寵の献身",
+        "description": "自身とパーティメンバーは5秒ごとにマナを15回復し、呪文のマナ消費が6%減少する。3分間持続する。"
+      },
+      "recall_the_fallen": {
+        "name": "倒れし者の帰還",
+        "description": "死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。"
+      },
+      "beacon_of_light": {
+        "name": "光の信標",
+        "description": "グループメンバー1人を光の信標にする。信標以外のグループメンバーが信標から60ヤード以内にいる時、自身が行った有効な回復量の75%で信標も回復する。自身か信標が死亡するまで持続する。"
+      },
+      "oathstrike": {
+        "name": "誓約の一撃",
+        "description": "武器ダメージに加えて{damage}ダメージを与え、信仰を1得る。昇華中は60%の威力でもう一度攻撃する。"
+      },
+      "final_edict": {
+        "name": "最後の勅令",
+        "description": "強烈な武器攻撃を行い、信仰を2得る。昇華中は自身の周囲に聖なる爆発も放つ。"
+      },
+      "dawnfall": {
+        "name": "暁の落光",
+        "description": "周囲の敵に{damage}の神聖ダメージを与え、信仰を2得る。昇華中はダメージと範囲が増加する。"
+      },
+      "faithforged_guard": {
+        "name": "信仰鍛造の守り",
+        "description": "8秒間、{damage}ダメージを吸収する盾で自身を包む。昇華中は盾の効果が50%増加する。"
+      },
+      "mercy_lance": {
+        "name": "慈悲の槍",
+        "description": "味方を回復するか敵に{damage}ダメージを与え、信仰を1得る。昇華中に回復へ使うと、近くの味方1人も回復する。"
+      },
+      "sacred_form": {
+        "name": "聖なる姿",
+        "description": "死亡するまで聖なる状態になり、回復量が10%、呪文のクリティカル率が5%増加し、発生させる脅威が50%減少する。神聖専用。"
+      },
+      "dawns_embrace": {
+        "name": "暁の抱擁",
+        "description": "強力な回復を行い、信仰を2得る。昇華中は即時発動となり、回復量が35%増加する。"
+      },
+      "radiant_chorus": {
+        "name": "輝きの聖歌",
+        "description": "近くの味方を{damage}回復し、信仰を2得る。昇華中は回復量と範囲が増加する。"
+      },
+      "life_covenant": {
+        "name": "生命の盟約",
+        "description": "味方1体が受けるダメージを40%軽減する。6秒間持続する。昇華中は力を消費せず、さらに120ダメージを防ぐ盾を与える。"
+      },
+      "aegis_first_dawn": {
+        "name": "第一の暁のイージス",
+        "description": "5秒間詠唱し、半径10ヤードの聖なるドームを作り出す。内部の味方を毎秒回復し、受けるダメージを50%軽減する。詠唱を完了すると最後の回復を放ち、移動速度を4秒間30%上昇させる。"
+      },
+      "vowkeeper_strike": {
+        "name": "守誓の一撃",
+        "description": "高い脅威を発生させる攻撃を行い、信仰を1得る。昇華中は小さな吸収盾も得る。"
+      },
+      "bastion_rite": {
+        "name": "砦の儀式",
+        "description": "受ける物理ダメージを20%軽減し、信仰を1得る。6秒間持続する。昇華中は持続時間が10秒になる。"
+      },
+      "sunward_disc": {
+        "name": "陽光の円盤",
+        "description": "輝く円盤を投げ、敵2体へ跳ね返らせて信仰を2得る。昇華中は5体へ跳ね返る。"
+      },
+      "sacred_challenge": {
+        "name": "聖なる挑戦",
+        "description": "敵1体に自身を攻撃させる。昇華中は力を消費せず、さらに受けるすべてのダメージを4秒間15%軽減する。"
+      },
+      "citadel_of_faith": {
+        "name": "信仰の城塞",
+        "description": "受けるすべてのダメージを40%軽減する。10秒間持続する。"
+      },
       "devotion_aura": {
         "name": "不動のオーラ",
         "description": "30分間、アーマーが{buff}増加します。"
@@ -7067,11 +7191,11 @@ export const ja_JP: EnTranslations = {
       },
       "righteous_fury": {
         "name": "バーニングオース",
-        "description": "30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。"
+        "description": "神聖ダメージによる脅威値が常時60%増加します。防御専用です。"
       },
       "retribution_aura": {
         "name": "報復のオーラ",
-        "description": "30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。"
+        "description": "自身とパーティメンバーを聖なる力で包み、近接攻撃をしてきた敵に5の神聖ダメージを与える。死亡するか別の献身に切り替えるまで持続する。"
       },
       "tame_beast": {
         "name": "野生の絆",
