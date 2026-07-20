@@ -641,8 +641,8 @@ const BOSSES: Record<string, MobTemplate> = {
     healAbsorb: { chance: 0.3, amount: 600, duration: 8, name: 'Necrotic Blight' },
     desperateHeal: { belowHpPct: 0.25, healPct: 0.2 },
     bigCast: {
-      castId: 'rift_soul_harvest',
-      name: 'Soul Harvest',
+      castId: 'rift_marrow_harvest',
+      name: 'Marrow Harvest',
       castTime: 2.5,
       every: 15,
       radius: 13,

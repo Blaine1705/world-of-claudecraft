@@ -39,6 +39,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   veilsteel_blade: 'sword',
   bonewrought_greatsword: 'sword',
   direfang_greatblade: 'sword',
+  hoarfrost_edge: 'sword',
   // Daggers
   rusty_dagger: 'dagger',
   keen_dirk: 'dagger',
@@ -86,6 +87,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   deacons_cleaver: 'axe',
   drogmars_skullcleaver: 'axe',
   gravewyrm_cleaver: 'axe',
+  pitlords_cleaver: 'axe',
   // Staves
   gnarled_staff: 'staff',
   apprentice_staff: 'staff',
