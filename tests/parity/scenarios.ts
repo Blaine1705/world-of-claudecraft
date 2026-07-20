@@ -3706,9 +3706,9 @@ function hitRatingHeroic(withHitGear: boolean): Scenario {
 // updatePlayerAutoAttack tick driver across several swing intervals for five
 // builds at once: a warrior meleeing a spiked-hide boar (thorns reflect tail) with
 // Heroic Strike queued (queuedOnSwing spend + bonus, cooldown 0), a rogue plain
-// melee, a hunter in melee with Raptor Strike queued (queuedOnSwing + on-next-swing
-// cooldown set, cd 6), a hunter at range firing Auto Shot (physical, armor-mitigated,
-// 8yd dead zone), and a mage wanding (arcane, no armor, no dead zone). Targets are
+// melee, a hunter mixing instant Gutting Strike into melee, a hunter at range firing
+// Auto Shot (physical, armor-mitigated, 8yd dead zone), and a mage wanding (arcane,
+// no armor, no dead zone). Targets are
 // re-pinned to their lane each round so the ranged dead-zone vs wand branches stay
 // exercised, and the rogue's auto-attack is stopped at the end (stopAutoAttack entry).
 function c5AutoAttack(): Scenario {
@@ -3718,7 +3718,7 @@ function c5AutoAttack(): Scenario {
       'player auto-attack driver updatePlayerAutoAttack (swingTimer cadence, facing/range gates)',
       'meleeSwing white-hit table: single rng.next() miss/dodge + crit + armor mitigation',
       'queuedOnSwing heroic_strike spend + bonus (warrior, cooldown 0)',
-      'queuedOnSwing raptor_strike spend + bonus + on-next-swing cooldown set (hunter, cooldown 6)',
+      'instant raptor_strike weaponStrike mixed into the hunter melee lane',
       'overpowerUntil window set on a melee dodge',
       'spiked-hide reflect tail of meleeSwing (wild_boar Bristled Hide)',
       'rangedSwing Auto Shot (hunter, physical, armor-mitigated, 8yd dead zone)',
@@ -3790,12 +3790,12 @@ function c5AutoAttack(): Scenario {
         }
         eWarrior.resource = eWarrior.maxResource;
         eHunterM.resource = eHunterM.maxResource;
-        // Queue on-next-swing abilities (the guard avoids the cast-toggle that a
-        // re-cast while already queued would trigger).
+        // Queue the warrior's on-next-swing ability (the guard avoids toggling it
+        // off), while the Hunter uses its immediate melee Focus generator.
         if (eWarrior.gcdRemaining <= 0 && !eWarrior.castingAbility && !eWarrior.queuedOnSwing) {
           sim.castAbility('heroic_strike', warrior);
         }
-        if (eHunterM.gcdRemaining <= 0 && !eHunterM.castingAbility && !eHunterM.queuedOnSwing) {
+        if (eHunterM.gcdRemaining <= 0 && !eHunterM.castingAbility) {
           sim.castAbility('raptor_strike', hunterM);
         }
         rec.tick(10);

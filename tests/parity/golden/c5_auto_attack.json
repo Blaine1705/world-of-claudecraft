@@ -7,7 +7,7 @@
     "player auto-attack driver updatePlayerAutoAttack (swingTimer cadence, facing/range gates)",
     "meleeSwing white-hit table: single rng.next() miss/dodge + crit + armor mitigation",
     "queuedOnSwing heroic_strike spend + bonus (warrior, cooldown 0)",
-    "queuedOnSwing raptor_strike spend + bonus + on-next-swing cooldown set (hunter, cooldown 6)",
+    "instant raptor_strike weaponStrike mixed into the hunter melee lane",
     "overpowerUntil window set on a melee dodge",
     "spiked-hide reflect tail of meleeSwing (wild_boar Bristled Hide)",
     "rangedSwing Auto Shot (hunter, physical, armor-mitigated, 8yd dead zone)",
