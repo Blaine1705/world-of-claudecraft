@@ -227,7 +227,8 @@ export const zh_TW: EnTranslations = {
     },
     "hud": {
       "lowMana": "法力不足",
-      "lowEnergy": "能量不足"
+      "lowEnergy": "能量不足",
+      "lowFocus": "集中值不足"
     },
     "talents": {
       "title": "天賦",
@@ -2997,6 +2998,8 @@ export const zh_TW: EnTranslations = {
       "blessing_of_might": "提升友方目標的攻擊強度，適合在開怪前施放。",
       "divine_protection": "快速的守護結界，在情勢危急時吸收傷害。",
       "raptor_strike": "在有東西貼上你時可用的一記重力近戰揮擊。",
+      "pack_command": "命令你的夥伴發動攻擊，並累積兇性以釋放野獸。",
+      "measured_shot": "一記從容瞄準的遠程射擊，為你的強力攻擊恢復集中值。",
       "aspect_of_the_hawk": "持續維持的姿態，用來強化你的遠程攻擊強度。",
       "serpent_sting": "施加毒液，隨時間造成持續的自然傷害。",
       "arcane_shot": "從遠處射出的瞬發一擊，迅速造成額外傷害。",
@@ -5235,7 +5238,8 @@ export const zh_TW: EnTranslations = {
     "resources": {
       "mana": "法力",
       "energy": "能量",
-      "rage": "怒氣"
+      "rage": "怒氣",
+      "focus": "集中值"
     },
     "roles": {
       "warrior": "坦克 / 近戰 DPS",
@@ -5941,7 +5945,8 @@ export const zh_TW: EnTranslations = {
     "resources": {
       "mana": "法力",
       "rage": "怒氣",
-      "energy": "能量"
+      "energy": "能量",
+      "focus": "集中值"
     },
     "forms": {
       "bear": "熊",
@@ -6304,6 +6309,54 @@ export const zh_TW: EnTranslations = {
       "volley": {
         "name": "亂射",
         "description": "向目標區域射出箭雨，持續 3 秒，每 0.5 秒對其中的敵人造成 {damage} 點傷害。"
+      },
+      "pack_command": {
+        "name": "獸群號令",
+        "description": "命令你的活體寵物發動攻擊。命中後產生 20 點集中值和一層獸群兇性。"
+      },
+      "unleash_beast": {
+        "name": "釋放野獸",
+        "description": "釋放滿層獸群兇性，對主要目標發動重擊並拍擊周圍敵人，隨後使寵物短暫進入順劈狂亂。"
+      },
+      "measured_shot": {
+        "name": "審慎射擊",
+        "description": "一記從容瞄準的射擊，造成 {damage} 點物理傷害，並在命中時產生 20 點集中值。"
+      },
+      "cold_focus": {
+        "name": "冷靜專注",
+        "description": "持續 12 秒，審慎射擊產生更多集中值，蓄力長射的速度更快、消耗更低。（冷視招牌技能）"
+      },
+      "bloodhook": {
+        "name": "血鉤",
+        "description": "衝向 8 至 25 碼外的敵人，撕開一道主要傷口，在 12 秒內造成 24 點流血傷害。（野戰技藝招牌技能）"
+      },
+      "shrapnel_charge": {
+        "name": "榴片炸彈",
+        "description": "用榴片轟擊目標及其附近敵人，隨後從主要目標擴散一道短暫的流血。"
+      },
+      "bloodtrail_assault": {
+        "name": "血跡突襲",
+        "description": "持續 12 秒，強化血鉤、撕傷、榴片炸彈以及寵物的後續攻擊。"
+      },
+      "trailbreak": {
+        "name": "斷跡",
+        "description": "向後躍開且不失去專精狀態。野戰技藝還會為下一次重返戰場做好準備。"
+      },
+      "wildheart": {
+        "name": "野性之心",
+        "description": "立即恢復最大生命值的 30%。"
+      },
+      "shellskin": {
+        "name": "甲殼之膚",
+        "description": "受到的傷害降低 60%，持續 8 秒，但生效期間無法攻擊。"
+      },
+      "frostjaw_trap": {
+        "name": "霜顎陷阱",
+        "description": "在選中的敵人處或腳下放置已啟動的陷阱。它會定身第一個觸發的敵人，並減速附近敵人。"
+      },
+      "pack_rally": {
+        "name": "獸群集結",
+        "description": "進入駿馬之姿，並激勵附近友方，使其移動速度提高 30%、攻擊與施法速度提高 10%，持續 10 秒。"
       },
       "hurricane": {
         "name": "颶風",
@@ -6707,7 +6760,7 @@ export const zh_TW: EnTranslations = {
       },
       "rapid_fire": {
         "name": "狂熱連射",
-        "description": "使你的攻擊速度提高 40%，持續 15 秒。"
+        "description": "移動時在2.4秒內快速射出6箭，每箭造成{damage}點物理傷害。"
       },
       "smite": {
         "name": "懲擊",

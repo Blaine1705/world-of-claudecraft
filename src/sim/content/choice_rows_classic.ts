@@ -1,17 +1,5 @@
 import type { ClassChoiceRows } from './talent_rows';
 
-const hunterRangedShotAbilityIds = [
-  'auto_shot',
-  'serpent_sting',
-  'arcane_shot',
-  'concussive_shot',
-  'aimed_shot',
-  'wyvern_sting',
-  'counter_shot',
-  'multi_shot',
-  'volley',
-];
-
 const rogueBuilderAbilityIds = [
   'sinister_strike',
   'backstab',
@@ -513,260 +501,254 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'shot_cadence',
-      decision: 'venom damage vs banked Fell Shots vs stronger Guises',
+      theme: 'mobility',
+      decision: 'active escape vs long travel vs rotational movement',
       options: [
         {
-          // Balance pass: was Venom Relay, an every-cast free-Fell-Shot relay.
-          // Now the classic Improved Serpent Sting shape: a flat poison boost.
-          id: 'hun_r5_improved_serpent_sting',
-          name: 'Deepvenom',
-          description: "Venom Barb's poison deals 20% more damage.",
-          icon: 'serpent_sting',
-          effect: { ability: [{ ability: 'serpent_sting', dmgPct: 0.2 }] },
+          id: 'hun_r5_tactical_retreat',
+          name: 'Tactical Retreat',
+          description: 'Trailbreak stores 2 uses and removes roots and movement slows when used.',
+          icon: 'trailbreak',
+          effect: { ability: [{ ability: 'trailbreak', bonusCharges: 1 }] },
         },
         {
-          id: 'hun_r5_quick_shots',
-          name: 'Twin Fletching',
-          description: 'Fell Shot stores 2 uses.',
-          icon: 'arcane_shot',
-          effect: { ability: [{ ability: 'arcane_shot', bonusCharges: 1 }] },
-        },
-        {
-          // Balance pass: was a swap-into-guise shot discount that cost more
-          // mana than it saved. Now the Guises themselves get stronger.
-          // Courser's Guise (learn 14) stays unbuffed: the unlock guard bans
-          // a level-5 row from modifying a later-learned ability.
-          id: 'hun_r5_aspect_mastery',
-          name: 'Guisecraft',
-          description: "Harrier's Guise and Marten's Guise effects are 25% stronger.",
-          icon: 'aspect_of_the_hawk',
+          id: 'hun_r5_enduring_courser',
+          name: 'Enduring Courser',
+          description:
+            "Courser's Guise grants 60% movement speed for 3 sec when activated. 20 sec internal cooldown.",
+          icon: 'aspect_of_the_cheetah',
           effect: {
-            ability: [
-              { ability: 'aspect_of_the_hawk', buffPct: 0.25 },
-              { ability: 'aspect_of_the_monkey', buffPct: 0.25 },
-            ],
+            ability: [{ ability: 'aspect_of_the_cheetah' }],
+            runtime: { movementSpeedPct: 0.6, duration: 3, internalCooldown: 20 },
+          },
+        },
+        {
+          id: 'hun_r5_predators_pace',
+          name: "Predator's Pace",
+          description:
+            'A successful Focus generator grants 20% movement speed for 3 sec. 8 sec internal cooldown.',
+          icon: 'measured_shot',
+          effect: {
+            ability: [{ ability: 'measured_shot' }],
+            runtime: { movementSpeedPct: 0.2, duration: 3, internalCooldown: 8 },
           },
         },
       ],
     },
     {
       level: 8,
-      theme: 'ranged_control',
-      decision: 'ranged disorient vs ground root vs frequent rooting shot',
+      theme: 'defense',
+      decision: 'precise mitigation vs recovery vs passive smoothing',
       options: [
         {
-          id: 'hun_r8_startle_shot',
-          name: 'Startle Shot',
-          description: 'Grants Startle Shot: a ranged disorient that breaks on any damage.',
-          icon: 'startle_shot',
-          effect: { grant: { ability: 'startle_shot' } },
+          id: 'hun_r8_receding_shell',
+          name: 'Receding Shell',
+          description:
+            'Recast Shellskin to end it early and refund 50% of its unused duration, up to 45 sec.',
+          icon: 'shellskin',
+          effect: {
+            ability: [{ ability: 'shellskin' }],
+            runtime: { cooldownRefundPct: 0.5, cooldownRefundCap: 45 },
+          },
         },
         {
-          id: 'hun_r8_frost_trap',
-          name: 'Rime Snare',
-          description: 'Grants Rime Snare.',
-          icon: 'frost_trap',
-          effect: { grant: { ability: 'frost_trap' } },
+          id: 'hun_r8_shared_recovery',
+          name: 'Shared Recovery',
+          description:
+            'Wildheart also heals your pet for 30% and grants both of you 20% damage reduction for 4 sec.',
+          icon: 'wildheart',
+          effect: {
+            ability: [{ ability: 'wildheart' }],
+            runtime: { petHealPct: 0.3, damageReductionPct: 0.2, duration: 4 },
+          },
         },
         {
-          // Balance pass round two: NO cooldown cut either (it pushed the 50%
-          // slow toward half uptime). The talent deepens the slow inside the
-          // same window instead: a second slow aura at 0.3 wins the
-          // moveSpeedMult min() over the baseline 0.5.
-          id: 'hun_r8_improved_concussive',
-          name: 'Pinning Barb',
-          description: "Rattling Shot's slow deepens to 70% for its 4 sec duration.",
+          id: 'hun_r8_beastguard',
+          name: 'Beastguard',
+          description:
+            'Redirect 15% of damage to a living pet without reducing it below 20% health. Without one, take 8% less damage below 50% health.',
           icon: 'concussive_shot',
           effect: {
-            ability: [
-              {
-                ability: 'concussive_shot',
-                addEffects: [{ type: 'slow', mult: 0.3, duration: 4 }],
-              },
-            ],
+            global: { petDmgSharePct: 0.15 },
+            runtime: {
+              petHealthFloorPct: 0.2,
+              fallbackDamageReductionPct: 0.08,
+              healthThresholdPct: 0.5,
+            },
           },
         },
       ],
     },
     {
       level: 11,
-      theme: 'sustain',
-      decision: 'pet sustain vs shot-fed mana vs reactive self-shield',
+      theme: 'control',
+      decision: 'interrupt coverage vs trap control vs pursuit control',
       options: [
         {
-          id: 'hun_r11_mend_pet',
-          name: 'Patch Up',
-          description: 'Patch Up heals a living pet for 50% more.',
-          icon: 'mend_pet',
-          effect: { ability: [{ ability: 'revive_pet', dmgPct: 0.5 }] },
-        },
-        {
-          // Balance pass: the instant-Long-Draw second payload is gone; the
-          // mana return stays (and G1 keeps proc-fed free shots from feeding
-          // the counter).
-          id: 'hun_r11_efficiency',
-          name: 'Lean Quiver',
-          description: 'Every 3rd ranged shot restores 20 mana.',
-          icon: 'aimed_shot',
+          id: 'hun_r11_double_hush',
+          name: 'Double Hush',
+          description: 'Hushing Shot stores 2 uses, each with a 24 sec recharge.',
+          icon: 'counter_shot',
           effect: {
-            proc: {
-              id: 'hun_lean_quiver',
-              name: 'Lean Quiver',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: hunterRangedShotAbilityIds,
-              },
-              responses: [{ kind: 'resource', amount: 20 }],
-            },
+            ability: [{ ability: 'counter_shot', bonusCharges: 1, cooldownFlat: 4 }],
           },
         },
         {
-          // Balance pass round three (maintainer rule: shields belong to
-          // priests only): the panic response is the skirmisher escape burst.
-          id: 'hun_r11_survival_instincts',
-          name: 'Deathless Will',
+          id: 'hun_r11_binding_payload',
+          name: 'Binding Payload',
           description:
-            'Taking a hit for at least 30% of your maximum health grants 40% movement speed for 4 sec. 30 sec internal cooldown.',
-          icon: 'aspect_of_the_monkey',
+            'Frostjaw Trap roots every enemy in its trigger area for 3 sec, then slows them by 40% for 4 sec.',
+          icon: 'frostjaw_trap',
           effect: {
-            proc: {
-              id: 'hun_deathless_will',
-              name: 'Deathless Will',
-              school: 'nature',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.3, icd: 30 },
-              responses: [
-                {
-                  kind: 'aura',
-                  auraKind: 'buff_speed',
-                  value: 1.4,
-                  duration: 4,
-                  name: 'Deathless Will',
-                },
-              ],
-            },
+            ability: [{ ability: 'frostjaw_trap' }],
+            runtime: { rootDuration: 3, slowPct: 0.4, slowDuration: 4 },
+          },
+        },
+        {
+          id: 'hun_r11_crippling_pursuit',
+          name: 'Crippling Pursuit',
+          description:
+            'Rattling Shot or Fettering Slash roots an already slowed target for 2 sec. 12 sec per-target cooldown.',
+          icon: 'concussive_shot',
+          effect: {
+            ability: [{ ability: 'concussive_shot' }],
+            runtime: { rootDuration: 2, perTargetCooldown: 12 },
           },
         },
       ],
     },
     {
       level: 14,
-      theme: 'damage_profile',
-      decision: 'area shot vs faster Long Draw vs venom rider',
+      theme: 'focus_engine',
+      decision: 'resource rhythm vs trap linkage vs timed guises',
       options: [
         {
-          id: 'hun_r14_multi_shot',
-          name: 'Splitshot',
-          description: 'Grants Splitshot.',
-          icon: 'multi_shot',
-          effect: { grant: { ability: 'multi_shot' } },
-        },
-        {
-          // Balance pass: was Rattling Ambush, the worst loop in the game
-          // (every Rattling Shot reset Fell Shot AND made it free). Now the
-          // Long Draw lane: a plain cast-speed talent.
-          id: 'hun_r14_sniper_training',
-          name: 'Steady Draw',
-          description: "Long Draw's cast time is reduced by 20%.",
-          icon: 'aimed_shot',
-          effect: { ability: [{ ability: 'aimed_shot', castPct: -0.2 }] },
-        },
-        {
-          id: 'hun_r14_serpents_venom',
-          name: 'Viperfletch',
+          id: 'hun_r14_efficient_rhythm',
+          name: 'Efficient Rhythm',
           description:
-            'Fell Shot also envenoms the target for 50% of its damage over 3 sec, ticking every 1 sec.',
-          icon: 'serpent_sting',
+            'After spending 75 Focus, your next Focus generator grants 20 additional Focus.',
+          icon: 'measured_shot',
           effect: {
-            ability: [
-              {
-                ability: 'arcane_shot',
-                addEffects: [
-                  {
-                    type: 'dot',
-                    total: 0,
-                    directPct: 0.5,
-                    duration: 3,
-                    interval: 1,
-                    school: 'nature',
-                  },
-                ],
-              },
-            ],
+            ability: [{ ability: 'measured_shot' }],
+            runtime: { focusSpendThreshold: 75, focusBonus: 20 },
+          },
+        },
+        {
+          id: 'hun_r14_trapcraft',
+          name: 'Trapcraft',
+          description:
+            "Frostjaw Trap's cooldown is reduced by 20%. Triggering it restores 20 Focus and reduces Trailbreak's cooldown by 5 sec.",
+          icon: 'frostjaw_trap',
+          effect: { ability: [{ ability: 'frostjaw_trap', cooldownPct: -0.2 }] },
+        },
+        {
+          id: 'hun_r14_guise_mastery',
+          name: 'Guise Mastery',
+          description:
+            "For 6 sec, Harrier's Guise increases Focus generation by 50%, Marten's Guise reduces direct damage by 25%, and Courser's Guise grants 50% movement speed, or 60% with Enduring Courser. 20 sec shared cooldown.",
+          icon: 'aspect_of_the_hawk',
+          effect: {
+            ability: [{ ability: 'aspect_of_the_hawk' }],
+            runtime: {
+              duration: 6,
+              focusGenerationPct: 0.5,
+              damageReductionPct: 0.25,
+              movementSpeedPct: 0.5,
+              enduringMovementSpeedPct: 0.6,
+              internalCooldown: 20,
+            },
           },
         },
       ],
     },
     {
       level: 17,
-      theme: 'survival_response',
-      decision: 'active avoidance vs pet damage sharing vs hardy constitution',
+      theme: 'major_window',
+      decision: 'personal burst vs pressure defense vs party rally',
       options: [
         {
-          id: 'hun_r17_deterrence',
-          name: 'Bristleguard',
-          description: 'Grants Bristleguard.',
-          icon: 'deterrence',
-          effect: { grant: { ability: 'deterrence' } },
+          id: 'hun_r17_apex_instinct',
+          name: 'Apex Instinct',
+          description:
+            'Your specialization cooldown grants 40 Focus. Its next 3 Focus spenders cost 50% less and deal 20% more damage. Charges persist for the cooldown window plus 4 sec.',
+          icon: 'bestial_wrath',
+          effect: {
+            ability: [{ ability: 'arcane_shot' }],
+            runtime: {
+              focusGain: 40,
+              charges: 3,
+              costReductionPct: 0.5,
+              primaryDamagePct: 0.2,
+              durationBuffer: 4,
+            },
+          },
         },
         {
-          id: 'hun_r17_master_tamer',
-          name: 'Bloodbond',
-          description: 'While your pet is alive, 20% of damage you take is redirected to it.',
-          icon: 'tame_beast',
-          effect: { global: { petDmgSharePct: 0.2 } },
+          id: 'hun_r17_shell_and_fang',
+          name: 'Shell and Fang',
+          description:
+            'Shellskin allows attacks and pet commands, but its damage reduction is reduced to 40%.',
+          icon: 'shellskin',
+          effect: {
+            ability: [{ ability: 'shellskin' }],
+            runtime: { damageReductionPct: 0.4 },
+          },
         },
         {
-          // Balance pass: was Calloused Hide (take a big hit, gain an instant
-          // Long Draw). Now the classic Survivalist shape.
-          id: 'hun_r17_thick_hide',
-          name: 'Fieldhardy',
-          description: 'Increases your maximum health by 10%.',
-          icon: 'aspect_of_the_monkey',
-          effect: { stats: { maxHpPct: 0.1 } },
+          id: 'hun_r17_pack_rally',
+          name: 'Pack Rally',
+          description:
+            "Courser's Guise can trigger Pack Rally, granting nearby allies 30% movement and 10% attack and cast speed for 10 sec. 90 sec cooldown.",
+          icon: 'aspect_of_the_wild',
+          effect: {
+            ability: [{ ability: 'aspect_of_the_cheetah' }],
+            runtime: {
+              movementSpeedPct: 0.3,
+              hastePct: 0.1,
+              duration: 10,
+              internalCooldown: 90,
+            },
+          },
         },
       ],
     },
     {
       level: 20,
-      theme: 'apex_hunt',
-      decision: 'steadfast Arrowfall vs shot-fed burst uptime vs party attack rally',
+      theme: 'focus_capstone',
+      decision: 'personal cleave vs trap echoes vs pet echoes',
       options: [
         {
-          id: 'hun_r20_improved_volley',
-          name: 'Steady Rain',
+          id: 'hun_r20_overdraw',
+          name: 'Overdraw',
           description:
-            'Arrowfall deals 50% more damage, and taking damage cannot shorten its channel.',
-          icon: 'volley',
+            'Every 3rd Focus spender deals 35% more primary damage and cleaves 50% of that damage to 2 nearby enemies.',
+          icon: 'arcane_shot',
           effect: {
-            ability: [{ ability: 'volley', dmgPct: 0.5, damagePushbackImmune: true }],
+            ability: [{ ability: 'arcane_shot' }],
+            runtime: { everyNth: 3, primaryDamagePct: 0.35, cleavePct: 0.5, targetCap: 2 },
           },
         },
         {
-          // Balance pass: was 15 sec per proc with no gate (free shots fed it
-          // and compressed the 300 sec cooldown to ~75). Now 5 sec, at most
-          // once every 8 sec, and G1 keeps proc-fed shots out of the count.
-          id: 'hun_r20_rapid_killing',
-          name: 'Redline Draw',
+          id: 'hun_r20_chain_reaction',
+          name: 'Chain Reaction',
           description:
-            "Every 3rd ranged shot reduces Fevered Draw's cooldown by 5 sec, at most once every 8 sec.",
-          icon: 'rapid_fire',
+            'Frostjaw Trap marks enemies within 4 yards for 8 sec. Your next 3 Focus spenders echo 40% damage between marked enemies.',
+          icon: 'frostjaw_trap',
           effect: {
-            proc: {
-              id: 'hun_redline_draw',
-              name: 'Redline Draw',
-              trigger: { on: 'castNth', n: 3, abilities: hunterRangedShotAbilityIds, icd: 8 },
-              responses: [{ kind: 'cooldownRefund', ability: 'rapid_fire', seconds: 5 }],
-            },
+            ability: [{ ability: 'frostjaw_trap' }],
+            runtime: { radius: 4, markDuration: 8, charges: 3, echoPct: 0.4 },
           },
         },
         {
-          id: 'hun_r20_aspect_of_the_wild',
-          name: 'Wildfang Rally',
-          description: 'Grants Wildfang Rally.',
-          icon: 'aspect_of_the_wild',
-          effect: { grant: { ability: 'aspect_of_the_wild' } },
+          id: 'hun_r20_fang_chorus',
+          name: 'Fang Chorus',
+          description:
+            'Each Focus spender commands a 50%-strength pet echo. Every 3rd echo becomes a 4 yd clap.',
+          icon: 'tame_beast',
+          effect: {
+            ability: [{ ability: 'arcane_shot' }],
+            runtime: { echoPct: 0.5, everyNth: 3, radius: 4 },
+          },
         },
       ],
     },

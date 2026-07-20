@@ -91,26 +91,6 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     );
   });
 
-  it('lands Splitshot at the selected point and keeps Twin Fletching talent charges explicit', () => {
-    const baseline = simWithRows('hunter', {});
-    expect(resolved(baseline, 'arcane_shot')).toMatchObject({ bonusCharges: 0 });
-    expect(resolved(baseline, 'arcane_shot').charges).toBeUndefined();
-
-    const sim = simWithRows('hunter', {
-      5: 'hun_r5_quick_shots',
-      14: 'hun_r14_multi_shot',
-    });
-    expect(resolved(sim, 'arcane_shot')).toMatchObject({ charges: 2, bonusCharges: 1 });
-    const distant = addTarget(sim, 20);
-    const nearCaster = addTarget(sim, 3);
-    sim.player.resource = sim.player.maxResource;
-
-    sim.castAbility('multi_shot', undefined, { x: distant.pos.x, z: distant.pos.z });
-
-    expect(distant.hp).toBeLessThan(distant.maxHp);
-    expect(nearCaster.hp).toBe(nearCaster.maxHp);
-  });
-
   it('restores energy on every third Wicked Slash with Ceaseless Cuts', () => {
     const sim = simWithRows('rogue', { 5: 'rog_r5_relentless_strikes' });
     const target = addTarget(sim);

@@ -5,7 +5,7 @@
 // live through src/ui/talent_i18n.ts. No balance numbers or instanced spoilers here.
 
 export type GuideRole = 'tank' | 'healer' | 'dps';
-export type GuideResource = 'rage' | 'mana' | 'energy';
+export type GuideResource = 'rage' | 'mana' | 'energy' | 'focus';
 
 export interface GuideAbilityRef { id: string; name: string; }
 export interface GuideClassSpec { id: string; name: string; role: GuideRole; signature: string; }
@@ -447,7 +447,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
   {
     "id": "hunter",
     "color": "#abd473",
-    "resource": "mana",
+    "resource": "focus",
     "roles": [
       "dps"
     ],
@@ -462,13 +462,13 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "marksmanship",
         "name": "Coldsight",
         "role": "dps",
-        "signature": "trueshot_aura"
+        "signature": "cold_focus"
       },
       {
         "id": "survival",
         "name": "Fieldcraft",
         "role": "dps",
-        "signature": "wyvern_sting"
+        "signature": "bloodhook"
       }
     ],
     "signatureAbilities": [
@@ -477,6 +477,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Gutting Strike"
       },
       {
+        "id": "pack_command",
+        "name": "Pack Command"
+      },
+      {
+        "id": "measured_shot",
+        "name": "Measured Shot"
+      },
+      {
         "id": "aspect_of_the_hawk",
         "name": "Harrier's Guise"
       },
@@ -487,14 +495,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "arcane_shot",
         "name": "Fell Shot"
-      },
-      {
-        "id": "concussive_shot",
-        "name": "Rattling Shot"
-      },
-      {
-        "id": "mongoose_bite",
-        "name": "Counterfang"
       }
     ],
     "abilities": [
@@ -503,6 +503,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Gutting Strike"
       },
       {
+        "id": "pack_command",
+        "name": "Pack Command"
+      },
+      {
+        "id": "measured_shot",
+        "name": "Measured Shot"
+      },
+      {
         "id": "aspect_of_the_hawk",
         "name": "Harrier's Guise"
       },
@@ -520,11 +528,27 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "mongoose_bite",
-        "name": "Counterfang"
+        "name": "Woundrend"
       },
       {
         "id": "wing_clip",
         "name": "Fettering Slash"
+      },
+      {
+        "id": "trailbreak",
+        "name": "Trailbreak"
+      },
+      {
+        "id": "wildheart",
+        "name": "Wildheart"
+      },
+      {
+        "id": "shellskin",
+        "name": "Shellskin"
+      },
+      {
+        "id": "frostjaw_trap",
+        "name": "Frostjaw Trap"
       },
       {
         "id": "tame_beast",
@@ -553,6 +577,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rapid_fire",
         "name": "Fevered Draw"
+      },
+      {
+        "id": "shrapnel_charge",
+        "name": "Shrapnel Charge"
+      },
+      {
+        "id": "bloodtrail_assault",
+        "name": "Bloodtrail Assault"
       },
       {
         "id": "volley",

@@ -227,7 +227,8 @@ export const da_DK: EnTranslations = {
     },
     "hud": {
       "lowMana": "Lav Mana",
-      "lowEnergy": "Lav Energi"
+      "lowEnergy": "Lav Energi",
+      "lowFocus": "Low Focus"
     },
     "talents": {
       "title": "Talenter",
@@ -2997,6 +2998,8 @@ export const da_DK: EnTranslations = {
       "blessing_of_might": "Hæver et venligt måls angrebsstyrke, god at kaste før kampen.",
       "divine_protection": "Et hurtigt beskyttende værn til at opsuge skade når det bliver hårdt.",
       "raptor_strike": "Et hårdt nærkampssving til når noget kommer tæt på dig.",
+      "pack_command": "Orders your companion to strike, building Pack Ferocity for Unleash Beast.",
+      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
       "aspect_of_the_hawk": "En holdning du holder oppe for at skærpe din angrebsstyrke på afstand.",
       "serpent_sting": "Lander en gift der bløder naturskade over tid.",
       "arcane_shot": "Et øjeblikkeligt skud på afstand for hurtig ekstra skade.",
@@ -5235,7 +5238,8 @@ export const da_DK: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energi",
-      "rage": "Raseri"
+      "rage": "Raseri",
+      "focus": "Focus"
     },
     "roles": {
       "warrior": "Tank / Nærkamps-DPS",
@@ -5941,7 +5945,8 @@ export const da_DK: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Raseri",
-      "energy": "Energi"
+      "energy": "Energi",
+      "focus": "Focus"
     },
     "forms": {
       "bear": "Bjørn",
@@ -6304,6 +6309,54 @@ export const da_DK: EnTranslations = {
       "volley": {
         "name": "Pileregn",
         "description": "Nedkalder en regn af pile over målområdet i 3 sek og påfører {damage} skade hvert 0,5 sek på fjender fanget i det."
+      },
+      "pack_command": {
+        "name": "Pack Command",
+        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+      },
+      "unleash_beast": {
+        "name": "Unleash Beast",
+        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+      },
+      "measured_shot": {
+        "name": "Measured Shot",
+        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+      },
+      "cold_focus": {
+        "name": "Cold Focus",
+        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+      },
+      "bloodhook": {
+        "name": "Bloodhook",
+        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+      },
+      "shrapnel_charge": {
+        "name": "Shrapnel Charge",
+        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+      },
+      "bloodtrail_assault": {
+        "name": "Bloodtrail Assault",
+        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+      },
+      "trailbreak": {
+        "name": "Trailbreak",
+        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+      },
+      "wildheart": {
+        "name": "Wildheart",
+        "description": "Immediately restore 30% of your maximum health."
+      },
+      "shellskin": {
+        "name": "Shellskin",
+        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+      },
+      "frostjaw_trap": {
+        "name": "Frostjaw Trap",
+        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+      },
+      "pack_rally": {
+        "name": "Pack Rally",
+        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
       },
       "hurricane": {
         "name": "Orkan",
@@ -6707,7 +6760,7 @@ export const da_DK: EnTranslations = {
       },
       "rapid_fire": {
         "name": "Febrilsk Optræk",
-        "description": "Øger din angrebshastighed med 40% i 15 sek."
+        "description": "Kanaliser seks hurtige skud over 2,4 sek. mens du bevæger dig. Hvert skud giver {damage} fysisk skade."
       },
       "smite": {
         "name": "Straffeslag",

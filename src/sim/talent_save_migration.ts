@@ -10,8 +10,10 @@ import type { CharacterState } from './sim';
 import { repairTalentLoadouts } from './talent_loadouts';
 import { MAX_LEVEL, type PlayerClass } from './types';
 
-/** Production character-JSON revision introduced by the v0.26 Talents V2 rollout. */
-export const CURRENT_CHARACTER_CONTENT_REVISION = 1;
+const TALENTS_V2_CONTENT_REVISION = 1;
+
+/** Latest production character-JSON content revision. */
+export const CURRENT_CHARACTER_CONTENT_REVISION = 2;
 
 function migrationLevel(value: number): number {
   if (!Number.isFinite(value)) return 1;
@@ -96,17 +98,20 @@ function migrateLoadouts(
 }
 
 /**
- * Pure one-way migration from production point-tree saves to canonical
- * `{spec, rows}`. Valid specialization identity survives; old ranks/choices have
- * no deterministic row mapping and become a free repick. All unrelated fields
- * are preserved. Reapplying the current revision is an identity operation.
+ * Pure one-way content migration. Revision 1 converted production point-tree
+ * saves to canonical `{spec, rows}`. Revision 2 grants Hunters a free row repick
+ * for the v0.29 redesign and removes retired abilities from saved loadout bars.
+ * Other classes only advance the revision marker. Reapplying the current
+ * revision is an identity operation.
  */
 export function migrateCharacterTalentsV2(cls: PlayerClass, state: CharacterState): CharacterState {
-  if (
-    Number.isSafeInteger(state.contentRevision) &&
-    (state.contentRevision as number) >= CURRENT_CHARACTER_CONTENT_REVISION
-  ) {
-    return state;
+  const revision = Number.isSafeInteger(state.contentRevision)
+    ? (state.contentRevision as number)
+    : 0;
+  if (revision >= CURRENT_CHARACTER_CONTENT_REVISION) return state;
+
+  if (revision >= TALENTS_V2_CONTENT_REVISION && cls !== 'hunter') {
+    return { ...state, contentRevision: CURRENT_CHARACTER_CONTENT_REVISION };
   }
 
   const level = migrationLevel(state.level);

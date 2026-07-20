@@ -1008,6 +1008,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': '该语言不可用。',
   'game.hud.lowMana': '法力不足',
   'game.hud.lowEnergy': '能量不足',
+  'game.hud.lowFocus': '集中值不足',
   'game.talents.title': '天赋',
   'game.talents.classTab': '职业',
   'game.talents.specTab': '专精',
@@ -1488,6 +1489,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': '法力',
   'classDetails.resources.energy': '能量',
   'classDetails.resources.rage': '怒气',
+  'classDetails.resources.focus': '集中值',
   'classDetails.roles.warrior': '坦克 / 近战 DPS',
   'classDetails.roles.paladin': '治疗 / 坦克 / 近战 DPS',
   'classDetails.roles.hunter': '远程 DPS',
@@ -2055,6 +2057,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': '法力',
   'abilityUi.resources.rage': '怒气',
   'abilityUi.resources.energy': '能量',
+  'abilityUi.resources.focus': '集中值',
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '钓鱼',
@@ -2364,6 +2367,40 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': '乱射',
   'entities.abilities.volley.description':
     '向目标区域射出箭雨，持续 3 秒，每 0.5 秒对其中的敌人造成 {damage} 点伤害。',
+  'entities.abilities.pack_command.name': '兽群号令',
+  'entities.abilities.pack_command.description':
+    '命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。',
+  'entities.abilities.unleash_beast.name': '释放野兽',
+  'entities.abilities.unleash_beast.description':
+    '释放满层兽群凶性，对主要目标发动重击并拍击周围敌人，随后使宠物短暂进入顺劈狂乱。',
+  'entities.abilities.measured_shot.name': '审慎射击',
+  'entities.abilities.measured_shot.description':
+    '一记从容瞄准的射击，造成 {damage} 点物理伤害，并在命中时产生 20 点集中值。',
+  'entities.abilities.cold_focus.name': '冷静专注',
+  'entities.abilities.cold_focus.description':
+    '持续 12 秒，审慎射击产生更多集中值，蓄力长射的速度更快、消耗更低。（冷视招牌技能）',
+  'entities.abilities.bloodhook.name': '血钩',
+  'entities.abilities.bloodhook.description':
+    '冲向 8 至 25 码外的敌人，撕开一道主要伤口，在 12 秒内造成 24 点流血伤害。（野战技艺招牌技能）',
+  'entities.abilities.shrapnel_charge.name': '榴片炸弹',
+  'entities.abilities.shrapnel_charge.description':
+    '用榴片轰击目标及其附近敌人，随后从主要目标扩散一道短暂的流血。',
+  'entities.abilities.bloodtrail_assault.name': '血迹突袭',
+  'entities.abilities.bloodtrail_assault.description':
+    '持续 12 秒，强化血钩、撕伤、榴片炸弹以及宠物的后续攻击。',
+  'entities.abilities.trailbreak.name': '断迹',
+  'entities.abilities.trailbreak.description':
+    '向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。',
+  'entities.abilities.wildheart.name': '野性之心',
+  'entities.abilities.wildheart.description': '立即恢复最大生命值的 30%。',
+  'entities.abilities.shellskin.name': '甲壳之肤',
+  'entities.abilities.shellskin.description': '受到的伤害降低 60%，持续 8 秒，但生效期间无法攻击。',
+  'entities.abilities.frostjaw_trap.name': '霜颚陷阱',
+  'entities.abilities.frostjaw_trap.description':
+    '在选中的敌人处或脚下放置已启动的陷阱。它会定身第一个触发的敌人，并减速附近敌人。',
+  'entities.abilities.pack_rally.name': '兽群集结',
+  'entities.abilities.pack_rally.description':
+    '进入骏马之姿，并激励附近盟友，使其移动速度提高 30%、攻击与施法速度提高 10%，持续 10 秒。',
   'entities.abilities.hurricane.name': '飓风',
   'entities.abilities.hurricane.description':
     '在目标区域召唤飓风，持续 6 秒，每秒重击敌人并造成 {damage} 点自然伤害。',
@@ -2540,7 +2577,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.name': '引弓长射',
   'entities.abilities.aimed_shot.description': '一次精心引弓的射击，造成 {damage} 点伤害。',
   'entities.abilities.rapid_fire.name': '狂热引弓',
-  'entities.abilities.rapid_fire.description': '使你的攻击速度提高 40%，持续 15 秒。',
+  'entities.abilities.rapid_fire.description':
+    '移动时在2.4秒内快速射出6箭，每箭造成{damage}点物理伤害。',
   'entities.abilities.smite.name': '惩击',
   'entities.abilities.smite.description': '惩击敌人，造成 {damage} 点神圣伤害。',
   'entities.abilities.lesser_heal.name': '低语祈祷',
@@ -4944,8 +4982,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lightning_bolt': '一次远程施法的自然伤害，是你远距离的常用手段。',
   'guide.abilityHook.lightning_shield': '为你充能，让攻击者打中你时受到自然伤害。',
   'guide.abilityHook.mark_of_the_wild': '开战前为自己或盟友施加的持续祝福。',
+  'guide.abilityHook.measured_shot': '一记从容瞄准的远程射击，为你的强力攻击恢复集中值。',
   'guide.abilityHook.mongoose_bite': '在敌人闪躲之后立即可用的反击技。',
   'guide.abilityHook.moonfire': '瞬间命中并让目标持续燃烧，移动时也很好用。',
+  'guide.abilityHook.pack_command': '命令你的伙伴发动攻击，并积攒凶性以释放野兽。',
   'guide.abilityHook.power_word_fortitude': '提升盟友的生命上限，开怪前施放并保持它的存在。',
   'guide.abilityHook.power_word_shield': '为盟友裹上一层护盾，在伤害落地前先吸收。',
   'guide.abilityHook.raptor_strike': '一记沉重的近战挥击，用于有东西贴近你时。',

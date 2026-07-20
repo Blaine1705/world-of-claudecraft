@@ -227,7 +227,8 @@ export const ja_JP: EnTranslations = {
     },
     "hud": {
       "lowMana": "マナ低下",
-      "lowEnergy": "エネルギー低下"
+      "lowEnergy": "エネルギー低下",
+      "lowFocus": "集中値低下"
     },
     "talents": {
       "title": "タレント",
@@ -2997,6 +2998,8 @@ export const ja_JP: EnTranslations = {
       "blessing_of_might": "味方の攻撃力を上げます。プルの前に唱えておくとよいでしょう。",
       "divine_protection": "状況が厳しいときにダメージを吸収する、素早い守りの結界です。",
       "raptor_strike": "敵に距離を詰められたときに使う、重い近接の一撃です。",
+      "pack_command": "相棒に攻撃を命じ、獣の解放に必要な獰猛さを蓄えます。",
+      "measured_shot": "慎重に狙う遠距離射撃で、強力な攻撃に使う集中値を回復します。",
       "aspect_of_the_hawk": "維持し続けることで遠隔攻撃力を高めるスタンスです。",
       "serpent_sting": "毒を浴びせ、継続してネイチャーダメージを与えます。",
       "arcane_shot": "遠距離からの即時ショットで、手早く追加ダメージを与えます。",
@@ -5235,7 +5238,8 @@ export const ja_JP: EnTranslations = {
     "resources": {
       "mana": "マナ",
       "energy": "エネルギー",
-      "rage": "怒り"
+      "rage": "怒り",
+      "focus": "集中値"
     },
     "roles": {
       "warrior": "タンク / 近接DPS",
@@ -5941,7 +5945,8 @@ export const ja_JP: EnTranslations = {
     "resources": {
       "mana": "マナ",
       "rage": "怒り",
-      "energy": "エネルギー"
+      "energy": "エネルギー",
+      "focus": "集中値"
     },
     "forms": {
       "bear": "熊",
@@ -6304,6 +6309,54 @@ export const ja_JP: EnTranslations = {
       "volley": {
         "name": "乱射",
         "description": "対象地点に3秒間、矢を降らせ、範囲内の敵に0.5秒ごとに{damage}のダメージを与えます。"
+      },
+      "pack_command": {
+        "name": "群れの指令",
+        "description": "生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。"
+      },
+      "unleash_beast": {
+        "name": "獣の解放",
+        "description": "最大まで高まった群れの獰猛さを解放し、主対象を強打して周囲も叩きます。その後、ペットを短時間の範囲攻撃狂乱に駆り立てます。"
+      },
+      "measured_shot": {
+        "name": "精密射撃",
+        "description": "慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。"
+      },
+      "cold_focus": {
+        "name": "冷徹集中",
+        "description": "12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）"
+      },
+      "bloodhook": {
+        "name": "血鉤",
+        "description": "8から25ヤード離れた敵へ突進して主傷口を開き、12秒間で24の出血ダメージを与えます。（野戦術のシグネチャ）"
+      },
+      "shrapnel_charge": {
+        "name": "榴散弾装薬",
+        "description": "対象と周囲の敵を榴散弾で吹き飛ばし、主対象から短時間の出血を広げます。"
+      },
+      "bloodtrail_assault": {
+        "name": "血跡強襲",
+        "description": "12秒間、血鉤、裂傷、榴散弾装薬、そしてペットの追撃を強化します。"
+      },
+      "trailbreak": {
+        "name": "離脱跳躍",
+        "description": "専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。"
+      },
+      "wildheart": {
+        "name": "野生の心",
+        "description": "最大体力の30%を即座に回復します。"
+      },
+      "shellskin": {
+        "name": "甲殻の皮膚",
+        "description": "8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。"
+      },
+      "frostjaw_trap": {
+        "name": "霜顎の罠",
+        "description": "選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。"
+      },
+      "pack_rally": {
+        "name": "群れの結集",
+        "description": "駿馬の相をまとい、周囲の味方を鼓舞します。10秒間、移動速度を30%、攻撃速度と詠唱速度を10%上昇させます。"
       },
       "hurricane": {
         "name": "ハリケーン",
@@ -6707,7 +6760,7 @@ export const ja_JP: EnTranslations = {
       },
       "rapid_fire": {
         "name": "熱狂の速射",
-        "description": "15秒間、攻撃速度が40%増加します。"
+        "description": "移動しながら2.4秒かけて6発の高速射撃を行い、1発ごとに{damage}の物理ダメージを与えます。"
       },
       "smite": {
         "name": "スマイト",

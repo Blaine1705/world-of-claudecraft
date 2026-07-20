@@ -10,6 +10,11 @@ import type { Aura } from '../types';
 // or listed here; a new group buff with neither guard fails that test loudly.
 export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new Set([
   'arcane_intellect',
+  // Pack Rally uses three fixed aura ids. A later Hunter refreshes the group
+  // effect instead of multiplying it across sources.
+  'hunter_pack_rally_speed',
+  'hunter_pack_rally_haste',
+  'hunter_pack_rally_spellhaste',
   // Wildfang Rally (v0.27.1): two hunters must not double the +45 AP / +5%
   // haste; both halves dedupe across sources like every other group buff.
   'aspect_of_the_wild',

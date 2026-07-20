@@ -3650,7 +3650,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Ein sorgfältig gespannter Schuss, der {damage} Schaden verursacht.',
   'entities.abilities.rapid_fire.name': 'Fieberhafter Zug',
-  'entities.abilities.rapid_fire.description': 'Erhöht euer Angriffstempo 15 Sek. lang um 40%.',
+  'entities.abilities.rapid_fire.description':
+    'Kanalisiert während der Bewegung über 2,4 Sek. sechs schnelle Schüsse, die jeweils {damage} körperlichen Schaden verursachen.',
   'entities.abilities.smite.name': 'Göttliche Pein',
   'entities.abilities.smite.description': 'Peinigt den Gegner für {damage} Heiligschaden.',
   'entities.abilities.lesser_heal.name': 'Geflüstertes Gebet',

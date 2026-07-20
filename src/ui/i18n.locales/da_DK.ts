@@ -2392,7 +2392,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'En snigeåbner der kradser fjenden for våbenskade plus {damage} og volder blødningsskade over 9 sek. Giver 1 kombopoint. Kun i Ulveform.',
   'entities.abilities.rake.name': 'Flæns',
-  'entities.abilities.rapid_fire.description': 'Øger din angrebshastighed med 40% i 15 sek.',
+  'entities.abilities.rapid_fire.description':
+    'Kanaliser seks hurtige skud over 2,4 sek. mens du bevæger dig. Hvert skud giver {damage} fysisk skade.',
   'entities.abilities.rapid_fire.name': 'Febrilsk Optræk',
   'entities.abilities.raptor_strike.description':
     'Et stærkt nærkampsangreb, der øger skaden med {damage}. Aktiveres ved dit næste hug.',

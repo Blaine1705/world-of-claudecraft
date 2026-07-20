@@ -2435,7 +2435,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een sluipopener die de vijand harkt voor wapenschade plus {damage} en bloedingsschade veroorzaakt gedurende 9 sec. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
   'entities.abilities.rake.name': 'Villen',
   'entities.abilities.rapid_fire.description':
-    'Verhoogt je aanvalssnelheid met 40% gedurende 15 sec.',
+    'Kanaliseer zes snelle schoten in 2,4 sec. terwijl je beweegt. Elk schot richt {damage} fysieke schade aan.',
   'entities.abilities.rapid_fire.name': 'Koortsige Trek',
   'entities.abilities.raptor_strike.description':
     'Een sterke slagaanval die de schade met {damage} verhoogt. Activeert bij je volgende slag.',

@@ -31,6 +31,7 @@
 // state routes through the seam.
 
 import { lineOfSightClear } from '../colliders';
+import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
 import { MOBS } from '../data';
 import { pctValue } from '../entity';
 import { isTrivialTo } from '../mob/targeting';
@@ -134,7 +135,9 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
         if (ranged) petRangedAttack(ctx, pet, target, ranged);
         else ctx.mobSwing(pet, target);
         // pet_spellhaste (Metamorphosis) speeds the demon's attack/cast cadence.
-        pet.swingTimer = (pet.weapon.speed * ctx.swingIntervalMult(pet)) / petHasteMult(pet);
+        pet.swingTimer =
+          (pet.weapon.speed * ctx.swingIntervalMult(pet)) /
+          (petHasteMult(pet) * packlordPetHasteMultiplier(ctx, pet));
       }
     }
     return;

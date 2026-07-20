@@ -187,7 +187,7 @@ describe('Guide generated class content', () => {
     expect(GUIDE_CLASSES).toHaveLength(9);
     for (const c of GUIDE_CLASSES) {
       expect(c.color).toMatch(/^#[0-9a-f]{6}$/);
-      expect(['rage', 'mana', 'energy']).toContain(c.resource);
+      expect(['rage', 'mana', 'energy', 'focus']).toContain(c.resource);
       expect(c.roles.length).toBeGreaterThan(0);
       expect(c.specs.length).toBeGreaterThan(0);
       expect(c.signatureAbilities.length).toBeGreaterThan(0);

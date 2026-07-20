@@ -65,6 +65,9 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { clearFieldcraftState } from './hunter_fieldcraft';
+import { clearPacklordState } from './hunter_packlord';
+import { breakEnduringCourserBurst, hasHunterTalent } from './hunter_shared';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -407,10 +410,20 @@ export function dealDamage(
 
   if (target.kind === 'player' && amount > 0) {
     const meta = ctx.players.get(target.id);
+    if (meta?.cls === 'hunter') breakEnduringCourserBurst(ctx, target);
     const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
     const pet = share > 0 ? ctx.petOf(target.id) : null;
+    const beastguard = !!meta && hasHunterTalent(meta, 'hun_r8_beastguard');
+    if (beastguard && (!pet || pet.dead) && target.hp < target.maxHp * 0.5) {
+      amount = Math.round(amount * 0.92);
+    }
     if (pet && !pet.dead) {
-      const redirected = Math.min(amount, Math.round(amount * share));
+      const petFloor = beastguard ? Math.ceil(pet.maxHp * 0.2) : 0;
+      const redirected = Math.min(
+        amount,
+        Math.round(amount * share),
+        Math.max(0, pet.hp - petFloor),
+      );
       if (redirected > 0) {
         amount -= redirected;
         ctx.dealDamage(
@@ -1042,6 +1055,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // carries from another chronomancer are left alone.
     stripTemporalEchoes(ctx, e.id);
     const meta = ctx.players.get(e.id);
+    if (meta?.cls === 'hunter') {
+      clearPacklordState(ctx, e);
+      clearFieldcraftState(ctx, e);
+    }
     if (meta) meta.counters.deaths++;
     // The Book of Deeds death hook (lifetime deaths counter, the Keeper's Toll
     // delight, perfection-window taints, the world-boss survival record) already
@@ -1136,6 +1153,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.aggroTargetId = null;
     clearThreat(e);
     if (e.ownerId !== null) {
+      const owner = ctx.entities.get(e.ownerId);
+      const ownerMeta = owner ? ctx.players.get(owner.id) : null;
+      if (owner && ownerMeta?.cls === 'hunter') clearPacklordState(ctx, owner);
       e.corpseTimer = Infinity;
       e.respawnTimer = Infinity;
       e.hostile = false;

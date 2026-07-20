@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { dealDamage } from '../src/sim/combat/damage';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
-import { onCastCompleted, onDamageTaken, tickProcState } from '../src/sim/combat/talent_procs';
+import { onCastCompleted, tickProcState } from '../src/sim/combat/talent_procs';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   accumulateTalentEffect,
@@ -91,7 +91,7 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the final Twin Verdicts, Rattling Ambush, Storm Recall, Sky Echo, Bruin Rebound, and content values', () => {
+  it('resolves the final Twin Verdicts, Storm Recall, Sky Echo, Bruin Rebound, and content values', () => {
     const rowOption = (cls: PlayerClass, id: string) => {
       const option = ROW_TREES[cls].flatMap((row) => row.options).find((o) => o.id === id);
       if (!option) throw new Error(`missing row option ${cls}:${id}`);
@@ -105,17 +105,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(verdict).toMatchObject({ cost: 30 });
     expect(verdict.cooldown).toBeCloseTo(8);
     expect(verdict.bonusCharges ?? 0).toBe(0);
-
-    // Balance pass: hun_r14_sniper_training is Steady Draw now (the Rattling
-    // Ambush reset+free relay was the worst loop in the game).
-    const steadyDraw = rowOption('hunter', 'hun_r14_sniper_training');
-    expect(steadyDraw.name).toBe('Steady Draw');
-    expect(steadyDraw.effect.proc).toBeUndefined();
-    const aimed = resolved('hunter', 'aimed_shot', { 14: 'hun_r14_sniper_training' });
-    expect(aimed.castTime).toBeCloseTo(2.4);
-    expect(effect(aimed, 'directDamage')).toEqual(
-      effect(resolved('hunter', 'aimed_shot'), 'directDamage'),
-    );
 
     const recall = rowOption('shaman', 'sha_r20_elemental_fury');
     expect(recall.name).toBe('Storm Recall');
@@ -192,21 +181,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(doubleBlink).toMatchObject({ charges: 2, bonusCharges: 1 });
   });
 
-  it('Fieldhardy (was Calloused Hide) is a flat max-health passive', () => {
-    // Balance pass: the on-hit instant Long Draw is gone; the option is the
-    // classic Survivalist shape and no bigHitTaken response remains on it.
-    const sim = harness(new Sim({ seed: 2608, playerClass: 'hunter', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    const before = sim.player.maxHp;
-    expect(sim.selectTalentRow(17, 'hun_r17_thick_hide')).toBe(true);
-    expect(sim.player.maxHp).toBeGreaterThan(before);
-    const player = sim.player;
-    player.resource = player.maxResource;
-    spawnTarget(sim, player);
-    onDamageTaken(sim.ctx, player, Math.ceil(player.maxHp * 0.15));
-    expect(player.auras.some((aura) => aura.id === 'hun_calloused_hide')).toBe(false);
-  });
-
   it('consumes a scoped cheap-cast aura at the authoritative cost boundary', () => {
     const sim = harness(new Sim({ seed: 2609, playerClass: 'druid', autoEquip: false }));
     sim.setPlayerLevel(20);
@@ -232,29 +206,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
     expect(player.resource).toBe(0);
     expect(player.auras.some((aura) => aura.id === 'test_cheap_claw')).toBe(false);
-  });
-
-  it('snapshots Viperfletch from the preceding resolved Fell Shot hit', () => {
-    const sim = harness(new Sim({ seed: 2610, playerClass: 'hunter', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(14, 'hun_r14_serpents_venom')).toBe(true);
-    const player = sim.player;
-    const target = spawnTarget(sim, player);
-    const res = sim.resolvedAbility('arcane_shot');
-    if (!res) throw new Error('missing Fell Shot');
-    sim.events = [];
-
-    runEffects(sim.ctx, player, metaOf(sim), target, res);
-
-    const direct = sim.events.find(
-      (event) => event.type === 'damage' && event.ability === res.def.name,
-    );
-    if (!direct || direct.type !== 'damage') throw new Error('missing direct Fell Shot damage');
-    const dot = target.auras.find(
-      (aura) => aura.kind === 'dot' && aura.id === 'arcane_shot' && aura.sourceId === player.id,
-    );
-    expect(dot?.value).toBe(Math.max(1, Math.round(Math.round(direct.amount * 0.5) / 3)));
-    expect(dot?.school).toBe('nature');
   });
 
   it("applies conditional bolt damage only for the caster's DoT", () => {
@@ -288,24 +239,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     };
 
     expect(damage(true)).toBeGreaterThan(damage(false));
-  });
-
-  it('Steady Rain prevents damage pushback without changing baseline channels', () => {
-    const castRemainingAfterHit = (selected: boolean): number => {
-      const sim = harness(new Sim({ seed: 2612, playerClass: 'hunter', autoEquip: false }));
-      sim.setPlayerLevel(20);
-      if (selected) expect(sim.selectTalentRow(20, 'hun_r20_improved_volley')).toBe(true);
-      const player = sim.player;
-      const attacker = spawnTarget(sim, player, 4);
-      player.castingAbility = 'volley';
-      player.castRemaining = 2;
-      player.castTotal = 3;
-      dealDamage(sim.ctx, attacker, player, 10, false, 'physical', 'Test Hit', 'hit');
-      return player.castRemaining;
-    };
-
-    expect(castRemainingAfterHit(false)).toBeGreaterThan(2);
-    expect(castRemainingAfterHit(true)).toBe(2);
   });
 
   it('fires and consumes Mercy Deferred when real damage crosses its health threshold', () => {

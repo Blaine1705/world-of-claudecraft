@@ -4033,7 +4033,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un tir soigneusement décoché qui inflige {damage} points de dégâts.',
   'entities.abilities.rapid_fire.name': 'Tir fiévreux',
   'entities.abilities.rapid_fire.description':
-    "Augmente votre vitesse d'attaque de 40% pendant 15 s.",
+    'Canalise six tirs rapides en 2,4 s tout en vous déplaçant. Chaque tir inflige {damage} points de dégâts physiques.',
   'entities.abilities.smite.name': 'Châtiment',
   'entities.abilities.smite.description': "Châtie l'ennemi pour {damage} points de dégâts Sacrés.",
   'entities.abilities.lesser_heal.name': 'Prière murmurée',

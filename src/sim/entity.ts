@@ -626,7 +626,7 @@ export function recalcPlayerStats(
       : Math.round(e.maxResource * manaFrac);
   } else {
     e.resourceType = def.resourceType;
-    e.maxResource = 100; // rage and energy both cap at 100
+    e.maxResource = 100; // rage, energy, and Focus all cap at 100
     e.resource = Math.min(e.resource, 100);
   }
 }

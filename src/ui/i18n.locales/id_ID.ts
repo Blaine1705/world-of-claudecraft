@@ -2497,7 +2497,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pembuka siluman yang menggaruk musuh sebesar kerusakan senjata ditambah {damage} dan menimbulkan kerusakan berdarah selama 9 detik. Memberi 1 poin kombo. Hanya dalam Wujud Serigala.',
   'entities.abilities.rake.name': 'Kupasan',
   'entities.abilities.rapid_fire.description':
-    'Meningkatkan kecepatan serangmu sebesar 40% selama 15 detik.',
+    'Salurkan enam tembakan cepat selama 2,4 detik sambil bergerak. Setiap tembakan menimbulkan {damage} kerusakan fisik.',
   'entities.abilities.rapid_fire.name': 'Tarikan Menggebu',
   'entities.abilities.raptor_strike.description':
     'Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar {damage}. Aktif pada ayunan berikutnya.',

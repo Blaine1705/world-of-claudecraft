@@ -3641,7 +3641,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un tiro accuratamente teso che infligge {damage} danni.',
   'entities.abilities.rapid_fire.name': 'Tiro Febbrile',
   'entities.abilities.rapid_fire.description':
-    "Aumenta la tua velocità d'attacco del 40% per 15 s.",
+    'Incanala sei colpi rapidi in 2,4 s mentre ti muovi. Ogni colpo infligge {damage} danni fisici.',
   'entities.abilities.smite.name': 'Punizione',
   'entities.abilities.smite.description': 'Colpisce il nemico per {damage} danni Sacri.',
   'entities.abilities.lesser_heal.name': 'Preghiera Sussurrata',

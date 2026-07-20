@@ -1,46 +1,51 @@
-// Group buffs are ONE per target regardless of caster (v0.27.1): a second
-// hunter's Wildfang Rally REPLACES the first, never stacks a duplicate +45 AP
-// and +5% haste. The general rule: every aoeAlly group buff must either carry
+// Group buffs are ONE per target regardless of caster: a second Hunter's Pack
+// Rally replaces the first. The general rule: every aoeAlly group buff must either carry
 // Bloodlust-style exhaustion (exhaust: true, the 'sated' debuff blocks a second
 // application) or appear in aura_stacking's source-independent dedupe set; the
 // guard test at the bottom makes forgetting BOTH a loud CI failure for any
 // future group buff.
 import { describe, expect, it } from 'vitest';
 import { SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS } from '../src/sim/combat/aura_stacking';
+import { runHunterPackRally } from '../src/sim/combat/hunter_shared';
 import { ABILITIES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 
-describe('Wildfang Rally never stacks with itself', () => {
+describe('Pack Rally never stacks with itself', () => {
   it('a second hunter casting replaces the first copy instead of stacking', () => {
     const sim = new Sim({ seed: 2026, playerClass: 'hunter', noPlayer: true }) as AnySim;
     const a = sim.addPlayer('hunter', 'HunterA');
     const b = sim.addPlayer('hunter', 'HunterB');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
     for (const pid of [a, b]) {
       sim.setPlayerLevel(20, pid);
       expect(sim.setSpec('beast_mastery', pid)).toBe(true);
-      expect(sim.selectTalentRow(20, 'hun_r20_aspect_of_the_wild', pid)).toBe(true);
+      expect(sim.selectTalentRow(17, 'hun_r17_pack_rally', pid)).toBe(true);
       const p = sim.entities.get(pid) as Entity;
       p.resource = p.maxResource;
+      p.inCombat = true;
     }
     const entA = sim.entities.get(a) as Entity;
     const entB = sim.entities.get(b) as Entity;
     entB.pos = { ...entA.pos };
 
-    sim.castAbility('aspect_of_the_wild', a);
-    entB.gcdRemaining = 0;
-    sim.castAbility('aspect_of_the_wild', b);
+    runHunterPackRally(sim.ctx, entA, 10, 30);
+    runHunterPackRally(sim.ctx, entB, 10, 30);
 
     for (const ent of [entA, entB]) {
-      const haste = ent.auras.filter((x) => x.id === 'aspect_of_the_wild');
-      const ap = ent.auras.filter((x) => x.id === 'aspect_of_the_wild_ap');
-      expect(haste, 'one haste copy').toHaveLength(1);
-      expect(ap, 'one AP copy').toHaveLength(1);
+      const speed = ent.auras.filter((x) => x.id === 'hunter_pack_rally_speed');
+      const attackHaste = ent.auras.filter((x) => x.id === 'hunter_pack_rally_haste');
+      const spellHaste = ent.auras.filter((x) => x.id === 'hunter_pack_rally_spellhaste');
+      expect(speed, 'one speed copy').toHaveLength(1);
+      expect(attackHaste, 'one attack haste copy').toHaveLength(1);
+      expect(spellHaste, 'one spell haste copy').toHaveLength(1);
       // The later cast owns the surviving copy.
-      expect(haste[0].sourceId).toBe(b);
-      expect(ap[0].sourceId).toBe(b);
+      expect(speed[0].sourceId).toBe(b);
+      expect(attackHaste[0].sourceId).toBe(b);
+      expect(spellHaste[0].sourceId).toBe(b);
     }
   });
 });

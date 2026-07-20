@@ -2459,7 +2459,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Düşmanı silah hasarı artı {damage} ile tırmalayan ve 9 saniye boyunca kanama hasarı yaratan gizlilik açılışı. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.',
   'entities.abilities.rake.name': 'Deri Yüzme',
-  'entities.abilities.rapid_fire.description': 'Saldırı hızını 15 saniye boyunca %40 artırır.',
+  'entities.abilities.rapid_fire.description':
+    'Hareket ederken 2,4 saniye boyunca altı hızlı atış yapar. Her atış {damage} fiziksel hasar verir.',
   'entities.abilities.rapid_fire.name': 'Hummalı Çekiş',
   'entities.abilities.raptor_strike.description':
     'Hasarı {damage} artıran güçlü bir yakın dövüş saldırısı. Bir sonraki vuruşunda etkinleşir.',

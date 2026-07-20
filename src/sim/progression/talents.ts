@@ -33,6 +33,9 @@
 // (enforced by tests/architecture.test.ts).
 
 import { stripTemporalEchoes } from '../combat/chronomancy';
+import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
+import { clearPacklordState } from '../combat/hunter_packlord';
+import { clearHunterTalentState } from '../combat/hunter_shared';
 import { abilitiesKnownAt } from '../content/classes';
 import {
   cloneAllocation,
@@ -267,6 +270,14 @@ function commitTalentAllocation(
   // companion returns home. Tamed hunter pets are never spec-gated, so they
   // are untouched; deterministic, no rng.
   dismissSpecLockedPet(ctx, player, meta);
+  if (meta.cls === 'hunter') {
+    clearHunterTalentState(ctx, player);
+    if (sanitized.spec !== 'beast_mastery') clearPacklordState(ctx, player);
+    if (sanitized.spec !== 'survival') clearFieldcraftState(ctx, player);
+    if (sanitized.spec !== 'marksmanship') {
+      player.auras = player.auras.filter((aura) => aura.kind !== 'hunter_cold_focus');
+    }
+  }
   // Chronomancy: leaving the healer spec (the new build no longer knows Temporal
   // Echo) clears any Temporal Echo marks this mage placed, so a fire/frost mage
   // never keeps feeding a stale echo. Keyed by sourceId; marks the mage carries

@@ -2464,7 +2464,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một đòn mở màn từ trạng thái ẩn thân cào xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 9 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.rake.name': 'Lóc Xé',
   'entities.abilities.rapid_fire.description':
-    'Tăng tốc độ tấn công của bạn thêm 40% trong 15 giây.',
+    'Vừa di chuyển vừa bắn nhanh sáu phát trong 2,4 giây. Mỗi phát gây {damage} sát thương vật lý.',
   'entities.abilities.rapid_fire.name': 'Giương Cung Cuồng Loạn',
   'entities.abilities.raptor_strike.description':
     'Một đòn cận chiến mạnh tăng sát thương thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn.',

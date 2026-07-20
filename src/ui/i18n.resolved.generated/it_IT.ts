@@ -227,7 +227,8 @@ export const it_IT: EnTranslations = {
     },
     "hud": {
       "lowMana": "Mana basso",
-      "lowEnergy": "Energia bassa"
+      "lowEnergy": "Energia bassa",
+      "lowFocus": "Low Focus"
     },
     "talents": {
       "title": "Talenti",
@@ -2997,6 +2998,8 @@ export const it_IT: EnTranslations = {
       "blessing_of_might": "Aumenta la potenza d'attacco di un alleato, ottima da lanciare prima di un pull.",
       "divine_protection": "Una rapida barriera protettiva per assorbire i danni quando le cose si fanno difficili.",
       "raptor_strike": "Un duro fendente in mischia per quando qualcosa ti arriva addosso.",
+      "pack_command": "Orders your companion to strike, building Pack Ferocity for Unleash Beast.",
+      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
       "aspect_of_the_hawk": "Un aspetto che tieni attivo per affinare la tua potenza d'attacco a distanza.",
       "serpent_sting": "Infligge un veleno che fa sanguinare danni da natura nel tempo.",
       "arcane_shot": "Un tiro istantaneo dalla distanza per un rapido danno aggiuntivo.",
@@ -5235,7 +5238,8 @@ export const it_IT: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energia",
-      "rage": "Rabbia"
+      "rage": "Rabbia",
+      "focus": "Focus"
     },
     "roles": {
       "warrior": "Tank / DPS da mischia",
@@ -5941,7 +5945,8 @@ export const it_IT: EnTranslations = {
     "resources": {
       "mana": "mana",
       "rage": "rabbia",
-      "energy": "energia"
+      "energy": "energia",
+      "focus": "Focus"
     },
     "forms": {
       "bear": "orso",
@@ -6304,6 +6309,54 @@ export const it_IT: EnTranslations = {
       "volley": {
         "name": "Scarica di Frecce",
         "description": "Fa piovere frecce sulla zona bersaglio per 3 sec, infliggendo {damage} danni ogni 0.5 sec ai nemici colpiti."
+      },
+      "pack_command": {
+        "name": "Pack Command",
+        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+      },
+      "unleash_beast": {
+        "name": "Unleash Beast",
+        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+      },
+      "measured_shot": {
+        "name": "Measured Shot",
+        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+      },
+      "cold_focus": {
+        "name": "Cold Focus",
+        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+      },
+      "bloodhook": {
+        "name": "Bloodhook",
+        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+      },
+      "shrapnel_charge": {
+        "name": "Shrapnel Charge",
+        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+      },
+      "bloodtrail_assault": {
+        "name": "Bloodtrail Assault",
+        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+      },
+      "trailbreak": {
+        "name": "Trailbreak",
+        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+      },
+      "wildheart": {
+        "name": "Wildheart",
+        "description": "Immediately restore 30% of your maximum health."
+      },
+      "shellskin": {
+        "name": "Shellskin",
+        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+      },
+      "frostjaw_trap": {
+        "name": "Frostjaw Trap",
+        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+      },
+      "pack_rally": {
+        "name": "Pack Rally",
+        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
       },
       "hurricane": {
         "name": "Uragano",
@@ -6707,7 +6760,7 @@ export const it_IT: EnTranslations = {
       },
       "rapid_fire": {
         "name": "Tiro Febbrile",
-        "description": "Aumenta la tua velocità d'attacco del 40% per 15 s."
+        "description": "Incanala sei colpi rapidi in 2,4 s mentre ti muovi. Ogni colpo infligge {damage} danni fisici."
       },
       "smite": {
         "name": "Punizione",

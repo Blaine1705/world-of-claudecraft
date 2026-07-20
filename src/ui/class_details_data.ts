@@ -83,7 +83,7 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
 export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
   warrior: ['charge', 'heroic_strike', 'execute'],
   paladin: ['holy_light', 'judgement', 'seal_of_righteousness'],
-  hunter: ['serpent_sting', 'aimed_shot', 'arcane_shot'],
+  hunter: ['pack_command', 'measured_shot', 'raptor_strike'],
   rogue: ['sinister_strike', 'eviscerate', 'evasion'],
   priest: ['smite', 'power_word_shield', 'shadow_word_pain'],
   shaman: ['lightning_bolt', 'rockbiter_weapon', 'ghost_wolf'],
@@ -147,17 +147,17 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     beast_mastery: {
       primaryStat: 'agi',
       complexity: 'low',
-      examples: ['bestial_wrath', 'tame_beast', 'serpent_sting', 'mongoose_bite'],
+      examples: ['pack_command', 'unleash_beast', 'bestial_wrath', 'tame_beast'],
     },
     marksmanship: {
       primaryStat: 'agi',
       complexity: 'medium',
-      examples: ['trueshot_aura', 'aimed_shot', 'rapid_fire', 'volley'],
+      examples: ['measured_shot', 'aimed_shot', 'rapid_fire', 'cold_focus'],
     },
     survival: {
       primaryStat: 'agi',
       complexity: 'high',
-      examples: ['wyvern_sting', 'wing_clip', 'concussive_shot', 'counter_shot'],
+      examples: ['bloodhook', 'raptor_strike', 'mongoose_bite', 'shrapnel_charge'],
     },
   },
   rogue: {

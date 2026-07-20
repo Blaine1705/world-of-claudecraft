@@ -1052,6 +1052,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': 'Этот язык недоступен.',
   'game.hud.lowMana': 'Мало маны',
   'game.hud.lowEnergy': 'Мало энергии',
+  'game.hud.lowFocus': 'Мало концентрации',
   'game.talents.title': 'Таланты',
   'game.talents.classTab': 'Класс',
   'game.talents.specTab': 'Специализация',
@@ -1576,6 +1577,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': 'Мана',
   'classDetails.resources.energy': 'Энергия',
   'classDetails.resources.rage': 'Ярость',
+  'classDetails.resources.focus': 'Концентрация',
   'classDetails.roles.warrior': 'Танк / ближний DPS',
   'classDetails.roles.paladin': 'Лекарь / танк / ближний DPS',
   'classDetails.roles.hunter': 'Дальний DPS',
@@ -2171,6 +2173,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': 'маны',
   'abilityUi.resources.rage': 'ярости',
   'abilityUi.resources.energy': 'энергии',
+  'abilityUi.resources.focus': 'концентрации',
   'abilityUi.forms.bear': 'медведя',
   'abilityUi.forms.cat': 'волка',
   'abilityUi.cast.fishing': 'Рыбная ловля',
@@ -2488,6 +2491,42 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': 'Залп',
   'entities.abilities.volley.description':
     'Осыпает указанную область стрелами в течение 3 сек., нанося {damage} ед. урона каждые 0.5 сек. врагам в ней.',
+  'entities.abilities.pack_command.name': 'Команда стае',
+  'entities.abilities.pack_command.description':
+    'Приказывает вашему живому питомцу атаковать. Успешное попадание дает 20 ед. концентрации и один уровень Свирепости стаи.',
+  'entities.abilities.unleash_beast.name': 'Высвободить зверя',
+  'entities.abilities.unleash_beast.description':
+    'Высвобождает полную Свирепость стаи в мощном ударе по основной цели и по области, а затем ненадолго приводит питомца в неистовство с рассекающими атаками.',
+  'entities.abilities.measured_shot.name': 'Выверенный выстрел',
+  'entities.abilities.measured_shot.description':
+    'Выверенный выстрел наносит {damage} ед. физического урона и при попадании дает 20 ед. концентрации.',
+  'entities.abilities.cold_focus.name': 'Холодная сосредоточенность',
+  'entities.abilities.cold_focus.description':
+    'На 12 сек. Выверенный выстрел дает больше концентрации, а Дальний натяг становится быстрее и дешевле. (Фирменная способность Холодного взора)',
+  'entities.abilities.bloodhook.name': 'Кровавый крюк',
+  'entities.abilities.bloodhook.description':
+    'Рывок к врагу на расстоянии от 8 до 25 м, открывающий основную рану с кровотечением на 24 ед. урона за 12 сек. (Фирменная способность Полевой выучки)',
+  'entities.abilities.shrapnel_charge.name': 'Шрапнельный заряд',
+  'entities.abilities.shrapnel_charge.description':
+    'Поражает цель и ближайших врагов шрапнелью, затем распространяет с основной цели короткое кровотечение.',
+  'entities.abilities.bloodtrail_assault.name': 'Натиск по кровавому следу',
+  'entities.abilities.bloodtrail_assault.description':
+    'На 12 сек. усиливает Кровавый крюк, Разрыв раны, Шрапнельный заряд и последующие атаки питомца.',
+  'entities.abilities.trailbreak.name': 'Разрыв следа',
+  'entities.abilities.trailbreak.description':
+    'Отпрыгивает назад, не теряя состояние специализации. Полевая выучка также подготавливает следующее возвращение в бой.',
+  'entities.abilities.wildheart.name': 'Дикое сердце',
+  'entities.abilities.wildheart.description':
+    'Мгновенно восстанавливает 30% от максимального запаса здоровья.',
+  'entities.abilities.shellskin.name': 'Панцирная кожа',
+  'entities.abilities.shellskin.description':
+    'Снижает получаемый урон на 60% на 8 сек., но во время действия запрещает атаковать.',
+  'entities.abilities.frostjaw_trap.name': 'Капкан ледяной пасти',
+  'entities.abilities.frostjaw_trap.description':
+    'Устанавливает взведенную ловушку у выбранного врага или у ваших ног. Она обездвиживает первого сработавшего на ней врага и замедляет врагов рядом.',
+  'entities.abilities.pack_rally.name': 'Сбор стаи',
+  'entities.abilities.pack_rally.description':
+    'Принимает Облик скакуна и воодушевляет ближайших союзников, повышая на 10 сек. скорость передвижения на 30%, а скорость атак и применения способностей на 10%.',
   'entities.abilities.hurricane.name': 'Ураган',
   'entities.abilities.hurricane.description':
     'Обрушивает ураган на указанную область на 6 сек., нанося врагам {damage} ед. урона силами природы каждую секунду.',
@@ -2672,7 +2711,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Тщательно натянутый выстрел, наносящий {damage} ед. урона.',
   'entities.abilities.rapid_fire.name': 'Лихорадочный натяг',
-  'entities.abilities.rapid_fire.description': 'Повышает скорость атаки на 40% на 15 сек.',
+  'entities.abilities.rapid_fire.description':
+    'Во время движения выпускает шесть быстрых стрел за 2,4 сек. Каждая наносит {damage} ед. физического урона.',
   'entities.abilities.smite.name': 'Кара',
   'entities.abilities.smite.description':
     'Карает врага, нанося {damage} ед. урона от светлой магии.',
@@ -5270,8 +5310,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Заряжает вас так, что атакующие получают урон силами природы, когда бьют вас.',
   'guide.abilityHook.mark_of_the_wild':
     'Длительное благословение, которое вы накладываете на себя или союзника перед боем.',
+  'guide.abilityHook.measured_shot':
+    'Выверенный дальний выстрел, восстанавливающий концентрацию для более мощных атак.',
   'guide.abilityHook.mongoose_bite':
     'Контрудар, который становится доступен сразу после того, как враг уклонился.',
+  'guide.abilityHook.pack_command':
+    'Приказывает вашему спутнику атаковать и накапливает Свирепость стаи для Высвобождения зверя.',
   'guide.abilityHook.moonfire':
     'Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.',
   'guide.abilityHook.power_word_fortitude':

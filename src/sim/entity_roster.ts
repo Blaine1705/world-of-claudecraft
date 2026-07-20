@@ -81,6 +81,9 @@ export type GroundAoE = {
     armRemaining: number;
     freezeDuration: number;
     triggered: boolean;
+    rootInstead?: boolean;
+    slowMult?: number;
+    slowDuration?: number;
   };
   temporalHourglass?: {
     id: string;
@@ -293,7 +296,7 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   p.resource =
     p.resourceType === 'mana'
       ? Math.round(p.maxResource * 0.5)
-      : p.resourceType === 'energy'
+      : p.resourceType === 'energy' || p.resourceType === 'focus'
         ? 100
         : 0;
   p.targetId = null;

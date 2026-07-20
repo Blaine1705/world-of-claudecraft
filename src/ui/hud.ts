@@ -29,6 +29,9 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { resolveActionReplacement } from '../sim/combat/action_replacement';
+import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
+import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
@@ -697,6 +700,7 @@ const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   mana: 'abilityUi.resources.mana',
   rage: 'abilityUi.resources.rage',
   energy: 'abilityUi.resources.energy',
+  focus: 'abilityUi.resources.focus',
 };
 // Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
 // are successes rendered as chat-log lines in handleEvents, but they map here
@@ -4992,9 +4996,12 @@ export class Hud {
   abilityForSlot(barSlot: number): ResolvedAbility | null {
     // barSlot 1..33 (three desktop rows of eleven configurable slots)
     const action = this.actionForSlot(barSlot);
-    return action?.type === 'ability'
-      ? (this.sim.known.find((k) => k.def.id === action.id) ?? null)
-      : null;
+    if (action?.type !== 'ability') return null;
+    const known = this.sim.known.find((entry) => entry.def.id === action.id) ?? null;
+    if (!known || this.sim.cfg.playerClass !== 'hunter') return known;
+    let resolved = resolveActionReplacement(known, this.sim.player);
+    resolved = resolveColdsightAbilityForSpec(resolved, this.sim.player, this.sim.talents.spec);
+    return resolveHunterSharedAbilityForTalents(resolved, this.sim.player, this.sim.talents);
   }
 
   private itemForSlot(barSlot: number): ItemDef | null {

@@ -123,9 +123,9 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     const swift = render('paladin', (e) => e.id === 'pal_r14_swift_verdicts');
     expect(swift).toContain('cooldown is reduced by 20%');
 
-    // Balance pass: the option is now Steady Draw, a plain cast-speed talent.
-    const sniper = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
-    expect(sniper).toContain('cast time is reduced by 20%');
+    // Hunter Talents 2.0: Trapcraft exposes the real cooldown reduction.
+    const trapcraft = render('hunter', (e) => e.id === 'hun_r14_trapcraft');
+    expect(trapcraft).toContain('cooldown is reduced by 20%');
 
     const attunement = render('shaman', (e) => e.id === 'sha_r11_elemental_attunement');
     expect(attunement).toContain('critical strikes');
@@ -236,6 +236,23 @@ const PCT_FIELDS = new Set([
   // entity.ts / auras.ts, shown as "5%" and "20%" in the hand-written description.
   'manaPct',
   'manaRegenPct',
+  // Hunter Talents 2.0 stores bespoke runtime constants here so the authored
+  // tooltip remains mechanically auditable without fake ability modifiers.
+  'movementSpeedPct',
+  'enduringMovementSpeedPct',
+  'focusGenerationPct',
+  'damageReductionPct',
+  'fallbackDamageReductionPct',
+  'petHealPct',
+  'cooldownRefundPct',
+  'petHealthFloorPct',
+  'healthThresholdPct',
+  'slowPct',
+  'costReductionPct',
+  'primaryDamagePct',
+  'cleavePct',
+  'echoPct',
+  'hastePct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {

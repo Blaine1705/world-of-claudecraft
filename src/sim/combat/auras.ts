@@ -92,6 +92,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
     let regen = 20;
     for (const a of p.auras) if (a.kind === 'buff_energyregen') regen *= 1 + a.value;
     p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
+  } else if (p.resourceType === 'focus') {
+    // Hunter Focus returns at 5 per second on the classic two-second tick.
+    p.resource = Math.min(p.maxResource, p.resource + 10);
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }

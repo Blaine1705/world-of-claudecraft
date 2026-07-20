@@ -3626,7 +3626,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Um tiro cuidadosamente retesado que causa {damage} de dano.',
   'entities.abilities.rapid_fire.name': 'Disparo Febril',
-  'entities.abilities.rapid_fire.description': 'Aumenta sua velocidade de ataque em 40% por 15 s.',
+  'entities.abilities.rapid_fire.description':
+    'Canaliza seis disparos rápidos ao longo de 2,4 s enquanto você se move. Cada disparo causa {damage} de dano físico.',
   'entities.abilities.smite.name': 'Punição',
   'entities.abilities.smite.description': 'Pune o inimigo com {damage} de dano Sagrado.',
   'entities.abilities.lesser_heal.name': 'Prece Sussurrada',

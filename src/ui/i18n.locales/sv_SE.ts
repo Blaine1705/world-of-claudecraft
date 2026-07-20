@@ -2397,7 +2397,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'En smygöppnare som krafsar fienden för vapenskada plus {damage} och vållar blödningsskada över 9 sek. Ger 1 kombopoäng. Endast i vargform.',
   'entities.abilities.rake.name': 'Flå',
-  'entities.abilities.rapid_fire.description': 'Ökar din anfallshastighet med 40 % i 15 sek.',
+  'entities.abilities.rapid_fire.description':
+    'Kanalisera sex snabba skott under 2,4 sek. medan du rör dig. Varje skott orsakar {damage} fysisk skada.',
   'entities.abilities.rapid_fire.name': 'Febrigt drag',
   'entities.abilities.raptor_strike.description':
     'Ett kraftfullt närstridsanfall som ökar skadan med {damage}. Aktiveras vid ditt nästa hugg.',

@@ -367,6 +367,7 @@ const RESOURCE_KEYS = {
   mana: 'classDetails.resources.mana',
   energy: 'classDetails.resources.energy',
   rage: 'classDetails.resources.rage',
+  focus: 'classDetails.resources.focus',
 } satisfies Record<string, TranslationKey>;
 
 function classDisplayDescription(className: PlayerClass): string {
