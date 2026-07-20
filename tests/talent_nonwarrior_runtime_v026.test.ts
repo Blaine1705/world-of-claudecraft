@@ -335,7 +335,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
   });
 
   it('pins exact Cleansing Verdict and Voidfeast healing with correct dispel direction', () => {
-    const paladin = simWithRows('paladin', { 17: 'pal_r17_cleansing_verdict' });
+    const paladin = simWithRows('paladin', { 8: 'pal_r8_cleansing_verdict' });
     const ally = addTarget(paladin, 2, false);
     ally.maxHp = 1_000;
     ally.hp = 500;

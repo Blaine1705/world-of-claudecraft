@@ -22,9 +22,13 @@ import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
 import {
+  AEGIS_OF_DEVOTION_DR,
+  AEGIS_OF_DEVOTION_DURATION,
   activateDivineAscension,
   ascensionImpactKind,
   consumeAscensionCharge,
+  DAWNS_PATH_SPEED_DURATION,
+  DAWNS_PATH_SPEED_MULT,
   devotionGainForAbility,
   grantDevotion,
 } from '../paladin_devotion';
@@ -1093,6 +1097,43 @@ export function runEffects(
       }
       case 'divineAscension': {
         if (activateDivineAscension(p)) {
+          const asc = mods.global;
+          // Extended Dawn: empower additional abilities during this Ascension.
+          if (asc.ascensionChargeBonus > 0 && p.paladinDevotion) {
+            p.paladinDevotion.ascensionCharges += asc.ascensionChargeBonus;
+          }
+          // Dawn's Path: break roots/slows and surge forward on activation.
+          if (asc.ascensionRush > 0) {
+            for (let index = p.auras.length - 1; index >= 0; index--) {
+              const aura = p.auras[index];
+              if (aura.kind !== 'root' && aura.kind !== 'slow') continue;
+              p.auras.splice(index, 1);
+              ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+            }
+            ctx.applyAura(p, {
+              id: 'dawns_path_speed',
+              name: "Dawn's Path",
+              kind: 'buff_speed',
+              remaining: DAWNS_PATH_SPEED_DURATION,
+              duration: DAWNS_PATH_SPEED_DURATION,
+              value: DAWNS_PATH_SPEED_MULT,
+              sourceId: p.id,
+              school: 'holy',
+            });
+          }
+          // Aegis of Devotion: a brief damage-reduction ward on activation.
+          if (asc.ascensionWard > 0) {
+            ctx.applyAura(p, {
+              id: 'aegis_of_devotion_dr',
+              name: 'Aegis of Devotion',
+              kind: 'buff_dr',
+              remaining: AEGIS_OF_DEVOTION_DURATION,
+              duration: AEGIS_OF_DEVOTION_DURATION,
+              value: AEGIS_OF_DEVOTION_DR,
+              sourceId: p.id,
+              school: 'holy',
+            });
+          }
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,

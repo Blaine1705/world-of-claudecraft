@@ -8,6 +8,11 @@ export const ASCENSION_DEVOTION_BANK_CAP = 10;
 export const DEVOTION_DECAY_DELAY = 10;
 export const DEVOTION_DECAY_INTERVAL = 2;
 export const BLOCK_DEVOTION_ICD = 6;
+// Divine Ascension (Amanecer) talent riders, applied at activation:
+export const DAWNS_PATH_SPEED_MULT = 1.4; // Dawn's Path: +40% movement speed
+export const DAWNS_PATH_SPEED_DURATION = 6;
+export const AEGIS_OF_DEVOTION_DR = 0.25; // Aegis of Devotion: 25% damage reduction
+export const AEGIS_OF_DEVOTION_DURATION = 8;
 
 export type PaladinSpec = 'holy' | 'protection' | 'retribution';
 export type AscensionImpactKind = 'healing' | 'defensive' | 'offensive' | 'area';
