@@ -1,7 +1,7 @@
 import { SPORT_ABILITIES } from '../../../sim/content/vale_cup';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
-import { WARRIOR_STANCE_GROUP } from '../../stance_bar_view';
+import { isStanceBarAbilityGroup } from '../../stance_bar_view';
 import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 import {
   actionForAttackSlot,
@@ -109,9 +109,9 @@ export class ActionBarController {
       // A passive (Measured Fury) is known but never castable, so it never
       // auto-places on the action bar (a manual drag would be a dead slot too).
       if (!this.isAbilityPlacementAllowed(id)) return;
-      // Warrior stances live on the dedicated #stancebar, never the action bar,
-      // so learning one on level-up must not consume an action slot.
-      if (ABILITIES[id]?.exclusiveGroup === WARRIOR_STANCE_GROUP) return;
+      // Warrior stances and Paladin auras live on the dedicated #stancebar,
+      // never the action bar, so learning one must not consume an action slot.
+      if (isStanceBarAbilityGroup(ABILITIES[id]?.exclusiveGroup)) return;
       if (this.shouldAutoPlaceOnForm(id, this.activeFormState)) autoPlaceAbilityIds.add(id);
     };
     if (this.knownAbilityIdsAtLastSync === null) {

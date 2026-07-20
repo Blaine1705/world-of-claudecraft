@@ -13,6 +13,96 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.aegis_first_dawn.name': '初曦圣盾',
+  'entities.abilities.aegis_first_dawn.description':
+    '引导 5 秒，制造一个 10 码的神圣穹顶。穹顶内的盟友每秒受到治疗，且受到的伤害降低 50%。完整引导后释放一次终结治疗，并使移动速度提高 30%，持续 4 秒。',
+  'entities.abilities.divine_ascension.name': '神圣升华',
+  'entities.abilities.divine_ascension.description':
+    '消耗 20 点奉献，获得 5 层升华充能，持续最多 25 秒。标记的技能会消耗 1 层充能并获得额外效果。',
+  'entities.abilities.devotion_ward.name': '奉献光环',
+  'entities.abilities.devotion_ward.description':
+    '使你和队伍成员受到的伤害降低 5%，持续至你死亡或切换奉献。你只能提供一种奉献，但不同圣骑士的奉献可以共存。',
+  'entities.abilities.hammer_of_grace.name': '恩典之锤',
+  'entities.abilities.hammer_of_grace.description':
+    '用武器攻击目标，命中后恢复 70 点法力值。与光明之锤共享冷却时间。',
+  'entities.abilities.hammer_of_light.name': '光明之锤',
+  'entities.abilities.hammer_of_light.description':
+    '用武器攻击目标，并为自己恢复相当于所造成伤害 50% 的生命值。与恩典之锤共享冷却时间。',
+  'entities.abilities.hushbrand.name': '静默烙印',
+  'entities.abilities.hushbrand.description': '打断施法，并使该法术学派在 4 秒内无法施放。',
+  'entities.abilities.unbinding_blessing.name': '解缚祝福',
+  'entities.abilities.unbinding_blessing.description': '移除一个友方目标身上的减速和定身效果。',
+  'entities.abilities.guardian_covenant.name': '守护契约',
+  'entities.abilities.guardian_covenant.description':
+    '保护一名盟友，使其受到的伤害降低 20%，持续 8 秒。',
+  'entities.abilities.solar_step.name': '日光疾步',
+  'entities.abilities.solar_step.description':
+    '以极高速度向前冲刺 2 秒。你可以转向，但无法提前停止前进。',
+  'entities.abilities.solar_invocation.name': '日光祈唤',
+  'entities.abilities.solar_invocation.description':
+    '呼唤圣光，为 40 码内所有友方玩家恢复 {damage} 点生命值。',
+  'entities.abilities.recall_the_fallen.name': '召回逝者',
+  'entities.abilities.recall_the_fallen.description':
+    '使一名死亡的队伍成员复活，并恢复其 35% 的生命值和法力值。',
+  'entities.abilities.beacon_of_light.name': '圣光信标',
+  'entities.abilities.beacon_of_light.description':
+    '将一名队伍成员标记为你的圣光信标。你对信标之外 60 码内队伍成员造成的有效治疗量，有 75% 也会治疗信标。持续到你或信标死亡。',
+  'entities.abilities.oathstrike.name': '誓约打击',
+  'entities.abilities.oathstrike.description':
+    '造成武器伤害并附加 {damage} 点伤害，生成 1 点奉献。升华会以 60% 威力重复此次攻击。',
+  'entities.abilities.final_edict.name': '终极裁决',
+  'entities.abilities.final_edict.description':
+    '发动一次沉重的武器攻击并生成 2 点奉献。升华还会在你周围释放神圣爆炸。',
+  'entities.abilities.dawnfall.name': '黎明陨落',
+  'entities.abilities.dawnfall.description':
+    '对附近敌人造成 {damage} 点神圣伤害并生成 2 点奉献。升华会提高伤害和范围。',
+  'entities.abilities.faithforged_guard.name': '信铸守护',
+  'entities.abilities.faithforged_guard.description':
+    '用护盾环绕自身，在 8 秒内吸收 {damage} 点伤害。升华使护盾效果提高 50%。',
+  'entities.abilities.sacred_form.name': '神圣形态',
+  'entities.abilities.sacred_form.description':
+    '进入神圣状态直至死亡，使治疗量提高 10%、法术暴击几率提高 5%，并使产生的威胁值降低 50%。仅限神圣专精。',
+  'entities.abilities.mercy_lance.name': '仁慈之枪',
+  'entities.abilities.mercy_lance.description':
+    '为一名盟友恢复或对一名敌人造成 {damage} 点生命值，并生成 1 点奉献。升华时用于治疗还会治疗附近一名盟友。',
+  'entities.abilities.dawns_embrace.name': '黎明之拥',
+  'entities.abilities.dawns_embrace.description':
+    '施放一次强力治疗并生成 2 点奉献。升华使其变为瞬发并使治疗量提高 35%。',
+  'entities.abilities.radiant_chorus.name': '光辉合唱',
+  'entities.abilities.radiant_chorus.description':
+    '为附近盟友恢复 {damage} 点生命值并生成 2 点奉献。升华会提高治疗量和范围。',
+  'entities.abilities.life_covenant.name': '生命契约',
+  'entities.abilities.life_covenant.description':
+    '使一名盟友受到的伤害降低 40%，持续 6 秒。升华期间还会赋予 120 点护盾，且不消耗充能。',
+  'entities.abilities.vowkeeper_strike.name': '守誓打击',
+  'entities.abilities.vowkeeper_strike.description':
+    '发动一次高威胁值攻击并生成 1 点奉献。升华还会赋予一个小型吸收护盾。',
+  'entities.abilities.bastion_rite.name': '堡垒仪式',
+  'entities.abilities.bastion_rite.description':
+    '使受到的物理伤害降低 20%，持续 6 秒，并生成 1 点奉献。升华将持续时间延长至 10 秒。',
+  'entities.abilities.sunward_disc.name': '日耀圆盾',
+  'entities.abilities.sunward_disc.description':
+    '投掷一面光辉圆盾，在敌人之间弹射 2 次并生成 2 点奉献。升华使其可弹射 5 次。',
+  'entities.abilities.sacred_challenge.name': '神圣挑战',
+  'entities.abilities.sacred_challenge.description':
+    '迫使一名敌人攻击你。升华期间还会使你受到的所有伤害降低 15%，持续 4 秒，且不消耗充能。',
+  'entities.abilities.citadel_of_faith.name': '信仰堡垒',
+  'entities.abilities.citadel_of_faith.description': '使受到的所有伤害降低 40%，持续 10 秒。',
+  'entities.abilities.radiant_devotion.name': '光辉奉献',
+  'entities.abilities.radiant_devotion.description':
+    '使你和队伍成员的法术强度提高 20 点，持续 30 分钟。',
+  'entities.abilities.dawn_devotion.name': '黎明奉献',
+  'entities.abilities.dawn_devotion.description':
+    '使你和队伍成员的攻击强度提高 40 点，持续 30 分钟。此奉献可与战士的战吼共存。',
+  'entities.abilities.grace_devotion.name': '恩典奉献',
+  'entities.abilities.grace_devotion.description':
+    '你和队伍成员每 5 秒恢复 15 点法力值，并使法术的法力消耗降低 6%，持续 3 分钟。',
+  'hudChrome.paladin.devotion': '奉献',
+  'hudChrome.paladin.devotionValue': '奉献 {value}/{max}',
+  'hudChrome.paladin.devotionAscensionCharges': '奉献 {value}/{max}。升华剩余 {charges} 层。',
+  'hudChrome.paladin.devotionAscensionLast': '奉献 {value}/{max}。升华仅剩最后一层。',
+  'hudChrome.paladin.ascensionLastAnnouncement': '升华仅剩最后一层',
+  'hudChrome.paladin.ascensionSpenderAria': '动作栏位 {slot}：{ability}。消耗 1 层升华。',
   'hudChrome.crafting.identity.ceilingRare': '稀有品质上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -2499,10 +2589,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '奉献你脚下的土地，持续 10 秒，每 2 秒灼烧附近敌人并造成 {damage} 点神圣伤害。',
   'entities.abilities.righteous_fury.name': '炽燃誓约',
   'entities.abilities.righteous_fury.description':
-    '使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。',
+    '被动使你的神圣伤害产生的威胁值提高 60%。仅限防护专精。',
   'entities.abilities.retribution_aura.name': '报偿光环',
   'entities.abilities.retribution_aura.description':
-    '以神圣能量环绕自身，持续 30 分钟，对任何近战攻击你的敌人造成 5 点神圣伤害。',
+    '以神圣能量环绕你和队伍成员，对任何发动近战攻击的敌人造成 5 点神圣伤害。持续至你死亡或切换奉献。',
   'entities.abilities.tame_beast.name': '野性羁绊',
   'entities.abilities.tame_beast.description':
     '开始驯服一只野兽作为你的伙伴。它必须不高于你的等级，且不能是精英。你的宠物会跟随你、攻击敌人，并保持自己的威胁值。同一时间只能拥有一只宠物。',

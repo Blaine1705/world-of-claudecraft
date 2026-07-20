@@ -35,6 +35,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   greaterInvisibility: 'other',
   breakControl: 'other',
   cleanseSelf: 'other',
+  cleanseMovement: 'other',
+  divineAscension: 'other',
   repositionToAim: 'other',
   blinkForward: 'other',
   finisherDamage: 'damage',
@@ -59,6 +61,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   // Chronomancy Temporal Echo: places a friendly mark (its Arcane-damage-to-heal
   // conversion is separate); the ability itself deals no damage and breaks no CC.
   temporalEcho: 'other',
+  beaconOfLight: 'other',
+  paladinAegis: 'other',
   massTemporalEcho: 'other',
   resurrectAlly: 'other',
   massResurrectGroup: 'other',

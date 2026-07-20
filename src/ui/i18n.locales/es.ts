@@ -13,6 +13,101 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paladin.devotion': 'Devoción',
+  'hudChrome.paladin.devotionValue': 'Devoción {value} de {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Devoción {value} de {max}. Ascensión: {charges} cargas.',
+  'hudChrome.paladin.devotionAscensionLast':
+    'Devoción {value} de {max}. Última carga de Ascensión.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Última carga de Ascensión',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Ranura de acción {slot}: {ability}. Consume una carga de Ascensión.',
+  'entities.abilities.divine_ascension.name': 'Ascensión divina',
+  'entities.abilities.divine_ascension.description':
+    'Consume 20 de Devoción para obtener 5 cargas de Ascensión durante un máximo de 25 s. Las facultades marcadas consumen una carga y obtienen un efecto adicional.',
+  'entities.abilities.devotion_ward.name': 'Aura de devoción',
+  'entities.abilities.devotion_ward.description':
+    'Reduce un 5% el daño que recibís tú y los miembros de tu grupo hasta morir o sustituirla. Solo puedes aportar una Devoción, pero las Devociones de distintos paladines pueden coexistir.',
+  'entities.abilities.hammer_of_grace.name': 'Martillo de gracia',
+  'entities.abilities.hammer_of_grace.description':
+    'Golpea con tu arma y restaura 70 de maná al acertar. Comparte tiempo de reutilización con Martillo de luz.',
+  'entities.abilities.hammer_of_light.name': 'Martillo de luz',
+  'entities.abilities.hammer_of_light.description':
+    'Golpea con tu arma y te sana un 50% del daño infligido. Comparte tiempo de reutilización con Martillo de gracia.',
+  'entities.abilities.hushbrand.name': 'Marca silente',
+  'entities.abilities.hushbrand.description':
+    'Interrumpe el lanzamiento e impide usar hechizos de esa escuela durante 4 s.',
+  'entities.abilities.unbinding_blessing.name': 'Bendición liberadora',
+  'entities.abilities.unbinding_blessing.description':
+    'Elimina los efectos de ralentización e inmovilización de un objetivo aliado.',
+  'entities.abilities.guardian_covenant.name': 'Pacto guardián',
+  'entities.abilities.guardian_covenant.description':
+    'Protege a un aliado y reduce un 20% el daño que recibe durante 8 s.',
+  'entities.abilities.solar_step.name': 'Paso solar',
+  'entities.abilities.solar_step.description':
+    'Avanza hacia delante a gran velocidad durante 2 s. Puedes girar, pero no detener el avance antes de tiempo.',
+  'entities.abilities.solar_invocation.name': 'Invocación solar',
+  'entities.abilities.solar_invocation.description':
+    'Recurre a la Luz para sanar {damage} a todos los jugadores aliados en un radio de 40 m.',
+  'entities.abilities.radiant_devotion.name': 'Devoción radiante',
+  'entities.abilities.radiant_devotion.description':
+    'Aumenta 20 p. el poder con hechizos tuyo y de los miembros de tu grupo durante 30 min.',
+  'entities.abilities.dawn_devotion.name': 'Devoción del alba',
+  'entities.abilities.dawn_devotion.description':
+    'Aumenta 40 p. el poder de ataque tuyo y de los miembros de tu grupo durante 30 min. Esta Devoción coexiste con los gritos de guerrero.',
+  'entities.abilities.grace_devotion.name': 'Devoción de gracia',
+  'entities.abilities.grace_devotion.description':
+    'Tú y los miembros de tu grupo restauráis 15 de maná cada 5 s y gastáis un 6% menos de maná durante 3 min.',
+  'entities.abilities.recall_the_fallen.name': 'Llamada de los caídos',
+  'entities.abilities.recall_the_fallen.description':
+    'Devuelve a la vida a un miembro muerto del grupo con un 35% de salud y maná.',
+  'entities.abilities.beacon_of_light.name': 'Señal de Luz',
+  'entities.abilities.beacon_of_light.description':
+    'Convierte a un miembro del grupo en tu Señal de Luz. Un 75% de la sanación efectiva que realices sobre otros miembros del grupo en un radio de 60 m también sana a la Señal. Dura hasta que muera uno de los dos.',
+  'entities.abilities.oathstrike.name': 'Golpe de juramento',
+  'entities.abilities.oathstrike.description':
+    'Inflige daño de arma más {damage} y genera 1 de Devoción. Ascensión repite el golpe con un 60% de potencia.',
+  'entities.abilities.final_edict.name': 'Edicto final',
+  'entities.abilities.final_edict.description':
+    'Asesta un potente golpe con el arma y genera 2 de Devoción. Ascensión también libera una explosión sagrada a tu alrededor.',
+  'entities.abilities.dawnfall.name': 'Caída del alba',
+  'entities.abilities.dawnfall.description':
+    'Inflige {damage} de daño Sagrado a los enemigos cercanos y genera 2 de Devoción. Ascensión aumenta el daño y el radio.',
+  'entities.abilities.faithforged_guard.name': 'Guardia forjada por la fe',
+  'entities.abilities.faithforged_guard.description':
+    'Te rodea con un escudo que absorbe {damage} de daño durante 8 s. Ascensión aumenta el escudo un 50%.',
+  'entities.abilities.mercy_lance.name': 'Lanza de misericordia',
+  'entities.abilities.mercy_lance.description':
+    'Sana a un aliado o inflige {damage} a un enemigo y genera 1 de Devoción. Al usarse para sanar, Ascensión también sana a un aliado cercano.',
+  'entities.abilities.sacred_form.name': 'Forma sagrada',
+  'entities.abilities.sacred_form.description':
+    'Asciendes a un estado sagrado hasta morir: aumenta un 10% tu sanación y un 5% tu probabilidad de crítico con hechizos, y reduce un 50% la amenaza que generas. Solo para Sanador solar.',
+  'entities.abilities.dawns_embrace.name': 'Abrazo del alba',
+  'entities.abilities.dawns_embrace.description':
+    'Lanza una potente sanación y genera 2 de Devoción. Ascensión hace que sea instantánea y aumenta un 35% su sanación.',
+  'entities.abilities.radiant_chorus.name': 'Coro radiante',
+  'entities.abilities.radiant_chorus.description':
+    'Sana {damage} a los aliados cercanos y genera 2 de Devoción. Ascensión aumenta la sanación y el radio.',
+  'entities.abilities.life_covenant.name': 'Pacto de vida',
+  'entities.abilities.life_covenant.description':
+    'Reduce un 40% el daño que recibe un aliado durante 6 s. Durante Ascensión también concede un escudo de 120 p. sin consumir una carga.',
+  'entities.abilities.aegis_first_dawn.name': 'Égida del Primer Amanecer',
+  'entities.abilities.aegis_first_dawn.description':
+    'Canaliza durante 5 s y crea una cúpula sagrada de 10 m. Los aliados en su interior reciben sanación cada segundo y sufren un 50% menos de daño. Al completar la canalización, libera una sanación final y aumenta un 30% la velocidad de movimiento durante 4 s.',
+  'entities.abilities.vowkeeper_strike.name': 'Golpe del custodio',
+  'entities.abilities.vowkeeper_strike.description':
+    'Golpea con gran amenaza y genera 1 de Devoción. Ascensión también concede un pequeño escudo de absorción.',
+  'entities.abilities.bastion_rite.name': 'Rito del bastión',
+  'entities.abilities.bastion_rite.description':
+    'Reduce un 20% el daño físico recibido durante 6 s y genera 1 de Devoción. Ascensión amplía la duración a 10 s.',
+  'entities.abilities.sunward_disc.name': 'Disco solar',
+  'entities.abilities.sunward_disc.description':
+    'Lanza un disco radiante que golpea y rebota hacia 2 enemigos, y genera 2 de Devoción. Ascensión permite 5 rebotes.',
+  'entities.abilities.sacred_challenge.name': 'Aguijón sagrado',
+  'entities.abilities.sacred_challenge.description':
+    'Obliga a un enemigo a atacarte. Durante Ascensión también reduce un 15% el daño recibido durante 4 s sin consumir una carga.',
+  'entities.abilities.citadel_of_faith.name': 'Ciudadela de fe',
+  'entities.abilities.citadel_of_faith.description': 'Reduce un 40% el daño recibido durante 10 s.',
   'hud.combat.floatingParry': 'Parada',
   'hud.combat.parried': 'Tu {ability} es parada por {target}.',
   'hud.pet.waterJet': 'Chorro de Agua',
@@ -3598,10 +3693,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consagra el suelo bajo tus pies y abrasa a los enemigos cercanos por {damage} de daño Sagrado cada 2 s durante 10 s.',
   'entities.abilities.righteous_fury.name': 'Juramento Ardiente',
   'entities.abilities.righteous_fury.description':
-    'Aumenta un 60% la amenaza generada por tu daño Sagrado durante 30 min. La piedra angular del paladín tanque.',
+    'Aumenta de forma pasiva un 60% la amenaza generada por tu daño Sagrado. Solo tanque.',
   'entities.abilities.retribution_aura.name': 'Aura de Represalia',
   'entities.abilities.retribution_aura.description':
-    'Te rodea de energía sagrada durante 30 min y causa 5 de daño Sagrado a cualquier enemigo que te golpee cuerpo a cuerpo.',
+    'Os rodea a ti y a tu grupo con energía sagrada hasta morir o sustituirla, e inflige 5 de daño Sagrado a cualquier enemigo que golpee cuerpo a cuerpo a un aliado afectado.',
   'entities.abilities.tame_beast.name': 'Vínculo Salvaje',
   'entities.abilities.tame_beast.description':
     'Comienza a domesticar una bestia para que sea tu compañera. Debe ser de tu nivel o inferior y no ser élite. Tu mascota te sigue, ataca a tus enemigos y genera su propia amenaza. Solo puedes tener una mascota a la vez.',

@@ -62,6 +62,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Patch Up's dead-pet revive fraction is owned by the pet lifecycle branch;
   // the living-pet HoT remains fully data-driven by the ability effect.
   revive_pet: [35],
+  // Divine Ascension's resource price, charge count and lifetime are owned by
+  // the dedicated paladin devotion state machine, not an AbilityEffect.
+  divine_ascension: [20, 5, 25],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

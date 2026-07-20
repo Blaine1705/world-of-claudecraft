@@ -28,6 +28,7 @@ interface StableAuraRecord {
   empowerAbilities: readonly string[] | undefined;
   sourceId: number;
   paused: boolean;
+  permanent: boolean;
   deadline: number;
 }
 
@@ -36,6 +37,7 @@ interface StableAuraWire {
   name: string;
   kind: string;
   dur: number;
+  perm?: 1;
   exp?: number;
   rem?: number;
   value?: number;
@@ -71,7 +73,8 @@ function auraMatches(
   simTime: number,
   paused: boolean,
 ): boolean {
-  const deadline = round2(paused ? aura.remaining : simTime + aura.remaining);
+  const permanent = aura.permanent === true;
+  const deadline = permanent ? 0 : round2(paused ? aura.remaining : simTime + aura.remaining);
   return (
     record.id === aura.id &&
     record.name === aura.name &&
@@ -87,6 +90,7 @@ function auraMatches(
     sameStringList(record.empowerAbilities, aura.empowerAbilities) &&
     record.sourceId === aura.sourceId &&
     record.paused === paused &&
+    record.permanent === permanent &&
     record.deadline === deadline
   );
 }
@@ -107,7 +111,8 @@ function auraRecord(aura: Aura, simTime: number, paused: boolean): StableAuraRec
     empowerAbilities: aura.empowerAbilities ? [...aura.empowerAbilities] : undefined,
     sourceId: aura.sourceId,
     paused,
-    deadline: round2(paused ? aura.remaining : simTime + aura.remaining),
+    permanent: aura.permanent === true,
+    deadline: aura.permanent ? 0 : round2(paused ? aura.remaining : simTime + aura.remaining),
   };
 }
 
@@ -116,9 +121,10 @@ function auraWire(record: StableAuraRecord): StableAuraWire {
     id: record.id,
     name: record.name,
     kind: record.kind,
-    dur: record.duration,
+    dur: record.permanent ? 0 : record.duration,
   };
-  if (record.paused) wire.rem = record.deadline;
+  if (record.permanent) wire.perm = 1;
+  else if (record.paused) wire.rem = record.deadline;
   else wire.exp = record.deadline;
   if (record.value !== 0) wire.value = record.value;
   if (record.value2 !== undefined) wire.value2 = record.value2;

@@ -180,6 +180,23 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
     return { key, anchorId: event.sourceId };
   }
   if (event.fx === 'nova') return { key: 'spell_nova', anchorId: event.targetId };
+  if (event.fx === 'paladinAscensionStart') {
+    return { key: 'spell_nova', anchorId: event.sourceId };
+  }
+  if (event.fx === 'paladinAscensionImpact') {
+    const key: SfxId =
+      event.impact === 'area'
+        ? 'proj_holy'
+        : event.impact === 'defensive'
+          ? 'combat_block'
+          : event.impact === 'healing'
+            ? 'cast_chain_heal'
+            : 'wand_holy';
+    return {
+      key,
+      anchorId: event.impact === 'area' ? event.sourceId : event.targetId,
+    };
+  }
   return null;
 }
 

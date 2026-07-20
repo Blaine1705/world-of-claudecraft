@@ -64,6 +64,9 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { cleanupPaladinAegis } from './paladin_aegis';
+import { stripBeaconOfLight } from './paladin_beacon';
+import { stripPaladinDevotionsFromSource } from './paladin_support';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -1001,6 +1004,8 @@ function reflectSpellWard(
 
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
   resetProcState(e);
+  cleanupPaladinAegis(ctx, e.id);
+  stripPaladinDevotionsFromSource(ctx, e.id);
   e.dead = true;
   e.hp = 0;
   ctx.clearNonPlayerStatAuras(e);
@@ -1041,6 +1046,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // shed by aurasSurvivingDeath above). Keyed by sourceId, so marks THIS player
     // carries from another chronomancer are left alone.
     stripTemporalEchoes(ctx, e.id);
+    stripBeaconOfLight(ctx, e.id);
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
     // The Book of Deeds death hook (lifetime deaths counter, the Keeper's Toll

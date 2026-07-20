@@ -27,7 +27,8 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { CLASSES, isArenaPos, MOBS } from '../data';
+import { isArenaPos, MOBS } from '../data';
+import { grantDevotionFromBlock } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -386,6 +387,7 @@ export function meleeSwing(
     // shared hit table.
     critBonus?: number;
     onDealt?: (amount: number) => void;
+    onEffectiveDamage?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
   },
 ): boolean {
@@ -470,15 +472,22 @@ export function meleeSwing(
     opts.forceCrit === true;
   if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+  const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+  if (blocked) {
     dmg = Math.max(1, dmg - target.blockValue);
+    const targetMeta = target.kind === 'player' ? ctx.players.get(target.id) : undefined;
+    if (targetMeta && ctx.playerMods(targetMeta).spec === 'protection') {
+      grantDevotionFromBlock(target);
+    }
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
+  const hpBefore = target.hp;
   ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
     flat: opts.threatFlat ?? 0,
     mult: opts.threatMult ?? 1,
   });
   opts.onDealt?.(dealtAmount);
+  opts.onEffectiveDamage?.(Math.max(0, hpBefore - target.hp));
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.

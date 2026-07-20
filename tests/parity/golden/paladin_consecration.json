@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "116ca42b",
+      "state": "2c35f61c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -100,6 +100,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -136,8 +137,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 417,
-      "state": "483ca20e",
-      "events": "ee312c82",
+      "state": "3dedbe29",
+      "events": "30d909b2",
       "rng": {
         "draws": 4,
         "digest": "e457e920"
@@ -147,7 +148,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 417,
-      "state": "a5d0c685",
+      "state": "584e1bf8",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -158,7 +159,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 417,
-      "state": "3d18ffa6",
+      "state": "cff90233",
       "events": "55404e76",
       "rng": {
         "draws": 80,
@@ -169,7 +170,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 417,
-      "state": "004b1ba7",
+      "state": "b0851362",
       "events": "741638a5",
       "rng": {
         "draws": 170,
@@ -180,8 +181,8 @@
       "tick": 100,
       "time": 5,
       "nextId": 417,
-      "state": "a1b29a14",
-      "events": "c42eb4a4",
+      "state": "82c77b79",
+      "events": "f543dc49",
       "rng": {
         "draws": 270,
         "digest": "afc4bc0b"
@@ -191,7 +192,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 417,
-      "state": "fe6bd29b",
+      "state": "75664a7e",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -202,8 +203,8 @@
       "tick": 140,
       "time": 7,
       "nextId": 417,
-      "state": "67d6ee88",
-      "events": "75a4e964",
+      "state": "42c7112b",
+      "events": "37edefcd",
       "rng": {
         "draws": 501,
         "digest": "9e9280f3"
@@ -213,7 +214,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 417,
-      "state": "4b521fc6",
+      "state": "3d829733",
       "events": "741638a5",
       "rng": {
         "draws": 627,
@@ -224,8 +225,8 @@
       "tick": 180,
       "time": 9,
       "nextId": 417,
-      "state": "bb2dd145",
-      "events": "2f266e06",
+      "state": "cb5ddbc2",
+      "events": "f8239027",
       "rng": {
         "draws": 765,
         "digest": "84d7375c"
@@ -235,7 +236,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 417,
-      "state": "7286a5f0",
+      "state": "b6891b6b",
       "events": "741638a5",
       "rng": {
         "draws": 931,
@@ -246,7 +247,7 @@
       "tick": 201,
       "time": 10.05,
       "nextId": 417,
-      "state": "93c8229e",
+      "state": "2f09422b",
       "events": "741638a5",
       "rng": {
         "draws": 932,
@@ -271,7 +272,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 164,
-            "damageTaken": 22
+            "damageTaken": 19
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -312,6 +313,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -339,9 +344,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         }
@@ -357,7 +363,7 @@
           "dodgeChance": 0.068,
           "fallStartY": 1.5,
           "fiveSecondRule": 10,
-          "hp": 49978,
+          "hp": 49981,
           "id": 415,
           "inCombat": true,
           "kind": "player",
@@ -368,6 +374,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -385,7 +392,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 438,
             "int": 32,
             "spi": 33,
             "sta": 60,
@@ -447,7 +454,7 @@
           "threat": [
             [
               415,
-              165
+              394.6
             ]
           ],
           "wanderTarget": {

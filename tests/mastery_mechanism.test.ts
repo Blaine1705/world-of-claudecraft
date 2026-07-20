@@ -33,7 +33,7 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     const base = abilitiesKnownAt('paladin', 20, undefined).find(
       (a) => a.def.id === 'retribution_aura',
     );
-    const baseThorns = base?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'thorns');
+    const baseThorns = base?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'thorns');
     expect(baseThorns && 'value' in baseThorns ? baseThorns.value : null).toBe(5);
 
     const retMods = computeTalentModifiers(
@@ -44,7 +44,7 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     const ret = abilitiesKnownAt('paladin', 20, retMods).find(
       (a) => a.def.id === 'retribution_aura',
     );
-    const retThorns = ret?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'thorns');
+    const retThorns = ret?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'thorns');
     // 5 * 1.2 (ret meleeDmgPct 0.2) = 6, not 5 (the pre-fix regression left it at 5).
     expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
   });

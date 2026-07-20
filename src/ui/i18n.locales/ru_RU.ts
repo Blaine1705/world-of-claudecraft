@@ -13,6 +13,102 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.aegis_first_dawn.name': 'Эгида Первого Рассвета',
+  'entities.abilities.aegis_first_dawn.description':
+    'Поддерживает заклинание 5 сек., создавая священный купол радиусом 10 м. Союзники внутри исцеляются каждую секунду и получают на 50% меньше урона. При полном завершении высвобождает финальное исцеление и повышает скорость передвижения на 30% на 4 сек.',
+  'entities.abilities.divine_ascension.name': 'Божественное вознесение',
+  'entities.abilities.divine_ascension.description':
+    'Расходует 20 ед. рвения и дает 5 зарядов вознесения на срок до 25 сек. Отмеченные способности расходуют один заряд и получают дополнительный эффект.',
+  'entities.abilities.devotion_ward.name': 'Аура благочестия',
+  'entities.abilities.devotion_ward.description':
+    'Уменьшает получаемый вами и членами группы урон на 5% до вашей смерти или смены благочестия. Вы можете поддерживать только одно благочестие, но эффекты разных паладинов действуют одновременно.',
+  'entities.abilities.hammer_of_grace.name': 'Молот благодати',
+  'entities.abilities.hammer_of_grace.description':
+    'Атакует противника оружием и при попадании восстанавливает 70 ед. маны. Имеет общее время восстановления с Молотом Света.',
+  'entities.abilities.hammer_of_light.name': 'Молот Света',
+  'entities.abilities.hammer_of_light.description':
+    'Атакует противника оружием и восстанавливает вам здоровье в размере 50% от нанесенного урона. Имеет общее время восстановления с Молотом благодати.',
+  'entities.abilities.hushbrand.name': 'Клеймо безмолвия',
+  'entities.abilities.hushbrand.description':
+    'Прерывает чтение заклинания и запрещает применять заклинания той же школы в течение 4 сек.',
+  'entities.abilities.unbinding_blessing.name': 'Благословение свободы',
+  'entities.abilities.unbinding_blessing.description':
+    'Снимает с союзной цели эффекты замедления и обездвиживания.',
+  'entities.abilities.guardian_covenant.name': 'Завет хранителя',
+  'entities.abilities.guardian_covenant.description':
+    'Защищает союзника, уменьшая получаемый им урон на 20% на 8 сек.',
+  'entities.abilities.solar_step.name': 'Солнечный шаг',
+  'entities.abilities.solar_step.description':
+    'Заставляет вас стремительно двигаться вперед в течение 2 сек. Направление можно менять, но остановиться раньше нельзя.',
+  'entities.abilities.solar_invocation.name': 'Солнечное воззвание',
+  'entities.abilities.solar_invocation.description':
+    'Призывает Свет и восстанавливает {damage} ед. здоровья всем союзным игрокам в радиусе 40 м.',
+  'entities.abilities.recall_the_fallen.name': 'Возвращение павших',
+  'entities.abilities.recall_the_fallen.description':
+    'Возвращает погибшего члена группы к жизни с 35% здоровья и маны.',
+  'entities.abilities.beacon_of_light.name': 'Частица Света',
+  'entities.abilities.beacon_of_light.description':
+    'Делает одного члена группы вашей Частицей Света. 75% эффективного исцеления, примененного вами к другим членам группы в радиусе 60 м от Частицы, также исцеляет ее носителя. Действует до смерти паладина или носителя.',
+  'entities.abilities.oathstrike.name': 'Удар клятвы',
+  'entities.abilities.oathstrike.description':
+    'Наносит урон оружием и еще {damage} ед. урона, накапливая 1 ед. рвения. При вознесении повторяет удар с силой 60%.',
+  'entities.abilities.final_edict.name': 'Последний эдикт',
+  'entities.abilities.final_edict.description':
+    'Наносит сокрушительный удар оружием и накапливает 2 ед. рвения. При вознесении также вызывает взрыв Света вокруг вас.',
+  'entities.abilities.dawnfall.name': 'Падение зари',
+  'entities.abilities.dawnfall.description':
+    'Наносит ближайшим противникам {damage} ед. урона от Света и накапливает 2 ед. рвения. Вознесение увеличивает урон и радиус.',
+  'entities.abilities.faithforged_guard.name': 'Закаленная верой защита',
+  'entities.abilities.faithforged_guard.description':
+    'Окружает вас щитом, поглощающим {damage} ед. урона в течение 8 сек. Вознесение усиливает щит на 50%.',
+  'entities.abilities.sacred_form.name': 'Священный облик',
+  'entities.abilities.sacred_form.description':
+    'До смерти переводит вас в священное состояние, повышая эффективность исцеления на 10%, вероятность критического эффекта заклинаний на 5% и снижая создаваемую угрозу на 50%. Только для специализации Свет.',
+  'entities.abilities.mercy_lance.name': 'Копье милосердия',
+  'entities.abilities.mercy_lance.description':
+    'Исцеляет союзника или наносит противнику {damage} ед. урона и накапливает 1 ед. рвения. При вознесении лечение также исцеляет ближайшего союзника.',
+  'entities.abilities.dawns_embrace.name': 'Объятия рассвета',
+  'entities.abilities.dawns_embrace.description':
+    'Мощно исцеляет цель и накапливает 2 ед. рвения. При вознесении применяется мгновенно и исцеляет на 35% больше.',
+  'entities.abilities.radiant_chorus.name': 'Сияющий хор',
+  'entities.abilities.radiant_chorus.description':
+    'Исцеляет ближайших союзников на {damage} ед. здоровья и накапливает 2 ед. рвения. Вознесение увеличивает лечение и радиус.',
+  'entities.abilities.life_covenant.name': 'Завет жизни',
+  'entities.abilities.life_covenant.description':
+    'Уменьшает получаемый союзником урон на 40% на 6 сек. При вознесении также дает щит прочностью 120 ед., не расходуя заряд.',
+  'entities.abilities.vowkeeper_strike.name': 'Удар хранителя клятвы',
+  'entities.abilities.vowkeeper_strike.description':
+    'Наносит удар с повышенной угрозой и накапливает 1 ед. рвения. При вознесении также дает небольшой поглощающий щит.',
+  'entities.abilities.bastion_rite.name': 'Обряд бастиона',
+  'entities.abilities.bastion_rite.description':
+    'Уменьшает получаемый физический урон на 20% на 6 сек. и накапливает 1 ед. рвения. Вознесение продлевает действие до 10 сек.',
+  'entities.abilities.sunward_disc.name': 'Солнечный диск',
+  'entities.abilities.sunward_disc.description':
+    'Бросает сияющий диск, который поражает и отскакивает к 2 противникам, накапливая 2 ед. рвения. При вознесении совершает 5 отскоков.',
+  'entities.abilities.sacred_challenge.name': 'Священный вызов',
+  'entities.abilities.sacred_challenge.description':
+    'Вынуждает противника атаковать вас. При вознесении также уменьшает весь получаемый урон на 15% на 4 сек., не расходуя заряд.',
+  'entities.abilities.citadel_of_faith.name': 'Цитадель веры',
+  'entities.abilities.citadel_of_faith.description':
+    'Уменьшает весь получаемый урон на 40% на 10 сек.',
+  'entities.abilities.radiant_devotion.name': 'Сияющее благочестие',
+  'entities.abilities.radiant_devotion.description':
+    'Повышает силу заклинаний у вас и членов группы на 20 на 30 мин.',
+  'entities.abilities.dawn_devotion.name': 'Благочестие рассвета',
+  'entities.abilities.dawn_devotion.description':
+    'Повышает силу атаки у вас и членов группы на 40 на 30 мин. Этот эффект действует одновременно с боевым кличем воина.',
+  'entities.abilities.grace_devotion.name': 'Благочестие милости',
+  'entities.abilities.grace_devotion.description':
+    'Вы и члены группы восстанавливаете 15 ед. маны раз в 5 сек., а затраты маны на заклинания уменьшаются на 6% на 3 мин.',
+  'hudChrome.paladin.devotion': 'Преданность',
+  'hudChrome.paladin.devotionValue': 'Преданность: {value}/{max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Преданность: {value}/{max}. Зарядов Вознесения: {charges}.',
+  'hudChrome.paladin.devotionAscensionLast':
+    'Преданность: {value}/{max}. Последний заряд Вознесения.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Последний заряд Вознесения',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Ячейка действия {slot}: {ability}. Расходует 1 заряд Вознесения.',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -2627,10 +2723,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Освящает землю под вами, обжигая ближайших врагов на {damage} ед. урона от светлой магии каждые 2 сек. в течение 10 сек.',
   'entities.abilities.righteous_fury.name': 'Пылающая клятва',
   'entities.abilities.righteous_fury.description':
-    'Повышает угрозу от вашего урона светлой магией на 60% на 30 мин. Основа паладина-танка.',
+    'Пассивно повышает угрозу от наносимого вами урона от Света на 60%. Только для специализации «Защита».',
   'entities.abilities.retribution_aura.name': 'Аура возмездия',
   'entities.abilities.retribution_aura.description':
-    'Окружает вас священной энергией на 30 мин и наносит 5 ед. урона светлой магией любому врагу, атакующему вас в ближнем бою.',
+    'Окружает вас и членов группы священной энергией и наносит 5 ед. урона светлой магией любому врагу, атакующему в ближнем бою. Действует до вашей смерти или смены благочестия.',
   'entities.abilities.tame_beast.name': 'Дикие узы',
   'entities.abilities.tame_beast.description':
     'Начинает приручать зверя в качестве спутника. Он должен быть не выше вашего уровня и не элитным. Ваш питомец следует за вами, атакует врагов и удерживает собственную угрозу. Одновременно можно иметь одного питомца.',

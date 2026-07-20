@@ -656,7 +656,15 @@ describe('arena: class ability target filters', () => {
         expect(sim.setSpec('arcane', pid)).toBe(true);
       },
     },
-    { cls: 'paladin', ability: 'consecration', level: 20 },
+    {
+      cls: 'paladin',
+      ability: 'consecration',
+      level: 20,
+      beforeQueue: (sim, pid) => {
+        sim.setPlayerLevel(20, pid);
+        expect(sim.setSpec('protection', pid)).toBe(true);
+      },
+    },
     {
       cls: 'druid',
       ability: 'swipe',

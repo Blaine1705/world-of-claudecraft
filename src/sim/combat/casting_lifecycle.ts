@@ -31,6 +31,7 @@ import { isDispellableAura } from '../aura_classify';
 import { ITEMS, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
+import { canActivateDivineAscension } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -55,6 +56,7 @@ import {
   normAngle,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
+import { sharedCooldownIds } from './ability_cooldown_groups';
 import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
 import {
   ARCANE_SURGE_ID,
@@ -82,6 +84,14 @@ import {
 import { empoweredCastProgress, empoweredStageForProgress } from './glacial_front';
 import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
 import {
+  cleanupPaladinAegis,
+  completePaladinAegis,
+  startPaladinAegis,
+  syncPaladinAegisProtection,
+  tickPaladinAegis,
+} from './paladin_aegis';
+import { paladinManaCostMultiplier } from './paladin_support';
+import {
   hasCastShield,
   noteSpellHit,
   spellDamageMultFromAuras,
@@ -90,9 +100,6 @@ import {
 import { isSpellResisted } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
 
-// Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
-// for the shared-cooldown predicate. Moved with the casting slice (only callers).
-const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
 export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'recklessness',
   'avatar',
@@ -137,13 +144,6 @@ function cancelStasisToggle(ctx: SimContext, entity: Entity, ability: AbilityDef
     ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
   }
   return true;
-}
-
-function isShamanShock(abilityId: string): boolean {
-  return (
-    (SHAMAN_SHOCK_COOLDOWN_IDS as readonly string[]).includes(abilityId) ||
-    abilityId === 'lightning_shock'
-  );
 }
 
 function chargeState(p: Entity, abilityId: string, bonusCharges: number, cooldown: number) {
@@ -221,6 +221,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
   }
+  if (activeCast && p.channeling) syncPaladinAegisProtection(ctx, p, activeCast);
   p.castRemaining -= DT;
 
   if (p.channeling) {
@@ -256,6 +257,8 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
         p.channelTicksLeft -= 1;
         fireChannelTick();
       }
+      const completed = p.castingAbility ? ctx.resolvedAbility(p.castingAbility, p.id) : null;
+      if (completed) completePaladinAegis(ctx, p, completed);
       p.castingAbility = null;
       p.channeling = false;
       // completed ground-targeted channels drop their aim like every other
@@ -361,6 +364,7 @@ function fireQueuedCast(ctx: SimContext, p: Entity): void {
 }
 
 export function cancelCast(ctx: SimContext, p: Entity): void {
+  if (p.castingAbility) cleanupPaladinAegis(ctx, p.id);
   p.castingAbility = null;
   p.castRemaining = 0;
   p.channeling = false;
@@ -445,6 +449,10 @@ export function castAbility(
   if (!res || p.dead) return;
   // Passive traits are spellbook information and mechanics hooks, never actions.
   if (res.def.passive) return;
+  if (abilityId === 'divine_ascension' && !canActivateDivineAscension(p)) {
+    ctx.error(p.id, 'That ability is not ready yet.');
+    return;
+  }
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
   if (cancelStasisToggle(ctx, p, ability)) return;
@@ -499,9 +507,7 @@ export function castAbility(
   // same-tick player press racing the GCD, not for a queued follow-up.
   if (!ability.offGcd && p.gcdRemaining > 0 && !blinkThrough) return; // silent, classic spams this
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
-  const sharedCooldown = isShamanShock(ability.id)
-    ? SHAMAN_SHOCK_COOLDOWN_IDS.find((id) => p.cooldowns.has(id))
-    : undefined;
+  const sharedCooldown = sharedCooldownIds(ability.id)?.find((id) => p.cooldowns.has(id));
   // Charge-limited abilities (the abilityCharges recharge model, driven by
   // bonusCharges: Double Charge, extra Blink/Frost Nova/Ice Block): a running
   // cooldown is only the RECHARGE timer; the cast is blocked only once every
@@ -521,7 +527,9 @@ export function castAbility(
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
   const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
   const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
-  const payableCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const cheapCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const payableCost =
+    p.resourceType === 'mana' ? Math.ceil(cheapCost * paladinManaCostMultiplier(p)) : cheapCost;
   if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(
       p.id,
@@ -857,6 +865,10 @@ export function castAbility(
     }
   }
 
+  if (ability.channel && res.cost > 0 && p.resourceType === 'mana' && !ability.spendsAllResource) {
+    res = { ...res, cost: Math.ceil(res.cost * paladinManaCostMultiplier(p)) };
+  }
+
   if (ability.channel) {
     spendAbilityCost(ctx, p, meta, res);
     armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
@@ -888,6 +900,7 @@ export function castAbility(
       ability: ability.id,
       time: channelDuration,
     });
+    startPaladinAegis(ctx, p, res);
     // A channel never reaches applyAbility (its ticks resolve in updateCasting),
     // so 'spellCast' set procs (Clearcasting) roll HERE, once per channel start.
     // Gated on setProcs inside applySetProcs, so proc-less players draw no rng.
@@ -1117,14 +1130,16 @@ function armAbilityCooldown(
     else p.cooldowns.delete(abilityId);
     return;
   }
-  if (isShamanShock(abilityId)) {
-    for (const id of SHAMAN_SHOCK_COOLDOWN_IDS) p.cooldowns.set(id, cooldown);
+  const sharedIds = sharedCooldownIds(abilityId);
+  if (sharedIds) {
+    for (const id of sharedIds) p.cooldowns.set(id, cooldown);
     return;
   }
   p.cooldowns.set(abilityId, cooldown);
 }
 
 function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): void {
+  if (tickPaladinAegis(ctx, p, res)) return;
   // Ground-targeted channels (Rain of Fire / Volley / Hurricane): each tick pulses
   // the ability's aoeDamage at the aimed point (clamped at cast start, held in
   // castAim for the channel's life), independent of any entity target.
@@ -1506,7 +1521,9 @@ function applyAbility(
   }
   const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
   const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
-  const payableCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const cheapCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const payableCost =
+    p.resourceType === 'mana' ? Math.ceil(cheapCost * paladinManaCostMultiplier(p)) : cheapCost;
   if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;
@@ -1516,6 +1533,9 @@ function applyAbility(
   } else if (res.cost > 0 && !togglingOff) {
     const cheap = consumeNextCastCheap(ctx, p, ability.id);
     if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
+  }
+  if (res.cost > 0 && p.resourceType === 'mana' && !ability.spendsAllResource) {
+    res = { ...res, cost: Math.ceil(res.cost * paladinManaCostMultiplier(p)) };
   }
   if (ability.spendsAllResource && !togglingOff) {
     const spend =

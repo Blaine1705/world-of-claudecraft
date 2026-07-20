@@ -98,6 +98,21 @@ describe('Talents V2 dispel and steal primitives', () => {
     expect(stolen?.sourceId).toBe(sim.player.id);
   });
 
+  it('does not steal permanent stance-style magic auras', () => {
+    const sim = new Sim({ seed: 21, playerClass: 'mage', autoEquip: true });
+    const enemy = addHostile(sim);
+    const permanent = aura(enemy, 'devotion_ward', 'buff_dr', 0.05, 'holy');
+    permanent.remaining = Number.POSITIVE_INFINITY;
+    permanent.duration = Number.POSITIVE_INFINITY;
+    permanent.permanent = true;
+    enemy.auras.push(permanent);
+
+    runAbilityEffect(sim, enemy, 'spellsteal');
+
+    expect(enemy.auras).toContainEqual(permanent);
+    expect(sim.player.auras.some((entry) => entry.id === 'devotion_ward')).toBe(false);
+  });
+
   it.each([
     ['buff_sta', 10],
     ['buff_sta_pct', 20],

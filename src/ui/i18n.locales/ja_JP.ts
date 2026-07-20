@@ -13,6 +13,100 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.aegis_first_dawn.name': '第一の暁のイージス',
+  'entities.abilities.aegis_first_dawn.description':
+    '5秒間詠唱し、半径10ヤードの聖なるドームを作り出す。内部の味方を毎秒回復し、受けるダメージを50%軽減する。詠唱を完了すると最後の回復を放ち、移動速度を4秒間30%上昇させる。',
+  'entities.abilities.divine_ascension.name': '聖なる昇華',
+  'entities.abilities.divine_ascension.description':
+    '信仰を20消費し、最大25秒間持続する昇華の力を5回分得る。指定された能力は力を1回分消費し、追加効果を得る。',
+  'entities.abilities.devotion_ward.name': '献身のオーラ',
+  'entities.abilities.devotion_ward.description':
+    '自身とパーティメンバーが受けるダメージを5%軽減する。死亡するか別の献身に切り替えるまで持続する。自身が与えられる献身は1種類だけだが、別の聖騎士の献身とは共存できる。',
+  'entities.abilities.hammer_of_grace.name': '恩寵の槌',
+  'entities.abilities.hammer_of_grace.description':
+    '武器で敵を攻撃し、命中するとマナを70回復する。光の槌と再使用時間を共有する。',
+  'entities.abilities.hammer_of_light.name': '光の槌',
+  'entities.abilities.hammer_of_light.description':
+    '武器で敵を攻撃し、与えたダメージの50%に相当する体力を回復する。恩寵の槌と再使用時間を共有する。',
+  'entities.abilities.hushbrand.name': '静寂の刻印',
+  'entities.abilities.hushbrand.description':
+    '呪文詠唱を中断し、同じ系統の呪文を4秒間使用不能にする。',
+  'entities.abilities.unbinding_blessing.name': '解放の祝福',
+  'entities.abilities.unbinding_blessing.description':
+    '味方1体の移動速度低下と移動不能効果を解除する。',
+  'entities.abilities.guardian_covenant.name': '守護の盟約',
+  'entities.abilities.guardian_covenant.description':
+    '味方1体を守り、受けるダメージを20%軽減する。8秒間持続する。',
+  'entities.abilities.solar_step.name': '陽光の歩み',
+  'entities.abilities.solar_step.description':
+    '2秒間、高速で前進する。方向転換はできるが、途中で前進を止めることはできない。',
+  'entities.abilities.solar_invocation.name': '陽光の祈願',
+  'entities.abilities.solar_invocation.description':
+    '聖なる光を呼び、40ヤード以内にいるすべての味方プレイヤーの体力を{damage}回復する。',
+  'entities.abilities.recall_the_fallen.name': '倒れし者の帰還',
+  'entities.abilities.recall_the_fallen.description':
+    '死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。',
+  'entities.abilities.beacon_of_light.name': '光の信標',
+  'entities.abilities.beacon_of_light.description':
+    'グループメンバー1人を光の信標にする。信標以外のグループメンバーが信標から60ヤード以内にいる時、自身が行った有効な回復量の75%で信標も回復する。自身か信標が死亡するまで持続する。',
+  'entities.abilities.oathstrike.name': '誓約の一撃',
+  'entities.abilities.oathstrike.description':
+    '武器ダメージに加えて{damage}ダメージを与え、信仰を1得る。昇華中は60%の威力でもう一度攻撃する。',
+  'entities.abilities.final_edict.name': '最後の勅令',
+  'entities.abilities.final_edict.description':
+    '強烈な武器攻撃を行い、信仰を2得る。昇華中は自身の周囲に聖なる爆発も放つ。',
+  'entities.abilities.dawnfall.name': '暁の落光',
+  'entities.abilities.dawnfall.description':
+    '周囲の敵に{damage}の神聖ダメージを与え、信仰を2得る。昇華中はダメージと範囲が増加する。',
+  'entities.abilities.faithforged_guard.name': '信仰鍛造の守り',
+  'entities.abilities.faithforged_guard.description':
+    '8秒間、{damage}ダメージを吸収する盾で自身を包む。昇華中は盾の効果が50%増加する。',
+  'entities.abilities.sacred_form.name': '聖なる姿',
+  'entities.abilities.sacred_form.description':
+    '死亡するまで聖なる状態になり、回復量が10%、呪文のクリティカル率が5%増加し、発生させる脅威が50%減少する。神聖専用。',
+  'entities.abilities.mercy_lance.name': '慈悲の槍',
+  'entities.abilities.mercy_lance.description':
+    '味方を回復するか敵に{damage}ダメージを与え、信仰を1得る。昇華中に回復へ使うと、近くの味方1人も回復する。',
+  'entities.abilities.dawns_embrace.name': '暁の抱擁',
+  'entities.abilities.dawns_embrace.description':
+    '強力な回復を行い、信仰を2得る。昇華中は即時発動となり、回復量が35%増加する。',
+  'entities.abilities.radiant_chorus.name': '輝きの聖歌',
+  'entities.abilities.radiant_chorus.description':
+    '近くの味方を{damage}回復し、信仰を2得る。昇華中は回復量と範囲が増加する。',
+  'entities.abilities.life_covenant.name': '生命の盟約',
+  'entities.abilities.life_covenant.description':
+    '味方1体が受けるダメージを40%軽減する。6秒間持続する。昇華中は力を消費せず、さらに120ダメージを防ぐ盾を与える。',
+  'entities.abilities.vowkeeper_strike.name': '守誓の一撃',
+  'entities.abilities.vowkeeper_strike.description':
+    '高い脅威を発生させる攻撃を行い、信仰を1得る。昇華中は小さな吸収盾も得る。',
+  'entities.abilities.bastion_rite.name': '砦の儀式',
+  'entities.abilities.bastion_rite.description':
+    '受ける物理ダメージを20%軽減し、信仰を1得る。6秒間持続する。昇華中は持続時間が10秒になる。',
+  'entities.abilities.sunward_disc.name': '陽光の円盤',
+  'entities.abilities.sunward_disc.description':
+    '輝く円盤を投げ、敵2体へ跳ね返らせて信仰を2得る。昇華中は5体へ跳ね返る。',
+  'entities.abilities.sacred_challenge.name': '聖なる挑戦',
+  'entities.abilities.sacred_challenge.description':
+    '敵1体に自身を攻撃させる。昇華中は力を消費せず、さらに受けるすべてのダメージを4秒間15%軽減する。',
+  'entities.abilities.citadel_of_faith.name': '信仰の城塞',
+  'entities.abilities.citadel_of_faith.description':
+    '受けるすべてのダメージを40%軽減する。10秒間持続する。',
+  'entities.abilities.radiant_devotion.name': '輝きの献身',
+  'entities.abilities.radiant_devotion.description':
+    '自身とパーティメンバーの呪文威力を20増加させる。30分間持続する。',
+  'entities.abilities.dawn_devotion.name': '暁の献身',
+  'entities.abilities.dawn_devotion.description':
+    '自身とパーティメンバーの攻撃力を40増加させる。30分間持続する。この献身は戦士の雄叫びと共存する。',
+  'entities.abilities.grace_devotion.name': '恩寵の献身',
+  'entities.abilities.grace_devotion.description':
+    '自身とパーティメンバーは5秒ごとにマナを15回復し、呪文のマナ消費が6%減少する。3分間持続する。',
+  'hudChrome.paladin.devotion': '信仰',
+  'hudChrome.paladin.devotionValue': '信仰 {value}/{max}',
+  'hudChrome.paladin.devotionAscensionCharges': '信仰 {value}/{max}。昇華チャージ残り {charges}。',
+  'hudChrome.paladin.devotionAscensionLast': '信仰 {value}/{max}。昇華の最終チャージ。',
+  'hudChrome.paladin.ascensionLastAnnouncement': '昇華の最終チャージ',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'アクションスロット {slot}: {ability}。昇華チャージを1消費します。',
   'hudChrome.crafting.identity.ceilingRare': 'レア上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -2607,10 +2701,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '足元の地面を聖別し、10秒間、周囲の敵を焼いて2秒ごとに{damage}の神聖ダメージを与えます。',
   'entities.abilities.righteous_fury.name': 'バーニングオース',
   'entities.abilities.righteous_fury.description':
-    '30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。',
+    '神聖ダメージによる脅威値が常時60%増加します。防御専用です。',
   'entities.abilities.retribution_aura.name': '報復のオーラ',
   'entities.abilities.retribution_aura.description':
-    '30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。',
+    '自身とパーティメンバーを聖なる力で包み、近接攻撃をしてきた敵に5の神聖ダメージを与える。死亡するか別の献身に切り替えるまで持続する。',
   'entities.abilities.tame_beast.name': '野生の絆',
   'entities.abilities.tame_beast.description':
     '獣を仲間にするための調教を始めます。獣はあなたのレベル以下で、エリートであってはなりません。ペットはあなたに従い、敵を攻撃し、独自の脅威を保ちます。同時に連れられるペットは1体だけです。',

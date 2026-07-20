@@ -287,6 +287,14 @@
           <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
             <div class="portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
+              <div class="paladin-devotion" id="paladin-devotion" role="progressbar" data-i18n-aria="hudChrome.paladin.devotion" aria-label="Devotion" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0">
+                <div class="paladin-devotion-fill" id="paladin-devotion-fill"></div>
+                <div class="paladin-devotion-label" id="paladin-devotion-label"></div>
+                <div class="paladin-ascension-charges" aria-hidden="true">
+                  <span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+              <span class="visually-hidden" id="paladin-ascension-status" role="status" aria-live="polite"></span>
               <div class="level-chip" id="pf-level">1</div>
               <div class="combat-flash" id="pf-combat" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat">⚔</div>
               <div class="rest-indicator" id="pf-rest" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>

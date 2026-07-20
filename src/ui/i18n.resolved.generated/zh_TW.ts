@@ -722,6 +722,14 @@ export const zh_TW: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "paladin": {
+      "devotion": "奉獻",
+      "devotionValue": "奉獻 {value}/{max}",
+      "devotionAscensionCharges": "奉獻 {value}/{max}。昇華剩餘 {charges} 層。",
+      "devotionAscensionLast": "奉獻 {value}/{max}。昇華僅剩最後一層。",
+      "ascensionLastAnnouncement": "昇華僅剩最後一層",
+      "ascensionSpenderAria": "動作欄位 {slot}：{ability}。消耗 1 層昇華。"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -6576,6 +6584,122 @@ export const zh_TW: EnTranslations = {
         "name": "療癒聖光",
         "description": "為一個友方目標恢復 {damage} 點生命值。"
       },
+      "divine_ascension": {
+        "name": "神聖昇華",
+        "description": "消耗 20 點奉獻，獲得 5 層昇華充能，持續最多 25 秒。標記的技能會消耗 1 層充能並獲得額外效果。"
+      },
+      "devotion_ward": {
+        "name": "奉獻光環",
+        "description": "使你和隊伍成員受到的傷害降低 5%，持續至你死亡或切換奉獻。你只能提供一種奉獻，但不同聖騎士的奉獻可以共存。"
+      },
+      "hammer_of_grace": {
+        "name": "恩典之錘",
+        "description": "以武器攻擊目標，命中後恢復 70 點法力。與光明之錘共享冷卻時間。"
+      },
+      "hammer_of_light": {
+        "name": "光明之錘",
+        "description": "以武器攻擊目標，並為自己恢復相當於所造成傷害 50% 的生命力。與恩典之錘共享冷卻時間。"
+      },
+      "hushbrand": {
+        "name": "靜默烙印",
+        "description": "中斷施法，並使該法術學派在 4 秒內無法施放。"
+      },
+      "unbinding_blessing": {
+        "name": "解縛祝福",
+        "description": "移除一名友方目標身上的緩速與定身效果。"
+      },
+      "guardian_covenant": {
+        "name": "守護契約",
+        "description": "保護一名盟友，使其受到的傷害降低 20%，持續 8 秒。"
+      },
+      "solar_step": {
+        "name": "日光疾步",
+        "description": "以極高速度向前衝刺 2 秒。你可以轉向，但無法提前停止前進。"
+      },
+      "solar_invocation": {
+        "name": "日光祈喚",
+        "description": "呼喚聖光，為 40 碼內所有友方玩家恢復 {damage} 點生命力。"
+      },
+      "radiant_devotion": {
+        "name": "光輝奉獻",
+        "description": "使你和隊伍成員的法術強度提高 20 點，持續 30 分鐘。"
+      },
+      "dawn_devotion": {
+        "name": "黎明奉獻",
+        "description": "使你和隊伍成員的攻擊強度提高 40 點，持續 30 分鐘。此奉獻可與戰士的戰吼共存。"
+      },
+      "grace_devotion": {
+        "name": "恩典奉獻",
+        "description": "你和隊伍成員每 5 秒恢復 15 點法力，並使法術的法力消耗降低 6%，持續 3 分鐘。"
+      },
+      "recall_the_fallen": {
+        "name": "召回逝者",
+        "description": "使一名死亡的隊伍成員復活，並恢復其 35% 的生命力與法力。"
+      },
+      "beacon_of_light": {
+        "name": "聖光信標",
+        "description": "將一名隊伍成員標記為你的聖光信標。你對信標之外 60 碼內隊伍成員造成的有效治療量，有 75% 也會治療信標。持續到你或信標死亡。"
+      },
+      "oathstrike": {
+        "name": "誓約打擊",
+        "description": "造成武器傷害並附加 {damage} 點傷害，產生 1 點奉獻。昇華會以 60% 威力重複此次攻擊。"
+      },
+      "final_edict": {
+        "name": "終極裁決",
+        "description": "發動一次沉重的武器攻擊並產生 2 點奉獻。昇華還會在你周圍釋放神聖爆炸。"
+      },
+      "dawnfall": {
+        "name": "黎明殞落",
+        "description": "對附近敵人造成 {damage} 點神聖傷害並產生 2 點奉獻。昇華會提高傷害與範圍。"
+      },
+      "faithforged_guard": {
+        "name": "信鑄守護",
+        "description": "以護盾環繞自身，在 8 秒內吸收 {damage} 點傷害。昇華使護盾效果提高 50%。"
+      },
+      "mercy_lance": {
+        "name": "仁慈之槍",
+        "description": "為一名盟友恢復或對一名敵人造成 {damage} 點生命力，並產生 1 點奉獻。昇華時用於治療還會治療附近一名盟友。"
+      },
+      "sacred_form": {
+        "name": "神聖形態",
+        "description": "進入神聖狀態直至死亡，使治療量提高 10%、法術致命一擊機率提高 5%，並使產生的威脅值降低 50%。僅限神聖專精。"
+      },
+      "dawns_embrace": {
+        "name": "黎明之擁",
+        "description": "施放一次強力治療並產生 2 點奉獻。昇華使其變為瞬發並使治療量提高 35%。"
+      },
+      "radiant_chorus": {
+        "name": "光輝合唱",
+        "description": "為附近盟友恢復 {damage} 點生命力並產生 2 點奉獻。昇華會提高治療量與範圍。"
+      },
+      "life_covenant": {
+        "name": "生命契約",
+        "description": "使一名盟友受到的傷害降低 40%，持續 6 秒。昇華期間還會賦予 120 點護盾，且不消耗充能。"
+      },
+      "aegis_first_dawn": {
+        "name": "初曦聖盾",
+        "description": "引導 5 秒，創造一個 10 碼的神聖穹頂。穹頂內的盟友每秒受到治療，且受到的傷害降低 50%。完整引導後釋放一次終結治療，並使移動速度提高 30%，持續 4 秒。"
+      },
+      "vowkeeper_strike": {
+        "name": "守誓打擊",
+        "description": "發動一次高威脅值攻擊並產生 1 點奉獻。昇華還會賦予一個小型吸收護盾。"
+      },
+      "bastion_rite": {
+        "name": "堡壘儀式",
+        "description": "使受到的物理傷害降低 20%，持續 6 秒，並產生 1 點奉獻。昇華將持續時間延長至 10 秒。"
+      },
+      "sunward_disc": {
+        "name": "日耀圓盾",
+        "description": "投擲一面光輝圓盾，在敵人之間彈射 2 次並產生 2 點奉獻。昇華使其可彈射 5 次。"
+      },
+      "sacred_challenge": {
+        "name": "神聖挑戰",
+        "description": "迫使一名敵人攻擊你。昇華期間還會使你受到的所有傷害降低 15%，持續 4 秒，且不消耗充能。"
+      },
+      "citadel_of_faith": {
+        "name": "信仰堡壘",
+        "description": "使受到的所有傷害降低 40%，持續 10 秒。"
+      },
       "devotion_aura": {
         "name": "堅定光環",
         "description": "使你的護甲提高 {buff}，持續 30 分鐘。"
@@ -6618,11 +6742,11 @@ export const zh_TW: EnTranslations = {
       },
       "righteous_fury": {
         "name": "燃燒誓言",
-        "description": "使你的神聖傷害產生的威脅值提高 60%，持續 30 分鐘。防護聖騎士的核心技能。"
+        "description": "被動使你的神聖傷害產生的威脅值提高 60%。僅限防護專精。"
       },
       "retribution_aura": {
         "name": "報償光環",
-        "description": "以神聖能量環繞自身，持續 30 分鐘，對任何近戰攻擊你的敵人造成 5 點神聖傷害。"
+        "description": "以神聖能量環繞你和隊伍成員，對任何發動近戰攻擊的敵人造成 5 點神聖傷害。持續至你死亡或切換奉獻。"
       },
       "tame_beast": {
         "name": "野性繫絆",

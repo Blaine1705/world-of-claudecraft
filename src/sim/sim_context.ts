@@ -690,6 +690,7 @@ export interface SimContextCallbacks {
       forceCrit?: boolean;
       critBonus?: number;
       onDealt?: (amount: number) => void;
+      onEffectiveDamage?: (amount: number) => void;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;

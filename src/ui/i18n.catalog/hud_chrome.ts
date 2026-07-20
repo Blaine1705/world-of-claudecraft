@@ -308,6 +308,14 @@ export const hudChromeStrings = {
   rest: {
     resting: 'Resting',
   },
+  paladin: {
+    devotion: 'Devotion',
+    devotionValue: 'Devotion {value} of {max}',
+    devotionAscensionCharges: 'Devotion {value} of {max}. Ascension {charges} charges.',
+    devotionAscensionLast: 'Devotion {value} of {max}. Ascension final charge.',
+    ascensionLastAnnouncement: 'Ascension final charge',
+    ascensionSpenderAria: 'Action slot {slot}: {ability}. Consumes one Ascension charge.',
+  },
   // The Spell Power / Attack Power contribution appended to an ability tooltip's
   // base damage, e.g. "66 to 74 (+29)". Punctuation + a formatted number only (no
   // words), so it is locale-neutral and an English-only add.

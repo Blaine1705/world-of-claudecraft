@@ -34,7 +34,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 424,
-      "state": "34dc6ee6",
+      "state": "c6ce774f",
       "events": "8461f434",
       "rng": {
         "draws": 6,
@@ -380,6 +380,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -822,7 +823,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 424,
-      "state": "a7613ad4",
+      "state": "f99a6b49",
       "events": "a18f2672",
       "rng": {
         "draws": 6,
@@ -1173,6 +1174,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {},
           "petMode": "defensive",
           "pos": {
             "x": 3,
@@ -1633,7 +1635,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 424,
-      "state": "1bba5221",
+      "state": "d1c68635",
       "events": "6f93363d",
       "rng": {
         "draws": 10,
@@ -1644,7 +1646,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 424,
-      "state": "b4ea8894",
+      "state": "65344d97",
       "events": "6f93363d",
       "rng": {
         "draws": 10,
@@ -1995,6 +1997,9 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 0.4
+          },
           "petMode": "defensive",
           "pos": {
             "x": 3,

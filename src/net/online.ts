@@ -126,6 +126,7 @@ interface ClientWireAura {
   rem?: number;
   exp?: number;
   dur: number;
+  perm?: 1;
   value?: number;
   value2?: number;
   value3?: number;
@@ -2179,6 +2180,7 @@ export class ClientWorld implements IWorld {
     const prevSelfDead = prevSelf?.dead ?? false;
 
     const auraRemaining = (aura: ClientWireAura): number => {
+      if (aura.perm === 1) return Number.POSITIVE_INFINITY;
       if (timerWire.mode !== 'stable' || timerWire.time === null) return Number(aura.rem);
       const deadlineRemaining = stableDeadlineRemaining(aura.exp, timerWire.time);
       if (deadlineRemaining !== null) return deadlineRemaining;
@@ -2329,6 +2331,19 @@ export class ClientWorld implements IWorld {
         e.maxResource = w.mres;
       }
       e.rangedPower = w.rp ?? 0;
+      if (w.pasc !== undefined && e.kind === 'player' && e.templateId === 'paladin') {
+        const ascensionCharges = Math.max(0, Math.min(5, Math.floor(Number(w.pasc) || 0)));
+        e.paladinDevotion ??= {
+          value: 0,
+          ascensionCharges: 0,
+          ascensionRemaining: 0,
+          outOfCombatTime: 0,
+          decayProgress: 0,
+          blockIcdRemaining: 0,
+        };
+        e.paladinDevotion.ascensionCharges = ascensionCharges;
+        e.paladinDevotion.ascensionRemaining = ascensionCharges > 0 ? 1 : 0;
+      }
       e.overheadEmoteId = isOverheadEmoteId(w.emo) ? w.emo : null;
       e.overheadEmoteUntil = e.overheadEmoteId ? Number.POSITIVE_INFINITY : 0;
       if (typeof w.emoSeq === 'number') e.overheadEmoteSeq = w.emoSeq;
@@ -2394,7 +2409,8 @@ export class ClientWorld implements IWorld {
             rec.name = a.name;
             rec.kind = a.kind;
             rec.remaining = auraRemaining(a);
-            rec.duration = a.dur;
+            rec.duration = a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur;
+            rec.permanent = a.perm === 1;
             rec.value = a.value ?? 0;
             rec.value2 = a.value2;
             rec.value3 = a.value3;
@@ -2416,7 +2432,8 @@ export class ClientWorld implements IWorld {
             name: a.name,
             kind: a.kind,
             remaining: auraRemaining(a),
-            duration: a.dur,
+            duration: a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur,
+            permanent: a.perm === 1,
             value: a.value ?? 0,
             value2: a.value2,
             value3: a.value3,
@@ -2529,6 +2546,18 @@ export class ClientWorld implements IWorld {
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
+      if (s.pdev !== undefined) {
+        e.paladinDevotion = s.pdev
+          ? {
+              value: Number(s.pdev.value) || 0,
+              ascensionCharges: Number(s.pdev.charges) || 0,
+              ascensionRemaining: Number(s.pdev.remaining) || 0,
+              outOfCombatTime: 0,
+              decayProgress: 0,
+              blockIcdRemaining: 0,
+            }
+          : undefined;
+      }
       e.targetId = s.target ?? null;
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;

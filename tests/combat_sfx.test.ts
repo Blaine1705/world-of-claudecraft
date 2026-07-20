@@ -246,6 +246,36 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
+  it('gives Ascension activation and each empowered impact a distinct sampled cue', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'holy',
+        fx: 'paladinAscensionStart',
+      }),
+    ).toEqual({ key: 'spell_nova', anchorId: 10 });
+    for (const [impact, key, anchorId] of [
+      ['offensive', 'wand_holy', 20],
+      ['area', 'proj_holy', 10],
+      ['defensive', 'combat_block', 20],
+      ['healing', 'cast_chain_heal', 20],
+    ] as const) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 20,
+          school: 'holy',
+          fx: 'paladinAscensionImpact',
+          impact,
+        }),
+      ).toEqual({ key, anchorId });
+      expect(key in SFX_CLIPS).toBe(true);
+    }
+  });
+
   it('uses explicit cast and impact school maps', () => {
     expect(castCueForAbility('fireball')).toBe('cast_fire');
     expect(castCueForAbility('lightning_bolt')).toBe('cast_lightning_bolt');

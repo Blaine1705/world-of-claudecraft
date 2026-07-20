@@ -1,6 +1,6 @@
-// Warrior-only melee defense folded into the existing one-roll hit tables.
-// The class check is deliberate: the redesigned Warrior gains parry and shield
-// block without changing any of the eight other classes or their RNG order.
+// Front-facing melee defense folded into the existing one-roll hit tables.
+// Warriors own Strength-scaled parry and baseline shield block. Protection
+// Paladins use the same block roll and may add a temporary Bastion Rite bonus.
 import type { Entity } from '../types';
 import { angleTo, normAngle } from '../types';
 
@@ -21,14 +21,24 @@ export function warriorParryChance(str: number): number {
 }
 
 export function warriorMeleeDefense(defender: Entity, attacker: Entity): WarriorMeleeDefense {
-  if (defender.kind !== 'player' || defender.templateId !== 'warrior') {
+  if (
+    defender.kind !== 'player' ||
+    (defender.templateId !== 'warrior' && defender.templateId !== 'paladin')
+  ) {
     return { parryChance: 0, blockChance: 0 };
   }
   const inFront =
     Math.abs(normAngle(angleTo(defender.pos, attacker.pos) - defender.facing)) < WARRIOR_FRONT_ARC;
   if (!inFront) return { parryChance: 0, blockChance: 0 };
+  const blockBonus = defender.auras.reduce(
+    (total, aura) => total + (aura.kind === 'buff_block' ? aura.value : 0),
+    0,
+  );
   return {
-    parryChance: warriorParryChance(defender.stats.str),
-    blockChance: defender.blockValue > 0 && defender.blockChance > 0 ? defender.blockChance : 0,
+    parryChance: defender.templateId === 'warrior' ? warriorParryChance(defender.stats.str) : 0,
+    blockChance:
+      defender.blockValue > 0 && defender.blockChance + blockBonus > 0
+        ? Math.min(1, defender.blockChance + blockBonus)
+        : 0,
   };
 }

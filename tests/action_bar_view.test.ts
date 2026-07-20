@@ -6,7 +6,7 @@
 // parity drives both world shapes to identical output.
 
 import { describe, expect, it, vi } from 'vitest';
-import { type AbilityDef, type Aura, type ItemDef, MELEE_RANGE } from '../src/sim/types';
+import { type AbilityDef, type ItemDef, MELEE_RANGE } from '../src/sim/types';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarAbility,
@@ -95,6 +95,12 @@ interface WorldOpts {
   abilityCharges?: { [id: string]: { charges: number } | undefined };
   stealthed?: boolean;
   auras?: ActionBarAuraInput[];
+  paladinDevotion?: {
+    value: number;
+    ascensionCharges: number;
+    ascensionRemaining: number;
+  };
+  paladinSpec?: string | null;
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -112,6 +118,8 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       abilityCharges: opts.abilityCharges,
       stealthed: opts.stealthed ?? false,
       auras: opts.auras ?? [],
+      paladinDevotion: opts.paladinDevotion,
+      paladinSpec: opts.paladinSpec,
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
@@ -119,6 +127,64 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
 }
 
 describe('actionBarView: the four slot kinds classify correctly', () => {
+  it('lights Divine Ascension when ready and marks only spec-eligible empowered actions', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(0, { ability: ability('divine_ascension') }),
+        slot(1, { ability: ability('oathstrike') }),
+        slot(2, { ability: ability('mercy_lance') }),
+      ),
+      fakeDeps(),
+    );
+    const ready = view.tick(
+      world({
+        paladinSpec: 'retribution',
+        paladinDevotion: { value: 20, ascensionCharges: 0, ascensionRemaining: 0 },
+      }),
+    ).slots;
+    expect(ready[0]).toMatchObject({ usable: true, procGlow: true });
+
+    const active = view.tick(
+      world({
+        paladinSpec: 'retribution',
+        paladinDevotion: { value: 0, ascensionCharges: 5, ascensionRemaining: 25 },
+      }),
+    ).slots;
+    expect(active[0]).toMatchObject({ usable: false, procGlow: false });
+    expect(active[1]).toMatchObject({
+      empowered: true,
+      ascensionSpender: true,
+      ascensionCostLabel: '-1',
+      ariaLabel: 'hudChrome.paladin.ascensionSpenderAria(slot=2,ability=ability:oathstrike)',
+    });
+    expect(active[2]).toMatchObject({ empowered: false, ascensionSpender: false });
+
+    const expired = view.tick(
+      world({
+        paladinSpec: 'retribution',
+        paladinDevotion: { value: 0, ascensionCharges: 0, ascensionRemaining: 0 },
+      }),
+    ).slots;
+    expect(expired[1]).toMatchObject({
+      empowered: false,
+      ascensionSpender: false,
+      ascensionCostLabel: '',
+      ariaLabel: 'abilityUi.actionBar.slotAria(slot=2,ability=ability:oathstrike)',
+    });
+
+    const switchedSpec = view.tick(
+      world({
+        paladinSpec: 'holy',
+        paladinDevotion: { value: 0, ascensionCharges: 5, ascensionRemaining: 25 },
+      }),
+    ).slots;
+    expect(switchedSpec[1]).toMatchObject({
+      empowered: false,
+      ascensionSpender: false,
+      ascensionCostLabel: '',
+    });
+  });
+
   it('attack / ability / item / empty each get the right kind, icon key, and ids', () => {
     const view = createActionBarView(
       descriptor(

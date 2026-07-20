@@ -15,9 +15,9 @@ function optionId(cls: PlayerClass, rowIndex: number, optionIndex = 0): string {
 }
 
 describe('Talents V2 row view', () => {
-  it('projects all six rows and three exclusive options for every playable class', () => {
+  it('projects all six rows and three exclusive options for classes with finished rows', () => {
     expect(ALL_CLASSES).toHaveLength(9);
-    for (const cls of ALL_CLASSES) {
+    for (const cls of ALL_CLASSES.filter((candidate) => candidate !== 'paladin')) {
       const view = buildTalentsView(emptyAllocation(), cls, 20);
       expect(view.hasRows, cls).toBe(true);
       expect(view.specs, cls).toHaveLength(3);
@@ -34,6 +34,16 @@ describe('Talents V2 row view', () => {
       expect(view.pickedCount, cls).toBe(0);
       expect(view.valid, cls).toBe(true);
     }
+  });
+
+  it('keeps Paladin specializations visible while its replacement choice rows are pending', () => {
+    const view = buildTalentsView(emptyAllocation(), 'paladin', 20);
+    expect(view.hasRows).toBe(false);
+    expect(view.specs).toHaveLength(3);
+    expect(view.rows).toEqual([]);
+    expect(view.pickedCount).toBe(0);
+    expect(view.unlockedCount).toBe(0);
+    expect(view.valid).toBe(true);
   });
 
   it('marks locked, selected, clear, and select states from the canonical allocation', () => {

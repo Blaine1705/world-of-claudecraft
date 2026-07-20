@@ -1,6 +1,7 @@
 // Classic threat mechanics + the class kit that drives them (stances/forms,
 // stealth, pets).
 import { describe, expect, it } from 'vitest';
+import { computeTalentModifiers } from '../src/sim/content/talents';
 import { abilitiesKnownAt } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
@@ -145,29 +146,38 @@ describe('threat from damage', () => {
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * BEAR_FORM_THREAT_MULT + 1, 5);
   });
 
-  it('righteous fury multiplies HOLY threat by 1.6 and leaves physical alone', () => {
+  it('Burning Oath passively multiplies Protection Holy-damage threat by 1.6', () => {
     const sim = makeSim('paladin');
     sim.setPlayerLevel(16);
-    sim.castAbility('righteous_fury');
+    expect(sim.setSpec('protection')).toBe(true);
     sim.tick();
+    expect(sim.resolvedAbility('righteous_fury')?.def.passive).toBe(true);
+    expect(sim.player.auras.some((a) => a.kind === 'righteous_fury')).toBe(false);
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     hit(sim, sim.player, wolf, 100, 'holy');
-    expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * RIGHTEOUS_FURY_THREAT_MULT + 1, 5);
+    const protectionMasteryThreat = 1.4;
+    expect(wolf.threat.get(sim.playerId)).toBeCloseTo(
+      100 * protectionMasteryThreat * RIGHTEOUS_FURY_THREAT_MULT + 1,
+      5,
+    );
     hit(sim, sim.player, wolf, 100, 'physical');
-    expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * RIGHTEOUS_FURY_THREAT_MULT + 101, 5);
+    expect(wolf.threat.get(sim.playerId)).toBeCloseTo(
+      100 * protectionMasteryThreat * RIGHTEOUS_FURY_THREAT_MULT +
+        100 * protectionMasteryThreat +
+        1,
+      5,
+    );
   });
 
   it('consecration burns the ground every 2 seconds from 0s to 8s and generates holy threat each pulse', () => {
     const sim = makeSim('paladin');
     sim.setPlayerLevel(20);
+    expect(sim.setSpec('protection')).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     teleport(sim, sim.player, wolf.pos.x, wolf.pos.z + 2);
     sim.player.resource = sim.player.maxResource;
-    sim.castAbility('righteous_fury');
-    sim.tick();
-    sim.player.gcdRemaining = 0;
     sim.castAbility('consecration');
 
     const damageEvents: number[] = [];
@@ -425,12 +435,20 @@ describe('taunt and growl', () => {
   });
 
   it('level 10 paladins know Sacred Goad and taunt at 30 yards', () => {
-    expect(abilitiesKnownAt('paladin', 10).some((a) => a.def.id === 'holy_taunt')).toBe(true);
+    const protection = computeTalentModifiers(
+      'paladin',
+      { spec: 'protection', ranks: {}, choices: {} },
+      10,
+    );
+    expect(
+      abilitiesKnownAt('paladin', 10, protection).some((a) => a.def.id === 'sacred_challenge'),
+    ).toBe(true);
 
     const sim = new Sim({ seed: 42, playerClass: 'paladin', noPlayer: true });
     const tank = sim.entities.get(sim.addPlayer('paladin', 'Tank'))!;
     const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
     sim.setPlayerLevel(10, tank.id);
+    expect(sim.setSpec('protection', tank.id)).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf', tank);
     teleport(sim, tank, wolf.pos.x + 25, wolf.pos.z);
     teleport(sim, dps, wolf.pos.x - 2, wolf.pos.z);
@@ -441,7 +459,7 @@ describe('taunt and growl', () => {
     sim.targetEntity(wolf.id, tank.id);
     tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
 
-    sim.castAbility('holy_taunt', tank.id);
+    sim.castAbility('sacred_challenge', tank.id);
     for (let i = 0; i < 25; i++) sim.tick();
 
     expect(wolf.threat.get(tank.id)).toBe(1000);
@@ -459,6 +477,7 @@ describe('taunt and growl', () => {
       const tank = sim.entities.get(sim.addPlayer('paladin', 'Tank'))!;
       const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
       sim.setPlayerLevel(10, tank.id);
+      expect(sim.setSpec('protection', tank.id)).toBe(true);
       const wolf = nearestMob(sim, 'forest_wolf', tank);
       wolf.level = tank.level + 3; // a wide level gap: a spell would often fully resist
       teleport(sim, tank, wolf.pos.x + 25, wolf.pos.z);
@@ -470,7 +489,7 @@ describe('taunt and growl', () => {
       sim.targetEntity(wolf.id, tank.id);
       tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
 
-      sim.castAbility('holy_taunt', tank.id);
+      sim.castAbility('sacred_challenge', tank.id);
       let resisted = false;
       for (let i = 0; i < 25; i++) {
         for (const ev of sim.tick()) {

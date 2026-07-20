@@ -29,6 +29,8 @@ import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
 import { runWeaponProcs } from './equip_procs';
+import { BEACON_HEAL_FRACTION, BEACON_OF_LIGHT_NAME, beaconTransferTarget } from './paladin_beacon';
+import { paladinHealingDoneMultiplier } from './paladin_support';
 import { onSpellCrit } from './talent_procs';
 
 // Combined incoming-healing multiplier from Mortal Wound debuffs (classic
@@ -110,6 +112,7 @@ export function applyHeal(
   let healed = Math.round(
     amount *
       (crit ? 1.5 + source.critDmgHealBonus : 1) *
+      paladinHealingDoneMultiplier(source) *
       hexOutputMult(ctx, source) *
       healingTakenMult(ctx, target),
   );
@@ -130,7 +133,34 @@ export function applyHeal(
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
   if (canTriggerWeaponProcs) runWeaponProcs(ctx, source, target, 'heal');
+  applyBeaconTransfer(ctx, source, target, healed);
   return healed;
+}
+
+function applyBeaconTransfer(
+  ctx: SimContext,
+  source: Entity,
+  healedTarget: Entity,
+  effectiveHeal: number,
+): void {
+  if (effectiveHeal <= 0) return;
+  const beacon = beaconTransferTarget(ctx, source, healedTarget);
+  if (!beacon) return;
+
+  let healed = Math.round(effectiveHeal * BEACON_HEAL_FRACTION * healingTakenMult(ctx, beacon));
+  healed = consumeHealAbsorb(ctx, beacon, healed);
+  healed = Math.min(healed, beacon.maxHp - beacon.hp);
+  if (healed <= 0) return;
+  beacon.hp += healed;
+  ctx.emit({
+    type: 'heal2',
+    sourceId: source.id,
+    targetId: beacon.id,
+    amount: healed,
+    crit: false,
+    ability: BEACON_OF_LIGHT_NAME,
+  });
+  healingThreat(ctx, source, beacon, healed);
 }
 
 // Classic healing threat: 0.5 per point of EFFECTIVE healing (overheal is

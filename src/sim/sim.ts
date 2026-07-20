@@ -66,6 +66,10 @@ import {
 } from './combat/heal';
 import { advanceHeroicLeap } from './combat/heroic_leap';
 import { tickNaturesFury } from './combat/natures_fury';
+import {
+  PALADIN_DEVOTION_ABILITY_IDS,
+  stripPaladinDevotionsFromSource,
+} from './combat/paladin_support';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
@@ -244,6 +248,11 @@ import {
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
+import {
+  grantDevotionFromBlock,
+  resolveAscensionAbility,
+  updatePaladinDevotion,
+} from './paladin_devotion';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -438,6 +447,7 @@ import { isStunDrCategory } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
+  RIGHTEOUS_FURY_THREAT_MULT,
   TAUNT_FORCE_SECONDS,
   threatEntries,
   threatModifier,
@@ -4152,7 +4162,13 @@ export class Sim {
     let m = threatModifier(source, school);
     if (source.kind === 'player') {
       const meta = this.players.get(source.id);
-      if (meta) m *= 1 + this.playerMods(meta).global.threatPct;
+      if (meta) {
+        m *= 1 + this.playerMods(meta).global.threatPct;
+        const hasBurningOath = meta.known.some(
+          (known) => known.def.id === 'righteous_fury' && known.def.passive === true,
+        );
+        if (hasBurningOath && school === 'holy') m *= RIGHTEOUS_FURY_THREAT_MULT;
+      }
     }
     return m;
   }
@@ -4184,7 +4200,8 @@ export class Sim {
     if (abilityId === 'arcane_surge' && cost > 0) {
       cost = Math.round(cost * aetherSurgeCostMult(r.e));
     }
-    return cost === found.cost ? found : { ...found, cost };
+    const costResolved = cost === found.cost ? found : { ...found, cost };
+    return resolveAscensionAbility(r.e, this.playerMods(r.meta).spec, costResolved);
   }
 
   // Highest active cost_tax aura, expressed as a cost multiplier (1 = no tax).
@@ -4323,7 +4340,10 @@ export class Sim {
     }
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
-      if (p) p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
+      if (p) {
+        p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
+        updatePaladinDevotion(p, DT);
+      }
     }
     lap?.('engaged');
 
@@ -4927,9 +4947,11 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     const { e, meta } = r;
-    const removed = removeCancelableAura(e.auras, auraId);
+    const isPaladinDevotion = PALADIN_DEVOTION_ABILITY_IDS.has(auraId);
+    const removed = removeCancelableAura(e.auras, auraId, isPaladinDevotion ? e.id : undefined);
     if (!removed) return;
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
+    if (isPaladinDevotion) stripPaladinDevotionsFromSource(this.ctx, e.id);
     if (auraAffectsStats(removed)) {
       recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta), meta.equipmentInstance);
     }
@@ -5437,6 +5459,7 @@ export class Sim {
       forceCrit?: boolean;
       critBonus?: number;
       onDealt?: (amount: number) => void;
+      onEffectiveDamage?: (amount: number) => void;
     },
   ): boolean {
     return meleeSwingImpl(this.ctx, attacker, target, bonus, abilityName, opts);
@@ -5789,10 +5812,14 @@ export class Sim {
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
     dmg *= this.petDamageMult(mob);
-    const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
+    const rawDmg = dmg; // pre-armor, post-crit/enrage, basis for cleave splash
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
-    if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+    const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+    if (blocked) {
       dmg = Math.max(1, dmg - target.blockValue);
+      if (target.kind === 'player' && this.players.get(target.id)?.talents.spec === 'protection') {
+        grantDevotionFromBlock(target);
+      }
     }
     const dealt = Math.max(1, Math.round(dmg));
     this.dealDamage(mob, target, dealt, crit, 'physical', null, 'hit');

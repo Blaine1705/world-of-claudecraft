@@ -664,6 +664,81 @@ export class Vfx {
     this.spawn(at.x, at.y + 0.3, at.z, 0, 0.4, 0, core, 2.2, 0.45, 0, SPR.flash);
   }
 
+  paladinAscensionStart(entityId: number): void {
+    const at = this.anchor(entityId, 0.42);
+    if (!at) return;
+    this.nova(entityId, 'holy');
+    this.buffSwirl(entityId, 0xffe18a);
+    const ivory = new THREE.Color(0xffffe8).multiplyScalar(hdr(3.1));
+    const amber = new THREE.Color(0xffb52f).multiplyScalar(hdr(2.4));
+    const rays = this.scaledCount(42);
+    for (let index = 0; index < rays; index++) {
+      const angle = (index / rays) * Math.PI * 2;
+      const radius = 0.18 + Math.random() * 0.6;
+      const speed = 1.2 + Math.random() * 2.2;
+      this.spawn(
+        at.x + Math.cos(angle) * radius,
+        at.y - 0.75 + Math.random() * 0.35,
+        at.z + Math.sin(angle) * radius,
+        Math.cos(angle) * 0.35,
+        speed,
+        Math.sin(angle) * 0.35,
+        index % 5 === 0 ? ivory : amber,
+        index % 5 === 0 ? 0.74 : 0.46,
+        0.7 + Math.random() * 0.45,
+        -0.45,
+        index % 5 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    this.spawn(at.x, at.y + 0.35, at.z, 0, 1.1, 0, ivory, 3.1, 0.42, 0, SPR.flash);
+  }
+
+  paladinAscensionImpact(
+    sourceId: number,
+    targetId: number,
+    impact: 'healing' | 'defensive' | 'offensive' | 'area' = 'offensive',
+  ): void {
+    const anchorId = impact === 'area' ? sourceId : targetId;
+
+    if (impact === 'healing') {
+      this.healGlow(anchorId);
+      this.buffSwirl(anchorId, 0xfff0c7);
+      return;
+    }
+    if (impact === 'defensive') {
+      this.wardBloom(anchorId, 'holy');
+      this.buffSwirl(anchorId, 0x9fd7ff);
+      return;
+    }
+
+    if (impact === 'area') this.nova(sourceId, 'holy');
+
+    const at = this.anchor(anchorId, 0.46);
+    if (!at) return;
+    const gold = new THREE.Color(impact === 'area' ? 0xffb52f : 0xffd85c).multiplyScalar(hdr(2.5));
+    const white = new THREE.Color(0xfff8d8).multiplyScalar(hdr(2.9));
+    const count = this.scaledCount(impact === 'area' ? 58 : 46);
+    for (let index = 0; index < count; index++) {
+      const angle = (index / count) * Math.PI * 2;
+      const speed = 4.5 + Math.random() * 4;
+      this.spawn(
+        at.x + Math.cos(angle) * 0.15,
+        at.y,
+        at.z + Math.sin(angle) * 0.15,
+        Math.cos(angle) * speed,
+        1.8 + Math.random() * 3.2,
+        Math.sin(angle) * speed,
+        index % 4 === 0 ? white : gold,
+        index % 4 === 0 ? 0.72 : 0.48,
+        0.55 + Math.random() * 0.35,
+        -4,
+        index % 4 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    this.spawn(at.x, at.y + 0.18, at.z, 0, 0.4, 0, white, 2.4, 0.28, 0, SPR.flash);
+    this.spawn(at.x, at.y - 0.2, at.z, 0, 0.2, 0, gold, 2.2, 0.48, 0, SPR.ring, 0);
+  }
+
   // A stored heal-echo firing: a fountain of life-green motes bursting upward
   // from the saved ally, collapsing back like a heartbeat. Original effect.
   echoBurst(entityId: number, school: string): void {

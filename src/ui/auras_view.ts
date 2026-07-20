@@ -28,6 +28,7 @@
 // mirror aura {stacks:undefined} derive identical output.
 
 import { isDebuffAura as classifyDebuffAura, DEBUFF_AURA_KINDS } from '../sim/aura_classify';
+import { isCancelableAura } from '../sim/combat/aura_cancel';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 
@@ -55,7 +56,7 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
 ]);
 // Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
 // Sprint also uses, 15s and very much worth a countdown), so it hides by id.
-const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
+const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf', 'beacon_of_light']);
 // The inverse override: an aura that rides a TOGGLE_KIND but is a genuine timed
 // buff worth a countdown. Greater Invisibility reuses the rogue-stealth machinery
 // for its vanish (kind 'stealth' with full move speed), but it is a fixed 20s
@@ -304,7 +305,7 @@ export function createAurasView(
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
         // a helpful buff is cancelable, a debuff never. The target debuff strip
         // (mode 'debuffs') is read-only, so nothing there is cancelable.
-        slot.cancelable = mode === 'buffs' && !debuff;
+        slot.cancelable = mode === 'buffs' && isCancelableAura(a);
         slot.effectHtml = deps.auraEffectHtml(a);
         slot.own = own;
         count++;

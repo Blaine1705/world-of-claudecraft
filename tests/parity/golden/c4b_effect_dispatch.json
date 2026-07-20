@@ -35,8 +35,8 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 422,
-      "state": "34797cc5",
-      "events": "db942aa5",
+      "state": "99a07f71",
+      "events": "f95f913f",
       "rng": {
         "draws": 2,
         "digest": "68f9f3dd"
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 422,
-      "state": "4c09159c",
+      "state": "f25d0c8a",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 422,
-      "state": "f6b10314",
+      "state": "21f81535",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 422,
-      "state": "ac785cd1",
+      "state": "3ccafea3",
       "events": "5636db41",
       "rng": {
         "draws": 2,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 422,
-      "state": "fbb23225",
+      "state": "049a900c",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 422,
-      "state": "ffa23387",
+      "state": "c0503f82",
       "events": "b1e513e5",
       "rng": {
         "draws": 2,
@@ -101,7 +101,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 422,
-      "state": "713b843f",
+      "state": "579e219f",
       "events": "5c5a36ff",
       "rng": {
         "draws": 4,
@@ -408,6 +408,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -435,9 +439,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -799,6 +804,9 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 1.6
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -815,7 +823,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 438,
             "int": 32,
             "spi": 33,
             "sta": 60,
@@ -1012,7 +1020,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 422,
-      "state": "b5b8b5fc",
+      "state": "6856a6dc",
       "events": "22113634",
       "rng": {
         "draws": 4,
@@ -1023,7 +1031,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 422,
-      "state": "fc6d3b7d",
+      "state": "ab74c218",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1034,7 +1042,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 422,
-      "state": "3824e154",
+      "state": "3663e084",
       "events": "741638a5",
       "rng": {
         "draws": 36,
@@ -1045,7 +1053,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 422,
-      "state": "648f9470",
+      "state": "3927f39a",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -1056,7 +1064,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 422,
-      "state": "37c2c164",
+      "state": "a601c95f",
       "events": "741638a5",
       "rng": {
         "draws": 66,
@@ -1067,7 +1075,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 422,
-      "state": "00cea768",
+      "state": "c88eca1c",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -1078,7 +1086,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 422,
-      "state": "e6180b58",
+      "state": "85ba21d3",
       "events": "741638a5",
       "rng": {
         "draws": 101,
@@ -1089,7 +1097,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 422,
-      "state": "2e8d3462",
+      "state": "c4bf2e35",
       "events": "741638a5",
       "rng": {
         "draws": 127,
@@ -1100,7 +1108,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 422,
-      "state": "4e655ca3",
+      "state": "a8867905",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -1111,7 +1119,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 422,
-      "state": "d1c41fe3",
+      "state": "b402fc18",
       "events": "741638a5",
       "rng": {
         "draws": 174,
@@ -1122,7 +1130,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 422,
-      "state": "8fe66716",
+      "state": "88d84f2e",
       "events": "741638a5",
       "rng": {
         "draws": 203,
@@ -1133,7 +1141,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 422,
-      "state": "9b42bb3c",
+      "state": "c19b5f62",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -1144,7 +1152,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 422,
-      "state": "8e7abbd8",
+      "state": "f36ef7f5",
       "events": "741638a5",
       "rng": {
         "draws": 253,
@@ -1155,7 +1163,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 422,
-      "state": "bc28d3de",
+      "state": "eaa6d3b2",
       "events": "741638a5",
       "rng": {
         "draws": 276,
@@ -1166,7 +1174,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 422,
-      "state": "b0da0548",
+      "state": "b8b55f15",
       "events": "741638a5",
       "rng": {
         "draws": 304,
@@ -1177,7 +1185,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 422,
-      "state": "1e93df95",
+      "state": "1e15e7ec",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -1188,7 +1196,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 422,
-      "state": "150d5856",
+      "state": "a5fd156c",
       "events": "741638a5",
       "rng": {
         "draws": 360,
@@ -1199,7 +1207,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 422,
-      "state": "e3ed2eb6",
+      "state": "5d005387",
       "events": "741638a5",
       "rng": {
         "draws": 388,
@@ -1210,7 +1218,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 422,
-      "state": "04c9e8b6",
+      "state": "2e990e8a",
       "events": "741638a5",
       "rng": {
         "draws": 408,
@@ -1221,7 +1229,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 422,
-      "state": "0a8a3296",
+      "state": "877f372e",
       "events": "741638a5",
       "rng": {
         "draws": 435,
@@ -1232,7 +1240,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 423,
-      "state": "9ed38666",
+      "state": "dca0d800",
       "events": "c09e532d",
       "rng": {
         "draws": 445,
@@ -1539,6 +1547,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -1566,9 +1578,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -1930,6 +1943,9 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -1946,7 +1962,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 438,
             "int": 32,
             "spi": 33,
             "sta": 60,
@@ -2143,7 +2159,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 424,
-      "state": "01a49ccf",
+      "state": "234789cb",
       "events": "b143e666",
       "rng": {
         "draws": 446,
@@ -2450,6 +2466,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -2477,9 +2497,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -2844,6 +2865,9 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -2860,7 +2884,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 438,
             "int": 32,
             "spi": 33,
             "sta": 60,
@@ -3123,7 +3147,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 426,
-      "state": "f0529b1b",
+      "state": "f2f3115f",
       "events": "e25d0965",
       "rng": {
         "draws": 448,
@@ -3435,6 +3459,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -3462,9 +3490,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -3829,6 +3858,9 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -3845,7 +3877,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 438,
             "int": 32,
             "spi": 33,
             "sta": 60,
@@ -4216,7 +4248,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 427,
-      "state": "7df8a904",
+      "state": "3b2f80c4",
       "events": "e3444394",
       "rng": {
         "draws": 453,
@@ -4532,6 +4564,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -4559,9 +4595,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -4934,6 +4971,9 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -4950,7 +4990,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 438,
             "int": 32,
             "spi": 33,
             "sta": 60,
@@ -5386,7 +5426,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 428,
-      "state": "d7308ceb",
+      "state": "51ed79a4",
       "events": "762a231a",
       "rng": {
         "draws": 454,
@@ -5706,6 +5746,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -5733,9 +5777,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -6132,6 +6177,9 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -6148,7 +6196,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 438,
             "int": 32,
             "spi": 33,
             "sta": 60,
@@ -6621,7 +6669,7 @@
           "threat": [
             [
               418,
-              34
+              80.2
             ]
           ],
           "weapon": {
@@ -6636,7 +6684,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 429,
-      "state": "f26c8770",
+      "state": "6be464cd",
       "events": "a867c74e",
       "rng": {
         "draws": 454,
@@ -6956,6 +7004,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -6983,9 +7035,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -7382,6 +7435,9 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -7398,7 +7454,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 438,
             "int": 32,
             "spi": 33,
             "sta": 60,
@@ -7884,7 +7940,7 @@
           "threat": [
             [
               418,
-              34
+              80.2
             ]
           ],
           "weapon": {
@@ -7940,7 +7996,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 429,
-      "state": "f26c8770",
+      "state": "6be464cd",
       "events": "741638a5",
       "rng": {
         "draws": 454,
@@ -8260,6 +8316,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -8287,9 +8347,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -8686,6 +8747,9 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -8702,7 +8766,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 438,
             "int": 32,
             "spi": 33,
             "sta": 60,
@@ -9188,7 +9252,7 @@
           "threat": [
             [
               418,
-              34
+              80.2
             ]
           ],
           "weapon": {

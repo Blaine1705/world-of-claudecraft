@@ -332,21 +332,21 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "holy",
-        "name": "Sacrament",
+        "name": "Sunmender",
         "role": "healer",
-        "signature": "holy_shock"
+        "signature": "mercy_lance"
       },
       {
         "id": "protection",
-        "name": "Vigil",
+        "name": "Faithwarden",
         "role": "tank",
-        "signature": "holy_shield"
+        "signature": "sunward_disc"
       },
       {
         "id": "retribution",
-        "name": "Requital",
+        "name": "Dawnreaver",
         "role": "dps",
-        "signature": "crusader_strike"
+        "signature": "oathstrike"
       }
     ],
     "signatureAbilities": [
@@ -359,10 +359,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Mending Light"
       },
       {
-        "id": "devotion_aura",
-        "name": "Steadfast Aura"
-      },
-      {
         "id": "judgement",
         "name": "Verdict"
       },
@@ -373,6 +369,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "divine_protection",
         "name": "Ward of Faith"
+      },
+      {
+        "id": "hammer_of_justice",
+        "name": "Sundering Gavel"
       }
     ],
     "abilities": [
@@ -383,10 +383,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "holy_light",
         "name": "Mending Light"
-      },
-      {
-        "id": "devotion_aura",
-        "name": "Steadfast Aura"
       },
       {
         "id": "judgement",
@@ -407,10 +403,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "lay_on_hands",
         "name": "Last Rite"
-      },
-      {
-        "id": "holy_taunt",
-        "name": "Sacred Goad"
       },
       {
         "id": "flash_of_light",
@@ -439,6 +431,122 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "sacred_bulwark",
         "name": "Sacred Bulwark"
+      },
+      {
+        "id": "holy_shock",
+        "name": "Holy Shock"
+      },
+      {
+        "id": "holy_shield",
+        "name": "Hallowed Wall"
+      },
+      {
+        "id": "crusader_strike",
+        "name": "Crusader Strike"
+      },
+      {
+        "id": "divine_ascension",
+        "name": "Divine Ascension"
+      },
+      {
+        "id": "devotion_ward",
+        "name": "Devotion Aura"
+      },
+      {
+        "id": "hammer_of_grace",
+        "name": "Hammer of Grace"
+      },
+      {
+        "id": "hammer_of_light",
+        "name": "Hammer of Light"
+      },
+      {
+        "id": "hushbrand",
+        "name": "Hushbrand"
+      },
+      {
+        "id": "unbinding_blessing",
+        "name": "Unbinding Blessing"
+      },
+      {
+        "id": "guardian_covenant",
+        "name": "Guardian Covenant"
+      },
+      {
+        "id": "solar_step",
+        "name": "Solar Step"
+      },
+      {
+        "id": "solar_invocation",
+        "name": "Solar Invocation"
+      },
+      {
+        "id": "recall_the_fallen",
+        "name": "Recall the Fallen"
+      },
+      {
+        "id": "beacon_of_light",
+        "name": "Beacon of Light"
+      },
+      {
+        "id": "oathstrike",
+        "name": "Oathstrike"
+      },
+      {
+        "id": "final_edict",
+        "name": "Final Edict"
+      },
+      {
+        "id": "dawnfall",
+        "name": "Dawnfall"
+      },
+      {
+        "id": "faithforged_guard",
+        "name": "Faithforged Guard"
+      },
+      {
+        "id": "mercy_lance",
+        "name": "Mercy Lance"
+      },
+      {
+        "id": "sacred_form",
+        "name": "Sacred Form"
+      },
+      {
+        "id": "dawns_embrace",
+        "name": "Dawn's Embrace"
+      },
+      {
+        "id": "radiant_chorus",
+        "name": "Radiant Chorus"
+      },
+      {
+        "id": "life_covenant",
+        "name": "Life Covenant"
+      },
+      {
+        "id": "aegis_first_dawn",
+        "name": "Aegis of the First Dawn"
+      },
+      {
+        "id": "vowkeeper_strike",
+        "name": "Vowkeeper Strike"
+      },
+      {
+        "id": "bastion_rite",
+        "name": "Bastion Rite"
+      },
+      {
+        "id": "sunward_disc",
+        "name": "Sunward Disc"
+      },
+      {
+        "id": "sacred_challenge",
+        "name": "Sacred Goad"
+      },
+      {
+        "id": "citadel_of_faith",
+        "name": "Citadel of Faith"
       }
     ],
     "model": "player_paladin",
