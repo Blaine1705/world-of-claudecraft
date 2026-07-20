@@ -1,0 +1,129 @@
+// Thundercall's deterministic build-and-vent engine. The bank rides an aura so
+// offline, hosted, reconnect, and replay state all use the same authority.
+
+import type { SimContext } from '../sim_context';
+import type { Entity } from '../types';
+
+export const THUNDER_CHARGES_ID = 'shaman_thunder_charges';
+export const PRIMAL_MASTERY_ID = 'elemental_mastery';
+export const PRIMAL_MASTERY_INSTANT_ID = 'elemental_mastery_instant';
+export const THUNDER_CHARGE_CAP = 5;
+export const THUNDER_BANK_DURATION = 86_400;
+export const EARTHEN_JOLT_BONUS_PER_CHARGE = 0.25;
+// Starting PBE value. Faultwake's coefficient remains independently tunable.
+export const FAULTWAKE_BONUS_PER_CHARGE = 0.2;
+export const PRIMAL_MASTERY_DURATION = 12;
+
+const THUNDER_VENTS: ReadonlySet<string> = new Set(['earth_shock', 'earthquake']);
+const THUNDERCALL_STATE_IDS: ReadonlySet<string> = new Set([
+  THUNDER_CHARGES_ID,
+  PRIMAL_MASTERY_ID,
+  PRIMAL_MASTERY_INSTANT_ID,
+]);
+
+function isThundercall(ctx: SimContext, player: Entity): boolean {
+  if (player.kind !== 'player') return false;
+  const meta = ctx.players.get(player.id);
+  return meta !== undefined && ctx.playerMods(meta).spec === 'elemental';
+}
+
+function removeAuraAt(ctx: SimContext, player: Entity, index: number): void {
+  const [aura] = player.auras.splice(index, 1);
+  if (!aura) return;
+  ctx.emit({
+    type: 'aura',
+    targetId: player.id,
+    name: aura.name,
+    gained: false,
+    auraKind: aura.kind,
+  });
+}
+
+export function thunderCharges(player: Entity): number {
+  const stacks = player.auras.find((aura) => aura.id === THUNDER_CHARGES_ID)?.stacks ?? 0;
+  return Math.max(0, Math.min(THUNDER_CHARGE_CAP, stacks));
+}
+
+export function addThunderCharges(ctx: SimContext, player: Entity, requested: number): number {
+  if (!isThundercall(ctx, player) || requested <= 0) return thunderCharges(player);
+  const existing = player.auras.find((aura) => aura.id === THUNDER_CHARGES_ID);
+  const next = Math.min(THUNDER_CHARGE_CAP, thunderCharges(player) + Math.floor(requested));
+  if (existing) {
+    existing.stacks = next;
+    existing.remaining = THUNDER_BANK_DURATION;
+    existing.duration = THUNDER_BANK_DURATION;
+    return next;
+  }
+  ctx.applyAura(player, {
+    id: THUNDER_CHARGES_ID,
+    name: 'Thunder Charges',
+    kind: 'internal_cd',
+    value: 0,
+    stacks: next,
+    remaining: THUNDER_BANK_DURATION,
+    duration: THUNDER_BANK_DURATION,
+    sourceId: player.id,
+    school: 'nature',
+  });
+  return next;
+}
+
+/** Called only after Arc Bolt has resolved a valid direct-damage impact. */
+export function thundercallOnArcBoltImpact(ctx: SimContext, player: Entity): void {
+  if (!isThundercall(ctx, player)) return;
+  const accelerated = player.auras.some((aura) => aura.id === PRIMAL_MASTERY_ID);
+  addThunderCharges(ctx, player, accelerated ? 2 : 1);
+}
+
+export function thundercallDamageMultiplier(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+): number {
+  if (!isThundercall(ctx, player)) return 1;
+  const charges = thunderCharges(player);
+  if (abilityId === 'earth_shock') return 1 + charges * EARTHEN_JOLT_BONUS_PER_CHARGE;
+  if (abilityId === 'earthquake') return 1 + charges * FAULTWAKE_BONUS_PER_CHARGE;
+  return 1;
+}
+
+/** Consume after a vent has resolved successfully, never at input time. */
+export function consumeThunderVent(ctx: SimContext, player: Entity, abilityId: string): number {
+  if (!isThundercall(ctx, player) || !THUNDER_VENTS.has(abilityId)) return 0;
+  const charges = thunderCharges(player);
+  const index = player.auras.findIndex((aura) => aura.id === THUNDER_CHARGES_ID);
+  if (index >= 0) removeAuraAt(ctx, player, index);
+  return charges;
+}
+
+/** Arms the signature window and scopes its instant cast to Arc Bolt. */
+export function armPrimalMastery(ctx: SimContext, player: Entity): void {
+  if (!isThundercall(ctx, player)) return;
+  ctx.applyAura(player, {
+    id: PRIMAL_MASTERY_ID,
+    name: 'Primal Mastery',
+    kind: 'internal_cd',
+    value: 0,
+    remaining: PRIMAL_MASTERY_DURATION,
+    duration: PRIMAL_MASTERY_DURATION,
+    sourceId: player.id,
+    school: 'nature',
+  });
+  ctx.applyAura(player, {
+    id: PRIMAL_MASTERY_INSTANT_ID,
+    name: 'Primal Mastery',
+    kind: 'next_cast_instant',
+    value: 1,
+    remaining: PRIMAL_MASTERY_DURATION,
+    duration: PRIMAL_MASTERY_DURATION,
+    sourceId: player.id,
+    school: 'nature',
+    empowerAbilities: ['lightning_bolt'],
+  });
+}
+
+export function clearThundercallState(ctx: SimContext, player: Entity): void {
+  for (let index = player.auras.length - 1; index >= 0; index--) {
+    if (THUNDERCALL_STATE_IDS.has(player.auras[index].id)) removeAuraAt(ctx, player, index);
+  }
+}
