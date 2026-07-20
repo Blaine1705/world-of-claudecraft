@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { RIFT_RARE_ITEM_IDS } from '../src/sim/content/rift/items';
 import { RIFT_BOSS_IDS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
-import { BUILTIN_WORLD, MOBS, riftInstanceOrigin } from '../src/sim/data';
+import { BUILTIN_WORLD, ITEMS, MOBS, riftInstanceOrigin } from '../src/sim/data';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
 import {
   RIFT_HEROIC_MIN_MOVE_SPEED,
@@ -314,6 +315,19 @@ describe('rift ranks: A/S one-shot rolling boulder', () => {
 });
 
 describe('rift loot: every rift creature pays out', () => {
+  it('every declared rift rare resolves, is rare quality, and actually drops', () => {
+    const dropped = new Set(
+      [...RIFT_TRASH_IDS, ...RIFT_BOSS_IDS].flatMap((id) =>
+        MOBS[id].loot.map((entry) => entry.itemId),
+      ),
+    );
+    for (const id of RIFT_RARE_ITEM_IDS) {
+      expect(ITEMS[id], id).toBeDefined();
+      expect(ITEMS[id].quality, id).toBe('rare');
+      expect(dropped.has(id), `${id} drops from some rift creature`).toBe(true);
+    }
+  });
+
   it('every trash template carries its themed rare + an essence trickle + coin', () => {
     for (const id of RIFT_TRASH_IDS) {
       const loot = MOBS[id].loot;
