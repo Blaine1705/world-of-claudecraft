@@ -347,6 +347,39 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-window',
+    label: 'World Market window (landscape multi-column listings)',
+    when: ['ui/market_window', 'ui/market_view', 'ui/market_filters', 'sim/market'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Teleport onto the Merchant's stall (zone1, {0, 11.5}) so marketOpen's proximity
+    // gate passes, then open the Browse tab directly. The Merchant always keeps some of
+    // its own standing stock (market.ts), so the listing grid is never empty offline.
+    async capture(page) {
+      await page.evaluate(() => {
+        const p = window.__game?.sim?.player;
+        if (p?.pos) {
+          p.pos.x = 0;
+          p.pos.z = 11.5;
+        }
+        const el = document.querySelector('#market-window');
+        if (el) el.style.display = 'none';
+        const hud = window.__game?.hud;
+        hud?.openMarket?.();
+        // Market docks its Bags companion alongside (like vendor/bank; unlike
+        // those, Market has no docking CSS pairing them side by side), and on
+        // mobile both share the same edge-pinned sheet position, so Bags stacks
+        // fully over Market. Hide the companion for this shot: the point of the
+        // capture is the Market window's own multi-column relayout, not the
+        // Bags pairing (a separate, pre-existing behavior this change does not
+        // touch).
+        const bags = document.querySelector('#bags');
+        if (bags) bags.style.display = 'none';
+      });
+      const open = await pollForSize(page, '#market-window');
+      return open ? { clip: '#market-window' } : {};
+    },
+  },
+  {
     key: 'card-duel',
     label: 'Card Duel window (Card Master)',
     when: [

@@ -8461,8 +8461,13 @@
   }
 
   /* ---------- The World Market (the Merchant's auction house) ---------- */
+  /* Widened from the old 560px tall single-column box into a landscape shape so
+     .mkt-list (below) can lay listings out in multiple columns instead of one
+     long stacked list; the .window shell's max-width clamp still shrinks this on
+     a narrow viewport, and .mkt-list's own auto-fill columns (plus the mobile
+     single-column override in hud.mobile.css) collapse back to one column there. */
   #market-window {
-    width: 560px;
+    width: 860px;
     height: min(640px, calc(85vh - 24px));
     display: none;
     flex-direction: column;
@@ -8477,6 +8482,40 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  /* Desktop docking pair with #bags (the bank-open pattern, see body.bank-open
+     above): opening the market force-opens bags alongside so items can be
+     clicked straight onto the Sell tab, but #market-window (centered) and
+     #bags (percentage-positioned off #ui independently) could overlap on
+     common laptop widths, covering the drop target (PR #2107 review round 4).
+     Pin both off the same 50% split with a fixed gap so they can never
+     collide, regardless of viewport width or either window's own size.
+     --bank-dock-gap is declared here (not inline literals) so BOTH sibling
+     windows inherit the same value, matching the body.bank-open pattern above. */
+  body.market-open {
+    --bank-dock-gap: 8px;
+  }
+  body.market-open #market-window {
+    left: 50%;
+    /* The generic .window max-width clamp (layout.css) is computed against the
+       FULL app viewport, so it never bites on the half the dock actually
+       leaves this window: at 860px wide plus the 320px bags companion plus
+       the gap, the pair needs ~1196px, and #market-window's left edge clips
+       outside #ui (overflow: hidden, base.css) on any common desktop width
+       below ~1752px (PR #2107 review round 4 follow-up). Re-clamp against
+       half the dock split instead, so the auto-fill listing grid degrades to
+       fewer columns instead of the window overflowing offscreen. */
+    max-width: calc(var(--app-vw, 100vw) / var(--window-scale) / 2 - var(--bank-dock-gap) - 8px);
+    transform: translateX(calc(-100% - var(--bank-dock-gap)));
+  }
+  body.market-open #bags {
+    left: 50%;
+    top: 10vh;
+    right: auto;
+    bottom: auto;
+    width: 320px;
+    max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);
+    transform: translateX(var(--bank-dock-gap));
   }
   .mkt-tabs {
     display: flex;
@@ -8511,10 +8550,26 @@
     color: #9fdc7f;
     font-size: 10.5px;
   }
-  .mkt-search {
-    width: 100%;
-    box-sizing: border-box;
+  /* The search box and the type/subtype/rarity dropdowns are one control row: at 860px
+     wide, a full-width search box (or a filter row spanning the whole window) reads
+     oversized, so both are capped to a sensible max-width and sit side by side,
+     wrapping onto their own line only once the window narrows too much to fit them
+     (mobile, or a three-menu row once the subtype filter appears). */
+  .mkt-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
     margin: 2px 0 8px;
+    position: relative;
+    z-index: 3;
+  }
+  .mkt-search {
+    flex: 1 1 200px;
+    max-width: 260px;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0;
     padding: 7px 10px;
     font-size: 16px;
     background: #120d07;
@@ -8533,20 +8588,18 @@
     border-color: var(--color-border-focus);
   }
   .mkt-filters {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-wrap: wrap;
+    flex: 2 1 auto;
     gap: 8px;
-    margin: 0 0 8px;
-    position: relative;
-    z-index: 3;
-  }
-  .mkt-filters.has-subtype {
-    grid-template-columns: 1fr 1fr 1fr;
+    margin: 0;
   }
   .mkt-filter {
     display: flex;
     flex-direction: column;
     gap: 3px;
+    flex: 1 1 140px;
+    max-width: 220px;
     min-width: 0;
   }
   .mkt-filter span {
@@ -8675,6 +8728,26 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
+  /* The listing list itself: multiple columns of item cards (the landscape
+     relayout) instead of one long stacked column. auto-fill + a minmax floor
+     lets the count of columns follow the window's actual width (the shell's
+     max-width clamp on a narrow viewport, or the mobile-touch override below,
+     both naturally fall back to a single column without a hardcoded breakpoint
+     list here); each row still lays its own icon/name/price/button out as a
+     grid (below), it just now occupies one card cell instead of a full-width
+     stripe. The note/empty/pager children are not cards, so they span every
+     column. */
+  .mkt-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 4px 10px;
+    align-content: start;
+  }
+  .mkt-note,
+  .mkt-empty,
+  .mkt-page {
+    grid-column: 1 / -1;
+  }
   .mkt-note {
     font-size: 11.5px;
     color: #b6ad8c;
@@ -8690,6 +8763,7 @@
     padding: 5px 6px;
     border-radius: 4px;
     font-size: 12px;
+    min-height: 40px;
   }
   .mkt-row:hover {
     background: #ffffff0d;

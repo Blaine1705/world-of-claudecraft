@@ -1764,7 +1764,7 @@ describe('client HTML shell', () => {
 
   it('keeps the World Market to one scroll container with browse filters below the tabs', () => {
     expect(componentsCss).toContain(
-      '#market-window {\n    width: 560px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
+      '#market-window {\n    width: 860px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
     );
     expect(componentsCss).toContain(
       '#market-body {\n    overflow-y: auto;\n    flex: 1;\n    min-height: 0;',
@@ -1772,27 +1772,61 @@ describe('client HTML shell', () => {
     expect(componentsCss).toContain(
       '.mkt-page {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;',
     );
-    // On mobile the Market takes the full available height (not the vendor's 58vh
-    // cap) so its tall stacked-filter header cannot squeeze the listing body flat,
-    // and #market-body keeps a min-height floor; the window itself stays
-    // overflow:hidden so #market-body remains the single scroll container.
+    // On mobile the search box lives above #market-body in `.mkt-controls`, a
+    // fourth stacked chrome row (tabs + controls + body). Reviewed regression on
+    // PR #2107: with the window clipped via overflow:hidden and #market-body as
+    // the only scroller, a tall controls row (the subtype filter's third menu)
+    // could push the body's content past the window's bottom edge with no way to
+    // reach it. The window now scrolls the whole sheet (tabs, controls, and the
+    // listing body together) instead of clipping, and #market-body sizes to its
+    // natural content height rather than flexing to fill a fixed remainder.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow: hidden;',
+      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
     );
-    expect(hudMobileCss).toContain('body.mobile-touch #market-body {\n    min-height: 96px;');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #market-body {\n    flex: none;\n    overflow-y: visible;\n    min-height: 0;',
+    );
     expect(marketWindowTs).toContain('buildMarketView'); // pagination + filtering delegated to the core
     expect(marketWindowTs).toContain('this.browsePage');
     expect(marketWindowTs).toContain('data-market-page="prev"');
     expect(marketWindowTs).toContain('data-market-page="next"');
     expect(marketWindowTs).toContain('itemUi.market.pageRange');
-    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
-    expect(marketWindowTs).toContain("class=\"mkt-filters${hasSubtype ? ' has-subtype' : ''}\"");
+    expect(marketWindowTs).toContain('class="mkt-filters"');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
     expect(marketWindowTs).toContain('data-market-filter-menu="${menu}"');
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'itemType'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'subtype'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'rarity'/);
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
+    // The load-bearing claim of the landscape refactor: `.mkt-controls` (search +
+    // filters) is a SIBLING of `#market-body`, positioned above it, not nested
+    // inside it (round 4 review, finding 4). A regression that renested the
+    // controls back inside #market-body would silently break the mobile
+    // sheet-scroll fix (hud.mobile.css keys off this exact sibling shape) with no
+    // other test catching it. controlsHtml (built with `.mkt-controls` as its own
+    // top-level div) is spliced into el.innerHTML as a sibling ahead of the
+    // `#market-body` div, never inside it.
+    expect(marketWindowTs).toContain('`<div class="mkt-controls">`');
+    const markupIdx = marketWindowTs.indexOf('el.innerHTML =');
+    const controlsHtmlIdx = marketWindowTs.indexOf('controlsHtml +', markupIdx);
+    const bodyIdx = marketWindowTs.indexOf('<div id="market-body">', markupIdx);
+    expect(controlsHtmlIdx).toBeGreaterThan(markupIdx);
+    expect(bodyIdx).toBeGreaterThan(controlsHtmlIdx);
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
+    expect(marketWindowTs).toContain('value="${esc(this.searchQuery)}"');
+    // .mkt-list is the grid the listing cards render into; a deletion of the
+    // multi-column landscape grid would otherwise go undetected.
+    expect(componentsCss).toContain('.mkt-list {');
+    expect(marketWindowTs).toContain("list.className = 'mkt-list';");
+    // Mobile stacks the controls row to one column (the flex-basis-neutralizing
+    // fix depends on this direction flip actually happening) and forces the
+    // listing grid back to a single column instead of relying on auto-fill alone.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mkt-controls {\n    flex-direction: column;\n    align-items: stretch;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mkt-list {\n    grid-template-columns: 1fr;',
+    );
   });
 
   it('keeps the mobile bar at top-left and leaves low-frequency actions in the More tray', () => {

@@ -2356,6 +2356,15 @@ export class Hud {
       (el.id === 'bank-window' || el.id === 'bags')
     )
       return;
+    // The market docks its bags companion the same way (body.market-open, see
+    // components.css): skip the cascade for that cluster too, or the inline
+    // position the cascade bakes onto #bags beats the docking CSS the moment a
+    // second window is already open (PR #2107 review round 5).
+    if (
+      document.body.classList.contains('market-open') &&
+      (el.id === 'market-window' || el.id === 'bags')
+    )
+      return;
     const openCount = [...document.querySelectorAll<HTMLElement>('.window.panel')].filter(
       (win) => win !== el && this.isWindowVisible(win),
     ).length;

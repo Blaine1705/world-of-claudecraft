@@ -80,4 +80,20 @@ describe('mobile window layout CSS', () => {
       margin-top: 0;
     }`);
   });
+
+  it('neutralizes the market controls flex-basis so column stacking never grows their height', () => {
+    // components.css gives .mkt-search/.mkt-filters/.mkt-filter a desktop flex-basis
+    // (200px/auto/140px) meant as a row WIDTH; once .mkt-controls/.mkt-filters flip to
+    // flex-direction: column that basis becomes a HEIGHT instead, ballooning the search
+    // box and clipping the filters and listing body out of the window (#2107 review).
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.mkt-search \{[^}]*flex: 0 0 auto;[^}]*max-width: none;[^}]*min-height: 40px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.mkt-filters \{[^}]*flex: 0 0 auto;[^}]*flex-direction: column;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.mkt-filter \{[^}]*flex: 0 0 auto;[^}]*max-width: none;/,
+    );
+  });
 });
