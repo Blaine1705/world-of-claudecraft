@@ -63,9 +63,8 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   respec(): void;
   currentBar(): (string | null)[];
   saveLoadout(name: string, bar: (string | null)[], alloc: TalentAllocation): void;
-  switchLoadout(index: number): void;
+  switchLoadout(index: number, bar: (string | null)[], alloc: TalentAllocation): void;
   deleteLoadout(index: number): void;
-  applyLoadoutBar(bar: (string | null)[], alloc: TalentAllocation): void;
   // Shared HUD chrome components.
   inputDialog(opts: {
     title: string;
@@ -498,8 +497,7 @@ export class TalentsWindow {
         cls: 'tal-lo-pick',
         onPick: () => {
           this.closeLoadoutMenu(root);
-          this.deps.switchLoadout(index);
-          this.deps.applyLoadoutBar(loadout.bar, loadout.alloc);
+          this.deps.switchLoadout(index, loadout.bar, loadout.alloc);
           this.refreshFromAuthority();
         },
       });

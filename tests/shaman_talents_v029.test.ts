@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { iceFloesAuraForAbility } from '../src/sim/combat/empower_next';
 import {
   consumeMendingCurrent,
   depositMendingCurrent,
@@ -163,6 +164,22 @@ describe('Shaman v0.29 talent grid', () => {
     expect(shamanManaCost(flow.sim.ctx, flow.player, 65)).toBe(25);
     onShamanManaSpent(flow.sim.ctx, flow.player, 25);
     expect(flow.player.auras.some((aura) => aura.id === FLOW_STATE_READY_ID)).toBe(false);
+  });
+
+  it('spends a ready Flow State on an eligible action even when the discount makes it free', () => {
+    const flow = shaman({ 14: SHAMAN_TALENT_IDS.flowState });
+    onShamanManaSpent(flow.sim.ctx, flow.player, 120);
+    expect(shamanManaCost(flow.sim.ctx, flow.player, 25)).toBe(0);
+    onShamanManaSpent(flow.sim.ctx, flow.player, 0, true);
+    expect(flow.player.auras.some((aura) => aura.id === FLOW_STATE_READY_ID)).toBe(false);
+  });
+
+  it('scopes Flowing Elements movement casting to Arc Bolt and Mending Waters', () => {
+    const flowing = shaman({ 5: SHAMAN_TALENT_IDS.flowingElements });
+    onShamanCastCompleted(flowing.sim.ctx, flowing.player, 'frost_shock');
+    expect(iceFloesAuraForAbility(flowing.player, 'lightning_bolt')).toBeDefined();
+    expect(iceFloesAuraForAbility(flowing.player, 'healing_wave')).toBeDefined();
+    expect(iceFloesAuraForAbility(flowing.player, 'chain_heal')).toBeUndefined();
   });
 
   it('Ward Cycle restores the canonical defensive ward and mana behind one ICD', () => {

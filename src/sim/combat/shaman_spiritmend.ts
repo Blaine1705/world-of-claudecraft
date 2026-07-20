@@ -3,12 +3,14 @@
 
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
+
+export { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from '../content/shaman_tuning';
+
 import {
   lifespringMasteryDepositBonus,
   SHAMAN_TALENT_IDS,
   shamanTalentSelected,
   spiritmendTalentDepositMultiplier,
-  triggerWardCycle,
 } from './shaman_talents';
 
 export const MENDING_CURRENT_ID = 'shaman_mending_current';
@@ -53,6 +55,24 @@ export function mendingCurrent(target: Entity, sourceId: number): Aura | null {
   );
 }
 
+/** Pure action-bar predicate for Tidecall's capped-target cue. */
+export function mendingCurrentTargetCapped(
+  sourceId: number | undefined,
+  target: {
+    maxHp?: number;
+    auras?: readonly { id?: string; sourceId?: number; value?: number }[];
+  } | null,
+): boolean {
+  const maxHp = target?.maxHp;
+  if (sourceId === undefined || !maxHp || maxHp <= 0 || !target.auras) return false;
+  return target.auras.some(
+    (aura) =>
+      aura.id === MENDING_CURRENT_ID &&
+      aura.sourceId === sourceId &&
+      (aura.value ?? 0) >= Math.round(maxHp * MENDING_CURRENT_MAX_HP_CAP),
+  );
+}
+
 export function spiritmendDepositMultiplier(
   ctx: SimContext,
   source: Entity,
@@ -76,6 +96,8 @@ function depositRawMendingCurrent(
   const existing = mendingCurrent(target, source.id);
   const previous = existing?.value ?? 0;
   const next = Math.min(cap, previous + Math.round(requested));
+  const previousTier = cap > 0 ? Math.min(3, Math.ceil((previous / cap) * 3)) : 0;
+  const nextTier = cap > 0 ? Math.min(3, Math.ceil((next / cap) * 3)) : 0;
   if (existing) {
     existing.value = next;
     existing.remaining = MENDING_CURRENT_DURATION;
@@ -96,6 +118,15 @@ function depositRawMendingCurrent(
       school: 'nature',
     });
   }
+  if (nextTier > previousTier) {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: source.id,
+      targetId: target.id,
+      school: 'nature',
+      fx: 'wardBloom',
+    });
+  }
   return next - previous;
 }
 
@@ -113,7 +144,6 @@ export function depositMendingCurrent(
     Math.round(calculatedHealing * spiritmendDepositMultiplier(ctx, source, abilityId)),
   );
   const added = depositRawMendingCurrent(ctx, source, target, deposit);
-  if (abilityId === 'healing_wave') triggerWardCycle(ctx, source);
   if (
     abilityId === 'tidecall' &&
     source.auras.some((aura) => aura.id === LIFESPRING_WEAPON_ID) &&
@@ -182,6 +212,13 @@ export function consumeMendingCurrent(ctx: SimContext, source: Entity, target: E
   const proposed = Math.max(0, Math.round((current?.value ?? 0) * CURRENT_CONSUME_MULTIPLIER));
   if (proposed > 0 && !target.dead) {
     ctx.applyHeal(source, target, proposed, 'Mending Current', MENDING_CURRENT_ID, false, false);
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: source.id,
+      targetId: target.id,
+      school: 'nature',
+      fx: 'echoBurst',
+    });
     if (shamanTalentSelected(ctx, source, SHAMAN_TALENT_IDS.echoingElements)) {
       ctx.applyAura(target, {
         id: 'shaman_echoing_elements_heal',

@@ -35,6 +35,7 @@ import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '..
 import { isStunned } from './cc';
 import { tickMendingCurrent } from './shaman_spiritmend';
 import { tickShamanTalentAura } from './shaman_talents';
+import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
@@ -151,8 +152,7 @@ export function updateTimers(p: Entity): void {
       }
       // Parallel per-charge recharge: every running timer ticks at once.
       const primalExaltationRate =
-        abilityId === 'tidecall' &&
-        p.auras.some((aura) => aura.id === 'shaman_primal_exaltation')
+        abilityId === 'tidecall' && p.auras.some((aura) => aura.id === 'shaman_primal_exaltation')
           ? 2
           : 1;
       const delta = temporalHourglassCooldownDelta(p, abilityId) * primalExaltationRate;
@@ -215,6 +215,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
           tickTemporalHourglassHealing(ctx, e, a);
         } else if (a.kind === 'dot') {
+          const dotSource = ctx.entities.get(a.sourceId) ?? null;
           let tickDamage = a.value;
           if (a.school === 'physical') {
             let bleedAmp = 0;
@@ -231,7 +232,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             fx: 'tick',
           });
           ctx.dealDamage(
-            ctx.entities.get(a.sourceId) ?? null,
+            dotSource,
             e,
             tickDamage,
             false,
@@ -239,13 +240,13 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.name,
             'hit',
             true,
-            undefined,
+            dotSource ? { mult: stoneboundThreatMultiplier(ctx, dotSource) } : undefined,
             // Periodic (DoT) ticks are not a direct attack: they must not walk a
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
           );
           if (a.leechPct !== undefined) {
-            const src = ctx.entities.get(a.sourceId);
+            const src = dotSource;
             if (src && !src.dead) {
               const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
               if (healed > 0) {

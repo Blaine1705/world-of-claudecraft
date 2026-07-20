@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
+import { warspiritCadence } from '../src/sim/combat/shaman_warspirit';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -7,6 +9,7 @@ import type { Entity, SimEvent } from '../src/sim/types';
 const GALEHEART_ID = 'galeheart_weapon';
 const STONEBOUND_ID = 'rockbiter_weapon';
 const STORMCAST_ID = 'shaman_stormcast';
+const STORMCAST_CHEAP_ID = 'shaman_stormcast_cheap';
 
 function setup(seed = 2810): { sim: Sim; shaman: Entity; target: Entity } {
   const sim = new Sim({ seed, playerClass: 'shaman', noPlayer: true, autoEquip: true });
@@ -112,6 +115,55 @@ describe('Shaman v0.29 Warspirit', () => {
     expect(shaman.castingAbility).toBeNull();
     expect(manaBefore - shaman.resource).toBeCloseTo((definition?.cost ?? 0) * 0.5, 5);
     expect(shaman.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(false);
+  });
+
+  it('refunds both Stormcast components when an Arc Bolt projectile fizzles', () => {
+    const { sim, shaman, target } = setup(2814);
+    castInstant(sim, shaman, STONEBOUND_ID);
+    for (let step = 0; step < 3; step++) landedSwing(sim, shaman, target);
+
+    shaman.gcdRemaining = 0;
+    shaman.resource = shaman.maxResource;
+    sim.castAbility('lightning_bolt', shaman.id);
+    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
+    expect(shaman.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(false);
+    expect(shaman.auras.some((aura) => aura.id === STORMCAST_CHEAP_ID)).toBe(false);
+
+    target.dead = true;
+    target.hp = 0;
+    sim.tick();
+    expect(shaman.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(true);
+    expect(shaman.auras.some((aura) => aura.id === STORMCAST_CHEAP_ID)).toBe(true);
+  });
+
+  it('advances the shared cadence from both real dual-wield auto attacks', () => {
+    const { sim, shaman, target } = setup(2815);
+    sim.addItem('training_mace', 1, shaman.id);
+    sim.equipItem('training_mace', shaman.id);
+    expect(shaman.dualWielding).toBe(true);
+    expect(shaman.offhandWeapon).not.toBeNull();
+    castInstant(sim, shaman, GALEHEART_ID);
+
+    const meta = sim.meta(shaman.id);
+    if (!meta) throw new Error('missing Warspirit metadata');
+    sim.rng.next = () => 0.99;
+    shaman.autoAttack = true;
+    shaman.swingTimer = 0;
+    shaman.offhandSwingTimer = 0;
+    updatePlayerAutoAttack(sim.ctx, shaman, meta);
+
+    const swings = sim
+      .drainEvents()
+      .filter(
+        (event) =>
+          event.type === 'damage' &&
+          event.sourceId === shaman.id &&
+          event.targetId === target.id &&
+          event.ability === null &&
+          event.kind === 'hit',
+      );
+    expect(swings).toHaveLength(2);
+    expect(warspiritCadence(shaman)).toBe(2);
   });
 
   it('makes Stonebound an exclusive defensive posture and removes every rider on exit', () => {

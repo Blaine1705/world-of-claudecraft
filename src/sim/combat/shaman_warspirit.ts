@@ -98,7 +98,13 @@ export function applyWarspiritPosture(
   removeOwnedAuras(
     ctx,
     player,
-    new Set([GALEHEART_WEAPON_ID, STONEBOUND_WEAPON_ID, STONEBOUND_ARMOR_ID, STONEBOUND_DR_ID]),
+    new Set([
+      GALEHEART_WEAPON_ID,
+      STONEBOUND_WEAPON_ID,
+      STONEBOUND_ARMOR_ID,
+      STONEBOUND_DR_ID,
+      STONEBOUND_WARD_SMOOTH_ID,
+    ]),
   );
   if (leavingStonebound) clearStoneboundForcedTargets(ctx, player.id);
 
@@ -202,7 +208,7 @@ export function advanceWarspiritCadence(
   resolvedWeaponDamage: number,
   steps: 1 | 2 = 1,
 ): boolean {
-  if (!isWarspirit(ctx, player) || warspiritPosture(player) === null || target.dead) return false;
+  if (!isWarspirit(ctx, player) || warspiritPosture(player) === null) return false;
   const cadenceTarget = primalExaltationActive(player) ? 2 : WARSPIRIT_CADENCE_STEPS;
   const total = warspiritCadence(player) + steps;
   if (total < cadenceTarget) {
@@ -211,7 +217,7 @@ export function advanceWarspiritCadence(
   }
   setCadence(ctx, player, Math.min(cadenceTarget - 1, total - cadenceTarget));
   armStormcast(ctx, player);
-  if (warspiritPosture(player) !== 'galeheart') return true;
+  if (warspiritPosture(player) !== 'galeheart' || target.dead) return true;
   const echoDamage = Math.max(
     1,
     Math.round(resolvedWeaponDamage * GALEHEART_ECHO_DAMAGE * galeheartEchoMultiplier(ctx, player)),

@@ -263,12 +263,16 @@ function commitTalentAllocation(
 
   const previousSpec = meta.talents.spec;
   if (meta.cls === 'shaman') clearShamanTalentState(ctx, player);
-  meta.talents = sanitized;
-  recomputeTalents(ctx, meta);
   if (previousSpec !== sanitized.spec) {
+    // Remove old spec auras before the single stat recomputation below. In
+    // particular, Stonebound's armor must not be baked into the new spec.
     clearThundercallState(ctx, player);
     clearWarspiritState(ctx, player);
     clearSpiritmendState(ctx, player);
+  }
+  meta.talents = sanitized;
+  recomputeTalents(ctx, meta);
+  if (previousSpec !== sanitized.spec) {
     ctx.revalidateOffhandForSpec(player.id);
   }
   // A spec-locked pet outlives its spec otherwise (owner report: the frost

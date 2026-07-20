@@ -8387,7 +8387,11 @@ export class Sim {
                 // 2026-07-12): other chronomancers' echoes still heal in the sim but
                 // never show in this viewer's group/raid strip. echoVisibleTo reads
                 // the real aura sourceId, so no wire field is added.
-                auras: partyFrameAuras(e.auras.filter((a) => echoVisibleTo(a, this.primaryId))),
+                auras: partyFrameAuras(
+                  e.auras.filter((a) => echoVisibleTo(a, this.primaryId)),
+                  undefined,
+                  e.maxHp,
+                ),
               },
             ]
           : [];

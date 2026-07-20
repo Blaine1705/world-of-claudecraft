@@ -15,6 +15,7 @@ import {
   TEMPORAL_HOURGLASS_SELF_RADIUS,
   type WeaponInfo,
 } from '../types';
+import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
 import type { TalentModifiers } from './talents';
 import { SPORT_ABILITIES } from './vale_cup';
@@ -3735,12 +3736,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Imbues your weapon with living water, increasing Mending Current deposits by 20%.',
   },
-  // Restoration shaman signature (granted only via the Restoration spec, not in the base
-  // kit). v1 is a strong single-target heal; the multi-target "chain" bounce is a
-  // follow-up once a bounce/jump primitive exists.
+  // Restoration Shaman signature, granted only by the Spiritmend spec.
   chain_heal: {
     id: 'chain_heal',
-    name: 'Chain Heal',
+    name: 'Cascading Mend',
     class: 'shaman',
     learnLevel: 10,
     cost: 60,
@@ -3752,14 +3751,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.5, radius: 12 }],
     description:
-      'Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
+      'Heals a friendly target for 120 to 145, then jumps to up to 2 nearby allies for 50% less healing per jump. Each ally reached consumes your Mending Current for an additional burst. (Spiritmend signature)',
   },
   healing_wave: {
     id: 'healing_wave',
     name: 'Mending Waters',
     class: 'shaman',
     learnLevel: 1,
-    cost: 25,
+    cost: MENDING_WATERS_MANA_COST,
     castTime: 1.5,
     cooldown: 0,
     range: 30,
@@ -3792,7 +3791,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'shaman',
     specs: ['restoration'],
     learnLevel: 10,
-    cost: 40,
+    cost: TIDECALL_MANA_COST,
     castTime: 0,
     cooldown: 12,
     maxCharges: 2,

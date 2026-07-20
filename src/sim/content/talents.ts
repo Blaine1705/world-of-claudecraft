@@ -274,6 +274,9 @@ export interface ResolvedAbilityMod {
 export interface TalentModifiers {
   spec: string | null;
   role: Role | null;
+  /** Selected option ids baked alongside the numeric modifiers. Combat modules
+   *  query this flat map instead of walking the authoritative allocation. */
+  selected: Record<string, true>;
   stats: Required<StatModEffect>;
   abilities: Record<string, ResolvedAbilityMod>;
   global: Required<GlobalModEffect>;
@@ -552,6 +555,7 @@ export function emptyModifiers(): TalentModifiers {
   return {
     spec: null,
     role: null,
+    selected: {},
     stats: zeroStats(),
     abilities: {},
     global: zeroGlobal(),
@@ -699,7 +703,10 @@ export function computeTalentModifiers(
     const optionId = allocation.rows[row.level];
     if (!optionId) continue;
     const option = row.options.find((candidate) => candidate.id === optionId);
-    if (option) accumulateTalentEffect(modifiers, option.effect);
+    if (option) {
+      modifiers.selected[option.id] = true;
+      accumulateTalentEffect(modifiers, option.effect);
+    }
   }
   return modifiers;
 }

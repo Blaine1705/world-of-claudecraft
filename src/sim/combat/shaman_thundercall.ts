@@ -8,24 +8,27 @@ import {
   pyrebrandBonusCharge,
   SHAMAN_TALENT_IDS,
   shamanTalentSelected,
-  triggerWardCycle,
 } from './shaman_talents';
 
 export const THUNDER_CHARGES_ID = 'shaman_thunder_charges';
 export const PRIMAL_MASTERY_ID = 'elemental_mastery';
 export const PRIMAL_MASTERY_INSTANT_ID = 'elemental_mastery_instant';
+export const PRIMAL_MASTERY_VENT_ID = 'elemental_mastery_vent';
 export const THUNDER_CHARGE_CAP = 5;
 export const THUNDER_BANK_DURATION = 86_400;
 export const EARTHEN_JOLT_BONUS_PER_CHARGE = 0.25;
 // Starting PBE value. Faultwake's coefficient remains independently tunable.
 export const FAULTWAKE_BONUS_PER_CHARGE = 0.2;
 export const PRIMAL_MASTERY_DURATION = 12;
+export const PRIMAL_MASTERY_VENT_BONUS = 0.25;
 
 const THUNDER_VENTS: ReadonlySet<string> = new Set(['earth_shock', 'earthquake']);
 const THUNDERCALL_STATE_IDS: ReadonlySet<string> = new Set([
+  'flametongue_weapon',
   THUNDER_CHARGES_ID,
   PRIMAL_MASTERY_ID,
   PRIMAL_MASTERY_INSTANT_ID,
+  PRIMAL_MASTERY_VENT_ID,
 ]);
 
 function isThundercall(ctx: SimContext, player: Entity): boolean {
@@ -49,6 +52,17 @@ function removeAuraAt(ctx: SimContext, player: Entity, index: number): void {
 export function thunderCharges(player: Entity): number {
   const stacks = player.auras.find((aura) => aura.id === THUNDER_CHARGES_ID)?.stacks ?? 0;
   return Math.max(0, Math.min(THUNDER_CHARGE_CAP, stacks));
+}
+
+/** Pure action-bar predicate for the persistent full-bank payoff cue. */
+export function thundercallPayoffGlowActive(
+  auras: readonly { id?: string; stacks?: number }[],
+  abilityId: string,
+): boolean {
+  if (!THUNDER_VENTS.has(abilityId)) return false;
+  return auras.some(
+    (aura) => aura.id === THUNDER_CHARGES_ID && (aura.stacks ?? 0) >= THUNDER_CHARGE_CAP,
+  );
 }
 
 export function addThunderCharges(ctx: SimContext, player: Entity, requested: number): number {
@@ -81,7 +95,6 @@ export function thundercallOnArcBoltImpact(ctx: SimContext, player: Entity): voi
   const accelerated =
     player.auras.some((aura) => aura.id === PRIMAL_MASTERY_ID) || primalExaltationActive(player);
   addThunderCharges(ctx, player, (accelerated ? 2 : 1) + pyrebrandBonusCharge(ctx, player));
-  triggerWardCycle(ctx, player);
 }
 
 export function thundercallDamageMultiplier(
@@ -91,8 +104,15 @@ export function thundercallDamageMultiplier(
 ): number {
   if (!isThundercall(ctx, player)) return 1;
   const charges = thunderCharges(player);
-  if (abilityId === 'earth_shock') return 1 + charges * EARTHEN_JOLT_BONUS_PER_CHARGE;
-  if (abilityId === 'earthquake') return 1 + charges * FAULTWAKE_BONUS_PER_CHARGE;
+  const primalBonus = player.auras.some((aura) => aura.id === PRIMAL_MASTERY_VENT_ID)
+    ? PRIMAL_MASTERY_VENT_BONUS
+    : 0;
+  if (abilityId === 'earth_shock') {
+    return (1 + charges * EARTHEN_JOLT_BONUS_PER_CHARGE) * (1 + primalBonus);
+  }
+  if (abilityId === 'earthquake') {
+    return (1 + charges * FAULTWAKE_BONUS_PER_CHARGE) * (1 + primalBonus);
+  }
   return 1;
 }
 
@@ -122,6 +142,17 @@ export function consumeThunderVent(
   const charges = thunderCharges(player);
   const index = player.auras.findIndex((aura) => aura.id === THUNDER_CHARGES_ID);
   if (index >= 0) removeAuraAt(ctx, player, index);
+  const primalVentIndex = player.auras.findIndex((aura) => aura.id === PRIMAL_MASTERY_VENT_ID);
+  if (primalVentIndex >= 0) {
+    removeAuraAt(ctx, player, primalVentIndex);
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: player.id,
+      targetId: target?.id ?? player.id,
+      school: 'nature',
+      fx: 'procSurge',
+    });
+  }
   if (charges === THUNDER_CHARGE_CAP) {
     if (shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.deepReservoir)) {
       addThunderCharges(ctx, player, 2);
@@ -188,6 +219,16 @@ export function armPrimalMastery(ctx: SimContext, player: Entity): void {
     sourceId: player.id,
     school: 'nature',
     empowerAbilities: ['lightning_bolt'],
+  });
+  ctx.applyAura(player, {
+    id: PRIMAL_MASTERY_VENT_ID,
+    name: 'Primal Mastery',
+    kind: 'internal_cd',
+    value: PRIMAL_MASTERY_VENT_BONUS,
+    remaining: PRIMAL_MASTERY_DURATION,
+    duration: PRIMAL_MASTERY_DURATION,
+    sourceId: player.id,
+    school: 'nature',
   });
 }
 

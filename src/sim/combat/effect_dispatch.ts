@@ -93,7 +93,13 @@ import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
 import { consumeMendingCurrent, depositMendingCurrent } from './shaman_spiritmend';
-import { applyPrimalExaltation, applyStoneward, onThunderWardActivated } from './shaman_talents';
+import {
+  applyPrimalExaltation,
+  applyStoneward,
+  onGhostWolfExited,
+  onThunderWardActivated,
+  triggerWardCycle,
+} from './shaman_talents';
 import {
   armPrimalMastery,
   consumeThunderVent,
@@ -441,7 +447,10 @@ export function runEffects(
           false,
           ability.id,
         );
-        if (ability.id === 'lightning_bolt') thundercallOnArcBoltImpact(ctx, p);
+        if (ability.id === 'lightning_bolt') {
+          thundercallOnArcBoltImpact(ctx, p);
+          triggerWardCycle(ctx, p);
+        }
         if (ability.id === 'earth_shock') {
           consumeThunderVent(ctx, p, ability.id, target, finalDamage);
           applyStoneboundJolt(ctx, p, target);
@@ -691,6 +700,7 @@ export function runEffects(
         if (ability.id === 'healing_wave' || ability.id === 'tidecall') {
           depositMendingCurrent(ctx, p, healTarget, healAmount, ability.id);
         }
+        if (ability.id === 'healing_wave') triggerWardCycle(ctx, p);
         // Power Echo (mage choice row): the armed echo also repeats a direct HEAL
         // (Temporal Mend, Temporal Echo) at its fraction of the RESOLVED heal on
         // the same target, consumed BEFORE the repeat so a copy can never re-echo.
@@ -2287,6 +2297,7 @@ export function runEffects(
             p.auras.splice(existing, 1);
             if (eff.kind === 'stealth') p.stealthed = false; // toggled back out of stealth
             ctx.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
+            if (ability.id === 'ghost_wolf') onGhostWolfExited(ctx, p);
             recalcPlayerStats(
               p,
               meta.cls,

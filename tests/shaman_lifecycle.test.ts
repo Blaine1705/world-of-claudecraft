@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { depositMendingCurrent, mendingCurrent } from '../src/sim/combat/shaman_spiritmend';
 import { addThunderCharges, THUNDER_CHARGES_ID } from '../src/sim/combat/shaman_thundercall';
 import {
+  applyStoneboundWardSmoothing,
   applyWarspiritPosture,
   GALEHEART_WEAPON_ID,
+  STONEBOUND_WARD_SMOOTH_ID,
   STORMCAST_ID,
 } from '../src/sim/combat/shaman_warspirit';
 import type { TalentAllocation } from '../src/sim/content/talents';
@@ -18,6 +20,10 @@ function player(sim: Sim, pid: number): Entity {
   const entity = sim.entities.get(pid);
   if (!entity) throw new Error('missing player');
   return entity;
+}
+
+function effectiveArmor(sim: Sim, entity: Entity): number {
+  return (sim as unknown as { effectiveArmor(target: Entity): number }).effectiveArmor(entity);
 }
 
 describe('Shaman v0.29 state lifecycle', () => {
@@ -46,6 +52,32 @@ describe('Shaman v0.29 state lifecycle', () => {
     expect(sim.setSpec('restoration')).toBe(true);
     expect(sim.player.auras.some((aura) => aura.id === GALEHEART_WEAPON_ID)).toBe(false);
     expect(sim.player.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(false);
+  });
+
+  it('removes baked armor, posture riders, and Pyrebrand before recomputing a new spec', () => {
+    const sim = new Sim({ seed: 2845, playerClass: 'shaman', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('enhancement')).toBe(true);
+    const baseArmor = effectiveArmor(sim, sim.player);
+    applyWarspiritPosture(sim.ctx, sim.player, 'stonebound');
+    applyStoneboundWardSmoothing(sim.ctx, sim.player, 'lightning_shield');
+    sim.player.auras.push({
+      id: 'flametongue_weapon',
+      name: 'Pyrebrand Weapon',
+      kind: 'imbue',
+      value: 8,
+      remaining: 300,
+      duration: 300,
+      sourceId: sim.player.id,
+      school: 'fire',
+    });
+    expect(effectiveArmor(sim, sim.player)).toBeCloseTo(Math.round(baseArmor * 1.3), 5);
+    expect(sim.player.auras.some((aura) => aura.id === STONEBOUND_WARD_SMOOTH_ID)).toBe(true);
+
+    expect(sim.setSpec('restoration')).toBe(true);
+    expect(effectiveArmor(sim, sim.player)).toBeCloseTo(baseArmor, 5);
+    expect(sim.player.auras.some((aura) => aura.id === STONEBOUND_WARD_SMOOTH_ID)).toBe(false);
+    expect(sim.player.auras.some((aura) => aura.id === 'flametongue_weapon')).toBe(false);
   });
 
   it('uses the same cleanup choke point for saved loadout switches', () => {

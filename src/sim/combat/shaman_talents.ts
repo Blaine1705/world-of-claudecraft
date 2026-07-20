@@ -1,5 +1,5 @@
-// Shaman Talents 2.0 runtime helpers. Talent identity is read from the
-// authoritative allocation; transient counters and windows ride auras so the
+// Shaman Talents 2.0 runtime helpers. Talent identity is read from the flat
+// precomputed modifier map; transient counters and windows ride auras so the
 // offline sim, server sim, snapshots, and parity traces share one state model.
 
 import type { SimContext } from '../sim_context';
@@ -38,6 +38,7 @@ export const WARD_CYCLE_ICD_ID = 'shaman_ward_cycle_icd';
 export const GATHERING_WINDS_ICD_ID = 'shaman_gathering_winds_icd';
 export const WAYFARER_GRACE_ICD_ID = 'shaman_wayfarer_grace_icd';
 export const ANCESTRAL_BULWARK_ICD_ID = 'shaman_ancestral_bulwark_icd';
+export const FLOW_STATE_COST_REDUCTION = 40;
 
 const LONG_STATE_DURATION = 86_400;
 const JOLT_IDS: ReadonlySet<string> = new Set(['earth_shock', 'flame_shock', 'frost_shock']);
@@ -55,7 +56,7 @@ export function shamanTalentSelected(
   talentId: ShamanTalentId,
 ): boolean {
   const meta = shamanMeta(ctx, player);
-  return meta !== null && Object.values(meta.talents.rows).includes(talentId);
+  return meta !== null && ctx.playerMods(meta).selected[talentId] === true;
 }
 
 function removeAuraAt(ctx: SimContext, target: Entity, index: number): Aura | null {
@@ -176,12 +177,23 @@ export function shamanManaCost(ctx: SimContext, player: Entity, cost: number): n
   ) {
     return cost;
   }
-  return Math.max(0, cost - 40);
+  return Math.max(0, cost - FLOW_STATE_COST_REDUCTION);
 }
 
-export function onShamanManaSpent(ctx: SimContext, player: Entity, amount: number): void {
+export function flowStateDiscountedCost(auras: readonly { id?: string }[], cost: number): number {
+  return cost > 0 && auras.some((aura) => aura.id === FLOW_STATE_READY_ID)
+    ? Math.max(0, cost - FLOW_STATE_COST_REDUCTION)
+    : cost;
+}
+
+export function onShamanManaSpent(
+  ctx: SimContext,
+  player: Entity,
+  amount: number,
+  eligibleAction = amount > 0,
+): void {
   if (
-    amount <= 0 ||
+    !eligibleAction ||
     player.resourceType !== 'mana' ||
     !shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.flowState)
   ) {
@@ -189,6 +201,7 @@ export function onShamanManaSpent(ctx: SimContext, player: Entity, amount: numbe
   }
   const readyIndex = player.auras.findIndex((aura) => aura.id === FLOW_STATE_READY_ID);
   if (readyIndex >= 0) removeAuraAt(ctx, player, readyIndex);
+  if (amount <= 0) return;
   const progress = player.auras.find((aura) => aura.id === FLOW_STATE_PROGRESS_ID);
   const total = (progress?.value ?? 0) + amount;
   const remainder = total >= 120 ? total - 120 : total;

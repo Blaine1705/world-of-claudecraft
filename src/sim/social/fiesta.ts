@@ -108,6 +108,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
   const m: TalentModifiers = {
     spec: base.spec,
     role: base.role,
+    selected: { ...base.selected },
     stats: { ...base.stats },
     global: { ...base.global },
     abilities: {},
