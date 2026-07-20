@@ -1,17 +1,17 @@
-# Hunter, Shaman, and Priest v0.28.0 Spell Implementation Plan
+# Hunter, Shaman, and Priest v0.29.0 Spell Implementation Plan
 
 > Review companion: use the standalone
 > [Talents 2.0 class design lab](../../prototypes/talents-v028/index.html) for a mobile-first comparison
 > of all nine specializations. This document and the linked class PRDs remain authoritative.
 
-Status: owner implementation plan, pending maintainer approval for gameplay slices
+Status: owner implementations complete; reconciliation and PBE validation pending
 Owner: Ryze
-Target: `release/v0.28.0`, then the assigned PBE wave for each class
+Target: `release/v0.29.0`, then the assigned PBE wave for each class
 
 ## Base and relationship to PR #2163
 
-This work is based on `release/v0.28.0` after PR #2163. The release branch contains merge commit
-`32415eb61509113731633b51f396c7c3c2dae222`, and this implementation branch descends from it.
+The three approved implementations are based on `release/v0.29.0`, which contains PR #2163's
+specialization power floor.
 
 PR #2163 remains the passive specialization power floor. This program does not fold new spells,
 rotation mechanics, procs, or talent rows into `SPEC_BASELINES`. The layers remain:
@@ -24,6 +24,11 @@ rotation mechanics, procs, or talent rows into `SPEC_BASELINES`. The layers rema
 The class redesign is a large content feature. Gameplay slices require approval from Levy or
 Fernando before implementation and must pass through the listed PBE waves. Documentation and
 fail-first test scaffolding may land independently.
+
+Levy approved the Hunter, Shaman, and Priest gameplay slices before implementation. Shaman targets
+PBE Wave A, Priest targets PBE Wave B, and Hunter targets PBE Wave C. The three draft PRs must be
+reconciled through one integration branch before PBE because they intentionally share combat,
+talent, UI, localization, documentation, and generated-file seams.
 
 ## Non-negotiable implementation rules
 
@@ -85,6 +90,7 @@ This seam lands separately and cannot contain Packlord-specific tuning.
 | Faultwake | Reuse `earthquake`, rename its display, and add the Thundercall gate | Thundercall |
 | Primal Mastery | Reuse `elemental_mastery` and its signature grant | Thundercall |
 | Galeheart Weapon | New enhancement ability and deterministic cadence | Warspirit |
+| One-handed dual wield | Extend the existing spec-gated equipment permission and auto-attack cadence | Warspirit |
 | Stonebound Weapon | Reuse `rockbiter_weapon`, then hand it off to Warspirit at level 5 | Warspirit after level 5 |
 | Ancestral Strike | Reuse `stormstrike` and its signature grant | Warspirit |
 | Stormcast | New owner aura earned by the melee cadence | Warspirit |
@@ -149,6 +155,9 @@ present in the same slice.
 - Implement Thundercall in `src/sim/combat/shaman_thundercall.ts`.
 - Implement Warspirit in `src/sim/combat/shaman_warspirit.ts`.
 - Implement Spiritmend in `src/sim/combat/shaman_spiritmend.ts`.
+- Extend the existing `canDualWield` spec gate to Warspirit for one-handed weapons only. Count
+  landed main-hand and off-hand base swings toward one cadence, preserve canonical off-hand damage
+  and miss rules, and sanitize the off-hand weapon through the existing path on respec.
 - Keep Mending Current ownership keyed by Shaman and ally so one healer cannot consume another
   healer's pool.
 - Apply every Stonebound armor, mitigation, threat, and forced-target rider only while the posture
@@ -220,6 +229,8 @@ Add focused tests paired with the Shaman system modules:
 - Earthen Jolt and Faultwake consume the bank only after a valid resolved cast.
 - Defensive Thunder Ward charges never spend or duplicate the offensive bank.
 - Every valid third Warspirit melee step triggers one Galeheart event and one Stormcast state.
+- Warspirit alone may equip a one-handed off-hand weapon, and landed swings from either hand feed
+  the same cadence without letting echoes recurse.
 - Galeheart echoes never advance the cadence or recursively proc.
 - Stonebound removes Galeheart and applies every defensive rider as one visible tradeoff.
 - Leaving Stonebound removes armor, mitigation, threat, forced-target, and smoothing riders.
@@ -264,7 +275,7 @@ Add focused tests paired with the Priest system modules:
 4. Run the parity suite and review every intentional state or combat-event change.
 5. Run `npx tsc --noEmit` and the changed-file checks.
 6. Run `npm run gate` before the PR is called ready.
-7. Keep the PR current with `release/v0.28.0` through review and PBE feedback.
+7. Keep the PR current with `release/v0.29.0` through review and PBE feedback.
 
 ## Definition of done
 

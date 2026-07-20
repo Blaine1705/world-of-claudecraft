@@ -1,8 +1,8 @@
-# Hunter v0.28.0 Class Design
+# Hunter v0.29.0 Class Design
 
-Status: owner design direction, pre-implementation
+Status: owner-approved implementation, PBE validation pending
 Owner: Ryze
-Target: v0.28.0, PBE Wave C
+Target: v0.29.0, PBE Wave C
 
 ## Purpose
 
@@ -28,7 +28,7 @@ PBE acceptance criteria:
 - [Fieldcraft](../prd/hunter-fieldcraft-survival-v028.md)
 
 When a shared rule and a specialization PRD disagree, this class document wins. Existing ability
-behavior on `release/v0.28.0` remains canonical unless a PRD explicitly identifies an approved
+behavior on `release/v0.29.0` remains canonical unless a PRD explicitly identifies an approved
 change.
 
 ## Design principles
@@ -184,7 +184,7 @@ level. Current overworld examples include:
 Rare, elite, boss, dungeon, and higher-level creatures remain untameable. Pack Ferocity and
 Unleash Beast must work with every legal tamed pet, regardless of its original model or scale.
 
-v0.28.0 keeps one active pet. A stable, multiple simultaneous combat pets, and family-specific
+v0.29.0 keeps one active pet. A stable, multiple simultaneous combat pets, and family-specific
 Unleash attacks are later design space because they expand persistence, AI, balance, trigger, and
 mobile-clarity scope.
 
@@ -228,7 +228,7 @@ damage and duration remain tuning values.
 - Pet death, dismissal, respec, and loadout changes must restore normal scale and color.
 - Maximum Ferocity needs a generous hold window. It cannot force a rapid mobile reaction.
 - Every currently tameable pet must support the same growth and calming states.
-- Future pet-family variations are outside the v0.28.0 class PR unless separately approved.
+- Future pet-family variations are outside the v0.29.0 class PR unless separately approved.
 
 ## Coldsight
 
@@ -332,7 +332,7 @@ taxes:
 - Wildheart is an immediate self-heal with a clear, separate job from Shellskin.
 - Frostjaw Trap provides target-centered control for every specialization.
 - Hushing Shot is already a baseline level 10 Hunter action on
-  `release/v0.28.0`. Its existing cost, range, minimum range, cooldown, and 4-second school lockout
+  `release/v0.29.0`. Its existing cost, range, minimum range, cooldown, and 4-second school lockout
   are canonical. Talents may modify that action, but must never grant it again.
 
 Frostjaw Trap defaults to the selected enemy's location, or the Hunter's location when there is no
@@ -436,7 +436,7 @@ mark, or three-step aura that is readable on mobile without a second resource ba
 
 - Focus as the Hunter resource.
 - The shared Hunter identity tools, subject to action-bar pruning.
-- Hushing Shot exactly as shipped on `release/v0.28.0`. The new grid may modify it, but does not
+- Hushing Shot exactly as shipped on `release/v0.29.0`. The new grid may modify it, but does not
   grant or replace it.
 - The Measured Shot, Long Draw, Fevered Draw, and Cold Focus Coldsight foundation.
 - The strongest movement, trap, and presentation work that can be split cleanly.

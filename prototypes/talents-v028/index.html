@@ -57,7 +57,9 @@
           <span>01</span>
           <p id="spec-nav-title">Choose a specialization</p>
         </div>
-        <div class="spec-picker" id="spec-picker" role="group" aria-label="Specializations"></div>
+        <fieldset class="spec-picker" id="spec-picker">
+          <legend class="visually-hidden">Specializations</legend>
+        </fieldset>
       </section>
 
       <section class="spec-hero section-shell" aria-labelledby="spec-name">
@@ -98,11 +100,12 @@
             <span>02</span>
             <p>Walk the rotation</p>
           </div>
-          <div class="rotation-controls" aria-label="Rotation preview controls">
+          <fieldset class="rotation-controls">
+            <legend class="visually-hidden">Rotation preview controls</legend>
             <button type="button" class="text-button" id="rotation-reset">Reset</button>
             <button type="button" class="text-button" id="rotation-next">Next beat</button>
             <button type="button" class="primary-button" id="rotation-play">Play loop</button>
-          </div>
+          </fieldset>
         </div>
 
         <div class="rotation-grid">
@@ -114,10 +117,11 @@
                 <p class="mini-label">Compact action bar</p>
                 <p id="rotation-status" aria-live="polite">Ready to begin</p>
               </div>
-              <div class="legend" aria-label="Action ownership legend">
+              <fieldset class="legend">
+                <legend class="visually-hidden">Action ownership legend</legend>
                 <span><i class="legend-dot shared"></i>Shared</span>
                 <span><i class="legend-dot exclusive"></i>Exclusive</span>
-              </div>
+              </fieldset>
             </div>
             <div class="action-bar" id="action-bar"></div>
             <p class="mobile-note">

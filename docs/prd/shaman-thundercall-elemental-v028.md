@@ -1,9 +1,10 @@
-# Shaman Thundercall v0.28.0 PRD
+# Shaman Thundercall v0.29.0 PRD
 
-Status: owner design direction, pre-approval and pre-implementation
+Status: owner-approved implementation, PBE validation pending
 Owner: Ryze
-Target: `release/v0.28.0`, PBE Wave A
-Parent design: [Shaman v0.28.0 Class Design](../design/shaman-v028-class-design.md)
+Target: `release/v0.29.0`, PBE Wave A
+Approval: Levy, confirmed 2026-07-20
+Parent design: [Shaman v0.29.0 Class Design](../design/shaman-v028-class-design.md)
 
 ## Specialization gate
 
@@ -53,7 +54,7 @@ group. Primal Mastery accelerates the same actions instead of replacing the rota
 | Pyrebrand Weapon | Thundercall-only weapon enhancement supporting spell pressure. |
 | Primal Mastery | Existing signature action, expanded into a short build-and-vent window without another temporary button. |
 
-Existing spell ranks, costs, ranges, and baseline effects on `release/v0.28.0` remain canonical
+Existing spell ranks, costs, ranges, and baseline effects on `release/v0.29.0` remain canonical
 unless this PRD explicitly names a specialization change.
 
 ## Thunder-charge contract
@@ -83,6 +84,10 @@ Arc Bolt builds Thunder charges
 
 Cinder and Rime Jolts retain their damage-over-time and control jobs. They do not consume Thunder
 charges in the starting design, so utility does not accidentally erase the main payoff.
+
+Chain Lightning does not replace Arc Bolt or become a required baseline action in this direction.
+It may remain optional talent space after the charge-to-shock loop is complete, but it cannot build
+or vent Thunder charges in a way that makes Arc Bolt and shock choice rotationally irrelevant.
 
 ## Primal Mastery
 
@@ -135,7 +140,7 @@ The exact 18 class-wide choices are defined in the parent Shaman design.
 - Tier-independent aura and action-bar cues.
 
 PR #1980 is source material for Stormbank and shared bank or consume primitives only. Every
-implementation slice targets and reconciles against `release/v0.28.0`.
+implementation slice targets and reconciles against `release/v0.29.0`.
 
 ## Balance knobs
 

@@ -1,9 +1,9 @@
 # Vespers: Effigy, Echo, and Tithefiend Design
 
-Status: owner design direction, pre-approval and pre-implementation
+Status: owner-approved implementation, PBE validation pending
 Owner: Ryze
-Target: `release/v0.28.0`, PBE Wave B
-Parent design: [Priest v0.28.0 Class Design](priest-v028-class-design.md)
+Target: `release/v0.29.0`, PBE Wave B
+Parent design: [Priest v0.29.0 Class Design](priest-v028-class-design.md)
 
 ## Specialization gate
 
@@ -59,7 +59,7 @@ specialization.
 | Tithefiend | One autonomous temporary guardian. Consumes Gloomtithe, attacks the Effigy, echoes suffering, and returns Mana. |
 | Gloamveil | Canonical Shadow form and mastery presentation. |
 
-Existing spell ranks, costs, ranges, and baseline effects on `release/v0.28.0` remain canonical
+Existing spell ranks, costs, ranges, and baseline effects on `release/v0.29.0` remain canonical
 unless the approved Vespers PRD explicitly changes them.
 
 ## Effigy contract
@@ -141,7 +141,7 @@ five-stack manifestation.
 - Tier-independent target, aura, action-bar, link, and guardian cues.
 
 PR #1980 remains source material for decay, Gloomtithe, and shared proc or bank primitives. The
-current implementation target is `release/v0.28.0`, which remains canonical.
+current implementation target is `release/v0.29.0`, which remains canonical.
 
 ## Balance knobs
 

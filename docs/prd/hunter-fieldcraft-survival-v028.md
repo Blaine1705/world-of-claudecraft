@@ -1,9 +1,9 @@
-# Hunter Fieldcraft v0.28.0 PRD
+# Hunter Fieldcraft v0.29.0 PRD
 
-Status: owner design direction, pre-approval and pre-implementation
+Status: owner-approved implementation, PBE validation pending
 Owner: Ryze
-Target: `release/v0.28.0`, PBE Wave C
-Parent design: [Hunter v0.28.0 Class Design](../design/hunter-v028-class-design.md)
+Target: `release/v0.29.0`, PBE Wave C
+Parent design: [Hunter v0.29.0 Class Design](../design/hunter-v028-class-design.md)
 
 ## Specialization gate
 
@@ -189,7 +189,7 @@ The exact 18 class-wide choices remain defined in the parent Hunter design.
 - Momentum and armed re-entry state in offline, online, and headless simulation.
 - Tier-independent target debuff, aura, action-bar, Bloodhook, grenade, and wound cues.
 
-Existing behavior on `release/v0.28.0` remains canonical unless this approved PRD names the change.
+Existing behavior on `release/v0.29.0` remains canonical unless this approved PRD names the change.
 PR #2165 is source material only and must not replace release behavior by accident.
 
 ## Balance knobs

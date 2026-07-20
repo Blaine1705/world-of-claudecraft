@@ -18,9 +18,8 @@ From the repository worktree root on macOS:
 open prototypes/talents-v028/index.html
 ```
 
-The prototype currently exists only in the local `feature/v028-owned-class-spells` worktree. It has
-not been committed, pushed, deployed, or assigned a public URL. After the branch is pushed, reviewers
-can check out the branch and open the file locally. A one-click Discord link requires a separate static
+The prototype is committed with the design companion. Reviewers can check out the design branch and
+open the file locally. It is not deployed; a one-click Discord link requires a separate static
 deployment or PR preview.
 
 The page deliberately has no runtime dependency on the game. That keeps design review separate from

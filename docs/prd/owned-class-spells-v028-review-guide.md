@@ -1,10 +1,10 @@
 # Hunter, Shaman, and Priest design review guide
 
-**Target:** v0.28.x PBE work after PR #2163
+**Target:** v0.29.0 PBE work after PR #2163
 
-**Status:** Design review only
+**Status:** Approved design companion and PBE review guide
 
-**Gameplay approval:** Required from Levy or Fernando before implementation
+**Gameplay approval:** Recorded for all three class slices
 
 ## Why this review exists
 
@@ -44,7 +44,7 @@ actions, and build one choice from each talent row. The linked PRDs remain the s
 Final coefficients, proc rates, animation work, and encounter-by-encounter balance are not approval
 targets for this design review. Those belong to implementation tests and PBE tuning.
 
-## Proposed stacked PR sequence
+## Delivery sequence
 
 1. **Design companion:** these PRDs and the standalone review prototype, with no gameplay changes.
 2. **Shared specialization infrastructure:** action replacement, wrong-spec cleanup, persistence, and
@@ -55,8 +55,9 @@ targets for this design review. Those belong to implementation tests and PBE tun
 6. **PBE balance pass:** shared targets, coefficients, proc frequency, survivability, and encounter
    validation across all nine specializations.
 
-Each gameplay slice stays current with `release/v0.28.0`, goes through PBE, and requires approval
-before serious implementation work begins.
+Each gameplay slice stays current with `release/v0.29.0` and goes through its assigned PBE wave.
+The implementation drafts share several infrastructure files, so their final changes are reconciled
+once on a clean integration branch rather than merged independently.
 
 ## Source documents
 

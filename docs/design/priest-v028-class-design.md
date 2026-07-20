@@ -1,8 +1,8 @@
-# Priest v0.28.0 Class Design
+# Priest v0.29.0 Class Design
 
-Status: owner design direction, pre-implementation
+Status: owner-approved implementation, PBE validation pending
 Owner: Ryze
-Target: v0.28.0, PBE Wave B
+Target: v0.29.0, PBE Wave B
 
 ## Purpose
 

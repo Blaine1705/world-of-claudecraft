@@ -53,9 +53,9 @@ There is also a responsive design prototype covering all nine specializations. I
 their rotations, compare shared and spec-exclusive actions, and inspect all six talent rows. It is a
 review tool rather than game code, so the class PRDs remain authoritative.
 
-The implementation should remain split into shared specialization infrastructure followed by separate
-Hunter, Shaman, and Priest PRs. Gameplay work begins after approval, rather than expanding #1980 or
-#2163 into another combined redesign.
+The implementations remain split into separate Hunter, Shaman, and Priest review PRs. Their shared
+infrastructure is reconciled once on a clean integration branch before PBE, rather than expanding
+#1980 or #2163 into another combined redesign.
 
 ## What Pack Ferocity means
 
@@ -85,8 +85,8 @@ The prototype is implemented as a standalone static page at:
 
 `prototypes/talents-v028/index.html`
 
-It currently exists only in the local `feature/v028-owned-class-spells` worktree. It has not been
-committed, pushed, deployed, or given a public URL yet.
+It is committed with this design companion. Reviewers can check out the design branch or open the
+file from a class PR that includes the companion. It is not deployed to a public URL.
 
 To open it locally from the worktree root:
 
@@ -94,9 +94,8 @@ To open it locally from the worktree root:
 open prototypes/talents-v028/index.html
 ```
 
-No dependency installation or game server is required. Once the design branch is committed and pushed,
-another contributor can check out that branch and open the same file. A single clickable link for
-Discord will require a static deployment or PR preview as a separate publishing step.
+No dependency installation or game server is required. A single clickable link for Discord still
+requires a static deployment or PR preview as a separate publishing step.
 
 The prototype contains:
 

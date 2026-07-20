@@ -35,7 +35,11 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at 85% 8%, color-mix(in srgb, var(--accent-soft) 44%, transparent), transparent 27rem),
+    radial-gradient(
+      circle at 85% 8%,
+      color-mix(in srgb, var(--accent-soft) 44%, transparent),
+      transparent 27rem
+    ),
     linear-gradient(180deg, #111518 0, var(--page) 38rem, var(--page-deep) 100%);
   transition: background 240ms ease;
 }
@@ -101,6 +105,12 @@ a:focus-visible {
   align-items: end;
 }
 
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
 .eyebrow,
 .mini-label,
 .section-kicker p,
@@ -114,10 +124,25 @@ a:focus-visible {
   text-transform: uppercase;
 }
 
-h1,
-h2,
-p {
-  margin-top: 0;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+fieldset.spec-picker,
+fieldset.rotation-controls,
+fieldset.legend {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
 }
 
 h1 {
@@ -323,7 +348,11 @@ main {
   height: 360px;
   pointer-events: none;
   content: "";
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent), transparent 68%);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 18%, transparent),
+    transparent 68%
+  );
 }
 
 .spec-copy,
@@ -1000,7 +1029,9 @@ main {
   *,
   *::before,
   *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: Reduced motion must override component transitions. */
     scroll-behavior: auto !important;
+    /* biome-ignore lint/complexity/noImportantStyles: Reduced motion must override component transitions. */
     transition-duration: 0.01ms !important;
   }
 }

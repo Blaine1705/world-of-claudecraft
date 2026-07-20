@@ -1,9 +1,9 @@
-# Hunter Coldsight v0.28.0 PRD
+# Hunter Coldsight v0.29.0 PRD
 
-Status: owner design direction, pre-approval and pre-implementation
+Status: owner-approved implementation, PBE validation pending
 Owner: Ryze
-Target: `release/v0.28.0`, PBE Wave C
-Parent design: [Hunter v0.28.0 Class Design](../design/hunter-v028-class-design.md)
+Target: `release/v0.29.0`, PBE Wave C
+Parent design: [Hunter v0.29.0 Class Design](../design/hunter-v028-class-design.md)
 
 ## Specialization gate
 
@@ -94,7 +94,7 @@ cooldown cannot remove all positional decision-making for its entire duration.
 - Long Draw keeps a generous completion window and cannot rely on sub-second stop-and-cast input.
 - Fevered Draw and the shared movement row cover forced movement without becoming the optimal
   stationary rotation.
-- Minimum-range behavior follows `release/v0.28.0` until an approved class decision changes it.
+- Minimum-range behavior follows `release/v0.29.0` until an approved class decision changes it.
 - Ground placement and narrow facing are never required for baseline single-target output.
 
 ## Presentation and accessibility
@@ -119,12 +119,12 @@ The exact 18 class-wide choices remain defined in the parent Hunter design.
 - Shared Hunter Focus conversion and generator or spender classification.
 - Reusable successful-hit resource award behavior.
 - Existing Long Draw, Fevered Draw, Hushing Shot, pet, trap, and aspect implementations from
-  `release/v0.28.0` where applicable.
+  `release/v0.29.0` where applicable.
 - Tier-independent Focus-ready, spender-ready, and Cold Focus cues.
 - Offline, online, and headless parity for cast completion and Focus awards.
 
 PR #2165 contains useful Measured Shot, Long Draw, Fevered Draw, Cold Focus, and presentation work. It is
-source material only and must be reconciled against `release/v0.28.0` rather than merged wholesale.
+source material only and must be reconciled against `release/v0.29.0` rather than merged wholesale.
 
 ## Balance knobs
 
