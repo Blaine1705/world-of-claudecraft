@@ -144,6 +144,14 @@ export interface GlobalModEffect {
   // a stacking burn (combat/fire_mage.ts igniteOnCrit copies the resolved
   // amount). Scales with level like every spec mastery.
   ignitionPct?: number;
+  // Paladin Divine Ascension (Amanecer) talents, applied at activation in
+  // effect_dispatch's divineAscension case:
+  // ascensionChargeBonus: extra empowered-ability charges (Extended Dawn).
+  // ascensionRush: 1 to cleanse roots/slows and grant a speed burst (Dawn's Path).
+  // ascensionWard: 1 to grant a brief damage-reduction ward (Aegis of Devotion).
+  ascensionChargeBonus?: number;
+  ascensionRush?: number;
+  ascensionWard?: number;
 }
 
 export type ProcTrigger =
@@ -535,6 +543,9 @@ function zeroGlobal(): Required<GlobalModEffect> {
     blinkCast: 0,
     convergence: 0,
     ignitionPct: 0,
+    ascensionChargeBonus: 0,
+    ascensionRush: 0,
+    ascensionWard: 0,
   };
 }
 
@@ -637,6 +648,9 @@ export function accumulateTalentEffect(
     target.blinkCast += (source.blinkCast ?? 0) * multiplier;
     target.convergence += (source.convergence ?? 0) * multiplier;
     target.ignitionPct += (source.ignitionPct ?? 0) * multiplier;
+    target.ascensionChargeBonus += (source.ascensionChargeBonus ?? 0) * multiplier;
+    target.ascensionRush += (source.ascensionRush ?? 0) * multiplier;
+    target.ascensionWard += (source.ascensionWard ?? 0) * multiplier;
   }
   for (const ability of effect.ability ?? []) {
     const target = modifiers.abilities[ability.ability] ?? zeroAbilityMod();

@@ -277,6 +277,30 @@ describe('paladin redesign', () => {
     expect(p.dead).toBe(true);
   });
 
+  it('Extended Dawn: Divine Ascension gains 2 additional charges', () => {
+    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_extended_dawn' });
+    if (!p.paladinDevotion) throw new Error('no devotion');
+    p.paladinDevotion.value = 20;
+    sim.castAbility('divine_ascension');
+    expect(p.paladinDevotion.ascensionCharges).toBe(7); // 5 base + 2
+  });
+
+  it("Dawn's Path: activating Divine Ascension grants a movement-speed burst", () => {
+    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_dawns_path' });
+    if (!p.paladinDevotion) throw new Error('no devotion');
+    p.paladinDevotion.value = 20;
+    sim.castAbility('divine_ascension');
+    expect(p.auras.some((a) => a.kind === 'buff_speed' && a.id === 'dawns_path_speed')).toBe(true);
+  });
+
+  it('Aegis of Devotion: activating Divine Ascension applies a damage-reduction ward', () => {
+    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_aegis_of_devotion' });
+    if (!p.paladinDevotion) throw new Error('no devotion');
+    p.paladinDevotion.value = 20;
+    sim.castAbility('divine_ascension');
+    expect(p.auras.some((a) => a.kind === 'buff_dr' && a.id === 'aegis_of_devotion_dr')).toBe(true);
+  });
+
   // The #1756 choice pass redesigned aura_surge from the Radiant Swell armor
   // buff into Dawnward Ricochet (chain damage + silence); the new behavior is
   // pinned end to end in talent_retained_semantics_v026.test.ts.

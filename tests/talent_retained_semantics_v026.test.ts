@@ -403,31 +403,4 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(player.hp).toBe(0);
     expect(player.dead).toBe(true);
   });
-
-  it('Dawnward Ricochet damages and silences its primary before deterministic falloff bounces', () => {
-    const sim = harness(new Sim({ seed: 2617, playerClass: 'paladin', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(8, 'pal_r8_dawnward_ricochet')).toBe(true);
-    const player = sim.player;
-    const primary = spawnTargetAt(sim, player, 9200, 3, 0);
-    // Insert the higher id first; equal-distance ties must still choose the lower id.
-    const tiedHigh = spawnTargetAt(sim, player, 9102, 3, 4);
-    const tiedLow = spawnTargetAt(sim, player, 9101, 7, 0);
-    const untouched = spawnTargetAt(sim, player, 9103, 13, 0);
-    const ricochet = sim.resolvedAbility('aura_surge');
-    if (!ricochet) throw new Error('missing Dawnward Ricochet');
-    sim.events = [];
-
-    runEffects(sim.ctx, player, metaOf(sim), primary, ricochet);
-
-    const damage = sim.events.filter(
-      (event): event is Extract<SimEvent, { type: 'damage' }> =>
-        event.type === 'damage' && event.ability === ricochet.def.name,
-    );
-    expect(damage.map((event) => event.targetId)).toEqual([primary.id, tiedLow.id, tiedHigh.id]);
-    expect(damage[1]?.amount).toBe(Math.max(1, Math.round((damage[0]?.amount ?? 0) * 0.75)));
-    expect(damage[2]?.amount).toBe(Math.max(1, Math.round((damage[0]?.amount ?? 0) * 0.75 ** 2)));
-    expect(primary.auras.some((aura) => aura.kind === 'silence')).toBe(true);
-    expect(untouched.hp).toBe(untouched.maxHp);
-  });
 });

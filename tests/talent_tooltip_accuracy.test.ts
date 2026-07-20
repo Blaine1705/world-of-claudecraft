@@ -3,6 +3,12 @@ import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { ABILITIES } from '../src/sim/content/classes';
 import { ROW_TREES, TALENTS } from '../src/sim/content/talents';
 import {
+  AEGIS_OF_DEVOTION_DR,
+  AEGIS_OF_DEVOTION_DURATION,
+  DAWNS_PATH_SPEED_DURATION,
+  DAWNS_PATH_SPEED_MULT,
+} from '../src/sim/paladin_devotion';
+import {
   STANCE_MASTERY_BATTLE_CRIT_DMG,
   STANCE_MASTERY_BERSERKER_HASTE,
   STANCE_MASTERY_GUARDED_CUT,
@@ -262,10 +268,15 @@ function expectedTokens(effect: unknown): string[] {
       if (typeof value === 'number') {
         if (value === 0) continue;
         if (key === 'battleRhythm') continue;
-        // Blink While Casting / Elemental Convergence (mage choice rows) are
-        // picked/not-picked flags like battleRhythm; their timings are stated
-        // as durations, not this 1.
-        if (key === 'blinkCast' || key === 'convergence') continue;
+        // Temporal Rift / Blink While Casting / Elemental Convergence (mage
+        // choice rows) are picked/not-picked flags like battleRhythm; their
+        // timings are stated as durations, not this 1.
+        if (key === 'temporalRift' || key === 'blinkCast' || key === 'convergence') continue;
+        // Dawn's Path / Aegis of Devotion are picked/not-picked flags; their
+        // speed / duration / damage-reduction numbers live in effect_dispatch's
+        // divineAscension case (the exported paladin_devotion constants), so the
+        // stated numbers are intrinsic, not this 1.
+        if (key === 'ascensionRush' || key === 'ascensionWard') continue;
         // A +50% spell or heal crit-damage mastery lifts the 1.5x base to 2.0x, which the
         // hand-written descriptions phrase as "double" rather than "50%".
         if ((key === 'critDmgSpellPct' || key === 'critDmgHealPct') && value === 0.5) {
@@ -338,6 +349,17 @@ function legitNumbers(effect: unknown): Set<number> {
         // Cheat death leaves the player at 1 health: the floor is intrinsic to
         // the mechanic, so copy may state the 1.
         if (key === 'cheatDeathIcd') out.add(1);
+        // Dawn's Path / Aegis of Devotion riders are intrinsic to the sim
+        // (effect_dispatch's divineAscension case), so their copy legitimately
+        // states the exported speed / duration / damage-reduction numbers.
+        if (key === 'ascensionRush') {
+          out.add(Math.round((DAWNS_PATH_SPEED_MULT - 1) * 100));
+          out.add(DAWNS_PATH_SPEED_DURATION);
+        }
+        if (key === 'ascensionWard') {
+          out.add(Math.round(AEGIS_OF_DEVOTION_DR * 100));
+          out.add(AEGIS_OF_DEVOTION_DURATION);
+        }
         if (key === 'bonusCharges') out.add(value + 1);
         // A slow mult also legitimizes the stated slow percentage (mult 0.5 = 50%).
         if (key === 'mult' && value > 0 && value < 1) out.add(Math.round((1 - value) * 100));
