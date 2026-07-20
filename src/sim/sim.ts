@@ -5015,6 +5015,7 @@ export class Sim {
     abilityId: string | null = null,
     canCrit = true,
     canTriggerWeaponProcs = true,
+    resolution?: { resolved: number },
   ): number {
     return applyHealImpl(
       this.ctx,
@@ -5025,6 +5026,7 @@ export class Sim {
       abilityId,
       canCrit,
       canTriggerWeaponProcs,
+      resolution,
     );
   }
 

@@ -1,9 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   emptyPriestMarkerState,
   priestActionGlowActive,
   priestMarkerStateForAuras,
 } from '../src/sim/combat/priest/presentation';
+import { auraDisplayNameFromSource } from '../src/ui/aura_display_name';
+import { setLanguage } from '../src/ui/i18n';
+import { localizeSimAuraName } from '../src/ui/sim_i18n';
+
+afterEach(() => setLanguage('en'));
 
 describe('Priest relationship presentation', () => {
   it('projects every persistent relationship marker and the five-stage Gloomtithe bank', () => {
@@ -12,6 +17,7 @@ describe('Priest relationship presentation', () => {
       [
         { id: 'priest_doctrine', kind: 'doctrine' },
         { id: 'seraphic_vigil', kind: 'heal_echo' },
+        { id: 'shadow_word_pain', kind: 'dot' },
         { id: 'priest_effigy', kind: 'hex' },
         { id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 5 },
       ],
@@ -22,6 +28,7 @@ describe('Priest relationship presentation', () => {
     expect(state).toEqual({
       doctrine: true,
       vigil: true,
+      dirge: true,
       effigy: true,
       gloomtitheStacks: 5,
       summonReady: true,
@@ -47,5 +54,13 @@ describe('Priest relationship presentation', () => {
         'mind_blast',
       ),
     ).toBe(false);
+  });
+
+  it('localizes every new visible Vespers state and guardian name', () => {
+    setLanguage('zh_CN');
+
+    expect(auraDisplayNameFromSource('Effigy')).not.toBe('Effigy');
+    expect(auraDisplayNameFromSource('Gloomtithe')).not.toBe('Gloomtithe');
+    expect(localizeSimAuraName('Tithefiend')).not.toBe('Tithefiend');
   });
 });

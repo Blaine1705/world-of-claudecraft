@@ -475,6 +475,9 @@ export interface Aura {
   // extendDot bookkeeping: seconds already added to this DoT application, so
   // the per-application maxBonus cap holds across channel ticks.
   extendedBy?: number;
+  // Vespers duplicate guard: one Dirge aura can mint at most one Gloomtithe
+  // stack in a simulation tick even if a hook is accidentally dispatched twice.
+  gloomtitheTick?: number;
   leechPct?: number; // dot only: fraction of tick damage healed back to source
   // Chronomancy Temporal Echo bookkeeping (temporal_echo auras only). echoGroup
   // marks the ORIGIN: false/undefined = the single-target Temporal Echo (35% ST /
@@ -2568,6 +2571,10 @@ export interface GuardianState {
   abilityName: string;
   preferredTargetId: number | null;
   maxRange: number;
+  /** Optional owner-scoped aura required on every valid target. */
+  requiredTargetAuraId?: string;
+  /** Fire-and-forget guardians may dismiss when their target contract is exhausted. */
+  dismissWhenUntargeted?: boolean;
 }
 
 export interface Entity {

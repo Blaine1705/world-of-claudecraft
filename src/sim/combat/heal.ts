@@ -101,6 +101,7 @@ export function applyHeal(
   // can suppress either source of rng independently without bypassing normal
   // healing, threat, absorbs, or emitted combat text.
   canTriggerWeaponProcs = true,
+  resolution?: { resolved: number },
   // Returns the effective heal applied (post-crit, post-mult, post-overheal-clamp,
   // the same number emitted). Callers that ignore it are unaffected; Power Echo
   // reads it to repeat a direct heal at a fraction of the resolved amount.
@@ -117,6 +118,7 @@ export function applyHeal(
       healingTakenMult(ctx, target),
   );
   healed = consumeHealAbsorb(ctx, target, healed);
+  if (resolution) resolution.resolved = healed;
   healed = Math.min(healed, target.maxHp - target.hp);
   target.hp += healed;
   ctx.emit({

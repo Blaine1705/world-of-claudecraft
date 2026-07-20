@@ -380,6 +380,7 @@ import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
 import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
+import { isControllableOwnedPet } from './pet_entity';
 import {
   chatPlayerContextActions,
   type PlayerContextAction,
@@ -6274,7 +6275,7 @@ export class Hud {
 
   private ownPet(): Entity | null {
     for (const e of this.sim.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.sim.playerId) return e;
+      if (isControllableOwnedPet(e, this.sim.playerId)) return e;
     }
     return null;
   }
@@ -12123,7 +12124,7 @@ export class Hud {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
     if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
       this.openContextMenu(t.id, t.name, x, y);
-    } else if (t && t.kind === 'mob' && t.ownerId === this.sim.playerId) {
+    } else if (t && isControllableOwnedPet(t, this.sim.playerId)) {
       this.openPetMenu(t.id, t.name, t.dead, x, y);
     } else if (
       t &&
@@ -13402,7 +13403,9 @@ function dungeonDisplayNameFromSource(name: string): string {
 
 function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'mob')
-    return entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
+    return entity.ownerId !== null
+      ? (localizeSimAuraName(entity.name) ?? entity.name)
+      : mobDisplayName(entity.templateId);
   if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
   return entity.name;
 }

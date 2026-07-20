@@ -5,6 +5,7 @@ import {
   emptyAllocation,
   type TalentAllocation,
 } from '../src/sim/content/talents';
+import { Sim } from '../src/sim/sim';
 import { syncHotbarActions } from '../src/ui/hud/action_bar/hotbar';
 
 const alloc = (spec: string | null): TalentAllocation => ({ ...emptyAllocation(), spec });
@@ -91,5 +92,22 @@ describe('Priest v0.28 spec kits', () => {
       { type: 'ability', id: 'summon_tithefiend' },
       { type: 'ability', id: 'smite' },
     ]);
+  });
+
+  it('rejects a forged wrong-spec signature through the authoritative cast path', () => {
+    const sim = new Sim({ seed: 2930, playerClass: 'priest', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('discipline')).toBe(true);
+    const resourceBefore = sim.player.resource;
+
+    sim.castAbility('summon_tithefiend');
+
+    expect(sim.player.resource).toBe(resourceBefore);
+    expect(sim.player.cooldowns.has('summon_tithefiend')).toBe(false);
+    expect(
+      [...sim.entities.values()].some(
+        (entity) => entity.ownerId === sim.playerId && entity.guardianState?.key === 'tithefiend',
+      ),
+    ).toBe(false);
   });
 });

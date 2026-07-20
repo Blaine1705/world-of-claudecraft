@@ -1513,8 +1513,27 @@ export function runEffects(
           if (!ctx.hasLineOfSight(p, m)) continue;
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
           const missingBefore = m.maxHp - m.hp;
-          const healed = ctx.applyHeal(p, m, healAmount, ability.name, ability.id);
-          priestOnGroupHeal(ctx, p, m, ability.id, ability.name, healAmount, missingBefore, healed);
+          const resolution = { resolved: 0 };
+          const healed = ctx.applyHeal(
+            p,
+            m,
+            healAmount,
+            ability.name,
+            ability.id,
+            true,
+            true,
+            resolution,
+          );
+          priestOnGroupHeal(
+            ctx,
+            p,
+            m,
+            ability.id,
+            ability.name,
+            resolution.resolved,
+            missingBefore,
+            healed,
+          );
         }
         break;
       }

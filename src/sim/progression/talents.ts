@@ -262,7 +262,7 @@ function commitTalentAllocation(
   meta.talents = sanitized;
   recomputeTalents(ctx, meta);
   if (previousSpec !== sanitized.spec) ctx.revalidateOffhandForSpec(player.id);
-  if (previousSpec !== sanitized.spec) cleanupPriestState(ctx, player.id);
+  if (meta.cls === 'priest') cleanupPriestState(ctx, player.id);
   // A spec-locked pet outlives its spec otherwise (owner report: the frost
   // Water Elemental kept fighting for a fire mage): if the ability that
   // summons the ACTIVE pet is no longer in the new build's known list, the
