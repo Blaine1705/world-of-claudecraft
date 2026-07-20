@@ -89,9 +89,7 @@ describe('Priest v0.29 talent mechanics', () => {
 
     const procession = priest('discipline', { 5: 'pri_r5_twisted_faith' });
     priestAfterAbility(procession.ctx, procession.p, 'veilstep', null);
-    expect(
-      procession.p.auras.some((effect) => effect.kind === 'processional_grace'),
-    ).toBe(true);
+    expect(procession.p.auras.some((effect) => effect.kind === 'processional_grace')).toBe(true);
   });
 
   it('pins all level 8 defensive values in the resolved proc engine', () => {

@@ -1,6 +1,6 @@
 import { createMob } from '../entity';
 import type { SimContext } from '../sim_context';
-import { dist2d, DT, type Entity, type GuardianState, type MobTemplate } from '../types';
+import { DT, dist2d, type Entity, type GuardianState, type MobTemplate } from '../types';
 
 export interface GuardianConfig extends Omit<GuardianState, 'attackTimer'> {
   name: string;

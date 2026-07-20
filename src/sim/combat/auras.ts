@@ -33,9 +33,9 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
-import { onHotExpired, tickProcState } from './talent_procs';
 import { priestOnAuraEnded } from './priest/talents';
 import { vespersOnDotTick } from './priest/vespers';
+import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
 

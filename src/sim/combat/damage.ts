@@ -58,6 +58,13 @@ import {
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import { isUnbreakableControlAura } from './cc';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
+import { recordDamageTaken } from './damage_history';
+import {
+  cauterizeFireDamageMult,
+  fireMageCauterize,
+  igniteOnCrit,
+  PERSONAL_BARRIER_IDS,
+} from './fire_mage';
 import { doctrineConvertDamage } from './priest/doctrine';
 import { cleanupPriestState } from './priest/lifecycle';
 import {
@@ -66,13 +73,6 @@ import {
   priestOnVigilTriggered,
 } from './priest/talents';
 import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
-import { recordDamageTaken } from './damage_history';
-import {
-  cauterizeFireDamageMult,
-  fireMageCauterize,
-  igniteOnCrit,
-  PERSONAL_BARRIER_IDS,
-} from './fire_mage';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user

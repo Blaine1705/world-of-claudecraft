@@ -15,9 +15,9 @@ import {
   TEMPORAL_HOURGLASS_SELF_RADIUS,
   type WeaponInfo,
 } from '../types';
+import { PRIEST_ABILITIES } from './priest';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
 import type { TalentModifiers } from './talents';
-import { PRIEST_ABILITIES } from './priest';
 import { SPORT_ABILITIES } from './vale_cup';
 
 // ---------------------------------------------------------------------------
