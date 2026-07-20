@@ -33,6 +33,9 @@
 // (enforced by tests/architecture.test.ts).
 
 import { stripTemporalEchoes } from '../combat/chronomancy';
+import { clearSpiritmendState } from '../combat/shaman_spiritmend';
+import { clearThundercallState } from '../combat/shaman_thundercall';
+import { clearWarspiritState } from '../combat/shaman_warspirit';
 import { abilitiesKnownAt } from '../content/classes';
 import {
   cloneAllocation,
@@ -260,7 +263,12 @@ function commitTalentAllocation(
   const previousSpec = meta.talents.spec;
   meta.talents = sanitized;
   recomputeTalents(ctx, meta);
-  if (previousSpec !== sanitized.spec) ctx.revalidateOffhandForSpec(player.id);
+  if (previousSpec !== sanitized.spec) {
+    clearThundercallState(ctx, player);
+    clearWarspiritState(ctx, player);
+    clearSpiritmendState(ctx, player);
+    ctx.revalidateOffhandForSpec(player.id);
+  }
   // A spec-locked pet outlives its spec otherwise (owner report: the frost
   // Water Elemental kept fighting for a fire mage): if the ability that
   // summons the ACTIVE pet is no longer in the new build's known list, the

@@ -11,6 +11,7 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { CAST_COMPLETE_EPS, DT } from '../types';
+import { applyStoneboundWardSmoothing } from './shaman_warspirit';
 import { onThornsReflect } from './talent_procs';
 
 export interface ThornsState {
@@ -68,7 +69,10 @@ export function applyThornsReaction(ctx: SimContext, defender: Entity, attacker:
         undefined,
         false,
       );
-      if (defender.kind === 'player') onThornsReflect(ctx, defender, a.id);
+      if (defender.kind === 'player') {
+        applyStoneboundWardSmoothing(ctx, defender, a.id);
+        onThornsReflect(ctx, defender, a.id);
+      }
     }
   }
   for (let i = defender.auras.length - 1; i >= 0; i--) {

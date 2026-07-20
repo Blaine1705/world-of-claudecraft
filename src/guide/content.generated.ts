@@ -850,20 +850,20 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Stonebound Weapon"
       },
       {
+        "id": "galeheart_weapon",
+        "name": "Galeheart Weapon"
+      },
+      {
+        "id": "lifespring_weapon",
+        "name": "Lifespring Weapon"
+      },
+      {
         "id": "healing_wave",
         "name": "Mending Waters"
       },
       {
-        "id": "earth_shock",
-        "name": "Earthen Jolt"
-      },
-      {
-        "id": "lightning_shield",
-        "name": "Thunder Ward"
-      },
-      {
-        "id": "flame_shock",
-        "name": "Cinder Jolt"
+        "id": "tidecall",
+        "name": "Tidecall"
       }
     ],
     "abilities": [
@@ -876,8 +876,20 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Stonebound Weapon"
       },
       {
+        "id": "galeheart_weapon",
+        "name": "Galeheart Weapon"
+      },
+      {
+        "id": "lifespring_weapon",
+        "name": "Lifespring Weapon"
+      },
+      {
         "id": "healing_wave",
         "name": "Mending Waters"
+      },
+      {
+        "id": "tidecall",
+        "name": "Tidecall"
       },
       {
         "id": "earth_shock",
@@ -900,16 +912,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Rime Jolt"
       },
       {
-        "id": "frostbrand_weapon",
-        "name": "Rimebound Weapon"
-      },
-      {
         "id": "ghost_wolf",
         "name": "Shadewolf"
       },
       {
         "id": "earthquake",
-        "name": "Earthquake"
+        "name": "Faultwake"
+      },
+      {
+        "id": "bloodlust",
+        "name": "Storm Chorus"
       }
     ],
     "model": "player_shaman",

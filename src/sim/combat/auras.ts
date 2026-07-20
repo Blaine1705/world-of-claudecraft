@@ -33,6 +33,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
+import { tickMendingCurrent } from './shaman_spiritmend';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
@@ -255,7 +256,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
           }
           if (e.dead) return;
-        } else if (a.kind === 'hot') {
+        } else if (a.kind === 'hot' && !tickMendingCurrent(ctx, e, a)) {
           const healed = Math.min(Math.round(a.value * ctx.healingTakenMult(e)), e.maxHp - e.hp);
           if (healed > 0) {
             e.hp += healed;

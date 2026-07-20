@@ -430,7 +430,7 @@ export const TALENT_ABILITIES_V2_A = {
     id: 'bloodlust',
     name: 'Storm Chorus',
     class: 'shaman',
-    learnLevel: 10,
+    learnLevel: 20,
     cost: 85,
     castTime: 0,
     cooldown: 300,

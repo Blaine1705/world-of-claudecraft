@@ -76,6 +76,7 @@ import { tickNaturesFury } from './combat/natures_fury';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
+import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
 import { warriorMeleeDefense } from './combat/warrior_hit_table';
@@ -2624,6 +2625,7 @@ export class Sim {
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
     this.preparePlayerLeave(pid);
+    clearSpiritmendCurrents(this.ctx, pid);
     despawnMobsForDev(this.ctx, pid, 'spawned');
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing

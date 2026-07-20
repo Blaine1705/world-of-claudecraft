@@ -92,6 +92,18 @@ import { resurrectDeadGroupMembers } from './mass_resurrection';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
+import { consumeMendingCurrent, depositMendingCurrent } from './shaman_spiritmend';
+import {
+  armPrimalMastery,
+  consumeThunderVent,
+  thundercallDamageMultiplier,
+  thundercallOnArcBoltImpact,
+} from './shaman_thundercall';
+import {
+  applyStoneboundJolt,
+  applyWarspiritPosture,
+  stoneboundThreatMultiplier,
+} from './shaman_warspirit';
 import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
@@ -226,7 +238,12 @@ export function runEffects(
       recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
     }
   }
-  const threatOpts = { flat: res.threatFlat, mult: res.threatMult };
+  const threatOpts = {
+    flat: res.threatFlat,
+    mult: res.threatMult * stoneboundThreatMultiplier(ctx, p),
+  };
+
+  if (ability.id === 'elemental_mastery') armPrimalMastery(ctx, p);
 
   // Cleaving Blows (Fury passive): Red Harvest refunds one stored Twinstrike
   // use on the abilityCharges recharge model. A partial refund leaves the
@@ -401,6 +418,7 @@ export function runEffects(
         // more Temporal Echo healing (no hidden heal bonus). Deterministic; reads
         // the caster's charge aura (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
+        dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
         ctx.dealDamage(
@@ -418,6 +436,11 @@ export function runEffects(
           false,
           ability.id,
         );
+        if (ability.id === 'lightning_bolt') thundercallOnArcBoltImpact(ctx, p);
+        if (ability.id === 'earth_shock') {
+          consumeThunderVent(ctx, p, ability.id);
+          applyStoneboundJolt(ctx, p, target);
+        }
         if (areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
@@ -660,6 +683,9 @@ export function runEffects(
         const healAmount =
           ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
         const healed = ctx.applyHeal(p, healTarget, healAmount, ability.name, ability.id);
+        if (ability.id === 'healing_wave' || ability.id === 'tidecall') {
+          depositMendingCurrent(ctx, p, healTarget, healAmount, ability.id);
+        }
         // Power Echo (mage choice row): the armed echo also repeats a direct HEAL
         // (Temporal Mend, Temporal Echo) at its fraction of the RESOLVED heal on
         // the same target, consumed BEFORE the repeat so a copy can never re-echo.
@@ -733,6 +759,7 @@ export function runEffects(
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
           ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id);
+          consumeMendingCurrent(ctx, p, chain[i]);
         }
         break;
       }
@@ -795,6 +822,15 @@ export function runEffects(
         break;
       }
       case 'imbue': {
+        if (ability.id === 'galeheart_weapon' || ability.id === 'rockbiter_weapon') {
+          applyWarspiritPosture(
+            ctx,
+            p,
+            ability.id === 'galeheart_weapon' ? 'galeheart' : 'stonebound',
+            eff.bonus,
+          );
+          break;
+        }
         for (let i = p.auras.length - 1; i >= 0; i--) {
           const a = p.auras[i];
           if (a.kind === 'imbue' && a.id !== ability.id) {
@@ -1527,12 +1563,13 @@ export function runEffects(
         // Ground-targeted casts drop the zone where they were aimed; others lay it
         // under the caster (e.g. Consecration at your feet).
         const zoneCenter = p.castAim ?? p.pos;
+        const thundercallMult = thundercallDamageMultiplier(ctx, p, ability.id);
         const groundEffect: GroundAoE = {
           sourceId: p.id,
           pos: { ...zoneCenter },
           radius: eff.radius,
-          min: eff.min,
-          max: eff.max,
+          min: Math.round(eff.min * thundercallMult),
+          max: Math.round(eff.max * thundercallMult),
           remaining: eff.duration,
           interval: eff.interval,
           tickTimer: eff.interval,
@@ -1609,6 +1646,7 @@ export function runEffects(
         // hit lands one interval later, exactly the fall time.
         if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
         ctx.groundAoEs.push(groundEffect);
+        consumeThunderVent(ctx, p, ability.id);
         break;
       }
       case 'aoeAttackSpeed': {

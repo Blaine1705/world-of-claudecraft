@@ -11,13 +11,17 @@ export const STORMCAST_ID = 'shaman_stormcast';
 export const STORMCAST_CHEAP_ID = 'shaman_stormcast_cheap';
 export const STONEBOUND_ARMOR_ID = 'shaman_stonebound_armor';
 export const STONEBOUND_DR_ID = 'shaman_stonebound_dr';
+export const STONEBOUND_WARD_SMOOTH_ID = 'shaman_stonebound_ward_smooth';
 export const WARSPIRIT_CADENCE_STEPS = 3;
 export const GALEHEART_ECHO_COUNT = 2;
 export const GALEHEART_ECHO_DAMAGE = 0.5;
 export const STORMCAST_DURATION = 12;
-export const STONEBOUND_ARMOR_BONUS = 0.3;
+// buff_armor_pct stores integer percentage points (30 = +30%).
+export const STONEBOUND_ARMOR_BONUS = 30;
 export const STONEBOUND_DAMAGE_REDUCTION = 0.1;
 export const STONEBOUND_THREAT_MULTIPLIER = 2;
+export const STONEBOUND_WARD_SMOOTH_REDUCTION = 0.1;
+export const STONEBOUND_WARD_SMOOTH_DURATION = 3;
 
 export const STORMCAST_ABILITIES: readonly string[] = [
   'lightning_bolt',
@@ -35,6 +39,7 @@ const WARSPIRIT_STATE_IDS: ReadonlySet<string> = new Set([
   STORMCAST_CHEAP_ID,
   STONEBOUND_ARMOR_ID,
   STONEBOUND_DR_ID,
+  STONEBOUND_WARD_SMOOTH_ID,
 ]);
 
 function isWarspirit(ctx: SimContext, player: Entity): boolean {
@@ -220,6 +225,30 @@ export function applyStoneboundJolt(ctx: SimContext, player: Entity, target: Ent
   );
   target.forcedTargetId = player.id;
   target.forcedTargetTimer = TAUNT_FORCE_SECONDS;
+}
+
+export function applyStoneboundWardSmoothing(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+): void {
+  if (
+    abilityId !== 'lightning_shield' ||
+    !isWarspirit(ctx, player) ||
+    warspiritPosture(player) !== 'stonebound'
+  ) {
+    return;
+  }
+  ctx.applyAura(player, {
+    id: STONEBOUND_WARD_SMOOTH_ID,
+    name: 'Stonebound Ward',
+    kind: 'buff_dr',
+    value: STONEBOUND_WARD_SMOOTH_REDUCTION,
+    remaining: STONEBOUND_WARD_SMOOTH_DURATION,
+    duration: STONEBOUND_WARD_SMOOTH_DURATION,
+    sourceId: player.id,
+    school: 'nature',
+  });
 }
 
 export function clearWarspiritState(ctx: SimContext, player: Entity): void {

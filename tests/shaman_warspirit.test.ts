@@ -105,6 +105,7 @@ describe('Shaman v0.28 Warspirit', () => {
 
     const definition = sim.resolvedAbility('healing_wave', shaman.id);
     expect(definition).toBeDefined();
+    shaman.gcdRemaining = 0;
     const manaBefore = shaman.resource;
     sim.castAbility('healing_wave', shaman.id);
 
@@ -126,7 +127,7 @@ describe('Shaman v0.28 Warspirit', () => {
     expect(shaman.auras.some((aura) => aura.id === STONEBOUND_ID)).toBe(true);
     expect(
       (sim as unknown as { effectiveArmor(entity: Entity): number }).effectiveArmor(shaman),
-    ).toBeCloseTo(baseArmor * 1.3, 5);
+    ).toBeCloseTo(Math.round(baseArmor * 1.3), 5);
 
     castInstant(sim, shaman, 'earth_shock');
     for (let tick = 0; tick < 20 * 3; tick++) sim.tick();

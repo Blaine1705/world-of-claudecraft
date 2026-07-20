@@ -461,7 +461,11 @@ export function castAbility(
   if (!r) return;
   const { meta, e: p } = r;
   let res = ctx.resolvedAbility(abilityId, p.id);
-  if (!res || p.dead) return;
+  if (!res) {
+    ctx.error(p.id, 'You do not know that ability.');
+    return;
+  }
+  if (p.dead) return;
   // Passive traits are spellbook information and mechanics hooks, never actions.
   if (res.def.passive) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
@@ -807,10 +811,23 @@ export function castAbility(
           ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
           : { x: aim.x, y: p.pos.y, z: aim.z };
     } else {
-      // No point chosen (e.g. a keybind cast with nothing under the cursor): fall
-      // back to the caster's own position so the spell still resolves at the feet,
-      // exactly as a caster-centered cast would.
-      aimPoint = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
+      // Faultwake's keybind default is the selected hostile; other position
+      // spells retain the canonical at-feet fallback. Clamp the selected point
+      // through the same authoritative range rule as explicit ground input.
+      const selected =
+        ability.id === 'earthquake' && p.targetId !== null
+          ? (ctx.entities.get(p.targetId) ?? null)
+          : null;
+      const fallback =
+        selected && !selected.dead && ctx.isHostileTo(p, selected) ? selected.pos : p.pos;
+      const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+      const dx = fallback.x - p.pos.x;
+      const dz = fallback.z - p.pos.z;
+      const d = Math.hypot(dx, dz);
+      aimPoint =
+        d > maxRange
+          ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
+          : { x: fallback.x, y: p.pos.y, z: fallback.z };
     }
   }
 

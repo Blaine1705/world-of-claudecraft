@@ -65,6 +65,7 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { clearSpiritmendCurrents } from './shaman_spiritmend';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -1001,6 +1002,7 @@ function reflectSpellWard(
 }
 
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+  if (e.kind === 'player') clearSpiritmendCurrents(ctx, e.id);
   resetProcState(e);
   e.dead = true;
   e.hp = 0;
