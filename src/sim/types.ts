@@ -220,6 +220,7 @@ export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 
 export type AuraKind =
   | 'dot'
+  | 'doctrine'
   | 'slow'
   | 'stun'
   | 'stasis'
@@ -303,6 +304,9 @@ export type AuraKind =
   | 'brain_freeze'
   | 'winters_chill'
   | 'icicles'
+  // Vespers Priest: source-owned self resource built by Mindfracture and
+  // Effigy-bound Dirge ticks, consumed whole by Call Tithefiend.
+  | 'gloomtithe'
   // Chronomancer offensive cooldown (combat/chronomancy.ts): while worn, Aether
   // Darts does not consume the caster's Arcane Charges.
   | 'perfect_moment'
@@ -364,6 +368,7 @@ export type AuraKind =
   | 'buff_armor_pct'
   | 'buff_ap_pct'
   | 'buff_dmg_done'
+  | 'buff_heal_done'
   | 'buff_crit'
   | 'buff_rage_gen'
   | 'buff_reckless'
@@ -383,6 +388,7 @@ export type AuraKind =
   // hard cast decrements the value and removes the aura at 0
   // (casting_lifecycle). Draws no rng.
   | 'ice_floes'
+  | 'processional_grace'
   // Overload (mage choice row): armed amplifier; the next mana spell is baked
   // 40% stronger and 50% costlier from a scaled copy of its resolved ability
   // (casting_lifecycle consumeOverload). value = the output fraction (0.4).
@@ -2549,7 +2555,23 @@ export interface DamageTick {
   amount: number;
 }
 
+/** Transient, non-command guardian runtime. Never serialized or put on the pet bar. */
+export interface GuardianState {
+  key: string;
+  remaining: number;
+  attackTimer: number;
+  attackInterval: number;
+  minDamage: number;
+  maxDamage: number;
+  school: string;
+  abilityId: string;
+  abilityName: string;
+  preferredTargetId: number | null;
+  maxRange: number;
+}
+
 export interface Entity {
+  guardianState?: GuardianState;
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };

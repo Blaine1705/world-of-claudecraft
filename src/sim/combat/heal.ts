@@ -107,8 +107,11 @@ export function applyHeal(
 ): number {
   if (target.dead) return 0;
   const crit = canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
+  let healDone = 0;
+  for (const aura of source.auras) if (aura.kind === 'buff_heal_done') healDone += aura.value;
   let healed = Math.round(
     amount *
+      (1 + healDone) *
       (crit ? 1.5 + source.critDmgHealBonus : 1) *
       hexOutputMult(ctx, source) *
       healingTakenMult(ctx, target),

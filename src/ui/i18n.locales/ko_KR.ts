@@ -8328,4 +8328,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_mana_draught.name': '태양꽃잎 마나 물약',
   'entities.items.elixir_of_the_serpent.name': '뱀의 비약',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.martyrs_aegis.name': '순교자의 방패',
+  'entities.abilities.choir_of_deliverance.name': '구원의 성가대',
 };

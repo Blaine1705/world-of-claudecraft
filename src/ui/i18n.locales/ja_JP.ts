@@ -8343,4 +8343,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_mana_draught.name': 'サンペタルのマナ薬',
   'entities.items.elixir_of_the_serpent.name': '蛇のエリクサー',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.martyrs_aegis.name': '殉教者の盾',
+  'entities.abilities.choir_of_deliverance.name': '救済の聖歌隊',
 };

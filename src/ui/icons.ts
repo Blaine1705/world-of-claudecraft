@@ -2893,6 +2893,19 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   desperate_prayer: r('holy', 'holyGold', ['hand', { p: 'heart', ...BR }], ['sparkle']),
   prayer_of_healing: r('holy', 'holyGold', ['cross', { p: 'sunburst', ...BR }], ['sparkle']),
   mind_sear: r('shadow', 'shadowPurple', ['eye', { p: 'flame', ...BR }], ['motion']),
+  // Priest v0.29 redesign: explicit, collision-free recipes for the shared
+  // movement spell, three signatures, and two major-prayer talents.
+  veilstep: r('shadow', 'silverWhite', ['boot', { p: 'wing', ...TR }], ['motion', 'sparkle']),
+  scouring_mercy: r('holy', 'holyGold', ['bolt', { p: 'heart', ...BR }], ['arcs']),
+  seraphic_vigil: r('holy', 'silverWhite', ['eye', { p: 'wing', ...TR }], ['glow']),
+  summon_tithefiend: r('shadow', 'shadowPurple', ['skull', { p: 'tendrils', ...TR }], ['drips']),
+  martyrs_aegis: r('blood', 'holyGold', ['shield', { p: 'heart', ...TR }], ['arcs']),
+  choir_of_deliverance: r(
+    'holy',
+    'arcanePink',
+    ['cross', { p: 'wing', ...BR }],
+    ['sparkle', 'arcs'],
+  ),
   // shaman
   healing_stream: r('nature', 'sky', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
   chain_lightning: r(

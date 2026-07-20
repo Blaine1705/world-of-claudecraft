@@ -26,6 +26,7 @@
 
 import { freeCostAuraActive } from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
+import { priestActionGlowActive } from '../../../sim/combat/priest/presentation';
 import {
   type AbilityDef,
   type AuraKind,
@@ -83,20 +84,14 @@ export interface ActionBarAbility {
   bonusCharges?: number;
 }
 
+/** The aura fields the bar reads to derive proc glows and next-cast empowerment. */
 export interface ActionBarAuraInput {
+  id?: string;
   kind: AuraKind;
   value?: number;
   empowerAbilities?: readonly string[];
   /** Stacks, for a stack-gated ability (Glacial Spike needs 5 Icicles). */
   stacks?: number;
-}
-
-/** The aura fields the bar reads to derive the proc glow and next-cast
- *  empowerment: a structural subset of Aura both worlds mirror. */
-export interface ActionBarAuraInput {
-  kind: AuraKind;
-  value?: number;
-  empowerAbilities?: readonly string[];
 }
 
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
@@ -480,7 +475,11 @@ export function createActionBarView(
         // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
         // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
         // sim predicate idiom as freeCostAuraActive above).
-        slot.procGlow = freeByProc || windowGlow || frostProcGlowActive(player.auras ?? [], def.id);
+        slot.procGlow =
+          freeByProc ||
+          windowGlow ||
+          frostProcGlowActive(player.auras ?? [], def.id) ||
+          priestActionGlowActive(player.auras ?? [], def.id);
         slot.empowered = hasEmpoweringAura(player.auras, ability);
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,

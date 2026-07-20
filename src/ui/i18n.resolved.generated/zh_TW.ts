@@ -7463,6 +7463,30 @@ export const zh_TW: EnTranslations = {
         "name": "虛空盛宴",
         "description": "吞噬一個魔法效果（敵人的增益或盟友的減益），並恢復你最大生命值的6%。"
       },
+      "veilstep": {
+        "name": "Veilstep",
+        "description": "Steps through the veil in the direction you are facing."
+      },
+      "scouring_mercy": {
+        "name": "Scouring Mercy",
+        "description": "Scours an enemy with holy power or delivers immediate mercy to a friendly target. Doctrine signature."
+      },
+      "seraphic_vigil": {
+        "name": "Seraphic Vigil",
+        "description": "Places a watchful blessing on one ally, restoring them when they become unsafe. Benison signature."
+      },
+      "summon_tithefiend": {
+        "name": "Call Tithefiend",
+        "description": "Consumes Gloomtithe to call a temporary Tithefiend that hunts your Effigy. Vespers signature."
+      },
+      "martyrs_aegis": {
+        "name": "殉道者聖盾",
+        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+      },
+      "choir_of_deliverance": {
+        "name": "救贖聖詠團",
+        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+      },
       "bear_charge": {
         "name": "巨熊衝鋒",
         "description": "向敵人衝鋒，產生 9 點怒氣並將其昏迷 1 秒。射程 8-25 公尺。僅限巨熊形態。"

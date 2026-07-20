@@ -7947,4 +7947,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_mana_draught.name': '阳瓣法力药水',
   'entities.items.elixir_of_the_serpent.name': '巨蛇药剂',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.martyrs_aegis.name': '殉道者圣盾',
+  'entities.abilities.choir_of_deliverance.name': '救赎圣咏团',
 };

@@ -7463,6 +7463,30 @@ export const ko_KR: EnTranslations = {
         "name": "공허의 포식",
         "description": "마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 삼키고 최대 생명력의 6%를 회복합니다."
       },
+      "veilstep": {
+        "name": "Veilstep",
+        "description": "Steps through the veil in the direction you are facing."
+      },
+      "scouring_mercy": {
+        "name": "Scouring Mercy",
+        "description": "Scours an enemy with holy power or delivers immediate mercy to a friendly target. Doctrine signature."
+      },
+      "seraphic_vigil": {
+        "name": "Seraphic Vigil",
+        "description": "Places a watchful blessing on one ally, restoring them when they become unsafe. Benison signature."
+      },
+      "summon_tithefiend": {
+        "name": "Call Tithefiend",
+        "description": "Consumes Gloomtithe to call a temporary Tithefiend that hunts your Effigy. Vespers signature."
+      },
+      "martyrs_aegis": {
+        "name": "순교자의 방패",
+        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+      },
+      "choir_of_deliverance": {
+        "name": "구원의 성가대",
+        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+      },
       "bear_charge": {
         "name": "큰곰 돌진",
         "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd. 큰곰 변신 상태에서만 사용 가능."

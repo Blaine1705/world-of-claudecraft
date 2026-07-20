@@ -7463,6 +7463,30 @@ export const ja_JP: EnTranslations = {
         "name": "虚無の饗宴",
         "description": "魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。"
       },
+      "veilstep": {
+        "name": "Veilstep",
+        "description": "Steps through the veil in the direction you are facing."
+      },
+      "scouring_mercy": {
+        "name": "Scouring Mercy",
+        "description": "Scours an enemy with holy power or delivers immediate mercy to a friendly target. Doctrine signature."
+      },
+      "seraphic_vigil": {
+        "name": "Seraphic Vigil",
+        "description": "Places a watchful blessing on one ally, restoring them when they become unsafe. Benison signature."
+      },
+      "summon_tithefiend": {
+        "name": "Call Tithefiend",
+        "description": "Consumes Gloomtithe to call a temporary Tithefiend that hunts your Effigy. Vespers signature."
+      },
+      "martyrs_aegis": {
+        "name": "殉教者の盾",
+        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+      },
+      "choir_of_deliverance": {
+        "name": "救済の聖歌隊",
+        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+      },
       "bear_charge": {
         "name": "ブルーインラッシュ",
         "description": "敵に突進して激怒を9獲得し、1秒間スタンさせる。射程7～23メートル。ブルーインフォーム時のみ使用可能。"

@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
 import {
+  emptyPriestMarkerState,
+  priestMarkerStateForAuras,
+} from '../sim/combat/priest/presentation';
+import {
   ABILITIES,
   ARENA_SLOT_COUNT,
   arenaOrigin,
@@ -141,6 +145,7 @@ import {
   prewarmEntryRuns,
   resolvePrewarmPolicy,
 } from './prewarm_policy';
+import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
@@ -617,6 +622,7 @@ export interface EntityView {
   temporalHourglassVisual: TemporalHourglassVisual | null;
   frostNovaRootVisual: FrostNovaRootVisual | null; // Atadura de Hielo restraint at the feet
   mageBarrierVisual: MageBarrierVisual | null; // personal mage absorb shell, built lazily
+  priestMarkersVisual: PriestMarkersVisual | null; // static Doctrine/Vigil/Effigy/Gloomtithe cues
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
@@ -1063,6 +1069,7 @@ export class Renderer {
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = { theme: 'frost', value: 0 };
+  private readonly priestMarkerStateScratch = emptyPriestMarkerState();
   private glacialFrontVisual!: GlacialFrontVisual;
   private weather: Weather;
   private weatherOn = true;
@@ -4095,6 +4102,7 @@ export class Renderer {
       temporalHourglassVisual: null,
       frostNovaRootVisual: null,
       mageBarrierVisual: null,
+      priestMarkersVisual: null,
       height,
       clickTarget,
       nameplate: np,
@@ -5071,6 +5079,12 @@ export class Renderer {
         v.height,
         mageBarrierState,
         dt,
+      );
+      v.priestMarkersVisual = syncPriestMarkersVisual(
+        v.priestMarkersVisual,
+        v.group,
+        v.height,
+        priestMarkerStateForAuras(e.auras, this.priestMarkerStateScratch),
       );
       const iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
 

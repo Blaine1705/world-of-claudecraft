@@ -63,6 +63,7 @@ import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
+import { updateGuardian } from './combat/guardians';
 import {
   applyHeal as applyHealImpl,
   consumeHealAbsorb as consumeHealAbsorbImpl,
@@ -73,6 +74,7 @@ import {
 } from './combat/heal';
 import { advanceHeroicLeap } from './combat/heroic_leap';
 import { tickNaturesFury } from './combat/natures_fury';
+import { cleanupPriestState } from './combat/priest/lifecycle';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
@@ -2701,6 +2703,7 @@ export class Sim {
     const meta = this.players.get(pid);
     if (!meta) return;
     meta.leaving = true;
+    cleanupPriestState(this.ctx, pid);
     // Dungeon Finder teardown FIRST, while the leaver's party/roster still resolves
     // (drops their queue unit, fails their proposal, closes their listing, withdraws
     // their application). It runs HERE, not in removePlayer, because the server calls
@@ -4320,7 +4323,11 @@ export class Sim {
 
     for (const e of this.entities.values()) {
       if (e.kind === 'mob') {
-        this.updateMob(e);
+        if (e.guardianState) {
+          if (!updateGuardian(this.ctx, e)) continue;
+        } else {
+          this.updateMob(e);
+        }
         // Tag the mob.update lap with the mob so the host can attribute this slice
         // of the phase cost to its zone/group. The sim reads nothing
         // from it and allocates nothing, so this stays behavior- and parity-inert.

@@ -1,0 +1,51 @@
+import { describe, expect, it } from 'vitest';
+import {
+  emptyPriestMarkerState,
+  priestActionGlowActive,
+  priestMarkerStateForAuras,
+} from '../src/sim/combat/priest/presentation';
+
+describe('Priest relationship presentation', () => {
+  it('projects every persistent relationship marker and the five-stage Gloomtithe bank', () => {
+    const out = emptyPriestMarkerState();
+    const state = priestMarkerStateForAuras(
+      [
+        { id: 'priest_doctrine', kind: 'doctrine' },
+        { id: 'seraphic_vigil', kind: 'heal_echo' },
+        { id: 'priest_effigy', kind: 'hex' },
+        { id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 5 },
+      ],
+      out,
+    );
+
+    expect(state).toBe(out);
+    expect(state).toEqual({
+      doctrine: true,
+      vigil: true,
+      effigy: true,
+      gloomtitheStacks: 5,
+      summonReady: true,
+    });
+  });
+
+  it('glows only Tithefiend at the full five-stack bank', () => {
+    expect(
+      priestActionGlowActive(
+        [{ id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 5 }],
+        'summon_tithefiend',
+      ),
+    ).toBe(true);
+    expect(
+      priestActionGlowActive(
+        [{ id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 4 }],
+        'summon_tithefiend',
+      ),
+    ).toBe(false);
+    expect(
+      priestActionGlowActive(
+        [{ id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 5 }],
+        'mind_blast',
+      ),
+    ).toBe(false);
+  });
+});

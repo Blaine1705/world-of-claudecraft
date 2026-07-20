@@ -8962,6 +8962,7 @@ type GrantEffectShape = {
   jumps?: number;
   falloff?: number;
   kind?: string;
+  pct?: number;
 };
 
 function grantAmountRange(min: number, max: number, lang: SupportedLanguage): string {
@@ -8985,6 +8986,7 @@ export function grantAbilityValues(id: string): InterpolationValues {
   const absorb = effects.find((effect) => effect.type === 'absorb');
   const overTime = effects.find((effect) => effect.type === 'dot' || effect.type === 'hot');
   const resource = effects.find((effect) => effect.type === 'gainResource');
+  const selfHealPctMax = effects.find((effect) => effect.type === 'selfHealPctMax');
   const buff = effects.find((effect) => effect.type === 'selfBuff' || effect.type === 'buffTarget');
   const allyAttackPower = effects.find((effect) => effect.type === 'aoeAllyAttackPower');
   const allyHaste = effects.find((effect) => effect.type === 'aoeAllyHaste');
@@ -9017,6 +9019,9 @@ export function grantAbilityValues(id: string): InterpolationValues {
     values.overTime = grantAmountRange(ground.min, ground.max, lang);
   }
   if (resource?.amount !== undefined) values.amount = formatNumber(resource.amount, lang);
+  if (selfHealPctMax?.pct !== undefined) {
+    values.damage = formatPercent(selfHealPctMax.pct, lang);
+  }
   if (buff?.value !== undefined) values.buff = formatNumber(buff.value, lang);
   if (allyAttackPower?.amount !== undefined) {
     values.buff = formatNumber(allyAttackPower.amount, lang);

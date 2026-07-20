@@ -42,6 +42,8 @@ describe('party frame aura relevance', () => {
     expect(partyFrameAuraIsRelevant({ id: 'arcane_intellect', kind: 'buff_int_pct' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'sacred_shield', kind: 'cast_shield' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'temporal_echo', kind: 'temporal_echo' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'priest_doctrine', kind: 'doctrine' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'seraphic_vigil', kind: 'heal_echo' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'renew', kind: 'hot' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'power_word_shield', kind: 'absorb' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'ice_block', kind: 'stasis' })).toBe(true);

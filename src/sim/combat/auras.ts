@@ -34,6 +34,8 @@ import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
 import { onHotExpired, tickProcState } from './talent_procs';
+import { priestOnAuraEnded } from './priest/talents';
+import { vespersOnDotTick } from './priest/vespers';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
 
@@ -236,6 +238,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
           );
+          vespersOnDotTick(ctx, e, a);
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);
             if (src && !src.dead) {
@@ -278,6 +281,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     }
     if (a.remaining <= CAST_COMPLETE_EPS) {
       e.auras.splice(i, 1);
+      priestOnAuraEnded(ctx, e, a);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
       // A HoT that ran its FULL duration (this natural-expiry path, never a

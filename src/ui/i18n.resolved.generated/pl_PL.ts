@@ -7463,6 +7463,30 @@ export const pl_PL: EnTranslations = {
         "name": "Uczta Pustki",
         "description": "Pożera efekt magiczny (korzystny z wroga albo szkodliwy z sojusznika) i leczy cię o 6% maksymalnego zdrowia."
       },
+      "veilstep": {
+        "name": "Veilstep",
+        "description": "Steps through the veil in the direction you are facing."
+      },
+      "scouring_mercy": {
+        "name": "Scouring Mercy",
+        "description": "Scours an enemy with holy power or delivers immediate mercy to a friendly target. Doctrine signature."
+      },
+      "seraphic_vigil": {
+        "name": "Seraphic Vigil",
+        "description": "Places a watchful blessing on one ally, restoring them when they become unsafe. Benison signature."
+      },
+      "summon_tithefiend": {
+        "name": "Call Tithefiend",
+        "description": "Consumes Gloomtithe to call a temporary Tithefiend that hunts your Effigy. Vespers signature."
+      },
+      "martyrs_aegis": {
+        "name": "Martyr's Aegis",
+        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+      },
+      "choir_of_deliverance": {
+        "name": "Choir of Deliverance",
+        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+      },
       "bear_charge": {
         "name": "Szarża Bruina",
         "description": "Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina."

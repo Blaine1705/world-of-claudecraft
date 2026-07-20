@@ -89,6 +89,10 @@ import { applyGroupHaste } from './haste_burst';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
 import { spawnHunterTrap } from './hunter_trap';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
+import { benisonAfterAbility } from './priest/benison';
+import { doctrineAfterAbility } from './priest/doctrine';
+import { priestAfterAbility, priestOnGroupHeal } from './priest/talents';
+import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
@@ -194,6 +198,7 @@ export function runEffects(
   attackAnimationStarted = false,
 ): void {
   const ability = res.def;
+  const vespersGloomtitheStacks = gloomtitheStacksForCast(p, ability.id);
   const isSpell = ability.school !== 'physical';
   const mods = ctx.playerMods(meta);
   const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
@@ -1507,7 +1512,9 @@ export function runEffects(
         for (const m of friendliesInRadius(ctx, p, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
-          ctx.applyHeal(p, m, healAmount, ability.name, ability.id);
+          const missingBefore = m.maxHp - m.hp;
+          const healed = ctx.applyHeal(p, m, healAmount, ability.name, ability.id);
+          priestOnGroupHeal(ctx, p, m, ability.id, ability.name, healAmount, missingBefore, healed);
         }
         break;
       }
@@ -2583,6 +2590,10 @@ export function runEffects(
   // two procs (committed frost only, so no existing golden moves); Flurry
   // plants Winter's Chill on its surviving target. Inert for everyone else.
   frostMageAfterCast(ctx, p, meta, ability, target);
+  benisonAfterAbility(ctx, p, meta, target, ability.id);
+  doctrineAfterAbility(ctx, p, meta, target, ability.id);
+  vespersAfterAbility(ctx, p, meta, target, ability.id, vespersGloomtitheStacks);
+  priestAfterAbility(ctx, p, ability.id, target);
 
   if (ability.spendsCombo && spentCombo > 0) {
     p.comboPoints = 0;

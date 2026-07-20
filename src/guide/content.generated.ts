@@ -725,25 +725,25 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "discipline",
         "name": "Doctrine",
         "role": "healer",
-        "signature": "power_infusion"
+        "signature": "scouring_mercy"
       },
       {
         "id": "holy",
         "name": "Benison",
         "role": "healer",
-        "signature": "holy_nova"
+        "signature": "seraphic_vigil"
       },
       {
         "id": "shadow",
         "name": "Vespers",
         "role": "dps",
-        "signature": "shadowform"
+        "signature": "summon_tithefiend"
       }
     ],
     "signatureAbilities": [
       {
         "id": "smite",
-        "name": "Smite"
+        "name": "Scouring Hymn"
       },
       {
         "id": "lesser_heal",
@@ -769,7 +769,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "abilities": [
       {
         "id": "smite",
-        "name": "Smite"
+        "name": "Scouring Hymn"
       },
       {
         "id": "lesser_heal",
@@ -806,6 +806,38 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "flash_heal",
         "name": "Urgent Prayer"
+      },
+      {
+        "id": "veilstep",
+        "name": "Veilstep"
+      },
+      {
+        "id": "psychic_scream",
+        "name": "Terror Canticle"
+      },
+      {
+        "id": "scouring_mercy",
+        "name": "Scouring Mercy"
+      },
+      {
+        "id": "prayer_of_healing",
+        "name": "Choirmend"
+      },
+      {
+        "id": "holy_nova",
+        "name": "Sunburst Canticle"
+      },
+      {
+        "id": "seraphic_vigil",
+        "name": "Seraphic Vigil"
+      },
+      {
+        "id": "shadowform",
+        "name": "Gloamveil"
+      },
+      {
+        "id": "summon_tithefiend",
+        "name": "Call Tithefiend"
       }
     ],
     "model": "player_priest",
