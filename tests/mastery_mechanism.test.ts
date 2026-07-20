@@ -49,21 +49,20 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
   });
 
-  it('Guisecraft strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
-    // The active Hunter row buffs a flat attack-power aura; with damage mods no
-    // longer scaling utility buffs, it must ride buffPct.
-    const mods = computeTalentModifiers(
-      'hunter',
-      { spec: null, rows: { 5: 'hun_r5_aspect_mastery' } },
-      20,
+  it('the Protection power floor strengthens its rate buff through buffPct', () => {
+    // This fixture must survive class-row redesigns. Protection's passive package
+    // strengthens a percent armor aura through buffPct, while damage modifiers stay
+    // exempt from utility-rate buffs.
+    const mods = computeTalentModifiers('paladin', { spec: 'protection', rows: {} }, 20);
+    const devotion = abilitiesKnownAt('paladin', 20, mods).find(
+      (a) => a.def.id === 'devotion_aura',
     );
-    const guise = abilitiesKnownAt('hunter', 20, mods).find(
-      (a) => a.def.id === 'aspect_of_the_hawk',
+    const buff = devotion?.effects.find(
+      (e) => e.type === 'buffTarget' && e.kind === 'buff_armor_pct',
     );
-    const buff = guise?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'buff_ap');
-    // Rank 3 is +50 AP at level 20; Guisecraft raises it by 25% and the
-    // resolved flat magnitude rounds to 63.
-    expect(buff && 'value' in buff ? buff.value : null).toBe(63);
+    // The base 10% aura gains the authored 40% buff increase without rounding
+    // the percentage as though it were a flat armor magnitude.
+    expect(buff && 'value' in buff ? buff.value : null).toBe(14);
   });
 });
 
