@@ -230,37 +230,33 @@ describe('shaman redesign', () => {
 });
 
 describe('paladin redesign', () => {
-  it('Vengeful Exorcism: Verdict resets the Rite of Expulsion cooldown', () => {
-    const { sim, p } = rig('paladin', 20, { 5: 'pal_r5_vengeful_exorcism' });
-    addTargetMob(sim, 100000, 8);
-    castAndSettle(sim, 'exorcism', 2);
-    expect(p.cooldowns.get('exorcism')).toBeGreaterThan(0);
-    castAndSettle(sim, 'seal_of_righteousness', 2);
-    castAndSettle(sim, 'judgement', 2);
-    expect(p.cooldowns.has('exorcism')).toBe(false);
-  });
-
-  it('Righteous Cause: swings under an active Oathbrand shave the Verdict cooldown', () => {
-    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' });
-    addTargetMob(sim);
-    castAndSettle(sim, 'seal_of_righteousness', 2);
-    castAndSettle(sim, 'judgement', 2);
-    castAndSettle(sim, 'seal_of_righteousness', 2); // judgement consumed the seal; re-brand
-    const before = p.cooldowns.get('judgement');
-    expect(before).toBeGreaterThan(0);
-    sim.startAutoAttack();
-    let swings = 0;
-    for (let i = 0; i < 20 * 10 && swings === 0; i++) {
-      for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.sourceId === p.id && ev.school === 'physical') swings++;
-      }
-    }
-    expect(swings).toBeGreaterThan(0);
-    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - 0.5);
+  it('Ardent Renewal: a heavy hit heals you, versus no talent', () => {
+    const run = (rows: Record<number, string>) => {
+      const { sim, p } = rig('paladin', 20, rows);
+      const deal = (
+        sim as unknown as {
+          dealDamage(
+            s: Entity | null,
+            t: Entity,
+            n: number,
+            c: boolean,
+            sc: string,
+            a: string | null,
+            k: string,
+          ): void;
+        }
+      ).dealDamage.bind(sim);
+      p.hp = Math.round(p.maxHp * 0.7);
+      // a hit worth at least 20% of max health is a heavy hit that fires the proc
+      deal(null, p, Math.round(p.maxHp * 0.5), false, 'holy', null, 'hit');
+      return p.hp;
+    };
+    // same seed and same hit both runs: the only difference is the 12% self-heal
+    expect(run({ 11: 'pal_r11_ardent_renewal' })).toBeGreaterThan(run({}));
   });
 
   it('Deathless Ardor: a killing blow leaves 1 health, once per 180 sec', () => {
-    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_ardent_defender' });
+    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_deathless_ardor' });
     const deal = (
       sim as unknown as {
         dealDamage(

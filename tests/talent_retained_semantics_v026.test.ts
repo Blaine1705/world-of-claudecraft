@@ -91,20 +91,12 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the final Twin Verdicts, Rattling Ambush, Storm Recall, Sky Echo, Bruin Rebound, and content values', () => {
+  it('resolves the final Rattling Ambush, Storm Recall, Sky Echo, Bruin Rebound, and content values', () => {
     const rowOption = (cls: PlayerClass, id: string) => {
       const option = ROW_TREES[cls].flatMap((row) => row.options).find((o) => o.id === id);
       if (!option) throw new Error(`missing row option ${cls}:${id}`);
       return option;
     };
-
-    // Balance pass: Swift Verdicts is a cooldown cut (10 -> 8 sec), not
-    // banked charges.
-    expect(rowOption('paladin', 'pal_r14_swift_verdicts').name).toBe('Swift Verdicts');
-    const verdict = resolved('paladin', 'judgement', { 14: 'pal_r14_swift_verdicts' });
-    expect(verdict).toMatchObject({ cost: 30 });
-    expect(verdict.cooldown).toBeCloseTo(8);
-    expect(verdict.bonusCharges ?? 0).toBe(0);
 
     // Balance pass: hun_r14_sniper_training is Steady Draw now (the Rattling
     // Ambush reset+free relay was the worst loop in the game).
@@ -364,7 +356,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   });
 
   it.each([
-    ['paladin', 17, 'pal_r17_ardent_defender', 180],
+    ['paladin', 14, 'pal_r14_deathless_ardor', 180],
     ['rogue', 17, 'rog_r17_cheat_death', 120],
   ] as const)(
     '%s cheat death saves once, honors its %d-row ICD, and rearms deterministically',
@@ -415,7 +407,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   it('Dawnward Ricochet damages and silences its primary before deterministic falloff bounces', () => {
     const sim = harness(new Sim({ seed: 2617, playerClass: 'paladin', autoEquip: false }));
     sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(20, 'pal_r20_aura_mastery')).toBe(true);
+    expect(sim.selectTalentRow(8, 'pal_r8_dawnward_ricochet')).toBe(true);
     const player = sim.player;
     const primary = spawnTargetAt(sim, player, 9200, 3, 0);
     // Insert the higher id first; equal-distance ties must still choose the lower id.

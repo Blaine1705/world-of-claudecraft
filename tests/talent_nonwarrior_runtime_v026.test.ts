@@ -75,20 +75,12 @@ function settle(sim: Sim): void {
 }
 
 describe('retained v0.26 non-Warrior row runtime contracts', () => {
-  it('banks a second Sundering Gavel or roots enemies in Holy Ground', () => {
-    const charges = simWithRows('paladin', { 8: 'pal_r8_fist_of_justice' });
+  it('banks a second Sundering Gavel with Twin Gavels', () => {
+    const charges = simWithRows('paladin', { 8: 'pal_r8_twin_gavels' });
     expect(resolved(charges, 'hammer_of_justice')).toMatchObject({
       charges: 2,
       bonusCharges: 1,
     });
-
-    const snare = simWithRows('paladin', { 8: 'pal_r8_consecrated_ground' });
-    const target = addTarget(snare);
-    snare.player.resource = snare.player.maxResource;
-    snare.castAbility('consecration');
-    expect(target.auras).toContainEqual(
-      expect.objectContaining({ kind: 'root', sourceId: snare.playerId, remaining: 2 }),
-    );
   });
 
   it('lands Splitshot at the selected point and keeps Twin Fletching talent charges explicit', () => {
@@ -343,7 +335,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
   });
 
   it('pins exact Cleansing Verdict and Voidfeast healing with correct dispel direction', () => {
-    const paladin = simWithRows('paladin', { 8: 'pal_r8_cleansing_verdict' });
+    const paladin = simWithRows('paladin', { 17: 'pal_r17_cleansing_verdict' });
     const ally = addTarget(paladin, 2, false);
     ally.maxHp = 1_000;
     ally.hp = 500;

@@ -216,14 +216,6 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
 
   it.each([
     {
-      name: 'Oathwheel cooldown refund',
-      cls: 'paladin' as const,
-      row: { 14: 'pal_r14_righteous_cause' },
-      prepare: (player: AnyEntity) => player.cooldowns.set('judgement', 5),
-      read: (player: AnyEntity) => player.cooldowns.get('judgement'),
-      expected: 4.5,
-    },
-    {
       name: 'Imbued Tempo cooldown refund',
       cls: 'shaman' as const,
       row: { 14: 'sha_r14_weapon_fury' },

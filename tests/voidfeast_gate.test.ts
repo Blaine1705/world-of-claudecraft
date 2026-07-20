@@ -102,8 +102,8 @@ describe('Voidfeast is only usable with something to devour', () => {
 
   it('Cleansing Verdict keeps the old behavior on a clean target (no gate)', () => {
     const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
-    sim.setPlayerLevel(10);
-    expect(sim.applyTalents({ spec: null, rows: { 8: 'pal_r8_cleansing_verdict' } })).toBe(true);
+    sim.setPlayerLevel(17);
+    expect(sim.applyTalents({ spec: null, rows: { 17: 'pal_r17_cleansing_verdict' } })).toBe(true);
     const p = sim.player;
     p.resource = p.maxResource;
     sim.targetEntity(p.id);

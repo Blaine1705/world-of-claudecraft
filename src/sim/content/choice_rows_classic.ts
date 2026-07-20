@@ -263,43 +263,58 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'holy_tempo',
-      decision: 'Verdict-fed mana vs mobile Mending Light vs Verdict-Rite resets',
+      theme: 'mobility',
+      decision: 'reposition on a broken ward vs heal on the move vs escape a heavy blow',
       options: [
         {
-          id: 'pal_r5_crusaders_zeal',
-          name: 'Oath Returned',
-          description: 'Verdict restores 25 mana when cast.',
-          icon: 'judgement',
+          id: 'pal_r5_radiant_stride',
+          name: 'Radiant Stride',
+          description: 'When Ward of Faith is fully consumed, gain 40% movement speed for 5 sec.',
+          icon: 'divine_protection',
           effect: {
             proc: {
-              id: 'pal_oath_returned',
-              name: 'Oath Returned',
-              trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
-              responses: [{ kind: 'resource', amount: 25, resourceType: 'mana' }],
+              id: 'pal_radiant_stride',
+              name: 'Radiant Stride',
+              trigger: { on: 'shieldConsumed', ability: 'divine_protection' },
+              responses: [
+                {
+                  kind: 'aura',
+                  auraKind: 'buff_speed',
+                  value: 1.4,
+                  duration: 5,
+                  name: 'Radiant Stride',
+                },
+              ],
             },
           },
         },
         {
-          id: 'pal_r5_blessed_momentum',
+          id: 'pal_r5_pilgrims_light',
           name: "Pilgrim's Light",
           description: 'Mending Light is castable while moving.',
           icon: 'holy_light',
           effect: { ability: [{ ability: 'holy_light', castWhileMoving: true }] },
         },
         {
-          id: 'pal_r5_vengeful_exorcism',
-          name: 'Ashen Sentence',
+          id: 'pal_r5_evasive_faith',
+          name: 'Evasive Faith',
           description:
-            'Rite of Expulsion deals 25% more damage, costs 25% less, and Verdict resets its cooldown.',
-          icon: 'exorcism',
+            'When you take a hit for at least 20% of your maximum health, gain 50% movement speed for 4 sec. Every 20 sec.',
+          icon: 'seal_of_righteousness',
           effect: {
-            ability: [{ ability: 'exorcism', dmgPct: 0.25, costPct: -0.25 }],
             proc: {
-              id: 'pal_vengeful_exorcism',
-              name: 'Vengeful Exorcism',
-              trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
-              responses: [{ kind: 'cooldownRefund', ability: 'exorcism', seconds: 'reset' }],
+              id: 'pal_evasive_faith',
+              name: 'Evasive Faith',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
+              responses: [
+                {
+                  kind: 'aura',
+                  auraKind: 'buff_speed',
+                  value: 1.5,
+                  duration: 4,
+                  name: 'Evasive Faith',
+                },
+              ],
             },
           },
         },
@@ -307,97 +322,73 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     },
     {
       level: 8,
-      theme: 'justice',
-      decision: 'ally dispel vs banked stuns vs Holy Ground lockdown',
+      theme: 'control',
+      decision: 'shorter stun cadence vs a banked second stun vs a silencing ricochet',
       options: [
         {
-          id: 'pal_r8_cleansing_verdict',
-          name: 'Cleansing Verdict',
-          description:
-            'Grants Cleansing Verdict: purge a harmful magic effect off an ally and heal them.',
-          icon: 'cleansing_verdict',
-          effect: { grant: { ability: 'cleansing_verdict' } },
+          id: 'pal_r8_lingering_yoke',
+          name: 'Lingering Yoke',
+          description: "Sundering Gavel's cooldown is reduced by 30%.",
+          icon: 'hammer_of_justice',
+          effect: { ability: [{ ability: 'hammer_of_justice', cooldownPct: -0.3 }] },
         },
         {
-          id: 'pal_r8_fist_of_justice',
+          id: 'pal_r8_twin_gavels',
           name: 'Twin Gavels',
           description: 'Sundering Gavel stores 2 uses.',
           icon: 'hammer_of_justice',
           effect: { ability: [{ ability: 'hammer_of_justice', bonusCharges: 1 }] },
         },
         {
-          id: 'pal_r8_consecrated_ground',
-          name: 'Hallowed Snare',
-          description: 'Holy Ground also roots enemies within 8 yd for 2 sec.',
-          icon: 'consecration',
-          effect: {
-            ability: [
-              {
-                ability: 'consecration',
-                addEffects: [{ type: 'aoeRoot', duration: 2, radius: 8, min: 0, max: 0 }],
-              },
-            ],
-          },
+          id: 'pal_r8_dawnward_ricochet',
+          name: 'Dawnward Ricochet',
+          description: 'Grants Dawnward Ricochet.',
+          icon: 'holy_shield',
+          effect: { grant: { ability: 'aura_surge' } },
         },
       ],
     },
     {
       level: 11,
-      theme: 'devotion',
-      decision: 'healing cadence vs shield-to-emergency reset vs critical-heal wards',
+      theme: 'mitigation',
+      decision: 'stronger shields vs an emergency shield vs an emergency heal',
       options: [
         {
-          id: 'pal_r11_divine_wisdom',
-          name: 'Third Benediction',
+          id: 'pal_r11_sacred_bulwark',
+          name: 'Sacred Bulwark',
+          description: 'Your absorb shields are 25% stronger.',
+          icon: 'divine_protection',
+          effect: { global: { absorbPct: 0.25 } },
+        },
+        {
+          id: 'pal_r11_bastion_aegis',
+          name: 'Bastion Aegis',
           description:
-            'Every 3rd Mending Light or Lightmend makes your next Mending Light within 10 sec instant.',
-          icon: 'flash_of_light',
+            'When you take a hit for at least 20% of your maximum health, shield yourself for 15% of your maximum health for 8 sec. Every 20 sec.',
+          icon: 'devotion_aura',
           effect: {
             proc: {
-              id: 'pal_divine_wisdom',
-              name: 'Third Benediction',
-              trigger: { on: 'castNth', n: 3, abilities: ['holy_light', 'flash_of_light'] },
+              id: 'pal_bastion_aegis',
+              name: 'Bastion Aegis',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
               responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['holy_light'],
-                  duration: 10,
-                },
+                { kind: 'absorb', amountPctMaxHp: 0.15, duration: 8, name: 'Bastion Aegis' },
               ],
             },
           },
         },
         {
-          id: 'pal_r11_guardians_favor',
-          name: 'Mercy from Ruin',
+          id: 'pal_r11_ardent_renewal',
+          name: 'Ardent Renewal',
           description:
-            "When Ward of Faith is fully consumed, it shaves 120 sec off Last Rite's cooldown.",
-          icon: 'divine_protection',
+            'When you take a hit for at least 20% of your maximum health, heal yourself for 12% of your maximum health. Every 20 sec.',
+          icon: 'holy_light',
           effect: {
             proc: {
-              id: 'pal_guardians_favor',
-              name: 'Mercy from Ruin',
-              trigger: { on: 'shieldConsumed', ability: 'divine_protection' },
-              responses: [{ kind: 'cooldownRefund', ability: 'lay_on_hands', seconds: 120 }],
-            },
-          },
-        },
-        {
-          id: 'pal_r11_greater_blessing',
-          name: 'Afterglow Aegis',
-          description:
-            'Critical heals from Mending Light, Lightmend, and Last Rite also ward the target, absorbing 60 damage for 10 sec.',
-          icon: 'blessing_of_might',
-          effect: {
-            proc: {
-              id: 'pal_greater_blessing',
-              name: 'Greater Blessing',
-              trigger: {
-                on: 'spellCrit',
-                abilities: ['holy_light', 'flash_of_light', 'lay_on_hands'],
-              },
-              responses: [{ kind: 'absorb', amount: 60, duration: 10, name: 'Greater Blessing' }],
+              id: 'pal_ardent_renewal',
+              name: 'Ardent Renewal',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
+              responses: [{ kind: 'heal', amountPctMaxHp: 0.12 }],
             },
           },
         },
@@ -405,56 +396,55 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     },
     {
       level: 14,
-      theme: 'reckoning',
-      decision: 'faster Verdicts vs area holy burst vs Oathbrand-fed Verdict tempo',
+      theme: 'resolve',
+      decision: 'cleanse the next lockout vs a bubble on demand vs cheat death',
       options: [
         {
-          // Balance pass (maintainer sheet): banked double Verdicts are out.
-          // The classic Improved Judgement shape instead.
-          id: 'pal_r14_swift_verdicts',
-          name: 'Swift Verdicts',
-          description: "Verdict's cooldown is reduced by 20%.",
-          icon: 'judgement',
-          effect: { ability: [{ ability: 'judgement', cooldownPct: -0.2 }] },
-        },
-        {
-          id: 'pal_r14_holy_wrath',
-          name: "Saint's Ire",
-          description: "Grants Saint's Ire.",
-          icon: 'holy_wrath',
-          effect: { grant: { ability: 'holy_wrath' } },
-        },
-        {
-          id: 'pal_r14_righteous_cause',
-          name: 'Oathwheel',
+          id: 'pal_r14_steadfast_spirit',
+          name: 'Steadfast Spirit',
           description:
-            'Landed melee attacks while your Oathbrand is active shave 0.5 sec off the cooldown of Verdict.',
-          icon: 'seal_of_righteousness',
-          effect: {
-            proc: {
-              id: 'pal_righteous_cause',
-              name: 'Righteous Cause',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [{ kind: 'cooldownRefund', ability: 'judgement', seconds: 0.5 }],
-            },
-          },
+            'Every 20 sec, the next stun, root, or silence to hit you is instantly cleansed.',
+          icon: 'divine_protection',
+          effect: { global: { temporalRift: 1 } },
         },
-      ],
-    },
-    {
-      level: 17,
-      theme: 'sanctuary',
-      decision: 'personal bulwark vs ally emergency ward vs cheat death',
-      options: [
         {
-          id: 'pal_r17_divine_shield',
+          id: 'pal_r14_lightward',
           name: 'Lightward',
           description: 'Grants Lightward.',
           icon: 'divine_shield',
           effect: { grant: { ability: 'divine_shield' } },
         },
         {
-          id: 'pal_r17_sacred_ward',
+          id: 'pal_r14_deathless_ardor',
+          name: 'Deathless Ardor',
+          description:
+            'A blow that would kill you leaves you at 1 health instead. Once every 180 sec.',
+          icon: 'divine_protection',
+          effect: { global: { cheatDeathIcd: 180 } },
+        },
+      ],
+    },
+    {
+      level: 17,
+      theme: 'devotion',
+      decision: 'personal power burst vs an ally cleanse-and-heal vs a shield on Last Rite',
+      options: [
+        {
+          id: 'pal_r17_wrathwing',
+          name: 'Wrathwing',
+          description: 'Grants Wrathwing.',
+          icon: 'avenging_wrath',
+          effect: { grant: { ability: 'avenging_wrath' } },
+        },
+        {
+          id: 'pal_r17_cleansing_verdict',
+          name: 'Cleansing Verdict',
+          description: 'Grants Cleansing Verdict.',
+          icon: 'cleansing_verdict',
+          effect: { grant: { ability: 'cleansing_verdict' } },
+        },
+        {
+          id: 'pal_r17_rites_afterglow',
           name: "Rite's Afterglow",
           description:
             'Last Rite also wraps its target in a sacred ward absorbing 360 damage for 10 sec.',
@@ -468,41 +458,43 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
             ],
           },
         },
-        {
-          id: 'pal_r17_ardent_defender',
-          name: 'Deathless Ardor',
-          description:
-            'A blow that would kill you leaves you at 1 health instead. Once every 180 sec.',
-          icon: 'divine_protection',
-          effect: { global: { cheatDeathIcd: 180 } },
-        },
       ],
     },
     {
       level: 20,
       theme: 'holy_arsenal',
-      decision: 'self empowerment vs ranged execute vs silencing shield ricochet',
+      decision: 'a wounded-target execute vs an area holy nova vs an emergency bulwark',
       options: [
         {
-          id: 'pal_r20_avenging_wrath',
-          name: 'Wrathwing',
-          description: 'Grants Wrathwing.',
-          icon: 'avenging_wrath',
-          effect: { grant: { ability: 'avenging_wrath' } },
-        },
-        {
-          id: 'pal_r20_hammer_of_wrath',
+          id: 'pal_r20_tolling_hammer',
           name: 'Tolling Hammer',
           description: 'Grants Tolling Hammer.',
           icon: 'hammer_of_wrath',
           effect: { grant: { ability: 'hammer_of_wrath' } },
         },
         {
-          id: 'pal_r20_aura_mastery',
-          name: 'Dawnward Ricochet',
-          description: 'Grants Dawnward Ricochet.',
-          icon: 'holy_shield',
-          effect: { grant: { ability: 'aura_surge' } },
+          id: 'pal_r20_saints_ire',
+          name: "Saint's Ire",
+          description: "Grants Saint's Ire.",
+          icon: 'holy_wrath',
+          effect: { grant: { ability: 'holy_wrath' } },
+        },
+        {
+          id: 'pal_r20_sunfire_aegis',
+          name: 'Sunfire Aegis',
+          description:
+            'When you take a hit for at least 25% of your maximum health, shield yourself for 30% of your maximum health for 10 sec. Every 45 sec.',
+          icon: 'divine_shield',
+          effect: {
+            proc: {
+              id: 'pal_sunfire_aegis',
+              name: 'Sunfire Aegis',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.25, icd: 45 },
+              responses: [
+                { kind: 'absorb', amountPctMaxHp: 0.3, duration: 10, name: 'Sunfire Aegis' },
+              ],
+            },
+          },
         },
       ],
     },
