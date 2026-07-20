@@ -1,5 +1,6 @@
 import type { SimContext } from '../sim_context';
 import type { Aura, AuraKind, Entity } from '../types';
+import { onStormcastConsumed, STORMCAST_ID } from './shaman_warspirit';
 
 function matches(aura: Aura, abilityId?: string): boolean {
   if (!aura.empowerAbilities) return true;
@@ -106,7 +107,9 @@ export function consumeFreeCostFor(ctx: SimContext, e: Entity, abilityId: string
 }
 
 export function consumeNextCastInstant(ctx: SimContext, e: Entity, abilityId?: string): boolean {
-  return consumeAuraKind(ctx, e, 'next_cast_instant', abilityId) !== null;
+  const aura = consumeAuraKind(ctx, e, 'next_cast_instant', abilityId);
+  if (aura?.id === STORMCAST_ID) onStormcastConsumed(ctx, e);
+  return aura !== null;
 }
 
 export function hasScopedNextCastInstant(e: Entity, abilityId: string): boolean {

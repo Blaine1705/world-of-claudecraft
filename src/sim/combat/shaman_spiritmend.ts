@@ -3,6 +3,13 @@
 
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
+import {
+  lifespringMasteryDepositBonus,
+  SHAMAN_TALENT_IDS,
+  shamanTalentSelected,
+  spiritmendTalentDepositMultiplier,
+  triggerWardCycle,
+} from './shaman_talents';
 
 export const MENDING_CURRENT_ID = 'shaman_mending_current';
 export const LIFESPRING_WEAPON_ID = 'lifespring_weapon';
@@ -46,31 +53,29 @@ export function mendingCurrent(target: Entity, sourceId: number): Aura | null {
   );
 }
 
-export function spiritmendDepositMultiplier(source: Entity, abilityId: string): number {
+export function spiritmendDepositMultiplier(
+  ctx: SimContext,
+  source: Entity,
+  abilityId: string,
+): number {
   const base = abilityId === 'tidecall' ? TIDECALL_DEPOSIT : MENDING_WATERS_DEPOSIT;
   const lifespring = source.auras.some((aura) => aura.id === LIFESPRING_WEAPON_ID)
-    ? 1 + LIFESPRING_DEPOSIT_BONUS
+    ? 1 + LIFESPRING_DEPOSIT_BONUS + lifespringMasteryDepositBonus(ctx, source)
     : 1;
-  return base * lifespring;
+  return base * lifespring * spiritmendTalentDepositMultiplier(ctx, source);
 }
 
-/** Deposit from calculated healing before overheal, then cap and refresh. */
-export function depositMendingCurrent(
+function depositRawMendingCurrent(
   ctx: SimContext,
   source: Entity,
   target: Entity,
-  calculatedHealing: number,
-  abilityId: 'healing_wave' | 'tidecall',
+  requested: number,
 ): number {
-  if (!isSpiritmend(ctx, source) || target.dead || calculatedHealing <= 0) return 0;
-  const deposit = Math.max(
-    0,
-    Math.round(calculatedHealing * spiritmendDepositMultiplier(source, abilityId)),
-  );
+  if (!isSpiritmend(ctx, source) || target.dead || requested <= 0) return 0;
   const cap = Math.max(0, Math.round(target.maxHp * MENDING_CURRENT_MAX_HP_CAP));
   const existing = mendingCurrent(target, source.id);
   const previous = existing?.value ?? 0;
-  const next = Math.min(cap, previous + deposit);
+  const next = Math.min(cap, previous + Math.round(requested));
   if (existing) {
     existing.value = next;
     existing.remaining = MENDING_CURRENT_DURATION;
@@ -92,6 +97,59 @@ export function depositMendingCurrent(
     });
   }
   return next - previous;
+}
+
+/** Deposit from calculated healing before overheal, then cap and refresh. */
+export function depositMendingCurrent(
+  ctx: SimContext,
+  source: Entity,
+  target: Entity,
+  calculatedHealing: number,
+  abilityId: 'healing_wave' | 'tidecall',
+): number {
+  if (!isSpiritmend(ctx, source) || target.dead || calculatedHealing <= 0) return 0;
+  const deposit = Math.max(
+    0,
+    Math.round(calculatedHealing * spiritmendDepositMultiplier(ctx, source, abilityId)),
+  );
+  const added = depositRawMendingCurrent(ctx, source, target, deposit);
+  if (abilityId === 'healing_wave') triggerWardCycle(ctx, source);
+  if (
+    abilityId === 'tidecall' &&
+    source.auras.some((aura) => aura.id === LIFESPRING_WEAPON_ID) &&
+    shamanTalentSelected(ctx, source, SHAMAN_TALENT_IDS.livingWeapon)
+  ) {
+    let best: Entity | null = null;
+    let bestFrac = Infinity;
+    let bestDist = Infinity;
+    for (const candidate of ctx.entities.values()) {
+      if (
+        candidate.id === target.id ||
+        candidate.dead ||
+        candidate.hp >= candidate.maxHp ||
+        (candidate.id !== source.id && !ctx.isFriendlyTo(source, candidate))
+      ) {
+        continue;
+      }
+      const dx = candidate.pos.x - target.pos.x;
+      const dz = candidate.pos.z - target.pos.z;
+      const distance = dx * dx + dz * dz;
+      if (distance > 100) continue;
+      const fraction = candidate.maxHp > 0 ? candidate.hp / candidate.maxHp : 1;
+      if (
+        best === null ||
+        fraction < bestFrac ||
+        (fraction === bestFrac &&
+          (distance < bestDist || (distance === bestDist && candidate.id < best.id)))
+      ) {
+        best = candidate;
+        bestFrac = fraction;
+        bestDist = distance;
+      }
+    }
+    if (best) depositRawMendingCurrent(ctx, source, best, calculatedHealing * 0.5);
+  }
+  return added;
 }
 
 /**
@@ -124,6 +182,23 @@ export function consumeMendingCurrent(ctx: SimContext, source: Entity, target: E
   const proposed = Math.max(0, Math.round((current?.value ?? 0) * CURRENT_CONSUME_MULTIPLIER));
   if (proposed > 0 && !target.dead) {
     ctx.applyHeal(source, target, proposed, 'Mending Current', MENDING_CURRENT_ID, false, false);
+    if (shamanTalentSelected(ctx, source, SHAMAN_TALENT_IDS.echoingElements)) {
+      ctx.applyAura(target, {
+        id: 'shaman_echoing_elements_heal',
+        name: 'Echoing Elements',
+        kind: 'hot',
+        value: Math.max(1, Math.round(proposed * 0.4)),
+        remaining: 2,
+        duration: 2,
+        tickInterval: 2,
+        tickTimer: 2,
+        sourceId: source.id,
+        school: 'nature',
+      });
+    }
+    if (shamanTalentSelected(ctx, source, SHAMAN_TALENT_IDS.deepReservoir)) {
+      depositRawMendingCurrent(ctx, source, target, (current?.value ?? 0) * 0.25);
+    }
   }
   return proposed;
 }

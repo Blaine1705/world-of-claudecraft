@@ -3965,7 +3965,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ghost_wolf',
     name: 'Shadewolf',
     class: 'shaman',
-    learnLevel: 16,
+    learnLevel: 5,
     cost: 35,
     castTime: 2.0,
     cooldown: 0,

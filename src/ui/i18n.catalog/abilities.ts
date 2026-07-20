@@ -1700,7 +1700,7 @@ const classAbilityNamesEn = {
       [
         'earthbind',
         'Gripping Earth',
-        'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
+        'Roots enemies within 4 yd of the target point for 2 sec, then slows them by 40% for 6 sec. (Shaman talent)',
       ],
       [
         'evocation',

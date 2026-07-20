@@ -3,6 +3,13 @@
 
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import {
+  primalExaltationActive,
+  pyrebrandBonusCharge,
+  SHAMAN_TALENT_IDS,
+  shamanTalentSelected,
+  triggerWardCycle,
+} from './shaman_talents';
 
 export const THUNDER_CHARGES_ID = 'shaman_thunder_charges';
 export const PRIMAL_MASTERY_ID = 'elemental_mastery';
@@ -71,8 +78,10 @@ export function addThunderCharges(ctx: SimContext, player: Entity, requested: nu
 /** Called only after Arc Bolt has resolved a valid direct-damage impact. */
 export function thundercallOnArcBoltImpact(ctx: SimContext, player: Entity): void {
   if (!isThundercall(ctx, player)) return;
-  const accelerated = player.auras.some((aura) => aura.id === PRIMAL_MASTERY_ID);
-  addThunderCharges(ctx, player, accelerated ? 2 : 1);
+  const accelerated =
+    player.auras.some((aura) => aura.id === PRIMAL_MASTERY_ID) || primalExaltationActive(player);
+  addThunderCharges(ctx, player, (accelerated ? 2 : 1) + pyrebrandBonusCharge(ctx, player));
+  triggerWardCycle(ctx, player);
 }
 
 export function thundercallDamageMultiplier(
@@ -87,12 +96,72 @@ export function thundercallDamageMultiplier(
   return 1;
 }
 
+/** Snapshot whether Faultwake should schedule its nonrecursive 40% ground echo. */
+export function shouldEchoThunderGroundVent(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+): boolean {
+  return (
+    abilityId === 'earthquake' &&
+    isThundercall(ctx, player) &&
+    thunderCharges(player) === THUNDER_CHARGE_CAP &&
+    shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.echoingElements)
+  );
+}
+
 /** Consume after a vent has resolved successfully, never at input time. */
-export function consumeThunderVent(ctx: SimContext, player: Entity, abilityId: string): number {
+export function consumeThunderVent(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+  target?: Entity | null,
+  resolvedDamage = 0,
+): number {
   if (!isThundercall(ctx, player) || !THUNDER_VENTS.has(abilityId)) return 0;
   const charges = thunderCharges(player);
   const index = player.auras.findIndex((aura) => aura.id === THUNDER_CHARGES_ID);
   if (index >= 0) removeAuraAt(ctx, player, index);
+  if (charges === THUNDER_CHARGE_CAP) {
+    if (shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.deepReservoir)) {
+      addThunderCharges(ctx, player, 2);
+    }
+    if (
+      shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.livingWeapon) &&
+      player.auras.some((aura) => aura.id === 'flametongue_weapon')
+    ) {
+      ctx.applyAura(player, {
+        id: 'shaman_living_weapon_bolt',
+        name: 'Living Weapon',
+        kind: 'next_cast_instant',
+        value: 1,
+        remaining: 12,
+        duration: 12,
+        sourceId: player.id,
+        school: 'fire',
+        empowerAbilities: ['lightning_bolt'],
+      });
+    }
+    if (
+      target &&
+      !target.dead &&
+      resolvedDamage > 0 &&
+      shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.echoingElements)
+    ) {
+      ctx.applyAura(target, {
+        id: 'shaman_echoing_elements_damage',
+        name: 'Echoing Elements',
+        kind: 'dot',
+        value: Math.max(1, Math.round(resolvedDamage * 0.4)),
+        remaining: 1,
+        duration: 1,
+        tickInterval: 1,
+        tickTimer: 1,
+        sourceId: player.id,
+        school: 'nature',
+      });
+    }
+  }
   return charges;
 }
 

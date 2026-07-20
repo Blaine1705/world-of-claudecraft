@@ -49,6 +49,7 @@ const baseEnTable = {
   'error.equipLevel': 'You must be level {level} to equip that.',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
+  'error.unknownAbility': 'You do not know that ability.',
   'error.maxLoadouts': 'You can save at most {count} loadouts.',
   'error.noLoadout': 'No such loadout.',
   'error.loadoutLevel': 'That loadout needs a higher level.',

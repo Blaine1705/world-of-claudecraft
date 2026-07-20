@@ -180,38 +180,32 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
     });
   };
 
-  it('lets Imbued Lifeblood save its owner from otherwise lethal thorns', () => {
+  it('resolves Ancestral Strike Ward Cycle sustain before thorns', () => {
     const { sim, p } = makeSim('shaman', 20, 1756);
-    expect(sim.applyTalents({ spec: null, rows: { 5: 'sha_r5_imbue_mastery' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 14: 'sha_r14_weapon_fury' } })).toBe(true);
     const mob = spawnDummy(sim, p, 1);
-    addImbue(p);
-    addThorns(mob, 10);
+    addThorns(mob, 1);
     p.mainhandItemId = null;
-    p.hp = 5;
-    const events = capture(sim);
+    p.resource = p.maxResource - 20;
+    let manaAtRetaliation = 0;
+    const dealDamage = sim.ctx.dealDamage;
+    sim.ctx.dealDamage = ((source: Entity | null, target: Entity, ...args: unknown[]) => {
+      if (source?.id === mob.id && target.id === p.id && args[3] === 'Punishing Thorns') {
+        manaAtRetaliation = p.resource;
+      }
+      return (dealDamage as (...callArgs: unknown[]) => unknown)(source, target, ...args);
+    }) as typeof sim.ctx.dealDamage;
     const draws: number[] = [];
     sim.rng.setObserver((value: number) => draws.push(value));
 
-    const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+    const connected = meleeSwing(sim.ctx, p, mob, 0, 'Ancestral Strike', {
+      cannotBeDodged: true,
+    });
     sim.rng.setObserver(null);
 
-    const healIndex = events.findIndex(
-      (event) => event.type === 'heal2' && event.ability === 'Imbued Lifeblood',
-    );
-    const thornsIndex = events.findIndex(
-      (event) =>
-        event.type === 'damage' &&
-        event.sourceId === mob.id &&
-        event.targetId === p.id &&
-        event.ability === 'Punishing Thorns',
-    );
     expect(connected).toBe(true);
-    expect(healIndex).toBeGreaterThan(-1);
-    expect(thornsIndex).toBeGreaterThan(healIndex);
-    expect(p.dead).toBe(false);
-    expect(p.hp).toBeGreaterThan(0);
-    // Hit table, weapon roll, swing crit, then Lifeblood's normal heal-crit roll.
-    expect(draws).toHaveLength(4);
+    expect(manaAtRetaliation).toBe(p.maxResource - 10);
+    expect(draws).toHaveLength(3);
   });
 
   it.each([
@@ -221,14 +215,6 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
       row: { 14: 'pal_r14_righteous_cause' },
       prepare: (player: AnyEntity) => player.cooldowns.set('judgement', 5),
       read: (player: AnyEntity) => player.cooldowns.get('judgement'),
-      expected: 4.5,
-    },
-    {
-      name: 'Imbued Tempo cooldown refund',
-      cls: 'shaman' as const,
-      row: { 14: 'sha_r14_weapon_fury' },
-      prepare: (player: AnyEntity) => player.cooldowns.set('earth_shock', 5),
-      read: (player: AnyEntity) => player.cooldowns.get('earth_shock'),
       expected: 4.5,
     },
   ])('applies $name before thorns without changing the shared RNG trace', (testCase) => {

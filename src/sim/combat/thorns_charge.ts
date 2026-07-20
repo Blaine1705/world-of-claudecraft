@@ -12,6 +12,7 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { CAST_COMPLETE_EPS, DT } from '../types';
 import { applyStoneboundWardSmoothing } from './shaman_warspirit';
+import { onThunderWardRetaliated } from './shaman_talents';
 import { onThornsReflect } from './talent_procs';
 
 export interface ThornsState {
@@ -71,6 +72,7 @@ export function applyThornsReaction(ctx: SimContext, defender: Entity, attacker:
       );
       if (defender.kind === 'player') {
         applyStoneboundWardSmoothing(ctx, defender, a.id);
+        if (a.id === 'lightning_shield') onThunderWardRetaliated(ctx, defender);
         onThornsReflect(ctx, defender, a.id);
       }
     }

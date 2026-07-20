@@ -18,6 +18,7 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
 import { PERSONAL_BARRIER_IDS } from './fire_mage';
+import { onShamanCastCompleted } from './shaman_talents';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
   if (!player.procState) player.procState = { counters: {}, icds: {} };
@@ -182,6 +183,7 @@ export function onCastCompleted(
   // Elemental Convergence (mage choice row): school-alternation memory, kept
   // here because every completed cast funnels through this hook. Draws no rng.
   convergenceOnCast(ctx, player, abilityId);
+  onShamanCastCompleted(ctx, player, abilityId);
   if (wasEmpowered) return;
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;

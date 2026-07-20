@@ -209,6 +209,11 @@ export interface TalentEffect {
   proc?: ProcDef;
   ability?: AbilityModEffect[];
   global?: GlobalModEffect;
+  // Player-facing values for bespoke class mechanics whose state machines live
+  // behind combat-module seams rather than the generic modifier/proc engine.
+  // This metadata is inert at runtime; it keeps authored tooltips numerically
+  // auditable without pretending a custom mechanic is a generic stat modifier.
+  runtime?: Record<string, number>;
 }
 
 export interface SpecDef {

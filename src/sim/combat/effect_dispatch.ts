@@ -93,9 +93,11 @@ import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
 import { consumeMendingCurrent, depositMendingCurrent } from './shaman_spiritmend';
+import { applyPrimalExaltation, applyStoneward, onThunderWardActivated } from './shaman_talents';
 import {
   armPrimalMastery,
   consumeThunderVent,
+  shouldEchoThunderGroundVent,
   thundercallDamageMultiplier,
   thundercallOnArcBoltImpact,
 } from './shaman_thundercall';
@@ -104,7 +106,7 @@ import {
   applyWarspiritPosture,
   stoneboundThreatMultiplier,
 } from './shaman_warspirit';
-import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 
@@ -244,6 +246,9 @@ export function runEffects(
   };
 
   if (ability.id === 'elemental_mastery') armPrimalMastery(ctx, p);
+  if (ability.id === 'primal_exaltation') applyPrimalExaltation(ctx, p);
+  if (ability.id === 'stoneward' && target) applyStoneward(ctx, p, target);
+  if (ability.id === 'lightning_shield') onThunderWardActivated(ctx, p);
 
   // Cleaving Blows (Fury passive): Red Harvest refunds one stored Twinstrike
   // use on the abilityCharges recharge model. A partial refund leaves the
@@ -438,7 +443,7 @@ export function runEffects(
         );
         if (ability.id === 'lightning_bolt') thundercallOnArcBoltImpact(ctx, p);
         if (ability.id === 'earth_shock') {
-          consumeThunderVent(ctx, p, ability.id);
+          consumeThunderVent(ctx, p, ability.id, target, finalDamage);
           applyStoneboundJolt(ctx, p, target);
         }
         if (areaEcho) {
@@ -1564,6 +1569,7 @@ export function runEffects(
         // under the caster (e.g. Consecration at your feet).
         const zoneCenter = p.castAim ?? p.pos;
         const thundercallMult = thundercallDamageMultiplier(ctx, p, ability.id);
+        const echoThunderVent = shouldEchoThunderGroundVent(ctx, p, ability.id);
         const groundEffect: GroundAoE = {
           sourceId: p.id,
           pos: { ...zoneCenter },
@@ -1646,6 +1652,24 @@ export function runEffects(
         // hit lands one interval later, exactly the fall time.
         if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
         ctx.groundAoEs.push(groundEffect);
+        if (echoThunderVent) {
+          // Faultwake's full vent is the whole zone, so mirror each pulse one
+          // second later at 40%. This echo carries damage only: it cannot copy
+          // slows, ignites, or another Echoing Elements trigger.
+          ctx.groundAoEs.push({
+            sourceId: p.id,
+            pos: { ...zoneCenter },
+            radius: eff.radius,
+            min: Math.max(1, Math.round(groundEffect.min * 0.4)),
+            max: Math.max(1, Math.round(groundEffect.max * 0.4)),
+            remaining: eff.duration + 1,
+            interval: eff.interval,
+            tickTimer: 1,
+            school: ability.school,
+            ability: 'Echoing Elements',
+            spBonus: (groundEffect.spBonus ?? 0) * 0.4,
+          });
+        }
         consumeThunderVent(ctx, p, ability.id);
         break;
       }
@@ -2127,6 +2151,18 @@ export function runEffects(
                 ability.school,
                 eff.breakOnDamage ? damageBreakThreshold(m.maxHp, eff.breakOnDamage) : undefined,
               );
+              if (ability.id === 'earthbind') {
+                ctx.applyAura(m, {
+                  id: 'earthbind_slow',
+                  name: ability.name,
+                  kind: 'slow',
+                  remaining: 8,
+                  duration: 8,
+                  value: 0.6,
+                  sourceId: p.id,
+                  school: ability.school,
+                });
+              }
             }
           }
         }

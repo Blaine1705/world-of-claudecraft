@@ -3993,6 +3993,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Din huvudsakliga eldkanon, landar ett slag och lämnar målet brinnande.',
   'guide.abilityHook.flame_shock':
     'En omedelbar brand som slår direkt och fortsätter att svida över tid.',
+  'guide.abilityHook.galeheart_weapon':
+    'Fyller båda vapnen med stormvind och belönar en jämn attackrytm.',
+  'guide.abilityHook.lifespring_weapon':
+    'Fyller ditt vapen med läkande vatten och stärker ditt fortlöpande läkningsflöde.',
+  'guide.abilityHook.tidecall':
+    'Kallar på tidvattnet och förstärker nästa följd av läkande besvärjelser.',
+  'guide.abilityHook.stoneward':
+    'Reser en laddad stensköld som omvandlar mottagen skada till läkning.',
+  'guide.abilityHook.primal_exaltation':
+    'Släpper kortvarigt lös din specialiserings elementarkraft.',
   'guide.abilityHook.frost_armor':
     'En varaktig självförstärkning som härdar din rustning före en strid.',
   'guide.abilityHook.frostbolt':

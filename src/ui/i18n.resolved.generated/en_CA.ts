@@ -3020,6 +3020,11 @@ export const en_CA: EnTranslations = {
       "earth_shock": "An instant shock for quick Nature damage when you need it now.",
       "lightning_shield": "Charges you so attackers take Nature damage when they hit you.",
       "flame_shock": "An instant burn that hits up front and keeps searing over time.",
+      "galeheart_weapon": "Imbues both weapons with storm winds that reward a steady dual-wield rhythm.",
+      "lifespring_weapon": "Imbues your weapon with restorative water that strengthens your healing flow.",
+      "tidecall": "Calls the tide to empower your next sequence of restorative casts.",
+      "stoneward": "Raises a charged stone shield that turns incoming damage into recovery.",
+      "primal_exaltation": "Unleashes a short specialization-specific surge of elemental power.",
       "fireball": "Your main fire nuke, lands a hit and leaves the target burning.",
       "fireball_form": "Become a living ember to cross open ground at high speed.",
       "frost_armor": "A lasting self-buff that hardens your armor before a fight.",
@@ -7287,7 +7292,7 @@ export const en_CA: EnTranslations = {
       },
       "earthbind": {
         "name": "Gripping Earth",
-        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+        "description": "Roots enemies within 4 yd of the target point for 2 sec, then slows them by 40% for 6 sec. (Shaman talent)"
       },
       "evocation": {
         "name": "Aetherwell",

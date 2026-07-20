@@ -5242,6 +5242,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Превращает вас в живой огненный шар для быстрого движения по открытой местности.',
   'guide.abilityHook.flame_shock':
     'Мгновенный поджог, который бьет сразу и продолжает жечь со временем.',
+  'guide.abilityHook.galeheart_weapon':
+    'Наполняет оба оружия штормовым ветром и вознаграждает ровный ритм атак.',
+  'guide.abilityHook.lifespring_weapon':
+    'Наполняет оружие целебной водой и усиливает непрерывный поток исцеления.',
+  'guide.abilityHook.tidecall':
+    'Призывает прилив, усиливая следующую череду исцеляющих заклинаний.',
+  'guide.abilityHook.stoneward':
+    'Поднимает заряженный каменный щит, превращающий полученный урон в исцеление.',
+  'guide.abilityHook.primal_exaltation':
+    'Ненадолго высвобождает стихийную силу, соответствующую специализации.',
   'guide.abilityHook.frost_armor':
     'Длительное усиление на себя, которое укрепляет броню перед боем.',
   'guide.abilityHook.frostbolt':

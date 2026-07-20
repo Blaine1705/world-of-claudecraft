@@ -95,6 +95,11 @@ import {
   spellDamageMultFromAuras,
   spellHasteMult,
 } from './spell_combat';
+import {
+  onShamanManaSpent,
+  shamanCastTimeMultiplier,
+  shamanManaCost,
+} from './shaman_talents';
 import { isSpellResisted } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
 
@@ -555,7 +560,8 @@ export function castAbility(
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
   const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
   const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
-  const payableCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const discountedCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const payableCost = shamanManaCost(ctx, p, discountedCost);
   if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(
       p.id,
@@ -815,7 +821,7 @@ export function castAbility(
       // spells retain the canonical at-feet fallback. Clamp the selected point
       // through the same authoritative range rule as explicit ground input.
       const selected =
-        ability.id === 'earthquake' && p.targetId !== null
+        (ability.id === 'earthquake' || ability.id === 'earthbind') && p.targetId !== null
           ? (ctx.entities.get(p.targetId) ?? null)
           : null;
       const fallback =
@@ -890,7 +896,7 @@ export function castAbility(
     (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id)) &&
     consumeNextCastInstant(ctx, p, ability.id)
       ? 0
-      : res.castTime;
+      : res.castTime * shamanCastTimeMultiplier(p, ability.id);
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
@@ -1053,12 +1059,14 @@ function spendAbilityCost(
     }
     return;
   }
-  spendResource(p, res.cost);
+  const paidCost = shamanManaCost(ctx, p, res.cost);
+  spendResource(p, paidCost);
+  onShamanManaSpent(ctx, p, paidCost);
   // Overflowing Power (mage choice row): every 10% of maximum mana actually
   // spent shaves manaDefCdrPer10 seconds off the mage defensive cooldowns,
   // capped per rolling window (the 'internal_cd' aura carries the window's
   // running total, so no new entity field enters the parity state hash).
-  overflowingPowerCdr(ctx, p, meta, res.cost);
+  overflowingPowerCdr(ctx, p, meta, paidCost);
   // Colossal Might: each point of rage actually spent shaves cdrPerRage seconds
   // off the tracked offensive cooldowns. 0 for everyone without the capstone.
   applyRageSpendCooldownRefund(ctx, p, meta, spentRage);
@@ -1553,7 +1561,8 @@ function applyAbility(
   }
   const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
   const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
-  const payableCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const discountedCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const payableCost = shamanManaCost(ctx, p, discountedCost);
   if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;

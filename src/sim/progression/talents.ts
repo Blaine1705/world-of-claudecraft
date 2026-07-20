@@ -34,6 +34,7 @@
 
 import { stripTemporalEchoes } from '../combat/chronomancy';
 import { clearSpiritmendState } from '../combat/shaman_spiritmend';
+import { clearShamanTalentState } from '../combat/shaman_talents';
 import { clearThundercallState } from '../combat/shaman_thundercall';
 import { clearWarspiritState } from '../combat/shaman_warspirit';
 import { abilitiesKnownAt } from '../content/classes';
@@ -261,6 +262,7 @@ function commitTalentAllocation(
   if (allocationsEqual(meta.talents, sanitized)) return true;
 
   const previousSpec = meta.talents.spec;
+  if (meta.cls === 'shaman') clearShamanTalentState(ctx, player);
   meta.talents = sanitized;
   recomputeTalents(ctx, meta);
   if (previousSpec !== sanitized.spec) {

@@ -3,6 +3,13 @@
 import type { SimContext } from '../sim_context';
 import { TAUNT_FORCE_SECONDS, topThreatValue } from '../threat';
 import type { Entity } from '../types';
+import {
+  galeheartEchoMultiplier,
+  primalExaltationActive,
+  SHAMAN_TALENT_IDS,
+  shamanTalentSelected,
+  stoneboundTalentDamageReduction,
+} from './shaman_talents';
 
 export const GALEHEART_WEAPON_ID = 'galeheart_weapon';
 export const STONEBOUND_WEAPON_ID = 'rockbiter_weapon';
@@ -120,7 +127,7 @@ export function applyWarspiritPosture(
     id: STONEBOUND_DR_ID,
     name: 'Stonebound Guard',
     kind: 'buff_dr',
-    value: STONEBOUND_DAMAGE_REDUCTION,
+    value: STONEBOUND_DAMAGE_REDUCTION + stoneboundTalentDamageReduction(ctx, player),
     remaining: 300,
     duration: 300,
     sourceId: player.id,
@@ -196,19 +203,81 @@ export function advanceWarspiritCadence(
   steps: 1 | 2 = 1,
 ): boolean {
   if (!isWarspirit(ctx, player) || warspiritPosture(player) === null || target.dead) return false;
+  const cadenceTarget = primalExaltationActive(player) ? 2 : WARSPIRIT_CADENCE_STEPS;
   const total = warspiritCadence(player) + steps;
-  if (total < WARSPIRIT_CADENCE_STEPS) {
+  if (total < cadenceTarget) {
     setCadence(ctx, player, total);
     return false;
   }
-  setCadence(ctx, player, total - WARSPIRIT_CADENCE_STEPS);
+  setCadence(ctx, player, Math.min(cadenceTarget - 1, total - cadenceTarget));
   armStormcast(ctx, player);
   if (warspiritPosture(player) !== 'galeheart') return true;
-  const echoDamage = Math.max(1, Math.round(resolvedWeaponDamage * GALEHEART_ECHO_DAMAGE));
+  const echoDamage = Math.max(
+    1,
+    Math.round(resolvedWeaponDamage * GALEHEART_ECHO_DAMAGE * galeheartEchoMultiplier(ctx, player)),
+  );
   for (let echo = 0; echo < GALEHEART_ECHO_COUNT && !target.dead; echo++) {
     ctx.dealDamage(player, target, echoDamage, false, 'nature', 'Galeheart Echo', 'hit', false);
   }
+  if (shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.livingWeapon)) {
+    const nearby = ctx
+      .hostilesInRadius(player, target.pos, 8)
+      .filter((candidate) => candidate.id !== target.id && !candidate.dead)
+      .sort((left, right) => {
+        const leftDist = (left.pos.x - target.pos.x) ** 2 + (left.pos.z - target.pos.z) ** 2;
+        const rightDist = (right.pos.x - target.pos.x) ** 2 + (right.pos.z - target.pos.z) ** 2;
+        return leftDist - rightDist || left.id - right.id;
+      })
+      .slice(0, 2);
+    for (const secondary of nearby) {
+      ctx.dealDamage(
+        player,
+        secondary,
+        Math.max(1, Math.round(echoDamage * 0.5)),
+        false,
+        'nature',
+        'Living Weapon',
+        'hit',
+        false,
+      );
+    }
+  }
   return true;
+}
+
+/** Runs when Stormcast's instant component is consumed by its spell. */
+export function onStormcastConsumed(ctx: SimContext, player: Entity): void {
+  if (!isWarspirit(ctx, player)) return;
+  if (shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.deepReservoir)) {
+    setCadence(ctx, player, 1);
+  }
+  if (shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.echoingElements)) {
+    ctx.applyAura(player, {
+      id: 'shaman_echoing_elements_stormcast',
+      name: 'Echoing Elements',
+      kind: 'power_echo',
+      value: 0.4,
+      remaining: STORMCAST_DURATION,
+      duration: STORMCAST_DURATION,
+      sourceId: player.id,
+      school: 'nature',
+    });
+  }
+  if (
+    warspiritPosture(player) === 'stonebound' &&
+    shamanTalentSelected(ctx, player, SHAMAN_TALENT_IDS.livingWeapon)
+  ) {
+    ctx.applyAura(player, {
+      id: 'shaman_living_weapon_absorb',
+      name: 'Living Weapon',
+      kind: 'absorb',
+      value: Math.max(1, Math.round(player.maxHp * 0.08)),
+      remaining: 12,
+      duration: 12,
+      sourceId: player.id,
+      school: 'nature',
+    });
+  }
 }
 
 export function stoneboundThreatMultiplier(ctx: SimContext, player: Entity): number {

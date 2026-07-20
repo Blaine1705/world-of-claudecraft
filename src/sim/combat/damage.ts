@@ -66,6 +66,7 @@ import {
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
 import { clearSpiritmendCurrents } from './shaman_spiritmend';
+import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -862,7 +863,10 @@ export function dealDamage(
     const meta = ctx.players.get(target.id);
     if (meta) meta.counters.damageTaken += amount;
     // Talent procs listening for big single hits (deterministic, ICD-gated).
-    if (amount > 0 && !target.dead) onDamageTaken(ctx, target, amount);
+    if (amount > 0 && !target.dead) {
+      onDamageTaken(ctx, target, amount);
+      onShamanDamageTaken(ctx, target, amount);
+    }
     if (target.resourceType === 'rage' && source && source.id !== target.id) {
       const isWarrior = meta?.cls === 'warrior';
       const baseRage = isWarrior
@@ -1002,7 +1006,10 @@ function reflectSpellWard(
 }
 
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
-  if (e.kind === 'player') clearSpiritmendCurrents(ctx, e.id);
+  if (e.kind === 'player') {
+    clearSpiritmendCurrents(ctx, e.id);
+    clearShamanTalentState(ctx, e);
+  }
   resetProcState(e);
   e.dead = true;
   e.hp = 0;

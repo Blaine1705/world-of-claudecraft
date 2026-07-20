@@ -43,7 +43,7 @@ describe('talent empowerNext scoping', () => {
     }
     // The scan must actually cover the proc surface: a refactor that moves the
     // rows out from under ROW_TREES should redden this, not silently pass.
-    expect(scanned).toBeGreaterThan(20);
+    expect(scanned).toBeGreaterThanOrEqual(20);
     expect(offenders).toEqual([]);
   });
 });

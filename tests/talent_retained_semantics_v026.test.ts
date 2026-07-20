@@ -118,17 +118,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     );
 
     const recall = rowOption('shaman', 'sha_r20_elemental_fury');
-    expect(recall.name).toBe('Storm Recall');
-    expect(recall.effect.proc).toEqual({
-      id: 'sha_storm_recall',
-      name: 'Storm Recall',
-      school: 'nature',
-      trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
-      responses: [
-        { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 'reset' },
-        { kind: 'empowerNext', aura: 'next_cast_free', abilities: ['earth_shock'], duration: 8 },
-      ],
-    });
+    expect(recall.name).toBe('Echoing Elements');
+    expect(recall.effect.proc).toBeUndefined();
+    expect(recall.effect.runtime).toEqual({ echoPercent: 40, damageDelay: 1, healingDelay: 2 });
     const bolt = resolved('shaman', 'lightning_bolt', { 20: 'sha_r20_elemental_fury' });
     const jolt = resolved('shaman', 'earth_shock', { 20: 'sha_r20_elemental_fury' });
     expect(effect(bolt, 'directDamage')).toEqual(
@@ -139,8 +131,10 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     );
 
     const skyEcho = rowOption('shaman', 'sha_r11_elemental_attunement');
-    expect(skyEcho.name).toBe('Sky Echo');
-    expect(skyEcho.effect.proc?.name).toBe('Sky Echo');
+    expect(skyEcho.name).toBe('Rime Lock');
+    expect(skyEcho.effect.ability).toEqual([
+      { ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] },
+    ]);
 
     const bruin = rowOption('druid', 'dru_r8_brutal_bash');
     expect(bruin.name).toBe('Bruin Rebound');
@@ -366,39 +360,36 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   it.each([
     ['paladin', 17, 'pal_r17_ardent_defender', 180],
     ['rogue', 17, 'rog_r17_cheat_death', 120],
-  ] as const)(
-    '%s cheat death saves once, honors its %d-row ICD, and rearms deterministically',
-    (cls, level, optionId, icd) => {
-      const selectedSim = () => {
-        const sim = harness(new Sim({ seed: 2615, playerClass: cls, autoEquip: false }));
-        sim.setPlayerLevel(20);
-        expect(sim.selectTalentRow(level, optionId)).toBe(true);
-        return sim;
-      };
-      const sim = selectedSim();
-      const player = sim.player;
-      player.hp = 100;
+  ] as const)('%s cheat death saves once, honors its %d-row ICD, and rearms deterministically', (cls, level, optionId, icd) => {
+    const selectedSim = () => {
+      const sim = harness(new Sim({ seed: 2615, playerClass: cls, autoEquip: false }));
+      sim.setPlayerLevel(20);
+      expect(sim.selectTalentRow(level, optionId)).toBe(true);
+      return sim;
+    };
+    const sim = selectedSim();
+    const player = sim.player;
+    player.hp = 100;
 
-      dealDamage(sim.ctx, null, player, 200, false, 'physical', 'Lethal Hit', 'hit');
-      expect(player.hp).toBe(1);
-      expect(player.dead).toBe(false);
-      expect(player.procState?.icds.cheat_death).toBe(icd);
+    dealDamage(sim.ctx, null, player, 200, false, 'physical', 'Lethal Hit', 'hit');
+    expect(player.hp).toBe(1);
+    expect(player.dead).toBe(false);
+    expect(player.procState?.icds.cheat_death).toBe(icd);
 
-      player.hp = 100;
-      dealDamage(sim.ctx, null, player, 200, false, 'physical', 'Lethal Hit', 'hit');
-      expect(player.hp).toBe(0);
-      expect(player.dead).toBe(true);
+    player.hp = 100;
+    dealDamage(sim.ctx, null, player, 200, false, 'physical', 'Lethal Hit', 'hit');
+    expect(player.hp).toBe(0);
+    expect(player.dead).toBe(true);
 
-      const rearmed = selectedSim();
-      rearmed.player.hp = 100;
-      dealDamage(rearmed.ctx, null, rearmed.player, 200, false, 'physical', 'Lethal Hit', 'hit');
-      tickProcState(rearmed.player, icd);
-      rearmed.player.hp = 100;
-      dealDamage(rearmed.ctx, null, rearmed.player, 200, false, 'physical', 'Lethal Hit', 'hit');
-      expect(rearmed.player.hp).toBe(1);
-      expect(rearmed.player.procState?.icds.cheat_death).toBe(icd);
-    },
-  );
+    const rearmed = selectedSim();
+    rearmed.player.hp = 100;
+    dealDamage(rearmed.ctx, null, rearmed.player, 200, false, 'physical', 'Lethal Hit', 'hit');
+    tickProcState(rearmed.player, icd);
+    rearmed.player.hp = 100;
+    dealDamage(rearmed.ctx, null, rearmed.player, 200, false, 'physical', 'Lethal Hit', 'hit');
+    expect(rearmed.player.hp).toBe(1);
+    expect(rearmed.player.procState?.icds.cheat_death).toBe(icd);
+  });
 
   it('does not grant cheat death without the selected row', () => {
     const sim = harness(new Sim({ seed: 2616, playerClass: 'rogue', autoEquip: false }));

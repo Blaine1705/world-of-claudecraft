@@ -5166,6 +5166,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball': '주력 화염 공격기로, 타격을 입히고 대상을 계속 불태웁니다.',
   'guide.abilityHook.fireball_form': '살아 있는 화염구로 변해 탁 트인 지형을 빠르게 가로지릅니다.',
   'guide.abilityHook.flame_shock': '즉시 타격을 입히고 시간이 지나며 계속 불태우는 점화기입니다.',
+  'guide.abilityHook.galeheart_weapon':
+    '쌍수 무기에 폭풍의 바람을 불어넣어 안정적인 공격 리듬을 보상합니다.',
+  'guide.abilityHook.lifespring_weapon':
+    '무기에 치유의 물을 불어넣어 이어지는 회복 흐름을 강화합니다.',
+  'guide.abilityHook.tidecall': '파도를 불러 다음에 이어지는 회복 주문들을 강화합니다.',
+  'guide.abilityHook.stoneward': '충전된 돌 방패를 세워 받는 피해를 회복으로 바꿉니다.',
+  'guide.abilityHook.primal_exaltation': '전문화에 맞는 원소의 힘을 짧은 시간 폭발시킵니다.',
   'guide.abilityHook.frost_armor': '전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.',
   'guide.abilityHook.frostbolt':
     '원거리에서 타격하며 대상의 이동 속도를 늦춰 다가오지 못하게 합니다.',

@@ -56,6 +56,7 @@ import { baseSwingSpeed, rangedAutoProfile } from './form_swing';
 import { isTravelFormAuraKind } from './forms';
 import { rangedShotProfile } from './ranged_shot';
 import { advanceWarspiritCadence, stoneboundThreatMultiplier } from './shaman_warspirit';
+import { triggerWardCycle } from './shaman_talents';
 import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
 import { warriorMeleeDefense } from './warrior_hit_table';
@@ -491,6 +492,7 @@ export function meleeSwing(
     if (abilityName === null) advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 1);
     else if (abilityName === 'Ancestral Strike') {
       advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 2);
+      triggerWardCycle(ctx, attacker);
     }
     onMeleeSwing(ctx, attacker);
   }

@@ -5881,6 +5881,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Dein wichtigster Feuerzauber, landet einen Treffer und lässt das Ziel brennen.',
   'guide.abilityHook.flame_shock':
     'Ein sofortiger Brand, der zu Beginn trifft und mit der Zeit weiter versengt.',
+  'guide.abilityHook.galeheart_weapon':
+    'Erfüllt beide Waffen mit Sturmwind und belohnt einen gleichmäßigen Angriffsrhythmus.',
+  'guide.abilityHook.lifespring_weapon':
+    'Erfüllt deine Waffe mit heilendem Wasser und verstärkt deinen anhaltenden Heilfluss.',
+  'guide.abilityHook.tidecall':
+    'Ruft die Gezeiten und verstärkt die nächste Folge von Heilzaubern.',
+  'guide.abilityHook.stoneward':
+    'Errichtet einen geladenen Steinschild, der erlittenen Schaden in Heilung verwandelt.',
+  'guide.abilityHook.primal_exaltation':
+    'Entfesselt kurzzeitig die Elementarkraft deiner Spezialisierung.',
   'guide.abilityHook.frost_armor':
     'Eine anhaltende Selbststärkung, die deine Rüstung vor einem Kampf härtet.',
   'guide.abilityHook.frostbolt':
