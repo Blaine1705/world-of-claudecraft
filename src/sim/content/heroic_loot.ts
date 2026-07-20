@@ -480,6 +480,16 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
 // Heroic-only drop tables per final boss, TWO rollGroups each (chances inside a
 // group sum to 1.0, so exactly one item drops per group => two heroic epics per
 // heroic kill). loot_roll.ts rolls these only for a heroic-claimed instance.
+// Heroic mount drop rates per rarity tier. These are APPENDED after all gear
+// roll-group draws so the gear draw-order stays byte-identical to non-mount runs.
+// Green (common) mounts: 0.5% per heroic clear on their single boss.
+const HEROIC_GREEN_MOUNT_CHANCE = 0.005;
+// Blue (rare) mounts: 0.6% per heroic clear on their single boss; 0.1% on the
+// Nythraxis heroic raid (the raid adds both blues so every heroic-raider has a
+// path to each, spread across the same boss since the raid has one final boss).
+const HEROIC_BLUE_MOUNT_CHANCE = 0.006;
+const HEROIC_RAID_BLUE_MOUNT_CHANCE = 0.001;
+
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   morthen: [
     { itemId: 'morthens_cryptforged_hauberk', chance: 0.34, rollGroup: 'morthen_heroic' },
@@ -488,6 +498,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'cryptplate_helm', chance: 0.34, rollGroup: 'morthen_heroic2' },
     { itemId: 'shadowpulse_slippers', chance: 0.33, rollGroup: 'morthen_heroic2' },
     { itemId: 'bonechill_cord', chance: 0.33, rollGroup: 'morthen_heroic2' },
+    // Green mount: heroic-gated only; the normal table entry was retired.
+    { itemId: 'reins_grag_bear', chance: HEROIC_GREEN_MOUNT_CHANCE },
   ],
   vael_the_mistcaller: [
     { itemId: 'mistcallers_fang', chance: 0.34, rollGroup: 'vael_heroic' },
@@ -496,6 +508,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'mistforged_pauldrons', chance: 0.34, rollGroup: 'vael_heroic2' },
     { itemId: 'tideguard_faceguard', chance: 0.33, rollGroup: 'vael_heroic2' },
     { itemId: 'sunken_court_mantle', chance: 0.33, rollGroup: 'vael_heroic2' },
+    // Green mount: heroic-gated only; the normal table entry was retired.
+    { itemId: 'reins_stalkglider_snail', chance: HEROIC_GREEN_MOUNT_CHANCE },
   ],
   ysolei: [
     { itemId: 'lunar_tide_greatstaff', chance: 0.34, rollGroup: 'ysolei_heroic' },
@@ -504,6 +518,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'lunar_choir_leggings', chance: 0.34, rollGroup: 'ysolei_heroic2' },
     { itemId: 'choir_blessed_spaulders', chance: 0.33, rollGroup: 'ysolei_heroic2' },
     { itemId: 'tideworn_warboots', chance: 0.33, rollGroup: 'ysolei_heroic2' },
+    // Blue mount: heroic-gated only; the normal table entry was retired.
+    { itemId: 'reins_aether_hover_cycle', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
   korzul_the_gravewyrm: [
     { itemId: 'gravewyrm_cleaver', chance: 0.34, rollGroup: 'korzul_heroic' },
@@ -512,6 +528,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'gravewyrm_claws', chance: 0.34, rollGroup: 'korzul_heroic2' },
     { itemId: 'gravescale_girdle', chance: 0.33, rollGroup: 'korzul_heroic2' },
     { itemId: 'wyrmchoir_handwraps', chance: 0.33, rollGroup: 'korzul_heroic2' },
+    // Blue mount: heroic-gated only; the normal table entry was retired.
+    { itemId: 'reins_shadowjump_toad', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
   nythraxis_scourge_of_thornpeak: [
     // The heroic set pieces and legendaries come free from the heroic loot swap:
@@ -519,7 +537,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // raid-tier (item level 33/37) heroic variants in a heroic claim
     // (loot/loot_roll.ts + heroic_variants.ts). This table adds only the
     // heroic-ONLY extras the normal table never carries: the three bespoke raid
-    // weapons, one of which drops per heroic kill (chances sum to 1.0).
+    // weapons, one of which drops per heroic kill (chances sum to 1.0), plus the
+    // blue mount secondary paths (lower rate than the five-mans, raid bonus path).
     { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic_weapon' },
     {
       itemId: 'scepter_of_the_deathless_court',
@@ -527,5 +546,9 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       rollGroup: 'nythraxis_heroic_weapon',
     },
     { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic_weapon' },
+    // Blue mount secondary paths on the heroic raid (0.1% each); the primary
+    // path for each is its five-man heroic boss. Epic mounts are rift S-only.
+    { itemId: 'reins_aether_hover_cycle', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
+    { itemId: 'reins_shadowjump_toad', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
   ],
 };

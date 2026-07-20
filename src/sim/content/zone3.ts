@@ -970,10 +970,6 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'nighttalon_waistband', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
       { itemId: 'soulflame_cord', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
       { itemId: 'stormcallers_waistguard', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
-      // Collectible mount (the world-boss chase drop): a rare independent draw,
-      // never in a roll group, so it bypasses the one-gear cap and rolls once
-      // per contributor per daily lockout (rollWorldBossLoot).
-      { itemId: 'reins_thunderstrut_gobbler', chance: 0.003 },
     ],
     scale: 8, // a large, imposing world boss that reads on the skyline without being mountain-sized. Visual scale is DECOUPLED from combat reach: his melee is pinned to a ~17yd (scale-5) body in combatProfileForMob (mob_combat.ts), so his move speed and the Howling Gale snare, not a giant swing, are what keep him unkitable.
     color: 0x7d8a99,
