@@ -1754,7 +1754,7 @@
       "tick": 43,
       "time": 2.15,
       "nextId": 690,
-      "state": "dcc3a5e2",
+      "state": "f529c81c",
       "events": "1a38dfa7",
       "rng": {
         "draws": 24,
@@ -2235,13 +2235,14 @@
               "sourceId": 677
             },
             {
-              "duration": 21.5,
+              "duration": 26,
               "id": "nythraxis_transition_stun",
               "kind": "stun",
               "name": "Shuddering Stomp",
-              "remaining": 21.5,
+              "remaining": 26,
               "school": "physical",
-              "sourceId": 682
+              "sourceId": 682,
+              "unbreakableControl": true
             }
           ],
           "blockChance": 0.05,
@@ -2298,13 +2299,14 @@
           "attackPower": 10,
           "auras": [
             {
-              "duration": 21.5,
+              "duration": 26,
               "id": "nythraxis_transition_stun",
               "kind": "stun",
               "name": "Shuddering Stomp",
-              "remaining": 21.5,
+              "remaining": 26,
               "school": "physical",
-              "sourceId": 682
+              "sourceId": 682,
+              "unbreakableControl": true
             }
           ],
           "combatTimer": 101.15,
@@ -2357,13 +2359,14 @@
           "attackPower": 10,
           "auras": [
             {
-              "duration": 21.5,
+              "duration": 26,
               "id": "nythraxis_transition_stun",
               "kind": "stun",
               "name": "Shuddering Stomp",
-              "remaining": 21.5,
+              "remaining": 26,
               "school": "physical",
-              "sourceId": 682
+              "sourceId": 682,
+              "unbreakableControl": true
             }
           ],
           "combatTimer": 101.15,
@@ -2416,13 +2419,14 @@
           "attackPower": 10,
           "auras": [
             {
-              "duration": 21.5,
+              "duration": 26,
               "id": "nythraxis_transition_stun",
               "kind": "stun",
               "name": "Shuddering Stomp",
-              "remaining": 21.5,
+              "remaining": 26,
               "school": "physical",
-              "sourceId": 682
+              "sourceId": 682,
+              "unbreakableControl": true
             }
           ],
           "combatTimer": 101.15,
@@ -2475,13 +2479,14 @@
           "attackPower": 10,
           "auras": [
             {
-              "duration": 21.5,
+              "duration": 26,
               "id": "nythraxis_transition_stun",
               "kind": "stun",
               "name": "Shuddering Stomp",
-              "remaining": 21.5,
+              "remaining": 26,
               "school": "physical",
-              "sourceId": 682
+              "sourceId": 682,
+              "unbreakableControl": true
             }
           ],
           "combatTimer": 101.15,
@@ -2534,11 +2539,11 @@
           "aiState": "attack",
           "auras": [
             {
-              "duration": 21.5,
+              "duration": 26,
               "id": "nythraxis_transition_pause",
               "kind": "stun",
               "name": "Shuddering Stomp",
-              "remaining": 21.45,
+              "remaining": 25.95,
               "school": "physical",
               "sourceId": 682
             }
@@ -2757,13 +2762,14 @@
           "aiState": "chase",
           "auras": [
             {
-              "duration": 21.5,
+              "duration": 26,
               "id": "nythraxis_transition_stun",
               "kind": "stun",
               "name": "Shuddering Stomp",
-              "remaining": 21.45,
+              "remaining": 25.95,
               "school": "physical",
-              "sourceId": 682
+              "sourceId": 682,
+              "unbreakableControl": true
             }
           ],
           "combatTimer": 99.1,
@@ -2819,13 +2825,14 @@
           "aiState": "chase",
           "auras": [
             {
-              "duration": 21.5,
+              "duration": 26,
               "id": "nythraxis_transition_stun",
               "kind": "stun",
               "name": "Shuddering Stomp",
-              "remaining": 21.45,
+              "remaining": 25.95,
               "school": "physical",
-              "sourceId": 682
+              "sourceId": 682,
+              "unbreakableControl": true
             }
           ],
           "combatTimer": 99.1,
@@ -2920,7 +2927,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 690,
-      "state": "41abda12",
+      "state": "16631c0f",
       "events": "741638a5",
       "rng": {
         "draws": 62,
@@ -2931,7 +2938,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 690,
-      "state": "ee922858",
+      "state": "1a889689",
       "events": "741638a5",
       "rng": {
         "draws": 122,

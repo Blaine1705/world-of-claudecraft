@@ -204,7 +204,9 @@ export type {
   VcMatchInfo,
   VcPhase,
   VcRosterPlayer,
+  VcSharedCupInfo,
   VcStanding,
+  VcViewerReadout,
 } from './world_api/vale_cup';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,

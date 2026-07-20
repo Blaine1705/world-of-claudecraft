@@ -24,17 +24,21 @@ Update this file at the end of every implementation and QA session. Statuses:
 | 8 | Stations and masters (sim and server) | complete | 2026-07-19 | 2026-07-19 |
 | 8 QA | Verify stations and masters | complete | 2026-07-19 | 2026-07-19 |
 | 9 | Station presence and recipe training | complete | 2026-07-19 | 2026-07-19 |
-| 9 QA | Verify station presence and training | not started | | |
-| 10 | Recipe ladders and materials content | not started | | |
-| 10 QA | Verify recipe ladders and materials | not started | | |
-| 11 | Fishing joins the framework | not started | | |
-| 11 QA | Verify fishing framework | not started | | |
+| 9 QA | Verify station presence and training | complete | 2026-07-19 | 2026-07-19 |
+| 10 | Recipe ladders and materials content | complete | 2026-07-19 | 2026-07-19 |
+| 10 QA | Verify recipe ladders and materials | complete | 2026-07-19 | 2026-07-19 |
+| 11 | Fishing joins the framework | complete (PR #2197 merged into release/v0.29.0) | 2026-07-20 | 2026-07-20 |
+| 11 QA | Verify fishing framework | complete (PR #2199 merged) | 2026-07-20 | 2026-07-20 |
 | 12 | Base tool tier gating | not started | | |
 | 12 QA | Verify tool tier gating | not started | | |
+| 12b | Gathering rhythm | not started | | |
+| 12b QA | Verify gathering rhythm | not started | | |
 | 13 | Enchanting reachable | not started | | |
 | 13 QA | Verify enchanting reachable | not started | | |
 | 14 | Attunement quests and nudges | not started | | |
 | 14 QA | Verify attunement quests and nudges | not started | | |
+| 14b | Commissions and the Maker's Bond | not started | | |
+| 14b QA | Verify commissions and the Maker's Bond | not started | | |
 | 15 | Deeds, tuning, and polish | not started | | |
 | 15 QA | Final integration QA and packet teardown | not started | | |
 
@@ -357,24 +361,96 @@ CLAUDE.md.
 - [x] Hands-vs-stations split confirmed live (landed in Phase 8; the `FIELD_RECIPES` OPEN item resolves as the default: the nine commons stay field-craftable, recorded in state.md)
 
 ### Phase 10: Recipe ladders and materials content
-- [ ] Tier ladders for all six deep crafts (common through rare at minimum) with material families
-- [ ] Cloth sourcing: humanoid components + plant fiber; corpse component quest-item collision ended
-- [ ] Economy invariant test pinned: no recipe vendors for more than its inputs
-- [ ] Cross-tier composition; combat-worthy consumables at every cooking/alchemy tier; materialTierBonus wired; the perfect specimen
-- [ ] Wiki content regenerated; recipe data feeds the guide
+- [x] Tier ladders for all six deep crafts (common through rare at minimum) with material families (`LADDER_RECIPES` in `src/sim/content/recipes.ts`: 54 trainer recipes, 9 per craft, 3 per rung at skillReq 0/25/50; outputs and materials in the new `src/sim/content/profession_items.ts`; no epic rung, per the locked wave-one ladder)
+- [x] Cloth sourcing: humanoid components + plant fiber; corpse component quest-item collision ended (`homespun_cloth` via the new cloth componentTag on humanoids, the herb ladder serves as plant fiber; `HARVEST_COMPONENT_ITEMS` remapped to dedicated materials, quest items keep their questId-gated kill-loot roles, regression suite `tests/harvest_component_materials.test.ts`)
+- [x] Economy invariant test pinned: no recipe vendors for more than its inputs (`tests/recipe_economy.test.ts`, strict less-than over every recipe in ALL_RECIPES with vendor reagents priced at purchase price; 14 pre-Phase-10 violators ride the frozen `LEGACY_GOLD_POSITIVE_RECIPE_IDS` exception list, a Phase 15 burn-down target pinned three ways)
+- [x] Cross-tier composition; combat-worthy consumables at every cooking/alchemy tier; materialTierBonus wired; the perfect specimen (every rung-50 recipe consumes a lower-band material, pinned; food/potion/elixir outputs at every rung inside the existing power curves; `src/sim/professions/material_tier.ts` at 0.01 per tier, max-tier rule, tier-0 contributes exactly 0 so parity goldens are unchanged; `pristine_hide`/`pristine_silk`/`pristine_venom_gland`/`prime_cut` granted signed at rare+ on the existing corpse rarity roll)
+- [x] Wiki content regenerated; recipe data feeds the guide (regenerates clean with zero diff; the generator does not yet enumerate recipe records, so the guide skeleton is unchanged, and the professions guide rewrite stays the Phase 15 deliverable)
 
 ### Phase 11: Fishing joins the framework
-- [ ] Fishing proficiency (additive, framework-integrated) while the minigame stays as-is
-- [ ] Catch rarity ladder feeds cooking tiers; rare catch integrates (deed intact)
+- [x] Fishing proficiency (additive, framework-integrated) while the minigame stays as-is (the
+  fishing row joins `GATHERING_PROFESSIONS` appended last; one point per landed catch, junk
+  included, through the shared `queueGatheringGrant` queue; no-bite, bags-full, and the
+  codfather quest branch never accrue; the minigame's guards, fixed 5 s cast, emitted strings,
+  and single table draw are untouched; the fishing block extracted move-not-rewrite into
+  `src/sim/professions/fishing.ts` behind SimContext, sim.ts shed 111 lines, parity goldens
+  byte-identical)
+- [x] Catch rarity ladder feeds cooking tiers; rare catch integrates (deed intact)
+  (`FISHING_TABLES_BY_BAND`, bands at proficiency 0/100/200 via `fishingBandFor`, pure state
+  ahead of the unchanged single rng draw; higher bands shift weight out of junk and empty-hook
+  rows into the six cooking fish; glimmerfin weight deliberately flat in every band and
+  `col_glimmerfin` plus the per-zone fish marks untouched; band 0 is the shipped table object
+  byte for byte, pinned by literal seed sequences in `tests/professions_fishing.test.ts`)
+
+Phase 11 notes (2026-07-20): phase start 09e943669 (the release/v0.28.0 "prepare v0.28.0"
+tip; QA diffs 09e943669..the PR head, first-parent across the 83b929398 release sync). Built
+as DRAFT PR #2197 while v0.28.0 shipped; after the cut, release/v0.29.0 (623b10aee) was
+merged in (sync commit 83b929398, release-merge-audit clean: three incoming commits, the
+Discord invite-rotation revert only, zero overlap with the phase diff) and the PR retargeted
+to release/v0.29.0. Phase 11 QA runs after the maintainer merges it. Decisions: catch feedback landed as the text-free personal
+`fishingResult` SimEvent (gatherResult family) rendered as `hudChrome.gathering.catchLine`
+colored by ItemDef quality with no second cue; the packet OPEN item resolved as fold-in (no
+separate skill id, gprof unchanged, ALL_DELTA_KEYS stays 49). Deferrals: the
+guide.professions gather prose still says "Three gathering trades" (the Phase 15 guide
+rewrite owns the reword; touching reviewed prose trips the full-gate i18n
+semantic-regression pins); a live chat catch-line screenshot was skipped (the two window
+surfaces are covered before/after). QA probe-first: the extraction commit 62ee26ec8
+move-not-rewrite, band-1 liveness at proficiency 150, and the live GameServer gprof round
+trip suite.
+
+Phase 11 QA (2026-07-20): PASS with fixes, zero blocking. Verified off the merge
+15c9794db9 into release/v0.29.0 (QA diff = the PR #2197 commits first-parent across the
+83b929398 sync, whose only cargo was the Discord invite-rotation revert). Method:
+validation matrix green at the untouched tip first (the matrix suites plus tests/parity,
+925 tests, tsc clean), one Explore context load, then an adversarial-verify Workflow (3
+packet audits + the 5 dispatch-matrix reviewers; every nontrivial finding retried by two
+independent skeptics under distinct lenses; all audits delivered structured output first
+try) plus a correctness probe suite run and deleted in-tree (band boundaries live at
+99/100/199/200, startFishing deny arms, codfather full-bags, col_glimmerfin off a real
+fished koi, nonzero persistence round trips). The extraction stopping rule never
+triggered: move-not-rewrite confirmed at line level, draw order and observable behavior
+unchanged, the two sanctioned additions (fishingResult emit, grant queue) draw-free after
+the single roll. The one guard regression found and fixed: the S3 drift guard's scan list
+was not extended to src/sim/professions/fishing.ts, so the three relocated literals whose
+only emitters now live there (no-bite, rare catch, face-fishable-water) had silently lost
+reword-drift protection (matchers unchanged, zero runtime impact; the guard now reds on a
+reword, mutation-verified). Coverage closed test-first, each pin mutation-verified: the
+band-2 top-band liveness literal (B2_SEQ_4242, diverging from the band-1 walk exactly
+where band 2 lands the koi and band 1 an empty hook), the codfather over-capacity
+force-add (the quest soft-lock defense), col_glimmerfin on the fished path, the
+startFishing deny arms plus the fixed 5 s zero-draw cast start, negative band input, the
+NONZERO fishing persistence round trip (every prior fixture carried fishing 0), and the
+ACCEPTED rollback caveat pin (a stripped-key reload re-zeroes fishing only, the other
+three professions survive). Cleanup: the data.ts FISHING_RARE_ID / FISHING_TABLES
+re-export arm, left consumer-less by the extraction, dropped. Deferred with reasons: a
+char_window DOM-level gathering test (the undefined-key skip arm is unreachable by
+construction: rows come from the fixed client-side GATHERING_PROFESSION_IDS list, and the
+label-map tripwire plus the wheel-window DOM pins cover the reachable arm), a
+vale-fallback cast test (unreachable via zoneAt: ZONES is exactly the three tabled zones,
+clamped at the strip ends), the SWIM_DEPTH deep-water alias now at four copies
+(extraction chore candidate, drift note in state.md), gathering accrual past maxSkill
+(pre-existing semantics shared with node harvests across all four professions; the wheel
+UI clamps via the Phase 5 above-cap saturation pin), and the catchLine unknown-item
+fallback arm (defensive, unreachable today).
 
 ### Phase 12: Base tool tier gating
 - [ ] Nodes carry tiers; tool tier + skill gate node and corpse-material access
 - [ ] The 15 existing tools change outcomes; stale no-op test pin replaced
 - [ ] Tool effects remain parked (explicitly out of scope)
 
+### Phase 12b: Gathering rhythm
+- [ ] Gather cast (tool-tier and band scaled, floored); completion re-validates; move cancels free
+- [ ] The shared non-spell-cast predicate consolidates the eleven cast-id exemption sites
+- [ ] Fishing bite minigame: hidden seeded delay, private bite SimEvent, server-authoritative reaction window, reel via pole re-press, miss costs nothing
+- [ ] Rod synergy: shorter average delay, wider window (composes with Phase 12 bands)
+- [ ] Placeholder cues routed and PLACEHOLDER-marked (sfx:check green, listed on #2208)
+- [ ] Every Pin-cost appendix row executed as briefed; no unlisted pin weakened
+
 ### Phase 13: Enchanting reachable
 - [ ] Disenchant + enchant-apply + salvage on IWorld, wire commands, bags context UI, both hosts
 - [ ] Enchanting skill visible in the wheel window
+- [ ] Typed disenchant reagents (hybrid): rare+ adds the type-keyed secondary; every typed material has a same-phase consumer (the wolf_fang rule); staves/wands bucket flagged
+- [ ] Bind-on-trade primitive live against the typed rare+ reagents (generic enforcement arm for Phase 14b)
 
 ### Phase 14: Attunement quests and nudges
 - [ ] Acceptance lore quests at the masters for all four wave-one archetypes
@@ -382,16 +458,41 @@ CLAUDE.md.
 - [ ] Trend nudges (chat first, Guild letter voice); attunement summary explains everything before commit
 - [ ] Work-order quests per master (cadence-capped) and one-shot-per-tier master mail
 - [ ] Title celebration on attunement
+- [ ] The crafting-window "learnable at a master" hint (shown exactly when unlearned trainer recipes exist, via the shared viewer predicates)
+
+### Phase 14b: Commissions and the Maker's Bond
+- [ ] Commission opt-in at craft; the marker rides the instance in both hosts
+- [ ] First trade stamps boundTo; onward trades refused beside the def-level soulbound gate, localized deny id
+- [ ] Master unbind service: resolved fee, replay-safe, signer and masterwork markers survive
+- [ ] The three flagged maintainer decisions implemented exactly as resolved in state.md
+- [ ] Mail/market face-to-face construction pinned against the new marker
 
 ### Phase 15: Deeds, tuning, and polish
-- [ ] Universal profession deeds incl. titles + marquee renown on first attunement and first masterwork, the Specialist deed, and the rare-find deeds (plus the rare fish, verified)
-- [ ] Economy tuning targets applied (#1301 fee/throttle, training fees, teach tiers, work orders, masterwork bounds); faucet-vs-sink review recorded
+- [ ] Universal profession deeds incl. titles + marquee renown on first attunement and first masterwork, the Specialist deed, and the rare-find deeds (plus the rare fish, verified to celebrate through the Phase 12b bite moment)
+- [ ] Economy tuning targets applied (#1301 fee/throttle, training fees, teach tiers, work orders, masterwork bounds, unbind fee); faucet-vs-sink review recorded
+- [ ] Legacy junk-recipe burn-down dispositioned, cross-checked against the typed-reagent consumers first
+- [ ] Profession SFX completion sweep over #2208: placeholders replaced or explicitly re-filed, station ambiences, per-craft success variants
 - [ ] Guide/wiki professions page rewritten; asset manifest final
 - [ ] Whole-feature qa-checklist.md matrix green; packet teardown offered
 
 ## Notes
 
 (append per-phase notes, deferrals, and surprises here as sessions complete)
+
+2026-07-20 timing and economy amendments: a second maintainer-approved
+amendment pass (community feedback on gathering feel and the crafted-goods
+economy) restructured the remaining packet to 12, 12b, 13, 14, 14b, 15.
+state.md records the rulings under "2026-07-20 timing and economy
+amendments" (the authority block); the new phase files
+(phase-12b-gathering-rhythm.md, phase-14b-commissions-binding.md, both
+with QA twins) and the amended Phase 12/13/14/15 files (each swept with
+its QA twin in the same pass) carry the deliverable wording. Epic #1866
+gained sub-issues #2206 (12b), #2207 (14b, linking #1298), and #2208 (the
+profession SFX help-wanted list); #2051 and #2053 closed against their
+landing PRs in the same sweep. The Phase 12b file introduces the Pin-cost
+appendix pattern: the phase pre-briefs its complete deliberate re-pin and
+golden-regen list, inventoried against the release/v0.29.0 tree, so QA
+audits appendix fidelity instead of discovering the blast radius.
 
 2026-07-17 design-review amendments: a maintainer design review (the
 response to the external Codex review) amended the packet between Phases 2
@@ -791,3 +892,67 @@ E2E not re-run, the Phase 8-precedent deferral). Its remaining INFO,
 a dedicated train_recipe rate limit, stays optional: the command is
 idempotent (already-known denies without charging) and the global
 command cadence limiter applies.
+
+Phase 10 (2026-07-19): recipe ladders and materials content, built as
+an ultracode Workflow off phase-start 720efc89f (the Phase 9 QA merge;
+the QA diff is the PR's commits off that tip). Orchestration: two
+parallel writer agents (materials/collision/specimen, and the
+materialTierBonus wiring) with disjoint file ownership, then six
+parallel craft designers returning structured ladders to scratchpad
+JSON, folded in by three sequential integration passes (one commit per
+craft pair) and a dedicated economy-test writer, with the validation
+matrix run green at the tip before the review fan-out. Quest credit
+was verified BEFORE the harvest remap landed: all three collect quests
+(q_boars, q_spiders, q_widows) have questId-gated kill-loot drops on
+their own mobs, so no quest lost its source. Key as-landed calls, all
+swept into both phase-10 files: the economy invariant carries a frozen
+14-member legacy exception list (8 commons, the 3 caster-hub rows, the
+3 combos; measured, pinned three ways, Phase 15 burn-down) because
+fixing the legacy sellValues would break the prime directive inside a
+content phase; the perfect specimen grants IN ADDITION to the plain
+component at rare+ (specimen-less families keep the old signed-regular
+behavior); every new recipe including the skillReq-0 rungs is
+station-bound and trainer-taught (coexists with the grandfathered
+field commons); materialTierBonus keys off def-level material tier
+bands, not consumed-instance rarity (instances do not report which
+copy was consumed); the six raw fish already existed so no fish
+ItemDefs were authored; no new deeds (recipes and materials are not
+conquerable content per docs/design/deeds.md). Deferred with reasons:
+guide recipe enumeration (Phase 15 professions guide rewrite), the
+recipeForResultItem reverse-lookup gap for non-common tables
+(pre-existing), a single shared battle-elixir aura slot (maintainer
+call; per-item power stays capped at the bear's 12), and the legacy
+gold-positive burn-down (Phase 15).
+
+Phase 10 QA (2026-07-19): PASS with fixes, zero blocking. Verified off
+the merge af7ac3d8b (QA diff 720efc89f..ad2bbbe92; the merge's first
+parent 8564d1ee2 was concurrent release movement with zero file
+overlap, verified). Method: validation matrix green at the untouched
+tip first (19 suites incl. the five item-content convention suites,
+727 tests, wiki:content zero diff), four live played beats (train with
+the full deny ladder and exact fees, station-bound craft end to end,
+rare+ specimen dual grant with zero quest-item leakage across 400
+seeds, mid-objective q_boars save-compat with a working turn-in, and
+the materialTierBonus 10000-craft odds decisively above the no-bonus
+model), economy-invariant mutation checks (both arms bite), then a
+25-agent adversarial-verify Workflow (3 packet audits + the 4
+dispatch-matrix reviewers, every finding retried by an independent
+skeptic: 14 confirmed, 4 dissolved). The one real sim defect: a corpse
+with two specimen families could overflow the bag (the jackpot stole a
+later family's reserved plain slot); fixed test-first by granting all
+plain yields before any signed instance, draw order untouched. Also
+landed: the ladder execution suite (all 54 recipes craft end to end,
+specimen consumers, real train rungs, elixir def pins + live use path,
+silkspun_satchel capacity), the HARVEST_COMPONENT_SPECIMENS literal
+pin plus all-family behavior arms, the train_view locked-row literal
+re-pin (formula tautology), item_icons BAG_IDS sixth bag, the stale
+TOOL_RECIPE_STUBS sweep, and an itemFallback potion/elixir flask
+branch (the eleven new consumables rendered junk-trinket icons).
+Deferred with reasons (drift notes in state.md): wolf_fang consumer
+(the one demand-rule outlier, Phase 15), recipeForResultItem widening
+(a live gameplay switch for the dormant battlefield-XP trickle,
+maintainer call), shared battle-elixir exclusivity (maintainer call,
+re-confirmed), cooking rungs are sit-heal food only (maintainer
+glance), and the retro CI reds on the release push (Release gate
+locale shards + version gate) are the branch-wide mid-cycle state,
+identical on the pre-phase push, with the Browser job green.

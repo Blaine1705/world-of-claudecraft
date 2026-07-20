@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 681,
-      "state": "1ed94d9d",
+      "state": "21b15153",
       "events": "e326d499",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 681,
-      "state": "8187c8b0",
+      "state": "5956e05e",
       "events": "6767a77c",
       "rng": {
         "draws": 54,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 681,
-      "state": "023a4a1a",
+      "state": "6f5f2ae8",
       "events": "09f0574c",
       "rng": {
         "draws": 223,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 681,
-      "state": "373d5935",
+      "state": "d05ac05f",
       "events": "9d4cb0c8",
       "rng": {
         "draws": 436,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 681,
-      "state": "112b9830",
+      "state": "6713d832",
       "events": "4fa61281",
       "rng": {
         "draws": 698,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 681,
-      "state": "b3ea1167",
+      "state": "2ccf4401",
       "events": "741638a5",
       "rng": {
         "draws": 950,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 681,
-      "state": "ea815b78",
+      "state": "531ca9ba",
       "events": "44cc17c0",
       "rng": {
         "draws": 1084,
@@ -504,7 +504,7 @@
           "attackPower": 118,
           "combatTimer": 99.05,
           "comboUntil": -1,
-          "critChance": 0.091,
+          "critChance": 0.121,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
           "dualWielding": true,
@@ -559,7 +559,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 115,
+          "attackPower": 139,
           "combatTimer": 102.1,
           "comboUntil": -1,
           "critChance": 0.091,
@@ -583,7 +583,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 164,
+          "rangedPower": 188,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -594,7 +594,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 82,
-            "armor": 375,
+            "armor": 405,
             "int": 32,
             "spi": 33,
             "sta": 57,

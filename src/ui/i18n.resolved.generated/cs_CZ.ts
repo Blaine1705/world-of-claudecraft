@@ -317,7 +317,11 @@ export const cs_CZ: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
-      "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými."
+      "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými.",
+      "healerConfirmTitle": "Přijmout strážcovo mýto?",
+      "healerConfirmBody": "Bledý strážce tě zde oživí, ale Strážcovo mýto sníží všechny tvé vlastnosti o 75 %, na vyšších úrovních až na 10 minut. Když se jako duch vrátíš ke svému tělu, oživíš se bez postihu.",
+      "healerConfirmAccept": "Oživ mě",
+      "healerConfirmCancel": "Zrušit"
     },
     "unstuck": {
       "menuButton": "Unstuck",
@@ -777,7 +781,7 @@ export const cs_CZ: EnTranslations = {
       "dailyRewards": "Obchod",
       "deeds": "Skutky",
       "mounts": "Mounts",
-      "professions": "Professions",
+      "professions": "Profese",
       "nameplates": "Jména",
       "haptics": "Haptika",
       "hapticsOff": "Haptika vypnuta",
@@ -1123,7 +1127,7 @@ export const cs_CZ: EnTranslations = {
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
-      "showThirdActionBar": "Show Third Action Bar",
+      "showThirdActionBar": "Zobrazit třetí panel akcí",
       "showTargetOfTarget": "Zobrazit cíl cíle",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
@@ -1554,7 +1558,7 @@ export const cs_CZ: EnTranslations = {
       "watchX": "Zobrazit na X",
       "watchKick": "Sledovat na Kicku",
       "watchYouTube": "Sledovat na YouTube",
-      "streamerBadgeTitle": "Verified streamer"
+      "streamerBadgeTitle": "Ověřený streamer"
     },
     "lootSettings": {
       "title": "Nastavení kořisti",
@@ -2172,9 +2176,11 @@ export const cs_CZ: EnTranslations = {
       "mining": "Těžba",
       "logging": "Dřevorubectví",
       "herbalism": "Bylinkářství",
+      "fishing": "Fishing",
       "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
-      "gatherLine": "You gather: {name}.",
-      "gatherLineQty": "You gather: {name} x{qty}."
+      "gatherLine": "Shromažďujete: {name}.",
+      "gatherLineQty": "Shromažďujete: {name} x{qty}.",
+      "catchLine": "You reel in: {name}"
     },
     "archetypeTitle": {
       "label": "Titul",
@@ -2206,40 +2212,40 @@ export const cs_CZ: EnTranslations = {
       "leatherworking": "Kožedělnictví"
     },
     "professions": {
-      "title": "Professions",
-      "close": "Close professions",
-      "ringAria": "Craft wheel",
-      "skillsHeader": "Craft skills",
-      "gatheringHeader": "Gathering",
-      "perksHeader": "Perks",
-      "identityHeader": "Identity",
-      "roleMajor": "Major",
-      "roleHobby": "Hobby",
-      "roleDormant": "Dormant",
-      "roleUnattuned": "Unattuned",
-      "ceilingUnlimited": "No empowerment cap",
-      "ceilingRare": "Rare cap",
-      "ceilingCommon": "Common cap",
+      "title": "Profese",
+      "close": "Zavřít profese",
+      "ringAria": "Řemeslné kolo",
+      "skillsHeader": "Řemeslné dovednosti",
+      "gatheringHeader": "Sběr",
+      "perksHeader": "Výhody",
+      "identityHeader": "Identita",
+      "roleMajor": "Hlavní obor",
+      "roleHobby": "Koníček",
+      "roleDormant": "Dočasně neaktivní znalosti",
+      "roleUnattuned": "Neladěno",
+      "ceilingUnlimited": "Bez omezení posílení",
+      "ceilingRare": "Omezení na vzácné",
+      "ceilingCommon": "Omezení na běžné",
       "skillValue": "{skill} / {max}",
-      "tierPipAria": "Tier {tier}",
-      "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
-      "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
-      "nextUnlockMax": "At maximum skill",
-      "perkSpecializedLine": "{craft}: Specialized, material costs -{pct}%",
-      "perkSpecializedAt": "Specializes at {threshold} skill",
-      "switchCost": "Next archetype switch costs {cost} amends",
-      "syncing": "Waiting for your profession data from the realm.",
-      "tutorialLine": "Reach {target} skill in any craft to unlock your first tier.",
-      "ctaHeader": "Next step",
-      "ctaRaise": "Keep raising {craft}: {points} more points to the next tier.",
-      "ctaStart": "Craft or gather with any profession to begin.",
-      "unattunedIdentity": "You are not yet attuned to an archetype. Raise your crafts and complete an attunement to choose your pair.",
-      "nudgeNearTier": "{craft}: {points} points from the next tier",
-      "nudgeDormant": "Your {craft} knowledge lies dormant",
+      "tierPipAria": "Úroveň {tier}",
+      "nextUnlockTier": "{points} bodů do další úrovně: šance na mistrovské dílo se zvýší",
+      "nextUnlockSpecialized": "{points} bodů do specializace: náklady na materiál klesnou",
+      "nextUnlockMax": "Při maximální zručnosti",
+      "perkSpecializedLine": "{craft}: specializováno, náklady na materiál -{pct} %",
+      "perkSpecializedAt": "Specializace při dovednosti {threshold}",
+      "switchCost": "Další změna archetypu stojí {cost} bodů nápravy",
+      "syncing": "Čekání na data vaší profese z říše.",
+      "tutorialLine": "Dosáhněte dovednosti {target} v jakémkoli řemesle a odemkněte svou první úroveň.",
+      "ctaHeader": "Další krok",
+      "ctaRaise": "Pokračuj ve zvyšování {craft}: do další úrovně zbývá {points} bodů.",
+      "ctaStart": "Pro začátek vytvořte nebo shromážděte s jakoukoli profesí.",
+      "unattunedIdentity": "Ještě nejste naladěni na archetyp. Zvyšte své řemeslo a dokončete naladění, abyste si vybrali svůj pár.",
+      "nudgeNearTier": "{craft}: do další úrovně zbývá {points} bodů",
+      "nudgeDormant": "Vaše znalosti {craft} jsou nečinné",
       "hobbyLabel": "Hobby: {craft}",
-      "majorsLabel": "Majors: {a} and {b}",
-      "pairsHeld": "Pairs held: {count}",
-      "returnsLabel": "Returns: {count}"
+      "majorsLabel": "Hlavní: {a} a {b}",
+      "pairsHeld": "Držené páry: {count}",
+      "returnsLabel": "Vrácení: {count}"
     },
     "crafting": {
       "title": "Výroba",
@@ -2259,7 +2265,7 @@ export const cs_CZ: EnTranslations = {
       "comboNotAttuned": "Nejprve zvol pár archetypů.",
       "comboWrongPair": "Pro výrobu aktivuj přesně tento pár.",
       "comboTierUnmet": "Dostaň oba hlavní obory na požadovanou úroveň.",
-      "comboTierUnmetNamed": "Raise {crafts} to tier {tier}.",
+      "comboTierUnmetNamed": "Zvyšte {crafts} na úroveň {tier}.",
       "professionChoice": "Volba profese",
       "noProfessionChoice": "V tuto chvíli není dostupná žádná platná volba profese.",
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
@@ -2290,48 +2296,48 @@ export const cs_CZ: EnTranslations = {
         "nearTier": "{craft} je {points} dovednostních bodů od příští úrovně.",
         "dormantKnowledge": "Znalosti {craft} jsou zachovány, ale dočasně neaktivní, dokud nebude aktivní jejich pár nebo koníček."
       },
-      "stationRequired": "You must be at the {station} to craft that.",
+      "stationRequired": "Abyste to mohli vytvořit, musíte být na {station}.",
       "stationName": {
-        "forge": "Forge",
-        "kitchens": "Kitchens",
-        "apothecary": "Apothecary",
-        "tannery": "Tannery",
-        "loom": "Loom",
-        "toolworks": "Toolworks"
+        "forge": "Kovárna",
+        "kitchens": "Kuchyně",
+        "apothecary": "Lékárník",
+        "tannery": "Koželužna",
+        "loom": "Tkalcovský stav",
+        "toolworks": "Nástrojárna"
       },
       "throttled": "Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.",
       "recipeNotLearned": "Tento recept ses ještě nenaučil.",
-      "skillReqLine": "Requires {craft} {skill}",
-      "difficultyFull": "Full skill gain",
-      "difficultyReduced": "Reduced skill gain",
-      "difficultyNone": "No skill gain",
-      "stationBadge": "Station",
-      "stationOutOfRangeNamed": "Move to the {station} to craft this.",
-      "masterworkToast": "Masterwork! {name}",
-      "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
-      "tierUpToast": "{craft} advanced to tier {tier}!",
-      "makersMark": "Crafted by {name}",
-      "masterworkSeal": "Masterwork",
-      "enchantedLine": "Enchanted"
+      "skillReqLine": "Vyžaduje {craft} {skill}",
+      "difficultyFull": "Plný zisk dovedností",
+      "difficultyReduced": "Snížený zisk dovedností",
+      "difficultyNone": "Žádný zisk dovedností",
+      "stationBadge": "Stanice",
+      "stationOutOfRangeNamed": "Chcete-li to vytvořit, přejděte do {station}.",
+      "masterworkToast": "Mistrovské dílo! {name}",
+      "masterworkZoneLine": "{crafter} vytvořil mistrovské dílo {name}!",
+      "tierUpToast": "{craft} postoupilo do úrovně {tier}!",
+      "makersMark": "Vytvořil {name}",
+      "masterworkSeal": "Mistrovské dílo",
+      "enchantedLine": "Okouzlený"
     },
     "training": {
-      "title": "Training: {name}",
-      "close": "Close training",
-      "empty": "This master has nothing to teach.",
-      "free": "Free",
-      "stateKnown": "Known",
-      "stateTeachable": "Available",
-      "stateLocked": "Locked",
-      "requirement": "Taught at {craft} {skill}",
-      "trainAria": "Learn {name} for {fee}",
-      "dialogOption": "Training",
-      "dialogOptionAria": "Browse training from {name}",
-      "learned": "Recipe learned: {recipe}",
-      "tierUnmet": "You need {craft} {skill} to learn that recipe.",
-      "cannotAfford": "You cannot afford that training.",
-      "notTaughtHere": "That recipe is not taught here.",
-      "alreadyKnown": "You already know that recipe.",
-      "outOfRange": "You must be at the station to train."
+      "title": "Školení: {name}",
+      "close": "Zavřít trénink",
+      "empty": "Tento mistr nemá co učit.",
+      "free": "Zdarma",
+      "stateKnown": "Známé",
+      "stateTeachable": "K dispozici",
+      "stateLocked": "Zamčeno",
+      "requirement": "Vyučováno na {craft} {skill}",
+      "trainAria": "Naučit se {name} za {fee}",
+      "dialogOption": "Výcvik",
+      "dialogOptionAria": "Prohlédnout výcvik u {name}",
+      "learned": "Naučen recept: {recipe}",
+      "tierUnmet": "K naučení tohoto receptu potřebuješ {craft} {skill}.",
+      "cannotAfford": "Ten trénink si nemůžete dovolit.",
+      "notTaughtHere": "Tento recept se zde neučí.",
+      "alreadyKnown": "Ten recept už znáte.",
+      "outOfRange": "Abys mohl trénovat, musíš být u řemeslné stanice."
     },
     "finder": {
       "title": "Hledač dungeonů",
@@ -2501,9 +2507,9 @@ export const cs_CZ: EnTranslations = {
     }
   },
   "gatherEvent": {
-    "pristineVein": "{finder} struck a pristine vein!",
-    "ancientHeartwood": "{finder} felled an ancient heartwood!",
-    "moonlitBloom": "{finder} discovered a moonlit bloom!"
+    "pristineVein": "{finder} narazil na nedotčenou rudnou žílu!",
+    "ancientHeartwood": "{finder} pokácel prastaré jádrové dřevo!",
+    "moonlitBloom": "{finder} objevil měsíční květ!"
   },
   "apiError": {
     "validation": {
@@ -3119,9 +3125,9 @@ export const cs_CZ: EnTranslations = {
       "ice_lance": "Okamžitý střep pro využití mrazivých procsů, zasáhne výrazně silněji zmrazeného cíle.",
       "flurry": "Tři rychlé střely, které cíl ochladí, takže tvoje příští mrazivé zásahy dopadnou, jako by byl zmrazen.",
       "fingers_of_frost": "Tvoje mrazivé střely někdy posílí Ice Lance tak, aby zasáhl, jako by byl cíl zmrazen.",
-      "brain_freeze": "Tvoje mrazivé střely někdy způsobí, že příští Winterlash bude okamžitý a silnější.",
+      "brain_freeze": "Tvoje mrazivá kouzla někdy způsobí, že další Winterlash bude okamžitý a přeskočí dobu obnovení.",
       "shatter": "Tvá kouzla mají mnohem vyšší šanci na kritický zásah proti zmrazeným cílům.",
-      "frozen_orb": "Pomalu kutálí sféru skupinou nepřátel, která vše ochladí a živí tvoje mrazivé procsy.",
+      "frozen_orb": "Kutálí pomalou sféru skrz skupinu nepřátel, ochlazuje je a ukládá rampouchy.",
       "blizzard": "Pokryje plochu ledem pro postupné ničení a zpomalení celé skupiny nepřátel.",
       "blink": "Teleportuje tě krátce dopředu a po cestě ruší ukotvení.",
       "conjure_water": "Vyvolá nápoje obnovující manu, abys mezi pully doplnil zásoby.",
@@ -4793,7 +4799,11 @@ export const cs_CZ: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Hrdinské značky: {count}",
-    "buyAria": "Koupit {item} za {marks} hrdinských značek"
+    "buyAria": "Koupit {item} za {marks} hrdinských značek",
+    "buyConfirmTitle": "Potvrdit nákup",
+    "buyConfirmBody": "Koupit {item} za {marks} Hrdinských známek? Nákupy za známky nelze vrátit.",
+    "buyConfirmAccept": "Nakoupit",
+    "buyConfirmCancel": "Zrušit"
   },
   "cardDuel": {
     "title": "Karetní souboj",
@@ -4846,7 +4856,11 @@ export const cs_CZ: EnTranslations = {
       "buyAria": "Koupit {item} za {marks} známek výprav",
       "reqHeroic": "Vyžaduje hrdinské dokončení",
       "reqClears": "Vyžaduje {count} dokončení",
-      "empty": "Nic není skladem."
+      "empty": "Nic není skladem.",
+      "buyConfirmTitle": "Potvrdit nákup",
+      "buyConfirmBody": "Koupit {item} za {marks} Známek výpravy? Nákupy za známky nelze vrátit.",
+      "buyConfirmAccept": "Nakoupit",
+      "buyConfirmCancel": "Zrušit"
     },
     "tracker": {
       "title": "Výprava",
@@ -5249,9 +5263,9 @@ export const cs_CZ: EnTranslations = {
     "rendererFailed": "Renderer se nepodařilo spustit: zkus stránku obnovit. {error}",
     "enterTimeout": "Nepodařilo se vstoupit do světa. Připojení vypršelo. Běží herní server?",
     "connectionLost": "Připojení k serveru bylo ztraceno.",
-    "reconnectingAttempt": "Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)",
-    "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
-    "slowConnection": "This is taking longer than usual. Check your internet connection.",
+    "reconnectingAttempt": "Spojení ztraceno. Znovu se připojuji... (pokus {attempt}/{maxAttempts}, opakování za {seconds}s)",
+    "reconnectingNow": "Spojení ztraceno. Nyní se znovu připojuje... (pokus {attempt}/{maxAttempts})",
+    "slowConnection": "Trvá to déle než obvykle. Zkontrolujte připojení k internetu.",
     "connectionRejected": "Server ukončil připojení.",
     "realmFull": "Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.",
     "tooManyConnections": "Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.",
@@ -6357,7 +6371,7 @@ export const cs_CZ: EnTranslations = {
       "rarityUncommon": "Neobvyklé",
       "rarityRare": "Vzácné",
       "rarityEpic": "Epické",
-      "rarityLegendary": "Legendary",
+      "rarityLegendary": "Legendární",
       "merchantStock": "Zásoby Obchodníka",
       "stackCount": "x{count}",
       "each": "{money} za kus",
@@ -6610,11 +6624,11 @@ export const cs_CZ: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Vypustíš tři ledové střely, každá za {damage} mrazivého poškození, a na cíl sesadíš Zimní chlad: jeho příštím 2 příchozím slučitelným kouzlům se cíl jeví jako zmrazený. Brain Freeze způsobí, že Winterlash je okamžitý, o 30 % silnější a přeskočí cooldown. (Mráz)"
+        "description": "Vypustíš tři ledové střely, z nichž každá způsobí {damage} mrazivého poškození, a uvalíš na cíl Zimní chlad: další 2 kompatibilní kouzla jej považují za zmrazený. Brain Freeze učiní Winterlash okamžitým a obejde jeho dobu obnovení. (Mráz)"
       },
       "frozen_orb": {
         "name": "Zmrzlá sféra",
-        "description": "Vypustíš sféru vířícího mrazu, která se 8 s pohybuje vpřed a způsobuje {damage} mrazivého poškození každou sekundu blízkým nepřátelům a zpomaluje je o 30 %. Její zásahy generují Zmrzlé prsty. (Mráz)"
+        "description": "Vypustíš kouli vířícího mrazu, která se 8 s pohybuje vpřed, každou sekundu způsobí okolním nepřátelům {damage} mrazivého poškození a zpomalí je o 30 %. Každý zásah vytvoří jeden rampouch. (Mráz)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6638,11 +6652,11 @@ export const cs_CZ: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Kopí jinovatky má 20% šanci způsobit, že tvůj příští Winterlash bude okamžitý, o 30 % silnější a bez cooldownu. (Mráz)"
+        "description": "Kopí jinovatky má 20% šanci, že tvůj příští Winterlash bude okamžitý a obejde dobu obnovení. (Mráz)"
       },
       "shatter": {
         "name": "Drcení mrazem",
-        "description": "Tvá kouzla získají 50% šanci na kritický zásah proti zmrazeným cílům a tyto kritické zásahy způsobí o 20 % více poškození. Zmrzlé prsty a Zimní chlad se počítají jako zmrazení. (Mráz)"
+        "description": "Tvá kouzla mají proti zmrazeným cílům o 50 % vyšší šanci na kritický zásah. Fingers of Frost a Zimní chlad se počítají jako zmrazení. (Mráz)"
       },
       "conjure_water": {
         "name": "Vodní pouto",
@@ -8540,16 +8554,220 @@ export const cs_CZ: EnTranslations = {
         "name": "Heart of the Rift"
       },
       "copper_ore": {
-        "name": "Copper Ore"
+        "name": "Měděná ruda"
       },
       "iron_ore": {
-        "name": "Iron Ore"
+        "name": "Železná ruda"
       },
       "ironbark_log": {
-        "name": "Ironbark Log"
+        "name": "Kláda ze železokůry"
       },
       "silverleaf_herb": {
-        "name": "Silverleaf Herb"
+        "name": "Stříbrnolistá bylina"
+      },
+      "rough_hide": {
+        "name": "Hrubá kůže"
+      },
+      "spider_silk": {
+        "name": "Pavoučí hedvábí"
+      },
+      "venom_gland": {
+        "name": "Jedová žláza"
+      },
+      "game_meat": {
+        "name": "Zvěřina"
+      },
+      "homespun_cloth": {
+        "name": "Domácí tkanina"
+      },
+      "pristine_hide": {
+        "name": "Nepoškozená kůže"
+      },
+      "pristine_silk": {
+        "name": "Nedotčené hedvábí"
+      },
+      "pristine_venom_gland": {
+        "name": "Nedotčená jedová žláza"
+      },
+      "prime_cut": {
+        "name": "Prvotřídní kus"
+      },
+      "smithing_flux": {
+        "name": "Kovářské tavidlo"
+      },
+      "spool_of_thread": {
+        "name": "Cívka nití"
+      },
+      "tanning_agent": {
+        "name": "Tříslovina"
+      },
+      "cooking_salt": {
+        "name": "Sůl na vaření"
+      },
+      "glass_vial": {
+        "name": "Skleněná lahvička"
+      },
+      "copper_bearded_axe": {
+        "name": "Měděná vousatá sekera"
+      },
+      "copper_flanged_mace": {
+        "name": "Měděný přírubový palcát"
+      },
+      "ironbark_boar_spear": {
+        "name": "Kančí kopí ze železokůry"
+      },
+      "ironedge_longsword": {
+        "name": "Dlouhý meč se železným ostřím"
+      },
+      "ironshod_maul": {
+        "name": "Železem pobité kladivo"
+      },
+      "whetted_iron_dirk": {
+        "name": "Nabroušená železná dýka"
+      },
+      "thorium_warblade": {
+        "name": "Thoriová válečná čepel"
+      },
+      "arcanite_war_axe": {
+        "name": "Arkanitová válečná sekera"
+      },
+      "elderwood_battle_staff": {
+        "name": "Bojová hůl z prastarého dřeva"
+      },
+      "riveted_copper_girdle": {
+        "name": "Nýtovaný měděný pás"
+      },
+      "coppermail_sabatons": {
+        "name": "Boty z měděné kroužkové zbroje"
+      },
+      "coppermail_gauntlets": {
+        "name": "Rukavice z měděné kroužkové zbroje"
+      },
+      "ironlink_hauberk": {
+        "name": "Železná kroužková košile"
+      },
+      "ironlink_legguards": {
+        "name": "Chrániče nohou ze železných kroužků"
+      },
+      "ironlink_spaulders": {
+        "name": "Železné kroužkové náplečníky"
+      },
+      "thoriumscale_greathelm": {
+        "name": "Velká přilba z thoriových šupin"
+      },
+      "thoriumscale_cuirass": {
+        "name": "Kyrys z thoriových šupin"
+      },
+      "thoriumscale_leggings": {
+        "name": "Nohavice z thoriových šupin"
+      },
+      "homespun_hood": {
+        "name": "Podomácku tkaná kapuce"
+      },
+      "homespun_mitts": {
+        "name": "Podomácku tkané rukavice"
+      },
+      "silverthread_slippers": {
+        "name": "Pantofle ze stříbrné nitě"
+      },
+      "goldweave_robe": {
+        "name": "Zlatě tkané roucho"
+      },
+      "goldweave_leggings": {
+        "name": "Zlatě tkané nohavice"
+      },
+      "silkspun_satchel": {
+        "name": "Hedvábná brašna"
+      },
+      "silkbinders_raiment": {
+        "name": "Roucho vazače hedvábí"
+      },
+      "sunweave_mantle": {
+        "name": "Sluncem tkaný plášť"
+      },
+      "sunweave_treads": {
+        "name": "Boty ze sluneční tkaniny"
+      },
+      "fenbridge_hide_leggings": {
+        "name": "Nohavice z fenbridgeské kůže"
+      },
+      "fenbridge_hide_boots": {
+        "name": "Boty z fenbridgeské kůže"
+      },
+      "fenbridge_hide_belt": {
+        "name": "Kožený opasek z Fenbridge"
+      },
+      "marshstalker_jerkin": {
+        "name": "Kazajka bažinného stopaře"
+      },
+      "marshstalker_hood": {
+        "name": "Kápě bažinného stopaře"
+      },
+      "marshstalker_spaulders": {
+        "name": "Náplečníky bažinného stopaře"
+      },
+      "mirewarden_jerkin": {
+        "name": "Kazajka strážce močálu"
+      },
+      "mirewarden_leggings": {
+        "name": "Nohavice strážce močálu"
+      },
+      "mirewarden_treads": {
+        "name": "Boty strážce močálu"
+      },
+      "pan_seared_perch": {
+        "name": "Okoun opečený na pánvi"
+      },
+      "hunters_game_skewer": {
+        "name": "Špíz z lovcovy zvěřiny"
+      },
+      "herbed_marsh_pike": {
+        "name": "Bažinná štika na bylinkách"
+      },
+      "ashwood_smoked_eel": {
+        "name": "Ashwood uzený úhoř"
+      },
+      "goldleaf_game_stew": {
+        "name": "Dušená zvěřina se zlatolistím"
+      },
+      "frostgill_chowder": {
+        "name": "Polévka Frostgill"
+      },
+      "silvered_carp_supper": {
+        "name": "Večeře z postříbřeného kapra"
+      },
+      "anglers_feast_platter": {
+        "name": "Rybářská hodovní mísa"
+      },
+      "marlows_grand_roast": {
+        "name": "Marlowova slavnostní pečeně"
+      },
+      "silverleaf_healing_draught": {
+        "name": "Léčivý lektvar ze stříbrnolistu"
+      },
+      "silverleaf_mana_draught": {
+        "name": "Manový lektvar ze stříbrnolistu"
+      },
+      "elixir_of_the_boar": {
+        "name": "Kančí elixír"
+      },
+      "goldleaf_healing_draught": {
+        "name": "Léčivý lektvar ze zlatolistu"
+      },
+      "goldleaf_mana_draught": {
+        "name": "Manový lektvar ze zlatolistu"
+      },
+      "venomfire_elixir": {
+        "name": "Elixír Venomfire"
+      },
+      "sunpetal_healing_draught": {
+        "name": "Léčivý lektvar ze slunného květu"
+      },
+      "sunpetal_mana_draught": {
+        "name": "Manový lektvar ze slunného květu"
+      },
+      "elixir_of_the_serpent": {
+        "name": "Hadí elixír"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -10145,34 +10363,34 @@ export const cs_CZ: EnTranslations = {
         "greeting": "It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore."
       },
       "forgemistress_darva": {
-        "name": "Forgemistress Darva",
-        "title": "Master of the Forge",
-        "greeting": "The forge answers to me, {className}. Bring good ore and it will answer to you too."
+        "name": "Mistryně kovárny Darva",
+        "title": "Mistryně kovárny",
+        "greeting": "Kovárna mi odpoví, {className}. Přineste dobrou rudu a ona se vám také zodpoví."
       },
       "cook_marlow": {
-        "name": "Cook Marlow",
-        "title": "Master of the Kitchens",
-        "greeting": "Nothing leaves my kitchens half-cooked, {className}. Sit, eat, then get back out there."
+        "name": "Kuchař Marlow",
+        "title": "Mistr kuchyní",
+        "greeting": "V mých kuchyních nic nezůstane napůl uvařené, {className}. Sedněte si, jezte a pak se tam vraťte."
       },
       "weaver_ottilie": {
-        "name": "Weaver Ottilie",
-        "title": "Master of the Loom",
-        "greeting": "Mind the threads, {className}. A steady hand at the loom beats a strong one."
+        "name": "Tkadlena Ottilie",
+        "title": "Mistryně tkalcovny",
+        "greeting": "Dávej pozor na nitě, {className}. Klidná ruka u stavu zmůže víc než silná."
       },
       "tinker_gizzel": {
-        "name": "Tinker Gizzel",
-        "title": "Master of the Toolworks",
-        "greeting": "Springs, sprockets, and sharp edges, {className}: the toolworks has whatever your hands lack."
+        "name": "Kutil Gizzel",
+        "title": "Mistr nástrojárny",
+        "greeting": "Pružiny, ozubená kolečka a ostré hrany, {className}: v nástrojárně najdeš vše, co tvým rukám chybí."
       },
       "tanner_hesk": {
-        "name": "Tanner Hesk",
-        "title": "Master of the Tannery",
-        "greeting": "A hide is only as good as its tanning, {className}. The vats are ready when you are."
+        "name": "Koželuh Hesk",
+        "title": "Mistr koželužny",
+        "greeting": "Kůže je jen tak dobrá, jak dobře je vyčiněná, {className}. Kádě jsou připravené, až budeš ty."
       },
       "alchemist_verane": {
-        "name": "Alchemist Verane",
-        "title": "Master of the Apothecary",
-        "greeting": "Measure twice and pour once, {className}. The apothecary has no patience for spilled reagents."
+        "name": "Alchymista Verane",
+        "title": "Mistr lékárny",
+        "greeting": "Dvakrát měř a jednou nalij, {className}. Lékárník nemá trpělivost na rozlité reagencie."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -11686,54 +11904,54 @@ export const cs_CZ: EnTranslations = {
         "body": "Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač"
       },
       "guild_trend_engineering_alchemy": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Engineering and Alchemy",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Engineering and Alchemy: charges measured and reagents weighed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Bombardier in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce ve strojírenství a alchymii",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci ve strojírenství a alchymii: nálože se odměřovaly a činidla vážila, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Ti, kdo tuto dvojici spojí, časem získají titul Bombardéra. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       },
       "guild_trend_alchemy_cooking": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Alchemy and Cooking",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Alchemy and Cooking: draughts simmered and dishes seasoned, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Apothecary in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce v alchymii a vaření",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v alchymii a vaření: lektvary probublávaly a pokrmy se kořenily, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Ti, kdo tuto dvojici spojí, časem získají titul Lékárníka. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       },
       "guild_trend_cooking_leatherworking": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Cooking and Leatherworking",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Cooking and Leatherworking: meals plated and hides cured, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce ve vaření a kožedělnictví",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci ve vaření a kožedělnictví: pokrmy se chystaly a kůže činily, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       },
       "guild_trend_leatherworking_tailoring": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Leatherworking and Tailoring",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Leatherworking and Tailoring: leather cut and cloth hemmed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Outfitter in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce v kožedělnictví a krejčovství",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v kožedělnictví a krejčovství: kůže se řezala a látka lemovala, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Ti, kdo tuto dvojici spojí, časem získají titul Výstrojníka. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       },
       "guild_trend_tailoring_inscription": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Tailoring and Inscription",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Tailoring and Inscription: seams stitched and glyphs inked, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce v krejčovství a písemnictví",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v krejčovství a písemnictví: švy se sešívaly a glyfy psaly inkoustem, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       },
       "guild_trend_inscription_enchanting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Inscription and Enchanting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Inscription and Enchanting: scrolls lettered and charms woven, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce v písemnictví a okouzlování",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v písemnictví a okouzlování: svitky se popisovaly a kouzla splétala, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       },
       "guild_trend_enchanting_jewelcrafting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Enchanting and Jewelcrafting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Enchanting and Jewelcrafting: charms bound and stones polished, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce v okouzlování a klenotnictví",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v okouzlování a klenotnictví: kouzla se vázala a kameny leštily, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       },
       "guild_trend_jewelcrafting_weaponcrafting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Jewelcrafting and Weaponcrafting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Jewelcrafting and Weaponcrafting: gems seated and edges ground, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce v klenotnictví a kovářství zbraní",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v klenotnictví a kovářství zbraní: drahokamy se zasazovaly a ostří brousila, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       },
       "guild_trend_weaponcrafting_armorcrafting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Weaponcrafting and Armorcrafting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Weaponcrafting and Armorcrafting: blades tempered and plates fitted, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Smith in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce v kovářství zbraní a zbrojnictví",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v kovářství zbraní a zbrojnictví: čepele se kalily a pláty lícovaly, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Ti, kdo tuto dvojici spojí, časem získají titul Kováře. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       },
       "guild_trend_armorcrafting_engineering": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Armorcrafting and Engineering",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Armorcrafting and Engineering: plates riveted and gears trued, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Řemeslnický cech",
+        "subject": "Tvá práce v zbrojnictví a strojírenství",
+        "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v zbrojnictví a strojírenství: pláty se nýtovaly a ozubená kola se seřizovala, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
       }
     },
     "itemSets": {

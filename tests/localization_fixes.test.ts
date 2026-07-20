@@ -927,6 +927,15 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/progression.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/rift_lockpick.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/portals.ts'), 'utf8'),
+    // Professions 2.0 Phase 11: the fishing command bodies moved out of sim.ts.
+    // Three literals have their ONLY emitter occurrences here ("No fish are
+    // biting.", "A rare catch! Something gleams on your line.", "You need to
+    // face fishable water."); they are byte-identical after the move so their
+    // matchers are unchanged, but a rewording of THIS file's sites was
+    // invisible to the guard before this entry. The file's other emits
+    // (bags-full, dead/in-combat/swimming/busy) are byte-identical to literals
+    // in already-scanned files.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/fishing.ts'), 'utf8'),
     // #2033 (PR 2039): the quest command bodies (accept/share/abandon/turn-in guards +
     // the accepted/abandoned/completed logs). The two profession-choice denials
     // ("That profession choice is not available." / "... no longer available.") have

@@ -30,6 +30,13 @@ export const hudChromeStrings = {
     resurrectAtCorpse: 'Resurrect at Corpse',
     resurrectAtHealer: "The Pale Keeper (Keeper's Toll)",
     spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
+    // Confirm dialog gating the Pale Keeper revive (the corpse run stays one-tap:
+    // it carries no penalty, so a confirm there would only add friction).
+    healerConfirmTitle: "Accept the Keeper's Toll?",
+    healerConfirmBody:
+      "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+    healerConfirmAccept: 'Revive Me',
+    healerConfirmCancel: 'Cancel',
   },
   // Countdown-to-graveyard recovery. Stable event phases/reasons come from the
   // authoritative sim; new semantics use new keys so stale safe-spot translations
@@ -2300,6 +2307,7 @@ export const hudChromeStrings = {
     mining: 'Mining',
     logging: 'Logging',
     herbalism: 'Herbalism',
+    fishing: 'Fishing',
     // #1866: click/tap/interact-key error when a targeted node's per-viewer
     // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
     notReady: 'This resource node has not respawned for you yet.',
@@ -2310,6 +2318,12 @@ export const hudChromeStrings = {
     // into that wording (divergence pin: tests/gather_event_i18n.test.ts).
     gatherLine: 'You gather: {name}.',
     gatherLineQty: 'You gather: {name} x{qty}.',
+    // Reel-in feedback line (Professions 2.0 Phase 11), rendered from the
+    // id-based fishingResult SimEvent. Like gatherLine above, deliberately
+    // worded APART from the loot family: the grant hub's own 'loot' event
+    // already prints "You receive:" for the same catch, so this line must
+    // never regress into that wording (nor into gatherLine's).
+    catchLine: 'You reel in: {name}',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0 Phase 1):
   // `label` heads the character-sheet title line, `none` is shown before the
