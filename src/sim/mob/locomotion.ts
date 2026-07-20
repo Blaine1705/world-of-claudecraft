@@ -612,6 +612,15 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
             radius: def.radius,
             remaining: def.castTime,
           });
+          // Notify online clients so they can mirror the zone countdown locally.
+          // Interest-scoped by world position, so only instance players receive it.
+          ctx.emit({
+            type: 'riftDeathZoneSpawn',
+            x: targetE.pos.x,
+            z: targetE.pos.z,
+            radius: def.radius,
+            durationSecs: def.castTime,
+          });
         }
         // Begin casting - cast bar is the visual telegraph for players to move.
         mob.castingAbility = def.castId;

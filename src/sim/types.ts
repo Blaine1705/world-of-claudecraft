@@ -4115,6 +4115,21 @@ export type SimEvent = { pid?: number } & (
       nodeType: GatherNodeType;
       itemId: string;
     }
+  // Rift boss lethal death zone placed (deathZoneCast / deathZoneStrike mechanic).
+  // Emitted at zone-placement time so online clients can mirror the countdown
+  // locally without a snapshot field. Interest-scoped by x/z world position like
+  // spellfxAt, so only instance players (who are inside the instance area) receive
+  // it. `durationSecs` equals the cast-time fuse the sim uses internally. The
+  // client counts the zone down locally starting from `durationSecs` and removes
+  // it when remaining reaches zero. Late joiners missing an in-flight zone are an
+  // accepted edge (the fuse is at most a few seconds).
+  | {
+      type: 'riftDeathZoneSpawn';
+      x: number;
+      z: number;
+      radius: number;
+      durationSecs: number;
+    }
 );
 
 export interface MoveInput {
