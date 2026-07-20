@@ -120,6 +120,14 @@ const MOONKIN_TINT = new THREE.Color(0x9d6bff);
 // (the fire aura around it comes from vfx.formAura, not the material). Kept
 // dark enough that the body still shades and the flames read against it.
 const METAMORPH_TINT = new THREE.Color(0x4f2170);
+const FEROCITY_TINTS = [
+  new THREE.Color(0xd98a62),
+  new THREE.Color(0xd84a35),
+  new THREE.Color(0xd62418),
+] as const;
+const FEROCITY_TINT_STRENGTH = [0.18, 0.32, 0.48] as const;
+const FEROCITY_EMISSIVE = [0x2a0802, 0x4a0803, 0x6a0803] as const;
+const FEROCITY_EMISSIVE_STRENGTH = [0.08, 0.15, 0.23] as const;
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -200,6 +208,11 @@ export class CharacterVisual {
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
   private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
+  private ferocityMaterials = [
+    new Map<THREE.Material, THREE.Material>(),
+    new Map<THREE.Material, THREE.Material>(),
+    new Map<THREE.Material, THREE.Material>(),
+  ];
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
@@ -221,6 +234,8 @@ export class CharacterVisual {
   private shadowform = false;
   private moonkin = false;
   private metamorph = false;
+  private ferocityStage = 0;
+  private presentationScale = 1;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -616,6 +631,21 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  /** Scale only the drawn pose. The click proxy remains at its authoritative size. */
+  setPresentationScale(scale: number): void {
+    const next = Number.isFinite(scale) ? Math.min(1.2, Math.max(1, scale)) : 1;
+    if (next === this.presentationScale) return;
+    this.presentationScale = next;
+    this.poseWrap.scale.setScalar(next);
+  }
+
+  setFerocityStage(stage: number): void {
+    const next = Number.isFinite(stage) ? Math.min(3, Math.max(0, Math.trunc(stage))) : 0;
+    if (next === this.ferocityStage) return;
+    this.ferocityStage = next;
+    this.applyVisualMaterials();
+  }
+
   setShadowform(on: boolean): void {
     if (on === this.shadowform) return;
     this.shadowform = on;
@@ -949,10 +979,18 @@ export class CharacterVisual {
     const materials = new Set<THREE.Material>([
       ...this.ghostMaterials.values(),
       ...this.soulRendMaterials.values(),
+      ...this.shadowformMaterials.values(),
+      ...this.moonkinMaterials.values(),
+      ...this.metamorphMaterials.values(),
+      ...this.ferocityMaterials.flatMap((cache) => [...cache.values()]),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
     this.soulRendMaterials.clear();
+    this.shadowformMaterials.clear();
+    this.moonkinMaterials.clear();
+    this.metamorphMaterials.clear();
+    for (const cache of this.ferocityMaterials) cache.clear();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -1070,7 +1108,33 @@ export class CharacterVisual {
     if (this.metamorph) return this.metamorphMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
+    if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
     return material;
+  }
+
+  private ferocityMaterial(material: THREE.Material, stage: number): THREE.Material {
+    const index = Math.min(2, Math.max(0, stage - 1));
+    const cache = this.ferocityMaterials[index];
+    const cached = cache.get(material);
+    if (cached) return cached;
+    const marked = material.clone();
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) {
+      withColor.color.lerp(FEROCITY_TINTS[index], FEROCITY_TINT_STRENGTH[index]);
+    }
+    if (withColor.emissive) {
+      withColor.emissive.setHex(FEROCITY_EMISSIVE[index]);
+      withColor.emissiveIntensity = Math.max(
+        withColor.emissiveIntensity ?? 0,
+        FEROCITY_EMISSIVE_STRENGTH[index],
+      );
+    }
+    cache.set(material, marked);
+    return marked;
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {

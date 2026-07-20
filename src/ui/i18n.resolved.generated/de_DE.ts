@@ -227,7 +227,8 @@ export const de_DE: EnTranslations = {
     },
     "hud": {
       "lowMana": "Wenig Mana",
-      "lowEnergy": "Wenig Energie"
+      "lowEnergy": "Wenig Energie",
+      "lowFocus": "Low Focus"
     },
     "talents": {
       "title": "Talente",
@@ -5235,7 +5236,8 @@ export const de_DE: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energie",
-      "rage": "Wut"
+      "rage": "Wut",
+      "focus": "Focus"
     },
     "roles": {
       "warrior": "Tank / Nahkampf-DPS",
@@ -5941,7 +5943,8 @@ export const de_DE: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Wut",
-      "energy": "Energie"
+      "energy": "Energie",
+      "focus": "Focus"
     },
     "forms": {
       "bear": "Bären",
@@ -6304,6 +6307,54 @@ export const de_DE: EnTranslations = {
       "volley": {
         "name": "Pfeilhagel",
         "description": "Lässt 3 Sek. lang Pfeile auf den Zielbereich niedergehen und verursacht alle 0.5 Sek. {damage} Schaden an Gegnern darin."
+      },
+      "pack_command": {
+        "name": "Pack Command",
+        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+      },
+      "unleash_beast": {
+        "name": "Unleash Beast",
+        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+      },
+      "measured_shot": {
+        "name": "Measured Shot",
+        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+      },
+      "cold_focus": {
+        "name": "Cold Focus",
+        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+      },
+      "bloodhook": {
+        "name": "Bloodhook",
+        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+      },
+      "shrapnel_charge": {
+        "name": "Shrapnel Charge",
+        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+      },
+      "bloodtrail_assault": {
+        "name": "Bloodtrail Assault",
+        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+      },
+      "trailbreak": {
+        "name": "Trailbreak",
+        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+      },
+      "wildheart": {
+        "name": "Wildheart",
+        "description": "Immediately restore 30% of your maximum health."
+      },
+      "shellskin": {
+        "name": "Shellskin",
+        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+      },
+      "frostjaw_trap": {
+        "name": "Frostjaw Trap",
+        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+      },
+      "pack_rally": {
+        "name": "Pack Rally",
+        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
       },
       "hurricane": {
         "name": "Wirbelsturm",
@@ -6707,7 +6758,7 @@ export const de_DE: EnTranslations = {
       },
       "rapid_fire": {
         "name": "Fieberhafter Zug",
-        "description": "Erhöht euer Angriffstempo 15 Sek. lang um 40%."
+        "description": "Kanalisiert während der Bewegung über 2,4 Sek. sechs schnelle Schüsse, die jeweils {damage} körperlichen Schaden verursachen."
       },
       "smite": {
         "name": "Göttliche Pein",

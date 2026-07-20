@@ -3627,7 +3627,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un disparo cuidadosamente tensado que inflige {damage} de daño.',
   'entities.abilities.rapid_fire.name': 'Tensado Febril',
   'entities.abilities.rapid_fire.description':
-    'Aumenta tu velocidad de ataque un 40% durante 15 s.',
+    'Canaliza seis disparos rápidos durante 2,4 s mientras te mueves. Cada uno inflige {damage} de daño físico.',
   'entities.abilities.smite.name': 'Punición',
   'entities.abilities.smite.description': 'Castiga al enemigo por {damage} de daño Sagrado.',
   'entities.abilities.lesser_heal.name': 'Plegaria Susurrada',

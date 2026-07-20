@@ -87,12 +87,33 @@ import { glacialFrontContains } from './glacial_front';
 import { livingGroupRaidInRadius } from './group_targeting';
 import { applyGroupHaste } from './haste_burst';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
-import { spawnHunterTrap } from './hunter_trap';
+import {
+  onFieldcraftWeaponStrike,
+  runShrapnelCharge,
+  startBloodhook,
+  trailbreak,
+} from './hunter_fieldcraft';
+import {
+  applyHowlingRage,
+  runFrenzyFellShotCleave,
+  runPackCommand,
+  runUnleashBeast,
+} from './hunter_packlord';
+import {
+  activateHunterMajorWindow,
+  cripplingPursuit,
+  grantHunterFocus,
+  onHunterGuiseActivated,
+  onHunterPrimaryDamage,
+  runHunterPackRally,
+  runHunterWildheart,
+} from './hunter_shared';
+import { spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
-import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 
@@ -302,6 +323,10 @@ export function runEffects(
           weaponMult *= 1.15;
           bonus = Math.round(bonus * 1.15);
         }
+        const hunterStrike =
+          meta.cls === 'hunter' &&
+          (ability.id === 'raptor_strike' || ability.id === 'mongoose_bite');
+        let landedDamage = 0;
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
           cannotBeDodged: eff.cannotBeDodged,
           weaponMult,
@@ -312,8 +337,9 @@ export function runEffects(
           // Redhanded Craven Thrust mastery) ride the shared hit table.
           critBonus: mods.abilities[ability.id]?.critPct ?? 0,
           onDealt:
-            areaEcho || sweeping
+            areaEcho || sweeping || hunterStrike
               ? (amount) => {
+                  landedDamage = amount;
                   if (areaEcho) {
                     areaEchoDealt = true;
                     echoAreaDamage(
@@ -339,6 +365,10 @@ export function runEffects(
                 }
               : undefined,
         });
+        if (hit && hunterStrike) {
+          onFieldcraftWeaponStrike(ctx, p, target, ability.id, landedDamage);
+          onHunterPrimaryDamage(ctx, p, target, res, landedDamage);
+        }
         if (hit && sureCrit) sureCritRolled = true;
         if (hit && ability.awardsCombo) {
           ctx.awardCombo(p, target, ability.awardsCombo);
@@ -418,6 +448,8 @@ export function runEffects(
           false,
           ability.id,
         );
+        onHunterPrimaryDamage(ctx, p, target, res, finalDamage);
+        if (ability.id === 'arcane_shot') runFrenzyFellShotCleave(ctx, p, target);
         if (areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
@@ -1199,6 +1231,7 @@ export function runEffects(
       }
       case 'slow': {
         if (!target || target.dead) break;
+        const alreadySlowed = target.auras.some((aura) => aura.kind === 'slow');
         ctx.applyAura(target, {
           id: `${ability.id}_slow`,
           name: ability.name,
@@ -1209,6 +1242,7 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        cripplingPursuit(ctx, p, target, ability.id, alreadySlowed);
         ctx.enterCombat(p, target);
         break;
       }
@@ -2289,6 +2323,10 @@ export function runEffects(
           ctx.playerMods(meta),
           meta.equipmentInstance,
         );
+        onHunterGuiseActivated(ctx, p, meta, ability.id);
+        if (ability.id === 'cold_focus' || ability.id === 'bloodtrail_assault') {
+          activateHunterMajorWindow(ctx, p, 90);
+        }
         break;
       }
       case 'petBuff': {
@@ -2331,7 +2369,43 @@ export function runEffects(
           meta.cls === 'warrior' && p.resourceType === 'rage'
             ? eff.amount * warriorAbilityRageMult(ctx, p, meta)
             : eff.amount;
-        p.resource = Math.min(p.maxResource, p.resource + amount);
+        if (meta.cls === 'hunter' && p.resourceType === 'focus') {
+          grantHunterFocus(ctx, p, amount, ability.id, true);
+        } else {
+          p.resource = Math.min(p.maxResource, p.resource + amount);
+        }
+        break;
+      }
+      case 'packCommand': {
+        runPackCommand(ctx, p, target, eff, ability.name);
+        break;
+      }
+      case 'unleashBeast': {
+        runUnleashBeast(ctx, p, target, eff, ability.name);
+        break;
+      }
+      case 'howlingRage': {
+        applyHowlingRage(ctx, p, eff.duration);
+        break;
+      }
+      case 'hunterBloodhook': {
+        startBloodhook(ctx, p, target, eff);
+        break;
+      }
+      case 'hunterShrapnel': {
+        runShrapnelCharge(ctx, p, target, eff, ability.name);
+        break;
+      }
+      case 'hunterTrailbreak': {
+        trailbreak(ctx, p, eff.distance);
+        break;
+      }
+      case 'hunterPackRally': {
+        runHunterPackRally(ctx, p, eff.duration, eff.radius);
+        break;
+      }
+      case 'frostjawTrap': {
+        spawnFrostjawTrap(ctx, p, eff, ability.name, ability.id, ability.range);
         break;
       }
       case 'aoeAllyMaxHp': {
@@ -2421,6 +2495,7 @@ export function runEffects(
           ? Math.max(eff.pct, 0.2)
           : eff.pct;
         ctx.applyHeal(p, p, Math.round(p.maxHp * pct), ability.name);
+        if (ability.id === 'wildheart') runHunterWildheart(ctx, p);
         break;
       }
       case 'selfHotPctMax': {

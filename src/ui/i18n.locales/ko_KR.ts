@@ -2629,7 +2629,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     '신중하게 시위를 당긴 사격으로 {damage}의 피해를 입힙니다.',
   'entities.abilities.rapid_fire.name': '열광의 연사',
-  'entities.abilities.rapid_fire.description': '15초 동안 공격 속도가 40%만큼 증가합니다.',
+  'entities.abilities.rapid_fire.description':
+    '이동하면서 2.4초에 걸쳐 6발을 빠르게 발사합니다. 각 발은 {damage}의 물리 피해를 줍니다.',
   'entities.abilities.smite.name': '성스러운 일격',
   'entities.abilities.smite.description': '적에게 {damage}의 신성 피해를 입힙니다.',
   'entities.abilities.lesser_heal.name': '속삭이는 기도',

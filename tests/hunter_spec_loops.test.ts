@@ -91,7 +91,8 @@ describe('Hunter v0.29 baseline specialization loops', () => {
     advance(sim, 0.5);
     expect(sim.player.resource).toBe(0);
     advance(sim, 2);
-    expect(sim.player.resource).toBe(20);
+    // The completed shot contributes 20, alongside one 2 sec passive regen tick.
+    expect(sim.player.resource).toBe(30);
 
     ready(sim, 'cold_focus');
     sim.castAbility('cold_focus');
@@ -131,7 +132,9 @@ describe('Hunter v0.29 baseline specialization loops', () => {
     advance(sim, 0.1);
     expect(target.hp).toBeLessThan(before);
     expect(target.auras.filter((aura) => aura.id === 'bloodhook_bleed')).toHaveLength(1);
-    expect(target.auras.find((aura) => aura.id === 'bloodhook_bleed')?.remaining).toBeGreaterThan(10);
+    expect(target.auras.find((aura) => aura.id === 'bloodhook_bleed')?.remaining).toBeGreaterThan(
+      10,
+    );
     expect(sim.player.auras.some((aura) => aura.id === 'hunting_momentum')).toBe(false);
   });
 });

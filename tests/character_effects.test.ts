@@ -3,6 +3,9 @@ import {
   characterRecklessnessActive,
   characterSanguineAuraActive,
   characterSoulRendActive,
+  hunterPetFerocityStage,
+  hunterPetFrenzyActive,
+  hunterPetVisualScale,
 } from '../src/render/character_effects';
 import type { Entity } from '../src/sim/types';
 
@@ -124,5 +127,53 @@ describe('character visual effects', () => {
     expect(characterRecklessnessActive(entity({ auras: [reckless] }))).toBe(true);
     expect(characterSanguineAuraActive(entity({ auras: [reckless] }))).toBe(false);
     expect(characterRecklessnessActive(entity({ auras: [sanguine] }))).toBe(false);
+  });
+
+  it('derives Pack Ferocity presentation from the owner without changing pet state', () => {
+    const owner = entity({
+      id: 7,
+      auras: [
+        {
+          id: 'pack_ferocity',
+          name: 'Pack Ferocity',
+          kind: 'hunter_ferocity',
+          remaining: 20,
+          duration: 30,
+          value: 2,
+          stacks: 2,
+          sourceId: 7,
+          school: 'physical',
+        },
+      ],
+    });
+    const pet = entity({ id: 8, kind: 'mob', ownerId: owner.id });
+
+    expect(hunterPetFerocityStage(pet, owner)).toBe(2);
+    expect(hunterPetVisualScale(2, false)).toBe(1.08);
+    expect(pet.scale).toBe(1);
+    expect(hunterPetFerocityStage(pet, entity({ id: 9 }))).toBe(0);
+  });
+
+  it('keeps the unleashed frenzy visually distinct after Ferocity is consumed', () => {
+    const owner = entity({
+      id: 7,
+      auras: [
+        {
+          id: 'pack_frenzy',
+          name: 'Unleashed Frenzy',
+          kind: 'hunter_frenzy',
+          remaining: 8,
+          duration: 8,
+          value: 0.25,
+          sourceId: 7,
+          school: 'physical',
+        },
+      ],
+    });
+    const pet = entity({ id: 8, kind: 'mob', ownerId: owner.id });
+
+    expect(hunterPetFerocityStage(pet, owner)).toBe(0);
+    expect(hunterPetFrenzyActive(pet, owner)).toBe(true);
+    expect(hunterPetVisualScale(0, true)).toBe(1.1);
   });
 });

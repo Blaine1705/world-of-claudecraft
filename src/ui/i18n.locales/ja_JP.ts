@@ -2651,7 +2651,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     '慎重に引き絞った射撃で {damage} のダメージを与えます。',
   'entities.abilities.rapid_fire.name': '熱狂の速射',
-  'entities.abilities.rapid_fire.description': '15秒間、攻撃速度が40%増加します。',
+  'entities.abilities.rapid_fire.description':
+    '移動しながら2.4秒かけて6発の高速射撃を行い、1発ごとに{damage}の物理ダメージを与えます。',
   'entities.abilities.smite.name': 'スマイト',
   'entities.abilities.smite.description': '敵に {damage} の神聖ダメージを与えます。',
   'entities.abilities.lesser_heal.name': '囁きの祈り',

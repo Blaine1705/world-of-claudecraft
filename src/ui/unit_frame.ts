@@ -28,7 +28,7 @@ import { type AbsorbBarInput, absorbBarView } from './absorb_bar';
  * no-resource-bar case a target frame needs (it has no rage/energy/mana bar). The
  * player is always one of the three power types, never `none`.
  */
-export type UnitResourceClass = 'rage' | 'energy' | 'mana' | 'none';
+export type UnitResourceClass = 'rage' | 'energy' | 'focus' | 'mana' | 'none';
 
 /**
  * The resource input the descriptor carries. `none` marks a unit with no resource
@@ -160,6 +160,7 @@ export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
   if (kind === 'none') return 'none';
   if (kind === 'rage') return 'rage';
   if (kind === 'energy') return 'energy';
+  if (kind === 'focus') return 'focus';
   // 'mana' or null: the player's default branch, byte-identical to the old ternary.
   return 'mana';
 }

@@ -227,7 +227,8 @@ export const vi_VN: EnTranslations = {
     },
     "hud": {
       "lowMana": "Cạn Mana",
-      "lowEnergy": "Cạn Năng Lượng"
+      "lowEnergy": "Cạn Năng Lượng",
+      "lowFocus": "Low Focus"
     },
     "talents": {
       "title": "Thiên phú",
@@ -5235,7 +5236,8 @@ export const vi_VN: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Năng Lượng",
-      "rage": "Nộ Khí"
+      "rage": "Nộ Khí",
+      "focus": "Focus"
     },
     "roles": {
       "warrior": "Đỡ Đòn / DPS Cận Chiến",
@@ -5941,7 +5943,8 @@ export const vi_VN: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Nộ Khí",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "focus": "Focus"
     },
     "forms": {
       "bear": "Gấu",
@@ -6304,6 +6307,54 @@ export const vi_VN: EnTranslations = {
       "volley": {
         "name": "Loạt Tên",
         "description": "Trút mưa tên xuống khu vực mục tiêu trong 3 giây, gây {damage} sát thương mỗi 0.5 giây cho kẻ địch bên trong."
+      },
+      "pack_command": {
+        "name": "Pack Command",
+        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+      },
+      "unleash_beast": {
+        "name": "Unleash Beast",
+        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+      },
+      "measured_shot": {
+        "name": "Measured Shot",
+        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+      },
+      "cold_focus": {
+        "name": "Cold Focus",
+        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+      },
+      "bloodhook": {
+        "name": "Bloodhook",
+        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+      },
+      "shrapnel_charge": {
+        "name": "Shrapnel Charge",
+        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+      },
+      "bloodtrail_assault": {
+        "name": "Bloodtrail Assault",
+        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+      },
+      "trailbreak": {
+        "name": "Trailbreak",
+        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+      },
+      "wildheart": {
+        "name": "Wildheart",
+        "description": "Immediately restore 30% of your maximum health."
+      },
+      "shellskin": {
+        "name": "Shellskin",
+        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+      },
+      "frostjaw_trap": {
+        "name": "Frostjaw Trap",
+        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+      },
+      "pack_rally": {
+        "name": "Pack Rally",
+        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
       },
       "hurricane": {
         "name": "Cuồng Phong",
@@ -6707,7 +6758,7 @@ export const vi_VN: EnTranslations = {
       },
       "rapid_fire": {
         "name": "Giương Cung Cuồng Loạn",
-        "description": "Tăng tốc độ tấn công của bạn thêm 40% trong 15 giây."
+        "description": "Vừa di chuyển vừa bắn nhanh sáu phát trong 2,4 giây. Mỗi phát gây {damage} sát thương vật lý."
       },
       "smite": {
         "name": "Trừng Phạt",

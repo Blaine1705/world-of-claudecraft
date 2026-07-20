@@ -47,6 +47,9 @@ import {
   characterRecklessnessActive,
   characterSanguineAuraActive,
   characterSoulRendActive,
+  hunterPetFerocityStage,
+  hunterPetFrenzyActive,
+  hunterPetVisualScale,
 } from './character_effects';
 import {
   type AnimState,
@@ -5116,6 +5119,11 @@ export class Renderer {
         this.reconcileViewLights(v);
       }
       v.visual.setWeaponAura(characterSanguineAuraActive(e));
+      const petOwner = e.ownerId === null ? null : (sim.entities.get(e.ownerId) ?? null);
+      const ferocityStage = hunterPetFerocityStage(e, petOwner);
+      const petFrenzy = hunterPetFrenzyActive(e, petOwner);
+      v.visual.setFerocityStage(petFrenzy ? 3 : ferocityStage);
+      v.visual.setPresentationScale(hunterPetVisualScale(ferocityStage, petFrenzy));
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)
@@ -5379,6 +5387,13 @@ export class Renderer {
         }
       } else if (v.recklessOn) {
         v.recklessOn = false;
+      }
+      if (!e.dead && (ferocityStage > 0 || petFrenzy)) {
+        this.vfx.castSparkle(
+          e.id,
+          'fire',
+          dt * (0.45 + ferocityStage * 0.35 + (petFrenzy ? 1 : 0)),
+        );
       }
       // Shapeshift-form particle auras riding the tints above: metamorph fire,
       // moonkin star motes, shadowform gloom wisps. Suppressed for the dead

@@ -36,6 +36,7 @@
 // routes through the seam.
 
 import { hasUnbreakableMovementLock } from '../combat/cc';
+import { clearPacklordState } from '../combat/hunter_packlord';
 import { DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
 import type { PetState } from '../sim';
@@ -384,6 +385,9 @@ export function createDemonPet(
 }
 
 export function despawnPersistentPet(ctx: SimContext, pet: Entity): void {
+  const owner = pet.ownerId === null ? null : ctx.entities.get(pet.ownerId);
+  const ownerMeta = owner ? ctx.players.get(owner.id) : null;
+  if (owner && ownerMeta?.cls === 'hunter') clearPacklordState(ctx, owner);
   clearNonPlayerStatAuras(ctx, pet);
   pet.auras = [];
   clearThreat(pet);

@@ -190,7 +190,7 @@ export const ALL_CLASSES: PlayerClass[] = [
   'warlock',
   'druid',
 ];
-export type ResourceType = 'rage' | 'mana' | 'energy';
+export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus';
 export const OVERHEAD_EMOTE_IDS = [
   'wave',
   'laugh',
@@ -378,6 +378,14 @@ export type AuraKind =
   | 'victory_rush'
   | 'aoe_echo'
   | 'sure_crit'
+  // Hunter specialization state. These are visible owner auras, not resources.
+  // Pack Ferocity and Hunting Momentum carry their stage in `stacks`.
+  | 'hunter_ferocity'
+  | 'hunter_frenzy'
+  | 'hunter_cold_focus'
+  | 'hunter_momentum'
+  | 'hunter_reentry'
+  | 'hunter_bloodtrail'
   // Ice Floes (mage choice row): `value` = cast-time spells left that may be
   // cast while moving. player_motion skips its cancel while worn; finishing a
   // hard cast decrements the value and removes the aura at 0
@@ -1775,6 +1783,52 @@ export type AbilityEffect =
   | { type: 'clearCooldowns'; abilities: string[] }
   | { type: 'breakRoots' }
   | { type: 'breakControl' }
+  | {
+      type: 'packCommand';
+      min: number;
+      max: number;
+      focus: number;
+      ferocityDuration: number;
+    }
+  | {
+      type: 'unleashBeast';
+      primaryMin: number;
+      primaryMax: number;
+      clapMin: number;
+      clapMax: number;
+      radius: number;
+      frenzyDuration: number;
+    }
+  | { type: 'howlingRage'; duration: number }
+  | {
+      type: 'hunterBloodhook';
+      bleedTotal: number;
+      bleedDuration: number;
+      bleedInterval: number;
+    }
+  | {
+      type: 'hunterShrapnel';
+      primaryMin: number;
+      primaryMax: number;
+      splashMin: number;
+      splashMax: number;
+      radius: number;
+      maxTargets: number;
+      spreadTotal: number;
+      spreadDuration: number;
+      spreadInterval: number;
+    }
+  | { type: 'hunterTrailbreak'; distance: number }
+  | { type: 'hunterPackRally'; duration: number; radius: number }
+  | {
+      type: 'frostjawTrap';
+      radius: number;
+      armTime: number;
+      lifetime: number;
+      rootDuration: number;
+      slowMult: number;
+      slowDuration: number;
+    }
   // Ice Block: strip every player-removable debuff (control, DoTs, stat saps, ...)
   // Broader than breakRoots and breakControl. See effect_dispatch.
   | { type: 'cleanseSelf' }
@@ -2162,6 +2216,14 @@ export interface AbilityDef {
   // has not committed to a spec keeps the full kit, and talent/row GRANTS are
   // never filtered (the tree they come from is already spec-scoped).
   specs?: readonly string[];
+  // A known action may resolve to another authored ability while a visible aura
+  // state is active. The hotbar keeps the base id, so saved bindings survive the
+  // transformation. The replacement itself is never learned as a second action.
+  actionReplacement?: {
+    abilityId: string;
+    auraKind: AuraKind;
+    minStacks?: number;
+  };
   // Spec EXCLUSION (Reaver Strike vs Revenge): when set, a player whose CHOSEN
   // spec id is in the list DROPS this ability from their known list, even though
   // it is otherwise ungated. Used to swap one ability for a spec-exclusive

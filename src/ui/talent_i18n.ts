@@ -9050,6 +9050,7 @@ function grantResourceName(id: string): string | null {
   if (resource === 'mana') return t('abilityUi.resources.mana');
   if (resource === 'rage') return t('abilityUi.resources.rage');
   if (resource === 'energy') return t('abilityUi.resources.energy');
+  if (resource === 'focus') return t('abilityUi.resources.focus');
   return null;
 }
 

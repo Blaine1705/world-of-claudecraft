@@ -2542,7 +2542,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.name': '長弓引射',
   'entities.abilities.aimed_shot.description': '一次仔細引弓的射擊，造成 {damage} 點傷害。',
   'entities.abilities.rapid_fire.name': '狂熱連射',
-  'entities.abilities.rapid_fire.description': '使你的攻擊速度提高 40%，持續 15 秒。',
+  'entities.abilities.rapid_fire.description':
+    '移動時在2.4秒內快速射出6箭，每箭造成{damage}點物理傷害。',
   'entities.abilities.smite.name': '懲擊',
   'entities.abilities.smite.description': '懲擊敵人，造成 {damage} 點神聖傷害。',
   'entities.abilities.lesser_heal.name': '低語祈禱',

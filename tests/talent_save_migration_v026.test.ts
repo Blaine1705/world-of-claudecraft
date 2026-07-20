@@ -26,7 +26,7 @@ function savedState(value: CharacterState | null): CharacterState {
   return value;
 }
 
-describe('v0.26 Talents V2 production save migration', () => {
+describe('talent production save migrations', () => {
   it('pins the representative v0.25 stable-Warrior fixture and its provenance', () => {
     expect(fixture.provenance).toEqual({
       kind: 'synthetic-production-shape',
@@ -93,6 +93,44 @@ describe('v0.26 Talents V2 production save migration', () => {
     const twice = migrateCharacterTalentsV2('warrior', once);
     expect(twice).toBe(once);
     expect(twice).toEqual(once);
+  });
+
+  it('gives v0.28 Hunters a safe row repick and repairs retired loadout abilities', () => {
+    const legacy = cloneFixture();
+    legacy.contentRevision = 1;
+    legacy.level = 20;
+    legacy.talents = {
+      spec: 'beast_mastery',
+      rows: {
+        5: 'hun_r5_improved_serpent_sting',
+        8: 'hun_r8_frost_trap',
+        11: 'hun_r11_mend_pet',
+        14: 'hun_r14_multi_shot',
+        17: 'hun_r17_master_tamer',
+        20: 'hun_r20_aspect_of_the_wild',
+      },
+    };
+    legacy.loadouts = [
+      {
+        name: 'Old Beast Mastery',
+        alloc: structuredClone(legacy.talents),
+        bar: ['frost_trap', 'multi_shot', 'aspect_of_the_wild'],
+      },
+    ];
+    legacy.activeLoadout = 0;
+
+    const migrated = migrateCharacterTalentsV2('hunter', legacy);
+
+    expect(migrated.contentRevision).toBe(CURRENT_CHARACTER_CONTENT_REVISION);
+    expect(migrated.contentRevision).toBeGreaterThan(1);
+    expect(migrated.talents).toEqual({ spec: 'beast_mastery', rows: {} });
+    expect(migrated.loadouts?.[0].alloc).toEqual({ spec: 'beast_mastery', rows: {} });
+    expect(migrated.loadouts?.[0].bar).toContain('pack_command');
+    expect(migrated.loadouts?.[0].bar).not.toContain('frost_trap');
+    expect(migrated.loadouts?.[0].bar).not.toContain('multi_shot');
+    expect(migrated.loadouts?.[0].bar).not.toContain('aspect_of_the_wild');
+    expect(migrated.xp).toBe(legacy.xp);
+    expect(migrated.copper).toBe(legacy.copper);
   });
 
   it('loads, saves, and reloads the migrated Warrior without duplicate learning or neutral-state loss', () => {

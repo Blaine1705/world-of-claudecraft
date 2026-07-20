@@ -209,6 +209,41 @@ export interface TalentEffect {
   proc?: ProcDef;
   ability?: AbilityModEffect[];
   global?: GlobalModEffect;
+  // Numeric contract for bespoke runtime hooks that do not fit a generic
+  // modifier primitive. Tooltip audits read this metadata so authored copy and
+  // the implementation constants stay in lockstep.
+  runtime?: {
+    movementSpeedPct?: number;
+    enduringMovementSpeedPct?: number;
+    focusGenerationPct?: number;
+    damageReductionPct?: number;
+    fallbackDamageReductionPct?: number;
+    petHealPct?: number;
+    cooldownRefundPct?: number;
+    petHealthFloorPct?: number;
+    healthThresholdPct?: number;
+    slowPct?: number;
+    costReductionPct?: number;
+    primaryDamagePct?: number;
+    cleavePct?: number;
+    echoPct?: number;
+    hastePct?: number;
+    focusSpendThreshold?: number;
+    focusBonus?: number;
+    focusGain?: number;
+    duration?: number;
+    rootDuration?: number;
+    slowDuration?: number;
+    markDuration?: number;
+    internalCooldown?: number;
+    perTargetCooldown?: number;
+    cooldownRefundCap?: number;
+    durationBuffer?: number;
+    charges?: number;
+    radius?: number;
+    targetCap?: number;
+    everyNth?: number;
+  };
 }
 
 export interface SpecDef {

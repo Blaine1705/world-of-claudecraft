@@ -88,6 +88,9 @@ import {
   frostMageChannelStart,
 } from './frost_mage';
 import { empoweredCastProgress, empoweredStageForProgress } from './glacial_front';
+import { bloodhookStartError } from './hunter_fieldcraft';
+import { packCommandError } from './hunter_packlord';
+import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
 import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
 import {
   hasCastShield,
@@ -132,6 +135,26 @@ function isToggleBuff(ability: AbilityDef): boolean {
 
 function isStasisToggle(ability: AbilityDef): boolean {
   return ability.effects.some((effect) => effect.type === 'selfBuff' && effect.kind === 'stasis');
+}
+
+function shellskinBlocksAbility(entity: Entity, meta: PlayerMeta, ability: AbilityDef): boolean {
+  if (!entity.auras.some((aura) => aura.id === 'shellskin')) return false;
+  if (meta.talents.rows[17] === 'hun_r17_shell_and_fang') return false;
+  if (ability.id === 'shellskin') return false;
+  if (ability.requiresTarget && ability.targetType !== 'friendly') return true;
+  return ability.effects.some((effect) =>
+    [
+      'directDamage',
+      'weaponDamage',
+      'weaponStrike',
+      'aoeDamage',
+      'packCommand',
+      'unleashBeast',
+      'hunterBloodhook',
+      'hunterShrapnel',
+      'frostjawTrap',
+    ].includes(effect.type),
+  );
 }
 
 function cancelStasisToggle(ctx: SimContext, entity: Entity, ability: AbilityDef): boolean {
@@ -466,7 +489,12 @@ export function castAbility(
   if (res.def.passive) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
+  if (cancelRecedingShell(ctx, p, meta, ability.id)) return;
   if (cancelStasisToggle(ctx, p, ability)) return;
+  if (shellskinBlocksAbility(p, meta, ability)) {
+    ctx.error(p.id, 'Shellskin prevents attacks.');
+    return;
+  }
   // Ice Block (usableWhileControlled) may be pressed through ordinary control;
   // cleanseSelf removes the player-breakable debuffs while encounter-authored
   // unbreakable control remains. Its own stasis is handled by the recast toggle above.
@@ -491,7 +519,9 @@ export function castAbility(
       (effect) =>
         effect.type === 'blinkForward' ||
         effect.type === 'repositionToAim' ||
-        effect.type === 'charge',
+        effect.type === 'charge' ||
+        effect.type === 'hunterBloodhook' ||
+        effect.type === 'hunterTrailbreak',
     )
   ) {
     ctx.error(p.id, 'You are stunned!');
@@ -559,7 +589,9 @@ export function castAbility(
         ? 'Not enough rage!'
         : p.resourceType === 'energy'
           ? 'Not enough energy!'
-          : 'Not enough mana!',
+          : p.resourceType === 'focus'
+            ? 'Not enough Focus!'
+            : 'Not enough mana!',
     );
     return;
   }
@@ -764,6 +796,20 @@ export function castAbility(
           return;
         }
       }
+    }
+  }
+  if (ability.id === 'pack_command' || ability.id === 'unleash_beast') {
+    const error = packCommandError(ctx, p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
+    }
+  }
+  if (ability.id === 'bloodhook') {
+    const error = bloodhookStartError(ctx, p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
     }
   }
   // Hard Bargain cannot spend the caster's last health. Reject it before GCD,
@@ -1037,6 +1083,7 @@ function spendAbilityCost(
     return;
   }
   spendResource(p, res.cost);
+  noteHunterFocusSpend(ctx, p, meta, res);
   // Overflowing Power (mage choice row): every 10% of maximum mana actually
   // spent shaves manaDefCdrPer10 seconds off the mage defensive cooldowns,
   // capped per rolling window (the 'internal_cd' aura carries the window's

@@ -227,7 +227,8 @@ export const ko_KR: EnTranslations = {
     },
     "hud": {
       "lowMana": "마나 부족",
-      "lowEnergy": "기력 부족"
+      "lowEnergy": "기력 부족",
+      "lowFocus": "Low Focus"
     },
     "talents": {
       "title": "특성",
@@ -5235,7 +5236,8 @@ export const ko_KR: EnTranslations = {
     "resources": {
       "mana": "마나",
       "energy": "기력",
-      "rage": "분노"
+      "rage": "분노",
+      "focus": "Focus"
     },
     "roles": {
       "warrior": "탱커 / 근접 DPS",
@@ -5941,7 +5943,8 @@ export const ko_KR: EnTranslations = {
     "resources": {
       "mana": "마나",
       "rage": "분노",
-      "energy": "기력"
+      "energy": "기력",
+      "focus": "Focus"
     },
     "forms": {
       "bear": "곰",
@@ -6304,6 +6307,54 @@ export const ko_KR: EnTranslations = {
       "volley": {
         "name": "일제 사격",
         "description": "지정한 지역에 3초 동안 화살을 쏟아부어 그 안의 적에게 0.5초마다 {damage}의 피해를 입힙니다."
+      },
+      "pack_command": {
+        "name": "Pack Command",
+        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+      },
+      "unleash_beast": {
+        "name": "Unleash Beast",
+        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+      },
+      "measured_shot": {
+        "name": "Measured Shot",
+        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+      },
+      "cold_focus": {
+        "name": "Cold Focus",
+        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+      },
+      "bloodhook": {
+        "name": "Bloodhook",
+        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+      },
+      "shrapnel_charge": {
+        "name": "Shrapnel Charge",
+        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+      },
+      "bloodtrail_assault": {
+        "name": "Bloodtrail Assault",
+        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+      },
+      "trailbreak": {
+        "name": "Trailbreak",
+        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+      },
+      "wildheart": {
+        "name": "Wildheart",
+        "description": "Immediately restore 30% of your maximum health."
+      },
+      "shellskin": {
+        "name": "Shellskin",
+        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+      },
+      "frostjaw_trap": {
+        "name": "Frostjaw Trap",
+        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+      },
+      "pack_rally": {
+        "name": "Pack Rally",
+        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
       },
       "hurricane": {
         "name": "폭풍우",
@@ -6707,7 +6758,7 @@ export const ko_KR: EnTranslations = {
       },
       "rapid_fire": {
         "name": "열광의 연사",
-        "description": "15초 동안 공격 속도가 40%만큼 증가합니다."
+        "description": "이동하면서 2.4초에 걸쳐 6발을 빠르게 발사합니다. 각 발은 {damage}의 물리 피해를 줍니다."
       },
       "smite": {
         "name": "성스러운 일격",

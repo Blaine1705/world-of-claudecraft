@@ -2672,7 +2672,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Тщательно натянутый выстрел, наносящий {damage} ед. урона.',
   'entities.abilities.rapid_fire.name': 'Лихорадочный натяг',
-  'entities.abilities.rapid_fire.description': 'Повышает скорость атаки на 40% на 15 сек.',
+  'entities.abilities.rapid_fire.description':
+    'Во время движения выпускает шесть быстрых стрел за 2,4 сек. Каждая наносит {damage} ед. физического урона.',
   'entities.abilities.smite.name': 'Кара',
   'entities.abilities.smite.description':
     'Карает врага, нанося {damage} ед. урона от светлой магии.',
