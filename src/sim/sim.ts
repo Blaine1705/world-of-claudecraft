@@ -454,6 +454,7 @@ import {
   riftInstanceAtPos,
   riftOpenTreasure as riftOpenTreasureImpl,
   riftPlayerLift as riftPlayerLiftImpl,
+  tickRiftBossDeathZones as tickRiftBossDeathZonesImpl,
   tickRiftLockpicks as tickRiftLockpicksImpl,
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
@@ -2047,6 +2048,7 @@ export class Sim {
         tier: null,
         portalId: null,
         rewarded: false,
+        bossDeathZones: [],
       });
     }
 
@@ -4747,6 +4749,7 @@ export class Sim {
     advanceRiftRollersImpl(this.ctx); // 20 Hz: smooth rolling-boulder motion
     liftRiftEntitiesImpl(this.ctx); // stand rift mobs/objects on the raised tier
     tickRiftLockpicksImpl(this.ctx); // per-tick rift-cache lockpick step clock
+    tickRiftBossDeathZonesImpl(this.ctx); // lethal boss zone fuses + detonation
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();

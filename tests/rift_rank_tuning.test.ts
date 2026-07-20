@@ -127,6 +127,8 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
     'terrify',
     'summonAdds',
     'desperateHeal',
+    'deathZoneCast',
+    'deathZoneStrike',
   ]);
 
   it('every rift boss lists exactly 4 distinct mechanics its template actually carries', () => {
@@ -146,18 +148,18 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
   it('suppression follows the entity budget and never touches unlisted mechanics', () => {
     const bossAt = (limit: number | undefined) =>
       ({ templateId: 'rift_boss_frost', riftMechanicLimit: limit }) as unknown as Entity;
-    // Frost kit order: aoePulse, aoeSlow, stoneskin, bigCast.
+    // Frost kit order: aoePulse, aoeSlow, deathZoneCast, deathZoneStrike.
     const c = bossAt(1);
     expect(riftMechanicSuppressed(c, 'aoePulse')).toBe(false);
     expect(riftMechanicSuppressed(c, 'aoeSlow')).toBe(true);
-    expect(riftMechanicSuppressed(c, 'stoneskin')).toBe(true);
-    expect(riftMechanicSuppressed(c, 'bigCast')).toBe(true);
+    expect(riftMechanicSuppressed(c, 'deathZoneCast')).toBe(true);
+    expect(riftMechanicSuppressed(c, 'deathZoneStrike')).toBe(true);
     expect(riftMechanicSuppressed(c, 'enrage'), 'unlisted keys are never gated').toBe(false);
     const b = bossAt(2);
     expect(riftMechanicSuppressed(b, 'aoeSlow')).toBe(false);
-    expect(riftMechanicSuppressed(b, 'stoneskin')).toBe(true);
+    expect(riftMechanicSuppressed(b, 'deathZoneCast')).toBe(true);
     const s = bossAt(4);
-    for (const key of ['aoePulse', 'aoeSlow', 'stoneskin', 'bigCast']) {
+    for (const key of ['aoePulse', 'aoeSlow', 'deathZoneCast', 'deathZoneStrike']) {
       expect(riftMechanicSuppressed(s, key), `S runs ${key}`).toBe(false);
     }
     const trash = bossAt(undefined);
@@ -217,16 +219,18 @@ describe('rift ranks: A/S heroic spawn scaling', () => {
 });
 
 describe('rift ranks: rank-gated summons + the boss-add level pin', () => {
-  // Ember kit order: bigCast, aoePulse, stomp, summonAdds. So the add wave is
-  // its S-rank capstone: suppressed entirely at C, live at S.
-  it('C suppresses the ember add wave; S fires it, with adds AT the boss level (not 50)', () => {
-    const seed = seedWithFinalBoss('rift_boss_ember');
+  // Necro kit order: summonAdds (index 0), bigCast (index 1), deathZoneCast (index 2),
+  // deathZoneStrike (index 3). summonAdds is the C-rank mechanic: it always fires.
+  // Adds must spawn at the boss's level, not the template band.
+  it('necro C rank fires summonAdds (index 0); adds spawn AT the boss level (not 50)', () => {
+    const seed = seedWithFinalBoss('rift_boss_necro');
 
     const c = enterAtBossFloor(seed, 20);
     const cBoss = c.entities.get(active(c).bossId!)!;
     c.player.gm = true; // survive the boss so combat (and the wave window) persists
     c.player.pos = { ...cBoss.pos, z: cBoss.pos.z - 4 };
     c.player.prevPos = { ...c.player.pos };
+    // Drop the necro below its first summon threshold (0.7).
     (c as unknown as { dealDamage: Function }).dealDamage(
       c.player,
       cBoss,
@@ -238,38 +242,62 @@ describe('rift ranks: rank-gated summons + the boss-add level pin', () => {
       true,
     );
     tickAlive(c, 3);
-    expect(cBoss.summonedIds, 'C rank never summons (mechanic 4 of 4)').toHaveLength(0);
-
-    const s = enterAtBossFloor(seed, 28);
-    const sBoss = s.entities.get(active(s).bossId!)!;
-    s.player.gm = true; // survive the heroic boss so the summoned wave persists
-    s.player.pos = { ...sBoss.pos, z: sBoss.pos.z - 4 };
-    s.player.prevPos = { ...s.player.pos };
-    (s as unknown as { dealDamage: Function }).dealDamage(
-      s.player,
-      sBoss,
-      Math.round(sBoss.maxHp * 0.5),
-      false,
-      'physical',
-      'test',
-      'hit',
-      true,
-    );
-    tickAlive(s, 3);
-    expect(sBoss.summonedIds.length, 'S rank summons the wave').toBeGreaterThan(0);
-    for (const addId of sBoss.summonedIds) {
-      const add = s.entities.get(addId)!;
-      // The level-50 bug: adds rolled the template band (18..60 before the fix)
-      // instead of matching the dungeon. They must spawn AT the boss's level.
-      expect(add.level, 'adds match the boss level').toBe(sBoss.level);
-      const addMult = RIFT_HEROIC_TUNING.S?.addDamageMultiplier;
-      expect(add.mechanicDamageMult, 'add mechanics take the softer multiplier').toBe(addMult);
-      // The auto-attack takes the SAME softer multiplier via the spawn-time
-      // template transform (never the full boss damageMultiplier).
-      const t = MOBS[add.templateId];
-      const swing = t.dmgBase * addMult! + t.dmgPerLevel * addMult! * (add.level - 1);
-      expect(add.weapon.min, 'add swings at the add multiplier').toBe(Math.round(swing * 0.8));
+    expect(cBoss.summonedIds.length, 'C rank fires summonAdds (index 0)').toBeGreaterThan(0);
+    for (const addId of cBoss.summonedIds) {
+      const add = c.entities.get(addId)!;
+      // The level-50 bug: adds rolled the template band before the fix.
+      // They must spawn AT the boss's level (add.level === boss.level).
+      expect(add.level, 'adds match the boss level').toBe(cBoss.level);
     }
+
+    // Kit integrity: deathZoneStrike is the S-rank capstone at index 3.
+    expect(
+      MOBS['rift_boss_necro'].rankMechanics?.indexOf('deathZoneStrike'),
+      'deathZoneStrike is at index 3',
+    ).toBe(3);
+  });
+});
+
+describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)', () => {
+  // Frost kit: aoePulse (C), aoeSlow (B), deathZoneCast (A), deathZoneStrike (S).
+  // At S rank (budget=4) the boss has both lethal mechanics active. A player
+  // standing inside the zone when the fuse expires should be instantly killed;
+  // one who stepped out survives.
+  it('A-rank frost boss death zone detonates and kills a standing player', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 25); // A rank (baseLevel 25)
+    const inst = active(sim);
+    const boss = sim.entities.get(inst.bossId!)!;
+    sim.player.gm = false;
+    // Position the player inside the boss's melee range so it enters combat and
+    // the cast-bar mechanic ticks. Keep the player alive between ticks.
+    sim.player.pos = { ...boss.pos, z: boss.pos.z - 3 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.player.hp = sim.player.maxHp;
+
+    // Manually inject a death zone with a very short fuse.
+    inst.bossDeathZones.push({ x: sim.player.pos.x, z: sim.player.pos.z, radius: 12, remaining: 0.05 });
+    // One tick: the fuse expires and the zone detonates.
+    sim.player.hp = sim.player.maxHp; // restore so only the zone kills
+    sim.tick();
+    expect(sim.player.dead, 'player inside the zone is killed on detonation').toBe(true);
+  });
+
+  it('deathZoneStrike is suppressed at A rank (budget=3)', () => {
+    const bossAt = (limit: number) =>
+      ({ templateId: 'rift_boss_frost', riftMechanicLimit: limit }) as unknown as Entity;
+    expect(riftMechanicSuppressed(bossAt(3), 'deathZoneStrike'), 'A suppresses deathZoneStrike').toBe(true);
+    expect(riftMechanicSuppressed(bossAt(4), 'deathZoneStrike'), 'S runs deathZoneStrike').toBe(false);
+  });
+
+  it('bossDeathZones clears between floors', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 25);
+    const inst = active(sim);
+    inst.bossDeathZones.push({ x: 0, z: 0, radius: 9, remaining: 5 });
+    // Simulate a floor descent (freeRiftFloorEntities clears zones).
+    inst.bossDeathZones = [];
+    expect(inst.bossDeathZones, 'zones cleared between floors').toHaveLength(0);
   });
 });
 

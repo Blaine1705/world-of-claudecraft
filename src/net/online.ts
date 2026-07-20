@@ -1179,6 +1179,8 @@ function blankEntity(id: number): Entity {
     pulseTimer: 0,
     stompTimer: 0,
     bigCastTimer: 0,
+    deathZoneCastTimer: 0,
+    deathZoneStrikeTimer: 0,
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,

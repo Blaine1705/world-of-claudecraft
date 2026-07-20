@@ -1170,6 +1170,36 @@ export interface MobTemplate {
     school?: string;
     yell?: string;
   };
+  // Boss mechanic: lethal telegraphed zone (A-rank). The boss hardcasts for
+  // `castTime` seconds (a visible cast bar, same as bigCast), placing a ground
+  // zone at a targeted player's position the instant casting begins. Any player
+  // still inside `radius` when the cast completes takes flat p.hp + p.maxHp
+  // (guaranteed kill, no mechanicDamageMult). `yell` fires at cast start;
+  // `detonateText` fires in a log line at detonation. Zone state lives on
+  // RiftInstance.bossDeathZones and ticks down; only rift boss floors emit these.
+  deathZoneCast?: {
+    castId: string;
+    name: string;
+    castTime: number;
+    every: number;
+    radius: number;
+    school?: string;
+    yell?: string;
+    detonateText: string;
+  };
+  // Boss mechanic: lethal telegraphed zone (S-rank), identical driver to
+  // deathZoneCast but with distinct castId/name/flavor (wider radius, slower
+  // cast) so rank S bosses run two distinct lethal patterns simultaneously.
+  deathZoneStrike?: {
+    castId: string;
+    name: string;
+    castTime: number;
+    every: number;
+    radius: number;
+    school?: string;
+    yell?: string;
+    detonateText: string;
+  };
   // Boss bark lines, broadcast as 'yell'-channel chat to every player within
   // YELL_RANGE (mirroring the Nythraxis encounter yells; sim-emitted English by
   // the variable-routed-chat precedent, see the S3 note in
@@ -1184,8 +1214,8 @@ export interface MobTemplate {
   // site). Absent (every non-rift template) or on an entity with no
   // riftMechanicLimit, nothing is suppressed. Keys name MobTemplate mechanic
   // fields driven by the timed/threshold runners (aoePulse, aoeSlow, bigCast,
-  // stoneskin, stomp, terrify, summonAdds, desperateHeal); on-hit affixes stay
-  // ungated flavor.
+  // stoneskin, stomp, terrify, summonAdds, desperateHeal, deathZoneCast,
+  // deathZoneStrike); on-hit affixes stay ungated flavor.
   rankMechanics?: readonly string[];
   // Boss mechanic: damage multiplier (and optional swing-speed haste) once hp
   // drops below the threshold. hasteMult > 1 makes the enraged mob swing faster.
@@ -2947,6 +2977,8 @@ export interface Entity {
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
   bigCastTimer: number; // boss telegraphed-hardcast (bigCast) cadence countdown
+  deathZoneCastTimer: number; // lethal zone cast (deathZoneCast) cadence countdown
+  deathZoneStrikeTimer: number; // lethal zone cast (deathZoneStrike) cadence countdown
   yelledEngage: boolean; // engage bark fired this pull (reset on evade/respawn)
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   terrifyTimer: number; // Banshee's Wail fear-pulse countdown

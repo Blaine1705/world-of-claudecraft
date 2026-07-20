@@ -414,6 +414,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
+  inst.bossDeathZones = [];
 }
 
 function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
@@ -434,6 +435,7 @@ function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
   inst.tier = null;
   inst.portalId = null;
   inst.rewarded = false;
+  inst.bossDeathZones = [];
   if (eventId !== null) {
     const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
     const anotherRun = ctx.riftInstances.some(
@@ -1381,6 +1383,33 @@ export function liftRiftEntities(ctx: SimContext): void {
     if (inst.descentId !== null) lift(inst.descentId);
     if (inst.exitId !== null) lift(inst.exitId);
     if (inst.cacheId !== null) lift(inst.cacheId);
+  }
+}
+
+/** Per-tick: advance every active rift boss lethal death zone fuse. When a zone
+ * expires it detonates: every living player still inside the radius takes flat
+ * p.hp + p.maxHp (guaranteed kill, no mechanicDamageMult modifier, by design).
+ * Only instances with active zones do any real work. */
+export function tickRiftBossDeathZones(ctx: SimContext): void {
+  for (const inst of ctx.riftInstances) {
+    if (inst.partyKey === null || inst.bossDeathZones.length === 0) continue;
+    const live: Array<{ x: number; z: number; radius: number; remaining: number }> = [];
+    for (const zone of inst.bossDeathZones) {
+      zone.remaining -= DT;
+      if (zone.remaining > 0) {
+        live.push(zone);
+        continue;
+      }
+      // Detonation: lethal to any player still inside the radius.
+      const pids = instancePlayerIds(ctx, inst);
+      for (const pid of pids) {
+        const p = ctx.entities.get(pid);
+        if (!p || p.dead || dist2d({ x: zone.x, z: zone.z, y: 0 }, p.pos) > zone.radius) continue;
+        ctx.dealDamage(null, p, p.hp + p.maxHp, false, 'fire', 'Death Zone', 'hit', true);
+        riftFx(ctx, p.pos.x, p.pos.z, 'fire', 'nova');
+      }
+    }
+    inst.bossDeathZones = live;
   }
 }
 
