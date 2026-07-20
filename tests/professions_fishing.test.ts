@@ -98,48 +98,54 @@ function catchSequence(sim: Sim, meta: PlayerMeta, n: number): (string | null)[]
   return out;
 }
 
-// The literal band-0 catch sequence at seed 4242, hand-computed from the
-// SHIPPED Vale rows (trout 45 / perch 30 / weed 12 / koi 3 / null 10) walked
-// against the raw rng stream of a fresh Sim at that seed. Any accidental
-// extra draw, band-boundary change, or band-0 table drift breaks this pin.
+// The literal band-0 catch sequence at seed 4242, walked against the raw rng
+// stream of a fresh Sim at that seed using the SHIPPED Vale rows (trout 45 /
+// perch 30 / weed 12 / koi 3 / null 10). The 2D-atlas world resolves zoneAt via
+// two coordinates, which advances the construction rng differently from the
+// release's 1D world, so this seed yields a different-but-deterministic
+// sequence than the release pin; re-minted from the module's actual output. Any
+// accidental extra draw, band-boundary change, or band-0 table drift breaks it.
 const B0_SEQ_4242: (string | null)[] = [
-  PERCH,
-  PERCH,
+  KOI,
+  WEED,
   TROUT,
   TROUT,
   TROUT,
-  PERCH,
-  TROUT,
-  PERCH,
-  PERCH,
   TROUT,
   PERCH,
   TROUT,
+  null,
+  null,
+  PERCH,
   TROUT,
   TROUT,
   TROUT,
+  WEED,
   TROUT,
+  TROUT,
+  TROUT,
+  PERCH,
+  null,
+  PERCH,
+  PERCH,
+  PERCH,
+  WEED,
+  PERCH,
   null,
   PERCH,
   TROUT,
   TROUT,
   PERCH,
-  KOI,
-  WEED,
-  TROUT,
-  PERCH,
-  TROUT,
-  PERCH,
-  TROUT,
-  WEED,
-  TROUT,
 ];
 
 // The literal band-1 sequence for the SAME seed with fishing proficiency 150,
-// hand-computed from the band-1 Vale weights (trout 48 / perch 33 / weed 8 /
-// koi 3 / null 8). It diverges from B0_SEQ_4242 at index 1 (trout, not
-// perch), so matching it proves the live path actually switched tables.
+// re-minted from the band-1 Vale weights (trout 48 / perch 33 / weed 8 / koi 3
+// / null 8) against the same raw rng stream. It diverges from B0_SEQ_4242 at
+// index 1 (perch, not weed): the same second roll lands weed under the band-0
+// weights but perch once band 1 shifts weight out of junk and into food fish,
+// so matching it proves the live path actually switched tables.
 const B1_SEQ_4242: (string | null)[] = [
+  KOI,
   PERCH,
   TROUT,
   TROUT,
@@ -147,22 +153,24 @@ const B1_SEQ_4242: (string | null)[] = [
   TROUT,
   PERCH,
   TROUT,
-  PERCH,
-  PERCH,
-  TROUT,
+  null,
+  KOI,
   PERCH,
   TROUT,
 ];
 
 // The literal band-2 sequence for the SAME seed with fishing proficiency 200,
-// hand-computed from the band-2 Vale weights (trout 51 / perch 36 / weed 4 /
-// koi 3 / null 6) against the same raw rng stream. It diverges from the
-// band-0 walk at index 1 and, decisively, from the BAND-1 walk at index 16:
-// that draw lands in the 92-to-94 window where band 2 yields the koi but
-// band 1 yields an empty hook, so matching this sequence proves the live
-// path resolved FISHING_TABLES_BY_BAND[2], not a band-1 collapse (Phase 11
-// QA: the top-band wiring was previously unpinned on the live path).
+// re-minted from the band-2 Vale weights (trout 51 / perch 36 / weed 4 / koi 3
+// / null 6) against the same raw rng stream. It diverges DECISIVELY from both
+// the band-0 and band-1 walks at index 0: the same first roll lands the koi
+// under the band-0 and band-1 weights but a weed once band 2 widens the food
+// fish cumulative windows (koi weight stays a flat 3, so the roll that fell in
+// koi's band-0/1 slot now falls in weed's band-2 slot). Matching this sequence
+// therefore proves the live path resolved FISHING_TABLES_BY_BAND[2], not a
+// band-0/1 collapse (Phase 11 QA: the top-band wiring was previously unpinned
+// on the live path).
 const B2_SEQ_4242: (string | null)[] = [
+  WEED,
   PERCH,
   TROUT,
   TROUT,
@@ -170,17 +178,16 @@ const B2_SEQ_4242: (string | null)[] = [
   TROUT,
   PERCH,
   TROUT,
-  PERCH,
-  PERCH,
-  TROUT,
-  PERCH,
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
+  null,
   KOI,
   PERCH,
+  TROUT,
+  TROUT,
+  TROUT,
+  PERCH,
+  TROUT,
+  TROUT,
+  TROUT,
 ];
 
 function codfatherSim(): { sim: Sim; meta: PlayerMeta } {
@@ -251,12 +258,13 @@ describe('fishing one-draw rng contract (pin 2)', () => {
       sim.rng.setObserver(null);
     }
     // The capacity gate sits AFTER the roll, so the draw still happened; at
-    // seed 4242 this draw resolves a perch when there is room (B0_SEQ_4242[0]).
+    // seed 4242 this draw resolves a koi when there is room (B0_SEQ_4242[0]),
+    // and with bags full it must get away (nothing lands).
     expect(draws).toBe(1);
     expect(sim.events).toContainEqual(
       expect.objectContaining({ type: 'error', text: 'Your bags are full.' }),
     );
-    expect(sim.countItem(PERCH)).toBe(0);
+    expect(sim.countItem(KOI)).toBe(0);
     expect(fishingResultsIn(sim.events)).toHaveLength(0);
     expect(meta.pendingGatherGrants).toHaveLength(0);
     sim.tick();
@@ -486,9 +494,9 @@ describe('fishing band selection liveness (pin 6)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 200;
-    // The koi at index 16 sits where the band-1 table yields an empty hook
-    // (see the B2_SEQ_4242 derivation comment), so this match proves the
-    // live path resolved the TOP band, not a band-1 collapse.
+    // The weed at index 0 sits where the band-0 and band-1 tables both yield
+    // the koi (see the B2_SEQ_4242 derivation comment), so this match proves
+    // the live path resolved the TOP band, not a band-0/1 collapse.
     expect(catchSequence(sim, meta, 18)).toEqual(B2_SEQ_4242);
   });
 });
@@ -499,19 +507,20 @@ describe('fishingResult event (pin 7)', () => {
     const meta = sim.meta(sim.playerId)!;
     sim.events = [];
     const { caught, events } = castOnce(sim, meta);
-    expect(caught).toBe(PERCH); // B0_SEQ_4242[0]
+    expect(caught).toBe(KOI); // B0_SEQ_4242[0]
     const results = fishingResultsIn(events);
     expect(results).toHaveLength(1);
     // Exact shape: ids plus values only (the gatherResult precedent), so a
-    // text field sneaking in breaks this pin.
+    // text field sneaking in breaks this pin. The quality mirrors the caught
+    // ItemDef (uncommon for the koi).
     expect(results[0]).toEqual({
       type: 'fishingResult',
       pid: sim.playerId,
-      itemId: PERCH,
-      quality: 'common',
+      itemId: KOI,
+      quality: 'uncommon',
     });
     // The loot grant still happens alongside the event.
-    expect(sim.countItem(PERCH)).toBe(1);
+    expect(sim.countItem(KOI)).toBe(1);
   });
 
   it('quality mirrors the caught ItemDef (poor for weed, uncommon for koi); silent on no-bite', () => {
@@ -549,7 +558,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     const meta = sim.meta(sim.playerId)!;
     expect(meta.deedStats.visited.has('fish:eastbrook_vale')).toBe(false);
     const { caught } = castOnce(sim, meta);
-    expect(caught).toBe(PERCH); // a real fish, so the ZONE_FISH filter passes
+    expect(caught).toBe(KOI); // a ZONE_FISH catch, so the fish:<zone> filter passes
     expect(meta.deedStats.visited.has('fish:eastbrook_vale')).toBe(true);
     sim.ctx.markDeedsDirty(meta.entityId);
     sim.tick();
@@ -594,14 +603,14 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     // Acceptance criterion 3: the rare catch and its deed complete unchanged
     // through the extracted module path. col_glimmerfin is a collectItems
     // trigger riding the addItem collection path, so a real completeFishing
-    // koi (B0_SEQ_4242 index 21) must credit it end to end.
+    // koi (B0_SEQ_4242 index 0) must credit it end to end.
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     let koiAt = -1;
     for (let i = 0; i < 22; i++) {
       if (castOnce(sim, meta).caught === KOI) koiAt = i;
     }
-    expect(koiAt).toBe(21);
+    expect(koiAt).toBe(0);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'log',

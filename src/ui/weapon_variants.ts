@@ -20,6 +20,8 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   crossroads_saber: 'sword_d',
   mistcallers_edge: 'sword_e',
   zealotsbane_blade: 'sword_e',
+  hoarfrost_edge: 'sword_e', // rift rare 1H sword (heroic clone rides heroicOf)
+  veilsteel_blade: 'sword_b', // realm uncommon 1H sword (arming-sword sibling)
   kingsbane_last_oath: 'sword_f', // LEGENDARY: the flaming blade (exclusive)
   valeborn_spellblade: 'sword_g', // crystalline
   maldrecs_soulbinder: 'sword_g',
@@ -47,6 +49,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mirejaw_biteblade: 'dagger_b',
   cultist_flayer: 'dagger_b',
   tideglass_dirk: 'dagger_b',
+  duskfang_dirk: 'dagger_b', // realm uncommon dirk (dirks share dagger_b)
   moggers_shiv: 'dagger_c',
   widowfang_dirk: 'dagger_c',
   nhalias_dirgeblade: 'dagger_c',
@@ -78,6 +81,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   staff_of_velkhar: 'staff_d',
   vaels_mist_staff: 'adv_staff',
   ogre_bonecharm_staff: 'adv_staff',
+  gleamwood_stave: 'staff_b', // realm uncommon caster stave (apprentice-tier)
   staff_of_the_gravewyrm: 'adv_druid_staff',
   deathless_heartwood: 'adv_druid_staff', // LEGENDARY druid relic (antler staff)
   drovers_staff: 'adv_druid_staff',
@@ -117,6 +121,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   gorraks_cleaver: 'adv_axe_1handed',
   tradesman_hatchet: 'adv_axe_1handed',
   gravewyrm_cleaver: 'adv_axe_1handed', // EPIC: Heroic Korzul axe
+  pitlords_cleaver: 'adv_axe_1handed', // rift rare cleaver (heroic clone rides heroicOf)
   tunnelkings_spade: 'adv_axe_2handed',
 
   // ---- polearms --------------------------------------------------------------
