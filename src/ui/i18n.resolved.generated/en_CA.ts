@@ -9277,6 +9277,9 @@ export const en_CA: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Galecall Waistguard"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Reins of the Valorsteed"
       },

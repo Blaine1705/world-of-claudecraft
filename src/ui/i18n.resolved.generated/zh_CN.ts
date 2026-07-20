@@ -9277,6 +9277,9 @@ export const zh_CN: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "唤雷者腰甲"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "英勇战马的缰绳"
       },

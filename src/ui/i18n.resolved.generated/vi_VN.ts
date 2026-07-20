@@ -9277,6 +9277,9 @@ export const vi_VN: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Hộ Yêu của Triệu Bão Sư"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Dây cương Valorsteed"
       },

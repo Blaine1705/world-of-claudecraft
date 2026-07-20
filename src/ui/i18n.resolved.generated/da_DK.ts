@@ -9277,6 +9277,9 @@ export const da_DK: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Stormkalderens Livværn"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Tøjler til Valorsteed"
       },

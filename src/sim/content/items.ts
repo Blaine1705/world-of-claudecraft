@@ -323,6 +323,20 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 36, sta: 2 },
     sellValue: 140,
   },
+  // Riding Training: the stablemaster's service entry. Buying it never puts an
+  // item in the bags; items.ts buyItem delegates to learnRiding (80 gold,
+  // level 20, once), which sets PlayerMeta.ridingTrained. The buyValue mirrors
+  // RIDING_SKILL_FEE_COPPER so the vendor window shows the real price.
+  riding_training: {
+    id: 'riding_training',
+    name: 'Riding Training',
+    kind: 'tool',
+    quality: 'common',
+    teachesRiding: true,
+    sellValue: 0,
+    buyValue: 800_000, // 80 gold in copper, mirrors RIDING_SKILL_FEE_COPPER
+    noMarketList: true,
+  },
   // The horse's reins: the ONLY purchasable mount, sold by Stablemaster Marla
   // Hitchen for 10 gold after the player has learned Riding (ridingTrained gate
   // in items.ts buyItem). Soulbound like every reins item, so owning it IS owning

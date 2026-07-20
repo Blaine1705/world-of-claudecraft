@@ -32,6 +32,7 @@ import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { mountOwned } from './mounts';
+import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -481,6 +482,13 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   }
   if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) {
     ctx.error(meta.entityId, 'Too far away.');
+    return;
+  }
+  // Riding Training (the stablemaster's service entry): buying it delegates to
+  // learnRiding, which owns every gate (already trained, level 20, the 80g fee,
+  // trainer identity, range) and never puts an item in the bags.
+  if (def.teachesRiding) {
+    learnRiding(ctx, npcId, pid);
     return;
   }
   // Mount purchase gates (the stablemaster's reins): a riding-skill requirement

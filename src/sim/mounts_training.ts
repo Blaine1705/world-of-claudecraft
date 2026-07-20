@@ -31,9 +31,11 @@ import { dist2d, type Entity, INTERACT_RANGE, type MountTrainingSession } from '
 
 // --- tuning (change numbers here, not inline) -------------------------------
 export const MOUNT_TRAIN_MIN_LEVEL = 20;
-// Legacy fee for the old race-platform start (now effectively bypassed: ridingTrained
-// replaces the old flow, but the constant is kept for test compatibility).
-export const MOUNT_TRAIN_FEE_COPPER = 1_000_000; // 100 gold (legacy, see learnRiding below)
+// The retired 100g lesson fee. Nothing charges it anymore: the lesson is free
+// and the only riding purchase is RIDING_SKILL_FEE_COPPER below. Kept only so
+// the grandfather mapping (mountTrainingFeePaid -> ridingTrained on load) has
+// its historical context documented.
+export const MOUNT_TRAIN_FEE_COPPER = 1_000_000; // 100 gold (legacy)
 // Riding skill purchase from Marla: 80 gold.
 export const RIDING_SKILL_FEE_COPPER = 800_000; // 80 gold in copper
 // The lesson's play area: the paddock rect plus a small margin (which also covers
@@ -138,14 +140,8 @@ export function prepareRidingLessonRace(ctx: SimContext, meta: PlayerMeta, e: En
     ctx.error(meta.entityId, "You can't do that while in combat.");
     return false;
   }
-  if (!meta.mountTrainingFeePaid) {
-    if (meta.copper < MOUNT_TRAIN_FEE_COPPER) {
-      ctx.error(meta.entityId, 'Not enough money.');
-      return false;
-    }
-    meta.copper -= MOUNT_TRAIN_FEE_COPPER;
-    meta.mountTrainingFeePaid = true;
-  }
+  // The lesson itself is free: the only riding purchase is the 80g skill at
+  // Marla (learnRiding), and quest acceptance already requires ridingTrained.
   let session = meta.mountTraining;
   const announce = session?.state !== 'IN_PROGRESS' || session.phase !== 'ride';
   if (session?.state !== 'IN_PROGRESS') {
@@ -242,14 +238,8 @@ export function mountTrainBegin(ctx: SimContext, pid?: number): void {
     ctx.error(meta.entityId, 'A riding lesson is already in progress.');
     return;
   }
-  if (!meta.mountTrainingFeePaid) {
-    if (meta.copper < MOUNT_TRAIN_FEE_COPPER) {
-      ctx.error(meta.entityId, 'Not enough money.');
-      return;
-    }
-    meta.copper -= MOUNT_TRAIN_FEE_COPPER;
-    meta.mountTrainingFeePaid = true;
-  }
+  // The lesson is free (see prepareRidingLessonRace): riding is bought once,
+  // as the 80g skill at Marla.
   const session: MountTrainingSession = {
     sessionId: `mt_${meta.entityId}_${ctx.tickCount}`,
     ownerId: meta.entityId,

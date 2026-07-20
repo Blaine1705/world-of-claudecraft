@@ -9277,6 +9277,9 @@ export const en_XA: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "[Ĝáļéçáļļ Ŵáíšţĝúáŕð]"
       },
+      "riding_training": {
+        "name": "[Ŕíðíñĝ Ţŕáíñíñĝ]"
+      },
       "reins_valorsteed": {
         "name": "[Ŕéíñš óƒ ţĥé Ʋáļóŕšţééð]"
       },

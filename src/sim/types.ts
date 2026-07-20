@@ -671,6 +671,11 @@ interface BaseItemDef {
   // reward tokens can opt into permanent storage. Enforced in social/trade.ts,
   // mail/post_office.ts, market.ts, and items.ts.
   soulbound?: boolean;
+  // Vendor service entry: buying this "item" teaches the riding skill instead of
+  // adding anything to the bags (items.ts buyItem delegates to learnRiding, which
+  // owns every gate: already trained, level, the 80g fee). Only the stablemaster
+  // stocks it.
+  teachesRiding?: boolean;
   /** Shown when interacting with a ground quest object before the quest is active. */
   pickupDeny?: string;
   /** Shown when the quest is active but the collect count is already met. */

@@ -1961,6 +1961,7 @@ export type TranslationKeyFlat =
   | 'entities.items.revenant_silk_robe.name'
   | 'entities.items.ridge_stalker_pelt.name'
   | 'entities.items.ridgestalker_treads.name'
+  | 'entities.items.riding_training.name'
   | 'entities.items.rift_essence.name'
   | 'entities.items.rift_gem_azure.name'
   | 'entities.items.rift_gem_crimson.name'

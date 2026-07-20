@@ -9277,6 +9277,9 @@ export const tr_TR: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Fırtınaçağıranın Bel Koruyucusu"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Valorsteed Dizginleri"
       },

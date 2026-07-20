@@ -9277,6 +9277,9 @@ export const fr_CA: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Protège-taille d'Appel-tempête"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Rênes du Destrier de Bravoure"
       },

@@ -9277,6 +9277,9 @@ export const ja_JP: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "嵐呼びの腰当て"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "ヴァロースティードの手綱"
       },

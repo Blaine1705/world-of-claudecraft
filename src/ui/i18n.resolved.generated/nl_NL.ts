@@ -9277,6 +9277,9 @@ export const nl_NL: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Lendenbescherming van de Stormroeper"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Teugels van de Valorsteed"
       },

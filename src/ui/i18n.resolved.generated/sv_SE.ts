@@ -9277,6 +9277,9 @@ export const sv_SE: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Stormkallarens midjeskydd"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Tyglar till Valorsteed"
       },

@@ -1219,9 +1219,11 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: Math.PI, // face -z, toward the race yard
     color: 0x8b5a2b,
     questIds: ['q_riding_lessons'],
-    // Marla sells the Valorsteed reins after the player has learned to ride.
-    // The riding-skill gate (ridingTrained) is enforced in buyItem (items.ts).
-    vendorItems: ['reins_valorsteed'],
+    // Marla sells Riding Training (the 80g skill purchase, a service entry that
+    // delegates to learnRiding) and the Valorsteed reins for riders who have
+    // learned. The riding-skill gate (ridingTrained) is enforced in buyItem
+    // (items.ts).
+    vendorItems: ['riding_training', 'reins_valorsteed'],
     greeting:
       'Every rider walks in on two legs, $C. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and Highwatch has no menders to spare for broken bones.',
   },
