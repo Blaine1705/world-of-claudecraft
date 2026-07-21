@@ -120,8 +120,6 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'gravewoven_bag', chance: 0.2, rollGroup: 'morthen_bonus' },
       { itemId: 'cryptbone_helm', chance: 0.18, rollGroup: 'morthen_bonus' },
       { itemId: 'cryptbone_pauldrons', chance: 0.18, rollGroup: 'morthen_bonus' },
-      // Collectible mount: a rare (sub-1%) independent draw, never in a roll group.
-      { itemId: 'reins_grag_bear', chance: 0.009 },
     ],
     scale: 1.35,
     color: 0x4a235a,
@@ -254,8 +252,6 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'mistveil_cord', chance: 0.12, rollGroup: 'vael_bonus' },
       { itemId: 'mistveil_grips', chance: 0.12, rollGroup: 'vael_bonus' },
       { itemId: 'mistcallers_duffel', chance: 0.1, rollGroup: 'vael_bonus' },
-      // Collectible mount: a rare (sub-1%) independent draw, never in a roll group.
-      { itemId: 'reins_stalkglider_snail', chance: 0.009 },
     ],
     scale: 1.35,
     color: 0x48c9b0,
@@ -432,8 +428,6 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'deathlords_dread_visage', chance: 0.04, rollGroup: 'korzul_bonus' },
       { itemId: 'necromancers_soulspire_mantle', chance: 0.04, rollGroup: 'korzul_bonus' },
       { itemId: 'wyrmshadow_talongrips', chance: 0.04, rollGroup: 'korzul_bonus' },
-      // Collectible mount: a rare (sub-1%) independent draw, never in a roll group.
-      { itemId: 'reins_shadowjump_toad', chance: 0.005 },
     ],
     scale: 1.8,
     color: 0x3d5c45,
@@ -606,9 +600,6 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'stormcallers_spaulders', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
       { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
       { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
-      // Collectible mount (the raid pinnacle drop): a rare (sub-1%) independent
-      // draw, never inside a roll group.
-      { itemId: 'reins_stormfeather_griffin', chance: 0.002 },
     ],
     scale: 3.1,
     color: 0x221b2d,
