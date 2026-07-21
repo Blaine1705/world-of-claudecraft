@@ -3359,7 +3359,7 @@ export const vi_VN: EnTranslations = {
       "bastionBody": "Một pháo đài ngập nước đã mất vào tay đầm lầy, do những kẻ phòng thủ chết chìm và chính con nước dâng nắm giữ.",
       "templeBody": "Một ngôi đền dưới ánh trăng chìm bên dưới một hồ băng phát sáng cao trên các đỉnh núi, đến được qua một cánh cổng ánh sáng lạnh. Một giáo phái chết chìm vẫn ca hát dưới đó trong những tấm lễ phục mục nát, và những lời cảnh báo khắc trên bờ nói rằng thứ gì đó bên dưới chỉ đang ngủ. Một bí ẩn khép kín, tách biệt khỏi cốt truyện chính, dành cho những kẻ tò mò và chuẩn bị kỹ càng.",
       "sanctumBody": "Trái tim đen tối của Đỉnh Gai, nơi công cuộc lâu dài của giáo phái đạt đến đỉnh điểm khủng khiếp.",
-      "orkadiaBody": "A brutal orc war-camp hewn into the black volcanic rock of the Drakelands, its halls lit by toxic-green warpyres. Cut through the Bloodtusk grunts and Ironhide marauders to reach Warlord Grommok Skullcleaver on his dais of skulls.",
+      "orkadiaBody": "A brutal orc war-camp held in the black volcanic rock of the Drakelands, an open field lit by toxic-green warpyres. Cut through the Bloodtusk grunts and Ironhide marauders to reach Warlord Grommok Skullcleaver on his dais of skulls.",
       "raidName": "Raid cuối game",
       "raidBody": "Phía sau một cánh cửa hoàng gia niêm phong chờ đợi một thử thách mười người chơi: một trận chiến nhiều giai đoạn và một thế lực bất tử mà cả raid phải cùng nhau ngăn chặn. Hãy giành quyền vào trong, rồi rủ chín người bạn cùng đến.",
       "heroicTitle": "Chế độ Anh Hùng",

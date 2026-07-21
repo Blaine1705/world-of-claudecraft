@@ -5227,7 +5227,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': '重置你的地城副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。',
   'guide.dungeonsPage.orkadiaBody':
-    '一座鑿入德雷克蘭黑色火山岩中的殘暴獸人戰營，殿堂由劇毒的綠色戰火照亮。殺穿血牙兵卒與鐵皮劫掠者，直取盤踞在頭骨高台上的督軍格羅莫克·碎顱者。',
+    '一座盤踞在德雷克蘭黑色火山岩上的殘暴獸人戰營，開闊的戰場由劇毒的綠色戰火照亮。殺穿血牙兵卒與鐵皮劫掠者，直取盤踞在頭骨高台上的督軍格羅莫克·碎顱者。',
   'guide.dungeonsPage.raidName': '最終團隊副本',
   'guide.dungeonsPage.raidBody':
     '在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。',
