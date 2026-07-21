@@ -113,9 +113,11 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // v0.28.x stat-identity pass: shadow is a DPS caster, so its flat stat is
       // Int (spell power), not the combat-dead Spirit it inherited.
       stats: { int: 6 },
+      global: { spellDmgPct: 0.15 },
       ability: [
-        { ability: 'shadow_word_pain', dmgPct: 0.24, costPct: -0.1 },
-        { ability: 'mind_blast', dmgPct: 0.18, costPct: -0.1 },
+        { ability: 'shadow_word_pain', dmgPct: 0.45, costPct: -0.1 },
+        { ability: 'mind_blast', dmgPct: 0.5, costPct: -0.1 },
+        { ability: 'mind_flay', dmgPct: 0.6 },
       ],
     },
   },

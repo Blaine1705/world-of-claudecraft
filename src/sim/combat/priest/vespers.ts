@@ -9,6 +9,7 @@ export { EFFIGY_AURA_ID, GLOOMTITHE_AURA_ID, GLOOMTITHE_MAX_STACKS } from './pre
 export const GLOOMTITHE_GRACE = 15;
 export const EFFIGY_ECHO_RATE = 0.3;
 export const TITHEFIEND_ECHO_RATE = 0.15;
+export const TITHEFIEND_MANA_RETURN_RATE = 0.01;
 export const TITHEFIEND_KEY = 'tithefiend';
 export const TITHEFIEND_STRIKE_ID = 'tithefiend_strike';
 
@@ -212,7 +213,7 @@ export function vespersEchoDamage(
   if (abilityId === TITHEFIEND_STRIKE_ID && priest.resourceType === 'mana') {
     priest.resource = Math.min(
       priest.maxResource,
-      priest.resource + Math.max(1, Math.round(priest.maxResource * 0.02)),
+      priest.resource + Math.max(1, Math.round(priest.maxResource * TITHEFIEND_MANA_RETURN_RATE)),
     );
   }
   const candidates: { entity: Entity; distance: number }[] = [];

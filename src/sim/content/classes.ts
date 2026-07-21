@@ -5914,9 +5914,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'form_shadow', value: 15, duration: 3600 }],
+    effects: [{ type: 'selfBuff', kind: 'form_shadow', value: 25, duration: 3600 }],
     description:
-      'Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+      'Enter Gloamveil, increasing your Shadow damage by 25%. Cast it again to leave Gloamveil. (Vespers signature)',
   },
   elemental_mastery: {
     id: 'elemental_mastery',

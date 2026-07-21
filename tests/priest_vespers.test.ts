@@ -3,6 +3,7 @@ import {
   addGloomtithe,
   GLOOMTITHE_GRACE,
   TITHEFIEND_ECHO_RATE,
+  TITHEFIEND_MANA_RETURN_RATE,
   TITHEFIEND_STRIKE_ID,
   vespersAfterAbility,
   vespersEchoDamage,
@@ -227,7 +228,9 @@ describe('Vespers baseline loop', () => {
     vespersEchoDamage(ctx, guardian, target, 0, TITHEFIEND_STRIKE_ID);
     expect(priest.resource).toBe(0);
     vespersEchoDamage(ctx, guardian, target, 10, TITHEFIEND_STRIKE_ID);
-    expect(priest.resource).toBe(Math.max(1, Math.round(priest.maxResource * 0.02)));
+    expect(priest.resource).toBe(
+      Math.max(1, Math.round(priest.maxResource * TITHEFIEND_MANA_RETURN_RATE)),
+    );
   });
 
   it('holds Gloomtithe while an eligible Effigy exists, then grants the full grace period', () => {
