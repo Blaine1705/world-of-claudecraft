@@ -843,22 +843,78 @@ describe('riding skill gate (Req 5)', () => {
     expect(result).toBe(true);
   });
 
-  it('grandfathers mountTrainingFeePaid into ridingTrained on load', () => {
+  it('grandfathers mountTrainingFeePaid into ridingTrained on addPlayer load', () => {
+    // A legacy save where the 100g fee was paid but ridingTrained was not yet stored
+    // (pre-v0.23 saves) must load with ridingTrained=true so toggleMount succeeds.
     const sim = makeWorld();
-    const pid = join(sim, 20);
-    // Check that the Sim's serializeCharacter / load round-trip sets ridingTrained
-    // when mountTrainingFeePaid is true
-    const meta = sim.players.get(pid)!;
-    meta.ridingTrained = false;
-    meta.mountTrainingFeePaid = true;
-    // Serialize and reload
-    const state = (
-      sim as unknown as { serializeCharacter(pid: number): unknown }
-    ).serializeCharacter(pid);
-    // The serialized state has ridingTrained=true (grandfathered from mountTrainingFeePaid)
-    const s = state as Record<string, unknown>;
-    // Both should be serialized when they are true
-    expect(s.mountTrainingFeePaid).toBe(true);
+    const state = {
+      level: 20,
+      xp: 0,
+      copper: 0,
+      hp: 100,
+      resource: 100,
+      pos: { x: 0, z: 0 },
+      facing: 0,
+      equipment: {},
+      inventory: [],
+      questLog: [],
+      questsDone: [],
+      mountTrainingFeePaid: true,
+      // ridingTrained is intentionally absent (legacy save).
+    };
+    const pid2 = sim.addPlayer('warrior', 'LegacyRider', { state: state as any });
+    const meta2 = sim.players.get(pid2)!;
+    expect(meta2.ridingTrained).toBe(true);
+    sim.addItem('reins_valorsteed', 1, pid2);
+    expect(toggleMount(sim.ctx, pid2)).toBe(true);
+  });
+
+  it('grandfathers q_riding_lessons active quest into ridingTrained on addPlayer load', () => {
+    // A mid-quest save where q_riding_lessons is IN_PROGRESS (the player had accepted
+    // the lesson and was racing) but ridingTrained was never stored must also load
+    // with ridingTrained=true (the fee was implied by quest acceptance).
+    const sim = makeWorld();
+    const state = {
+      level: 20,
+      xp: 0,
+      copper: 0,
+      hp: 100,
+      resource: 100,
+      pos: { x: 0, z: 0 },
+      facing: 0,
+      equipment: {},
+      inventory: [],
+      questLog: [{ questId: 'q_riding_lessons', state: 'active', counts: [] }],
+      questsDone: [],
+      // ridingTrained and mountTrainingFeePaid are intentionally absent.
+    };
+    const pid3 = sim.addPlayer('warrior', 'MidQuestRider', { state: state as any });
+    const meta3 = sim.players.get(pid3)!;
+    expect(meta3.ridingTrained).toBe(true);
+    sim.addItem('reins_valorsteed', 1, pid3);
+    expect(toggleMount(sim.ctx, pid3)).toBe(true);
+  });
+
+  it('grandfathers q_riding_lessons completed quest into ridingTrained on addPlayer load', () => {
+    // A save where q_riding_lessons is in questsDone (lesson finished and turned in)
+    // but ridingTrained was not stored must also load with ridingTrained=true.
+    const sim = makeWorld();
+    const state = {
+      level: 20,
+      xp: 0,
+      copper: 0,
+      hp: 100,
+      resource: 100,
+      pos: { x: 0, z: 0 },
+      facing: 0,
+      equipment: {},
+      inventory: [],
+      questLog: [],
+      questsDone: ['q_riding_lessons'],
+    };
+    const pid4 = sim.addPlayer('warrior', 'DoneRider', { state: state as any });
+    const meta4 = sim.players.get(pid4)!;
+    expect(meta4.ridingTrained).toBe(true);
   });
 });
 
