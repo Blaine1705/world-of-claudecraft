@@ -141,6 +141,7 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
+import { ABILITY_VFX_FULL_SPECS } from './render/ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from './render/ability_vfx_specs';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
@@ -3326,7 +3327,11 @@ async function startGame(
           ...(import.meta.env.DEV
             ? {
                 abilityVfxStats: () => renderer.abilityVfxStats(),
-                abilityVfxProbe: { specs: ABILITY_VFX_SPECS, abilities: ABILITIES },
+                abilityVfxProbe: {
+                  specs: ABILITY_VFX_SPECS,
+                  fullSpecs: ABILITY_VFX_FULL_SPECS,
+                  abilities: ABILITIES,
+                },
               }
             : {}),
         };

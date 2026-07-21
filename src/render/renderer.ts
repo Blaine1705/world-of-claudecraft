@@ -1736,6 +1736,8 @@ export class Renderer {
       spawnAoeRing: (x, z, radius, school, colorHex) =>
         this.spawnAoeRing(x, z, radius, school, colorHex),
       triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
+      lightPulse: (id, school, intensity, duration) =>
+        this.pulseAt(id, school, intensity, duration),
     });
     this.pulseAt = (id, school, intensity, duration) => {
       const v = this.views.get(id);

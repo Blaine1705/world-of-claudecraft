@@ -6,7 +6,6 @@
 // spec's color, scale, and archetype. Unknown ability or fx kind: it declines
 // and the renderer's generic school-colored arm runs unchanged.
 
-import type { AbilityVfxSpec } from '../ability_vfx_core';
 import {
   AbilityVfxBudget,
   type AbilityVfxPlan,
@@ -14,9 +13,10 @@ import {
   planCast,
   planImpact,
 } from '../ability_vfx_core';
+import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
-import type { AbilityVfxFx, DecalStyle, OrbitStyle } from './fx';
+import type { AbilityVfxFx, OrbitStyle, ParticleBurstKind } from './fx';
 
 interface VfxPoint {
   x: number;
@@ -60,6 +60,9 @@ export interface AbilityVfxDeps {
   anchor: (id: number, heightFrac: number) => VfxPoint | null;
   spawnAoeRing: (x: number, z: number, radius: number, school: string, colorHex?: number) => void;
   triggerAttack: (entityId: number, abilityId?: string) => void;
+  // The renderer's pooled talent-moment point light (pulseAt); optional so
+  // tests can omit it.
+  lightPulse?: (entityId: number, school: string, intensity: number, duration: number) => void;
 }
 
 // Structural slices of the SimEvent members this painter consumes.
@@ -112,13 +115,30 @@ const CAST_FX = new Set([
 // 8 yd warrior shout ring).
 const RING_RADIUS_PER_SCALE = 4;
 
-// Palette to ground-mark mapping: fire scorches, frost rimes, magic runes.
-const DECAL_BY_PALETTE: Record<string, DecalStyle> = {
-  fire: 'ember',
-  blood: 'ember',
-  physical: 'ember',
-  frost: 'rime',
-  moon: 'rime',
+// Palette to school mapping for the pooled point-light flashes (the renderer's
+// pulseAt is school-colored).
+const SCHOOL_BY_PALETTE: Record<string, string> = {
+  fire: 'fire',
+  blood: 'fire',
+  frost: 'frost',
+  storm: 'frost',
+  arcane: 'arcane',
+  moon: 'arcane',
+  shadow: 'shadow',
+  venom: 'nature',
+  nature: 'nature',
+  gold: 'holy',
+  holy: 'holy',
+  physical: 'physical',
+};
+
+// Particle sprite family per burst kind, mapped onto Vfx.burst's school hint.
+const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
+  sparks: 'arcane',
+  embers: 'fire',
+  debris: 'physical',
+  smoke: 'shadow',
+  blood: 'physical',
 };
 
 // Spec bo (buff orbit) styles collapsed onto the three sprite bands the fx
@@ -136,10 +156,6 @@ const ORBIT_BY_BO: Record<string, OrbitStyle> = {
   leaves: 'runes',
 };
 
-function decalStyleFor(spec: AbilityVfxSpec, school: string): DecalStyle {
-  return DECAL_BY_PALETTE[spec.p ?? school] ?? 'rune';
-}
-
 export class AbilityVfx {
   private quality = 1;
   private budget = new AbilityVfxBudget();
@@ -152,6 +168,24 @@ export class AbilityVfx {
     now?: () => number,
   ) {
     this.now = now ?? (() => performance.now() / 1000);
+    // Particle bursts ride the pooled Vfx cloud; sequencer light pulses ride
+    // the renderer's pooled point lights; sequencer spawns feed the probe stats.
+    deps.fx.setDelegates(
+      (x, y, z, colorHex, count, power, kind) =>
+        deps.vfx.burst(
+          { x, y, z },
+          BURST_SCHOOL_BY_KIND[kind],
+          count,
+          power,
+          kind === 'blood' ? 0xa01222 : colorHex,
+        ),
+      (entityId, palette, intensity, duration) =>
+        deps.lightPulse?.(entityId, SCHOOL_BY_PALETTE[palette] ?? 'arcane', intensity, duration),
+      (abilityId, n) => {
+        this.spawned = n;
+        this.recordStat(abilityId, false);
+      },
+    );
   }
 
   setQuality(q: number): void {
@@ -186,8 +220,7 @@ export class AbilityVfx {
     const tier = this.budget.admit(ev.sourceId, this.now());
     const plan = planCast(spec, this.quality, tier);
     const fx = this.deps.fx;
-    const arch = spec.a ?? 'burst';
-    const gentle = arch === 'heal' || arch === 'buff' || arch === 'cc';
+    const full = ABILITY_VFX_FULL_SPECS[ev.ability];
     this.spawned = 0;
     // Spin specs whirl the rig (Bladestorm); the one-shot is cheap, so it
     // survives every degrade tier.
@@ -206,16 +239,31 @@ export class AbilityVfx {
           if (tier < 2) {
             fx.jaggedBolt(ev.sourceId, ev.targetId, plan.color);
             this.spawned++;
+            // the crack lands instantly: run the archetype sequence compressed
+            if (full)
+              fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
           }
         } else {
           for (let i = 0; i < plan.volley; i++) {
             this.deps.vfx.projectile(ev.sourceId, ev.targetId, ev.school, scale, plan.color);
             this.spawned++;
           }
-          // The gallery bolt read: a flowing comet trail chasing the head,
-          // landing a vertical impact halo (full fidelity only).
+          // The gallery bolt read: release flash + a flowing comet trail
+          // chasing the head, and the FULL impact stack where it arrives.
           if (tier < 2) {
-            fx.cometTrail(ev.sourceId, ev.targetId, plan.color, 0.16 * scale, tier === 0);
+            if (full) {
+              fx.sequenceBolt(
+                ev.ability,
+                full,
+                ev.sourceId,
+                ev.targetId,
+                plan.color,
+                0.16 * scale,
+                tier,
+              );
+            } else {
+              fx.cometTrail(ev.sourceId, ev.targetId, plan.color, 0.16 * scale, tier === 0);
+            }
             this.spawned++;
           }
         }
@@ -227,6 +275,8 @@ export class AbilityVfx {
         if (tier < 2) {
           fx.jaggedBolt(ev.sourceId, ev.targetId, plan.color);
           this.spawned++;
+          if (full)
+            fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         }
         break;
       case 'beam':
@@ -248,43 +298,25 @@ export class AbilityVfx {
         this.deps.vfx.shoutwave(ev.sourceId, plan.color);
         this.spawned++;
         this.spawnRing(ev.sourceId, plan, ev.school);
-        if (tier < 2) {
-          const radius = Math.max(4, RING_RADIUS_PER_SCALE * (spec.rg ?? 2));
-          fx.doubleGroundRing(ev.sourceId, radius, plan.color, 1);
-          this.spawned += 2;
-          if (tier === 0) {
-            fx.impactRing(ev.sourceId, plan.color, true);
-            this.spawned++;
-          }
-        }
+        if (tier < 2 && full)
+          fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         break;
       }
       case 'nova': {
         this.deps.vfx.nova(ev.targetId, ev.school, plan.color);
         this.spawned++;
         this.spawnRing(ev.targetId, plan, ev.school);
-        if (tier < 2) {
-          const radius = Math.max(3, RING_RADIUS_PER_SCALE * (spec.rg ?? 1));
-          fx.doubleGroundRing(ev.targetId, radius, plan.color, gentle ? 0.55 : 1);
-          this.spawned += 2;
-          // The linger: novas etch a fading ground mark (scorch, rime, or a
-          // slow-spinning rune by palette). Tier 1 sheds lingers first.
-          if (tier === 0 && arch !== 'cc') {
-            fx.decalAt(
-              ev.targetId,
-              radius * 0.7,
-              plan.color,
-              decalStyleFor(spec, ev.school),
-              Math.min(6, 1.5 + (spec.lg ?? 1) * 1.4),
-            );
-            this.spawned++;
-          }
-        }
+        if (tier < 2 && full)
+          fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         break;
       }
       case 'tick':
+        // Instants run their FULL archetype sequence, compressed (0.15s
+        // release to impact), never just the small tick accent.
         this.deps.vfx.tick(ev.targetId, ev.school, plan.color);
         this.spawned++;
+        if (tier < 2 && full)
+          fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         break;
     }
     this.recordStat(ev.ability, true);
@@ -317,12 +349,13 @@ export class AbilityVfx {
     this.spawned = 0;
     this.deps.vfx.burst(at, ev.school, plan.burstCount, plan.burstPower, plan.color);
     this.spawned++;
-    const arch = spec.a ?? 'strike';
-    if (arch === 'strike' || arch === 'dash') {
-      this.deps.fx.slashArc(ev.targetId, plan.color);
-      this.spawned++;
-    }
-    if (ev.crit || spec.fin === 1) {
+    const full = ABILITY_VFX_FULL_SPECS[abilityId];
+    const arch = full?.archetype ?? spec.a ?? 'strike';
+    if (full && (arch === 'strike' || arch === 'dash')) {
+      // A physical special's ONLY event is its hit: the contact moment runs
+      // the full archetype sequence (authored slash arc, impact stack, motifs).
+      this.deps.fx.sequenceInstant(abilityId, full, ev.sourceId, ev.targetId, plan.color, tier);
+    } else if (ev.crit || spec.fin === 1) {
       this.deps.fx.impactRing(ev.targetId, plan.color, ev.crit);
       this.spawned++;
     }
@@ -362,7 +395,8 @@ export class AbilityVfx {
       if (spec) {
         const progress =
           e.castTotal > 0 ? Math.min(1, Math.max(0, 1 - e.castRemaining / e.castTotal)) : 0;
-        if (fx.windup(e.id, abilityVfxColor(spec), progress)) {
+        const style = ABILITY_VFX_FULL_SPECS[e.castingAbility]?.windupStyle ?? 'orb';
+        if (fx.windup(e.id, abilityVfxColor(spec), progress, style)) {
           this.spawned = 1;
           this.recordStat(e.castingAbility, false);
         }
@@ -372,8 +406,11 @@ export class AbilityVfx {
     for (let i = 0; i < e.auras.length && bands < 3; i++) {
       const auraId = e.auras[i].id;
       const spec = ABILITY_VFX_SPECS[auraId];
-      const style = spec?.bo !== undefined ? ORBIT_BY_BO[spec.bo] : undefined;
-      if (spec === undefined || style === undefined) continue;
+      if (spec === undefined) continue;
+      // barrier specs wear the translucent fresnel shell while the aura lives
+      if (ABILITY_VFX_FULL_SPECS[auraId]?.barrier) fx.holdShell(e.id, abilityVfxColor(spec));
+      const style = spec.bo !== undefined ? ORBIT_BY_BO[spec.bo] : undefined;
+      if (style === undefined) continue;
       if (fx.orbit(e.id, style, abilityVfxColor(spec))) {
         // The band just appeared (aura gained): pop the swirl here instead of
         // the aura event, which carries no ability id. Works online too, since

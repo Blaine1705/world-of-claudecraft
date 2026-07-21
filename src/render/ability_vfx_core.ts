@@ -35,6 +35,147 @@ export interface AbilityVfxSpec {
   a?: string;
 }
 
+// The COMPLETE per-ability spec, mirrored 1:1 from the gallery source of truth
+// (feature/ability-vfx-gallery ability_specs.js). The compact AbilityVfxSpec
+// above stays the planning/budget projection; this full shape drives the
+// archetype sequencer (src/render/ability_vfx/sequencer.ts). Data lives in
+// src/render/ability_vfx_full_specs.ts (generated, one line per ability).
+export type AbilityVfxArchetype =
+  | 'bolt'
+  | 'burst'
+  | 'strike'
+  | 'nova'
+  | 'beam'
+  | 'dot'
+  | 'heal'
+  | 'buff'
+  | 'shout'
+  | 'summon'
+  | 'cc'
+  | 'dash';
+
+export type AbilityVfxWindupStyle =
+  | 'none'
+  | 'stance'
+  | 'vortex'
+  | 'weapon'
+  | 'orb'
+  | 'runes'
+  | 'ascend';
+
+export type AbilityVfxMotif =
+  | 'fissure'
+  | 'pillars'
+  | 'chains'
+  | 'bladestorm'
+  | 'barrier'
+  | 'swarm'
+  | 'implosion'
+  | 'claws'
+  | 'crescents'
+  | 'fountain'
+  | 'gavel'
+  | 'orbitals'
+  | 'vines'
+  | 'cross';
+
+export interface AbilityVfxImpactSpec {
+  trail?: 'arc' | 'sweep' | 'low' | 'riposte' | 'x' | 'overhead';
+  sparks?: number;
+  light?: number;
+  flipbook?: boolean;
+  ring?: number | boolean;
+  vRing?: boolean | number;
+  debris?: boolean;
+  smoke?: boolean;
+  blood?: boolean;
+  liteAudio?: boolean;
+  sample?: string;
+}
+
+export interface AbilityVfxBuffSpec {
+  style?: 'raise' | 'morph' | 'veil';
+  orbit?: string;
+  shellDur?: number;
+  o?: {
+    rate?: number;
+    tickEvery?: number;
+    bpm?: number;
+    ringR?: number;
+    density?: number;
+    spread?: number;
+    up?: number;
+    n?: number;
+    size?: number;
+    tex?: string;
+    weave?: number;
+    radius?: number;
+    incline?: number;
+    ribs?: number;
+    span?: number;
+    flapRate?: number;
+  };
+}
+
+export interface AbilityVfxFullSpec {
+  archetype: AbilityVfxArchetype;
+  palette: string;
+  power?: number;
+  windup?: number;
+  windupStyle?: AbilityVfxWindupStyle;
+  motifs?: AbilityVfxMotif[];
+  motifAt?: 'target' | 'caster';
+  motifEvery?: number;
+  motifR?: number;
+  impact?: AbilityVfxImpactSpec;
+  bolt?: {
+    speed?: number;
+    headScale?: number;
+    style?: 'rock' | 'shard' | 'comet' | 'arrow' | 'wisp';
+    coils?: boolean;
+    jagged?: boolean;
+    forkEvery?: number;
+    volley?: number;
+    tracer?: boolean;
+    leader?: boolean;
+  };
+  strike?: {
+    swings?: number;
+    arc?: 'horizontal' | 'thrust' | 'uppercut' | 'vertical' | 'claws' | 'bite';
+    bleed?: boolean;
+    groundSlam?: boolean;
+    stars?: boolean;
+  };
+  nova?: { radius?: number };
+  beam?: { dur?: number; ticks?: number; drain?: boolean };
+  dot?: { drip?: 'rise' | 'fall' };
+  cc?: { style?: 'poof' | 'stars' | 'tendrils' };
+  shout?: { radius?: number; target?: boolean };
+  burst?: { style?: 'skybeam' | 'link' | 'ground' };
+  buff?: AbilityVfxBuffSpec;
+  spin?: { rate?: number; clip?: string; timeScale?: number };
+  spirit?: {
+    model?: string;
+    path?: string;
+    at?: string;
+    scale?: number;
+    dur?: number;
+    tint?: string;
+    dim?: number;
+  } | null;
+  barrier?: boolean;
+  shaft?: number | boolean;
+  screenFx?: boolean;
+  linger?: number;
+  rim?: string;
+  tint?: string;
+  accent?: string | number;
+  hot?: number;
+  decal?: 'crack' | 'scorch' | 'rune' | 'portal';
+  finisher?: boolean;
+  self?: boolean;
+}
+
 // What the painter needs to drive one cast or impact through the pooled Vfx.
 export interface AbilityVfxPlan {
   color: number;

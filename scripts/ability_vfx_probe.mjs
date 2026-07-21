@@ -1,10 +1,12 @@
-// Ability VFX coverage probe: proves every spec'd ability produces per-ability
-// visuals in the real client. Boots the offline game (dev server on :5173),
-// then for EVERY id in ABILITY_VFX_SPECS synthesizes the render-side event the
-// sim would emit (fx derived from the ability's projectileFx/castTime/spec
-// archetype), reads the painter's dev stats hook (window.__game.abilityVfxStats)
-// to record claimed/primitives, screenshots every 10th cast to tmp/vfx_ingame/,
-// drives one melee auto-attack sequence, and writes tmp/vfx_ingame/report.json.
+// Ability VFX coverage probe: proves every spec'd ability produces its FULL
+// archetype read in the real client. Boots the offline game (dev server on
+// :5173), then for EVERY id in ABILITY_VFX_SPECS synthesizes the render-side
+// event the sim would emit (fx derived from projectileFx/castTime/archetype),
+// reads the painter's dev stats hook (window.__game.abilityVfxStats), asserts
+// the PER-ARCHETYPE minimum primitive bar (bolt/nova/shout >= 3, everything
+// else >= 2, +1 when the full spec authors motifs), screenshots every 5th cast
+// to tmp/vfx_ingame/, drives a real self-buff cast (orbit band) plus a melee
+// auto-attack sequence, and writes tmp/vfx_ingame/report.json.
 //
 // Usage: npm run dev (":5173") in another terminal, then
 //   node scripts/ability_vfx_probe.mjs
@@ -122,23 +124,51 @@ for (let i = 0; i < specIds.length; i++) {
     setup.mobId,
   );
   await new Promise((r) => setTimeout(r, CAST_SETTLE_MS));
-  if (i % 10 === 0) {
+  if (i % 5 === 0) {
     shot++;
     await page.screenshot({
       path: `${OUT_DIR}/${String(i).padStart(3, '0')}_${id}.png`,
     });
   }
-  const after = await page.evaluate(
-    (abilityId) => window.__game.abilityVfxStats()[abilityId] ?? { claimed: 0, primitives: 0 },
-    id,
-  );
+  const after = await page.evaluate((abilityId) => {
+    const st = window.__game.abilityVfxStats()[abilityId] ?? { claimed: 0, primitives: 0 };
+    const full = window.__game.abilityVfxProbe.fullSpecs[abilityId];
+    return {
+      ...st,
+      archetype: full?.archetype ?? 'unknown',
+      hasMotifs: !!(full?.motifs && full.motifs.length > 0),
+    };
+  }, id);
+  // The per-archetype minimum primitive bar: the big shapes must always fire;
+  // motif-authored specs must additionally land their set piece.
+  const baseMin = { bolt: 3, nova: 3, shout: 3 }[after.archetype] ?? 2;
+  const minBar = baseMin + (after.hasMotifs ? 1 : 0);
   results[id] = {
     fx: cast.fx,
     school: cast.school,
+    archetype: after.archetype,
+    hasMotifs: after.hasMotifs,
+    minBar,
     claimed: after.claimed - cast.before.claimed > 0,
     primitives: after.primitives - cast.before.primitives,
   };
 }
+
+// A REAL self-buff cast through the sim proves the aura-driven orbit band and
+// swirl pop (no synthesized event involved): battle_shout applies its aura,
+// syncEntity sees it, the band + swirl register as primitives.
+const buffBand = await page.evaluate(() => {
+  const g = window.__game;
+  const before = g.abilityVfxStats().battle_shout ?? { claimed: 0, primitives: 0 };
+  g.sim.castAbility('battle_shout');
+  return { before };
+});
+await new Promise((r) => setTimeout(r, 800));
+await page.screenshot({ path: `${OUT_DIR}/buff_band_battle_shout.png` });
+const buffBandAfter = await page.evaluate(
+  () => window.__game.abilityVfxStats().battle_shout ?? { claimed: 0, primitives: 0 },
+);
+const buffBandDelta = buffBandAfter.primitives - buffBand.before.primitives;
 
 // Melee auto-attack sequence: a plain swing and a ranged-correlated one. The
 // painter adds the subtle slash ribbon; meleeSpark and the swing anim are the
@@ -170,7 +200,7 @@ await page.screenshot({ path: `${OUT_DIR}/auto_attack.png` });
 
 const claimed = Object.values(results).filter((r) => r.claimed);
 const withPrimitives = claimed.filter((r) => r.primitives > 0);
-const failed = Object.entries(results).filter(([, r]) => !r.claimed || r.primitives <= 0);
+const failed = Object.entries(results).filter(([, r]) => !r.claimed || r.primitives < r.minBar);
 const report = {
   url: URL,
   when: new Date().toISOString(),
@@ -179,15 +209,21 @@ const report = {
   withPrimitivesCount: withPrimitives.length,
   failed: failed.map(([id, r]) => ({ id, ...r })),
   autoAttack: { ...auto, pageerrorsDuring: pageerrors.length },
+  buffBand: { ability: 'battle_shout', primitives: buffBandDelta, ok: buffBandDelta >= 2 },
   screenshots: shot + 1,
   pageerrors,
   abilities: results,
 };
 fs.writeFileSync(`${OUT_DIR}/report.json`, JSON.stringify(report, null, 2));
 console.log(
-  `coverage: ${withPrimitives.length}/${specIds.length} claimed with primitives, ` +
-    `${claimed.length} claimed, ${failed.length} failed, ${pageerrors.length} pageerrors`,
+  `coverage: ${specIds.length - failed.length}/${specIds.length} at the archetype bar, ` +
+    `${claimed.length} claimed, ${withPrimitives.length} with primitives, ` +
+    `${failed.length} below bar, buffBand=${buffBandDelta}, ${pageerrors.length} pageerrors`,
 );
-if (failed.length > 0) console.log('failed:', failed.map(([id]) => id).join(', '));
+if (failed.length > 0)
+  console.log(
+    'below bar:',
+    failed.map(([id, r]) => `${id}(${r.archetype} ${r.primitives}/${r.minBar})`).join(', '),
+  );
 await browser.close();
-process.exit(failed.length > 0 || pageerrors.length > 0 ? 2 : 0);
+process.exit(failed.length > 0 || buffBandDelta < 2 || pageerrors.length > 0 ? 2 : 0);

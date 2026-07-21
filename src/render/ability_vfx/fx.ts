@@ -1,11 +1,28 @@
 import * as THREE from 'three';
+import type { AbilityVfxFullSpec } from '../ability_vfx_core';
 import { type DecalStyle, GroundDecals } from './decals';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { OverlaySprites } from './overlay_sprites';
+import { LightPillars } from './pillars';
 import { AbilityVfxRibbons, type RibbonAnchor } from './ribbons';
 import { ShockRings } from './rings';
+import { ArchetypeSequencer, type SequencerHost } from './sequencer';
+import { BuffShells } from './shells';
 
 export type { DecalStyle } from './decals';
+
+// Particle bursts delegate to the pooled Vfx cloud through this seam (the
+// painter wires deps.vfx.burst in); kind picks the sprite family.
+export type ParticleBurstKind = 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood';
+export type ParticleBurst = (
+  x: number,
+  y: number,
+  z: number,
+  colorHex: number,
+  count: number,
+  power: number,
+  kind: ParticleBurstKind,
+) => void;
 
 const camPosScratch = new THREE.Vector3();
 
@@ -32,9 +49,12 @@ interface OrbitBand {
   stamp: number;
 }
 
+export type WindupStyle = 'none' | 'orb' | 'runes' | 'vortex' | 'ascend' | 'stance' | 'weapon';
+
 interface WindupState {
   colorHex: number;
   progress: number;
+  style: WindupStyle;
   stamp: number;
 }
 
@@ -81,17 +101,25 @@ const ORBIT_DNA: Record<
   },
 };
 
-export class AbilityVfxFx {
+export class AbilityVfxFx implements SequencerHost {
   private ribbons: AbilityVfxRibbons;
   private rings: ShockRings;
   private decals: GroundDecals;
   private overlay: OverlaySprites;
+  private pillars: LightPillars;
+  private shells: BuffShells;
   private windups = new Map<number, WindupState>();
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
   private time = 0;
   private frame = 0;
-  private quality = 1;
+  private qualityLevel = 1;
+  private particleBurst: ParticleBurst | null = null;
+  private lightPulseCb:
+    | ((entityId: number, palette: string, intensity: number, duration: number) => void)
+    | null = null;
+  private statSink: ((abilityId: string, n: number) => void) | null = null;
+  private sequencer = new ArchetypeSequencer();
 
   constructor(
     scene: THREE.Scene,
@@ -104,14 +132,218 @@ export class AbilityVfxFx {
     this.rings = new ShockRings(scene, tex);
     this.decals = new GroundDecals(scene, tex);
     this.overlay = new OverlaySprites(scene, tex);
+    this.pillars = new LightPillars(scene);
+    this.shells = new BuffShells(scene);
+  }
+
+  // Wired once by the painter: particle bursts ride the pooled Vfx cloud,
+  // impact light rides the renderer's pooled point-light flashes, and every
+  // sequencer spawn is counted into the painter's probe stats.
+  setDelegates(
+    burst: ParticleBurst,
+    lightPulse: (entityId: number, palette: string, intensity: number, duration: number) => void,
+    statSink: (abilityId: string, n: number) => void,
+  ): void {
+    this.particleBurst = burst;
+    this.lightPulseCb = lightPulse;
+    this.statSink = statSink;
+  }
+
+  // ---- archetype sequences (the gallery phase anatomy; see sequencer.ts) --
+
+  // Instant cast: release now, impact 0.15s later at the archetype's anchor.
+  sequenceInstant(
+    abilityId: string,
+    spec: AbilityVfxFullSpec,
+    casterId: number,
+    targetId: number,
+    colorHex: number,
+    tier: number,
+  ): void {
+    this.sequencer.start(this, abilityId, spec, casterId, targetId, colorHex, tier, false);
+  }
+
+  // Traveling bolt: release now, comet trail chases the pooled Vfx projectile,
+  // and the FULL impact stack lands where and when the trail arrives.
+  sequenceBolt(
+    abilityId: string,
+    spec: AbilityVfxFullSpec,
+    casterId: number,
+    targetId: number,
+    colorHex: number,
+    width: number,
+    tier: number,
+  ): void {
+    const slot = this.sequencer.start(
+      this,
+      abilityId,
+      spec,
+      casterId,
+      targetId,
+      colorHex,
+      tier,
+      true,
+    );
+    this.ribbons.spawnTrail(
+      casterId,
+      targetId,
+      colorHex,
+      width,
+      slot ? (x, y, z) => this.sequencer.triggerImpact(this, slot, x, y, z) : null,
+    );
   }
 
   setQuality(q: number): void {
-    this.quality = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
+    this.qualityLevel = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
     this.overlay.setViewportScale(heightPx / (2 * Math.tan((fovDeg * Math.PI) / 360)));
+  }
+
+  // ---- SequencerHost surface (sequencer.ts drives these) ------------------
+
+  anchorOf(id: number, frac: number): { x: number; y: number; z: number } | null {
+    return this.anchor(id, frac);
+  }
+
+  groundYAt(x: number, z: number): number {
+    return this.groundY(x, z);
+  }
+
+  ringAt(
+    x: number,
+    y: number,
+    z: number,
+    maxR: number,
+    dur: number,
+    colorHex: number,
+    intensity: number,
+    vertical: boolean,
+  ): void {
+    this.rings.spawn(x, y, z, maxR, dur, colorHex, intensity * this.intensity(), vertical);
+  }
+
+  decalXZ(
+    x: number,
+    z: number,
+    radius: number,
+    colorHex: number,
+    style: string,
+    dur: number,
+  ): void {
+    const s: DecalStyle = style === 'ember' || style === 'rime' ? style : 'rune';
+    this.decals.spawn(x, this.groundY(x, z), z, radius, colorHex, s, dur);
+  }
+
+  pillarAt(
+    x: number,
+    y: number,
+    z: number,
+    radius: number,
+    height: number,
+    colorHex: number,
+    dur: number,
+  ): void {
+    this.pillars.spawn(x, y, z, radius, height, colorHex, dur);
+  }
+
+  shellFlash(entityId: number, colorHex: number, dur: number): void {
+    this.shells.flash(entityId, colorHex, dur);
+  }
+
+  // Held barrier shell, refreshed per frame while the barrier aura lives.
+  holdShell(entityId: number, colorHex: number): void {
+    this.shells.hold(entityId, colorHex, this.frame);
+  }
+
+  burstAt(
+    x: number,
+    y: number,
+    z: number,
+    colorHex: number,
+    count: number,
+    power: number,
+    kind: ParticleBurstKind,
+  ): void {
+    this.particleBurst?.(x, y, z, colorHex, count, power, kind);
+  }
+
+  pulseLight(entityId: number, palette: string, intensity: number, duration: number): void {
+    this.lightPulseCb?.(entityId, palette, intensity, duration);
+  }
+
+  boltBetween(
+    sourceId: number,
+    targetId: number,
+    colorHex: number,
+    life: number,
+    width: number,
+    jag: number,
+  ): void {
+    this.ribbons.spawnBolt(sourceId, targetId, colorHex, life, width, jag);
+  }
+
+  boltPoints(
+    fx: number,
+    fy: number,
+    fz: number,
+    tx: number,
+    ty: number,
+    tz: number,
+    colorHex: number,
+    life: number,
+    width: number,
+    jag: number,
+  ): void {
+    this.ribbons.spawnBoltPoints(fx, fy, fz, tx, ty, tz, colorHex, life, width, jag);
+  }
+
+  slashStyled(
+    at: { x: number; y: number; z: number },
+    colorHex: number,
+    style: string,
+    scale = 1,
+  ): void {
+    this.ribbons.spawnSlashStyled(at, colorHex, style, scale);
+  }
+
+  pathRibbon(
+    colorHex: number,
+    width: number,
+    life: number,
+    fill: (pts: { set(x: number, y: number, z: number): unknown }[]) => number,
+  ): void {
+    this.ribbons.spawnPath(colorHex, width, life, fill);
+  }
+
+  pushOverlay(
+    x: number,
+    y: number,
+    z: number,
+    colorHex: number,
+    size: number,
+    cell: number,
+    alpha: number,
+    brightness: number,
+  ): void {
+    this.overlay.push(x, y, z, colorHex, size, cell, alpha, brightness);
+  }
+
+  overlayCells(): { glow: number; star: number; rune: number; spark: number } {
+    return OVERLAY_CELL;
+  }
+
+  quality(): number {
+    return this.qualityLevel;
+  }
+
+  timeNow(): number {
+    return this.time;
+  }
+
+  countPrimitive(abilityId: string, n: number): void {
+    this.statSink?.(abilityId, n);
   }
 
   // ---- fire-and-forget primitives (painter dispatch) ----------------------
@@ -194,17 +426,24 @@ export class AbilityVfxFx {
 
   // Returns true when this call STARTED the windup (first frame of the cast),
   // so the painter can count and accent the moment.
-  windup(entityId: number, colorHex: number, progress: number): boolean {
+  windup(
+    entityId: number,
+    colorHex: number,
+    progress: number,
+    style: WindupStyle = 'orb',
+  ): boolean {
+    if (style === 'none') return false;
     let w = this.windups.get(entityId);
     let started = false;
     if (!w) {
       if (this.windups.size >= MAX_WINDUPS) return false;
-      w = { colorHex, progress, stamp: this.frame };
+      w = { colorHex, progress, style, stamp: this.frame };
       this.windups.set(entityId, w);
       started = true;
     }
     w.colorHex = colorHex;
     w.progress = progress;
+    w.style = style;
     w.stamp = this.frame;
     return started;
   }
@@ -245,6 +484,8 @@ export class AbilityVfxFx {
     this.ribbons.update(dt, camPosScratch);
     this.rings.update(dt, this.camera.quaternion);
     this.decals.update(dt);
+    this.pillars.update(dt);
+    this.shells.update(dt, this.time, this.frame, this.anchor);
     this.overlay.beginFrame();
     for (const [id, w] of this.windups) {
       if (w.stamp !== this.frame) {
@@ -269,6 +510,9 @@ export class AbilityVfxFx {
         this.drawOrbit(id, band);
       }
     }
+    // the archetype sequences advance here so their transient draws (release
+    // flash, gavel descent, stun stars) land inside this frame's overlay batch
+    this.sequencer.update(this, dt);
     this.overlay.commit();
     this.frame++;
   }
@@ -277,23 +521,141 @@ export class AbilityVfxFx {
     this.ribbons.clear();
     this.rings.clear();
     this.decals.clear();
+    this.pillars.clear();
+    this.shells.clear();
+    this.sequencer.clear();
     this.windups.clear();
     this.orbits.clear();
     this.orbitBandCount = 0;
   }
 
   private intensity(): number {
-    return 0.55 + 0.45 * this.quality;
+    return 0.55 + 0.45 * this.qualityLevel;
   }
 
-  // Windup orb: a glow that converges and swells between the caster's hands as
-  // the cast bar fills, with a star core and two inward-spiraling motes.
+  // Windup ceremonies (gallery windupStyle set), all immediate-mode overlay
+  // sprites recomputed per frame from the live cast progress:
+  //   orb     a glow converging and swelling between the hands (the default)
+  //   runes   a rotating rune circle at the feet, tightening as the cast fills
+  //   vortex  wide sparks pulled inward, the drain-cast read
+  //   ascend  a rising mote column crowned by a star near completion
+  //   stance  low dust drifting at the feet (warrior stances)
+  //   weapon  a hand-height star building along the weapon
   private drawWindup(entityId: number, w: WindupState): void {
+    const p = Math.min(1, Math.max(0, w.progress));
+    const q = 0.75 + 0.25 * this.qualityLevel;
+    const pulse = 1 + 0.07 * Math.sin(this.time * 14);
+    if (w.style === 'runes') {
+      const feet = this.anchor(entityId, 0.04);
+      if (!feet) return;
+      const n = 4;
+      const r = 1.25 - 0.35 * p;
+      for (let k = 0; k < n; k++) {
+        const a = this.time * 1.4 + (k / n) * Math.PI * 2;
+        this.overlay.push(
+          feet.x + Math.cos(a) * r,
+          feet.y + 0.14,
+          feet.z + Math.sin(a) * r,
+          w.colorHex,
+          0.3 * q,
+          OVERLAY_CELL.rune,
+          0.55 + 0.45 * p,
+          2.1,
+        );
+      }
+      const chest = this.anchor(entityId, 0.58);
+      if (chest)
+        this.overlay.push(
+          chest.x,
+          chest.y,
+          chest.z,
+          w.colorHex,
+          0.24 * (0.5 + p) * pulse * q,
+          OVERLAY_CELL.glow,
+          0.7,
+          1.8,
+        );
+      return;
+    }
+    if (w.style === 'stance') {
+      const feet = this.anchor(entityId, 0.06);
+      if (!feet) return;
+      for (let k = 0; k < 3; k++) {
+        const a = this.time * 1.1 + k * 2.1 + entityId;
+        const r = 0.5 + 0.35 * Math.sin(this.time * 2.4 + k);
+        this.overlay.push(
+          feet.x + Math.cos(a) * r,
+          feet.y + 0.12 + 0.1 * Math.sin(this.time * 3 + k),
+          feet.z + Math.sin(a) * r,
+          w.colorHex,
+          0.22 * q,
+          OVERLAY_CELL.glow,
+          0.4 + 0.3 * p,
+          1.2,
+        );
+      }
+      return;
+    }
+    if (w.style === 'weapon') {
+      const hand = this.anchor(entityId, 0.46);
+      if (!hand) return;
+      this.overlay.push(
+        hand.x,
+        hand.y,
+        hand.z,
+        w.colorHex,
+        (0.16 + 0.3 * p) * pulse * q,
+        OVERLAY_CELL.star,
+        0.55 + 0.45 * p,
+        2.5,
+      );
+      this.overlay.push(
+        hand.x,
+        hand.y,
+        hand.z,
+        w.colorHex,
+        (0.3 + 0.35 * p) * q,
+        OVERLAY_CELL.glow,
+        0.5,
+        1.6,
+      );
+      return;
+    }
+    if (w.style === 'ascend') {
+      const feet = this.anchor(entityId, 0.04);
+      const head = this.anchor(entityId, 1.0);
+      if (!feet || !head) return;
+      const span = head.y - feet.y + 0.8;
+      for (let k = 0; k < 4; k++) {
+        const f = (this.time * 0.45 + k / 4) % 1;
+        const a = this.time * 2 + k * 1.7;
+        this.overlay.push(
+          feet.x + Math.cos(a) * 0.35,
+          feet.y + f * span,
+          feet.z + Math.sin(a) * 0.35,
+          w.colorHex,
+          0.2 * q,
+          OVERLAY_CELL.glow,
+          (1 - f) * (0.4 + 0.6 * p),
+          1.9,
+        );
+      }
+      this.overlay.push(
+        head.x,
+        head.y + 0.5,
+        head.z,
+        w.colorHex,
+        0.3 * p * pulse * q,
+        OVERLAY_CELL.star,
+        p,
+        2.6,
+      );
+      return;
+    }
+    // orb (default) and vortex share the hand orb; vortex pulls from wider out
     const at = this.anchor(entityId, 0.58);
     if (!at) return;
-    const p = Math.min(1, Math.max(0, w.progress));
-    const pulse = 1 + 0.07 * Math.sin(this.time * 14);
-    const size = (0.28 + 0.5 * p) * pulse * (0.75 + 0.25 * this.quality);
+    const size = (0.28 + 0.5 * p) * pulse * q;
     this.overlay.push(at.x, at.y + 0.12, at.z, w.colorHex, size, OVERLAY_CELL.glow, 0.85, 1.9);
     this.overlay.push(
       at.x,
@@ -305,10 +667,12 @@ export class AbilityVfxFx {
       0.5 + 0.5 * p,
       2.6,
     );
-    if (this.quality >= 0.5) {
-      for (let k = 0; k < 2; k++) {
-        const a = this.time * 5 + k * Math.PI + entityId;
-        const r = 0.25 + 0.9 * (1 - p);
+    if (this.qualityLevel >= 0.5) {
+      const motes = w.style === 'vortex' ? 4 : 2;
+      const reach = w.style === 'vortex' ? 1.9 : 0.9;
+      for (let k = 0; k < motes; k++) {
+        const a = this.time * 5 + (k * Math.PI * 2) / motes + entityId;
+        const r = 0.25 + reach * (1 - p);
         this.overlay.push(
           at.x + Math.cos(a) * r,
           at.y + 0.12 + Math.sin(this.time * 3 + k * 2) * 0.14,
@@ -327,7 +691,7 @@ export class AbilityVfxFx {
     const dna = ORBIT_DNA[band.style];
     const at = this.anchor(entityId, dna.frac);
     if (!at) return;
-    const fade = Math.min(1, band.age / 0.25) * (0.55 + 0.45 * this.quality);
+    const fade = Math.min(1, band.age / 0.25) * (0.55 + 0.45 * this.qualityLevel);
     for (let k = 0; k < dna.n; k++) {
       const a = band.phase + this.time * dna.rate + (k / dna.n) * Math.PI * 2;
       const y = at.y + Math.sin(this.time * 2 + k * 2) * dna.weave;

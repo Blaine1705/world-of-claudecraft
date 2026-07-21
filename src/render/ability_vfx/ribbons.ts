@@ -14,7 +14,7 @@ const BOLT_SLOTS = 10;
 const BOLT_PTS = 17; // 4 midpoint-displacement passes on a 2-point seed
 const TRAIL_SLOTS = 12;
 const TRAIL_PTS = 9;
-const ARC_SLOTS = 8;
+const ARC_SLOTS = 20;
 const ARC_PTS = 12;
 const TRAIL_SPEED = 26; // yards/sec, matches Vfx.projectile so the trail rides the comet
 const WHITE = new THREE.Color(0xffffff);
@@ -32,6 +32,11 @@ interface BoltSlot {
   lastGen: number;
   sourceId: number;
   targetId: number;
+  // fixed-endpoint mode (motif ground cracks): endpoints in world space
+  // instead of live entity anchors
+  fixed: boolean;
+  fromP: THREE.Vector3;
+  toP: THREE.Vector3;
   width: number;
   jagScale: number;
   core: THREE.Color;
@@ -65,6 +70,13 @@ interface ArcSlot {
 }
 
 export type RibbonAnchor = (id: number, heightFrac: number) => THREE.Vector3 | null;
+
+// Plain world point (structurally satisfied by THREE.Vector3).
+export interface RibbonPoint {
+  x: number;
+  y: number;
+  z: number;
+}
 
 export class AbilityVfxRibbons {
   private geo = new THREE.BufferGeometry();
@@ -150,6 +162,9 @@ export class AbilityVfxRibbons {
         lastGen: -1,
         sourceId: 0,
         targetId: 0,
+        fixed: false,
+        fromP: new THREE.Vector3(),
+        toP: new THREE.Vector3(),
         width: 0.1,
         jagScale: 1,
         core: new THREE.Color(),
@@ -205,11 +220,63 @@ export class AbilityVfxRibbons {
     slot.lastGen = -1;
     slot.sourceId = sourceId;
     slot.targetId = targetId;
+    slot.fixed = false;
     slot.width = width;
     slot.jagScale = jagScale;
     slot.core.setHex(colorHex).lerp(WHITE, 0.55);
     slot.glow.setHex(colorHex);
     slot.count = 0;
+  }
+
+  // Fixed-endpoint variant (motif ground cracks, sky strikes): same flicker
+  // regeneration between two world points instead of live entity anchors.
+  spawnBoltPoints(
+    fx: number,
+    fy: number,
+    fz: number,
+    tx: number,
+    ty: number,
+    tz: number,
+    colorHex: number,
+    life = 0.3,
+    width = 0.12,
+    jagScale = 1,
+  ): void {
+    const slot = this.bolts.find((b) => !b.active) ?? this.bolts[0];
+    slot.active = true;
+    slot.age = 0;
+    slot.life = life;
+    slot.lastGen = -1;
+    slot.fixed = true;
+    slot.fromP.set(fx, fy, fz);
+    slot.toP.set(tx, ty, tz);
+    slot.width = width;
+    slot.jagScale = jagScale;
+    slot.core.setHex(colorHex).lerp(WHITE, 0.55);
+    slot.glow.setHex(colorHex);
+    slot.count = 0;
+  }
+
+  // A generic short-lived path ribbon: the caller fills the slot's
+  // preallocated points (helix climbs, chain sags, fountain streams, gavel
+  // strokes) and returns how many it wrote. Spawn-time-only closure cost.
+  spawnPath(
+    colorHex: number,
+    width: number,
+    life: number,
+    fill: (pts: THREE.Vector3[]) => number,
+  ): void {
+    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    const count = Math.min(ARC_PTS, Math.max(0, fill(slot.pts)));
+    if (count < 2) return;
+    // pad the unwritten tail onto the last point so the strip stays degenerate
+    for (let i = count; i < ARC_PTS; i++) slot.pts[i].copy(slot.pts[count - 1]);
+    slot.active = true;
+    slot.age = 0;
+    slot.life = life;
+    slot.width = width;
+    slot.core.setHex(colorHex).lerp(WHITE, 0.5);
+    slot.glow.setHex(colorHex);
   }
 
   // A comet trail chasing the pooled Vfx projectile: advances with the same
@@ -239,28 +306,97 @@ export class AbilityVfxRibbons {
 
   // A bowed slash arc through a world point (melee strike read): computed once
   // into the slot's preallocated points, fades fast.
-  spawnSlash(at: THREE.Vector3, colorHex: number, span = 1.15, life = 0.22): void {
+  spawnSlash(at: RibbonPoint, colorHex: number, span = 1.15, life = 0.22): void {
+    this.slashOne(at, colorHex, span, life, (Math.random() - 0.5) * 1.1, 0, 0.34);
+  }
+
+  // The gallery's authored slash/trail vocabulary: every strike arc style and
+  // impact trail style maps onto oriented slash strips through the target.
+  spawnSlashStyled(at: RibbonPoint, colorHex: number, style: string, scale = 1): void {
+    switch (style) {
+      case 'vertical':
+      case 'overhead':
+        // overhead chop: top-to-bottom, nearly no horizontal travel
+        this.slashOne(at, colorHex, 0.35 * scale, 0.26, 3.2, 0.55 * scale, 0.3);
+        break;
+      case 'uppercut':
+        // rising cut: bottom-to-top with a forward kick
+        this.slashOne(at, colorHex, 0.5 * scale, 0.26, -2.6, 0.5 * scale, 0.3);
+        break;
+      case 'thrust':
+        // straight lunge: long, narrow, almost flat
+        this.slashOne(at, colorHex, 1.5 * scale, 0.18, 0.05, 0, 0.12);
+        break;
+      case 'low':
+        // ankle-height reap
+        this.slashOne(at, colorHex, 1.1 * scale, 0.2, 0.15, -0.45, 0.28);
+        break;
+      case 'sweep':
+        // extra-wide retaliatory sweep
+        this.slashOne(at, colorHex, 1.6 * scale, 0.26, 0.25, 0, 0.4);
+        break;
+      case 'riposte':
+        this.slashOne(at, colorHex, 1.0 * scale, 0.2, 0.9, 0.15, 0.26);
+        break;
+      case 'x':
+      case 'cross':
+        // two crossing diagonals
+        this.slashOne(at, colorHex, 1.05 * scale, 0.26, 1.1, 0.1, 0.3);
+        this.slashOne(at, colorHex, 1.05 * scale, 0.3, -1.1, 0.1, 0.3);
+        break;
+      case 'claws':
+        // three parallel raking gashes
+        for (let k = -1; k <= 1; k++)
+          this.slashOne(at, colorHex, 0.85 * scale, 0.24, 1.4, 0.3 * k, 0.16);
+        break;
+      case 'bite':
+        // two opposing jaw arcs snapping shut
+        this.slashOne(at, colorHex, 0.7 * scale, 0.2, 2.4, 0.4, 0.22);
+        this.slashOne(at, colorHex, 0.7 * scale, 0.22, -2.4, -0.4, 0.22);
+        break;
+      case 'crescent':
+        // one moon-blade: wide, heavily bowed
+        this.slashOne(at, colorHex, 1.3 * scale, 0.3, 0.4, 0.2, 0.5);
+        break;
+      default:
+        // 'horizontal' / 'arc': the flat baseline sweep with a random tilt
+        this.slashOne(at, colorHex, 1.15 * scale, 0.22, (Math.random() - 0.5) * 1.1, 0, 0.34);
+        break;
+    }
+  }
+
+  // One oriented slash strip: tilt skews the vertical travel across the swing
+  // (large = vertical chop, negative = rising), lift offsets the whole arc.
+  private slashOne(
+    at: RibbonPoint,
+    colorHex: number,
+    span: number,
+    life: number,
+    tilt: number,
+    lift: number,
+    width: number,
+  ): void {
     const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
     slot.active = true;
     slot.age = 0;
     slot.life = life;
-    slot.width = 0.34;
+    slot.width = width;
     slot.core.setHex(colorHex).lerp(WHITE, 0.5);
     slot.glow.setHex(colorHex);
     // side axis perpendicular to the camera ray on XZ, so the arc always shows
-    // its face; a random tilt keeps repeat strikes from stamping
-    this.t1.subVectors(at, this.camPos);
-    const len = Math.hypot(this.t1.x, this.t1.z) || 1;
-    const sx = -this.t1.z / len;
-    const sz = this.t1.x / len;
-    const tilt = (Math.random() - 0.5) * 1.1;
+    // its face
+    const dx = at.x - this.camPos.x;
+    const dz = at.z - this.camPos.z;
+    const len = Math.hypot(dx, dz) || 1;
+    const sx = -dz / len;
+    const sz = dx / len;
     for (let i = 0; i < ARC_PTS; i++) {
       const u = i / (ARC_PTS - 1);
       const swing = (u - 0.5) * 2; // -1..1 across the target
       const bowY = Math.sin(u * Math.PI) * 0.34;
       slot.pts[i].set(
         at.x + sx * swing * span,
-        at.y + bowY + swing * tilt * 0.4,
+        at.y + lift + bowY + swing * tilt * 0.4,
         at.z + sz * swing * span,
       );
     }
@@ -344,8 +480,8 @@ export class AbilityVfxRibbons {
 
   // Midpoint displacement into the slot's preallocated points (no branches).
   private genBolt(b: BoltSlot): void {
-    const from = this.anchor(b.sourceId, 0.62);
-    const to = this.anchor(b.targetId, 0.5);
+    const from = b.fixed ? b.fromP : this.anchor(b.sourceId, 0.62);
+    const to = b.fixed ? b.toP : this.anchor(b.targetId, 0.5);
     if (!from || !to) {
       b.count = 0;
       return;
