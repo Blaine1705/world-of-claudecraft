@@ -1687,7 +1687,8 @@ export const id_ID: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "{family} Level {level}",
@@ -2085,7 +2086,11 @@ export const id_ID: EnTranslations = {
       "blockSearchPlaceholder": "Nama pemain",
       "blockAction": "Blokir",
       "nowBlocking": "{name} diblokir.",
-      "stopBlockingTitle": "Buka blokir {name}"
+      "stopBlockingTitle": "Buka blokir {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Pengumpulan",
@@ -2096,7 +2101,27 @@ export const id_ID: EnTranslations = {
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
       "gatherLine": "Anda mengumpulkan: {name}.",
       "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
-      "catchLine": "You reel in: {name}"
+      "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
+      "nodeName": {
+        "ore": "Ore Vein",
+        "wood": "Timber Stand",
+        "herb": "Herb Patch"
+      },
+      "tierRequired": {
+        "mining": "Requires a tier {tier} mining pick",
+        "logging": "Requires a tier {tier} logging axe",
+        "herbalism": "Requires a tier {tier} herbalism sickle"
+      },
+      "toolTierUnmet": {
+        "mining": "You need a tier {tier} mining pick to harvest this vein.",
+        "logging": "You need a tier {tier} logging axe to fell this stand.",
+        "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
+      },
+      "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "stateReady": "Ready",
+      "stateCooldown": "Respawning"
     },
     "archetypeTitle": {
       "label": "Gelar",
@@ -2146,7 +2171,7 @@ export const id_ID: EnTranslations = {
       "tierPipAria": "Tingkat {tier}",
       "nextUnlockTier": "{points} menunjuk ke tingkat berikutnya: peluang karya besar meningkat",
       "nextUnlockSpecialized": "{points} menunjuk ke Khusus: biaya material turun",
-      "nextUnlockMax": "Pada keterampilan maksimal",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Khusus, biaya material -{pct}%",
       "perkSpecializedAt": "Mengkhususkan diri pada keterampilan {threshold}",
       "switchCost": "Peralihan arketipe berikutnya membutuhkan {cost} poin penebusan",
@@ -2226,6 +2251,7 @@ export const id_ID: EnTranslations = {
       "skillReqLine": "Membutuhkan {craft} {skill}",
       "difficultyFull": "Peningkatan keterampilan penuh",
       "difficultyReduced": "Mengurangi perolehan keterampilan",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Tidak ada perolehan keterampilan",
       "stationBadge": "Tempat Kerja Kerajinan",
       "stationOutOfRangeNamed": "Pindah ke {station} untuk membuat ini.",
@@ -5852,7 +5878,8 @@ export const id_ID: EnTranslations = {
         "offline": "Luring",
         "combat": "Dalam Pertempuran",
         "dungeon": "Dalam Dungeon",
-        "dead": "Tewas"
+        "dead": "Tewas",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {
@@ -5961,6 +5988,7 @@ export const id_ID: EnTranslations = {
     },
     "cast": {
       "fishing": "Memancing",
+      "gathering": "Gathering",
       "demonHeal": "Penyembuhan Iblis",
       "thunzharrStormcall": "Panggilan Badai"
     }
@@ -8812,6 +8840,12 @@ export const id_ID: EnTranslations = {
       "verlans_oathblade": {
         "name": "Bilah Sumpah Verlan"
       },
+      "ironreel_fishing_rod": {
+        "name": "Joran gulungan besi"
+      },
+      "silverstream_fishing_rod": {
+        "name": "Joran arus perak"
+      },
       "briny_idol": {
         "name": "Berhala Asin"
       },
@@ -10972,6 +11006,11 @@ export const id_ID: EnTranslations = {
         "sender": "Persatuan Perajin",
         "subject": "Pekerjaan Anda di bidang Pembuatan Zirah dan Teknik",
         "body": "Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda di bidang Pembuatan Zirah dan Teknik: pelat-pelat dipaku dan roda gigi dipasang, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

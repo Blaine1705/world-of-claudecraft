@@ -92,7 +92,25 @@ export const CAST_COMPLETE_EPS = 1e-9;
 export const CAST_QUEUE_WINDOW_SEC = 0.4;
 export const FISHING_CAST_ID = 'fishing';
 export const FISHING_CAST_NAME = 'Fishing';
-export const FISHING_CAST_TIME = 5;
+// The constant castTotal/castRemaining of a fishing session (Professions 2.0
+// Phase 12b, retiring the fixed FISHING_CAST_TIME cast): a generous cap that
+// carries ZERO information about the hidden bite (max bite delay plus max
+// reel window end every real session well before it), so the broadcast cast
+// fields can never leak the bite timing to a modified client.
+export const FISHING_SESSION_CAP_SEC = 15;
+// The gather-cast sentinel riding castingAbility (Professions 2.0 Phase 12b),
+// beside FISHING_CAST_ID above: an activity marker, never an ability id.
+export const GATHER_CAST_ID = 'gathering';
+// The non-spell casts: castingAbility sentinels that are activities, not
+// abilities. They share one semantics bundle at the casting choke points:
+// exempt from silence and school lockouts, no blink-through, no spell queue,
+// immune to interrupt effects, damage cancels instead of pushing back, and
+// item use is blocked while one runs. DEMON_HEAL_CAST_ID is deliberately NOT
+// a member: its channel keeps its own per-site behavior, folded in explicitly
+// only where that behavior is already byte-identical (see the call sites).
+export function isNonSpellCast(castId: string | null): boolean {
+  return castId === FISHING_CAST_ID || castId === GATHER_CAST_ID;
+}
 // Seconds an empty instance idles before it resets. Shared by the dungeon instance
 // reaper (instances/dungeons.ts) and the delve reaper (sim.ts). NYTHRAXIS_BOSS_ID
 // (the dungeon raid-door seal also keys off it) lives lower in this file (C1 relocation).
@@ -2383,6 +2401,11 @@ export interface GatherNodeDef {
   // (professions/profession_xp.ts gatherActionXp), snapshotted at authoring
   // time from the node's zone levelRange midpoint rather than looked up live.
   level: number;
+  // Access tier (Professions 2.0 Phase 12), 1 = bare-hands: gated via
+  // canGatherTier against the player's best owned matching tool
+  // (professions/tools.ts bestOwnedGatherToolTier). Pure access gating, never
+  // a speed mechanic; every pre-phase node is tier 1.
+  tier: number;
 }
 
 export interface DungeonSpawn {
@@ -2809,6 +2832,20 @@ export interface Entity {
   // aimed at, captured (server-clamped to range) when the cast begins and read by
   // its area effects when it resolves. null for normal entity/self casts.
   castAim: Vec3 | null;
+  // Hidden per-cast state (Professions 2.0 Phase 12b). All three are
+  // transient: initialized inert ('' / 0) at entity creation, nonzero ONLY
+  // between a real cast start and its end, and cleared on EVERY end path
+  // (completion, reel, miss, cancelCast). Parity contract: while inert they
+  // canonicalize away (omitDefaults), so existing goldens stay byte-identical;
+  // a future scenario sampling mid-cast regenerates. Anti-cheat contract:
+  // never written to any wire snapshot field (wireEntity emits explicit
+  // fields only), so the bite timing stays server-hidden.
+  /** Node id a running gather cast resolves against at completion ('' = none). */
+  gatherCastNodeId: string;
+  /** Hidden seeded sim tick the fishing bite fires on (0 = no pending bite). */
+  fishBiteAtTick: number;
+  /** Sim-tick deadline for the fishing reel re-press (0 = window not armed). */
+  fishReelDeadlineTick: number;
   channeling: boolean;
   channelTickTimer: number;
   channelTickEvery: number;
@@ -2853,6 +2890,12 @@ export interface Entity {
   // Z-key cosmetic toggle: held weapons render sheathed on the back. Cleared by
   // any deliberate combat action (auto-attack engage, ability cast), WoW-style.
   weaponStowed: boolean;
+  // /afk display mirror: true while this player's PlayerMeta.away is in `afk`
+  // mode. Kept in lockstep with meta.away by src/sim/social/away.ts so the flag
+  // rides the entity (wire `ak` bit) to other clients' nameplates and the social
+  // presence dot. Transient, session-only, never persisted; always false for
+  // non-players and for the `dnd` away mode.
+  afk: boolean;
   // mob AI
   aiState: AiState;
   tappedById: number | null; // first player to damage this mob owns loot/xp/quest credit
@@ -3702,6 +3745,21 @@ export type SimEvent = { pid?: number } & (
       // The rare event this harvest rolled (resolveHarvest draw #2), or null.
       rareEvent: GatherRareEventFlavor | null;
     }
+  // Gathering tool-gate denial (Professions 2.0 Phase 12): the player lacks a
+  // matching tool of at least `requiredTier` for a node harvest, or for a
+  // corpse harvest's premium (signed/specimen) arm. Personal (pid = the
+  // gatherer) and text-free on purpose (like gatherResult above): the client
+  // composes its own localized copy off the structured fields. `professionId`
+  // is present exactly when surface === 'node' (a corpse harvest is gated by
+  // the best tool tier across ALL gathering professions, so no single
+  // profession applies).
+  | {
+      type: 'gatherDenied';
+      pid: number;
+      surface: 'node' | 'corpse';
+      requiredTier: number;
+      professionId?: GatheringProfessionId;
+    }
   // Fishing catch outcome (Professions 2.0 Phase 11): a landed catch emits
   // this so the client can log the reel-in feedback line for the acting
   // player. Personal (carries pid = the angler), emitted only on the
@@ -3717,6 +3775,19 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       quality: NonNullable<ItemDef['quality']>;
     }
+  // Fishing bite (Professions 2.0 Phase 12b): the hidden seeded bite fired
+  // for this angler's running fishing session. Personal (pid = the angler)
+  // and text-free on purpose (the fishingResult idiom): the client drives
+  // the bobber bite state and the always-audible cue off it, so no
+  // sim/server i18n matcher rule is needed. Emitted at most once per
+  // session, at the seeded bite tick; carries no timing payload, so the
+  // wire never reveals the delay distribution.
+  | { type: 'fishingBite'; pid: number }
+  // Fishing miss (Professions 2.0 Phase 12b): the reel window closed with no
+  // re-press ("it got away"), or a session defensively timed out. Personal
+  // and text-free like fishingBite: the client renders its own localized
+  // got-away line. Costs nothing but the ended cast; recast immediately.
+  | { type: 'fishingGotAway'; pid: number }
   // Rare gather event (Professions 2.0 Phase 4): a harvest struck a pristine
   // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is
   // emitted per player currently in the node's zone, `pid` being the RECIPIENT

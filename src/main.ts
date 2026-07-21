@@ -216,6 +216,7 @@ import { renderDiscordWidget } from './ui/discord_widget';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
+import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
 import { chatInputSize } from './ui/hud/chat/chat_input_autosize';
@@ -253,6 +254,7 @@ import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
+import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
 import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
 import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
@@ -1081,6 +1083,7 @@ async function startGame(
     });
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
+    applyPerfOrnamentVars(); // Performance Overlay window's gilded corner/edge masks
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
     // loading screen up forever. A HANDLED failure is not a process kill, so the
@@ -2278,6 +2281,7 @@ async function startGame(
         world,
         hud,
         GATHER_NODES,
+        (node) => gatherNodeToolGateFor(world, node),
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
         t('errors.nothingInteract'),
@@ -2380,6 +2384,7 @@ async function startGame(
             node.pos,
             t('questUi.errors.tooFar'),
             t('hudChrome.gathering.notReady'),
+            gatherNodeToolGateFor(world, node),
           ),
           input,
           mobileControls,
@@ -2823,6 +2828,17 @@ async function startGame(
       hud.clearHoverTooltip();
     }
   }
+
+  // Desktop-only gather-node hover tooltip (Professions 2.0 Phase 12): the
+  // module owns the listener/throttle/paint; this is thin wiring only.
+  attachGatherNodeHoverTooltip(
+    canvas,
+    world,
+    hud,
+    (x, y) => renderer.pickGatherNode(x, y),
+    (x, y) => renderer.pick(x, y),
+    () => input.isDragging() || hud.isModalOpen(),
+  );
 
   function renderFacingOverride(): number | null {
     // A ghost (dead && ghost) is not movement-frozen and keeps camera-driven

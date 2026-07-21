@@ -2733,6 +2733,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Spöklik essens',
   'entities.items.glacier_melt.name': 'Glaciärsmälta',
   'entities.items.glimmerfin_koi.name': 'Skimmerfenad koi',
+  'entities.items.ironreel_fishing_rod.name': 'Järnrullespö',
+  'entities.items.silverstream_fishing_rod.name': 'Silverbäcksspö',
   'entities.items.glowing_wax.name': 'Glödande vax',
   'entities.items.gnarled_staff.name': 'Kärrekstav',
   'entities.items.gorraks_cleaver.name': 'Gorraks klyvare',
@@ -8420,7 +8422,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identitet',
   'hudChrome.professions.majorsLabel': 'Huvudämnen: {a} och {b}',
-  'hudChrome.professions.nextUnlockMax': 'Med maximal skicklighet',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} poäng till Specialiserad: materialkostnaderna sjunker',
   'hudChrome.professions.nextUnlockTier':

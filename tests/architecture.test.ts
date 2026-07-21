@@ -131,6 +131,7 @@ const UI_PURE_CORES = [
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
   'src/ui/party_collapse.ts',
+  'src/ui/guild_hide_offline.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',
@@ -234,6 +235,7 @@ const UI_PURE_CORES = [
 // the same contract for the map editor's realtime terrain/water edits.
 const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
+  'src/render/fishing_bobber_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/nameplate_view.ts',
@@ -261,6 +263,7 @@ const BARE_NAMED = [
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
   'src/ui/party_collapse.ts',
+  'src/ui/guild_hide_offline.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',

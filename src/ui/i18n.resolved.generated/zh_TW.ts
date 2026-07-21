@@ -1687,7 +1687,8 @@ export const zh_TW: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "等級 {level} {family}",
@@ -2085,7 +2086,11 @@ export const zh_TW: EnTranslations = {
       "blockSearchPlaceholder": "玩家名稱",
       "blockAction": "封鎖",
       "nowBlocking": "已封鎖 {name}。",
-      "stopBlockingTitle": "取消對 {name} 的封鎖"
+      "stopBlockingTitle": "取消對 {name} 的封鎖",
+      "onlineHeader": "在線 ({n})",
+      "offlineHeader": "離線 ({n})",
+      "hideOffline": "隱藏離線",
+      "hideOfflineTitle": "隱藏離線公會成員"
     },
     "gathering": {
       "title": "採集",
@@ -2096,7 +2101,27 @@ export const zh_TW: EnTranslations = {
       "notReady": "這個資源節點尚未為你重新生成。",
       "gatherLine": "你採集了：{name}。",
       "gatherLineQty": "你採集了：{name} x{qty}。",
-      "catchLine": "你釣上了：{name}"
+      "catchLine": "你釣上了：{name}",
+      "biteLine": "有東西上鉤了！",
+      "gotAwayLine": "牠跑掉了。",
+      "nodeName": {
+        "ore": "礦脈",
+        "wood": "林木",
+        "herb": "草藥叢"
+      },
+      "tierRequired": {
+        "mining": "需要{tier}階採礦鎬",
+        "logging": "需要{tier}階伐木斧",
+        "herbalism": "需要{tier}階草藥鐮"
+      },
+      "toolTierUnmet": {
+        "mining": "你需要{tier}階採礦鎬才能開採這條礦脈。",
+        "logging": "你需要{tier}階伐木斧才能砍伐這片林木。",
+        "herbalism": "你需要{tier}階草藥鐮才能採集這片草藥叢。"
+      },
+      "toolTierUnmetCorpse": "你需要{tier}階採集工具才能取得最上等的材料。",
+      "stateReady": "可採集",
+      "stateCooldown": "恢復中"
     },
     "archetypeTitle": {
       "label": "稱號",
@@ -2146,7 +2171,7 @@ export const zh_TW: EnTranslations = {
       "tierPipAria": "階級 {tier}",
       "nextUnlockTier": "距離下一階級還差 {points} 點：打造大師之作的機率將提升",
       "nextUnlockSpecialized": "距離專精還差 {points} 點：材料消耗將降低",
-      "nextUnlockMax": "已達技能上限",
+      "nextUnlockMastered": "已精通，暫時如此",
       "perkSpecializedLine": "{craft}：專精，材料消耗 -{pct}%",
       "perkSpecializedAt": "技能達到 {threshold} 後專精",
       "switchCost": "下次切換原型需要 {cost} 點補償",
@@ -2226,6 +2251,7 @@ export const zh_TW: EnTranslations = {
       "skillReqLine": "需要{craft} {skill}",
       "difficultyFull": "完整技能成長",
       "difficultyReduced": "技能成長減少",
+      "difficultyMinimal": "微量技能成長",
       "difficultyNone": "無技能成長",
       "stationBadge": "製作站",
       "stationOutOfRangeNamed": "前往{station}即可製作該物品。",
@@ -5852,7 +5878,8 @@ export const zh_TW: EnTranslations = {
         "offline": "離線",
         "combat": "戰鬥中",
         "dungeon": "地城中",
-        "dead": "死亡"
+        "dead": "死亡",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {
@@ -5961,6 +5988,7 @@ export const zh_TW: EnTranslations = {
     },
     "cast": {
       "fishing": "釣魚",
+      "gathering": "採集",
       "demonHeal": "惡魔治療",
       "thunzharrStormcall": "風暴召喚"
     }
@@ -8812,6 +8840,12 @@ export const zh_TW: EnTranslations = {
       "verlans_oathblade": {
         "name": "維爾蘭的誓約之刃"
       },
+      "ironreel_fishing_rod": {
+        "name": "鐵輪釣竿"
+      },
+      "silverstream_fishing_rod": {
+        "name": "銀溪釣竿"
+      },
       "briny_idol": {
         "name": "鹹海神像"
       },
@@ -10972,6 +11006,11 @@ export const zh_TW: EnTranslations = {
         "sender": "工匠公會",
         "subject": "關於你的護甲鍛造與工程學",
         "body": "工匠：\n\n你鑽研護甲鍛造與工程學的名聲已傳到公會：鉚好甲片，校準齒輪，兩門技藝相輔相成。能同時打磨相鄰兩門技藝的手，正是準備好調諧的手。請到東溪鎮拜訪哈德倫鐵匠：眼下由他代諸位大師發言。用親手做出的成果向他證明你的技藝，他便會把這兩門技藝調諧為你的主修。\n\n謹此，\n工匠公會"
+      },
+      "mastery_reset_notice": {
+        "sender": "公會會館",
+        "subject": "你的手藝，從此作數",
+        "body": "公會同仁：\n\n公會已啟用全新的技藝衡量之法。人人從頭攀登：你的製作技能與採集熟練度已歸零。\n\n其餘一切分毫未動，仍歸你所有：你的配方、工具與材料、銀行與金幣、調諧與頭銜、功績與名望、任務與郵件。\n\n如今的攀登童叟無欺。廉價的活計再也帶不動你。去尋求更難的配方、更富的礦脈、更深的水域吧。\n\n謹致敬意，\n公會會館"
       }
     },
     "itemSets": {

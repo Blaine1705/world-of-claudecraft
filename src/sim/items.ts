@@ -40,9 +40,9 @@ import {
   dist2d,
   type Entity,
   type EquipSlot,
-  FISHING_CAST_ID,
   INTERACT_RANGE,
   type ItemInstancePayload,
+  isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
 import { vendorStackSize } from './vendor_stack';
@@ -327,6 +327,16 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     ctx.startFishing(p, meta);
     return;
   }
+  // Phase 12: the tiered fishing rods are gatherTool items (their tier caps
+  // the catch band, professions/fishing.ts) but must still CAST like the
+  // simple pole, so a fishing-profession gatherTool use routes to the same
+  // startFishing (which owns the dead/combat/busy/water gates, exactly as the
+  // arm above). Every OTHER gatherTool use (picks, axes, sickles) stays a safe
+  // no-op exactly as today: node gating scans bags, never an item use.
+  if (def.use?.type === 'gatherTool' && def.use.professionId === 'fishing') {
+    ctx.startFishing(p, meta);
+    return;
+  }
   if (def.use?.type === 'mechChroma') {
     return ctx.unlockMechChromaFromItem(meta, itemId, def.use.chromaId);
   }
@@ -334,7 +344,10 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
     return;
   }
-  if (p.castingAbility === FISHING_CAST_ID) {
+  // A running non-spell cast (fishing/gather) blocks other item use. The
+  // Demon Heal channel is deliberately NOT folded in: items stay usable
+  // during it, as today.
+  if (isNonSpellCast(p.castingAbility)) {
     ctx.error(meta.entityId, 'You are busy.');
     return;
   }

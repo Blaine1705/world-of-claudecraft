@@ -5349,6 +5349,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Gâteau au miel invoqué',
   'entities.items.conjured_bread4.name': 'Pain de festin invoqué',
   'entities.items.glimmerfin_koi.name': 'Koï aux nageoires scintillantes',
+  'entities.items.ironreel_fishing_rod.name': 'Canne à moulinet de fer',
+  'entities.items.silverstream_fishing_rod.name': "Canne du ruisseau d'argent",
   'entities.items.raw_bog_eel.name': 'Anguille des marais crue',
   'entities.items.raw_frostgill_trout.name': 'Truite aux ouïes givrées crue',
   'entities.items.raw_marsh_pike.name': 'Brochet des marais cru',
@@ -8636,7 +8638,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Passe-temps : {craft}',
   'hudChrome.professions.identityHeader': 'Identité',
   'hudChrome.professions.majorsLabel': 'Majeurs : {a} et {b}',
-  'hudChrome.professions.nextUnlockMax': 'Au maximum de compétence',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} points avant la spécialisation : les coûts des matériaux diminuent',
   'hudChrome.professions.nextUnlockTier':

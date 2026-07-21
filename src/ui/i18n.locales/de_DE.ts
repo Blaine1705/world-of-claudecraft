@@ -4970,6 +4970,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Herbeigezauberter Honigkuchen',
   'entities.items.conjured_bread4.name': 'Herbeigezauberter Festschmauslaib',
   'entities.items.glimmerfin_koi.name': 'Schimmerflossen-Koi',
+  'entities.items.ironreel_fishing_rod.name': 'Eisenrollen-Angelrute',
+  'entities.items.silverstream_fishing_rod.name': 'Silberbach-Angelrute',
   'entities.items.raw_bog_eel.name': 'Roher Mooraal',
   'entities.items.raw_frostgill_trout.name': 'Rohe Frostkiemen-Forelle',
   'entities.items.raw_marsh_pike.name': 'Roher Sumpfhecht',
@@ -8600,7 +8602,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identität',
   'hudChrome.professions.majorsLabel': 'Hauptfächer: {a} und {b}',
-  'hudChrome.professions.nextUnlockMax': 'Mit maximalem Können',
   'hudChrome.professions.nextUnlockSpecialized':
     'Noch {points} Punkte bis zur Spezialisierung: Materialkosten sinken',
   'hudChrome.professions.nextUnlockTier':

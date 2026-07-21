@@ -2729,6 +2729,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Spøgelsesagtig Essens',
   'entities.items.glacier_melt.name': 'Gletsjersmeltevand',
   'entities.items.glimmerfin_koi.name': 'Glimtfinne-Koi',
+  'entities.items.ironreel_fishing_rod.name': 'Fiskestang med jernhjul',
+  'entities.items.silverstream_fishing_rod.name': 'Sølvbæk-fiskestang',
   'entities.items.glowing_wax.name': 'Glødende Voks',
   'entities.items.gnarled_staff.name': 'Moseeg-Stav',
   'entities.items.gorraks_cleaver.name': 'Gorraks Kløver',
@@ -8408,7 +8410,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identitet',
   'hudChrome.professions.majorsLabel': 'Hovedfag: {a} og {b}',
-  'hudChrome.professions.nextUnlockMax': 'Ved maksimal dygtighed',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} point til Specialiseret: materialeomkostningerne falder',
   'hudChrome.professions.nextUnlockTier':

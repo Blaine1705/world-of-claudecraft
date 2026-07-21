@@ -1687,7 +1687,8 @@ export const sv_SE: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Nivå {level} {family}",
@@ -2085,7 +2086,11 @@ export const sv_SE: EnTranslations = {
       "blockSearchPlaceholder": "Spelarnamn",
       "blockAction": "Blockera",
       "nowBlocking": "{name} blockerad.",
-      "stopBlockingTitle": "Avblockera {name}"
+      "stopBlockingTitle": "Avblockera {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Insamling",
@@ -2096,7 +2101,27 @@ export const sv_SE: EnTranslations = {
       "notReady": "Den här resursnoden har inte återspawnats för dig ännu.",
       "gatherLine": "Du samlar: {name}.",
       "gatherLineQty": "Du samlar in: {name} x{qty}.",
-      "catchLine": "You reel in: {name}"
+      "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
+      "nodeName": {
+        "ore": "Ore Vein",
+        "wood": "Timber Stand",
+        "herb": "Herb Patch"
+      },
+      "tierRequired": {
+        "mining": "Requires a tier {tier} mining pick",
+        "logging": "Requires a tier {tier} logging axe",
+        "herbalism": "Requires a tier {tier} herbalism sickle"
+      },
+      "toolTierUnmet": {
+        "mining": "You need a tier {tier} mining pick to harvest this vein.",
+        "logging": "You need a tier {tier} logging axe to fell this stand.",
+        "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
+      },
+      "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "stateReady": "Ready",
+      "stateCooldown": "Respawning"
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -2146,7 +2171,7 @@ export const sv_SE: EnTranslations = {
       "tierPipAria": "Nivå {tier}",
       "nextUnlockTier": "{points} poäng till nästa nivå: mästerverksodds förbättras",
       "nextUnlockSpecialized": "{points} poäng till Specialiserad: materialkostnaderna sjunker",
-      "nextUnlockMax": "Med maximal skicklighet",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Specialiserade, materialkostnader -{pct}%",
       "perkSpecializedAt": "Specialiserad på {threshold} skicklighet",
       "switchCost": "Nästa arketypbyte kostar {cost} botgöringspoäng",
@@ -2226,6 +2251,7 @@ export const sv_SE: EnTranslations = {
       "skillReqLine": "Kräver {craft} {skill}",
       "difficultyFull": "Full skicklighetsvinst",
       "difficultyReduced": "Minskad färdighetsvinst",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Ingen färdighetsvinst",
       "stationBadge": "Station",
       "stationOutOfRangeNamed": "Flytta till {station} för att skapa detta.",
@@ -5852,7 +5878,8 @@ export const sv_SE: EnTranslations = {
         "offline": "Frånkopplad",
         "combat": "I strid",
         "dungeon": "I fängelsehåla",
-        "dead": "Död"
+        "dead": "Död",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {
@@ -5961,6 +5988,7 @@ export const sv_SE: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiske",
+      "gathering": "Gathering",
       "demonHeal": "Demonläkning",
       "thunzharrStormcall": "Stormrop"
     }
@@ -8812,6 +8840,12 @@ export const sv_SE: EnTranslations = {
       "verlans_oathblade": {
         "name": "Verlans edsklinga"
       },
+      "ironreel_fishing_rod": {
+        "name": "Järnrullespö"
+      },
+      "silverstream_fishing_rod": {
+        "name": "Silverbäcksspö"
+      },
       "briny_idol": {
         "name": "Salt avgudabild"
       },
@@ -10972,6 +11006,11 @@ export const sv_SE: EnTranslations = {
         "sender": "Hantverksgillet",
         "subject": "Ditt arbete med rustningssmide och ingenjörskonst",
         "body": "Hantverkare,\n\nBud når gillet av ditt arbete i rustningssmide och ingenjörskonst: plåtar nitade och kugghjul satta, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

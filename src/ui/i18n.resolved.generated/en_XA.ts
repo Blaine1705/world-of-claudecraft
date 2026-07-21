@@ -1687,7 +1687,8 @@ export const en_XA: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "[{level}]",
-      "mobEliteLevel": "[{level}+]"
+      "mobEliteLevel": "[{level}+]",
+      "afkTag": "[ÁƑĶ]"
     },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",
@@ -2085,7 +2086,11 @@ export const en_XA: EnTranslations = {
       "blockSearchPlaceholder": "[Þļáýéŕ ñáɱé]",
       "blockAction": "[Ɓļóçķ]",
       "nowBlocking": "[Ɓļóçķéð {name}.]",
-      "stopBlockingTitle": "[Šţóþ ƀļóçķíñĝ {name}]"
+      "stopBlockingTitle": "[Šţóþ ƀļóçķíñĝ {name}]",
+      "onlineHeader": "[Óñļíñé ({n})]",
+      "offlineHeader": "[Óƒƒļíñé ({n})]",
+      "hideOffline": "[Ĥíðé óƒƒļíñé]",
+      "hideOfflineTitle": "[Ĥíðé óƒƒļíñé ĝúíļð ɱéɱƀéŕš]"
     },
     "gathering": {
       "title": "[Ĝáţĥéŕíñĝ]",
@@ -2096,7 +2101,27 @@ export const en_XA: EnTranslations = {
       "notReady": "[Ţĥíš ŕéšóúŕçé ñóðé ĥáš ñóţ ŕéšþáŵñéð ƒóŕ ýóú ýéţ.]",
       "gatherLine": "[Ýóú ĝáţĥéŕ: {name}.]",
       "gatherLineQty": "[Ýóú ĝáţĥéŕ: {name} ẋ{qty}.]",
-      "catchLine": "[Ýóú ŕééļ íñ: {name}]"
+      "catchLine": "[Ýóú ŕééļ íñ: {name}]",
+      "biteLine": "[Šóɱéţĥíñĝ ţáķéš ţĥé ƀáíţ!]",
+      "gotAwayLine": "[Íţ ĝóţ áŵáý.]",
+      "nodeName": {
+        "ore": "[Óŕé Ʋéíñ]",
+        "wood": "[Ţíɱƀéŕ Šţáñð]",
+        "herb": "[Ĥéŕƀ Þáţçĥ]"
+      },
+      "tierRequired": {
+        "mining": "[Ŕéɋúíŕéš á ţíéŕ {tier} ɱíñíñĝ þíçķ]",
+        "logging": "[Ŕéɋúíŕéš á ţíéŕ {tier} ļóĝĝíñĝ áẋé]",
+        "herbalism": "[Ŕéɋúíŕéš á ţíéŕ {tier} ĥéŕƀáļíšɱ šíçķļé]"
+      },
+      "toolTierUnmet": {
+        "mining": "[Ýóú ñééð á ţíéŕ {tier} ɱíñíñĝ þíçķ ţó ĥáŕʋéšţ ţĥíš ʋéíñ.]",
+        "logging": "[Ýóú ñééð á ţíéŕ {tier} ļóĝĝíñĝ áẋé ţó ƒéļļ ţĥíš šţáñð.]",
+        "herbalism": "[Ýóú ñééð á ţíéŕ {tier} ĥéŕƀáļíšɱ šíçķļé ţó ĝáţĥéŕ ţĥíš þáţçĥ.]"
+      },
+      "toolTierUnmetCorpse": "[Ýóú ñééð á ţíéŕ {tier} ĝáţĥéŕíñĝ ţóóļ ţó ŕéçóʋéŕ ţĥé ƒíñéšţ ɱáţéŕíáļš.]",
+      "stateReady": "[Ŕéáðý]",
+      "stateCooldown": "[Ŕéšþáŵñíñĝ]"
     },
     "archetypeTitle": {
       "label": "[Ţíţļé]",
@@ -2146,7 +2171,7 @@ export const en_XA: EnTranslations = {
       "tierPipAria": "[Ţíéŕ {tier}]",
       "nextUnlockTier": "[{points} þóíñţš ţó ţĥé ñéẋţ ţíéŕ: ɱášţéŕŵóŕķ óððš íɱþŕóʋé]",
       "nextUnlockSpecialized": "[{points} þóíñţš ţó Šþéçíáļížéð: ɱáţéŕíáļ çóšţš ðŕóþ]",
-      "nextUnlockMax": "[Áţ ɱáẋíɱúɱ šķíļļ]",
+      "nextUnlockMastered": "[Ɱášţéŕéð, ƒóŕ ñóŵ]",
       "perkSpecializedLine": "[{craft}: Šþéçíáļížéð, ɱáţéŕíáļ çóšţš -{pct}%]",
       "perkSpecializedAt": "[Šþéçíáļížéš áţ {threshold} šķíļļ]",
       "switchCost": "[Ñéẋţ áŕçĥéţýþé šŵíţçĥ çóšţš {cost} áɱéñðš]",
@@ -2226,6 +2251,7 @@ export const en_XA: EnTranslations = {
       "skillReqLine": "[Ŕéɋúíŕéš {craft} {skill}]",
       "difficultyFull": "[Ƒúļļ šķíļļ ĝáíñ]",
       "difficultyReduced": "[Ŕéðúçéð šķíļļ ĝáíñ]",
+      "difficultyMinimal": "[Ɱíñíɱáļ šķíļļ ĝáíñ]",
       "difficultyNone": "[Ñó šķíļļ ĝáíñ]",
       "stationBadge": "[Šţáţíóñ]",
       "stationOutOfRangeNamed": "[Ɱóʋé ţó ţĥé {station} ţó çŕáƒţ ţĥíš.]",
@@ -5852,7 +5878,8 @@ export const en_XA: EnTranslations = {
         "offline": "[Óƒƒļíñé]",
         "combat": "[Íñ Çóɱƀáţ]",
         "dungeon": "[Íñ Ðúñĝéóñ]",
-        "dead": "[Ðéáð]"
+        "dead": "[Ðéáð]",
+        "afk": "[Áŵáý]"
       },
       "statusWithZone": "[{status} - {zone}]",
       "ranks": {
@@ -5961,6 +5988,7 @@ export const en_XA: EnTranslations = {
     },
     "cast": {
       "fishing": "[Ƒíšĥíñĝ]",
+      "gathering": "[Ĝáţĥéŕíñĝ]",
       "demonHeal": "[Ðéɱóñ Ĥéáļ]",
       "thunzharrStormcall": "[Šţóŕɱçáļļ]"
     }
@@ -8812,6 +8840,12 @@ export const en_XA: EnTranslations = {
       "verlans_oathblade": {
         "name": "[Ʋéŕļáñ'š Óáţĥƀļáðé]"
       },
+      "ironreel_fishing_rod": {
+        "name": "[Íŕóñŕééļ Ƒíšĥíñĝ Ŕóð]"
+      },
+      "silverstream_fishing_rod": {
+        "name": "[Šíļʋéŕšţŕéáɱ Ƒíšĥíñĝ Ŕóð]"
+      },
       "briny_idol": {
         "name": "[Ɓŕíñý Íðóļ]"
       },
@@ -10972,6 +11006,11 @@ export const en_XA: EnTranslations = {
         "sender": "[Ţĥé Çŕáƒţíñĝ Ĝúíļð]",
         "subject": "[Ýóúŕ ŵóŕķ íñ Áŕɱóŕçŕáƒţíñĝ áñð Éñĝíñééŕíñĝ]",
         "body": "[Áŕţíšáñ,\n\nŴóŕð ŕéáçĥéš ţĥé Ĝúíļð óƒ ýóúŕ ŵóŕķ íñ Áŕɱóŕçŕáƒţíñĝ áñð Éñĝíñééŕíñĝ: þļáţéš ŕíʋéţéð áñð ĝéáŕš ţŕúéð, ţĥé ţŵó çŕáƒţš ƒééðíñĝ óñé áñóţĥéŕ. Ñéíĝĥƀóŕíñĝ çŕáƒţš ŵóŕķéð ţóĝéţĥéŕ ɱáŕķ á ĥáñð ŕéáðý ƒóŕ áţţúñéɱéñţ. Šééķ óúţ Šɱíţĥ Ĥáļðŕéñ, ţĥé áŕɱóŕéŕ óƒ Éášţƀŕóóķ: ĥé šþéáķš ƒóŕ ţĥé ɱášţéŕš ƒóŕ ñóŵ. Þŕóʋé ýóúŕ çŕáƒţ ţó ĥíɱ ŵíţĥ ŵóŕķ óƒ ýóúŕ óŵñ ĥáñðš, áñð ĥé ŵíļļ šéé ýóúŕ ţŵó ɱáĵóŕš áţţúñéð.\n\nÍñ ĝóóð šţáñðíñĝ,\nŢĥé Çŕáƒţíñĝ Ĝúíļð]"
+      },
+      "mastery_reset_notice": {
+        "sender": "[Ţĥé Ĝúíļðĥáļļ]",
+        "subject": "[Ýóúŕ çŕáƒţ, ɱáðé ĥóñéšţ]",
+        "body": "[Ĝúíļðɱáţé,\n\nŢĥé ĝúíļð ĥáš áðóþţéð á ñéŵ ŕéçķóñíñĝ óƒ ɱášţéŕý. Éʋéŕý ĥáñð šţáŕţš ţĥé çļíɱƀ áĝáíñ: ýóúŕ çŕáƒţ šķíļļš áñð ýóúŕ ĝáţĥéŕíñĝ þŕóƒíçíéñçíéš ĥáʋé ƀééñ šéţ ţó žéŕó.\n\nÉʋéŕýţĥíñĝ éļšé íš ýóúŕš, úñţóúçĥéð: ýóúŕ ŕéçíþéš, ýóúŕ ţóóļš áñð ɱáţéŕíáļš, ýóúŕ ƀáñķ áñð ĝóļð, ýóúŕ áţţúñéɱéñţš áñð ţíţļéš, ýóúŕ ðééðš áñð ŕéñóŵñ, ýóúŕ ɋúéšţš áñð ɱáíļ.\n\nŢĥé çļíɱƀ íš ĥóñéšţ ñóŵ. Çĥéáþ ŵóŕķ ŵíļļ ñóţ çáŕŕý ýóú. Šééķ ĥáŕðéŕ ŕéçíþéš, ŕíçĥéŕ ʋéíñš, áñð ðééþéŕ ŵáţéŕš.\n\nŴíţĥ ŕéšþéçţ,\nŢĥé Ĝúíļðĥáļļ]"
       }
     },
     "itemSets": {

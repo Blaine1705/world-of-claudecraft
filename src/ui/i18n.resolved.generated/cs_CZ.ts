@@ -1687,7 +1687,8 @@ export const cs_CZ: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -2085,7 +2086,11 @@ export const cs_CZ: EnTranslations = {
       "blockSearchPlaceholder": "Jméno hráče",
       "blockAction": "Zablokovat",
       "nowBlocking": "{name} zablokován.",
-      "stopBlockingTitle": "Odblokovat hráče {name}"
+      "stopBlockingTitle": "Odblokovat hráče {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Sběr",
@@ -2096,7 +2101,27 @@ export const cs_CZ: EnTranslations = {
       "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
       "gatherLine": "Shromažďujete: {name}.",
       "gatherLineQty": "Shromažďujete: {name} x{qty}.",
-      "catchLine": "You reel in: {name}"
+      "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
+      "nodeName": {
+        "ore": "Ore Vein",
+        "wood": "Timber Stand",
+        "herb": "Herb Patch"
+      },
+      "tierRequired": {
+        "mining": "Requires a tier {tier} mining pick",
+        "logging": "Requires a tier {tier} logging axe",
+        "herbalism": "Requires a tier {tier} herbalism sickle"
+      },
+      "toolTierUnmet": {
+        "mining": "You need a tier {tier} mining pick to harvest this vein.",
+        "logging": "You need a tier {tier} logging axe to fell this stand.",
+        "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
+      },
+      "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "stateReady": "Ready",
+      "stateCooldown": "Respawning"
     },
     "archetypeTitle": {
       "label": "Titul",
@@ -2146,7 +2171,7 @@ export const cs_CZ: EnTranslations = {
       "tierPipAria": "Úroveň {tier}",
       "nextUnlockTier": "{points} bodů do další úrovně: šance na mistrovské dílo se zvýší",
       "nextUnlockSpecialized": "{points} bodů do specializace: náklady na materiál klesnou",
-      "nextUnlockMax": "Při maximální zručnosti",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: specializováno, náklady na materiál -{pct} %",
       "perkSpecializedAt": "Specializace při dovednosti {threshold}",
       "switchCost": "Další změna archetypu stojí {cost} bodů nápravy",
@@ -2226,6 +2251,7 @@ export const cs_CZ: EnTranslations = {
       "skillReqLine": "Vyžaduje {craft} {skill}",
       "difficultyFull": "Plný zisk dovedností",
       "difficultyReduced": "Snížený zisk dovedností",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Žádný zisk dovedností",
       "stationBadge": "Stanice",
       "stationOutOfRangeNamed": "Chcete-li to vytvořit, přejděte do {station}.",
@@ -5852,7 +5878,8 @@ export const cs_CZ: EnTranslations = {
         "offline": "Offline",
         "combat": "V boji",
         "dungeon": "V dungeonu",
-        "dead": "Mrtvý"
+        "dead": "Mrtvý",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {
@@ -5961,6 +5988,7 @@ export const cs_CZ: EnTranslations = {
     },
     "cast": {
       "fishing": "Rybaření",
+      "gathering": "Gathering",
       "demonHeal": "Léčení démona",
       "thunzharrStormcall": "Volání bouře"
     }
@@ -8812,6 +8840,12 @@ export const cs_CZ: EnTranslations = {
       "verlans_oathblade": {
         "name": "Verlanova čepel přísahy"
       },
+      "ironreel_fishing_rod": {
+        "name": "Prut se železným navijákem"
+      },
+      "silverstream_fishing_rod": {
+        "name": "Prut stříbrného potoka"
+      },
       "briny_idol": {
         "name": "Slaný idol"
       },
@@ -10972,6 +11006,11 @@ export const cs_CZ: EnTranslations = {
         "sender": "Řemeslnický cech",
         "subject": "Tvá práce v zbrojnictví a strojírenství",
         "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v zbrojnictví a strojírenství: pláty se nýtovaly a ozubená kola se seřizovala, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

@@ -1687,7 +1687,8 @@ export const pl_PL: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Poziom {level}: {family}",
@@ -2085,7 +2086,11 @@ export const pl_PL: EnTranslations = {
       "blockSearchPlaceholder": "Nazwa gracza",
       "blockAction": "Zablokuj",
       "nowBlocking": "{name} zablokowany.",
-      "stopBlockingTitle": "Odblokuj gracza {name}"
+      "stopBlockingTitle": "Odblokuj gracza {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Zbieractwo",
@@ -2096,7 +2101,27 @@ export const pl_PL: EnTranslations = {
       "notReady": "Ten węzeł zasobu jeszcze nie odrósł dla ciebie.",
       "gatherLine": "Zbierasz: {name}.",
       "gatherLineQty": "Zbierasz: {name} x{qty}.",
-      "catchLine": "You reel in: {name}"
+      "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
+      "nodeName": {
+        "ore": "Ore Vein",
+        "wood": "Timber Stand",
+        "herb": "Herb Patch"
+      },
+      "tierRequired": {
+        "mining": "Requires a tier {tier} mining pick",
+        "logging": "Requires a tier {tier} logging axe",
+        "herbalism": "Requires a tier {tier} herbalism sickle"
+      },
+      "toolTierUnmet": {
+        "mining": "You need a tier {tier} mining pick to harvest this vein.",
+        "logging": "You need a tier {tier} logging axe to fell this stand.",
+        "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
+      },
+      "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "stateReady": "Ready",
+      "stateCooldown": "Respawning"
     },
     "archetypeTitle": {
       "label": "Tytuł",
@@ -2146,7 +2171,7 @@ export const pl_PL: EnTranslations = {
       "tierPipAria": "Poziom {tier}",
       "nextUnlockTier": "{points} wskazuje na następny poziom: zwiększają się szanse na arcydzieło",
       "nextUnlockSpecialized": "{points} wskazuje na Specjalistyczne: spadają koszty materiałów",
-      "nextUnlockMax": "Przy maksymalnych umiejętnościach",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Specjalistyczne, koszty materiałowe -{pct}%",
       "perkSpecializedAt": "Specjalizuje się w umiejętności {threshold}",
       "switchCost": "Następna zmiana archetypu kosztuje {cost} punktów zadośćuczynienia",
@@ -2226,6 +2251,7 @@ export const pl_PL: EnTranslations = {
       "skillReqLine": "Wymaga {craft} {skill}",
       "difficultyFull": "Pełny przyrost umiejętności",
       "difficultyReduced": "Zmniejszony przyrost umiejętności",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Żadnego przyrostu umiejętności",
       "stationBadge": "Stanowisko rzemieślnicze",
       "stationOutOfRangeNamed": "Przejdź do {station}, aby to wytworzyć.",
@@ -5852,7 +5878,8 @@ export const pl_PL: EnTranslations = {
         "offline": "Niedostępny",
         "combat": "W walce",
         "dungeon": "W lochu",
-        "dead": "Martwy"
+        "dead": "Martwy",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {
@@ -5961,6 +5988,7 @@ export const pl_PL: EnTranslations = {
     },
     "cast": {
       "fishing": "Wędkarstwo",
+      "gathering": "Gathering",
       "demonHeal": "Demoniczne leczenie",
       "thunzharrStormcall": "Zew burzy"
     }
@@ -8812,6 +8840,12 @@ export const pl_PL: EnTranslations = {
       "verlans_oathblade": {
         "name": "Ostrze przysięgi Verlana"
       },
+      "ironreel_fishing_rod": {
+        "name": "Wędka z żelaznym kołowrotkiem"
+      },
+      "silverstream_fishing_rod": {
+        "name": "Wędka srebrnego strumienia"
+      },
       "briny_idol": {
         "name": "Słony bożek"
       },
@@ -10972,6 +11006,11 @@ export const pl_PL: EnTranslations = {
         "sender": "Gildia Rzemieślnicza",
         "subject": "Twoja praca w zbrojeniówce i inżynierii",
         "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w zbrojeniówce i inżynierii: płyty są nitowane, koła zębate ustawione, a oba rzemiosła zasilają się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

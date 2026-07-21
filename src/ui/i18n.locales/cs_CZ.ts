@@ -4830,6 +4830,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Přízračná esence',
   'entities.items.glacier_melt.name': 'Ledovcová voda',
   'entities.items.glimmerfin_koi.name': 'Koi se třpytivou ploutví',
+  'entities.items.ironreel_fishing_rod.name': 'Prut se železným navijákem',
+  'entities.items.silverstream_fishing_rod.name': 'Prut stříbrného potoka',
   'entities.items.glowing_wax.name': 'Zářící vosk',
   'entities.items.gnarled_staff.name': 'Hůl bažinného dubu',
   'entities.items.goldleaf_sickle.name': 'Zlatolistý srp',
@@ -8354,7 +8356,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identita',
   'hudChrome.professions.majorsLabel': 'Hlavní: {a} a {b}',
-  'hudChrome.professions.nextUnlockMax': 'Při maximální zručnosti',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} bodů do specializace: náklady na materiál klesnou',
   'hudChrome.professions.nextUnlockTier':

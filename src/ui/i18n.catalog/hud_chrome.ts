@@ -1726,6 +1726,9 @@ export const hudChromeStrings = {
     // to the bracket only, not the mob name text.
     mobLevel: '{level}',
     mobEliteLevel: '{level}+',
+    // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
+    // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
+    afkTag: 'AFK',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
@@ -2183,6 +2186,13 @@ export const hudChromeStrings = {
     blockAction: 'Block',
     nowBlocking: 'Blocked {name}.',
     stopBlockingTitle: 'Stop blocking {name}',
+    // Guild roster grouping: members are split into an online group over an offline
+    // group, each header carrying its member count ({n}, formatted). The hide-offline
+    // toggle is a persisted USER choice that suppresses the offline group.
+    onlineHeader: 'Online ({n})',
+    offlineHeader: 'Offline ({n})',
+    hideOffline: 'Hide offline',
+    hideOfflineTitle: 'Hide offline guild members',
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).
@@ -2208,6 +2218,42 @@ export const hudChromeStrings = {
     // already prints "You receive:" for the same catch, so this line must
     // never regress into that wording (nor into gatherLine's).
     catchLine: 'You reel in: {name}',
+    // Bite minigame lines (Professions 2.0 Phase 12b), rendered from the
+    // text-free personal fishingBite / fishingGotAway SimEvents. biteLine
+    // keeps the bite moment visible in the log (never sound-only,
+    // accessibility); gotAwayLine is the no-cost miss.
+    biteLine: 'Something takes the bait!',
+    gotAwayLine: 'It got away.',
+    // Base tool tier gating (Professions 2.0 Phase 12). The sim's gatherDenied
+    // SimEvent and the node hover tooltip are both text-free at the source:
+    // every line here is composed client-side off structured fields, keyed per
+    // profession (single-key interpolation, never concatenated fragments).
+    nodeName: {
+      ore: 'Ore Vein',
+      wood: 'Timber Stand',
+      herb: 'Herb Patch',
+    },
+    // Tooltip requirement line, shown for tier 2+ nodes only (tier 1 is the
+    // bare-hands floor); doubles as the locked-state line (red while the
+    // viewer's owned-best tool falls short).
+    tierRequired: {
+      mining: 'Requires a tier {tier} mining pick',
+      logging: 'Requires a tier {tier} logging axe',
+      herbalism: 'Requires a tier {tier} herbalism sickle',
+    },
+    // gatherDenied error toast, surface 'node', worded per node family.
+    toolTierUnmet: {
+      mining: 'You need a tier {tier} mining pick to harvest this vein.',
+      logging: 'You need a tier {tier} logging axe to fell this stand.',
+      herbalism: 'You need a tier {tier} herbalism sickle to gather this patch.',
+    },
+    // gatherDenied error toast, surface 'corpse': profession-neutral (a corpse
+    // harvest is gated by the best owned tool across ALL gathering
+    // professions, so no single tool is named).
+    toolTierUnmetCorpse: 'You need a tier {tier} gathering tool to recover the finest materials.',
+    // Tooltip third line: the per-viewer respawn state.
+    stateReady: 'Ready',
+    stateCooldown: 'Respawning',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0 Phase 1):
   // `label` heads the character-sheet title line, `none` is shown before the
@@ -2275,7 +2321,7 @@ export const hudChromeStrings = {
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',
-    nextUnlockMax: 'At maximum skill',
+    nextUnlockMastered: 'Mastered, for now',
     perkSpecializedLine: '{craft}: Specialized, material costs -{pct}%',
     perkSpecializedAt: 'Specializes at {threshold} skill',
     switchCost: 'Next archetype switch costs {cost} amends',
@@ -2383,6 +2429,7 @@ export const hudChromeStrings = {
     skillReqLine: 'Requires {craft} {skill}',
     difficultyFull: 'Full skill gain',
     difficultyReduced: 'Reduced skill gain',
+    difficultyMinimal: 'Minimal skill gain',
     difficultyNone: 'No skill gain',
     stationBadge: 'Station',
     // Phase 8 (supersedes the retired stationOutOfRange key): the crafting

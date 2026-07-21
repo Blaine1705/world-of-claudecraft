@@ -1687,7 +1687,8 @@ export const ru_RU: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Уровень {level} {family}",
@@ -2085,7 +2086,11 @@ export const ru_RU: EnTranslations = {
       "blockSearchPlaceholder": "Имя персонажа",
       "blockAction": "Заблокировать",
       "nowBlocking": "{name} заблокирован.",
-      "stopBlockingTitle": "Разблокировать {name}"
+      "stopBlockingTitle": "Разблокировать {name}",
+      "onlineHeader": "В сети ({n})",
+      "offlineHeader": "Не в сети ({n})",
+      "hideOffline": "Скрыть офлайн",
+      "hideOfflineTitle": "Скрыть офлайн участников гильдии"
     },
     "gathering": {
       "title": "Собирательство",
@@ -2096,7 +2101,27 @@ export const ru_RU: EnTranslations = {
       "notReady": "Этот ресурсный узел еще не восстановился для вас.",
       "gatherLine": "Вы добываете: {name}.",
       "gatherLineQty": "Вы добываете: {name} x{qty}.",
-      "catchLine": "Вы выуживаете: {name}"
+      "catchLine": "Вы выуживаете: {name}",
+      "biteLine": "Что-то клюнуло!",
+      "gotAwayLine": "Добыча сорвалась.",
+      "nodeName": {
+        "ore": "Рудная жила",
+        "wood": "Древостой",
+        "herb": "Заросли трав"
+      },
+      "tierRequired": {
+        "mining": "Требуется шахтерская кирка {tier} уровня",
+        "logging": "Требуется лесорубный топор {tier} уровня",
+        "herbalism": "Требуется серп травника {tier} уровня"
+      },
+      "toolTierUnmet": {
+        "mining": "Чтобы разработать эту жилу, нужна шахтерская кирка {tier} уровня.",
+        "logging": "Чтобы срубить этот древостой, нужен лесорубный топор {tier} уровня.",
+        "herbalism": "Чтобы собрать эти заросли, нужен серп травника {tier} уровня."
+      },
+      "toolTierUnmetCorpse": "Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.",
+      "stateReady": "Готово",
+      "stateCooldown": "Восстанавливается"
     },
     "archetypeTitle": {
       "label": "Титул",
@@ -2146,7 +2171,7 @@ export const ru_RU: EnTranslations = {
       "tierPipAria": "Ранг {tier}",
       "nextUnlockTier": "До следующего ранга {points} навыка: шанс шедевра повысится",
       "nextUnlockSpecialized": "До специализации {points} навыка: расход материалов снизится",
-      "nextUnlockMax": "Навык на максимуме",
+      "nextUnlockMastered": "Освоено, пока что",
       "perkSpecializedLine": "{craft}: Специалист, расход материалов -{pct}%",
       "perkSpecializedAt": "Специализация при навыке {threshold}",
       "switchCost": "Следующая смена архетипа потребует искупления: {cost}",
@@ -2226,6 +2251,7 @@ export const ru_RU: EnTranslations = {
       "skillReqLine": "Требуется {craft} {skill}",
       "difficultyFull": "Полный рост навыка",
       "difficultyReduced": "Сниженный рост навыка",
+      "difficultyMinimal": "Минимальный рост навыка",
       "difficultyNone": "Без роста навыка",
       "stationBadge": "Станция",
       "stationOutOfRangeNamed": "Подойдите к станции \"{station}\", чтобы изготовить это.",
@@ -5852,7 +5878,8 @@ export const ru_RU: EnTranslations = {
         "offline": "Не в сети",
         "combat": "В бою",
         "dungeon": "В подземелье",
-        "dead": "Мертв"
+        "dead": "Мертв",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {
@@ -5961,6 +5988,7 @@ export const ru_RU: EnTranslations = {
     },
     "cast": {
       "fishing": "Рыбная ловля",
+      "gathering": "Сбор ресурсов",
       "demonHeal": "Исцеление демона",
       "thunzharrStormcall": "Зов бури"
     }
@@ -8812,6 +8840,12 @@ export const ru_RU: EnTranslations = {
       "verlans_oathblade": {
         "name": "Клинок клятвы Верлана"
       },
+      "ironreel_fishing_rod": {
+        "name": "Удочка с железной катушкой"
+      },
+      "silverstream_fishing_rod": {
+        "name": "Удочка серебряного ручья"
+      },
       "briny_idol": {
         "name": "Просоленный идол"
       },
@@ -10972,6 +11006,11 @@ export const ru_RU: EnTranslations = {
         "sender": "Гильдия ремесленников",
         "subject": "О вашей работе: бронное дело и инженерное дело",
         "body": "Ремесленник!\n\nДо гильдии дошли вести о вашей работе: бронное дело и инженерное дело, пластины склёпаны, шестерни выверены, и два ремесла питают друг друга. Соседние ремесла, освоенные вместе, выдают руку, готовую к настройке. Разыщите кузнеца Халдрена в Истбруке: пока он говорит от лица мастеров. Докажите ему своё умение работой собственных рук, и он настроит эти два ремесла как ваши основные.\n\nС уважением,\nГильдия ремесленников"
+      },
+      "mastery_reset_notice": {
+        "sender": "Дом гильдии",
+        "subject": "Мастерство по-честному",
+        "body": "Собрат по гильдии!\n\nГильдия приняла новую меру мастерства. Каждый начинает подъём заново: ваши навыки ремесла и сноровка добытчика обнулены.\n\nВсё остальное осталось при вас, нетронутым: рецепты, инструменты и материалы, банк и золото, настройки и титулы, деяния и известность, задания и почта.\n\nТеперь подъём честен. Дешёвая работа наверх не вывезет. Ищите рецепты посложнее, жилы побогаче и воды поглубже.\n\nС уважением,\nДом гильдии"
       }
     },
     "itemSets": {
