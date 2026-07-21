@@ -1322,7 +1322,8 @@ describe('dungeons: heroic boss drops', () => {
     ]);
     // Blues at 0.1%, greens at 0.5% - check each individually.
     for (const e of mountEntries) {
-      const isBlue = e.itemId === 'reins_aether_hover_cycle' || e.itemId === 'reins_shadowjump_toad';
+      const isBlue =
+        e.itemId === 'reins_aether_hover_cycle' || e.itemId === 'reins_shadowjump_toad';
       expect(e.chance, `${e.itemId} chance`).toBe(isBlue ? 0.001 : 0.005);
     }
 
