@@ -141,6 +141,7 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
+import { ABILITY_VFX_SPECS } from './render/ability_vfx_specs';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import { preloadMechAssets } from './render/characters/assets';
@@ -3319,6 +3320,15 @@ async function startGame(
           lockpickAction: (action: string) =>
             hud.submitLockpickAction(action as import('./sim/lockpick').PickAction),
           flushLockpickEvents: () => hud.flushLockpickEvents(),
+          // Dev-only ability VFX probe surface (scripts/ability_vfx_probe.mjs):
+          // per-ability claim/primitive counters plus the data the probe needs
+          // to synthesize render-side events. Absent from production bundles.
+          ...(import.meta.env.DEV
+            ? {
+                abilityVfxStats: () => renderer.abilityVfxStats(),
+                abilityVfxProbe: { specs: ABILITY_VFX_SPECS, abilities: ABILITIES },
+              }
+            : {}),
         };
       }, LOADING_FADE_MS);
     }),

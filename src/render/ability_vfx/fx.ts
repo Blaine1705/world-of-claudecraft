@@ -120,6 +120,12 @@ export class AbilityVfxFx {
     this.ribbons.spawnBolt(sourceId, targetId, colorHex);
   }
 
+  // A wavering channel beam (drains, mind rays): the bolt slot at near-zero
+  // jag, a touch wider and longer-lived than the lightning crack.
+  beamRibbon(sourceId: number, targetId: number, colorHex: number): void {
+    this.ribbons.spawnBolt(sourceId, targetId, colorHex, 0.32, 0.11, 0.18);
+  }
+
   // Comet trail chasing the pooled Vfx projectile; lands a small vertical
   // shock halo at the impact point when asked (the bolt archetype's read).
   cometTrail(
@@ -140,9 +146,9 @@ export class AbilityVfxFx {
     );
   }
 
-  slashArc(targetId: number, colorHex: number): void {
+  slashArc(targetId: number, colorHex: number, span = 1.15, life = 0.22): void {
     const at = this.anchor(targetId, 0.55);
-    if (at) this.ribbons.spawnSlash(at, colorHex);
+    if (at) this.ribbons.spawnSlash(at, colorHex, span, life);
   }
 
   // Vertical camera-facing halo at an entity (impacts, crits, shout chests).
@@ -186,19 +192,26 @@ export class AbilityVfxFx {
 
   // ---- per-frame state (refreshed every frame by painter.syncEntity) ------
 
-  windup(entityId: number, colorHex: number, progress: number): void {
+  // Returns true when this call STARTED the windup (first frame of the cast),
+  // so the painter can count and accent the moment.
+  windup(entityId: number, colorHex: number, progress: number): boolean {
     let w = this.windups.get(entityId);
+    let started = false;
     if (!w) {
-      if (this.windups.size >= MAX_WINDUPS) return;
+      if (this.windups.size >= MAX_WINDUPS) return false;
       w = { colorHex, progress, stamp: this.frame };
       this.windups.set(entityId, w);
+      started = true;
     }
     w.colorHex = colorHex;
     w.progress = progress;
     w.stamp = this.frame;
+    return started;
   }
 
-  orbit(entityId: number, style: OrbitStyle, colorHex: number): void {
+  // Returns true when this call CREATED the band (the aura-gain moment), so
+  // the painter can pop a swirl without any event carrying the ability id.
+  orbit(entityId: number, style: OrbitStyle, colorHex: number): boolean {
     let bands = this.orbits.get(entityId);
     if (!bands) {
       bands = [];
@@ -208,10 +221,11 @@ export class AbilityVfxFx {
       if (band.style === style) {
         band.colorHex = colorHex;
         band.stamp = this.frame;
-        return;
+        return false;
       }
     }
-    if (bands.length >= MAX_ORBITS_PER_ENTITY || this.orbitBandCount >= MAX_ORBIT_BANDS) return;
+    if (bands.length >= MAX_ORBITS_PER_ENTITY || this.orbitBandCount >= MAX_ORBIT_BANDS)
+      return false;
     bands.push({
       style,
       colorHex,
@@ -220,6 +234,7 @@ export class AbilityVfxFx {
       stamp: this.frame,
     });
     this.orbitBandCount++;
+    return true;
   }
 
   // ---- frame advance ------------------------------------------------------

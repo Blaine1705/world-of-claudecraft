@@ -12,4 +12,5 @@ export {
   type AbilityVfxEntityState,
   type AbilityVfxPrimitives,
   type AbilityVfxSpellfxEvent,
+  type AbilityVfxStat,
 } from './painter';

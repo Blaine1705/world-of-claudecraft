@@ -4283,6 +4283,12 @@ export class Renderer {
     else this.lightOwnerGroups.delete(v.group);
   }
 
+  // Dev probe surface (scripts/ability_vfx_probe.mjs via window.__game):
+  // per-ability claim/primitive counters from the ability VFX painter.
+  abilityVfxStats(): Record<string, { claimed: number; primitives: number }> {
+    return this.abilityVfx.statsSnapshot();
+  }
+
   triggerAttack(entityId: number, abilityId?: string): void {
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;

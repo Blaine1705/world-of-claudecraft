@@ -430,11 +430,13 @@ export class Vfx {
     });
   }
 
-  beam(sourceId: number, targetId: number, school: string): void {
+  beam(sourceId: number, targetId: number, school: string, colorOverride?: number): void {
     const from = this.anchor(sourceId, 0.62);
     const to = this.anchor(targetId, 0.55);
     if (!from || !to) return;
-    const color = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.9));
+    const color = new THREE.Color(
+      colorOverride ?? SCHOOL_COLORS[school] ?? 0xffffff,
+    ).multiplyScalar(hdr(1.9));
     const dir = to.clone().sub(from);
     const len = dir.length();
     if (len <= 0.001) return;

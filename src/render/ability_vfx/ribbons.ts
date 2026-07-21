@@ -33,6 +33,7 @@ interface BoltSlot {
   sourceId: number;
   targetId: number;
   width: number;
+  jagScale: number;
   core: THREE.Color;
   glow: THREE.Color;
   pts: THREE.Vector3[];
@@ -150,6 +151,7 @@ export class AbilityVfxRibbons {
         sourceId: 0,
         targetId: 0,
         width: 0.1,
+        jagScale: 1,
         core: new THREE.Color(),
         glow: new THREE.Color(),
         pts: allocPts(BOLT_PTS),
@@ -186,8 +188,16 @@ export class AbilityVfxRibbons {
 
   // A jagged electric crack from caster to target, regenerated every ~45ms so
   // it flickers (the gallery genBolt read, main line only: branches cost too
-  // much churn for a crowd scene). Tracks both moving anchors.
-  spawnBolt(sourceId: number, targetId: number, colorHex: number, life = 0.22, width = 0.09): void {
+  // much churn for a crowd scene). Tracks both moving anchors. jagScale near 0
+  // turns the crack into a wavering channel beam (drains, mind rays).
+  spawnBolt(
+    sourceId: number,
+    targetId: number,
+    colorHex: number,
+    life = 0.22,
+    width = 0.09,
+    jagScale = 1,
+  ): void {
     const slot = this.bolts.find((b) => !b.active) ?? this.bolts[0];
     slot.active = true;
     slot.age = 0;
@@ -196,6 +206,7 @@ export class AbilityVfxRibbons {
     slot.sourceId = sourceId;
     slot.targetId = targetId;
     slot.width = width;
+    slot.jagScale = jagScale;
     slot.core.setHex(colorHex).lerp(WHITE, 0.55);
     slot.glow.setHex(colorHex);
     slot.count = 0;
@@ -351,7 +362,7 @@ export class AbilityVfxRibbons {
       .normalize();
     this.t3.crossVectors(this.t1, this.t2);
     let stride = BOLT_PTS - 1;
-    let amp = totalLen * 0.14;
+    let amp = totalLen * 0.14 * b.jagScale;
     while (stride > 1) {
       const half = stride / 2;
       for (let s = 0; s + stride < BOLT_PTS; s += stride) {
