@@ -81,6 +81,10 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === 'convergence_mark' && a.kind === 'internal_cd') {
     return { key: `${KEY}.elementalConvergencePrimed`, nums: {} };
   }
+  if (a.kind === 'hunter_ferocity') {
+    const stacks = Math.min(3, Math.max(0, Math.trunc(a.stacks ?? a.value)));
+    return { key: `${KEY}.hunterFerocity`, nums: { stacks, pct: stacks * 10 } };
+  }
   switch (a.kind) {
     case 'dot':
       return {

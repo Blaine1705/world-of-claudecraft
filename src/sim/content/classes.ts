@@ -3281,9 +3281,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
       auraKind: 'hunter_ferocity',
       minStacks: 3,
     },
-    effects: [{ type: 'packCommand', min: 48, max: 64, focus: 20, ferocityDuration: 30 }],
+    effects: [{ type: 'packCommand', min: 36, max: 48, focus: 20, ferocityDuration: 30 }],
     description:
-      "Command your living pet to strike for 48 to 64 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3.",
+      "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit.",
   },
   unleash_beast: {
     id: 'unleash_beast',
@@ -3300,16 +3300,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'unleashBeast',
-        primaryMin: 110,
-        primaryMax: 140,
-        clapMin: 32,
-        clapMax: 42,
+        primaryMin: 83,
+        primaryMax: 105,
+        clapMin: 26,
+        clapMax: 34,
         radius: 6,
         frenzyDuration: 8,
       },
     ],
     description:
-      "Consume 3 Pack Ferocity. Your pet strikes for 110 to 140 Physical damage and claps every enemy within 6 yards for 32 to 42. Damage increases with the pet's Attack Power. For 8 sec, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies.",
+      "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies.",
   },
   measured_shot: {
     id: 'measured_shot',

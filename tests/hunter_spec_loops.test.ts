@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { hunterPetFerocityDamageMultiplier } from '../src/sim/combat/hunter_shared';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 
@@ -79,6 +80,62 @@ describe('Hunter v0.29 baseline specialization loops', () => {
       expect(sim.player.auras.find((aura) => aura.id === 'pack_ferocity')?.stacks).toBe(stage);
     }
     expect(sim.resolvedAbility('pack_command')?.def.id).toBe('unleash_beast');
+  });
+
+  it('adds 10% pet damage per Ferocity stage and resolves Pack Command before its new stage', () => {
+    function commandDamage(stacks: number): number {
+      const sim = hunter('beast_mastery', 2914);
+      const target = addMob(sim, 3);
+      target.armor = 0;
+      const pet = addPet(sim);
+      sim.targetEntity(target.id);
+      if (stacks > 0) {
+        sim.player.auras.push({
+          id: 'pack_ferocity',
+          name: 'Pack Ferocity',
+          kind: 'hunter_ferocity',
+          remaining: 30,
+          duration: 30,
+          value: stacks,
+          stacks,
+          sourceId: sim.playerId,
+          school: 'physical',
+        });
+      }
+      expect(hunterPetFerocityDamageMultiplier(sim.ctx, pet)).toBeCloseTo(1 + stacks * 0.1);
+      sim.castAbility('pack_command');
+      const event = advance(sim, 0.1).find(
+        (candidate) => candidate.type === 'damage' && candidate.ability === 'Pack Command',
+      );
+      if (!event || event.type !== 'damage') throw new Error('missing Pack Command damage');
+      return event.amount;
+    }
+
+    const calmDamage = commandDamage(0);
+    const twoStageDamage = commandDamage(2);
+    expect(twoStageDamage / calmDamage).toBeGreaterThan(1.15);
+    expect(twoStageDamage / calmDamage).toBeLessThan(1.25);
+  });
+
+  it('grants no Focus or Ferocity when Pack Command cannot land', () => {
+    for (const failure of ['missing-pet', 'dead-pet', 'missing-target', 'miss'] as const) {
+      const sim = hunter('beast_mastery', 2915);
+      const target = addMob(sim, 3);
+      const pet = failure === 'missing-pet' ? null : addPet(sim);
+      if (pet && failure === 'dead-pet') pet.dead = true;
+      if (failure !== 'missing-target') sim.targetEntity(target.id);
+      if (failure === 'miss') vi.spyOn(sim.ctx.rng, 'chance').mockReturnValueOnce(true);
+      sim.player.resource = 0;
+
+      sim.castAbility('pack_command');
+      advance(sim, 0.1);
+
+      expect(sim.player.resource, failure).toBe(0);
+      expect(
+        sim.player.auras.some((aura) => aura.id === 'pack_ferocity'),
+        failure,
+      ).toBe(false);
+    }
   });
 
   it('Measured Shot grants Focus only when the shot completes, while Cold Focus accelerates it', () => {

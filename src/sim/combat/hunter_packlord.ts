@@ -2,7 +2,11 @@ import { pctValue } from '../entity';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d, swingMissChance } from '../types';
-import { activateHunterMajorWindow, grantHunterFocus } from './hunter_shared';
+import {
+  activateHunterMajorWindow,
+  grantHunterFocus,
+  hunterPetFerocityDamageMultiplier,
+} from './hunter_shared';
 
 export const PACK_FEROCITY_AURA_ID = 'pack_ferocity';
 export const PACK_FRENZY_AURA_ID = 'pack_frenzy';
@@ -26,6 +30,7 @@ function petDamageMultiplier(ctx: SimContext, pet: Entity): number {
     const owner = ctx.entities.get(pet.ownerId);
     if (owner?.auras.some((aura) => aura.kind === 'hunter_frenzy')) multiplier *= 1.25;
   }
+  multiplier *= hunterPetFerocityDamageMultiplier(ctx, pet);
   return multiplier;
 }
 

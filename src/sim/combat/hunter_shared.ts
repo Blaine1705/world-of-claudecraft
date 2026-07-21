@@ -24,6 +24,7 @@ const LONG_STATE_DURATION = 86_400;
 
 const FOCUS_SPENDERS = new Set(['arcane_shot', 'aimed_shot', 'mongoose_bite']);
 const FOCUS_GENERATORS = new Set(['pack_command', 'measured_shot', 'raptor_strike']);
+export const PACK_FEROCITY_DAMAGE_PER_STACK = 0.1;
 
 function removeAura(ctx: SimContext, entity: Entity, id: string): void {
   const index = entity.auras.findIndex((aura) => aura.id === id);
@@ -56,6 +57,14 @@ function applyStateAura(
 
 export function hasHunterTalent(meta: PlayerMeta, talentId: string): boolean {
   return meta.cls === 'hunter' && hunterTalentSelected(meta.talents, talentId);
+}
+
+export function hunterPetFerocityDamageMultiplier(ctx: SimContext, pet: Entity): number {
+  if (pet.ownerId === null) return 1;
+  const owner = ctx.entities.get(pet.ownerId);
+  const aura = owner?.auras.find((candidate) => candidate.kind === 'hunter_ferocity');
+  const stacks = Math.min(3, Math.max(0, Math.trunc(aura?.stacks ?? aura?.value ?? 0)));
+  return 1 + stacks * PACK_FEROCITY_DAMAGE_PER_STACK;
 }
 
 function hunterTalentSelected(talents: TalentAllocation, talentId: string): boolean {
@@ -249,6 +258,7 @@ function petDamageMultiplier(ctx: SimContext, pet: Entity): number {
     const ownerMeta = ctx.players.get(pet.ownerId);
     if (ownerMeta) multiplier *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
   }
+  multiplier *= hunterPetFerocityDamageMultiplier(ctx, pet);
   return multiplier;
 }
 
@@ -649,5 +659,9 @@ export function clearHunterTalentState(ctx: SimContext, hunter: Entity): void {
     entity.auras = entity.auras.filter(
       (aura) => aura.id !== markId && !pursuitIds.includes(aura.id),
     );
+  }
+  for (let index = ctx.groundAoEs.length - 1; index >= 0; index--) {
+    const effect = ctx.groundAoEs[index];
+    if (effect.sourceId === hunter.id && effect.hunterTrap) ctx.groundAoEs.splice(index, 1);
   }
 }

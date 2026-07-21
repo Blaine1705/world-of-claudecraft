@@ -67,7 +67,11 @@ import {
 } from './fire_mage';
 import { clearFieldcraftState } from './hunter_fieldcraft';
 import { clearPacklordState } from './hunter_packlord';
-import { breakEnduringCourserBurst, hasHunterTalent } from './hunter_shared';
+import {
+  breakEnduringCourserBurst,
+  clearHunterTalentState,
+  hasHunterTalent,
+} from './hunter_shared';
 import { doctrineConvertDamage } from './priest/doctrine';
 import { cleanupPriestState } from './priest/lifecycle';
 import {
@@ -1092,6 +1096,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     cleanupPriestState(ctx, e.id);
     const meta = ctx.players.get(e.id);
     if (meta?.cls === 'hunter') {
+      clearHunterTalentState(ctx, e);
       clearPacklordState(ctx, e);
       clearFieldcraftState(ctx, e);
     }

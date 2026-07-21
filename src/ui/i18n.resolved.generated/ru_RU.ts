@@ -1574,6 +1574,7 @@ export const ru_RU: EnTranslations = {
       "dmgDoneReduce": "Снижает наносимый урон на {pct}%",
       "heatingUp": "Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»",
       "elementalConvergencePrimed": "Следующее заклинание другой стихийной школы активирует Стихийное слияние",
+      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
       "battleStance": "Боевая стойка: на 10% больше создания ярости",
       "berserkerStance": "Стойка берсерка: крит. удары на 3% чаще и на 3% сильнее",
       "crit": "Повышает шанс критического удара на {pct}%",

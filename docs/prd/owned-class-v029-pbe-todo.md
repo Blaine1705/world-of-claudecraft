@@ -8,7 +8,8 @@ Release baseline: `682df1b7b` from `release/v0.29.0`, merged into this isolated 
 worktree by `5129a2b1f`.
 
 Latest completed slices: DPS balance harness, Fieldcraft and Vespers tuning, safe level 20 default
-bars, and the first English tooltip clarity pass. Final fixed-head validation is still required.
+bars, persistence coverage for those bars, and the first English tooltip clarity pass. Final
+fixed-head validation is still required.
 
 Scope: Hunter, Shaman, and Priest, including all nine specializations, their shared talent rows,
 their player-facing states, and the new rotation and starter action-bar work requested after the
@@ -22,7 +23,7 @@ Detailed One Button priorities and exact level 20 templates are in
 
 ## Definition of done
 
-- [ ] Every spec owns only its intended spells and clears old spec state on change, death, relog,
+- [x] Every spec owns only its intended spells and clears old spec state on change, death, relog,
       reconnect, and loadout swap.
 - [x] Every owned-spec damage, healing, mitigation, threat, and resource result is measured in the
       shared 1-target and 3-target harness.
@@ -32,7 +33,7 @@ Detailed One Button priorities and exact level 20 templates are in
 - [ ] Every new English spell, talent, aura, proc, and mechanic tooltip is plain, exact, and backed
       by live scaling tests.
 - [ ] Mobile, desktop, reduced-motion, low-graphics, offline, online, and headless behavior agree.
-- [ ] PBE feedback is retested on the same fixed gear and target setup.
+- [x] PBE feedback is retested on the same fixed gear and target setup.
 - [ ] The integration branch passes the required targeted checks and full gate before merge.
 
 ## 1. Lock the baseline and test harness
@@ -67,11 +68,11 @@ Detailed One Button priorities and exact level 20 templates are in
       Gloamveil, Overdraw tracking, or similar states.
 - [x] Clear Flow State when the Shaman changes spec. The existing cleanup was correct and now has
       a direct regression test.
-- [ ] Audit every spec-only aura, bank, link, guardian, posture, proc counter, and action
+- [x] Audit every spec-only aura, bank, link, guardian, posture, proc counter, and action
       replacement for cleanup on spec change.
-- [ ] Repeat the cleanup audit for death, release, disconnect, reconnect, relog, loadout change,
+- [x] Repeat the cleanup audit for death, release, disconnect, reconnect, relog, loadout change,
       and character load.
-- [ ] Confirm removed wrong-spec actions are cleared from saved action bars and cannot be cast by a
+- [x] Confirm removed wrong-spec actions are cleared from saved action bars and cannot be cast by a
       forged client command.
 - [ ] Confirm transformed actions keep the saved slot and return to the base action after the state
       ends.
@@ -153,7 +154,7 @@ Do not overwrite a player-customized bar.
       rotation.
 - [x] Include no unlearned, talent-dependent, or wrong-spec action in a base template.
 - [x] Resolve each template against the character's actually known actions before applying it.
-- [ ] Make template application deterministic across offline, online, load, respec, and imported
+- [x] Make template application deterministic across offline, online, load, respec, and imported
       loadouts.
 - [ ] Add a player setting or one-time reset command only if PBE shows that automatic repair is not
       enough.
@@ -186,34 +187,37 @@ Do not overwrite a player-customized bar.
 ### Action-bar tests
 
 - [x] Add a table-driven expected template for all nine specs.
-- [ ] Add relog, reconnect, and imported-loadout action-bar coverage.
+- [x] Add relog, reconnect, and imported-loadout action-bar coverage.
 - [x] Test first sync, spec change, repeat selection, level-up to 20, and saved customized or empty
-      bars. Relog, reconnect, and imported-loadout coverage remains open.
+      bars.
 - [x] Test that no saved customized slot is overwritten.
 - [x] Test that an untouched generated template is swapped on spec change.
 - [x] Test that templates contain only actions the selected level 20 spec actually knows.
-- [ ] Test desktop bars, controller access, and mobile action-ring reachability.
+- [x] Test desktop bars, controller access, and mobile action-ring reachability. The first 11
+      actions stay on the default-visible desktop row, the first eight manual actions have default
+      controller bindings, and every populated action is reachable through the mobile pager.
+- [ ] Decide through PBE whether desktop players should see the secondary utility row by default.
+      Today it remains an option, so actions after slot 11 are saved but hidden until enabled.
 
 ## 5. Hunter PBE work
 
 ### Packlord, Beast Mastery
 
-- [ ] Treat Pack Command as the non-retail name for the Kill Command generator role.
-- [ ] On a successful living-pet hit, Pack Command generates Focus and one Pack Ferocity stack.
-- [ ] Keep Pack Command from granting anything on a miss, invalid target, missing pet, or dead pet.
-- [ ] Make Pack Ferocity a visible Hunter-owned buff with three stages.
-- [ ] Give each stage a visible pet size and red-tint increase without changing collision, reach,
+- [x] Treat Pack Command as the non-retail name for the Kill Command generator role.
+- [x] On a successful living-pet hit, Pack Command generates Focus and one Pack Ferocity stack.
+- [x] Keep Pack Command from granting anything on a miss, invalid target, missing pet, or dead pet.
+- [x] Make Pack Ferocity a visible Hunter-owned buff with three stages.
+- [x] Give each stage a visible pet size and red-tint increase without changing collision, reach,
       or pathing.
-- [ ] Tune a clear per-stack increase to all pet-originated damage. The current design target is
-      10% per stack, subject to PBE measurement.
-- [ ] Apply the bonus to pet basic attacks, Pack Command, pet cleaves, pet claps, Unleash Beast,
-      and Stampede beasts.
-- [ ] Do not apply Ferocity to the Hunter's direct weapon damage.
-- [ ] Resolve Pack Command with the pre-cast Ferocity state, then add its new stack.
-- [ ] At three stacks, replace Pack Command with Unleash Beast in the same saved action slot.
-- [ ] Make Unleash Beast consume all three stacks, use the full Ferocity bonus for its clap and
-      frenzy, then return the pet to its calm size and color.
-- [ ] Make Fell Shot a deliberate Focus spender instead of the only repeated filler.
+- [x] Increase all current pet-originated damage by 10% per Pack Ferocity stack.
+- [x] Apply the bonus to pet basic attacks, Pack Command, pet cleaves, pet claps, and Unleash Beast.
+      Stampede must use the same helper if that separate feature is approved.
+- [x] Do not apply Ferocity to the Hunter's direct weapon damage.
+- [x] Resolve Pack Command with the pre-cast Ferocity state, then add its new stack.
+- [x] At three stacks, replace Pack Command with Unleash Beast in the same saved action slot.
+- [x] Make Unleash Beast use the full Ferocity bonus for its strike and clap, consume all three
+      stacks, enter its separate 25% frenzy, then return the pet to its calm size and color.
+- [x] Make Fell Shot a deliberate Focus spender instead of the only repeated filler.
 - [ ] Add Stampede as a Packlord offensive cooldown that summons temporary beasts to attack the
       selected target without pet micromanagement.
 - [ ] Credit Stampede damage to the Hunter in meters and show it in floating combat text.
@@ -224,17 +228,19 @@ Do not overwrite a player-customized bar.
 - [ ] Do not allow the reset proc while Stampede beasts are active.
 - [ ] Add deterministic bad-luck protection after the approved number of failed Pack Commands. The
       current design range is five to six failures.
+- [x] Retest the manual Packlord loop after Ferocity damage lands and keep it inside the approved
+      single-target and three-target Hunter bands.
 - [ ] Retest the manual and One Button loops after Stampede lands.
 
 ### Coldsight, Marksmanship
 
 - [x] Keep Overdraw to one tracker in the aura list.
 - [x] Replace its one-day display with an untimed counter state.
-- [ ] Confirm Measured Shot remains the deliberate Focus generator.
-- [ ] Confirm Long Draw is the main Focus spender and respects movement and cast interruption.
-- [ ] Confirm Fevered Draw can move while channeling and does not double-count tooltip damage.
-- [ ] Retest Cold Focus duration, Focus generation, Long Draw cost, and cast-time changes.
-- [ ] Compare single-target and 3-target output after the shared Overdraw fix.
+- [x] Confirm Measured Shot remains the deliberate Focus generator.
+- [x] Confirm Long Draw is the main Focus spender and respects movement and cast interruption.
+- [x] Confirm Fevered Draw can move while channeling and does not double-count tooltip damage.
+- [x] Retest Cold Focus duration, Focus generation, Long Draw cost, and cast-time changes.
+- [x] Compare single-target and 3-target output after the shared Overdraw fix.
 
 ### Fieldcraft, Survival
 
@@ -344,7 +350,7 @@ Do not overwrite a player-customized bar.
 
 - [x] Replace all visible English `Smite` labels with `Scouring Hymn`.
 - [x] Confirm Gloamveil uses the existing untimed form display.
-- [ ] Audit cleanup for Doctrine links, Seraphic Vigils, Effigies, Gloomtithe, Tithefiends, and
+- [x] Audit cleanup for Doctrine links, Seraphic Vigils, Effigies, Gloomtithe, Tithefiends, and
       capstone state.
 
 ## 8. Final English tooltip audit

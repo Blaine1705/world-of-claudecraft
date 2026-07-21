@@ -4790,6 +4790,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.heatingUp'
   | 'hudChrome.auraEffect.hex'
   | 'hudChrome.auraEffect.hot'
+  | 'hudChrome.auraEffect.hunterFerocity'
   | 'hudChrome.auraEffect.iceFloesCasts'
   | 'hudChrome.auraEffect.imbue'
   | 'hudChrome.auraEffect.imbueRange'

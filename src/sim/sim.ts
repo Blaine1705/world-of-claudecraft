@@ -85,8 +85,13 @@ import {
 } from './combat/heal';
 import { advanceHeroicLeap } from './combat/heroic_leap';
 import { resolveColdsightAbility } from './combat/hunter_coldsight';
-import { finishBloodhook } from './combat/hunter_fieldcraft';
-import { resolveHunterSharedAbility } from './combat/hunter_shared';
+import { clearFieldcraftState, finishBloodhook } from './combat/hunter_fieldcraft';
+import { clearPacklordState } from './combat/hunter_packlord';
+import {
+  clearHunterTalentState,
+  hunterPetFerocityDamageMultiplier,
+  resolveHunterSharedAbility,
+} from './combat/hunter_shared';
 import { tickNaturesFury } from './combat/natures_fury';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
@@ -2764,6 +2769,12 @@ export class Sim {
     if (!meta) return;
     meta.leaving = true;
     cleanupPriestState(this.ctx, pid);
+    const leaving = this.entities.get(pid);
+    if (leaving && meta.cls === 'hunter') {
+      clearHunterTalentState(this.ctx, leaving);
+      clearPacklordState(this.ctx, leaving);
+      clearFieldcraftState(this.ctx, leaving);
+    }
     // Dungeon Finder teardown FIRST, while the leaver's party/roster still resolves
     // (drops their queue unit, fails their proposal, closes their listing, withdraws
     // their application). It runs HERE, not in removePlayer, because the server calls
@@ -4660,6 +4671,7 @@ export class Sim {
     }
     const ownerMeta = this.players.get(e.ownerId);
     if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
+    mult *= hunterPetFerocityDamageMultiplier(this.ctx, e);
     return mult;
   }
 

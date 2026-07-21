@@ -637,7 +637,8 @@ export const guideStrings = {
     blessing_of_might: "Raises a friendly target's attack power, good to cast before a pull.",
     divine_protection: 'A quick protective ward to soak damage when things get rough.',
     raptor_strike: 'A hard melee swing for when something closes the gap on you.',
-    pack_command: 'Orders your companion to strike, building Pack Ferocity for Unleash Beast.',
+    pack_command:
+      'Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.',
     measured_shot: 'A deliberate ranged shot that restores Focus for your heavier attacks.',
     aspect_of_the_hawk: 'A stance you keep up to sharpen your ranged attack power.',
     serpent_sting: 'Lands a venom that bleeds nature damage over time.',

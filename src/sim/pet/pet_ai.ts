@@ -32,6 +32,7 @@
 
 import { lineOfSightClear } from '../colliders';
 import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
+import { hunterPetFerocityDamageMultiplier } from '../combat/hunter_shared';
 import { MOBS } from '../data';
 import { pctValue } from '../entity';
 import { isTrivialTo } from '../mob/targeting';
@@ -286,6 +287,7 @@ function petDamageMult(ctx: SimContext, pet: Entity): number {
   }
   const ownerMeta = ctx.players.get(pet.ownerId);
   if (ownerMeta) mult *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
+  mult *= hunterPetFerocityDamageMultiplier(ctx, pet);
   return mult;
 }
 

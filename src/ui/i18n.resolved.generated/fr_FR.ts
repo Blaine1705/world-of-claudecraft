@@ -1574,6 +1574,7 @@ export const fr_FR: EnTranslations = {
       "dmgDoneReduce": "Réduit les dégâts infligés de {pct} %",
       "heatingUp": "Votre prochain coup critique consécutif d'un générateur de Feu accorde Bonne série ; un générateur sans critique supprime Chauffe en cours",
       "elementalConvergencePrimed": "Votre prochain sort de l'autre école élémentaire accorde la Convergence élémentaire",
+      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
       "battleStance": "Posture de combat : 10% de génération de rage en plus",
       "berserkerStance": "Posture berserker : coups critiques 3% plus fréquents et 3% plus puissants",
       "crit": "Augmente les chances de coup critique de {pct}%",
@@ -3041,7 +3042,7 @@ export const fr_FR: EnTranslations = {
       "blessing_of_might": "Augmente la puissance d'attaque d'une cible alliée, à lancer de préférence avant d'engager.",
       "divine_protection": "Une garde protectrice rapide pour encaisser les dégâts quand la situation se tend.",
       "raptor_strike": "Un coup de mêlée puissant pour quand quelque chose comble la distance.",
-      "pack_command": "Orders your companion to strike, building Pack Ferocity for Unleash Beast.",
+      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
       "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
       "aspect_of_the_hawk": "Une posture à garder active pour aiguiser votre puissance d'attaque à distance.",
       "serpent_sting": "Inflige un venin qui inflige des dégâts de nature dans la durée.",
@@ -6342,11 +6343,11 @@ export const fr_FR: EnTranslations = {
       },
       "pack_command": {
         "name": "Pack Command",
-        "description": "Command your living pet to strike for 48 to 64 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3."
+        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
       },
       "unleash_beast": {
         "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity. Your pet strikes for 110 to 140 Physical damage and claps every enemy within 6 yards for 32 to 42. Damage increases with the pet's Attack Power. For 8 sec, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
       },
       "measured_shot": {
         "name": "Measured Shot",
