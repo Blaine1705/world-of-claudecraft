@@ -1738,6 +1738,15 @@ export class Renderer {
       triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
       lightPulse: (id, school, intensity, duration) =>
         this.pulseAt(id, school, intensity, duration),
+      setAuraGlow: (id, colorHex, intensity) => {
+        const v = this.views.get(id);
+        if (v) this.activeVisual(v)?.setAuraGlow(colorHex, intensity);
+      },
+      playShoutAnim: (id) => {
+        const v = this.views.get(id);
+        const vis = v ? this.activeVisual(v) : null;
+        if (vis && !vis.isMidOneShot) vis.playEmote('cheer', 1);
+      },
     });
     this.pulseAt = (id, school, intensity, duration) => {
       const v = this.views.get(id);
@@ -4286,15 +4295,27 @@ export class Renderer {
   }
 
   // Dev probe surface (scripts/ability_vfx_probe.mjs via window.__game):
-  // per-ability claim/primitive counters from the ability VFX painter.
+  // per-ability claim/primitive counters from the ability VFX painter, the
+  // live body-glow intensity of an entity, and the one-shot swing counter.
   abilityVfxStats(): Record<string, { claimed: number; primitives: number }> {
     return this.abilityVfx.statsSnapshot();
   }
+
+  abilityVfxGlow(entityId: number): number {
+    return this.abilityVfx.glowIntensityOf(entityId);
+  }
+
+  abilityVfxAttackCount(): number {
+    return this.attackTriggerCount;
+  }
+
+  private attackTriggerCount = 0;
 
   triggerAttack(entityId: number, abilityId?: string): void {
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;
     if (!visual) return;
+    this.attackTriggerCount++;
     if (isSpinAttackAbility(abilityId)) visual.playWhirl();
     else visual.playAttack(abilityId);
   }

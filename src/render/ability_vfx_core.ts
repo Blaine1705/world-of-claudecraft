@@ -202,15 +202,21 @@ export const TIER2_BURST_COUNT_MAX = 6;
 const colorCache = new Map<string, number>();
 const HEX_COLOR_RE = /^#([0-9a-fA-F]{6})$/;
 
-// Parse the spec's '#rrggbb' color to an int (white on a malformed value so a
-// bad row degrades visibly instead of throwing at frame rate).
-export function abilityVfxColor(spec: AbilityVfxSpec): number {
-  const cached = colorCache.get(spec.c);
+// Parse any '#rrggbb' spec color string to an int, cached (white on a
+// malformed value so a bad row degrades visibly instead of throwing at frame
+// rate). Shared by the compact c color and the full spec's rim/tint/accent.
+export function abilityHexColor(value: string): number {
+  const cached = colorCache.get(value);
   if (cached !== undefined) return cached;
-  const match = HEX_COLOR_RE.exec(spec.c);
-  const value = match ? Number.parseInt(match[1], 16) : 0xffffff;
-  colorCache.set(spec.c, value);
-  return value;
+  const match = HEX_COLOR_RE.exec(value);
+  const parsed = match ? Number.parseInt(match[1], 16) : 0xffffff;
+  colorCache.set(value, parsed);
+  return parsed;
+}
+
+// The compact spec's main color.
+export function abilityVfxColor(spec: AbilityVfxSpec): number {
+  return abilityHexColor(spec.c);
 }
 
 function clamp(value: number, min: number, max: number): number {

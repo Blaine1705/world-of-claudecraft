@@ -8,7 +8,10 @@
 
 import {
   AbilityVfxBudget,
+  type AbilityVfxFullSpec,
   type AbilityVfxPlan,
+  type AbilityVfxSpec,
+  abilityHexColor,
   abilityVfxColor,
   planCast,
   planImpact,
@@ -63,6 +66,10 @@ export interface AbilityVfxDeps {
   // The renderer's pooled talent-moment point light (pulseAt); optional so
   // tests can omit it.
   lightPulse?: (entityId: number, school: string, intensity: number, duration: number) => void;
+  // Writes the rig body glow (CharacterVisual.setAuraGlow); optional for tests.
+  setAuraGlow?: (entityId: number, colorHex: number, intensity: number) => void;
+  // Plays the caster's roar/cheer one-shot for shout casts; optional for tests.
+  playShoutAnim?: (entityId: number) => void;
 }
 
 // Structural slices of the SimEvent members this painter consumes.
@@ -132,6 +139,13 @@ const SCHOOL_BY_PALETTE: Record<string, string> = {
   physical: 'physical',
 };
 
+// The gallery rim rule: spec.rim outlines the body when authored, else the
+// ability's main color carries the glow.
+function rimColorOf(full: AbilityVfxFullSpec | undefined, spec: AbilityVfxSpec): number {
+  if (full?.rim) return abilityHexColor(full.rim);
+  return abilityVfxColor(spec);
+}
+
 // Particle sprite family per burst kind, mapped onto Vfx.burst's school hint.
 const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
   sparks: 'arcane',
@@ -185,6 +199,7 @@ export class AbilityVfx {
         this.spawned = n;
         this.recordStat(abilityId, false);
       },
+      (entityId, colorHex, intensity) => deps.setAuraGlow?.(entityId, colorHex, intensity),
     );
   }
 
@@ -298,6 +313,7 @@ export class AbilityVfx {
         this.deps.vfx.shoutwave(ev.sourceId, plan.color);
         this.spawned++;
         this.spawnRing(ev.sourceId, plan, ev.school);
+        this.deps.playShoutAnim?.(ev.sourceId);
         if (tier < 2 && full)
           fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         break;
@@ -351,9 +367,11 @@ export class AbilityVfx {
     this.spawned++;
     const full = ABILITY_VFX_FULL_SPECS[abilityId];
     const arch = full?.archetype ?? spec.a ?? 'strike';
-    if (full && (arch === 'strike' || arch === 'dash')) {
+    if (full && (arch === 'strike' || arch === 'dash' || arch === 'buff')) {
       // A physical special's ONLY event is its hit: the contact moment runs
       // the full archetype sequence (authored slash arc, impact stack, motifs).
+      // Buff-archetype self-hits (Blood Toll's health price) run the buff
+      // sequence too: shell pop plus the red body-glow pulse.
       this.deps.fx.sequenceInstant(abilityId, full, ev.sourceId, ev.targetId, plan.color, tier);
     } else if (ev.crit || spec.fin === 1) {
       this.deps.fx.impactRing(ev.targetId, plan.color, ev.crit);
@@ -390,12 +408,20 @@ export class AbilityVfx {
   // Allocation-free per call.
   syncEntity(e: AbilityVfxEntityState): void {
     const fx = this.deps.fx;
+    // Body glow (the gallery rim read): the strongest live source wins between
+    // an in-flight cast and any spec'd buff auras (rim or buff block).
+    let glowColor = 0;
+    let glowStrength = 0;
+    let glowSlow = false;
     if (e.castingAbility) {
       const spec = ABILITY_VFX_SPECS[e.castingAbility];
       if (spec) {
         const progress =
           e.castTotal > 0 ? Math.min(1, Math.max(0, 1 - e.castRemaining / e.castTotal)) : 0;
-        const style = ABILITY_VFX_FULL_SPECS[e.castingAbility]?.windupStyle ?? 'orb';
+        const full = ABILITY_VFX_FULL_SPECS[e.castingAbility];
+        const style = full?.windupStyle ?? 'orb';
+        glowColor = rimColorOf(full, spec);
+        glowStrength = 1.2 * (full?.power ?? 1);
         if (fx.windup(e.id, abilityVfxColor(spec), progress, style)) {
           this.spawned = 1;
           this.recordStat(e.castingAbility, false);
@@ -407,8 +433,18 @@ export class AbilityVfx {
       const auraId = e.auras[i].id;
       const spec = ABILITY_VFX_SPECS[auraId];
       if (spec === undefined) continue;
+      const full = ABILITY_VFX_FULL_SPECS[auraId];
       // barrier specs wear the translucent fresnel shell while the aura lives
-      if (ABILITY_VFX_FULL_SPECS[auraId]?.barrier) fx.holdShell(e.id, abilityVfxColor(spec));
+      if (full?.barrier) fx.holdShell(e.id, abilityVfxColor(spec));
+      // held buffs light the body: casterGlowV = (shellDur ? 2 : 1.3) * power
+      if (full && (full.buff !== undefined || full.rim !== undefined || full.barrier)) {
+        const strength = (full.buff?.shellDur ? 2 : 1.3) * (full.power ?? 1);
+        if (strength > glowStrength) {
+          glowStrength = strength;
+          glowColor = rimColorOf(full, spec);
+          glowSlow = !!full.buff?.shellDur;
+        }
+      }
       const style = spec.bo !== undefined ? ORBIT_BY_BO[spec.bo] : undefined;
       if (style === undefined) continue;
       if (fx.orbit(e.id, style, abilityVfxColor(spec))) {
@@ -421,6 +457,12 @@ export class AbilityVfx {
       }
       bands++;
     }
+    if (glowStrength > 0) fx.bodyGlow(e.id, glowColor, glowStrength, glowSlow);
+  }
+
+  // Dev probe surface: the entity's current body-glow intensity.
+  glowIntensityOf(entityId: number): number {
+    return this.deps.fx.glowIntensityOf(entityId);
   }
 
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).

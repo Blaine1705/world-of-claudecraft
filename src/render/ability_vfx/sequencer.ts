@@ -1,4 +1,8 @@
-import type { AbilityVfxFullSpec, AbilityVfxMotif } from '../ability_vfx_core';
+import {
+  type AbilityVfxFullSpec,
+  type AbilityVfxMotif,
+  abilityHexColor,
+} from '../ability_vfx_core';
 
 // The archetype sequencer, ported from the gallery interpreters
 // (arc_bolt_preview.js): each claimed cast becomes one pooled sequence slot
@@ -11,7 +15,7 @@ import type { AbilityVfxFullSpec, AbilityVfxMotif } from '../ability_vfx_core';
 // slot-pooled and capped; budget tier 1 sheds motifs and lingers, tier 2 never
 // reaches the sequencer.
 
-const SEQ_SLOTS = 16;
+const SEQ_SLOTS = 24;
 
 // The host surface fx.ts implements: every primitive the sequences drive.
 export interface SequencerHost {
@@ -48,6 +52,7 @@ export interface SequencerHost {
     kind: 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood',
   ): void;
   pulseLight(entityId: number, palette: string, intensity: number, duration: number): void;
+  glowPulse(entityId: number, colorHex: number, strength: number, slowDecay: boolean): void;
   boltBetween(
     sourceId: number,
     targetId: number,
@@ -210,7 +215,14 @@ export class ArchetypeSequencer {
     awaitTravel: boolean,
   ): SeqSlot | null {
     if (tier >= 2) return null;
-    const slot = this.slots.find((s) => !s.active) ?? null;
+    // steal the oldest running sequence when the pool is saturated: a fresh
+    // cast always reads louder than a stale linger tail
+    let slot = this.slots.find((s) => !s.active) ?? null;
+    if (!slot) {
+      for (const cand of this.slots) {
+        if (!slot || cand.t > slot.t) slot = cand;
+      }
+    }
     if (!slot) return null;
     slot.active = true;
     slot.abilityId = abilityId;
@@ -449,6 +461,19 @@ export class ArchetypeSequencer {
     }
     if (o.blood) {
       host.burstAt(slot.ix, slot.iy, slot.iz, 0xa01222, Math.round(12 * cs), 0.9, 'blood');
+      n++;
+    }
+    // buff-block casts light the caster's body (the gallery casterGlowV on
+    // buff impact); instant no-aura buffs like Blood Toll get their red read
+    // from exactly this pulse
+    if (spec.buff !== undefined || arch === 'buff') {
+      const rim = spec.rim ? abilityHexColor(spec.rim) : slot.color;
+      host.glowPulse(
+        slot.casterId,
+        rim,
+        (spec.buff?.shellDur ? 2 : 1.3) * cs,
+        !!spec.buff?.shellDur,
+      );
       n++;
     }
     // impact light pulse
@@ -939,7 +964,12 @@ export class ArchetypeSequencer {
       spec.archetype === 'buff' ||
       spec.archetype === 'heal' ||
       spec.archetype === 'summon';
-    return host.anchorOf(selfCentered ? slot.casterId : slot.targetId, 0.4);
+    // a target that died mid-flight loses its anchor: land the stack at the
+    // caster instead of fizzling the whole sequence
+    return (
+      host.anchorOf(selfCentered ? slot.casterId : slot.targetId, 0.4) ??
+      host.anchorOf(slot.casterId, 0.4)
+    );
   }
 
   private ringScale(slot: SeqSlot): number {

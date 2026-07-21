@@ -3327,6 +3327,8 @@ async function startGame(
           ...(import.meta.env.DEV
             ? {
                 abilityVfxStats: () => renderer.abilityVfxStats(),
+                abilityVfxGlow: (id: number) => renderer.abilityVfxGlow(id),
+                abilityVfxAttackCount: () => renderer.abilityVfxAttackCount(),
                 abilityVfxProbe: {
                   specs: ABILITY_VFX_SPECS,
                   fullSpecs: ABILITY_VFX_FULL_SPECS,

@@ -119,7 +119,15 @@ export class AbilityVfxFx implements SequencerHost {
     | ((entityId: number, palette: string, intensity: number, duration: number) => void)
     | null = null;
   private statSink: ((abilityId: string, n: number) => void) | null = null;
+  private applyGlow: ((entityId: number, colorHex: number, intensity: number) => void) | null =
+    null;
   private sequencer = new ArchetypeSequencer();
+  // Body-glow envelopes (the gallery casterGlowV): attack fast while fed each
+  // frame, decay 0.9/s for held-shell buffs else 2.2/s once the source drops.
+  private glows = new Map<
+    number,
+    { color: number; target: number; level: number; slow: boolean; stamp: number }
+  >();
 
   constructor(
     scene: THREE.Scene,
@@ -143,10 +151,56 @@ export class AbilityVfxFx implements SequencerHost {
     burst: ParticleBurst,
     lightPulse: (entityId: number, palette: string, intensity: number, duration: number) => void,
     statSink: (abilityId: string, n: number) => void,
+    applyGlow?: (entityId: number, colorHex: number, intensity: number) => void,
   ): void {
     this.particleBurst = burst;
     this.lightPulseCb = lightPulse;
     this.statSink = statSink;
+    this.applyGlow = applyGlow ?? null;
+  }
+
+  // Feed the body glow for one entity this frame (spec'd cast or live buff
+  // aura). The envelope owns attack/decay; the delegate writes the rig
+  // emissive. Returns the current glow intensity for the dev probe.
+  bodyGlow(entityId: number, colorHex: number, strength: number, slowDecay: boolean): void {
+    let g = this.glows.get(entityId);
+    if (!g) {
+      if (this.glows.size >= 16) return;
+      g = { color: colorHex, target: strength, level: 0, slow: slowDecay, stamp: this.frame };
+      this.glows.set(entityId, g);
+    }
+    // one held call per entity per frame (the painter pre-selects the
+    // strongest aura); a fresh frame RESETS the target so a dropped strong
+    // buff stops holding the level up forever
+    g.target = g.stamp === this.frame ? Math.max(g.target, strength) : strength;
+    // a stronger transient pulse keeps its color until the envelope decays
+    // back to the held level
+    if (strength >= g.level) {
+      g.color = colorHex;
+      g.slow = slowDecay;
+    }
+    g.stamp = this.frame;
+  }
+
+  // One-shot glow pop (instant buffs with no aura to hold, e.g. Blood Toll):
+  // the level jumps to strength now and decays on the envelope.
+  bodyGlowPulse(entityId: number, colorHex: number, strength: number, slowDecay: boolean): void {
+    let g = this.glows.get(entityId);
+    if (!g) {
+      if (this.glows.size >= 16) return;
+      g = { color: colorHex, target: 0, level: 0, slow: slowDecay, stamp: -1 };
+      this.glows.set(entityId, g);
+    }
+    if (strength >= g.level) {
+      g.level = strength;
+      g.color = colorHex;
+      g.slow = slowDecay;
+    }
+  }
+
+  glowIntensityOf(entityId: number): number {
+    const g = this.glows.get(entityId);
+    return g ? Math.min(0.85, g.level * 0.38) : 0;
   }
 
   // ---- archetype sequences (the gallery phase anatomy; see sequencer.ts) --
@@ -271,6 +325,10 @@ export class AbilityVfxFx implements SequencerHost {
 
   pulseLight(entityId: number, palette: string, intensity: number, duration: number): void {
     this.lightPulseCb?.(entityId, palette, intensity, duration);
+  }
+
+  glowPulse(entityId: number, colorHex: number, strength: number, slowDecay: boolean): void {
+    this.bodyGlowPulse(entityId, colorHex, strength, slowDecay);
   }
 
   boltBetween(
@@ -514,6 +572,24 @@ export class AbilityVfxFx implements SequencerHost {
     // flash, gavel descent, stun stars) land inside this frame's overlay batch
     this.sequencer.update(this, dt);
     this.overlay.commit();
+    for (const [id, g] of this.glows) {
+      if (g.stamp === this.frame) {
+        // held: rise toward the target, or decay DOWN to it after a pulse
+        g.level =
+          g.level < g.target
+            ? Math.min(g.target, g.level + dt * 10)
+            : Math.max(g.target, g.level - dt * (g.slow ? 0.9 : 2.2));
+      } else {
+        g.level -= dt * (g.slow ? 0.9 : 2.2);
+        g.target = 0;
+      }
+      if (g.level <= 0.03 && g.stamp !== this.frame) {
+        this.applyGlow?.(id, g.color, 0);
+        this.glows.delete(id);
+        continue;
+      }
+      this.applyGlow?.(id, g.color, Math.min(0.85, g.level * 0.38));
+    }
     this.frame++;
   }
 
@@ -524,6 +600,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.pillars.clear();
     this.shells.clear();
     this.sequencer.clear();
+    for (const [id, g] of this.glows) this.applyGlow?.(id, g.color, 0);
+    this.glows.clear();
     this.windups.clear();
     this.orbits.clear();
     this.orbitBandCount = 0;

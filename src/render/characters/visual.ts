@@ -200,6 +200,13 @@ export class CharacterVisual {
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
   private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
+  // Ability VFX body glow (the gallery rim read): per-visual material clones
+  // carrying an emissive tint while a spec'd cast or buff aura is live. Cloned
+  // once per original because base materials are SHARED per-asset caches;
+  // writing emissive on those would leak the glow across every same-skin rig.
+  private auraGlowMaterials = new Map<THREE.Material, THREE.Material>();
+  private auraGlowColor = 0xffffff;
+  private auraGlowIntensity = 0;
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
@@ -610,6 +617,43 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  /** Ability VFX body glow (buff/cast rim): tint the rig's emissive toward the
+   *  spec color at the given intensity (0 restores the shared originals). The
+   *  material swap runs only on the off/on edge; while on, per-frame calls just
+   *  rewrite emissive on this visual's private clones. Death and shapeshift
+   *  treatments keep priority over the glow. */
+  setAuraGlow(colorHex: number, intensity: number): void {
+    const on = intensity > 0.01;
+    const wasOn = this.auraGlowIntensity > 0.01;
+    this.auraGlowColor = colorHex;
+    this.auraGlowIntensity = intensity;
+    if (on !== wasOn) this.applyVisualMaterials();
+    if (!on) return;
+    for (const glow of this.auraGlowMaterials.values()) this.writeAuraGlow(glow);
+  }
+
+  private writeAuraGlow(material: THREE.Material): void {
+    const m = material as THREE.Material & { emissive?: THREE.Color; emissiveIntensity?: number };
+    if (!m.emissive) return;
+    m.emissive.setHex(this.auraGlowColor);
+    // the gallery cap: the rim accents the body, never repaints it
+    m.emissiveIntensity = Math.min(0.85, this.auraGlowIntensity);
+  }
+
+  private auraGlowMaterial(material: THREE.Material): THREE.Material {
+    if ((material as THREE.Material & { emissive?: THREE.Color }).emissive === undefined)
+      return material; // no emissive channel (low-tier basic materials): no glow
+    const cached = this.auraGlowMaterials.get(material);
+    if (cached) {
+      this.writeAuraGlow(cached);
+      return cached;
+    }
+    const glow = material.clone();
+    this.writeAuraGlow(glow);
+    this.auraGlowMaterials.set(material, glow);
+    return glow;
+  }
+
   setSoulRend(on: boolean): void {
     if (on === this.soulRend) return;
     this.soulRend = on;
@@ -942,6 +986,7 @@ export class CharacterVisual {
     disposeOwnedWeaponSkinMaterials(this.model, this.originalMaterials, [
       this.ghostMaterials,
       this.soulRendMaterials,
+      this.auraGlowMaterials,
     ]);
   }
 
@@ -949,10 +994,12 @@ export class CharacterVisual {
     const materials = new Set<THREE.Material>([
       ...this.ghostMaterials.values(),
       ...this.soulRendMaterials.values(),
+      ...this.auraGlowMaterials.values(),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
     this.soulRendMaterials.clear();
+    this.auraGlowMaterials.clear();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -1070,6 +1117,8 @@ export class CharacterVisual {
     if (this.metamorph) return this.metamorphMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
+    // lowest priority: the ability VFX buff/cast body glow
+    if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
     return material;
   }
 

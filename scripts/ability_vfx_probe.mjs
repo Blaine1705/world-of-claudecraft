@@ -102,11 +102,24 @@ for (let i = 0; i < specIds.length; i++) {
             : 'tick');
       const school = ab?.school ?? 'nature';
       const selfCentered = fx === 'nova' || !ab || !ab.requiresTarget;
-      const targetId = selfCentered ? playerId : mobId;
-      // The probe parks the player next to a live mob for framing; top the
-      // character up each cast so aggro cannot kill it mid-run (dev harness
-      // convention: smoke scripts already write player state directly).
+      // The boot-time mob can DIE mid-sweep (wildlife fights): re-pick the
+      // nearest LIVING mob per cast so target-anchored impacts never fizzle.
       const p = g.sim.player;
+      let liveMob = null;
+      let best = 1e9;
+      for (const e of g.sim.entities.values()) {
+        if (e.kind === 'mob' && !e.dead && e.ownerId === null) {
+          const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
+          if (d < best) {
+            best = d;
+            liveMob = e;
+          }
+        }
+      }
+      const targetId = selfCentered ? playerId : liveMob ? liveMob.id : mobId;
+      // Top the character up each cast so aggro cannot kill it mid-run (dev
+      // harness convention: smoke scripts already write player state directly).
+      p.maxHp = Math.max(p.maxHp, 4000);
       if (!p.dead) p.hp = p.maxHp;
       const before = g.abilityVfxStats()[abilityId] ?? { claimed: 0, primitives: 0 };
       g.renderer.handleEvent({
@@ -153,6 +166,207 @@ for (let i = 0; i < specIds.length; i++) {
     primitives: after.primitives - cast.before.primitives,
   };
 }
+
+// ---------------------------------------------------------------------------
+// REAL-CAST section: actual sim.castAbility per class, end to end. One bolt,
+// one buff (rim body glow), one strike where class-appropriate. Asserts the
+// live glow level (abilityVfxGlow), projectile/sequence primitives, and the
+// swing one-shot counter (abilityVfxAttackCount).
+const REAL_CASTS = {
+  // spec: committed spec id, required for spec-gated kit (Blood Toll is
+  // arms/prot-only). crusader_strike is talent-GRANTED, not base kit, so the
+  // paladin asserts judgement instead.
+  // warrior: talent GRANTS (meta.talentMods.grants) make Blood Toll and
+  // Bladestorm castable while the base kit stays intact: committing a spec
+  // would DROP heroic_strike, which every committed spec excludes.
+  warrior: {
+    grants: ['bloodrage', 'bladestorm'],
+    buff: 'bloodrage',
+    strike: 'heroic_strike',
+    extraSpin: 'bladestorm',
+  },
+  mage: { bolt: 'frostbolt', bolt2: 'fireball', buff: 'arcane_intellect' },
+  priest: { bolt: 'smite', buff: 'power_word_fortitude' },
+  warlock: { bolt: 'shadow_bolt', buff: 'demon_skin' },
+  druid: { bolt: 'wrath', buff: 'mark_of_the_wild' },
+  shaman: { bolt: 'lightning_bolt', buff: 'lightning_shield' },
+  hunter: { bolt: 'arcane_shot', buff: 'aspect_of_the_hawk', strike: 'raptor_strike' },
+  paladin: { buff: 'seal_of_righteousness', bolt2: 'judgement' },
+  rogue: { buff: 'evasion', strike: 'sinister_strike' },
+};
+
+async function realCastClass(cls, plan) {
+  await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
+  const ok = await enterOfflineGame(page, { charClass: cls, settleMs: 2600 });
+  if (!ok) return { cls, error: 'boot failed' };
+  const ids = await page.evaluate(
+    (specId, grants) => {
+      const g = window.__game;
+      const sim = g.sim;
+      const p = sim.player;
+      // dev probe conventions: level up so the kit is known (meta.known is a
+      // SNAPSHOT: refresh it the way levelUp does), commit a spec for
+      // spec-gated kit, park by a mob, and widen the pools so rank-scaled
+      // costs at 40 stay affordable
+      p.level = 40;
+      const meta = sim.players?.get?.(p.id);
+      if (meta) {
+        if (specId && meta.talentMods) meta.talentMods.spec = specId;
+        if (grants.length > 0 && meta.talentMods) {
+          meta.talentMods.grants = [
+            ...(meta.talentMods.grants ?? []),
+            ...grants.map((ability) => ({ ability })),
+          ];
+        }
+        sim.refreshKnownAbilities?.(meta, false);
+      }
+      p.maxHp = Math.max(p.maxHp, 4000);
+      p.maxResource = Math.max(p.maxResource, 4000);
+      p.hp = p.maxHp;
+      p.resource = p.maxResource;
+      let mob = null;
+      let best = 1e9;
+      for (const e of sim.entities.values()) {
+        if (e.kind === 'mob' && !e.dead && e.ownerId === null && e.hostile !== false) {
+          const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
+          if (d < best) {
+            best = d;
+            mob = e;
+          }
+        }
+      }
+      if (mob) {
+        p.pos.x = mob.pos.x + 3;
+        p.pos.z = mob.pos.z;
+        sim.targetEntity(mob.id);
+      }
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      return { playerId: p.id, mobId: mob ? mob.id : p.id };
+    },
+    plan.spec ?? null,
+    plan.grants ?? [],
+  );
+  const out = { cls };
+  let retried = false;
+  const castOne = async (kind, abilityId, settleMs, standOff = 3) => {
+    if (!abilityId) return;
+    const before = await page.evaluate(
+      (id, playerId, dist) => {
+        const g = window.__game;
+        const sim = g.sim;
+        const p = sim.player;
+        p.hp = p.maxHp;
+        p.resource = p.maxResource;
+        // retarget the nearest LIVING mob at the requested stand-off: a rank-40
+        // bolt one-shots level-3 mobs, and hunter shots have a min-range dead
+        // zone, so each cast needs a fresh victim at the right distance
+        let mob = null;
+        let best = 1e9;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && !e.dead && e.ownerId === null && e.hostile !== false) {
+            const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
+            if (d < best) {
+              best = d;
+              mob = e;
+            }
+          }
+        }
+        if (mob) {
+          p.pos.x = mob.pos.x + dist;
+          p.pos.z = mob.pos.z;
+          sim.targetEntity(mob.id);
+        }
+        const st = g.abilityVfxStats()[id] ?? { claimed: 0, primitives: 0 };
+        const attacks = g.abilityVfxAttackCount();
+        g.sim.castAbility(id);
+        return { st, attacks, glow0: g.abilityVfxGlow(playerId) };
+      },
+      abilityId,
+      ids.playerId,
+      standOff,
+    );
+    await new Promise((r) => setTimeout(r, settleMs));
+    const after = await page.evaluate(
+      (id, playerId) => {
+        const g = window.__game;
+        const st = g.abilityVfxStats()[id] ?? { claimed: 0, primitives: 0 };
+        return { st, attacks: g.abilityVfxAttackCount(), glow: g.abilityVfxGlow(playerId) };
+      },
+      abilityId,
+      ids.playerId,
+    );
+    const primitives = after.st.primitives - before.st.primitives;
+    const attacksDelta = after.attacks - before.attacks;
+    const entry = { ability: abilityId, primitives, attacksDelta, glow: after.glow };
+    if (kind === 'bolt' || kind === 'bolt2') entry.ok = primitives >= 3;
+    else if (kind === 'buff') entry.ok = primitives >= 2 && after.glow > 0.05;
+    else if (kind === 'strike') entry.ok = primitives >= 2 && attacksDelta >= 1;
+    else if (kind === 'extraSpin') entry.ok = attacksDelta >= 1;
+    // the offline world is a live ecosystem (wildlife fights, cooldown/GCD
+    // races): one retry absorbs a transient cast refusal; a real regression
+    // still fails twice
+    if (entry.ok === false && !retried) {
+      retried = true;
+      return castOne(kind, abilityId, settleMs, standOff);
+    }
+    out[kind] = entry;
+  };
+  // bolts stand off (hunter dead zone is ~8 yd); waits absorb the cast bar
+  // plus travel plus the previous cast's GCD
+  await castOne('bolt', plan.bolt, 3600, cls === 'hunter' ? 15 : 9);
+  retried = false;
+  await castOne('bolt2', plan.bolt2, 3600, 9);
+  retried = false;
+  await castOne('buff', plan.buff, 1900);
+  retried = false;
+  await castOne('strike', plan.strike, 1200);
+  retried = false;
+  await castOne('extraSpin', plan.extraSpin, 1900);
+  await page.screenshot({ path: `${OUT_DIR}/real_${cls}.png` });
+  return out;
+}
+
+const realCasts = [];
+for (const [cls, plan] of Object.entries(REAL_CASTS)) {
+  let out = await realCastClass(cls, plan);
+  if (out.error) out = await realCastClass(cls, plan); // one retry on a flaky boot
+  realCasts.push(out);
+}
+const realCastFails = [];
+for (const rc of realCasts) {
+  for (const [kind, entry] of Object.entries(rc)) {
+    if (kind === 'cls') continue;
+    if (entry && typeof entry === 'object' && entry.ok === false)
+      realCastFails.push(
+        `${rc.cls}.${kind}(${entry.ability}) prim=${entry.primitives} atk=${entry.attacksDelta} glow=${entry.glow.toFixed(2)}`,
+      );
+  }
+  if (rc.error) realCastFails.push(`${rc.cls}: ${rc.error}`);
+}
+
+// Back into a fresh warrior session for the aura-band and auto-attack checks.
+await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
+await enterOfflineGame(page, { charClass: 'warrior', settleMs: 2600 });
+await page.evaluate(() => {
+  const g = window.__game;
+  const sim = g.sim;
+  const p = sim.player;
+  let mob = null;
+  let best = 1e9;
+  for (const e of sim.entities.values()) {
+    if (e.kind === 'mob' && !e.dead && e.ownerId === null) {
+      const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
+      if (d < best) {
+        best = d;
+        mob = e;
+      }
+    }
+  }
+  if (mob) {
+    p.pos.x = mob.pos.x + 3;
+    p.pos.z = mob.pos.z;
+  }
+});
 
 // A REAL self-buff cast through the sim proves the aura-driven orbit band and
 // swirl pop (no synthesized event involved): battle_shout applies its aura,
@@ -210,6 +424,8 @@ const report = {
   failed: failed.map(([id, r]) => ({ id, ...r })),
   autoAttack: { ...auto, pageerrorsDuring: pageerrors.length },
   buffBand: { ability: 'battle_shout', primitives: buffBandDelta, ok: buffBandDelta >= 2 },
+  realCasts,
+  realCastFails,
   screenshots: shot + 1,
   pageerrors,
   abilities: results,
@@ -218,12 +434,18 @@ fs.writeFileSync(`${OUT_DIR}/report.json`, JSON.stringify(report, null, 2));
 console.log(
   `coverage: ${specIds.length - failed.length}/${specIds.length} at the archetype bar, ` +
     `${claimed.length} claimed, ${withPrimitives.length} with primitives, ` +
-    `${failed.length} below bar, buffBand=${buffBandDelta}, ${pageerrors.length} pageerrors`,
+    `${failed.length} below bar, buffBand=${buffBandDelta}, ` +
+    `realCastFails=${realCastFails.length}, ${pageerrors.length} pageerrors`,
 );
+if (realCastFails.length > 0) console.log('real-cast failures:', realCastFails.join(' | '));
 if (failed.length > 0)
   console.log(
     'below bar:',
     failed.map(([id, r]) => `${id}(${r.archetype} ${r.primitives}/${r.minBar})`).join(', '),
   );
 await browser.close();
-process.exit(failed.length > 0 || buffBandDelta < 2 || pageerrors.length > 0 ? 2 : 0);
+process.exit(
+  failed.length > 0 || buffBandDelta < 2 || realCastFails.length > 0 || pageerrors.length > 0
+    ? 2
+    : 0,
+);
