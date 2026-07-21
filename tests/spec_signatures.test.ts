@@ -14,6 +14,10 @@ function producesEffect(cls: PlayerClass, specId: string, sig: string): string {
   sim.setPlayerLevel(20);
   const ok = sim.setSpec(specId);
   if (!ok) return 'setSpec failed';
+  if (ABILITIES[sig]?.requiresShield) {
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+  }
   const pid = sim.playerId;
   const p = sim.entities.get(pid) as any;
   if (!sim.resolvedAbility(sig)) return `signature ${sig} not granted by spec`;
