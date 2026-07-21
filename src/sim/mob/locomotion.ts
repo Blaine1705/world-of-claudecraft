@@ -33,6 +33,7 @@ import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { riftMechanicSuppressed } from '../rift/ranks';
+import { instancePlayerIds } from '../rift/runs';
 import type { SimContext } from '../sim_context';
 import { clearThreat, stealthDetectionRadius } from '../threat';
 import {
@@ -544,7 +545,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       }
     } else {
       mob.bigCastTimer -= DT;
-      if (mob.bigCastTimer <= 0) {
+      if (mob.bigCastTimer <= 0 && mob.castingAbility === null) {
         mob.bigCastTimer = bigCast.every + bigCast.castTime;
         mob.castingAbility = bigCast.castId;
         mob.castTotal = bigCast.castTime;
@@ -591,37 +592,38 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       mob[timerKey] -= DT;
       if (mob[timerKey] <= 0) {
         mob[timerKey] = def.every + def.castTime;
-        // Pick a random living player in the instance as the zone anchor.
-        const allPids: number[] = [];
-        for (const meta of ctx.players.values()) {
-          const pe = ctx.entities.get(meta.entityId);
-          if (pe && !pe.dead) allPids.push(pe.id);
-        }
-        if (allPids.length === 0) return;
-        const targetPid = allPids[ctx.rng.int(0, allPids.length - 1)];
-        const targetE = ctx.entities.get(targetPid);
-        if (!targetE || targetE.dead) return;
-        // Place zone at the picked player's current position.
+        // Skip if already casting (cast exclusivity: two death zones must not stack).
+        if (mob.castingAbility !== null) return;
+        // Resolve the instance first: the zone anchor must be a living player
+        // inside the boss's own rift instance, not the full world player list.
         const inst = ctx.riftInstances.find(
           (ri) => ri.partyKey !== null && ri.mobIds.includes(mob.id),
         );
-        if (inst) {
-          inst.bossDeathZones.push({
-            x: targetE.pos.x,
-            z: targetE.pos.z,
-            radius: def.radius,
-            remaining: def.castTime,
-          });
-          // Notify online clients so they can mirror the zone countdown locally.
-          // Interest-scoped by world position, so only instance players receive it.
-          ctx.emit({
-            type: 'riftDeathZoneSpawn',
-            x: targetE.pos.x,
-            z: targetE.pos.z,
-            radius: def.radius,
-            durationSecs: def.castTime,
-          });
-        }
+        if (!inst) return; // no live instance for this boss - do not cast
+        const instPids = instancePlayerIds(ctx, inst).filter((pid) => {
+          const e = ctx.entities.get(pid);
+          return e && !e.dead;
+        });
+        if (instPids.length === 0) return; // no living party members - skip
+        const targetPid = instPids[ctx.rng.int(0, instPids.length - 1)];
+        const targetE = ctx.entities.get(targetPid);
+        if (!targetE || targetE.dead) return;
+        // Place zone at the picked player's current position.
+        inst.bossDeathZones.push({
+          x: targetE.pos.x,
+          z: targetE.pos.z,
+          radius: def.radius,
+          remaining: def.castTime,
+        });
+        // Notify online clients so they can mirror the zone countdown locally.
+        // Interest-scoped by world position, so only instance players receive it.
+        ctx.emit({
+          type: 'riftDeathZoneSpawn',
+          x: targetE.pos.x,
+          z: targetE.pos.z,
+          radius: def.radius,
+          durationSecs: def.castTime,
+        });
         // Begin casting - cast bar is the visual telegraph for players to move.
         mob.castingAbility = def.castId;
         mob.castTotal = def.castTime;

@@ -36,7 +36,7 @@ import {
   riftHeroicTuningFor,
   riftRankForBaseLevel,
 } from './ranks';
-import { generateRiftFloor, riftLiftAt } from './rift_gen';
+import { generateRiftFloor, isSetPieceRift, riftLiftAt } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
 import type { RiftInstance, RiftRoller } from './types';
 
@@ -285,7 +285,12 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
     }
     // Rank-gated boss kits: how many entries of the template's rankMechanics
     // list are live on this spawn (C=1 .. S=4). Trash carries no budget.
-    if (spawn.boss || spawn.miniboss) mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+    // Authored set-piece floors (the Infernal Citadel) are C-only hand-tuned
+    // content; their bosses run their full kit at every rank and must not be
+    // capped by the procedural rank budget.
+    if ((spawn.boss || spawn.miniboss) && !isSetPieceRift(inst.seed, inst.baseLevel)) {
+      mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+    }
     // Per-run re-grade: a fresh tint (and a little scale variance) so the same
     // template reads as a different creature across rifts. Model + mechanics are
     // unchanged (both read from the static template by id).
@@ -1246,7 +1251,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   return true;
 }
 
-function instancePlayerIds(ctx: SimContext, inst: RiftInstance): number[] {
+export function instancePlayerIds(ctx: SimContext, inst: RiftInstance): number[] {
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const out: number[] = [];
   const candidates =
@@ -1438,7 +1443,13 @@ export function updateRiftInstances(ctx: SimContext): void {
   // the earlier kill could lose the shared race.
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null || inst.bossDiedAtTick !== null || inst.bossId === null) continue;
-    if (ctx.entities.get(inst.bossId)?.dead) inst.bossDiedAtTick = ctx.tickCount;
+    if (ctx.entities.get(inst.bossId)?.dead) {
+      inst.bossDiedAtTick = ctx.tickCount;
+      // Clear any pending lethal death zones so a zone placed just before the
+      // killing blow cannot execute the winning party. Symmetric with the evade
+      // clear in locomotion.ts.
+      inst.bossDeathZones = [];
+    }
   }
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {
