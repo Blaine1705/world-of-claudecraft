@@ -44,6 +44,7 @@ import {
   validUsernameShape,
   verifyPassword,
 } from './auth';
+import { communityTestAccountsEnabled } from './community_test_accounts';
 import {
   type AccountRow,
   createAccount,
@@ -318,8 +319,10 @@ async function registerHandler(ctx: Ctx): Promise<void> {
   // level-20 character per class in true best-in-slot gear so testers land
   // straight in endgame testing. Awaited so the character select screen right
   // after this response already shows the roster; it must never fail the
-  // registration itself.
-  if (pbeBoostEnabled()) {
+  // registration itself. Skipped when community test-account provisioning
+  // (PROVISION_TEST_ACCOUNTS) already rostered the account inside
+  // createAccount: two rosters would blow the character cap.
+  if (pbeBoostEnabled() && !communityTestAccountsEnabled()) {
     try {
       const boosted = await boostAccountCharacters(account.id);
       logger.info({ accountId: account.id, boosted }, 'pbe account boost complete');

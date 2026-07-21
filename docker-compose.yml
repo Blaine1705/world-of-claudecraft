@@ -54,6 +54,10 @@ services:
       # Community test realms can opt in to a ready-made level-20 roster for
       # every newly created account. The production-safe default is disabled.
       PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}
+      # PBE only: boost registrations to a BiS roster and top existing
+      # characters up to the current BiS kit at world join (server/pbe_boost.ts).
+      # NEVER set in production. The production-safe default is disabled.
+      PBE_BOOST_ACCOUNTS: ${PBE_BOOST_ACCOUNTS:-}
       # Target the game server 302-redirects /wiki to when hit directly (not via the
       # reverse proxy). Public origin in prod; localhost fallback for local dev.
       WIKI_URL: ${WIKI_URL:-http://localhost:8080/wiki/index.php/Main_Page}
