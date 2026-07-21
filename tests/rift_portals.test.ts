@@ -91,15 +91,19 @@ describe('rift ranks: zone mapping and tuning', () => {
     expect(riftTierForZone(nightbloom, 0.99)).toBe('S');
   });
 
-  it('rank tuning is monotonic: higher rank, higher baseLevel and more marks', () => {
+  it('rank tuning is monotonic in baseLevel and carries no mark currency', () => {
     const tiers = ['C', 'B', 'A', 'S'] as const;
     for (let i = 1; i < tiers.length; i++) {
       expect(RIFT_TIER_INFO[tiers[i]].baseLevel).toBeGreaterThan(
         RIFT_TIER_INFO[tiers[i - 1]].baseLevel,
       );
-      expect(RIFT_TIER_INFO[tiers[i]].marks).toBeGreaterThan(RIFT_TIER_INFO[tiers[i - 1]].marks);
     }
     expect(RIFT_TIER_INFO.C.baseLevel).toBe(20);
+    // Rifts pay NO Heroic Marks at any rank (maintainer decision): the tier
+    // table must not grow a marks field back.
+    for (const tier of tiers) {
+      expect(Object.keys(RIFT_TIER_INFO[tier]).sort()).toEqual(['baseLevel', 'color']);
+    }
   });
 });
 
@@ -211,7 +215,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     return { inst, boss, portalInfo: p };
   }
 
-  it('boss kill seals the portal, announces it, and drops rank-scaled marks', () => {
+  it('boss kill seals the portal, announces it, and pays no Heroic Marks', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-07';
@@ -229,29 +233,23 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
           e.text === `The ${portalInfo.tier}-rank rift in ${portalInfo.zoneName} has been sealed.`,
       ),
     ).toBe(true);
-    // Marks on the boss corpse, personal to the player, scaled by rank.
+    // NO Heroic Marks on the corpse at any rank: marks stay a heroic
+    // dungeon/raid currency (maintainer decision).
     const marks = (boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_ITEM_ID);
-    expect(marks.length).toBe(
-      RIFT_TIER_INFO[portalInfo.tier].marks + RIFT_TIER_INFO[portalInfo.tier].raceMarks,
-    );
-    expect(marks[0].personalFor).toEqual([sim.player.id]);
+    expect(marks).toEqual([]);
   });
 
-  it('the rank payout is daily-gated: a second same-rank clear pays nothing', () => {
+  it('a ranked clear never touches the heroic daily ledger or pays marks', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-07';
     const meta = sim.players.get(sim.player.id)!;
     spawnDuePortal(sim);
-    const { boss, portalInfo } = runToBossKill(sim);
+    const { boss } = runToBossKill(sim);
     tickSeconds(sim, 1.2);
-    expect(meta.heroicDaily.marked.has(`rift_${portalInfo.tier}`)).toBe(true);
-    const tierInfo = RIFT_TIER_INFO[portalInfo.tier];
-    const firstMarks = (boss.loot?.items ?? []).filter(
-      (i) => i.itemId === HEROIC_MARK_ITEM_ID,
-    ).length;
-    // C pays 0 marks (normal tier); B/A/S pay marks + raceMarks.
-    expect(firstMarks).toBe(tierInfo.marks + tierInfo.raceMarks);
+    // The heroic daily gate is dungeon/raid state: a rift clear never stamps it.
+    expect([...meta.heroicDaily.marked].some((k) => k.startsWith('rift_'))).toBe(false);
+    expect((boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_ITEM_ID)).toEqual([]);
     // A dev-portal run has no rank: never pays, never seals.
     sim.enterRift(4242, 15, sim.player.id);
     const inst2 = sim.riftInstances.find((i) => i.partyKey !== null && i.seed === 4242)!;

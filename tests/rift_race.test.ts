@@ -108,7 +108,12 @@ describe('shared Rift race with group-isolated dungeon instances', () => {
     );
     expect(events).toContainEqual(expect.objectContaining({ type: 'riftRaceWorld' }));
     expect(sim.entities.has(portalInfo.id)).toBe(false);
-    expect((boss.loot?.items ?? []).some((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toBe(true);
+    // Rifts pay NO Heroic Marks (maintainer decision): the win pays the gear
+    // ladder and first-clear extras instead, and the corpse stays lootable.
+    expect((boss.loot?.items ?? []).some((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toBe(
+      false,
+    );
+    expect((boss.loot?.items ?? []).length).toBeGreaterThan(0);
   });
 
   it('ranks same-window clears by boss-death tick, not slot order', () => {

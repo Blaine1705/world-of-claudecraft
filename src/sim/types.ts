@@ -4060,7 +4060,6 @@ export type SimEvent = { pid?: number } & (
       tier: RiftTier;
       winnerNames: string[];
       clearTime: number;
-      rewardMarks: number;
     }
   | {
       type: 'riftRaceWorld';

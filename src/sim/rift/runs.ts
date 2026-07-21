@@ -12,7 +12,6 @@
 
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { delveChestItemsForTier } from '../content/delves/lockpick_tiers';
-import { HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import {
   DUNGEON_FLOOR_Y,
   isRiftPos,
@@ -1093,44 +1092,9 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   }
 }
 
-/** Put normal rank marks plus the one-off race bonus on the winner's boss corpse
- * as personal loot. Normal marks retain the existing daily-per-rank gate; race
- * marks are event-specific and therefore always paid to a legitimate winner. */
-function rewardRiftWinner(
-  ctx: SimContext,
-  inst: RiftInstance,
-  boss: Entity | null,
-  participants: readonly number[],
-  raceWinner: boolean,
-): Map<number, number> {
-  const awardedByPlayer = new Map<number, number>();
-  if (inst.tier === null || !boss) return awardedByPlayer;
-  const info = RIFT_TIER_INFO[inst.tier];
-  const loot = boss.loot ?? { copper: 0, items: [] };
-  const dailyKey = `rift_${inst.tier}`;
-  for (const pid of participants) {
-    const meta = ctx.players.get(pid);
-    if (!meta) continue;
-    let marks = raceWinner ? info.raceMarks : 0;
-    const today = ctx.utcDay;
-    if (today && meta.heroicDaily.date !== today) {
-      meta.heroicDaily = { date: today, marked: new Set() };
-    }
-    if (!meta.heroicDaily.marked.has(dailyKey)) {
-      meta.heroicDaily.marked.add(dailyKey);
-      marks += info.marks;
-    }
-    for (let i = 0; i < marks; i++) {
-      loot.items.push({ itemId: HEROIC_MARK_ITEM_ID, count: 1, personalFor: [pid] });
-    }
-    awardedByPlayer.set(pid, marks);
-  }
-  if (awardedByPlayer.size > 0) {
-    boss.loot = loot;
-    boss.lootable = true;
-  }
-  return awardedByPlayer;
-}
+// Rifts pay NO Heroic Marks at any rank (maintainer decision): marks stay a
+// heroic dungeon/raid currency, and the rift prize is the clear-time gear
+// ladder, the first-clear rings/essence/gems, the mount rolls, and coin.
 
 function terminateLosingInstance(ctx: SimContext, inst: RiftInstance): void {
   const event =
@@ -1153,7 +1117,6 @@ function terminateLosingInstance(ctx: SimContext, inst: RiftInstance): void {
         tier,
         winnerNames,
         clearTime,
-        rewardMarks: 0,
       });
     }
     ctx.emit({
@@ -1182,11 +1145,9 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.rewarded = true;
   inst.outcome = 'won';
   inst.finishedAt = ctx.time;
-  // Rank-gated epic/legendary payout on the corpse (every winning clear, ranked
-  // or dev; C pays nothing here, its rares come from the static tables).
+  // Rank-gated payout on the corpse (every winning clear, ranked or dev): C a
+  // guaranteed themed rare + coin, B/A/S the epic ladder. No Heroic Marks.
   if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
-  const raceWinner = claim.event !== null;
-  const rewards = rewardRiftWinner(ctx, inst, boss, participants, raceWinner);
 
   // A cleared rift seals its way in: the entry portal despawns, so a finished
   // run can never be walked into and re-farmed. Ranked natural portals seal
@@ -1224,7 +1185,6 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
         tier: claim.event.tier,
         winnerNames,
         clearTime,
-        rewardMarks: rewards.get(pid) ?? 0,
       });
     }
     ctx.emit({

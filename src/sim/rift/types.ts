@@ -326,7 +326,7 @@ export interface RiftInstance {
   /** Overworld portal entity id the run came through (null for dev portals);
    * the portal is sealed (despawned + announced) when the final boss dies. */
   portalId: number | null;
-  /** True once the final boss kill has paid out (marks + seal), so a slot that
+  /** True once the final boss kill has paid out (gear + seal), so a slot that
    * lingers after the kill never double-pays. */
   rewarded: boolean;
   /** The sealed reward cache the giga-boss drops (`rift_locked_chest`), opened via
