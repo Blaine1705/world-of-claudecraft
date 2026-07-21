@@ -8334,7 +8334,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyStableHint':
     'レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。',
   'hudChrome.mounts.emptyDropHint':
-    'より希少なマウントはダンジョンやレイドのボスがドロップします。',
+    'より希少なマウントはヒロイックダンジョンのボスからドロップするか、リフトの完了で入手できます。',
   'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
   'hudChrome.mountTraining.mountPrompt': '{key} キーを押して訓練用ヴァロースティードに騎乗する。',
   'hudChrome.mountTraining.ownedMountPrompt': '{key} キーを押して騎乗する',
@@ -8342,7 +8342,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。',
   'hudChrome.mountTraining.begin': 'レッスン開始',
   'hudChrome.mountTraining.success': 'ヴァロースティードを乗りこなした。',
-  'hudChrome.mountTraining.returnToMarla': '厩舎のマーラのもとへ戻り、厩舎の馬を引き取ろう。',
+  'hudChrome.mountTraining.returnToMarla': '厩舎のマーラのもとへ戻り、10ゴールドでヴァロースティードの手綱を購入しよう。',
   'hudChrome.mountRace.cancelButton': 'レースをキャンセル',
   'hudChrome.mountRace.startButton': 'レース開始',
   'hudChrome.mountRace.start': 'スタート！すべての障害を跳び越え、アーチへ戻って駆け抜けろ。',

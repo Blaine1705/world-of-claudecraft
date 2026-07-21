@@ -908,7 +908,7 @@ export const ja_JP: EnTranslations = {
       "keybindHint": "騎乗 / 降車キーで騎乗します。",
       "emptyTitle": "マウントは未入手",
       "emptyStableHint": "レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。",
-      "emptyDropHint": "より希少なマウントはダンジョンやレイドのボスがドロップします。",
+      "emptyDropHint": "より希少なマウントはヒロイックダンジョンのボスからドロップするか、リフトの完了で入手できます。",
       "clickManage": "クリックしてマウントを選択",
       "rarity_common": "コモン",
       "rarity_rare": "レア",
@@ -935,7 +935,7 @@ export const ja_JP: EnTranslations = {
       "ridePrompt": "光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。",
       "begin": "レッスン開始",
       "success": "ヴァロースティードを乗りこなした。",
-      "returnToMarla": "厩舎のマーラのもとへ戻り、厩舎の馬を引き取ろう。"
+      "returnToMarla": "厩舎のマーラのもとへ戻り、10ゴールドでヴァロースティードの手綱を購入しよう。"
     },
     "mountRace": {
       "startButton": "レース開始",

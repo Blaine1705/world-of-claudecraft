@@ -935,7 +935,7 @@ export const pt_BR: EnTranslations = {
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
       "success": "You have tamed the Valorsteed.",
-      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+      "returnToMarla": "Return to Marla at the stables to buy your Valorsteed reins for 10g."
     },
     "mountRace": {
       "startButton": "Start Race",

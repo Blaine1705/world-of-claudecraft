@@ -8476,7 +8476,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
   'hudChrome.mounts.emptyStableHint':
     'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
-  'hudChrome.mounts.emptyDropHint': 'Более редких скакунов выбивают боссы подземелий и рейдов.',
+  'hudChrome.mounts.emptyDropHint': 'Более редких скакунов выбивают боссы героических подземелий или получают за прохождение Разломов.',
   'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
   'hudChrome.mountTraining.mountPrompt':
     'Нажми {key}, чтобы оседлать учебного Доблестного скакуна.',
@@ -8486,7 +8486,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mountTraining.begin': 'Начать урок',
   'hudChrome.mountTraining.success': 'Ты приручил Доблестного скакуна.',
   'hudChrome.mountTraining.returnToMarla':
-    'Вернись к Марле в конюшни, чтобы взять себе конюшенную лошадь.',
+    'Вернись к Марле в конюшни, чтобы купить поводья Доблестного скакуна за 10 золотых.',
   'hudChrome.mountRace.cancelButton': 'Отменить заезд',
   'hudChrome.mountRace.startButton': 'Начать заезд',
   'hudChrome.mountRace.start': 'Вперёд! Бери все препятствия и скачи назад через арку.',
