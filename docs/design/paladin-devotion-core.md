@@ -10,8 +10,9 @@ cooldown.
 
 ## Shared resource
 
-Devotion ranges from 0 to 20. Only successful offensive actions and effective healing grant
-Devotion. Protection also gains 1 Devotion from a successful block, limited by a 6 second
+Devotion ranges from 0 to 20. Holy gains it from effective healing and from unleashing an
+active Seal with Verdict. Protection and Retribution gain it from successful damaging
+actions. Protection also gains 1 Devotion from a successful block, limited by a 6 second
 internal cooldown. Devotion begins decaying 10 seconds after combat ends, at 1 point every
 2 seconds.
 
@@ -36,7 +37,7 @@ during Ascension but its bank is capped at 10 Devotion.
 | Ability | First-pass behavior |
 | --- | --- |
 | Devotion Ward | Reduces damage taken by 5% for 30 min. Five percent is the initial value because several Paladins can stack their independently owned Devotions. |
-| Solar Invocation | Holy only. Two second cast, 90 sec cooldown, 80 mana. Heals every allied player within 40 yd for 180 to 220 before scaling and critical hits. |
+| Solar Invocation | Holy only. Instant, 8 sec cooldown, 80 mana, and 30 yd range. Heals one friendly target for 180 to 220 and generates 1 Devotion from effective healing. During Ascension it consumes 1 charge and also heals allied players within 10 yd of the target for half as much. |
 | Hammer of Grace | 110% weapon strike plus 28. Restores 70 mana only when it connects. |
 | Hammer of Light | 110% weapon strike plus 28. Heals the Paladin for 50% of actual damage dealt and cannot crit as a second healing event. |
 | Sacred Form | Holy only. For 30 min, increases healing by 10%, spell critical chance by 5%, and multiplies generated threat by 0.5. |
@@ -78,12 +79,13 @@ need to empty every charge immediately.
 
 ## Sunmender
 
-Holy generates Devotion by healing. Mercy Lance may deal damage, but damage is optional and
-is not required to sustain the resource cycle.
+Holy generates Devotion through effective healing and by unleashing an active Seal with
+Verdict for 1 Devotion. Mercy Lance may deal damage, but its offensive use does not generate
+Devotion.
 
 | English / Spanish | Function and normal effect | Devotion | Cooldown, cast, GCD | Range | Ascension interaction | Suggested visual and priority use |
 | --- | --- | ---: | --- | ---: | --- | --- |
-| Mercy Lance / Lanza de Misericordia | Heals an ally or damages an enemy for 80 to 100. Costs 20 mana. | 1 on effective heal or landed damage | 6 sec, instant, GCD | 30 yd | Marked. On a healing cast it consumes 1 charge and also heals one nearby ally at 70% power. | A narrow lance changes from warm gold on allies to white-gold on enemies. Use frequently for movement and efficient spot healing. |
+| Mercy Lance / Lanza de Misericordia | Heals an ally or damages an enemy for 80 to 100. Costs 20 mana. | 1 on effective healing | 6 sec, instant, GCD | 30 yd | Marked. On a healing cast it consumes 1 charge and also heals one nearby ally at 70% power. | A narrow lance changes from warm gold on allies to white-gold on enemies. Use frequently for movement and efficient spot healing. |
 | Dawn's Embrace / Abrazo del Alba | Strong heal for 260 to 310. Costs 45 mana. | 2 on effective healing | 10 sec, 1.5 sec cast, GCD | 30 yd | Marked. Consumes 1 charge, becomes instant, and heals for 35% more. | A sunrise fan opens behind the target. Tank or emergency heal and the strongest reactive charge use. |
 | Radiant Chorus / Coro Radiante | Heals nearby allies for 90 to 110 in 30 yd. Costs 60 mana. | 2 if at least one ally is effectively healed | 12 sec, 2 sec cast, GCD | Self-centered | Marked. Consumes 1 charge, heals for 20% more, and expands to 40 yd. | Several light notes or rings converge on injured allies. Group damage response. |
 | Life Covenant / Pacto de Vida | Reduces an ally's damage taken by 40% for 6 sec. Costs 40 mana. | 0 | 90 sec, instant, off GCD | 30 yd | Improved during Ascension but never consumes a charge. It also grants a 120-point shield. | A bright life-rune locks over the ally's health frame and model. Pre-empt lethal damage. |
