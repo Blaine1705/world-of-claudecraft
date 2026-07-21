@@ -2,6 +2,7 @@ import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { ABILITIES } from '../src/sim/content/classes';
 import { ABILITY_IMAGE_IDS, abilityImageUrl } from '../src/ui/icons';
 
 // Gate for the committed WebP class ability icons. The art under
@@ -54,12 +55,61 @@ function isValidWebp(file: string): boolean {
   }
 }
 
+// Dimensions straight out of the WebP header (lossy VP8, lossless VP8L, or extended VP8X),
+// mirroring the dependency-free item-icon gate.
+function webpSize(file: string): { width: number; height: number } {
+  const fd = openSync(file, 'r');
+  try {
+    const buf = Buffer.alloc(32);
+    readSync(fd, buf, 0, 32, 0);
+    const tag = buf.toString('ascii', 12, 16);
+    if (tag === 'VP8 ')
+      return { width: buf.readUInt16LE(26) & 0x3fff, height: buf.readUInt16LE(28) & 0x3fff };
+    if (tag === 'VP8L') {
+      const bits = buf.readUInt32LE(21);
+      return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+    }
+    if (tag === 'VP8X') {
+      return {
+        width: (buf.readUIntLE(24, 3) & 0xffffff) + 1,
+        height: (buf.readUIntLE(27, 3) & 0xffffff) + 1,
+      };
+    }
+    throw new Error(`unknown webp chunk "${tag}" in ${file}`);
+  } finally {
+    closeSync(fd);
+  }
+}
+
 const webpFiles = (): string[] =>
   walk(skillsDir).filter((p) => path.extname(p).toLowerCase() === '.webp');
+
+const paladinWebpFiles = (): string[] =>
+  webpFiles().filter((file) => path.basename(path.dirname(file)) === 'paladin');
+
+type PaladinMapping = {
+  iconSize: number;
+  abilities: Array<{ abilityId: string; output: string }>;
+};
+
+const paladinMapping = (): PaladinMapping =>
+  JSON.parse(
+    readFileSync(path.join(skillsDir, 'paladin', 'mapping.json'), 'utf8'),
+  ) as PaladinMapping;
 
 describe('class ability webp icons', () => {
   it('has image-backed ability ids wired (guards the fixture)', () => {
     expect(ABILITY_IMAGE_IDS.size).toBeGreaterThan(0);
+  });
+
+  it('gives every paladin ability painted artwork', () => {
+    const missing = Object.values(ABILITIES)
+      .filter((ability) => ability.class === 'paladin')
+      .map((ability) => ability.id)
+      .filter((id) => !ABILITY_IMAGE_IDS.has(id))
+      .sort();
+
+    expect(missing).toEqual([]);
   });
 
   it('uses the owner-provided Fireball Form and Counterspell artwork', () => {
@@ -140,6 +190,42 @@ describe('class ability webp icons', () => {
     expect(
       orphans,
       'unwired or misplaced webp(s) committed; remove dead-weight art or wire the id into ABILITY_IMAGE_IDS',
+    ).toEqual([]);
+  });
+
+  it('keeps every Paladin icon and provenance row in a one-to-one mapping', () => {
+    const files = paladinWebpFiles().map((file) => path.basename(file));
+    const entries = paladinMapping().abilities;
+    const outputs = entries.map(({ output }) => output);
+
+    expect(new Set(outputs).size, 'mapping.json contains duplicate output filenames').toBe(
+      outputs.length,
+    );
+    expect(
+      files.filter((file) => !outputs.includes(file)),
+      'Paladin artwork without provenance in mapping.json',
+    ).toEqual([]);
+    expect(
+      outputs.filter((file) => !files.includes(file)),
+      'mapping.json lists missing Paladin artwork',
+    ).toEqual([]);
+    expect(
+      entries.filter(({ abilityId, output }) => output !== `${abilityId}.webp`),
+      'Paladin provenance rows must map each ability id to its canonical filename',
+    ).toEqual([]);
+  });
+
+  it('keeps every Paladin icon at the declared 128px square', () => {
+    const { iconSize } = paladinMapping();
+    expect(iconSize).toBe(128);
+    const wrong = paladinWebpFiles()
+      .map((file) => ({ file, ...webpSize(file) }))
+      .filter(({ width, height }) => width !== iconSize || height !== iconSize)
+      .map(({ file, width, height }) => `${path.basename(file)} (${width}x${height})`);
+
+    expect(
+      wrong,
+      'resize Paladin source art to 128px square before running `npm run assets:skills`',
     ).toEqual([]);
   });
 });
