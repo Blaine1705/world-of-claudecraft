@@ -126,14 +126,16 @@ const common: AbilityDef[] = [
     specs: ['holy'],
     learnLevel: 12,
     cost: 80,
-    castTime: 2,
-    cooldown: 90,
-    range: 0,
+    castTime: 0,
+    cooldown: 8,
+    range: 30,
     school: 'holy',
     projectile: false,
-    requiresTarget: false,
-    effects: [{ type: 'aoeHeal', min: 180, max: 220, radius: 40, playersOnly: true }],
-    description: 'Call upon the Light to heal all allied players within 40 m for $d.',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'heal', min: 180, max: 220 }],
+    description:
+      'Instantly heal a friendly target for $d. Effective healing generates 1 Devotion. During Ascension, also heal allied players within 10 m of the target for half as much.',
   },
   {
     id: 'recall_the_fallen',
@@ -324,7 +326,7 @@ const holy: AbilityDef[] = [
       { type: 'directDamage', min: 80, max: 100 },
     ],
     description:
-      'Heal an ally or damage an enemy for $d and generate 1 Devotion. Ascension also heals a nearby ally when used to heal.',
+      'Heal an ally or damage an enemy for $d. Effective healing generates 1 Devotion. Ascension also heals a nearby ally when used to heal.',
   },
   {
     id: 'dawns_embrace',
@@ -443,7 +445,7 @@ const protection: AbilityDef[] = [
       { type: 'selfBuff', kind: 'buff_block', value: 0.2, duration: 6 },
     ],
     description:
-      'Reduce physical damage taken by 20% for 6 sec and generate 1 Devotion. Ascension extends the duration to 10 sec.',
+      'Reduce physical damage taken by 20% for 6 sec. Ascension extends the duration to 10 sec.',
   },
   {
     id: 'sunward_disc',

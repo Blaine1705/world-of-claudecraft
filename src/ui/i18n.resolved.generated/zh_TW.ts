@@ -7073,7 +7073,7 @@ export const zh_TW: EnTranslations = {
       },
       "solar_invocation": {
         "name": "日光祈喚",
-        "description": "呼喚聖光，為 40 碼內所有友方玩家恢復 {damage} 點生命力。"
+        "description": "立即為一個友方目標恢復 {damage} 點生命力。有效治療會產生 1 點奉獻。昇華期間，還會為目標周圍 10 碼內的友方玩家恢復一半生命力。"
       },
       "radiant_devotion": {
         "name": "光輝奉獻",
@@ -7113,7 +7113,7 @@ export const zh_TW: EnTranslations = {
       },
       "mercy_lance": {
         "name": "仁慈之槍",
-        "description": "為一名盟友恢復或對一名敵人造成 {damage} 點生命力，並產生 1 點奉獻。昇華時用於治療還會治療附近一名盟友。"
+        "description": "為一名盟友恢復或對一名敵人造成 {damage} 點生命力。有效治療會產生 1 點奉獻。昇華時用於治療還會治療附近一名盟友。"
       },
       "sacred_form": {
         "name": "神聖形態",
@@ -7141,7 +7141,7 @@ export const zh_TW: EnTranslations = {
       },
       "bastion_rite": {
         "name": "堡壘儀式",
-        "description": "使受到的物理傷害降低 20%，持續 6 秒，並產生 1 點奉獻。昇華將持續時間延長至 10 秒。"
+        "description": "使受到的物理傷害降低 20%，持續 6 秒。昇華將持續時間延長至 10 秒。"
       },
       "sunward_disc": {
         "name": "日耀圓盾",

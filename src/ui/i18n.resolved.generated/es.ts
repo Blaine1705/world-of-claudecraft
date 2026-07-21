@@ -7073,7 +7073,7 @@ export const es: EnTranslations = {
       },
       "solar_invocation": {
         "name": "Invocación solar",
-        "description": "Recurre a la Luz para sanar {damage} a todos los jugadores aliados en un radio de 40 m."
+        "description": "Sana al instante {damage} a un objetivo amistoso. La sanación efectiva genera 1 de Devoción. Durante Ascensión, también sana a los jugadores aliados en un radio de 10 m alrededor del objetivo por la mitad de esa cantidad."
       },
       "radiant_devotion": {
         "name": "Devoción radiante",
@@ -7113,7 +7113,7 @@ export const es: EnTranslations = {
       },
       "mercy_lance": {
         "name": "Lanza de misericordia",
-        "description": "Sana a un aliado o inflige {damage} a un enemigo y genera 1 de Devoción. Al usarse para sanar, Ascensión también sana a un aliado cercano."
+        "description": "Sana a un aliado o inflige {damage} a un enemigo. La sanación efectiva genera 1 de Devoción. Al usarse para sanar, Ascensión también sana a un aliado cercano."
       },
       "sacred_form": {
         "name": "Forma sagrada",
@@ -7141,7 +7141,7 @@ export const es: EnTranslations = {
       },
       "bastion_rite": {
         "name": "Rito del bastión",
-        "description": "Reduce un 20% el daño físico recibido durante 6 s y genera 1 de Devoción. Ascensión amplía la duración a 10 s."
+        "description": "Reduce un 20% el daño físico recibido durante 6 s. Ascensión amplía la duración a 10 s."
       },
       "sunward_disc": {
         "name": "Disco solar",

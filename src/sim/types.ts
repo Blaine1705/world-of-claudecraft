@@ -1988,7 +1988,14 @@ export type AbilityEffect =
       softCap?: number;
       rageOnHit?: { base: number; perTarget: number; capTargets: number };
     }
-  | { type: 'aoeHeal'; min: number; max: number; radius: number; playersOnly?: boolean }
+  | {
+      type: 'aoeHeal';
+      min: number;
+      max: number;
+      radius: number;
+      playersOnly?: boolean;
+      centerOnTarget?: boolean;
+    }
   | {
       type: 'groundAoE';
       min: number;

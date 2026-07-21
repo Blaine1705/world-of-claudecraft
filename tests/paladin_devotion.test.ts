@@ -73,13 +73,15 @@ describe('paladin Devotion core', () => {
       devotionGainForAbility('holy', 'mercy_lance'),
       devotionGainForAbility('holy', 'dawns_embrace'),
       devotionGainForAbility('holy', 'radiant_chorus'),
-    ]).toEqual([1, 1, 2, 2]);
+      devotionGainForAbility('holy', 'solar_invocation'),
+      devotionGainForAbility('holy', 'judgement'),
+    ]).toEqual([1, 1, 2, 2, 1, 1]);
     expect([
       devotionGainForAbility('protection', 'vowkeeper_strike'),
       devotionGainForAbility('protection', 'bastion_rite'),
       devotionGainForAbility('protection', 'sunward_disc'),
       devotionGainForAbility('protection', 'bastion_sweep'),
-    ]).toEqual([1, 1, 2, 1]);
+    ]).toEqual([1, 0, 2, 1]);
     expect([
       devotionGainForAbility('retribution', 'oathstrike'),
       devotionGainForAbility('retribution', 'final_edict'),
@@ -89,7 +91,7 @@ describe('paladin Devotion core', () => {
     ]).toEqual([1, 2, 2, 1, 1]);
 
     expect(
-      ['mercy_lance', 'dawns_embrace', 'radiant_chorus'].every((id) =>
+      ['mercy_lance', 'dawns_embrace', 'radiant_chorus', 'solar_invocation'].every((id) =>
         isAscensionEmpoweredAbility('holy', id),
       ),
     ).toBe(true);

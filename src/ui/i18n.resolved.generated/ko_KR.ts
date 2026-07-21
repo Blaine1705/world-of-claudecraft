@@ -7073,7 +7073,7 @@ export const ko_KR: EnTranslations = {
       },
       "solar_invocation": {
         "name": "태양의 기원",
-        "description": "빛을 불러내 40미터 안의 모든 아군 플레이어를 {damage}만큼 치유합니다."
+        "description": "아군 대상 하나를 즉시 {damage}만큼 치유합니다. 유효 치유 시 헌신 1을 얻습니다. 승천 중에는 대상의 10미터 안에 있는 아군 플레이어도 절반만큼 치유합니다."
       },
       "radiant_devotion": {
         "name": "광휘의 헌신",
@@ -7113,7 +7113,7 @@ export const ko_KR: EnTranslations = {
       },
       "mercy_lance": {
         "name": "자비의 창",
-        "description": "아군을 치유하거나 적에게 {damage}의 피해를 입히고 헌신 1을 얻습니다. 승천 중 치유에 사용하면 가까운 아군 한 명도 치유합니다."
+        "description": "아군을 치유하거나 적에게 {damage}의 피해를 입힙니다. 유효 치유 시 헌신 1을 얻습니다. 승천 중 치유에 사용하면 가까운 아군 한 명도 치유합니다."
       },
       "sacred_form": {
         "name": "신성한 형상",
@@ -7141,7 +7141,7 @@ export const ko_KR: EnTranslations = {
       },
       "bastion_rite": {
         "name": "보루의 의식",
-        "description": "받는 물리 피해를 6초 동안 20%만큼 감소시키고 헌신 1을 얻습니다. 승천 중에는 지속시간이 10초로 늘어납니다."
+        "description": "받는 물리 피해를 6초 동안 20%만큼 감소시킵니다. 승천 중에는 지속시간이 10초로 늘어납니다."
       },
       "sunward_disc": {
         "name": "태양수호 원반",

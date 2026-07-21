@@ -8,13 +8,13 @@ type PaladinSpec = 'holy' | 'protection' | 'retribution';
 
 const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
   holy: ['radiant_chorus', 'dawns_embrace', 'mercy_lance', 'holy_light'],
-  protection: ['sunward_disc', 'bastion_rite', 'vowkeeper_strike'],
+  protection: ['sunward_disc', 'consecration', 'vowkeeper_strike'],
   retribution: ['final_edict', 'dawnfall', 'oathstrike'],
 };
 
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 36.15,
-  protection: 40.05,
+  protection: 41.4,
   retribution: 32.65,
 };
 

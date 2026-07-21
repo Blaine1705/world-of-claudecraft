@@ -7073,7 +7073,7 @@ export const ja_JP: EnTranslations = {
       },
       "solar_invocation": {
         "name": "陽光の祈願",
-        "description": "聖なる光を呼び、40ヤード以内にいるすべての味方プレイヤーの体力を{damage}回復する。"
+        "description": "味方1体の体力を即座に{damage}回復する。有効な回復で信仰を1得る。昇華中は、対象から10メートル以内の味方プレイヤーもその半分だけ回復する。"
       },
       "radiant_devotion": {
         "name": "輝きの献身",
@@ -7113,7 +7113,7 @@ export const ja_JP: EnTranslations = {
       },
       "mercy_lance": {
         "name": "慈悲の槍",
-        "description": "味方を回復するか敵に{damage}ダメージを与え、信仰を1得る。昇華中に回復へ使うと、近くの味方1人も回復する。"
+        "description": "味方を回復するか敵に{damage}ダメージを与える。有効な回復で信仰を1得る。昇華中に回復へ使うと、近くの味方1人も回復する。"
       },
       "sacred_form": {
         "name": "聖なる姿",
@@ -7141,7 +7141,7 @@ export const ja_JP: EnTranslations = {
       },
       "bastion_rite": {
         "name": "砦の儀式",
-        "description": "受ける物理ダメージを20%軽減し、信仰を1得る。6秒間持続する。昇華中は持続時間が10秒になる。"
+        "description": "受ける物理ダメージを20%軽減する。6秒間持続する。昇華中は持続時間が10秒になる。"
       },
       "sunward_disc": {
         "name": "陽光の円盤",

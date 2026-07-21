@@ -19,7 +19,13 @@ export type PaladinSpec = 'holy' | 'protection' | 'retribution';
 export type AscensionImpactKind = 'healing' | 'defensive' | 'offensive' | 'area';
 
 const ASCENSION_ABILITIES: Readonly<Record<PaladinSpec, ReadonlySet<string>>> = {
-  holy: new Set(['mercy_lance', 'dawns_embrace', 'radiant_chorus', 'guardian_covenant']),
+  holy: new Set([
+    'mercy_lance',
+    'dawns_embrace',
+    'radiant_chorus',
+    'solar_invocation',
+    'guardian_covenant',
+  ]),
   protection: new Set([
     'vowkeeper_strike',
     'bastion_rite',
@@ -44,10 +50,11 @@ const DEVOTION_GAIN: Readonly<Record<PaladinSpec, Readonly<Record<string, number
     mercy_lance: 1,
     dawns_embrace: 2,
     radiant_chorus: 2,
+    solar_invocation: 1,
+    judgement: 1,
   },
   protection: {
     vowkeeper_strike: 1,
-    bastion_rite: 1,
     sunward_disc: 2,
     bastion_sweep: 1,
   },
@@ -137,12 +144,29 @@ export function devotionGainForAbility(spec: string | null, abilityId: string): 
   return DEVOTION_GAIN[spec][abilityId] ?? 0;
 }
 
+export function devotionGenerationTriggered(
+  spec: string | null,
+  abilityId: string,
+  trigger: { damage: boolean; healing: boolean },
+): boolean {
+  if (spec === 'holy') {
+    return trigger.healing || (abilityId === 'judgement' && trigger.damage);
+  }
+  return (spec === 'protection' || spec === 'retribution') && trigger.damage;
+}
+
 export function ascensionImpactKind(
   abilityId: string,
   targetIsHostile: boolean,
 ): AscensionImpactKind {
   if (abilityId === 'mercy_lance') return targetIsHostile ? 'offensive' : 'healing';
-  if (abilityId === 'dawns_embrace' || abilityId === 'radiant_chorus') return 'healing';
+  if (
+    abilityId === 'dawns_embrace' ||
+    abilityId === 'radiant_chorus' ||
+    abilityId === 'solar_invocation'
+  ) {
+    return 'healing';
+  }
   if (
     abilityId === 'faithforged_guard' ||
     abilityId === 'bastion_rite' ||
@@ -264,6 +288,15 @@ export function resolveAscensionAbility(
         radius: 30,
       };
     }
+  } else if (resolved.def.id === 'solar_invocation') {
+    effects.push({
+      type: 'aoeHeal',
+      min: 90,
+      max: 110,
+      radius: 10,
+      playersOnly: true,
+      centerOnTarget: true,
+    });
   } else if (resolved.def.id === 'vowkeeper_strike') {
     effects.push({
       type: 'selfBuff',

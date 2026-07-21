@@ -30,6 +30,7 @@ import {
   DAWNS_PATH_SPEED_DURATION,
   DAWNS_PATH_SPEED_MULT,
   devotionGainForAbility,
+  devotionGenerationTriggered,
   grantDevotion,
 } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
@@ -221,7 +222,8 @@ export function runEffects(
   const areaEcho = echoEligible && hasAreaEchoAura(p);
   const sweeping = echoEligible && hasSweepingStrikes(p);
   let areaEchoDealt = false;
-  let devotionTriggered = false;
+  let devotionDamageTriggered = false;
+  let devotionHealingTriggered = false;
   // Dynamic DoT riders snapshot a fraction of the preceding resolved direct
   // hit, including its scaling and critical multiplier.
   let lastDirectDamage = 0;
@@ -390,7 +392,7 @@ export function runEffects(
               : undefined,
         });
         if (hit && sureCrit) sureCritRolled = true;
-        if (hit) devotionTriggered = true;
+        if (hit) devotionDamageTriggered = true;
         if (hit && ability.awardsCombo) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
@@ -453,7 +455,7 @@ export function runEffects(
         // the caster's charge aura (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         const finalDamage = Math.round(dmg);
-        devotionTriggered = true;
+        devotionDamageTriggered = true;
         lastDirectDamage = finalDamage;
         ctx.dealDamage(
           p,
@@ -718,7 +720,7 @@ export function runEffects(
         const healAmount =
           ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
         const healed = ctx.applyHeal(p, healTarget, healAmount, ability.name, ability.id);
-        if (healed > 0) devotionTriggered = true;
+        if (healed > 0) devotionHealingTriggered = true;
         // Power Echo (mage choice row): the armed echo also repeats a direct HEAL
         // (Temporal Mend, Temporal Echo) at its fraction of the RESOLVED heal on
         // the same target, consumed BEFORE the repeat so a copy can never re-echo.
@@ -795,7 +797,7 @@ export function runEffects(
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
           totalHealed += ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id);
         }
-        if (totalHealed > 0) devotionTriggered = true;
+        if (totalHealed > 0) devotionHealingTriggered = true;
         break;
       }
       case 'feralCharge': {
@@ -913,7 +915,7 @@ export function runEffects(
           false,
           ability.id,
         );
-        devotionTriggered = true;
+        devotionDamageTriggered = true;
         noteSpellHit(ctx, p, crit, ability.id);
         break;
       }
@@ -1491,7 +1493,7 @@ export function runEffects(
           }
           aoeTargets.push(m);
         }
-        if (aoeTargets.length > 0) devotionTriggered = true;
+        if (aoeTargets.length > 0) devotionDamageTriggered = true;
         // Classic AoE soft cap (Revenge): above `softCap` targets, hold the TOTAL
         // to softCap x per-target by scaling every rolled hit. Scales the already-
         // rolled amount, so it draws no extra rng.
@@ -1646,23 +1648,24 @@ export function runEffects(
         break;
       }
       case 'aoeHeal': {
+        const center = eff.centerOnTarget && target ? target : p;
         ctx.emit({
           type: 'spellfx',
           sourceId: p.id,
-          targetId: p.id,
+          targetId: center.id,
           school: ability.school,
           fx: 'nova',
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
         const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true);
         let totalHealed = 0;
-        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+        for (const m of friendliesInRadius(ctx, center, eff.radius)) {
           if (eff.playersOnly && m.kind !== 'player') continue;
-          if (!ctx.hasLineOfSight(p, m)) continue;
+          if (!ctx.hasLineOfSight(center, m)) continue;
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
           totalHealed += ctx.applyHeal(p, m, healAmount, ability.name, ability.id);
         }
-        if (totalHealed > 0) devotionTriggered = true;
+        if (totalHealed > 0) devotionHealingTriggered = true;
         break;
       }
       case 'frozenOrb': {
@@ -2766,7 +2769,12 @@ export function runEffects(
   frostMageAfterCast(ctx, p, meta, ability, target);
 
   const paladinSpec = mods.spec;
-  if (devotionTriggered || ability.id === 'bastion_rite') {
+  if (
+    devotionGenerationTriggered(paladinSpec, ability.id, {
+      damage: devotionDamageTriggered,
+      healing: devotionHealingTriggered,
+    })
+  ) {
     grantDevotion(p, devotionGainForAbility(paladinSpec, ability.id));
   }
   if (consumeAscensionCharge(p, paladinSpec, ability.id)) {

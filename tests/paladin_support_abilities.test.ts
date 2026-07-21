@@ -4,6 +4,7 @@ import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { activateDivineAscension, grantDevotion } from '../src/sim/paladin_devotion';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import { fiestaDownEntity } from '../src/sim/social/fiesta';
 import { threatModifier } from '../src/sim/threat';
@@ -156,13 +157,22 @@ describe('Paladin support abilities', () => {
     expect(ABILITIES.citadel_of_faith).toBeUndefined();
   });
 
-  it('offers only Devotion Aura and Requital Aura in the current aura family', () => {
-    const known = abilitiesKnownAt('paladin', 20).map((entry) => entry.def.id);
-    expect(known).toEqual(expect.arrayContaining(['devotion_ward', 'retribution_aura']));
-    expect(known).not.toContain('devotion_aura');
-    for (const id of ['radiant_devotion', 'dawn_devotion', 'grace_devotion']) {
-      expect(known).not.toContain(id);
+  it('offers every Devotion to all three Paladin specializations', () => {
+    const devotionIds = [
+      'devotion_ward',
+      'radiant_devotion',
+      'dawn_devotion',
+      'grace_devotion',
+      'retribution_aura',
+    ];
+    const mods = (spec: 'protection' | 'holy' | 'retribution') =>
+      computeTalentModifiers('paladin', { spec, ranks: {}, choices: {} }, 20);
+    for (const spec of ['protection', 'holy', 'retribution'] as const) {
+      const known = abilitiesKnownAt('paladin', 20, mods(spec)).map((entry) => entry.def.id);
+      expect(known).toEqual(expect.arrayContaining(devotionIds));
     }
+    const known = abilitiesKnownAt('paladin', 20).map((entry) => entry.def.id);
+    expect(known).not.toContain('devotion_aura');
   });
 
   it('authors the requested first-pass values and spec restrictions', () => {
@@ -195,12 +205,16 @@ describe('Paladin support abilities', () => {
     ]);
     expect(paladin.setSpec('holy')).toBe(true);
     expect(resolve(paladin, 'solar_invocation')).toMatchObject({
-      castTime: 2,
-      cooldown: 90,
+      castTime: 0,
+      cooldown: 8,
     });
-    expect(resolve(paladin, 'solar_invocation').def.range).toBe(0);
+    expect(resolve(paladin, 'solar_invocation').def).toMatchObject({
+      range: 30,
+      requiresTarget: true,
+      targetType: 'friendly',
+    });
     expect(resolve(paladin, 'solar_invocation').effects).toEqual([
-      { type: 'aoeHeal', min: 180, max: 220, radius: 40, playersOnly: true },
+      { type: 'heal', min: 180, max: 220 },
     ]);
     expect(resolve(paladin, 'hammer_of_grace').cooldown).toBe(10);
     expect(resolve(paladin, 'hammer_of_light').cooldown).toBe(10);
@@ -526,26 +540,36 @@ describe('Paladin support abilities', () => {
     expect(Math.hypot(sim.player.pos.x - before.x, sim.player.pos.z - before.z)).toBeGreaterThan(0);
   });
 
-  it('heals allied players with Solar Invocation but excludes allied pets', () => {
+  it('heals one target with Solar Invocation and splashes around that target in Ascension', () => {
     const sim = new Sim({ seed: 131, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.setSpec('holy');
-    const allyId = sim.addPlayer('priest', 'Solar Ally');
-    sim.setPlayerLevel(20, allyId);
-    const ally = sim.entities.get(allyId);
-    if (!ally) throw new Error('missing allied player');
-    ally.pos = { ...sim.player.pos };
-    ally.hp = 1;
+    const primaryId = sim.addPlayer('priest', 'Solar Primary');
+    const nearbyId = sim.addPlayer('warrior', 'Solar Nearby');
+    const casterSideId = sim.addPlayer('mage', 'Solar Caster Side');
+    const primary = sim.entities.get(primaryId);
+    const nearby = sim.entities.get(nearbyId);
+    const casterSide = sim.entities.get(casterSideId);
+    if (!primary || !nearby || !casterSide) throw new Error('missing Solar Invocation ally');
+    primary.pos.x = sim.player.pos.x + 20;
+    nearby.pos.x = sim.player.pos.x + 25;
+    casterSide.pos.x = sim.player.pos.x + 2;
+    for (const ally of [primary, nearby, casterSide]) ally.hp = 1;
 
-    const pet = createMob(9102, MOBS.ridge_stalker, 20, { ...sim.player.pos });
-    pet.ownerId = sim.player.id;
-    pet.hp = 1;
-    (sim as unknown as { addEntity(entity: Entity): void }).addEntity(pet);
+    run(sim, primary, resolve(sim, 'solar_invocation'));
+    expect(primary.hp).toBeGreaterThan(1);
+    expect(nearby.hp).toBe(1);
+    expect(casterSide.hp).toBe(1);
 
-    run(sim, null, resolve(sim, 'solar_invocation'));
+    for (const ally of [primary, nearby, casterSide]) ally.hp = 1;
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+    run(sim, primary, resolve(sim, 'solar_invocation'));
 
-    expect(ally.hp).toBeGreaterThan(1);
-    expect(pet.hp).toBe(1);
+    expect(primary.hp).toBeGreaterThan(1);
+    expect(nearby.hp).toBeGreaterThan(1);
+    expect(casterSide.hp).toBe(1);
+    expect(sim.player.paladinDevotion?.ascensionCharges).toBe(4);
   });
 
   it('stacks Devotion Aura by source in the real damage pipeline', () => {

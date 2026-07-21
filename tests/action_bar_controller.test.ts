@@ -76,7 +76,14 @@ describe('ActionBarController form persistence', () => {
   it('keeps Paladin aura choices on the stance-style row instead of auto-placing them', () => {
     const { controller } = makeHarness(
       'paladin',
-      ['devotion_ward', 'retribution_aura', 'solar_step'],
+      [
+        'devotion_ward',
+        'radiant_devotion',
+        'dawn_devotion',
+        'grace_devotion',
+        'retribution_aura',
+        'solar_step',
+      ],
       bar(),
     );
 

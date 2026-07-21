@@ -990,7 +990,7 @@ const classAbilityNamesEn = {
       [
         'solar_invocation',
         'Solar Invocation',
-        'Call upon the Light to heal all allied players within 40 m for {damage}.',
+        'Instantly heal a friendly target for {damage}. Effective healing generates 1 Devotion. During Ascension, also heal allied players within 10 m of the target for half as much.',
       ],
       [
         'radiant_devotion',
@@ -1040,7 +1040,7 @@ const classAbilityNamesEn = {
       [
         'mercy_lance',
         'Mercy Lance',
-        'Heal an ally or damage an enemy for {damage} and generate 1 Devotion. Ascension also heals a nearby ally when used to heal.',
+        'Heal an ally or damage an enemy for {damage}. Effective healing generates 1 Devotion. Ascension also heals a nearby ally when used to heal.',
       ],
       [
         'sacred_form',
@@ -1075,7 +1075,7 @@ const classAbilityNamesEn = {
       [
         'bastion_rite',
         'Bastion Rite',
-        'Reduce physical damage taken by 20% for 6 sec and generate 1 Devotion. Ascension extends the duration to 10 sec.',
+        'Reduce physical damage taken by 20% for 6 sec. Ascension extends the duration to 10 sec.',
       ],
       [
         'sunward_disc',

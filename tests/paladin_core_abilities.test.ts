@@ -105,6 +105,7 @@ describe('Paladin core abilities', () => {
     expect(enemyEvents).toContainEqual(
       expect.objectContaining({ type: 'damage', targetId: enemy.id }),
     );
+    expect(sim.player.paladinDevotion?.value).toBe(0);
     expect(enemyEvents).not.toContainEqual(
       expect.objectContaining({ type: 'heal2', targetId: enemy.id }),
     );
@@ -130,6 +131,20 @@ describe('Paladin core abilities', () => {
         impact: 'healing',
       }),
     );
+    expect(sim.player.paladinDevotion?.value).toBe(1);
+  });
+
+  it('lets Holy generate Devotion by unleashing an active Seal with Judgement', () => {
+    const sim = new Sim({ seed: 39, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const enemy = hostileNear(sim);
+
+    run(sim, null, resolve(sim, 'seal_of_righteousness'));
+    run(sim, enemy, resolve(sim, 'judgement'));
+
+    expect(enemy.hp).toBeLessThan(enemy.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(1);
   });
 
   it('refuses Divine Ascension before 20 Devotion and activates it when ready', () => {
@@ -175,7 +190,7 @@ describe('Paladin core abilities', () => {
     run(sim, null, resolve(sim, 'bastion_rite'));
     const during = warriorMeleeDefense(sim.player, mob);
     expect(during).toEqual({ parryChance: 0, blockChance: 0.25 });
-    expect(sim.player.paladinDevotion?.value).toBe(1);
+    expect(sim.player.paladinDevotion?.value).toBe(0);
   });
 
   it('generates Protection Devotion from actual blocks with an internal cooldown', () => {
@@ -256,6 +271,17 @@ describe('Paladin core abilities', () => {
     });
     expect(resolve(holy, 'radiant_chorus').effects).toEqual([
       { type: 'aoeHeal', min: 108, max: 132, radius: 40 },
+    ]);
+    expect(resolve(holy, 'solar_invocation').effects).toEqual([
+      { type: 'heal', min: 180, max: 220 },
+      {
+        type: 'aoeHeal',
+        min: 90,
+        max: 110,
+        radius: 10,
+        playersOnly: true,
+        centerOnTarget: true,
+      },
     ]);
     expect(resolve(holy, 'guardian_covenant').effects).toEqual([
       { type: 'buffTarget', kind: 'buff_dr', value: 0.3, duration: 8 },

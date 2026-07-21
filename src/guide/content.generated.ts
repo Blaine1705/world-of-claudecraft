@@ -586,10 +586,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Burning Oath"
       },
       {
-        "id": "retribution_aura",
-        "name": "Requital Aura"
-      },
-      {
         "id": "rebuke",
         "name": "Reproach"
       },
@@ -616,6 +612,22 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "devotion_ward",
         "name": "Devotion Aura"
+      },
+      {
+        "id": "radiant_devotion",
+        "name": "Radiant Devotion"
+      },
+      {
+        "id": "dawn_devotion",
+        "name": "Dawn Devotion"
+      },
+      {
+        "id": "grace_devotion",
+        "name": "Grace Devotion"
+      },
+      {
+        "id": "retribution_aura",
+        "name": "Requital Aura"
       },
       {
         "id": "hammer_of_grace",
