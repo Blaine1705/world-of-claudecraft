@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest';
 const PALADIN_CORE_ICON_IDS = [
   'divine_ascension',
   'hushbrand',
-  'unbinding_blessing',
   'guardian_covenant',
   'devotion_ward',
   'solar_step',
@@ -30,7 +29,6 @@ const PALADIN_CORE_ICON_IDS = [
   'bastion_rite',
   'sunward_disc',
   'sacred_challenge',
-  'citadel_of_faith',
 ] as const;
 
 describe('Paladin core icon identity', () => {

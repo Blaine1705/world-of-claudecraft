@@ -7063,17 +7063,13 @@ export const ja_JP: EnTranslations = {
         "name": "静寂の刻印",
         "description": "呪文詠唱を中断し、同じ系統の呪文を4秒間使用不能にする。"
       },
-      "unbinding_blessing": {
-        "name": "解放の祝福",
-        "description": "味方1体の移動速度低下と移動不能効果を解除する。"
-      },
       "guardian_covenant": {
         "name": "守護の盟約",
         "description": "味方1体を守り、受けるダメージを20%軽減する。8秒間持続する。"
       },
       "solar_step": {
         "name": "陽光の歩み",
-        "description": "2秒間、高速で前進する。方向転換はできるが、途中で前進を止めることはできない。"
+        "description": "2秒間、移動速度が150%上昇します。"
       },
       "solar_invocation": {
         "name": "陽光の祈願",
@@ -7155,10 +7151,6 @@ export const ja_JP: EnTranslations = {
         "name": "聖なる挑戦",
         "description": "敵1体に自身を攻撃させる。昇華中は力を消費せず、さらに受けるすべてのダメージを4秒間15%軽減する。"
       },
-      "citadel_of_faith": {
-        "name": "信仰の城塞",
-        "description": "受けるすべてのダメージを40%軽減する。10秒間持続する。"
-      },
       "devotion_aura": {
         "name": "不動のオーラ",
         "description": "30分間、アーマーが{buff}増加します。"
@@ -7197,7 +7189,7 @@ export const ja_JP: EnTranslations = {
       },
       "consecration": {
         "name": "聖なる大地",
-        "description": "足元の地面を聖別し、10秒間、周囲の敵を焼いて2秒ごとに{damage}の神聖ダメージを与えます。"
+        "description": "足元の地面を9秒間聖別し、毎秒、周囲の敵に{damage}の神聖ダメージを与えて高い脅威を発生させます。最初の命中で信仰を1生成します。防護パラディンは範囲内にいる間、受けるダメージが5%減少します。昇華中はダメージと範囲が増加します。"
       },
       "bastion_sweep": {
         "name": "砦の薙ぎ払い",
@@ -7205,7 +7197,7 @@ export const ja_JP: EnTranslations = {
       },
       "oath_chain": {
         "name": "誓約の鎖",
-        "description": "遠くの敵を聖なる鎖で縛って3メートル以内へ引き寄せ、4秒間50%減速させます。この補助効果は昇華で強化されません。"
+        "description": "遠くの敵を聖なる鎖で縛って3メートル以内へ引き寄せ、4秒間50%減速させます。昇華中は近くの敵をもう1体引き寄せます。"
       },
       "righteous_fury": {
         "name": "バーニングオース",

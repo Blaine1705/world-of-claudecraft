@@ -133,13 +133,6 @@
       "confidence": "high"
     },
     {
-      "abilityId": "unbinding_blessing",
-      "name": "Unbinding Blessing",
-      "sourceFile": "OpenAI image generation, original project artwork",
-      "output": "unbinding_blessing.webp",
-      "confidence": "high"
-    },
-    {
       "abilityId": "guardian_covenant",
       "name": "Guardian Covenant",
       "sourceFile": "OpenAI image generation, original project artwork",
@@ -291,13 +284,6 @@
       "name": "Sacred Goad",
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "sacred_challenge.webp",
-      "confidence": "high"
-    },
-    {
-      "abilityId": "citadel_of_faith",
-      "name": "Citadel of Faith",
-      "sourceFile": "OpenAI image generation, original project artwork",
-      "output": "citadel_of_faith.webp",
       "confidence": "high"
     },
     {

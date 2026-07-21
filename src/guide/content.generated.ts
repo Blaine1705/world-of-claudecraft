@@ -630,10 +630,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Hushbrand"
       },
       {
-        "id": "unbinding_blessing",
-        "name": "Unbinding Blessing"
-      },
-      {
         "id": "guardian_covenant",
         "name": "Guardian Covenant"
       },
@@ -724,10 +720,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "oath_chain",
         "name": "Oath Chain"
-      },
-      {
-        "id": "citadel_of_faith",
-        "name": "Citadel of Faith"
       }
     ],
     "model": "player_paladin",

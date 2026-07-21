@@ -67,6 +67,7 @@ import {
 } from './fire_mage';
 import { cleanupPaladinAegis } from './paladin_aegis';
 import { stripBeaconOfLight } from './paladin_beacon';
+import { protectionConsecrationDamageReduction } from './paladin_consecration';
 import { stripPaladinDevotionsFromSource } from './paladin_support';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
@@ -272,7 +273,7 @@ export function dealDamage(
   }
 
   if (source && source.id !== target.id && amount > 0) {
-    let reduction = 0;
+    let reduction = protectionConsecrationDamageReduction(ctx.groundAoEs, target);
     for (const aura of target.auras) {
       if (aura.kind === 'buff_dr' || aura.kind === 'die_by_sword') reduction += aura.value;
     }

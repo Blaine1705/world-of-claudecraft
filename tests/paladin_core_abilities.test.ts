@@ -257,6 +257,9 @@ describe('Paladin core abilities', () => {
     expect(resolve(holy, 'radiant_chorus').effects).toEqual([
       { type: 'aoeHeal', min: 108, max: 132, radius: 40 },
     ]);
+    expect(resolve(holy, 'guardian_covenant').effects).toEqual([
+      { type: 'buffTarget', kind: 'buff_dr', value: 0.3, duration: 8 },
+    ]);
 
     const protection = new Sim({ seed: 43, playerClass: 'paladin', autoEquip: true });
     protection.setPlayerLevel(20);
@@ -281,9 +284,6 @@ describe('Paladin core abilities', () => {
       { type: 'directDamage', min: 117, max: 143 },
       { type: 'chainDamage', min: 78, max: 98, jumps: 5, falloff: 1, radius: 10 },
     ]);
-    expect(resolve(protection, 'guardian_covenant').effects).toEqual([
-      { type: 'buffTarget', kind: 'buff_dr', value: 0.3, duration: 8 },
-    ]);
     expect(resolve(protection, 'bastion_sweep').effects).toEqual([
       { type: 'aoeDamage', min: 94, max: 114, radius: 8, softCap: 5 },
     ]);
@@ -301,6 +301,15 @@ describe('Paladin core abilities', () => {
         duration: 9,
         interval: 1,
         devotionOnFirstHit: 1,
+      },
+    ]);
+    expect(resolve(protection, 'oath_chain').effects).toEqual([
+      {
+        type: 'pullTarget',
+        stopDistance: 3,
+        slowMult: 0.5,
+        slowDuration: 4,
+        maxTargets: 2,
       },
     ]);
 

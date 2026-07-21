@@ -7063,17 +7063,13 @@ export const tr_TR: EnTranslations = {
         "name": "Hushbrand",
         "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
       },
-      "unbinding_blessing": {
-        "name": "Unbinding Blessing",
-        "description": "Removes movement-slowing and rooting effects from a friendly target."
-      },
       "guardian_covenant": {
         "name": "Guardian Covenant",
         "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
       },
       "solar_step": {
         "name": "Solar Step",
-        "description": "Surge forward at high speed for 2 sec. You can steer, but the forward movement cannot be stopped early."
+        "description": "Increase your movement speed by 150% for 2 sec."
       },
       "solar_invocation": {
         "name": "Solar Invocation",
@@ -7149,15 +7145,11 @@ export const tr_TR: EnTranslations = {
       },
       "sunward_disc": {
         "name": "Sunward Disc",
-        "description": "Hurl a radiant disc that strikes and bounces to 2 enemies, generating 2 Devotion. Ascension empowers 5 bounces."
+        "description": "Requires a shield. Hurl a radiant disc that strikes and bounces to 2 enemies, generating 2 Devotion. Ascension empowers 5 bounces."
       },
       "sacred_challenge": {
         "name": "Sacred Goad",
         "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
-      },
-      "citadel_of_faith": {
-        "name": "Citadel of Faith",
-        "description": "Reduce all damage taken by 40% for 10 sec."
       },
       "devotion_aura": {
         "name": "Sarsılmaz Aura",
@@ -7205,7 +7197,7 @@ export const tr_TR: EnTranslations = {
       },
       "oath_chain": {
         "name": "Oath Chain",
-        "description": "Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. This utility is not empowered by Ascension."
+        "description": "Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. During Ascension it pulls a second nearby enemy."
       },
       "righteous_fury": {
         "name": "Yanan Yemin",

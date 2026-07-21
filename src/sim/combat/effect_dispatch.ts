@@ -101,7 +101,8 @@ import { armHeroicLeap, relocateSwept } from './heroic_leap';
 import { spawnHunterTrap } from './hunter_trap';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
 import { placeBeaconOfLight } from './paladin_beacon';
-import { pullPaladinTarget, pulsePaladinThreat } from './paladin_control';
+import { PROTECTION_CONSECRATION_DAMAGE_REDUCTION } from './paladin_consecration';
+import { pullPaladinTargets, pulsePaladinThreat } from './paladin_control';
 import { PALADIN_DEVOTION_ABILITY_IDS, paladinDevotionConflicts } from './paladin_support';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
@@ -1343,10 +1344,12 @@ export function runEffects(
       }
       case 'pullTarget': {
         if (!target || target.dead) break;
-        pullPaladinTarget(
+        pullPaladinTargets(
           ctx,
           p,
           target,
+          eff.maxTargets ?? 1,
+          ability.range,
           eff.stopDistance,
           eff.slowMult,
           eff.slowDuration,
@@ -1701,7 +1704,14 @@ export function runEffects(
           devotionOnFirstHit: eff.devotionOnFirstHit,
           consecration:
             ability.id === 'consecration'
-              ? { id: `consecration:${p.id}:${ctx.tickCount}`, duration: eff.duration }
+              ? {
+                  id: `consecration:${p.id}:${ctx.tickCount}`,
+                  duration: eff.duration,
+                  protectionDamageReduction:
+                    mods.spec === 'protection'
+                      ? PROTECTION_CONSECRATION_DAMAGE_REDUCTION
+                      : undefined,
+                }
               : undefined,
         };
         // A fresh Blizzard zone gets a fresh Frozen Orb refund budget (the

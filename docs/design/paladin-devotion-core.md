@@ -20,24 +20,23 @@ seconds. Only explicitly marked abilities consume a charge, at most one charge p
 The state ends when all five charges are spent or the timer expires. Generation continues
 during Ascension but its bank is capped at 10 Devotion.
 
-## Shared class abilities
+## Core class abilities
 
 | English / Spanish | Function and normal effect | Devotion | Cooldown, cast, GCD | Range | Ascension interaction | Suggested visual and use |
 | --- | --- | ---: | --- | ---: | --- | --- |
 | Divine Ascension / Ascensión Divina | Starts the empowered state at 20 Devotion. No mana cost. | Consumes 20 | No cooldown, instant, off GCD | Self | Grants 5 charges for 25 sec. | A vertical gold-white flare, brighter armor edges, and five orbiting sigils. Activate before the situation where its flexible charges matter. |
 | Mending Light / Luz Reparadora | Basic directed heal. At rank 4 it heals for 190 to 222 and costs 55 mana. | Holy: 1 on effective healing. Other specs: 0. | No cooldown, 2.5 sec cast, GCD | 30 yd | Never consumes a charge and is not empowered. | A narrow beam that gathers into the ally. Holy filler when stronger heals are unnecessary. |
-| Hushbrand / Marca Silente | Interrupts a cast and locks its school for 4 sec. No mana cost. | 0 | 15 sec, instant, off GCD | 5 yd | Never consumes a charge. | A brief sealed rune over the enemy's mouth or casting focus. Reactive interrupt. |
-| Unbinding Blessing / Bendición Liberadora | Removes roots and movement slows. Costs 30 mana. | 0 | 25 sec, instant, GCD | 30 yd | Never consumes a charge. | Golden bindings snap and dissolve. Save for meaningful control rather than routine slows. |
-| Guardian Covenant / Pacto Guardián | Reduces an ally's damage taken by 20% for 8 sec. Costs 35 mana. | 0 | 45 sec, instant, off GCD | 30 yd | Protection only: marked, consumes 1 charge, and increases reduction to 30%. | A linked shield-rune between Paladin and ally. Use before predictable ally damage. |
-| Solar Step / Paso Solar | Commits to a steerable forward rush at 250% speed for 2 sec. Costs 20 mana. | 0 | 30 sec, instant, GCD | Self | Never consumes a charge. | A sustained solar trail replaces the old instant displacement. Collision, slopes, and walls remain authoritative. |
-| Recall the Fallen / Retorno de los Caídos | Out-of-combat resurrection at 35% health and mana. Costs 60 mana. | 0 | No cooldown, 8 sec cast, GCD | 30 yd | Never consumes a charge. | A quiet column of dawnlight that reforms the ally. Group recovery only. |
+| Hushbrand / Marca Silente | Protection and Retribution only. Interrupts a cast and locks its school for 4 sec. No mana cost. | 0 | 15 sec, instant, off GCD | 5 yd | Never consumes a charge. | A brief sealed rune over the enemy's mouth or casting focus. Reactive interrupt. |
+| Guardian Covenant / Pacto Guardián | Holy only. Reduces an ally's damage taken by 20% for 8 sec. Costs 35 mana. | 0 | 45 sec, instant, off GCD | 30 yd | Marked, consumes 1 charge, and increases reduction to 30%. | A linked shield-rune between Paladin and ally. Use before predictable ally damage. |
+| Solar Step / Paso Solar | All specializations. Increases movement speed by 150% for 2 sec without forcing movement. Costs 20 mana. | 0 | 30 sec, instant, GCD | Self | Never consumes a charge. | A sustained solar trail follows the Paladin while moving. Collision, slopes, and walls remain authoritative. |
+| Recall the Fallen / Retorno de los Caídos | Holy only. Out-of-combat resurrection at 35% health and mana. Costs 60 mana. | 0 | No cooldown, 8 sec cast, GCD | 30 yd | Never consumes a charge. | A quiet column of dawnlight that reforms the ally. Group recovery only. |
 
 ### Additional shared abilities
 
 | Ability | First-pass behavior |
 | --- | --- |
 | Devotion Ward | Reduces damage taken by 5% for 30 min. Five percent is the initial value because several Paladins can stack their independently owned Devotions. |
-| Solar Invocation | Two second cast, 90 sec cooldown, 80 mana. Heals every allied player within 40 yd for 180 to 220 before scaling and critical hits. |
+| Solar Invocation | Holy only. Two second cast, 90 sec cooldown, 80 mana. Heals every allied player within 40 yd for 180 to 220 before scaling and critical hits. |
 | Hammer of Grace | 110% weapon strike plus 28. Restores 70 mana only when it connects. |
 | Hammer of Light | 110% weapon strike plus 28. Heals the Paladin for 50% of actual damage dealt and cannot crit as a second healing event. |
 | Sacred Form | Holy only. For 30 min, increases healing by 10%, spell critical chance by 5%, and multiplies generated threat by 0.5. |
@@ -105,16 +104,13 @@ parry.
 | --- | --- | ---: | --- | ---: | --- | --- |
 | Vowkeeper Strike / Golpe del Custodio | Main attack for weapon damage plus 21 with 3x threat. No mana cost. | 1 on hit | 5 sec, instant, GCD | Melee | Marked. Consumes 1 charge and grants a shield equal to 6% maximum health for 6 sec. | A shield-shaped spark remains on the Paladin after impact. Main threat generator and mixed offense-defense charge use. |
 | Bastion Rite / Rito del Bastión | Reduces physical damage by 20% and adds 20% block chance for 6 sec. Costs 20 mana. | 1 on use | 10 sec, instant, GCD | Self | Marked. Consumes 1 charge and extends both effects to 10 sec. | A broad geometric ward forms in front of the equipped shield. Maintain around dangerous melee sequences rather than blindly on cooldown. |
-| Sunward Disc / Disco Solar | Initial hit for 90 to 110 and two bounces for 60 to 75, all with 3x threat. Costs 25 mana. | 2 on hit | 10 sec, instant, GCD | 30 yd | Marked. Consumes 1 charge, increases damage by 30%, and permits five bounces. | A spinning sun-disc leaves a readable arc between targets. Ranged pickup and primary group-threat charge use. |
+| Sunward Disc / Disco Solar | Requires a shield. Initial hit for 90 to 110 and two bounces for 60 to 75, all with 3x threat. Costs 25 mana. | 2 on hit | 10 sec, instant, GCD | 30 yd | Marked. Consumes 1 charge, increases damage by 30%, and permits five bounces. | A spinning sun-disc leaves a readable arc between targets. Ranged pickup and primary group-threat charge use. |
 | Sacred Challenge / Desafío Sagrado | Taunts an enemy. No mana cost. | 0 | 10 sec, instant, off GCD | 30 yd | Improved during Ascension but never consumes a charge. Also grants 15% damage reduction for 4 sec. | A pillar and oath-chain mark the challenged enemy. Recover threat or brace for a forced attack. |
-| Citadel of Faith / Ciudadela de Fe | Reduces all damage taken by 40% for 10 sec. No mana cost. | 0 | 120 sec, instant, off GCD | Self | Never consumes a charge. | A large stationary citadel outline surrounds the Paladin. Major defensive for planned lethal pressure. |
 
 Defensive priority: keep Vowkeeper Strike cycling for threat, use Sunward Disc to collect
 or control groups, and time Bastion Rite around physical pressure. Successful blocks grant
 1 Devotion at most once every 6 seconds. Sacred Challenge recovers enemies and becomes a
-small no-charge defensive during Ascension. Guardian Covenant protects an ally and can use
-an Ascension charge for stronger reduction. Citadel of Faith is the independent emergency
-cooldown.
+small no-charge defensive during Ascension.
 
 ## Expected cadence
 

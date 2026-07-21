@@ -19,15 +19,15 @@ export type PaladinSpec = 'holy' | 'protection' | 'retribution';
 export type AscensionImpactKind = 'healing' | 'defensive' | 'offensive' | 'area';
 
 const ASCENSION_ABILITIES: Readonly<Record<PaladinSpec, ReadonlySet<string>>> = {
-  holy: new Set(['mercy_lance', 'dawns_embrace', 'radiant_chorus']),
+  holy: new Set(['mercy_lance', 'dawns_embrace', 'radiant_chorus', 'guardian_covenant']),
   protection: new Set([
     'vowkeeper_strike',
     'bastion_rite',
     'sunward_disc',
-    'guardian_covenant',
     'bastion_sweep',
     'holy_shield',
     'consecration',
+    'oath_chain',
   ]),
   retribution: new Set([
     'oathstrike',
@@ -154,7 +154,8 @@ export function ascensionImpactKind(
   return abilityId === 'dawnfall' ||
     abilityId === 'final_edict' ||
     abilityId === 'bastion_sweep' ||
-    abilityId === 'consecration'
+    abilityId === 'consecration' ||
+    abilityId === 'oath_chain'
     ? 'area'
     : 'offensive';
 }
@@ -232,6 +233,8 @@ export function resolveAscensionAbility(
         return effect;
       case 'guardian_covenant':
         return effect.type === 'buffTarget' ? { ...effect, value: 0.3 } : effect;
+      case 'oath_chain':
+        return effect.type === 'pullTarget' ? { ...effect, maxTargets: 2 } : effect;
       default:
         return effect;
     }

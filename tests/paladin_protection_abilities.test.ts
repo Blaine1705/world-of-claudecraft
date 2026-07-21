@@ -98,6 +98,41 @@ describe('Paladin Protection abilities', () => {
     expect(target.hp).toBeLessThan(afterPull);
   });
 
+  it('pulls two enemies with Oath Chain during Ascension', () => {
+    const sim = makeProtection();
+    const first = targetAt(sim, 24);
+    const second = targetAt(sim, 20, 1);
+    const third = targetAt(sim, 24, -4);
+    sim.targetEntity(first.id);
+    grantDevotion(sim.player, 20);
+    sim.castAbility('divine_ascension');
+
+    sim.castAbility('oath_chain');
+
+    expect(first.auras.some((aura) => aura.id === 'oath_chain_slow')).toBe(true);
+    expect(second.auras.some((aura) => aura.id === 'oath_chain_slow')).toBe(true);
+    expect(third.auras.some((aura) => aura.id === 'oath_chain_slow')).toBe(false);
+    expect(sim.player.paladinDevotion?.ascensionCharges).toBe(4);
+  });
+
+  it('requires a shield to cast Sunward Disc', () => {
+    const sim = makeProtection();
+    const target = targetAt(sim, 10);
+    sim.targetEntity(target.id);
+    delete sim.equipment.offhand;
+    delete sim.player.equippedItems.offhand;
+
+    sim.castAbility('sunward_disc');
+    expect(target.hp).toBe(target.maxHp);
+    expect(sim.player.cooldowns.has('sunward_disc')).toBe(false);
+
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+    expect(sim.equipment.offhand).toBe('eastbrook_buckler');
+    sim.castAbility('sunward_disc');
+    expect(target.hp).toBeLessThan(target.maxHp);
+  });
+
   it('Holy Shield requires and spends three Devotion, then grants block and absorb', () => {
     const blocked = makeProtection();
     grantDevotion(blocked.player, 2);
@@ -152,5 +187,29 @@ describe('Paladin Protection abilities', () => {
     );
     expect(outside.threat.get(sim.playerId) ?? 0).toBeLessThanOrEqual(1);
     expect(sim.player.paladinDevotion?.value).toBe(1);
+  });
+
+  it('reduces damage to a Protection Paladin by 5% only while standing in Consecration', () => {
+    const sim = makeProtection();
+    const attacker = targetAt(sim, 2);
+    sim.castAbility('consecration');
+
+    const insideHp = sim.player.hp;
+    sim.ctx.dealDamage(attacker, sim.player, 100, false, 'holy', 'Test', 'hit');
+    expect(insideHp - sim.player.hp).toBe(95);
+
+    sim.player.hp = insideHp;
+    sim.player.pos.z += 9;
+    sim.ctx.dealDamage(attacker, sim.player, 100, false, 'holy', 'Test', 'hit');
+    expect(insideHp - sim.player.hp).toBe(100);
+
+    const retribution = new Sim({ seed: 7172, playerClass: 'paladin', autoEquip: true }) as TestSim;
+    retribution.setPlayerLevel(20);
+    retribution.setSpec('retribution');
+    const retAttacker = targetAt(retribution, 2);
+    retribution.castAbility('consecration');
+    const retHp = retribution.player.hp;
+    retribution.ctx.dealDamage(retAttacker, retribution.player, 100, false, 'holy', 'Test', 'hit');
+    expect(retHp - retribution.player.hp).toBe(100);
   });
 });

@@ -144,13 +144,6 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   if (inp.strafeLeft) mx -= 1;
   if (inp.strafeRight) mx += 1;
 
-  // Solar Step is a committed two-second forward rush. It uses the shared
-  // movement kernel, so walls, slopes, water and online extrapolation agree.
-  if (p.auras.some((a) => a.id === 'solar_step')) {
-    mx = 0;
-    mz = 1;
-  }
-
   const wantsMove = mx !== 0 || mz !== 0 || inp.jump;
   if (wantsMove && p.sitting) deps.standUp(p);
 

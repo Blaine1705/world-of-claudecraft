@@ -982,20 +982,11 @@ const classAbilityNamesEn = {
         'Interrupts spellcasting and prevents spells from that school for 4 sec.',
       ],
       [
-        'unbinding_blessing',
-        'Unbinding Blessing',
-        'Removes movement-slowing and rooting effects from a friendly target.',
-      ],
-      [
         'guardian_covenant',
         'Guardian Covenant',
         'Protects an ally, reducing their damage taken by 20% for 8 sec.',
       ],
-      [
-        'solar_step',
-        'Solar Step',
-        'Surge forward at high speed for 2 sec. You can steer, but the forward movement cannot be stopped early.',
-      ],
+      ['solar_step', 'Solar Step', 'Increase your movement speed by 150% for 2 sec.'],
       [
         'solar_invocation',
         'Solar Invocation',
@@ -1089,14 +1080,13 @@ const classAbilityNamesEn = {
       [
         'sunward_disc',
         'Sunward Disc',
-        'Hurl a radiant disc that strikes and bounces to 2 enemies, generating 2 Devotion. Ascension empowers 5 bounces.',
+        'Requires a shield. Hurl a radiant disc that strikes and bounces to 2 enemies, generating 2 Devotion. Ascension empowers 5 bounces.',
       ],
       [
         'sacred_challenge',
         'Sacred Goad',
         'Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge.',
       ],
-      ['citadel_of_faith', 'Citadel of Faith', 'Reduce all damage taken by 40% for 10 sec.'],
       [
         'devotion_aura',
         'Steadfast Aura',
@@ -1141,7 +1131,7 @@ const classAbilityNamesEn = {
       [
         'consecration',
         'Consecration',
-        'Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Ascension increases damage and radius.',
+        'Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Protection Paladins take 5% less damage while standing inside. Ascension increases damage and radius.',
       ],
       [
         'bastion_sweep',
@@ -1151,7 +1141,7 @@ const classAbilityNamesEn = {
       [
         'oath_chain',
         'Oath Chain',
-        'Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. This utility is not empowered by Ascension.',
+        'Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. During Ascension it pulls a second nearby enemy.',
       ],
       [
         'righteous_fury',

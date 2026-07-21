@@ -7063,17 +7063,13 @@ export const zh_TW: EnTranslations = {
         "name": "靜默烙印",
         "description": "中斷施法，並使該法術學派在 4 秒內無法施放。"
       },
-      "unbinding_blessing": {
-        "name": "解縛祝福",
-        "description": "移除一名友方目標身上的緩速與定身效果。"
-      },
       "guardian_covenant": {
         "name": "守護契約",
         "description": "保護一名盟友，使其受到的傷害降低 20%，持續 8 秒。"
       },
       "solar_step": {
         "name": "日光疾步",
-        "description": "以極高速度向前衝刺 2 秒。你可以轉向，但無法提前停止前進。"
+        "description": "移動速度提高150%，持續2秒。"
       },
       "solar_invocation": {
         "name": "日光祈喚",
@@ -7155,10 +7151,6 @@ export const zh_TW: EnTranslations = {
         "name": "神聖挑戰",
         "description": "迫使一名敵人攻擊你。昇華期間還會使你受到的所有傷害降低 15%，持續 4 秒，且不消耗充能。"
       },
-      "citadel_of_faith": {
-        "name": "信仰堡壘",
-        "description": "使受到的所有傷害降低 40%，持續 10 秒。"
-      },
       "devotion_aura": {
         "name": "堅定光環",
         "description": "使你的護甲提高 {buff}，持續 30 分鐘。"
@@ -7197,7 +7189,7 @@ export const zh_TW: EnTranslations = {
       },
       "consecration": {
         "name": "聖化之地",
-        "description": "奉獻你腳下的土地，持續 10 秒，每 2 秒灼燒附近敵人造成 {damage} 點神聖傷害。"
+        "description": "聖化腳下的土地，持續9秒，每秒對附近敵人造成{damage}點神聖傷害並產生大量威脅值。首次命中產生1點虔誠。防護聖騎士站在範圍內時受到的傷害降低5%。昇華會提高傷害與作用半徑。"
       },
       "bastion_sweep": {
         "name": "壁壘橫掃",
@@ -7205,7 +7197,7 @@ export const zh_TW: EnTranslations = {
       },
       "oath_chain": {
         "name": "誓約鎖鏈",
-        "description": "用神聖鎖鏈束縛遠處的敵人，將其拉至 3 公尺內，並使其減速 50%，持續 4 秒。此輔助效果不受昇華強化。"
+        "description": "用神聖鎖鏈束縛遠處的敵人，將其拉至3公尺內，並使其減速50%，持續4秒。昇華期間還會拉來附近的另一個敵人。"
       },
       "righteous_fury": {
         "name": "燃燒誓言",

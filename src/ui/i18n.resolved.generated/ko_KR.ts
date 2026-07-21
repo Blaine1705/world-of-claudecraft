@@ -7063,17 +7063,13 @@ export const ko_KR: EnTranslations = {
         "name": "침묵의 낙인",
         "description": "주문 시전을 방해하고 같은 계열의 주문을 4초 동안 시전하지 못하게 합니다."
       },
-      "unbinding_blessing": {
-        "name": "해방의 축복",
-        "description": "아군 대상에게 걸린 이동 속도 감소 및 이동 불가 효과를 제거합니다."
-      },
       "guardian_covenant": {
         "name": "수호자의 서약",
         "description": "아군 한 명을 보호하여 받는 피해를 8초 동안 20%만큼 감소시킵니다."
       },
       "solar_step": {
         "name": "태양의 발걸음",
-        "description": "2초 동안 매우 빠른 속도로 전진합니다. 방향은 바꿀 수 있지만 전진을 일찍 멈출 수는 없습니다."
+        "description": "2초 동안 이동 속도가 150% 증가합니다."
       },
       "solar_invocation": {
         "name": "태양의 기원",
@@ -7155,10 +7151,6 @@ export const ko_KR: EnTranslations = {
         "name": "신성한 도전",
         "description": "적 한 명이 자신을 공격하도록 강제합니다. 승천 중에는 충전을 소모하지 않고 받는 모든 피해가 4초 동안 15% 감소합니다."
       },
-      "citadel_of_faith": {
-        "name": "신앙의 성채",
-        "description": "받는 모든 피해를 10초 동안 40%만큼 감소시킵니다."
-      },
       "devotion_aura": {
         "name": "굳건함의 오라",
         "description": "30분 동안 방어도가 {buff}만큼 증가합니다."
@@ -7197,7 +7189,7 @@ export const ko_KR: EnTranslations = {
       },
       "consecration": {
         "name": "신성한 땅",
-        "description": "발밑의 땅을 신성화하여 10초 동안 2초마다 주위 적에게 {damage}의 신성 피해를 입힙니다."
+        "description": "발밑의 땅을 9초 동안 신성화하여 매초 주위 적에게 {damage}의 신성 피해를 입히고 높은 위협을 생성합니다. 첫 적중 시 헌신을 1 생성합니다. 보호 성기사는 범위 안에 있는 동안 받는 피해가 5% 감소합니다. 승천 중에는 피해와 범위가 증가합니다."
       },
       "bastion_sweep": {
         "name": "성채 휩쓸기",
@@ -7205,7 +7197,7 @@ export const ko_KR: EnTranslations = {
       },
       "oath_chain": {
         "name": "서약의 사슬",
-        "description": "멀리 있는 적을 신성한 사슬로 묶어 3미터 안으로 끌어당기고 4초 동안 50% 느려지게 합니다. 이 보조 효과는 승천으로 강화되지 않습니다."
+        "description": "멀리 있는 적을 신성한 사슬로 묶어 3미터 안으로 끌어당기고 4초 동안 50% 느려지게 합니다. 승천 중에는 근처의 적 하나를 추가로 끌어당깁니다."
       },
       "righteous_fury": {
         "name": "불타는 맹세",

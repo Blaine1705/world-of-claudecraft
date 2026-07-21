@@ -38,6 +38,49 @@ export function pullPaladinTarget(
   ctx.enterCombat(source, target);
 }
 
+export function pullPaladinTargets(
+  ctx: SimContext,
+  source: Entity,
+  primary: Entity,
+  maxTargets: number,
+  searchRadius: number,
+  stopDistance: number,
+  slowMult: number,
+  slowDuration: number,
+  abilityId: string,
+  abilityName: string,
+): void {
+  const targets = [primary];
+  if (maxTargets > 1) {
+    const candidates = ctx
+      .hostilesInRadius(source, source.pos, searchRadius)
+      .filter(
+        (candidate) =>
+          candidate.id !== primary.id && !candidate.dead && ctx.hasLineOfSight(source, candidate),
+      )
+      .sort((a, b) => {
+        const adx = a.pos.x - source.pos.x;
+        const adz = a.pos.z - source.pos.z;
+        const bdx = b.pos.x - source.pos.x;
+        const bdz = b.pos.z - source.pos.z;
+        return adx * adx + adz * adz - (bdx * bdx + bdz * bdz) || a.id - b.id;
+      });
+    targets.push(...candidates.slice(0, maxTargets - 1));
+  }
+  for (const target of targets) {
+    pullPaladinTarget(
+      ctx,
+      source,
+      target,
+      stopDistance,
+      slowMult,
+      slowDuration,
+      abilityId,
+      abilityName,
+    );
+  }
+}
+
 export function pulsePaladinThreat(
   ctx: SimContext,
   source: Entity,

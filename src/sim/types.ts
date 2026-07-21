@@ -1959,7 +1959,13 @@ export type AbilityEffect =
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
   | { type: 'consumeDot'; dot: string }
   | { type: 'slow'; mult: number; duration: number }
-  | { type: 'pullTarget'; stopDistance: number; slowMult: number; slowDuration: number }
+  | {
+      type: 'pullTarget';
+      stopDistance: number;
+      slowMult: number;
+      slowDuration: number;
+      maxTargets?: number;
+    }
   | { type: 'threatPulse'; amount: number; radius: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }

@@ -106,7 +106,8 @@ describe('Paladin support abilities', () => {
     expect(ABILITIES.consecration).toMatchObject({
       name: 'Consecration',
       learnLevel: 10,
-      specs: ['protection'],
+      cooldown: 12,
+      specs: ['protection', 'retribution'],
     });
     expect(ABILITIES.consecration.hiddenFromPlayer).not.toBe(true);
     expect(ABILITIES.retribution_aura).toMatchObject({
@@ -118,15 +119,41 @@ describe('Paladin support abilities', () => {
       computeTalentModifiers('paladin', { spec, ranks: {}, choices: {} }, 20);
     const known = (spec: 'protection' | 'holy' | 'retribution') =>
       abilitiesKnownAt('paladin', 20, mods(spec)).map((entry) => entry.def.id);
+    const tankOnly = [
+      'vowkeeper_strike',
+      'bastion_rite',
+      'sunward_disc',
+      'sacred_challenge',
+      'bastion_sweep',
+      'oath_chain',
+    ];
     expect(known('protection')).toEqual(
-      expect.arrayContaining(['sacred_challenge', 'righteous_fury', 'consecration']),
+      expect.arrayContaining([...tankOnly, 'righteous_fury', 'consecration', 'hushbrand']),
     );
-    for (const id of ['sacred_challenge', 'righteous_fury', 'consecration']) {
+    expect(known('retribution')).toEqual(expect.arrayContaining(['consecration', 'hushbrand']));
+    expect(known('holy')).toEqual(
+      expect.arrayContaining([
+        'guardian_covenant',
+        'solar_step',
+        'solar_invocation',
+        'recall_the_fallen',
+      ]),
+    );
+    for (const id of [...tankOnly, 'righteous_fury', 'consecration', 'hushbrand']) {
       expect(known('holy')).not.toContain(id);
     }
-    expect(known('retribution')).not.toContain('consecration');
-    expect(known('retribution')).not.toContain('sacred_challenge');
+    for (const id of tankOnly) {
+      expect(known('retribution')).not.toContain(id);
+    }
+    for (const id of ['guardian_covenant', 'solar_invocation', 'recall_the_fallen']) {
+      expect(known('protection')).not.toContain(id);
+      expect(known('retribution')).not.toContain(id);
+    }
+    expect(known('protection')).toContain('solar_step');
+    expect(known('retribution')).toContain('solar_step');
     expect(known('retribution')).not.toContain('righteous_fury');
+    expect(ABILITIES.unbinding_blessing).toBeUndefined();
+    expect(ABILITIES.citadel_of_faith).toBeUndefined();
   });
 
   it('offers only Devotion Aura and Requital Aura in the current aura family', () => {
@@ -166,6 +193,7 @@ describe('Paladin support abilities', () => {
     expect(resolve(paladin, 'solar_step').effects).toEqual([
       { type: 'selfBuff', kind: 'buff_speed', value: 2.5, duration: 2 },
     ]);
+    expect(paladin.setSpec('holy')).toBe(true);
     expect(resolve(paladin, 'solar_invocation')).toMatchObject({
       castTime: 2,
       cooldown: 90,
@@ -480,7 +508,7 @@ describe('Paladin support abilities', () => {
     expect(sim.player.auras.some((active) => active.id === 'sacred_form')).toBe(false);
   });
 
-  it('drives Solar Step forward even without held movement input', () => {
+  it('lets Solar Step remain stationary until the player supplies movement input', () => {
     const sim = new Sim({ seed: 127, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
     run(sim, null, resolve(sim, 'solar_step'));
@@ -488,17 +516,20 @@ describe('Paladin support abilities', () => {
 
     sim.tick();
 
-    expect(Math.hypot(sim.player.pos.x - before.x, sim.player.pos.z - before.z)).toBeGreaterThan(
-      0.5,
-    );
+    expect(sim.player.pos).toEqual(before);
     expect(sim.player.auras).toContainEqual(
       expect.objectContaining({ id: 'solar_step', kind: 'buff_speed' }),
     );
+
+    sim.moveInput.forward = true;
+    sim.tick();
+    expect(Math.hypot(sim.player.pos.x - before.x, sim.player.pos.z - before.z)).toBeGreaterThan(0);
   });
 
   it('heals allied players with Solar Invocation but excludes allied pets', () => {
     const sim = new Sim({ seed: 131, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
+    sim.setSpec('holy');
     const allyId = sim.addPlayer('priest', 'Solar Ally');
     sim.setPlayerLevel(20, allyId);
     const ally = sim.entities.get(allyId);

@@ -48,6 +48,10 @@ function secondsToTwenty(spec: PaladinSpec): number {
   const sim = new Sim({ seed: 53, playerClass: 'paladin', autoEquip: true });
   sim.setPlayerLevel(20);
   sim.setSpec(spec);
+  if (spec === 'protection') {
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+  }
   sim.tick();
   const player = sim.player;
   let target: Entity;

@@ -98,10 +98,10 @@ describe('paladin Devotion core', () => {
         'vowkeeper_strike',
         'bastion_rite',
         'sunward_disc',
-        'guardian_covenant',
         'bastion_sweep',
         'holy_shield',
         'consecration',
+        'oath_chain',
       ].every((id) => isAscensionEmpoweredAbility('protection', id)),
     ).toBe(true);
     expect(
@@ -110,7 +110,8 @@ describe('paladin Devotion core', () => {
       ),
     ).toBe(true);
     expect(devotionGainForAbility('retribution', 'faithforged_guard')).toBe(0);
-    expect(isAscensionEmpoweredAbility('protection', 'oath_chain')).toBe(false);
+    expect(isAscensionEmpoweredAbility('holy', 'guardian_covenant')).toBe(true);
+    expect(isAscensionEmpoweredAbility('protection', 'guardian_covenant')).toBe(false);
     expect(isAscensionEmpoweredAbility('retribution', 'avenging_wrath')).toBe(false);
     expect(isAscensionEmpoweredAbility('holy', 'holy_light')).toBe(false);
   });

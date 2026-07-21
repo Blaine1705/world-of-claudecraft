@@ -69,7 +69,7 @@ export type GroundAoE = {
   threat?: { flat?: number; mult?: number };
   devotionOnFirstHit?: number;
   devotionGranted?: boolean;
-  consecration?: { id: string; duration: number };
+  consecration?: { id: string; duration: number; protectionDamageReduction?: number };
   // Ring of Frost: annular contact trap state. Its duration uses `remaining`;
   // targets are remembered so standing on or re-entering one ring cannot chain-root.
   frostRing?: {

@@ -7063,17 +7063,13 @@ export const zh_CN: EnTranslations = {
         "name": "静默烙印",
         "description": "打断施法，并使该法术学派在 4 秒内无法施放。"
       },
-      "unbinding_blessing": {
-        "name": "解缚祝福",
-        "description": "移除一个友方目标身上的减速和定身效果。"
-      },
       "guardian_covenant": {
         "name": "守护契约",
         "description": "保护一名盟友，使其受到的伤害降低 20%，持续 8 秒。"
       },
       "solar_step": {
         "name": "日光疾步",
-        "description": "以极高速度向前冲刺 2 秒。你可以转向，但无法提前停止前进。"
+        "description": "移动速度提高150%，持续2秒。"
       },
       "solar_invocation": {
         "name": "日光祈唤",
@@ -7155,10 +7151,6 @@ export const zh_CN: EnTranslations = {
         "name": "神圣挑战",
         "description": "迫使一名敌人攻击你。升华期间还会使你受到的所有伤害降低 15%，持续 4 秒，且不消耗充能。"
       },
-      "citadel_of_faith": {
-        "name": "信仰堡垒",
-        "description": "使受到的所有伤害降低 40%，持续 10 秒。"
-      },
       "devotion_aura": {
         "name": "坚定光环",
         "description": "使你的护甲提高 {buff}，持续 30 分钟。"
@@ -7197,7 +7189,7 @@ export const zh_CN: EnTranslations = {
       },
       "consecration": {
         "name": "神圣领域",
-        "description": "奉献你脚下的土地，持续 10 秒，每 2 秒灼烧附近敌人并造成 {damage} 点神圣伤害。"
+        "description": "圣化脚下的土地，持续9秒，每秒对附近敌人造成{damage}点神圣伤害并产生大量威胁值。首次命中产生1点虔诚。防护圣骑士站在范围内时受到的伤害降低5%。升华会提高伤害和作用半径。"
       },
       "bastion_sweep": {
         "name": "壁垒横扫",
@@ -7205,7 +7197,7 @@ export const zh_CN: EnTranslations = {
       },
       "oath_chain": {
         "name": "誓约锁链",
-        "description": "用神圣锁链束缚远处的敌人，将其拉至 3 米内，并使其减速 50%，持续 4 秒。此辅助效果不受升华强化。"
+        "description": "用神圣锁链束缚远处的敌人，将其拉至3米内，并使其减速50%，持续4秒。升华期间还会拉来附近的另一个敌人。"
       },
       "righteous_fury": {
         "name": "炽燃誓约",

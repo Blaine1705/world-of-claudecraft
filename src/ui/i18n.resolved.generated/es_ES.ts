@@ -7063,17 +7063,13 @@ export const es_ES: EnTranslations = {
         "name": "Marca silente",
         "description": "Interrumpe el lanzamiento e impide usar hechizos de esa escuela durante 4 s."
       },
-      "unbinding_blessing": {
-        "name": "Bendición liberadora",
-        "description": "Elimina los efectos de ralentización e inmovilización de un objetivo aliado."
-      },
       "guardian_covenant": {
         "name": "Pacto guardián",
         "description": "Protege a un aliado y reduce un 20% el daño que recibe durante 8 s."
       },
       "solar_step": {
         "name": "Paso solar",
-        "description": "Avanza hacia delante a gran velocidad durante 2 s. Puedes girar, pero no detener el avance antes de tiempo."
+        "description": "Aumenta tu velocidad de movimiento un 150% durante 2 s."
       },
       "solar_invocation": {
         "name": "Invocación solar",
@@ -7155,10 +7151,6 @@ export const es_ES: EnTranslations = {
         "name": "Aguijón sagrado",
         "description": "Obliga a un enemigo a atacarte. Durante Ascensión también reduce un 15% el daño recibido durante 4 s sin consumir una carga."
       },
-      "citadel_of_faith": {
-        "name": "Ciudadela de fe",
-        "description": "Reduce un 40% el daño recibido durante 10 s."
-      },
       "devotion_aura": {
         "name": "Aura Inquebrantable",
         "description": "Aumenta tu armadura en {buff} durante 30 min."
@@ -7197,7 +7189,7 @@ export const es_ES: EnTranslations = {
       },
       "consecration": {
         "name": "Tierra Sagrada",
-        "description": "Consagra el suelo bajo tus pies y abrasa a los enemigos cercanos por {damage} de daño Sagrado cada 2 s durante 10 s."
+        "description": "Consagra el suelo bajo tus pies durante 9 s e inflige {damage} de daño Sagrado con mucha amenaza cada segundo. El primer impacto genera 1 de Devoción. Los paladines de Protección reciben un 5% menos de daño mientras permanecen dentro. Ascensión aumenta el daño y el radio."
       },
       "bastion_sweep": {
         "name": "Bastion Sweep",
@@ -7205,7 +7197,7 @@ export const es_ES: EnTranslations = {
       },
       "oath_chain": {
         "name": "Oath Chain",
-        "description": "Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. This utility is not empowered by Ascension."
+        "description": "Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. During Ascension it pulls a second nearby enemy."
       },
       "righteous_fury": {
         "name": "Juramento Ardiente",

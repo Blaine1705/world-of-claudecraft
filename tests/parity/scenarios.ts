@@ -759,7 +759,7 @@ function paladinConsecration(): Scenario {
     build: () => new Sim({ seed: 1007, playerClass: 'paladin', autoEquip: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
-      sim.setPlayerLevel(20); // consecration learnLevel 18
+      sim.setPlayerLevel(20); // consecration learnLevel 10
       sim.setSpec('protection');
       const p = sim.player as AnyEntity;
       beef(p);
@@ -3073,7 +3073,7 @@ function c3AuraRunner(): Scenario {
     build: () => new Sim({ seed: 1017, playerClass: 'paladin', autoEquip: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
-      sim.setPlayerLevel(20); // consecration learnLevel 18
+      sim.setPlayerLevel(20); // consecration learnLevel 10
       sim.setSpec('protection');
       const p = sim.player as AnyEntity;
       beef(p);
