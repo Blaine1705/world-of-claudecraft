@@ -3,7 +3,13 @@
 // pure core (ability_vfx_core.ts) for a plan, and drives the EXISTING pooled
 // Vfx primitives with the spec's color and scale. Unknown ability or fx kind:
 // it declines and the renderer's generic school-colored arm runs unchanged.
-import { AbilityVfxBudget, type AbilityVfxPlan, planCast, planImpact } from './ability_vfx_core';
+import {
+  AbilityVfxBudget,
+  type AbilityVfxPlan,
+  abilityVfxColor,
+  planCast,
+  planImpact,
+} from './ability_vfx_core';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { attackAbilityId } from './characters/weapon_attack_style_core';
 
@@ -172,6 +178,14 @@ export class AbilityVfx {
     const spec = ABILITY_VFX_SPECS[abilityId];
     if (!spec) return;
     this.deps.vfx.buffSwirl(ev.targetId, planCast(spec, this.quality, 0).swirlColor);
+  }
+
+  // Spec color for the per-frame cast sparkle of a casting ability, or
+  // undefined to keep the generic school color. Cached parse, zero allocation:
+  // safe to call every frame from the renderer's entity sync.
+  sparkleColorFor(abilityId: string | null | undefined): number | undefined {
+    const spec = abilityId ? ABILITY_VFX_SPECS[abilityId] : undefined;
+    return spec ? abilityVfxColor(spec) : undefined;
   }
 
   // Reserved for time-based per-ability effects (lingering glows). O(1) today.

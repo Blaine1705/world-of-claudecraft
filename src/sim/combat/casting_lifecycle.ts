@@ -1331,6 +1331,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     targetId: target.id,
     school: res.def.school,
     fx: 'projectile',
+    ability: res.def.id,
   });
   // Each channel bolt (e.g. Arcane Missiles) deals its damage on arrival, not on the
   // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).
@@ -1590,6 +1591,7 @@ function applyAbility(
       // A spell may override the flying-bolt visual (e.g. Lightning Bolt draws a
       // jagged electric strike); the projectile MECHANIC below is unchanged.
       fx: ability.projectileFx ?? 'projectile',
+      ability: ability.id,
       ...(isSpell ? {} : { attackAnimation: 'ranged-shot' as const }),
     });
     // The bolt is now in flight: its hit roll and effects resolve when it reaches the

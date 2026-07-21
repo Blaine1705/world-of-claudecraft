@@ -5385,6 +5385,8 @@ export class Renderer {
               ? 'shadow'
               : (ABILITIES[e.castingAbility!]?.school ?? 'arcane'),
           dt,
+          // per-ability spec color when the casting ability has one
+          this.abilityVfx.sparkleColorFor(e.castingAbility),
         );
       }
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {

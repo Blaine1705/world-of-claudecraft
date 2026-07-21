@@ -446,6 +446,7 @@ export function runEffects(
                 targetId: target.id,
                 school: ability.school,
                 fx: 'projectile',
+                ability: ability.id,
               });
               scheduleProjectile(ctx, p, target, (src, tgt) => {
                 ctx.dealDamage(
@@ -621,6 +622,7 @@ export function runEffects(
           targetId: ally.id,
           school: 'arcane',
           fx: 'temporalGlyph',
+          ability: ability.id,
         });
         break;
       }
@@ -730,6 +732,7 @@ export function runEffects(
             targetId: chain[i].id,
             school: ability.school,
             fx: 'chainHeal',
+            ability: ability.id,
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
           ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id);
@@ -958,6 +961,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         const fearBreakPct = mods.global.fearBreakPct;
         let feared = 0;
@@ -1042,6 +1046,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'echoBurst',
+          ability: ability.id,
         });
         break;
       }
@@ -1181,6 +1186,7 @@ export function runEffects(
           targetId: target.id,
           school: dot.school,
           fx: 'detonate',
+          ability: ability.id,
         });
         if (remainingDamage > 0) {
           ctx.dealDamage(
@@ -1317,6 +1323,7 @@ export function runEffects(
             targetId: p.id,
             school: ability.school,
             fx: 'nova',
+            ability: ability.id,
           });
         }
         const aoeSpBonus = directHitBonus(
@@ -1472,6 +1479,7 @@ export function runEffects(
             targetId: m.id,
             school: ability.school,
             fx: 'projectile',
+            ability: ability.id,
           });
           let dmg = baseAmount * eff.falloff ** i;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
@@ -1501,6 +1509,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
         const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true);
@@ -1603,6 +1612,7 @@ export function runEffects(
             targetId: p.id,
             school: ability.school,
             fx: 'nova',
+            ability: ability.id,
           });
         }
         // A delayed zone (Meteor's fall) skips the on-cast pulse: its first
@@ -1674,6 +1684,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
@@ -1707,6 +1718,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx,
+          ability: ability.id,
           range: stage.range,
           angle,
           level,
@@ -1979,6 +1991,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'nova',
+          ability: ability.id,
         });
         // Materialize before movement so displacement cannot perturb iteration.
         for (const hostile of [...ctx.hostilesInRadius(p, p.pos, eff.radius)]) {
@@ -2030,6 +2043,7 @@ export function runEffects(
             targetId: p.id,
             school: ability.school,
             fx: 'nova',
+            ability: ability.id,
           });
         }
         // Control-only roots (for example Frost Trap) must not turn spell power
@@ -2196,6 +2210,7 @@ export function runEffects(
           targetId: p.id,
           school: ability.school,
           fx: 'blinkStep',
+          ability: ability.id,
         });
         break;
       }
