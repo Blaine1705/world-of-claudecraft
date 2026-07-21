@@ -294,6 +294,12 @@ export const hudChromeStrings = {
     collapseHint: 'Collapse quest tracker',
     expandHint: 'Expand quest tracker',
   },
+  interfaceTabs: {
+    general: 'General',
+    frames: 'Frames',
+    chat: 'Chat',
+    combat: 'Combat',
+  },
   chatTimestamps: {
     show: 'Show Chat Timestamps',
     format: 'Timestamp Format',
@@ -1044,6 +1050,13 @@ export const hudChromeStrings = {
       fiestaWin: 'Fiesta victory',
     },
   },
+  // Character sheet showcase layout: the two titled stat-panel headings under the
+  // primary attribute tiles. Stat NAMES themselves reuse itemUi.stats.* / the
+  // statInfo.names.* labels below; only these two group headings are new here.
+  charSheet: {
+    offense: 'Offense',
+    defense: 'Defense',
+  },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
   // The breakdown numbers are recomputed live from the player's current stats
@@ -1405,6 +1418,11 @@ export const hudChromeStrings = {
   townFocus: {
     title: 'Town Focus',
     hint: "Focus points add a bonus on top of every component's baseline yield. Unfocused components stay at baseline.",
+    // Phase 12d legibility: the tier-shift rule ({points} = POINTS_PER_TIER_BONUS,
+    // {steps} = MAX_FOCUS_TIER_BONUS) and the town-only rule, always visible.
+    tierHint:
+      'Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.',
+    townOnlyHint: 'Focus can only be changed while you are in town.',
     budgetLabel: 'Points remaining: {remaining} / {budget}',
     saveButton: 'Save Focus',
     notInTownHint: 'You must be in town to set your focus.',
@@ -1504,6 +1522,10 @@ export const hudChromeStrings = {
     // that grid is a derived list, its squares hold no bag position, so honoring the drop
     // would move a stack the player never aimed at. Say so instead of doing nothing.
     reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
+    // Accessible-name arm of the Phase 12d instanced-slot corner marker: the
+    // visual tab is aria-hidden, so the per-copy flag rides the cell's label
+    // (the tooltip on focus stays the detail surface).
+    itemAriaInstanced: '{item}, quantity {count}, maker-marked copy',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -2251,6 +2273,11 @@ export const hudChromeStrings = {
     // harvest is gated by the best owned tool across ALL gathering
     // professions, so no single tool is named).
     toolTierUnmetCorpse: 'You need a tier {tier} gathering tool to recover the finest materials.',
+    // Full-bag signed-grant downgrade toasts (Phase 12d), rendered from the
+    // text-free personal gatherDowngrade SimEvent, one key per lost arm:
+    // 'mark' (the yield arrived unsigned) and 'find' (the jackpot dropped).
+    downgradeMark: "Bags full: the find was stored without its gatherer's mark.",
+    downgradeFind: 'Bags full: a pristine find slipped away.',
     // Tooltip third line: the per-viewer respawn state.
     stateReady: 'Ready',
     stateCooldown: 'Respawning',
@@ -2439,6 +2466,10 @@ export const hudChromeStrings = {
     masterworkZoneLine: '{crafter} crafted a masterwork {name}!',
     tierUpToast: '{craft} advanced to tier {tier}!',
     makersMark: 'Crafted by {name}',
+    // Phase 12d: the gathered-material sibling of makersMark, resolved by item
+    // KIND (item_instance_tooltip.ts isGatheredProvenanceKind); same signer
+    // payload, different wording.
+    gatheredBy: 'Gathered by {name}',
     masterworkSeal: 'Masterwork',
     // Generic enchanted marker: EnchantDef.name has no localized display
     // surface yet, so the tooltip marks the state without naming the enchant.

@@ -353,3 +353,22 @@ destructive rollback strip-refire arm and the second ui letter registry are
 consciously pinned in professions_mastery_reset.test.ts. Phase 13 heads-up:
 the shared throttle gates disenchant/salvage BEFORE their rng draw (unwired
 today).
+
+QA addendum rows (Phase 12c QA, all additive):
+- tests/mastery_reset_rehearsal.test.ts gains the completeness arm (arm 3):
+  flag-absent rows must show every craft/gathering leaf, legacy mirror
+  included, at exactly 0 in the output; a partial reset now fails the
+  synthetic corpus AND the production-copy run instead of tallying as
+  applied.
+- tests/mastery_reset_online.test.ts (NEW suite): the reset and the notice
+  letter through a live GameServer.join plus the restart-relog no-refire
+  arm (the db-mock boilerplate from deeds_reconcile.test.ts).
+- tests/professions_mastery_reset.test.ts gains the re-crossing positive
+  control (a never-earned prog_mining_100 grants fresh on the climb).
+- tests/profession_identity_card.test.ts gains the GOLD_ACCENT_COLOR
+  lockstep pin (tokens.css --gold = the TS twin = #ffd100).
+- scripts/pr_shot_targets.mjs stub values re-staged post-12c-legal
+  (craft 125 at cap; gathering 88/45/100/68 over caps 100/100/100/200) and
+  the six committed after-shots recaptured; the live IWorld path was always
+  correct, the stale stub only misrepresented the UI in the committed
+  screenshots.

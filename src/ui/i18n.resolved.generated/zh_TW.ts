@@ -706,6 +706,12 @@ export const zh_TW: EnTranslations = {
       "collapseHint": "收合任務追蹤器",
       "expandHint": "展開任務追蹤器"
     },
+    "interfaceTabs": {
+      "general": "一般",
+      "frames": "頭像框",
+      "chat": "聊天",
+      "combat": "戰鬥"
+    },
     "chatTimestamps": {
       "show": "顯示聊天時間戳記",
       "format": "時間戳記格式",
@@ -1178,6 +1184,10 @@ export const zh_TW: EnTranslations = {
         "fiestaWin": "嘉年華勝利"
       }
     },
+    "charSheet": {
+      "offense": "攻擊",
+      "defense": "防禦"
+    },
     "statInfo": {
       "fromYour": "來自你的 {value} 點{stat}：",
       "names": {
@@ -1454,6 +1464,8 @@ export const zh_TW: EnTranslations = {
     "townFocus": {
       "title": "城鎮專注",
       "hint": "專注點會在每種材料的基礎產出上疊加加成。未專注的材料保持基礎產出不變。",
+      "tierHint": "每在一種材料上投入{points}點專注，其採集品階就會提升一階，最多提升{steps}階；不足{points}點時仍會提高產出。",
+      "townOnlyHint": "專注只能在城鎮中調整。",
       "budgetLabel": "剩餘點數：{remaining} / {budget}",
       "saveButton": "儲存專注",
       "notInTownHint": "你必須在城鎮中才能設定專注。",
@@ -1512,6 +1524,7 @@ export const zh_TW: EnTranslations = {
       "dragEquipHint": "拖曳到角色身上以裝備",
       "dragDestroyHint": "拖曳到世界中以銷毀",
       "reorderNeedsRecent": "清除篩選並按「最近」排序即可整理背包",
+      "itemAriaInstanced": "{item}，數量 {count}，帶工匠印記的物品",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -2120,6 +2133,8 @@ export const zh_TW: EnTranslations = {
         "herbalism": "你需要{tier}階草藥鐮才能採集這片草藥叢。"
       },
       "toolTierUnmetCorpse": "你需要{tier}階採集工具才能取得最上等的材料。",
+      "downgradeMark": "背包已滿：這份收穫未能留下採集者的印記。",
+      "downgradeFind": "背包已滿：一件完美的收穫溜走了。",
       "stateReady": "可採集",
       "stateCooldown": "恢復中"
     },
@@ -2259,6 +2274,7 @@ export const zh_TW: EnTranslations = {
       "masterworkZoneLine": "{crafter}製作出了傑作{name}！",
       "tierUpToast": "{craft}提升至階級 {tier}！",
       "makersMark": "製作者：{name}",
+      "gatheredBy": "採集者：{name}",
       "masterworkSeal": "傑作",
       "enchantedLine": "已附魔"
     },
@@ -2554,9 +2570,6 @@ export const zh_TW: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
-    },
-    "welcome": {
-      "invalid_input": "輸入無效。"
     }
   },
   "guide": {
@@ -4137,6 +4150,7 @@ export const zh_TW: EnTranslations = {
   "stats": {
     "title": "世界狀態",
     "accountsCreated": "玩家",
+    "charactersCreated": "已創建角色",
     "playersOnline": "線上玩家數",
     "realmName": "世界名稱"
   },
@@ -4170,7 +4184,9 @@ export const zh_TW: EnTranslations = {
     "error": "無法載入更新。請稍後再試。",
     "empty": "目前尚無更新，敬請期待。",
     "prerelease": "搶先版",
-    "viewOnGithub": "在 GitHub 上檢視"
+    "viewOnGithub": "在 GitHub 上檢視",
+    "new": "新",
+    "viewAll": "在 GitHub 上查看全部更新"
   },
   "download": {
     "title": "下載電腦版啟動器",
@@ -5337,29 +5353,6 @@ export const zh_TW: EnTranslations = {
     "heading": "這個世界暫時無法使用。",
     "body": "我們正在重新啟動遊戲服務，Claudemoon 應會很快恢復。此頁面會自動持續檢查。",
     "status": "即將恢復"
-  },
-  "welcome": {
-    "back": "歡迎回來，{name}",
-    "level": "等級 {level}",
-    "lastPlayed": "上次遊玩：{when}",
-    "continue": "進入世界",
-    "continueHint": "按 Enter 繼續，按 Esc 跳過",
-    "continueHintTouch": "點擊繼續",
-    "discord": {
-      "title": "社群活躍在 Discord",
-      "sub": "版本預告、活動、開發者聊天，綁定還可獲得 2 個額外銀行格。",
-      "join": "加入我們的 Discord"
-    },
-    "chest": {
-      "ready": "每日寶箱已就緒"
-    },
-    "armory": {
-      "cta": "進入並瀏覽軍械庫"
-    },
-    "news": {
-      "new": "新",
-      "viewAll": "在 GitHub 上查看全部更新"
-    }
   },
   "hud": {
     "core": {
@@ -8593,6 +8586,129 @@ export const zh_TW: EnTranslations = {
       },
       "elixir_of_the_serpent": {
         "name": "巨蛇藥劑"
+      },
+      "mosshide_vest": {
+        "name": "苔皮背心"
+      },
+      "thornling_grips": {
+        "name": "棘靈護手"
+      },
+      "acolyte_chain_grips": {
+        "name": "侍僧鏈甲護手"
+      },
+      "votive_chain_belt": {
+        "name": "誓願鏈甲腰帶"
+      },
+      "briarroot_staff": {
+        "name": "棘根法杖"
+      },
+      "valefire_lantern": {
+        "name": "谷火燈籠"
+      },
+      "fenbark_leggings": {
+        "name": "沼皮護腿"
+      },
+      "mirebloom_treads": {
+        "name": "泥花軟靴"
+      },
+      "fenwarden_sabatons": {
+        "name": "沼衛鐵靴"
+      },
+      "marshlight_hauberk": {
+        "name": "沼光鎖甲"
+      },
+      "duskthorn_mantle": {
+        "name": "暮棘披肩"
+      },
+      "fenshadow_maul": {
+        "name": "沼影重錘"
+      },
+      "wildgrove_cinch": {
+        "name": "野林束帶"
+      },
+      "cragward_pauldrons": {
+        "name": "岩衛肩甲"
+      },
+      "cragthorn_greatstaff": {
+        "name": "岩棘巨杖"
+      },
+      "moonbark_vestments": {
+        "name": "月皮祭服"
+      },
+      "peaksong_helm": {
+        "name": "峰歌頭盔"
+      },
+      "stormchant_gauntlets": {
+        "name": "風暴詠唱護手"
+      },
+      "cragprowl_belt": {
+        "name": "岩行腰帶"
+      },
+      "stormroot_cowl": {
+        "name": "風根兜帽"
+      },
+      "thunderward_legguards": {
+        "name": "雷衛護腿"
+      },
+      "revenantstep_treads": {
+        "name": "亡魂行靴"
+      },
+      "shardfang_grips": {
+        "name": "片牙護手"
+      },
+      "shardsong_mantle": {
+        "name": "碎片之歌披肩"
+      },
+      "wyrmcult_spellgrips": {
+        "name": "龍教法術護手"
+      },
+      "thornpeak_wildwraps": {
+        "name": "荊峰野性裹手"
+      },
+      "stormvotive_hauberk": {
+        "name": "風暴誓願鎖甲"
+      },
+      "cryptbloom_shoulderguards": {
+        "name": "墓花護肩"
+      },
+      "gravewyrm_thornmaul": {
+        "name": "墓龍棘錘"
+      },
+      "vestments_of_the_waking_grove": {
+        "name": "甦醒林地祭服"
+      },
+      "nightfangs_greatstaff": {
+        "name": "夜牙巨杖"
+      },
+      "maul_of_the_scourged_wilds": {
+        "name": "災野重錘"
+      },
+      "tidehymn_slippers": {
+        "name": "潮詩便鞋"
+      },
+      "pearlward_aegis": {
+        "name": "珍珠守護盾"
+      },
+      "wildgrowth_leggings": {
+        "name": "荒野生長護腿"
+      },
+      "grovewardens_grips": {
+        "name": "林地守護者護手"
+      },
+      "verdant_walkers": {
+        "name": "翠綠行者長靴"
+      },
+      "lunarward_cinch": {
+        "name": "月衛束帶"
+      },
+      "dreamroot_boots": {
+        "name": "夢根長靴"
+      },
+      "stormbark_mantle": {
+        "name": "風暴樹皮披肩"
+      },
+      "wildsoul_maul": {
+        "name": "荒野之魂重錘"
       },
       "conjured_water4": {
         "name": "魔法泉水"

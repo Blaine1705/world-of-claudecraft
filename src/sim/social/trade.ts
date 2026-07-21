@@ -184,17 +184,19 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   // capacity gate: each side must fit what they RECEIVE after what they GIVE
   // leaves their bags (simulated on a scratch copy; nothing moved yet). A
   // receive is not uniformly fungible: grantOffer (below) grants each
-  // instanced copy via addItemInstance, which always takes a fresh slot and
-  // never merges into a plain stack of the same itemId (bags.ts addStacked
-  // skips slots with `.instance`). fitsAll alone assumes every unit of a
-  // receive can stack, which under-predicts slot usage whenever the giver's
-  // stock for that item is (partly) instanced copies, letting a receiver end
-  // up over capacity. Mirror removePreferFungible's own split here: only the
-  // giver's fungible stock can stack on arrival; the rest needs one free slot
-  // each, exactly like the real transfer.
+  // instanced copy via addItemInstance, which merges only into a byte-equal
+  // identical-payload stack with room (Phase 12d) and otherwise takes a fresh
+  // slot, never a plain stack of the same itemId. fitsAll alone assumes every
+  // unit of a receive can stack, which under-predicts slot usage whenever the
+  // giver's stock for that item is (partly) instanced copies, letting a
+  // receiver end up over capacity. Mirror removePreferFungible's own split
+  // here: the giver's fungible stock stacks on arrival; the instanced
+  // remainder transfers from the giver's instanced slots highest-index-first
+  // (removeItem's walk), so model those exact payloads merge-aware against
+  // the scratch bags, exactly like the real transfer.
   const fitsAfterSwap = (
     meta: PlayerMeta,
-    giverPid: number,
+    giver: PlayerMeta,
     gives: InvSlot[],
     receives: InvSlot[],
   ): boolean => {
@@ -202,13 +204,24 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     for (const s of gives) removeStacked(scratch, s.itemId, s.count);
     const capacity = bagCapacity(meta.bags);
     for (const s of receives) {
-      const instancedCount = Math.max(0, s.count - ctx.countFungibleItem(s.itemId, giverPid));
-      const plainCount = s.count - instancedCount;
+      const plainCount = Math.min(s.count, ctx.countFungibleItem(s.itemId, giver.entityId));
       if (plainCount > 0) {
         if (countFit(scratch, capacity, s.itemId, plainCount) < plainCount) return false;
         addStacked(scratch, s.itemId, plainCount);
       }
-      for (let i = 0; i < instancedCount; i++) {
+      let remaining = s.count - plainCount;
+      for (let i = giver.inventory.length - 1; i >= 0 && remaining > 0; i--) {
+        const g = giver.inventory[i];
+        if (g.itemId !== s.itemId || !g.instance) continue;
+        const take = Math.min(g.count, remaining);
+        remaining -= take;
+        if (countFit(scratch, capacity, s.itemId, take, g.instance) < take) return false;
+        addStacked(scratch, s.itemId, take, g.instance);
+      }
+      // Stock the giver's inventory list does not surface (a stubbed store in
+      // tests, or a desynced offer the final validation above already
+      // covered): the conservative one-fresh-slot-per-unit model.
+      for (let i = 0; i < remaining; i++) {
         if (scratch.length >= capacity) return false;
         scratch.push({ itemId: s.itemId, count: 1, instance: {} });
       }
@@ -216,8 +229,8 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     return true;
   };
   if (
-    !fitsAfterSwap(metaA, session.b, session.offerA.items, session.offerB.items) ||
-    !fitsAfterSwap(metaB, session.a, session.offerB.items, session.offerA.items)
+    !fitsAfterSwap(metaA, metaB, session.offerA.items, session.offerB.items) ||
+    !fitsAfterSwap(metaB, metaA, session.offerB.items, session.offerA.items)
   ) {
     for (const tPid of [session.a, session.b])
       ctx.error(tPid, 'Trade failed: not enough bag space.');

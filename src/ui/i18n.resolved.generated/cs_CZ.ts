@@ -706,6 +706,12 @@ export const cs_CZ: EnTranslations = {
       "collapseHint": "Sbalit tracker úkolů",
       "expandHint": "Rozbalit tracker úkolů"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Zobrazit časové značky chatu",
       "format": "Formát časových značek",
@@ -1178,6 +1184,10 @@ export const cs_CZ: EnTranslations = {
         "fiestaWin": "Vítězství ve Fiestě"
       }
     },
+    "charSheet": {
+      "offense": "Offense",
+      "defense": "Defense"
+    },
     "statInfo": {
       "fromYour": "Z tvojí hodnoty {value} {stat}:",
       "names": {
@@ -1454,6 +1464,8 @@ export const cs_CZ: EnTranslations = {
     "townFocus": {
       "title": "Zaměření města",
       "hint": "Body zaměření přidávají bonus nad základní výnos každé součásti. Nezaměřené součásti zůstávají na základní hodnotě.",
+      "tierHint": "Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.",
+      "townOnlyHint": "Focus can only be changed while you are in town.",
       "budgetLabel": "Zbývající body: {remaining} / {budget}",
       "saveButton": "Uložit zaměření",
       "notInTownHint": "Zaměření lze nastavit jen ve městě.",
@@ -1512,6 +1524,7 @@ export const cs_CZ: EnTranslations = {
       "dragEquipHint": "Přetáhni na svou postavu a předmět bude vybaven",
       "dragDestroyHint": "Přetáhni do světa a předmět bude zničen",
       "reorderNeedsRecent": "Zruš filtr a seřaď podle Nedávných, chceš-li přeuspořádat batohy",
+      "itemAriaInstanced": "{item}, quantity {count}, maker-marked copy",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -2120,6 +2133,8 @@ export const cs_CZ: EnTranslations = {
         "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
       },
       "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "downgradeMark": "Bags full: the find was stored without its gatherer's mark.",
+      "downgradeFind": "Bags full: a pristine find slipped away.",
       "stateReady": "Ready",
       "stateCooldown": "Respawning"
     },
@@ -2259,6 +2274,7 @@ export const cs_CZ: EnTranslations = {
       "masterworkZoneLine": "{crafter} vytvořil mistrovské dílo {name}!",
       "tierUpToast": "{craft} postoupilo do úrovně {tier}!",
       "makersMark": "Vytvořil {name}",
+      "gatheredBy": "Gathered by {name}",
       "masterworkSeal": "Mistrovské dílo",
       "enchantedLine": "Okouzlený"
     },
@@ -2554,9 +2570,6 @@ export const cs_CZ: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
-    },
-    "welcome": {
-      "invalid_input": "Neplatný vstup."
     }
   },
   "guide": {
@@ -4137,6 +4150,7 @@ export const cs_CZ: EnTranslations = {
   "stats": {
     "title": "Stav světa",
     "accountsCreated": "Hráči",
+    "charactersCreated": "Characters Created",
     "playersOnline": "Hráči online",
     "realmName": "Název světa"
   },
@@ -4170,7 +4184,9 @@ export const cs_CZ: EnTranslations = {
     "error": "Aktualizace se nepodařilo načíst. Zkus to prosím později znovu.",
     "empty": "Zatím žádné aktualizace - brzy se vrať.",
     "prerelease": "Předběžné vydání",
-    "viewOnGithub": "Zobrazit na GitHubu"
+    "viewOnGithub": "Zobrazit na GitHubu",
+    "new": "Nové",
+    "viewAll": "Zobrazit všechny aktualizace na GitHubu"
   },
   "download": {
     "title": "Stáhnout desktopový launcher",
@@ -5337,29 +5353,6 @@ export const cs_CZ: EnTranslations = {
     "heading": "Svět je dočasně nedostupný.",
     "body": "Restartujeme herní službu a očekáváme, že se Claudemoon brzy vrátí. Tato stránka bude stav automaticky kontrolovat.",
     "status": "Brzy zpět"
-  },
-  "welcome": {
-    "back": "Vítej zpět, {name}",
-    "level": "Úroveň {level}",
-    "lastPlayed": "Naposledy ve hře: {when}",
-    "continue": "Vstoupit do světa",
-    "continueHint": "Enter pro pokračování, Esc pro přeskočení",
-    "continueHintTouch": "Klepnutím pokračuj",
-    "discord": {
-      "title": "Komunita žije na Discordu",
-      "sub": "Ukázky aktualizací, události, chat s vývojáři a 2 bonusové sloty v bance za propojení účtu s Discordem.",
-      "join": "Připojit se na náš Discord"
-    },
-    "chest": {
-      "ready": "Denní truhla je připravená"
-    },
-    "armory": {
-      "cta": "Vstoupit a prohlédnout si Zbrojnici"
-    },
-    "news": {
-      "new": "Nové",
-      "viewAll": "Zobrazit všechny aktualizace na GitHubu"
-    }
   },
   "hud": {
     "core": {
@@ -8593,6 +8586,129 @@ export const cs_CZ: EnTranslations = {
       },
       "elixir_of_the_serpent": {
         "name": "Hadí elixír"
+      },
+      "mosshide_vest": {
+        "name": "Mosshide Vest"
+      },
+      "thornling_grips": {
+        "name": "Thornling Grips"
+      },
+      "acolyte_chain_grips": {
+        "name": "Acolyte Chain Grips"
+      },
+      "votive_chain_belt": {
+        "name": "Votive Chain Belt"
+      },
+      "briarroot_staff": {
+        "name": "Briarroot Staff"
+      },
+      "valefire_lantern": {
+        "name": "Valefire Lantern"
+      },
+      "fenbark_leggings": {
+        "name": "Fenbark Leggings"
+      },
+      "mirebloom_treads": {
+        "name": "Mirebloom Treads"
+      },
+      "fenwarden_sabatons": {
+        "name": "Fenwarden Sabatons"
+      },
+      "marshlight_hauberk": {
+        "name": "Marshlight Hauberk"
+      },
+      "duskthorn_mantle": {
+        "name": "Duskthorn Mantle"
+      },
+      "fenshadow_maul": {
+        "name": "Fenshadow Maul"
+      },
+      "wildgrove_cinch": {
+        "name": "Wildgrove Cinch"
+      },
+      "cragward_pauldrons": {
+        "name": "Cragward Pauldrons"
+      },
+      "cragthorn_greatstaff": {
+        "name": "Cragthorn Greatstaff"
+      },
+      "moonbark_vestments": {
+        "name": "Moonbark Vestments"
+      },
+      "peaksong_helm": {
+        "name": "Peaksong Helm"
+      },
+      "stormchant_gauntlets": {
+        "name": "Stormchant Gauntlets"
+      },
+      "cragprowl_belt": {
+        "name": "Cragprowl Belt"
+      },
+      "stormroot_cowl": {
+        "name": "Stormroot Cowl"
+      },
+      "thunderward_legguards": {
+        "name": "Thunderward Legguards"
+      },
+      "revenantstep_treads": {
+        "name": "Revenantstep Treads"
+      },
+      "shardfang_grips": {
+        "name": "Shardfang Grips"
+      },
+      "shardsong_mantle": {
+        "name": "Shardsong Mantle"
+      },
+      "wyrmcult_spellgrips": {
+        "name": "Wyrmcult Spellgrips"
+      },
+      "thornpeak_wildwraps": {
+        "name": "Thornpeak Wildwraps"
+      },
+      "stormvotive_hauberk": {
+        "name": "Stormvotive Hauberk"
+      },
+      "cryptbloom_shoulderguards": {
+        "name": "Cryptbloom Shoulderguards"
+      },
+      "gravewyrm_thornmaul": {
+        "name": "Gravewyrm Thornmaul"
+      },
+      "vestments_of_the_waking_grove": {
+        "name": "Vestments of the Waking Grove"
+      },
+      "nightfangs_greatstaff": {
+        "name": "Nightfang's Greatstaff"
+      },
+      "maul_of_the_scourged_wilds": {
+        "name": "Maul of the Scourged Wilds"
+      },
+      "tidehymn_slippers": {
+        "name": "Tidehymn Slippers"
+      },
+      "pearlward_aegis": {
+        "name": "Pearlward Aegis"
+      },
+      "wildgrowth_leggings": {
+        "name": "Wildgrowth Leggings"
+      },
+      "grovewardens_grips": {
+        "name": "Grovewarden's Grips"
+      },
+      "verdant_walkers": {
+        "name": "Verdant Walkers"
+      },
+      "lunarward_cinch": {
+        "name": "Lunarward Cinch"
+      },
+      "dreamroot_boots": {
+        "name": "Dreamroot Boots"
+      },
+      "stormbark_mantle": {
+        "name": "Stormbark Mantle"
+      },
+      "wildsoul_maul": {
+        "name": "Wildsoul Maul"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

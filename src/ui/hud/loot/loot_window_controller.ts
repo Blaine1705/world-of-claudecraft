@@ -76,7 +76,11 @@ export class LootWindowController {
       }, t('hudChrome.loot.takeAllTooltip'));
     }
     if (harvestable && componentTags) {
-      renderCorpseHarvestPicker(this.deps.element, corpseHarvestView(componentTags, new Set()), {
+      // Pre-check the caller's town focus: the same subset an omitted-components
+      // harvest resolves server-side (Phase 12d). Deselecting every box still
+      // submits an explicit empty pick, which spreads.
+      const focused = new Set(componentTags.filter((tag) => (world.townFocus[tag] ?? 0) > 0));
+      renderCorpseHarvestPicker(this.deps.element, corpseHarvestView(componentTags, focused), {
         onHarvest: (chosen) => {
           this.deps.world().harvestCorpse(mobId, chosen);
           this.close();

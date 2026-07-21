@@ -1008,6 +1008,29 @@ describe('delta snapshots', () => {
     expect(client.inventory.find((s) => s.itemId === 'apprentice_staff')?.instance).toEqual(legacy);
   });
 
+  it('a counted identical-payload stack (Phase 12d) rides the inv snapshot as one slot', () => {
+    // Three byte-equal signed grants merge server-side into a single count-3
+    // slot; the wire sends the inventory wholesale, so the client mirror must
+    // show the same one slot with the count AND the payload intact (a mirror
+    // that re-split or dropped either would red here).
+    const signed = { signer: 'Testa' };
+    for (let i = 0; i < 3; i++) server.sim.addItemInstance('wolf_fang', signed, session.pid);
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    const wireSlots = snap.self.inv.filter((s: any) => s.itemId === 'wolf_fang');
+    expect(wireSlots).toHaveLength(1);
+    expect(wireSlots[0].count).toBe(3);
+    expect(wireSlots[0].instance).toEqual(signed);
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    const mirrored = client.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(mirrored).toHaveLength(1);
+    expect(mirrored[0].count).toBe(3);
+    expect(mirrored[0].instance).toEqual(signed);
+  });
+
   it('mirrors vendor buyback deltas to the client', () => {
     const wilkes = [...server.sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     const player = server.sim.entities.get(session.pid)!;

@@ -706,6 +706,12 @@ export const ko_KR: EnTranslations = {
       "collapseHint": "퀘스트 추적기 접기",
       "expandHint": "퀘스트 추적기 펼치기"
     },
+    "interfaceTabs": {
+      "general": "일반",
+      "frames": "프레임",
+      "chat": "채팅",
+      "combat": "전투"
+    },
     "chatTimestamps": {
       "show": "채팅 시각 표시",
       "format": "시각 표시 형식",
@@ -1178,6 +1184,10 @@ export const ko_KR: EnTranslations = {
         "fiestaWin": "피에스타 승리"
       }
     },
+    "charSheet": {
+      "offense": "공격",
+      "defense": "방어"
+    },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
@@ -1454,6 +1464,8 @@ export const ko_KR: EnTranslations = {
     "townFocus": {
       "title": "마을 집중",
       "hint": "집중 포인트는 각 재료의 기본 산출량에 보너스를 더합니다. 집중하지 않은 재료는 기본 산출량 그대로 유지됩니다.",
+      "tierHint": "재료 하나에 집중 {points}포인트를 투자할 때마다 채집 등급이 한 단계 오릅니다(최대 {steps}단계). {points}포인트 미만이라도 산출량은 늘어납니다.",
+      "townOnlyHint": "집중은 마을 안에서만 변경할 수 있습니다.",
       "budgetLabel": "남은 포인트: {remaining} / {budget}",
       "saveButton": "집중 저장",
       "notInTownHint": "집중을 설정하려면 마을에 있어야 합니다.",
@@ -1512,6 +1524,7 @@ export const ko_KR: EnTranslations = {
       "dragEquipHint": "캐릭터로 끌어다 놓아 장착",
       "dragDestroyHint": "세계로 끌어내어 파괴",
       "reorderNeedsRecent": "가방을 정리하려면 필터를 해제하고 최근 순으로 정렬하세요",
+      "itemAriaInstanced": "{item}, 수량 {count}, 제작자 표식이 있는 사본",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -2120,6 +2133,8 @@ export const ko_KR: EnTranslations = {
         "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다."
       },
       "toolTierUnmetCorpse": "최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.",
+      "downgradeMark": "가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.",
+      "downgradeFind": "가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.",
       "stateReady": "채집 가능",
       "stateCooldown": "재생성 중"
     },
@@ -2259,6 +2274,7 @@ export const ko_KR: EnTranslations = {
       "masterworkZoneLine": "{crafter}님이 걸작 {name}을(를) 제작했습니다!",
       "tierUpToast": "{craft} 티어 {tier} 달성!",
       "makersMark": "제작자: {name}",
+      "gatheredBy": "채집자: {name}",
       "masterworkSeal": "걸작",
       "enchantedLine": "마법부여됨"
     },
@@ -2554,9 +2570,6 @@ export const ko_KR: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
-    },
-    "welcome": {
-      "invalid_input": "입력이 올바르지 않습니다."
     }
   },
   "guide": {
@@ -4137,6 +4150,7 @@ export const ko_KR: EnTranslations = {
   "stats": {
     "title": "월드 상태",
     "accountsCreated": "플레이어",
+    "charactersCreated": "생성된 캐릭터",
     "playersOnline": "현재 접속자 수",
     "realmName": "월드 이름"
   },
@@ -4170,7 +4184,9 @@ export const ko_KR: EnTranslations = {
     "error": "소식을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
     "empty": "아직 새 소식이 없습니다. 곧 다시 확인해 주세요.",
     "prerelease": "사전 출시",
-    "viewOnGithub": "GitHub에서 보기"
+    "viewOnGithub": "GitHub에서 보기",
+    "new": "신규",
+    "viewAll": "GitHub에서 모든 업데이트 보기"
   },
   "download": {
     "title": "데스크톱 런처 다운로드",
@@ -5337,29 +5353,6 @@ export const ko_KR: EnTranslations = {
     "heading": "월드를 일시적으로 이용할 수 없습니다.",
     "body": "게임 서비스를 재시작하고 있으며 Claudemoon은 곧 돌아올 예정입니다. 이 페이지는 자동으로 계속 확인합니다.",
     "status": "곧 돌아옵니다"
-  },
-  "welcome": {
-    "back": "다시 오신 것을 환영합니다, {name}",
-    "level": "레벨 {level}",
-    "lastPlayed": "마지막 플레이: {when}",
-    "continue": "월드 입장",
-    "continueHint": "Enter로 계속, Esc로 건너뛰기",
-    "continueHintTouch": "탭하여 계속",
-    "discord": {
-      "title": "커뮤니티는 Discord에서 활동합니다",
-      "sub": "패치 미리보기, 이벤트, 개발자 채팅, 연동 시 보너스 은행 슬롯 2개.",
-      "join": "Discord에 참여하기"
-    },
-    "chest": {
-      "ready": "일일 상자 준비 완료"
-    },
-    "armory": {
-      "cta": "무기고 둘러보기"
-    },
-    "news": {
-      "new": "신규",
-      "viewAll": "GitHub에서 모든 업데이트 보기"
-    }
   },
   "hud": {
     "core": {
@@ -8593,6 +8586,129 @@ export const ko_KR: EnTranslations = {
       },
       "elixir_of_the_serpent": {
         "name": "뱀의 비약"
+      },
+      "mosshide_vest": {
+        "name": "이끼가죽 조끼"
+      },
+      "thornling_grips": {
+        "name": "가시령 장갑"
+      },
+      "acolyte_chain_grips": {
+        "name": "수행자 사슬 장갑"
+      },
+      "votive_chain_belt": {
+        "name": "서원 사슬 허리띠"
+      },
+      "briarroot_staff": {
+        "name": "가시뿌리 지팡이"
+      },
+      "valefire_lantern": {
+        "name": "골짜기불 랜턴"
+      },
+      "fenbark_leggings": {
+        "name": "늪껍질 다리보호구"
+      },
+      "mirebloom_treads": {
+        "name": "수렁꽃 장화"
+      },
+      "fenwarden_sabatons": {
+        "name": "늪지기 철장화"
+      },
+      "marshlight_hauberk": {
+        "name": "습지빛 사슬갑옷"
+      },
+      "duskthorn_mantle": {
+        "name": "황혼가시 어깨망토"
+      },
+      "fenshadow_maul": {
+        "name": "늪그림자 철퇴"
+      },
+      "wildgrove_cinch": {
+        "name": "야생숲 허리띠"
+      },
+      "cragward_pauldrons": {
+        "name": "바위수비 어깨갑옷"
+      },
+      "cragthorn_greatstaff": {
+        "name": "바위가시 대지팡이"
+      },
+      "moonbark_vestments": {
+        "name": "달껍질 예복"
+      },
+      "peaksong_helm": {
+        "name": "봉우리노래 투구"
+      },
+      "stormchant_gauntlets": {
+        "name": "폭풍영창 건틀릿"
+      },
+      "cragprowl_belt": {
+        "name": "바위배회 허리띠"
+      },
+      "stormroot_cowl": {
+        "name": "폭풍뿌리 두건"
+      },
+      "thunderward_legguards": {
+        "name": "천둥수호 다리갑옷"
+      },
+      "revenantstep_treads": {
+        "name": "망령발걸음 장화"
+      },
+      "shardfang_grips": {
+        "name": "파편송곳니 장갑"
+      },
+      "shardsong_mantle": {
+        "name": "파편노래 어깨망토"
+      },
+      "wyrmcult_spellgrips": {
+        "name": "용교단 주문장갑"
+      },
+      "thornpeak_wildwraps": {
+        "name": "쏜피크 야생손싸개"
+      },
+      "stormvotive_hauberk": {
+        "name": "폭풍서원 사슬갑옷"
+      },
+      "cryptbloom_shoulderguards": {
+        "name": "무덤꽃 어깨보호구"
+      },
+      "gravewyrm_thornmaul": {
+        "name": "무덤용 가시철퇴"
+      },
+      "vestments_of_the_waking_grove": {
+        "name": "깨어나는 숲의 예복"
+      },
+      "nightfangs_greatstaff": {
+        "name": "밤송곳니의 대지팡이"
+      },
+      "maul_of_the_scourged_wilds": {
+        "name": "재앙 들판의 철퇴"
+      },
+      "tidehymn_slippers": {
+        "name": "물결찬가 슬리퍼"
+      },
+      "pearlward_aegis": {
+        "name": "진주수호 방패"
+      },
+      "wildgrowth_leggings": {
+        "name": "야생성장 다리보호구"
+      },
+      "grovewardens_grips": {
+        "name": "숲지기 장갑"
+      },
+      "verdant_walkers": {
+        "name": "신록의 장화"
+      },
+      "lunarward_cinch": {
+        "name": "달수호 허리띠"
+      },
+      "dreamroot_boots": {
+        "name": "꿈뿌리 장화"
+      },
+      "stormbark_mantle": {
+        "name": "폭풍나무 껍질 망토"
+      },
+      "wildsoul_maul": {
+        "name": "야생영혼 철퇴"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

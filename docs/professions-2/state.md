@@ -1301,12 +1301,94 @@ tables, i18n key namespaces, files created)
   common), deeds_sites (74 to 74.75 staging), deeds + deeds_reconcile
   (curve-era masteryResetApplied fixtures; the pre-curve arm pinned in
   professions_mastery_reset).
-- Phase 12d: (planned) the identical-payload merge rule in bags/bank/
-  addItemInstance, the Gathered by key + bag-grid instanced marker + the
-  signed-downgrade notice event, the unified loot-and-harvest interact
-  flow with the decoupled corpse lifecycle and verified town focus, mail
-  attachment expiry with the return cycle, and the companion fixes
-  (#2139, the rename signer sweep).
+  - Phase 12c QA drift notes (2026-07-20): the rehearsal gained the
+    completeness arm (a partial reset now fails, production-copy mode
+    included) and a live GameServer online suite
+    (mastery_reset_online.test.ts). Two standing constraints for later
+    phases: (1) normalizeArchetypeState is the SINGLE load-time reader of
+    PRE-reset skill values (identity derivation only, by design, ordering
+    load-bearing); any future archetype-POWER surface must key off the live
+    post-reset skill number, never the derived attunement alone. (2) The
+    disenchant/salvage/enchant-apply commands are un-surfaced on every host
+    today (no SimEvent, not on IWorld, no server dispatch, no UI); when
+    Phase 13 wires them, EACH needs a personal SimEvent plus a sim/server
+    i18n matcher entry mirroring craftItem's craftResult path, and their new
+    'throttled' deny reason (the shared budget) surfaces then, including the
+    message-attribution question of a craft denial caused by silent
+    disenchant/salvage spend. Raw-blob readers (character sheet, armory,
+    character select) show stale pre-reset skills for a pre-curve character
+    until next login (display-only, self-heals; recorded in progress.md).
+- Phase 12d (built 2026-07-21, phase start a9d499291): identical-payload
+  stacking lives in src/sim/item_instance_merge.ts
+  (itemInstancePayloadsEqual, isMergeableInstancePayload,
+  canStackInstancePayloads; a charges-bearing payload NEVER merges, the
+  one mutate-in-place field) consumed by all four merge points (bags.ts
+  countFit/addStacked via a new instance param, Sim.addItemInstance, the
+  moveBetweenContainers bank arm both directions) plus bags.ts
+  canGrantItemInstance, the merge-aware signed-grant guard that closed
+  the #2139 modeling ask (the filed overflow itself was already dead:
+  the Phase 10 QA grant-order fix guards it, now pinned at the hunted
+  crossing case). removeItem/removeEnchantableItem return one payload
+  PER UNIT, deep-cloned while the source slot survives (the
+  enchant-aliasing guard); sanitizeBankState preserves counted instanced
+  slots (capped at stackSizeOf, 1 for charges). Provenance is
+  kind-driven (junk = gathered, both partition sides pinned) via
+  isGatheredProvenanceKind; new keys hudChrome.crafting.gatheredBy,
+  hudChrome.gathering.downgradeMark/downgradeFind,
+  hudChrome.townFocus.tierHint/townOnlyHint, and
+  hudChrome.bags.itemAriaInstanced (the marker's accessible-name arm);
+  gatherDowngrade SimEvent {pid, surface, lost:'mark'|'find'} text-free,
+  at most one per command, mark wins when a command loses both. The
+  unified press composes the two EXISTING commands client-side (harvest
+  then loot, availability-gated; NO new command, facet member, or
+  census/parity re-pin); harvestCorpse's components-OMITTED arm is the
+  server-derived town-focus default (explicit [] keeps spread; the
+  picker now opens pre-checked from town focus). Lifecycle:
+  CORPSE_INTERACT_GRACE_SECONDS 30 in loot_roll.ts; the prune keeps a
+  fully-looted unclaimed-harvest corpse open for the grace window; a
+  successful harvest collapses an exhausted corpse fast (4) or clamps
+  remaining loot to the grace, guarded by hasPendingLootRollForMob (now
+  exported) so a pending need-greed roll is never undercut; the respawn
+  gate formula is untouched. Mail: MAIL_ATTACHMENT_EXPIRY_SECONDS (30
+  days, sim-time) on player-kind parcels; MailMessage/MailSave gained
+  returned (additive); the sweep returns-to-sender once then deletes
+  (the delete arm structurally requires returned); the return is an
+  in-place re-key onto the senderName bucket that bypasses the
+  send-time box cap (a full box holds the letter); loadMail starts
+  legacy never-sentinel player parcels at deploy; system/npc mail is
+  exempt by construction (kind filter, no clock ever set). Rename sweep
+  = src/sim/character_rename.ts rekeyInstanceSigner over the renamed
+  character's OWN blob (carried + bank + equipped instances), wired
+  into renameHandler beside the market/mail rekeys; foreign-held copies
+  keep the stale name BY SCOPE (a flagged maintainer surface). The S3
+  scan list gained item_instance_merge.ts and character_rename.ts.
+  Parity: exactly two deliberate golden regens, draws verified
+  (professions_gather: merges move inventory shape only;
+  l1_loot_distribution: the grace defers the respawn wanderTimer draw
+  past the trace window, every pre-existing frame byte-identical).
+  - ROLLBACK CAVEAT (release-notes item; the counted-instanced-stack
+    class, DESTRUCTIVE in one arm): v0.29.0 sanitizeBankState clamps a
+    counted instanced BANK stack back to count 1 on next load, silently
+    destroying the merged surplus (deposit 5 same-signer fangs, roll
+    back, reload: 4 units gone). Carried-bag counted stacks survive a
+    rollback with count intact, but old bags.ts never models count>1
+    instanced slots, so do not linger on old code. A returned mail
+    parcel round-tripped through old code loses its returned flag and
+    can fire ONE extra return flight after re-upgrade (bounded, no item
+    loss, the accepted mailWelcomed additive-flag class).
+  - Phase 12d drift notes (2026-07-21): a tagged corpse whose death
+    roll yields NO loot still gets lootable=false at handleDeath and
+    never opens for harvest (pre-existing, the Phase 3 note stands);
+    fish are kind food and never signed, so the provenance split never
+    sees them (revisit if fishing ever signs a catch); the bank window
+    is a bespoke painter, so the instanced marker is bags-only; partial
+    instanced slot splits are unimplemented (wave 2); vendor buyback
+    still re-grants plain copies (pre-existing payload loss, documented
+    at the site); trade fitsAfterSwap keeps the conservative
+    one-fresh-slot model as the fallback for stub harnesses; the RL env
+    interact() action now draws harvest rng where pre-12d it was
+    draw-free on a corpse (deterministic semantic expansion, no
+    headless golden pins the old shape).
 - Phase 13: (planned) disenchantItem/applyEnchant/salvageItem IWorld
   members + wire commands; plus, per the 2026-07-20 amendments, the typed
   disenchant reagents (hybrid model, same-phase consumers) and the

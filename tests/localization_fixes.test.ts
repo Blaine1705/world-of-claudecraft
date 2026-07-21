@@ -933,6 +933,18 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // change so any future emit added here lands under the drift guard from
     // day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/action_throttle.ts'), 'utf8'),
+    // Professions 2.0 Phase 12d: the identical-payload stack-merge predicate.
+    // It emits no player text itself (pure stacking bookkeeping consumed by
+    // bags/bank/trade/sim), but every new sim module joins the scan list in
+    // the same change so any future emit added here lands under the drift
+    // guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/item_instance_merge.ts'), 'utf8'),
+    // Professions 2.0 Phase 12d: the force-rename instance-signer sweep. It
+    // emits no player text itself (pure signer bookkeeping the rename handler
+    // consumes), but every new sim module joins the scan list in the same
+    // change so any future emit added here lands under the drift guard from
+    // day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/character_rename.ts'), 'utf8'),
     // #2033 (PR 2039): the quest command bodies (accept/share/abandon/turn-in guards +
     // the accepted/abandoned/completed logs). The two profession-choice denials
     // ("That profession choice is not available." / "... no longer available.") have

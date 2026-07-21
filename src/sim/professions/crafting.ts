@@ -94,9 +94,12 @@ import {
   tierForSkill,
 } from './wheel';
 
-// One flat craft-skill point per successful common-tier craft (the free-floor
-// rule: common-tier crafting itself never costs anything, but skill still
-// accrues so later tiers have something to build a gate against).
+// The BASE craft-skill amount per successful craft, scaled by the Phase 12c
+// four-state mastery curve at the gain site below (CRAFT_SKILL_GAIN *
+// craftSkillGainMultiplier): full 1, reduced 0.5, minimal 0.25, gray 0. The
+// old tier-0 free-floor GAIN rule (skill always accrues on the cheapest
+// recipe) is retired; the free-floor COST rule (common-tier crafting never
+// costs anything) lives on in recipes.ts/types.ts.
 const CRAFT_SKILL_GAIN = 1;
 
 export interface CraftResult {

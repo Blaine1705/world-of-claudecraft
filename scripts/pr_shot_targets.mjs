@@ -191,6 +191,9 @@ export const TARGETS = [
     label: 'Inventory / bags',
     when: ['ui/bags', 'ui/inventory', 'ui/item', 'ui/vendor', 'ui/loot', 'sim/content/items'],
     // Fill the bags with a spread so the window has content, then open it and clip to #bags.
+    // The desktop and mobile variants share the recipe: the Phase 12d instanced-slot
+    // marker must be visible on both (the acceptance's mobile arm).
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
       await page.evaluate(() => {
         const sim = window.__game?.sim;
@@ -209,6 +212,14 @@ export const TARGETS = [
             sim?.addItem(id, 1);
           } catch {}
         }
+        // Phase 12d: two same-signer copies grant through the real hub; on the
+        // 12d tree they MERGE into one counted instanced stack (marker + count
+        // badge in one cell), while the same recipe on the base tree honestly
+        // shows two separate unmarked slots.
+        try {
+          sim?.addItemInstance?.('wolf_fang', { signer: 'Toralin' });
+          sim?.addItemInstance?.('wolf_fang', { signer: 'Toralin' });
+        } catch {}
         // Force-hide then toggle so the open is deterministic regardless of prior state
         // (the same trick the bag_filter screenshot harness uses).
         const el = document.querySelector('#bags');
@@ -217,6 +228,84 @@ export const TARGETS = [
       });
       await wait(700);
       return { clip: '#bags' };
+    },
+  },
+  {
+    key: 'corpse-unified-press',
+    label: 'Unified corpse press: one interact loots AND harvests (Professions 2.0 Phase 12d)',
+    when: [
+      'loot_window_controller',
+      'corpse_harvest_window',
+      'corpse_harvest_view',
+      'nearby_interaction',
+    ],
+    // Kill the nearest forest wolf beside the player, then either press the real
+    // interact key (chat shows the loot line AND the gather line from one press;
+    // the base tree honestly shows the loot line alone) or open the loot window
+    // to show the harvest picker pre-checked from the player's town focus (the
+    // base tree opens it empty).
+    variants: [{ key: 'chat-outcome' }, { key: 'picker-preselected', picker: true }],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!sim || !p) return;
+        // Town focus first, while the fresh spawn still stands in the Eastbrook
+        // hub circle (the setter is in-town-only); hide drives both variants.
+        try {
+          sim.setTownFocus?.({ hide: 5 });
+        } catch {}
+        let wolf = null;
+        let best = Infinity;
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.templateId !== 'forest_wolf' || e.dead) continue;
+          const dx = e.pos.x - p.pos.x;
+          const dz = e.pos.z - p.pos.z;
+          const d2 = dx * dx + dz * dz;
+          if (d2 < best) {
+            best = d2;
+            wolf = e;
+          }
+        }
+        if (!wolf) return;
+        p.pos.x = wolf.pos.x + 2;
+        p.pos.y = wolf.pos.y;
+        p.pos.z = wolf.pos.z;
+        p.facing = Math.atan2(wolf.pos.x - p.pos.x, wolf.pos.z - p.pos.z);
+        wolf.hp = 1;
+        sim.targetEntity?.(wolf.id);
+        sim.startAutoAttack?.();
+        window.__p12dShotWolfId = wolf.id;
+      });
+      // One auto-attack swing at 1 hp kills the wolf; the live 20 Hz loop needs
+      // real time for the swing timer and the death resolution.
+      await wait(3000);
+      if (variant?.picker) {
+        await page.evaluate(() => {
+          const game = window.__game;
+          const id = window.__p12dShotWolfId;
+          if (id)
+            game?.hud?.openLoot?.(id, Math.round(innerWidth / 2), Math.round(innerHeight / 2));
+        });
+        await wait(700);
+        return { clip: '#loot-window' };
+      }
+      await page.evaluate(() => {
+        // The real bound interact key (KeyF), not the debug hook: the unified
+        // press is exactly what this shot is evidence for.
+        const down = new KeyboardEvent('keydown', { code: 'KeyF', key: 'f', bubbles: true });
+        const up = new KeyboardEvent('keyup', { code: 'KeyF', key: 'f', bubbles: true });
+        window.dispatchEvent(down);
+        window.dispatchEvent(up);
+      });
+      await wait(900);
+      return { clip: '#chatlog-wrap' };
     },
   },
   {
@@ -321,24 +410,32 @@ export const TARGETS = [
     // Grant a signed masterwork copy, open bags, hover its slot: the tooltip's
     // per-copy lines (gold seal, green baked bonus stats, Crafted by) all read
     // in one frame. Full-frame shot: the tooltip renders beside the window and
-    // the single-selector clip cannot union the two rects.
-    async capture(page) {
-      await page.evaluate(() => {
+    // the single-selector clip cannot union the two rects. The Phase 12d
+    // gathered variant hovers a signed harvest material instead: the same
+    // signer line reads Gathered by there (Crafted by on the base tree, the
+    // honest before side).
+    variants: [{ key: 'crafted' }, { key: 'gathered', gathered: true }],
+    async capture(page, variant) {
+      await page.evaluate((gathered) => {
         document.querySelector('#gpu-notice')?.remove();
         document.querySelector('.camera-prompt-confirm')?.click();
         const game = window.__game;
         try {
-          // A dungeon-drop def the starter bag can never contain, so the
-          // aria-label lookup below is unambiguous.
-          game?.sim?.addItemInstance('gravewyrm_gauntlets', {
-            signer: 'Thorgar',
-            rolled: { masterwork: true, stats: { str: 2, sta: 1 } },
-          });
+          if (gathered) {
+            game?.sim?.addItemInstance('pristine_hide', { signer: 'Thorgar' });
+          } else {
+            // A dungeon-drop def the starter bag can never contain, so the
+            // aria-label lookup below is unambiguous.
+            game?.sim?.addItemInstance('gravewyrm_gauntlets', {
+              signer: 'Thorgar',
+              rolled: { masterwork: true, stats: { str: 2, sta: 1 } },
+            });
+          }
         } catch {}
         const el = document.querySelector('#bags');
         if (el) el.style.display = 'none';
         game?.hud?.toggleBags?.();
-      });
+      }, Boolean(variant?.gathered));
       // toggleBags tracks logical open state, so a shared page where an earlier
       // target left the bags logically open needs a second toggle to reopen.
       let open = await pollForSize(page, '#bags');
@@ -347,7 +444,7 @@ export const TARGETS = [
         open = await pollForSize(page, '#bags');
       }
       if (!open) return {};
-      await page.evaluate(() => {
+      await page.evaluate((gathered) => {
         // The grant can pop a transient deed banner and the camera prompt on
         // the shared page; clear both so the tooltip is the frame's subject.
         document.querySelector('.camera-prompt-confirm')?.click();
@@ -355,12 +452,13 @@ export const TARGETS = [
         if (banner) banner.style.opacity = '0';
         // Real focus fires attachTooltip's focusin arm (keyboard-nav path), a
         // sturdier trigger than synthetic mouseenter under headless.
+        const name = gathered ? 'Pristine Hide' : 'Gravewyrm Gauntlets';
         const cell = Array.from(document.querySelectorAll('#bags button')).find((b) =>
-          b.getAttribute('aria-label')?.includes('Gravewyrm Gauntlets'),
+          b.getAttribute('aria-label')?.includes(name),
         );
         cell?.scrollIntoView({ block: 'center' });
         cell?.focus();
-      });
+      }, Boolean(variant?.gathered));
       await pollForSize(page, '#tooltip');
       await wait(300);
       return {};
@@ -487,6 +585,29 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#social-window');
       return open ? { clip: '#social-window' } : {};
+    },
+  },
+  {
+    key: 'interface-options-tabs',
+    label: 'Interface options panel (four-tab split)',
+    when: ['ui/options_window', 'ui/options_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        // Land on a fresh main menu, then route to the Interface sub-panel. The
+        // main menu lists Key Bindings, Controller, Graphics, Interface, Audio,
+        // Performance, [Report a Bug (online only)], Log Out, Return; offline has
+        // no bug-report row, so Interface is the fourth button.
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[3]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      return open ? { clip: '#options-menu' } : {};
     },
   },
   {
@@ -991,7 +1112,10 @@ export const TARGETS = [
             version: 1,
             synced: true,
             craftSkills: {
-              weaponcrafting: 132,
+              // Post-12c-legal staging (Phase 12c QA): 125 is the enforced
+              // craft cap, staging the mastered state honestly; a live
+              // character can never exceed it, so the stub must not either.
+              weaponcrafting: 125,
               armorcrafting: 87,
               tailoring: 23,
               leatherworking: 0,
@@ -1015,11 +1139,14 @@ export const TARGETS = [
             configurable: true,
           });
           const gathering = {
+            // Post-12c-legal staging (Phase 12c QA): the enforced caps are
+            // 100/100/100/200 (content/professions.ts maxSkill) and skills
+            // can never exceed them; herbalism stages a mastered row at cap.
             skills: [
-              { professionId: 'mining', skill: 112, maxSkill: 300 },
-              { professionId: 'logging', skill: 45, maxSkill: 300 },
-              { professionId: 'herbalism', skill: 203, maxSkill: 300 },
-              { professionId: 'fishing', skill: 68, maxSkill: 300 },
+              { professionId: 'mining', skill: 88, maxSkill: 100 },
+              { professionId: 'logging', skill: 45, maxSkill: 100 },
+              { professionId: 'herbalism', skill: 100, maxSkill: 100 },
+              { professionId: 'fishing', skill: 68, maxSkill: 200 },
             ],
           };
           const stateIsFn = typeof game.world.professionsState === 'function';

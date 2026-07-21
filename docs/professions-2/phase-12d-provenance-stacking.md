@@ -263,6 +263,70 @@ instanced stacks under old code, the mailWelcomed class). Record surprises to me
 STEP 7 - FINAL RESPONSE FORMAT: phase status; files touched; validation results; review
 verdicts; deferrals; one line for the Phase 12d QA handoff naming the phase-start commit.
 
+AS-LANDED (2026-07-21, build session; authoritative over the older wording above):
+- Merge rule: src/sim/item_instance_merge.ts (itemInstancePayloadsEqual,
+  isMergeableInstancePayload, canStackInstancePayloads). One carve-out beyond the
+  byte-equality spec: a payload carrying `charges` never merges (the one field with
+  mutate-in-place per-unit semantics; no shipped stackable item carries charges, this is
+  a forward guard). removeItem/removeEnchantableItem return one payload PER UNIT,
+  deep-cloned while the source slot survives (the enchant-aliasing guard).
+  sanitizeBankState now preserves counted instanced slots (was: force count=1).
+  moveBetweenContainers still moves an instanced slot whole (partial instanced splits
+  are unimplemented, wave 2); trade fitsAfterSwap models the receive side merge-aware
+  from the giver's real slots, with the old conservative model as the fallback for
+  stub harnesses. Vendor buyback still re-grants plain copies (pre-existing payload
+  loss, documented at the site).
+- Slice C landed with NO new wire command and NO new IWorld member: the unified press
+  composes the two existing commands (harvest_corpse then loot_corpse, client-dispatched
+  per the corpseLootAvailability predicate, order-preserved in the tick batch), and the
+  town-focus default is server-derived via the components-OMITTED arm of harvestCorpse
+  (explicit [] keeps the spread semantics; the IWorldInteraction doc was updated).
+  Sim.interact()'s targeted-corpse arm was unified in a follow-up commit (the stage
+  landed only the scan arm). Lifecycle: CORPSE_INTERACT_GRACE_SECONDS = 30 in
+  loot_roll.ts; Arm 2 gained a pending-need-greed-roll guard (hasPendingLootRollForMob,
+  now exported) so a harvest during a pending roll cannot clamp the corpse under the
+  roll floor. The respawn gate formula is untouched. Pre-existing and out of scope: a
+  tagged corpse whose death roll yields NO loot gets lootable=false at handleDeath and
+  never opens for harvest (the Phase 3 note stands).
+- Provenance: resolved by kind, `junk` = gathered (every signable gathered item is kind
+  junk; no recipe output is; both sides pinned). Fish are kind `food` and are never
+  signed today; if fishing ever signs a catch the split needs revisiting. The bank
+  window is a bespoke painter (not the bag-item family), so the instanced marker is
+  bags-only. gatherDowngrade SimEvent {pid, surface, lost:'mark'|'find'} with keys
+  hudChrome.gathering.downgradeMark/downgradeFind; when one command loses both, the
+  single deduped event reports `mark` (the plain-fallback loop runs first, pinned).
+- Mail: MAIL_ATTACHMENT_EXPIRY_SECONDS = 30 days; MailMessage/MailSave gained
+  `returned` (additive). The return is an in-place re-key onto the senderName bucket
+  (the loadMail soulbound precedent), deliberately bypassing the send-time
+  MAIL_MAX_PER_RECIPIENT gate so a full sender box holds the letter. The delete arm
+  structurally requires `returned`. mailTake's emptied-clock condition generalized to a
+  hadAttachments capture (behavior-identical for every pre-phase state). Deploy clock:
+  loadMail assigns now+30d to player parcels persisted with the never sentinel.
+- Companion fixes: the filed #2139 crossing case was ALREADY guarded by the Phase 10 QA
+  grant-order fix (verify-not-refix outcome); the phase added the hunted-seed pin plus
+  merge-aware signed-grant guards (bags.ts canGrantItemInstance) at both corpse arms,
+  so a full bag with a byte-equal stack now keeps the signature instead of downgrading
+  (harvestNode's guard was already merge-aware via stage 1's countFit). Rename sweep:
+  src/sim/character_rename.ts rekeyInstanceSigner sweeps the renamed character's OWN
+  blob (carried + bank + equipped); mail attachments and market escrow hold no
+  instances by construction; foreign-held copies keep the stale name BY SCOPE (a
+  flagged maintainer surface, not an oversight); the live-meta arm is structurally
+  unreachable behind the offline gate and is documented at the call site.
+- Parity: two deliberate golden regens, each its own commit with draws verified:
+  professions_gather (same-signer materials now merge, draws/drawDigest/eventDigest
+  byte-identical) and l1_loot_distribution (the grace arm defers the fully-looted
+  tagged corpse's respawn, moving its wanderTimer draw past the trace window; every
+  pre-existing frame byte-identical).
+- Review round (7 reviewers, zero blocking): three should-fixes landed in-branch: the
+  instanced marker gained its accessible-name arm (hudChrome.bags.itemAriaInstanced,
+  the aria-hidden corner tab alone was sighted-only), the removeItem partial-take
+  survivor-clone arm got its own pin beside the removeEnchantableItem sibling, and
+  the rollback caveat was recorded in state.md (the migration reviewer caught it
+  unrecorded). The full suite also caught five loot-distribution pins asserting the
+  pre-12d fast collapse on emptied tagged corpses plus the retired-heroic mail
+  round-trip (the deploy clock); all re-pinned with comments in
+  test(sim): re-pin full-suite corpse and mail contracts.
+
 STOPPING RULES:
 - Stop if payload-equality merging cannot be made safe for any consumer of instanced
   slots without redesigning that consumer; surface the consumer instead of forcing it.

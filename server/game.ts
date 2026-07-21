@@ -1548,6 +1548,11 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
+    // force the heavy self block (tal/inv/equip/bags/...) to re-run next
+    // snapshot: it is gated on meta.wireRev vs session.lastWireRev, and that
+    // comparison is keyed to whichever entity's meta is being wired, so
+    // without this the target's heavy fields can silently fail to resend.
+    moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
   }
@@ -1572,6 +1577,10 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
+    // same as enterSpectate: force the heavy self block to re-run so the
+    // moderator's OWN talents/inventory/equip/etc. resend immediately
+    // instead of staying stuck on the spectated target's last-sent values.
+    moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
   }

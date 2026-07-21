@@ -771,6 +771,7 @@ export class Api {
 
   async projectStats(): Promise<{
     accounts_created: number;
+    characters_created: number;
     players_online: number;
     realm: string;
   }> {
@@ -834,9 +835,16 @@ export class Api {
     native = false,
     challenge = '',
     nativeAttestation: unknown = undefined,
+    desktop = false,
   ): Promise<{ url: string }> {
     const nativeQuery = native ? `&native=1&challenge=${encodeURIComponent(challenge)}` : '';
-    return this.post(`/api/auth/discord/start?mode=${mode}${nativeQuery}`, { nativeAttestation });
+    // `desktop` and `native` are mutually exclusive: native is the mobile-app PKCE
+    // handoff, desktop marks a login start from the Electron/Steam shell's system
+    // browser so the callback bounces back to /desktop-login instead of '/'.
+    const desktopQuery = !native && desktop ? '&desktop=1' : '';
+    return this.post(`/api/auth/discord/start?mode=${mode}${nativeQuery}${desktopQuery}`, {
+      nativeAttestation,
+    });
   }
 
   async exchangeNativeDiscordCode(
@@ -891,18 +899,6 @@ export class Api {
   // Current account's Discord link status + reward points + live guild presence.
   async discordStatus(): Promise<Record<string, unknown>> {
     return this.get('/api/discord');
-  }
-
-  // Server-side Welcome Screen flags (today: the Season 1 Armory promo gate).
-  async welcomeFlags(): Promise<{ armoryPromoEnabled: boolean }> {
-    return this.get('/api/welcome/flags');
-  }
-
-  // Daily rewards status (bearer-only, no world/character needed): the Welcome
-  // Screen's chest-tile readiness read reuses the same endpoint the in-world
-  // daily rewards window polls via ClientWorld.dailyRewards().
-  async dailyRewards(): Promise<DailyRewardStatus> {
-    return this.get('/api/daily-rewards');
   }
 
   // Unlink Discord. A Discord-provisioned account (no real password yet) must send a

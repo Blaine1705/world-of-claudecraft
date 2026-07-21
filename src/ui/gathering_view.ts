@@ -132,6 +132,15 @@ export function gatherDeniedLineKey(
   return 'hudChrome.gathering.toolTierUnmetCorpse';
 }
 
+/** The i18n key the gatherDowngrade SimEvent's toast resolves (Phase 12d; the
+ *  sim is text-free): 'mark' means the yield arrived as a plain unsigned
+ *  top-up, 'find' means a pure-extra specimen jackpot was dropped outright. */
+export function gatherDowngradeLineKey(lost: 'mark' | 'find'): string {
+  return lost === 'find'
+    ? 'hudChrome.gathering.downgradeFind'
+    : 'hudChrome.gathering.downgradeMark';
+}
+
 /** One row of the gathering-proficiency display: a profession id plus its
  *  current point value, in the fixed GATHERING_PROFESSION_IDS order. */
 export interface GatheringProficiencyRow {

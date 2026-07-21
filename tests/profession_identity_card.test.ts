@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { renderCraftingWindow } from '../src/ui/crafting_window';
+import { GOLD_ACCENT_COLOR } from '../src/ui/icons';
 import { renderProfessionIdentityCard } from '../src/ui/profession_identity_card';
 import { buildProfessionIdentityView } from '../src/ui/profession_identity_view';
 
@@ -387,6 +388,22 @@ describe('crafting window Phase 6 QA pins', () => {
     expect(html).toContain('Requires Armorcrafting 25');
     expect(html).toContain('Full skill gain');
     expect(html).toContain('Move to the Forge to craft this.');
+  });
+});
+
+describe('GOLD_ACCENT_COLOR lockstep (Phase 12c QA)', () => {
+  it('the TS twin, the CSS --gold token, and the literal agree', () => {
+    // icons.ts GOLD_ACCENT_COLOR exists because inline-styling painters cannot
+    // read the CSS custom property; the comment promises lockstep with --gold
+    // in src/styles/tokens.css. This pin is the promise's teeth: a retheme
+    // that moves either side without the other reds here. The literal arm
+    // keeps the pair from drifting together unnoticed (the reduced-difficulty
+    // tint pin above expects the same hex).
+    const tokens = readFileSync(path.resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8');
+    const match = tokens.match(/--gold:\s*(#[0-9a-fA-F]{6})\s*;/);
+    expect(match, 'tokens.css should declare --gold as a 6-digit hex').not.toBeNull();
+    expect(match?.[1]).toBe(GOLD_ACCENT_COLOR);
+    expect(GOLD_ACCENT_COLOR).toBe('#ffd100');
   });
 });
 

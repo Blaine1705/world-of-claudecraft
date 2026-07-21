@@ -706,6 +706,12 @@ export const da_DK: EnTranslations = {
       "collapseHint": "Fold opgavesporing sammen",
       "expandHint": "Fold opgavesporing ud"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Vis chat-tidsstempler",
       "format": "Tidsstempelformat",
@@ -1178,6 +1184,10 @@ export const da_DK: EnTranslations = {
         "fiestaWin": "Fiesta-sejr"
       }
     },
+    "charSheet": {
+      "offense": "Offense",
+      "defense": "Defense"
+    },
     "statInfo": {
       "fromYour": "Fra din {value} {stat}:",
       "names": {
@@ -1454,6 +1464,8 @@ export const da_DK: EnTranslations = {
     "townFocus": {
       "title": "Byfokus",
       "hint": "Fokuspoint lægger en bonus oven på hver komponents grundudbytte. Ufokuserede komponenter bliver på grundniveauet.",
+      "tierHint": "Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.",
+      "townOnlyHint": "Focus can only be changed while you are in town.",
       "budgetLabel": "Point tilbage: {remaining} / {budget}",
       "saveButton": "Gem fokus",
       "notInTownHint": "Du skal være i byen for at sætte dit fokus.",
@@ -1512,6 +1524,7 @@ export const da_DK: EnTranslations = {
       "dragEquipHint": "Træk hen på din karakter for at udruste",
       "dragDestroyHint": "Træk ud i verden for at ødelægge",
       "reorderNeedsRecent": "Ryd filteret og sortér efter Seneste for at omarrangere dine tasker",
+      "itemAriaInstanced": "{item}, quantity {count}, maker-marked copy",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -2120,6 +2133,8 @@ export const da_DK: EnTranslations = {
         "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
       },
       "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "downgradeMark": "Bags full: the find was stored without its gatherer's mark.",
+      "downgradeFind": "Bags full: a pristine find slipped away.",
       "stateReady": "Ready",
       "stateCooldown": "Respawning"
     },
@@ -2259,6 +2274,7 @@ export const da_DK: EnTranslations = {
       "masterworkZoneLine": "{crafter} lavede et mesterværk {name}!",
       "tierUpToast": "{craft} avanceret til niveau {tier}!",
       "makersMark": "Udformet af {name}",
+      "gatheredBy": "Gathered by {name}",
       "masterworkSeal": "Mesterværk",
       "enchantedLine": "Fortryllet"
     },
@@ -2554,9 +2570,6 @@ export const da_DK: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen."
-    },
-    "welcome": {
-      "invalid_input": "Ugyldig indtastning."
     }
   },
   "guide": {
@@ -4137,6 +4150,7 @@ export const da_DK: EnTranslations = {
   "stats": {
     "title": "Verdensstatus",
     "accountsCreated": "Spillere",
+    "charactersCreated": "Characters Created",
     "playersOnline": "Spillere online",
     "realmName": "Verdensnavn"
   },
@@ -4170,7 +4184,9 @@ export const da_DK: EnTranslations = {
     "error": "Kunne ikke indlæse opdateringer. Prøv venligst igen senere.",
     "empty": "Ingen opdateringer endnu — kig forbi igen snart.",
     "prerelease": "Forhåndsudgivelse",
-    "viewOnGithub": "Vis på GitHub"
+    "viewOnGithub": "Vis på GitHub",
+    "new": "Ny",
+    "viewAll": "Se alle opdateringer på GitHub"
   },
   "download": {
     "title": "Download Desktop-launcher",
@@ -5337,29 +5353,6 @@ export const da_DK: EnTranslations = {
     "heading": "Verdenen er midlertidigt utilgængelig.",
     "body": "Vi genstarter spiltjenesten og forventer, at Claudemoon vender tilbage om kort tid. Denne side bliver ved med at tjekke automatisk.",
     "status": "Tilbage snart"
-  },
-  "welcome": {
-    "back": "Velkommen tilbage, {name}",
-    "level": "Niveau {level}",
-    "lastPlayed": "Sidst spillet: {when}",
-    "continue": "Træd ind i verden",
-    "continueHint": "Enter for at fortsætte, Esc for at springe over",
-    "continueHintTouch": "Tryk for at fortsætte",
-    "discord": {
-      "title": "Fællesskabet lever på Discord",
-      "sub": "Forhåndsvisninger af patches, begivenheder, udviklerchat og 2 bonuspladser i banken, når du forbinder din Discord-konto.",
-      "join": "Tilslut dig vores Discord"
-    },
-    "chest": {
-      "ready": "Kisten med daglige belønninger er klar"
-    },
-    "armory": {
-      "cta": "Træd ind i verden, og udforsk Våbenhuset"
-    },
-    "news": {
-      "new": "Ny",
-      "viewAll": "Se alle opdateringer på GitHub"
-    }
   },
   "hud": {
     "core": {
@@ -8593,6 +8586,129 @@ export const da_DK: EnTranslations = {
       },
       "elixir_of_the_serpent": {
         "name": "Slangens eliksir"
+      },
+      "mosshide_vest": {
+        "name": "Mosshide Vest"
+      },
+      "thornling_grips": {
+        "name": "Thornling Grips"
+      },
+      "acolyte_chain_grips": {
+        "name": "Acolyte Chain Grips"
+      },
+      "votive_chain_belt": {
+        "name": "Votive Chain Belt"
+      },
+      "briarroot_staff": {
+        "name": "Briarroot Staff"
+      },
+      "valefire_lantern": {
+        "name": "Valefire Lantern"
+      },
+      "fenbark_leggings": {
+        "name": "Fenbark Leggings"
+      },
+      "mirebloom_treads": {
+        "name": "Mirebloom Treads"
+      },
+      "fenwarden_sabatons": {
+        "name": "Fenwarden Sabatons"
+      },
+      "marshlight_hauberk": {
+        "name": "Marshlight Hauberk"
+      },
+      "duskthorn_mantle": {
+        "name": "Duskthorn Mantle"
+      },
+      "fenshadow_maul": {
+        "name": "Fenshadow Maul"
+      },
+      "wildgrove_cinch": {
+        "name": "Wildgrove Cinch"
+      },
+      "cragward_pauldrons": {
+        "name": "Cragward Pauldrons"
+      },
+      "cragthorn_greatstaff": {
+        "name": "Cragthorn Greatstaff"
+      },
+      "moonbark_vestments": {
+        "name": "Moonbark Vestments"
+      },
+      "peaksong_helm": {
+        "name": "Peaksong Helm"
+      },
+      "stormchant_gauntlets": {
+        "name": "Stormchant Gauntlets"
+      },
+      "cragprowl_belt": {
+        "name": "Cragprowl Belt"
+      },
+      "stormroot_cowl": {
+        "name": "Stormroot Cowl"
+      },
+      "thunderward_legguards": {
+        "name": "Thunderward Legguards"
+      },
+      "revenantstep_treads": {
+        "name": "Revenantstep Treads"
+      },
+      "shardfang_grips": {
+        "name": "Shardfang Grips"
+      },
+      "shardsong_mantle": {
+        "name": "Shardsong Mantle"
+      },
+      "wyrmcult_spellgrips": {
+        "name": "Wyrmcult Spellgrips"
+      },
+      "thornpeak_wildwraps": {
+        "name": "Thornpeak Wildwraps"
+      },
+      "stormvotive_hauberk": {
+        "name": "Stormvotive Hauberk"
+      },
+      "cryptbloom_shoulderguards": {
+        "name": "Cryptbloom Shoulderguards"
+      },
+      "gravewyrm_thornmaul": {
+        "name": "Gravewyrm Thornmaul"
+      },
+      "vestments_of_the_waking_grove": {
+        "name": "Vestments of the Waking Grove"
+      },
+      "nightfangs_greatstaff": {
+        "name": "Nightfang's Greatstaff"
+      },
+      "maul_of_the_scourged_wilds": {
+        "name": "Maul of the Scourged Wilds"
+      },
+      "tidehymn_slippers": {
+        "name": "Tidehymn Slippers"
+      },
+      "pearlward_aegis": {
+        "name": "Pearlward Aegis"
+      },
+      "wildgrowth_leggings": {
+        "name": "Wildgrowth Leggings"
+      },
+      "grovewardens_grips": {
+        "name": "Grovewarden's Grips"
+      },
+      "verdant_walkers": {
+        "name": "Verdant Walkers"
+      },
+      "lunarward_cinch": {
+        "name": "Lunarward Cinch"
+      },
+      "dreamroot_boots": {
+        "name": "Dreamroot Boots"
+      },
+      "stormbark_mantle": {
+        "name": "Stormbark Mantle"
+      },
+      "wildsoul_maul": {
+        "name": "Wildsoul Maul"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

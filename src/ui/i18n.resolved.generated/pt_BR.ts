@@ -706,6 +706,12 @@ export const pt_BR: EnTranslations = {
       "collapseHint": "Recolher missões",
       "expandHint": "Expandir missões"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Mostrar horário no chat",
       "format": "Formato do horário",
@@ -1178,6 +1184,10 @@ export const pt_BR: EnTranslations = {
         "fiestaWin": "Vitória na Fiesta"
       }
     },
+    "charSheet": {
+      "offense": "Offense",
+      "defense": "Defense"
+    },
     "statInfo": {
       "fromYour": "Do seu {value} de {stat}:",
       "names": {
@@ -1454,6 +1464,8 @@ export const pt_BR: EnTranslations = {
     "townFocus": {
       "title": "Foco da Cidade",
       "hint": "Pontos de foco adicionam um bônus sobre o rendimento base de cada componente. Componentes sem foco permanecem no valor base.",
+      "tierHint": "Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.",
+      "townOnlyHint": "Focus can only be changed while you are in town.",
       "budgetLabel": "Pontos restantes: {remaining} / {budget}",
       "saveButton": "Salvar Foco",
       "notInTownHint": "Você precisa estar na cidade para definir seu foco.",
@@ -1512,6 +1524,7 @@ export const pt_BR: EnTranslations = {
       "dragEquipHint": "Arraste para seu personagem para equipar",
       "dragDestroyHint": "Arraste para fora do inventário para destruir",
       "reorderNeedsRecent": "Limpe o filtro e ordene por Recentes para reorganizar suas bolsas",
+      "itemAriaInstanced": "{item}, quantity {count}, maker-marked copy",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
       "filterWeapon": "Armas",
@@ -2120,6 +2133,8 @@ export const pt_BR: EnTranslations = {
         "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
       },
       "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "downgradeMark": "Bags full: the find was stored without its gatherer's mark.",
+      "downgradeFind": "Bags full: a pristine find slipped away.",
       "stateReady": "Ready",
       "stateCooldown": "Respawning"
     },
@@ -2259,6 +2274,7 @@ export const pt_BR: EnTranslations = {
       "masterworkZoneLine": "{crafter} criou uma obra-prima {name}!",
       "tierUpToast": "{craft} avançou para o nível {tier}!",
       "makersMark": "Feito por {name}",
+      "gatheredBy": "Gathered by {name}",
       "masterworkSeal": "Obra-prima",
       "enchantedLine": "Encantado"
     },
@@ -2554,9 +2570,6 @@ export const pt_BR: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente."
-    },
-    "welcome": {
-      "invalid_input": "Entrada inválida."
     }
   },
   "guide": {
@@ -4137,6 +4150,7 @@ export const pt_BR: EnTranslations = {
   "stats": {
     "title": "Status do Mundo",
     "accountsCreated": "Jogadores",
+    "charactersCreated": "Characters Created",
     "playersOnline": "Jogadores online",
     "realmName": "Nome do mundo"
   },
@@ -4170,7 +4184,9 @@ export const pt_BR: EnTranslations = {
     "error": "Não foi possível carregar as novidades. Tente novamente mais tarde.",
     "empty": "Ainda não há novidades; volte em breve.",
     "prerelease": "Pré-lançamento",
-    "viewOnGithub": "Ver no GitHub"
+    "viewOnGithub": "Ver no GitHub",
+    "new": "Novo",
+    "viewAll": "Ver todas as atualizações no GitHub"
   },
   "download": {
     "title": "Baixar launcher para desktop",
@@ -5337,29 +5353,6 @@ export const pt_BR: EnTranslations = {
     "heading": "O mundo está temporariamente indisponível.",
     "body": "Estamos reiniciando o serviço do jogo e esperamos que Claudemoon volte em breve. Esta página continuará verificando automaticamente.",
     "status": "Voltamos em breve"
-  },
-  "welcome": {
-    "back": "Que bom ter você de volta, {name}",
-    "level": "Nível {level}",
-    "lastPlayed": "Última vez em jogo: {when}",
-    "continue": "Entrar no mundo",
-    "continueHint": "Pressione Enter para continuar, Esc para pular",
-    "continueHintTouch": "Toque para continuar",
-    "discord": {
-      "title": "A comunidade vive no Discord",
-      "sub": "Prévias de patches, eventos, bate-papo com os desenvolvedores e 2 espaços bônus no banco ao vincular sua conta do Discord.",
-      "join": "Entre no nosso Discord"
-    },
-    "chest": {
-      "ready": "Baú de Recompensas Diárias pronto"
-    },
-    "armory": {
-      "cta": "Entrar no mundo e explorar o Arsenal"
-    },
-    "news": {
-      "new": "Novo",
-      "viewAll": "Ver todas as atualizações no GitHub"
-    }
   },
   "hud": {
     "core": {
@@ -8593,6 +8586,129 @@ export const pt_BR: EnTranslations = {
       },
       "elixir_of_the_serpent": {
         "name": "Elixir da Serpente"
+      },
+      "mosshide_vest": {
+        "name": "Mosshide Vest"
+      },
+      "thornling_grips": {
+        "name": "Thornling Grips"
+      },
+      "acolyte_chain_grips": {
+        "name": "Acolyte Chain Grips"
+      },
+      "votive_chain_belt": {
+        "name": "Votive Chain Belt"
+      },
+      "briarroot_staff": {
+        "name": "Briarroot Staff"
+      },
+      "valefire_lantern": {
+        "name": "Valefire Lantern"
+      },
+      "fenbark_leggings": {
+        "name": "Fenbark Leggings"
+      },
+      "mirebloom_treads": {
+        "name": "Mirebloom Treads"
+      },
+      "fenwarden_sabatons": {
+        "name": "Fenwarden Sabatons"
+      },
+      "marshlight_hauberk": {
+        "name": "Marshlight Hauberk"
+      },
+      "duskthorn_mantle": {
+        "name": "Duskthorn Mantle"
+      },
+      "fenshadow_maul": {
+        "name": "Fenshadow Maul"
+      },
+      "wildgrove_cinch": {
+        "name": "Wildgrove Cinch"
+      },
+      "cragward_pauldrons": {
+        "name": "Cragward Pauldrons"
+      },
+      "cragthorn_greatstaff": {
+        "name": "Cragthorn Greatstaff"
+      },
+      "moonbark_vestments": {
+        "name": "Moonbark Vestments"
+      },
+      "peaksong_helm": {
+        "name": "Peaksong Helm"
+      },
+      "stormchant_gauntlets": {
+        "name": "Stormchant Gauntlets"
+      },
+      "cragprowl_belt": {
+        "name": "Cragprowl Belt"
+      },
+      "stormroot_cowl": {
+        "name": "Stormroot Cowl"
+      },
+      "thunderward_legguards": {
+        "name": "Thunderward Legguards"
+      },
+      "revenantstep_treads": {
+        "name": "Revenantstep Treads"
+      },
+      "shardfang_grips": {
+        "name": "Shardfang Grips"
+      },
+      "shardsong_mantle": {
+        "name": "Shardsong Mantle"
+      },
+      "wyrmcult_spellgrips": {
+        "name": "Wyrmcult Spellgrips"
+      },
+      "thornpeak_wildwraps": {
+        "name": "Thornpeak Wildwraps"
+      },
+      "stormvotive_hauberk": {
+        "name": "Stormvotive Hauberk"
+      },
+      "cryptbloom_shoulderguards": {
+        "name": "Cryptbloom Shoulderguards"
+      },
+      "gravewyrm_thornmaul": {
+        "name": "Gravewyrm Thornmaul"
+      },
+      "vestments_of_the_waking_grove": {
+        "name": "Vestments of the Waking Grove"
+      },
+      "nightfangs_greatstaff": {
+        "name": "Nightfang's Greatstaff"
+      },
+      "maul_of_the_scourged_wilds": {
+        "name": "Maul of the Scourged Wilds"
+      },
+      "tidehymn_slippers": {
+        "name": "Tidehymn Slippers"
+      },
+      "pearlward_aegis": {
+        "name": "Pearlward Aegis"
+      },
+      "wildgrowth_leggings": {
+        "name": "Wildgrowth Leggings"
+      },
+      "grovewardens_grips": {
+        "name": "Grovewarden's Grips"
+      },
+      "verdant_walkers": {
+        "name": "Verdant Walkers"
+      },
+      "lunarward_cinch": {
+        "name": "Lunarward Cinch"
+      },
+      "dreamroot_boots": {
+        "name": "Dreamroot Boots"
+      },
+      "stormbark_mantle": {
+        "name": "Stormbark Mantle"
+      },
+      "wildsoul_maul": {
+        "name": "Wildsoul Maul"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

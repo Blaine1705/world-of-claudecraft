@@ -76,7 +76,7 @@ export function craftSkillsFor(ctx: SimContext, pid: number): CraftSkills {
 //
 // A player's "tier capability" in a craft is derived from their current flat
 // skill value in that craft via a simple, fixed bucket: every TIER_SKILL_STEP
-// points of skill unlocks one more tier. Tier 0 ("common") is the free floor:
+// points of skill unlocks one more tier. Tier 0 ("common") is the baseline:
 // skill 0-24 has common-tier capability, 25-49 tier-1 capability, 50-74 tier-2,
 // and so on. Recipes bucket their skillReq the same way, so a recipe's tier
 // and a player's capability tier are directly comparable.

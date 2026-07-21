@@ -706,6 +706,12 @@ export const id_ID: EnTranslations = {
       "collapseHint": "Ciutkan pelacak misi",
       "expandHint": "Bentangkan pelacak misi"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Tampilkan Cap Waktu Obrolan",
       "format": "Format Cap Waktu",
@@ -1178,6 +1184,10 @@ export const id_ID: EnTranslations = {
         "fiestaWin": "Kemenangan Fiesta"
       }
     },
+    "charSheet": {
+      "offense": "Offense",
+      "defense": "Defense"
+    },
     "statInfo": {
       "fromYour": "Dari {value} {stat} Anda:",
       "names": {
@@ -1454,6 +1464,8 @@ export const id_ID: EnTranslations = {
     "townFocus": {
       "title": "Fokus Kota",
       "hint": "Poin fokus menambahkan bonus di atas hasil dasar setiap komponen. Komponen tanpa fokus tetap pada hasil dasar.",
+      "tierHint": "Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.",
+      "townOnlyHint": "Focus can only be changed while you are in town.",
       "budgetLabel": "Sisa poin: {remaining} / {budget}",
       "saveButton": "Simpan Fokus",
       "notInTownHint": "Kamu harus berada di kota untuk mengatur fokusmu.",
@@ -1512,6 +1524,7 @@ export const id_ID: EnTranslations = {
       "dragEquipHint": "Seret ke karaktermu untuk memakai",
       "dragDestroyHint": "Seret ke dunia untuk menghancurkan",
       "reorderNeedsRecent": "Hapus filter dan urutkan berdasarkan Terbaru untuk mengatur ulang tasmu",
+      "itemAriaInstanced": "{item}, quantity {count}, maker-marked copy",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -2120,6 +2133,8 @@ export const id_ID: EnTranslations = {
         "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
       },
       "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "downgradeMark": "Bags full: the find was stored without its gatherer's mark.",
+      "downgradeFind": "Bags full: a pristine find slipped away.",
       "stateReady": "Ready",
       "stateCooldown": "Respawning"
     },
@@ -2259,6 +2274,7 @@ export const id_ID: EnTranslations = {
       "masterworkZoneLine": "{crafter} membuat karya besar {name}!",
       "tierUpToast": "{craft} maju ke tingkat {tier}!",
       "makersMark": "Dibuat oleh {name}",
+      "gatheredBy": "Gathered by {name}",
       "masterworkSeal": "Karya besar",
       "enchantedLine": "Terpesona"
     },
@@ -2554,9 +2570,6 @@ export const id_ID: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi."
-    },
-    "welcome": {
-      "invalid_input": "Data yang dimasukkan tidak valid."
     }
   },
   "guide": {
@@ -4137,6 +4150,7 @@ export const id_ID: EnTranslations = {
   "stats": {
     "title": "Status Dunia",
     "accountsCreated": "Pemain",
+    "charactersCreated": "Characters Created",
     "playersOnline": "Pemain Online",
     "realmName": "Nama Dunia"
   },
@@ -4170,7 +4184,9 @@ export const id_ID: EnTranslations = {
     "error": "Tidak dapat memuat pembaruan. Silakan coba lagi nanti.",
     "empty": "Belum ada pembaruan — periksa lagi nanti.",
     "prerelease": "Pra-rilis",
-    "viewOnGithub": "Lihat di GitHub"
+    "viewOnGithub": "Lihat di GitHub",
+    "new": "Baru",
+    "viewAll": "Lihat semua pembaruan di GitHub"
   },
   "download": {
     "title": "Unduh Peluncur Desktop",
@@ -5337,29 +5353,6 @@ export const id_ID: EnTranslations = {
     "heading": "Dunia sementara tidak tersedia.",
     "body": "Kami sedang memulai ulang layanan game dan memperkirakan Claudemoon akan kembali sebentar lagi. Halaman ini akan terus memeriksa secara otomatis.",
     "status": "Segera kembali"
-  },
-  "welcome": {
-    "back": "Selamat datang kembali, {name}",
-    "level": "Level {level}",
-    "lastPlayed": "Terakhir dimainkan: {when}",
-    "continue": "Masuki Dunia",
-    "continueHint": "Tekan Enter untuk melanjutkan, Esc untuk melewati",
-    "continueHintTouch": "Ketuk untuk melanjutkan",
-    "discord": {
-      "title": "Komunitas berkumpul di Discord",
-      "sub": "Pratinjau pembaruan, acara, obrolan pengembang, serta 2 slot bank bonus saat Discord ditautkan.",
-      "join": "Gabung ke Discord kami"
-    },
-    "chest": {
-      "ready": "Peti harian siap dibuka"
-    },
-    "armory": {
-      "cta": "Masuki dunia dan jelajahi Gudang Senjata"
-    },
-    "news": {
-      "new": "Baru",
-      "viewAll": "Lihat semua pembaruan di GitHub"
-    }
   },
   "hud": {
     "core": {
@@ -8593,6 +8586,129 @@ export const id_ID: EnTranslations = {
       },
       "elixir_of_the_serpent": {
         "name": "Ramuan Ular"
+      },
+      "mosshide_vest": {
+        "name": "Mosshide Vest"
+      },
+      "thornling_grips": {
+        "name": "Thornling Grips"
+      },
+      "acolyte_chain_grips": {
+        "name": "Acolyte Chain Grips"
+      },
+      "votive_chain_belt": {
+        "name": "Votive Chain Belt"
+      },
+      "briarroot_staff": {
+        "name": "Briarroot Staff"
+      },
+      "valefire_lantern": {
+        "name": "Valefire Lantern"
+      },
+      "fenbark_leggings": {
+        "name": "Fenbark Leggings"
+      },
+      "mirebloom_treads": {
+        "name": "Mirebloom Treads"
+      },
+      "fenwarden_sabatons": {
+        "name": "Fenwarden Sabatons"
+      },
+      "marshlight_hauberk": {
+        "name": "Marshlight Hauberk"
+      },
+      "duskthorn_mantle": {
+        "name": "Duskthorn Mantle"
+      },
+      "fenshadow_maul": {
+        "name": "Fenshadow Maul"
+      },
+      "wildgrove_cinch": {
+        "name": "Wildgrove Cinch"
+      },
+      "cragward_pauldrons": {
+        "name": "Cragward Pauldrons"
+      },
+      "cragthorn_greatstaff": {
+        "name": "Cragthorn Greatstaff"
+      },
+      "moonbark_vestments": {
+        "name": "Moonbark Vestments"
+      },
+      "peaksong_helm": {
+        "name": "Peaksong Helm"
+      },
+      "stormchant_gauntlets": {
+        "name": "Stormchant Gauntlets"
+      },
+      "cragprowl_belt": {
+        "name": "Cragprowl Belt"
+      },
+      "stormroot_cowl": {
+        "name": "Stormroot Cowl"
+      },
+      "thunderward_legguards": {
+        "name": "Thunderward Legguards"
+      },
+      "revenantstep_treads": {
+        "name": "Revenantstep Treads"
+      },
+      "shardfang_grips": {
+        "name": "Shardfang Grips"
+      },
+      "shardsong_mantle": {
+        "name": "Shardsong Mantle"
+      },
+      "wyrmcult_spellgrips": {
+        "name": "Wyrmcult Spellgrips"
+      },
+      "thornpeak_wildwraps": {
+        "name": "Thornpeak Wildwraps"
+      },
+      "stormvotive_hauberk": {
+        "name": "Stormvotive Hauberk"
+      },
+      "cryptbloom_shoulderguards": {
+        "name": "Cryptbloom Shoulderguards"
+      },
+      "gravewyrm_thornmaul": {
+        "name": "Gravewyrm Thornmaul"
+      },
+      "vestments_of_the_waking_grove": {
+        "name": "Vestments of the Waking Grove"
+      },
+      "nightfangs_greatstaff": {
+        "name": "Nightfang's Greatstaff"
+      },
+      "maul_of_the_scourged_wilds": {
+        "name": "Maul of the Scourged Wilds"
+      },
+      "tidehymn_slippers": {
+        "name": "Tidehymn Slippers"
+      },
+      "pearlward_aegis": {
+        "name": "Pearlward Aegis"
+      },
+      "wildgrowth_leggings": {
+        "name": "Wildgrowth Leggings"
+      },
+      "grovewardens_grips": {
+        "name": "Grovewarden's Grips"
+      },
+      "verdant_walkers": {
+        "name": "Verdant Walkers"
+      },
+      "lunarward_cinch": {
+        "name": "Lunarward Cinch"
+      },
+      "dreamroot_boots": {
+        "name": "Dreamroot Boots"
+      },
+      "stormbark_mantle": {
+        "name": "Stormbark Mantle"
+      },
+      "wildsoul_maul": {
+        "name": "Wildsoul Maul"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

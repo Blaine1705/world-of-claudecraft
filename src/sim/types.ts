@@ -3760,6 +3760,20 @@ export type SimEvent = { pid?: number } & (
       requiredTier: number;
       professionId?: GatheringProfessionId;
     }
+  // Full-bag signed-grant downgrade (Professions 2.0 Phase 12d): a signed
+  // yield could not land in its signed form, so either the units arrived as a
+  // plain unsigned top-up (lost 'mark': the yield survived, the gatherer's
+  // mark did not) or a pure-extra specimen jackpot was dropped outright (lost
+  // 'find'). Personal (pid = the gatherer) and text-free on purpose (like
+  // gatherDenied above): the client composes its own localized copy off the
+  // structured fields. Emitted at most ONCE per harvest command (the
+  // gatherDenied dedupe idiom), even when several yields downgrade.
+  | {
+      type: 'gatherDowngrade';
+      pid: number;
+      surface: 'node' | 'corpse';
+      lost: 'mark' | 'find';
+    }
   // Fishing catch outcome (Professions 2.0 Phase 11): a landed catch emits
   // this so the client can log the reel-in feedback line for the acting
   // player. Personal (carries pid = the angler), emitted only on the

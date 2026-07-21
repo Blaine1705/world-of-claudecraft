@@ -224,8 +224,10 @@ export function equipItem(
   const consumed = ctx.removeItem(itemId, 1, meta.entityId);
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
-    // its own instanced slot (never merge it into a plain stack, which would
-    // silently drop the enchant), same non-merge rule addItemInstance follows.
+    // its own instanced slot (never merged into a plain stack, which would
+    // silently drop the enchant; worn kinds are 1-per-slot, so the
+    // identical-payload merge arm addItemInstance grew in Phase 12d could
+    // never apply here anyway).
     if (oldInstance) meta.inventory.push({ itemId: old, count: 1, instance: oldInstance });
     else addItemSilent(old, 1, meta);
   }

@@ -16,7 +16,14 @@ import type {
   PlayerProfessionsView,
 } from '../world_api';
 import * as bagsMod from './bags';
-import { addStacked, BAG_SOCKETS, bagCapacity, canAddItem, migrationBagsFor } from './bags';
+import {
+  addStacked,
+  BAG_SOCKETS,
+  bagCapacity,
+  canAddItem,
+  migrationBagsFor,
+  stackSizeOf,
+} from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
@@ -205,6 +212,7 @@ import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
+import { canStackInstancePayloads } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
 import type { JailState } from './jail';
@@ -6583,14 +6591,23 @@ export class Sim {
   }
 
   // Grant a single non-fungible copy of `itemId` carrying an instance payload
-  // (#1165: signer/charges/rolled/boundTo). Always its own slot entry (count 1),
-  // never merged with an existing plain or differently-instanced stack.
+  // (#1165: signer/charges/rolled/boundTo). Identical-payload stacking (Phase
+  // 12d): the copy merges into an existing slot whose payload is byte-equal
+  // under canStackInstancePayloads (so a charge-bearing payload stays
+  // one-per-slot) with stack room; otherwise it takes its own slot entry. It
+  // never merges with a plain or differently-instanced stack.
   addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    meta.inventory.push({ itemId, count: 1, instance });
+    const stack = stackSizeOf(def);
+    const mergeTarget = meta.inventory.find(
+      (s) =>
+        s.itemId === itemId && s.count < stack && canStackInstancePayloads(s.instance, instance),
+    );
+    if (mergeTarget) mergeTarget.count += 1;
+    else meta.inventory.push({ itemId, count: 1, instance });
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
     // the static def quality for the quality-first marks.
     deedsMod.markItemDiscovered(this.ctx, meta, itemId, instance.rolled?.quality);
@@ -6602,11 +6619,16 @@ export class Sim {
     this.ctx.onInventoryChangedForQuests(meta);
   }
 
-  // Returns the `instance` payload of every instanced slot actually consumed
-  // (highest-index/most-recently-added slot first, matching the removal
-  // order below), so a caller that needs to attribute an effect to the
-  // SPECIFIC copy removed (e.g. #1149 Battlefield Experience) never guesses
-  // at a different slot than the one this call actually took from.
+  // Returns the `instance` payload of every instanced UNIT actually consumed
+  // (highest-index/most-recently-added slot first, matching the removal order
+  // below; one entry PER UNIT, since an identical-payload stack holds many
+  // units behind one payload object), so a caller that needs to attribute an
+  // effect to the SPECIFIC copy removed (e.g. #1149 Battlefield Experience)
+  // never guesses at a different slot than the one this call actually took
+  // from. Payloads are deep-cloned whenever the slot RETAINS units after the
+  // removal: a caller that mutates a returned payload (enchanting is the live
+  // case) must never alias the surviving stack's shared payload. The final
+  // unit of a fully-consumed slot returns the original object.
   removeItem(itemId: string, count: number, pid?: number): ItemInstancePayload[] {
     const consumedInstances: ItemInstancePayload[] = [];
     const r = this.resolve(pid);
@@ -6615,8 +6637,15 @@ export class Sim {
     for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
       const s = meta.inventory[i];
       if (s.itemId !== itemId) continue;
-      if (s.instance) consumedInstances.push(s.instance);
       const take = Math.min(s.count, count);
+      if (s.instance) {
+        for (let unit = 0; unit < take; unit++) {
+          const finalUnitOfSlot = take >= s.count && unit === take - 1;
+          consumedInstances.push(
+            finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
+          );
+        }
+      }
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
@@ -6669,7 +6698,7 @@ export class Sim {
   // stacks (matching removeFungibleItem's ordering within that subset) and only
   // reaches for an instanced-but-unenchanted copy once no fungible copy is left.
   // Never removes an already-enchanted copy (isEnchantedInstance). Returns the
-  // `instance` payload of every instanced slot actually consumed (matching
+  // `instance` payload of every instanced unit actually consumed (matching
   // removeItem's return contract) so a caller applying an enchant can merge a
   // crafted copy's signer/masterwork/legacy rolled.quality into the
   // freshly-enchanted instance instead of silently dropping them (#1712
@@ -6688,12 +6717,18 @@ export class Sim {
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
-    // Pass 2: instanced copies that are not already enchanted.
+    // Pass 2: instanced copies that are not already enchanted. Per-unit
+    // returns with the same clone-on-survival rule removeItem follows: the
+    // enchant path mutates the payload it gets back, so a surviving stack's
+    // shared payload must never be aliased out.
     for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
       const s = meta.inventory[i];
       if (s.itemId !== itemId || !s.instance || isEnchantedInstance(s.instance)) continue;
-      consumedInstances.push(s.instance);
       const take = Math.min(s.count, count);
+      for (let unit = 0; unit < take; unit++) {
+        const finalUnitOfSlot = take >= s.count && unit === take - 1;
+        consumedInstances.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+      }
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);

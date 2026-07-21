@@ -360,6 +360,32 @@ describe('re-crossing the 75/100 thresholds after the reset', () => {
     expect(meta.guildLetterSent).toBe(true);
     expect(sim.mailUnreadFor(pid)).toBe(unreadBefore);
   });
+
+  it('positive control: the deed eval DOES fire on the climb for a never-earned deed', () => {
+    // Same climb as above, but prog_mining_100 was never earned by this
+    // character: the re-cross must grant it fresh. This is the arm that
+    // proves the no-duplicate pins above are not vacuous (the deed sweep
+    // demonstrably ran against the climbed skills in this exact idiom).
+    const s = resetSave();
+    // biome-ignore lint/suspicious/noExplicitAny: fixture shaping
+    delete (s as any).archetype;
+    // biome-ignore lint/suspicious/noExplicitAny: fixture shaping
+    delete (s as any).deeds.prog_mining_100;
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'FreshCross', { state: s });
+    const meta = metaOf(sim, pid);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_mining_100')).toBe(false);
+    const renownBefore = meta.renown;
+    meta.gatheringProficiency.mining = 100;
+    // biome-ignore lint/suspicious/noExplicitAny: test reaches the ctx seam
+    markDeedsDirty((sim as any).ctx, pid);
+    for (let i = 0; i < 45; i++) sim.tick();
+    expect(meta.deedsEarned.has('prog_mining_100')).toBe(true);
+    // A FRESH grant, not the fixture sentinel, and it pays renown.
+    expect(meta.deedsEarned.get('prog_mining_100')).not.toBe('2026-01-02');
+    expect(meta.renown).toBeGreaterThan(renownBefore);
+  });
 });
 
 describe('parity: zero new sampled PlayerMeta fields', () => {

@@ -156,6 +156,36 @@ function rehearse(state: CharacterState, seed: number, playerClass = 'warrior'):
   if (actual.masteryResetApplied !== true) {
     violations.push('output blob is missing masteryResetApplied: true');
   }
+
+  // Arm 3 (completeness, Phase 12c QA): the two allowlist arms above only
+  // classify deltas that HAPPENED, so a partial reset (one map missed) sails
+  // through them: the untouched map produces no delta at all. For a row the
+  // reset should have applied to, require every craft-skill and gathering
+  // leaf of the OUTPUT blob (the legacy professions mirror included, when
+  // present) to be exactly 0. This is the arm that makes the env-gated
+  // production-copy run fail loudly on an incomplete reset instead of
+  // tallying it as applied.
+  if (!wasApplied) {
+    const craftOut = (actual.craftSkills ?? {}) as Record<string, unknown>;
+    for (const craft of CRAFT_RING) {
+      if (craftOut[craft.id] !== 0) {
+        violations.push(
+          `reset incompleteness: craftSkills.${craft.id} is ${JSON.stringify(craftOut[craft.id])}, expected 0`,
+        );
+      }
+    }
+    for (const root of ['gatheringProficiency', 'professions'] as const) {
+      const map = actual[root] as Record<string, unknown> | undefined;
+      if (root === 'professions' && map === undefined) continue; // mirror is optional
+      for (const id of Object.keys(GATHERING_PROFESSIONS)) {
+        if ((map ?? {})[id] !== 0) {
+          violations.push(
+            `reset incompleteness: ${root}.${id} is ${JSON.stringify((map ?? {})[id])}, expected 0`,
+          );
+        }
+      }
+    }
+  }
   return { applied: !wasApplied, violations };
 }
 

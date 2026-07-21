@@ -76,24 +76,25 @@ describe('held weapon models', () => {
     expect(unmapped.map((item) => item.id)).toEqual([]);
   });
 
-  // The wraithfire_orb (and its generated heroic clone) is the ONE known held
-  // model gap: the shared art set has no orb model to map it to, so it needs new
-  // art, not a table row. Pinning the exact set makes the exception conscious: a
-  // future held_offhand item must either map to a model or extend this pin.
-  it('pins the wraithfire orb as the only held_offhand without a model', () => {
+  // The wraithfire_orb (and its generated heroic clone) plus the valefire_lantern
+  // are the known held model gaps: the shared art set has no orb or lantern model
+  // to map them to, so they need new art, not a table row. Pinning the exact set
+  // makes the exception conscious: a future held_offhand item must either map to
+  // a model or extend this pin.
+  it('pins the held_offhand items without a model (orb and lantern)', () => {
     const heldOffhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
     const unmapped = heldOffhands
       .filter((item) => itemOffhandModelUrl(item.id) === null)
       .map((item) => item.id)
       .sort();
-    expect(unmapped).toEqual(['heroic_wraithfire_orb', 'wraithfire_orb']);
+    expect(unmapped).toEqual(['heroic_wraithfire_orb', 'valefire_lantern', 'wraithfire_orb']);
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {
     expect(itemOffhandModelUrl('eastbrook_buckler')).toBe('models/weapons/shield_round.glb');
     expect(itemOffhandModelUrl('highwatch_wallshield')).toBe('models/weapons/shield_square.glb');
     expect(itemOffhandModelUrl('rusty_dagger')).toBe('models/weapons/dagger_a.glb');
-    expect(itemOffhandModelUrl('heroic_moggers_shiv')).toBe('models/weapons/dagger_c.glb');
+    expect(itemOffhandModelUrl('heroic_fang_of_korzul')).toBe('models/weapons/dagger_c.glb');
     expect(itemOffhandModelUrl('chest_armor_not_an_offhand')).toBeNull();
     expect(itemOffhandModelUrl(null)).toBeNull();
     expect(itemOffhandModelUrl(undefined)).toBeNull();
@@ -272,7 +273,7 @@ describe('weapon skin held models', () => {
     expect(offhandModelUrl('rusty_dagger', 'frostbite_dagger')).toBe(
       weaponSkinModelUrl('frostbite_dagger'),
     );
-    expect(offhandModelUrl('heroic_moggers_shiv', 'ashspark_dagger')).toBe(
+    expect(offhandModelUrl('heroic_fang_of_korzul', 'ashspark_dagger')).toBe(
       weaponSkinModelUrl('ashspark_dagger'),
     );
     // Sword skin + offhand one-hand sword: also mirrors.

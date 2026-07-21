@@ -798,7 +798,9 @@ describe('parties', () => {
       // the common item round-robins to exactly one recipient.
       expect(sim.countItem('worn_sword', a) + sim.countItem('worn_sword', b)).toBe(1);
       // the corpse is fully cleared by the delegated lootCorpse distribution.
-      expect(mob.lootable).toBe(false);
+      // Phase 12d: the emptied wolf corpse stays lootable through its
+      // unclaimed-harvest grace window instead of collapsing immediately.
+      expect(mob.lootable).toBe(true);
       expect(mob.loot).toBeNull();
       expect(sim.events.some((e) => e.type === 'error')).toBe(false);
     });
@@ -861,7 +863,9 @@ describe('parties', () => {
       });
       sim.autoLoot(openMob.id, a);
       expect(sim.meta(a)?.copper ?? 0).toBeGreaterThan(0);
-      expect(openMob.lootable).toBe(false);
+      // Phase 12d grace window: emptied but still owed its unclaimed harvest.
+      expect(openMob.lootable).toBe(true);
+      expect(openMob.loot).toBeNull();
     });
 
     it("does not auto-loot a stranger's corpse after it goes FFA, though a deliberate manual loot still can", () => {
@@ -884,7 +888,9 @@ describe('parties', () => {
       // A deliberate manual loot on the same FFA corpse still works (manual honors FFA).
       sim.lootCorpse(mob.id, a);
       expect(sim.countItem('worn_sword', a)).toBe(1);
-      expect(mob.lootable).toBe(false);
+      // Phase 12d grace window: emptied but still owed its unclaimed harvest.
+      expect(mob.lootable).toBe(true);
+      expect(mob.loot).toBeNull();
     });
   });
 });

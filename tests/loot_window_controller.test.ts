@@ -30,6 +30,7 @@ function entity(
 function harness(
   initialEntities: Entity[] = [],
   corpseAvailability = (mob: Entity) => corpseLootAvailability(mob, 7),
+  townFocus: Record<string, number> = {},
 ) {
   const element = document.createElement('div');
   element.id = 'loot-window';
@@ -42,6 +43,7 @@ function harness(
     entities,
     playerId: 7,
     player: { pos: { x: 0, y: 0, z: 0 } },
+    townFocus,
     lootCorpse,
     harvestCorpse,
     collectDelveChestLoot,
@@ -161,6 +163,34 @@ describe('LootWindowController', () => {
 
     expect(test.harvestCorpse).toHaveBeenCalledWith(11, [boxes[0].value]);
     expect(test.element.style.display).toBe('none');
+  });
+
+  it('pre-checks the town-focus components in the harvest picker (Phase 12d)', () => {
+    const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)!.componentTags!;
+    expect(tags.length).toBeGreaterThanOrEqual(2); // a strict focused subset must be expressible
+    const mob = entity(13, { kind: 'mob', templateId: harvestMobId, loot: null });
+    const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), { [tags[0]]: 5 });
+
+    test.controller.openCorpse(13, 0, 0);
+
+    const boxes = [...test.element.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
+    expect(boxes.map((box) => [box.value, box.checked])).toEqual(
+      tags.map((tag) => [tag, tag === tags[0]]),
+    );
+  });
+
+  it('deselecting every pre-checked box still submits an explicit empty pick (spread)', () => {
+    const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)!.componentTags!;
+    const mob = entity(14, { kind: 'mob', templateId: harvestMobId, loot: null });
+    const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), { [tags[0]]: 5 });
+
+    test.controller.openCorpse(14, 0, 0);
+    for (const box of test.element.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')) {
+      box.checked = false;
+    }
+    test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
+
+    expect(test.harvestCorpse).toHaveBeenCalledWith(14, []);
   });
 
   it('owns delve chest state and collection while empty rewards stay closed', () => {
