@@ -1245,7 +1245,18 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           description:
             'Doctrine damage-healing restores Psalm of Warding by 20% of the healing done, up to its original absorb. Benison turns Choirmend overhealing into a 10 sec absorb capped at 10% maximum health. Each Vespers Effigy echo extends Dirge of Decay by 1 sec, up to 6 sec per target.',
           icon: 'power_word_shield',
-          effect: { intrinsic: { mechanic: 'priest_living_covenant', metrics: {} } },
+          effect: {
+            intrinsic: {
+              mechanic: 'priest_living_covenant',
+              metrics: {
+                doctrineShieldPct: 0.2,
+                benisonAbsorbDuration: 10,
+                benisonAbsorbCapPct: 0.1,
+                vespersExtension: 1,
+                vespersExtensionCap: 6,
+              },
+            },
+          },
         },
       ],
     },
@@ -1293,7 +1304,16 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           icon: 'seraphic_vigil',
           effect: {
             ability: [{ ability: 'seraphic_vigil', bonusCharges: 1 }],
-            intrinsic: { mechanic: 'priest_twin_covenant', metrics: {} },
+            intrinsic: {
+              mechanic: 'priest_twin_covenant',
+              metrics: {
+                doctrineConversionPct: 0.7,
+                linkCap: 2,
+                vigilCharges: 2,
+                vigilTargetCap: 2,
+                effigyCap: 2,
+              },
+            },
           },
         },
         {
@@ -1312,7 +1332,19 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           description:
             'A fully consumed Psalm of Warding heals its target for 40% of the original absorb. Benison Vigil healing also heals up to 3 nearby party members for 40%. A 5-stack Vespers Tithefiend deals 50% more damage and lasts 50% longer.',
           icon: 'summon_tithefiend',
-          effect: { intrinsic: { mechanic: 'priest_incarnate_spirit', metrics: {} } },
+          effect: {
+            intrinsic: {
+              mechanic: 'priest_incarnate_spirit',
+              metrics: {
+                shieldHealPct: 0.4,
+                splashTargetCap: 3,
+                splashHealPct: 0.4,
+                tithefiendStacks: 5,
+                tithefiendDamagePct: 0.5,
+                tithefiendDurationPct: 0.5,
+              },
+            },
+          },
         },
       ],
     },
