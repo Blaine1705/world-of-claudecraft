@@ -219,7 +219,10 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
     },
   ],
   paladin: [
-    { id: 'retribution', weights: { str: 1, sta: 0.8, int: 0.3, spi: 0.2 }, melee: true },
+    // Ret weights are PURE physical: with the heroic pool open, even a small
+    // int/spi weight let the giant heroic healer staff outscore the 2H swords
+    // and a retribution paladin spawned holding a resto stick.
+    { id: 'retribution', weights: { str: 1, sta: 0.8, agi: 0.2 }, melee: true },
     { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false },
     {
       id: 'protection',
@@ -472,8 +475,10 @@ export const NYTHRAXIS_ATTUNEMENT_QUESTS: readonly string[] = [
 
 /** Bump when the kit rules change (new gear pools, new roles) so every
  *  existing character re-kits at its next world join. v2: true BiS across the
- *  whole PvE ladder incl. heroic/raid/rift gear, riding trained. */
-export const BOOST_KIT_VERSION = 2;
+ *  whole PvE ladder incl. heroic/raid/rift gear, riding trained. v3: ret
+ *  paladin weights go pure physical (the heroic healer staff outscored the
+ *  2H swords through the old int/spi weights). */
+export const BOOST_KIT_VERSION = 3;
 
 /**
  * Bring one live player up to the current boost kit: level 20, four
