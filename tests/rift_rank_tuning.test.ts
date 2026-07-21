@@ -667,8 +667,9 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     expect(ITEMS[RIFT_LEGENDARY_ITEM_ID].quality).toBe('legendary');
   });
 
-  it('C pays nothing, B rolls a slim chance, A guarantees an epic, S guarantees plus rolls more', () => {
+  it('C pays a guaranteed rare + coin, B guarantees an epic, A guarantees an epic, S guarantees plus rolls more', () => {
     const epicIds = new Set<string>(RIFT_EPIC_ITEM_IDS);
+    const rareIds = new Set<string>(RIFT_RARE_ITEM_IDS);
     const mountIds = new Set<string>([...RIFT_BLUE_MOUNT_REINS, ...RIFT_EPIC_MOUNT_REINS]);
     // Returns only the gear (non-mount) items from a clear.
     const run = (baseLevel: number, rngSeed: number) => {
@@ -677,13 +678,25 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
       addRiftClearGearLoot(ctx, boss, baseLevel);
       return boss.loot!.items.map((i) => i.itemId).filter((id) => !mountIds.has(id!));
     };
+    const runCopper = (baseLevel: number, rngSeed: number): number => {
+      const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
+      const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
+      addRiftClearGearLoot(ctx, boss, baseLevel);
+      return boss.loot!.copper;
+    };
     for (let s = 1; s <= 40; s++) {
-      expect(run(20, s), 'C never pays clear gear').toHaveLength(0);
+      // C: guaranteed rare from RIFT_RARE_ITEM_IDS, never an epic.
+      const c = run(20, s);
+      expect(c.length, 'C pays exactly one rare').toBe(1);
+      expect(rareIds.has(c[0]!), 'C pays from the rare pool').toBe(true);
+      expect(runCopper(20, s), 'C pays the coin bonus').toBe(RIFT_COIN_BONUS_C);
       const a = run(25, s);
       expect(a.length, 'A guarantees exactly one epic').toBe(1);
       expect(epicIds.has(a[0]!), 'A pays from the epic pool').toBe(true);
+      // B: guaranteed 1 epic (RIFT_EPIC_CHANCE_B = 1.0).
       const b = run(22, s);
-      expect(b.length, 'B is a slim gear roll').toBeLessThanOrEqual(1);
+      expect(b.length, 'B guarantees exactly one epic').toBe(1);
+      expect(epicIds.has(b[0]!), 'B pays from the epic pool').toBe(true);
       const sDrops = run(28, s);
       expect(sDrops.length, 'S guarantees one epic').toBeGreaterThanOrEqual(1);
       expect(sDrops.length).toBeLessThanOrEqual(3);
@@ -692,23 +705,19 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
         expect(epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID).toBe(true);
       }
     }
-    // Across many rolls, B pays SOMETIMES (neither never nor always), and the S
-    // legendary is reachable but rare.
-    let bHits = 0;
+    // S legendary is reachable but rare; B always pays exactly one epic.
     let sLegendaries = 0;
     for (let s = 1; s <= 300; s++) {
-      if (run(22, s).length > 0) bHits++;
       if (run(28, s).includes(RIFT_LEGENDARY_ITEM_ID)) sLegendaries++;
     }
-    expect(bHits).toBeGreaterThan(0);
-    expect(bHits).toBeLessThan(150);
     expect(sLegendaries).toBeGreaterThan(0);
     expect(sLegendaries).toBeLessThan(60);
   });
 
-  it('an S-rank clear leaves the epic on the boss corpse; a C clear does not', () => {
+  it('an S-rank clear leaves an epic on the boss corpse; a C clear leaves a rare (not an epic)', () => {
     const seed = seedWithFinalBoss('rift_boss_ember');
     const epicIds = new Set<string>(RIFT_EPIC_ITEM_IDS);
+    const rareIds = new Set<string>(RIFT_RARE_ITEM_IDS);
 
     const s = enterAtBossFloor(seed, 28);
     const sBoss = s.entities.get(active(s).bossId!)!;
@@ -752,20 +761,24 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     const cItems = (cBoss.loot?.items ?? []).map((i) => i.itemId);
     expect(
       cItems.some((id) => epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID),
-      'C corpse never carries clear gear',
+      'C corpse never carries an epic or legendary',
     ).toBe(false);
+    expect(
+      cItems.some((id) => rareIds.has(id!)),
+      'C corpse carries exactly one rare',
+    ).toBe(true);
   });
 
-  it('rank coin bonus: C pays none, B/A/S each pay the correct copper bonus', () => {
+  it('rank coin bonus: C/B/A/S each pay the correct copper bonus', () => {
     const runCopper = (baseLevel: number, rngSeed: number): number => {
       const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
       const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
       addRiftClearGearLoot(ctx, boss, baseLevel);
       return boss.loot!.copper;
     };
-    // C gets no bonus (baseLevel 20).
+    // C gets the normal-tier coin bonus (RIFT_COIN_BONUS_C = 10 000c).
     for (let s = 1; s <= 10; s++) {
-      expect(runCopper(20, s), 'C rank: no coin bonus').toBe(RIFT_COIN_BONUS_C);
+      expect(runCopper(20, s), 'C rank: normal-tier coin bonus').toBe(RIFT_COIN_BONUS_C);
     }
     // B always gets exactly RIFT_COIN_BONUS_B regardless of other draws.
     for (let s = 1; s <= 10; s++) {

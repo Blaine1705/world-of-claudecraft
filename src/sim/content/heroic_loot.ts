@@ -539,7 +539,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // (loot/loot_roll.ts + heroic_variants.ts). This table adds only the
     // heroic-ONLY extras the normal table never carries: the three bespoke raid
     // weapons, one of which drops per heroic kill (chances sum to 1.0), plus the
-    // blue mount secondary paths (lower rate than the five-mans, raid bonus path).
+    // blue and green mount secondary paths (same per-mount rate as their five-man
+    // sources; the raid offers both of each so every heroic raider has a path).
     { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic_weapon' },
     {
       itemId: 'scepter_of_the_deathless_court',
@@ -547,9 +548,14 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       rollGroup: 'nythraxis_heroic_weapon',
     },
     { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic_weapon' },
-    // Blue mount secondary paths on the heroic raid (0.1% each); the primary
+    // Blue mount secondary paths on the heroic raid (0.1% each, equal per-mount
+    // to the five-man rate; both blues available so aggregate ~0.2%); the primary
     // path for each is its five-man heroic boss. Epic mounts are rift S-only.
     { itemId: 'reins_aether_hover_cycle', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
     { itemId: 'reins_shadowjump_toad', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
+    // Green mount secondary paths on the heroic raid (0.5% each), mirroring the
+    // five-man green paths (morthen + vael); every heroic raider has a path to each.
+    { itemId: 'reins_grag_bear', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    { itemId: 'reins_stalkglider_snail', chance: HEROIC_GREEN_MOUNT_CHANCE },
   ],
 };

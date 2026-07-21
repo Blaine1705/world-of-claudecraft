@@ -246,10 +246,12 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     const { boss, portalInfo } = runToBossKill(sim);
     tickSeconds(sim, 1.2);
     expect(meta.heroicDaily.marked.has(`rift_${portalInfo.tier}`)).toBe(true);
+    const tierInfo = RIFT_TIER_INFO[portalInfo.tier];
     const firstMarks = (boss.loot?.items ?? []).filter(
       (i) => i.itemId === HEROIC_MARK_ITEM_ID,
     ).length;
-    expect(firstMarks).toBeGreaterThan(0);
+    // C pays 0 marks (normal tier); B/A/S pay marks + raceMarks.
+    expect(firstMarks).toBe(tierInfo.marks + tierInfo.raceMarks);
     // A dev-portal run has no rank: never pays, never seals.
     sim.enterRift(4242, 15, sim.player.id);
     const inst2 = sim.riftInstances.find((i) => i.partyKey !== null && i.seed === 4242)!;

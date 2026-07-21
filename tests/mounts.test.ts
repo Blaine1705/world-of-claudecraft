@@ -203,6 +203,13 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(entry, `heroic Nythraxis also drops ${itemId}`).toBeDefined();
       expect(entry?.chance, `${itemId} raid heroic chance`).toBe(0.001);
     }
+    // Both greens also appear on the heroic Nythraxis raid at 0.5%.
+    for (const itemId of ['reins_grag_bear', 'reins_stalkglider_snail']) {
+      const entry = nythEntries.find((l) => l.itemId === itemId);
+      expect(entry, `heroic Nythraxis also drops ${itemId}`).toBeDefined();
+      expect(entry?.chance, `${itemId} raid green chance`).toBe(0.005);
+      expect(entry?.rollGroup, `${itemId} not in a roll group`).toBeUndefined();
+    }
 
     // Epic mounts: rift S-clear only (RIFT_EPIC_MOUNT_REINS), NOT on any static table.
     for (const itemId of ['reins_stormfeather_griffin', 'reins_thunderstrut_gobbler']) {

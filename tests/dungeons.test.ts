@@ -1316,9 +1316,16 @@ describe('dungeons: heroic boss drops', () => {
     for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
     expect(mountEntries.map((e) => e.itemId).sort()).toEqual([
       'reins_aether_hover_cycle',
+      'reins_grag_bear',
       'reins_shadowjump_toad',
+      'reins_stalkglider_snail',
     ]);
-    for (const e of mountEntries) expect(e.chance).toBe(0.001);
+    // Blues at 0.1%, greens at 0.5% - check each individually.
+    for (const e of mountEntries) {
+      const isBlue =
+        e.itemId === 'reins_aether_hover_cycle' || e.itemId === 'reins_shadowjump_toad';
+      expect(e.chance, `${e.itemId} chance`).toBe(isBlue ? 0.001 : 0.005);
+    }
 
     const droppedWeapons = new Set<string>();
     const droppedVariants = new Set<string>();
