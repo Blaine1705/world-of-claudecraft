@@ -1,5 +1,7 @@
+import { stoneboundThreatMultiplier } from '../src/sim/combat/shaman_warspirit';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { updateMobTarget } from '../src/sim/mob/targeting';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -16,6 +18,8 @@ export type OwnedDpsSpec =
   | 'thundercall'
   | 'warspirit'
   | 'vespers';
+
+export type OwnedHealerSpec = 'spiritmend' | 'doctrine' | 'benison';
 
 export interface OwnedClassBalanceScenario {
   targets: 1 | 3;
@@ -50,8 +54,40 @@ export interface OwnedClassBalanceResult {
   equipment: Record<string, string | null>;
 }
 
+export interface OwnedHealerBalanceResult {
+  head: string;
+  seed: number;
+  spec: OwnedHealerSpec;
+  allies: 1 | 3;
+  seconds: 60;
+  effectiveHealing: number;
+  hps: number;
+  overhealing: number;
+  overhealPct: number;
+  damage: number;
+  dps: number;
+  preparedHealing: number;
+  emergencyRecoverySeconds: number | null;
+  castsByAbility: Record<string, number>;
+  resource: { start: number; end: number; max: number };
+  equipment: Record<string, string | null>;
+}
+
+export interface WarspiritOfftankResult {
+  head: string;
+  seed: number;
+  rawIncomingDamage: number;
+  galeheartIncomingDamage: number;
+  stoneboundIncomingDamage: number;
+  stoneboundMitigationPct: number;
+  stoneboundThreatFrom100Damage: number;
+  forcedTargetUptimeSeconds: number;
+  secondsToLoseThreatAfterLeaving: number;
+}
+
 type ProbeSim = Sim & {
   addEntity(entity: Entity): void;
+  rebucket(entity: Entity): void;
   nextId: number;
 };
 
@@ -161,6 +197,9 @@ const VESPERS_PBE_LOADOUT: PbeLoadout = {
   ring2: 'architects_cornerstone',
 };
 
+const HEALER_SHAMAN_PBE_LOADOUT: PbeLoadout = THUNDERCALL_PBE_LOADOUT;
+const HEALER_PRIEST_PBE_LOADOUT: PbeLoadout = VESPERS_PBE_LOADOUT;
+
 export const OWNED_CLASS_PBE_LOADOUTS: Readonly<Record<OwnedDpsSpec, PbeLoadout>> = {
   packlord: HUNTER_PBE_LOADOUT,
   coldsight: HUNTER_PBE_LOADOUT,
@@ -171,7 +210,10 @@ export const OWNED_CLASS_PBE_LOADOUTS: Readonly<Record<OwnedDpsSpec, PbeLoadout>
 };
 
 function equipPbeLoadout(sim: Sim, spec: OwnedDpsSpec): void {
-  const loadout = OWNED_CLASS_PBE_LOADOUTS[spec];
+  equipExactLoadout(sim, OWNED_CLASS_PBE_LOADOUTS[spec]);
+}
+
+function equipExactLoadout(sim: Sim, loadout: PbeLoadout): void {
   for (const [slot, itemId] of Object.entries(loadout) as [EquipSlot, string][]) {
     if (!ITEMS[itemId]) throw new Error(`missing PBE fixture item ${itemId}`);
     sim.addItem(itemId, 1);
@@ -183,6 +225,12 @@ function equipPbeLoadout(sim: Sim, spec: OwnedDpsSpec): void {
       throw new Error(`failed to equip ${itemId} in ${slot}`);
     }
   }
+}
+
+function placeEntity(sim: ProbeSim, entity: Entity, x: number, z: number): void {
+  entity.pos = sim.groundPos(x, z);
+  entity.prevPos = { ...entity.pos };
+  sim.rebucket(entity);
 }
 
 function addTarget(sim: ProbeSim, xOffset: number, distance: number): Entity {
@@ -501,6 +549,313 @@ export function runOwnedClassDpsMatrix(
   );
 }
 
+function healerFixture(spec: OwnedHealerSpec): {
+  cls: 'shaman' | 'priest';
+  talentSpec: 'restoration' | 'discipline' | 'holy';
+  loadout: PbeLoadout;
+} {
+  if (spec === 'spiritmend') {
+    return { cls: 'shaman', talentSpec: 'restoration', loadout: HEALER_SHAMAN_PBE_LOADOUT };
+  }
+  return {
+    cls: 'priest',
+    talentSpec: spec === 'doctrine' ? 'discipline' : 'holy',
+    loadout: HEALER_PRIEST_PBE_LOADOUT,
+  };
+}
+
+function lowestHealth(allies: readonly Entity[]): Entity {
+  return [...allies].sort(
+    (left, right) => left.hp / left.maxHp - right.hp / right.maxHp || left.id - right.id,
+  )[0];
+}
+
+function healerCast(
+  sim: Sim,
+  caster: Entity,
+  abilityId: string,
+  target: Entity,
+  castsByAbility: Record<string, number>,
+): boolean {
+  const resolved = sim.resolvedAbility(abilityId, caster.id);
+  if (!resolved || caster.resource < resolved.cost) return false;
+  sim.targetEntity(target.id, caster.id);
+  caster.facing = Math.atan2(target.pos.x - caster.pos.x, target.pos.z - caster.pos.z);
+  caster.prevFacing = caster.facing;
+  const before = castFingerprint(sim, resolved.def.id);
+  sim.castAbility(abilityId, caster.id);
+  if (castFingerprint(sim, resolved.def.id) === before) return false;
+  castsByAbility[resolved.def.name] = (castsByAbility[resolved.def.name] ?? 0) + 1;
+  return true;
+}
+
+function runHealerRotation(
+  spec: OwnedHealerSpec,
+  sim: Sim,
+  healer: Entity,
+  allies: Entity[],
+  enemy: Entity,
+  castsByAbility: Record<string, number>,
+): void {
+  if (healer.dead || healer.castingAbility || healer.gcdRemaining > 0.001) return;
+  const lowest = lowestHealth(allies);
+  const injured = allies.filter((ally) => ally.hp / ally.maxHp < 0.82).length;
+  if (spec === 'spiritmend') {
+    const prepared = allies.filter((ally) =>
+      ally.auras.some(
+        (aura) => aura.id === 'shaman_mending_current' && aura.sourceId === healer.id,
+      ),
+    ).length;
+    if (allies.length === 3 && prepared >= 2 && injured >= 2) {
+      if (healerCast(sim, healer, 'chain_heal', lowest, castsByAbility)) return;
+    }
+    if (lowest.hp / lowest.maxHp < 0.55) {
+      if (healerCast(sim, healer, 'tidecall', lowest, castsByAbility)) return;
+    }
+    healerCast(sim, healer, 'healing_wave', lowest, castsByAbility);
+    return;
+  }
+  if (spec === 'doctrine') {
+    const linked = allies.some((ally) =>
+      ally.auras.some((aura) => aura.id === 'priest_doctrine' && aura.sourceId === healer.id),
+    );
+    if (!linked && healerCast(sim, healer, 'power_word_shield', lowest, castsByAbility)) return;
+    if (lowest.hp / lowest.maxHp < 0.42) {
+      if (healerCast(sim, healer, 'scouring_mercy', lowest, castsByAbility)) return;
+      if (healerCast(sim, healer, 'flash_heal', lowest, castsByAbility)) return;
+    }
+    healerCast(sim, healer, 'smite', enemy, castsByAbility);
+    return;
+  }
+  const watched = allies.some((ally) =>
+    ally.auras.some((aura) => aura.id === 'seraphic_vigil' && aura.sourceId === healer.id),
+  );
+  if (!watched && healerCast(sim, healer, 'seraphic_vigil', lowest, castsByAbility)) return;
+  if (allies.length === 3 && injured >= 2) {
+    if (healerCast(sim, healer, 'prayer_of_healing', healer, castsByAbility)) return;
+  }
+  if (lowest.hp / lowest.maxHp < 0.5) {
+    if (healerCast(sim, healer, 'flash_heal', lowest, castsByAbility)) return;
+  }
+  healerCast(sim, healer, 'heal', lowest, castsByAbility);
+}
+
+export function runOwnedHealerProbe(
+  spec: OwnedHealerSpec,
+  allyCount: 1 | 3,
+  seed = 29_910,
+  head = 'working-tree',
+): OwnedHealerBalanceResult {
+  const fixture = healerFixture(spec);
+  const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
+  sim.setPlayerLevel(20);
+  if (!sim.applyTalents({ spec: fixture.talentSpec, rows: {} } as never)) {
+    throw new Error(`failed to apply ${fixture.talentSpec}`);
+  }
+  equipExactLoadout(sim, fixture.loadout);
+  const healer = sim.player;
+  placeEntity(sim, healer, 720, 0);
+  const allies: Entity[] = [];
+  for (let index = 0; index < allyCount; index++) {
+    const allyId = sim.addPlayer('warrior', `Balance Ally ${index + 1}`);
+    sim.setPlayerLevel(20, allyId);
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('missing healer balance ally');
+    placeEntity(sim, ally, 722 + index * 2, 0);
+    sim.partyInvite(ally.id, healer.id);
+    sim.partyAccept(ally.id);
+    ally.hp = Math.max(1, Math.round(ally.maxHp * 0.35));
+    allies.push(ally);
+  }
+  const enemy = addTarget(sim, 0, 10);
+  enemy.weapon.min = 0;
+  enemy.weapon.max = 0;
+  healer.resource = healer.maxResource;
+  const resourceStart = healer.resource;
+  const castsByAbility: Record<string, number> = {};
+  let effectiveHealing = 0;
+  let overhealing = 0;
+  const originalApplyHeal = sim.ctx.applyHeal;
+  sim.ctx.applyHeal = (...args): number => {
+    const callerResolution = args[7];
+    const measured = { resolved: 0 };
+    args[7] = measured;
+    const effective = originalApplyHeal(...args);
+    effectiveHealing += effective;
+    overhealing += Math.max(0, measured.resolved - effective);
+    if (callerResolution) callerResolution.resolved = measured.resolved;
+    return effective;
+  };
+  sim.drainEvents();
+
+  let damage = 0;
+  let emergencyRecoverySeconds: number | null = null;
+  let recovered = false;
+  for (let tick = 0; tick < 60 * 20; tick++) {
+    runHealerRotation(spec, sim, healer, allies, enemy, castsByAbility);
+    const events = sim.tick();
+    damage += collectDamage(
+      {
+        sim,
+        spec: 'vespers',
+        targets: [enemy],
+        primary: enemy,
+        castsByAbility,
+        cooldownUses: {},
+        buttonsPressed: 0,
+      },
+      events,
+      { target_1: 0 },
+      {},
+    );
+    const elapsed = (tick + 1) / 20;
+    if (!recovered && allies.every((ally) => ally.hp / ally.maxHp >= 0.8)) {
+      recovered = true;
+      emergencyRecoverySeconds = elapsed;
+    }
+    if (recovered && (tick + 1) % 20 === 0) {
+      for (const ally of allies) {
+        const pulse = Math.max(1, Math.round(ally.maxHp * 0.12));
+        ally.hp = Math.max(1, ally.hp - pulse);
+      }
+    }
+  }
+  const preparedHealing = allies.reduce(
+    (total, ally) =>
+      total +
+      (ally.auras.find(
+        (aura) => aura.id === 'shaman_mending_current' && aura.sourceId === healer.id,
+      )?.value ?? 0),
+    0,
+  );
+  const meta = sim.players.get(healer.id);
+  if (!meta) throw new Error('missing healer metadata');
+  return {
+    head,
+    seed,
+    spec,
+    allies: allyCount,
+    seconds: 60,
+    effectiveHealing,
+    hps: effectiveHealing / 60,
+    overhealing,
+    overhealPct:
+      effectiveHealing + overhealing > 0 ? overhealing / (effectiveHealing + overhealing) : 0,
+    damage,
+    dps: damage / 60,
+    preparedHealing,
+    emergencyRecoverySeconds,
+    castsByAbility,
+    resource: { start: resourceStart, end: healer.resource, max: healer.maxResource },
+    equipment: { ...meta.equipment },
+  };
+}
+
+function incomingDamageForPosture(
+  posture: 'galeheart_weapon' | 'rockbiter_weapon',
+  seed: number,
+): number {
+  const sim = new Sim({ seed, playerClass: 'shaman', autoEquip: false }) as ProbeSim;
+  sim.setPlayerLevel(20);
+  if (!sim.applyTalents({ spec: 'enhancement', rows: {} } as never)) {
+    throw new Error('failed to apply enhancement');
+  }
+  equipExactLoadout(sim, WARSPIRIT_PBE_LOADOUT);
+  const attacker = createMob(sim.nextId++, MOBS.forest_wolf, 20, sim.groundPos(0, 3));
+  attacker.hostile = true;
+  attacker.hp = attacker.maxHp = 1_000_000;
+  sim.addEntity(attacker);
+  sim.player.gcdRemaining = 0;
+  sim.castAbility(posture);
+  sim.tick();
+  if (posture === 'rockbiter_weapon') {
+    sim.player.gcdRemaining = 0;
+    sim.castAbility('lightning_shield');
+    sim.tick();
+  }
+  sim.player.hp = sim.player.maxHp = 1_000_000;
+  const before = sim.player.hp;
+  for (let hit = 0; hit < 10; hit++) {
+    sim.ctx.dealDamage(
+      attacker,
+      sim.player,
+      100,
+      false,
+      'physical',
+      'Benchmark Swing',
+      'hit',
+      false,
+    );
+  }
+  return before - sim.player.hp;
+}
+
+export function runWarspiritOfftankProbe(
+  seed = 29_920,
+  head = 'working-tree',
+): WarspiritOfftankResult {
+  const galeheartIncomingDamage = incomingDamageForPosture('galeheart_weapon', seed);
+  const stoneboundIncomingDamage = incomingDamageForPosture('rockbiter_weapon', seed);
+  const sim = new Sim({ seed, playerClass: 'shaman', autoEquip: false }) as ProbeSim;
+  sim.setPlayerLevel(20);
+  if (!sim.applyTalents({ spec: 'enhancement', rows: {} } as never)) {
+    throw new Error('failed to apply enhancement');
+  }
+  equipExactLoadout(sim, WARSPIRIT_PBE_LOADOUT);
+  const rivalId = sim.addPlayer('warrior', 'Threat Rival');
+  sim.setPlayerLevel(20, rivalId);
+  const rival = sim.entities.get(rivalId);
+  if (!rival) throw new Error('missing threat rival');
+  const target = createMob(sim.nextId++, MOBS.forest_wolf, 20, sim.groundPos(0, 3));
+  target.hostile = true;
+  target.hp = target.maxHp = 1_000_000;
+  target.inCombat = true;
+  target.aiState = 'attack';
+  target.aggroTargetId = sim.player.id;
+  target.threat.set(rival.id, 1_000);
+  sim.addEntity(target);
+  sim.player.gcdRemaining = 0;
+  sim.castAbility('rockbiter_weapon');
+  sim.tick();
+  target.threat.clear();
+  sim.ctx.dealDamage(sim.player, target, 100, false, 'physical', 'Threat Probe', 'hit', false, {
+    mult: stoneboundThreatMultiplier(sim.ctx, sim.player),
+  });
+  const stoneboundThreatFrom100Damage = target.threat.get(sim.player.id) ?? 0;
+
+  target.threat.set(rival.id, 1_000);
+  target.threat.set(sim.player.id, 1_000);
+  target.aggroTargetId = sim.player.id;
+  target.forcedTargetId = sim.player.id;
+  target.forcedTargetTimer = 3;
+  let forcedTicks = 0;
+  while (target.forcedTargetTimer > 0 && forcedTicks < 100) {
+    updateMobTarget(sim.ctx, target);
+    forcedTicks++;
+  }
+  sim.player.gcdRemaining = 0;
+  sim.castAbility('galeheart_weapon');
+  sim.tick();
+  let secondsToLoseThreatAfterLeaving = 0;
+  while (target.aggroTargetId === sim.player.id && secondsToLoseThreatAfterLeaving < 60) {
+    secondsToLoseThreatAfterLeaving++;
+    target.threat.set(rival.id, (target.threat.get(rival.id) ?? 0) + 25);
+    updateMobTarget(sim.ctx, target);
+  }
+  const rawIncomingDamage = 1_000;
+  return {
+    head,
+    seed,
+    rawIncomingDamage,
+    galeheartIncomingDamage,
+    stoneboundIncomingDamage,
+    stoneboundMitigationPct: 1 - stoneboundIncomingDamage / galeheartIncomingDamage,
+    stoneboundThreatFrom100Damage,
+    forcedTargetUptimeSeconds: forcedTicks / 20,
+    secondsToLoseThreatAfterLeaving,
+  };
+}
+
 function printResult(result: OwnedClassBalanceResult): void {
   const { scenario } = result;
   console.log(
@@ -518,4 +873,23 @@ function printResult(result: OwnedClassBalanceResult): void {
 if (process.argv[1]?.endsWith('owned_class_balance_probe.ts')) {
   const head = process.env.WOC_BALANCE_HEAD ?? 'working-tree';
   for (const result of runOwnedClassDpsMatrix(29_900, head)) printResult(result);
+  for (const spec of ['spiritmend', 'doctrine', 'benison'] as const) {
+    for (const allies of [1, 3] as const) {
+      const result = runOwnedHealerProbe(spec, allies, 29_910, head);
+      console.log(
+        `${spec.padEnd(12)} ${allies} ${allies === 1 ? 'ally ' : 'allies'} 60 sec ` +
+          `${result.hps.toFixed(2).padStart(7)} HPS  ${result.dps.toFixed(2).padStart(7)} DPS  ` +
+          `overheal ${(result.overhealPct * 100).toFixed(1)}%  recovery ` +
+          `${result.emergencyRecoverySeconds ?? 'never'} sec  mana ${Math.round(result.resource.end)}/${result.resource.max}`,
+      );
+    }
+  }
+  const offtank = runWarspiritOfftankProbe(29_920, head);
+  console.log(
+    `warspirit off-tank  Stonebound ${offtank.stoneboundIncomingDamage}/${offtank.galeheartIncomingDamage} ` +
+      `incoming (${(offtank.stoneboundMitigationPct * 100).toFixed(1)}% less), ` +
+      `${offtank.stoneboundThreatFrom100Damage} threat/100 damage, ` +
+      `${offtank.forcedTargetUptimeSeconds.toFixed(1)} sec forced, ` +
+      `${offtank.secondsToLoseThreatAfterLeaving} sec to lose threat`,
+  );
 }

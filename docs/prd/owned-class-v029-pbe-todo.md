@@ -4,8 +4,11 @@ Status: active PBE work list
 
 Integration PR: #2218
 
-Local correctness pass: verified on top of `55ed43b5b` in the isolated integration worktree.
-Release-branch reconciliation is still required before review.
+Release baseline: `8f519277a` from `release/v0.29.0`, merged into this isolated integration
+worktree by `5c2c9333c`.
+
+Latest completed slices: DPS balance harness, Fieldcraft and Vespers tuning, safe level 20 default
+bars, and the first English tooltip clarity pass. Final fixed-head validation is still required.
 
 Scope: Hunter, Shaman, and Priest, including all nine specializations, their shared talent rows,
 their player-facing states, and the new rotation and starter action-bar work requested after the
@@ -21,9 +24,9 @@ Detailed One Button priorities and exact level 20 templates are in
 
 - [ ] Every spec owns only its intended spells and clears old spec state on change, death, relog,
       reconnect, and loadout swap.
-- [ ] Every damage, healing, mitigation, threat, and resource result is measured in the shared
-      1-target and 3-target harness.
-- [ ] Every level 20 spec has a useful default action bar that is applied only when safe.
+- [x] Every owned-spec damage, healing, mitigation, threat, and resource result is measured in the
+      shared 1-target and 3-target harness.
+- [x] Every level 20 spec has a useful default action bar that is applied only when safe.
 - [ ] Approved DPS specs have a spellbook `One Button` action with a documented and tested priority
       list.
 - [ ] Every new English spell, talent, aura, proc, and mechanic tooltip is plain, exact, and backed
@@ -34,18 +37,18 @@ Detailed One Button priorities and exact level 20 templates are in
 
 ## 1. Lock the baseline and test harness
 
-- [ ] Record the exact #2218 commit used for each PBE measurement.
-- [ ] Use the same level 20 gear, target level, target armor, buffs, talents, pet, and weapon setup
+- [x] Record the exact #2218 commit used for each PBE measurement.
+- [x] Use the same level 20 gear, target level, target armor, buffs, talents, pet, and weapon setup
       for every comparison.
-- [ ] Add a 60 sec single-target sustained test.
-- [ ] Add a 15 sec single-target burst test.
-- [ ] Add a 60 sec 3-target sustained test.
-- [ ] Add a 15 sec 3-target burst test.
-- [ ] Record total DPS, per-target DPS, damage by source, resource remaining, cooldown use, and the
+- [x] Add a 60 sec single-target sustained test.
+- [x] Add a 15 sec single-target burst test.
+- [x] Add a 60 sec 3-target sustained test.
+- [x] Add a 15 sec 3-target burst test.
+- [x] Record total DPS, per-target DPS, damage by source, resource remaining, cooldown use, and the
       number of rotational buttons pressed.
-- [ ] Add a fixed healer damage profile and record HPS, mana, overhealing, prepared healing, and
+- [x] Add a fixed healer damage profile and record HPS, mana, overhealing, prepared healing, and
       emergency recovery time.
-- [ ] Add a Warspirit off-tank scenario and record incoming damage, threat, forced-target uptime,
+- [x] Add a Warspirit off-tank scenario and record incoming damage, threat, forced-target uptime,
       and time to lose threat after leaving Stonebound.
 - [ ] Keep results for release classes beside these nine specs so elite difficulty is not tuned
       only around possibly overtuned redesigns.
@@ -140,17 +143,16 @@ Do not overwrite a player-customized bar.
 
 ### Shared rules
 
-- [ ] Define the exact empty-bar and first-spec-selection conditions.
-- [ ] Preserve every non-empty player slot unless the slot contains an invalid wrong-spec action.
-- [ ] Clear invalid old-spec actions, then fill only genuinely empty slots from the new spec
-      template.
-- [ ] Keep the same functional categories in the same positions where practical: core action,
+- [x] Define the exact empty-bar and first-spec-selection conditions.
+- [x] Preserve a saved customized bar, including a deliberately empty saved bar.
+- [x] Replace only a missing bar or the exact untouched template generated for the previous spec.
+- [x] Keep the same functional categories in the same positions where practical: core action,
       spender, area action, interrupt, movement, defense, heal, major cooldown, and utility.
-- [ ] Keep the highest-frequency actions in the easiest keyboard and mobile positions.
+- [x] Keep the highest-frequency actions in the easiest keyboard and mobile positions.
 - [ ] Put `One Button` in a visible starter slot when the spec owns it, without replacing the manual
       rotation.
-- [ ] Include no unlearned, talent-dependent, or wrong-spec action in a base template.
-- [ ] Add talent-granted actions to the next safe empty slot when selected.
+- [x] Include no unlearned, talent-dependent, or wrong-spec action in a base template.
+- [x] Resolve each template against the character's actually known actions before applying it.
 - [ ] Make template application deterministic across offline, online, load, respec, and imported
       loadouts.
 - [ ] Add a player setting or one-time reset command only if PBE shows that automatic repair is not
@@ -158,46 +160,38 @@ Do not overwrite a player-customized bar.
 
 ### Hunter templates
 
-- [ ] Packlord: Pack Command, Fell Shot, Venom Barb, Volley, One Button, Hushing Shot, Trailbreak,
-      Shellskin, Wildheart, Howling Rage, Frostjaw Trap, and pet care access.
-- [ ] Coldsight: Measured Shot, Long Draw, Fell Shot, Fevered Draw, Volley, One Button, Hushing Shot,
-      Trailbreak, Shellskin, Wildheart, Cold Focus, and Frostjaw Trap.
-- [ ] Fieldcraft: Bloodhook, Gutting Strike, Woundrend, Shrapnel Charge, One Button, Hushing Shot,
-      Trailbreak, Shellskin, Wildheart, Bloodtrail Assault, Frostjaw Trap, and Fettering Slash.
+- [x] Packlord has a tested manual-first level 20 template built from its known actions.
+- [x] Coldsight has a tested manual-first level 20 template built from its known actions.
+- [x] Fieldcraft has a tested manual-first level 20 template built from its known actions.
 - [ ] Decide whether guises live on the main bar, a secondary bar, or a stance strip.
 - [ ] Keep Wildbond, Patch Up, and Release Companion reachable without crowding the main rotation.
 
 ### Shaman templates
 
-- [ ] Thundercall: Arc Bolt, Earthen Jolt, Cinder Jolt, Rime Jolt, Faultwake, One Button, Thunder
-      Ward, Mending Waters, Shadewolf, Pyrebrand Weapon, Primal Mastery, and Storm Chorus.
-- [ ] Warspirit: Ancestral Strike, Earthen Jolt, Arc Bolt, Cinder Jolt, Rime Jolt, One Button,
-      Thunder Ward, Mending Waters, Shadewolf, Galeheart Weapon, Stonebound Weapon, and Storm Chorus.
-- [ ] Spiritmend: Mending Waters, Tidecall, Cascading Mend, Earthen Jolt, Arc Bolt, Thunder Ward,
-      Shadewolf, Lifespring Weapon, Storm Chorus, and the chosen talent utility.
-- [ ] Keep Galeheart and Stonebound beside each other so the damage and off-tank posture choice is
+- [x] Thundercall has a tested manual-first level 20 template built from its known actions.
+- [x] Warspirit has a tested manual-first level 20 template built from its known actions.
+- [x] Spiritmend has a tested manual-first level 20 template built from its known actions.
+- [x] Keep Galeheart and Stonebound beside each other so the damage and off-tank posture choice is
       obvious.
-- [ ] Do not put a DPS One Button action on Spiritmend by default.
+- [x] Do not put a DPS One Button action on Spiritmend by default.
 
 ### Priest templates
 
-- [ ] Doctrine: Scouring Hymn, Scouring Mercy, Psalm of Warding, Dirge of Decay, Mindfracture,
-      Urgent Prayer, Solemn Prayer, Veilstep, Terror Canticle, and chosen talent utility.
-- [ ] Benison: Solemn Prayer, Urgent Prayer, Choirmend, Sunburst Canticle, Seraphic Vigil, Lingering
-      Grace, Psalm of Warding, Veilstep, Terror Canticle, and chosen talent utility.
-- [ ] Vespers: Mindfracture, Dirge of Decay, Litany of Woe, Call Tithefiend, Gloamveil, One Button,
-      Psalm of Warding, Urgent Prayer, Veilstep, Terror Canticle, and chosen talent utility.
+- [x] Doctrine has a tested manual-first level 20 template built from its known actions.
+- [x] Benison has a tested manual-first level 20 template built from its known actions.
+- [x] Vespers has a tested manual-first level 20 template built from its known actions.
 - [ ] Decide whether Doctrine gets a One Button slot only after its hybrid role decision is made.
 - [ ] Keep emergency healing visible on every Priest template without crowding the DPS loop.
 
 ### Action-bar tests
 
-- [ ] Add a table-driven expected template for all nine specs.
-- [ ] Test first selection, respec, repeat selection, relog, reconnect, loadout import, level-up to
-      20, and an already-customized bar.
-- [ ] Test that no customized valid slot is overwritten.
-- [ ] Test that wrong-spec actions are removed and safe empty slots are filled once.
-- [ ] Test that talent grants enter and leave cleanly.
+- [x] Add a table-driven expected template for all nine specs.
+- [ ] Add relog, reconnect, and imported-loadout action-bar coverage.
+- [x] Test first sync, spec change, repeat selection, level-up to 20, and saved customized or empty
+      bars. Relog, reconnect, and imported-loadout coverage remains open.
+- [x] Test that no saved customized slot is overwritten.
+- [x] Test that an untouched generated template is swapped on spec change.
+- [x] Test that templates contain only actions the selected level 20 spec actually knows.
 - [ ] Test desktop bars, controller access, and mobile action-ring reachability.
 
 ## 5. Hunter PBE work
@@ -244,32 +238,31 @@ Do not overwrite a player-customized bar.
 
 ### Fieldcraft, Survival
 
-- [ ] Reduce Guttering Strike or Gutting Strike spam from the reported 150 DPS outlier.
-- [ ] Reduce empowered Woundrend from the reported 300 DPS outlier.
-- [ ] Keep the Trailbreak into Bloodhook re-entry interaction.
-- [ ] Keep Bloodhook as movement to the enemy, never a pull of the enemy.
-- [ ] Keep the range and blocked-geometry checks.
-- [ ] Keep the melee-led bleed, trap, explosive, and disengage identity.
-- [ ] Audit Bloodhook, Bloodhook Wound, Woundrend, Shrapnel Charge, Bloodtrail Assault, and Hunting
+- [x] Reduce Guttering Strike or Gutting Strike spam from the reported 150 DPS outlier.
+- [x] Reduce empowered Woundrend from the reported 300 DPS outlier.
+- [x] Keep the Trailbreak into Bloodhook re-entry interaction.
+- [x] Keep Bloodhook as movement to the enemy, never a pull of the enemy.
+- [x] Keep the range and blocked-geometry checks.
+- [x] Keep the melee-led bleed, trap, explosive, and disengage identity.
+- [x] Audit Bloodhook, Bloodhook Wound, Woundrend, Shrapnel Charge, Bloodtrail Assault, and Hunting
       Momentum against the shared scaling rules.
-- [ ] Decide and implement the intended Bloodhook bleed scaling before claiming it in the tooltip.
-      The current base bleed is flat 24 damage over 12 sec; only the re-entry hit adds 8% of Ranged
-      Attack Power.
-- [ ] Replace `primary wound` with plain English in every player-facing description.
-- [ ] Test Bloodhook tooltip values at two Ranged Attack Power values after scaling lands.
+- [x] Scale Bloodhook Wound as 24 base damage plus 30% of Ranged Attack Power over 12 sec in four
+      ticks, with the Trailbreak re-entry hit retaining its separate scaling.
+- [x] Replace `primary wound` with plain English in every player-facing description.
+- [x] Test Bloodhook tooltip values at two Ranged Attack Power values after scaling lands.
 
 #### Bloodhook DPS balance
 
-- [ ] Set a per-cast damage budget for Bloodhook's base bleed, optional re-entry hit, and
+- [x] Set a per-cast damage budget for Bloodhook's base bleed, optional re-entry hit, and
       Bloodtrail spread. Its movement utility must count as part of the spell's power budget.
-- [ ] Measure Bloodhook alone and inside the full Fieldcraft rotation in the 15 sec and 60 sec
+- [x] Measure Bloodhook alone and inside the full Fieldcraft rotation in the 15 sec and 60 sec
       1-target tests. Record base bleed damage, Ranged Attack Power contribution, re-entry damage,
       and cooldown-normalized DPS separately.
-- [ ] Repeat the measurement with 3 targets. Confirm Bloodtrail spread and Shrapnel interactions
+- [x] Repeat the measurement with 3 targets. Confirm Bloodtrail spread and Shrapnel interactions
       stay within the shared area-damage target and do not grow more than intended.
-- [ ] Tune the flat bleed and Ranged Attack Power coefficient separately so Bloodhook is useful at
+- [x] Tune the flat bleed and Ranged Attack Power coefficient separately so Bloodhook is useful at
       level 5, scales with level 20 gear, and does not become the largest rotational damage source.
-- [ ] Add deterministic tests that pin the chosen 1-target and 3-target damage budgets at low and
+- [x] Add deterministic tests that pin the chosen 1-target and 3-target damage budgets at low and
       high Ranged Attack Power, including normal entry and Trailbreak re-entry.
 
 ## 6. Shaman PBE work
@@ -292,7 +285,7 @@ Do not overwrite a player-customized bar.
 - [ ] Prevent echoes from advancing or recursively triggering the cadence.
 - [ ] Remove every Stonebound armor, mitigation, threat, control, and smoothing effect when the
       posture ends.
-- [ ] Benchmark damage, mitigation, and threat before changing numbers.
+- [x] Benchmark damage, mitigation, and threat before changing numbers.
 
 ### Spiritmend, Restoration
 
@@ -315,22 +308,25 @@ Do not overwrite a player-customized bar.
 
 ### Vespers, Shadow
 
-- [ ] Raise normal rotation damage before adding more power to Tithefiend.
-- [ ] Compare Vespers with other DPS specs in both 1-target and 3-target tests.
-- [ ] Reduce Tithefiend mana restoration so it does not create effectively infinite mana.
+- [x] Raise normal rotation damage before adding more power to Tithefiend.
+- [x] Compare Vespers with other DPS specs in both 1-target and 3-target tests.
+- [x] Reduce Tithefiend mana restoration to 1% maximum mana per hit so it does not create
+      effectively infinite mana.
 - [x] Show every Tithefiend hit in floating combat text and credit it to the Priest in meters.
 - [ ] Add depth through one existing Shadow spell interacting with Effigy or Gloomtithe rather
       than adding another button by default.
 - [ ] Keep Effigy ownership, movement, replacement, and cleanup deterministic.
-- [ ] Explain exactly how Effigy is applied, how echoes choose targets, how Gloomtithe is earned,
+- [x] Explain exactly how Effigy is applied, how echoes choose targets, how Gloomtithe is earned,
       its five-stack cap, and what Call Tithefiend consumes.
 - [ ] Keep the rotation mobile friendly.
 
 ### Doctrine, Discipline
 
 - [ ] Do not tune Doctrine by comparing it only with the currently weak Vespers result.
-- [ ] Benchmark the reported 70 DPS and 20 to 30 HPS against an explicit hybrid role target.
-- [ ] Measure damage conversion, shield use, emergency direct healing, mana, and group value.
+- [x] Benchmark damage and healing together in fixed one-ally and three-ally profiles.
+- [ ] Agree on the hybrid role target before tuning the measured result.
+- [x] Measure damage conversion, emergency direct healing, mana, and group recovery.
+- [ ] Add absorb accounting so Psalm of Warding's contribution is included beside effective HPS.
 - [ ] Decide whether its One Button option is a damage priority helper or whether hybrid play stays
       fully manual.
 - [ ] Preserve the fresh damage-to-clean-healing play style.
@@ -340,7 +336,8 @@ Do not overwrite a player-customized bar.
 - [ ] Run real dungeon tests before changing Solemn Prayer or Seraphic Vigil.
 - [ ] Test whether Solemn Prayer needs a longer cast time.
 - [ ] Test whether Seraphic Vigil needs more than its current 30 sec duration.
-- [ ] Measure large group healing, angel timing, overhealing, mana, and emergency recovery.
+- [x] Measure fixed one-ally and three-ally healing, overhealing, mana, and emergency recovery.
+- [ ] Measure angel timing and group recovery in a real dungeon run.
 - [ ] Preserve the strong group-healing identity without making normal dungeon damage irrelevant.
 
 ### Shared Priest
@@ -358,18 +355,20 @@ resolved catalogs.
 
 ### Required content for every tooltip
 
-- [ ] State the target and main action plainly.
-- [ ] Show exact live damage, healing, absorb, resource, duration, cooldown, charge, stack, radius,
+- [x] State the target and main action plainly for the new nine-spec mechanics and talent rows.
+- [x] Show exact live damage, healing, absorb, resource, duration, cooldown, charge, stack, radius,
       and target-cap values.
-- [ ] State important triggers, reset rules, consumption rules, and failure conditions.
-- [ ] State or correctly resolve Spell Power, Attack Power, Ranged Attack Power, weapon damage,
+- [x] State important triggers, reset rules, consumption rules, and failure conditions.
+- [x] State or correctly resolve Spell Power, Attack Power, Ranged Attack Power, weapon damage,
       maximum-health, pet-state, or flat scaling.
-- [ ] For periodic effects, state whether the number is total damage or per tick.
-- [ ] Remove unexplained terms such as `primary wound`, `valid impact`, `spec relationship`, and
+- [x] For periodic effects touched in this pass, state whether the number is total damage or per
+      tick.
+- [x] Remove unexplained terms such as `primary wound`, `valid impact`, `spec relationship`, and
       `calculated healing`.
 - [ ] Keep ability names consistent across the spellbook, action bar, aura frame, talent window,
       combat log, floating combat text, meters, and guide.
-- [ ] Test each scaling tooltip at two power values and compare it with the combat result.
+- [x] Test the custom scaling tooltips touched by the pass at two power values and compare them
+      with the combat result.
 
 ### Hunter spell and state inventory
 

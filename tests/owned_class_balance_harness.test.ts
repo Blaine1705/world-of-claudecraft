@@ -5,6 +5,8 @@ import {
   OWNED_DPS_SPECS,
   runOwnedClassDpsMatrix,
   runOwnedClassDpsProbe,
+  runOwnedHealerProbe,
+  runWarspiritOfftankProbe,
 } from '../scripts/owned_class_balance_probe';
 
 describe('owned-class level 20 balance harness', () => {
@@ -71,4 +73,43 @@ describe('owned-class level 20 balance harness', () => {
 
     expect(vespers.dps).toBeGreaterThanOrEqual(thundercall.dps * 0.9);
   });
+
+  it.each(['spiritmend', 'doctrine', 'benison'] as const)(
+    'records the fixed one-ally and three-ally %s healing profiles',
+    (spec) => {
+      for (const allies of [1, 3] as const) {
+        const result = runOwnedHealerProbe(spec, allies, 29_910, 'test-head');
+        expect(result.head).toBe('test-head');
+        expect(result.effectiveHealing).toBeGreaterThan(0);
+        expect(result.hps).toBe(result.effectiveHealing / result.seconds);
+        expect(result.overhealing).toBeGreaterThanOrEqual(0);
+        expect(result.overhealPct).toBeGreaterThanOrEqual(0);
+        expect(result.overhealPct).toBeLessThanOrEqual(1);
+        expect(result.emergencyRecoverySeconds).not.toBeNull();
+        expect(result.resource.end).toBeGreaterThanOrEqual(0);
+        expect(Object.keys(result.castsByAbility).length).toBeGreaterThan(0);
+        expect(Object.keys(result.equipment).length).toBeGreaterThan(0);
+      }
+    },
+    30_000,
+  );
+
+  it('records Warspirit mitigation, threat, forced-target uptime, and exit behavior', () => {
+    const result = runWarspiritOfftankProbe(29_920, 'test-head');
+    expect(result.head).toBe('test-head');
+    expect(result.stoneboundIncomingDamage).toBeLessThan(result.galeheartIncomingDamage);
+    expect(result.stoneboundMitigationPct).toBeGreaterThan(0);
+    expect(result.stoneboundThreatFrom100Damage).toBeGreaterThanOrEqual(200);
+    expect(result.forcedTargetUptimeSeconds).toBeGreaterThanOrEqual(3);
+    expect(result.forcedTargetUptimeSeconds).toBeLessThanOrEqual(3.1);
+    expect(result.secondsToLoseThreatAfterLeaving).toBeGreaterThan(0);
+    expect(result.secondsToLoseThreatAfterLeaving).toBeLessThanOrEqual(60);
+  });
+
+  it('keeps role probes deterministic at the same fixed seed', () => {
+    expect(runOwnedHealerProbe('spiritmend', 3, 29_911)).toEqual(
+      runOwnedHealerProbe('spiritmend', 3, 29_911),
+    );
+    expect(runWarspiritOfftankProbe(29_921)).toEqual(runWarspiritOfftankProbe(29_921));
+  }, 30_000);
 });
