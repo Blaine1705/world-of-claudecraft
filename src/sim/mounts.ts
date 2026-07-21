@@ -166,14 +166,21 @@ export function selectMount(ctx: SimContext, pid: number, key: string): boolean 
 
 /** Strip all active form auras (FORM_AURA_KINDS) and ghost_wolf from the entity,
  *  emitting aura-removal events for each one removed. Called before a mount summon
- *  starts so the player is never simultaneously shapeshifted and mounting. */
+ *  starts so the player is never simultaneously shapeshifted and mounting. Calls
+ *  recalcFor if any aura was removed so stat effects (speed, etc.) clear immediately. */
 function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
+  let stripped = false;
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const aura = e.auras[i];
     if (FORM_AURA_KINDS.has(aura.kind) || aura.id === 'ghost_wolf') {
       e.auras.splice(i, 1);
       ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
+      stripped = true;
     }
+  }
+  if (stripped) {
+    const meta = ctx.players.get(e.id);
+    if (meta) recalcFor(ctx, e, meta);
   }
 }
 

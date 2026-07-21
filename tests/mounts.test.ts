@@ -860,3 +860,92 @@ describe('riding skill gate (Req 5)', () => {
     expect(s.mountTrainingFeePaid).toBe(true);
   });
 });
+
+describe('cancelFormsAndGhostWolf recalcs stats (Fix #1)', () => {
+  it('strips a bear form aura and immediately recalcs stats so armor drops from bear-form level', () => {
+    // Arrange: a druid casts bear_form (which calls recalcPlayerStats internally),
+    // giving +90% armor. Then we start a mount summon, which should strip the form
+    // AND call recalcPlayerStats so armor drops back to caster-form levels immediately,
+    // not on the next tick.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('druid', 'Ursatest');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    const e = sim.entities.get(pid)!;
+    // Record baseline (caster-form) armor.
+    const baselineArmor = e.stats.armor;
+    // Enter bear form: castAbility calls recalcPlayerStats so armor inflates to 1.9x.
+    castAbility(sim.ctx, 'bear_form', pid);
+    const armorInBearForm = e.stats.armor;
+    expect(armorInBearForm).toBeGreaterThan(baselineArmor);
+    expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+
+    // Act: start the mount summon channel (calls cancelFormsAndGhostWolf internally).
+    const started = toggleMount(sim.ctx, pid);
+
+    // Assert: channel started, form gone, armor immediately back to baseline (no tick needed).
+    expect(started).toBe(true);
+    expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(false);
+    expect(e.stats.armor).toBeLessThan(armorInBearForm);
+    expect(e.stats.armor).toBe(baselineArmor);
+  });
+});
+
+describe('summon channel cancels on ability cast (Fix #2)', () => {
+  it('cancels an in-progress mount summon channel when the player casts any ability', () => {
+    // Arrange: a warrior starts a mount summon (1.5s channel).
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    const e = sim.entities.get(pid)!;
+    toggleMount(sim.ctx, pid);
+
+    // Verify the summon channel started.
+    expect(e.mountCastKey).toBe('valorsteed');
+    expect(e.mountCastRemaining ?? 0).toBeGreaterThan(0);
+
+    // Act: cast an ability mid-channel (battle_shout is instant and has no target req).
+    castAbility(sim.ctx, 'battle_shout', pid);
+
+    // Assert: the summon channel was cancelled; the player is still dismounted.
+    expect(e.mountCastKey).toBe('');
+    expect(e.mountCastRemaining ?? 0).toBe(0);
+    expect(e.mountKey).toBe('');
+  });
+
+  it('does not cancel the mount key when the player casts with no summon in flight', () => {
+    // Casting while FULLY mounted (no channel) triggers forceDismount instantly (pre-existing
+    // behavior, not related to Fix #2). Verify that Fix #2 only adds the summon-channel cancel
+    // and does not break the forceDismount path.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    const e = sim.entities.get(pid)!;
+    // Fully mount the player (no in-flight channel).
+    ride(sim, pid);
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.mountCastRemaining ?? 0).toBe(0);
+
+    // Cast an ability: forceDismount fires as before (pre-existing behavior).
+    castAbility(sim.ctx, 'battle_shout', pid);
+
+    // The pre-existing forceDismount path should still clear the mount key.
+    expect(e.mountKey).toBe('');
+    // No summon channel was in flight, so mountCastKey stays ''.
+    expect(e.mountCastKey).toBe('');
+  });
+});
