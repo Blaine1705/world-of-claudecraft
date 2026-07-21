@@ -37,6 +37,7 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
+import { AbilityVfx } from './ability_vfx';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { buildArtisanRowProps } from './artisan_row_props';
@@ -1054,6 +1055,9 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
+  // Per-ability spell VFX painter (spec-driven colors/scales over the pooled
+  // Vfx primitives; see src/render/ability_vfx.ts).
+  private abilityVfx: AbilityVfx;
   private lightPulses: LightPulses;
   // Flash a pooled talent-moment point light at an entity's feet (see
   // light_pulses.ts); bound once in the constructor over the views map.
@@ -1707,14 +1711,22 @@ export class Renderer {
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
-    this.vfx = new Vfx(this.scene, (id, frac) => {
+    const vfxAnchor = (id: number, frac: number) => {
       const v = this.views.get(id);
       if (!v) return null;
       const e = this.sim.entities.get(id);
       const h = v.height * (e?.scale ?? 1) * frac;
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
-    });
+    };
+    this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+    this.abilityVfx = new AbilityVfx({
+      vfx: this.vfx,
+      anchor: vfxAnchor,
+      spawnAoeRing: (x, z, radius, school, colorHex) =>
+        this.spawnAoeRing(x, z, radius, school, colorHex),
+      triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
+    });
     this.pulseAt = (id, school, intensity, duration) => {
       const v = this.views.get(id);
       if (!v) return;
@@ -1898,6 +1910,7 @@ export class Renderer {
     this.foliage.setGrassQuality(state.levels.grass);
     this.foliage.setModelQuality(state.levels.foliage);
     this.vfx.setQuality(state.levels.vfx);
+    this.abilityVfx.setQuality(state.levels.vfx);
     this.effectivePointLights = Math.max(1, Math.round(GFX.maxPointLights * state.levels.lighting));
     if (Math.abs(previousScale - this.effectiveRenderScale) >= 0.001) this.applyResolution();
   }
@@ -2392,6 +2405,7 @@ export class Renderer {
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
+    this.abilityVfx.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
@@ -3236,6 +3250,9 @@ export class Renderer {
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
       case 'spellfx': {
+        // Spec-driven per-ability visuals claim the event first; unknown
+        // ability/fx falls through to the generic school-colored arms below.
+        if (this.abilityVfx.handleSpellfx(ev)) break;
         if (ev.fx === 'blinkStep') {
           // A teleport step (Flickerstep / Shadowstep): reset the cached self
           // position so the body snaps to the authoritative destination. A
@@ -3440,6 +3457,8 @@ export class Renderer {
           this.triggerHit(ev.targetId);
           if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
         }
+        // spec-driven per-ability impact accent (no-op for unknown abilities)
+        this.abilityVfx.onDamage(ev);
         break;
       }
       case 'heal2':
@@ -5572,6 +5591,7 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    this.abilityVfx.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);

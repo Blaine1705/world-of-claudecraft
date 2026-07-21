@@ -233,6 +233,7 @@ const UI_PURE_CORES = [
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
 const RENDER_PURE_CORES = [
+  'src/render/ability_vfx_core.ts',
   'src/render/cast_bar.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
