@@ -1898,9 +1898,23 @@ export class Renderer {
       groundHeight(x, z, this.sim.cfg.seed),
     );
     void import('./rift_death_zone').then(({ RiftDeathZoneVisuals }) => {
-      this.riftDeathZoneVisuals = new RiftDeathZoneVisuals(this.scene, (x, z) =>
-        groundHeight(x, z, this.sim.cfg.seed),
-      );
+      this.riftDeathZoneVisuals = new RiftDeathZoneVisuals(this.scene, (x, z) => {
+        const base = groundHeight(x, z, this.sim.cfg.seed);
+        // Add the rift platform lift so rings on elevated sanctum boss arenas
+        // sit on the arena floor, not under it. Same pattern as entity ground
+        // (line ~6603) and camera clamp (~line 7643).
+        const rf = this.sim.riftFloor;
+        if (rf)
+          return (
+            base +
+            riftLiftAt(
+              generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade),
+              x - rf.origin.x,
+              z - rf.origin.z,
+            )
+          );
+        return base;
+      });
     });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),

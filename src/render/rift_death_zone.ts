@@ -31,7 +31,6 @@ interface ZoneVisual {
  * other ground-ring systems (ringOfFrostVisuals, etc.). */
 export class RiftDeathZoneVisuals {
   private readonly zones = new Map<string, ZoneVisual>();
-  private time = 0;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -72,19 +71,10 @@ export class RiftDeathZoneVisuals {
     }
   }
 
-  /** Remove all visuals (call when leaving a rift). */
-  clear(): void {
-    for (const visual of this.zones.values()) {
-      this.scene.remove(visual.loop);
-      visual.mat.dispose();
-      visual.loop.geometry.dispose();
-    }
-    this.zones.clear();
-  }
-
   private create(key: string, zone: RiftBossDeathZoneView): void {
-    // Build a horizontal circle at terrain height, draped by sampling groundY at
-    // four cardinal points (accurate enough for a flat rift floor).
+    // Build a horizontal circle at terrain height. The groundY callback already
+    // includes the rift platform lift (applied in the renderer constructor),
+    // so the ring sits on the correct floor even on elevated boss sanctums.
     const y = this.groundY(zone.x, zone.z) + 0.08; // slight lift to avoid z-fight
     const pts: THREE.Vector3[] = [];
     for (let i = 0; i <= SEGMENTS; i++) {
