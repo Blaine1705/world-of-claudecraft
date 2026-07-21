@@ -14,7 +14,7 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { meleeSwing } from '../src/sim/combat/auto_attack';
+import { meleeSwing, updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
 import { castAbility } from '../src/sim/combat/casting_lifecycle';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import {
@@ -26,6 +26,7 @@ import {
   normalizeSelectedMount,
 } from '../src/sim/content/mounts';
 import { ITEMS, MOBS, QUESTS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import {
   MOUNT_DISMOUNT_SECONDS,
   MOUNT_SUMMON_SECONDS,
@@ -947,5 +948,44 @@ describe('summon channel cancels on ability cast (Fix #2)', () => {
     expect(e.mountKey).toBe('');
     // No summon channel was in flight, so mountCastKey stays ''.
     expect(e.mountCastKey).toBe('');
+  });
+});
+
+describe('pre-armed auto-attack while mounted (Fix #3)', () => {
+  it('force-dismounts the player when the swing loop fires with mountKey set', () => {
+    // Arrange: a warrior is somehow mounted with autoAttack armed and a hostile target
+    // in melee range (swing timer elapsed). This can happen if the client sends an
+    // Attack command while mounted without the server blocking it via startAutoAttack
+    // (which already force-dismounts). The per-tick updatePlayerAutoAttack must also guard.
+    const sim = makeWorld();
+    const pid = join(sim, 10);
+    const meta = sim.players.get(pid)!;
+    sim.addItem('reins_grag_bear', 1, pid);
+    selectMount(sim.ctx, pid, 'grag_bear');
+    const e = sim.entities.get(pid)!;
+    // Put the player fully mounted (skip the channel).
+    ride(sim, pid);
+    expect(e.mountKey).toBe('grag_bear');
+
+    // Spawn a hostile mob right next to the player in melee range.
+    const tpl = MOBS['wild_boar'];
+    const mobId = (sim as any).nextId++;
+    const mob = createMob(mobId, tpl, 3, { x: e.pos.x + 1, y: e.pos.y, z: e.pos.z });
+    mob.maxHp = 100_000;
+    mob.hp = mob.maxHp;
+    mob.hostile = true;
+    sim.entities.set(mobId, mob);
+
+    // Arm auto-attack directly (bypasses startAutoAttack's own dismount guard).
+    e.autoAttack = true;
+    e.targetId = mobId;
+    e.swingTimer = 0;
+    e.facing = 0; // facing +z; mob is to the right, still within melee arc
+
+    // Act: run the per-tick auto-attack loop.
+    updatePlayerAutoAttack(sim.ctx, e, meta);
+
+    // Assert: the mount was cleared before the swing could fire while mounted.
+    expect(e.mountKey).toBe('');
   });
 });
