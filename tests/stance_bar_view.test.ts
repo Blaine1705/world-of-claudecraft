@@ -46,23 +46,14 @@ describe('stanceBarView (HUD render model)', () => {
     );
   });
 
-  it('uses one choice row for every Paladin Devotion', () => {
-    const ids = [
-      'devotion_ward',
-      'radiant_devotion',
-      'dawn_devotion',
-      'grace_devotion',
-      'retribution_aura',
-    ];
-    const m = stanceBarView('paladin', ids, 'grace_devotion');
+  it('uses one choice row only for the two Paladin auras', () => {
+    const ids = ['devotion_ward', 'retribution_aura'];
+    const m = stanceBarView('paladin', ids, 'retribution_aura');
 
     expect(m.visible).toBe(true);
     expect(m.slots).toEqual([
       { id: 'devotion_ward', iconKey: 'devotion_ward', active: false },
-      { id: 'radiant_devotion', iconKey: 'radiant_devotion', active: false },
-      { id: 'dawn_devotion', iconKey: 'dawn_devotion', active: false },
-      { id: 'grace_devotion', iconKey: 'grace_devotion', active: true },
-      { id: 'retribution_aura', iconKey: 'retribution_aura', active: false },
+      { id: 'retribution_aura', iconKey: 'retribution_aura', active: true },
     ]);
   });
 
@@ -86,15 +77,12 @@ describe('stanceBarView (HUD render model)', () => {
     }
   });
 
-  it('routes every Paladin Devotion through the dedicated row group', () => {
-    for (const id of [
-      'devotion_ward',
-      'radiant_devotion',
-      'dawn_devotion',
-      'grace_devotion',
-      'retribution_aura',
-    ]) {
+  it('routes only Paladin auras through the dedicated row group', () => {
+    for (const id of ['devotion_ward', 'retribution_aura']) {
       expect(ABILITIES[id]?.exclusiveGroup).toBe(PALADIN_DEVOTION_GROUP);
+    }
+    for (const id of ['radiant_devotion', 'dawn_devotion', 'grace_devotion']) {
+      expect(ABILITIES[id]?.exclusiveGroup).toBeUndefined();
     }
     expect(isStanceBarAbilityGroup(WARRIOR_STANCE_GROUP)).toBe(true);
     expect(isStanceBarAbilityGroup(PALADIN_DEVOTION_GROUP)).toBe(true);

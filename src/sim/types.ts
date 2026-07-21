@@ -1836,6 +1836,7 @@ export type AbilityEffect =
   | { type: 'cleanseSelf' }
   | { type: 'cleanseMovement' }
   | { type: 'divineAscension' }
+  | { type: 'grantDevotion'; amount: number }
   | {
       type: 'repositionToAim';
       breakRoots?: boolean;

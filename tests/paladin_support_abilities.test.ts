@@ -152,6 +152,9 @@ describe('Paladin support abilities', () => {
     }
     expect(known('protection')).toContain('solar_step');
     expect(known('retribution')).toContain('solar_step');
+    expect(known('protection')).toContain('avenging_wrath');
+    expect(known('holy')).toContain('avenging_wrath');
+    expect(known('retribution')).toContain('avenging_wrath');
     expect(known('retribution')).not.toContain('righteous_fury');
     expect(ABILITIES.unbinding_blessing).toBeUndefined();
     expect(ABILITIES.citadel_of_faith).toBeUndefined();
@@ -199,6 +202,29 @@ describe('Paladin support abilities', () => {
         party: true,
       },
     ]);
+    expect(resolve(paladin, 'radiant_devotion').def.exclusiveGroup).toBeUndefined();
+    expect(resolve(paladin, 'radiant_devotion').def).toMatchObject({
+      effects: [
+        { type: 'buffTarget', kind: 'buff_spellpower', value: 20, duration: 1800, party: true },
+      ],
+    });
+    expect(resolve(paladin, 'dawn_devotion').def.exclusiveGroup).toBeUndefined();
+    expect(resolve(paladin, 'dawn_devotion').def).toMatchObject({
+      effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 40, duration: 1800, party: true }],
+    });
+    expect(resolve(paladin, 'grace_devotion').def.exclusiveGroup).toBeUndefined();
+    expect(resolve(paladin, 'grace_devotion').def).toMatchObject({
+      effects: [
+        {
+          type: 'buffTarget',
+          kind: 'buff_mana_grace',
+          value: 15,
+          value2: 0.03,
+          duration: 1800,
+          party: true,
+        },
+      ],
+    });
     expect(resolve(paladin, 'solar_step')).toMatchObject({ cooldown: 30 });
     expect(resolve(paladin, 'solar_step').effects).toEqual([
       { type: 'selfBuff', kind: 'buff_speed', value: 2.5, duration: 2 },
@@ -235,32 +261,36 @@ describe('Paladin support abilities', () => {
     ]);
   });
 
-  it('keeps one Devotion per source while allowing different Paladins to stack', () => {
+  it('keeps long Devotion buffs independent from the active aura choice', () => {
     const current = [
       aura('radiant_devotion', 'buff_spellpower', 1, 20),
       aura('dawn_devotion', 'buff_ap', 2, 40),
       aura('grace_devotion', 'buff_mana_grace', 1, 15),
     ];
 
-    expect(paladinDevotionConflicts(current, 1, 'devotion_ward')).toEqual([2, 0]);
-    expect(paladinDevotionConflicts(current, 2, 'devotion_ward')).toEqual([1]);
+    expect(paladinDevotionConflicts(current, 1, 'devotion_ward')).toEqual([]);
+    expect(paladinDevotionConflicts(current, 2, 'devotion_ward')).toEqual([]);
 
     const sim = new Sim({ seed: 102, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
-    sim.player.auras.push(aura('radiant_devotion', 'buff_spellpower', sim.player.id, 20));
-    sim.player.auras.push(aura('dawn_devotion', 'buff_ap', 999, 40));
+    run(sim, null, resolve(sim, 'radiant_devotion'));
+    run(sim, null, resolve(sim, 'dawn_devotion'));
+    run(sim, null, resolve(sim, 'grace_devotion'));
     run(sim, null, resolve(sim, 'devotion_ward'));
     expect(sim.player.auras).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'devotion_ward', sourceId: sim.player.id }),
-        expect.objectContaining({ id: 'dawn_devotion', sourceId: 999 }),
+        expect.objectContaining({ id: 'radiant_devotion', sourceId: sim.player.id }),
+        expect.objectContaining({ id: 'dawn_devotion', sourceId: sim.player.id }),
+        expect.objectContaining({ id: 'grace_devotion', sourceId: sim.player.id }),
       ]),
     );
-    expect(
-      sim.player.auras.some(
-        (active) => active.id === 'radiant_devotion' && active.sourceId === sim.player.id,
-      ),
-    ).toBe(false);
+
+    run(sim, null, resolve(sim, 'retribution_aura'));
+    expect(sim.player.auras.some((active) => active.id === 'devotion_ward')).toBe(false);
+    for (const id of ['radiant_devotion', 'dawn_devotion', 'grace_devotion']) {
+      expect(sim.player.auras.some((active) => active.id === id)).toBe(true);
+    }
   });
 
   it('switches Devotion and Requital through one aura family across the party', () => {

@@ -7,8 +7,6 @@ import {
   activateDivineAscension,
   canActivateDivineAscension,
   consumeAscensionCharge,
-  DEVOTION_DECAY_DELAY,
-  DEVOTION_DECAY_INTERVAL,
   devotionGainForAbility,
   grantDevotion,
   grantDevotionFromBlock,
@@ -135,7 +133,7 @@ describe('paladin Devotion core', () => {
     expect(isDivineAscensionActive(expired)).toBe(false);
   });
 
-  it('rate-limits block generation and decays after leaving combat', () => {
+  it('rate-limits block generation and never loses Devotion over time', () => {
     const player = paladin();
     expect(grantDevotionFromBlock(player)).toBe(true);
     expect(grantDevotionFromBlock(player)).toBe(false);
@@ -144,8 +142,8 @@ describe('paladin Devotion core', () => {
     expect(grantDevotionFromBlock(player)).toBe(true);
     expect(player.paladinDevotion?.value).toBe(2);
 
-    updatePaladinDevotion(player, DEVOTION_DECAY_DELAY + DEVOTION_DECAY_INTERVAL);
-    expect(player.paladinDevotion?.value).toBe(1);
+    updatePaladinDevotion(player, 3_600);
+    expect(player.paladinDevotion?.value).toBe(2);
   });
 
   it('resets the whole cycle on death and ignores non-paladins', () => {

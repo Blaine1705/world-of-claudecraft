@@ -6,8 +6,6 @@ export const MAX_DEVOTION = 20;
 export const ASCENSION_CHARGES = 5;
 export const ASCENSION_DURATION = 25;
 export const ASCENSION_DEVOTION_BANK_CAP = 10;
-export const DEVOTION_DECAY_DELAY = 10;
-export const DEVOTION_DECAY_INTERVAL = 2;
 export const BLOCK_DEVOTION_ICD = 6;
 // Divine Ascension (Amanecer) talent riders, applied at activation:
 export const DAWNS_PATH_SPEED_MULT = 1.4; // Dawn's Path: +40% movement speed
@@ -103,6 +101,11 @@ export function grantDevotion(e: Entity, amount: number): number {
   return devotion.value - before;
 }
 
+export function grantAbilityDevotion(e: Entity, amount: number): number {
+  const multiplier = e.auras.some((aura) => aura.id === 'avenging_wrath') ? 2 : 1;
+  return grantDevotion(e, amount * multiplier);
+}
+
 export function spendDevotion(e: Entity, amount: number): boolean {
   const devotion = state(e);
   if (!devotion || !Number.isFinite(amount) || amount < 0) return false;
@@ -131,7 +134,7 @@ export function grantGroundAoEDevotionOnFirstHit(
 ): void {
   if (struck <= 0 || effect.devotionGranted || !effect.devotionOnFirstHit) return;
   effect.devotionGranted = true;
-  grantDevotion(source, effect.devotionOnFirstHit);
+  grantAbilityDevotion(source, effect.devotionOnFirstHit);
 }
 
 export function isAscensionEmpoweredAbility(spec: string | null, abilityId: string): boolean {
@@ -364,14 +367,6 @@ export function updatePaladinDevotion(e: Entity, dt: number): void {
     return;
   }
 
-  const previousOutOfCombatTime = devotion.outOfCombatTime;
   devotion.outOfCombatTime += dt;
-  if (devotion.outOfCombatTime <= DEVOTION_DECAY_DELAY || devotion.value <= 0) return;
-  devotion.decayProgress +=
-    Math.max(0, devotion.outOfCombatTime - DEVOTION_DECAY_DELAY) -
-    Math.max(0, previousOutOfCombatTime - DEVOTION_DECAY_DELAY);
-  while (devotion.decayProgress >= DEVOTION_DECAY_INTERVAL && devotion.value > 0) {
-    devotion.decayProgress -= DEVOTION_DECAY_INTERVAL;
-    devotion.value -= 1;
-  }
+  devotion.decayProgress = 0;
 }

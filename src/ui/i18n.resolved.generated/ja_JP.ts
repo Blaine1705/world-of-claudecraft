@@ -3161,7 +3161,7 @@ export const ja_JP: EnTranslations = {
       "judgement": "現在のシールを消費し、近距離から敵を打ち据えます。",
       "oathstrike": "確実な武器攻撃で献身を蓄え、次の聖なる猛攻に備えます。",
       "hammer_of_wrath": "遠距離から瀕死の敵を処刑し、翼の発動中はどの敵にも使用できます。",
-      "avenging_wrath": "聖なる翼を広げ、15秒間強力なダメージ強化を得ます。",
+      "avenging_wrath": "信仰を10得て、15秒間、能力が生み出す信仰を2倍にします。",
       "bastion_sweep": "盾で敵の集団を薙ぎ払い、脅威を奪って献身を蓄えます。",
       "oath_chain": "遠くの敵を集団へ引き寄せ、逃走速度を低下させます。",
       "holy_shield": "献身を消費し、能動的なブロック、吸収、脅威の波を得ます。",
@@ -7049,7 +7049,7 @@ export const ja_JP: EnTranslations = {
       },
       "devotion_ward": {
         "name": "献身のオーラ",
-        "description": "自身とパーティメンバーが受けるダメージを5%軽減する。死亡するか別の献身に切り替えるまで持続する。自身が与えられる献身は1種類だけだが、別の聖騎士の献身とは共存できる。"
+        "description": "自身とパーティメンバーが受けるダメージを5%軽減し、死亡または切り替えまで持続する。献身のオーラと応報のオーラだけが互いに置き換わり、光輝、曙光、恩寵の献身は共存する。"
       },
       "hammer_of_grace": {
         "name": "恩寵の槌",
@@ -7073,7 +7073,7 @@ export const ja_JP: EnTranslations = {
       },
       "solar_invocation": {
         "name": "陽光の祈願",
-        "description": "味方1体の体力を即座に{damage}回復する。有効な回復で信仰を1得る。昇華中は、対象から10メートル以内の味方プレイヤーもその半分だけ回復する。"
+        "description": "味方1体の体力を即座に{damage}回復する。回復として使用すると信仰を1得る。昇華中は、対象から10メートル以内の味方プレイヤーもその半分だけ回復する。"
       },
       "radiant_devotion": {
         "name": "輝きの献身",
@@ -7085,7 +7085,7 @@ export const ja_JP: EnTranslations = {
       },
       "grace_devotion": {
         "name": "恩寵の献身",
-        "description": "自身とパーティメンバーは5秒ごとにマナを15回復し、呪文のマナ消費が6%減少する。3分間持続する。"
+        "description": "自身とパーティメンバーは5秒ごとにマナを15回復し、呪文のマナ消費が3%減少する。30分間持続する。"
       },
       "recall_the_fallen": {
         "name": "倒れし者の帰還",
@@ -7113,7 +7113,7 @@ export const ja_JP: EnTranslations = {
       },
       "mercy_lance": {
         "name": "慈悲の槍",
-        "description": "味方を回復するか敵に{damage}ダメージを与える。有効な回復で信仰を1得る。昇華中に回復へ使うと、近くの味方1人も回復する。"
+        "description": "味方を回復するか敵に{damage}ダメージを与える。回復として使用すると信仰を1得る。昇華中に回復へ使うと、近くの味方1人も回復する。"
       },
       "sacred_form": {
         "name": "聖なる姿",
@@ -7769,7 +7769,7 @@ export const ja_JP: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "復讐の翼",
-        "description": "復讐の力を呼び起こし、攻撃力を60、魔力を30上昇させる。効果時間20秒。（パラディンのタレント）"
+        "description": "聖なる翼を広げて信仰を10得る。15秒間、能力が生み出す信仰が2倍になり、与えるダメージが20%増加する。報復では、あらゆる対象に憤怒の槌を使用できる。"
       },
       "berserk": {
         "name": "赤き霞",

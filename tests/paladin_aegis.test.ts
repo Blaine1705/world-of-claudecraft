@@ -168,14 +168,14 @@ describe('Aegis of the First Dawn', () => {
       duration: Number.POSITIVE_INFINITY,
       permanent: true,
       value: 15,
-      value2: 0.06,
+      value2: 0.03,
       sourceId: sim.player.id,
       school: 'holy',
     });
 
     sim.castAbility('aegis_first_dawn');
 
-    expect(sim.player.resource).toBe(359);
+    expect(sim.player.resource).toBe(354);
   });
 
   it('ends immediately without a burst when stunned', () => {

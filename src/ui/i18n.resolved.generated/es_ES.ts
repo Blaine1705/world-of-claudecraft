@@ -3161,7 +3161,7 @@ export const es_ES: EnTranslations = {
       "judgement": "Gasta tu Sello activo para golpear a un enemigo a corta distancia.",
       "oathstrike": "A reliable weapon strike that builds Devotion for your next holy assault.",
       "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Unfurls holy wings for a powerful fifteen-second damage window.",
+      "avenging_wrath": "Otorga 10 de Devoción y duplica durante quince segundos la Devoción generada por habilidades.",
       "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
       "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
       "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
@@ -7049,7 +7049,7 @@ export const es_ES: EnTranslations = {
       },
       "devotion_ward": {
         "name": "Aura de devoción",
-        "description": "Reduce un 5% el daño que recibís tú y los miembros de tu grupo hasta morir o sustituirla. Solo puedes aportar una Devoción, pero las Devociones de distintos paladines pueden coexistir."
+        "description": "Reduce un 5% el daño que recibís tú y los miembros de tu grupo hasta morir o sustituirla. Solo Aura de Devoción y Aura de Requital se sustituyen entre sí; Devoción Radiante, del Alba y de Gracia coexisten."
       },
       "hammer_of_grace": {
         "name": "Martillo de gracia",
@@ -7073,7 +7073,7 @@ export const es_ES: EnTranslations = {
       },
       "solar_invocation": {
         "name": "Invocación solar",
-        "description": "Sana al instante {damage} a un objetivo amistoso. La sanación efectiva genera 1 de Devoción. Durante Ascensión, también sana a los jugadores aliados en un radio de 10 m alrededor del objetivo por la mitad de esa cantidad."
+        "description": "Sana al instante {damage} a un objetivo amistoso. Lanzarla como cura genera 1 de Devoción. Durante Ascensión, también sana a los jugadores aliados en un radio de 10 m alrededor del objetivo por la mitad de esa cantidad."
       },
       "radiant_devotion": {
         "name": "Devoción radiante",
@@ -7085,7 +7085,7 @@ export const es_ES: EnTranslations = {
       },
       "grace_devotion": {
         "name": "Devoción de gracia",
-        "description": "Tú y los miembros de tu grupo restauráis 15 de maná cada 5 s y gastáis un 6% menos de maná durante 3 min."
+        "description": "Tú y los miembros de tu grupo restauráis 15 de maná cada 5 s y gastáis un 3% menos de maná durante 30 min."
       },
       "recall_the_fallen": {
         "name": "Llamada de los caídos",
@@ -7113,7 +7113,7 @@ export const es_ES: EnTranslations = {
       },
       "mercy_lance": {
         "name": "Lanza de misericordia",
-        "description": "Sana a un aliado o inflige {damage} a un enemigo. La sanación efectiva genera 1 de Devoción. Al usarse para sanar, Ascensión también sana a un aliado cercano."
+        "description": "Sana a un aliado o inflige {damage} a un enemigo. Lanzarla como cura genera 1 de Devoción. Al usarse para sanar, Ascensión también sana a un aliado cercano."
       },
       "sacred_form": {
         "name": "Forma sagrada",
@@ -7769,7 +7769,7 @@ export const es_ES: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "Ala de Venganza",
-        "description": "Invoca poder vengador, aumentando tu poder de ataque en 60 y tu poder con hechizos en 30 durante 20 s. (talento de Paladín)"
+        "description": "Despliega alas de poder sagrado, obtiene 10 de Devoción y duplica durante 15 s la Devoción generada por tus habilidades. También aumenta un 20% el daño infligido. Reprensión: permite usar Martillo de Cólera contra cualquier objetivo."
       },
       "berserk": {
         "name": "Bruma Roja",

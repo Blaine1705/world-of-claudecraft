@@ -219,14 +219,38 @@ describe('Paladin core abilities', () => {
     expect(sim.player.paladinDevotion?.value).toBe(1);
   });
 
-  it('generates Holy Devotion through effective healing without requiring damage', () => {
+  it('generates Holy Devotion on consecutive healing casts even at full health', () => {
     const sim = new Sim({ seed: 31, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.setSpec('holy');
-    sim.player.hp = Math.round(sim.player.maxHp * 0.5);
 
     run(sim, sim.player, resolve(sim, 'holy_light'));
-    expect(sim.player.paladinDevotion?.value).toBe(1);
+    run(sim, sim.player, resolve(sim, 'holy_light'));
+    expect(sim.player.paladinDevotion?.value).toBe(2);
+  });
+
+  it('doubles Holy healing generation while Avenging Wrath is active', () => {
+    const sim = new Sim({ seed: 32, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+
+    sim.castAbility('avenging_wrath');
+    expect(sim.player.paladinDevotion?.value).toBe(10);
+    run(sim, sim.player, resolve(sim, 'holy_light'));
+    run(sim, sim.player, resolve(sim, 'holy_light'));
+
+    expect(sim.player.paladinDevotion?.value).toBe(14);
+  });
+
+  it('doubles Protection damage generation while Avenging Wrath is active', () => {
+    const sim = new Sim({ seed: 33, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('protection');
+
+    sim.castAbility('avenging_wrath');
+    run(sim, hostileNear(sim), resolve(sim, 'vowkeeper_strike'));
+
+    expect(sim.player.paladinDevotion?.value).toBe(12);
   });
 
   it('improves rescue tools during Ascension without marking them as charge spenders', () => {

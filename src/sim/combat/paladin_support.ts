@@ -4,9 +4,6 @@ import type { Aura, Entity } from '../types';
 export const PALADIN_DEVOTION_ABILITY_IDS: ReadonlySet<string> = new Set([
   'devotion_ward',
   'retribution_aura',
-  'radiant_devotion',
-  'dawn_devotion',
-  'grace_devotion',
 ]);
 
 export function paladinDevotionConflicts(
@@ -44,7 +41,7 @@ export function stripPaladinDevotionsFromSource(ctx: SimContext, sourceId: numbe
 export function paladinManaCostMultiplier(entity: Entity): number {
   let reduction = 0;
   for (const aura of entity.auras) {
-    if (aura.kind === 'buff_mana_grace') reduction += aura.value2 ?? 0.06;
+    if (aura.kind === 'buff_mana_grace') reduction += aura.value2 ?? 0.03;
   }
   return Math.max(0.2, 1 - reduction);
 }

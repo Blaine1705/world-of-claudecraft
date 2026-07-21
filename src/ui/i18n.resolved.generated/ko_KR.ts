@@ -3161,7 +3161,7 @@ export const ko_KR: EnTranslations = {
       "judgement": "현재 활성화된 인장을 소모해 근거리에서 적을 강타합니다.",
       "oathstrike": "안정적인 무기 공격으로 헌신을 쌓아 다음 신성한 공세를 준비합니다.",
       "hammer_of_wrath": "원거리에서 부상당한 적을 처형하며, 날개가 활성화되면 모든 적에게 사용할 수 있습니다.",
-      "avenging_wrath": "신성한 날개를 펼쳐 15초 동안 강력한 공격력 증가 효과를 얻습니다.",
+      "avenging_wrath": "헌신 10을 얻고 15초 동안 능력으로 생성하는 헌신을 두 배로 만듭니다.",
       "bastion_sweep": "방패로 적 무리를 휩쓸어 위협을 확보하고 헌신을 쌓습니다.",
       "oath_chain": "멀리 있는 적을 무리 안으로 끌어당기고 도주 속도를 낮춥니다.",
       "holy_shield": "헌신을 소모해 능동 방어, 피해 흡수, 위협 파동을 얻습니다.",
@@ -7049,7 +7049,7 @@ export const ko_KR: EnTranslations = {
       },
       "devotion_ward": {
         "name": "헌신의 오라",
-        "description": "자신과 파티원이 받는 피해를 5%만큼 감소시킵니다. 죽거나 다른 헌신으로 전환할 때까지 지속됩니다. 자신이 제공할 수 있는 헌신은 하나뿐이지만, 다른 성기사의 헌신과는 함께 적용됩니다."
+        "description": "자신과 파티원이 받는 피해를 5%만큼 감소시키며 죽거나 교체할 때까지 지속됩니다. 헌신의 오라와 응보의 오라만 서로 교체되며, 광휘, 여명, 은총의 헌신은 함께 적용됩니다."
       },
       "hammer_of_grace": {
         "name": "은총의 망치",
@@ -7073,7 +7073,7 @@ export const ko_KR: EnTranslations = {
       },
       "solar_invocation": {
         "name": "태양의 기원",
-        "description": "아군 대상 하나를 즉시 {damage}만큼 치유합니다. 유효 치유 시 헌신 1을 얻습니다. 승천 중에는 대상의 10미터 안에 있는 아군 플레이어도 절반만큼 치유합니다."
+        "description": "아군 대상 하나를 즉시 {damage}만큼 치유합니다. 치유로 사용하면 헌신 1을 얻습니다. 승천 중에는 대상의 10미터 안에 있는 아군 플레이어도 절반만큼 치유합니다."
       },
       "radiant_devotion": {
         "name": "광휘의 헌신",
@@ -7085,7 +7085,7 @@ export const ko_KR: EnTranslations = {
       },
       "grace_devotion": {
         "name": "은총의 헌신",
-        "description": "자신과 파티원은 5초마다 마나를 15 회복하고 주문의 마나 소모량이 6% 감소합니다. 3분 동안 지속됩니다."
+        "description": "자신과 파티원은 5초마다 마나를 15 회복하고 주문의 마나 소모량이 3% 감소합니다. 30분 동안 지속됩니다."
       },
       "recall_the_fallen": {
         "name": "쓰러진 자의 귀환",
@@ -7113,7 +7113,7 @@ export const ko_KR: EnTranslations = {
       },
       "mercy_lance": {
         "name": "자비의 창",
-        "description": "아군을 치유하거나 적에게 {damage}의 피해를 입힙니다. 유효 치유 시 헌신 1을 얻습니다. 승천 중 치유에 사용하면 가까운 아군 한 명도 치유합니다."
+        "description": "아군을 치유하거나 적에게 {damage}의 피해를 입힙니다. 치유로 사용하면 헌신 1을 얻습니다. 승천 중 치유에 사용하면 가까운 아군 한 명도 치유합니다."
       },
       "sacred_form": {
         "name": "신성한 형상",
@@ -7769,7 +7769,7 @@ export const ko_KR: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "응징의 날개",
-        "description": "응징의 힘을 불러내 20초 동안 공격력을 60, 주문력을 30만큼 증가시킵니다. (성기사 특성)"
+        "description": "신성한 날개를 펼쳐 헌신 10을 얻습니다. 15초 동안 능력으로 생성하는 헌신이 두 배가 되고 공격력이 20% 증가합니다. 징벌 전문화는 모든 대상에게 분노의 망치를 사용할 수 있습니다."
       },
       "berserk": {
         "name": "붉은 안개",

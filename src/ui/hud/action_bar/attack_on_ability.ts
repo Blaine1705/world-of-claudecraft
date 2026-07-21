@@ -38,6 +38,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   cleanseSelf: 'other',
   cleanseMovement: 'other',
   divineAscension: 'other',
+  grantDevotion: 'other',
   repositionToAim: 'other',
   blinkForward: 'other',
   finisherDamage: 'damage',

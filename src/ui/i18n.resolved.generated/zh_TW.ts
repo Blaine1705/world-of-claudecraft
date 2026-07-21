@@ -3161,7 +3161,7 @@ export const zh_TW: EnTranslations = {
       "judgement": "消耗你當前的聖印，從近距離打擊敵人。",
       "oathstrike": "可靠的武器攻擊，可累積奉獻，為下一次神聖猛攻蓄力。",
       "hammer_of_wrath": "從遠處處決受傷的敵人；聖翼啟動時可攻擊任何敵人。",
-      "avenging_wrath": "展開神聖雙翼，獲得持續十五秒的強力傷害增幅。",
+      "avenging_wrath": "獲得 10 點奉獻，並使技能產生的奉獻在十五秒內加倍。",
       "bastion_sweep": "揮盾橫掃敵群，奪取仇恨並累積奉獻。",
       "oath_chain": "將遠處的敵人拖入隊伍並減緩其逃跑速度。",
       "holy_shield": "消耗奉獻，獲得主動格擋、吸收護盾和仇恨脈衝。",
@@ -7049,7 +7049,7 @@ export const zh_TW: EnTranslations = {
       },
       "devotion_ward": {
         "name": "奉獻光環",
-        "description": "使你和隊伍成員受到的傷害降低 5%，持續至你死亡或切換奉獻。你只能提供一種奉獻，但不同聖騎士的奉獻可以共存。"
+        "description": "使你和隊伍成員受到的傷害降低 5%，持續至你死亡或替換。只有虔誠光環和懲戒光環會互相替換；輝光、黎明和恩典奉獻可同時存在。"
       },
       "hammer_of_grace": {
         "name": "恩典之錘",
@@ -7073,7 +7073,7 @@ export const zh_TW: EnTranslations = {
       },
       "solar_invocation": {
         "name": "日光祈喚",
-        "description": "立即為一個友方目標恢復 {damage} 點生命力。有效治療會產生 1 點奉獻。昇華期間，還會為目標周圍 10 碼內的友方玩家恢復一半生命力。"
+        "description": "立即為一個友方目標恢復 {damage} 點生命力。作為治療施放時產生 1 點奉獻。昇華期間，還會為目標周圍 10 碼內的友方玩家恢復一半生命力。"
       },
       "radiant_devotion": {
         "name": "光輝奉獻",
@@ -7085,7 +7085,7 @@ export const zh_TW: EnTranslations = {
       },
       "grace_devotion": {
         "name": "恩典奉獻",
-        "description": "你和隊伍成員每 5 秒恢復 15 點法力，並使法術的法力消耗降低 6%，持續 3 分鐘。"
+        "description": "你和隊伍成員每 5 秒恢復 15 點法力，並使法術的法力消耗降低 3%，持續 30 分鐘。"
       },
       "recall_the_fallen": {
         "name": "召回逝者",
@@ -7113,7 +7113,7 @@ export const zh_TW: EnTranslations = {
       },
       "mercy_lance": {
         "name": "仁慈之槍",
-        "description": "為一名盟友恢復或對一名敵人造成 {damage} 點生命力。有效治療會產生 1 點奉獻。昇華時用於治療還會治療附近一名盟友。"
+        "description": "為一名盟友恢復生命力或對一名敵人造成 {damage} 點傷害。作為治療施放時產生 1 點奉獻。昇華時用於治療還會治療附近一名盟友。"
       },
       "sacred_form": {
         "name": "神聖形態",
@@ -7769,7 +7769,7 @@ export const zh_TW: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "復仇之翼",
-        "description": "召喚復仇之力，使你的攻擊強度提高60、法術強度提高30，持續20秒。（聖騎士天賦）"
+        "description": "展開神聖雙翼，獲得 10 點奉獻，並使技能產生的奉獻在 15 秒內加倍。造成的傷害也提高 20%。懲戒：可對任意目標使用憤怒之錘。"
       },
       "berserk": {
         "name": "赤紅迷霧",

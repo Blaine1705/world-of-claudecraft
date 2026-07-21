@@ -113,7 +113,7 @@ describe('Paladin Retribution abilities', () => {
     expect(avengingTarget.hp).toBeLessThan(avengingTarget.maxHp);
   });
 
-  it('Avenging Wrath increases outgoing damage by 20% for 15 seconds and expires', () => {
+  it('Avenging Wrath grants 10 Devotion, doubles ability generation, increases damage, and expires', () => {
     const sim = makeRet();
     const target = targetAt(sim, 2);
 
@@ -125,13 +125,19 @@ describe('Paladin Retribution abilities', () => {
 
     expect(hit()).toBe(100);
     sim.castAbility('avenging_wrath');
+    expect(sim.player.paladinDevotion?.value).toBe(10);
     expect(sim.player.auras).toContainEqual(
       expect.objectContaining({ id: 'avenging_wrath', kind: 'buff_dmg_done', value: 0.2 }),
     );
     expect(hit()).toBe(120);
 
+    runEffects(sim, target, 'oathstrike');
+    expect(sim.player.paladinDevotion?.value).toBe(12);
+
     advance(sim, 15.1);
     expect(sim.player.auras.some((aura) => aura.id === 'avenging_wrath')).toBe(false);
     expect(hit()).toBe(100);
+    runEffects(sim, target, 'oathstrike');
+    expect(sim.player.paladinDevotion?.value).toBe(13);
   });
 });

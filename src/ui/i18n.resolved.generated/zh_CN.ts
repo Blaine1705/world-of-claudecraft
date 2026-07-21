@@ -3161,7 +3161,7 @@ export const zh_CN: EnTranslations = {
       "judgement": "消耗你激活的圣印，从近距离打击敌人。",
       "oathstrike": "可靠的武器攻击，可积累奉献，为下一次神圣猛攻蓄力。",
       "hammer_of_wrath": "从远处处决受伤的敌人；圣翼激活时可攻击任何敌人。",
-      "avenging_wrath": "展开神圣双翼，获得持续十五秒的强力伤害增幅。",
+      "avenging_wrath": "获得 10 点奉献，并使技能生成的奉献在十五秒内翻倍。",
       "bastion_sweep": "挥盾横扫敌群，夺取仇恨并积累奉献。",
       "oath_chain": "将远处的敌人拖入队伍并减缓其逃跑速度。",
       "holy_shield": "消耗奉献，获得主动格挡、吸收护盾和仇恨脉冲。",
@@ -7049,7 +7049,7 @@ export const zh_CN: EnTranslations = {
       },
       "devotion_ward": {
         "name": "奉献光环",
-        "description": "使你和队伍成员受到的伤害降低 5%，持续至你死亡或切换奉献。你只能提供一种奉献，但不同圣骑士的奉献可以共存。"
+        "description": "使你和队伍成员受到的伤害降低 5%，持续至你死亡或替换。只有虔诚光环和惩戒光环会互相替换；辉光、黎明和恩典奉献可同时存在。"
       },
       "hammer_of_grace": {
         "name": "恩典之锤",
@@ -7073,7 +7073,7 @@ export const zh_CN: EnTranslations = {
       },
       "solar_invocation": {
         "name": "日光祈唤",
-        "description": "立即为一个友方目标恢复 {damage} 点生命值。有效治疗会生成 1 点奉献。升华期间，还会为目标周围 10 码内的友方玩家恢复一半生命值。"
+        "description": "立即为一个友方目标恢复 {damage} 点生命值。作为治疗施放时生成 1 点奉献。升华期间，还会为目标周围 10 码内的友方玩家恢复一半生命值。"
       },
       "radiant_devotion": {
         "name": "光辉奉献",
@@ -7085,7 +7085,7 @@ export const zh_CN: EnTranslations = {
       },
       "grace_devotion": {
         "name": "恩典奉献",
-        "description": "你和队伍成员每 5 秒恢复 15 点法力值，并使法术的法力消耗降低 6%，持续 3 分钟。"
+        "description": "你和队伍成员每 5 秒恢复 15 点法力值，并使法术的法力消耗降低 3%，持续 30 分钟。"
       },
       "recall_the_fallen": {
         "name": "召回逝者",
@@ -7113,7 +7113,7 @@ export const zh_CN: EnTranslations = {
       },
       "mercy_lance": {
         "name": "仁慈之枪",
-        "description": "为一名盟友恢复或对一名敌人造成 {damage} 点生命值。有效治疗会生成 1 点奉献。升华时用于治疗还会治疗附近一名盟友。"
+        "description": "为一名盟友恢复生命值或对一名敌人造成 {damage} 点伤害。作为治疗施放时生成 1 点奉献。升华时用于治疗还会治疗附近一名盟友。"
       },
       "sacred_form": {
         "name": "神圣形态",
@@ -7769,7 +7769,7 @@ export const zh_CN: EnTranslations = {
       },
       "avenging_wrath": {
         "name": "复仇之翼",
-        "description": "召唤复仇之力，使你的攻击强度提高60、法术强度提高30，持续20秒。（圣骑士天赋）"
+        "description": "展开神圣双翼，获得 10 点奉献，并使技能生成的奉献在 15 秒内翻倍。造成的伤害也提高 20%。惩戒：可对任意目标使用愤怒之锤。"
       },
       "berserk": {
         "name": "赤红迷雾",

@@ -31,6 +31,7 @@ import {
   DAWNS_PATH_SPEED_MULT,
   devotionGainForAbility,
   devotionGenerationTriggered,
+  grantAbilityDevotion,
   grantDevotion,
 } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
@@ -720,7 +721,7 @@ export function runEffects(
         const healAmount =
           ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
         const healed = ctx.applyHeal(p, healTarget, healAmount, ability.name, ability.id);
-        if (healed > 0) devotionHealingTriggered = true;
+        devotionHealingTriggered = true;
         // Power Echo (mage choice row): the armed echo also repeats a direct HEAL
         // (Temporal Mend, Temporal Echo) at its fraction of the RESOLVED heal on
         // the same target, consumed BEFORE the repeat so a copy can never re-echo.
@@ -783,7 +784,6 @@ export function runEffects(
           if (best === null) break;
           chain.push(best);
         }
-        let totalHealed = 0;
         for (let i = 0; i < chain.length; i++) {
           // The green healing arc: caster to the first target, then previous hop to
           // the next (a dedicated fx so it reads as a healing cord, not a nuke beam).
@@ -795,9 +795,9 @@ export function runEffects(
             fx: 'chainHeal',
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
-          totalHealed += ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id);
+          ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id);
         }
-        if (totalHealed > 0) devotionHealingTriggered = true;
+        devotionHealingTriggered = true;
         break;
       }
       case 'feralCharge': {
@@ -1139,6 +1139,10 @@ export function runEffects(
             fx: 'paladinAscensionStart',
           });
         }
+        break;
+      }
+      case 'grantDevotion': {
+        grantDevotion(p, eff.amount);
         break;
       }
       case 'lifeTap': {
@@ -1658,14 +1662,15 @@ export function runEffects(
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
         const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true);
-        let totalHealed = 0;
+        let healingAttempted = false;
         for (const m of friendliesInRadius(ctx, center, eff.radius)) {
           if (eff.playersOnly && m.kind !== 'player') continue;
           if (!ctx.hasLineOfSight(center, m)) continue;
+          healingAttempted = true;
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
-          totalHealed += ctx.applyHeal(p, m, healAmount, ability.name, ability.id);
+          ctx.applyHeal(p, m, healAmount, ability.name, ability.id);
         }
-        if (totalHealed > 0) devotionHealingTriggered = true;
+        if (healingAttempted) devotionHealingTriggered = true;
         break;
       }
       case 'frozenOrb': {
@@ -2775,7 +2780,7 @@ export function runEffects(
       healing: devotionHealingTriggered,
     })
   ) {
-    grantDevotion(p, devotionGainForAbility(paladinSpec, ability.id));
+    grantAbilityDevotion(p, devotionGainForAbility(paladinSpec, ability.id));
   }
   if (consumeAscensionCharge(p, paladinSpec, ability.id)) {
     const ascensionImpact = ascensionImpactKind(ability.id, ascensionFxTargetHostile);
