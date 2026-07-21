@@ -244,6 +244,19 @@ const ORC_TRIPO: ClipMap = {
   death: 'Death',
 };
 
+// Orkadia specialist rig. These five creatures come through the current biped
+// pipeline, which retargets and bakes the complete game vocabulary directly.
+const ORKADIA_SPECIALIST_RIG: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'Cast',
+  jump: 'Jump',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -1064,6 +1077,43 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.1,
   },
+  // Five bespoke Orkadia specialists, kept effectively untinted so their
+  // authored armor, warpaint, fel runes, and rank silhouettes remain distinct.
+  mob_orkadia_axethrower: {
+    url: `${CREATURES}/orkadia_axethrower.glb`,
+    height: 2.4,
+    clips: ORKADIA_SPECIALIST_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_orkadia_fel_shaman: {
+    url: `${CREATURES}/orkadia_fel_shaman.glb`,
+    height: 2.4,
+    clips: ORKADIA_SPECIALIST_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_orkadia_beast_handler: {
+    url: `${CREATURES}/orkadia_beast_handler.glb`,
+    height: 2.5,
+    clips: ORKADIA_SPECIALIST_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_orkadia_siege_brute: {
+    url: `${CREATURES}/orkadia_siege_brute.glb`,
+    height: 2.9,
+    clips: ORKADIA_SPECIALIST_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_orkadia_banner_captain: {
+    url: `${CREATURES}/orkadia_banner_captain.glb`,
+    height: 2.7,
+    clips: ORKADIA_SPECIALIST_RIG,
+    tint: 'entity',
+    tintStrength: 0.05,
+  },
   mob_elemental: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.2,
@@ -1535,6 +1585,11 @@ const MOB_KEYS: Record<string, string> = {
   orkadia_grunt: 'mob_orc_grunt',
   orkadia_marauder: 'mob_orc_marauder',
   orkadia_warlord: 'mob_orc_warlord',
+  orkadia_axethrower: 'mob_orkadia_axethrower',
+  orkadia_fel_shaman: 'mob_orkadia_fel_shaman',
+  orkadia_beast_handler: 'mob_orkadia_beast_handler',
+  orkadia_siege_brute: 'mob_orkadia_siege_brute',
+  orkadia_banner_captain: 'mob_orkadia_banner_captain',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',

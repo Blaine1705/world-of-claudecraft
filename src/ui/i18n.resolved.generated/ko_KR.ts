@@ -10065,6 +10065,21 @@ export const ko_KR: EnTranslations = {
       "orkadia_marauder": {
         "name": "무쇠가죽 약탈자"
       },
+      "orkadia_axethrower": {
+        "name": "피엄니 도끼투척병"
+      },
+      "orkadia_fel_shaman": {
+        "name": "잿빛뼈 지옥 주술사"
+      },
+      "orkadia_beast_handler": {
+        "name": "무쇠가죽 전투야수 조련사"
+      },
+      "orkadia_siege_brute": {
+        "name": "오르카디아 공성 투사"
+      },
+      "orkadia_banner_captain": {
+        "name": "검은 깃발 대장"
+      },
       "orkadia_warlord": {
         "name": "전쟁군주 그로목 해골분쇄자"
       },

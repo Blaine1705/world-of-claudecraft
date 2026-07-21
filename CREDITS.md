@@ -150,6 +150,13 @@ in official releases and the Claudium store.
 | Generated prop model (orkadia_torch_post) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (orkadia_trophy_pole) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (orkadia_supply_crates) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (orkadia_war_tent) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (orkadia_catapult) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated creature model + animations (orkadia_beast_handler) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset |
+| Generated creature model + animations (orkadia_siege_brute) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset |
+| Generated creature model + animations (orkadia_banner_captain) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset |
+| Generated creature model + animations (orkadia_axethrower) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset |
+| Generated creature model + animations (orkadia_fel_shaman) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset |
 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not

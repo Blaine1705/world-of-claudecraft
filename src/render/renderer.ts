@@ -431,6 +431,10 @@ const YUMI_MAZE_SUN_INTENSITY = 1.2;
 const YUMI_MAZE_HEMI_INTENSITY = 0.42;
 const YUMI_MAZE_ENV_INTENSITY = 0.28;
 const YUMI_MAZE_RIM_BOOST = 1.7;
+const ORKADIA_SUN_INTENSITY = 1.35;
+const ORKADIA_HEMI_INTENSITY = 0.55;
+const ORKADIA_ENV_INTENSITY = 0.24;
+const ORKADIA_RIM_BOOST = 1.75;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
 const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
@@ -5711,12 +5715,12 @@ export class Renderer {
         fog.near = 20;
         fog.far = 80;
       } else if (desired === 'orkadiaField') {
-        // the open-air war-camp reads under a real sky: only a light ashen haze
-        // at the far edge of the ~240yd field, so the relief and the camp props
-        // stay crisp from the gate to the boss terrace.
-        fog.color.setHex(0x27301f);
-        fog.near = 110;
-        fog.far = 540;
+        // A smoky volcanic basin under its own storm dome. The far edge stays
+        // readable while the mountain and rear fortress fall into green-grey
+        // atmospheric depth instead of exposing the overworld horizon.
+        fog.color.setHex(0x303831);
+        fog.near = 90;
+        fog.far = 350;
       } else if (desired === 'delve') {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the
@@ -5753,6 +5757,7 @@ export class Renderer {
       // The rim glow cranks up instead — silhouettes must split from the murk.
       if (!this.lowGfx) {
         const mazeNight = desired === 'yumiMaze';
+        const orkadiaStorm = desired === 'orkadiaField';
         const underground =
           desired === 'dungeon' ||
           desired === 'temple' ||
@@ -5763,24 +5768,37 @@ export class Renderer {
         // of a cave at night stays night.
         this.sun.intensity = mazeNight
           ? YUMI_MAZE_SUN_INTENSITY
-          : underground
-            ? DUNGEON_SUN_INTENSITY
-            : SUN_INTENSITY * this.dnGrade.lightScale;
+          : orkadiaStorm
+            ? ORKADIA_SUN_INTENSITY
+            : underground
+              ? DUNGEON_SUN_INTENSITY
+              : SUN_INTENSITY * this.dnGrade.lightScale;
         this.hemi.intensity = mazeNight
           ? YUMI_MAZE_HEMI_INTENSITY
-          : underground
-            ? DUNGEON_HEMI_INTENSITY
-            : HEMI_INTENSITY * this.dnGrade.lightScale;
+          : orkadiaStorm
+            ? ORKADIA_HEMI_INTENSITY
+            : underground
+              ? DUNGEON_HEMI_INTENSITY
+              : HEMI_INTENSITY * this.dnGrade.lightScale;
         this.scene.environmentIntensity = mazeNight
           ? YUMI_MAZE_ENV_INTENSITY
-          : underground
-            ? DUNGEON_ENV_INTENSITY
-            : this.envOutdoorIntensity * this.dnGrade.lightScale;
+          : orkadiaStorm
+            ? ORKADIA_ENV_INTENSITY
+            : underground
+              ? DUNGEON_ENV_INTENSITY
+              : this.envOutdoorIntensity * this.dnGrade.lightScale;
         sharedUniforms.uRimBoost.value = mazeNight
           ? YUMI_MAZE_RIM_BOOST
-          : underground
-            ? DUNGEON_RIM_BOOST
-            : 1;
+          : orkadiaStorm
+            ? ORKADIA_RIM_BOOST
+            : underground
+              ? DUNGEON_RIM_BOOST
+              : 1;
+        if (orkadiaStorm) {
+          this.sun.color.setHex(0xa9b8a8);
+          this.hemi.color.setHex(0x899b9a);
+          this.hemi.groundColor.setHex(0x25281f);
+        }
       }
       return;
     }
