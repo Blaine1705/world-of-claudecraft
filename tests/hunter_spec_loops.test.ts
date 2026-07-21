@@ -86,7 +86,7 @@ describe('Hunter v0.29 baseline specialization loops', () => {
     function commandDamage(stacks: number): number {
       const sim = hunter('beast_mastery', 2914);
       const target = addMob(sim, 3);
-      target.armor = 0;
+      target.stats.armor = 0;
       const pet = addPet(sim);
       sim.targetEntity(target.id);
       if (stacks > 0) {
