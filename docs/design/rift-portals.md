@@ -174,8 +174,10 @@ A second polish pass, all still descriptor-driven and within the region bounds
 Roughly one seed in seven (`isSetPieceSeed`, `Rng(mix(seed, 0x1f3e)).chance(0.15)`) opens a
 HAND-AUTHORED dungeon instead of a procedural descent: a fixed TWO-FLOOR citadel
 (`INFERNAL_FLOOR_COUNT`) with two bosses, the halls above and The Pit below. Because the theme
-is chosen by the SEED and the rank only sets `baseLevel` (marks/loot), the citadel can headline
-a C-rank or an S-rank portal alike; there is nothing to gate.
+is chosen by the SEED; the citadel is C-rank content only. B, A and S portals on a set-piece seed
+open a procedural descent instead (`isSetPieceRift` requires `riftHeroicTuningFor(baseLevel) === null`).
+The two authored bosses (ritualist, pitlord) run their full hand-tuned kit at every level; they are
+exempt from the procedural rank-mechanic budget so the citadel identity is never stripped by rank gating.
 
 - **The authored-layout seam** (`src/sim/rift/authored.ts`). `DungeonLayout` gained optional
   `rooms` / `doors` / `decor`. `authoredWallSegments(rooms, doors)` unions every coincident room
