@@ -918,8 +918,6 @@ export const de_DE: EnTranslations = {
       "rarity_rare": "Selten",
       "rarity_epic": "Episch",
       "spec_speed": "+{pct}% zusätzliche Mobilität",
-      "spec_block": "+{pct}% Nahkampfschadensblock",
-      "spec_crit": "+{pct}% kritische Trefferchance",
       "name_valorsteed": "Valorross",
       "name_grag_bear": "Goliath-Gragbär",
       "name_stalkglider_snail": "Moosschalen-Stielgleiter",
@@ -941,7 +939,7 @@ export const de_DE: EnTranslations = {
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
       "success": "You have tamed the Valorsteed.",
-      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+      "returnToMarla": "Return to Marla at the stables to buy your Valorsteed reins for 10g."
     },
     "mountRace": {
       "startButton": "Start Race",
@@ -4647,7 +4645,27 @@ export const de_DE: EnTranslations = {
       "raceLostBanner": "Rift Already Cleared",
       "forgeUpgraded": "Rift upgrade completed for {name}.",
       "forgeEnchanted": "Rift enchant completed for {name}.",
-      "forgeSocketed": "Rift gem socketed for {name}."
+      "forgeSocketed": "Rift gem socketed for {name}.",
+      "detonateGlacialGrave": "Glacial Grave detonates!",
+      "detonateAbsoluteZero": "Absolute Zero erupts!",
+      "detonateMagmaWell": "Magma Well erupts!",
+      "detonateCoreMeltdown": "Core Meltdown detonates!",
+      "detonateVenomPool": "Venom Pool erupts!",
+      "detonateBroodmothersMark": "Broodmother's Mark detonates!",
+      "detonateSoulGrave": "Soul Grave detonates!",
+      "detonateDeathSentence": "Death Sentence falls!",
+      "detonateEarthshatter": "Earthshatter detonates!",
+      "detonateFinalJudgment": "Final Judgment lands!",
+      "detonateVoidRift": "Void Rift detonates!",
+      "detonateArcaneAnnihilation": "Arcane Annihilation erupts!",
+      "detonateLightningRod": "Lightning Rod strikes!",
+      "detonateStormcallersWrath": "Stormcaller's Wrath erupts!",
+      "detonateAbyssalMaw": "Abyssal Maw closes!",
+      "detonateCrushingDepth": "Crushing Depth crushes!",
+      "detonatePactSeal": "Pact Seal detonates!",
+      "detonateBloodRite": "Blood Rite falls!",
+      "detonatePitSentence": "Pit Sentence detonates!",
+      "detonateHellfireBrand": "Hellfire Brand detonates!"
     },
     "delve": {
       "cannotEnterNow": "Du kannst jetzt keinen Tiefgang betreten.",
@@ -6131,7 +6149,23 @@ export const de_DE: EnTranslations = {
     "cast": {
       "fishing": "Angeln",
       "demonHeal": "Dämonenheilung",
-      "thunzharrStormcall": "Sturmruf"
+      "thunzharrStormcall": "Sturmruf",
+      "rift_frost_execution": "Glacial Grave",
+      "rift_frost_strike": "Absolute Zero",
+      "rift_ember_execution": "Magma Well",
+      "rift_ember_strike": "Core Meltdown",
+      "rift_venom_execution": "Venom Pool",
+      "rift_venom_strike": "Broodmother's Mark",
+      "rift_necro_execution": "Soul Grave",
+      "rift_necro_strike": "Death Sentence",
+      "rift_brute_execution": "Earthshatter",
+      "rift_brute_strike": "Final Judgment",
+      "rift_arcane_execution": "Void Rift",
+      "rift_arcane_strike": "Arcane Annihilation",
+      "rift_storm_execution": "Lightning Rod",
+      "rift_storm_strike": "Stormcaller's Wrath",
+      "rift_tide_execution": "Abyssal Maw",
+      "rift_tide_strike": "Crushing Depth"
     }
   },
   "questUi": {
@@ -9495,6 +9529,9 @@ export const de_DE: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Gürtelschutz des Sturmrufers"
+      },
+      "riding_training": {
+        "name": "Riding Training"
       },
       "reins_valorsteed": {
         "name": "Zügel des Valorross"

@@ -27,8 +27,8 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { mountMeleeBlockPct } from '../content/mounts';
 import { CLASSES, isArenaPos, MOBS } from '../data';
+import { forceDismount } from '../mounts';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -91,6 +91,8 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
+  // Auto-dismount when the player is mounted and starts auto-attack.
+  if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.sitting) ctx.standUp(p);
   if (p.weaponStowed) drawWeapon(p);
   p.autoAttack = true;
@@ -152,6 +154,10 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // casters (wand-style, no dead zone so they don't run into melee, #94).
   // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
   // bear/cat/travel resolve to undefined here and fall through to melee.
+  // A pre-armed auto-attack that fires while mounted (e.g. mounted player who
+  // somehow retained autoAttack=true) force-dismounts before the swing lands,
+  // mirroring the ghost_wolf break pattern below and the startAutoAttack guard.
+  if (p.mountKey !== '') forceDismount(ctx, p);
   const ranged = rangedAutoProfile(p, meta.cls);
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
@@ -471,11 +477,6 @@ export function meleeSwing(
     opts.forceCrit === true;
   if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  // Mounted melee block (rare+ mounts, src/sim/content/mounts.ts): a flat
-  // fraction shaved off melee swings only, applied with the other upstream
-  // mitigation so dealDamage's amp/absorb math sees the reduced amount. Draws
-  // no rng, so the swing's draw order is unchanged for unmounted targets.
-  dmg *= 1 - mountMeleeBlockPct(target.mountKey);
   if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
     dmg = Math.max(1, dmg - target.blockValue);
   }

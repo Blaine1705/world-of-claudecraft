@@ -326,7 +326,7 @@ export interface RiftInstance {
   /** Overworld portal entity id the run came through (null for dev portals);
    * the portal is sealed (despawned + announced) when the final boss dies. */
   portalId: number | null;
-  /** True once the final boss kill has paid out (marks + seal), so a slot that
+  /** True once the final boss kill has paid out (gear + seal), so a slot that
    * lingers after the kill never double-pays. */
   rewarded: boolean;
   /** The sealed reward cache the giga-boss drops (`rift_locked_chest`), opened via
@@ -336,6 +336,15 @@ export interface RiftInstance {
    * `lockpick` engine + the shared HUD/wire), or null. Rift-hosted, so the delve
    * lockpick controller stays untouched. */
   lockpick: LockSession | null;
+  /** Sim time of the last "the runes go dark" sequence-reset notice broadcast to
+   * this instance. Instance-level (not per-player) so N party members standing on
+   * a wrong rune together still produce only one notice per cooldown window. */
+  seqResetAt: number;
+  /** Active lethal death zones placed by the floor boss (deathZoneCast /
+   * deathZoneStrike mechanics). Each zone starts with a `remaining` fuse equal
+   * to the boss's cast time; at zero it detonates (lethal to anyone inside `radius`).
+   * Cleared on boss death or floor reset. */
+  bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number }>;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

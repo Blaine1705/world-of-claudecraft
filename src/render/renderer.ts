@@ -1263,6 +1263,7 @@ export class Renderer {
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
+  private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = { theme: 'frost', value: 0 };
   private glacialFrontVisual!: GlacialFrontVisual;
@@ -1900,6 +1901,25 @@ export class Renderer {
     this.ringOfFrostVisuals = new RingOfFrostVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
+    void import('./rift_death_zone').then(({ RiftDeathZoneVisuals }) => {
+      this.riftDeathZoneVisuals = new RiftDeathZoneVisuals(this.scene, (x, z) => {
+        const base = groundHeight(x, z, this.sim.cfg.seed);
+        // Add the rift platform lift so rings on elevated sanctum boss arenas
+        // sit on the arena floor, not under it. Same pattern as entity ground
+        // (line ~6603) and camera clamp (~line 7643).
+        const rf = this.sim.riftFloor;
+        if (rf)
+          return (
+            base +
+            riftLiftAt(
+              generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade),
+              x - rf.origin.x,
+              z - rf.origin.z,
+            )
+          );
+        return base;
+      });
+    });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -3041,6 +3061,10 @@ export class Renderer {
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
+    if (this.riftDeathZoneVisuals) {
+      this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
+      this.riftDeathZoneVisuals.update(dt);
+    }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
@@ -6994,6 +7018,10 @@ export class Renderer {
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
+    if (this.riftDeathZoneVisuals) {
+      this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
+      this.riftDeathZoneVisuals.update(dt);
+    }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));

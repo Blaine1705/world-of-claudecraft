@@ -45,9 +45,9 @@ import { applyRiftUpgrade } from './upgrade';
 const MIN_FLOORS = 3;
 const MAX_FLOORS = 6;
 
-// Mob levels are rank-banded in rift/ranks.ts: C/B ramp under the classic
-// fairness cap (22), A holds 22 and gets its bite from the heroic stat
-// transform, and S-rank floors run 23 to 25 by design (re-exported here for
+// Mob levels are rank-banded in rift/ranks.ts: C ramps under the classic
+// fairness cap (22), B/A hold 22 and get their bite from the heroic stat
+// transform, and S-rank floors are a flat 23 by design (re-exported here for
 // the callers that historically read the cap off the generator).
 export { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from './ranks';
 
@@ -78,16 +78,16 @@ export function isSetPieceSeed(seed: number): boolean {
 }
 
 /** Whether this seed+rank opens the citadel. The 2-floor authored set-piece is
- * C/B content only: A and S rank dungeons are guaranteed 3+ floors, so a
- * heroic-rank portal always runs the procedural descent, even on a set-piece
- * seed. Pure over the descriptor, so every host agrees. */
+ * C content only: B, A and S rank dungeons are heroic scaled and guaranteed
+ * 3+ floors, so a heroic-rank portal always runs the procedural descent, even
+ * on a set-piece seed. Pure over the descriptor, so every host agrees. */
 export function isSetPieceRift(seed: number, baseLevel: number): boolean {
   return isSetPieceSeed(seed) && riftHeroicTuningFor(baseLevel) === null;
 }
 
 /** How many floors this rift runs (deterministic from the descriptor). The
  * authored set-piece descends from the citadel halls into the pit; every
- * procedural rift (including any A/S run) is 3 to 6 floors. `baseLevel`
+ * procedural rift (including any B/A/S run) is 3 to 6 floors. `baseLevel`
  * defaults to the C-rank baseline for legacy seed-only callers. */
 export function riftFloorCount(seed: number, baseLevel: number = RIFT_RANK_BASE_LEVEL.C): number {
   if (isSetPieceRift(seed, baseLevel)) return INFERNAL_FLOOR_COUNT;

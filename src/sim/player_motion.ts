@@ -170,10 +170,15 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // slides it back into deep water.
   const steepGround =
     p.onGround && !swimming && rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
-  // A mount summon/dismount transition holds the player in place: walk, strafe, and
-  // both jumps are blocked while mountCastRemaining > 0 (keyboard turning stays, above).
-  // The field syncs on the wire, so the online self-extrapolator roots in lockstep.
-  const mountLocked = p.mountCastRemaining > 0;
+  // Move-to-cancel: any movement input during a summon channel cancels the cast.
+  // Dismount channels (mountCastKey === '') remain fully rooted (handled by mountLocked below).
+  if (p.mountCastRemaining > 0 && p.mountCastKey !== '' && hasMoveInput) {
+    p.mountCastRemaining = 0;
+    p.mountCastKey = '';
+  }
+  // Keep the root ONLY during the dismount channel (mountCastKey === '' means dismounting).
+  // During a summon channel, movement is allowed (and handled above via move-to-cancel).
+  const mountLocked = p.mountCastRemaining > 0 && p.mountCastKey === '';
   const moving = hasMoveInput && !isRooted(p) && !steepGround && !mountLocked;
   let wishX = 0,
     wishZ = 0,

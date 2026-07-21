@@ -912,14 +912,12 @@ export const en_XA: EnTranslations = {
       "keybindHint": "[Þŕéšš ţĥé Ɱóúñţ / Ðíšɱóúñţ ķéý ţó ŕíðé.]",
       "emptyTitle": "[Ñó ɱóúñţš çóļļéçţéð]",
       "emptyStableHint": "[Ŕéáçĥ ļéʋéļ 20 áñð ţáķé ŕíðíñĝ ļéššóñš ŵíţĥ Šţáƀļéɱášţéŕ Ɱáŕļá áţ ţĥé Ĥíĝĥŵáţçĥ Šţáƀļéš, ŵéšţ óƒ Ĥíĝĥŵáţçĥ.]",
-      "emptyDropHint": "[Ŕáŕéŕ ɱóúñţš ðŕóþ ƒŕóɱ ðúñĝéóñ áñð ŕáíð ƀóššéš.]",
+      "emptyDropHint": "[Ŕáŕéŕ ɱóúñţš ðŕóþ ƒŕóɱ ĥéŕóíç ðúñĝéóñ ƀóššéš áñð Ŕíƒţ çóɱþļéţíóñš.]",
       "clickManage": "[Çļíçķ ţó çĥóóšé ýóúŕ ɱóúñţ]",
       "rarity_common": "[Çóɱɱóñ]",
       "rarity_rare": "[Ŕáŕé]",
       "rarity_epic": "[Éþíç]",
       "spec_speed": "[+{pct}% éẋţŕá ɱóƀíļíţý]",
-      "spec_block": "[+{pct}% ɱéļéé ðáɱáĝé ƀļóçķ]",
-      "spec_crit": "[+{pct}% çŕíţíçáļ šţŕíķé çĥáñçé]",
       "name_valorsteed": "[Ʋáļóŕšţééð]",
       "name_grag_bear": "[Ĝóļíáţĥ Ĝŕáĝ-Ɓéáŕ]",
       "name_stalkglider_snail": "[Ɱóšš-Šĥéļļ Šţáļķ-Ĝļíðéŕ]",
@@ -941,7 +939,7 @@ export const en_XA: EnTranslations = {
       "ridePrompt": "[Ƒóļļóŵ ţĥé ĝļóŵíñĝ ɱáŕķéŕ ţó ţĥé šţáŕţ ļíñé, ţĥéñ þŕéšš Šţáŕţ Ŕáçé.]",
       "begin": "[Ɓéĝíñ Ļéššóñ]",
       "success": "[Ýóú ĥáʋé ţáɱéð ţĥé Ʋáļóŕšţééð.]",
-      "returnToMarla": "[Ŕéţúŕñ ţó Ɱáŕļá áţ ţĥé šţáƀļéš ţó áðóþţ á šţáƀļé ĥóŕšé.]"
+      "returnToMarla": "[Ŕéţúŕñ ţó Ɱáŕļá áţ ţĥé šţáƀļéš ţó ƀúý ýóúŕ Ʋáļóŕšţééð ŕéíñš ƒóŕ 10ĝ.]"
     },
     "mountRace": {
       "startButton": "[Šţáŕţ Ŕáçé]",
@@ -4647,7 +4645,27 @@ export const en_XA: EnTranslations = {
       "raceLostBanner": "[Ŕíƒţ Áļŕéáðý Çļéáŕéð]",
       "forgeUpgraded": "[Ŕíƒţ úþĝŕáðé çóɱþļéţéð ƒóŕ {name}.]",
       "forgeEnchanted": "[Ŕíƒţ éñçĥáñţ çóɱþļéţéð ƒóŕ {name}.]",
-      "forgeSocketed": "[Ŕíƒţ ĝéɱ šóçķéţéð ƒóŕ {name}.]"
+      "forgeSocketed": "[Ŕíƒţ ĝéɱ šóçķéţéð ƒóŕ {name}.]",
+      "detonateGlacialGrave": "[Ĝļáçíáļ Ĝŕáʋé ðéţóñáţéš!]",
+      "detonateAbsoluteZero": "[Áƀšóļúţé Žéŕó éŕúþţš!]",
+      "detonateMagmaWell": "[Ɱáĝɱá Ŵéļļ éŕúþţš!]",
+      "detonateCoreMeltdown": "[Çóŕé Ɱéļţðóŵñ ðéţóñáţéš!]",
+      "detonateVenomPool": "[Ʋéñóɱ Þóóļ éŕúþţš!]",
+      "detonateBroodmothersMark": "[Ɓŕóóðɱóţĥéŕ'š Ɱáŕķ ðéţóñáţéš!]",
+      "detonateSoulGrave": "[Šóúļ Ĝŕáʋé ðéţóñáţéš!]",
+      "detonateDeathSentence": "[Ðéáţĥ Šéñţéñçé ƒáļļš!]",
+      "detonateEarthshatter": "[Éáŕţĥšĥáţţéŕ ðéţóñáţéš!]",
+      "detonateFinalJudgment": "[Ƒíñáļ Ĵúðĝɱéñţ ļáñðš!]",
+      "detonateVoidRift": "[Ʋóíð Ŕíƒţ ðéţóñáţéš!]",
+      "detonateArcaneAnnihilation": "[Áŕçáñé Áññíĥíļáţíóñ éŕúþţš!]",
+      "detonateLightningRod": "[Ļíĝĥţñíñĝ Ŕóð šţŕíķéš!]",
+      "detonateStormcallersWrath": "[Šţóŕɱçáļļéŕ'š Ŵŕáţĥ éŕúþţš!]",
+      "detonateAbyssalMaw": "[Áƀýššáļ Ɱáŵ çļóšéš!]",
+      "detonateCrushingDepth": "[Çŕúšĥíñĝ Ðéþţĥ çŕúšĥéš!]",
+      "detonatePactSeal": "[Þáçţ Šéáļ ðéţóñáţéš!]",
+      "detonateBloodRite": "[Ɓļóóð Ŕíţé ƒáļļš!]",
+      "detonatePitSentence": "[Þíţ Šéñţéñçé ðéţóñáţéš!]",
+      "detonateHellfireBrand": "[Ĥéļļƒíŕé Ɓŕáñð ðéţóñáţéš!]"
     },
     "delve": {
       "cannotEnterNow": "[Ýóú çáññóţ éñţéŕ á ðéļʋé ŕíĝĥţ ñóŵ.]",
@@ -6131,7 +6149,23 @@ export const en_XA: EnTranslations = {
     "cast": {
       "fishing": "[Ƒíšĥíñĝ]",
       "demonHeal": "[Ðéɱóñ Ĥéáļ]",
-      "thunzharrStormcall": "[Šţóŕɱçáļļ]"
+      "thunzharrStormcall": "[Šţóŕɱçáļļ]",
+      "rift_frost_execution": "[Ĝļáçíáļ Ĝŕáʋé]",
+      "rift_frost_strike": "[Áƀšóļúţé Žéŕó]",
+      "rift_ember_execution": "[Ɱáĝɱá Ŵéļļ]",
+      "rift_ember_strike": "[Çóŕé Ɱéļţðóŵñ]",
+      "rift_venom_execution": "[Ʋéñóɱ Þóóļ]",
+      "rift_venom_strike": "[Ɓŕóóðɱóţĥéŕ'š Ɱáŕķ]",
+      "rift_necro_execution": "[Šóúļ Ĝŕáʋé]",
+      "rift_necro_strike": "[Ðéáţĥ Šéñţéñçé]",
+      "rift_brute_execution": "[Éáŕţĥšĥáţţéŕ]",
+      "rift_brute_strike": "[Ƒíñáļ Ĵúðĝɱéñţ]",
+      "rift_arcane_execution": "[Ʋóíð Ŕíƒţ]",
+      "rift_arcane_strike": "[Áŕçáñé Áññíĥíļáţíóñ]",
+      "rift_storm_execution": "[Ļíĝĥţñíñĝ Ŕóð]",
+      "rift_storm_strike": "[Šţóŕɱçáļļéŕ'š Ŵŕáţĥ]",
+      "rift_tide_execution": "[Áƀýššáļ Ɱáŵ]",
+      "rift_tide_strike": "[Çŕúšĥíñĝ Ðéþţĥ]"
     }
   },
   "questUi": {
@@ -9496,6 +9530,9 @@ export const en_XA: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "[Ĝáļéçáļļ Ŵáíšţĝúáŕð]"
       },
+      "riding_training": {
+        "name": "[Ŕíðíñĝ Ţŕáíñíñĝ]"
+      },
       "reins_valorsteed": {
         "name": "[Ŕéíñš óƒ ţĥé Ʋáļóŕšţééð]"
       },
@@ -11223,8 +11260,8 @@ export const en_XA: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "[Ŕíðíñĝ Ļéššóñš]",
-        "text": "[Éʋéŕý ŕíðéŕ ŵáļķš íñ óñ ţŵó ļéĝš, {playerName}, šáɱé áš Í ţóļð ýóú ţĥé ðáý ŵé ɱéţ. Þáý ţĥé ƒéé, áñð ŵĥéñ Í ĝíʋé ţĥé ŵóŕð, çáļļ ţĥé ţŕáíñíñĝ Ʋáļóŕšţééð áñð çļíɱƀ áƀóáŕð. Ţĥéñ ŕíðé ţĥé çóúŕšé: ƒóļļóŵ ţĥé ɱáŕķéŕ ţó ţĥé šţáŕţ áŕçĥ, ţáķé éʋéŕý ĵúɱþ çļéáñ, áñð çŕóšš ţĥé ļíñé áĝáíñ ƀéƒóŕé ţĥé ĝļášš ŕúñš ðŕý. Ðó ţĥáţ áñð ţĥé šéáţ íš ýóúŕš. Ŵáñðéŕ óúţ óƒ ţĥé þáððóçķ áñð ŵé šţáŕţ óʋéŕ.]",
-        "completion": "[Ţĥéŕé, ñóŵ. Úþ íñ óñé çļéáñ ɱóţíóñ áñð á šţéáðý šéáţ áţ ţĥé ţóþ. Ţĥé Ʋáļóŕšţééð íš ýóúŕš, {playerName}: šáððļé, ŕéíñš, áñð ţĥé šţáñðíñĝ óƒ á ŕíðéŕ ŵĥó éáŕñéð ţĥé šéáţ íñšţéáð óƒ ƀúýíñĝ íţ.]",
+        "text": "[Ýóú ĥáʋé ļéáŕñéð ýóúŕ Ŕíðíñĝ, {playerName}, ñóŵ šĥóŵ ɱé ýóú ðéšéŕʋé íţ. Ŵĥéñ Í ĝíʋé ţĥé ŵóŕð, çáļļ ţĥé ţŕáíñíñĝ Ʋáļóŕšţééð áñð çļíɱƀ áƀóáŕð. Ŕíðé ţĥé çóúŕšé: ƒóļļóŵ ţĥé ɱáŕķéŕ ţó ţĥé šţáŕţ áŕçĥ, ţáķé éʋéŕý ĵúɱþ çļéáñ, áñð çŕóšš ţĥé ļíñé áĝáíñ ƀéƒóŕé ţĥé ĝļášš ŕúñš ðŕý. Ðó ţĥáţ áñð ţĥé çóúŕšé íš ýóúŕš. Ŵáñðéŕ óúţ óƒ ţĥé þáððóçķ áñð ŵé šţáŕţ óʋéŕ.]",
+        "completion": "[Úþ íñ óñé çļéáñ ɱóţíóñ áñð á šţéáðý šéáţ áţ ţĥé ţóþ. Ŵéļļ ŕíððéñ, {playerName}. Ýóú ĥáʋé éáŕñéð ţĥé ŕáñķ óƒ ŕíðéŕ. Šþéáķ ţó ɱé áĝáíñ ţó ƀúý ýóúŕ óŵñ Ʋáļóŕšţééð ŕéíñš.]",
         "objectives": {
           "0": {
             "label": "[Ţáɱé ţĥé Ʋáļóŕšţééð]"

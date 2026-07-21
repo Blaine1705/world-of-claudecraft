@@ -7,7 +7,15 @@ import {
 import { RIFT_BOSS_IDS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
 import { BUILTIN_WORLD, ITEMS, MOBS, riftInstanceOrigin } from '../src/sim/data';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
-import { addRiftClearGearLoot } from '../src/sim/rift/progression';
+import {
+  addRiftClearGearLoot,
+  RIFT_BLUE_MOUNT_REINS,
+  RIFT_COIN_BONUS_A,
+  RIFT_COIN_BONUS_B,
+  RIFT_COIN_BONUS_C,
+  RIFT_COIN_BONUS_S,
+  RIFT_EPIC_MOUNT_REINS,
+} from '../src/sim/rift/progression';
 import {
   RIFT_HEROIC_MIN_MOVE_SPEED,
   RIFT_HEROIC_TUNING,
@@ -109,11 +117,12 @@ describe('rift ranks: derivation and level bands', () => {
     expect(RIFT_RANK_MECHANIC_BUDGET).toEqual({ C: 1, B: 2, A: 3, S: 4 });
   });
 
-  it('C ramps 20..22, B/A hold 22, S runs 23..25', () => {
+  it('C ramps 20..22, B/A hold 22, S is flat 23', () => {
     expect([0, 1, 2, 3, 5].map((i) => riftFloorLevel(20, i))).toEqual([20, 21, 22, 22, 22]);
     expect([0, 3, 5].map((i) => riftFloorLevel(22, i))).toEqual([22, 22, 22]);
     expect([0, 3, 5].map((i) => riftFloorLevel(25, i))).toEqual([22, 22, 22]);
-    expect([0, 1, 2, 3, 5].map((i) => riftFloorLevel(28, i))).toEqual([23, 24, 25, 25, 25]);
+    // S-rank mobs are flat 23 on every floor (no ramp to 25).
+    expect([0, 1, 2, 3, 5].map((i) => riftFloorLevel(28, i))).toEqual([23, 23, 23, 23, 23]);
   });
 });
 
@@ -127,6 +136,8 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
     'terrify',
     'summonAdds',
     'desperateHeal',
+    'deathZoneCast',
+    'deathZoneStrike',
   ]);
 
   it('every rift boss lists exactly 4 distinct mechanics its template actually carries', () => {
@@ -143,21 +154,28 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
     }
   });
 
-  it('suppression follows the entity budget and never touches unlisted mechanics', () => {
+  it('suppression follows the entity budget; unlisted non-driver-keys (enrage, knockback) are never gated; unlisted driver-keys ARE suppressed at all ranks', () => {
     const bossAt = (limit: number | undefined) =>
       ({ templateId: 'rift_boss_frost', riftMechanicLimit: limit }) as unknown as Entity;
-    // Frost kit order: aoePulse, aoeSlow, stoneskin, bigCast.
+    // Frost kit order: aoePulse, aoeSlow, deathZoneCast, deathZoneStrike.
     const c = bossAt(1);
     expect(riftMechanicSuppressed(c, 'aoePulse')).toBe(false);
     expect(riftMechanicSuppressed(c, 'aoeSlow')).toBe(true);
-    expect(riftMechanicSuppressed(c, 'stoneskin')).toBe(true);
-    expect(riftMechanicSuppressed(c, 'bigCast')).toBe(true);
+    expect(riftMechanicSuppressed(c, 'deathZoneCast')).toBe(true);
+    expect(riftMechanicSuppressed(c, 'deathZoneStrike')).toBe(true);
     expect(riftMechanicSuppressed(c, 'enrage'), 'unlisted keys are never gated').toBe(false);
+    expect(riftMechanicSuppressed(c, 'stomp'), 'unlisted driver key suppressed at all ranks').toBe(
+      true,
+    );
+    expect(
+      riftMechanicSuppressed(c, 'knockback'),
+      'knockback (unlisted, not a driver key) never gated',
+    ).toBe(false);
     const b = bossAt(2);
     expect(riftMechanicSuppressed(b, 'aoeSlow')).toBe(false);
-    expect(riftMechanicSuppressed(b, 'stoneskin')).toBe(true);
+    expect(riftMechanicSuppressed(b, 'deathZoneCast')).toBe(true);
     const s = bossAt(4);
-    for (const key of ['aoePulse', 'aoeSlow', 'stoneskin', 'bigCast']) {
+    for (const key of ['aoePulse', 'aoeSlow', 'deathZoneCast', 'deathZoneStrike']) {
       expect(riftMechanicSuppressed(s, key), `S runs ${key}`).toBe(false);
     }
     const trash = bossAt(undefined);
@@ -167,16 +185,37 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
   });
 });
 
-describe('rift ranks: A/S heroic spawn scaling', () => {
-  it('A/S trash takes the heroic stat transform + mechanic multipliers; C/B does not', () => {
-    for (const baseLevel of [20, 22]) {
+describe('rift ranks: A/S/B heroic spawn scaling', () => {
+  it('B/A/S trash takes the heroic stat transform + mechanic multipliers; C does not', () => {
+    // C is the only rank without the heroic transform.
+    for (const baseLevel of [20]) {
       const sim = makeSim();
       sim.enterRift(SEED, baseLevel, sim.player.id);
       const inst = active(sim);
       for (const id of inst.mobIds) {
         const m = sim.entities.get(id)!;
-        expect(m.mechanicDamageMult, `C/B mob ${m.templateId}`).toBeUndefined();
+        expect(m.mechanicDamageMult, `C mob ${m.templateId}`).toBeUndefined();
         expect(m.riftMechanicLimit, 'trash carries no mechanic budget').toBeUndefined();
+      }
+    }
+    // B-rank mobs DO carry the 1.5/1.35 heroic transform (new in B-rank tuning).
+    {
+      const sim = makeSim();
+      sim.enterRift(SEED, 22, sim.player.id);
+      const inst = active(sim);
+      const tuning = RIFT_HEROIC_TUNING.B!;
+      expect(inst.mobIds.length).toBeGreaterThan(0);
+      for (const id of inst.mobIds) {
+        const m = sim.entities.get(id)!;
+        const t = MOBS[m.templateId];
+        expect(m.mechanicDamageMult, `B mob ${m.templateId}`).toBe(tuning.damageMultiplier);
+        expect(m.mechanicHealMult).toBe(tuning.healthMultiplier);
+        expect(m.moveSpeed, 'anti-kite move-speed floor').toBeGreaterThanOrEqual(
+          RIFT_HEROIC_MIN_MOVE_SPEED,
+        );
+        const hm = tuning.healthMultiplier;
+        const expected = Math.round((t.hpBase * hm + t.hpPerLevel * hm * (m.level - 1)) * 2.3);
+        expect(m.maxHp, `B ${m.templateId} hp`).toBe(expected);
       }
     }
     for (const baseLevel of [25, 28]) {
@@ -212,21 +251,24 @@ describe('rift ranks: A/S heroic spawn scaling', () => {
     const s = enterAtBossFloor(seed, 28);
     const sBoss = s.entities.get(active(s).bossId!)!;
     expect(sBoss.riftMechanicLimit).toBe(4);
-    expect(sBoss.level, 'S boss reaches the 25 ceiling').toBe(25);
+    // S-rank is flat 23 on every floor (no ramp to 25).
+    expect(sBoss.level, 'S boss is flat 23').toBe(23);
   });
 });
 
 describe('rift ranks: rank-gated summons + the boss-add level pin', () => {
-  // Ember kit order: bigCast, aoePulse, stomp, summonAdds. So the add wave is
-  // its S-rank capstone: suppressed entirely at C, live at S.
-  it('C suppresses the ember add wave; S fires it, with adds AT the boss level (not 50)', () => {
-    const seed = seedWithFinalBoss('rift_boss_ember');
+  // Necro kit order: summonAdds (index 0), bigCast (index 1), deathZoneCast (index 2),
+  // deathZoneStrike (index 3). summonAdds is the C-rank mechanic: it always fires.
+  // Adds must spawn at the boss's level, not the template band.
+  it('necro C rank fires summonAdds (index 0); adds spawn AT the boss level (not 50)', () => {
+    const seed = seedWithFinalBoss('rift_boss_necro');
 
     const c = enterAtBossFloor(seed, 20);
     const cBoss = c.entities.get(active(c).bossId!)!;
     c.player.gm = true; // survive the boss so combat (and the wave window) persists
     c.player.pos = { ...cBoss.pos, z: cBoss.pos.z - 4 };
     c.player.prevPos = { ...c.player.pos };
+    // Drop the necro below its first summon threshold (0.7).
     (c as unknown as { dealDamage: Function }).dealDamage(
       c.player,
       cBoss,
@@ -238,37 +280,126 @@ describe('rift ranks: rank-gated summons + the boss-add level pin', () => {
       true,
     );
     tickAlive(c, 3);
-    expect(cBoss.summonedIds, 'C rank never summons (mechanic 4 of 4)').toHaveLength(0);
+    expect(cBoss.summonedIds.length, 'C rank fires summonAdds (index 0)').toBeGreaterThan(0);
+    for (const addId of cBoss.summonedIds) {
+      const add = c.entities.get(addId)!;
+      // The level-50 bug: adds rolled the template band before the fix.
+      // They must spawn AT the boss's level (add.level === boss.level).
+      expect(add.level, 'adds match the boss level').toBe(cBoss.level);
+    }
 
-    const s = enterAtBossFloor(seed, 28);
-    const sBoss = s.entities.get(active(s).bossId!)!;
-    s.player.gm = true; // survive the heroic boss so the summoned wave persists
-    s.player.pos = { ...sBoss.pos, z: sBoss.pos.z - 4 };
-    s.player.prevPos = { ...s.player.pos };
-    (s as unknown as { dealDamage: Function }).dealDamage(
-      s.player,
-      sBoss,
-      Math.round(sBoss.maxHp * 0.5),
+    // Kit integrity: deathZoneStrike is the S-rank capstone at index 3.
+    expect(
+      MOBS['rift_boss_necro'].rankMechanics?.indexOf('deathZoneStrike'),
+      'deathZoneStrike is at index 3',
+    ).toBe(3);
+  });
+});
+
+describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)', () => {
+  // Frost kit: aoePulse (C), aoeSlow (B), deathZoneCast (A), deathZoneStrike (S).
+  // At S rank (budget=4) the boss has both lethal mechanics active. A player
+  // standing inside the zone when the fuse expires should be instantly killed;
+  // one who stepped out survives.
+  it('A-rank frost boss death zone detonates and kills a standing player', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 25); // A rank (baseLevel 25)
+    const inst = active(sim);
+    const boss = sim.entities.get(inst.bossId!)!;
+    sim.player.gm = false;
+    // Position the player inside the boss's melee range so it enters combat and
+    // the cast-bar mechanic ticks. Keep the player alive between ticks.
+    sim.player.pos = { ...boss.pos, z: boss.pos.z - 3 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.player.hp = sim.player.maxHp;
+
+    // Manually inject a death zone with a very short fuse.
+    inst.bossDeathZones.push({
+      x: sim.player.pos.x,
+      z: sim.player.pos.z,
+      radius: 12,
+      remaining: 0.05,
+    });
+    // One tick: the fuse expires and the zone detonates.
+    sim.player.hp = sim.player.maxHp; // restore so only the zone kills
+    sim.tick();
+    expect(sim.player.dead, 'player inside the zone is killed on detonation').toBe(true);
+  });
+
+  it('deathZoneStrike is suppressed at A rank (budget=3)', () => {
+    const bossAt = (limit: number) =>
+      ({ templateId: 'rift_boss_frost', riftMechanicLimit: limit }) as unknown as Entity;
+    expect(
+      riftMechanicSuppressed(bossAt(3), 'deathZoneStrike'),
+      'A suppresses deathZoneStrike',
+    ).toBe(true);
+    expect(riftMechanicSuppressed(bossAt(4), 'deathZoneStrike'), 'S runs deathZoneStrike').toBe(
+      false,
+    );
+  });
+
+  it('bossDeathZones clears between floors', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 25);
+    const inst = active(sim);
+    inst.bossDeathZones.push({ x: 0, z: 0, radius: 9, remaining: 5 });
+    // Simulate a floor descent (freeRiftFloorEntities clears zones).
+    inst.bossDeathZones = [];
+    expect(inst.bossDeathZones, 'zones cleared between floors').toHaveLength(0);
+  });
+
+  it('the heroic tuning table carries the approved literals', () => {
+    // The transform tests above assert WIRING against this table (field on the
+    // mob === field in the table), so the numbers themselves must be pinned
+    // here as literals or a silent retune of any multiplier passes every test.
+    expect(RIFT_HEROIC_TUNING).toEqual({
+      B: {
+        healthMultiplier: 1.5,
+        damageMultiplier: 1.35,
+        addDamageMultiplier: 1.12,
+        armorMultiplier: 1.12,
+      },
+      A: {
+        healthMultiplier: 1.9,
+        damageMultiplier: 1.6,
+        addDamageMultiplier: 1.25,
+        armorMultiplier: 1.25,
+      },
+      S: {
+        healthMultiplier: 2.5,
+        damageMultiplier: 2,
+        addDamageMultiplier: 1.5,
+        armorMultiplier: 1.4,
+      },
+    });
+  });
+
+  it('B-rank boss adds take the softer 1.12 multiplier (venom summons in budget)', () => {
+    const seed = seedWithFinalBoss('rift_boss_venom');
+    const b = enterAtBossFloor(seed, 22);
+    const bBoss = b.entities.get(active(b).bossId!)!;
+    b.player.gm = true; // survive the heroic boss so the summoned wave persists
+    b.player.pos = { ...bBoss.pos, z: bBoss.pos.z - 4 };
+    b.player.prevPos = { ...b.player.pos };
+    (b as unknown as { dealDamage: Function }).dealDamage(
+      b.player,
+      bBoss,
+      Math.round(bBoss.maxHp * 0.5),
       false,
       'physical',
       'test',
       'hit',
       true,
     );
-    tickAlive(s, 3);
-    expect(sBoss.summonedIds.length, 'S rank summons the wave').toBeGreaterThan(0);
-    for (const addId of sBoss.summonedIds) {
-      const add = s.entities.get(addId)!;
-      // The level-50 bug: adds rolled the template band (18..60 before the fix)
-      // instead of matching the dungeon. They must spawn AT the boss's level.
-      expect(add.level, 'adds match the boss level').toBe(sBoss.level);
-      const addMult = RIFT_HEROIC_TUNING.S?.addDamageMultiplier;
-      expect(add.mechanicDamageMult, 'add mechanics take the softer multiplier').toBe(addMult);
-      // The auto-attack takes the SAME softer multiplier via the spawn-time
-      // template transform (never the full boss damageMultiplier).
+    tickAlive(b, 3);
+    expect(bBoss.summonedIds.length, 'B summons (venom slot 1 fits budget 2)').toBeGreaterThan(0);
+    for (const addId of bBoss.summonedIds) {
+      const add = b.entities.get(addId)!;
+      expect(add.level, 'adds match the boss level').toBe(bBoss.level);
+      expect(add.mechanicDamageMult, 'softer add multiplier, literal').toBe(1.12);
       const t = MOBS[add.templateId];
-      const swing = t.dmgBase * addMult! + t.dmgPerLevel * addMult! * (add.level - 1);
-      expect(add.weapon.min, 'add swings at the add multiplier').toBe(Math.round(swing * 0.8));
+      const swing = t.dmgBase * 1.12 + t.dmgPerLevel * 1.12 * (add.level - 1);
+      expect(add.weapon.min, 'add swings at the softer multiplier').toBe(Math.round(swing * 0.8));
     }
   });
 });
@@ -296,7 +427,7 @@ describe('rift ranks: A/S one-shot rolling boulder', () => {
     sim.player.prevPos = { ...sim.player.pos };
   }
 
-  it('C chips a fraction of max hp; A executes outright (lava stays a burn)', () => {
+  it('C chips a fraction of max hp; B/A/S execute outright (lava stays a burn)', () => {
     const seed = rollerSeed();
 
     const c = makeSim(seed);
@@ -309,6 +440,17 @@ describe('rift ranks: A/S one-shot rolling boulder', () => {
     }
     expect(c.player.dead, 'a C-rank boulder is survivable').toBe(false);
     expect(c.player.hp, 'but it hurts').toBeLessThan(c.player.maxHp);
+
+    // B-rank boulders are lethal (B now has heroic tuning).
+    const b = makeSim(seed);
+    b.enterRift(seed, 22, b.player.id);
+    parkInLane(b);
+    b.player.hp = b.player.maxHp;
+    for (let i = 0; i < 20 * 30 && !b.player.dead; i++) {
+      parkInLane(b);
+      b.tick();
+    }
+    expect(b.player.dead, 'a B-rank boulder is a one-shot kill').toBe(true);
 
     const a = makeSim(seed);
     a.enterRift(seed, 25, a.player.id);
@@ -474,16 +616,22 @@ describe('rift ranks: rune-reset notice rate limit', () => {
   });
 });
 
-describe('rift ranks: A/S rifts are never shorter than 3 floors', () => {
-  it('a set-piece seed opens the 2-floor citadel at C/B but runs procedural 3+ at A/S', () => {
+describe('rift ranks: B/A/S rifts are never shorter than 3 floors', () => {
+  it('a set-piece seed opens the 2-floor citadel at C only; B/A/S run procedural 3+', () => {
+    // B now has the heroic transform, so isSetPieceRift gates on tuning !== null.
+    // The citadel is C-only content; B/A/S all run the procedural descent.
     let seed = -1;
     for (let s = 1; s < 400 && seed < 0; s++) if (isSetPieceSeed(s)) seed = s;
     expect(seed).toBeGreaterThan(0);
-    // C/B: the citadel (2 authored floors).
+    // C: the citadel (2 authored floors).
     expect(riftFloorCount(seed)).toBe(2);
     expect(riftFloorCount(seed, 20)).toBe(2);
-    expect(riftFloorCount(seed, 22)).toBe(2);
     expect(generateRiftFloor(seed, 20, 0).authored).toBe(true);
+    // B on a citadel seed now runs procedural 3+ (B has heroic tuning).
+    expect(riftFloorCount(seed, 22), 'B runs procedural').toBeGreaterThanOrEqual(3);
+    const bFloor = generateRiftFloor(seed, 22, 0);
+    expect(bFloor.authored, 'B never opens the 2-floor set-piece').toBeUndefined();
+    expect(bFloor.floorCount).toBeGreaterThanOrEqual(3);
     // A/S: guaranteed 3+ procedural floors, never the 2-floor set-piece.
     for (const baseLevel of [25, 28]) {
       expect(riftFloorCount(seed, baseLevel), `base ${baseLevel}`).toBeGreaterThanOrEqual(3);
@@ -500,11 +648,12 @@ describe('rift ranks: A/S rifts are never shorter than 3 floors', () => {
     }
   });
 
-  it('an S-rank citadel-seed run fields S-band mobs on its procedural floors', () => {
+  it('an S-rank citadel-seed run fields S-band mobs (flat 23) on its procedural floors', () => {
     let seed = -1;
     for (let s = 1; s < 400 && seed < 0; s++) if (isSetPieceSeed(s)) seed = s;
     const floor = generateRiftFloor(seed, 28, 0);
-    for (const sp of floor.spawns) expect(sp.level).toBeGreaterThanOrEqual(23);
+    // S-rank is flat 23 on every floor.
+    for (const sp of floor.spawns) expect(sp.level).toBe(23);
   });
 });
 
@@ -518,21 +667,36 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     expect(ITEMS[RIFT_LEGENDARY_ITEM_ID].quality).toBe('legendary');
   });
 
-  it('C pays nothing, B rolls a slim chance, A guarantees an epic, S guarantees plus rolls more', () => {
+  it('C pays a guaranteed rare + coin, B guarantees an epic, A guarantees an epic, S guarantees plus rolls more', () => {
     const epicIds = new Set<string>(RIFT_EPIC_ITEM_IDS);
+    const rareIds = new Set<string>(RIFT_RARE_ITEM_IDS);
+    const mountIds = new Set<string>([...RIFT_BLUE_MOUNT_REINS, ...RIFT_EPIC_MOUNT_REINS]);
+    // Returns only the gear (non-mount) items from a clear.
     const run = (baseLevel: number, rngSeed: number) => {
       const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
       const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
       addRiftClearGearLoot(ctx, boss, baseLevel);
-      return boss.loot!.items.map((i) => i.itemId);
+      return boss.loot!.items.map((i) => i.itemId).filter((id) => !mountIds.has(id!));
+    };
+    const runCopper = (baseLevel: number, rngSeed: number): number => {
+      const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
+      const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
+      addRiftClearGearLoot(ctx, boss, baseLevel);
+      return boss.loot!.copper;
     };
     for (let s = 1; s <= 40; s++) {
-      expect(run(20, s), 'C never pays clear gear').toHaveLength(0);
+      // C: guaranteed rare from RIFT_RARE_ITEM_IDS, never an epic.
+      const c = run(20, s);
+      expect(c.length, 'C pays exactly one rare').toBe(1);
+      expect(rareIds.has(c[0]!), 'C pays from the rare pool').toBe(true);
+      expect(runCopper(20, s), 'C pays the coin bonus').toBe(RIFT_COIN_BONUS_C);
       const a = run(25, s);
       expect(a.length, 'A guarantees exactly one epic').toBe(1);
       expect(epicIds.has(a[0]!), 'A pays from the epic pool').toBe(true);
+      // B: guaranteed 1 epic (RIFT_EPIC_CHANCE_B = 1.0).
       const b = run(22, s);
-      expect(b.length, 'B is a slim roll').toBeLessThanOrEqual(1);
+      expect(b.length, 'B guarantees exactly one epic').toBe(1);
+      expect(epicIds.has(b[0]!), 'B pays from the epic pool').toBe(true);
       const sDrops = run(28, s);
       expect(sDrops.length, 'S guarantees one epic').toBeGreaterThanOrEqual(1);
       expect(sDrops.length).toBeLessThanOrEqual(3);
@@ -541,23 +705,19 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
         expect(epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID).toBe(true);
       }
     }
-    // Across many rolls, B pays SOMETIMES (neither never nor always), and the S
-    // legendary is reachable but rare.
-    let bHits = 0;
+    // S legendary is reachable but rare; B always pays exactly one epic.
     let sLegendaries = 0;
     for (let s = 1; s <= 300; s++) {
-      if (run(22, s).length > 0) bHits++;
       if (run(28, s).includes(RIFT_LEGENDARY_ITEM_ID)) sLegendaries++;
     }
-    expect(bHits).toBeGreaterThan(0);
-    expect(bHits).toBeLessThan(150);
     expect(sLegendaries).toBeGreaterThan(0);
     expect(sLegendaries).toBeLessThan(60);
   });
 
-  it('an S-rank clear leaves the epic on the boss corpse; a C clear does not', () => {
+  it('an S-rank clear leaves an epic on the boss corpse; a C clear leaves a rare (not an epic)', () => {
     const seed = seedWithFinalBoss('rift_boss_ember');
     const epicIds = new Set<string>(RIFT_EPIC_ITEM_IDS);
+    const rareIds = new Set<string>(RIFT_RARE_ITEM_IDS);
 
     const s = enterAtBossFloor(seed, 28);
     const sBoss = s.entities.get(active(s).bossId!)!;
@@ -601,8 +761,37 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     const cItems = (cBoss.loot?.items ?? []).map((i) => i.itemId);
     expect(
       cItems.some((id) => epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID),
-      'C corpse never carries clear gear',
+      'C corpse never carries an epic or legendary',
     ).toBe(false);
+    expect(
+      cItems.some((id) => rareIds.has(id!)),
+      'C corpse carries exactly one rare',
+    ).toBe(true);
+  });
+
+  it('rank coin bonus: C/B/A/S each pay the correct copper bonus', () => {
+    const runCopper = (baseLevel: number, rngSeed: number): number => {
+      const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
+      const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
+      addRiftClearGearLoot(ctx, boss, baseLevel);
+      return boss.loot!.copper;
+    };
+    // C gets the normal-tier coin bonus (RIFT_COIN_BONUS_C = 10 000c).
+    for (let s = 1; s <= 10; s++) {
+      expect(runCopper(20, s), 'C rank: normal-tier coin bonus').toBe(RIFT_COIN_BONUS_C);
+    }
+    // B always gets exactly RIFT_COIN_BONUS_B regardless of other draws.
+    for (let s = 1; s <= 10; s++) {
+      expect(runCopper(22, s), 'B rank: flat 10 000c bonus').toBe(RIFT_COIN_BONUS_B);
+    }
+    // A always gets exactly RIFT_COIN_BONUS_A.
+    for (let s = 1; s <= 10; s++) {
+      expect(runCopper(25, s), 'A rank: flat 35 000c bonus').toBe(RIFT_COIN_BONUS_A);
+    }
+    // S always gets exactly RIFT_COIN_BONUS_S.
+    for (let s = 1; s <= 10; s++) {
+      expect(runCopper(28, s), 'S rank: flat 50 000c bonus').toBe(RIFT_COIN_BONUS_S);
+    }
   });
 });
 
@@ -620,5 +809,259 @@ describe('rift exit: the way home is never anchored in water', () => {
     sim.enterRift(SEED, 20, sim.player.id, wet!);
     const inst = active(sim);
     expect(isInWaterBody(inst.returnPos.x, inst.returnPos.z), 'return point is dry').toBe(false);
+  });
+});
+
+// ---- Walk-in throttle pins ---------------------------------------------------
+// These pin the rate-limit behavior of the four repeating messages that fire on
+// the 20 Hz walk-in path without a throttle. Counting emitted messages over a
+// fixed tick window proves they stay within the cooldown cadence.
+
+describe('rift throttle: pool-full error fires at most once per cooldown window', () => {
+  it('standing in a full-pool portal emits the error once per 4 s, not every call', () => {
+    const sim = makeSim();
+    // Fill every rift slot so no free slot exists.
+    for (const inst of sim.riftInstances) {
+      inst.partyKey = 'party:occupied';
+    }
+    // A fake portal entity carrying the fields enterRift's portal-gate checks read.
+    const fakePortal = {
+      id: 9999,
+      riftSeed: SEED,
+      riftBaseLevel: 20,
+      pos: { x: 0, y: 0, z: 0 },
+    } as unknown as import('../src/sim/types').Entity;
+    sim.player.level = 20;
+    const drainPoolFull = (): number => {
+      sim.enterRift(SEED, 20, sim.player.id, undefined, fakePortal);
+      return (sim as unknown as { drainEvents(): import('../src/sim/types').SimEvent[] })
+        .drainEvents()
+        .filter(
+          (ev) =>
+            ev.type === 'error' &&
+            (ev as { text: string }).text === 'All rifts are unstable right now. Try again soon.',
+        ).length;
+    };
+    // First call: one error.
+    expect(drainPoolFull(), 'first call emits the error').toBe(1);
+    // Immediate re-call: silenced by cooldown.
+    expect(drainPoolFull(), 'immediate re-call is silenced').toBe(0);
+    // After 100 ticks (> 4 s), the cooldown has elapsed: one more error.
+    tickAlive(sim, 100);
+    expect(drainPoolFull(), 'error fires again after cooldown').toBe(1);
+  });
+});
+
+describe('rift throttle: level-denial error fires at most once per 4 s', () => {
+  it('low-level player re-entering a portal sees the denial once per cooldown', () => {
+    const sim = makeSim();
+    const fakePortal = {
+      id: 9998,
+      riftSeed: SEED,
+      riftBaseLevel: 20,
+      pos: { x: 0, y: 0, z: 0 },
+    } as unknown as import('../src/sim/types').Entity;
+    sim.player.level = 1;
+    const deny = 'Only adventurers of level 20 or higher may enter this rift.';
+    const drainDeny = (): number => {
+      sim.enterRift(SEED, 20, sim.player.id, undefined, fakePortal);
+      return (sim as unknown as { drainEvents(): import('../src/sim/types').SimEvent[] })
+        .drainEvents()
+        .filter((ev) => ev.type === 'error' && (ev as { text: string }).text === deny).length;
+    };
+    expect(drainDeny(), 'first call emits the denial').toBe(1);
+    expect(drainDeny(), 'immediate re-call is silenced').toBe(0);
+    tickAlive(sim, 100);
+    expect(drainDeny(), 'denial fires again after 4 s cooldown').toBe(1);
+  });
+});
+
+describe('rift throttle: orb-notice fires at most once per 6 s cooldown', () => {
+  it('standing at a dormant Blood Orb nudges at most once per 6 s, not every tick', () => {
+    let setPieceSeed = -1;
+    for (let s = 1; s < 400 && setPieceSeed < 0; s++) {
+      if (isSetPieceSeed(s)) setPieceSeed = s;
+    }
+    expect(setPieceSeed, 'found a set-piece seed').toBeGreaterThan(0);
+    const sim = makeSim(setPieceSeed);
+    sim.enterRift(setPieceSeed, 20, sim.player.id);
+    const inst = active(sim);
+    expect(inst.orbId, 'authored floor has an orb').not.toBeNull();
+    const orb = sim.entities.get(inst.orbId!)!;
+    sim.player.gm = true;
+    const countOrb = (ticks: number): number => {
+      let n = 0;
+      for (let i = 0; i < ticks; i++) {
+        sim.player.pos = { ...orb.pos };
+        sim.player.prevPos = { ...sim.player.pos };
+        sim.player.hp = sim.player.maxHp;
+        for (const ev of sim.tick()) {
+          if (
+            ev.type === 'log' &&
+            (ev as { text?: string }).text === 'The orb is sealed by the ritual below.'
+          )
+            n++;
+        }
+      }
+      return n;
+    };
+    // 120 ticks = 6 s: one nudge on arrival, then silence for the rest.
+    expect(countOrb(120), 'one nudge per 6 s window').toBe(1);
+    expect(countOrb(120), 'one more nudge in the next window').toBe(1);
+  });
+});
+
+describe('rift throttle: seq-reset notice is instance-level, not per-player', () => {
+  it('two party members standing on a wrong rune produce one broadcast per window', () => {
+    let seqSeed = -1;
+    for (let s = 1; s < 800 && seqSeed < 0; s++) {
+      const f = generateRiftFloor(s, 20, 0);
+      if (
+        !f.isBoss &&
+        f.puzzle.kind === 'sequence' &&
+        f.objects.filter((o) => o.kind === 'seq_rune').length >= 2
+      )
+        seqSeed = s;
+    }
+    expect(seqSeed, 'found a multi-rune sequence floor').toBeGreaterThan(0);
+    const sim = makeSim(seqSeed);
+    sim.player.level = 20;
+    // Add a second player and form a party with the primary.
+    const pid2 = sim.addPlayer('warrior', 'P2', { autoEquip: true });
+    const p2 = sim.entities.get(pid2)!;
+    p2.level = 20;
+    sim.partyInvite(pid2, sim.player.id);
+    sim.partyAccept(pid2);
+    // Both enter the rift (they share the same instance because they are in a party).
+    sim.enterRift(seqSeed, 20, sim.player.id);
+    sim.enterRift(seqSeed, 20, pid2);
+    const inst = active(sim);
+    killTrash(sim);
+    sim.player.gm = true;
+    p2.gm = true;
+    // Both stand on the SECOND rune (wrong: the sequence requires rune 0 first).
+    const wrongRune = sim.entities.get(inst.seqRuneIds[1])!;
+    const countNotices = (ticks: number): number => {
+      let n = 0;
+      for (let i = 0; i < ticks; i++) {
+        sim.player.pos = { ...wrongRune.pos };
+        sim.player.prevPos = { ...sim.player.pos };
+        p2.pos = { ...wrongRune.pos };
+        p2.prevPos = { ...p2.pos };
+        sim.player.hp = sim.player.maxHp;
+        p2.hp = p2.maxHp;
+        for (const ev of sim.tick()) {
+          if (
+            ev.type === 'log' &&
+            (ev as { text?: string }).text === 'The runes go dark. Begin again.'
+          )
+            n++;
+        }
+      }
+      return n;
+    };
+    // The instance-level stamp means exactly ONE broadcast fires per 4 s window.
+    // Each broadcast sends the log to every member: 2 players = 2 log events.
+    // With the old per-player stamp, BOTH players would trigger a broadcast on the
+    // same tick = up to 4 log events in the first tick (2 players x 2 recipients).
+    const first80 = countNotices(80);
+    expect(first80, 'one broadcast per window (2 recipients)').toBe(2);
+    const next80 = countNotices(80);
+    expect(next80, 'one broadcast in the next window').toBe(2);
+  });
+});
+
+describe('rift ranks: budget escape and citadel exemption', () => {
+  it('an unlisted driver key (stomp on frost boss) is suppressed at every rank limit', () => {
+    const boss = (limit: number | undefined) =>
+      ({ templateId: 'rift_boss_frost', riftMechanicLimit: limit }) as unknown as Entity;
+    // frost kit: aoePulse, aoeSlow, deathZoneCast, deathZoneStrike - stomp not listed
+    expect(riftMechanicSuppressed(boss(1), 'stomp'), 'stomp suppressed at C').toBe(true);
+    expect(riftMechanicSuppressed(boss(4), 'stomp'), 'stomp suppressed at S').toBe(true);
+    // enrage and knockback are not driver keys - never gated
+    expect(riftMechanicSuppressed(boss(1), 'enrage'), 'enrage never gated').toBe(false);
+    expect(riftMechanicSuppressed(boss(1), 'knockback'), 'knockback never gated').toBe(false);
+  });
+
+  it('citadel bosses carry no riftMechanicLimit (exempt from rank budget)', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) if (isSetPieceSeed(s)) seed = s;
+    expect(seed).toBeGreaterThan(0);
+    const sim = makeSim(seed);
+    sim.enterRift(seed, 20, sim.player.id);
+    const inst = active(sim);
+    // The citadel fields a miniboss (ritualist) and a boss (pitlord).
+    // Neither should carry riftMechanicLimit since citadel is exempt.
+    if (inst.minibossId !== null) {
+      const mini = sim.entities.get(inst.minibossId!)!;
+      expect(mini.riftMechanicLimit, 'citadel miniboss is exempt from rank budget').toBeUndefined();
+    }
+    if (inst.bossId !== null) {
+      const boss = sim.entities.get(inst.bossId!)!;
+      expect(boss.riftMechanicLimit, 'citadel boss is exempt from rank budget').toBeUndefined();
+    }
+  });
+
+  it('dodgeability: deathZone castTime satisfies slowedSpeed * castTime >= radius * 1.2 for each boss with in-kit CC', () => {
+    const RUN_SPEED = 7;
+    const cases: Array<{
+      id: string;
+      ccMult: number;
+      zone: string;
+      minCastTime: number;
+      stunDuration?: number;
+    }> = [
+      // frost: aoeSlow mult 0.4
+      { id: 'rift_boss_frost', ccMult: 0.4, zone: 'deathZoneCast', minCastTime: 4.0 },
+      { id: 'rift_boss_frost', ccMult: 0.4, zone: 'deathZoneStrike', minCastTime: 5.0 },
+      // venom: aoeSlow mult 0.5
+      { id: 'rift_boss_venom', ccMult: 0.5, zone: 'deathZoneCast', minCastTime: 3.2 },
+      { id: 'rift_boss_venom', ccMult: 0.5, zone: 'deathZoneStrike', minCastTime: 4.0 },
+      // brute: stomp stun 1.5s (free_run_time = castTime - 1.5 must cover radius/speed)
+      {
+        id: 'rift_boss_brute',
+        ccMult: 1,
+        stunDuration: 1.5,
+        zone: 'deathZoneCast',
+        minCastTime: 3.5,
+      },
+      {
+        id: 'rift_boss_brute',
+        ccMult: 1,
+        stunDuration: 1.5,
+        zone: 'deathZoneStrike',
+        minCastTime: 4.0,
+      },
+      // tide: terrify 2.5s (full fear covers entire old fuse)
+      {
+        id: 'rift_boss_tide',
+        ccMult: 1,
+        stunDuration: 2.5,
+        zone: 'deathZoneCast',
+        minCastTime: 5.0,
+      },
+      {
+        id: 'rift_boss_tide',
+        ccMult: 1,
+        stunDuration: 2.5,
+        zone: 'deathZoneStrike',
+        minCastTime: 5.0,
+      },
+    ];
+    for (const { id, ccMult, zone, minCastTime, stunDuration } of cases) {
+      const tmpl = MOBS[id] as unknown as Record<string, { castTime: number; radius: number }>;
+      const def = tmpl[zone];
+      expect(def, `${id}.${zone} exists`).toBeDefined();
+      expect(def.castTime, `${id}.${zone} castTime >= ${minCastTime}`).toBeGreaterThanOrEqual(
+        minCastTime,
+      );
+      // Verify the actual dodgeability inequality.
+      const freeSecs = stunDuration ? def.castTime - stunDuration : def.castTime;
+      const escapeDist = RUN_SPEED * ccMult * freeSecs;
+      expect(
+        escapeDist,
+        `${id}.${zone}: escape dist ${escapeDist.toFixed(2)} >= required ${(def.radius * 1.2).toFixed(2)}`,
+      ).toBeGreaterThanOrEqual(def.radius * 1.2);
+    }
   });
 });

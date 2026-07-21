@@ -96,17 +96,19 @@ export const GROUND_PICKUP_PROVING_QUESTS: readonly string[] = [
 ];
 
 // The highest level any giantslayer-creditable mob can ever spawn at: S-rank
-// rift floors run mobs up to 25 (rift/ranks.ts RIFT_MAX_MOB_LEVEL), heroic
-// instances pin every mob to 22 (content/dungeon_difficulty.ts), and nothing
-// else exceeds the player cap itself (dummies, the world boss, and owned pets
-// are excluded from the killing-blow credit). cmb_giantslayer needs a blow
-// five levels up, so past this ceiling minus five the deed is permanently out
-// of reach for the character; at 25 the deed is legitimately earnable at the
-// level-20 cap inside an S-rank rift, so capped characters no longer receive
-// the stranded retro-grant. PINNED: shipping a higher-level creditable mob is
-// a conscious re-decision of the stranded threshold (the content-integrity
-// test cross-checks the ceiling against the real tables).
-export const MAX_CREDITABLE_MOB_LEVEL = 25;
+// rift floors now hold a flat level 23 (rift/ranks.ts RIFT_MAX_MOB_LEVEL),
+// heroic instances pin every mob to 22 (content/dungeon_difficulty.ts), and
+// nothing else exceeds the player cap itself (dummies, the world boss, and
+// owned pets are excluded from the killing-blow credit). cmb_giantslayer needs
+// a blow five levels up, so past this ceiling minus five (23 - 5 = 18) the
+// deed is permanently out of reach; a capped player (20) is at level 20 which
+// is above 18, so the deed IS permanently stranded in rifts for capped
+// characters and the retro auto-heal DOES fire. Giantslayer is no longer
+// earnable inside S-rank rifts (maintainer-accepted in v0.23.0 rank retune).
+// PINNED: shipping a higher-level creditable mob is a conscious re-decision of
+// the stranded threshold (the content-integrity test cross-checks the ceiling
+// against the real tables).
+export const MAX_CREDITABLE_MOB_LEVEL = 23;
 
 // Dungeon final bosses whose kill credit bumps deedStats.dungeonClears (keys
 // '<dungeonId>' and '<dungeonId>:heroic') and the dungeonFinalBossKills

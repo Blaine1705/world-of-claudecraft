@@ -79,12 +79,12 @@ describe('buildMountPickerView', () => {
     expect(view.rows).toEqual([]);
   });
 
-  it('exposes the display percents as integers (the card spec line)', () => {
+  it('exposes the display speed percent as an integer (the card spec line)', () => {
     const view = buildMountPickerView(20, 'valorsteed', '', ['valorsteed', 'stormfeather_griffin']);
     const griffin = row(view, 'stormfeather_griffin');
-    expect([griffin.speedPct, griffin.blockPct, griffin.critPct]).toEqual([80, 8, 5]);
+    expect(griffin.speedPct).toBe(80);
     const horse = row(view, 'valorsteed');
-    expect([horse.speedPct, horse.blockPct, horse.critPct]).toEqual([60, 0, 0]);
+    expect(horse.speedPct).toBe(60);
   });
 
   it('keeps a locked owned pick selected (the painter drops the Selected chip)', () => {

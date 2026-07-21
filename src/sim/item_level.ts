@@ -27,6 +27,12 @@ import {
 } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
+import {
+  RIFT_EPIC_ITEM_IDS,
+  RIFT_GEAR_ITEM_IDS,
+  RIFT_LEGENDARY_ITEM_ID,
+  RIFT_RARE_ITEM_IDS,
+} from './content/rift/items';
 import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
 // The pure budget primitives live in the leaf module ./item_budget (no ./data
 // import, so content/heroic_variants.ts can share them at data-eval time without a
@@ -72,6 +78,19 @@ export const RAID_MIN_PLAYERS = 10;
 // The source level the Heroic Quartermaster's stock reads as (heroic dungeons
 // are level-20 content); see buildSourceIndex.
 export const HEROIC_VENDOR_SOURCE_LEVEL = 20;
+
+// The source level the rift clear-time gear (epics + legendary) reads as. The
+// rift mobs themselves are source level 23 (their maxLevel after the rank retune
+// capped spawns at 23; mob-loot block below picks this up), so the rare
+// world-drops land at ilvl 26 (23 + rare bonus 3) automatically. The
+// clear-time epics and legendary sit above the static drops and are registered
+// at HEROIC_LOOT_SOURCE_LEVEL (25) just like the five-man heroic table, giving
+// them ilvl 31 (25 + epic 6) and ilvl 35 (25 + legendary 10). The riftbound
+// rings (A/S personal gear, source level 20) and gems/essence (tools, no slot)
+// are excluded from item-level registration: rings derive their level from the
+// personal first-clear event (not a static loot source), and tools have no slot
+// so isItemLevelEligible returns false already.
+export const RIFT_CLEAR_LOOT_SOURCE_LEVEL = HEROIC_LOOT_SOURCE_LEVEL; // 25
 
 // itemScore weights: how many armor points and how much weapon DPS count as one
 // primary-stat point, so a single comparable number can span gear types.
@@ -191,6 +210,22 @@ function buildSourceIndex(): Map<string, ItemSource> {
       : HEROIC_VARIANT_SOURCE_LEVEL;
     bump(item.id, src, false);
   }
+  // Rift clear-time epics and legendary: gated behind B+/A/S final-boss kills
+  // (addRiftClearGearLoot), they never appear on static mob loot tables, so the
+  // mob-loot block above never registers them. Register at RIFT_CLEAR_LOOT_SOURCE_LEVEL
+  // (25) so they land at item level 31 (epics) and 35 (legendary), one tier above
+  // the rift world-drop rares (ilvl 26, auto-registered via the mob-loot block above
+  // since rift mobs are maxLevel 23). Not a raid source.
+  for (const id of RIFT_EPIC_ITEM_IDS) bump(id, RIFT_CLEAR_LOOT_SOURCE_LEVEL, false);
+  bump(RIFT_LEGENDARY_ITEM_ID, RIFT_CLEAR_LOOT_SOURCE_LEVEL, false);
+  // Rift rare world-drops: already picked up by the mob-loot block (rift mobs are
+  // maxLevel 23) but listed here explicitly so the intent is clear. The bump() call
+  // is a no-op when the mob block already registered a higher-or-equal level.
+  for (const id of RIFT_RARE_ITEM_IDS) bump(id, 23, false);
+  // Riftbound rings (RIFT_GEAR_ITEM_IDS): personal gear created on first-clear via
+  // createRiftGearInstance. They have no static loot source, so we skip registration
+  // here. Their tooltip defers to the instance payload's rolled quality.
+  void RIFT_GEAR_ITEM_IDS; // referenced to keep the import non-dead
   // Crafted gear (content/recipes.ts): a recipe's output is current at the recipe's
   // own level (the level a character can learn/use it, mirroring how a mob's level
   // stands in for its loot). Without this, any crafted item with primary stats has

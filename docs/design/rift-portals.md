@@ -174,8 +174,10 @@ A second polish pass, all still descriptor-driven and within the region bounds
 Roughly one seed in seven (`isSetPieceSeed`, `Rng(mix(seed, 0x1f3e)).chance(0.15)`) opens a
 HAND-AUTHORED dungeon instead of a procedural descent: a fixed TWO-FLOOR citadel
 (`INFERNAL_FLOOR_COUNT`) with two bosses, the halls above and The Pit below. Because the theme
-is chosen by the SEED and the rank only sets `baseLevel` (marks/loot), the citadel can headline
-a C-rank or an S-rank portal alike; there is nothing to gate.
+is chosen by the SEED; the citadel is C-rank content only. B, A and S portals on a set-piece seed
+open a procedural descent instead (`isSetPieceRift` requires `riftHeroicTuningFor(baseLevel) === null`).
+The two authored bosses (ritualist, pitlord) run their full hand-tuned kit at every level; they are
+exempt from the procedural rank-mechanic budget so the citadel identity is never stripped by rank gating.
 
 - **The authored-layout seam** (`src/sim/rift/authored.ts`). `DungeonLayout` gained optional
   `rooms` / `doors` / `decor`. `authoredWallSegments(rooms, doors)` unions every coincident room
@@ -201,8 +203,8 @@ a C-rank or an S-rank portal alike; there is nothing to gate.
 - **Floor 1, The Pit.** The descent lands on a raised balcony (lift 3.2) above the temple nave
   tier (1.6); the arena where the giga-boss **Azgorath, Lord of the Pit** waits drops to the pit
   floor (0), with the Hell Forge wing (molten-runoff hazard, forge cache) off the nave. His death
-  opens the usual exit + sealed cache + rank-scaled Heroic Marks, and the won run SEALS its entry
-  portal (dev portals included), so a cleared rift can never be re-entered.
+  opens the usual exit + sealed cache + the rank-gated clear loot, and the won run SEALS its
+  entry portal (dev portals included), so a cleared rift can never be re-entered.
 - **Authored relief.** `AuthoredRoom` carries an optional per-room `lift`; the pure
   `authoredLiftAt(rooms, doors, x, z)` turns every lift-changing door into a linear stair ramp,
   and `riftLiftAt` is the ONE entry point read by the sim's entity lift, the movement kernel
@@ -246,10 +248,12 @@ A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus 
 - **Lifecycle:** a portal ANNOUNCES world-visibly on open, stays until its rift's
   final boss dies (SEALED) or `RIFT_PORTAL_LIFETIME` (1 h) passes uncleared
   (COLLAPSED), each with its own world announcement.
-- **Rewards.** Sealing a ranked rift pays Heroic Marks scaled by rank (C=1 ... S=4)
-  onto the boss corpse as personal loot, daily-gated per rank via the same
-  `meta.heroicDaily` set the heroic dungeons use (key `rift_<tier>`). Dev-portal
-  runs (tier null) seal nothing and pay nothing.
+- **Rewards.** Rifts pay NO Heroic Marks at any rank (maintainer decision: marks
+  stay a heroic dungeon/raid currency). The clear prize is the rank-gated gear
+  ladder on the boss corpse (C a guaranteed themed rare + coin; B/A/S the epic
+  ladder up to the S legendary), the natural-first-clear personal rings, essence
+  and gems, the mount rolls, and the rank coin bonus. Dev-portal runs (tier
+  null) still pay the gear ladder but no first-clear extras.
 - **Public test profile.** `COMMUNITY_TEST_RIFTS=1` is a validated, default-off
   server flag. After persisted state loads, the server preserves open events, fills
   to eight distinct active eligible regions, and saves the result before accepting
@@ -311,8 +315,8 @@ LETTER is a game glyph (like item-quality colour), not translated.
   two-boss content, and the full miniboss -> orb -> gate -> giga-boss lifecycle).
 - `tests/rift_portals.test.ts`: zone->rank mapping, monotonic rank tuning, the
   scheduler (cadence + world announce + determinism + collapse), the level-20
-  gate (deny + admit + rank stamping), and sealing paying rank-scaled Heroic Marks
-  with the per-rank daily gate.
+  gate (deny + admit + rank stamping), and sealing paying NO Heroic Marks at any
+  rank (the no-marks contract, incl. the untouched heroic daily ledger).
 - Cross-cutting guards that also cover rifts: `tests/world_api_parity.test.ts`
   (the `riftFloor`/`riftCollisionToken` IWorld members), `tests/architecture.test.ts`
   (sim purity + the `rift_rank`/render pure-core registration), `tests/sim_context.test.ts`

@@ -76,19 +76,18 @@ describe('infernal citadel: seed selection', () => {
     expect(pct).toBeLessThan(0.22);
   });
 
-  it('is C/B content: both low ranks build the same citadel; A/S run procedural', () => {
-    // The 2-floor set-piece may not headline a heroic rank: A and S dungeons
-    // are guaranteed 3+ floors, so their runs take the procedural generator
-    // even on a citadel seed (rift_gen.ts isSetPieceRift).
+  it('is C-only content: C builds the citadel; B/A/S run procedural', () => {
+    // The 2-floor set-piece gates on riftHeroicTuningFor(baseLevel) === null.
+    // B now carries the heroic transform, so B/A/S all bypass the citadel and
+    // run the procedural descent even on a set-piece seed.
     const seed = setPieceSeeds(1)[0];
-    const low = (['C', 'B'] as const).map((tier) =>
-      JSON.stringify(generateRiftFloor(seed, RIFT_TIER_INFO[tier].baseLevel, 0).layout),
-    );
-    expect(new Set(low).size).toBe(1);
-    // Only the mob level scales between the citadel ranks.
-    const cLvl = generateRiftFloor(seed, RIFT_TIER_INFO.C.baseLevel, 0).spawns[0].level;
-    const bLvl = generateRiftFloor(seed, RIFT_TIER_INFO.B.baseLevel, 0).spawns[0].level;
-    expect(bLvl).toBeGreaterThan(cLvl);
+    // C: gets the authored citadel.
+    const cFloor = generateRiftFloor(seed, RIFT_TIER_INFO.C.baseLevel, 0);
+    expect(cFloor.authored, 'C opens the citadel').toBeDefined();
+    // B on a citadel seed runs procedural 3+ (B has heroic tuning now).
+    const bFloor = generateRiftFloor(seed, RIFT_TIER_INFO.B.baseLevel, 0);
+    expect(bFloor.authored, 'B never opens the 2-floor set-piece').toBeUndefined();
+    expect(bFloor.floorCount).toBeGreaterThanOrEqual(3);
     for (const tier of ['A', 'S'] as const) {
       const floor = generateRiftFloor(seed, RIFT_TIER_INFO[tier].baseLevel, 0);
       expect(floor.authored, `${tier} never opens the 2-floor set-piece`).toBeUndefined();
@@ -97,8 +96,9 @@ describe('infernal citadel: seed selection', () => {
   });
 
   it('names the rift a Citadel and descends two floors (halls, then the pit)', () => {
+    // The citadel is C-only content: use the C-rank base level (20).
     for (const seed of setPieceSeeds(5)) {
-      const plan = generateRiftPlan(seed, 22);
+      const plan = generateRiftPlan(seed, 20);
       expect(plan.floorCount).toBe(INFERNAL_FLOOR_COUNT);
       expect(plan.floorCount).toBe(2);
       expect(plan.themeId).toBe('infernal');
@@ -162,7 +162,8 @@ describe('infernal citadel: determinism', () => {
     const before = sim.rng.next();
     const sim2 = new Sim({ seed: 7, playerClass: 'warrior' });
     buildInfernalCitadelFloor(setPieceSeeds(1)[0], 22, 22);
-    generateRiftFloor(setPieceSeeds(1)[0], 22, 0);
+    // Use C-rank (20) so the set-piece gate opens the citadel (B now has heroic tuning).
+    generateRiftFloor(setPieceSeeds(1)[0], 20, 0);
     const after = sim2.rng.next();
     expect(after).toBe(before);
   });
@@ -532,8 +533,9 @@ describe('infernal citadel: lifecycle', () => {
     seed = setPieceSeeds(1)[0];
     sim = new Sim({ seed: 99, playerClass: 'warrior', autoEquip: true, devCommands: true });
     pid = sim.player.id;
-    sim.player.level = 22;
-    sim.enterRift(seed, 22, pid);
+    // Use C-rank (baseLevel 20): the citadel is C-only content since B now has
+    // the heroic stat transform and is excluded from the set-piece by the shared gate.
+    sim.enterRift(seed, 20, pid);
   });
 
   /** Clear the halls (trash + Magus), touch the armed orb, then ride the descent
@@ -547,7 +549,7 @@ describe('infernal citadel: lifecycle', () => {
     tickSeconds(1.1); // the 1 Hz driver arms the orb and tears the descent open
     expect(i.orbActive).toBe(true);
     expect(i.descentOpen).toBe(true);
-    const floor0 = generateRiftFloor(seed, 22, 0);
+    const floor0 = generateRiftFloor(seed, 20, 0);
     const orb = floor0.objects.find((o) => o.kind === 'infernal_orb') as { x: number; z: number };
     teleport(orb.x, orb.z - 2.2);
     sim.tick();
@@ -574,7 +576,7 @@ describe('infernal citadel: lifecycle', () => {
   });
 
   it('keeps the closed gate impassable (a runtime clamp, never a collider)', () => {
-    const floor = generateRiftFloor(seed, 22, 0);
+    const floor = generateRiftFloor(seed, 20, 0);
     const gate = floor.gate as NonNullable<typeof floor.gate>;
     teleport(0, gate.z + 6); // try to stand INSIDE the temple
     sim.tick();
@@ -601,7 +603,7 @@ describe('infernal citadel: lifecycle', () => {
   });
 
   it('refuses the dormant orb, then opens the gate once the miniboss falls', () => {
-    const floor = generateRiftFloor(seed, 22, 0);
+    const floor = generateRiftFloor(seed, 20, 0);
     const orb = floor.objects.find((o) => o.kind === 'infernal_orb') as { x: number; z: number };
     const i = inst() as NonNullable<ReturnType<typeof inst>>;
     killTrash();
@@ -702,7 +704,8 @@ describe('infernal citadel: lifecycle', () => {
     const s2 = new Sim({ seed: 99, playerClass: 'warrior', autoEquip: true, devCommands: true });
     const p2 = s2.player.id;
     s2.player.level = 22;
-    s2.chat('/dev portal 5 22 A infernal', p2);
+    // Use baseLevel 20 (C-rank): the citadel is C-only since B now has heroic tuning.
+    s2.chat('/dev portal 5 20 A infernal', p2);
     const portal = [...s2.entities.values()]
       .filter((e) => e.templateId === 'rift_portal')
       .at(-1) as Entity;
@@ -760,7 +763,7 @@ describe('infernal citadel: lifecycle', () => {
 
   it('kills nothing on entry: every mob spawns clear of the walls it fights in', () => {
     const i = inst() as NonNullable<ReturnType<typeof inst>>;
-    const floor = generateRiftFloor(seed, 22, 0);
+    const floor = generateRiftFloor(seed, 20, 0);
     const colliders = layoutColliders(floor.layout);
     const o = riftInstanceOrigin(i.slot, i.floorIndex);
     expect(i.mobIds.length).toBe(floor.spawns.length);

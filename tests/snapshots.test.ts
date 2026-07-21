@@ -2924,6 +2924,9 @@ describe('online mount command and race-event transport', () => {
     sim.setPlayerLevel(20, actor.pid);
     sim.setPlayerLevel(20, other.pid);
     sim.addItem('reins_grag_bear', 1, actor.pid);
+    // Riding is a purchased skill now; the transport fixture buys past the gate.
+    actorMeta.ridingTrained = true;
+    otherMeta.ridingTrained = true;
 
     // Drive the real ClientWorld command adapter. The select payload is the
     // fragile arm: both the command token and the `mount` field must arrive
@@ -3071,6 +3074,7 @@ const ALL_DELTA_KEYS = [
   'mntLesson',
   'mntOwn',
   'mntRace',
+  'mntRtd',
   'mntSel',
   'mst',
   'ncd',
@@ -3136,6 +3140,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   mntLesson: 'mountLessonActive',
   mntOwn: 'ownedMounts',
   mntRace: 'mountRaceView',
+  mntRtd: 'ridingTrained',
   mntSel: 'selectedMount',
   mres: 'maxResource',
   mst: 'activeMobileStationCraft',
@@ -3269,6 +3274,7 @@ function dirtyEveryDeltaField(): {
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', rows: {} };
   meta.selectedMount = 'grag_bear';
+  meta.ridingTrained = true; // dirties mntRtd (the purchased riding skill)
   meta.mountTraining = {
     sessionId: 'mt_wire_fixture',
     ownerId: lp,
@@ -3517,6 +3523,7 @@ describe('full self-state snapshot delta fixture', () => {
       clearedMask: 3,
       cleared: 2,
     });
+    expect(client.ridingTrained()).toBe(true); // mntRtd -> ridingTrained
     expect(client.partyInfo).not.toBeNull(); // party -> partyInfo
     expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
     expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()
@@ -3740,9 +3747,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 55 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(55);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(55);
+  it('ALL_DELTA_KEYS contains exactly 56 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(56);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(56);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3761,7 +3768,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(55);
+    expect(scraped.size).toBe(56); // 55 (v0.29 union) + 1: mntRtd (the purchased riding skill)
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3785,6 +3792,7 @@ describe('delta-key contract pins (anti-drift)', () => {
       dstats: 'deedStats',
       mntLesson: 'mountLessonActive',
       mntRace: 'mountRaceView',
+      mntRtd: 'ridingTrained',
       mntSel: 'selectedMount',
     };
     for (const [terse, iworld] of Object.entries(required)) {

@@ -1182,6 +1182,8 @@ function blankEntity(id: number): Entity {
     pulseTimer: 0,
     stompTimer: 0,
     bigCastTimer: 0,
+    deathZoneCastTimer: 0,
+    deathZoneStrikeTimer: 0,
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
@@ -1369,6 +1371,17 @@ export class ClientWorld implements IWorld {
   // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
   // field). The renderer regenerates geometry/style from this descriptor.
   riftFloor: RiftFloorView | null = null;
+  // Active lethal boss death zones, mirrored from riftDeathZoneSpawn events.
+  // Each entry stores the zone geometry and the wall-clock expiry (ms, performance.now
+  // scale). riftBossDeathZones() converts these to RiftBossDeathZoneView on demand.
+  // Cleared on riftState(active:false) so stale zones from a previous run never
+  // bleed into a new floor. Late joiners missing an in-flight zone are accepted.
+  private activeBossDeathZones: Array<{
+    x: number;
+    z: number;
+    radius: number;
+    expiresAtMs: number;
+  }> = [];
   // The online client never registers rift collision regions (the server owns
   // collision); 0 keeps rift camera occlusion a no-op here.
   readonly riftCollisionToken = 0;
@@ -1986,6 +1999,7 @@ export class ClientWorld implements IWorld {
         this.applyMountTrainEvent(ev as SimEvent);
         this.applyCraftResultEvent(ev as SimEvent);
         this.applyRiftStateEvent(ev as SimEvent);
+        this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
         this.applyUnstuckEvent(ev as SimEvent);
@@ -2675,6 +2689,7 @@ export class ClientWorld implements IWorld {
           .map((k) => normalizeMountKey(typeof k === 'string' ? k : ''))
           .filter((k): k is MountKey => k !== '');
       }
+      if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
       if (s.mntRace !== undefined) {
         const view = s.mntRace as MountRaceView | null;
@@ -3175,6 +3190,9 @@ export class ClientWorld implements IWorld {
   ownedMounts(): readonly MountKey[] {
     return this.selfOwnedMounts;
   }
+  ridingTrained(): boolean {
+    return this.selfRidingTrained;
+  }
   selectMount(key: MountKey): void {
     const def = mountDef(key);
     const p = this.entities.get(this.playerId);
@@ -3185,6 +3203,11 @@ export class ClientWorld implements IWorld {
   }
   toggleMounted(): void {
     this.cmd({ cmd: 'mount_toggle' });
+  }
+  // --- riding skill purchase: server-authoritative; on success the snapshot
+  // delta (mntRtd=true) confirms the skill was granted. ---
+  learnRiding(npcId: number): void {
+    this.cmd({ cmd: 'learn_riding', npc: npcId });
   }
   // --- riding lesson: fully server-authoritative, no optimistic local nudge
   // (unlike selectMount above); feedback rides the mountTrain* events straight to
@@ -3804,6 +3827,18 @@ export class ClientWorld implements IWorld {
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
   }
+  // Live lethal death zones on the current rift boss floor. Mirrored from
+  // riftDeathZoneSpawn events emitted at zone-placement time; the client counts
+  // each zone down locally and drops it when remaining falls to zero.
+  riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
+    const now = performance.now();
+    const out: import('../world_api/dungeons').RiftBossDeathZoneView[] = [];
+    for (const z of this.activeBossDeathZones) {
+      const remaining = (z.expiresAtMs - now) / 1000;
+      if (remaining > 0) out.push({ x: z.x, z: z.z, radius: z.radius, remaining });
+    }
+    return out;
+  }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};
@@ -3813,6 +3848,9 @@ export class ClientWorld implements IWorld {
   // until the server says so (the horse is no longer auto-granted), so an empty list
   // is the correct pre-snapshot state.
   private selfOwnedMounts: MountKey[] = [];
+  // Riding skill, mirrored from the snapshot `s.mntRtd`. False until the server
+  // confirms the player purchased it from Marla.
+  private selfRidingTrained = false;
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};
@@ -3878,6 +3916,22 @@ export class ClientWorld implements IWorld {
           tier: ev.tier,
         }
       : null;
+    // Clear death zones on rift exit / floor change so stale rings from a
+    // previous run never bleed into a new floor.
+    if (!ev.active) this.activeBossDeathZones = [];
+  }
+
+  // Mirror a spawned lethal boss death zone so riftBossDeathZones() returns
+  // the live ring for the renderer. The zone counts down via wall-clock; no
+  // tick dependency needed. Expired entries are lazily dropped by the reader.
+  private applyRiftDeathZoneSpawnEvent(ev: SimEvent): void {
+    if (ev.type !== 'riftDeathZoneSpawn') return;
+    this.activeBossDeathZones.push({
+      x: ev.x,
+      z: ev.z,
+      radius: ev.radius,
+      expiresAtMs: performance.now() + ev.durationSecs * 1000,
+    });
   }
 
   private applyCraftResultEvent(ev: SimEvent): void {

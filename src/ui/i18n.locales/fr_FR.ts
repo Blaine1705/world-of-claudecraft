@@ -8047,8 +8047,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.rarity_rare': 'Rare',
   'hudChrome.mounts.rarity_epic': 'Épique',
   'hudChrome.mounts.spec_speed': '+{pct}% de mobilité supplémentaire',
-  'hudChrome.mounts.spec_block': '+{pct}% de blocage des dégâts de mêlée',
-  'hudChrome.mounts.spec_crit': '+{pct}% de chances de coup critique',
   'hudChrome.mounts.name_valorsteed': 'Destrier de Bravoure',
   'hudChrome.mounts.name_grag_bear': 'Ours-Grag Goliath',
   'hudChrome.mounts.name_stalkglider_snail': 'Glisseur à Coquille Moussue',

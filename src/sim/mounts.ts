@@ -11,7 +11,7 @@
 // first owned mount). The live "riding X right now" state is Entity.mountKey
 // ('' dismounted), which the wire mirrors like `skin` so every host (renderer,
 // other clients, the online self extrapolator) reads the same field the
-// speed/crit/block hooks use.
+// speed hook uses.
 //
 // Summoning is not instant: mounting channels a short summon and dismounting a
 // quicker put-away (updateMountTransition, driven per tick and interruptible by
@@ -34,7 +34,7 @@ import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { DT, type Entity } from './types';
+import { DT, type Entity, FORM_AURA_KINDS } from './types';
 
 // Summon/dismount channel durations (seconds). Mounting is a short cast the
 // player can interrupt by moving into combat or water; dismounting is quicker.
@@ -88,8 +88,8 @@ export function ownedMounts(meta: PlayerMeta): MountKey[] {
   return MOUNT_KEYS.filter((key) => owned.has(key));
 }
 
-// The mount crit bonus rides Entity.critChance (recalcPlayerStats), so every
-// mount/dismount recomputes stats the same way an equip does.
+// Recompute the player's derived stats after a mount state change (aura strips,
+// mount/dismount): this is the same path an equip change takes.
 function recalcFor(ctx: SimContext, e: Entity, meta: PlayerMeta): void {
   recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
 }
@@ -103,9 +103,9 @@ function trainingSummon(meta: PlayerMeta | undefined, key: string): boolean {
 }
 
 /** Force an instant dismount with no put-away channel: clears the live mount and
- *  any in-flight summon/dismount channel, then recomputes stats (the mount
- *  crit/block bonus rides Entity via recalcPlayerStats). Used by the riding lesson
- *  to take the unowned training steed back the moment the lesson ends. */
+ *  any in-flight summon/dismount channel, then recomputes stats. Used by the riding
+ *  lesson to take the unowned training steed back the moment the lesson ends, and by
+ *  the auto-attack loop and cast path to dismount on ability use. */
 export function forceDismount(ctx: SimContext, e: Entity): void {
   if (!e.mountKey && (e.mountCastRemaining ?? 0) <= 0 && e.mountCastKey === '') return;
   e.mountKey = '';
@@ -128,15 +128,21 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
   return true;
 }
 
-/** Pick the player's stable mount (persisted). Ownership- and level-gated;
- *  swaps the live mount in place when already riding. Returns false on an
- *  unknown key or a failed gate (an error event carries the reason). */
+const RIDING_UNTRAINED_MSG = 'You must learn to ride first. Find a riding trainer.';
+
+/** Pick the player's stable mount (persisted). Riding skill-, ownership-, and
+ *  level-gated; swaps the live mount in place when already riding. Returns false
+ *  on an unknown key or a failed gate (an error event carries the reason). */
 export function selectMount(ctx: SimContext, pid: number, key: string): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
   const def = mountDef(key);
   if (!def) return false;
+  if (!meta.ridingTrained) {
+    ctx.error(pid, RIDING_UNTRAINED_MSG);
+    return false;
+  }
   if (!mountOwned(meta, def.key)) {
     // The reins item is not in bags or bank. Reuses the registered useItem
     // deny (sim_i18n error.noItem) instead of minting a new sim string.
@@ -149,13 +155,33 @@ export function selectMount(ctx: SimContext, pid: number, key: string): boolean 
   }
   meta.selectedMount = def.key;
   // Swap the ridden mount in place only OUT of combat: a mid-fight swap would
-  // bypass toggleMount's combat gate and grant a stronger mount's crit/block
-  // reactively. In combat the pick still updates and applies on the next mount.
+  // bypass toggleMount's combat gate. In combat the pick still updates and applies
+  // on the next mount.
   if (e.mountKey && e.mountKey !== def.key && !e.inCombat && !e.dead && !e.ghost) {
     e.mountKey = def.key;
     recalcFor(ctx, e, meta);
   }
   return true;
+}
+
+/** Strip all active form auras (FORM_AURA_KINDS) and ghost_wolf from the entity,
+ *  emitting aura-removal events for each one removed. Called before a mount summon
+ *  starts so the player is never simultaneously shapeshifted and mounting. Calls
+ *  recalcFor if any aura was removed so stat effects (speed, etc.) clear immediately. */
+function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
+  let stripped = false;
+  for (let i = e.auras.length - 1; i >= 0; i--) {
+    const aura = e.auras[i];
+    if (FORM_AURA_KINDS.has(aura.kind) || aura.id === 'ghost_wolf') {
+      e.auras.splice(i, 1);
+      ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
+      stripped = true;
+    }
+  }
+  if (stripped) {
+    const meta = ctx.players.get(e.id);
+    if (meta) recalcFor(ctx, e, meta);
+  }
 }
 
 /** Toggle riding: start a summon channel when dismounted, or a dismount channel
@@ -177,6 +203,13 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     e.mountCastKey = '';
     return true;
   }
+  // Riding skill gate: the player must have purchased riding from Marla before
+  // they can summon any mount. The training lesson is the one exception (it teaches
+  // the skill via the quest and lends the Valorsteed during the lesson itself).
+  if (!meta.ridingTrained && meta.mountTraining?.state !== 'IN_PROGRESS') {
+    ctx.error(pid, RIDING_UNTRAINED_MSG);
+    return false;
+  }
   // Riding-lesson tutorial: while a lesson is in progress the Mount/Dismount
   // toggle summons the training Valorsteed even though it is UNOWNED (teaching the
   // Z keybind is the whole point). Runs the normal summon channel; it never touches
@@ -188,6 +221,7 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
       ctx.error(pid, "You can't do that while in combat.");
       return false;
     }
+    cancelFormsAndGhostWolf(ctx, e);
     e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
     e.mountCastKey = TRAINING_MOUNT_KEY;
     return true;
@@ -216,6 +250,8 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     ctx.error(pid, "You can't do that while in combat.");
     return false;
   }
+  // Cancel all active form auras and ghost_wolf before the summon channel starts.
+  cancelFormsAndGhostWolf(ctx, e);
   // Start the summon channel. mountKey stays '' until the channel completes.
   e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
   e.mountCastKey = def.key;
@@ -257,6 +293,10 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
         meta &&
         (mountOwned(meta, target) || trainingSummon(meta, target))
       ) {
+        // Strip any form that slipped through during the channel (e.g. instant
+        // shapeshifts cast while channeling), so the player is never
+        // simultaneously mounted and shapeshifted at completion.
+        cancelFormsAndGhostWolf(ctx, e);
         e.mountKey = target;
       }
       // A summon whose reins vanished mid-channel leaves the player unmounted.

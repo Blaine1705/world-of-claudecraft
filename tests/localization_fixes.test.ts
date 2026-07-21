@@ -870,7 +870,6 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/auto_attack.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/talents.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/xp.ts'), 'utf8'),
-    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/lifecycle.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_commands.ts'), 'utf8'),
@@ -927,6 +926,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/progression.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/rift_lockpick.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/portals.ts'), 'utf8'),
+    // Mob locomotion: the deathZoneCast/deathZoneStrike driver emits def.detonateText
+    // at zone expiry (type:'log', telegraph:true). These are the only player-facing
+    // emits in this file; re-localized via the sim.rift.detonate* rules.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
     // Professions 2.0 Phase 11: the fishing command bodies moved out of sim.ts.
     // Three literals have their ONLY emitter occurrences here ("No fish are
     // biting.", "A rare catch! Something gleams on your line.", "You need to
@@ -949,6 +952,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Riding lesson: the mount_train_begin guard refusals and the driver's
     // notices (level/range/quest/in-progress/success/left-yard literals).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts_training.ts'), 'utf8'),
+    // Mounts: the toggleMount/selectMount guard refusals and the ridingTrained
+    // error (RIDING_UNTRAINED_MSG) that the riding-skill gate emits.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts.ts'), 'utf8'),
     socialSrc,
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The

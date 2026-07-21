@@ -41,9 +41,12 @@ function teleport(sim: Sim, pid: number, x: number, z: number): void {
   e.prevPos = { ...e.pos };
 }
 
-/** Level the player, grant the horse reins, and run the summon channel. */
+/** Level the player, grant the riding skill and horse reins, and run the summon channel. */
 function mountUp(sim: Sim, pid: number): void {
   sim.setPlayerLevel(20, pid);
+  // ridingTrained is now required to summon any owned mount.
+  const meta = sim.players.get(pid)!;
+  meta.ridingTrained = true;
   sim.addItem('reins_valorsteed', 1, pid);
   // Summon in the north pasture so the summon lock never overlaps a ride.
   teleport(sim, pid, STABLE_PASTURE.xMin + 2, STABLE_PASTURE.zMin + 2);
@@ -235,10 +238,11 @@ describe('starting a race', () => {
   });
 
   it('starts an accepted riding lesson from the platform without Begin Lesson', () => {
+    // The lesson is free: no copper required to start from the platform.
     const sim = makeSim();
     sim.setPlayerLevel(20);
     const meta = sim.players.get(sim.playerId)!;
-    meta.copper = MOUNT_TRAIN_FEE_COPPER;
+    meta.ridingTrained = true;
     meta.questLog.set('q_riding_lessons', {
       questId: 'q_riding_lessons',
       counts: [0],
@@ -250,7 +254,8 @@ describe('starting a race', () => {
     expect(events.some((e) => e.type === 'mountTrainSession' && e.phase === 'ride')).toBe(true);
     expect(events.some((e) => e.type === 'mountRaceCountdown')).toBe(true);
     expect(meta.mountTraining?.phase).toBe('ride');
-    expect(meta.mountTrainingFeePaid).toBe(true);
+    // mountTrainingFeePaid is no longer written by the lesson; the lesson is free.
+    expect(meta.mountTrainingFeePaid ?? false).toBe(false);
     expect(sim.player.mountKey).toBe('valorsteed');
     expect(raceOf(sim, sim.playerId)?.phase).toBe('countdown');
   });

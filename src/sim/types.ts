@@ -674,6 +674,11 @@ interface BaseItemDef {
   // reward tokens can opt into permanent storage. Enforced in social/trade.ts,
   // mail/post_office.ts, market.ts, and items.ts.
   soulbound?: boolean;
+  // Vendor service entry: buying this "item" teaches the riding skill instead of
+  // adding anything to the bags (items.ts buyItem delegates to learnRiding, which
+  // owns every gate: already trained, level, the 80g fee). Only the stablemaster
+  // stocks it.
+  teachesRiding?: boolean;
   /** Shown when interacting with a ground quest object before the quest is active. */
   pickupDeny?: string;
   /** Shown when the quest is active but the collect count is already met. */
@@ -1173,6 +1178,36 @@ export interface MobTemplate {
     school?: string;
     yell?: string;
   };
+  // Boss mechanic: lethal telegraphed zone (A-rank). The boss hardcasts for
+  // `castTime` seconds (a visible cast bar, same as bigCast), placing a ground
+  // zone at a targeted player's position the instant casting begins. Any player
+  // still inside `radius` when the cast completes takes flat p.hp + p.maxHp
+  // (guaranteed kill, no mechanicDamageMult). `yell` fires at cast start;
+  // `detonateText` fires in a log line at detonation. Zone state lives on
+  // RiftInstance.bossDeathZones and ticks down; only rift boss floors emit these.
+  deathZoneCast?: {
+    castId: string;
+    name: string;
+    castTime: number;
+    every: number;
+    radius: number;
+    school?: string;
+    yell?: string;
+    detonateText: string;
+  };
+  // Boss mechanic: lethal telegraphed zone (S-rank), identical driver to
+  // deathZoneCast but with distinct castId/name/flavor (wider radius, slower
+  // cast) so rank S bosses run two distinct lethal patterns simultaneously.
+  deathZoneStrike?: {
+    castId: string;
+    name: string;
+    castTime: number;
+    every: number;
+    radius: number;
+    school?: string;
+    yell?: string;
+    detonateText: string;
+  };
   // Boss bark lines, broadcast as 'yell'-channel chat to every player within
   // YELL_RANGE (mirroring the Nythraxis encounter yells; sim-emitted English by
   // the variable-routed-chat precedent, see the S3 note in
@@ -1187,8 +1222,8 @@ export interface MobTemplate {
   // site). Absent (every non-rift template) or on an entity with no
   // riftMechanicLimit, nothing is suppressed. Keys name MobTemplate mechanic
   // fields driven by the timed/threshold runners (aoePulse, aoeSlow, bigCast,
-  // stoneskin, stomp, terrify, summonAdds, desperateHeal); on-hit affixes stay
-  // ungated flavor.
+  // stoneskin, stomp, terrify, summonAdds, desperateHeal, deathZoneCast,
+  // deathZoneStrike); on-hit affixes stay ungated flavor.
   rankMechanics?: readonly string[];
   // Boss mechanic: damage multiplier (and optional swing-speed haste) once hp
   // drops below the threshold. hasteMult > 1 makes the enraged mob swing faster.
@@ -2617,6 +2652,10 @@ export interface QuestDef {
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
   requiresQuest?: string; // prerequisite quest id (must be turned in)
+  // Acceptance requires the purchased riding skill (PlayerMeta.ridingTrained).
+  // Enforced in finalizeQuestAccept so every accept path (npc, linked share,
+  // dev completer) shares the gate.
+  requiresRidingTrained?: boolean;
   requiredItems?: string[]; // quest items obtained earlier (e.g. a prerequisite reward) that this
   // quest needs; re-granted on accept if the player no longer has them, to avoid a progression block
   minLevel?: number;
@@ -2951,6 +2990,8 @@ export interface Entity {
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
   bigCastTimer: number; // boss telegraphed-hardcast (bigCast) cadence countdown
+  deathZoneCastTimer: number; // lethal zone cast (deathZoneCast) cadence countdown
+  deathZoneStrikeTimer: number; // lethal zone cast (deathZoneStrike) cadence countdown
   yelledEngage: boolean; // engage bark fired this pull (reset on evade/respawn)
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   terrifyTimer: number; // Banshee's Wail fear-pulse countdown
@@ -3049,9 +3090,15 @@ export interface Entity {
   // Sim time of the last "level too low" rift denial shown to this player, so
   // standing inside the portal trigger radius does not spam the toast per tick.
   riftDeniedAt?: number;
+  // Sim time of the last "pool full" / "event already cleared" denial shown to
+  // this player on walk-in, so a 20 Hz trigger does not spam the error toast.
+  riftPoolFullAt?: number;
   // Sim time of the last "the orb is sealed" nudge shown to this player at a
   // dormant Blood Orb (authored citadel), throttled the same way.
   riftOrbNoticeAt?: number;
+  // Sim time of the last lockpickOffer emitted to this player from a
+  // rift_locked_chest click, so repeated F-key presses don't spam the UI.
+  riftLockpickOfferAt?: number;
   // Walk-in portal grace after leaving a rift: until this sim time the player
   // does not auto-enter portals, so being returned near the entry portal can
   // never bounce them straight back in (clicking the portal still works).
@@ -3067,10 +3114,6 @@ export interface Entity {
   // Cooldown gate (sim time) between rolling-boulder knockbacks, so a single pass
   // shoves + chips once rather than every tick of overlap.
   riftRollerUntil?: number;
-  // Sim time of the last "the runes go dark" sequence-reset notice shown to this
-  // player, so standing on a wrong rune re-announces at most once per cooldown
-  // instead of every tick (rift/runs.ts).
-  riftSeqResetAt?: number;
   // Rift boss rank budget: how many entries of the template's `rankMechanics`
   // list are live on THIS spawn (C=1, B=2, A=3, S=4; rift/ranks.ts). Undefined
   // (every non-rift mob, and rift trash) suppresses nothing.
@@ -4021,7 +4064,6 @@ export type SimEvent = { pid?: number } & (
       tier: RiftTier;
       winnerNames: string[];
       clearTime: number;
-      rewardMarks: number;
     }
   | {
       type: 'riftRaceWorld';
@@ -4101,6 +4143,21 @@ export type SimEvent = { pid?: number } & (
       zoneId: string;
       nodeType: GatherNodeType;
       itemId: string;
+    }
+  // Rift boss lethal death zone placed (deathZoneCast / deathZoneStrike mechanic).
+  // Emitted at zone-placement time so online clients can mirror the countdown
+  // locally without a snapshot field. Interest-scoped by x/z world position like
+  // spellfxAt, so only instance players (who are inside the instance area) receive
+  // it. `durationSecs` equals the cast-time fuse the sim uses internally. The
+  // client counts the zone down locally starting from `durationSecs` and removes
+  // it when remaining reaches zero. Late joiners missing an in-flight zone are an
+  // accepted edge (the fuse is at most a few seconds).
+  | {
+      type: 'riftDeathZoneSpawn';
+      x: number;
+      z: number;
+      radius: number;
+      durationSecs: number;
     }
 );
 

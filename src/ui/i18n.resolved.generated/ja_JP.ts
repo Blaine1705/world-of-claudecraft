@@ -912,14 +912,12 @@ export const ja_JP: EnTranslations = {
       "keybindHint": "騎乗 / 降車キーで騎乗します。",
       "emptyTitle": "マウントは未入手",
       "emptyStableHint": "レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。",
-      "emptyDropHint": "より希少なマウントはダンジョンやレイドのボスがドロップします。",
+      "emptyDropHint": "より希少なマウントはヒロイックダンジョンのボスからドロップするか、リフトの完了で入手できます。",
       "clickManage": "クリックしてマウントを選択",
       "rarity_common": "コモン",
       "rarity_rare": "レア",
       "rarity_epic": "エピック",
       "spec_speed": "+{pct}% 移動力上昇",
-      "spec_block": "+{pct}% 近接ダメージブロック",
-      "spec_crit": "+{pct}% クリティカル率",
       "name_valorsteed": "ヴァロースティード",
       "name_grag_bear": "ゴリアテ・グラグベア",
       "name_stalkglider_snail": "モスシェル・ストークグライダー",
@@ -941,7 +939,7 @@ export const ja_JP: EnTranslations = {
       "ridePrompt": "光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。",
       "begin": "レッスン開始",
       "success": "ヴァロースティードを乗りこなした。",
-      "returnToMarla": "厩舎のマーラのもとへ戻り、厩舎の馬を引き取ろう。"
+      "returnToMarla": "厩舎のマーラのもとへ戻り、10ゴールドでヴァロースティードの手綱を購入しよう。"
     },
     "mountRace": {
       "startButton": "レース開始",
@@ -4647,7 +4645,27 @@ export const ja_JP: EnTranslations = {
       "raceLostBanner": "リフト攻略済み",
       "forgeUpgraded": "{name} のリフト強化が完了しました。",
       "forgeEnchanted": "{name} のリフト付与が完了しました。",
-      "forgeSocketed": "{name} にリフトの宝石をはめ込みました。"
+      "forgeSocketed": "{name} にリフトの宝石をはめ込みました。",
+      "detonateGlacialGrave": "氷河の墓が炸裂する！",
+      "detonateAbsoluteZero": "絶対零度が爆発する！",
+      "detonateMagmaWell": "マグマの泉が噴出する！",
+      "detonateCoreMeltdown": "コアメルトダウンが炸裂する！",
+      "detonateVenomPool": "毒の沼が噴発する！",
+      "detonateBroodmothersMark": "蜘蛛母の刻印が炸裂する！",
+      "detonateSoulGrave": "魂の墓が炸裂する！",
+      "detonateDeathSentence": "死の宣告が下る！",
+      "detonateEarthshatter": "大地砕きが炸裂する！",
+      "detonateFinalJudgment": "最後の審判が落ちる！",
+      "detonateVoidRift": "虚空の裂け目が炸裂する！",
+      "detonateArcaneAnnihilation": "秘術の殲滅が爆発する！",
+      "detonateLightningRod": "避雷針が雷撃する！",
+      "detonateStormcallersWrath": "嵐の使者の怒りが爆発する！",
+      "detonateAbyssalMaw": "深淵の顎が閉じる！",
+      "detonateCrushingDepth": "粉砕の深淵が押しつぶす！",
+      "detonatePactSeal": "契約の封印が炸裂する！",
+      "detonateBloodRite": "血の儀式が落ちる！",
+      "detonatePitSentence": "奈落の判決が炸裂する！",
+      "detonateHellfireBrand": "地獄の焼き印が炸裂する！"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",
@@ -6131,7 +6149,23 @@ export const ja_JP: EnTranslations = {
     "cast": {
       "fishing": "釣り",
       "demonHeal": "悪魔の治癒",
-      "thunzharrStormcall": "嵐の呼び声"
+      "thunzharrStormcall": "嵐の呼び声",
+      "rift_frost_execution": "Glacial Grave",
+      "rift_frost_strike": "Absolute Zero",
+      "rift_ember_execution": "Magma Well",
+      "rift_ember_strike": "Core Meltdown",
+      "rift_venom_execution": "Venom Pool",
+      "rift_venom_strike": "Broodmother's Mark",
+      "rift_necro_execution": "Soul Grave",
+      "rift_necro_strike": "Death Sentence",
+      "rift_brute_execution": "Earthshatter",
+      "rift_brute_strike": "Final Judgment",
+      "rift_arcane_execution": "Void Rift",
+      "rift_arcane_strike": "Arcane Annihilation",
+      "rift_storm_execution": "Lightning Rod",
+      "rift_storm_strike": "Stormcaller's Wrath",
+      "rift_tide_execution": "Abyssal Maw",
+      "rift_tide_strike": "Crushing Depth"
     }
   },
   "questUi": {
@@ -9495,6 +9529,9 @@ export const ja_JP: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "嵐呼びの腰当て"
+      },
+      "riding_training": {
+        "name": "騎乗訓練"
       },
       "reins_valorsteed": {
         "name": "ヴァロースティードの手綱"

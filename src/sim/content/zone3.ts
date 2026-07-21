@@ -972,10 +972,6 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'nighttalon_waistband', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
       { itemId: 'soulflame_cord', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
       { itemId: 'stormcallers_waistguard', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
-      // Collectible mount (the world-boss chase drop): a rare independent draw,
-      // never in a roll group, so it bypasses the one-gear cap and rolls once
-      // per contributor per daily lockout (rollWorldBossLoot).
-      { itemId: 'reins_thunderstrut_gobbler', chance: 0.003 },
     ],
     scale: 8, // a large, imposing world boss that reads on the skyline without being mountain-sized. Visual scale is DECOUPLED from combat reach: his melee is pinned to a ~17yd (scale-5) body in combatProfileForMob (mob_combat.ts), so his move speed and the Howling Gale snare, not a giant swing, are what keep him unkitable.
     color: 0x7d8a99,
@@ -1221,6 +1217,11 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: Math.PI, // face -z, toward the race yard
     color: 0x8b5a2b,
     questIds: ['q_riding_lessons'],
+    // Marla sells Riding Training (the 80g skill purchase, a service entry that
+    // delegates to learnRiding) and the Valorsteed reins for riders who have
+    // learned. The riding-skill gate (ridingTrained) is enforced in buyItem
+    // (items.ts).
+    vendorItems: ['riding_training', 'reins_valorsteed'],
     greeting:
       'Every rider walks in on two legs, $C. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and Highwatch has no menders to spare for broken bones.',
   },
@@ -1927,9 +1928,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Riding Lessons',
     giverNpcId: 'stablemaster_marla',
     turnInNpcId: 'stablemaster_marla',
-    text: 'Every rider walks in on two legs, $N, same as I told you the day we met. Pay the fee, and when I give the word, call the training Valorsteed and climb aboard. Then ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the seat is yours. Wander out of the paddock and we start over.',
+    text: 'You have learned your Riding, $N, now show me you deserve it. When I give the word, call the training Valorsteed and climb aboard. Ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the course is yours. Wander out of the paddock and we start over.',
     completionText:
-      'There, now. Up in one clean motion and a steady seat at the top. The Valorsteed is yours, $N: saddle, reins, and the standing of a rider who earned the seat instead of buying it.',
+      'Up in one clean motion and a steady seat at the top. Well ridden, $N. You have earned the rank of rider. Speak to me again to buy your own Valorsteed reins.',
     objectives: [
       {
         type: 'interact',
@@ -1939,13 +1940,13 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
       },
     ],
     xpReward: 3000,
-    copperReward: 1500,
-    itemRewards: {
-      warrior: 'reins_valorsteed',
-      mage: 'reins_valorsteed',
-      rogue: 'reins_valorsteed',
-    },
+    // The quest reward is gold and XP; the Valorsteed reins are purchased
+    // separately from Marla for 10 gold after the quest is complete.
+    copperReward: 5000,
+    itemRewards: {},
     minLevel: 20,
+    // Pickable only after the 80g Riding purchase from Marla herself.
+    requiresRidingTrained: true,
   },
 };
 

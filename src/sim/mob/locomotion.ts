@@ -34,6 +34,7 @@ import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { riftMechanicSuppressed } from '../rift/ranks';
+import { instancePlayerIds } from '../rift/runs';
 import type { SimContext } from '../sim_context';
 import { clearThreat, stealthDetectionRadius } from '../threat';
 import {
@@ -546,7 +547,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       }
     } else {
       mob.bigCastTimer -= DT;
-      if (mob.bigCastTimer <= 0) {
+      if (mob.bigCastTimer <= 0 && mob.castingAbility === null) {
         mob.bigCastTimer = bigCast.every + bigCast.castTime;
         mob.castingAbility = bigCast.castId;
         mob.castTotal = bigCast.castTime;
@@ -557,6 +558,86 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       }
     }
   }
+  // Lethal telegraphed zone (deathZoneCast, A-rank mechanic): the boss begins a
+  // hardcast (same cast-bar wire as bigCast). The instant casting starts, a ground
+  // zone is placed at a random living player's position with a fuse equal to the
+  // cast time. On cast completion the zone immediately ticks to zero (it is handled
+  // by tickRiftBossDeathZones which expires it the same tick). Any player still
+  // inside the zone's radius takes p.hp + p.maxHp (guaranteed kill, no multiplier).
+  // Zone state lives on RiftInstance.bossDeathZones; only rift boss floors emit these.
+  function runDeathZoneDriver(
+    tmplKey: 'deathZoneCast' | 'deathZoneStrike',
+    timerKey: 'deathZoneCastTimer' | 'deathZoneStrikeTimer',
+  ): void {
+    const def = MOBS[mob.templateId]?.[tmplKey];
+    if (!def || riftMechanicSuppressed(mob, tmplKey)) return;
+    if (mob.castingAbility === def.castId) {
+      mob.castRemaining = Math.max(0, mob.castRemaining - DT);
+      if (mob.castRemaining <= 0) {
+        mob.castingAbility = null;
+        mob.castTotal = 0;
+        mob.castRemaining = 0;
+        mob.castTargetId = null;
+        const school = (def.school ?? 'fire') as Aura['school'];
+        ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+        if (!MOBS[mob.templateId]?.quietMechanics)
+          ctx.emit({
+            type: 'log',
+            text: def.detonateText,
+            color: '#ff4400',
+            entityId: mob.id,
+            telegraph: true,
+          });
+        // The zone was placed at cast-start; tickRiftBossDeathZones handles detonation.
+      }
+    } else {
+      mob[timerKey] -= DT;
+      if (mob[timerKey] <= 0) {
+        mob[timerKey] = def.every + def.castTime;
+        // Skip if already casting (cast exclusivity: two death zones must not stack).
+        if (mob.castingAbility !== null) return;
+        // Resolve the instance first: the zone anchor must be a living player
+        // inside the boss's own rift instance, not the full world player list.
+        const inst = ctx.riftInstances.find(
+          (ri) => ri.partyKey !== null && ri.mobIds.includes(mob.id),
+        );
+        if (!inst) return; // no live instance for this boss - do not cast
+        const instPids = instancePlayerIds(ctx, inst).filter((pid) => {
+          const e = ctx.entities.get(pid);
+          return e && !e.dead;
+        });
+        if (instPids.length === 0) return; // no living party members - skip
+        const targetPid = instPids[ctx.rng.int(0, instPids.length - 1)];
+        const targetE = ctx.entities.get(targetPid);
+        if (!targetE || targetE.dead) return;
+        // Place zone at the picked player's current position.
+        inst.bossDeathZones.push({
+          x: targetE.pos.x,
+          z: targetE.pos.z,
+          radius: def.radius,
+          remaining: def.castTime,
+        });
+        // Notify online clients so they can mirror the zone countdown locally.
+        // Interest-scoped by world position, so only instance players receive it.
+        ctx.emit({
+          type: 'riftDeathZoneSpawn',
+          x: targetE.pos.x,
+          z: targetE.pos.z,
+          radius: def.radius,
+          durationSecs: def.castTime,
+        });
+        // Begin casting - cast bar is the visual telegraph for players to move.
+        mob.castingAbility = def.castId;
+        mob.castTotal = def.castTime;
+        mob.castRemaining = def.castTime;
+        mob.castTargetId = targetPid;
+        mob.channeling = false;
+        if (def.yell) emitMobYell(ctx, mob, def.yell);
+      }
+    }
+  }
+  runDeathZoneDriver('deathZoneCast', 'deathZoneCastTimer');
+  runDeathZoneDriver('deathZoneStrike', 'deathZoneStrikeTimer');
   // Stoneskin: a periodic self-absorb barrier. Telegraphed via createMob, which
   // seeds stoneskinTimer to one full interval so the first barrier never snaps up
   // the instant combat opens.
@@ -714,13 +795,31 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // and let the next pull bark its engage line again.
   const bigCastDef = MOBS[mob.templateId]?.bigCast;
   mob.bigCastTimer = bigCastDef?.every ?? 0;
-  if (bigCastDef && mob.castingAbility === bigCastDef.castId) {
+  const deathZoneCastDef = MOBS[mob.templateId]?.deathZoneCast;
+  mob.deathZoneCastTimer = deathZoneCastDef?.every ?? 0;
+  const deathZoneStrikeDef = MOBS[mob.templateId]?.deathZoneStrike;
+  mob.deathZoneStrikeTimer = deathZoneStrikeDef?.every ?? 0;
+  if (
+    (bigCastDef && mob.castingAbility === bigCastDef.castId) ||
+    (deathZoneCastDef && mob.castingAbility === deathZoneCastDef.castId) ||
+    (deathZoneStrikeDef && mob.castingAbility === deathZoneStrikeDef.castId)
+  ) {
     mob.castingAbility = null;
     mob.castTotal = 0;
     mob.castRemaining = 0;
     mob.castTargetId = null;
   }
   mob.yelledEngage = false;
+  // A boss evade ends the pull: clear any pending lethal death zones so stale
+  // zones from the previous pull do not linger into the next.
+  if (deathZoneCastDef || deathZoneStrikeDef) {
+    for (const inst of ctx.riftInstances) {
+      if (inst.partyKey !== null && inst.bossId === mob.id) {
+        inst.bossDeathZones = [];
+        break;
+      }
+    }
+  }
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);

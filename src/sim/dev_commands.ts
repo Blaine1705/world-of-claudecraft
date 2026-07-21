@@ -201,6 +201,7 @@ export function handleDevChat(
       const maxGate = Math.max(...MOUNT_KEYS.map((key) => MOUNTS[key].level));
       const leveled = entity.level < maxGate;
       if (leveled) ctx.setPlayerLevel(maxGate, pid);
+      meta.ridingTrained = true;
       let granted = 0;
       for (const key of MOUNT_KEYS) {
         if (mountOwned(meta, key)) continue;
@@ -213,7 +214,7 @@ export function handleDevChat(
       emitDevLog(
         ctx,
         pid,
-        `[dev] Granted ${granted} mount reins (${MOUNT_KEYS.length} owned)${levelNote}. Press Z to ride.`,
+        `[dev] Granted ${granted} mount reins (${MOUNT_KEYS.length} owned)${levelNote}. Press Z to summon a mount.`,
       );
     }
     return null;

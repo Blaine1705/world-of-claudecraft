@@ -912,14 +912,12 @@ export const en: EnTranslations = {
       "keybindHint": "Press the Mount / Dismount key to ride.",
       "emptyTitle": "No mounts collected",
       "emptyStableHint": "Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.",
-      "emptyDropHint": "Rarer mounts drop from dungeon and raid bosses.",
+      "emptyDropHint": "Rarer mounts drop from heroic dungeon bosses and Rift completions.",
       "clickManage": "Click to choose your mount",
       "rarity_common": "Common",
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
       "spec_speed": "+{pct}% extra mobility",
-      "spec_block": "+{pct}% melee damage block",
-      "spec_crit": "+{pct}% critical strike chance",
       "name_valorsteed": "Valorsteed",
       "name_grag_bear": "Goliath Grag-Bear",
       "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
@@ -941,7 +939,7 @@ export const en: EnTranslations = {
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
       "success": "You have tamed the Valorsteed.",
-      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+      "returnToMarla": "Return to Marla at the stables to buy your Valorsteed reins for 10g."
     },
     "mountRace": {
       "startButton": "Start Race",
@@ -4647,7 +4645,27 @@ export const en: EnTranslations = {
       "raceLostBanner": "Rift Already Cleared",
       "forgeUpgraded": "Rift upgrade completed for {name}.",
       "forgeEnchanted": "Rift enchant completed for {name}.",
-      "forgeSocketed": "Rift gem socketed for {name}."
+      "forgeSocketed": "Rift gem socketed for {name}.",
+      "detonateGlacialGrave": "Glacial Grave detonates!",
+      "detonateAbsoluteZero": "Absolute Zero erupts!",
+      "detonateMagmaWell": "Magma Well erupts!",
+      "detonateCoreMeltdown": "Core Meltdown detonates!",
+      "detonateVenomPool": "Venom Pool erupts!",
+      "detonateBroodmothersMark": "Broodmother's Mark detonates!",
+      "detonateSoulGrave": "Soul Grave detonates!",
+      "detonateDeathSentence": "Death Sentence falls!",
+      "detonateEarthshatter": "Earthshatter detonates!",
+      "detonateFinalJudgment": "Final Judgment lands!",
+      "detonateVoidRift": "Void Rift detonates!",
+      "detonateArcaneAnnihilation": "Arcane Annihilation erupts!",
+      "detonateLightningRod": "Lightning Rod strikes!",
+      "detonateStormcallersWrath": "Stormcaller's Wrath erupts!",
+      "detonateAbyssalMaw": "Abyssal Maw closes!",
+      "detonateCrushingDepth": "Crushing Depth crushes!",
+      "detonatePactSeal": "Pact Seal detonates!",
+      "detonateBloodRite": "Blood Rite falls!",
+      "detonatePitSentence": "Pit Sentence detonates!",
+      "detonateHellfireBrand": "Hellfire Brand detonates!"
     },
     "delve": {
       "cannotEnterNow": "You cannot enter a delve right now.",
@@ -6131,7 +6149,23 @@ export const en: EnTranslations = {
     "cast": {
       "fishing": "Fishing",
       "demonHeal": "Demon Heal",
-      "thunzharrStormcall": "Stormcall"
+      "thunzharrStormcall": "Stormcall",
+      "rift_frost_execution": "Glacial Grave",
+      "rift_frost_strike": "Absolute Zero",
+      "rift_ember_execution": "Magma Well",
+      "rift_ember_strike": "Core Meltdown",
+      "rift_venom_execution": "Venom Pool",
+      "rift_venom_strike": "Broodmother's Mark",
+      "rift_necro_execution": "Soul Grave",
+      "rift_necro_strike": "Death Sentence",
+      "rift_brute_execution": "Earthshatter",
+      "rift_brute_strike": "Final Judgment",
+      "rift_arcane_execution": "Void Rift",
+      "rift_arcane_strike": "Arcane Annihilation",
+      "rift_storm_execution": "Lightning Rod",
+      "rift_storm_strike": "Stormcaller's Wrath",
+      "rift_tide_execution": "Abyssal Maw",
+      "rift_tide_strike": "Crushing Depth"
     }
   },
   "questUi": {
@@ -9496,6 +9530,9 @@ export const en: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Galecall Waistguard"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Reins of the Valorsteed"
       },
@@ -11223,8 +11260,8 @@ export const en: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Riding Lessons",
-        "text": "Every rider walks in on two legs, {playerName}, same as I told you the day we met. Pay the fee, and when I give the word, call the training Valorsteed and climb aboard. Then ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the seat is yours. Wander out of the paddock and we start over.",
-        "completion": "There, now. Up in one clean motion and a steady seat at the top. The Valorsteed is yours, {playerName}: saddle, reins, and the standing of a rider who earned the seat instead of buying it.",
+        "text": "You have learned your Riding, {playerName}, now show me you deserve it. When I give the word, call the training Valorsteed and climb aboard. Ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the course is yours. Wander out of the paddock and we start over.",
+        "completion": "Up in one clean motion and a steady seat at the top. Well ridden, {playerName}. You have earned the rank of rider. Speak to me again to buy your own Valorsteed reins.",
         "objectives": {
           "0": {
             "label": "Tame the Valorsteed"

@@ -1303,12 +1303,29 @@ describe('dungeons: heroic boss drops', () => {
     // set-piece and legendary drops auto-upgrade to their raid-tier heroic
     // variants in a heroic claim (loot/loot_roll.ts + heroic_variants.ts).
     const heroicTable = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak;
-    const weaponIds = heroicTable.flatMap((e) => (e.itemId ? [e.itemId] : []));
-    const groups = new Set(heroicTable.map((e) => e.rollGroup));
+    // The table now also carries the two blue mount reins as independent
+    // sub-1% draws (the mount drop matrix); the weapon contract applies to the
+    // roll-grouped entries only.
+    const weaponEntries = heroicTable.filter((e) => e.rollGroup !== undefined);
+    const mountEntries = heroicTable.filter((e) => e.rollGroup === undefined);
+    const weaponIds = weaponEntries.flatMap((e) => (e.itemId ? [e.itemId] : []));
+    const groups = new Set(weaponEntries.map((e) => e.rollGroup));
     expect(groups.size).toBe(1);
     expect(new Set(weaponIds).size).toBe(3);
-    expect(heroicTable.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
+    expect(weaponEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
     for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
+    expect(mountEntries.map((e) => e.itemId).sort()).toEqual([
+      'reins_aether_hover_cycle',
+      'reins_grag_bear',
+      'reins_shadowjump_toad',
+      'reins_stalkglider_snail',
+    ]);
+    // Blues at 0.1%, greens at 0.5% - check each individually.
+    for (const e of mountEntries) {
+      const isBlue =
+        e.itemId === 'reins_aether_hover_cycle' || e.itemId === 'reins_shadowjump_toad';
+      expect(e.chance, `${e.itemId} chance`).toBe(isBlue ? 0.001 : 0.005);
+    }
 
     const droppedWeapons = new Set<string>();
     const droppedVariants = new Set<string>();

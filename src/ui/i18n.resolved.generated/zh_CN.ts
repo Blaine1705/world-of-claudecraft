@@ -912,14 +912,12 @@ export const zh_CN: EnTranslations = {
       "keybindHint": "按下骑乘 / 下骑键即可骑乘。",
       "emptyTitle": "尚未收集坐骑",
       "emptyStableHint": "升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。",
-      "emptyDropHint": "较稀有的坐骑由地下城和团队副本首领掉落。",
+      "emptyDropHint": "较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。",
       "clickManage": "点击选择坐骑",
       "rarity_common": "普通",
       "rarity_rare": "稀有",
       "rarity_epic": "史诗",
       "spec_speed": "+{pct}%额外移动力",
-      "spec_block": "+{pct}%近战伤害格挡",
-      "spec_crit": "+{pct}%致命一击几率",
       "name_valorsteed": "英勇战马",
       "name_grag_bear": "歌利亚格拉格巨熊",
       "name_stalkglider_snail": "苔壳滑行蜗牛",
@@ -941,7 +939,7 @@ export const zh_CN: EnTranslations = {
       "ridePrompt": "跟随发光的标记前往起点线，然后点击开始比赛。",
       "begin": "开始课程",
       "success": "你已经驯服了英勇战马。",
-      "returnToMarla": "返回马厩找玛拉，领养一匹马厩里的马。"
+      "returnToMarla": "返回马厩找玛拉，花10金购买英勇战马的缰绳。"
     },
     "mountRace": {
       "startButton": "开始比赛",
@@ -4647,7 +4645,27 @@ export const zh_CN: EnTranslations = {
       "raceLostBanner": "裂隙已被清除",
       "forgeUpgraded": "{name} 的裂隙强化已完成。",
       "forgeEnchanted": "{name} 的裂隙附魔已完成。",
-      "forgeSocketed": "已为 {name} 镶嵌裂隙宝石。"
+      "forgeSocketed": "已为 {name} 镶嵌裂隙宝石。",
+      "detonateGlacialGrave": "冰川之墓引爆！",
+      "detonateAbsoluteZero": "绝对零度爆发！",
+      "detonateMagmaWell": "岩浆泉喷涌！",
+      "detonateCoreMeltdown": "核心熔毁引爆！",
+      "detonateVenomPool": "毒液池喷发！",
+      "detonateBroodmothersMark": "蜘蛛母后之印引爆！",
+      "detonateSoulGrave": "灵魂之墓引爆！",
+      "detonateDeathSentence": "死亡判决降临！",
+      "detonateEarthshatter": "碎地之力引爆！",
+      "detonateFinalJudgment": "终极审判落下！",
+      "detonateVoidRift": "虚空裂隙引爆！",
+      "detonateArcaneAnnihilation": "奥术湮灭爆发！",
+      "detonateLightningRod": "避雷针雷击！",
+      "detonateStormcallersWrath": "风暴召唤者之怒爆发！",
+      "detonateAbyssalMaw": "深渊之口合拢！",
+      "detonateCrushingDepth": "粉碎深渊碾压！",
+      "detonatePactSeal": "契约封印引爆！",
+      "detonateBloodRite": "血液仪式降临！",
+      "detonatePitSentence": "深坑判决引爆！",
+      "detonateHellfireBrand": "地狱烙印引爆！"
     },
     "delve": {
       "cannotEnterNow": "你现在无法进入探秘。",
@@ -6131,7 +6149,23 @@ export const zh_CN: EnTranslations = {
     "cast": {
       "fishing": "钓鱼",
       "demonHeal": "恶魔治疗",
-      "thunzharrStormcall": "风暴召唤"
+      "thunzharrStormcall": "风暴召唤",
+      "rift_frost_execution": "Glacial Grave",
+      "rift_frost_strike": "Absolute Zero",
+      "rift_ember_execution": "Magma Well",
+      "rift_ember_strike": "Core Meltdown",
+      "rift_venom_execution": "Venom Pool",
+      "rift_venom_strike": "Broodmother's Mark",
+      "rift_necro_execution": "Soul Grave",
+      "rift_necro_strike": "Death Sentence",
+      "rift_brute_execution": "Earthshatter",
+      "rift_brute_strike": "Final Judgment",
+      "rift_arcane_execution": "Void Rift",
+      "rift_arcane_strike": "Arcane Annihilation",
+      "rift_storm_execution": "Lightning Rod",
+      "rift_storm_strike": "Stormcaller's Wrath",
+      "rift_tide_execution": "Abyssal Maw",
+      "rift_tide_strike": "Crushing Depth"
     }
   },
   "questUi": {
@@ -9495,6 +9529,9 @@ export const zh_CN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "唤雷者腰甲"
+      },
+      "riding_training": {
+        "name": "骑术训练"
       },
       "reins_valorsteed": {
         "name": "英勇战马的缰绳"

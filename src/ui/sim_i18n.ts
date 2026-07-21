@@ -54,9 +54,19 @@ const baseEnTable = {
   'error.noMountYet': "You don't have a mount yet.",
   'error.mountBuyLevel': 'You must be level 20 to buy a mount.',
   'error.mountAlreadyOwned': 'You already own that mount.',
+  // Riding skill gate (src/sim/mounts.ts): emitted when the player tries to
+  // mount or select a mount without having purchased the riding skill from Marla.
+  // Placeholder-free, so it registers in the EXACT matcher automatically.
+  'error.ridingUntrained': 'You must learn to ride first. Find a riding trainer.',
+  // Riding skill purchase (learnRiding in src/sim/mounts_training.ts).
+  'error.ridingAlreadyLearned': 'You have already learned Riding.',
+  'error.ridingTrainLevel': 'You must be level 20 to learn Riding.',
+  'error.ridingWrongNpc': 'You must speak to Marla Hitchen to learn Riding.',
+  'log.ridingLearned': 'You have learned Riding. You can now summon and ride a mount.',
   // Riding lesson (src/sim/mounts_training.ts). The shared "Too far away." /
   // "Not enough money." / "You can't do that while dead." refusals are reused
   // verbatim and already registered above.
+  'error.ridingQuestUntrained': 'You must learn Riding before taking this lesson.',
   'error.mountTrainLevel': 'You must be level 20 to take riding lessons.',
   'error.mountTrainNeedsQuest': 'You need to accept the riding lesson quest first.',
   'error.mountTrainInProgress': 'A riding lesson is already in progress.',
@@ -3170,6 +3180,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMountYet': '你还没有坐骑。',
     'error.mountBuyLevel': '你必须达到等级20才能购买坐骑。',
     'error.mountAlreadyOwned': '你已经拥有该坐骑了。',
+    'error.ridingUntrained': '你必须先学会骑乘。请找骑乘训练师。',
+    'error.ridingAlreadyLearned': '你已经学会了骑乘术。',
+    'error.ridingTrainLevel': '你必须达到等级20才能学习骑乘术。',
+    'error.ridingWrongNpc': '你必须和玛拉·希肯交谈才能学习骑乘术。',
+    'log.ridingLearned': '你已学会骑乘术，现在可以召唤并骑乘坐骑。',
+    'error.ridingQuestUntrained': '你必须先学习骑乘术才能参加这个课程。',
     'error.invalidBuild': '无效的天赋配置。',
     'error.unknownSpec': '未知的专精。',
     'error.maxLoadouts': '你最多只能保存{count}套配置。',
@@ -3542,6 +3558,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMountYet': '你還沒有坐騎。',
     'error.mountBuyLevel': '你必須達到等級 20 才能購買坐騎。',
     'error.mountAlreadyOwned': '你已經擁有該坐騎了。',
+    'error.ridingUntrained': '你必須先學會騎乘。請找騎乘訓練師。',
+    'error.ridingAlreadyLearned': '你已經學會了騎乘術。',
+    'error.ridingTrainLevel': '你必須達到等級 20 才能學習騎乘術。',
+    'error.ridingWrongNpc': '你必須和瑪拉·希肯交談才能學習騎乘術。',
+    'log.ridingLearned': '你已學會騎乘術，現在可以召喚並騎乘坐騎。',
+    'error.ridingQuestUntrained': '你必須先學習騎乘術才能參加這個課程。',
     'error.invalidBuild': '無效的天賦配置。',
     'error.unknownSpec': '未知的專精。',
     'error.maxLoadouts': '你最多只能儲存 {count} 組配置。',
@@ -3920,6 +3942,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMountYet': '아직 탈것이 없습니다.',
     'error.mountBuyLevel': '20레벨이 되어야 탈것을 구매할 수 있습니다.',
     'error.mountAlreadyOwned': '이미 그 탈것을 가지고 있습니다.',
+    'error.ridingUntrained': '먼저 기승술을 배워야 합니다. 기승 훈련사를 찾으세요.',
+    'error.ridingAlreadyLearned': '이미 기승술을 배웠습니다.',
+    'error.ridingTrainLevel': '기승술을 배우려면 20레벨이 되어야 합니다.',
+    'error.ridingWrongNpc': '기승술을 배우려면 마를라 히첸과 이야기해야 합니다.',
+    'log.ridingLearned': '기승술을 습득했습니다. 이제 탈것을 소환하고 탈 수 있습니다.',
+    'error.ridingQuestUntrained': '이 수업을 받으려면 먼저 기승술을 배워야 합니다.',
     'error.invalidBuild': '잘못된 특성 구성입니다.',
     'error.unknownSpec': '알 수 없는 전문화입니다.',
     'error.maxLoadouts': '특성 묶음은 최대 {count}개까지 저장할 수 있습니다.',
@@ -4309,6 +4337,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMountYet': 'まだマウントを持っていません。',
     'error.mountBuyLevel': 'マウントを購入するにはレベル20が必要です。',
     'error.mountAlreadyOwned': 'そのマウントはすでに所有しています。',
+    'error.ridingUntrained': 'まず騎乗術を習得してください。騎乗訓練士を探しましょう。',
+    'error.ridingAlreadyLearned': 'すでに騎乗術を習得しています。',
+    'error.ridingTrainLevel': '騎乗術を習得するにはレベル20が必要です。',
+    'error.ridingWrongNpc': '騎乗術を習得するにはマーラ・ヒッチェンに話しかけてください。',
+    'log.ridingLearned': '騎乗術を習得しました。マウントを召喚して乗れるようになりました。',
+    'error.ridingQuestUntrained': 'このレッスンを受けるには、まず騎乗術を習得してください。',
     'error.invalidBuild': '無効なタレントビルドです。',
     'error.unknownSpec': '不明な専門化です。',
     'error.maxLoadouts': 'ロードアウトは最大{count}個まで保存できます。',
@@ -5027,6 +5061,13 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMountYet': 'У вас пока нет транспорта.',
     'error.mountBuyLevel': 'Чтобы купить транспорт, нужен 20 уровень.',
     'error.mountAlreadyOwned': 'У вас уже есть этот транспорт.',
+    'error.ridingUntrained': 'Сначала нужно научиться верховой езде. Найдите инструктора.',
+    'error.ridingAlreadyLearned': 'Вы уже обучились верховой езде.',
+    'error.ridingTrainLevel': 'Чтобы обучиться верховой езде, нужен 20 уровень.',
+    'error.ridingWrongNpc': 'Чтобы обучиться верховой езде, поговорите с Марлой Хитчен.',
+    'log.ridingLearned':
+      'Вы обучились верховой езде. Теперь вы можете призывать и оседлать ездовое животное.',
+    'error.ridingQuestUntrained': 'Чтобы пройти этот урок, сначала обучитесь верховой езде.',
     'error.invalidBuild': 'Недопустимая сборка талантов.',
     'error.unknownSpec': 'Неизвестная специализация.',
     'error.maxLoadouts': 'Можно сохранить не более {count} наборов.',
@@ -7719,6 +7760,90 @@ const RULES: Rule[] = [
   {
     re: /^Rift gem socketed for (.+)\.$/,
     build: (m) => t('sim.rift.forgeSocketed', { name: m[1] }),
+  },
+  // Boss lethal death-zone detonation lines (src/sim/mob/locomotion.ts). The sim
+  // emits def.detonateText verbatim at zone expiry; match each exact string here and
+  // re-render via its sim.rift.detonate* catalog key. One rule per mechanic so each
+  // can be translated distinctly (a frost grave != an arcane rift).
+  {
+    re: /^Glacial Grave detonates!$/,
+    build: () => t('sim.rift.detonateGlacialGrave'),
+  },
+  {
+    re: /^Absolute Zero erupts!$/,
+    build: () => t('sim.rift.detonateAbsoluteZero'),
+  },
+  {
+    re: /^Magma Well erupts!$/,
+    build: () => t('sim.rift.detonateMagmaWell'),
+  },
+  {
+    re: /^Core Meltdown detonates!$/,
+    build: () => t('sim.rift.detonateCoreMeltdown'),
+  },
+  {
+    re: /^Venom Pool erupts!$/,
+    build: () => t('sim.rift.detonateVenomPool'),
+  },
+  {
+    re: /^Broodmother's Mark detonates!$/,
+    build: () => t('sim.rift.detonateBroodmothersMark'),
+  },
+  {
+    re: /^Soul Grave detonates!$/,
+    build: () => t('sim.rift.detonateSoulGrave'),
+  },
+  {
+    re: /^Death Sentence falls!$/,
+    build: () => t('sim.rift.detonateDeathSentence'),
+  },
+  {
+    re: /^Earthshatter detonates!$/,
+    build: () => t('sim.rift.detonateEarthshatter'),
+  },
+  {
+    re: /^Final Judgment lands!$/,
+    build: () => t('sim.rift.detonateFinalJudgment'),
+  },
+  {
+    re: /^Void Rift detonates!$/,
+    build: () => t('sim.rift.detonateVoidRift'),
+  },
+  {
+    re: /^Arcane Annihilation erupts!$/,
+    build: () => t('sim.rift.detonateArcaneAnnihilation'),
+  },
+  {
+    re: /^Lightning Rod strikes!$/,
+    build: () => t('sim.rift.detonateLightningRod'),
+  },
+  {
+    re: /^Stormcaller's Wrath erupts!$/,
+    build: () => t('sim.rift.detonateStormcallersWrath'),
+  },
+  {
+    re: /^Abyssal Maw closes!$/,
+    build: () => t('sim.rift.detonateAbyssalMaw'),
+  },
+  {
+    re: /^Crushing Depth crushes!$/,
+    build: () => t('sim.rift.detonateCrushingDepth'),
+  },
+  {
+    re: /^Pact Seal detonates!$/,
+    build: () => t('sim.rift.detonatePactSeal'),
+  },
+  {
+    re: /^Blood Rite falls!$/,
+    build: () => t('sim.rift.detonateBloodRite'),
+  },
+  {
+    re: /^Pit Sentence detonates!$/,
+    build: () => t('sim.rift.detonatePitSentence'),
+  },
+  {
+    re: /^Hellfire Brand detonates!$/,
+    build: () => t('sim.rift.detonateHellfireBrand'),
   },
   { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
   { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },

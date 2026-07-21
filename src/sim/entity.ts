@@ -1,5 +1,4 @@
 import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
-import { mountCritPct } from './content/mounts';
 import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
@@ -135,6 +134,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     pulseTimer: 0,
     stompTimer: 0,
     bigCastTimer: 0,
+    deathZoneCastTimer: 0,
+    deathZoneStrikeTimer: 0,
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
@@ -582,11 +583,7 @@ export function recalcPlayerStats(
   // crit talents were dead weight to casters). The active mount's bonus rides
   // here too so it covers melee, ranged, and ability crit uniformly.
   e.sharedCritBonus =
-    bonusCrit +
-    (mods?.stats.crit ?? 0) +
-    setEff.crit +
-    critFractionFromRating(e.critRating) +
-    mountCritPct(e.mountKey);
+    bonusCrit + (mods?.stats.crit ?? 0) + setEff.crit + critFractionFromRating(e.critRating);
   // Crit: ~1% per 20 agi at low level
   e.critChance =
     0.05 +
@@ -719,6 +716,9 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.stoneskin) e.stoneskinTimer = template.stoneskin.every;
   // Telegraph the first hardcast (bigCast) the same way: one full interval after engage.
   if (template.bigCast) e.bigCastTimer = template.bigCast.every;
+  // Telegraph the lethal zone casts the same way: one full interval before first fire.
+  if (template.deathZoneCast) e.deathZoneCastTimer = template.deathZoneCast.every;
+  if (template.deathZoneStrike) e.deathZoneStrikeTimer = template.deathZoneStrike.every;
   // Telegraph the first Rally the same way: one full interval after engage.
   if (template.rally) e.rallyTimer = template.rally.every;
   // Telegraph the first War Cadence the same way: one full interval after engage.

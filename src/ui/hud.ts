@@ -17,7 +17,7 @@ import {
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
-import { castBarState, consumeBarState } from '../render/cast_bar';
+import { castBarState, consumeBarState, mountSummonBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
@@ -702,6 +702,27 @@ const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
+// Rift boss one-shot mechanic cast IDs: keyed by their authored mechanic name.
+// These appear in the target cast bar when the boss winds up a lethal zone.
+// The lookup prevents falling back to the raw castId string on the HUD.
+const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
+  'abilityUi.cast.rift_frost_execution': true,
+  'abilityUi.cast.rift_frost_strike': true,
+  'abilityUi.cast.rift_ember_execution': true,
+  'abilityUi.cast.rift_ember_strike': true,
+  'abilityUi.cast.rift_venom_execution': true,
+  'abilityUi.cast.rift_venom_strike': true,
+  'abilityUi.cast.rift_necro_execution': true,
+  'abilityUi.cast.rift_necro_strike': true,
+  'abilityUi.cast.rift_brute_execution': true,
+  'abilityUi.cast.rift_brute_strike': true,
+  'abilityUi.cast.rift_arcane_execution': true,
+  'abilityUi.cast.rift_arcane_strike': true,
+  'abilityUi.cast.rift_storm_execution': true,
+  'abilityUi.cast.rift_storm_strike': true,
+  'abilityUi.cast.rift_tide_execution': true,
+  'abilityUi.cast.rift_tide_strike': true,
+};
 const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
@@ -710,6 +731,8 @@ const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
+  const riftKey = `abilityUi.cast.${id}` as TranslationKey;
+  if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];
   return ability ? abilityDisplayName(ability) : id;
 };
@@ -4709,8 +4732,6 @@ export class Hud {
         if (descKey) html += `<div class="tt-desc">${esc(t(descKey))}</div>`;
         for (const line of mountSpecLines({
           speedPct: Math.round(mountDef.moveSpeedPct * 100),
-          blockPct: Math.round(mountDef.meleeBlockPct * 100),
-          critPct: Math.round(mountDef.critPct * 100),
         }))
           html += `<div class="tt-green">${esc(line)}</div>`;
         const meets = this.sim.player.level >= mountDef.level;
@@ -7277,10 +7298,13 @@ export class Hud {
     }
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
-    // the player-only eat/drink overlay (consumeBarState), and clears on hide.
+    // the mount summon channel (mountSummonBarState) and the player-only eat/drink
+    // overlay (consumeBarState), and clears on hide. Priority: spell cast > mount
+    // summon > eat/drink (you cannot cast while mounting, but the painter guards it).
     this.playerCastBarPainter.paint({
       cast: castBarState(p),
       castRemaining: p.castRemaining,
+      mountSummon: mountSummonBarState(p.mountCastRemaining, p.mountCastKey),
       consume: consumeBarState(p.eating, p.drinking),
     });
 

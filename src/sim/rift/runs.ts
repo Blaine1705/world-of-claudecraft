@@ -12,7 +12,6 @@
 
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { delveChestItemsForTier } from '../content/delves/lockpick_tiers';
-import { HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import {
   DUNGEON_FLOOR_Y,
   isRiftPos,
@@ -36,7 +35,7 @@ import {
   riftHeroicTuningFor,
   riftRankForBaseLevel,
 } from './ranks';
-import { generateRiftFloor, riftLiftAt } from './rift_gen';
+import { generateRiftFloor, isSetPieceRift, riftLiftAt } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
 import type { RiftInstance, RiftRoller } from './types';
 
@@ -49,6 +48,7 @@ const SEQ_TRIGGER_RADIUS = 2.6; // walk this close to step a sequence rune
 const ORB_TRIGGER_RADIUS = 3.2;
 const ORB_NOTICE_COOLDOWN = 6; // seconds between "the orb is sealed" nudges
 const SEQ_RESET_NOTICE_COOLDOWN = 4; // seconds between "the runes go dark" reset notices
+const POOL_FULL_NOTICE_COOLDOWN = 4; // seconds between "all rifts are unstable" / "already cleared" denials on walk-in
 const BOULDER_PUSH_RADIUS = 2.0; // shove a boulder when this close and moving into it
 const PAD_RADIUS = 2.2; // a boulder counts as socketed within this of its pad
 const ICE_SLIDE_SPEED = 13; // yd/s glide across the ice (~1.85x run: frictionless momentum)
@@ -248,6 +248,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.boulderPads = [];
   inst.seqRuneIds = [];
   inst.seqStep = 0;
+  inst.seqResetAt = -Infinity;
   inst.beaconId = null;
   inst.rollerIds = [];
   inst.cacheId = null;
@@ -259,7 +260,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.orbId = null;
   inst.orbActive = false;
 
-  // A- and S-rank rifts are heroic scaled: a spawn-time stat transform plus the
+  // B-, A- and S-rank rifts are heroic scaled: a spawn-time stat transform plus the
   // per-entity mechanic multipliers, mirroring instances/difficulty.ts. The rank
   // derives from the descriptor's baseLevel, so every host regenerates it.
   const rank = riftRankForBaseLevel(inst.baseLevel);
@@ -283,7 +284,12 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
     }
     // Rank-gated boss kits: how many entries of the template's rankMechanics
     // list are live on this spawn (C=1 .. S=4). Trash carries no budget.
-    if (spawn.boss || spawn.miniboss) mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+    // Authored set-piece floors (the Infernal Citadel) are C-only hand-tuned
+    // content; their bosses run their full kit at every rank and must not be
+    // capped by the procedural rank budget.
+    if ((spawn.boss || spawn.miniboss) && !isSetPieceRift(inst.seed, inst.baseLevel)) {
+      mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+    }
     // Per-run re-grade: a fresh tint (and a little scale variance) so the same
     // template reads as a different creature across rifts. Model + mechanics are
     // unchanged (both read from the static template by id).
@@ -403,6 +409,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.boulderPads = [];
   inst.seqRuneIds = [];
   inst.seqStep = 0;
+  inst.seqResetAt = -Infinity;
   inst.beaconId = null;
   inst.rollerIds = [];
   inst.cacheId = null;
@@ -414,6 +421,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
+  inst.bossDeathZones = [];
 }
 
 function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
@@ -434,6 +442,7 @@ function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
   inst.tier = null;
   inst.portalId = null;
   inst.rewarded = false;
+  inst.bossDeathZones = [];
   if (eventId !== null) {
     const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
     const anotherRun = ctx.riftInstances.some(
@@ -478,8 +487,11 @@ export function enterRift(
   if (eventId !== null) {
     const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
     if (!event || event.status === 'cleared' || event.status === 'collapsed') {
-      const winner = event?.firstClear?.memberNames.join(', ') || 'another party';
-      ctx.error(r.meta.entityId, `This rift has already been cleared by ${winner}.`);
+      if (ctx.time >= (r.e.riftPoolFullAt ?? -Infinity) + POOL_FULL_NOTICE_COOLDOWN) {
+        r.e.riftPoolFullAt = ctx.time;
+        const winner = event?.firstClear?.memberNames.join(', ') || 'another party';
+        ctx.error(r.meta.entityId, `This rift has already been cleared by ${winner}.`);
+      }
       return;
     }
     if (event.upgradeStatus === 'pending') event.upgradeStatus = 'fallback';
@@ -501,7 +513,10 @@ export function enterRift(
   if (!inst) {
     const free = ctx.riftInstances.find((i) => i.partyKey === null);
     if (!free) {
-      ctx.error(r.meta.entityId, 'All rifts are unstable right now. Try again soon.');
+      if (ctx.time >= (r.e.riftPoolFullAt ?? -Infinity) + POOL_FULL_NOTICE_COOLDOWN) {
+        r.e.riftPoolFullAt = ctx.time;
+        ctx.error(r.meta.entityId, 'All rifts are unstable right now. Try again soon.');
+      }
       return;
     }
     inst = free;
@@ -844,9 +859,9 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
               if (rr) rr.templateId = 'rift_seq_rune';
             }
           }
-          const throttled = ctx.time < (p.riftSeqResetAt ?? -Infinity) + SEQ_RESET_NOTICE_COOLDOWN;
+          const throttled = ctx.time < inst.seqResetAt + SEQ_RESET_NOTICE_COOLDOWN;
           if (hadProgress || !throttled) {
-            p.riftSeqResetAt = ctx.time;
+            inst.seqResetAt = ctx.time;
             riftFx(ctx, rune.pos.x, rune.pos.z, 'shadow'); // the runes snuff out
             for (const pid of instancePlayerIds(ctx, inst)) {
               ctx.emit({
@@ -1077,44 +1092,9 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   }
 }
 
-/** Put normal rank marks plus the one-off race bonus on the winner's boss corpse
- * as personal loot. Normal marks retain the existing daily-per-rank gate; race
- * marks are event-specific and therefore always paid to a legitimate winner. */
-function rewardRiftWinner(
-  ctx: SimContext,
-  inst: RiftInstance,
-  boss: Entity | null,
-  participants: readonly number[],
-  raceWinner: boolean,
-): Map<number, number> {
-  const awardedByPlayer = new Map<number, number>();
-  if (inst.tier === null || !boss) return awardedByPlayer;
-  const info = RIFT_TIER_INFO[inst.tier];
-  const loot = boss.loot ?? { copper: 0, items: [] };
-  const dailyKey = `rift_${inst.tier}`;
-  for (const pid of participants) {
-    const meta = ctx.players.get(pid);
-    if (!meta) continue;
-    let marks = raceWinner ? info.raceMarks : 0;
-    const today = ctx.utcDay;
-    if (today && meta.heroicDaily.date !== today) {
-      meta.heroicDaily = { date: today, marked: new Set() };
-    }
-    if (!meta.heroicDaily.marked.has(dailyKey)) {
-      meta.heroicDaily.marked.add(dailyKey);
-      marks += info.marks;
-    }
-    for (let i = 0; i < marks; i++) {
-      loot.items.push({ itemId: HEROIC_MARK_ITEM_ID, count: 1, personalFor: [pid] });
-    }
-    awardedByPlayer.set(pid, marks);
-  }
-  if (awardedByPlayer.size > 0) {
-    boss.loot = loot;
-    boss.lootable = true;
-  }
-  return awardedByPlayer;
-}
+// Rifts pay NO Heroic Marks at any rank (maintainer decision): marks stay a
+// heroic dungeon/raid currency, and the rift prize is the clear-time gear
+// ladder, the first-clear rings/essence/gems, the mount rolls, and coin.
 
 function terminateLosingInstance(ctx: SimContext, inst: RiftInstance): void {
   const event =
@@ -1137,7 +1117,6 @@ function terminateLosingInstance(ctx: SimContext, inst: RiftInstance): void {
         tier,
         winnerNames,
         clearTime,
-        rewardMarks: 0,
       });
     }
     ctx.emit({
@@ -1166,11 +1145,9 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.rewarded = true;
   inst.outcome = 'won';
   inst.finishedAt = ctx.time;
-  // Rank-gated epic/legendary payout on the corpse (every winning clear, ranked
-  // or dev; C pays nothing here, its rares come from the static tables).
+  // Rank-gated payout on the corpse (every winning clear, ranked or dev): C a
+  // guaranteed themed rare + coin, B/A/S the epic ladder. No Heroic Marks.
   if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
-  const raceWinner = claim.event !== null;
-  const rewards = rewardRiftWinner(ctx, inst, boss, participants, raceWinner);
 
   // A cleared rift seals its way in: the entry portal despawns, so a finished
   // run can never be walked into and re-farmed. Ranked natural portals seal
@@ -1208,7 +1185,6 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
         tier: claim.event.tier,
         winnerNames,
         clearTime,
-        rewardMarks: rewards.get(pid) ?? 0,
       });
     }
     ctx.emit({
@@ -1235,7 +1211,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   return true;
 }
 
-function instancePlayerIds(ctx: SimContext, inst: RiftInstance): number[] {
+export function instancePlayerIds(ctx: SimContext, inst: RiftInstance): number[] {
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const out: number[] = [];
   const candidates =
@@ -1278,7 +1254,7 @@ function tickRiftHazards(
 }
 
 // Roll one lane's boulder forward a tick and bowl over anyone it overtakes.
-// C/B ranks chip a chunk of max HP; on the heroic A/S ranks a boulder is a
+// C rank chips a chunk of max HP; on the heroic B/A/S ranks a boulder is a
 // ONE-SHOT mechanic (an unblockable killing blow), so the lane must be dodged
 // or jumped, never tanked. Lava deliberately stays damage-over-time at every
 // rank (tickRiftHazards): a burn is a mistake tax, a boulder is an execution.
@@ -1384,6 +1360,33 @@ export function liftRiftEntities(ctx: SimContext): void {
   }
 }
 
+/** Per-tick: advance every active rift boss lethal death zone fuse. When a zone
+ * expires it detonates: every living player still inside the radius takes flat
+ * p.hp + p.maxHp (guaranteed kill, no mechanicDamageMult modifier, by design).
+ * Only instances with active zones do any real work. */
+export function tickRiftBossDeathZones(ctx: SimContext): void {
+  for (const inst of ctx.riftInstances) {
+    if (inst.partyKey === null || inst.bossDeathZones.length === 0) continue;
+    const live: Array<{ x: number; z: number; radius: number; remaining: number }> = [];
+    for (const zone of inst.bossDeathZones) {
+      zone.remaining -= DT;
+      if (zone.remaining > 0) {
+        live.push(zone);
+        continue;
+      }
+      // Detonation: lethal to any player still inside the radius.
+      const pids = instancePlayerIds(ctx, inst);
+      for (const pid of pids) {
+        const p = ctx.entities.get(pid);
+        if (!p || p.dead || dist2d({ x: zone.x, z: zone.z, y: 0 }, p.pos) > zone.radius) continue;
+        ctx.dealDamage(null, p, p.hp + p.maxHp, false, 'fire', 'Death Zone', 'hit', true);
+        riftFx(ctx, p.pos.x, p.pos.z, 'fire', 'nova');
+      }
+    }
+    inst.bossDeathZones = live;
+  }
+}
+
 /** Per-tick step-clock for any active rift-cache lockpick attempt (mirrors the
  * delve controller's per-tick tickLockpickTimeout). Cheap: only instances with a
  * live session do any work. */
@@ -1400,7 +1403,13 @@ export function updateRiftInstances(ctx: SimContext): void {
   // the earlier kill could lose the shared race.
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null || inst.bossDiedAtTick !== null || inst.bossId === null) continue;
-    if (ctx.entities.get(inst.bossId)?.dead) inst.bossDiedAtTick = ctx.tickCount;
+    if (ctx.entities.get(inst.bossId)?.dead) {
+      inst.bossDiedAtTick = ctx.tickCount;
+      // Clear any pending lethal death zones so a zone placed just before the
+      // killing blow cannot execute the winning party. Symmetric with the evade
+      // clear in locomotion.ts.
+      inst.bossDeathZones = [];
+    }
   }
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {

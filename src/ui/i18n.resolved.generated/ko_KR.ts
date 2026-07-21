@@ -912,14 +912,12 @@ export const ko_KR: EnTranslations = {
       "keybindHint": "탑승 / 하차 키를 눌러 탑승합니다.",
       "emptyTitle": "보유한 탈것 없음",
       "emptyStableHint": "20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.",
-      "emptyDropHint": "더 희귀한 탈것은 던전과 공격대 우두머리가 떨어뜨립니다.",
+      "emptyDropHint": "더 희귀한 탈것은 영웅 던전 우두머리나 균열 완료를 통해 얻을 수 있습니다.",
       "clickManage": "클릭하여 탈것 선택",
       "rarity_common": "일반",
       "rarity_rare": "희귀",
       "rarity_epic": "서사",
       "spec_speed": "+{pct}% 추가 기동력",
-      "spec_block": "+{pct}% 근접 피해 방어",
-      "spec_crit": "+{pct}% 치명타 확률",
       "name_valorsteed": "발러스티드",
       "name_grag_bear": "골리앗 그라그곰",
       "name_stalkglider_snail": "이끼껍질 활공달팽이",
@@ -941,7 +939,7 @@ export const ko_KR: EnTranslations = {
       "ridePrompt": "빛나는 표식을 따라 출발선으로 간 뒤 레이스 시작을 누르세요.",
       "begin": "수업 시작",
       "success": "발러스티드를 길들였다.",
-      "returnToMarla": "마구간의 마를라에게 돌아가 마구간 말을 입양하세요."
+      "returnToMarla": "마구간의 마를라에게 돌아가 발러스티드 고삐를 10골드에 구매하세요."
     },
     "mountRace": {
       "startButton": "레이스 시작",
@@ -4647,7 +4645,27 @@ export const ko_KR: EnTranslations = {
       "raceLostBanner": "이미 정복된 균열",
       "forgeUpgraded": "{name}의 균열 강화가 완료되었습니다.",
       "forgeEnchanted": "{name}의 균열 마법부여가 완료되었습니다.",
-      "forgeSocketed": "{name}에 균열 보석을 장착했습니다."
+      "forgeSocketed": "{name}에 균열 보석을 장착했습니다.",
+      "detonateGlacialGrave": "빙하의 무덤이 폭발합니다!",
+      "detonateAbsoluteZero": "절대 영도가 폭발합니다!",
+      "detonateMagmaWell": "마그마 우물이 분출합니다!",
+      "detonateCoreMeltdown": "핵심 용해가 폭발합니다!",
+      "detonateVenomPool": "독액 웅덩이가 분출합니다!",
+      "detonateBroodmothersMark": "여왕 거미의 낙인이 폭발합니다!",
+      "detonateSoulGrave": "영혼의 무덤이 폭발합니다!",
+      "detonateDeathSentence": "사망 선고가 내려집니다!",
+      "detonateEarthshatter": "대지 분쇄가 폭발합니다!",
+      "detonateFinalJudgment": "최후의 심판이 내립니다!",
+      "detonateVoidRift": "공허 균열이 폭발합니다!",
+      "detonateArcaneAnnihilation": "비전 소멸이 폭발합니다!",
+      "detonateLightningRod": "피뢰침이 번개를 내리칩니다!",
+      "detonateStormcallersWrath": "폭풍 소환사의 분노가 폭발합니다!",
+      "detonateAbyssalMaw": "심연의 아가리가 닫힙니다!",
+      "detonateCrushingDepth": "분쇄의 심연이 짓누릅니다!",
+      "detonatePactSeal": "서약 봉인이 폭발합니다!",
+      "detonateBloodRite": "피의 의식이 내려집니다!",
+      "detonatePitSentence": "구렁텅이 판결이 폭발합니다!",
+      "detonateHellfireBrand": "지옥불 낙인이 폭발합니다!"
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
@@ -6131,7 +6149,23 @@ export const ko_KR: EnTranslations = {
     "cast": {
       "fishing": "낚시",
       "demonHeal": "악마 치유",
-      "thunzharrStormcall": "폭풍의 부름"
+      "thunzharrStormcall": "폭풍의 부름",
+      "rift_frost_execution": "Glacial Grave",
+      "rift_frost_strike": "Absolute Zero",
+      "rift_ember_execution": "Magma Well",
+      "rift_ember_strike": "Core Meltdown",
+      "rift_venom_execution": "Venom Pool",
+      "rift_venom_strike": "Broodmother's Mark",
+      "rift_necro_execution": "Soul Grave",
+      "rift_necro_strike": "Death Sentence",
+      "rift_brute_execution": "Earthshatter",
+      "rift_brute_strike": "Final Judgment",
+      "rift_arcane_execution": "Void Rift",
+      "rift_arcane_strike": "Arcane Annihilation",
+      "rift_storm_execution": "Lightning Rod",
+      "rift_storm_strike": "Stormcaller's Wrath",
+      "rift_tide_execution": "Abyssal Maw",
+      "rift_tide_strike": "Crushing Depth"
     }
   },
   "questUi": {
@@ -9495,6 +9529,9 @@ export const ko_KR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "폭풍소환사의 허리보호구"
+      },
+      "riding_training": {
+        "name": "탑승 훈련"
       },
       "reins_valorsteed": {
         "name": "발러스티드의 고삐"

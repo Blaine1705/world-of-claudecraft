@@ -47,6 +47,13 @@ const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
 const AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
 
+// Combat-rating allowance for the ilvl-31 clear-time epics: one rating per piece.
+// Armor pieces follow the heroic ilvl-31 floor (ARMOR_RATING = 40 in heroic_loot.ts).
+// Jewelry (ring) follows the jewelry precedent (JEWELRY_RATING = 25 in heroic_vendor.ts).
+// Off the primary-stat budget like spellPower, so stat sums stay budget-enforced.
+const RIFT_ARMOR_RATING = 40; // 40 rating = 4.0%, mirrors the heroic ilvl-31 armor floor
+const RIFT_JEWELRY_RATING = 25; // 25 rating, matches heroic quartermaster jewelry precedent
+
 /** Static shells. The non-fungible payload carries each drop's source, power,
  * upgrades, enchantment, sockets, gems, and rolled bonus stats. */
 export const RIFT_ITEMS: Record<string, ItemDef> = {
@@ -120,8 +127,10 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     noMarketList: true,
   },
   // ---- Themed world-drop rares (one per rift environment) ----
-  // Stat lines sit a notch under the heroic five-man epics (heroic_loot.ts) and
-  // inside the rare-quality budget for their level-20-25 sources (item_budget.ts).
+  // Stat lines sit at the ilvl-26 rare budget (source 23 + rare bonus 3).
+  // ilvl-26 slot budgets (round(26 * 0.8 * slot_mult * 0.7)):
+  //   mainhand 1.0 = 15, chest 1.0 = 15, gloves 0.7 = 10,
+  //   shoulder 0.75 = 11, waist 0.7 = 10, feet 0.65 = 9, ring 0.6 = 9.
   hoarfrost_edge: {
     id: 'hoarfrost_edge',
     name: 'Hoarfrost Edge',
@@ -129,8 +138,9 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     requiredLevel: 20,
-    weapon: { min: 27, max: 40, speed: 2.4 },
-    stats: { str: 8, sta: 5 },
+    weapon: { min: 28, max: 42, speed: 2.4 },
+    // ilvl-26 mainhand rare budget = 15; str:10+sta:5 = 15
+    stats: { str: 10, sta: 5 },
     sellValue: 7500,
     requiredClass: HEAVY,
   },
@@ -142,7 +152,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 165, str: 7, sta: 4 },
+    // ilvl-26 gloves rare budget = 10; str:6+sta:4 = 10
+    stats: { armor: 165, str: 6, sta: 4 },
     sellValue: 5000,
     requiredClass: HEAVY,
   },
@@ -154,7 +165,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 165, agi: 8, sta: 6 },
+    // ilvl-26 chest rare budget = 15; agi:9+sta:6 = 15
+    stats: { armor: 165, agi: 9, sta: 6 },
     sellValue: 6000,
     requiredClass: AGILE_WILD,
   },
@@ -166,6 +178,7 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'rare',
     requiredLevel: 20,
+    // ilvl-26 shoulder rare budget = 11; int:7+spi:4 = 11
     stats: { armor: 38, int: 7, spi: 4 },
     sellValue: 5000,
     requiredClass: CASTER,
@@ -178,7 +191,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 140, str: 7, sta: 4 },
+    // ilvl-26 waist rare budget = 10; str:6+sta:4 = 10
+    stats: { armor: 140, str: 6, sta: 4 },
     sellValue: 5000,
     requiredClass: HEAVY,
   },
@@ -190,7 +204,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 42, int: 7, spi: 4 },
+    // ilvl-26 gloves rare budget = 10; int:6+spi:4 = 10
+    stats: { armor: 42, int: 6, spi: 4 },
     sellValue: 5000,
     requiredClass: CASTER,
   },
@@ -202,7 +217,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 85, agi: 7, sta: 3 },
+    // ilvl-26 feet rare budget = 9; agi:6+sta:3 = 9
+    stats: { armor: 85, agi: 6, sta: 3 },
     sellValue: 5000,
     requiredClass: AGILE,
   },
@@ -213,6 +229,7 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'rare',
     requiredLevel: 20,
+    // ilvl-26 ring rare budget = 9; sta:5+spi:4 = 9 (unchanged from ilvl-28: same budget)
     stats: { sta: 5, spi: 4 },
     sellValue: 5000,
   },
@@ -225,7 +242,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 55, int: 8, spi: 6 },
+    // ilvl-26 chest rare budget = 15; int:9+spi:6 = 15
+    stats: { armor: 55, int: 9, spi: 6 },
     sellValue: 6500,
     requiredClass: CASTER,
   },
@@ -237,15 +255,20 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     requiredLevel: 20,
     weapon: { min: 34, max: 50, speed: 2.9 },
+    // ilvl-26 mainhand rare budget = 15; str:9+sta:6 = 15
     stats: { str: 9, sta: 6 },
     sellValue: 8500,
     requiredClass: HEAVY,
   },
   // ---- Clear-time epics (B+ final-boss kills only; see addRiftClearGearLoot) ----
-  // Stat lines sit in the ilvl-31 band between the heroic five-man epics (26-28)
-  // and the raid variants (33/37), matching the A/S heroic-plus difficulty that
-  // gates them. No combat ratings: the rating ladder is a heroic/raid-set
-  // signature (combat_rating tests pin the per-ilvl ladder).
+  // Stat lines sit in the ilvl-31 band (source level 25 + epic bonus 6), registered
+  // in item_level.buildSourceIndex. Armor pieces carry RIFT_ARMOR_RATING = 40
+  // (matching the heroic ilvl-31 five-man floor). The ring follows the jewelry
+  // precedent (RIFT_JEWELRY_RATING = 25, matching heroic quartermaster rings).
+  // All ratings are off the primary-stat budget like spellPower so stat sums stay
+  // budget-enforced. Rating choices follow the stat identity: str/tank -> hit,
+  // agi -> crit, int/spi (healer-facing) -> haste (healers are not level-resisted).
+  // See heroic_loot.ts for the ilvl-31 armor template these mirror.
   emberforged_bulwark: {
     id: 'emberforged_bulwark',
     name: 'Emberforged Bulwark',
@@ -254,7 +277,9 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'epic',
     requiredLevel: 20,
+    // ilvl-31 chest epic budget = 22; str:13+sta:9 = 22
     stats: { armor: 360, str: 13, sta: 9 },
+    hitRating: RIFT_ARMOR_RATING,
     sellValue: 16000,
     requiredClass: HEAVY,
   },
@@ -266,7 +291,9 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     requiredLevel: 20,
+    // ilvl-31 helmet epic budget = 18; agi:11+sta:7 = 18
     stats: { armor: 118, agi: 11, sta: 7 },
+    critRating: RIFT_ARMOR_RATING,
     sellValue: 13000,
     requiredClass: AGILE_WILD,
   },
@@ -278,7 +305,9 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     requiredLevel: 20,
+    // ilvl-31 shoulder epic budget = 16; int:10+spi:6 = 16
     stats: { armor: 48, int: 10, spi: 6 },
+    hasteRating: RIFT_ARMOR_RATING,
     sellValue: 13000,
     requiredClass: CASTER,
   },
@@ -289,7 +318,12 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { sta: 7, spi: 5 },
+    // ilvl-31 ring epic budget = 13; sta:8+spi:5 = 13.
+    // Rating follows the jewelry precedent (25, not the 40 armor-piece floor).
+    // Haste suits the sta/spi (healer-facing) stat identity; healers are not
+    // resisted by level so Hit would be wasted.
+    stats: { sta: 8, spi: 5 },
+    hasteRating: RIFT_JEWELRY_RATING,
     sellValue: 12000,
   },
   // The one legendary chase item: an S-rank clear rolls a slim chance at it.

@@ -912,14 +912,12 @@ export const ru_RU: EnTranslations = {
       "keybindHint": "Нажмите клавишу «Сесть / Спешиться», чтобы поехать.",
       "emptyTitle": "Скакунов пока нет",
       "emptyStableHint": "Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.",
-      "emptyDropHint": "Более редких скакунов выбивают боссы подземелий и рейдов.",
+      "emptyDropHint": "Более редких скакунов выбивают боссы героических подземелий или получают за прохождение Разломов.",
       "clickManage": "Нажмите, чтобы выбрать транспорт",
       "rarity_common": "Обычный",
       "rarity_rare": "Редкий",
       "rarity_epic": "Эпический",
       "spec_speed": "+{pct}% к скорости передвижения",
-      "spec_block": "+{pct}% блока урона в ближнем бою",
-      "spec_crit": "+{pct}% к шансу критического удара",
       "name_valorsteed": "Доблестный скакун",
       "name_grag_bear": "Голиаф Граг-медведь",
       "name_stalkglider_snail": "Мохопанцирный скользень",
@@ -941,7 +939,7 @@ export const ru_RU: EnTranslations = {
       "ridePrompt": "Следуй за светящейся меткой к линии старта и нажми «Начать заезд».",
       "begin": "Начать урок",
       "success": "Ты приручил Доблестного скакуна.",
-      "returnToMarla": "Вернись к Марле в конюшни, чтобы взять себе конюшенную лошадь."
+      "returnToMarla": "Вернись к Марле в конюшни, чтобы купить поводья Доблестного скакуна за 10 золотых."
     },
     "mountRace": {
       "startButton": "Начать заезд",
@@ -4647,7 +4645,27 @@ export const ru_RU: EnTranslations = {
       "raceLostBanner": "Разлом уже закрыт",
       "forgeUpgraded": "Улучшение разлома завершено для {name}.",
       "forgeEnchanted": "Зачарование разлома завершено для {name}.",
-      "forgeSocketed": "Самоцвет разлома вставлен в {name}."
+      "forgeSocketed": "Самоцвет разлома вставлен в {name}.",
+      "detonateGlacialGrave": "Ледяная могила взрывается!",
+      "detonateAbsoluteZero": "Абсолютный ноль вырывается!",
+      "detonateMagmaWell": "Магматический колодец вырывается!",
+      "detonateCoreMeltdown": "Расплавление ядра взрывается!",
+      "detonateVenomPool": "Ядовитая лужа вырывается!",
+      "detonateBroodmothersMark": "Метка паучьей матки взрывается!",
+      "detonateSoulGrave": "Могила душ взрывается!",
+      "detonateDeathSentence": "Смертный приговор падает!",
+      "detonateEarthshatter": "Разрушитель земли взрывается!",
+      "detonateFinalJudgment": "Окончательный приговор обрушивается!",
+      "detonateVoidRift": "Разлом пустоты взрывается!",
+      "detonateArcaneAnnihilation": "Тайное уничтожение вырывается!",
+      "detonateLightningRod": "Громоотвод разит молнией!",
+      "detonateStormcallersWrath": "Гнев призывателя бурь вырывается!",
+      "detonateAbyssalMaw": "Пасть бездны сжимается!",
+      "detonateCrushingDepth": "Сокрушающая глубина давит!",
+      "detonatePactSeal": "Печать пакта взрывается!",
+      "detonateBloodRite": "Кровавый обряд падает!",
+      "detonatePitSentence": "Приговор ямы взрывается!",
+      "detonateHellfireBrand": "Адское клеймо взрывается!"
     },
     "delve": {
       "cannotEnterNow": "Сейчас вы не можете войти в вылазку.",
@@ -6131,7 +6149,23 @@ export const ru_RU: EnTranslations = {
     "cast": {
       "fishing": "Рыбная ловля",
       "demonHeal": "Исцеление демона",
-      "thunzharrStormcall": "Зов бури"
+      "thunzharrStormcall": "Зов бури",
+      "rift_frost_execution": "Glacial Grave",
+      "rift_frost_strike": "Absolute Zero",
+      "rift_ember_execution": "Magma Well",
+      "rift_ember_strike": "Core Meltdown",
+      "rift_venom_execution": "Venom Pool",
+      "rift_venom_strike": "Broodmother's Mark",
+      "rift_necro_execution": "Soul Grave",
+      "rift_necro_strike": "Death Sentence",
+      "rift_brute_execution": "Earthshatter",
+      "rift_brute_strike": "Final Judgment",
+      "rift_arcane_execution": "Void Rift",
+      "rift_arcane_strike": "Arcane Annihilation",
+      "rift_storm_execution": "Lightning Rod",
+      "rift_storm_strike": "Stormcaller's Wrath",
+      "rift_tide_execution": "Abyssal Maw",
+      "rift_tide_strike": "Crushing Depth"
     }
   },
   "questUi": {
@@ -9495,6 +9529,9 @@ export const ru_RU: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Поясная защита призывателя бурь"
+      },
+      "riding_training": {
+        "name": "Обучение верховой езде"
       },
       "reins_valorsteed": {
         "name": "Поводья Доблестного скакуна"
