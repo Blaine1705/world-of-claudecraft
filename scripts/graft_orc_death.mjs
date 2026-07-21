@@ -9,7 +9,7 @@
 // Default is check mode: the skeletons are compared and a validation table is
 // printed, but nothing is written. --write performs the graft, and ONLY when the
 // retargeted rig is structurally identical to the shipped rig (same joint set,
-// same node hierarchy by name) — a name-remapped graft across different skeletons
+// same node hierarchy by name), a name-remapped graft across different skeletons
 // would produce garbage motion, so the script refuses and exits non-zero.
 //
 // Current reality (2026-07): the shipped orc GLBs use the original Tripo
@@ -84,7 +84,7 @@ function clipDuration(anim) {
 }
 
 // Translation range of the named node across a clip (null when the clip has no
-// translation channel for it — the retargets are rotation-only, inPlace:true).
+// translation channel for it, the retargets are rotation-only, inPlace:true).
 function translationRange(anim, nodeName) {
   for (const channel of anim.listChannels()) {
     if (channel.getTargetNode()?.getName() !== nodeName) continue;
@@ -110,7 +110,7 @@ function translationRange(anim, nodeName) {
 }
 
 // Max angular deviation (radians) from the first keyframe on the named node's
-// rotation channel — a rig-agnostic "does the joint really move" diff metric.
+// rotation channel, a rig-agnostic "does the joint really move" diff metric.
 function rotationSwing(anim, nodeName) {
   for (const channel of anim.listChannels()) {
     if (channel.getTargetNode()?.getName() !== nodeName) continue;
@@ -257,7 +257,7 @@ for (const orc of ORCS) {
   const identical = skeletonsIdentical(origSig, newSig);
 
   // Diff metric: hip-node motion, old synthesized topple vs the real
-  // retargeted fall (each in its own rig's local units — the shipped armature
+  // retargeted fall (each in its own rig's local units, the shipped armature
   // is 0.01-scale; the retargets are rotation-only, hence the swing metric).
   const synthHipT = synthDeath ? translationRange(synthDeath, 'mixamorig:Hips') : null;
   const synthHipR = synthDeath ? rotationSwing(synthDeath, 'mixamorig:Hips') : null;
@@ -280,7 +280,7 @@ for (const orc of ORCS) {
     row.reason =
       `skeleton mismatch (orig ${origSig.nodeCount} nodes/${origSig.joints.length} joints ` +
       `vs retargeted ${newSig.nodeCount} nodes/${newSig.joints.length} joints; ` +
-      'mixamorig:* vs Tripo biped names) — graft would need a re-rig';
+      'mixamorig:* vs Tripo biped names), graft would need a re-rig';
     refused++;
     continue;
   }

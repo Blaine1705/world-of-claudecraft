@@ -233,7 +233,7 @@ const BIPED14: ClipMap = {
 // A real Tripo death retarget exists (scripts/reanim_orc_death.mjs artifacts
 // under tmp/asset_pipeline/reanim_orc_death_*_orc/), but it targets Tripo's
 // 41-joint biped rig (Hip/Waist/Pelvis/...) after a full re-rig, not the
-// shipped 22-joint mixamorig:* skeleton — scripts/graft_orc_death.mjs verifies
+// shipped 22-joint mixamorig:* skeleton, scripts/graft_orc_death.mjs verifies
 // the mismatch and refuses to graft, so the synthesized clips remain.
 const ORC_TRIPO: ClipMap = {
   idle: 'Idle_Loop',
