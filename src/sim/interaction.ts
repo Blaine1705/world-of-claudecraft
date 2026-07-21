@@ -62,6 +62,8 @@ import {
 } from './types';
 import { markWorldBossLooted } from './world_boss';
 
+const LOCKPICK_OFFER_COOLDOWN = 4; // seconds between repeated rift_locked_chest offer emits per player
+
 // Shared corpse loot-rights snapshot for both the manual `lootCorpse` and the passive
 // walk-by `autoLootForParty`. The caller passes `ffaUnlocked` so the two paths can
 // diverge on the free-for-all rule: manual looting honors the FFA timer (a deliberate
@@ -456,7 +458,11 @@ export function interact(ctx: SimContext, pid?: number): void {
         }
         if (target.templateId === 'rift_locked_chest') {
           // Offer the ante selector; the pick itself runs via lockpick_engage.
-          ctx.emit({ type: 'lockpickOffer', objectId: target.id, bountiful: false, pid: p.id });
+          // Rate-limited per player so repeated F-key spam does not re-open the UI.
+          if (ctx.time >= (p.riftLockpickOfferAt ?? -Infinity) + LOCKPICK_OFFER_COOLDOWN) {
+            p.riftLockpickOfferAt = ctx.time;
+            ctx.emit({ type: 'lockpickOffer', objectId: target.id, bountiful: false, pid: p.id });
+          }
           return;
         }
         if (target.templateId === 'rift_treasure') {
@@ -529,7 +535,10 @@ export function interact(ctx: SimContext, pid?: number): void {
       return;
     }
     if (obj.templateId === 'rift_locked_chest') {
-      ctx.emit({ type: 'lockpickOffer', objectId: obj.id, bountiful: false, pid: p.id });
+      if (ctx.time >= (p.riftLockpickOfferAt ?? -Infinity) + LOCKPICK_OFFER_COOLDOWN) {
+        p.riftLockpickOfferAt = ctx.time;
+        ctx.emit({ type: 'lockpickOffer', objectId: obj.id, bountiful: false, pid: p.id });
+      }
       return;
     }
     if (obj.templateId === 'rift_treasure') {

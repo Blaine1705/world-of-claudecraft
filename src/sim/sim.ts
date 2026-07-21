@@ -2047,6 +2047,7 @@ export class Sim {
         tier: null,
         portalId: null,
         rewarded: false,
+        seqResetAt: -Infinity,
       });
     }
 

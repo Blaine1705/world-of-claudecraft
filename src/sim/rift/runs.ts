@@ -49,6 +49,7 @@ const SEQ_TRIGGER_RADIUS = 2.6; // walk this close to step a sequence rune
 const ORB_TRIGGER_RADIUS = 3.2;
 const ORB_NOTICE_COOLDOWN = 6; // seconds between "the orb is sealed" nudges
 const SEQ_RESET_NOTICE_COOLDOWN = 4; // seconds between "the runes go dark" reset notices
+const POOL_FULL_NOTICE_COOLDOWN = 4; // seconds between "all rifts are unstable" / "already cleared" denials on walk-in
 const BOULDER_PUSH_RADIUS = 2.0; // shove a boulder when this close and moving into it
 const PAD_RADIUS = 2.2; // a boulder counts as socketed within this of its pad
 const ICE_SLIDE_SPEED = 13; // yd/s glide across the ice (~1.85x run: frictionless momentum)
@@ -248,6 +249,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.boulderPads = [];
   inst.seqRuneIds = [];
   inst.seqStep = 0;
+  inst.seqResetAt = -Infinity;
   inst.beaconId = null;
   inst.rollerIds = [];
   inst.cacheId = null;
@@ -403,6 +405,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.boulderPads = [];
   inst.seqRuneIds = [];
   inst.seqStep = 0;
+  inst.seqResetAt = -Infinity;
   inst.beaconId = null;
   inst.rollerIds = [];
   inst.cacheId = null;
@@ -478,8 +481,11 @@ export function enterRift(
   if (eventId !== null) {
     const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
     if (!event || event.status === 'cleared' || event.status === 'collapsed') {
-      const winner = event?.firstClear?.memberNames.join(', ') || 'another party';
-      ctx.error(r.meta.entityId, `This rift has already been cleared by ${winner}.`);
+      if (ctx.time >= (r.e.riftPoolFullAt ?? -Infinity) + POOL_FULL_NOTICE_COOLDOWN) {
+        r.e.riftPoolFullAt = ctx.time;
+        const winner = event?.firstClear?.memberNames.join(', ') || 'another party';
+        ctx.error(r.meta.entityId, `This rift has already been cleared by ${winner}.`);
+      }
       return;
     }
     if (event.upgradeStatus === 'pending') event.upgradeStatus = 'fallback';
@@ -501,7 +507,10 @@ export function enterRift(
   if (!inst) {
     const free = ctx.riftInstances.find((i) => i.partyKey === null);
     if (!free) {
-      ctx.error(r.meta.entityId, 'All rifts are unstable right now. Try again soon.');
+      if (ctx.time >= (r.e.riftPoolFullAt ?? -Infinity) + POOL_FULL_NOTICE_COOLDOWN) {
+        r.e.riftPoolFullAt = ctx.time;
+        ctx.error(r.meta.entityId, 'All rifts are unstable right now. Try again soon.');
+      }
       return;
     }
     inst = free;
@@ -844,9 +853,9 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
               if (rr) rr.templateId = 'rift_seq_rune';
             }
           }
-          const throttled = ctx.time < (p.riftSeqResetAt ?? -Infinity) + SEQ_RESET_NOTICE_COOLDOWN;
+          const throttled = ctx.time < inst.seqResetAt + SEQ_RESET_NOTICE_COOLDOWN;
           if (hadProgress || !throttled) {
-            p.riftSeqResetAt = ctx.time;
+            inst.seqResetAt = ctx.time;
             riftFx(ctx, rune.pos.x, rune.pos.z, 'shadow'); // the runes snuff out
             for (const pid of instancePlayerIds(ctx, inst)) {
               ctx.emit({
