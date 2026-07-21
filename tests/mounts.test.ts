@@ -1045,3 +1045,45 @@ describe('pre-armed auto-attack while mounted (Fix #3)', () => {
     expect(e.mountKey).toBe('');
   });
 });
+
+describe('summon completion strips forms that slipped through mid-channel (Fix #2B)', () => {
+  it('strips a bear form aura that was gained during the summon channel at completion', () => {
+    // Arrange: a druid starts a mount summon, then we inject a bear form aura
+    // directly (simulating a form that slipped through during the 1.5s channel).
+    // At channel completion, updateMountTransition must call cancelFormsAndGhostWolf
+    // so the player is never simultaneously mounted and shapeshifted.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('druid', 'Ursatest');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    const e = sim.entities.get(pid)!;
+
+    // Start the summon channel.
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    expect(e.mountCastKey).toBe('valorsteed');
+
+    // Inject a bear form aura mid-channel (simulates a form cast during the 1.5s window).
+    e.auras.push({
+      id: 'bear_form',
+      name: 'Bruin Form',
+      kind: 'form_bear',
+      remaining: 3600,
+      duration: 3600,
+      value: 1,
+      sourceId: pid,
+      school: 'physical',
+    });
+    expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+
+    // Act: complete the summon channel (drives updateMountTransition to completion).
+    finishTransition(sim, pid);
+
+    // Assert: the player is mounted AND the form is gone.
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(false);
+  });
+});

@@ -293,6 +293,10 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
         meta &&
         (mountOwned(meta, target) || trainingSummon(meta, target))
       ) {
+        // Strip any form that slipped through during the channel (e.g. instant
+        // shapeshifts cast while channeling), so the player is never
+        // simultaneously mounted and shapeshifted at completion.
+        cancelFormsAndGhostWolf(ctx, e);
         e.mountKey = target;
       }
       // A summon whose reins vanished mid-channel leaves the player unmounted.
