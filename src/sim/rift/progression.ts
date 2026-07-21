@@ -7,6 +7,7 @@ import {
   RIFT_ESSENCE_ITEM_ID,
   RIFT_GEM_IDS,
   RIFT_LEGENDARY_ITEM_ID,
+  RIFT_RARE_ITEM_IDS,
   type RiftGemId,
 } from '../content/rift/items';
 import { ITEMS } from '../data';
@@ -171,23 +172,24 @@ export function createRiftGearInstance(
 }
 
 // Clear-time epic/legendary odds per rank. Economy rationale: these land ONLY
-// on a completed final-boss kill (never a static loot table), so nothing below
-// B pays epics, a C farm cannot mint them, and the cadence is bound by the
-// ranked portal spawns. B tastes the tier, A guarantees one epic for the
-// heroic-scaled effort, S guarantees one with a real shot at a second, plus
+// on a completed final-boss kill (never a static loot table), so a C farm can
+// never mint epics (it gets a guaranteed rare instead), and the cadence is
+// bound by the ranked portal spawns. B now guarantees one epic, matching the
+// heroic five-man floor for a rank that carries the same heroic stat transform.
+// A guarantees one epic; S guarantees one with a real shot at a second, plus
 // the game's one legendary chase roll.
-const RIFT_EPIC_CHANCE_B = 0.15;
+const RIFT_EPIC_CHANCE_B = 1.0; // guaranteed: B carries heroic stat transform
 const RIFT_SECOND_EPIC_CHANCE_S = 0.35;
 const RIFT_LEGENDARY_CHANCE_S = 0.04;
 
 // Clear-time coin bonuses by rank (added on top of the static boss coin, which
-// stays rank-invariant). C clears pay no bonus; B tastes a small windfall; A/S
-// scale toward the Korzul (50 000c) and Nythraxis (150 000c) benchmarks.
+// stays rank-invariant). C gets a normal-dungeon-scale bonus; B tastes a small
+// windfall; A/S scale toward the Korzul (50 000c) and Nythraxis benchmarks.
 // Named constants so balance tuning stays in one place.
-export const RIFT_COIN_BONUS_C = 0; // C gets no clear-time coin bonus
+export const RIFT_COIN_BONUS_C = 10_000; // 10 000c: mirrors normal-dungeon economy
 export const RIFT_COIN_BONUS_B = 10_000; // 10 000c (10 silver)
 export const RIFT_COIN_BONUS_A = 35_000; // 35 000c (35 silver)
-export const RIFT_COIN_BONUS_S = 50_000; // 50 000c, matches Korzul Heroic peak
+export const RIFT_COIN_BONUS_S = 50_000; // 50 000c, matches Korzul Heroic peak (per-capita: 5-player vs 10-player)
 
 // Blue (rare) mount reins that roll on A or S clears. A 0.6% independent roll
 // picks one of these two at random; they are appended AFTER all gear draws so
@@ -209,17 +211,30 @@ export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
  * the rank derived from the descriptor baseLevel.
  *
  * Draw order (APPEND-ONLY; inserting before any existing draw breaks parity):
- *   1. B: optional epic gear roll (RIFT_EPIC_CHANCE_B)
+ *   0. C: guaranteed rare from RIFT_RARE_ITEM_IDS pool (rng.int pick)
+ *   1. B: guaranteed epic gear (RIFT_EPIC_CHANCE_B = 1.0, preserves rng draw)
  *   2. A/S: guaranteed first epic gear (rng.int pick)
  *   3. S: optional second epic gear (RIFT_SECOND_EPIC_CHANCE_S)
  *   4. S: optional legendary gear (RIFT_LEGENDARY_CHANCE_S)
  *   5. A/S: optional blue mount (RIFT_BLUE_MOUNT_CHANCE + rng.int pick)
  *   6. S: optional epic mount (RIFT_EPIC_MOUNT_CHANCE + rng.int pick)
+ *
+ * B/A/S draws are unaffected by the new C draw (C returns after draw 0).
  */
 export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: number): void {
   const rank = riftRankForBaseLevel(baseLevel);
-  if (rank === 'C') return;
   const loot = boss.loot ?? { copper: 0, items: [] };
+
+  // --- Draw 0: C-rank guaranteed rare + coin (normal-tier payout; exits here) ---
+  if (rank === 'C') {
+    const rare = RIFT_RARE_ITEM_IDS[ctx.rng.int(0, RIFT_RARE_ITEM_IDS.length - 1)];
+    loot.items.push({ itemId: rare, count: 1 });
+    loot.copper = (loot.copper ?? 0) + RIFT_COIN_BONUS_C;
+    boss.loot = loot;
+    boss.lootable = true;
+    return;
+  }
+
   const epic = (): string => RIFT_EPIC_ITEM_IDS[ctx.rng.int(0, RIFT_EPIC_ITEM_IDS.length - 1)];
 
   // --- Draws 1-4: clear-time gear (existing order preserved for parity) ---

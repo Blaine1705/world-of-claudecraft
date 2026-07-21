@@ -46,7 +46,7 @@ export const RIFT_TIER_INFO: Record<
   RiftTier,
   { baseLevel: number; marks: number; raceMarks: number; color: number }
 > = {
-  C: { baseLevel: RIFT_RANK_BASE_LEVEL.C, marks: 1, raceMarks: 1, color: RIFT_TIER_COLORS.C },
+  C: { baseLevel: RIFT_RANK_BASE_LEVEL.C, marks: 0, raceMarks: 0, color: RIFT_TIER_COLORS.C },
   B: { baseLevel: RIFT_RANK_BASE_LEVEL.B, marks: 2, raceMarks: 1, color: RIFT_TIER_COLORS.B },
   A: { baseLevel: RIFT_RANK_BASE_LEVEL.A, marks: 3, raceMarks: 2, color: RIFT_TIER_COLORS.A },
   S: { baseLevel: RIFT_RANK_BASE_LEVEL.S, marks: 4, raceMarks: 3, color: RIFT_TIER_COLORS.S },
