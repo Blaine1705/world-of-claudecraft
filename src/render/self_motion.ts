@@ -326,10 +326,12 @@ export class SelfMotionPredictor {
     // Mount speed reads the entity mirror (player_motion.moveSpeedMult), so a
     // mid-session mount/dismount must reach the scratch actor the same frame.
     actor.mountKey = self.mountKey;
-    // The kernel roots movement while a mount summon/dismount is in flight
-    // (mountCastRemaining > 0); borrow it too so the online display roots in
-    // lockstep with the server instead of predicting a forbidden step.
+    // The kernel roots movement while a mount summon channel is in flight
+    // (mountCastRemaining > 0 with a non-empty mountCastKey); borrow both so the
+    // online display roots in lockstep with the server. A dismount channel
+    // (mountCastKey === '') does not root movement and is move-cancelable.
     actor.mountCastRemaining = self.mountCastRemaining;
+    actor.mountCastKey = self.mountCastKey;
 
     // Fixed-step advance with the held intent. Turn flags are stripped: the
     // heading is assigned from the one display source each step, and letting
