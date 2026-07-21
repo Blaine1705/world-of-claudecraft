@@ -3129,6 +3129,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   mntLesson: 'mountLessonActive',
   mntOwn: 'ownedMounts',
   mntRace: 'mountRaceView',
+  mntRtd: 'ridingTrained',
   mntSel: 'selectedMount',
   mres: 'maxResource',
   mst: 'activeMobileStationCraft',
@@ -3512,6 +3513,7 @@ describe('full self-state snapshot delta fixture', () => {
       clearedMask: 3,
       cleared: 2,
     });
+    expect(client.ridingTrained()).toBe(true); // mntRtd -> ridingTrained
     expect(client.partyInfo).not.toBeNull(); // party -> partyInfo
     expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
     expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()
@@ -3758,6 +3760,7 @@ describe('delta-key contract pins (anti-drift)', () => {
       dstats: 'deedStats',
       mntLesson: 'mountLessonActive',
       mntRace: 'mountRaceView',
+      mntRtd: 'ridingTrained',
       mntSel: 'selectedMount',
     };
     for (const [terse, iworld] of Object.entries(required)) {
