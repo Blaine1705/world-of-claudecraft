@@ -9298,7 +9298,7 @@ export const ru_RU: EnTranslations = {
         "name": "Поясная защита призывателя бурь"
       },
       "riding_training": {
-        "name": "Riding Training"
+        "name": "Обучение верховой езде"
       },
       "reins_valorsteed": {
         "name": "Поводья Доблестного скакуна"

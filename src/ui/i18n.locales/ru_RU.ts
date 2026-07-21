@@ -7430,6 +7430,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.sister_nhalia_choir_plate.name': 'Хоровая Кованая Броня Сестры Нхалии',
   'entities.items.drowned_choir_fang.name': 'Клык Утопшего Хора',
   'entities.items.reins_grag_bear.name': 'Поводья Голиафа Граг-медведя',
+  'entities.items.riding_training.name': 'Обучение верховой езде',
   'entities.items.reins_valorsteed.name': 'Поводья Доблестного скакуна',
   'entities.items.reins_stalkglider_snail.name': 'Поводья мохопанцирного скользня',
   'entities.items.reins_aether_hover_cycle.name':

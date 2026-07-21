@@ -11018,7 +11018,7 @@ export const en: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Riding Lessons",
-        "text": "You have learned your Riding, now show me you deserve it. When I give the word, call the training Valorsteed and climb aboard. Ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the course is yours. Wander out of the paddock and we start over.",
+        "text": "You have learned your Riding, {playerName}, now show me you deserve it. When I give the word, call the training Valorsteed and climb aboard. Ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the course is yours. Wander out of the paddock and we start over.",
         "completion": "Up in one clean motion and a steady seat at the top. Well ridden, {playerName}. You have earned the rank of rider. Speak to me again to buy your own Valorsteed reins.",
         "objectives": {
           "0": {

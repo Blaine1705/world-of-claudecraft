@@ -2921,6 +2921,9 @@ describe('online mount command and race-event transport', () => {
     sim.setPlayerLevel(20, actor.pid);
     sim.setPlayerLevel(20, other.pid);
     sim.addItem('reins_grag_bear', 1, actor.pid);
+    // Riding is a purchased skill now; the transport fixture buys past the gate.
+    actorMeta.ridingTrained = true;
+    otherMeta.ridingTrained = true;
 
     // Drive the real ClientWorld command adapter. The select payload is the
     // fragile arm: both the command token and the `mount` field must arrive
@@ -3064,6 +3067,7 @@ const ALL_DELTA_KEYS = [
   'mntLesson',
   'mntOwn',
   'mntRace',
+  'mntRtd',
   'mntSel',
   'mst',
   'ncd',
@@ -3259,6 +3263,7 @@ function dirtyEveryDeltaField(): {
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', rows: {} };
   meta.selectedMount = 'grag_bear';
+  meta.ridingTrained = true; // dirties mntRtd (the purchased riding skill)
   meta.mountTraining = {
     sessionId: 'mt_wire_fixture',
     ownerId: lp,
@@ -3715,9 +3720,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 54 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(54);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(54);
+  it('ALL_DELTA_KEYS contains exactly 55 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(55);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(55);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3729,7 +3734,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(54);
+    expect(scraped.size).toBe(55); // +1: mntRtd (the purchased riding skill)
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

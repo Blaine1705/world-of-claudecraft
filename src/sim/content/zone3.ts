@@ -1925,7 +1925,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Riding Lessons',
     giverNpcId: 'stablemaster_marla',
     turnInNpcId: 'stablemaster_marla',
-    text: 'You have learned your Riding, now show me you deserve it. When I give the word, call the training Valorsteed and climb aboard. Ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the course is yours. Wander out of the paddock and we start over.',
+    text: 'You have learned your Riding, $N, now show me you deserve it. When I give the word, call the training Valorsteed and climb aboard. Ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the course is yours. Wander out of the paddock and we start over.',
     completionText:
       'Up in one clean motion and a steady seat at the top. Well ridden, $N. You have earned the rank of rider. Speak to me again to buy your own Valorsteed reins.',
     objectives: [

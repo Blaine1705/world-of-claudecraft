@@ -3467,7 +3467,6 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "zh_CN": [
-    "entities.items.riding_training.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
@@ -3475,7 +3474,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.skillValue"
   ],
   "zh_TW": [
-    "entities.items.riding_training.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
@@ -3483,7 +3481,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.skillValue"
   ],
   "ko_KR": [
-    "entities.items.riding_training.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
@@ -3491,7 +3488,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.skillValue"
   ],
   "ja_JP": [
-    "entities.items.riding_training.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",
@@ -4075,7 +4071,6 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "ru_RU": [
-    "entities.items.riding_training.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.mountRace.go",

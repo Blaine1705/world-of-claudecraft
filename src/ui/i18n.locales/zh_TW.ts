@@ -6965,6 +6965,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.sister_nhalia_choir_plate.name': '娜哈莉亞修女的唱詩鍛甲',
   'entities.items.drowned_choir_fang.name': '溺水唱詩獠牙',
   'entities.items.reins_grag_bear.name': '歌利亞格拉格巨熊的韁繩',
+  'entities.items.riding_training.name': '騎術訓練',
   'entities.items.reins_valorsteed.name': '英勇戰馬的韁繩',
   'entities.items.reins_stalkglider_snail.name': '苔殼滑行蝸牛的韁繩',
   'entities.items.reins_aether_hover_cycle.name': '點火鑰匙：乙太騎士懸浮機車',

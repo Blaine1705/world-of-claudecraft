@@ -7310,6 +7310,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.sister_nhalia_choir_plate.name': 'ナリア修道女の聖歌鍛造鎧',
   'entities.items.drowned_choir_fang.name': '溺れた聖歌の牙',
   'entities.items.reins_grag_bear.name': 'ゴリアテ・グラグベアの手綱',
+  'entities.items.riding_training.name': '騎乗訓練',
   'entities.items.reins_valorsteed.name': 'ヴァロースティードの手綱',
   'entities.items.reins_stalkglider_snail.name': 'モスシェル・ストークグライダーの手綱',
   'entities.items.reins_aether_hover_cycle.name': '起動キー：エーテルジャウスター・ホバーサイクル',

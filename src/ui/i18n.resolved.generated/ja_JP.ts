@@ -9298,7 +9298,7 @@ export const ja_JP: EnTranslations = {
         "name": "嵐呼びの腰当て"
       },
       "riding_training": {
-        "name": "Riding Training"
+        "name": "騎乗訓練"
       },
       "reins_valorsteed": {
         "name": "ヴァロースティードの手綱"

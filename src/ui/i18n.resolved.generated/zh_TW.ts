@@ -9298,7 +9298,7 @@ export const zh_TW: EnTranslations = {
         "name": "喚雷者腰甲"
       },
       "riding_training": {
-        "name": "Riding Training"
+        "name": "騎術訓練"
       },
       "reins_valorsteed": {
         "name": "英勇戰馬的韁繩"

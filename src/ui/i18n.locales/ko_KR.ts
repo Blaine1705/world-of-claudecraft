@@ -7294,6 +7294,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sister_nhalia_choir_plate.name': '나할리아 수녀의 성가 단조 판금',
   'entities.items.drowned_choir_fang.name': '익사한 성가대의 송곳니',
   'entities.items.reins_grag_bear.name': '골리앗 그라그곰의 고삐',
+  'entities.items.riding_training.name': '탑승 훈련',
   'entities.items.reins_valorsteed.name': '발러스티드의 고삐',
   'entities.items.reins_stalkglider_snail.name': '이끼껍질 활공달팽이의 고삐',
   'entities.items.reins_aether_hover_cycle.name': '시동 열쇠: 에테르 기사 호버사이클',
