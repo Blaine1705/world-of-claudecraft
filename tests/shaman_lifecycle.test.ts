@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { depositMendingCurrent, mendingCurrent } from '../src/sim/combat/shaman_spiritmend';
+import {
+  FLOW_STATE_PROGRESS_ID,
+  FLOW_STATE_READY_ID,
+  SHAMAN_TALENT_STATE_DURATION,
+} from '../src/sim/combat/shaman_talents';
 import { addThunderCharges, THUNDER_CHARGES_ID } from '../src/sim/combat/shaman_thundercall';
 import {
   applyStoneboundWardSmoothing,
@@ -27,6 +32,32 @@ function effectiveArmor(sim: Sim, entity: Entity): number {
 }
 
 describe('Shaman v0.29 state lifecycle', () => {
+  it('clears Flow State progress and ready state when changing specialization', () => {
+    const sim = new Sim({ seed: 2840, playerClass: 'shaman' });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('elemental')).toBe(true);
+    for (const id of [FLOW_STATE_PROGRESS_ID, FLOW_STATE_READY_ID]) {
+      sim.player.auras.push({
+        id,
+        name: 'Flow State',
+        kind: 'internal_cd',
+        value: id === FLOW_STATE_PROGRESS_ID ? 80 : 0,
+        remaining: SHAMAN_TALENT_STATE_DURATION,
+        duration: SHAMAN_TALENT_STATE_DURATION,
+        sourceId: sim.player.id,
+        school: 'nature',
+      });
+    }
+
+    expect(sim.setSpec('restoration')).toBe(true);
+
+    expect(
+      sim.player.auras.some(
+        (aura) => aura.id === FLOW_STATE_PROGRESS_ID || aura.id === FLOW_STATE_READY_ID,
+      ),
+    ).toBe(false);
+  });
+
   it('clears every foreign spec engine on authoritative spec changes', () => {
     const sim = new Sim({ seed: 2841, playerClass: 'shaman' });
     sim.setPlayerLevel(20);

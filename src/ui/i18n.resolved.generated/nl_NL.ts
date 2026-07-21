@@ -7039,11 +7039,11 @@ export const nl_NL: EnTranslations = {
       },
       "galeheart_weapon": {
         "name": "Galeheart Weapon",
-        "description": "Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast."
+        "description": "Imbues your weapons for 30 min. Every third landed weapon attack echoes twice and arms Stormcast."
       },
       "lifespring_weapon": {
         "name": "Lifespring Weapon",
-        "description": "Imbues your weapon with living water, increasing Mending Current deposits by 20%."
+        "description": "Imbues your weapon for 30 min, increasing Mending Current deposits by 20%."
       },
       "primal_exaltation": {
         "name": "Primal Exaltation",

@@ -3925,13 +3925,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'imbue', bonus: 5, duration: 300 }],
+    effects: [{ type: 'imbue', bonus: 5, duration: 1800 }],
     ranks: [
-      { rank: 2, level: 8, cost: 30, effects: [{ type: 'imbue', bonus: 9, duration: 300 }] },
-      { rank: 3, level: 16, cost: 45, effects: [{ type: 'imbue', bonus: 14, duration: 300 }] },
+      { rank: 2, level: 8, cost: 30, effects: [{ type: 'imbue', bonus: 9, duration: 1800 }] },
+      { rank: 3, level: 16, cost: 45, effects: [{ type: 'imbue', bonus: 14, duration: 1800 }] },
     ],
-    description:
-      'Imbues your weapon with the fury of stone: each swing deals $d additional damage for 5 min.',
+    description: 'Imbues your weapon for 30 min. Each swing deals $d additional damage.',
   },
   galeheart_weapon: {
     id: 'galeheart_weapon',
@@ -3945,9 +3944,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'imbue', bonus: 0, duration: 300 }],
+    effects: [{ type: 'imbue', bonus: 0, duration: 1800 }],
     description:
-      'Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast.',
+      'Imbues your weapons for 30 min. Every third landed weapon attack echoes twice and arms Stormcast.',
   },
   lifespring_weapon: {
     id: 'lifespring_weapon',
@@ -3961,9 +3960,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'imbue', bonus: 0, duration: 300 }],
-    description:
-      'Imbues your weapon with living water, increasing Mending Current deposits by 20%.',
+    effects: [{ type: 'imbue', bonus: 0, duration: 1800 }],
+    description: 'Imbues your weapon for 30 min, increasing Mending Current deposits by 20%.',
   },
   // Restoration Shaman signature, granted only by the Spiritmend spec.
   chain_heal: {
@@ -4146,12 +4144,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'fire',
     requiresTarget: false,
-    effects: [{ type: 'imbue', bonus: 8, duration: 300 }],
+    effects: [{ type: 'imbue', bonus: 8, duration: 1800 }],
     ranks: [
-      { rank: 2, level: 18, cost: 40, effects: [{ type: 'imbue', bonus: 13, duration: 300 }] },
+      { rank: 2, level: 18, cost: 40, effects: [{ type: 'imbue', bonus: 13, duration: 1800 }] },
     ],
-    description:
-      'Imbues your weapon with elemental fire: each swing deals $d additional Fire damage for 5 min.',
+    description: 'Imbues your weapon for 30 min. Each swing deals $d additional Fire damage.',
   },
   frost_shock: {
     id: 'frost_shock',

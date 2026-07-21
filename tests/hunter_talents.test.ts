@@ -287,7 +287,19 @@ describe('Hunter v0.29 choice-row mechanics', () => {
       sim.castAbility('aimed_shot');
       advance(sim, 3);
       ready(sim, 'aimed_shot');
+      expect(
+        sim.player.auras.filter((aura) => aura.id === 'hunter_overdraw_counter'),
+        `Overdraw tracker after spender ${cast}`,
+      ).toHaveLength(1);
     }
+    const tracker = sim.player.auras.find((aura) => aura.id === 'hunter_overdraw_counter');
+    expect(tracker).toBeDefined();
+    if (!tracker) throw new Error('missing Overdraw tracker');
+    tracker.remaining = 0.01;
+    sim.tick();
+    expect(sim.player.auras.filter((aura) => aura.id === 'hunter_overdraw_counter')).toHaveLength(
+      1,
+    );
     expect(sim.resolvedAbility('aimed_shot')?.hunterOverdraw).toBe(true);
   });
 

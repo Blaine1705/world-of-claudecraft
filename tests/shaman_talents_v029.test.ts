@@ -174,6 +174,19 @@ describe('Shaman v0.29 talent grid', () => {
     expect(flow.player.auras.some((aura) => aura.id === FLOW_STATE_READY_ID)).toBe(false);
   });
 
+  it('keeps a ready Flow State until it is spent or cleaned up', () => {
+    const flow = shaman({ 14: SHAMAN_TALENT_IDS.flowState });
+    onShamanManaSpent(flow.sim.ctx, flow.player, 120);
+    const ready = flow.player.auras.find((aura) => aura.id === FLOW_STATE_READY_ID);
+    expect(ready).toBeDefined();
+    if (!ready) throw new Error('missing Flow State ready aura');
+    ready.remaining = 0.01;
+
+    flow.sim.tick();
+
+    expect(flow.player.auras.some((aura) => aura.id === FLOW_STATE_READY_ID)).toBe(true);
+  });
+
   it('scopes Flowing Elements movement casting to Arc Bolt and Mending Waters', () => {
     const flowing = shaman({ 5: SHAMAN_TALENT_IDS.flowingElements });
     onShamanCastCompleted(flowing.sim.ctx, flowing.player, 'frost_shock');

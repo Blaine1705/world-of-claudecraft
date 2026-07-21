@@ -1121,7 +1121,7 @@ const classAbilityNamesEn = {
         'Fevered Draw',
         'Channel six rapid shots over 2.4 sec while moving, each dealing {damage} Physical damage.',
       ],
-      ['smite', 'Smite', 'Smites the enemy for {damage} Holy damage.'],
+      ['smite', 'Scouring Hymn', 'Deals {damage} Holy damage to an enemy.'],
       ['lesser_heal', 'Whispered Prayer', 'Heals a friendly target for {damage}.'],
       [
         'power_word_fortitude',
@@ -1155,7 +1155,7 @@ const classAbilityNamesEn = {
       [
         'rockbiter_weapon',
         'Stonebound Weapon',
-        'Imbues your weapon with the fury of stone: each swing deals {damage} additional damage for 5 min.',
+        'Imbues your weapon for 30 min. Each swing deals {damage} additional damage.',
       ],
       ['healing_wave', 'Mending Waters', 'Heals a friendly target for {damage}.'],
       [
@@ -1176,7 +1176,7 @@ const classAbilityNamesEn = {
       [
         'flametongue_weapon',
         'Pyrebrand Weapon',
-        'Imbues your weapon with elemental fire: each swing deals {damage} additional Fire damage for 5 min.',
+        'Imbues your weapon for 30 min. Each swing deals {damage} additional Fire damage.',
       ],
       [
         'frost_shock',
@@ -1388,12 +1388,12 @@ const classAbilityNamesEn = {
       [
         'galeheart_weapon',
         'Galeheart Weapon',
-        'Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast.',
+        'Imbues your weapons for 30 min. Every third landed weapon attack echoes twice and arms Stormcast.',
       ],
       [
         'lifespring_weapon',
         'Lifespring Weapon',
-        'Imbues your weapon with living water, increasing Mending Current deposits by 20%.',
+        'Imbues your weapon for 30 min, increasing Mending Current deposits by 20%.',
       ],
       [
         'primal_exaltation',

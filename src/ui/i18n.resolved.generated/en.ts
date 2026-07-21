@@ -6770,8 +6770,8 @@ export const en: EnTranslations = {
         "description": "Channel six rapid shots over 2.4 sec while moving, each dealing {damage} Physical damage."
       },
       "smite": {
-        "name": "Smite",
-        "description": "Smites the enemy for {damage} Holy damage."
+        "name": "Scouring Hymn",
+        "description": "Deals {damage} Holy damage to an enemy."
       },
       "lesser_heal": {
         "name": "Whispered Prayer",
@@ -6815,7 +6815,7 @@ export const en: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound Weapon",
-        "description": "Imbues your weapon with the fury of stone: each swing deals {damage} additional damage for 5 min."
+        "description": "Imbues your weapon for 30 min. Each swing deals {damage} additional damage."
       },
       "healing_wave": {
         "name": "Mending Waters",
@@ -6835,7 +6835,7 @@ export const en: EnTranslations = {
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Weapon",
-        "description": "Imbues your weapon with elemental fire: each swing deals {damage} additional Fire damage for 5 min."
+        "description": "Imbues your weapon for 30 min. Each swing deals {damage} additional Fire damage."
       },
       "frost_shock": {
         "name": "Rime Jolt",
@@ -7039,11 +7039,11 @@ export const en: EnTranslations = {
       },
       "galeheart_weapon": {
         "name": "Galeheart Weapon",
-        "description": "Imbues your weapons with a gale. Every third landed weapon attack echoes twice and arms Stormcast."
+        "description": "Imbues your weapons for 30 min. Every third landed weapon attack echoes twice and arms Stormcast."
       },
       "lifespring_weapon": {
         "name": "Lifespring Weapon",
-        "description": "Imbues your weapon with living water, increasing Mending Current deposits by 20%."
+        "description": "Imbues your weapon for 30 min, increasing Mending Current deposits by 20%."
       },
       "primal_exaltation": {
         "name": "Primal Exaltation",

@@ -880,6 +880,7 @@ export function runEffects(
             p,
             ability.id === 'galeheart_weapon' ? 'galeheart' : 'stonebound',
             eff.bonus,
+            eff.duration,
           );
           break;
         }

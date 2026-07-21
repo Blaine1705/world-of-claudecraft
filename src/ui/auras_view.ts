@@ -28,6 +28,7 @@
 // mirror aura {stacks:undefined} derive identical output.
 
 import { isDebuffAura as classifyDebuffAura, DEBUFF_AURA_KINDS } from '../sim/aura_classify';
+import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 
@@ -293,7 +294,8 @@ export function createAurasView(
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
         slot.durationText =
-          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id)
+          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id) || isPersistentEngineAura(a.id)) &&
+          !TIMED_IDS.has(a.id)
             ? ''
             : compactAuraDuration(a.remaining, units);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the

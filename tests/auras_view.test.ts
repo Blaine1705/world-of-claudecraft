@@ -296,6 +296,23 @@ describe('createAurasView: derivation per mode', () => {
     ).toBe('20s');
   });
 
+  it('hides fake one-day timers for persistent class engine states', () => {
+    const v = createAurasView('all', deps());
+    for (const id of [
+      'hunter_overdraw_counter',
+      'shaman_flow_state_progress',
+      'shaman_flow_state_ready',
+      'shaman_thunder_charges',
+      'shaman_warspirit_cadence',
+    ]) {
+      expect(
+        v.tick(entity([aura({ id, kind: 'internal_cd', remaining: 86_400 })])).slots[0]
+          .durationText,
+        id,
+      ).toBe('');
+    }
+  });
+
   it('compactAuraDuration boundaries: seconds round UP, larger units to nearest', () => {
     const U = { s: 's', m: 'm', h: 'h', d: 'd' };
     expect(compactAuraDuration(59.9, U)).toBe('60s');

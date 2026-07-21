@@ -29,6 +29,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { pctValue, recalcPlayerStats } from '../entity';
+import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
@@ -208,7 +209,12 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   tickProcState(e, DT);
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
-    if (a.kind !== 'gloomtithe' || !preservesGloomtithe(ctx, e.id)) a.remaining -= DT;
+    if (
+      !isPersistentEngineAura(a.id) &&
+      (a.kind !== 'gloomtithe' || !preservesGloomtithe(ctx, e.id))
+    ) {
+      a.remaining -= DT;
+    }
     tickShamanTalentAura(a);
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.

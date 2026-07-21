@@ -40,6 +40,21 @@ const SHARED_BACKBONE = [
 ] as const;
 
 describe('Shaman v0.29 specialization ownership', () => {
+  it('keeps every active spec weapon enhancement for 30 minutes', () => {
+    for (const abilityId of [
+      'flametongue_weapon',
+      'galeheart_weapon',
+      'rockbiter_weapon',
+      'lifespring_weapon',
+    ]) {
+      const ability = ABILITIES[abilityId];
+      expect(ability.effects).toContainEqual(
+        expect.objectContaining({ type: 'imbue', duration: 1800 }),
+      );
+      expect(ability.description).toContain('30 min');
+    }
+  });
+
   it('grants each exclusive action only to its owning specialization', () => {
     for (const owner of SHAMAN_SPECS) {
       const ownerKnown = knownAt(owner, 20);

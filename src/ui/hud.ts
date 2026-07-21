@@ -383,7 +383,7 @@ import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
 import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
-import { isControllableOwnedPet } from './pet_entity';
+import { guardianOwnerId, isControllableOwnedPet } from './pet_entity';
 import {
   chatPlayerContextActions,
   type PlayerContextAction,
@@ -8508,8 +8508,11 @@ export class Hud {
           const tgt = sim.entities.get(ev.targetId);
           if (!tgt) break;
           const isPlayerSource = ev.sourceId === sim.playerId;
+          const isPlayerOwnedSource = guardianOwnerId(src) === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
-          if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
+          if (isPlayerSource || isPlayerOwnedSource || isPlayerTarget) {
+            this.lastCombatEventAt = performance.now();
+          }
           if (isPlayerTarget && (ev.absorbed ?? 0) > 0) {
             const absorbShape = fctSpawnShape({ type: 'absorb' });
             if (absorbShape)
@@ -8540,6 +8543,7 @@ export class Hud {
               ability: false,
               crit: false,
               isPlayerSource,
+              isPlayerOwnedSource,
               isPlayerTarget,
             });
             if (shape)
@@ -8563,7 +8567,7 @@ export class Hud {
               this.fiestaWordPop(t('fiesta.word.dodge'), '#7fd4ff', 1);
               this.renderer.addShake(0.15);
             }
-            if (isPlayerSource) {
+            if (isPlayerSource || isPlayerOwnedSource) {
               const logKey =
                 ev.kind === 'miss'
                   ? 'hud.combat.miss'
@@ -8591,6 +8595,7 @@ export class Hud {
             ability: !!ev.ability,
             crit: ev.crit,
             isPlayerSource,
+            isPlayerOwnedSource,
             isPlayerTarget,
           });
           if (

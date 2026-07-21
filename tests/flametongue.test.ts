@@ -19,7 +19,7 @@ describe('Flametongue Weapon (shaman fire imbue)', () => {
     expect(def.class).toBe('shaman');
     expect(def.learnLevel).toBe(5);
     expect(def.school).toBe('fire');
-    expect(def.effects).toEqual([{ type: 'imbue', bonus: 8, duration: 300 }]);
+    expect(def.effects).toEqual([{ type: 'imbue', bonus: 8, duration: 1800 }]);
     // ranks up to +13 at level 18
     expect(def.ranks?.[0]).toMatchObject({ rank: 2, level: 18 });
     // listed in the class learn order

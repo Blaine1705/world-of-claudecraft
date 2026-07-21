@@ -92,6 +92,7 @@ export function applyWarspiritPosture(
   player: Entity,
   posture: 'galeheart' | 'stonebound',
   imbueBonus = 0,
+  duration = 1800,
 ): void {
   if (!isWarspirit(ctx, player)) return;
   const leavingStonebound = warspiritPosture(player) === 'stonebound' && posture !== 'stonebound';
@@ -113,8 +114,8 @@ export function applyWarspiritPosture(
     name: posture === 'galeheart' ? 'Galeheart Weapon' : 'Stonebound Weapon',
     kind: 'imbue',
     value: posture === 'galeheart' ? 0 : imbueBonus,
-    remaining: 300,
-    duration: 300,
+    remaining: duration,
+    duration,
     sourceId: player.id,
     school: 'nature',
   });
@@ -124,8 +125,8 @@ export function applyWarspiritPosture(
     name: 'Stonebound Armor',
     kind: 'buff_armor_pct',
     value: STONEBOUND_ARMOR_BONUS,
-    remaining: 300,
-    duration: 300,
+    remaining: duration,
+    duration,
     sourceId: player.id,
     school: 'nature',
   });
@@ -134,8 +135,8 @@ export function applyWarspiritPosture(
     name: 'Stonebound Guard',
     kind: 'buff_dr',
     value: STONEBOUND_DAMAGE_REDUCTION + stoneboundTalentDamageReduction(ctx, player),
-    remaining: 300,
-    duration: 300,
+    remaining: duration,
+    duration,
     sourceId: player.id,
     school: 'nature',
   });

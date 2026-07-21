@@ -7,6 +7,7 @@ import {
 } from '../src/sim/content/talents';
 import { Sim } from '../src/sim/sim';
 import { syncHotbarActions } from '../src/ui/hud/action_bar/hotbar';
+import { en } from '../src/ui/i18n.catalog';
 
 const alloc = (spec: string | null): TalentAllocation => ({ ...emptyAllocation(), spec });
 
@@ -39,6 +40,11 @@ const SPEC_KITS = {
 const ALL_EXCLUSIVES = Object.values(SPEC_KITS).flat();
 
 describe('Priest v0.28 spec kits', () => {
+  it('shows Scouring Hymn for the stable smite ability id in English UI', () => {
+    expect(ABILITIES.smite.name).toBe('Scouring Hymn');
+    expect(en.entities.abilities.smite.name).toBe(ABILITIES.smite.name);
+  });
+
   it('pins the new signature ability for each spec', () => {
     const expected = {
       discipline: 'scouring_mercy',
