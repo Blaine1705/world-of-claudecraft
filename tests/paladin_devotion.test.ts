@@ -102,6 +102,7 @@ describe('paladin Devotion core', () => {
         'holy_shield',
         'consecration',
         'oath_chain',
+        'veilbound_march',
       ].every((id) => isAscensionEmpoweredAbility('protection', id)),
     ).toBe(true);
     expect(

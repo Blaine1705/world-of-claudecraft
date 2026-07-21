@@ -312,6 +312,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'sacred_challenge',
       'bastion_sweep',
       'oath_chain',
+      'veilbound_march',
     ],
     color: 0xf58ca0,
   },

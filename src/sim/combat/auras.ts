@@ -231,7 +231,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.name,
             'hit',
             true,
-            undefined,
+            a.threatMult === undefined ? undefined : { mult: a.threatMult },
             // Periodic (DoT) ticks are not a direct attack: they must not walk a
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,

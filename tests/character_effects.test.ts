@@ -3,6 +3,7 @@ import {
   characterRecklessnessActive,
   characterSanguineAuraActive,
   characterSoulRendActive,
+  characterVeilboundState,
 } from '../src/render/character_effects';
 import type { Entity } from '../src/sim/types';
 
@@ -75,6 +76,24 @@ function entity(partial: Partial<Entity>): Entity {
   } as unknown as Entity;
 }
 
+function aura(
+  id: string,
+  kind: Entity['auras'][number]['kind'],
+  sourceId: number,
+  duration: number,
+): Entity['auras'][number] {
+  return {
+    id,
+    name: id,
+    kind,
+    remaining: duration,
+    duration,
+    value: 0,
+    sourceId,
+    school: 'holy',
+  };
+}
+
 describe('character visual effects', () => {
   it('detects Soul Rend as a model-level effect instead of a nameplate marker', () => {
     expect(characterSoulRendActive(entity({ auras: [] }))).toBe(false);
@@ -124,5 +143,14 @@ describe('character visual effects', () => {
     expect(characterRecklessnessActive(entity({ auras: [reckless] }))).toBe(true);
     expect(characterSanguineAuraActive(entity({ auras: [reckless] }))).toBe(false);
     expect(characterRecklessnessActive(entity({ auras: [sanguine] }))).toBe(false);
+  });
+
+  it('distinguishes the ethereal marcher from a white-gold Veil Mark silhouette', () => {
+    const march = aura('veilbound_march', 'buff_speed', 1, 4);
+    const mark = aura('veilbound_mark', 'dot', 1, 6);
+
+    expect(characterVeilboundState(entity({ auras: [] }))).toBe('none');
+    expect(characterVeilboundState(entity({ auras: [march] }))).toBe('march');
+    expect(characterVeilboundState(entity({ auras: [mark] }))).toBe('mark');
   });
 });

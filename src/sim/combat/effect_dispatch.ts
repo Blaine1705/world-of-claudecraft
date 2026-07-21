@@ -106,6 +106,7 @@ import { placeBeaconOfLight } from './paladin_beacon';
 import { PROTECTION_CONSECRATION_DAMAGE_REDUCTION } from './paladin_consecration';
 import { pullPaladinTargets, pulsePaladinThreat } from './paladin_control';
 import { PALADIN_DEVOTION_ABILITY_IDS, paladinDevotionConflicts } from './paladin_support';
+import { activateVeilboundMarch } from './paladin_veilbound_march';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
@@ -1143,6 +1144,10 @@ export function runEffects(
       }
       case 'grantDevotion': {
         grantDevotion(p, eff.amount);
+        break;
+      }
+      case 'veilboundMarch': {
+        activateVeilboundMarch(ctx, p, eff, ability.name);
         break;
       }
       case 'lifeTap': {

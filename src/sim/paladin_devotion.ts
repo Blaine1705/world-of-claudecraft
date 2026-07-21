@@ -32,6 +32,7 @@ const ASCENSION_ABILITIES: Readonly<Record<PaladinSpec, ReadonlySet<string>>> = 
     'holy_shield',
     'consecration',
     'oath_chain',
+    'veilbound_march',
   ]),
   retribution: new Set([
     'oathstrike',
@@ -182,7 +183,8 @@ export function ascensionImpactKind(
     abilityId === 'final_edict' ||
     abilityId === 'bastion_sweep' ||
     abilityId === 'consecration' ||
-    abilityId === 'oath_chain'
+    abilityId === 'oath_chain' ||
+    abilityId === 'veilbound_march'
     ? 'area'
     : 'offensive';
 }
@@ -262,6 +264,8 @@ export function resolveAscensionAbility(
         return effect.type === 'buffTarget' ? { ...effect, value: 0.3 } : effect;
       case 'oath_chain':
         return effect.type === 'pullTarget' ? { ...effect, maxTargets: 2 } : effect;
+      case 'veilbound_march':
+        return effect.type === 'veilboundMarch' ? { ...effect, ascended: true } : effect;
       default:
         return effect;
     }

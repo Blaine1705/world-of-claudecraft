@@ -22,7 +22,12 @@ export function isDebuffAura(a: CancelableAura): boolean {
 // classic right-click-cancel includes forms, stances, and stealth (canceling a
 // form aura reverts to caster form) since none of those are harmful.
 export function isCancelableAura(a: Aura): boolean {
-  return a.id !== 'beacon_of_light' && !isUnbreakableControlAura(a) && !isDebuffAura(a);
+  return (
+    a.id !== 'beacon_of_light' &&
+    a.id !== 'veilbound_march' &&
+    !isUnbreakableControlAura(a) &&
+    !isDebuffAura(a)
+  );
 }
 
 // Whether removing this aura changes derived stats and so needs a recalc to

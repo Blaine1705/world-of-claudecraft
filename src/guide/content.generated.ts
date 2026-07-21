@@ -732,6 +732,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "oath_chain",
         "name": "Oath Chain"
+      },
+      {
+        "id": "veilbound_march",
+        "name": "Veilbound March"
       }
     ],
     "model": "player_paladin",

@@ -2,6 +2,7 @@ import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import type { Entity } from '../types';
 import { relocateSwept } from './heroic_leap';
+import { isVeilboundMarchActive } from './paladin_veilbound_state';
 
 export function pullPaladinTarget(
   ctx: SimContext,
@@ -16,7 +17,7 @@ export function pullPaladinTarget(
   const dx = target.pos.x - source.pos.x;
   const dz = target.pos.z - source.pos.z;
   const distance = Math.hypot(dx, dz);
-  if (distance > stopDistance && distance > 1e-6) {
+  if (distance > stopDistance && distance > 1e-6 && !isVeilboundMarchActive(target)) {
     relocateSwept(ctx, target, {
       x: source.pos.x + (dx / distance) * stopDistance,
       y: target.pos.y,

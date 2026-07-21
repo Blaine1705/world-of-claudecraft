@@ -62,6 +62,7 @@ import {
   characterRecklessnessActive,
   characterSanguineAuraActive,
   characterSoulRendActive,
+  characterVeilboundState,
 } from './character_effects';
 import {
   type AnimState,
@@ -5276,6 +5277,7 @@ export class Renderer {
       }
       if (!v.visual) continue;
       const ascensionPlan = paladinAscensionVisualPlanInto(e, this.paladinAscensionPlanScratch);
+      const veilboundState = characterVeilboundState(e);
       v.iceBlockVisual = syncIceBlockVisual(v.iceBlockVisual, v.group, v.height, hasIceBlock, dt);
       v.temporalHourglassVisual = syncTemporalHourglassVisual(
         v.temporalHourglassVisual,
@@ -5438,7 +5440,7 @@ export class Renderer {
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      active.setGhost(ghost);
+      active.setGhost(ghost || veilboundState === 'march');
       active.setSoulRend(characterSoulRendActive(e));
       // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
       // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
@@ -5446,7 +5448,7 @@ export class Renderer {
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
       active.setMetamorph(hasMetamorph);
-      active.setAscended(ascensionPlan.active);
+      active.setAscended(ascensionPlan.active || veilboundState !== 'none');
       v.visual.root.visible = active === v.visual && !fireballForm;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && !fireballForm);
@@ -5618,6 +5620,7 @@ export class Renderer {
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
       }
+      if (veilboundState !== 'none') this.vfx.castSparkle(e.id, 'holy', dt * 2.4);
       if (characterRecklessnessActive(e)) {
         this.vfx.recklessFlame(e.id, dt);
         if (!v.recklessOn) {

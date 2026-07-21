@@ -383,6 +383,13 @@
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "aura_surge.webp",
       "confidence": "high"
+    },
+    {
+      "abilityId": "veilbound_march",
+      "name": "Veilbound March",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "veilbound_march.webp",
+      "confidence": "high"
     }
   ]
 }

@@ -414,6 +414,22 @@ const holy: AbilityDef[] = [
 
 const protection: AbilityDef[] = [
   {
+    id: 'veilbound_march',
+    name: 'Veilbound March',
+    class: 'paladin',
+    specs: ['protection'],
+    learnLevel: 13,
+    cost: 0,
+    castTime: 0,
+    cooldown: 75,
+    range: 0,
+    school: 'holy',
+    requiresTarget: false,
+    effects: [{ type: 'veilboundMarch', duration: 4, speedMult: 1.4, armorPct: 30 }],
+    description:
+      'Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you.',
+  },
+  {
     id: 'vowkeeper_strike',
     name: 'Vowkeeper Strike',
     class: 'paladin',

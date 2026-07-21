@@ -5810,6 +5810,7 @@ const mobNameToId = new Map<string, string>();
 for (const [id, m] of Object.entries(MOBS)) mobNameToId.set(m.name, id);
 const abilityNameToId = new Map<string, string>();
 for (const [id, a] of Object.entries(ABILITIES)) abilityNameToId.set(a.name, id);
+abilityNameToId.set('Veil Mark', 'veilbound_mark');
 const delveNameToId = new Map<string, string>();
 for (const [id, d] of Object.entries(DELVES)) delveNameToId.set(d.name, id);
 // Module display names are also the delveUi.moduleName.* source values; reverse
