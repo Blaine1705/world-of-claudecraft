@@ -1446,7 +1446,7 @@ export const zh_CN: EnTranslations = {
     "corpseHarvest": {
       "title": "采集",
       "harvestButton": "采集",
-      "harvestButtonTooltip": "采集：从这具尸体上获取制作材料（兽皮、尖牙、丝线等类似部位），与战利品分开。任何人都可以采集，但每具尸体只能被一名玩家采集。",
+      "harvestTooltip": "采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。",
       "concentrateHint": "选择的部位越少，每个部位的品质越高。",
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
@@ -1692,7 +1692,9 @@ export const zh_CN: EnTranslations = {
     },
     "loot": {
       "chestTitle": "宝箱",
-      "takeAllTooltip": "全部拾取：收取此战利品窗口中的所有金币和物品。"
+      "takeLootButton": "拾取战利品",
+      "takeLootTooltip": "收取金币和掉落的物品。不会用掉采集机会。",
+      "unifiedPressHint": "按一次互动键即可同时拾取战利品并按城镇专注进行采集。"
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",

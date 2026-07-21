@@ -7671,11 +7671,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'Claudium mağazası şu anda kullanılamıyor. Bakiyeniz ve satın alımlarınız etkilenmez; lütfen kısa süre sonra tekrar kontrol edin.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Hasat: Bu cesetten işçilik malzemelerini (deri, diş, ipek ve benzeri bileşenler) herhangi bir ganimetten ayrı olarak toplayın. Herkes hasat yapabilir; belirli bir cesedi yalnızca bir oyuncu toplayabilir.',
   'hudChrome.deeds.openBookHint': "Yiğitlikler Kitabı'nı açın",
-  'hudChrome.loot.takeAllTooltip':
-    "Tümü'yi alın: bu ganimet penceresindeki tüm paraları ve eşyaları toplayın.",
   'hudChrome.statInfo.desc.warfare':
     'Oyunculara verilen hasarı {increase}% artırır ve oyunculardan alınan hasarı {reduction}% azaltır.',
   'hudChrome.statInfo.names.warfare': 'Harp',

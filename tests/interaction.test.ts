@@ -11,9 +11,11 @@
 // byte-identical behavior across the move. Here we assert the module's own surface.
 
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { bagCapacity } from '../src/sim/bags';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { createGroundObject, createMob } from '../src/sim/entity';
 import * as interaction from '../src/sim/interaction';
+import { CORPSE_INTERACT_GRACE_SECONDS } from '../src/sim/loot/loot_roll';
 import { Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE, OBJECT_RESPAWN } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -79,6 +81,21 @@ function errors(sim: AnySim): string[] {
 }
 
 // Two unpartied players a (the looter under test) and b (a foreign tapper).
+// Same idiom as tests/corpse_lifecycle.test.ts fillBags: distinct 1-per-slot
+// gear so the next add has nowhere to go.
+function fillBags(sim: AnySim, pid: number): void {
+  const m = sim.players.get(pid)!;
+  const cap = bagCapacity(m.bags);
+  const gearIds = Object.values(ITEMS)
+    .filter((d) => d.kind === 'weapon' || d.kind === 'armor')
+    .map((d) => d.id);
+  let i = 0;
+  while (m.inventory.length < cap) {
+    sim.addItem(gearIds[i % gearIds.length], 1, pid);
+    i++;
+  }
+}
+
 function twoPlayers(): { sim: AnySim; a: number; b: number } {
   const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true }) as AnySim;
   const a = sim.addPlayer('warrior', 'Aaa');
@@ -262,6 +279,48 @@ describe('interaction.interact dispatch', () => {
     expect(mob.loot).toBeNull();
     expect(mob.lootable).toBe(false);
     expect(mob.corpseTimer).toBe(4);
+  });
+
+  it('nearest-scan: a capacity-denied harvest still delivers the loot half (Phase 12d QA)', () => {
+    const { sim, a } = twoPlayers();
+    fillBags(sim, a);
+    const mob = corpse(sim, 20, 21, a, []);
+    mob.loot = { copper: 25, items: [] };
+    mob.corpseTimer = 60;
+    const copperBefore = sim.meta(a)!.copper;
+    (sim.entities.get(a) as AnyEntity).targetId = null;
+    sim.drainEvents();
+    interaction.interact(ctxOf(sim), a);
+    const events = sim.drainEvents();
+    expect(events.some((e: any) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(
+      true,
+    );
+    expect(mob.harvestClaimedBy).toBeNull(); // the denial left the claim unconsumed
+    expect(sim.meta(a)!.copper).toBe(copperBefore + 25); // the loot half still delivered
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(true); // the grace arm holds the harvest open
+    expect(mob.corpseTimer).toBe(CORPSE_INTERACT_GRACE_SECONDS);
+  });
+
+  it('target-path: a capacity-denied harvest still delivers the loot half (Phase 12d QA)', () => {
+    const { sim, a } = twoPlayers();
+    fillBags(sim, a);
+    const mob = corpse(sim, 20, 21, a, []);
+    mob.loot = { copper: 25, items: [] };
+    mob.corpseTimer = 60;
+    const copperBefore = sim.meta(a)!.copper;
+    (sim.entities.get(a) as AnyEntity).targetId = mob.id;
+    sim.drainEvents();
+    interaction.interact(ctxOf(sim), a);
+    const events = sim.drainEvents();
+    expect(events.some((e: any) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(
+      true,
+    );
+    expect(mob.harvestClaimedBy).toBeNull();
+    expect(sim.meta(a)!.copper).toBe(copperBefore + 25);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(true);
+    expect(mob.corpseTimer).toBe(CORPSE_INTERACT_GRACE_SECONDS);
   });
 
   it('routes a nearby quest NPC to talkToNpc via the ctx callbacks (quest accepted)', () => {

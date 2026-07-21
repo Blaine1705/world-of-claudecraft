@@ -568,7 +568,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     '준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답.',
   'hudChrome.loot.chestTitle': '상자',
-  'hudChrome.loot.takeAllTooltip': '모두 가져가기: 이 전리품 창의 모든 돈과 아이템을 가져갑니다.',
+  'hudChrome.loot.takeLootButton': '전리품 가져가기',
+  'hudChrome.loot.takeLootTooltip':
+    '돈과 떨어진 아이템을 가져갑니다. 채집 기회는 소모되지 않습니다.',
+  'hudChrome.loot.unifiedPressHint':
+    '상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다.',
   'hudChrome.itemTooltip.requiresLevel': '필요 레벨 {level}',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',
   'hudChrome.spellbook.removeFromBarAria': '{name}을(를) 행동 단축바에서 제거',
@@ -754,8 +758,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '채집',
   'hudChrome.corpseHarvest.concentrateHint': '선택한 부위가 적을수록 부위당 등급이 더 높아집니다.',
   'hudChrome.corpseHarvest.alreadyHarvested': '이 시체는 이미 채집되었습니다.',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    '채집: 이 시체에서 전리품과 별개로 제작 재료(가죽, 송곳니, 실크 등)를 모읍니다. 누구나 채집할 수 있지만, 하나의 시체는 한 명의 플레이어만 채집할 수 있습니다.',
+  'hudChrome.corpseHarvest.harvestTooltip':
+    '선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.',
   'hudChrome.corpseHarvest.componentAria': '{component} 채집',
   'hudChrome.corpseHarvest.components.hide': '가죽',
   'hudChrome.corpseHarvest.components.fang': '송곳니',

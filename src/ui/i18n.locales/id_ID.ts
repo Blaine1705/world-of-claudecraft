@@ -7758,11 +7758,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'Toko Claudium tidak tersedia saat ini. Saldo dan pembelian Anda tidak terpengaruh; harap segera periksa kembali.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Panen: kumpulkan bahan kerajinan dari mayat ini (kulit, taring, sutra, dan komponen serupa), pisahkan dari jarahan apa pun. Siapapun bisa memanen; hanya satu pemain yang dapat memanen mayat tertentu.',
   'hudChrome.deeds.openBookHint': 'Buka Kitab Jasa',
-  'hudChrome.loot.takeAllTooltip':
-    'Ambil Semua: kumpulkan setiap koin dan item di jendela jarahan ini.',
   'hudChrome.statInfo.desc.warfare':
     'Meningkatkan kerusakan yang diberikan kepada pemain sebesar {increase}% dan mengurangi kerusakan yang diterima dari pemain sebesar {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Perang',

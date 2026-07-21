@@ -1318,7 +1318,8 @@ tables, i18n key namespaces, files created)
     disenchant/salvage spend. Raw-blob readers (character sheet, armory,
     character select) show stale pre-reset skills for a pre-curve character
     until next login (display-only, self-heals; recorded in progress.md).
-- Phase 12d (built 2026-07-21, phase start a9d499291): identical-payload
+- Phase 12d (built 2026-07-21, merged as PR #2264 = e302c8be5; QA PASS
+  2026-07-21, phase start a9d499291): identical-payload
   stacking lives in src/sim/item_instance_merge.ts
   (itemInstancePayloadsEqual, isMergeableInstancePayload,
   canStackInstancePayloads; a charges-bearing payload NEVER merges, the
@@ -1389,6 +1390,23 @@ tables, i18n key namespaces, files created)
     interact() action now draws harvest rng where pre-12d it was
     draw-free on a corpse (deterministic semantic expansion, no
     headless golden pins the old shape).
+  - Phase 12d QA additions (2026-07-21, the QA pass): BOTH persisted
+    load arms (carried inventory in addPlayer AND the bank) now consume
+    one shared tamper ceiling, bags.ts instancedCountCap (merge-legal
+    stack cap; charges capped at 1 def-independently; an UNKNOWN item
+    def is dormant recoverable data, uncapped on the mergeable arm,
+    refining the bank arm's old DEFAULT_STACK clamp). Loot-window
+    legibility (user-approved wording): the corpse arm's button is Take
+    Loot (the chest arm keeps Take All), both corpse buttons carry
+    attachTooltip-idiom tooltips (native title attributes gone from the
+    corpse loot path), and the unified-press footer hint renders on the
+    town-focus-hint idiom; keys minted NEW
+    (hudChrome.loot.takeLootButton/takeLootTooltip/unifiedPressHint,
+    hudChrome.corpseHarvest.harvestTooltip) with five non-Latin fills
+    each, and the retired takeAllTooltip/harvestButtonTooltip rows left
+    the catalog and every overlay. The gathering toast key helpers
+    (gatherDeniedLineKey/gatherDowngradeLineKey) now return
+    TranslationKey, so a typo'd or retired key fails tsc.
 - Phase 13: (planned) disenchantItem/applyEnchant/salvageItem IWorld
   members + wire commands; plus, per the 2026-07-20 amendments, the typed
   disenchant reagents (hybrid model, same-phase consumers) and the

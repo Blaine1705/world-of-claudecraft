@@ -7688,11 +7688,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'Cửa hàng Claudium hiện không có sẵn. Số dư và giao dịch mua hàng của bạn không bị ảnh hưởng; vui lòng kiểm tra lại trong thời gian ngắn.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Thu hoạch: thu thập nguyên liệu chế tạo từ xác chết này (da, răng nanh, lụa và các thành phần tương tự), tách biệt với bất kỳ chiến lợi phẩm nào. Bất cứ ai cũng có thể thu hoạch; chỉ một người chơi có thể thu hoạch một xác chết nhất định.',
   'hudChrome.deeds.openBookHint': 'Mở Sách Kỳ Công',
-  'hudChrome.loot.takeAllTooltip':
-    'Lấy Tất Cả: thu thập mọi xu và vật phẩm trong cửa sổ chiến lợi phẩm này.',
   'hudChrome.statInfo.desc.warfare':
     'Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Chiến Tranh',

@@ -553,7 +553,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     '準備確認：{ready} 人就緒，{notReady} 人未準備，{noResponse} 人未回應。',
   'hudChrome.loot.chestTitle': '寶箱',
-  'hudChrome.loot.takeAllTooltip': '全部拾取：收取此戰利品視窗中的所有金幣和物品。',
+  'hudChrome.loot.takeLootButton': '拾取戰利品',
+  'hudChrome.loot.takeLootTooltip': '收取金幣和掉落的物品。不會用掉採集機會。',
+  'hudChrome.loot.unifiedPressHint': '按一次互動鍵即可同時拾取戰利品並按城鎮專注進行採集。',
   'hudChrome.itemTooltip.requiresLevel': '需要等級 {level}',
   'hudChrome.spellbook.addToBarAria': '將 {name} 加入動作列',
   'hudChrome.spellbook.removeFromBarAria': '將 {name} 從動作列移除',
@@ -733,8 +735,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '採集',
   'hudChrome.corpseHarvest.concentrateHint': '選擇的部位越少，每個部位的品質越高。',
   'hudChrome.corpseHarvest.alreadyHarvested': '這具屍體已經被採集過了。',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    '採集：從這具屍體取得製作材料（獸皮、尖牙、絲線等類似部位），與戰利品分開。任何人都可以採集，但每具屍體只能被一名玩家採集。',
+  'hudChrome.corpseHarvest.harvestTooltip':
+    '採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。',
   'hudChrome.corpseHarvest.componentAria': '採集{component}',
   'hudChrome.corpseHarvest.components.hide': '獸皮',
   'hudChrome.corpseHarvest.components.fang': '尖牙',

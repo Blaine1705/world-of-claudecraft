@@ -1446,7 +1446,7 @@ export const pt_BR: EnTranslations = {
     "corpseHarvest": {
       "title": "Coleta",
       "harvestButton": "Coletar",
-      "harvestButtonTooltip": "Coleta: obtenha deste cadáver materiais de criação (couro, presas, seda e componentes semelhantes), separados do saque. Qualquer pessoa pode coletar, mas cada cadáver só pode ser coletado por um jogador.",
+      "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
       "concentrateHint": "Quanto menos componentes você escolher, maior a qualidade de cada um.",
       "alreadyHarvested": "Este cadáver já foi coletado.",
       "componentAria": "Coletar {component}",
@@ -1692,7 +1692,9 @@ export const pt_BR: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Baú",
-      "takeAllTooltip": "Pegar tudo: colete todas as moedas e os itens desta janela de saque."
+      "takeLootButton": "Take Loot",
+      "takeLootTooltip": "Takes the coins and dropped items. Does not use up the harvest.",
+      "unifiedPressHint": "The interact key loots and harvests in one press, using your town focus."
     },
     "spellbook": {
       "addToBarAria": "Adicionar {name} à barra de ação",

@@ -7654,10 +7654,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'Claudium-butikken er ikke tilgængelig lige nu. Din saldo og dine køb er ikke påvirket. Prøv igen om lidt.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Høst: Saml håndværksmaterialer fra dette lig (skind, hugtænder, silke og lignende dele), uafhængigt af dets bytte. Alle kan høste, men hvert lig kan kun høstes af én spiller.',
   'hudChrome.deeds.openBookHint': 'Åbn Bedrifternes Bog',
-  'hudChrome.loot.takeAllTooltip': 'Tag alt: Saml alle mønter og genstande i dette byttevindue.',
   'hudChrome.statInfo.desc.warfare':
     'Øger skade givet til spillere med {increase}% og reducerer skade modtaget fra spillere med {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Krigsførelse',

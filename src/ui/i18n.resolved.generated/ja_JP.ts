@@ -1446,7 +1446,7 @@ export const ja_JP: EnTranslations = {
     "corpseHarvest": {
       "title": "採取",
       "harvestButton": "採取",
-      "harvestButtonTooltip": "採取：この死体から製作素材（毛皮、牙、絹糸など）を戦利品とは別に集めます。誰でも採取できますが、1体の死体を採取できるのは1人だけです。",
+      "harvestTooltip": "チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。",
       "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
@@ -1692,7 +1692,9 @@ export const ja_JP: EnTranslations = {
     },
     "loot": {
       "chestTitle": "宝箱",
-      "takeAllTooltip": "すべて取る：この戦利品ウィンドウ内のすべてのお金とアイテムを回収します。"
+      "takeLootButton": "戦利品を取る",
+      "takeLootTooltip": "お金とドロップしたアイテムを受け取ります。採取の機会は消費しません。",
+      "unifiedPressHint": "相互作用キーを一度押すだけで、町のフォーカスに従って戦利品の回収と採取を同時に行います。"
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",

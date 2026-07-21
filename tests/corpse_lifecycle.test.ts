@@ -86,6 +86,18 @@ describe('corpse lifecycle decoupling (Phase 12d)', () => {
     expect(mob.corpseTimer).toBe(12);
   });
 
+  it('the HARVEST-arm grace clamp never RAISES a shorter remaining decay either', () => {
+    // The prune-path pin above covers lootCorpse; this is the harvestCorpse
+    // else-arm's own Math.min clamp (loot still aboard, claim consumed).
+    const { sim, mob, a } = setup();
+    giveLoot(mob);
+    mob.corpseTimer = 12;
+    sim.harvestCorpse(mob.id, undefined, a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(mob.lootable).toBe(true);
+    expect(mob.corpseTimer).toBe(12);
+  });
+
   it('the corpse still opens and harvests during the grace window, then collapses fast', () => {
     const { sim, mob, a, b } = setup();
     giveLoot(mob);

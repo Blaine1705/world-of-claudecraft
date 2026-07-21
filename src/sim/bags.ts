@@ -50,6 +50,24 @@ export function stackSizeOf(def: ItemDef | undefined): number {
   return UNSTACKED_KINDS.has(def.kind) ? 1 : DEFAULT_STACK;
 }
 
+/** The tamper ceiling for a PERSISTED slot's count: a counted instanced slot
+ *  loads capped at the stack cap identical-payload merges could legitimately
+ *  have built; a charge-bearing payload stays one-per-slot regardless (a
+ *  counted stack shares ONE payload object, so a hand-edited count would mint
+ *  shared-charge copies); an unknown item def stays dormant recoverable data,
+ *  uncapped like the plain arm (items are never destroyed by a load); plain
+ *  slots are uncapped. Consumed by bank.ts sanitizeBankState AND the
+ *  carried-inventory hydration in Sim.addPlayer so the rule cannot drift
+ *  between the two load arms. */
+export function instancedCountCap(
+  def: ItemDef | undefined,
+  instance: ItemInstancePayload | undefined,
+): number {
+  if (!instance) return Number.POSITIVE_INFINITY;
+  if (!isMergeableInstancePayload(instance)) return 1;
+  return def ? stackSizeOf(def) : Number.POSITIVE_INFINITY;
+}
+
 /** Extra slots a bag item grants when equipped (0 for a non-bag). */
 export function bagSlotsOf(def: ItemDef | undefined): number {
   return def?.kind === 'bag' ? (def.bagSlots ?? 0) : 0;

@@ -1392,12 +1392,12 @@ export const hudChromeStrings = {
   corpseHarvest: {
     title: 'Harvest',
     harvestButton: 'Harvest',
-    // Playtester-clarity fix: new players did not know Harvest is a separate,
-    // no-cost gathering action (not a profession skill check) that extracts raw
-    // crafting materials (hide, fang, silk, and the rest of the component list
-    // below) from the corpse, on top of any coin or items taken with Take All.
-    harvestButtonTooltip:
-      'Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.',
+    // Loot-window legibility reword (Phase 12d QA): states the once-per-corpse,
+    // first-come claim rule and that harvesting leaves the loot untouched.
+    // Successor to the retired harvestButtonTooltip; a new key because the old
+    // one carried reviewed fills in every locale (in-place rewords go stale).
+    harvestTooltip:
+      'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
     concentrateHint: 'Fewer chosen components yield a higher tier each.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
@@ -1729,9 +1729,17 @@ export const hudChromeStrings = {
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
   loot: {
     chestTitle: 'Chest',
-    // Playtester-clarity fix: pairs with corpseHarvest.harvestButtonTooltip so
-    // the two loot-window buttons read as clearly distinct actions.
-    takeAllTooltip: 'Take All: collect every coin and item in this loot window.',
+    // Loot-window legibility reword (Phase 12d QA): the corpse arm's button is
+    // "Take Loot" (the old "Take All" label promised the harvest too); the
+    // delve-chest arm keeps itemUi.loot.takeAll, where "all" is accurate.
+    // takeLootTooltip pairs with corpseHarvest.harvestTooltip so the two
+    // loot-window buttons read as clearly distinct actions; successors to the
+    // retired takeAllTooltip/harvestButtonTooltip (reviewed fills in every
+    // locale, so a reword mints new keys rather than going stale in place).
+    takeLootButton: 'Take Loot',
+    takeLootTooltip: 'Takes the coins and dropped items. Does not use up the harvest.',
+    // Footer hint on the corpse loot window, the town-focus hint-line idiom.
+    unifiedPressHint: 'The interact key loots and harvests in one press, using your town focus.',
   },
   // Spellbook action-bar toggle accessible names. The visible glyph is +/-; the
   // accessible name states the action so a screen reader is not left with a bare

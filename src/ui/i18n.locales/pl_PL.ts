@@ -7713,11 +7713,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'Sklep Claudium jest obecnie niedostępny. Nie ma to wpływu na Twoje saldo i zakupy; sprawdź ponownie wkrótce.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Żniwa: zbierz materiały rzemieślnicze z tych zwłok (skórę, kły, jedwab i podobne elementy), oddzielnie od wszelkich łupów. Każdy może zbierać plony; tylko jeden gracz może zebrać dane zwłoki.',
   'hudChrome.deeds.openBookHint': 'Otwórz Księgę Czynów',
-  'hudChrome.loot.takeAllTooltip':
-    'Weź Wszystkie: zbierz wszystkie monety i przedmioty w tym oknie łupów.',
   'hudChrome.statInfo.desc.warfare':
     'Zwiększa obrażenia zadawane graczom o {increase}% i zmniejsza obrażenia otrzymywane od graczy o {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Działania wojenne',

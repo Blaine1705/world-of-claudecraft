@@ -16,10 +16,9 @@
 // (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import type { BankInfo } from '../world_api';
-import { addStacked, bagCapacity, bagsFullError, countFit, stackSizeOf } from './bags';
+import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
-import { isMergeableInstancePayload } from './item_instance_merge';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
 
@@ -303,15 +302,14 @@ export function sanitizeBankState(raw: unknown): BankState {
       const e = entry as { itemId?: unknown; count?: unknown; instance?: unknown };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
       const hasInstance = !!e.instance && typeof e.instance === 'object';
-      // An instanced slot's count is capped at the stack cap it could have
-      // legitimately reached through identical-payload merges (Phase 12d), and
-      // a charge-bearing payload stays capped at 1 (a counted stack shares ONE
-      // payload object, so a tampered count would mint shared-charge copies).
-      const instanceCap = hasInstance
-        ? isMergeableInstancePayload(e.instance as InvSlot['instance'])
-          ? stackSizeOf(ITEMS[e.itemId])
-          : 1
-        : Number.POSITIVE_INFINITY;
+      // The shared tamper ceiling (bags.ts instancedCountCap, also applied to
+      // the carried-inventory hydration in Sim.addPlayer): merge-legal stack
+      // cap for a counted instanced slot, 1 for a charge-bearing payload, and
+      // an unknown item def stays dormant uncapped data like the plain arm.
+      const instanceCap = instancedCountCap(
+        ITEMS[e.itemId],
+        hasInstance ? (e.instance as InvSlot['instance']) : undefined,
+      );
       const count = Math.min(instanceCap, Math.max(1, Math.floor(Number(e.count)) || 1));
       const slot: InvSlot = hasInstance
         ? { itemId: e.itemId, count, instance: e.instance as InvSlot['instance'] }

@@ -1446,7 +1446,7 @@ export const vi_VN: EnTranslations = {
     "corpseHarvest": {
       "title": "Thu Hoạch",
       "harvestButton": "Thu Hoạch",
-      "harvestButtonTooltip": "Thu hoạch: thu thập nguyên liệu chế tạo từ xác chết này (da, răng nanh, lụa và các thành phần tương tự), tách biệt với bất kỳ chiến lợi phẩm nào. Bất cứ ai cũng có thể thu hoạch; chỉ một người chơi có thể thu hoạch một xác chết nhất định.",
+      "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
       "concentrateHint": "Chọn càng ít bộ phận, mỗi bộ phận thu được sẽ có bậc chất lượng càng cao.",
       "alreadyHarvested": "Xác này đã bị thu hoạch rồi.",
       "componentAria": "Thu hoạch {component}",
@@ -1692,7 +1692,9 @@ export const vi_VN: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Rương",
-      "takeAllTooltip": "Lấy Tất Cả: thu thập mọi xu và vật phẩm trong cửa sổ chiến lợi phẩm này."
+      "takeLootButton": "Take Loot",
+      "takeLootTooltip": "Takes the coins and dropped items. Does not use up the harvest.",
+      "unifiedPressHint": "The interact key loots and harvests in one press, using your town focus."
     },
     "spellbook": {
       "addToBarAria": "Thêm {name} vào thanh kỹ năng",

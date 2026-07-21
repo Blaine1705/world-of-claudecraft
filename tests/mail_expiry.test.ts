@@ -249,6 +249,17 @@ describe('persistence', () => {
     sim3.loadMail(save3);
     const raw3 = bookOf(sim3).find((m) => m.subject === 'Parcel');
     expect(raw3.expiresAt).toBe(t3 + 1234);
+
+    // A row from before the window field existed at all (the field ABSENT, not
+    // the -1 sentinel) starts the deploy clock exactly like the sentinel arm.
+    const save4 = JSON.parse(JSON.stringify(sim.serializeMail()));
+    const row4 = save4.mail.find((m: { subject: string }) => m.subject === 'Parcel');
+    delete row4.secondsLeft;
+    const sim4 = makeWorld();
+    const t4 = sim4.time;
+    sim4.loadMail(save4);
+    const raw4 = bookOf(sim4).find((m) => m.subject === 'Parcel');
+    expect(raw4.expiresAt).toBe(t4 + MAIL_ATTACHMENT_EXPIRY_SECONDS);
   });
 
   it('round-trips the returned flag with its second window', () => {

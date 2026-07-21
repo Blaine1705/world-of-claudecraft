@@ -7810,11 +7810,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'A loja Claudium não está disponível no momento. Seu saldo e suas compras não serão afetados. Tente novamente em breve.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Coleta: obtenha deste cadáver materiais de criação (couro, presas, seda e componentes semelhantes), separados do saque. Qualquer pessoa pode coletar, mas cada cadáver só pode ser coletado por um jogador.',
   'hudChrome.deeds.openBookHint': 'Abra o Livro dos Feitos',
-  'hudChrome.loot.takeAllTooltip':
-    'Pegar tudo: colete todas as moedas e os itens desta janela de saque.',
   'hudChrome.statInfo.desc.warfare':
     'Aumenta o dano causado aos jogadores em {increase}% e reduz o dano recebido dos jogadores em {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Guerra',

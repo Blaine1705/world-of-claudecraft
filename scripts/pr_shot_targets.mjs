@@ -244,7 +244,14 @@ export const TARGETS = [
     // the base tree honestly shows the loot line alone) or open the loot window
     // to show the harvest picker pre-checked from the player's town focus (the
     // base tree opens it empty).
-    variants: [{ key: 'chat-outcome' }, { key: 'picker-preselected', picker: true }],
+    variants: [
+      { key: 'chat-outcome' },
+      { key: 'picker-preselected', picker: true },
+      // The centered mobile-touch layout of the same picker window (the 12d QA
+      // legibility pass renamed the corpse arm's button and added the footer
+      // hint, both of which render on mobile too).
+      { key: 'picker-preselected-mobile', picker: true, mobile: true },
+    ],
     async capture(page, variant) {
       await page.evaluate(() => {
         document.querySelector('.camera-prompt-confirm')?.click();

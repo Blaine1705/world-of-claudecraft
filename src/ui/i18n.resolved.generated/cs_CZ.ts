@@ -1446,7 +1446,7 @@ export const cs_CZ: EnTranslations = {
     "corpseHarvest": {
       "title": "Sklizeň",
       "harvestButton": "Sklidit",
-      "harvestButtonTooltip": "Sklidit: získá z tohoto těla výrobní materiály (kůži, tesák, hedvábí a podobné součásti), odděleně od kořisti. Sklízet může každý, ale dané tělo smí sklidit jen jeden hráč.",
+      "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
       "concentrateHint": "Méně vybraných komponent dá každé vyšší stupeň.",
       "alreadyHarvested": "Tato mrtvola už byla sklizena.",
       "componentAria": "Sklidit {component}",
@@ -1692,7 +1692,9 @@ export const cs_CZ: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Truhla",
-      "takeAllTooltip": "Vzít vše: sebere všechny mince a předměty v tomto okně kořisti."
+      "takeLootButton": "Take Loot",
+      "takeLootTooltip": "Takes the coins and dropped items. Does not use up the harvest.",
+      "unifiedPressHint": "The interact key loots and harvests in one press, using your town focus."
     },
     "spellbook": {
       "addToBarAria": "Přidat {name} na akční lištu",

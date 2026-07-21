@@ -1446,7 +1446,7 @@ export const zh_TW: EnTranslations = {
     "corpseHarvest": {
       "title": "採集",
       "harvestButton": "採集",
-      "harvestButtonTooltip": "採集：從這具屍體取得製作材料（獸皮、尖牙、絲線等類似部位），與戰利品分開。任何人都可以採集，但每具屍體只能被一名玩家採集。",
+      "harvestTooltip": "採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。",
       "concentrateHint": "選擇的部位越少，每個部位的品質越高。",
       "alreadyHarvested": "這具屍體已經被採集過了。",
       "componentAria": "採集{component}",
@@ -1692,7 +1692,9 @@ export const zh_TW: EnTranslations = {
     },
     "loot": {
       "chestTitle": "寶箱",
-      "takeAllTooltip": "全部拾取：收取此戰利品視窗中的所有金幣和物品。"
+      "takeLootButton": "拾取戰利品",
+      "takeLootTooltip": "收取金幣和掉落的物品。不會用掉採集機會。",
+      "unifiedPressHint": "按一次互動鍵即可同時拾取戰利品並按城鎮專注進行採集。"
     },
     "spellbook": {
       "addToBarAria": "將 {name} 加入動作列",

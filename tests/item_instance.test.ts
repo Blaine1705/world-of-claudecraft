@@ -462,4 +462,35 @@ describe('identical-payload stacking (Professions 2.0 Phase 12d)', () => {
     expect(loaded[0].count).toBe(3);
     expect(loaded[0].instance).toEqual({ signer: 'Ana' });
   });
+
+  it('addPlayer clamps a tampered counted instanced slot with the same rule as the bank arm (12d QA)', () => {
+    const sim = makeSim();
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    const state = JSON.parse(JSON.stringify(sim.serializeCharacter(sim.playerId)!));
+    const signed = state.inventory.find(
+      (s: { itemId: string; instance?: unknown }) => s.itemId === 'wolf_fang' && s.instance,
+    );
+    signed.count = 999; // hand-edited past the merge-legal cap
+    state.inventory.push({
+      itemId: 'wolf_fang',
+      count: 4, // a counted stack shares ONE payload: a charge count over 1 would mint copies
+      instance: { signer: 'Ana', charges: { zap: 2 } },
+    });
+    state.inventory.push({
+      itemId: 'unknown_id_xyz', // a removed def: dormant recoverable data, never destroyed
+      count: 30,
+      instance: { signer: 'Old' },
+    });
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid2 = sim2.addPlayer('warrior', 'Tampered', { state });
+    const inv = sim2.meta(pid2)!.inventory;
+    const counts = (pred: (s: (typeof inv)[number]) => boolean) =>
+      inv.filter(pred).map((s) => s.count);
+    expect(counts((s) => s.itemId === 'wolf_fang' && !!s.instance && !s.instance.charges)).toEqual([
+      stackSizeOf(ITEMS.wolf_fang),
+    ]);
+    expect(counts((s) => s.itemId === 'wolf_fang' && !!s.instance?.charges)).toEqual([1]);
+    expect(counts((s) => s.itemId === 'unknown_id_xyz')).toEqual([30]);
+  });
 });

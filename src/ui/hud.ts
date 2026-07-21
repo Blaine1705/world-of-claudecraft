@@ -8998,7 +8998,7 @@ export class Hud {
           // trap); the sim event is text-free, so the pure core resolves the
           // key off surface + professionId and requiredTier interpolates.
           this.showError(
-            t(gatherDeniedLineKey(ev.surface, ev.professionId) as TranslationKey, {
+            t(gatherDeniedLineKey(ev.surface, ev.professionId), {
               tier: formatNumber(ev.requiredTier, { maximumFractionDigits: 0 }),
             }),
           );
@@ -9009,7 +9009,7 @@ export class Hud {
           // toast ONLY, the gatherDenied pattern above. No loot line, no cue,
           // no other state (the grant-hub double-log trap); the sim event is
           // text-free, so the pure core resolves the key off the lost arm.
-          this.showError(t(gatherDowngradeLineKey(ev.lost) as TranslationKey));
+          this.showError(t(gatherDowngradeLineKey(ev.lost)));
           break;
         }
         case 'fishingResult': {

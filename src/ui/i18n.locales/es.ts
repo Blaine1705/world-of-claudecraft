@@ -7833,11 +7833,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'La tienda de Claudium no está disponible en este momento. Tu saldo y tus compras no se verán afectados; vuelve a intentarlo dentro de poco.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Recolectar: obtén materiales de artesanía de este cadáver (piel, colmillos, seda y componentes similares), por separado del botín. Cualquiera puede recolectarlo, pero solo un jugador puede recolectar cada cadáver.',
   'hudChrome.deeds.openBookHint': 'Abrir el Libro de Gestas',
-  'hudChrome.loot.takeAllTooltip':
-    'Recoger todos: recoge todas las monedas y objetos de esta ventana de botín.',
   'hudChrome.statInfo.desc.warfare':
     'Aumenta un {increase}% el daño infligido a jugadores y reduce un {reduction}% el daño recibido de jugadores.',
   'hudChrome.statInfo.names.warfare': 'Pericia bélica',

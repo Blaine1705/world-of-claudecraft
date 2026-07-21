@@ -728,11 +728,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'La boutique de Claudium est indisponible pour le moment. Votre solde et vos achats ne sont pas affectés. Veuillez revenir dans quelques instants.',
   'hudChrome.claudium.wocBalance': 'WOC : {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Dépecer : prélevez sur ce cadavre des matériaux d’artisanat (peau, croc, soie et composants similaires), séparément de son butin. Tout le monde peut le dépecer, mais un cadavre donné ne peut l’être que par un seul joueur.',
   'hudChrome.deeds.openBookHint': 'Ouvrir le Livre des hauts faits',
-  'hudChrome.loot.takeAllTooltip':
-    'Tout prendre : récupérez chaque pièce et chaque objet de cette fenêtre de butin.',
   'hudChrome.statInfo.desc.warfare':
     'Augmente de {increase} % les dégâts infligés aux joueurs et réduit de {reduction} % les dégâts que les joueurs vous infligent.',
   'hudChrome.statInfo.names.warfare': 'Art de la guerre',

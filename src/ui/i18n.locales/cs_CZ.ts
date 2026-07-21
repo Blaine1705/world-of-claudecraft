@@ -7690,11 +7690,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'Obchod Claudium nyní není dostupný. Tvůj zůstatek ani nákupy to neovlivní, zkus to za chvíli znovu.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Sklidit: získá z tohoto těla výrobní materiály (kůži, tesák, hedvábí a podobné součásti), odděleně od kořisti. Sklízet může každý, ale dané tělo smí sklidit jen jeden hráč.',
   'hudChrome.deeds.openBookHint': 'Otevřít Knihu skutků',
-  'hudChrome.loot.takeAllTooltip':
-    'Vzít vše: sebere všechny mince a předměty v tomto okně kořisti.',
   'hudChrome.statInfo.desc.warfare':
     'Zvýší poškození způsobené hráčům o {increase} % a sníží poškození utrpěné od hráčů o {reduction} %.',
   'hudChrome.statInfo.names.warfare': 'Válečnictví',

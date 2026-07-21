@@ -327,6 +327,40 @@ AS-LANDED (2026-07-21, build session; authoritative over the older wording above
   round-trip (the deploy clock); all re-pinned with comments in
   test(sim): re-pin full-suite corpse and mail contracts.
 
+QA post-inventory (2026-07-21, the Phase 12d QA pass, PASS zero blocking):
+- Conservation held in every probe: real-Sim partial/counted trades both
+  directions (incl. both sides offering the same payload in one confirm),
+  removeItem/removeEnchantableItem per-unit clone-on-survival, bank
+  deposit-merge/withdraw-split, vendor sell, save/load, the countFit cap
+  edges, and the charges carve-out at every merge point.
+- Landed in the QA pass: the shared instancedCountCap tamper ceiling on BOTH
+  persisted load arms (the carried arm loaded tampered counts verbatim; the
+  unknown-def mergeable arm is now dormant-uncapped on both), a REAL-Sim
+  counted-stack trade pin (the stub-drift gap), the harvestCorpse-arm
+  never-raise pin, press-level denial-decoupling pins on both interact
+  arms, the mail deploy clock's absent-field arm, typed gathering toast key
+  helpers, and the user-directed loot-window legibility fix (Take Loot,
+  attachTooltip-idiom tooltips on both corpse buttons, the unified-press
+  footer hint; new keys, five non-Latin fills each, retired keys stripped
+  everywhere, before/after shots desktop and mobile).
+- Verified live but deliberately unpinned-then-pinned classes are recorded in
+  progress.md's QA row; deferrals with reasons: fitsAfterSwap's payload-blind
+  scratch removal (capacity modeling only; wave 2 with partial splits), the
+  rename-save no-nonce TOCTOU (self-state, tiny window), the unbounded
+  harvest_corpse components length (server short-circuits it), the
+  "maker-marked" accessible-name overclaim on per-copy stacks (maintainer
+  copy call), and the unified-press hint on loot-only corpses (the approved
+  wording is unqualified).
+- The DESTRUCTIVE sanitizeBankState rollback caveat stays recorded in
+  state.md; docs/release-notes/ has no v0.29.0 file yet, so propagation into
+  player-facing notes is a release-cut item, not a QA item.
+- The standing 12b Pin-cost appendix re-inventory (closed pin lists are
+  re-inventoried after every later phase): zero rows moved by 12d. The
+  gather_open_gate harvest-only-corpse flip is the unified-press canOpen
+  contract (deliberate, re-pinned with its comment), and the
+  gather_rare_events changes are additive #2139-family pins; both sit
+  outside the appendix's bite/reel/cast families.
+
 STOPPING RULES:
 - Stop if payload-equality merging cannot be made safe for any consumer of instanced
   slots without redesigning that consumer; surface the consumer instead of forcing it.

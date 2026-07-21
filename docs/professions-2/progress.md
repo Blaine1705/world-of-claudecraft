@@ -35,8 +35,8 @@ Update this file at the end of every implementation and QA session. Statuses:
 | 12b QA | Verify gathering rhythm | complete (PASS, zero blocking) | 2026-07-20 | 2026-07-20 |
 | 12c | The Mastery Curve | complete (PR #2242 merged into release/v0.29.0) | 2026-07-20 | 2026-07-20 |
 | 12c QA | Verify The Mastery Curve | complete (PASS, zero blocking) | 2026-07-20 | 2026-07-20 |
-| 12d | Provenance and the harvest loop | built (PR #2264 open) | 2026-07-21 | 2026-07-21 |
-| 12d QA | Verify provenance and the harvest loop | not started | | |
+| 12d | Provenance and the harvest loop | complete (PR #2264 merged into release/v0.29.0) | 2026-07-21 | 2026-07-21 |
+| 12d QA | Verify provenance and the harvest loop | complete (PASS, zero blocking) | 2026-07-21 | 2026-07-21 |
 | 13 | Enchanting reachable | not started | | |
 | 13 QA | Verify enchanting reachable | not started | | |
 | 14 | Attunement quests and nudges | not started | | |
@@ -1201,7 +1201,8 @@ big-diff recovery recipe); skeptics dissolved 2 of 3 SHOULD-FIX findings
   pair already pins strict-less semantics). Comment-only free-floor drift
   fixed in place (crafting.ts CRAFT_SKILL_GAIN, wheel.ts tier-0 wording).
 
-Phase 12d (2026-07-21): built, PR #2264 open off release/v0.29.0. Phase-start commit
+Phase 12d (2026-07-21): complete, PR #2264 merged into release/v0.29.0
+(e302c8be5, PR head 1e7019d6c). Phase-start commit
 a9d499291 (the Phase 12c QA merge, the release tip all session). Build =
 six-stage sequential workflow, one cadence commit each, plus follow-ups.
 - The four merge points landed together with the equality module
@@ -1248,3 +1249,61 @@ six-stage sequential workflow, one cadence commit each, plus follow-ups.
   re-pin does not overlap the phase's two regens and full parity is green
   on the merged tree; the delta's new db-mock key (getCharactersCount) is
   release-owned, not the branch-export trap.
+
+Phase 12d QA (2026-07-21): PASS, zero blocking. QA phase-start 402deef1c (the
+release/v0.29.0 tip: the e302c8be5 merge plus the a02823fb7 packet amendment
+and one release merge); QA diff a9d499291..1e7019d6c first-parent audited
+across the 4b7280cdb release sync. Validation matrix green at the untouched
+tip (tsc + full suite, 1432 files / 17752 tests). Fan-out: 21-agent Workflow
+(5 probe charters + 5 dispatch-matrix reviewers + qa-checklist sweep + paired
+refute-and-impact skeptics per serious finding); the two custom-agentType
+reviewers (cross-platform-sync, privacy-security-review) completed without
+structured output and were re-dispatched via the Agent tool, 2 of 2 delivered
+(the standing recovery recipe). The re-dispatched wire review confirmed
+against the real encode/decode that the omitted-vs-[] harvest components
+distinction survives the online path (JSON.stringify drops undefined; the
+server decode maps a non-array back to the town-focus default), that NO new
+command or IWorld member landed, and that gatherDowngrade reaches online
+clients through the generic per-pid event routing; parity and census suites
+green (318 tests). Conservation held in EVERY inventory,
+lifecycle, mail, companion, and provenance probe; the companion agent
+mutation-verified all three #2139 guard pins (cp-restore dance, pristine
+tree). Five skeptic-confirmed (REAL/REAL) SHOULD-FIX findings, ALL landed
+this pass, plus the directed should-fix:
+- DIRECTED (user-approved wording): the corpse loot window's Take All button
+  is now Take Loot, both corpse buttons moved off native title attributes
+  onto the shared attachTooltip idiom (hover, mobile long-press, keyboard
+  focus), and the approved unified-press footer hint landed on the
+  town-focus-hint idiom. Four NEW keys with five non-Latin fills each (M16);
+  the retired takeAllTooltip/harvestButtonTooltip rows left the catalog and
+  ALL overlays (in-place rewords go stale; the union regen makes tsc enforce
+  the removal). Pins: literal labels both arms, both tooltip bindings, the
+  hint, empty native titles. Before/after shots desktop + mobile.
+- INV-1: the carried-inventory hydration in addPlayer loaded tampered counts
+  verbatim while the bank arm sanitized; both load arms now consume ONE
+  bags.ts helper (instancedCountCap), mutation-verified pin on the real
+  addPlayer path. Includes the INV-4 refinement: an unknown item def stays
+  dormant uncapped data on the mergeable arm (never destroyed), while the
+  charge cap stays def-independent.
+- INV-2: every instanced-trade pin drove a hand-copied stub of removeItem;
+  landed a REAL-Sim counted-stack trade pin (both directions, both sides
+  offering the same payload in one confirm, unit conservation).
+- QA12D-CL-01 + F1: the harvestCorpse-arm grace clamp's never-raise side and
+  the press-level denial decoupling (capacity-denied harvest still delivers
+  the loot half, claim unconsumed) were live-verified but unpinned; pinned
+  on both interact arms.
+- MAIL-1 (nit, landed): the deploy clock's absent-secondsLeft legacy arm
+  pinned beside the sentinel arm. FE-2 (nit, landed): the gathering toast
+  key helpers now return TranslationKey (casts removed, typo'd keys fail
+  tsc).
+- Deferred with reasons: fitsAfterSwap's payload-blind scratch removal
+  (capacity modeling only, over-capacity tolerated by design; wave 2 with
+  partial splits); the rename-save no-nonce TOCTOU (self-state only, tiny
+  window, mirrors the existing delete-guard class); harvest_corpse
+  components array length unbounded (short-circuited server-side, ws
+  maxPayload bounds the frame); the marker accessible-name "maker-marked"
+  overclaim on non-signed per-copy stacks (maintainer copy call); the
+  unified-press hint showing on loot-only corpses (the approved wording is
+  unqualified); release-notes propagation of the DESTRUCTIVE
+  sanitizeBankState rollback caveat (recorded in state.md; no v0.29.0 notes
+  file exists yet, a cut-time item).

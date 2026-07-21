@@ -1446,7 +1446,7 @@ export const en_CA: EnTranslations = {
     "corpseHarvest": {
       "title": "Harvest",
       "harvestButton": "Harvest",
-      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
+      "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
       "concentrateHint": "Fewer chosen components yield a higher tier each.",
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
@@ -1692,7 +1692,9 @@ export const en_CA: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Chest",
-      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
+      "takeLootButton": "Take Loot",
+      "takeLootTooltip": "Takes the coins and dropped items. Does not use up the harvest.",
+      "unifiedPressHint": "The interact key loots and harvests in one press, using your town focus."
     },
     "spellbook": {
       "addToBarAria": "Add {name} to action bar",

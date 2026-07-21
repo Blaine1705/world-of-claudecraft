@@ -983,12 +983,17 @@ describe('sanitizeBankState', () => {
         // counted stack shares ONE payload object, so a tampered count would
         // mint shared-charge copies.
         { itemId: 'wolf_fang', count: 4, instance: { signer: 'Ana', charges: { zap: 2 } } },
+        // An unknown item def (removed content) is dormant recoverable data:
+        // the merge-legal ceiling does not apply (12d QA), but the charge cap
+        // still does (the shared-payload dupe guard is def-independent).
+        { itemId: 'unknown_id_xyz', count: 30, instance: { signer: 'Ana' } },
+        { itemId: 'unknown_id_xyz', count: 4, instance: { charges: { zap: 1 } } },
       ],
       purchasedSlots: 0,
       bonusSlots: 0,
     };
     const out = sanitizeBankState(raw).inventory;
-    expect(out.map((s) => s.count)).toEqual([3, 20, 20, 1, 1]);
+    expect(out.map((s) => s.count)).toEqual([3, 20, 20, 1, 1, 30, 1]);
     expect(out[0]).toEqual({ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } });
   });
 

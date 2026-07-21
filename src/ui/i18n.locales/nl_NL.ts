@@ -7757,11 +7757,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'De Claudium-winkel is momenteel niet beschikbaar. Je saldo en aankopen zijn niet aangetast. Probeer het binnenkort opnieuw.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Oogsten: verzamel ambachtsmaterialen van dit lijk (vel, hoektand, zijde en vergelijkbare onderdelen), los van de buit. Iedereen kan oogsten, maar elk lijk kan maar door één speler worden geoogst.',
   'hudChrome.deeds.openBookHint': 'Open het Boek der Daden',
-  'hudChrome.loot.takeAllTooltip':
-    'Alles nemen: verzamel alle munten en voorwerpen in dit buitvenster.',
   'hudChrome.statInfo.desc.warfare':
     'Verhoogt de schade die aan spelers wordt toegebracht met {increase}% en vermindert de schade die aan spelers wordt toegebracht met {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Oorlogvoering',

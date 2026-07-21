@@ -22,6 +22,7 @@ import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { bestOwnedGatherToolTier, canGatherTier } from '../sim/professions/tools';
 import type { GatherNodeDef } from '../sim/types';
 import type { IWorld } from '../world_api';
+import type { TranslationKey } from './i18n.catalog';
 
 /** Whether a gather node is harvestable right now for the local viewer, or on
  *  cooldown for them specifically (another player may see the opposite state
@@ -123,7 +124,7 @@ export function buildGatherNodeTooltip(
 export function gatherDeniedLineKey(
   surface: 'node' | 'corpse',
   professionId?: GatheringProfessionId,
-): string {
+): TranslationKey {
   if (surface === 'node') {
     if (professionId === 'mining' || professionId === 'logging' || professionId === 'herbalism') {
       return `hudChrome.gathering.toolTierUnmet.${professionId}`;
@@ -135,7 +136,7 @@ export function gatherDeniedLineKey(
 /** The i18n key the gatherDowngrade SimEvent's toast resolves (Phase 12d; the
  *  sim is text-free): 'mark' means the yield arrived as a plain unsigned
  *  top-up, 'find' means a pure-extra specimen jackpot was dropped outright. */
-export function gatherDowngradeLineKey(lost: 'mark' | 'find'): string {
+export function gatherDowngradeLineKey(lost: 'mark' | 'find'): TranslationKey {
   return lost === 'find'
     ? 'hudChrome.gathering.downgradeFind'
     : 'hudChrome.gathering.downgradeMark';

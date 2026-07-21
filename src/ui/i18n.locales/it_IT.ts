@@ -7835,11 +7835,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'Il negozio Claudium non è disponibile al momento. Il tuo saldo e i tuoi acquisti non subiranno modifiche. Riprova tra poco.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Raccolta: recupera da questo cadavere materiali per la creazione (pelle, zanne, seta e componenti simili), separati dal bottino. Chiunque può raccogliere, ma ogni cadavere può essere raccolto da un solo giocatore.',
   'hudChrome.deeds.openBookHint': 'Apri il Libro delle Imprese',
-  'hudChrome.loot.takeAllTooltip':
-    'Prendi tutto: raccogli tutte le monete e gli oggetti in questa finestra del bottino.',
   'hudChrome.statInfo.desc.warfare':
     'Aumenta il danno inflitto ai giocatori del {increase}% e riduce il danno subito dai giocatori del {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Guerra',

@@ -1446,7 +1446,7 @@ export const nl_NL: EnTranslations = {
     "corpseHarvest": {
       "title": "Oogsten",
       "harvestButton": "Oogsten",
-      "harvestButtonTooltip": "Oogsten: verzamel ambachtsmaterialen van dit lijk (vel, hoektand, zijde en vergelijkbare onderdelen), los van de buit. Iedereen kan oogsten, maar elk lijk kan maar door één speler worden geoogst.",
+      "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
       "concentrateHint": "Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.",
       "alreadyHarvested": "Dit kadaver is al geoogst.",
       "componentAria": "Oogst {component}",
@@ -1692,7 +1692,9 @@ export const nl_NL: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Kist",
-      "takeAllTooltip": "Alles nemen: verzamel alle munten en voorwerpen in dit buitvenster."
+      "takeLootButton": "Take Loot",
+      "takeLootTooltip": "Takes the coins and dropped items. Does not use up the harvest.",
+      "unifiedPressHint": "The interact key loots and harvests in one press, using your town focus."
     },
     "spellbook": {
       "addToBarAria": "{name} toevoegen aan actiebalk",

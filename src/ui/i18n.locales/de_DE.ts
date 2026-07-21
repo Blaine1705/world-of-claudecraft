@@ -7872,11 +7872,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'Der Claudium-Shop ist derzeit nicht verfügbar. Dein Guthaben und deine Käufe bleiben davon unberührt. Bitte versuche es gleich noch einmal.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Verwerten: Sammle Handwerksmaterialien aus diesem Kadaver (Haut, Fangzahn, Seide und ähnliche Komponenten), unabhängig von der Beute. Jeder kann Kadaver verwerten, aber einen bestimmten Kadaver darf nur ein Spieler verwerten.',
   'hudChrome.deeds.openBookHint': 'Buch der Taten öffnen',
-  'hudChrome.loot.takeAllTooltip':
-    'Alles nehmen: Sammle alle Münzen und Gegenstände in diesem Beutefenster.',
   'hudChrome.statInfo.desc.warfare':
     'Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Kriegsführung',

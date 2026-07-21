@@ -21,6 +21,7 @@ import {
   BAG_SOCKETS,
   bagCapacity,
   canAddItem,
+  instancedCountCap,
   migrationBagsFor,
   stackSizeOf,
 } from './bags';
@@ -2228,7 +2229,16 @@ export class Sim {
           cloneItemInstancePayload(inst),
         ]),
       );
-      meta.inventory = s.inventory.map(cloneInvSlot);
+      // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
+      // bank arm below): a counted instanced slot loads capped at what
+      // identical-payload merges could legitimately have built, and a
+      // charge-bearing payload stays one-per-slot, so a hand-edited count can
+      // never launder into independent copies via a later deposit or trade.
+      meta.inventory = s.inventory.map((raw) => {
+        const slot = cloneInvSlot(raw);
+        slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
+        return slot;
+      });
       if (s.bags === undefined) {
         // PRE-BAG save: the character earned this space under the infinite
         // inventory, so grant + equip bags that cover it (lowest quality tier
