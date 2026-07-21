@@ -1832,6 +1832,7 @@ export type AbilityEffect =
       bleedTotal: number;
       bleedDuration: number;
       bleedInterval: number;
+      rangedPowerCoeff: number;
     }
   | {
       type: 'hunterShrapnel';

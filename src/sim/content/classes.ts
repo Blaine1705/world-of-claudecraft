@@ -3240,14 +3240,29 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 5 }],
+    effects: [{ type: 'weaponStrike', bonus: 1, weaponMult: 0.1 }],
     ranks: [
-      { rank: 2, level: 8, cost: 0, effects: [{ type: 'weaponStrike', bonus: 11 }] },
-      { rank: 3, level: 14, cost: 0, effects: [{ type: 'weaponStrike', bonus: 18 }] },
-      { rank: 4, level: 20, cost: 0, effects: [{ type: 'weaponStrike', bonus: 27 }] },
+      {
+        rank: 2,
+        level: 8,
+        cost: 0,
+        effects: [{ type: 'weaponStrike', bonus: 2, weaponMult: 0.1 }],
+      },
+      {
+        rank: 3,
+        level: 14,
+        cost: 0,
+        effects: [{ type: 'weaponStrike', bonus: 3, weaponMult: 0.1 }],
+      },
+      {
+        rank: 4,
+        level: 20,
+        cost: 0,
+        effects: [{ type: 'weaponStrike', bonus: 4, weaponMult: 0.1 }],
+      },
     ],
     description:
-      'Strike for weapon damage plus $d, generating 15 Focus and one Hunting Momentum on a hit.',
+      'Strike for 10% weapon damage plus $d. A hit generates 15 Focus and one Hunting Momentum.',
   },
   pack_command: {
     id: 'pack_command',
@@ -5679,9 +5694,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     minRange: 8,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'hunterBloodhook', bleedTotal: 24, bleedDuration: 12, bleedInterval: 3 }],
+    effects: [
+      {
+        type: 'hunterBloodhook',
+        bleedTotal: 24,
+        bleedDuration: 12,
+        bleedInterval: 3,
+        rangedPowerCoeff: 0.3,
+      },
+    ],
     description:
-      'Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)',
+      'Charge to an enemy 8 to 25 yards away and open a primary wound that deals $d Physical damage over 12 sec. The wound scales with Ranged Attack Power. (Fieldcraft signature)',
   },
   trueshot_aura: {
     id: 'trueshot_aura',

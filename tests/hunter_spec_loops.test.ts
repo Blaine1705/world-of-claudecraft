@@ -109,10 +109,14 @@ describe('Hunter v0.29 baseline specialization loops', () => {
     const target = addMob(sim, 12);
     sim.targetEntity(target.id);
     sim.player.resource = 0;
+    const expectedBloodhookTick = Math.max(1, Math.round((24 + sim.player.rangedPower * 0.3) / 4));
 
     sim.castAbility('bloodhook');
     advance(sim, 2);
     expect(target.auras.filter((aura) => aura.id === 'bloodhook_bleed')).toHaveLength(1);
+    expect(target.auras.find((aura) => aura.id === 'bloodhook_bleed')?.value).toBe(
+      expectedBloodhookTick,
+    );
 
     sim.player.pos.z = target.pos.z - 2;
     for (let stack = 1; stack <= 3; stack++) {

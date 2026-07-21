@@ -37,6 +37,10 @@ function required<T>(value: T | undefined): T {
 const SC: AbilityScaling = { spellPower: 80, rangedPower: 200, attackPower: 140 };
 const ARCANE_MODS = { ...emptyModifiers(), spec: 'arcane' as const };
 const FROST_MODS = { ...emptyModifiers(), spec: 'frost' as const };
+const SURVIVAL_MODS = computeTalentModifiers('hunter', {
+  ...emptyAllocation(),
+  spec: 'survival',
+} as never);
 const PROT_MODS = computeTalentModifiers('warrior', {
   ...emptyAllocation(),
   spec: 'prot',
@@ -101,6 +105,14 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     expect(abilityDamageBonus(as, eff, SC)).toBe(
       directHitBonus(SC.rangedPower, as.def, as.castTime, false),
     );
+  });
+
+  it('Bloodhook shows the same Ranged Attack Power wound bonus that combat snapshots', () => {
+    const bloodhook = known('hunter', 'bloodhook', SURVIVAL_MODS);
+    const effect = required(
+      bloodhook.effects.find((candidate) => candidate.type === 'hunterBloodhook'),
+    );
+    expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(60);
   });
 
   it('a channelled directDamage (Arcane Missiles) uses the per-tick CHANNEL coefficient', () => {

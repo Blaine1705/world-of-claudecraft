@@ -107,6 +107,8 @@ export function abilityDamageBonus(
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
       return dotTickBonus(power, def, eff.duration, eff.interval) * ticks;
     }
+    case 'hunterBloodhook':
+      return Math.round(scaling.rangedPower * eff.rangedPowerCoeff);
     default:
       return 0;
   }
@@ -137,7 +139,8 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'drainTick' ||
       eff.type === 'sunder' ||
       eff.type === 'faerieFire' ||
-      eff.type === 'lifeTap',
+      eff.type === 'lifeTap' ||
+      eff.type === 'hunterBloodhook',
   );
 }
 

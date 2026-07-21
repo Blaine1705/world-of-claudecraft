@@ -13687,6 +13687,8 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
             perCombo: formatAbilityNumber(primary.perCombo),
           }) + suffix(primary)
         );
+      case 'hunterBloodhook':
+        return formatAbilityNumber(primary.bleedTotal) + suffix(primary);
     }
   }
 

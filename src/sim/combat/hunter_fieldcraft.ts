@@ -76,7 +76,12 @@ export function startBloodhook(
   ctx: SimContext,
   hunter: Entity,
   target: Entity | null,
-  effect: { bleedTotal: number; bleedDuration: number; bleedInterval: number },
+  effect: {
+    bleedTotal: number;
+    bleedDuration: number;
+    bleedInterval: number;
+    rangedPowerCoeff: number;
+  },
 ): void {
   if (!target) return;
   hunter.chargeTargetId = target.id;
@@ -89,7 +94,7 @@ export function startBloodhook(
     remaining: 3,
     duration: 3,
     value: target.id,
-    value2: effect.bleedTotal,
+    value2: effect.bleedTotal + hunter.rangedPower * effect.rangedPowerCoeff,
     value3: effect.bleedDuration,
     tickInterval: effect.bleedInterval,
     sourceId: hunter.id,
@@ -111,11 +116,12 @@ export function finishBloodhook(
     hunter.cooldowns.delete('bloodhook');
     return;
   }
+  const woundTotal = pending.value2 ?? 24;
   applyPrimaryWound(
     ctx,
     hunter,
     target,
-    pending.value2 ?? 48,
+    woundTotal,
     pending.value3 ?? 12,
     pending.tickInterval ?? 3,
   );
@@ -131,7 +137,7 @@ export function finishBloodhook(
         ctx,
         hunter,
         enemy,
-        Math.round((pending.value2 ?? 48) * 0.6),
+        Math.round(woundTotal * 0.6),
         pending.value3 ?? 12,
         pending.tickInterval ?? 3,
       );
