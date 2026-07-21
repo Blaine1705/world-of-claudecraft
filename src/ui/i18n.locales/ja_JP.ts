@@ -6134,6 +6134,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージを{pct}%低下させる',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します',
+  'hudChrome.auraEffect.hunterFerocity':
+    '群れの獰猛さ{stacks}スタック：ペットの与えるダメージが{pct}%上昇',
   'hudChrome.auraEffect.heatingUp':
     '次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます',
   'hudChrome.auraEffect.tongues': '詠唱時間を{pct}%増加させる',

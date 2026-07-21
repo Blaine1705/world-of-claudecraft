@@ -864,22 +864,18 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_CN": [
     "hud.social.status.afk",
-    "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.nameplate.afkTag"
   ],
   "zh_TW": [
     "hud.social.status.afk",
-    "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.nameplate.afkTag"
   ],
   "ko_KR": [
     "hud.social.status.afk",
-    "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.nameplate.afkTag"
   ],
   "ja_JP": [
     "hud.social.status.afk",
-    "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.nameplate.afkTag"
   ],
   "pt_BR": [
@@ -1026,7 +1022,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [
     "hud.social.status.afk",
-    "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.nameplate.afkTag"
   ],
   "cs_CZ": [

@@ -6246,6 +6246,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDoneReduce': 'Снижает наносимый урон на {pct}%',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     'Следующее заклинание другой стихийной школы активирует Стихийное слияние',
+  'hudChrome.auraEffect.hunterFerocity':
+    'Стайная свирепость, {stacks} зар.: урон вашего питомца повышен на {pct}%',
   'hudChrome.auraEffect.heatingUp':
     'Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»',
   'hudChrome.auraEffect.tongues': 'Увеличивает время произнесения заклинаний на {pct}%',
