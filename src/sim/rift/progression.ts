@@ -183,13 +183,17 @@ const RIFT_SECOND_EPIC_CHANCE_S = 0.35;
 const RIFT_LEGENDARY_CHANCE_S = 0.04;
 
 // Clear-time coin bonuses by rank (added on top of the static boss coin, which
-// stays rank-invariant). C gets a normal-dungeon-scale bonus; B tastes a small
-// windfall; A/S scale toward the Korzul (50 000c) and Nythraxis benchmarks.
+// stays rank-invariant). C mirrors the normal-dungeon economy; B tastes a small
+// windfall; A matches the Korzul Heroic peak (50 000c); S holds at the same cap
+// (gear quality, mounts, and legendaries differentiate it from A, not raw coin).
+// Nythraxis pays 150 000c over 10 players = 15 000c per capita; S at 5 players
+// and 55 000c total = 11 000c per capita, modestly below the raid benchmark, which
+// is appropriate given the shorter portal format.
 // Named constants so balance tuning stays in one place.
 export const RIFT_COIN_BONUS_C = 10_000; // 10 000c: mirrors normal-dungeon economy
 export const RIFT_COIN_BONUS_B = 10_000; // 10 000c (10 silver)
-export const RIFT_COIN_BONUS_A = 35_000; // 35 000c (35 silver)
-export const RIFT_COIN_BONUS_S = 50_000; // 50 000c, matches Korzul Heroic peak (per-capita: 5-player vs 10-player)
+export const RIFT_COIN_BONUS_A = 35_000; // 35 000c (35 silver), matches Korzul Heroic
+export const RIFT_COIN_BONUS_S = 50_000; // 50 000c; +5 000c static boss coin = 55 000c total
 
 // Blue (rare) mount reins that roll on A or S clears. A 0.6% independent roll
 // picks one of these two at random; they are appended AFTER all gear draws so
