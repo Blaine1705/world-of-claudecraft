@@ -6136,7 +6136,23 @@ export const en_XA: EnTranslations = {
     "cast": {
       "fishing": "[Ƒíšĥíñĝ]",
       "demonHeal": "[Ðéɱóñ Ĥéáļ]",
-      "thunzharrStormcall": "[Šţóŕɱçáļļ]"
+      "thunzharrStormcall": "[Šţóŕɱçáļļ]",
+      "rift_frost_execution": "[Ĝļáçíáļ Ĝŕáʋé]",
+      "rift_frost_strike": "[Áƀšóļúţé Žéŕó]",
+      "rift_ember_execution": "[Ɱáĝɱá Ŵéļļ]",
+      "rift_ember_strike": "[Çóŕé Ɱéļţðóŵñ]",
+      "rift_venom_execution": "[Ʋéñóɱ Þóóļ]",
+      "rift_venom_strike": "[Ɓŕóóðɱóţĥéŕ'š Ɱáŕķ]",
+      "rift_necro_execution": "[Šóúļ Ĝŕáʋé]",
+      "rift_necro_strike": "[Ðéáţĥ Šéñţéñçé]",
+      "rift_brute_execution": "[Éáŕţĥšĥáţţéŕ]",
+      "rift_brute_strike": "[Ƒíñáļ Ĵúðĝɱéñţ]",
+      "rift_arcane_execution": "[Ʋóíð Ŕíƒţ]",
+      "rift_arcane_strike": "[Áŕçáñé Áññíĥíļáţíóñ]",
+      "rift_storm_execution": "[Ļíĝĥţñíñĝ Ŕóð]",
+      "rift_storm_strike": "[Šţóŕɱçáļļéŕ'š Ŵŕáţĥ]",
+      "rift_tide_execution": "[Áƀýššáļ Ɱáŵ]",
+      "rift_tide_strike": "[Çŕúšĥíñĝ Ðéþţĥ]"
     }
   },
   "questUi": {

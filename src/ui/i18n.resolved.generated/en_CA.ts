@@ -6136,7 +6136,23 @@ export const en_CA: EnTranslations = {
     "cast": {
       "fishing": "Fishing",
       "demonHeal": "Demon Heal",
-      "thunzharrStormcall": "Stormcall"
+      "thunzharrStormcall": "Stormcall",
+      "rift_frost_execution": "Glacial Grave",
+      "rift_frost_strike": "Absolute Zero",
+      "rift_ember_execution": "Magma Well",
+      "rift_ember_strike": "Core Meltdown",
+      "rift_venom_execution": "Venom Pool",
+      "rift_venom_strike": "Broodmother's Mark",
+      "rift_necro_execution": "Soul Grave",
+      "rift_necro_strike": "Death Sentence",
+      "rift_brute_execution": "Earthshatter",
+      "rift_brute_strike": "Final Judgment",
+      "rift_arcane_execution": "Void Rift",
+      "rift_arcane_strike": "Arcane Annihilation",
+      "rift_storm_execution": "Lightning Rod",
+      "rift_storm_strike": "Stormcaller's Wrath",
+      "rift_tide_execution": "Abyssal Maw",
+      "rift_tide_strike": "Crushing Depth"
     }
   },
   "questUi": {
