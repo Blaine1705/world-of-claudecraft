@@ -33,7 +33,12 @@ import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
 import { FISH_REEL_WINDOW_ROD_BONUS_SEC, FISH_REEL_WINDOW_SEC } from '../professions/fishing';
 import { bestOwnedGatherToolTier } from '../professions/tools';
-import { canActivateDivineAscension } from '../paladin_devotion';
+import {
+  canActivateDivineAscension,
+  hasDevotion,
+  paladinExecuteWindowActive,
+  spendDevotion,
+} from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -540,6 +545,10 @@ export function castAbility(
   }
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
+  if (ability.devotionCost && !hasDevotion(p, ability.devotionCost)) {
+    ctx.error(p.id, 'Not enough Devotion!');
+    return;
+  }
   if (cancelStasisToggle(ctx, p, ability)) return;
   // Ice Block (usableWhileControlled) may be pressed through ordinary control;
   // cleanseSelf removes the player-breakable debuffs while encounter-authored
@@ -778,14 +787,20 @@ export function castAbility(
       return;
     }
     // execute-style gate: only usable while the target is nearly dead
+    const targetHpThreshold = ability.executeThreshold ?? ability.requiresTargetHpBelow;
+    const targetOutsideExecuteWindow =
+      targetHpThreshold !== undefined &&
+      (ability.executeThreshold !== undefined
+        ? target.hp >= target.maxHp * targetHpThreshold
+        : target.hp > target.maxHp * targetHpThreshold);
     if (
-      ability.requiresTargetHpBelow !== undefined &&
-      target.hp > target.maxHp * ability.requiresTargetHpBelow &&
-      !(ability.id === 'execute' && p.auras.some((aura) => aura.kind === 'sudden_death'))
+      targetOutsideExecuteWindow &&
+      !(ability.id === 'execute' && p.auras.some((aura) => aura.kind === 'sudden_death')) &&
+      !paladinExecuteWindowActive(p, ability.id)
     ) {
       ctx.error(
         p.id,
-        `That ability requires the target below ${Math.round(ability.requiresTargetHpBelow * 100)}% health.`,
+        `That ability requires the target below ${Math.round(targetHpThreshold * 100)}% health.`,
       );
       return;
     }
@@ -1103,6 +1118,7 @@ function spendAbilityCost(
   res: ResolvedAbility,
 ): void {
   if (isToggleBuff(res.def) && p.auras.some((a) => a.id === res.def.id)) return;
+  if (res.def.devotionCost) spendDevotion(p, res.def.devotionCost);
   const spentRage = p.resourceType === 'rage' ? res.cost : 0;
   const shift = formShiftKind(p, res.def);
   if (shift === 'off') return;
@@ -1494,6 +1510,10 @@ function applyAbility(
   // castAbility channel branch and resolve per tick). Draws no rng.
   res = consumeOverload(ctx, p, res);
   const ability = res.def;
+  if (ability.devotionCost && !hasDevotion(p, ability.devotionCost)) {
+    ctx.error(p.id, 'Not enough Devotion!');
+    return;
+  }
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   // The free charge is consumed exactly where a cost is actually billed; the
   // early-return utility branches below bill directly, so they must go through

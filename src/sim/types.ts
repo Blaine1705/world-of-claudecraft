@@ -1913,7 +1913,13 @@ export type AbilityEffect =
       radius: number;
     }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
-  | { type: 'absorb'; amount: number; duration: number; spellPowerCoeff?: number } // power word: shield
+  | {
+      type: 'absorb';
+      amount: number;
+      duration: number;
+      spellPowerCoeff?: number;
+      auraId?: string;
+    } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
   | { type: 'judgement'; dmgMult?: number; flat?: number } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
@@ -1953,6 +1959,8 @@ export type AbilityEffect =
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
   | { type: 'consumeDot'; dot: string }
   | { type: 'slow'; mult: number; duration: number }
+  | { type: 'pullTarget'; stopDistance: number; slowMult: number; slowDuration: number }
+  | { type: 'threatPulse'; amount: number; radius: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
@@ -1999,6 +2007,9 @@ export type AbilityEffect =
       // Blizzard: each struck enemy shaves the running Frozen Orb cooldown
       // (frost_mage's per-cast budget, reset when the zone is placed).
       orbCdr?: boolean;
+      // Paladin Consecration grants this amount once, on the first pulse that
+      // actually strikes at least one hostile target.
+      devotionOnFirstHit?: number;
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   // Demoralizing roar/shout. `amount` = the legacy flat attack-power drain
@@ -2284,6 +2295,10 @@ export interface AbilityDef {
   fearDr?: boolean; // incapacitate effects that use fear diminishing returns
   requiresDodgeProc?: boolean; // overpower
   requiresTargetHpBelow?: number; // execute-style (fraction)
+  executeThreshold?: number; // strict execute threshold: target health must be below this fraction
+  // Paladin secondary resource cost. Checked before mana/cooldown/GCD and
+  // spent only when the cast is committed.
+  devotionCost?: number;
   requiresShield?: boolean;
   // Classic threat riders: flat bonus threat on a successful use and/or a
   // multiplier on the damage-threat (both scale with stance/form modifiers).

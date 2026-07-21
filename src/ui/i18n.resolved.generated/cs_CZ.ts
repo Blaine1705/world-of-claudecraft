@@ -3159,6 +3159,14 @@ export const cs_CZ: EnTranslations = {
       "holy_light": "Stabilní, výrazné léčení pro doléčení spojence nebo sebe.",
       "devotion_aura": "Trvalý self-buff zvedající zbroj, takže zásahy dopadají měkčeji.",
       "judgement": "Utratí aktivní pečeť a udeří nepřítele z krátké vzdálenosti.",
+      "oathstrike": "A reliable weapon strike that builds Devotion for your next holy assault.",
+      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
+      "avenging_wrath": "Unfurls holy wings for a powerful fifteen-second damage window.",
+      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
+      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
+      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
+      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
+      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
       "blessing_of_might": "Zvedne přátelskému cíli sílu útoku, dobré seslat před pullem.",
       "divine_protection": "Rychlá ochranná záštita, která pohltí poškození, když přituhne.",
       "raptor_strike": "Tvrdý útok na blízko pro chvíle, kdy se k tobě něco dostane.",
@@ -6058,6 +6066,7 @@ export const cs_CZ: EnTranslations = {
       "notEnoughRage": "Nedostatek vzteku!",
       "notEnoughEnergy": "Nedostatek energie!",
       "notEnoughMana": "Nedostatek many!",
+      "notEnoughDevotion": "Not enough Devotion!",
       "notEnoughResource": "Nedostatek zdroje: {resource}!",
       "notEnoughHealth": "Nedostatek zdraví.",
       "targetMustDodge": "Tvůj cíl se musí nejdřív vyhnout.",
@@ -6364,7 +6373,8 @@ export const cs_CZ: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Vztek",
-      "energy": "Energie"
+      "energy": "Energie",
+      "devotion": "Devotion"
     },
     "forms": {
       "bear": "Medvěd",
@@ -7188,6 +7198,14 @@ export const cs_CZ: EnTranslations = {
       "consecration": {
         "name": "Svatá půda",
         "description": "Posvětí půdu pod tebou a sežehne blízké nepřátele za {damage} svatého poškození každé 2 s po dobu 10 s."
+      },
+      "bastion_sweep": {
+        "name": "Bastion Sweep",
+        "description": "Sweep your shield through nearby enemies for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+      },
+      "oath_chain": {
+        "name": "Oath Chain",
+        "description": "Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. This utility is not empowered by Ascension."
       },
       "righteous_fury": {
         "name": "Hořící přísaha",

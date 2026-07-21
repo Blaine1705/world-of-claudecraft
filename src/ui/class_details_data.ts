@@ -135,12 +135,12 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     protection: {
       primaryStat: 'str',
       complexity: 'medium',
-      examples: ['holy_shield', 'consecration', 'righteous_fury', 'sacred_bulwark'],
+      examples: ['bastion_sweep', 'oath_chain', 'holy_shield', 'consecration'],
     },
     retribution: {
       primaryStat: 'str',
       complexity: 'low',
-      examples: ['crusader_strike', 'judgement', 'seal_of_righteousness', 'exorcism'],
+      examples: ['oathstrike', 'judgement', 'hammer_of_wrath', 'avenging_wrath'],
     },
   },
   hunter: {

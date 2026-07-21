@@ -5196,6 +5196,7 @@ export class GameServer {
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
     const activeFrostRings = this.sim.activeFrostRings;
     const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
+    const activeConsecrations = this.sim.activeConsecrations;
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -5377,10 +5378,23 @@ export class GameServer {
           );
         const temporalHourglassesJson =
           temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
+        const consecrations = activeConsecrations
+          .filter((consecration) => {
+            const dx = consecration.x - anchorEntity.pos.x;
+            const dz = consecration.z - anchorEntity.pos.z;
+            const limit = INTEREST_QUERY_RADIUS + consecration.radius;
+            return dx * dx + dz * dz <= limit * limit;
+          })
+          .map(
+            (consecration) =>
+              `{"id":${JSON.stringify(consecration.id)},"x":${round2(consecration.x)},"z":${round2(consecration.z)},"r":${round2(consecration.radius)},"dur":${round2(consecration.duration)},"rem":${round2(consecration.remaining)}}`,
+          );
+        const consecrationsJson =
+          consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
+          `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
         );
       },
       (err, resolved) =>

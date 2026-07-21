@@ -2,6 +2,7 @@ import type {
   AccountCosmetics,
   ActionBarLayout,
   ActionBarLayoutRestore,
+  ActiveConsecration,
   ActiveFrostRing,
   ActiveTemporalHourglass,
   BankBonusSource,
@@ -266,6 +267,7 @@ import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
 import {
   grantDevotionFromBlock,
+  grantGroundAoEDevotionOnFirstHit,
   resolveAscensionAbility,
   updatePaladinDevotion,
 } from './paladin_devotion';
@@ -1650,6 +1652,22 @@ export class Sim {
       });
     }
     return hourglasses;
+  }
+  get activeConsecrations(): ActiveConsecration[] {
+    const consecrations: ActiveConsecration[] = [];
+    for (const effect of this.groundAoEs) {
+      const consecration = effect.consecration;
+      if (!consecration || effect.remaining <= 0) continue;
+      consecrations.push({
+        id: consecration.id,
+        x: effect.pos.x,
+        z: effect.pos.z,
+        radius: effect.radius,
+        duration: consecration.duration,
+        remaining: effect.remaining,
+      });
+    }
+    return consecrations;
   }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
@@ -5095,6 +5113,7 @@ export class Sim {
     if (effect.orbCdr && zoneStruck > 0 && source.kind === 'player') {
       frostMageChannelPulse(this.ctx, source, 'blizzard', zoneStruck);
     }
+    grantGroundAoEDevotionOnFirstHit(source, effect, zoneStruck);
   }
 
   // -------------------------------------------------------------------------

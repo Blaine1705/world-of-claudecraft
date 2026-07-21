@@ -48,7 +48,7 @@ describe('Paladin core abilities', () => {
 
     expect(resolve(sim, 'divine_ascension').def.hiddenFromPlayer).not.toBe(true);
     expect(resolve(sim, 'oathstrike').def.specs).toEqual(['retribution']);
-    expect(resolve(sim, 'judgement').def.hiddenFromPlayer).toBe(true);
+    expect(resolve(sim, 'judgement').def.hiddenFromPlayer).not.toBe(true);
     expect(sim.resolvedAbility('mercy_lance')).toBeNull();
     expect(sim.resolvedAbility('sunward_disc')).toBeNull();
   });
@@ -284,6 +284,25 @@ describe('Paladin core abilities', () => {
     expect(resolve(protection, 'guardian_covenant').effects).toEqual([
       { type: 'buffTarget', kind: 'buff_dr', value: 0.3, duration: 8 },
     ]);
+    expect(resolve(protection, 'bastion_sweep').effects).toEqual([
+      { type: 'aoeDamage', min: 94, max: 114, radius: 8, softCap: 5 },
+    ]);
+    expect(resolve(protection, 'holy_shield').effects).toEqual([
+      { type: 'selfBuff', kind: 'buff_block', value: 0.4, duration: 10 },
+      { type: 'absorb', amount: 135, duration: 10, auraId: 'holy_shield_absorb' },
+      { type: 'threatPulse', amount: 150, radius: 8 },
+    ]);
+    expect(resolve(protection, 'consecration').effects).toEqual([
+      {
+        type: 'groundAoE',
+        min: 29,
+        max: 36,
+        radius: 10,
+        duration: 9,
+        interval: 1,
+        devotionOnFirstHit: 1,
+      },
+    ]);
 
     const retribution = new Sim({ seed: 47, playerClass: 'paladin', autoEquip: true });
     retribution.setPlayerLevel(20);
@@ -303,6 +322,9 @@ describe('Paladin core abilities', () => {
     ]);
     expect(resolve(retribution, 'faithforged_guard').effects).toEqual([
       { type: 'absorb', amount: 210, duration: 8 },
+    ]);
+    expect(resolve(retribution, 'hammer_of_wrath').effects).toEqual([
+      { type: 'directDamage', min: 234, max: 281 },
     ]);
   });
 

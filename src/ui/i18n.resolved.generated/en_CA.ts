@@ -3158,7 +3158,15 @@ export const en_CA: EnTranslations = {
       "seal_of_righteousness": "Imbues your swings with Holy damage, then spend it with Verdict.",
       "holy_light": "A steady, sizable heal for topping off an ally or yourself.",
       "devotion_aura": "A lasting self-buff that raises armor so hits land softer.",
-      "judgement": "Spends your active Seal to strike an enemy from short range.",
+      "judgement": "Spends your active Seal to strike an enemy from long range and build Devotion.",
+      "oathstrike": "A reliable weapon strike that builds Devotion for your next holy assault.",
+      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
+      "avenging_wrath": "Unfurls holy wings for a powerful fifteen-second damage window.",
+      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
+      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
+      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
+      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
+      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
       "blessing_of_might": "Raises a friendly target's attack power, good to cast before a pull.",
       "divine_protection": "A quick protective ward to soak damage when things get rough.",
       "raptor_strike": "A hard melee swing for when something closes the gap on you.",
@@ -6058,6 +6066,7 @@ export const en_CA: EnTranslations = {
       "notEnoughRage": "Not enough rage!",
       "notEnoughEnergy": "Not enough energy!",
       "notEnoughMana": "Not enough mana!",
+      "notEnoughDevotion": "Not enough Devotion!",
       "notEnoughResource": "Not enough {resource}!",
       "notEnoughHealth": "Not enough health.",
       "targetMustDodge": "Your target must dodge first.",
@@ -6364,7 +6373,8 @@ export const en_CA: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Rage",
-      "energy": "Energy"
+      "energy": "Energy",
+      "devotion": "Devotion"
     },
     "forms": {
       "bear": "Bear",
@@ -7186,8 +7196,16 @@ export const en_CA: EnTranslations = {
         "description": "Banishes the wicked with Holy wrath, causing {damage} Holy damage."
       },
       "consecration": {
-        "name": "Holy Ground",
-        "description": "Consecrates the ground beneath you, searing nearby enemies for {damage} Holy damage every 2 sec for 10 sec."
+        "name": "Consecration",
+        "description": "Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Ascension increases damage and radius."
+      },
+      "bastion_sweep": {
+        "name": "Bastion Sweep",
+        "description": "Sweep your shield through nearby enemies for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+      },
+      "oath_chain": {
+        "name": "Oath Chain",
+        "description": "Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. This utility is not empowered by Ascension."
       },
       "righteous_fury": {
         "name": "Burning Oath",
@@ -7530,8 +7548,8 @@ export const en_CA: EnTranslations = {
         "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
       },
       "holy_shield": {
-        "name": "Hallowed Wall",
-        "description": "Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)"
+        "name": "Holy Shield",
+        "description": "Spend 3 Devotion to gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense."
       },
       "bestial_wrath": {
         "name": "Howling Rage",
@@ -7758,8 +7776,8 @@ export const en_CA: EnTranslations = {
         "description": "Transform into a colossus for 20 sec, breaking enemy control effects on you (boss control is unaffected) and increasing your damage dealt by 20%."
       },
       "avenging_wrath": {
-        "name": "Wrathwing",
-        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
+        "name": "Avenging Wrath",
+        "description": "Unfurl wings of holy power, increasing all damage dealt by 20% for 15 sec and enabling Hammer of Wrath against any target."
       },
       "berserk": {
         "name": "Red Haze",
@@ -7846,8 +7864,8 @@ export const en_CA: EnTranslations = {
         "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "Tolling Hammer",
-        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
+        "name": "Hammer of Wrath",
+        "description": "Hurl a holy hammer for {damage} damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Avenging Wrath. Ascension increases its damage by 30%."
       },
       "healing_stream": {
         "name": "Springwell",

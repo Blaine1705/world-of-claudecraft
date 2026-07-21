@@ -3159,6 +3159,14 @@ export const zh_TW: EnTranslations = {
       "holy_light": "穩定而可觀的治療，用來把友方或自己補滿。",
       "devotion_aura": "持續的自我增益，提升護甲讓敵人的攻擊更不痛。",
       "judgement": "消耗你當前的聖印，從近距離打擊敵人。",
+      "oathstrike": "可靠的武器攻擊，可累積奉獻，為下一次神聖猛攻蓄力。",
+      "hammer_of_wrath": "從遠處處決受傷的敵人；聖翼啟動時可攻擊任何敵人。",
+      "avenging_wrath": "展開神聖雙翼，獲得持續十五秒的強力傷害增幅。",
+      "bastion_sweep": "揮盾橫掃敵群，奪取仇恨並累積奉獻。",
+      "oath_chain": "將遠處的敵人拖入隊伍並減緩其逃跑速度。",
+      "holy_shield": "消耗奉獻，獲得主動格擋、吸收護盾和仇恨脈衝。",
+      "consecration": "以持續的神聖傷害和仇恨佔據周圍地面。",
+      "hammer_of_justice": "用短暫而可靠的昏迷阻止一個敵人。",
       "blessing_of_might": "提升友方目標的攻擊強度，適合在開怪前施放。",
       "divine_protection": "快速的守護結界，在情勢危急時吸收傷害。",
       "raptor_strike": "在有東西貼上你時可用的一記重力近戰揮擊。",
@@ -6058,6 +6066,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughRage": "怒氣不足！",
       "notEnoughEnergy": "能量不足！",
       "notEnoughMana": "法力不足！",
+      "notEnoughDevotion": "奉獻不足！",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
       "targetMustDodge": "你的目標必須先閃避。",
@@ -6364,7 +6373,8 @@ export const zh_TW: EnTranslations = {
     "resources": {
       "mana": "法力",
       "rage": "怒氣",
-      "energy": "能量"
+      "energy": "能量",
+      "devotion": "奉獻"
     },
     "forms": {
       "bear": "熊",
@@ -7188,6 +7198,14 @@ export const zh_TW: EnTranslations = {
       "consecration": {
         "name": "聖化之地",
         "description": "奉獻你腳下的土地，持續 10 秒，每 2 秒灼燒附近敵人造成 {damage} 點神聖傷害。"
+      },
+      "bastion_sweep": {
+        "name": "壁壘橫掃",
+        "description": "用盾牌橫掃附近敵人，造成 {damage} 點神聖傷害並產生大量仇恨，同時獲得 1 點奉獻。昇華使傷害提高 30%，半徑擴大至 8 公尺。"
+      },
+      "oath_chain": {
+        "name": "誓約鎖鏈",
+        "description": "用神聖鎖鏈束縛遠處的敵人，將其拉至 3 公尺內，並使其減速 50%，持續 4 秒。此輔助效果不受昇華強化。"
       },
       "righteous_fury": {
         "name": "燃燒誓言",

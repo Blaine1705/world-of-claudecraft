@@ -56,6 +56,7 @@ const abilityStringsEn = {
       mana: 'Mana',
       rage: 'Rage',
       energy: 'Energy',
+      devotion: 'Devotion',
     },
     forms: {
       bear: 'Bear',
@@ -1139,8 +1140,18 @@ const classAbilityNamesEn = {
       ],
       [
         'consecration',
-        'Holy Ground',
-        'Consecrates the ground beneath you, searing nearby enemies for {damage} Holy damage every 2 sec for 10 sec.',
+        'Consecration',
+        'Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Ascension increases damage and radius.',
+      ],
+      [
+        'bastion_sweep',
+        'Bastion Sweep',
+        'Sweep your shield through nearby enemies for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m.',
+      ],
+      [
+        'oath_chain',
+        'Oath Chain',
+        'Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. This utility is not empowered by Ascension.',
       ],
       [
         'righteous_fury',
@@ -1482,8 +1493,8 @@ const classAbilityNamesEn = {
       ],
       [
         'holy_shield',
-        'Hallowed Wall',
-        'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)',
+        'Holy Shield',
+        'Spend 3 Devotion to gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
       ],
       [
         'bestial_wrath',
@@ -1767,8 +1778,8 @@ const classAbilityNamesEn = {
       ],
       [
         'avenging_wrath',
-        'Wrathwing',
-        'Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)',
+        'Avenging Wrath',
+        'Unfurl wings of holy power, increasing all damage dealt by 20% for 15 sec and enabling Hammer of Wrath against any target.',
       ],
       ['berserk', 'Red Haze', 'Increases attack power by 70 for 15 sec. (Druid talent)'],
       [
@@ -1865,8 +1876,8 @@ const classAbilityNamesEn = {
       ],
       [
         'hammer_of_wrath',
-        'Tolling Hammer',
-        'Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)',
+        'Hammer of Wrath',
+        'Hurl a holy hammer for {damage} damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Avenging Wrath. Ascension increases its damage by 30%.',
       ],
       [
         'healing_stream',

@@ -181,7 +181,7 @@ describe('coverage: each scenario fires its subsystem', () => {
       (e) =>
         e.type === 'damage' &&
         typeof e.ability === 'string' &&
-        e.ability.toLowerCase().includes('holy ground'),
+        e.ability.toLowerCase().includes('consecration'),
     );
     // 1 immediate on-cast pulse (~4097) + >=1 deferred interval pulse (~3052).
     expect(hits.length).toBeGreaterThanOrEqual(2);
@@ -611,7 +611,7 @@ describe('coverage: each scenario fires its subsystem', () => {
           (e) =>
             e.type === 'damage' &&
             typeof e.ability === 'string' &&
-            e.ability.toLowerCase().includes('holy ground'),
+            e.ability.toLowerCase().includes('consecration'),
         )
         .map((e) => e.targetId),
     );

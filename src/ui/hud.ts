@@ -5110,6 +5110,14 @@ export class Hud {
         }),
       );
     }
+    if (a.devotionCost) {
+      costLine.push(
+        t('abilityUi.tooltip.cost', {
+          cost: formatAbilityNumber(a.devotionCost),
+          resource: t('abilityUi.resources.devotion'),
+        }),
+      );
+    }
     const rangeLine = abilityRangeLine(a);
     if (rangeLine) costLine.push(rangeLine);
     if (costLine.length) html += `<div class="tt-stat">${costLine.map(esc).join(' &nbsp; ')}</div>`;
@@ -10753,6 +10761,7 @@ export class Hud {
       'Not enough rage!': 'hud.errors.notEnoughRage',
       'Not enough energy!': 'hud.errors.notEnoughEnergy',
       'Not enough mana!': 'hud.errors.notEnoughMana',
+      'Not enough Devotion!': 'hud.errors.notEnoughDevotion',
       'Not enough health.': 'hud.errors.notEnoughHealth',
       'Your target must dodge first.': 'hud.errors.targetMustDodge',
       'That ability requires combo points.': 'hud.errors.requiresCombo',
@@ -14136,10 +14145,11 @@ export function abilityRequirementLines(def: AbilityDef): string[] {
   if (def.spendsCombo) lines.push(t('abilityUi.tooltip.requiresCombo'));
   if (def.requiresDodgeProc) lines.push(t('abilityUi.tooltip.requiresDodge'));
   if (def.requiresOutOfCombat) lines.push(t('abilityUi.tooltip.requiresOutOfCombat'));
-  if (def.requiresTargetHpBelow !== undefined) {
+  const targetHealthThreshold = def.executeThreshold ?? def.requiresTargetHpBelow;
+  if (targetHealthThreshold !== undefined) {
     lines.push(
       t('abilityUi.tooltip.requiresTargetHealthBelow', {
-        percent: formatAbilityNumber(def.requiresTargetHpBelow * 100),
+        percent: formatAbilityNumber(targetHealthThreshold * 100),
       }),
     );
   }

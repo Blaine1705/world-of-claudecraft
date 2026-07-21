@@ -101,6 +101,7 @@ import { armHeroicLeap, relocateSwept } from './heroic_leap';
 import { spawnHunterTrap } from './hunter_trap';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
 import { placeBeaconOfLight } from './paladin_beacon';
+import { pullPaladinTarget, pulsePaladinThreat } from './paladin_control';
 import { PALADIN_DEVOTION_ABILITY_IDS, paladinDevotionConflicts } from './paladin_support';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
@@ -843,7 +844,7 @@ export function runEffects(
           (effect) => effect.type === 'selfBuff' && effect.kind === 'stasis',
         );
         ctx.applyAura(shieldTarget, {
-          id: hasStasisSelfBuff ? `${ability.id}_absorb` : ability.id,
+          id: eff.auraId ?? (hasStasisSelfBuff ? `${ability.id}_absorb` : ability.id),
           name: ability.name,
           kind: 'absorb',
           remaining: eff.duration,
@@ -911,6 +912,7 @@ export function runEffects(
           false,
           ability.id,
         );
+        devotionTriggered = true;
         noteSpellHit(ctx, p, crit, ability.id);
         break;
       }
@@ -1339,6 +1341,24 @@ export function runEffects(
         ctx.enterCombat(p, target);
         break;
       }
+      case 'pullTarget': {
+        if (!target || target.dead) break;
+        pullPaladinTarget(
+          ctx,
+          p,
+          target,
+          eff.stopDistance,
+          eff.slowMult,
+          eff.slowDuration,
+          ability.id,
+          ability.name,
+        );
+        break;
+      }
+      case 'threatPulse': {
+        pulsePaladinThreat(ctx, p, eff.amount, eff.radius);
+        break;
+      }
       case 'root': {
         if (!target || target.dead) break;
         ctx.applyRootAura(
@@ -1677,6 +1697,12 @@ export function runEffects(
           slowMult: eff.slowMult,
           slowDuration: eff.slowDuration,
           orbCdr: eff.orbCdr,
+          threat: threatOpts,
+          devotionOnFirstHit: eff.devotionOnFirstHit,
+          consecration:
+            ability.id === 'consecration'
+              ? { id: `consecration:${p.id}:${ctx.tickCount}`, duration: eff.duration }
+              : undefined,
         };
         // A fresh Blizzard zone gets a fresh Frozen Orb refund budget (the
         // same per-cast budget the old channel reset at channel start).

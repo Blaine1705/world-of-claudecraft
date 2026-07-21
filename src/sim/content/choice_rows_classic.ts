@@ -460,17 +460,17 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pal_r20_tolling_hammer',
-          name: 'Tolling Hammer',
-          description: 'Grants Tolling Hammer.',
+          name: 'Hammer of Wrath',
+          description: 'Hammer of Wrath deals 15% more damage.',
           icon: 'hammer_of_wrath',
-          effect: { grant: { ability: 'hammer_of_wrath' } },
+          effect: { ability: [{ ability: 'hammer_of_wrath', dmgPct: 0.15 }] },
         },
         {
           id: 'pal_r20_wrathwing',
-          name: 'Wrathwing',
-          description: 'Grants Wrathwing.',
+          name: 'Avenging Wrath',
+          description: 'Avenging Wrath recharges 30 sec faster.',
           icon: 'avenging_wrath',
-          effect: { grant: { ability: 'avenging_wrath' } },
+          effect: { ability: [{ ability: 'avenging_wrath', cooldownFlat: -30 }] },
         },
         {
           id: 'pal_r20_sunfire_aegis',

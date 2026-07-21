@@ -3159,6 +3159,14 @@ export const pt_BR: EnTranslations = {
       "holy_light": "Uma cura firme e considerável para recuperar um aliado ou você mesmo.",
       "devotion_aura": "Um aprimoramento próprio duradouro que aumenta a armadura para os golpes doerem menos.",
       "judgement": "Gasta seu Selo ativo para atingir um inimigo a curta distância.",
+      "oathstrike": "A reliable weapon strike that builds Devotion for your next holy assault.",
+      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
+      "avenging_wrath": "Unfurls holy wings for a powerful fifteen-second damage window.",
+      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
+      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
+      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
+      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
+      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
       "blessing_of_might": "Aumenta o poder de ataque de um alvo amigo; bom para lançar antes da puxada.",
       "divine_protection": "Uma salvaguarda protetora rápida para absorver dano quando as coisas ficam difíceis.",
       "raptor_strike": "Um golpe corpo a corpo pesado para quando algo encurta a distância até você.",
@@ -6058,6 +6066,7 @@ export const pt_BR: EnTranslations = {
       "notEnoughRage": "Raiva insuficiente!",
       "notEnoughEnergy": "Energia insuficiente!",
       "notEnoughMana": "Mana insuficiente!",
+      "notEnoughDevotion": "Not enough Devotion!",
       "notEnoughResource": "{resource} insuficiente!",
       "notEnoughHealth": "Saúde insuficiente.",
       "targetMustDodge": "Seu alvo precisa esquivar primeiro.",
@@ -6364,7 +6373,8 @@ export const pt_BR: EnTranslations = {
     "resources": {
       "mana": "mana",
       "rage": "raiva",
-      "energy": "energia"
+      "energy": "energia",
+      "devotion": "Devotion"
     },
     "forms": {
       "bear": "urso",
@@ -7188,6 +7198,14 @@ export const pt_BR: EnTranslations = {
       "consecration": {
         "name": "Solo Sagrado",
         "description": "Consagra o chão sob você, queimando inimigos próximos com {damage} de dano Sagrado a cada 2 s por 10 s."
+      },
+      "bastion_sweep": {
+        "name": "Bastion Sweep",
+        "description": "Sweep your shield through nearby enemies for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+      },
+      "oath_chain": {
+        "name": "Oath Chain",
+        "description": "Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. This utility is not empowered by Ascension."
       },
       "righteous_fury": {
         "name": "Juramento Ardente",

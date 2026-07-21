@@ -105,6 +105,7 @@ export const IWORLD_MEMBERS = [
   { name: 'craftSkills', kind: 'data' },
   { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
+  { name: 'activeConsecrations', kind: 'data' },
   { name: 'activeFrostRings', kind: 'data' },
   { name: 'activeTemporalHourglasses', kind: 'data' },
   { name: 'questLog', kind: 'data' },
@@ -463,9 +464,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // pickRowTalent; rowPicks stays off the seam, rows live on the allocation)
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
-    // activeMobileStationCraft), and the commissions unbindItem command.
-    expect(IWORLD_MEMBERS.length).toBe(253);
-    expect(DATA_MEMBERS.length).toBe(67);
+    // activeMobileStationCraft), the commissions unbindItem command, and
+    // Paladin Consecration ground-state projection.
+    expect(IWORLD_MEMBERS.length).toBe(254);
+    expect(DATA_MEMBERS.length).toBe(68);
     expect(METHOD_MEMBERS.length).toBe(186);
   });
   it('has no duplicate member names', () => {
@@ -483,6 +485,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptQuest',
       'accountCosmetics',
       'accountFlair',
+      'activeConsecrations',
       'activeFrostRings',
       'activeLoadout',
       'activeLootRolls',
@@ -736,6 +739,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
   it('the sorted data-kind set is exactly the pinned list', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountCosmetics',
+      'activeConsecrations',
       'activeFrostRings',
       'activeLoadout',
       'activeMobileStationCraft',
@@ -1040,7 +1044,7 @@ describe('membership, not equality: world extras do not fail the gate', () => {
 //       a MISSING name (if the array omits a key, Exclude<> is a non-never union and tsc
 //       fails) -- (1)+(2) together make each array EXACTLY its facet key-set;
 //   (3) the 28 arrays are pairwise DISJOINT (a member filed in two facets reddens);
-//   (4) their union, sorted, equals the pinned 250-name IWORLD_MEMBERS set (a member
+//   (4) their union, sorted, equals the pinned 251-name IWORLD_MEMBERS set (a member
 //       dropped from the split reddens).
 // This is the rigorous form, NOT the tautological `keyof IWorld === keyof (A & B & ...)`
 // (IWorld extends them, so that self-equality proves nothing): it asserts against the
@@ -1065,6 +1069,7 @@ type _ExhaustEntityRoster = AssertNever<
 
 const FACET_COMBAT = [
   'known',
+  'activeConsecrations',
   'activeFrostRings',
   'activeTemporalHourglasses',
   'castAbility',
@@ -1506,8 +1511,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 28 fa
 
   it('the union of the facets equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(253);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(253);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(254);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(254);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

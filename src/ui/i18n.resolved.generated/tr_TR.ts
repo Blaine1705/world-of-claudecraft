@@ -3159,6 +3159,14 @@ export const tr_TR: EnTranslations = {
       "holy_light": "Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.",
       "devotion_aura": "Zırhı yükselten kalıcı bir öz güçlendirmesi, böylece darbeler daha hafif gelir.",
       "judgement": "Aktif Mührünü harcayarak kısa menzilden bir düşmana vurur.",
+      "oathstrike": "A reliable weapon strike that builds Devotion for your next holy assault.",
+      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
+      "avenging_wrath": "Unfurls holy wings for a powerful fifteen-second damage window.",
+      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
+      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
+      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
+      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
+      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
       "blessing_of_might": "Dost bir hedefin saldırı gücünü yükseltir, akından önce kullanmak iyidir.",
       "divine_protection": "İşler kızıştığında hasarı emmek için hızlı bir koruyucu siper.",
       "raptor_strike": "Bir şey aradaki mesafeyi kapattığında kullanılacak sert bir yakın dövüş savruşu.",
@@ -6058,6 +6066,7 @@ export const tr_TR: EnTranslations = {
       "notEnoughRage": "Yeterli öfke yok!",
       "notEnoughEnergy": "Yeterli enerji yok!",
       "notEnoughMana": "Yeterli mana yok!",
+      "notEnoughDevotion": "Not enough Devotion!",
       "notEnoughResource": "Yeterli {resource} yok!",
       "notEnoughHealth": "Yeterli can yok.",
       "targetMustDodge": "Önce hedefinin sıyrılması gerekir.",
@@ -6364,7 +6373,8 @@ export const tr_TR: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Öfke",
-      "energy": "Enerji"
+      "energy": "Enerji",
+      "devotion": "Devotion"
     },
     "forms": {
       "bear": "Ayı",
@@ -7188,6 +7198,14 @@ export const tr_TR: EnTranslations = {
       "consecration": {
         "name": "Kutsal Toprak",
         "description": "Altındaki zemini kutsar, yakındaki düşmanları 10 saniye boyunca her 2 saniyede bir {damage} Kutsal hasarla dağlar."
+      },
+      "bastion_sweep": {
+        "name": "Bastion Sweep",
+        "description": "Sweep your shield through nearby enemies for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+      },
+      "oath_chain": {
+        "name": "Oath Chain",
+        "description": "Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. This utility is not empowered by Ascension."
       },
       "righteous_fury": {
         "name": "Yanan Yemin",

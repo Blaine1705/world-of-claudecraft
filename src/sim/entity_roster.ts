@@ -66,6 +66,10 @@ export type GroundAoE = {
   slowMult?: number;
   slowDuration?: number;
   orbCdr?: boolean;
+  threat?: { flat?: number; mult?: number };
+  devotionOnFirstHit?: number;
+  devotionGranted?: boolean;
+  consecration?: { id: string; duration: number };
   // Ring of Frost: annular contact trap state. Its duration uses `remaining`;
   // targets are remembered so standing on or re-entering one ring cannot chain-root.
   frostRing?: {
@@ -248,7 +252,7 @@ export function tickGroundAoEs(ctx: SimContext): void {
     effect.tickTimer -= DT;
     while (effect.tickTimer <= CAST_COMPLETE_EPS && effect.remaining > CAST_COMPLETE_EPS) {
       effect.tickTimer += effect.interval;
-      ctx.pulseGroundAoE(effect);
+      ctx.pulseGroundAoE(effect, effect.threat);
     }
     if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
   }

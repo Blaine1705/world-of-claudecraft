@@ -129,6 +129,24 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
 }
 
 describe('actionBarView: the four slot kinds classify correctly', () => {
+  it('dims a Devotion spender until the secondary resource cost is met', () => {
+    const view = createActionBarView(
+      descriptor(slot(0, { ability: ability('holy_shield', { devotionCost: 3 }) })),
+      fakeDeps(),
+    );
+
+    expect(
+      view.tick(
+        world({ paladinDevotion: { value: 2, ascensionCharges: 0, ascensionRemaining: 0 } }),
+      ).slots[0].usable,
+    ).toBe(false);
+    expect(
+      view.tick(
+        world({ paladinDevotion: { value: 3, ascensionCharges: 0, ascensionRemaining: 0 } }),
+      ).slots[0].usable,
+    ).toBe(true);
+  });
+
   it('lights Divine Ascension when ready and marks only spec-eligible empowered actions', () => {
     const view = createActionBarView(
       descriptor(

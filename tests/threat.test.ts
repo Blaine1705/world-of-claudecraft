@@ -170,7 +170,7 @@ describe('threat from damage', () => {
     );
   });
 
-  it('consecration burns the ground every 2 seconds from 0s to 8s and generates holy threat each pulse', () => {
+  it('consecration burns the ground every second from 0s to 8s and generates high holy threat each pulse', () => {
     const sim = makeSim('paladin');
     sim.setPlayerLevel(20);
     expect(sim.setSpec('protection')).toBe(true);
@@ -185,7 +185,7 @@ describe('threat from damage', () => {
       for (const event of sim.tick()) {
         if (
           event.type === 'damage' &&
-          event.ability === 'Holy Ground' &&
+          event.ability === 'Consecration' &&
           event.targetId === wolf.id &&
           event.amount > 0
         ) {
@@ -194,9 +194,9 @@ describe('threat from damage', () => {
       }
     }
 
-    expect(damageEvents).toHaveLength(5);
-    expect(damageEvents.reduce((sum, amount) => sum + amount, 0)).toBeGreaterThanOrEqual(28 * 5);
-    expect(wolf.threat.get(sim.playerId) ?? 0).toBeGreaterThan(28 * 5 * RIGHTEOUS_FURY_THREAT_MULT);
+    expect(damageEvents).toHaveLength(9);
+    expect(damageEvents.reduce((sum, amount) => sum + amount, 0)).toBeGreaterThanOrEqual(22 * 9);
+    expect(wolf.threat.get(sim.playerId) ?? 0).toBeGreaterThan(22 * 9 * RIGHTEOUS_FURY_THREAT_MULT);
   });
 
   it('classic flat threat values resolve per rank (heroic strike 20/39)', () => {

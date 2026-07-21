@@ -3793,6 +3793,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'bastion_rite',
   'sunward_disc',
   'sacred_challenge',
+  'bastion_sweep',
+  'oath_chain',
   'citadel_of_faith',
   'seal_of_righteousness',
   'holy_light',

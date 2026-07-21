@@ -579,7 +579,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "consecration",
-        "name": "Holy Ground"
+        "name": "Consecration"
       },
       {
         "id": "righteous_fury",
@@ -603,7 +603,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "holy_shield",
-        "name": "Hallowed Wall"
+        "name": "Holy Shield"
       },
       {
         "id": "crusader_strike",
@@ -670,6 +670,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Faithforged Guard"
       },
       {
+        "id": "hammer_of_wrath",
+        "name": "Hammer of Wrath"
+      },
+      {
+        "id": "avenging_wrath",
+        "name": "Avenging Wrath"
+      },
+      {
         "id": "mercy_lance",
         "name": "Mercy Lance"
       },
@@ -708,6 +716,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "sacred_challenge",
         "name": "Sacred Goad"
+      },
+      {
+        "id": "bastion_sweep",
+        "name": "Bastion Sweep"
+      },
+      {
+        "id": "oath_chain",
+        "name": "Oath Chain"
       },
       {
         "id": "citadel_of_faith",

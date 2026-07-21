@@ -157,6 +157,7 @@ import {
   type PaladinAscensionVisual,
   syncPaladinAscensionVisual,
 } from './paladin_ascension_visual';
+import { PaladinConsecrationVisuals } from './paladin_consecration_visual';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import {
@@ -1127,6 +1128,7 @@ export class Renderer {
   private mageGroundFx!: MageGroundFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
+  private paladinConsecrationVisuals!: PaladinConsecrationVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = {
     theme: 'frost',
     value: 0,
@@ -1755,6 +1757,9 @@ export class Renderer {
       groundHeight(x, z, this.sim.cfg.seed),
     );
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.paladinConsecrationVisuals = new PaladinConsecrationVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
     this.vfx = new Vfx(this.scene, (id, frac) => {
@@ -2471,6 +2476,8 @@ export class Renderer {
     this.ringOfFrostVisuals.update(dt);
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
+    this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);
+    this.paladinConsecrationVisuals.update(dt);
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
@@ -5819,6 +5826,8 @@ export class Renderer {
     this.ringOfFrostVisuals.update(dt);
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
+    this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);
+    this.paladinConsecrationVisuals.update(dt);
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);

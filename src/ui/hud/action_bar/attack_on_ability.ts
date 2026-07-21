@@ -78,6 +78,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   buffTarget: 'other',
   debuffTargetSource: 'other',
   slow: 'other',
+  pullTarget: 'other',
+  threatPulse: 'other',
   root: 'other',
   stun: 'other',
   aoeAttackSpeed: 'other',

@@ -1,3 +1,4 @@
+import type { GroundAoE } from './entity_roster';
 import type { ResolvedAbility } from './sim';
 import type { Entity } from './types';
 
@@ -19,8 +20,22 @@ export type AscensionImpactKind = 'healing' | 'defensive' | 'offensive' | 'area'
 
 const ASCENSION_ABILITIES: Readonly<Record<PaladinSpec, ReadonlySet<string>>> = {
   holy: new Set(['mercy_lance', 'dawns_embrace', 'radiant_chorus']),
-  protection: new Set(['vowkeeper_strike', 'bastion_rite', 'sunward_disc', 'guardian_covenant']),
-  retribution: new Set(['oathstrike', 'final_edict', 'dawnfall', 'faithforged_guard']),
+  protection: new Set([
+    'vowkeeper_strike',
+    'bastion_rite',
+    'sunward_disc',
+    'guardian_covenant',
+    'bastion_sweep',
+    'holy_shield',
+    'consecration',
+  ]),
+  retribution: new Set([
+    'oathstrike',
+    'final_edict',
+    'dawnfall',
+    'faithforged_guard',
+    'hammer_of_wrath',
+  ]),
 };
 
 const DEVOTION_GAIN: Readonly<Record<PaladinSpec, Readonly<Record<string, number>>>> = {
@@ -34,8 +49,11 @@ const DEVOTION_GAIN: Readonly<Record<PaladinSpec, Readonly<Record<string, number
     vowkeeper_strike: 1,
     bastion_rite: 1,
     sunward_disc: 2,
+    bastion_sweep: 1,
   },
   retribution: {
+    judgement: 1,
+    hammer_of_wrath: 1,
     oathstrike: 1,
     final_edict: 2,
     dawnfall: 2,
@@ -78,6 +96,37 @@ export function grantDevotion(e: Entity, amount: number): number {
   return devotion.value - before;
 }
 
+export function spendDevotion(e: Entity, amount: number): boolean {
+  const devotion = state(e);
+  if (!devotion || !Number.isFinite(amount) || amount < 0) return false;
+  const cost = Math.floor(amount);
+  if (devotion.value < cost) return false;
+  devotion.value -= cost;
+  return true;
+}
+
+export function hasDevotion(e: Entity, amount: number): boolean {
+  const devotion = state(e);
+  return !!devotion && devotion.value >= Math.max(0, Math.floor(amount));
+}
+
+export function paladinExecuteWindowActive(e: Entity, abilityId: string): boolean {
+  return (
+    abilityId === 'hammer_of_wrath' &&
+    (isDivineAscensionActive(e) || e.auras.some((aura) => aura.id === 'avenging_wrath'))
+  );
+}
+
+export function grantGroundAoEDevotionOnFirstHit(
+  source: Entity,
+  effect: GroundAoE,
+  struck: number,
+): void {
+  if (struck <= 0 || effect.devotionGranted || !effect.devotionOnFirstHit) return;
+  effect.devotionGranted = true;
+  grantDevotion(source, effect.devotionOnFirstHit);
+}
+
 export function isAscensionEmpoweredAbility(spec: string | null, abilityId: string): boolean {
   if (spec !== 'holy' && spec !== 'protection' && spec !== 'retribution') return false;
   return ASCENSION_ABILITIES[spec].has(abilityId);
@@ -97,11 +146,17 @@ export function ascensionImpactKind(
   if (
     abilityId === 'faithforged_guard' ||
     abilityId === 'bastion_rite' ||
+    abilityId === 'holy_shield' ||
     abilityId === 'guardian_covenant'
   ) {
     return 'defensive';
   }
-  return abilityId === 'dawnfall' || abilityId === 'final_edict' ? 'area' : 'offensive';
+  return abilityId === 'dawnfall' ||
+    abilityId === 'final_edict' ||
+    abilityId === 'bastion_sweep' ||
+    abilityId === 'consecration'
+    ? 'area'
+    : 'offensive';
 }
 
 function scaleRange(min: number, max: number, mult: number): { min: number; max: number } {
@@ -136,6 +191,26 @@ export function resolveAscensionAbility(
       case 'dawnfall':
         return effect.type === 'aoeDamage'
           ? { ...effect, ...scaleRange(effect.min, effect.max, 1.5), radius: 10 }
+          : effect;
+      case 'hammer_of_wrath':
+        return effect.type === 'directDamage'
+          ? { ...effect, ...scaleRange(effect.min, effect.max, 1.3) }
+          : effect;
+      case 'bastion_sweep':
+        return effect.type === 'aoeDamage'
+          ? { ...effect, ...scaleRange(effect.min, effect.max, 1.3), radius: 8 }
+          : effect;
+      case 'holy_shield':
+        if (effect.type === 'selfBuff' && effect.kind === 'buff_block') {
+          return { ...effect, value: 0.4, duration: 10 };
+        }
+        if (effect.type === 'absorb') {
+          return { ...effect, amount: Math.round(effect.amount * 1.5), duration: 10 };
+        }
+        return effect;
+      case 'consecration':
+        return effect.type === 'groundAoE'
+          ? { ...effect, ...scaleRange(effect.min, effect.max, 1.3), radius: 10 }
           : effect;
       case 'faithforged_guard':
         return effect.type === 'absorb'

@@ -3159,6 +3159,14 @@ export const ja_JP: EnTranslations = {
       "holy_light": "味方や自分の体力を満タンに戻す、安定した大きめのヒールです。",
       "devotion_aura": "アーマーを上げて被弾を和らげる、持続する自己強化です。",
       "judgement": "現在のシールを消費し、近距離から敵を打ち据えます。",
+      "oathstrike": "確実な武器攻撃で献身を蓄え、次の聖なる猛攻に備えます。",
+      "hammer_of_wrath": "遠距離から瀕死の敵を処刑し、翼の発動中はどの敵にも使用できます。",
+      "avenging_wrath": "聖なる翼を広げ、15秒間強力なダメージ強化を得ます。",
+      "bastion_sweep": "盾で敵の集団を薙ぎ払い、脅威を奪って献身を蓄えます。",
+      "oath_chain": "遠くの敵を集団へ引き寄せ、逃走速度を低下させます。",
+      "holy_shield": "献身を消費し、能動的なブロック、吸収、脅威の波を得ます。",
+      "consecration": "持続する神聖ダメージと脅威で周囲の地面を支配します。",
+      "hammer_of_justice": "短時間の確実なスタンで敵1体を止めます。",
       "blessing_of_might": "味方の攻撃力を上げます。プルの前に唱えておくとよいでしょう。",
       "divine_protection": "状況が厳しいときにダメージを吸収する、素早い守りの結界です。",
       "raptor_strike": "敵に距離を詰められたときに使う、重い近接の一撃です。",
@@ -6058,6 +6066,7 @@ export const ja_JP: EnTranslations = {
       "notEnoughRage": "怒りが足りません！",
       "notEnoughEnergy": "エネルギーが足りません！",
       "notEnoughMana": "マナが足りません！",
+      "notEnoughDevotion": "献身が足りません！",
       "notEnoughResource": "{resource}が足りません！",
       "notEnoughHealth": "体力が足りません。",
       "targetMustDodge": "対象が先に回避する必要があります。",
@@ -6364,7 +6373,8 @@ export const ja_JP: EnTranslations = {
     "resources": {
       "mana": "マナ",
       "rage": "怒り",
-      "energy": "エネルギー"
+      "energy": "エネルギー",
+      "devotion": "献身"
     },
     "forms": {
       "bear": "熊",
@@ -7188,6 +7198,14 @@ export const ja_JP: EnTranslations = {
       "consecration": {
         "name": "聖なる大地",
         "description": "足元の地面を聖別し、10秒間、周囲の敵を焼いて2秒ごとに{damage}の神聖ダメージを与えます。"
+      },
+      "bastion_sweep": {
+        "name": "砦の薙ぎ払い",
+        "description": "盾で周囲の敵を薙ぎ払い、{damage}の神聖ダメージと高い脅威を与え、献身を1得ます。昇華中はダメージが30%増加し、半径が8メートルになります。"
+      },
+      "oath_chain": {
+        "name": "誓約の鎖",
+        "description": "遠くの敵を聖なる鎖で縛って3メートル以内へ引き寄せ、4秒間50%減速させます。この補助効果は昇華で強化されません。"
       },
       "righteous_fury": {
         "name": "バーニングオース",

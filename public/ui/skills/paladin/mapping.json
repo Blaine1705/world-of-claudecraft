@@ -330,7 +330,7 @@
     },
     {
       "abilityId": "holy_shield",
-      "name": "Hallowed Wall",
+      "name": "Holy Shield",
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "holy_shield.webp",
       "confidence": "high"
@@ -365,16 +365,30 @@
     },
     {
       "abilityId": "avenging_wrath",
-      "name": "Wrathwing",
+      "name": "Avenging Wrath",
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "avenging_wrath.webp",
       "confidence": "high"
     },
     {
       "abilityId": "hammer_of_wrath",
-      "name": "Tolling Hammer",
+      "name": "Hammer of Wrath",
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "hammer_of_wrath.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "bastion_sweep",
+      "name": "Bastion Sweep",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "bastion_sweep.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "oath_chain",
+      "name": "Oath Chain",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "oath_chain.webp",
       "confidence": "high"
     },
     {

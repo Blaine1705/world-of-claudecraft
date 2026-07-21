@@ -3159,6 +3159,14 @@ export const ko_KR: EnTranslations = {
       "holy_light": "아군이나 자신의 체력을 채워 주는 안정적이고 큰 치유입니다.",
       "devotion_aura": "방어도를 높여 받는 타격을 줄여 주는 지속형 자기 강화입니다.",
       "judgement": "현재 활성화된 인장을 소모해 근거리에서 적을 강타합니다.",
+      "oathstrike": "안정적인 무기 공격으로 헌신을 쌓아 다음 신성한 공세를 준비합니다.",
+      "hammer_of_wrath": "원거리에서 부상당한 적을 처형하며, 날개가 활성화되면 모든 적에게 사용할 수 있습니다.",
+      "avenging_wrath": "신성한 날개를 펼쳐 15초 동안 강력한 공격력 증가 효과를 얻습니다.",
+      "bastion_sweep": "방패로 적 무리를 휩쓸어 위협을 확보하고 헌신을 쌓습니다.",
+      "oath_chain": "멀리 있는 적을 무리 안으로 끌어당기고 도주 속도를 낮춥니다.",
+      "holy_shield": "헌신을 소모해 능동 방어, 피해 흡수, 위협 파동을 얻습니다.",
+      "consecration": "지속적인 신성 피해와 위협으로 주변 지면을 장악합니다.",
+      "hammer_of_justice": "짧고 확실한 기절로 적 하나를 저지합니다.",
       "blessing_of_might": "아군 대상의 공격력을 높여 주며, 전투를 시작하기 전에 시전하면 좋습니다.",
       "divine_protection": "상황이 험해질 때 피해를 흡수하는 신속한 보호의 결계입니다.",
       "raptor_strike": "무언가가 거리를 좁혀 왔을 때 강하게 휘두르는 근접 일격입니다.",
@@ -6058,6 +6066,7 @@ export const ko_KR: EnTranslations = {
       "notEnoughRage": "분노가 부족합니다!",
       "notEnoughEnergy": "기력이 부족합니다!",
       "notEnoughMana": "마나가 부족합니다!",
+      "notEnoughDevotion": "헌신이 부족합니다!",
       "notEnoughResource": "{resource}이 부족합니다!",
       "notEnoughHealth": "생명력이 부족합니다.",
       "targetMustDodge": "대상이 먼저 회피해야 합니다.",
@@ -6364,7 +6373,8 @@ export const ko_KR: EnTranslations = {
     "resources": {
       "mana": "마나",
       "rage": "분노",
-      "energy": "기력"
+      "energy": "기력",
+      "devotion": "헌신"
     },
     "forms": {
       "bear": "곰",
@@ -7188,6 +7198,14 @@ export const ko_KR: EnTranslations = {
       "consecration": {
         "name": "신성한 땅",
         "description": "발밑의 땅을 신성화하여 10초 동안 2초마다 주위 적에게 {damage}의 신성 피해를 입힙니다."
+      },
+      "bastion_sweep": {
+        "name": "성채 휩쓸기",
+        "description": "방패로 주변 적을 휩쓸어 {damage}의 신성 피해와 높은 위협을 주고 헌신을 1 얻습니다. 승천 중에는 피해가 30% 증가하고 반경이 8미터가 됩니다."
+      },
+      "oath_chain": {
+        "name": "서약의 사슬",
+        "description": "멀리 있는 적을 신성한 사슬로 묶어 3미터 안으로 끌어당기고 4초 동안 50% 느려지게 합니다. 이 보조 효과는 승천으로 강화되지 않습니다."
       },
       "righteous_fury": {
         "name": "불타는 맹세",

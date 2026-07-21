@@ -104,9 +104,9 @@ describe('Paladin support abilities', () => {
     });
     expect(ABILITIES.righteous_fury.hiddenFromPlayer).not.toBe(true);
     expect(ABILITIES.consecration).toMatchObject({
-      name: 'Holy Ground',
-      learnLevel: 18,
-      specs: ['protection', 'retribution'],
+      name: 'Consecration',
+      learnLevel: 10,
+      specs: ['protection'],
     });
     expect(ABILITIES.consecration.hiddenFromPlayer).not.toBe(true);
     expect(ABILITIES.retribution_aura).toMatchObject({
@@ -124,7 +124,7 @@ describe('Paladin support abilities', () => {
     for (const id of ['sacred_challenge', 'righteous_fury', 'consecration']) {
       expect(known('holy')).not.toContain(id);
     }
-    expect(known('retribution')).toContain('consecration');
+    expect(known('retribution')).not.toContain('consecration');
     expect(known('retribution')).not.toContain('sacred_challenge');
     expect(known('retribution')).not.toContain('righteous_fury');
   });

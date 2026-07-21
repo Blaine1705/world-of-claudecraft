@@ -526,9 +526,13 @@ export function createActionBarView(
           def.id !== 'divine_ascension' ||
           ((player.paladinDevotion?.value ?? 0) >= 20 &&
             (player.paladinDevotion?.ascensionCharges ?? 0) <= 0);
+        const devotionReady =
+          def.devotionCost === undefined ||
+          (player.paladinDevotion?.value ?? 0) >= def.devotionCost;
         slot.usable =
           (!(player.resource < ability.cost) || freeByProc) &&
           ascensionReady &&
+          devotionReady &&
           windowOpen &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
           (!def.requiresStealth || player.stealthed);

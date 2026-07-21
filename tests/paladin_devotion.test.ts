@@ -15,6 +15,7 @@ import {
   isAscensionEmpoweredAbility,
   isDivineAscensionActive,
   MAX_DEVOTION,
+  spendDevotion,
   updatePaladinDevotion,
 } from '../src/sim/paladin_devotion';
 
@@ -46,6 +47,15 @@ describe('paladin Devotion core', () => {
     expect(player.paladinDevotion?.value).toBe(ASCENSION_DEVOTION_BANK_CAP);
   });
 
+  it('spends Devotion atomically and refuses an unaffordable cost', () => {
+    const player = paladin();
+    grantDevotion(player, 3);
+    expect(spendDevotion(player, 4)).toBe(false);
+    expect(player.paladinDevotion?.value).toBe(3);
+    expect(spendDevotion(player, 3)).toBe(true);
+    expect(player.paladinDevotion?.value).toBe(0);
+  });
+
   it('only consumes charges for explicitly empowered abilities of the chosen spec', () => {
     const player = paladin();
     grantDevotion(player, MAX_DEVOTION);
@@ -68,12 +78,15 @@ describe('paladin Devotion core', () => {
       devotionGainForAbility('protection', 'vowkeeper_strike'),
       devotionGainForAbility('protection', 'bastion_rite'),
       devotionGainForAbility('protection', 'sunward_disc'),
-    ]).toEqual([1, 1, 2]);
+      devotionGainForAbility('protection', 'bastion_sweep'),
+    ]).toEqual([1, 1, 2, 1]);
     expect([
       devotionGainForAbility('retribution', 'oathstrike'),
       devotionGainForAbility('retribution', 'final_edict'),
       devotionGainForAbility('retribution', 'dawnfall'),
-    ]).toEqual([1, 2, 2]);
+      devotionGainForAbility('retribution', 'judgement'),
+      devotionGainForAbility('retribution', 'hammer_of_wrath'),
+    ]).toEqual([1, 2, 2, 1, 1]);
 
     expect(
       ['mercy_lance', 'dawns_embrace', 'radiant_chorus'].every((id) =>
@@ -81,16 +94,24 @@ describe('paladin Devotion core', () => {
       ),
     ).toBe(true);
     expect(
-      ['vowkeeper_strike', 'bastion_rite', 'sunward_disc', 'guardian_covenant'].every((id) =>
-        isAscensionEmpoweredAbility('protection', id),
-      ),
+      [
+        'vowkeeper_strike',
+        'bastion_rite',
+        'sunward_disc',
+        'guardian_covenant',
+        'bastion_sweep',
+        'holy_shield',
+        'consecration',
+      ].every((id) => isAscensionEmpoweredAbility('protection', id)),
     ).toBe(true);
     expect(
-      ['oathstrike', 'final_edict', 'dawnfall', 'faithforged_guard'].every((id) =>
-        isAscensionEmpoweredAbility('retribution', id),
+      ['oathstrike', 'final_edict', 'dawnfall', 'faithforged_guard', 'hammer_of_wrath'].every(
+        (id) => isAscensionEmpoweredAbility('retribution', id),
       ),
     ).toBe(true);
     expect(devotionGainForAbility('retribution', 'faithforged_guard')).toBe(0);
+    expect(isAscensionEmpoweredAbility('protection', 'oath_chain')).toBe(false);
+    expect(isAscensionEmpoweredAbility('retribution', 'avenging_wrath')).toBe(false);
     expect(isAscensionEmpoweredAbility('holy', 'holy_light')).toBe(false);
   });
 

@@ -65,6 +65,7 @@ import {
 } from '../sim/types';
 import {
   type AccountCosmetics,
+  type ActiveConsecration,
   type ActiveFrostRing,
   type ActiveTemporalHourglass,
   type ArenaInfo,
@@ -1526,6 +1527,7 @@ export class ClientWorld implements IWorld {
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
+  activeConsecrations: ActiveConsecration[] = [];
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -2245,6 +2247,36 @@ export class ClientWorld implements IWorld {
               radius: hourglass.r as number,
               duration: hourglass.dur as number,
               remaining: Math.min(hourglass.rem as number, hourglass.dur as number),
+            },
+          ];
+        })
+      : [];
+    this.activeConsecrations = Array.isArray(snap.consecrations)
+      ? snap.consecrations.flatMap((value: unknown): ActiveConsecration[] => {
+          if (!value || typeof value !== 'object') return [];
+          const consecration = value as Record<string, unknown>;
+          if (
+            typeof consecration.id !== 'string' ||
+            ![
+              consecration.x,
+              consecration.z,
+              consecration.r,
+              consecration.dur,
+              consecration.rem,
+            ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
+            (consecration.r as number) <= 0 ||
+            (consecration.dur as number) <= 0 ||
+            (consecration.rem as number) <= 0
+          )
+            return [];
+          return [
+            {
+              id: consecration.id,
+              x: consecration.x as number,
+              z: consecration.z as number,
+              radius: consecration.r as number,
+              duration: consecration.dur as number,
+              remaining: Math.min(consecration.rem as number, consecration.dur as number),
             },
           ];
         })

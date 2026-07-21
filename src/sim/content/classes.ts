@@ -296,6 +296,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'final_edict',
       'dawnfall',
       'faithforged_guard',
+      'hammer_of_wrath',
+      'avenging_wrath',
       'mercy_lance',
       'sacred_form',
       'dawns_embrace',
@@ -306,6 +308,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'bastion_rite',
       'sunward_disc',
       'sacred_challenge',
+      'bastion_sweep',
+      'oath_chain',
       'citadel_of_faith',
     ],
     color: 0xf58ca0,
@@ -3006,7 +3010,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 30,
     castTime: 0,
     cooldown: 10,
-    range: 10,
+    range: 30,
     school: 'holy',
     requiresTarget: true,
     effects: [{ type: 'judgement' }],
@@ -3141,22 +3145,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 46, max: 56 }],
     description: 'Banishes the wicked with Holy wrath, causing $d Holy damage.',
-  },
-  consecration: {
-    id: 'consecration',
-    name: 'Holy Ground',
-    class: 'paladin',
-    learnLevel: 18,
-    specs: ['protection', 'retribution'],
-    cost: 60,
-    castTime: 0,
-    cooldown: 8,
-    range: 0,
-    school: 'holy',
-    requiresTarget: false,
-    effects: [{ type: 'groundAoE', min: 28, max: 34, radius: 8, duration: 10, interval: 2 }],
-    description:
-      'Consecrates the ground beneath you, searing nearby enemies for $d Holy damage every 2 sec for 10 sec.',
   },
   righteous_fury: {
     id: 'righteous_fury',
@@ -5380,24 +5368,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Shocks a friendly target with Holy energy to heal them, or an enemy for $d Holy damage. (Holy signature)',
   },
-  holy_shield: {
-    id: 'holy_shield',
-    name: 'Hallowed Wall',
-    class: 'paladin',
-    learnLevel: 10,
-    cost: 30,
-    castTime: 0,
-    cooldown: 8,
-    range: 30,
-    school: 'holy',
-    requiresTarget: true,
-    effects: [
-      { type: 'directDamage', min: 90, max: 110 },
-      { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
-    ],
-    description:
-      'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)',
-  },
   bestial_wrath: {
     id: 'bestial_wrath',
     name: 'Howling Rage',
@@ -6224,7 +6194,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
 const PALADIN_LEGACY_ABILITY_IDS = [
   'seal_of_righteousness',
   'devotion_aura',
-  'judgement',
   'blessing_of_might',
   'divine_protection',
   'holy_taunt',
@@ -6233,7 +6202,6 @@ const PALADIN_LEGACY_ABILITY_IDS = [
   'rebuke',
   'sacred_bulwark',
   'holy_shock',
-  'holy_shield',
   'crusader_strike',
 ] as const;
 

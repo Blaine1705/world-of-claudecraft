@@ -4462,6 +4462,54 @@ describe('Temporal Hourglass snapshot parity', () => {
   });
 });
 
+describe('Consecration snapshot parity', () => {
+  it('mirrors active holy ground and clears zones missing from the next snapshot', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      consecrations: [{ id: 'consecration:1:20', x: 3, z: 5, r: 8, dur: 9, rem: 6.5 }],
+    });
+    expect(client.activeConsecrations).toEqual([
+      { id: 'consecration:1:20', x: 3, z: 5, radius: 8, duration: 9, remaining: 6.5 },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeConsecrations).toEqual([]);
+  });
+
+  it('interest-scopes holy ground with its authoritative remaining lifetime', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Lightwire', 'paladin');
+    const caster = server.sim.entities.get(session.pid)!;
+    (server.sim as any).groundAoEs.push({
+      sourceId: caster.id,
+      pos: { x: caster.pos.x + 4, y: caster.pos.y, z: caster.pos.z },
+      radius: 8,
+      min: 22,
+      max: 28,
+      remaining: 6.5,
+      interval: 1,
+      tickTimer: 0.5,
+      school: 'holy',
+      ability: 'Consecration',
+      consecration: { id: `consecration:${caster.id}:10`, duration: 9 },
+    });
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).consecrations).toEqual([
+      expect.objectContaining({
+        id: `consecration:${caster.id}:10`,
+        r: 8,
+        dur: 9,
+        rem: 6.5,
+      }),
+    ]);
+  });
+});
+
 describe('authoritative interaction command outcomes', () => {
   it.each([
     ['loot', { id: -1 }],

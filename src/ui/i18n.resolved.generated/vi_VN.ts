@@ -3159,6 +3159,14 @@ export const vi_VN: EnTranslations = {
       "holy_light": "Một đòn trị liệu vững chãi, đáng kể để hồi đầy cho đồng đội hoặc bản thân.",
       "devotion_aura": "Một buff bản thân lâu dài giúp tăng giáp để đòn đánh giảm uy lực.",
       "judgement": "Tiêu Ấn Chú đang kích hoạt để giáng đòn lên kẻ địch từ cự ly gần.",
+      "oathstrike": "A reliable weapon strike that builds Devotion for your next holy assault.",
+      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
+      "avenging_wrath": "Unfurls holy wings for a powerful fifteen-second damage window.",
+      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
+      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
+      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
+      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
+      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
       "blessing_of_might": "Tăng sức tấn công cho mục tiêu thân thiện, nên niệm trước khi vào trận.",
       "divine_protection": "Một tấm bùa hộ mệnh nhanh gọn để hứng sát thương khi tình thế ngặt nghèo.",
       "raptor_strike": "Một cú vung cận chiến mạnh tay cho khi có kẻ áp sát bạn.",
@@ -6058,6 +6066,7 @@ export const vi_VN: EnTranslations = {
       "notEnoughRage": "Không đủ nộ khí!",
       "notEnoughEnergy": "Không đủ năng lượng!",
       "notEnoughMana": "Không đủ mana!",
+      "notEnoughDevotion": "Not enough Devotion!",
       "notEnoughResource": "Không đủ {resource}!",
       "notEnoughHealth": "Không đủ sinh lực.",
       "targetMustDodge": "Mục tiêu của bạn phải né được trước đã.",
@@ -6364,7 +6373,8 @@ export const vi_VN: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Nộ Khí",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "devotion": "Devotion"
     },
     "forms": {
       "bear": "Gấu",
@@ -7188,6 +7198,14 @@ export const vi_VN: EnTranslations = {
       "consecration": {
         "name": "Thánh Địa",
         "description": "Thánh hóa mặt đất bên dưới ngươi, thiêu đốt kẻ địch lân cận gây {damage} sát thương Thần Thánh mỗi 2 giây trong 10 giây."
+      },
+      "bastion_sweep": {
+        "name": "Bastion Sweep",
+        "description": "Sweep your shield through nearby enemies for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+      },
+      "oath_chain": {
+        "name": "Oath Chain",
+        "description": "Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. This utility is not empowered by Ascension."
       },
       "righteous_fury": {
         "name": "Lời Thề Rực Cháy",
