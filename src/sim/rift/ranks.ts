@@ -53,18 +53,35 @@ export function riftFloorLevel(baseLevel: number, floorIndex: number): number {
 /** How many of a boss template's `rankMechanics` are live per rank. */
 export const RIFT_RANK_MECHANIC_BUDGET: Record<RiftTier, number> = { C: 1, B: 2, A: 3, S: 4 };
 
-/** Whether a rift boss mechanic is suppressed on this spawn by its rank budget.
- * Consulted at every timed/threshold fire site (mob/locomotion.ts, the
- * updateBossMechanics threshold pass). Inert unless the entity carries a
- * riftMechanicLimit AND its template lists the key in `rankMechanics`, so
- * every non-rift mob (and any unlisted mechanic, e.g. enrage) is untouched. */
+// The set of driver keys that rank-gating governs. Any key in this set that a
+// kit-carrying boss does NOT list in rankMechanics is treated as suppressed at
+// all ranks (the displaced-mechanic budget escape fix). Keys absent from this
+// set (enrage, knockback, cleave, passive on-hits) are never gated.
+const GATED_DRIVER_KEYS = new Set([
+  'aoePulse',
+  'aoeSlow',
+  'bigCast',
+  'stoneskin',
+  'stomp',
+  'terrify',
+  'summonAdds',
+  'desperateHeal',
+  'deathZoneCast',
+  'deathZoneStrike',
+]);
+
 export function riftMechanicSuppressed(mob: Entity, key: string): boolean {
   const limit = mob.riftMechanicLimit;
   if (limit === undefined) return false;
   const order = MOBS[mob.templateId]?.rankMechanics;
   if (!order) return false;
   const index = order.indexOf(key);
-  return index >= 0 && index >= limit;
+  // Listed keys: suppressed when beyond the budget index.
+  if (index >= 0) return index >= limit;
+  // Unlisted driver keys on a kit-carrying boss are suppressed at all ranks
+  // (budget escape fix: displaced template mechanics must not fire at C/B when
+  // the kill-zones slots fill the high indices).
+  return GATED_DRIVER_KEYS.has(key);
 }
 
 // B-, A-, and S-rank rifts are heroic scaled: a spawn-time stat transform (the

@@ -154,7 +154,7 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
     }
   });
 
-  it('suppression follows the entity budget and never touches unlisted mechanics', () => {
+  it('suppression follows the entity budget; unlisted non-driver-keys (enrage, knockback) are never gated; unlisted driver-keys ARE suppressed at all ranks', () => {
     const bossAt = (limit: number | undefined) =>
       ({ templateId: 'rift_boss_frost', riftMechanicLimit: limit }) as unknown as Entity;
     // Frost kit order: aoePulse, aoeSlow, deathZoneCast, deathZoneStrike.
@@ -164,6 +164,13 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
     expect(riftMechanicSuppressed(c, 'deathZoneCast')).toBe(true);
     expect(riftMechanicSuppressed(c, 'deathZoneStrike')).toBe(true);
     expect(riftMechanicSuppressed(c, 'enrage'), 'unlisted keys are never gated').toBe(false);
+    expect(riftMechanicSuppressed(c, 'stomp'), 'unlisted driver key suppressed at all ranks').toBe(
+      true,
+    );
+    expect(
+      riftMechanicSuppressed(c, 'knockback'),
+      'knockback (unlisted, not a driver key) never gated',
+    ).toBe(false);
     const b = bossAt(2);
     expect(riftMechanicSuppressed(b, 'aoeSlow')).toBe(false);
     expect(riftMechanicSuppressed(b, 'deathZoneCast')).toBe(true);
@@ -948,5 +955,100 @@ describe('rift throttle: seq-reset notice is instance-level, not per-player', ()
     expect(first80, 'one broadcast per window (2 recipients)').toBe(2);
     const next80 = countNotices(80);
     expect(next80, 'one broadcast in the next window').toBe(2);
+  });
+});
+
+describe('rift ranks: budget escape and citadel exemption', () => {
+  it('an unlisted driver key (stomp on frost boss) is suppressed at every rank limit', () => {
+    const boss = (limit: number | undefined) =>
+      ({ templateId: 'rift_boss_frost', riftMechanicLimit: limit }) as unknown as Entity;
+    // frost kit: aoePulse, aoeSlow, deathZoneCast, deathZoneStrike - stomp not listed
+    expect(riftMechanicSuppressed(boss(1), 'stomp'), 'stomp suppressed at C').toBe(true);
+    expect(riftMechanicSuppressed(boss(4), 'stomp'), 'stomp suppressed at S').toBe(true);
+    // enrage and knockback are not driver keys - never gated
+    expect(riftMechanicSuppressed(boss(1), 'enrage'), 'enrage never gated').toBe(false);
+    expect(riftMechanicSuppressed(boss(1), 'knockback'), 'knockback never gated').toBe(false);
+  });
+
+  it('citadel bosses carry no riftMechanicLimit (exempt from rank budget)', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) if (isSetPieceSeed(s)) seed = s;
+    expect(seed).toBeGreaterThan(0);
+    const sim = makeSim(seed);
+    sim.enterRift(seed, 20, sim.player.id);
+    const inst = active(sim);
+    // The citadel fields a miniboss (ritualist) and a boss (pitlord).
+    // Neither should carry riftMechanicLimit since citadel is exempt.
+    if (inst.minibossId !== null) {
+      const mini = sim.entities.get(inst.minibossId!)!;
+      expect(mini.riftMechanicLimit, 'citadel miniboss is exempt from rank budget').toBeUndefined();
+    }
+    if (inst.bossId !== null) {
+      const boss = sim.entities.get(inst.bossId!)!;
+      expect(boss.riftMechanicLimit, 'citadel boss is exempt from rank budget').toBeUndefined();
+    }
+  });
+
+  it('dodgeability: deathZone castTime satisfies slowedSpeed * castTime >= radius * 1.2 for each boss with in-kit CC', () => {
+    const RUN_SPEED = 7;
+    const cases: Array<{
+      id: string;
+      ccMult: number;
+      zone: string;
+      minCastTime: number;
+      stunDuration?: number;
+    }> = [
+      // frost: aoeSlow mult 0.4
+      { id: 'rift_boss_frost', ccMult: 0.4, zone: 'deathZoneCast', minCastTime: 4.0 },
+      { id: 'rift_boss_frost', ccMult: 0.4, zone: 'deathZoneStrike', minCastTime: 5.0 },
+      // venom: aoeSlow mult 0.5
+      { id: 'rift_boss_venom', ccMult: 0.5, zone: 'deathZoneCast', minCastTime: 3.2 },
+      { id: 'rift_boss_venom', ccMult: 0.5, zone: 'deathZoneStrike', minCastTime: 4.0 },
+      // brute: stomp stun 1.5s (free_run_time = castTime - 1.5 must cover radius/speed)
+      {
+        id: 'rift_boss_brute',
+        ccMult: 1,
+        stunDuration: 1.5,
+        zone: 'deathZoneCast',
+        minCastTime: 3.5,
+      },
+      {
+        id: 'rift_boss_brute',
+        ccMult: 1,
+        stunDuration: 1.5,
+        zone: 'deathZoneStrike',
+        minCastTime: 4.0,
+      },
+      // tide: terrify 2.5s (full fear covers entire old fuse)
+      {
+        id: 'rift_boss_tide',
+        ccMult: 1,
+        stunDuration: 2.5,
+        zone: 'deathZoneCast',
+        minCastTime: 5.0,
+      },
+      {
+        id: 'rift_boss_tide',
+        ccMult: 1,
+        stunDuration: 2.5,
+        zone: 'deathZoneStrike',
+        minCastTime: 5.0,
+      },
+    ];
+    for (const { id, ccMult, zone, minCastTime, stunDuration } of cases) {
+      const tmpl = MOBS[id] as unknown as Record<string, { castTime: number; radius: number }>;
+      const def = tmpl[zone];
+      expect(def, `${id}.${zone} exists`).toBeDefined();
+      expect(def.castTime, `${id}.${zone} castTime >= ${minCastTime}`).toBeGreaterThanOrEqual(
+        minCastTime,
+      );
+      // Verify the actual dodgeability inequality.
+      const freeSecs = stunDuration ? def.castTime - stunDuration : def.castTime;
+      const escapeDist = RUN_SPEED * ccMult * freeSecs;
+      expect(
+        escapeDist,
+        `${id}.${zone}: escape dist ${escapeDist.toFixed(2)} >= required ${(def.radius * 1.2).toFixed(2)}`,
+      ).toBeGreaterThanOrEqual(def.radius * 1.2);
+    }
   });
 });
