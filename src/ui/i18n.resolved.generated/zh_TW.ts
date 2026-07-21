@@ -908,14 +908,12 @@ export const zh_TW: EnTranslations = {
       "keybindHint": "按下騎乘 / 下騎鍵即可騎乘。",
       "emptyTitle": "尚未收集坐騎",
       "emptyStableHint": "升到 20 級，前往高望以西的馬廄，向馬廄總管瑪拉學習騎術。",
-      "emptyDropHint": "較稀有的坐騎由地城和團隊副本首領掉落。",
+      "emptyDropHint": "較稀有的坐騎由英雄地城首領掉落或完成裂隙獲得。",
       "clickManage": "點擊選擇坐騎",
       "rarity_common": "普通",
       "rarity_rare": "稀有",
       "rarity_epic": "史詩",
       "spec_speed": "+{pct}% 額外移動力",
-      "spec_block": "+{pct}% 近戰傷害格擋",
-      "spec_crit": "+{pct}% 致命一擊機率",
       "name_valorsteed": "英勇戰馬",
       "name_grag_bear": "歌利亞格拉格巨熊",
       "name_stalkglider_snail": "苔殼滑行蝸牛",
@@ -937,7 +935,7 @@ export const zh_TW: EnTranslations = {
       "ridePrompt": "跟隨發光的標記前往起點線，然後點擊開始比賽。",
       "begin": "開始課程",
       "success": "你已經馴服了英勇戰馬。",
-      "returnToMarla": "返回馬廄找瑪拉，領養一匹馬廄裡的馬。"
+      "returnToMarla": "返回馬廄找瑪拉，花 10 金購買英勇戰馬的韁繩。"
     },
     "mountRace": {
       "startButton": "開始比賽",

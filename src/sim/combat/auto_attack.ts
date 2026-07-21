@@ -154,6 +154,10 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // casters (wand-style, no dead zone so they don't run into melee, #94).
   // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
   // bear/cat/travel resolve to undefined here and fall through to melee.
+  // A pre-armed auto-attack that fires while mounted (e.g. mounted player who
+  // somehow retained autoAttack=true) force-dismounts before the swing lands,
+  // mirroring the ghost_wolf break pattern below and the startAutoAttack guard.
+  if (p.mountKey !== '') forceDismount(ctx, p);
   const ranged = rangedAutoProfile(p, meta.cls);
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;

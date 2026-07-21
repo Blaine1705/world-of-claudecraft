@@ -14,7 +14,7 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { meleeSwing } from '../src/sim/combat/auto_attack';
+import { meleeSwing, updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
 import { castAbility } from '../src/sim/combat/casting_lifecycle';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import {
@@ -26,6 +26,7 @@ import {
   normalizeSelectedMount,
 } from '../src/sim/content/mounts';
 import { ITEMS, MOBS, QUESTS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import {
   MOUNT_DISMOUNT_SECONDS,
   MOUNT_SUMMON_SECONDS,
@@ -842,21 +843,247 @@ describe('riding skill gate (Req 5)', () => {
     expect(result).toBe(true);
   });
 
-  it('grandfathers mountTrainingFeePaid into ridingTrained on load', () => {
+  it('grandfathers mountTrainingFeePaid into ridingTrained on addPlayer load', () => {
+    // A legacy save where the 100g fee was paid but ridingTrained was not yet stored
+    // (pre-v0.23 saves) must load with ridingTrained=true so toggleMount succeeds.
     const sim = makeWorld();
-    const pid = join(sim, 20);
-    // Check that the Sim's serializeCharacter / load round-trip sets ridingTrained
-    // when mountTrainingFeePaid is true
+    const state = {
+      level: 20,
+      xp: 0,
+      copper: 0,
+      hp: 100,
+      resource: 100,
+      pos: { x: 0, z: 0 },
+      facing: 0,
+      equipment: {},
+      inventory: [],
+      questLog: [],
+      questsDone: [],
+      mountTrainingFeePaid: true,
+      // ridingTrained is intentionally absent (legacy save).
+    };
+    const pid2 = sim.addPlayer('warrior', 'LegacyRider', { state: state as any });
+    const meta2 = sim.players.get(pid2)!;
+    expect(meta2.ridingTrained).toBe(true);
+    sim.addItem('reins_valorsteed', 1, pid2);
+    expect(toggleMount(sim.ctx, pid2)).toBe(true);
+  });
+
+  it('grandfathers q_riding_lessons active quest into ridingTrained on addPlayer load', () => {
+    // A mid-quest save where q_riding_lessons is IN_PROGRESS (the player had accepted
+    // the lesson and was racing) but ridingTrained was never stored must also load
+    // with ridingTrained=true (the fee was implied by quest acceptance).
+    const sim = makeWorld();
+    const state = {
+      level: 20,
+      xp: 0,
+      copper: 0,
+      hp: 100,
+      resource: 100,
+      pos: { x: 0, z: 0 },
+      facing: 0,
+      equipment: {},
+      inventory: [],
+      questLog: [{ questId: 'q_riding_lessons', state: 'active', counts: [] }],
+      questsDone: [],
+      // ridingTrained and mountTrainingFeePaid are intentionally absent.
+    };
+    const pid3 = sim.addPlayer('warrior', 'MidQuestRider', { state: state as any });
+    const meta3 = sim.players.get(pid3)!;
+    expect(meta3.ridingTrained).toBe(true);
+    sim.addItem('reins_valorsteed', 1, pid3);
+    expect(toggleMount(sim.ctx, pid3)).toBe(true);
+  });
+
+  it('grandfathers q_riding_lessons completed quest into ridingTrained on addPlayer load', () => {
+    // A save where q_riding_lessons is in questsDone (lesson finished and turned in)
+    // but ridingTrained was not stored must also load with ridingTrained=true.
+    const sim = makeWorld();
+    const state = {
+      level: 20,
+      xp: 0,
+      copper: 0,
+      hp: 100,
+      resource: 100,
+      pos: { x: 0, z: 0 },
+      facing: 0,
+      equipment: {},
+      inventory: [],
+      questLog: [],
+      questsDone: ['q_riding_lessons'],
+    };
+    const pid4 = sim.addPlayer('warrior', 'DoneRider', { state: state as any });
+    const meta4 = sim.players.get(pid4)!;
+    expect(meta4.ridingTrained).toBe(true);
+  });
+});
+
+describe('cancelFormsAndGhostWolf recalcs stats (Fix #1)', () => {
+  it('strips a bear form aura and immediately recalcs stats so armor drops from bear-form level', () => {
+    // Arrange: a druid casts bear_form (which calls recalcPlayerStats internally),
+    // giving +90% armor. Then we start a mount summon, which should strip the form
+    // AND call recalcPlayerStats so armor drops back to caster-form levels immediately,
+    // not on the next tick.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('druid', 'Ursatest');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
     const meta = sim.players.get(pid)!;
-    meta.ridingTrained = false;
-    meta.mountTrainingFeePaid = true;
-    // Serialize and reload
-    const state = (
-      sim as unknown as { serializeCharacter(pid: number): unknown }
-    ).serializeCharacter(pid);
-    // The serialized state has ridingTrained=true (grandfathered from mountTrainingFeePaid)
-    const s = state as Record<string, unknown>;
-    // Both should be serialized when they are true
-    expect(s.mountTrainingFeePaid).toBe(true);
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    const e = sim.entities.get(pid)!;
+    // Record baseline (caster-form) armor.
+    const baselineArmor = e.stats.armor;
+    // Enter bear form: castAbility calls recalcPlayerStats so armor inflates to 1.9x.
+    castAbility(sim.ctx, 'bear_form', pid);
+    const armorInBearForm = e.stats.armor;
+    expect(armorInBearForm).toBeGreaterThan(baselineArmor);
+    expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+
+    // Act: start the mount summon channel (calls cancelFormsAndGhostWolf internally).
+    const started = toggleMount(sim.ctx, pid);
+
+    // Assert: channel started, form gone, armor immediately back to baseline (no tick needed).
+    expect(started).toBe(true);
+    expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(false);
+    expect(e.stats.armor).toBeLessThan(armorInBearForm);
+    expect(e.stats.armor).toBe(baselineArmor);
+  });
+});
+
+describe('summon channel cancels on ability cast (Fix #2)', () => {
+  it('cancels an in-progress mount summon channel when the player casts any ability', () => {
+    // Arrange: a warrior starts a mount summon (1.5s channel).
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    const e = sim.entities.get(pid)!;
+    toggleMount(sim.ctx, pid);
+
+    // Verify the summon channel started.
+    expect(e.mountCastKey).toBe('valorsteed');
+    expect(e.mountCastRemaining ?? 0).toBeGreaterThan(0);
+
+    // Act: cast an ability mid-channel (battle_shout is instant and has no target req).
+    castAbility(sim.ctx, 'battle_shout', pid);
+
+    // Assert: the summon channel was cancelled; the player is still dismounted.
+    expect(e.mountCastKey).toBe('');
+    expect(e.mountCastRemaining ?? 0).toBe(0);
+    expect(e.mountKey).toBe('');
+  });
+
+  it('does not cancel the mount key when the player casts with no summon in flight', () => {
+    // Casting while FULLY mounted (no channel) triggers forceDismount instantly (pre-existing
+    // behavior, not related to Fix #2). Verify that Fix #2 only adds the summon-channel cancel
+    // and does not break the forceDismount path.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    const e = sim.entities.get(pid)!;
+    // Fully mount the player (no in-flight channel).
+    ride(sim, pid);
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.mountCastRemaining ?? 0).toBe(0);
+
+    // Cast an ability: forceDismount fires as before (pre-existing behavior).
+    castAbility(sim.ctx, 'battle_shout', pid);
+
+    // The pre-existing forceDismount path should still clear the mount key.
+    expect(e.mountKey).toBe('');
+    // No summon channel was in flight, so mountCastKey stays ''.
+    expect(e.mountCastKey).toBe('');
+  });
+});
+
+describe('pre-armed auto-attack while mounted (Fix #3)', () => {
+  it('force-dismounts the player when the swing loop fires with mountKey set', () => {
+    // Arrange: a warrior is somehow mounted with autoAttack armed and a hostile target
+    // in melee range (swing timer elapsed). This can happen if the client sends an
+    // Attack command while mounted without the server blocking it via startAutoAttack
+    // (which already force-dismounts). The per-tick updatePlayerAutoAttack must also guard.
+    const sim = makeWorld();
+    const pid = join(sim, 10);
+    const meta = sim.players.get(pid)!;
+    sim.addItem('reins_grag_bear', 1, pid);
+    selectMount(sim.ctx, pid, 'grag_bear');
+    const e = sim.entities.get(pid)!;
+    // Put the player fully mounted (skip the channel).
+    ride(sim, pid);
+    expect(e.mountKey).toBe('grag_bear');
+
+    // Spawn a hostile mob right next to the player in melee range.
+    const tpl = MOBS['wild_boar'];
+    const mobId = (sim as any).nextId++;
+    const mob = createMob(mobId, tpl, 3, { x: e.pos.x + 1, y: e.pos.y, z: e.pos.z });
+    mob.maxHp = 100_000;
+    mob.hp = mob.maxHp;
+    mob.hostile = true;
+    sim.entities.set(mobId, mob);
+
+    // Arm auto-attack directly (bypasses startAutoAttack's own dismount guard).
+    e.autoAttack = true;
+    e.targetId = mobId;
+    e.swingTimer = 0;
+    e.facing = 0; // facing +z; mob is to the right, still within melee arc
+
+    // Act: run the per-tick auto-attack loop.
+    updatePlayerAutoAttack(sim.ctx, e, meta);
+
+    // Assert: the mount was cleared before the swing could fire while mounted.
+    expect(e.mountKey).toBe('');
+  });
+});
+
+describe('summon completion strips forms that slipped through mid-channel (Fix #2B)', () => {
+  it('strips a bear form aura that was gained during the summon channel at completion', () => {
+    // Arrange: a druid starts a mount summon, then we inject a bear form aura
+    // directly (simulating a form that slipped through during the 1.5s channel).
+    // At channel completion, updateMountTransition must call cancelFormsAndGhostWolf
+    // so the player is never simultaneously mounted and shapeshifted.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('druid', 'Ursatest');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+    const e = sim.entities.get(pid)!;
+
+    // Start the summon channel.
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    expect(e.mountCastKey).toBe('valorsteed');
+
+    // Inject a bear form aura mid-channel (simulates a form cast during the 1.5s window).
+    e.auras.push({
+      id: 'bear_form',
+      name: 'Bruin Form',
+      kind: 'form_bear',
+      remaining: 3600,
+      duration: 3600,
+      value: 1,
+      sourceId: pid,
+      school: 'physical',
+    });
+    expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+
+    // Act: complete the summon channel (drives updateMountTransition to completion).
+    finishTransition(sim, pid);
+
+    // Assert: the player is mounted AND the form is gone.
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.auras.some((a) => a.kind === 'form_bear')).toBe(false);
   });
 });

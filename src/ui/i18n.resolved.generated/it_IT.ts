@@ -914,8 +914,6 @@ export const it_IT: EnTranslations = {
       "rarity_rare": "Rara",
       "rarity_epic": "Epica",
       "spec_speed": "+{pct}% di mobilità extra",
-      "spec_block": "+{pct}% di blocco dei danni in mischia",
-      "spec_crit": "+{pct}% di probabilità di colpo critico",
       "name_valorsteed": "Destriero del Valore",
       "name_grag_bear": "Orso Grag Golia",
       "name_stalkglider_snail": "Aliante dal Guscio Muschioso",
@@ -937,7 +935,7 @@ export const it_IT: EnTranslations = {
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
       "success": "You have tamed the Valorsteed.",
-      "returnToMarla": "Return to Marla at the stables to adopt a stable horse."
+      "returnToMarla": "Return to Marla at the stables to buy your Valorsteed reins for 10g."
     },
     "mountRace": {
       "startButton": "Start Race",

@@ -1,13 +1,14 @@
 // The riding lesson ("mount training"), server-authoritative, a sibling system
-// behind SimContext. After accepting Marla's quest, the player stands on the
-// glowing square behind the arch and presses Start Race. That deliberate action
-// pays the one-time 100g fee, lends a training Valorsteed, and arms the countdown.
+// behind SimContext. The riding skill itself (ridingTrained) is purchased from
+// Marla for 80g (learnRiding). After accepting Marla's quest, the player stands
+// on the glowing square behind the arch and presses Start Race. The lesson is
+// FREE: pressing Start Race lends a training Valorsteed and arms the countdown.
 // FINISHING the course passes the lesson and credits its quest objective
 // (mountTrainingRaceFinished, called from src/sim/mount_race.ts). Marla takes the
 // steed back afterward (an instant force-dismount; the player never keeps the
-// unowned mount), and turning in
-// q_riding_lessons at her grants reins_valorsteed. Dismounting or leaving the
-// paddock abandons the attempt (the fee stays paid).
+// unowned mount), and turning in q_riding_lessons at her grants reins_valorsteed
+// (the first Valorsteed reins, sold for 10g). Dismounting or leaving the paddock
+// abandons the attempt (re-entrant: the player can start another race).
 //
 // The legacy mount_train_begin command remains append-only compatible, but no
 // current HUD button sends it. The session lives directly on PlayerMeta.mountTraining. The NPC

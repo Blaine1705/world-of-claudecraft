@@ -7637,8 +7637,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.rarity_rare': 'Rara',
   'hudChrome.mounts.rarity_epic': 'Epica',
   'hudChrome.mounts.spec_speed': '+{pct}% di mobilità extra',
-  'hudChrome.mounts.spec_block': '+{pct}% di blocco dei danni in mischia',
-  'hudChrome.mounts.spec_crit': '+{pct}% di probabilità di colpo critico',
   'hudChrome.mounts.name_valorsteed': 'Destriero del Valore',
   'hudChrome.mounts.name_grag_bear': 'Orso Grag Golia',
   'hudChrome.mounts.name_stalkglider_snail': 'Aliante dal Guscio Muschioso',

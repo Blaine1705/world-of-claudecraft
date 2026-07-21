@@ -11,7 +11,7 @@
 // first owned mount). The live "riding X right now" state is Entity.mountKey
 // ('' dismounted), which the wire mirrors like `skin` so every host (renderer,
 // other clients, the online self extrapolator) reads the same field the
-// speed/crit/block hooks use.
+// speed hook uses.
 //
 // Summoning is not instant: mounting channels a short summon and dismounting a
 // quicker put-away (updateMountTransition, driven per tick and interruptible by
@@ -88,8 +88,8 @@ export function ownedMounts(meta: PlayerMeta): MountKey[] {
   return MOUNT_KEYS.filter((key) => owned.has(key));
 }
 
-// The mount crit bonus rides Entity.critChance (recalcPlayerStats), so every
-// mount/dismount recomputes stats the same way an equip does.
+// Recompute the player's derived stats after a mount state change (aura strips,
+// mount/dismount): this is the same path an equip change takes.
 function recalcFor(ctx: SimContext, e: Entity, meta: PlayerMeta): void {
   recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
 }
@@ -103,9 +103,9 @@ function trainingSummon(meta: PlayerMeta | undefined, key: string): boolean {
 }
 
 /** Force an instant dismount with no put-away channel: clears the live mount and
- *  any in-flight summon/dismount channel, then recomputes stats (the mount
- *  crit/block bonus rides Entity via recalcPlayerStats). Used by the riding lesson
- *  to take the unowned training steed back the moment the lesson ends. */
+ *  any in-flight summon/dismount channel, then recomputes stats. Used by the riding
+ *  lesson to take the unowned training steed back the moment the lesson ends, and by
+ *  the auto-attack loop and cast path to dismount on ability use. */
 export function forceDismount(ctx: SimContext, e: Entity): void {
   if (!e.mountKey && (e.mountCastRemaining ?? 0) <= 0 && e.mountCastKey === '') return;
   e.mountKey = '';
@@ -155,8 +155,8 @@ export function selectMount(ctx: SimContext, pid: number, key: string): boolean 
   }
   meta.selectedMount = def.key;
   // Swap the ridden mount in place only OUT of combat: a mid-fight swap would
-  // bypass toggleMount's combat gate and grant a stronger mount's crit/block
-  // reactively. In combat the pick still updates and applies on the next mount.
+  // bypass toggleMount's combat gate. In combat the pick still updates and applies
+  // on the next mount.
   if (e.mountKey && e.mountKey !== def.key && !e.inCombat && !e.dead && !e.ghost) {
     e.mountKey = def.key;
     recalcFor(ctx, e, meta);
@@ -166,14 +166,21 @@ export function selectMount(ctx: SimContext, pid: number, key: string): boolean 
 
 /** Strip all active form auras (FORM_AURA_KINDS) and ghost_wolf from the entity,
  *  emitting aura-removal events for each one removed. Called before a mount summon
- *  starts so the player is never simultaneously shapeshifted and mounting. */
+ *  starts so the player is never simultaneously shapeshifted and mounting. Calls
+ *  recalcFor if any aura was removed so stat effects (speed, etc.) clear immediately. */
 function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
+  let stripped = false;
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const aura = e.auras[i];
     if (FORM_AURA_KINDS.has(aura.kind) || aura.id === 'ghost_wolf') {
       e.auras.splice(i, 1);
       ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
+      stripped = true;
     }
+  }
+  if (stripped) {
+    const meta = ctx.players.get(e.id);
+    if (meta) recalcFor(ctx, e, meta);
   }
 }
 
@@ -286,6 +293,10 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
         meta &&
         (mountOwned(meta, target) || trainingSummon(meta, target))
       ) {
+        // Strip any form that slipped through during the channel (e.g. instant
+        // shapeshifts cast while channeling), so the player is never
+        // simultaneously mounted and shapeshifted at completion.
+        cancelFormsAndGhostWolf(ctx, e);
         e.mountKey = target;
       }
       // A summon whose reins vanished mid-channel leaves the player unmounted.

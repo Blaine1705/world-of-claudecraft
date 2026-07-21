@@ -2469,6 +2469,16 @@ export class Sim {
       if (s.mountTrainingFeePaid === true) meta.mountTrainingFeePaid = true;
       // Grandfather: players who already paid the old 100g fee are riding-trained.
       if (s.ridingTrained === true || s.mountTrainingFeePaid === true) meta.ridingTrained = true;
+      // Grandfather: players who had q_riding_lessons active in a mid-quest save
+      // (state='active' or 'ready') but never received ridingTrained=true are
+      // riding-trained because accepting the quest proves they already paid
+      // the old lesson fee. Also covers done: questsDone.has('q_riding_lessons').
+      if (
+        !meta.ridingTrained &&
+        (meta.questLog.has('q_riding_lessons') || meta.questsDone.has('q_riding_lessons'))
+      ) {
+        meta.ridingTrained = true;
+      }
       meta.guildLetterSent = s.guildLetterSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };

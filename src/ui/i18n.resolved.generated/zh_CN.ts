@@ -908,14 +908,12 @@ export const zh_CN: EnTranslations = {
       "keybindHint": "按下骑乘 / 下骑键即可骑乘。",
       "emptyTitle": "尚未收集坐骑",
       "emptyStableHint": "升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。",
-      "emptyDropHint": "较稀有的坐骑由地下城和团队副本首领掉落。",
+      "emptyDropHint": "较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。",
       "clickManage": "点击选择坐骑",
       "rarity_common": "普通",
       "rarity_rare": "稀有",
       "rarity_epic": "史诗",
       "spec_speed": "+{pct}%额外移动力",
-      "spec_block": "+{pct}%近战伤害格挡",
-      "spec_crit": "+{pct}%致命一击几率",
       "name_valorsteed": "英勇战马",
       "name_grag_bear": "歌利亚格拉格巨熊",
       "name_stalkglider_snail": "苔壳滑行蜗牛",
@@ -937,7 +935,7 @@ export const zh_CN: EnTranslations = {
       "ridePrompt": "跟随发光的标记前往起点线，然后点击开始比赛。",
       "begin": "开始课程",
       "success": "你已经驯服了英勇战马。",
-      "returnToMarla": "返回马厩找玛拉，领养一匹马厩里的马。"
+      "returnToMarla": "返回马厩找玛拉，花10金购买英勇战马的缰绳。"
     },
     "mountRace": {
       "startButton": "开始比赛",
