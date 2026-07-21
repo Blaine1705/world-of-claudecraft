@@ -870,7 +870,6 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/auto_attack.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/talents.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/xp.ts'), 'utf8'),
-    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/lifecycle.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_commands.ts'), 'utf8'),
@@ -944,6 +943,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Riding lesson: the mount_train_begin guard refusals and the driver's
     // notices (level/range/quest/in-progress/success/left-yard literals).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts_training.ts'), 'utf8'),
+    // Mounts: the toggleMount/selectMount guard refusals and the ridingTrained
+    // error (RIDING_UNTRAINED_MSG) that the riding-skill gate emits.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts.ts'), 'utf8'),
     socialSrc,
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
