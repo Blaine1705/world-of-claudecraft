@@ -964,7 +964,7 @@ const classAbilityNamesEn = {
       [
         'devotion_ward',
         'Devotion Aura',
-        'Reduce damage taken by you and party members by 5% until death or replacement. Only Devotion Aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist.',
+        'Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist.',
       ],
       [
         'hammer_of_grace',
