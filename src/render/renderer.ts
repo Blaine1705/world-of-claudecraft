@@ -5711,11 +5711,12 @@ export class Renderer {
         fog.near = 20;
         fog.far = 80;
       } else if (desired === 'orkadiaField') {
-        // the open-air war-camp reads under a real sky: an ashen volcanic haze
-        // pushed past the boss end of the ~160yd field, not the room murk
+        // the open-air war-camp reads under a real sky: only a light ashen haze
+        // at the far edge of the ~240yd field, so the relief and the camp props
+        // stay crisp from the gate to the boss terrace.
         fog.color.setHex(0x27301f);
-        fog.near = 45;
-        fog.far = 230;
+        fog.near = 110;
+        fog.far = 540;
       } else if (desired === 'delve') {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the

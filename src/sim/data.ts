@@ -799,6 +799,13 @@ export function instanceOrigin(dungeonIndex: number, slot: number): { x: number;
   return { x: INSTANCE_X_BASE + 900 + dungeonIndex * 600, z: -1250 + slot * 500 };
 }
 
+// Inverse of instanceOrigin's z term, clamped to a live slot: which slot band a
+// far-east z falls in. Consumers that need instance-local coords (collision,
+// ground relief) derive the origin from this plus the dungeon's index.
+export function instanceSlotForZ(z: number): number {
+  return Math.min(INSTANCE_SLOT_COUNT - 1, Math.max(0, Math.round((z + 1250) / 500)));
+}
+
 export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,

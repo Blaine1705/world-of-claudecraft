@@ -978,5 +978,10 @@ export function buildDoorBody(
   portal.position.y = 2.15;
   portal.scale.set(1, 1.35, 1);
   body.add(portal);
+  if (isOrkadia) {
+    // The orc war-gate is monumental next to the other dungeon doors: same
+    // arch and membrane, scaled up (the walk trigger is sim-side, unchanged).
+    body.scale.setScalar(1.55);
+  }
   return { body, portal };
 }
