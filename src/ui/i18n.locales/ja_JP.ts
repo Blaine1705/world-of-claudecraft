@@ -8342,7 +8342,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。',
   'hudChrome.mountTraining.begin': 'レッスン開始',
   'hudChrome.mountTraining.success': 'ヴァロースティードを乗りこなした。',
-  'hudChrome.mountTraining.returnToMarla': '厩舎のマーラのもとへ戻り、10ゴールドでヴァロースティードの手綱を購入しよう。',
+  'hudChrome.mountTraining.returnToMarla':
+    '厩舎のマーラのもとへ戻り、10ゴールドでヴァロースティードの手綱を購入しよう。',
   'hudChrome.mountRace.cancelButton': 'レースをキャンセル',
   'hudChrome.mountRace.startButton': 'レース開始',
   'hudChrome.mountRace.start': 'スタート！すべての障害を跳び越え、アーチへ戻って駆け抜けろ。',

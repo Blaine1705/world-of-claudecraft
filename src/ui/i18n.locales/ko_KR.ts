@@ -8317,7 +8317,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
   'hudChrome.mounts.emptyStableHint':
     '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
-  'hudChrome.mounts.emptyDropHint': '더 희귀한 탈것은 영웅 던전 우두머리나 균열 완료를 통해 얻을 수 있습니다.',
+  'hudChrome.mounts.emptyDropHint':
+    '더 희귀한 탈것은 영웅 던전 우두머리나 균열 완료를 통해 얻을 수 있습니다.',
   'hudChrome.mounts.clickManage': '클릭하여 탈것 선택',
   'hudChrome.mountTraining.mountPrompt': '{key} 키를 눌러 훈련용 발러스티드에 탑승한다.',
   'hudChrome.mountTraining.ownedMountPrompt': '{key} 키를 눌러 탑승하세요',
@@ -8325,7 +8326,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '빛나는 표식을 따라 출발선으로 간 뒤 레이스 시작을 누르세요.',
   'hudChrome.mountTraining.begin': '수업 시작',
   'hudChrome.mountTraining.success': '발러스티드를 길들였다.',
-  'hudChrome.mountTraining.returnToMarla': '마구간의 마를라에게 돌아가 발러스티드 고삐를 10골드에 구매하세요.',
+  'hudChrome.mountTraining.returnToMarla':
+    '마구간의 마를라에게 돌아가 발러스티드 고삐를 10골드에 구매하세요.',
   'hudChrome.mountRace.cancelButton': '경기 취소',
   'hudChrome.mountRace.startButton': '레이스 시작',
   'hudChrome.mountRace.start': '출발! 모든 장애물을 뛰어넘고 아치로 돌아가 통과하라.',
