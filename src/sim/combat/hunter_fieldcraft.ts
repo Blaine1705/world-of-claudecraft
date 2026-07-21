@@ -116,7 +116,7 @@ export function finishBloodhook(
     hunter.cooldowns.delete('bloodhook');
     return;
   }
-  const woundTotal = pending.value2 ?? 24;
+  const woundTotal = pending.value2 ?? 36;
   applyPrimaryWound(
     ctx,
     hunter,

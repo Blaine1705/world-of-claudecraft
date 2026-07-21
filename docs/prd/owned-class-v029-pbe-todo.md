@@ -246,7 +246,7 @@ Do not overwrite a player-customized bar.
 - [x] Keep the melee-led bleed, trap, explosive, and disengage identity.
 - [x] Audit Bloodhook, Bloodhook Wound, Woundrend, Shrapnel Charge, Bloodtrail Assault, and Hunting
       Momentum against the shared scaling rules.
-- [x] Scale Bloodhook Wound as 24 base damage plus 30% of Ranged Attack Power over 12 sec in four
+- [x] Scale Bloodhook Wound as 36 base damage plus 28% of Ranged Attack Power over 12 sec in four
       ticks, with the Trailbreak re-entry hit retaining its separate scaling.
 - [x] Replace `primary wound` with plain English in every player-facing description.
 - [x] Test Bloodhook tooltip values at two Ranged Attack Power values after scaling lands.

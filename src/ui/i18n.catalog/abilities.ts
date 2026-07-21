@@ -639,7 +639,7 @@ const classAbilityNamesEn = {
       [
         'bloodhook',
         'Bloodhook',
-        'Charge to the enemy and apply Bloodhook Wound. The wound deals 24 base Physical damage plus 30% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
+        'Charge to the enemy and apply Bloodhook Wound. The wound deals 36 base Physical damage plus 28% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
       ],
       [
         'shrapnel_charge',

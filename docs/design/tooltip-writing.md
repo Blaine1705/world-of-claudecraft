@@ -102,13 +102,13 @@ step after the English source changes. Locale filling remains a release task.
 ## Bloodhook example
 
 Bloodhook applies a named bleed, so its tooltip must explain the name and the full scaling rule.
-The live implementation snapshots 24 base Physical damage plus 30% of the Hunter's Ranged Attack
+The live implementation snapshots 36 base Physical damage plus 28% of the Hunter's Ranged Attack
 Power, then deals that total over 12 sec in four ticks. Trailbreak can also arm a separate re-entry
 hit. That hit has its own base range and Ranged Attack Power contribution.
 
 Accurate copy for the current wound is:
 
-> Charge to the enemy and apply Bloodhook Wound. The wound deals 24 base Physical damage plus 30%
+> Charge to the enemy and apply Bloodhook Wound. The wound deals 36 base Physical damage plus 28%
 > of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)
 
 Keep the wound and re-entry formulas separate in both combat and player copy. A balance change to

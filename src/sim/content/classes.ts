@@ -5708,14 +5708,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'hunterBloodhook',
-        bleedTotal: 24,
+        bleedTotal: 36,
         bleedDuration: 12,
         bleedInterval: 3,
-        rangedPowerCoeff: 0.3,
+        rangedPowerCoeff: 0.28,
       },
     ],
     description:
-      'Charge to the enemy and apply Bloodhook Wound. The wound deals 24 base Physical damage plus 30% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
+      'Charge to the enemy and apply Bloodhook Wound. The wound deals 36 base Physical damage plus 28% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
   },
   trueshot_aura: {
     id: 'trueshot_aura',
