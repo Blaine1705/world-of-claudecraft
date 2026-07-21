@@ -13690,7 +13690,9 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
           }) + suffix(primary)
         );
       case 'hunterBloodhook':
-        return formatAbilityNumber(primary.bleedTotal) + suffix(primary);
+        return (
+          formatAbilityNumber(primary.bleedTotal * (primary.damageMult ?? 1)) + suffix(primary)
+        );
     }
   }
 

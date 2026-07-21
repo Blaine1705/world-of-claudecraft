@@ -1,6 +1,6 @@
 import type { PlayerMeta } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import type { Aura, Entity } from '../../types';
+import { type Aura, dist2d, type Entity } from '../../types';
 import { dismissOwnedGuardians, guardianOf, summonGuardian } from '../guardians';
 import { EFFIGY_AURA_ID, GLOOMTITHE_AURA_ID, GLOOMTITHE_MAX_STACKS } from './presentation';
 import { hasPriestTalent, PRIEST_TALENT_IDS } from './talents';
@@ -12,6 +12,7 @@ export const TITHEFIEND_ECHO_RATE = 0.15;
 export const TITHEFIEND_MANA_RETURN_RATE = 0.01;
 export const TITHEFIEND_KEY = 'tithefiend';
 export const TITHEFIEND_STRIKE_ID = 'tithefiend_strike';
+export const TITHEFIEND_MAX_RANGE = 35;
 
 function ownDirge(target: Entity, priestId: number): Aura | undefined {
   return target.auras.find(
@@ -20,8 +21,17 @@ function ownDirge(target: Entity, priestId: number): Aura | undefined {
 }
 
 export function hasTithefiendTarget(ctx: SimContext, priestId: number): boolean {
+  const priest = ctx.entities.get(priestId);
+  if (!priest || priest.dead) return false;
   for (const entity of ctx.entities.values()) {
-    if (!entity.dead && ownDirge(entity, priestId)) return true;
+    if (
+      !entity.dead &&
+      ctx.isHostileTo(priest, entity) &&
+      dist2d(priest.pos, entity.pos) <= TITHEFIEND_MAX_RANGE &&
+      ownDirge(entity, priestId)
+    ) {
+      return true;
+    }
   }
   return false;
 }
@@ -144,7 +154,7 @@ function summonTithefiend(ctx: SimContext, priest: Entity, stacks: number): void
     abilityId: TITHEFIEND_STRIKE_ID,
     abilityName: 'Tithefiend Strike',
     preferredTargetId: effigyTarget(ctx, priest.id)?.id ?? null,
-    maxRange: 35,
+    maxRange: TITHEFIEND_MAX_RANGE,
     requiredTargetAuraId: 'shadow_word_pain',
     dismissWhenUntargeted: true,
   });

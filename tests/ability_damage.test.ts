@@ -22,6 +22,7 @@ import {
   abilityDamageBonus,
   abilityTemporalHourglassValues,
 } from '../src/ui/ability_damage';
+import { abilityEffectText } from '../src/ui/hud';
 
 function known(cls: Parameters<typeof abilitiesKnownAt>[0], id: string, mods?: TalentModifiers) {
   const ability = abilitiesKnownAt(cls, MAX_LEVEL, mods).find((k) => k.def.id === id);
@@ -114,6 +115,7 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     );
     expect(abilityDamageBonus(bloodhook, effect, { ...SC, rangedPower: 0 })).toBe(0);
     expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(55);
+    expect(abilityEffectText(bloodhook, SC)).toBe('36 (+55)');
   });
 
   it('a channelled directDamage (Arcane Missiles) uses the per-tick CHANNEL coefficient', () => {

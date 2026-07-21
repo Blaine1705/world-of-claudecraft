@@ -291,6 +291,31 @@ describe('Vespers baseline loop', () => {
     ).toBe(false);
   });
 
+  it('preserves Gloomtithe, Mana, and cooldown when every owned Dirge target is out of range', () => {
+    const { sim, priest } = vespersPriest();
+    const target = addDummy(sim, 9916, priest.pos.x, priest.pos.z + 40);
+    target.auras.push({
+      id: 'shadow_word_pain',
+      name: 'Dirge of Decay',
+      kind: 'dot',
+      remaining: 18,
+      duration: 18,
+      value: 1,
+      sourceId: priest.id,
+      school: 'shadow',
+    });
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    addGloomtithe(ctx, priest, 5);
+    const resourceBefore = priest.resource;
+
+    sim.castAbility('summon_tithefiend', priest.id);
+    sim.tick();
+
+    expect(priest.resource).toBe(resourceBefore);
+    expect(priest.cooldowns.has('summon_tithefiend')).toBe(false);
+    expect(priest.auras.find((aura) => aura.id === 'priest_gloomtithe')?.stacks).toBe(5);
+  });
+
   it('uses a smaller Tithefiend echo against eligible linked enemies', () => {
     const { sim, priest } = vespersPriest();
     const primary = addDummy(sim, 9914, priest.pos.x, priest.pos.z + 8);

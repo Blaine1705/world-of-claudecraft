@@ -32,6 +32,7 @@ import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import { isPersistentEngineAura } from '../sim/persistent_aura';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
@@ -2088,7 +2089,7 @@ export class ClientWorld implements IWorld {
           if (entity.dead || entity.auras.length === 0) continue;
           let retained = 0;
           for (const aura of entity.auras) {
-            if (Number.isFinite(aura.remaining))
+            if (!isPersistentEngineAura(aura.id) && Number.isFinite(aura.remaining))
               aura.remaining = Math.max(0, aura.remaining - elapsed);
             if (aura.remaining > 0) entity.auras[retained++] = aura;
           }

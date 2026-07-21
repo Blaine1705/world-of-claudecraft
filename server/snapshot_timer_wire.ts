@@ -1,5 +1,5 @@
-import type { Aura, Entity } from '../src/sim/types';
 import { isPersistentEngineAura } from '../src/sim/persistent_aura';
+import type { Aura, Entity } from '../src/sim/types';
 import type { StableCooldownWire } from '../src/world_api';
 
 export interface SerializedTimerWire {
