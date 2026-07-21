@@ -36,7 +36,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
       { type: 'heal', min: 130, max: 155 },
     ],
     description:
-      'Scours an enemy with holy power or delivers immediate mercy to a friendly target. Doctrine signature.',
+      'Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)',
   },
   seraphic_vigil: {
     id: 'seraphic_vigil',
@@ -53,7 +53,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'buffTarget', kind: 'heal_echo', value: 180, duration: 30 }],
     description:
-      'Places a watchful blessing on one ally, restoring them when they become unsafe. Benison signature.',
+      'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)',
   },
   summon_tithefiend: {
     id: 'summon_tithefiend',
@@ -70,7 +70,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     requiresAuraKind: 'gloomtithe',
     effects: [],
     description:
-      'Consumes Gloomtithe to call a temporary Tithefiend that hunts your Effigy. Vespers signature.',
+      'Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack, and prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
   },
   martyrs_aegis: {
     id: 'martyrs_aegis',

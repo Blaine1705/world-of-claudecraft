@@ -685,7 +685,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r17_apex_instinct',
           name: 'Apex Instinct',
           description:
-            'Your specialization cooldown grants 40 Focus. Its next 3 Focus spenders cost 50% less and deal 20% more damage. Charges persist for the cooldown window plus 4 sec.',
+            'Howling Rage, Cold Focus, or Bloodtrail Assault restores 40 Focus. Your next 3 Focus spenders cost 50% less and deal 20% more damage. These uses expire 4 sec after the triggering cooldown ends.',
           icon: 'bestial_wrath',
           effect: {
             ability: [{ ability: 'arcane_shot' }],
@@ -1128,7 +1128,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r17_desperate_prayer',
           name: 'Last Prayer',
-          description: 'Grants Last Prayer, an instant self-heal for 30% maximum health.',
+          description: 'Learn Last Prayer, which instantly heals you for 30% of maximum health.',
           icon: 'desperate_prayer',
           effect: {
             grant: { ability: 'desperate_prayer' },
@@ -1177,7 +1177,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r8_silence',
           name: 'Hushword',
-          description: 'Grants Hushword, a 4 sec silence with a 30 sec cooldown.',
+          description: 'Learn Hushword, which silences one enemy for 4 sec. 30 sec cooldown.',
           icon: 'silence',
           effect: { grant: { ability: 'silence' } },
         },
@@ -1242,7 +1242,8 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r14_pain_and_suffering',
           name: 'Living Covenant',
-          description: "Strengthens Doctrine's link, Benison's group recovery, or Vespers' echoes.",
+          description:
+            'Doctrine damage-healing restores Psalm of Warding by 20% of the healing done, up to its original absorb. Benison turns Choirmend overhealing into a 10 sec absorb capped at 10% maximum health. Each Vespers Effigy echo extends Dirge of Decay by 1 sec, up to 6 sec per target.',
           icon: 'power_word_shield',
           effect: { intrinsic: { mechanic: 'priest_living_covenant', metrics: {} } },
         },
@@ -1256,21 +1257,24 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r17_anointing',
           name: 'Anointing',
-          description: 'Grants Anointing.',
+          description:
+            'Learn Anointing, which grants one ally 20% more damage, healing, and casting speed for 15 sec. 120 sec cooldown.',
           icon: 'power_infusion',
           effect: { grant: { ability: 'power_infusion' } },
         },
         {
           id: 'pri_r17_martyrs_aegis',
           name: "Martyr's Aegis",
-          description: "Grants Martyr's Aegis.",
+          description:
+            "Learn Martyr's Aegis, which reduces one ally's incoming damage by 40% for 8 sec. 120 sec cooldown.",
           icon: 'martyrs_aegis',
           effect: { grant: { ability: 'martyrs_aegis' } },
         },
         {
           id: 'pri_r17_choir_of_deliverance',
           name: 'Choir of Deliverance',
-          description: 'Grants Choir of Deliverance.',
+          description:
+            'Learn Choir of Deliverance, which channels for 6 sec and heals nearby party members every 2 sec. 180 sec cooldown.',
           icon: 'choir_of_deliverance',
           effect: { grant: { ability: 'choir_of_deliverance' } },
         },
@@ -1284,7 +1288,8 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r20_twin_covenant',
           name: 'Twin Covenant',
-          description: 'Supports 2 spec relationships with one shared resource bank.',
+          description:
+            'Doctrine can link 2 allies and converts 70% of Holy damage into healing for each. Benison stores 2 Seraphic Vigil uses and can protect 2 allies. Vespers can bind 2 Effigies; both build the same Gloomtithe bank.',
           icon: 'seraphic_vigil',
           effect: {
             ability: [{ ability: 'seraphic_vigil', bonusCharges: 1 }],
@@ -1294,7 +1299,8 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r20_second_verse',
           name: 'Second Verse',
-          description: 'Repeats the spec relationship payoff once at 40% after 2 sec.',
+          description:
+            'After 2 sec, repeat 40% of Scouring Mercy healing from Doctrine, group healing from Benison, or Effigy echo damage from Vespers. The repeat cannot trigger itself.',
           icon: 'smite',
           effect: {
             intrinsic: { mechanic: 'priest_second_verse', metrics: { pct: 0.4, delay: 2 } },
@@ -1303,7 +1309,8 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r20_incarnate_spirit',
           name: 'Incarnate Spirit',
-          description: 'Manifests the selected specialization spirit at full commitment.',
+          description:
+            'A fully consumed Psalm of Warding heals its target for 40% of the original absorb. Benison Vigil healing also heals up to 3 nearby party members for 40%. A 5-stack Vespers Tithefiend deals 50% more damage and lasts 50% longer.',
           icon: 'summon_tithefiend',
           effect: { intrinsic: { mechanic: 'priest_incarnate_spirit', metrics: {} } },
         },
@@ -1461,7 +1468,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r17_earthbind',
           name: 'Primal Exaltation',
           description:
-            'Grants a 12 sec specialization-specific throughput surge. 120 sec cooldown.',
+            'For 12 sec, Thundercall Arc Bolts cast 50% faster and grant 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. 120 sec cooldown.',
           icon: 'elemental_mastery',
           effect: { grant: { ability: 'primal_exaltation' } },
         },

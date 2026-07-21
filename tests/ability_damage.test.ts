@@ -107,11 +107,12 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     );
   });
 
-  it('Bloodhook shows the same Ranged Attack Power wound bonus that combat snapshots', () => {
+  it('Bloodhook uses the same Ranged Attack Power wound bonus that combat snapshots', () => {
     const bloodhook = known('hunter', 'bloodhook', SURVIVAL_MODS);
     const effect = required(
       bloodhook.effects.find((candidate) => candidate.type === 'hunterBloodhook'),
     );
+    expect(abilityDamageBonus(bloodhook, effect, { ...SC, rangedPower: 0 })).toBe(0);
     expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(60);
   });
 

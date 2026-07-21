@@ -6340,35 +6340,35 @@ export const cs_CZ: EnTranslations = {
       },
       "pack_command": {
         "name": "Pack Command",
-        "description": "Command your living pet to strike. A successful hit generates 20 Focus and one Pack Ferocity stage."
+        "description": "Command your living pet to strike for 48 to 64 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3."
       },
       "unleash_beast": {
         "name": "Unleash Beast",
-        "description": "Release maximum Pack Ferocity in a heavy primary strike and area clap, then drive your pet into a short cleaving frenzy."
+        "description": "Consume 3 Pack Ferocity. Your pet strikes for 110 to 140 Physical damage and claps every enemy within 6 yards for 32 to 42. Damage increases with the pet's Attack Power. For 8 sec, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
       },
       "measured_shot": {
         "name": "Measured Shot",
-        "description": "A deliberate shot that deals {damage} Physical damage and generates 20 Focus on impact."
+        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
       },
       "cold_focus": {
         "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot generates more Focus and Long Draw becomes faster and cheaper. (Coldsight signature)"
+        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
       },
       "bloodhook": {
         "name": "Bloodhook",
-        "description": "Charge to an enemy 8 to 25 yards away and open a primary wound that bleeds for 24 damage over 12 sec. (Fieldcraft signature)"
+        "description": "Charge to the enemy and apply Bloodhook Wound. The wound deals 24 base Physical damage plus 30% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
       },
       "shrapnel_charge": {
         "name": "Shrapnel Charge",
-        "description": "Blast the target and nearby enemies with shrapnel, then spread a short bleed from the primary target."
+        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
       },
       "bloodtrail_assault": {
         "name": "Bloodtrail Assault",
-        "description": "For 12 sec, empower Bloodhook, Woundrend, Shrapnel Charge, and your pet follow-ups."
+        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
       },
       "trailbreak": {
         "name": "Trailbreak",
-        "description": "Leap away without losing specialization state. Fieldcraft also arms its next re-entry."
+        "description": "Leap 12 yards backward. Fieldcraft refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% extra damage per Momentum. Bloodhook adds an 18 to 24 damage re-entry hit whose base damage increases by 15% per Momentum and whose damage also increases with Ranged Attack Power."
       },
       "wildheart": {
         "name": "Wildheart",
@@ -6380,7 +6380,7 @@ export const cs_CZ: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Frostjaw Trap",
-        "description": "Place an armed trap at your selected enemy or your feet. It roots the first enemy to trigger it and slows nearby enemies."
+        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
       },
       "pack_rally": {
         "name": "Pack Rally",
@@ -7060,15 +7060,15 @@ export const cs_CZ: EnTranslations = {
       },
       "galeheart_weapon": {
         "name": "Galeheart Weapon",
-        "description": "Imbues your weapons for 30 min. Every third landed weapon attack echoes twice and arms Stormcast."
+        "description": "Imbue both weapons for 30 min. Every 3rd landed weapon attack repeats twice for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana."
       },
       "lifespring_weapon": {
         "name": "Lifespring Weapon",
-        "description": "Imbues your weapon for 30 min, increasing Mending Current deposits by 20%."
+        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
       },
       "primal_exaltation": {
         "name": "Primal Exaltation",
-        "description": "Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)"
+        "description": "For 12 sec, Thundercall Arc Bolts cast 50% faster and grant 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
       },
       "stoneward": {
         "name": "Stoneward",
@@ -7076,7 +7076,7 @@ export const cs_CZ: EnTranslations = {
       },
       "tidecall": {
         "name": "Tidecall",
-        "description": "Calls a quick restorative tide, healing an ally and adding the calculated healing to Mending Current."
+        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
       },
       "metamorphosis": {
         "name": "Děsivý zjev",
@@ -7572,15 +7572,15 @@ export const cs_CZ: EnTranslations = {
       },
       "scouring_mercy": {
         "name": "Scouring Mercy",
-        "description": "Scours an enemy with holy power or delivers immediate mercy to a friendly target. Doctrine signature."
+        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
       },
       "seraphic_vigil": {
         "name": "Seraphic Vigil",
-        "description": "Places a watchful blessing on one ally, restoring them when they become unsafe. Benison signature."
+        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
       },
       "summon_tithefiend": {
         "name": "Call Tithefiend",
-        "description": "Consumes Gloomtithe to call a temporary Tithefiend that hunts your Effigy. Vespers signature."
+        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack, and prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
       },
       "martyrs_aegis": {
         "name": "Martyr's Aegis",

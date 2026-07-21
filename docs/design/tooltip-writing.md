@@ -101,20 +101,18 @@ step after the English source changes. Locale filling remains a release task.
 
 ## Bloodhook example
 
-The current Bloodhook tooltip is unclear because it repeats the range and calls the bleed a
-`primary wound` without explaining that term.
+Bloodhook applies a named bleed, so its tooltip must explain the name and the full scaling rule.
+The live implementation snapshots 24 base Physical damage plus 30% of the Hunter's Ranged Attack
+Power, then deals that total over 12 sec in four ticks. Trailbreak can also arm a separate re-entry
+hit. That hit has its own base range and Ranged Attack Power contribution.
 
-The live implementation currently applies 24 total Physical damage over 12 sec in four flat
-ticks. That base bleed does not scale with Attack Power or Ranged Attack Power. A separate
-Bloodhook re-entry hit adds 8% of the Hunter's Ranged Attack Power.
+Accurate copy for the current wound is:
 
-Accurate copy for the current code is:
+> Charge to the enemy and apply Bloodhook Wound. The wound deals 24 base Physical damage plus 30%
+> of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)
 
-> Charge to the enemy. It bleeds for 24 Physical damage over 12 sec. (Fieldcraft signature)
-
-If the intended Ranged Attack Power scaling is added to the bleed, wire the combat and tooltip to
-one shared calculation first. Then use a resolved total instead of `24`, and state that the damage
-increases with Ranged Attack Power if that information helps the player choose gear.
+Keep the wound and re-entry formulas separate in both combat and player copy. A balance change to
+one must not silently change the other.
 
 ## Final check
 

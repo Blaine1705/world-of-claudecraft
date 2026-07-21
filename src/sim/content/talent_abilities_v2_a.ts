@@ -461,7 +461,7 @@ export const TALENT_ABILITIES_V2_A = {
     requiresTarget: false,
     effects: [],
     description:
-      'Unleashes your specialization for 12 sec, empowering its normal rotation. (Shaman talent)',
+      'For 12 sec, Thundercall Arc Bolts cast 50% faster and grant 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)',
   },
   bloodlust: {
     id: 'bloodlust',

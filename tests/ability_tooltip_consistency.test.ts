@@ -62,8 +62,19 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Patch Up's dead-pet revive fraction is owned by the pet lifecycle branch;
   // the living-pet HoT remains fully data-driven by the ability effect.
   revive_pet: [35],
-  // Gutting Strike's 15 Focus award is applied by hunter_fieldcraft.ts after a hit.
-  raptor_strike: [15],
+  // Fieldcraft's Focus, Momentum, and re-entry rules live in hunter_fieldcraft.ts.
+  raptor_strike: [1, 3, 8, 15],
+  trailbreak: [15, 18, 24],
+  // The Priest spec relationship rules are post-damage hooks rather than ability effects.
+  smite: [15, 30],
+  shadow_word_pain: [1],
+  mind_blast: [1, 3, 30],
+  // Thundercall and Stonebound values live in their spec runtime modules.
+  lightning_bolt: [1, 5],
+  rockbiter_weapon: [3, 10],
+  earth_shock: [3, 25],
+  // Spiritmend deposits are calculated after the direct heal resolves.
+  healing_wave: [12, 30, 50],
 };
 
 // Every resolved rank of every class ability (deduped by rank).
