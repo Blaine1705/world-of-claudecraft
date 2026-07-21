@@ -125,8 +125,10 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     noMarketList: true,
   },
   // ---- Themed world-drop rares (one per rift environment) ----
-  // Stat lines sit a notch under the heroic five-man epics (heroic_loot.ts) and
-  // inside the rare-quality budget for their level-20-25 sources (item_budget.ts).
+  // Stat lines sit at the ilvl-26 rare budget (source 23 + rare bonus 3).
+  // ilvl-26 slot budgets (round(26 * 0.8 * slot_mult * 0.7)):
+  //   mainhand 1.0 = 15, chest 1.0 = 15, gloves 0.7 = 10,
+  //   shoulder 0.75 = 11, waist 0.7 = 10, feet 0.65 = 9, ring 0.6 = 9.
   hoarfrost_edge: {
     id: 'hoarfrost_edge',
     name: 'Hoarfrost Edge',
@@ -134,9 +136,9 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     requiredLevel: 20,
-    weapon: { min: 27, max: 40, speed: 2.4 },
-    // ilvl-28 mainhand rare budget = 16; str:11+sta:5 = 16
-    stats: { str: 11, sta: 5 },
+    weapon: { min: 28, max: 42, speed: 2.4 },
+    // ilvl-26 mainhand rare budget = 15; str:10+sta:5 = 15
+    stats: { str: 10, sta: 5 },
     sellValue: 7500,
     requiredClass: HEAVY,
   },
@@ -148,7 +150,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 165, str: 7, sta: 4 },
+    // ilvl-26 gloves rare budget = 10; str:6+sta:4 = 10
+    stats: { armor: 165, str: 6, sta: 4 },
     sellValue: 5000,
     requiredClass: HEAVY,
   },
@@ -160,8 +163,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'rare',
     requiredLevel: 20,
-    // ilvl-28 chest rare budget = 16; agi:10+sta:6 = 16
-    stats: { armor: 165, agi: 10, sta: 6 },
+    // ilvl-26 chest rare budget = 15; agi:9+sta:6 = 15
+    stats: { armor: 165, agi: 9, sta: 6 },
     sellValue: 6000,
     requiredClass: AGILE_WILD,
   },
@@ -173,8 +176,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'rare',
     requiredLevel: 20,
-    // ilvl-28 shoulder rare budget = 12; int:8+spi:4 = 12
-    stats: { armor: 38, int: 8, spi: 4 },
+    // ilvl-26 shoulder rare budget = 11; int:7+spi:4 = 11
+    stats: { armor: 38, int: 7, spi: 4 },
     sellValue: 5000,
     requiredClass: CASTER,
   },
@@ -186,7 +189,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 140, str: 7, sta: 4 },
+    // ilvl-26 waist rare budget = 10; str:6+sta:4 = 10
+    stats: { armor: 140, str: 6, sta: 4 },
     sellValue: 5000,
     requiredClass: HEAVY,
   },
@@ -198,7 +202,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 42, int: 7, spi: 4 },
+    // ilvl-26 gloves rare budget = 10; int:6+spi:4 = 10
+    stats: { armor: 42, int: 6, spi: 4 },
     sellValue: 5000,
     requiredClass: CASTER,
   },
@@ -210,7 +215,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'rare',
     requiredLevel: 20,
-    stats: { armor: 85, agi: 7, sta: 3 },
+    // ilvl-26 feet rare budget = 9; agi:6+sta:3 = 9
+    stats: { armor: 85, agi: 6, sta: 3 },
     sellValue: 5000,
     requiredClass: AGILE,
   },
@@ -221,6 +227,7 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'rare',
     requiredLevel: 20,
+    // ilvl-26 ring rare budget = 9; sta:5+spi:4 = 9 (unchanged from ilvl-28: same budget)
     stats: { sta: 5, spi: 4 },
     sellValue: 5000,
   },
@@ -233,8 +240,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'rare',
     requiredLevel: 20,
-    // ilvl-28 chest rare budget = 16; int:10+spi:6 = 16
-    stats: { armor: 55, int: 10, spi: 6 },
+    // ilvl-26 chest rare budget = 15; int:9+spi:6 = 15
+    stats: { armor: 55, int: 9, spi: 6 },
     sellValue: 6500,
     requiredClass: CASTER,
   },
@@ -246,8 +253,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     requiredLevel: 20,
     weapon: { min: 34, max: 50, speed: 2.9 },
-    // ilvl-28 mainhand rare budget = 16; str:10+sta:6 = 16
-    stats: { str: 10, sta: 6 },
+    // ilvl-26 mainhand rare budget = 15; str:9+sta:6 = 15
+    stats: { str: 9, sta: 6 },
     sellValue: 8500,
     requiredClass: HEAVY,
   },

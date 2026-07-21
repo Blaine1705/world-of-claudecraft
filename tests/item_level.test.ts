@@ -343,16 +343,17 @@ describe('item level: purity and determinism', () => {
   });
 });
 
-describe('item level: rift gear is budget-exact (rares ilvl 28, clear-time epics/legendary ilvl 31/35)', () => {
-  it('rift world-drop rares resolve at ilvl 28 with exact budget', () => {
-    // Rift mobs have maxLevel 25. Rare quality adds 3, so ilvl = 28.
-    // The mob-loot block in buildSourceIndex registers them at source 25.
+describe('item level: rift gear is budget-exact (rares ilvl 26, clear-time epics/legendary ilvl 31/35)', () => {
+  it('rift world-drop rares resolve at ilvl 26 with exact budget', () => {
+    // Rift mobs have maxLevel 23 (rank retune: max spawn level is 23).
+    // Rare quality adds 3, so ilvl = 26.
+    // The mob-loot block in buildSourceIndex registers them at source 23.
     for (const id of RIFT_RARE_ITEM_IDS) {
       const item = ITEMS[id];
       expect(item, `${id} is a real item`).toBeTruthy();
-      expect(itemSourceLevel(id), `${id} source`).toBe(25);
+      expect(itemSourceLevel(id), `${id} source`).toBe(23);
       expect(item.quality, `${id} quality`).toBe('rare');
-      expect(itemLevel(item), `${id} ilvl`).toBe(28);
+      expect(itemLevel(item), `${id} ilvl`).toBe(26);
       expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
     }
   });
