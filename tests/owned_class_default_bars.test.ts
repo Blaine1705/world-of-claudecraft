@@ -1,8 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
+import { DEFAULT_GAMEPAD_BINDINGS } from '../src/game/gamepad_map';
 import type { PlayerClass } from '../src/sim/types';
-import { buildDefaultFormBar, type HotbarAction } from '../src/ui/hud/action_bar/hotbar';
+import {
+  ACTION_BAR_ABILITY_SLOTS,
+  ActionBarController,
+} from '../src/ui/hud/action_bar/action_bar_controller';
+import { actionBarRowForSlot } from '../src/ui/hud/action_bar/action_bar_layout_core';
+import {
+  applyActionBarLayout,
+  captureActionBarLayout,
+  planActionBarRestore,
+} from '../src/ui/hud/action_bar/action_bar_layout_sync';
+import {
+  applyLoadoutBar,
+  buildDefaultFormBar,
+  type HotbarAction,
+  loadoutKnownAbilityIds,
+} from '../src/ui/hud/action_bar/hotbar';
+import {
+  MOBILE_ACTION_PAGE_COUNT,
+  MOBILE_ACTIONS_PER_PAGE,
+  mobileButtonHasSourceSlot,
+  sourceSlotForMobileButton,
+} from '../src/ui/hud/action_bar/mobile_action_page_view';
 import {
   ownedClassSpecDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
@@ -156,13 +178,72 @@ const EXPECTED = {
   ],
 } as const;
 
+class MemoryStorage {
+  readonly values = new Map<string, string>();
+
+  getItem(key: string): string | null {
+    return this.values.get(key) ?? null;
+  }
+
+  setItem(key: string, value: string): void {
+    this.values.set(key, value);
+  }
+
+  removeItem(key: string): void {
+    this.values.delete(key);
+  }
+}
+
+function ownedSpecEntries(): Array<{
+  key: string;
+  playerClass: PlayerClass;
+  spec: string;
+  expected: readonly string[];
+  known: Set<string>;
+}> {
+  return Object.entries(EXPECTED).map(([key, expected]) => {
+    const [playerClass, spec] = key.split('/');
+    const cls = playerClass as PlayerClass;
+    const modifiers = computeTalentModifiers(cls, { spec, rows: {} }, 20);
+    const known = new Set(abilitiesKnownAt(cls, 20, modifiers).map(({ def }) => def.id));
+    return { key, playerClass: cls, spec, expected, known };
+  });
+}
+
+function controllerFor(
+  storage: MemoryStorage,
+  playerClass: PlayerClass,
+  spec: string,
+  known: ReadonlySet<string>,
+): ActionBarController {
+  return new ActionBarController({
+    storage,
+    playerClass,
+    playerName: 'OwnedDefaultTester',
+    playerLevel: () => 20,
+    talentSpec: () => spec,
+    knownAbilityIds: () => [...known],
+    hasAura: () => false,
+    isInSportMatch: () => false,
+    showAttackButton: () => true,
+  });
+}
+
+function seedOwnedSpecBar(
+  storage: MemoryStorage,
+  playerClass: PlayerClass,
+  spec: string,
+  known: ReadonlySet<string>,
+): ActionBarController {
+  const controller = controllerFor(storage, playerClass, spec, known);
+  controller.init();
+  controller.syncKnownAbilities();
+  return controller;
+}
+
 describe('owned class level 20 default action bars', () => {
   it('pins the manual-first templates for all nine specs', () => {
-    for (const [key, expected] of Object.entries(EXPECTED)) {
-      const [playerClass, spec] = key.split('/');
-      const cls = playerClass as PlayerClass;
-      const modifiers = computeTalentModifiers(cls, { spec, rows: {} }, 20);
-      const known = new Set(abilitiesKnownAt(cls, 20, modifiers).map(({ def }) => def.id));
+    for (const { key, playerClass, spec, expected, known } of ownedSpecEntries()) {
       expect(ownedClassSpecDefaultAbilityIds(playerClass, spec, 20, known), key).toEqual(expected);
       expect(
         expected.some((id) => id.includes('one_button')),
@@ -193,5 +274,95 @@ describe('owned class level 20 default action bars', () => {
     expect(shouldSeedOwnedSpecDefault(customized, previous, true)).toBe(false);
     expect(shouldSeedOwnedSpecDefault(previous, null, false)).toBe(true);
     expect(shouldSeedOwnedSpecDefault(previous, null, true)).toBe(false);
+  });
+
+  it('keeps every generated spec bar byte-for-byte through a local relog', () => {
+    for (const { key, playerClass, spec, expected, known } of ownedSpecEntries()) {
+      const storage = new MemoryStorage();
+      seedOwnedSpecBar(storage, playerClass, spec, known);
+
+      const relogged = controllerFor(storage, playerClass, spec, known);
+      relogged.init();
+      relogged.syncKnownAbilities();
+
+      expect(relogged.actions, key).toEqual(
+        buildDefaultFormBar(expected, ACTION_BAR_ABILITY_SLOTS),
+      );
+    }
+  });
+
+  it('restores every generated spec bar on another device and leaves it alone on reconnect', () => {
+    for (const { key, playerClass, spec, expected, known } of ownedSpecEntries()) {
+      const source = new MemoryStorage();
+      seedOwnedSpecBar(source, playerClass, spec, known);
+      const layout = captureActionBarLayout(source, playerClass, 'OwnedDefaultTester');
+
+      const destination = new MemoryStorage();
+      const restore = planActionBarRestore({ source: 'server', layout }, () => ({
+        v: 1,
+        forms: {},
+      }));
+      expect(restore.action, key).toBe('apply-server');
+      if (restore.action !== 'apply-server') throw new Error(`${key} did not restore from server`);
+      applyActionBarLayout(destination, playerClass, 'OwnedDefaultTester', restore.layout);
+
+      const imported = controllerFor(destination, playerClass, spec, known);
+      imported.init();
+      imported.syncKnownAbilities();
+      const expectedBar = buildDefaultFormBar(expected, ACTION_BAR_ABILITY_SLOTS);
+      expect(imported.actions, key).toEqual(expectedBar);
+
+      const reconnect = planActionBarRestore({ source: 'noop' }, () =>
+        captureActionBarLayout(destination, playerClass, 'OwnedDefaultTester'),
+      );
+      expect(reconnect, key).toEqual({ action: 'none' });
+      const reconnected = controllerFor(destination, playerClass, spec, known);
+      reconnected.init();
+      reconnected.syncKnownAbilities();
+      expect(reconnected.actions, key).toEqual(expectedBar);
+    }
+  });
+
+  it('accepts every generated template as an imported saved talent-loadout bar', () => {
+    for (const { key, playerClass, spec, expected } of ownedSpecEntries()) {
+      const known = loadoutKnownAbilityIds(playerClass, { spec, rows: {} }, 20);
+      const imported = applyLoadoutBar(
+        buildDefaultFormBar([], ACTION_BAR_ABILITY_SLOTS),
+        [...expected],
+        ACTION_BAR_ABILITY_SLOTS,
+        (abilityId) => known.has(abilityId),
+      );
+      expect(imported, key).toEqual(buildDefaultFormBar(expected, ACTION_BAR_ABILITY_SLOTS));
+    }
+  });
+
+  it('keeps core actions visible and controller-bound, with every action reachable on mobile', () => {
+    const controllerActions = new Set(Object.values(DEFAULT_GAMEPAD_BINDINGS));
+    for (const { key, expected } of ownedSpecEntries()) {
+      const actions = buildDefaultFormBar(expected, ACTION_BAR_ABILITY_SLOTS);
+      for (let index = 0; index < actions.length; index++) {
+        if (!actions[index]) continue;
+        const sourceSlot = index + 1;
+        const desktopRow = actionBarRowForSlot(sourceSlot);
+        expect(desktopRow, `${key} desktop slot ${sourceSlot}`).toBeLessThanOrEqual(3);
+        if (index < 11) {
+          expect(desktopRow, `${key} visible desktop slot ${sourceSlot}`).toBe(1);
+        }
+        if (index < 8) {
+          expect(controllerActions, `${key} default controller slot ${sourceSlot}`).toContain(
+            `slot${sourceSlot}`,
+          );
+        }
+        const page = Math.floor(index / MOBILE_ACTIONS_PER_PAGE);
+        const button = index % MOBILE_ACTIONS_PER_PAGE;
+        expect(page, `${key} mobile slot ${sourceSlot}`).toBeLessThan(MOBILE_ACTION_PAGE_COUNT);
+        expect(mobileButtonHasSourceSlot(page, button), `${key} mobile slot ${sourceSlot}`).toBe(
+          true,
+        );
+        expect(sourceSlotForMobileButton(page, button), `${key} mobile slot ${sourceSlot}`).toBe(
+          sourceSlot,
+        );
+      }
+    }
   });
 });
