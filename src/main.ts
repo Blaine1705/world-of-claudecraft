@@ -3065,7 +3065,7 @@ async function startGame(
   function updateHoverCursor(): void {
     if (!input.hoverActive || input.isDragging() || hud.isModalOpen()) {
       input.setHoverCursor('default');
-      hud.clearMobHoverTooltip();
+      hud.clearHoverTooltip();
       return;
     }
     if (hoverPickGate.shouldPick(input.hoverX, input.hoverY, performance.now())) {
@@ -3080,8 +3080,10 @@ async function startGame(
     // frame from live entity state, so counts and death update without a re-pick.
     if (entity && entity.kind === 'mob' && !entity.dead) {
       hud.showMobHoverTooltip(entity, pvpOpponents);
+    } else if (entity && entity.kind === 'player' && entity.id !== world.playerId && !entity.dead) {
+      hud.showPlayerHoverTooltip(entity);
     } else {
-      hud.clearMobHoverTooltip();
+      hud.clearHoverTooltip();
     }
   }
 

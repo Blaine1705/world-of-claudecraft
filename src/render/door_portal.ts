@@ -152,6 +152,49 @@ function doorPortalMaterial(entering: boolean, lowGfx: boolean): THREE.MeshBasic
   return material;
 }
 
+// The Orkadia war-camp gate reads distinct from every other dungeon door: a
+// toxic warpyre-green membrane carrying the same swirling energy texture the
+// ranked Rift gates use (so it visibly churns per frame), over a blackened orc
+// arch. Cached per lowGfx like doorPortalMaterial.
+function orkadiaDoorPortalMaterial(lowGfx: boolean): THREE.MeshBasicMaterial {
+  const key = `orkadia:${lowGfx}`;
+  const existing = portalMats.get(key);
+  if (existing) return existing;
+  const material = markSharedMaterial(
+    new THREE.MeshBasicMaterial({
+      color: 0x5aff3a, // acid warpyre green
+      map: riftPortalTexture() ?? undefined,
+      transparent: true,
+      opacity: 0.72,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  if (!lowGfx) material.color.multiplyScalar(PORTAL_BOOST);
+  portalMats.set(key, material);
+  return material;
+}
+
+// Blackened orc-iron grade for the Orkadia arch: a cloned, darkened copy of the
+// stone/GLB material so the shared door arch reads as scorched black rock. Never
+// mutates the shared source material (clone-then-tint, the marshMaterial trick).
+const ORKADIA_ARCH_TINT = 0x2a2620;
+function darkenOrkadiaArch(root: THREE.Object3D): void {
+  root.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      const src = child.material;
+      const mats = Array.isArray(src) ? src : [src];
+      child.material = mats.map((m) => {
+        const c = (m as THREE.Material).clone() as THREE.MeshStandardMaterial;
+        if (c.color) c.color.multiply(new THREE.Color(ORKADIA_ARCH_TINT));
+        return c;
+      });
+      if (!Array.isArray(src)) child.material = (child.material as THREE.Material[])[0];
+    }
+  });
+}
+
 // Soft radial "energy membrane" texture for the rift gate: a bright core fading
 // to transparent at the rim (so the disc fills the opening with soft edges that
 // tuck behind the frame instead of a hard-edged spinning oval), plus faint
@@ -898,6 +941,7 @@ export function buildDoorBody(
     return { body };
   }
 
+  const isOrkadia = dungeonId === 'orkadia';
   if (loadedDoorArchGltf) {
     const inst = loadedDoorArchGltf.clone(true);
     inst.traverse((child) => {
@@ -906,9 +950,13 @@ export function buildDoorBody(
         child.receiveShadow = true;
       }
     });
+    if (isOrkadia) darkenOrkadiaArch(inst);
     body.add(inst);
   } else {
-    const stone = doorStoneMaterial();
+    const stone = isOrkadia ? doorStoneMaterial().clone() : doorStoneMaterial();
+    if (isOrkadia && (stone as THREE.MeshStandardMaterial).color) {
+      (stone as THREE.MeshStandardMaterial).color.multiply(new THREE.Color(ORKADIA_ARCH_TINT));
+    }
     const arch = new THREE.Mesh(doorArchGeometry(), stone);
     arch.castShadow = true;
     body.add(arch);
@@ -923,7 +971,10 @@ export function buildDoorBody(
       body.add(plinth);
     }
   }
-  const portal = new THREE.Mesh(doorPortalGeometry(), doorPortalMaterial(entering, lowGfx));
+  const portalMat = isOrkadia
+    ? orkadiaDoorPortalMaterial(lowGfx)
+    : doorPortalMaterial(entering, lowGfx);
+  const portal = new THREE.Mesh(doorPortalGeometry(), portalMat);
   portal.position.y = 2.15;
   portal.scale.set(1, 1.35, 1);
   body.add(portal);

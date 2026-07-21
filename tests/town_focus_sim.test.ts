@@ -77,7 +77,7 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 10000 + i, ZONE1.hub);
         sim.harvestCorpse(mob.id, undefined, a);
-        total = sim.countItem('boar_hide', a);
+        total = sim.countItem('rough_hide', a);
       }
       return total;
     }
@@ -104,9 +104,9 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
         sim.harvestCorpse(mob.id, undefined, a);
         // drain the bag each harvest: richer merged-world yields can hit the
         // bag cap inside 300 trials, and a capped total reads as a dead heat
-        const gained = sim.countItem('boar_hide', a);
+        const gained = sim.countItem('rough_hide', a);
         total += gained;
-        if (gained > 0) sim.removeItem('boar_hide', gained, a);
+        if (gained > 0) sim.removeItem('rough_hide', gained, a);
       }
       return total;
     }
@@ -122,12 +122,12 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
     sim.setTownFocus({ fang: 10 }, a);
     const mob = spawnHideWolf(internals, 20000, ZONE1.hub);
     sim.harvestCorpse(mob.id, undefined, a);
-    const withOtherFocused = sim.countItem('boar_hide', a);
+    const withOtherFocused = sim.countItem('rough_hide', a);
 
     const { sim: sim2, internals: internals2, a: a2 } = setup();
     const mob2 = spawnHideWolf(internals2, 20001, ZONE1.hub);
     sim2.harvestCorpse(mob2.id, undefined, a2);
-    const baseline = sim2.countItem('boar_hide', a2);
+    const baseline = sim2.countItem('rough_hide', a2);
 
     // Both draw the same rng stream from a freshly-seeded Sim (seed 21), so the
     // unfocused 'hide' component's tier roll is identical either way.

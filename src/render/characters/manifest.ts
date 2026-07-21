@@ -224,6 +224,21 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// Tripo orc rig (Orkadia dungeon: black/blue/red orc GLBs). Ships Idle_Loop,
+// Walk_Loop, Sprint_Loop, Punch_Jab, Sword_Attack (Red also Sword_Idle). The
+// batch had no death or hit-react take, so `Death` (a hips-driven topple that
+// clamps flat) and `Hit` (a short spine/neck flinch) are synthesized onto the
+// shipped Mixamo skeleton by scripts/_add_orc_death_anim.mjs (the Stone Cantor
+// precedent, _add_cantor_hit_anim.mjs); re-run it if the GLBs are regenerated.
+const ORC_TRIPO: ClipMap = {
+  idle: 'Idle_Loop',
+  walk: 'Walk_Loop',
+  run: 'Sprint_Loop',
+  attack: ['Sword_Attack', 'Punch_Jab'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -1021,6 +1036,29 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2, // skin washes pink fast
   },
+  // Orkadia orc war-camp (Tripo GLBs). Low tint strength so each orc keeps its
+  // own baked black/blue/red identity; the mob `color` only nudges it.
+  mob_orc_grunt: {
+    url: `${CREATURES}/black_orc.glb`,
+    height: 2.3,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_orc_marauder: {
+    url: `${CREATURES}/blue_orc.glb`,
+    height: 2.4,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_orc_warlord: {
+    url: `${CREATURES}/red_orc.glb`,
+    height: 2.6,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
   mob_elemental: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.2,
@@ -1488,6 +1526,10 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Orkadia orc war-camp: each orc template renders its own Tripo GLB.
+  orkadia_grunt: 'mob_orc_grunt',
+  orkadia_marauder: 'mob_orc_marauder',
+  orkadia_warlord: 'mob_orc_warlord',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',

@@ -317,7 +317,11 @@ export const ja_JP: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
-      "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。"
+      "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。",
+      "healerConfirmTitle": "復活の後遺症を受けますか？",
+      "healerConfirmBody": "霊魂の癒し手はこの場で復活させてくれますが、復活の後遺症により全属性が75%低下します。高レベルでは最長10分間続きます。魂を遺体まで戻せばペナルティなしで復活できます。",
+      "healerConfirmAccept": "復活する",
+      "healerConfirmCancel": "キャンセル"
     },
     "unstuck": {
       "menuButton": "スタック解除",
@@ -2170,9 +2174,11 @@ export const ja_JP: EnTranslations = {
       "mining": "採掘",
       "logging": "伐採",
       "herbalism": "薬草学",
+      "fishing": "釣り",
       "notReady": "この資源ノードはまだあなたのために再生していません。",
       "gatherLine": "{name}を採集した。",
-      "gatherLineQty": "{name}を{qty}個採集した。"
+      "gatherLineQty": "{name}を{qty}個採集した。",
+      "catchLine": "{name}を釣り上げた"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -3117,9 +3123,9 @@ export const ja_JP: EnTranslations = {
       "ice_lance": "氷の効果を消費する即時発動の氷片。凍結した対象には大幅に高いダメージを与えます。",
       "flurry": "3発の氷弾を素早く放ち、次の氷系攻撃が対象を凍結状態として扱うようにします。",
       "fingers_of_frost": "氷の矢が、ときどき次のアイスランスに対象を凍結状態として扱う力を与えます。",
-      "brain_freeze": "氷の矢が、ときどき次のウィンターラッシュを即時発動にして威力を高めます。",
+      "brain_freeze": "氷の矢が、ときどき次のウィンターラッシュを即時発動にしてクールダウンを無視します。",
       "shatter": "凍結した対象に対する呪文のクリティカル率が大幅に上昇します。",
-      "frozen_orb": "ゆっくり進む氷球を敵の群れへ放ち、周囲を冷やして氷の効果を発生させます。",
+      "frozen_orb": "ゆっくり進む氷球を敵の群れへ放ち、敵を冷やして氷柱を蓄えます。",
       "blizzard": "一帯を氷で覆い、敵の群れにダメージを与えながら移動速度を低下させます。",
       "blink": "短い距離を前方へ瞬間移動し、移動不能効果を解除します。",
       "conjure_water": "マナを回復する飲み物を作り出し、プルの合間に補充できます。",
@@ -3353,6 +3359,7 @@ export const ja_JP: EnTranslations = {
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
+      "orkadiaBody": "ドレイクランドの黒い火山岩を穿って築かれた残虐なオークの戦営。広間は毒々しい緑の戦火に照らされている。血牙の兵卒と鉄皮の略奪者を斬り伏せ、髑髏の壇上に鎮座する軍団長グロモク・スカルクリーヴァーへと至れ。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -4811,7 +4818,11 @@ export const ja_JP: EnTranslations = {
   },
   "heroicShop": {
     "balance": "英雄の証: {count}",
-    "buyAria": "英雄の証{marks}個で{item}を購入"
+    "buyAria": "英雄の証{marks}個で{item}を購入",
+    "buyConfirmTitle": "購入の確認",
+    "buyConfirmBody": "英雄の証{marks}個で{item}を購入しますか？証での購入は返金できません。",
+    "buyConfirmAccept": "購入",
+    "buyConfirmCancel": "キャンセル"
   },
   "cardDuel": {
     "title": "カードデュエル",
@@ -4864,7 +4875,11 @@ export const ja_JP: EnTranslations = {
       "buyAria": "デルヴの刻印{marks}個で{item}を購入",
       "reqHeroic": "ヒロイッククリアが必要",
       "reqClears": "{count}回のクリアが必要",
-      "empty": "在庫がありません。"
+      "empty": "在庫がありません。",
+      "buyConfirmTitle": "購入の確認",
+      "buyConfirmBody": "デルヴの刻印{marks}個で{item}を購入しますか？刻印での購入は返金できません。",
+      "buyConfirmAccept": "購入",
+      "buyConfirmCancel": "キャンセル"
     },
     "tracker": {
       "title": "デルヴ",
@@ -6644,11 +6659,11 @@ export const ja_JP: EnTranslations = {
       },
       "flurry": {
         "name": "ウィンターラッシュ",
-        "description": "3発の氷弾を放ち、それぞれ{damage}の氷ダメージを与え、対象にウィンターズ・チルを付与します。次に命中する対応呪文2回は対象を凍結状態として扱います。ブレインフリーズ発動時は即時発動となり、威力が30%上昇してクールダウンを無視します。（氷）"
+        "description": "3発の氷弾を放ち、それぞれ{damage}の氷ダメージを与え、対象にウィンターズ・チルを付与します。次に命中する対応呪文2回は対象を凍結状態として扱います。ブレインフリーズ発動時は即時発動となり、クールダウンを無視します。（氷）"
       },
       "frozen_orb": {
         "name": "フローズンオーブ",
-        "description": "渦巻く氷球を放ち、8秒間前方へ漂わせます。周囲の敵に毎秒{damage}の氷ダメージを与え、移動速度を30%低下させます。命中するとフィンガーズ・オブ・フロストを生成します。（氷）"
+        "description": "渦巻く氷球を放ち、8秒間前方へ漂わせます。周囲の敵に毎秒{damage}の氷ダメージを与え、移動速度を30%低下させます。敵に命中したパルスごとに氷柱を1つ生成します。（氷）"
       },
       "blizzard": {
         "name": "ブリザード",
@@ -6672,11 +6687,11 @@ export const ja_JP: EnTranslations = {
       },
       "brain_freeze": {
         "name": "ブレインフリーズ",
-        "description": "ライムランスが20%の確率で、次のウィンターラッシュを即時発動にし、威力を30%上昇させ、クールダウンを無視させます。（氷）"
+        "description": "ライムランスが20%の確率で、次のウィンターラッシュを即時発動にし、クールダウンを無視させます。（氷）"
       },
       "shatter": {
         "name": "脆き破滅",
-        "description": "凍結した対象に対する呪文のクリティカル率が50%上昇し、そのクリティカルダメージが20%上昇します。フィンガーズ・オブ・フロストとウィンターズ・チルも対象を凍結状態として扱います。（氷）"
+        "description": "凍結した対象に対する呪文のクリティカル率が50%上昇します。フィンガーズ・オブ・フロストとウィンターズ・チルも対象を凍結状態として扱います。（氷）"
       },
       "conjure_water": {
         "name": "水の召喚",
@@ -8585,6 +8600,210 @@ export const ja_JP: EnTranslations = {
       "silverleaf_herb": {
         "name": "シルバーリーフ草"
       },
+      "rough_hide": {
+        "name": "粗い獣皮"
+      },
+      "spider_silk": {
+        "name": "蜘蛛の糸"
+      },
+      "venom_gland": {
+        "name": "毒腺"
+      },
+      "game_meat": {
+        "name": "野獣の肉"
+      },
+      "homespun_cloth": {
+        "name": "手織りの布"
+      },
+      "pristine_hide": {
+        "name": "極上の獣皮"
+      },
+      "pristine_silk": {
+        "name": "極上の蜘蛛の糸"
+      },
+      "pristine_venom_gland": {
+        "name": "極上の毒腺"
+      },
+      "prime_cut": {
+        "name": "極上の肉"
+      },
+      "smithing_flux": {
+        "name": "鍛冶の融剤"
+      },
+      "spool_of_thread": {
+        "name": "糸巻き"
+      },
+      "tanning_agent": {
+        "name": "なめし剤"
+      },
+      "cooking_salt": {
+        "name": "調理用の塩"
+      },
+      "glass_vial": {
+        "name": "ガラスの小瓶"
+      },
+      "copper_bearded_axe": {
+        "name": "銅のひげ斧"
+      },
+      "copper_flanged_mace": {
+        "name": "銅のフランジメイス"
+      },
+      "ironbark_boar_spear": {
+        "name": "アイアンバークの猪槍"
+      },
+      "ironedge_longsword": {
+        "name": "鉄刃のロングソード"
+      },
+      "ironshod_maul": {
+        "name": "鉄装のモール"
+      },
+      "whetted_iron_dirk": {
+        "name": "研ぎ澄まされた鉄の短剣"
+      },
+      "thorium_warblade": {
+        "name": "トリウムのウォーブレード"
+      },
+      "arcanite_war_axe": {
+        "name": "アーケナイトの戦斧"
+      },
+      "elderwood_battle_staff": {
+        "name": "エルダーウッドのバトルスタッフ"
+      },
+      "riveted_copper_girdle": {
+        "name": "銅のリベットベルト"
+      },
+      "coppermail_sabatons": {
+        "name": "銅鎖のサバトン"
+      },
+      "coppermail_gauntlets": {
+        "name": "銅鎖のガントレット"
+      },
+      "ironlink_hauberk": {
+        "name": "鉄鎖のホーバーク"
+      },
+      "ironlink_legguards": {
+        "name": "鉄鎖のレッグガード"
+      },
+      "ironlink_spaulders": {
+        "name": "鉄鎖のショルダーガード"
+      },
+      "thoriumscale_greathelm": {
+        "name": "トリウム鱗のグレートヘルム"
+      },
+      "thoriumscale_cuirass": {
+        "name": "トリウム鱗のキュイラス"
+      },
+      "thoriumscale_leggings": {
+        "name": "トリウム鱗のレギンス"
+      },
+      "homespun_hood": {
+        "name": "手織りのフード"
+      },
+      "homespun_mitts": {
+        "name": "手織りのミトン"
+      },
+      "silverthread_slippers": {
+        "name": "銀糸のスリッパ"
+      },
+      "goldweave_robe": {
+        "name": "金織りのローブ"
+      },
+      "goldweave_leggings": {
+        "name": "金織りのレギンス"
+      },
+      "silkspun_satchel": {
+        "name": "絹紡ぎのサッチェル"
+      },
+      "silkbinders_raiment": {
+        "name": "絹縛りの法衣"
+      },
+      "sunweave_mantle": {
+        "name": "陽織りのマント"
+      },
+      "sunweave_treads": {
+        "name": "陽織りの足具"
+      },
+      "fenbridge_hide_leggings": {
+        "name": "フェンブリッジ革のレギンス"
+      },
+      "fenbridge_hide_boots": {
+        "name": "フェンブリッジ革のブーツ"
+      },
+      "fenbridge_hide_belt": {
+        "name": "フェンブリッジ革のベルト"
+      },
+      "marshstalker_jerkin": {
+        "name": "沼追跡者のジャーキン"
+      },
+      "marshstalker_hood": {
+        "name": "沼追跡者のフード"
+      },
+      "marshstalker_spaulders": {
+        "name": "沼追跡者の肩当て"
+      },
+      "mirewarden_jerkin": {
+        "name": "泥沼の番人のジャーキン"
+      },
+      "mirewarden_leggings": {
+        "name": "泥沼の番人のレギンス"
+      },
+      "mirewarden_treads": {
+        "name": "泥沼の番人の足具"
+      },
+      "pan_seared_perch": {
+        "name": "川スズキのソテー"
+      },
+      "hunters_game_skewer": {
+        "name": "狩人の野獣串"
+      },
+      "herbed_marsh_pike": {
+        "name": "沼カワカマスのハーブ焼き"
+      },
+      "ashwood_smoked_eel": {
+        "name": "アッシュウッドの燻製ウナギ"
+      },
+      "goldleaf_game_stew": {
+        "name": "ゴールドリーフの野獣シチュー"
+      },
+      "frostgill_chowder": {
+        "name": "霜エラマスのチャウダー"
+      },
+      "silvered_carp_supper": {
+        "name": "銀鯉の晩餐"
+      },
+      "anglers_feast_platter": {
+        "name": "釣り人の饗宴プレート"
+      },
+      "marlows_grand_roast": {
+        "name": "マーロウの豪華ロースト"
+      },
+      "silverleaf_healing_draught": {
+        "name": "シルバーリーフの治癒薬"
+      },
+      "silverleaf_mana_draught": {
+        "name": "シルバーリーフのマナ薬"
+      },
+      "elixir_of_the_boar": {
+        "name": "猪のエリクサー"
+      },
+      "goldleaf_healing_draught": {
+        "name": "ゴールドリーフの治癒薬"
+      },
+      "goldleaf_mana_draught": {
+        "name": "ゴールドリーフのマナ薬"
+      },
+      "venomfire_elixir": {
+        "name": "毒炎のエリクサー"
+      },
+      "sunpetal_healing_draught": {
+        "name": "サンペタルの治癒薬"
+      },
+      "sunpetal_mana_draught": {
+        "name": "サンペタルのマナ薬"
+      },
+      "elixir_of_the_serpent": {
+        "name": "蛇のエリクサー"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -9837,6 +10056,15 @@ export const ja_JP: EnTranslations = {
       },
       "rift_boss_pitlord": {
         "name": "奈落の王アズゴラス"
+      },
+      "orkadia_grunt": {
+        "name": "血牙の兵卒"
+      },
+      "orkadia_marauder": {
+        "name": "鉄皮の略奪者"
+      },
+      "orkadia_warlord": {
+        "name": "軍団長グロモク・スカルクリーヴァー"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
@@ -11677,6 +11905,11 @@ export const ja_JP: EnTranslations = {
         "name": "ナイスラクシスのレイドアリーナ",
         "enterText": "封印された王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
+      },
+      "orkadia": {
+        "name": "オルカディア",
+        "enterText": "戦火が緑に燃え上がる。オルカディアの戦営はお前の来訪を知った。",
+        "leaveText": "斬り開いて外へ出ると、ドレイクランドの灰混じりの風が吹きつけた。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

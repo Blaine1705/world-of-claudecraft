@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { GROUND_PICKUP_LINES } from '../src/sim/content/ground_pickup_lines';
 import { DEEPFEN_SHALLOWS_LAKE, GROUND_OBJECTS, ITEMS, LAKE, NPCS } from '../src/sim/data';
 import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
+import { completeFishing } from '../src/sim/professions/fishing';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -603,7 +604,7 @@ describe('food, drink, vendor', () => {
     // marsh/heights fish, and never an item outside the catch list.
     const valeIds = new Set(VALE_CATCHES);
     const preexisting = new Set(meta.inventory.map((s) => s.itemId)); // starter rations etc.
-    for (let i = 0; i < 400; i++) (sim as any).completeFishing(sim.player, meta);
+    for (let i = 0; i < 400; i++) completeFishing(sim.ctx, sim.player, meta);
     for (const slot of meta.inventory) {
       if (preexisting.has(slot.itemId)) continue;
       expect(valeIds.has(slot.itemId)).toBe(true);
@@ -623,7 +624,7 @@ describe('food, drink, vendor', () => {
       const caught: string[] = [];
       for (let i = 0; i < 30; i++) {
         const before = meta.inventory.reduce((n, s) => n + s.count, 0);
-        (sim as any).completeFishing(sim.player, meta);
+        completeFishing(sim.ctx, sim.player, meta);
         const after = meta.inventory.reduce((n, s) => n + s.count, 0);
         caught.push(after > before ? meta.inventory[meta.inventory.length - 1].itemId : 'nothing');
       }
@@ -638,7 +639,7 @@ describe('food, drink, vendor', () => {
     let sawRare = false;
     for (let i = 0; i < 400 && !sawRare; i++) {
       sim.events = [];
-      (sim as any).completeFishing(sim.player, meta);
+      completeFishing(sim.ctx, sim.player, meta);
       if (sim.events.some((e) => e.type === 'log' && /rare catch/i.test((e as any).text))) {
         sawRare = true;
         expect(sim.countItem('glimmerfin_koi')).toBeGreaterThan(0);

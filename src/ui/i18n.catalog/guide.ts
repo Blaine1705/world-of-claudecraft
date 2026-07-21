@@ -684,10 +684,9 @@ export const guideStrings = {
       'Three quick bolts that chill the target so your next frost hits land as if it were frozen.',
     fingers_of_frost:
       'Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.',
-    brain_freeze: 'Your frost bolts sometimes make the next Flurry instant and harder-hitting.',
+    brain_freeze: 'Your frost bolts sometimes make the next Flurry instant and skip its cooldown.',
     shatter: 'Your spells crit far more often against frozen targets.',
-    frozen_orb:
-      'Rolls a slow orb through the pack that chills everything and feeds your frost procs.',
+    frozen_orb: 'Rolls a slow orb through the pack that chills enemies and banks Icicles.',
     blizzard: 'Blankets an area in ice to wear down and slow a whole pack.',
     blink: 'Teleports you a short distance forward, breaking roots on the way out.',
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',
@@ -1035,6 +1034,8 @@ export const guideStrings = {
       'A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.',
     sanctumBody:
       "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
+    orkadiaBody:
+      'A brutal orc war-camp hewn into the black volcanic rock of the Drakelands, its halls lit by toxic-green warpyres. Cut through the Bloodtusk grunts and Ironhide marauders to reach Warlord Grommok Skullcleaver on his dais of skulls.',
     raidName: 'The endgame raid',
     raidBody:
       'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',

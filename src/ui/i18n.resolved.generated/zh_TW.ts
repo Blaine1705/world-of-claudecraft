@@ -317,7 +317,11 @@ export const zh_TW: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
-      "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。"
+      "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。",
+      "healerConfirmTitle": "接受復活虛弱？",
+      "healerConfirmBody": "靈魂醫者可以就地復活你，但復活虛弱會使你的全部屬性降低75%，高等級時最長持續10分鐘。讓靈魂返回屍體復活則沒有任何懲罰。",
+      "healerConfirmAccept": "復活",
+      "healerConfirmCancel": "取消"
     },
     "unstuck": {
       "menuButton": "脫困",
@@ -2170,9 +2174,11 @@ export const zh_TW: EnTranslations = {
       "mining": "採礦",
       "logging": "伐木",
       "herbalism": "藥草學",
+      "fishing": "釣魚",
       "notReady": "這個資源節點尚未為你重新生成。",
       "gatherLine": "你採集了：{name}。",
-      "gatherLineQty": "你採集了：{name} x{qty}。"
+      "gatherLineQty": "你採集了：{name} x{qty}。",
+      "catchLine": "你釣上了：{name}"
     },
     "archetypeTitle": {
       "label": "稱號",
@@ -3117,9 +3123,9 @@ export const zh_TW: EnTranslations = {
       "ice_lance": "用來消耗冰霜觸發效果的瞬發冰刺，對凍結目標造成的傷害大幅提高。",
       "flurry": "快速射出三枚冰彈，使目標寒冷，讓你接下來的冰霜法術視其為已凍結。",
       "fingers_of_frost": "你的冰霜箭有時會強化一次冰槍術，使其命中時將目標視為已凍結。",
-      "brain_freeze": "你的冰霜箭有時會使下一次凜冬之鞭瞬發且造成更高傷害。",
+      "brain_freeze": "你的冰霜箭有時會使下一次凜冬之鞭瞬發並跳過冷卻時間。",
       "shatter": "你的法術對凍結目標的致命一擊機率大幅提高。",
-      "frozen_orb": "讓一顆緩慢的冰球穿過敵群，冰凍沿途的一切並觸發你的冰霜效果。",
+      "frozen_orb": "讓一顆緩慢的冰球穿過敵群，使敵人緩速並積蓄冰柱。",
       "blizzard": "以冰雪覆蓋一片區域，持續傷害並緩速整群敵人。",
       "blink": "向前瞬移一小段距離，並在離開時解除定身。",
       "conjure_water": "製造飲品以恢復法力，讓你能在每次開怪之間補滿。",
@@ -3353,6 +3359,7 @@ export const zh_TW: EnTranslations = {
       "bastionBody": "一座沉入沼澤、被遺忘的要塞，由溺亡的守軍與不斷上漲的潮水本身所據守。",
       "templeBody": "沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。",
+      "orkadiaBody": "一座鑿入德雷克蘭黑色火山岩中的殘暴獸人戰營，殿堂由劇毒的綠色戰火照亮。殺穿血牙兵卒與鐵皮劫掠者，直取盤踞在頭骨高台上的督軍格羅莫克·碎顱者。",
       "raidName": "最終團隊副本",
       "raidBody": "在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。",
       "heroicTitle": "英雄模式",
@@ -4811,7 +4818,11 @@ export const zh_TW: EnTranslations = {
   },
   "heroicShop": {
     "balance": "英雄徽記: {count}",
-    "buyAria": "用{marks}枚英雄徽記購買{item}"
+    "buyAria": "用{marks}枚英雄徽記購買{item}",
+    "buyConfirmTitle": "確認購買",
+    "buyConfirmBody": "用{marks}枚英雄徽記購買{item}？徽記購買後無法退款。",
+    "buyConfirmAccept": "購買",
+    "buyConfirmCancel": "取消"
   },
   "cardDuel": {
     "title": "紙牌對決",
@@ -4864,7 +4875,11 @@ export const zh_TW: EnTranslations = {
       "buyAria": "用 {marks} 枚秘探印記購買 {item}",
       "reqHeroic": "需要英雄難度通關",
       "reqClears": "需要通關 {count} 次",
-      "empty": "暫無存貨。"
+      "empty": "暫無存貨。",
+      "buyConfirmTitle": "確認購買",
+      "buyConfirmBody": "用 {marks} 枚秘探印記購買 {item}？印記購買後無法退款。",
+      "buyConfirmAccept": "購買",
+      "buyConfirmCancel": "取消"
     },
     "tracker": {
       "title": "秘探",
@@ -6644,11 +6659,11 @@ export const zh_TW: EnTranslations = {
       },
       "flurry": {
         "name": "凜冬之鞭",
-        "description": "連續射出三枚冰彈，每枚造成 {damage} 點冰霜傷害，並對目標施加凜冬之寒：接下來 2 個相容法術會將其視為已凍結。思維凍結會使凜冬之鞭瞬發、傷害提高 30%，並跳過冷卻時間。（冰霜）"
+        "description": "連續射出三枚冰彈，每枚造成 {damage} 點冰霜傷害，並對目標施加凜冬之寒：接下來 2 個相容法術會將其視為已凍結。思維凍結會使凜冬之鞭瞬發並跳過冷卻時間。（冰霜）"
       },
       "frozen_orb": {
         "name": "寒冰寶珠",
-        "description": "釋放一顆旋轉的寒冰寶珠，向前飄移 8 秒，每秒對附近敵人造成 {damage} 點冰霜傷害並使其緩速 30%。寶珠命中時會產生寒冰指。（冰霜）"
+        "description": "釋放一顆旋轉的寒冰寶珠，向前飄移 8 秒，每秒對附近敵人造成 {damage} 點冰霜傷害並使其緩速 30%。每次命中的脈衝都會生成一枚冰柱。（冰霜）"
       },
       "blizzard": {
         "name": "暴風雪",
@@ -6672,11 +6687,11 @@ export const zh_TW: EnTranslations = {
       },
       "brain_freeze": {
         "name": "思維凍結",
-        "description": "霜緣之矛有 20% 機率使你的下一次凜冬之鞭變為瞬發、傷害提高 30%，並且不受冷卻時間限制。（冰霜）"
+        "description": "霜緣之矛有 20% 機率使你的下一次凜冬之鞭變為瞬發，並且不受冷卻時間限制。（冰霜）"
       },
       "shatter": {
         "name": "脆碎之殤",
-        "description": "你的法術對凍結目標的致命一擊機率提高 50%，這些致命一擊造成的傷害提高 20%。寒冰指和凜冬之寒會將目標視為已凍結。（冰霜）"
+        "description": "你的法術對凍結目標的致命一擊機率提高 50%。寒冰指和凜冬之寒會將目標視為已凍結。（冰霜）"
       },
       "conjure_water": {
         "name": "縛水術",
@@ -8585,6 +8600,210 @@ export const zh_TW: EnTranslations = {
       "silverleaf_herb": {
         "name": "銀葉草"
       },
+      "rough_hide": {
+        "name": "粗糙的獸皮"
+      },
+      "spider_silk": {
+        "name": "蜘蛛絲"
+      },
+      "venom_gland": {
+        "name": "毒液腺"
+      },
+      "game_meat": {
+        "name": "野味肉"
+      },
+      "homespun_cloth": {
+        "name": "手織布"
+      },
+      "pristine_hide": {
+        "name": "完美的獸皮"
+      },
+      "pristine_silk": {
+        "name": "完美的蜘蛛絲"
+      },
+      "pristine_venom_gland": {
+        "name": "完美的毒液腺"
+      },
+      "prime_cut": {
+        "name": "上等肉塊"
+      },
+      "smithing_flux": {
+        "name": "鍛造助熔劑"
+      },
+      "spool_of_thread": {
+        "name": "線軸"
+      },
+      "tanning_agent": {
+        "name": "鞣革劑"
+      },
+      "cooking_salt": {
+        "name": "烹飪用鹽"
+      },
+      "glass_vial": {
+        "name": "玻璃瓶"
+      },
+      "copper_bearded_axe": {
+        "name": "銅鬚斧"
+      },
+      "copper_flanged_mace": {
+        "name": "銅翼錘"
+      },
+      "ironbark_boar_spear": {
+        "name": "鐵皮木野豬矛"
+      },
+      "ironedge_longsword": {
+        "name": "鐵刃長劍"
+      },
+      "ironshod_maul": {
+        "name": "鐵包巨槌"
+      },
+      "whetted_iron_dirk": {
+        "name": "磨利鐵匕首"
+      },
+      "thorium_warblade": {
+        "name": "瑟銀戰刃"
+      },
+      "arcanite_war_axe": {
+        "name": "秘銀戰斧"
+      },
+      "elderwood_battle_staff": {
+        "name": "古老接骨木戰棍"
+      },
+      "riveted_copper_girdle": {
+        "name": "鉚釘銅腰帶"
+      },
+      "coppermail_sabatons": {
+        "name": "銅鏈戰靴"
+      },
+      "coppermail_gauntlets": {
+        "name": "銅鏈護手"
+      },
+      "ironlink_hauberk": {
+        "name": "鐵鏈鎖甲"
+      },
+      "ironlink_legguards": {
+        "name": "鐵鏈護腿"
+      },
+      "ironlink_spaulders": {
+        "name": "鐵鏈肩甲"
+      },
+      "thoriumscale_greathelm": {
+        "name": "瑟銀鱗巨盔"
+      },
+      "thoriumscale_cuirass": {
+        "name": "瑟銀鱗胸甲"
+      },
+      "thoriumscale_leggings": {
+        "name": "瑟銀鱗腿甲"
+      },
+      "homespun_hood": {
+        "name": "手織兜帽"
+      },
+      "homespun_mitts": {
+        "name": "手織連指手套"
+      },
+      "silverthread_slippers": {
+        "name": "銀線便鞋"
+      },
+      "goldweave_robe": {
+        "name": "金織長袍"
+      },
+      "goldweave_leggings": {
+        "name": "金織護腿"
+      },
+      "silkspun_satchel": {
+        "name": "絲紡挎包"
+      },
+      "silkbinders_raiment": {
+        "name": "縛絲法衣"
+      },
+      "sunweave_mantle": {
+        "name": "陽織披肩"
+      },
+      "sunweave_treads": {
+        "name": "陽織足墊"
+      },
+      "fenbridge_hide_leggings": {
+        "name": "芬橋皮護腿"
+      },
+      "fenbridge_hide_boots": {
+        "name": "芬橋皮靴"
+      },
+      "fenbridge_hide_belt": {
+        "name": "芬橋皮腰帶"
+      },
+      "marshstalker_jerkin": {
+        "name": "沼澤潛獵者皮甲"
+      },
+      "marshstalker_hood": {
+        "name": "沼澤潛獵者兜帽"
+      },
+      "marshstalker_spaulders": {
+        "name": "沼澤潛獵者肩甲"
+      },
+      "mirewarden_jerkin": {
+        "name": "泥沼守衛皮甲"
+      },
+      "mirewarden_leggings": {
+        "name": "泥沼守衛護腿"
+      },
+      "mirewarden_treads": {
+        "name": "泥沼守衛足墊"
+      },
+      "pan_seared_perch": {
+        "name": "香煎河鱸魚"
+      },
+      "hunters_game_skewer": {
+        "name": "獵人野味串"
+      },
+      "herbed_marsh_pike": {
+        "name": "香草沼澤狗魚"
+      },
+      "ashwood_smoked_eel": {
+        "name": "灰木燻鰻魚"
+      },
+      "goldleaf_game_stew": {
+        "name": "金葉野味燉肉"
+      },
+      "frostgill_chowder": {
+        "name": "霜鰓濃湯"
+      },
+      "silvered_carp_supper": {
+        "name": "銀鯉晚宴"
+      },
+      "anglers_feast_platter": {
+        "name": "漁夫盛宴拼盤"
+      },
+      "marlows_grand_roast": {
+        "name": "馬洛的盛大烤肉"
+      },
+      "silverleaf_healing_draught": {
+        "name": "銀葉治療藥水"
+      },
+      "silverleaf_mana_draught": {
+        "name": "銀葉法力藥水"
+      },
+      "elixir_of_the_boar": {
+        "name": "野豬藥劑"
+      },
+      "goldleaf_healing_draught": {
+        "name": "金葉治療藥水"
+      },
+      "goldleaf_mana_draught": {
+        "name": "金葉法力藥水"
+      },
+      "venomfire_elixir": {
+        "name": "毒火藥劑"
+      },
+      "sunpetal_healing_draught": {
+        "name": "陽瓣治療藥水"
+      },
+      "sunpetal_mana_draught": {
+        "name": "陽瓣法力藥水"
+      },
+      "elixir_of_the_serpent": {
+        "name": "巨蛇藥劑"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -9837,6 +10056,15 @@ export const zh_TW: EnTranslations = {
       },
       "rift_boss_pitlord": {
         "name": "深淵之主阿茲戈拉斯"
+      },
+      "orkadia_grunt": {
+        "name": "血牙兵卒"
+      },
+      "orkadia_marauder": {
+        "name": "鐵皮劫掠者"
+      },
+      "orkadia_warlord": {
+        "name": "督軍格羅莫克·碎顱者"
       },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
@@ -11677,6 +11905,11 @@ export const zh_TW: EnTranslations = {
         "name": "尼思拉克西斯團隊競技場",
         "enterText": "你穿過封印的王室之門。",
         "leaveText": "你回到荊峰的寒冷空氣中。"
+      },
+      "orkadia": {
+        "name": "奧卡迪亞",
+        "enterText": "戰火驟然泛起綠光。奧卡迪亞的戰營已知你到來。",
+        "leaveText": "你殺出重圍，回到德雷克蘭灰燼瀰漫的勁風之中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

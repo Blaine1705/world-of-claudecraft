@@ -96,6 +96,20 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     finalBossId: 'korzul_the_gravewyrm',
     marksPerParticipant: 1,
   },
+  // The Orkadia orc war-camp: a Drakelands five-man tuned in line with the
+  // other level-18-20 dungeons (the Sanctum band), Warlord Grommok as the
+  // final boss whose Warstomp/enrage kit the heroic transform scales.
+  orkadia: {
+    id: 'orkadia',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 2.0,
+    damageMultiplier: 4.05,
+    addDamageMultiplier: 2.0,
+    armorMultiplier: 1.2,
+    finalBossId: 'orkadia_warlord',
+    marksPerParticipant: 1,
+  },
   // The 10-player raid arena. Normal Nythraxis already swings ~3.7x harder
   // than Korzul, so the raid's heroic multiplier is small in RELATIVE terms
   // while landing the hardest absolute hits in the game: at the level-22

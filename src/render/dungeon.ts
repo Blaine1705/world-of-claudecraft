@@ -79,7 +79,10 @@ export type DungeonInteriorVariant =
   // isDelveVariant, but light with a sickly bog-green torch tint; the trash
   // rooms route through the ossuary dressing path, the apse through the finale).
   | 'delve_marsh'
-  | 'delve_marsh_apse';
+  | 'delve_marsh_apse'
+  // Orkadia orc war-camp (classic DungeonDef interior 'orkadia'): the Sanctum
+  // room kit re-lit with toxic-green warpyres over near-black volcanic stone.
+  | 'orkadia';
 
 /** True for any delve module variant (Collapsed Reliquary or Drowned Litany). */
 export function isDelveVariant(variant: DungeonInteriorVariant): boolean {
@@ -133,6 +136,10 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   delve_marsh: { flame: 0x6abf6a, emissive: 0x2f6f2f, light: 0x6aff8c },
   // the drowned apse burns brighter and colder: a cyan corpse-glow over the stage
   delve_marsh_apse: { flame: 0x7fe6c0, emissive: 0x2f8f6f, light: 0x6affb0 },
+  // Orkadia burns with toxic warpyre green: hot poison-green flame over the
+  // dark volcanic stone of the orc war-camp, a touch brighter than the
+  // necromantic sanctum green so the war-hall reads clearly under it.
+  orkadia: { flame: 0x9dff66, emissive: 0x3aa82a, light: 0x86f060 },
 };
 
 // The Drowned Litany reuses the same KayKit crypt-stone wall/floor/pillar kit as
@@ -144,6 +151,14 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
 // applied to a clone of the shared pack material, never the source itself.
 const MARSH_WALL_TINT = 0x5a6a52;
 const MARSH_FLOOR_TINT = 0x3c3830;
+
+// Orkadia grades the same shared crypt-stone kit toward dark volcanic rock with a
+// green mossy cast (walls/pillars) and blackened ash underfoot (floors), applied
+// via the general tintedMaterial() path in emit(). Kept dark-but-lit (comparable
+// to the marsh delve grade) so the toxic-green warpyre light (TORCH_COLORS.orkadia)
+// reads clearly against the stone instead of the surfaces swallowing it to black.
+const ORKADIA_WALL_TINT = 0x8a9c6a;
+const ORKADIA_FLOOR_TINT = 0x5c6742;
 
 // The Drowned Temple is flooded — a translucent, self-animating water sheet
 // (driven by the shared uTime so it needs no per-frame plumbing) with cheap
@@ -707,7 +722,7 @@ export class DungeonInteriors {
     // while collision used the real delve footprint, drifting walls and floor.
     const layout =
       opts?.layout ??
-      (interior === 'sanctum'
+      (interior === 'sanctum' || interior === 'orkadia'
         ? SANCTUM_LAYOUT
         : interior === 'temple'
           ? TEMPLE_LAYOUT
@@ -792,7 +807,15 @@ export class DungeonInteriors {
       }
     }
 
-    this.emit(group, p, variant);
+    // Orkadia carries its near-black volcanic stone grade through the general
+    // wall/floor tint path (the same emit() override the authored citadel uses),
+    // so the shared crypt-stone kit reads dark under the green warpyres.
+    this.emit(
+      group,
+      p,
+      variant,
+      variant === 'orkadia' ? { wall: ORKADIA_WALL_TINT, floor: ORKADIA_FLOOR_TINT } : undefined,
+    );
     if (arenaWalls) {
       for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall);
     }
@@ -1156,6 +1179,7 @@ export class DungeonInteriors {
     if (interior === 'arena') return 'arena';
     if (interior === 'nythraxis') return 'nythraxis';
     if (interior === 'sanctum') return 'sanctum';
+    if (interior === 'orkadia') return 'orkadia';
     if (interior === 'temple') return 'temple';
     const bastionX = instanceOrigin(1, 0).x;
     if (Math.abs(ox - bastionX) < 250) return 'bastion';

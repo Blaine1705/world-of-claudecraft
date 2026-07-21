@@ -4,7 +4,7 @@
 // merges those records into the flat tables the rest of the engine consumes,
 // and owns the world-layout constants.
 
-import { BASE_ITEMS, FISHING_RARE_ID, FISHING_TABLES } from './content/items';
+import { BASE_ITEMS } from './content/items';
 import type {
   CampDef,
   DelveDef,
@@ -25,7 +25,6 @@ import type {
 } from './types';
 
 export type { FishingEntry } from './content/items';
-export { FISHING_RARE_ID, FISHING_TABLES };
 
 import {
   AMBERFALL_CAMPS,
@@ -136,6 +135,7 @@ import {
   NIGHTBLOOM_ROADS,
   NIGHTBLOOM_ZONE,
 } from './content/nightbloom';
+import { ORKADIA_DUNGEON_DEFS, ORKADIA_MOBS } from './content/orkadia';
 import {
   PALMREACH_CAMPS,
   PALMREACH_ITEMS,
@@ -269,6 +269,7 @@ import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
 
@@ -307,6 +308,7 @@ export type {
 
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
+  PROFESSION_ITEMS,
   ZONE2_ITEMS,
   ZONE3_ITEMS,
   TEMPLE_ITEMS,
@@ -346,6 +348,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...YUMI_MOBS,
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
+  ...ORKADIA_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,
@@ -796,7 +799,11 @@ export function instanceOrigin(dungeonIndex: number, slot: number): { x: number;
   return { x: INSTANCE_X_BASE + 900 + dungeonIndex * 600, z: -1250 + slot * 500 };
 }
 
-export const DUNGEONS: Record<string, DungeonDef> = { ...DUNGEON_DEFS, ...TEMPLE_DUNGEON_DEFS };
+export const DUNGEONS: Record<string, DungeonDef> = {
+  ...DUNGEON_DEFS,
+  ...TEMPLE_DUNGEON_DEFS,
+  ...ORKADIA_DUNGEON_DEFS,
+};
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
 
@@ -805,8 +812,15 @@ export function dungeonByIndex(index: number): DungeonDef | null {
 }
 
 // Which dungeon a far-off instance position belongs to, by x-band.
+// Dungeons occupy the instance x-band from the first slot up to (but not
+// including) the delve band. The Ashen Coliseum sits at a half-slot inside that
+// range (ARENA_X, between dungeon index 5 and 6), so its own tight band is
+// excluded explicitly. This lets the Orkadia slot (index 6, instance origin
+// ARENA_X + 300: past the arena footprint, west of the delve band) resolve as a
+// dungeon instead of being swallowed by the old `x >= ARENA_X_MIN` cutoff, which
+// left its interior unbuilt and its colliders unresolved (a pitch-black room).
 export function dungeonAt(x: number): DungeonDef | null {
-  if (x <= DUNGEON_X_THRESHOLD || x >= ARENA_X_MIN) return null;
+  if (x <= DUNGEON_X_THRESHOLD || x >= DELVE_BAND_X_MIN || isArenaPos(x)) return null;
   return dungeonByIndex(Math.round((x - (INSTANCE_X_BASE + 900)) / 600));
 }
 
@@ -820,6 +834,13 @@ export function dungeonAt(x: number): DungeonDef | null {
 
 export const ARENA_X = INSTANCE_X_BASE + 4200; // arena instances share this x; slots stack along z
 export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
+// The arena band is a TIGHT column bracketing ARENA_X (all slots share this x;
+// the pit footprint is only ~±24u). It deliberately does NOT stretch to the
+// delve band: the gap east of the arena holds the Orkadia dungeon slot (index 6,
+// origin ARENA_X + 300), which must classify as a dungeon, not the arena. The
+// bound sits at the midpoint between the arena and the Orkadia slot so each
+// footprint stays comfortably on its own side.
+export const ARENA_X_MAX = ARENA_X + 150; // x at/after this = past the arena band
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
 const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
@@ -829,7 +850,7 @@ export function arenaOrigin(slot: number): { x: number; z: number } {
 }
 
 export function isArenaPos(x: number): boolean {
-  return x >= ARENA_X_MIN && x < DELVE_BAND_X_MIN;
+  return x >= ARENA_X_MIN && x < ARENA_X_MAX;
 }
 
 // Nearest arena instance origin to a far-off position, matched by z-band (the
