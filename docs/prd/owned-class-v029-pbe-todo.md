@@ -4,8 +4,8 @@ Status: active PBE work list
 
 Integration PR: #2218
 
-Release baseline: `8f519277a` from `release/v0.29.0`, merged into this isolated integration
-worktree by `5c2c9333c`.
+Release baseline: `682df1b7b` from `release/v0.29.0`, merged into this isolated integration
+worktree by `5129a2b1f`.
 
 Latest completed slices: DPS balance harness, Fieldcraft and Vespers tuning, safe level 20 default
 bars, and the first English tooltip clarity pass. Final fixed-head validation is still required.
