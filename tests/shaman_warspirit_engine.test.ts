@@ -58,18 +58,26 @@ describe('Warspirit engine', () => {
     expect(warspiritCadence(shaman)).toBe(2);
   });
 
-  it('makes Stonebound exclusive, forces its Jolt target, and cleans every rider', () => {
+  it('makes Stonebound exclusive, respects taunt immunity, and cleans every rider', () => {
     const { sim, shaman, target } = setup();
     applyWarspiritPosture(sim.ctx, shaman, 'stonebound', 14);
     expect(warspiritPosture(shaman)).toBe('stonebound');
     expect(shaman.auras.find((aura) => aura.id === STONEBOUND_ARMOR_ID)?.value).toBe(30);
     expect(shaman.auras.find((aura) => aura.id === STONEBOUND_DR_ID)?.value).toBe(0.1);
     applyStoneboundJolt(sim.ctx, shaman, target);
-    expect(target.forcedTargetId).toBe(shaman.id);
+    expect(target.forcedTargetId).toBeNull();
+
+    const wolf = createMob(91_022, MOBS.forest_wolf, 20, sim.groundPos(0, 3));
+    wolf.hostile = true;
+    sim.entities.set(wolf.id, wolf);
+    applyStoneboundJolt(sim.ctx, shaman, wolf);
+    expect(wolf.forcedTargetId).toBe(shaman.id);
 
     clearWarspiritState(sim.ctx, shaman);
     expect(warspiritPosture(shaman)).toBeNull();
     expect(target.forcedTargetId).toBeNull();
     expect(target.forcedTargetTimer).toBe(0);
+    expect(wolf.forcedTargetId).toBeNull();
+    expect(wolf.forcedTargetTimer).toBe(0);
   });
 });

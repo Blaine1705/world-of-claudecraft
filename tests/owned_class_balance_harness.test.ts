@@ -47,14 +47,22 @@ describe('owned-class level 20 balance harness', () => {
     );
     expect(vespersArea?.damageByTarget.target_2).toBeGreaterThan(0);
     expect(vespersArea?.damageByTarget.target_3).toBeGreaterThan(0);
-  }, 30_000);
+    const thundercallArea = results.find(
+      (result) =>
+        result.spec === 'thundercall' &&
+        result.scenario.targets === 3 &&
+        result.scenario.seconds === 60,
+    );
+    expect(thundercallArea?.damageByTarget.target_2).toBeGreaterThan(0);
+    expect(thundercallArea?.damageByTarget.target_3).toBeGreaterThan(0);
+  }, 60_000);
 
   it('is deterministic at the same fixed seed and fixture', () => {
     const scenario = OWNED_CLASS_BALANCE_SCENARIOS[3];
     expect(runOwnedClassDpsProbe('fieldcraft', scenario, 29_901)).toEqual(
       runOwnedClassDpsProbe('fieldcraft', scenario, 29_901),
     );
-  });
+  }, 30_000);
 
   it('keeps Fieldcraft sustained damage near the ranged Hunter specs and pays Bloodhook', () => {
     const scenario = OWNED_CLASS_BALANCE_SCENARIOS[1];
@@ -72,7 +80,8 @@ describe('owned-class level 20 balance harness', () => {
     const vespers = runOwnedClassDpsProbe('vespers', scenario, 29_903);
 
     expect(vespers.dps).toBeGreaterThanOrEqual(thundercall.dps * 0.9);
-  });
+    expect(vespers.dps).toBeLessThanOrEqual(thundercall.dps * 1.15);
+  }, 30_000);
 
   it.each(['spiritmend', 'doctrine', 'benison'] as const)(
     'records the fixed one-ally and three-ally %s healing profiles',
@@ -93,6 +102,14 @@ describe('owned-class level 20 balance harness', () => {
     },
     30_000,
   );
+
+  it('runs Priest healer pressure through shields and Seraphic Vigil', () => {
+    const doctrine = runOwnedHealerProbe('doctrine', 3, 29_912);
+    const benison = runOwnedHealerProbe('benison', 3, 29_912);
+
+    expect(doctrine.absorbedDamage).toBeGreaterThan(0);
+    expect(benison.healingBySource['Seraphic Vigil']).toBeGreaterThan(0);
+  }, 30_000);
 
   it('records Warspirit mitigation, threat, forced-target uptime, and exit behavior', () => {
     const result = runWarspiritOfftankProbe(29_920, 'test-head');

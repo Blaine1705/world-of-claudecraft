@@ -1,5 +1,6 @@
 // Warspirit's deterministic weapon-posture and three-hit cadence engine.
 
+import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import { TAUNT_FORCE_SECONDS, topThreatValue } from '../threat';
 import type { Entity } from '../types';
@@ -299,6 +300,10 @@ export function applyStoneboundJolt(ctx: SimContext, player: Entity, target: Ent
     player.id,
     Math.max(target.threat.get(player.id) ?? 0, topThreatValue(target), 1),
   );
+  const template = MOBS[target.templateId];
+  if (template?.ignoreTaunt || template?.dummy || (player.ownerId !== null && template?.boss)) {
+    return;
+  }
   target.forcedTargetId = player.id;
   target.forcedTargetTimer = TAUNT_FORCE_SECONDS;
 }

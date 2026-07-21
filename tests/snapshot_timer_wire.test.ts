@@ -49,6 +49,17 @@ describe('StableAuraWireCache', () => {
     expect(cache.rebuilds).toBe(1);
   });
 
+  it('does not rebuild persistent engine state whose backing duration never ticks', () => {
+    const cache = new StableAuraWireCache();
+    const persistent = aura('shaman_flow_state_progress', 86_400);
+    const first = cache.encode([persistent], 4, false);
+
+    const second = cache.encode([persistent], 4.05, false);
+
+    expect(second).toBe(first);
+    expect(cache.rebuilds).toBe(1);
+  });
+
   it('serializes unbreakable control and rebuilds when its protection changes', () => {
     const cache = new StableAuraWireCache();
     const active = aura('scripted_stasis', 10);

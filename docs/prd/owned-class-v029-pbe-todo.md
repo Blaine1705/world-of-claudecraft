@@ -252,8 +252,9 @@ Do not overwrite a player-customized bar.
 - [x] Keep the melee-led bleed, trap, explosive, and disengage identity.
 - [x] Audit Bloodhook, Bloodhook Wound, Woundrend, Shrapnel Charge, Bloodtrail Assault, and Hunting
       Momentum against the shared scaling rules.
-- [x] Scale Bloodhook Wound as 36 base damage plus 28% of Ranged Attack Power over 12 sec in four
-      ticks, with the Trailbreak re-entry hit retaining its separate scaling.
+- [x] Scale Bloodhook Wound as 34 base damage plus 26% of Ranged Attack Power over 12 sec in four
+      ticks, with the restored Survival damage bonus applying to the whole wound and the Trailbreak
+      re-entry hit retaining its separate scaling.
 - [x] Replace `primary wound` with plain English in every player-facing description.
 - [x] Test Bloodhook tooltip values at two Ranged Attack Power values after scaling lands.
 
@@ -435,17 +436,52 @@ Keep these outside the nine-spec fix unless a separate PR is approved.
 
 ## 10. Final validation and handoff
 
-- [ ] Run focused mechanic tests for Hunter, Shaman, and Priest.
-- [ ] Run spec ownership, hotbar, tooltip consistency, scaling, cleanup, snapshot, parity,
+### Review-driven fixes completed
+
+- [x] Make Apex Instinct's major window last its authored duration instead of displaying for more
+      than a minute.
+- [x] Reject Call Tithefiend before spending mana or starting its cooldown when no living enemy has
+      the Priest's Dirge of Decay.
+- [x] Make Reset Action Bar restore the selected level 20 spec's curated bar.
+- [x] Route healer balance pressure through normal damage and absorb handling so Doctrine shields
+      count in the test.
+- [x] Apply Survival's restored passive damage bonus to Bloodhook and Shrapnel Charge.
+- [x] Show normal pet and Tithefiend damage in the owning player's floating combat text and combat
+      log while keeping ordinary pets separate in the damage meter.
+- [x] Stop permanent Shaman engine states from rebuilding network snapshots every update.
+- [x] Make Stormcast spend half mana without also consuming Clearcasting.
+- [x] Respect normal taunt immunity when Stonebound Weapon applies its threat effect.
+- [x] Preserve retained Shaman talent state when a different talent row changes.
+- [x] Apply Thunder's damage multiplier to Faultwake's Spell Power contribution.
+- [x] Require real three-target damage in the balance harness and bound Vespers sustained damage.
+- [x] Cancel a Hunter projectile when its caster changes away from the projectile's owning spec.
+- [x] Retune Bloodhook after restored passive scaling so Fieldcraft remains inside its approved
+      single-target band.
+
+### Deliberate follow-ups and human checks
+
+- [ ] Decide with design whether Pack Command and Unleash Beast wait for the pet to reach melee
+      range, move the pet instantly, or retain their current command-range hit behavior.
+- [ ] Decide whether customized action bars need a separate saved profile for every spec. The safe
+      default and reset paths are implemented; changing persisted bar storage is a larger follow-up.
+- [ ] Decide whether Measured Shot should grant Focus when its projectile reaches an immune target.
+- [ ] Add live calculated numbers to the remaining custom pet and Shrapnel tooltips if the tooltip
+      UI gains a supported custom-effect formatter.
+- [ ] Complete human PBE checks and screenshots on desktop, mobile portrait, mobile landscape,
+      reduced motion, and low graphics.
+- [ ] Obtain reviewer signoff before moving the pull request out of draft.
+
+- [x] Run focused mechanic tests for Hunter, Shaman, and Priest.
+- [x] Run spec ownership, hotbar, tooltip consistency, scaling, cleanup, snapshot, parity,
       localization, guide, architecture, and talent tests touched by the work.
-- [ ] Run `npx tsc --noEmit`.
-- [ ] Run changed-file formatting and copy checks.
+- [x] Run `npx tsc --noEmit`.
+- [x] Run changed-file formatting and copy checks.
 - [ ] Run mobile portrait and landscape checks for action bars, spellbook, One Button, aura states,
       and long tooltips.
 - [ ] Run desktop checks for the same surfaces.
 - [ ] Run reduced-motion and low-graphics checks for every actionable state.
-- [ ] Regenerate owned generated artifacts through their normal commands.
-- [ ] Run `npm run gate` on the fixed final head.
+- [x] Regenerate owned generated artifacts through their normal commands.
+- [x] Run `npm run gate` on the fixed final head.
 - [ ] Update the #2218 PR body with the final PBE measurements, screenshots, fails-before and
       passes-after bug evidence, and remaining separate follow-ups.
 - [ ] Keep #2218 current with `release/v0.29.0` through review until merge or explicit closure.

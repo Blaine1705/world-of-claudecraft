@@ -1833,6 +1833,7 @@ export type AbilityEffect =
       bleedDuration: number;
       bleedInterval: number;
       rangedPowerCoeff: number;
+      damageMult?: number;
     }
   | {
       type: 'hunterShrapnel';
@@ -1845,6 +1846,7 @@ export type AbilityEffect =
       spreadTotal: number;
       spreadDuration: number;
       spreadInterval: number;
+      damageMult?: number;
     }
   | { type: 'hunterTrailbreak'; distance: number }
   | { type: 'hunterPackRally'; duration: number; radius: number }

@@ -193,14 +193,25 @@ describe('Hunter v0.29 choice-row mechanics', () => {
     expect(target.auras.some((entry) => entry.id.startsWith('hunter_crippling_root'))).toBe(true);
   });
 
-  it('Apex Instinct grants Focus and discounts three specialization spenders', () => {
-    const sim = hunter('marksmanship', { 17: 'hun_r17_apex_instinct' }, 2924);
-    sim.player.resource = 0;
-    sim.castAbility('cold_focus');
+  it('Apex Instinct grants Focus and expires four seconds after each major window', () => {
+    for (const [spec, cooldown, spender, seed] of [
+      ['beast_mastery', 'bestial_wrath', 'arcane_shot', 2924],
+      ['marksmanship', 'cold_focus', 'aimed_shot', 2925],
+      ['survival', 'bloodtrail_assault', 'mongoose_bite', 2926],
+    ] as const) {
+      const sim = hunter(spec, { 17: 'hun_r17_apex_instinct' }, seed);
+      sim.player.resource = 0;
+      sim.castAbility(cooldown);
 
-    expect(sim.player.resource).toBe(40);
-    expect(sim.resolvedAbility('aimed_shot')?.cost).toBe(13);
-    expect(sim.player.auras.find((entry) => entry.id === 'hunter_apex_instinct')?.stacks).toBe(3);
+      expect(sim.player.resource, spec).toBe(40);
+      expect(sim.resolvedAbility(spender)?.cost, spec).toBeLessThan(
+        sim.players.get(sim.playerId)?.known.find((entry) => entry.def.id === spender)?.cost ?? 0,
+      );
+      expect(
+        sim.player.auras.find((entry) => entry.id === 'hunter_apex_instinct'),
+        spec,
+      ).toMatchObject({ stacks: 3, remaining: 16 });
+    }
   });
 
   it('Efficient Rhythm converts 75 Focus spent into one stronger generator', () => {

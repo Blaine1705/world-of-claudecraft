@@ -272,6 +272,25 @@ describe('Vespers baseline loop', () => {
     ).toBe(false);
   });
 
+  it('preserves Gloomtithe, Mana, and cooldown when no owned Dirge target remains', () => {
+    const { sim, priest } = vespersPriest();
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    addGloomtithe(ctx, priest, 5);
+    const resourceBefore = priest.resource;
+
+    sim.castAbility('summon_tithefiend', priest.id);
+    sim.tick();
+
+    expect(priest.resource).toBe(resourceBefore);
+    expect(priest.cooldowns.has('summon_tithefiend')).toBe(false);
+    expect(priest.auras.find((aura) => aura.id === 'priest_gloomtithe')?.stacks).toBe(5);
+    expect(
+      [...sim.entities.values()].some(
+        (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
+      ),
+    ).toBe(false);
+  });
+
   it('uses a smaller Tithefiend echo against eligible linked enemies', () => {
     const { sim, priest } = vespersPriest();
     const primary = addDummy(sim, 9914, priest.pos.x, priest.pos.z + 8);

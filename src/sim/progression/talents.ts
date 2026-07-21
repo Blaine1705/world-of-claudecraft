@@ -245,6 +245,18 @@ function markTalentSnapshotDirty(meta: PlayerMeta, revisionBeforeMutation: numbe
   if (meta.wireRev === revisionBeforeMutation) meta.wireRev++;
 }
 
+function cancelPendingProjectilesFrom(ctx: SimContext, sourceId: number): void {
+  const retained: typeof ctx.pendingProjectiles = [];
+  for (const projectile of ctx.pendingProjectiles) {
+    if (projectile.sourceId !== sourceId) {
+      retained.push(projectile);
+      continue;
+    }
+    projectile.fizzle?.();
+  }
+  ctx.pendingProjectiles = retained;
+}
+
 function commitTalentAllocation(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -266,8 +278,11 @@ function commitTalentAllocation(
   if (allocationsEqual(meta.talents, sanitized)) return true;
 
   const previousSpec = meta.talents.spec;
-  if (meta.cls === 'shaman') clearShamanTalentState(ctx, player);
+  if (meta.cls === 'shaman') {
+    clearShamanTalentState(ctx, player, new Set(Object.values(sanitized.rows)));
+  }
   if (previousSpec !== sanitized.spec) {
+    cancelPendingProjectilesFrom(ctx, player.id);
     // Remove old spec auras before the single stat recomputation below. In
     // particular, Stonebound's armor must not be baked into the new spec.
     clearThundercallState(ctx, player);

@@ -14,6 +14,7 @@ import {
   onShamanCastCompleted,
   onShamanDamageTaken,
   onShamanManaSpent,
+  onThunderWardActivated,
   onThunderWardRetaliated,
   SHAMAN_TALENT_IDS,
   shamanCastTimeMultiplier,
@@ -89,6 +90,30 @@ describe('Shaman v0.29 talent grid', () => {
     const { sim, player } = shaman({ 14: SHAMAN_TALENT_IDS.imbueMastery });
     expect(shamanTalentSelected(sim.ctx, player, SHAMAN_TALENT_IDS.imbueMastery)).toBe(true);
     expect(shamanTalentSelected(sim.ctx, player, SHAMAN_TALENT_IDS.flowState)).toBe(false);
+  });
+
+  it('preserves retained talent progress and cooldowns when another row changes', () => {
+    const rows = {
+      14: SHAMAN_TALENT_IDS.flowState,
+      17: SHAMAN_TALENT_IDS.ancestralBulwark,
+    };
+    const { sim, player } = shaman(rows);
+    onShamanManaSpent(sim.ctx, player, 75);
+    onThunderWardActivated(sim.ctx, player);
+    const progress = player.auras.find((aura) => aura.id === 'shaman_flow_state_progress');
+    const cooldown = player.auras.find((aura) => aura.id === 'shaman_ancestral_bulwark_icd');
+    expect(progress).toBeDefined();
+    expect(cooldown).toBeDefined();
+
+    expect(
+      sim.applyTalents({
+        spec: 'elemental',
+        rows: { ...rows, 5: SHAMAN_TALENT_IDS.gatheringWinds },
+      }),
+    ).toBe(true);
+
+    expect(player.auras.find((aura) => aura.id === 'shaman_flow_state_progress')).toBe(progress);
+    expect(player.auras.find((aura) => aura.id === 'shaman_ancestral_bulwark_icd')).toBe(cooldown);
   });
 
   it('Stoneward owns one six-charge ally shield and heals through its ICD', () => {

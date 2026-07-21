@@ -639,7 +639,7 @@ const classAbilityNamesEn = {
       [
         'bloodhook',
         'Bloodhook',
-        'Charge to the enemy and apply Bloodhook Wound. The wound deals 36 base Physical damage plus 28% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
+        'Charge to the enemy and apply Bloodhook Wound. The wound deals 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
       ],
       [
         'shrapnel_charge',
@@ -679,7 +679,7 @@ const classAbilityNamesEn = {
       ],
       [
         'earthquake',
-        'Earthquake',
+        'Faultwake',
         'Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Consume all Thunder after the cast, increasing every pulse by 20% per charge.',
       ],
       [
@@ -1211,7 +1211,7 @@ const classAbilityNamesEn = {
       [
         'ghost_wolf',
         'Shadewolf',
-        'Turns you into a Shadewolf, increasing movement speed by 40% for 10 min.',
+        'Take Shadewolf form, increasing movement speed by 40%. Cast again to return to normal form.',
       ],
       [
         'stormstrike',

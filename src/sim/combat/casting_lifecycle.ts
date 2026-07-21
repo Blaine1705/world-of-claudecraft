@@ -98,6 +98,7 @@ import { bloodhookStartError } from './hunter_fieldcraft';
 import { packCommandError } from './hunter_packlord';
 import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
 import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
+import { hasTithefiendTarget } from './priest/vespers';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
 import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
 import {
@@ -658,11 +659,21 @@ export function castAbility(
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
   const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
+  const stormcastArmedForAbility = p.auras.some(
+    (aura) =>
+      aura.id === STORMCAST_ID &&
+      (aura.empowerAbilities === undefined || aura.empowerAbilities.includes(ability.id)),
+  );
   const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
   const discountedCost =
     cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
   const payableCost = shamanManaCost(ctx, p, discountedCost);
-  if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
+  if (
+    p.resource < payableCost &&
+    (!canCastFree || stormcastArmedForAbility) &&
+    !togglingOff &&
+    !formShiftKind(p, ability)
+  ) {
     ctx.error(
       p.id,
       p.resourceType === 'rage'
@@ -700,6 +711,10 @@ export function castAbility(
     )
   ) {
     ctx.error(p.id, 'That ability is not ready yet.');
+    return;
+  }
+  if (ability.id === 'summon_tithefiend' && !hasTithefiendTarget(ctx, p.id)) {
+    ctx.error(p.id, 'Your Tithefiend needs an enemy affected by Dirge of Decay.');
     return;
   }
   // combo points are character-bound: any built points finish on the current target
@@ -1022,7 +1037,12 @@ export function castAbility(
   // ability, so the charge must survive until then and be consumed there.
   let consumedCheapAura: Aura | null = null;
   if ((castTime === 0 || ability.channel) && !togglingOff) {
-    if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
+    if (consumedInstantAura?.id === STORMCAST_ID && res.cost > 0) {
+      consumedCheapAura = consumeNextCastCheapAura(ctx, p, ability.id);
+      if (consumedCheapAura !== null) {
+        res = { ...res, cost: Math.ceil(res.cost * consumedCheapAura.value) };
+      }
+    } else if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
       res = { ...res, cost: 0 };
     } else if (res.cost > 0) {
       consumedCheapAura = consumeNextCastCheapAura(ctx, p, ability.id);
@@ -1717,7 +1737,8 @@ function applyAbility(
       return;
     }
   }
-  const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
+  const canCastFree =
+    stormcastReservation === null && res.cost > 0 && hasFreeCostFor(p, ability.id);
   const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
   const discountedCost =
     cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
@@ -1728,7 +1749,7 @@ function applyAbility(
   }
   if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id)) {
     res = { ...res, cost: 0 };
-  } else if (res.cost > 0 && !togglingOff) {
+  } else if (stormcastReservation === null && res.cost > 0 && !togglingOff) {
     const cheap = consumeNextCastCheap(ctx, p, ability.id);
     if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
   }

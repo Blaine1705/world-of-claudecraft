@@ -1656,7 +1656,9 @@ export function runEffects(
           ability: ability.name,
           // Each pulse is an AoE hit; scale per tick off the school's rating
           // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
-          spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
+          spBonus:
+            directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true) *
+            thundercallMult,
           allyBuffPct: eff.allyBuffPct,
           igniteFrac: eff.igniteFrac,
           slowMult: eff.slowMult,
@@ -2439,7 +2441,7 @@ export function runEffects(
         );
         onHunterGuiseActivated(ctx, p, meta, ability.id);
         if (ability.id === 'cold_focus' || ability.id === 'bloodtrail_assault') {
-          activateHunterMajorWindow(ctx, p, 90);
+          activateHunterMajorWindow(ctx, p, eff.duration);
         }
         break;
       }

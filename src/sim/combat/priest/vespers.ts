@@ -19,6 +19,13 @@ function ownDirge(target: Entity, priestId: number): Aura | undefined {
   );
 }
 
+export function hasTithefiendTarget(ctx: SimContext, priestId: number): boolean {
+  for (const entity of ctx.entities.values()) {
+    if (!entity.dead && ownDirge(entity, priestId)) return true;
+  }
+  return false;
+}
+
 function ownEffigy(target: Entity, priestId: number): Aura | undefined {
   return target.auras.find((aura) => aura.id === EFFIGY_AURA_ID && aura.sourceId === priestId);
 }

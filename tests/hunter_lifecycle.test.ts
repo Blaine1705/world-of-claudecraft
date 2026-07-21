@@ -116,6 +116,25 @@ function expectTransientStateCleared(sim: TestSim, hunter: Entity, target: Entit
 }
 
 describe('Hunter v0.29 state lifecycle', () => {
+  it('cancels in-flight old-spec projectiles before a specialization change', () => {
+    const { sim, hunter, target } = setup();
+    expect(sim.setSpec('marksmanship')).toBe(true);
+    target.pos.z = hunter.pos.z + 35;
+    sim.rebucket(target);
+    sim.targetEntity(target.id);
+    hunter.resource = hunter.maxResource;
+    const hpBefore = target.hp;
+
+    sim.castAbility('measured_shot');
+    for (let tick = 0; tick < 40 && sim.ctx.pendingProjectiles.length === 0; tick++) sim.tick();
+    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
+
+    expect(sim.setSpec('survival')).toBe(true);
+    expect(sim.ctx.pendingProjectiles).toHaveLength(0);
+    for (let tick = 0; tick < 100; tick++) sim.tick();
+    expect(target.hp).toBe(hpBefore);
+  });
+
   it('uses the same cleanup path for saved loadout switches', () => {
     const { sim, hunter, target } = setup();
     expect(sim.saveLoadout('Fieldcraft', [], { spec: 'survival', rows: {} })).toBe(0);

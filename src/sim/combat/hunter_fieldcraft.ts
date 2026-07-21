@@ -48,9 +48,10 @@ function fieldcraftPhysicalDamage(
   min: number,
   max: number,
   ability: string,
+  damageMult = 1,
 ): number {
   const crit = ctx.rng.chance(hunter.critChance);
-  let amount = ctx.rng.range(min, max) + hunter.rangedPower * 0.08;
+  let amount = (ctx.rng.range(min, max) + hunter.rangedPower * 0.08) * damageMult;
   if (crit) amount *= 2 + hunter.critDmgPhysBonus;
   amount *= 1 - armorReduction(ctx.effectiveArmor(target), hunter.level);
   const dealt = Math.max(1, Math.round(amount));
@@ -81,6 +82,7 @@ export function startBloodhook(
     bleedDuration: number;
     bleedInterval: number;
     rangedPowerCoeff: number;
+    damageMult?: number;
   },
 ): void {
   if (!target) return;
@@ -94,7 +96,8 @@ export function startBloodhook(
     remaining: 3,
     duration: 3,
     value: target.id,
-    value2: effect.bleedTotal + hunter.rangedPower * effect.rangedPowerCoeff,
+    value2:
+      (effect.bleedTotal + hunter.rangedPower * effect.rangedPowerCoeff) * (effect.damageMult ?? 1),
     value3: effect.bleedDuration,
     tickInterval: effect.bleedInterval,
     sourceId: hunter.id,
@@ -247,6 +250,7 @@ export function runShrapnelCharge(
     spreadTotal: number;
     spreadDuration: number;
     spreadInterval: number;
+    damageMult?: number;
   },
   abilityName: string,
 ): void {
@@ -260,6 +264,7 @@ export function runShrapnelCharge(
     effect.primaryMin * (empowered ? 1.25 : 1),
     effect.primaryMax * (empowered ? 1.25 : 1),
     abilityName,
+    effect.damageMult,
   );
   const primaryWound = target.auras.find(
     (aura) => aura.id === BLOODHOOK_BLEED_ID && aura.sourceId === hunter.id,
@@ -282,7 +287,15 @@ export function runShrapnelCharge(
     .sort((a, b) => dist2d(a.pos, target.pos) - dist2d(b.pos, target.pos) || a.id - b.id)
     .slice(0, Math.max(0, effect.maxTargets - 1));
   for (const enemy of nearby) {
-    fieldcraftPhysicalDamage(ctx, hunter, enemy, effect.splashMin, effect.splashMax, abilityName);
+    fieldcraftPhysicalDamage(
+      ctx,
+      hunter,
+      enemy,
+      effect.splashMin,
+      effect.splashMax,
+      abilityName,
+      effect.damageMult,
+    );
     const ticks = Math.max(1, Math.round(effect.spreadDuration / effect.spreadInterval));
     ctx.applyAura(enemy, {
       id: 'shrapnel_wound',
@@ -290,7 +303,7 @@ export function runShrapnelCharge(
       kind: 'dot',
       remaining: effect.spreadDuration,
       duration: effect.spreadDuration,
-      value: Math.max(1, Math.round(effect.spreadTotal / ticks)),
+      value: Math.max(1, Math.round((effect.spreadTotal * (effect.damageMult ?? 1)) / ticks)),
       tickInterval: effect.spreadInterval,
       tickTimer: effect.spreadInterval,
       sourceId: hunter.id,

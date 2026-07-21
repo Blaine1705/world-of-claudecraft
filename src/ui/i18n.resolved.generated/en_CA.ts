@@ -6359,7 +6359,7 @@ export const en_CA: EnTranslations = {
       },
       "bloodhook": {
         "name": "Bloodhook",
-        "description": "Charge to the enemy and apply Bloodhook Wound. The wound deals 36 base Physical damage plus 28% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "description": "Charge to the enemy and apply Bloodhook Wound. The wound deals 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
       },
       "shrapnel_charge": {
         "name": "Shrapnel Charge",
@@ -6394,7 +6394,7 @@ export const en_CA: EnTranslations = {
         "description": "Calls a hurricane onto the target area for 6 sec, battering enemies for {damage} Nature damage each second."
       },
       "earthquake": {
-        "name": "Earthquake",
+        "name": "Faultwake",
         "description": "Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Consume all Thunder after the cast, increasing every pulse by 20% per charge."
       },
       "heroic_strike": {
@@ -6871,7 +6871,7 @@ export const en_CA: EnTranslations = {
       },
       "ghost_wolf": {
         "name": "Shadewolf",
-        "description": "Turns you into a Shadewolf, increasing movement speed by 40% for 10 min."
+        "description": "Take Shadewolf form, increasing movement speed by 40%. Cast again to return to normal form."
       },
       "stormstrike": {
         "name": "Ancestral Strike",

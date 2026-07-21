@@ -20,7 +20,7 @@ function setup(seed = 2810): { sim: Sim; shaman: Entity; target: Entity } {
   if (!shaman) throw new Error('missing Warspirit Shaman');
   shaman.resource = shaman.maxResource;
 
-  const target = createMob(90_010, MOBS.training_dummy, 20, {
+  const target = createMob(90_010, MOBS.forest_wolf, 20, {
     x: shaman.pos.x,
     y: shaman.pos.y,
     z: shaman.pos.z + 3,
@@ -115,6 +115,33 @@ describe('Shaman v0.29 Warspirit', () => {
     expect(shaman.castingAbility).toBeNull();
     expect(manaBefore - shaman.resource).toBeCloseTo((definition?.cost ?? 0) * 0.5, 5);
     expect(shaman.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(false);
+  });
+
+  it('uses Stormcast for its instant half-cost spell without consuming Clearcasting', () => {
+    const { sim, shaman, target } = setup(2816);
+    castInstant(sim, shaman, STONEBOUND_ID);
+    for (let step = 0; step < 3; step++) landedSwing(sim, shaman, target);
+    shaman.auras.push({
+      id: 'set_clearcasting',
+      name: 'Clearcasting',
+      kind: 'next_cast_free',
+      value: 0,
+      remaining: 12,
+      duration: 12,
+      sourceId: shaman.id,
+      school: 'nature',
+    });
+    const definition = sim.resolvedAbility('healing_wave', shaman.id);
+    if (!definition) throw new Error('missing Healing Wave');
+    shaman.gcdRemaining = 0;
+    const manaBefore = shaman.resource;
+
+    sim.castAbility('healing_wave', shaman.id);
+
+    expect(manaBefore - shaman.resource).toBeCloseTo(definition.cost * 0.5, 5);
+    expect(shaman.auras.some((aura) => aura.id === 'set_clearcasting')).toBe(true);
+    expect(shaman.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(false);
+    expect(shaman.auras.some((aura) => aura.id === STORMCAST_CHEAP_ID)).toBe(false);
   });
 
   it('refunds both Stormcast components when an Arc Bolt projectile fizzles', () => {

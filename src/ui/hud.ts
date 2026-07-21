@@ -391,7 +391,7 @@ import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
 import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
-import { guardianOwnerId, isControllableOwnedPet } from './pet_entity';
+import { isControllableOwnedPet, ownedCombatSourceOwnerId } from './pet_entity';
 import {
   chatPlayerContextActions,
   type PlayerContextAction,
@@ -8581,7 +8581,7 @@ export class Hud {
           const tgt = sim.entities.get(ev.targetId);
           if (!tgt) break;
           const isPlayerSource = ev.sourceId === sim.playerId;
-          const isPlayerOwnedSource = guardianOwnerId(src) === sim.playerId;
+          const isPlayerOwnedSource = ownedCombatSourceOwnerId(src) === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
           if (isPlayerSource || isPlayerOwnedSource || isPlayerTarget) {
             this.lastCombatEventAt = performance.now();

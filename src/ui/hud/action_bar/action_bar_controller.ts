@@ -260,11 +260,21 @@ export class ActionBarController {
   }
 
   resetActiveBar(): void {
+    const knownAbilityIds = [...this.deps.knownAbilityIds()];
+    const ownedSpecDefault =
+      this.activeFormState === 'normal'
+        ? ownedClassSpecDefaultAbilityIds(
+            this.deps.playerClass,
+            this.deps.talentSpec(),
+            this.deps.playerLevel(),
+            new Set(knownAbilityIds),
+          )
+        : null;
     this.actionState = buildDefaultFormBar(
-      this.formKitAbilityIds(this.activeFormState),
+      ownedSpecDefault ?? this.formKitAbilityIds(this.activeFormState),
       ACTION_BAR_ABILITY_SLOTS,
     );
-    this.knownAbilityIdsAtLastSync = new Set(this.deps.knownAbilityIds());
+    this.knownAbilityIdsAtLastSync = new Set(knownAbilityIds);
     this.markFormBarSeeded();
     this.saveActions();
   }

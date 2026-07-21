@@ -108,7 +108,7 @@ export function abilityDamageBonus(
       return dotTickBonus(power, def, eff.duration, eff.interval) * ticks;
     }
     case 'hunterBloodhook':
-      return Math.round(scaling.rangedPower * eff.rangedPowerCoeff);
+      return Math.round(scaling.rangedPower * eff.rangedPowerCoeff * (eff.damageMult ?? 1));
     default:
       return 0;
   }

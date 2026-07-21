@@ -412,32 +412,44 @@ export function onGhostWolfExited(ctx: SimContext, player: Entity): void {
   applyInternalState(ctx, player, WAYFARER_GRACE_ICD_ID, 'Wayfarer Grace', 90);
 }
 
-export function clearShamanTalentState(ctx: SimContext, source: Entity): void {
-  const ownedIds = new Set([
-    STONEWARD_ID,
-    PRIMAL_EXALTATION_ID,
-    FLOWING_ELEMENTS_ID,
-    WAYFARER_GRACE_ID,
-    FLOW_STATE_PROGRESS_ID,
-    FLOW_STATE_READY_ID,
-    WARD_CYCLE_ICD_ID,
-    GATHERING_WINDS_ICD_ID,
-    WAYFARER_GRACE_ICD_ID,
-    ANCESTRAL_BULWARK_ICD_ID,
-    'shaman_gathering_winds',
-    'shaman_ancestral_bulwark',
-    'shaman_warded_elements',
-    'shaman_pyrebrand_mastery',
-    'shaman_echoing_elements_damage',
-    'shaman_echoing_elements_stormcast',
-    'shaman_echoing_elements_heal',
-    'shaman_living_weapon_bolt',
-    'shaman_living_weapon_absorb',
-  ]);
+const SHAMAN_STATE_TALENT = new Map<string, ShamanTalentId>([
+  [STONEWARD_ID, SHAMAN_TALENT_IDS.stoneward],
+  [PRIMAL_EXALTATION_ID, SHAMAN_TALENT_IDS.primalExaltation],
+  [FLOWING_ELEMENTS_ID, SHAMAN_TALENT_IDS.flowingElements],
+  [WAYFARER_GRACE_ID, SHAMAN_TALENT_IDS.wayfarerGrace],
+  [FLOW_STATE_PROGRESS_ID, SHAMAN_TALENT_IDS.flowState],
+  [FLOW_STATE_READY_ID, SHAMAN_TALENT_IDS.flowState],
+  [WARD_CYCLE_ICD_ID, SHAMAN_TALENT_IDS.wardCycle],
+  [GATHERING_WINDS_ICD_ID, SHAMAN_TALENT_IDS.gatheringWinds],
+  [WAYFARER_GRACE_ICD_ID, SHAMAN_TALENT_IDS.wayfarerGrace],
+  [ANCESTRAL_BULWARK_ICD_ID, SHAMAN_TALENT_IDS.ancestralBulwark],
+  ['shaman_gathering_winds', SHAMAN_TALENT_IDS.gatheringWinds],
+  ['shaman_ancestral_bulwark', SHAMAN_TALENT_IDS.ancestralBulwark],
+  ['shaman_warded_elements', SHAMAN_TALENT_IDS.wardedElements],
+  ['shaman_pyrebrand_mastery', SHAMAN_TALENT_IDS.imbueMastery],
+  ['shaman_echoing_elements_damage', SHAMAN_TALENT_IDS.echoingElements],
+  ['shaman_echoing_elements_stormcast', SHAMAN_TALENT_IDS.echoingElements],
+  ['shaman_echoing_elements_heal', SHAMAN_TALENT_IDS.echoingElements],
+  ['shaman_living_weapon_bolt', SHAMAN_TALENT_IDS.livingWeapon],
+  ['shaman_living_weapon_absorb', SHAMAN_TALENT_IDS.livingWeapon],
+]);
+
+export function clearShamanTalentState(
+  ctx: SimContext,
+  source: Entity,
+  retainedTalentIds: ReadonlySet<string> | null = null,
+): void {
   for (const entity of ctx.entities.values()) {
     for (let index = entity.auras.length - 1; index >= 0; index--) {
       const aura = entity.auras[index];
-      if (aura.sourceId === source.id && ownedIds.has(aura.id)) removeAuraAt(ctx, entity, index);
+      const talentId = SHAMAN_STATE_TALENT.get(aura.id);
+      if (
+        aura.sourceId === source.id &&
+        talentId !== undefined &&
+        !retainedTalentIds?.has(talentId)
+      ) {
+        removeAuraAt(ctx, entity, index);
+      }
     }
   }
 }

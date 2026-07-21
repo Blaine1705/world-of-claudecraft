@@ -1,4 +1,5 @@
 import type { Aura, Entity } from '../src/sim/types';
+import { isPersistentEngineAura } from '../src/sim/persistent_aura';
 import type { StableCooldownWire } from '../src/world_api';
 
 export interface SerializedTimerWire {
@@ -73,7 +74,8 @@ function auraMatches(
   simTime: number,
   paused: boolean,
 ): boolean {
-  const deadline = round2(paused ? aura.remaining : simTime + aura.remaining);
+  const wirePaused = paused || isPersistentEngineAura(aura.id);
+  const deadline = round2(wirePaused ? aura.remaining : simTime + aura.remaining);
   return (
     record.id === aura.id &&
     record.name === aura.name &&
@@ -89,12 +91,13 @@ function auraMatches(
     sameStringList(record.empowerAbilities, aura.empowerAbilities) &&
     record.sourceId === aura.sourceId &&
     record.unbreakableControl === (aura.unbreakableControl === true) &&
-    record.paused === paused &&
+    record.paused === wirePaused &&
     record.deadline === deadline
   );
 }
 
 function auraRecord(aura: Aura, simTime: number, paused: boolean): StableAuraRecord {
+  const wirePaused = paused || isPersistentEngineAura(aura.id);
   return {
     id: aura.id,
     name: aura.name,
@@ -110,8 +113,8 @@ function auraRecord(aura: Aura, simTime: number, paused: boolean): StableAuraRec
     empowerAbilities: aura.empowerAbilities ? [...aura.empowerAbilities] : undefined,
     sourceId: aura.sourceId,
     unbreakableControl: aura.unbreakableControl === true,
-    paused,
-    deadline: round2(paused ? aura.remaining : simTime + aura.remaining),
+    paused: wirePaused,
+    deadline: round2(wirePaused ? aura.remaining : simTime + aura.remaining),
   };
 }
 

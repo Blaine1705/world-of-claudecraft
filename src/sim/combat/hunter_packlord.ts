@@ -134,7 +134,7 @@ export function applyHowlingRage(ctx: SimContext, hunter: Entity, duration: numb
     sourceId: hunter.id,
     school: 'physical',
   });
-  activateHunterMajorWindow(ctx, hunter, 90);
+  activateHunterMajorWindow(ctx, hunter, duration);
 }
 
 export function runUnleashBeast(

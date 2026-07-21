@@ -291,6 +291,22 @@ describe('owned class level 20 default action bars', () => {
     }
   });
 
+  it('restores the curated spec template when Reset Action Bar is used', () => {
+    for (const { key, playerClass, spec, expected, known } of ownedSpecEntries()) {
+      const storage = new MemoryStorage();
+      const controller = seedOwnedSpecBar(storage, playerClass, spec, known);
+      controller.replaceActions(
+        buildDefaultFormBar([...known].reverse(), ACTION_BAR_ABILITY_SLOTS),
+      );
+
+      controller.resetActiveBar();
+
+      expect(controller.actions, key).toEqual(
+        buildDefaultFormBar(expected, ACTION_BAR_ABILITY_SLOTS),
+      );
+    }
+  });
+
   it('restores every generated spec bar on another device and leaves it alone on reconnect', () => {
     for (const { key, playerClass, spec, expected, known } of ownedSpecEntries()) {
       const source = new MemoryStorage();

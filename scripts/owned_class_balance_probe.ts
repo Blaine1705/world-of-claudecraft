@@ -61,9 +61,11 @@ export interface OwnedHealerBalanceResult {
   allies: 1 | 3;
   seconds: 60;
   effectiveHealing: number;
+  healingBySource: Record<string, number>;
   hps: number;
   overhealing: number;
   overhealPct: number;
+  absorbedDamage: number;
   damage: number;
   dps: number;
   preparedHealing: number;
@@ -675,6 +677,8 @@ export function runOwnedHealerProbe(
   const castsByAbility: Record<string, number> = {};
   let effectiveHealing = 0;
   let overhealing = 0;
+  let absorbedDamage = 0;
+  const healingBySource: Record<string, number> = {};
   const originalApplyHeal = sim.ctx.applyHeal;
   sim.ctx.applyHeal = (...args): number => {
     const callerResolution = args[7];
@@ -682,6 +686,8 @@ export function runOwnedHealerProbe(
     args[7] = measured;
     const effective = originalApplyHeal(...args);
     effectiveHealing += effective;
+    const ability = args[3];
+    healingBySource[ability] = (healingBySource[ability] ?? 0) + effective;
     overhealing += Math.max(0, measured.resolved - effective);
     if (callerResolution) callerResolution.resolved = measured.resolved;
     return effective;
@@ -716,7 +722,27 @@ export function runOwnedHealerProbe(
     if (recovered && (tick + 1) % 20 === 0) {
       for (const ally of allies) {
         const pulse = Math.max(1, Math.round(ally.maxHp * 0.12));
-        ally.hp = Math.max(1, ally.hp - pulse);
+        const absorbBefore = ally.auras.reduce(
+          (total, aura) => total + (aura.kind === 'absorb' ? Math.max(0, aura.value) : 0),
+          0,
+        );
+        sim.ctx.dealDamage(
+          enemy,
+          ally,
+          pulse,
+          false,
+          'physical',
+          'Balance Pressure',
+          'hit',
+          true,
+          undefined,
+          false,
+        );
+        const absorbAfter = ally.auras.reduce(
+          (total, aura) => total + (aura.kind === 'absorb' ? Math.max(0, aura.value) : 0),
+          0,
+        );
+        absorbedDamage += Math.max(0, absorbBefore - absorbAfter);
       }
     }
   }
@@ -737,10 +763,12 @@ export function runOwnedHealerProbe(
     allies: allyCount,
     seconds: 60,
     effectiveHealing,
+    healingBySource,
     hps: effectiveHealing / 60,
     overhealing,
     overhealPct:
       effectiveHealing + overhealing > 0 ? overhealing / (effectiveHealing + overhealing) : 0,
+    absorbedDamage,
     damage,
     dps: damage / 60,
     preparedHealing,

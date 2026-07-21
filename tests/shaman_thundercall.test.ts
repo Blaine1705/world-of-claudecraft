@@ -176,6 +176,22 @@ describe('Shaman v0.29 Thundercall', () => {
     expect(run()).toEqual(first);
   });
 
+  it('applies Thunder charges to Faultwake base damage and Spell Power together', () => {
+    const groundEffect = (charges: number) => {
+      const { sim, shaman } = setup(2817 + charges);
+      seedThunderBank(shaman, charges);
+      sim.castAbility('earthquake', shaman.id);
+      return sim.ctx.groundAoEs.find((effect) => effect.sourceId === shaman.id);
+    };
+    const plain = groundEffect(0);
+    const charged = groundEffect(5);
+    if (!plain || !charged) throw new Error('missing Faultwake zone');
+
+    expect(charged.min).toBe(plain.min * 2);
+    expect(charged.max).toBe(plain.max * 2);
+    expect(charged.spBonus).toBeCloseTo((plain.spBonus ?? 0) * 2, 8);
+  });
+
   it('uses Primal Mastery to accelerate the same builder and vent loop', () => {
     const { sim, shaman } = setup(2807);
     expect(sim.resolvedAbility('elemental_mastery', shaman.id)?.cooldown).toBe(90);

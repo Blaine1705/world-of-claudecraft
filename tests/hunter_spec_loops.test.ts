@@ -166,7 +166,10 @@ describe('Hunter v0.29 baseline specialization loops', () => {
     const target = addMob(sim, 12);
     sim.targetEntity(target.id);
     sim.player.resource = 0;
-    const expectedBloodhookTick = Math.max(1, Math.round((36 + sim.player.rangedPower * 0.28) / 4));
+    const expectedBloodhookTick = Math.max(
+      1,
+      Math.round(((34 + sim.player.rangedPower * 0.26) * 1.06) / 4),
+    );
 
     sim.castAbility('bloodhook');
     advance(sim, 2);

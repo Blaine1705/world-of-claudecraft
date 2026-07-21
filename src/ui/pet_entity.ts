@@ -2,6 +2,13 @@ import type { Entity } from '../sim/types';
 
 type OwnedMobIdentity = Pick<Entity, 'kind' | 'ownerId' | 'templateId'>;
 
+/** Resolve any player-owned combat source for floating text and combat-log credit. */
+export function ownedCombatSourceOwnerId(
+  entity: OwnedMobIdentity | null | undefined,
+): number | null {
+  return entity?.kind === 'mob' && entity.ownerId !== null ? entity.ownerId : null;
+}
+
 /** Resolve the player who receives combat credit for a temporary guardian. */
 export function guardianOwnerId(entity: OwnedMobIdentity | null | undefined): number | null {
   if (

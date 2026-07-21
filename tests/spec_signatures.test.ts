@@ -60,6 +60,18 @@ function producesEffect(cls: PlayerClass, specId: string, sig: string): string {
     sim.entities.set(e.id, e);
     (sim as any).rebucket(e);
   }
+  if (sig === 'summon_tithefiend') {
+    mob.auras.push({
+      id: 'shadow_word_pain',
+      name: 'Dirge of Decay',
+      kind: 'dot',
+      remaining: 18,
+      duration: 18,
+      value: 1,
+      sourceId: pid,
+      school: 'shadow',
+    });
+  }
   p.facing = 0;
   sim.targetEntity(mob.id, pid);
   const before = {

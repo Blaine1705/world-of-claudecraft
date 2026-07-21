@@ -113,7 +113,7 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
       bloodhook.effects.find((candidate) => candidate.type === 'hunterBloodhook'),
     );
     expect(abilityDamageBonus(bloodhook, effect, { ...SC, rangedPower: 0 })).toBe(0);
-    expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(56);
+    expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(55);
   });
 
   it('a channelled directDamage (Arcane Missiles) uses the per-tick CHANNEL coefficient', () => {

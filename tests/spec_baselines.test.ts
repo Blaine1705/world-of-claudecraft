@@ -300,6 +300,23 @@ describe('v0.28 passive restoration hotfix', () => {
     expect(dead).toEqual([]);
   });
 
+  it('applies the Survival physical baseline to custom Fieldcraft effects', () => {
+    const known = abilitiesKnownAt(
+      'hunter',
+      20,
+      computeTalentModifiers('hunter', allocation('survival'), 20),
+    );
+    const bloodhook = known
+      .find(({ def }) => def.id === 'bloodhook')
+      ?.effects.find((effect) => effect.type === 'hunterBloodhook');
+    const shrapnel = known
+      .find(({ def }) => def.id === 'shrapnel_charge')
+      ?.effects.find((effect) => effect.type === 'hunterShrapnel');
+
+    expect(bloodhook).toMatchObject({ damageMult: 1.06 });
+    expect(shrapnel).toMatchObject({ damageMult: 1.06 });
+  });
+
   it('restores the complete repository-backed baseline for all 21 applicable specs', () => {
     expect(Object.keys(EXPECTED_BASELINES)).toHaveLength(21);
     for (const [key, expected] of Object.entries(EXPECTED_BASELINES)) {
