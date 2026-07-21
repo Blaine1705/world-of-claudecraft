@@ -37,7 +37,7 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
-import { AbilityVfx } from './ability_vfx';
+import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { buildArtisanRowProps } from './artisan_row_props';
@@ -1055,9 +1055,11 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
-  // Per-ability spell VFX painter (spec-driven colors/scales over the pooled
-  // Vfx primitives; see src/render/ability_vfx.ts).
+  // Per-ability spell VFX subsystem: the spec-driven painter plus the pooled
+  // primitive engine (ribbons, shock rings, decals, windup orbs, buff orbits;
+  // see src/render/ability_vfx/).
   private abilityVfx: AbilityVfx;
+  private abilityVfxFx: AbilityVfxFx;
   private lightPulses: LightPulses;
   // Flash a pooled talent-moment point light at an entity's feet (see
   // light_pulses.ts); bound once in the constructor over the views map.
@@ -1720,8 +1722,16 @@ export class Renderer {
     };
     this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+    this.abilityVfxFx = new AbilityVfxFx(this.scene, this.camera, vfxAnchor, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.abilityVfxFx.setViewportScale(
+      this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),
+      60,
+    );
     this.abilityVfx = new AbilityVfx({
       vfx: this.vfx,
+      fx: this.abilityVfxFx,
       anchor: vfxAnchor,
       spawnAoeRing: (x, z, radius, school, colorHex) =>
         this.spawnAoeRing(x, z, radius, school, colorHex),
@@ -1813,6 +1823,7 @@ export class Renderer {
     }
     const devicePxHeight = this.webgl.domElement.clientHeight * this.webgl.getPixelRatio();
     this.vfx.setViewportScale(devicePxHeight, 60);
+    this.abilityVfxFx.setViewportScale(devicePxHeight, 60);
     // Weapon-skin VFX point sprites size against the device-pixel height too:
     // future rigs read the module value, live rigs re-scale in place.
     setWeaponVfxViewportHeight(devicePxHeight);
@@ -3180,6 +3191,7 @@ export class Renderer {
       }
     } finally {
       this.vfx.clear();
+      this.abilityVfxFx.clear();
       if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
       if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
@@ -5376,6 +5388,9 @@ export class Renderer {
         }
       }
 
+      // per-ability windup orb + buff-orbit bands (spec-driven; no-op for
+      // entities with no spec'd cast or aura)
+      this.abilityVfx.syncEntity(e);
       if (st.casting) {
         this.vfx.castSparkle(
           e.id,
