@@ -53,7 +53,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 420,
-      "state": "e0408b79",
+      "state": "825cc425",
       "events": "291a1e36",
       "rng": {
         "draws": 76,
@@ -64,7 +64,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 420,
-      "state": "91856a22",
+      "state": "774827ab",
       "events": "741638a5",
       "rng": {
         "draws": 156,
@@ -745,7 +745,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 420,
-      "state": "4ef1b8b3",
+      "state": "cf3c0c5f",
       "events": "03abc3c8",
       "rng": {
         "draws": 352,
@@ -756,7 +756,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 420,
-      "state": "e316a28f",
+      "state": "9b885f88",
       "events": "741638a5",
       "rng": {
         "draws": 488,
@@ -767,7 +767,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 420,
-      "state": "fe494b15",
+      "state": "a0f2f7a1",
       "events": "840f823c",
       "rng": {
         "draws": 620,
@@ -778,7 +778,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 420,
-      "state": "845427a8",
+      "state": "46c6f443",
       "events": "741638a5",
       "rng": {
         "draws": 760,
@@ -789,7 +789,7 @@
       "tick": 182,
       "time": 9.1,
       "nextId": 420,
-      "state": "125758e9",
+      "state": "f485ccdd",
       "events": "741638a5",
       "rng": {
         "draws": 782,
@@ -1237,11 +1237,11 @@
           "attackPower": 98,
           "auras": [
             {
-              "duration": 300,
+              "duration": 1800,
               "id": "galeheart_weapon",
               "kind": "imbue",
               "name": "Galeheart Weapon",
-              "remaining": 295.9,
+              "remaining": 1795.9,
               "school": "nature",
               "sourceId": 416
             },
@@ -1284,7 +1284,7 @@
               "id": "shaman_warspirit_cadence",
               "kind": "internal_cd",
               "name": "Warspirit Cadence",
-              "remaining": 86398.4,
+              "remaining": 86400,
               "school": "nature",
               "sourceId": 416,
               "stacks": 1
@@ -1522,7 +1522,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 420,
-      "state": "e9c95f3b",
+      "state": "a390387b",
       "events": "fd2378a3",
       "rng": {
         "draws": 897,
@@ -1533,7 +1533,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 420,
-      "state": "4cdce0f1",
+      "state": "aa4c3e5c",
       "events": "741638a5",
       "rng": {
         "draws": 981,
@@ -1544,7 +1544,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 420,
-      "state": "8eb48ec0",
+      "state": "8ad4dace",
       "events": "9b98aed1",
       "rng": {
         "draws": 1078,
@@ -1555,7 +1555,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 420,
-      "state": "2dbbc57b",
+      "state": "8db0d6d9",
       "events": "f95ee6e0",
       "rng": {
         "draws": 1153,
@@ -1566,7 +1566,7 @@
       "tick": 264,
       "time": 13.2,
       "nextId": 420,
-      "state": "abd35bf2",
+      "state": "e25a7f5e",
       "events": "741638a5",
       "rng": {
         "draws": 1172,
@@ -1999,11 +1999,11 @@
           "attackPower": 98,
           "auras": [
             {
-              "duration": 300,
+              "duration": 1800,
               "id": "galeheart_weapon",
               "kind": "imbue",
               "name": "Galeheart Weapon",
-              "remaining": 291.8,
+              "remaining": 1791.8,
               "school": "nature",
               "sourceId": 416
             },
@@ -2046,7 +2046,7 @@
               "id": "shaman_warspirit_cadence",
               "kind": "internal_cd",
               "name": "Warspirit Cadence",
-              "remaining": 86399.1,
+              "remaining": 86400,
               "school": "nature",
               "sourceId": 416,
               "stacks": 1
@@ -2297,7 +2297,7 @@
       "tick": 264,
       "time": 13.2,
       "nextId": 420,
-      "state": "abd35bf2",
+      "state": "e25a7f5e",
       "events": "741638a5",
       "rng": {
         "draws": 1172,
@@ -2730,11 +2730,11 @@
           "attackPower": 98,
           "auras": [
             {
-              "duration": 300,
+              "duration": 1800,
               "id": "galeheart_weapon",
               "kind": "imbue",
               "name": "Galeheart Weapon",
-              "remaining": 291.8,
+              "remaining": 1791.8,
               "school": "nature",
               "sourceId": 416
             },
@@ -2777,7 +2777,7 @@
               "id": "shaman_warspirit_cadence",
               "kind": "internal_cd",
               "name": "Warspirit Cadence",
-              "remaining": 86399.1,
+              "remaining": 86400,
               "school": "nature",
               "sourceId": 416,
               "stacks": 1
