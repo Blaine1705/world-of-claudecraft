@@ -307,7 +307,12 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     sim.player.hp = sim.player.maxHp;
 
     // Manually inject a death zone with a very short fuse.
-    inst.bossDeathZones.push({ x: sim.player.pos.x, z: sim.player.pos.z, radius: 12, remaining: 0.05 });
+    inst.bossDeathZones.push({
+      x: sim.player.pos.x,
+      z: sim.player.pos.z,
+      radius: 12,
+      remaining: 0.05,
+    });
     // One tick: the fuse expires and the zone detonates.
     sim.player.hp = sim.player.maxHp; // restore so only the zone kills
     sim.tick();
@@ -317,8 +322,13 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
   it('deathZoneStrike is suppressed at A rank (budget=3)', () => {
     const bossAt = (limit: number) =>
       ({ templateId: 'rift_boss_frost', riftMechanicLimit: limit }) as unknown as Entity;
-    expect(riftMechanicSuppressed(bossAt(3), 'deathZoneStrike'), 'A suppresses deathZoneStrike').toBe(true);
-    expect(riftMechanicSuppressed(bossAt(4), 'deathZoneStrike'), 'S runs deathZoneStrike').toBe(false);
+    expect(
+      riftMechanicSuppressed(bossAt(3), 'deathZoneStrike'),
+      'A suppresses deathZoneStrike',
+    ).toBe(true);
+    expect(riftMechanicSuppressed(bossAt(4), 'deathZoneStrike'), 'S runs deathZoneStrike').toBe(
+      false,
+    );
   });
 
   it('bossDeathZones clears between floors', () => {
