@@ -323,10 +323,25 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 36, sta: 2 },
     sellValue: 140,
   },
+  // Riding Training: the stablemaster's service entry. Buying it never puts an
+  // item in the bags; items.ts buyItem delegates to learnRiding (80 gold,
+  // level 20, once), which sets PlayerMeta.ridingTrained. The buyValue mirrors
+  // RIDING_SKILL_FEE_COPPER so the vendor window shows the real price.
+  riding_training: {
+    id: 'riding_training',
+    name: 'Riding Training',
+    kind: 'tool',
+    quality: 'common',
+    teachesRiding: true,
+    sellValue: 0,
+    buyValue: 800_000, // 80 gold in copper, mirrors RIDING_SKILL_FEE_COPPER
+    noMarketList: true,
+  },
   // The horse's reins: the ONLY purchasable mount, sold by Stablemaster Marla
-  // Hitchen in Eastbrook for 100 gold (buyValue in copper). Soulbound like every
-  // reins item, so owning it IS owning the horse (src/sim/mounts.ts mountOwned)
-  // and it never transfers. sellValue 0: bought, never sold back.
+  // Hitchen for 10 gold after the player has learned Riding (ridingTrained gate
+  // in items.ts buyItem). Soulbound like every reins item, so owning it IS owning
+  // the horse (src/sim/mounts.ts mountOwned) and it never transfers.
+  // sellValue 0: bought, never sold back.
   reins_valorsteed: {
     id: 'reins_valorsteed',
     name: 'Reins of the Valorsteed',
@@ -336,7 +351,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noDiscard: true,
     sellValue: 0,
-    buyValue: 1_000_000,
+    buyValue: 100_000, // 10 gold in copper
   },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the
   // reins item IS owning the mount (src/sim/mounts.ts mountOwned): soulbound,

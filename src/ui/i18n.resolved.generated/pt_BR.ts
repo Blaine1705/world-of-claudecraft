@@ -9297,6 +9297,9 @@ export const pt_BR: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Guarda-cintura do Chamatormentas"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Rédeas do Corcel do Valor"
       },

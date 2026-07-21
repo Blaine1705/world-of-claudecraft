@@ -2679,6 +2679,7 @@ export class ClientWorld implements IWorld {
           .map((k) => normalizeMountKey(typeof k === 'string' ? k : ''))
           .filter((k): k is MountKey => k !== '');
       }
+      if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
       if (s.mntRace !== undefined) {
         const view = s.mntRace as MountRaceView | null;
@@ -3152,6 +3153,9 @@ export class ClientWorld implements IWorld {
   ownedMounts(): readonly MountKey[] {
     return this.selfOwnedMounts;
   }
+  ridingTrained(): boolean {
+    return this.selfRidingTrained;
+  }
   selectMount(key: MountKey): void {
     const def = mountDef(key);
     const p = this.entities.get(this.playerId);
@@ -3162,6 +3166,11 @@ export class ClientWorld implements IWorld {
   }
   toggleMounted(): void {
     this.cmd({ cmd: 'mount_toggle' });
+  }
+  // --- riding skill purchase: server-authoritative; on success the snapshot
+  // delta (mntRtd=true) confirms the skill was granted. ---
+  learnRiding(npcId: number): void {
+    this.cmd({ cmd: 'learn_riding', npc: npcId });
   }
   // --- riding lesson: fully server-authoritative, no optimistic local nudge
   // (unlike selectMount above); feedback rides the mountTrain* events straight to
@@ -3802,6 +3811,9 @@ export class ClientWorld implements IWorld {
   // until the server says so (the horse is no longer auto-granted), so an empty list
   // is the correct pre-snapshot state.
   private selfOwnedMounts: MountKey[] = [];
+  // Riding skill, mirrored from the snapshot `s.mntRtd`. False until the server
+  // confirms the player purchased it from Marla.
+  private selfRidingTrained = false;
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};

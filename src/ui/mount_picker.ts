@@ -49,16 +49,10 @@ export function mountDisplayName(key: string): string {
   return nameKey ? t(nameKey) : ((MOUNTS as Record<string, { name: string }>)[key]?.name ?? key);
 }
 
-/** The specialty lines ("+40% extra mobility", ...) for a mount row. */
-export function mountSpecLines(row: {
-  speedPct: number;
-  blockPct: number;
-  critPct: number;
-}): string[] {
-  const parts = [t('hudChrome.mounts.spec_speed', { pct: row.speedPct })];
-  if (row.blockPct > 0) parts.push(t('hudChrome.mounts.spec_block', { pct: row.blockPct }));
-  if (row.critPct > 0) parts.push(t('hudChrome.mounts.spec_crit', { pct: row.critPct }));
-  return parts;
+/** The specialty lines ("+40% extra mobility") for a mount row.
+ *  Speed is the only stat now; block and crit were removed in the mounts overhaul. */
+export function mountSpecLines(row: { speedPct: number }): string[] {
+  return [t('hudChrome.mounts.spec_speed', { pct: row.speedPct })];
 }
 
 // The state chip never co-renders a contradiction: the "Riding" chip only when

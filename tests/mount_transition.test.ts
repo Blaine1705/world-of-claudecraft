@@ -53,6 +53,10 @@ function joinRider(sim: Sim, opts: { level?: number; x?: number; z?: number } = 
   p.pos.z = z;
   p.pos.y = terrainHeight(x, z, SEED);
   p.prevPos = { ...p.pos };
+  // Req 5: riding skill required; set it so transition tests stay focused on
+  // channel timing and water/combat gate behavior, not the riding-skill gate.
+  const meta = sim.players.get(pid);
+  if (meta) meta.ridingTrained = true;
   sim.addItem('reins_grag_bear', 1, pid);
   selectMount(sim.ctx, pid, 'grag_bear');
   return pid;
@@ -175,22 +179,22 @@ describe('mount summon/dismount transition', () => {
     expect(e.inCombat).toBe(false);
   });
 
-  it('roots the player for the whole summon (no walk/strafe/jump)', () => {
+  it('cancels the summon channel when the player moves (move-to-cancel)', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
     const e = sim.entities.get(pid)!;
     const meta = sim.meta(pid)!;
 
     toggleMount(sim.ctx, pid);
-    const start = { x: e.pos.x, z: e.pos.z };
-    // Hold forward through several mid-summon ticks: on open ground an unrooted
-    // player would cover ~0.5 yd here, so an unchanged pose proves the root.
+    expect(e.mountCastRemaining).toBeGreaterThan(0); // channel started
+    expect(e.mountCastKey).toBe('grag_bear');
+
+    // Apply forward movement input - after one tick the summon should be cancelled.
     meta.moveInput.forward = true;
-    for (let i = 0; i < 5; i++) sim.tick();
-    expect(e.mountCastRemaining).toBeGreaterThan(0); // still channelling
-    expect(e.mountKey).toBe(''); // not mounted yet
-    expect(e.pos.x).toBeCloseTo(start.x, 6);
-    expect(e.pos.z).toBeCloseTo(start.z, 6);
+    sim.tick();
+    expect(e.mountCastRemaining).toBe(0);
+    expect(e.mountCastKey).toBe('');
+    expect(e.mountKey).toBe(''); // never mounted
   });
 
   it('ignores a second toggle while a summon is already channelling', () => {
@@ -378,5 +382,23 @@ describe('mount transition on the entity wire', () => {
     expect(typeof dismounting.mcr).toBe('number');
     expect(dismounting.mcr as number).toBeGreaterThan(0);
     expect(dismounting).not.toHaveProperty('mck'); // '' is omitted
+  });
+});
+
+describe('attack auto-dismount', () => {
+  it('casting any ability while mounted instantly dismounts the player', () => {
+    const sim = makeSim();
+    const pid = joinRider(sim);
+    const e = sim.entities.get(pid)!;
+
+    // Arrange: player is fully mounted (skip the summon channel)
+    e.mountKey = 'grag_bear';
+    expect(e.mountKey).toBe('grag_bear');
+
+    // Act: cast a warrior self-buff (no target required, instant)
+    sim.castAbility('battle_shout', pid);
+
+    // Assert: player is dismounted immediately
+    expect(e.mountKey).toBe('');
   });
 });

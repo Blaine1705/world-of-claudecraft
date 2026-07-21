@@ -417,6 +417,7 @@ export const COMMAND_NAMES = [
   'mount_train_abort',
   'mount_race_start',
   'mount_race_cancel',
+  'learn_riding',
   'releaseEmpowered',
   'df_roles',
   'df_queue',
@@ -711,6 +712,9 @@ export const COMMAND_FACETS = {
   // mountRace* events.
   mount_race_start: 'IWorldMounts',
   mount_race_cancel: 'IWorldMounts',
+  // learn_riding: purchase the riding skill from Marla (80g, once). No snapshot
+  // field; the result rides the ridingTrained snapshot delta (mntRtd).
+  learn_riding: 'IWorldMounts',
   // IWorldDungeonFinder: the group finder (snake_case wire strings, by design).
   // dungeonFinderInfo / dungeonFinderBoard are snapshot reads (no send, untagged).
   df_roles: 'IWorldDungeonFinder',

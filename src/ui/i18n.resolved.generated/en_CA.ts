@@ -9297,6 +9297,9 @@ export const en_CA: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Galecall Waistguard"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Reins of the Valorsteed"
       },
@@ -11015,8 +11018,8 @@ export const en_CA: EnTranslations = {
       },
       "q_riding_lessons": {
         "title": "Riding Lessons",
-        "text": "Every rider walks in on two legs, {playerName}, same as I told you the day we met. Pay the fee, and when I give the word, call the training Valorsteed and climb aboard. Then ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the seat is yours. Wander out of the paddock and we start over.",
-        "completion": "There, now. Up in one clean motion and a steady seat at the top. The Valorsteed is yours, {playerName}: saddle, reins, and the standing of a rider who earned the seat instead of buying it.",
+        "text": "You have learned your Riding, now show me you deserve it. When I give the word, call the training Valorsteed and climb aboard. Ride the course: follow the marker to the start arch, take every jump clean, and cross the line again before the glass runs dry. Do that and the course is yours. Wander out of the paddock and we start over.",
+        "completion": "Up in one clean motion and a steady seat at the top. Well ridden, {playerName}. You have earned the rank of rider. Speak to me again to buy your own Valorsteed reins.",
         "objectives": {
           "0": {
             "label": "Tame the Valorsteed"

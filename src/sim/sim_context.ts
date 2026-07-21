@@ -729,6 +729,7 @@ export interface SimContextCallbacks {
   tameError(p: Entity, target: Entity): string | null;
   standUp(p: Entity): void;
   breakGhostWolf(e: Entity): void;
+  forceDismount(e: Entity): void;
   startAutoAttack(pid?: number): void;
   revivePet(pid?: number): void;
   completeFishing(p: Entity, meta: PlayerMeta): void;
@@ -1326,6 +1327,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     tameError: host.tameError,
     standUp: host.standUp,
     breakGhostWolf: host.breakGhostWolf,
+    forceDismount: host.forceDismount,
     startAutoAttack: host.startAutoAttack,
     revivePet: host.revivePet,
     completeFishing: host.completeFishing,

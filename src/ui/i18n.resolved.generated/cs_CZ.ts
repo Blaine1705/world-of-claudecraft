@@ -9297,6 +9297,9 @@ export const cs_CZ: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Pás volajícího bouři"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Otěže Valorsteeda"
       },

@@ -4281,6 +4281,11 @@ export class GameServer {
         // the fee stays paid.
         sim.mountTrainAbortFor(pid);
         break;
+      // Riding skill purchase: player buys Riding from Marla for 80g. The Sim
+      // re-validates NPC identity, range, level, and funds.
+      case 'learn_riding':
+        if (typeof msg.npc === 'number') sim.learnRidingFor(msg.npc, pid);
+        break;
       // Show-jumping race: the Sim re-validates the glowing platform, lesson or
       // mount eligibility, and liveness before arming the countdown.
       case 'mount_race_start':
@@ -5699,6 +5704,10 @@ export class GameServer {
     // strings whose serialized form only changes on a loot/bank move, so the
     // per-tick diff is negligible. Wire key `mntOwn`.
     maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+    // Riding skill: persisted, so the client knows whether to show the riding
+    // trainer UI without waiting on a mount/select command to fail. Wire key
+    // `mntRtd`; delta-guarded, only changes once (false to true, never back).
+    maybe('mntRtd', meta.ridingTrained === true ? true : null);
     // Session-only lesson and race state must still reconcile after linkdead:
     // events sent while the socket is absent are not replayed on resume. These
     // self deltas are authoritative and clear stale client mirrors with false/null.

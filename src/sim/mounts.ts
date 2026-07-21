@@ -34,7 +34,7 @@ import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { DT, type Entity } from './types';
+import { DT, type Entity, FORM_AURA_KINDS } from './types';
 
 // Summon/dismount channel durations (seconds). Mounting is a short cast the
 // player can interrupt by moving into combat or water; dismounting is quicker.
@@ -128,15 +128,21 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
   return true;
 }
 
-/** Pick the player's stable mount (persisted). Ownership- and level-gated;
- *  swaps the live mount in place when already riding. Returns false on an
- *  unknown key or a failed gate (an error event carries the reason). */
+const RIDING_UNTRAINED_MSG = 'You must learn to ride first. Find a riding trainer.';
+
+/** Pick the player's stable mount (persisted). Riding skill-, ownership-, and
+ *  level-gated; swaps the live mount in place when already riding. Returns false
+ *  on an unknown key or a failed gate (an error event carries the reason). */
 export function selectMount(ctx: SimContext, pid: number, key: string): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
   const def = mountDef(key);
   if (!def) return false;
+  if (!meta.ridingTrained) {
+    ctx.error(pid, RIDING_UNTRAINED_MSG);
+    return false;
+  }
   if (!mountOwned(meta, def.key)) {
     // The reins item is not in bags or bank. Reuses the registered useItem
     // deny (sim_i18n error.noItem) instead of minting a new sim string.
@@ -158,6 +164,19 @@ export function selectMount(ctx: SimContext, pid: number, key: string): boolean 
   return true;
 }
 
+/** Strip all active form auras (FORM_AURA_KINDS) and ghost_wolf from the entity,
+ *  emitting aura-removal events for each one removed. Called before a mount summon
+ *  starts so the player is never simultaneously shapeshifted and mounting. */
+function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
+  for (let i = e.auras.length - 1; i >= 0; i--) {
+    const aura = e.auras[i];
+    if (FORM_AURA_KINDS.has(aura.kind) || aura.id === 'ghost_wolf') {
+      e.auras.splice(i, 1);
+      ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
+    }
+  }
+}
+
 /** Toggle riding: start a summon channel when dismounted, or a dismount channel
  *  when riding. Returns true when a transition was started (or completed for
  *  dismount), false on a failed gate or an ignored mid-transition toggle. The
@@ -177,6 +196,13 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     e.mountCastKey = '';
     return true;
   }
+  // Riding skill gate: the player must have purchased riding from Marla before
+  // they can summon any mount. The training lesson is the one exception (it teaches
+  // the skill via the quest and lends the Valorsteed during the lesson itself).
+  if (!meta.ridingTrained && meta.mountTraining?.state !== 'IN_PROGRESS') {
+    ctx.error(pid, RIDING_UNTRAINED_MSG);
+    return false;
+  }
   // Riding-lesson tutorial: while a lesson is in progress the Mount/Dismount
   // toggle summons the training Valorsteed even though it is UNOWNED (teaching the
   // Z keybind is the whole point). Runs the normal summon channel; it never touches
@@ -188,6 +214,7 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
       ctx.error(pid, "You can't do that while in combat.");
       return false;
     }
+    cancelFormsAndGhostWolf(ctx, e);
     e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
     e.mountCastKey = TRAINING_MOUNT_KEY;
     return true;
@@ -216,6 +243,8 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     ctx.error(pid, "You can't do that while in combat.");
     return false;
   }
+  // Cancel all active form auras and ghost_wolf before the summon channel starts.
+  cancelFormsAndGhostWolf(ctx, e);
   // Start the summon channel. mountKey stays '' until the channel completes.
   e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
   e.mountCastKey = def.key;

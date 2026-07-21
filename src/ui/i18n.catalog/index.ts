@@ -1393,6 +1393,9 @@ export const en = {
       nighttalon_waistband: { name: 'Direfang Waistband' },
       soulflame_cord: { name: 'Wraithfire Cord' },
       stormcallers_waistguard: { name: 'Galecall Waistguard' },
+      // The stablemaster's riding-skill service entry (buyItem delegates to
+      // learnRiding; never lands in the bags).
+      riding_training: { name: 'Riding Training' },
       // Collectible mount reins (boss drops; src/sim/mounts.ts mountOwned).
       // reins_valorsteed is the one bought from the stablemaster, not looted.
       reins_valorsteed: { name: 'Reins of the Valorsteed' },

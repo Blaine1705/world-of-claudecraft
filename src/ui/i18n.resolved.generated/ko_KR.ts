@@ -9297,6 +9297,9 @@ export const ko_KR: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "폭풍소환사의 허리보호구"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "발러스티드의 고삐"
       },

@@ -31,10 +31,6 @@ export interface MountDef {
   level: number;
   /** Additive move-speed fraction while mounted (0.6 = +60% extra mobility). */
   moveSpeedPct: number;
-  /** Fraction of incoming melee swing damage blocked while mounted (0.05 = 5%). */
-  meleeBlockPct: number;
-  /** Additive critical strike chance while mounted (0.05 = +5%). */
-  critPct: number;
 }
 
 // Speed/stat tiers (design directive): the purchasable horse is the 60% base;
@@ -51,8 +47,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'common',
     level: 20,
     moveSpeedPct: 0.6,
-    meleeBlockPct: 0,
-    critPct: 0,
   },
   grag_bear: {
     key: 'grag_bear',
@@ -60,8 +54,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'common',
     level: 10,
     moveSpeedPct: 0.7,
-    meleeBlockPct: 0.05,
-    critPct: 0,
   },
   stalkglider_snail: {
     key: 'stalkglider_snail',
@@ -69,8 +61,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'common',
     level: 10,
     moveSpeedPct: 0.7,
-    meleeBlockPct: 0.05,
-    critPct: 0,
   },
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
@@ -78,8 +68,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'rare',
     level: 15,
     moveSpeedPct: 0.75,
-    meleeBlockPct: 0.05,
-    critPct: 0.03,
   },
   shadowjump_toad: {
     key: 'shadowjump_toad',
@@ -87,8 +75,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'rare',
     level: 15,
     moveSpeedPct: 0.75,
-    meleeBlockPct: 0.05,
-    critPct: 0.03,
   },
   stormfeather_griffin: {
     key: 'stormfeather_griffin',
@@ -96,8 +82,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     level: 20,
     moveSpeedPct: 0.8,
-    meleeBlockPct: 0.08,
-    critPct: 0.05,
   },
   thunderstrut_gobbler: {
     key: 'thunderstrut_gobbler',
@@ -105,8 +89,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     level: 20,
     moveSpeedPct: 0.8,
-    meleeBlockPct: 0.08,
-    critPct: 0.05,
   },
 };
 
@@ -142,16 +124,6 @@ export function normalizeMountKey(key: string | undefined | null): MountKey | ''
 export function normalizeSelectedMount(key: string | undefined | null): MountKey {
   const normalized = normalizeMountKey(key);
   return normalized === '' ? DEFAULT_MOUNT : normalized;
-}
-
-/** Additive crit fraction the active mount grants ('' or non-carrier: 0). */
-export function mountCritPct(mountKey: string): number {
-  return mountKey ? (mountDef(mountKey)?.critPct ?? 0) : 0;
-}
-
-/** Fraction of an incoming melee swing the active mount blocks ('' : 0). */
-export function mountMeleeBlockPct(mountKey: string): number {
-  return mountKey ? (mountDef(mountKey)?.meleeBlockPct ?? 0) : 0;
 }
 
 /** Additive move-speed fraction of the active mount ('' : 0). */

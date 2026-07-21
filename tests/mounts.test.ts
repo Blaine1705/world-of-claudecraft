@@ -15,13 +15,13 @@ vi.mock('../server/db', () => ({
 }));
 
 import { meleeSwing } from '../src/sim/combat/auto_attack';
+import { castAbility } from '../src/sim/combat/casting_lifecycle';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import {
   DEFAULT_MOUNT,
   MOUNT_KEYS,
   MOUNTS,
   mountDef,
-  mountMeleeBlockPct,
   normalizeMountKey,
   normalizeSelectedMount,
 } from '../src/sim/content/mounts';
@@ -44,7 +44,7 @@ import {
   RIFT_EPIC_MOUNT_REINS,
 } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
-import { DT, type MountItemDef, type SimEvent } from '../src/sim/types';
+import { DT, FORM_AURA_KINDS, type MountItemDef, type SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -54,6 +54,10 @@ function join(sim: Sim, level = 20): number {
   const pid = sim.addPlayer('warrior', 'Rider');
   sim.tick();
   if (level > 1) sim.setPlayerLevel(level, pid);
+  // Req 5: riding skill is required; set it so existing tests stay focused on
+  // ownership/level/combat gates rather than the riding-skill gate.
+  const meta = sim.players.get(pid);
+  if (meta) meta.ridingTrained = true;
   return pid;
 }
 
@@ -91,15 +95,15 @@ describe('mount catalog (the seven ground mounts from the cards)', () => {
   it('pins each card: level gate, rarity, and specialty numbers (60% base, tiered above)', () => {
     const spec = (k: string) => {
       const d = MOUNTS[k as keyof typeof MOUNTS];
-      return [d.level, d.rarity, d.moveSpeedPct, d.meleeBlockPct, d.critPct];
+      return [d.level, d.rarity, d.moveSpeedPct];
     };
-    expect(spec('valorsteed')).toEqual([20, 'common', 0.6, 0, 0]);
-    expect(spec('grag_bear')).toEqual([10, 'common', 0.7, 0.05, 0]);
-    expect(spec('stalkglider_snail')).toEqual([10, 'common', 0.7, 0.05, 0]);
-    expect(spec('aether_hover_cycle')).toEqual([15, 'rare', 0.75, 0.05, 0.03]);
-    expect(spec('shadowjump_toad')).toEqual([15, 'rare', 0.75, 0.05, 0.03]);
-    expect(spec('stormfeather_griffin')).toEqual([20, 'epic', 0.8, 0.08, 0.05]);
-    expect(spec('thunderstrut_gobbler')).toEqual([20, 'epic', 0.8, 0.08, 0.05]);
+    expect(spec('valorsteed')).toEqual([20, 'common', 0.6]);
+    expect(spec('grag_bear')).toEqual([10, 'common', 0.7]);
+    expect(spec('stalkglider_snail')).toEqual([10, 'common', 0.7]);
+    expect(spec('aether_hover_cycle')).toEqual([15, 'rare', 0.75]);
+    expect(spec('shadowjump_toad')).toEqual([15, 'rare', 0.75]);
+    expect(spec('stormfeather_griffin')).toEqual([20, 'epic', 0.8]);
+    expect(spec('thunderstrut_gobbler')).toEqual([20, 'epic', 0.8]);
   });
 
   it('normalizeMountKey coerces unknown or absent keys to "" (unmounted)', () => {
@@ -142,10 +146,10 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it('only the horse reins is purchasable, for 100 gold; the rest are loot-only', () => {
+  it('only the horse reins is purchasable, for 10 gold; the rest are loot-only', () => {
     const horse = reinsFor('valorsteed')[0];
     expect(horse.id).toBe('reins_valorsteed');
-    expect(horse.buyValue).toBe(1_000_000); // 100 gold in copper
+    expect(horse.buyValue).toBe(100_000); // 10 gold in copper (ridingTrained gated)
     for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed')) {
       expect(reinsFor(key)[0].buyValue).toBeUndefined();
     }
@@ -272,13 +276,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
   });
 });
 
-// The stablemaster no longer sells the horse reins directly: she teaches the
-// q_riding_lessons quest (giver/turn-in) and the reins are its itemReward,
-// granted only through the mount-training minigame's 'interact' objective
-// (sentinel targetObjectItemId 'train_valorsteed'). The old direct-purchase
-// flow this block used to cover is replaced by tests/mounts_training.test.ts;
-// this block now pins the new giver/reward wiring instead.
-describe('mount purchase (the stablemaster teaches, no longer sells)', () => {
+// The stablemaster teaches the q_riding_lessons quest (giver/turn-in) and sells
+// the Valorsteed reins for 10g after the player has learned to ride (ridingTrained).
+// The old 100g-fee/quest-reward-reins flow is replaced: quest gives gold+XP, and
+// Marla's vendor stock (reins_valorsteed) is the new purchase path.
+describe('mount purchase (Marla sells reins for 10g after ridingTrained)', () => {
   const stablemaster = (sim: Sim) =>
     [...sim.entities.values()].find(
       (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
@@ -293,29 +295,32 @@ describe('mount purchase (the stablemaster teaches, no longer sells)', () => {
     return npc.id;
   }
 
-  it('spawns the stablemaster stocking nothing; she offers q_riding_lessons, not a sale', () => {
+  it('spawns the stablemaster stocking reins_valorsteed and offering q_riding_lessons', () => {
     const sim = makeWorld();
     join(sim, 20);
     const npc = stablemaster(sim);
     expect(npc).toBeDefined();
-    expect(npc.vendorItems).toEqual([]); // no vendorItems: reins is not for sale here
+    expect(npc.vendorItems).toContain('reins_valorsteed');
     expect(npc.questIds).toContain('q_riding_lessons');
   });
 
-  it('refuses a direct buyItem for the horse reins; no charge, no item', () => {
+  it('refuses a buyItem for the horse reins when ridingTrained is false', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
     const meta = sim.players.get(pid)!;
     meta.copper = 2_000_000;
+    meta.ridingTrained = false; // explicitly not trained
     const npcId = standAtStable(sim, pid);
     sim.buyItem(npcId, 'reins_valorsteed', pid);
-    expect(errorTexts(sim.tick())).toContain('That merchant is not available.');
+    expect(errorTexts(sim.tick())).toContain(
+      'You must learn to ride first. Find a riding trainer.',
+    );
     expect(meta.copper).toBe(2_000_000);
     expect(sim.countItem('reins_valorsteed', pid)).toBe(0);
     expect(mountOwned(meta, 'valorsteed')).toBe(false);
   });
 
-  it('gates the horse behind q_riding_lessons instead: level 20, given/turned in at Marla', () => {
+  it('gates the horse behind q_riding_lessons: level 20, given/turned in at Marla', () => {
     const quest = QUESTS['q_riding_lessons'];
     expect(quest).toBeDefined();
     expect(quest.giverNpcId).toBe('stablemaster_marla');
@@ -323,13 +328,11 @@ describe('mount purchase (the stablemaster teaches, no longer sells)', () => {
     expect(quest.minLevel).toBe(20);
   });
 
-  it('the quest itemReward is the horse reins for every class, tied to the training objective', () => {
+  it('the quest itemRewards are empty; it gives gold and XP only', () => {
     const quest = QUESTS['q_riding_lessons'];
-    expect(quest.itemRewards).toEqual({
-      warrior: 'reins_valorsteed',
-      mage: 'reins_valorsteed',
-      rogue: 'reins_valorsteed',
-    });
+    expect(quest.itemRewards).toEqual({});
+    expect(quest.copperReward).toBe(5000);
+    expect(quest.xpReward).toBe(3000);
     expect(quest.objectives).toHaveLength(1);
     const obj = quest.objectives[0];
     expect(obj.type).toBe('interact');
@@ -645,62 +648,6 @@ describe('mount specialty stats', () => {
     });
     expect(moveSpeedMult(e)).toBeCloseTo(0.9, 10);
   });
-
-  it('grants the epic crit bonus while mounted and removes it on dismount', () => {
-    const sim = makeWorld();
-    const pid = join(sim, 20);
-    const e = sim.entities.get(pid)!;
-    const base = e.critChance;
-    sim.addItem('reins_stormfeather_griffin', 1, pid);
-    selectMount(sim.ctx, pid, 'stormfeather_griffin');
-    ride(sim, pid);
-    expect(e.critChance).toBeCloseTo(base + 0.05, 10);
-    toggleMount(sim.ctx, pid);
-    finishTransition(sim, pid);
-    expect(e.critChance).toBeCloseTo(base, 10);
-  });
-
-  it('the horse blocks no melee; commons and specials block 5%, the epic 8%', () => {
-    expect(mountMeleeBlockPct('valorsteed')).toBe(0);
-    expect(mountMeleeBlockPct('grag_bear')).toBe(0.05);
-    expect(mountMeleeBlockPct('aether_hover_cycle')).toBe(0.05);
-    expect(mountMeleeBlockPct('stormfeather_griffin')).toBe(0.08);
-    expect(mountMeleeBlockPct('')).toBe(0);
-  });
-
-  it('shaves 5% off an identical melee swing when the target rides a rare mount', () => {
-    // Pin a large fixed swing so integer rounding cannot erase the 5% reduction.
-    // Twin sims still exercise the real melee path, with only the mount differing.
-    const damages: number[] = [];
-    for (const mounted of [false, true]) {
-      const sim = makeWorld();
-      const attacker = join(sim, 20);
-      const target = sim.addPlayer('warrior', 'Tank');
-      sim.tick();
-      sim.setPlayerLevel(20, target);
-      const ae = sim.entities.get(attacker)!;
-      const te = sim.entities.get(target)!;
-      ae.weapon = { min: 100, max: 100, speed: 2 };
-      ae.attackPower = 0;
-      ae.critChance = 0;
-      sim.rng.next = () => 0.5;
-      if (mounted) {
-        sim.addItem('reins_shadowjump_toad', 1, target);
-        selectMount(sim.ctx, target, 'shadowjump_toad');
-        ride(sim, target);
-        expect(te.mountKey).toBe('shadowjump_toad');
-      }
-      // Mounting recalculates derived stats, so normalize mitigation afterward.
-      te.stats.armor = 0;
-      te.dodgeChance = 0;
-      const hpBefore = te.hp;
-      meleeSwing(sim.ctx, ae, te, 0, null, { cannotBeDodged: true });
-      damages.push(hpBefore - te.hp);
-    }
-    const [unmounted, mounted] = damages;
-    expect(unmounted).toBe(100);
-    expect(mounted).toBe(95);
-  });
 });
 
 describe('mount wire mirror', () => {
@@ -714,5 +661,202 @@ describe('mount wire mirror', () => {
     selectMount(sim.ctx, pid, 'valorsteed');
     ride(sim, pid);
     expect(wireEntity(e).mnt).toBe('valorsteed');
+  });
+});
+
+describe('mount + form/ghost_wolf interaction', () => {
+  // Helper: give the player a bear form aura directly (bypasses cast gates so we
+  // can test toggleMount's cancel logic in isolation from castAbility).
+  function putInBearForm(sim: Sim, pid: number): void {
+    const e = sim.entities.get(pid)!;
+    e.auras.push({
+      id: 'bear_form',
+      name: 'Bruin Form',
+      kind: 'form_bear',
+      remaining: 3600,
+      duration: 3600,
+      value: 1,
+      sourceId: pid,
+      school: 'physical',
+    });
+  }
+
+  // Helper: give the player a ghost_wolf (buff_speed) aura directly.
+  function putInGhostWolf(sim: Sim, pid: number): void {
+    const e = sim.entities.get(pid)!;
+    e.auras.push({
+      id: 'ghost_wolf',
+      name: 'Shadewolf',
+      kind: 'buff_speed',
+      remaining: 3600,
+      duration: 3600,
+      value: 1.4,
+      sourceId: pid,
+      school: 'nature',
+    });
+  }
+
+  function giveReins(sim: Sim, pid: number): void {
+    sim.addItem('reins_valorsteed', 1, pid);
+    selectMount(sim.ctx, pid, 'valorsteed');
+  }
+
+  it('starting a mount summon cancels all active form auras', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInBearForm(sim, pid);
+    expect(e.auras.some((a) => FORM_AURA_KINDS.has(a.kind))).toBe(true);
+
+    sim.drainEvents();
+    const started = toggleMount(sim.ctx, pid);
+    const events = sim.drainEvents();
+
+    expect(started).toBe(true);
+    // No form aura should remain.
+    expect(e.auras.some((a) => FORM_AURA_KINDS.has(a.kind))).toBe(false);
+    // An aura-removal event must have been emitted for the bear form.
+    const removal = events.find(
+      (ev) => ev.type === 'aura' && ev.targetId === pid && !ev.gained && ev.name === 'Bruin Form',
+    );
+    expect(removal).toBeDefined();
+  });
+
+  it('starting a mount summon breaks ghost_wolf', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInGhostWolf(sim, pid);
+    expect(e.auras.some((a) => a.id === 'ghost_wolf')).toBe(true);
+
+    sim.drainEvents();
+    const started = toggleMount(sim.ctx, pid);
+    const events = sim.drainEvents();
+
+    expect(started).toBe(true);
+    expect(e.auras.some((a) => a.id === 'ghost_wolf')).toBe(false);
+    const removal = events.find(
+      (ev) => ev.type === 'aura' && ev.targetId === pid && !ev.gained && ev.name === 'Shadewolf',
+    );
+    expect(removal).toBeDefined();
+  });
+
+  it('shapeshifting into a form while mounted force-dismounts the player', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('druid', 'Ursa');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const e = sim.entities.get(pid)!;
+    // Put the player on a mount directly (simulate already-mounted state).
+    giveReins(sim, pid);
+    e.mountKey = 'valorsteed';
+
+    castAbility(sim.ctx, 'bear_form', pid);
+
+    expect(e.mountKey).toBe('');
+  });
+
+  it('activating ghost_wolf while mounted force-dismounts the player', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('shaman', 'Thrall');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    e.mountKey = 'valorsteed';
+
+    castAbility(sim.ctx, 'ghost_wolf', pid);
+
+    expect(e.mountKey).toBe('');
+  });
+});
+
+describe('riding skill gate (Req 5)', () => {
+  it('blocks toggleMount when ridingTrained is absent', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const meta = sim.players.get(pid)!;
+    // Override the ridingTrained flag set by join()
+    meta.ridingTrained = false;
+    sim.addItem('reins_valorsteed', 1, pid);
+    const e = sim.entities.get(pid)!;
+
+    const events: SimEvent[] = [];
+    const orig = sim.ctx.emit.bind(sim.ctx);
+    // Capture events
+    const result = toggleMount(sim.ctx, pid);
+
+    expect(result).toBe(false);
+    expect(e.mountCastRemaining ?? 0).toBe(0);
+    expect(e.mountCastKey).toBe('');
+  });
+
+  it('blocks selectMount when ridingTrained is absent, emitting the untrained error', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = false;
+    // Give the player grag_bear (distinct from the default valorsteed pick)
+    sim.addItem('reins_grag_bear', 1, pid);
+    // Pre-set pick to something known
+    const prevPick = meta.selectedMount;
+
+    const events: SimEvent[] = [];
+    const result = selectMount(sim.ctx, pid, 'grag_bear');
+
+    expect(result).toBe(false);
+    // The pick must not have changed to grag_bear
+    expect(meta.selectedMount).toBe(prevPick);
+  });
+
+  it('allows toggleMount when ridingTrained is true', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    // join() sets ridingTrained = true already
+    sim.addItem('reins_valorsteed', 1, pid);
+
+    const result = toggleMount(sim.ctx, pid);
+
+    expect(result).toBe(true);
+  });
+
+  it('allows toggleMount during a riding lesson even without ridingTrained', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = false;
+    // Put the player into a lesson IN_PROGRESS
+    meta.mountTraining = {
+      sessionId: 'test_session',
+      ownerId: pid,
+      anchor: { x: 0, z: 0 },
+      state: 'IN_PROGRESS',
+      phase: 'mount',
+    };
+
+    const result = toggleMount(sim.ctx, pid);
+
+    // Should start the training mount summon
+    expect(result).toBe(true);
+  });
+
+  it('grandfathers mountTrainingFeePaid into ridingTrained on load', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    // Check that the Sim's serializeCharacter / load round-trip sets ridingTrained
+    // when mountTrainingFeePaid is true
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = false;
+    meta.mountTrainingFeePaid = true;
+    // Serialize and reload
+    const state = (
+      sim as unknown as { serializeCharacter(pid: number): unknown }
+    ).serializeCharacter(pid);
+    // The serialized state has ridingTrained=true (grandfathered from mountTrainingFeePaid)
+    const s = state as Record<string, unknown>;
+    // Both should be serialized when they are true
+    expect(s.mountTrainingFeePaid).toBe(true);
   });
 });

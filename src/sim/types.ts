@@ -671,6 +671,11 @@ interface BaseItemDef {
   // reward tokens can opt into permanent storage. Enforced in social/trade.ts,
   // mail/post_office.ts, market.ts, and items.ts.
   soulbound?: boolean;
+  // Vendor service entry: buying this "item" teaches the riding skill instead of
+  // adding anything to the bags (items.ts buyItem delegates to learnRiding, which
+  // owns every gate: already trained, level, the 80g fee). Only the stablemaster
+  // stocks it.
+  teachesRiding?: boolean;
   /** Shown when interacting with a ground quest object before the quest is active. */
   pickupDeny?: string;
   /** Shown when the quest is active but the collect count is already met. */
@@ -2643,6 +2648,10 @@ export interface QuestDef {
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
   requiresQuest?: string; // prerequisite quest id (must be turned in)
+  // Acceptance requires the purchased riding skill (PlayerMeta.ridingTrained).
+  // Enforced in finalizeQuestAccept so every accept path (npc, linked share,
+  // dev completer) shares the gate.
+  requiresRidingTrained?: boolean;
   requiredItems?: string[]; // quest items obtained earlier (e.g. a prerequisite reward) that this
   // quest needs; re-granted on accept if the player no longer has them, to avoid a progression block
   minLevel?: number;

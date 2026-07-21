@@ -9297,6 +9297,9 @@ export const ru_RU: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Поясная защита призывателя бурь"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Поводья Доблестного скакуна"
       },

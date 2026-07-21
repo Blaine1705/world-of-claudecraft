@@ -9297,6 +9297,9 @@ export const id_ID: EnTranslations = {
       "stormcallers_waistguard": {
         "name": "Pelindung Pinggang Pemanggil Badai"
       },
+      "riding_training": {
+        "name": "Riding Training"
+      },
       "reins_valorsteed": {
         "name": "Tali Kekang Valorsteed"
       },
