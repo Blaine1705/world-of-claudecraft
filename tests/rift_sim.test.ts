@@ -77,6 +77,66 @@ describe('rift sim: dev portal + entry', () => {
     expect(portal?.riftBaseLevel).toBe(12);
   });
 
+  // The rank letter IS the difficulty. It used to set only the badge while the
+  // instance opened at the player's level (rank C at the cap), which silently
+  // downgraded every ranked playtest. The letter now selects the canonical
+  // baseLevel for that rank, and the badge always derives from the final
+  // baseLevel, so the two can never disagree.
+  it('/dev portal rank letter selects the canonical baseLevel for that rank', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    sim.chat('/dev portal 700 S', sim.player.id);
+    const portal = [...sim.entities.values()].find(
+      (e) => e.templateId === 'rift_portal' && e.riftSeed === 700,
+    );
+    expect(portal?.riftBaseLevel).toBe(28);
+    expect(portal?.riftTier).toBe('S');
+  });
+
+  it('/dev portal rank letter overrides a conflicting explicit level', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    sim.chat('/dev portal 701 20 S', sim.player.id);
+    const portal = [...sim.entities.values()].find(
+      (e) => e.templateId === 'rift_portal' && e.riftSeed === 701,
+    );
+    expect(portal?.riftBaseLevel).toBe(28);
+    expect(portal?.riftTier).toBe('S');
+  });
+
+  it('/dev portal with only a level derives a truthful badge, never a random one', () => {
+    const sim = makeSim();
+    sim.chat('/dev portal 702 24', sim.player.id);
+    const portal = [...sim.entities.values()].find(
+      (e) => e.templateId === 'rift_portal' && e.riftSeed === 702,
+    );
+    expect(portal?.riftBaseLevel).toBe(24);
+    expect(portal?.riftTier).toBe('B');
+  });
+
+  it('/dev portal with no args opens at the player level with the matching badge', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    sim.chat('/dev portal', sim.player.id);
+    const portal = [...sim.entities.values()].find((e) => e.templateId === 'rift_portal');
+    expect(portal?.riftBaseLevel).toBe(20);
+    expect(portal?.riftTier).toBe('C');
+  });
+
+  it('walking into a letter-ranked dev portal enters an instance at that difficulty', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    sim.chat('/dev portal 703 A', sim.player.id);
+    const portal = [...sim.entities.values()].find(
+      (e) => e.templateId === 'rift_portal' && e.riftSeed === 703,
+    )!;
+    sim.player.pos = { ...portal.pos };
+    sim.player.prevPos = { ...portal.pos };
+    sim.tick();
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    expect(inst.baseLevel).toBe(25);
+  });
+
   it('walking into the portal enters a generated floor with spawned mobs', () => {
     const sim = makeSim();
     sim.enterRift(SEED, 15, sim.player.id);

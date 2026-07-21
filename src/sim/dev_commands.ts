@@ -7,6 +7,7 @@ import { mountItemId, mountOwned } from './mounts';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
+import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
@@ -397,10 +398,13 @@ export function handleDevChat(
 
   // [dev] Spawn a procedural rift portal in front of the player. Each invocation
   // rolls a fresh seed (so every portal opens a different, infinite dungeon) unless
-  // one is supplied for reproducibility. An optional rank letter forces the tier
-  // (colour + badge); omitted, a random rank is rolled so the portal always shows
-  // a coloured shimmer and its floating letter. A trailing kind token forces the
-  // DUNGEON TYPE: /dev portal [seed] [level] [C|B|A|S] [infernal|random].
+  // one is supplied for reproducibility. An optional rank letter selects the
+  // DIFFICULTY: it maps to that rank's canonical baseLevel (RIFT_RANK_BASE_LEVEL),
+  // overriding an explicit level, so what spawns inside always matches the badge.
+  // Without a letter, the badge derives from the (explicit or player) level via
+  // the same inversion every difficulty consumer uses; the badge can never lie.
+  // A trailing kind token forces the DUNGEON TYPE:
+  // /dev portal [seed] [level] [C|B|A|S] [infernal|random].
   //
   // The kind is not a wire field: it SEARCHES for a seed of the requested kind
   // (isSetPieceSeed is a pure function of the seed), so the descriptor stays
@@ -434,11 +438,11 @@ export function handleDevChat(
         });
       }
     }
-    const baseLevel = Math.max(1, Math.min(60, portalMatch[2] ? Number(portalMatch[2]) : e.level));
-    const TIERS: RiftTier[] = ['C', 'B', 'A', 'S'];
-    const tier: RiftTier = portalMatch[3]
-      ? (portalMatch[3].toUpperCase() as RiftTier)
-      : TIERS[ctx.rng.int(0, 3)];
+    const forcedTier = portalMatch[3] ? (portalMatch[3].toUpperCase() as RiftTier) : null;
+    const baseLevel = forcedTier
+      ? RIFT_RANK_BASE_LEVEL[forcedTier]
+      : Math.max(1, Math.min(60, portalMatch[2] ? Number(portalMatch[2]) : e.level));
+    const tier: RiftTier = forcedTier ?? riftRankForBaseLevel(Math.round(baseLevel));
     const d = 5;
     const px = e.pos.x + Math.sin(e.facing) * d;
     const pz = e.pos.z + Math.cos(e.facing) * d;

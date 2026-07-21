@@ -256,7 +256,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     expect(inst2.tier).toBeNull();
   });
 
-  it('/dev portal keeps its cosmetic rank but pays no Heroic Marks on clear', () => {
+  it('/dev portal run is real S difficulty but unranked: no Heroic Marks on clear', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-07';
@@ -265,6 +265,9 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
       (entity) => entity.templateId === 'rift_portal' && entity.riftSeed === 5,
     )!;
     expect(portal.riftTier).toBe('S');
+    // The rank letter drives the difficulty (canonical S baseLevel), overriding
+    // the conflicting explicit 20.
+    expect(portal.riftBaseLevel).toBe(28);
 
     sim.player.pos = { ...portal.pos };
     sim.player.prevPos = { ...portal.pos };

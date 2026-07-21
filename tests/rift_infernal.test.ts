@@ -704,8 +704,10 @@ describe('infernal citadel: lifecycle', () => {
     const s2 = new Sim({ seed: 99, playerClass: 'warrior', autoEquip: true, devCommands: true });
     const p2 = s2.player.id;
     s2.player.level = 22;
-    // Use baseLevel 20 (C-rank): the citadel is C-only since B now has heroic tuning.
-    s2.chat('/dev portal 5 20 A infernal', p2);
+    // Use baseLevel 20 (C-rank): the citadel is C-only since B now has heroic
+    // tuning. No rank letter: a letter now forces that rank's canonical
+    // baseLevel, and any heroic rank would exclude the set-piece citadel.
+    s2.chat('/dev portal 5 20 infernal', p2);
     const portal = [...s2.entities.values()]
       .filter((e) => e.templateId === 'rift_portal')
       .at(-1) as Entity;
