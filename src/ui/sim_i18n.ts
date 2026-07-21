@@ -7613,6 +7613,90 @@ const RULES: Rule[] = [
     re: /^Rift gem socketed for (.+)\.$/,
     build: (m) => t('sim.rift.forgeSocketed', { name: m[1] }),
   },
+  // Boss lethal death-zone detonation lines (src/sim/mob/locomotion.ts). The sim
+  // emits def.detonateText verbatim at zone expiry; match each exact string here and
+  // re-render via its sim.rift.detonate* catalog key. One rule per mechanic so each
+  // can be translated distinctly (a frost grave != an arcane rift).
+  {
+    re: /^Glacial Grave detonates!$/,
+    build: () => t('sim.rift.detonateGlacialGrave'),
+  },
+  {
+    re: /^Absolute Zero erupts!$/,
+    build: () => t('sim.rift.detonateAbsoluteZero'),
+  },
+  {
+    re: /^Magma Well erupts!$/,
+    build: () => t('sim.rift.detonateMagmaWell'),
+  },
+  {
+    re: /^Core Meltdown detonates!$/,
+    build: () => t('sim.rift.detonateCoreMeltdown'),
+  },
+  {
+    re: /^Venom Pool erupts!$/,
+    build: () => t('sim.rift.detonateVenomPool'),
+  },
+  {
+    re: /^Broodmother's Mark detonates!$/,
+    build: () => t('sim.rift.detonateBroodmothersMark'),
+  },
+  {
+    re: /^Soul Grave detonates!$/,
+    build: () => t('sim.rift.detonateSoulGrave'),
+  },
+  {
+    re: /^Death Sentence falls!$/,
+    build: () => t('sim.rift.detonateDeathSentence'),
+  },
+  {
+    re: /^Earthshatter detonates!$/,
+    build: () => t('sim.rift.detonateEarthshatter'),
+  },
+  {
+    re: /^Final Judgment lands!$/,
+    build: () => t('sim.rift.detonateFinalJudgment'),
+  },
+  {
+    re: /^Void Rift detonates!$/,
+    build: () => t('sim.rift.detonateVoidRift'),
+  },
+  {
+    re: /^Arcane Annihilation erupts!$/,
+    build: () => t('sim.rift.detonateArcaneAnnihilation'),
+  },
+  {
+    re: /^Lightning Rod strikes!$/,
+    build: () => t('sim.rift.detonateLightningRod'),
+  },
+  {
+    re: /^Stormcaller's Wrath erupts!$/,
+    build: () => t('sim.rift.detonateStormcallersWrath'),
+  },
+  {
+    re: /^Abyssal Maw closes!$/,
+    build: () => t('sim.rift.detonateAbyssalMaw'),
+  },
+  {
+    re: /^Crushing Depth crushes!$/,
+    build: () => t('sim.rift.detonateCrushingDepth'),
+  },
+  {
+    re: /^Pact Seal detonates!$/,
+    build: () => t('sim.rift.detonatePactSeal'),
+  },
+  {
+    re: /^Blood Rite falls!$/,
+    build: () => t('sim.rift.detonateBloodRite'),
+  },
+  {
+    re: /^Pit Sentence detonates!$/,
+    build: () => t('sim.rift.detonatePitSentence'),
+  },
+  {
+    re: /^Hellfire Brand detonates!$/,
+    build: () => t('sim.rift.detonateHellfireBrand'),
+  },
   { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
   { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },
   { re: /^Leave the arena first\.$/, build: () => t('sim.delve.leaveArenaFirst') },

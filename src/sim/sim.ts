@@ -454,6 +454,7 @@ import {
   riftInstanceAtPos,
   riftOpenTreasure as riftOpenTreasureImpl,
   riftPlayerLift as riftPlayerLiftImpl,
+  tickRiftBossDeathZones as tickRiftBossDeathZonesImpl,
   tickRiftLockpicks as tickRiftLockpicksImpl,
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
@@ -2048,6 +2049,7 @@ export class Sim {
         portalId: null,
         rewarded: false,
         seqResetAt: -Infinity,
+        bossDeathZones: [],
       });
     }
 
@@ -4748,6 +4750,7 @@ export class Sim {
     advanceRiftRollersImpl(this.ctx); // 20 Hz: smooth rolling-boulder motion
     liftRiftEntitiesImpl(this.ctx); // stand rift mobs/objects on the raised tier
     tickRiftLockpicksImpl(this.ctx); // per-tick rift-cache lockpick step clock
+    tickRiftBossDeathZonesImpl(this.ctx); // lethal boss zone fuses + detonation
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
@@ -9589,6 +9592,14 @@ export class Sim {
       themeName: floor.themeName,
       tier: inst.tier,
     };
+  }
+
+  riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
+    const p = this.entities.get(this.primaryId);
+    if (!p) return [];
+    const inst = riftInstanceAtPos(this.ctx, p.pos);
+    if (!inst || inst.partyKey === null) return [];
+    return inst.bossDeathZones;
   }
 
   get delveRun(): DelveRunInfo | null {

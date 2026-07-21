@@ -1259,6 +1259,7 @@ export class Renderer {
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
+  private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = { theme: 'frost', value: 0 };
   private glacialFrontVisual!: GlacialFrontVisual;
@@ -1896,6 +1897,11 @@ export class Renderer {
     this.ringOfFrostVisuals = new RingOfFrostVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
+    void import('./rift_death_zone').then(({ RiftDeathZoneVisuals }) => {
+      this.riftDeathZoneVisuals = new RiftDeathZoneVisuals(this.scene, (x, z) =>
+        groundHeight(x, z, this.sim.cfg.seed),
+      );
+    });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -3037,6 +3043,10 @@ export class Renderer {
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
+    if (this.riftDeathZoneVisuals) {
+      this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
+      this.riftDeathZoneVisuals.update(dt);
+    }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
@@ -6988,6 +6998,10 @@ export class Renderer {
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
+    if (this.riftDeathZoneVisuals) {
+      this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
+      this.riftDeathZoneVisuals.update(dt);
+    }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));

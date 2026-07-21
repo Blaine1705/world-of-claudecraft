@@ -313,6 +313,7 @@ export const IWORLD_MEMBERS = [
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
+  { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
@@ -478,9 +479,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, and Phase 8's mobile-station pair (placeMobileStation +
     // activeMobileStationCraft).
-    expect(IWORLD_MEMBERS.length).toBe(268);
+    expect(IWORLD_MEMBERS.length).toBe(269);
     expect(DATA_MEMBERS.length).toBe(71);
-    expect(METHOD_MEMBERS.length).toBe(197);
+    expect(METHOD_MEMBERS.length).toBe(198);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -699,6 +700,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
+      'riftBossDeathZones',
       'riftCollisionToken',
       'riftFloor',
       'salvageItem',
@@ -988,6 +990,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
+      'riftBossDeathZones',
       'salvageItem',
       'saveLoadout',
       'searchCharacters',
@@ -1380,6 +1383,7 @@ const FACET_DUNGEONS = [
   'raidLockouts',
   'riftCollisionToken',
   'riftFloor',
+  'riftBossDeathZones',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'buyHeroicVendorItem',
@@ -1562,8 +1566,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(268);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(268);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(269);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(269);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
