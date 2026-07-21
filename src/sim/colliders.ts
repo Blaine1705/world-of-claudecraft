@@ -27,6 +27,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import { ORKADIA_FIELD_COLLIDER_SPECS, ORKADIA_FIELD_WALLS } from './orkadia_field';
 import type { BuildingDef, WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import {
@@ -329,15 +330,29 @@ const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
 
+// Orkadia is an OPEN FIELD, not a room kit: a perimeter enclosure (plain obbs
+// that pull the chase cam in like interior walls, so players cannot leave the
+// war-camp) plus one circle per placed prop, camGhost + cameraTopY following
+// the world-prop contract. Both halves derive from the SAME placement table
+// the renderer builds the field from (src/sim/orkadia_field.ts), so what you
+// see is what you collide with. The skull dais stays walkable (no collider),
+// matching the room-kit boss-dais contract.
+const ORKADIA_COLLIDERS: Collider[] = [
+  ...ORKADIA_FIELD_WALLS.map(
+    (w): Collider => ({ type: 'obb', x: w.x, z: w.z, hw: w.hw, hd: w.hd, rot: 0 }),
+  ),
+  ...ORKADIA_FIELD_COLLIDER_SPECS.map(
+    (s): Collider => ({ type: 'circle', x: s.x, z: s.z, r: s.r, cameraTopY: s.h, camGhost: true }),
+  ),
+];
+
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   crypt: CRYPT_COLLIDERS,
   sanctum: SANCTUM_COLLIDERS,
   temple: TEMPLE_COLLIDERS,
   nythraxis: NYTHRAXIS_COLLIDERS,
-  // Orkadia reuses the Sanctum room footprint (same colliders), re-themed
-  // green/black in the renderer; see src/render/dungeon.ts `orkadia` variant.
-  orkadia: SANCTUM_COLLIDERS,
+  orkadia: ORKADIA_COLLIDERS,
 };
 
 // ---------------------------------------------------------------------------

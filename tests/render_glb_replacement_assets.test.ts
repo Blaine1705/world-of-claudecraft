@@ -14,6 +14,7 @@ import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
+import { orkadiaPropsPreloadInternalsForTest } from '../src/render/orkadia_props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
@@ -86,6 +87,12 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('crafting station prop assets (Professions 2.0 Phase 9)', () => {
     for (const url of Object.values(stationsPreloadInternalsForTest.assetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('Orkadia war-camp prop assets', () => {
+    for (const url of Object.values(orkadiaPropsPreloadInternalsForTest.assetUrl)) {
       expectAssetExistsAndManifested(url);
     }
   });
