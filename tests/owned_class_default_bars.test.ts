@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_GAMEPAD_BINDINGS } from '../src/game/gamepad_map';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
-import { DEFAULT_GAMEPAD_BINDINGS } from '../src/game/gamepad_map';
 import type { PlayerClass } from '../src/sim/types';
 import {
   ACTION_BAR_ABILITY_SLOTS,

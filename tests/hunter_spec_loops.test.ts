@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
+import { hunterPetFerocityDamageMultiplier } from '../src/sim/combat/hunter_shared';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { hunterPetFerocityDamageMultiplier } from '../src/sim/combat/hunter_shared';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 
