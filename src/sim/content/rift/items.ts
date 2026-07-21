@@ -47,10 +47,12 @@ const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
 const AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
 
-// Combat-rating allowance for the ilvl-31 clear-time epics: one rating per piece,
-// matching the ilvl-31 heroic five-man tier (ARMOR_RATING = 40 in heroic_loot.ts).
+// Combat-rating allowance for the ilvl-31 clear-time epics: one rating per piece.
+// Armor pieces follow the heroic ilvl-31 floor (ARMOR_RATING = 40 in heroic_loot.ts).
+// Jewelry (ring) follows the jewelry precedent (JEWELRY_RATING = 25 in heroic_vendor.ts).
 // Off the primary-stat budget like spellPower, so stat sums stay budget-enforced.
-const RIFT_ARMOR_RATING = 40; // 40 rating = 4.0%, mirrors the heroic ilvl-31 floor
+const RIFT_ARMOR_RATING = 40; // 40 rating = 4.0%, mirrors the heroic ilvl-31 armor floor
+const RIFT_JEWELRY_RATING = 25; // 25 rating, matches heroic quartermaster jewelry precedent
 
 /** Static shells. The non-fungible payload carries each drop's source, power,
  * upgrades, enchantment, sockets, gems, and rolled bonus stats. */
@@ -260,12 +262,13 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
   },
   // ---- Clear-time epics (B+ final-boss kills only; see addRiftClearGearLoot) ----
   // Stat lines sit in the ilvl-31 band (source level 25 + epic bonus 6), registered
-  // in item_level.buildSourceIndex. Each piece carries one combat rating at
-  // RIFT_ARMOR_RATING = 40 (matching the heroic ilvl-31 five-man floor), off the
-  // primary-stat budget like spellPower so stat sums stay budget-enforced. Ratings
-  // follow the heroic precedent: str/tank pieces favor hit, agi pieces favor crit,
-  // int/spi pieces favor haste; the neutral ring takes hit as the broadly useful pick.
-  // See heroic_loot.ts for the ilvl-31 template these mirror.
+  // in item_level.buildSourceIndex. Armor pieces carry RIFT_ARMOR_RATING = 40
+  // (matching the heroic ilvl-31 five-man floor). The ring follows the jewelry
+  // precedent (RIFT_JEWELRY_RATING = 25, matching heroic quartermaster rings).
+  // All ratings are off the primary-stat budget like spellPower so stat sums stay
+  // budget-enforced. Rating choices follow the stat identity: str/tank -> hit,
+  // agi -> crit, int/spi (healer-facing) -> haste (healers are not level-resisted).
+  // See heroic_loot.ts for the ilvl-31 armor template these mirror.
   emberforged_bulwark: {
     id: 'emberforged_bulwark',
     name: 'Emberforged Bulwark',
@@ -315,9 +318,12 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'epic',
     requiredLevel: 20,
-    // ilvl-31 ring epic budget = 13; sta:8+spi:5 = 13 (was 12, now corrected to budget)
+    // ilvl-31 ring epic budget = 13; sta:8+spi:5 = 13.
+    // Rating follows the jewelry precedent (25, not the 40 armor-piece floor).
+    // Haste suits the sta/spi (healer-facing) stat identity; healers are not
+    // resisted by level so Hit would be wasted.
     stats: { sta: 8, spi: 5 },
-    hitRating: RIFT_ARMOR_RATING,
+    hasteRating: RIFT_JEWELRY_RATING,
     sellValue: 12000,
   },
   // The one legendary chase item: an S-rank clear rolls a slim chance at it.
