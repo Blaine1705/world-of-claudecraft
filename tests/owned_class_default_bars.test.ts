@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers } from '../src/sim/content/talents';
+import type { PlayerClass } from '../src/sim/types';
+import { buildDefaultFormBar, type HotbarAction } from '../src/ui/hud/action_bar/hotbar';
 import {
   ownedClassSpecDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
 } from '../src/ui/hud/action_bar/owned_class_spec_defaults';
-import { buildDefaultFormBar, type HotbarAction } from '../src/ui/hud/action_bar/hotbar';
 
 const EXPECTED = {
   'hunter/beast_mastery': [
@@ -157,11 +160,14 @@ describe('owned class level 20 default action bars', () => {
   it('pins the manual-first templates for all nine specs', () => {
     for (const [key, expected] of Object.entries(EXPECTED)) {
       const [playerClass, spec] = key.split('/');
+      const cls = playerClass as PlayerClass;
+      const modifiers = computeTalentModifiers(cls, { spec, rows: {} }, 20);
+      const known = new Set(abilitiesKnownAt(cls, 20, modifiers).map(({ def }) => def.id));
+      expect(ownedClassSpecDefaultAbilityIds(playerClass, spec, 20, known), key).toEqual(expected);
       expect(
-        ownedClassSpecDefaultAbilityIds(playerClass, spec, 20, new Set(expected)),
+        expected.some((id) => id.includes('one_button')),
         key,
-      ).toEqual(expected);
-      expect(expected.some((id) => id.includes('one_button')), key).toBe(false);
+      ).toBe(false);
     }
   });
 

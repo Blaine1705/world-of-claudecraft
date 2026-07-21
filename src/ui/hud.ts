@@ -1423,6 +1423,8 @@ export class Hud {
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
       playerName: this.sim.player.name,
+      playerLevel: () => this.sim.player.level,
+      talentSpec: () => this.sim.talentSpec,
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
       isInSportMatch: () => {
