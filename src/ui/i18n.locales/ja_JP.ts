@@ -5464,6 +5464,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
   'guide.dungeonsPage.orkadiaBody':
     'ドレイクランドの黒い火山岩に構えた残虐なオークの戦営。毒々しい緑の戦火が照らす開けた野原だ。血牙の兵卒と鉄皮の略奪者を斬り伏せ、髑髏の壇上に鎮座する軍団長グロモク・スカルクリーヴァーへと至れ。',
+  'guide.dungeonsPage.wildheartBody':
+    '温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドでズルガーに挑め。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
   'guide.dungeonsPage.raidBody':
     '封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。',
@@ -8972,5 +8974,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_healing_draught.name': 'サンペタルの治癒薬',
   'entities.items.sunpetal_mana_draught.name': 'サンペタルのマナ薬',
   'entities.items.elixir_of_the_serpent.name': '蛇のエリクサー',
+  'entities.mobs.wildheart_stalker.name': '蔦爪の追跡者',
+  'entities.mobs.wildheart_ravager.name': '血鬣の略奪者',
+  'entities.mobs.wildheart_hexcaller.name': '陽骨の呪術師',
+  'entities.mobs.wildheart_beastmaster.name': '牙王の獣使い',
+  'entities.mobs.wildheart_high_priest.name': '盆地の声ズルガー',
+  'entities.dungeons.wildheart_basin.name': 'ワイルドハート盆地',
+  'entities.dungeons.wildheart_basin.enterText':
+    '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
+  'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
+  'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
+  'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
+  'entities.items.wildheart_fangknife.name': 'ズルガーの牙小刀',
   'hudChrome.professions.skillValue': '{skill} / {max}',
 };

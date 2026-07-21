@@ -183,6 +183,7 @@ import {
 } from './content/temple';
 import { VALE_CUP_BALL_MOB, VALE_CUP_BALL_TEMPLATE_ID } from './content/vale_cup';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
+import { WILDHEART_DUNGEON_DEFS, WILDHEART_ITEMS, WILDHEART_MOBS } from './content/wildheart';
 import {
   WILLOWFEN_CAMPS,
   WILLOWFEN_ITEMS,
@@ -329,6 +330,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   EVERGARDEN_ITEMS,
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
+  WILDHEART_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -349,6 +351,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
   ...ORKADIA_MOBS,
+  ...WILDHEART_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,
@@ -796,8 +799,18 @@ export const DUNGEON_X_THRESHOLD = INSTANCE_X_BASE + 600; // x beyond this = ins
 export const DUNGEON_FLOOR_Y = 0;
 
 export function instanceOrigin(dungeonIndex: number, slot: number): { x: number; z: number } {
-  return { x: INSTANCE_X_BASE + 900 + dungeonIndex * 600, z: -1250 + slot * 500 };
+  // The original contiguous dungeon band is full at index 6 because the delve
+  // band begins immediately after it. New dungeons use an overflow band east
+  // of the bounded Yumi instances, preserving every shipped instance origin.
+  const x =
+    dungeonIndex >= DUNGEON_OVERFLOW_INDEX
+      ? DUNGEON_OVERFLOW_X_BASE + (dungeonIndex - DUNGEON_OVERFLOW_INDEX) * 600
+      : INSTANCE_X_BASE + 900 + dungeonIndex * 600;
+  return { x, z: -1250 + slot * 500 };
 }
+
+export const DUNGEON_OVERFLOW_INDEX = 7;
+export const DUNGEON_OVERFLOW_X_BASE = INSTANCE_X_BASE + 15_000;
 
 // Inverse of instanceOrigin's z term, clamped to a live slot: which slot band a
 // far-east z falls in. Consumers that need instance-local coords (collision,
@@ -810,6 +823,7 @@ export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
   ...ORKADIA_DUNGEON_DEFS,
+  ...WILDHEART_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
@@ -827,6 +841,12 @@ export function dungeonByIndex(index: number): DungeonDef | null {
 // dungeon instead of being swallowed by the old `x >= ARENA_X_MIN` cutoff, which
 // left its interior unbuilt and its colliders unresolved (a pitch-black room).
 export function dungeonAt(x: number): DungeonDef | null {
+  if (x >= DUNGEON_OVERFLOW_X_BASE - 300) {
+    const index = DUNGEON_OVERFLOW_INDEX + Math.round((x - DUNGEON_OVERFLOW_X_BASE) / 600);
+    const dungeon = dungeonByIndex(index);
+    if (dungeon && Math.abs(x - instanceOrigin(index, 0).x) < 300) return dungeon;
+    return null;
+  }
   if (x <= DUNGEON_X_THRESHOLD || x >= DELVE_BAND_X_MIN || isArenaPos(x)) return null;
   return dungeonByIndex(Math.round((x - (INSTANCE_X_BASE + 900)) / 600));
 }

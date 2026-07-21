@@ -2,7 +2,7 @@
 // mailbox/delve-prop models: every preload URL declared by the render modules
 // must point at a real file under public/models, and every referenced GLB
 // must have been picked up by the media manifest.
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { artisanRowPreloadInternalsForTest } from '../src/render/artisan_row_props';
@@ -17,6 +17,7 @@ import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
 import { orkadiaPropsPreloadInternalsForTest } from '../src/render/orkadia_props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
+import { wildheartPropsPreloadInternalsForTest } from '../src/render/wildheart_props';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 
 const publicDir = path.join(__dirname, '..', 'public');
@@ -28,6 +29,17 @@ function expectAssetExistsAndManifested(url: string): void {
     MEDIA_ASSETS[rel],
     `${url} should be present in the generated media manifest`,
   ).toBeDefined();
+}
+
+function readGlbJson(url: string): { extensionsUsed?: string[] } {
+  const bytes = readFileSync(path.join(publicDir, url.replace(/^\//, '')));
+  const jsonLength = bytes.readUInt32LE(12);
+  return JSON.parse(
+    bytes
+      .subarray(20, 20 + jsonLength)
+      .toString('utf8')
+      .trim(),
+  );
 }
 
 describe('GLB-replacement asset preload sets resolve to real, manifested files', () => {
@@ -71,6 +83,7 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('dungeon door arch asset', () => {
     expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.doorArchAssetUrl);
+    expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.wildheartGateAssetUrl);
   });
 
   it('quest object assets', () => {
@@ -94,6 +107,19 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
   it('Orkadia war-camp prop assets', () => {
     for (const url of Object.values(orkadiaPropsPreloadInternalsForTest.assetUrl)) {
       expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('Wildheart Basin jungle prop assets', () => {
+    for (const url of Object.values(wildheartPropsPreloadInternalsForTest.assetUrl)) {
+      expectAssetExistsAndManifested(url);
+      const file = path.join(publicDir, url.replace(/^\//, ''));
+      const size = statSync(file).size;
+      expect(size, `${url} should meet the static-prop size floor`).toBeGreaterThanOrEqual(40_000);
+      expect(size, `${url} should meet the static-prop size ceiling`).toBeLessThanOrEqual(100_000);
+      expect(readGlbJson(url).extensionsUsed, `${url} should use Meshopt`).toContain(
+        'EXT_meshopt_compression',
+      );
     }
   });
 });

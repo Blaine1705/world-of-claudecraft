@@ -435,6 +435,10 @@ const ORKADIA_SUN_INTENSITY = 1.35;
 const ORKADIA_HEMI_INTENSITY = 0.55;
 const ORKADIA_ENV_INTENSITY = 0.24;
 const ORKADIA_RIM_BOOST = 1.75;
+const WILDHEART_SUN_INTENSITY = 1.55;
+const WILDHEART_HEMI_INTENSITY = 0.68;
+const WILDHEART_ENV_INTENSITY = 0.32;
+const WILDHEART_RIM_BOOST = 1.5;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
 const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
@@ -3086,7 +3090,10 @@ export class Renderer {
     }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     // The dome rides the camera, so it also serves Orkadia's open-air field.
-    this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'orkadiaField';
+    this.sky.visible =
+      this.fogState === 'outdoor' ||
+      this.fogState === 'orkadiaField' ||
+      this.fogState === 'wildheartField';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
@@ -5317,7 +5324,8 @@ export class Renderer {
     | 'underwater'
     | 'rift'
     | 'practice'
-    | 'orkadiaField' = 'outdoor';
+    | 'orkadiaField'
+    | 'wildheartField' = 'outdoor';
 
   /** Drop a retired interior's scene nodes and prune its lights/flames out of
    * the per-frame registries. See riftInteriorGroups for why nothing here
@@ -5650,6 +5658,7 @@ export class Renderer {
     // Orkadia is an OPEN-AIR war-camp, not a closed room: it keeps the sky dome
     // and the daylight rig and only swaps in its own ashen field haze.
     const inOrkadiaField = interior === 'orkadia';
+    const inWildheartField = interior === 'wildheart';
     const desired = inPractice
       ? 'practice'
       : inDelve
@@ -5662,11 +5671,13 @@ export class Renderer {
               ? 'nythraxis'
               : inOrkadiaField
                 ? 'orkadiaField'
-                : inside
-                  ? 'dungeon'
-                  : camY < waterLevelAt(px, pz) - 0.05
-                    ? 'underwater'
-                    : 'outdoor';
+                : inWildheartField
+                  ? 'wildheartField'
+                  : inside
+                    ? 'dungeon'
+                    : camY < waterLevelAt(px, pz) - 0.05
+                      ? 'underwater'
+                      : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -5721,6 +5732,12 @@ export class Renderer {
         fog.color.setHex(0x303831);
         fog.near = 90;
         fog.far = 350;
+      } else if (desired === 'wildheartField') {
+        // Sunlit humid depth keeps the full caldera readable while the rear
+        // shrine and limestone shell settle into a warm green atmospheric veil.
+        fog.color.setHex(0x8ca786);
+        fog.near = 105;
+        fog.far = 430;
       } else if (desired === 'delve') {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the
@@ -5758,6 +5775,7 @@ export class Renderer {
       if (!this.lowGfx) {
         const mazeNight = desired === 'yumiMaze';
         const orkadiaStorm = desired === 'orkadiaField';
+        const wildheartSun = desired === 'wildheartField';
         const underground =
           desired === 'dungeon' ||
           desired === 'temple' ||
@@ -5770,34 +5788,46 @@ export class Renderer {
           ? YUMI_MAZE_SUN_INTENSITY
           : orkadiaStorm
             ? ORKADIA_SUN_INTENSITY
-            : underground
-              ? DUNGEON_SUN_INTENSITY
-              : SUN_INTENSITY * this.dnGrade.lightScale;
+            : wildheartSun
+              ? WILDHEART_SUN_INTENSITY
+              : underground
+                ? DUNGEON_SUN_INTENSITY
+                : SUN_INTENSITY * this.dnGrade.lightScale;
         this.hemi.intensity = mazeNight
           ? YUMI_MAZE_HEMI_INTENSITY
           : orkadiaStorm
             ? ORKADIA_HEMI_INTENSITY
-            : underground
-              ? DUNGEON_HEMI_INTENSITY
-              : HEMI_INTENSITY * this.dnGrade.lightScale;
+            : wildheartSun
+              ? WILDHEART_HEMI_INTENSITY
+              : underground
+                ? DUNGEON_HEMI_INTENSITY
+                : HEMI_INTENSITY * this.dnGrade.lightScale;
         this.scene.environmentIntensity = mazeNight
           ? YUMI_MAZE_ENV_INTENSITY
           : orkadiaStorm
             ? ORKADIA_ENV_INTENSITY
-            : underground
-              ? DUNGEON_ENV_INTENSITY
-              : this.envOutdoorIntensity * this.dnGrade.lightScale;
+            : wildheartSun
+              ? WILDHEART_ENV_INTENSITY
+              : underground
+                ? DUNGEON_ENV_INTENSITY
+                : this.envOutdoorIntensity * this.dnGrade.lightScale;
         sharedUniforms.uRimBoost.value = mazeNight
           ? YUMI_MAZE_RIM_BOOST
           : orkadiaStorm
             ? ORKADIA_RIM_BOOST
-            : underground
-              ? DUNGEON_RIM_BOOST
-              : 1;
+            : wildheartSun
+              ? WILDHEART_RIM_BOOST
+              : underground
+                ? DUNGEON_RIM_BOOST
+                : 1;
         if (orkadiaStorm) {
           this.sun.color.setHex(0xa9b8a8);
           this.hemi.color.setHex(0x899b9a);
           this.hemi.groundColor.setHex(0x25281f);
+        } else if (wildheartSun) {
+          this.sun.color.setHex(0xffd48c);
+          this.hemi.color.setHex(0xd8ebca);
+          this.hemi.groundColor.setHex(0x5b4a2d);
         }
       }
       return;
@@ -5909,6 +5939,9 @@ export class Renderer {
   // Aim the sun and moon disc sprites along their directions and fade them by how
   // far each body sits above the horizon (out when below, and only outdoors).
   private updateCelestialSprites(): void {
+    // The basin keeps directional daylight and the sky dome, but the camera-
+    // riding sun and moon sprites can clip against its high rim as oversized
+    // wedges. Reserve screen-space celestial overlays for the overworld.
     const outdoor = this.fogState === 'outdoor';
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
@@ -7156,7 +7189,10 @@ export class Renderer {
     // sky dome + sun disc ride along with the camera
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     // The dome rides the camera, so it also serves Orkadia's open-air field.
-    this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'orkadiaField';
+    this.sky.visible =
+      this.fogState === 'outdoor' ||
+      this.fogState === 'orkadiaField' ||
+      this.fogState === 'wildheartField';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
@@ -7376,6 +7412,9 @@ export class Renderer {
   // light shafts fade in as the camera turns toward the sun, outdoor only
   private updateGodRays(): void {
     if (this.godRays.length === 0) return;
+    // Wildheart is open-air, but the long screen-space shafts read as giant
+    // triangles against its enclosed caldera rim. The basin keeps the sun,
+    // sky, and outdoor grade while reserving these shafts for the overworld.
     const outdoor = this.fogState === 'outdoor';
     // azimuth-only alignment — the chase cam always pitches down while the
     // sun sits high, so a full 3D dot product would never light the shafts

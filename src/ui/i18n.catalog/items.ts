@@ -2173,6 +2173,9 @@ const ITEM_ENTITY_IDS = [
   'sunpetal_healing_draught',
   'sunpetal_mana_draught',
   'elixir_of_the_serpent',
+  'wildheart_tuskblade',
+  'wildheart_hexwood_staff',
+  'wildheart_fangknife',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2204,6 +2207,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   voidweave_mantle: 'Voidweave Mantle',
   abysswrought_band: 'Abysswrought Band',
   heart_of_the_rift: 'Heart of the Rift',
+  wildheart_tuskblade: 'Wildheart Tuskblade',
+  wildheart_hexwood_staff: 'Hexwood Staff of the Basin',
+  wildheart_fangknife: 'Fangknife of Zulgar',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

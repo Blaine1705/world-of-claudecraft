@@ -42,6 +42,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   bonewrought_greatsword: 'sword',
   direfang_greatblade: 'sword',
   hoarfrost_edge: 'sword',
+  wildheart_tuskblade: 'sword',
   // Daggers
   rusty_dagger: 'dagger',
   whetted_iron_dirk: 'dagger',
@@ -70,6 +71,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   mistcallers_fang: 'dagger',
   first_blood_razor: 'dagger',
   duskfang_dirk: 'dagger',
+  wildheart_fangknife: 'dagger',
   // Maces
   training_mace: 'mace',
   copper_flanged_mace: 'mace',
@@ -117,6 +119,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   lunar_tide_greatstaff: 'staff',
   emberglass_warstaff: 'staff',
   gleamwood_stave: 'staff',
+  wildheart_hexwood_staff: 'staff',
   // Wands
   drowned_tide_scepter: 'wand',
   palecoil_rod: 'wand',

@@ -208,6 +208,11 @@ const MOB_IDS = [
   'orkadia_siege_brute',
   'orkadia_banner_captain',
   'orkadia_warlord',
+  'wildheart_stalker',
+  'wildheart_ravager',
+  'wildheart_hexcaller',
+  'wildheart_beastmaster',
+  'wildheart_high_priest',
 ] as const;
 
 const NPC_IDS = [
@@ -387,6 +392,7 @@ const DUNGEON_IDS = [
   'nythraxis_crypt',
   'nythraxis_boss_arena',
   'orkadia',
+  'wildheart_basin',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

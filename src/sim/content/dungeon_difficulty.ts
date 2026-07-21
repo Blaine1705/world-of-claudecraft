@@ -27,7 +27,7 @@ export interface HeroicDungeonTuning {
 }
 
 // Tuning model: every heroic mob is pinned to LEVEL 22 (two above the level-20
-// player cap) and the four five-mans are damage-EQUALIZED, so a heroic feels
+// player cap) and the six five-mans are damage-EQUALIZED, so a heroic feels
 // the same whichever one you run. The calibration target is an average elite
 // TRASH swing landing ~225 post-mitigation on the reference GEARED shaman
 // (full heroic mail: 2142 armor, 1493 hp, 48.55% DR vs a level-22 attacker),
@@ -108,6 +108,19 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     addDamageMultiplier: 2.0,
     armorMultiplier: 1.2,
     finalBossId: 'orkadia_warlord',
+    marksPerParticipant: 1,
+  },
+  // Palmreach's open-field five-man. The broad route and two rare elites use
+  // the same level-22 Heroic pin as the other endgame leveling dungeons.
+  wildheart_basin: {
+    id: 'wildheart_basin',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 2,
+    damageMultiplier: 4.05,
+    addDamageMultiplier: 2,
+    armorMultiplier: 1.2,
+    finalBossId: 'wildheart_high_priest',
     marksPerParticipant: 1,
   },
   // The 10-player raid arena. Normal Nythraxis already swings ~3.7x harder

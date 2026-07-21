@@ -26,6 +26,7 @@ import { orkadiaFieldHeight } from './orkadia_field';
 import { fbm2, hash2, noise2 } from './rng';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
+import { wildheartFieldHeight } from './wildheart_field';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
 // and the renderer (mesh) sample the same heightfield, so they always agree.
@@ -2671,6 +2672,10 @@ export function groundHeight(x: number, z: number, seed: number): number {
     if (dungeon?.interior === 'orkadia') {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
       return DUNGEON_FLOOR_Y + orkadiaFieldHeight(x - origin.x, z - origin.z);
+    }
+    if (dungeon?.interior === 'wildheart') {
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + wildheartFieldHeight(x - origin.x, z - origin.z);
     }
     return DUNGEON_FLOOR_Y;
   }

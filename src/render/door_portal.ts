@@ -11,7 +11,9 @@ import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 // swirl disc stays procedural (an animated additive VFX, not part of the
 // static stone body).
 const DOOR_ARCH_ASSET_URL = '/models/props/dungeon_door_arch.glb';
+const WILDHEART_GATE_ASSET_URL = '/models/props/wildheart_jaguar_gate.glb';
 let loadedDoorArchGltf: THREE.Group | null = null;
+let loadedWildheartGateGltf: THREE.Group | null = null;
 
 if (typeof window !== 'undefined') {
   registerPreload(
@@ -31,11 +33,23 @@ if (typeof window !== 'undefined') {
       loadedDoorArchGltf = scene;
     }),
   );
+  registerPreload(
+    loadGltf(WILDHEART_GATE_ASSET_URL).then((gltf) => {
+      gltf.scene.traverse((child) => {
+        if (!(child instanceof THREE.Mesh)) return;
+        markSharedGeometry(child.geometry);
+        const materials = Array.isArray(child.material) ? child.material : [child.material];
+        for (const material of materials) markSharedMaterial(material);
+      });
+      loadedWildheartGateGltf = gltf.scene;
+    }),
+  );
 }
 
 /** Test-only window into the preload asset set (mirrors gather_nodes.ts). */
 export const doorPortalPreloadInternalsForTest = {
   doorArchAssetUrl: DOOR_ARCH_ASSET_URL,
+  wildheartGateAssetUrl: WILDHEART_GATE_ASSET_URL,
 };
 
 // The dungeon door / exit-portal visual system, lifted out of renderer.ts so the
@@ -176,6 +190,26 @@ function orkadiaDoorPortalMaterial(lowGfx: boolean): THREE.MeshBasicMaterial {
   return material;
 }
 
+function wildheartDoorPortalMaterial(lowGfx: boolean): THREE.MeshBasicMaterial {
+  const key = `wildheart:${lowGfx}`;
+  const existing = portalMats.get(key);
+  if (existing) return existing;
+  const material = markSharedMaterial(
+    new THREE.MeshBasicMaterial({
+      color: 0x48d8c1,
+      map: riftPortalTexture() ?? undefined,
+      transparent: true,
+      opacity: 0.66,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  if (!lowGfx) material.color.multiplyScalar(PORTAL_BOOST);
+  portalMats.set(key, material);
+  return material;
+}
+
 // Blackened orc-iron grade for the Orkadia arch: a cloned, darkened copy of the
 // stone/GLB material so the shared door arch reads as scorched black rock. Never
 // mutates the shared source material (clone-then-tint, the marshMaterial trick).
@@ -193,6 +227,37 @@ function darkenOrkadiaArch(root: THREE.Object3D): void {
       if (!Array.isArray(src)) child.material = (child.material as THREE.Material[])[0];
     }
   });
+}
+
+function warmWildheartArch(root: THREE.Object3D): void {
+  root.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const source = child.material;
+    const materials = Array.isArray(source) ? source : [source];
+    child.material = materials.map((material) => {
+      const clone = material.clone() as THREE.MeshStandardMaterial;
+      if (clone.color) clone.color.lerp(new THREE.Color(0xb9a66d), 0.48);
+      return clone;
+    });
+    if (!Array.isArray(source)) child.material = (child.material as THREE.Material[])[0];
+  });
+}
+
+function cloneWildheartGate(): THREE.Object3D | null {
+  if (!loadedWildheartGateGltf) return null;
+  const gate = loadedWildheartGateGltf.clone(true);
+  gate.rotation.y = -Math.PI / 2;
+  const initial = new THREE.Box3().setFromObject(gate);
+  const height = initial.max.y - initial.min.y;
+  gate.scale.setScalar(height > 1e-4 ? 13 / height : 1);
+  const scaled = new THREE.Box3().setFromObject(gate);
+  gate.position.y -= scaled.min.y;
+  gate.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    child.castShadow = true;
+    child.receiveShadow = true;
+  });
+  return gate;
 }
 
 // Soft radial "energy membrane" texture for the rift gate: a bright core fading
@@ -942,7 +1007,11 @@ export function buildDoorBody(
   }
 
   const isOrkadia = dungeonId === 'orkadia';
-  if (loadedDoorArchGltf) {
+  const isWildheart = dungeonId === 'wildheart_basin';
+  const wildheartGate = isWildheart ? cloneWildheartGate() : null;
+  if (wildheartGate) {
+    body.add(wildheartGate);
+  } else if (loadedDoorArchGltf) {
     const inst = loadedDoorArchGltf.clone(true);
     inst.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -951,11 +1020,15 @@ export function buildDoorBody(
       }
     });
     if (isOrkadia) darkenOrkadiaArch(inst);
+    if (isWildheart) warmWildheartArch(inst);
     body.add(inst);
   } else {
-    const stone = isOrkadia ? doorStoneMaterial().clone() : doorStoneMaterial();
+    const stone = isOrkadia || isWildheart ? doorStoneMaterial().clone() : doorStoneMaterial();
     if (isOrkadia && (stone as THREE.MeshStandardMaterial).color) {
       (stone as THREE.MeshStandardMaterial).color.multiply(new THREE.Color(ORKADIA_ARCH_TINT));
+    }
+    if (isWildheart && (stone as THREE.MeshStandardMaterial).color) {
+      (stone as THREE.MeshStandardMaterial).color.setHex(0xb9a66d);
     }
     const arch = new THREE.Mesh(doorArchGeometry(), stone);
     arch.castShadow = true;
@@ -973,15 +1046,23 @@ export function buildDoorBody(
   }
   const portalMat = isOrkadia
     ? orkadiaDoorPortalMaterial(lowGfx)
-    : doorPortalMaterial(entering, lowGfx);
+    : isWildheart
+      ? wildheartDoorPortalMaterial(lowGfx)
+      : doorPortalMaterial(entering, lowGfx);
   const portal = new THREE.Mesh(doorPortalGeometry(), portalMat);
-  portal.position.y = 2.15;
-  portal.scale.set(1, 1.35, 1);
+  portal.position.y = isWildheart && wildheartGate ? 4.4 : 2.15;
+  portal.scale.set(
+    isWildheart && wildheartGate ? 2.35 : 1,
+    isWildheart && wildheartGate ? 2.75 : 1.35,
+    1,
+  );
   body.add(portal);
   if (isOrkadia) {
     // The orc war-gate is monumental next to the other dungeon doors: same
     // arch and membrane, scaled up (the walk trigger is sim-side, unchanged).
     body.scale.setScalar(1.55);
+  } else if (isWildheart) {
+    if (!wildheartGate) body.scale.setScalar(1.65);
   }
   return { body, portal };
 }

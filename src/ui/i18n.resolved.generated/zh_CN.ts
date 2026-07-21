@@ -3360,6 +3360,7 @@ export const zh_CN: EnTranslations = {
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
       "orkadiaBody": "一座盘踞在德雷克兰黑色火山岩上的残暴兽人战营，开阔的战场由剧毒的绿色战火照亮。杀穿血牙兵卒与铁皮劫掠者，直取盘踞在头骨高台上的督军格罗莫克·碎颅者。",
+      "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔上迎战祖尔加。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
@@ -8806,6 +8807,15 @@ export const zh_CN: EnTranslations = {
       "elixir_of_the_serpent": {
         "name": "巨蛇药剂"
       },
+      "wildheart_tuskblade": {
+        "name": "荒野之心獠牙巨刃"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "盆地巫木法杖"
+      },
+      "wildheart_fangknife": {
+        "name": "祖尔加的獠牙匕首"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -10082,6 +10092,21 @@ export const zh_CN: EnTranslations = {
       },
       "orkadia_warlord": {
         "name": "督军格罗莫克·碎颅者"
+      },
+      "wildheart_stalker": {
+        "name": "藤爪潜猎者"
+      },
+      "wildheart_ravager": {
+        "name": "血鬃掠夺者"
+      },
+      "wildheart_hexcaller": {
+        "name": "日骨巫咒师"
+      },
+      "wildheart_beastmaster": {
+        "name": "獠牙领主驯兽师"
+      },
+      "wildheart_high_priest": {
+        "name": "盆地之声祖尔加"
       },
       "ironvein_foreman": {
         "name": "铁脉工头"
@@ -11927,6 +11952,11 @@ export const zh_CN: EnTranslations = {
         "name": "奥卡迪亚",
         "enterText": "战火骤然泛起绿光。奥卡迪亚的战营已知你到来。",
         "leaveText": "你杀出重围，回到德雷克兰灰烬弥漫的劲风之中。"
+      },
+      "wildheart_basin": {
+        "name": "荒野之心盆地",
+        "enterText": "温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。",
+        "leaveText": "你从石牙之下穿回棕榈之境的阳光中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

@@ -1,5 +1,8 @@
 # Playbook del rework de Orkadia
 
+Para una segunda aplicacion deliberadamente distinta de este contrato de campo abierto, consulta
+`docs/prd/wildheart-basin-open-field-dungeon.md`.
+
 Este documento conserva el proceso seguido para convertir Orkadia en la primera dungeon
 instanciada de campo abierto de World of ClaudeCraft. Es a la vez un registro histórico y una
 receta para futuros agentes que tengan que rehacer un espacio, generar un kit 3D coherente o

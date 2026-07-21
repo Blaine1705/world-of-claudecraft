@@ -37,7 +37,7 @@ const SYNTHETIC: MobTemplate = {
 };
 
 describe('heroic tuning data contract', () => {
-  it('covers the five five-player dungeons plus the raid arena, with their final bosses', () => {
+  it('covers the six five-player dungeons plus the raid arena, with their final bosses', () => {
     expect([...HEROIC_DUNGEON_IDS].sort()).toEqual([
       'drowned_temple',
       'gravewyrm_sanctum',
@@ -45,6 +45,7 @@ describe('heroic tuning data contract', () => {
       'nythraxis_boss_arena',
       'orkadia',
       'sunken_bastion',
+      'wildheart_basin',
     ]);
     expect(
       Object.fromEntries(Object.values(HEROIC_DUNGEON_TUNING).map((t) => [t.id, t.finalBossId])),
@@ -54,6 +55,7 @@ describe('heroic tuning data contract', () => {
       drowned_temple: 'ysolei',
       gravewyrm_sanctum: 'korzul_the_gravewyrm',
       orkadia: 'orkadia_warlord',
+      wildheart_basin: 'wildheart_high_priest',
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
     });
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
@@ -72,12 +74,13 @@ describe('heroic tuning data contract', () => {
       drowned_temple: 1,
       gravewyrm_sanctum: 1,
       orkadia: 1,
+      wildheart_basin: 1,
       nythraxis_boss_arena: 3,
     });
   });
 
   it('pins the classic-era heroic multipliers per dungeon', () => {
-    // The four five-mans are damage-EQUALIZED at the level-22 pin: the raw
+    // The six five-mans are damage-EQUALIZED at the level-22 pin: the raw
     // damageMultiplier per dungeon is set so an average elite-trash swing lands
     // ~225 post-mitigation on the reference geared shaman (see the tuning
     // table's comment; the whole ladder was cut 25% from the original ~300
@@ -100,6 +103,7 @@ describe('heroic tuning data contract', () => {
       drowned_temple: [2.6, 4.3, 2.15, 1.25],
       gravewyrm_sanctum: [2.0, 4.05, 2.0, 1.2],
       orkadia: [2.0, 4.05, 2.0, 1.2],
+      wildheart_basin: [2.0, 4.05, 2.0, 1.2],
       // The raid multiplier is smaller in RELATIVE terms because normal
       // Nythraxis already lands the game's hardest hits (see the tuning
       // table's comment); its percentage mechanics scale separately in

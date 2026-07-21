@@ -5229,6 +5229,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。',
   'guide.dungeonsPage.orkadiaBody':
     '一座盘踞在德雷克兰黑色火山岩上的残暴兽人战营，开阔的战场由剧毒的绿色战火照亮。杀穿血牙兵卒与铁皮劫掠者，直取盘踞在头骨高台上的督军格罗莫克·碎颅者。',
+  'guide.dungeonsPage.wildheartBody':
+    '一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔上迎战祖尔加。',
   'guide.dungeonsPage.raidName': '终局团队副本',
   'guide.dungeonsPage.raidBody':
     '在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。',
@@ -8557,5 +8559,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_healing_draught.name': '阳瓣治疗药水',
   'entities.items.sunpetal_mana_draught.name': '阳瓣法力药水',
   'entities.items.elixir_of_the_serpent.name': '巨蛇药剂',
+  'entities.mobs.wildheart_stalker.name': '藤爪潜猎者',
+  'entities.mobs.wildheart_ravager.name': '血鬃掠夺者',
+  'entities.mobs.wildheart_hexcaller.name': '日骨巫咒师',
+  'entities.mobs.wildheart_beastmaster.name': '獠牙领主驯兽师',
+  'entities.mobs.wildheart_high_priest.name': '盆地之声祖尔加',
+  'entities.dungeons.wildheart_basin.name': '荒野之心盆地',
+  'entities.dungeons.wildheart_basin.enterText':
+    '温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。',
+  'entities.dungeons.wildheart_basin.leaveText': '你从石牙之下穿回棕榈之境的阳光中。',
+  'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
+  'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
+  'entities.items.wildheart_fangknife.name': '祖尔加的獠牙匕首',
   'hudChrome.professions.skillValue': '{skill} / {max}',
 };

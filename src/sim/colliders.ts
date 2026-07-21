@@ -30,6 +30,7 @@ import {
 import { ORKADIA_FIELD_COLLIDER_SPECS, ORKADIA_FIELD_WALLS } from './orkadia_field';
 import type { BuildingDef, WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
+import { WILDHEART_FIELD_COLLIDER_SPECS, WILDHEART_FIELD_WALLS } from './wildheart_field';
 import {
   crossesGardenHedge,
   crossesSealedBorder,
@@ -346,6 +347,31 @@ const ORKADIA_COLLIDERS: Collider[] = [
   ),
 ];
 
+// Wildheart follows the same open-field contract, but its walkable bridges and
+// water ribbons are heightfield surfaces rather than blocking props.
+const WILDHEART_COLLIDERS: Collider[] = [
+  ...WILDHEART_FIELD_WALLS.map(
+    (wall): Collider => ({
+      type: 'obb',
+      x: wall.x,
+      z: wall.z,
+      hw: wall.hw,
+      hd: wall.hd,
+      rot: 0,
+    }),
+  ),
+  ...WILDHEART_FIELD_COLLIDER_SPECS.map(
+    (spec): Collider => ({
+      type: 'circle',
+      x: spec.x,
+      z: spec.z,
+      r: spec.r,
+      cameraTopY: spec.h,
+      camGhost: true,
+    }),
+  ),
+];
+
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   crypt: CRYPT_COLLIDERS,
@@ -353,6 +379,7 @@ const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   temple: TEMPLE_COLLIDERS,
   nythraxis: NYTHRAXIS_COLLIDERS,
   orkadia: ORKADIA_COLLIDERS,
+  wildheart: WILDHEART_COLLIDERS,
 };
 
 // ---------------------------------------------------------------------------

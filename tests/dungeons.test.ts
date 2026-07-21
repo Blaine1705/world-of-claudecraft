@@ -905,12 +905,14 @@ describe('dungeons: heroic difficulty', () => {
     expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(true);
   });
 
-  it('supports heroic mode across the four five-player dungeons only', () => {
+  it('supports heroic mode across all six five-player dungeons', () => {
     const finalBosses = [
       ['hollow_crypt', 'morthen'],
       ['sunken_bastion', 'vael_the_mistcaller'],
       ['drowned_temple', 'ysolei'],
       ['gravewyrm_sanctum', 'korzul_the_gravewyrm'],
+      ['orkadia', 'orkadia_warlord'],
+      ['wildheart_basin', 'wildheart_high_priest'],
     ] as const;
 
     for (const [dungeonId, bossId] of finalBosses) {

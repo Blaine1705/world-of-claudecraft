@@ -246,7 +246,7 @@ const ORC_TRIPO: ClipMap = {
 
 // Orkadia specialist rig. These five creatures come through the current biped
 // pipeline, which retargets and bakes the complete game vocabulary directly.
-const ORKADIA_SPECIALIST_RIG: ClipMap = {
+const TRIPO_BIPED_FULL_RIG: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Run',
@@ -1082,37 +1082,79 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_orkadia_axethrower: {
     url: `${CREATURES}/orkadia_axethrower.glb`,
     height: 2.4,
-    clips: ORKADIA_SPECIALIST_RIG,
+    clips: TRIPO_BIPED_FULL_RIG,
     tint: 'entity',
     tintStrength: 0.06,
   },
   mob_orkadia_fel_shaman: {
     url: `${CREATURES}/orkadia_fel_shaman.glb`,
     height: 2.4,
-    clips: ORKADIA_SPECIALIST_RIG,
+    clips: TRIPO_BIPED_FULL_RIG,
     tint: 'entity',
     tintStrength: 0.06,
   },
   mob_orkadia_beast_handler: {
     url: `${CREATURES}/orkadia_beast_handler.glb`,
     height: 2.5,
-    clips: ORKADIA_SPECIALIST_RIG,
+    clips: TRIPO_BIPED_FULL_RIG,
     tint: 'entity',
     tintStrength: 0.06,
   },
   mob_orkadia_siege_brute: {
     url: `${CREATURES}/orkadia_siege_brute.glb`,
     height: 2.9,
-    clips: ORKADIA_SPECIALIST_RIG,
+    clips: TRIPO_BIPED_FULL_RIG,
     tint: 'entity',
     tintStrength: 0.04,
   },
   mob_orkadia_banner_captain: {
     url: `${CREATURES}/orkadia_banner_captain.glb`,
     height: 2.7,
-    clips: ORKADIA_SPECIALIST_RIG,
+    clips: TRIPO_BIPED_FULL_RIG,
     tint: 'entity',
     tintStrength: 0.05,
+  },
+  // Five Wildheart troll silhouettes use the same complete biped vocabulary,
+  // but preserve their woven cloth, bone paint, feathers, and jungle palette.
+  mob_wildheart_stalker: {
+    url: `${CREATURES}/wildheart_stalker.glb`,
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_wildheart_ravager: {
+    url: `${CREATURES}/wildheart_ravager.glb`,
+    height: 2.7,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_wildheart_hexcaller: {
+    url: `${CREATURES}/wildheart_hexcaller.glb`,
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_wildheart_beastmaster: {
+    url: `${CREATURES}/wildheart_beastmaster.glb`,
+    height: 3,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.03,
+  },
+  mob_wildheart_high_priest: {
+    url: `${CREATURES}/wildheart_high_priest.glb`,
+    height: 3.2,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.03,
   },
   mob_elemental: {
     url: `${CREATURES}/golelingevolved.glb`,
@@ -1590,6 +1632,11 @@ const MOB_KEYS: Record<string, string> = {
   orkadia_beast_handler: 'mob_orkadia_beast_handler',
   orkadia_siege_brute: 'mob_orkadia_siege_brute',
   orkadia_banner_captain: 'mob_orkadia_banner_captain',
+  wildheart_stalker: 'mob_wildheart_stalker',
+  wildheart_ravager: 'mob_wildheart_ravager',
+  wildheart_hexcaller: 'mob_wildheart_hexcaller',
+  wildheart_beastmaster: 'mob_wildheart_beastmaster',
+  wildheart_high_priest: 'mob_wildheart_high_priest',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',

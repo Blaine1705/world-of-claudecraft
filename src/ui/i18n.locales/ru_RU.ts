@@ -5525,6 +5525,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
   'guide.dungeonsPage.orkadiaBody':
     'Жестокий орочий военный лагерь в чёрном вулканическом камне Дрейкленда: открытое поле, освещённое ядовито-зелёными боевыми кострами. Прорубитесь сквозь пехотинцев Кровавого Клыка и мародёров Железношкурых, чтобы добраться до полководца Громмока Черепокола на его помосте из черепов.',
+  'guide.dungeonsPage.wildheartBody':
+    'Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду к Зулгару.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
   'guide.dungeonsPage.raidBody':
     'За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.',
@@ -9137,5 +9139,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_healing_draught.name': 'Целебный настой солнцелепеста',
   'entities.items.sunpetal_mana_draught.name': 'Настой маны солнцелепеста',
   'entities.items.elixir_of_the_serpent.name': 'Эликсир змея',
+  'entities.mobs.wildheart_stalker.name': 'Лазутчик Лозокогтя',
+  'entities.mobs.wildheart_ravager.name': 'Разоритель Кровавой Гривы',
+  'entities.mobs.wildheart_hexcaller.name': 'Заклинатель Солнечной Кости',
+  'entities.mobs.wildheart_beastmaster.name': 'Повелитель клыков',
+  'entities.mobs.wildheart_high_priest.name': 'Зулгар, Голос Котловины',
+  'entities.dungeons.wildheart_basin.name': 'Котловина Дикого Сердца',
+  'entities.dungeons.wildheart_basin.enterText':
+    'Тёплый дождь шипит на древнем камне. Перед вами открывается Котловина Дикого Сердца.',
+  'entities.dungeons.wildheart_basin.leaveText':
+    'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
+  'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
+  'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
+  'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',
   'hudChrome.professions.skillValue': '{skill} / {max}',
 };

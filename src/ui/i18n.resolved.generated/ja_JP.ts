@@ -3360,6 +3360,7 @@ export const ja_JP: EnTranslations = {
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
       "orkadiaBody": "ドレイクランドの黒い火山岩に構えた残虐なオークの戦営。毒々しい緑の戦火が照らす開けた野原だ。血牙の兵卒と鉄皮の略奪者を斬り伏せ、髑髏の壇上に鎮座する軍団長グロモク・スカルクリーヴァーへと至れ。",
+      "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドでズルガーに挑め。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -8806,6 +8807,15 @@ export const ja_JP: EnTranslations = {
       "elixir_of_the_serpent": {
         "name": "蛇のエリクサー"
       },
+      "wildheart_tuskblade": {
+        "name": "ワイルドハートの牙大剣"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "盆地の呪木杖"
+      },
+      "wildheart_fangknife": {
+        "name": "ズルガーの牙小刀"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -10082,6 +10092,21 @@ export const ja_JP: EnTranslations = {
       },
       "orkadia_warlord": {
         "name": "軍団長グロモク・スカルクリーヴァー"
+      },
+      "wildheart_stalker": {
+        "name": "蔦爪の追跡者"
+      },
+      "wildheart_ravager": {
+        "name": "血鬣の略奪者"
+      },
+      "wildheart_hexcaller": {
+        "name": "陽骨の呪術師"
+      },
+      "wildheart_beastmaster": {
+        "name": "牙王の獣使い"
+      },
+      "wildheart_high_priest": {
+        "name": "盆地の声ズルガー"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
@@ -11927,6 +11952,11 @@ export const ja_JP: EnTranslations = {
         "name": "オルカディア",
         "enterText": "戦火が緑に燃え上がる。オルカディアの戦営はお前の来訪を知った。",
         "leaveText": "斬り開いて外へ出ると、ドレイクランドの灰混じりの風が吹きつけた。"
+      },
+      "wildheart_basin": {
+        "name": "ワイルドハート盆地",
+        "enterText": "温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。",
+        "leaveText": "石の牙の下をくぐり、パームリーチの陽光へ戻った。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

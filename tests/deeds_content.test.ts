@@ -52,9 +52,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 195 deeds worth 2390 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(195);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2390);
+  it('ships exactly 197 deeds worth 2410 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(197);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2410);
   });
 
   it('ships the audited per-category counts', () => {
@@ -63,7 +63,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 30,
       combat: 10,
-      dungeon: 29,
+      dungeon: 31,
       delve: 13,
       chronicle: 24,
       collection: 24,
@@ -89,12 +89,21 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'pvp_card_duel_first_win',
       'dgn_orkadia',
       'dgn_orkadia_heroic',
+      'dgn_wildheart_basin',
+      'dgn_wildheart_basin_heroic',
     ]);
     expect(DEEDS.dgn_orkadia.renown).toBe(10);
     expect(DEEDS.dgn_orkadia_heroic.renown).toBe(10);
     expect(DEEDS.dgn_orkadia.trigger).toEqual({
       kind: 'dungeonClears',
       dungeonId: 'orkadia',
+      count: 1,
+    });
+    expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
+    expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
+    expect(DEEDS.dgn_wildheart_basin.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'wildheart_basin',
       count: 1,
     });
     expect(DEEDS.prog_crown_below.renown).toBe(25);
@@ -182,7 +191,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // This new digest freezes that release contract; it is not permission for later edits.
   // Re-baselined once more at the release/v0.27.0 base merge: the catalog now also
   // carries the appended pvp_card_duel_first_win deed (Card Duel).
-  const FROZEN_CATALOG_SHA256 = '3425f7976a267c8e13875894a093b1967e0318a494f20506741408550ff3982e';
+  const FROZEN_CATALOG_SHA256 = '614aad6dc385e9396801f39c6c13386ccbeb3d1b541da13127d5516086932579';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -294,7 +303,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_orkadia_heroic');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_wildheart_basin_heroic');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

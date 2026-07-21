@@ -3360,6 +3360,7 @@ export const ko_KR: EnTranslations = {
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
       "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
       "orkadiaBody": "드레이크랜드의 검은 화산암에 자리한 잔혹한 오크 전쟁 야영지로, 유독한 녹색 전화(戰火)가 활짝 열린 들판을 밝힌다. 피엄니 병졸과 무쇠가죽 약탈자를 베어 넘기고 해골 단상에 앉은 전쟁군주 그로목 해골분쇄자에게 이르라.",
+      "wildheartBody": "따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드의 줄가르와 맞서라.",
       "raidName": "최종 단계 공격대",
       "raidBody": "봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.",
       "heroicTitle": "영웅 난이도",
@@ -8806,6 +8807,15 @@ export const ko_KR: EnTranslations = {
       "elixir_of_the_serpent": {
         "name": "뱀의 비약"
       },
+      "wildheart_tuskblade": {
+        "name": "야생심장 엄니대검"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "분지의 사술나무 지팡이"
+      },
+      "wildheart_fangknife": {
+        "name": "줄가르의 송곳니칼"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -10082,6 +10092,21 @@ export const ko_KR: EnTranslations = {
       },
       "orkadia_warlord": {
         "name": "전쟁군주 그로목 해골분쇄자"
+      },
+      "wildheart_stalker": {
+        "name": "덩굴발톱 추적자"
+      },
+      "wildheart_ravager": {
+        "name": "피갈기 약탈자"
+      },
+      "wildheart_hexcaller": {
+        "name": "태양뼈 사술사"
+      },
+      "wildheart_beastmaster": {
+        "name": "송곳니 군주 야수조련사"
+      },
+      "wildheart_high_priest": {
+        "name": "분지의 목소리 줄가르"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"
@@ -11927,6 +11952,11 @@ export const ko_KR: EnTranslations = {
         "name": "오르카디아",
         "enterText": "전화가 녹색으로 타오른다. 오르카디아의 전쟁 야영지가 그대의 도래를 알아챘다.",
         "leaveText": "베어 헤치고 나와 잿빛 드레이크랜드의 바람 속으로 돌아선다."
+      },
+      "wildheart_basin": {
+        "name": "야생심장 분지",
+        "enterText": "따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.",
+        "leaveText": "돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

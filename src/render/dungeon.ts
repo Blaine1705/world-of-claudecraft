@@ -52,6 +52,7 @@ import { sharedUniforms } from './gfx';
 import { buildOrkadiaFieldInterior } from './orkadia_props';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
+import { buildWildheartFieldInterior } from './wildheart_props';
 
 const FLAME_EMISSIVE_HIGH = 2.2;
 // dungeon torch point lights: pumped + hung low so warm pools break up the
@@ -714,6 +715,16 @@ export class DungeonInteriors {
     // the claimed slot's origin and added to the scene.
     if (interior === 'orkadia') {
       const group = buildOrkadiaFieldInterior({
+        lowGfx: this.lowGfx,
+        flames: this.flames,
+        fireLights: this.fireLights,
+      });
+      group.position.set(ox, 0, oz);
+      this.scene.add(group);
+      return group;
+    }
+    if (interior === 'wildheart') {
+      const group = buildWildheartFieldInterior({
         lowGfx: this.lowGfx,
         flames: this.flames,
         fireLights: this.fireLights,

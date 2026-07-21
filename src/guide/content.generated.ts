@@ -1869,6 +1869,14 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "name": "Gravewyrm Sanctum"
   },
   {
+    "id": "wildheart_basin",
+    "isRaid": false,
+    "suggestedPlayers": 5,
+    "min": 20,
+    "max": 20,
+    "name": "The Wildheart Basin"
+  },
+  {
     "id": "raid",
     "isRaid": true,
     "suggestedPlayers": 10,
@@ -4249,6 +4257,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   {
     "id": "dgn_orkadia_heroic",
     "name": "Heroic: Orkadia",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_wildheart_basin",
+    "name": "The Basin Bites Back",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_wildheart_basin_heroic",
+    "name": "Heroic: The Wildheart Basin",
     "category": "dungeon",
     "renown": 10,
     "feat": false
