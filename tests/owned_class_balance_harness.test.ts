@@ -53,4 +53,14 @@ describe('owned-class level 20 balance harness', () => {
       runOwnedClassDpsProbe('fieldcraft', scenario, 29_901),
     );
   });
+
+  it('keeps Fieldcraft sustained damage near the ranged Hunter specs and pays Bloodhook', () => {
+    const scenario = OWNED_CLASS_BALANCE_SCENARIOS[1];
+    const coldsight = runOwnedClassDpsProbe('coldsight', scenario, 29_902);
+    const fieldcraft = runOwnedClassDpsProbe('fieldcraft', scenario, 29_902);
+    const woundDamage = fieldcraft.damageBySource['Bloodhook Wound'] ?? 0;
+
+    expect(fieldcraft.dps).toBeLessThanOrEqual(coldsight.dps * 1.2);
+    expect(woundDamage / fieldcraft.totalDamage).toBeGreaterThanOrEqual(0.05);
+  });
 });
