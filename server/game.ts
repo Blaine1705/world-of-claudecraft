@@ -180,6 +180,7 @@ import {
 } from './moderation_service';
 import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from './msg_rate_limit';
 import { PartyFrameProjectionCache } from './party_frame_projection';
+import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
@@ -2710,6 +2711,21 @@ export class GameServer {
       this.sim.setGm(pid);
       const e = this.sim.entities.get(pid);
       if (e && e.level < 20) this.sim.setPlayerLevel(20, pid);
+    }
+    // PBE only (PBE_BOOST_ACCOUNTS=1): top the character up to the current
+    // boost kit once per BOOST_KIT_VERSION (true-BiS gear for every spec, BiS
+    // bags, riding, attunement), so a roster created before the boost existed,
+    // or before a kit revision, re-kits at its next login. The stamp rides the
+    // character state and persists through the normal save path. Never
+    // allowed to fail the join.
+    if (pbeBoostEnabled()) {
+      try {
+        if (applyBoostKitToPlayer(this.sim, pid)) {
+          console.log(`pbe boost kit topped up: ${name} (character ${characterId})`);
+        }
+      } catch (err) {
+        console.error('pbe boost kit top-up failed:', err);
+      }
     }
     const accountCosmetics = this.rememberAccountCosmetics(
       accountId,
