@@ -38,6 +38,8 @@ import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
+import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
+import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { buildArtisanRowProps } from './artisan_row_props';
@@ -1748,6 +1750,30 @@ export class Renderer {
         if (vis && !vis.isMidOneShot) vis.playEmote('cheer', 1);
       },
     });
+    // Dev-only ability VFX probe surface (scripts/ability_vfx_probe.mjs):
+    // self-installs onto window.__game once main.ts has assembled it, so the
+    // probe wiring lives entirely inside the subsystem it measures and the
+    // production bundle carries none of it.
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      const install = () => {
+        const g = (window as unknown as { __game?: Record<string, unknown> }).__game;
+        if (!g) {
+          setTimeout(install, 250);
+          return;
+        }
+        if (!g.abilityVfxStats) {
+          g.abilityVfxStats = () => this.abilityVfxStats();
+          g.abilityVfxGlow = (id: number) => this.abilityVfxGlow(id);
+          g.abilityVfxAttackCount = () => this.abilityVfxAttackCount();
+          g.abilityVfxProbe = {
+            specs: ABILITY_VFX_SPECS,
+            fullSpecs: ABILITY_VFX_FULL_SPECS,
+            abilities: ABILITIES,
+          };
+        }
+      };
+      setTimeout(install, 250);
+    }
     this.pulseAt = (id, school, intensity, duration) => {
       const v = this.views.get(id);
       if (!v) return;
