@@ -914,8 +914,6 @@ export const ko_KR: EnTranslations = {
       "rarity_rare": "희귀",
       "rarity_epic": "서사",
       "spec_speed": "+{pct}% 추가 기동력",
-      "spec_block": "+{pct}% 근접 피해 방어",
-      "spec_crit": "+{pct}% 치명타 확률",
       "name_valorsteed": "발러스티드",
       "name_grag_bear": "골리앗 그라그곰",
       "name_stalkglider_snail": "이끼껍질 활공달팽이",

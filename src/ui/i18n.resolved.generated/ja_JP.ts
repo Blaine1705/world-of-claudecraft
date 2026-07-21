@@ -914,8 +914,6 @@ export const ja_JP: EnTranslations = {
       "rarity_rare": "レア",
       "rarity_epic": "エピック",
       "spec_speed": "+{pct}% 移動力上昇",
-      "spec_block": "+{pct}% 近接ダメージブロック",
-      "spec_crit": "+{pct}% クリティカル率",
       "name_valorsteed": "ヴァロースティード",
       "name_grag_bear": "ゴリアテ・グラグベア",
       "name_stalkglider_snail": "モスシェル・ストークグライダー",

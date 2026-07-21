@@ -914,8 +914,6 @@ export const ru_RU: EnTranslations = {
       "rarity_rare": "Редкий",
       "rarity_epic": "Эпический",
       "spec_speed": "+{pct}% к скорости передвижения",
-      "spec_block": "+{pct}% блока урона в ближнем бою",
-      "spec_crit": "+{pct}% к шансу критического удара",
       "name_valorsteed": "Доблестный скакун",
       "name_grag_bear": "Голиаф Граг-медведь",
       "name_stalkglider_snail": "Мохопанцирный скользень",

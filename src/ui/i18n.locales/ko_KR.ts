@@ -8296,8 +8296,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.rarity_rare': '희귀',
   'hudChrome.mounts.rarity_epic': '서사',
   'hudChrome.mounts.spec_speed': '+{pct}% 추가 기동력',
-  'hudChrome.mounts.spec_block': '+{pct}% 근접 피해 방어',
-  'hudChrome.mounts.spec_crit': '+{pct}% 치명타 확률',
   'hudChrome.mounts.name_valorsteed': '발러스티드',
   'hudChrome.mounts.name_grag_bear': '골리앗 그라그곰',
   'hudChrome.mounts.name_stalkglider_snail': '이끼껍질 활공달팽이',

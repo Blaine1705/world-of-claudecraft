@@ -8452,8 +8452,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.rarity_rare': 'Редкий',
   'hudChrome.mounts.rarity_epic': 'Эпический',
   'hudChrome.mounts.spec_speed': '+{pct}% к скорости передвижения',
-  'hudChrome.mounts.spec_block': '+{pct}% блока урона в ближнем бою',
-  'hudChrome.mounts.spec_crit': '+{pct}% к шансу критического удара',
   'hudChrome.mounts.name_valorsteed': 'Доблестный скакун',
   'hudChrome.mounts.name_grag_bear': 'Голиаф Граг-медведь',
   'hudChrome.mounts.name_stalkglider_snail': 'Мохопанцирный скользень',

@@ -914,8 +914,6 @@ export const en_XA: EnTranslations = {
       "rarity_rare": "[Ŕáŕé]",
       "rarity_epic": "[Éþíç]",
       "spec_speed": "[+{pct}% éẋţŕá ɱóƀíļíţý]",
-      "spec_block": "[+{pct}% ɱéļéé ðáɱáĝé ƀļóçķ]",
-      "spec_crit": "[+{pct}% çŕíţíçáļ šţŕíķé çĥáñçé]",
       "name_valorsteed": "[Ʋáļóŕšţééð]",
       "name_grag_bear": "[Ĝóļíáţĥ Ĝŕáĝ-Ɓéáŕ]",
       "name_stalkglider_snail": "[Ɱóšš-Šĥéļļ Šţáļķ-Ĝļíðéŕ]",

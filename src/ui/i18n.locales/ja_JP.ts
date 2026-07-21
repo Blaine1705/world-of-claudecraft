@@ -8312,8 +8312,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.rarity_rare': 'レア',
   'hudChrome.mounts.rarity_epic': 'エピック',
   'hudChrome.mounts.spec_speed': '+{pct}% 移動力上昇',
-  'hudChrome.mounts.spec_block': '+{pct}% 近接ダメージブロック',
-  'hudChrome.mounts.spec_crit': '+{pct}% クリティカル率',
   'hudChrome.mounts.name_valorsteed': 'ヴァロースティード',
   'hudChrome.mounts.name_grag_bear': 'ゴリアテ・グラグベア',
   'hudChrome.mounts.name_stalkglider_snail': 'モスシェル・ストークグライダー',

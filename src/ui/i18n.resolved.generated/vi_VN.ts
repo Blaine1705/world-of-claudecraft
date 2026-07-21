@@ -914,8 +914,6 @@ export const vi_VN: EnTranslations = {
       "rarity_rare": "Rare",
       "rarity_epic": "Epic",
       "spec_speed": "+{pct}% extra mobility",
-      "spec_block": "+{pct}% melee damage block",
-      "spec_crit": "+{pct}% critical strike chance",
       "name_valorsteed": "Valorsteed",
       "name_grag_bear": "Goliath Grag-Bear",
       "name_stalkglider_snail": "Moss-Shell Stalk-Glider",

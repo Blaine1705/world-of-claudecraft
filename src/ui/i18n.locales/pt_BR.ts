@@ -7608,8 +7608,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.rarity_rare': 'Rara',
   'hudChrome.mounts.rarity_epic': 'Épica',
   'hudChrome.mounts.spec_speed': '+{pct}% de mobilidade extra',
-  'hudChrome.mounts.spec_block': '+{pct}% de bloqueio de dano corpo a corpo',
-  'hudChrome.mounts.spec_crit': '+{pct}% de chance de acerto crítico',
   'hudChrome.mounts.name_valorsteed': 'Corcel do Valor',
   'hudChrome.mounts.name_grag_bear': 'Urso Grag Golias',
   'hudChrome.mounts.name_stalkglider_snail': 'Planador de Casco Musgoso',

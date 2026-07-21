@@ -7931,8 +7931,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.rarity_rare': '稀有',
   'hudChrome.mounts.rarity_epic': '史诗',
   'hudChrome.mounts.spec_speed': '+{pct}%额外移动力',
-  'hudChrome.mounts.spec_block': '+{pct}%近战伤害格挡',
-  'hudChrome.mounts.spec_crit': '+{pct}%致命一击几率',
   'hudChrome.mounts.name_valorsteed': '英勇战马',
   'hudChrome.mounts.name_grag_bear': '歌利亚格拉格巨熊',
   'hudChrome.mounts.name_stalkglider_snail': '苔壳滑行蜗牛',

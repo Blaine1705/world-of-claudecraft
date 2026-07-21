@@ -914,8 +914,6 @@ export const fr_FR: EnTranslations = {
       "rarity_rare": "Rare",
       "rarity_epic": "Épique",
       "spec_speed": "+{pct}% de mobilité supplémentaire",
-      "spec_block": "+{pct}% de blocage des dégâts de mêlée",
-      "spec_crit": "+{pct}% de chances de coup critique",
       "name_valorsteed": "Destrier de Bravoure",
       "name_grag_bear": "Ours-Grag Goliath",
       "name_stalkglider_snail": "Glisseur à Coquille Moussue",

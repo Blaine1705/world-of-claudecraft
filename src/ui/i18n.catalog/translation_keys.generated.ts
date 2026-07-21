@@ -5966,8 +5966,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.mounts.riding'
   | 'hudChrome.mounts.select'
   | 'hudChrome.mounts.selected'
-  | 'hudChrome.mounts.spec_block'
-  | 'hudChrome.mounts.spec_crit'
   | 'hudChrome.mounts.spec_speed'
   | 'hudChrome.mounts.title'
   | 'hudChrome.nameplate.mobEliteLevel'

@@ -914,8 +914,6 @@ export const de_DE: EnTranslations = {
       "rarity_rare": "Selten",
       "rarity_epic": "Episch",
       "spec_speed": "+{pct}% zusätzliche Mobilität",
-      "spec_block": "+{pct}% Nahkampfschadensblock",
-      "spec_crit": "+{pct}% kritische Trefferchance",
       "name_valorsteed": "Valorross",
       "name_grag_bear": "Goliath-Gragbär",
       "name_stalkglider_snail": "Moosschalen-Stielgleiter",

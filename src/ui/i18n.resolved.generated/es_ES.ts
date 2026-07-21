@@ -914,8 +914,6 @@ export const es_ES: EnTranslations = {
       "rarity_rare": "Rara",
       "rarity_epic": "Épica",
       "spec_speed": "+{pct}% de movilidad adicional",
-      "spec_block": "+{pct}% de bloqueo de daño cuerpo a cuerpo",
-      "spec_crit": "+{pct}% de probabilidad de golpe crítico",
       "name_valorsteed": "Corcel del Valor",
       "name_grag_bear": "Oso Grag Goliat",
       "name_stalkglider_snail": "Deslizador de Caparazón Musgoso",

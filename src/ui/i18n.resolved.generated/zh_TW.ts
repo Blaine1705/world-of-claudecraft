@@ -914,8 +914,6 @@ export const zh_TW: EnTranslations = {
       "rarity_rare": "稀有",
       "rarity_epic": "史詩",
       "spec_speed": "+{pct}% 額外移動力",
-      "spec_block": "+{pct}% 近戰傷害格擋",
-      "spec_crit": "+{pct}% 致命一擊機率",
       "name_valorsteed": "英勇戰馬",
       "name_grag_bear": "歌利亞格拉格巨熊",
       "name_stalkglider_snail": "苔殼滑行蝸牛",
