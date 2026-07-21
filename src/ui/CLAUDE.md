@@ -183,6 +183,12 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   build the view, call the module with `deps`.
 
 ## i18n (sparse-overlay model; contributors add ENGLISH ONLY)
+
+Every spell, talent, aura, item, and mechanic tooltip follows
+`docs/design/tooltip-writing.md`. Inspect the live effect path before changing copy, use resolved
+values for rank and power scaling, and prove the text against combat with a focused test. Use the
+`write-game-tooltips` Claude skill or `woc-write-game-tooltips` Codex skill for tooltip work.
+
 The locale data is split; touch the right file (full model + locked-terms glossary:
 `docs/i18n-scaling/translation-workflow.md`):
 - **`i18n.catalog/`** is the authoritative English source catalog (nested domain modules

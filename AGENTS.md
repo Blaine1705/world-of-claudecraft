@@ -46,6 +46,8 @@ Repository skills live in `.agents/skills/` and are invoked as `$skill-name`:
 - `$woc-feature-plan`: produce an implementation-ready plan for cross-cutting work.
 - `$woc-review-pr`: verify a pull request without posting unless explicitly requested.
 - `$woc-file-issue`: draft an issue, and file it only with explicit authorization.
+- `$woc-write-game-tooltips`: write or audit plain English tooltips against live combat values and
+  scaling.
 - `$woc-release-merge-audit`: find semantic damage after release integration.
 - `$woc-release-malware-audit`: scan and judge malicious-code risk.
 - `$woc-codex-audit`: compare the checked-in Codex architecture with current official
