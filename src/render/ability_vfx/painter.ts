@@ -17,6 +17,7 @@ import {
   planCast,
   planImpact,
 } from '../ability_vfx_core';
+import { ABILITIES } from '../../sim/data';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
@@ -214,6 +215,31 @@ const SCHOOL_BY_PALETTE: Record<string, string> = {
 function rimColorOf(full: AbilityVfxFullSpec | undefined, spec: AbilityVfxSpec): number {
   if (full?.rim) return abilityHexColor(full.rim);
   return abilityVfxColor(spec);
+}
+
+// Maintenance passives are completely SILENT — no body glow, no orbit band,
+// no ground aura. The tell is the sim ability def, not the vfx spec: the
+// warrior stances (perpetually re-applied toggles, exclusiveGroup
+// 'warrior_stance') and spellbook-only passive traits. A default level-1
+// passive must not paint the character at all; the stance-swap cast ceremony
+// still plays through the normal cast path.
+function isPassiveAura(auraId: string): boolean {
+  const def = ABILITIES[auraId];
+  if (def === undefined) return false;
+  return def.passive === true || def.exclusiveGroup?.endsWith('_stance') === true;
+}
+
+// Transformative buffs are the ONE exception that keeps a sustained body rim,
+// restrained to a fraction of the old held-buff strength. Derived from spec
+// DNA: shapeshift/aspect forms author buff style 'morph', and the
+// ultimate-cooldown moments (Avatar, Metamorphosis, Bloodlust,
+// Elemental Mastery...) are exactly the buff-archetype specs authored at
+// power >= 1.1 — every default buff sits at 1.0 or below.
+const TRANSFORMATIVE_BUFF_POWER = 1.1;
+const TRANSFORMATIVE_RIM_SCALE = 0.25;
+function isTransformativeBuff(full: AbilityVfxFullSpec): boolean {
+  if (full.buff?.style === 'morph') return true;
+  return full.archetype === 'buff' && (full.power ?? 1) >= TRANSFORMATIVE_BUFF_POWER;
 }
 
 // Effect-granted auras can suffix the authoring ability's id (the sim's
@@ -937,8 +963,9 @@ export class AbilityVfx {
       this.warmedSpiritClasses.add(e.templateId);
       fx.warmSpiritsForClass(e.templateId);
     }
-    // Body glow (the gallery rim read): the strongest live source wins between
-    // an in-flight cast and any spec'd buff auras (rim or buff block).
+    // Body glow (the gallery rim read) is RESERVED: an in-flight cast windup,
+    // or a held transformative buff's restrained rim (see the aura loop) —
+    // strongest live source wins. Default buffs never tint the rig.
     let glowColor = 0;
     let glowStrength = 0;
     let glowSlow = false;
@@ -968,31 +995,57 @@ export class AbilityVfx {
       }
     }
     let bands = 0;
+    let discs = 0;
     // Peeked (never charged) degrade tier for this entity's orbit bands,
     // computed lazily on the first orbit-carrying aura: tier >= 1 halves each
     // band's sprite count in the fx engine while the read survives.
     let orbitTier = -1;
-    for (let i = 0; i < e.auras.length && bands < 3; i++) {
+    for (let i = 0; i < e.auras.length; i++) {
       const auraId = auraSpecId(e.auras[i].id);
       if (auraId === null) continue;
       const spec = ABILITY_VFX_SPECS[auraId];
       if (spec === undefined) continue;
+      // maintenance passives (stances, spellbook traits): no read at all
+      if (isPassiveAura(auraId)) continue;
       const full = ABILITY_VFX_FULL_SPECS[auraId];
       // barrier specs wear the translucent fresnel shell while the aura lives
       if (full?.barrier) fx.holdShell(e.id, abilityVfxColor(spec));
-      // held buffs light the body: casterGlowV = (shellDur ? 2 : 1.3) * power
-      if (full && (full.buff !== undefined || full.rim !== undefined || full.barrier)) {
-        const strength = (full.buff?.shellDur ? 2 : 1.3) * (full.power ?? 1);
-        if (strength > glowStrength) {
-          glowStrength = strength;
-          glowColor = rimColorOf(full, spec);
-          glowSlow = !!full.buff?.shellDur;
+      // Held buffs: the sustained whole-rig tint is RESERVED. Morph forms and
+      // ultimate cooldowns keep a restrained rim; every other buff wears the
+      // subtle under-character ground aura instead (band 0 the soft disc,
+      // further concurrent buffs thin concentric rings, a 4th+ blends its hue
+      // into the outermost). Veil styles (stealth, vanish) opt out — a
+      // disappearing act must not glow the ground it stands on.
+      let discStarted = false;
+      if (full !== undefined && (full.buff !== undefined || full.archetype === 'buff' || full.barrier === true)) {
+        if (isTransformativeBuff(full)) {
+          const strength =
+            TRANSFORMATIVE_RIM_SCALE * (full.buff?.shellDur ? 2 : 1.3) * (full.power ?? 1);
+          if (strength > glowStrength) {
+            glowStrength = strength;
+            glowColor = rimColorOf(full, spec);
+            glowSlow = false;
+          }
+        } else if (full.buff?.style !== 'veil') {
+          const spin = full.palette !== 'physical' && full.palette !== 'blood';
+          discStarted = fx.holdGroundAura(e.id, discs, rimColorOf(full, spec), spin);
+          discs++;
+          if (discStarted) {
+            this.spawned = 1;
+            this.recordStat(auraId, false);
+          }
         }
       }
       // The full spec's authored orbit wins (its 'none' suppresses too);
       // compact-spec bo carries the same nine style names as fallback.
       const style = asOrbitStyle(full?.buff?.orbit ?? spec.bo);
-      if (style === null) continue;
+      if (style === null) {
+        // orbit-less buffs still get their gain moment off the disc's first frame
+        if (discStarted)
+          this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
+        continue;
+      }
+      if (bands >= 3) continue;
       if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
       if (fx.orbit(e.id, style, abilityVfxColor(spec), full?.buff?.o, orbitTier)) {
         // The band just appeared (aura gained): pop the swirl here instead of
@@ -1010,6 +1063,11 @@ export class AbilityVfx {
   // Dev probe surface: the entity's current body-glow intensity.
   glowIntensityOf(entityId: number): number {
     return this.deps.fx.glowIntensityOf(entityId);
+  }
+
+  // Dev probe surface: the entity's held ground-aura band count.
+  groundAuraCountOf(entityId: number): number {
+    return this.deps.fx.groundAuraCountOf(entityId);
   }
 
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).

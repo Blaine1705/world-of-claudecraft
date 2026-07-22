@@ -1808,6 +1808,7 @@ export class Renderer {
         if (!g.abilityVfxStats) {
           g.abilityVfxStats = () => this.abilityVfxStats();
           g.abilityVfxGlow = (id: number) => this.abilityVfxGlow(id);
+          g.abilityVfxGroundAuras = (id: number) => this.abilityVfxGroundAuras(id);
           g.abilityVfxAttackCount = () => this.abilityVfxAttackCount();
           g.abilityVfxProbe = {
             specs: ABILITY_VFX_SPECS,
@@ -4424,6 +4425,10 @@ export class Renderer {
 
   abilityVfxGlow(entityId: number): number {
     return this.abilityVfx.glowIntensityOf(entityId);
+  }
+
+  abilityVfxGroundAuras(entityId: number): number {
+    return this.abilityVfx.groundAuraCountOf(entityId);
   }
 
   abilityVfxAttackCount(): number {

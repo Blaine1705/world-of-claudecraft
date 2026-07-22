@@ -4,6 +4,7 @@ import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { type DecalStyle, GroundDecals } from './decals';
 import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
+import { GroundAuras } from './ground_auras';
 import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
 import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './ribbons';
@@ -83,6 +84,12 @@ const MAX_WINDUPS = 24;
 
 // The gallery windup lean magnitude (updateBodyFeel: -0.085 rad at full charge).
 const WINDUP_LEAN_RAD = 0.085;
+
+// Cap on the one-shot buff-application glow pulse (fx.glowPulse): applied rig
+// emissive peaks at min(0.85, 0.9 * 0.38) ≈ 0.34 and fast-decays to nothing in
+// ~0.4s. Sustained body tint is reserved for cast windups and the morph/
+// ultimate rims the painter grants explicitly.
+const BUFF_APPLICATION_PULSE_MAX = 0.9;
 
 // Honor spec.screenFx the gallery way: authored false opts out, authored true
 // forces it, and by default only the HEAVY moments — finishers and big novas —
@@ -263,6 +270,7 @@ export class AbilityVfxFx implements SequencerHost {
   private overlay: OverlaySprites;
   private pillars: LightPillars;
   private shells: BuffShells;
+  private groundAuras: GroundAuras;
   private flipbooks: ImpactFlipbooks;
   private spirits: SpiritApparitions;
   private windups = new Map<number, WindupState>();
@@ -365,6 +373,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.overlay = new OverlaySprites(scene, tex);
     this.pillars = new LightPillars(scene);
     this.shells = new BuffShells(scene);
+    this.groundAuras = new GroundAuras(scene, tex);
     this.flipbooks = new ImpactFlipbooks(scene);
     this.spirits = new SpiritApparitions(scene, groundY);
   }
@@ -471,6 +480,11 @@ export class AbilityVfxFx implements SequencerHost {
   glowIntensityOf(entityId: number): number {
     const g = this.glows.get(entityId);
     return g ? Math.min(0.85, g.level * 0.38) : 0;
+  }
+
+  // Dev probe: the entity's held ground-aura band count.
+  groundAuraCountOf(entityId: number): number {
+    return this.groundAuras.countOf(entityId);
   }
 
   // ---- archetype sequences (the gallery phase anatomy; see sequencer.ts) --
@@ -673,6 +687,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.flipbooks.prewarm(x, y + 1.1, z);
     this.pillars.spawn(x, gy, z, 1, 6, 0xffffff, 0.7);
     this.shells.flash(entityId, 0xffffff, 0.7);
+    // held for one frame, then auto-releases as its fade — enough to compile
+    this.groundAuras.hold(entityId, 0, 0xffffff, true, this.frame);
     this.ribbons.spawnSlashStyled({ x, y: y + 1.1, z }, 0xffffff, 'horizontal');
     this.overlay.push(x, y + 1.1, z, 0xffffff, 0.3, OVERLAY_CELL.glow, 0.6, 1.5);
     this.overlay.commit();
@@ -757,6 +773,14 @@ export class AbilityVfxFx implements SequencerHost {
     this.shells.hold(entityId, colorHex, this.frame);
   }
 
+  // Held under-character ground aura (the default buff read), refreshed per
+  // frame while the buff aura lives; band stacks concentric rings for
+  // concurrent buffs. Returns true when this call created the band (the
+  // aura-gain moment).
+  holdGroundAura(entityId: number, band: number, colorHex: number, spin: boolean): boolean {
+    return this.groundAuras.hold(entityId, band, colorHex, spin, this.frame);
+  }
+
   burstAt(
     x: number,
     y: number,
@@ -779,8 +803,12 @@ export class AbilityVfxFx implements SequencerHost {
     this.lightPulseCb?.(entityId, palette, intensity, duration, range);
   }
 
-  glowPulse(entityId: number, colorHex: number, strength: number, slowDecay: boolean): void {
-    this.bodyGlowPulse(entityId, colorHex, strength, slowDecay);
+  glowPulse(entityId: number, colorHex: number, strength: number, _slowDecay: boolean): void {
+    // Buff application flash only: the sustained buff read is the ground aura
+    // (holdGroundAura), never a held body tint — so the sequencer's buff-impact
+    // pulse is capped low and always decays fast (~0.4s at the envelope's
+    // 2.2/s), the brief 'it landed' read.
+    this.bodyGlowPulse(entityId, colorHex, Math.min(strength, BUFF_APPLICATION_PULSE_MAX), false);
   }
 
   boltBetween(
@@ -1175,6 +1203,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.decals.update(dt);
     this.pillars.update(dt);
     this.shells.update(dt, this.time, this.frame, this.anchor);
+    this.groundAuras.update(dt, this.time, this.frame, this.anchor, this.groundY);
     this.spirits.update(dt);
     this.overlay.beginFrame();
     // styled bolt heads ride this frame's overlay batch (positions were just
@@ -1235,6 +1264,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.decals.clear();
     this.pillars.clear();
     this.shells.clear();
+    this.groundAuras.clear();
     this.spirits.clear();
     this.sequencer.clear();
     for (const [id, g] of this.glows) this.applyGlow?.(id, g.color, 0);
@@ -1427,6 +1457,8 @@ export class AbilityVfxFx implements SequencerHost {
       const period = 60 / Math.min(240, Math.max(30, o?.bpm ?? 83));
       if (band.age >= band.beat) {
         band.beat = band.age + period;
+        // the beat is the ring + chest glimmer alone: orbits never feed a
+        // body tint (the rig emissive is reserved for casts and morph rims)
         this.rings.spawn(
           at.x,
           at.y,
@@ -1437,7 +1469,6 @@ export class AbilityVfxFx implements SequencerHost {
           1.5 * this.intensity() * Math.min(1, fade * 2),
           true,
         );
-        this.bodyGlowPulse(entityId, color, 1.3, false);
       }
       if (!halve) {
         // chest glimmer swelling right after each beat
