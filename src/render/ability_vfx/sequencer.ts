@@ -3,6 +3,7 @@ import {
   type AbilityVfxMotif,
   abilityHexColor,
 } from '../ability_vfx_core';
+import { isCrescendoArchetype, SPECTACLE } from './spectacle';
 
 // The archetype sequencer, ported from the gallery interpreters
 // (arc_bolt_preview.js): each claimed cast becomes one pooled sequence slot
@@ -67,7 +68,13 @@ export interface SequencerHost {
     power: number,
     kind: 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood',
   ): void;
-  pulseLight(entityId: number, palette: string, intensity: number, duration: number): void;
+  pulseLight(
+    entityId: number,
+    palette: string,
+    intensity: number,
+    duration: number,
+    range?: number,
+  ): void;
   glowPulse(entityId: number, colorHex: number, strength: number, slowDecay: boolean): void;
   boltBetween(
     sourceId: number,
@@ -201,6 +208,9 @@ export interface SeqSlot {
   releaseDone: boolean;
   impactAt: number;
   impactDone: boolean;
+  // second staggered flipbook (crescendo tier 0): stretches the hot window
+  flip2At: number;
+  flip2Done: boolean;
   ring2At: number;
   ring2Done: boolean;
   ring3At: number;
@@ -211,6 +221,10 @@ export interface SeqSlot {
   dotTimer: number;
   motifTimer: number;
   motifLoops: number;
+  // spectacle afterglow (crescendo archetypes, tier 0): fading impact dome +
+  // periodic embers until afterglowUntil
+  afterglowUntil: number;
+  afterglowTimer: number;
   // impact anchor captured at impact time (world point)
   ix: number;
   iy: number;
@@ -306,6 +320,8 @@ export class ArchetypeSequencer {
         releaseDone: true,
         impactAt: 0.15,
         impactDone: false,
+        flip2At: 0,
+        flip2Done: true,
         ring2At: 0,
         ring2Done: true,
         ring3At: 0,
@@ -316,6 +332,8 @@ export class ArchetypeSequencer {
         dotTimer: 0,
         motifTimer: 0,
         motifLoops: 0,
+        afterglowUntil: 0,
+        afterglowTimer: 0,
         ix: 0,
         iy: 0,
         iz: 0,
@@ -371,6 +389,7 @@ export class ArchetypeSequencer {
     slot.releaseDone = windupDelay <= 0;
     slot.impactAt = awaitTravel ? Number.POSITIVE_INFINITY : windupDelay + 0.15;
     slot.impactDone = false;
+    slot.flip2Done = true;
     slot.ring2Done = true;
     slot.ring3Done = true;
     slot.swing2Done = true;
@@ -378,6 +397,8 @@ export class ArchetypeSequencer {
     slot.dotTimer = 0;
     slot.motifTimer = spec.motifEvery ?? 0;
     slot.motifLoops = 0;
+    slot.afterglowUntil = 0;
+    slot.afterglowTimer = 0;
     // seed the point anchor BEFORE release: release-phase motifs on a
     // point-anchored slot already need the fallback
     if (at) {
@@ -444,10 +465,24 @@ export class ArchetypeSequencer {
           continue;
         }
       }
+      // second staggered flipbook (crescendo tier 0)
+      if (!slot.flip2Done && slot.t >= slot.flip2At) {
+        slot.flip2Done = true;
+        host.flipbookAt(
+          slot.ix,
+          slot.iy + 0.3,
+          slot.iz,
+          2 * slot.power * SPECTACLE.flipbook * 0.85,
+          slot.accent,
+          SHEET_BY_PALETTE[spec.palette] ?? 'electric',
+          1.1 * SPECTACLE.flipbookHdr,
+        );
+        host.countPrimitive(slot.abilityId, 1);
+      }
       // staggered ring follow-ups (the "stacked inside 150ms" tail)
       if (!slot.ring2Done && slot.t >= slot.ring2At) {
         slot.ring2Done = true;
-        const rs = this.ringScale(slot);
+        const rs = this.ringScale(slot) * (isCrescendoArchetype(spec.archetype) ? SPECTACLE.followRing : 1);
         host.ringAt(
           slot.ix,
           this.groundOf(host, slot),
@@ -462,7 +497,7 @@ export class ArchetypeSequencer {
       }
       if (!slot.ring3Done && slot.t >= slot.ring3At) {
         slot.ring3Done = true;
-        const rs = this.ringScale(slot);
+        const rs = this.ringScale(slot) * (isCrescendoArchetype(spec.archetype) ? SPECTACLE.followRing : 1);
         host.ringAt(slot.ix, slot.iy + 0.6, slot.iz, 3.6 * rs, 0.55, 0xffffff, 1.5, true);
         host.countPrimitive(slot.abilityId, 1);
       }
@@ -471,7 +506,12 @@ export class ArchetypeSequencer {
         slot.swing2Done = true;
         const at = host.anchorOf(slot.targetId, 0.55);
         if (at) {
-          host.slashStyled(at, slot.color, spec.strike?.arc ?? 'horizontal', 0.85);
+          host.slashStyled(
+            at,
+            slot.color,
+            spec.strike?.arc ?? 'horizontal',
+            0.85 * SPECTACLE.strikeArc,
+          );
           host.burstAt(at.x, at.y, at.z, slot.color, 14, 0.9, 'sparks');
           host.countPrimitive(slot.abilityId, 2);
         }
@@ -518,10 +558,12 @@ export class ArchetypeSequencer {
       // sequence end: after impact + lingers + transients drain
       const done =
         slot.impactDone &&
+        slot.flip2Done &&
         slot.ring2Done &&
         slot.ring3Done &&
         slot.swing2Done &&
         slot.t >= slot.lingerUntil &&
+        slot.t >= slot.afterglowUntil &&
         !slot.gavel &&
         slot.ccStars <= 0 &&
         slot.implode <= 0 &&
@@ -625,6 +667,9 @@ export class ArchetypeSequencer {
   // Release: the 100ms hot flash at the caster plus per-archetype openers.
   private release(host: SequencerHost, slot: SeqSlot): void {
     const spec = slot.spec;
+    // spectacle calibration: targeted crescendos measured 4.5-12.7x under the
+    // gallery's release moment while radial/held families sat at parity
+    const boost = isCrescendoArchetype(spec.archetype);
     const caster = host.anchorOf(slot.casterId, 0.58);
     if (caster) {
       host.burstAt(
@@ -632,12 +677,44 @@ export class ArchetypeSequencer {
         caster.y,
         caster.z,
         slot.color,
-        Math.round(10 * slot.power),
+        Math.round(10 * slot.power * (boost ? SPECTACLE.releaseSparks : 1)),
         1.1,
         'sparks',
       );
-      host.pulseLight(slot.casterId, spec.palette, 3.2 * slot.power, 0.22);
+      host.pulseLight(
+        slot.casterId,
+        spec.palette,
+        3.2 * slot.power * (boost ? SPECTACLE.releaseLight : 1),
+        0.22,
+        boost ? SPECTACLE.lightRange : undefined,
+      );
       host.countPrimitive(slot.abilityId, 2);
+      if (boost && slot.tier === 0) {
+        // the gallery's cast-off explosion: a full-size sheet AT the caster
+        host.flipbookAt(
+          caster.x,
+          caster.y + 0.1,
+          caster.z,
+          SPECTACLE.releaseFlipbook * slot.power,
+          slot.color,
+          SHEET_BY_PALETTE[spec.palette] ?? 'electric',
+          1.35 * SPECTACLE.flipbookHdr,
+        );
+        host.countPrimitive(slot.abilityId, 1);
+        // the gallery's huge cast-off flash: a vertical shock halo bursting
+        // off the caster with the release star
+        host.ringAt(
+          caster.x,
+          caster.y,
+          caster.z,
+          SPECTACLE.releaseRingR * slot.power,
+          0.4,
+          slot.accent,
+          1.5,
+          true,
+        );
+        host.countPrimitive(slot.abilityId, 1);
+      }
       host.abilityAudio?.('release', spec.palette, slot.power, caster.x, caster.y, caster.z, {
         lite: spec.impact?.liteAudio === true || slot.tier >= 1,
         archetype: spec.archetype,
@@ -661,6 +738,9 @@ export class ArchetypeSequencer {
     const gy = this.groundOf(host, slot);
     const arch = spec.archetype;
     const gentle = arch === 'heal' || arch === 'buff' || arch === 'cc';
+    // spectacle calibration (see spectacle.ts): only the targeted-crescendo
+    // archetypes scale up — novas/shouts already measured at gallery parity
+    const boost = isCrescendoArchetype(arch);
     // the palette identity sounds where the hit visually lands (a ground zone
     // booms AT the zone); gentleness/lite policy resolves in the audio engine
     host.abilityAudio?.('impact', spec.palette, slot.power, slot.ix, slot.iy, slot.iz, {
@@ -680,10 +760,10 @@ export class ArchetypeSequencer {
         slot.ix,
         slot.iy,
         slot.iz,
-        2 * cs,
+        2 * cs * (boost ? SPECTACLE.flipbook : 1),
         slot.color,
         SHEET_BY_PALETTE[spec.palette] ?? 'electric',
-        spec.finisher ? 1.6 : 1.25,
+        (spec.finisher ? 1.6 : 1.25) * (boost ? SPECTACLE.flipbookHdr : 1),
       );
       n++;
     }
@@ -694,7 +774,7 @@ export class ArchetypeSequencer {
           ? (spec.nova?.radius ?? 5) * slot.power
           : arch === 'shout'
             ? (spec.shout?.radius ?? 6) * slot.power
-            : 2.4 * cs;
+            : 2.4 * cs * (boost ? SPECTACLE.followRing : 1);
       host.ringAt(slot.ix, gy, slot.iz, base * rs, 0.55, slot.color, 1.8, false);
       slot.ring2At = slot.t + 0.06;
       slot.ring2Done = false;
@@ -706,7 +786,7 @@ export class ArchetypeSequencer {
         slot.ix,
         slot.iy + 0.4,
         slot.iz,
-        2.6 * cs * (o.vRing === true ? 1 : o.vRing),
+        2.6 * cs * (o.vRing === true ? 1 : o.vRing) * (boost ? SPECTACLE.vRing : 1),
         0.45,
         slot.accent,
         1.3,
@@ -722,7 +802,11 @@ export class ArchetypeSequencer {
     // particles: sparks, embers, debris, smoke, blood
     const q = 0.4 + 0.6 * host.quality();
     const sparks = Math.round(
-      (o.sparks ?? (gentle ? 14 : 30)) * cs * q * (slot.tier === 1 ? 0.5 : 1),
+      (o.sparks ?? (gentle ? 14 : 30)) *
+        cs *
+        q *
+        (slot.tier === 1 ? 0.5 : 1) *
+        (boost ? SPECTACLE.impactSparkCount : 1),
     );
     if (sparks > 0) {
       host.burstAt(
@@ -731,7 +815,7 @@ export class ArchetypeSequencer {
         slot.iz,
         slot.accent,
         Math.min(60, Math.max(4, sparks)),
-        1.1 * cs,
+        1.1 * cs * (boost ? SPECTACLE.impactSparkPower : 1),
         'sparks',
       );
       n++;
@@ -761,17 +845,36 @@ export class ArchetypeSequencer {
       );
       n++;
     }
-    // impact light pulse
+    // impact light pulse (in a daylight scene the lit ground carries most of
+    // the readable impact coverage, so the crescendo boost rides it hard)
     const light = typeof o.light === 'number' ? o.light : 1;
     if (light > 0) {
-      host.pulseLight(slot.targetId, spec.palette, Math.min(10, 2.5 * light * cs), 0.3);
+      host.pulseLight(
+        slot.targetId,
+        spec.palette,
+        Math.min(10, 2.5 * light * cs * (boost ? SPECTACLE.impactLight : 1)),
+        0.3,
+        boost ? SPECTACLE.lightRange : undefined,
+      );
       n++;
+      if (boost && slot.tier === 0) {
+        // sustained afterglow light: the lit ground carries the aftermath
+        // through the gallery's ~1s hot window, not a 0.3s pop
+        host.pulseLight(
+          slot.targetId,
+          spec.palette,
+          SPECTACLE.sustainLight * cs,
+          SPECTACLE.sustainLightDur,
+          SPECTACLE.lightRange,
+        );
+        n++;
+      }
     }
     // weapon trail arc frozen at contact
     if (o.trail) {
       const at = host.anchorOf(slot.targetId, 0.55);
       if (at) {
-        host.slashStyled(at, slot.accent, o.trail, 1);
+        host.slashStyled(at, slot.accent, o.trail, boost ? SPECTACLE.strikeArc : 1);
         n++;
       }
     }
@@ -784,6 +887,26 @@ export class ArchetypeSequencer {
         slot.color,
         decalStyleOf(spec),
         Math.min(6, 1.5 + (spec.linger ?? 1) * 1.4),
+      );
+      n++;
+    }
+    // second staggered flipbook stretches the hot window toward the
+    // gallery's ~1s aftermath (tier-0 crescendo, only when a first one fired)
+    if (boost && slot.tier === 0 && o.flipbook !== false && (o.flipbook === true || !gentle)) {
+      slot.flip2At = slot.t + SPECTACLE.flipbook2Delay;
+      slot.flip2Done = false;
+    }
+    // the finisher's post-impact light column (the gallery pillar read IS its
+    // impact-phase coverage)
+    if (boost && slot.tier === 0 && spec.finisher) {
+      host.pillarAt(
+        slot.ix,
+        gy,
+        slot.iz,
+        SPECTACLE.pillarR * cs,
+        SPECTACLE.pillarH,
+        slot.color,
+        SPECTACLE.pillarDur,
       );
       n++;
     }
@@ -821,6 +944,13 @@ export class ArchetypeSequencer {
     // lingers honor the authored 1-6s dwell at tier 0 (dot drips, motif loops,
     // and the decal above all ride this window)
     slot.lingerUntil = slot.t + (slot.tier === 0 ? Math.min(6, spec.linger ?? 0.5) : 0);
+    // spectacle afterglow: crescendo impacts hold a readable aftermath (fading
+    // dome + periodic embers in drawTransients) even when the authored linger
+    // is short — the gallery's aftermath field the compressed stack dropped
+    if (boost && slot.tier === 0 && arch !== 'strike') {
+      slot.afterglowUntil = slot.t + SPECTACLE.afterglowDur;
+      slot.afterglowTimer = SPECTACLE.afterglowEvery;
+    }
   }
 
   private archetypeImpact(host: SequencerHost, slot: SeqSlot, gy: number): void {
@@ -830,7 +960,9 @@ export class ArchetypeSequencer {
       case 'strike': {
         const at = host.anchorOf(slot.targetId, 0.55);
         if (at) {
-          host.slashStyled(at, c, spec.strike?.arc ?? 'horizontal', 1);
+          // melee contact measured the worst non-bolt gap (8-20x): the arc is
+          // the strike's whole identity, so it swings at gallery span
+          host.slashStyled(at, c, spec.strike?.arc ?? 'horizontal', SPECTACLE.strikeArc);
           host.countPrimitive(slot.abilityId, 1);
           if (spec.strike?.bleed) {
             host.burstAt(at.x, at.y, at.z, 0xa01222, 8, 0.7, 'blood');
@@ -1321,14 +1453,18 @@ export class ArchetypeSequencer {
 
   private drawTransients(host: SequencerHost, slot: SeqSlot, dt: number): void {
     const cells = host.overlayCells();
-    // release flash: 100ms hot star at the caster's chest (timed from the
-    // release moment, which a synthetic windup shifts late)
+    const boost = isCrescendoArchetype(slot.spec.archetype);
+    // release flash: a hot star at the caster's chest (timed from the release
+    // moment, which a synthetic windup shifts late). Crescendo archetypes hold
+    // it longer at gallery scale, backed by a glow plate and a fan of radial
+    // filaments — all immediate-mode overlay pushes, zero pool cost.
+    const flashDur = boost ? SPECTACLE.releaseDur : 0.1;
     const sinceRelease = slot.t - slot.releaseAt;
-    if (sinceRelease >= 0 && sinceRelease < 0.1) {
+    if (sinceRelease >= 0 && sinceRelease < flashDur) {
       const caster = host.anchorOf(slot.casterId, 0.58);
       if (caster) {
-        const rp = sinceRelease / 0.1;
-        const size = (0.6 + 1.1 * rp) * slot.power;
+        const rp = sinceRelease / flashDur;
+        const size = (0.6 + 1.1 * rp) * slot.power * (boost ? SPECTACLE.releaseStar : 1);
         host.pushOverlay(
           caster.x,
           caster.y,
@@ -1339,6 +1475,123 @@ export class ArchetypeSequencer {
           (1 - rp) ** 1.2,
           3.2,
         );
+        if (boost) {
+          host.pushOverlay(
+            caster.x,
+            caster.y,
+            caster.z,
+            slot.color,
+            size * 1.6,
+            cells.glow,
+            (1 - rp) * 0.55,
+            1.9,
+          );
+          // radial filament fan bursting out of the flash (the gallery's dense
+          // branched release); expands and fades over the flash life
+          const nFil = SPECTACLE.releaseFilaments;
+          for (let k = 0; k < nFil; k++) {
+            const a = (k / nFil) * Math.PI * 2 + slot.casterId * 0.7;
+            const r = (0.4 + 2.4 * rp) * slot.power;
+            host.pushOverlay(
+              caster.x + Math.cos(a) * r,
+              caster.y + Math.sin(a * 2.7 + k) * 0.65,
+              caster.z + Math.sin(a) * r,
+              slot.color,
+              0.3,
+              cells.spark,
+              (1 - rp) * 0.85,
+              2.4,
+            );
+          }
+        }
+      }
+    }
+    // spectacle afterglow: the crescendo impact's fading aftermath dome +
+    // periodic ember pops at the landing point (armed in impact(), tier 0)
+    if (slot.impactDone && slot.t < slot.afterglowUntil) {
+      const rem = Math.min(1, (slot.afterglowUntil - slot.t) / SPECTACLE.afterglowDur);
+      host.pushOverlay(
+        slot.ix,
+        slot.iy + 0.25,
+        slot.iz,
+        slot.color,
+        SPECTACLE.afterglowSize * (0.7 + 0.5 * rem),
+        cells.glow,
+        0.62 * rem,
+        1.9,
+      );
+      const agGy = this.groundOf(host, slot) + 0.15;
+      host.pushOverlay(
+        slot.ix,
+        agGy,
+        slot.iz,
+        slot.accent,
+        SPECTACLE.afterglowSize * 1.35,
+        cells.glow,
+        0.32 * rem,
+        1.3,
+      );
+      // a slowly-turning ring of ground glow patches widens the aftermath
+      for (let k = 0; k < 4; k++) {
+        const a2 = host.timeNow() * 0.6 + (k / 4) * Math.PI * 2;
+        host.pushOverlay(
+          slot.ix + Math.cos(a2) * 1.15,
+          agGy + 0.1,
+          slot.iz + Math.sin(a2) * 1.15,
+          slot.color,
+          SPECTACLE.afterglowSize * 0.8,
+          cells.glow,
+          0.28 * rem,
+          1.4,
+        );
+      }
+      slot.afterglowTimer -= dt;
+      if (slot.afterglowTimer <= 0) {
+        slot.afterglowTimer = SPECTACLE.afterglowEvery;
+        host.burstAt(slot.ix, slot.iy + 0.2, slot.iz, slot.accent, 5, 0.55, 'embers');
+        // the pulsing afterglow: a soft re-lit ground disc plus a low ground
+        // ring ripple — in daylight these carry the aftermath read at chase
+        // distance where dim sprites vanish
+        host.pulseLight(
+          slot.targetId,
+          slot.spec.palette,
+          3.2 * rem,
+          SPECTACLE.afterglowEvery + 0.15,
+          SPECTACLE.lightRange,
+        );
+        host.ringAt(
+          slot.ix,
+          this.groundOf(host, slot),
+          slot.iz,
+          2.3,
+          0.5,
+          slot.color,
+          1.0 * rem,
+          false,
+        );
+        // storm aftermath crackles: residual ground arcs around the strike
+        // point (the gallery's lingering electric field)
+        if (slot.spec.palette === 'storm' || slot.spec.palette === 'arcane') {
+          const gy2 = this.groundOf(host, slot);
+          for (let k = 0; k < 2; k++) {
+            const a3 = Math.random() * Math.PI * 2;
+            const r3 = 0.6 + Math.random() * 1.7;
+            host.boltPoints(
+              slot.ix,
+              gy2 + 0.15,
+              slot.iz,
+              slot.ix + Math.cos(a3) * r3,
+              gy2 + 0.1,
+              slot.iz + Math.sin(a3) * r3,
+              slot.color,
+              0.22,
+              0.1,
+              1.1,
+            );
+          }
+          host.countPrimitive(slot.abilityId, 2);
+        }
+        host.countPrimitive(slot.abilityId, 3);
       }
     }
     // implosion converge motes (gallery scale: a wide shell of space sucking

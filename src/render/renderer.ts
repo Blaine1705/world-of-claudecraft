@@ -1065,7 +1065,13 @@ export class Renderer {
   private lightPulses: LightPulses;
   // Flash a pooled talent-moment point light at an entity's feet (see
   // light_pulses.ts); bound once in the constructor over the views map.
-  private pulseAt: (id: number, school: string, intensity: number, duration: number) => void;
+  private pulseAt: (
+    id: number,
+    school: string,
+    intensity: number,
+    duration: number,
+    range?: number,
+  ) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
@@ -1738,8 +1744,8 @@ export class Renderer {
       spawnAoeRing: (x, z, radius, school, colorHex) =>
         this.spawnAoeRing(x, z, radius, school, colorHex),
       triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
-      lightPulse: (id, school, intensity, duration) =>
-        this.pulseAt(id, school, intensity, duration),
+      lightPulse: (id, school, intensity, duration, range) =>
+        this.pulseAt(id, school, intensity, duration, range),
       setAuraGlow: (id, colorHex, intensity) => {
         const v = this.views.get(id);
         if (v) this.activeVisual(v)?.setAuraGlow(colorHex, intensity);
@@ -1812,10 +1818,10 @@ export class Renderer {
       };
       setTimeout(install, 250);
     }
-    this.pulseAt = (id, school, intensity, duration) => {
+    this.pulseAt = (id, school, intensity, duration, range) => {
       const v = this.views.get(id);
       if (!v) return;
-      this.lightPulses.pulse(v.group.position, school, intensity, duration);
+      this.lightPulses.pulse(v.group.position, school, intensity, duration, range);
     };
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
@@ -3818,7 +3824,9 @@ export class Renderer {
   private screenImpactAt(x: number, y: number, z: number, strength: number): void {
     if (!this.post || this.reducedMotion()) return;
     this.post.screenRipple(x, y, z, strength);
-    this.post.screenFlash(0.08 * strength);
+    // spectacle calibration: the finisher pop reads brighter (still well under
+    // the pass's 0.4 clamp and the ~3-frame decay — a pop, never a strobe)
+    this.post.screenFlash(0.12 * strength);
   }
 
   // A golden pillar bursts up off a fighter who just locked in an augment.

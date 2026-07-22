@@ -10,6 +10,7 @@ import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './rib
 import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
+import { SPECTACLE } from './spectacle';
 import { asSpiritPath, type SpiritAtKind, SpiritApparitions } from './spirits';
 
 export type { DecalStyle } from './decals';
@@ -277,7 +278,13 @@ export class AbilityVfxFx implements SequencerHost {
   private camRightZ = 0;
   private particleBurst: ParticleBurst | null = null;
   private lightPulseCb:
-    | ((entityId: number, palette: string, intensity: number, duration: number) => void)
+    | ((
+        entityId: number,
+        palette: string,
+        intensity: number,
+        duration: number,
+        range?: number,
+      ) => void)
     | null = null;
   private statSink: ((abilityId: string, n: number) => void) | null = null;
   private applyGlow: ((entityId: number, colorHex: number, intensity: number) => void) | null =
@@ -375,7 +382,13 @@ export class AbilityVfxFx implements SequencerHost {
   // trauma rides the renderer's existing addShake accumulator.
   setDelegates(
     burst: ParticleBurst,
-    lightPulse: (entityId: number, palette: string, intensity: number, duration: number) => void,
+    lightPulse: (
+      entityId: number,
+      palette: string,
+      intensity: number,
+      duration: number,
+      range?: number,
+    ) => void,
     statSink: (abilityId: string, n: number) => void,
     applyGlow?: (entityId: number, colorHex: number, intensity: number) => void,
     addShake?: (amount: number) => void,
@@ -538,6 +551,11 @@ export class AbilityVfxFx implements SequencerHost {
     volley = 1,
     headScale = 1,
   ): void {
+    // spectacle calibration: the measured crescendo gap was widest on bolts
+    // (trail + head sparse inside a gallery-sized bbox), so the travel read
+    // scales up at the one spawn seam every tier shares
+    width *= SPECTACLE.boltWidth;
+    headScale *= SPECTACLE.boltHead;
     const slot = this.sequencer.start(
       this,
       abilityId,
@@ -751,8 +769,14 @@ export class AbilityVfxFx implements SequencerHost {
     this.particleBurst?.(x, y, z, colorHex, count, power, kind);
   }
 
-  pulseLight(entityId: number, palette: string, intensity: number, duration: number): void {
-    this.lightPulseCb?.(entityId, palette, intensity, duration);
+  pulseLight(
+    entityId: number,
+    palette: string,
+    intensity: number,
+    duration: number,
+    range?: number,
+  ): void {
+    this.lightPulseCb?.(entityId, palette, intensity, duration, range);
   }
 
   glowPulse(entityId: number, colorHex: number, strength: number, slowDecay: boolean): void {

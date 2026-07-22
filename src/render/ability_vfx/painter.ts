@@ -67,7 +67,13 @@ export interface AbilityVfxDeps {
   triggerAttack: (entityId: number, abilityId?: string) => void;
   // The renderer's pooled talent-moment point light (pulseAt); optional so
   // tests can omit it.
-  lightPulse?: (entityId: number, school: string, intensity: number, duration: number) => void;
+  lightPulse?: (
+    entityId: number,
+    school: string,
+    intensity: number,
+    duration: number,
+    range?: number,
+  ) => void;
   // Writes the rig body glow (CharacterVisual.setAuraGlow); optional for tests.
   setAuraGlow?: (entityId: number, colorHex: number, intensity: number) => void;
   // Plays the caster's roar/cheer one-shot for shout casts; optional for tests.
@@ -313,8 +319,14 @@ export class AbilityVfx {
           power,
           kind === 'blood' ? 0xa01222 : colorHex,
         ),
-      (entityId, palette, intensity, duration) =>
-        deps.lightPulse?.(entityId, SCHOOL_BY_PALETTE[palette] ?? 'arcane', intensity, duration),
+      (entityId, palette, intensity, duration, range) =>
+        deps.lightPulse?.(
+          entityId,
+          SCHOOL_BY_PALETTE[palette] ?? 'arcane',
+          intensity,
+          duration,
+          range,
+        ),
       (abilityId, n) => {
         this.spawned = n;
         this.recordStat(abilityId, false);

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { type AbilityVfxTextures, OVERLAY_CELL } from './fx_textures';
+import { slashWidthScale } from './spectacle';
 
 // Camera-facing ribbon trails, ported from the gallery's RibbonMesh +
 // genBolt/smoothArc (arc_bolt_preview.js, ribbons section). One pooled dynamic
@@ -456,55 +457,58 @@ export class AbilityVfxRibbons {
 
   // The gallery's authored slash/trail vocabulary: every strike arc style and
   // impact trail style maps onto oriented slash strips through the target.
+  // Strip width follows the span scale (slashWidthScale) so a scaled-up arc
+  // keeps its aspect instead of thinning into a hoop.
   spawnSlashStyled(at: RibbonPoint, colorHex: number, style: string, scale = 1): void {
+    const w = slashWidthScale(scale);
     switch (style) {
       case 'vertical':
       case 'overhead':
         // overhead chop: top-to-bottom, nearly no horizontal travel
-        this.slashOne(at, colorHex, 0.35 * scale, 0.26, 3.2, 0.55 * scale, 0.3);
+        this.slashOne(at, colorHex, 0.35 * scale, 0.26, 3.2, 0.55 * scale, 0.3 * w);
         break;
       case 'uppercut':
         // rising cut: bottom-to-top with a forward kick
-        this.slashOne(at, colorHex, 0.5 * scale, 0.26, -2.6, 0.5 * scale, 0.3);
+        this.slashOne(at, colorHex, 0.5 * scale, 0.26, -2.6, 0.5 * scale, 0.3 * w);
         break;
       case 'thrust':
         // straight lunge: long, narrow, almost flat
-        this.slashOne(at, colorHex, 1.5 * scale, 0.18, 0.05, 0, 0.12);
+        this.slashOne(at, colorHex, 1.5 * scale, 0.18, 0.05, 0, 0.12 * w);
         break;
       case 'low':
         // ankle-height reap
-        this.slashOne(at, colorHex, 1.1 * scale, 0.2, 0.15, -0.45, 0.28);
+        this.slashOne(at, colorHex, 1.1 * scale, 0.2, 0.15, -0.45, 0.28 * w);
         break;
       case 'sweep':
         // extra-wide retaliatory sweep
-        this.slashOne(at, colorHex, 1.6 * scale, 0.26, 0.25, 0, 0.4);
+        this.slashOne(at, colorHex, 1.6 * scale, 0.26, 0.25, 0, 0.4 * w);
         break;
       case 'riposte':
-        this.slashOne(at, colorHex, 1.0 * scale, 0.2, 0.9, 0.15, 0.26);
+        this.slashOne(at, colorHex, 1.0 * scale, 0.2, 0.9, 0.15, 0.26 * w);
         break;
       case 'x':
       case 'cross':
         // two crossing diagonals
-        this.slashOne(at, colorHex, 1.05 * scale, 0.26, 1.1, 0.1, 0.3);
-        this.slashOne(at, colorHex, 1.05 * scale, 0.3, -1.1, 0.1, 0.3);
+        this.slashOne(at, colorHex, 1.05 * scale, 0.26, 1.1, 0.1, 0.3 * w);
+        this.slashOne(at, colorHex, 1.05 * scale, 0.3, -1.1, 0.1, 0.3 * w);
         break;
       case 'claws':
         // three parallel raking gashes
         for (let k = -1; k <= 1; k++)
-          this.slashOne(at, colorHex, 0.85 * scale, 0.24, 1.4, 0.3 * k, 0.16);
+          this.slashOne(at, colorHex, 0.85 * scale, 0.24, 1.4, 0.3 * k, 0.16 * w);
         break;
       case 'bite':
         // two opposing jaw arcs snapping shut
-        this.slashOne(at, colorHex, 0.7 * scale, 0.2, 2.4, 0.4, 0.22);
-        this.slashOne(at, colorHex, 0.7 * scale, 0.22, -2.4, -0.4, 0.22);
+        this.slashOne(at, colorHex, 0.7 * scale, 0.2, 2.4, 0.4, 0.22 * w);
+        this.slashOne(at, colorHex, 0.7 * scale, 0.22, -2.4, -0.4, 0.22 * w);
         break;
       case 'crescent':
         // one moon-blade: wide, heavily bowed
-        this.slashOne(at, colorHex, 1.3 * scale, 0.3, 0.4, 0.2, 0.5);
+        this.slashOne(at, colorHex, 1.3 * scale, 0.3, 0.4, 0.2, 0.5 * w);
         break;
       default:
         // 'horizontal' / 'arc': the flat baseline sweep with a random tilt
-        this.slashOne(at, colorHex, 1.15 * scale, 0.22, (Math.random() - 0.5) * 1.1, 0, 0.34);
+        this.slashOne(at, colorHex, 1.15 * scale, 0.22, (Math.random() - 0.5) * 1.1, 0, 0.34 * w);
         break;
     }
   }
