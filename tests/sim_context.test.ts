@@ -295,6 +295,7 @@ function makeFakeHost() {
     arenaQueueYumi5: [],
     yumiBusySlots: new Set(),
     yumiCatMatches: new Map(),
+    escortRuns: new Map(),
     matchmakeYumi: vi.fn(),
     updateYumiActive: vi.fn(),
     yumiPlayerDown: vi.fn(),

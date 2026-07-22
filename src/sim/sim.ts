@@ -26,6 +26,8 @@ import {
   resolvePosition,
 } from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
+import * as escortMod from './escort';
+import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
   cleanseFriendlyNpcAuras,
@@ -548,6 +550,7 @@ import {
   EQUIP_SLOTS,
   type EquipSlot,
   type ErrorReason,
+  type EscortRunState,
   emptyMoveInput,
   FAERIE_FIRE_ARMOR_PCT,
   GCD,
@@ -1638,6 +1641,9 @@ export class Sim {
   naturalRiftPortals: NaturalRiftPortal[] = [];
   riftPortalSpawnCount = 0;
   riftPortalNextAt = RIFT_PORTAL_FIRST_AT;
+  // Escort quest runs (src/sim/escort.ts), keyed by EscortDef id. Live
+  // SimContext view; the module owns every mutation.
+  escortRuns = new Map<string, EscortRunState>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -2071,6 +2077,11 @@ export class Sim {
     if (!cfg.noPlayer) {
       this.addPlayer(this.cfg.playerClass, this.cfg.playerName, { autoEquip: this.cfg.autoEquip });
     }
+
+    // Escort quest NPCs (src/sim/escort.ts). Last on purpose: the spawns draw
+    // no rng and only consume trailing entity ids, so every id and rng draw
+    // above stays byte-identical to a world without escorts.
+    initEscortsImpl(this.ctx);
   }
 
   private lockoutNowMs(): number {
@@ -3944,6 +3955,9 @@ export class Sim {
       get yumiCatMatches() {
         return sim.yumiCatMatches;
       },
+      get escortRuns() {
+        return sim.escortRuns;
+      },
       get nextArenaMatchId() {
         return sim.nextArenaMatchId;
       },
@@ -4801,6 +4815,8 @@ export class Sim {
     tickRiftLockpicksImpl(this.ctx); // per-tick rift-cache lockpick step clock
     tickRiftBossDeathZonesImpl(this.ctx); // lethal boss zone fuses + detonation
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
+    // Escort runs walk their NPC + watch ambush waves (rng-free; src/sim/escort.ts).
+    updateEscortsImpl(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
@@ -7725,6 +7741,12 @@ export class Sim {
     // A Protect Yumi cat is heal/shield-targetable only by its own team.
     if (target.kind === 'mob' && yumiMod.isYumiCat(target))
       return yumiMod.yumiCatFriendlyTo(this.ctx, caster, target);
+    // An escortee with a live run is heal/shield-targetable by any player
+    // (escort.ts owns the predicate; players can never attack it because
+    // isHostileTo resolves an ownerless mob to its hostile flag, false here).
+    if (target.kind === 'mob' && escortMod.isActiveEscortee(this.ctx, target)) {
+      return this.pvpController(caster) !== null;
+    }
     if (target.kind === 'mob' && target.ownerId !== null) {
       const owner = this.entities.get(target.ownerId);
       return !!owner && owner.kind === 'player' && !this.isHostileTo(caster, owner);

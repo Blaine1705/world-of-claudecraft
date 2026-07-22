@@ -27,6 +27,7 @@ import { bagCapacity, fitsAll } from './bags';
 import { HARVEST_COMPONENT_SPECIMENS } from './content/professions';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
+import { tryStartEscort } from './escort';
 import {
   activateNythraxisRelic,
   interactObjectForQuests,
@@ -528,6 +529,9 @@ export function interact(ctx: SimContext, pid?: number): void {
       }
     }
   }
+  // Escort start: standing near an idle escortee whose quest this player has
+  // active begins the walk (escort.ts picks the nearest eligible one).
+  if (tryStartEscort(ctx, p, r.meta)) return;
   let bestCorpse: Entity | null = null;
   let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestObj: Entity | null = null;

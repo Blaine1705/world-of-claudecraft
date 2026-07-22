@@ -2079,6 +2079,16 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_fox__d87838.webp"
       },
       {
+        "name": "Terrace Howler",
+        "min": 19,
+        "max": 20,
+        "rare": false,
+        "templateId": "terrace_howler",
+        "model": "mob_wolf",
+        "tint": "#9db4c8",
+        "still": "/guide-stills/mob_wolf__9db4c8.webp"
+      },
+      {
         "name": "Gloam Strider",
         "min": 20,
         "max": 20,

@@ -10,6 +10,7 @@ import type {
   DelveDef,
   DelveModuleDef,
   DungeonDef,
+  EscortDef,
   GatherNodeDef,
   GroundObjectDef,
   ItemDef,
@@ -89,12 +90,14 @@ import {
 } from './content/farshore';
 import {
   FROSTVEIL_CAMPS,
+  FROSTVEIL_ESCORTS,
   FROSTVEIL_ITEMS,
   FROSTVEIL_MOBS,
   FROSTVEIL_NPCS,
   FROSTVEIL_OBJECTS,
   FROSTVEIL_PORTALS,
   FROSTVEIL_PROPS,
+  FROSTVEIL_QUEST_CAMPS,
   FROSTVEIL_QUEST_ORDER,
   FROSTVEIL_QUESTS,
   FROSTVEIL_ROADS,
@@ -469,7 +472,17 @@ export const CAMPS: CampDef[] = [
   ...EVERGARDEN_CAMPS,
   ...GALECREST_CAMPS,
   ...FARSHORE_CAMPS,
+  // Quest-pass camp additions stay BELOW every original realm camp (the same
+  // append-last draw-order rule as above): a new camp inserted mid-array would
+  // shift every later camp's world-gen rng draws.
+  ...FROSTVEIL_QUEST_CAMPS,
 ];
+
+// Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
+// like QUESTS.
+export const ESCORTS: Record<string, EscortDef> = {
+  ...FROSTVEIL_ESCORTS,
+};
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE1_OBJECTS,

@@ -31,6 +31,7 @@ import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
+import { isEscortNpcTemplate } from '../escort';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import {
@@ -183,6 +184,20 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // hostility safety net below must not re-hostile them (team hostility lives
   // in the isHostileTo/isFriendlyTo yumi arms).
   if (mob.templateId === YUMI_TEMPLATE_ID) {
+    mob.hostile = false;
+    mob.aiState = 'idle';
+    mob.inCombat = false;
+    mob.aggroTargetId = null;
+    clearThreat(mob);
+    return;
+  }
+
+  // Escort-run escortees are inert walkers: moved only by the escort driver
+  // (src/sim/escort.ts), no aggro, no wander, no evade-home, and the
+  // leaked-mob safety net below must not re-hostile them. Ambush mobs damage
+  // them through seeded threat; players heal them via the escort arm in
+  // Sim.isFriendlyTo. Yumi-cat pattern, verbatim.
+  if (isEscortNpcTemplate(mob.templateId)) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;

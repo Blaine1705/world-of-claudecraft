@@ -157,6 +157,8 @@ const MOB_IDS = [
   'rime_elemental',
   'fen_sprite',
   'frostmane_yeti',
+  'terrace_howler',
+  'apprentice_wren',
   'emberwing_drake',
   'ashbone_raider',
   'ashbone_warcaller',
@@ -257,6 +259,12 @@ const NPC_IDS = [
   'provisioner_fenna',
   'wardsmith_orun',
   'archivist_tullo',
+  // Icemantle, the Frostveil Reach
+  'warden_kaldra',
+  'hearthkeeper_maeve',
+  'scout_einna',
+  'aurorist_veyla',
+  'trapper_brosk',
   // Gullhaven, the Farshore redoubt
   'warden_coalfast',
   'riftwatch_ollun',
@@ -367,6 +375,19 @@ const QUEST_IDS = [
   'q_waking_warden',
   'q_seal_restored',
   'q_prof_hobby_switch',
+  // the Frostveil Reach
+  'q_fv_snowline_report',
+  'q_fv_wolves_at_the_door',
+  'q_fv_winter_pelts',
+  'q_fv_ember_caches',
+  'q_fv_lights_over_steps',
+  'q_fv_silent_trapline',
+  'q_fv_aurora_motes',
+  'q_fv_rime_unbound',
+  'q_fv_sprung_traps',
+  'q_fv_howl_above',
+  'q_fv_seeing_wren_home',
+  'q_fv_frostmane_tyrant',
 ] as const;
 
 const ZONE_IDS = [

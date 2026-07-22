@@ -2176,6 +2176,12 @@ const ITEM_ENTITY_IDS = [
   'wildheart_tuskblade',
   'wildheart_hexwood_staff',
   'wildheart_fangknife',
+  'thick_winter_pelt',
+  'aurora_mote',
+  'hearth_ember_cache',
+  'sprung_trap',
+  'hearthlined_treads',
+  'frostmane_mantle',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2210,6 +2216,12 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   wildheart_tuskblade: 'Wildheart Tuskblade',
   wildheart_hexwood_staff: 'Hexwood Staff of the Basin',
   wildheart_fangknife: 'Fangknife of Zulgar',
+  thick_winter_pelt: 'Thick Winter Pelt',
+  aurora_mote: 'Aurora Mote',
+  hearth_ember_cache: 'Ember Cache',
+  sprung_trap: 'Sprung Fen Trap',
+  hearthlined_treads: 'Hearth-Lined Treads',
+  frostmane_mantle: 'Mantle of the Frostmane',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {
