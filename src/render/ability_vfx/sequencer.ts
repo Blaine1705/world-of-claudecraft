@@ -96,6 +96,9 @@ export interface SequencerHost {
     brightness: number,
   ): void;
   overlayCells(): { glow: number; star: number; rune: number; spark: number };
+  // One frame of the authored windup ceremony on an entity (drives the
+  // sequencer's synthetic pre-release phase for instant casts).
+  windupDraw(entityId: number, colorHex: number, progress: number, style: string): void;
   quality(): number;
   timeNow(): number;
   countPrimitive(abilityId: string, n: number): void;
@@ -113,6 +116,10 @@ export interface SeqSlot {
   t: number;
   power: number;
   // phase bookkeeping
+  // synthetic pre-release windup for instants: release fires at releaseAt and
+  // until then the caster draws the authored windup ceremony each frame
+  releaseAt: number;
+  releaseDone: boolean;
   impactAt: number;
   impactDone: boolean;
   ring2At: number;
@@ -178,6 +185,8 @@ export class ArchetypeSequencer {
         tier: 0,
         t: 0,
         power: 1,
+        releaseAt: 0,
+        releaseDone: true,
         impactAt: 0.15,
         impactDone: false,
         ring2At: 0,
@@ -203,7 +212,11 @@ export class ArchetypeSequencer {
 
   // Begin a sequence at the RELEASE moment. awaitTravel: a live projectile is
   // in flight and triggerImpact() will land it; otherwise the impact fires at
-  // the compressed instant timing (0.15s).
+  // the compressed instant timing (0.15s). windupDelay > 0 stages a synthetic
+  // pre-release windup first: the release (and everything after it) shifts
+  // late by that much while the caster draws the authored windup ceremony.
+  // `at` pins the sequence to a WORLD POINT (ground-aimed casts): pass
+  // targetId -1 with it, and every target-anchored read falls back there.
   start(
     host: SequencerHost,
     abilityId: string,
@@ -213,6 +226,8 @@ export class ArchetypeSequencer {
     colorHex: number,
     tier: number,
     awaitTravel: boolean,
+    windupDelay = 0,
+    at?: { x: number; y: number; z: number },
   ): SeqSlot | null {
     if (tier >= 2) return null;
     // steal the oldest running sequence when the pool is saturated: a fresh
@@ -234,7 +249,9 @@ export class ArchetypeSequencer {
     slot.tier = tier;
     slot.t = 0;
     slot.power = spec.power ?? 1;
-    slot.impactAt = awaitTravel ? Number.POSITIVE_INFINITY : 0.15;
+    slot.releaseAt = windupDelay;
+    slot.releaseDone = windupDelay <= 0;
+    slot.impactAt = awaitTravel ? Number.POSITIVE_INFINITY : windupDelay + 0.15;
     slot.impactDone = false;
     slot.ring2Done = true;
     slot.ring3Done = true;
@@ -243,10 +260,17 @@ export class ArchetypeSequencer {
     slot.dotTimer = 0;
     slot.motifTimer = spec.motifEvery ?? 0;
     slot.motifLoops = 0;
+    // seed the point anchor BEFORE release: release-phase motifs on a
+    // point-anchored slot already need the fallback
+    if (at) {
+      slot.ix = at.x;
+      slot.iy = at.y;
+      slot.iz = at.z;
+    }
     slot.gavel = false;
     slot.ccStars = 0;
     slot.implode = 0;
-    this.release(host, slot);
+    if (slot.releaseDone) this.release(host, slot);
     return slot;
   }
 
@@ -265,6 +289,20 @@ export class ArchetypeSequencer {
       if (!slot.active) continue;
       slot.t += dt;
       const spec = slot.spec;
+      if (!slot.releaseDone) {
+        if (slot.t < slot.releaseAt) {
+          // pre-release: the caster performs the authored windup ceremony
+          host.windupDraw(
+            slot.casterId,
+            slot.color,
+            Math.min(1, slot.t / slot.releaseAt),
+            spec.windupStyle ?? 'orb',
+          );
+          continue;
+        }
+        slot.releaseDone = true;
+        this.release(host, slot);
+      }
       if (!slot.impactDone && slot.t >= slot.impactAt) {
         const at = this.impactAnchor(host, slot);
         if (at) {
@@ -315,7 +353,9 @@ export class ArchetypeSequencer {
         slot.dotTimer -= dt;
         if (slot.dotTimer <= 0) {
           slot.dotTimer = 0.5;
-          const at = host.anchorOf(slot.targetId, 0.5);
+          const at =
+            host.anchorOf(slot.targetId, 0.5) ??
+            (slot.targetId < 0 ? { x: slot.ix, y: slot.iy, z: slot.iz } : null);
           if (at) {
             const rise = spec.dot?.drip !== 'fall';
             host.burstAt(
@@ -873,11 +913,13 @@ export class ArchetypeSequencer {
 
   private drawTransients(host: SequencerHost, slot: SeqSlot, dt: number): void {
     const cells = host.overlayCells();
-    // release flash: 100ms hot star at the caster's chest
-    if (slot.t < 0.1) {
+    // release flash: 100ms hot star at the caster's chest (timed from the
+    // release moment, which a synthetic windup shifts late)
+    const sinceRelease = slot.t - slot.releaseAt;
+    if (sinceRelease >= 0 && sinceRelease < 0.1) {
       const caster = host.anchorOf(slot.casterId, 0.58);
       if (caster) {
-        const rp = slot.t / 0.1;
+        const rp = sinceRelease / 0.1;
         const size = (0.6 + 1.1 * rp) * slot.power;
         host.pushOverlay(
           caster.x,
@@ -956,6 +998,9 @@ export class ArchetypeSequencer {
     host: SequencerHost,
     slot: SeqSlot,
   ): { x: number; y: number; z: number } | null {
+    // point-anchored casts (ground aims, targetId -1) are pinned to their
+    // seeded world point
+    if (slot.targetId < 0) return { x: slot.ix, y: slot.iy, z: slot.iz };
     const spec = slot.spec;
     const selfCentered =
       spec.self === true ||

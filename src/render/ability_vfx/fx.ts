@@ -51,6 +51,16 @@ interface OrbitBand {
 
 export type WindupStyle = 'none' | 'orb' | 'runes' | 'vortex' | 'ascend' | 'stance' | 'weapon';
 
+const WINDUP_STYLE_SET = new Set<string>([
+  'none',
+  'orb',
+  'runes',
+  'vortex',
+  'ascend',
+  'stance',
+  'weapon',
+]);
+
 interface WindupState {
   colorHex: number;
   progress: number;
@@ -205,7 +215,8 @@ export class AbilityVfxFx implements SequencerHost {
 
   // ---- archetype sequences (the gallery phase anatomy; see sequencer.ts) --
 
-  // Instant cast: release now, impact 0.15s later at the archetype's anchor.
+  // Instant cast: release now (or after a synthetic windup phase of
+  // windupDelay seconds), impact 0.15s later at the archetype's anchor.
   sequenceInstant(
     abilityId: string,
     spec: AbilityVfxFullSpec,
@@ -213,8 +224,41 @@ export class AbilityVfxFx implements SequencerHost {
     targetId: number,
     colorHex: number,
     tier: number,
+    windupDelay = 0,
   ): void {
-    this.sequencer.start(this, abilityId, spec, casterId, targetId, colorHex, tier, false);
+    this.sequencer.start(
+      this,
+      abilityId,
+      spec,
+      casterId,
+      targetId,
+      colorHex,
+      tier,
+      false,
+      windupDelay,
+    );
+  }
+
+  // Ground-aimed instant: the whole sequence anchors at the WORLD POINT (the
+  // slot travels with targetId -1 and a pre-seeded impact anchor), so release
+  // reads on the caster while motifs, decals, and lingers land where the cast
+  // was aimed.
+  sequenceInstantAt(
+    abilityId: string,
+    spec: AbilityVfxFullSpec,
+    casterId: number,
+    x: number,
+    z: number,
+    colorHex: number,
+    tier: number,
+    windupDelay = 0,
+  ): void {
+    const y = this.groundY(x, z) + 0.4;
+    this.sequencer.start(this, abilityId, spec, casterId, -1, colorHex, tier, false, windupDelay, {
+      x,
+      y,
+      z,
+    });
   }
 
   // Traveling bolt: release now, comet trail chases the pooled Vfx projectile,
@@ -412,6 +456,15 @@ export class AbilityVfxFx implements SequencerHost {
     return OVERLAY_CELL;
   }
 
+  // Sequencer-driven windup ceremony (the synthetic pre-release phase for
+  // instants). Safe to call from sequencer.update: it runs between the
+  // overlay's beginFrame and commit, so the pushes land in this frame's batch.
+  windupDraw(entityId: number, colorHex: number, progress: number, style: string): void {
+    const s: WindupStyle = WINDUP_STYLE_SET.has(style) ? (style as WindupStyle) : 'orb';
+    if (s === 'none') return;
+    this.drawWindup(entityId, s, colorHex, progress);
+  }
+
   quality(): number {
     return this.qualityLevel;
   }
@@ -570,7 +623,7 @@ export class AbilityVfxFx implements SequencerHost {
         this.windups.delete(id);
         continue;
       }
-      this.drawWindup(id, w);
+      this.drawWindup(id, w.style, w.colorHex, w.progress);
     }
     for (const [id, bands] of this.orbits) {
       for (let i = bands.length - 1; i >= 0; i--) {
@@ -639,11 +692,16 @@ export class AbilityVfxFx implements SequencerHost {
   //   ascend  a rising mote column crowned by a star near completion
   //   stance  low dust drifting at the feet (warrior stances)
   //   weapon  a hand-height star building along the weapon
-  private drawWindup(entityId: number, w: WindupState): void {
-    const p = Math.min(1, Math.max(0, w.progress));
+  private drawWindup(
+    entityId: number,
+    style: WindupStyle,
+    colorHex: number,
+    progress: number,
+  ): void {
+    const p = Math.min(1, Math.max(0, progress));
     const q = 0.75 + 0.25 * this.qualityLevel;
     const pulse = 1 + 0.07 * Math.sin(this.time * 14);
-    if (w.style === 'runes') {
+    if (style === 'runes') {
       const feet = this.anchor(entityId, 0.04);
       if (!feet) return;
       const n = 4;
@@ -654,7 +712,7 @@ export class AbilityVfxFx implements SequencerHost {
           feet.x + Math.cos(a) * r,
           feet.y + 0.14,
           feet.z + Math.sin(a) * r,
-          w.colorHex,
+          colorHex,
           0.3 * q,
           OVERLAY_CELL.rune,
           0.55 + 0.45 * p,
@@ -667,7 +725,7 @@ export class AbilityVfxFx implements SequencerHost {
           chest.x,
           chest.y,
           chest.z,
-          w.colorHex,
+          colorHex,
           0.24 * (0.5 + p) * pulse * q,
           OVERLAY_CELL.glow,
           0.7,
@@ -675,7 +733,7 @@ export class AbilityVfxFx implements SequencerHost {
         );
       return;
     }
-    if (w.style === 'stance') {
+    if (style === 'stance') {
       const feet = this.anchor(entityId, 0.06);
       if (!feet) return;
       for (let k = 0; k < 3; k++) {
@@ -685,7 +743,7 @@ export class AbilityVfxFx implements SequencerHost {
           feet.x + Math.cos(a) * r,
           feet.y + 0.12 + 0.1 * Math.sin(this.time * 3 + k),
           feet.z + Math.sin(a) * r,
-          w.colorHex,
+          colorHex,
           0.22 * q,
           OVERLAY_CELL.glow,
           0.4 + 0.3 * p,
@@ -694,14 +752,14 @@ export class AbilityVfxFx implements SequencerHost {
       }
       return;
     }
-    if (w.style === 'weapon') {
+    if (style === 'weapon') {
       const hand = this.anchor(entityId, 0.46);
       if (!hand) return;
       this.overlay.push(
         hand.x,
         hand.y,
         hand.z,
-        w.colorHex,
+        colorHex,
         (0.16 + 0.3 * p) * pulse * q,
         OVERLAY_CELL.star,
         0.55 + 0.45 * p,
@@ -711,7 +769,7 @@ export class AbilityVfxFx implements SequencerHost {
         hand.x,
         hand.y,
         hand.z,
-        w.colorHex,
+        colorHex,
         (0.3 + 0.35 * p) * q,
         OVERLAY_CELL.glow,
         0.5,
@@ -719,7 +777,7 @@ export class AbilityVfxFx implements SequencerHost {
       );
       return;
     }
-    if (w.style === 'ascend') {
+    if (style === 'ascend') {
       const feet = this.anchor(entityId, 0.04);
       const head = this.anchor(entityId, 1.0);
       if (!feet || !head) return;
@@ -731,7 +789,7 @@ export class AbilityVfxFx implements SequencerHost {
           feet.x + Math.cos(a) * 0.35,
           feet.y + f * span,
           feet.z + Math.sin(a) * 0.35,
-          w.colorHex,
+          colorHex,
           0.2 * q,
           OVERLAY_CELL.glow,
           (1 - f) * (0.4 + 0.6 * p),
@@ -742,7 +800,7 @@ export class AbilityVfxFx implements SequencerHost {
         head.x,
         head.y + 0.5,
         head.z,
-        w.colorHex,
+        colorHex,
         0.3 * p * pulse * q,
         OVERLAY_CELL.star,
         p,
@@ -754,20 +812,20 @@ export class AbilityVfxFx implements SequencerHost {
     const at = this.anchor(entityId, 0.58);
     if (!at) return;
     const size = (0.28 + 0.5 * p) * pulse * q;
-    this.overlay.push(at.x, at.y + 0.12, at.z, w.colorHex, size, OVERLAY_CELL.glow, 0.85, 1.9);
+    this.overlay.push(at.x, at.y + 0.12, at.z, colorHex, size, OVERLAY_CELL.glow, 0.85, 1.9);
     this.overlay.push(
       at.x,
       at.y + 0.12,
       at.z,
-      w.colorHex,
+      colorHex,
       size * 0.45,
       OVERLAY_CELL.star,
       0.5 + 0.5 * p,
       2.6,
     );
     if (this.qualityLevel >= 0.5) {
-      const motes = w.style === 'vortex' ? 4 : 2;
-      const reach = w.style === 'vortex' ? 1.9 : 0.9;
+      const motes = style === 'vortex' ? 4 : 2;
+      const reach = style === 'vortex' ? 1.9 : 0.9;
       for (let k = 0; k < motes; k++) {
         const a = this.time * 5 + (k * Math.PI * 2) / motes + entityId;
         const r = 0.25 + reach * (1 - p);
@@ -775,7 +833,7 @@ export class AbilityVfxFx implements SequencerHost {
           at.x + Math.cos(a) * r,
           at.y + 0.12 + Math.sin(this.time * 3 + k * 2) * 0.14,
           at.z + Math.sin(a) * r,
-          w.colorHex,
+          colorHex,
           0.16,
           OVERLAY_CELL.spark,
           0.7,
