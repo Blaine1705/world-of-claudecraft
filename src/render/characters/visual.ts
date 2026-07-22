@@ -446,7 +446,7 @@ export class CharacterVisual {
         : 0;
 
     // distant corpses show the static idle far mesh — tip it over
-    if (this.farMesh && this.farMesh.visible) {
+    if (this.farMesh?.visible) {
       if (s.dead) {
         this.farMesh.rotation.z = Math.PI / 2;
         this.farMesh.position.y = this.height * 0.16;
@@ -1419,11 +1419,11 @@ export class CharacterVisual {
     this.clickProxy.scale.y = pickProxyHeight(this.height, this.clickRadius, false);
     const death = this.action(this.def.clips.death);
     if (death) death.stop();
-    const flourish = this.action(this.def.clips.flourish);
-    if (flourish) {
+    const flourishClip = this.def.clips.flourish;
+    if (flourishClip && this.action(flourishClip)) {
       // skeletons claw back out of the ground; bosses taunt
       this.current = null;
-      this.playOneShot(this.def.clips.flourish!, 1);
+      this.playOneShot(flourishClip, 1);
     } else {
       this.fadeTo(this.action(this.def.clips.idle), 0.2, false);
     }

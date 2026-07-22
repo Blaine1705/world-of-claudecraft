@@ -183,11 +183,7 @@ export class GroundAuras {
           ? 1
           : Math.min(1, Math.max(0, (slot.release - slot.age) / FADE_OUT));
       const breath = Math.sin(2 * Math.PI * BREATH_HZ * time + slot.phase);
-      slot.mesh.position.set(
-        at.x,
-        groundY(at.x, at.z) + 0.05 + slot.band * 0.01,
-        at.z,
-      );
+      slot.mesh.position.set(at.x, groundY(at.x, at.z) + 0.05 + slot.band * 0.01, at.z);
       slot.mesh.scale.setScalar(
         BAND_RADIUS[slot.band] * (0.85 + 0.15 * growEase) * (1 + 0.05 * breath),
       );

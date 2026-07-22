@@ -502,7 +502,8 @@ export class ArchetypeSequencer {
       }
       if (!slot.ring3Done && slot.t >= slot.ring3At) {
         slot.ring3Done = true;
-        const rs = this.ringScale(slot) * (isCrescendoArchetype(spec.archetype) ? SPECTACLE.followRing : 1);
+        const rs =
+          this.ringScale(slot) * (isCrescendoArchetype(spec.archetype) ? SPECTACLE.followRing : 1);
         // the gallery critFinisher death-sentence beat at +0.12s: a huge
         // second ground wave PLUS the white-hot vertical halo
         host.ringAt(
@@ -536,11 +537,44 @@ export class ArchetypeSequencer {
           host.slashStyled(at, slot.color, spec.strike?.arc ?? 'horizontal', SPECTACLE.strikeArc);
           host.burstAt(at.x, at.y, at.z, slot.color, 18, 1.2, 'sparks');
           const rs2 = this.ringScale(slot) * SPECTACLE.followRing;
-          host.ringAt(at.x, this.groundOf(host, slot), at.z, 4.2 * rs2, 0.75, slot.accent, 1.5, false);
-          host.ringAt(at.x, at.y + 0.3, at.z, 2.4 * this.ringScale(slot) * SPECTACLE.vRing, 0.5, slot.accent, 1.4, true);
+          host.ringAt(
+            at.x,
+            this.groundOf(host, slot),
+            at.z,
+            4.2 * rs2,
+            0.75,
+            slot.accent,
+            1.5,
+            false,
+          );
+          host.ringAt(
+            at.x,
+            at.y + 0.3,
+            at.z,
+            2.4 * this.ringScale(slot) * SPECTACLE.vRing,
+            0.5,
+            slot.accent,
+            1.4,
+            true,
+          );
           // the echo is a contact beat of its own: white-hot star + camera bite
-          host.pushOverlay(at.x, at.y, at.z, 0xffffff, 1.6 * slot.power, host.overlayCells().star, 0.9, 3.2);
-          host.pulseLight(slot.targetId, spec.palette, 4.5 * slot.power, 0.35, SPECTACLE.lightRange);
+          host.pushOverlay(
+            at.x,
+            at.y,
+            at.z,
+            0xffffff,
+            1.6 * slot.power,
+            host.overlayCells().star,
+            0.9,
+            3.2,
+          );
+          host.pulseLight(
+            slot.targetId,
+            spec.palette,
+            4.5 * slot.power,
+            0.35,
+            SPECTACLE.lightRange,
+          );
           if (slot.tier === 0) host.shakeAt(at.x, at.y, at.z, 0.25);
           host.countPrimitive(slot.abilityId, 5);
         }
@@ -647,7 +681,15 @@ export class ArchetypeSequencer {
   private fireBeat(host: SequencerHost, beat: Beat): void {
     switch (beat.kind) {
       case 'burst':
-        host.burstAt(beat.x, beat.y, beat.z, beat.color, Math.round(beat.a), beat.b, beat.burstKind);
+        host.burstAt(
+          beat.x,
+          beat.y,
+          beat.z,
+          beat.color,
+          Math.round(beat.a),
+          beat.b,
+          beat.burstKind,
+        );
         host.countPrimitive(beat.abilityId, 1);
         break;
       case 'pillar': {

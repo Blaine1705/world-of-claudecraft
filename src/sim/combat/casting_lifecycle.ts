@@ -445,9 +445,9 @@ function resolveDeadAllyTarget(
   const id = overrideId ?? p.targetId;
   if (id === null) return null;
   const t = ctx.entities.get(id);
-  if (!t || !t.dead || t.kind !== 'player') return null;
+  if (!t?.dead || t.kind !== 'player') return null;
   const party = ctx.partyOf(p.id);
-  return party && party.members.includes(t.id) ? t : null;
+  return party?.members.includes(t.id) ? t : null;
 }
 
 export function castAbility(
@@ -653,7 +653,7 @@ export function castAbility(
     // silently burns the cast on an empty selection.
     if (ability.partyOnlyTarget && target.id !== p.id) {
       const party = ctx.partyOf(p.id);
-      if (!party || !party.members.includes(target.id)) {
+      if (!party?.members.includes(target.id)) {
         ctx.error(p.id, 'That ally is not in your group.');
         return;
       }

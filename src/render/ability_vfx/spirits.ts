@@ -321,7 +321,10 @@ export class SpiritApparitions {
       const name = list.find((n) => names.has(n));
       return name ? (animations.find((c) => c.name === name) ?? null) : null;
     };
-    const mkAction = (clip: THREE.AnimationClip | null, loop: boolean): THREE.AnimationAction | null => {
+    const mkAction = (
+      clip: THREE.AnimationClip | null,
+      loop: boolean,
+    ): THREE.AnimationAction | null => {
       if (!clip) return null;
       const a = mixer.clipAction(clip);
       a.timeScale = tempo * (loop ? 1 : 1.15);

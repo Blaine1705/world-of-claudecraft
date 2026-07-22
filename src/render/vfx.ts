@@ -120,7 +120,8 @@ function buildAtlasTexture(): THREE.CanvasTexture {
   const size = ATLAS_GRID * ATLAS_CELL;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2D canvas context unavailable');
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, size, size);
   for (let i = 0; i < SPRITE_FILES.length; i++) {

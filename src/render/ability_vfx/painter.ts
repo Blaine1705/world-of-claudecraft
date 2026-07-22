@@ -6,6 +6,7 @@
 // spec's color, scale, and archetype. Unknown ability or fx kind: it declines
 // and the renderer's generic school-colored arm runs unchanged.
 
+import { ABILITIES } from '../../sim/data';
 import {
   AbilityVfxBudget,
   type AbilityVfxFullSpec,
@@ -17,7 +18,6 @@ import {
   planCast,
   planImpact,
 } from '../ability_vfx_core';
-import { ABILITIES } from '../../sim/data';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
@@ -1017,7 +1017,10 @@ export class AbilityVfx {
       // into the outermost). Veil styles (stealth, vanish) opt out — a
       // disappearing act must not glow the ground it stands on.
       let discStarted = false;
-      if (full !== undefined && (full.buff !== undefined || full.archetype === 'buff' || full.barrier === true)) {
+      if (
+        full !== undefined &&
+        (full.buff !== undefined || full.archetype === 'buff' || full.barrier === true)
+      ) {
         if (isTransformativeBuff(full)) {
           const strength =
             TRANSFORMATIVE_RIM_SCALE * (full.buff?.shellDur ? 2 : 1.3) * (full.power ?? 1);
@@ -1041,8 +1044,7 @@ export class AbilityVfx {
       const style = asOrbitStyle(full?.buff?.orbit ?? spec.bo);
       if (style === null) {
         // orbit-less buffs still get their gain moment off the disc's first frame
-        if (discStarted)
-          this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
+        if (discStarted) this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
         continue;
       }
       if (bands >= 3) continue;

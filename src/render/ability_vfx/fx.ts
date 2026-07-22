@@ -1,5 +1,9 @@
 import * as THREE from 'three';
-import { type AbilityVfxBuffSpec, type AbilityVfxFullSpec, abilityHexColor } from '../ability_vfx_core';
+import {
+  type AbilityVfxBuffSpec,
+  type AbilityVfxFullSpec,
+  abilityHexColor,
+} from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { type DecalStyle, GroundDecals } from './decals';
 import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
@@ -12,7 +16,7 @@ import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
 import { isCrescendoArchetype, SPECTACLE } from './spectacle';
-import { asSpiritPath, type SpiritAtKind, SpiritApparitions } from './spirits';
+import { asSpiritPath, SpiritApparitions, type SpiritAtKind } from './spirits';
 
 export type { DecalStyle } from './decals';
 
@@ -313,9 +317,8 @@ export class AbilityVfxFx implements SequencerHost {
     null;
   private shakeCb: ((amount: number) => void) | null = null;
   private bodyLeanCb: ((entityId: number, amount: number) => void) | null = null;
-  private screenImpactCb:
-    | ((x: number, y: number, z: number, strength: number) => void)
-    | null = null;
+  private screenImpactCb: ((x: number, y: number, z: number, strength: number) => void) | null =
+    null;
   private abilityAudioCb:
     | ((
         kind: AbilityAudioKind,
@@ -1600,10 +1603,7 @@ export class AbilityVfxFx implements SequencerHost {
     if (band.style === 'leaves') {
       // rising mote column (heals, regrowth): motes cycle feet to crown,
       // fading in and out over the climb
-      const n = orbitCount(
-        Math.max(3, Math.min(7, Math.round((o?.density ?? 12) * 0.5))),
-        halve,
-      );
+      const n = orbitCount(Math.max(3, Math.min(7, Math.round((o?.density ?? 12) * 0.5))), halve);
       const spread = o?.spread ?? dna.radius;
       const up = o?.up ?? 1;
       for (let k = 0; k < n; k++) {

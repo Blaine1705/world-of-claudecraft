@@ -1426,7 +1426,12 @@ class Sfx {
           attack: 0.15,
           delay: d,
         });
-        this.aPartials(out, t, { freqs: [1174, 880, 587], dur: 1.3, gain: 0.12 * I, stagger: 0.06 });
+        this.aPartials(out, t, {
+          freqs: [1174, 880, 587],
+          dur: 1.3,
+          gain: 0.12 * I,
+          stagger: 0.06,
+        });
         break;
       case 'arcane':
         this.aTone(out, t, {
@@ -1525,9 +1530,7 @@ class Sfx {
   /** Heals chime, never boom (gallery heal, synth path). */
   private abilityHeal(out: GainNode, t: number, palette: string): void {
     const base =
-      palette === 'nature' || palette === 'venom'
-        ? [392, 494, 587, 784]
-        : [523, 659, 784, 1046];
+      palette === 'nature' || palette === 'venom' ? [392, 494, 587, 784] : [523, 659, 784, 1046];
     this.aPartials(out, t, { freqs: base, dur: 1.4, gain: 0.2, stagger: 0.09 });
     this.aNoise(out, t, { dur: 0.8, freq: 2600, gain: 0.06, type: 'highpass', attack: 0.25 });
   }
@@ -1539,7 +1542,14 @@ class Sfx {
       return;
     }
     if (style === 'morph') {
-      this.aNoise(out, t, { dur: 0.32, freq: 500, sweep: 2400, gain: 0.22, type: 'bandpass', q: 2 });
+      this.aNoise(out, t, {
+        dur: 0.32,
+        freq: 500,
+        sweep: 2400,
+        gain: 0.22,
+        type: 'bandpass',
+        q: 2,
+      });
       this.aTone(out, t, {
         freq: 880,
         slide: 1500,

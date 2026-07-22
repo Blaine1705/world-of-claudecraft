@@ -28,7 +28,13 @@ export class GroundDecals {
   private maps: Record<DecalStyle, THREE.CanvasTexture>;
 
   constructor(scene: THREE.Scene, tex: AbilityVfxTextures) {
-    this.maps = { ember: tex.ember, rime: tex.rime, rune: tex.rune, crack: tex.crack, char: tex.char };
+    this.maps = {
+      ember: tex.ember,
+      rime: tex.rime,
+      rune: tex.rune,
+      crack: tex.crack,
+      char: tex.char,
+    };
     const geo = new THREE.CircleGeometry(1, 24);
     const proto = new THREE.ShaderMaterial({
       uniforms: {

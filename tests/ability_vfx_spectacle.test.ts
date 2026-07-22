@@ -4,13 +4,13 @@
 // the already-at-parity radial families (nova/shout) untouched, preserve the
 // tier degradation ratios, and hold a bounded afterglow after impact.
 import { describe, expect, it } from 'vitest';
-import type { AbilityVfxFullSpec } from '../src/render/ability_vfx_core';
 import { ArchetypeSequencer, type SequencerHost } from '../src/render/ability_vfx/sequencer';
 import {
   isCrescendoArchetype,
   SPECTACLE,
   slashWidthScale,
 } from '../src/render/ability_vfx/spectacle';
+import type { AbilityVfxFullSpec } from '../src/render/ability_vfx_core';
 
 interface RingCall {
   maxR: number;
@@ -98,16 +98,7 @@ describe('spectacle crescendo classification', () => {
   it('boosts exactly the targeted archetypes', () => {
     for (const a of ['bolt', 'strike', 'burst', 'dot'] as const)
       expect(isCrescendoArchetype(a)).toBe(true);
-    for (const a of [
-      'nova',
-      'shout',
-      'heal',
-      'buff',
-      'cc',
-      'summon',
-      'dash',
-      'beam',
-    ] as const)
+    for (const a of ['nova', 'shout', 'heal', 'buff', 'cc', 'summon', 'dash', 'beam'] as const)
       expect(isCrescendoArchetype(a)).toBe(false);
   });
 
@@ -263,7 +254,10 @@ describe('sequencer applies the crescendo boosts at the spawn seams', () => {
       a.rings.some((r) => !r.vertical && Math.abs(r.maxR - SPECTACLE.finisherWaveR) < 1e-6),
     ).toBe(true);
     expect(
-      a.rings.some((r) => r.vertical && Math.abs(r.maxR - SPECTACLE.finisherWaveVR * SPECTACLE.followRing) < 1e-6),
+      a.rings.some(
+        (r) =>
+          r.vertical && Math.abs(r.maxR - SPECTACLE.finisherWaveVR * SPECTACLE.followRing) < 1e-6,
+      ),
     ).toBe(true);
   });
 
@@ -273,9 +267,9 @@ describe('sequencer applies the crescendo boosts at the spawn seams', () => {
     seq.start(a.host, 'bolt', BOLT_SPEC, 1, 2, 0xffffff, 0, false);
     step(seq, a.host, 0.2);
     // default-on vRing at the crescendo multiplier (gallery o.vRing !== false)
-    expect(
-      a.rings.some((r) => r.vertical && Math.abs(r.maxR - 2.6 * SPECTACLE.vRing) < 1e-6),
-    ).toBe(true);
+    expect(a.rings.some((r) => r.vertical && Math.abs(r.maxR - 2.6 * SPECTACLE.vRing) < 1e-6)).toBe(
+      true,
+    );
     const HEAL_SPEC: AbilityVfxFullSpec = { archetype: 'heal', palette: 'holy', power: 1 };
     const b = makeHost();
     const seq2 = new ArchetypeSequencer();

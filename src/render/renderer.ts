@@ -1371,7 +1371,8 @@ export class Renderer {
     const sunCanvas = (core: boolean): THREE.CanvasTexture => {
       const c = document.createElement('canvas');
       c.width = c.height = 128;
-      const ctx = c.getContext('2d')!;
+      const ctx = c.getContext('2d');
+      if (!ctx) throw new Error('2D canvas context unavailable');
       const g = ctx.createRadialGradient(64, 64, 2, 64, 64, 64);
       if (core) {
         g.addColorStop(0, 'rgba(255,252,238,1)');
@@ -1415,7 +1416,8 @@ export class Renderer {
       const shaft = document.createElement('canvas');
       shaft.width = 64;
       shaft.height = 256;
-      const sctx = shaft.getContext('2d')!;
+      const sctx = shaft.getContext('2d');
+      if (!sctx) throw new Error('2D canvas context unavailable');
       const gh = sctx.createLinearGradient(0, 0, 0, 256);
       gh.addColorStop(0, 'rgba(255,240,200,0)');
       gh.addColorStop(0.45, 'rgba(255,240,200,0.55)');
@@ -2875,7 +2877,6 @@ export class Renderer {
       maxViewsHigh: VIEW_PREWARM_MAX_VIEWS_HIGH,
       maxViewsConstrained: VIEW_PREWARM_MAX_VIEWS_CONSTRAINED,
     });
-    const constrainedPrewarm = policy.minimalManifest;
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
     const started = performance.now();
     const deadline = started + maxMs;
@@ -3975,14 +3976,14 @@ export class Renderer {
       body = built.body;
       portal = built.portal;
       height = 4.6;
-      objectMesh = body!;
+      objectMesh = built.body;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
       const built = buildMailboxPillar(e.id);
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = built.group;
     } else if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
       // Delve interactables: skip the object pool (each is unique/stateful) and
       // build a dedicated procedural mesh that matches the crypt aesthetic.
@@ -3990,7 +3991,7 @@ export class Renderer {
       const built = buildDelveInteractable(e.templateId, e.id);
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = built.group;
       // Pressure plates are flush to the floor, no sparkle clutter overhead.
       if (
         e.templateId !== 'delve_pressure_plate' &&
@@ -4030,7 +4031,7 @@ export class Renderer {
         height = built.height;
         objectPoolKey = null;
       }
-      objectMesh = body!;
+      objectMesh = body;
       if (!this.sparkleMat) {
         this.sparkleMat = new THREE.SpriteMaterial({
           map: sparkleTexture(),
@@ -4112,11 +4113,15 @@ export class Renderer {
       if (!isQuestVision) visual.clickProxy.userData.entityId = e.id;
       clickTarget = visual.clickProxy;
     } else {
-      group.add(body!);
-      body?.traverse((o) => {
-        o.userData.entityId = e.id;
-      });
-      clickTarget = body!;
+      // every object branch above built a body; the bare group is a benign
+      // fallback for the (unreachable) no-body case
+      if (body) {
+        group.add(body);
+        body.traverse((o) => {
+          o.userData.entityId = e.id;
+        });
+      }
+      clickTarget = body ?? group;
     }
     group.scale.setScalar(e.scale);
     group.position.set(e.pos.x, e.pos.y, e.pos.z);
@@ -5553,7 +5558,7 @@ export class Renderer {
             ? 'frost'
             : e.castingAbility === 'demon_heal'
               ? 'shadow'
-              : (ABILITIES[e.castingAbility!]?.school ?? 'arcane'),
+              : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
           dt,
           // per-ability spec color when the casting ability has one
           this.abilityVfx.sparkleColorFor(e.castingAbility),

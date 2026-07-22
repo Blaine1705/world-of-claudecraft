@@ -20,7 +20,8 @@ function makeCanvas(
 ): THREE.CanvasTexture {
   const c = document.createElement('canvas');
   c.width = c.height = size;
-  const ctx = c.getContext('2d')!;
+  const ctx = c.getContext('2d');
+  if (!ctx) throw new Error('2D canvas context unavailable');
   draw(ctx, size);
   const tex = new THREE.CanvasTexture(c);
   tex.minFilter = THREE.LinearFilter;

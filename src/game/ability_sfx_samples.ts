@@ -87,7 +87,12 @@ export function beefCurve(amount: number): Float32Array<ArrayBuffer> {
  *  low-shelf 170 Hz body -> presence peak 2.7 kHz (or, for `soft` voices, a
  *  4.2 kHz top-shave lowpass instead of the bite) -> dest. Returns the chain
  *  input. The caller applies the 1/(1 + beef * 0.5) drive compensation. */
-export function buildBeefChain(ctx: BaseAudioContext, dest: AudioNode, beef: number, soft: boolean): AudioNode {
+export function buildBeefChain(
+  ctx: BaseAudioContext,
+  dest: AudioNode,
+  beef: number,
+  soft: boolean,
+): AudioNode {
   const shaper = ctx.createWaveShaper();
   shaper.curve = beefCurve(beef);
   const shelf = ctx.createBiquadFilter();

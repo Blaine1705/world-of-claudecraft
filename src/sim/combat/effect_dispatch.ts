@@ -92,7 +92,7 @@ import { resurrectDeadGroupMembers } from './mass_resurrection';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
-import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 
@@ -874,13 +874,16 @@ export function runEffects(
         const scriptedChannel = interruptedDef
           ? undefined
           : SCRIPTED_INTERRUPTIBLE_CHANNELS[target.castingAbility];
+        // `school` is undefined exactly when BOTH lookups came up empty (both
+        // carry a required school field), so this guard is the old
+        // `!interruptedDef && !scriptedChannel` immunity check.
+        const school = interruptedDef?.school ?? scriptedChannel?.school;
         if (
-          (!interruptedDef && !scriptedChannel) ||
+          school === undefined ||
           interruptedDef?.school === 'physical' ||
           interruptedDef?.uninterruptible
         )
           break;
-        const school = interruptedDef?.school ?? scriptedChannel!.school;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
         ctx.cancelCast(target);
         if (eff.rageOnInterrupt && meta.cls === 'warrior' && p.resourceType === 'rage') {
