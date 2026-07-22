@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { AbilityVfxTextures } from './fx_textures';
+import { type AbilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 
 // Camera-facing ribbon trails, ported from the gallery's RibbonMesh +
 // genBolt/smoothArc (arc_bolt_preview.js, ribbons section). One pooled dynamic
@@ -18,6 +18,59 @@ const ARC_SLOTS = 20;
 const ARC_PTS = 12;
 const TRAIL_SPEED = 26; // yards/sec, matches Vfx.projectile so the trail rides the comet
 const WHITE = new THREE.Color(0xffffff);
+const COIL_PTS = 14; // gallery coil resolution: 14 samples over the 1.9 yd tail
+const COIL_DIRS = [1, -1]; // twin counter-rotating helices
+
+// Per-style projectile identity, ported from the gallery's buildProjMesh +
+// trail feel (arc_bolt_preview.js bolt archetype). Styled trails carry their
+// own head sprite (drawHeads), so the generic Vfx comet stays off for them.
+export type BoltTrailStyle = 'comet' | 'rock' | 'shard' | 'arrow' | 'wisp';
+
+// Trail strip DNA per style: width and brightness multipliers over the
+// baseline comet ribbon (glow strip / core strip).
+const TRAIL_DNA: Record<
+  BoltTrailStyle,
+  { wGlow: number; mGlow: number; wCore: number; mCore: number }
+> = {
+  comet: { wGlow: 1, mGlow: 1, wCore: 1, mCore: 1 },
+  rock: { wGlow: 1.35, mGlow: 1, wCore: 1.2, mCore: 0.7 }, // fat dim molten wake
+  shard: { wGlow: 0.65, mGlow: 0.85, wCore: 0.6, mCore: 1.3 }, // narrow crisp glint
+  arrow: { wGlow: 0.4, mGlow: 0.55, wCore: 0.4, mCore: 1.1 }, // whisper-thin streak
+  wisp: { wGlow: 1.25, mGlow: 1.25, wCore: 1, mCore: 0.65 }, // soft smoky drift
+};
+
+// Spawn-time options for a styled projectile trail (the full spec's bolt DNA).
+// Garnish flags (coils/jagTrail/forkEvery/tracer) are pre-gated by the caller's
+// degrade tier; delay staggers volley followers, aim offsets their landing.
+export interface StyledTrailOpts {
+  speed: number;
+  style: BoltTrailStyle;
+  headSize: number; // 0 = no head sprite (legacy trails riding a Vfx comet)
+  coils: boolean;
+  jagTrail: boolean;
+  forkEvery: number;
+  tracer: boolean;
+  delay: number;
+  aimX: number;
+  aimY: number;
+  aimZ: number;
+  groundY: ((x: number, z: number) => number) | null;
+}
+
+const LEGACY_TRAIL_OPTS: StyledTrailOpts = {
+  speed: TRAIL_SPEED,
+  style: 'comet',
+  headSize: 0,
+  coils: false,
+  jagTrail: false,
+  forkEvery: 0,
+  tracer: false,
+  delay: 0,
+  aimX: 0,
+  aimY: 0,
+  aimZ: 0,
+  groundY: null,
+};
 
 function allocPts(n: number): THREE.Vector3[] {
   const pts: THREE.Vector3[] = [];
@@ -48,15 +101,35 @@ interface BoltSlot {
 interface TrailSlot {
   active: boolean;
   targetId: number;
+  sourceId: number;
   ttl: number;
   width: number;
   core: THREE.Color;
   glow: THREE.Color;
+  colorHex: number;
+  coreHex: number;
   head: THREE.Vector3;
   ring: THREE.Vector3[]; // last TRAIL_PTS head positions, oldest overwritten
   ringHead: number;
   ringCount: number;
   onArrive: ((x: number, y: number, z: number) => void) | null;
+  // styled-bolt DNA (see StyledTrailOpts); legacy comet trails zero these out
+  speed: number;
+  style: BoltTrailStyle;
+  headSize: number;
+  delay: number;
+  coils: boolean;
+  coilPhase: number;
+  jagTrail: boolean;
+  jagTimer: number;
+  forkEvery: number;
+  forkTimer: number;
+  tracer: boolean;
+  origin: THREE.Vector3; // launch point (tracer etch endpoint)
+  aim: THREE.Vector3; // target-anchor offset (volley spread)
+  dir: THREE.Vector3; // unit travel direction (coils/jag/forks)
+  groundY: ((x: number, z: number) => number) | null;
+  seed: number; // per-slot phase for head shimmer/writhe
 }
 
 interface ArcSlot {
@@ -98,8 +171,13 @@ export class AbilityVfxRibbons {
   private t1 = new THREE.Vector3();
   private t2 = new THREE.Vector3();
   private t3 = new THREE.Vector3();
+  // s1/s2 survive across a whole coil/fork computation (t1..t3 are clobbered
+  // by add()/genBolt, so style garnish gets its own scratch pair)
+  private s1 = new THREE.Vector3();
+  private s2 = new THREE.Vector3();
   private camPos = new THREE.Vector3();
   private ordered: THREE.Vector3[] = allocPts(TRAIL_PTS + 1); // scratch, holds refs only
+  private coilScratch: THREE.Vector3[] = allocPts(COIL_PTS); // reused for both helices
 
   constructor(
     scene: THREE.Scene,
@@ -177,15 +255,34 @@ export class AbilityVfxRibbons {
       this.trails.push({
         active: false,
         targetId: 0,
+        sourceId: 0,
         ttl: 0,
         width: 0.2,
         core: new THREE.Color(),
         glow: new THREE.Color(),
+        colorHex: 0xffffff,
+        coreHex: 0xffffff,
         head: new THREE.Vector3(),
         ring: allocPts(TRAIL_PTS),
         ringHead: 0,
         ringCount: 0,
         onArrive: null,
+        speed: TRAIL_SPEED,
+        style: 'comet',
+        headSize: 0,
+        delay: 0,
+        coils: false,
+        coilPhase: 0,
+        jagTrail: false,
+        jagTimer: 0,
+        forkEvery: 0,
+        forkTimer: 0,
+        tracer: false,
+        origin: new THREE.Vector3(),
+        aim: new THREE.Vector3(),
+        dir: new THREE.Vector3(1, 0, 0),
+        groundY: null,
+        seed: 0,
       });
     }
     for (let i = 0; i < ARC_SLOTS; i++) {
@@ -230,6 +327,8 @@ export class AbilityVfxRibbons {
 
   // Fixed-endpoint variant (motif ground cracks, sky strikes): same flicker
   // regeneration between two world points instead of live entity anchors.
+  // delay holds the slot dark before it first draws (the lightning family's
+  // return stroke answering its leader).
   spawnBoltPoints(
     fx: number,
     fy: number,
@@ -241,10 +340,11 @@ export class AbilityVfxRibbons {
     life = 0.3,
     width = 0.12,
     jagScale = 1,
+    delay = 0,
   ): void {
     const slot = this.bolts.find((b) => !b.active) ?? this.bolts[0];
     slot.active = true;
-    slot.age = 0;
+    slot.age = -delay;
     slot.life = life;
     slot.lastGen = -1;
     slot.fixed = true;
@@ -288,20 +388,64 @@ export class AbilityVfxRibbons {
     width: number,
     onArrive: ((x: number, y: number, z: number) => void) | null = null,
   ): void {
+    this.spawnTrailStyled(sourceId, targetId, colorHex, width, LEGACY_TRAIL_OPTS, onArrive);
+  }
+
+  // A styled projectile trail carrying the full spec's bolt DNA: its own head
+  // sprite (the trail IS the projectile — no Vfx comet rides along), authored
+  // speed, and the tier-gated garnish the caller enabled in opts.
+  spawnTrailStyled(
+    sourceId: number,
+    targetId: number,
+    colorHex: number,
+    width: number,
+    opts: StyledTrailOpts,
+    onArrive: ((x: number, y: number, z: number) => void) | null = null,
+  ): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
     const slot = this.trails.find((t) => !t.active) ?? this.trails[0];
     slot.active = true;
     slot.targetId = targetId;
-    slot.ttl = 3;
+    slot.sourceId = sourceId;
     slot.width = width;
     slot.core.setHex(colorHex).lerp(WHITE, 0.4);
     slot.glow.setHex(colorHex);
+    slot.colorHex = colorHex;
+    slot.coreHex = slot.core.getHex();
     slot.head.copy(from);
     slot.ring[0].copy(from);
     slot.ringHead = 1 % TRAIL_PTS;
     slot.ringCount = 1;
     slot.onArrive = onArrive;
+    slot.speed = Math.max(4, opts.speed);
+    slot.style = opts.style;
+    slot.headSize = opts.headSize;
+    slot.delay = opts.delay;
+    slot.coils = opts.coils;
+    slot.coilPhase = 0;
+    slot.jagTrail = opts.jagTrail;
+    slot.jagTimer = 0;
+    slot.forkEvery = opts.forkEvery;
+    slot.forkTimer = opts.forkEvery * (0.4 + Math.random() * 0.6);
+    slot.tracer = opts.tracer;
+    slot.origin.copy(from);
+    slot.aim.set(opts.aimX, opts.aimY, opts.aimZ);
+    slot.groundY = opts.groundY;
+    slot.seed = Math.random() * Math.PI * 2;
+    // life scales with the real flight time (a 7 yd/s orb crossing 30 yd
+    // must not evaporate at the legacy 3 s cap)
+    const to = this.anchor(targetId, 0.5);
+    if (to) {
+      this.s1.copy(to).add(slot.aim).sub(from);
+      const dist = this.s1.length();
+      if (dist > 1e-6) slot.dir.copy(this.s1).multiplyScalar(1 / dist);
+      else slot.dir.set(1, 0, 0);
+      slot.ttl = opts.delay + Math.min(10, Math.max(3, dist / slot.speed + 1.5));
+    } else {
+      slot.dir.set(1, 0, 0);
+      slot.ttl = opts.delay + 3;
+    }
   }
 
   // A bowed slash arc through a world point (melee strike read): computed once
@@ -415,6 +559,7 @@ export class AbilityVfxRibbons {
         b.active = false;
         continue;
       }
+      if (b.age < 0) continue; // delayed strike (a return stroke) still pending
       if (b.age - b.lastGen >= 0.045) {
         b.lastGen = b.age;
         this.genBolt(b);
@@ -427,24 +572,87 @@ export class AbilityVfxRibbons {
 
     for (const t of this.trails) {
       if (!t.active) continue;
+      if (t.delay > 0) {
+        // staggered volley follower: ride the caster's hand until launch
+        t.delay -= dt;
+        t.ttl -= dt;
+        const from = this.anchor(t.sourceId, 0.62);
+        if (from) {
+          t.head.copy(from);
+          t.origin.copy(from);
+          t.ring[0].copy(from);
+          t.ringHead = 1 % TRAIL_PTS;
+          t.ringCount = 1;
+        }
+        continue;
+      }
       t.ttl -= dt;
       const target = this.anchor(t.targetId, 0.5);
       if (!target || t.ttl <= 0) {
         t.active = false;
         continue;
       }
-      this.t1.subVectors(target, t.head);
+      this.s1.copy(target).add(t.aim);
+      this.t1.subVectors(this.s1, t.head);
       const dist = this.t1.length();
-      const step = TRAIL_SPEED * dt;
+      const step = t.speed * dt;
       if (dist <= Math.max(0.7, step)) {
-        if (t.onArrive) t.onArrive(target.x, target.y, target.z);
+        if (t.tracer) this.spawnTracer(t, this.s1.x, this.s1.y, this.s1.z);
+        if (t.onArrive) t.onArrive(this.s1.x, this.s1.y, this.s1.z);
         t.active = false;
         continue;
       }
-      t.head.addScaledVector(this.t1, step / dist);
+      t.dir.copy(this.t1).multiplyScalar(1 / dist);
+      t.head.addScaledVector(t.dir, step);
       t.ring[t.ringHead].copy(t.head);
       t.ringHead = (t.ringHead + 1) % TRAIL_PTS;
       if (t.ringCount < TRAIL_PTS) t.ringCount++;
+      // style garnish (the spawner already gated these by degrade tier)
+      if (t.coils) this.drawCoils(t, dt);
+      if (t.jagTrail) {
+        // the gallery's flicker cadence: regen the electric tail every ~45ms
+        t.jagTimer -= dt;
+        if (t.jagTimer <= 0) {
+          t.jagTimer = 0.045;
+          const len = Math.min(4, dist * 0.5 + 1);
+          this.s1.copy(t.head).addScaledVector(t.dir, -len);
+          this.spawnBoltPoints(
+            this.s1.x,
+            this.s1.y,
+            this.s1.z,
+            t.head.x,
+            t.head.y,
+            t.head.z,
+            t.colorHex,
+            0.1,
+            t.width * 0.6,
+            0.8,
+          );
+        }
+      }
+      if (t.forkEvery > 0 && t.groundY) {
+        // periodic small fork bolts spitting off the head into the ground
+        t.forkTimer -= dt;
+        if (t.forkTimer <= 0) {
+          t.forkTimer = t.forkEvery * (0.7 + Math.random() * 0.8);
+          const fwd = 0.5 + Math.random() * 1.8;
+          const side = (Math.random() - 0.5) * 4;
+          const fxp = t.head.x + t.dir.x * fwd - t.dir.z * side;
+          const fzp = t.head.z + t.dir.z * fwd + t.dir.x * side;
+          this.spawnBoltPoints(
+            t.head.x,
+            t.head.y,
+            t.head.z,
+            fxp,
+            t.groundY(fxp, fzp) + 0.08,
+            fzp,
+            t.colorHex,
+            0.08 + Math.random() * 0.06,
+            0.09,
+            1.2,
+          );
+        }
+      }
       // oldest-to-newest through the ring, head last (scratch holds refs only)
       let n = 0;
       for (let k = 0; k < t.ringCount; k++) {
@@ -452,8 +660,9 @@ export class AbilityVfxRibbons {
         this.ordered[n++] = t.ring[idx];
       }
       if (n >= 2) {
-        this.add(this.ordered, n, t.width * 2.6, t.glow, 1.2, 0.85);
-        this.add(this.ordered, n, t.width, t.core, 2.2, 0.85);
+        const dna = TRAIL_DNA[t.style];
+        this.add(this.ordered, n, t.width * 2.6 * dna.wGlow, t.glow, 1.2 * dna.mGlow, 0.85);
+        this.add(this.ordered, n, t.width * dna.wCore, t.core, 2.2 * dna.mCore, 0.85);
       }
     }
 
@@ -476,6 +685,124 @@ export class AbilityVfxRibbons {
     for (const b of this.bolts) b.active = false;
     for (const t of this.trails) t.active = false;
     for (const a of this.arcs) a.active = false;
+  }
+
+  // Per-style head sprites for the styled trails, emitted through the fx
+  // engine's overlay batch (called between beginFrame and commit). The sink is
+  // a stable closure owned by the caller; nothing here allocates.
+  drawHeads(
+    time: number,
+    sink: (
+      x: number,
+      y: number,
+      z: number,
+      colorHex: number,
+      size: number,
+      cell: number,
+      alpha: number,
+      brightness: number,
+    ) => void,
+  ): void {
+    for (const t of this.trails) {
+      if (!t.active || t.headSize <= 0 || t.delay > 0) continue;
+      const hs = t.headSize;
+      const h = t.head;
+      const pulse = 1 + 0.12 * Math.sin(time * 40 + t.seed);
+      switch (t.style) {
+        case 'shard':
+          // elongated crystal glint: the thin spark flash over a faint halo
+          sink(h.x, h.y, h.z, t.coreHex, 0.4 * hs * pulse, OVERLAY_CELL.spark, 0.95, 2.8);
+          sink(h.x, h.y, h.z, t.colorHex, 0.3 * hs, OVERLAY_CELL.glow, 0.6, 1.1);
+          break;
+        case 'rock': {
+          // molten boulder: a dim fat glow with two embers tumbling around it
+          sink(h.x, h.y, h.z, t.colorHex, 0.5 * hs, OVERLAY_CELL.glow, 0.9, 1.15);
+          for (let k = 0; k < 2; k++) {
+            const a = time * 9 + t.seed + k * Math.PI;
+            sink(
+              h.x + Math.cos(a) * 0.18 * hs,
+              h.y + Math.sin(a * 1.4) * 0.12 * hs,
+              h.z + Math.sin(a) * 0.18 * hs,
+              t.coreHex,
+              0.15 * hs,
+              OVERLAY_CELL.spark,
+              0.85,
+              2.1,
+            );
+          }
+          break;
+        }
+        case 'wisp': {
+          // three writhing blobs, no bright core (the gallery writhe read)
+          for (let k = 0; k < 3; k++) {
+            const ph = time * 6 + t.seed + k * 2.1;
+            sink(
+              h.x + Math.sin(ph) * 0.16 * hs,
+              h.y + Math.cos(ph * 1.3 + k) * 0.13 * hs,
+              h.z + Math.sin(ph * 0.7 + k * 4) * 0.16 * hs,
+              t.colorHex,
+              0.28 * hs,
+              OVERLAY_CELL.glow,
+              0.8,
+              1.5,
+            );
+          }
+          break;
+        }
+        case 'arrow':
+          // near-invisible tip glint; the thin streak trail is the read
+          sink(h.x, h.y, h.z, t.coreHex, 0.2 * hs, OVERLAY_CELL.spark, 0.9, 2.3);
+          break;
+        default:
+          // comet: the classic bright core in a soft halo
+          sink(h.x, h.y, h.z, t.colorHex, 0.55 * hs * pulse, OVERLAY_CELL.glow, 0.85, 1.5);
+          sink(h.x, h.y, h.z, t.coreHex, 0.26 * hs * pulse, OVERLAY_CELL.star, 0.9, 2.6);
+          break;
+      }
+    }
+  }
+
+  // Twin counter-rotating helical ribbons around the trail tail (the gallery
+  // coil read: 1.9 yd behind the head, radius tapering toward the tail).
+  private drawCoils(t: TrailSlot, dt: number): void {
+    t.coilPhase += dt * 9 * Math.PI * 2;
+    this.s1.set(0, 1, 0).cross(t.dir);
+    if (this.s1.lengthSq() < 1e-6) this.s1.set(1, 0, 0);
+    this.s1.normalize();
+    this.s2.crossVectors(t.dir, this.s1);
+    for (const dirn of COIL_DIRS) {
+      for (let k = 0; k < COIL_PTS; k++) {
+        const u = k / (COIL_PTS - 1);
+        const ang = t.coilPhase * dirn + u * 7.5 * dirn;
+        const r = 0.3 * (1 - u * 0.5);
+        this.coilScratch[k]
+          .copy(t.head)
+          .addScaledVector(t.dir, -u * 1.9)
+          .addScaledVector(this.s1, Math.cos(ang) * r)
+          .addScaledVector(this.s2, Math.sin(ang) * r);
+      }
+      this.add(this.coilScratch, COIL_PTS, 0.08, t.core, 1.7, 0.5);
+    }
+  }
+
+  // The etched flight path left behind on arrival: a slow-fading narrow
+  // ribbon from the launch point to the impact, on an arc slot.
+  private spawnTracer(t: TrailSlot, x: number, y: number, z: number): void {
+    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    slot.active = true;
+    slot.age = 0;
+    slot.life = 1.1;
+    slot.width = 0.05;
+    slot.core.copy(t.core);
+    slot.glow.copy(t.glow);
+    for (let i = 0; i < ARC_PTS; i++) {
+      const u = i / (ARC_PTS - 1);
+      slot.pts[i].set(
+        t.origin.x + (x - t.origin.x) * u,
+        t.origin.y + (y - t.origin.y) * u + Math.sin(u * Math.PI) * 0.15,
+        t.origin.z + (z - t.origin.z) * u,
+      );
+    }
   }
 
   // Midpoint displacement into the slot's preallocated points (no branches).

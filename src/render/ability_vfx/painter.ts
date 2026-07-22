@@ -327,7 +327,24 @@ export class AbilityVfx {
         if (ev.attackAnimation === 'ranged-shot' && !plan.whirl)
           this.deps.triggerAttack(ev.sourceId);
         const scale = ev.fx === 'heavyBolt' ? Math.max(plan.projScale, 2) : plan.projScale;
-        if (plan.jagged) {
+        if (tier < 2 && full?.bolt) {
+          // The full spec's bolt DNA (style silhouette, authored speed, coils,
+          // forks, tracer, leader, volley) drives the styled trail system,
+          // whose head sprite IS the projectile — the generic Vfx comet would
+          // shadow it at the wrong speed, so it stays off entirely.
+          fx.sequenceBolt(
+            ev.ability,
+            full,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            0.16 * scale,
+            tier,
+            plan.volley,
+            scale,
+          );
+          this.spawned += plan.volley;
+        } else if (plan.jagged) {
           this.deps.vfx.lightningProjectile(ev.sourceId, ev.targetId, plan.color);
           this.spawned++;
           if (tier < 2) {

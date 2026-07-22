@@ -4,7 +4,7 @@ import { type DecalStyle, GroundDecals } from './decals';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
-import { AbilityVfxRibbons, type RibbonAnchor } from './ribbons';
+import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './ribbons';
 import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
@@ -111,6 +111,17 @@ const ORBIT_DNA: Record<
   },
 };
 
+// The gallery's palette-default projectile silhouette (PROJ_DEFAULT): specs
+// that author no bolt style still read as their school's shape.
+const PROJ_STYLE_BY_PALETTE: Record<string, BoltTrailStyle> = {
+  fire: 'rock',
+  blood: 'rock',
+  frost: 'shard',
+  moon: 'shard',
+  shadow: 'wisp',
+  venom: 'wisp',
+};
+
 export class AbilityVfxFx implements SequencerHost {
   private ribbons: AbilityVfxRibbons;
   private rings: ShockRings;
@@ -138,6 +149,29 @@ export class AbilityVfxFx implements SequencerHost {
     number,
     { color: number; target: number; level: number; slow: boolean; stamp: number }
   >();
+  // Stable sink for the styled bolt heads (ribbons.drawHeads pushes through
+  // it into the frame's overlay batch); one closure for the object's lifetime.
+  private headSink = (
+    x: number,
+    y: number,
+    z: number,
+    colorHex: number,
+    size: number,
+    cell: number,
+    alpha: number,
+    brightness: number,
+  ): void => {
+    this.overlay.push(
+      x,
+      y,
+      z,
+      colorHex,
+      size * (0.8 + 0.2 * this.qualityLevel),
+      cell,
+      alpha,
+      brightness,
+    );
+  };
 
   constructor(
     scene: THREE.Scene,
@@ -261,8 +295,14 @@ export class AbilityVfxFx implements SequencerHost {
     });
   }
 
-  // Traveling bolt: release now, comet trail chases the pooled Vfx projectile,
-  // and the FULL impact stack lands where and when the trail arrives.
+  // Traveling bolt carrying the full spec's bolt DNA. Without a bolt block
+  // the trail rides the pooled Vfx comet at its speed (the legacy read); WITH
+  // one, the styled trail IS the projectile — per-style head sprite and trail,
+  // authored speed, and at full tier the garnish: twin counter-rotating coils,
+  // the flickering jagged tail, periodic ground forks, the tracer etch. The
+  // lightning family's leader/return double flash answers on arrival, and
+  // volley > 1 staggers followers behind the lead bolt with a spread aim.
+  // The FULL impact stack lands where and when the lead trail arrives.
   sequenceBolt(
     abilityId: string,
     spec: AbilityVfxFullSpec,
@@ -271,6 +311,8 @@ export class AbilityVfxFx implements SequencerHost {
     colorHex: number,
     width: number,
     tier: number,
+    volley = 1,
+    headScale = 1,
   ): void {
     const slot = this.sequencer.start(
       this,
@@ -282,13 +324,84 @@ export class AbilityVfxFx implements SequencerHost {
       tier,
       true,
     );
-    this.ribbons.spawnTrail(
+    const b = spec.bolt;
+    if (!b) {
+      this.ribbons.spawnTrail(
+        casterId,
+        targetId,
+        colorHex,
+        width,
+        slot ? (x, y, z) => this.sequencer.triggerImpact(this, slot, x, y, z) : null,
+      );
+      return;
+    }
+    const style: BoltTrailStyle = b.style ?? PROJ_STYLE_BY_PALETTE[spec.palette] ?? 'comet';
+    const speed = b.speed ?? 26;
+    const fullTier = tier === 0;
+    // gallery head factors: arrows nearly vanish, shaped heads run leaner
+    const hs = headScale * (style === 'arrow' ? 0.35 : style !== 'comet' ? 0.7 : 1);
+    const leader = b.leader === true && tier < 2;
+    this.ribbons.spawnTrailStyled(
       casterId,
       targetId,
       colorHex,
       width,
-      slot ? (x, y, z) => this.sequencer.triggerImpact(this, slot, x, y, z) : null,
+      {
+        speed,
+        style,
+        headSize: hs,
+        coils: fullTier && b.coils === true,
+        jagTrail: fullTier && b.jagged === true,
+        forkEvery: fullTier ? (b.forkEvery ?? 0) : 0,
+        tracer: fullTier && b.tracer === true,
+        delay: 0,
+        aimX: 0,
+        aimY: 0,
+        aimZ: 0,
+        groundY: this.groundY,
+      },
+      (x, y, z) => {
+        if (leader) this.leaderStrike(casterId, x, y, z, colorHex);
+        if (slot) this.sequencer.triggerImpact(this, slot, x, y, z);
+      },
     );
+    // staggered barrage riding behind the lead projectile (gallery volley):
+    // followers keep the style head and trail, shed the garnish, land with a
+    // small spark accent instead of a second impact stack
+    const n = Math.min(4, Math.max(1, Math.round(volley)));
+    for (let i = 1; i < n; i++) {
+      this.ribbons.spawnTrailStyled(
+        casterId,
+        targetId,
+        colorHex,
+        width * 0.75,
+        {
+          speed,
+          style,
+          headSize: hs * 0.75,
+          coils: false,
+          jagTrail: false,
+          forkEvery: 0,
+          tracer: false,
+          delay: i * 0.12,
+          aimX: (Math.random() - 0.5) * 1.6,
+          aimY: (Math.random() - 0.5) * 0.7,
+          aimZ: (Math.random() - 0.5) * 1.6,
+          groundY: null,
+        },
+        (x, y, z) => this.particleBurst?.(x, y, z, colorHex, 6, 0.5, 'sparks'),
+      );
+    }
+  }
+
+  // Real lightning answers itself: a dim leader stroke finds the path from
+  // the caster to the strike point, then the fat return stroke ANSWERS along
+  // it 80ms later (a delayed bolt slot; endpoints frozen at arrival).
+  private leaderStrike(casterId: number, x: number, y: number, z: number, colorHex: number): void {
+    const from = this.anchor(casterId, 0.62);
+    if (!from) return;
+    this.ribbons.spawnBoltPoints(from.x, from.y, from.z, x, y, z, colorHex, 0.07, 0.04, 1.3);
+    this.ribbons.spawnBoltPoints(from.x, from.y, from.z, x, y, z, colorHex, 0.16, 0.22, 1, 0.08);
   }
 
   // Boot-only warm-up (the renderer's 'vfx.ability-primitives' prewarm entry):
@@ -618,6 +731,9 @@ export class AbilityVfxFx implements SequencerHost {
     this.pillars.update(dt);
     this.shells.update(dt, this.time, this.frame, this.anchor);
     this.overlay.beginFrame();
+    // styled bolt heads ride this frame's overlay batch (positions were just
+    // advanced by ribbons.update above)
+    this.ribbons.drawHeads(this.time, this.headSink);
     for (const [id, w] of this.windups) {
       if (w.stamp !== this.frame) {
         this.windups.delete(id);
