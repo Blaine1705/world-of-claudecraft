@@ -2766,6 +2766,15 @@ export class Renderer {
     for (const mat of mats) {
       const textureMat = mat as TextureBackedMaterial;
       for (const key of textureKeys) this.prewarmTexture(textureMat[key]);
+      // ShaderMaterials (ability-vfx pools, custom fx) hold their textures in
+      // uniforms, invisible to the standard-key walk above.
+      const shaderMat = mat as THREE.ShaderMaterial;
+      if (shaderMat.isShaderMaterial) {
+        for (const uniform of Object.values(shaderMat.uniforms)) {
+          const value = uniform?.value as { isTexture?: boolean } | null | undefined;
+          if (value?.isTexture) this.prewarmTexture(value as THREE.Texture);
+        }
+      }
     }
   }
 
@@ -3080,6 +3089,28 @@ export class Renderer {
           }
         },
         detail: () => `bursts=${vfxPrewarmBursts}`,
+      },
+      {
+        // Spawn one of every pooled ability-VFX primitive (rings, decals,
+        // pillar, shell, slash ribbon, overlay sprite). The pools build their
+        // meshes visible=false, so neither the render passes nor
+        // programs.compile ever see their ShaderMaterials — the first spec'd
+        // cast in the open world used to link them synchronously. The spawns
+        // also bind the per-style decal textures, so the texture re-walk below
+        // uploads the whole canvas set now. abilityVfxFx.clear() in the
+        // finally block hides everything again.
+        id: 'vfx.ability-primitives',
+        category: 'vfx',
+        priority: 62,
+        required: false,
+        run: () => {
+          this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
+          this.scene.traverse((child) => {
+            const renderable = child as RenderableDiagnosticObject;
+            if (renderable.userData.renderCategory !== 'vfx' || !renderable.material) return;
+            this.prewarmMaterialTextures(renderable.material);
+          });
+        },
       },
       {
         id: 'world.initial-frame',

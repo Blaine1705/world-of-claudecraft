@@ -247,6 +247,26 @@ export class AbilityVfxFx implements SequencerHost {
     );
   }
 
+  // Boot-only warm-up (the renderer's 'vfx.ability-primitives' prewarm entry):
+  // spawn one of every pooled primitive so their meshes — visible=false until
+  // first use, hence invisible to the prewarm's compile passes — render during
+  // the boot prewarm frames instead of linking their shaders on the first
+  // spec'd cast. Each decal style binds its texture so all three upload now.
+  // The prewarm's finally-block clear() hides everything again.
+  prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
+    const gy = this.groundY(x, z);
+    this.rings.spawn(x, gy + 0.15, z, 2, 0.7, 0xffffff, 1, false);
+    this.rings.spawn(x, gy + 1.2, z, 1.6, 0.7, 0xffffff, 1, true);
+    this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'ember', 1.2);
+    this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'rime', 1.2);
+    this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'rune', 1.2);
+    this.pillars.spawn(x, gy, z, 1, 6, 0xffffff, 0.7);
+    this.shells.flash(entityId, 0xffffff, 0.7);
+    this.ribbons.spawnSlashStyled({ x, y: y + 1.1, z }, 0xffffff, 'horizontal');
+    this.overlay.push(x, y + 1.1, z, 0xffffff, 0.3, OVERLAY_CELL.glow, 0.6, 1.5);
+    this.overlay.commit();
+  }
+
   setQuality(q: number): void {
     this.qualityLevel = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
   }
