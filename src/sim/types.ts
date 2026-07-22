@@ -3395,7 +3395,11 @@ export type SimEvent = { pid?: number } & (
         | 'fireCone'
         // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
-        | 'blinkStep';
+        | 'blinkStep'
+        // An untargeted/self cast completing with no castFx of its own (forms,
+        // summon rites, aspects): the only completion cue such casts emit, so
+        // the per-ability VFX layer can stage their ceremony. Visual-only.
+        | 'selfCast';
       // The casting ability's id, carried only by fx kinds whose visual varies per
       // ability (shouts pick their wave colour; weapon auras identify the buff).
       ability?: string;

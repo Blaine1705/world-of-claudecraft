@@ -179,6 +179,7 @@ const CAST_FX = new Set([
   'nova',
   'tick',
   'beam',
+  'selfCast',
 ]);
 // spawnAoeRing radius in yards per spec ringScale unit (rg 2 = the classic
 // 8 yd warrior shout ring).
@@ -390,6 +391,16 @@ export class AbilityVfx {
     // crescendoing cord and lands the full impact stack once, on the last tick.
     if (full?.archetype === 'beam' && ev.fx !== 'windup' && ev.fx !== 'shout')
       return this.beamChannelTick(ev, ev.ability, spec, full);
+    // selfCast is the ONLY completion cue an untargeted/self cast emits (forms,
+    // summon rites, aspects). Only ceremony archetypes claim it — anything whose
+    // read arrives via other events (heals via heal events, strikes via their
+    // damage claim) falls through unclaimed so nothing double-stages. Checked
+    // before castTier so an unclaimed selfCast never charges the budget.
+    if (ev.fx === 'selfCast') {
+      const arch = full?.archetype ?? spec.a;
+      const ceremonial = arch === 'buff' || arch === 'summon' || arch === 'cc' || !!full?.spirit;
+      if (!full || !ceremonial) return false;
+    }
     const tier = this.castTier(ev.sourceId, ev.ability);
     const plan = planCast(spec, this.quality, tier);
     const fx = this.deps.fx;
@@ -538,6 +549,24 @@ export class AbilityVfx {
             tier,
             this.windupDelayFor(ev.ability, full, ev.sourceId),
           );
+        break;
+      case 'selfCast':
+        // Ceremony anchored on the caster (the pre-switch gate guarantees a
+        // full ceremonial spec); spirits, shells, and orbits ride the sequence.
+        if (tier < 2 && full) {
+          fx.sequenceInstant(
+            ev.ability,
+            full,
+            ev.sourceId,
+            ev.sourceId,
+            plan.color,
+            tier,
+            this.windupDelayFor(ev.ability, full, ev.sourceId),
+          );
+        } else {
+          this.deps.vfx.tick(ev.sourceId, ev.school, plan.color);
+          this.spawned++;
+        }
         break;
     }
     // Local-player cast acknowledgment: a claimed physical instant plays the

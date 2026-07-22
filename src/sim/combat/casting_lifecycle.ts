@@ -1646,6 +1646,18 @@ function applyAbility(
       fx: ability.castFx,
       ability: ability.id,
     });
+  } else if (!togglingOff && (!target || target === p)) {
+    // An untargeted/self completion (Shadewolf, summon rites, forms, aspects)
+    // otherwise emits nothing at all, leaving the per-ability VFX layer blind
+    // to the cast that just happened. Renderer-only cue; no mechanic.
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: p.id,
+      school: ability.school,
+      fx: 'selfCast',
+      ability: ability.id,
+    });
   }
   ctx.runEffects(p, meta, target, res);
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a
