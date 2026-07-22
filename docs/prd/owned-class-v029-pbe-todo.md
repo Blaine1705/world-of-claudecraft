@@ -7,9 +7,9 @@ Integration PR: #2218
 Release baseline: `682df1b7b` from `release/v0.29.0`, merged into this isolated integration
 worktree by `5129a2b1f`.
 
-Latest completed slices: DPS balance harness, Fieldcraft and Vespers tuning, safe level 20 default
-bars, persistence coverage for those bars, and the first English tooltip clarity pass. Final
-fixed-head validation is still required.
+Latest completed slices: training-dummy and raid-level DPS balance harnesses, Fieldcraft and
+Vespers tuning, safe level 20 default bars, persistence coverage for those bars, and the first
+English tooltip clarity pass. Final fixed-head validation is still required.
 
 Scope: Hunter, Shaman, and Priest, including all nine specializations, their shared talent rows,
 their player-facing states, and the new rotation and starter action-bar work requested after the
@@ -45,8 +45,11 @@ Detailed One Button priorities and exact level 20 templates are in
 - [x] Add a 15 sec single-target burst test.
 - [x] Add a 60 sec 3-target sustained test.
 - [x] Add a 15 sec 3-target burst test.
+- [x] Add 120 sec single-target raid profiles at levels 22, 23, and 24 using Nythraxis's real armor
+      curve without running encounter mechanics.
 - [x] Record total DPS, per-target DPS, damage by source, resource remaining, cooldown use, and the
       number of rotational buttons pressed.
+- [x] Record landed hits, misses, dodges, parries, resists, and critical hits in every DPS profile.
 - [x] Add a fixed healer damage profile and record HPS, mana, overhealing, prepared healing, and
       emergency recovery time.
 - [x] Add a Warspirit off-tank scenario and record incoming damage, threat, forced-target uptime,
@@ -320,6 +323,8 @@ Do not overwrite a player-customized bar.
 
 - [x] Raise normal rotation damage before adding more power to Tithefiend.
 - [x] Compare Vespers with other DPS specs in both 1-target and 3-target tests.
+- [x] Recheck Vespers against the level 22 to 24 raid profiles. Keep its current damage because it
+      remains above the median DPS band without overtaking the top result.
 - [x] Reduce Tithefiend mana restoration to 1% maximum mana per hit so it does not create
       effectively infinite mana.
 - [x] Show every Tithefiend hit in floating combat text and credit it to the Priest in meters.

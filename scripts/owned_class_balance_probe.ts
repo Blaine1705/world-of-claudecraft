@@ -23,8 +23,19 @@ export type OwnedHealerSpec = 'spiritmend' | 'doctrine' | 'benison';
 
 export interface OwnedClassBalanceScenario {
   targets: 1 | 3;
-  seconds: 15 | 60;
-  window: 'burst' | 'sustained';
+  seconds: 15 | 60 | 120;
+  window: 'burst' | 'sustained' | 'raid';
+  targetLevel?: 20 | 22 | 23 | 24;
+  targetTemplateId?: 'training_dummy' | 'nythraxis_scourge_of_thornpeak';
+}
+
+export interface OwnedClassCombatOutcomes {
+  hit: number;
+  miss: number;
+  dodge: number;
+  parry: number;
+  resist: number;
+  crit: number;
 }
 
 export interface OwnedClassBalanceResult {
@@ -33,8 +44,10 @@ export interface OwnedClassBalanceResult {
   spec: OwnedDpsSpec;
   playerClass: PlayerClass;
   scenario: OwnedClassBalanceScenario;
+  targetArmor: number;
   totalDamage: number;
   dps: number;
+  outcomes: OwnedClassCombatOutcomes;
   damageByTarget: Record<string, number>;
   damageBySource: Record<string, number>;
   castsByAbility: Record<string, number>;
@@ -117,6 +130,30 @@ export const OWNED_CLASS_BALANCE_SCENARIOS: readonly OwnedClassBalanceScenario[]
   { targets: 1, seconds: 60, window: 'sustained' },
   { targets: 3, seconds: 15, window: 'burst' },
   { targets: 3, seconds: 60, window: 'sustained' },
+] as const;
+
+export const OWNED_CLASS_RAID_SCENARIOS: readonly OwnedClassBalanceScenario[] = [
+  {
+    targets: 1,
+    seconds: 120,
+    window: 'raid',
+    targetLevel: 22,
+    targetTemplateId: 'nythraxis_scourge_of_thornpeak',
+  },
+  {
+    targets: 1,
+    seconds: 120,
+    window: 'raid',
+    targetLevel: 23,
+    targetTemplateId: 'nythraxis_scourge_of_thornpeak',
+  },
+  {
+    targets: 1,
+    seconds: 120,
+    window: 'raid',
+    targetLevel: 24,
+    targetTemplateId: 'nythraxis_scourge_of_thornpeak',
+  },
 ] as const;
 
 export const OWNED_DPS_SPECS: readonly OwnedDpsSpec[] = [
@@ -235,13 +272,28 @@ function placeEntity(sim: ProbeSim, entity: Entity, x: number, z: number): void 
   sim.rebucket(entity);
 }
 
-function addTarget(sim: ProbeSim, xOffset: number, distance: number): Entity {
-  const target = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+function addTarget(
+  sim: ProbeSim,
+  xOffset: number,
+  distance: number,
+  scenario: OwnedClassBalanceScenario = {
+    targets: 1,
+    seconds: 60,
+    window: 'sustained',
+  },
+): Entity {
+  const targetLevel = scenario.targetLevel ?? 20;
+  const armorTemplate = MOBS[scenario.targetTemplateId ?? 'training_dummy'];
+  // Keep the target inert so this probe measures the class rotation, not the
+  // Nythraxis encounter script. The named raid template supplies its real armor
+  // curve while the training-dummy shell prevents boss casts, adds, and movement.
+  const target = createMob(sim.nextId++, MOBS.training_dummy, targetLevel, {
     x: sim.player.pos.x + xOffset,
     y: sim.player.pos.y,
     z: sim.player.pos.z + distance,
   });
   target.hostile = true;
+  target.stats.armor = Math.round(armorTemplate.armorPerLevel * (targetLevel - 1));
   target.aiState = 'idle';
   target.moveSpeed = 0;
   target.maxHp = 100_000_000;
@@ -453,18 +505,20 @@ function collectDamage(
   events: SimEvent[],
   byTarget: Record<string, number>,
   bySource: Record<string, number>,
+  outcomes?: OwnedClassCombatOutcomes,
 ): number {
   let total = 0;
   for (const event of events) {
-    if (
-      event.type !== 'damage' ||
-      event.amount <= 0 ||
-      !ownedByPlayer(state.sim, event.sourceId, state.sim.playerId)
-    ) {
+    if (event.type !== 'damage' || !ownedByPlayer(state.sim, event.sourceId, state.sim.playerId)) {
       continue;
     }
     const targetIndex = state.targets.findIndex((target) => target.id === event.targetId);
     if (targetIndex < 0) continue;
+    if (outcomes) {
+      outcomes[event.kind]++;
+      if (event.crit) outcomes.crit++;
+    }
+    if (event.amount <= 0) continue;
     total += event.amount;
     const targetKey = `target_${targetIndex + 1}`;
     byTarget[targetKey] = (byTarget[targetKey] ?? 0) + event.amount;
@@ -491,7 +545,7 @@ export function runOwnedClassDpsProbe(
   // has a static collider just left of the player, so a negative offset turns the
   // third target into a line-of-sight fixture instead of an area-damage fixture.
   const offsets = scenario.targets === 1 ? [0] : [0, 2, 4];
-  const targets = offsets.map((offset) => addTarget(sim, offset, fixture.distance));
+  const targets = offsets.map((offset) => addTarget(sim, offset, fixture.distance, scenario));
   if (fixture.hunterPet) addHunterPet(sim, targets[0]);
   sim.targetEntity(targets[0].id);
   sim.startAutoAttack();
@@ -509,10 +563,18 @@ export function runOwnedClassDpsProbe(
   const resourceStart = sim.player.resource;
   const damageByTarget = Object.fromEntries(targets.map((_, index) => [`target_${index + 1}`, 0]));
   const damageBySource: Record<string, number> = {};
+  const outcomes: OwnedClassCombatOutcomes = {
+    hit: 0,
+    miss: 0,
+    dodge: 0,
+    parry: 0,
+    resist: 0,
+    crit: 0,
+  };
   let totalDamage = 0;
   for (let tick = 0; tick < scenario.seconds * 20; tick++) {
     runRotation(state);
-    totalDamage += collectDamage(state, sim.tick(), damageByTarget, damageBySource);
+    totalDamage += collectDamage(state, sim.tick(), damageByTarget, damageBySource, outcomes);
   }
   const meta = sim.players.get(sim.playerId);
   if (!meta) throw new Error('missing player metadata');
@@ -522,8 +584,10 @@ export function runOwnedClassDpsProbe(
     spec,
     playerClass: fixture.cls,
     scenario,
+    targetArmor: state.primary.stats.armor,
     totalDamage,
     dps: totalDamage / scenario.seconds,
+    outcomes,
     damageByTarget,
     damageBySource,
     castsByAbility: state.castsByAbility,
@@ -552,6 +616,15 @@ export function runOwnedClassDpsMatrix(
     OWNED_CLASS_BALANCE_SCENARIOS.map((scenario) =>
       runOwnedClassDpsProbe(spec, scenario, seed, head),
     ),
+  );
+}
+
+export function runOwnedClassRaidMatrix(
+  seed = 29_930,
+  head = 'working-tree',
+): OwnedClassBalanceResult[] {
+  return OWNED_DPS_SPECS.flatMap((spec) =>
+    OWNED_CLASS_RAID_SCENARIOS.map((scenario) => runOwnedClassDpsProbe(spec, scenario, seed, head)),
   );
 }
 
@@ -890,21 +963,32 @@ export function runWarspiritOfftankProbe(
 
 function printResult(result: OwnedClassBalanceResult): void {
   const { scenario } = result;
+  const targetLabel =
+    scenario.window === 'raid' ? ` level ${scenario.targetLevel} armor ${result.targetArmor}` : '';
   console.log(
     `${result.spec.padEnd(12)} ${scenario.targets} target ${String(scenario.seconds).padStart(2)} sec ` +
       `${result.dps.toFixed(2).padStart(7)} DPS  buttons ${String(result.buttonsPressed).padStart(2)} ` +
-      `${result.resource.type ?? 'none'} ${Math.round(result.resource.end)}/${result.resource.max}`,
+      `${result.resource.type ?? 'none'} ${Math.round(result.resource.end)}/${result.resource.max}` +
+      targetLabel,
   );
   const sources = Object.entries(result.damageBySource)
     .sort((left, right) => right[1] - left[1])
     .map(([ability, damage]) => `${ability}: ${damage}`)
     .join(', ');
   console.log(`  ${sources}`);
+  if (scenario.window === 'raid') {
+    const outcomes = result.outcomes;
+    console.log(
+      `  outcomes hit ${outcomes.hit}, miss ${outcomes.miss}, dodge ${outcomes.dodge}, ` +
+        `parry ${outcomes.parry}, resist ${outcomes.resist}, crit ${outcomes.crit}`,
+    );
+  }
 }
 
 if (process.argv[1]?.endsWith('owned_class_balance_probe.ts')) {
   const head = process.env.WOC_BALANCE_HEAD ?? 'working-tree';
   for (const result of runOwnedClassDpsMatrix(29_900, head)) printResult(result);
+  for (const result of runOwnedClassRaidMatrix(29_930, head)) printResult(result);
   for (const spec of ['spiritmend', 'doctrine', 'benison'] as const) {
     for (const allies of [1, 3] as const) {
       const result = runOwnedHealerProbe(spec, allies, 29_910, head);
