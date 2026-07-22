@@ -99,7 +99,7 @@ const BUFF_APPLICATION_PULSE_MAX = 0.9;
 // forces it, and by default the crescendo impacts (the gallery ripples+flashes
 // EVERY landed hit), finishers, and big novas touch the screen. Tier 0 only
 // (budget tiers degrade spam first), the post pass pools 4 ripples and clamps
-// the flash at 0.4, and screenFxAt applies camera-distance falloff — so a
+// the flash at 0.4, and screenFxAt applies camera-distance falloff - so a
 // crowded fight still never strobes.
 function wantsScreenFx(spec: AbilityVfxFullSpec, tier: number): boolean {
   if (tier !== 0 || spec.screenFx === false) return false;
@@ -155,7 +155,7 @@ interface WindupState {
 // Per-style orbit DNA defaults (gallery band discipline: halo crowns the
 // HEAD, sparks orbit the SHOULDERS, plates ring the WAIST, runes circle the
 // ANKLES, speedlines blur the LEGS, wings fan from the BACK, weaponGlow rides
-// the HAND, leaves rise as a COLUMN, heartbeat thumps off the CHEST — every
+// the HAND, leaves rise as a COLUMN, heartbeat thumps off the CHEST - every
 // band stacks without collision). buff.o overrides these per ability. For the
 // bespoke styles the generic fields are reinterpreted: wings rate=flapRate
 // radius=span n=ribs; heartbeat radius=ringR; leaves rate=riseSpeed
@@ -299,7 +299,7 @@ export class AbilityVfxFx implements SequencerHost {
   private qualityLevel = 1;
   // Camera-right on the ground plane, refreshed once per update: entities
   // expose no facing through the anchor seam, so wings fan and speedlines
-  // streak across the SCREEN — the silhouette always reads.
+  // streak across the SCREEN - the silhouette always reads.
   private camRightX = 1;
   private camRightZ = 0;
   private particleBurst: ParticleBurst | null = null;
@@ -332,7 +332,7 @@ export class AbilityVfxFx implements SequencerHost {
     | null = null;
   // Deferred screen-fx beats for instant sequences (impact = release + 0.15s):
   // fixed slots, world- or entity-anchored, resolved when they fire. The cap
-  // doubles as the anti-strobe guard — saturated beats simply drop.
+  // doubles as the anti-strobe guard - saturated beats simply drop.
   private screenFxQueue = Array.from({ length: 4 }, () => ({
     t: 0,
     entityId: -1,
@@ -397,7 +397,7 @@ export class AbilityVfxFx implements SequencerHost {
 
   // Kick the async GLB loads for every spirit model a sighted player's class
   // can conjure (painter.syncEntity calls this on first sighting), so the
-  // model is warm before its first cast — an unwarmed cast skips its spirit.
+  // model is warm before its first cast - an unwarmed cast skips its spirit.
   warmSpiritsForClass(cls: string): void {
     this.spirits.warmForClass(cls);
   }
@@ -565,7 +565,7 @@ export class AbilityVfxFx implements SequencerHost {
 
   // Traveling bolt carrying the full spec's bolt DNA. Without a bolt block
   // the trail rides the pooled Vfx comet at its speed (the legacy read); WITH
-  // one, the styled trail IS the projectile — per-style head sprite and trail,
+  // one, the styled trail IS the projectile - per-style head sprite and trail,
   // authored speed, and at full tier the garnish: twin counter-rotating coils,
   // the flickering jagged tail, periodic ground forks, the tracer etch. The
   // lightning family's leader/return double flash answers on arrival, and
@@ -685,8 +685,8 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   // Boot-only warm-up (the renderer's 'vfx.ability-primitives' prewarm entry):
-  // spawn one of every pooled primitive so their meshes — visible=false until
-  // first use, hence invisible to the prewarm's compile passes — render during
+  // spawn one of every pooled primitive so their meshes - visible=false until
+  // first use, hence invisible to the prewarm's compile passes - render during
   // the boot prewarm frames instead of linking their shaders on the first
   // spec'd cast. Each decal style binds its texture so the whole set uploads
   // now, and the flipbook prewarm does the same for the six impact sheets.
@@ -704,7 +704,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.flipbooks.prewarm(x, y + 1.1, z);
     this.pillars.spawn(x, gy, z, 1, 6, 0xffffff, 0.7);
     this.shells.flash(entityId, 0xffffff, 0.7);
-    // held for one frame, then auto-releases as its fade — enough to compile
+    // held for one frame, then auto-releases as its fade - enough to compile
     this.groundAuras.hold(entityId, 0, 0xffffff, true, this.frame);
     this.ribbons.spawnSlashStyled({ x, y: y + 1.1, z }, 0xffffff, 'horizontal');
     this.overlay.push(x, y + 1.1, z, 0xffffff, 0.3, OVERLAY_CELL.glow, 0.6, 1.5);
@@ -822,7 +822,7 @@ export class AbilityVfxFx implements SequencerHost {
 
   glowPulse(entityId: number, colorHex: number, strength: number, _slowDecay: boolean): void {
     // Buff application flash only: the sustained buff read is the ground aura
-    // (holdGroundAura), never a held body tint — so the sequencer's buff-impact
+    // (holdGroundAura), never a held body tint - so the sequencer's buff-impact
     // pulse is capped low and always decays fast (~0.4s at the envelope's
     // 2.2/s), the brief 'it landed' read.
     this.bodyGlowPulse(entityId, colorHex, Math.min(strength, BUFF_APPLICATION_PULSE_MAX), false);
@@ -1046,7 +1046,7 @@ export class AbilityVfxFx implements SequencerHost {
   // jag, a touch wider and longer-lived than the lightning crack. Energy flows
   // along the strip TOWARD the last point, so callers reverse the argument
   // order to reverse the flow (drains run target -> caster). width and life
-  // let a channel crescendo — the cord swelling tick over tick, its life
+  // let a channel crescendo - the cord swelling tick over tick, its life
   // spanning the tick gap so the beam reads continuous.
   beamRibbon(
     sourceId: number,
@@ -1084,7 +1084,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   // Vertical camera-facing halo at an entity (impacts, crits, shout chests).
-  // The big (crit) halo also kicks a small camera shake — accent-gated by the
+  // The big (crit) halo also kicks a small camera shake - accent-gated by the
   // painter and budget-clamped here, so crit chains never stack trauma.
   impactRing(entityId: number, colorHex: number, big = false): void {
     const at = this.anchor(entityId, 0.55);
@@ -1456,7 +1456,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   // The nine buff-orbit body bands (gallery updateOneOrbit), all immediate-
-  // mode overlay sprites recomputed per frame — except heartbeat's chest
+  // mode overlay sprites recomputed per frame - except heartbeat's chest
   // pulse, which rides the pooled shock rings at its authored bpm. buff.o
   // overrides the style DNA so same-band buffs still read as different spells.
   private drawOrbit(entityId: number, band: OrbitBand): void {

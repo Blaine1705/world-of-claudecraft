@@ -129,8 +129,8 @@ export interface SequencerHost {
   // rolling budget so spam can never stack shake).
   shakeAt(x: number, y: number, z: number, amount: number): void;
   // Per-ability audio (src/game/sfx.ts: sampled pack + procedural recipes) at
-  // the sequence's exact release and impact moments — a projectile's boom
-  // lands when the bolt does, a ground cast's boom lands AT the zone — plus
+  // the sequence's exact release and impact moments - a projectile's boom
+  // lands when the bolt does, a ground cast's boom lands AT the zone - plus
   // spirit calls at spawn and set-piece motif foley at the motif anchor.
   // Optional: tests and hosts without an audio sink omit it and the sequence
   // is simply silent.
@@ -529,7 +529,7 @@ export class ArchetypeSequencer {
         host.countPrimitive(slot.abilityId, 2);
       }
       // strike second swing / follow-through echo: a full contact beat of its
-      // own — arc, shockwave, halo, sparks — staggered past the first
+      // own - arc, shockwave, halo, sparks - staggered past the first
       if (!slot.swing2Done && slot.t >= slot.swing2At) {
         slot.swing2Done = true;
         const at = host.anchorOf(slot.targetId, 0.55);
@@ -810,7 +810,7 @@ export class ArchetypeSequencer {
     const arch = spec.archetype;
     const gentle = arch === 'heal' || arch === 'buff' || arch === 'cc';
     // spectacle calibration (see spectacle.ts): only the targeted-crescendo
-    // archetypes scale up — novas/shouts already measured at gallery parity
+    // archetypes scale up - novas/shouts already measured at gallery parity
     const boost = isCrescendoArchetype(arch);
     // the palette identity sounds where the hit visually lands (a ground zone
     // booms AT the zone); gentleness/lite policy resolves in the audio engine
@@ -823,7 +823,7 @@ export class ArchetypeSequencer {
     });
     let n = 0;
     // hero impact sheet (gallery impactStack fires the flipbook first): the
-    // authored spec wins — an explicit true forces it even on gentle
+    // authored spec wins - an explicit true forces it even on gentle
     // archetypes, false suppresses it, and the default fires only for
     // non-gentle impacts. Tier-0-only spectacle; sheet picked per school.
     if (slot.tier === 0 && o.flipbook !== false && (o.flipbook === true || !gentle)) {
@@ -864,7 +864,7 @@ export class ArchetypeSequencer {
       slot.ring2Done = false;
       n++;
     }
-    // vertical halo — default ON for non-gentle impacts (the gallery's
+    // vertical halo - default ON for non-gentle impacts (the gallery's
     // o.vRing !== false: every real hit pops a camera-facing halo; a spec
     // can still author a size or opt out with false)
     const vr =
@@ -942,7 +942,7 @@ export class ArchetypeSequencer {
       n++;
     }
     // receiver feedback (the gallery targetGlow 2.6*cs): the victim's rig
-    // flashes in the hit color and fast-decays — the body itself sells the
+    // flashes in the hit color and fast-decays - the body itself sells the
     // contact. Targeted, non-gentle hits only; never the caster.
     if (!gentle && slot.targetId >= 0 && slot.targetId !== slot.casterId) {
       host.glowPulse(slot.targetId, slot.color, 1.2 * cs, false);
@@ -1028,7 +1028,7 @@ export class ArchetypeSequencer {
     }
     // per-archetype impact extras
     this.archetypeImpact(host, slot, gy);
-    // spirit apparition (summons, cc, shapeshifts — any spec authoring one):
+    // spirit apparition (summons, cc, shapeshifts - any spec authoring one):
     // tier-0-only spectacle, once per sequence, at the impact moment
     if (
       slot.tier === 0 &&
@@ -1058,7 +1058,7 @@ export class ArchetypeSequencer {
     slot.lingerUntil = slot.t + (slot.tier === 0 ? Math.min(6, spec.linger ?? 0.5) : 0);
     // spectacle afterglow: crescendo impacts hold a readable aftermath (fading
     // dome + periodic embers in drawTransients) even when the authored linger
-    // is short — the gallery's aftermath field the compressed stack dropped.
+    // is short - the gallery's aftermath field the compressed stack dropped.
     // Strikes hold a SHORT hot-metal window instead of the spell dwell.
     if (boost && slot.tier === 0) {
       slot.afterglowSpan =
@@ -1579,7 +1579,7 @@ export class ArchetypeSequencer {
     // release flash: a hot star at the caster's chest (timed from the release
     // moment, which a synthetic windup shifts late). Crescendo archetypes hold
     // it longer at gallery scale, backed by a glow plate and a fan of radial
-    // filaments — all immediate-mode overlay pushes, zero pool cost.
+    // filaments - all immediate-mode overlay pushes, zero pool cost.
     const flashDur = boost ? SPECTACLE.releaseDur : 0.1;
     const sinceRelease = slot.t - slot.releaseAt;
     if (sinceRelease >= 0 && sinceRelease < flashDur) {
@@ -1672,7 +1672,7 @@ export class ArchetypeSequencer {
         slot.afterglowTimer = SPECTACLE.afterglowEvery;
         host.burstAt(slot.ix, slot.iy + 0.2, slot.iz, slot.accent, 7, 0.55, 'embers');
         // the pulsing afterglow: a soft re-lit ground disc plus a low ground
-        // ring ripple — in daylight these carry the aftermath read at chase
+        // ring ripple - in daylight these carry the aftermath read at chase
         // distance where dim sprites vanish
         host.pulseLight(
           slot.targetId,

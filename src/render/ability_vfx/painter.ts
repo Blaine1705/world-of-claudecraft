@@ -81,7 +81,7 @@ export interface AbilityVfxDeps {
   playShoutAnim?: (entityId: number) => void;
   // Entity lookups mirroring the renderer's generic-arm checks (all optional
   // for tests): mob-kind, live cast state, and whether the rig is already
-  // playing a one-shot — the painter replicates the mob-throw fallback the
+  // playing a one-shot - the painter replicates the mob-throw fallback the
   // generic arm applies when it does NOT claim.
   isMob?: (entityId: number) => boolean;
   castingAbilityOf?: (entityId: number) => string | null;
@@ -217,7 +217,7 @@ function rimColorOf(full: AbilityVfxFullSpec | undefined, spec: AbilityVfxSpec):
   return abilityVfxColor(spec);
 }
 
-// Maintenance passives are completely SILENT — no body glow, no orbit band,
+// Maintenance passives are completely SILENT - no body glow, no orbit band,
 // no ground aura. The tell is the sim ability def, not the vfx spec: the
 // warrior stances (perpetually re-applied toggles, exclusiveGroup
 // 'warrior_stance') and spellbook-only passive traits. A default level-1
@@ -234,7 +234,7 @@ function isPassiveAura(auraId: string): boolean {
 // DNA: shapeshift/aspect forms author buff style 'morph', and the
 // ultimate-cooldown moments (Avatar, Metamorphosis, Bloodlust,
 // Elemental Mastery...) are exactly the buff-archetype specs authored at
-// power >= 1.1 — every default buff sits at 1.0 or below.
+// power >= 1.1 - every default buff sits at 1.0 or below.
 const TRANSFORMATIVE_BUFF_POWER = 1.1;
 const TRANSFORMATIVE_RIM_SCALE = 0.25;
 function isTransformativeBuff(full: AbilityVfxFullSpec): boolean {
@@ -309,7 +309,7 @@ export class AbilityVfx {
   private castChargeAt = new Map<string, number>();
   // live beam channels by caster id: every tick of a beam-archetype channel
   // (mind rays, drains) arrives as its own cast-fx event, so the tracker turns
-  // the series into ONE cast — a crescendoing cord across the ticks and the
+  // the series into ONE cast - a crescendoing cord across the ticks and the
   // full impact stack once, on the last tick. Interrupted channels expire in
   // update() without an impact.
   private beamChannels = new Map<
@@ -381,8 +381,8 @@ export class AbilityVfx {
   }
 
   // Degrade tier for a cast-claiming event: charges the cast budget once per
-  // (caster, ability) window — a cast plus its own follow-through (aimed
-  // landing, a strike's contact hit) never double-charges — and biases the
+  // (caster, ability) window - a cast plus its own follow-through (aimed
+  // landing, a strike's contact hit) never double-charges - and biases the
   // local player one tier up (their own rotation degrades last).
   private castTier(casterId: number, abilityId: string): 0 | 1 | 2 {
     const nowSec = this.now();
@@ -431,7 +431,7 @@ export class AbilityVfx {
     if (full?.archetype === 'beam' && ev.fx !== 'windup' && ev.fx !== 'shout')
       return this.beamChannelTick(ev, ev.ability, spec, full);
     // selfCast is the ONLY completion cue an untargeted/self cast emits (forms,
-    // summon rites, aspects). Only ceremony archetypes claim it — anything whose
+    // summon rites, aspects). Only ceremony archetypes claim it - anything whose
     // read arrives via other events (heals via heal events, strikes via their
     // damage claim) falls through unclaimed so nothing double-stages. Checked
     // before castTier so an unclaimed selfCast never charges the budget.
@@ -458,7 +458,7 @@ export class AbilityVfx {
         if (tier < 2 && full?.bolt) {
           // The full spec's bolt DNA (style silhouette, authored speed, coils,
           // forks, tracer, leader, volley) drives the styled trail system,
-          // whose head sprite IS the projectile — the generic Vfx comet would
+          // whose head sprite IS the projectile - the generic Vfx comet would
           // shadow it at the wrong speed, so it stays off entirely.
           fx.sequenceBolt(
             ev.ability,
@@ -626,8 +626,8 @@ export class AbilityVfx {
 
   // One tick of a beam-archetype channel. The whole channel is ONE cast to
   // the spam budget (charged on its first tick); across the ticks the cord
-  // crescendos — the ribbon swells and outlives the tick gap so it reads
-  // continuous, the receiving end accents harder each tick — and the LAST
+  // crescendos - the ribbon swells and outlives the tick gap so it reads
+  // continuous, the receiving end accents harder each tick - and the LAST
   // tick lands the authored impact stack through the normal sequence
   // machinery. Drains reverse the ribbon's point order, which reverses its
   // flow: energy visibly runs target -> caster.
@@ -704,7 +704,7 @@ export class AbilityVfx {
         0.25,
       );
     }
-    // channel end: the last tick IS the payoff — the full authored impact
+    // channel end: the last tick IS the payoff - the full authored impact
     // stack (already budget-charged at channel start, so no second charge)
     if (ch.ticks >= ch.expected) {
       this.beamChannels.delete(ev.sourceId);
@@ -716,8 +716,8 @@ export class AbilityVfx {
 
   // Point-anchored claims: an aimed ground cast's landing ('nova'/'burst' at
   // the aim point) runs the full archetype sequence anchored at the WORLD
-  // POINT — windup ceremony and release flash on the caster, motifs, decal,
-  // and linger at the point — and a zone pulse ('tick') draws a cheap
+  // POINT - windup ceremony and release flash on the caster, motifs, decal,
+  // and linger at the point - and a zone pulse ('tick') draws a cheap
   // per-pulse re-hit, never a full sequence. The four bespoke lifetime kinds
   // (meteorFall/snowZone/runeCircle/orb) are deliberately never claimed:
   // their legacy visuals animate duration-long state (a ball timed to its
@@ -802,7 +802,7 @@ export class AbilityVfx {
 
   // The cheap per-pulse zone re-hit (ground-zone ticks, repeated aimed novas):
   // a small expanding ring, a pinch of palette debris, and at full tier a
-  // vertical accent halo — never a full sequence. Tier 2 draws nothing.
+  // vertical accent halo - never a full sequence. Tier 2 draws nothing.
   private zoneRehit(
     x: number,
     gy: number,
@@ -838,9 +838,9 @@ export class AbilityVfx {
   // plus its archetype read: strikes slash a ribbon arc across the victim and
   // crits pop a vertical halo. Damage events carry player-facing ability
   // NAMES; normalize back to the stable id first. Accents ride the flat accent
-  // window and only peek the cast tier — a rotation's own landed hits (and
+  // window and only peek the cast tier - a rotation's own landed hits (and
   // plain autos) never consume its cast slots. The one exception: a physical
-  // special whose ONLY event is its hit — that contact IS its cast, so it
+  // special whose ONLY event is its hit - that contact IS its cast, so it
   // charges the cast budget (deduped) and runs the full sequence.
   onDamage(ev: AbilityVfxDamageEvent): void {
     if (ev.kind !== 'hit' || ev.amount <= 0) return;
@@ -872,7 +872,7 @@ export class AbilityVfx {
     const isCastMoment = !!full && (arch === 'strike' || arch === 'dash' || arch === 'buff');
     // Local-player crit hitstop + screen pop (gallery critHit feel): body and
     // screen feedback, not a particle spawn, so it rides OUTSIDE the accent
-    // window — your own crit reads even in a saturated fight. The visual's
+    // window - your own crit reads even in a saturated fight. The visual's
     // refractory, the flash clamp, and the shake budget keep chains calm.
     if (local && ev.crit) {
       this.deps.animHold?.(ev.targetId, 0.1, 0.14);
@@ -964,7 +964,7 @@ export class AbilityVfx {
       fx.warmSpiritsForClass(e.templateId);
     }
     // Body glow (the gallery rim read) is RESERVED: an in-flight cast windup,
-    // or a held transformative buff's restrained rim (see the aura loop) —
+    // or a held transformative buff's restrained rim (see the aura loop)  -
     // strongest live source wins. Default buffs never tint the rig.
     let glowColor = 0;
     let glowStrength = 0;
@@ -1014,7 +1014,7 @@ export class AbilityVfx {
       // ultimate cooldowns keep a restrained rim; every other buff wears the
       // subtle under-character ground aura instead (band 0 the soft disc,
       // further concurrent buffs thin concentric rings, a 4th+ blends its hue
-      // into the outermost). Veil styles (stealth, vanish) opt out — a
+      // into the outermost). Veil styles (stealth, vanish) opt out - a
       // disappearing act must not glow the ground it stands on.
       let discStarted = false;
       if (

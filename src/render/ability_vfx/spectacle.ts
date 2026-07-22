@@ -5,7 +5,7 @@
 //
 // The measured gap lived in the 0.3s CRESCENDO of targeted abilities: at
 // release/impact the game effect occupied the same screen region as the
-// gallery (bbox ~1.0, per-pixel peak ~0.75x) but was sparse inside it —
+// gallery (bbox ~1.0, per-pixel peak ~0.75x) but was sparse inside it  -
 // coverage 4.5-12.7x smaller (lightning_bolt 12.7:1, heroic_strike 8:1,
 // fireball 6:1). Ground novas, shout rings, buff orbits, and persistence were
 // already AT gallery parity, so these multipliers deliberately apply only to
@@ -55,12 +55,12 @@ export const SPECTACLE = {
   boltHead: 1.6,
 
   /** Release cast-off flipbook size (yd, x power; tier 0). The gallery fires
-   *  a full-size explosion sheet AT the caster on release — the single
+   *  a full-size explosion sheet AT the caster on release - the single
    *  biggest reason its release frame reads 8x denser than the game's. */
   releaseFlipbook: 4.2,
 
   // ---- impact: the landing stack (sequencer.impact)
-  // ROUND 2 (user brief): "impact effects are too small — maximise the visuals
+  // ROUND 2 (user brief): "impact effects are too small - maximise the visuals
   // ... satisfying, large, beautiful effects". The transient 35%-of-frame
   // conservatism is rescinded for the impact MOMENT; only sustained effects
   // stay gameplay-readable. Constants re-raised against the stored gallery
@@ -82,11 +82,11 @@ export const SPECTACLE = {
    *  seam's width-with-scale rule). Melee contact measured 8-20x under. */
   strikeArc: 2.9,
   /** Second staggered flipbook after the first (tier 0): stretches the hot
-   *  window toward the gallery's ~1s aftermath instead of a one-sheet pop —
+   *  window toward the gallery's ~1s aftermath instead of a one-sheet pop  -
    *  0.3s lands it deep in the measured impact window. */
   flipbook2Delay: 0.3,
   /** Crescendo flipbook HDR multiplier: colored sheets (flame, void) on the
-   *  bright daylit terrain read far dimmer than the gallery's night stage —
+   *  bright daylit terrain read far dimmer than the gallery's night stage  -
    *  brightness, not size, is the honest recovery lever. Rides bloom. */
   flipbookHdr: 1.65,
   /** Finisher impact light pillar (radius yd x power, height yd, seconds).
@@ -128,7 +128,7 @@ export const SPECTACLE = {
    *  readable aftermath. */
   afterglowDur: 2.8,
   /** Strikes hold a SHORT hot-metal afterglow (gallery strike linger is tiny,
-   *  but its impact frame stays hot ~1s — sparks, lit ground, halo). */
+   *  but its impact frame stays hot ~1s - sparks, lit ground, halo). */
   strikeAfterglowDur: 1.3,
   /** Afterglow ember-burst period in seconds. */
   afterglowEvery: 0.4,
