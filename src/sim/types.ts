@@ -2526,6 +2526,7 @@ export interface HeroicLeapFlight {
   apex: number;
   landingAoe: { min: number; max: number; radius: number };
   abilityName: string;
+  abilityId: string;
   school: AbilityDef['school'];
 }
 
@@ -3423,7 +3424,12 @@ export type SimEvent = { pid?: number } & (
       x: number;
       z: number;
       school: string;
-      fx: 'burst' | 'nova' | 'orb' | 'meteorFall' | 'runeCircle' | 'snowZone';
+      // 'tick' is a ground-zone pulse (Consecration et al) anchored at the
+      // ZONE, not the caster; the other kinds are impact/lifetime visuals.
+      fx: 'burst' | 'nova' | 'orb' | 'meteorFall' | 'runeCircle' | 'snowZone' | 'tick';
+      // The casting ability's id, so the renderer can pick that ground cast's
+      // authored visual instead of a generic per-school one.
+      ability?: string;
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;
@@ -3437,8 +3443,9 @@ export type SimEvent = { pid?: number } & (
       // animation; 'halt'/'resume' freeze and restart it at the server's real
       // coordinates when the orb latches onto (and outlives) an enemy.
       phase?: 'release' | 'halt' | 'resume';
-      // 'orb' only: the casting entity, keying halt/resume to their live orb
-      // (one orb per caster: the cooldown far outlasts the flight).
+      // 'orb': the casting entity, keying halt/resume to their live orb (one
+      // orb per caster: the cooldown far outlasts the flight). 'tick': the
+      // zone's owner, so the renderer can attribute the pulse.
       sourceId?: number;
     }
   // entityId (when set) anchors the log to that entity so the server only

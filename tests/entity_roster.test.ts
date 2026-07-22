@@ -525,7 +525,8 @@ describe('entity_roster: ground-AoE drain (isolated ctx)', () => {
       interval: 1,
       tickTimer: 0,
       school: 'holy',
-      ability: 'consecration',
+      ability: 'Consecration',
+      abilityId: 'consecration',
       ...over,
     };
   }

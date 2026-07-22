@@ -627,7 +627,7 @@ export function runEffects(
         break;
       }
       case 'massResurrectGroup': {
-        resurrectDeadGroupMembers(ctx, p, eff.hpFrac);
+        resurrectDeadGroupMembers(ctx, p, eff.hpFrac, ability.id);
         break;
       }
       case 'perfectMoment': {
@@ -1315,6 +1315,7 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             radius: eff.radius,
+            ability: ability.id,
           });
         } else {
           ctx.emit({
@@ -1528,6 +1529,7 @@ export function runEffects(
           p,
           eff,
           ability.name,
+          ability.id,
           directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
         );
         break;
@@ -1547,6 +1549,7 @@ export function runEffects(
           tickTimer: eff.interval,
           school: ability.school,
           ability: ability.name,
+          abilityId: ability.id,
           // Each pulse is an AoE hit; scale per tick off the school's rating
           // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
           spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
@@ -1571,6 +1574,7 @@ export function runEffects(
             fx: 'meteorFall',
             radius: eff.radius,
             duration: eff.interval,
+            ability: ability.id,
           });
         }
         if (eff.allyBuffPct) {
@@ -1582,6 +1586,7 @@ export function runEffects(
             fx: 'runeCircle',
             radius: eff.radius,
             duration: eff.duration,
+            ability: ability.id,
           });
         }
         // A snaring frost zone (Blizzard) snows over its area for its life.
@@ -1594,6 +1599,7 @@ export function runEffects(
             fx: 'snowZone',
             radius: eff.radius,
             duration: eff.duration,
+            ability: ability.id,
           });
         }
         if (p.castAim) {
@@ -1604,6 +1610,7 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             radius: eff.radius,
+            ability: ability.id,
           });
         } else {
           ctx.emit({
@@ -2035,6 +2042,7 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             radius: eff.radius,
+            ability: ability.id,
           });
         } else {
           ctx.emit({

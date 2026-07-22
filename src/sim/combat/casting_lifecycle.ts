@@ -1169,6 +1169,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       school: res.def.school,
       fx: 'nova',
       radius,
+      ability: res.def.id,
     });
     const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
     // How many enemies this pulse actually struck: Blizzard's Frozen Orb
@@ -1227,6 +1228,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         school: res.def.school,
         fx: 'nova',
         radius: eff.radius,
+        ability: res.def.id,
       });
       for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
         if (!ctx.hasLineOfSight(p, m)) continue;
@@ -1295,6 +1297,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         school: res.def.school,
         fx: 'nova',
         radius: eff.radius,
+        ability: res.def.id,
       });
       const radiusSq = eff.radius * eff.radius;
       for (const ally of ctx.entities.values()) {
