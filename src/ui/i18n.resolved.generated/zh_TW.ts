@@ -3155,6 +3155,7 @@ export const zh_TW: EnTranslations = {
       "divine_protection": "快速的守護結界，在情勢危急時吸收傷害。",
       "raptor_strike": "在有東西貼上你時可用的一記重力近戰揮擊。",
       "pack_command": "命令你的夥伴發動攻擊，並累積兇性以釋放野獸。",
+      "stampede": "召喚三隻野獸攻擊12秒。疊滿獸群兇性後使用，可讓牠們在整個召喚期間保持最高傷害加成。",
       "measured_shot": "一記從容瞄準的遠程射擊，為你的強力攻擊恢復集中值。",
       "aspect_of_the_hawk": "持續維持的姿態，用來強化你的遠程攻擊強度。",
       "serpent_sting": "施加毒液，隨時間造成持續的自然傷害。",
@@ -3174,6 +3175,7 @@ export const zh_TW: EnTranslations = {
       "power_word_shield": "為友方罩上護盾，在傷害落下前先行吸收。",
       "renew": "隨時間持續跳動的治療，適合施放後繼續移動。",
       "lightning_bolt": "施放遠程的自然傷害，是你從遠處的慣用招式。",
+      "chain_lightning": "攻擊一個目標並跳向附近兩名敵人，整次施法產生一層雷霆。",
       "rockbiter_weapon": "為武器附魔，讓你近戰每一擊都更沉重。",
       "healing_wave": "你主要的治療法術，直接為自己或友方回復生命。",
       "earth_shock": "瞬發震擊，在你需要時立即造成自然傷害。",
@@ -3182,6 +3184,7 @@ export const zh_TW: EnTranslations = {
       "galeheart_weapon": "為雙持武器灌注風暴之風，以穩定的攻擊節奏獲得回報。",
       "lifespring_weapon": "為武器灌注復甦之水，強化持續的治療節奏。",
       "tidecall": "立即治療一名盟友，並注入滿額癒合水流。",
+      "ancestor_return": "在戰鬥外長時間施法後，使所有陣亡的隊伍或團隊成員復活。",
       "stoneward": "升起充能石盾，將受到的傷害轉化為恢復。",
       "primal_exaltation": "短暫釋放符合你專精的元素力量。",
       "fireball": "你主要的火焰核彈，命中後讓目標持續燃燒。",
@@ -6458,6 +6461,10 @@ export const zh_TW: EnTranslations = {
         "name": "獸群號令",
         "description": "命令你的活體寵物發動攻擊。命中後產生 20 點集中值和一層獸群兇性。"
       },
+      "stampede": {
+        "name": "獸群奔襲",
+        "description": "召喚3隻野獸，持續12秒。每隻野獸每2秒攻擊一次，造成{damage}點物理傷害。顯示的傷害已計入你遠程攻擊強度的8%，但尚未計入寵物傷害加成。野獸在召喚時會鎖定獸群凶性層數，每層使其傷害提高10%。獸群奔襲處於冷卻時，成功施放獸群號令有20%機率重置其冷卻；連續5次未觸發後必定重置。野獸存在期間無法重置。（獸群之主）"
+      },
       "unleash_beast": {
         "name": "釋放野獸",
         "description": "釋放滿層獸群兇性，對主要目標發動重擊並拍擊周圍敵人，隨後使寵物短暫進入順劈狂亂。"
@@ -7455,8 +7462,8 @@ export const zh_TW: EnTranslations = {
         "description": "使30碼內的盟友陷入狂亂，攻擊速度提高30%，持續15秒。（薩滿天賦）"
       },
       "chain_lightning": {
-        "name": "叉狀閃電",
-        "description": "向目標區域投擲閃電，對附近的敵人造成{damage}點傷害。（薩滿天賦）"
+        "name": "天穹分枝",
+        "description": "攻擊目標，並跳向10碼內最多2名敵人，對每個目標造成{damage}點自然傷害。命中時整次施法獲得1層雷霆，而不是每個目標各獲得1層。傷害隨法術強度提高。原始掌控可使其瞬發，原始昇華會使其施法時間縮短一半。（喚雷者）"
       },
       "chaos_bolt": {
         "name": "毀滅箭",
@@ -7589,6 +7596,10 @@ export const zh_TW: EnTranslations = {
       "collective_reversal": {
         "name": "集體逆轉",
         "description": "倒轉隊伍或團隊中每位陣亡成員的時間線，使其在遺體旁以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）"
+      },
+      "ancestor_return": {
+        "name": "先祖歸來",
+        "description": "呼喚隊伍或團隊中所有陣亡成員，使其在屍體處復活並恢復30%生命值和法力值。戰鬥中無法施放。（靈癒）"
       },
       "temporal_rewind": {
         "name": "回溯",

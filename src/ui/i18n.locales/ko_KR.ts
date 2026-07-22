@@ -131,7 +131,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': '붉은 안개',
   'entities.abilities.blink.name': '섬광걸음',
   'entities.abilities.bloodlust.name': '전쟁 북',
-  'entities.abilities.chain_lightning.name': '갈래 번개',
+  'entities.abilities.chain_lightning.name': '하늘가지',
   'entities.abilities.chaos_bolt.name': '파멸 화살',
   'entities.abilities.cleansing_verdict.name': '정화의 심판',
   'entities.abilities.cleansing_verdict.description':
@@ -5236,6 +5236,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lifespring_weapon':
     '무기에 치유의 물을 불어넣어 이어지는 회복 흐름을 강화합니다.',
   'guide.abilityHook.tidecall': '아군을 즉시 치유하고 치유의 물결을 최대로 저장합니다.',
+  'guide.abilityHook.ancestor_return':
+    '전투 중이 아닐 때 길게 시전해 쓰러진 파티 또는 공격대원 모두를 부활시킵니다.',
   'guide.abilityHook.stoneward': '충전된 돌 방패를 세워 받는 피해를 회복으로 바꿉니다.',
   'guide.abilityHook.primal_exaltation': '전문화에 맞는 원소의 힘을 짧은 시간 폭발시킵니다.',
   'guide.abilityHook.frost_armor': '전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.',
@@ -5254,6 +5256,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '가만히 서 있을 여유가 있을 때 아군의 체력을 채우는 안정적인 치유입니다.',
   'guide.abilityHook.life_tap': '마나가 바닥날 때 자신의 생명력 일부를 마나로 전환합니다.',
   'guide.abilityHook.lightning_bolt': '자연 피해를 주는 원거리 시전기로, 멀리서 쓰는 주력기입니다.',
+  'guide.abilityHook.chain_lightning':
+    '한 대상을 공격하고 주변 적 두 명에게 튕기며, 전체 시전에서 천둥 한 개를 쌓습니다.',
   'guide.abilityHook.lightning_shield':
     '몸에 전하를 둘러 공격자가 당신을 칠 때 자연 피해를 받게 합니다.',
   'guide.abilityHook.mark_of_the_wild': '전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.',
@@ -5263,6 +5267,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.moonfire': '즉시 타격하고 대상을 계속 불태우므로, 이동 중에 쓰기 좋습니다.',
   'guide.abilityHook.pack_command':
     '동료에게 공격을 명령하고, 야수 해방에 필요한 흉포함을 쌓습니다.',
+  'guide.abilityHook.stampede':
+    '야수 세 마리를 12초 동안 불러 공격시킵니다. 무리의 야성이 최대일 때 사용하면 소환 내내 최대 피해 보너스를 유지합니다.',
   'guide.abilityHook.power_word_fortitude':
     '아군의 생명력을 높여 주므로, 전투를 시작하기 전에 시전하고 유지하세요.',
   'guide.abilityHook.power_word_shield': '아군을 보호막으로 감싸 타격이 닿기 전에 흡수합니다.',
@@ -8007,7 +8013,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '30미터 안의 아군을 광분시켜 15초 동안 공격 속도를 30%만큼 증가시킵니다. (주술사 특성)',
   'entities.abilities.chain_lightning.description':
-    '대상 지역에 번개를 내리쳐 주위 적에게 {damage}의 피해를 입힙니다. (주술사 특성)',
+    '대상을 공격한 뒤 10미터 안의 적 최대 2명에게 번져 각각 {damage}의 자연 피해를 입힙니다. 적중하면 대상마다가 아니라 시전 전체에서 천둥 1개를 얻습니다. 피해는 주문력에 따라 증가합니다. 원시 숙련은 이 주문을 즉시 시전하게 할 수 있고, 원시 고양은 시전 시간을 절반으로 줄입니다. (천둥소환사)',
   'entities.abilities.chaos_bolt.description':
     '혼돈의 불꽃 화살을 던져 {damage}의 화염 피해를 입힙니다. (흑마법사 특성)',
   'entities.abilities.cloak_of_shadows.description':
@@ -8775,4 +8781,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': '그 아이템은 귀속되어 있지 않습니다.',
   'hudChrome.unbind.cannotAfford': '귀속 해제 수수료를 지불할 수 없습니다.',
   'hudChrome.unbind.outOfRange': '귀속을 해제하려면 작업대 옆에 있어야 합니다.',
+  'entities.abilities.stampede.name': '야수 쇄도',
+  'entities.abilities.stampede.description':
+    '야수 3마리를 12초 동안 소환합니다. 각 야수는 2초마다 공격해 {damage}의 물리 피해를 입힙니다. 표시된 피해에는 원거리 전투력의 8%가 포함되지만 소환수 피해 보너스는 포함되지 않습니다. 야수는 소환될 때 무리의 흉포함을 저장하며, 중첩당 피해가 10% 증가합니다. 야수 쇄도가 재사용 대기 중일 때 무리 명령이 적중하면 20% 확률로 재사용 대기시간이 초기화되며, 5번 연속 실패하면 반드시 초기화됩니다. 야수들이 활동 중일 때는 초기화되지 않습니다. (무리군주)',
+  'entities.abilities.ancestor_return.name': '선조의 귀환',
+  'entities.abilities.ancestor_return.description':
+    '파티 또는 공격대에서 쓰러진 모든 구성원을 시체가 있는 곳에서 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (영혼치유사)',
 };

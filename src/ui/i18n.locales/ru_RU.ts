@@ -129,7 +129,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': 'Багровая дымка',
   'entities.abilities.blink.name': 'Мерцающий шаг',
   'entities.abilities.bloodlust.name': 'Боевые барабаны',
-  'entities.abilities.chain_lightning.name': 'Разветвленная молния',
+  'entities.abilities.chain_lightning.name': 'Небесная ветвь',
   'entities.abilities.chaos_bolt.name': 'Стрела погибели',
   'entities.abilities.cleansing_verdict.name': 'Очищающий приговор',
   'entities.abilities.cleansing_verdict.description':
@@ -5313,6 +5313,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lifespring_weapon':
     'Наполняет оружие целебной водой и усиливает непрерывный поток исцеления.',
   'guide.abilityHook.tidecall': 'Мгновенно исцеляет союзника и наполняет его Поток исцеления.',
+  'guide.abilityHook.ancestor_return':
+    'После долгого применения вне боя возвращает к жизни всех погибших участников группы или рейда.',
   'guide.abilityHook.stoneward':
     'Поднимает заряженный каменный щит, превращающий полученный урон в исцеление.',
   'guide.abilityHook.primal_exaltation':
@@ -5341,6 +5343,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Обменивает часть вашего здоровья обратно в ману, когда вы выдыхаетесь.',
   'guide.abilityHook.lightning_bolt':
     'Накладываемый удар силами природы с дистанции, ваш основной способ бить издалека.',
+  'guide.abilityHook.chain_lightning':
+    'Поражает одну цель и перескакивает на двух ближайших врагов, давая один заряд Грома за все применение.',
   'guide.abilityHook.lightning_shield':
     'Заряжает вас так, что атакующие получают урон силами природы, когда бьют вас.',
   'guide.abilityHook.mark_of_the_wild':
@@ -5351,6 +5355,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Контрудар, который становится доступен сразу после того, как враг уклонился.',
   'guide.abilityHook.pack_command':
     'Приказывает вашему спутнику атаковать и накапливает Свирепость стаи для Высвобождения зверя.',
+  'guide.abilityHook.stampede':
+    'Призывает трех зверей атаковать в течение 12 сек. Используйте при максимальной Свирепости стаи, чтобы звери сохраняли наибольшую прибавку к урону все время призыва.',
   'guide.abilityHook.moonfire':
     'Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.',
   'guide.abilityHook.power_word_fortitude':
@@ -8163,7 +8169,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     'Приводит союзников в радиусе 30 м в исступление, повышая их скорость атаки на 30% на 15 сек. (талант шамана)',
   'entities.abilities.chain_lightning.description':
-    'Обрушивает молнию на выбранную область, нанося ближайшим противникам {damage} ед. урона. (талант шамана)',
+    'Поражает цель и перескакивает еще на 2 противников в радиусе 10 м, нанося каждому {damage} ед. урона от сил природы. При попадании заклинание дает 1 заряд Грома за все применение, а не за каждую цель. Урон повышается от силы заклинаний. Изначальное мастерство может сделать заклинание мгновенным, а Изначальное возвышение вдвое сокращает время произнесения. (Громовержец)',
   'entities.abilities.chaos_bolt.description':
     'Выпускает сгусток хаотического огня, наносящий {damage} ед. урона от Огня. (талант чернокнижника)',
   'entities.abilities.cloak_of_shadows.description':
@@ -8956,4 +8962,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': 'Этот предмет не привязан.',
   'hudChrome.unbind.cannotAfford': 'Вам не хватает денег на снятие привязки.',
   'hudChrome.unbind.outOfRange': 'Для снятия привязки нужно стоять у мастерской.',
+  'entities.abilities.stampede.name': 'Звериный натиск',
+  'entities.abilities.stampede.description':
+    'Призывает 3 зверей на 12 сек. Каждый зверь атакует раз в 2 сек. и наносит {damage} ед. физического урона. Показанный урон включает 8% от силы атаки дальнего боя до прибавок к урону питомцев. Звери запоминают Свирепость стаи при призыве и наносят на 10% больше урона за каждый заряд. Пока Звериный натиск восстанавливается, успешная Команда стае с вероятностью 20% сбрасывает его время восстановления; после 5 неудачных попыток сброс срабатывает наверняка. Пока звери активны, сброс невозможен. (Повелитель стаи)',
+  'entities.abilities.ancestor_return.name': 'Возвращение предков',
+  'entities.abilities.ancestor_return.description':
+    'Возвращает к жизни всех погибших участников группы или рейда у их тел с 30% здоровья и маны. Нельзя применять в бою. (Целитель духов)',
 };

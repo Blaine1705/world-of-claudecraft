@@ -36,8 +36,11 @@ change.
 - Spiritmend remains Chain Heal-oriented. Cascading Mend retains the shipped `chain_heal` id and
   core Chain Heal role as the specialization signature; it is not a talent morph of Mending
   Waters. Mending Waters prepares allies, then Cascading Mend consumes their Mending Currents.
-- Thundercall remains an Arc Bolt builder and shock spender. Chain Lightning may remain optional
-  talent space, but it does not replace Arc Bolt or become a required baseline builder or vent.
+- Thundercall remains an Arc Bolt builder and shock spender. Its approved Skybranch follow-up is a
+  level 14, three-target builder on a six-second cooldown. It grants one Thunder per landed cast,
+  never per bounce, and does not replace Arc Bolt or vent the bank.
+- Spiritmend receives Ancestors' Return at level 20. It is a seven-second out-of-combat group revive,
+  not a combat resurrection.
 - Warspirit unlocks one-handed dual wielding. Landed main-hand and off-hand base weapon swings each
   add one cadence step, while Galeheart echoes never add steps. A Stonebound player may replace the
   off-hand weapon with a shield, accepting slower cadence in exchange for the existing block
@@ -325,7 +328,7 @@ Thundercall's offensive bank.
 
 | Choice | Starting effect | Player reason to choose it |
 |---|---|---|
-| Primal Exaltation | Grants one 12-second active with a 120-second cooldown. Thundercall Arc Bolts cast 50% faster and grant two Thunder charges. Warspirit triggers its cadence every second landed melee attack. Spiritmend deposits 50% more Mending Current healing and Tidecall charges recharge twice as quickly. | A specialization-specific throughput window using the normal rotation. |
+| Primal Exaltation | Grants one 12-second active with a 120-second cooldown. Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants two Thunder charges. Warspirit triggers its cadence every second landed melee attack. Spiritmend deposits 50% more Mending Current healing and Tidecall charges recharge twice as quickly. | A specialization-specific throughput window using the normal rotation. |
 | Wayfarer Grace | When ready, exiting Shadewolf allows casting while moving for 8 seconds. This can occur once every 90 seconds. | Maintains damage or healing through extended movement. |
 | Ancestral Bulwark | Activating Thunder Ward grants 40% damage reduction for 6 seconds, with a 120-second internal cooldown. | Converts the existing shield action into a major defensive window. |
 

@@ -1,6 +1,6 @@
 # One Button and level 20 spec bars
 
-Status: design ready, implementation not started
+Status: manual-first level 20 bars implemented; One Button remains unapproved and deferred
 
 Target: v0.29.0 PBE after Levy or Fernando approves this gameplay-assistance slice
 
@@ -274,16 +274,17 @@ bar.
 | ---: | --- |
 | 1 | One Button |
 | 2 | Arc Bolt |
-| 3 | Earthen Jolt |
-| 4 | Cinder Jolt |
-| 5 | Faultwake |
-| 6 | Rime Jolt |
-| 7 | Primal Mastery |
-| 8 | Thunder Ward |
-| 9 | Mending Waters |
-| 10 | Shadewolf |
-| 11 | Storm Chorus |
-| 12 | Pyrebrand Weapon |
+| 3 | Skybranch |
+| 4 | Earthen Jolt |
+| 5 | Cinder Jolt |
+| 6 | Faultwake |
+| 7 | Rime Jolt |
+| 8 | Primal Mastery |
+| 9 | Thunder Ward |
+| 10 | Mending Waters |
+| 11 | Shadewolf |
+| 12 | Storm Chorus |
+| 13 | Pyrebrand Weapon |
 
 ### Warspirit
 
@@ -311,14 +312,15 @@ Galeheart and Stonebound stay next to each other. The player always chooses the 
 | 1 | Mending Waters |
 | 2 | Tidecall |
 | 3 | Cascading Mend |
-| 4 | Thunder Ward |
-| 5 | Shadewolf |
-| 6 | Earthen Jolt |
-| 7 | Rime Jolt |
-| 8 | Cinder Jolt |
-| 9 | Arc Bolt |
-| 10 | Lifespring Weapon |
-| 11 | Storm Chorus |
+| 4 | Ancestors' Return |
+| 5 | Thunder Ward |
+| 6 | Shadewolf |
+| 7 | Earthen Jolt |
+| 8 | Rime Jolt |
+| 9 | Cinder Jolt |
+| 10 | Arc Bolt |
+| 11 | Lifespring Weapon |
+| 12 | Storm Chorus |
 
 ## Priest level 20 bars
 

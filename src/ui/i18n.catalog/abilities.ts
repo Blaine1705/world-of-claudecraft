@@ -622,6 +622,11 @@ const classAbilityNamesEn = {
         "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit.",
       ],
       [
+        'stampede',
+        'Stampede',
+        'Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)',
+      ],
+      [
         'unleash_beast',
         'Unleash Beast',
         "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies.",
@@ -1418,7 +1423,7 @@ const classAbilityNamesEn = {
       [
         'primal_exaltation',
         'Primal Exaltation',
-        'For 12 sec, Thundercall Arc Bolts cast 50% faster and grant 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)',
+        'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)',
       ],
       [
         'stoneward',
@@ -1513,7 +1518,7 @@ const classAbilityNamesEn = {
       [
         'elemental_mastery',
         'Primal Mastery',
-        'For 12 sec, every Arc Bolt hit grants 2 Thunder instead of 1. Your next Arc Bolt is instant, and your next Earthen Jolt or Faultwake deals 25% more damage. (Thundercall signature)',
+        'For 12 sec, every Arc Bolt hit grants 2 Thunder instead of 1. Your next Arc Bolt or Skybranch is instant, and your next Earthen Jolt or Faultwake deals 25% more damage. (Thundercall signature)',
       ],
       [
         'siphon_life',
@@ -1750,7 +1755,7 @@ const classAbilityNamesEn = {
       [
         'chain_lightning',
         'Skybranch',
-        'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
+        'Strike the target and jump to up to 2 enemies within 10 yards for {damage} Nature damage each. The cast grants 1 Thunder if it hits, not 1 per target. Damage increases with Spell Power. Primal Mastery can make this cast instant, and Primal Exaltation halves its cast time. (Thundercall)',
       ],
       [
         'chaos_bolt',
@@ -1905,6 +1910,11 @@ const classAbilityNamesEn = {
         'collective_reversal',
         'Collective Reversal',
         'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
+      ],
+      [
+        'ancestor_return',
+        "Ancestors' Return",
+        'Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
       ],
       [
         'temporal_rewind',

@@ -131,7 +131,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': '赤き霞',
   'entities.abilities.blink.name': '瞬き歩み',
   'entities.abilities.bloodlust.name': '戦の太鼓',
-  'entities.abilities.chain_lightning.name': '枝分かれの稲妻',
+  'entities.abilities.chain_lightning.name': '天枝の雷',
   'entities.abilities.chaos_bolt.name': '破滅の矢',
   'entities.abilities.cleansing_verdict.name': '浄化の裁定',
   'entities.abilities.cleansing_verdict.description':
@@ -5240,6 +5240,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.galeheart_weapon': '二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。',
   'guide.abilityHook.lifespring_weapon': '武器に癒やしの水を宿し、継続する回復の流れを強めます。',
   'guide.abilityHook.tidecall': '味方1体を即時に回復し、癒しの水流を最大まで蓄えます。',
+  'guide.abilityHook.ancestor_return':
+    '戦闘外で長く詠唱し、倒れたパーティーまたはレイドの全員を蘇生します。',
   'guide.abilityHook.stoneward': '力を蓄えた石の盾を掲げ、受けたダメージを回復に変えます。',
   'guide.abilityHook.primal_exaltation': '専門分野に応じた元素の力を短時間解き放ちます。',
   'guide.abilityHook.frost_armor': '戦闘の前にアーマーを固める、持続する自己強化です。',
@@ -5257,6 +5259,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '立ち止まる余裕があるときに味方の体力を満タンに戻す、安定した詠唱です。',
   'guide.abilityHook.life_tap': 'マナが尽きたとき、自分の体力を一部マナに変換します。',
   'guide.abilityHook.lightning_bolt': 'ネイチャーダメージを与える遠距離詠唱。遠くからの主力です。',
+  'guide.abilityHook.chain_lightning':
+    '1体を攻撃して近くの敵2体へ跳び、1回の発動全体で雷鳴を1つ蓄えます。',
   'guide.abilityHook.lightning_shield':
     '身にまとい、攻撃してきた相手にネイチャーダメージを与えます。',
   'guide.abilityHook.mark_of_the_wild': '戦闘の前に自分や味方に付与する、持続する祝福です。',
@@ -5264,6 +5268,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.mongoose_bite': '敵の回避の直後に使える反撃です。',
   'guide.abilityHook.moonfire': '即座に当たり標的を燃焼させるため、移動中にも向いています。',
   'guide.abilityHook.pack_command': '相棒に攻撃を命じ、獣の解放に必要な獰猛さを蓄えます。',
+  'guide.abilityHook.stampede':
+    '3体の獣を12秒間呼び出して攻撃させます。群れの獰猛さが最大の時に使うと、召喚中ずっと最大のダメージ上昇を保ちます。',
   'guide.abilityHook.power_word_fortitude':
     '味方の体力総量を上げます。プルの前に唱え、維持し続けましょう。',
   'guide.abilityHook.power_word_shield': '味方をシールドで包み、攻撃が当たる前に吸収します。',
@@ -8014,7 +8020,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '30ヤード以内の味方を狂乱させ、攻撃速度を30%上昇させる。効果時間15秒。（シャーマンのタレント）',
   'entities.abilities.chain_lightning.description':
-    '対象地点へ雷を放ち、周囲の敵に{damage}のダメージを与える。（シャーマンのタレント）',
+    '対象を攻撃し、10ヤード以内の敵最大2体へ跳び移り、それぞれに{damage}の自然ダメージを与える。命中すると、対象ごとではなく詠唱全体で雷霆を1つ得る。ダメージはスペルパワーで増加する。原始の熟達で即時発動になり、原始の高揚で詠唱時間が半分になる。（雷呼び）',
   'entities.abilities.chaos_bolt.description':
     '混沌の炎を放ち、{damage}の火属性ダメージを与える。（ウォーロックのタレント）',
   'entities.abilities.cloak_of_shadows.description':
@@ -8780,4 +8786,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': 'そのアイテムはバインドされていません。',
   'hudChrome.unbind.cannotAfford': 'バインド解除の手数料を支払えません。',
   'hudChrome.unbind.outOfRange': 'バインド解除するには作業台のそばにいる必要があります。',
+  'entities.abilities.stampede.name': '獣群突撃',
+  'entities.abilities.stampede.description':
+    '獣を3体、12秒間召喚する。各獣は2秒ごとに攻撃し、{damage}の物理ダメージを与える。表示ダメージには遠隔攻撃力の8%が含まれるが、ペットダメージボーナスは含まれない。獣は召喚時の群れの獰猛さを記録し、1スタックごとにダメージが10%増加する。獣群突撃がクールダウン中、群れの指令の命中は20%の確率でクールダウンをリセットし、5回連続で失敗すると必ず発動する。獣が活動中はリセットされない。（群れの王）',
+  'entities.abilities.ancestor_return.name': '祖霊の帰還',
+  'entities.abilities.ancestor_return.description':
+    'グループまたはレイドの倒れたメンバー全員を遺体の場所で蘇生し、体力とマナを30%回復させる。戦闘中は使用できない。（霊癒）',
 };

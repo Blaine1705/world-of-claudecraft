@@ -2,15 +2,24 @@ import { pctValue } from '../entity';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d, swingMissChance } from '../types';
+import { dismissGuardian, summonGuardian } from './guardians';
 import {
   activateHunterMajorWindow,
   grantHunterFocus,
+  hunterFerocityDamageMultiplier,
   hunterPetFerocityDamageMultiplier,
 } from './hunter_shared';
 
 export const PACK_FEROCITY_AURA_ID = 'pack_ferocity';
 export const PACK_FRENZY_AURA_ID = 'pack_frenzy';
 export const HOWLING_RAGE_EMPOWER_ID = 'howling_rage_empower';
+export const STAMPEDE_GUARDIAN_KEY_PREFIX = 'hunter_stampede_';
+export const STAMPEDE_READY_AURA_ID = 'stampede_ready';
+export const STAMPEDE_RESET_CHANCE = 0.2;
+export const STAMPEDE_BAD_LUCK_CAP = 5;
+
+const STAMPEDE_STATE_DURATION = 86_400;
+const STAMPEDE_FAILURE_COUNTER = 'packlord_stampede_failures';
 
 function removeAura(ctx: SimContext, entity: Entity, id: string): void {
   const index = entity.auras.findIndex((aura) => aura.id === id);
@@ -82,6 +91,106 @@ function setFerocity(ctx: SimContext, hunter: Entity, stacks: number, duration: 
   });
 }
 
+function stampedeGuardians(ctx: SimContext, hunterId: number): Entity[] {
+  return [...ctx.entities.values()].filter(
+    (entity) =>
+      entity.ownerId === hunterId &&
+      entity.guardianState?.key.startsWith(STAMPEDE_GUARDIAN_KEY_PREFIX),
+  );
+}
+
+function setStampedeFailures(hunter: Entity, stacks: number): void {
+  if (stacks <= 0) {
+    if (hunter.procState) delete hunter.procState.counters[STAMPEDE_FAILURE_COUNTER];
+    return;
+  }
+  if (!hunter.procState) hunter.procState = { counters: {}, icds: {} };
+  hunter.procState.counters[STAMPEDE_FAILURE_COUNTER] = stacks;
+}
+
+function armStampedeReady(ctx: SimContext, hunter: Entity): void {
+  hunter.cooldowns.delete('stampede');
+  setStampedeFailures(hunter, 0);
+  ctx.applyAura(hunter, {
+    id: STAMPEDE_READY_AURA_ID,
+    name: 'Stampede Ready',
+    kind: 'internal_cd',
+    remaining: STAMPEDE_STATE_DURATION,
+    duration: STAMPEDE_STATE_DURATION,
+    value: 1,
+    sourceId: hunter.id,
+    school: 'physical',
+  });
+}
+
+function tryResetStampede(ctx: SimContext, hunter: Entity): void {
+  if ((hunter.cooldowns.get('stampede') ?? 0) <= 0) return;
+  if (stampedeGuardians(ctx, hunter.id).length > 0) return;
+  if (hunter.auras.some((aura) => aura.id === STAMPEDE_READY_AURA_ID)) return;
+
+  const failed = hunter.procState?.counters[STAMPEDE_FAILURE_COUNTER] ?? 0;
+  if (ctx.rng.chance(STAMPEDE_RESET_CHANCE) || failed + 1 >= STAMPEDE_BAD_LUCK_CAP) {
+    armStampedeReady(ctx, hunter);
+    return;
+  }
+  setStampedeFailures(hunter, failed + 1);
+}
+
+export function runStampede(
+  ctx: SimContext,
+  hunter: Entity,
+  target: Entity | null,
+  effect: {
+    beasts: number;
+    duration: number;
+    attackInterval: number;
+    min: number;
+    max: number;
+    rangedPowerCoeff: number;
+  },
+  abilityName: string,
+): void {
+  if (!target || target.dead || !ctx.isHostileTo(hunter, target)) return;
+  removeAura(ctx, hunter, STAMPEDE_READY_AURA_ID);
+  setStampedeFailures(hunter, 0);
+
+  const meta = ctx.players.get(hunter.id);
+  const petDamageBonus = meta ? ctx.playerMods(meta).global.petDmgPct : 0;
+  const snapshotMultiplier = (1 + petDamageBonus) * hunterFerocityDamageMultiplier(hunter);
+  const rangedPowerDamage = hunter.rangedPower * effect.rangedPowerCoeff;
+  const minDamage = Math.max(1, Math.round((effect.min + rangedPowerDamage) * snapshotMultiplier));
+  const maxDamage = Math.max(
+    minDamage,
+    Math.round((effect.max + rangedPowerDamage) * snapshotMultiplier),
+  );
+
+  for (let index = 0; index < effect.beasts; index++) {
+    summonGuardian(ctx, hunter, {
+      key: `${STAMPEDE_GUARDIAN_KEY_PREFIX}${index}`,
+      name: `Stampede Beast ${index + 1}`,
+      color: 0xa02d24,
+      scale: 0.85 + index * 0.08,
+      remaining: effect.duration,
+      attackInterval: effect.attackInterval,
+      minDamage,
+      maxDamage,
+      school: 'physical',
+      abilityId: 'stampede',
+      abilityName,
+      preferredTargetId: target.id,
+      maxRange: 35,
+      dismissWhenUntargeted: false,
+    });
+  }
+}
+
+export function packlordActionGlowActive(
+  auras: readonly { id?: string }[],
+  abilityId: string,
+): boolean {
+  return abilityId === 'stampede' && auras.some((aura) => aura.id === STAMPEDE_READY_AURA_ID);
+}
+
 export function packCommandError(
   ctx: SimContext,
   hunter: Entity,
@@ -119,6 +228,7 @@ export function runPackCommand(
   grantHunterFocus(ctx, hunter, effect.focus, 'pack_command');
   const current = hunter.auras.find((aura) => aura.id === PACK_FEROCITY_AURA_ID)?.stacks ?? 0;
   setFerocity(ctx, hunter, Math.min(3, current + 1), effect.ferocityDuration);
+  tryResetStampede(ctx, hunter);
 }
 
 export function applyHowlingRage(ctx: SimContext, hunter: Entity, duration: number): void {
@@ -213,7 +323,10 @@ export function runFrenzyFellShotCleave(ctx: SimContext, hunter: Entity, primary
 }
 
 export function clearPacklordState(ctx: SimContext, hunter: Entity): void {
+  for (const guardian of stampedeGuardians(ctx, hunter.id)) dismissGuardian(ctx, guardian);
   removeAura(ctx, hunter, PACK_FEROCITY_AURA_ID);
   removeAura(ctx, hunter, PACK_FRENZY_AURA_ID);
   removeAura(ctx, hunter, HOWLING_RAGE_EMPOWER_ID);
+  removeAura(ctx, hunter, STAMPEDE_READY_AURA_ID);
+  setStampedeFailures(hunter, 0);
 }

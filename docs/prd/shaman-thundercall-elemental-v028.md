@@ -85,19 +85,21 @@ Arc Bolt builds Thunder charges
 Cinder and Rime Jolts retain their damage-over-time and control jobs. They do not consume Thunder
 charges in the starting design, so utility does not accidentally erase the main payoff.
 
-Chain Lightning does not replace Arc Bolt or become a required baseline action in this direction.
-It may remain optional talent space after the charge-to-shock loop is complete, but it cannot build
-or vent Thunder charges in a way that makes Arc Bolt and shock choice rotationally irrelevant.
+Skybranch is the Thundercall-only Chain Lightning action at level 14. It hits the selected enemy and
+up to two nearby enemies, then grants exactly one Thunder for the whole landed cast. It never grants
+one charge per bounce. Its six-second cooldown keeps Arc Bolt as the repeatable builder, and it does
+not vent Thunder or replace the Earthen Jolt and Faultwake choice.
 
 ## Primal Mastery
 
 Primal Mastery should transform its existing one-instant-spell identity into a proposed 12-second
 storm window:
 
-- Activation makes the next Arc Bolt instant.
+- Activation makes the next Arc Bolt or Skybranch instant.
 - Arc Bolt grants two Thunder charges during the window.
 - The first valid vent receives an additional visual and damage payoff.
 - The normal builder and vent actions remain on the bar.
+- Primal Exaltation halves the cast time of both Arc Bolt and Skybranch during its window.
 - The proposed starting cooldown is 90 seconds.
 
 PBE may reduce the duration or charge acceleration. It must not remove the need to choose the vent

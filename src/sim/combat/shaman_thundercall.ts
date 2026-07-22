@@ -97,6 +97,12 @@ export function thundercallOnArcBoltImpact(ctx: SimContext, player: Entity): voi
   addThunderCharges(ctx, player, (accelerated ? 2 : 1) + pyrebrandBonusCharge(ctx, player));
 }
 
+/** Skybranch grants one Thunder for the whole landed chain, never one per bounce. */
+export function thundercallOnChainLightningImpact(ctx: SimContext, player: Entity): void {
+  if (!isThundercall(ctx, player)) return;
+  addThunderCharges(ctx, player, 1);
+}
+
 export function thundercallDamageMultiplier(
   ctx: SimContext,
   player: Entity,
@@ -196,7 +202,7 @@ export function consumeThunderVent(
   return charges;
 }
 
-/** Arms the signature window and scopes its instant cast to Arc Bolt. */
+/** Arms the signature window and scopes its instant cast to a Thundercall lightning builder. */
 export function armPrimalMastery(ctx: SimContext, player: Entity): void {
   if (!isThundercall(ctx, player)) return;
   ctx.applyAura(player, {
@@ -218,7 +224,7 @@ export function armPrimalMastery(ctx: SimContext, player: Entity): void {
     duration: PRIMAL_MASTERY_DURATION,
     sourceId: player.id,
     school: 'nature',
-    empowerAbilities: ['lightning_bolt'],
+    empowerAbilities: ['lightning_bolt', 'chain_lightning'],
   });
   ctx.applyAura(player, {
     id: PRIMAL_MASTERY_VENT_ID,

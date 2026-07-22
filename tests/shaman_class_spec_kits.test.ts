@@ -24,9 +24,9 @@ function knownAt(spec: ShamanSpec, level: number): Set<string> {
 }
 
 const EXCLUSIVE_KITS: Readonly<Record<ShamanSpec, readonly string[]>> = {
-  elemental: ['flametongue_weapon', 'earthquake', 'elemental_mastery'],
+  elemental: ['flametongue_weapon', 'chain_lightning', 'earthquake', 'elemental_mastery'],
   enhancement: ['galeheart_weapon', 'rockbiter_weapon', 'stormstrike'],
-  restoration: ['lifespring_weapon', 'tidecall', 'chain_heal'],
+  restoration: ['lifespring_weapon', 'tidecall', 'chain_heal', 'ancestor_return'],
 };
 
 const SHARED_BACKBONE = [

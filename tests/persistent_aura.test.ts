@@ -8,6 +8,7 @@ describe('persistent class engine auras', () => {
       'hunter_efficient_rhythm_ready',
       'hunter_fang_chorus_counter',
       'hunter_overdraw_counter',
+      'stampede_ready',
       'shaman_flow_state_progress',
       'shaman_flow_state_ready',
       'shaman_pyrebrand_mastery',

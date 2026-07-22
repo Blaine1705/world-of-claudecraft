@@ -404,17 +404,27 @@ export const TALENT_ABILITIES_V2_A = {
     id: 'chain_lightning',
     name: 'Skybranch',
     class: 'shaman',
-    learnLevel: 10,
+    specs: ['elemental'],
+    learnLevel: 14,
     cost: 80,
     castTime: 2.5,
     cooldown: 6,
     range: 30,
     school: 'nature',
-    requiresTarget: false,
-    targetMode: 'position',
-    effects: [{ type: 'aoeDamage', min: 70, max: 86, radius: 8 }],
+    requiresTarget: true,
+    effects: [
+      {
+        type: 'chainDamage',
+        min: 52,
+        max: 60,
+        jumps: 2,
+        falloff: 1,
+        radius: 10,
+        hitsPrimary: true,
+      },
+    ],
     description:
-      'Hurls lightning at the target area, damaging nearby enemies for $d. (Shaman talent)',
+      'Strike the target and jump to up to 2 enemies within 10 yards for $d Nature damage each. The cast grants 1 Thunder if it hits, not 1 per target. Damage increases with Spell Power. Primal Mastery can make this cast instant, and Primal Exaltation halves its cast time. (Thundercall)',
   },
   earthbind: {
     id: 'earthbind',
@@ -461,7 +471,7 @@ export const TALENT_ABILITIES_V2_A = {
     requiresTarget: false,
     effects: [],
     description:
-      'For 12 sec, Thundercall Arc Bolts cast 50% faster and grant 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)',
+      'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)',
   },
   bloodlust: {
     id: 'bloodlust',

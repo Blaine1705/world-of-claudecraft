@@ -165,7 +165,10 @@ export function primalExaltationActive(player: Entity): boolean {
 }
 
 export function shamanCastTimeMultiplier(player: Entity, abilityId: string): number {
-  return abilityId === 'lightning_bolt' && primalExaltationActive(player) ? 0.5 : 1;
+  return (abilityId === 'lightning_bolt' || abilityId === 'chain_lightning') &&
+    primalExaltationActive(player)
+    ? 0.5
+    : 1;
 }
 
 export function shamanManaCost(ctx: SimContext, player: Entity, cost: number): number {

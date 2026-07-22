@@ -481,6 +481,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Pack Command"
       },
       {
+        "id": "stampede",
+        "name": "Stampede"
+      },
+      {
         "id": "measured_shot",
         "name": "Measured Shot"
       },
@@ -491,10 +495,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "serpent_sting",
         "name": "Venom Barb"
-      },
-      {
-        "id": "arcane_shot",
-        "name": "Fell Shot"
       }
     ],
     "abilities": [
@@ -505,6 +505,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "pack_command",
         "name": "Pack Command"
+      },
+      {
+        "id": "stampede",
+        "name": "Stampede"
       },
       {
         "id": "measured_shot",
@@ -910,6 +914,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Arc Bolt"
       },
       {
+        "id": "chain_lightning",
+        "name": "Skybranch"
+      },
+      {
         "id": "rockbiter_weapon",
         "name": "Stonebound Weapon"
       },
@@ -924,10 +932,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "healing_wave",
         "name": "Mending Waters"
-      },
-      {
-        "id": "tidecall",
-        "name": "Tidecall"
       }
     ],
     "abilities": [
@@ -936,6 +940,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Arc Bolt"
       },
       {
+        "id": "chain_lightning",
+        "name": "Skybranch"
+      },
+      {
         "id": "rockbiter_weapon",
         "name": "Stonebound Weapon"
       },
@@ -954,6 +962,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "tidecall",
         "name": "Tidecall"
+      },
+      {
+        "id": "ancestor_return",
+        "name": "Ancestors' Return"
       },
       {
         "id": "earth_shock",

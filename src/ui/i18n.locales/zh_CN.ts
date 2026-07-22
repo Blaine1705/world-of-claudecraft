@@ -132,7 +132,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': '赤红迷雾',
   'entities.abilities.blink.name': '闪烁步',
   'entities.abilities.bloodlust.name': '战鼓',
-  'entities.abilities.chain_lightning.name': '叉状闪电',
+  'entities.abilities.chain_lightning.name': '天穹分枝',
   'entities.abilities.chaos_bolt.name': '毁灭箭',
   'entities.abilities.cleansing_verdict.name': '净化裁决',
   'entities.abilities.cleansing_verdict.description':
@@ -4995,6 +4995,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.galeheart_weapon': '为双持武器灌注风暴之风，以稳定的攻击节奏获取回报。',
   'guide.abilityHook.lifespring_weapon': '为武器灌注复苏之水，强化持续的治疗节奏。',
   'guide.abilityHook.tidecall': '立即治疗一名盟友，并注入满额愈合水流。',
+  'guide.abilityHook.ancestor_return': '在战斗外长时间施法后，使所有阵亡的小队或团队成员复活。',
   'guide.abilityHook.stoneward': '升起充能石盾，将受到的伤害转化为恢复。',
   'guide.abilityHook.primal_exaltation': '短暂释放与你专精相符的元素力量。',
   'guide.abilityHook.frost_armor': '持续的自我增益，开战前先硬化你的护甲。',
@@ -5010,12 +5011,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lesser_heal': '稳健的施法治疗，有空站定时为盟友补血。',
   'guide.abilityHook.life_tap': '在法力枯竭时，将部分自身生命值转化为法力。',
   'guide.abilityHook.lightning_bolt': '一次远程施法的自然伤害，是你远距离的常用手段。',
+  'guide.abilityHook.chain_lightning': '攻击一个目标并跳向附近两名敌人，整次施法产生一层雷霆。',
   'guide.abilityHook.lightning_shield': '为你充能，让攻击者打中你时受到自然伤害。',
   'guide.abilityHook.mark_of_the_wild': '开战前为自己或盟友施加的持续祝福。',
   'guide.abilityHook.measured_shot': '一记从容瞄准的远程射击，为你的强力攻击恢复集中值。',
   'guide.abilityHook.mongoose_bite': '在敌人闪躲之后立即可用的反击技。',
   'guide.abilityHook.moonfire': '瞬间命中并让目标持续燃烧，移动时也很好用。',
   'guide.abilityHook.pack_command': '命令你的伙伴发动攻击，并积攒凶性以释放野兽。',
+  'guide.abilityHook.stampede':
+    '召唤三只野兽攻击12秒。叠满兽群凶性后使用，可让它们在整个召唤期间保持最高伤害加成。',
   'guide.abilityHook.power_word_fortitude': '提升盟友的生命上限，开怪前施放并保持它的存在。',
   'guide.abilityHook.power_word_shield': '为盟友裹上一层护盾，在伤害落地前先吸收。',
   'guide.abilityHook.raptor_strike': '一记沉重的近战挥击，用于有东西贴近你时。',
@@ -7627,7 +7631,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '使30码内的盟友陷入狂乱，攻击速度提高30%，持续15秒。（萨满天赋）',
   'entities.abilities.chain_lightning.description':
-    '向目标区域投掷闪电，对附近的敌人造成{damage}点伤害。（萨满天赋）',
+    '攻击目标，并跳向10码内最多2名敌人，对每个目标造成{damage}点自然伤害。命中时整次施法获得1层雷霆，而不是每个目标各获得1层。伤害随法术强度提高。原始掌控可使其瞬发，原始升华会使其施法时间缩短一半。（唤雷者）',
   'entities.abilities.chaos_bolt.description':
     '投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）',
   'entities.abilities.cloak_of_shadows.description':
@@ -8369,4 +8373,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': '该物品未绑定。',
   'hudChrome.unbind.cannotAfford': '你付不起解绑费用。',
   'hudChrome.unbind.outOfRange': '你必须站在工作台旁才能解绑。',
+  'entities.abilities.stampede.name': '兽群奔袭',
+  'entities.abilities.stampede.description':
+    '召唤3只野兽，持续12秒。每只野兽每2秒攻击一次，造成{damage}点物理伤害。显示的伤害已计入你远程攻击强度的8%，但尚未计入宠物伤害加成。野兽在召唤时会锁定兽群凶性层数，每层使其伤害提高10%。兽群奔袭处于冷却时，成功施放兽群号令有20%几率重置其冷却；连续5次未触发后必定重置。野兽存在期间无法重置。（兽群之主）',
+  'entities.abilities.ancestor_return.name': '先祖归来',
+  'entities.abilities.ancestor_return.description':
+    '呼唤小队或团队中所有阵亡成员，使其在尸体处复活并恢复30%生命值和法力值。战斗中无法施放。（灵愈）',
 };

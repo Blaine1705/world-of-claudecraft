@@ -109,6 +109,8 @@ export function abilityDamageBonus(
     }
     case 'hunterBloodhook':
       return Math.round(scaling.rangedPower * eff.rangedPowerCoeff * (eff.damageMult ?? 1));
+    case 'hunterStampede':
+      return Math.round(scaling.rangedPower * eff.rangedPowerCoeff);
     default:
       return 0;
   }
@@ -132,6 +134,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'aoeDamage' ||
       eff.type === 'aoeHeal' ||
       eff.type === 'aoeRoot' ||
+      eff.type === 'chainDamage' ||
       eff.type === 'groundAoE' ||
       (eff.type === 'repositionToAim' && eff.landingAoe !== undefined) ||
       eff.type === 'consumeAura' ||
@@ -140,7 +143,8 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'sunder' ||
       eff.type === 'faerieFire' ||
       eff.type === 'lifeTap' ||
-      eff.type === 'hunterBloodhook',
+      eff.type === 'hunterBloodhook' ||
+      eff.type === 'hunterStampede',
   );
 }
 

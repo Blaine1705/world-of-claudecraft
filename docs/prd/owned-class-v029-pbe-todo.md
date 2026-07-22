@@ -218,19 +218,21 @@ Do not overwrite a player-customized bar.
 - [x] Make Unleash Beast use the full Ferocity bonus for its strike and clap, consume all three
       stacks, enter its separate 25% frenzy, then return the pet to its calm size and color.
 - [x] Make Fell Shot a deliberate Focus spender instead of the only repeated filler.
-- [ ] Add Stampede as a Packlord offensive cooldown that summons temporary beasts to attack the
+- [x] Add Stampede as a Packlord offensive cooldown that summons temporary beasts to attack the
       selected target without pet micromanagement.
-- [ ] Credit Stampede damage to the Hunter in meters and show it in floating combat text.
-- [ ] Decide whether Stampede snapshots Ferocity or reads it live. Use one rule in combat and the
+- [x] Credit Stampede damage to the Hunter in meters and show it in floating combat text.
+- [x] Decide whether Stampede snapshots Ferocity or reads it live. Use one rule in combat and the
       tooltip.
-- [ ] While Stampede is on cooldown, let successful Pack Commands trigger a visible Stampede Ready
+- [x] While Stampede is on cooldown, let successful Pack Commands trigger a visible Stampede Ready
       proc that resets the cooldown and makes the action glow.
-- [ ] Do not allow the reset proc while Stampede beasts are active.
-- [ ] Add deterministic bad-luck protection after the approved number of failed Pack Commands. The
+- [x] Do not allow the reset proc while Stampede beasts are active.
+- [x] Add deterministic bad-luck protection after the approved number of failed Pack Commands. The
       current design range is five to six failures.
 - [x] Retest the manual Packlord loop after Ferocity damage lands and keep it inside the approved
       single-target and three-target Hunter bands.
-- [ ] Retest the manual and One Button loops after Stampede lands.
+- [x] Retest the manual Packlord loop with Stampede in the deterministic 1-target and 3-target
+      balance scenarios.
+- [ ] Retest the One Button loop after that separate feature is approved and implemented.
 
 ### Coldsight, Marksmanship
 
@@ -281,7 +283,8 @@ Do not overwrite a player-customized bar.
 - [ ] Confirm exactly which spells build Thunder and which spells spend it.
 - [ ] Confirm Earthen Jolt and Faultwake spend the bank only after a valid cast resolves.
 - [ ] Keep defensive Thunder Ward charges separate from offensive Thunder charges.
-- [ ] Treat Chain Lightning as a separate follow-up, not a requirement for this PBE fix pass.
+- [x] Add the separately approved Skybranch follow-up as a three-target Thundercall builder that
+      grants one Thunder per landed cast and never per bounce.
 - [ ] Treat extra shock interactions as a separate follow-up after the base bank is clear.
 
 ### Warspirit, Enhancement
@@ -302,7 +305,7 @@ Do not overwrite a player-customized bar.
 - [ ] Confirm Cascading Mend consumes every owned current on every ally it reaches.
 - [ ] Keep another Shaman's currents separate.
 - [ ] Test the normal heal when an ally has no prepared current.
-- [ ] Treat an out-of-combat group revive talent as a separate follow-up.
+- [x] Add the separately approved Ancestors' Return as a seven-second, out-of-combat group revive.
 
 ### Shared Shaman
 
@@ -429,8 +432,9 @@ Keep these outside the nine-spec fix unless a separate PR is approved.
 - [ ] Investigate Gravewyrm normal and heroic difficulty as its own balance task.
 - [ ] Fix dungeon reset being blocked by unlooted loot as its own bug-fix PR.
 - [ ] Audit weak wand auto-attack scaling as its own combat-balance task.
-- [ ] Consider Shaman group revive as its own utility follow-up.
-- [ ] Consider Thundercall Chain Lightning as its own rotation follow-up.
+- [x] Add the approved Shaman group revive utility follow-up to this PBE integration candidate.
+- [x] Add the approved Thundercall Chain Lightning rotation follow-up to this PBE integration
+      candidate.
 - [ ] Consider more shock interactions only after current Thunder generation and spending are
       clear.
 

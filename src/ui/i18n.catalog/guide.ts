@@ -639,6 +639,8 @@ export const guideStrings = {
     raptor_strike: 'A hard melee swing for when something closes the gap on you.',
     pack_command:
       'Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.',
+    stampede:
+      'Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.',
     measured_shot: 'A deliberate ranged shot that restores Focus for your heavier attacks.',
     aspect_of_the_hawk: 'A stance you keep up to sharpen your ranged attack power.',
     serpent_sting: 'Lands a venom that bleeds nature damage over time.',
@@ -659,6 +661,8 @@ export const guideStrings = {
     power_word_shield: 'Wraps an ally in a shield that soaks hits before they land.',
     renew: 'A heal that ticks over time, good to cast and keep moving.',
     lightning_bolt: 'A ranged cast of Nature damage, your go-to from afar.',
+    chain_lightning:
+      'Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.',
     rockbiter_weapon: 'Imbues your weapon so each swing lands harder in melee.',
     healing_wave: 'Your main heal, a direct mend for yourself or an ally.',
     earth_shock: 'An instant shock for quick Nature damage when you need it now.',
@@ -669,6 +673,8 @@ export const guideStrings = {
     lifespring_weapon:
       'Imbues your weapon with restorative water that strengthens your healing flow.',
     tidecall: 'Immediately heals an ally and deposits a full Mending Current pool.',
+    ancestor_return:
+      'Returns every fallen group or raid member to life after a long out-of-combat cast.',
     stoneward: 'Raises a charged stone shield that turns incoming damage into recovery.',
     primal_exaltation: 'Unleashes a short specialization-specific surge of elemental power.',
     fireball: 'Your main fire nuke, lands a hit and leaves the target burning.',

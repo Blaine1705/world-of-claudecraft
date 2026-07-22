@@ -3155,6 +3155,7 @@ export const en_CA: EnTranslations = {
       "divine_protection": "A quick protective ward to soak damage when things get rough.",
       "raptor_strike": "A hard melee swing for when something closes the gap on you.",
       "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
+      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
       "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
       "aspect_of_the_hawk": "A stance you keep up to sharpen your ranged attack power.",
       "serpent_sting": "Lands a venom that bleeds nature damage over time.",
@@ -3174,6 +3175,7 @@ export const en_CA: EnTranslations = {
       "power_word_shield": "Wraps an ally in a shield that soaks hits before they land.",
       "renew": "A heal that ticks over time, good to cast and keep moving.",
       "lightning_bolt": "A ranged cast of Nature damage, your go-to from afar.",
+      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
       "rockbiter_weapon": "Imbues your weapon so each swing lands harder in melee.",
       "healing_wave": "Your main heal, a direct mend for yourself or an ally.",
       "earth_shock": "An instant shock for quick Nature damage when you need it now.",
@@ -3182,6 +3184,7 @@ export const en_CA: EnTranslations = {
       "galeheart_weapon": "Imbues both weapons with storm winds that reward a steady dual-wield rhythm.",
       "lifespring_weapon": "Imbues your weapon with restorative water that strengthens your healing flow.",
       "tidecall": "Immediately heals an ally and deposits a full Mending Current pool.",
+      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
       "stoneward": "Raises a charged stone shield that turns incoming damage into recovery.",
       "primal_exaltation": "Unleashes a short specialization-specific surge of elemental power.",
       "fireball": "Your main fire nuke, lands a hit and leaves the target burning.",
@@ -6458,6 +6461,10 @@ export const en_CA: EnTranslations = {
         "name": "Pack Command",
         "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
       },
+      "stampede": {
+        "name": "Stampede",
+        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+      },
       "unleash_beast": {
         "name": "Unleash Beast",
         "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
@@ -7184,7 +7191,7 @@ export const en_CA: EnTranslations = {
       },
       "primal_exaltation": {
         "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolts cast 50% faster and grant 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
       },
       "stoneward": {
         "name": "Stoneward",
@@ -7260,7 +7267,7 @@ export const en_CA: EnTranslations = {
       },
       "elemental_mastery": {
         "name": "Primal Mastery",
-        "description": "For 12 sec, every Arc Bolt hit grants 2 Thunder instead of 1. Your next Arc Bolt is instant, and your next Earthen Jolt or Faultwake deals 25% more damage. (Thundercall signature)"
+        "description": "For 12 sec, every Arc Bolt hit grants 2 Thunder instead of 1. Your next Arc Bolt or Skybranch is instant, and your next Earthen Jolt or Faultwake deals 25% more damage. (Thundercall signature)"
       },
       "siphon_life": {
         "name": "Veinleech",
@@ -7456,7 +7463,7 @@ export const en_CA: EnTranslations = {
       },
       "chain_lightning": {
         "name": "Skybranch",
-        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+        "description": "Strike the target and jump to up to 2 enemies within 10 yards for {damage} Nature damage each. The cast grants 1 Thunder if it hits, not 1 per target. Damage increases with Spell Power. Primal Mastery can make this cast instant, and Primal Exaltation halves its cast time. (Thundercall)"
       },
       "chaos_bolt": {
         "name": "Ruinbolt",
@@ -7589,6 +7596,10 @@ export const en_CA: EnTranslations = {
       "collective_reversal": {
         "name": "Collective Reversal",
         "description": "Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
+      },
+      "ancestor_return": {
+        "name": "Ancestors' Return",
+        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
       },
       "temporal_rewind": {
         "name": "Rewind",

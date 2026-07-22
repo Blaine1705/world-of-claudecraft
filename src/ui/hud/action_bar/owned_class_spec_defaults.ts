@@ -13,6 +13,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'serpent_sting',
       'volley',
       'bestial_wrath',
+      'stampede',
       'counter_shot',
       'trailbreak',
       'wildheart',
@@ -69,6 +70,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
   shaman: {
     elemental: [
       'lightning_bolt',
+      'chain_lightning',
       'earth_shock',
       'flame_shock',
       'earthquake',
@@ -97,6 +99,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'healing_wave',
       'tidecall',
       'chain_heal',
+      'ancestor_return',
       'lightning_shield',
       'ghost_wolf',
       'earth_shock',

@@ -40,7 +40,7 @@ describe('Thundercall engine', () => {
     expect(shaman.auras.find((aura) => aura.id === PRIMAL_MASTERY_ID)?.duration).toBe(12);
     expect(
       shaman.auras.find((aura) => aura.id === PRIMAL_MASTERY_INSTANT_ID)?.empowerAbilities,
-    ).toEqual(['lightning_bolt']);
+    ).toEqual(['lightning_bolt', 'chain_lightning']);
     thundercallOnArcBoltImpact(sim.ctx, shaman);
     expect(thunderCharges(shaman)).toBe(2);
   });

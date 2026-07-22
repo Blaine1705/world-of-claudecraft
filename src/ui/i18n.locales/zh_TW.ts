@@ -132,7 +132,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': '赤紅迷霧',
   'entities.abilities.blink.name': '閃爍步',
   'entities.abilities.bloodlust.name': '戰鼓',
-  'entities.abilities.chain_lightning.name': '叉狀閃電',
+  'entities.abilities.chain_lightning.name': '天穹分枝',
   'entities.abilities.chaos_bolt.name': '毀滅箭',
   'entities.abilities.cleansing_verdict.name': '淨化裁決',
   'entities.abilities.cleansing_verdict.description':
@@ -5009,6 +5009,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.galeheart_weapon': '為雙持武器灌注風暴之風，以穩定的攻擊節奏獲得回報。',
   'guide.abilityHook.lifespring_weapon': '為武器灌注復甦之水，強化持續的治療節奏。',
   'guide.abilityHook.tidecall': '立即治療一名盟友，並注入滿額癒合水流。',
+  'guide.abilityHook.ancestor_return': '在戰鬥外長時間施法後，使所有陣亡的隊伍或團隊成員復活。',
   'guide.abilityHook.stoneward': '升起充能石盾，將受到的傷害轉化為恢復。',
   'guide.abilityHook.primal_exaltation': '短暫釋放符合你專精的元素力量。',
   'guide.abilityHook.frost_armor': '持續的自我增益，在戰鬥前強化你的護甲。',
@@ -5024,12 +5025,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lesser_heal': '穩定的施法治療，在有時間站定時補滿友方。',
   'guide.abilityHook.life_tap': '在法力見底時，以部分自身生命換回法力。',
   'guide.abilityHook.lightning_bolt': '施放遠程的自然傷害，是你從遠處的慣用招式。',
+  'guide.abilityHook.chain_lightning': '攻擊一個目標並跳向附近兩名敵人，整次施法產生一層雷霆。',
   'guide.abilityHook.lightning_shield': '為自己充能，攻擊者打中你時會受到自然傷害。',
   'guide.abilityHook.mark_of_the_wild': '戰鬥前替自己或友方施加的持久祝福。',
   'guide.abilityHook.measured_shot': '一記從容瞄準的遠程射擊，為你的強力攻擊恢復集中值。',
   'guide.abilityHook.mongoose_bite': '在敵人閃躲後立刻可用的反擊。',
   'guide.abilityHook.moonfire': '瞬間命中並讓目標持續燃燒，移動時也很好用。',
   'guide.abilityHook.pack_command': '命令你的夥伴發動攻擊，並累積兇性以釋放野獸。',
+  'guide.abilityHook.stampede':
+    '召喚三隻野獸攻擊12秒。疊滿獸群兇性後使用，可讓牠們在整個召喚期間保持最高傷害加成。',
   'guide.abilityHook.power_word_fortitude': '提升友方的生命上限，開怪前先施放並隨時維持。',
   'guide.abilityHook.power_word_shield': '為友方罩上護盾，在傷害落下前先行吸收。',
   'guide.abilityHook.raptor_strike': '在有東西貼上你時可用的一記重力近戰揮擊。',
@@ -7627,7 +7631,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '使30碼內的盟友陷入狂亂，攻擊速度提高30%，持續15秒。（薩滿天賦）',
   'entities.abilities.chain_lightning.description':
-    '向目標區域投擲閃電，對附近的敵人造成{damage}點傷害。（薩滿天賦）',
+    '攻擊目標，並跳向10碼內最多2名敵人，對每個目標造成{damage}點自然傷害。命中時整次施法獲得1層雷霆，而不是每個目標各獲得1層。傷害隨法術強度提高。原始掌控可使其瞬發，原始昇華會使其施法時間縮短一半。（喚雷者）',
   'entities.abilities.chaos_bolt.description':
     '投擲一枚混沌火焰彈，造成{damage}點火焰傷害。（術士天賦）',
   'entities.abilities.cloak_of_shadows.description':
@@ -8370,4 +8374,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': '該物品未綁定。',
   'hudChrome.unbind.cannotAfford': '你付不起解綁費用。',
   'hudChrome.unbind.outOfRange': '你必須站在對應的工作臺旁才能解綁。',
+  'entities.abilities.stampede.name': '獸群奔襲',
+  'entities.abilities.stampede.description':
+    '召喚3隻野獸，持續12秒。每隻野獸每2秒攻擊一次，造成{damage}點物理傷害。顯示的傷害已計入你遠程攻擊強度的8%，但尚未計入寵物傷害加成。野獸在召喚時會鎖定獸群凶性層數，每層使其傷害提高10%。獸群奔襲處於冷卻時，成功施放獸群號令有20%機率重置其冷卻；連續5次未觸發後必定重置。野獸存在期間無法重置。（獸群之主）',
+  'entities.abilities.ancestor_return.name': '先祖歸來',
+  'entities.abilities.ancestor_return.description':
+    '呼喚隊伍或團隊中所有陣亡成員，使其在屍體處復活並恢復30%生命值和法力值。戰鬥中無法施放。（靈癒）',
 };

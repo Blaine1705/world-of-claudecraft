@@ -1836,6 +1836,15 @@ export type AbilityEffect =
     }
   | { type: 'howlingRage'; duration: number }
   | {
+      type: 'hunterStampede';
+      beasts: number;
+      duration: number;
+      attackInterval: number;
+      min: number;
+      max: number;
+      rangedPowerCoeff: number;
+    }
+  | {
       type: 'hunterBloodhook';
       bleedTotal: number;
       bleedDuration: number;

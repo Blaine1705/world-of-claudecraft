@@ -55,6 +55,15 @@ describe('owned-class level 20 balance harness', () => {
     );
     expect(thundercallArea?.damageByTarget.target_2).toBeGreaterThan(0);
     expect(thundercallArea?.damageByTarget.target_3).toBeGreaterThan(0);
+    expect(thundercallArea?.castsByAbility.Skybranch).toBeGreaterThan(0);
+    const packlordBurst = results.find(
+      (result) =>
+        result.spec === 'packlord' &&
+        result.scenario.targets === 1 &&
+        result.scenario.seconds === 15,
+    );
+    expect(packlordBurst?.castsByAbility.Stampede).toBeGreaterThan(0);
+    expect(packlordBurst?.damageBySource.Stampede).toBeGreaterThan(0);
   }, 60_000);
 
   it('is deterministic at the same fixed seed and fixture', () => {

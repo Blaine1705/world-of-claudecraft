@@ -7,7 +7,7 @@ Parent design: [Hunter v0.29.0 Class Design](../design/hunter-v028-class-design.
 
 ## Specialization gate
 
-Pack Command, Pack Ferocity, Unleash Beast, and Howling Rage belong only to Packlord. Selecting
+Pack Command, Pack Ferocity, Unleash Beast, Howling Rage, and Stampede belong only to Packlord. Selecting
 Coldsight or Fieldcraft removes these actions and states before the new specialization kit is
 resolved. Shared pet care remains available to every Hunter.
 
@@ -28,7 +28,7 @@ frenzy, then watches it calm before beginning the cycle again.
 
 ## Non-goals
 
-- Multiple simultaneous combat pets or a pet stable.
+- Multiple permanent combat pets or a pet stable.
 - Family-specific rotations or Unleash attacks in v0.29.0.
 - Manual high-frequency pet abilities.
 - Pet growth that changes collision, reach, targeting, pathing, or camera behavior.
@@ -55,6 +55,7 @@ do not force a rushed reaction.
 | Pack Ferocity | Three stages stored as a visible buff on the Hunter. The active pet mirrors the Hunter's current stage through growth, tint, and effects. |
 | Unleash Beast | Replaces Pack Command at maximum Ferocity. Commands an immediate primary-target hit and area clap, then begins the frenzy. |
 | Howling Rage | Existing signature action and proposed 90-second offensive cooldown. It immediately reaches maximum Ferocity and empowers the next clap and frenzy. |
+| Stampede | A 90-second offensive cooldown that summons three temporary beasts for 12 seconds. Their damage snapshots Pack Ferocity when summoned. |
 
 Exact cooldown, damage, duration, and radius values remain tuning knobs. The action relationships
 and transformed Pack Command slot are the required design.
@@ -92,12 +93,20 @@ Howling Rage uses the existing action slot and does not grant another temporary 
 
 The starting PBE target is a 90-second cooldown and a roughly 12-second empowered window.
 
+Stampede remains a separate manual cooldown. Its three beasts attack the selected target without
+pet micromanagement and count as Hunter-owned pet damage in floating combat text and meters. Each
+successful Pack Command made while Stampede is cooling down has a 20% chance to reset it. The reset
+is guaranteed after five failed chances, creates a visible Stampede Ready state, and cannot occur
+while Stampede beasts are active.
+
 ## Targeting and proc safety
 
 - Pet cleave selects targets deterministically under the shared simulation rules.
 - The primary target always receives the full commanded strike.
 - Cleave and echo strikes cannot duplicate owner procs or recursively trigger themselves.
 - Pet echoes cannot generate Focus or Ferocity unless the originating action explicitly says so.
+- Stampede snapshots Pack Ferocity at summon time. Unleash Beast can consume Ferocity afterward
+  without weakening beasts that are already active.
 - A target becoming invalid between command and impact must fail cleanly without awarding state.
 - Online snapshots must preserve the same Hunter-owned Ferocity stage and transformed action state as
   offline simulation. Pet presentation derives from that replicated owner state.
@@ -134,6 +143,7 @@ The exact 18 class-wide choices remain defined in the parent Hunter design.
 - A Hunter buff aura, action-bar cue, and derived pet presentation.
 - Pet scale, tint, outline, clap, frenzy, and calming presentation with gameplay-neutral graphics
   settings.
+- Existing temporary-guardian ownership, targeting, floating-text, and meter-credit seams.
 
 PR #2165 is implementation reference material only. Work must reconcile against and target
 `release/v0.29.0`, which remains canonical.
@@ -146,6 +156,8 @@ PR #2165 is implementation reference material only. Work must reconcile against 
 - Unleash primary damage, area damage, radius, frenzy duration, and attack speed.
 - Howling Rage cooldown, clap multiplier, and frenzy extension.
 - Fell Shot cost and frenzy echo strength.
+- Stampede strike damage, Ranged Attack Power coefficient, duration, attack interval, reset chance,
+  and bad-luck limit.
 
 ## PBE acceptance criteria
 
@@ -158,4 +170,6 @@ PR #2165 is implementation reference material only. Work must reconcile against 
 - The Hunter buff remains readable when the pet is obscured, off-screen, or surrounded by enemies.
 - Reduced-motion and low-graphics modes show every actionable state.
 - Mobile players can run the core rotation without opening a pet action bar.
+- Stampede uses one manual action, needs no temporary pet bar, and never resets while its beasts are
+  active.
 - PBE validates Focus pacing, armed-state hold time, pet pathing, proc recursion, and PvP burst.

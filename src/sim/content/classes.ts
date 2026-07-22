@@ -301,6 +301,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     abilities: [
       'raptor_strike',
       'pack_command',
+      'stampede',
       'measured_shot',
       'aspect_of_the_hawk',
       'serpent_sting',
@@ -377,11 +378,13 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startItems: START_RATIONS_MANA,
     abilities: [
       'lightning_bolt',
+      'chain_lightning',
       'rockbiter_weapon',
       'galeheart_weapon',
       'lifespring_weapon',
       'healing_wave',
       'tidecall',
+      'ancestor_return',
       'earth_shock',
       'lightning_shield',
       'flame_shock',
@@ -3311,6 +3314,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies.",
   },
+  stampede: {
+    id: 'stampede',
+    name: 'Stampede',
+    class: 'hunter',
+    specs: ['beast_mastery'],
+    learnLevel: 17,
+    cost: 0,
+    castTime: 0,
+    cooldown: 90,
+    range: 35,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [
+      {
+        type: 'hunterStampede',
+        beasts: 3,
+        duration: 12,
+        attackInterval: 2,
+        min: 18,
+        max: 24,
+        rangedPowerCoeff: 0.08,
+      },
+    ],
+    description:
+      'Summon 3 beasts for 12 sec. Each attacks every 2 sec for $d Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)',
+  },
   measured_shot: {
     id: 'measured_shot',
     name: 'Measured Shot',
@@ -4003,6 +4032,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.5, radius: 12 }],
     description:
       'Heal a friendly target for 120 to 145, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)',
+  },
+  ancestor_return: {
+    id: 'ancestor_return',
+    name: "Ancestors' Return",
+    class: 'shaman',
+    specs: ['restoration'],
+    learnLevel: 20,
+    cost: 250,
+    castTime: 7,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    requiresOutOfCombat: true,
+    projectile: false,
+    effects: [{ type: 'massResurrectGroup', hpFrac: 0.3 }],
+    description:
+      'Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
   },
   healing_wave: {
     id: 'healing_wave',
@@ -5942,7 +5989,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'For 12 sec, every Arc Bolt hit grants 2 Thunder instead of 1. Your next Arc Bolt is instant, and your next Earthen Jolt or Faultwake deals 25% more damage. (Thundercall signature)',
+      'For 12 sec, every Arc Bolt hit grants 2 Thunder instead of 1. Your next Arc Bolt or Skybranch is instant, and your next Earthen Jolt or Faultwake deals 25% more damage. (Thundercall signature)',
   },
   siphon_life: {
     id: 'siphon_life',

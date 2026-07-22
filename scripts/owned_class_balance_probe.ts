@@ -332,6 +332,9 @@ function tryCast(
 }
 
 function castPacklord(state: RunState): void {
+  if (fullStacks(state.sim.player, 'hunter_ferocity', 3) && tryCast(state, 'stampede')) {
+    return;
+  }
   if (state.sim.resolvedAbility('pack_command')?.def.id === 'unleash_beast') {
     if (tryCast(state, 'pack_command')) return;
   }
@@ -379,6 +382,7 @@ function castThundercall(state: RunState): void {
     (target) => !ownAura(target, 'flame_shock', state.sim.playerId),
   );
   if (missingCinder && thunder < 4 && tryCast(state, 'flame_shock', missingCinder)) return;
+  if (state.targets.length === 3 && tryCast(state, 'chain_lightning')) return;
   tryCast(state, 'lightning_bolt');
 }
 

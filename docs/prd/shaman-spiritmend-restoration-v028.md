@@ -8,7 +8,7 @@ Parent design: [Shaman v0.29.0 Class Design](../design/shaman-v028-class-design.
 
 ## Specialization gate
 
-Lifespring Weapon, Mending Currents, Tidecall, and Cascading Mend belong only to Spiritmend.
+Lifespring Weapon, Mending Currents, Tidecall, Cascading Mend, and Ancestors' Return belong only to Spiritmend.
 Cascading Mend retains the shipped `chain_heal` id and the core Chain Heal role; it is granted by
 the specialization rather than by a talent or Mending Waters morph. Selecting Thundercall or
 Warspirit removes every owned pool and exclusive action before the new specialization kit is
@@ -60,6 +60,7 @@ consume them now before an ally dies.
 | Tidecall | One instant Spiritmend action. Heals immediately, adds to the target's pool, and refreshes it. |
 | Cascading Mend (`chain_heal`) | Retained Chain Heal signature with its canonical initial heal and two bounces. Consumes every Mending Current reached for a proposed 125% of its remaining amount. |
 | Lifespring Weapon | Spiritmend-only enhancement that increases Mending Current deposits. |
+| Ancestors' Return | Seven-second, out-of-combat cast that offers every dead group or raid member a return with 30% health and mana. |
 
 Tidecall is the player-facing action name. Mending Current is the pool it creates or enlarges.
 
@@ -133,6 +134,8 @@ preparation and accepting the risk of spending efficient healing early.
 - Cascading Mend shows which reached allies consumed a pool through a distinct burst cue.
 - Reduced-motion mode retains static party-frame, aura, action, and consumption cues.
 - Mobile players can prepare and consume through ordinary ally targeting without ground input.
+- Ancestors' Return needs no target, cannot be cast in combat, and reuses the existing group
+  resurrection response flow.
 
 ## Shared talent integration
 
@@ -178,6 +181,8 @@ against `release/v0.29.0`.
 - One Shaman cannot consume another Shaman's pools.
 - Invalid casts, death, respec, disconnect, and reconnect cannot duplicate or strand healing.
 - The loop remains effective with one injured ally and without offensive spellcasting.
+- Ancestors' Return offers every dead group or raid member a resurrection after seven seconds, cannot
+  start in combat, and never affects players outside the group.
 - Mobile and reduced-motion players can read pool size, Mending Current readiness, and consumption.
 - PBE validates Mana efficiency, preloading caps, burst healing, overhealing risk, host parity, and
   PvP survivability.

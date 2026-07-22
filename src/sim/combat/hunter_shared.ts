@@ -59,12 +59,15 @@ export function hasHunterTalent(meta: PlayerMeta, talentId: string): boolean {
   return meta.cls === 'hunter' && hunterTalentSelected(meta.talents, talentId);
 }
 
-export function hunterPetFerocityDamageMultiplier(ctx: SimContext, pet: Entity): number {
-  if (pet.ownerId === null) return 1;
-  const owner = ctx.entities.get(pet.ownerId);
-  const aura = owner?.auras.find((candidate) => candidate.kind === 'hunter_ferocity');
+export function hunterFerocityDamageMultiplier(hunter: Entity | null | undefined): number {
+  const aura = hunter?.auras.find((candidate) => candidate.kind === 'hunter_ferocity');
   const stacks = Math.min(3, Math.max(0, Math.trunc(aura?.stacks ?? aura?.value ?? 0)));
   return 1 + stacks * PACK_FEROCITY_DAMAGE_PER_STACK;
+}
+
+export function hunterPetFerocityDamageMultiplier(ctx: SimContext, pet: Entity): number {
+  if (pet.ownerId === null) return 1;
+  return hunterFerocityDamageMultiplier(ctx.entities.get(pet.ownerId));
 }
 
 function hunterTalentSelected(talents: TalentAllocation, talentId: string): boolean {

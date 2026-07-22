@@ -97,6 +97,7 @@ import {
   applyHowlingRage,
   runFrenzyFellShotCleave,
   runPackCommand,
+  runStampede,
   runUnleashBeast,
 } from './hunter_packlord';
 import {
@@ -131,6 +132,7 @@ import {
   shouldEchoThunderGroundVent,
   thundercallDamageMultiplier,
   thundercallOnArcBoltImpact,
+  thundercallOnChainLightningImpact,
 } from './shaman_thundercall';
 import {
   applyStoneboundJolt,
@@ -699,7 +701,7 @@ export function runEffects(
         break;
       }
       case 'massResurrectGroup': {
-        resurrectDeadGroupMembers(ctx, p, eff.hpFrac);
+        resurrectDeadGroupMembers(ctx, p, eff.hpFrac, ability.school);
         break;
       }
       case 'perfectMoment': {
@@ -1584,6 +1586,10 @@ export function runEffects(
             false,
             ability.id,
           );
+        }
+        if (ability.id === 'chain_lightning' && hitList.length > 0) {
+          thundercallOnChainLightningImpact(ctx, p);
+          triggerWardCycle(ctx, p);
         }
         break;
       }
@@ -2502,6 +2508,10 @@ export function runEffects(
       }
       case 'howlingRage': {
         applyHowlingRage(ctx, p, eff.duration);
+        break;
+      }
+      case 'hunterStampede': {
+        runStampede(ctx, p, target, eff, ability.name);
         break;
       }
       case 'hunterBloodhook': {

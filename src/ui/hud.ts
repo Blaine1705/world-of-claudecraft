@@ -14071,8 +14071,11 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       case 'aoeDamage':
       case 'aoeHeal':
       case 'aoeRoot':
+      case 'chainDamage':
       case 'groundAoE':
       case 'drainTick':
+        return abilityAmountRange(primary.min, primary.max) + suffix(primary);
+      case 'hunterStampede':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
       case 'repositionToAim':
         return primary.landingAoe

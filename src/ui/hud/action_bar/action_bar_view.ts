@@ -26,6 +26,7 @@
 
 import { freeCostAuraActive } from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
+import { packlordActionGlowActive } from '../../../sim/combat/hunter_packlord';
 import { priestActionGlowActive } from '../../../sim/combat/priest/presentation';
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
@@ -524,6 +525,7 @@ export function createActionBarView(
           freeByProc ||
           windowGlow ||
           frostProcGlowActive(player.auras ?? [], def.id) ||
+          packlordActionGlowActive(player.auras ?? [], def.id) ||
           thundercallPayoffGlowActive(player.auras ?? [], def.id) ||
           flowStateReady ||
           priestActionGlowActive(player.auras ?? [], def.id);
