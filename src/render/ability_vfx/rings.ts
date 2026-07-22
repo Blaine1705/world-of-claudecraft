@@ -53,7 +53,10 @@ export class ShockRings {
             * (1.0 - smoothstep(uProgress - 0.03, uProgress, d));
           float n = texture2D(uNoise, vec2(ang * 0.6366, d * 1.4 - uProgress * 0.35)).r;
           band *= smoothstep(0.18, 0.62, n + (1.0 - uProgress) * 0.45);
-          float fade = pow(1.0 - uProgress, 1.35);
+          // Softer decay than the original 1.35 pow: the wavefront stays
+          // readable through the back half of its life (the front-loaded
+          // easeOutQuart otherwise kills the band visually by ~40% age).
+          float fade = pow(1.0 - uProgress, 1.05);
           vec3 col = uColor * uIntensity * (0.6 + 1.6 * band);
           gl_FragColor = vec4(col * band * fade, band * fade);
         }`,

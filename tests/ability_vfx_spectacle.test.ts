@@ -223,4 +223,64 @@ describe('sequencer applies the crescendo boosts at the spawn seams', () => {
     step(seq, a.host, 0.3);
     expect(slot?.afterglowUntil).toBe(0);
   });
+
+  it('strikes hold only the short hot-metal afterglow', () => {
+    const a = makeHost();
+    const seq = new ArchetypeSequencer();
+    const slot = seq.start(a.host, 'strike', STRIKE_SPEC, 1, 2, 0xffffff, 0, false);
+    step(seq, a.host, 0.3);
+    expect(slot?.afterglowUntil).toBeGreaterThan(0);
+    expect(slot!.afterglowUntil - slot!.t).toBeLessThanOrEqual(SPECTACLE.strikeAfterglowDur);
+  });
+
+  it('single-swing tier-0 strikes echo the arc a beat later', () => {
+    const a = makeHost();
+    const seq = new ArchetypeSequencer();
+    seq.start(a.host, 'strike', STRIKE_SPEC, 1, 2, 0xffffff, 0, false);
+    step(seq, a.host, 0.3);
+    const before = a.slashes.length;
+    step(seq, a.host, SPECTACLE.strikeEchoDelay + 0.1);
+    expect(a.slashes.length).toBeGreaterThan(before); // the follow-through echo
+  });
+
+  it('finishers fire the gallery double shockwave at +0.12s', () => {
+    const FIN_SPEC: AbilityVfxFullSpec = {
+      archetype: 'bolt',
+      palette: 'fire',
+      power: 1,
+      finisher: true,
+    };
+    const a = makeHost();
+    const seq = new ArchetypeSequencer();
+    seq.start(a.host, 'fin', FIN_SPEC, 1, 2, 0xffffff, 0, false);
+    step(seq, a.host, 0.2); // impact fired, ring3 still pending
+    const beforeGround = a.rings.filter(
+      (r) => !r.vertical && Math.abs(r.maxR - SPECTACLE.finisherWaveR) < 1e-6,
+    ).length;
+    expect(beforeGround).toBe(0);
+    step(seq, a.host, 0.2); // +0.12 beat passes
+    expect(
+      a.rings.some((r) => !r.vertical && Math.abs(r.maxR - SPECTACLE.finisherWaveR) < 1e-6),
+    ).toBe(true);
+    expect(
+      a.rings.some((r) => r.vertical && Math.abs(r.maxR - SPECTACLE.finisherWaveVR * SPECTACLE.followRing) < 1e-6),
+    ).toBe(true);
+  });
+
+  it('non-gentle impacts pop the vertical halo by default; gentle stay quiet', () => {
+    const a = makeHost();
+    const seq = new ArchetypeSequencer();
+    seq.start(a.host, 'bolt', BOLT_SPEC, 1, 2, 0xffffff, 0, false);
+    step(seq, a.host, 0.2);
+    // default-on vRing at the crescendo multiplier (gallery o.vRing !== false)
+    expect(
+      a.rings.some((r) => r.vertical && Math.abs(r.maxR - 2.6 * SPECTACLE.vRing) < 1e-6),
+    ).toBe(true);
+    const HEAL_SPEC: AbilityVfxFullSpec = { archetype: 'heal', palette: 'holy', power: 1 };
+    const b = makeHost();
+    const seq2 = new ArchetypeSequencer();
+    seq2.start(b.host, 'heal', HEAL_SPEC, 1, 1, 0xffffff, 0, false);
+    step(seq2, b.host, 0.2);
+    expect(b.rings.some((r) => r.vertical && Math.abs(r.maxR - 2.6) < 1e-6)).toBe(false);
+  });
 });

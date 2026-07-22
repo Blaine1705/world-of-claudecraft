@@ -10,7 +10,9 @@ import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } fro
 // construction; a spawn only rebinds the style's cached sheet uniform.
 
 const FLIP_SLOTS = 6;
-const FLIP_DUR = 0.45;
+// Sheet life: the gallery impact sheet runs 0.5s; a touch longer holds the
+// hot frame through the measured aftermath window without a third sheet.
+const FLIP_DUR = 0.55;
 const LAST_FRAME = FLIPBOOK_GRID * FLIPBOOK_GRID - 1;
 
 const easeOutCubic = (t: number): number => 1 - (1 - t) ** 3;

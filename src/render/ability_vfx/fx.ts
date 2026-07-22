@@ -11,7 +11,7 @@ import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './rib
 import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
-import { SPECTACLE } from './spectacle';
+import { isCrescendoArchetype, SPECTACLE } from './spectacle';
 import { asSpiritPath, type SpiritAtKind, SpiritApparitions } from './spirits';
 
 export type { DecalStyle } from './decals';
@@ -92,12 +92,26 @@ const WINDUP_LEAN_RAD = 0.085;
 const BUFF_APPLICATION_PULSE_MAX = 0.9;
 
 // Honor spec.screenFx the gallery way: authored false opts out, authored true
-// forces it, and by default only the HEAVY moments — finishers and big novas —
-// touch the screen. Tier 0 only, so a crowded fight never strobes.
+// forces it, and by default the crescendo impacts (the gallery ripples+flashes
+// EVERY landed hit), finishers, and big novas touch the screen. Tier 0 only
+// (budget tiers degrade spam first), the post pass pools 4 ripples and clamps
+// the flash at 0.4, and screenFxAt applies camera-distance falloff — so a
+// crowded fight still never strobes.
 function wantsScreenFx(spec: AbilityVfxFullSpec, tier: number): boolean {
   if (tier !== 0 || spec.screenFx === false) return false;
   if (spec.screenFx === true) return true;
-  return spec.finisher === true || (spec.archetype === 'nova' && (spec.nova?.radius ?? 5) >= 7);
+  return (
+    isCrescendoArchetype(spec.archetype) ||
+    spec.finisher === true ||
+    (spec.archetype === 'nova' && (spec.nova?.radius ?? 5) >= 7)
+  );
+}
+
+// Ripple+flash strength for a sequence's landing: crescendo impacts ride the
+// spectacle constants (gallery-scale), everything else keeps the gentle ask.
+function screenFxStrengthOf(spec: AbilityVfxFullSpec): number {
+  if (!isCrescendoArchetype(spec.archetype)) return spec.finisher ? 1 : 0.8;
+  return spec.finisher ? SPECTACLE.screenFxFinisher : SPECTACLE.screenFx;
 }
 
 interface OrbitBand {
@@ -518,7 +532,7 @@ export class AbilityVfxFx implements SequencerHost {
         spec.self === true || spec.archetype === 'nova' || spec.archetype === 'shout'
           ? casterId
           : targetId;
-      this.scheduleScreenFx(windupDelay + 0.15, anchorId, 0, 0, 0, spec.finisher ? 1 : 0.8);
+      this.scheduleScreenFx(windupDelay + 0.15, anchorId, 0, 0, 0, screenFxStrengthOf(spec));
     }
   }
 
@@ -543,7 +557,7 @@ export class AbilityVfxFx implements SequencerHost {
       z,
     });
     if (wantsScreenFx(spec, tier))
-      this.scheduleScreenFx(windupDelay + 0.15, -1, x, y, z, spec.finisher ? 1 : 0.8);
+      this.scheduleScreenFx(windupDelay + 0.15, -1, x, y, z, screenFxStrengthOf(spec));
   }
 
   // Traveling bolt carrying the full spec's bolt DNA. Without a bolt block
@@ -591,7 +605,7 @@ export class AbilityVfxFx implements SequencerHost {
         slot
           ? (x, y, z) => {
               this.sequencer.triggerImpact(this, slot, x, y, z);
-              if (screen) this.screenFxAt(x, y, z, spec.finisher ? 1 : 0.8);
+              if (screen) this.screenFxAt(x, y, z, screenFxStrengthOf(spec));
             }
           : null,
       );
@@ -625,7 +639,7 @@ export class AbilityVfxFx implements SequencerHost {
       (x, y, z) => {
         if (leader) this.leaderStrike(casterId, x, y, z, colorHex);
         if (slot) this.sequencer.triggerImpact(this, slot, x, y, z);
-        if (screen) this.screenFxAt(x, y, z, spec.finisher ? 1 : 0.8);
+        if (screen) this.screenFxAt(x, y, z, screenFxStrengthOf(spec));
       },
     );
     // staggered barrage riding behind the lead projectile (gallery volley):
