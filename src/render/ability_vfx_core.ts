@@ -9,7 +9,8 @@
 //   volley in [1, 4]
 //   burstCount in [4, 60] after the (0.4 + 0.6 * quality) scale; tier 2 <= 6
 //   burstPower in (0, 1.6]
-//   ringScale >= 0 (0 = no ring); tier >= 1 drops the ring entirely
+//   ringScale >= 0 (0 = no ring); tier 2 drops the ring entirely (tier 1
+//   keeps it — the area telegraph is actionable, not decoration)
 
 // Compact per-ability visual spec (key legend in ability_vfx_specs.ts header):
 // c=color p=palette pw=power sp=sparks rg=ringScale vr=vRing db=debris
@@ -261,7 +262,7 @@ function buildPlan(
     volley: tier >= 2 ? 1 : Math.round(clamp(spec.b?.vl ?? 1, 1, VOLLEY_MAX)),
     burstCount,
     burstPower,
-    ringScale: tier >= 1 ? 0 : (spec.rg ?? 0),
+    ringScale: tier >= 2 ? 0 : (spec.rg ?? 0),
     light: tier >= 2 ? 0 : (spec.li ?? 0) * (0.4 + 0.6 * quality),
     swirlColor: lighten(color, 0.25),
     sparkleColor: color,
@@ -271,8 +272,8 @@ function buildPlan(
 
 // Plan the cast-moment visual (projectile launch, shout wave, nova, tick).
 // quality is the render-budget vfx dial in [0, 1]; tier is the spam-guard
-// degrade level from AbilityVfxBudget.admit (0 full, 1 reduced counts and no
-// ring, 2 color-only minimal).
+// degrade level from AbilityVfxBudget.admit (0 full, 1 reduced counts but the
+// ring survives, 2 color-only minimal).
 export function planCast(spec: AbilityVfxSpec, quality: number, tier = 0): AbilityVfxPlan {
   const q = clamp01(quality);
   const pw = spec.pw ?? 1;
@@ -297,19 +298,37 @@ export function planImpact(
   return plan;
 }
 
-// Rolling-second spam guard. Pure math with injected time (nowSec in seconds):
-// at most GLOBAL_CAP planned casts per rolling second across all casters and
-// CASTER_CAP per caster run at full fidelity; the next band runs reduced
-// (tier 1) and past double either cap everything is color-only (tier 2).
+// Rolling-second spam guard. Pure math with injected time (nowSec in seconds).
+// It exists to keep raid crowds sane, never to strip a solo player's rotation,
+// so it holds two independent windows:
+//   Cast window — at most GLOBAL_CAP planned casts per rolling second across
+//   all casters and CASTER_CAP per caster run at full fidelity; the next band
+//   runs reduced (tier 1) and past double either cap everything is color-only
+//   (tier 2). Only a cast-claiming event charges it (via admit); follow-through
+//   visuals of the same cast read the tier with peek, which never records.
+//   Accent window — landed-hit accents, auto-attack polish, and zone-pulse
+//   re-hits share a flat ACCENT_CAP per rolling second (admitAccent) and never
+//   consume a cast slot, so a normal rotation of casts + its own hits + autos
+//   stays tier 0 indefinitely.
 // Fixed-size ring buffers of timestamps: zero allocation in steady state (one
 // small window object is allocated the first time a caster is seen, then
 // reused; stale casters are pruned in place once the map grows).
 export const ABILITY_VFX_GLOBAL_CAP = 20;
-export const ABILITY_VFX_CASTER_CAP = 4;
+// Casts only (hits and autos ride the accent window): a fast solo rotation is
+// ~1-2 casts/s, so 6 leaves room for proc bursts without ever degrading.
+export const ABILITY_VFX_CASTER_CAP = 6;
+export const ABILITY_VFX_ACCENT_CAP = 8;
 const WINDOW_SEC = 1;
 const GLOBAL_RING = ABILITY_VFX_GLOBAL_CAP * 2;
 const CASTER_RING = ABILITY_VFX_CASTER_CAP * 2;
 const PRUNE_ABOVE = 64;
+
+// The local player's own casts are the LAST thing degraded: under spam they
+// read one tier better (still bounded by the same global window — tier 2 spam
+// leaves them reduced, never exempt).
+export function localCasterTier(tier: 0 | 1 | 2): 0 | 1 | 2 {
+  return tier > 0 ? ((tier - 1) as 0 | 1) : 0;
+}
 
 interface CasterWindow {
   times: Float64Array;
@@ -320,25 +339,21 @@ export class AbilityVfxBudget {
   private globalTimes = new Float64Array(GLOBAL_RING).fill(Number.NEGATIVE_INFINITY);
   private globalHead = 0;
   private casters = new Map<number, CasterWindow>();
+  private accentTimes = new Float64Array(ABILITY_VFX_ACCENT_CAP).fill(Number.NEGATIVE_INFINITY);
+  private accentHead = 0;
 
   // Returns the degrade tier for one planned cast and records it (tier 2 casts
   // draw next to nothing, so they are not recorded and cannot pin the window).
   admit(casterId: number, nowSec: number): 0 | 1 | 2 {
     const cutoff = nowSec - WINDOW_SEC;
-    let global = 0;
-    for (let i = 0; i < GLOBAL_RING; i++) {
-      if (this.globalTimes[i] > cutoff) global++;
-    }
+    const global = liveCount(this.globalTimes, cutoff);
     let caster = this.casters.get(casterId);
     if (!caster) {
       if (this.casters.size >= PRUNE_ABOVE) this.prune(cutoff);
       caster = { times: new Float64Array(CASTER_RING).fill(Number.NEGATIVE_INFINITY), head: 0 };
       this.casters.set(casterId, caster);
     }
-    let own = 0;
-    for (let i = 0; i < CASTER_RING; i++) {
-      if (caster.times[i] > cutoff) own++;
-    }
+    const own = liveCount(caster.times, cutoff);
     if (global >= GLOBAL_RING || own >= CASTER_RING) return 2;
     this.globalTimes[this.globalHead] = nowSec;
     this.globalHead = (this.globalHead + 1) % GLOBAL_RING;
@@ -347,16 +362,40 @@ export class AbilityVfxBudget {
     return global >= ABILITY_VFX_GLOBAL_CAP || own >= ABILITY_VFX_CASTER_CAP ? 1 : 0;
   }
 
+  // The tier admit WOULD return, recording nothing: follow-through visuals of
+  // an already-charged cast (its landing, its contact hit, its zone pulses)
+  // match the cast's degrade level without charging the window again.
+  peek(casterId: number, nowSec: number): 0 | 1 | 2 {
+    const cutoff = nowSec - WINDOW_SEC;
+    const global = liveCount(this.globalTimes, cutoff);
+    const caster = this.casters.get(casterId);
+    const own = caster ? liveCount(caster.times, cutoff) : 0;
+    if (global >= GLOBAL_RING || own >= CASTER_RING) return 2;
+    return global >= ABILITY_VFX_GLOBAL_CAP || own >= ABILITY_VFX_CASTER_CAP ? 1 : 0;
+  }
+
+  // One slot of the flat accent window (landed-hit accents, auto-attack
+  // polish, zone-pulse re-hits). True = draw it; false = this second is
+  // already saturated with accents. Never touches the cast window.
+  admitAccent(nowSec: number): boolean {
+    const cutoff = nowSec - WINDOW_SEC;
+    if (liveCount(this.accentTimes, cutoff) >= ABILITY_VFX_ACCENT_CAP) return false;
+    this.accentTimes[this.accentHead] = nowSec;
+    this.accentHead = (this.accentHead + 1) % ABILITY_VFX_ACCENT_CAP;
+    return true;
+  }
+
   private prune(cutoff: number): void {
     for (const [id, slot] of this.casters) {
-      let live = false;
-      for (let i = 0; i < CASTER_RING; i++) {
-        if (slot.times[i] > cutoff) {
-          live = true;
-          break;
-        }
-      }
-      if (!live) this.casters.delete(id);
+      if (liveCount(slot.times, cutoff) === 0) this.casters.delete(id);
     }
   }
+}
+
+function liveCount(times: Float64Array, cutoff: number): number {
+  let n = 0;
+  for (let i = 0; i < times.length; i++) {
+    if (times[i] > cutoff) n++;
+  }
+  return n;
 }

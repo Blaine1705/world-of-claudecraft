@@ -5,6 +5,7 @@
 // injected time.
 import { describe, expect, it } from 'vitest';
 import {
+  ABILITY_VFX_ACCENT_CAP,
   ABILITY_VFX_CASTER_CAP,
   ABILITY_VFX_GLOBAL_CAP,
   AbilityVfxBudget,
@@ -12,6 +13,7 @@ import {
   BURST_COUNT_MAX,
   BURST_COUNT_MIN,
   BURST_POWER_MAX,
+  localCasterTier,
   PROJ_SCALE_MAX,
   PROJ_SCALE_MIN,
   planCast,
@@ -92,14 +94,15 @@ describe('planCast / planImpact', () => {
     expect(planCast(spec, 0).burstCount).toBe(24); // 60 * 0.4
   });
 
-  it('tier 1 halves counts and drops the ring; tier 2 is color-only minimal', () => {
+  it('tier 1 halves counts but keeps the ring; tier 2 is color-only minimal', () => {
     const spec = ABILITY_VFX_SPECS.whirlwind; // sp: 34, rg: 1.6
     const full = planCast(spec, 1, 0);
     const reduced = planCast(spec, 1, 1);
     const minimal = planCast(spec, 1, 2);
     expect(full.ringScale).toBeGreaterThan(0);
     expect(reduced.burstCount).toBe(Math.round(full.burstCount / 2));
-    expect(reduced.ringScale).toBe(0);
+    // the area telegraph is actionable: it survives tier 1
+    expect(reduced.ringScale).toBe(full.ringScale);
     expect(minimal.burstCount).toBeLessThanOrEqual(TIER2_BURST_COUNT_MAX);
     expect(minimal.ringScale).toBe(0);
     expect(minimal.color).toBe(full.color);
@@ -126,7 +129,8 @@ describe('planCast / planImpact', () => {
 describe('AbilityVfxBudget', () => {
   it('admits the global cap per rolling second, then degrades, then recovers', () => {
     const budget = new AbilityVfxBudget();
-    // 5 casters x 4 casts: exactly the global cap, all full fidelity.
+    // Casters spread under the per-caster cap: exactly the global cap of
+    // casts, all full fidelity.
     for (let i = 0; i < ABILITY_VFX_GLOBAL_CAP; i++) {
       expect(budget.admit(100 + Math.floor(i / ABILITY_VFX_CASTER_CAP), 0.1)).toBe(0);
     }
@@ -141,7 +145,7 @@ describe('AbilityVfxBudget', () => {
     expect(budget.admit(999, 1.31)).toBe(0);
   });
 
-  it('caps a single caster at 4 full-fidelity casts per rolling second', () => {
+  it('caps a single caster at the per-caster cap of full-fidelity casts per rolling second', () => {
     const budget = new AbilityVfxBudget();
     for (let i = 0; i < ABILITY_VFX_CASTER_CAP; i++) expect(budget.admit(7, 0.1)).toBe(0);
     expect(budget.admit(7, 0.2)).toBe(1); // over the per-caster cap
@@ -149,5 +153,45 @@ describe('AbilityVfxBudget', () => {
     for (let i = 0; i < ABILITY_VFX_CASTER_CAP - 1; i++) expect(budget.admit(7, 0.2)).toBe(1);
     expect(budget.admit(7, 0.3)).toBe(2); // past double the per-caster cap
     expect(budget.admit(7, 1.31)).toBe(0); // recovered after the window rolls
+  });
+
+  it('peek reads the tier without recording a cast', () => {
+    const budget = new AbilityVfxBudget();
+    // Heavy peeking (unknown casters included) never charges either window.
+    for (let i = 0; i < 50; i++) expect(budget.peek(7, 0.1)).toBe(0);
+    for (let i = 0; i < ABILITY_VFX_CASTER_CAP; i++) expect(budget.admit(7, 0.1)).toBe(0);
+    expect(budget.peek(7, 0.2)).toBe(1); // matches what admit would return
+    expect(budget.peek(7, 0.2)).toBe(1); // and repeated peeks never escalate
+    expect(budget.peek(8, 0.2)).toBe(0); // unseen caster peeks clean
+    expect(budget.peek(7, 1.31)).toBe(0); // window rolls off for peek too
+  });
+
+  it('accents ride their own window and never consume cast slots', () => {
+    const budget = new AbilityVfxBudget();
+    for (let i = 0; i < ABILITY_VFX_ACCENT_CAP; i++) expect(budget.admitAccent(0.1)).toBe(true);
+    expect(budget.admitAccent(0.2)).toBe(false); // accent window saturated
+    // A full accent window leaves the cast budget untouched.
+    for (let i = 0; i < ABILITY_VFX_CASTER_CAP; i++) expect(budget.admit(7, 0.2)).toBe(0);
+    // And a busy cast window leaves accents available after it rolls.
+    expect(budget.admitAccent(1.31)).toBe(true);
+  });
+
+  it('a solo rotation of 2 casts + 2 hits + 2 autos per second stays tier 0', () => {
+    const budget = new AbilityVfxBudget();
+    for (let s = 0; s < 6; s++) {
+      for (let i = 0; i < 2; i++) expect(budget.admit(7, s + i * 0.45)).toBe(0);
+      // landed hits and plain autos are accents: they peek and take accent
+      // slots, so they can never push the caster over the cast cap
+      for (let i = 0; i < 4; i++) {
+        expect(budget.peek(7, s + 0.1 + i * 0.2)).toBe(0);
+        expect(budget.admitAccent(s + 0.1 + i * 0.2)).toBe(true);
+      }
+    }
+  });
+
+  it('localCasterTier biases the local player one tier up, never exempt', () => {
+    expect(localCasterTier(0)).toBe(0);
+    expect(localCasterTier(1)).toBe(0);
+    expect(localCasterTier(2)).toBe(1);
   });
 });

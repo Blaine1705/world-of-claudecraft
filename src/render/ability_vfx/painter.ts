@@ -13,6 +13,7 @@ import {
   type AbilityVfxSpec,
   abilityHexColor,
   abilityVfxColor,
+  localCasterTier,
   planCast,
   planImpact,
 } from '../ability_vfx_core';
@@ -186,6 +187,11 @@ const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
 // the whole release + impact anatomy every second.
 const POINT_SEQ_REFRACTORY_SEC = 3;
 
+// One cast-budget charge per (caster, ability) inside this window: a cast
+// event plus its own point-anchored landing (or a strike's contact hit) are
+// ONE cast to the spam guard, never two. Matches the budget's rolling second.
+const CAST_CHARGE_WINDOW_SEC = 1;
+
 // Zone-pulse debris family per spec palette (the per-pulse re-hit accent).
 const PULSE_BURST_BY_PALETTE: Record<string, ParticleBurstKind> = {
   fire: 'embers',
@@ -218,6 +224,9 @@ export class AbilityVfx {
   // last full point-sequence time per `${casterId}:${abilityId}` (see
   // POINT_SEQ_REFRACTORY_SEC); stale entries pruned in place once it grows
   private pointSeqAt = new Map<string, number>();
+  // last cast-budget charge per `${casterId}:${abilityId}` (see
+  // CAST_CHARGE_WINDOW_SEC); stale entries pruned in place once it grows
+  private castChargeAt = new Map<string, number>();
   private spawned = 0; // primitives spawned by the CURRENT event (probe counter)
 
   constructor(
@@ -258,6 +267,33 @@ export class AbilityVfx {
     return out;
   }
 
+  // Degrade tier for a cast-claiming event: charges the cast budget once per
+  // (caster, ability) window — a cast plus its own follow-through (aimed
+  // landing, a strike's contact hit) never double-charges — and biases the
+  // local player one tier up (their own rotation degrades last).
+  private castTier(casterId: number, abilityId: string): 0 | 1 | 2 {
+    const nowSec = this.now();
+    const key = `${casterId}:${abilityId}`;
+    const last = this.castChargeAt.get(key);
+    let tier: 0 | 1 | 2;
+    if (last !== undefined && nowSec - last < CAST_CHARGE_WINDOW_SEC) {
+      tier = this.budget.peek(casterId, nowSec);
+    } else {
+      if (this.castChargeAt.size > 64) {
+        for (const [k, at] of this.castChargeAt) {
+          if (nowSec - at >= CAST_CHARGE_WINDOW_SEC) this.castChargeAt.delete(k);
+        }
+      }
+      this.castChargeAt.set(key, nowSec);
+      tier = this.budget.admit(casterId, nowSec);
+    }
+    return this.biasFor(casterId, tier);
+  }
+
+  private biasFor(casterId: number, tier: 0 | 1 | 2): 0 | 1 | 2 {
+    return this.deps.localPlayerId?.() === casterId ? localCasterTier(tier) : tier;
+  }
+
   private recordStat(abilityId: string, claimed: boolean): void {
     let s = this.stats.get(abilityId);
     if (!s) {
@@ -275,7 +311,7 @@ export class AbilityVfx {
     if (!ev.ability || !CAST_FX.has(ev.fx)) return false;
     const spec = ABILITY_VFX_SPECS[ev.ability];
     if (!spec) return false;
-    const tier = this.budget.admit(ev.sourceId, this.now());
+    const tier = this.castTier(ev.sourceId, ev.ability);
     const plan = planCast(spec, this.quality, tier);
     const fx = this.deps.fx;
     const full = ABILITY_VFX_FULL_SPECS[ev.ability];
@@ -440,24 +476,22 @@ export class AbilityVfx {
     const spec = ABILITY_VFX_SPECS[ev.ability];
     if (!spec) return false;
     const casterId = ev.sourceId ?? -1;
-    const tier = this.budget.admit(casterId, this.now());
-    const plan = planCast(spec, this.quality, tier);
     const fx = this.deps.fx;
     const gy = fx.groundYAt(ev.x, ev.z);
+    const nowSec = this.now();
     this.spawned = 0;
     if (ev.fx === 'tick') {
-      this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, plan, tier);
+      // Zone-pulse re-hits ride the accent window, never the cast budget: a
+      // 6s earthquake must not starve its caster's next cast.
+      if (this.budget.admitAccent(nowSec)) {
+        const tier = this.biasFor(casterId, this.budget.peek(casterId, nowSec));
+        this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, planCast(spec, this.quality, tier), tier);
+      }
       this.recordStat(ev.ability, true);
       return true;
     }
     const full = ABILITY_VFX_FULL_SPECS[ev.ability];
-    // the terrain-draped area ring is an actionable telegraph: always instant
-    if (ev.radius) {
-      this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, plan.color);
-      this.spawned++;
-    }
     // recurring emits of the same aimed nova replay only the cheap re-hit
-    const nowSec = this.now();
     const seqKey = `${casterId}:${ev.ability}`;
     const lastSeq = this.pointSeqAt.get(seqKey);
     const repeat = lastSeq !== undefined && nowSec - lastSeq < POINT_SEQ_REFRACTORY_SEC;
@@ -467,8 +501,21 @@ export class AbilityVfx {
       }
     }
     this.pointSeqAt.set(seqKey, nowSec);
+    // a fresh landing is the cast (charged once, deduped against its own cast
+    // event); repeats are follow-through on the accent window
+    const tier = repeat
+      ? this.biasFor(casterId, this.budget.peek(casterId, nowSec))
+      : this.castTier(casterId, ev.ability);
+    const plan = planCast(spec, this.quality, tier);
+    // the terrain-draped area ring is an actionable telegraph: always instant
+    if (ev.radius) {
+      this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, plan.color);
+      this.spawned++;
+    }
     if (repeat) {
-      this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, plan, tier);
+      if (this.budget.admitAccent(nowSec)) {
+        this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, plan, tier);
+      }
     } else if (tier < 2 && full) {
       fx.sequenceInstantAt(
         ev.ability,
@@ -535,14 +582,22 @@ export class AbilityVfx {
   // A landed ability hit gets one reduced-count accent burst in the spec color
   // plus its archetype read: strikes slash a ribbon arc across the victim and
   // crits pop a vertical halo. Damage events carry player-facing ability
-  // NAMES; normalize back to the stable id first. Budget-gated: any degrade
-  // tier skips the accent entirely (casts keep priority under spam).
+  // NAMES; normalize back to the stable id first. Accents ride the flat accent
+  // window and only peek the cast tier — a rotation's own landed hits (and
+  // plain autos) never consume its cast slots. The one exception: a physical
+  // special whose ONLY event is its hit — that contact IS its cast, so it
+  // charges the cast budget (deduped) and runs the full sequence.
   onDamage(ev: AbilityVfxDamageEvent): void {
     if (ev.kind !== 'hit' || ev.amount <= 0) return;
+    const nowSec = this.now();
     if (!ev.ability) {
       // Auto-attack polish: a subtle steel slash ribbon on plain melee swings
-      // (the meleeSpark already popped). Budget-gated so crowds stay calm.
-      if (ev.school === 'physical' && this.budget.admit(ev.sourceId, this.now()) === 0) {
+      // (the meleeSpark already popped). Accent-gated so crowds stay calm.
+      if (
+        ev.school === 'physical' &&
+        this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, nowSec)) === 0 &&
+        this.budget.admitAccent(nowSec)
+      ) {
         this.deps.fx.slashArc(ev.targetId, 0xffd9a8, 0.85, 0.16);
       }
       return;
@@ -550,23 +605,30 @@ export class AbilityVfx {
     const abilityId = attackAbilityId(ev.ability);
     const spec = abilityId ? ABILITY_VFX_SPECS[abilityId] : undefined;
     if (!spec || !abilityId) return;
-    const tier = this.budget.admit(ev.sourceId, this.now());
-    if (tier >= 1) return;
+    const full = ABILITY_VFX_FULL_SPECS[abilityId];
+    const arch = full?.archetype ?? spec.a ?? 'strike';
+    const isCastMoment = !!full && (arch === 'strike' || arch === 'dash' || arch === 'buff');
+    let tier: 0 | 1 | 2;
+    if (isCastMoment) {
+      tier = this.castTier(ev.sourceId, abilityId);
+    } else {
+      tier = this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, nowSec));
+      if (tier >= 1) return; // degraded accents vanish first; casts keep priority
+      if (!this.budget.admitAccent(nowSec)) return;
+    }
     const plan = planImpact(spec, ev.crit, this.quality, tier);
     const at = this.deps.anchor(ev.targetId, 0.55);
     if (!at) return;
     this.spawned = 0;
     this.deps.vfx.burst(at, ev.school, plan.burstCount, plan.burstPower, plan.color);
     this.spawned++;
-    const full = ABILITY_VFX_FULL_SPECS[abilityId];
-    const arch = full?.archetype ?? spec.a ?? 'strike';
-    if (full && (arch === 'strike' || arch === 'dash' || arch === 'buff')) {
-      // A physical special's ONLY event is its hit: the contact moment runs
-      // the full archetype sequence (authored slash arc, impact stack, motifs).
-      // Buff-archetype self-hits (Blood Toll's health price) run the buff
-      // sequence too: shell pop plus the red body-glow pulse.
+    if (isCastMoment && full && tier < 2) {
+      // The contact moment runs the full archetype sequence (authored slash
+      // arc, impact stack, motifs). Buff-archetype self-hits (Blood Toll's
+      // health price) run the buff sequence too: shell pop plus the red
+      // body-glow pulse.
       this.deps.fx.sequenceInstant(abilityId, full, ev.sourceId, ev.targetId, plan.color, tier);
-    } else if (ev.crit || spec.fin === 1) {
+    } else if (!isCastMoment && (ev.crit || spec.fin === 1)) {
       this.deps.fx.impactRing(ev.targetId, plan.color, ev.crit);
       this.spawned++;
     }
