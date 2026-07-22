@@ -421,28 +421,46 @@ export const TARGETS = [
     // gathered variant hovers a signed harvest material instead: the same
     // signer line reads Gathered by there (Crafted by on the base tree, the
     // honest before side).
-    variants: [{ key: 'crafted' }, { key: 'gathered', gathered: true }],
+    variants: [
+      { key: 'crafted' },
+      { key: 'gathered', gathered: true },
+      // Phase 14b: a commissioned copy bound to its recipient, so the gold
+      // Maker's Bond line reads beside the maker's mark.
+      { key: 'commission-bound', commission: true },
+    ],
     async capture(page, variant) {
-      await page.evaluate((gathered) => {
-        document.querySelector('#gpu-notice')?.remove();
-        document.querySelector('.camera-prompt-confirm')?.click();
-        const game = window.__game;
-        try {
-          if (gathered) {
-            game?.sim?.addItemInstance('pristine_hide', { signer: 'Thorgar' });
-          } else {
-            // A dungeon-drop def the starter bag can never contain, so the
-            // aria-label lookup below is unambiguous.
-            game?.sim?.addItemInstance('gravewyrm_gauntlets', {
-              signer: 'Thorgar',
-              rolled: { masterwork: true, stats: { str: 2, sta: 1 } },
-            });
-          }
-        } catch {}
-        const el = document.querySelector('#bags');
-        if (el) el.style.display = 'none';
-        game?.hud?.toggleBags?.();
-      }, Boolean(variant?.gathered));
+      await page.evaluate(
+        (mode) => {
+          document.querySelector('#gpu-notice')?.remove();
+          document.querySelector('.camera-prompt-confirm')?.click();
+          const game = window.__game;
+          try {
+            if (mode === 'gathered') {
+              game?.sim?.addItemInstance('pristine_hide', { signer: 'Thorgar' });
+            } else if (mode === 'commission') {
+              // Phase 14b: a commissioned (bindOnTrade) copy already bound to
+              // its recipient; the tooltip composes the bound line with the
+              // maker's mark.
+              game?.sim?.addItemInstance('gravewyrm_gauntlets', {
+                signer: 'Thorgar',
+                bindOnTrade: true,
+                boundTo: game?.sim?.playerId,
+              });
+            } else {
+              // A dungeon-drop def the starter bag can never contain, so the
+              // aria-label lookup below is unambiguous.
+              game?.sim?.addItemInstance('gravewyrm_gauntlets', {
+                signer: 'Thorgar',
+                rolled: { masterwork: true, stats: { str: 2, sta: 1 } },
+              });
+            }
+          } catch {}
+          const el = document.querySelector('#bags');
+          if (el) el.style.display = 'none';
+          game?.hud?.toggleBags?.();
+        },
+        variant?.gathered ? 'gathered' : variant?.commission ? 'commission' : 'crafted',
+      );
       // toggleBags tracks logical open state, so a shared page where an earlier
       // target left the bags logically open needs a second toggle to reopen.
       let open = await pollForSize(page, '#bags');
@@ -469,6 +487,50 @@ export const TARGETS = [
       await pollForSize(page, '#tooltip');
       await wait(300);
       return {};
+    },
+  },
+  {
+    key: 'unbind-window',
+    label: "Maker's Bond unbind window (station master service)",
+    when: ['ui/hud/vendor/unbind', 'sim/professions/commission'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Grant a bound commissioned piece plus the fee, stand next to the forge
+    // master (the walk-away proximity close needs the player within 8yd of
+    // the NPC), and open the service window directly. The row lists the
+    // DEF-quality fee off the sim's own unbindFeeFor, so the shot proves the
+    // fee-before-confirm surface.
+    async capture(page) {
+      const staged = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!game || !sim) return { ok: false, reason: 'offline world is unavailable' };
+        try {
+          sim.addItemInstance('eastbrook_arming_sword', {
+            bindOnTrade: true,
+            boundTo: sim.playerId,
+            signer: 'Thorgar',
+          });
+        } catch {}
+        const meta = sim.players?.get(sim.primaryId);
+        if (meta) meta.copper = Math.max(meta.copper, 50000);
+        let master = null;
+        for (const e of sim.entities.values()) {
+          if (e.templateId === 'forgemistress_darva') master = e;
+        }
+        if (!master) return { ok: false, reason: 'forge master not found' };
+        const p = sim.player;
+        p.pos.x = master.pos.x + 1.5;
+        p.pos.z = master.pos.z;
+        const el = document.querySelector('#unbind-window');
+        if (el) el.style.display = 'none';
+        game.hud?.openUnbind?.(master.id);
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      const open = await pollForSize(page, '#unbind-window');
+      return open ? { clip: '#unbind-window' } : {};
     },
   },
   {
@@ -1273,6 +1335,87 @@ export const TARGETS = [
     },
   },
   {
+    key: 'attunement-legibility',
+    label: 'Attunement legibility: quest-dialog preview with return cost, first-tier tutorial',
+    when: [
+      'ui/hud/quest/quest_dialog_controller',
+      'sim/quests/profession_quest_effects',
+      'ui/profession_tutorial_window',
+      'ui/profession_identity_view.ts',
+    ],
+    // The Phase 14 legibility rule: the full pre-commit picture (majors, hobby,
+    // dormancy, and the escalating make-amends return cost) must be visible in
+    // the lore-quest dialog BEFORE the player commits, and the one-time tier
+    // tutorial must fire at the first tier-1 crossing. The quest variants shoot
+    // the q_prof_attune_smith detail at Forgemistress Darva for a fresh
+    // unattuned character; the tutorial variant crosses weaponcrafting to
+    // skill 26 and lets the REAL 1 Hz sweep emit the event that opens the panel.
+    variants: [
+      { key: 'quest-desktop' },
+      { key: 'quest-mobile', mobile: true },
+      { key: 'tutorial-desktop', tutorial: true },
+      { key: 'tutorial-mobile', tutorial: true, mobile: true },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      if (variant?.tutorial) {
+        const armed = await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          const meta = sim?.players?.get(sim.primaryId);
+          if (!meta) return { ok: false, reason: 'no primary player meta' };
+          meta.craftSkills = { ...meta.craftSkills, weaponcrafting: 26 };
+          return { ok: true };
+        });
+        if (!armed.ok) throw new Error(`tutorial setup failed: ${armed.reason}`);
+        // The prof-nudges sweep runs at 1 Hz on sim ticks; the panel opens on
+        // the resulting profTierTutorial event, so poll rather than guess.
+        const open = await pollForSize(page, '#profession-tutorial');
+        if (!open) throw new Error('profession tutorial did not open');
+        return { clip: '#profession-tutorial' };
+      }
+      // Quest-dialog variants: stand beside Darva (the dialog auto-closes on
+      // distance like the train window) and open her quest list, then the
+      // lore-quest detail row.
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const master = [...sim.entities.values()].find(
+          (e) => e.templateId === 'forgemistress_darva',
+        );
+        if (!master) return { ok: false, reason: 'no forgemistress_darva entity' };
+        const p = sim.player;
+        if (p?.pos) {
+          p.pos.x = master.pos.x;
+          p.pos.z = master.pos.z - 2;
+        }
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(master.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`quest-dialog setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      await page.evaluate(() => {
+        document.querySelector('#quest-dialog [data-quest="q_prof_attune_smith"]')?.click();
+      });
+      await wait(400);
+      // The detail must carry the pinned-pair preview with the return-cost
+      // sentence (the whole point of the shot).
+      const hasPreview = await page.evaluate(() =>
+        Boolean(document.querySelector('#quest-dialog [data-profession-preview]')),
+      );
+      if (!hasPreview) throw new Error('attunement preview line missing from the quest detail');
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
     key: 'station-props',
     label: 'Crafting-station scenery (Eastbrook forge)',
     when: ['render/stations', 'src/sim/content/professions'],
@@ -1304,6 +1447,102 @@ export const TARGETS = [
       // The anvil GLB and station clutter stream in on first view; wait generously.
       await wait(4500);
       await page.evaluate(() => document.querySelector('#gpu-notice')?.remove());
+      return {};
+    },
+  },
+  {
+    key: 'party-below-target',
+    label: 'Party frames clear the target buff strip',
+    when: ['party_below_target'],
+    variants: [
+      { key: 'desktop', charClass: 'paladin', charName: 'Overlap' },
+      { key: 'mobile', charClass: 'paladin', charName: 'Overlap', mobile: true },
+      // The common case: an unwrapped strip, where the full 2x2 party fits
+      // above the move joystick (the 18-aura variant shows the degraded
+      // one-row-plus-scroll extreme).
+      { key: 'mobile-light', charClass: 'paladin', charName: 'Overlap', mobile: true, auras: 6 },
+    ],
+    async capture(page, variant) {
+      await page.evaluate((auraCount) => {
+        const sim = window.__game.sim;
+        const me = sim.primaryId;
+        const p = sim.player;
+        // Party state lives on the PartyMachine (sim.party); assemble the
+        // struct directly (offline invites queue stale cards).
+        const pm = sim.party;
+        const roster = [
+          ['Brightoak', 'druid'],
+          ['Stormcaller', 'shaman'],
+          ['Nightblade', 'rogue'],
+          ['Emberlyn', 'mage'],
+        ];
+        const pids = roster.map(([name, cls], i) => {
+          const pid = sim.addPlayer(cls, name);
+          const e = sim.entities.get(pid);
+          if (e) {
+            e.pos = { x: p.pos.x + (i % 4) * 2 - 3, y: p.pos.y, z: p.pos.z + 2 };
+            e.prevPos = { ...e.pos };
+          }
+          return pid;
+        });
+        const party = {
+          id: pm.nextPartyId++,
+          leader: me,
+          members: [me, ...pids],
+          raid: false,
+          raidGroups: new Map(),
+          lootStrategies: {},
+        };
+        pm.parties.set(party.id, party);
+        pm.partyByPid.set(me, party.id);
+        for (const q of pids) pm.partyByPid.set(q, party.id);
+        // Target a nearby mob and load its strip with enough auras that the
+        // wrapped rows exceed the old hand-tuned below-target offset.
+        let mob = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId === null && !e.dead) {
+            mob = e;
+            break;
+          }
+        }
+        if (!mob) return;
+        mob.pos = { x: p.pos.x + 2, y: p.pos.y, z: p.pos.z + 8 };
+        mob.prevPos = { ...mob.pos };
+        sim.rebucket(mob);
+        sim.targetEntity(mob.id);
+        for (let i = 0; i < auraCount; i++) {
+          sim.applyAura(mob, {
+            id: `overlap_probe_${i}`,
+            name: `Probe ${i}`,
+            kind: 'dot',
+            value: 1,
+            remaining: 600,
+            duration: 600,
+            sourceId: me,
+            school: 'shadow',
+          });
+        }
+      }, variant.auras ?? 18);
+      await wait(1200);
+      // Becoming leader auto-opens Loot Settings on the frame the HUD notices
+      // the new party; close it AFTER that frame so the corner stays clean.
+      await page.evaluate(() => window.__game.hud.closeLootSettings?.());
+      if (variant.mobile) {
+        // Expand the party chip (persisted-collapse default) so the member
+        // frames render below the strip; poll its own aria-expanded state.
+        for (let i = 0; i < 8; i++) {
+          const state = await page.evaluate(() => {
+            const chip = document.querySelector('#party-frames [aria-expanded]');
+            if (!chip) return 'no-chip';
+            if (chip.getAttribute('aria-expanded') === 'true') return 'expanded';
+            chip.click();
+            return 'clicked';
+          });
+          if (state === 'expanded' || state === 'no-chip') break;
+          await wait(400);
+        }
+      }
+      await wait(600);
       return {};
     },
   },
@@ -1777,6 +2016,114 @@ export const TARGETS = [
       }
       await wait(300);
       return {};
+    },
+  },
+  {
+    key: 'p13-bag-actions',
+    label: 'Bag item action menu (disenchant / salvage / apply enchant)',
+    when: ['bag_item_context_menu', 'bag_item_action_menu', 'enchant_apply_view'],
+    // Four states of the Phase 13 surface: the desktop right-click menu, the same
+    // menu from a mobile tap (the phase acceptance's mobile arm), the stronger
+    // destruction warning (the only held copy is signed masterwork), and the
+    // Apply Enchant picker (the first render sink for enchant names). The recipe
+    // branches on variant.key; menu opening goes through the REAL bound events
+    // (contextmenu / click on the bag row), never a debug hook.
+    variants: [
+      { key: 'menu-desktop' },
+      { key: 'menu-mobile', mobile: true },
+      { key: 'confirm-special', confirm: true },
+      { key: 'picker', picker: true },
+      { key: 'picker-mobile', picker: true, mobile: true },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      const staged = await page.evaluate(
+        (wantsConfirm, wantsPicker) => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
+          if (wantsPicker) {
+            // Enough dust to afford the base weapon enchants, so the picker's
+            // affordability lines show a mix of ready and short rows.
+            sim.addItem('arcane_dust', 6);
+            sim.addItem('arcane_essence', 1);
+            return { ok: true, itemName: 'Arcane Dust' };
+          }
+          if (wantsConfirm) {
+            // The ONLY held copy is a signed masterwork instance, so the confirm
+            // must take the stronger-warning path.
+            sim.addItemInstance('eastbrook_arming_sword', {
+              signer: 'Aldric',
+              rolled: { masterwork: true, stats: { str: 2 } },
+            });
+            return { ok: true, itemName: 'Eastbrook Arming Sword' };
+          }
+          sim.addItem('eastbrook_arming_sword', 1);
+          return { ok: true, itemName: 'Eastbrook Arming Sword' };
+        },
+        Boolean(variant?.confirm),
+        Boolean(variant?.picker),
+      );
+      if (!staged.ok) throw new Error(staged.reason);
+      await page.evaluate(() => {
+        const game = window.__game;
+        if (!document.querySelector('#bags')?.checkVisibility?.()) game.hud.toggleBags();
+      });
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      // Open the menu through the real handler: contextmenu on desktop, a plain
+      // tap (click) on the mobile-touch variant, on the granted item's bag row.
+      const opened = await page.evaluate((itemName) => {
+        // Occupied squares only: empty cells share the bag-item class (with
+        // .empty) and would swallow the dispatch. The staged stack is found by
+        // its aria-label (which carries the localized display name).
+        const rows = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+        const el =
+          rows.find((r) => (r.getAttribute('aria-label') ?? '').includes(itemName)) ??
+          rows[rows.length - 1];
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        const ev = new MouseEvent(
+          document.body.classList.contains('mobile-touch') ? 'click' : 'contextmenu',
+          {
+            bubbles: true,
+            cancelable: true,
+            clientX: r.x + r.width / 2,
+            clientY: r.y + r.height / 2,
+          },
+        );
+        el.dispatchEvent(ev);
+        return true;
+      }, staged.itemName);
+      if (!opened) throw new Error('no bag row to open the action menu on');
+      if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('action menu did not open');
+      if (variant?.confirm) {
+        // Click the Disenchant row (row two: the classic action is row one).
+        await page.evaluate(() => {
+          const rows = [...document.querySelectorAll('#ctx-menu .ctx-item')];
+          rows[1]?.click();
+        });
+        if (!(await pollForSize(page, '#confirm-dialog')))
+          throw new Error('destruction confirm did not open');
+        await wait(300);
+        return { clip: '#ui' };
+      }
+      if (variant?.picker) {
+        // Click the Apply Enchant row (the staged reagent's only Phase 13 action).
+        await page.evaluate(() => {
+          const rows = [...document.querySelectorAll('#ctx-menu .ctx-item')];
+          rows[rows.length - 1]?.click();
+        });
+        await wait(500);
+        if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('enchant picker did not open');
+        await wait(300);
+        return { clip: '#ui' };
+      }
+      await wait(300);
+      return { clip: '#ui' };
     },
   },
 ];

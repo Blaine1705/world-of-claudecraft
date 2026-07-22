@@ -11,9 +11,14 @@ sessions merged into release/v0.29.0 (12b QA is PR #2229). The 2026-07-20
 timing and economy amendments restructured the remaining plan to 12, 12b,
 13, 14, 14b, 15; the SECOND 2026-07-20 block (mastery and provenance, see
 Locked design decisions) inserts Phases 12c and 12d after the 12b QA, so
-the remaining order is 12c, 12d, 13, 14, 14b, 15. Phase 12c is BUILT
-(PR #2242 off release/v0.29.0, 2026-07-20; as-landed surfaces below).
-Next: Phase 12c QA (phase-12c-qa.md) once the PR merges; then 12d.
+the remaining order is 12c, 12d, 13, 14, 14b, 15. Phases 12c and 12d plus
+both QA sessions are MERGED into release/v0.29.0 (12c PR #2242, 12c QA
+PR #2246, 12d PR #2264, 12d QA PR #2267 = 682df1b7b; this pointer had
+gone stale at "12c BUILT" and was corrected by the Phase 13 session).
+Phase 13 is MERGED (PR #2269 = 90e502786 into release/v0.29.0,
+2026-07-21; as-landed surfaces below) and Phase 13 QA is COMPLETE
+(2026-07-21, PASS; the QA entry below the as-landed block). Next:
+Phase 14.
 
 ## Locked design decisions
 
@@ -1407,15 +1412,321 @@ tables, i18n key namespaces, files created)
     the catalog and every overlay. The gathering toast key helpers
     (gatherDeniedLineKey/gatherDowngradeLineKey) now return
     TranslationKey, so a typo'd or retired key fails tsc.
-- Phase 13: (planned) disenchantItem/applyEnchant/salvageItem IWorld
-  members + wire commands; plus, per the 2026-07-20 amendments, the typed
-  disenchant reagents (hybrid model, same-phase consumers) and the
-  bind-on-trade primitive applied to them; inherits the Phase 12c shared
-  throttle and quality-tiered soft-ceiling gain model on day one.
-- Phase 14b: (planned) the commission marker, bind-on-first-trade
-  enforcement, the master unbind service; the three maintainer decisions
-  are RESOLVED in OPEN items (character binding, equipment-only opt-in
-  classes, the tier-scaled unbind ladder), so STEP 0's gate is satisfied.
+- Phase 13 (built 2026-07-21, phase start 682df1b7b, PR #2269): enchanting,
+  disenchant, and salvage reachable in both hosts. IWorld
+  (src/world_api/professions.ts): disenchantItem(itemId)/
+  applyEnchant(itemId, enchantId)/salvageItem(itemId) plus
+  lastDisenchantResult/lastEnchantResult/lastSalvageResult
+  (SalvageResultView/DisenchantResultView/ApplyEnchantResultView typed
+  views). Wire: commands disenchant_item{item}/apply_enchant{item,
+  enchant}/salvage_item{item}; per-tick self-deltas denc/ench/salv
+  (outside the heavy gate, the convergence arm); pid-scoped text-free
+  SimEvents disenchantResult/enchantResult/salvageResult (the immediacy
+  arm; both arms feed the same lastX mirror, the lastCraftResult dual-arm
+  pattern; the S3 guard needs no matcher rows for text-free events, only
+  the trade deny below). Census pins moved: IWORLD_MEMBERS 259 (71 data,
+  188 method), ALL_DELTA_KEYS 54, commands 162 send / 171 dispatch; the
+  professions command cluster stays untagged in COMMAND_FACETS (matches
+  craft_item/train_recipe/place_mobile_station/harvest_node) and out of
+  JAILED_BLOCKED_COMMANDS (same treatment as its siblings).
+  Typed reagents (hybrid): rare+ disenchants ALSO yield one type-keyed
+  bind-on-trade secondary via src/sim/professions/disenchant_reagents.ts
+  typedSecondaryFor (cloth resonant_thread, leather resonant_hide, mail
+  resonant_links; sword/axe/dagger/mace/polearm resonant_steel;
+  staff/wand/bow/crossbow resonant_timber, the resolved WEAPON bucket;
+  unclassified weapons fall back to steel; rare+ pieces with no typed
+  material, e.g. jewelry, yield the primary only). Rare+ primary counts
+  moved to the APPROVED tuning: rare exactly 1 essence plus 1 secondary
+  with zero rng draws; epic/legendary exactly 1 shard plus 1-2
+  secondaries via one draw; SUB-RARE IS BYTE-IDENTICAL to pre-phase
+  behavior. DEVIATION NOTE (maintainer heads-up): the Tuning-targets row
+  "uncommon 1 to 2 arcane_dust" was NOT implemented because it conflicts
+  with the phase acceptance criterion "sub-rare disenchants are
+  byte-identical to today"; the Tuning targets header marks those rows
+  Phase 15 placeholders, so the uncommon retune is deferred to the Phase
+  15 evidence check as a flagged call. Five typed materials
+  (content/items.ts, junk kind, quality rare, sellValue 40, NO buyValue
+  per the market ruling) each consumed by one new always-known Runed
+  enchant (content/enchants.ts: enchant_weapon_runed_edge/
+  enchant_weapon_runed_focus/enchant_chest_runeweave/
+  enchant_legs_runed_hide/enchant_helmet_runed_links, essence x2 + typed
+  x1, magnitudes pinned between base and Greater per slot).
+  Bind-on-trade primitive (generic, Phase 14b extends it): payload field
+  ItemInstancePayload.bindOnTrade ARMS the lock, boundTo IS the lock;
+  secondaries mint armed via addItemInstance and stack as 12d counted
+  instanced stacks; trade.ts isTradeLocked/offerableCount gate
+  tradeSetOffer (clamp + ONE English deny 'That item is bound and cannot
+  be traded.' matcher-mapped to hud.errors.tradeBound), offerCovered,
+  removeOffer (removePreferFungible grew an optional skip predicate;
+  every other caller byte-identical), and the fitsAfterSwap capacity
+  walk; grantOffer stamps boundTo = recipient pid on first trade. The
+  foreign inspect eqi wire strips bindOnTrade by allowlist construction;
+  the self inv mirror is unfiltered. MIXED-FLEET DEPLOY NOTE: the
+  enforcement arms do not exist on pre-Phase-13 binaries, so during a
+  rolling deploy an armed copy traded on an old realm crosses unstamped;
+  exposure is bounded (minting needs the new command) and self-heals once
+  the fleet upgrades.
+  UI: bags right-click (desktop) / tap (mobile-touch, plain-use default
+  mode only) opens the shared #ctx-menu popup with the classic action as
+  row one, then Disenchant/Salvage/Apply Enchant per the pure core
+  src/ui/bag_item_context_menu.ts (UI_PURE_CORES + BARE_NAMED); painter
+  src/ui/bag_item_action_menu.ts; destruction routes through the ONE
+  Hud.confirmDialog family with the stronger warning only when the copy
+  the sim would actually consume is signed/masterwork/enchanted
+  (mirroring each action's removal order); the Apply Enchant two-step
+  picker (src/ui/enchant_apply_view.ts) is the FIRST render sink for
+  enchant names: hudChrome.enchantName.<id> covers every ENCHANTS row
+  with five non-Latin fills; result toasts via src/ui/enchanting_view.ts
+  behind three thin hud.ts drainEvents arms, each throttled deny naming
+  its own action (the 12c cross-action attribution nuance); the wheel row
+  needed no code (enchanting is a CRAFT_RING craft), pinned by
+  tests/professions_enchanting_reachable.test.ts. Mobile stacking fix:
+  body.mobile-touch #ctx-menu rises to z-index 96 above the forced
+  window-sheet 95 (tests/ctx_menu_mobile_stacking.test.ts pins both
+  directions). i18n namespaces: hudChrome.enchantName.*,
+  hudChrome.itemMenu.*, hudChrome.enchanting.*, hud.errors.tradeBound,
+  and the five reagent entity names (M16 fills in the five non-Latin
+  overlays). New sim module on the S3 scan list:
+  disenchant_reagents.ts. New tests: professions_typed_reagents,
+  professions_enchanting_commands, professions_p13_coverage,
+  bag_item_context_menu, enchant_apply_view, enchanting_view,
+  professions_enchanting_reachable, ctx_menu_mobile_stacking; the
+  Phase 3 trade payload-survival test dropped its decorative boundTo
+  fields (boundTo is now the lock; a deliberate re-pin). Known interplay
+  kept BY SCOPE: vendor buyback re-grants plain copies (a sold bound
+  reagent launders its payload; pre-existing class); bow/crossbow timber
+  rows are unreachable until such a weapon classifies in
+  WEAPON_TYPE_BY_ITEM; persisted enchant ids have no shipped_enchant_ids
+  golden (flagged as a possible follow-up, the shipped_item_ids
+  precedent).
+- Phase 13 QA (2026-07-21, QA diff 682df1b7b..90e502786, fix branch
+  fix/professions-2-phase-13-qa): PASS, zero blocking; all 13 acceptance
+  criteria verified against the real code and every validation row green.
+  REAL FIX (found by the QA capacity probe, landed test-first):
+  fitsAfterSwap modeled the giver's PRE-STAMP payload while grantOffer
+  stamps boundTo on arrival, wrong in both directions: a full receiver
+  holding a byte-equal armed slot was granted OVER capacity (17/16
+  slots), and a receiver whose byte-equal slot was already stamped to
+  them was denied a trade that genuinely fits. The model now stamps armed
+  arrivals (no rng; parity goldens untouched). REAL FIX (live keyboard
+  probe of the destroy confirm): with OK focused, Enter fired the
+  chat-open edge action (focus left the aria-modal dialog, nothing
+  activated) and Space died to the jump preventDefault, so a keyboard
+  user could cancel but never confirm; bindDialogKeyActivation
+  (src/ui/dialog_key_activation.ts) repairs the whole confirm family
+  dialog-scoped (Escape, Tab trap, and movement keys unchanged).
+  MAINTAINER-DIRECTED amendment: the Apply Enchant picker takes a
+  painter-managed ctx-menu-picker modifier (wider; max-height
+  min(60vh, 560px) desktop, 60 percent of app-vh on touch; scrolling
+  with overscroll containment; capped placement reserve). Every plain
+  paint site clears the modifier (seven sites incl. the chat channel
+  picker: keyboard-activated openers fire click with no pointerdown, so
+  clearing only at the close path was insufficient); pinned by
+  tests/ctx_menu_picker_sizing.test.ts; both picker shots re-captured
+  and the mobile picker shot added. Durable suites promoted from the QA
+  probes: professions_p13_qa_arc (offline plus live-GameServer end to
+  end), professions_p13_qa_coverage (jewelry zero-draw resolve arm,
+  trade partial clamp plus deny-once, mirror negative arms, salvage
+  unknown_item, both capacity-model directions),
+  professions_p13_races (11 interleaved destroy-vs-trade/inv_move
+  scenarios, conservation pinned in each),
+  professions_p13_result_mirror (event arm alone via the real onMessage
+  path, identical-consecutive-deny delta suppression, ordering both
+  ways, reconnect full snapshot, throttled enchant attribution), and
+  professions_p13_bound_surfaces (mail/market/vendor/bank vs armed and
+  stamped resonant copies; refusal today is EMERGENT from the #1165
+  fungible-only escrow, so the #1146 instanced-listing work must
+  re-enforce the boundTo lock explicitly, these pins are the wall).
+  Doctrine notes: consumers of repeat-deny feedback ride the drainEvents
+  arm, never lastX equality (the self-delta JSON-diff suppresses an
+  identical stash); the result-mirror handlers carry no ev.pid guard
+  (the inherited applyCraftResultEvent pattern; spectate bleed is
+  possible and unprobed, add the guard family-wide if ever confirmed
+  undesirable). Deferred as maintainer calls: salvage grants no
+  craft-skill gain (reads as by design under criterion 11's inherited
+  clause; confirm); an enchant of an offered copy mid-trade does not
+  reset the accept flags (coherent, conservation holds; stricter
+  semantics would re-run the handshake when an offered item's instance
+  composition changes); the disenchant menu row shows on all-enchanted
+  holdings and ends in a safe localized deny (UX polish candidate);
+  mail and market deny copy for bound-only holdings stays the generic
+  notEnoughItems (defer to #1146).
+- Phase 14 (built 2026-07-21, phase start 8b7bd4596, branch
+  feature/professions-2-phase-14-attunement): attunement quests, nudges,
+  work orders, tier mail, and the legibility layer. Quests: four lore
+  quests q_prof_attune_{smith,outfitter,apothecary,bombardier} (xp 150,
+  non-repeatable, no prerequisite: the masters are independent entry
+  points) on the four zone-1 anchor masters
+  (forgemistress_darva/weaver_ottilie/cook_marlow/tinker_gizzel), four
+  repeatable make-amends quests q_prof_amends_{same} (xp 100, mode
+  'return', resolvedObjectiveCounts archetypeAmends), six work orders
+  q_prof_workorder_{forge,kitchens,loom,toolworks,tannery,apothecary}
+  (repeatable, coin = floor(0.5 * summed input vendor sell value):
+  16/16/15/16/20/45 copper, xp 100, cadence-capped). The retired
+  placeholder rows q_archetype_acceptance and q_prof_make_amends are
+  GONE (content, i18n keys, every locale fill); unknown quest ids in a
+  loaded questLog are now PRUNED at load (normalize-on-load, pinned by
+  tests/quest_log_normalization.test.ts), which is what keeps
+  mid-placeholder-quest production saves loading cleanly. DECISION: the
+  attunePair completionEffect gained an optional pairId that NARROWS the
+  2039 selection whitelist to the quest's pair (never widens; recorded
+  here per the stopping rule). Consequence, accepted: pre-phase
+  characters attuned to a non-wave-one ring pair have no return path
+  until later archetype phases land; nothing crashes, pinned.
+  Mechanisms: src/sim/professions/cadence.ts (WORK_ORDER_CADENCE_TICKS
+  36000, NUDGE_CADENCE_TICKS 18000, QuestDef.repeatCadenceTicks, load
+  clamp so tick resets never brick a quest), prof_nudges.ts (1 Hz sweep:
+  text-free profTrendNudge SimEvent on the Phase 7 classifier for
+  unattuned characters, in-memory cadence that deliberately resets on
+  restart; profTierTutorial one-shot at the first tier-1 crossing,
+  persisted flag), tier_mail.ts (1 Hz sweep: one-shot-per-tier-per-major
+  congratulation letters from MASTER_TIER_LETTERS, per-craft
+  tierMailSent map with SILENT BASELINE ARMING so deploy migration and
+  fresh attunes never mail retroactively; top tier only on multi-tier
+  jumps; unknown pairs skipped), attunement_events.ts (personal
+  'attuned' + zone 'attunedZone' text-free SimEvents on the
+  masterworkZone pattern, both modes). Letters: MASTER_TIER_LETTERS in
+  content/letters.ts, 4 wave-one pairs x tiers 1..5, letterId derives as
+  'prof_tier_' + pairId with '+' to '_' + '_' + tier (the guild_trend
+  derivation, validation loop pinned); registered in both UI registries;
+  five non-Latin fills incl. localized senders. Wire: NO new IWorld
+  member, delta key, or command (census 259/54 unchanged);
+  cadenceBlockedQuests rides the existing cprof view field
+  (world_api/professions.ts), server-computed, display-mirrored,
+  re-validated server-side on accept. Persistence: questCadence,
+  tierMailSent, profTierTutorialSent on characters.state with
+  zero-default omission (zero golden regen). ROLLBACK CAVEAT: a
+  v0.29.0 reader ignores and silently drops the three new keys on
+  re-save; benign by design (tier mail re-baselines silently, the
+  tutorial can re-fire once, a work-order window frees early). UI: pure
+  cores profession_event_lines_core.ts + profession_tutorial_view.ts
+  (UI_PURE_CORES) with the tutorial modal on the confirm-dialog keyboard
+  family at z 96 over the mobile sheet; attunement preview returnCost (5
+  + 3 * switchCount) on the quest dialog AND identity card pre-commit;
+  the crafting-window learnable-at-a-master hint row through the shared
+  train_view knownness predicates + the station registry; celebration
+  banner on the craft-celebration family showing the archetype pair
+  title (no nameplate surface, per the Phase 1 QA drift note); i18n
+  namespace hudChrome.crafting.* (11 new keys), all events text-free so
+  no sim_i18n matcher rows were needed. NOTE: the legacy IWorld members
+  acceptArchetypeQuest/switchArchetype (no UI caller, ClientWorld
+  no-ops) do not celebrate or baseline-arm; they stay on the Phase 15
+  retirement list. #1295's described arms are complete (the issue was
+  already closed administratively). Phase 14 QA addition (branch
+  fix/professions-2-phase-14-qa): computeQuestState gained the
+  one-pending-identity-transition gate: while any attunePair-effect
+  quest is active, every OTHER attunePair-effect quest reports
+  'unavailable' in both hosts (the shared function; the server accept
+  path rides questState). Closes the banked-amends escalation dodge:
+  resolvedCounts is stamped at accept and turn-in never re-resolves it,
+  and new-pair attunes leave switchCount untouched, so banking two open
+  amends quests completed the second at a stale cheaper count. Pinned in
+  tests/profession_attunement_quests.test.ts (live path, abandon reopen,
+  escalated re-resolve at 8) and tests/quest_state_optimistic.test.ts
+  (mirror arm); switchHobby and plain quests stay outside the gate. QA
+  deferrals live in #2285.
+- Phase 14b (built 2026-07-21, phase start 9453ff8d8, branch
+  feature/professions-2-phase-14b-commissions): Commissions and the
+  Maker's Bond (#2207; #1298 stays open for the ORDER workflow). The
+  commission marker IS the Phase 13 bindOnTrade arm, never a parallel
+  field: the craft command grew an optional BOOLEAN `commission`
+  (widened craftItem across facet/Sim/ClientWorld/dispatch, NO census
+  change; sent only when true so a non-commission wire message is
+  byte-identical), honored server-side only for the ruled-in equipment
+  kinds via commission.ts isCommissionEligible (weapon/armor/
+  held_offhand; jewelry rides the armor kind by taxonomy). All three
+  grant arms compose the arm onto their payload (masterwork, signed,
+  and the plain arm FORCES the instance path for commissioned sub-rare
+  outputs; a multi-copy output arms every copy); signing rules are
+  untouched (commission never adds signer); CraftResult grew
+  `commission?: true`. Bind-on-first-trade and the bound-trade refusal
+  are UNCHANGED Phase 13 arms, now pinned against commissioned
+  equipment. Master unbind service: new module
+  src/sim/professions/commission.ts (S3 scan list same change) with
+  resolveUnbind on the resolveTrain deny-order doctrine
+  (silent-unknown, unbind_not_eligible, unbind_not_bound BEFORE the
+  charge arm for replay safety, unbind_out_of_range via the new
+  type-agnostic stations.ts isAtAnyStation, unbind_cannot_afford), fee
+  ladder UNBIND_FEE_BY_QUALITY_TIER [2500, 10000, 40000] indexed from
+  the uncommon rung of MASTERWORK_QUALITY_LADDER over DEF quality only
+  (clamp-to-last above per the ruling, clamp-to-FIRST below: a
+  commissioned common piece pays the uncommon fee, a free unbind would
+  leak the sink; legacy rolled.quality never moves the fee, the
+  masterwork-deed DEF-quality doctrine). unbindItem clears boundTo
+  ONLY on the EARLIEST bound slot (presence-clear, never a
+  value-compare: entity ids are not stable cross-session identities);
+  a byte-equal bound stack SPLITS (one copy re-granted unbound via
+  addItemInstance, the rest stay bound at full price each);
+  bindOnTrade survives so the piece RE-BINDS on its next trade; every
+  other marker (signer/rolled/enchant/charges) survives, pinned. New
+  command unbind_item (census 163 send / 172 dispatch, untagged in
+  COMMAND_FACETS like its cluster) and facet member unbindItem
+  (IWORLD_MEMBERS 260, methods 189). New personal text-free SimEvent
+  unbindResult {ok,itemId,reason?,fee}, a HEAVY_SELF_EVENTS member ON
+  PURPOSE: the single-copy unbind clears boundTo in place with no loot
+  event, so the result event itself re-diffs the heavy self inv mirror
+  (pinned in the live-server arc). No new delta key, no persistence
+  change (bindOnTrade/boundTo predate the phase, so NO rollback caveat
+  arises). UI: per-recipe commission checkbox in the crafting window
+  (crafting_view commissionEligible off the sim predicate; checked
+  state on the Hud so staleness repaints never untick; consumed per
+  craft, cleared on close), tooltip lines via
+  item_instance_tooltip.ts instanceBindingLines gated to the eligible
+  kinds (Phase 13 reagents stay line-free) with the bound line naming
+  NO ONE (deliberate deviation from the phase file's 'Bound to {name}'
+  sketch: the payload carries no name and ids are not stable, so
+  presence is the only honest fact); unbind window as a second gossip
+  option on every station master (unbind_view pure core in
+  UI_PURE_CORES + thin painter in the vendor family, #unbind-window in
+  the four mobile-sheet CSS groups), fee-confirm through the ONE
+  confirmDialog family. i18n: hudChrome.crafting.commission* +
+  hudChrome.unbind.* (21 keys), M16 fills in all five non-Latin
+  overlays. Deny reasons ride the text-free event (no matcher rows
+  needed). Vendor-sell laundering (sell a bound piece, buy back plain)
+  stays open BY SCOPE, the pre-existing Phase 13 class. Tests:
+  professions_p14b_commissions(.test.ts + _ui.test.ts) plus
+  instanceBindingLines arms in item_instance_tooltip.test.ts; parity
+  goldens untouched (zero regen: the default path is byte-identical
+  and unbind draws no rng). Review-pass fixes (six-reviewer fan-out):
+  the paperdoll worn tooltip routes through wornTooltipInstance
+  (item_instance_tooltip.ts), a shared projection to EXACTLY the
+  public eqi allowlist (signer/enchant/rolled), because online
+  equippedInstances decode from the stripped eqi wire and the offline
+  full payload would otherwise show the bond lines on worn gear in one
+  host only; worn identity NEVER shows the bond in either host (the
+  Phase 12d trim lineage; widening eqi would expose bond state to
+  inspectors, rejected). The mobile commission row gets a 40px
+  touch-floor rule (hud.mobile.css). The live-arc HEAVY_SELF_EVENTS
+  pin was made decisive (flush + negative control before the unbind;
+  mutation-verified: removing 'unbindResult' from the set reds it).
+  The full gate additionally caught play.html window-id parity (the
+  unbind-window div must exist in BOTH entry pages) and the
+  trainResult source-pin slice anchor (now ends at the unbindResult
+  case). Known accepted defensive arms: the stack-split path is
+  unreachable with shipped content (all eligible kinds are UNSTACKED,
+  stackSize 1) and addItemInstance has no capacity guard there; the
+  commissioned masterwork multi-copy remainder mints unsigned armed
+  copies (mirrors the plain remainder; synthetic-recipe tested).
+- Phase 14b QA (2026-07-21, QA diff cb2f026243..065763a02, fix branch
+  fix/professions-2-phase-14b-qa): PASS, zero blocking; every surface
+  above verified holding in code, the three RESOLVED decisions landed
+  exactly, all abuse probes (offline + live wire, incl. same-tick stamp
+  race and payload smuggling) PASS, 8/8 mutation checks red. QA
+  hardening: unbindItem now debits the fee AFTER the defensive
+  unreachable slot guard (no reachable behavior change; a diverging
+  future refactor fails to a no-op instead of a charge-without-clear).
+  QA coverage additions: bound-holder lifecycle pins (equip/unequip
+  byte-intact, mutation-proven; the unbind scan is bags-only so an
+  equipped bound piece resolves unbind_not_bound; bank round trip;
+  vendor sell allowed), mixed bound+unbound same-itemId equipment
+  offer, deny-order discrimination pairs, the exact STATION_RADIUS
+  boundary, the active-mobile-station exclusion, wire type guards,
+  a tool-kind tamper arm, hud source pins (unbind_window_hud.test.ts:
+  the ONE-SHOT craftCommissionOptIn delete is the load-bearing line, a
+  has() regression would arm every later craft), and the gossip
+  [data-unbind] route. The vendor buyback-plain wash stays open by
+  scope; flagged as a Phase 15 tuning-evidence input (the fee ladder
+  gives the zero-cost wash fresh economic value).
 
 ## Tuning targets (placeholders until Phase 15 tunes against live data)
 
