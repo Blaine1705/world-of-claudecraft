@@ -97,6 +97,19 @@ const STOW_ARM_BONE = 'upperarmr';
 const STOW_ARM_LIFT_RAD = -0.85;
 const HIT_REACT_COOLDOWN = 0.9;
 
+// Contact-frame hitstop (gallery melee "bite": timeScale ~0.07 for ~0.11s at
+// contact). Only THIS rig's animation clock slows — the world, the sim, and
+// every other character keep running, so it is multiplayer-safe by
+// construction. After a hold ends, a short refractory swallows re-triggers so
+// a fast swing chain cannot smear the rig into slow motion.
+const HOLD_REFRACTORY_S = 0.25;
+// Windup lean spring (gallery updateBodyFeel: -0.085 rad ease during windup,
+// released through a small forward recoil snap). Fed per frame; auto-releases
+// when feeding stops.
+const LEAN_FEED_S = 0.12;
+const LEAN_RECOIL_S = 0.14;
+const LEAN_MAX_RAD = 0.12;
+
 // Lie_Idle already lays the rig flat — a touch of extra pitch reads as a
 // surface glide; clip-less rigs (creatures) get the full procedural prone
 const SWIM_PITCH_CLIP = 0.35;
@@ -217,6 +230,15 @@ export class CharacterVisual {
   private initialized = false;
   private attackIdx = 0;
   private hitCooldown = 0;
+  // contact-frame hitstop state (see HOLD_REFRACTORY_S)
+  private holdT = 0;
+  private holdScale = 1;
+  private holdCooldown = 0;
+  // windup lean spring (see LEAN_FEED_S); applied on poseWrap pitch
+  private lean = 0;
+  private leanTarget = 0;
+  private leanFeed = 0;
+  private leanRecoil = 0;
   private pendingDt = 0;
   private swimPitch = 0;
   private spinAngle = 0;
@@ -347,6 +369,7 @@ export class CharacterVisual {
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean): void {
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
     // Deferred sheathe swap: lands at the gesture's windup peak (see
     // setWeaponStowed), where the clip is also cut so the chop's downswing never
     // plays. Ticks even when `animate` is false so a throttled rig still settles.
@@ -401,7 +424,21 @@ export class CharacterVisual {
     const proneAngle = this.action(this.def.clips.swim) ? SWIM_PITCH_CLIP : SWIM_PITCH_PROCEDURAL;
     const wantPitch = s.swimming && !s.dead ? proneAngle : 0;
     this.swimPitch += (wantPitch - this.swimPitch) * Math.min(1, dt * 8);
-    this.poseWrap.rotation.x = this.swimPitch;
+    // windup lean/recoil spring: while fed (setWindupLean each ceremony frame)
+    // the body eases back toward the target; when feeding stops — the release —
+    // it snaps forward through a small recoil, then settles to neutral
+    if (this.leanFeed > 0) {
+      this.leanFeed -= dt;
+      this.lean += (this.leanTarget - this.lean) * Math.min(1, dt * 10);
+      if (this.leanFeed <= 0) this.leanRecoil = LEAN_RECOIL_S;
+    } else if (this.leanRecoil > 0) {
+      this.leanRecoil -= dt;
+      this.lean += (-this.leanTarget * 0.45 - this.lean) * Math.min(1, dt * 22);
+    } else if (this.lean !== 0) {
+      this.lean += -this.lean * Math.min(1, dt * 9);
+      if (Math.abs(this.lean) < 1e-3) this.lean = 0;
+    }
+    this.poseWrap.rotation.x = this.swimPitch + this.lean;
     this.poseWrap.rotation.z = 0;
     this.poseWrap.position.y =
       s.swimming && !s.dead
@@ -419,7 +456,15 @@ export class CharacterVisual {
       }
     }
 
-    this.pendingDt = Math.min(MIXER_DT_CAP, this.pendingDt + dt);
+    // hitstop: the held rig integrates a slowed dt (its clock, not the world's)
+    this.pendingDt = Math.min(
+      MIXER_DT_CAP,
+      this.pendingDt + (this.holdT > 0 ? dt * this.holdScale : dt),
+    );
+    if (this.holdT > 0) {
+      this.holdT -= dt;
+      if (this.holdT <= 0) this.holdCooldown = HOLD_REFRACTORY_S;
+    }
     if (animate) {
       this.mixer.update(this.pendingDt);
       this.pendingDt = 0;
@@ -515,6 +560,33 @@ export class CharacterVisual {
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
+  }
+
+  /** Contact-frame hitstop: hold THIS rig's animation at `scale` speed for
+   *  `dur` seconds (the melee "bite"; also the struck target's flinch-freeze).
+   *  Overlapping requests merge — longest duration, slowest scale — and the
+   *  post-hold refractory swallows rapid re-triggers, so stacking strikes can
+   *  never chain the rig into visible slow motion. */
+  holdFrame(scale: number, dur: number): void {
+    if (this.deadLock || dur <= 0) return;
+    if (this.holdT > 0) {
+      this.holdT = Math.max(this.holdT, dur);
+      this.holdScale = Math.min(this.holdScale, Math.max(0.02, scale));
+      return;
+    }
+    if (this.holdCooldown > 0) return;
+    this.holdT = dur;
+    this.holdScale = Math.max(0.02, scale);
+  }
+
+  /** Feed the cast-windup lean for this frame (anticipation): the body eases
+   *  toward `amount` rad of backward pitch while fed each frame; once feeding
+   *  stops (the release moment) the spring snaps through a small forward
+   *  recoil back to neutral. Rig-group rotation only — no bone surgery. */
+  setWindupLean(amount: number): void {
+    if (this.deadLock) return;
+    this.leanTarget = -Math.min(LEAN_MAX_RAD, Math.max(0, amount));
+    this.leanFeed = LEAN_FEED_S;
   }
 
   playEmote(id: OverheadEmoteId, repeatsOverride?: number): void {
