@@ -32,6 +32,15 @@ export interface SequencerHost {
     vertical: boolean,
   ): void;
   decalXZ(x: number, z: number, radius: number, colorHex: number, style: string, dur: number): void;
+  flipbookAt(
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    colorHex: number,
+    sheet: string,
+    hdr: number,
+  ): void;
   pillarAt(
     x: number,
     y: number,
@@ -155,8 +164,8 @@ function lighten(color: number, amount: number): number {
 }
 
 const DECAL_BY_SPEC: Record<string, string> = {
-  crack: 'rune',
-  scorch: 'ember',
+  crack: 'crack',
+  scorch: 'char',
   rune: 'rune',
   portal: 'rune',
 };
@@ -164,10 +173,27 @@ const DECAL_BY_SPEC: Record<string, string> = {
 function decalStyleOf(spec: AbilityVfxFullSpec): string {
   if (spec.decal) return DECAL_BY_SPEC[spec.decal] ?? 'rune';
   const p = spec.palette;
-  if (p === 'fire' || p === 'blood' || p === 'physical') return 'ember';
+  if (p === 'fire' || p === 'blood') return 'ember';
+  if (p === 'physical' || p === 'storm') return 'char';
   if (p === 'frost' || p === 'moon') return 'rime';
   return 'rune';
 }
+
+// Which flipbook sheet each school's impact plays (the gallery PAL_STYLE map).
+const SHEET_BY_PALETTE: Record<string, string> = {
+  storm: 'electric',
+  arcane: 'electric',
+  physical: 'electric',
+  fire: 'flame',
+  blood: 'flame',
+  frost: 'shatter',
+  moon: 'radiance',
+  holy: 'radiance',
+  gold: 'radiance',
+  shadow: 'void',
+  venom: 'void',
+  nature: 'verdant',
+};
 
 export class ArchetypeSequencer {
   private slots: SeqSlot[] = [];
@@ -442,6 +468,22 @@ export class ArchetypeSequencer {
     const arch = spec.archetype;
     const gentle = arch === 'heal' || arch === 'buff' || arch === 'cc';
     let n = 0;
+    // hero impact sheet (gallery impactStack fires the flipbook first): the
+    // authored spec wins — an explicit true forces it even on gentle
+    // archetypes, false suppresses it, and the default fires only for
+    // non-gentle impacts. Tier-0-only spectacle; sheet picked per school.
+    if (slot.tier === 0 && o.flipbook !== false && (o.flipbook === true || !gentle)) {
+      host.flipbookAt(
+        slot.ix,
+        slot.iy,
+        slot.iz,
+        2 * cs,
+        slot.color,
+        SHEET_BY_PALETTE[spec.palette] ?? 'electric',
+        spec.finisher ? 1.6 : 1.25,
+      );
+      n++;
+    }
     // ground ring (rings default ON except when spec turns them off)
     if (o.ring !== false && (o.ring !== undefined || !gentle)) {
       const base =

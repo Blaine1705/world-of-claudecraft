@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { AbilityVfxFullSpec } from '../ability_vfx_core';
 import { type DecalStyle, GroundDecals } from './decals';
+import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
@@ -129,6 +130,7 @@ export class AbilityVfxFx implements SequencerHost {
   private overlay: OverlaySprites;
   private pillars: LightPillars;
   private shells: BuffShells;
+  private flipbooks: ImpactFlipbooks;
   private windups = new Map<number, WindupState>();
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
@@ -186,6 +188,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.overlay = new OverlaySprites(scene, tex);
     this.pillars = new LightPillars(scene);
     this.shells = new BuffShells(scene);
+    this.flipbooks = new ImpactFlipbooks(scene);
   }
 
   // Wired once by the painter: particle bursts ride the pooled Vfx cloud,
@@ -408,7 +411,8 @@ export class AbilityVfxFx implements SequencerHost {
   // spawn one of every pooled primitive so their meshes — visible=false until
   // first use, hence invisible to the prewarm's compile passes — render during
   // the boot prewarm frames instead of linking their shaders on the first
-  // spec'd cast. Each decal style binds its texture so all three upload now.
+  // spec'd cast. Each decal style binds its texture so the whole set uploads
+  // now, and the flipbook prewarm does the same for the six impact sheets.
   // The prewarm's finally-block clear() hides everything again.
   prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
     const gy = this.groundY(x, z);
@@ -417,6 +421,10 @@ export class AbilityVfxFx implements SequencerHost {
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'ember', 1.2);
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'rime', 1.2);
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'rune', 1.2);
+    this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'crack', 1.2);
+    this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'char', 1.2);
+    // builds all six flipbook sheets and binds one per slot for the texture walk
+    this.flipbooks.prewarm(x, y + 1.1, z);
     this.pillars.spawn(x, gy, z, 1, 6, 0xffffff, 0.7);
     this.shells.flash(entityId, 0xffffff, 0.7);
     this.ribbons.spawnSlashStyled({ x, y: y + 1.1, z }, 0xffffff, 'horizontal');
@@ -463,8 +471,23 @@ export class AbilityVfxFx implements SequencerHost {
     style: string,
     dur: number,
   ): void {
-    const s: DecalStyle = style === 'ember' || style === 'rime' ? style : 'rune';
+    const s: DecalStyle =
+      style === 'ember' || style === 'rime' || style === 'crack' || style === 'char'
+        ? style
+        : 'rune';
     this.decals.spawn(x, this.groundY(x, z), z, radius, colorHex, s, dur);
+  }
+
+  flipbookAt(
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    colorHex: number,
+    sheet: string,
+    hdr: number,
+  ): void {
+    this.flipbooks.spawn(x, y, z, size, colorHex, hdr * this.intensity(), asFlipbookStyle(sheet));
   }
 
   pillarAt(
@@ -727,6 +750,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.camera.getWorldPosition(camPosScratch);
     this.ribbons.update(dt, camPosScratch);
     this.rings.update(dt, this.camera.quaternion);
+    this.flipbooks.update(dt, this.camera.quaternion);
     this.decals.update(dt);
     this.pillars.update(dt);
     this.shells.update(dt, this.time, this.frame, this.anchor);
@@ -785,6 +809,7 @@ export class AbilityVfxFx implements SequencerHost {
   clear(): void {
     this.ribbons.clear();
     this.rings.clear();
+    this.flipbooks.clear();
     this.decals.clear();
     this.pillars.clear();
     this.shells.clear();

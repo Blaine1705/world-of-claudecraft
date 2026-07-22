@@ -11,6 +11,8 @@ function rnd(): number {
   return seedState / 0x7fffffff;
 }
 const rr = (a: number, b: number): number => a + (b - a) * rnd();
+const easeOutCubic = (t: number): number => 1 - (1 - t) ** 3;
+const easeOutQuart = (t: number): number => 1 - (1 - t) ** 4;
 
 function makeCanvas(
   size: number,
@@ -190,6 +192,98 @@ function rimeTexture(): THREE.CanvasTexture {
   });
 }
 
+// Jagged radiating fissures with branch offshoots, ported from the gallery's
+// crackGlowTex (earthquake cracks). Near-white so the decal shader's uColor
+// carries the school; its dissolve edge supplies the hot rim.
+function crackTexture(): THREE.CanvasTexture {
+  return makeCanvas(256, (g, s) => {
+    const c = s / 2;
+    g.strokeStyle = 'rgba(245,248,255,0.9)';
+    g.lineCap = 'round';
+    g.shadowColor = 'rgba(215,220,235,0.9)';
+    g.shadowBlur = 7;
+    for (let k = 0; k < 7; k++) {
+      const a0 = (k / 7) * Math.PI * 2 + rr(-0.2, 0.2);
+      let x = c;
+      let y = c;
+      let a = a0;
+      let d = 0;
+      g.lineWidth = 3.2;
+      g.beginPath();
+      g.moveTo(x, y);
+      while (d < c * 0.86) {
+        const step = rr(9, 20);
+        a += rr(-0.55, 0.55);
+        x += Math.cos(a) * step;
+        y += Math.sin(a) * step;
+        d += step;
+        g.lineTo(x, y);
+        if (rnd() < 0.3) {
+          // branch offshoot, then keep walking the main fissure
+          g.moveTo(x, y);
+          g.lineTo(
+            x + Math.cos(a + rr(-1.4, 1.4)) * rr(8, 22),
+            y + Math.sin(a + rr(-1.4, 1.4)) * rr(8, 22),
+          );
+          g.moveTo(x, y);
+        }
+        g.lineWidth = Math.max(0.6, g.lineWidth * 0.92);
+      }
+      g.stroke();
+    }
+    g.shadowBlur = 0;
+  });
+}
+
+// Scorched sunburst: broken radiating burn streaks over a mottled soot annulus
+// (the gallery 'char' ground residue, recut for the pool's single additive
+// decal path — structure carries the burnt read, uColor the school).
+function charTexture(): THREE.CanvasTexture {
+  return makeCanvas(256, (g, s) => {
+    const c = s / 2;
+    const grad = g.createRadialGradient(c, c, 0, c, c, c * 0.45);
+    grad.addColorStop(0, 'rgba(255,255,255,0.5)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grad;
+    g.beginPath();
+    g.arc(c, c, c * 0.45, 0, Math.PI * 2);
+    g.fill();
+    g.lineCap = 'round';
+    for (let k = 0; k < 18; k++) {
+      const a = (k / 18) * Math.PI * 2 + rr(-0.08, 0.08);
+      const inner = c * rr(0.16, 0.24);
+      const outer = c * (k % 2 ? rr(0.5, 0.65) : rr(0.7, 0.92));
+      g.strokeStyle = `rgba(255,255,255,${rr(0.35, 0.6).toFixed(3)})`;
+      g.lineWidth = k % 2 ? rr(2, 3.5) : rr(4, 6.5);
+      // a gap partway along each streak sells the charred crumble
+      const gap0 = rr(0.45, 0.7);
+      const gap1 = gap0 + rr(0.06, 0.14);
+      g.beginPath();
+      g.moveTo(c + Math.cos(a) * inner, c + Math.sin(a) * inner);
+      g.lineTo(
+        c + Math.cos(a) * (inner + (outer - inner) * gap0),
+        c + Math.sin(a) * (inner + (outer - inner) * gap0),
+      );
+      g.moveTo(
+        c + Math.cos(a) * (inner + (outer - inner) * gap1),
+        c + Math.sin(a) * (inner + (outer - inner) * gap1),
+      );
+      g.lineTo(c + Math.cos(a) * outer, c + Math.sin(a) * outer);
+      g.stroke();
+    }
+    for (let i = 0; i < 150; i++) {
+      const a = rnd() * Math.PI * 2;
+      const d = (0.3 + rnd() ** 1.5 * 0.55) * c;
+      const rad = rr(2, 7) * (1 - (d / c) * 0.45);
+      const alpha = 0.22 * (1 - Math.abs(d / c - 0.5));
+      g.fillStyle = `rgba(255,255,255,${Math.max(0, alpha).toFixed(3)})`;
+      g.beginPath();
+      g.arc(c + Math.cos(a) * d, c + Math.sin(a) * d, rad, 0, Math.PI * 2);
+      g.fill();
+    }
+  });
+}
+
 // 2x2 overlay sprite atlas: soft glow, four-point star, rune diamond, spark.
 // Cell indices are the OVERLAY_CELL constants; append means a bigger grid.
 export const OVERLAY_ATLAS_GRID = 2;
@@ -257,12 +351,308 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
   });
 }
 
+// ---- impact flipbook sheets (gallery flipbookSheet, arc_bolt_preview.js) ---
+// 8x8 grayscale explosion sheets, one NEUTRAL sheet per elemental school,
+// tinted by the flipbook shader's uTint. Built lazily per style and cached
+// (~4 MB GPU each); ImpactFlipbooks.prewarm builds and binds all six during
+// the boot prewarm so none first-uploads mid-combat.
+
+export const FLIPBOOK_GRID = 8;
+export const FLIPBOOK_STYLES = [
+  'flame',
+  'shatter',
+  'electric',
+  'void',
+  'verdant',
+  'radiance',
+] as const;
+export type FlipbookStyle = (typeof FLIPBOOK_STYLES)[number];
+
+const flipbookCache = new Map<FlipbookStyle, THREE.CanvasTexture>();
+
+export function flipbookSheet(style: FlipbookStyle): THREE.CanvasTexture {
+  let tex = flipbookCache.get(style);
+  if (!tex) {
+    const cell = 128;
+    tex = makeCanvas(FLIPBOOK_GRID * cell, (g) => {
+      for (let f = 0; f < FLIPBOOK_GRID * FLIPBOOK_GRID; f++) {
+        const t = f / (FLIPBOOK_GRID * FLIPBOOK_GRID - 1);
+        const cx = (f % FLIPBOOK_GRID) * cell + cell / 2;
+        const cy = Math.floor(f / FLIPBOOK_GRID) * cell + cell / 2;
+        g.save();
+        g.beginPath();
+        g.rect(cx - cell / 2, cy - cell / 2, cell, cell);
+        g.clip();
+        g.globalCompositeOperation = 'lighter';
+        FLIP_FRAME[style](g, cx, cy, t);
+        g.restore();
+      }
+    });
+    flipbookCache.set(style, tex);
+  }
+  return tex;
+}
+
+// Per-style frame painters (gallery drawFlipFrame), each drawing one frame of
+// the school's explosion anatomy at time t in [0, 1].
+const FLIP_FRAME: Record<
+  FlipbookStyle,
+  (g: CanvasRenderingContext2D, cx: number, cy: number, t: number) => void
+> = {
+  electric(g, cx, cy, t) {
+    // the original: flash → eroding ring → filaments
+    const flashA = Math.max(0, 1 - t * 2.6) ** 1.7;
+    if (flashA > 0.01) {
+      const r0 = 8 + 30 * easeOutCubic(Math.min(1, t * 3));
+      const grad = g.createRadialGradient(cx, cy, 0, cx, cy, r0);
+      grad.addColorStop(0, `rgba(255,255,255,${flashA})`);
+      grad.addColorStop(0.5, `rgba(210,214,224,${(flashA * 0.6).toFixed(3)})`);
+      grad.addColorStop(1, 'rgba(150,155,170,0)');
+      g.fillStyle = grad;
+      g.beginPath();
+      g.arc(cx, cy, r0, 0, Math.PI * 2);
+      g.fill();
+    }
+    const ringR = 8 + 50 * easeOutQuart(t);
+    g.strokeStyle = `rgba(215,220,232,${((1 - t) ** 1.4 * 0.9).toFixed(3)})`;
+    g.lineWidth = 6.5 * (1 - t) + 1.2;
+    g.shadowColor = 'rgba(210,214,226,0.8)';
+    g.shadowBlur = 8;
+    g.beginPath();
+    g.arc(cx, cy, ringR, 0, Math.PI * 2);
+    g.stroke();
+    g.shadowBlur = 0;
+    const nFil = Math.max(2, Math.floor(11 * (1 - t * 0.7)));
+    g.strokeStyle = `rgba(240,243,250,${((1 - t) ** 1.2).toFixed(3)})`;
+    g.lineWidth = 2.1 * (1 - t) + 0.5;
+    for (let k = 0; k < nFil; k++) {
+      const a = rnd() * Math.PI * 2;
+      let x = cx + Math.cos(a) * 6;
+      let y = cy + Math.sin(a) * 6;
+      let ang = a;
+      let d = 0;
+      g.beginPath();
+      g.moveTo(x, y);
+      const reach = ringR * rr(0.75, 1.2);
+      while (d < reach) {
+        const step = rr(5, 11);
+        ang += rr(-0.6, 0.6);
+        x += Math.cos(ang) * step;
+        y += Math.sin(ang) * step;
+        d += step;
+        g.lineTo(x, y);
+      }
+      g.stroke();
+    }
+    if (t > 0.45) drawSmokeBlobs(g, cx, cy, t, 5, 8 + 50 * easeOutQuart(t) * 0.7);
+  },
+  flame(g, cx, cy, t) {
+    // roiling fire: blobs rise and lick upward
+    const n = Math.max(3, Math.floor(12 * (1 - t * 0.5)));
+    for (let k = 0; k < n; k++) {
+      const a = rnd() * Math.PI * 2;
+      const spread = 10 + 34 * easeOutCubic(t);
+      const x = cx + Math.cos(a) * spread * rr(0.2, 1);
+      const y = cy + Math.sin(a) * spread * rr(0.15, 0.7) - t * 34 * rr(0.4, 1); // rises
+      const rad = rr(8, 22) * (1 - t * 0.45);
+      const heat = rr(0.55, 1);
+      const grad = g.createRadialGradient(x, y, 0, x, y, rad);
+      grad.addColorStop(0, `rgba(255,255,255,${((1 - t) ** 1.1 * heat).toFixed(3)})`);
+      grad.addColorStop(0.45, `rgba(200,200,205,${((1 - t) ** 1.3 * heat * 0.7).toFixed(3)})`);
+      grad.addColorStop(1, 'rgba(120,120,125,0)');
+      g.fillStyle = grad;
+      g.beginPath();
+      g.arc(x, y, rad, 0, Math.PI * 2);
+      g.fill();
+    }
+    if (t < 0.3) {
+      // ignition flash
+      const grad = g.createRadialGradient(cx, cy, 0, cx, cy, 26);
+      grad.addColorStop(0, `rgba(255,255,255,${(1 - t / 0.3).toFixed(3)})`);
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = grad;
+      g.beginPath();
+      g.arc(cx, cy, 26, 0, Math.PI * 2);
+      g.fill();
+    }
+    if (t > 0.4) drawSmokeBlobs(g, cx, cy - t * 26, t, 6, 34);
+  },
+  shatter(g, cx, cy, t) {
+    // angular shards flying outward + glints
+    const e = easeOutQuart(t);
+    for (let k = 0; k < 10; k++) {
+      const a = (k / 10) * Math.PI * 2 + 0.4;
+      const d = 6 + 52 * e * rr(0.75, 1);
+      const x = cx + Math.cos(a) * d;
+      const y = cy + Math.sin(a) * d;
+      const len = rr(8, 18) * (1 - t * 0.5);
+      const wid = len * 0.36;
+      const rot = a + e * rr(1, 3);
+      const alpha = (1 - t) ** 1.15;
+      g.save();
+      g.translate(x, y);
+      g.rotate(rot);
+      g.fillStyle = `rgba(235,240,248,${alpha.toFixed(3)})`;
+      g.beginPath();
+      g.moveTo(0, -len / 2);
+      g.lineTo(wid / 2, len / 4);
+      g.lineTo(0, len / 2);
+      g.lineTo(-wid / 2, len / 4);
+      g.closePath();
+      g.fill();
+      g.restore();
+    }
+    // crystalline glints (plus signs)
+    g.strokeStyle = `rgba(255,255,255,${((1 - t) ** 1.6).toFixed(3)})`;
+    g.lineWidth = 1.6;
+    for (let k = 0; k < 5; k++) {
+      const a = rnd() * Math.PI * 2;
+      const d = rr(4, 40 * e + 8);
+      const x = cx + Math.cos(a) * d;
+      const y = cy + Math.sin(a) * d;
+      const s = rr(3, 7);
+      g.beginPath();
+      g.moveTo(x - s, y);
+      g.lineTo(x + s, y);
+      g.moveTo(x, y - s);
+      g.lineTo(x, y + s);
+      g.stroke();
+    }
+    if (t < 0.25) {
+      const grad = g.createRadialGradient(cx, cy, 0, cx, cy, 24);
+      grad.addColorStop(0, `rgba(255,255,255,${(1 - t / 0.25).toFixed(3)})`);
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = grad;
+      g.beginPath();
+      g.arc(cx, cy, 24, 0, Math.PI * 2);
+      g.fill();
+    }
+  },
+  radiance(g, cx, cy, t) {
+    // gentle glory: soft bloom + rotating rays
+    const glowR = 14 + 30 * easeOutCubic(Math.min(1, t * 1.6));
+    const alpha = (1 - t) ** 1.15;
+    const grad = g.createRadialGradient(cx, cy, 0, cx, cy, glowR);
+    grad.addColorStop(0, `rgba(255,255,255,${alpha.toFixed(3)})`);
+    grad.addColorStop(0.55, `rgba(230,232,238,${(alpha * 0.5).toFixed(3)})`);
+    grad.addColorStop(1, 'rgba(200,202,210,0)');
+    g.fillStyle = grad;
+    g.beginPath();
+    g.arc(cx, cy, glowR, 0, Math.PI * 2);
+    g.fill();
+    g.strokeStyle = `rgba(255,255,255,${(alpha * 0.85).toFixed(3)})`;
+    for (let k = 0; k < 12; k++) {
+      const a = (k / 12) * Math.PI * 2 + t * 0.7;
+      const inner = glowR * 0.4;
+      const outer = glowR * rr(1.15, 1.7);
+      g.lineWidth = k % 3 === 0 ? 2.4 : 1.1;
+      g.beginPath();
+      g.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner);
+      g.lineTo(cx + Math.cos(a) * outer, cy + Math.sin(a) * outer);
+      g.stroke();
+    }
+  },
+  void(g, cx, cy, t) {
+    // implosion: ring contracts, tendrils curl inward
+    const ringR = 56 * (1 - easeOutCubic(t)) + 7;
+    const alpha = Math.min(1, t * 2.5) ** 0.8 * (1 - t) ** 0.55;
+    g.strokeStyle = `rgba(225,220,240,${alpha.toFixed(3)})`;
+    g.lineWidth = 5 * (1 - t) + 1.6;
+    g.shadowColor = 'rgba(200,190,230,0.8)';
+    g.shadowBlur = 9;
+    g.beginPath();
+    g.arc(cx, cy, ringR, 0, Math.PI * 2);
+    g.stroke();
+    g.shadowBlur = 0;
+    g.lineWidth = 1.8;
+    for (let k = 0; k < 7; k++) {
+      const a0 = (k / 7) * Math.PI * 2 + t * 2;
+      g.beginPath();
+      for (let s = 0; s <= 8; s++) {
+        const u = s / 8;
+        const a = a0 + u * 1.6;
+        const d = ringR + (1 - u) * 22;
+        const x = cx + Math.cos(a) * d;
+        const y = cy + Math.sin(a) * d;
+        if (s === 0) g.moveTo(x, y);
+        else g.lineTo(x, y);
+      }
+      g.strokeStyle = `rgba(210,205,232,${(alpha * 0.7).toFixed(3)})`;
+      g.stroke();
+    }
+    if (t > 0.72) {
+      // collapse pop
+      const p = (t - 0.72) / 0.28;
+      const grad = g.createRadialGradient(cx, cy, 0, cx, cy, 30 * p + 6);
+      grad.addColorStop(0, `rgba(255,255,255,${(1 - p).toFixed(3)})`);
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = grad;
+      g.beginPath();
+      g.arc(cx, cy, 30 * p + 6, 0, Math.PI * 2);
+      g.fill();
+    }
+  },
+  verdant(g, cx, cy, t) {
+    // petals/leaves spiraling out on soft bloom
+    const e = easeOutCubic(t);
+    const grad = g.createRadialGradient(cx, cy, 0, cx, cy, 20 + 18 * e);
+    grad.addColorStop(0, `rgba(245,248,242,${((1 - t) ** 1.3).toFixed(3)})`);
+    grad.addColorStop(1, 'rgba(210,220,205,0)');
+    g.fillStyle = grad;
+    g.beginPath();
+    g.arc(cx, cy, 20 + 18 * e, 0, Math.PI * 2);
+    g.fill();
+    for (let k = 0; k < 10; k++) {
+      const a = (k / 10) * Math.PI * 2 + e * 2.4 + k * 0.4;
+      const d = 6 + 44 * e * rr(0.7, 1);
+      const x = cx + Math.cos(a) * d;
+      const y = cy + Math.sin(a) * d;
+      const alpha = (1 - t) ** 1.1;
+      g.save();
+      g.translate(x, y);
+      g.rotate(a + e * 3);
+      g.fillStyle = `rgba(235,242,230,${alpha.toFixed(3)})`;
+      g.beginPath();
+      g.ellipse(0, 0, rr(6, 10) * (1 - t * 0.4), rr(2.5, 4), 0, 0, Math.PI * 2);
+      g.fill();
+      g.restore();
+    }
+  },
+};
+
+function drawSmokeBlobs(
+  g: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  t: number,
+  n: number,
+  spread: number,
+): void {
+  const sA = Math.max(0, (t - 0.4) * 0.55 * (1 - t));
+  for (let k = 0; k < n; k++) {
+    const a = rnd() * Math.PI * 2;
+    const d = rr(8, spread);
+    const x = cx + Math.cos(a) * d;
+    const y = cy + Math.sin(a) * d;
+    const rad = rr(12, 26);
+    const grad = g.createRadialGradient(x, y, 0, x, y, rad);
+    grad.addColorStop(0, `rgba(120,124,136,${sA.toFixed(3)})`);
+    grad.addColorStop(1, 'rgba(120,124,136,0)');
+    g.fillStyle = grad;
+    g.beginPath();
+    g.arc(x, y, rad, 0, Math.PI * 2);
+    g.fill();
+  }
+}
+
 export interface AbilityVfxTextures {
   noise: THREE.CanvasTexture;
   ribbon: THREE.CanvasTexture;
   rune: THREE.CanvasTexture;
   ember: THREE.CanvasTexture;
   rime: THREE.CanvasTexture;
+  crack: THREE.CanvasTexture;
+  char: THREE.CanvasTexture;
   overlay: THREE.CanvasTexture;
 }
 
@@ -277,6 +667,8 @@ export function abilityVfxTextures(): AbilityVfxTextures {
       rune: runeRingTexture(),
       ember: emberRingTexture(),
       rime: rimeTexture(),
+      crack: crackTexture(),
+      char: charTexture(),
       overlay: overlayAtlasTexture(),
     };
   }

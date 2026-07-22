@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import type { AbilityVfxTextures } from './fx_textures';
 
-// Fading ground decals (scorch embers, frost rime, arcane runes), ported from
+// Fading ground decals (scorch embers, frost rime, arcane runes, earth
+// cracks, charred sunbursts), ported from
 // the gallery's dissolve decal shader (arc_bolt_preview.js, decals section):
 // visible where noise > uDissolve, with a bright dissolve edge, so marks etch
 // in and burn away instead of alpha-popping. Fixed slot pool, one shared
@@ -10,7 +11,7 @@ import type { AbilityVfxTextures } from './fx_textures';
 
 const DECAL_SLOTS = 12;
 
-export type DecalStyle = 'ember' | 'rime' | 'rune';
+export type DecalStyle = 'ember' | 'rime' | 'rune' | 'crack' | 'char';
 
 interface DecalSlot {
   mesh: THREE.Mesh;
@@ -27,7 +28,7 @@ export class GroundDecals {
   private maps: Record<DecalStyle, THREE.CanvasTexture>;
 
   constructor(scene: THREE.Scene, tex: AbilityVfxTextures) {
-    this.maps = { ember: tex.ember, rime: tex.rime, rune: tex.rune };
+    this.maps = { ember: tex.ember, rime: tex.rime, rune: tex.rune, crack: tex.crack, char: tex.char };
     const geo = new THREE.CircleGeometry(1, 24);
     const proto = new THREE.ShaderMaterial({
       uniforms: {
