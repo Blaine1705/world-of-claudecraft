@@ -26,8 +26,6 @@ import {
   resolvePosition,
 } from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
-import * as escortMod from './escort';
-import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
   cleanseFriendlyNpcAuras,
@@ -208,6 +206,8 @@ import {
   tickGroundAoEs,
 } from './entity_roster';
 import { canEquipItem, resolveEquipSlot } from './equipment_rules';
+import * as escortMod from './escort';
+import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';

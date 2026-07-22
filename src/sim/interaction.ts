@@ -27,12 +27,12 @@ import { bagCapacity, fitsAll } from './bags';
 import { HARVEST_COMPONENT_SPECIMENS } from './content/professions';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
-import { tryStartEscort } from './escort';
 import {
   activateNythraxisRelic,
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {

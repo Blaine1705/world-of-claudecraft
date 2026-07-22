@@ -31,8 +31,8 @@ import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
-import { isEscortNpcTemplate } from '../escort';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
+import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import {
   capRiftNonLethalMechanicDamage,

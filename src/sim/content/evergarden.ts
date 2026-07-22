@@ -123,9 +123,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 9,
     aggroRadius: 0, // clipped leaves grazing the lawn; it minds its own shape
-    loot: [
-      { itemId: 'evergarden_bloom_clipping', chance: 0.65, questId: 'q_eg_bloom_clippings' },
-    ],
+    loot: [{ itemId: 'evergarden_bloom_clipping', chance: 0.65, questId: 'q_eg_bloom_clippings' }],
     scale: 1.15,
     color: 0x3f7e3c,
   },
@@ -199,7 +197,8 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
     facing: -2.6,
     color: 0x8a9a6a,
     questIds: ['q_eg_gate_report'],
-    greeting: 'Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy.',
+    greeting:
+      'Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy.',
   },
   head_gardener_amaranth: {
     id: 'head_gardener_amaranth',
@@ -209,7 +208,8 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
     facing: 2.8,
     color: 0xb46a7a,
     questIds: ['q_eg_gate_report', 'q_eg_hungry_shapes', 'q_eg_who_trims_the_hedges'],
-    greeting: 'Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams.',
+    greeting:
+      'Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams.',
   },
   wickmother_sorrel: {
     id: 'wickmother_sorrel',
@@ -235,7 +235,8 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
       'q_eg_four_statues',
       'q_eg_bull_of_the_court',
     ],
-    greeting: 'Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks.',
+    greeting:
+      'Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks.',
   },
 };
 

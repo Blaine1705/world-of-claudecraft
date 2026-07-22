@@ -218,7 +218,8 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
     facing: 1.0,
     color: 0xc9b07a,
     questIds: ['q_pr_down_to_drifthaven'],
-    greeting: 'Out of the black trees at last. Breathe, stranger, the sun holds this side of the pass.',
+    greeting:
+      'Out of the black trees at last. Breathe, stranger, the sun holds this side of the pass.',
   },
   salvage_boss_ryna: {
     id: 'salvage_boss_ryna',
@@ -233,7 +234,8 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
       'q_pr_scuttler_cull',
       'q_pr_the_lost_navigator',
     ],
-    greeting: 'A $C with working arms, good. The wreck line pays well, if the crabs leave you enough fingers to count it.',
+    greeting:
+      'A $C with working arms, good. The wreck line pays well, if the crabs leave you enough fingers to count it.',
   },
   pearlmother_isha: {
     id: 'pearlmother_isha',
@@ -258,7 +260,8 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
       'q_pr_what_the_drums_guard',
       'q_pr_idol_guardian',
     ],
-    greeting: 'Quiet now. The drums count everything that walks under the trees, and they have already counted you.',
+    greeting:
+      'Quiet now. The drums count everything that walks under the trees, and they have already counted you.',
   },
 };
 export const PALMREACH_QUESTS: Record<string, QuestDef> = {
@@ -369,9 +372,14 @@ export const PALMREACH_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'hermit_okku',
     text: 'The divers will not step past the treeline, $N, and I will not ask them to. You have heard the drums by now: everyone does, by the second night. One man on this island ever walked toward that sound and came back. Okku. He camps under the great banyans at the Vinefall, deep up the Tangle road. Find him, and ask him what the green is hiding.',
     completionText:
-      'Isha sent you? The Pearl-Mother has not spoken my name in years. Sit out of the vines\' reach, $N, and I will tell you what I know: the drums are not the danger. They are the warning.',
+      "Isha sent you? The Pearl-Mother has not spoken my name in years. Sit out of the vines' reach, $N, and I will tell you what I know: the drums are not the danger. They are the warning.",
     objectives: [
-      { type: 'interact', targetNpcId: 'hermit_okku', count: 1, label: 'Find Okku at the Vinefall' },
+      {
+        type: 'interact',
+        targetNpcId: 'hermit_okku',
+        count: 1,
+        label: 'Find Okku at the Vinefall',
+      },
     ],
     xpReward: 2800,
     copperReward: 1100,
@@ -387,7 +395,9 @@ export const PALMREACH_QUESTS: Record<string, QuestDef> = {
     text: 'Look up, $N. Every canopy from here to the idol is webbed like a fishing net, and the weavers grow bolder each season. I string their own silk across the paths, tripline bells, so the jungle cannot creep up on me. Six good hanks off the canopy weavers will restring my lines.',
     completionText:
       'Good, strong silk. My bells will sing a while longer, and nothing walks these paths at night without me knowing, $N. Lately, something has been walking often.',
-    objectives: [{ type: 'collect', itemId: 'canopy_silk_hank', count: 6, label: 'Canopy Silk Hank' }],
+    objectives: [
+      { type: 'collect', itemId: 'canopy_silk_hank', count: 6, label: 'Canopy Silk Hank' },
+    ],
     xpReward: 5000,
     copperReward: 2600,
     itemRewards: {},

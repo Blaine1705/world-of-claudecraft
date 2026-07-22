@@ -316,7 +316,12 @@ export const FROSTVEIL_QUESTS: Record<string, QuestDef> = {
     completionText:
       'The pass holds, then. Einna sits that waycamp through storms that bury the road markers, and she has never once sent me idle news. Welcome to Icemantle, $N.',
     objectives: [
-      { type: 'interact', targetNpcId: 'warden_kaldra', count: 1, label: 'Report to Warden Kaldra' },
+      {
+        type: 'interact',
+        targetNpcId: 'warden_kaldra',
+        count: 1,
+        label: 'Report to Warden Kaldra',
+      },
     ],
     xpReward: 2400,
     copperReward: 900,
@@ -365,8 +370,7 @@ export const FROSTVEIL_QUESTS: Record<string, QuestDef> = {
     giverNpcId: 'hearthkeeper_maeve',
     turnInNpcId: 'hearthkeeper_maeve',
     text: 'A sledge of ember caches overturned on the tarn road in last night: iron kettles that hold a banked fire alive for a month. Three of them are still lying in the snow, $N, and the lodge cannot spare what they hold. Bring the fire home.',
-    completionText:
-      'Still warm, every one. You have bought the lodge a whole winter of mercy, $N.',
+    completionText: 'Still warm, every one. You have bought the lodge a whole winter of mercy, $N.',
     objectives: [
       {
         type: 'interact',
@@ -660,7 +664,8 @@ export const FROSTVEIL_ESCORTS: Record<string, EscortDef> = {
     creditRadius: 40,
     respawnSeconds: 30,
     startText: "You'll walk with me? Stay close, please. The wolves have been circling since dusk.",
-    successText: 'The lights! We made it, we truly made it. Thank you, friend. I can see the camp from here.',
+    successText:
+      'The lights! We made it, we truly made it. Thank you, friend. I can see the camp from here.',
     failText: "No... I'm sorry, Brosk... I couldn't make it...",
   },
 };

@@ -205,7 +205,8 @@ export const GALECREST_NPCS: Record<string, NpcDef> = {
     facing: -0.6,
     color: 0x9aa8b4,
     questIds: ['q_gc_down_the_windway'],
-    greeting: 'Mind your footing past the gate. The wind up here takes hats first and questions never.',
+    greeting:
+      'Mind your footing past the gate. The wind up here takes hats first and questions never.',
   },
   harbormaster_odile: {
     id: 'harbormaster_odile',
@@ -220,7 +221,8 @@ export const GALECREST_NPCS: Record<string, NpcDef> = {
       'q_gc_scuttlers_in_the_pots',
       'q_gc_keeper_of_the_flame',
     ],
-    greeting: 'Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will not wait.',
+    greeting:
+      'Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will not wait.',
   },
   keeper_bram: {
     id: 'keeper_bram',
@@ -235,7 +237,8 @@ export const GALECREST_NPCS: Record<string, NpcDef> = {
       'q_gc_wind_against_the_wick',
       'q_gc_the_far_shore',
     ],
-    greeting: 'Nine and thirty years this lamp has burned on my watch. It will not go dark on yours.',
+    greeting:
+      'Nine and thirty years this lamp has burned on my watch. It will not go dark on yours.',
   },
   salvager_edda: {
     id: 'salvager_edda',
@@ -245,7 +248,8 @@ export const GALECREST_NPCS: Record<string, NpcDef> = {
     facing: -1.8,
     color: 0x7d8a6a,
     questIds: ['q_gc_the_far_shore', 'q_gc_dead_mens_cargo', 'q_gc_the_wreck_warden'],
-    greeting: "Wreckwood, rope, and dead men's cargo. The sea pays my wage, when the Warden lets it.",
+    greeting:
+      "Wreckwood, rope, and dead men's cargo. The sea pays my wage, when the Warden lets it.",
   },
 };
 export const GALECREST_QUESTS: Record<string, QuestDef> = {
@@ -352,7 +356,9 @@ export const GALECREST_QUESTS: Record<string, QuestDef> = {
     text: 'The gale wisps are the wind gone spiteful, $N. They gather on the high downs by the Mirror Tarn, and every flame they find, they snuff, a lantern, a hearth, one day this lamp. Thirty-nine years I have kept the Beacon lit, and I will not lose it to weather with a grudge. Scatter eight of them.',
     completionText:
       'The lamp did not so much as gutter last night, first time in a month. The wind still hates us, $N, but it has gone back to hating us fairly.',
-    objectives: [{ type: 'kill', targetMobId: 'gale_wisp', count: 8, label: 'Gale Wisp scattered' }],
+    objectives: [
+      { type: 'kill', targetMobId: 'gale_wisp', count: 8, label: 'Gale Wisp scattered' },
+    ],
     xpReward: 5000,
     copperReward: 2600,
     itemRewards: {},
@@ -384,7 +390,12 @@ export const GALECREST_QUESTS: Record<string, QuestDef> = {
     completionText:
       'Six crews quieter and three crates high and dry. You salvage with a heavier hand than I do, $N, but the ledger does not care. Half of this is yours by law, and by law I mean I say so.',
     objectives: [
-      { type: 'kill', targetMobId: 'drowned_deckhand', count: 6, label: 'Drowned Deckhand laid to rest' },
+      {
+        type: 'kill',
+        targetMobId: 'drowned_deckhand',
+        count: 6,
+        label: 'Drowned Deckhand laid to rest',
+      },
       {
         type: 'interact',
         targetObjectItemId: 'wreckfield_flotsam_crate',

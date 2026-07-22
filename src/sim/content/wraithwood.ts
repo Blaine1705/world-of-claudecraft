@@ -270,7 +270,12 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
     completionText:
       'Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gallowmere, $N. Mind the bells.',
     objectives: [
-      { type: 'interact', targetNpcId: 'sexton_marrow', count: 1, label: 'Report to Sexton Marrow' },
+      {
+        type: 'interact',
+        targetNpcId: 'sexton_marrow',
+        count: 1,
+        label: 'Report to Sexton Marrow',
+      },
     ],
     xpReward: 2600,
     copperReward: 1000,
@@ -286,7 +291,12 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
     completionText:
       'Ten fewer weavers in the eaves. The lamplighters will walk their rounds tonight without looking up, and that is worth more here than you know.',
     objectives: [
-      { type: 'kill', targetMobId: 'widowsilk_spinner', count: 10, label: 'Widowsilk Spinner slain' },
+      {
+        type: 'kill',
+        targetMobId: 'widowsilk_spinner',
+        count: 10,
+        label: 'Widowsilk Spinner slain',
+      },
     ],
     xpReward: 4600,
     copperReward: 2200,
@@ -301,7 +311,9 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
     text: 'The spinners take our dead for their larders, $N, so I take their silk for our shrouds. It burns clean and it holds a blessing better than linen ever did. Bring me six skeins of widowsilk, and the next soul we bury goes down wrapped and warded.',
     completionText:
       'Six skeins, soft as a held breath. The dead will lie easier in this. Take these wraps, I sewed them from the last batch, and the wood has never once bitten through them.',
-    objectives: [{ type: 'collect', itemId: 'widowsilk_skein', count: 6, label: 'Widowsilk Skein' }],
+    objectives: [
+      { type: 'collect', itemId: 'widowsilk_skein', count: 6, label: 'Widowsilk Skein' },
+    ],
     xpReward: 4800,
     copperReward: 2400,
     itemRewards: {
@@ -357,7 +369,9 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
     text: 'The wood wraiths were the chapel wardens once, $N, grown from trees planted over the honored dead. Since the tarn turned black they have forgotten their office, and now they drift through my graveyard pulling at the soil. Break eight of them apart before they finish what they have started.',
     completionText:
       'Eight wardens laid down at last. I will not call it a mercy in daylight, but between us, $N, it was one.',
-    objectives: [{ type: 'kill', targetMobId: 'wood_wraith', count: 8, label: 'Wood Wraith slain' }],
+    objectives: [
+      { type: 'kill', targetMobId: 'wood_wraith', count: 8, label: 'Wood Wraith slain' },
+    ],
     xpReward: 4800,
     copperReward: 2400,
     itemRewards: {},

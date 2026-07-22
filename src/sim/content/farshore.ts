@@ -437,7 +437,12 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
     completionText:
       'Ollun sent word ahead: the singing stopped. My whole town heard the quiet, $N, and half of them wept at the sound of nothing at all. Wear this mantle. The Farshore does not forget who held its shore.',
     objectives: [
-      { type: 'kill', targetMobId: 'sundered_horror', count: 1, label: 'The Sundered Horror slain' },
+      {
+        type: 'kill',
+        targetMobId: 'sundered_horror',
+        count: 1,
+        label: 'The Sundered Horror slain',
+      },
     ],
     xpReward: 1100,
     copperReward: 600,

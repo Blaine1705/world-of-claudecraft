@@ -37,9 +37,7 @@ function activateQuest(sim: Sim): void {
 // template: the Shiverfen has a resident fen_sprite camp).
 function liveAmbushers(sim: Sim): Entity[] {
   const ids = sim.escortRuns.get(ESCORT_ID)?.run?.ambushIds ?? [];
-  return ids
-    .map((id) => sim.entities.get(id))
-    .filter((e): e is Entity => !!e && !e.dead);
+  return ids.map((id) => sim.entities.get(id)).filter((e): e is Entity => !!e && !e.dead);
 }
 
 function tickMany(sim: Sim, ticks: number): SimEvent[] {
@@ -58,9 +56,7 @@ describe('escort content integrity', () => {
       expect(MOBS[def.npcMobId].aggroRadius).toBe(0);
       const quest = QUESTS[def.questId];
       expect(quest, `${def.id} quest`).toBeTruthy();
-      const objective = quest.objectives.find(
-        (o) => o.type === 'escort' && o.escortId === def.id,
-      );
+      const objective = quest.objectives.find((o) => o.type === 'escort' && o.escortId === def.id);
       expect(objective, `${def.id} quest escort objective`).toBeTruthy();
       expect(objective?.count).toBe(1);
       expect(def.waypoints.length).toBeGreaterThan(0);
@@ -81,8 +77,9 @@ describe('escort run lifecycle', () => {
     const wren = findEscortee(sim);
     expect(wren).toBeTruthy();
     expect(wren?.hostile).toBe(false);
-    expect(Math.hypot((wren?.pos.x ?? 0) - def.start.x, (wren?.pos.z ?? 0) - def.start.z))
-      .toBeLessThan(2);
+    expect(
+      Math.hypot((wren?.pos.x ?? 0) - def.start.x, (wren?.pos.z ?? 0) - def.start.z),
+    ).toBeLessThan(2);
   });
 
   it('does not start without the quest, and starts (with a bark) with it active', () => {
@@ -99,7 +96,8 @@ describe('escort run lifecycle', () => {
     const events = tickMany(sim, 1);
     expect(
       events.some(
-        (e) => e.type === 'chat' && 'channel' in e && e.channel === 'yell' && e.text === def.startText,
+        (e) =>
+          e.type === 'chat' && 'channel' in e && e.channel === 'yell' && e.text === def.startText,
       ),
     ).toBe(true);
   });
@@ -158,7 +156,8 @@ describe('escort run lifecycle', () => {
     expect(wren.dead).toBe(true);
     expect(
       events.some(
-        (e) => e.type === 'chat' && 'channel' in e && e.channel === 'yell' && e.text === def.failText,
+        (e) =>
+          e.type === 'chat' && 'channel' in e && e.channel === 'yell' && e.text === def.failText,
       ),
     ).toBe(true);
     expect(sim.escortRuns.get(ESCORT_ID)?.run ?? null).toBeNull();
@@ -173,8 +172,9 @@ describe('escort run lifecycle', () => {
     tickMany(sim, Math.ceil(def.respawnSeconds * 20) + 5);
     const again = findEscortee(sim);
     expect(again).toBeTruthy();
-    expect(Math.hypot((again?.pos.x ?? 0) - def.start.x, (again?.pos.z ?? 0) - def.start.z))
-      .toBeLessThan(2);
+    expect(
+      Math.hypot((again?.pos.x ?? 0) - def.start.x, (again?.pos.z ?? 0) - def.start.z),
+    ).toBeLessThan(2);
     expect(sim.escortRuns.get(ESCORT_ID)?.run ?? null).toBeNull();
   });
 

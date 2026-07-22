@@ -820,7 +820,8 @@ export const REALM_QUESTS: Record<string, QuestDef> = {
     giverNpcId: 'provisioner_fenna',
     turnInNpcId: 'huntsman_deral',
     text: 'You look like someone who can handle more than wisps, $N. Huntsman Deral keeps his lookout among the stag meadows east of here, and he has been asking after capable hands for weeks. Whatever he is tracking out there, he will not say it aloud in the village.',
-    completionText: 'Fenna sent you? Good. Then she trusts you, and I have two names that need crossing out.',
+    completionText:
+      'Fenna sent you? Good. Then she trusts you, and I have two names that need crossing out.',
     objectives: [
       { type: 'interact', targetNpcId: 'huntsman_deral', count: 1, label: 'Find Huntsman Deral' },
     ],
@@ -835,7 +836,8 @@ export const REALM_QUESTS: Record<string, QuestDef> = {
     giverNpcId: 'huntsman_deral',
     turnInNpcId: 'huntsman_deral',
     text: 'The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldergleam had a gate. It wanders, $N, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.',
-    completionText: 'The shallows are just water again. I have watched that shell break better hunters than me, $N. Not you.',
+    completionText:
+      'The shallows are just water again. I have watched that shell break better hunters than me, $N. Not you.',
     objectives: [
       { type: 'kill', targetMobId: 'old_marrowshell', count: 1, label: 'Old Marrowshell slain' },
     ],
@@ -852,7 +854,8 @@ export const REALM_QUESTS: Record<string, QuestDef> = {
     giverNpcId: 'huntsman_deral',
     turnInNpcId: 'huntsman_deral',
     text: 'The second name is harder to say. Aurelhorn led these herds when my grandmother kept this lookout, and whatever woke in the Hollow woke him wrong. He tramples what he once warded, and the herd will not survive his madness. He roams the meadows near the old court roads. End him with mercy, $N, and bring a friend to share the weight of it.',
-    completionText: 'So the First falls to the last. The herd is already calmer, do you feel it? You did the Hollow a kindness today, even if it does not look like one.',
+    completionText:
+      'So the First falls to the last. The herd is already calmer, do you feel it? You did the Hollow a kindness today, even if it does not look like one.',
     objectives: [
       { type: 'kill', targetMobId: 'aurelhorn', count: 1, label: 'Aurelhorn given peace' },
     ],

@@ -238,7 +238,8 @@ export const AMBERFALL_NPCS: Record<string, NpcDef> = {
     facing: 2.8,
     color: 0x9a7d5a,
     questIds: ['q_af_goldmelt_road'],
-    greeting: 'Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing count.',
+    greeting:
+      'Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing count.',
   },
   ferrymaster_caddow: {
     id: 'ferrymaster_caddow',
@@ -248,7 +249,8 @@ export const AMBERFALL_NPCS: Record<string, NpcDef> = {
     facing: 0.2,
     color: 0x6a7d8a,
     questIds: ['q_af_lanterns_on_the_water', 'q_af_what_took_the_moorings', 'q_af_the_meredark'],
-    greeting: 'Fog is on the Mere again. When the lanterns go out on the water, wise folk stay ashore.',
+    greeting:
+      'Fog is on the Mere again. When the lanterns go out on the water, wise folk stay ashore.',
   },
   orchardist_pomeline: {
     id: 'orchardist_pomeline',
@@ -258,7 +260,8 @@ export const AMBERFALL_NPCS: Record<string, NpcDef> = {
     facing: 1.2,
     color: 0x8a9a4a,
     questIds: ['q_af_orchard_call', 'q_af_sprites_and_spigots', 'q_af_amber_from_the_herd'],
-    greeting: 'Mind where you step. Every root in these rows is older than the town, and they remember.',
+    greeting:
+      'Mind where you step. Every root in these rows is older than the town, and they remember.',
   },
 };
 
@@ -272,7 +275,12 @@ export const AMBERFALL_QUESTS: Record<string, QuestDef> = {
     completionText:
       'Quiet on the Goldmelt, and a traveler with snow in their hair to prove it. Sorrel keeps her watch too well to send idle word. Be welcome in Lanternmere, $N. The lanterns burn for you.',
     objectives: [
-      { type: 'interact', targetNpcId: 'reeve_ottoline', count: 1, label: 'Report to Reeve Ottoline' },
+      {
+        type: 'interact',
+        targetNpcId: 'reeve_ottoline',
+        count: 1,
+        label: 'Report to Reeve Ottoline',
+      },
     ],
     xpReward: 2400,
     copperReward: 900,
@@ -345,7 +353,9 @@ export const AMBERFALL_QUESTS: Record<string, QuestDef> = {
     text: 'The gilded stags bed down beneath my oldest trees, and the sap drips gold into their coats all night. Combed clots of it are the purest amber in the weald. Bring me six, $N. The stags will not thank you, but they will not miss it either.',
     completionText:
       'Six clots, clean as poured honey. These gloves are stitched with the last batch, $N: sap-stiffened, and warmer than they look.',
-    objectives: [{ type: 'collect', itemId: 'gilded_sap_clot', count: 6, label: 'Gilded Sap Clot' }],
+    objectives: [
+      { type: 'collect', itemId: 'gilded_sap_clot', count: 6, label: 'Gilded Sap Clot' },
+    ],
     xpReward: 4200,
     copperReward: 2000,
     itemRewards: {
@@ -384,7 +394,9 @@ export const AMBERFALL_QUESTS: Record<string, QuestDef> = {
     text: 'Now I will tell you what I did not say in front of the town. The moorings were not slipped, they were bitten through. Mere lurkers, bolder every night, dragging at the ropes and the rudders. Put eight of them back under the water for good, $N, before a ferryman goes with them.',
     completionText:
       'Eight fewer shapes in the shallows, and the crossing ran on time today for the first time in a fortnight. But bold lurkers are driven lurkers, $N. Something beneath the Mere is moving them.',
-    objectives: [{ type: 'kill', targetMobId: 'mere_lurker', count: 8, label: 'Mere Lurker slain' }],
+    objectives: [
+      { type: 'kill', targetMobId: 'mere_lurker', count: 8, label: 'Mere Lurker slain' },
+    ],
     xpReward: 4600,
     copperReward: 2400,
     itemRewards: {},
@@ -399,7 +411,9 @@ export const AMBERFALL_QUESTS: Record<string, QuestDef> = {
     text: 'The old ferrymen have a name they only say ashore: the Meredark, the first lurker, old as the lake and twice as patient. It rose once before, the year the drowned jetty went under, and it is rising now. At dusk it suns itself on the jetty ruin off the south shore, $N. Take a friend, take two, and end it while it can still be ended.',
     completionText:
       'The fog lifted off the Mere this morning, $N, and the whole town saw it. The ferries will run the night crossing again, and every lantern on the water will burn in your name. Take this: it was dredged from the drowned jetty, and no one has better right to wear it.',
-    objectives: [{ type: 'kill', targetMobId: 'the_meredark', count: 1, label: 'The Meredark slain' }],
+    objectives: [
+      { type: 'kill', targetMobId: 'the_meredark', count: 1, label: 'The Meredark slain' },
+    ],
     xpReward: 6000,
     copperReward: 3600,
     itemRewards: {
