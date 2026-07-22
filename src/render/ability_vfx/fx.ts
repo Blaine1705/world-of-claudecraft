@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { AbilityVfxBuffSpec, AbilityVfxFullSpec } from '../ability_vfx_core';
+import { type AbilityVfxBuffSpec, type AbilityVfxFullSpec, abilityHexColor } from '../ability_vfx_core';
 import { type DecalStyle, GroundDecals } from './decals';
 import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
@@ -9,6 +9,7 @@ import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './rib
 import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
+import { asSpiritPath, type SpiritAtKind, SpiritApparitions } from './spirits';
 
 export type { DecalStyle } from './decals';
 
@@ -246,6 +247,7 @@ export class AbilityVfxFx implements SequencerHost {
   private pillars: LightPillars;
   private shells: BuffShells;
   private flipbooks: ImpactFlipbooks;
+  private spirits: SpiritApparitions;
   private windups = new Map<number, WindupState>();
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
@@ -314,6 +316,14 @@ export class AbilityVfxFx implements SequencerHost {
     this.pillars = new LightPillars(scene);
     this.shells = new BuffShells(scene);
     this.flipbooks = new ImpactFlipbooks(scene);
+    this.spirits = new SpiritApparitions(scene, groundY);
+  }
+
+  // Kick the async GLB loads for every spirit model a sighted player's class
+  // can conjure (painter.syncEntity calls this on first sighting), so the
+  // model is warm before its first cast — an unwarmed cast skips its spirit.
+  warmSpiritsForClass(cls: string): void {
+    this.spirits.warmForClass(cls);
   }
 
   // Wired once by the painter: particle bursts ride the pooled Vfx cloud,
@@ -754,6 +764,82 @@ export class AbilityVfxFx implements SequencerHost {
     this.shakeCb(granted);
   }
 
+  // Spirit apparition trigger (the sequencer fires it once per impact when a
+  // spec authors a spirit block, tier 0 only). Resolves the choreography
+  // anchor from the authored at-kind, gates on local relevance (apparitions
+  // are a NEARBY-fight spectacle: within ~40 yd of the camera) and on model
+  // readiness (still-loading GLBs skip silently, never pop in late), then
+  // announces a successful spawn with the gallery's entrance dust + ring.
+  spiritAt(
+    spirit: NonNullable<AbilityVfxFullSpec['spirit']>,
+    casterId: number,
+    targetId: number,
+    x: number,
+    _y: number,
+    z: number,
+    colorHex: number,
+    palette: string,
+  ): boolean {
+    const model = spirit.model;
+    if (!model) return false;
+    const atKind: SpiritAtKind =
+      spirit.at === 'target' || spirit.at === 'portal' ? spirit.at : 'caster';
+    const anchorId = atKind === 'target' ? targetId : casterId;
+    // 'portal' plays at the sequence's impact point (the summon rune); the
+    // entity kinds ride their live anchors, falling back to the impact point
+    const at = atKind === 'portal' ? null : this.anchor(anchorId, 0);
+    const ax = at ? at.x : x;
+    const az = at ? at.z : z;
+    const dcx = ax - camPosScratch.x;
+    const dcz = az - camPosScratch.z;
+    if (dcx * dcx + dcz * dcz > 40 * 40) return false;
+    // choreography direction: caster toward target, camera-right fallback so
+    // a self-cast lunge still crosses the screen instead of collapsing
+    let dirX = this.camRightX;
+    let dirZ = this.camRightZ;
+    const from = this.anchor(casterId, 0);
+    const to = targetId >= 0 && targetId !== casterId ? this.anchor(targetId, 0) : null;
+    if (from) {
+      const ddx = (to ? to.x : x) - from.x;
+      const ddz = (to ? to.z : z) - from.z;
+      const len = Math.hypot(ddx, ddz);
+      if (len > 0.3) {
+        dirX = ddx / len;
+        dirZ = ddz / len;
+      }
+    }
+    const scale = spirit.scale ?? 1;
+    const path = asSpiritPath(spirit.path);
+    const tint = spirit.tint ? abilityHexColor(spirit.tint) : colorHex;
+    const gy = this.groundY(ax, az);
+    const ok = this.spirits.spawn({
+      model,
+      path,
+      atKind,
+      x: ax,
+      y: gy,
+      z: az,
+      dirX,
+      dirZ,
+      scale,
+      dur: spirit.dur ?? 1.5,
+      colorHex: tint,
+      dim: spirit.dim ?? 1,
+    });
+    if (!ok) return false;
+    // grand entrance: apparitions announce themselves
+    if (path === 'rise') {
+      this.particleBurst?.(ax, gy + 0.6, az, 0xd8dde6, model === 'sheep' ? 6 : 4, 0.5, 'smoke');
+      this.rings.spawn(ax, gy + 0.15, az, 1.7 * scale, 0.5, tint, 1.2 * this.intensity(), false);
+    } else if (path === 'lunge' || path === 'pounce') {
+      this.rings.spawn(ax, gy + 0.15, az, 1.3 * scale, 0.4, tint, 1.0 * this.intensity(), false);
+      this.particleBurst?.(ax, gy + 0.15, az, tint, 8, 1.2, 'embers'); // kicked-up dust
+    }
+    this.lightPulseCb?.(anchorId, palette, 3, 0.5);
+    if (scale >= 1.05) this.shakeAt(ax, gy, az, 0.22); // big spirits shake the earth
+    return true;
+  }
+
   // ---- fire-and-forget primitives (painter dispatch) ----------------------
 
   jaggedBolt(sourceId: number, targetId: number, colorHex: number): void {
@@ -922,6 +1008,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.decals.update(dt);
     this.pillars.update(dt);
     this.shells.update(dt, this.time, this.frame, this.anchor);
+    this.spirits.update(dt);
     this.overlay.beginFrame();
     // styled bolt heads ride this frame's overlay batch (positions were just
     // advanced by ribbons.update above)
@@ -981,6 +1068,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.decals.clear();
     this.pillars.clear();
     this.shells.clear();
+    this.spirits.clear();
     this.sequencer.clear();
     for (const [id, g] of this.glows) this.applyGlow?.(id, g.color, 0);
     this.glows.clear();

@@ -129,12 +129,16 @@ export interface AbilityVfxAuraEvent {
 }
 
 // The per-frame entity slice syncEntity consumes (Entity satisfies it).
+// kind/templateId are optional so tests can omit them; for players templateId
+// IS the class id, which warms that class's spirit models on first sighting.
 export interface AbilityVfxEntityState {
   id: number;
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
   auras: readonly { id: string }[];
+  kind?: string;
+  templateId?: string;
 }
 
 // The cast-moment fx kinds this painter claims; everything else stays generic.
@@ -260,6 +264,8 @@ export class AbilityVfx {
     }
   >();
   private spawned = 0; // primitives spawned by the CURRENT event (probe counter)
+  // player classes whose spirit models were already warmed (first sighting)
+  private warmedSpiritClasses = new Set<string>();
 
   constructor(
     private deps: AbilityVfxDeps,
@@ -808,6 +814,13 @@ export class AbilityVfx {
   // Allocation-free per call.
   syncEntity(e: AbilityVfxEntityState): void {
     const fx = this.deps.fx;
+    // First sighting of a player of a class kicks the async loads for that
+    // class's spirit-apparition GLBs, so the models are warm before a cast
+    // needs them (a still-loading model's cast skips its spirit silently).
+    if (e.kind === 'player' && e.templateId && !this.warmedSpiritClasses.has(e.templateId)) {
+      this.warmedSpiritClasses.add(e.templateId);
+      fx.warmSpiritsForClass(e.templateId);
+    }
     // Body glow (the gallery rim read): the strongest live source wins between
     // an in-flight cast and any spec'd buff auras (rim or buff block).
     let glowColor = 0;

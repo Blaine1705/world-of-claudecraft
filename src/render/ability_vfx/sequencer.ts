@@ -121,6 +121,19 @@ export interface SequencerHost {
   // Camera trauma at a world point (the host applies distance falloff and a
   // rolling budget so spam can never stack shake).
   shakeAt(x: number, y: number, z: number, amount: number): void;
+  // Ghost-creature apparition (spirits.ts): fired once at impact when the
+  // spec authors a spirit block. The host resolves the anchor, gates on
+  // camera relevance and model readiness, and returns whether one spawned.
+  spiritAt?(
+    spirit: NonNullable<AbilityVfxFullSpec['spirit']>,
+    casterId: number,
+    targetId: number,
+    x: number,
+    y: number,
+    z: number,
+    colorHex: number,
+    palette: string,
+  ): boolean;
 }
 
 type SeqBurstKind = 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood';
@@ -745,6 +758,24 @@ export class ArchetypeSequencer {
     if (spec.finisher && slot.tier === 0) host.shakeAt(slot.ix, slot.iy, slot.iz, 0.15);
     // per-archetype impact extras
     this.archetypeImpact(host, slot, gy);
+    // spirit apparition (summons, cc, shapeshifts — any spec authoring one):
+    // tier-0-only spectacle, once per sequence, at the impact moment
+    if (
+      slot.tier === 0 &&
+      spec.spirit?.model &&
+      host.spiritAt?.(
+        spec.spirit,
+        slot.casterId,
+        slot.targetId,
+        slot.ix,
+        slot.iy,
+        slot.iz,
+        slot.color,
+        spec.palette,
+      )
+    ) {
+      host.countPrimitive(slot.abilityId, 1);
+    }
     // impact-phase motifs; tier 1 keeps one signature beat per motif
     if (spec.motifs && slot.tier <= 1) this.runMotifs(host, slot);
     // lingers honor the authored 1-6s dwell at tier 0 (dot drips, motif loops,
