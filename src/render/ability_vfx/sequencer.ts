@@ -121,6 +121,19 @@ export interface SequencerHost {
   // Camera trauma at a world point (the host applies distance falloff and a
   // rolling budget so spam can never stack shake).
   shakeAt(x: number, y: number, z: number, amount: number): void;
+  // Per-ability procedural audio (src/game/sfx.ts recipes) at the sequence's
+  // exact release and impact moments — a projectile's boom lands when the bolt
+  // does, a ground cast's boom lands AT the zone. Optional: tests and hosts
+  // without an audio sink omit it and the sequence is simply silent.
+  abilityAudio?(
+    kind: 'release' | 'impact',
+    palette: string,
+    power: number,
+    x: number,
+    y: number,
+    z: number,
+    opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+  ): void;
   // Ghost-creature apparition (spirits.ts): fired once at impact when the
   // spec authors a spirit block. The host resolves the anchor, gates on
   // camera relevance and model readiness, and returns whether one spawned.
@@ -616,6 +629,10 @@ export class ArchetypeSequencer {
       );
       host.pulseLight(slot.casterId, spec.palette, 3.2 * slot.power, 0.22);
       host.countPrimitive(slot.abilityId, 2);
+      host.abilityAudio?.('release', spec.palette, slot.power, caster.x, caster.y, caster.z, {
+        lite: spec.impact?.liteAudio === true || slot.tier >= 1,
+        archetype: spec.archetype,
+      });
     }
     // release-phase motifs (bladestorm whirl, implosion pull-in); tier 1 still
     // plays them as their single signature beat
@@ -635,6 +652,14 @@ export class ArchetypeSequencer {
     const gy = this.groundOf(host, slot);
     const arch = spec.archetype;
     const gentle = arch === 'heal' || arch === 'buff' || arch === 'cc';
+    // the palette identity sounds where the hit visually lands (a ground zone
+    // booms AT the zone); gentleness/lite policy resolves in the audio engine
+    host.abilityAudio?.('impact', spec.palette, slot.power, slot.ix, slot.iy, slot.iz, {
+      lite: o.liteAudio === true || slot.tier >= 1,
+      finisher: spec.finisher,
+      archetype: arch,
+      buffStyle: spec.buff?.style,
+    });
     let n = 0;
     // hero impact sheet (gallery impactStack fires the flipbook first): the
     // authored spec wins — an explicit true forces it even on gentle

@@ -286,6 +286,17 @@ export class AbilityVfxFx implements SequencerHost {
   private screenImpactCb:
     | ((x: number, y: number, z: number, strength: number) => void)
     | null = null;
+  private abilityAudioCb:
+    | ((
+        kind: 'release' | 'impact',
+        palette: string,
+        power: number,
+        x: number,
+        y: number,
+        z: number,
+        opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+      ) => void)
+    | null = null;
   // Deferred screen-fx beats for instant sequences (impact = release + 0.15s):
   // fixed slots, world- or entity-anchored, resolved when they fire. The cap
   // doubles as the anti-strobe guard — saturated beats simply drop.
@@ -369,6 +380,15 @@ export class AbilityVfxFx implements SequencerHost {
     addShake?: (amount: number) => void,
     bodyLean?: (entityId: number, amount: number) => void,
     screenImpact?: (x: number, y: number, z: number, strength: number) => void,
+    abilityAudio?: (
+      kind: 'release' | 'impact',
+      palette: string,
+      power: number,
+      x: number,
+      y: number,
+      z: number,
+      opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+    ) => void,
   ): void {
     this.particleBurst = burst;
     this.lightPulseCb = lightPulse;
@@ -377,6 +397,21 @@ export class AbilityVfxFx implements SequencerHost {
     this.shakeCb = addShake ?? null;
     this.bodyLeanCb = bodyLean ?? null;
     this.screenImpactCb = screenImpact ?? null;
+    this.abilityAudioCb = abilityAudio ?? null;
+  }
+
+  // SequencerHost audio surface: forwards the sequence's release/impact
+  // moments to the wired spatial audio sink (silent when none is wired).
+  abilityAudio(
+    kind: 'release' | 'impact',
+    palette: string,
+    power: number,
+    x: number,
+    y: number,
+    z: number,
+    opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+  ): void {
+    this.abilityAudioCb?.(kind, palette, power, x, y, z, opts);
   }
 
   // Feed the body glow for one entity this frame (spec'd cast or live buff

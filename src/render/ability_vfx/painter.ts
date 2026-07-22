@@ -104,6 +104,19 @@ export interface AbilityVfxDeps {
   // moments); the renderer projects onto the post chain, composer-gated like
   // bloom. The fx engine applies distance falloff first. Optional for tests.
   screenImpact?: (x: number, y: number, z: number, strength: number) => void;
+  // Per-ability procedural audio (src/game/sfx.ts recipes via the renderer's
+  // spatial audio sink): release/impact ride the sequencer's exact moments,
+  // this painter fires zone pulses and crit stings directly. Optional for
+  // tests and hosts without an audio engine.
+  abilityAudio?: (
+    kind: 'release' | 'impact' | 'pulse' | 'crit',
+    palette: string,
+    power: number,
+    x: number,
+    y: number,
+    z: number,
+    opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+  ) => void;
 }
 
 // Structural slices of the SimEvent members this painter consumes.
@@ -308,6 +321,10 @@ export class AbilityVfx {
       deps.addShake ? (amount) => deps.addShake?.(amount) : undefined,
       deps.bodyLean ? (entityId, amount) => deps.bodyLean?.(entityId, amount) : undefined,
       deps.screenImpact ? (x, y, z, s) => deps.screenImpact?.(x, y, z, s) : undefined,
+      deps.abilityAudio
+        ? (kind, palette, power, x, y, z, opts) =>
+            deps.abilityAudio?.(kind, palette, power, x, y, z, opts)
+        : undefined,
     );
   }
 
@@ -730,6 +747,8 @@ export class AbilityVfx {
     if (tier >= 2) return;
     const fx = this.deps.fx;
     const r = Math.min(6, Math.max(1.6, (radius ?? 4) * 0.85));
+    // soft per-pulse thud AT the zone (never the full impact identity)
+    this.deps.abilityAudio?.('pulse', spec.p ?? 'arcane', spec.pw ?? 1, x, gy, z);
     fx.ringAt(x, gy + 0.15, z, r, 0.5, plan.color, 1.1, false);
     fx.burstAt(
       x,
@@ -811,6 +830,20 @@ export class AbilityVfx {
     const plan = planImpact(spec, ev.crit, this.quality, tier);
     const at = this.deps.anchor(ev.targetId, 0.55);
     if (!at) return;
+    // crit sting layered over the impact: the sequencer's impact recipe plays
+    // the palette identity; the sting is the crit's own extra layer (the
+    // damage event is the only place crit is known)
+    if (ev.crit) {
+      this.deps.abilityAudio?.(
+        'crit',
+        full?.palette ?? spec.p ?? 'physical',
+        full?.power ?? spec.pw ?? 1,
+        at.x,
+        at.y,
+        at.z,
+        { lite: full?.impact?.liteAudio === true || tier >= 1 },
+      );
+    }
     this.spawned = 0;
     this.deps.vfx.burst(at, ev.school, plan.burstCount, plan.burstPower, plan.color);
     this.spawned++;

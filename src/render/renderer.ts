@@ -1782,6 +1782,11 @@ export class Renderer {
         if (this.post && !this.reducedMotion()) this.post.screenFlash(strength);
       },
       screenImpact: (x, y, z, strength) => this.screenImpactAt(x, y, z, strength),
+      // per-ability procedural audio (release whooshes, palette impact
+      // identities, zone pulses, crit stings) rides the injected spatial
+      // audio sink; offline/headless hosts without one stay silent
+      abilityAudio: (kind, palette, power, x, y, z, opts) =>
+        this.audioSink?.abilityAudio?.(kind, palette, power, x, y, z, opts),
     });
     // Dev-only ability VFX probe surface (scripts/ability_vfx_probe.mjs):
     // self-installs onto window.__game once main.ts has assembled it, so the
