@@ -1831,6 +1831,7 @@ const NPC_KEYS: Record<string, string> = {
   alchemist_verane: 'npc_villager_robed',
   cook_marlow: 'npc_villager',
   tanner_hesk: 'npc_villager',
+  huntsman_deral: 'npc_scout',
 };
 
 export function visualKeyFor(e: Entity): string {

@@ -2697,6 +2697,11 @@ export interface EscortRunState {
     startedAt: number;
     ambushIds: number[];
     fired: boolean[];
+    // Stuck-advance bookkeeping: a walker pinned against a collider for a few
+    // seconds counts its current waypoint as reached (escort.ts).
+    lastX: number;
+    lastZ: number;
+    stuckTicks: number;
   } | null;
 }
 

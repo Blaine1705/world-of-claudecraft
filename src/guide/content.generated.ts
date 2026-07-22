@@ -1713,6 +1713,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky.",
     "families": [
       "beast",
+      "undead",
       "elemental"
     ]
   },
@@ -1801,6 +1802,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.",
     "families": [
       "beast",
+      "undead",
       "elemental"
     ]
   },
@@ -2572,6 +2574,26 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "skel_warrior",
         "tint": "#cacfd2",
         "still": "/guide-stills/skel_warrior__cacfd2.webp"
+      },
+      {
+        "name": "Barrow Wight",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "barrow_wight",
+        "model": "skel_minion",
+        "tint": "#9fb0c4",
+        "still": "/guide-stills/skel_minion__9fb0c4.webp"
+      },
+      {
+        "name": "Drowned Deckhand",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "drowned_deckhand",
+        "model": "skel_minion",
+        "tint": "#86988e",
+        "still": "/guide-stills/skel_minion__86988e.webp"
       }
     ]
   },

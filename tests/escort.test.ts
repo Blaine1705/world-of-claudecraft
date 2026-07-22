@@ -220,3 +220,40 @@ describe('escort run lifecycle', () => {
     expect(sim.questLog.get(QUEST_ID)?.state ?? 'done').toBe('done');
   });
 });
+
+// Every authored escort route must be WALKABLE in the real world: the escortee
+// has to reach its final waypoint against real terrain and colliders (a
+// waypoint inside a rock or across deep water would strand every run at the
+// timeout). Drives each def's full walk with waves auto-culled.
+describe('every escort route completes in the real world', () => {
+  for (const def of Object.values(ESCORTS)) {
+    it(`${def.id} walks its full route to credit`, () => {
+      const sim = makeSim();
+      teleportTo(sim, def.start.x, def.start.z);
+      sim.questLog.set(def.questId, { questId: def.questId, counts: [0], state: 'active' });
+      sim.interact();
+      const state = sim.escortRuns.get(def.id);
+      expect(state?.run, `${def.id} run started`).toBeTruthy();
+      const npcId = state?.npcId;
+      const npc = npcId !== null && npcId !== undefined ? sim.entities.get(npcId) : undefined;
+      expect(npc).toBeTruthy();
+      if (!npc) return;
+      let credited = false;
+      for (let i = 0; i < 300 * 20 && !credited; i++) {
+        const run = sim.escortRuns.get(def.id)?.run;
+        for (const id of run?.ambushIds ?? []) {
+          const mob = sim.entities.get(id);
+          if (mob && !mob.dead) {
+            mob.hp = 0;
+            mob.dead = true;
+            mob.respawnTimer = 99999;
+          }
+        }
+        teleportTo(sim, npc.pos.x + 2, npc.pos.z + 2);
+        const events = sim.tick();
+        credited = events.some((e) => e.type === 'questReady' && e.questId === def.questId);
+      }
+      expect(credited, `${def.id} reached its destination`).toBe(true);
+    });
+  }
+});

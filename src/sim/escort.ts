@@ -47,7 +47,14 @@ export function isEscortNpcTemplate(templateId: string): boolean {
 }
 
 // The escortee counts as arrived at a waypoint inside this range (yards).
-export const ESCORT_ARRIVE_RANGE = 1.5;
+export const ESCORT_ARRIVE_RANGE = 2.5;
+// Stuck-advance: a walking escortee that has not moved this far in
+// ESCORT_STUCK_TICKS consecutive ticks (a collider pinning the approach)
+// counts its current waypoint as reached instead of wedging the run into the
+// timeout. Waypoints hug authored roads, so a pin only ever happens on the
+// final yards into a prop-dense camp.
+const ESCORT_STUCK_MOVE_EPSILON = 0.05;
+const ESCORT_STUCK_TICKS = 80; // 4 seconds at 20 Hz
 // Default ambush spawn ring radius around the escortee (yards).
 export const ESCORT_AMBUSH_RADIUS = 5;
 // A run that has not finished after this many sim seconds fails (a blocked
@@ -130,7 +137,15 @@ export function tryStartEscort(ctx: SimContext, p: Entity, meta: PlayerMeta): bo
   }
   if (!best) return false;
   const state = escortState(ctx, best.def.id);
-  state.run = { waypointIndex: 0, startedAt: ctx.time, ambushIds: [], fired: [] };
+  state.run = {
+    waypointIndex: 0,
+    startedAt: ctx.time,
+    ambushIds: [],
+    fired: [],
+    lastX: best.npc.pos.x,
+    lastZ: best.npc.pos.z,
+    stuckTicks: 0,
+  };
   emitMobYell(ctx, best.npc, best.def.startText);
   return true;
 }
@@ -257,7 +272,16 @@ export function updateEscorts(ctx: SimContext): void {
       continue;
     }
     const wp = def.waypoints[run.waypointIndex];
-    if (Math.hypot(npc.pos.x - wp.x, npc.pos.z - wp.z) <= ESCORT_ARRIVE_RANGE) {
+    const moved = Math.hypot(npc.pos.x - run.lastX, npc.pos.z - run.lastZ);
+    if (moved < ESCORT_STUCK_MOVE_EPSILON) run.stuckTicks++;
+    else run.stuckTicks = 0;
+    run.lastX = npc.pos.x;
+    run.lastZ = npc.pos.z;
+    const arrived =
+      Math.hypot(npc.pos.x - wp.x, npc.pos.z - wp.z) <= ESCORT_ARRIVE_RANGE ||
+      run.stuckTicks >= ESCORT_STUCK_TICKS;
+    if (arrived) {
+      run.stuckTicks = 0;
       fireAmbushes(ctx, def, state, npc);
       run.waypointIndex++;
       continue;
