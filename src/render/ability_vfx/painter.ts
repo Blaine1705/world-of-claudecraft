@@ -70,6 +70,20 @@ export interface AbilityVfxDeps {
   setAuraGlow?: (entityId: number, colorHex: number, intensity: number) => void;
   // Plays the caster's roar/cheer one-shot for shout casts; optional for tests.
   playShoutAnim?: (entityId: number) => void;
+  // Entity lookups mirroring the renderer's generic-arm checks (all optional
+  // for tests): mob-kind, live cast state, and whether the rig is already
+  // playing a one-shot — the painter replicates the mob-throw fallback the
+  // generic arm applies when it does NOT claim.
+  isMob?: (entityId: number) => boolean;
+  castingAbilityOf?: (entityId: number) => string | null;
+  isMidOneShot?: (entityId: number) => boolean;
+  // The local player's entity id (cast-acknowledgment gestures).
+  localPlayerId?: () => number;
+  // True when the ability resolves with no cast bar (no cast time, channel, or
+  // empower hold). Only these get the synthetic pre-release windup phase: a
+  // real cast already performed its ceremony through the live castingAbility
+  // path in syncEntity. Unknown ids should return true.
+  isInstantAbility?: (abilityId: string) => boolean;
 }
 
 // Structural slices of the SimEvent members this painter consumes.
@@ -80,6 +94,17 @@ export interface AbilityVfxSpellfxEvent {
   fx: string;
   ability?: string;
   attackAnimation?: 'ranged-shot';
+}
+
+// Structural slice of the point-anchored SimEvent member ('spellfxAt').
+export interface AbilityVfxSpellfxAtEvent {
+  x: number;
+  z: number;
+  school: string;
+  fx: string;
+  ability?: string;
+  radius?: number;
+  sourceId?: number;
 }
 
 export interface AbilityVfxDamageEvent {
@@ -155,6 +180,21 @@ const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
   blood: 'physical',
 };
 
+// One FULL point-anchored sequence per (caster, ability) inside this window:
+// recurring emits of the same aimed nova (Frozen Orb's flight pulses, a
+// re-triggered trap) degrade to the cheap zone re-hit instead of replaying
+// the whole release + impact anatomy every second.
+const POINT_SEQ_REFRACTORY_SEC = 3;
+
+// Zone-pulse debris family per spec palette (the per-pulse re-hit accent).
+const PULSE_BURST_BY_PALETTE: Record<string, ParticleBurstKind> = {
+  fire: 'embers',
+  blood: 'blood',
+  physical: 'debris',
+  shadow: 'smoke',
+  venom: 'smoke',
+};
+
 // Spec bo (buff orbit) styles collapsed onto the three sprite bands the fx
 // engine draws (halo crowns the head, sparks orbit shoulders, runes circle
 // the feet).
@@ -175,6 +215,9 @@ export class AbilityVfx {
   private budget = new AbilityVfxBudget();
   private now: () => number;
   private stats = new Map<string, AbilityVfxStat>();
+  // last full point-sequence time per `${casterId}:${abilityId}` (see
+  // POINT_SEQ_REFRACTORY_SEC); stale entries pruned in place once it grows
+  private pointSeqAt = new Map<string, number>();
   private spawned = 0; // primitives spawned by the CURRENT event (probe counter)
 
   constructor(
@@ -282,6 +325,7 @@ export class AbilityVfx {
             this.spawned++;
           }
         }
+        if (!plan.whirl && ev.attackAnimation !== 'ranged-shot') this.mobThrowFallback(ev.sourceId);
         break;
       }
       case 'lightning':
@@ -293,6 +337,7 @@ export class AbilityVfx {
           if (full)
             fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         }
+        if (!plan.whirl) this.mobThrowFallback(ev.sourceId);
         break;
       case 'beam':
         // Channel rays (drains, mind flay): the school beam recolored plus a
@@ -303,6 +348,7 @@ export class AbilityVfx {
           fx.beamRibbon(ev.sourceId, ev.targetId, plan.color);
           this.spawned++;
         }
+        if (!plan.whirl) this.mobThrowFallback(ev.sourceId);
         break;
       case 'windup':
         // The generic windup arm's whole job is the throw animation: keep it.
@@ -310,33 +356,180 @@ export class AbilityVfx {
         this.spawned++;
         break;
       case 'shout': {
+        // The roar starts now even when the sequence stages a short windup:
+        // the caster bellowing THROUGH the ceremony is the natural read.
         this.deps.vfx.shoutwave(ev.sourceId, plan.color);
         this.spawned++;
         this.spawnRing(ev.sourceId, plan, ev.school);
         this.deps.playShoutAnim?.(ev.sourceId);
         if (tier < 2 && full)
-          fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
+          fx.sequenceInstant(
+            ev.ability,
+            full,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            tier,
+            this.windupDelayFor(ev.ability, full, ev.sourceId),
+          );
         break;
       }
       case 'nova': {
-        this.deps.vfx.nova(ev.targetId, ev.school, plan.color);
-        this.spawned++;
+        if (tier < 2 && full) {
+          const delay = this.windupDelayFor(ev.ability, full, ev.sourceId);
+          // a staged release carries the boom itself: firing the pooled nova
+          // now would double the read half a windup early
+          if (delay <= 0) {
+            this.deps.vfx.nova(ev.targetId, ev.school, plan.color);
+            this.spawned++;
+          }
+          fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier, delay);
+        } else {
+          this.deps.vfx.nova(ev.targetId, ev.school, plan.color);
+          this.spawned++;
+        }
         this.spawnRing(ev.targetId, plan, ev.school);
-        if (tier < 2 && full)
-          fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         break;
       }
       case 'tick':
         // Instants run their FULL archetype sequence, compressed (0.15s
-        // release to impact), never just the small tick accent.
+        // release to impact) after any authored windup phase, never just the
+        // small tick accent.
         this.deps.vfx.tick(ev.targetId, ev.school, plan.color);
         this.spawned++;
         if (tier < 2 && full)
-          fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
+          fx.sequenceInstant(
+            ev.ability,
+            full,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            tier,
+            this.windupDelayFor(ev.ability, full, ev.sourceId),
+          );
         break;
+    }
+    // Local-player cast acknowledgment: a claimed physical instant plays the
+    // ability's one-shot so the button press reads on the rig (spell instants
+    // get their read from the windup ceremony; no new clips are invented).
+    if (
+      ev.fx !== 'windup' &&
+      !plan.whirl &&
+      ev.attackAnimation !== 'ranged-shot' &&
+      this.deps.localPlayerId?.() === ev.sourceId
+    ) {
+      const arch = full?.archetype ?? spec.a;
+      if (arch === 'strike' || arch === 'dash') this.deps.triggerAttack(ev.sourceId, ev.ability);
     }
     this.recordStat(ev.ability, true);
     return true;
+  }
+
+  // Point-anchored claims: an aimed ground cast's landing ('nova'/'burst' at
+  // the aim point) runs the full archetype sequence anchored at the WORLD
+  // POINT — windup ceremony and release flash on the caster, motifs, decal,
+  // and linger at the point — and a zone pulse ('tick') draws a cheap
+  // per-pulse re-hit, never a full sequence. The four bespoke lifetime kinds
+  // (meteorFall/snowZone/runeCircle/orb) are deliberately never claimed:
+  // their legacy visuals animate duration-long state (a ball timed to its
+  // landing, snowfall over the zone's whole life, a persistent inscription,
+  // the roaming orb) that a one-shot sequence would read worse than.
+  handleSpellfxAt(ev: AbilityVfxSpellfxAtEvent): boolean {
+    if (!ev.ability) return false;
+    if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
+    const spec = ABILITY_VFX_SPECS[ev.ability];
+    if (!spec) return false;
+    const casterId = ev.sourceId ?? -1;
+    const tier = this.budget.admit(casterId, this.now());
+    const plan = planCast(spec, this.quality, tier);
+    const fx = this.deps.fx;
+    const gy = fx.groundYAt(ev.x, ev.z);
+    this.spawned = 0;
+    if (ev.fx === 'tick') {
+      this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, plan, tier);
+      this.recordStat(ev.ability, true);
+      return true;
+    }
+    const full = ABILITY_VFX_FULL_SPECS[ev.ability];
+    // the terrain-draped area ring is an actionable telegraph: always instant
+    if (ev.radius) {
+      this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, plan.color);
+      this.spawned++;
+    }
+    // recurring emits of the same aimed nova replay only the cheap re-hit
+    const nowSec = this.now();
+    const seqKey = `${casterId}:${ev.ability}`;
+    const lastSeq = this.pointSeqAt.get(seqKey);
+    const repeat = lastSeq !== undefined && nowSec - lastSeq < POINT_SEQ_REFRACTORY_SEC;
+    if (this.pointSeqAt.size > 64) {
+      for (const [key, at] of this.pointSeqAt) {
+        if (nowSec - at >= POINT_SEQ_REFRACTORY_SEC) this.pointSeqAt.delete(key);
+      }
+    }
+    this.pointSeqAt.set(seqKey, nowSec);
+    if (repeat) {
+      this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, plan, tier);
+    } else if (tier < 2 && full) {
+      fx.sequenceInstantAt(
+        ev.ability,
+        full,
+        casterId,
+        ev.x,
+        ev.z,
+        plan.color,
+        tier,
+        this.windupDelayFor(ev.ability, full, casterId),
+      );
+      // ground slams from the local player still read on the rig
+      if (this.deps.localPlayerId?.() === casterId) {
+        const arch = full.archetype;
+        if (arch === 'strike' || arch === 'dash') this.deps.triggerAttack(casterId, ev.ability);
+      }
+    } else {
+      // minimal fallback read: the spec-colored burst at the landing point
+      this.deps.vfx.burst(
+        { x: ev.x, y: gy + 0.4, z: ev.z },
+        ev.school,
+        plan.burstCount,
+        plan.burstPower,
+        plan.color,
+      );
+      this.spawned++;
+    }
+    this.recordStat(ev.ability, true);
+    return true;
+  }
+
+  // The cheap per-pulse zone re-hit (ground-zone ticks, repeated aimed novas):
+  // a small expanding ring, a pinch of palette debris, and at full tier a
+  // vertical accent halo — never a full sequence. Tier 2 draws nothing.
+  private zoneRehit(
+    x: number,
+    gy: number,
+    z: number,
+    radius: number | undefined,
+    spec: AbilityVfxSpec,
+    plan: AbilityVfxPlan,
+    tier: number,
+  ): void {
+    if (tier >= 2) return;
+    const fx = this.deps.fx;
+    const r = Math.min(6, Math.max(1.6, (radius ?? 4) * 0.85));
+    fx.ringAt(x, gy + 0.15, z, r, 0.5, plan.color, 1.1, false);
+    fx.burstAt(
+      x,
+      gy + 0.3,
+      z,
+      plan.swirlColor,
+      tier === 0 ? 8 : 5,
+      0.8,
+      PULSE_BURST_BY_PALETTE[spec.p ?? ''] ?? 'sparks',
+    );
+    this.spawned += 2;
+    if (tier === 0) {
+      fx.ringAt(x, gy + 0.9, z, Math.min(2.4, r * 0.5), 0.4, plan.swirlColor, 1.2, true);
+      this.spawned++;
+    }
   }
 
   // A landed ability hit gets one reduced-count accent burst in the spec color
@@ -468,6 +661,43 @@ export class AbilityVfx {
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).
   update(dt: number): void {
     this.deps.fx.update(dt);
+  }
+
+  // The synthetic pre-release windup for an INSTANT cast (part of the gallery
+  // anatomy the 0.15s compression dropped): min(authored windup, 0.5s), with
+  // gentler caps so nothing reads sluggish. Zero for real casts (their
+  // ceremony already ran via the live castingAbility path), finisher-flagged
+  // reactions, and unstyled windups. The visual release is what shifts late;
+  // the sim's damage timing is untouched.
+  private windupDelayFor(
+    abilityId: string,
+    full: AbilityVfxFullSpec | undefined,
+    sourceId: number,
+  ): number {
+    if (!full?.windup || full.windup <= 0) return 0;
+    if ((full.windupStyle ?? 'orb') === 'none') return 0;
+    if (full.finisher) return 0;
+    // dashes: the movement itself is the windup, and a leap's landing crater
+    // must never arrive late
+    if (full.archetype === 'dash') return 0;
+    const d = this.deps;
+    if (d.isInstantAbility && !d.isInstantAbility(abilityId)) return 0;
+    if (d.castingAbilityOf?.(sourceId)) return 0;
+    const arch = full.archetype;
+    const cap = arch === 'heal' || arch === 'buff' || arch === 'shout' ? 0.25 : 0.5;
+    return Math.min(full.windup, cap);
+  }
+
+  // Mirror of the renderer's generic-arm mob rule (its spellfx tail): a mob
+  // hurling an instant bolt/ray with NO cast state has nothing else animating
+  // the throw, so play its attack one-shot at launch. Claiming an event must
+  // not lose that read.
+  private mobThrowFallback(sourceId: number): void {
+    const d = this.deps;
+    if (!d.isMob?.(sourceId)) return;
+    if (d.castingAbilityOf?.(sourceId)) return;
+    if (d.isMidOneShot?.(sourceId)) return;
+    d.triggerAttack(sourceId);
   }
 
   private spawnRing(entityId: number, plan: AbilityVfxPlan, school: string): void {

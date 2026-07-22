@@ -1749,6 +1749,17 @@ export class Renderer {
         const vis = v ? this.activeVisual(v) : null;
         if (vis && !vis.isMidOneShot) vis.playEmote('cheer', 1);
       },
+      isMob: (id) => this.sim.entities.get(id)?.kind === 'mob',
+      castingAbilityOf: (id) => this.sim.entities.get(id)?.castingAbility ?? null,
+      isMidOneShot: (id) => {
+        const v = this.views.get(id);
+        return v ? !!this.activeVisual(v)?.isMidOneShot : false;
+      },
+      localPlayerId: () => this.sim.player.id,
+      isInstantAbility: (abilityId) => {
+        const def = ABILITIES[abilityId];
+        return !def || (def.castTime <= 0 && !def.channel && !def.empowerStages);
+      },
     });
     // Dev-only ability VFX probe surface (scripts/ability_vfx_probe.mjs):
     // self-installs onto window.__game once main.ts has assembled it, so the
@@ -3462,6 +3473,14 @@ export class Renderer {
         break;
       }
       case 'spellfxAt': {
+        // Spec-driven ground-cast visuals claim the point-anchored cues first
+        // (aimed 'nova'/'burst' landings and 'tick' zone pulses). The painter
+        // deliberately never claims meteorFall/snowZone/runeCircle/orb: those
+        // four are stateful lifetime visuals (a ball timed to its landing,
+        // snowfall over the zone's whole life, a persistent inscription, the
+        // roaming orb) that its one-shot sequences would read worse than, so
+        // their dedicated arms below stay authoritative.
+        if (this.abilityVfx.handleSpellfxAt(ev)) break;
         // The Frozen Orb flight, animated locally from its three moments:
         // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
         // the server's real coordinates when the orb latches onto an enemy.
