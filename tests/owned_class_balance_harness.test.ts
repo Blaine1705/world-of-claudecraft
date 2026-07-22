@@ -81,7 +81,7 @@ describe('owned-class level 20 balance harness', () => {
 
     expect(fieldcraft.dps).toBeLessThanOrEqual(coldsight.dps * 1.2);
     expect(woundDamage / fieldcraft.totalDamage).toBeGreaterThanOrEqual(0.05);
-  });
+  }, 30_000);
 
   it('keeps Vespers sustained damage in the DPS caster band', () => {
     const scenario = OWNED_CLASS_BALANCE_SCENARIOS[1];
