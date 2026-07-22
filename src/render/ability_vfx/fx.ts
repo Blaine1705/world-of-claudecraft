@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { AbilityVfxFullSpec } from '../ability_vfx_core';
+import type { AbilityVfxBuffSpec, AbilityVfxFullSpec } from '../ability_vfx_core';
 import { type DecalStyle, GroundDecals } from './decals';
 import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
@@ -26,6 +26,7 @@ export type ParticleBurst = (
 ) => void;
 
 const camPosScratch = new THREE.Vector3();
+const camRightScratch = new THREE.Vector3();
 
 // The Three-side engine of the per-ability VFX system: owns the pooled
 // primitive families ported from the Ability VFX Gallery (ribbon trails, shock
@@ -36,17 +37,56 @@ const camPosScratch = new THREE.Vector3();
 // gain and are swept by frame stamp when the entity stops casting or the aura
 // drops.
 
-export type OrbitStyle = 'halo' | 'sparks' | 'runes';
+export type OrbitStyle =
+  | 'halo'
+  | 'sparks'
+  | 'runes'
+  | 'plates'
+  | 'wings'
+  | 'heartbeat'
+  | 'speedlines'
+  | 'weaponGlow'
+  | 'leaves';
+
+const ORBIT_STYLE_SET = new Set<string>([
+  'halo',
+  'sparks',
+  'runes',
+  'plates',
+  'wings',
+  'heartbeat',
+  'speedlines',
+  'weaponGlow',
+  'leaves',
+]);
+
+// Resolve an authored buff-orbit name ('none', unknown, or absent → null).
+export function asOrbitStyle(v: string | null | undefined): OrbitStyle | null {
+  return v != null && ORBIT_STYLE_SET.has(v) ? (v as OrbitStyle) : null;
+}
+
+// The full spec's per-buff orbit DNA (buff.o): count/size/tex/rate/weave/
+// radius/incline for the circular bands, bpm/ringR for heartbeat, ribs/span/
+// flapRate for wings, density/spread/up for leaves.
+export type OrbitDna = NonNullable<AbilityVfxBuffSpec['o']>;
 
 const MAX_ORBITS_PER_ENTITY = 3;
 const MAX_ORBIT_BANDS = 24;
+const MAX_ORBIT_SPRITES = 8;
 const MAX_WINDUPS = 8;
 
 interface OrbitBand {
   style: OrbitStyle;
   colorHex: number;
+  // authored DNA overrides (a stable reference into the spec table; never
+  // mutated, never allocated per frame)
+  o: OrbitDna | undefined;
+  // degrade tier refreshed by the painter each frame: >= 1 halves sprite count
+  tier: number;
   phase: number;
   age: number;
+  // heartbeat only: the band age of the next chest pulse
+  beat: number;
   stamp: number;
 }
 
@@ -69,8 +109,14 @@ interface WindupState {
   stamp: number;
 }
 
-// Per-style orbit DNA (gallery band discipline: halo crowns the head, sparks
-// orbit the shoulders, runes circle the ankles).
+// Per-style orbit DNA defaults (gallery band discipline: halo crowns the
+// HEAD, sparks orbit the SHOULDERS, plates ring the WAIST, runes circle the
+// ANKLES, speedlines blur the LEGS, wings fan from the BACK, weaponGlow rides
+// the HAND, leaves rise as a COLUMN, heartbeat thumps off the CHEST — every
+// band stacks without collision). buff.o overrides these per ability. For the
+// bespoke styles the generic fields are reinterpreted: wings rate=flapRate
+// radius=span n=ribs; heartbeat radius=ringR; leaves rate=riseSpeed
+// radius=spread; speedlines radius=streakLength.
 const ORBIT_DNA: Record<
   OrbitStyle,
   {
@@ -87,7 +133,7 @@ const ORBIT_DNA: Record<
     n: 3,
     rate: 0.8,
     radius: 0.42,
-    weave: 0.06,
+    weave: 0.08,
     frac: 1.02,
     size: 0.26,
     cell: OVERLAY_CELL.star,
@@ -110,7 +156,76 @@ const ORBIT_DNA: Record<
     size: 0.32,
     cell: OVERLAY_CELL.rune,
   },
+  plates: {
+    n: 4,
+    rate: 0.9,
+    radius: 0.9,
+    weave: 0.1,
+    frac: 0.45,
+    size: 0.5,
+    cell: OVERLAY_CELL.glow,
+  },
+  wings: {
+    n: 5,
+    rate: 1.3,
+    radius: 1,
+    weave: 0.3,
+    frac: 0.72,
+    size: 0.24,
+    cell: OVERLAY_CELL.glow,
+  },
+  heartbeat: {
+    n: 1,
+    rate: 1,
+    radius: 1.5,
+    weave: 0,
+    frac: 0.58,
+    size: 0.22,
+    cell: OVERLAY_CELL.glow,
+  },
+  speedlines: {
+    n: 3,
+    rate: 1,
+    radius: 0.9,
+    weave: 0,
+    frac: 0.3,
+    size: 0.13,
+    cell: OVERLAY_CELL.glow,
+  },
+  weaponGlow: {
+    n: 1,
+    rate: 1,
+    radius: 0,
+    weave: 0,
+    frac: 0.46,
+    size: 0.24,
+    cell: OVERLAY_CELL.star,
+  },
+  leaves: {
+    n: 6,
+    rate: 0.4,
+    radius: 0.9,
+    weave: 0,
+    frac: 0.04,
+    size: 0.17,
+    cell: OVERLAY_CELL.glow,
+  },
 };
+
+// Gallery ORBIT_TEX names mapped onto the overlay atlas's four cells (chip →
+// spark is the closest fragment read; rays → star; paw → rune glyph).
+const ORBIT_TEX_CELL: Record<string, number | undefined> = {
+  star: OVERLAY_CELL.star,
+  glow: OVERLAY_CELL.glow,
+  chip: OVERLAY_CELL.spark,
+  rays: OVERLAY_CELL.star,
+  paw: OVERLAY_CELL.rune,
+};
+
+// Tier 1 keeps the orbit read but halves the sprite count.
+function orbitCount(n: number, halve: boolean): number {
+  return halve ? Math.max(1, Math.ceil(n / 2)) : n;
+}
 
 // The gallery's palette-default projectile silhouette (PROJ_DEFAULT): specs
 // that author no bolt style still read as their school's shape.
@@ -137,6 +252,11 @@ export class AbilityVfxFx implements SequencerHost {
   private time = 0;
   private frame = 0;
   private qualityLevel = 1;
+  // Camera-right on the ground plane, refreshed once per update: entities
+  // expose no facing through the anchor seam, so wings fan and speedlines
+  // streak across the SCREEN — the silhouette always reads.
+  private camRightX = 1;
+  private camRightZ = 0;
   private particleBurst: ParticleBurst | null = null;
   private lightPulseCb:
     | ((entityId: number, palette: string, intensity: number, duration: number) => void)
@@ -144,6 +264,11 @@ export class AbilityVfxFx implements SequencerHost {
   private statSink: ((abilityId: string, n: number) => void) | null = null;
   private applyGlow: ((entityId: number, colorHex: number, intensity: number) => void) | null =
     null;
+  private shakeCb: ((amount: number) => void) | null = null;
+  // Rolling shake budget: recent trauma adds decay over time, and shakeAt only
+  // grants what remains under the cap, so a spam fight can never stack the
+  // camera into a constant rumble.
+  private shakeRecent = 0;
   private sequencer = new ArchetypeSequencer();
   // Body-glow envelopes (the gallery casterGlowV): attack fast while fed each
   // frame, decay 0.9/s for held-shell buffs else 2.2/s once the source drops.
@@ -192,18 +317,21 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   // Wired once by the painter: particle bursts ride the pooled Vfx cloud,
-  // impact light rides the renderer's pooled point-light flashes, and every
-  // sequencer spawn is counted into the painter's probe stats.
+  // impact light rides the renderer's pooled point-light flashes, every
+  // sequencer spawn is counted into the painter's probe stats, and camera
+  // trauma rides the renderer's existing addShake accumulator.
   setDelegates(
     burst: ParticleBurst,
     lightPulse: (entityId: number, palette: string, intensity: number, duration: number) => void,
     statSink: (abilityId: string, n: number) => void,
     applyGlow?: (entityId: number, colorHex: number, intensity: number) => void,
+    addShake?: (amount: number) => void,
   ): void {
     this.particleBurst = burst;
     this.lightPulseCb = lightPulse;
     this.statSink = statSink;
     this.applyGlow = applyGlow ?? null;
+    this.shakeCb = addShake ?? null;
   }
 
   // Feed the body glow for one entity this frame (spec'd cast or live buff
@@ -613,6 +741,19 @@ export class AbilityVfxFx implements SequencerHost {
     this.statSink?.(abilityId, n);
   }
 
+  // Camera trauma from a world point: distance falloff (full inside 18 yd,
+  // gone by 50) plus the rolling budget, so only nearby heavy moments kick
+  // and a spam fight can never hold the camera shaking.
+  shakeAt(x: number, y: number, z: number, amount: number): void {
+    if (!this.shakeCb || amount <= 0) return;
+    const d = Math.hypot(x - camPosScratch.x, y - camPosScratch.y, z - camPosScratch.z);
+    const falloff = d <= 18 ? 1 : Math.max(0, 1 - (d - 18) / 32);
+    const granted = Math.min(amount * falloff, Math.max(0, 0.55 - this.shakeRecent));
+    if (granted <= 0.01) return;
+    this.shakeRecent += granted;
+    this.shakeCb(granted);
+  }
+
   // ---- fire-and-forget primitives (painter dispatch) ----------------------
 
   jaggedBolt(sourceId: number, targetId: number, colorHex: number): void {
@@ -620,9 +761,19 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   // A wavering channel beam (drains, mind rays): the bolt slot at near-zero
-  // jag, a touch wider and longer-lived than the lightning crack.
-  beamRibbon(sourceId: number, targetId: number, colorHex: number): void {
-    this.ribbons.spawnBolt(sourceId, targetId, colorHex, 0.32, 0.11, 0.18);
+  // jag, a touch wider and longer-lived than the lightning crack. Energy flows
+  // along the strip TOWARD the last point, so callers reverse the argument
+  // order to reverse the flow (drains run target -> caster). width and life
+  // let a channel crescendo — the cord swelling tick over tick, its life
+  // spanning the tick gap so the beam reads continuous.
+  beamRibbon(
+    sourceId: number,
+    targetId: number,
+    colorHex: number,
+    width = 0.11,
+    life = 0.32,
+  ): void {
+    this.ribbons.spawnBolt(sourceId, targetId, colorHex, life, width, 0.18);
   }
 
   // Comet trail chasing the pooled Vfx projectile; lands a small vertical
@@ -651,6 +802,8 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   // Vertical camera-facing halo at an entity (impacts, crits, shout chests).
+  // The big (crit) halo also kicks a small camera shake — accent-gated by the
+  // painter and budget-clamped here, so crit chains never stack trauma.
   impactRing(entityId: number, colorHex: number, big = false): void {
     const at = this.anchor(entityId, 0.55);
     if (!at) return;
@@ -664,6 +817,7 @@ export class AbilityVfxFx implements SequencerHost {
       (big ? 1.8 : 1.4) * this.intensity(),
       true,
     );
+    if (big) this.shakeAt(at.x, at.y, at.z, 0.08);
   }
 
   // The nova/shout ground read: two staggered expanding rings draped at the
@@ -717,7 +871,9 @@ export class AbilityVfxFx implements SequencerHost {
 
   // Returns true when this call CREATED the band (the aura-gain moment), so
   // the painter can pop a swirl without any event carrying the ability id.
-  orbit(entityId: number, style: OrbitStyle, colorHex: number): boolean {
+  // o is the spec's buff.o DNA (per-buff count/size/rate/radius/... overrides);
+  // tier >= 1 halves the band's sprite count while keeping the read.
+  orbit(entityId: number, style: OrbitStyle, colorHex: number, o?: OrbitDna, tier = 0): boolean {
     let bands = this.orbits.get(entityId);
     if (!bands) {
       bands = [];
@@ -726,6 +882,8 @@ export class AbilityVfxFx implements SequencerHost {
     for (const band of bands) {
       if (band.style === style) {
         band.colorHex = colorHex;
+        band.o = o;
+        band.tier = tier;
         band.stamp = this.frame;
         return false;
       }
@@ -735,8 +893,11 @@ export class AbilityVfxFx implements SequencerHost {
     bands.push({
       style,
       colorHex,
+      o,
+      tier,
       phase: ((entityId * 2654435761) % 628) / 100,
       age: 0,
+      beat: 0,
       stamp: this.frame,
     });
     this.orbitBandCount++;
@@ -747,7 +908,14 @@ export class AbilityVfxFx implements SequencerHost {
 
   update(dt: number): void {
     this.time += dt;
+    this.shakeRecent = Math.max(0, this.shakeRecent - dt * 0.8);
     this.camera.getWorldPosition(camPosScratch);
+    camRightScratch.set(1, 0, 0).applyQuaternion(this.camera.quaternion);
+    const rightLen = Math.hypot(camRightScratch.x, camRightScratch.z);
+    if (rightLen > 1e-4) {
+      this.camRightX = camRightScratch.x / rightLen;
+      this.camRightZ = camRightScratch.z / rightLen;
+    }
     this.ribbons.update(dt, camPosScratch);
     this.rings.update(dt, this.camera.quaternion);
     this.flipbooks.update(dt, this.camera.quaternion);
@@ -984,23 +1152,200 @@ export class AbilityVfxFx implements SequencerHost {
     }
   }
 
+  // The nine buff-orbit body bands (gallery updateOneOrbit), all immediate-
+  // mode overlay sprites recomputed per frame — except heartbeat's chest
+  // pulse, which rides the pooled shock rings at its authored bpm. buff.o
+  // overrides the style DNA so same-band buffs still read as different spells.
   private drawOrbit(entityId: number, band: OrbitBand): void {
     const dna = ORBIT_DNA[band.style];
     const at = this.anchor(entityId, dna.frac);
     if (!at) return;
+    const o = band.o;
     const fade = Math.min(1, band.age / 0.25) * (0.55 + 0.45 * this.qualityLevel);
-    for (let k = 0; k < dna.n; k++) {
-      const a = band.phase + this.time * dna.rate + (k / dna.n) * Math.PI * 2;
-      const y = at.y + Math.sin(this.time * 2 + k * 2) * dna.weave;
+    const halve = band.tier >= 1;
+    const color = band.colorHex;
+    const t = this.time;
+    if (band.style === 'heartbeat') {
+      // pounding pulse rings off the chest: frenzy buffs race (Recklessness
+      // bpm 170), fortitude thumps slow
+      const period = 60 / Math.min(240, Math.max(30, o?.bpm ?? 83));
+      if (band.age >= band.beat) {
+        band.beat = band.age + period;
+        this.rings.spawn(
+          at.x,
+          at.y,
+          at.z,
+          o?.ringR ?? dna.radius,
+          0.5,
+          color,
+          1.5 * this.intensity() * Math.min(1, fade * 2),
+          true,
+        );
+        this.bodyGlowPulse(entityId, color, 1.3, false);
+      }
+      if (!halve) {
+        // chest glimmer swelling right after each beat
+        const since = Math.min(1, Math.max(0, 1 - (band.beat - band.age) / period));
+        const swell = Math.exp(-since * 5);
+        this.overlay.push(
+          at.x,
+          at.y,
+          at.z,
+          color,
+          dna.size * (1 + swell),
+          dna.cell,
+          fade * (0.35 + 0.45 * swell),
+          1.9,
+        );
+      }
+      return;
+    }
+    if (band.style === 'speedlines') {
+      // wind-blur streaks at the LEG band, under everything else; per-frame
+      // flicker and jitter IS the gallery read
+      const streaks = halve ? 2 : 3;
+      const rate = o?.rate ?? 1;
+      const rx = this.camRightX;
+      const rz = this.camRightZ;
+      for (let s = 0; s < streaks; s++) {
+        if (Math.random() > 0.6) continue;
+        const y = at.y + (Math.random() - 0.5) * 0.9;
+        const off = (Math.random() - 0.5) * 0.7;
+        const ox = -rz * off;
+        const oz = rx * off;
+        const len = dna.radius * (0.8 + 0.4 * Math.random()) * (0.8 + 0.2 * rate);
+        for (let j = 0; j < 3; j++) {
+          const d = len * (1 - j);
+          this.overlay.push(
+            at.x + rx * d + ox,
+            y,
+            at.z + rz * d + oz,
+            color,
+            dna.size * (1 - 0.15 * j),
+            dna.cell,
+            fade * (0.7 - 0.18 * j),
+            1.6,
+          );
+        }
+      }
+      return;
+    }
+    if (band.style === 'wings') {
+      // spectral rib fan off the back (Rallying Cry's war banner): a glow per
+      // rib per side plus a shoulder root, flapping on flapRate
+      const ribs = Math.max(2, Math.min(5, o?.ribs ?? dna.n));
+      const nRibs = halve ? Math.max(2, Math.ceil(ribs / 2)) : ribs;
+      const span = o?.span ?? dna.radius;
+      const flap = Math.sin(t * (o?.flapRate ?? dna.rate)) * dna.weave;
+      const rx = this.camRightX;
+      const rz = this.camRightZ;
+      for (let side = -1; side <= 1; side += 2) {
+        this.overlay.push(
+          at.x + rx * side * 0.2,
+          at.y + 0.15,
+          at.z + rz * side * 0.2,
+          color,
+          0.3 * span,
+          OVERLAY_CELL.glow,
+          fade * 0.5,
+          1.6,
+        );
+        for (let f = 0; f < nRibs; f++) {
+          const u = nRibs > 1 ? f / (nRibs - 1) : 0;
+          const lat = (0.55 + u * 0.95) * span;
+          this.overlay.push(
+            at.x + rx * side * lat,
+            at.y + (0.6 - u * 1.05) * span + flap * (0.4 + u * 0.65),
+            at.z + rz * side * lat,
+            color,
+            dna.size * span * (1 - u * 0.3),
+            dna.cell,
+            fade * (0.85 - u * 0.3),
+            1.8,
+          );
+        }
+      }
+      return;
+    }
+    if (band.style === 'weaponGlow') {
+      // enchanted weapon shimmer at the hand: soft glow, pulsing star, and a
+      // flickering spark shed off the blade
+      const pulse = 1 + 0.15 * Math.sin(t * 6 * (o?.rate ?? 1));
+      this.overlay.push(at.x, at.y, at.z, color, 0.4 * pulse, OVERLAY_CELL.glow, fade * 0.55, 1.6);
       this.overlay.push(
-        at.x + Math.cos(a) * dna.radius,
-        y,
-        at.z + Math.sin(a) * dna.radius,
-        band.colorHex,
-        dna.size,
+        at.x,
+        at.y,
+        at.z,
+        color,
+        (o?.size ?? dna.size) * pulse,
         dna.cell,
-        fade,
-        2.1,
+        fade * 0.85,
+        2.4,
+      );
+      if (!halve && Math.random() < 0.4) {
+        this.overlay.push(
+          at.x + (Math.random() - 0.5) * 0.25,
+          at.y + (Math.random() - 0.3) * 0.4,
+          at.z + (Math.random() - 0.5) * 0.25,
+          color,
+          0.14,
+          OVERLAY_CELL.spark,
+          fade * 0.8,
+          2.2,
+        );
+      }
+      return;
+    }
+    if (band.style === 'leaves') {
+      // rising mote column (heals, regrowth): motes cycle feet to crown,
+      // fading in and out over the climb
+      const n = orbitCount(
+        Math.max(3, Math.min(7, Math.round((o?.density ?? 12) * 0.5))),
+        halve,
+      );
+      const spread = o?.spread ?? dna.radius;
+      const up = o?.up ?? 1;
+      for (let k = 0; k < n; k++) {
+        const f = (t * dna.rate * up + k / n) % 1;
+        const a = band.phase + k * 2.4 + t * 0.3;
+        const r = 0.35 + spread * 0.55 * ((k * 0.618) % 1);
+        this.overlay.push(
+          at.x + Math.cos(a) * r,
+          at.y + 0.15 + f * 2.1,
+          at.z + Math.sin(a) * r,
+          color,
+          dna.size,
+          dna.cell,
+          fade * Math.sin(f * Math.PI) * 0.9,
+          1.7,
+        );
+      }
+      return;
+    }
+    // circular orbit family: halo (head) / sparks (shoulders) / plates
+    // (waist) / runes (ankles). o.rate MULTIPLIES the style's base speed;
+    // radius/weave/incline/size/tex override outright. Plates run dimmer and
+    // larger so they read as translucent facets, not hot points.
+    const plates = band.style === 'plates';
+    const n = orbitCount(Math.min(MAX_ORBIT_SPRITES, o?.n ?? dna.n), halve);
+    const rate = dna.rate * (o?.rate ?? 1);
+    const radius = o?.radius ?? dna.radius;
+    const weave = o?.weave ?? dna.weave;
+    const incline = o?.incline ?? 0;
+    const size = plates ? dna.size * (o?.size ?? 1) : (o?.size ?? dna.size);
+    const cell = (o?.tex !== undefined ? ORBIT_TEX_CELL[o.tex] : undefined) ?? dna.cell;
+    for (let k = 0; k < n; k++) {
+      const a = band.phase + t * rate + (k / n) * Math.PI * 2;
+      const y = at.y + Math.sin(t * 2 + k * 2) * weave + Math.sin(a) * incline;
+      this.overlay.push(
+        at.x + Math.cos(a) * radius,
+        y,
+        at.z + Math.sin(a) * radius,
+        color,
+        size,
+        cell,
+        plates ? 0.7 * fade : fade,
+        plates ? 1.3 : 2.1,
       );
     }
   }

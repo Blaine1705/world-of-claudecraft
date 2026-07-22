@@ -11,11 +11,18 @@ import {
 // second ring, +120ms finisher ring, vRing, sparks/embers/debris/smoke/blood,
 // light pulse, trail arc, decal), then lingers (dot drips, motifEvery loops).
 // Instants run the same sequence compressed: impact fires 0.15s after release.
-// Motifs are set-piece compositions on the same pools. Everything is
-// slot-pooled and capped; budget tier 1 sheds motifs and lingers, tier 2 never
-// reaches the sequencer.
+// Motifs are set-piece compositions on the same pools, staged over time
+// through a pooled beat queue (the gallery's setTimeoutSim staggering).
+// Everything is slot-pooled and capped; budget tier 0 plays the full
+// composition, tier 1 keeps ONE signature beat per motif and sheds lingers,
+// tier 2 never reaches the sequencer.
 
 const SEQ_SLOTS = 24;
+const BEAT_SLOTS = 48;
+// The implosion converge and barrier-plate transients play over fixed spans.
+const IMPLODE_DUR = 0.42;
+const BARRIER_DUR = 1.35;
+const BARRIER_PLATE_LIFE = 1.1;
 
 // The host surface fx.ts implements: every primitive the sequences drive.
 export interface SequencerHost {
@@ -111,6 +118,34 @@ export interface SequencerHost {
   quality(): number;
   timeNow(): number;
   countPrimitive(abilityId: string, n: number): void;
+  // Camera trauma at a world point (the host applies distance falloff and a
+  // rolling budget so spam can never stack shake).
+  shakeAt(x: number, y: number, z: number, amount: number): void;
+}
+
+type SeqBurstKind = 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood';
+
+// One pooled delayed motif beat (the gallery's setTimeoutSim staggering):
+// counts down, fires its primitive stack once, frees the slot. Beats hold
+// world coordinates so they land correctly even after their sequence ends.
+type BeatKind = 'burst' | 'pillar' | 'orbital';
+
+interface Beat {
+  active: boolean;
+  delay: number;
+  kind: BeatKind;
+  abilityId: string;
+  x: number;
+  y: number;
+  z: number;
+  tx: number;
+  ty: number;
+  tz: number;
+  color: number;
+  accent: number;
+  a: number; // count (burst) / height (pillar)
+  b: number; // power (burst) / radius (pillar)
+  burstKind: SeqBurstKind;
 }
 
 export interface SeqSlot {
@@ -150,6 +185,7 @@ export interface SeqSlot {
   gavelT: number;
   ccStars: number; // stunned-star band duration remaining
   implode: number; // implosion converge remaining
+  barrierT: number; // barrier plate-arc duration remaining
 }
 
 function lighten(color: number, amount: number): number {
@@ -197,8 +233,28 @@ const SHEET_BY_PALETTE: Record<string, string> = {
 
 export class ArchetypeSequencer {
   private slots: SeqSlot[] = [];
+  private beats: Beat[] = [];
 
   constructor() {
+    for (let i = 0; i < BEAT_SLOTS; i++) {
+      this.beats.push({
+        active: false,
+        delay: 0,
+        kind: 'burst',
+        abilityId: '',
+        x: 0,
+        y: 0,
+        z: 0,
+        tx: 0,
+        ty: 0,
+        tz: 0,
+        color: 0xffffff,
+        accent: 0xffffff,
+        a: 0,
+        b: 0,
+        burstKind: 'sparks',
+      });
+    }
     for (let i = 0; i < SEQ_SLOTS; i++) {
       this.slots.push({
         active: false,
@@ -232,6 +288,7 @@ export class ArchetypeSequencer {
         gavelT: 0,
         ccStars: 0,
         implode: 0,
+        barrierT: 0,
       });
     }
   }
@@ -296,6 +353,7 @@ export class ArchetypeSequencer {
     slot.gavel = false;
     slot.ccStars = 0;
     slot.implode = 0;
+    slot.barrierT = 0;
     if (slot.releaseDone) this.release(host, slot);
     return slot;
   }
@@ -311,6 +369,15 @@ export class ArchetypeSequencer {
   }
 
   update(host: SequencerHost, dt: number): void {
+    // staggered motif beats fire before the slot walk so a beat scheduled last
+    // frame lands on time even if its sequence ended
+    for (const beat of this.beats) {
+      if (!beat.active) continue;
+      beat.delay -= dt;
+      if (beat.delay > 0) continue;
+      beat.active = false;
+      this.fireBeat(host, beat);
+    }
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.t += dt;
@@ -422,13 +489,100 @@ export class ArchetypeSequencer {
         slot.t >= slot.lingerUntil &&
         !slot.gavel &&
         slot.ccStars <= 0 &&
-        slot.implode <= 0;
+        slot.implode <= 0 &&
+        slot.barrierT <= 0;
       if (done || slot.t > 12) slot.active = false;
     }
   }
 
   clear(): void {
     for (const slot of this.slots) slot.active = false;
+    for (const beat of this.beats) beat.active = false;
+  }
+
+  // ---- staggered motif beats ----------------------------------------------
+
+  private scheduleBeat(
+    delay: number,
+    kind: BeatKind,
+    abilityId: string,
+    x: number,
+    y: number,
+    z: number,
+    color: number,
+    accent: number,
+    a: number,
+    b: number,
+    burstKind: SeqBurstKind = 'sparks',
+    tx = 0,
+    ty = 0,
+    tz = 0,
+  ): void {
+    // a saturated pool drops garnish beats; the immediate stack already read
+    const beat = this.beats.find((bt) => !bt.active);
+    if (!beat) return;
+    beat.active = true;
+    beat.delay = delay;
+    beat.kind = kind;
+    beat.abilityId = abilityId;
+    beat.x = x;
+    beat.y = y;
+    beat.z = z;
+    beat.tx = tx;
+    beat.ty = ty;
+    beat.tz = tz;
+    beat.color = color;
+    beat.accent = accent;
+    beat.a = a;
+    beat.b = b;
+    beat.burstKind = burstKind;
+  }
+
+  private fireBeat(host: SequencerHost, beat: Beat): void {
+    switch (beat.kind) {
+      case 'burst':
+        host.burstAt(beat.x, beat.y, beat.z, beat.color, Math.round(beat.a), beat.b, beat.burstKind);
+        host.countPrimitive(beat.abilityId, 1);
+        break;
+      case 'pillar': {
+        // one sequential ground eruption (gallery pillars): light column, a
+        // vertical crack, and risers bursting off the base
+        const gy = host.groundYAt(beat.x, beat.z);
+        host.pillarAt(beat.x, gy, beat.z, beat.b, beat.a, beat.color, 0.5);
+        host.boltPoints(
+          beat.x,
+          gy + 0.05,
+          beat.z,
+          beat.x + (Math.random() - 0.5) * 0.5,
+          gy + beat.a,
+          beat.z + (Math.random() - 0.5) * 0.5,
+          beat.color,
+          0.28,
+          0.12,
+          0.8,
+        );
+        host.burstAt(beat.x, gy + 0.15, beat.z, beat.accent, 7, 1.3, 'embers');
+        host.countPrimitive(beat.abilityId, 3);
+        break;
+      }
+      case 'orbital':
+        // one orb slam (gallery orbitals): the strike arc plus its spark pop
+        host.boltPoints(
+          beat.x,
+          beat.y,
+          beat.z,
+          beat.tx,
+          beat.ty,
+          beat.tz,
+          beat.color,
+          0.16,
+          0.09,
+          0.25,
+        );
+        host.burstAt(beat.tx, beat.ty, beat.tz, beat.accent, 8, 1.3, 'sparks');
+        host.countPrimitive(beat.abilityId, 2);
+        break;
+    }
   }
 
   // ---- phases -------------------------------------------------------------
@@ -450,8 +604,9 @@ export class ArchetypeSequencer {
       host.pulseLight(slot.casterId, spec.palette, 3.2 * slot.power, 0.22);
       host.countPrimitive(slot.abilityId, 2);
     }
-    // release-phase motifs (bladestorm whirl, implosion pull-in)
-    if (spec.motifs && slot.tier === 0) {
+    // release-phase motifs (bladestorm whirl, implosion pull-in); tier 1 still
+    // plays them as their single signature beat
+    if (spec.motifs && slot.tier <= 1) {
       for (const m of spec.motifs) {
         if (m === 'bladestorm' || m === 'implosion') this.runOneMotif(host, slot, m);
       }
@@ -585,11 +740,15 @@ export class ArchetypeSequencer {
       n++;
     }
     host.countPrimitive(slot.abilityId, n);
+    // crit-finisher impacts kick the camera (small; the accent system and the
+    // host's shake budget keep a crit chain from stacking trauma)
+    if (spec.finisher && slot.tier === 0) host.shakeAt(slot.ix, slot.iy, slot.iz, 0.15);
     // per-archetype impact extras
     this.archetypeImpact(host, slot, gy);
-    // impact-phase motifs
-    if (spec.motifs && slot.tier === 0) this.runMotifs(host, slot);
-    // lingers
+    // impact-phase motifs; tier 1 keeps one signature beat per motif
+    if (spec.motifs && slot.tier <= 1) this.runMotifs(host, slot);
+    // lingers honor the authored 1-6s dwell at tier 0 (dot drips, motif loops,
+    // and the decal above all ride this window)
     slot.lingerUntil = slot.t + (slot.tier === 0 ? Math.min(6, spec.linger ?? 0.5) : 0);
   }
 
@@ -610,6 +769,7 @@ export class ArchetypeSequencer {
             host.ringAt(slot.ix, gy, slot.iz, 4.2 * slot.power, 0.6, c, 1.6, false);
             host.burstAt(slot.ix, gy + 0.2, slot.iz, c, 12, 1, 'debris');
             host.countPrimitive(slot.abilityId, 2);
+            if (slot.tier === 0) host.shakeAt(slot.ix, gy, slot.iz, 0.2);
           }
           if (spec.strike?.stars) slot.ccStars = Math.max(slot.ccStars, 1.2);
         }
@@ -782,8 +942,13 @@ export class ArchetypeSequencer {
     }
   }
 
+  // Set-piece motif compositions at gallery scale (MOTIFS table,
+  // arc_bolt_preview.js): full stagger and beat count at tier 0, the ONE
+  // signature beat at tier 1. Delayed beats ride the pooled beat queue; the
+  // immediate primitives count here and every beat counts itself on fire.
   private runOneMotif(host: SequencerHost, slot: SeqSlot, motif: AbilityVfxMotif): void {
     const spec = slot.spec;
+    const lite = slot.tier >= 1;
     const atCaster = spec.motifAt === 'caster' || spec.self === true;
     const anchorId =
       spec.motifAt === 'target' ? slot.targetId : atCaster ? slot.casterId : slot.targetId;
@@ -792,84 +957,176 @@ export class ArchetypeSequencer {
     const c = slot.color;
     const acc = slot.accent;
     const r = spec.motifR ?? 1.1;
+    const id = slot.abilityId;
     let n = 1;
     switch (motif) {
       case 'fissure': {
+        // the ground splits toward the target: a branching caster-to-point
+        // crack (0.8s) with six ember/dust eruptions staggered along it
         const from = host.anchorOf(slot.casterId, 0.05);
-        if (from) {
-          const fgy = host.groundYAt(from.x, from.z);
-          host.boltPoints(from.x, fgy + 0.12, from.z, at.x, gy + 0.12, at.z, c, 0.7, 0.16, 0.5);
-          for (let k = 0; k < 4; k++) {
-            const u = (k + 1) / 5;
-            host.burstAt(
-              from.x + (at.x - from.x) * u,
-              fgy + 0.15,
-              from.z + (at.z - from.z) * u,
-              c,
-              5,
-              0.7,
-              'debris',
-            );
-          }
-          n = 5;
+        if (!from) {
+          n = 0;
+          break;
         }
+        const fgy = host.groundYAt(from.x, from.z);
+        host.boltPoints(from.x, fgy + 0.12, from.z, at.x, gy + 0.12, at.z, c, 0.8, 0.18, 0.5);
+        if (lite) {
+          // signature beat: the crack plus one eruption where it ends
+          host.burstAt(at.x, gy + 0.15, at.z, c, 6, 1, 'debris');
+          n = 2;
+          break;
+        }
+        // a branch splitting off the midpoint sells "branching", which the
+        // pooled bolt generator itself never draws
+        const mx = (from.x + at.x) / 2;
+        const mz = (from.z + at.z) / 2;
+        const px = -(at.z - from.z);
+        const pz = at.x - from.x;
+        const pl = Math.hypot(px, pz) || 1;
+        const side = Math.random() < 0.5 ? 1 : -1;
+        const bx = mx + (px / pl) * 2.2 * side;
+        const bz = mz + (pz / pl) * 2.2 * side;
+        host.boltPoints(
+          mx,
+          host.groundYAt(mx, mz) + 0.12,
+          mz,
+          bx,
+          host.groundYAt(bx, bz) + 0.12,
+          bz,
+          c,
+          0.6,
+          0.1,
+          0.8,
+        );
+        for (let k = 0; k < 6; k++) {
+          const u = (k + 1) / 7;
+          const ex = from.x + (at.x - from.x) * u;
+          const ez = from.z + (at.z - from.z) * u;
+          this.scheduleBeat(
+            u * 0.22,
+            'burst',
+            id,
+            ex,
+            host.groundYAt(ex, ez) + 0.15,
+            ez,
+            k % 2 === 0 ? c : acc,
+            acc,
+            6,
+            1.1,
+            k % 2 === 0 ? 'debris' : 'embers',
+          );
+        }
+        if (slot.tier === 0) host.shakeAt(at.x, gy, at.z, 0.3);
+        n = 2;
         break;
       }
       case 'pillars': {
+        // ring of five sequential ground eruptions, 90ms apart
+        if (lite) {
+          host.pillarAt(at.x, gy, at.z, 0.45, 3, c, 0.5);
+          break;
+        }
         for (let k = 0; k < 5; k++) {
           const a = (k / 5) * Math.PI * 2;
-          host.pillarAt(at.x + Math.cos(a) * 1.9, gy, at.z + Math.sin(a) * 1.9, 0.35, 2.6, c, 0.45);
+          this.scheduleBeat(
+            k * 0.09,
+            'pillar',
+            id,
+            at.x + Math.cos(a) * 1.9,
+            gy,
+            at.z + Math.sin(a) * 1.9,
+            c,
+            acc,
+            2.2 + (k % 3) * 0.5,
+            0.42,
+          );
         }
-        n = 5;
+        n = 0;
         break;
       }
       case 'crescents':
-        host.slashStyled({ x: at.x, y: at.y + 0.4, z: at.z }, c, 'crescent', 1.1);
-        host.slashStyled({ x: at.x, y: at.y + 0.6, z: at.z }, acc, 'crescent', 0.9);
-        n = 2;
+        // twin moon-blades sweeping through at gallery span
+        host.slashStyled({ x: at.x, y: at.y + 0.4, z: at.z }, c, 'crescent', lite ? 1.5 : 1.6);
+        if (!lite) {
+          host.slashStyled({ x: at.x, y: at.y + 0.7, z: at.z }, acc, 'crescent', 1.3);
+          host.burstAt(at.x, at.y + 0.5, at.z, acc, 8, 0.9, 'sparks');
+          n = 3;
+        }
         break;
       case 'bladestorm': {
+        // slash ribbons ARCING around the caster (true whirl segments, not
+        // point slashes); spec.motifR widens the whirl to the real AoE
         const center = host.anchorOf(slot.casterId, 0.5) ?? at;
-        for (let k = 0; k < 3; k++) {
-          const a = host.timeNow() * 9 + (k / 3) * Math.PI * 2;
-          host.slashStyled(
-            { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r },
-            k % 2 === 0 ? c : acc,
-            'horizontal',
-            0.8 * Math.sqrt(r / 1.1),
-          );
+        const w = Math.sqrt(r / 1.1);
+        const count = lite ? 1 : 3;
+        for (let k = 0; k < count; k++) {
+          const ph = host.timeNow() * 9 + (k / 3) * Math.PI * 2;
+          host.pathRibbon(k % 2 === 0 ? c : acc, 0.11 * w, 0.55, (pts) => {
+            for (let i = 0; i < 9; i++) {
+              const a = ph + (i / 8) * 1.6;
+              pts[i].set(
+                center.x + Math.cos(a) * r,
+                center.y + Math.sin(ph * 0.7) * 0.3,
+                center.z + Math.sin(a) * r,
+              );
+            }
+            return 9;
+          });
         }
-        n = 3;
+        if (slot.tier === 0) host.shakeAt(center.x, center.y, center.z, 0.25);
+        n = count;
         break;
       }
       case 'orbitals': {
-        for (let k = 0; k < 3; k++) {
-          const a = (k / 3) * Math.PI * 2 + 0.6;
-          const sx = at.x + Math.cos(a) * 1.8;
-          const sz = at.z + Math.sin(a) * 1.8;
+        // orbs circle in and slam one-two-three (staggered 140ms apart)
+        if (lite) {
+          const a = 0.6;
           host.boltPoints(
-            sx,
-            at.y + 1.6,
-            sz,
+            at.x + Math.cos(a) * 1.8,
+            at.y + 0.9,
+            at.z + Math.sin(a) * 1.8,
             at.x,
             at.y,
             at.z,
-            k % 2 === 0 ? c : acc,
-            0.25,
+            c,
+            0.16,
             0.09,
-            0.2,
+            0.25,
+          );
+          host.burstAt(at.x, at.y, at.z, acc, 8, 1.1, 'sparks');
+          n = 2;
+          break;
+        }
+        for (let k = 0; k < 3; k++) {
+          const a = (k / 3) * Math.PI * 2 + 0.6;
+          this.scheduleBeat(
+            0.1 + k * 0.14,
+            'orbital',
+            id,
+            at.x + Math.cos(a) * 1.8,
+            at.y + 0.9,
+            at.z + Math.sin(a) * 1.8,
+            k % 2 === 0 ? c : acc,
+            acc,
+            0,
+            0,
+            'sparks',
+            at.x,
+            at.y,
+            at.z,
           );
         }
-        host.burstAt(at.x, at.y, at.z, acc, 8, 0.8, 'sparks');
-        n = 4;
+        n = 0;
         break;
       }
       case 'fountain': {
-        for (let k = 0; k < 4; k++) {
-          const a = (k / 4) * Math.PI * 2 + 0.4;
+        // arcing streams rain onto the point from a wide ring
+        const streams = lite ? 2 : 6;
+        for (let k = 0; k < streams; k++) {
+          const a = (k / streams) * Math.PI * 2 + 0.4;
           const sx = at.x + Math.cos(a) * 2.4;
           const sz = at.z + Math.sin(a) * 2.4;
-          host.pathRibbon(k % 2 === 0 ? c : acc, 0.09, 0.7, (pts) => {
+          host.pathRibbon(k % 2 === 0 ? c : acc, 0.09, 0.85, (pts) => {
             for (let i = 0; i < 10; i++) {
               const u = i / 9;
               pts[i].set(
@@ -881,52 +1138,73 @@ export class ArchetypeSequencer {
             return 10;
           });
         }
-        n = 4;
+        n = streams;
+        if (!lite) {
+          host.burstAt(at.x, gy + 0.5, at.z, acc, 10, 0.9, 'embers');
+          n++;
+        }
         break;
       }
       case 'chains': {
-        for (let k = 0; k < 3; k++) {
+        // taut binding chains snap up from the earth, sagging then tensing
+        const links = lite ? 1 : 3;
+        for (let k = 0; k < links; k++) {
           const a = (k / 3) * Math.PI * 2 + 1.1;
           const sx = at.x + Math.cos(a) * 2.2;
           const sz = at.z + Math.sin(a) * 2.2;
-          const ty = at.y + 1.2 + k * 0.25;
-          host.pathRibbon(k % 2 === 0 ? c : acc, 0.07, 0.9, (pts) => {
+          const ty = at.y + 1.2 + k * 0.35;
+          host.pathRibbon(k % 2 === 0 ? c : acc, 0.07, 1.0, (pts) => {
             for (let i = 0; i < 9; i++) {
               const u = i / 8;
               pts[i].set(
-                sx + (at.x - sx) * u,
-                gy + (ty - gy) * u + Math.sin(u * Math.PI) * -0.35,
-                sz + (at.z - sz) * u,
+                sx + (at.x - sx) * u + (i % 2 === 1 ? (Math.random() - 0.5) * 0.1 : 0),
+                gy + (ty - gy) * u + Math.sin(u * Math.PI) * -0.3,
+                sz + (at.z - sz) * u + (i % 2 === 1 ? (Math.random() - 0.5) * 0.1 : 0),
               );
             }
             return 9;
           });
+          if (!lite) host.burstAt(sx, gy + 0.2, sz, acc, 4, 0.6, 'sparks');
         }
-        n = 3;
+        n = lite ? 1 : 6;
         break;
       }
       case 'swarm':
-        host.burstAt(at.x, at.y + 0.4, at.z, c, 14, 1.4, 'smoke');
+        // dark shapes burst out and FLEE: the slow smoke bloom plus a fast
+        // scattering ember shell
+        host.burstAt(at.x, at.y + 0.4, at.z, c, lite ? 8 : 16, 1.4, 'smoke');
+        if (!lite) {
+          host.burstAt(at.x, at.y + 0.5, at.z, acc, 12, 2.4, 'embers');
+          n = 2;
+        }
         break;
       case 'implosion':
-        slot.implode = Math.max(slot.implode, 0.28);
+        // space sucks inward before the hit (drawn per frame in transients)
+        slot.implode = Math.max(slot.implode, lite ? 0.25 : IMPLODE_DUR);
+        if (slot.tier === 0) host.shakeAt(at.x, at.y, at.z, 0.28);
         break;
       case 'barrier':
-        host.shellFlash(slot.casterId, c, 1.1);
+        // plates snap into a guarding arc around the shell flash
+        host.shellFlash(slot.casterId, c, 1.2);
+        if (!lite) slot.barrierT = BARRIER_DUR;
         break;
       case 'gavel':
         slot.gavel = true;
         slot.gavelT = 0;
         break;
       case 'claws':
-        host.slashStyled(at, c, 'claws', 1);
-        host.burstAt(at.x, at.y, at.z, acc, 10, 0.8, 'sparks');
-        n = 2;
+        host.slashStyled(at, c, 'claws', 1.25);
+        if (!lite) {
+          host.burstAt(at.x, at.y, at.z, acc, 12, 1, 'sparks');
+          n = 2;
+        }
         break;
       case 'vines': {
-        for (let k = 0; k < 4; k++) {
-          const a0 = (k / 4) * Math.PI * 2;
-          host.pathRibbon(k % 2 === 0 ? c : acc, 0.09, 1.2, (pts) => {
+        // living coils climb the target
+        const coils = lite ? 1 : 5;
+        for (let k = 0; k < coils; k++) {
+          const a0 = (k / 5) * Math.PI * 2;
+          host.pathRibbon(k % 2 === 0 ? c : acc, 0.09, 1.1 + k * 0.1, (pts) => {
             for (let i = 0; i < 12; i++) {
               const u = i / 11;
               const ang = a0 + u * 4.2;
@@ -936,14 +1214,25 @@ export class ArchetypeSequencer {
             return 12;
           });
         }
-        host.burstAt(at.x, gy + 0.4, at.z, acc, 10, 0.8, 'embers');
-        n = 5;
+        n = coils;
+        if (!lite) {
+          host.burstAt(at.x, gy + 0.4, at.z, acc, 12, 1.2, 'embers');
+          n++;
+        }
         break;
       }
-      case 'cross':
-        host.slashStyled({ x: at.x, y: at.y + 0.5, z: at.z }, c, 'x', 1.4);
-        n = 2;
+      case 'cross': {
+        // the radiant cross-flash: a straight vertical stroke crossed by a
+        // long flat horizontal, sealed with a hot center star
+        const cy = at.y + 0.55;
+        host.boltPoints(at.x, cy - 1.6, at.z, at.x, cy + 1.6, at.z, c, 0.35, 0.16, 0.06);
+        if (!lite) {
+          host.slashStyled({ x: at.x, y: cy, z: at.z }, c, 'thrust', 1.7);
+          host.pushOverlay(at.x, cy, at.z, acc, 0.65, host.overlayCells().star, 0.9, 2.8);
+          n = 3;
+        }
         break;
+      }
       default:
         n = 0;
         break;
@@ -975,22 +1264,50 @@ export class ArchetypeSequencer {
         );
       }
     }
-    // implosion converge motes
+    // implosion converge motes (gallery scale: a wide shell of space sucking
+    // inward; tier 1 runs a smaller, sparser pull)
     if (slot.implode > 0) {
       slot.implode -= dt;
       const caster = host.anchorOf(slot.casterId, 0.55);
       if (caster) {
-        for (let k = 0; k < 5; k++) {
-          const a = host.timeNow() * 7 + k * 1.26;
-          const rr2 = 0.4 + 1.8 * (slot.implode / 0.28);
+        const motes = slot.tier === 0 ? 8 : 4;
+        const pull = Math.max(0, slot.implode / IMPLODE_DUR);
+        for (let k = 0; k < motes; k++) {
+          const a = host.timeNow() * 7 + k * 0.79;
+          const rr2 = 0.35 + 2.1 * pull;
           host.pushOverlay(
             caster.x + Math.cos(a) * rr2,
-            caster.y + Math.sin(a * 1.7) * 0.5,
+            caster.y + Math.sin(a * 1.7 + k) * (0.3 + 0.5 * pull),
             caster.z + Math.sin(a) * rr2,
             slot.color,
-            0.18,
+            0.16 + 0.1 * (1 - pull),
             cells.spark,
-            0.8,
+            0.85,
+            2.1,
+          );
+        }
+      }
+    }
+    // barrier plates snapping into a guarding arc (staggered in, long fade)
+    if (slot.barrierT > 0) {
+      slot.barrierT -= dt;
+      const center = host.anchorOf(slot.casterId, 0.55);
+      if (center) {
+        const elapsed = BARRIER_DUR - slot.barrierT;
+        for (let k = 0; k < 5; k++) {
+          const tt = elapsed - k * 0.05;
+          if (tt < 0 || tt > BARRIER_PLATE_LIFE) continue;
+          const u = tt / BARRIER_PLATE_LIFE;
+          const alpha = u < 0.15 ? u / 0.15 : (1 - (u - 0.15) / 0.85) ** 1.4 * 0.75;
+          const a = (k - 2) * 0.35 + host.timeNow() * 0.3;
+          host.pushOverlay(
+            center.x + Math.cos(a) * 1.15,
+            center.y + 0.15 + Math.abs(k - 2) * 0.1,
+            center.z + Math.sin(a) * 1.15,
+            slot.color,
+            0.5,
+            cells.rune,
+            alpha,
             2,
           );
         }
@@ -1016,19 +1333,21 @@ export class ArchetypeSequencer {
         }
       }
     }
-    // gavel: a hammer of light descending onto the impact point over 0.22s
+    // gavel: a hammer of light descending onto the impact point over 0.22s,
+    // accelerating into the verdict and LANDING (ring, sparks, light, trauma)
     if (slot.gavel) {
       slot.gavelT += dt;
       const u = Math.min(1, slot.gavelT / 0.22);
       const y = slot.iy + 6.4 - (6.4 - 1.15) * u * u;
-      host.pushOverlay(slot.ix, y, slot.iz, slot.color, 0.85, cells.glow, 0.9, 2.4);
-      host.pushOverlay(slot.ix, y + 0.5, slot.iz, slot.accent, 0.4, cells.rune, 0.9, 2.2);
+      host.pushOverlay(slot.ix, y, slot.iz, slot.color, 1.05, cells.glow, 0.9, 2.4);
+      host.pushOverlay(slot.ix, y + 0.55, slot.iz, slot.accent, 0.45, cells.rune, 0.9, 2.2);
       if (u >= 1) {
         slot.gavel = false;
         const gy = this.groundOf(host, slot);
         host.ringAt(slot.ix, gy, slot.iz, 4.2, 0.6, slot.color, 1.9, false);
-        host.burstAt(slot.ix, slot.iy, slot.iz, slot.accent, 22, 1.2, 'sparks');
+        host.burstAt(slot.ix, slot.iy, slot.iz, slot.accent, 26, 1.2, 'sparks');
         host.pulseLight(slot.targetId, slot.spec.palette, 6, 0.3);
+        if (slot.tier === 0) host.shakeAt(slot.ix, slot.iy, slot.iz, 0.35);
         host.countPrimitive(slot.abilityId, 3);
       }
     }

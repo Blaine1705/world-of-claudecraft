@@ -1760,6 +1760,10 @@ export class Renderer {
         const def = ABILITIES[abilityId];
         return !def || (def.castTime <= 0 && !def.channel && !def.empowerStages);
       },
+      // heavy VFX moments (fissures, gavel verdicts, finisher crits) ride the
+      // Fiesta trauma accumulator; the fx engine has already applied distance
+      // falloff and its rolling anti-spam budget
+      addShake: (amount) => this.addShake(amount),
     });
     // Dev-only ability VFX probe surface (scripts/ability_vfx_probe.mjs):
     // self-installs onto window.__game once main.ts has assembled it, so the

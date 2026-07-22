@@ -20,7 +20,7 @@ import {
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
-import type { AbilityVfxFx, OrbitStyle, ParticleBurstKind } from './fx';
+import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
 
 interface VfxPoint {
   x: number;
@@ -85,6 +85,10 @@ export interface AbilityVfxDeps {
   // real cast already performed its ceremony through the live castingAbility
   // path in syncEntity. Unknown ids should return true.
   isInstantAbility?: (abilityId: string) => boolean;
+  // Adds camera trauma (the renderer's Fiesta addShake accumulator); the fx
+  // engine applies distance falloff and a rolling budget before it. Optional
+  // so tests can omit it.
+  addShake?: (amount: number) => void;
 }
 
 // Structural slices of the SimEvent members this painter consumes.
@@ -172,6 +176,31 @@ function rimColorOf(full: AbilityVfxFullSpec | undefined, spec: AbilityVfxSpec):
   return abilityVfxColor(spec);
 }
 
+// Effect-granted auras can suffix the authoring ability's id (the sim's
+// aoeAlly buffs: rallying_cry_hp / rallying_cry_dr, `${abilityId}_ap`), which
+// would miss the spec table and silently drop the buff's authored look. On a
+// miss, retry with the known suffixes stripped. Memoized so the per-frame
+// aura scan stays allocation-free in steady state; only ids that RESOLVE are
+// re-keyed, so an unrelated ability that happens to end in a suffix is safe.
+const AURA_ID_SUFFIXES = ['_hp', '_dr', '_ap'];
+const auraSpecIdMemo = new Map<string, string | null>();
+function auraSpecId(auraId: string): string | null {
+  if (ABILITY_VFX_SPECS[auraId] !== undefined) return auraId;
+  let base = auraSpecIdMemo.get(auraId);
+  if (base === undefined) {
+    base = null;
+    for (const s of AURA_ID_SUFFIXES) {
+      if (auraId.endsWith(s)) {
+        const stripped = auraId.slice(0, -s.length);
+        if (ABILITY_VFX_SPECS[stripped] !== undefined) base = stripped;
+        break;
+      }
+    }
+    if (auraSpecIdMemo.size < 512) auraSpecIdMemo.set(auraId, base);
+  }
+  return base;
+}
+
 // Particle sprite family per burst kind, mapped onto Vfx.burst's school hint.
 const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
   sparks: 'arcane',
@@ -201,21 +230,6 @@ const PULSE_BURST_BY_PALETTE: Record<string, ParticleBurstKind> = {
   venom: 'smoke',
 };
 
-// Spec bo (buff orbit) styles collapsed onto the three sprite bands the fx
-// engine draws (halo crowns the head, sparks orbit shoulders, runes circle
-// the feet).
-const ORBIT_BY_BO: Record<string, OrbitStyle> = {
-  halo: 'halo',
-  wings: 'halo',
-  heartbeat: 'halo',
-  sparks: 'sparks',
-  weaponGlow: 'sparks',
-  speedlines: 'sparks',
-  runes: 'runes',
-  plates: 'runes',
-  leaves: 'runes',
-};
-
 export class AbilityVfx {
   private quality = 1;
   private budget = new AbilityVfxBudget();
@@ -227,6 +241,24 @@ export class AbilityVfx {
   // last cast-budget charge per `${casterId}:${abilityId}` (see
   // CAST_CHARGE_WINDOW_SEC); stale entries pruned in place once it grows
   private castChargeAt = new Map<string, number>();
+  // live beam channels by caster id: every tick of a beam-archetype channel
+  // (mind rays, drains) arrives as its own cast-fx event, so the tracker turns
+  // the series into ONE cast — a crescendoing cord across the ticks and the
+  // full impact stack once, on the last tick. Interrupted channels expire in
+  // update() without an impact.
+  private beamChannels = new Map<
+    number,
+    {
+      abilityId: string;
+      targetId: number;
+      ticks: number;
+      expected: number;
+      every: number;
+      lastAt: number;
+      tier: 0 | 1 | 2;
+      color: number;
+    }
+  >();
   private spawned = 0; // primitives spawned by the CURRENT event (probe counter)
 
   constructor(
@@ -252,6 +284,7 @@ export class AbilityVfx {
         this.recordStat(abilityId, false);
       },
       (entityId, colorHex, intensity) => deps.setAuraGlow?.(entityId, colorHex, intensity),
+      deps.addShake ? (amount) => deps.addShake?.(amount) : undefined,
     );
   }
 
@@ -311,10 +344,15 @@ export class AbilityVfx {
     if (!ev.ability || !CAST_FX.has(ev.fx)) return false;
     const spec = ABILITY_VFX_SPECS[ev.ability];
     if (!spec) return false;
+    const full = ABILITY_VFX_FULL_SPECS[ev.ability];
+    // Beam-archetype channels (mind rays, drains) never fly a projectile:
+    // every tick's cast-fx event feeds the channel tracker, which draws the
+    // crescendoing cord and lands the full impact stack once, on the last tick.
+    if (full?.archetype === 'beam' && ev.fx !== 'windup' && ev.fx !== 'shout')
+      return this.beamChannelTick(ev, ev.ability, spec, full);
     const tier = this.castTier(ev.sourceId, ev.ability);
     const plan = planCast(spec, this.quality, tier);
     const fx = this.deps.fx;
-    const full = ABILITY_VFX_FULL_SPECS[ev.ability];
     this.spawned = 0;
     // Spin specs whirl the rig (Bladestorm); the one-shot is cheap, so it
     // survives every degrade tier.
@@ -475,6 +513,96 @@ export class AbilityVfx {
       if (arch === 'strike' || arch === 'dash') this.deps.triggerAttack(ev.sourceId, ev.ability);
     }
     this.recordStat(ev.ability, true);
+    return true;
+  }
+
+  // One tick of a beam-archetype channel. The whole channel is ONE cast to
+  // the spam budget (charged on its first tick); across the ticks the cord
+  // crescendos — the ribbon swells and outlives the tick gap so it reads
+  // continuous, the receiving end accents harder each tick — and the LAST
+  // tick lands the authored impact stack through the normal sequence
+  // machinery. Drains reverse the ribbon's point order, which reverses its
+  // flow: energy visibly runs target -> caster.
+  private beamChannelTick(
+    ev: AbilityVfxSpellfxEvent,
+    abilityId: string,
+    spec: AbilityVfxSpec,
+    full: AbilityVfxFullSpec,
+  ): boolean {
+    const nowSec = this.now();
+    const drain = full.beam?.drain === true;
+    const expected = Math.max(1, full.beam?.ticks ?? 3);
+    const every = Math.max(0.4, (full.beam?.dur ?? 3) / expected);
+    let ch = this.beamChannels.get(ev.sourceId);
+    if (!ch || ch.abilityId !== abilityId || nowSec - ch.lastAt > every * 1.9 + 0.25) {
+      const tier = this.castTier(ev.sourceId, abilityId);
+      ch = {
+        abilityId,
+        targetId: ev.targetId,
+        ticks: 0,
+        expected,
+        every,
+        lastAt: nowSec,
+        tier,
+        color: planCast(spec, this.quality, tier).color,
+      };
+      this.beamChannels.set(ev.sourceId, ch);
+      this.mobThrowFallback(ev.sourceId);
+    }
+    ch.lastAt = nowSec;
+    ch.targetId = ev.targetId;
+    ch.ticks++;
+    const tier = ch.tier;
+    const color = ch.color;
+    const fx = this.deps.fx;
+    this.spawned = 0;
+    // the cord: the recolored school beam under the flowing ribbon
+    this.deps.vfx.beam(ev.sourceId, ev.targetId, ev.school, color);
+    this.spawned++;
+    if (tier < 2) {
+      const grow = ch.expected > 1 ? Math.min(1, (ch.ticks - 1) / (ch.expected - 1)) : 1;
+      const src = drain ? ev.targetId : ev.sourceId;
+      const dst = drain ? ev.sourceId : ev.targetId;
+      fx.beamRibbon(src, dst, color, 0.1 * (1 + 0.8 * grow), every + 0.2);
+      this.spawned++;
+      // per-tick mini-accents, louder each tick: the receiving end sparks (a
+      // drain's caster drinks embers) and the drained victim sheds flecks
+      if (tier === 0) {
+        const recv = this.deps.anchor(drain ? ev.sourceId : ev.targetId, 0.55);
+        if (recv) {
+          fx.burstAt(
+            recv.x,
+            recv.y,
+            recv.z,
+            color,
+            4 + 2 * ch.ticks,
+            0.6 + 0.15 * ch.ticks,
+            drain ? 'embers' : 'sparks',
+          );
+          this.spawned++;
+        }
+        if (drain) {
+          const victim = this.deps.anchor(ev.targetId, 0.5);
+          if (victim) {
+            fx.burstAt(victim.x, victim.y, victim.z, 0xa01222, 4, 0.5, 'blood');
+            this.spawned++;
+          }
+        }
+      }
+      this.deps.lightPulse?.(
+        drain ? ev.sourceId : ev.targetId,
+        ev.school,
+        1.5 + 0.5 * ch.ticks,
+        0.25,
+      );
+    }
+    // channel end: the last tick IS the payoff — the full authored impact
+    // stack (already budget-charged at channel start, so no second charge)
+    if (ch.ticks >= ch.expected) {
+      this.beamChannels.delete(ev.sourceId);
+      if (tier < 2) fx.sequenceInstant(abilityId, full, ev.sourceId, ev.targetId, color, tier);
+    }
+    this.recordStat(abilityId, true);
     return true;
   }
 
@@ -701,8 +829,13 @@ export class AbilityVfx {
       }
     }
     let bands = 0;
+    // Peeked (never charged) degrade tier for this entity's orbit bands,
+    // computed lazily on the first orbit-carrying aura: tier >= 1 halves each
+    // band's sprite count in the fx engine while the read survives.
+    let orbitTier = -1;
     for (let i = 0; i < e.auras.length && bands < 3; i++) {
-      const auraId = e.auras[i].id;
+      const auraId = auraSpecId(e.auras[i].id);
+      if (auraId === null) continue;
       const spec = ABILITY_VFX_SPECS[auraId];
       if (spec === undefined) continue;
       const full = ABILITY_VFX_FULL_SPECS[auraId];
@@ -717,9 +850,12 @@ export class AbilityVfx {
           glowSlow = !!full.buff?.shellDur;
         }
       }
-      const style = spec.bo !== undefined ? ORBIT_BY_BO[spec.bo] : undefined;
-      if (style === undefined) continue;
-      if (fx.orbit(e.id, style, abilityVfxColor(spec))) {
+      // The full spec's authored orbit wins (its 'none' suppresses too);
+      // compact-spec bo carries the same nine style names as fallback.
+      const style = asOrbitStyle(full?.buff?.orbit ?? spec.bo);
+      if (style === null) continue;
+      if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
+      if (fx.orbit(e.id, style, abilityVfxColor(spec), full?.buff?.o, orbitTier)) {
         // The band just appeared (aura gained): pop the swirl here instead of
         // the aura event, which carries no ability id. Works online too, since
         // this reads the mirrored entity's auras, not sim events.
@@ -740,6 +876,14 @@ export class AbilityVfx {
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).
   update(dt: number): void {
     this.deps.fx.update(dt);
+    // a broken beam channel (interrupt, death, retarget mid-cord) simply
+    // expires: the cord stops being fed and no final impact ever lands
+    if (this.beamChannels.size > 0) {
+      const nowSec = this.now();
+      for (const [id, ch] of this.beamChannels) {
+        if (nowSec - ch.lastAt > ch.every * 1.9 + 0.25) this.beamChannels.delete(id);
+      }
+    }
   }
 
   // The synthetic pre-release windup for an INSTANT cast (part of the gallery
