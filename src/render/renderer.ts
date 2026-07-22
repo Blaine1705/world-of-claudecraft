@@ -1764,6 +1764,24 @@ export class Renderer {
       // Fiesta trauma accumulator; the fx engine has already applied distance
       // falloff and its rolling anti-spam budget
       addShake: (amount) => this.addShake(amount),
+      // contact-frame hitstop: only THAT rig's animation clock slows (the
+      // world, sim, and every other character keep running); the visual
+      // guards against stacking
+      animHold: (id, scale, dur) => {
+        const v = this.views.get(id);
+        if (v) this.activeVisual(v)?.holdFrame(scale, dur);
+      },
+      // caster windup lean, fed per frame by the staged ceremony
+      bodyLean: (id, amount) => {
+        const v = this.views.get(id);
+        if (v) this.activeVisual(v)?.setWindupLean(amount);
+      },
+      // screen feedback (crit flash, finisher ripples): composer-gated like
+      // bloom, skipped for reduced-motion players
+      screenFlash: (strength) => {
+        if (this.post && !this.reducedMotion()) this.post.screenFlash(strength);
+      },
+      screenImpact: (x, y, z, strength) => this.screenImpactAt(x, y, z, strength),
     });
     // Dev-only ability VFX probe surface (scripts/ability_vfx_probe.mjs):
     // self-installs onto window.__game once main.ts has assembled it, so the
@@ -3786,6 +3804,16 @@ export class Renderer {
   // and big hits (kills, ring closes) really kick.
   addShake(amount: number): void {
     this.shakeTrauma = Math.min(1, this.shakeTrauma + amount);
+  }
+
+  // Ability-VFX screen feedback (spec.screenFx finishers / big novas): a
+  // world-anchored radial distortion ripple plus a faint flash on the post
+  // chain. Composer-gated like bloom — the low tier renders direct and pays
+  // nothing — and skipped entirely for reduced-motion players.
+  private screenImpactAt(x: number, y: number, z: number, strength: number): void {
+    if (!this.post || this.reducedMotion()) return;
+    this.post.screenRipple(x, y, z, strength);
+    this.post.screenFlash(0.08 * strength);
   }
 
   // A golden pillar bursts up off a fighter who just locked in an augment.
@@ -5856,8 +5884,12 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
-    if (this.post) this.post.render();
-    else this.webgl.render(this.scene, this.camera);
+    if (this.post) {
+      // screen-fx pass state (ripple re-projection, flash decay) advances
+      // with the camera finalized for this frame
+      this.post.updateScreenFx(dt);
+      this.post.render();
+    } else this.webgl.render(this.scene, this.camera);
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;

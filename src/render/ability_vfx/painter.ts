@@ -89,6 +89,21 @@ export interface AbilityVfxDeps {
   // engine applies distance falloff and a rolling budget before it. Optional
   // so tests can omit it.
   addShake?: (amount: number) => void;
+  // Contact-frame hitstop on ONE rig (CharacterVisual.holdFrame): briefly hold
+  // that character's animation clock at `scale` for `dur` seconds. The visual
+  // guards stacking; the world clock is never touched. Optional for tests.
+  animHold?: (entityId: number, scale: number, dur: number) => void;
+  // Per-frame windup lean feed on a caster's rig (CharacterVisual.
+  // setWindupLean); the fx engine drives it from the staged windup ceremony.
+  // Optional for tests.
+  bodyLean?: (entityId: number, amount: number) => void;
+  // One-frame white screen flash (local-player crit pop); the renderer gates
+  // on composer + reduced motion. Optional for tests.
+  screenFlash?: (strength: number) => void;
+  // World-anchored screen distortion ripple + faint flash (spec.screenFx
+  // moments); the renderer projects onto the post chain, composer-gated like
+  // bloom. The fx engine applies distance falloff first. Optional for tests.
+  screenImpact?: (x: number, y: number, z: number, strength: number) => void;
 }
 
 // Structural slices of the SimEvent members this painter consumes.
@@ -291,6 +306,8 @@ export class AbilityVfx {
       },
       (entityId, colorHex, intensity) => deps.setAuraGlow?.(entityId, colorHex, intensity),
       deps.addShake ? (amount) => deps.addShake?.(amount) : undefined,
+      deps.bodyLean ? (entityId, amount) => deps.bodyLean?.(entityId, amount) : undefined,
+      deps.screenImpact ? (x, y, z, s) => deps.screenImpact?.(x, y, z, s) : undefined,
     );
   }
 
@@ -741,7 +758,14 @@ export class AbilityVfx {
   onDamage(ev: AbilityVfxDamageEvent): void {
     if (ev.kind !== 'hit' || ev.amount <= 0) return;
     const nowSec = this.now();
+    const local = this.deps.localPlayerId?.() === ev.sourceId;
     if (!ev.ability) {
+      // Plain melee crit from the local player: the tiny contact bite on both
+      // bodies, no screen flash (autos land too often to strobe the screen).
+      if (local && ev.crit && ev.school === 'physical') {
+        this.deps.animHold?.(ev.sourceId, 0.1, 0.12);
+        this.deps.animHold?.(ev.targetId, 0.1, 0.12);
+      }
       // Auto-attack polish: a subtle steel slash ribbon on plain melee swings
       // (the meleeSpark already popped). Accent-gated so crowds stay calm.
       if (
@@ -759,6 +783,23 @@ export class AbilityVfx {
     const full = ABILITY_VFX_FULL_SPECS[abilityId];
     const arch = full?.archetype ?? spec.a ?? 'strike';
     const isCastMoment = !!full && (arch === 'strike' || arch === 'dash' || arch === 'buff');
+    // Local-player crit hitstop + screen pop (gallery critHit feel): body and
+    // screen feedback, not a particle spawn, so it rides OUTSIDE the accent
+    // window — your own crit reads even in a saturated fight. The visual's
+    // refractory, the flash clamp, and the shake budget keep chains calm.
+    if (local && ev.crit) {
+      this.deps.animHold?.(ev.targetId, 0.1, 0.14);
+      this.deps.screenFlash?.(0.25);
+      const kickAt = this.deps.anchor(ev.targetId, 0.55);
+      if (kickAt) this.deps.fx.shakeAt(kickAt.x, kickAt.y, kickAt.z, 0.12);
+    }
+    // The melee contact frame bites (gallery hold: timeScale ~0.07 for
+    // ~0.11s): the local player's strike/dash contact briefly holds both rigs.
+    if (local && isCastMoment && (arch === 'strike' || arch === 'dash')) {
+      const dur = ev.crit ? 0.16 : 0.1;
+      this.deps.animHold?.(ev.sourceId, 0.1, dur);
+      this.deps.animHold?.(ev.targetId, 0.1, dur);
+    }
     let tier: 0 | 1 | 2;
     if (isCastMoment) {
       tier = this.castTier(ev.sourceId, abilityId);
@@ -835,7 +876,17 @@ export class AbilityVfx {
         const style = full?.windupStyle ?? 'orb';
         glowColor = rimColorOf(full, spec);
         glowStrength = 1.2 * (full?.power ?? 1);
-        if (fx.windup(e.id, abilityVfxColor(spec), progress, style)) {
+        // the local player is priority: guaranteed a windup slot even when
+        // a crowded hub saturates the pool
+        if (
+          fx.windup(
+            e.id,
+            abilityVfxColor(spec),
+            progress,
+            style,
+            this.deps.localPlayerId?.() === e.id,
+          )
+        ) {
           this.spawned = 1;
           this.recordStat(e.castingAbility, false);
         }

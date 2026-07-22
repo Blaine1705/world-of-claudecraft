@@ -74,7 +74,22 @@ export type OrbitDna = NonNullable<AbilityVfxBuffSpec['o']>;
 const MAX_ORBITS_PER_ENTITY = 3;
 const MAX_ORBIT_BANDS = 24;
 const MAX_ORBIT_SPRITES = 8;
-const MAX_WINDUPS = 8;
+// Windup ceremonies are a few overlay sprites each; a busy hub full of casters
+// should keep them all. The local player is additionally guaranteed a slot
+// (windup's priority flag evicts the oldest other entry when saturated).
+const MAX_WINDUPS = 24;
+
+// The gallery windup lean magnitude (updateBodyFeel: -0.085 rad at full charge).
+const WINDUP_LEAN_RAD = 0.085;
+
+// Honor spec.screenFx the gallery way: authored false opts out, authored true
+// forces it, and by default only the HEAVY moments — finishers and big novas —
+// touch the screen. Tier 0 only, so a crowded fight never strobes.
+function wantsScreenFx(spec: AbilityVfxFullSpec, tier: number): boolean {
+  if (tier !== 0 || spec.screenFx === false) return false;
+  if (spec.screenFx === true) return true;
+  return spec.finisher === true || (spec.archetype === 'nova' && (spec.nova?.radius ?? 5) >= 7);
+}
 
 interface OrbitBand {
   style: OrbitStyle;
@@ -267,6 +282,22 @@ export class AbilityVfxFx implements SequencerHost {
   private applyGlow: ((entityId: number, colorHex: number, intensity: number) => void) | null =
     null;
   private shakeCb: ((amount: number) => void) | null = null;
+  private bodyLeanCb: ((entityId: number, amount: number) => void) | null = null;
+  private screenImpactCb:
+    | ((x: number, y: number, z: number, strength: number) => void)
+    | null = null;
+  // Deferred screen-fx beats for instant sequences (impact = release + 0.15s):
+  // fixed slots, world- or entity-anchored, resolved when they fire. The cap
+  // doubles as the anti-strobe guard — saturated beats simply drop.
+  private screenFxQueue = Array.from({ length: 4 }, () => ({
+    t: 0,
+    entityId: -1,
+    x: 0,
+    y: 0,
+    z: 0,
+    strength: 0,
+    active: false,
+  }));
   // Rolling shake budget: recent trauma adds decay over time, and shakeAt only
   // grants what remains under the cap, so a spam fight can never stack the
   // camera into a constant rumble.
@@ -336,12 +367,16 @@ export class AbilityVfxFx implements SequencerHost {
     statSink: (abilityId: string, n: number) => void,
     applyGlow?: (entityId: number, colorHex: number, intensity: number) => void,
     addShake?: (amount: number) => void,
+    bodyLean?: (entityId: number, amount: number) => void,
+    screenImpact?: (x: number, y: number, z: number, strength: number) => void,
   ): void {
     this.particleBurst = burst;
     this.lightPulseCb = lightPulse;
     this.statSink = statSink;
     this.applyGlow = applyGlow ?? null;
     this.shakeCb = addShake ?? null;
+    this.bodyLeanCb = bodyLean ?? null;
+    this.screenImpactCb = screenImpact ?? null;
   }
 
   // Feed the body glow for one entity this frame (spec'd cast or live buff
@@ -412,6 +447,15 @@ export class AbilityVfxFx implements SequencerHost {
       false,
       windupDelay,
     );
+    if (wantsScreenFx(spec, tier)) {
+      // fire with the sequence's compressed impact; self-centered archetypes
+      // land on the caster (mirrors the sequencer's impactAnchor rule)
+      const anchorId =
+        spec.self === true || spec.archetype === 'nova' || spec.archetype === 'shout'
+          ? casterId
+          : targetId;
+      this.scheduleScreenFx(windupDelay + 0.15, anchorId, 0, 0, 0, spec.finisher ? 1 : 0.8);
+    }
   }
 
   // Ground-aimed instant: the whole sequence anchors at the WORLD POINT (the
@@ -434,6 +478,8 @@ export class AbilityVfxFx implements SequencerHost {
       y,
       z,
     });
+    if (wantsScreenFx(spec, tier))
+      this.scheduleScreenFx(windupDelay + 0.15, -1, x, y, z, spec.finisher ? 1 : 0.8);
   }
 
   // Traveling bolt carrying the full spec's bolt DNA. Without a bolt block
@@ -465,6 +511,7 @@ export class AbilityVfxFx implements SequencerHost {
       tier,
       true,
     );
+    const screen = wantsScreenFx(spec, tier);
     const b = spec.bolt;
     if (!b) {
       this.ribbons.spawnTrail(
@@ -472,7 +519,12 @@ export class AbilityVfxFx implements SequencerHost {
         targetId,
         colorHex,
         width,
-        slot ? (x, y, z) => this.sequencer.triggerImpact(this, slot, x, y, z) : null,
+        slot
+          ? (x, y, z) => {
+              this.sequencer.triggerImpact(this, slot, x, y, z);
+              if (screen) this.screenFxAt(x, y, z, spec.finisher ? 1 : 0.8);
+            }
+          : null,
       );
       return;
     }
@@ -504,6 +556,7 @@ export class AbilityVfxFx implements SequencerHost {
       (x, y, z) => {
         if (leader) this.leaderStrike(casterId, x, y, z, colorHex);
         if (slot) this.sequencer.triggerImpact(this, slot, x, y, z);
+        if (screen) this.screenFxAt(x, y, z, spec.finisher ? 1 : 0.8);
       },
     );
     // staggered barrage riding behind the lead projectile (gallery volley):
@@ -736,6 +789,10 @@ export class AbilityVfxFx implements SequencerHost {
   windupDraw(entityId: number, colorHex: number, progress: number, style: string): void {
     const s: WindupStyle = WINDUP_STYLE_SET.has(style) ? (style as WindupStyle) : 'orb';
     if (s === 'none') return;
+    // caster anticipation: the body eases back through the ceremony (gallery
+    // easeInOutSine ramp); the visual's spring recoils it forward on release
+    const p = Math.min(1, Math.max(0, progress));
+    this.bodyLeanCb?.(entityId, WINDUP_LEAN_RAD * (0.5 - 0.5 * Math.cos(Math.PI * p)));
     this.drawWindup(entityId, s, colorHex, progress);
   }
 
@@ -762,6 +819,39 @@ export class AbilityVfxFx implements SequencerHost {
     if (granted <= 0.01) return;
     this.shakeRecent += granted;
     this.shakeCb(granted);
+  }
+
+  // Screen-space impact feedback (the gallery distortion ripple + flash),
+  // honored only for NEARBY heavy moments: full inside 20 yd of the camera,
+  // gone by 42. The post pass caps concurrency at 4 and pools its uniforms.
+  private screenFxAt(x: number, y: number, z: number, strength: number): void {
+    if (!this.screenImpactCb || strength <= 0) return;
+    const d = Math.hypot(x - camPosScratch.x, y - camPosScratch.y, z - camPosScratch.z);
+    const falloff = d <= 20 ? 1 : Math.max(0, 1 - (d - 20) / 22);
+    if (falloff <= 0.05) return;
+    this.screenImpactCb(x, y, z, strength * falloff);
+  }
+
+  // Queue a screen-fx beat for a sequence whose impact fires later (instants:
+  // release + 0.15s). entityId >= 0 resolves the anchor at fire time; -1 uses
+  // the seeded world point.
+  private scheduleScreenFx(
+    delay: number,
+    entityId: number,
+    x: number,
+    y: number,
+    z: number,
+    strength: number,
+  ): void {
+    const slot = this.screenFxQueue.find((s) => !s.active);
+    if (!slot) return;
+    slot.active = true;
+    slot.t = delay;
+    slot.entityId = entityId;
+    slot.x = x;
+    slot.y = y;
+    slot.z = z;
+    slot.strength = strength;
   }
 
   // Spirit apparition trigger (the sequencer fires it once per impact when a
@@ -938,12 +1028,19 @@ export class AbilityVfxFx implements SequencerHost {
     colorHex: number,
     progress: number,
     style: WindupStyle = 'orb',
+    priority = false,
   ): boolean {
     if (style === 'none') return false;
     let w = this.windups.get(entityId);
     let started = false;
     if (!w) {
-      if (this.windups.size >= MAX_WINDUPS) return false;
+      if (this.windups.size >= MAX_WINDUPS) {
+        if (!priority) return false;
+        // the local player always gets a windup slot: evict the oldest entry
+        const oldest = this.windups.keys().next();
+        if (oldest.done) return false;
+        this.windups.delete(oldest.value);
+      }
       w = { colorHex, progress, style, stamp: this.frame };
       this.windups.set(entityId, w);
       started = true;
@@ -1001,6 +1098,15 @@ export class AbilityVfxFx implements SequencerHost {
     if (rightLen > 1e-4) {
       this.camRightX = camRightScratch.x / rightLen;
       this.camRightZ = camRightScratch.z / rightLen;
+    }
+    // deferred screen-fx beats (instant sequences): resolve anchors and fire
+    for (const s of this.screenFxQueue) {
+      if (!s.active) continue;
+      s.t -= dt;
+      if (s.t > 0) continue;
+      s.active = false;
+      const at = s.entityId >= 0 ? this.anchor(s.entityId, 0.5) : s;
+      if (at) this.screenFxAt(at.x, at.y, at.z, s.strength);
     }
     this.ribbons.update(dt, camPosScratch);
     this.rings.update(dt, this.camera.quaternion);
@@ -1075,6 +1181,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.windups.clear();
     this.orbits.clear();
     this.orbitBandCount = 0;
+    for (const s of this.screenFxQueue) s.active = false;
   }
 
   private intensity(): number {
