@@ -17,8 +17,10 @@ export interface AmbientPointSource {
 
 /** Per-ability audio moments fired by the ability-VFX engine: release (cast
  *  lets go, at the caster), impact (at the impact point), pulse (one soft
- *  zone re-hit), crit (the sting layered over a critical impact). */
-export type AbilityAudioKind = 'release' | 'impact' | 'pulse' | 'crit';
+ *  zone re-hit), crit (the sting layered over a critical impact), spirit
+ *  (a creature apparition calls as it spawns), motif (set-piece foley at the
+ *  motif anchor). */
+export type AbilityAudioKind = 'release' | 'impact' | 'pulse' | 'crit' | 'spirit' | 'motif';
 
 export interface AbilityAudioOpts {
   /** Quieter, sub-less version (spec liteAudio or a degraded visual tier). */
@@ -28,6 +30,11 @@ export interface AbilityAudioOpts {
   archetype?: string;
   /** Authored buff apply style ('raise' | 'morph' | 'veil'). */
   buffStyle?: string;
+  /** Spec-authored bespoke sample id (impact.sample) — wins over the palette
+   *  identity when the sample pack carries it. */
+  sample?: string;
+  /** The spirit creature model ('spirit') or motif name ('motif'). */
+  name?: string;
 }
 
 export interface SpatialAudioSink {

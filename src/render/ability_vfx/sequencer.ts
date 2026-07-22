@@ -121,18 +121,27 @@ export interface SequencerHost {
   // Camera trauma at a world point (the host applies distance falloff and a
   // rolling budget so spam can never stack shake).
   shakeAt(x: number, y: number, z: number, amount: number): void;
-  // Per-ability procedural audio (src/game/sfx.ts recipes) at the sequence's
-  // exact release and impact moments — a projectile's boom lands when the bolt
-  // does, a ground cast's boom lands AT the zone. Optional: tests and hosts
-  // without an audio sink omit it and the sequence is simply silent.
+  // Per-ability audio (src/game/sfx.ts: sampled pack + procedural recipes) at
+  // the sequence's exact release and impact moments — a projectile's boom
+  // lands when the bolt does, a ground cast's boom lands AT the zone — plus
+  // spirit calls at spawn and set-piece motif foley at the motif anchor.
+  // Optional: tests and hosts without an audio sink omit it and the sequence
+  // is simply silent.
   abilityAudio?(
-    kind: 'release' | 'impact',
+    kind: 'release' | 'impact' | 'spirit' | 'motif',
     palette: string,
     power: number,
     x: number,
     y: number,
     z: number,
-    opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+    opts?: {
+      lite?: boolean;
+      finisher?: boolean;
+      archetype?: string;
+      buffStyle?: string;
+      sample?: string;
+      name?: string;
+    },
   ): void;
   // Ghost-creature apparition (spirits.ts): fired once at impact when the
   // spec authors a spirit block. The host resolves the anchor, gates on
@@ -659,6 +668,7 @@ export class ArchetypeSequencer {
       finisher: spec.finisher,
       archetype: arch,
       buffStyle: spec.buff?.style,
+      sample: o.sample,
     });
     let n = 0;
     // hero impact sheet (gallery impactStack fires the flipbook first): the
@@ -800,6 +810,11 @@ export class ArchetypeSequencer {
       )
     ) {
       host.countPrimitive(slot.abilityId, 1);
+      // every apparition speaks: the creature call rides the spawn moment
+      // (sampled spirit_<model> voice; silent until the pack is loaded)
+      host.abilityAudio?.('spirit', spec.palette, slot.power, slot.ix, slot.iy, slot.iz, {
+        name: spec.spirit.model,
+      });
     }
     // impact-phase motifs; tier 1 keeps one signature beat per motif
     if (spec.motifs && slot.tier <= 1) this.runMotifs(host, slot);
@@ -1015,6 +1030,12 @@ export class ArchetypeSequencer {
     const r = spec.motifR ?? 1.1;
     const id = slot.abilityId;
     let n = 1;
+    // every set-piece has its foley (sampled motif_* ids; motifs without a
+    // recording, and hosts without the pack, keep their visual-only read)
+    host.abilityAudio?.('motif', spec.palette, slot.power, at.x, gy, at.z, {
+      lite,
+      name: motif,
+    });
     switch (motif) {
       case 'fissure': {
         // the ground splits toward the target: a branching caster-to-point

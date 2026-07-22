@@ -19,6 +19,7 @@ import {
 } from '../ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
+import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
 
@@ -104,18 +105,18 @@ export interface AbilityVfxDeps {
   // moments); the renderer projects onto the post chain, composer-gated like
   // bloom. The fx engine applies distance falloff first. Optional for tests.
   screenImpact?: (x: number, y: number, z: number, strength: number) => void;
-  // Per-ability procedural audio (src/game/sfx.ts recipes via the renderer's
-  // spatial audio sink): release/impact ride the sequencer's exact moments,
-  // this painter fires zone pulses and crit stings directly. Optional for
-  // tests and hosts without an audio engine.
+  // Per-ability audio (src/game/sfx.ts: sampled pack + procedural recipes via
+  // the renderer's spatial audio sink): release/impact/spirit/motif ride the
+  // sequencer's exact moments, this painter fires zone pulses and crit stings
+  // directly. Optional for tests and hosts without an audio engine.
   abilityAudio?: (
-    kind: 'release' | 'impact' | 'pulse' | 'crit',
+    kind: AbilityAudioKind,
     palette: string,
     power: number,
     x: number,
     y: number,
     z: number,
-    opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+    opts?: AbilityAudioOpts,
   ) => void;
 }
 

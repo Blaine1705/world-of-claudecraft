@@ -49,6 +49,7 @@ provided as a courtesy.
 | Guide webfonts (`public/fonts/*.woff2`: Cinzel by Natanael Gama; Alegreya and Alegreya Sans by Juan Pablo del Peral, Huerta Tipografica; woff2 subsets latin/latin-ext/cyrillic/vietnamese as served by Google Fonts, self-hosted for the /wiki guide) | Natanael Gama; Huerta Tipografica | https://fonts.google.com/specimen/Cinzel , https://fonts.google.com/specimen/Alegreya , https://fonts.google.com/specimen/Alegreya+Sans | SIL OFL 1.1 |
 | Owner-provided Mage artwork (`fireball_form.webp`, `counterspell.webp`) | Levy Street account | Owner-provided artwork | Used with permission |
 | Temporal clock sound effect (`public/audio/sfx/temporal_clock.mp3`) | World of ClaudeCraft | User-provided source recording | Project asset |
+| Ability sound-effect sample pack (`public/audio/sfx/ability_sfx_pack.json`: palette impact identities, release whooshes, motif foley, spirit calls, heal/buff chimes, and related one-shots) | World of ClaudeCraft | AI-generated for this project via the ElevenLabs sound-generation API | Project asset |
 
 ## Brand marks
 

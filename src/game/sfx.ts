@@ -12,6 +12,14 @@
 import { apiUrl } from '../client_origin';
 import type { BiomeId } from '../sim/types';
 import {
+  abilitySfxSamples,
+  buildBeefChain,
+  buildSoftChain,
+  MOTIF_SAMPLE,
+  RELEASE_FAMILY,
+  SPIRIT_VOICE,
+} from './ability_sfx_samples';
+import {
   SFX_CATALOG_HASH,
   SFX_CLIPS,
   SFX_RUNTIME_PACK_URL,
@@ -170,9 +178,28 @@ class Sfx {
         });
       }
       void this.preloadStartup();
+      // ElevenLabs ability sample pack (ability_sfx_samples.ts): lazy and
+      // deferred past the world-enter burst. The procedural ability layer
+      // carries every moment until the pack lands, then keeps playing
+      // underneath it as the sub-weight/crit-sting layer (gallery hybrid).
+      const packCtx = this.ctx;
+      if (typeof window !== 'undefined' && packCtx) {
+        window.setTimeout(() => void abilitySfxSamples.load(packCtx), 1500);
+      }
     } catch {
       this.ctx = null;
     }
+  }
+
+  /** Dev/probe surface: ability sample pack progress (scripts poll for
+   *  state === 'loaded'; sounds = decoded sound-id count; served = takes
+   *  handed to actual voices since load). */
+  abilityPackStats(): { state: string; sounds: number; served: number } {
+    return {
+      state: abilitySfxSamples.state,
+      sounds: abilitySfxSamples.soundCount(),
+      served: abilitySfxSamples.served(),
+    };
   }
 
   private entry(key: string): SfxEntry | undefined {
@@ -846,18 +873,30 @@ class Sfx {
   /** One per-ability audio moment at a world position. `kind`:
    *  release = the cast lets go (at the caster); impact = the hit lands (at
    *  the impact point — a ground zone booms AT the zone); pulse = one soft
-   *  zone re-hit; crit = the sting layered over a critical impact.
+   *  zone re-hit; crit = the sting layered over a critical impact; spirit =
+   *  a creature apparition calls at spawn; motif = set-piece foley.
    *  Gentle archetypes (heal/buff/cc) chime instead of booming and skip the
    *  release whoosh entirely; opts.lite (spec liteAudio or a degraded visual
-   *  tier) plays a quieter, sub-less version of the same identity. */
+   *  tier) plays a quieter, sub-less version of the same identity.
+   *  Once the ElevenLabs sample pack has loaded (ability_sfx_samples.ts) the
+   *  recordings carry each identity and the synth recipes stay underneath as
+   *  sub weight / crit sting / finisher toll (the gallery hybrid); until
+   *  then — and for any id the pack misses — the synth recipes are the read. */
   abilityAudio(
-    kind: 'release' | 'impact' | 'pulse' | 'crit',
+    kind: 'release' | 'impact' | 'pulse' | 'crit' | 'spirit' | 'motif',
     palette: string,
     power: number,
     x: number,
     y: number,
     z: number,
-    opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+    opts?: {
+      lite?: boolean;
+      finisher?: boolean;
+      archetype?: string;
+      buffStyle?: string;
+      sample?: string;
+      name?: string;
+    },
   ): void {
     const ctx = this.ctx,
       master = this.master;
@@ -867,10 +906,23 @@ class Sfx {
     const gentle = arch === 'heal' || arch === 'buff' || arch === 'cc';
     if (kind === 'release' && gentle) return; // their impact chime is the read
     const now = ctx.currentTime;
-    // per-(kind, palette) cooldown: a volley or AoE multi-hit plays once, not
+    // per-(kind, palette) cooldown — spirit calls and motif foley key on
+    // their own name instead: a volley or AoE multi-hit plays once, not
     // as a machine-gun of identical transients
-    const cdKey = `abl:${kind}:${palette}`;
-    const cd = kind === 'crit' ? 0.25 : kind === 'pulse' ? 0.12 : 0.07;
+    const cdKey =
+      kind === 'spirit' || kind === 'motif'
+        ? `abl:${kind}:${opts?.name ?? ''}`
+        : `abl:${kind}:${palette}`;
+    const cd =
+      kind === 'crit'
+        ? 0.25
+        : kind === 'pulse'
+          ? 0.12
+          : kind === 'spirit'
+            ? 0.5
+            : kind === 'motif'
+              ? 0.2
+              : 0.07;
     if (now - (this.lastPlay.get(cdKey) ?? Number.NEGATIVE_INFINITY) < cd) return;
     let slot = -1;
     for (let i = 0; i < ABILITY_VOICES; i++) {
@@ -890,19 +942,22 @@ class Sfx {
       this.abilityEnd = now;
       switch (kind) {
         case 'release':
-          this.abilityRelease(out, now, power);
+          this.releaseMoment(out, now, palette, power, arch);
           break;
         case 'impact':
-          if (arch === 'heal') this.abilityHeal(out, now, palette);
-          else if (arch === 'buff') this.abilityBuff(out, now, palette, opts?.buffStyle);
-          else if (arch === 'cc') this.abilityPoof(out, now);
-          else this.abilityImpact(out, now, palette, power, lite, opts?.finisher === true);
+          this.impactMoment(out, now, palette, power, lite, arch, opts);
           break;
         case 'pulse':
           this.abilityPulse(out, now, palette, power);
           break;
         case 'crit':
           this.abilityCrit(out, now, lite);
+          break;
+        case 'spirit':
+          this.spiritMoment(out, now, opts?.name ?? '');
+          break;
+        case 'motif':
+          this.motifMoment(out, now, opts?.name ?? '');
           break;
       }
       if (this.abilityEnd <= now) {
@@ -925,6 +980,213 @@ class Sfx {
     } catch {
       /* minimal AudioContext stubs may lack synthesis nodes */
     }
+  }
+
+  // ---- sampled dispatch (gallery hybrid: recording leads, synth supports) --
+
+  /** Play one ElevenLabs pack take through the gallery BEEF BUS into `out`
+   *  (mirrors gallery Sfx.sample(): round-robin take, per-take normalization
+   *  gain, tanh saturation + low-shelf body + presence bite with drive
+   *  compensation, optional octave-down subOct double, `soft` top-shave for
+   *  screechy voices). Returns false — scheduling nothing — when the pack,
+   *  the id, or the context isn't ready, so callers fall back to the synth
+   *  recipe. Rides the caller's ABILITY_VOICES accounting via abilityEnd. */
+  private samplePlay(
+    out: GainNode,
+    t: number,
+    id: string,
+    o: { gain?: number; beef?: number; subOct?: boolean; soft?: boolean },
+  ): boolean {
+    const ctx = this.ctx;
+    if (!ctx) return false;
+    const take = abilitySfxSamples.pick(id);
+    if (!take) return false;
+    try {
+      const beef = o.beef ?? 0.12;
+      const soft = o.soft === true;
+      let dest: AudioNode = out;
+      let gain = (o.gain ?? 1) * take.gain;
+      if (beef > 0.02) {
+        dest = buildBeefChain(ctx, out, beef, soft);
+        gain *= 1 / (1 + beef * 0.5); // drive compensation
+      } else if (soft) {
+        dest = buildSoftChain(ctx, out);
+      }
+      const src = ctx.createBufferSource();
+      src.buffer = take.buf;
+      src.playbackRate.value = 0.95 + Math.random() * 0.11; // gallery rr(0.95, 1.06)
+      const g = ctx.createGain();
+      g.gain.value = gain;
+      src.connect(g);
+      g.connect(dest);
+      src.start(t);
+      let end = t + take.buf.duration / src.playbackRate.value + 0.05;
+      if (o.subOct) {
+        // octave-down double of the same take, instant chest-cavity body
+        const s2 = ctx.createBufferSource();
+        s2.buffer = take.buf;
+        s2.playbackRate.value = src.playbackRate.value * 0.5;
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 320;
+        const g2 = ctx.createGain();
+        g2.gain.value = gain * 0.55;
+        s2.connect(lp);
+        lp.connect(g2);
+        g2.connect(dest);
+        s2.start(t);
+        end = Math.max(end, t + take.buf.duration / s2.playbackRate.value + 0.05);
+      }
+      this.abilityEnd = Math.max(this.abilityEnd, end);
+      return true;
+    } catch {
+      /* minimal AudioContext stubs may lack WaveShaper/filters */
+      return false;
+    }
+  }
+
+  /** Cast release at the caster: dash wind for dashes, swing whooshes for
+   *  strikes, else the palette family's whoosh recording (gallery release /
+   *  whoosh / dashWind); the synth release recipe is the no-pack fallback. */
+  private releaseMoment(
+    out: GainNode,
+    t: number,
+    palette: string,
+    power: number,
+    arch: string,
+  ): void {
+    if (arch === 'dash') {
+      if (this.samplePlay(out, t, 'dash', { gain: 0.8, beef: 0.2 })) return;
+    } else if (arch === 'strike') {
+      const heavy = power >= 1.2;
+      if (
+        this.samplePlay(out, t, heavy ? 'whoosh_heavy' : 'whoosh_blade', {
+          gain: heavy ? 0.9 : 0.7,
+          beef: heavy ? 0.25 : 0.15,
+        })
+      ) {
+        return;
+      }
+    } else if (
+      this.samplePlay(out, t, `rel_${RELEASE_FAMILY[palette] ?? 'arcane'}`, {
+        gain: 0.85,
+        beef: 0.18,
+      })
+    ) {
+      return;
+    }
+    this.abilityRelease(out, t, power);
+  }
+
+  /** The impact moment, sampled when the pack covers it (gallery impact /
+   *  heal / buffCast / poof / shout / portal category volumes), with the
+   *  synth layer underneath supplying what recordings can't: sub weight and
+   *  the finisher toll. Every branch falls back to the pre-pack recipe. */
+  private impactMoment(
+    out: GainNode,
+    t: number,
+    palette: string,
+    power: number,
+    lite: boolean,
+    arch: string,
+    opts?: { finisher?: boolean; buffStyle?: string; sample?: string },
+  ): void {
+    const bespoke = opts?.sample;
+    const finisher = opts?.finisher === true;
+    if (arch === 'heal') {
+      // spec-authored bespoke id first (the temporal chime), then the school pair
+      const id =
+        bespoke && abilitySfxSamples.has(bespoke)
+          ? bespoke
+          : palette === 'nature' || palette === 'venom'
+            ? 'heal_nature'
+            : 'heal_holy';
+      if (!this.samplePlay(out, t, id, { gain: 0.8 })) this.abilityHeal(out, t, palette);
+      return;
+    }
+    if (arch === 'buff') {
+      const style = opts?.buffStyle;
+      if (bespoke && abilitySfxSamples.has(bespoke)) {
+        if (this.samplePlay(out, t, bespoke, { gain: 0.9, beef: 0.2 })) return;
+      }
+      const id = style === 'veil' ? 'buff_veil' : style === 'morph' ? 'buff_morph' : 'buff_raise';
+      if (!this.samplePlay(out, t, id, { gain: 0.75 })) this.abilityBuff(out, t, palette, style);
+      return;
+    }
+    if (arch === 'cc') {
+      if (!this.samplePlay(out, t, 'poof', { gain: 0.8 })) this.abilityPoof(out, t);
+      return;
+    }
+    if (arch === 'shout') {
+      // an actual war-cry, with chest weight under the voice (gallery shout)
+      if (this.samplePlay(out, t, 'shout_war', { gain: 0.95, beef: 0.3 })) {
+        this.aSub(out, t, { from: 95, to: 55, dur: 0.35, gain: 0.3 });
+        return;
+      }
+      this.abilityImpact(out, t, palette, power, lite, finisher);
+      return;
+    }
+    if (arch === 'summon') {
+      // dark summons rip a portal open; the rest arrive on a raise chime
+      const dark =
+        palette === 'shadow' || palette === 'fire' || palette === 'blood' || palette === 'venom';
+      if (this.samplePlay(out, t, dark ? 'portal' : 'buff_raise', { gain: dark ? 0.9 : 0.75 })) {
+        return;
+      }
+      this.abilityImpact(out, t, palette, power, lite, finisher);
+      return;
+    }
+    // the palette identity: the recording carries the character (a
+    // spec-authored bespoke id wins when the pack carries it); synthesis
+    // keeps supplying what recordings can't — sub weight, finisher toll
+    const I = Math.min(1.5, power) * (lite ? 0.6 : 1);
+    const d = finisher ? 0.035 : 0; // pre-gap: silence, then the hit
+    const id = bespoke && abilitySfxSamples.has(bespoke) ? bespoke : `imp_${palette}`;
+    if (
+      this.samplePlay(out, t + d, id, {
+        gain: Math.min(1.4, 0.5 + 0.5 * I) * (lite ? 0.5 : 1),
+        beef: lite ? 0.2 : 0.3 + 0.15 * I,
+        subOct: !lite,
+      })
+    ) {
+      if (!lite) {
+        const sub = finisher ? 0.45 : 1; // the toll partly replaces the sub
+        this.aSub(out, t, {
+          from: 120,
+          to: I >= 1.2 ? 26 : 32,
+          dur: 0.45 * (0.7 + 0.3 * I),
+          gain: 0.5 * I * sub,
+          delay: d,
+        });
+      }
+      if (finisher) {
+        this.aPartials(out, t, { freqs: [65, 98], dur: 1.2, gain: 0.3, type: 'triangle' });
+      }
+      return;
+    }
+    this.abilityImpact(out, t, palette, power, lite, finisher);
+  }
+
+  /** A creature apparition calls at spawn. Sampled only — apparitions had no
+   *  procedural voice, so this stays silent until the pack has loaded. The
+   *  screechers sit back in the mix behind the soft top-shave; the growlers
+   *  stay forward (gallery spirit / SPIRIT_VOICE). */
+  private spiritMoment(out: GainNode, t: number, model: string): void {
+    if (!model) return;
+    const [vol, soft] = SPIRIT_VOICE[model] ?? [0.8, false];
+    this.samplePlay(out, t, `spirit_${model}`, { gain: vol, soft });
+  }
+
+  /** Set-piece motif foley at the motif anchor (gallery motif). Sampled only;
+   *  motifs without a recording keep their visual-only read. */
+  private motifMoment(out: GainNode, t: number, motif: string): void {
+    const id = MOTIF_SAMPLE[motif];
+    if (!id) return;
+    this.samplePlay(out, t, id, {
+      gain: 0.85,
+      beef: 0.3,
+      subOct: motif === 'gavel' || motif === 'fissure' || motif === 'pillars',
+    });
   }
 
   // ---- synth primitives (gallery tone2/noise2/partials/ticks/sub) ---------

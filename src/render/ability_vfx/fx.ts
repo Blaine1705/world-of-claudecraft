@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { type AbilityVfxBuffSpec, type AbilityVfxFullSpec, abilityHexColor } from '../ability_vfx_core';
+import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { type DecalStyle, GroundDecals } from './decals';
 import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
@@ -288,13 +289,13 @@ export class AbilityVfxFx implements SequencerHost {
     | null = null;
   private abilityAudioCb:
     | ((
-        kind: 'release' | 'impact',
+        kind: AbilityAudioKind,
         palette: string,
         power: number,
         x: number,
         y: number,
         z: number,
-        opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+        opts?: AbilityAudioOpts,
       ) => void)
     | null = null;
   // Deferred screen-fx beats for instant sequences (impact = release + 0.15s):
@@ -381,13 +382,13 @@ export class AbilityVfxFx implements SequencerHost {
     bodyLean?: (entityId: number, amount: number) => void,
     screenImpact?: (x: number, y: number, z: number, strength: number) => void,
     abilityAudio?: (
-      kind: 'release' | 'impact',
+      kind: AbilityAudioKind,
       palette: string,
       power: number,
       x: number,
       y: number,
       z: number,
-      opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+      opts?: AbilityAudioOpts,
     ) => void,
   ): void {
     this.particleBurst = burst;
@@ -400,16 +401,17 @@ export class AbilityVfxFx implements SequencerHost {
     this.abilityAudioCb = abilityAudio ?? null;
   }
 
-  // SequencerHost audio surface: forwards the sequence's release/impact
-  // moments to the wired spatial audio sink (silent when none is wired).
+  // SequencerHost audio surface: forwards the sequence's release/impact/
+  // spirit/motif moments to the wired spatial audio sink (silent when none
+  // is wired).
   abilityAudio(
-    kind: 'release' | 'impact',
+    kind: AbilityAudioKind,
     palette: string,
     power: number,
     x: number,
     y: number,
     z: number,
-    opts?: { lite?: boolean; finisher?: boolean; archetype?: string; buffStyle?: string },
+    opts?: AbilityAudioOpts,
   ): void {
     this.abilityAudioCb?.(kind, palette, power, x, y, z, opts);
   }
