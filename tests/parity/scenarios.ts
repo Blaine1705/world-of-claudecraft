@@ -4290,9 +4290,10 @@ function cardDuel(): Scenario {
 // Seed HUNTED (bounded scan from seed 1 upward over this exact drive sequence, not
 // committed) so the vestments proc draw lands under the capped 15 percent
 // masterwork chance and the proc fires inside the recorded run; only the found
-// literal is pinned here. Spare seeds 23 and 34 were also verified to fire the proc
-// for this drive.
-function professionsCraft(seed = 21): Scenario {
+// literal is pinned here. Re-hunted after the Frostveil quest pass shifted the
+// construction-time draw stream (new quest camps + the escort NPC spawn). Spare
+// seeds 7 and 10 were also verified to fire the proc for this drive.
+function professionsCraft(seed = 4): Scenario {
   return {
     name: 'professions_craft',
     coverage: [
