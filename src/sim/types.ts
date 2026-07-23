@@ -4134,7 +4134,7 @@ export interface DeedStats {
 // Prestige cost. Each prestige rank requires a full level-cap bar's worth of
 // post-cap lifetime XP, so prestige rank is a pure function of XP actually
 // earned past the cap. This is the anti-abuse guard: the prestige command can't
-// be spammed from a hacked client to inflate the (leaderboard-visible) rank  - 
+// be spammed from a hacked client to inflate the (leaderboard-visible) rank  -
 // the server caps rank at maxPrestigeRank(lifetimeXp) regardless of how many
 // prestige commands arrive.
 export const PRESTIGE_XP_PER_RANK = xpForLevel(MAX_LEVEL); // = 23,200
