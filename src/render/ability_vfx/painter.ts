@@ -477,15 +477,18 @@ export class AbilityVfx {
     // claimed by ceremony archetypes; a cue carrying a VICTIM (sunder,
     // interrupts, taunts, stuns - the sim only emits it when the resolved
     // effects announce nothing themselves) is claimed by the contact and shout
-    // archetypes and anchors the read at the target. Anything whose read
-    // arrives via other events (heals via heal events, damaging strikes via
-    // their damage claim) falls through unclaimed so nothing double-stages.
-    // Checked before castTier so an unclaimed selfCast never charges the
-    // budget.
+    // archetypes and anchors the read at the target. Heal ceremonies are
+    // claimed too: the heal2 events that follow only feed FCT numbers and the
+    // tiny legacy glow (no spec-driven read arrives any other way), so this
+    // cue IS the ceremony for self heals and ally-cast heals alike. Damaging
+    // strikes still fall through unclaimed (their read arrives via the damage
+    // claim) so nothing double-stages. Checked before castTier so an
+    // unclaimed selfCast never charges the budget.
     if (ev.fx === 'selfCast') {
       const arch = full?.archetype ?? spec.a;
       const targeted = ev.targetId !== ev.sourceId;
-      const ceremonial = arch === 'buff' || arch === 'summon' || arch === 'cc' || !!full?.spirit;
+      const ceremonial =
+        arch === 'buff' || arch === 'summon' || arch === 'cc' || arch === 'heal' || !!full?.spirit;
       const utility =
         targeted && (arch === 'strike' || arch === 'cc' || arch === 'burst' || arch === 'shout');
       if (!full || !(utility || ceremonial)) return false;
@@ -646,23 +649,34 @@ export class AbilityVfx {
         // there instead: contact archetypes swing the caster's rig and land
         // the authored impact at the target; a shout-archetype taunt barks
         // from the caster with its wave while the sequence carries the victim
-        // so motifAt 'target' snaps at the goaded enemy.
+        // so motifAt 'target' snaps at the goaded enemy. A cue carrying an
+        // ALLY (the sim's friendly-path completion: heals, blessings,
+        // dispels) anchors the sequence landing on that ally instead - the
+        // ability def is the signal, since only friendly/'any'-target defs
+        // resolve through that path (a hostile 'any' cast flies a projectile
+        // and never cues selfCast). The windup ceremony still draws on the
+        // caster inside the sequencer, so Last Rite's light spirals off the
+        // paladin before pouring into the target. No swing, no shoutwave.
         const arch = full?.archetype ?? spec.a;
         const targeted = ev.targetId !== ev.sourceId;
-        const contact = targeted && (arch === 'strike' || arch === 'cc');
+        const defTargetType = ABILITIES[ev.ability]?.targetType;
+        const friendly = targeted && (defTargetType === 'friendly' || defTargetType === 'any');
+        const contact = targeted && !friendly && (arch === 'strike' || arch === 'cc');
         // The physical hit reads on the body first: the caster visibly swings
         // (attackByAbility picks the authored clip - Jawcrack's bare-fist
         // punch), on every client that sees the cue. Burst zaps and shouts
         // carry no swing.
         if (contact && !plan.whirl) this.deps.triggerAttack(ev.sourceId, ev.ability);
-        if (targeted && arch === 'shout') {
+        if (targeted && !friendly && arch === 'shout') {
           this.deps.vfx.shoutwave(ev.sourceId, plan.color);
           this.spawned++;
           this.spawnRing(ev.sourceId, plan, ev.school);
           this.deps.playShoutAnim?.(ev.sourceId);
         }
         const seqTarget =
-          targeted && (contact || arch === 'burst' || arch === 'shout') ? ev.targetId : ev.sourceId;
+          targeted && (contact || friendly || arch === 'burst' || arch === 'shout')
+            ? ev.targetId
+            : ev.sourceId;
         if (tier < 2 && full) {
           fx.sequenceInstant(
             ev.ability,
