@@ -142,7 +142,7 @@ export interface AbilityVfxFullSpec {
   };
   strike?: {
     swings?: number;
-    arc?: 'horizontal' | 'thrust' | 'uppercut' | 'vertical' | 'claws' | 'bite' | 'low';
+    arc?: 'horizontal' | 'thrust' | 'uppercut' | 'vertical' | 'claws' | 'bite' | 'low' | 'sweep';
     bleed?: boolean;
     groundSlam?: boolean;
     stars?: boolean;

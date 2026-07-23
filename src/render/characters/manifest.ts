@@ -502,10 +502,13 @@ export const VISUALS: Record<string, VisualDef> = {
         shield_slam: '2H_Melee_Attack_Chop',
         raging_gale: 'Dualwield_Melee_Attack_Chop',
         bloodthirst: 'Dualwield_Melee_Attack_Chop',
-        cleave: '1H_Melee_Attack_Chop',
+        // Reaping Arc and Revenge hit everything in the frontal arc: the
+        // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs), not the
+        // top-to-bottom chop (owner: "sideways sword sweep").
+        cleave: '1H_Melee_Attack_Slice_Horizontal',
+        revenge: '1H_Melee_Attack_Slice_Horizontal',
         thunder_clap: '1H_Melee_Attack_Chop',
         faultline: '1H_Melee_Attack_Chop',
-        revenge: '1H_Melee_Attack_Chop',
         heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
         overpower: '1H_Melee_Attack_Slice_Diagonal',
         hamstring: '1H_Melee_Attack_Slice_Diagonal',
