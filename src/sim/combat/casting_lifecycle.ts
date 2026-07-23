@@ -35,7 +35,7 @@ import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
-import type { AbilityDef, Entity, Vec3 } from '../types';
+import type { AbilityDef, AbilityEffect, Entity, Vec3 } from '../types';
 import {
   angleTo,
   armorReduction,
@@ -1385,6 +1385,39 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   });
 }
 
+// Effect types whose resolution already reaches the renderer on its own:
+// immediate damage lands as damage events (the per-ability VFX layer's strike
+// read), and the movement/sport kinds drive their own visible motion (charge
+// run, blink snap, leap arc, Vale Cup ball handling). A hostile-targeted
+// completion built ONLY of other effects (sunder, interrupt, taunt, stun,
+// incapacitate, a finisher's haste buff...) emits nothing at all, so
+// applyAbility gives those the same renderer-only 'selfCast' cue untargeted
+// completions get. Damaging casts stay excluded - their read arrives via the
+// damage event, and a second cue would double-stage the visuals.
+const SELF_ANNOUNCING_EFFECTS: ReadonlySet<AbilityEffect['type']> = new Set([
+  'weaponDamage',
+  'weaponStrike',
+  'directDamage',
+  'chainDamage',
+  'finisherDamage',
+  'aoeDamage',
+  'empoweredCone',
+  'judgement',
+  'drainTick',
+  'consumeAura',
+  'groundAoE',
+  'frozenOrb',
+  'charge',
+  'feralCharge',
+  'blinkForward',
+  'repositionToAim',
+  'ballKick',
+  'ballPass',
+  'ballShoot',
+  'sportDash',
+  'sportShove',
+]);
+
 function applyAbility(
   ctx: SimContext,
   p: Entity,
@@ -1646,14 +1679,21 @@ function applyAbility(
       fx: ability.castFx,
       ability: ability.id,
     });
-  } else if (!togglingOff && (!target || target === p)) {
+  } else if (
+    !togglingOff &&
+    (!target || target === p || !res.effects.some((eff) => SELF_ANNOUNCING_EFFECTS.has(eff.type)))
+  ) {
     // An untargeted/self completion (Shadewolf, summon rites, forms, aspects)
     // otherwise emits nothing at all, leaving the per-ability VFX layer blind
-    // to the cast that just happened. Renderer-only cue; no mechanic.
+    // to the cast that just happened. The same blindness hits hostile-targeted
+    // pure-utility completions (Armor Shear's sunder, Jawcrack's interrupt,
+    // Goad's taunt, stuns/saps/finisher buffs): no damage event, no castFx,
+    // nothing. Emit the cue for both, carrying the victim so the painter can
+    // anchor the utility read at the target. Renderer-only; no mechanic.
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,
-      targetId: p.id,
+      targetId: (target ?? p).id,
       school: ability.school,
       fx: 'selfCast',
       ability: ability.id,
