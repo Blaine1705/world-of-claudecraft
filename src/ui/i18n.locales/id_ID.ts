@@ -766,7 +766,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Berkah Layu (membakar mana)',
   'hudChrome.finder.mech.mist_surge': 'Lonjakan Kabut (kerusakan area berdenyut)',
   'hudChrome.finder.mech.mortal_wound': 'Luka Terlupakan (mengurangi penyembuhan yang diterima)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Gelombang Kejut Nekrotik (kerusakan area berat)',
+  'hudChrome.finder.mech.grave_inferno': 'Neraka Kubur (AoE api tersalur, jaga jarak)',
   'hudChrome.finder.mech.profane_mending': 'Pemulihan Najis (menyembuhkan sekutunya)',
   'hudChrome.finder.mech.raise_fallen': 'Bangkitkan Yang Gugur (gelombang bala bantuan berkala)',
   'hudChrome.finder.mech.reaping_arc': 'Busur Penuai (tebasan ke depan)',
@@ -2692,7 +2692,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard. Hanya dalam Wujud Bruin.',
   'entities.abilities.bear_charge.name': 'Terjangan Bruin',
   'entities.abilities.bear_form.description':
-    'Berubah wujud menjadi beruang: zirah +90%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal.',
+    'Berubah wujud menjadi beruang: zirah +130%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal.',
   'entities.abilities.bear_form.name': 'Wujud Bruin',
   'entities.abilities.berserker_rage.description':
     'Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)',

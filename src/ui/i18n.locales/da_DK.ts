@@ -804,7 +804,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Visnet Velsignelse (forbrænder mana)',
   'hudChrome.finder.mech.mist_surge': 'Tågebølge (pulserende omradesskade)',
   'hudChrome.finder.mech.mortal_wound': 'Glemt Sår (reducerer modtaget heling)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Nekrotisk Chokbølge (kraftig omradesskade)',
+  'hudChrome.finder.mech.grave_inferno': 'Gravsinferno (kanaliseret ild-AoE, hold afstand)',
   'hudChrome.finder.mech.profane_mending': 'Vanhellig Heling (heler sine allierede)',
   'hudChrome.finder.mech.raise_fallen': 'Rejse de Faldne (periodiske bølger af tilkaldelser)',
   'hudChrome.finder.mech.reaping_arc': 'Mejende Bue (frontal mejning)',
@@ -2553,7 +2553,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde. Kun i Bruin-form.',
   'entities.abilities.bear_charge.name': 'Bruin-storm',
   'entities.abilities.bear_form.description':
-    'Forvandl dig til en bjørn: rustning +90%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform.',
+    'Forvandl dig til en bjørn: rustning +130%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform.',
   'entities.abilities.bear_form.name': 'Bruin-form',
   'entities.abilities.berserker_rage.description':
     'Gå i et sydende raseri, og generér 20 raseri. (Krigertalent)',

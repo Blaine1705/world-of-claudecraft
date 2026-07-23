@@ -896,7 +896,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Bénédiction desséchée (brûle le mana)',
   'hudChrome.finder.mech.mist_surge': 'Déferlante de brume (dégâts de zone pulsés)',
   'hudChrome.finder.mech.mortal_wound': 'Blessure oubliée (réduit les soins reçus)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Onde de choc nécrotique (dégâts de zone importants)',
+  'hudChrome.finder.mech.grave_inferno': 'Brasier sépulcral (AoE de feu canalisé, restez espacés)',
   'hudChrome.finder.mech.profane_mending': 'Soins profanes (soigne ses alliés)',
   'hudChrome.finder.mech.raise_fallen': 'Relever les morts (vagues périodiques de renforts)',
   'hudChrome.finder.mech.reaping_arc': 'Arc faucheur (cleave frontal)',
@@ -4673,7 +4673,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Enracine la cible sur place pendant un maximum de 12 s.',
   'entities.abilities.bear_form.name': 'Forme de Bruin',
   'entities.abilities.bear_form.description':
-    "Vous change en ours: armure +90%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur.",
+    "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur.",
   'entities.abilities.maul.name': 'Bonecrush',
   'entities.abilities.maul.description':
     "Attaque dévastatrice qui augmente les dégâts de mêlée de {damage} et génère beaucoup de menace. S'active lors de votre prochaine frappe. Forme de Bruin uniquement.",

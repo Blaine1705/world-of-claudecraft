@@ -756,7 +756,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Solmuş Kutsama (manayı yakar)',
   'hudChrome.finder.mech.mist_surge': 'Sis Dalgası (darbeli alan hasarı)',
   'hudChrome.finder.mech.mortal_wound': 'Unutulmuş Yara (alınan iyileştirmeyi azaltır)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Nekrotik Şok Dalgası (ağır alan hasarı)',
+  'hudChrome.finder.mech.grave_inferno': 'Mezar Inferno (kanalize ateş AoE, daginik durun)',
   'hudChrome.finder.mech.profane_mending': 'Murdar Şifa (müttefiklerini iyileştirir)',
   'hudChrome.finder.mech.raise_fallen': 'Düşenleri Kaldır (periyodik yardımcı dalgaları)',
   'hudChrome.finder.mech.reaping_arc': 'Biçen Yay (öne doğru yay saldırısı)',
@@ -2668,7 +2668,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil. Yalnızca Bruin Formu.',
   'entities.abilities.bear_charge.name': 'Bruin Hücumu',
   'entities.abilities.bear_form.description':
-    'Bir ayıya dönüş: zırh +%90, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan.',
+    'Bir ayıya dönüş: zırh +%130, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan.',
   'entities.abilities.bear_form.name': 'Bruin Formu',
   'entities.abilities.berserker_rage.description':
     'Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)',

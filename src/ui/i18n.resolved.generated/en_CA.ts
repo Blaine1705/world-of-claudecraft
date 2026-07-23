@@ -2499,7 +2499,7 @@ export const en_CA: EnTranslations = {
         "lunar_tide": "Lunar Tide (pulsing area damage)",
         "enrage": "Enrages at low health",
         "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_inferno": "Grave Inferno (channeled fire AoE, stay spread)",
         "grave_cleaver": "Grave-Cleaver (frontal cleave)",
         "shadow_nova": "Shadow Nova (area burst)",
         "profane_mending": "Profane Mending (heals its allies)",
@@ -7280,7 +7280,7 @@ export const en_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +90%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +130%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",

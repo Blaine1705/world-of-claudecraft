@@ -9,6 +9,15 @@
 // Writes tmp/healing_mc/raid_report.json and prints the digest.
 
 import { mkdirSync, writeFileSync } from 'node:fs';
+
+// Bench-script only: throws with a clear message rather than silently producing
+// undefined. The sim contract guarantees these lookups succeed; if they do not
+// the run is already broken and an early throw beats a cryptic downstream error.
+function must<T>(value: T | undefined, label = 'expected value'): T {
+  if (value === undefined) throw new Error(`must: ${label} was undefined`);
+  return value;
+}
+
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, MELEE_RANGE } from '../src/sim/types';
@@ -134,7 +143,8 @@ function runRaid(difficulty: 'normal' | 'heroic', healerSpecs: Spec[], seed: num
     ...Array.from({ length: 10 - 2 - healerSpecs.length }, () => MAGE_SPEC),
   ];
   const pids = specs.map((spec, i) => addSpecPlayer(sim, spec, `${spec.key}_${i}`));
-  for (const pid of pids) sim.players.get(pid)!.questsDone.add('q_nythraxis_bound_guardian');
+  for (const pid of pids)
+    must(sim.players.get(pid), `player ${pid}`).questsDone.add('q_nythraxis_bound_guardian');
   for (const pid of pids.slice(1)) {
     sim.partyInvite(pid, pids[0]);
     sim.partyAccept(pid);
@@ -142,7 +152,7 @@ function runRaid(difficulty: 'normal' | 'heroic', healerSpecs: Spec[], seed: num
   sim.convertPartyToRaid(pids[0]);
   if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', pids[0]);
   sim.enterDungeon(RAID_DUNGEON, pids[0]);
-  const leader = sim.entities.get(pids[0])!;
+  const leader = must(sim.entities.get(pids[0]), `leader entity ${pids[0]}`);
   const slot = sim.instanceSlotAt(leader.pos);
   const origin = instanceOrigin(DUNGEONS[RAID_DUNGEON].index, slot ?? 0);
   const boss = [...sim.entities.values()].find(
@@ -167,7 +177,7 @@ function runRaid(difficulty: 'normal' | 'heroic', healerSpecs: Spec[], seed: num
         : { x: boss.pos.x + Math.sin(angle) * range, z: boss.pos.z - Math.cos(angle) * range };
     homePos.set(pid, pos);
     teleport(sim, pid, pos.x, pos.z);
-    const e = sim.entities.get(pid)!;
+    const e = must(sim.entities.get(pid), `player entity ${pid}`);
     e.targetId = boss.id;
     face(e, boss);
     for (const ability of specs[i].setup ?? []) cast(sim, pid, pid, ability);
@@ -214,7 +224,7 @@ function runRaid(difficulty: 'normal' | 'heroic', healerSpecs: Spec[], seed: num
       boss.threat.set(replacement, top + 10000);
       boss.aggroTargetId = replacement;
     }
-    const tank = sim.entities.get(activeTankPid)!;
+    const tank = must(sim.entities.get(activeTankPid), `active tank ${activeTankPid}`);
     tankAliveSeconds += 1 / 20;
 
     // Off-tank secures add waves; DPS focus the priest add (Malric) first so
@@ -222,7 +232,7 @@ function runRaid(difficulty: 'normal' | 'heroic', healerSpecs: Spec[], seed: num
     const adds = livingAdds(sim);
     const otAlive = otPid !== activeTankPid && !sim.entities.get(otPid)?.dead;
     if (otAlive && adds.length) {
-      const ot = sim.entities.get(otPid)!;
+      const ot = must(sim.entities.get(otPid), `off-tank entity ${otPid}`);
       const focus = adds.find((a) => a.aggroTargetId !== otPid) ?? adds[0];
       for (const add of adds) {
         if (add.templateId === 'nythraxis_heroic_rogue_add') continue; // untauntable by design
@@ -273,7 +283,7 @@ function runRaid(difficulty: 'normal' | 'heroic', healerSpecs: Spec[], seed: num
       wards.forEach((obj, i) => {
         const pid = livingHealers[i] ?? livingDps[i];
         if (pid === undefined) return;
-        const p = sim.entities.get(pid)!;
+        const p = must(sim.entities.get(pid), `ward channeler entity ${pid}`);
         teleport(sim, pid, obj.pos.x, obj.pos.z);
         if (p.castingAbility !== 'nythraxis_ward_channel') {
           p.castingAbility = null;
@@ -292,14 +302,16 @@ function runRaid(difficulty: 'normal' | 'heroic', healerSpecs: Spec[], seed: num
     previousDeathlessRemaining = deathlessRemaining;
 
     // Healers: triage the lowest raider, else the active tank.
-    const living = pids.map((pid) => sim.entities.get(pid)!).filter((p) => !p.dead);
+    const living = pids
+      .map((pid) => must(sim.entities.get(pid), `raider entity ${pid}`))
+      .filter((p) => !p.dead);
     const wounded = living
       .filter((p) => p.hp < p.maxHp * 0.85)
       .sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp);
     const lowest = living.sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
     for (let i = 0; i < healerPids.length; i++) {
       const hpid = healerPids[i];
-      const h = sim.entities.get(hpid)!;
+      const h = must(sim.entities.get(hpid), `healer entity ${hpid}`);
       if (h.dead || h.castingAbility === 'nythraxis_ward_channel') continue;
       const spec = healerSpecs[i];
       const target = lowest && lowest.hp / lowest.maxHp < 0.9 ? lowest : tank;

@@ -873,7 +873,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Benedizione Avvizzita (brucia mana)',
   'hudChrome.finder.mech.mist_surge': 'Ondata di Nebbia (danno ad area pulsante)',
   'hudChrome.finder.mech.mortal_wound': 'Ferita Dimenticata (riduce le cure ricevute)',
-  'hudChrome.finder.mech.necrotic_shockwave': "Onda d'Urto Necrotica (danno ad area pesante)",
+  'hudChrome.finder.mech.grave_inferno': 'Inferno Sepolcrale (AoE di fuoco canalizzato, tenetevi distanti)',
   'hudChrome.finder.mech.profane_mending': 'Cura Profana (cura i propri alleati)',
   'hudChrome.finder.mech.raise_fallen': 'Richiama i Caduti (ondate periodiche di rinforzi)',
   'hudChrome.finder.mech.reaping_arc': 'Arco Mietitore (fendente frontale)',
@@ -4226,7 +4226,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Radica il bersaglio sul posto per un massimo di 12 s.',
   'entities.abilities.bear_form.name': 'Forma di Bruin',
   'entities.abilities.bear_form.description':
-    "Mutamenti in orso: armatura +90%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore.",
+    "Mutamenti in orso: armatura +130%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.maul.name': 'Frantumaossa',
   'entities.abilities.maul.description':
     'Attacco brutale che aumenta i danni in mischia di {damage} e causa molta minaccia. Si attiva al tuo prossimo colpo. Solo in Forma di Bruin.',

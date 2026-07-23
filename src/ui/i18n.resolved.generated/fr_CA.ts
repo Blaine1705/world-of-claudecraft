@@ -2499,7 +2499,7 @@ export const fr_CA: EnTranslations = {
         "lunar_tide": "Marée lunaire (dégâts de zone pulsés)",
         "enrage": "Entre en rage à faible santé",
         "shuddering_stomp": "Piétinement tremblant (étourdissement de zone)",
-        "necrotic_shockwave": "Onde de choc nécrotique (dégâts de zone importants)",
+        "grave_inferno": "Brasier sépulcral (AoE de feu canalisé, restez espacés)",
         "grave_cleaver": "Faucheur de tombes (cleave frontal)",
         "shadow_nova": "Nova des ombres (explosion de zone)",
         "profane_mending": "Soins profanes (soigne ses alliés)",
@@ -7280,7 +7280,7 @@ export const fr_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Forme de Bruin",
-        "description": "Vous change en ours: armure +90%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
+        "description": "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
       },
       "maul": {
         "name": "Bonecrush",

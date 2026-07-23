@@ -17,6 +17,15 @@
 // Writes tmp/healing_mc/report.json and prints the digest tables.
 
 import { mkdirSync, writeFileSync } from 'node:fs';
+
+// Bench-script only: throws with a clear message rather than silently producing
+// undefined. The sim contract guarantees these lookups succeed; if they do not
+// the run is already broken and an early throw beats a cryptic downstream error.
+function must<T>(value: T | undefined, label = 'expected value'): T {
+  if (value === undefined) throw new Error(`must: ${label} was undefined`);
+  return value;
+}
+
 import {
   defaultBuild,
   type TalentAllocation,
@@ -285,7 +294,7 @@ function ensureTalents(sim: Sim, pid: number, spec: Spec) {
 // --------------------------------------------------------------- sim helpers
 
 export function teleport(sim: Sim, id: number, x: number, z: number) {
-  const e = sim.entities.get(id)!;
+  const e = must(sim.entities.get(id), `entity ${id}`);
   e.pos.x = x;
   e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
@@ -304,7 +313,7 @@ export function auraActive(entity: Entity, id: string, sourceId?: number): boole
 }
 
 export function cast(sim: Sim, pid: number, targetId: number, ability: string): boolean {
-  const p = sim.entities.get(pid)!;
+  const p = must(sim.entities.get(pid), `entity ${pid}`);
   if (p.dead || p.castingAbility) return false;
   p.targetId = targetId;
   const target = sim.entities.get(targetId);
@@ -322,7 +331,7 @@ export function healTick(
   spec: Spec,
   priority: string[],
 ) {
-  const h = sim.entities.get(healerPid)!;
+  const h = must(sim.entities.get(healerPid), `healer entity ${healerPid}`);
   if (h.dead || h.castingAbility) return;
   if (spec.emergencyMana && h.resource < h.maxResource * 0.25) {
     if (cast(sim, healerPid, healerPid, spec.emergencyMana)) return;
@@ -456,8 +465,8 @@ function runHealerBench(spec: Spec, seed: number): { run: HealerBenchRun; profil
     sim.setPlayerLevel(MAX_LEVEL, patientPid);
     teleport(sim, healerPid, ARENA.x, ARENA.z);
     teleport(sim, patientPid, ARENA.x, ARENA.z + 5);
-    const healer = sim.entities.get(healerPid)!;
-    const patient = sim.entities.get(patientPid)!;
+    const healer = must(sim.entities.get(healerPid), `healer entity ${healerPid}`);
+    const patient = must(sim.entities.get(patientPid), `patient entity ${patientPid}`);
     // A bottomless wound: heals never clamp against missing HP, HoTs always tick.
     patient.maxHp = 5e8;
     profile = {
@@ -506,7 +515,7 @@ function runHealerBench(spec: Spec, seed: number): { run: HealerBenchRun; profil
       castsByAbility,
       healingByAbility,
     },
-    profile: profile!,
+    profile: must(profile, 'healer profile'),
   };
 }
 
@@ -565,7 +574,7 @@ type IntakeRun = {
 // priest party buff) and Elixir of the Bear (+12 sta). Probe: 2762 base kit
 // to 3072 buffed; enchant/masterwork rolled stats (unmodeled) add more.
 export function applyTankRaidBuffs(sim: Sim, pid: number) {
-  const tank = sim.entities.get(pid)!;
+  const tank = must(sim.entities.get(pid), `tank entity ${pid}`);
   sim.ctx.applyAura(tank, {
     id: 'bench_litany',
     name: 'Litany of Resolve',
@@ -593,7 +602,7 @@ export function applyTankRaidBuffs(sim: Sim, pid: number) {
 function setupTank(sim: Sim): { pid: number; tank: Entity } {
   const pid = addSpecPlayer(sim, TANK_SPEC, 'Tank');
   teleport(sim, pid, ARENA.x, ARENA.z);
-  const tank = sim.entities.get(pid)!;
+  const tank = must(sim.entities.get(pid), `tank entity ${pid}`);
   for (const ability of TANK_SPEC.setup ?? []) cast(sim, pid, pid, ability);
   applyTankRaidBuffs(sim, pid);
   return { pid, tank };
@@ -702,7 +711,7 @@ function runSurvival(encounter: Encounter, healerSpecs: Spec[], seed: number): S
     for (const mob of mobs) if (!mob.dead) pinThreat(mob, tank);
     sim.startAutoAttack(tankPid);
     for (let i = 0; i < healerPids.length; i++) {
-      const healer = sim.entities.get(healerPids[i])!;
+      const healer = must(sim.entities.get(healerPids[i]), `healer entity ${healerPids[i]}`);
       if (tank.hp < tank.maxHp) {
         healTick(sim, healerPids[i], tank, healerSpecs[i], healerSpecs[i].healPriority ?? []);
       }
@@ -749,7 +758,7 @@ function main() {
       profile = out.profile;
     }
     healerRuns[spec.key] = runs;
-    healerProfiles[spec.key] = profile!;
+    healerProfiles[spec.key] = must(profile, `profile for ${spec.key}`);
     const burst = summarize(runs.map((r) => r.burstHps));
     const sustain = summarize(runs.map((r) => r.sustainHps));
     const ttoom = summarize(runs.map((r) => r.ttoomSeconds ?? SUSTAIN_SECONDS));
@@ -762,7 +771,7 @@ function main() {
     console.log(
       `A ${spec.key.padEnd(20)} burst ${burst.p50.toFixed(1).padStart(6)} hps  ` +
         `sustain ${sustain.p50.toFixed(1).padStart(6)} hps  ttoom ${ttoom.p50}s  ` +
-        `mana ${profile!.maxMana} sp ${profile!.spellPower}`,
+        `mana ${must(profile, `profile for ${spec.key}`).maxMana} sp ${must(profile, `profile for ${spec.key}`).spellPower}`,
     );
   }
 
@@ -829,7 +838,10 @@ function main() {
     'sanctum_midboss_korgath',
     'sanctum_boss_korzul',
   ]) {
-    const encounter = ENCOUNTERS.find((e) => e.key === encounterKey)!;
+    const encounter = must(
+      ENCOUNTERS.find((e) => e.key === encounterKey),
+      `encounter ${encounterKey}`,
+    );
     const duo = [HEALER_SPECS[0], HEALER_SPECS[3]]; // holy priest + resto shaman
     const runs: SurvivalRun[] = [];
     for (let r = 0; r < RUNS; r++) runs.push(runSurvival(encounter, duo, BASE_SEED + r * 32452843));
@@ -843,7 +855,7 @@ function main() {
   const survivalRows: Record<string, Record<string, unknown>> = {};
   for (const cell of survivalCells) {
     const deaths = cell.runs.filter((r) => r.tankDeathSeconds !== null);
-    const deathTimes = summarize(deaths.map((r) => r.tankDeathSeconds!));
+    const deathTimes = summarize(deaths.map((r) => must(r.tankDeathSeconds, 'tankDeathSeconds')));
     const survivedPct = round1((100 * (cell.runs.length - deaths.length)) / cell.runs.length);
     const dtps = summarize(cell.runs.map((r) => r.tankDamageTaken / r.seconds));
     const hps = summarize(cell.runs.map((r) => r.tankHealingReceived / r.seconds));

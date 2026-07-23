@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
+
+// Vitest default (5 s) is too tight for the 240 s simulated window under CI's
+// parallel load (each case runs ~6-7 s there). Match vale_cup_match.test.ts idiom.
+vi.setConfig({ testTimeout: 30000 });
 
 // Tank crit immunity: creatures cannot critically strike a committed tank.
 // Committed means Protection-spec warrior, Protection-spec paladin, or a

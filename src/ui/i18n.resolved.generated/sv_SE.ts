@@ -2499,7 +2499,7 @@ export const sv_SE: EnTranslations = {
         "lunar_tide": "Månflod (pulserande områdesskada)",
         "enrage": "Rasar vid låga livspunkter",
         "shuddering_stomp": "Darrande trampling (områdeschock)",
-        "necrotic_shockwave": "Nekrotisk chockvåg (kraftig områdesskada)",
+        "grave_inferno": "Gravinferno (kanaliserat eld-AoE, håll avstånd)",
         "grave_cleaver": "Grav-klyvare (frontalt huggsving)",
         "shadow_nova": "Skuggnova (områdesburst)",
         "profane_mending": "Vanhelgad läkning (helar sina allierade)",
@@ -7280,7 +7280,7 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +90 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +130 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",

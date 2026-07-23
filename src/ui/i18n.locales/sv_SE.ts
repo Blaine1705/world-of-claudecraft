@@ -802,7 +802,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Förvissnad välsignelse (bränner mana)',
   'hudChrome.finder.mech.mist_surge': 'Dimstorm (pulserande områdesskada)',
   'hudChrome.finder.mech.mortal_wound': 'Glömt sår (minskar mottagen läkning)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Nekrotisk chockvåg (kraftig områdesskada)',
+  'hudChrome.finder.mech.grave_inferno': 'Gravinferno (kanaliserat eld-AoE, håll avstånd)',
   'hudChrome.finder.mech.profane_mending': 'Vanhelgad läkning (helar sina allierade)',
   'hudChrome.finder.mech.raise_fallen': 'Res de fallna (periodiska vågor av tillskott)',
   'hudChrome.finder.mech.reaping_arc': 'Skördebåge (frontalt huggsving)',
@@ -2545,7 +2545,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. 8-25 m räckvidd. Endast i Bruinform.',
   'entities.abilities.bear_charge.name': 'Bruinrusning',
   'entities.abilities.bear_form.description':
-    'Skiftar gestalt till en björn: rustning +90 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform.',
+    'Skiftar gestalt till en björn: rustning +130 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform.',
   'entities.abilities.bear_form.name': 'Bruinform',
   'entities.abilities.berserker_rage.description':
     'Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)',

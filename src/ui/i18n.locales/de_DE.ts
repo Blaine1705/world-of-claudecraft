@@ -860,7 +860,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Verdorrter Segen (verbrennt Mana)',
   'hudChrome.finder.mech.mist_surge': 'Nebelwelle (pulsierender Flachenschaden)',
   'hudChrome.finder.mech.mortal_wound': 'Vergessene Wunde (verringert erhaltene Heilung)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Nekrotische Schockwelle (schwerer Flachenschaden)',
+  'hudChrome.finder.mech.grave_inferno': 'Grabesinferno (kanalisiertes Feuer-AoE, Abstand halten)',
   'hudChrome.finder.mech.profane_mending': 'Entweihte Heilung (heilt Verbundete)',
   'hudChrome.finder.mech.raise_fallen': 'Gefallene erheben (periodische Verstarkungswellen)',
   'hudChrome.finder.mech.reaping_arc': 'Sichelschwung (frontaler Schwung)',
@@ -4260,7 +4260,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle.',
   'entities.abilities.bear_form.name': 'Bruin Form',
   'entities.abilities.bear_form.description':
-    'Verwandelt euch in einen Bären: Rüstung +90%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
+    'Verwandelt euch in einen Bären: Rüstung +130%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.maul.name': 'Bonecrush',
   'entities.abilities.maul.description':
     'Ein zerfleischender Angriff, der den Nahkampfschaden um {damage} erhöht und viel Bedrohung verursacht. Wird bei eurem nächsten Schwung ausgelöst. Nur in Bruin Form.',
