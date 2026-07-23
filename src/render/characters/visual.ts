@@ -121,6 +121,9 @@ const SPIN_ATTACK_TIMESCALE = 1.6;
 const SPIN_ONCE_DURATION = 0.55;
 const SPIN_ONCE_RATE = 18;
 const GHOST_OPACITY = 0.34;
+// Stealth (Duskveil/Smokestep) reads as a faded-but-solid silhouette, a touch
+// denser than the spirit run's 0.34 (owner: stealth was "too transparent").
+const STEALTH_OPACITY = 0.45;
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
 const SHADOWFORM_OPACITY = 0.9;
@@ -133,6 +136,10 @@ const MOONKIN_TINT = new THREE.Color(0x9d6bff);
 // (the fire aura around it comes from vfx.formAura, not the material). Kept
 // dark enough that the body still shades and the flames read against it.
 const METAMORPH_TINT = new THREE.Color(0x4f2170);
+
+/** Translucent-rig flavor: 'spirit' is the thin ghost run (released spirits,
+ *  ghost wolf, the graveyard angel); 'stealth' is the denser Duskveil fade. */
+export type GhostStyle = 'spirit' | 'stealth';
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -196,6 +203,7 @@ export class CharacterVisual {
   private stowArmBone: THREE.Object3D | null | undefined;
   private disposed = false;
   private ghosted = false;
+  private ghostStyle: GhostStyle = 'spirit';
   private mixer: THREE.AnimationMixer;
   private actions = new Map<string, THREE.AnimationAction>();
   private model: THREE.Object3D;
@@ -684,8 +692,10 @@ export class CharacterVisual {
     return this.far;
   }
 
-  setGhost(on: boolean): void {
+  setGhost(on: boolean, style: GhostStyle = 'spirit'): void {
+    if (on === this.ghosted && style === this.ghostStyle) return;
     this.ghosted = on;
+    this.ghostStyle = style;
     this.applyVisualMaterials();
   }
 
@@ -1204,12 +1214,22 @@ export class CharacterVisual {
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {
+    const opacity = this.ghostStyle === 'stealth' ? STEALTH_OPACITY : GHOST_OPACITY;
     const cached = this.ghostMaterials.get(material);
-    if (cached) return cached;
+    if (cached) {
+      // one cache serves both flavors; rewrite the opacity on style flips
+      // (stealth -> die -> ghost run reuses the same clones)
+      cached.opacity = opacity;
+      return cached;
+    }
     const ghost = material.clone();
     ghost.transparent = true;
-    ghost.opacity = GHOST_OPACITY;
-    ghost.depthWrite = false;
+    ghost.opacity = opacity;
+    // depthWrite stays ON: with it off the whole rig depth-blends against
+    // itself, so back faces and far limbs shine through the chest - the x-ray
+    // the owner reported on Duskveil. Writing depth lets nearer faces occlude
+    // farther ones and the body reads as one uniformly faded silhouette.
+    ghost.depthWrite = true;
     this.ghostMaterials.set(material, ghost);
     return ghost;
   }

@@ -5386,13 +5386,19 @@ export class Renderer {
               : travel && v.travelVisual
                 ? v.travelVisual
                 : v.visual;
+      const stealthGhost = shouldRenderStealthGhost(this.sim.playerId, e);
       const ghost =
         ghostWolf ||
-        shouldRenderStealthGhost(this.sim.playerId, e) ||
+        stealthGhost ||
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      active.setGhost(ghost);
+      // Duskveil/Smokestep wear the denser stealth fade; every spirit read
+      // (ghost run, ghost wolf, visions, the graveyard angel) keeps the thin
+      // ethereal one. A dead stealther is a spirit first.
+      const ghostStyle =
+        stealthGhost && !ghostWolf && !e.ghost ? ('stealth' as const) : ('spirit' as const);
+      active.setGhost(ghost, ghostStyle);
       active.setSoulRend(characterSoulRendActive(e));
       // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
       // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
