@@ -1599,6 +1599,23 @@ function applyAbility(
   ) {
     spendAbilityCost(ctx, p, meta, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
+    // A friendly-target completion (heals, ally blessings, dispels) resolves
+    // right here: no damage event, no projectile, no castFx - the heal2/aura
+    // events that follow only feed numbers and the small legacy glow, so
+    // without a cue the per-ability VFX layer is blind to the cast that just
+    // happened (Last Rite healed with no ceremony at all). Emit the same
+    // renderer-only 'selfCast' cue the other silent completions get, carrying
+    // the ALLY so the painter can anchor the ceremony's landing on them.
+    if (!ability.castFx && !togglingOff) {
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: p.id,
+        targetId: (target ?? p).id,
+        school: ability.school,
+        fx: 'selfCast',
+        ability: ability.id,
+      });
+    }
     ctx.runEffects(p, meta, target, res);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')
