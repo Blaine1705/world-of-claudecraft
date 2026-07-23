@@ -18,6 +18,7 @@
 // power-up draws use the per-match stream in fiesta.ts. Import-isolated (no DOM /
 // Three, rng-only) so tests/architecture.test.ts still passes.
 
+import { rangedAutoProfile } from '../combat/form_swing';
 import { arenaOrigin, CLASSES, DUNGEON_X_THRESHOLD } from '../data';
 import type { PlayerMeta, Sim } from '../sim';
 import {
@@ -57,6 +58,8 @@ export function startFiestaPractice(sim: Sim): boolean {
   ];
   for (let i = 0; i < kit.length; i++) {
     const pid = sim.addPlayer(kit[i].cls, kit[i].name);
+    const botMeta = sim.players.get(pid);
+    if (botMeta) botMeta.isFiestaBot = true;
     const e = sim.entities.get(pid);
     if (e) {
       const ang = (i / kit.length) * Math.PI * 2;
@@ -145,7 +148,9 @@ function driveFiestaBot(sim: Sim, pid: number): void {
   if (!target) return;
 
   e.facing = steadyAngleTo(e.pos, target.pos, e.facing);
-  const engageRange = CLASSES[meta.cls].ranged ? 22 : MELEE_RANGE * 0.9;
+  // Form-aware (rangedAutoProfile): bots never shapeshift today, but if one
+  // ever does, a wandless form correctly collapses its standoff to melee.
+  const engageRange = rangedAutoProfile(e, meta.cls) ? 22 : MELEE_RANGE * 0.9;
   if (best > engageRange) meta.moveInput.forward = true;
   e.targetId = target.id;
   if (!e.autoAttack) sim.startAutoAttack(pid);

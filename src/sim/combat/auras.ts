@@ -28,11 +28,16 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { recalcPlayerStats } from '../entity';
+import { pctValue, recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { isStunned } from './cc';
+import { onHotExpired, tickProcState } from './talent_procs';
+import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
+
+const SECOND_WIND_THRESHOLD = 0.35;
 
 // Friendly NPCs reject hostile control / debuff auras: any aura of these kinds is
 // stripped on the NPC's tick (cleanseFriendlyNpcAuras). Moved here with that method
@@ -47,6 +52,7 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'polymorph',
   'attackspeed',
   'sunder',
+  'bleed_vuln',
   'corrode',
   'faerie_fire',
   'spellvuln',
@@ -60,24 +66,46 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
   return FRIENDLY_NPC_REJECTED_AURA_KINDS.has(aura.kind);
 }
 
-export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
+export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
+  // Lifesap restores whichever resource bar is currently live, including across
+  // form changes. Hard control stills the sap rather than banking free resource.
+  if (!isStunned(p)) {
+    for (const aura of p.auras) {
+      if (aura.kind === 'resource_sap') {
+        p.resource = Math.min(p.maxResource, p.resource + Math.round(aura.value));
+      }
+    }
+  }
   if (p.resourceType === 'mana') {
     if (p.fiveSecondRule >= 5) {
       // out-of-combat mana regen: faster than before and scales with spirit
       // (gear/level) plus a small flat per-level floor so low-spirit casters
       // still recover at a reasonable pace (#103)
-      const regen = p.stats.spi / 3 + 4 + Math.floor(p.level / 5);
+      const regen =
+        (p.stats.spi / 3 + 4 + Math.floor(p.level / 5)) *
+        (1 + ctx.playerMods(meta).global.manaRegenPct);
       p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
     }
   } else if (p.resourceType === 'energy') {
-    p.resource = Math.min(p.maxResource, p.resource + 20);
+    // Feral Instinct (cat form) grants a buff_energyregen aura (value = fraction, 1 = +100%).
+    let regen = 20;
+    for (const a of p.auras) if (a.kind === 'buff_energyregen') regen *= 1 + a.value;
+    p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
   if (!p.inCombat && p.hp < p.maxHp && !p.eating) {
     const regen = p.stats.sta * 0.3 + 2;
     p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
+  }
+  const secondWindPct = ctx.playerMods(meta).global.secondWindPctPerSec;
+  if (secondWindPct > 0 && p.hp > 0 && p.hp < p.maxHp * SECOND_WIND_THRESHOLD) {
+    const heal = Math.min(Math.round(p.maxHp * secondWindPct * 2), p.maxHp - p.hp);
+    if (heal > 0) {
+      p.hp += heal;
+      ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
+    }
   }
   // food and drink tick independently, so both can run at once
   for (const slot of ['eating', 'drinking'] as const) {
@@ -102,9 +130,39 @@ export function updateTimers(p: Entity): void {
   p.fiveSecondRule += DT;
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
-    const nv = v - DT;
+    const nv = v - temporalHourglassCooldownDelta(p, k);
     if (nv <= 0) p.cooldowns.delete(k);
     else p.cooldowns.set(k, nv);
+  }
+  if (p.abilityCharges) {
+    for (const [abilityId, state] of Object.entries(p.abilityCharges)) {
+      if (state.charges >= state.maxCharges) continue;
+      // Legacy sequential state (an old JSONB save without per-charge timers):
+      // convert once, staggering the missing charges the way the old model
+      // would have returned them, so a mid-recharge relog keeps its schedule.
+      if (!state.recharges) {
+        const missing = Math.max(1, state.maxCharges - state.charges);
+        state.recharges = Array.from(
+          { length: missing },
+          (_, i) => state.recharge + i * state.rechargeLength,
+        );
+      }
+      // Parallel per-charge recharge: every running timer ticks at once.
+      const delta = temporalHourglassCooldownDelta(p, abilityId);
+      state.recharges = state.recharges.map((t) => t - delta);
+      while (state.recharges.length > 0 && state.recharges[0] <= 0) {
+        state.recharges.shift();
+        state.charges = Math.min(state.maxCharges, state.charges + 1);
+      }
+      if (state.charges >= state.maxCharges || state.recharges.length === 0) {
+        state.recharges = [];
+        state.recharge = 0;
+        if (state.charges > 0) p.cooldowns.delete(abilityId);
+        continue;
+      }
+      state.recharge = state.recharges[0];
+      if (state.charges <= 0) p.cooldowns.set(abilityId, state.recharge);
+    }
   }
 }
 
@@ -134,6 +192,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     return;
   }
   let statsDirty = false;
+  // Talent-proc internal cooldowns age at the same cadence as auras.
+  tickProcState(e, DT);
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
     a.remaining -= DT;
@@ -144,7 +204,17 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
-        if (a.kind === 'dot') {
+        if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
+          tickTemporalHourglassHealing(ctx, e, a);
+        } else if (a.kind === 'dot') {
+          let tickDamage = a.value;
+          if (a.school === 'physical') {
+            let bleedAmp = 0;
+            for (const targetAura of e.auras) {
+              if (targetAura.kind === 'bleed_vuln') bleedAmp += pctValue(targetAura.value);
+            }
+            if (bleedAmp > 0) tickDamage = Math.round(tickDamage * (1 + bleedAmp));
+          }
           ctx.emit({
             type: 'spellfx',
             sourceId: a.sourceId,
@@ -155,7 +225,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           ctx.dealDamage(
             ctx.entities.get(a.sourceId) ?? null,
             e,
-            a.value,
+            tickDamage,
             false,
             a.school,
             a.name,
@@ -166,6 +236,24 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
           );
+          if (a.leechPct !== undefined) {
+            const src = ctx.entities.get(a.sourceId);
+            if (src && !src.dead) {
+              const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
+              if (healed > 0) {
+                src.hp += healed;
+                ctx.emit({
+                  type: 'heal2',
+                  sourceId: src.id,
+                  targetId: src.id,
+                  amount: healed,
+                  crit: false,
+                  ability: a.name,
+                });
+                ctx.healingThreat(src, src, healed);
+              }
+            }
+          }
           if (e.dead) return;
         } else if (a.kind === 'hot') {
           const healed = Math.min(Math.round(a.value * ctx.healingTakenMult(e)), e.maxHp - e.hp);
@@ -192,9 +280,25 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       e.auras.splice(i, 1);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
+      // A HoT that ran its FULL duration (this natural-expiry path, never a
+      // dispel/overwrite) reports to the caster's talent procs. No rng.
+      if (a.kind === 'hot') {
+        const source = ctx.entities.get(a.sourceId);
+        if (source && !source.dead && source.kind === 'player') {
+          onHotExpired(ctx, source, a.id, e);
+        }
+      }
       // debuff_ap is the one non-buff kind recalcPlayerStats folds, so it must
       // mark stats dirty on expiry or the AP cut would persist after the fade.
-      if (a.kind.startsWith('buff') || a.kind.startsWith('form') || a.kind === 'debuff_ap')
+      if (
+        a.kind.startsWith('buff') ||
+        a.kind.startsWith('form') ||
+        a.kind === 'debuff_ap' ||
+        a.kind === 'die_by_sword' ||
+        a.kind === 'enrage' ||
+        a.kind === 'bloodbath' ||
+        a.kind === 'berserker_stance'
+      )
         statsDirty = true;
     }
   }

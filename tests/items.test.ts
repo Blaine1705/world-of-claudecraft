@@ -1,8 +1,11 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { type Entity, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
+import { type Entity, type ItemDef, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
 
 // Direct tests for the extracted inventory/vendor module (W2). They call the module
 // functions with the real SimContext the Sim built in its ctor (the same seam the thin
@@ -240,6 +243,101 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(sim.countItem('minor_healing_potion', pid)).toBe(1); // non-staples stay single
   });
 
+  it('buys FURY gear with honor without changing lifetime honor', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Veteran');
+    const meta = sim.meta(pid)!;
+    const fury = [...sim.entities.values()].find((entity) => entity.templateId === 'fury')!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = fury.pos.x;
+    player.pos.z = fury.pos.z;
+    meta.inventory.length = 0;
+    meta.honor = 1_000;
+    meta.lifetimeHonor = 2_000;
+
+    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
+
+    expect(sim.countItem('final_argument_greatblade', pid)).toBe(1);
+    expect(meta.honor).toBe(200);
+    expect(meta.lifetimeHonor).toBe(2_000);
+    expect(meta.copper).toBe(0);
+  });
+
+  it('can destroy duplicate soulbound FURY purchases without making them transferable', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Collector');
+    const meta = sim.meta(pid)!;
+    const fury = [...sim.entities.values()].find((entity) => entity.templateId === 'fury')!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = fury.pos.x;
+    player.pos.z = fury.pos.z;
+    meta.inventory.length = 0;
+    meta.honor = 1_600;
+
+    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
+    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
+    expect(sim.countItem('final_argument_greatblade', pid)).toBe(2);
+    expect(ITEMS.final_argument_greatblade.soulbound).toBe(true);
+
+    items.discardItem(ctxOf(sim), 'final_argument_greatblade', 2, pid);
+    expect(sim.countItem('final_argument_greatblade', pid)).toBe(0);
+  });
+
+  it('checks dual copper/honor prices and bag space before either debit', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'DualBuyer');
+    const meta = sim.meta(pid)!;
+    const fury = [...sim.entities.values()].find((entity) => entity.templateId === 'fury')!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = fury.pos.x;
+    player.pos.z = fury.pos.z;
+    meta.inventory.length = 0;
+    const testId = 'test_warfare_rations';
+    ITEMS[testId] = {
+      id: testId,
+      name: 'Test Warfare Rations',
+      kind: 'food',
+      foodHp: 100,
+      buyValue: 10,
+      priceHonor: 7,
+      sellValue: 1,
+    };
+    fury.vendorItems.push(testId);
+
+    try {
+      meta.copper = 49;
+      meta.honor = 7;
+      items.buyItem(ctxOf(sim), fury.id, testId, pid);
+      expect(meta.copper).toBe(49);
+      expect(meta.honor).toBe(7);
+      expect(sim.countItem(testId, pid)).toBe(0);
+
+      meta.copper = 50;
+      meta.honor = 6;
+      items.buyItem(ctxOf(sim), fury.id, testId, pid);
+      expect(meta.copper).toBe(50);
+      expect(meta.honor).toBe(6);
+      expect(sim.countItem(testId, pid)).toBe(0);
+
+      meta.honor = 7;
+      items.buyItem(ctxOf(sim), fury.id, testId, pid);
+      expect(meta.copper).toBe(0);
+      expect(meta.honor).toBe(0);
+      expect(sim.countItem(testId, pid)).toBe(5);
+
+      meta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'worn_sword', count: 1 }));
+      meta.copper = 0;
+      meta.honor = 800;
+      items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
+      expect(meta.copper).toBe(0);
+      expect(meta.honor).toBe(800);
+      expect(sim.countItem('final_argument_greatblade', pid)).toBe(0);
+    } finally {
+      fury.vendorItems.splice(fury.vendorItems.indexOf(testId), 1);
+      delete ITEMS[testId];
+    }
+  });
+
   it('buying a food stack then selling it back is a net loss (no vendor arbitrage)', () => {
     const sim = makeWorld();
     const { pid, wilkes, meta } = vendorPlayer(sim);
@@ -263,21 +361,45 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     const { pid, meta } = vendorPlayer(sim);
     const ctx = ctxOf(sim);
     meta.copper = 0;
-    sim.addItem('wolf_fang', 2, pid); // poor, sellValue 4 -> 8
+    // wolf_fang is a crafting reagent now (quality common, never
+    // swept), so this sweep uses mudfin_scale as its gray fodder.
+    sim.addItem('mudfin_scale', 2, pid); // poor, sellValue 5 -> 10
     sim.addItem('bandit_bandana', 1, pid); // poor, sellValue 6
+    sim.addItem('wolf_fang', 1, pid); // reagent (common, white) -> kept
     sim.addItem('apprentice_staff', 1, pid); // not poor -> kept
     sim.drainEvents();
 
     items.sellAllJunk(ctx, pid);
-    expect(sim.countItem('wolf_fang', pid)).toBe(0);
+    expect(sim.countItem('mudfin_scale', pid)).toBe(0);
     expect(sim.countItem('bandit_bandana', pid)).toBe(0);
+    expect(sim.countItem('wolf_fang', pid)).toBe(1);
     expect(sim.countItem('apprentice_staff', pid)).toBe(1);
-    expect(meta.copper).toBe(2 * 4 + 6); // 14
-    expect(meta.vendorBuyback.some((s) => s.itemId === 'wolf_fang' && s.count === 2)).toBe(true);
+    expect(meta.copper).toBe(2 * 5 + 6); // 16
+    expect(meta.vendorBuyback.some((s) => s.itemId === 'mudfin_scale' && s.count === 2)).toBe(true);
     const summary = sim
       .drainEvents()
       .filter((e) => e.type === 'loot' && /^Sold \d+ junk item/.test((e as { text: string }).text));
     expect(summary).toHaveLength(1);
+  });
+
+  it('junkSellableSlot is the one sweep rule: every arm decides, and the HUD preview consumes it', () => {
+    // The predicate is shared by sellAllJunk and the vendor preview in
+    // hud.ts renderVendor; per-arm decisiveness here plus the source pin
+    // below keep the two surfaces from ever drifting apart again.
+    const gray: ItemDef = ITEMS.mudfin_scale;
+    const slot = { count: 1 };
+    expect(items.junkSellableSlot(gray, slot)).toBe(true);
+    expect(items.junkSellableSlot(undefined, slot)).toBe(false);
+    expect(items.junkSellableSlot(ITEMS.wolf_fang, slot)).toBe(false); // common, not poor
+    expect(items.junkSellableSlot({ ...gray, kind: 'quest' } as ItemDef, slot)).toBe(false);
+    expect(items.junkSellableSlot({ ...gray, noVendorSell: true }, slot)).toBe(false);
+    expect(items.junkSellableSlot({ ...gray, soulbound: true }, slot)).toBe(false);
+    expect(items.junkSellableSlot(gray, { count: 0 })).toBe(false);
+    expect(items.junkSellableSlot(gray, { count: 1, instance: { boundTo: 7 } })).toBe(false);
+    expect(items.junkSellableSlot(gray, { count: 1, instance: { signer: 'Ana' } })).toBe(true);
+
+    const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    expect(hud).toContain('junkSellableSlot(ITEMS[slot.itemId], slot)');
   });
 
   it('buyBackItem repurchases via the silent add, spends copper, and clears the buyback slot', () => {

@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 405,
+      "nextId": 415,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "3a3e8356",
+      "nextId": 416,
+      "state": "58da384c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,12 +61,23 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -79,9 +90,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -90,6 +101,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -97,14 +121,15 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 90,
-          "id": 405,
+          "hp": 100,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 90,
+          "maxHp": 100,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -123,10 +148,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -141,9 +166,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "9828a68c",
-      "events": "096ab7a3",
+      "nextId": 416,
+      "state": "c15c4ed3",
+      "events": "7db794b1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -168,12 +193,25 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "spring_water",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -194,9 +232,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -205,6 +243,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -212,14 +263,15 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 90,
-          "id": 405,
+          "hp": 100,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 90,
+          "maxHp": 100,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -238,10 +290,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -256,9 +308,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "e3b1513c",
-      "events": "3484c3f2",
+      "nextId": 416,
+      "state": "e2f94fac",
+      "events": "aced36d1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -283,13 +335,28 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -314,9 +381,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -325,6 +392,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -332,14 +412,15 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 120,
-          "id": 405,
+          "hp": 130,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 120,
+          "maxHp": 130,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -358,10 +439,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 158,
+            "armor": 192,
             "int": 10,
             "spi": 11,
-            "sta": 25,
+            "sta": 26,
             "str": 23
           },
           "templateId": "warrior",
@@ -376,9 +457,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "6f328f28",
-      "events": "38928174",
+      "nextId": 416,
+      "state": "041cd44f",
+      "events": "7b632ab5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -403,13 +484,28 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -434,9 +530,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -445,6 +541,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -452,14 +561,15 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 110,
-          "id": 405,
+          "hp": 120,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 110,
+          "maxHp": 120,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -478,10 +588,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 155,
+            "armor": 189,
             "int": 10,
             "spi": 11,
-            "sta": 24,
+            "sta": 25,
             "str": 23
           },
           "templateId": "warrior",
@@ -496,9 +606,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "fa6c6c46",
-      "events": "e99be2dd",
+      "nextId": 416,
+      "state": "41856809",
+      "events": "d7e42320",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -523,12 +633,27 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -557,9 +682,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -568,6 +693,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -575,14 +713,15 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 90,
-          "id": 405,
+          "hp": 100,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 90,
+          "maxHp": 100,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -601,10 +740,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -619,9 +758,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "cbbf8f78",
-      "events": "c0073169",
+      "nextId": 416,
+      "state": "3f38658f",
+      "events": "e7c82b41",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -646,12 +785,27 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -680,9 +834,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -691,6 +845,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -710,14 +877,15 @@
           },
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 90,
-          "id": 405,
+          "hp": 100,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 90,
+          "maxHp": 100,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -737,10 +905,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -755,9 +923,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "ae1c12a9",
-      "events": "c9b07f5e",
+      "nextId": 416,
+      "state": "ddc2ebd8",
+      "events": "beac14d0",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -782,12 +950,27 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -812,9 +995,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -823,6 +1006,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -842,14 +1038,15 @@
           },
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 90,
-          "id": 405,
+          "hp": 100,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 90,
+          "maxHp": 100,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -869,10 +1066,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -887,9 +1084,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "07d46df9",
-      "events": "d79812c3",
+      "nextId": 416,
+      "state": "825b91d5",
+      "events": "700fff02",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -914,12 +1111,28 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "elixir_of_the_bear",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -944,9 +1157,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -957,16 +1170,27 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            },
+            {
               "duration": 900,
               "id": "elixir_elixir_of_the_bear",
               "kind": "buff_sta",
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 405,
+              "sourceId": 415,
               "value": 12
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -986,14 +1210,15 @@
           },
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 210,
-          "id": 405,
+          "hp": 220,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 210,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1013,10 +1238,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -1031,9 +1256,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "f47168c5",
-      "events": "d1fd54a6",
+      "nextId": 416,
+      "state": "479a06c6",
+      "events": "5917907c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1058,12 +1283,29 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "elixir_of_the_bear",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1092,9 +1334,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -1105,16 +1347,27 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            },
+            {
               "duration": 900,
               "id": "elixir_elixir_of_the_bear",
               "kind": "buff_sta",
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 405,
+              "sourceId": 415,
               "value": 12
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -1134,14 +1387,15 @@
           },
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 210,
-          "id": 405,
+          "hp": 220,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 210,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1161,10 +1415,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -1179,9 +1433,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "514ae5ce",
-      "events": "23e16a50",
+      "nextId": 416,
+      "state": "494ec213",
+      "events": "43fbfed4",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1206,12 +1460,29 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "elixir_of_the_bear",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1240,9 +1511,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "vendorBuyback": [
@@ -1259,16 +1530,27 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            },
+            {
               "duration": 900,
               "id": "elixir_elixir_of_the_bear",
               "kind": "buff_sta",
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 405,
+              "sourceId": 415,
               "value": 12
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -1288,14 +1570,15 @@
           },
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 210,
-          "id": 405,
+          "hp": 220,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 210,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1315,10 +1598,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -1333,9 +1616,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "76f8018d",
-      "events": "4fe3c73e",
+      "nextId": 416,
+      "state": "49f3a37a",
+      "events": "a5ebc92c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1356,16 +1639,34 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 724,
+          "copper": 720,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "bandit_bandana",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "elixir_of_the_bear",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1386,13 +1687,17 @@
             {
               "count": 1,
               "itemId": "roadwardens_helm"
+            },
+            {
+              "count": 1,
+              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "vendorBuyback": [
@@ -1401,7 +1706,7 @@
               "itemId": "bandit_bandana"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wolf_fang"
             }
           ]
@@ -1413,16 +1718,27 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            },
+            {
               "duration": 900,
               "id": "elixir_elixir_of_the_bear",
               "kind": "buff_sta",
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 405,
+              "sourceId": 415,
               "value": 12
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -1442,14 +1758,15 @@
           },
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 210,
-          "id": 405,
+          "hp": 220,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 210,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1469,10 +1786,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -1487,9 +1804,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "239d37ff",
-      "events": "5c2ca31d",
+      "nextId": 416,
+      "state": "dffcef0d",
+      "events": "6787cd59",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1510,16 +1827,34 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 720,
+          "copper": 716,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "bandit_bandana",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "elixir_of_the_bear",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1542,25 +1877,21 @@
               "itemId": "roadwardens_helm"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "vendorBuyback": [
             {
               "count": 1,
               "itemId": "bandit_bandana"
-            },
-            {
-              "count": 1,
-              "itemId": "wolf_fang"
             }
           ]
         }
@@ -1571,16 +1902,27 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            },
+            {
               "duration": 900,
               "id": "elixir_elixir_of_the_bear",
               "kind": "buff_sta",
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 405,
+              "sourceId": 415,
               "value": 12
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -1600,14 +1942,15 @@
           },
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 210,
-          "id": 405,
+          "hp": 220,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 210,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1627,10 +1970,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",
@@ -1645,8 +1988,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "239d37ff",
+      "nextId": 416,
+      "state": "dffcef0d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1668,16 +2011,34 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 720,
+          "copper": 716,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "bandit_bandana",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "elixir_of_the_bear",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1700,25 +2061,21 @@
               "itemId": "roadwardens_helm"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "vendorBuyback": [
             {
               "count": 1,
               "itemId": "bandit_bandana"
-            },
-            {
-              "count": 1,
-              "itemId": "wolf_fang"
             }
           ]
         }
@@ -1729,16 +2086,27 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            },
+            {
               "duration": 900,
               "id": "elixir_elixir_of_the_bear",
               "kind": "buff_sta",
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 405,
+              "sourceId": 415,
               "value": 12
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -1758,14 +2126,15 @@
           },
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 210,
-          "id": 405,
+          "hp": 220,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 210,
+          "maxHp": 220,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1785,10 +2154,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 23
           },
           "templateId": "warrior",

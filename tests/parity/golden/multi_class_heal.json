@@ -19,7 +19,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 405,
+      "nextId": 415,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -33,9 +33,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 414,
-      "state": "78cd2495",
-      "events": "9b8485f8",
+      "nextId": 424,
+      "state": "1d23a2ec",
+      "events": "8461f434",
       "rng": {
         "draws": 6,
         "digest": "e9e34462"
@@ -59,9 +59,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -81,9 +91,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -104,9 +114,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "spring_water",
+              "training_mace"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 416,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
@@ -126,9 +146,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -149,9 +169,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 417,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -171,9 +201,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -194,9 +224,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 418,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "training_mace"
@@ -216,9 +256,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -239,12 +279,23 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 419,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -257,9 +308,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -276,7 +327,7 @@
           "fallStartY": 2.338163,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 405,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -325,7 +376,7 @@
           "fallStartY": 2.403234,
           "fiveSecondRule": 99,
           "hp": 95,
-          "id": 406,
+          "id": 416,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -375,7 +426,7 @@
               "name": "Weakening Hex",
               "remaining": 60,
               "school": "physical",
-              "sourceId": 411,
+              "sourceId": 421,
               "value": 0.3
             }
           ],
@@ -387,7 +438,7 @@
           "fallStartY": 2.479635,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 407,
+          "id": 417,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -437,7 +488,7 @@
           "fallStartY": 2.354059,
           "fiveSecondRule": 99,
           "hp": 68,
-          "id": 408,
+          "id": 418,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -481,16 +532,27 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 419
+            },
+            {
               "duration": 60,
               "id": "absorb_big",
               "kind": "heal_absorb",
               "name": "Necrotic",
               "remaining": 60,
               "school": "physical",
-              "sourceId": 411,
+              "sourceId": 421,
               "value": 3700
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -499,13 +561,14 @@
           "fallStartY": -1.48336,
           "fiveSecondRule": 99,
           "hp": 10000,
-          "id": 409,
+          "id": 419,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 10000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -524,10 +587,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -547,7 +610,7 @@
           "fallStartY": -1.48336,
           "fiveSecondRule": 99,
           "hp": 96,
-          "id": 410,
+          "id": 420,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -555,7 +618,7 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 409,
+          "ownerId": 419,
           "petMode": "defensive",
           "pos": {
             "x": 80,
@@ -589,7 +652,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 411,
+          "id": 421,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -616,19 +679,19 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              415,
               115.666667
             ],
             [
-              406,
+              416,
               200
             ],
             [
-              407,
+              417,
               87.5
             ],
             [
-              409,
+              419,
               10
             ]
           ],
@@ -649,7 +712,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 412,
+          "id": 422,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -676,19 +739,19 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              415,
               115.666667
             ],
             [
-              406,
+              416,
               200
             ],
             [
-              407,
+              417,
               87.5
             ],
             [
-              409,
+              419,
               10
             ]
           ],
@@ -709,7 +772,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 413,
+          "id": 423,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -736,19 +799,19 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              415,
               115.666667
             ],
             [
-              406,
+              416,
               200
             ],
             [
-              407,
+              417,
               87.5
             ],
             [
-              410,
+              420,
               10
             ]
           ],
@@ -763,9 +826,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 414,
-      "state": "8ca741d7",
-      "events": "ac3619d5",
+      "nextId": 424,
+      "state": "37f14b52",
+      "events": "a18f2672",
       "rng": {
         "draws": 6,
         "digest": "e9e34462"
@@ -789,9 +852,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -811,9 +884,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -834,9 +907,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "spring_water",
+              "training_mace"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 416,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
@@ -856,9 +939,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -881,9 +964,22 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "crits": 1,
+              "damageDealt": 105
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 417,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -903,9 +999,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -926,9 +1022,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 418,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "training_mace"
@@ -948,9 +1054,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -971,12 +1077,23 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 419,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -989,9 +1106,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -1008,7 +1125,7 @@
           "fallStartY": 2.338163,
           "fiveSecondRule": 99,
           "hp": 51,
-          "id": 405,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1057,7 +1174,7 @@
           "fallStartY": 2.403234,
           "fiveSecondRule": 99,
           "hp": 95,
-          "id": 406,
+          "id": 416,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1107,7 +1224,7 @@
               "name": "Weakening Hex",
               "remaining": 60,
               "school": "physical",
-              "sourceId": 411,
+              "sourceId": 421,
               "value": 0.3
             }
           ],
@@ -1118,7 +1235,7 @@
           "fallStartY": 2.479635,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 407,
+          "id": 417,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1169,7 +1286,7 @@
           "fallStartY": 2.354059,
           "fiveSecondRule": 99,
           "hp": 68,
-          "id": 408,
+          "id": 418,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1213,16 +1330,27 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 419
+            },
+            {
               "duration": 60,
               "id": "absorb_big",
               "kind": "heal_absorb",
               "name": "Necrotic",
               "remaining": 60,
               "school": "physical",
-              "sourceId": 411,
+              "sourceId": 421,
               "value": 3700
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -1231,13 +1359,14 @@
           "fallStartY": -1.48336,
           "fiveSecondRule": 99,
           "hp": 10000,
-          "id": 409,
+          "id": 419,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 10000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1256,10 +1385,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -1279,7 +1408,7 @@
           "fallStartY": -1.48336,
           "fiveSecondRule": 99,
           "hp": 96,
-          "id": 410,
+          "id": 420,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1287,7 +1416,7 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 409,
+          "ownerId": 419,
           "petMode": "defensive",
           "pos": {
             "x": 80,
@@ -1311,7 +1440,7 @@
           }
         },
         {
-          "aggroTargetId": 407,
+          "aggroTargetId": 417,
           "aiState": "chase",
           "auras": [
             {
@@ -1321,7 +1450,7 @@
               "name": "Find Weakness",
               "remaining": 60,
               "school": "physical",
-              "sourceId": 407,
+              "sourceId": 417,
               "value": 0.5
             }
           ],
@@ -1333,7 +1462,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49895,
-          "id": 411,
+          "id": 421,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1362,23 +1491,23 @@
           "stats": {
             "armor": 40
           },
-          "tappedById": 407,
+          "tappedById": 417,
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              415,
               115.666667
             ],
             [
-              406,
+              416,
               200
             ],
             [
-              407,
+              417,
               193.5
             ],
             [
-              409,
+              419,
               10
             ]
           ],
@@ -1399,7 +1528,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 412,
+          "id": 422,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -1426,19 +1555,19 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              415,
               115.666667
             ],
             [
-              406,
+              416,
               200
             ],
             [
-              407,
+              417,
               87.5
             ],
             [
-              409,
+              419,
               10
             ]
           ],
@@ -1459,7 +1588,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 413,
+          "id": 423,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -1486,19 +1615,19 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              415,
               115.666667
             ],
             [
-              406,
+              416,
               200
             ],
             [
-              407,
+              417,
               87.5
             ],
             [
-              410,
+              420,
               10
             ]
           ],
@@ -1513,9 +1642,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 414,
-      "state": "e2181904",
-      "events": "cc157a1d",
+      "nextId": 424,
+      "state": "7e1d241f",
+      "events": "6f93363d",
       "rng": {
         "draws": 10,
         "digest": "fce7a45d"
@@ -1524,9 +1653,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 414,
-      "state": "d04edacb",
-      "events": "cc157a1d",
+      "nextId": 424,
+      "state": "1a6fcb12",
+      "events": "6f93363d",
       "rng": {
         "draws": 10,
         "digest": "fce7a45d"
@@ -1550,9 +1679,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 415,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1572,9 +1711,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1595,9 +1734,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "spring_water",
+              "training_mace"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 416,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
@@ -1617,9 +1766,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1642,9 +1791,22 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "crits": 1,
+              "damageDealt": 105
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 417,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
@@ -1664,9 +1826,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1687,9 +1849,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 418,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "training_mace"
@@ -1709,9 +1881,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1732,12 +1904,23 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 419,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1750,9 +1933,9 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -1769,7 +1952,7 @@
           "fallStartY": 2.338163,
           "fiveSecondRule": 99.4,
           "hp": 51,
-          "id": 405,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1818,7 +2001,7 @@
           "fallStartY": 2.403234,
           "fiveSecondRule": 99.4,
           "hp": 95,
-          "id": 406,
+          "id": 416,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1868,7 +2051,7 @@
               "name": "Weakening Hex",
               "remaining": 59.6,
               "school": "physical",
-              "sourceId": 411,
+              "sourceId": 421,
               "value": 0.3
             }
           ],
@@ -1880,7 +2063,7 @@
           "fallStartY": 2.479635,
           "fiveSecondRule": 99.4,
           "hp": 62,
-          "id": 407,
+          "id": 417,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1931,7 +2114,7 @@
           "fallStartY": 2.354059,
           "fiveSecondRule": 99.4,
           "hp": 68,
-          "id": 408,
+          "id": 418,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1975,13 +2158,22 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.6,
+              "school": "physical",
+              "sourceId": 419
+            },
+            {
               "duration": 60,
               "id": "absorb_big",
               "kind": "heal_absorb",
               "name": "Necrotic",
               "remaining": 59.6,
               "school": "physical",
-              "sourceId": 411,
+              "sourceId": 421,
               "value": 3700
             },
             {
@@ -1991,12 +2183,14 @@
               "name": "Rejuvenation",
               "remaining": 2.6,
               "school": "physical",
-              "sourceId": 407,
+              "sourceId": 417,
               "tickInterval": 0.1,
               "tickTimer": 0.1,
               "value": 300
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99.4,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -2005,13 +2199,14 @@
           "fallStartY": -1.48336,
           "fiveSecondRule": 99.4,
           "hp": 3200,
-          "id": 409,
+          "id": 419,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 10000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2030,10 +2225,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -2053,7 +2248,7 @@
           "fallStartY": -1.48336,
           "fiveSecondRule": 99,
           "hp": 96,
-          "id": 410,
+          "id": 420,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2061,7 +2256,7 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 409,
+          "ownerId": 419,
           "petMode": "defensive",
           "petPathCooldown": 0.15,
           "pos": {
@@ -2086,7 +2281,7 @@
           }
         },
         {
-          "aggroTargetId": 407,
+          "aggroTargetId": 417,
           "aiState": "chase",
           "auras": [
             {
@@ -2096,7 +2291,7 @@
               "name": "Find Weakness",
               "remaining": 59.6,
               "school": "physical",
-              "sourceId": 407,
+              "sourceId": 417,
               "value": 0.5
             }
           ],
@@ -2110,7 +2305,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49895,
-          "id": 411,
+          "id": 421,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2139,23 +2334,23 @@
           "stats": {
             "armor": 40
           },
-          "tappedById": 407,
+          "tappedById": 417,
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              415,
               115.666667
             ],
             [
-              406,
+              416,
               200
             ],
             [
-              407,
+              417,
               393.5
             ],
             [
-              409,
+              419,
               10
             ]
           ],
@@ -2177,7 +2372,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 412,
+          "id": 422,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -2204,19 +2399,19 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              415,
               115.666667
             ],
             [
-              406,
+              416,
               200
             ],
             [
-              407,
+              417,
               287.5
             ],
             [
-              409,
+              419,
               10
             ]
           ],
@@ -2244,7 +2439,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 413,
+          "id": 423,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -2271,19 +2466,19 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              415,
               115.666667
             ],
             [
-              406,
+              416,
               200
             ],
             [
-              407,
+              417,
               287.5
             ],
             [
-              410,
+              420,
               10
             ]
           ],

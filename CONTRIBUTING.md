@@ -13,7 +13,7 @@ dungeon: it all counts, and you're welcome here.
 
 This guide will help you get set up and make your first contribution a smooth one.
 You don't need to be an expert. If anything is unclear, ask on
-[Discord](https://discord.gg/GjhnUsBtw) and someone will be happy to help.
+[Discord](https://discord.com/invite/worldofclaudecraft) and someone will be happy to help.
 
 By participating, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
@@ -63,6 +63,44 @@ npm run dev          # in another terminal; the client proxies to the server
 
 The [README](README.md) has the full host, develop, and play guide, and the
 `CLAUDE.md` files throughout the repo document the conventions for each area.
+
+### TypeScript toolchain
+
+Type checking runs on TypeScript 7, the native compiler: `npx tsc --noEmit` works
+exactly as before and a full repo check now takes a few seconds instead of tens of
+seconds. The install is the official dual alias: the `typescript` package resolves
+the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
+`svelte-check` still consumes that API, while `@typescript/native` provides the
+`tsc` binary. Things to know:
+
+- **Editors.** VS Code needs the "TypeScript 7" marketplace extension
+  (`TypeScriptTeam.native-preview`) for native language service support until the
+  built-in support ships; it toggles via the `js/ts.experimental.useTsgo` setting,
+  and its "Disable TypeScript 7 Language Server" command is the sanctioned
+  fallback to the TypeScript 6 tsserver. JetBrains IDEs auto-detect the native
+  server only under the `@typescript/native-preview` package name, so they will
+  not pick it up from this repo's `@typescript/native` alias; their bundled
+  TypeScript 6 support works fine.
+- **Useful tsc flags.** `--checkers N` sets the parallel type-checker worker count
+  (default 4; results are identical at any count): lower it to cap memory on a
+  constrained runner, raise it on a many-core machine, and measure either way,
+  since more is not always faster. `--singleThreaded` disables all parallelism.
+  Checking a single file ad hoc (`npx tsc somefile.ts`) errors when the directory
+  has a `tsconfig.json`; pass `--ignoreConfig` for the old behavior.
+- **Lockfile.** Regenerate `package-lock.json` only with
+  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics, and
+  newer npm majors (including the npm 11 that CI's Node 26 bundles) silently drop
+  `svelte-check`'s nested optional-peer entries, which desyncs `npm ci` in CI.
+  Plain `npm ci` is safe under any npm major. After regenerating, confirm
+  `npm ci --dry-run` is in sync under both npm 10 and your workstation's npm.
+- **When to revisit.** Collapse the dual alias back to a single `typescript`
+  dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped
+  (TypeScript 7.0 ships no JS API at all; the replacement is tracked in
+  microsoft/typescript-go issue 2824), and sveltejs/language-tools issue 3063 has
+  closed with a released `svelte-check` that adopts it. svelte-check's
+  experimental `--tsgo` modes do not lift its TypeScript 6 API requirement, and
+  its in-progress TypeScript 7 loading (language-tools PR 3073) reads the
+  `@typescript/native` alias this repo already uses, so no rename is needed.
 
 ## Making your change
 
@@ -170,7 +208,7 @@ write any game code to do it:
 3. Run `npx tsc --noEmit` to confirm nothing is missing, then open a PR.
 
 To propose a brand-new locale, or to discuss tone and terminology, start a thread
-on [Discord](https://discord.gg/GjhnUsBtw) and we'll help you wire it up. Native
+on [Discord](https://discord.com/invite/worldofclaudecraft) and we'll help you wire it up. Native
 and fluent speakers are especially welcome. Good translations make the game feel
 like home for players everywhere.
 
@@ -188,13 +226,50 @@ Please use the [issue templates](https://github.com/levy-street/world-of-claudec
 ## Getting help
 
 Stuck, or just want to say hi? Join the
-[community Discord](https://discord.gg/GjhnUsBtw). No question is too small, and
+[community Discord](https://discord.com/invite/worldofclaudecraft). No question is too small, and
 new contributors are always welcome.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the
-project's [MIT License](LICENSE), the same license that covers the project.
+By contributing code, you agree that your code contributions will be licensed
+under the project's [MIT License](LICENSE), the same license that covers the
+project.
+
+The MIT License means what it says: anyone may use, modify, and redistribute the
+code, commercially or not. Our
+[Terms of Service](https://worldofclaudecraft.com/terms) govern the hosted game
+we operate at worldofclaudecraft.com (accounts, conduct, virtual items) and do
+not restrict the rights the MIT License gives you or anyone else in this code.
+The "World of ClaudeCraft" and "Levy Street" names and branding are not covered
+by the MIT License.
+
+Original creative assets (sound recordings, music, art, and similar authored
+works) are the exception. If you contribute an original asset you created, you
+may instead keep copyright and contribute it under a license of your choice
+(for example CC BY-NC 4.0), provided that:
+
+- the license, the asset paths it covers, and your attribution are recorded in
+  the license table in [CREDITS.md](CREDITS.md) as part of the same pull
+  request, and
+- it includes at minimum a perpetual, royalty-free grant to Levy Street to use
+  the assets commercially in World of ClaudeCraft, including official releases
+  and the in-game store.
+
+For assets listed in the CREDITS.md table, that recorded license controls over
+the project's default MIT license.
+
+**Media assets with no CREDITS.md entry are not licensed under MIT.** The
+register is still being completed, so a missing entry means the terms are
+unrecorded, not that the asset is free to take. This is deliberate: it stops an
+unregistered contribution being given away by default. Code is the other way
+around, and anything not carved out in CREDITS.md is MIT.
+
+That is exactly why the register entry is not optional paperwork. If you
+contribute an asset without a CREDITS.md row, nobody downstream can use it and
+we have no record of what you granted us. Record the **Redistribution** column
+honestly too. It is what tells someone forking this project whether they may
+pass your asset on, and some rows are marked "No, permission required" precisely
+because they may not.
 
 ---
 

@@ -16,7 +16,7 @@ import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { instanceOrigin } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
-import { isLitanyModuleId } from '../sim/delve_litany_layout';
+import { isLitanyModuleId, polygonWallSegments } from '../sim/delve_litany_layout';
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
@@ -1387,10 +1387,10 @@ export class DungeonInteriors {
     }
   }
 
-  // Polygon-shell wall path: walks each authored boundary edge and places
-  // fixed-pitch wall modules along it (same ~8u module pitch and variant-keyed
-  // wallKind/banner logic as the rectangular loop above), rotated to run along
-  // the edge. This covers the end faces too (the polygon already closes the
+  // Polygon-shell wall path: walks the exact shared collision segments and
+  // scales one wall module to each span, with the same variant-keyed wall and
+  // banner logic as the rectangular loop above. This covers the end faces too
+  // (the polygon already closes the
   // room), so there is no separate end-cap pass and no door gap (Drowned
   // Litany rooms are teleport-in, matching the sim shell colliders built by
   // polygonShellColliders in sim/delve_litany_layout.ts). Rotation uses the
@@ -1405,27 +1405,18 @@ export class DungeonInteriors {
     variant: Variant,
   ): void {
     const bannerEvery = variant === 'crypt' ? 4 : 3;
-    const n = points.length;
     let i = 0;
-    for (let e = 0; e < n; e++) {
-      const a = points[e];
-      const b = points[(e + 1) % n];
-      const dx = b.x - a.x;
-      const dz = b.z - a.z;
-      const len = Math.hypot(dx, dz);
-      if (len < 1e-6) continue;
-      const rot = Math.atan2(-dz, dx);
-      const count = Math.max(1, Math.round(len / 8));
-      for (let s = 0; s < count; s++, i++) {
-        const t = (s + 0.5) / count;
-        const x = a.x + dx * t;
-        const z = a.z + dz * t;
-        const kind = this.wallKind(variant, hash2(x * 13.7, z));
-        p.add(kind, x, 0, z, rot, MODULE_SCALE);
-        if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
-          p.add(this.bannerKind(variant, hash2(z, x * 7.3)), x, 0, z, rot, MODULE_SCALE);
-        }
+    for (const segment of polygonWallSegments(points)) {
+      const { x, z, rot, halfLength } = segment;
+      const kind = this.wallKind(variant, hash2(x * 13.7, z));
+      // KayKit wall modules are 4u long on local X. Scale each one to the exact
+      // shared segment span instead of drawing an 8u module past a short edge.
+      const scale: [number, number, number] = [halfLength / 2, MODULE_SCALE, MODULE_SCALE];
+      p.add(kind, x, 0, z, rot, scale);
+      if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
+        p.add(this.bannerKind(variant, hash2(z, x * 7.3)), x, 0, z, rot, MODULE_SCALE);
       }
+      i++;
     }
   }
 
@@ -1588,10 +1579,18 @@ export class DungeonInteriors {
     }
   }
 
-  // Sanctum chamber waists: solid wall blocks built from stretched kit walls
-  // (cap flush at |x|=6 so the visual never intrudes into the 10u passage),
-  // plus a ritual arch spanning the centre passage.
+  // Chamber waists use variant-specific geometry derived from their authored
+  // stub OBBs so their visible footprint stays aligned with collision.
   private placeStubs(p: Placements, stubs: WallStub[], variant: Variant): void {
+    if (variant === 'arena') {
+      // Arena cover is a narrow full-height wall rather than the large
+      // sanctum chamber mass. The centered KayKit wall is 4u long and 1u
+      // thick, so these scales map its visual bounds exactly onto the OBB.
+      for (const s of stubs) {
+        p.add('wall', s.x, 0, s.z, Math.PI / 2, [s.hd / 2, MODULE_SCALE, s.hw * 2]);
+      }
+      return;
+    }
     if (variant === 'delve_bell') {
       // Bell Niche: each stub is a solid pier (hw x hd OBB) flush against the
       // side wall, dividing the deep handbell alcoves. Render the aisle-facing
