@@ -2499,7 +2499,7 @@ export const it_IT: EnTranslations = {
         "lunar_tide": "Marea Lunare (danno ad area pulsante)",
         "enrage": "Va in furia con poca salute",
         "shuddering_stomp": "Pestata Tremenda (stordimento ad area)",
-        "necrotic_shockwave": "Onda d'Urto Necrotica (danno ad area pesante)",
+        "grave_inferno": "Inferno Sepolcrale (AoE di fuoco canalizzato, tenetevi distanti)",
         "grave_cleaver": "Tranciatumba (fendente frontale)",
         "shadow_nova": "Nova d'Ombra (esplosione ad area)",
         "profane_mending": "Cura Profana (cura i propri alleati)",
@@ -7280,7 +7280,7 @@ export const it_IT: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma di Bruin",
-        "description": "Mutamenti in orso: armatura +90%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore."
+        "description": "Mutamenti in orso: armatura +130%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore."
       },
       "maul": {
         "name": "Frantumaossa",

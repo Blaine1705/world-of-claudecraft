@@ -2791,7 +2791,7 @@ export const hudChromeStrings = {
       lunar_tide: 'Lunar Tide (pulsing area damage)',
       enrage: 'Enrages at low health',
       shuddering_stomp: 'Shuddering Stomp (area stun)',
-      necrotic_shockwave: 'Necrotic Shockwave (heavy area damage)',
+      grave_inferno: 'Grave Inferno (channeled fire AoE, stay spread)',
       grave_cleaver: 'Grave-Cleaver (frontal cleave)',
       shadow_nova: 'Shadow Nova (area burst)',
       profane_mending: 'Profane Mending (heals its allies)',

@@ -2768,7 +2768,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '대상을 최대 12초 동안 제자리에 묶습니다.',
   'entities.abilities.bear_form.name': '큰곰 변신',
   'entities.abilities.bear_form.description':
-    '곰으로 변신합니다. 방어도 +90%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
+    '곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
   'entities.abilities.maul.name': '뼈 분쇄',
   'entities.abilities.maul.description':
     '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
@@ -7706,7 +7706,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': '달의 파도(주기적 광역 피해)',
   'hudChrome.finder.mech.enrage': '체력이 낮으면 격노',
   'hudChrome.finder.mech.shuddering_stomp': '전율의 발구르기(광역 기절)',
-  'hudChrome.finder.mech.necrotic_shockwave': '괴사의 충격파(높은 광역 피해)',
+  'hudChrome.finder.mech.grave_inferno': '무덤의 지옥불(시전 화염 광역, 분산 유지)',
   'hudChrome.finder.mech.grave_cleaver': '무덤 절단(전방 휩쓸기)',
   'hudChrome.finder.mech.shadow_nova': '어둠의 회오리(광역 폭발)',
   'hudChrome.finder.mech.profane_mending': '모독의 치유(아군 치유)',

@@ -750,7 +750,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Bendicion Marchita (quema el mana)',
   'hudChrome.finder.mech.mist_surge': 'Oleada de Niebla (dano de area pulsante)',
   'hudChrome.finder.mech.mortal_wound': 'Herida Olvidada (reduce la curacion recibida)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Onda de Choque Necrotica (dano de area intenso)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Infierno Sepulcral (AoE de fuego canalizado, manteneos separados)',
   'hudChrome.finder.mech.profane_mending': 'Restauracion Profana (cura a sus aliados)',
   'hudChrome.finder.mech.raise_fallen': 'Despertar a los Caidos (oleadas periodicas de refuerzos)',
   'hudChrome.finder.mech.reaping_arc': 'Arco Segador (tajo frontal)',
@@ -4103,7 +4104,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Enraíza al objetivo en el sitio durante hasta 12 s.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
-    'Cambias a forma de oso: armadura +90%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo.',
+    'Cambias a forma de oso: armadura +130%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo.',
   'entities.abilities.maul.name': 'Rompehuesos',
   'entities.abilities.maul.description':
     'Ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa mucha amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin.',

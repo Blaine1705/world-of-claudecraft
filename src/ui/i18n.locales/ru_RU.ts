@@ -2812,7 +2812,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Оплетает цель корнями на месте на срок до 12 сек.',
   'entities.abilities.bear_form.name': 'Облик бурого',
   'entities.abilities.bear_form.description':
-    'Вы принимаете облик медведя: броня +90%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
+    'Вы принимаете облик медведя: броня +130%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
   'entities.abilities.maul.name': 'Костолом',
   'entities.abilities.maul.description':
     'Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.',
@@ -7855,8 +7855,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': 'Лунный прилив (периодический урон по области)',
   'hudChrome.finder.mech.enrage': 'Приходит в ярость при низком здоровье',
   'hudChrome.finder.mech.shuddering_stomp': 'Сотрясающий топот (оглушение по области)',
-  'hudChrome.finder.mech.necrotic_shockwave':
-    'Некротическая ударная волна (высокий урон по области)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Могильный инферно (канализируемый огненный AoE, держите дистанцию)',
   'hudChrome.finder.mech.grave_cleaver': 'Могильный секач (рассекающий удар спереди)',
   'hudChrome.finder.mech.shadow_nova': 'Кольцо тьмы (взрыв по области)',
   'hudChrome.finder.mech.profane_mending': 'Нечестивое исцеление (лечит союзников)',

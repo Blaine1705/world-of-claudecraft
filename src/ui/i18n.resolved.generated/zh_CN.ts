@@ -2499,7 +2499,7 @@ export const zh_CN: EnTranslations = {
         "lunar_tide": "月潮（周期性范围伤害）",
         "enrage": "低血量时狂怒",
         "shuddering_stomp": "震颤践踏（范围眩晕）",
-        "necrotic_shockwave": "死灵冲击波（高额范围伤害）",
+        "grave_inferno": "墓场炼狱（引导火焰AoE，保持分散）",
         "grave_cleaver": "掘墓劈砍（正面顺劈）",
         "shadow_nova": "暗影新星（范围爆发）",
         "profane_mending": "亵渎治疗（治疗其盟友）",
@@ -7280,7 +7280,7 @@ export const zh_CN: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形态",
-        "description": "变形为熊：护甲 +90%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
+        "description": "变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
       },
       "maul": {
         "name": "碎骨击",

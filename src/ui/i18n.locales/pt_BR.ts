@@ -862,7 +862,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Bênção Murcha (consome mana)',
   'hudChrome.finder.mech.mist_surge': 'Surto de Névoa (dano em área pulsante)',
   'hudChrome.finder.mech.mortal_wound': 'Ferida Esquecida (reduz a cura recebida)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Onda de Choque Necrótica (dano em área intenso)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Inferno Sepulcral (AoE de fogo canalizado, mantenha distancia)',
   'hudChrome.finder.mech.profane_mending': 'Cura Profana (cura os aliados)',
   'hudChrome.finder.mech.raise_fallen': 'Erguer os Caídos (ondas periódicas de reforços)',
   'hudChrome.finder.mech.reaping_arc': 'Arco Ceifante (golpe em cone frontal)',
@@ -4188,7 +4189,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': 'Enraíza o alvo no lugar por até 12 s.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
-    'Assume a forma de urso: armadura +90%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador.',
+    'Assume a forma de urso: armadura +130%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador.',
   'entities.abilities.maul.name': 'Esmaga-Ossos',
   'entities.abilities.maul.description':
     'Ataque brutal que aumenta o dano corpo a corpo em {damage} e causa muita ameaça. Ativa no seu próximo golpe. Apenas Forma de Bruin.',

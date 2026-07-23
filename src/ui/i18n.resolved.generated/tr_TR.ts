@@ -2499,7 +2499,7 @@ export const tr_TR: EnTranslations = {
         "lunar_tide": "Ay Dalgası (darbeli alan hasarı)",
         "enrage": "Düşük canda çılgına döner",
         "shuddering_stomp": "Titreyen Çiğneme (alan sersemletmesi)",
-        "necrotic_shockwave": "Nekrotik Şok Dalgası (ağır alan hasarı)",
+        "grave_inferno": "Mezar Inferno (kanalize ateş AoE, daginik durun)",
         "grave_cleaver": "Mezar Biçici (öne doğru yay saldırısı)",
         "shadow_nova": "Gölge Novası (alan patlaması)",
         "profane_mending": "Murdar Şifa (müttefiklerini iyileştirir)",
@@ -7280,7 +7280,7 @@ export const tr_TR: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Formu",
-        "description": "Bir ayıya dönüş: zırh +%90, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
+        "description": "Bir ayıya dönüş: zırh +%130, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
       },
       "maul": {
         "name": "Kemik Kıran",

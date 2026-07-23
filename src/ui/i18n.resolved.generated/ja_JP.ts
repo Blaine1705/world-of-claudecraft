@@ -2499,7 +2499,7 @@ export const ja_JP: EnTranslations = {
         "lunar_tide": "ルナタイド（周期的な範囲ダメージ）",
         "enrage": "低体力で激怒",
         "shuddering_stomp": "身震いの踏みつけ（範囲スタン）",
-        "necrotic_shockwave": "ネクロティック衝撃波（大範囲ダメージ）",
+        "grave_inferno": "墓場のインフェルノ（詠唱火炎AoE、散開を維持）",
         "grave_cleaver": "グレイブクリーバー（前方クリーブ）",
         "shadow_nova": "シャドウノヴァ（範囲バースト）",
         "profane_mending": "冒涜の治癒（味方を回復）",
@@ -7280,7 +7280,7 @@ export const ja_JP: EnTranslations = {
       },
       "bear_form": {
         "name": "ブルーインフォーム",
-        "description": "熊に変身します。アーマー +90%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。"
+        "description": "熊に変身します。アーマー +130%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。"
       },
       "maul": {
         "name": "骨砕き",

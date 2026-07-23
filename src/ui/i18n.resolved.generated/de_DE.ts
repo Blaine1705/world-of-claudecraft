@@ -2499,7 +2499,7 @@ export const de_DE: EnTranslations = {
         "lunar_tide": "Mondflut (pulsierender Flachenschaden)",
         "enrage": "Rasiert bei geringer Gesundheit",
         "shuddering_stomp": "Erschutternder Stampfer (Flachenbetaubung)",
-        "necrotic_shockwave": "Nekrotische Schockwelle (schwerer Flachenschaden)",
+        "grave_inferno": "Grabesinferno (kanalisiertes Feuer-AoE, Abstand halten)",
         "grave_cleaver": "Grabspalter (frontaler Schwung)",
         "shadow_nova": "Schattennova (Flachenexplosion)",
         "profane_mending": "Entweihte Heilung (heilt Verbundete)",
@@ -7280,7 +7280,7 @@ export const de_DE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Verwandelt euch in einen Bären: Rüstung +90%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren."
+        "description": "Verwandelt euch in einen Bären: Rüstung +130%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren."
       },
       "maul": {
         "name": "Bonecrush",

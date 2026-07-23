@@ -2499,7 +2499,7 @@ export const pt_BR: EnTranslations = {
         "lunar_tide": "Mare Lunar (dano em área pulsante)",
         "enrage": "Entra em frenesi com pouca vida",
         "shuddering_stomp": "Pisão Estremecedor (atordoamento em área)",
-        "necrotic_shockwave": "Onda de Choque Necrótica (dano em área intenso)",
+        "grave_inferno": "Inferno Sepulcral (AoE de fogo canalizado, mantenha distancia)",
         "grave_cleaver": "Ceifador de Tumbas (golpe em cone frontal)",
         "shadow_nova": "Nova das Sombras (explosão em área)",
         "profane_mending": "Cura Profana (cura os aliados)",
@@ -7280,7 +7280,7 @@ export const pt_BR: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Assume a forma de urso: armadura +90%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
+        "description": "Assume a forma de urso: armadura +130%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
       },
       "maul": {
         "name": "Esmaga-Ossos",
