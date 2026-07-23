@@ -939,7 +939,10 @@ export class CharacterVisual {
       const aura = new THREE.Mesh(
         mesh.geometry,
         new THREE.MeshBasicMaterial({
-          color: 0x45ff9a,
+          // Sanguine Aura is BLOOD-imbued (owner: red, not green): the kit's
+          // established bright blood red (battle_shout's rim family), same
+          // brightness class as the old venom green so only the hue moved.
+          color: 0xff4636,
           transparent: true,
           opacity: 0.42,
           depthWrite: false,
