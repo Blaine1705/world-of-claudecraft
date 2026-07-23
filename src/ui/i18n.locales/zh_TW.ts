@@ -166,8 +166,29 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': '心靈尖嘯',
   'entities.abilities.shadowstep.name': '影步',
   'entities.abilities.silence.name': '沉默',
+  'entities.abilities.venomrend.name': '蝕毒撕裂',
+  'entities.abilities.venomrend.description':
+    '吞噬毒祭：造成22點傷害，每個連擊點額外造成26點，引爆你的流血效果的剩餘傷害，並恢復25點能量。（刀工引擎）',
+  'entities.abilities.veilstrike.name': '罩影突襲',
+  'entities.abilities.veilstrike.description':
+    '耗盡幽暝儲備，暗影纏身6秒：你的潛行先制技可在明處使用，且造成的傷害提高25%。（詭詐引擎）',
+  'entities.abilities.body_blow.name': '擊體重拳',
+  'entities.abilities.body_blow.description':
+    '沉重的一擊，造成130%武器傷害外加10點，獲得2個連擊點，並使紅線加深一格。（戰鬥引擎）',
+  'entities.abilities.knockout_blow.name': '擊倒重拳',
+  'entities.abilities.knockout_blow.description':
+    '以擊倒終結紅線：造成45點傷害，每個連擊點額外造成35點，紅線每格加深使傷害提高25%，並恢復25點能量。（戰鬥引擎）',
+  'entities.abilities.venom_dart.name': '毒鏢',
+  'entities.abilities.venom_dart.description':
+    '彈出一枚毒鏢，造成{damage}點自然傷害。獲得1個連擊點。刀工：使你的蝕毒撕裂傷口延長6秒，最多20秒。',
   'entities.abilities.smoke_screen.name': '煙幕',
   'entities.abilities.smoke_screen.description': '遁入煙霧之中，使你的閃躲幾率提高30%，持續8秒。',
+  'entities.abilities.flurry_of_knives.name': '刀刃亂舞',
+  'entities.abilities.flurry_of_knives.description':
+    '擲出飛刀鞭笞6碼內的所有敵人，造成{damage}點物理傷害，並獲得2個連擊點。（潛行者天賦）',
+  'entities.abilities.thieves_chorus.name': '盜賊合唱',
+  'entities.abilities.thieves_chorus.description':
+    '一聲呼哨激勵你的隊伍，使攻擊、施法和引導速度提高10%，持續10秒。近期受過群體加速激勵的盟友過於疲憊，無法受益。（潛行者天賦）',
   'entities.abilities.spellsteal.name': '奪法',
   'entities.abilities.spellsteal.description': '從敵人身上竊取一個有益魔法效果並轉移到自己身上。',
   'entities.abilities.startle_shot.name': '驚擾射擊',
@@ -453,6 +474,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': '懸停沙漏',
   'entities.abilities.temporal_hourglass.description':
     '在選定位置放置一個時間沙漏。置於敵人腳下時，在 PvE 中使其懸停 {hostilePveDuration} 秒，在 PvP 中懸停 {hostilePvpDuration} 秒；受到任何傷害都會解除效果。置於自己或隊伍盟友腳下時，進入 {duration} 秒的停滯，免疫傷害且無法行動，恢復 {healing}% 最大生命值，並使自己的冷卻恢復速度提高 {selfCooldownRecovery}%，盟友提高 {allyCooldownRecovery}%。若位置為空，沙漏會等待 {groundDuration} 秒並影響第一個踩上去的有效單位。增益光環可手動移除。',
+  'hudChrome.auraEffect.venomRitual':
+    '毒祭：第{stacks}/{max}層。連擊點生成技能累積層數，達到{max}層時，入土長眠變為蝕毒撕裂',
+  'hudChrome.auraEffect.gloam': '幽暝：第{stacks}/{max}層。達到{max}層時，暮紗變為罩影突襲',
+  'hudChrome.auraEffect.redline':
+    '紅線：第{stacks}/{max}格。擊體重拳增加格數；擊倒重拳每格傷害提高{pct}%，命中後結束紅線。時限一到則作廢',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    '暗影纏身：你的暮紗先制技可在明處以任意角度使用，造成的傷害提高{pct}%',
+  'hudChrome.auraEffect.veiledEdge': '你的下一次潛伏者一擊造成雙倍傷害',
+  'hudChrome.auraEffect.duskEconomy': '技能的能量消耗降低{pct}%',
   'hudChrome.auraEffect.temporalHourglass':
     '免疫傷害且無法行動；恢復生命並加速冷卻。按右鍵可取消。',
   'hudChrome.auth.appleLoginCta': '透過 Apple 繼續',

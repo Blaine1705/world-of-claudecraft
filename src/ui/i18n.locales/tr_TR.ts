@@ -555,6 +555,27 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Arındırıcı Hüküm',
   'entities.abilities.cleansing_verdict.description':
     'Dost bir hedeften zararlı bir büyü etkisini kaldırır ve onu {damage} Kutsal iyileştirir.',
+  'entities.abilities.flurry_of_knives.name': 'Bıçak Sağanağı',
+  'entities.abilities.flurry_of_knives.description':
+    'Fırlatma bıçaklarıyla 6 m içindeki tüm düşmanları biçer, {damage} fiziksel hasar verir ve 2 kombo puanı kazandırır. (Haydut yeteneği)',
+  'entities.abilities.thieves_chorus.name': 'Hırsızlar Korosu',
+  'entities.abilities.thieves_chorus.description':
+    'Islıkla verilen işaret grubu coşturur: saldırı, büyü ve kanal hızı 10 sn boyunca %10 artar. Yakın zamanda grup hızlandırması alan müttefikler yararlanamayacak kadar bitkindir. (Haydut yeteneği)',
+  'entities.abilities.venomrend.name': 'Zehir Yarığı',
+  'entities.abilities.venomrend.description':
+    'Zehir Ayinini tüketir: 22 artı kombo puanı başına 26 hasar vurur, kanamalarının kalan hasarını patlatır ve 25 enerji yeniler. (Knifework motoru)',
+  'entities.abilities.veilstrike.name': 'Perde Vuruşu',
+  'entities.abilities.veilstrike.description':
+    'Alacakaranlık birikimini tüketerek 6 sn boyunca gölgeye bürünürsün: gizlilik açılışların açıkta çalışır ve %25 daha fazla hasar verirsin. (Skulduggery motoru)',
+  'entities.abilities.body_blow.name': 'Gövde Darbesi',
+  'entities.abilities.body_blow.description':
+    'Silah hasarının %130’u artı 10 vuran, 2 kombo puanı kazandıran ve Redline’ı bir kademe derinleştiren ağır bir darbe. (Thuggery motoru)',
+  'entities.abilities.knockout_blow.name': 'Nakavt Darbesi',
+  'entities.abilities.knockout_blow.description':
+    'Redline’ı nakavtla bitirir: 45 artı kombo puanı başına 35 vurur, her Redline kademesinde %25 daha sert olur ve 25 enerji geri kazandırır. (Thuggery motoru)',
+  'entities.abilities.venom_dart.name': 'Zehirli Dart',
+  'entities.abilities.venom_dart.description':
+    'Zehirli bir dart fırlatarak {damage} doğa hasarı verir. 1 kombo puanı kazandırır. Knifework: Zehir Yarığı yaranızı 6 sn uzatır, en fazla 20 sn.',
   'entities.abilities.smoke_screen.name': 'Duman Perdesi',
   'entities.abilities.smoke_screen.description':
     'Bir duman bulutunda kaybolur ve 8 sn. boyunca kaçınma şansını %30 artırırsın.',

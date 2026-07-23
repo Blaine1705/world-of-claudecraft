@@ -562,6 +562,27 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Oczyszczający Wyrok',
   'entities.abilities.cleansing_verdict.description':
     'Usuwa szkodliwy efekt magiczny z przyjaznego celu i leczy go świętą magią za {damage}.',
+  'entities.abilities.flurry_of_knives.name': 'Grad noży',
+  'entities.abilities.flurry_of_knives.description':
+    'Chłoszcze wszystkich wrogów w promieniu 6 m rzucanymi nożami, zadając {damage} obrażeń fizycznych i przyznając 2 punkty combo. (talent Łotrzyka)',
+  'entities.abilities.thieves_chorus.name': 'Chór złodziei',
+  'entities.abilities.thieves_chorus.description':
+    'Gwizdnięty sygnał zagrzewa twoją grupę: szybkość ataku, rzucania zaklęć i kanałowania zwiększona o 10% na 10 sek. Sojusznicy niedawno objęci grupowym przyspieszeniem są zbyt wyczerpani, by skorzystać. (talent Łotrzyka)',
+  'entities.abilities.venomrend.name': 'Jadowite rozdarcie',
+  'entities.abilities.venomrend.description':
+    'Pochłania Rytuał Jadu: uderza za 22 plus 26 za punkt combo, detonuje pozostałe obrażenia twoich krwawień i przywraca 25 energii. (silnik Knifework)',
+  'entities.abilities.veilstrike.name': 'Cios zasłony',
+  'entities.abilities.veilstrike.description':
+    'Pochłania zapas Pomroki, spowijając cię cieniem na 6 sek.: twoje otwarcia z ukrycia działają w odkrytym terenie, a ty zadajesz 25% więcej obrażeń. (silnik Skulduggery)',
+  'entities.abilities.body_blow.name': 'Cios w korpus',
+  'entities.abilities.body_blow.description':
+    'Potężny cios za 130% obrażeń broni plus 10, który przyznaje 2 punkty combo i pogłębia Redline o jedną kreskę. (silnik Thuggery)',
+  'entities.abilities.knockout_blow.name': 'Cios nokautujący',
+  'entities.abilities.knockout_blow.description':
+    'Zakończ Redline nokautem: uderza za 45 plus 35 za każdy punkt combo, o 25% mocniej za każdą kreskę Redline, i przywraca 25 energii. (silnik Thuggery)',
+  'entities.abilities.venom_dart.name': 'Jadowita strzałka',
+  'entities.abilities.venom_dart.description':
+    'Ciska zatrutą strzałką, zadając {damage} obrażeń natury. Przyznaje 1 punkt combo. Knifework: przedłuża ranę od Jadowitego rozdarcia o 6 sek., maksymalnie do 20 sek.',
   'entities.abilities.smoke_screen.name': 'Zasłona Dymna',
   'entities.abilities.smoke_screen.description':
     'Znikasz w chmurze dymu, zwiększając szansę na unik o 30% na 8 sek.',

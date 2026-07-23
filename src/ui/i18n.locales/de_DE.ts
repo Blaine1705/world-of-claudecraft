@@ -574,6 +574,27 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Läuterndes Urteil',
   'entities.abilities.cleansing_verdict.description':
     'Entfernt einen schädlichen magischen Effekt von einem verbündeten Ziel und heilt es mit heiliger Magie um {damage}.',
+  'entities.abilities.flurry_of_knives.name': 'Messerhagel',
+  'entities.abilities.flurry_of_knives.description':
+    'Peitscht alle Gegner im Umkreis von 6 m mit Wurfmessern, verursacht {damage} körperlichen Schaden und gewährt 2 Combopunkte. (Schurkentalent)',
+  'entities.abilities.thieves_chorus.name': 'Chor der Diebe',
+  'entities.abilities.thieves_chorus.description':
+    'Ein gepfiffenes Signal spornt eure Gruppe an: Angriffs-, Zauber- und Kanalisierungstempo für 10 Sek. um 10% erhöht. Verbündete, die kürzlich einen Gruppentempo-Schub erhielten, sind zu erschöpft, um zu profitieren. (Schurkentalent)',
+  'entities.abilities.venomrend.name': 'Giftriss',
+  'entities.abilities.venomrend.description':
+    'Verzehrt das Giftritual: trifft für 22 plus 26 pro Combopunkt, bringt den Restschaden eurer Blutungen zur Detonation und stellt 25 Energie wieder her. (Knifework-Engine)',
+  'entities.abilities.veilstrike.name': 'Schleierstoß',
+  'entities.abilities.veilstrike.description':
+    'Verzehrt den Düstervorrat und hüllt euch 6 Sek. lang in Schatten: eure Schleichangriffe funktionieren im Offenen und ihr verursacht 25% mehr Schaden. (Skulduggery-Engine)',
+  'entities.abilities.body_blow.name': 'Körpertreffer',
+  'entities.abilities.body_blow.description':
+    'Ein wuchtiger Treffer für 130% Waffenschaden plus 10, der 2 Combopunkte gewährt und die Redline um eine Stufe vertieft. (Thuggery-Engine)',
+  'entities.abilities.knockout_blow.name': 'K.o.-Schlag',
+  'entities.abilities.knockout_blow.description':
+    'Beendet die Redline mit einem K.o.: trifft für 45 plus 35 pro Combopunkt, pro Redline-Stufe 25% härter, und stellt 25 Energie wieder her. (Thuggery-Engine)',
+  'entities.abilities.venom_dart.name': 'Giftpfeil',
+  'entities.abilities.venom_dart.description':
+    'Schnippt einen vergifteten Pfeil für {damage} Naturschaden. Gewährt 1 Combopunkt. Knifework: verlängert eure Giftriss-Wunde um 6 Sek., bis zu 20 Sek.',
   'entities.abilities.smoke_screen.name': 'Rauchvorhang',
   'entities.abilities.smoke_screen.description':
     'Ihr verschwindet in einer Rauchwolke, wodurch sich Eure Ausweichchance 8 Sek. lang um 30 % erhöht.',

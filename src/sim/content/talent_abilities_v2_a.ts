@@ -227,6 +227,146 @@ export const TALENT_ABILITIES_V2_A = {
     effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.3, duration: 8 }],
     description: 'Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec.',
   },
+  flurry_of_knives: {
+    id: 'flurry_of_knives',
+    name: 'Flurry of Knives',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 45,
+    range: 0,
+    requiresTarget: false,
+    school: 'physical',
+    awardsCombo: 2,
+    // Classic never-crits AoE path (no canCrit): zero extra rng per cast.
+    effects: [{ type: 'aoeDamage', min: 48, max: 62, radius: 6 }],
+    description:
+      'Lash every enemy within 6 yd with thrown knives for $d Physical damage and gain 2 combo points. (Rogue talent)',
+  },
+  thieves_chorus: {
+    id: 'thieves_chorus',
+    name: "Thieves' Chorus",
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 25,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    requiresTarget: false,
+    school: 'physical',
+    // Shares the group haste-burst exhaustion (combat/haste_burst.ts) so it can
+    // never be chained with Storm Chorus or Temporal Acceleration.
+    effects: [
+      {
+        type: 'aoeAllyHaste',
+        mult: 1.1,
+        duration: 10,
+        radius: 30,
+        spell: true,
+        exhaust: true,
+        groupOnly: true,
+      },
+    ],
+    description:
+      'A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec. Allies recently affected by a group haste burst are too exhausted to benefit. (Rogue talent)',
+  },
+  venomrend: {
+    id: 'venomrend',
+    name: 'Venomrend',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 30,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    spendsCombo: true,
+    // The armed Venom Ritual: Dirt Nap transforms into this at 6 stages
+    // (actionReplacement on eviscerate); casting consumes the whole ritual.
+    // Six stages against a five-thrust combo cycle means the finisher
+    // alternates Dirt Nap, then Venomrend: the two-beat rhythm.
+    requiresAuraKind: 'venom_ritual',
+    requiresAuraStacks: 6,
+    // Owner playtest pass: the detonation is self-sustaining. It consumes
+    // every bleed (including the wound it opened last time), then reopens the
+    // wound itself, so the player never juggles Bleed Out upkeep against the
+    // ritual cadence. Consumes fire before the fresh dot applies. Sized for
+    // landing every OTHER full finisher (Dirt Nap covers the off-beat).
+    effects: [
+      { type: 'finisherDamage', base: 100, perCombo: 55, variance: 12 },
+      { type: 'consumeDot', dot: 'rupture' },
+      { type: 'consumeDot', dot: 'garrote' },
+      { type: 'consumeDot', dot: 'venomrend' },
+      { type: 'dot', total: 120, duration: 20, interval: 2 },
+      { type: 'gainResource', amount: 20 },
+    ],
+    description:
+      'Consume the Venom Ritual: strike for 100 plus 55 per combo point, reopen your venom wound (120 damage over 20 sec), and detonate the previous wound plus any other bleeds for their remaining damage. Restores 20 energy. (Knifework engine)',
+  },
+  body_blow: {
+    id: 'body_blow',
+    name: 'Body Blow',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    awardsCombo: 2,
+    // The Redline builder: Wicked Slash transforms into this while the window
+    // runs (actionReplacement on sinister_strike). Each landing deepens the
+    // run by one pip (rogueEngineOnCast), feeding the Knockout cash-out.
+    effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 1.3 }],
+    description:
+      'A heavy blow for 130% weapon damage plus 10 that awards 2 combo points and deepens the Redline by one pip. (Thuggery engine)',
+  },
+  knockout_blow: {
+    id: 'knockout_blow',
+    name: 'Knockout Blow',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 30,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    spendsCombo: true,
+    // The Redline cash-out: Dirt Nap transforms into this while the window
+    // runs. The pip multiplier and the run-ending consumption live in the
+    // engine module (knockoutRedlineMult at the finisherDamage case), so a
+    // window that expires first forfeits the Knockout entirely.
+    effects: [
+      { type: 'finisherDamage', base: 45, perCombo: 35, variance: 12 },
+      { type: 'gainResource', amount: 25 },
+    ],
+    description:
+      'End the Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder per Redline pip, and recover 25 energy. (Thuggery engine)',
+  },
+  veilstrike: {
+    id: 'veilstrike',
+    name: 'Shadow Veil',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    // Never learned or castable: this def is the display card (icon, name,
+    // tooltip) for the veil aura the engine raises when a Duskveil opener
+    // detonates a full Gloam bank (rogueGloamDetonation). The owner cut the
+    // transformed stealth button: the openers themselves are the trigger,
+    // and the Veiled Edge is applied by the same engine hook.
+    effects: [{ type: 'selfBuff', kind: 'buff_dmg_done', value: 0.1, duration: 6 }],
+    description:
+      "The detonated Gloam bank: for 6 sec your Duskveil openers work in the open from any angle, you deal 10% more damage, and the first Lurker's Strike of the veil strikes for double. (Skulduggery engine)",
+  },
   preparation: {
     id: 'preparation',
     name: 'Contingency',

@@ -118,6 +118,12 @@ import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
+import {
+  consumeVeiledEdge,
+  knockoutRedlineMult,
+  rogueEngineOnFinisher,
+  rogueGloamDetonation,
+} from './rogue_engines';
 import { consumeMendingCurrent, depositMendingCurrent } from './shaman_spiritmend';
 import {
   applyPrimalExaltation,
@@ -139,7 +145,7 @@ import {
   applyWarspiritPosture,
   stoneboundThreatMultiplier,
 } from './shaman_warspirit';
-import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 
@@ -260,6 +266,11 @@ export function runEffects(
   // stack / Winter's Chill charge. Inert (and free) for everyone who is not a
   // committed-frost mage. Deterministic, no rng.
   const frozen = resolveFrozenCast(ctx, p, meta, ability, target);
+  // Skulduggery detonation (combat/rogue_engines.ts): a Duskveil opener thrown
+  // in the open with a full Gloam bank raises the shadow veil BEFORE this
+  // cast's effects resolve, so the detonating Lurker's Strike is the doubled
+  // one. Checked before breakStealth: a true-stealth opener banks instead.
+  rogueGloamDetonation(ctx, p, ability.id);
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
@@ -362,6 +373,9 @@ export function runEffects(
           meta.cls === 'hunter' &&
           (ability.id === 'raptor_strike' || ability.id === 'mongoose_bite');
         let landedDamage = 0;
+        // Veiled Edge (rogue sub engine): the first Lurker's Strike from
+        // inside the veil consumes the edge and strikes for double.
+        weaponMult *= consumeVeiledEdge(ctx, p, ability.id);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
           cannotBeDodged: eff.cannotBeDodged,
           weaponMult,
@@ -564,6 +578,9 @@ export function runEffects(
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
+        // Knockout Blow (rogue combat engine): cash out the Redline window,
+        // hitting harder per pip; consuming the window here ENDS the run.
+        dmg *= knockoutRedlineMult(ctx, p, ability.id);
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) ||
           sureCrit ||
@@ -586,6 +603,38 @@ export function runEffects(
           false,
           ability.id,
         );
+        // Second Shadow (rogue capstone, docs/design/rogue-v029-class-design.md):
+        // a full 5-combo finisher strikes again as a shadow echo at a fraction of
+        // the resolved damage. No extra rng (never crits); the amount is already
+        // fully source-modified, so source-output mods are skipped on the echo.
+        if (spentCombo >= 5 && target && !target.dead) {
+          const echoMeta = ctx.players.get(p.id);
+          const echoPct = echoMeta ? ctx.playerMods(echoMeta).global.secondShadowPct : 0;
+          if (echoPct > 0) {
+            ctx.dealDamage(
+              p,
+              target,
+              Math.round(dmg * echoPct),
+              false,
+              'shadow',
+              'Second Shadow',
+              'hit',
+              true,
+              threatOpts,
+              false,
+              false,
+              true,
+              ability.id,
+            );
+            ctx.emit({
+              type: 'spellfx',
+              sourceId: p.id,
+              targetId: target.id,
+              school: 'shadow',
+              fx: 'procSurge',
+            });
+          }
+        }
         break;
       }
       case 'enrageChance': {
@@ -1517,6 +1566,13 @@ export function runEffects(
         // enemies it caught. A whiff feeds nothing (no draw happened either).
         if ((eff.canCrit ?? false) && aoeTargets.length > 0 && isSpell)
           noteSpellHit(ctx, p, aoeCrit, ability.id);
+        // An AoE builder (Flurry of Knives) awards its combo ONCE per cast when
+        // at least one enemy was struck, mirroring the single-target strike
+        // cases above. A whiff builds nothing.
+        if (ability.awardsCombo && !comboAwarded && aoeTargets.length > 0) {
+          ctx.awardCombo(p, aoeTargets[0], ability.awardsCombo);
+          comboAwarded = true;
+        }
         break;
       }
       case 'chainDamage': {
@@ -2788,6 +2844,13 @@ export function runEffects(
   doctrineAfterAbility(ctx, p, meta, target, ability.id);
   vespersAfterAbility(ctx, p, meta, target, ability.id, vespersGloomtitheStacks);
   priestAfterAbility(ctx, p, ability.id, target);
+
+  // Rogue spec engines (combat/rogue_engines.ts): a full five-point finisher
+  // advances the owning spec's engine (Venom Ritual stage or Redline window),
+  // read here before the combo points reset. Inert for everyone else.
+  if (ability.spendsCombo && spentCombo > 0) {
+    rogueEngineOnFinisher(ctx, p, ability.id, spentCombo);
+  }
 
   if (ability.spendsCombo && spentCombo > 0) {
     p.comboPoints = 0;

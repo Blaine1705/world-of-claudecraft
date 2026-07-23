@@ -248,6 +248,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'blind',
       'stealth',
       'kick',
+      'venom_dart',
     ],
     color: 0xfff569,
   },
@@ -2529,6 +2530,25 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
 
   // ====================== ROGUE ======================
+  venom_dart: {
+    id: 'venom_dart',
+    name: 'Venom Dart',
+    class: 'rogue',
+    learnLevel: 14,
+    cost: 25,
+    castTime: 0,
+    cooldown: 8,
+    range: 20,
+    school: 'nature',
+    requiresTarget: true,
+    awardsCombo: 1,
+    // The Knifework wound-tending accent (owner playtest: the loop wanted a
+    // fourth rotational button, and the Venomrend wound kept expiring before
+    // the next rend). The extension itself lives in rogueEngineOnCast.
+    effects: [{ type: 'directDamage', min: 30, max: 40 }],
+    description:
+      'Flick a poisoned dart for $d Nature damage. Awards 1 combo point. Knifework: extends your Venomrend wound by 6 sec, up to 20 sec.',
+  },
   sinister_strike: {
     id: 'sinister_strike',
     name: 'Wicked Slash',
@@ -2541,13 +2561,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     awardsCombo: 1,
+    // Thuggery engine (combat/rogue_engines.ts): while the Redline window
+    // runs, the builder button is Body Blow, the pip-deepening heavy hit.
+    actionReplacement: { abilityId: 'body_blow', auraKind: 'redline', minStacks: 1 },
     effects: [{ type: 'weaponStrike', bonus: 3 }],
     ranks: [
       { rank: 2, level: 8, cost: 45, effects: [{ type: 'weaponStrike', bonus: 6 }] },
       { rank: 3, level: 14, cost: 45, effects: [{ type: 'weaponStrike', bonus: 12 }] },
       { rank: 4, level: 20, cost: 45, effects: [{ type: 'weaponStrike', bonus: 18 }] },
     ],
-    description: 'An instant strike for weapon damage plus $d. Awards 1 combo point.',
+    description:
+      'An instant strike for weapon damage plus $d. Awards 1 combo point. Knifework: builds the Venom Ritual like Craven Thrust. Thuggery: becomes Body Blow while the Redline window runs.',
   },
   eviscerate: {
     id: 'eviscerate',
@@ -2561,6 +2585,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     spendsCombo: true,
+    // Knifework engine (combat/rogue_engines.ts): at 6 Venom Ritual stages
+    // the button transforms into Venomrend, the detonation finisher (six
+    // against a five-thrust cycle alternates Dirt Nap and Venomrend).
+    // Thuggery engine: while the Redline window runs the same button is
+    // Knockout Blow, the cash-out that ends the run. The aura kinds are
+    // spec-gated, so at most one rule can match.
+    actionReplacement: [
+      { abilityId: 'venomrend', auraKind: 'venom_ritual', minStacks: 6 },
+      { abilityId: 'knockout_blow', auraKind: 'redline', minStacks: 1 },
+    ],
     effects: [{ type: 'finisherDamage', base: 4, perCombo: 7, variance: 4 }],
     ranks: [
       {
@@ -2576,7 +2610,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'finisherDamage', base: 14, perCombo: 18, variance: 9 }],
       },
     ],
-    description: 'Finishing move that causes $d.',
+    description:
+      'Finishing move that causes $d. Knifework: becomes Venomrend at 6 Venom Ritual stages. Thuggery: landing this with 4 or more combo points opens the 8 sec Redline window, transforming your buttons.',
   },
   backstab: {
     id: 'backstab',
@@ -2606,7 +2641,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Drive your dagger into the target's back for 150% weapon damage plus $d. Must be behind the target. Requires a dagger. Awards 1 combo point.",
+      "Drive your dagger into the target's back for 150% weapon damage plus $d. Must be behind the target. Requires a dagger. Awards 1 combo point. Knifework: each strike adds a Venom Ritual stage and refunds 15 energy; at 6 stages Dirt Nap becomes Venomrend.",
   },
   gouge: {
     id: 'gouge',
@@ -2665,7 +2700,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     spendsCombo: true,
-    effects: [{ type: 'finisherHaste', mult: 1.3, basedur: 9, perCombo: 3 }],
+    // Engines feel pass (owner playtest): at real energy cadence a 24 sec max
+    // uptime meant the buff was down every build cycle; 12 + 4 per combo
+    // (32 sec at 5) keeps upkeep to roughly one refresh per engine payoff.
+    effects: [{ type: 'finisherHaste', mult: 1.3, basedur: 12, perCombo: 4 }],
     description:
       'Finishing move that increases melee attack speed by 30%. Lasts longer per combo point.',
   },
@@ -2714,7 +2752,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresStealth: true,
     effects: [{ type: 'weaponStrike', bonus: 28, requiresBehind: true, weaponMult: 2.5 }],
     description:
-      'Strike from the shadows for 250% weapon damage plus $d. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
+      'Strike from the shadows for 250% weapon damage plus $d. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open from any angle FOR FREE, detonating the bank into a 6 sec shadow veil, and the first one of the veil strikes for double.',
   },
   stealth: {
     id: 'stealth',
@@ -2731,7 +2769,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresOutOfCombat: true,
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 3600 }],
     description:
-      'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.',
+      'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out. Skulduggery: openers cast from Duskveil bank Gloam stages.',
   },
   adrenaline_rush: {
     id: 'adrenaline_rush',
@@ -2777,7 +2815,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Loop a wire around the enemy's throat, causing $d damage now and bleeding it for $o over 18 sec. Must be stealthed. Awards 1 combo point.",
+      "Loop a wire around the enemy's throat, causing $d damage now and bleeding it for $o over 18 sec. Must be stealthed. Awards 1 combo point. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open FOR FREE, detonating the bank into a 6 sec shadow veil.",
   },
   cheap_shot: {
     id: 'cheap_shot',
@@ -2797,7 +2835,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'stun', duration: 4 },
     ],
     description:
-      'Strike the target for $d damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.',
+      'Strike the target for $d damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open FOR FREE, detonating the bank into a 6 sec shadow veil.',
   },
   sap: {
     id: 'sap',
@@ -5919,7 +5957,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'applyDebuff', kind: 'bleed_vuln', value: 0.4, duration: 12 },
     ],
     description:
-      'Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
+      'Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Skulduggery: every 2nd cast banks a Gloam stage. (Subtlety signature)',
   },
   power_infusion: {
     id: 'power_infusion',
@@ -6592,6 +6630,7 @@ export interface KnownAbility {
   threatMult: number;
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
   damagePushbackImmune?: boolean;
+  ignoreStealthRequirement?: boolean; // Cheap Trick: the resolved ability drops requiresStealth
   charges?: number; // resolved total uses; undefined means one use
   bonusCharges?: number; // +N stored uses resolved from def/talents; drives the abilityCharges recharge model
 }
@@ -6796,6 +6835,7 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.cooldownFlat) entry.cooldown = Math.max(0, entry.cooldown + am.cooldownFlat);
     if (am.castWhileMoving) entry.castWhileMoving = true;
     if (am.damagePushbackImmune) entry.damagePushbackImmune = true;
+    if (am.ignoreStealthRequirement) entry.ignoreStealthRequirement = true;
     // Stored uses (Double Charge): base 1 unless the def itself is
     // charge-limited (maxCharges, already resolved onto entry.charges); the
     // combat gate + recharge live in casting_lifecycle / updateTimers, keyed

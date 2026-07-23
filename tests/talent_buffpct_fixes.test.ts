@@ -42,8 +42,8 @@ describe('talent buffPct resolver fixes', () => {
     );
 
     expect(effect.mult).toBeCloseTo(1.375, 6);
-    expect(effect.basedur).toBe(9);
-    expect(effect.perCombo).toBe(3);
+    expect(effect.basedur).toBe(12);
+    expect(effect.perCombo).toBe(4);
   });
 
   it('buffPct and cooldownPct compose on the same defensive ability', () => {

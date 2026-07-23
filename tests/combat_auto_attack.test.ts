@@ -260,7 +260,7 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
     const run = (active: boolean) => {
       const { sim, p } = makeSim('rogue', 20, 26014);
       if (active) {
-        expect(sim.applyTalents({ spec: null, rows: { 14: 'rog_r14_deadly_brew' } })).toBe(true);
+        expect(sim.applyTalents({ spec: null, rows: { 14: 'rog_r14_venom_dividend' } })).toBe(true);
       }
       const mob = spawnDummy(sim, p, 1);
       addImbue(p);

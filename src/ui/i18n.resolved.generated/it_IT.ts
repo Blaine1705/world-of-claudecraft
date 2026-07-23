@@ -1598,6 +1598,12 @@ export const it_IT: EnTranslations = {
       "freeCast": "Il prossimo lancio non costa nulla",
       "instantCast": "Il prossimo incantesimo con un tempo di lancio è istantaneo",
       "cheapCast": "Il prossimo incantesimo costa il {pct}% in meno",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Aumenta la potenza di attacco di {value}",
         "sp": "Aumenta il potere degli incantesimi di {value}",
@@ -7517,6 +7523,10 @@ export const it_IT: EnTranslations = {
         "name": "Pozzo d’Etere",
         "description": "Restaura mana rápidamente. (talento da mago)"
       },
+      "flurry_of_knives": {
+        "name": "Raffica di coltelli",
+        "description": "Sferza tutti i nemici entro 6 m con coltelli da lancio, infliggendo {damage} danni fisici e conferendo 2 punti combo. (talento del Ladro)"
+      },
       "frenzied_regeneration": {
         "name": "Rammendo Selvaggio",
         "description": "Ripristina 180 salute in 10 sec. Utilizzabile solo in Forma d’Orso. (talento del Druido)"
@@ -7681,9 +7691,33 @@ export const it_IT: EnTranslations = {
         "name": "Ordine del Silenzio",
         "description": "Silenzia il bersaglio durante il lancio e impedisce di lanciare incantesimi di quella scuola per 5 s."
       },
+      "thieves_chorus": {
+        "name": "Coro dei ladri",
+        "description": "Un fischio d’intesa sprona il tuo gruppo: velocità di attacco, lancio e canalizzazione aumentata del 10% per 10 s. Gli alleati colpiti di recente da uno slancio di celerità di gruppo sono troppo esausti per beneficiarne. (talento del Ladro)"
+      },
       "tranquility": {
         "name": "Canto della Radura",
         "description": "Incanala energia rigenerante per 4 sec., curando ogni secondo gli alleati entro 30 m di 42-52. (talento del Druido)"
+      },
+      "venom_dart": {
+        "name": "Dardo velenoso",
+        "description": "Scaglia un dardo avvelenato che infligge {damage} danni da Natura. Conferisce 1 punto combo. Knifework: prolunga la tua ferita di Squarcio velenoso di 6 sec, fino a 20 sec."
+      },
+      "body_blow": {
+        "name": "Colpo al corpo",
+        "description": "Un colpo pesante per il 130% del danno dell’arma più 10 che conferisce 2 punti combo e approfondisce la Redline di una tacca. (motore Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Colpo da knockout",
+        "description": "Concludi la Redline con un knockout: colpisce per 45 più 35 per punto combo, il 25% più forte per ogni tacca della Redline, e recupera 25 energia. (motore Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Colpo del velo",
+        "description": "Consuma la riserva di Brumora per avvolgerti nell’ombra per 6 s: le tue aperture furtive funzionano allo scoperto e infliggi il 25% di danni in più. (motore Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Squarcio velenoso",
+        "description": "Consuma il Rituale del veleno: colpisce per 22 più 26 per punto combo, fa detonare i danni residui dei tuoi sanguinamenti e ripristina 25 energia. (motore Knifework)"
       },
       "typhoon": {
         "name": "Tifone",

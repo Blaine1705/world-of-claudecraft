@@ -582,6 +582,27 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Verdetto Purificante',
   'entities.abilities.cleansing_verdict.description':
     'Dissipa un effetto magico dannoso da un bersaglio alleato e lo cura di {damage} con magia Sacra.',
+  'entities.abilities.flurry_of_knives.name': 'Raffica di coltelli',
+  'entities.abilities.flurry_of_knives.description':
+    'Sferza tutti i nemici entro 6 m con coltelli da lancio, infliggendo {damage} danni fisici e conferendo 2 punti combo. (talento del Ladro)',
+  'entities.abilities.thieves_chorus.name': 'Coro dei ladri',
+  'entities.abilities.thieves_chorus.description':
+    'Un fischio d’intesa sprona il tuo gruppo: velocità di attacco, lancio e canalizzazione aumentata del 10% per 10 s. Gli alleati colpiti di recente da uno slancio di celerità di gruppo sono troppo esausti per beneficiarne. (talento del Ladro)',
+  'entities.abilities.venomrend.name': 'Squarcio velenoso',
+  'entities.abilities.venomrend.description':
+    'Consuma il Rituale del veleno: colpisce per 22 più 26 per punto combo, fa detonare i danni residui dei tuoi sanguinamenti e ripristina 25 energia. (motore Knifework)',
+  'entities.abilities.veilstrike.name': 'Colpo del velo',
+  'entities.abilities.veilstrike.description':
+    'Consuma la riserva di Brumora per avvolgerti nell’ombra per 6 s: le tue aperture furtive funzionano allo scoperto e infliggi il 25% di danni in più. (motore Skulduggery)',
+  'entities.abilities.body_blow.name': 'Colpo al corpo',
+  'entities.abilities.body_blow.description':
+    'Un colpo pesante per il 130% del danno dell’arma più 10 che conferisce 2 punti combo e approfondisce la Redline di una tacca. (motore Thuggery)',
+  'entities.abilities.knockout_blow.name': 'Colpo da knockout',
+  'entities.abilities.knockout_blow.description':
+    'Concludi la Redline con un knockout: colpisce per 45 più 35 per punto combo, il 25% più forte per ogni tacca della Redline, e recupera 25 energia. (motore Thuggery)',
+  'entities.abilities.venom_dart.name': 'Dardo velenoso',
+  'entities.abilities.venom_dart.description':
+    'Scaglia un dardo avvelenato che infligge {damage} danni da Natura. Conferisce 1 punto combo. Knifework: prolunga la tua ferita di Squarcio velenoso di 6 sec, fino a 20 sec.',
   'entities.abilities.smoke_screen.name': 'Cortina Fumogena',
   'entities.abilities.smoke_screen.description':
     'Scompari in una nube di fumo, aumentando del 30% la probabilità di schivare per 8 s.',

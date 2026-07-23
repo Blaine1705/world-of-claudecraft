@@ -165,8 +165,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': '精神の絶叫',
   'entities.abilities.shadowstep.name': '影すべり',
   'entities.abilities.silence.name': '沈黙',
+  'entities.abilities.venomrend.name': '毒裂き',
+  'entities.abilities.venomrend.description':
+    '毒の儀式を喰らい尽くす：22+コンボポイントごとに26のダメージを与え、自らの出血効果の残りダメージを起爆し、エナジーを25回復する。（ナイフワーク・エンジン）',
+  'entities.abilities.veilstrike.name': 'ヴェールストライク',
+  'entities.abilities.veilstrike.description':
+    '宵闇の蓄えを喰らい尽くし、6秒間影を纏う：隠密の先制技が白昼でも使用でき、与ダメージが25%上昇する。（スカルダガリー・エンジン）',
+  'entities.abilities.body_blow.name': 'ボディブロー',
+  'entities.abilities.body_blow.description':
+    '武器ダメージの130%に10を加えた重い一撃。コンボポイントを2獲得し、レッドラインを1段階深める。（コンバット・エンジン）',
+  'entities.abilities.knockout_blow.name': 'ノックアウトブロー',
+  'entities.abilities.knockout_blow.description':
+    'ノックアウトでレッドラインを締めくくる：45にコンボポイントごとに35を加えたダメージを与え、レッドラインの段階ごとに25%強化され、エナジーを25回復する。（コンバット・エンジン）',
+  'entities.abilities.venom_dart.name': '毒針',
+  'entities.abilities.venom_dart.description':
+    '毒針を弾き飛ばし、{damage}の自然ダメージを与える。コンボポイントを1獲得する。ナイフワーク:毒裂きの傷を6秒延長する(最大20秒)。',
   'entities.abilities.smoke_screen.name': 'スモークスクリーン',
   'entities.abilities.smoke_screen.description': '煙幕に紛れ、8秒間、回避率を30%上昇させる。',
+  'entities.abilities.flurry_of_knives.name': '短剣乱舞',
+  'entities.abilities.flurry_of_knives.description':
+    '投げナイフで6ヤード以内のすべての敵を切り裂き、{damage}の物理ダメージを与え、コンボポイントを2獲得する。（ローグのタレント）',
+  'entities.abilities.thieves_chorus.name': '盗賊の合唱',
+  'entities.abilities.thieves_chorus.description':
+    '口笛の合図でグループを鼓舞し、10秒間、攻撃・詠唱・チャネリング速度を10%上昇させる。最近グループ速度上昇を受けた味方は疲労しており、効果を受けられない。（ローグのタレント）',
   'entities.abilities.spellsteal.name': '魔法奪取',
   'entities.abilities.spellsteal.description': '敵の有益な魔法効果を1つ奪い、自分へ移す。',
   'entities.abilities.startle_shot.name': '驚愕射撃',
@@ -457,6 +478,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': '停止の砂時計',
   'entities.abilities.temporal_hourglass.description':
     '選択地点に時の砂時計を置きます。敵の足元では PvE で {hostilePveDuration} 秒、PvP で {hostilePvpDuration} 秒間停止させ、ダメージを受けると解除されます。自分またはパーティの味方の足元では {duration} 秒間の停滞となり、ダメージを受けず行動不能になり、最大体力の {healing}% を回復します。自分のクールダウンは {selfCooldownRecovery}%、味方は {allyCooldownRecovery}% 速く回復します。空の地面に置くと {groundDuration} 秒間待機し、最初に踏んだ有効な対象へ効果を与えます。強化効果は手動で解除できます。',
+  'hudChrome.auraEffect.venomRitual':
+    '毒の儀式:{stacks}/{max}段階。ビルダー攻撃で段階が進み、{max}段階で「永の眠り」が「毒裂き」に変化する',
+  'hudChrome.auraEffect.gloam':
+    '薄闇の蓄え:{stacks}/{max}段階。{max}段階で「ダスクヴェール」が「ヴェールストライク」に変化する',
+  'hudChrome.auraEffect.redline':
+    'レッドライン:{stacks}/{max}ピップ。「ボディブロー」でピップが増え、「ノックアウトブロー」はピップごとに{pct}%強化され、命中でウィンドウが終了する。時間切れで失われる',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    '影に包まれている:ダスクヴェール専用の先制技をどの角度からでも使用でき、与ダメージが{pct}%増加する',
+  'hudChrome.auraEffect.veiledEdge': '次に放つ「潜伏者の一撃」は2倍のダメージを与える',
+  'hudChrome.auraEffect.duskEconomy': 'アビリティの消費エナジーが{pct}%減少する',
   'hudChrome.auraEffect.temporalHourglass':
     'ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。',
   'hudChrome.auth.appleLoginCta': 'Appleで続ける',

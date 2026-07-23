@@ -1598,6 +1598,12 @@ export const zh_TW: EnTranslations = {
       "freeCast": "下一次施法不消耗任何資源",
       "instantCast": "下一個有施法時間的法術變為瞬發",
       "cheapCast": "下一個法術消耗降低{pct}%",
+      "venomRitual": "毒祭：第{stacks}/{max}層。連擊點生成技能累積層數，達到{max}層時，入土長眠變為蝕毒撕裂",
+      "gloam": "幽暝：第{stacks}/{max}層。達到{max}層時，暮紗變為罩影突襲",
+      "redline": "紅線：第{stacks}/{max}格。擊體重拳增加格數；擊倒重拳每格傷害提高{pct}%，命中後結束紅線。時限一到則作廢",
+      "veilstrikeWindow": "暗影纏身：你的暮紗先制技可在明處以任意角度使用，造成的傷害提高{pct}%",
+      "veiledEdge": "你的下一次潛伏者一擊造成雙倍傷害",
+      "duskEconomy": "技能的能量消耗降低{pct}%",
       "increase": {
         "ap": "攻擊強度提高 {value}",
         "sp": "法術強度提高 {value}",
@@ -7517,6 +7523,10 @@ export const zh_TW: EnTranslations = {
         "name": "乙太之井",
         "description": "快速恢復法力。（法師天賦）"
       },
+      "flurry_of_knives": {
+        "name": "刀刃亂舞",
+        "description": "擲出飛刀鞭笞6碼內的所有敵人，造成{damage}點物理傷害，並獲得2個連擊點。（潛行者天賦）"
+      },
       "frenzied_regeneration": {
         "name": "野性癒合",
         "description": "在10秒內恢復180點生命值。只能在熊形態下使用。（德魯伊天賦）"
@@ -7681,9 +7691,33 @@ export const zh_TW: EnTranslations = {
         "name": "封口令",
         "description": "在施法中沉默目標，並在5秒內封鎖該法術學派。"
       },
+      "thieves_chorus": {
+        "name": "盜賊合唱",
+        "description": "一聲呼哨激勵你的隊伍，使攻擊、施法和引導速度提高10%，持續10秒。近期受過群體加速激勵的盟友過於疲憊，無法受益。（潛行者天賦）"
+      },
       "tranquility": {
         "name": "林地之歌",
         "description": "引導恢復能量4秒，每秒為30碼內的盟友恢復42至52點生命值。（德魯伊天賦）"
+      },
+      "venom_dart": {
+        "name": "毒鏢",
+        "description": "彈出一枚毒鏢，造成{damage}點自然傷害。獲得1個連擊點。刀工：使你的蝕毒撕裂傷口延長6秒，最多20秒。"
+      },
+      "body_blow": {
+        "name": "擊體重拳",
+        "description": "沉重的一擊，造成130%武器傷害外加10點，獲得2個連擊點，並使紅線加深一格。（戰鬥引擎）"
+      },
+      "knockout_blow": {
+        "name": "擊倒重拳",
+        "description": "以擊倒終結紅線：造成45點傷害，每個連擊點額外造成35點，紅線每格加深使傷害提高25%，並恢復25點能量。（戰鬥引擎）"
+      },
+      "veilstrike": {
+        "name": "罩影突襲",
+        "description": "耗盡幽暝儲備，暗影纏身6秒：你的潛行先制技可在明處使用，且造成的傷害提高25%。（詭詐引擎）"
+      },
+      "venomrend": {
+        "name": "蝕毒撕裂",
+        "description": "吞噬毒祭：造成22點傷害，每個連擊點額外造成26點，引爆你的流血效果的剩餘傷害，並恢復25點能量。（刀工引擎）"
       },
       "typhoon": {
         "name": "颱風",

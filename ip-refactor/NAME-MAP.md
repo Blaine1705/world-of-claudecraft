@@ -1157,3 +1157,40 @@ coverage with zero residual:
 - **Three WoW-adjacent mob names KEPT** by operator (generic/original, whole-value clears them):
   Static Charge, Blood Frenzy, Deathstalker Cleave (mob `deathstalker_voss`).
 The scanner is GREEN after this change - the whole IP scrub is verified complete.
+
+## Rogue v0.29 row redesign coinages (2026-07-22, append-only)
+
+Fresh names for the rogue v0.29 choice rows and their two granted abilities
+(docs/design/rogue-v029-class-design.md). All are original coinages in the map
+voice; none shadow a Blizzard spell or talent name. Two candidates were
+REJECTED for verbatim WoW collisions before ship: "Deathmark" (Dragonflight
+Assassination talent) recoined as Grave Brand, and "Slipstream" (Evoker talent)
+recoined as Quickstep.
+
+| id | old | new | kind | flag |
+|---|---|---|---|---|
+| `rog_r5_killers_pace` | (new) | Killer's Pace | row-option | new-coinage |
+| `rog_r5_slipstream` | (new) | Quickstep | row-option | new-coinage |
+| `rog_r8_ghostfoot_ward` | (new) | Ghostfoot Ward | row-option | new-coinage |
+| `rog_r11_marked_prey` | (new) | Marked Prey | row-option | new-coinage |
+| `rog_r11_cheap_trick` | (new) | Cheap Trick | row-option | new-coinage |
+| `rog_r14_dusk_economy` | (new) | Dusk Economy | row-option | new-coinage |
+| `rog_r20_second_shadow` | (new) | Second Shadow | row-option | new-coinage |
+| `rog_r20_deathmark` | (new) | Grave Brand | row-option | new-coinage |
+| `rog_r20_kill_chain` | (new) | Kill Chain | row-option | new-coinage |
+| `flurry_of_knives` | (new) | Flurry of Knives | ability | new-coinage |
+| `thieves_chorus` | (new) | Thieves' Chorus | ability | new-coinage |
+
+## Rogue v0.29 spec-engine coinages (2026-07-22, append-only)
+
+The spec-engine abilities and states (docs/design/rogue-v029-spec-engines.md),
+all original coinages in the map voice; none shadow a Blizzard spell, talent,
+or hero-tree name.
+
+| id | old | new | kind | flag |
+|---|---|---|---|---|
+| `venomrend` | (new) | Venomrend | ability | new-coinage |
+| `veilstrike` | (new) | Veilstrike | ability | new-coinage |
+| `venom_ritual` | (new) | Venom Ritual | engine-state | new-coinage |
+| `redline` | (new) | Redline | engine-state | new-coinage |
+| `gloam` | (new) | Gloam | engine-state | new-coinage |

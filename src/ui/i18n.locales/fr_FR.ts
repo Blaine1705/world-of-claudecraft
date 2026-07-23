@@ -584,6 +584,27 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Verdict purificateur',
   'entities.abilities.cleansing_verdict.description':
     'Dissipe un effet magique néfaste sur une cible alliée et lui rend {damage} points de vie par la magie du Sacré.',
+  'entities.abilities.flurry_of_knives.name': 'Rafale de couteaux',
+  'entities.abilities.flurry_of_knives.description':
+    'Fouette tous les ennemis dans un rayon de 6 m avec des couteaux de lancer, infligeant {damage} points de dégâts physiques et octroyant 2 points de combo. (talent de Voleur)',
+  'entities.abilities.thieves_chorus.name': 'Chœur des voleurs',
+  'entities.abilities.thieves_chorus.description':
+    'Un signal sifflé galvanise votre groupe : vitesse d’attaque, d’incantation et de canalisation augmentée de 10% pendant 10 s. Les alliés récemment touchés par une accélération de groupe sont trop épuisés pour en profiter. (talent de Voleur)',
+  'entities.abilities.venomrend.name': 'Déchirure venimeuse',
+  'entities.abilities.venomrend.description':
+    'Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Knifework)',
+  'entities.abilities.veilstrike.name': 'Frappe du voile',
+  'entities.abilities.veilstrike.description':
+    'Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Skulduggery)',
+  'entities.abilities.body_blow.name': 'Coup au corps',
+  'entities.abilities.body_blow.description':
+    'Un coup puissant infligeant 130% des dégâts de l’arme plus 10, qui confère 2 points de combo et approfondit la Redline d’un cran. (moteur Thuggery)',
+  'entities.abilities.knockout_blow.name': 'Coup de K.-O.',
+  'entities.abilities.knockout_blow.description':
+    'Termine la Redline par un K.-O. : frappe pour 45 plus 35 par point de combo, 25% plus fort par cran de Redline, et rend 25 points d’énergie. (moteur Thuggery)',
+  'entities.abilities.venom_dart.name': 'Dard venimeux',
+  'entities.abilities.venom_dart.description':
+    'Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Knifework : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec.',
   'entities.abilities.smoke_screen.name': 'Écran de fumée',
   'entities.abilities.smoke_screen.description':
     'Vous disparaissez dans un nuage de fumée, ce qui augmente vos chances d’esquiver de 30 % pendant 8 s.',

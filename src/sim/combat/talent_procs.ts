@@ -19,6 +19,7 @@ import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
 import { PERSONAL_BARRIER_IDS } from './fire_mage';
 import { priestOnCastCompleted } from './priest/talents';
+import { rogueEngineOnCast } from './rogue_engines';
 import { onShamanCastCompleted } from './shaman_talents';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
@@ -190,6 +191,9 @@ export function onCastCompleted(
   // here because every completed cast funnels through this hook. Draws no rng.
   convergenceOnCast(ctx, player, abilityId);
   onShamanCastCompleted(ctx, player, abilityId);
+  // Rogue spec engines (combat/rogue_engines.ts): Skulduggery banks Gloam
+  // from Duskveil openers and the Red Ribbon rhythm. Same funnel, no rng.
+  rogueEngineOnCast(ctx, player, abilityId, target);
   if (wasEmpowered) return;
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;

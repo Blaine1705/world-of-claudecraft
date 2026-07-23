@@ -553,6 +553,27 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Veredicto Purificador',
   'entities.abilities.cleansing_verdict.description':
     'Purga un efecto mágico perjudicial de un objetivo amistoso y lo sana con {damage} de magia Sagrada.',
+  'entities.abilities.flurry_of_knives.name': 'Ráfaga de cuchillos',
+  'entities.abilities.flurry_of_knives.description':
+    'Azota a todos los enemigos en un radio de 6 m con cuchillos arrojadizos, causando {damage} de daño físico y otorgando 2 puntos de combo. (talento de Pícaro)',
+  'entities.abilities.thieves_chorus.name': 'Coro de ladrones',
+  'entities.abilities.thieves_chorus.description':
+    'Una señal silbada espolea a tu grupo: la velocidad de ataque, lanzamiento y canalización aumenta un 10% durante 10 s. Los aliados afectados hace poco por un impulso de celeridad de grupo están demasiado exhaustos para beneficiarse. (talento de Pícaro)',
+  'entities.abilities.venomrend.name': 'Desgarro venenoso',
+  'entities.abilities.venomrend.description':
+    'Consume el Ritual de Veneno: golpea por 22 más 26 por punto de combo, detona el daño restante de tus sangrados y restaura 25 de energía. (motor de Knifework)',
+  'entities.abilities.veilstrike.name': 'Golpe del velo',
+  'entities.abilities.veilstrike.description':
+    'Consume la reserva de Penumbra para envolverte en sombras durante 6 s: tus aperturas de sigilo funcionan al descubierto y causas un 25% más de daño. (motor de Skulduggery)',
+  'entities.abilities.body_blow.name': 'Golpe al cuerpo',
+  'entities.abilities.body_blow.description':
+    'Un golpe contundente por el 130% del daño del arma más 10 que otorga 2 puntos de combo y profundiza la Redline un nivel. (motor de Thuggery)',
+  'entities.abilities.knockout_blow.name': 'Golpe de nocaut',
+  'entities.abilities.knockout_blow.description':
+    'Termina la Redline con un nocaut: golpea por 45 más 35 por punto de combo, un 25% más fuerte por cada nivel de la Redline, y recupera 25 de energía. (motor de Thuggery)',
+  'entities.abilities.venom_dart.name': 'Dardo venenoso',
+  'entities.abilities.venom_dart.description':
+    'Lanzas un dardo envenenado que inflige {damage} de daño de naturaleza. Otorga 1 punto de combo. Knifework: prolonga tu herida de Desgarro venenoso 6 s, hasta 20 s.',
   'entities.abilities.smoke_screen.name': 'Cortina de Humo',
   'entities.abilities.smoke_screen.description':
     'Desapareces en una nube de humo, lo que aumenta tu probabilidad de esquivar un 30% durante 8 s.',

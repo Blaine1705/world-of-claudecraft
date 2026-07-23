@@ -1598,6 +1598,12 @@ export const sv_SE: EnTranslations = {
       "freeCast": "Ditt nästa kast kostar ingenting",
       "instantCast": "Din nästa besvärjelse med kasttid är omedelbar",
       "cheapCast": "Din nästa besvärjelse kostar {pct}% mindre",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Ökar besvärjelsekraft med {value}",
@@ -7517,6 +7523,10 @@ export const sv_SE: EnTranslations = {
         "name": "Eterbrunn",
         "description": "Restaura mana rápidamente. (magikertalang)"
       },
+      "flurry_of_knives": {
+        "name": "Knivstorm",
+        "description": "Piskar alla fiender inom 6 m med kastknivar, vållar {damage} fysisk skada och ger 2 kombopoäng. (skurktalang)"
+      },
       "frenzied_regeneration": {
         "name": "Vild läkning",
         "description": "Återställer 180 hälsa under 10 sek. Endast i Björngestalt. (druidtalang)"
@@ -7681,9 +7691,33 @@ export const sv_SE: EnTranslations = {
         "name": "Munkavle",
         "description": "Tystar målet mitt i en besvärjelse och hindrar det från att kasta besvärjelser från den magiskolan i 5 sek."
       },
+      "thieves_chorus": {
+        "name": "Tjuvarnas kör",
+        "description": "En visslad signal sporrar din grupp: attack-, besvärjelse- och kanaliseringstakt ökad med 10% i 10 sek. Allierade som nyligen fått en grupphastighetsvåg är för utmattade för att gynnas. (skurktalang)"
+      },
       "tranquility": {
         "name": "Gläntsång",
         "description": "Kanaliserar återställande energi i 4 sek. och helar allierade inom 30 m för 42 till 52 varje sekund. (druidtalang)"
+      },
+      "venom_dart": {
+        "name": "Giftpil",
+        "description": "Slungar en förgiftad pil för {damage} naturskada. Ger 1 combopoäng. Knifework: förlänger ditt Giftrivning-sår med 6 sek, upp till 20 sek."
+      },
+      "body_blow": {
+        "name": "Kroppsslag",
+        "description": "Ett tungt slag för 130% vapenskada plus 10 som ger 2 combopoäng och fördjupar Redline med ett steg. (Thuggery-motorn)"
+      },
+      "knockout_blow": {
+        "name": "Knockoutslag",
+        "description": "Avsluta Redline med en knockout: slår för 45 plus 35 per combopoäng, 25% hårdare per Redline-steg, och återställer 25 energi. (Thuggery-motorn)"
+      },
+      "veilstrike": {
+        "name": "Slöjhugg",
+        "description": "Förtär Skymningsförrådet och sveper dig i skugga i 6 sek: dina smygöppnare fungerar i det öppna och du gör 25% mer skada. (Skulduggery-motorn)"
+      },
+      "venomrend": {
+        "name": "Giftrivning",
+        "description": "Förtär Giftritualen: slår för 22 plus 26 per kombopoäng, detonerar dina blödningars återstående skada och återställer 25 energi. (Knifework-motorn)"
       },
       "typhoon": {
         "name": "Tyfon",

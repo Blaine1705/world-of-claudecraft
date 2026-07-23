@@ -768,7 +768,6 @@ export class CharacterVisual {
         skinEmissiveTexture(this.key, this.skinIndex),
       );
     }
-    this.originalMaterials.clear();
     this.rebuildCasters();
     this.applyVisualMaterials();
   }
@@ -860,8 +859,8 @@ export class CharacterVisual {
       }
     }
     // the model graph changed (weapon meshes added/removed): rebuild the caster
-    // list and re-snapshot originals, then re-apply ghost/stealth overlays.
-    this.originalMaterials.clear();
+    // list and re-snapshot originals (rebuildCasters un-applies live overlays
+    // first, so a stealthed equip never bakes the ghost material in).
     this.rebuildCasters();
     this.applyVisualMaterials();
     this.buildWeaponVfx(payloads);
@@ -1126,6 +1125,13 @@ export class CharacterVisual {
   /** Rebuild the shadow-caster list and original-material snapshot after the model
    *  graph changes (a weapon swap adds/removes bone-child meshes). */
   private rebuildCasters(): void {
+    // Un-apply any live effect overlay (ghost, soul rend, tints) BEFORE the
+    // snapshot: equipping a weapon while stealthed otherwise captures the
+    // ghost clone as a mesh's "original", and the character stays translucent
+    // forever after leaving stealth (owner playtest: /dev bis inside
+    // Duskveil). Restore from the pre-rebuild map first, then recapture.
+    for (const [mesh, original] of this.originalMaterials) mesh.material = original;
+    this.originalMaterials.clear();
     this.casters.length = 0;
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;

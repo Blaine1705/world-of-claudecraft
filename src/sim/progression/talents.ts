@@ -37,6 +37,7 @@ import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
 import { clearPacklordState } from '../combat/hunter_packlord';
 import { clearHunterTalentState } from '../combat/hunter_shared';
 import { cleanupPriestState } from '../combat/priest/lifecycle';
+import { cleanRogueEngineState } from '../combat/rogue_engines';
 import { clearSpiritmendState } from '../combat/shaman_spiritmend';
 import { clearShamanTalentState } from '../combat/shaman_talents';
 import { clearThundercallState } from '../combat/shaman_thundercall';
@@ -185,6 +186,7 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   ctx.refreshKnownAbilities(meta, true);
   if (e) {
     cleanRemovedProcState(ctx, e, previousMods, meta.talentMods);
+    cleanRogueEngineState(ctx, e, previousMods.spec, meta.talentMods.spec);
     normalizeAbilityCharges(e, meta, previousChargeCaps);
     stripOrphanedFormAuras(ctx, meta, e);
   }

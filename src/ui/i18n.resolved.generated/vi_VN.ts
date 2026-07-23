@@ -1598,6 +1598,12 @@ export const vi_VN: EnTranslations = {
       "freeCast": "Lần thi triển tiếp theo của bạn không tốn mana",
       "instantCast": "Phép tiếp theo của bạn có thời gian thi triển sẽ lập tức",
       "cheapCast": "Phép tiếp theo của bạn tốn ít hơn {pct}%",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Tăng sức mạnh phép thuật lên {value}",
@@ -7517,6 +7523,10 @@ export const vi_VN: EnTranslations = {
         "name": "Giếng Ête",
         "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
       },
+      "flurry_of_knives": {
+        "name": "Loạt Dao Xoáy",
+        "description": "Quất tất cả kẻ địch trong vòng 6 m bằng dao phóng, gây {damage} sát thương vật lý và nhận 2 điểm liên hoàn. (thiên phú Đạo tặc)"
+      },
       "frenzied_regeneration": {
         "name": "Hồi Phục Hoang Dã",
         "description": "Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)"
@@ -7681,9 +7691,33 @@ export const vi_VN: EnTranslations = {
         "name": "Khóa Phép",
         "description": "Làm câm lặng mục tiêu đang niệm phép và ngăn mục tiêu thi triển phép thuộc hệ đó trong 5 giây."
       },
+      "thieves_chorus": {
+        "name": "Hợp Xướng Đạo Tặc",
+        "description": "Tiếng huýt sáo hiệu lệnh thúc giục cả nhóm: tốc độ đánh, niệm chú và duy trì tăng 10% trong 10 giây. Đồng minh vừa nhận hiệu ứng tăng tốc nhóm quá kiệt sức để hưởng lợi. (thiên phú Đạo tặc)"
+      },
       "tranquility": {
         "name": "Khúc Ca Rừng Thưa",
         "description": "Niệm năng lượng hồi phục trong 4 giây, hồi 42 đến 52 máu mỗi giây cho đồng minh trong phạm vi 30 m. (thiên phú Druid)"
+      },
+      "venom_dart": {
+        "name": "Phi Tiêu Độc",
+        "description": "Búng một phi tiêu tẩm độc gây {damage} sát thương tự nhiên. Cho 1 điểm liên hoàn. Knifework: kéo dài vết thương Xé Độc của bạn thêm 6 giây, tối đa 20 giây."
+      },
+      "body_blow": {
+        "name": "Đòn Thân",
+        "description": "Một đòn nặng gây 130% sát thương vũ khí cộng 10, cho 2 điểm liên hoàn và làm sâu thêm Redline một nấc. (động cơ Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Đòn Nốc Ao",
+        "description": "Kết thúc Redline bằng cú nốc ao: đánh 45 cộng 35 mỗi điểm liên hoàn, mạnh hơn 25% mỗi nấc Redline, và hồi 25 năng lượng. (động cơ Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Đòn Màn Che",
+        "description": "Nuốt trọn kho U Ám để phủ bóng tối lên người trong 6 giây: các đòn mở màn ẩn thân dùng được giữa chốn đông người và bạn gây thêm 25% sát thương. (động cơ Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Xé Độc",
+        "description": "Nuốt trọn Nghi Thức Độc: đánh 22 cộng 26 mỗi điểm liên hoàn, kích nổ sát thương còn lại của các vết chảy máu và hồi 25 năng lượng. (động cơ Knifework)"
       },
       "typhoon": {
         "name": "Cuồng Phong",

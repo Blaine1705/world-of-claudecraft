@@ -94,7 +94,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
   });
 
   it('restores energy on every third Wicked Slash with Ceaseless Cuts', () => {
-    const sim = simWithRows('rogue', { 5: 'rog_r5_relentless_strikes' });
+    const sim = simWithRows('rogue', { 14: 'rog_r14_ceaseless_cuts' });
     const target = addTarget(sim);
     sim.player.resource = 0;
 
@@ -103,7 +103,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(sim.player.resource).toBe(0);
     onCastCompleted(sim.ctx, sim.player, 'sinister_strike', target);
 
-    expect(sim.player.resource).toBe(30);
+    expect(sim.player.resource).toBe(50);
   });
 
   it('adds one talent charge for Twin Icebind', () => {

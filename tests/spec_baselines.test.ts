@@ -374,7 +374,7 @@ describe('v0.28 passive restoration hotfix', () => {
     const baseline = computeTalentModifiers('rogue', allocation('assassination'), 20);
     const withChoice = computeTalentModifiers(
       'rogue',
-      { spec: 'assassination', rows: { 5: 'rog_r5_relentless_strikes' } },
+      { spec: 'assassination', rows: { 5: 'rog_r5_killers_pace' } },
       20,
     );
 

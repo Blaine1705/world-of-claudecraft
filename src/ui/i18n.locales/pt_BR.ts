@@ -577,6 +577,27 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Veredito Purificador',
   'entities.abilities.cleansing_verdict.description':
     'Expurga um efeito mágico nocivo de um alvo aliado e o cura em {damage} com magia Sagrada.',
+  'entities.abilities.flurry_of_knives.name': 'Rajada de Facas',
+  'entities.abilities.flurry_of_knives.description':
+    'Açoita todos os inimigos num raio de 6 m com facas de arremesso, causando {damage} de dano físico e concedendo 2 pontos de combo. (talento de Ladino)',
+  'entities.abilities.thieves_chorus.name': 'Coro dos Ladrões',
+  'entities.abilities.thieves_chorus.description':
+    'Um assobio de sinal incita seu grupo: velocidade de ataque, lançamento e canalização aumentada em 10% por 10 s. Aliados afetados há pouco por um surto de aceleração de grupo estão exaustos demais para se beneficiar. (talento de Ladino)',
+  'entities.abilities.venomrend.name': 'Dilaceração Venenosa',
+  'entities.abilities.venomrend.description':
+    'Consome o Ritual de Veneno: golpeia por 22 mais 26 por ponto de combo, detona o dano restante dos seus sangramentos e restaura 25 de energia. (motor de Knifework)',
+  'entities.abilities.veilstrike.name': 'Golpe do Véu',
+  'entities.abilities.veilstrike.description':
+    'Consome a reserva de Lusco para envolver-se em sombras por 6 s: suas aberturas furtivas funcionam a descoberto e você causa 25% mais dano. (motor de Skulduggery)',
+  'entities.abilities.body_blow.name': 'Golpe no Corpo',
+  'entities.abilities.body_blow.description':
+    'Um golpe pesado por 130% do dano da arma mais 10 que concede 2 pontos de combo e aprofunda a Redline em um nível. (motor de Thuggery)',
+  'entities.abilities.knockout_blow.name': 'Golpe de Nocaute',
+  'entities.abilities.knockout_blow.description':
+    'Encerre a Redline com um nocaute: golpeia por 45 mais 35 por ponto de combo, 25% mais forte por nível da Redline, e recupera 25 de energia. (motor de Thuggery)',
+  'entities.abilities.venom_dart.name': 'Dardo Venenoso',
+  'entities.abilities.venom_dart.description':
+    'Arremessa um dardo envenenado que causa {damage} de dano de Natureza. Concede 1 ponto de combo. Knifework: prolonga sua ferida de Dilaceração Venenosa em 6 s, até 20 s.',
   'entities.abilities.smoke_screen.name': 'Cortina de Fumaça',
   'entities.abilities.smoke_screen.description':
     'Você desaparece numa nuvem de fumaça, aumentando em 30% sua chance de esquiva por 8 s.',

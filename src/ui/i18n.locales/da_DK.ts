@@ -557,6 +557,27 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Rensende Dom',
   'entities.abilities.cleansing_verdict.description':
     'Fjerner en skadelig magisk effekt fra et venligt mål og helbreder det med Hellig magi for {damage}.',
+  'entities.abilities.flurry_of_knives.name': 'Knivbyge',
+  'entities.abilities.flurry_of_knives.description':
+    'Pisker alle fjender inden for 6 m med kasteknive, påfører {damage} fysisk skade og giver 2 kombopoint. (slyngeltalent)',
+  'entities.abilities.thieves_chorus.name': 'Tyvenes Kor',
+  'entities.abilities.thieves_chorus.description':
+    'Et fløjtet signal ansporer din gruppe: angrebs-, besværgelses- og kanaliseringshastighed øget med 10% i 10 sek. Allierede, der for nylig fik et gruppehast-udbrud, er for udmattede til at få gavn. (slyngeltalent)',
+  'entities.abilities.venomrend.name': 'Giftflænge',
+  'entities.abilities.venomrend.description':
+    'Fortærer Giftritualet: rammer for 22 plus 26 pr. kombopoint, detonerer dine blødningers resterende skade og gendanner 25 energi. (Knifework-motoren)',
+  'entities.abilities.veilstrike.name': 'Slørstød',
+  'entities.abilities.veilstrike.description':
+    'Fortærer Skumringslageret og hyller dig i skygge i 6 sek.: dine snigåbnere virker i det åbne, og du gør 25% mere skade. (Skulduggery-motoren)',
+  'entities.abilities.body_blow.name': 'Kropsstød',
+  'entities.abilities.body_blow.description':
+    'Et tungt stød for 130% våbenskade plus 10, der giver 2 combopoint og uddyber Redline med ét hak. (Thuggery-motoren)',
+  'entities.abilities.knockout_blow.name': 'Knockoutstød',
+  'entities.abilities.knockout_blow.description':
+    'Afslut Redline med en knockout: rammer for 45 plus 35 pr. combopoint, 25% hårdere pr. Redline-hak, og genvinder 25 energi. (Thuggery-motoren)',
+  'entities.abilities.venom_dart.name': 'Giftpil',
+  'entities.abilities.venom_dart.description':
+    'Kaster en forgiftet pil for {damage} naturskade. Giver 1 combopoint. Knifework: forlænger dit Giftflænge-sår med 6 sek., op til 20 sek.',
   'entities.abilities.smoke_screen.name': 'Røgslør',
   'entities.abilities.smoke_screen.description':
     'Du forsvinder i en røgsky, hvilket øger din undvigelseschance med 30 % i 8 sek.',

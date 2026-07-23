@@ -561,6 +561,27 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Očistný rozsudek',
   'entities.abilities.cleansing_verdict.description':
     'Odstraní škodlivý magický účinek ze spojeneckého cíle a vyléčí jej svatou magií za {damage}.',
+  'entities.abilities.flurry_of_knives.name': 'Smršť nožů',
+  'entities.abilities.flurry_of_knives.description':
+    'Šlehá všechny nepřátele do 6 m vrhacími noži, způsobuje {damage} fyzického poškození a dává 2 body komba. (lotrovský talent)',
+  'entities.abilities.thieves_chorus.name': 'Sbor zlodějů',
+  'entities.abilities.thieves_chorus.description':
+    'Hvízdnutý signál povzbudí tvou skupinu: rychlost útoku, sesílání a kanálování se zvýší o 10% na 10 s. Spojenci nedávno zasažení skupinovým zrychlením jsou příliš vyčerpaní, aby z toho těžili. (lotrovský talent)',
+  'entities.abilities.venomrend.name': 'Jedová trhlina',
+  'entities.abilities.venomrend.description':
+    'Pohltí Jedový rituál: udeří za 22 plus 26 za bod komba, odpálí zbývající poškození tvých krvácení a obnoví 25 energie. (engine Knifework)',
+  'entities.abilities.veilstrike.name': 'Úder závoje',
+  'entities.abilities.veilstrike.description':
+    'Pohltí zásobu Šera a zahalí tě na 6 s do stínu: tvé plíživé otvíráky fungují na otevřeném prostranství a působíš o 25% vyšší poškození. (engine Skulduggery)',
+  'entities.abilities.body_blow.name': 'Úder na tělo',
+  'entities.abilities.body_blow.description':
+    'Těžký úder za 130 % poškození zbraně plus 10, který uděluje 2 combo body a prohlubuje Redline o jeden dílek. (engine Thuggery)',
+  'entities.abilities.knockout_blow.name': 'Nokautující úder',
+  'entities.abilities.knockout_blow.description':
+    'Ukončí Redline nokautem: zasáhne za 45 plus 35 za každý combo bod, o 25 % tvrději za každý dílek Redline, a obnoví 25 energie. (engine Thuggery)',
+  'entities.abilities.venom_dart.name': 'Jedová šipka',
+  'entities.abilities.venom_dart.description':
+    'Vymrští otrávenou šipku za {damage} přírodního poškození. Uděluje 1 combo bod. Knifework: prodlužuje ránu vaší Jedové trhliny o 6 s, nejvýše na 20 s.',
   'entities.abilities.smoke_screen.name': 'Kouřová clona',
   'entities.abilities.smoke_screen.description':
     'Zmizíte v oblaku kouře a na 8 s zvýšíte svou šanci na úhyb o 30 %.',

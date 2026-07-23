@@ -81,8 +81,8 @@ function expireHot(sim: Sim, ability: string, target: Entity): void {
 describe('rogue wave 2 choice rows', () => {
   it('Evasion grants a cheap builder and poison swings restore energy', () => {
     const { sim, p } = rig('rogue', 20, {
-      14: 'rog_r14_deadly_brew',
-      17: 'rog_r17_improved_evasion',
+      14: 'rog_r14_venom_dividend',
+      17: 'rog_r17_ghostfoot_gambit',
     });
     addTargetMob(sim, 100000, 3);
     p.resource = 40;
@@ -96,7 +96,7 @@ describe('rogue wave 2 choice rows', () => {
   });
 
   it('Cheat Death prevents one killing blow', () => {
-    const { sim, p } = rig('rogue', 20, { 17: 'rog_r17_cheat_death' });
+    const { sim, p } = rig('rogue', 20, { 8: 'rog_r8_borrowed_breath' });
     dealDamage(sim, p, p.hp + 100);
     expect(p.dead).toBe(false);
     expect(p.hp).toBe(1);
