@@ -931,7 +931,18 @@ export class ArchetypeSequencer {
       n++;
     }
     if (o.blood) {
-      host.burstAt(slot.ix, slot.iy, slot.iz, 0xa01222, Math.round(12 * cs), 0.9, 'blood');
+      // an authored number multiplies the spray (Bleed Out's contact gush);
+      // power climbs gently with it so the extra droplets also fly harder
+      const gush = typeof o.blood === 'number' ? o.blood : 1;
+      host.burstAt(
+        slot.ix,
+        slot.iy,
+        slot.iz,
+        0xa01222,
+        Math.round(12 * cs * gush),
+        0.9 * Math.min(1.35, Math.sqrt(gush)),
+        'blood',
+      );
       n++;
     }
     // buff-block casts light the caster's body (the gallery casterGlowV on

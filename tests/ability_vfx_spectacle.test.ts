@@ -235,6 +235,32 @@ describe('sequencer applies the crescendo boosts at the spawn seams', () => {
     expect(a.slashes.length).toBeGreaterThan(before); // the follow-through echo
   });
 
+  it('a numeric impact.blood multiplies the contact spray (Bleed Out gush)', () => {
+    const dotSpec = (blood: boolean | number): AbilityVfxFullSpec => ({
+      archetype: 'dot',
+      palette: 'blood',
+      power: 1,
+      impact: { blood, sparks: 0, flipbook: false, ring: false, vRing: false },
+    });
+    const base = makeHost();
+    const seqBase = new ArchetypeSequencer();
+    seqBase.start(base.host, 'dot_base', dotSpec(true), 1, 2, 0xffffff, 0, false);
+    step(seqBase, base.host, 0.3);
+    const gush = makeHost();
+    const seqGush = new ArchetypeSequencer();
+    seqGush.start(gush.host, 'dot_gush', dotSpec(2.2), 1, 2, 0xffffff, 0, false);
+    step(seqGush, gush.host, 0.3);
+    const baseBlood = base.bursts.find((b) => b.kind === 'blood');
+    const gushBlood = gush.bursts.find((b) => b.kind === 'blood');
+    expect(baseBlood).toBeDefined();
+    expect(gushBlood).toBeDefined();
+    // the multiplier rides the same crescendo-scaled baseline count (each
+    // side rounds independently, so allow the rounding seam)
+    expect(Math.abs(gushBlood!.count - baseBlood!.count * 2.2)).toBeLessThanOrEqual(1.2);
+    expect(gushBlood!.power).toBeGreaterThan(baseBlood!.power);
+    expect(gushBlood!.power).toBeLessThanOrEqual(baseBlood!.power * 1.35 + 1e-9);
+  });
+
   it('finishers fire the gallery double shockwave at +0.12s', () => {
     const FIN_SPEC: AbilityVfxFullSpec = {
       archetype: 'bolt',

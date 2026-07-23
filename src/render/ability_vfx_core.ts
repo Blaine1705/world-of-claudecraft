@@ -89,7 +89,9 @@ export interface AbilityVfxImpactSpec {
   vRing?: boolean | number;
   debris?: boolean;
   smoke?: boolean;
-  blood?: boolean;
+  // blood spray at contact: true = the standard burst, a number multiplies
+  // its particle count (Bleed Out's louder application read)
+  blood?: boolean | number;
   liteAudio?: boolean;
   sample?: string;
 }

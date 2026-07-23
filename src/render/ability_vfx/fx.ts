@@ -1720,12 +1720,14 @@ export class AbilityVfxFx implements SequencerHost {
     }
     if (band.style === 'leaves') {
       // rising mote column (heals, regrowth): motes cycle feet to crown,
-      // fading in and out over the climb
+      // fading in and out over the climb. A NEGATIVE o.up runs the cycle
+      // backwards - falling motes (Bleed Out's dripping blood) - so the
+      // phase is wrapped into [0,1) instead of relying on JS % keeping sign.
       const n = orbitCount(Math.max(3, Math.min(7, Math.round((o?.density ?? 12) * 0.5))), halve);
       const spread = o?.spread ?? dna.radius;
       const up = o?.up ?? 1;
       for (let k = 0; k < n; k++) {
-        const f = (t * dna.rate * up + k / n) % 1;
+        const f = (((t * dna.rate * up + k / n) % 1) + 1) % 1;
         const a = band.phase + k * 2.4 + t * 0.3;
         const r = 0.35 + spread * 0.55 * ((k * 0.618) % 1);
         this.overlay.push(
