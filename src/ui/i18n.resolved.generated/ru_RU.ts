@@ -8817,169 +8817,169 @@ export const ru_RU: EnTranslations = {
         "name": "Клыковый нож Зулгара"
       },
       "thick_winter_pelt": {
-        "name": "Thick Winter Pelt"
+        "name": "Плотная зимняя шкура"
       },
       "aurora_mote": {
-        "name": "Aurora Mote"
+        "name": "Пылинка сияния"
       },
       "hearth_ember_cache": {
-        "name": "Ember Cache"
+        "name": "Запас углей"
       },
       "sprung_trap": {
-        "name": "Sprung Fen Trap"
+        "name": "Захлопнувшийся топяной капкан"
       },
       "hearthlined_treads": {
-        "name": "Hearth-Lined Treads"
+        "name": "Прогретые у очага боты"
       },
       "frostmane_mantle": {
-        "name": "Mantle of the Frostmane"
+        "name": "Мантия Морозной Гривы"
       },
       "ashbone_war_brand": {
-        "name": "Ashbone War-Brand"
+        "name": "Пеплокостное боевое клеймо"
       },
       "emberwing_scale": {
-        "name": "Emberwing Scale"
+        "name": "Чешуйка углекрылого дрейка"
       },
       "scorched_supply_crate": {
-        "name": "Scorched Supply Crate"
+        "name": "Обгоревший ящик с припасами"
       },
       "wyrmwatch_warning_banner": {
-        "name": "Wyrmwatch Warning Banner"
+        "name": "Предупредительное знамя Змеиного дозора"
       },
       "cinderwalk_treads": {
-        "name": "Cinderwalk Treads"
+        "name": "Боты пеплохода"
       },
       "mawscale_pauldrons": {
-        "name": "Mawscale Pauldrons"
+        "name": "Наплечники из чешуи Дрейкмо"
       },
       "gilded_sap_clot": {
-        "name": "Gilded Sap Clot"
+        "name": "Сгусток золочёной живицы"
       },
       "amberfall_sap_bucket": {
-        "name": "Sap-Tap Bucket"
+        "name": "Ведёрко для живицы"
       },
       "mere_ferry_lantern": {
-        "name": "Ferry Lantern"
+        "name": "Паромный фонарь"
       },
       "orchard_sapbinder_grips": {
-        "name": "Sapbinder Grips"
+        "name": "Рукавицы смоловяза"
       },
       "mantle_of_the_meredark": {
-        "name": "Mantle of the Meredark"
+        "name": "Мантия Озёрного Мрака"
       },
       "plump_fen_eel": {
-        "name": "Plump Fen Eel"
+        "name": "Жирный топяной угорь"
       },
       "wisplight_globe": {
-        "name": "Wisplight Globe"
+        "name": "Шар света огоньков"
       },
       "fenway_mooring_line": {
-        "name": "Cut Mooring Line"
+        "name": "Перекушенный швартов"
       },
       "bridgemere_toll_chest": {
-        "name": "Sunken Toll-Chest"
+        "name": "Затонувший сундук с пошлиной"
       },
       "eelskin_mudwaders": {
-        "name": "Eelskin Mudwaders"
+        "name": "Болотные сапоги из кожи угря"
       },
       "lilybed_mantle": {
-        "name": "Mantle of the Lily-Bed"
+        "name": "Мантия кувшинкового ложа"
       },
       "moonfleece_tuft": {
-        "name": "Moonfleece Tuft"
+        "name": "Клок лунного руна"
       },
       "gloamfield_nightbloom": {
-        "name": "Nightbloom Blossom"
+        "name": "Цветок ночецвета"
       },
       "vigil_star_chart": {
-        "name": "Vigil Star Chart"
+        "name": "Звёздная карта Стоячего Дозора"
       },
       "barrow_grave_offering": {
-        "name": "Scattered Grave Offering"
+        "name": "Разбросанное могильное подношение"
       },
       "moonfleece_mitts": {
-        "name": "Moonfleece Mitts"
+        "name": "Рукавицы из лунного руна"
       },
       "barrowshade_mantle": {
-        "name": "Barrowshade Mantle"
+        "name": "Мантия курганной тени"
       },
       "widowsilk_skein": {
-        "name": "Widowsilk Skein"
+        "name": "Моток вдовьего шёлка"
       },
       "gallowmere_grave_candle": {
-        "name": "Grave-Candle"
+        "name": "Могильная свеча"
       },
       "silkbound_remains": {
-        "name": "Silkbound Remains"
+        "name": "Опутанные шёлком останки"
       },
       "gravebound_silk_wraps": {
-        "name": "Gravebound Silk Wraps"
+        "name": "Погребальные шёлковые обмотки"
       },
       "mantle_of_the_unhorsed": {
-        "name": "Mantle of the Unhorsed"
+        "name": "Мантия спешенного всадника"
       },
       "pearlwake_cargo_crate": {
-        "name": "Pearlwake Cargo Crate"
+        "name": "Ящик с грузом «Жемчужного Следа»"
       },
       "canopy_silk_hank": {
-        "name": "Canopy Silk Hank"
+        "name": "Моток кронового шёлка"
       },
       "sunken_offering_bowl": {
-        "name": "Refilled Offering Bowl"
+        "name": "Вновь наполненная жертвенная чаша"
       },
       "saltwalker_sandals": {
-        "name": "Saltwalker Sandals"
+        "name": "Сандалии солеброда"
       },
       "sunken_idol_mantle": {
-        "name": "Mantle of the Sunken Idol"
+        "name": "Мантия Затонувшего Идола"
       },
       "hedgewick_shears": {
-        "name": "Stolen Hedgewick Shears"
+        "name": "Украденные хеджвикские ножницы"
       },
       "evergarden_bloom_clipping": {
-        "name": "Pruned Bloom Clipping"
+        "name": "Свежесрезанный побег"
       },
       "hedgewick_tool_cart": {
-        "name": "Spilled Tool Cart"
+        "name": "Опрокинутая тележка с инструментами"
       },
       "evergarden_statue_rubbing": {
-        "name": "Statue Rubbing"
+        "name": "Оттиск со статуи"
       },
       "shearkeeper_gloves": {
-        "name": "Shearkeeper Gloves"
+        "name": "Перчатки хранителя ножниц"
       },
       "fountain_court_mantle": {
-        "name": "Mantle of the Fountain Court"
+        "name": "Мантия Фонтанного Двора"
       },
       "galecrest_ram_wool": {
-        "name": "Greasy Ram Wool"
+        "name": "Жирная баранья шерсть"
       },
       "shear_storm_lantern": {
-        "name": "Doused Storm-Lantern"
+        "name": "Погасший штормовой фонарь"
       },
       "wreckfield_flotsam_crate": {
-        "name": "Flotsam Crate"
+        "name": "Прибитый морем ящик"
       },
       "wickspun_treads": {
-        "name": "Wickspun Treads"
+        "name": "Боты викхарборской пряжи"
       },
       "wreck_wardens_mantle": {
-        "name": "Mantle of the Wreck Warden"
+        "name": "Мантия Стража Кораблекрушений"
       },
       "breakscarred_steel": {
-        "name": "Break-Scarred Steel"
+        "name": "Сталь со шрамами прорыва"
       },
       "farshore_salt_moss": {
-        "name": "Farshore Salt Moss"
+        "name": "Солёный мох Дальнего Берега"
       },
       "gullhaven_watchbell": {
-        "name": "Coastal Watchbell"
+        "name": "Береговой сторожевой колокол"
       },
       "saltforged_grips": {
-        "name": "Saltforged Grips"
+        "name": "Рукавицы солёной ковки"
       },
       "mantle_of_the_unbroken_shore": {
-        "name": "Mantle of the Unbroken Shore"
+        "name": "Мантия несломленного берега"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
@@ -10112,10 +10112,10 @@ export const ru_RU: EnTranslations = {
         "name": "Морозогривый йети"
       },
       "terrace_howler": {
-        "name": "Terrace Howler"
+        "name": "Террасный ревун"
       },
       "apprentice_wren": {
-        "name": "Apprentice Wren"
+        "name": "Ученица Рен"
       },
       "emberwing_drake": {
         "name": "Углекрылый дрейк"
@@ -10130,7 +10130,7 @@ export const ru_RU: EnTranslations = {
         "name": "Дюнный тролль"
       },
       "cindraleth_maw_matriarch": {
-        "name": "Cindraleth the Maw Matriarch"
+        "name": "Синдралет, Матриарх Дрейкмо"
       },
       "gilded_stag": {
         "name": "Золочёный олень"
@@ -10142,7 +10142,7 @@ export const ru_RU: EnTranslations = {
         "name": "Садовый древень"
       },
       "the_meredark": {
-        "name": "The Meredark"
+        "name": "Озёрный Мрак"
       },
       "harvest_sprite": {
         "name": "Жатвенный дух"
@@ -10175,7 +10175,7 @@ export const ru_RU: EnTranslations = {
         "name": "Курганный Король"
       },
       "barrow_wight": {
-        "name": "Barrow Wight"
+        "name": "Курганное умертвие"
       },
       "widowsilk_spinner": {
         "name": "Вдовий шелкопряд"
@@ -10190,7 +10190,7 @@ export const ru_RU: EnTranslations = {
         "name": "Бледный Ловчий"
       },
       "gravedigger_mosley": {
-        "name": "Gravedigger Mosley"
+        "name": "Могильщик Мозли"
       },
       "tide_scuttler": {
         "name": "Приливный краб"
@@ -10205,7 +10205,7 @@ export const ru_RU: EnTranslations = {
         "name": "Страж идола"
       },
       "castaway_navigator": {
-        "name": "Navigator Suli"
+        "name": "Штурман Сули"
       },
       "topiary_stag": {
         "name": "Фигурный олень"
@@ -10232,7 +10232,7 @@ export const ru_RU: EnTranslations = {
         "name": "Страж Кораблекрушений"
       },
       "drowned_deckhand": {
-        "name": "Drowned Deckhand"
+        "name": "Утонувший матрос"
       },
       "riftspawn": {
         "name": "Порождение разлома"
@@ -10247,7 +10247,7 @@ export const ru_RU: EnTranslations = {
         "name": "Расколотый Ужас"
       },
       "fisher_bram": {
-        "name": "Fisher Bram"
+        "name": "Рыбак Брам"
       },
       "rift_hellguard": {
         "name": "Адский страж"
@@ -10614,189 +10614,189 @@ export const ru_RU: EnTranslations = {
         "greeting": "Тамошние монументы давно никому не говорили ни слова. Быть может, они ждали свежие уши."
       },
       "huntsman_deral": {
-        "name": "Huntsman Deral",
-        "title": "Warden of the Herds",
-        "greeting": "Quiet now. The herd knows every sound this valley makes, and so do I."
+        "name": "Охотник Дерал",
+        "title": "Смотритель стад",
+        "greeting": "Тише. Стадо знает каждый звук этой долины — и я тоже."
       },
       "warden_kaldra": {
-        "name": "Warden Kaldra",
-        "title": "Warden of Icemantle",
-        "greeting": "Mind the benches, stranger. The snow keeps what it takes."
+        "name": "Смотрительница Калдра",
+        "title": "Смотрительница Ледяной Мантии",
+        "greeting": "Осторожнее на уступах, странник. Снег не отдаёт того, что забрал."
       },
       "hearthkeeper_maeve": {
-        "name": "Hearthkeeper Maeve",
-        "title": "Keeper of the Hearth-Lodge",
-        "greeting": "Come in off the cold. The lodge fire never goes out, so long as I draw breath."
+        "name": "Хранительница очага Мейв",
+        "title": "Хозяйка Очажного дома",
+        "greeting": "Заходи с мороза. Огонь в этом доме не гаснет, пока я дышу."
       },
       "scout_einna": {
-        "name": "Scout Einna",
-        "title": "Snowline Scout",
-        "greeting": "You walked the pass alive. Good. Icemantle should hear of it."
+        "name": "Разведчица Эйнна",
+        "title": "Разведчица Снеговой Тропы",
+        "greeting": "Перевал остался позади, и ты в живых. Хорошо. Ледяная Мантия должна об этом узнать."
       },
       "aurorist_veyla": {
-        "name": "Aurorist Veyla",
-        "title": "Reader of the Lights",
-        "greeting": "Hush. The lights are speaking tonight, and they do not repeat themselves."
+        "name": "Чтица сияния Вейла",
+        "title": "Читающая небесные огни",
+        "greeting": "Тише. Этой ночью сияние говорит, а оно не повторяет дважды."
       },
       "trapper_brosk": {
-        "name": "Trapper Brosk",
-        "title": "Shiverfen Trapper",
-        "greeting": "Fen took three of my lines this week. Fen never took a line in twenty years."
+        "name": "Зверолов Броск",
+        "title": "Зверолов Дрожащей топи",
+        "greeting": "За эту неделю топь забрала у меня три ловчие линии. За двадцать лет она не тронула ни одной."
       },
       "gatecaptain_brannoc": {
-        "name": "Gatecaptain Brannoc",
-        "title": "Commander of Wyrmwatch",
-        "greeting": "Wyrmwatch holds the gate. Has held it forty years. It will hold it tonight."
+        "name": "Капитан врат Браннок",
+        "title": "Командир Змеиного дозора",
+        "greeting": "Змеиный дозор держит врата. Держит сорок лет. Удержит и этой ночью."
       },
       "quartermaster_sela": {
-        "name": "Quartermaster Sela",
-        "title": "Keeper of the Garrison Stores",
-        "greeting": "Every crate in this yard crossed forty miles of ash to get here. Treat them kindly."
+        "name": "Интендант Села",
+        "title": "Хранительница гарнизонных складов",
+        "greeting": "Каждый ящик на этом дворе прошёл сорок миль пепла, чтобы попасть сюда. Обращайся с ними бережно."
       },
       "scout_yerrin": {
-        "name": "Scout Yerrin",
-        "title": "Far-Dune Watcher",
-        "greeting": "Keep low. Sound carries strangely off the glass, and the gate below has ears."
+        "name": "Разведчица Йеррин",
+        "title": "Дозорная дальних дюн",
+        "greeting": "Пригнись. Звук странно отражается от стекла, а у врат внизу есть уши."
       },
       "reeve_ottoline": {
-        "name": "Reeve Ottoline",
-        "title": "Reeve of Lanternmere",
-        "greeting": "Welcome to Lanternmere, where the harvest never ends and neither does the work."
+        "name": "Староста Оттолина",
+        "title": "Староста Лантанмира",
+        "greeting": "Добро пожаловать в Лантанмир, где не кончается жатва — а с нею и работа."
       },
       "waywatcher_sorrel": {
-        "name": "Waywatcher Sorrel",
-        "title": "Watcher of the Goldmelt",
-        "greeting": "Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing count."
+        "name": "Дозорная Соррел",
+        "title": "Дозорная Золотой Проталины",
+        "greeting": "Позади снег, впереди золото. Мало кто проходит Золотую Проталину дважды — так пусть переход будет не зря."
       },
       "ferrymaster_caddow": {
-        "name": "Ferrymaster Caddow",
-        "title": "Keeper of the Lantern Ferries",
-        "greeting": "Fog is on the Mere again. When the lanterns go out on the water, wise folk stay ashore."
+        "name": "Паромщик Каддоу",
+        "title": "Хранитель фонарных паромов",
+        "greeting": "На Великое озеро снова лёг туман. Когда фонари на воде гаснут, разумный люд остаётся на берегу."
       },
       "orchardist_pomeline": {
-        "name": "Orchardist Pomeline",
-        "title": "Keeper of the Gilded Rows",
-        "greeting": "Mind where you step. Every root in these rows is older than the town, and they remember."
+        "name": "Садовница Помелина",
+        "title": "Хранительница золочёных рядов",
+        "greeting": "Смотри, куда ступаешь. Каждый корень в этих рядах старше города — и они всё помнят."
       },
       "waykeeper_pell": {
-        "name": "Waykeeper Pell",
-        "title": "Keeper of the Amberfen Steps",
-        "greeting": "Down the Steps and into the soft country. Mind where you plant your boots."
+        "name": "Смотрительница пути Пелл",
+        "title": "Хранительница Янтарных Ступеней",
+        "greeting": "Вниз по Ступеням — и в мягкий край. Гляди, куда ставишь сапоги."
       },
       "bridgewright_alden": {
-        "name": "Bridgewright Alden",
-        "title": "Master of the Fenway",
-        "greeting": "Every plank in this town is mine to keep, and the fen chews on all of them."
+        "name": "Мостовщик Олден",
+        "title": "Мастер Топяной гати",
+        "greeting": "Каждая доска в этом городе на моём попечении — а топь грызёт их все."
       },
       "netter_maris": {
-        "name": "Netter Maris",
-        "title": "Eel-Netter of Bridgemere",
-        "greeting": "Smell that? Smoked eel. Half this town stands on stilts I bought with it."
+        "name": "Ловец угрей Марис",
+        "title": "Ловец угрей из Бриджмира",
+        "greeting": "Чуешь? Копчёный угорь. Полгорода стоит на сваях, купленных на него."
       },
       "mother_sedge": {
-        "name": "Mother Sedge",
-        "title": "Fen-Witch of Willowweep",
-        "greeting": "The willows told me you were coming before your boots left the bridge."
+        "name": "Матушка Осока",
+        "title": "Топяная ведьма Плакучей заводи",
+        "greeting": "Ивы сказали мне, что ты идёшь, прежде чем твои сапоги сошли с моста."
       },
       "lamplighter_sorrel": {
-        "name": "Lamplighter Sorrel",
-        "title": "Keeper of the Nightgate",
-        "greeting": "Mind the lamps, friend. Past this gate the sun gives up and the flowers take over."
+        "name": "Фонарщик Соррел",
+        "title": "Хранитель Ночных Врат",
+        "greeting": "Держись фонарей, друг. За этими вратами солнце сдаётся, и его сменяют цветы."
       },
       "lira_dewsong": {
-        "name": "Lira Dewsong",
-        "title": "Night-Gardener of Moonrest",
-        "greeting": "Welcome to Moonrest, where the flowers do our dawning for us."
+        "name": "Лира Песнь Росы",
+        "title": "Ночная садовница Лунного Приюта",
+        "greeting": "Добро пожаловать в Лунный Приют, где рассвет за нас встречают цветы."
       },
       "weaver_amelle": {
-        "name": "Weaver Amelle",
-        "title": "Moonfleece Weaver",
-        "greeting": "Feel that? Moonfleece on the loom. Warmer than any fire you have sat beside."
+        "name": "Ткачиха Амелла",
+        "title": "Ткачиха лунного руна",
+        "greeting": "Чувствуешь? Лунное руно на станке. Теплее любого огня, у которого ты грелся."
       },
       "astronomer_cassian": {
-        "name": "Astronomer Cassian",
-        "title": "Watcher at the Vigil",
-        "greeting": "Hush now. The sky never dawns here, so it never stops talking either."
+        "name": "Астроном Кассиан",
+        "title": "Наблюдатель Стоячего Дозора",
+        "greeting": "Тише. Здесь небо не знает рассвета — потому оно и не умолкает ни на миг."
       },
       "lampman_cobb": {
-        "name": "Lampman Cobb",
-        "title": "Keeper of the Crowgate Lanterns",
-        "greeting": "Stay in the lamplight, friend. The wood counts everyone who passes the gate."
+        "name": "Фонарщик Кобб",
+        "title": "Хранитель фонарей Вороньих Врат",
+        "greeting": "Не выходи из света фонарей, друг. Лес считает каждого, кто минует врата."
       },
       "sexton_marrow": {
-        "name": "Sexton Marrow",
-        "title": "Sexton of Gallowmere",
-        "greeting": "We bury them deep here, and we ring the bells so they remember to stay down."
+        "name": "Пономарь Марроу",
+        "title": "Пономарь Гэллоумира",
+        "greeting": "Здесь мы хороним глубоко и звоним в колокола, чтобы мёртвые не забывали лежать смирно."
       },
       "widow_tansy": {
-        "name": "Widow Tansy",
-        "title": "Candlewright of Gallowmere",
-        "greeting": "A candle for every grave, and not one may go out. Not one, do you hear me?"
+        "name": "Вдова Пижма",
+        "title": "Свечница Гэллоумира",
+        "greeting": "По свече на каждую могилу, и ни одна не должна погаснуть. Ни одна, слышишь?"
       },
       "vicar_creel": {
-        "name": "Vicar Creel",
-        "title": "Last Vicar of the Mournstone",
-        "greeting": "The chapel fell years ago. The dead beneath it did not notice, and so I stayed."
+        "name": "Викарий Крил",
+        "title": "Последний викарий Скорбного Камня",
+        "greeting": "Часовня рухнула много лет назад. Мёртвые под ней этого не заметили — потому я и остался."
       },
       "strandwatcher_pell": {
-        "name": "Strandwatcher Pell",
-        "title": "Watcher of the Tanglemouth",
-        "greeting": "Out of the black trees at last. Breathe, stranger, the sun holds this side of the pass."
+        "name": "Береговой дозорный Пелл",
+        "title": "Дозорный Заросшего Устья",
+        "greeting": "Наконец-то из чёрных деревьев. Дыши, странник: по эту сторону прохода правит солнце."
       },
       "salvage_boss_ryna": {
-        "name": "Salvage-Boss Ryna",
-        "title": "Mistress of the Wreck Line",
-        "greeting": "A {className} with working arms, good. The wreck line pays well, if the crabs leave you enough fingers to count it."
+        "name": "Начальница добытчиков Рина",
+        "title": "Хозяйка полосы крушений",
+        "greeting": "Смотри-ка, {className} с крепкими руками — хорошо. Полоса крушений платит щедро, если крабы оставят тебе достаточно пальцев, чтобы пересчитать выручку."
       },
       "pearlmother_isha": {
-        "name": "Pearl-Mother Isha",
-        "title": "Elder of the Divers",
-        "greeting": "The sea gives, the sand keeps, and the jungle takes. Stay on the strand, stranger."
+        "name": "Мать-Жемчужница Иша",
+        "title": "Старейшина ныряльщиц",
+        "greeting": "Море даёт, песок хранит, а джунгли забирают. Держись берега, странник."
       },
       "hermit_okku": {
-        "name": "Okku",
-        "title": "The Man Who Went In",
-        "greeting": "Quiet now. The drums count everything that walks under the trees, and they have already counted you."
+        "name": "Окку",
+        "title": "Тот, кто вошёл в чащу",
+        "greeting": "Тихо. Барабаны считают всех, кто ходит под деревьями, — и тебя они уже сосчитали."
       },
       "gatewarden_pell": {
-        "name": "Gatewarden Pell",
-        "title": "Keeper of the Garden Gate",
-        "greeting": "Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy."
+        "name": "Привратник Пелл",
+        "title": "Хранитель Садовых Врат",
+        "greeting": "Поосторожнее на газонах. Сад сам их подстригает, и он любит порядок."
       },
       "head_gardener_amaranth": {
-        "name": "Head Gardener Amaranth",
-        "title": "Head Gardener of the Evergarden",
-        "greeting": "Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams."
+        "name": "Старшая садовница Амарант",
+        "title": "Старшая садовница Вечного Сада",
+        "greeting": "Не обращай внимания на тени у меня под глазами. Кто-то должен бодрствовать, пока сад видит сны."
       },
       "wickmother_sorrel": {
-        "name": "Wickmother Sorrel",
-        "title": "Keeper of the Hedgewick Inn",
-        "greeting": "Come in, sit, there is cordial on the fire. Just keep a hand on anything iron: the gnomes are light-fingered of late."
+        "name": "Матушка Соррел",
+        "title": "Хозяйка трактира Хеджвика",
+        "greeting": "Заходи, садись, на огне греется наливка. Только придерживай всё железное: гномы в последнее время на руку нечисты."
       },
       "gardener_yew": {
-        "name": "Gardener Yew",
-        "title": "The Last Gardener",
-        "greeting": "Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks."
+        "name": "Садовник Тис",
+        "title": "Последний садовник",
+        "greeting": "Подай-ка мне ту тачку, будь добр. Газоны сами себя не обходят, что бы там ни думали в деревне."
       },
       "watcher_maren": {
-        "name": "Watcher Maren",
-        "title": "The Windway Watch",
-        "greeting": "Mind your footing past the gate. The wind up here takes hats first and questions never."
+        "name": "Дозорный Марен",
+        "title": "Дозор Ветрового Прохода",
+        "greeting": "Смотри под ноги за воротами. Здешний ветер сперва забирает шляпы, а вопросов не задаёт вовсе."
       },
       "harbormaster_odile": {
-        "name": "Harbormaster Odile",
-        "title": "Harbormaster of Wickharbor",
-        "greeting": "Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will not wait."
+        "name": "Начальница гавани Одиль",
+        "title": "Начальница гавани Викхарбора",
+        "greeting": "Каждая лодка в этой бухте обязана килем Старому Маяку. Говори быстрее — прилив ждать не станет."
       },
       "keeper_bram": {
-        "name": "Keeper Bram",
-        "title": "Keeper of the Old Beacon",
-        "greeting": "Nine and thirty years this lamp has burned on my watch. It will not go dark on yours."
+        "name": "Смотритель Брам",
+        "title": "Смотритель Старого Маяка",
+        "greeting": "Тридцать девять лет эта лампа горит на моей вахте. На твоей она не погаснет."
       },
       "salvager_edda": {
-        "name": "Salvager Edda",
-        "title": "Wreckfield Salvager",
-        "greeting": "Wreckwood, rope, and dead men's cargo. The sea pays my wage, when the Warden lets it."
+        "name": "Добытчица Эдда",
+        "title": "Добытчица Полей Кораблекрушений",
+        "greeting": "Корабельный лес, канаты да груз мертвецов. Море платит мне жалованье — когда Страж позволяет."
       },
       "warden_coalfast": {
         "name": "Смотритель Хладоуголь",
@@ -11834,32 +11834,32 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_hollow_the_huntsman": {
-        "title": "The Warden of the Herds",
-        "text": "You look like someone who can handle more than wisps, {playerName}. Huntsman Deral keeps his lookout among the stag meadows east of here, and he has been asking after capable hands for weeks. Whatever he is tracking out there, he will not say it aloud in the village.",
-        "completion": "Fenna sent you? Good. Then she trusts you, and I have two names that need crossing out.",
+        "title": "Смотритель стад",
+        "text": "Ты, похоже, из тех, кому по плечу не только огоньки, {playerName}. Охотник Дерал держит дозор среди оленьих лугов к востоку отсюда и уже которую неделю спрашивает про умелые руки. Что бы он там ни выслеживал, вслух в деревне он этого не скажет.",
+        "completion": "Тебя прислала Фенна? Хорошо. Значит, она тебе доверяет, а у меня есть два имени, которые надо вычеркнуть.",
         "objectives": {
           "0": {
-            "label": "Find Huntsman Deral"
+            "label": "Найдите охотника Дерала"
           }
         }
       },
       "q_hollow_old_marrowshell": {
-        "title": "The Old Shell of the Shallows",
-        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldergleam had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
-        "completion": "The shallows are just water again. I have watched that shell break better hunters than me, {playerName}. Not you.",
+        "title": "Старый панцирь отмелей",
+        "text": "Первое имя — Старый Костнопанцирь, краб размером с повозку, что охотится в восточных отмелях с тех пор, когда у Элдерглима ещё не было ворот. Он бродит, {playerName}, так что придётся идти вдоль берега, пока не пересечёшь его след. Не ходи в одиночку и не верь его неподвижности.",
+        "completion": "Отмели снова стали просто водой. Я видел, как этот панцирь ломал охотников получше меня, {playerName}. Но не тебя.",
         "objectives": {
           "0": {
-            "label": "Old Marrowshell slain"
+            "label": "Старый Костнопанцирь убит"
           }
         }
       },
       "q_hollow_first_of_the_herd": {
-        "title": "First of the Herd",
-        "text": "The second name is harder to say. Aurelhorn led these herds when my grandmother kept this lookout, and whatever woke in the Hollow woke him wrong. He tramples what he once warded, and the herd will not survive his madness. He roams the meadows near the old court roads. End him with mercy, {playerName}, and bring a friend to share the weight of it.",
-        "completion": "So the First falls to the last. The herd is already calmer, do you feel it? You did the Hollow a kindness today, even if it does not look like one.",
+        "title": "Первый в стаде",
+        "text": "Второе имя выговорить труднее. Аурелхорн водил эти стада, когда этот дозор держала моя бабка, и то, что проснулось в Лощине, разбудило его неправильно. Он топчет то, что прежде оберегал, и стаду не пережить его безумия. Он бродит по лугам у старых дворовых дорог. Оборви его муку милосердно, {playerName}, и возьми друга, чтобы разделить эту ношу.",
+        "completion": "Вот и пал Первый — от руки последнего. Стадо уже спокойнее, чувствуешь? Сегодня ты оказал Лощине милость, даже если она на милость не похожа.",
         "objectives": {
           "0": {
-            "label": "Aurelhorn given peace"
+            "label": "Аурелхорн обрёл покой"
           }
         }
       },
@@ -11874,912 +11874,912 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_fv_snowline_report": {
-        "title": "Word from the Snowline",
-        "text": "Every soul who climbs out of the Drakelands passes my fire, {playerName}, and fewer climb every week. Warden Kaldra holds Icemantle up the north road. Tell her the pass is still open, and tell her a stranger walked it alone.",
-        "completion": "The pass holds, then. Einna sits that waycamp through storms that bury the road markers, and she has never once sent me idle news. Welcome to Icemantle, {playerName}.",
+        "title": "Весть со Снеговой Тропы",
+        "text": "Каждая душа, что выбирается из Земель Драконов, проходит мимо моего костра, {playerName}, и с каждой неделей таких всё меньше. Смотрительница Калдра держит Ледяную Мантию выше по северной дороге. Скажи ей, что перевал ещё открыт, и скажи, что его в одиночку прошёл чужак.",
+        "completion": "Значит, перевал держится. Эйнна высиживает в том путевом лагере бури, что хоронят дорожные вехи, и ни разу не прислала мне пустой вести. Добро пожаловать в Ледяную Мантию, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Report to Warden Kaldra"
+            "label": "Доложите Смотрительнице Калдре"
           }
         }
       },
       "q_fv_wolves_at_the_door": {
-        "title": "Wolves at the Door",
-        "text": "The snowdrift packs used to keep to the high benches. Now they cross the tarn road in daylight and my woodcutters will not leave the walls. Thin the packs, {playerName}, ten of them, and the road is a road again.",
-        "completion": "Ten fewer shadows between here and the tarn. The woodcutters are already arguing over who goes out first.",
+        "title": "Волки у порога",
+        "text": "Сугробные стаи прежде держались верхних уступов. Теперь они переходят озёрную дорогу средь бела дня, и мои дровосеки не выходят за стены. Прореди стаи, {playerName}, десятерых хватит, — и дорога снова станет дорогой.",
+        "completion": "На десять теней меньше между нами и Ледниковым озером. Дровосеки уже спорят, кто выйдет первым.",
         "objectives": {
           "0": {
-            "label": "Snowdrift Wolf slain"
+            "label": "Сугробный волк убит"
           }
         }
       },
       "q_fv_winter_pelts": {
-        "title": "Pelts for the Lodge",
-        "text": "Firewood keeps a body alive, {playerName}, but wool will not turn this cold, only wolf-fur will. Six thick winter pelts off the snowdrift packs and I can line bedrolls for everyone the lodge shelters.",
-        "completion": "Fur like this is the only argument winter listens to. Take these treads, they are lined with the last batch.",
+        "title": "Шкуры для дома",
+        "text": "Дрова держат тело живым, {playerName}, но этот холод не остановить шерстью — только волчьим мехом. Шесть плотных зимних шкур с сугробных стай, и я подобью постели всем, кого приютил Очажный дом.",
+        "completion": "Такой мех — единственный довод, к которому прислушивается зима. Возьми эти боты, они подбиты последней партией.",
         "objectives": {
           "0": {
-            "label": "Thick Winter Pelt"
+            "label": "Плотная зимняя шкура"
           }
         }
       },
       "q_fv_ember_caches": {
-        "title": "Embers on the Tarn Road",
-        "text": "A sledge of ember caches overturned on the tarn road in last night: iron kettles that hold a banked fire alive for a month. Three of them are still lying in the snow, {playerName}, and the lodge cannot spare what they hold. Bring the fire home.",
-        "completion": "Still warm, every one. You have bought the lodge a whole winter of mercy, {playerName}.",
+        "title": "Угли на озёрной дороге",
+        "text": "Этой ночью на озёрной дороге перевернулись сани с запасами углей: железные котелки, что месяц хранят прикрытый жар живым. Три из них так и лежат в снегу, {playerName}, а дому не пережить потери того, что в них тлеет. Верни огонь домой.",
+        "completion": "Всё ещё тёплые, все до единого. Ты купил этому дому целую зиму милосердия, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ember Cache recovered"
+            "label": "Запас углей возвращён"
           }
         }
       },
       "q_fv_lights_over_steps": {
-        "title": "Lights over the Steps",
-        "text": "The aurora has burned green every night this month, and the old folk will not walk under it. One woman might know why: Veyla, the Aurorist. She camps alone on the Aurora Steps, southeast past the tarn. Find her camp, {playerName}, and hear what the lights have told her.",
-        "completion": "Kaldra sent you? Then she is finally worried, and she is right to be. Sit, {playerName}. Watch the sky with me a while.",
+        "title": "Огни над Ступенями",
+        "text": "Весь этот месяц сияние каждую ночь горит зелёным, и старики не хотят ходить под ним. Одна женщина может знать почему: Вейла, чтица сияния. Она стоит одна на Ступенях Сияния, к юго-востоку за озером. Найди её лагерь, {playerName}, и услышь, что рассказали ей огни.",
+        "completion": "Тебя прислала Калдра? Значит, она наконец встревожилась — и не зря. Сядь, {playerName}. Посмотри со мной на небо.",
         "objectives": {
           "0": {
-            "label": "Find Aurorist Veyla"
+            "label": "Найдите чтицу сияния Вейлу"
           }
         }
       },
       "q_fv_silent_trapline": {
-        "title": "The Silent Trapline",
-        "text": "Old Brosk works the Shiverfen trapline west of here, and every week for eleven years he has sent a bundle of furs up with the wood sledge. Two weeks now, nothing. He is too stubborn to freeze and too careful to drown, {playerName}, so something else is wrong. Find his camp at the fen and see him breathing.",
-        "completion": "Maeve sent you? Ha. Eleven years and the woman still thinks the fen will eat me. Well... this year she might be right. Look at what it's done to my lines.",
+        "title": "Умолкшая ловчая линия",
+        "text": "Старый Броск держит ловчие линии Дрожащей топи к западу отсюда, и каждую неделю все одиннадцать лет он отправлял с дровяными санями связку мехов. Уже две недели — ничего. Он слишком упрям, чтобы замёрзнуть, и слишком осторожен, чтобы утонуть, {playerName}, — стало быть, стряслось что-то иное. Найди его лагерь у топи и убедись, что он дышит.",
+        "completion": "Тебя прислала Мейв? Ха. Одиннадцать лет — а она всё думает, что топь меня съест. Что ж... в этом году она может оказаться права. Посмотри, что стало с моими линиями.",
         "objectives": {
           "0": {
-            "label": "Find Trapper Brosk"
+            "label": "Найдите зверолова Броска"
           }
         }
       },
       "q_fv_aurora_motes": {
-        "title": "Motes of the Aurora",
-        "text": "The wisps that drift these steps are shed by the lights themselves, and each carries a mote of the aurora in its heart. I need six to read what the sky is writing, {playerName}. The wisps do not fight back. Whether that makes the work easier or harder is between you and your conscience.",
-        "completion": "Six motes, still glowing. Look at them, {playerName}: they pulse in time with each other. The lights are not weather. They are a signal.",
+        "title": "Пылинки сияния",
+        "text": "Огоньки, что плывут над этими ступенями, роняет само сияние, и каждый несёт в сердце его пылинку. Мне нужно шесть, чтобы прочесть, что пишет небо, {playerName}. Огоньки не сопротивляются. Легче от этого работа или тяжелее — решать тебе и твоей совести.",
+        "completion": "Шесть пылинок, и все ещё светятся. Взгляни на них, {playerName}: они пульсируют в лад друг с другом. Сияние — не погода. Сияние — это сигнал.",
         "objectives": {
           "0": {
-            "label": "Aurora Mote"
+            "label": "Пылинка сияния"
           }
         }
       },
       "q_fv_rime_unbound": {
-        "title": "Rime Unbound",
-        "text": "When the aurora burns this bright, the cold stands up and walks: rime elementals, frost given a will. They gather where the lights touch the benches, and they are wandering closer to my camp each night. Break eight of them apart, {playerName}, before one of them breaks me.",
-        "completion": "The night feels thinner already. Whatever wakes them is not done, but you have bought the Steps some quiet.",
+        "title": "Иней на воле",
+        "text": "Когда сияние горит так ярко, холод встаёт и идёт: инеевые элементали, мороз, обретший волю. Они собираются там, где огни касаются уступов, и каждую ночь подбираются всё ближе к моему лагерю. Разбей восьмерых, {playerName}, пока один из них не разбил меня.",
+        "completion": "Ночь уже стала тоньше. То, что их будит, ещё не закончило, но ты выторговал Ступеням немного тишины.",
         "objectives": {
           "0": {
-            "label": "Rime Elemental slain"
+            "label": "Инеевый элементаль убит"
           }
         }
       },
       "q_fv_sprung_traps": {
-        "title": "Sprites in the Traps",
-        "text": "Fen sprites, {playerName}. The little devils spring my traps for sport and scatter the iron in the reeds. Drive them off, eight should teach the rest, and gather up what is left of my traplines while you are out there.",
-        "completion": "Four good traps back and the reeds gone quiet. You trap with a heavier hand than I do, {playerName}, but I cannot argue with the results.",
+        "title": "Духи в капканах",
+        "text": "Топяные духи, {playerName}. Чертенята забавы ради захлопывают мои капканы и раскидывают железо по камышам. Прогони их — восьмерых хватит, чтобы наука дошла до остальных, — и собери, что осталось от моих ловчих линий, раз уж будешь там.",
+        "completion": "Четыре добрых капкана на месте, и в камышах стало тихо. Ставишь ты их тяжелее моего, {playerName}, но с итогом не поспоришь.",
         "objectives": {
           "0": {
-            "label": "Fen Sprite driven off"
+            "label": "Топяной дух прогнан"
           },
           "1": {
-            "label": "Trap recovered"
+            "label": "Капкан возвращён"
           }
         }
       },
       "q_fv_howl_above": {
-        "title": "The Howl on the Terraces",
-        "text": "You hear it at dusk, {playerName}: a howl off the Howling Terraces that is not the snowdrift packs. Bigger throats. The terrace howlers have come down from the peaks for the first time since my grandmother held this post, and they are what pushed the wolves onto my road. Cull eight and push them back.",
-        "completion": "Eight, and the dusk chorus is thinner for it. But howlers do not leave the peaks for nothing. Something up there moved them, and I fear it has a name.",
+        "title": "Вой на террасах",
+        "text": "Ты слышишь его в сумерках, {playerName}: вой с Воющих террас, и это не сугробные стаи. Глотки крупнее. Террасные ревуны спустились с вершин впервые с тех пор, как этот пост держала моя бабка, и это они согнали волков на мою дорогу. Истреби восьмерых и оттесни их назад.",
+        "completion": "Восемь — и сумеречный хор стал жиже. Но ревуны не покидают вершин просто так. Что-то их согнало, и я боюсь, что у этого есть имя.",
         "objectives": {
           "0": {
-            "label": "Terrace Howler slain"
+            "label": "Террасный ревун убит"
           }
         }
       },
       "q_fv_seeing_wren_home": {
-        "title": "Seeing Wren Home",
-        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers southwest of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
-        "completion": "The girl is inside, wrapped in half my blankets and talking the stars out of the sky. You did a kind thing today, {playerName}. The Reach doesn't see many of those.",
+        "title": "Проводить Рен домой",
+        "text": "Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к юго-западу от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.",
+        "completion": "Девочка внутри, закутана в половину моих одеял и болтает так, что звёзды с неба сыплются. Ты сделал сегодня доброе дело, {playerName}. Предел таких видит немного.",
         "objectives": {
           "0": {
-            "label": "Apprentice Wren seen safely to the Aurora Steps"
+            "label": "Ученица Рен благополучно доведена до Ступеней Сияния"
           }
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "The Frostmane Tyrant",
-        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Frostmane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
-        "completion": "When the wind dropped last night the whole village heard the silence where the Frostmane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
+        "title": "Тиран Морозная Грива",
+        "text": "Ревуны не охотились, когда спускались по террасам. Они бежали. Высоты забрал себе йети — горный люд зовёт его Морозной Гривой, — и даже стаи не делят с ним склона. С этим надо покончить, {playerName}, пока зима не согнала его к моим стенам. Возьми друга. А лучше двух.",
+        "completion": "Когда этой ночью стих ветер, вся деревня услышала тишину там, где раньше была Морозная Грива. Предел в долгу перед тобой, и платить его будут годами, {playerName}. Носи это — и каждая дверь в Ледяной Мантии открыта для тебя.",
         "objectives": {
           "0": {
-            "label": "The Frostmane slain"
+            "label": "Морозная Грива убита"
           }
         }
       },
       "q_dk_ash_on_the_wind": {
-        "title": "Ash on the Wind",
-        "text": "Look south off the palisade, {playerName}. Those fires in the dunes are not troll cookfires, they are ashbone musters, and every night there are more. The dead come up out of the bonefields with sand still in their teeth. Cut down ten raiders before they cut a road to my gate.",
-        "completion": "Ten fewer blades in the dunes, and the muster fires burned lower last night. My sentries slept, which they have not done in a week. Well cut, {playerName}.",
+        "title": "Пепел на ветру",
+        "text": "Взгляни на юг с частокола, {playerName}. Огни в дюнах — это не костры троллей, это пеплокостные сборы, и с каждой ночью их всё больше. Мёртвые встают из костяных полей с песком на зубах. Сруби десять налётчиков, пока они не прорубили дорогу к моим воротам.",
+        "completion": "В дюнах на десять клинков меньше, и этой ночью огни сборов горели тусклее. Мои часовые выспались — впервые за неделю. Чистая работа, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ashbone Raider slain"
+            "label": "Пеплокостный налётчик убит"
           }
         }
       },
       "q_dk_trolls_on_the_road": {
-        "title": "Trolls on the Road",
-        "text": "The dune trolls have learned the sound of a supply wagon, {playerName}. They hit the Cinder Dunes road three times this month, and the last driver walked in carrying nothing but the reins. Eight trolls off that road and my wagons roll again.",
-        "completion": "Eight, and my drivers have stopped writing farewell letters before every run. The garrison eats because of you, {playerName}.",
+        "title": "Тролли на дороге",
+        "text": "Дюнные тролли выучили, как звучит обозная повозка, {playerName}. За этот месяц они трижды нападали на дороге Пепельных дюн, и последний возница пришёл пешком, неся одни лишь поводья. Убери восемь троллей с той дороги — и мои повозки снова покатятся.",
+        "completion": "Восемь — и мои возницы перестали писать прощальные письма перед каждым рейсом. Гарнизон ест благодаря тебе, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Dune Troll slain"
+            "label": "Дюнный тролль убит"
           }
         }
       },
       "q_dk_scorched_stores": {
-        "title": "Scorched Stores",
-        "text": "The last wagon burned, {playerName}, but iron-strapped crates do not burn through. Four of them are still lying scorched along the dunes road with a season of salt, nails, and bowstrings inside. Bring my stores home before the trolls work out how to open them.",
-        "completion": "Scorched black and every latch still holding. The smith gets his nails, the fletcher her strings, and you get the boots I was saving for whoever brought my crates back, {playerName}.",
+        "title": "Обгоревшие припасы",
+        "text": "Последний обоз сгорел, {playerName}, но окованные железом ящики насквозь не прогорают. Четыре из них так и лежат, обугленные, вдоль дороги через дюны, а внутри — соль, гвозди и тетивы на целый сезон. Верни мои припасы домой, пока тролли не додумались, как их открыть.",
+        "completion": "Обгорели дочерна, а все запоры держат. Кузнец получит свои гвозди, лучница — тетивы, а ты — сапоги, что я приберегала для того, кто вернёт мои ящики, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Scorched supply crate recovered"
+            "label": "Обгоревший ящик с припасами возвращён"
           }
         }
       },
       "q_dk_banners_over_the_dunes": {
-        "title": "Banners over the Dunes",
-        "text": "The ashbone muster at the old bonefield graves, {playerName}, and my patrols cannot read the dunes the way they read a wall. Kill five of their warcallers, the ones that scream the dead upright, and plant a warning banner on each muster ground so my sentries can mark it from the ridge.",
-        "completion": "Three banners snapping in the hot wind, right where my glass can find them. With five warcallers silenced, whatever answers their call will come slower. You bought us time, {playerName}.",
+        "title": "Знамёна над дюнами",
+        "text": "Пеплокостные собираются у старых могил костяных полей, {playerName}, а мои дозоры читают дюны хуже, чем стену. Убей пятерых их горлопанов — тех, что криком поднимают мёртвых, — и водрузи на каждом месте сбора предупредительное знамя, чтобы часовые могли отметить его с гребня.",
+        "completion": "Три знамени хлопают на горячем ветру — ровно там, где их найдёт моя подзорная труба. Пять горлопанов умолкли, и то, что отзывается на их зов, придёт медленнее. Ты выиграл нам время, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ashbone Warcaller slain"
+            "label": "Пеплокостный горлопан убит"
           },
           "1": {
-            "label": "Warning banner planted"
+            "label": "Предупредительное знамя водружено"
           }
         }
       },
       "q_dk_watcher_at_the_wargate": {
-        "title": "The Watcher at the Wargate",
-        "text": "Something is pulling the ashbone east, {playerName}, and I sent my best to learn what. Scout Yerrin has camped a month in the far dunes past Trollmoot, in sight of a gate nobody built in my lifetime. Her reports stopped ten days ago. Find her camp and get me her eyes.",
-        "completion": "Brannoc sent you? Then my last runner never made it. Keep your voice down and sit, {playerName}. You see that gate below? Count the war-banners in front of it, and you will understand why I stopped writing things down.",
+        "title": "Дозорная у Врат войны",
+        "text": "Что-то тянет пеплокостных на восток, {playerName}, и я послал лучшую из моих разведчиц узнать, что именно. Разведчица Йеррин уже месяц стоит лагерем в дальних дюнах за Тролльмутом, в виду врат, которых на моём веку никто не строил. Десять дней назад её донесения оборвались. Найди её лагерь и добудь мне её глаза.",
+        "completion": "Тебя прислал Браннок? Значит, мой последний гонец так и не дошёл. Говори тише и сядь, {playerName}. Видишь врата внизу? Сосчитай боевые знамёна перед ними — и поймёшь, почему я перестала вести записи.",
         "objectives": {
           "0": {
-            "label": "Find Scout Yerrin"
+            "label": "Найдите разведчицу Йеррин"
           }
         }
       },
       "q_dk_marrow_and_ash": {
-        "title": "Marrow and Ash",
-        "text": "Every ashbone raider carries a war-brand, {playerName}: a scorched tally of the host it marches under. I have counted four hosts from this ridge, but guesses are not intelligence. Bring me six brands off the raiders and their warcallers, and I will give Brannoc the shape of the war that is coming.",
-        "completion": "Six brands, and one mark burned into every one of them. This is no raid muster, {playerName}. Every host in the dunes answers to the wargate below us, the trolls call it Orkadia, and no five soldiers I ever served with could break what drums behind that door. Perhaps five like you.",
+        "title": "Кость и пепел",
+        "text": "Каждый пеплокостный налётчик носит боевое клеймо, {playerName}: обожжённую метку войска, под которым он идёт. С этого гребня я насчитала четыре войска, но догадки — не разведданные. Принеси мне шесть клейм с налётчиков и их горлопанов, и я покажу Бранноку очертания грядущей войны.",
+        "completion": "Шесть клейм — и на каждом выжжен один и тот же знак. Это не сбор для набега, {playerName}. Каждое войско в дюнах подчиняется вратам войны под нами — тролли зовут их Оркадией, — и никакая пятёрка солдат из тех, с кем я служила, не сломила бы то, что грохочет за той дверью. Разве что пятёрка таких, как ты.",
         "objectives": {
           "0": {
-            "label": "Ashbone War-Brand"
+            "label": "Пеплокостное боевое клеймо"
           }
         }
       },
       "q_dk_scales_of_the_maw": {
-        "title": "Scales of the Maw",
-        "text": "When the wind turns off the Drakemaw, the emberwing drakes ride it over my camp low enough to count their teeth, {playerName}. They range farther every day, and something in that crater drives them. Bring me three of their scales. Scales remember heat, and I can read where a drake has been roosting by the burn.",
-        "completion": "Look at the underside of this one, {playerName}: scorched in a spiral, and only one thing nests in circles. These drakes are brood-guards. Something in the Drakemaw is a mother.",
+        "title": "Чешуя Дрейкмо",
+        "text": "Когда ветер задувает со стороны Дрейкмо, углекрылые дрейки проносятся над моим лагерем так низко, что можно пересчитать им зубы, {playerName}. С каждым днём они залетают всё дальше, и что-то в том кратере их гонит. Принеси мне три их чешуйки. Чешуя помнит жар, и по ожогу я прочту, где дрейк устроил гнездовье.",
+        "completion": "Взгляни на испод этой, {playerName}: опалён по спирали, а кругами гнездится только одно. Эти дрейки — стражи выводка. В Дрейкмо кто-то стал матерью.",
         "objectives": {
           "0": {
-            "label": "Emberwing Scale"
+            "label": "Чешуйка углекрылого дрейка"
           }
         }
       },
       "q_dk_matriarch_of_the_maw": {
-        "title": "Matriarch of the Maw",
-        "text": "The scales told it true, {playerName}. I climbed the rim at dawn and saw her on the crater floor: Cindraleth, the matriarch every emberwing in this sky was hatched under, gold as a coal about to catch. While she broods, the drakes grow bolder, and Wyrmwatch cannot fight dragons and the ashbone both. End her in her crater, then carry the word to Gatecaptain Brannoc. Do not go alone.",
-        "completion": "The sky over the Drakemaw has been empty for two days, and now you walk through my gate with a matriarch's blood on your boots. Wyrmwatch has stood forty years on watch for exactly this, {playerName}. Take these pauldrons, mawscale, worked by our own smith. Wear them where the drakes can see.",
+        "title": "Матриарх Дрейкмо",
+        "text": "Чешуя не солгала, {playerName}. На рассвете я поднялась на кромку и увидела её на дне кратера: Синдралет, матриарх, под которой вылупился каждый углекрылый в этом небе, золотая, как уголь за миг до вспышки. Пока она сидит на кладке, дрейки наглеют, а Змеиный дозор не может воевать разом и с драконами, и с пеплокостными. Покончи с ней в её кратере, а затем отнеси весть капитану врат Бранноку. Не ходи в одиночку.",
+        "completion": "Небо над Дрейкмо пустует уже два дня — и вот ты входишь в мои ворота с кровью матриарха на сапогах. Сорок лет Змеиный дозор стоял на страже именно ради этого, {playerName}. Возьми эти наплечники из чешуи Дрейкмо, работы нашего же кузнеца. Носи их там, где их увидят дрейки.",
         "objectives": {
           "0": {
-            "label": "Cindraleth the Maw Matriarch slain"
+            "label": "Синдралет, Матриарх Дрейкмо, убита"
           }
         }
       },
       "q_af_goldmelt_road": {
-        "title": "The Gold Road Down",
-        "text": "You came over the Goldmelt, {playerName}, snow still on your boots. I keep this shrine so Lanternmere knows who walks in from the cold, and lately I have had little to report. Take the gold road down to the town, find Reeve Ottoline by the well, and tell her the pass is quiet.",
-        "completion": "Quiet on the Goldmelt, and a traveler with snow in their hair to prove it. Sorrel keeps her watch too well to send idle word. Be welcome in Lanternmere, {playerName}. The lanterns burn for you.",
+        "title": "Золотая дорога вниз",
+        "text": "Ты перешёл Золотую Проталину, {playerName}, — на сапогах ещё снег. Я держу это святилище, чтобы Лантанмир знал, кто приходит с холода, а докладывать в последнее время было нечего. Спустись по золотой дороге в город, найди старосту Оттолину у колодца и передай ей, что на перевале тихо.",
+        "completion": "На Золотой Проталине тихо — и вот путник со снегом в волосах тому порукой. Соррел несёт дозор слишком исправно, чтобы слать пустые вести. Добро пожаловать в Лантанмир, {playerName}. Фонари горят для тебя.",
         "objectives": {
           "0": {
-            "label": "Report to Reeve Ottoline"
+            "label": "Доложите старосте Оттолине"
           }
         }
       },
       "q_af_foxes_in_the_lamplight": {
-        "title": "Foxes in the Lamplight",
-        "text": "The gloam foxes have learned what the lantern stores are worth, {playerName}. Every dusk they slip the fences and carry off the tallow we press for the ferry lamps. Soft paws, softer conscience. Cull ten of them and the rest will remember to fear the town.",
-        "completion": "Ten, and the stores went untouched last night for the first time this season. The lamplighters send their thanks, {playerName}.",
+        "title": "Лисы в свете фонарей",
+        "text": "Сумеречные лисы поняли, чего стоят фонарные припасы, {playerName}. Каждый вечер они проскальзывают за ограду и таскают сало, что мы топим для паромных ламп. Мягкие лапы — и совесть ещё мягче. Истреби десяток, и остальные вспомнят, что города надо бояться.",
+        "completion": "Десять — и этой ночью припасы впервые за сезон остались нетронуты. Фонарщики шлют тебе благодарность, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Gloam Fox slain"
+            "label": "Сумеречный лис убит"
           }
         }
       },
       "q_af_lanterns_on_the_water": {
-        "title": "Lanterns on the Water",
-        "text": "Every ferry on the Mere carries a stern lantern, {playerName}, and three of my boats came back at dawn without theirs. The fog took them, or something in the fog did. They wash up along the east shore when the wind turns. Walk the shore road and bring my lanterns home.",
-        "completion": "All three, and still burning. Ferry lanterns do not go out in water, {playerName}. That is the point of them. What worries me is what pulled them loose.",
+        "title": "Фонари на воде",
+        "text": "Каждый паром на Великом озере несёт кормовой фонарь, {playerName}, а три мои лодки вернулись на рассвете без них. Их забрал туман — или что-то в тумане. Когда ветер меняется, их выносит на восточный берег. Пройди по прибрежной дороге и верни мои фонари домой.",
+        "completion": "Все три — и всё ещё горят. Паромные фонари не гаснут в воде, {playerName}. На то они и сделаны. Меня тревожит другое: что их сорвало.",
         "objectives": {
           "0": {
-            "label": "Ferry Lantern recovered"
+            "label": "Паромный фонарь возвращён"
           }
         }
       },
       "q_af_orchard_call": {
-        "title": "A Cart for the Orchard",
-        "text": "Orchardist Pomeline keeps the Gilded Orchard on the west road, and her sap carts are three days overdue. The whole town runs on that amber sap, {playerName}: lamp resin, sweetening, the harvest ale. Walk the west road and find out what keeps her.",
-        "completion": "The Reeve counts her carts, does she? Well, she can count them missing a while longer. Look at my rows, {playerName}. I have greater troubles than a late delivery.",
+        "title": "Повозка для сада",
+        "text": "Садовница Помелина держит Золочёный сад у западной дороги, и её повозки с живицей запаздывают уже на три дня. Весь город живёт этой янтарной живицей, {playerName}: смола для ламп, подсластка, жатвенный эль. Пройди по западной дороге и выясни, что её задержало.",
+        "completion": "Староста считает свои повозки, вот как? Что ж, пусть ещё немного посчитает их пропавшими. Взгляни на мои ряды, {playerName}. У меня беды посерьёзнее запоздалой поставки.",
         "objectives": {
           "0": {
-            "label": "Find Orchardist Pomeline"
+            "label": "Найдите садовницу Помелину"
           }
         }
       },
       "q_af_amber_from_the_herd": {
-        "title": "Amber off the Herd",
-        "text": "The gilded stags bed down beneath my oldest trees, and the sap drips gold into their coats all night. Combed clots of it are the purest amber in the weald. Bring me six, {playerName}. The stags will not thank you, but they will not miss it either.",
-        "completion": "Six clots, clean as poured honey. These gloves are stitched with the last batch, {playerName}: sap-stiffened, and warmer than they look.",
+        "title": "Янтарь со стада",
+        "text": "Золочёные олени ложатся на ночлег под моими старейшими деревьями, и живица всю ночь капает золотом им в шерсть. Вычесанные сгустки — чистейший янтарь во всей округе. Принеси мне шесть, {playerName}. Олени спасибо не скажут, но и убыли не заметят.",
+        "completion": "Шесть сгустков, чистых, как литой мёд. Эти рукавицы прошиты прошлой партией, {playerName}: живица держит их жёсткими, а греют они лучше, чем кажется.",
         "objectives": {
           "0": {
-            "label": "Gilded Sap Clot"
+            "label": "Сгусток золочёной живицы"
           }
         }
       },
       "q_af_what_took_the_moorings": {
-        "title": "What Took the Moorings",
-        "text": "Now I will tell you what I did not say in front of the town. The moorings were not slipped, they were bitten through. Mere lurkers, bolder every night, dragging at the ropes and the rudders. Put eight of them back under the water for good, {playerName}, before a ferryman goes with them.",
-        "completion": "Eight fewer shapes in the shallows, and the crossing ran on time today for the first time in a fortnight. But bold lurkers are driven lurkers, {playerName}. Something beneath the Mere is moving them.",
+        "title": "Что забрало швартовы",
+        "text": "А теперь я скажу то, чего не сказал при всём городе. Швартовы не соскользнули — их перекусили. Озёрные скрытни, что наглеют с каждой ночью, тянут за канаты и рули. Отправь восьмерых обратно под воду навсегда, {playerName}, пока следом не ушёл кто-нибудь из паромщиков.",
+        "completion": "На восемь теней в отмелях меньше, и сегодня переправа впервые за две недели прошла по расписанию. Но наглый скрытень — это гонимый скрытень, {playerName}. Что-то под гладью озера гонит их наверх.",
         "objectives": {
           "0": {
-            "label": "Mere Lurker slain"
+            "label": "Озёрный скрытень убит"
           }
         }
       },
       "q_af_sprites_and_spigots": {
-        "title": "Sprites and Spigots",
-        "text": "Harvest sprites, {playerName}. They pry my sap-taps from the trunks for the sweetness inside and fling the buckets into the grass. Drive off eight of the little thieves and bring back four of my buckets, and the carts roll again.",
-        "completion": "Four buckets back on their hooks and the rows gone quiet. You have a heavier hand with sprites than I do, {playerName}, and today I am glad of it.",
+        "title": "Духи и краники",
+        "text": "Жатвенные духи, {playerName}. Они выковыривают мои краники из стволов ради сладости внутри, а вёдра швыряют в траву. Прогони восьмерых маленьких воришек и верни четыре моих ведёрка — и повозки снова покатятся.",
+        "completion": "Четыре ведёрка снова на крюках, и в рядах стало тихо. Рука у тебя с духами тяжелее моей, {playerName}, и сегодня я этому рада.",
         "objectives": {
           "0": {
-            "label": "Harvest Sprite driven off"
+            "label": "Жатвенный дух прогнан"
           },
           "1": {
-            "label": "Sap-Tap Bucket recovered"
+            "label": "Ведёрко для живицы возвращено"
           }
         }
       },
       "q_af_the_meredark": {
-        "title": "The Meredark",
-        "text": "The old ferrymen have a name they only say ashore: the Meredark, the first lurker, old as the lake and twice as patient. It rose once before, the year the drowned jetty went under, and it is rising now. At dusk it suns itself on the jetty ruin off the south shore, {playerName}. Take a friend, take two, and end it while it can still be ended.",
-        "completion": "The fog lifted off the Mere this morning, {playerName}, and the whole town saw it. The ferries will run the night crossing again, and every lantern on the water will burn in your name. Take this: it was dredged from the drowned jetty, and no one has better right to wear it.",
+        "title": "Озёрный Мрак",
+        "text": "У старых паромщиков есть имя, которое произносят только на берегу: Озёрный Мрак — первый из скрытней, старый, как само озеро, и вдвое терпеливее. Однажды он уже поднимался — в тот год, когда ушла под воду затонувшая пристань, — и теперь поднимается снова. В сумерках он греется на руинах пристани у южного берега, {playerName}. Возьми друга, а лучше двух, и покончи с ним, пока с ним ещё можно покончить.",
+        "completion": "Этим утром туман сошёл с Великого озера, {playerName}, и весь город это видел. Паромы снова пойдут ночным рейсом, и каждый фонарь на воде будет гореть в твою честь. Возьми: её подняли со дна у затонувшей пристани, и ни у кого нет больше прав её носить.",
         "objectives": {
           "0": {
-            "label": "The Meredark slain"
+            "label": "Озёрный Мрак убит"
           }
         }
       },
       "q_wf_across_the_fenway": {
-        "title": "Across the Fenway",
-        "text": "A gentle country, the Willowfen, but gentle is not the same as safe, {playerName}. Follow the road north to the Fenway causeway and cross into Bridgemere. Tell Bridgewright Alden the Steps are open and the waycamp fire is lit.",
-        "completion": "Pell keeps that fire burning through every fog the fen can breathe at her. If she says the Steps are open, they are open. Welcome to Bridgemere, {playerName}. Watch your step on my planks and we will get along fine.",
+        "title": "Через Топяную гать",
+        "text": "Мягкий край эта Ивовая Топь, но мягкий — не значит безопасный, {playerName}. Иди по дороге на север к Топяной гати и переходи в Бриджмир. Скажи мостовщику Олдену, что Ступени открыты и что костёр путевого лагеря горит.",
+        "completion": "Пелл держит тот костёр сквозь любой туман, каким топь на неё дышит. Если она говорит, что Ступени открыты, — они открыты. Добро пожаловать в Бриджмир, {playerName}. Смотри под ноги на моих досках, и мы поладим.",
         "objectives": {
           "0": {
-            "label": "Report to Bridgewright Alden"
+            "label": "Доложите мостовщику Олдену"
           }
         }
       },
       "q_wf_rope_chewers": {
-        "title": "The Rope-Chewers",
-        "text": "Bogtoads, {playerName}. They haul up out of the moat at night and chew through my mooring ropes like they were reed stems. Three skiffs went drifting last week, and one of them had my good winch aboard. Thin them out, ten of the fat things, and the boats stay where we tie them.",
-        "completion": "Ten fewer sets of teeth in my moat. The skiffs sat their moorings all night for the first time in a month, {playerName}. You have the thanks of every netter in town.",
+        "title": "Грызуны канатов",
+        "text": "Топяные жабы, {playerName}. По ночам они выбираются из рва и перегрызают мои швартовы, будто камышовые стебли. На той неделе три ялика унесло, и на одном была моя добрая лебёдка. Прореди их — десяток жирных тварей, — и лодки будут стоять там, где мы их привязали.",
+        "completion": "На десять пастей меньше в моём рву. Ялики впервые за месяц простояли на швартовых всю ночь, {playerName}. Тебе благодарен каждый сетевик в городе.",
         "objectives": {
           "0": {
-            "label": "Bogtoad slain"
+            "label": "Топяная жаба убита"
           }
         }
       },
       "q_wf_eels_for_the_smokehouse": {
-        "title": "Eels for the Smokehouse",
-        "text": "The bogtoads are not just eating my ropes, {playerName}, they are eating my catch: they gulp the eels down whole, straight out of the traps. Cut six plump ones free of the greedy things before the meat spoils, and the smokehouse fires stay lit.",
-        "completion": "Six good eels, barely bruised. The smokehouse will smell like money by morning. Here, these waders were mine when I was quicker: eelskin turns the wet like nothing else.",
+        "title": "Угри для коптильни",
+        "text": "Топяные жабы жрут не только мои канаты, {playerName}, — они жрут мой улов: заглатывают угрей целиком прямо из ловушек. Вырежи шесть жирных из брюха этих обжор, пока мясо не испортилось, и огни коптильни не погаснут.",
+        "completion": "Шесть добрых угрей, почти не помятых. К утру коптильня будет пахнуть деньгами. Вот, держи: эти сапоги были моими, пока я был проворнее, — кожа угря держит сырость, как ничто другое.",
         "objectives": {
           "0": {
-            "label": "Plump Fen Eel"
+            "label": "Жирный топяной угорь"
           }
         }
       },
       "q_wf_mind_the_moorings": {
-        "title": "Mind the Moorings",
-        "text": "Good rope is dear out here, {playerName}: every line the toads bite through is a week of eel-money gone. The cut ends are still lying along the moat shore where the boats slipped them. Walk the boardwalks and bring me back four lines, and I can splice them good as new.",
-        "completion": "Look at that: clean bites, every one, but there is rope enough left to splice. You have saved me a month of coin and the netters a month of grumbling, {playerName}.",
+        "title": "Береги швартовы",
+        "text": "Добрый канат здесь дорог, {playerName}: каждый перегрызенный жабами конец — неделя угриных денег на ветер. Обрезки так и лежат вдоль берега рва, где лодки их обронили. Пройди по мосткам и принеси мне четыре конца, и я срощу их как новые.",
+        "completion": "Гляди-ка: срезы чистые, все до единого, а каната осталось довольно, чтобы срастить. Ты сберёг мне месяц монет, а сетевикам — месяц ворчания, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Cut Mooring Line recovered"
+            "label": "Перекушенный швартов возвращён"
           }
         }
       },
       "q_wf_witch_of_willowweep": {
-        "title": "The Witch of Willowweep",
-        "text": "You have heard it by now, {playerName}: the snore. Slow and heavy, out past the Drowsy Flats, like the fen itself turning over in its sleep. The toads, the sprites, the wisps burning at noon: it all started when that sound did. One soul might know what it is. Mother Sedge keeps a camp at Willowweep, west around the moat and down the far shore. Find her, and ask her what sleeps at the middle of my fen.",
-        "completion": "Alden sent you all this way to ask about the snoring? Then the bridge-folk are finally listening. Sit down out of the damp, {playerName}. That sound has a name, and a throat, and I have been waiting for someone fool enough to help me quiet it.",
+        "title": "Ведьма Плакучей заводи",
+        "text": "Ты уже слышал его, {playerName}: храп. Медленный и тяжёлый, где-то за Дремотными отмелями, будто сама топь ворочается во сне. Жабы, духи, огоньки, горящие в полдень, — всё началось вместе с этим звуком. Одна душа может знать, что это. Матушка Осока живёт у Плакучей заводи — вокруг рва на запад и вниз по дальнему берегу. Найди её и спроси, что спит посреди моей топи.",
+        "completion": "Олден послал тебя в такую даль спросить про храп? Значит, мостовой люд наконец прислушался. Сядь, спрячься от сырости, {playerName}. У этого звука есть имя, и есть глотка, и я давно жду кого-нибудь достаточно безрассудного, чтобы помочь мне её утихомирить.",
         "objectives": {
           "0": {
-            "label": "Find Mother Sedge"
+            "label": "Найдите Матушку Осоку"
           }
         }
       },
       "q_wf_toll_and_tangle": {
-        "title": "Toll and Tangle",
-        "text": "The willow sprites think it is a fine game to cut a ferry loose, {playerName}, and last week the toll skiff went over on the east track with a season of bridge-toll aboard. The chests went down in the shallows and the sprites dance on the boardwalks like they own them. Drive off eight and haul up three toll-chests, and Bridgemere eats this winter.",
-        "completion": "Three chests, and the coin still dry inside. The sprites will sulk in the withies for a week, {playerName}, and the town owes you its winter bread.",
+        "title": "Пошлина и путаница",
+        "text": "Ивовые духи считают отличной забавой перерезать паром, {playerName}, а на той неделе на восточном ходу перевернулся пошлинный ялик с мостовым сбором за целый сезон. Сундуки ушли на дно в отмелях, а духи пляшут на мостках, будто они здесь хозяева. Прогони восьмерых и подними три сундука с пошлиной — и Бриджмир этой зимой ест.",
+        "completion": "Три сундука, и монета внутри суха. Духи будут неделю дуться в ивняке, {playerName}, а город обязан тебе своим зимним хлебом.",
         "objectives": {
           "0": {
-            "label": "Willow Sprite driven off"
+            "label": "Ивовый дух прогнан"
           },
           "1": {
-            "label": "Toll-Chest recovered"
+            "label": "Сундук с пошлиной возвращён"
           }
         }
       },
       "q_wf_wisplight_charms": {
-        "title": "Wisplight Charms",
-        "text": "The wisps over the pools are the fen dreaming out loud, {playerName}, and their light is the only thing that holds against the Croaker's lull. I weave it into willow charms: one round your neck and the snore cannot drag your eyelids down. Bring me six wisplight globes. The wisps will not fight you for them, which makes it a kindness or a theft, depending on how you carry it.",
-        "completion": "Six globes, still warm with dreaming. Give me till moonrise and I will have charms woven for you and whoever is brave enough to stand beside you.",
+        "title": "Обереги света огоньков",
+        "text": "Огоньки над бочагами — это топь, грезящая вслух, {playerName}, и только их свет держится против дрёмы Квакуна. Я вплетаю его в ивовые обереги: один на шею — и храп не утянет твои веки вниз. Принеси мне шесть шаров света огоньков. Огоньки не станут за них драться, так что выйдет это добротой или воровством — смотря как понесёшь.",
+        "completion": "Шесть шаров, ещё тёплых от грёз. Дай мне срок до восхода луны, и обереги будут сплетены — для тебя и для всякого, кому хватит храбрости встать с тобой рядом.",
         "objectives": {
           "0": {
-            "label": "Wisplight Globe"
+            "label": "Шар света огоньков"
           }
         }
       },
       "q_wf_croakers_hush": {
-        "title": "The Croaker's Hush",
-        "text": "Now you know the snorer's name, {playerName}: the Drowsy Croaker, the old toad-king out on the Drowsy Flats. Every year his croak grows heavier, and every year more of the fen forgets to wake. The charms will keep your eyes open, but his bulk is another matter: bring a friend, and do not fight him in the water. Put the old king to a quieter sleep.",
-        "completion": "Listen, {playerName}. Nothing. The first true silence over this fen in thirty years, and half the town will not sleep tonight for the strangeness of it. The willows say thank you, in their way. Wear this, woven from his own lily-bed, and the fen will know you for a friend wherever the water reaches.",
+        "title": "Тишина Квакуна",
+        "text": "Теперь ты знаешь имя храпуна, {playerName}: Дремотный Квакун, старый жабий король с Дремотных отмелей. С каждым годом его кваканье тяжелеет, и с каждым годом всё больше топи забывает проснуться. Обереги удержат твои глаза открытыми, но его туша — дело другое: возьми друга и не бейся с ним в воде. Уложи старого короля в сон потише.",
+        "completion": "Слушай, {playerName}. Ничего. Первая настоящая тишина над этой топью за тридцать лет, и полгорода сегодня не уснёт от её непривычности. Ивы благодарят тебя — по-своему. Носи это, сплетено из его собственного кувшинкового ложа, — и топь признает в тебе друга всюду, куда дотягивается вода.",
         "objectives": {
           "0": {
-            "label": "The Drowsy Croaker slain"
+            "label": "Дремотный Квакун убит"
           }
         }
       },
       "q_nb_road_of_lanterns": {
-        "title": "The Road of Lanterns",
-        "text": "Up here the sun never follows, {playerName}, only the lamps I keep lit along the climb. Moonrest lies north where the flower-light gathers. Find Lira Dewsong among her gardens and tell her the Nightgate lamps still burn.",
-        "completion": "The lamps still burn, and the road still carries strangers to us. Sorrel has kept that gate longer than anyone in Moonrest remembers. Welcome, {playerName}, to the realm that never dawns.",
+        "title": "Дорога фонарей",
+        "text": "Сюда, наверх, солнце не идёт следом, {playerName}, — только лампы, что я держу зажжёнными вдоль подъёма. Лунный Приют лежит к северу, там, где собирается цветочный свет. Найди Лиру Песнь Росы среди её садов и скажи ей, что лампы Ночных Врат ещё горят.",
+        "completion": "Лампы горят, и дорога всё ещё приводит к нам странников. Соррел держит те врата дольше, чем помнит кто-либо в Лунном Приюте. Добро пожаловать, {playerName}, в край, где не бывает рассвета.",
         "objectives": {
           "0": {
-            "label": "Find Lira Dewsong in Moonrest"
+            "label": "Найдите Лиру Песнь Росы в Лунном Приюте"
           }
         }
       },
       "q_nb_striders_in_the_dark": {
-        "title": "Striders in the Dark",
-        "text": "The gloam striders were always patient hunters, {playerName}, but of late they slip right into the flower beds and take moonfleece lambs beneath our lanterns. Cull ten of them and give the downs back their quiet.",
-        "completion": "Ten striders fewer, and the herds already graze easier. The gardens keep their own hours, but tonight they keep them in peace.",
+        "title": "Бегуны во тьме",
+        "text": "Сумеречные бегуны всегда были терпеливыми охотниками, {playerName}, но в последнее время они проскальзывают прямо в цветочные гряды и уносят лунорунных ягнят под самыми нашими фонарями. Истреби десятерых и верни холмам их тишину.",
+        "completion": "На десять бегунов меньше, и стада уже пасутся спокойнее. Сады живут по собственным часам, но этой ночью они живут по ним в мире.",
         "objectives": {
           "0": {
-            "label": "Gloam Strider slain"
+            "label": "Сумеречный бегун убит"
           }
         }
       },
       "q_nb_wool_by_moonlight": {
-        "title": "Wool by Moonlight",
-        "text": "Nothing warms like moonfleece, {playerName}, and nothing spins so fine. The grazers carry their silver wool loose in tufts as they drift the downs. Bring me six good tufts off the herds and I will weave you something worth the walking.",
-        "completion": "Silver as starlight and twice as soft. Here, {playerName}: mitts from the last batch, lined the way only moonfleece lines.",
+        "title": "Шерсть при лунном свете",
+        "text": "Ничто не греет так, как лунное руно, {playerName}, и ничто не прядётся так тонко. Лунорунные звери, бредя по холмам, роняют своё серебро клоками. Принеси мне шесть добрых клоков со стад, и я сотку тебе то, ради чего стоило ходить.",
+        "completion": "Серебристое, как звёздный свет, и вдвое мягче. Вот, {playerName}: рукавицы из последней партии, подбитые так, как подбивает только лунное руно.",
         "objectives": {
           "0": {
-            "label": "Moonfleece Tuft"
+            "label": "Клок лунного руна"
           }
         }
       },
       "q_nb_night_gardens": {
-        "title": "The Night Gardens",
-        "text": "The nightbloom opens only under this sky, and Gloamfield holds the oldest beds in the realm. I need four fresh blossoms for the shrine garlands, {playerName}. Cut them gently: a bed remembers a rough hand for a season.",
-        "completion": "Still glowing, every petal. The shrine will smell of night for a week, and Moonrest sleeps easier for it.",
+        "title": "Ночные сады",
+        "text": "Ночецвет раскрывается только под этим небом, а Сумеречное Поле хранит старейшие гряды во всём краю. Мне нужно четыре свежих цветка для гирлянд святилища, {playerName}. Срезай бережно: гряда помнит грубую руку целый сезон.",
+        "completion": "Всё ещё светятся, каждый лепесток. Святилище неделю будет пахнуть ночью, и Лунному Приюту от этого спится легче.",
         "objectives": {
           "0": {
-            "label": "Nightbloom Blossom gathered"
+            "label": "Цветок ночецвета собран"
           }
         }
       },
       "q_nb_eyes_on_the_vigil": {
-        "title": "Eyes on the Vigil",
-        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the nightkin drift among the stones. Find him, and ask what the stars are saying.",
-        "completion": "Lira sent you? Then the gardens feel it too. Sit by the glass a moment, {playerName}. The stars have been restless for a month, and every chart I draw leans north toward the barrow.",
+        "title": "Глаза на Дозоре",
+        "text": "Что-то сделало бегунов дерзкими, а стада — беспокойными, {playerName}, и по цветам мне этого не прочесть. Кассиан прочтёт по небу. Его обсерваторный лагерь стоит у Стоячего Дозора к востоку отсюда, там, где среди камней бродят ночерождённые. Найди его и спроси, что говорят звёзды.",
+        "completion": "Тебя прислала Лира? Значит, и сады это чувствуют. Посиди у трубы, {playerName}. Звёзды не находят покоя уже месяц, и каждая карта, что я черчу, клонится на север, к кургану.",
         "objectives": {
           "0": {
-            "label": "Find Astronomer Cassian at the Standing Vigil"
+            "label": "Найдите астронома Кассиана у Стоячего Дозора"
           }
         }
       },
       "q_nb_charts_of_the_stones": {
-        "title": "The Charts in the Stones",
-        "text": "The Vigil stones are older than Moonrest, older than the nightkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
-        "completion": "No doubt is left. Every bearing has crept toward the Sleepless Barrow, as if the sky itself leans over that mound to watch. The old kings were buried under aligned stars for a reason, {playerName}.",
+        "title": "Карты в камнях",
+        "text": "Камни Дозора старше Лунного Приюта, старше ночерождённых, что за ними ухаживают, и на их гранях высечены звёздные карты, которые я учился читать всю жизнь. Небо сдвинулось, {playerName}, и я должен знать, насколько. Прочти карты на трёх камнях и принеси мне их пеленги.",
+        "completion": "Сомнений не осталось. Каждый пеленг сполз к Кургану Неспящего, будто само небо склонилось над этим холмом, чтобы смотреть. Старых королей не зря хоронили под выверенными звёздами, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Star chart read"
+            "label": "Звёздная карта прочитана"
           }
         }
       },
       "q_nb_restless_mounds": {
-        "title": "The Restless Mounds",
-        "text": "The charts were a warning, and the barrow field proves it: the mounds are opening from beneath. Wights walk the grave rows wearing the old honors, and the offerings that kept them sleeping lie scattered in the grass. Put eight of them down, {playerName}, and gather four of the offerings back to me.",
-        "completion": "Grave gold, still cold from the soil. The wights are not rising on their own, {playerName}: something beneath the great mound is calling them out, and I fear the charts have already told us its name.",
+        "title": "Беспокойные курганы",
+        "text": "Карты были предупреждением, и курганное поле его подтверждает: могильники открываются изнутри. Умертвия ходят между могильных рядов в старых почестях, а подношения, что хранили их сон, раскиданы по траве. Упокой восьмерых, {playerName}, и собери мне обратно четыре подношения.",
+        "completion": "Могильное золото, ещё холодное от земли. Умертвия встают не сами по себе, {playerName}: что-то под великим курганом выкликает их наружу, и боюсь, карты уже назвали нам его имя.",
         "objectives": {
           "0": {
-            "label": "Barrow Wight slain"
+            "label": "Курганное умертвие убито"
           },
           "1": {
-            "label": "Grave offering recovered"
+            "label": "Могильное подношение возвращено"
           }
         }
       },
       "q_nb_the_barrow_king": {
-        "title": "The Barrow King Wakes",
-        "text": "Every bearing, every restless star, every opened mound points to one thing: the Barrow King is waking beneath the great mound, and this realm has no dawn to hold him back. He must be put to rest before he remembers his crown, {playerName}. Do not go alone: bring a friend, and keep the flower-light at your back.",
-        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the nightkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
+        "title": "Курганный Король пробуждается",
+        "text": "Каждый пеленг, каждая беспокойная звезда, каждый вскрытый могильник указывают на одно: под великим курганом просыпается Курганный Король, а у этого края нет рассвета, чтобы его сдержать. Его нужно вернуть в сон, прежде чем он вспомнит свою корону, {playerName}. Не ходи в одиночку: возьми друга, и пусть цветочный свет будет у тебя за спиной.",
+        "completion": "Звёзды улеглись впервые за сезон, {playerName}. Могильники закрыты, ночерождённые замерли у своих камней, и король снова спит внизу. Носи эту мантию: Лунный Приют скроил её для того, кому ночь наконец доверилась.",
         "objectives": {
           "0": {
-            "label": "The Barrow King put to rest"
+            "label": "Курганный Король упокоен"
           }
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "The Bells of Gallowmere",
-        "text": "Hear that tolling, {playerName}? That is Gallowmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
-        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gallowmere, {playerName}. Mind the bells.",
+        "title": "Колокола Гэллоумира",
+        "text": "Слышишь звон, {playerName}? Это Гэллоумир, вверх по северной дороге, убаюкивает своих мёртвых. Пономарь Марроу ведёт счёт каждой душе под этими кронами — и живой, и погребённой. Иди и будь сосчитан, пока лес не сосчитал тебя сам.",
+        "completion": "Кобб отправил тебя по дороге целым, вот как? Хороший человек. Тридцать лет он держит те привратные фонари зажжёнными, и лес ни разу его не обошёл. Добро пожаловать в Гэллоумир, {playerName}. Слушайся колоколов.",
         "objectives": {
           "0": {
-            "label": "Report to Sexton Marrow"
+            "label": "Доложите пономарю Марроу"
           }
         }
       },
       "q_ww_silk_in_the_eaves": {
-        "title": "Silk in the Eaves",
-        "text": "Look up when you walk the west road, {playerName}, and you will see them: wrapped shapes in the canopy, swaying where no wind reaches. The widowsilk spinners have crept out of the Thicket and strung their larders over my lanterns. Kill ten, and the road is a road again.",
-        "completion": "Ten fewer weavers in the eaves. The lamplighters will walk their rounds tonight without looking up, and that is worth more here than you know.",
+        "title": "Шёлк под кронами",
+        "text": "Подними глаза, когда пойдёшь западной дорогой, {playerName}, и увидишь их: спелёнутые силуэты в кронах, качающиеся там, куда не достаёт ветер. Вдовьи шелкопряды выползли из Чащи и развесили свои кладовые над моими фонарями. Убей десятерых — и дорога снова станет дорогой.",
+        "completion": "На десять шелкопрядов меньше под кронами. Этой ночью фонарщики пройдут свой обход, не поднимая глаз, а это здесь стоит больше, чем ты думаешь.",
         "objectives": {
           "0": {
-            "label": "Widowsilk Spinner slain"
+            "label": "Вдовий шелкопряд убит"
           }
         }
       },
       "q_ww_widows_skeins": {
-        "title": "The Widow's Skeins",
-        "text": "The spinners take our dead for their larders, {playerName}, so I take their silk for our shrouds. It burns clean and it holds a blessing better than linen ever did. Bring me six skeins of widowsilk, and the next soul we bury goes down wrapped and warded.",
-        "completion": "Six skeins, soft as a held breath. The dead will lie easier in this. Take these wraps, I sewed them from the last batch, and the wood has never once bitten through them.",
+        "title": "Вдовьи мотки",
+        "text": "Шелкопряды забирают наших мёртвых в свои кладовые, {playerName}, — а я забираю их шёлк на наши саваны. Он горит чисто и держит благословение лучше, чем любое полотно. Принеси мне шесть мотков вдовьего шёлка, и следующая душа, которую мы похороним, ляжет в землю спелёнутой и обережённой.",
+        "completion": "Шесть мотков, мягких, как задержанное дыхание. Мёртвым в таком лежится легче. Возьми эти обмотки — я сшила их из последней партии, и лес ещё ни разу не прокусил их насквозь.",
         "objectives": {
           "0": {
-            "label": "Widowsilk Skein"
+            "label": "Моток вдовьего шёлка"
           }
         }
       },
       "q_ww_candles_at_the_bounds": {
-        "title": "Candles at the Bounds",
-        "text": "Four boundary stones ring Gallowmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
-        "completion": "All four burning? Then breathe, {playerName}. You did not hear it, but the whole village did: the bells rang easier the moment the last wick caught.",
+        "title": "Свечи на рубежах",
+        "text": "Гэллоумир окружают четыре пограничных камня, {playerName}, по одному на каждой дороге из города, и на каждом камне горит могильная свеча. Пока они горят, погребённые остаются погребёнными. Морось затопила их — все четыре, а я слишком стара, чтобы обходить рубежи одна. Возьми мою лучину и зажги их снова, скорее.",
+        "completion": "Все четыре горят? Тогда выдохни, {playerName}. Ты этого не слышал, но слышала вся деревня: колокола зазвонили легче в тот самый миг, когда занялся последний фитиль.",
         "objectives": {
           "0": {
-            "label": "Grave-candle relit"
+            "label": "Могильная свеча зажжена вновь"
           }
         }
       },
       "q_ww_the_last_vicar": {
-        "title": "The Last Vicar",
-        "text": "South of here the Mournstone Chapel moulders by its black tarn, and one man still tends it: Vicar Creel, who would not leave when the roof came down. He knows the old rites better than my bells do, {playerName}, and he has not sent word in a month. Walk the chapel road and see him breathing.",
-        "completion": "Marrow worries after me? That is new. Tell him the Mournstone stands, after a fashion, and so do I. Stay a while, {playerName}. The tarn has been whispering, and I would rather not listen alone.",
+        "title": "Последний викарий",
+        "text": "К югу отсюда у чёрного озерца ветшает Часовня Скорбного Камня, и один человек всё ещё смотрит за ней: викарий Крил, который не ушёл, даже когда обвалилась крыша. Старые обряды он знает лучше, чем мои колокола, {playerName}, а вестей от него нет уже месяц. Пройди по дороге к часовне и убедись, что он дышит.",
+        "completion": "Марроу обо мне тревожится? Это что-то новое. Передай ему: Скорбный Камень стоит — в известном смысле, — и я тоже. Побудь здесь, {playerName}. Озерцо шепчет, и мне не хотелось бы слушать его в одиночестве.",
         "objectives": {
           "0": {
-            "label": "Find Vicar Creel"
+            "label": "Найдите викария Крила"
           }
         }
       },
       "q_ww_wraiths_of_the_tarn": {
-        "title": "Wraiths of the Tarn",
-        "text": "The wood wraiths were the chapel wardens once, {playerName}, grown from trees planted over the honored dead. Since the tarn turned black they have forgotten their office, and now they drift through my graveyard pulling at the soil. Break eight of them apart before they finish what they have started.",
-        "completion": "Eight wardens laid down at last. I will not call it a mercy in daylight, but between us, {playerName}, it was one.",
+        "title": "Призраки озерца",
+        "text": "Лесные призраки когда-то были стражами часовни, {playerName}, — они выросли из деревьев, посаженных над почётными мёртвыми. С тех пор как озерцо почернело, они забыли своё служение и теперь бродят по моему кладбищу, дёргая землю. Разбей восьмерых, пока они не довершили начатое.",
+        "completion": "Восемь стражей наконец улеглись. При свете дня я не назову это милостью, но между нами, {playerName}, — это была она.",
         "objectives": {
           "0": {
-            "label": "Wood Wraith slain"
+            "label": "Лесной призрак убит"
           }
         }
       },
       "q_ww_what_the_bark_holds": {
-        "title": "What the Bark Holds",
-        "text": "In the Hanging Glade east of Gallowmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
-        "completion": "Three souls back under honest ground before nightfall. The shamblers will grow back, bark always does, but tonight the glade hangs empty, and that is enough.",
+        "title": "Что держит кора",
+        "text": "На Висельной Поляне к востоку от Гэллоумира шелкопряды развешивают по ветвям своих спелёнутых шёлком мертвецов, а гробокорые шатуны стоят на страже внизу, как терпеливые носильщики гроба. Там, наверху, наши люди, {playerName}. Свали пятерых шатунов, срежь троих спелёнутых мёртвых и верни их домой, в землю.",
+        "completion": "Три души вернулись под честную землю до наступления ночи. Шатуны отрастут — кора всегда отрастает, — но этой ночью поляна висит пустой, и этого довольно.",
         "objectives": {
           "0": {
-            "label": "Gravenbark Shambler felled"
+            "label": "Гробокорый шатун повержен"
           },
           "1": {
-            "label": "Silkbound remains cut down"
+            "label": "Опутанные шёлком останки срезаны"
           }
         }
       },
       "q_ww_walking_mosley_home": {
-        "title": "Walking Mosley Home",
-        "text": "My gravedigger Mosley took the chapel road three days ago to open a plot in the old yard, and the dig came down on top of him. He clawed his way out, the fool is alive, but he is huddled by the chapel graves and will not move for spinners on the road. Walk him home, {playerName}. I cannot ring the bells for a living man.",
-        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gallowmere keeps its people, that is the whole of our law.",
+        "title": "Проводить Мозли домой",
+        "text": "Мой могильщик Мозли три дня назад ушёл по дороге к часовне копать могилу на старом дворе, и раскоп обрушился прямо на него. Он выбрался, дурень жив, но сидит, сжавшись, у часовенных могил и не двинется с места из-за шелкопрядов на дороге. Доведи его до дома, {playerName}. Я не могу звонить в колокола по живому человеку.",
+        "completion": "Он вошёл в ворота на своих двоих, божась, что отныне не выкопает ничего глубже грядки под репу. К воскресенью вернётся на двор — они всегда возвращаются. Спасибо, {playerName}. Гэллоумир бережёт своих — вот и весь наш закон.",
         "objectives": {
           "0": {
-            "label": "Gravedigger Mosley walked safely back to Gallowmere"
+            "label": "Могильщик Мозли благополучно доведён до Гэллоумира"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
-        "title": "The Horn of the Huntsman",
-        "text": "You have heard the horn by now, {playerName}, thin and far off, the sound the whole wood holds its breath for. The Pale Huntsman rides his clearing north of here, and every grave he passes grows shallower. He was a man once, and he was buried wrong, and I am done pretending prayer will do it. Take a friend, take two, and unhorse him.",
-        "completion": "The horn stopped mid-note. Every bell in Gallowmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
+        "title": "Рог Ловчего",
+        "text": "Ты уже слышал рог, {playerName}: тонкий, далёкий — звук, на котором весь лес задерживает дыхание. Бледный Ловчий объезжает свою поляну к северу отсюда, и каждая могила, мимо которой он проезжает, становится мельче. Когда-то он был человеком, и похоронили его неправильно, а я устал делать вид, что молитва с этим справится. Возьми друга, а лучше двух, и выбей его из седла.",
+        "completion": "Рог оборвался на полуноте. Каждый колокол в Гэллоумире ударил по разу, сам по себе, а потом лес затих так, как не затихал на моей памяти тридцать лет. Ты совершил обряд, который был мне не по силам, {playerName}. Носи это — и ходи под кронами без страха.",
         "objectives": {
           "0": {
-            "label": "The Pale Huntsman unhorsed"
+            "label": "Бледный Ловчий выбит из седла"
           }
         }
       },
       "q_pr_down_to_drifthaven": {
-        "title": "Down to Drifthaven",
-        "text": "Out of the black trees and into the sun, {playerName}. Follow the shore road north and you will strike Drifthaven before the tide turns. Ask for Salvage-Boss Ryna, she has work for any pair of hands since the storm, and tell her the Tanglemouth road is still open.",
-        "completion": "Pell sent you? Then you walked the whole Tanglemouth road alone, and that is reference enough for me. Welcome to Drifthaven, {playerName}. Grab a rope, we are short-handed.",
+        "title": "Вниз, в Дрифтхейвен",
+        "text": "Из чёрных деревьев — на солнце, {playerName}. Иди по прибрежной дороге на север, и выйдешь к Дрифтхейвену раньше, чем сменится прилив. Спроси начальницу добытчиков Рину — после шторма у неё найдётся работа для любой пары рук — и скажи ей, что дорога Заросшего Устья ещё открыта.",
+        "completion": "Тебя прислал Пелл? Значит, ты в одиночку прошёл всю дорогу Заросшего Устья, и лучшей рекомендации мне не нужно. Добро пожаловать в Дрифтхейвен, {playerName}. Хватай канат — у нас не хватает рук.",
         "objectives": {
           "0": {
-            "label": "Report to Salvage-Boss Ryna"
+            "label": "Доложите начальнице добытчиков Рине"
           }
         }
       },
       "q_pr_wreck_line_cargo": {
-        "title": "The Wreck Line",
-        "text": "The storm three nights back drove the Pearlwake onto the reef, and her cargo is strewn the whole length of the wreck line between here and the Palmstrand. Three crates of trade goods are still lying in the surf, {playerName}. Bring them in before the tide, or the crabs, claim what is left.",
-        "completion": "Salt-stained but sound, all three. The divers eat this month because of you, {playerName}.",
+        "title": "Полоса крушений",
+        "text": "Шторм три ночи назад выбросил «Жемчужный След» на риф, и его груз раскидало по всей полосе крушений отсюда до Пальмовой Косы. Три ящика с товаром так и лежат в прибое, {playerName}. Втащи их на берег, пока прилив — или крабы — не забрали то, что осталось.",
+        "completion": "В солёных разводах, но целёхоньки, все три. Ныряльщицы этот месяц едят благодаря тебе, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Pearlwake Cargo recovered"
+            "label": "Груз «Жемчужного Следа» возвращён"
           }
         }
       },
       "q_pr_scuttler_cull": {
-        "title": "Shellbacked Thieves",
-        "text": "Every wreck on this coast draws the tide scuttlers, and the Pearlwake has drawn half the reef. My salvage crews will not work a line with those claws in the shallows. Crack ten of them, {playerName}, and the wreck line is ours again.",
-        "completion": "Ten fewer claws in the surf. My crews are already wading back out, and not one of them said thank you, so I will: thank you, {playerName}.",
+        "title": "Воры в панцирях",
+        "text": "Каждое крушение на этом берегу манит приливных крабов, а «Жемчужный След» приманил полрифа. Мои добытчики не станут работать на линии, пока в отмелях щёлкают эти клешни. Расколи десятерых, {playerName}, и полоса крушений снова наша.",
+        "completion": "На десять клешней меньше в прибое. Мои команды уже бредут обратно в воду, и ни одна не сказала спасибо, так что скажу я: спасибо, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Tide Scuttler cracked"
+            "label": "Приливный краб расколот"
           }
         }
       },
       "q_pr_boars_in_the_gardens": {
-        "title": "Boars in the Gardens",
-        "text": "Whatever stirs in the deep green, it pushes the thicket boars out onto our strand. They have rooted up the garden terraces twice this week, and they will have the drying racks next. Ten boars, {playerName}, and push the rest back under the trees.",
-        "completion": "The racks stand and the gardens can be replanted. The boars did not choose to come onto the sand, {playerName}. Remember that: something moved them.",
+        "title": "Вепри в огородах",
+        "text": "Что бы ни ворочалось в глубокой зелени, оно выталкивает чащобных вепрей на нашу полосу. Дважды за неделю они перерыли огородные террасы, а следом возьмутся за сушильные рамы. Десять вепрей, {playerName}, — и оттесни остальных обратно под деревья.",
+        "completion": "Рамы стоят, а огороды можно засадить заново. Вепри не сами решили выйти на песок, {playerName}. Помни это: что-то их погнало.",
         "objectives": {
           "0": {
-            "label": "Thicket Boar driven off"
+            "label": "Чащобный вепрь прогнан"
           }
         }
       },
       "q_pr_the_man_who_went_in": {
-        "title": "The Man Who Went In",
-        "text": "The divers will not step past the treeline, {playerName}, and I will not ask them to. You have heard the drums by now: everyone does, by the second night. One man on this island ever walked toward that sound and came back. Okku. He camps under the great banyans at the Vinefall, deep up the Tangle road. Find him, and ask him what the green is hiding.",
-        "completion": "Isha sent you? The Pearl-Mother has not spoken my name in years. Sit out of the vines' reach, {playerName}, and I will tell you what I know: the drums are not the danger. They are the warning.",
+        "title": "Тот, кто вошёл в чащу",
+        "text": "Ныряльщицы не ступят за кромку деревьев, {playerName}, и я не стану их просить. Барабаны ты уже слышал: их слышат все — ко второй ночи. Лишь один человек на этом острове пошёл на этот звук и вернулся. Окку. Он живёт под великими баньянами у Лианопада, в глубине дороги через Заросли. Найди его и спроси, что прячет зелень.",
+        "completion": "Тебя прислала Иша? Мать-Жемчужница годами не произносила моего имени. Сядь подальше от лиан, {playerName}, и я расскажу, что знаю: барабаны — не опасность. Барабаны — предупреждение.",
         "objectives": {
           "0": {
-            "label": "Find Okku at the Vinefall"
+            "label": "Найдите Окку у Лианопада"
           }
         }
       },
       "q_pr_canopy_silk": {
-        "title": "Silk from the Canopy",
-        "text": "Look up, {playerName}. Every canopy from here to the idol is webbed like a fishing net, and the weavers grow bolder each season. I string their own silk across the paths, tripline bells, so the jungle cannot creep up on me. Six good hanks off the canopy weavers will restring my lines.",
-        "completion": "Good, strong silk. My bells will sing a while longer, and nothing walks these paths at night without me knowing, {playerName}. Lately, something has been walking often.",
+        "title": "Шёлк из крон",
+        "text": "Подними голову, {playerName}. Все кроны отсюда до идола затянуты паутиной, как рыбацкой сетью, и ткачи наглеют с каждым сезоном. Я натягиваю их же шёлк поперёк троп — колокольчики на растяжках, — чтобы джунгли не подкрались ко мне. Шесть добрых мотков с кроновых ткачей — и мои линии натянуты заново.",
+        "completion": "Хороший, крепкий шёлк. Мои колокольчики ещё попоют, и ничто не пройдёт этими тропами ночью без моего ведома, {playerName}. А в последнее время что-то ходит часто.",
         "objectives": {
           "0": {
-            "label": "Canopy Silk Hank"
+            "label": "Моток кронового шёлка"
           }
         }
       },
       "q_pr_the_lost_navigator": {
-        "title": "The Lost Navigator",
-        "text": "We pulled every hand off the Pearlwake but one: Navigator Suli, who swam for the far strand and never walked in. A diver spotted her holed up in the bow wreckage past the Palmstrand, alive, and too spent to run the gauntlet alone. Walk her home along the shore road, {playerName}. The crabs will not like it, and the jungle likes it less.",
-        "completion": "Suli is by the fire, still swearing she could have swum it. You brought back the only chart-reader on this coast, {playerName}. These are from her sea chest, with her blessing.",
+        "title": "Пропавший штурман",
+        "text": "Мы сняли с «Жемчужного Следа» всех, кроме одной: штурман Сули поплыла к дальней полосе и так и не дошла. Ныряльщица видела её в носовых обломках за Пальмовой Косой — жива, но слишком измотана, чтобы пройти этот строй в одиночку. Доведи её домой по прибрежной дороге, {playerName}. Крабам это не понравится, а джунглям — и того меньше.",
+        "completion": "Сули у костра и всё ещё божится, что доплыла бы сама. Ты вернул единственного чтеца карт на этом берегу, {playerName}. Это из её морского сундука, с её благословения.",
         "objectives": {
           "0": {
-            "label": "Navigator Suli seen safely to Drifthaven"
+            "label": "Штурман Сули благополучно доведена до Дрифтхейвена"
           }
         }
       },
       "q_pr_what_the_drums_guard": {
-        "title": "What the Drums Guard",
-        "text": "I have walked as near the Sunken Idol as a living man dares, and I saw two things: the weavers have curtained the idol road in web, and the old offering bowls along it have been filled again. Freshly, {playerName}. Cut eight weavers off the road and bring me three of those offerings. I would know what hand still feeds a dead god.",
-        "completion": "Moss, pearl-shell, and boar blood, packed by fingers. Something in that ruin still keeps its rites, {playerName}, and the Guardian keeps everything else out. It is time we spoke of it plainly.",
+        "title": "Что стерегут барабаны",
+        "text": "Я подходил к Затонувшему Идолу так близко, как смеет живой, и увидел две вещи: ткачи занавесили дорогу к идолу паутиной, а старые жертвенные чаши вдоль неё снова наполнены. Свежим, {playerName}. Сруби восьмерых ткачей с дороги и принеси мне три подношения. Я хочу знать, чья рука всё ещё кормит мёртвого бога.",
+        "completion": "Мох, жемчужница и кабанья кровь, умятые пальцами. Что-то в тех руинах всё ещё блюдёт свои обряды, {playerName}, а Страж не подпускает всех остальных. Пора поговорить об этом начистоту.",
         "objectives": {
           "0": {
-            "label": "Canopy Weaver cut down"
+            "label": "Кроновый ткач срублен"
           },
           "1": {
-            "label": "Refilled Offering Bowl gathered"
+            "label": "Наполненная жертвенная чаша собрана"
           }
         }
       },
       "q_pr_idol_guardian": {
-        "title": "The Idol Guardian",
-        "text": "The idol is older than the island, {playerName}. Older than the drums, older than the name Palmreach. Its Guardian has stood in that drowned ring since before the palms grew, and now it wakes and walks the columns at night. Whatever the offerings feed, the Guardian is its door-ward. Bring a friend, and break it.",
-        "completion": "You felled a thing the jungle itself would not touch. Look there, behind the idol: the Guardian was never guarding the columns, {playerName}, it was guarding the steps beneath them. The drums have gone quiet tonight. Whatever sleeps below the Wildheart Basin now knows your name.",
+        "title": "Страж идола",
+        "text": "Идол старше острова, {playerName}. Старше барабанов, старше самого имени Пальмового Берега. Его Страж стоял в том затопленном кольце ещё до того, как выросли пальмы, а теперь он проснулся и ночами ходит меж колонн. Что бы ни кормили подношения, Страж — его привратник. Возьми друга и сломай его.",
+        "completion": "Ты свалил то, чего сами джунгли не смели коснуться. Взгляни туда, за идола: Страж никогда не стерёг колонны, {playerName}, он стерёг ступени под ними. Барабаны этой ночью умолкли. То, что спит под Котловиной Дикого Сердца, теперь знает твоё имя.",
         "objectives": {
           "0": {
-            "label": "The Idol Guardian broken"
+            "label": "Страж идола сломлен"
           }
         }
       },
       "q_eg_gate_report": {
-        "title": "Word Through the Gate",
-        "text": "The lawns past this gate have trimmed themselves for a hundred years, {playerName}, and lately they have started trimming visitors. Head Gardener Amaranth keeps the books in Hedgewick, up the road past the gate lawns. Tell her another traveler has come through, and tell her the hedges by the gate moved last night.",
-        "completion": "Moved, did they. Pell reports that every week, and every week he is right. Forgive my eyes, {playerName}, I have not slept a whole night in years: someone has to watch the garden watch us. Welcome to Hedgewick.",
+        "title": "Весть за врата",
+        "text": "Газоны за этими вратами стригут сами себя уже сотню лет, {playerName}, а в последнее время принялись подстригать и гостей. Старшая садовница Амарант ведёт учёт в Хеджвике, вверх по дороге за привратными лужайками. Скажи ей, что прошёл ещё один путник, и скажи, что изгороди у врат этой ночью шевелились.",
+        "completion": "Шевелились, значит. Пелл докладывает это каждую неделю — и каждую неделю он прав. Прости мои глаза, {playerName}, я годами не сплю целую ночь: кто-то же должен следить за тем, как сад следит за нами. Добро пожаловать в Хеджвик.",
         "objectives": {
           "0": {
-            "label": "Report to Head Gardener Amaranth"
+            "label": "Доложите старшей садовнице Амарант"
           }
         }
       },
       "q_eg_hungry_shapes": {
-        "title": "Pruned into Hunger",
-        "text": "Whoever shapes this garden has grown careless, or cruel. The wolf shapes out in the Rose Wilds were clipped for show, yet lately they hunt: green jaws, no bellies, and no reason ever to stop. Cut down ten topiary wolves, {playerName}, and let the lawns be lawns again for a while.",
-        "completion": "Ten heaps of clippings where ten wolves stood. It should feel like gardening, {playerName}. Why does it feel like war?",
+        "title": "Пострижены в голод",
+        "text": "Тот, кто стрижёт этот сад, стал небрежен — или жесток. Волчьи фигуры в Диких Розах были выстрижены для красоты, но с недавних пор они охотятся: зелёные пасти, никаких животов — и ни единой причины останавливаться. Сруби десять фигурных волков, {playerName}, и пусть газоны хоть ненадолго снова побудут газонами.",
+        "completion": "Десять куч обрезков там, где стояли десять волков. Это должно было быть похоже на садоводство, {playerName}. Почему же это похоже на войну?",
         "objectives": {
           "0": {
-            "label": "Topiary Wolf slain"
+            "label": "Фигурный волк убит"
           }
         }
       },
       "q_eg_stolen_shears": {
-        "title": "The Stolen Shears",
-        "text": "Every pair of shears in Hedgewick has walked off in a fortnight, {playerName}: off the pegs, out of locked sheds, one pair out of my own apron while I dozed. It is the hedge gnomes, the little groundskeepers who hate us walking their lawns. Get six pairs back before the whole hamlet is down to kitchen knives.",
-        "completion": "Six pairs, and my own among them, I would know the nick in the blade anywhere. Here, these gloves were knitted for pruning work. Warm hands make steady shears.",
+        "title": "Украденные ножницы",
+        "text": "За две недели из Хеджвика ушли все садовые ножницы до единых, {playerName}: с крючков, из запертых сараев, а одна пара — прямо из моего фартука, пока я дремала. Это гномы живой изгороди, маленькие садовники, которым ненавистно, что мы топчем их газоны. Верни шесть пар, пока вся деревня не осталась с одними кухонными ножами.",
+        "completion": "Шесть пар, и среди них мои собственные — эту зазубрину на лезвии я узнаю где угодно. Вот, держи: эти перчатки вязали для работы с секатором. Тёплые руки — твёрдые ножницы.",
         "objectives": {
           "0": {
-            "label": "Stolen Hedgewick Shears"
+            "label": "Украденные хеджвикские ножницы"
           }
         }
       },
       "q_eg_who_trims_the_hedges": {
-        "title": "Who Trims the Hedges",
-        "text": "I have kept the ledgers thirty years, {playerName}, and not slept properly for ten of them, because the sums will not close. Grass wants cutting and hedges want shaping, and nobody here does either, yet every dawn the garden stands trimmed. Lately the woodfolk swear they see an old man with a barrow on the far south lawns, past the maze by the Lily Basin. Find him. If he is real, I can finally sleep. If he is not, I suppose I never will.",
-        "completion": "So the house finally sent someone. A hundred years I have walked these lawns, {playerName}, and the garden and I have an understanding: I trim what asks to be trimmed. Sit. The hedges can spare you an hour.",
+        "title": "Кто стрижёт изгороди",
+        "text": "Я веду учётные книги тридцать лет, {playerName}, и десять из них толком не сплю, потому что счета не сходятся. Трава просит стрижки, изгороди просят формы, и никто здесь не делает ни того ни другого — а сад каждое утро стоит подстриженный. С недавних пор лесной люд божится, что видит старика с тачкой на дальних южных лужайках, за лабиринтом, у Кувшинковой чаши. Найди его. Если он существует, я наконец усну. А если нет — видно, не усну уже никогда.",
+        "completion": "Стало быть, дом наконец кого-то прислал. Сто лет я хожу по этим газонам, {playerName}, и у нас с садом уговор: я стригу то, что просит стрижки. Присядь. Изгороди уступят тебе час.",
         "objectives": {
           "0": {
-            "label": "Find the gardener by the Lily Basin"
+            "label": "Найдите садовника у Кувшинковой чаши"
           }
         }
       },
       "q_eg_gnomes_in_the_green": {
-        "title": "The Groundskeepers Grudge",
-        "text": "The shears were only the start, {playerName}. Last night the gnomes tipped our tool carts into the green, one out by their warren west of the maze, one clean across the garden on the pond walk, and scattered a hundred years of good iron in the grass. Drive off eight of the little devils and haul the spilled carts home.",
-        "completion": "Three carts back and the pegs full again. Let the little devils sulk in their hedges: Hedgewick works these lawns too.",
+        "title": "Обида садовых гномов",
+        "text": "Ножницы были только началом, {playerName}. Этой ночью гномы опрокинули в зелень наши тележки с инструментами — одну у их лабиринтовой норы к западу, другую через весь сад, на дорожке у пруда, — и рассыпали по траве сотню лет доброго железа. Прогони восьмерых маленьких злыдней и притащи опрокинутые тележки домой.",
+        "completion": "Три тележки на месте, и крючки снова полны. Пусть чертенята дуются в своих изгородях: Хеджвик тоже работает на этих газонах.",
         "objectives": {
           "0": {
-            "label": "Hedge Gnome driven off"
+            "label": "Гном живой изгороди прогнан"
           },
           "1": {
-            "label": "Tool cart recovered"
+            "label": "Тележка с инструментами возвращена"
           }
         }
       },
       "q_eg_bloom_clippings": {
-        "title": "Clippings from the Living Green",
-        "text": "You want to understand this garden? Then read it the way I do. The stags that graze the lawns grow the truest green: every leaf on them is a page. Bring me six fresh clippings from the topiary stags, {playerName}. They will not thank you for the pruning, but they will regrow. Everything here regrows.",
-        "completion": "Look here: the leaves are curling in on themselves, every clipping the same. The garden is afraid, {playerName}. In a hundred years I have never once known it afraid.",
+        "title": "Черенки живой зелени",
+        "text": "Хочешь понять этот сад? Тогда читай его, как читаю я. Олени, что пасутся на газонах, растят самую верную зелень: каждый их лист — страница. Принеси мне шесть свежих побегов с фигурных оленей, {playerName}. За обрезку они спасибо не скажут, но отрастут заново. Здесь всё отрастает заново.",
+        "completion": "Взгляни сюда: листья сворачиваются внутрь, на каждом побеге одно и то же. Сад боится, {playerName}. За сто лет я ни разу не видел его испуганным.",
         "objectives": {
           "0": {
-            "label": "Pruned Bloom Clipping"
+            "label": "Свежесрезанный побег"
           }
         }
       },
       "q_eg_four_statues": {
-        "title": "The Four Quiet Sisters",
-        "text": "When the garden was young, the first gardeners raised four marble sisters to watch its quarters: one above the Rose Wilds, one on the pond walk east of the maze, one on the west lawn where the gnomes keep their warren, and one on the south lawn past the hedges. The maze grew up between them, and most folk never see all four. Walk the quarters, {playerName}, and press your palm to each sister. When the garden has looked you over from all four sides, it will open places it keeps from strangers.",
-        "completion": "Four rubbings, four sisters, and not one of them wept marble. The garden has taken your measure, {playerName}, and it did not find you wanting. Now I can send you where the trouble truly lives.",
+        "title": "Четыре тихие сестры",
+        "text": "Когда сад был юн, первые садовники поставили четырёх мраморных сестёр стеречь его четверти: одну над Дикими Розами, одну на прудовой дорожке к востоку от лабиринта, одну на западной лужайке, где гномы держат нору, и одну на южной, за изгородями. Лабиринт вырос между ними, и мало кто видел всех четырёх. Обойди четверти, {playerName}, и приложи ладонь к каждой сестре. Когда сад осмотрит тебя со всех четырёх сторон, он откроет места, что прячет от чужих.",
+        "completion": "Четыре оттиска, четыре сестры — и ни одна не заплакала мрамором. Сад снял с тебя мерку, {playerName}, и не нашёл изъяна. Теперь я могу послать тебя туда, где живёт настоящая беда.",
         "objectives": {
           "0": {
-            "label": "Garden statue visited"
+            "label": "Садовая статуя осмотрена"
           }
         }
       },
       "q_eg_bull_of_the_court": {
-        "title": "The Bull of the Fountain Court",
-        "text": "Now the truth, {playerName}. The bull at the heart of the maze was my masterwork: I shaped him to guard the Fountain Court, and for a hundred years he did. But the fear in the green has reached him, and he guards nothing now, he hunts. The maze feeds him whoever wanders in. I am too old to unmake him, and it must be unmaking, root and branch. Bring a friend, walk the maze to the court, and cut my bull down.",
-        "completion": "I felt it, here, when he came apart. A hundred years of work, and you were right to end it. Take this mantle: I cut it for whoever proved stronger than my best. The court is only a fountain tonight, {playerName}, and the garden is only a garden. Perhaps now the Head Gardener and I can both sleep.",
+        "title": "Бык Фонтанного Двора",
+        "text": "А теперь правда, {playerName}. Бык в сердце лабиринта был моим лучшим творением: я выстриг его стеречь Фонтанный Двор, и сто лет он его стерёг. Но страх, что бродит в зелени, добрался и до него, и теперь он не стережёт — он охотится. Лабиринт скармливает ему всякого, кто забредёт внутрь. Я слишком стар, чтобы развоплотить его, а нужно именно развоплощение — под корень и под ветвь. Возьми друга, пройди лабиринт до двора и сруби моего быка.",
+        "completion": "Я почувствовал — вот здесь, — когда он распался. Сто лет труда, и ты был прав, что положил им конец. Возьми эту мантию: я скроил её для того, кто окажется сильнее лучшего из моих творений. Сегодня двор — просто фонтан, {playerName}, а сад — просто сад. Быть может, теперь мы со старшей садовницей оба выспимся.",
         "objectives": {
           "0": {
-            "label": "The Topiary Bull unmade"
+            "label": "Фигурный бык развоплощён"
           }
         }
       },
       "q_fs_bell_at_the_landing": {
-        "title": "The Bell at the Landing",
-        "text": "You came over the Ferrywalk, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up the shore road, past the drying racks nobody tends anymore. Tell Warden Coalfast the causeway still stands, and that Tam has not rung a three-toll today. Yet.",
-        "completion": "The causeway holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands that crosses that sandbar is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
+        "title": "Колокол у Пристани",
+        "text": "Ты пришёл по Паромной косе, {playerName}? Значит, ты первый за неделю, и Смотритель захочет на тебя взглянуть. Чаячья Гавань выше по прибрежной дороге, за сушильными рамами, за которыми больше никто не смотрит. Скажи Смотрителю Хладоуглю, что коса ещё цела и что Там сегодня не бил тройной набат. Пока.",
+        "completion": "Коса держится, а у Тама ещё хватает дыхания шутить про тройной набат. Хорошо. Мы — остров в осаде, {playerName}, и каждая пара рук, что переходит эту отмель, — ещё одна пара, через которую прорывам придётся пробиться, прежде чем они доберутся до моих людей. Добро пожаловать в Чаячью Гавань.",
         "objectives": {
           "0": {
-            "label": "Report to Warden Coalfast"
+            "label": "Доложите Смотрителю Хладоуглю"
           }
         }
       },
       "q_fs_hold_the_riftfields": {
-        "title": "Hold the Riftfields",
-        "text": "East of town the grain rows have gone to wrack, and the wretches that came through the Riftfields break now pick them clean. My people cannot tend a field they cannot stand in, {playerName}. Cull ten of the wretches and give the farmers back their ground.",
-        "completion": "Ten fewer, and the field hands are already arguing over who walks out first. It will not last, the breaks never rest long, but a town that eats is a town that holds.",
+        "title": "Удержать Поля Разломов",
+        "text": "К востоку от города хлебные ряды пришли в запустение, и отродья, пролезшие через прорыв на Полях Разломов, теперь обирают их дочиста. Мои люди не могут возделывать поле, на котором не могут стоять, {playerName}. Истреби десять отродий и верни земледельцам их землю.",
+        "completion": "На десять меньше — и батраки уже спорят, кто первым выйдет в поле. Это ненадолго, прорывы не отдыхают подолгу, но город, который ест, — это город, который держится.",
         "objectives": {
           "0": {
-            "label": "Breach Wretch slain"
+            "label": "Отродье прорыва убито"
           }
         }
       },
       "q_fs_steel_for_the_redoubt": {
-        "title": "Steel for the Redoubt",
-        "text": "Every blade I hand out is one the sea gave back or one I pried off the dead, {playerName}. The wretches carry scrap through the breaks, hinges, hooks, broken sword-steel, magpie stuff, but it hammers out true. Bring me six pieces of their scavenged steel and the barricade line gets its teeth back.",
-        "completion": "Salt-pitted and break-scarred, and it will hold an edge all the same. Here, I lined these grips myself. Steel for steel, {playerName}: it is the only trade the Farshore runs these days.",
+        "title": "Сталь для редута",
+        "text": "Каждый клинок, что я выдаю, — из тех, что вернуло море, или из тех, что я сняла с мёртвых, {playerName}. Отродья тащат через прорывы лом: петли, крючья, обломки мечей — сорочья добыча, но перековывается она на славу. Принеси мне шесть кусков их награбленной стали, и у линии заграждений снова будут зубы.",
+        "completion": "Изъедена солью, в шрамах прорыва — а кромку всё равно держит. Вот, эти рукавицы я подбивала сама. Сталь за сталь, {playerName}: другой торговли на Дальнем Береге нынче не водится.",
         "objectives": {
           "0": {
-            "label": "Break-Scarred Steel"
+            "label": "Сталь со шрамами прорыва"
           }
         }
       },
       "q_fs_the_three_bells": {
-        "title": "The Three Bells",
-        "text": "Three watchbells stand the coast beyond my own: one on the Landing point, one on the south strand, one out by the Riftfields shore. If a rope has rotted or a clapper has been carried off, the town learns of a break when it is already in the streets. Walk the coast, {playerName}, and ring each bell once, so I know it still has a voice.",
-        "completion": "Three voices, three answers, carried clean over the water. Sleep in Gullhaven tonight, {playerName}, and know that if a bell wakes you, it will be by my hand and in good time.",
+        "title": "Три колокола",
+        "text": "Кроме моего, на побережье стоят три сторожевых колокола: один на мысу у Пристани, один на южной полосе, один у берега Полей Разломов. Если верёвка сгнила или язык унесли, город узнает о прорыве, когда тот уже будет на улицах. Обойди берег, {playerName}, и ударь в каждый колокол по разу, чтобы я знал, что голос при нём.",
+        "completion": "Три голоса, три ответа, чисто донесённых над водой. Спи этой ночью в Чаячьей Гавани, {playerName}, и знай: если тебя разбудит колокол, то от моей руки — и вовремя.",
         "objectives": {
           "0": {
-            "label": "Watchbell rung"
+            "label": "Сторожевой колокол прозвонил"
           }
         }
       },
       "q_fs_song_before_the_break": {
-        "title": "The Song Before the Break",
-        "text": "There is a man who hears the breaks before they open. Riftwatch Ollun: a scholar, or a madman, and lately I cannot afford the difference. He keeps his vigil at the Watch Meadow, up the road southeast of town. Find him, {playerName}, and ask him what the island is about to do to us next.",
-        "completion": "The Warden sent you? Good. That means the town has finally started listening. Now be still a moment, {playerName}. There, under the wind, do you hear it? The cliffs are singing, and I do not like the tune.",
+        "title": "Песнь перед прорывом",
+        "text": "Есть человек, который слышит прорывы раньше, чем они раскрываются. Стражеразлома Оллун: учёный — или безумец, а мне в последнее время эта разница не по карману. Он несёт свою вахту на Дозорном Лугу, вверх по дороге к юго-востоку от города. Найди его, {playerName}, и спроси, что остров собирается сделать с нами дальше.",
+        "completion": "Тебя прислал Смотритель? Хорошо. Значит, город наконец начал слушать. А теперь замри на мгновение, {playerName}. Вот, под ветром — слышишь? Утёсы поют, и напев мне не нравится.",
         "objectives": {
           "0": {
-            "label": "Find Riftwatch Ollun"
+            "label": "Найдите Стражеразлома Оллуна"
           }
         }
       },
       "q_fs_moss_and_mending": {
-        "title": "Moss and Mending",
-        "text": "The salt moss that grows along the tideline is the best wound-packing I know, and the riftspawn have claimed every stretch of shore it grows on. They carry tufts of it snagged on their hides, of all things. Clear six of them off the east reaches, {playerName}, and pull me four good handfuls of moss from what they have trampled through.",
-        "completion": "Moss in one hand and a quieter shoreline in the other. You have restocked my whole surgery, {playerName}. Do me the kindness of not becoming my next patient.",
+        "title": "Мох и врачевание",
+        "text": "Солёный мох, что растёт вдоль линии прилива, — лучшая повязка на рану из всех, что я знаю, а порождения разлома заняли каждую полосу берега, где он растёт. Они, представь себе, таскают его клочья, зацепившиеся за шкуры. Расчисть от них восточные отмели — шестерых хватит, {playerName}, — и набери мне четыре добрых горсти мха там, где они его истоптали.",
+        "completion": "В одной руке мох, в другой — притихший берег. Ты пополнил всю мою лечебницу, {playerName}. Сделай милость: не становись моим следующим пациентом.",
         "objectives": {
           "0": {
-            "label": "Riftspawn slain"
+            "label": "Порождение разлома убито"
           },
           "1": {
-            "label": "Farshore Salt Moss"
+            "label": "Солёный мох Дальнего Берега"
           }
         }
       },
       "q_fs_bram_come_home": {
-        "title": "Bram Come Home",
-        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.",
-        "completion": "Bram! You brought him back to me whole, {playerName}. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.",
+        "title": "Вернись домой, Брам",
+        "text": "Мой Брам вывел лодку в то самое утро, когда раскрылся прорыв у сетей, и море выбросило его где-то за мысом у Пристани. Три ночи назад я слышала его, {playerName}, — он звал через воду, а я побоялась пойти. Я и сейчас боюсь. Прошу тебя. Его лодка лежит разбитой на северном берегу. Доведи его до дома, ко мне.",
+        "completion": "Брам! Ты вернул мне его целым, {playerName}. Мы оба плакали, и никому из нас не стыдно. Что бы прорывы ни забрали у этого острова дальше, моей семьи им не видать. Больше никогда.",
         "objectives": {
           "0": {
-            "label": "Fisher Bram seen safely home to Gullhaven"
+            "label": "Рыбак Брам благополучно доведён до Чаячьей Гавани"
           }
         }
       },
       "q_fs_stalkers_off_the_light": {
-        "title": "Stalkers off the Light",
-        "text": "The stalkers hunt the dark between the watchfires, and every night they circle my meadow a little closer. They are not mindless, {playerName}, they are patient, and patience is the one thing I cannot outlast. Kill eight and push the dark back to the cliffs it came through.",
-        "completion": "Eight nights of circling, ended in one. The fires burn steadier already, or perhaps that is only my hands. Either way the meadow is mine again, and I can hear the island think.",
+        "title": "Охотники прочь от света",
+        "text": "Охотники рыщут во тьме между сторожевыми кострами, и с каждой ночью их круг вокруг моего луга всё теснее. Они не безмозглы, {playerName}, они терпеливы, а терпение — единственное, что мне не пересидеть. Убей восьмерых и оттесни тьму назад, к утёсам, из которых она пришла.",
+        "completion": "Восемь ночей кружения окончились за одну. Костры уже горят ровнее — или это только мои руки. Так или иначе, луг снова мой, и я слышу, как остров думает.",
         "objectives": {
           "0": {
-            "label": "Void Stalker slain"
+            "label": "Охотник Пустоты убит"
           }
         }
       },
       "q_fs_the_great_break": {
-        "title": "The Great Break",
-        "text": "Every song this island sings ends on the same low note, and it comes from the Sundered Cliffs. Something came through the great break there, {playerName}, something the cliffs themselves cracked open to admit, and it is still growing. If it walks north, no bell will matter. Take a friend, take two, and end it. Then tell Coalfast the tune has changed.",
-        "completion": "Ollun sent word ahead: the singing stopped. My whole town heard the quiet, {playerName}, and half of them wept at the sound of nothing at all. Wear this mantle. The Farshore does not forget who held its shore.",
+        "title": "Великий прорыв",
+        "text": "Каждая песня этого острова кончается одной и той же низкой нотой, и идёт она с Расколотых Утёсов. Что-то прошло там через великий прорыв, {playerName}, — что-то, ради чего утёсы сами треснули, чтобы впустить его, — и оно всё ещё растёт. Если оно двинется на север, никакой колокол уже не поможет. Возьми друга, а лучше двух, и покончи с ним. Потом скажи Хладоуглю, что мелодия переменилась.",
+        "completion": "Оллун прислал весть вперёд тебя: пение смолкло. Весь мой город услышал эту тишину, {playerName}, и половина заплакала от звука полного ничего. Носи эту мантию. Дальний Берег не забывает тех, кто удержал его берег.",
         "objectives": {
           "0": {
-            "label": "The Sundered Horror slain"
+            "label": "Расколотый Ужас убит"
           }
         }
       },
       "q_gc_down_the_windway": {
-        "title": "Down the Windway",
-        "text": "You made the climb, {playerName}, so the wind has decided to keep you. Wickharbor sits east along the downs road, tucked in the lee of its cove. Harbormaster Odile counts every soul who comes over the pass, and she will want to count you. Tell her the Windway is still open.",
-        "completion": "Over the pass on foot, in this weather? Maren sends me few enough names, and fewer still walk in to answer for themselves. Welcome to Wickharbor, {playerName}. Close the inn door behind you.",
+        "title": "Вниз по Ветровому Проходу",
+        "text": "Ты одолел подъём, {playerName}, — значит, ветер решил тебя оставить. Викхарбор лежит к востоку по дороге через холмы, укрытый в затишье своей бухты. Начальница гавани Одиль считает каждую душу, что переваливает через проход, и захочет сосчитать тебя. Скажи ей, что Ветровой Проход ещё открыт.",
+        "completion": "Через перевал пешком, в такую погоду? Марен присылает мне немного имён, и ещё меньше их приходит отвечать за себя самим. Добро пожаловать в Викхарбор, {playerName}. Закрой за собой дверь таверны.",
         "objectives": {
           "0": {
-            "label": "Report to Harbormaster Odile"
+            "label": "Доложите начальнице гавани Одиль"
           }
         }
       },
       "q_gc_wool_off_the_downs": {
-        "title": "Wool off the Downs",
-        "text": "My boat crews row into a gale that cuts through oilskin like paper, {playerName}. Only one thing turns this wind: the greasy wool off the moor rams, spun thick the Wickharbor way. The herds graze the Howling Downs west of town. Six good fleeces and every crew rows warm this season.",
-        "completion": "Fleece like this is why the rams stand out there fat and smug in weather that kills men. The spinners will be at it by lamplight. Take these treads, {playerName}, they are lined from the last shearing.",
+        "title": "Шерсть с холмов",
+        "text": "Мои лодочные команды гребут в шторм, что режет сквозь промасленную кожу, как сквозь бумагу, {playerName}. Этот ветер держит лишь одно: жирная шерсть вересковых баранов, спрядённая потолще, по-викхарборски. Стада пасутся на Воющих Холмах к западу от города. Шесть добрых рун — и каждая команда этот сезон гребёт в тепле.",
+        "completion": "Вот из-за такого руна бараны и стоят там, сытые и самодовольные, в погоду, что убивает людей. Пряхи засядут за работу при лампах. Возьми эти боты, {playerName}, они подбиты с последней стрижки.",
         "objectives": {
           "0": {
-            "label": "Greasy Ram Wool"
+            "label": "Жирная баранья шерсть"
           }
         }
       },
       "q_gc_scuttlers_in_the_pots": {
-        "title": "Scuttlers in the Pots",
-        "text": "The shoal scuttlers have learned to climb the cliff road and crack our crab pots open on the stones, {playerName}. Half the catch gone this week, and one potman with a hand he will not be using for a month. Break ten of them and the rest will remember why they kept to the shoals.",
-        "completion": "Ten fewer shells on my road, and the pots came up full this morning. The potmen are calling you a good omen, {playerName}. In Wickharbor that is as warm as praise gets.",
+        "title": "Крабы в ловушках",
+        "text": "Отмельные крабы научились взбираться по прибрежной дороге и раскалывать наши крабьи ловушки о камни, {playerName}. За неделю — половина улова, и один ловец с рукой, которой он месяц не сможет пользоваться. Разбей десятерых, и остальные вспомнят, почему держались отмелей.",
+        "completion": "На десять панцирей меньше на моей дороге, и этим утром ловушки поднялись полными. Ловцы зовут тебя добрым знаком, {playerName}. В Викхарборе теплее похвалы не бывает.",
         "objectives": {
           "0": {
-            "label": "Shoal Scuttler slain"
+            "label": "Отмельный краб убит"
           }
         }
       },
       "q_gc_keeper_of_the_flame": {
-        "title": "The Keeper of the Flame",
-        "text": "Old Bram keeps the Beacon on the high head northeast of town, and he has not come down for his stores in two weeks. The lamp still burns, so he lives, but a man his age alone on that head in this wind, {playerName}. Climb the beacon road and see him standing.",
-        "completion": "Odile sent you all this way to see if the wind had taken me? Ha. Tell her the lamp burns and so do I. But since you have made the climb, {playerName}, stay a moment. The Beacon has work only a stranger seems fit to do.",
+        "title": "Хранитель огня",
+        "text": "Старый Брам держит Маяк на высоком мысу к северо-востоку от города, и вот уже две недели он не спускается за припасами. Лампа горит — значит, он жив, но человек его лет, один на том мысу, на таком ветру, {playerName}... Поднимись по маячной дороге и убедись, что он на ногах.",
+        "completion": "Одиль послала тебя в такую даль проверить, не унесло ли меня ветром? Ха. Передай ей: лампа горит, и я горю. Но раз уж ты одолел подъём, {playerName}, задержись. У Маяка есть работа, к которой годен, похоже, только чужак.",
         "objectives": {
           "0": {
-            "label": "Find Keeper Bram"
+            "label": "Найдите смотрителя Брама"
           }
         }
       },
       "q_gc_lanterns_on_the_shear": {
-        "title": "Lanterns on the Shear",
-        "text": "The Beacon is the great light, {playerName}, but it is the storm-lanterns that walk a night traveler down the cliff road above the Shear. Last night the gale doused every one of them, and that road in the dark is a long fall with a short ending. Take my striker and relight the four along the cliff.",
-        "completion": "Four points of light on the cliff road, right where they belong. From up here it looks like the coast has opened its eyes again. You have the makings of a keeper, {playerName}.",
+        "title": "Фонари над Срезом",
+        "text": "Маяк — великий свет, {playerName}, но ночного путника по дороге над Отвесным Срезом ведут штормовые фонари. Этой ночью шторм задул их все до единого, а та дорога в темноте — это долгое падение с коротким концом. Возьми моё огниво и снова зажги четыре фонаря вдоль обрыва.",
+        "completion": "Четыре точки света на дороге над обрывом, ровно там, где им положено. Отсюда, сверху, кажется, будто побережье снова открыло глаза. Из тебя вышел бы смотритель, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Storm-lantern relit"
+            "label": "Штормовой фонарь зажжён вновь"
           }
         }
       },
       "q_gc_wind_against_the_wick": {
-        "title": "Wind Against the Wick",
-        "text": "The gale wisps are the wind gone spiteful, {playerName}. They gather on the high downs by the Mirror Tarn, and every flame they find, they snuff, a lantern, a hearth, one day this lamp. Thirty-nine years I have kept the Beacon lit, and I will not lose it to weather with a grudge. Scatter eight of them.",
-        "completion": "The lamp did not so much as gutter last night, first time in a month. The wind still hates us, {playerName}, but it has gone back to hating us fairly.",
+        "title": "Ветер против фитиля",
+        "text": "Штормовые духи — это ветер, обернувшийся злобой, {playerName}. Они собираются на верхних холмах у Зеркального Озера, и всякое пламя, что найдут, гасят: фонарь, очаг, а однажды — и эту лампу. Тридцать девять лет я держу Маяк зажжённым и не отдам его погоде, затаившей обиду. Развей восьмерых.",
+        "completion": "Этой ночью лампа ни разу даже не дрогнула — впервые за месяц. Ветер всё ещё ненавидит нас, {playerName}, но ненавидит снова честно.",
         "objectives": {
           "0": {
-            "label": "Gale Wisp scattered"
+            "label": "Штормовой дух развеян"
           }
         }
       },
       "q_gc_the_far_shore": {
-        "title": "The Far Shore",
-        "text": "From this lamp room I can see the whole coast, {playerName}, and what I see in the north I do not like. Green lights walking the Wreckfields at low tide, hull by hull. One woman works that shore alone: Edda, the salvager. Follow the cliff road north past the Shear until the wrecks begin, and see that she still draws breath.",
-        "completion": "Bram watches my shore from his tower now, does he? The old man is right to worry, {playerName}. The dead have been walking their own wrecks at night, and lately they have stopped caring whether the sun is up.",
+        "title": "Дальний берег",
+        "text": "Из этой ламповой комнаты мне видно всё побережье, {playerName}, и то, что я вижу на севере, мне не по душе. Зелёные огни бродят по Полям Кораблекрушений в отлив, от остова к остову. На том берегу работает одна-единственная женщина: Эдда, добытчица. Иди по дороге над обрывом на север, мимо Среза, пока не начнутся остовы, и убедись, что она ещё дышит.",
+        "completion": "Брам теперь караулит мой берег со своей башни, вот как? Старик прав, что тревожится, {playerName}. Мертвецы стали по ночам обходить собственные крушения, а с недавних пор им всё равно, взошло ли солнце.",
         "objectives": {
           "0": {
-            "label": "Find Salvager Edda"
+            "label": "Найдите добытчицу Эдду"
           }
         }
       },
       "q_gc_dead_mens_cargo": {
-        "title": "Dead Men's Cargo",
-        "text": "Salvage law is simple, {playerName}: what the sea gives the beach is mine. The drowned deckhands disagree. They rise from their hulls and drag every crate I stack back below the tideline. Put six of them down for good, and while the beach is quiet, haul in three flotsam crates before the tide files its counterclaim.",
-        "completion": "Six crews quieter and three crates high and dry. You salvage with a heavier hand than I do, {playerName}, but the ledger does not care. Half of this is yours by law, and by law I mean I say so.",
+        "title": "Груз мертвецов",
+        "text": "Закон добычи прост, {playerName}: что море отдало берегу, то моё. Утонувшие матросы не согласны. Они поднимаются из своих остовов и утаскивают каждый сложенный мною ящик обратно за линию прилива. Упокой шестерых насовсем, а пока на берегу тихо, вытащи три прибитых морем ящика, прежде чем прилив подаст встречный иск.",
+        "completion": "Шесть команд стали тише, и три ящика в сухости. Добываешь ты тяжелее моего, {playerName}, но учётной книге всё равно. Половина твоя по закону, а закон здесь — это я.",
         "objectives": {
           "0": {
-            "label": "Drowned Deckhand laid to rest"
+            "label": "Утонувший матрос упокоен"
           },
           "1": {
-            "label": "Flotsam Crate salvaged"
+            "label": "Прибитый морем ящик добыт"
           }
         }
       },
       "q_gc_the_wreck_warden": {
-        "title": "The Wreck Warden",
-        "text": "Now you know why the deckhands rise, {playerName}. Something wears the barnacled plate of the first wreck ever to break on this shore, and it wardens every hull on the beach like a graveyard it was hired to keep. It holds a hoard I have coveted for ten years and a crew I would rather see resting. End the Wreck Warden. Bring a friend, the dead keep good watch.",
-        "completion": "The beach went silent the moment it fell, {playerName}. First silence I have heard on this shore in ten years of working it. The crews are just bones now, resting bones. Take the mantle off the top of the hoard, it was always going to fit a living back better.",
+        "title": "Страж Кораблекрушений",
+        "text": "Теперь ты знаешь, почему матросы встают, {playerName}. Нечто носит обросшие ракушками латы первого корабля, разбившегося об этот берег, и сторожит каждый остов на отмели, как кладбище, которое ему поручили. Оно хранит клад, о котором я мечтаю десять лет, и команду, которой я желала бы покоя. Покончи со Стражем Кораблекрушений. Возьми друга — мёртвые несут дозор исправно.",
+        "completion": "Берег умолк в тот самый миг, когда он пал, {playerName}. Первая тишина на этом берегу за десять лет моей работы. Команды теперь просто кости — упокоенные кости. Возьми мантию с верхушки клада: живой спине она всегда была впору больше.",
         "objectives": {
           "0": {
-            "label": "The Wreck Warden felled"
+            "label": "Страж Кораблекрушений повержен"
           }
         }
       },

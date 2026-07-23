@@ -8817,169 +8817,169 @@ export const zh_CN: EnTranslations = {
         "name": "祖尔加的獠牙匕首"
       },
       "thick_winter_pelt": {
-        "name": "Thick Winter Pelt"
+        "name": "厚实的冬季毛皮"
       },
       "aurora_mote": {
-        "name": "Aurora Mote"
+        "name": "极光微尘"
       },
       "hearth_ember_cache": {
-        "name": "Ember Cache"
+        "name": "火种罐"
       },
       "sprung_trap": {
-        "name": "Sprung Fen Trap"
+        "name": "被触发的沼泽捕兽夹"
       },
       "hearthlined_treads": {
-        "name": "Hearth-Lined Treads"
+        "name": "炉火衬里行靴"
       },
       "frostmane_mantle": {
-        "name": "Mantle of the Frostmane"
+        "name": "霜鬃披风"
       },
       "ashbone_war_brand": {
-        "name": "Ashbone War-Brand"
+        "name": "灰骨战印"
       },
       "emberwing_scale": {
-        "name": "Emberwing Scale"
+        "name": "烬翼龙鳞"
       },
       "scorched_supply_crate": {
-        "name": "Scorched Supply Crate"
+        "name": "烧焦的补给箱"
       },
       "wyrmwatch_warning_banner": {
-        "name": "Wyrmwatch Warning Banner"
+        "name": "望龙哨警示旗"
       },
       "cinderwalk_treads": {
-        "name": "Cinderwalk Treads"
+        "name": "烬径行靴"
       },
       "mawscale_pauldrons": {
-        "name": "Mawscale Pauldrons"
+        "name": "龙喉鳞护肩"
       },
       "gilded_sap_clot": {
-        "name": "Gilded Sap Clot"
+        "name": "鎏金树脂凝块"
       },
       "amberfall_sap_bucket": {
-        "name": "Sap-Tap Bucket"
+        "name": "采脂桶"
       },
       "mere_ferry_lantern": {
-        "name": "Ferry Lantern"
+        "name": "渡船提灯"
       },
       "orchard_sapbinder_grips": {
-        "name": "Sapbinder Grips"
+        "name": "缚脂护手"
       },
       "mantle_of_the_meredark": {
-        "name": "Mantle of the Meredark"
+        "name": "湖渊暗影披风"
       },
       "plump_fen_eel": {
-        "name": "Plump Fen Eel"
+        "name": "肥美的沼泽鳗鱼"
       },
       "wisplight_globe": {
-        "name": "Wisplight Globe"
+        "name": "泽光球"
       },
       "fenway_mooring_line": {
-        "name": "Cut Mooring Line"
+        "name": "断掉的系船索"
       },
       "bridgemere_toll_chest": {
-        "name": "Sunken Toll-Chest"
+        "name": "沉水桥税箱"
       },
       "eelskin_mudwaders": {
-        "name": "Eelskin Mudwaders"
+        "name": "鳗皮涉泥靴"
       },
       "lilybed_mantle": {
-        "name": "Mantle of the Lily-Bed"
+        "name": "莲床披风"
       },
       "moonfleece_tuft": {
-        "name": "Moonfleece Tuft"
+        "name": "月绒毛团"
       },
       "gloamfield_nightbloom": {
-        "name": "Nightbloom Blossom"
+        "name": "夜绽花"
       },
       "vigil_star_chart": {
-        "name": "Vigil Star Chart"
+        "name": "守望石阵星图"
       },
       "barrow_grave_offering": {
-        "name": "Scattered Grave Offering"
+        "name": "散落的墓前祭品"
       },
       "moonfleece_mitts": {
-        "name": "Moonfleece Mitts"
+        "name": "月绒连指手套"
       },
       "barrowshade_mantle": {
-        "name": "Barrowshade Mantle"
+        "name": "冢影披风"
       },
       "widowsilk_skein": {
-        "name": "Widowsilk Skein"
+        "name": "寡妇丝线束"
       },
       "gallowmere_grave_candle": {
-        "name": "Grave-Candle"
+        "name": "墓烛"
       },
       "silkbound_remains": {
-        "name": "Silkbound Remains"
+        "name": "缚丝遗骸"
       },
       "gravebound_silk_wraps": {
-        "name": "Gravebound Silk Wraps"
+        "name": "缚墓丝裹"
       },
       "mantle_of_the_unhorsed": {
-        "name": "Mantle of the Unhorsed"
+        "name": "落马者披风"
       },
       "pearlwake_cargo_crate": {
-        "name": "Pearlwake Cargo Crate"
+        "name": "珠浪号货箱"
       },
       "canopy_silk_hank": {
-        "name": "Canopy Silk Hank"
+        "name": "树冠丝束"
       },
       "sunken_offering_bowl": {
-        "name": "Refilled Offering Bowl"
+        "name": "重新盛满的祭碗"
       },
       "saltwalker_sandals": {
-        "name": "Saltwalker Sandals"
+        "name": "踏盐凉鞋"
       },
       "sunken_idol_mantle": {
-        "name": "Mantle of the Sunken Idol"
+        "name": "沉没神像披风"
       },
       "hedgewick_shears": {
-        "name": "Stolen Hedgewick Shears"
+        "name": "失窃的篱苑修枝剪"
       },
       "evergarden_bloom_clipping": {
-        "name": "Pruned Bloom Clipping"
+        "name": "修剪下的花枝"
       },
       "hedgewick_tool_cart": {
-        "name": "Spilled Tool Cart"
+        "name": "翻倒的工具车"
       },
       "evergarden_statue_rubbing": {
-        "name": "Statue Rubbing"
+        "name": "雕像拓片"
       },
       "shearkeeper_gloves": {
-        "name": "Shearkeeper Gloves"
+        "name": "持剪人手套"
       },
       "fountain_court_mantle": {
-        "name": "Mantle of the Fountain Court"
+        "name": "喷泉庭院披风"
       },
       "galecrest_ram_wool": {
-        "name": "Greasy Ram Wool"
+        "name": "含脂羊毛"
       },
       "shear_storm_lantern": {
-        "name": "Doused Storm-Lantern"
+        "name": "熄灭的风暴提灯"
       },
       "wreckfield_flotsam_crate": {
-        "name": "Flotsam Crate"
+        "name": "漂流货箱"
       },
       "wickspun_treads": {
-        "name": "Wickspun Treads"
+        "name": "烛纺行靴"
       },
       "wreck_wardens_mantle": {
-        "name": "Mantle of the Wreck Warden"
+        "name": "沉船守卫披风"
       },
       "breakscarred_steel": {
-        "name": "Break-Scarred Steel"
+        "name": "裂隙创痕钢"
       },
       "farshore_salt_moss": {
-        "name": "Farshore Salt Moss"
+        "name": "远岸盐苔"
       },
       "gullhaven_watchbell": {
-        "name": "Coastal Watchbell"
+        "name": "海岸警钟"
       },
       "saltforged_grips": {
-        "name": "Saltforged Grips"
+        "name": "盐锻护手"
       },
       "mantle_of_the_unbroken_shore": {
-        "name": "Mantle of the Unbroken Shore"
+        "name": "不破之岸披风"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -10112,10 +10112,10 @@ export const zh_CN: EnTranslations = {
         "name": "霜鬃雪人"
       },
       "terrace_howler": {
-        "name": "Terrace Howler"
+        "name": "台地嚎兽"
       },
       "apprentice_wren": {
-        "name": "Apprentice Wren"
+        "name": "学徒雯恩"
       },
       "emberwing_drake": {
         "name": "烬翼幼龙"
@@ -10130,7 +10130,7 @@ export const zh_CN: EnTranslations = {
         "name": "沙丘巨魔"
       },
       "cindraleth_maw_matriarch": {
-        "name": "Cindraleth the Maw Matriarch"
+        "name": "辛德拉蕾丝，龙喉之母"
       },
       "gilded_stag": {
         "name": "鎏金雄鹿"
@@ -10142,7 +10142,7 @@ export const zh_CN: EnTranslations = {
         "name": "果园树人"
       },
       "the_meredark": {
-        "name": "The Meredark"
+        "name": "湖渊暗影"
       },
       "harvest_sprite": {
         "name": "丰收小妖"
@@ -10175,7 +10175,7 @@ export const zh_CN: EnTranslations = {
         "name": "古冢之王"
       },
       "barrow_wight": {
-        "name": "Barrow Wight"
+        "name": "古冢尸妖"
       },
       "widowsilk_spinner": {
         "name": "寡妇丝纺蛛"
@@ -10190,7 +10190,7 @@ export const zh_CN: EnTranslations = {
         "name": "苍白猎手"
       },
       "gravedigger_mosley": {
-        "name": "Gravedigger Mosley"
+        "name": "掘墓人莫斯利"
       },
       "tide_scuttler": {
         "name": "潮汐蟹"
@@ -10205,7 +10205,7 @@ export const zh_CN: EnTranslations = {
         "name": "神像守卫"
       },
       "castaway_navigator": {
-        "name": "Navigator Suli"
+        "name": "领航员苏莉"
       },
       "topiary_stag": {
         "name": "绿雕雄鹿"
@@ -10232,7 +10232,7 @@ export const zh_CN: EnTranslations = {
         "name": "沉船守卫"
       },
       "drowned_deckhand": {
-        "name": "Drowned Deckhand"
+        "name": "溺亡水手"
       },
       "riftspawn": {
         "name": "裂生怪"
@@ -10247,7 +10247,7 @@ export const zh_CN: EnTranslations = {
         "name": "碎裂恐魔"
       },
       "fisher_bram": {
-        "name": "Fisher Bram"
+        "name": "渔民布拉姆"
       },
       "rift_hellguard": {
         "name": "地狱卫士"
@@ -10614,189 +10614,189 @@ export const zh_CN: EnTranslations = {
         "greeting": "外面那些石碑已经许久不曾对人开口。也许它们正等着新的耳朵。"
       },
       "huntsman_deral": {
-        "name": "Huntsman Deral",
-        "title": "Warden of the Herds",
-        "greeting": "Quiet now. The herd knows every sound this valley makes, and so do I."
+        "name": "猎人德拉尔",
+        "title": "鹿群守望者",
+        "greeting": "别出声。鹿群熟悉这山谷里的每一种声响，我也一样。"
       },
       "warden_kaldra": {
-        "name": "Warden Kaldra",
-        "title": "Warden of Icemantle",
-        "greeting": "Mind the benches, stranger. The snow keeps what it takes."
+        "name": "守望者卡尔德拉",
+        "title": "冰幔镇守望者",
+        "greeting": "当心那些雪台，陌生人。雪拿走的东西，从不归还。"
       },
       "hearthkeeper_maeve": {
-        "name": "Hearthkeeper Maeve",
-        "title": "Keeper of the Hearth-Lodge",
-        "greeting": "Come in off the cold. The lodge fire never goes out, so long as I draw breath."
+        "name": "炉火看守梅芙",
+        "title": "炉舍看守",
+        "greeting": "快进来避避寒。只要我还有一口气，炉舍的火就不会熄。"
       },
       "scout_einna": {
-        "name": "Scout Einna",
-        "title": "Snowline Scout",
-        "greeting": "You walked the pass alive. Good. Icemantle should hear of it."
+        "name": "斥候艾娜",
+        "title": "雪线斥候",
+        "greeting": "你活着走过了隘口。很好。这消息该让冰幔镇知道。"
       },
       "aurorist_veyla": {
-        "name": "Aurorist Veyla",
-        "title": "Reader of the Lights",
-        "greeting": "Hush. The lights are speaking tonight, and they do not repeat themselves."
+        "name": "极光师薇拉",
+        "title": "读光者",
+        "greeting": "安静。今晚极光正在开口，而它们从不重复自己说过的话。"
       },
       "trapper_brosk": {
-        "name": "Trapper Brosk",
-        "title": "Shiverfen Trapper",
-        "greeting": "Fen took three of my lines this week. Fen never took a line in twenty years."
+        "name": "捕兽人布罗斯克",
+        "title": "颤栗沼泽捕兽人",
+        "greeting": "这星期沼泽吞了我三条陷阱线。二十年来它一条都没吞过。"
       },
       "gatecaptain_brannoc": {
-        "name": "Gatecaptain Brannoc",
-        "title": "Commander of Wyrmwatch",
-        "greeting": "Wyrmwatch holds the gate. Has held it forty years. It will hold it tonight."
+        "name": "门队长布兰诺克",
+        "title": "望龙哨指挥官",
+        "greeting": "望龙哨守着这道门。守了四十年。今夜也一样守得住。"
       },
       "quartermaster_sela": {
-        "name": "Quartermaster Sela",
-        "title": "Keeper of the Garrison Stores",
-        "greeting": "Every crate in this yard crossed forty miles of ash to get here. Treat them kindly."
+        "name": "军需官塞拉",
+        "title": "驻军仓库看守",
+        "greeting": "这院子里的每只箱子都是跨过四十里灰烬才到这儿的。对它们好一点。"
       },
       "scout_yerrin": {
-        "name": "Scout Yerrin",
-        "title": "Far-Dune Watcher",
-        "greeting": "Keep low. Sound carries strangely off the glass, and the gate below has ears."
+        "name": "斥候耶琳",
+        "title": "远丘瞭望者",
+        "greeting": "压低身子。声音在血玻璃上传得很怪，而下面那道门长着耳朵。"
       },
       "reeve_ottoline": {
-        "name": "Reeve Ottoline",
-        "title": "Reeve of Lanternmere",
-        "greeting": "Welcome to Lanternmere, where the harvest never ends and neither does the work."
+        "name": "镇务官奥托琳",
+        "title": "灯湖镇镇务官",
+        "greeting": "欢迎来到灯湖镇，这里的丰收永不结束，活计也一样。"
       },
       "waywatcher_sorrel": {
-        "name": "Waywatcher Sorrel",
-        "title": "Watcher of the Goldmelt",
-        "greeting": "Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing count."
+        "name": "望道者索雷尔",
+        "title": "融金隘口守望者",
+        "greeting": "身后是雪，前方是金。走融金隘口第二遍的人不多，所以这一趟要走得值。"
       },
       "ferrymaster_caddow": {
-        "name": "Ferrymaster Caddow",
-        "title": "Keeper of the Lantern Ferries",
-        "greeting": "Fog is on the Mere again. When the lanterns go out on the water, wise folk stay ashore."
+        "name": "渡船长卡多",
+        "title": "灯火渡船看守",
+        "greeting": "大湖又起雾了。水面上的灯笼一灭，聪明人就该待在岸上。"
       },
       "orchardist_pomeline": {
-        "name": "Orchardist Pomeline",
-        "title": "Keeper of the Gilded Rows",
-        "greeting": "Mind where you step. Every root in these rows is older than the town, and they remember."
+        "name": "果园主帕梅琳",
+        "title": "鎏金果园看守",
+        "greeting": "脚下留神。这些果树的每一条根都比镇子古老，而且它们记性很好。"
       },
       "waykeeper_pell": {
-        "name": "Waykeeper Pell",
-        "title": "Keeper of the Amberfen Steps",
-        "greeting": "Down the Steps and into the soft country. Mind where you plant your boots."
+        "name": "道口看守佩尔",
+        "title": "琥珀沼石阶看守",
+        "greeting": "沿石阶而下就是那片松软的水乡。落脚的地方可要看仔细。"
       },
       "bridgewright_alden": {
-        "name": "Bridgewright Alden",
-        "title": "Master of the Fenway",
-        "greeting": "Every plank in this town is mine to keep, and the fen chews on all of them."
+        "name": "桥匠奥尔登",
+        "title": "沼道之主",
+        "greeting": "镇上每一块木板都归我照管，而沼泽正啃着它们每一块。"
       },
       "netter_maris": {
-        "name": "Netter Maris",
-        "title": "Eel-Netter of Bridgemere",
-        "greeting": "Smell that? Smoked eel. Half this town stands on stilts I bought with it."
+        "name": "网夫马里斯",
+        "title": "桥湖镇捕鳗人",
+        "greeting": "闻到了吗？熏鳗鱼。这镇子有一半的木桩都是我拿它换来的。"
       },
       "mother_sedge": {
-        "name": "Mother Sedge",
-        "title": "Fen-Witch of Willowweep",
-        "greeting": "The willows told me you were coming before your boots left the bridge."
+        "name": "莎草婆婆",
+        "title": "柳泣泽的沼泽女巫",
+        "greeting": "你的靴子还没离开桥面，柳树就已告诉我你要来了。"
       },
       "lamplighter_sorrel": {
-        "name": "Lamplighter Sorrel",
-        "title": "Keeper of the Nightgate",
-        "greeting": "Mind the lamps, friend. Past this gate the sun gives up and the flowers take over."
+        "name": "点灯人索雷尔",
+        "title": "夜门看守",
+        "greeting": "留意这些灯，朋友。过了这道门，太阳就放弃了，接班的是花。"
       },
       "lira_dewsong": {
-        "name": "Lira Dewsong",
-        "title": "Night-Gardener of Moonrest",
-        "greeting": "Welcome to Moonrest, where the flowers do our dawning for us."
+        "name": "莉拉·露歌",
+        "title": "月栖镇夜园丁",
+        "greeting": "欢迎来到月栖镇，在这里，替我们迎来黎明的是花。"
       },
       "weaver_amelle": {
-        "name": "Weaver Amelle",
-        "title": "Moonfleece Weaver",
-        "greeting": "Feel that? Moonfleece on the loom. Warmer than any fire you have sat beside."
+        "name": "织工艾梅尔",
+        "title": "月绒织工",
+        "greeting": "摸摸看？织机上的月绒。比你烤过的任何炉火都暖。"
       },
       "astronomer_cassian": {
-        "name": "Astronomer Cassian",
-        "title": "Watcher at the Vigil",
-        "greeting": "Hush now. The sky never dawns here, so it never stops talking either."
+        "name": "天文学者卡西安",
+        "title": "守望石阵观测者",
+        "greeting": "轻声些。这里的天空从无黎明，所以它也从不停止诉说。"
       },
       "lampman_cobb": {
-        "name": "Lampman Cobb",
-        "title": "Keeper of the Crowgate Lanterns",
-        "greeting": "Stay in the lamplight, friend. The wood counts everyone who passes the gate."
+        "name": "灯夫科布",
+        "title": "鸦门灯火看守",
+        "greeting": "待在灯光里，朋友。这片林子数着每一个过门的人。"
       },
       "sexton_marrow": {
-        "name": "Sexton Marrow",
-        "title": "Sexton of Gallowmere",
-        "greeting": "We bury them deep here, and we ring the bells so they remember to stay down."
+        "name": "司墓人马罗",
+        "title": "绞湖镇司墓人",
+        "greeting": "在这里我们把死者埋得很深，还要敲响钟声，好让他们记得安分躺着。"
       },
       "widow_tansy": {
-        "name": "Widow Tansy",
-        "title": "Candlewright of Gallowmere",
-        "greeting": "A candle for every grave, and not one may go out. Not one, do you hear me?"
+        "name": "遗孀坦茜",
+        "title": "绞湖镇制烛人",
+        "greeting": "每座坟一支蜡烛，一支也不许熄。一支也不许，你听清了吗？"
       },
       "vicar_creel": {
-        "name": "Vicar Creel",
-        "title": "Last Vicar of the Mournstone",
-        "greeting": "The chapel fell years ago. The dead beneath it did not notice, and so I stayed."
+        "name": "牧师克里尔",
+        "title": "哀石礼拜堂最后的牧师",
+        "greeting": "礼拜堂多年前就塌了。堂下的亡者浑然不觉，于是我留了下来。"
       },
       "strandwatcher_pell": {
-        "name": "Strandwatcher Pell",
-        "title": "Watcher of the Tanglemouth",
-        "greeting": "Out of the black trees at last. Breathe, stranger, the sun holds this side of the pass."
+        "name": "滩岸守望者佩尔",
+        "title": "缠木隘口守望者",
+        "greeting": "总算走出那片黑树林了。喘口气吧，陌生人，隘口这一侧还归太阳管。"
       },
       "salvage_boss_ryna": {
-        "name": "Salvage-Boss Ryna",
-        "title": "Mistress of the Wreck Line",
-        "greeting": "A {className} with working arms, good. The wreck line pays well, if the crabs leave you enough fingers to count it."
+        "name": "打捞头目莱娜",
+        "title": "沉船线女主人",
+        "greeting": "一位胳膊还能使唤的{className}，好。沉船线上的报酬不薄，前提是螃蟹给你留下够数钱的手指。"
       },
       "pearlmother_isha": {
-        "name": "Pearl-Mother Isha",
-        "title": "Elder of the Divers",
-        "greeting": "The sea gives, the sand keeps, and the jungle takes. Stay on the strand, stranger."
+        "name": "珍珠之母伊莎",
+        "title": "采珠人长老",
+        "greeting": "海会给予，沙会保存，丛林只会夺取。待在沙滩上吧，陌生人。"
       },
       "hermit_okku": {
-        "name": "Okku",
-        "title": "The Man Who Went In",
-        "greeting": "Quiet now. The drums count everything that walks under the trees, and they have already counted you."
+        "name": "奥库",
+        "title": "走进丛林的人",
+        "greeting": "安静。鼓声数着树下走过的一切，而它们已经数到了你。"
       },
       "gatewarden_pell": {
-        "name": "Gatewarden Pell",
-        "title": "Keeper of the Garden Gate",
-        "greeting": "Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy."
+        "name": "门卫佩尔",
+        "title": "花园之门看守",
+        "greeting": "在草坪上走路当心些。花园亲自修剪它们，也喜欢它们整整齐齐。"
       },
       "head_gardener_amaranth": {
-        "name": "Head Gardener Amaranth",
-        "title": "Head Gardener of the Evergarden",
-        "greeting": "Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams."
+        "name": "园丁长阿玛兰丝",
+        "title": "常青园园丁长",
+        "greeting": "别在意我眼下的阴影。花园做梦的时候，总得有人醒着。"
       },
       "wickmother_sorrel": {
-        "name": "Wickmother Sorrel",
-        "title": "Keeper of the Hedgewick Inn",
-        "greeting": "Come in, sit, there is cordial on the fire. Just keep a hand on anything iron: the gnomes are light-fingered of late."
+        "name": "烛芯大娘索雷尔",
+        "title": "篱苑旅店老板娘",
+        "greeting": "进来坐吧，火上温着甜酒。只是铁器都看牢些：那帮地精最近手脚不太干净。"
       },
       "gardener_yew": {
-        "name": "Gardener Yew",
-        "title": "The Last Gardener",
-        "greeting": "Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks."
+        "name": "园丁尤伊",
+        "title": "最后的园丁",
+        "greeting": "把那辆手推车递给我，好吗？不管小镇怎么想，这些草坪总得有人走上一遍。"
       },
       "watcher_maren": {
-        "name": "Watcher Maren",
-        "title": "The Windway Watch",
-        "greeting": "Mind your footing past the gate. The wind up here takes hats first and questions never."
+        "name": "瞭望者玛伦",
+        "title": "风道岗哨",
+        "greeting": "过了门就看稳脚下。这上头的风先抢帽子，从不问话。"
       },
       "harbormaster_odile": {
-        "name": "Harbormaster Odile",
-        "title": "Harbormaster of Wickharbor",
-        "greeting": "Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will not wait."
+        "name": "港务长奥黛尔",
+        "title": "烛港港务长",
+        "greeting": "这湾里每一条船的龙骨都欠着老灯塔的情。有话快说，潮水可不等人。"
       },
       "keeper_bram": {
-        "name": "Keeper Bram",
-        "title": "Keeper of the Old Beacon",
-        "greeting": "Nine and thirty years this lamp has burned on my watch. It will not go dark on yours."
+        "name": "守灯人布拉姆",
+        "title": "老灯塔守灯人",
+        "greeting": "这盏灯在我手上烧了三十九年。它不会在你来的这天熄灭。"
       },
       "salvager_edda": {
-        "name": "Salvager Edda",
-        "title": "Wreckfield Salvager",
-        "greeting": "Wreckwood, rope, and dead men's cargo. The sea pays my wage, when the Warden lets it."
+        "name": "打捞者艾妲",
+        "title": "沉船滩打捞者",
+        "greeting": "沉船木、缆绳，还有死人的货。大海付我工钱，只要沉船守卫肯放行。"
       },
       "warden_coalfast": {
         "name": "守望者·煤耐",
@@ -11834,32 +11834,32 @@ export const zh_CN: EnTranslations = {
         }
       },
       "q_hollow_the_huntsman": {
-        "title": "The Warden of the Herds",
-        "text": "You look like someone who can handle more than wisps, {playerName}. Huntsman Deral keeps his lookout among the stag meadows east of here, and he has been asking after capable hands for weeks. Whatever he is tracking out there, he will not say it aloud in the village.",
-        "completion": "Fenna sent you? Good. Then she trusts you, and I have two names that need crossing out.",
+        "title": "鹿群守望者",
+        "text": "你看着可不像只能对付光灵的人，{playerName}。猎人德拉尔在东边的雄鹿草甸间守着他的瞭望哨，这几周他一直在打听有没有能干的帮手。不管他在那边追踪的是什么，他都不肯在村子里说出口。",
+        "completion": "芬娜派你来的？好。那就是说她信得过你，而我这里有两个需要划掉的名字。",
         "objectives": {
           "0": {
-            "label": "Find Huntsman Deral"
+            "label": "找到猎人德拉尔"
           }
         }
       },
       "q_hollow_old_marrowshell": {
-        "title": "The Old Shell of the Shallows",
-        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldergleam had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
-        "completion": "The shallows are just water again. I have watched that shell break better hunters than me, {playerName}. Not you.",
+        "title": "浅滩老甲",
+        "text": "第一个名字是老甲髓，一只货车大小的螃蟹，早在古辉镇还没有大门的年月，它就在东边的浅滩里捕猎了。它四处游走，{playerName}，所以你得沿着岸线走，直到撞上它的行迹。不要独自前往，也不要相信它的静止。",
+        "completion": "浅滩又只是一片水了。我亲眼见过那只甲壳磕碎比我更好的猎手，{playerName}。但没能磕碎你。",
         "objectives": {
           "0": {
-            "label": "Old Marrowshell slain"
+            "label": "已击杀老甲髓"
           }
         }
       },
       "q_hollow_first_of_the_herd": {
-        "title": "First of the Herd",
-        "text": "The second name is harder to say. Aurelhorn led these herds when my grandmother kept this lookout, and whatever woke in the Hollow woke him wrong. He tramples what he once warded, and the herd will not survive his madness. He roams the meadows near the old court roads. End him with mercy, {playerName}, and bring a friend to share the weight of it.",
-        "completion": "So the First falls to the last. The herd is already calmer, do you feel it? You did the Hollow a kindness today, even if it does not look like one.",
+        "title": "鹿群之首",
+        "text": "第二个名字更难说出口。我祖母守这座瞭望哨的年月，金角就已统领着这些鹿群，而幽谷中苏醒的那个东西，把他唤醒错了。他践踏着自己曾经守护的一切，鹿群熬不过他的疯狂。他在旧王庭道路附近的草甸上游荡。仁慈地终结他吧，{playerName}，再带上一个朋友，分担这份重量。",
+        "completion": "于是鹿群之首倒在了最后。鹿群已经安定了些，你感觉到了吗？你今天为幽谷做了一件善事，哪怕它看上去不像。",
         "objectives": {
           "0": {
-            "label": "Aurelhorn given peace"
+            "label": "已让金角安息"
           }
         }
       },
@@ -11874,912 +11874,912 @@ export const zh_CN: EnTranslations = {
         }
       },
       "q_fv_snowline_report": {
-        "title": "Word from the Snowline",
-        "text": "Every soul who climbs out of the Drakelands passes my fire, {playerName}, and fewer climb every week. Warden Kaldra holds Icemantle up the north road. Tell her the pass is still open, and tell her a stranger walked it alone.",
-        "completion": "The pass holds, then. Einna sits that waycamp through storms that bury the road markers, and she has never once sent me idle news. Welcome to Icemantle, {playerName}.",
+        "title": "雪线来讯",
+        "text": "每一个从龙裔荒原爬上来的人都会经过我的火堆，{playerName}，而一周比一周人少。守望者卡尔德拉守着北路上头的冰幔镇。告诉她隘口还开着，再告诉她，有个陌生人独自走完了它。",
+        "completion": "这么说，隘口还守得住。艾娜守着那处驿营，熬过一场场埋掉路标的风雪，从没给我送来过一句废话。欢迎来到冰幔镇，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Report to Warden Kaldra"
+            "label": "向守望者卡尔德拉报到"
           }
         }
       },
       "q_fv_wolves_at_the_door": {
-        "title": "Wolves at the Door",
-        "text": "The snowdrift packs used to keep to the high benches. Now they cross the tarn road in daylight and my woodcutters will not leave the walls. Thin the packs, {playerName}, ten of them, and the road is a road again.",
-        "completion": "Ten fewer shadows between here and the tarn. The woodcutters are already arguing over who goes out first.",
+        "title": "门前之狼",
+        "text": "雪堆狼群从前只在高处的雪台活动。如今它们大白天就横穿冰川湖路，我的樵夫们不肯出墙了。削减狼群吧，{playerName}，十头，路就又是路了。",
+        "completion": "从这里到冰川湖之间少了十条影子。樵夫们已经在争谁第一个出门了。",
         "objectives": {
           "0": {
-            "label": "Snowdrift Wolf slain"
+            "label": "已击杀雪堆狼"
           }
         }
       },
       "q_fv_winter_pelts": {
-        "title": "Pelts for the Lodge",
-        "text": "Firewood keeps a body alive, {playerName}, but wool will not turn this cold, only wolf-fur will. Six thick winter pelts off the snowdrift packs and I can line bedrolls for everyone the lodge shelters.",
-        "completion": "Fur like this is the only argument winter listens to. Take these treads, they are lined with the last batch.",
+        "title": "炉舍的毛皮",
+        "text": "柴火能吊住一条命，{playerName}，可这样的冷，羊毛挡不住，只有狼皮挡得住。从雪堆狼群身上取六张厚实的冬季毛皮来，我就能给炉舍收留的每个人都衬一床铺盖。",
+        "completion": "这样的毛皮，是冬天唯一听得进的道理。收下这双行靴吧，里子就是用上一批衬的。",
         "objectives": {
           "0": {
-            "label": "Thick Winter Pelt"
+            "label": "厚实的冬季毛皮"
           }
         }
       },
       "q_fv_ember_caches": {
-        "title": "Embers on the Tarn Road",
-        "text": "A sledge of ember caches overturned on the tarn road in last night: iron kettles that hold a banked fire alive for a month. Three of them are still lying in the snow, {playerName}, and the lodge cannot spare what they hold. Bring the fire home.",
-        "completion": "Still warm, every one. You have bought the lodge a whole winter of mercy, {playerName}.",
+        "title": "湖路上的火种",
+        "text": "昨夜一架运火种罐的雪橇在冰川湖路上翻了：那是些铁罐，封好的火种能在里头活上一个月。还有三只躺在雪里，{playerName}，罐里的东西炉舍一点也损失不起。把火带回家。",
+        "completion": "每一只都还温着。你为炉舍换来了整整一冬的仁慈，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Ember Cache recovered"
+            "label": "已寻回火种罐"
           }
         }
       },
       "q_fv_lights_over_steps": {
-        "title": "Lights over the Steps",
-        "text": "The aurora has burned green every night this month, and the old folk will not walk under it. One woman might know why: Veyla, the Aurorist. She camps alone on the Aurora Steps, southeast past the tarn. Find her camp, {playerName}, and hear what the lights have told her.",
-        "completion": "Kaldra sent you? Then she is finally worried, and she is right to be. Sit, {playerName}. Watch the sky with me a while.",
+        "title": "台阶上的极光",
+        "text": "这个月，极光夜夜烧成绿色，老人们都不肯从它底下走了。有一个女人也许知道缘由：薇拉，那位极光师。她独自在极光台阶上扎营，过了冰川湖再往东南。找到她的营地，{playerName}，听听极光都对她说了什么。",
+        "completion": "卡尔德拉派你来的？那她总算是担心了，而她担心得对。坐吧，{playerName}。陪我看一会儿天。",
         "objectives": {
           "0": {
-            "label": "Find Aurorist Veyla"
+            "label": "找到极光师薇拉"
           }
         }
       },
       "q_fv_silent_trapline": {
-        "title": "The Silent Trapline",
-        "text": "Old Brosk works the Shiverfen trapline west of here, and every week for eleven years he has sent a bundle of furs up with the wood sledge. Two weeks now, nothing. He is too stubborn to freeze and too careful to drown, {playerName}, so something else is wrong. Find his camp at the fen and see him breathing.",
-        "completion": "Maeve sent you? Ha. Eleven years and the woman still thinks the fen will eat me. Well... this year she might be right. Look at what it's done to my lines.",
+        "title": "沉默的陷阱线",
+        "text": "老布罗斯克在西边经营着颤栗沼泽的陷阱线，十一年来，每周都有一捆毛皮跟着运柴雪橇送上来。可这两周，什么也没有。他犟得冻不死，仔细得淹不着，{playerName}，所以出岔子的是别的事。去沼泽找到他的营地，亲眼看看他还喘着气。",
+        "completion": "梅芙派你来的？哈。十一年了，那女人还当沼泽会吃了我。唔……今年她也许还真说对了。看看它把我的陷阱线糟蹋成什么样了。",
         "objectives": {
           "0": {
-            "label": "Find Trapper Brosk"
+            "label": "找到捕兽人布罗斯克"
           }
         }
       },
       "q_fv_aurora_motes": {
-        "title": "Motes of the Aurora",
-        "text": "The wisps that drift these steps are shed by the lights themselves, and each carries a mote of the aurora in its heart. I need six to read what the sky is writing, {playerName}. The wisps do not fight back. Whether that makes the work easier or harder is between you and your conscience.",
-        "completion": "Six motes, still glowing. Look at them, {playerName}: they pulse in time with each other. The lights are not weather. They are a signal.",
+        "title": "极光微尘",
+        "text": "这片台阶上漂浮的光灵是极光亲自洒落的，每一只心里都揣着一粒极光的微尘。我需要六粒，才能读出天空正在书写的东西，{playerName}。光灵不会还手。这让活计更轻松还是更沉重，就看你和你的良心怎么商量了。",
+        "completion": "六粒微尘，还亮着。看看它们，{playerName}：它们的明灭彼此同步。极光不是天象。是信号。",
         "objectives": {
           "0": {
-            "label": "Aurora Mote"
+            "label": "极光微尘"
           }
         }
       },
       "q_fv_rime_unbound": {
-        "title": "Rime Unbound",
-        "text": "When the aurora burns this bright, the cold stands up and walks: rime elementals, frost given a will. They gather where the lights touch the benches, and they are wandering closer to my camp each night. Break eight of them apart, {playerName}, before one of them breaks me.",
-        "completion": "The night feels thinner already. Whatever wakes them is not done, but you have bought the Steps some quiet.",
+        "title": "脱缚之霜",
+        "text": "极光烧得这么亮的时候，寒冷就会站起来行走：霜凝元素，被赋予了意志的霜。它们聚在极光触到雪台的地方，一夜比一夜游荡得离我的营地更近。拆散八个吧，{playerName}，别等哪一个先拆散我。",
+        "completion": "夜色已经显得稀薄了些。唤醒它们的东西还没有罢手，但你为台阶换来了一阵安宁。",
         "objectives": {
           "0": {
-            "label": "Rime Elemental slain"
+            "label": "已击杀霜凝元素"
           }
         }
       },
       "q_fv_sprung_traps": {
-        "title": "Sprites in the Traps",
-        "text": "Fen sprites, {playerName}. The little devils spring my traps for sport and scatter the iron in the reeds. Drive them off, eight should teach the rest, and gather up what is left of my traplines while you are out there.",
-        "completion": "Four good traps back and the reeds gone quiet. You trap with a heavier hand than I do, {playerName}, but I cannot argue with the results.",
+        "title": "陷阱里的小妖",
+        "text": "是沼泽小妖，{playerName}。这帮小恶棍拿触发我的陷阱当消遣，还把铁夹子撒进芦苇丛。赶走它们，八个就够给其余的上一课，出门在外时顺手把我陷阱线剩下的家当也收拢回来。",
+        "completion": "四只好夹子回来了，芦苇丛也安静了。你下手比我这个捕兽人还重，{playerName}，可结果摆在这儿，我没什么好争的。",
         "objectives": {
           "0": {
-            "label": "Fen Sprite driven off"
+            "label": "已赶走沼泽小妖"
           },
           "1": {
-            "label": "Trap recovered"
+            "label": "已寻回捕兽夹"
           }
         }
       },
       "q_fv_howl_above": {
-        "title": "The Howl on the Terraces",
-        "text": "You hear it at dusk, {playerName}: a howl off the Howling Terraces that is not the snowdrift packs. Bigger throats. The terrace howlers have come down from the peaks for the first time since my grandmother held this post, and they are what pushed the wolves onto my road. Cull eight and push them back.",
-        "completion": "Eight, and the dusk chorus is thinner for it. But howlers do not leave the peaks for nothing. Something up there moved them, and I fear it has a name.",
+        "title": "台地上的嚎叫",
+        "text": "黄昏时你也听见了吧，{playerName}：呼啸台地上传来的嚎叫，不是雪堆狼群的声音。喉咙更大。台地嚎兽下了峰顶，这是自我祖母执掌这个哨位以来的头一遭，把狼群挤上我这条路的正是它们。除掉八头，把它们赶回去。",
+        "completion": "八头，黄昏的合唱也单薄了几分。可嚎兽不会平白无故离开峰顶。上头有什么东西挪动了它们，而我担心那东西有名有姓。",
         "objectives": {
           "0": {
-            "label": "Terrace Howler slain"
+            "label": "已击杀台地嚎兽"
           }
         }
       },
       "q_fv_seeing_wren_home": {
-        "title": "Seeing Wren Home",
-        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers southwest of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
-        "completion": "The girl is inside, wrapped in half my blankets and talking the stars out of the sky. You did a kind thing today, {playerName}. The Reach doesn't see many of those.",
+        "title": "送雯恩回家",
+        "text": "我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。",
+        "completion": "姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。",
         "objectives": {
           "0": {
-            "label": "Apprentice Wren seen safely to the Aurora Steps"
+            "label": "已护送学徒雯恩平安抵达极光台阶"
           }
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "The Frostmane Tyrant",
-        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Frostmane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
-        "completion": "When the wind dropped last night the whole village heard the silence where the Frostmane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
+        "title": "霜鬃暴君",
+        "text": "嚎兽们下台地时并不是在狩猎。它们是在逃。一头雪人占下了高地，山民管它叫霜鬃，连狼群都不肯和它同处一面山坡。必须了结它，{playerName}，赶在寒冬把它逼下我的城墙之前。带上一个朋友。带上两个。",
+        "completion": "昨夜风一停，全村人都听见了霜鬃从前盘踞之处的那片寂静。霜幕之境欠你一笔要还上好些年的债，{playerName}。披上这个，冰幔镇的每一扇门都为你敞开。",
         "objectives": {
           "0": {
-            "label": "The Frostmane slain"
+            "label": "已击杀霜鬃"
           }
         }
       },
       "q_dk_ash_on_the_wind": {
-        "title": "Ash on the Wind",
-        "text": "Look south off the palisade, {playerName}. Those fires in the dunes are not troll cookfires, they are ashbone musters, and every night there are more. The dead come up out of the bonefields with sand still in their teeth. Cut down ten raiders before they cut a road to my gate.",
-        "completion": "Ten fewer blades in the dunes, and the muster fires burned lower last night. My sentries slept, which they have not done in a week. Well cut, {playerName}.",
+        "title": "风中之烬",
+        "text": "到栅墙上朝南看看，{playerName}。沙丘里那些火光不是巨魔的炊火，是灰骨大军的集结火，而且一夜多过一夜。死者从白骨之地里爬出来，牙缝里还嵌着沙。砍倒十个掠夺者，别让他们先砍出一条通向我大门的路。",
+        "completion": "沙丘里少了十把刀，昨夜的集结火也黯了几分。我的哨兵们睡上了觉，这可是一周来的头一回。砍得漂亮，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Ashbone Raider slain"
+            "label": "已击杀灰骨掠夺者"
           }
         }
       },
       "q_dk_trolls_on_the_road": {
-        "title": "Trolls on the Road",
-        "text": "The dune trolls have learned the sound of a supply wagon, {playerName}. They hit the Cinder Dunes road three times this month, and the last driver walked in carrying nothing but the reins. Eight trolls off that road and my wagons roll again.",
-        "completion": "Eight, and my drivers have stopped writing farewell letters before every run. The garrison eats because of you, {playerName}.",
+        "title": "路上的巨魔",
+        "text": "沙丘巨魔已经听熟了补给马车的声响，{playerName}。这个月它们在烬沙丘的路上抢了三回，最后那位车夫走回来时手里只剩缰绳。从那条路上除掉八头巨魔，我的车队就能重新上路。",
+        "completion": "八头，我的车夫们出车前也不再先写诀别信了。驻军能吃上饭，全靠你，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Dune Troll slain"
+            "label": "已击杀沙丘巨魔"
           }
         }
       },
       "q_dk_scorched_stores": {
-        "title": "Scorched Stores",
-        "text": "The last wagon burned, {playerName}, but iron-strapped crates do not burn through. Four of them are still lying scorched along the dunes road with a season of salt, nails, and bowstrings inside. Bring my stores home before the trolls work out how to open them.",
-        "completion": "Scorched black and every latch still holding. The smith gets his nails, the fletcher her strings, and you get the boots I was saving for whoever brought my crates back, {playerName}.",
+        "title": "烧焦的补给",
+        "text": "上一辆马车烧了，{playerName}，可包铁的箱子烧不穿。四只箱子还焦黑地躺在沙丘路边，里头装着一季的盐、钉子和弓弦。趁巨魔还没琢磨出怎么开箱，把我的补给运回家。",
+        "completion": "焦得漆黑，锁扣却一只没坏。铁匠有了钉子，制箭师有了弓弦，而你得到这双靴子，本就是留给把箱子带回来的人的，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Scorched supply crate recovered"
+            "label": "已寻回烧焦的补给箱"
           }
         }
       },
       "q_dk_banners_over_the_dunes": {
-        "title": "Banners over the Dunes",
-        "text": "The ashbone muster at the old bonefield graves, {playerName}, and my patrols cannot read the dunes the way they read a wall. Kill five of their warcallers, the ones that scream the dead upright, and plant a warning banner on each muster ground so my sentries can mark it from the ridge.",
-        "completion": "Three banners snapping in the hot wind, right where my glass can find them. With five warcallers silenced, whatever answers their call will come slower. You bought us time, {playerName}.",
+        "title": "沙丘上的旗帜",
+        "text": "灰骨大军在白骨旧冢集结，{playerName}，而我的巡逻队读沙丘不像读城墙那样在行。杀掉五个战吼者，就是那些把死者吼得站起来的家伙，再在每处集结地插上一面警示旗，好让我的哨兵能从山脊上认出它们。",
+        "completion": "三面旗在热风里猎猎作响，正插在我的望远镜找得到的地方。五个战吼者闭了嘴，无论什么会应他们的召唤，来得都会慢一些。你为我们争到了时间，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Ashbone Warcaller slain"
+            "label": "已击杀灰骨战吼者"
           },
           "1": {
-            "label": "Warning banner planted"
+            "label": "已插上警示旗"
           }
         }
       },
       "q_dk_watcher_at_the_wargate": {
-        "title": "The Watcher at the Wargate",
-        "text": "Something is pulling the ashbone east, {playerName}, and I sent my best to learn what. Scout Yerrin has camped a month in the far dunes past Trollmoot, in sight of a gate nobody built in my lifetime. Her reports stopped ten days ago. Find her camp and get me her eyes.",
-        "completion": "Brannoc sent you? Then my last runner never made it. Keep your voice down and sit, {playerName}. You see that gate below? Count the war-banners in front of it, and you will understand why I stopped writing things down.",
+        "title": "战门前的瞭望者",
+        "text": "有什么正把灰骨大军往东牵引，{playerName}，我派了手下最好的人去查。斥候耶琳在巨魔集会以外的远沙丘里扎营一个月了，营地正望着一道我此生从未见人修起的门。她的回报十天前断了。找到她的营地，把她看到的带回来给我。",
+        "completion": "布兰诺克派你来的？那就是说我最后一个传令兵没能回去。压低声音坐下吧，{playerName}。看见下面那道门了？数数门前的战旗，你就明白我为什么不再写报告了。",
         "objectives": {
           "0": {
-            "label": "Find Scout Yerrin"
+            "label": "找到斥候耶琳"
           }
         }
       },
       "q_dk_marrow_and_ash": {
-        "title": "Marrow and Ash",
-        "text": "Every ashbone raider carries a war-brand, {playerName}: a scorched tally of the host it marches under. I have counted four hosts from this ridge, but guesses are not intelligence. Bring me six brands off the raiders and their warcallers, and I will give Brannoc the shape of the war that is coming.",
-        "completion": "Six brands, and one mark burned into every one of them. This is no raid muster, {playerName}. Every host in the dunes answers to the wargate below us, the trolls call it Orkadia, and no five soldiers I ever served with could break what drums behind that door. Perhaps five like you.",
+        "title": "骨髓与灰烬",
+        "text": "每个灰骨掠夺者都带着一枚战印，{playerName}：一块灼痕烙出的计数牌，记着它所属的军团。从这道山脊上我数出了四个军团，可猜测算不得情报。从掠夺者和战吼者身上取六枚战印来，我就能让布兰诺克看清这场将至之战的轮廓。",
+        "completion": "六枚战印，每一枚上都烙着同一个记号。这不是打劫的集结，{playerName}。沙丘里的每个军团都听命于我们下方那道战门，巨魔管它叫奥卡迪亚，而我共事过的士兵里，凑不出五个能撼动门后那阵战鼓的。也许五个像你这样的人可以。",
         "objectives": {
           "0": {
-            "label": "Ashbone War-Brand"
+            "label": "灰骨战印"
           }
         }
       },
       "q_dk_scales_of_the_maw": {
-        "title": "Scales of the Maw",
-        "text": "When the wind turns off the Drakemaw, the emberwing drakes ride it over my camp low enough to count their teeth, {playerName}. They range farther every day, and something in that crater drives them. Bring me three of their scales. Scales remember heat, and I can read where a drake has been roosting by the burn.",
-        "completion": "Look at the underside of this one, {playerName}: scorched in a spiral, and only one thing nests in circles. These drakes are brood-guards. Something in the Drakemaw is a mother.",
+        "title": "龙喉之鳞",
+        "text": "每当风从龙喉吹下来，烬翼幼龙就会乘着风掠过我的营地，低得能数清它们的牙，{playerName}。它们一天比一天飞得远，而火山口里有什么东西在驱使它们。给我带三片它们的鳞来。鳞片记得热度，凭灼痕我就能读出一头幼龙栖息过的地方。",
+        "completion": "看看这片的背面，{playerName}：灼痕呈螺旋状，而只有一种东西会绕着圈筑巢。这些幼龙是护巢的。龙喉里的那个东西，是一位母亲。",
         "objectives": {
           "0": {
-            "label": "Emberwing Scale"
+            "label": "烬翼龙鳞"
           }
         }
       },
       "q_dk_matriarch_of_the_maw": {
-        "title": "Matriarch of the Maw",
-        "text": "The scales told it true, {playerName}. I climbed the rim at dawn and saw her on the crater floor: Cindraleth, the matriarch every emberwing in this sky was hatched under, gold as a coal about to catch. While she broods, the drakes grow bolder, and Wyrmwatch cannot fight dragons and the ashbone both. End her in her crater, then carry the word to Gatecaptain Brannoc. Do not go alone.",
-        "completion": "The sky over the Drakemaw has been empty for two days, and now you walk through my gate with a matriarch's blood on your boots. Wyrmwatch has stood forty years on watch for exactly this, {playerName}. Take these pauldrons, mawscale, worked by our own smith. Wear them where the drakes can see.",
+        "title": "龙喉之母",
+        "text": "鳞片没有说谎，{playerName}。拂晓时我爬上火山口边缘，看见她就伏在火山口底：辛德拉蕾丝，这片天空中每一头烬翼幼龙都是在她的羽翼下孵出的，通体金黄，像一块将燃未燃的炭。只要她还在孵巢，幼龙就会越来越大胆，而望龙哨没法同时对付巨龙和灰骨大军。在她的火山口里终结她，然后把消息带给门队长布兰诺克。不要独自前往。",
+        "completion": "龙喉上空已经空了两天，而此刻你踏进我的大门，靴上还沾着龙母的血。望龙哨四十年的守望，等的正是这一天，{playerName}。收下这对护肩吧，龙喉之鳞所制，出自我们自己的铁匠之手。戴上它，走到幼龙看得见的地方去。",
         "objectives": {
           "0": {
-            "label": "Cindraleth the Maw Matriarch slain"
+            "label": "已击杀龙喉之母辛德拉蕾丝"
           }
         }
       },
       "q_af_goldmelt_road": {
-        "title": "The Gold Road Down",
-        "text": "You came over the Goldmelt, {playerName}, snow still on your boots. I keep this shrine so Lanternmere knows who walks in from the cold, and lately I have had little to report. Take the gold road down to the town, find Reeve Ottoline by the well, and tell her the pass is quiet.",
-        "completion": "Quiet on the Goldmelt, and a traveler with snow in their hair to prove it. Sorrel keeps her watch too well to send idle word. Be welcome in Lanternmere, {playerName}. The lanterns burn for you.",
+        "title": "下山的金路",
+        "text": "你翻过了融金隘口，{playerName}，靴子上还沾着雪。我守着这座小神龛，好让灯湖镇知道都有谁从寒地走进来，而近来我几乎无事可报。沿着金色大道下山进镇，到水井边找镇务官奥托琳，告诉她隘口一切平静。",
+        "completion": "融金隘口平静无事，还有一位发间带雪的旅人可以作证。索雷尔的岗从不虚报。欢迎来到灯湖镇，{playerName}。这里的灯笼为你而亮。",
         "objectives": {
           "0": {
-            "label": "Report to Reeve Ottoline"
+            "label": "向镇务官奥托琳报到"
           }
         }
       },
       "q_af_foxes_in_the_lamplight": {
-        "title": "Foxes in the Lamplight",
-        "text": "The gloam foxes have learned what the lantern stores are worth, {playerName}. Every dusk they slip the fences and carry off the tallow we press for the ferry lamps. Soft paws, softer conscience. Cull ten of them and the rest will remember to fear the town.",
-        "completion": "Ten, and the stores went untouched last night for the first time this season. The lamplighters send their thanks, {playerName}.",
+        "title": "灯火中的狐狸",
+        "text": "暮光狐已经摸清了灯料仓库的价值，{playerName}。每到黄昏，它们就溜过栅栏，叼走我们为渡船灯压制的油脂。爪子轻，良心更轻。除掉十只，其余的就会重新记起要怕这座镇子。",
+        "completion": "十只，而昨夜的仓库这一季头一次分毫未失。点灯人们托我向你道谢，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Gloam Fox slain"
+            "label": "已击杀暮光狐"
           }
         }
       },
       "q_af_lanterns_on_the_water": {
-        "title": "Lanterns on the Water",
-        "text": "Every ferry on the Mere carries a stern lantern, {playerName}, and three of my boats came back at dawn without theirs. The fog took them, or something in the fog did. They wash up along the east shore when the wind turns. Walk the shore road and bring my lanterns home.",
-        "completion": "All three, and still burning. Ferry lanterns do not go out in water, {playerName}. That is the point of them. What worries me is what pulled them loose.",
+        "title": "水上的灯火",
+        "text": "大湖上的每条渡船都挂着一盏船尾灯，{playerName}，而今天拂晓，我有三条船回来时灯不见了。是雾拿走了它们，或者是雾里的什么东西。风向一转，它们就会被冲上东岸。沿着湖岸路走一遭，把我的灯带回家。",
+        "completion": "三盏俱全，而且还亮着。渡船灯在水里也不会熄，{playerName}。它们生来如此。让我担心的，是究竟什么把它们扯了下来。",
         "objectives": {
           "0": {
-            "label": "Ferry Lantern recovered"
+            "label": "已寻回渡船提灯"
           }
         }
       },
       "q_af_orchard_call": {
-        "title": "A Cart for the Orchard",
-        "text": "Orchardist Pomeline keeps the Gilded Orchard on the west road, and her sap carts are three days overdue. The whole town runs on that amber sap, {playerName}: lamp resin, sweetening, the harvest ale. Walk the west road and find out what keeps her.",
-        "completion": "The Reeve counts her carts, does she? Well, she can count them missing a while longer. Look at my rows, {playerName}. I have greater troubles than a late delivery.",
+        "title": "果园的货车",
+        "text": "果园主帕梅琳照看着西路上的鎏金果园，她的树脂货车已经迟了三天。全镇都靠那种琥珀树脂过活，{playerName}：灯用树脂、甜料，还有丰收麦酒。沿西路走一趟，看看是什么绊住了她。",
+        "completion": "镇务官在数她的货车，是吗？那就让她再多数几天空缺吧。看看我的果林，{playerName}。比起迟到的货，我有更大的麻烦。",
         "objectives": {
           "0": {
-            "label": "Find Orchardist Pomeline"
+            "label": "找到果园主帕梅琳"
           }
         }
       },
       "q_af_amber_from_the_herd": {
-        "title": "Amber off the Herd",
-        "text": "The gilded stags bed down beneath my oldest trees, and the sap drips gold into their coats all night. Combed clots of it are the purest amber in the weald. Bring me six, {playerName}. The stags will not thank you, but they will not miss it either.",
-        "completion": "Six clots, clean as poured honey. These gloves are stitched with the last batch, {playerName}: sap-stiffened, and warmer than they look.",
+        "title": "鹿群身上的琥珀",
+        "text": "鎏金雄鹿总在我最老的果树下过夜，树脂整晚滴落，把金色淌进它们的皮毛。梳下来的凝块是整片林地最纯的琥珀。给我带六块来，{playerName}。雄鹿不会谢你，但也不会心疼这点东西。",
+        "completion": "六块凝块，干净得像刚倒出的蜂蜜。这双护手就是用上一批缝的，{playerName}：树脂浸硬，比看上去暖和得多。",
         "objectives": {
           "0": {
-            "label": "Gilded Sap Clot"
+            "label": "鎏金树脂凝块"
           }
         }
       },
       "q_af_what_took_the_moorings": {
-        "title": "What Took the Moorings",
-        "text": "Now I will tell you what I did not say in front of the town. The moorings were not slipped, they were bitten through. Mere lurkers, bolder every night, dragging at the ropes and the rudders. Put eight of them back under the water for good, {playerName}, before a ferryman goes with them.",
-        "completion": "Eight fewer shapes in the shallows, and the crossing ran on time today for the first time in a fortnight. But bold lurkers are driven lurkers, {playerName}. Something beneath the Mere is moving them.",
+        "title": "是什么咬断了缆绳",
+        "text": "现在我要告诉你我没在镇上人面前说的话。那些缆绳不是松脱的，是被咬断的。湖泽潜伏者一晚比一晚大胆，拖拽着缆绳和船舵。让八只永远沉回水底吧，{playerName}，别等哪个船夫跟着一起沉下去。",
+        "completion": "浅水里少了八条影子，今天的渡船两周来头一次准点。可潜伏者变得大胆，是因为有东西在驱赶它们，{playerName}。大湖底下有什么正在搅动。",
         "objectives": {
           "0": {
-            "label": "Mere Lurker slain"
+            "label": "已击杀湖泽潜伏者"
           }
         }
       },
       "q_af_sprites_and_spigots": {
-        "title": "Sprites and Spigots",
-        "text": "Harvest sprites, {playerName}. They pry my sap-taps from the trunks for the sweetness inside and fling the buckets into the grass. Drive off eight of the little thieves and bring back four of my buckets, and the carts roll again.",
-        "completion": "Four buckets back on their hooks and the rows gone quiet. You have a heavier hand with sprites than I do, {playerName}, and today I am glad of it.",
+        "title": "小妖与采脂桶",
+        "text": "是丰收小妖，{playerName}。它们为了里头的甜汁把采脂嘴从树干上撬下来，还把桶子扔进草丛。赶走八个小贼，找回我的四只桶，货车就能重新上路。",
+        "completion": "四只桶重新挂回了钩子，果林也安静了。你对付小妖的手比我重得多，{playerName}，而今天我为此庆幸。",
         "objectives": {
           "0": {
-            "label": "Harvest Sprite driven off"
+            "label": "已赶走丰收小妖"
           },
           "1": {
-            "label": "Sap-Tap Bucket recovered"
+            "label": "已找回采脂桶"
           }
         }
       },
       "q_af_the_meredark": {
-        "title": "The Meredark",
-        "text": "The old ferrymen have a name they only say ashore: the Meredark, the first lurker, old as the lake and twice as patient. It rose once before, the year the drowned jetty went under, and it is rising now. At dusk it suns itself on the jetty ruin off the south shore, {playerName}. Take a friend, take two, and end it while it can still be ended.",
-        "completion": "The fog lifted off the Mere this morning, {playerName}, and the whole town saw it. The ferries will run the night crossing again, and every lantern on the water will burn in your name. Take this: it was dredged from the drowned jetty, and no one has better right to wear it.",
+        "title": "湖渊暗影",
+        "text": "老船夫们有一个只敢在岸上说的名字：湖渊暗影，第一头潜伏者，和湖一样古老，耐心还要多上一倍。它从前浮起过一次，就在沉没栈桥没入水中的那一年，而如今它又在上浮。黄昏时分，它会趴在南岸外的栈桥残骸上晒着余晖，{playerName}。带上一个朋友，带上两个，趁它还能被终结时终结它。",
+        "completion": "今天清晨，大湖上的雾散了，{playerName}，全镇的人都看见了。夜渡将会重开，水面上的每一盏灯都将为你的名字而亮。收下这个：它是从沉没栈桥打捞上来的，没有人比你更有资格披上它。",
         "objectives": {
           "0": {
-            "label": "The Meredark slain"
+            "label": "已击杀湖渊暗影"
           }
         }
       },
       "q_wf_across_the_fenway": {
-        "title": "Across the Fenway",
-        "text": "A gentle country, the Willowfen, but gentle is not the same as safe, {playerName}. Follow the road north to the Fenway causeway and cross into Bridgemere. Tell Bridgewright Alden the Steps are open and the waycamp fire is lit.",
-        "completion": "Pell keeps that fire burning through every fog the fen can breathe at her. If she says the Steps are open, they are open. Welcome to Bridgemere, {playerName}. Watch your step on my planks and we will get along fine.",
+        "title": "跨过沼道",
+        "text": "柳泽沼地是片温柔的水乡，可温柔不等于安全，{playerName}。沿路向北走到沼道堤道，过桥进入桥湖镇。告诉桥匠奥尔登，石阶还开着，驿营的火也点着了。",
+        "completion": "不管沼泽朝她呼出怎样的浓雾，佩尔都能让那堆火一直烧着。她说石阶开着，那就是开着。欢迎来到桥湖镇，{playerName}。在我的木板上走路当心些，咱们就能处得来。",
         "objectives": {
           "0": {
-            "label": "Report to Bridgewright Alden"
+            "label": "向桥匠奥尔登报到"
           }
         }
       },
       "q_wf_rope_chewers": {
-        "title": "The Rope-Chewers",
-        "text": "Bogtoads, {playerName}. They haul up out of the moat at night and chew through my mooring ropes like they were reed stems. Three skiffs went drifting last week, and one of them had my good winch aboard. Thin them out, ten of the fat things, and the boats stay where we tie them.",
-        "completion": "Ten fewer sets of teeth in my moat. The skiffs sat their moorings all night for the first time in a month, {playerName}. You have the thanks of every netter in town.",
+        "title": "咬绳的家伙",
+        "text": "是沼蟾，{playerName}。它们夜里从护城河里爬上来，把我的系船索当芦苇秆一样嚼断。上周漂走了三条小艇，其中一条还载着我那台好绞盘。削减它们的数目吧，十只肥家伙，船就能老老实实待在我们系它的地方。",
+        "completion": "护城河里少了十副牙口。小艇整夜安安稳稳地泊着，一个月来头一回，{playerName}。全镇的网夫都承你的情。",
         "objectives": {
           "0": {
-            "label": "Bogtoad slain"
+            "label": "已击杀沼蟾"
           }
         }
       },
       "q_wf_eels_for_the_smokehouse": {
-        "title": "Eels for the Smokehouse",
-        "text": "The bogtoads are not just eating my ropes, {playerName}, they are eating my catch: they gulp the eels down whole, straight out of the traps. Cut six plump ones free of the greedy things before the meat spoils, and the smokehouse fires stay lit.",
-        "completion": "Six good eels, barely bruised. The smokehouse will smell like money by morning. Here, these waders were mine when I was quicker: eelskin turns the wet like nothing else.",
+        "title": "熏房的鳗鱼",
+        "text": "沼蟾吃的不只是我的绳子，{playerName}，还有我的渔获：它们把鳗鱼整条吞下去，直接从笼子里抢。趁鱼肉还没坏，从那些贪吃鬼肚里剖出六条肥鳗来，熏房的火就能一直烧着。",
+        "completion": "六条好鳗，几乎没伤着。到明早，熏房就该是一股钱味儿了。给，这双涉水靴是我腿脚还利索时穿的：论挡水，什么也比不过鳗皮。",
         "objectives": {
           "0": {
-            "label": "Plump Fen Eel"
+            "label": "肥美的沼泽鳗鱼"
           }
         }
       },
       "q_wf_mind_the_moorings": {
-        "title": "Mind the Moorings",
-        "text": "Good rope is dear out here, {playerName}: every line the toads bite through is a week of eel-money gone. The cut ends are still lying along the moat shore where the boats slipped them. Walk the boardwalks and bring me back four lines, and I can splice them good as new.",
-        "completion": "Look at that: clean bites, every one, but there is rope enough left to splice. You have saved me a month of coin and the netters a month of grumbling, {playerName}.",
+        "title": "看好缆绳",
+        "text": "在这地方好绳子金贵得很，{playerName}：蟾蜍咬断一根，就是一周的鳗钱打了水漂。断掉的绳头还散在护城河岸边，就在船脱缆的地方。沿着栈道走一圈，给我捡回四根，我就能把它们接得跟新的一样。",
+        "completion": "瞧瞧：每一根都是齐齐整整的咬口，好在剩下的绳子还够拼接。你省了我一个月的铜钱，也省了网夫们一个月的牢骚，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Cut Mooring Line recovered"
+            "label": "已寻回断掉的系船索"
           }
         }
       },
       "q_wf_witch_of_willowweep": {
-        "title": "The Witch of Willowweep",
-        "text": "You have heard it by now, {playerName}: the snore. Slow and heavy, out past the Drowsy Flats, like the fen itself turning over in its sleep. The toads, the sprites, the wisps burning at noon: it all started when that sound did. One soul might know what it is. Mother Sedge keeps a camp at Willowweep, west around the moat and down the far shore. Find her, and ask her what sleeps at the middle of my fen.",
-        "completion": "Alden sent you all this way to ask about the snoring? Then the bridge-folk are finally listening. Sit down out of the damp, {playerName}. That sound has a name, and a throat, and I have been waiting for someone fool enough to help me quiet it.",
+        "title": "柳泣泽的女巫",
+        "text": "你如今该听见了，{playerName}：那阵鼾声。缓慢而沉重，从沉眠浅滩外传来，像沼泽本身在睡梦里翻了个身。蟾蜍、小妖、正午还亮着的泽光：一切都是从那声音响起时开始的。有一个人也许知道那是什么。莎草婆婆在柳泣泽有个营地，绕护城河向西，再沿远岸走到头。找到她，问问我这片沼泽的正中央睡着什么。",
+        "completion": "奥尔登让你跑这么远，就为问那阵鼾声？那桥镇的人总算肯听了。坐到干燥些的地方来，{playerName}。那声音有名字，也有喉咙，而我一直在等一个够傻的人来帮我让它安静。",
         "objectives": {
           "0": {
-            "label": "Find Mother Sedge"
+            "label": "找到莎草婆婆"
           }
         }
       },
       "q_wf_toll_and_tangle": {
-        "title": "Toll and Tangle",
-        "text": "The willow sprites think it is a fine game to cut a ferry loose, {playerName}, and last week the toll skiff went over on the east track with a season of bridge-toll aboard. The chests went down in the shallows and the sprites dance on the boardwalks like they own them. Drive off eight and haul up three toll-chests, and Bridgemere eats this winter.",
-        "completion": "Three chests, and the coin still dry inside. The sprites will sulk in the withies for a week, {playerName}, and the town owes you its winter bread.",
+        "title": "桥税与纠缠",
+        "text": "柳树小妖觉得割断渡船缆绳是个有趣的游戏，{playerName}，上周收税的小艇就在东航道上翻了，载着一整季的桥税。钱箱沉进了浅水，小妖们在栈道上手舞足蹈，好像那是它们的地盘。赶走八只，捞起三只桥税箱，桥湖镇今年冬天就有饭吃。",
+        "completion": "三只箱子，里头的钱还干干的。小妖们要在柳条丛里赌上一周的气了，{playerName}，而这座镇子欠你一个冬天的面包。",
         "objectives": {
           "0": {
-            "label": "Willow Sprite driven off"
+            "label": "已赶走柳树小妖"
           },
           "1": {
-            "label": "Toll-Chest recovered"
+            "label": "已寻回桥税箱"
           }
         }
       },
       "q_wf_wisplight_charms": {
-        "title": "Wisplight Charms",
-        "text": "The wisps over the pools are the fen dreaming out loud, {playerName}, and their light is the only thing that holds against the Croaker's lull. I weave it into willow charms: one round your neck and the snore cannot drag your eyelids down. Bring me six wisplight globes. The wisps will not fight you for them, which makes it a kindness or a theft, depending on how you carry it.",
-        "completion": "Six globes, still warm with dreaming. Give me till moonrise and I will have charms woven for you and whoever is brave enough to stand beside you.",
+        "title": "泽光护符",
+        "text": "池塘上的光灵是沼泽在大声做梦，{playerName}，而它们的光是唯一扛得住蛙王催眠的东西。我把它编进柳条护符：一只挂上脖子，那阵鼾声就再拖不下你的眼皮。给我带六只泽光球来。光灵不会为此和你相争，所以这算善举还是偷窃，全看你怎么拿。",
+        "completion": "六只光球，还带着梦的余温。给我到月升的工夫，我就把护符编好，给你，也给每一个敢站在你身边的人。",
         "objectives": {
           "0": {
-            "label": "Wisplight Globe"
+            "label": "泽光球"
           }
         }
       },
       "q_wf_croakers_hush": {
-        "title": "The Croaker's Hush",
-        "text": "Now you know the snorer's name, {playerName}: the Drowsy Croaker, the old toad-king out on the Drowsy Flats. Every year his croak grows heavier, and every year more of the fen forgets to wake. The charms will keep your eyes open, but his bulk is another matter: bring a friend, and do not fight him in the water. Put the old king to a quieter sleep.",
-        "completion": "Listen, {playerName}. Nothing. The first true silence over this fen in thirty years, and half the town will not sleep tonight for the strangeness of it. The willows say thank you, in their way. Wear this, woven from his own lily-bed, and the fen will know you for a friend wherever the water reaches.",
+        "title": "蛙王的静默",
+        "text": "现在你知道打鼾者的名字了，{playerName}：瞌睡蛙王，沉眠浅滩上的老蟾之王。他的鼾鸣一年比一年沉，沼泽里忘记醒来的东西也一年比一年多。护符能让你睁着眼，可他那身块头是另一回事：带上一个朋友，别在水里跟他缠斗。送这位老王进一场更安静的长眠吧。",
+        "completion": "听，{playerName}。什么也没有。三十年来这片沼泽上第一场真正的寂静，今夜镇上有一半人反倒要因为这份陌生睡不着了。柳树们在用它们的方式道谢。披上这个吧，用他自己的莲床编成，从此凡是水到之处，沼泽都认你这个朋友。",
         "objectives": {
           "0": {
-            "label": "The Drowsy Croaker slain"
+            "label": "已击杀瞌睡蛙王"
           }
         }
       },
       "q_nb_road_of_lanterns": {
-        "title": "The Road of Lanterns",
-        "text": "Up here the sun never follows, {playerName}, only the lamps I keep lit along the climb. Moonrest lies north where the flower-light gathers. Find Lira Dewsong among her gardens and tell her the Nightgate lamps still burn.",
-        "completion": "The lamps still burn, and the road still carries strangers to us. Sorrel has kept that gate longer than anyone in Moonrest remembers. Welcome, {playerName}, to the realm that never dawns.",
+        "title": "灯笼之路",
+        "text": "太阳从不跟着人爬到这上头来，{playerName}，一路相随的只有我沿坡点亮的灯。月栖镇在北边，花光汇聚的地方。去花园里找到莉拉·露歌，告诉她夜门的灯还亮着。",
+        "completion": "灯还亮着，路也还在把陌生人送到我们这里。索雷尔守那道门的年头，比月栖镇任何人记得的都久。欢迎你，{playerName}，来到这片永无黎明的国度。",
         "objectives": {
           "0": {
-            "label": "Find Lira Dewsong in Moonrest"
+            "label": "在月栖镇找到莉拉·露歌"
           }
         }
       },
       "q_nb_striders_in_the_dark": {
-        "title": "Striders in the Dark",
-        "text": "The gloam striders were always patient hunters, {playerName}, but of late they slip right into the flower beds and take moonfleece lambs beneath our lanterns. Cull ten of them and give the downs back their quiet.",
-        "completion": "Ten striders fewer, and the herds already graze easier. The gardens keep their own hours, but tonight they keep them in peace.",
+        "title": "暗中的疾行者",
+        "text": "幽暝疾行者向来是耐心的猎手，{playerName}，可近来它们径直溜进花床，在我们的灯笼底下叼走月绒羔羊。除掉十只，把安宁还给丘野。",
+        "completion": "少了十只疾行者，兽群吃草已经安心多了。花园自有它的作息，但今夜，它过得太平。",
         "objectives": {
           "0": {
-            "label": "Gloam Strider slain"
+            "label": "已击杀幽暝疾行者"
           }
         }
       },
       "q_nb_wool_by_moonlight": {
-        "title": "Wool by Moonlight",
-        "text": "Nothing warms like moonfleece, {playerName}, and nothing spins so fine. The grazers carry their silver wool loose in tufts as they drift the downs. Bring me six good tufts off the herds and I will weave you something worth the walking.",
-        "completion": "Silver as starlight and twice as soft. Here, {playerName}: mitts from the last batch, lined the way only moonfleece lines.",
+        "title": "月光下的绒毛",
+        "text": "没有什么比月绒更暖，{playerName}，也没有什么纺得比它更细。月绒兽在丘野间游荡时，银色的绒毛会一团团松松地挂在身上。从兽群那儿给我带六团好绒毛来，我就给你织一件值得你跑这一趟的东西。",
+        "completion": "像星光一样银亮，还要柔软一倍。给，{playerName}：上一批绒毛做的连指手套，那种衬里只有月绒衬得出来。",
         "objectives": {
           "0": {
-            "label": "Moonfleece Tuft"
+            "label": "月绒毛团"
           }
         }
       },
       "q_nb_night_gardens": {
-        "title": "The Night Gardens",
-        "text": "The nightbloom opens only under this sky, and Gloamfield holds the oldest beds in the realm. I need four fresh blossoms for the shrine garlands, {playerName}. Cut them gently: a bed remembers a rough hand for a season.",
-        "completion": "Still glowing, every petal. The shrine will smell of night for a week, and Moonrest sleeps easier for it.",
+        "title": "夜之花园",
+        "text": "夜绽花只在这片天空下开放，而暮光花田里有全境最古老的花床。我需要四朵新鲜的花来做圣祠的花环，{playerName}。剪的时候轻一些：一床花能把一双粗鲁的手记上一整季。",
+        "completion": "每一片花瓣都还亮着。圣祠会有一整周都带着夜的香气，月栖镇也能睡得更安稳了。",
         "objectives": {
           "0": {
-            "label": "Nightbloom Blossom gathered"
+            "label": "已采集夜绽花"
           }
         }
       },
       "q_nb_eyes_on_the_vigil": {
-        "title": "Eyes on the Vigil",
-        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the nightkin drift among the stones. Find him, and ask what the stars are saying.",
-        "completion": "Lira sent you? Then the gardens feel it too. Sit by the glass a moment, {playerName}. The stars have been restless for a month, and every chart I draw leans north toward the barrow.",
+        "title": "望向石阵的眼睛",
+        "text": "有什么东西让疾行者变得大胆、兽群惶惶不安，{playerName}，而我从花里读不出缘由。卡西安能从天上读出来。他的观星营地就在东边的守望石阵旁，夜裔在石间飘荡的地方。找到他，问问星星都在说些什么。",
+        "completion": "莉拉派你来的？那就是说花园也感觉到了。到望远镜边坐一会儿吧，{playerName}。星星已经躁动一个月了，我画的每一张星图都朝北偏向古冢。",
         "objectives": {
           "0": {
-            "label": "Find Astronomer Cassian at the Standing Vigil"
+            "label": "在守望石阵找到天文学者卡西安"
           }
         }
       },
       "q_nb_charts_of_the_stones": {
-        "title": "The Charts in the Stones",
-        "text": "The Vigil stones are older than Moonrest, older than the nightkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
-        "completion": "No doubt is left. Every bearing has crept toward the Sleepless Barrow, as if the sky itself leans over that mound to watch. The old kings were buried under aligned stars for a reason, {playerName}.",
+        "title": "石上星图",
+        "text": "石阵的立石比月栖镇古老，比照看它们的夜裔更古老，石面上刻着我用一生学着解读的星图。天空移位了，{playerName}，我必须知道移了多远。读取三座立石上的星图，把方位带回来给我。",
+        "completion": "再没有疑问了。每一个方位都朝不眠古冢挪去，仿佛天空亲自俯身盯着那座坟丘。古时的王要葬在群星连线之下，是有缘由的，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Star chart read"
+            "label": "已读取星图"
           }
         }
       },
       "q_nb_restless_mounds": {
-        "title": "The Restless Mounds",
-        "text": "The charts were a warning, and the barrow field proves it: the mounds are opening from beneath. Wights walk the grave rows wearing the old honors, and the offerings that kept them sleeping lie scattered in the grass. Put eight of them down, {playerName}, and gather four of the offerings back to me.",
-        "completion": "Grave gold, still cold from the soil. The wights are not rising on their own, {playerName}: something beneath the great mound is calling them out, and I fear the charts have already told us its name.",
+        "title": "不安的坟丘",
+        "text": "星图是一次警告，古冢原野证实了它：坟丘正从底下被打开。尸妖披挂着旧日的荣饰在墓行间走动，而那些让他们安眠的祭品散落在草丛里。放倒八只，{playerName}，再把四份祭品收回来给我。",
+        "completion": "陪葬的金器，还带着泥土的凉气。尸妖不是自己爬起来的，{playerName}：大坟丘底下有什么在唤他们出来，而我担心星图早已把它的名字告诉了我们。",
         "objectives": {
           "0": {
-            "label": "Barrow Wight slain"
+            "label": "已击杀古冢尸妖"
           },
           "1": {
-            "label": "Grave offering recovered"
+            "label": "已寻回墓前祭品"
           }
         }
       },
       "q_nb_the_barrow_king": {
-        "title": "The Barrow King Wakes",
-        "text": "Every bearing, every restless star, every opened mound points to one thing: the Barrow King is waking beneath the great mound, and this realm has no dawn to hold him back. He must be put to rest before he remembers his crown, {playerName}. Do not go alone: bring a friend, and keep the flower-light at your back.",
-        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the nightkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
+        "title": "古冢之王苏醒",
+        "text": "每一个方位、每一颗躁动的星、每一座开启的坟丘都指向同一件事：古冢之王正在大坟丘之下苏醒，而这片国度没有黎明可以拦他。必须赶在他想起自己的王冠之前送他安息，{playerName}。不要独自前往：带上一个朋友，让花光始终照在你背后。",
+        "completion": "星星安定了下来，一季以来头一回，{playerName}。坟丘闭合了，夜裔在他们的立石旁归于静止，王也重新沉睡于地下。披上这件披风吧：月栖镇裁下它，就是留给夜晚最终信任的那个人。",
         "objectives": {
           "0": {
-            "label": "The Barrow King put to rest"
+            "label": "已让古冢之王安息"
           }
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "The Bells of Gallowmere",
-        "text": "Hear that tolling, {playerName}? That is Gallowmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
-        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gallowmere, {playerName}. Mind the bells.",
+        "title": "绞湖镇的钟声",
+        "text": "听见那阵钟鸣了吗，{playerName}？那是绞湖镇，在北路上头，正用钟声哄它的亡者入睡。司墓人马罗数点着树冠之下的每一个人，活着的和入土的都算。去让他数上你一笔吧，免得这片林子亲自来数你。",
+        "completion": "科布把你囫囵个儿地送上了路，是吗？好人。那些门灯他点了三十年，这片林子从没能越过他一步。欢迎来到绞湖镇，{playerName}。留心钟声。",
         "objectives": {
           "0": {
-            "label": "Report to Sexton Marrow"
+            "label": "向司墓人马罗报到"
           }
         }
       },
       "q_ww_silk_in_the_eaves": {
-        "title": "Silk in the Eaves",
-        "text": "Look up when you walk the west road, {playerName}, and you will see them: wrapped shapes in the canopy, swaying where no wind reaches. The widowsilk spinners have crept out of the Thicket and strung their larders over my lanterns. Kill ten, and the road is a road again.",
-        "completion": "Ten fewer weavers in the eaves. The lamplighters will walk their rounds tonight without looking up, and that is worth more here than you know.",
+        "title": "檐下之丝",
+        "text": "走西路的时候抬头看看，{playerName}，你会看见它们：树冠里一具具裹起来的形体，在没有风的地方摇晃。寡妇丝纺蛛已经爬出棘丛，把它们的储食窖挂在了我的灯笼上方。杀掉十只，路就又是路了。",
+        "completion": "檐下少了十只纺蛛。今夜点灯人巡街时再不用抬头看了，这在这地方的分量，比你知道的重得多。",
         "objectives": {
           "0": {
-            "label": "Widowsilk Spinner slain"
+            "label": "已击杀寡妇丝纺蛛"
           }
         }
       },
       "q_ww_widows_skeins": {
-        "title": "The Widow's Skeins",
-        "text": "The spinners take our dead for their larders, {playerName}, so I take their silk for our shrouds. It burns clean and it holds a blessing better than linen ever did. Bring me six skeins of widowsilk, and the next soul we bury goes down wrapped and warded.",
-        "completion": "Six skeins, soft as a held breath. The dead will lie easier in this. Take these wraps, I sewed them from the last batch, and the wood has never once bitten through them.",
+        "title": "寡妇的丝线",
+        "text": "纺蛛把我们的亡者收进储食窖，{playerName}，那我就取它们的丝来做我们的裹尸布。这丝烧得干净，又比亚麻更能留住祝福。给我带六束寡妇丝来，下一个下葬的人就能裹得妥帖、护得周全地入土。",
+        "completion": "六束丝，软得像一口屏住的气。亡者裹着它会躺得安稳些。收下这副裹手吧，是我用上一批缝的，这片林子从没能咬穿过它们。",
         "objectives": {
           "0": {
-            "label": "Widowsilk Skein"
+            "label": "寡妇丝线束"
           }
         }
       },
       "q_ww_candles_at_the_bounds": {
-        "title": "Candles at the Bounds",
-        "text": "Four boundary stones ring Gallowmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
-        "completion": "All four burning? Then breathe, {playerName}. You did not hear it, but the whole village did: the bells rang easier the moment the last wick caught.",
+        "title": "界石上的蜡烛",
+        "text": "四块界石环着绞湖镇，{playerName}，每条出镇的路上一块，每块石上都燃着一支墓烛。烛火不灭，入土者就不出土。这场细雨把它们浇熄了，四支全灭了，而我太老了，独自走不完这一圈界石。拿上我的引烛，快去把它们重新点亮。",
+        "completion": "四支都燃起来了？那就松口气吧，{playerName}。你没听见，可全村人都听见了：最后一根烛芯着起来的那一刻，钟声都敲得轻快了。",
         "objectives": {
           "0": {
-            "label": "Grave-candle relit"
+            "label": "已重新点燃墓烛"
           }
         }
       },
       "q_ww_the_last_vicar": {
-        "title": "The Last Vicar",
-        "text": "South of here the Mournstone Chapel moulders by its black tarn, and one man still tends it: Vicar Creel, who would not leave when the roof came down. He knows the old rites better than my bells do, {playerName}, and he has not sent word in a month. Walk the chapel road and see him breathing.",
-        "completion": "Marrow worries after me? That is new. Tell him the Mournstone stands, after a fashion, and so do I. Stay a while, {playerName}. The tarn has been whispering, and I would rather not listen alone.",
+        "title": "最后的牧师",
+        "text": "从这里往南，哀石礼拜堂在它那片黑水潭边一点点朽坏，只剩一个人还在照看它：牧师克里尔，当年屋顶塌下来他也不肯走。论古老的仪轨，他比我的钟还熟，{playerName}，可他已经一个月没捎来只言片语了。走一趟礼拜堂的路，亲眼看看他还喘着气。",
+        "completion": "马罗居然惦记起我来了？倒是新鲜。告诉他，哀石礼拜堂还立着，勉强算立着，我也一样。留一会儿吧，{playerName}。水潭最近总在低语，我不想独自听着。",
         "objectives": {
           "0": {
-            "label": "Find Vicar Creel"
+            "label": "找到牧师克里尔"
           }
         }
       },
       "q_ww_wraiths_of_the_tarn": {
-        "title": "Wraiths of the Tarn",
-        "text": "The wood wraiths were the chapel wardens once, {playerName}, grown from trees planted over the honored dead. Since the tarn turned black they have forgotten their office, and now they drift through my graveyard pulling at the soil. Break eight of them apart before they finish what they have started.",
-        "completion": "Eight wardens laid down at last. I will not call it a mercy in daylight, but between us, {playerName}, it was one.",
+        "title": "水潭怨灵",
+        "text": "林中怨灵从前是礼拜堂的守卫，{playerName}，由栽在贤者墓上的树木生成。自从水潭变黑，它们就忘了自己的职守，如今在我的墓园里飘荡，扒抓着泥土。趁它们还没做完已经开始的事，拆散八只。",
+        "completion": "八位守卫终于躺下了。在白天我不会管这叫仁慈，可私下里说，{playerName}，这就是仁慈。",
         "objectives": {
           "0": {
-            "label": "Wood Wraith slain"
+            "label": "已击杀林中怨灵"
           }
         }
       },
       "q_ww_what_the_bark_holds": {
-        "title": "What the Bark Holds",
-        "text": "In the Hanging Glade east of Gallowmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
-        "completion": "Three souls back under honest ground before nightfall. The shamblers will grow back, bark always does, but tonight the glade hangs empty, and that is enough.",
+        "title": "树皮所守之物",
+        "text": "在绞湖镇以东的吊影林地，纺蛛把裹满蛛丝的死者悬在枝头，墓皮树怪像一队耐心的抬棺人一样在底下守着。挂在上头的是我们的人啊，{playerName}。击碎五只树怪，割下三具裹尸，带他们回家入土。",
+        "completion": "天黑之前，三个魂灵回到了干净的土里。树怪还会再长出来，树皮向来如此，可今夜林地上空空荡荡，这就够了。",
         "objectives": {
           "0": {
-            "label": "Gravenbark Shambler felled"
+            "label": "已击倒墓皮树怪"
           },
           "1": {
-            "label": "Silkbound remains cut down"
+            "label": "已割下缚丝遗骸"
           }
         }
       },
       "q_ww_walking_mosley_home": {
-        "title": "Walking Mosley Home",
-        "text": "My gravedigger Mosley took the chapel road three days ago to open a plot in the old yard, and the dig came down on top of him. He clawed his way out, the fool is alive, but he is huddled by the chapel graves and will not move for spinners on the road. Walk him home, {playerName}. I cannot ring the bells for a living man.",
-        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gallowmere keeps its people, that is the whole of our law.",
+        "title": "送莫斯利回家",
+        "text": "我的掘墓人莫斯利三天前走礼拜堂的路，去旧墓园开一块墓穴，结果坑塌下来把他埋了。他自己刨了出来，这傻子命还在，可他缩在礼拜堂的坟堆边不敢动，路上全是纺蛛。送他回家吧，{playerName}。我总不能为一个活人敲丧钟。",
+        "completion": "他靠自己两条腿走进了大门，赌咒说从今往后挖得最深的就是萝卜地。不出周日他就会回墓园上工，他们向来如此。谢谢你，{playerName}。绞湖镇护住自己的人，这就是我们全部的律法。",
         "objectives": {
           "0": {
-            "label": "Gravedigger Mosley walked safely back to Gallowmere"
+            "label": "已护送掘墓人莫斯利平安回到绞湖镇"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
-        "title": "The Horn of the Huntsman",
-        "text": "You have heard the horn by now, {playerName}, thin and far off, the sound the whole wood holds its breath for. The Pale Huntsman rides his clearing north of here, and every grave he passes grows shallower. He was a man once, and he was buried wrong, and I am done pretending prayer will do it. Take a friend, take two, and unhorse him.",
-        "completion": "The horn stopped mid-note. Every bell in Gallowmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
+        "title": "猎手的号角",
+        "text": "号角声你如今该听过了，{playerName}，细弱而遥远，整片林子都为那声音屏住呼吸。苍白猎手在这里以北他的林隙中驰骋，他每经过一座坟，坟就变浅一分。他曾经是个人，却被下葬错了，而我已经不想再假装祷告能管用。带上一个朋友，带上两个，把他挑落马下。",
+        "completion": "号角声在半个音上断了。绞湖镇的每一口钟都自己响了一声，随后这片林子安静下来，三十年来我从没听过它这样安静。你完成了我做不到的仪式，{playerName}。披上这个，从此在树冠下行走，无所畏惧。",
         "objectives": {
           "0": {
-            "label": "The Pale Huntsman unhorsed"
+            "label": "已将苍白猎手挑落马下"
           }
         }
       },
       "q_pr_down_to_drifthaven": {
-        "title": "Down to Drifthaven",
-        "text": "Out of the black trees and into the sun, {playerName}. Follow the shore road north and you will strike Drifthaven before the tide turns. Ask for Salvage-Boss Ryna, she has work for any pair of hands since the storm, and tell her the Tanglemouth road is still open.",
-        "completion": "Pell sent you? Then you walked the whole Tanglemouth road alone, and that is reference enough for me. Welcome to Drifthaven, {playerName}. Grab a rope, we are short-handed.",
+        "title": "去往漂流港",
+        "text": "走出黑树林，走进太阳里，{playerName}。沿着岸边路向北，赶在潮水转向之前你就能到漂流港。去找打捞头目莱娜，风暴过后她那儿多的是活计，谁的手都用得上，再告诉她缠木隘口的路还通着。",
+        "completion": "佩尔派你来的？那你就是独自走完了整条缠木隘口的路，这份履历对我来说够用了。欢迎来到漂流港，{playerName}。抄起根缆绳吧，我们正缺人手。",
         "objectives": {
           "0": {
-            "label": "Report to Salvage-Boss Ryna"
+            "label": "向打捞头目莱娜报到"
           }
         }
       },
       "q_pr_wreck_line_cargo": {
-        "title": "The Wreck Line",
-        "text": "The storm three nights back drove the Pearlwake onto the reef, and her cargo is strewn the whole length of the wreck line between here and the Palmstrand. Three crates of trade goods are still lying in the surf, {playerName}. Bring them in before the tide, or the crabs, claim what is left.",
-        "completion": "Salt-stained but sound, all three. The divers eat this month because of you, {playerName}.",
+        "title": "沉船线",
+        "text": "三夜前的风暴把珠浪号推上了礁石，她的货物撒满了从这里到棕榈长滩之间整条沉船线。还有三箱货物躺在浪花里，{playerName}。抢在潮水，或是螃蟹，认领剩下的东西之前，把它们运回来。",
+        "completion": "三箱俱全，沾了盐渍但完好无损。这个月采珠人有饭吃，全靠你，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Pearlwake Cargo recovered"
+            "label": "已寻回珠浪号货物"
           }
         }
       },
       "q_pr_scuttler_cull": {
-        "title": "Shellbacked Thieves",
-        "text": "Every wreck on this coast draws the tide scuttlers, and the Pearlwake has drawn half the reef. My salvage crews will not work a line with those claws in the shallows. Crack ten of them, {playerName}, and the wreck line is ours again.",
-        "completion": "Ten fewer claws in the surf. My crews are already wading back out, and not one of them said thank you, so I will: thank you, {playerName}.",
+        "title": "披壳的窃贼",
+        "text": "这条海岸上每一艘沉船都会招来潮汐蟹，而珠浪号招来了半个礁盘。浅水里满是那些钳子，我的打捞队没法下水作业。敲开十只，{playerName}，沉船线就又是我们的了。",
+        "completion": "浪花里少了十副钳子。我的人已经重新蹚水下去了，没一个说声谢谢，那就由我来说：谢谢你，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Tide Scuttler cracked"
+            "label": "已敲碎潮汐蟹"
           }
         }
       },
       "q_pr_boars_in_the_gardens": {
-        "title": "Boars in the Gardens",
-        "text": "Whatever stirs in the deep green, it pushes the thicket boars out onto our strand. They have rooted up the garden terraces twice this week, and they will have the drying racks next. Ten boars, {playerName}, and push the rest back under the trees.",
-        "completion": "The racks stand and the gardens can be replanted. The boars did not choose to come onto the sand, {playerName}. Remember that: something moved them.",
+        "title": "菜园里的野猪",
+        "text": "不管深绿之中骚动的是什么，它正把灌丛野猪挤到我们的沙滩上来。这一周它们已经两次拱翻了梯田菜园，下一个遭殃的就是晒架。十头野猪，{playerName}，把其余的赶回树下去。",
+        "completion": "晒架保住了，菜园也还能重新栽种。野猪不是自己选了走上沙滩的，{playerName}。记住这一点：是有什么东西挪动了它们。",
         "objectives": {
           "0": {
-            "label": "Thicket Boar driven off"
+            "label": "已赶走灌丛野猪"
           }
         }
       },
       "q_pr_the_man_who_went_in": {
-        "title": "The Man Who Went In",
-        "text": "The divers will not step past the treeline, {playerName}, and I will not ask them to. You have heard the drums by now: everyone does, by the second night. One man on this island ever walked toward that sound and came back. Okku. He camps under the great banyans at the Vinefall, deep up the Tangle road. Find him, and ask him what the green is hiding.",
-        "completion": "Isha sent you? The Pearl-Mother has not spoken my name in years. Sit out of the vines' reach, {playerName}, and I will tell you what I know: the drums are not the danger. They are the warning.",
+        "title": "走进丛林的人",
+        "text": "采珠人不肯踏过林线一步，{playerName}，我也不会开这个口。鼓声你如今该听过了：到第二夜，人人都会听见。这座岛上只有一个人朝那声音走过去，还走了回来。奥库。他在垂藤林的大榕树下扎营，得沿缠木路走进深处。找到他，问问绿荫里藏着什么。",
+        "completion": "伊莎派你来的？珍珠之母已经多年没提过我的名字了。坐到藤蔓够不着的地方来，{playerName}，我把知道的都告诉你：鼓声不是危险。鼓声是警告。",
         "objectives": {
           "0": {
-            "label": "Find Okku at the Vinefall"
+            "label": "在垂藤林找到奥库"
           }
         }
       },
       "q_pr_canopy_silk": {
-        "title": "Silk from the Canopy",
-        "text": "Look up, {playerName}. Every canopy from here to the idol is webbed like a fishing net, and the weavers grow bolder each season. I string their own silk across the paths, tripline bells, so the jungle cannot creep up on me. Six good hanks off the canopy weavers will restring my lines.",
-        "completion": "Good, strong silk. My bells will sing a while longer, and nothing walks these paths at night without me knowing, {playerName}. Lately, something has been walking often.",
+        "title": "树冠之丝",
+        "text": "抬头看，{playerName}。从这里到神像，每一片树冠都结着渔网似的蛛网，织网蛛一季比一季大胆。我把它们自己的丝拉在小径上，系成绊线铃，好叫丛林没法悄悄摸到我跟前。从树冠织网蛛身上取六束好丝，我的线就能重新拉起来。",
+        "completion": "好丝，结实。我的铃铛还能再唱上一阵子，夜里走这些小径的东西，没有一个能瞒过我，{playerName}。而最近，有什么东西走得很勤。",
         "objectives": {
           "0": {
-            "label": "Canopy Silk Hank"
+            "label": "树冠丝束"
           }
         }
       },
       "q_pr_the_lost_navigator": {
-        "title": "The Lost Navigator",
-        "text": "We pulled every hand off the Pearlwake but one: Navigator Suli, who swam for the far strand and never walked in. A diver spotted her holed up in the bow wreckage past the Palmstrand, alive, and too spent to run the gauntlet alone. Walk her home along the shore road, {playerName}. The crabs will not like it, and the jungle likes it less.",
-        "completion": "Suli is by the fire, still swearing she could have swum it. You brought back the only chart-reader on this coast, {playerName}. These are from her sea chest, with her blessing.",
+        "title": "失踪的领航员",
+        "text": "珠浪号上的人手我们都捞回来了，只差一个：领航员苏莉，她朝远处的沙滩游去，却始终没有走进港来。有个采珠人瞧见她躲在棕榈长滩过去的船头残骸里，人还活着，只是精疲力竭，独自闯不过那条险路。沿着岸边路送她回家吧，{playerName}。螃蟹不会乐意，丛林更不乐意。",
+        "completion": "苏莉已经坐在火边了，还在赌咒说她本可以游回来。你带回了这条海岸上唯一识海图的人，{playerName}。这些是从她的船箱里取的，带着她的祝福。",
         "objectives": {
           "0": {
-            "label": "Navigator Suli seen safely to Drifthaven"
+            "label": "已护送领航员苏莉平安抵达漂流港"
           }
         }
       },
       "q_pr_what_the_drums_guard": {
-        "title": "What the Drums Guard",
-        "text": "I have walked as near the Sunken Idol as a living man dares, and I saw two things: the weavers have curtained the idol road in web, and the old offering bowls along it have been filled again. Freshly, {playerName}. Cut eight weavers off the road and bring me three of those offerings. I would know what hand still feeds a dead god.",
-        "completion": "Moss, pearl-shell, and boar blood, packed by fingers. Something in that ruin still keeps its rites, {playerName}, and the Guardian keeps everything else out. It is time we spoke of it plainly.",
+        "title": "鼓声守护之物",
+        "text": "我曾走到活人敢靠近沉没神像的极限，看见了两件事：织网蛛用蛛网把神像之路挂成了帷幔，而路边那些古老的祭碗又被盛满了。是新盛的，{playerName}。清掉路上的八只织网蛛，再给我带三份祭品回来。我要知道，究竟是谁的手还在供奉一位死去的神。",
+        "completion": "苔藓、珠贝，还有野猪血，是用手指一点点按进去的。那片废墟里还有什么在奉行它的仪式，{playerName}，而守卫把其余一切都挡在外面。是时候把话说开了。",
         "objectives": {
           "0": {
-            "label": "Canopy Weaver cut down"
+            "label": "已斩落树冠织网蛛"
           },
           "1": {
-            "label": "Refilled Offering Bowl gathered"
+            "label": "已收集重新盛满的祭碗"
           }
         }
       },
       "q_pr_idol_guardian": {
-        "title": "The Idol Guardian",
-        "text": "The idol is older than the island, {playerName}. Older than the drums, older than the name Palmreach. Its Guardian has stood in that drowned ring since before the palms grew, and now it wakes and walks the columns at night. Whatever the offerings feed, the Guardian is its door-ward. Bring a friend, and break it.",
-        "completion": "You felled a thing the jungle itself would not touch. Look there, behind the idol: the Guardian was never guarding the columns, {playerName}, it was guarding the steps beneath them. The drums have gone quiet tonight. Whatever sleeps below the Wildheart Basin now knows your name.",
+        "title": "神像守卫",
+        "text": "神像比这座岛更古老，{playerName}。比鼓声古老，比棕榈湾这个名字更古老。早在棕榈还没长出来的年月，它的守卫就立在那圈沉水的石环里，而如今它醒了，夜里在石柱间走动。无论祭品供养的是什么，守卫就是它的门卫。带上一个朋友，打碎它。",
+        "completion": "你击倒了一件连丛林自己都不敢碰的东西。看那边，神像背后：守卫守的从来不是石柱，{playerName}，它守的是石柱之下的台阶。今夜鼓声沉寂了。沉睡在荒野之心盆地之下的那个东西，如今已经知道了你的名字。",
         "objectives": {
           "0": {
-            "label": "The Idol Guardian broken"
+            "label": "已击碎神像守卫"
           }
         }
       },
       "q_eg_gate_report": {
-        "title": "Word Through the Gate",
-        "text": "The lawns past this gate have trimmed themselves for a hundred years, {playerName}, and lately they have started trimming visitors. Head Gardener Amaranth keeps the books in Hedgewick, up the road past the gate lawns. Tell her another traveler has come through, and tell her the hedges by the gate moved last night.",
-        "completion": "Moved, did they. Pell reports that every week, and every week he is right. Forgive my eyes, {playerName}, I have not slept a whole night in years: someone has to watch the garden watch us. Welcome to Hedgewick.",
+        "title": "门内传讯",
+        "text": "这道门后的草坪已经自己修剪了一百年，{playerName}，而最近它们开始修剪访客了。园丁长阿玛兰丝在篱苑镇管着记录，就在门前草坪再往前的路上。告诉她又有一位旅人进了园子，还有，门边的树篱昨夜挪动了。",
+        "completion": "挪动了，是吗。佩尔每周都这么报，而每周他都没报错。请原谅我这双眼睛，{playerName}，我已经多年没睡过一个整觉了：花园在盯着我们，总得有人盯着花园。欢迎来到篱苑镇。",
         "objectives": {
           "0": {
-            "label": "Report to Head Gardener Amaranth"
+            "label": "向园丁长阿玛兰丝报到"
           }
         }
       },
       "q_eg_hungry_shapes": {
-        "title": "Pruned into Hunger",
-        "text": "Whoever shapes this garden has grown careless, or cruel. The wolf shapes out in the Rose Wilds were clipped for show, yet lately they hunt: green jaws, no bellies, and no reason ever to stop. Cut down ten topiary wolves, {playerName}, and let the lawns be lawns again for a while.",
-        "completion": "Ten heaps of clippings where ten wolves stood. It should feel like gardening, {playerName}. Why does it feel like war?",
+        "title": "修剪成的饥饿",
+        "text": "修剪这座花园的那位，要么是粗心了，要么是变得残忍了。野蔷薇丛里那些狼形绿雕本是剪来观赏的，近来却开始狩猎：绿色的颚，没有肚腹，也就永远没有停下的理由。砍倒十头绿雕之狼，{playerName}，让草坪再当一阵子草坪。",
+        "completion": "十头狼站过的地方，如今是十堆碎枝。这本该像是园艺活，{playerName}。为什么却像是打仗？",
         "objectives": {
           "0": {
-            "label": "Topiary Wolf slain"
+            "label": "已击杀绿雕之狼"
           }
         }
       },
       "q_eg_stolen_shears": {
-        "title": "The Stolen Shears",
-        "text": "Every pair of shears in Hedgewick has walked off in a fortnight, {playerName}: off the pegs, out of locked sheds, one pair out of my own apron while I dozed. It is the hedge gnomes, the little groundskeepers who hate us walking their lawns. Get six pairs back before the whole hamlet is down to kitchen knives.",
-        "completion": "Six pairs, and my own among them, I would know the nick in the blade anywhere. Here, these gloves were knitted for pruning work. Warm hands make steady shears.",
+        "title": "失窃的修枝剪",
+        "text": "两周之内，篱苑镇的每一把修枝剪都不翼而飞了，{playerName}：挂钩上的、锁着的棚屋里的，还有一把是趁我打盹时从我围裙里摸走的。是树篱地精干的，那些小园丁最恨我们踩他们的草坪。找回六把来，别让全镇沦落到只能用菜刀干活。",
+        "completion": "六把，我自己那把也在里头，刀刃上那道缺口我到哪儿都认得。来，这双手套是专为修剪活计织的。手暖了，剪子才稳。",
         "objectives": {
           "0": {
-            "label": "Stolen Hedgewick Shears"
+            "label": "失窃的篱苑修枝剪"
           }
         }
       },
       "q_eg_who_trims_the_hedges": {
-        "title": "Who Trims the Hedges",
-        "text": "I have kept the ledgers thirty years, {playerName}, and not slept properly for ten of them, because the sums will not close. Grass wants cutting and hedges want shaping, and nobody here does either, yet every dawn the garden stands trimmed. Lately the woodfolk swear they see an old man with a barrow on the far south lawns, past the maze by the Lily Basin. Find him. If he is real, I can finally sleep. If he is not, I suppose I never will.",
-        "completion": "So the house finally sent someone. A hundred years I have walked these lawns, {playerName}, and the garden and I have an understanding: I trim what asks to be trimmed. Sit. The hedges can spare you an hour.",
+        "title": "谁在修剪树篱",
+        "text": "我管了三十年账本，{playerName}，其中十年不曾睡好，因为账目怎么也对不上。草要割，树篱要剪，这里没有一个人做这些活，可每天拂晓花园都是修剪整齐的。最近林中人赌咒说，在遥远的南草坪上见过一个推着手推车的老人，就在迷宫之外的睡莲池边。找到他。若他是真的，我总算能睡了。若不是，我想我这辈子都睡不成了。",
+        "completion": "这么说，镇上总算派人来了。我在这些草坪上走了一百年，{playerName}，花园和我之间有个默契：什么求剪，我就剪什么。坐吧。树篱匀得出你一个钟头。",
         "objectives": {
           "0": {
-            "label": "Find the gardener by the Lily Basin"
+            "label": "在睡莲池边找到那位园丁"
           }
         }
       },
       "q_eg_gnomes_in_the_green": {
-        "title": "The Groundskeepers Grudge",
-        "text": "The shears were only the start, {playerName}. Last night the gnomes tipped our tool carts into the green, one out by their warren west of the maze, one clean across the garden on the pond walk, and scattered a hundred years of good iron in the grass. Drive off eight of the little devils and haul the spilled carts home.",
-        "completion": "Three carts back and the pegs full again. Let the little devils sulk in their hedges: Hedgewick works these lawns too.",
+        "title": "小园丁的怨气",
+        "text": "修枝剪只是个开头，{playerName}。昨夜地精把我们的工具车掀进了绿丛，一辆翻在迷宫西边他们的地洞旁，另一辆远在花园另一头的花瓣池步道上，把上百年的好铁器撒了一草地。赶走八个小恶棍，把翻倒的车拖回家。",
+        "completion": "三辆车回来了，挂钩上也重新挂满了。让那帮小恶棍在树篱里赌气去吧：这片草坪，篱苑镇同样有份打理。",
         "objectives": {
           "0": {
-            "label": "Hedge Gnome driven off"
+            "label": "已赶走树篱地精"
           },
           "1": {
-            "label": "Tool cart recovered"
+            "label": "已寻回工具车"
           }
         }
       },
       "q_eg_bloom_clippings": {
-        "title": "Clippings from the Living Green",
-        "text": "You want to understand this garden? Then read it the way I do. The stags that graze the lawns grow the truest green: every leaf on them is a page. Bring me six fresh clippings from the topiary stags, {playerName}. They will not thank you for the pruning, but they will regrow. Everything here regrows.",
-        "completion": "Look here: the leaves are curling in on themselves, every clipping the same. The garden is afraid, {playerName}. In a hundred years I have never once known it afraid.",
+        "title": "活绿剪枝",
+        "text": "你想弄懂这座花园？那就用我的法子来读它。草坪上吃草的那些绿雕雄鹿长着最纯正的绿：它们身上每一片叶子都是一页书。从绿雕雄鹿身上给我剪六段新鲜的枝叶来，{playerName}。它们不会为这次修剪谢你，但它们会重新长好。这里的一切都会重新长好。",
+        "completion": "看这里：叶子全都向内蜷着，每一段剪枝都一样。花园在害怕，{playerName}。一百年来，我从没见过它害怕。",
         "objectives": {
           "0": {
-            "label": "Pruned Bloom Clipping"
+            "label": "修剪下的花枝"
           }
         }
       },
       "q_eg_four_statues": {
-        "title": "The Four Quiet Sisters",
-        "text": "When the garden was young, the first gardeners raised four marble sisters to watch its quarters: one above the Rose Wilds, one on the pond walk east of the maze, one on the west lawn where the gnomes keep their warren, and one on the south lawn past the hedges. The maze grew up between them, and most folk never see all four. Walk the quarters, {playerName}, and press your palm to each sister. When the garden has looked you over from all four sides, it will open places it keeps from strangers.",
-        "completion": "Four rubbings, four sisters, and not one of them wept marble. The garden has taken your measure, {playerName}, and it did not find you wanting. Now I can send you where the trouble truly lives.",
+        "title": "四位静默姐妹",
+        "text": "花园年轻的时候，最早的园丁们立起四位大理石姐妹，看护园子的四方：一位立在野蔷薇丛上方，一位在迷宫以东的花瓣池步道，一位在地精筑洞的西草坪，还有一位在树篱之外的南草坪。迷宫在她们之间长了起来，大多数人一辈子也见不全四位。走遍四方吧，{playerName}，把手掌贴上每一位姐妹。等花园从四面把你打量过一遍，它就会向你敞开那些不给陌生人看的地方。",
+        "completion": "四张拓片，四位姐妹，没有一位落下大理石的泪。花园已经掂量过你了，{playerName}，而它没有嫌弃你。现在我可以把你派往麻烦真正盘踞的地方了。",
         "objectives": {
           "0": {
-            "label": "Garden statue visited"
+            "label": "已造访花园雕像"
           }
         }
       },
       "q_eg_bull_of_the_court": {
-        "title": "The Bull of the Fountain Court",
-        "text": "Now the truth, {playerName}. The bull at the heart of the maze was my masterwork: I shaped him to guard the Fountain Court, and for a hundred years he did. But the fear in the green has reached him, and he guards nothing now, he hunts. The maze feeds him whoever wanders in. I am too old to unmake him, and it must be unmaking, root and branch. Bring a friend, walk the maze to the court, and cut my bull down.",
-        "completion": "I felt it, here, when he came apart. A hundred years of work, and you were right to end it. Take this mantle: I cut it for whoever proved stronger than my best. The court is only a fountain tonight, {playerName}, and the garden is only a garden. Perhaps now the Head Gardener and I can both sleep.",
+        "title": "喷泉庭院的公牛",
+        "text": "现在说实话吧，{playerName}。迷宫深处那头公牛是我的得意之作：我把他剪成喷泉庭院的守卫，他也守了一百年。可绿意里的恐惧已经蔓延到他身上，如今他什么也不守了，他在狩猎。谁误入迷宫，迷宫就把谁喂给他。我太老了，拆解不动他了，而这必须是连根带枝的拆解。带上一个朋友，穿过迷宫走到庭院，砍倒我的公牛。",
+        "completion": "他散架的那一刻，我在这里感觉到了。一百年的心血，而你终结它是对的。收下这件披风：我裁下它，就是留给证明自己胜过我最好作品的人。今夜的庭院只是一座喷泉，{playerName}，花园也只是一座花园。也许现在，园丁长和我都能睡上一觉了。",
         "objectives": {
           "0": {
-            "label": "The Topiary Bull unmade"
+            "label": "已拆解绿雕公牛"
           }
         }
       },
       "q_fs_bell_at_the_landing": {
-        "title": "The Bell at the Landing",
-        "text": "You came over the Ferrywalk, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up the shore road, past the drying racks nobody tends anymore. Tell Warden Coalfast the causeway still stands, and that Tam has not rung a three-toll today. Yet.",
-        "completion": "The causeway holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands that crosses that sandbar is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
+        "title": "登岸口的钟",
+        "text": "你是从沙洲堤道过来的，{playerName}？那你是这一周里的头一个，守望者肯定想亲眼瞧瞧你。鸥港就在岸边路再往上，过了那排如今没人打理的晒网架。告诉守望者煤耐，堤道还立着，塔姆今天也还没敲过三响。暂时还没有。",
+        "completion": "堤道还撑得住，塔姆也还有力气拿三响打趣。很好。我们是一座被围攻的岛，{playerName}，每一双跨过沙洲的手，都是裂隙要伤到我的人之前必须先闯过的一道关。欢迎来到鸥港。",
         "objectives": {
           "0": {
-            "label": "Report to Warden Coalfast"
+            "label": "向守望者煤耐报到"
           }
         }
       },
       "q_fs_hold_the_riftfields": {
-        "title": "Hold the Riftfields",
-        "text": "East of town the grain rows have gone to wrack, and the wretches that came through the Riftfields break now pick them clean. My people cannot tend a field they cannot stand in, {playerName}. Cull ten of the wretches and give the farmers back their ground.",
-        "completion": "Ten fewer, and the field hands are already arguing over who walks out first. It will not last, the breaks never rest long, but a town that eats is a town that holds.",
+        "title": "守住裂野",
+        "text": "镇子以东的麦田已经荒败，从裂野的裂隙钻出来的恶徒正把田里洗劫一空。人连站都站不进去的田，叫人怎么耕种，{playerName}。除掉十个恶徒，把土地还给农人。",
+        "completion": "少了十个，雇工们已经在争谁第一个下田了。这撑不了多久，裂隙从不会安分太久，但吃得上饭的镇子，就是守得住的镇子。",
         "objectives": {
           "0": {
-            "label": "Breach Wretch slain"
+            "label": "已击杀裂口恶徒"
           }
         }
       },
       "q_fs_steel_for_the_redoubt": {
-        "title": "Steel for the Redoubt",
-        "text": "Every blade I hand out is one the sea gave back or one I pried off the dead, {playerName}. The wretches carry scrap through the breaks, hinges, hooks, broken sword-steel, magpie stuff, but it hammers out true. Bring me six pieces of their scavenged steel and the barricade line gets its teeth back.",
-        "completion": "Salt-pitted and break-scarred, and it will hold an edge all the same. Here, I lined these grips myself. Steel for steel, {playerName}: it is the only trade the Farshore runs these days.",
+        "title": "堡垒之钢",
+        "text": "我发下去的每一把刀，不是海还回来的，就是我从死人身上撬下来的，{playerName}。恶徒们把碎铁从裂隙里带过来，铰链、挂钩、断掉的剑钢，尽是些喜鹊叼来的破烂，可锤打出来却是好钢。给我带六块他们搜刮的钢铁来，路障防线就能重新长出牙齿。",
+        "completion": "盐蚀斑斑，裂痕累累，可开刃照样锋利。来，这副护手是我亲手衬的里。以钢换钢，{playerName}：如今的远岸，只做这一门买卖。",
         "objectives": {
           "0": {
-            "label": "Break-Scarred Steel"
+            "label": "裂隙创痕钢"
           }
         }
       },
       "q_fs_the_three_bells": {
-        "title": "The Three Bells",
-        "text": "Three watchbells stand the coast beyond my own: one on the Landing point, one on the south strand, one out by the Riftfields shore. If a rope has rotted or a clapper has been carried off, the town learns of a break when it is already in the streets. Walk the coast, {playerName}, and ring each bell once, so I know it still has a voice.",
-        "completion": "Three voices, three answers, carried clean over the water. Sleep in Gullhaven tonight, {playerName}, and know that if a bell wakes you, it will be by my hand and in good time.",
+        "title": "三口警钟",
+        "text": "除了我这一口，海岸上还立着三口警钟：一口在登岸口的岬角，一口在南边的沙滩，一口在裂野的岸边。若是绳子朽了，或是钟舌被人拿走了，等镇子知道裂隙开了，它已经进了街巷。沿海岸走一遭吧，{playerName}，每口钟敲一响，好让我知道它们还有嗓子。",
+        "completion": "三副嗓子，三声回应，清清楚楚地传过了水面。今夜就睡在鸥港吧，{playerName}，放心，若有钟声吵醒你，那一定是我亲手敲的，而且敲得及时。",
         "objectives": {
           "0": {
-            "label": "Watchbell rung"
+            "label": "已敲响警钟"
           }
         }
       },
       "q_fs_song_before_the_break": {
-        "title": "The Song Before the Break",
-        "text": "There is a man who hears the breaks before they open. Riftwatch Ollun: a scholar, or a madman, and lately I cannot afford the difference. He keeps his vigil at the Watch Meadow, up the road southeast of town. Find him, {playerName}, and ask him what the island is about to do to us next.",
-        "completion": "The Warden sent you? Good. That means the town has finally started listening. Now be still a moment, {playerName}. There, under the wind, do you hear it? The cliffs are singing, and I do not like the tune.",
+        "title": "裂开前的歌",
+        "text": "有个人能在裂隙开启之前听见它们。裂察奥伦：一位学者，或是一个疯子，而近来我已经付不起分辨的代价了。他在守望草甸守着他的哨位，就在镇子东南的路上。找到他，{playerName}，问问他这座岛接下来又要对我们做什么。",
+        "completion": "守望者派你来的？好。这说明镇子总算肯听了。现在静一静，{playerName}。那儿，在风声底下，听见了吗？峭壁在唱歌，而我不喜欢这个调子。",
         "objectives": {
           "0": {
-            "label": "Find Riftwatch Ollun"
+            "label": "找到裂察奥伦"
           }
         }
       },
       "q_fs_moss_and_mending": {
-        "title": "Moss and Mending",
-        "text": "The salt moss that grows along the tideline is the best wound-packing I know, and the riftspawn have claimed every stretch of shore it grows on. They carry tufts of it snagged on their hides, of all things. Clear six of them off the east reaches, {playerName}, and pull me four good handfuls of moss from what they have trampled through.",
-        "completion": "Moss in one hand and a quieter shoreline in the other. You have restocked my whole surgery, {playerName}. Do me the kindness of not becoming my next patient.",
+        "title": "苔藓与疗伤",
+        "text": "潮线边生长的盐苔是我所知最好的敷伤药，可裂生怪占了它生长的每一段海岸。说来也怪，它们的皮上就挂着一撮撮刮下来的盐苔。把东边滩涂上的六只清掉，{playerName}，再从它们踩烂的苔地里给我采四把好苔来。",
+        "completion": "一手是盐苔，一手是安静下来的海岸线。你把我整间手术房都补齐了，{playerName}。行行好，别成了我的下一个病人。",
         "objectives": {
           "0": {
-            "label": "Riftspawn slain"
+            "label": "已击杀裂生怪"
           },
           "1": {
-            "label": "Farshore Salt Moss"
+            "label": "远岸盐苔"
           }
         }
       },
       "q_fs_bram_come_home": {
-        "title": "Bram Come Home",
-        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.",
-        "completion": "Bram! You brought him back to me whole, {playerName}. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.",
+        "title": "布拉姆回家",
+        "text": "晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在北岸。把他领回家，交到我手上。",
+        "completion": "布拉姆！你把他完完整整地带回来了，{playerName}。我们俩都哭了，谁也不觉得丢人。往后裂隙不管再从这座岛夺走什么，都别想夺走我的家人。再也不会了。",
         "objectives": {
           "0": {
-            "label": "Fisher Bram seen safely home to Gullhaven"
+            "label": "已护送渔民布拉姆平安回到鸥港"
           }
         }
       },
       "q_fs_stalkers_off_the_light": {
-        "title": "Stalkers off the Light",
-        "text": "The stalkers hunt the dark between the watchfires, and every night they circle my meadow a little closer. They are not mindless, {playerName}, they are patient, and patience is the one thing I cannot outlast. Kill eight and push the dark back to the cliffs it came through.",
-        "completion": "Eight nights of circling, ended in one. The fires burn steadier already, or perhaps that is only my hands. Either way the meadow is mine again, and I can hear the island think.",
+        "title": "驱离灯火的潜行者",
+        "text": "潜行者在哨火之间的黑暗里狩猎，每一夜都把包围我草甸的圈子收得更紧一些。它们并非没有心智，{playerName}，它们有的是耐心，而耐心恰恰是我唯一耗不过的东西。杀掉八只，把黑暗推回它钻出来的峭壁去。",
+        "completion": "八夜的围困，一夜了结。火光已经烧得稳了些，也可能只是我的手稳了。不管怎样，草甸又是我的了，我又能听见这座岛思考了。",
         "objectives": {
           "0": {
-            "label": "Void Stalker slain"
+            "label": "已击杀虚空潜行者"
           }
         }
       },
       "q_fs_the_great_break": {
-        "title": "The Great Break",
-        "text": "Every song this island sings ends on the same low note, and it comes from the Sundered Cliffs. Something came through the great break there, {playerName}, something the cliffs themselves cracked open to admit, and it is still growing. If it walks north, no bell will matter. Take a friend, take two, and end it. Then tell Coalfast the tune has changed.",
-        "completion": "Ollun sent word ahead: the singing stopped. My whole town heard the quiet, {playerName}, and half of them wept at the sound of nothing at all. Wear this mantle. The Farshore does not forget who held its shore.",
+        "title": "大裂隙",
+        "text": "这座岛唱的每一支歌，都终结在同一个低音上，而那个音来自碎裂断崖。有什么东西从那里的大裂隙里过来了，{playerName}，是峭壁亲自裂开身子放进来的东西，而它还在生长。一旦它向北走，什么钟声都救不了了。带上一个朋友，带上两个，终结它。然后告诉煤耐，曲调变了。",
+        "completion": "奥伦先送来了消息：歌声停了。全镇的人都听见了那份安静，{playerName}，有一半人听着那一无所有的声音落了泪。披上这件披风吧。远岸不会忘记是谁守住了它的海岸。",
         "objectives": {
           "0": {
-            "label": "The Sundered Horror slain"
+            "label": "已击杀碎裂恐魔"
           }
         }
       },
       "q_gc_down_the_windway": {
-        "title": "Down the Windway",
-        "text": "You made the climb, {playerName}, so the wind has decided to keep you. Wickharbor sits east along the downs road, tucked in the lee of its cove. Harbormaster Odile counts every soul who comes over the pass, and she will want to count you. Tell her the Windway is still open.",
-        "completion": "Over the pass on foot, in this weather? Maren sends me few enough names, and fewer still walk in to answer for themselves. Welcome to Wickharbor, {playerName}. Close the inn door behind you.",
+        "title": "沿风道而下",
+        "text": "你爬上来了，{playerName}，看来风决定留下你了。烛港在丘陵路的东头，藏在小湾的背风处。港务长奥黛尔清点每一个翻过隘口的人，她也会想把你点上一笔。告诉她风道还开着。",
+        "completion": "这种天气，靠两条腿翻隘口？玛伦送来的名字本就不多，能亲自走进来交代自己来历的更少。欢迎来到烛港，{playerName}。进旅店记得随手关门。",
         "objectives": {
           "0": {
-            "label": "Report to Harbormaster Odile"
+            "label": "向港务长奥黛尔报到"
           }
         }
       },
       "q_gc_wool_off_the_downs": {
-        "title": "Wool off the Downs",
-        "text": "My boat crews row into a gale that cuts through oilskin like paper, {playerName}. Only one thing turns this wind: the greasy wool off the moor rams, spun thick the Wickharbor way. The herds graze the Howling Downs west of town. Six good fleeces and every crew rows warm this season.",
-        "completion": "Fleece like this is why the rams stand out there fat and smug in weather that kills men. The spinners will be at it by lamplight. Take these treads, {playerName}, they are lined from the last shearing.",
+        "title": "丘陵上的羊毛",
+        "text": "我的船员们划进的狂风，能把油布像纸一样割穿，{playerName}。能挡住这风的只有一样东西：荒原羊身上的含脂羊毛，按烛港的老法子纺得厚厚的。羊群就在镇子西边的啸风丘陵吃草。六张好羊毛，这一季每条船的人都能划得暖暖和和。",
+        "completion": "正是这样的毛，让那些羊在能要人命的天气里站得又肥又得意。纺工们今晚就会点灯开工。收下这双行靴，{playerName}，里子是上一次剪毛时衬的。",
         "objectives": {
           "0": {
-            "label": "Greasy Ram Wool"
+            "label": "含脂羊毛"
           }
         }
       },
       "q_gc_scuttlers_in_the_pots": {
-        "title": "Scuttlers in the Pots",
-        "text": "The shoal scuttlers have learned to climb the cliff road and crack our crab pots open on the stones, {playerName}. Half the catch gone this week, and one potman with a hand he will not be using for a month. Break ten of them and the rest will remember why they kept to the shoals.",
-        "completion": "Ten fewer shells on my road, and the pots came up full this morning. The potmen are calling you a good omen, {playerName}. In Wickharbor that is as warm as praise gets.",
+        "title": "蟹笼里的贼",
+        "text": "浅滩蟹学会了爬上崖路，把我们的蟹笼在石头上磕开，{playerName}。这一周半数的渔获没了，还有个笼夫的一只手一个月都使不上劲了。敲碎十只，其余的就会想起它们当初为什么只待在浅滩。",
+        "completion": "我的路上少了十只壳，今早的蟹笼也满满当当地提了上来。笼夫们都说你是个好兆头，{playerName}。在烛港，这已经是最热乎的夸奖了。",
         "objectives": {
           "0": {
-            "label": "Shoal Scuttler slain"
+            "label": "已击杀浅滩蟹"
           }
         }
       },
       "q_gc_keeper_of_the_flame": {
-        "title": "The Keeper of the Flame",
-        "text": "Old Bram keeps the Beacon on the high head northeast of town, and he has not come down for his stores in two weeks. The lamp still burns, so he lives, but a man his age alone on that head in this wind, {playerName}. Climb the beacon road and see him standing.",
-        "completion": "Odile sent you all this way to see if the wind had taken me? Ha. Tell her the lamp burns and so do I. But since you have made the climb, {playerName}, stay a moment. The Beacon has work only a stranger seems fit to do.",
+        "title": "守焰之人",
+        "text": "老布拉姆守着镇子东北高岬上的灯塔，已经两周没下来取补给了。灯还亮着，人就还活着，可他那把年纪，独自一人待在那样的风口岬角上，{playerName}。爬一趟灯塔路，亲眼看看他还站着。",
+        "completion": "奥黛尔让你跑这么远，就为看看风把我卷走了没有？哈。告诉她，灯还烧着，我也还烧着。不过既然你爬都爬上来了，{playerName}，就留一会儿。灯塔这儿有桩活，似乎只有外乡人做得来。",
         "objectives": {
           "0": {
-            "label": "Find Keeper Bram"
+            "label": "找到守灯人布拉姆"
           }
         }
       },
       "q_gc_lanterns_on_the_shear": {
-        "title": "Lanterns on the Shear",
-        "text": "The Beacon is the great light, {playerName}, but it is the storm-lanterns that walk a night traveler down the cliff road above the Shear. Last night the gale doused every one of them, and that road in the dark is a long fall with a short ending. Take my striker and relight the four along the cliff.",
-        "completion": "Four points of light on the cliff road, right where they belong. From up here it looks like the coast has opened its eyes again. You have the makings of a keeper, {playerName}.",
+        "title": "断崖上的提灯",
+        "text": "灯塔是大光，{playerName}，可真正领着夜行人走下断崖上方崖路的，是那些风暴提灯。昨夜狂风把它们一盏不剩全吹灭了，而摸黑走那条路，就是一段很长的坠落加一个很短的结局。拿上我的打火器，把崖边那四盏重新点亮。",
+        "completion": "崖路上四点灯火，正在它们该在的地方。从这上头望下去，像是海岸重新睁开了眼睛。你有当守灯人的料，{playerName}。",
         "objectives": {
           "0": {
-            "label": "Storm-lantern relit"
+            "label": "已重新点亮风暴提灯"
           }
         }
       },
       "q_gc_wind_against_the_wick": {
-        "title": "Wind Against the Wick",
-        "text": "The gale wisps are the wind gone spiteful, {playerName}. They gather on the high downs by the Mirror Tarn, and every flame they find, they snuff, a lantern, a hearth, one day this lamp. Thirty-nine years I have kept the Beacon lit, and I will not lose it to weather with a grudge. Scatter eight of them.",
-        "completion": "The lamp did not so much as gutter last night, first time in a month. The wind still hates us, {playerName}, but it has gone back to hating us fairly.",
+        "title": "逆芯之风",
+        "text": "疾风精就是起了歹意的风，{playerName}。它们聚在镜湖旁的高丘上，见火就掐：掐提灯，掐炉膛，早晚要掐到这盏塔灯头上。我让灯塔亮了三十九年，绝不能把它输给一场记仇的天气。驱散八只。",
+        "completion": "昨夜塔灯连晃都没晃一下，一个月来头一回。风还是恨我们，{playerName}，但它总算恨得讲规矩了。",
         "objectives": {
           "0": {
-            "label": "Gale Wisp scattered"
+            "label": "已驱散疾风精"
           }
         }
       },
       "q_gc_the_far_shore": {
-        "title": "The Far Shore",
-        "text": "From this lamp room I can see the whole coast, {playerName}, and what I see in the north I do not like. Green lights walking the Wreckfields at low tide, hull by hull. One woman works that shore alone: Edda, the salvager. Follow the cliff road north past the Shear until the wrecks begin, and see that she still draws breath.",
-        "completion": "Bram watches my shore from his tower now, does he? The old man is right to worry, {playerName}. The dead have been walking their own wrecks at night, and lately they have stopped caring whether the sun is up.",
+        "title": "远处的海岸",
+        "text": "从这间灯室能望尽整条海岸，{playerName}，而北边的景象我不喜欢。退潮时有绿光在沉船滩上游走，一条船壳挨着一条船壳。那片岸上只有一个女人独自讨生活：打捞者艾妲。沿崖路向北过了断崖，一直走到沉船出现的地方，去确认她还有气。",
+        "completion": "布拉姆如今在他的塔上盯着我这片岸了，是吗？老头担心得没错，{playerName}。死人夜里会在自己的沉船上走动，而最近，他们已经不在乎太阳升没升起了。",
         "objectives": {
           "0": {
-            "label": "Find Salvager Edda"
+            "label": "找到打捞者艾妲"
           }
         }
       },
       "q_gc_dead_mens_cargo": {
-        "title": "Dead Men's Cargo",
-        "text": "Salvage law is simple, {playerName}: what the sea gives the beach is mine. The drowned deckhands disagree. They rise from their hulls and drag every crate I stack back below the tideline. Put six of them down for good, and while the beach is quiet, haul in three flotsam crates before the tide files its counterclaim.",
-        "completion": "Six crews quieter and three crates high and dry. You salvage with a heavier hand than I do, {playerName}, but the ledger does not care. Half of this is yours by law, and by law I mean I say so.",
+        "title": "死人的货",
+        "text": "打捞法很简单，{playerName}：海送上滩的，就是我的。溺亡水手们不同意。他们从船壳里爬起来，把我码好的每只箱子又拖回潮线以下。让六个彻底安息，趁滩上清静，再抢在潮水提出反诉之前拖回三只漂流货箱。",
+        "completion": "六个水手安静了，三只箱子也高高地晾干了。你打捞的手比我重，{playerName}，可账本不管这些。按法律这一半归你，而所谓法律，就是我说了算。",
         "objectives": {
           "0": {
-            "label": "Drowned Deckhand laid to rest"
+            "label": "已安息溺亡水手"
           },
           "1": {
-            "label": "Flotsam Crate salvaged"
+            "label": "已打捞漂流货箱"
           }
         }
       },
       "q_gc_the_wreck_warden": {
-        "title": "The Wreck Warden",
-        "text": "Now you know why the deckhands rise, {playerName}. Something wears the barnacled plate of the first wreck ever to break on this shore, and it wardens every hull on the beach like a graveyard it was hired to keep. It holds a hoard I have coveted for ten years and a crew I would rather see resting. End the Wreck Warden. Bring a friend, the dead keep good watch.",
-        "completion": "The beach went silent the moment it fell, {playerName}. First silence I have heard on this shore in ten years of working it. The crews are just bones now, resting bones. Take the mantle off the top of the hoard, it was always going to fit a living back better.",
+        "title": "沉船守卫",
+        "text": "现在你明白水手们为什么会爬起来了，{playerName}。有个东西披着这片岸上第一艘失事船的藤壶甲板，像看守一座受雇照管的墓园一样，看守着滩上的每一具船壳。它守着一批我垂涎了十年的财货，还有一群我更愿看到安息的船员。终结沉船守卫。带上朋友，死人站岗站得很牢。",
+        "completion": "它倒下的那一刻，海滩静了，{playerName}。我在这片岸上讨了十年生活，头一次听见这样的寂静。船员们如今只是白骨了，安息的白骨。把财货堆顶上那件披风拿走吧，它反正更合活人的背。",
         "objectives": {
           "0": {
-            "label": "The Wreck Warden felled"
+            "label": "已击倒沉船守卫"
           }
         }
       },

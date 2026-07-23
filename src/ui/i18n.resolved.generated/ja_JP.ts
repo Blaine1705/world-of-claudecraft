@@ -8817,169 +8817,169 @@ export const ja_JP: EnTranslations = {
         "name": "ズルガーの牙小刀"
       },
       "thick_winter_pelt": {
-        "name": "Thick Winter Pelt"
+        "name": "厚い冬毛皮"
       },
       "aurora_mote": {
-        "name": "Aurora Mote"
+        "name": "オーロラの光粒"
       },
       "hearth_ember_cache": {
-        "name": "Ember Cache"
+        "name": "熾火の壺"
       },
       "sprung_trap": {
-        "name": "Sprung Fen Trap"
+        "name": "弾かれた沼の罠"
       },
       "hearthlined_treads": {
-        "name": "Hearth-Lined Treads"
+        "name": "炉火裏地の足具"
       },
       "frostmane_mantle": {
-        "name": "Mantle of the Frostmane"
+        "name": "フロストメインのマント"
       },
       "ashbone_war_brand": {
-        "name": "Ashbone War-Brand"
+        "name": "アッシュボーンの戦の焼印"
       },
       "emberwing_scale": {
-        "name": "Emberwing Scale"
+        "name": "エンバーウィングの鱗"
       },
       "scorched_supply_crate": {
-        "name": "Scorched Supply Crate"
+        "name": "焦げた補給箱"
       },
       "wyrmwatch_warning_banner": {
-        "name": "Wyrmwatch Warning Banner"
+        "name": "ワームウォッチの警告旗"
       },
       "cinderwalk_treads": {
-        "name": "Cinderwalk Treads"
+        "name": "シンダーウォークの足具"
       },
       "mawscale_pauldrons": {
-        "name": "Mawscale Pauldrons"
+        "name": "モウスケイルの肩当て"
       },
       "gilded_sap_clot": {
-        "name": "Gilded Sap Clot"
+        "name": "金色の樹液の塊"
       },
       "amberfall_sap_bucket": {
-        "name": "Sap-Tap Bucket"
+        "name": "樹液採りのバケツ"
       },
       "mere_ferry_lantern": {
-        "name": "Ferry Lantern"
+        "name": "渡し船のランタン"
       },
       "orchard_sapbinder_grips": {
-        "name": "Sapbinder Grips"
+        "name": "樹液固めの握り"
       },
       "mantle_of_the_meredark": {
-        "name": "Mantle of the Meredark"
+        "name": "ミアダークのマント"
       },
       "plump_fen_eel": {
-        "name": "Plump Fen Eel"
+        "name": "丸々とした沼ウナギ"
       },
       "wisplight_globe": {
-        "name": "Wisplight Globe"
+        "name": "ウィスプライトの玉"
       },
       "fenway_mooring_line": {
-        "name": "Cut Mooring Line"
+        "name": "切られた舫い綱"
       },
       "bridgemere_toll_chest": {
-        "name": "Sunken Toll-Chest"
+        "name": "沈んだ通行料の櫃"
       },
       "eelskin_mudwaders": {
-        "name": "Eelskin Mudwaders"
+        "name": "ウナギ革の泥長靴"
       },
       "lilybed_mantle": {
-        "name": "Mantle of the Lily-Bed"
+        "name": "睡蓮の褥のマント"
       },
       "moonfleece_tuft": {
-        "name": "Moonfleece Tuft"
+        "name": "ムーンフリースの房毛"
       },
       "gloamfield_nightbloom": {
-        "name": "Nightbloom Blossom"
+        "name": "ナイトブルームの花"
       },
       "vigil_star_chart": {
-        "name": "Vigil Star Chart"
+        "name": "石環の星図"
       },
       "barrow_grave_offering": {
-        "name": "Scattered Grave Offering"
+        "name": "散らばった墓前の供物"
       },
       "moonfleece_mitts": {
-        "name": "Moonfleece Mitts"
+        "name": "ムーンフリースのミトン"
       },
       "barrowshade_mantle": {
-        "name": "Barrowshade Mantle"
+        "name": "塚影のマント"
       },
       "widowsilk_skein": {
-        "name": "Widowsilk Skein"
+        "name": "ウィドウシルクのかせ"
       },
       "gallowmere_grave_candle": {
-        "name": "Grave-Candle"
+        "name": "墓前の蝋燭"
       },
       "silkbound_remains": {
-        "name": "Silkbound Remains"
+        "name": "絹に包まれた亡骸"
       },
       "gravebound_silk_wraps": {
-        "name": "Gravebound Silk Wraps"
+        "name": "墓縛りの絹巻き"
       },
       "mantle_of_the_unhorsed": {
-        "name": "Mantle of the Unhorsed"
+        "name": "落馬せし者のマント"
       },
       "pearlwake_cargo_crate": {
-        "name": "Pearlwake Cargo Crate"
+        "name": "パールウェイクの積み荷箱"
       },
       "canopy_silk_hank": {
-        "name": "Canopy Silk Hank"
+        "name": "キャノピーシルクの束"
       },
       "sunken_offering_bowl": {
-        "name": "Refilled Offering Bowl"
+        "name": "再び満たされた供物鉢"
       },
       "saltwalker_sandals": {
-        "name": "Saltwalker Sandals"
+        "name": "塩歩きのサンダル"
       },
       "sunken_idol_mantle": {
-        "name": "Mantle of the Sunken Idol"
+        "name": "沈んだ神像のマント"
       },
       "hedgewick_shears": {
-        "name": "Stolen Hedgewick Shears"
+        "name": "盗まれたヘッジウィックの剪定ばさみ"
       },
       "evergarden_bloom_clipping": {
-        "name": "Pruned Bloom Clipping"
+        "name": "剪定した花の切り枝"
       },
       "hedgewick_tool_cart": {
-        "name": "Spilled Tool Cart"
+        "name": "ひっくり返った道具車"
       },
       "evergarden_statue_rubbing": {
-        "name": "Statue Rubbing"
+        "name": "彫像の拓本"
       },
       "shearkeeper_gloves": {
-        "name": "Shearkeeper Gloves"
+        "name": "鋏守の手袋"
       },
       "fountain_court_mantle": {
-        "name": "Mantle of the Fountain Court"
+        "name": "噴水の中庭のマント"
       },
       "galecrest_ram_wool": {
-        "name": "Greasy Ram Wool"
+        "name": "脂じみた雄羊の羊毛"
       },
       "shear_storm_lantern": {
-        "name": "Doused Storm-Lantern"
+        "name": "消えた嵐ランタン"
       },
       "wreckfield_flotsam_crate": {
-        "name": "Flotsam Crate"
+        "name": "漂着物の木箱"
       },
       "wickspun_treads": {
-        "name": "Wickspun Treads"
+        "name": "ウィック紡ぎの足具"
       },
       "wreck_wardens_mantle": {
-        "name": "Mantle of the Wreck Warden"
+        "name": "レックウォーデンのマント"
       },
       "breakscarred_steel": {
-        "name": "Break-Scarred Steel"
+        "name": "裂け目傷の鋼"
       },
       "farshore_salt_moss": {
-        "name": "Farshore Salt Moss"
+        "name": "遠つ岸の塩苔"
       },
       "gullhaven_watchbell": {
-        "name": "Coastal Watchbell"
+        "name": "沿岸の警鐘"
       },
       "saltforged_grips": {
-        "name": "Saltforged Grips"
+        "name": "塩鍛えの握り"
       },
       "mantle_of_the_unbroken_shore": {
-        "name": "Mantle of the Unbroken Shore"
+        "name": "揺るがぬ岸のマント"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -10112,10 +10112,10 @@ export const ja_JP: EnTranslations = {
         "name": "フロストメイン・イエティ"
       },
       "terrace_howler": {
-        "name": "Terrace Howler"
+        "name": "テラスハウラー"
       },
       "apprentice_wren": {
-        "name": "Apprentice Wren"
+        "name": "見習いレン"
       },
       "emberwing_drake": {
         "name": "エンバーウィング・ドレイク"
@@ -10130,7 +10130,7 @@ export const ja_JP: EnTranslations = {
         "name": "デューントロール"
       },
       "cindraleth_maw_matriarch": {
-        "name": "Cindraleth the Maw Matriarch"
+        "name": "シンドラレス、火口の母竜"
       },
       "gilded_stag": {
         "name": "黄金の牡鹿"
@@ -10142,7 +10142,7 @@ export const ja_JP: EnTranslations = {
         "name": "果樹園のトレント"
       },
       "the_meredark": {
-        "name": "The Meredark"
+        "name": "ミアダーク"
       },
       "harvest_sprite": {
         "name": "ハーベストスプライト"
@@ -10175,7 +10175,7 @@ export const ja_JP: EnTranslations = {
         "name": "塚の王"
       },
       "barrow_wight": {
-        "name": "Barrow Wight"
+        "name": "塚のワイト"
       },
       "widowsilk_spinner": {
         "name": "ウィドウシルク・スピナー"
@@ -10190,7 +10190,7 @@ export const ja_JP: EnTranslations = {
         "name": "蒼白の狩人"
       },
       "gravedigger_mosley": {
-        "name": "Gravedigger Mosley"
+        "name": "墓掘りモズリー"
       },
       "tide_scuttler": {
         "name": "タイドスカトラー"
@@ -10205,7 +10205,7 @@ export const ja_JP: EnTranslations = {
         "name": "神像の守護者"
       },
       "castaway_navigator": {
-        "name": "Navigator Suli"
+        "name": "航海士スリ"
       },
       "topiary_stag": {
         "name": "トピアリーの雄鹿"
@@ -10232,7 +10232,7 @@ export const ja_JP: EnTranslations = {
         "name": "レックウォーデン"
       },
       "drowned_deckhand": {
-        "name": "Drowned Deckhand"
+        "name": "溺れた甲板員"
       },
       "riftspawn": {
         "name": "裂け目の落とし子"
@@ -10247,7 +10247,7 @@ export const ja_JP: EnTranslations = {
         "name": "引き裂かれし恐怖"
       },
       "fisher_bram": {
-        "name": "Fisher Bram"
+        "name": "漁師ブラム"
       },
       "rift_hellguard": {
         "name": "ヘルガード"
@@ -10614,189 +10614,189 @@ export const ja_JP: EnTranslations = {
         "greeting": "外の石碑はもう長いこと誰にも語りかけていない。新しい耳を待っていたのかもしれん。"
       },
       "huntsman_deral": {
-        "name": "Huntsman Deral",
-        "title": "Warden of the Herds",
-        "greeting": "Quiet now. The herd knows every sound this valley makes, and so do I."
+        "name": "狩人デラル",
+        "title": "群れの番人",
+        "greeting": "静かにな。群れはこの谷のあらゆる物音を知っている。わたしもだ。"
       },
       "warden_kaldra": {
-        "name": "Warden Kaldra",
-        "title": "Warden of Icemantle",
-        "greeting": "Mind the benches, stranger. The snow keeps what it takes."
+        "name": "守将カルドラ",
+        "title": "アイスマントルの守将",
+        "greeting": "雪棚には気をつけよ、よそ者。雪は、奪ったものを返さぬ。"
       },
       "hearthkeeper_maeve": {
-        "name": "Hearthkeeper Maeve",
-        "title": "Keeper of the Hearth-Lodge",
-        "greeting": "Come in off the cold. The lodge fire never goes out, so long as I draw breath."
+        "name": "炉端守メイヴ",
+        "title": "炉火の宿の主",
+        "greeting": "寒いところから、さあお入り。わたしが息をしている限り、この宿の火は消えないよ。"
       },
       "scout_einna": {
-        "name": "Scout Einna",
-        "title": "Snowline Scout",
-        "greeting": "You walked the pass alive. Good. Icemantle should hear of it."
+        "name": "斥候エインナ",
+        "title": "スノーラインの斥候",
+        "greeting": "峠を生きて越えたか。上出来だ。アイスマントルに知らせるべきだな。"
       },
       "aurorist_veyla": {
-        "name": "Aurorist Veyla",
-        "title": "Reader of the Lights",
-        "greeting": "Hush. The lights are speaking tonight, and they do not repeat themselves."
+        "name": "オーロラ読みヴェイラ",
+        "title": "光を読む者",
+        "greeting": "お静かに。今夜は光が語っている。あれは二度と同じことを言わないのだよ。"
       },
       "trapper_brosk": {
-        "name": "Trapper Brosk",
-        "title": "Shiverfen Trapper",
-        "greeting": "Fen took three of my lines this week. Fen never took a line in twenty years."
+        "name": "罠師ブロスク",
+        "title": "シヴァーフェンの罠師",
+        "greeting": "今週、沼に罠のラインを三本持っていかれた。二十年で一本も取られたことはなかったのにだ。"
       },
       "gatecaptain_brannoc": {
-        "name": "Gatecaptain Brannoc",
-        "title": "Commander of Wyrmwatch",
-        "greeting": "Wyrmwatch holds the gate. Has held it forty years. It will hold it tonight."
+        "name": "門長ブラノック",
+        "title": "ワームウォッチ司令官",
+        "greeting": "ワームウォッチは門を守る。四十年守り抜いてきた。今夜も守り抜く。"
       },
       "quartermaster_sela": {
-        "name": "Quartermaster Sela",
-        "title": "Keeper of the Garrison Stores",
-        "greeting": "Every crate in this yard crossed forty miles of ash to get here. Treat them kindly."
+        "name": "補給将校セラ",
+        "title": "駐屯地物資の管理人",
+        "greeting": "この置き場の木箱はどれも、四十マイルの灰の道を越えてここに来た。丁重に扱っておくれ。"
       },
       "scout_yerrin": {
-        "name": "Scout Yerrin",
-        "title": "Far-Dune Watcher",
-        "greeting": "Keep low. Sound carries strangely off the glass, and the gate below has ears."
+        "name": "斥候イェリン",
+        "title": "遠砂丘の見張り",
+        "greeting": "身を低くしろ。硝子の上では音が妙に運ばれる。それに、下の門には耳がある。"
       },
       "reeve_ottoline": {
-        "name": "Reeve Ottoline",
-        "title": "Reeve of Lanternmere",
-        "greeting": "Welcome to Lanternmere, where the harvest never ends and neither does the work."
+        "name": "代官オトリーヌ",
+        "title": "ランタンミアの代官",
+        "greeting": "ようこそランタンミアへ。ここでは収穫が終わらない。つまり、仕事もね。"
       },
       "waywatcher_sorrel": {
-        "name": "Waywatcher Sorrel",
-        "title": "Watcher of the Goldmelt",
-        "greeting": "Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing count."
+        "name": "道番ソレル",
+        "title": "ゴールドメルトの見張り",
+        "greeting": "背には雪、行く手には金色。ゴールドメルトを二度歩く者は少ない。だから、この越えを無駄にするな。"
       },
       "ferrymaster_caddow": {
-        "name": "Ferrymaster Caddow",
-        "title": "Keeper of the Lantern Ferries",
-        "greeting": "Fog is on the Mere again. When the lanterns go out on the water, wise folk stay ashore."
+        "name": "渡し守キャドウ",
+        "title": "ランタン渡しの主",
+        "greeting": "また大いなる湖に霧が出た。水の上のランタンが消えたら、賢い者は岸にとどまるものだ。"
       },
       "orchardist_pomeline": {
-        "name": "Orchardist Pomeline",
-        "title": "Keeper of the Gilded Rows",
-        "greeting": "Mind where you step. Every root in these rows is older than the town, and they remember."
+        "name": "果樹園主ポメリーヌ",
+        "title": "黄金の並木の守り手",
+        "greeting": "足元に気をつけて。この並木の根はどれも町より古い。そして、根は覚えているのよ。"
       },
       "waykeeper_pell": {
-        "name": "Waykeeper Pell",
-        "title": "Keeper of the Amberfen Steps",
-        "greeting": "Down the Steps and into the soft country. Mind where you plant your boots."
+        "name": "道守ペル",
+        "title": "アンバーフェンの石段の番人",
+        "greeting": "石段を下れば、やわらかな国だ。靴をどこに沈めるかは、よく見てからにするんだな。"
       },
       "bridgewright_alden": {
-        "name": "Bridgewright Alden",
-        "title": "Master of the Fenway",
-        "greeting": "Every plank in this town is mine to keep, and the fen chews on all of them."
+        "name": "橋大工アルデン",
+        "title": "フェンウェイの主",
+        "greeting": "この町の板という板はわたしの預かりものだ。そして沼は、その一枚残らず齧ってくる。"
       },
       "netter_maris": {
-        "name": "Netter Maris",
-        "title": "Eel-Netter of Bridgemere",
-        "greeting": "Smell that? Smoked eel. Half this town stands on stilts I bought with it."
+        "name": "網師マリス",
+        "title": "ブリッジミアのウナギ網師",
+        "greeting": "この匂いが分かるかい？燻製ウナギさ。この町の高床の半分は、これで稼いだ金で建っているんだ。"
       },
       "mother_sedge": {
-        "name": "Mother Sedge",
-        "title": "Fen-Witch of Willowweep",
-        "greeting": "The willows told me you were coming before your boots left the bridge."
+        "name": "マザー・セッジ",
+        "title": "ウィローウィープの沼の魔女",
+        "greeting": "あんたが来ることは柳たちが教えてくれたよ。その靴が橋を離れるより前にね。"
       },
       "lamplighter_sorrel": {
-        "name": "Lamplighter Sorrel",
-        "title": "Keeper of the Nightgate",
-        "greeting": "Mind the lamps, friend. Past this gate the sun gives up and the flowers take over."
+        "name": "点灯夫ソレル",
+        "title": "夜の門の番人",
+        "greeting": "ランプを頼りにな、友よ。この門の先では太陽が匙を投げ、あとは花々が引き継ぐのだ。"
       },
       "lira_dewsong": {
-        "name": "Lira Dewsong",
-        "title": "Night-Gardener of Moonrest",
-        "greeting": "Welcome to Moonrest, where the flowers do our dawning for us."
+        "name": "リラ・デューソング",
+        "title": "ムーンレストの夜庭師",
+        "greeting": "ようこそムーンレストへ。ここでは花々が、夜明けの代わりを務めてくれるの。"
       },
       "weaver_amelle": {
-        "name": "Weaver Amelle",
-        "title": "Moonfleece Weaver",
-        "greeting": "Feel that? Moonfleece on the loom. Warmer than any fire you have sat beside."
+        "name": "織り手アメル",
+        "title": "ムーンフリースの織り手",
+        "greeting": "触ってごらん。機にかかっているのはムーンフリース。あなたが当たったどんな火よりも温かいのよ。"
       },
       "astronomer_cassian": {
-        "name": "Astronomer Cassian",
-        "title": "Watcher at the Vigil",
-        "greeting": "Hush now. The sky never dawns here, so it never stops talking either."
+        "name": "天文学者カシアン",
+        "title": "石環の観測者",
+        "greeting": "静かに。ここの空には夜明けが来ない。だから、語りやむこともないのだ。"
       },
       "lampman_cobb": {
-        "name": "Lampman Cobb",
-        "title": "Keeper of the Crowgate Lanterns",
-        "greeting": "Stay in the lamplight, friend. The wood counts everyone who passes the gate."
+        "name": "ランプ番コッブ",
+        "title": "鴉の門のランタン番",
+        "greeting": "灯りの中にいるんだ、友よ。森は門をくぐる者をひとり残らず数えている。"
       },
       "sexton_marrow": {
-        "name": "Sexton Marrow",
-        "title": "Sexton of Gallowmere",
-        "greeting": "We bury them deep here, and we ring the bells so they remember to stay down."
+        "name": "堂守マロウ",
+        "title": "ガロウミアの堂守",
+        "greeting": "ここでは死者を深くに葬る。そして鐘を鳴らすのだ。土の下にとどまることを、彼らが忘れぬようにな。"
       },
       "widow_tansy": {
-        "name": "Widow Tansy",
-        "title": "Candlewright of Gallowmere",
-        "greeting": "A candle for every grave, and not one may go out. Not one, do you hear me?"
+        "name": "寡婦タンジー",
+        "title": "ガロウミアの蝋燭師",
+        "greeting": "墓のひとつひとつに蝋燭をひとつ。ひとつたりとも消してはいけない。ひとつたりともだよ、聞いているのかい？"
       },
       "vicar_creel": {
-        "name": "Vicar Creel",
-        "title": "Last Vicar of the Mournstone",
-        "greeting": "The chapel fell years ago. The dead beneath it did not notice, and so I stayed."
+        "name": "司祭クリール",
+        "title": "哀石最後の司祭",
+        "greeting": "礼拝堂は何年も前に崩れた。その下の死者たちは気づきもしなかった。だから、わたしは残ったのだ。"
       },
       "strandwatcher_pell": {
-        "name": "Strandwatcher Pell",
-        "title": "Watcher of the Tanglemouth",
-        "greeting": "Out of the black trees at last. Breathe, stranger, the sun holds this side of the pass."
+        "name": "浜守ペル",
+        "title": "絡み口の見張り",
+        "greeting": "黒い木々からようやく抜けたな。息をつけ、旅の人。峠のこちら側は太陽が守っている。"
       },
       "salvage_boss_ryna": {
-        "name": "Salvage-Boss Ryna",
-        "title": "Mistress of the Wreck Line",
-        "greeting": "A {className} with working arms, good. The wreck line pays well, if the crabs leave you enough fingers to count it."
+        "name": "引き揚げ頭リナ",
+        "title": "難破船の列の女主人",
+        "greeting": "腕の動く{className}か、結構。難破船の列は実入りがいいよ。カニどもが、稼ぎを数える指を残してくれればの話だけどね。"
       },
       "pearlmother_isha": {
-        "name": "Pearl-Mother Isha",
-        "title": "Elder of the Divers",
-        "greeting": "The sea gives, the sand keeps, and the jungle takes. Stay on the strand, stranger."
+        "name": "パールマザー・イーシャ",
+        "title": "海人の長老",
+        "greeting": "海は与え、砂は蓄え、密林は奪う。浜から離れるでないよ、旅の人。"
       },
       "hermit_okku": {
-        "name": "Okku",
-        "title": "The Man Who Went In",
-        "greeting": "Quiet now. The drums count everything that walks under the trees, and they have already counted you."
+        "name": "オック",
+        "title": "奥へ入った男",
+        "greeting": "静かに。太鼓は木々の下を歩くものをすべて数えている。おまえのことも、もう数え終えている。"
       },
       "gatewarden_pell": {
-        "name": "Gatewarden Pell",
-        "title": "Keeper of the Garden Gate",
-        "greeting": "Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy."
+        "name": "門番ペル",
+        "title": "ガーデンゲートの番人",
+        "greeting": "芝生の上は歩き方に気をつけよ。庭が自ら刈り込んでいるのでな。庭は、整った芝を好むのだ。"
       },
       "head_gardener_amaranth": {
-        "name": "Head Gardener Amaranth",
-        "title": "Head Gardener of the Evergarden",
-        "greeting": "Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams."
+        "name": "庭園長アマランス",
+        "title": "エバーガーデンの庭園長",
+        "greeting": "目の下の隈は気にしないでおくれ。庭が夢を見ている間、誰かが起きていなければならないのだから。"
       },
       "wickmother_sorrel": {
-        "name": "Wickmother Sorrel",
-        "title": "Keeper of the Hedgewick Inn",
-        "greeting": "Come in, sit, there is cordial on the fire. Just keep a hand on anything iron: the gnomes are light-fingered of late."
+        "name": "ウィックマザー・ソレル",
+        "title": "ヘッジウィック亭の女主人",
+        "greeting": "お入り、お座り、火にかけた甘い酒があるよ。ただし鉄物からは手を離さないこと。近ごろのノームは手癖が悪いからね。"
       },
       "gardener_yew": {
-        "name": "Gardener Yew",
-        "title": "The Last Gardener",
-        "greeting": "Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks."
+        "name": "庭師ユー",
+        "title": "最後の庭師",
+        "greeting": "その手押し車を取ってくれるかね。村がどう思っていようと、この芝生はひとりでに手入れされるわけではないのだよ。"
       },
       "watcher_maren": {
-        "name": "Watcher Maren",
-        "title": "The Windway Watch",
-        "greeting": "Mind your footing past the gate. The wind up here takes hats first and questions never."
+        "name": "見張りマレン",
+        "title": "ウィンドウェイの見張り",
+        "greeting": "門から先は足元に気をつけな。ここの風はまず帽子をさらう。質問は一度もしない。"
       },
       "harbormaster_odile": {
-        "name": "Harbormaster Odile",
-        "title": "Harbormaster of Wickharbor",
-        "greeting": "Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will not wait."
+        "name": "港務長オディール",
+        "title": "ウィックハーバーの港務長",
+        "greeting": "この入り江の船はどれも、竜骨ごとオールドビーコンに借りがある。用件は手短にね、潮は待ってくれないよ。"
       },
       "keeper_bram": {
-        "name": "Keeper Bram",
-        "title": "Keeper of the Old Beacon",
-        "greeting": "Nine and thirty years this lamp has burned on my watch. It will not go dark on yours."
+        "name": "灯台守ブラム",
+        "title": "オールドビーコンの灯台守",
+        "greeting": "三十九年、この灯りはわたしの番で燃え続けてきた。お前の番で消させはせんよ。"
       },
       "salvager_edda": {
-        "name": "Salvager Edda",
-        "title": "Wreckfield Salvager",
-        "greeting": "Wreckwood, rope, and dead men's cargo. The sea pays my wage, when the Warden lets it."
+        "name": "引き揚げ屋エッダ",
+        "title": "レックフィールズの引き揚げ屋",
+        "greeting": "難破材に、綱に、死人の積み荷。海がわたしの給金を払ってくれる。ウォーデンが許してくれればの話だがね。"
       },
       "warden_coalfast": {
         "name": "守将コールファスト",
@@ -11834,32 +11834,32 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_hollow_the_huntsman": {
-        "title": "The Warden of the Herds",
-        "text": "You look like someone who can handle more than wisps, {playerName}. Huntsman Deral keeps his lookout among the stag meadows east of here, and he has been asking after capable hands for weeks. Whatever he is tracking out there, he will not say it aloud in the village.",
-        "completion": "Fenna sent you? Good. Then she trusts you, and I have two names that need crossing out.",
+        "title": "群れの番人",
+        "text": "あなた、ウィスプより手強いものも扱えそうな顔をしているね、{playerName}。狩人デラルがここから東の牡鹿の草地で見張り場を構えていて、何週間も前から腕の立つ者を探している。あの人がそこで何を追っているのかは知らないけれど、村の中では決して口にしないんだ。",
+        "completion": "フェンナの遣いか？良し。なら彼女はお前を信用している。そしてわたしには、消さねばならん名前がふたつある。",
         "objectives": {
           "0": {
-            "label": "Find Huntsman Deral"
+            "label": "狩人デラルを見つけた"
           }
         }
       },
       "q_hollow_old_marrowshell": {
-        "title": "The Old Shell of the Shallows",
-        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldergleam had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
-        "completion": "The shallows are just water again. I have watched that shell break better hunters than me, {playerName}. Not you.",
+        "title": "浅瀬の古い甲羅",
+        "text": "ひとつめの名はオールド・マロウシェル。エルダーグリームに門ができるより前から東の浅瀬で狩りをしてきた、荷車ほどもある蟹だ。奴は歩き回る、{playerName}。だから、その足跡に行き当たるまで岸辺を歩くしかない。ひとりで行くな。そして、奴の静けさを信じるな。",
+        "completion": "浅瀬はまた、ただの水になった。あの甲羅がわたしより腕のいい狩人たちを砕くのを、わたしはずっと見てきたのだ、{playerName}。お前は砕かれなかった。",
         "objectives": {
           "0": {
-            "label": "Old Marrowshell slain"
+            "label": "オールド・マロウシェルを倒した"
           }
         }
       },
       "q_hollow_first_of_the_herd": {
-        "title": "First of the Herd",
-        "text": "The second name is harder to say. Aurelhorn led these herds when my grandmother kept this lookout, and whatever woke in the Hollow woke him wrong. He tramples what he once warded, and the herd will not survive his madness. He roams the meadows near the old court roads. End him with mercy, {playerName}, and bring a friend to share the weight of it.",
-        "completion": "So the First falls to the last. The herd is already calmer, do you feel it? You did the Hollow a kindness today, even if it does not look like one.",
+        "title": "群れの始祖",
+        "text": "ふたつめの名は、口にするのがもっと重い。アウレルホーンは、祖母がこの見張り場を守っていたころから群れを率いてきた。幽谷で目覚めた何かが、彼を誤ったかたちで目覚めさせたのだ。かつて守っていたものを、今は踏み荒らしている。群れは彼の狂気を生き延びられない。彼は古い宮廷の道の近くの草地を歩き回っている。慈悲をもって終わらせてくれ、{playerName}。そして、その重さを分かち合う友を連れて行け。",
+        "completion": "こうして始祖は、最後の一頭に倒れたか。群れはもう落ち着き始めている。感じるか？今日、お前は幽谷に善いことをしたのだ。たとえそう見えなくともな。",
         "objectives": {
           "0": {
-            "label": "Aurelhorn given peace"
+            "label": "アウレルホーンに安らぎを与えた"
           }
         }
       },
@@ -11874,912 +11874,912 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_fv_snowline_report": {
-        "title": "Word from the Snowline",
-        "text": "Every soul who climbs out of the Drakelands passes my fire, {playerName}, and fewer climb every week. Warden Kaldra holds Icemantle up the north road. Tell her the pass is still open, and tell her a stranger walked it alone.",
-        "completion": "The pass holds, then. Einna sits that waycamp through storms that bury the road markers, and she has never once sent me idle news. Welcome to Icemantle, {playerName}.",
+        "title": "スノーラインからの言伝",
+        "text": "ドレイクランドから登ってくる者は皆わたしの焚き火の前を通る、{playerName}。そしてその数は週ごとに減っている。守将カルドラが北の道の先でアイスマントルを預かっている。峠はまだ開いていると伝えてくれ。それから、よそ者がひとりでそこを歩いた、ともな。",
+        "completion": "峠は保っている、か。エインナは道標が埋まるほどの嵐の中でもあの中継所を守り抜く女だ。無駄な知らせを寄越したことは一度もない。ようこそアイスマントルへ、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Report to Warden Kaldra"
+            "label": "守将カルドラに報告した"
           }
         }
       },
       "q_fv_wolves_at_the_door": {
-        "title": "Wolves at the Door",
-        "text": "The snowdrift packs used to keep to the high benches. Now they cross the tarn road in daylight and my woodcutters will not leave the walls. Thin the packs, {playerName}, ten of them, and the road is a road again.",
-        "completion": "Ten fewer shadows between here and the tarn. The woodcutters are already arguing over who goes out first.",
+        "title": "戸口の狼",
+        "text": "スノードリフトの群れは以前、高い雪棚から下りてこなかった。それが今では白昼に湖への道を横切り、木こりたちは壁の外へ出ようとせん。群れを間引け、{playerName}。十頭だ。そうすれば道はまた道になる。",
+        "completion": "ここから湖までの影が十減った。木こりたちはもう、誰が最初に出るかで言い合っている。",
         "objectives": {
           "0": {
-            "label": "Snowdrift Wolf slain"
+            "label": "スノードリフトウルフを倒した"
           }
         }
       },
       "q_fv_winter_pelts": {
-        "title": "Pelts for the Lodge",
-        "text": "Firewood keeps a body alive, {playerName}, but wool will not turn this cold, only wolf-fur will. Six thick winter pelts off the snowdrift packs and I can line bedrolls for everyone the lodge shelters.",
-        "completion": "Fur like this is the only argument winter listens to. Take these treads, they are lined with the last batch.",
+        "title": "宿のための毛皮",
+        "text": "薪は体を生かしてくれるがね、{playerName}、この寒さは羊毛では防げない。狼の毛皮だけだ。スノードリフトの群れから厚い冬毛皮を六枚。そうすれば、この宿が抱えるみんなの寝袋に裏を張ってやれる。",
+        "completion": "こういう毛皮だけが、冬が耳を貸すたったひとつの理屈でね。この足具をお持ち。前の毛皮で裏張りしたものだよ。",
         "objectives": {
           "0": {
-            "label": "Thick Winter Pelt"
+            "label": "厚い冬毛皮"
           }
         }
       },
       "q_fv_ember_caches": {
-        "title": "Embers on the Tarn Road",
-        "text": "A sledge of ember caches overturned on the tarn road in last night: iron kettles that hold a banked fire alive for a month. Three of them are still lying in the snow, {playerName}, and the lodge cannot spare what they hold. Bring the fire home.",
-        "completion": "Still warm, every one. You have bought the lodge a whole winter of mercy, {playerName}.",
+        "title": "湖への道の熾火",
+        "text": "昨夜、熾火の壺を積んだ橇が湖への道でひっくり返ってね。あれは埋み火をひと月生かしておける鉄の釜なんだ。三つ、まだ雪の中に転がっている、{playerName}。あの中身は、この宿には欠かせないものでね。火を家へ連れて帰っておくれ。",
+        "completion": "どれもまだ温かい。この宿に、冬まるごとの慈悲を買ってくれたね、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Ember Cache recovered"
+            "label": "熾火の壺を回収した"
           }
         }
       },
       "q_fv_lights_over_steps": {
-        "title": "Lights over the Steps",
-        "text": "The aurora has burned green every night this month, and the old folk will not walk under it. One woman might know why: Veyla, the Aurorist. She camps alone on the Aurora Steps, southeast past the tarn. Find her camp, {playerName}, and hear what the lights have told her.",
-        "completion": "Kaldra sent you? Then she is finally worried, and she is right to be. Sit, {playerName}. Watch the sky with me a while.",
+        "title": "階段の上の光",
+        "text": "オーロラが今月は毎晩緑に燃えていて、年寄りたちはその下を歩こうとせん。理由を知っていそうな者がひとりだけいる。ヴェイラ、オーロラ読みだ。氷河の湖を過ぎた南東、オーロラの階段にひとりで野営している。彼女の野営地を見つけて、{playerName}、光が彼女に何を告げたのか聞いてくるのだ。",
+        "completion": "カルドラの遣いかい？なら、彼女もようやく案じ始めたのだね。それが正しい。お座り、{playerName}。しばらく、わたしと空を眺めておいき。",
         "objectives": {
           "0": {
-            "label": "Find Aurorist Veyla"
+            "label": "オーロラ読みヴェイラを見つけた"
           }
         }
       },
       "q_fv_silent_trapline": {
-        "title": "The Silent Trapline",
-        "text": "Old Brosk works the Shiverfen trapline west of here, and every week for eleven years he has sent a bundle of furs up with the wood sledge. Two weeks now, nothing. He is too stubborn to freeze and too careful to drown, {playerName}, so something else is wrong. Find his camp at the fen and see him breathing.",
-        "completion": "Maeve sent you? Ha. Eleven years and the woman still thinks the fen will eat me. Well... this year she might be right. Look at what it's done to my lines.",
+        "title": "沈黙した罠のライン",
+        "text": "ブロスク爺はここから西のシヴァーフェンで罠のラインを張っていてね、十一年間、毎週欠かさず薪の橇に毛皮の束を乗せて寄越してきた。それが二週間、何もなしだ。あの人は凍え死ぬには頑固すぎるし、溺れるには用心深すぎる、{playerName}。つまり、別の何かがおかしいのだよ。沼の野営地を見つけて、あの人が息をしているのを確かめておくれ。",
+        "completion": "メイヴの遣いか？はっ。十一年経っても、あの女はまだ沼がわたしを食うと思っていやがる。まあ、今年ばかりは、当たっているかもしれん。見ろ、わたしのラインがどうなったかを。",
         "objectives": {
           "0": {
-            "label": "Find Trapper Brosk"
+            "label": "罠師ブロスクを見つけた"
           }
         }
       },
       "q_fv_aurora_motes": {
-        "title": "Motes of the Aurora",
-        "text": "The wisps that drift these steps are shed by the lights themselves, and each carries a mote of the aurora in its heart. I need six to read what the sky is writing, {playerName}. The wisps do not fight back. Whether that makes the work easier or harder is between you and your conscience.",
-        "completion": "Six motes, still glowing. Look at them, {playerName}: they pulse in time with each other. The lights are not weather. They are a signal.",
+        "title": "オーロラの光粒",
+        "text": "この階段を漂うウィスプたちは、光そのものから零れ落ちたもの。その心にはひと粒ずつ、オーロラの光粒を宿している。空が何を書いているのか読むには、六粒が要るのだよ、{playerName}。ウィスプは抗いはしない。それで仕事が楽になるのか重くなるのかは、お前の良心との相談だね。",
+        "completion": "六粒、まだ輝いている。ごらん、{playerName}。互いに拍を合わせて明滅している。あの光は天候などではない。合図なのだよ。",
         "objectives": {
           "0": {
-            "label": "Aurora Mote"
+            "label": "オーロラの光粒"
           }
         }
       },
       "q_fv_rime_unbound": {
-        "title": "Rime Unbound",
-        "text": "When the aurora burns this bright, the cold stands up and walks: rime elementals, frost given a will. They gather where the lights touch the benches, and they are wandering closer to my camp each night. Break eight of them apart, {playerName}, before one of them breaks me.",
-        "completion": "The night feels thinner already. Whatever wakes them is not done, but you have bought the Steps some quiet.",
+        "title": "解き放たれた霧氷",
+        "text": "オーロラがこれほど明るく燃えるとき、寒さは立ち上がって歩き出す。霧氷の精霊、意志を得た霜だ。奴らは光が雪棚に触れる場所に集まって、夜ごとわたしの野営へと近づいてくる。八体砕いておくれ、{playerName}。あれがわたしを砕く前にね。",
+        "completion": "夜がもう薄くなったのを感じる。彼らを目覚めさせているものの仕事はまだ終わっていないが、お前はこの階段に、しばしの静けさを買ってくれた。",
         "objectives": {
           "0": {
-            "label": "Rime Elemental slain"
+            "label": "霧氷の精霊を倒した"
           }
         }
       },
       "q_fv_sprung_traps": {
-        "title": "Sprites in the Traps",
-        "text": "Fen sprites, {playerName}. The little devils spring my traps for sport and scatter the iron in the reeds. Drive them off, eight should teach the rest, and gather up what is left of my traplines while you are out there.",
-        "completion": "Four good traps back and the reeds gone quiet. You trap with a heavier hand than I do, {playerName}, but I cannot argue with the results.",
+        "title": "罠の中のスプライト",
+        "text": "フェンスプライトだよ、{playerName}。あの小悪魔ども、遊び半分でわたしの罠を弾いては、鉄物を葦の中へ撒き散らすんだ。追い払え。八匹もやれば残りも懲りる。ついでに、罠のラインの残骸も拾い集めてきてくれ。",
+        "completion": "良い罠が四つ戻って、葦原も静かになった。お前はわたしより罠への手が重いがね、{playerName}、この結果に文句をつける気はないよ。",
         "objectives": {
           "0": {
-            "label": "Fen Sprite driven off"
+            "label": "フェンスプライトを追い払った"
           },
           "1": {
-            "label": "Trap recovered"
+            "label": "罠を回収した"
           }
         }
       },
       "q_fv_howl_above": {
-        "title": "The Howl on the Terraces",
-        "text": "You hear it at dusk, {playerName}: a howl off the Howling Terraces that is not the snowdrift packs. Bigger throats. The terrace howlers have come down from the peaks for the first time since my grandmother held this post, and they are what pushed the wolves onto my road. Cull eight and push them back.",
-        "completion": "Eight, and the dusk chorus is thinner for it. But howlers do not leave the peaks for nothing. Something up there moved them, and I fear it has a name.",
+        "title": "段丘の咆哮",
+        "text": "夕暮れに聞こえるだろう、{playerName}。咆哮のテラスから響く、スノードリフトの群れのものではない遠吠えが。もっと大きな喉だ。テラスハウラーどもが、祖母がこの持ち場を守っていた時代以来はじめて峰から下りてきた。狼どもをわたしの道へ押し出したのは奴らなのだ。八体狩って、押し返せ。",
+        "completion": "八体。おかげで夕暮れの合唱がいくらか薄くなった。だがハウラーが理由もなく峰を離れることはない。上の何かが奴らを動かした。そしてそれには、名前がある気がしてならないのだ。",
         "objectives": {
           "0": {
-            "label": "Terrace Howler slain"
+            "label": "テラスハウラーを倒した"
           }
         }
       },
       "q_fv_seeing_wren_home": {
-        "title": "Seeing Wren Home",
-        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers southwest of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
-        "completion": "The girl is inside, wrapped in half my blankets and talking the stars out of the sky. You did a kind thing today, {playerName}. The Reach doesn't see many of those.",
+        "title": "レンを送り届けて",
+        "text": "弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の南西の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。",
+        "completion": "あの子は中にいるよ。わたしの毛布を半分体に巻きつけて、空から星を語り落とす勢いでしゃべっている。今日、お前は優しいことをしたね、{playerName}。この果ての地では、めったに見られないものだよ。",
         "objectives": {
           "0": {
-            "label": "Apprentice Wren seen safely to the Aurora Steps"
+            "label": "見習いレンをオーロラの階段まで送り届けた"
           }
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "The Frostmane Tyrant",
-        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Frostmane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
-        "completion": "When the wind dropped last night the whole village heard the silence where the Frostmane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
+        "title": "フロストメインの暴君",
+        "text": "ハウラーどもが段丘を下ってきたのは、狩りのためではなかった。逃げていたのだ。イエティが高地を我が物にした。山の民はフロストメインと呼ぶ。群れでさえ、あれと斜面を分かち合おうとはせん。終わらせねばならんのだ、{playerName}、冬があれをわたしの壁まで追い下ろす前に。友を連れて行け。ふたり連れて行け。",
+        "completion": "昨夜、風がやんだとき、フロストメインがいたはずの場所の静けさを、村じゅうが聞いた。この果ての地は、返すのに何年もかかる借りをお前に負ったのだ、{playerName}。これをまとえ。アイスマントルの扉という扉が、お前に開かれる。",
         "objectives": {
           "0": {
-            "label": "The Frostmane slain"
+            "label": "フロストメインを倒した"
           }
         }
       },
       "q_dk_ash_on_the_wind": {
-        "title": "Ash on the Wind",
-        "text": "Look south off the palisade, {playerName}. Those fires in the dunes are not troll cookfires, they are ashbone musters, and every night there are more. The dead come up out of the bonefields with sand still in their teeth. Cut down ten raiders before they cut a road to my gate.",
-        "completion": "Ten fewer blades in the dunes, and the muster fires burned lower last night. My sentries slept, which they have not done in a week. Well cut, {playerName}.",
+        "title": "風に乗る灰",
+        "text": "柵の上から南を見ろ、{playerName}。砂丘に見えるあの火はトロールの炊事の火ではない。アッシュボーンの召集の火だ。しかも夜ごとに増えている。死者どもが、歯に砂を残したまま骨野から這い上がってくるのだ。奴らがわたしの門への道を切り開く前に、略奪者を十体斬り伏せよ。",
+        "completion": "砂丘の刃が十本減り、昨夜は召集の火も弱まった。歩哨たちが眠れたのだ。この一週間なかったことだ。見事な太刀筋だった、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Ashbone Raider slain"
+            "label": "アッシュボーンの略奪者を倒した"
           }
         }
       },
       "q_dk_trolls_on_the_road": {
-        "title": "Trolls on the Road",
-        "text": "The dune trolls have learned the sound of a supply wagon, {playerName}. They hit the Cinder Dunes road three times this month, and the last driver walked in carrying nothing but the reins. Eight trolls off that road and my wagons roll again.",
-        "completion": "Eight, and my drivers have stopped writing farewell letters before every run. The garrison eats because of you, {playerName}.",
+        "title": "街道のトロール",
+        "text": "デューントロールどもは補給馬車の音を覚えてしまった、{playerName}。今月だけでシンダー砂丘の街道を三度襲われ、最後の御者は手綱だけを抱えて歩いて帰ってきた。あの街道からトロールを八体除けば、荷馬車はまた走れる。",
+        "completion": "八体。うちの御者たちは、走るたびに別れの手紙を書くのをやめたよ。駐屯地が食えているのはお前のおかげだ、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Dune Troll slain"
+            "label": "デューントロールを倒した"
           }
         }
       },
       "q_dk_scorched_stores": {
-        "title": "Scorched Stores",
-        "text": "The last wagon burned, {playerName}, but iron-strapped crates do not burn through. Four of them are still lying scorched along the dunes road with a season of salt, nails, and bowstrings inside. Bring my stores home before the trolls work out how to open them.",
-        "completion": "Scorched black and every latch still holding. The smith gets his nails, the fletcher her strings, and you get the boots I was saving for whoever brought my crates back, {playerName}.",
+        "title": "焦げた物資",
+        "text": "最後の荷馬車は燃えた、{playerName}。だが鉄帯の木箱は燃え抜けん。四つ、まだ砂丘街道沿いに焦げたまま転がっていて、中にはひと季節分の塩と釘と弓弦が入っている。トロールどもが開け方を思いつく前に、うちの物資を持ち帰ってくれ。",
+        "completion": "真っ黒に焦げて、それでも留め金はどれも保っている。鍛冶は釘を、矢作りは弦を手に入れた。そしてお前は、木箱を取り戻してくれた者のために取っておいたこのブーツを受け取れ、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Scorched supply crate recovered"
+            "label": "焦げた補給箱を回収した"
           }
         }
       },
       "q_dk_banners_over_the_dunes": {
-        "title": "Banners over the Dunes",
-        "text": "The ashbone muster at the old bonefield graves, {playerName}, and my patrols cannot read the dunes the way they read a wall. Kill five of their warcallers, the ones that scream the dead upright, and plant a warning banner on each muster ground so my sentries can mark it from the ridge.",
-        "completion": "Three banners snapping in the hot wind, right where my glass can find them. With five warcallers silenced, whatever answers their call will come slower. You bought us time, {playerName}.",
+        "title": "砂丘に立つ旗",
+        "text": "アッシュボーンは古い骨野の墓場で召集をかけている、{playerName}。だが、わたしの偵察隊は壁を読むようには砂丘を読めん。奴らの戦呼びを五体殺せ。死者を叫び声で立ち上がらせる連中だ。そして各召集地に警告旗を立てておけ。尾根からわが歩哨が見て取れるようにな。",
+        "completion": "熱風にはためく三本の旗。わたしの遠眼鏡がちょうど捉えられる場所だ。戦呼びが五体黙れば、奴らの呼び声に応えるものが何であれ、来るのは遅くなる。時間を稼いでくれたな、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Ashbone Warcaller slain"
+            "label": "アッシュボーンの戦呼びを倒した"
           },
           "1": {
-            "label": "Warning banner planted"
+            "label": "警告旗を立てた"
           }
         }
       },
       "q_dk_watcher_at_the_wargate": {
-        "title": "The Watcher at the Wargate",
-        "text": "Something is pulling the ashbone east, {playerName}, and I sent my best to learn what. Scout Yerrin has camped a month in the far dunes past Trollmoot, in sight of a gate nobody built in my lifetime. Her reports stopped ten days ago. Find her camp and get me her eyes.",
-        "completion": "Brannoc sent you? Then my last runner never made it. Keep your voice down and sit, {playerName}. You see that gate below? Count the war-banners in front of it, and you will understand why I stopped writing things down.",
+        "title": "戦門の見張り",
+        "text": "何かがアッシュボーンを東へ引き寄せている、{playerName}。それを探らせるために、最も腕の立つ者を送った。斥候イェリンだ。トロールムートの先の遠い砂丘で、わたしの生きているうちには誰も建てなかったはずの門を望みながら、ひと月も野営している。その報告が十日前に途絶えた。彼女の野営地を見つけ、その眼が見たものを持ち帰れ。",
+        "completion": "ブラノックの遣いか？なら、わたしの最後の伝令は届かなかったのだな。声を落として座れ、{playerName}。下のあの門が見えるか？その前に立つ戦旗の数を数えてみろ。わたしが記録を取るのをやめた理由が分かるだろう。",
         "objectives": {
           "0": {
-            "label": "Find Scout Yerrin"
+            "label": "斥候イェリンを見つけた"
           }
         }
       },
       "q_dk_marrow_and_ash": {
-        "title": "Marrow and Ash",
-        "text": "Every ashbone raider carries a war-brand, {playerName}: a scorched tally of the host it marches under. I have counted four hosts from this ridge, but guesses are not intelligence. Bring me six brands off the raiders and their warcallers, and I will give Brannoc the shape of the war that is coming.",
-        "completion": "Six brands, and one mark burned into every one of them. This is no raid muster, {playerName}. Every host in the dunes answers to the wargate below us, the trolls call it Orkadia, and no five soldiers I ever served with could break what drums behind that door. Perhaps five like you.",
+        "title": "髄と灰",
+        "text": "アッシュボーンの略奪者は皆、戦の焼印を持っている、{playerName}。自分の属する軍団を示す、焦げた刻み札だ。この尾根から数えた限りでは軍団は四つ。だが推測は諜報ではない。略奪者と戦呼びから焼印を六つ取ってこい。そうすればブラノックに、来たるべき戦の輪郭を渡してやれる。",
+        "completion": "焼印が六つ、そのすべてに同じ印がひとつ焼き付けられている。これは略奪の召集などではないぞ、{playerName}。砂丘のすべての軍団は、この下の戦門に従っている。トロールどもはオルカディアと呼ぶ。あの扉の奥で轟くものを、わたしが共に仕えたどんな五人の兵でも破れはすまい。だが、お前のような五人なら、あるいは。",
         "objectives": {
           "0": {
-            "label": "Ashbone War-Brand"
+            "label": "アッシュボーンの戦の焼印"
           }
         }
       },
       "q_dk_scales_of_the_maw": {
-        "title": "Scales of the Maw",
-        "text": "When the wind turns off the Drakemaw, the emberwing drakes ride it over my camp low enough to count their teeth, {playerName}. They range farther every day, and something in that crater drives them. Bring me three of their scales. Scales remember heat, and I can read where a drake has been roosting by the burn.",
-        "completion": "Look at the underside of this one, {playerName}: scorched in a spiral, and only one thing nests in circles. These drakes are brood-guards. Something in the Drakemaw is a mother.",
+        "title": "火口の鱗",
+        "text": "ドレイクモウから風向きが変わると、エンバーウィング・ドレイクどもがそれに乗って、歯の数が数えられるほど低くわたしの野営の上を飛ぶ、{playerName}。奴らの行動範囲は日に日に広がっている。あの火口の何かが奴らを駆り立てているのだ。鱗を三枚持ってこい。鱗は熱を覚えている。焦げ方を見れば、ドレイクがどこをねぐらにしてきたか読み取れるのだ。",
+        "completion": "この一枚の裏を見ろ、{playerName}。渦巻き状に焦げている。輪を描いて巣ごもるものはひとつしかいない。このドレイクどもは巣の護衛だ。ドレイクモウの何かが、母親なのだ。",
         "objectives": {
           "0": {
-            "label": "Emberwing Scale"
+            "label": "エンバーウィングの鱗"
           }
         }
       },
       "q_dk_matriarch_of_the_maw": {
-        "title": "Matriarch of the Maw",
-        "text": "The scales told it true, {playerName}. I climbed the rim at dawn and saw her on the crater floor: Cindraleth, the matriarch every emberwing in this sky was hatched under, gold as a coal about to catch. While she broods, the drakes grow bolder, and Wyrmwatch cannot fight dragons and the ashbone both. End her in her crater, then carry the word to Gatecaptain Brannoc. Do not go alone.",
-        "completion": "The sky over the Drakemaw has been empty for two days, and now you walk through my gate with a matriarch's blood on your boots. Wyrmwatch has stood forty years on watch for exactly this, {playerName}. Take these pauldrons, mawscale, worked by our own smith. Wear them where the drakes can see.",
+        "title": "火口の母竜",
+        "text": "鱗は真実を告げていたよ、{playerName}。夜明けに縁を登って、火口の底に彼女を見た。シンドラレス。この空のエンバーウィングすべてが、その下で孵った母竜だ。今にも燃え上がりそうな炭のような金色だった。彼女が抱卵している間、ドレイクどもは大胆になっていく。そしてワームウォッチは、ドラゴンとアッシュボーンの両方とは戦えない。火口で彼女を討ち果たし、それから門長ブラノックに知らせを運べ。決してひとりで行くな。",
+        "completion": "ドレイクモウの空が二日間空っぽだった。そこへお前が、母竜の血を靴につけてわたしの門をくぐって来るとはな。ワームウォッチは四十年、まさにこの時のために見張りに立ってきたのだ、{playerName}。この肩当てを受け取れ。モウスケイル、うちの鍛冶が鍛えたものだ。ドレイクどもに見えるところで着けておけ。",
         "objectives": {
           "0": {
-            "label": "Cindraleth the Maw Matriarch slain"
+            "label": "シンドラレスを倒した"
           }
         }
       },
       "q_af_goldmelt_road": {
-        "title": "The Gold Road Down",
-        "text": "You came over the Goldmelt, {playerName}, snow still on your boots. I keep this shrine so Lanternmere knows who walks in from the cold, and lately I have had little to report. Take the gold road down to the town, find Reeve Ottoline by the well, and tell her the pass is quiet.",
-        "completion": "Quiet on the Goldmelt, and a traveler with snow in their hair to prove it. Sorrel keeps her watch too well to send idle word. Be welcome in Lanternmere, {playerName}. The lanterns burn for you.",
+        "title": "金の道を下って",
+        "text": "ゴールドメルトを越えて来たのだね、{playerName}、靴にまだ雪を残して。わたしがこの祠を守っているのは、寒さの中から誰が歩いて来るかをランタンミアに知らせるためだ。だが近ごろは、知らせることがほとんどなくてね。金の道を下って町へ行き、井戸のそばにいる代官オトリーヌを見つけて、峠は静かだと伝えておくれ。",
+        "completion": "ゴールドメルトは静か、そしてそれを証す、髪に雪を残した旅人がひとり。ソレルの見張りは確かだから、無駄な知らせは寄越さない。ようこそランタンミアへ、{playerName}。ランタンはあなたのために灯っているわ。",
         "objectives": {
           "0": {
-            "label": "Report to Reeve Ottoline"
+            "label": "代官オトリーヌに報告した"
           }
         }
       },
       "q_af_foxes_in_the_lamplight": {
-        "title": "Foxes in the Lamplight",
-        "text": "The gloam foxes have learned what the lantern stores are worth, {playerName}. Every dusk they slip the fences and carry off the tallow we press for the ferry lamps. Soft paws, softer conscience. Cull ten of them and the rest will remember to fear the town.",
-        "completion": "Ten, and the stores went untouched last night for the first time this season. The lamplighters send their thanks, {playerName}.",
+        "title": "灯火のなかの狐",
+        "text": "グロームフォックスどもは、ランタン用の蓄えの値打ちを覚えてしまったんだ、{playerName}。夕暮れのたびに柵を抜けて、渡し船のランプ用に搾った獣脂を持ち去っていく。足音は柔らかく、良心はもっと柔らかい。十匹狩れば、残りも町を恐れることを思い出すだろう。",
+        "completion": "十匹。そして昨夜、今の季節に入って初めて蓄えが無事だった。点灯夫たちが礼を言っていたよ、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Gloam Fox slain"
+            "label": "グロームフォックスを倒した"
           }
         }
       },
       "q_af_lanterns_on_the_water": {
-        "title": "Lanterns on the Water",
-        "text": "Every ferry on the Mere carries a stern lantern, {playerName}, and three of my boats came back at dawn without theirs. The fog took them, or something in the fog did. They wash up along the east shore when the wind turns. Walk the shore road and bring my lanterns home.",
-        "completion": "All three, and still burning. Ferry lanterns do not go out in water, {playerName}. That is the point of them. What worries me is what pulled them loose.",
+        "title": "水の上のランタン",
+        "text": "大いなる湖を渡る船はどれも船尾にランタンを提げている、{playerName}。それが今朝、うちの三艘がランタンなしで戻ってきた。霧が持っていったのか、霧の中の何かが、だ。風向きが変われば東の岸に打ち上げられる。岸辺の道を歩いて、うちのランタンを取り戻してきておくれ。",
+        "completion": "三つとも、まだ燃えている。渡し船のランタンは水の中でも消えないのだ、{playerName}。そのために作られているのだからな。気にかかるのは、何がこれを引きちぎったのか、ということだ。",
         "objectives": {
           "0": {
-            "label": "Ferry Lantern recovered"
+            "label": "渡し船のランタンを回収した"
           }
         }
       },
       "q_af_orchard_call": {
-        "title": "A Cart for the Orchard",
-        "text": "Orchardist Pomeline keeps the Gilded Orchard on the west road, and her sap carts are three days overdue. The whole town runs on that amber sap, {playerName}: lamp resin, sweetening, the harvest ale. Walk the west road and find out what keeps her.",
-        "completion": "The Reeve counts her carts, does she? Well, she can count them missing a while longer. Look at my rows, {playerName}. I have greater troubles than a late delivery.",
+        "title": "果樹園の荷車",
+        "text": "果樹園主ポメリーヌは西の道沿いで黄金の果樹園を営んでいるのだけれど、彼女の樹液の荷車が三日も遅れているの。この町はあの琥珀色の樹液で回っているのよ、{playerName}。ランプの樹脂も、甘味も、収穫祭のエールもね。西の道を歩いて、何が彼女を引き留めているのか確かめてきて。",
+        "completion": "代官が荷車の数を数えている、って？なら、もうしばらく足りないまま数えていてもらいましょう。わたしの並木を見てごらんなさい、{playerName}。配達の遅れどころの騒ぎではないのよ。",
         "objectives": {
           "0": {
-            "label": "Find Orchardist Pomeline"
+            "label": "果樹園主ポメリーヌを見つけた"
           }
         }
       },
       "q_af_amber_from_the_herd": {
-        "title": "Amber off the Herd",
-        "text": "The gilded stags bed down beneath my oldest trees, and the sap drips gold into their coats all night. Combed clots of it are the purest amber in the weald. Bring me six, {playerName}. The stags will not thank you, but they will not miss it either.",
-        "completion": "Six clots, clean as poured honey. These gloves are stitched with the last batch, {playerName}: sap-stiffened, and warmer than they look.",
+        "title": "群れから採る琥珀",
+        "text": "黄金の牡鹿たちは、うちで一番古い木々の下で眠る。夜通し、樹液が金色にしたたって、その毛皮に染み込むのよ。梳き取った樹液の塊は、この森里で一番純度の高い琥珀になる。六つ持ってきておくれ、{playerName}。牡鹿たちは感謝はしないだろうけれど、惜しがりもしないわ。",
+        "completion": "六つの塊、注いだ蜂蜜のように澄んでいる。この手袋は前の採り分で仕立てたものよ、{playerName}。樹液で固めてあって、見た目より温かいの。",
         "objectives": {
           "0": {
-            "label": "Gilded Sap Clot"
+            "label": "金色の樹液の塊"
           }
         }
       },
       "q_af_what_took_the_moorings": {
-        "title": "What Took the Moorings",
-        "text": "Now I will tell you what I did not say in front of the town. The moorings were not slipped, they were bitten through. Mere lurkers, bolder every night, dragging at the ropes and the rudders. Put eight of them back under the water for good, {playerName}, before a ferryman goes with them.",
-        "completion": "Eight fewer shapes in the shallows, and the crossing ran on time today for the first time in a fortnight. But bold lurkers are driven lurkers, {playerName}. Something beneath the Mere is moving them.",
+        "title": "舫いを奪ったもの",
+        "text": "さて、町の連中の前では言わなかったことを話そう。舫い綱は解けたのではない、噛み切られていたのだ。湖の潜み手ども、夜ごとに大胆になって、綱や舵に食らいついてくる。八匹、水の底へ永遠に沈めてきてくれ、{playerName}。渡し守が道連れにされる前にな。",
+        "completion": "浅瀬の影が八つ減って、今日は二週間ぶりに渡しが定刻どおりに走った。だが大胆になった潜み手は、追い立てられた潜み手だ、{playerName}。湖の下の何かが、奴らを動かしている。",
         "objectives": {
           "0": {
-            "label": "Mere Lurker slain"
+            "label": "湖の潜み手を倒した"
           }
         }
       },
       "q_af_sprites_and_spigots": {
-        "title": "Sprites and Spigots",
-        "text": "Harvest sprites, {playerName}. They pry my sap-taps from the trunks for the sweetness inside and fling the buckets into the grass. Drive off eight of the little thieves and bring back four of my buckets, and the carts roll again.",
-        "completion": "Four buckets back on their hooks and the rows gone quiet. You have a heavier hand with sprites than I do, {playerName}, and today I am glad of it.",
+        "title": "スプライトと樹液栓",
+        "text": "ハーベストスプライトよ、{playerName}。あの小さな盗人たちは、中の甘みほしさに樹液栓を幹からこじり取って、バケツを草むらに放り投げていくの。八匹追い払って、バケツを四つ取り戻してきて。そうすれば荷車はまた走り出せるわ。",
+        "completion": "バケツ四つが掛け釘に戻って、並木も静かになった。あなたはわたしよりスプライトへの手が重いようだけれど、{playerName}、今日ばかりはそれがありがたいわ。",
         "objectives": {
           "0": {
-            "label": "Harvest Sprite driven off"
+            "label": "ハーベストスプライトを追い払った"
           },
           "1": {
-            "label": "Sap-Tap Bucket recovered"
+            "label": "樹液採りのバケツを回収した"
           }
         }
       },
       "q_af_the_meredark": {
-        "title": "The Meredark",
-        "text": "The old ferrymen have a name they only say ashore: the Meredark, the first lurker, old as the lake and twice as patient. It rose once before, the year the drowned jetty went under, and it is rising now. At dusk it suns itself on the jetty ruin off the south shore, {playerName}. Take a friend, take two, and end it while it can still be ended.",
-        "completion": "The fog lifted off the Mere this morning, {playerName}, and the whole town saw it. The ferries will run the night crossing again, and every lantern on the water will burn in your name. Take this: it was dredged from the drowned jetty, and no one has better right to wear it.",
+        "title": "ミアダーク",
+        "text": "年寄りの渡し守たちには、岸の上でしか口にしない名前がある。ミアダーク。最初の潜み手、湖と同じだけ古く、その倍も辛抱強いものだ。一度だけ浮かび上がったことがある。沈んだ桟橋が水に呑まれた年だ。そして今、また浮かび上がろうとしている。夕暮れどき、南岸の沖の桟橋の残骸で日を浴びているのだ、{playerName}。友をひとり、いや、ふたり連れて行け。まだ終わらせられるうちに、終わらせるのだ。",
+        "completion": "今朝、大いなる湖から霧が晴れた、{playerName}。町じゅうがそれを見たよ。渡し船はまた夜の航路を走る。水の上のランタンはひとつ残らず、あなたの名のために灯るだろう。これを受け取っておくれ。沈んだ桟橋から引き揚げられたものだ。これを身にまとう資格が、あなた以上にある者はいない。",
         "objectives": {
           "0": {
-            "label": "The Meredark slain"
+            "label": "ミアダークを倒した"
           }
         }
       },
       "q_wf_across_the_fenway": {
-        "title": "Across the Fenway",
-        "text": "A gentle country, the Willowfen, but gentle is not the same as safe, {playerName}. Follow the road north to the Fenway causeway and cross into Bridgemere. Tell Bridgewright Alden the Steps are open and the waycamp fire is lit.",
-        "completion": "Pell keeps that fire burning through every fog the fen can breathe at her. If she says the Steps are open, they are open. Welcome to Bridgemere, {playerName}. Watch your step on my planks and we will get along fine.",
+        "title": "フェンウェイを渡って",
+        "text": "穏やかな国だよ、ウィローフェンは。だが穏やかは安全と同じではない、{playerName}。道を北へたどって、フェンウェイの堤道を渡り、ブリッジミアに入るといい。橋大工アルデンに、石段は開いていて、中継所の火は灯っていると伝えてくれ。",
+        "completion": "ペルはあの火を、沼がどれだけ霧を吹きかけてこようと絶やさず守り続けている。彼女が石段は開いていると言うなら、開いているのだ。ようこそブリッジミアへ、{playerName}。わたしの板の上では足元に気をつけてくれれば、うまくやっていけるさ。",
         "objectives": {
           "0": {
-            "label": "Report to Bridgewright Alden"
+            "label": "橋大工アルデンに報告した"
           }
         }
       },
       "q_wf_rope_chewers": {
-        "title": "The Rope-Chewers",
-        "text": "Bogtoads, {playerName}. They haul up out of the moat at night and chew through my mooring ropes like they were reed stems. Three skiffs went drifting last week, and one of them had my good winch aboard. Thin them out, ten of the fat things, and the boats stay where we tie them.",
-        "completion": "Ten fewer sets of teeth in my moat. The skiffs sat their moorings all night for the first time in a month, {playerName}. You have the thanks of every netter in town.",
+        "title": "綱かじりども",
+        "text": "ボグトードだよ、{playerName}。夜になると堀から這い上がってきて、わたしの舫い綱を葦の茎みたいに噛み千切るんだ。先週は小舟が三艘流されて、そのうち一艘には上等のウィンチが載っていた。間引いておくれ、太った奴を十匹。そうすれば船は繋いだ場所にとどまってくれる。",
+        "completion": "わたしの堀の歯が十組減った。小舟がひと晩じゅう舫いに落ち着いていたのは、ひと月ぶりだよ、{playerName}。町じゅうの網師があんたに感謝してる。",
         "objectives": {
           "0": {
-            "label": "Bogtoad slain"
+            "label": "ボグトードを倒した"
           }
         }
       },
       "q_wf_eels_for_the_smokehouse": {
-        "title": "Eels for the Smokehouse",
-        "text": "The bogtoads are not just eating my ropes, {playerName}, they are eating my catch: they gulp the eels down whole, straight out of the traps. Cut six plump ones free of the greedy things before the meat spoils, and the smokehouse fires stay lit.",
-        "completion": "Six good eels, barely bruised. The smokehouse will smell like money by morning. Here, these waders were mine when I was quicker: eelskin turns the wet like nothing else.",
+        "title": "燻製小屋のウナギ",
+        "text": "ボグトードどもは、わたしの綱だけじゃなく獲物まで食っているんだ、{playerName}。罠から出したてのウナギを丸呑みにしていく。肉が悪くなる前に、丸々とした奴を六匹、あの食いしん坊どもから切り出してきておくれ。そうすれば燻製小屋の火は消えずに済む。",
+        "completion": "良いウナギが六匹、傷みもほとんどない。朝までには燻製小屋が金の匂いをさせるだろうさ。ほら、この長靴はわたしがもっと素早かったころのものだ。ウナギ革ほど水をはじくものはないからね。",
         "objectives": {
           "0": {
-            "label": "Plump Fen Eel"
+            "label": "丸々とした沼ウナギ"
           }
         }
       },
       "q_wf_mind_the_moorings": {
-        "title": "Mind the Moorings",
-        "text": "Good rope is dear out here, {playerName}: every line the toads bite through is a week of eel-money gone. The cut ends are still lying along the moat shore where the boats slipped them. Walk the boardwalks and bring me back four lines, and I can splice them good as new.",
-        "completion": "Look at that: clean bites, every one, but there is rope enough left to splice. You have saved me a month of coin and the netters a month of grumbling, {playerName}.",
+        "title": "舫いに気をつけて",
+        "text": "ここでは良い綱は貴重なんだ、{playerName}。ヒキガエルに噛み切られる一本一本が、一週間分のウナギの稼ぎに相当する。切れた端は、船が流された堀の岸辺にまだ転がっている。板張りの道を歩いて四本持ち帰ってくれれば、新品同様に継ぎ直せる。",
+        "completion": "見てごらん。どれもきれいな噛み跡だが、継ぐには十分な長さが残っている。ひと月分の銭と、網師たちのひと月分の愚痴を省いてくれたよ、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Cut Mooring Line recovered"
+            "label": "切られた舫い綱を回収した"
           }
         }
       },
       "q_wf_witch_of_willowweep": {
-        "title": "The Witch of Willowweep",
-        "text": "You have heard it by now, {playerName}: the snore. Slow and heavy, out past the Drowsy Flats, like the fen itself turning over in its sleep. The toads, the sprites, the wisps burning at noon: it all started when that sound did. One soul might know what it is. Mother Sedge keeps a camp at Willowweep, west around the moat and down the far shore. Find her, and ask her what sleeps at the middle of my fen.",
-        "completion": "Alden sent you all this way to ask about the snoring? Then the bridge-folk are finally listening. Sit down out of the damp, {playerName}. That sound has a name, and a throat, and I have been waiting for someone fool enough to help me quiet it.",
+        "title": "ウィローウィープの魔女",
+        "text": "もう聞いただろう、{playerName}。あのいびきだ。まどろみの浅瀬の先から響く、遅くて重い音。まるで沼そのものが寝返りを打っているような。ヒキガエルも、スプライトも、真昼に燃えるウィスプも、全部あの音が始まったときに始まった。正体を知っていそうな者がひとりだけいる。マザー・セッジが、堀を西に回って向こう岸を下ったウィローウィープに野営している。彼女を見つけて、わたしの沼の真ん中で何が眠っているのか尋ねてきてくれ。",
+        "completion": "アルデンがわざわざ、いびきのことを訊きに人を寄越したのかい？なら橋の民もようやく耳を傾け始めたんだね。湿気を避けてお座り、{playerName}。あの音には名前があり、喉がある。そしてわたしは、あれを静める手伝いをしてくれる馬鹿者を、ずっと待っていたのさ。",
         "objectives": {
           "0": {
-            "label": "Find Mother Sedge"
+            "label": "マザー・セッジを見つけた"
           }
         }
       },
       "q_wf_toll_and_tangle": {
-        "title": "Toll and Tangle",
-        "text": "The willow sprites think it is a fine game to cut a ferry loose, {playerName}, and last week the toll skiff went over on the east track with a season of bridge-toll aboard. The chests went down in the shallows and the sprites dance on the boardwalks like they own them. Drive off eight and haul up three toll-chests, and Bridgemere eats this winter.",
-        "completion": "Three chests, and the coin still dry inside. The sprites will sulk in the withies for a week, {playerName}, and the town owes you its winter bread.",
+        "title": "通行料ともつれ",
+        "text": "ウィロースプライトどもは、渡し船を切り放すのを上等な遊びだと思っているんだ、{playerName}。先週は東の水路で通行料の小舟がひっくり返って、ひと季節分の橋の通行料が積まれたままだった。櫃は浅瀬に沈み、スプライトどもは板張りの道の上で、我が物顔で踊っている。八匹追い払って、通行料の櫃を三つ引き揚げてくれれば、ブリッジミアはこの冬を食いつなげる。",
+        "completion": "櫃が三つ、中の銭はまだ乾いている。スプライトどもは一週間は柳の茂みでふてくされているだろうさ、{playerName}。町は冬のパンをあんたに借りたよ。",
         "objectives": {
           "0": {
-            "label": "Willow Sprite driven off"
+            "label": "ウィロースプライトを追い払った"
           },
           "1": {
-            "label": "Toll-Chest recovered"
+            "label": "通行料の櫃を回収した"
           }
         }
       },
       "q_wf_wisplight_charms": {
-        "title": "Wisplight Charms",
-        "text": "The wisps over the pools are the fen dreaming out loud, {playerName}, and their light is the only thing that holds against the Croaker's lull. I weave it into willow charms: one round your neck and the snore cannot drag your eyelids down. Bring me six wisplight globes. The wisps will not fight you for them, which makes it a kindness or a theft, depending on how you carry it.",
-        "completion": "Six globes, still warm with dreaming. Give me till moonrise and I will have charms woven for you and whoever is brave enough to stand beside you.",
+        "title": "ウィスプライトのお守り",
+        "text": "池の上のウィスプたちは、沼が声に出して見ている夢なんだよ、{playerName}。そしてあの光だけが、クローカーの眠気に抗える。わたしはそれを柳のお守りに織り込む。首にひとつ提げれば、あのいびきもまぶたを引きずり下ろせなくなる。ウィスプライトの玉を六つ持っておいで。ウィスプは奪い合いはしないから、これが親切になるか盗みになるかは、あんたの持ち帰り方次第さ。",
+        "completion": "玉が六つ、まだ夢の温もりが残っている。月の出までお待ち。あんたと、あんたの隣に立つ勇気のある者のぶんまで、お守りを織っておいてあげよう。",
         "objectives": {
           "0": {
-            "label": "Wisplight Globe"
+            "label": "ウィスプライトの玉"
           }
         }
       },
       "q_wf_croakers_hush": {
-        "title": "The Croaker's Hush",
-        "text": "Now you know the snorer's name, {playerName}: the Drowsy Croaker, the old toad-king out on the Drowsy Flats. Every year his croak grows heavier, and every year more of the fen forgets to wake. The charms will keep your eyes open, but his bulk is another matter: bring a friend, and do not fight him in the water. Put the old king to a quieter sleep.",
-        "completion": "Listen, {playerName}. Nothing. The first true silence over this fen in thirty years, and half the town will not sleep tonight for the strangeness of it. The willows say thank you, in their way. Wear this, woven from his own lily-bed, and the fen will know you for a friend wherever the water reaches.",
+        "title": "クローカーの静寂",
+        "text": "これで、いびきの主の名が分かったね、{playerName}。まどろみのクローカー。まどろみの浅瀬にいる、年老いたヒキガエルの王だよ。彼の鳴き声は年々重くなり、年々、沼の多くが目覚めるのを忘れていく。お守りがあれば目は開いていられるけれど、あの巨体は別の話だ。友を連れて行き、水の中では戦わないこと。老いた王を、もっと静かな眠りにつかせておやり。",
+        "completion": "お聞き、{playerName}。何も聞こえない。三十年ぶりの、この沼の上の本当の静けさだ。奇妙さのあまり、町の半分は今夜眠れないだろうね。柳たちが礼を言っているよ、彼らなりのやり方でね。これをお召し。彼自身の睡蓮の褥から織ったものだ。水の届くところならどこでも、沼はあんたを友と見なすだろう。",
         "objectives": {
           "0": {
-            "label": "The Drowsy Croaker slain"
+            "label": "まどろみのクローカーを倒した"
           }
         }
       },
       "q_nb_road_of_lanterns": {
-        "title": "The Road of Lanterns",
-        "text": "Up here the sun never follows, {playerName}, only the lamps I keep lit along the climb. Moonrest lies north where the flower-light gathers. Find Lira Dewsong among her gardens and tell her the Nightgate lamps still burn.",
-        "completion": "The lamps still burn, and the road still carries strangers to us. Sorrel has kept that gate longer than anyone in Moonrest remembers. Welcome, {playerName}, to the realm that never dawns.",
+        "title": "ランタンの道",
+        "text": "ここまで登れば太陽はついてこない、{playerName}。ついてくるのは、わたしが登り道に灯してきたランプだけだ。ムーンレストは花明かりの集まる北にある。庭々の中からリラ・デューソングを見つけて、夜の門のランプはまだ燃えていると伝えてくれ。",
+        "completion": "ランプはまだ燃えていて、道は今も旅人をわたしたちのもとへ運んでくれる。ソレルは、ムーンレストの誰の記憶よりも長くあの門を守ってきたの。ようこそ、{playerName}。夜の明けない国へ。",
         "objectives": {
           "0": {
-            "label": "Find Lira Dewsong in Moonrest"
+            "label": "ムーンレストでリラ・デューソングを見つけた"
           }
         }
       },
       "q_nb_striders_in_the_dark": {
-        "title": "Striders in the Dark",
-        "text": "The gloam striders were always patient hunters, {playerName}, but of late they slip right into the flower beds and take moonfleece lambs beneath our lanterns. Cull ten of them and give the downs back their quiet.",
-        "completion": "Ten striders fewer, and the herds already graze easier. The gardens keep their own hours, but tonight they keep them in peace.",
+        "title": "闇のストライダー",
+        "text": "グロームストライダーはもともと辛抱強い狩り手なのだけれど、{playerName}、近ごろは花床にまで忍び込んで、ランタンの下からムーンフリースの仔羊をさらっていくの。十体狩って、丘に静けさを返してあげて。",
+        "completion": "ストライダーが十減って、群れはもう安心して草を食んでいる。庭々は自分の時を刻むものだけれど、今夜のそれは、安らぎの時ね。",
         "objectives": {
           "0": {
-            "label": "Gloam Strider slain"
+            "label": "グロームストライダーを倒した"
           }
         }
       },
       "q_nb_wool_by_moonlight": {
-        "title": "Wool by Moonlight",
-        "text": "Nothing warms like moonfleece, {playerName}, and nothing spins so fine. The grazers carry their silver wool loose in tufts as they drift the downs. Bring me six good tufts off the herds and I will weave you something worth the walking.",
-        "completion": "Silver as starlight and twice as soft. Here, {playerName}: mitts from the last batch, lined the way only moonfleece lines.",
+        "title": "月明かりの羊毛",
+        "text": "ムーンフリースほど温まるものはないし、{playerName}、これほど細く紡げる毛もないの。草を食む獣たちは、丘を漂いながら銀の毛を房のまま緩く落としていく。群れから良い房を六つ持ってきて。歩いた甲斐のあるものを織ってあげるから。",
+        "completion": "星明かりのように銀色で、その倍やわらかい。はい、{playerName}。前の毛で編んだミトンよ。ムーンフリースにしかできない裏張りがしてあるの。",
         "objectives": {
           "0": {
-            "label": "Moonfleece Tuft"
+            "label": "ムーンフリースの房毛"
           }
         }
       },
       "q_nb_night_gardens": {
-        "title": "The Night Gardens",
-        "text": "The nightbloom opens only under this sky, and Gloamfield holds the oldest beds in the realm. I need four fresh blossoms for the shrine garlands, {playerName}. Cut them gently: a bed remembers a rough hand for a season.",
-        "completion": "Still glowing, every petal. The shrine will smell of night for a week, and Moonrest sleeps easier for it.",
+        "title": "夜の庭",
+        "text": "ナイトブルームの花はこの空の下でしか開かない。そして宵闇の花野には、この国で最も古い花床があるの。祠の花綱のために、摘みたての花が四輪欲しいのよ、{playerName}。優しく切ってあげて。花床は、荒い手をひと季節は忘れないから。",
+        "completion": "どの花びらも、まだ光っている。祠はこれから一週間、夜の香りに包まれるでしょう。ムーンレストの眠りも、それだけ安らかになるわ。",
         "objectives": {
           "0": {
-            "label": "Nightbloom Blossom gathered"
+            "label": "ナイトブルームの花を集めた"
           }
         }
       },
       "q_nb_eyes_on_the_vigil": {
-        "title": "Eyes on the Vigil",
-        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the nightkin drift among the stones. Find him, and ask what the stars are saying.",
-        "completion": "Lira sent you? Then the gardens feel it too. Sit by the glass a moment, {playerName}. The stars have been restless for a month, and every chart I draw leans north toward the barrow.",
+        "title": "石環を見つめる目",
+        "text": "何かがストライダーたちを大胆にさせ、群れを落ち着かなくさせている、{playerName}。それを、わたしは花からは読み取れない。カシアンなら空から読める。彼はここから東、ナイトキンが石々の間を漂う見張りの石環のそばに、観測の野営を構えているの。彼を見つけて、星が何を語っているのか尋ねてきて。",
+        "completion": "リラの遣いか？なら、庭々もそれを感じているのだな。しばし、遠眼鏡のそばに座りたまえ、{playerName}。星々はこのひと月ずっと落ち着かず、わたしの引く星図はどれも、北の塚のほうへ傾いていくのだ。",
         "objectives": {
           "0": {
-            "label": "Find Astronomer Cassian at the Standing Vigil"
+            "label": "見張りの石環で天文学者カシアンを見つけた"
           }
         }
       },
       "q_nb_charts_of_the_stones": {
-        "title": "The Charts in the Stones",
-        "text": "The Vigil stones are older than Moonrest, older than the nightkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
-        "completion": "No doubt is left. Every bearing has crept toward the Sleepless Barrow, as if the sky itself leans over that mound to watch. The old kings were buried under aligned stars for a reason, {playerName}.",
+        "title": "石に刻まれた星図",
+        "text": "石環の石はムーンレストより古く、石を守るナイトキンよりも古い。その面には星図が刻まれていて、わたしはそれを読むことに生涯を費やしてきた。空がずれたのだ、{playerName}。どこまでずれたのかを知らねばならん。三つの石の星図を読んで、その方位を持ち帰ってくれ。",
+        "completion": "もう疑いは残っていない。どの方位も不眠の塚のほうへ這っている。まるで空そのものが、あの塚を覗き込もうと身を乗り出しているかのようだ。古き王たちが揃えられた星の下に葬られたのには、理由があるのだよ、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Star chart read"
+            "label": "星図を読んだ"
           }
         }
       },
       "q_nb_restless_mounds": {
-        "title": "The Restless Mounds",
-        "text": "The charts were a warning, and the barrow field proves it: the mounds are opening from beneath. Wights walk the grave rows wearing the old honors, and the offerings that kept them sleeping lie scattered in the grass. Put eight of them down, {playerName}, and gather four of the offerings back to me.",
-        "completion": "Grave gold, still cold from the soil. The wights are not rising on their own, {playerName}: something beneath the great mound is calling them out, and I fear the charts have already told us its name.",
+        "title": "眠らぬ塚",
+        "text": "星図は警告だった。そして塚野がそれを証明している。塚が、下から開いているのだ。ワイトどもが古の栄誉を身にまとって墓の列を歩き、彼らを眠らせていた供物は草に散らばっている。八体を沈めて、{playerName}、供物を四つ、わたしのもとへ集め戻してくれ。",
+        "completion": "墓の黄金、まだ土の冷たさを残している。ワイトどもは自ら起き上がっているのではないぞ、{playerName}。大塚の下の何かが彼らを呼び出している。そしてその名は、もう星図が告げてしまった気がしてならない。",
         "objectives": {
           "0": {
-            "label": "Barrow Wight slain"
+            "label": "塚のワイトを倒した"
           },
           "1": {
-            "label": "Grave offering recovered"
+            "label": "墓前の供物を回収した"
           }
         }
       },
       "q_nb_the_barrow_king": {
-        "title": "The Barrow King Wakes",
-        "text": "Every bearing, every restless star, every opened mound points to one thing: the Barrow King is waking beneath the great mound, and this realm has no dawn to hold him back. He must be put to rest before he remembers his crown, {playerName}. Do not go alone: bring a friend, and keep the flower-light at your back.",
-        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the nightkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
+        "title": "塚の王の目覚め",
+        "text": "すべての方位、すべての落ち着かない星、すべての開いた塚が、ひとつのことを指している。塚の王が大塚の下で目覚めつつあり、この国には彼を押しとどめる夜明けがない。彼が己の王冠を思い出す前に、眠りへ帰さねばならんのだ、{playerName}。ひとりで行くな。友を連れ、花明かりを背にして戦え。",
+        "completion": "ひと季節ぶりに、星々がはじめて静まった、{playerName}。塚は閉じ、ナイトキンは石のそばで動きを止め、王は再び下で眠っている。このマントをまとうといい。夜がついに信を置いた者のために、ムーンレストが裁ったものだ。",
         "objectives": {
           "0": {
-            "label": "The Barrow King put to rest"
+            "label": "塚の王を眠りに帰した"
           }
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "The Bells of Gallowmere",
-        "text": "Hear that tolling, {playerName}? That is Gallowmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
-        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gallowmere, {playerName}. Mind the bells.",
+        "title": "ガロウミアの鐘",
+        "text": "あの鐘の音が聞こえるか、{playerName}？あれがガロウミアだ。北の道の先で、死者たちを眠りへと撞き送っている。堂守マロウが、この梢の下のすべての魂を数えている。生きている者も、葬られた者もな。行って、数えられてこい。森のほうがお前を数えてしまう前に。",
+        "completion": "コッブはお前を無事に道へ送り出したか。良い男だ。三十年あの門のランタンを灯し続けて、森は一度も彼を出し抜けなかった。ようこそガロウミアへ、{playerName}。鐘には気をつけてな。",
         "objectives": {
           "0": {
-            "label": "Report to Sexton Marrow"
+            "label": "堂守マロウに報告した"
           }
         }
       },
       "q_ww_silk_in_the_eaves": {
-        "title": "Silk in the Eaves",
-        "text": "Look up when you walk the west road, {playerName}, and you will see them: wrapped shapes in the canopy, swaying where no wind reaches. The widowsilk spinners have crept out of the Thicket and strung their larders over my lanterns. Kill ten, and the road is a road again.",
-        "completion": "Ten fewer weavers in the eaves. The lamplighters will walk their rounds tonight without looking up, and that is worth more here than you know.",
+        "title": "軒先の絹糸",
+        "text": "西の道を歩くときは上を見ろ、{playerName}。見えるだろう。風も届かない梢で揺れている、包まれた形が。ウィドウシルク・スピナーどもが茨から這い出して、わたしのランタンの上に食料庫を張り渡したのだ。十匹殺せ。そうすれば道はまた道になる。",
+        "completion": "軒の織り手が十減った。今夜、点灯夫たちは上を見ずに見回りを歩けるだろう。ここでは、それはお前が思うよりずっと値打ちのあることなのだ。",
         "objectives": {
           "0": {
-            "label": "Widowsilk Spinner slain"
+            "label": "ウィドウシルク・スピナーを倒した"
           }
         }
       },
       "q_ww_widows_skeins": {
-        "title": "The Widow's Skeins",
-        "text": "The spinners take our dead for their larders, {playerName}, so I take their silk for our shrouds. It burns clean and it holds a blessing better than linen ever did. Bring me six skeins of widowsilk, and the next soul we bury goes down wrapped and warded.",
-        "completion": "Six skeins, soft as a held breath. The dead will lie easier in this. Take these wraps, I sewed them from the last batch, and the wood has never once bitten through them.",
+        "title": "寡婦の絹かせ",
+        "text": "スピナーどもはわたしたちの死者を食料庫に取っていく、{playerName}。だからわたしは、奴らの絹を経帷子に取り返すのさ。あの絹は清らかに燃えるし、亜麻布よりずっとよく祝福を保つ。ウィドウシルクのかせを六つ持っておいで。次に葬る魂は、包まれ、守られて土に降りていくのだから。",
+        "completion": "六かせ、押し殺した息のようにやわらかい。これなら死者も安らかに横たわれる。この巻きをお持ち。前の絹で縫ったもので、森はまだ一度も噛み通せていないよ。",
         "objectives": {
           "0": {
-            "label": "Widowsilk Skein"
+            "label": "ウィドウシルクのかせ"
           }
         }
       },
       "q_ww_candles_at_the_bounds": {
-        "title": "Candles at the Bounds",
-        "text": "Four boundary stones ring Gallowmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
-        "completion": "All four burning? Then breathe, {playerName}. You did not hear it, but the whole village did: the bells rang easier the moment the last wick caught.",
+        "title": "境界の蝋燭",
+        "text": "ガロウミアの周りには四つの境界石が立っている、{playerName}。外へ出る道の一本ごとにひとつ、そしてどの石の上でも墓前の蝋燭が燃えている。あれが燃えている限り、葬られた者は葬られたままでいる。その四つすべてが、霧雨に消されてしまった。わたしはもう、ひとりで境界を歩ける歳ではない。わたしの付け木を持って、急ぎ、灯し直してきてくれ。",
+        "completion": "四つとも燃えているか？なら息をつけ、{playerName}。お前には聞こえなかったろうが、村じゅうが聞いたのだ。最後の灯芯に火が入った瞬間、鐘の鳴りが軽くなったのを。",
         "objectives": {
           "0": {
-            "label": "Grave-candle relit"
+            "label": "墓前の蝋燭を灯し直した"
           }
         }
       },
       "q_ww_the_last_vicar": {
-        "title": "The Last Vicar",
-        "text": "South of here the Mournstone Chapel moulders by its black tarn, and one man still tends it: Vicar Creel, who would not leave when the roof came down. He knows the old rites better than my bells do, {playerName}, and he has not sent word in a month. Walk the chapel road and see him breathing.",
-        "completion": "Marrow worries after me? That is new. Tell him the Mournstone stands, after a fashion, and so do I. Stay a while, {playerName}. The tarn has been whispering, and I would rather not listen alone.",
+        "title": "最後の司祭",
+        "text": "ここから南、哀石の礼拝堂が黒い湖沼のほとりで朽ちかけていて、今もひとりの男がそれを守っている。司祭クリール。屋根が落ちたときも、去ろうとしなかった男だ。彼はわたしの鐘よりも古い儀式に通じている、{playerName}。その彼から、ひと月も便りがない。礼拝堂への道を歩いて、息をしているのを確かめてきてくれ。",
+        "completion": "マロウがわたしの心配を？それは新しいな。哀石は立っている、まあ、立っているようなものだ、わたしも同じだと伝えてくれ。少し居るといい、{playerName}。湖沼が近ごろ囁くのでな。できれば、ひとりで聞きたくないのだ。",
         "objectives": {
           "0": {
-            "label": "Find Vicar Creel"
+            "label": "司祭クリールを見つけた"
           }
         }
       },
       "q_ww_wraiths_of_the_tarn": {
-        "title": "Wraiths of the Tarn",
-        "text": "The wood wraiths were the chapel wardens once, {playerName}, grown from trees planted over the honored dead. Since the tarn turned black they have forgotten their office, and now they drift through my graveyard pulling at the soil. Break eight of them apart before they finish what they have started.",
-        "completion": "Eight wardens laid down at last. I will not call it a mercy in daylight, but between us, {playerName}, it was one.",
+        "title": "湖沼のレイス",
+        "text": "ウッドレイスたちは、かつて礼拝堂の守り手だった、{playerName}。誉れある死者の上に植えられた木々から育ったものだ。湖沼が黒く濁ってからというもの、彼らは己の務めを忘れ、今はわたしの墓地を漂いながら土を引き掻いている。彼らが始めたことを終えてしまう前に、八体を砕いてくれ。",
+        "completion": "八人の守り手が、ようやく横たわった。日の光の下では慈悲とは呼ばないでおくが、ここだけの話、{playerName}、あれは慈悲だったよ。",
         "objectives": {
           "0": {
-            "label": "Wood Wraith slain"
+            "label": "ウッドレイスを倒した"
           }
         }
       },
       "q_ww_what_the_bark_holds": {
-        "title": "What the Bark Holds",
-        "text": "In the Hanging Glade east of Gallowmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
-        "completion": "Three souls back under honest ground before nightfall. The shamblers will grow back, bark always does, but tonight the glade hangs empty, and that is enough.",
+        "title": "樹皮が抱えるもの",
+        "text": "ガロウミアの東の吊るしの林間地では、スピナーどもが絹に包んだ死者を枝から吊るし、その下ではグレイヴンバークどもが、辛抱強い棺担ぎのように見張りに立っている。あの上にあるのは、わたしたちの民なのだ、{playerName}。グレイヴンバークを五体砕き、包まれた死者を三体切り下ろして、土へ帰してやってくれ。",
+        "completion": "日暮れ前に、三つの魂がまっとうな土の下へ戻った。グレイヴンバークどもはまた生えてくるだろう。樹皮とはそういうものだ。だが今夜、あの林間地には何も吊るされていない。それで十分だ。",
         "objectives": {
           "0": {
-            "label": "Gravenbark Shambler felled"
+            "label": "グレイヴンバークを打ち倒した"
           },
           "1": {
-            "label": "Silkbound remains cut down"
+            "label": "絹に包まれた亡骸を切り下ろした"
           }
         }
       },
       "q_ww_walking_mosley_home": {
-        "title": "Walking Mosley Home",
-        "text": "My gravedigger Mosley took the chapel road three days ago to open a plot in the old yard, and the dig came down on top of him. He clawed his way out, the fool is alive, but he is huddled by the chapel graves and will not move for spinners on the road. Walk him home, {playerName}. I cannot ring the bells for a living man.",
-        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gallowmere keeps its people, that is the whole of our law.",
+        "title": "モズリーを家まで",
+        "text": "うちの墓掘りモズリーが三日前、古い墓地に墓穴を開けに礼拝堂の道を行ったのだが、掘った穴が上から崩れてきた。自力で這い出した。馬鹿者は生きている。だが礼拝堂の墓のそばでうずくまったきり、道のスピナーが怖くて動けんのだ。家まで歩かせてやってくれ、{playerName}。生きている男のために鐘を鳴らすわけにはいかんのでな。",
+        "completion": "自分の両足で門をくぐってきたよ。これからはカブの床より深い穴は掘らないと誓いながらな。日曜までには墓地へ戻っているさ、ああいう手合いはいつもそうだ。ありがとう、{playerName}。ガロウミアは己の民を手放さない。それがわたしたちの掟のすべてだ。",
         "objectives": {
           "0": {
-            "label": "Gravedigger Mosley walked safely back to Gallowmere"
+            "label": "墓掘りモズリーをガロウミアまで送り届けた"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
-        "title": "The Horn of the Huntsman",
-        "text": "You have heard the horn by now, {playerName}, thin and far off, the sound the whole wood holds its breath for. The Pale Huntsman rides his clearing north of here, and every grave he passes grows shallower. He was a man once, and he was buried wrong, and I am done pretending prayer will do it. Take a friend, take two, and unhorse him.",
-        "completion": "The horn stopped mid-note. Every bell in Gallowmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
+        "title": "狩人の角笛",
+        "text": "もう角笛は聞いただろう、{playerName}。細く、遠く、森全体が息を潜めるあの音だ。蒼白の狩人はここから北の広場で馬を駆っており、彼が通り過ぎるたび、墓は浅くなっていく。彼もかつては人だった。そして、誤ったやり方で葬られた。祈りで済むふりは、もう終わりにする。友をひとり、ふたり連れて、彼を馬から引きずり下ろせ。",
+        "completion": "角笛が、音の途中で止まった。ガロウミアの鐘という鐘がひとりでに一度鳴り、それから森は、この三十年で聞いたことのないほど静かになった。わたしにできなかった儀式を、お前が果たしたのだ、{playerName}。これをまとい、梢の下を恐れず歩くがいい。",
         "objectives": {
           "0": {
-            "label": "The Pale Huntsman unhorsed"
+            "label": "蒼白の狩人を馬から落とした"
           }
         }
       },
       "q_pr_down_to_drifthaven": {
-        "title": "Down to Drifthaven",
-        "text": "Out of the black trees and into the sun, {playerName}. Follow the shore road north and you will strike Drifthaven before the tide turns. Ask for Salvage-Boss Ryna, she has work for any pair of hands since the storm, and tell her the Tanglemouth road is still open.",
-        "completion": "Pell sent you? Then you walked the whole Tanglemouth road alone, and that is reference enough for me. Welcome to Drifthaven, {playerName}. Grab a rope, we are short-handed.",
+        "title": "ドリフトヘイヴンへ",
+        "text": "黒い木々を抜けて、陽の下へ出たな、{playerName}。岸辺の道を北へたどれば、潮が変わる前にドリフトヘイヴンに着く。引き揚げ頭リナを訪ねろ。嵐このかた、彼女は動く手ならなんでも欲しがっている。それと、絡み口の道はまだ開いていると伝えてくれ。",
+        "completion": "ペルの遣いかい？なら絡み口の道をひとりで歩き通したってことだ。わたしにはそれで十分な推薦状さ。ようこそドリフトヘイヴンへ、{playerName}。綱をお取り、人手が足りないんだ。",
         "objectives": {
           "0": {
-            "label": "Report to Salvage-Boss Ryna"
+            "label": "引き揚げ頭リナに報告した"
           }
         }
       },
       "q_pr_wreck_line_cargo": {
-        "title": "The Wreck Line",
-        "text": "The storm three nights back drove the Pearlwake onto the reef, and her cargo is strewn the whole length of the wreck line between here and the Palmstrand. Three crates of trade goods are still lying in the surf, {playerName}. Bring them in before the tide, or the crabs, claim what is left.",
-        "completion": "Salt-stained but sound, all three. The divers eat this month because of you, {playerName}.",
+        "title": "難破船の列",
+        "text": "三晩前の嵐がパールウェイクを礁に乗り上げさせて、積み荷はここからパームストランドまで、難破船の列いっぱいに散らばっちまった。交易品の木箱が三つ、まだ波打ち際に転がってる、{playerName}。潮かカニが残りを頂いちまう前に、運び込んでおくれ。",
+        "completion": "塩染みだらけだけど、三つとも無事だ。今月、潜り手たちが食えるのはあんたのおかげだよ、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Pearlwake Cargo recovered"
+            "label": "パールウェイクの積み荷を回収した"
           }
         }
       },
       "q_pr_scuttler_cull": {
-        "title": "Shellbacked Thieves",
-        "text": "Every wreck on this coast draws the tide scuttlers, and the Pearlwake has drawn half the reef. My salvage crews will not work a line with those claws in the shallows. Crack ten of them, {playerName}, and the wreck line is ours again.",
-        "completion": "Ten fewer claws in the surf. My crews are already wading back out, and not one of them said thank you, so I will: thank you, {playerName}.",
+        "title": "甲羅の盗人ども",
+        "text": "この海岸の難破船はどれもタイドスカトラーを引き寄せるけど、パールウェイクは礁の半分を引き寄せちまった。うちの引き揚げ組は、あの鋏が浅瀬にいるうちは潜り綱につこうとしない。十匹割っておくれ、{playerName}。そうすれば難破船の列はまたわたしらのものだ。",
+        "completion": "波打ち際の鋏が十減った。うちの連中はもう浅瀬へ戻り始めてる。誰ひとり礼を言わなかったろうから、わたしが言うよ。ありがとう、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Tide Scuttler cracked"
+            "label": "タイドスカトラーを割った"
           }
         }
       },
       "q_pr_boars_in_the_gardens": {
-        "title": "Boars in the Gardens",
-        "text": "Whatever stirs in the deep green, it pushes the thicket boars out onto our strand. They have rooted up the garden terraces twice this week, and they will have the drying racks next. Ten boars, {playerName}, and push the rest back under the trees.",
-        "completion": "The racks stand and the gardens can be replanted. The boars did not choose to come onto the sand, {playerName}. Remember that: something moved them.",
+        "title": "庭園の猪",
+        "text": "深い緑で何が蠢いているにせよ、それが茂みの猪をわたしたちの浜へ押し出している。今週だけで庭の段々畑が二度掘り返された。次は魚干し棚がやられるだろう。猪を十頭だ、{playerName}。残りは木々の下へ押し返しておやり。",
+        "completion": "干し棚は立ち、庭は植え直せる。猪たちは、自分から砂へ出てきたわけではないのだよ、{playerName}。覚えておおき。何かが、彼らを動かしたのだ。",
         "objectives": {
           "0": {
-            "label": "Thicket Boar driven off"
+            "label": "茂みの猪を追い払った"
           }
         }
       },
       "q_pr_the_man_who_went_in": {
-        "title": "The Man Who Went In",
-        "text": "The divers will not step past the treeline, {playerName}, and I will not ask them to. You have heard the drums by now: everyone does, by the second night. One man on this island ever walked toward that sound and came back. Okku. He camps under the great banyans at the Vinefall, deep up the Tangle road. Find him, and ask him what the green is hiding.",
-        "completion": "Isha sent you? The Pearl-Mother has not spoken my name in years. Sit out of the vines' reach, {playerName}, and I will tell you what I know: the drums are not the danger. They are the warning.",
+        "title": "奥へ入った男",
+        "text": "潜り手たちは木々の際から先へは踏み込まない、{playerName}。わたしも頼みはしない。太鼓はもう聞いただろう。二晩目までには、誰もが聞く。あの音へ向かって歩き、戻ってきた者はこの島にひとりしかいない。オックだ。彼は絡みの道を深く上った蔓垂の森の、大きな榕樹の下に野営している。彼を見つけて、緑が何を隠しているのか尋ねておいで。",
+        "completion": "イーシャの遣いだと？パールマザーがわたしの名を口にするのは何年ぶりか。蔓の届かないところへお座り、{playerName}。知っていることを話そう。太鼓は危険ではない。太鼓は、警告なのだ。",
         "objectives": {
           "0": {
-            "label": "Find Okku at the Vinefall"
+            "label": "蔓垂の森でオックを見つけた"
           }
         }
       },
       "q_pr_canopy_silk": {
-        "title": "Silk from the Canopy",
-        "text": "Look up, {playerName}. Every canopy from here to the idol is webbed like a fishing net, and the weavers grow bolder each season. I string their own silk across the paths, tripline bells, so the jungle cannot creep up on me. Six good hanks off the canopy weavers will restring my lines.",
-        "completion": "Good, strong silk. My bells will sing a while longer, and nothing walks these paths at night without me knowing, {playerName}. Lately, something has been walking often.",
+        "title": "梢の糸",
+        "text": "上を見ろ、{playerName}。ここから神像までの梢という梢が、漁網のように糸で張られている。ウィーバーどもは季節ごとに大胆になっていく。わたしは奴らの糸を道々に張り渡している。仕掛け線の鈴だ。密林がわたしに忍び寄れないようにな。キャノピーウィーバーから良い糸束を六つ。それでわたしの線は張り直せる。",
+        "completion": "良い、強い糸だ。わたしの鈴はまだしばらく歌える。そして夜にこの道を歩くものは、何であれわたしに知られずには済まん、{playerName}。近ごろ、何かが足繁く歩いているのだ。",
         "objectives": {
           "0": {
-            "label": "Canopy Silk Hank"
+            "label": "キャノピーシルクの束"
           }
         }
       },
       "q_pr_the_lost_navigator": {
-        "title": "The Lost Navigator",
-        "text": "We pulled every hand off the Pearlwake but one: Navigator Suli, who swam for the far strand and never walked in. A diver spotted her holed up in the bow wreckage past the Palmstrand, alive, and too spent to run the gauntlet alone. Walk her home along the shore road, {playerName}. The crabs will not like it, and the jungle likes it less.",
-        "completion": "Suli is by the fire, still swearing she could have swum it. You brought back the only chart-reader on this coast, {playerName}. These are from her sea chest, with her blessing.",
+        "title": "行方知れずの航海士",
+        "text": "パールウェイクからは、ひとりを残して全員引き揚げた。航海士スリ。遠い浜を目指して泳いで、そのまま歩いて戻らなかった。潜り手がパームストランドの先の船首の残骸に隠れているのを見つけたんだ。生きてる。でも、あの関門をひとりで走り抜ける力は残っちゃいない。岸辺の道沿いに家まで歩かせてやっておくれ、{playerName}。カニどもは嫌がるだろうし、密林はもっと嫌がるだろうけどね。",
+        "completion": "スリは焚き火のそばだよ。今でも自分なら泳ぎ切れたと言い張ってる。この海岸でただひとりの海図読みを連れ戻してくれたんだ、{playerName}。これはあの子の船箪笥から。本人の祝福つきさ。",
         "objectives": {
           "0": {
-            "label": "Navigator Suli seen safely to Drifthaven"
+            "label": "航海士スリをドリフトヘイヴンまで送り届けた"
           }
         }
       },
       "q_pr_what_the_drums_guard": {
-        "title": "What the Drums Guard",
-        "text": "I have walked as near the Sunken Idol as a living man dares, and I saw two things: the weavers have curtained the idol road in web, and the old offering bowls along it have been filled again. Freshly, {playerName}. Cut eight weavers off the road and bring me three of those offerings. I would know what hand still feeds a dead god.",
-        "completion": "Moss, pearl-shell, and boar blood, packed by fingers. Something in that ruin still keeps its rites, {playerName}, and the Guardian keeps everything else out. It is time we spoke of it plainly.",
+        "title": "太鼓が守るもの",
+        "text": "生きた人間に許される限りのところまで、沈んだ神像に近づいてみた。見えたものはふたつ。ウィーバーどもが神像への道を糸の帳で覆っていたこと。そして、道沿いの古い供物鉢が、再び満たされていたことだ。それも新しく、だ、{playerName}。道からウィーバーを八体払い、供物を三つ持ってきてくれ。死んだ神に今も餌をやる手が誰のものか、知っておきたい。",
+        "completion": "苔、真珠貝、猪の血。指で詰められている。あの廃墟の中の何かは、いまだに祭祀を続けているのだ、{playerName}。そして守護者が、それ以外のすべてを締め出している。そろそろ、包み隠さず話すときだな。",
         "objectives": {
           "0": {
-            "label": "Canopy Weaver cut down"
+            "label": "キャノピーウィーバーを切り落とした"
           },
           "1": {
-            "label": "Refilled Offering Bowl gathered"
+            "label": "再び満たされた供物鉢を集めた"
           }
         }
       },
       "q_pr_idol_guardian": {
-        "title": "The Idol Guardian",
-        "text": "The idol is older than the island, {playerName}. Older than the drums, older than the name Palmreach. Its Guardian has stood in that drowned ring since before the palms grew, and now it wakes and walks the columns at night. Whatever the offerings feed, the Guardian is its door-ward. Bring a friend, and break it.",
-        "completion": "You felled a thing the jungle itself would not touch. Look there, behind the idol: the Guardian was never guarding the columns, {playerName}, it was guarding the steps beneath them. The drums have gone quiet tonight. Whatever sleeps below the Wildheart Basin now knows your name.",
+        "title": "神像の守護者",
+        "text": "あの神像は島より古い、{playerName}。太鼓より古く、パームリーチという名より古い。その守護者は、椰子が生えるより前からあの水没した環に立ち続けてきた。それが今、目覚めて、夜ごと柱の間を歩いている。供物が何を養っているにせよ、守護者はその扉の番人だ。友を連れて行き、砕いてこい。",
+        "completion": "密林そのものが手を出さなかったものを、お前は倒したのだ。見ろ、神像の後ろを。守護者が守っていたのは柱ではない、{playerName}。その下の階段だったのだ。今夜、太鼓は静まっている。ワイルドハート盆地の下で眠るものが何であれ、もうお前の名を知っている。",
         "objectives": {
           "0": {
-            "label": "The Idol Guardian broken"
+            "label": "神像の守護者を砕いた"
           }
         }
       },
       "q_eg_gate_report": {
-        "title": "Word Through the Gate",
-        "text": "The lawns past this gate have trimmed themselves for a hundred years, {playerName}, and lately they have started trimming visitors. Head Gardener Amaranth keeps the books in Hedgewick, up the road past the gate lawns. Tell her another traveler has come through, and tell her the hedges by the gate moved last night.",
-        "completion": "Moved, did they. Pell reports that every week, and every week he is right. Forgive my eyes, {playerName}, I have not slept a whole night in years: someone has to watch the garden watch us. Welcome to Hedgewick.",
+        "title": "門ごしの言伝",
+        "text": "この門の先の芝生は百年間ひとりでに刈り込まれてきた、{playerName}。そして近ごろは、訪問者まで刈り込み始めている。庭園長アマランスがヘッジウィックで帳簿を預かっている。門前の芝生を過ぎて道を上った先だ。また旅人がひとり通ったと伝えてくれ。それと、昨夜、門のそばの生け垣が動いたこともな。",
+        "completion": "動いた、ときたか。ペルは毎週それを報告してきて、毎週正しいのだよ。この目を許しておくれ、{playerName}、もう何年もひと晩通して眠れていなくてね。庭がわたしたちを見張るのを、誰かが見張っていなければならないから。ようこそヘッジウィックへ。",
         "objectives": {
           "0": {
-            "label": "Report to Head Gardener Amaranth"
+            "label": "庭園長アマランスに報告した"
           }
         }
       },
       "q_eg_hungry_shapes": {
-        "title": "Pruned into Hunger",
-        "text": "Whoever shapes this garden has grown careless, or cruel. The wolf shapes out in the Rose Wilds were clipped for show, yet lately they hunt: green jaws, no bellies, and no reason ever to stop. Cut down ten topiary wolves, {playerName}, and let the lawns be lawns again for a while.",
-        "completion": "Ten heaps of clippings where ten wolves stood. It should feel like gardening, {playerName}. Why does it feel like war?",
+        "title": "飢えに刈り込まれて",
+        "text": "この庭を形づくる何者かは、不注意になったか、それとも残酷になったか。野バラの茂みの狼の像は見世物として刈られたものなのに、近ごろは狩りをしている。緑の顎、腹はなく、止まる理由も永遠にない。トピアリーの狼を十体切り倒して、{playerName}、しばらくの間、芝生をただの芝生に戻しておくれ。",
+        "completion": "十の狼が立っていた場所に、十の刈り屑の山。庭仕事のはずなのだよ、{playerName}。なのになぜ、戦のように感じるのだろうね。",
         "objectives": {
           "0": {
-            "label": "Topiary Wolf slain"
+            "label": "トピアリーの狼を倒した"
           }
         }
       },
       "q_eg_stolen_shears": {
-        "title": "The Stolen Shears",
-        "text": "Every pair of shears in Hedgewick has walked off in a fortnight, {playerName}: off the pegs, out of locked sheds, one pair out of my own apron while I dozed. It is the hedge gnomes, the little groundskeepers who hate us walking their lawns. Get six pairs back before the whole hamlet is down to kitchen knives.",
-        "completion": "Six pairs, and my own among them, I would know the nick in the blade anywhere. Here, these gloves were knitted for pruning work. Warm hands make steady shears.",
+        "title": "盗まれた鋏",
+        "text": "この二週間で、ヘッジウィックじゅうの剪定ばさみが歩いて消えたんだよ、{playerName}。掛け釘から、鍵のかかった物置から、一丁はうたた寝している間にわたしの前掛けの中からね。生け垣ノームの仕業さ。わたしたちが奴らの芝生を歩くのを憎んでいる、小さな庭番たちだよ。村じゅうが台所のナイフで枝を切る羽目になる前に、六丁取り戻しておくれ。",
+        "completion": "六丁、しかもわたしのも交じっている。刃のこの欠けなら、どこで見ても分かるさ。ほら、この手袋は剪定仕事のために編まれたものだ。手が温かければ、鋏も揺るがないからね。",
         "objectives": {
           "0": {
-            "label": "Stolen Hedgewick Shears"
+            "label": "盗まれたヘッジウィックの剪定ばさみ"
           }
         }
       },
       "q_eg_who_trims_the_hedges": {
-        "title": "Who Trims the Hedges",
-        "text": "I have kept the ledgers thirty years, {playerName}, and not slept properly for ten of them, because the sums will not close. Grass wants cutting and hedges want shaping, and nobody here does either, yet every dawn the garden stands trimmed. Lately the woodfolk swear they see an old man with a barrow on the far south lawns, past the maze by the Lily Basin. Find him. If he is real, I can finally sleep. If he is not, I suppose I never will.",
-        "completion": "So the house finally sent someone. A hundred years I have walked these lawns, {playerName}, and the garden and I have an understanding: I trim what asks to be trimmed. Sit. The hedges can spare you an hour.",
+        "title": "生け垣を刈るのは誰",
+        "text": "三十年帳簿をつけてきて、そのうち十年はろくに眠れていない。勘定が合わないからだよ、{playerName}。草は刈られたがり、生け垣は形を整えられたがる。なのにここでは誰もどちらもしていないのに、毎朝、庭は刈り整えられて立っている。近ごろ森の民が、迷路の先、睡蓮の泉水のそばの南の外れの芝生で、手押し車を押す老人を見たと言い張るのだ。彼を見つけておくれ。実在するなら、わたしはやっと眠れる。実在しないなら、きっと一生眠れないままなのだろうね。",
+        "completion": "ようやく館が人を寄越したか。百年この芝生を歩いてきたがね、{playerName}、庭とわたしの間には了解があるのだ。刈られたがるものを、わたしが刈る。お座り。生け垣くらい、一時間ならお前に割いてくれるさ。",
         "objectives": {
           "0": {
-            "label": "Find the gardener by the Lily Basin"
+            "label": "睡蓮の泉水のそばの庭師を見つけた"
           }
         }
       },
       "q_eg_gnomes_in_the_green": {
-        "title": "The Groundskeepers Grudge",
-        "text": "The shears were only the start, {playerName}. Last night the gnomes tipped our tool carts into the green, one out by their warren west of the maze, one clean across the garden on the pond walk, and scattered a hundred years of good iron in the grass. Drive off eight of the little devils and haul the spilled carts home.",
-        "completion": "Three carts back and the pegs full again. Let the little devils sulk in their hedges: Hedgewick works these lawns too.",
+        "title": "庭番の遺恨",
+        "text": "鋏は始まりに過ぎなかったのだよ、{playerName}。昨夜、ノームどもはうちの道具車を緑の中へひっくり返した。一台は迷路の西の奴らの巣穴のそば、一台は庭を挟んだ反対側の池の遊歩道。百年ものの良い鉄物が草に撒き散らされた。小悪魔どもを八匹追い払って、ひっくり返った道具車を引きずり戻しておくれ。",
+        "completion": "車が三台戻って、掛け釘もまた満杯だ。小悪魔どもは生け垣の中でふてくされていればいい。ヘッジウィックだって、この芝生を手入れしているのだからね。",
         "objectives": {
           "0": {
-            "label": "Hedge Gnome driven off"
+            "label": "生け垣ノームを追い払った"
           },
           "1": {
-            "label": "Tool cart recovered"
+            "label": "道具車を回収した"
           }
         }
       },
       "q_eg_bloom_clippings": {
-        "title": "Clippings from the Living Green",
-        "text": "You want to understand this garden? Then read it the way I do. The stags that graze the lawns grow the truest green: every leaf on them is a page. Bring me six fresh clippings from the topiary stags, {playerName}. They will not thank you for the pruning, but they will regrow. Everything here regrows.",
-        "completion": "Look here: the leaves are curling in on themselves, every clipping the same. The garden is afraid, {playerName}. In a hundred years I have never once known it afraid.",
+        "title": "生ける緑の切り枝",
+        "text": "この庭を理解したいのかい？なら、わたしと同じやり方で庭を読むことだ。芝生で草を食むあの牡鹿たちには、最も真なる緑が茂る。彼らの葉の一枚一枚が、書物の頁なのだよ。トピアリーの雄鹿から、摘みたての切り枝を六本持っておいで、{playerName}。剪定を感謝はされないだろうが、また生えてくる。ここでは、すべてがまた生えてくるのだ。",
+        "completion": "ごらん。葉がどれも内へ内へと丸まっている。切り枝のすべてが同じだ。庭が怯えているのだよ、{playerName}。百年生きてきて、庭が怯えるのを見たことなど一度もなかった。",
         "objectives": {
           "0": {
-            "label": "Pruned Bloom Clipping"
+            "label": "剪定した花の切り枝"
           }
         }
       },
       "q_eg_four_statues": {
-        "title": "The Four Quiet Sisters",
-        "text": "When the garden was young, the first gardeners raised four marble sisters to watch its quarters: one above the Rose Wilds, one on the pond walk east of the maze, one on the west lawn where the gnomes keep their warren, and one on the south lawn past the hedges. The maze grew up between them, and most folk never see all four. Walk the quarters, {playerName}, and press your palm to each sister. When the garden has looked you over from all four sides, it will open places it keeps from strangers.",
-        "completion": "Four rubbings, four sisters, and not one of them wept marble. The garden has taken your measure, {playerName}, and it did not find you wanting. Now I can send you where the trouble truly lives.",
+        "title": "四人の静かな姉妹",
+        "text": "庭が若かったころ、最初の庭師たちは庭の四つの区画を見守らせるため、大理石の姉妹を四人立てた。ひとりは野バラの茂みの上に、ひとりは迷路の東の池の遊歩道に、ひとりはノームが巣穴を構える西の芝生に、ひとりは生け垣の先の南の芝生に。迷路は姉妹たちの間に育ってしまって、四人すべてを見る者はほとんどいない。区画を巡って、{playerName}、それぞれの姉妹に手のひらを当てておいで。庭が四方からお前を眺め終えたら、よそ者には閉ざしている場所を開いてくれるだろう。",
+        "completion": "四枚の拓本、四人の姉妹、そして大理石の涙を流した者はひとりもいない。庭はお前の器を測り終えた、{playerName}。そして、足りないとは見なさなかった。これでようやく、本当の厄介ごとが棲む場所へお前を送れる。",
         "objectives": {
           "0": {
-            "label": "Garden statue visited"
+            "label": "庭の彫像を訪れた"
           }
         }
       },
       "q_eg_bull_of_the_court": {
-        "title": "The Bull of the Fountain Court",
-        "text": "Now the truth, {playerName}. The bull at the heart of the maze was my masterwork: I shaped him to guard the Fountain Court, and for a hundred years he did. But the fear in the green has reached him, and he guards nothing now, he hunts. The maze feeds him whoever wanders in. I am too old to unmake him, and it must be unmaking, root and branch. Bring a friend, walk the maze to the court, and cut my bull down.",
-        "completion": "I felt it, here, when he came apart. A hundred years of work, and you were right to end it. Take this mantle: I cut it for whoever proved stronger than my best. The court is only a fountain tonight, {playerName}, and the garden is only a garden. Perhaps now the Head Gardener and I can both sleep.",
+        "title": "噴水の中庭の雄牛",
+        "text": "さあ、本当のことを話そう、{playerName}。迷路の中心にいる雄牛は、わたしの最高傑作だった。噴水の中庭を守るように仕立て、百年のあいだ彼は守り続けた。だが緑に走った恐れが、彼にまで届いてしまった。今の彼は何も守っていない、狩っているのだ。迷路は迷い込む者を彼の餌にしている。わたしはもう年老いて、彼をほどくことができない。そしてこれは、根も枝も残さぬほどきでなければならない。友を連れ、迷路を抜けて中庭まで歩き、わたしの雄牛を切り倒しておくれ。",
+        "completion": "彼がほどけた瞬間、ここに、胸に感じたよ。百年の仕事だった。それでも、終わらせたお前が正しい。このマントを受け取っておくれ。わたしの最高傑作より強い者のために裁っておいたものだ。今夜、中庭はただの噴水で、{playerName}、庭はただの庭だ。これでようやく、庭園長もわたしも眠れるかもしれないね。",
         "objectives": {
           "0": {
-            "label": "The Topiary Bull unmade"
+            "label": "トピアリーの雄牛をほどいた"
           }
         }
       },
       "q_fs_bell_at_the_landing": {
-        "title": "The Bell at the Landing",
-        "text": "You came over the Ferrywalk, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up the shore road, past the drying racks nobody tends anymore. Tell Warden Coalfast the causeway still stands, and that Tam has not rung a three-toll today. Yet.",
-        "completion": "The causeway holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands that crosses that sandbar is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
+        "title": "船着き場の鐘",
+        "text": "砂州道を渡って来たのか、{playerName}？なら、この一週間で最初のひとりだ。守将がお前を検分したがるだろう。カモメ港は岸辺の道を上った先、誰も手入れしなくなった魚干し棚を過ぎたところにある。守将コールファストに伝えてくれ。堤道はまだ立っている、そしてタムは今日はまだ三打ちを鳴らしていない、とな。今のところは、だが。",
+        "completion": "堤道は保ち、タムにはまだ三打ちを冗談にする息が残っている。良し。我らは包囲された島なのだ、{playerName}。あの砂州を渡ってくる一組の手は、裂け目どもが我が民に届く前に突破せねばならん一組の手でもある。ようこそ、カモメ港へ。",
         "objectives": {
           "0": {
-            "label": "Report to Warden Coalfast"
+            "label": "守将コールファストに報告した"
           }
         }
       },
       "q_fs_hold_the_riftfields": {
-        "title": "Hold the Riftfields",
-        "text": "East of town the grain rows have gone to wrack, and the wretches that came through the Riftfields break now pick them clean. My people cannot tend a field they cannot stand in, {playerName}. Cull ten of the wretches and give the farmers back their ground.",
-        "completion": "Ten fewer, and the field hands are already arguing over who walks out first. It will not last, the breaks never rest long, but a town that eats is a town that holds.",
+        "title": "裂け目野を守れ",
+        "text": "町の東では穀物の列が荒れ果て、裂け目野の裂け目から来た成れの果てどもが、今やそれを食い荒らしている。立ち入ることもできない畑を、我が民は耕せぬのだ、{playerName}。成れの果てを十体間引いて、農夫たちに大地を返してやれ。",
+        "completion": "十体減った。畑の働き手たちはもう、誰が最初に出るかで言い合いを始めている。長くは続くまい、裂け目どもは長くは休まん。だが、食える町は保つ町だ。",
         "objectives": {
           "0": {
-            "label": "Breach Wretch slain"
+            "label": "破れの成れの果てを倒した"
           }
         }
       },
       "q_fs_steel_for_the_redoubt": {
-        "title": "Steel for the Redoubt",
-        "text": "Every blade I hand out is one the sea gave back or one I pried off the dead, {playerName}. The wretches carry scrap through the breaks, hinges, hooks, broken sword-steel, magpie stuff, but it hammers out true. Bring me six pieces of their scavenged steel and the barricade line gets its teeth back.",
-        "completion": "Salt-pitted and break-scarred, and it will hold an edge all the same. Here, I lined these grips myself. Steel for steel, {playerName}: it is the only trade the Farshore runs these days.",
+        "title": "堡塁のための鋼",
+        "text": "わたしが配る刃はどれも、海が返してくれたものか、死者からもぎ取ったものだ、{playerName}。成れの果てどもは裂け目の向こうから金屑を運んでくる。蝶番、鉤、折れた剣の鋼。カササギの集め物さ。だが、打ち直せばまっすぐに伸びる。奴らの漁った鋼を六片持ってきな。そうすれば防柵の列に、また牙が戻る。",
+        "completion": "塩に食われ、裂け目の傷を負って、それでも刃は立つ。ほら、この握りはわたしが自分で裏張りしたものだ。鋼には鋼を、{playerName}。近ごろの遠つ岸で通じる商いは、それだけさ。",
         "objectives": {
           "0": {
-            "label": "Break-Scarred Steel"
+            "label": "裂け目傷の鋼"
           }
         }
       },
       "q_fs_the_three_bells": {
-        "title": "The Three Bells",
-        "text": "Three watchbells stand the coast beyond my own: one on the Landing point, one on the south strand, one out by the Riftfields shore. If a rope has rotted or a clapper has been carried off, the town learns of a break when it is already in the streets. Walk the coast, {playerName}, and ring each bell once, so I know it still has a voice.",
-        "completion": "Three voices, three answers, carried clean over the water. Sleep in Gullhaven tonight, {playerName}, and know that if a bell wakes you, it will be by my hand and in good time.",
+        "title": "三つの鐘",
+        "text": "わたしの鐘のほかに、三つの警鐘が海岸に立っている。ひとつは船着き場の岬、ひとつは南の浜、ひとつは裂け目野の岸辺だ。綱が朽ちていたり、鐘の舌が持ち去られていたりすれば、町が裂け目を知るのは、それが通りまで来てからになる。海岸を歩いて、{playerName}、それぞれの鐘を一度ずつ鳴らしてきてくれ。まだ声が出るかどうか、確かめておきたいのだ。",
+        "completion": "三つの声、三つの応え、水の上を澄んで渡ってきた。今夜はカモメ港で眠るといい、{playerName}。もし鐘に起こされることがあれば、それはわたしの手で、しかも間に合ううちに鳴らされたものだと知っておけ。",
         "objectives": {
           "0": {
-            "label": "Watchbell rung"
+            "label": "警鐘を鳴らした"
           }
         }
       },
       "q_fs_song_before_the_break": {
-        "title": "The Song Before the Break",
-        "text": "There is a man who hears the breaks before they open. Riftwatch Ollun: a scholar, or a madman, and lately I cannot afford the difference. He keeps his vigil at the Watch Meadow, up the road southeast of town. Find him, {playerName}, and ask him what the island is about to do to us next.",
-        "completion": "The Warden sent you? Good. That means the town has finally started listening. Now be still a moment, {playerName}. There, under the wind, do you hear it? The cliffs are singing, and I do not like the tune.",
+        "title": "裂け目の前の歌",
+        "text": "裂け目が開く前にそれを聞き取る男がいる。裂け目監視のオルン。学者か、狂人か。近ごろの私には、その違いを気にかける余裕もない。町の南東、道を上った見張りの草原で見張りを続けている。彼を見つけて、{playerName}、この島が次に我らへ何を仕掛けるつもりか聞いてこい。",
+        "completion": "守将の遣いか？良い。町がようやく耳を貸し始めたということだ。さあ、少し静かに、{playerName}。ほら、風の下に、聞こえるか？断崖が歌っている。そして私は、この旋律が好かん。",
         "objectives": {
           "0": {
-            "label": "Find Riftwatch Ollun"
+            "label": "裂け目監視のオルンを見つけた"
           }
         }
       },
       "q_fs_moss_and_mending": {
-        "title": "Moss and Mending",
-        "text": "The salt moss that grows along the tideline is the best wound-packing I know, and the riftspawn have claimed every stretch of shore it grows on. They carry tufts of it snagged on their hides, of all things. Clear six of them off the east reaches, {playerName}, and pull me four good handfuls of moss from what they have trampled through.",
-        "completion": "Moss in one hand and a quieter shoreline in the other. You have restocked my whole surgery, {playerName}. Do me the kindness of not becoming my next patient.",
+        "title": "苔と手当て",
+        "text": "潮線に沿って生える塩苔は、わたしの知る限り最良の傷詰めだ。そして裂け目の落とし子どもが、苔の生える岸辺という岸辺を占領してしまった。あろうことか、奴らの皮には苔の房が引っかかっている。東の岸から六体払って、{playerName}、奴らが踏み荒らした中から良い苔を四掴み集めてきてくれ。",
+        "completion": "片手に苔、もう片手に静かになった海岸線か。わたしの診療所を丸ごと補充してくれたな、{playerName}。頼むから、次の患者にはならないでくれよ。",
         "objectives": {
           "0": {
-            "label": "Riftspawn slain"
+            "label": "裂け目の落とし子を倒した"
           },
           "1": {
-            "label": "Farshore Salt Moss"
+            "label": "遠つ岸の塩苔"
           }
         }
       },
       "q_fs_bram_come_home": {
-        "title": "Bram Come Home",
-        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.",
-        "completion": "Bram! You brought him back to me whole, {playerName}. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.",
+        "title": "ブラムを家へ",
+        "text": "うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は北の岸で難破している。彼を家まで連れて帰っておくれ。",
+        "completion": "ブラム！五体満足で連れ帰ってくれたんだね、{playerName}。ふたりして泣いたけど、どちらも恥じてなんかいないよ。裂け目どもが次にこの島から何を奪おうと、うちの家族だけは渡さない。もう二度と。",
         "objectives": {
           "0": {
-            "label": "Fisher Bram seen safely home to Gullhaven"
+            "label": "漁師ブラムをカモメ港まで送り届けた"
           }
         }
       },
       "q_fs_stalkers_off_the_light": {
-        "title": "Stalkers off the Light",
-        "text": "The stalkers hunt the dark between the watchfires, and every night they circle my meadow a little closer. They are not mindless, {playerName}, they are patient, and patience is the one thing I cannot outlast. Kill eight and push the dark back to the cliffs it came through.",
-        "completion": "Eight nights of circling, ended in one. The fires burn steadier already, or perhaps that is only my hands. Either way the meadow is mine again, and I can hear the island think.",
+        "title": "灯りを狙うもの",
+        "text": "忍び寄りどもは篝火と篝火の間の闇を狩り場にして、夜ごと、わたしの草原へ輪を狭めてくる。奴らは無心ではないぞ、{playerName}。辛抱強いのだ。そして辛抱こそ、わたしが競り負ける唯一のものでな。八体仕留めて、闇を奴らが抜けてきた断崖まで押し返してくれ。",
+        "completion": "八夜続いた旋回が、一夜で終わった。篝火はもう安定して燃えている。いや、震えていないのは私の手のほうか。どちらにせよ草原はまた私のものだ。島の考えごとが、また聞こえる。",
         "objectives": {
           "0": {
-            "label": "Void Stalker slain"
+            "label": "虚無の忍び寄りを倒した"
           }
         }
       },
       "q_fs_the_great_break": {
-        "title": "The Great Break",
-        "text": "Every song this island sings ends on the same low note, and it comes from the Sundered Cliffs. Something came through the great break there, {playerName}, something the cliffs themselves cracked open to admit, and it is still growing. If it walks north, no bell will matter. Take a friend, take two, and end it. Then tell Coalfast the tune has changed.",
-        "completion": "Ollun sent word ahead: the singing stopped. My whole town heard the quiet, {playerName}, and half of them wept at the sound of nothing at all. Wear this mantle. The Farshore does not forget who held its shore.",
+        "title": "大いなる裂け目",
+        "text": "この島が歌うどの歌も、同じ低い音で終わる。その音は引き裂かれた断崖から来ているのだ。あそこの大いなる裂け目を抜けて、何かが渡ってきた、{playerName}。断崖そのものがひび割れて招き入れた何かが。そして、それはまだ育っている。あれが北へ歩けば、どんな鐘も間に合わん。友をひとり、ふたり連れて、終わらせてくれ。それからコールファストに伝えるのだ。旋律が変わった、と。",
+        "completion": "オルンから先触れが届いた。歌がやんだ、とな。町じゅうがその静けさを聞いたのだ、{playerName}。何も聞こえないという音に、半分が泣いた。このマントをまとえ。遠つ岸は、己の岸を守った者を忘れはせん。",
         "objectives": {
           "0": {
-            "label": "The Sundered Horror slain"
+            "label": "引き裂かれし恐怖を倒した"
           }
         }
       },
       "q_gc_down_the_windway": {
-        "title": "Down the Windway",
-        "text": "You made the climb, {playerName}, so the wind has decided to keep you. Wickharbor sits east along the downs road, tucked in the lee of its cove. Harbormaster Odile counts every soul who comes over the pass, and she will want to count you. Tell her the Windway is still open.",
-        "completion": "Over the pass on foot, in this weather? Maren sends me few enough names, and fewer still walk in to answer for themselves. Welcome to Wickharbor, {playerName}. Close the inn door behind you.",
+        "title": "ウィンドウェイを下って",
+        "text": "登りきったか、{playerName}。なら風はお前を生かしておくことに決めたわけだ。ウィックハーバーは丘陵の道を東へ行った先、入り江の風陰にうずくまっている。港務長オディールは峠を越えてくる者をひとり残らず数えている。お前のことも数えたがるだろう。ウィンドウェイはまだ開いている、と伝えてくれ。",
+        "completion": "この天気に、徒歩で峠越えを？マレンが寄越す名前は少ないし、自分の足で申し開きに来る者はもっと少ない。ようこそウィックハーバーへ、{playerName}。宿の扉は閉めていっておくれよ。",
         "objectives": {
           "0": {
-            "label": "Report to Harbormaster Odile"
+            "label": "港務長オディールに報告した"
           }
         }
       },
       "q_gc_wool_off_the_downs": {
-        "title": "Wool off the Downs",
-        "text": "My boat crews row into a gale that cuts through oilskin like paper, {playerName}. Only one thing turns this wind: the greasy wool off the moor rams, spun thick the Wickharbor way. The herds graze the Howling Downs west of town. Six good fleeces and every crew rows warm this season.",
-        "completion": "Fleece like this is why the rams stand out there fat and smug in weather that kills men. The spinners will be at it by lamplight. Take these treads, {playerName}, they are lined from the last shearing.",
+        "title": "丘陵の羊毛",
+        "text": "うちの船の漕ぎ手たちは、油布を紙みたいに切り裂く強風の中へ漕ぎ出していくんだ、{playerName}。この風を防げるものはひとつだけ。ムーアラムの脂じみた羊毛を、ウィックハーバー流に太く紡いだものさ。群れは町の西のハウリングダウンズで草を食んでいる。良い毛を六頭分。そうすれば今シーズンは、どの船組も温かく漕げる。",
+        "completion": "こういう毛があるから、人が死ぬ天気の中でも雄羊どもは太って澄ました顔で立っていられるのさ。紡ぎ手たちは今夜、ランプの明かりで仕事にかかるよ。この足具をお持ち、{playerName}、前の毛刈りの毛で裏張りしてあるからね。",
         "objectives": {
           "0": {
-            "label": "Greasy Ram Wool"
+            "label": "脂じみた雄羊の羊毛"
           }
         }
       },
       "q_gc_scuttlers_in_the_pots": {
-        "title": "Scuttlers in the Pots",
-        "text": "The shoal scuttlers have learned to climb the cliff road and crack our crab pots open on the stones, {playerName}. Half the catch gone this week, and one potman with a hand he will not be using for a month. Break ten of them and the rest will remember why they kept to the shoals.",
-        "completion": "Ten fewer shells on my road, and the pots came up full this morning. The potmen are calling you a good omen, {playerName}. In Wickharbor that is as warm as praise gets.",
+        "title": "蟹籠のスカトラー",
+        "text": "ショールスカトラーどもが断崖の道を登ることを覚えてね、うちの蟹籠を石の上で叩き割るようになったんだ、{playerName}。今週だけで漁獲の半分が消えて、籠師のひとりはひと月使いものにならない手になった。十匹叩き割ってやりな。残りも、浅瀬にこもっていた理由を思い出すだろうさ。",
+        "completion": "わたしの道の甲羅が十減って、今朝は籠が満杯で上がってきた。籠師たちはあんたを吉兆だと呼んでいるよ、{playerName}。ウィックハーバーでは、それが精一杯の賛辞なのさ。",
         "objectives": {
           "0": {
-            "label": "Shoal Scuttler slain"
+            "label": "ショールスカトラーを倒した"
           }
         }
       },
       "q_gc_keeper_of_the_flame": {
-        "title": "The Keeper of the Flame",
-        "text": "Old Bram keeps the Beacon on the high head northeast of town, and he has not come down for his stores in two weeks. The lamp still burns, so he lives, but a man his age alone on that head in this wind, {playerName}. Climb the beacon road and see him standing.",
-        "completion": "Odile sent you all this way to see if the wind had taken me? Ha. Tell her the lamp burns and so do I. But since you have made the climb, {playerName}, stay a moment. The Beacon has work only a stranger seems fit to do.",
+        "title": "火を守る者",
+        "text": "ブラム爺さんは町の北東の高い岬でビーコンを守っているんだけどね、二週間、物資を取りに下りてきていない。灯りはまだ燃えているから生きてはいる。でもあの歳の男がひとり、この風の吹きすさぶ岬にいるんだよ、{playerName}。灯台の道を登って、立っている姿を見てきておくれ。",
+        "completion": "オディールはわざわざ、風がわたしをさらったかどうか確かめに人を寄越したのか？はっ。ランプは燃えている、わたしもだと伝えな。だがせっかく登ってきたのだ、{playerName}、少し居ていけ。このビーコンには、よそ者にしか頼めない仕事があるのでな。",
         "objectives": {
           "0": {
-            "label": "Find Keeper Bram"
+            "label": "灯台守ブラムを見つけた"
           }
         }
       },
       "q_gc_lanterns_on_the_shear": {
-        "title": "Lanterns on the Shear",
-        "text": "The Beacon is the great light, {playerName}, but it is the storm-lanterns that walk a night traveler down the cliff road above the Shear. Last night the gale doused every one of them, and that road in the dark is a long fall with a short ending. Take my striker and relight the four along the cliff.",
-        "completion": "Four points of light on the cliff road, right where they belong. From up here it looks like the coast has opened its eyes again. You have the makings of a keeper, {playerName}.",
+        "title": "シアーのランタン",
+        "text": "ビーコンは大いなる灯りだ、{playerName}。だが夜の旅人をザ・シアーの上の断崖の道で導き下ろすのは、嵐ランタンのほうだ。昨夜の強風がその全部を吹き消した。暗闇のあの道は、長い落下と短い結末だ。わたしの火打ちを持って、断崖沿いの四つに火を入れ直してこい。",
+        "completion": "断崖の道に四つの光が、あるべき場所に灯っている。ここから見ると、海岸がまた目を開いたようだ。お前には灯台守の素質があるぞ、{playerName}。",
         "objectives": {
           "0": {
-            "label": "Storm-lantern relit"
+            "label": "嵐ランタンを灯し直した"
           }
         }
       },
       "q_gc_wind_against_the_wick": {
-        "title": "Wind Against the Wick",
-        "text": "The gale wisps are the wind gone spiteful, {playerName}. They gather on the high downs by the Mirror Tarn, and every flame they find, they snuff, a lantern, a hearth, one day this lamp. Thirty-nine years I have kept the Beacon lit, and I will not lose it to weather with a grudge. Scatter eight of them.",
-        "completion": "The lamp did not so much as gutter last night, first time in a month. The wind still hates us, {playerName}, but it has gone back to hating us fairly.",
+        "title": "灯芯に逆らう風",
+        "text": "ゲイルウィスプは、性悪になった風だ、{playerName}。ミラーターンのそばの高い丘陵に集まって、見つけた炎を片端から吹き消していく。ランタンを、炉の火を、そしていつかは、このランプをな。三十九年、わたしはビーコンを灯し続けてきた。逆恨みした天気なんぞに、消させてたまるか。八体、散らしてこい。",
+        "completion": "昨夜、ランプは一度も揺らがなかった。ひと月ぶりのことだ。風は今もわたしらを憎んでいるがね、{playerName}、憎み方が公平に戻ったよ。",
         "objectives": {
           "0": {
-            "label": "Gale Wisp scattered"
+            "label": "ゲイルウィスプを散らした"
           }
         }
       },
       "q_gc_the_far_shore": {
-        "title": "The Far Shore",
-        "text": "From this lamp room I can see the whole coast, {playerName}, and what I see in the north I do not like. Green lights walking the Wreckfields at low tide, hull by hull. One woman works that shore alone: Edda, the salvager. Follow the cliff road north past the Shear until the wrecks begin, and see that she still draws breath.",
-        "completion": "Bram watches my shore from his tower now, does he? The old man is right to worry, {playerName}. The dead have been walking their own wrecks at night, and lately they have stopped caring whether the sun is up.",
+        "title": "遠い岸辺",
+        "text": "このランプ室からは海岸の全部が見える、{playerName}。そして北に見えるものが、わたしは気に入らん。引き潮どき、レックフィールズを緑の灯りが歩いている。船体から船体へとな。あの岸でひとりで働いている女がいる。エッダ、引き揚げ屋だ。断崖の道をザ・シアーの先まで北へたどって、難破船が始まるところまで行け。彼女がまだ息をしているか確かめてくれ。",
+        "completion": "ブラムは今じゃ塔からわたしの浜を見張ってるのかい？年寄りの心配は当たっているよ、{playerName}。死人どもは夜、自分の難破船を歩き回っていた。それが近ごろ、日が出ているかどうかも気にしなくなってきたんだ。",
         "objectives": {
           "0": {
-            "label": "Find Salvager Edda"
+            "label": "引き揚げ屋エッダを見つけた"
           }
         }
       },
       "q_gc_dead_mens_cargo": {
-        "title": "Dead Men's Cargo",
-        "text": "Salvage law is simple, {playerName}: what the sea gives the beach is mine. The drowned deckhands disagree. They rise from their hulls and drag every crate I stack back below the tideline. Put six of them down for good, and while the beach is quiet, haul in three flotsam crates before the tide files its counterclaim.",
-        "completion": "Six crews quieter and three crates high and dry. You salvage with a heavier hand than I do, {playerName}, but the ledger does not care. Half of this is yours by law, and by law I mean I say so.",
+        "title": "死者の積み荷",
+        "text": "引き揚げの掟は単純さ、{playerName}。海が浜に与えたものはわたしのもの。だが溺れた甲板員どもは、そうは思っちゃいない。船体から起き上がっては、わたしの積み上げた木箱をひとつ残らず潮線の下へ引きずり戻すんだ。六体、永遠に寝かしつけてやりな。そして浜が静かなうちに、漂着物の木箱を三つ引き揚げてくるんだよ。潮が対抗の申し立てを出す前にね。",
+        "completion": "六組の船員が静かになって、木箱が三つ、高くて乾いた場所にある。あんたはわたしより引き揚げの手が荒いがね、{playerName}、帳簿は気にしちゃいない。この半分はあんたのものさ、掟によればね。掟ってのは、わたしがそう言うことだけど。",
         "objectives": {
           "0": {
-            "label": "Drowned Deckhand laid to rest"
+            "label": "溺れた甲板員を眠らせた"
           },
           "1": {
-            "label": "Flotsam Crate salvaged"
+            "label": "漂着物の木箱を引き揚げた"
           }
         }
       },
       "q_gc_the_wreck_warden": {
-        "title": "The Wreck Warden",
-        "text": "Now you know why the deckhands rise, {playerName}. Something wears the barnacled plate of the first wreck ever to break on this shore, and it wardens every hull on the beach like a graveyard it was hired to keep. It holds a hoard I have coveted for ten years and a crew I would rather see resting. End the Wreck Warden. Bring a friend, the dead keep good watch.",
-        "completion": "The beach went silent the moment it fell, {playerName}. First silence I have heard on this shore in ten years of working it. The crews are just bones now, resting bones. Take the mantle off the top of the hoard, it was always going to fit a living back better.",
+        "title": "レックウォーデン",
+        "text": "これで甲板員どもが起き上がるわけが分かったろう、{playerName}。この岸で最初に砕けた難破船のフジツボだらけの甲冑を、何かが着ている。そして雇われた墓守みたいに、浜のすべての船体を見張っているのさ。奴は、わたしが十年欲しがってきた財宝と、わたしが安らがせてやりたい船員たちを抱え込んでいる。レックウォーデンを終わらせな。友を連れて行くんだよ。死人ってのは、見張りが上手いからね。",
+        "completion": "奴が倒れた瞬間、浜が静まり返った、{playerName}。この岸で働いて十年、初めて聞く静けさだった。船員たちはもうただの骨だ。休んでいる骨だよ。ほら、山のてっぺんのマントをお取り。もともと、生きた背中にこそ似合うものだったのさ。",
         "objectives": {
           "0": {
-            "label": "The Wreck Warden felled"
+            "label": "レックウォーデンを打ち倒した"
           }
         }
       },

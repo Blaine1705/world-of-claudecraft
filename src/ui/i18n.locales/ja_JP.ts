@@ -4391,6 +4391,570 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_scourges_end.completion':
     'これで王冠はついに沈黙しました。ソーンピークはなお死者を抱えるでしょうが、山の下の王が彼らを再び戦へ呼ぶことはありません。あなたは、アルドレン、マルリック、そしてヴォスが封じることしかできなかったものを終わらせました。',
   'entities.quests.q_nythraxis_scourges_end.objectives.0.label': 'ニスラクシスを撃破',
+  'entities.quests.q_af_amber_from_the_herd.title': '群れから採る琥珀',
+  'entities.quests.q_af_amber_from_the_herd.text':
+    '黄金の牡鹿たちは、うちで一番古い木々の下で眠る。夜通し、樹液が金色にしたたって、その毛皮に染み込むのよ。梳き取った樹液の塊は、この森里で一番純度の高い琥珀になる。六つ持ってきておくれ、{playerName}。牡鹿たちは感謝はしないだろうけれど、惜しがりもしないわ。',
+  'entities.quests.q_af_amber_from_the_herd.completion':
+    '六つの塊、注いだ蜂蜜のように澄んでいる。この手袋は前の採り分で仕立てたものよ、{playerName}。樹液で固めてあって、見た目より温かいの。',
+  'entities.quests.q_af_amber_from_the_herd.objectives.0.label': '金色の樹液の塊',
+  'entities.quests.q_af_foxes_in_the_lamplight.title': '灯火のなかの狐',
+  'entities.quests.q_af_foxes_in_the_lamplight.text':
+    'グロームフォックスどもは、ランタン用の蓄えの値打ちを覚えてしまったんだ、{playerName}。夕暮れのたびに柵を抜けて、渡し船のランプ用に搾った獣脂を持ち去っていく。足音は柔らかく、良心はもっと柔らかい。十匹狩れば、残りも町を恐れることを思い出すだろう。',
+  'entities.quests.q_af_foxes_in_the_lamplight.completion':
+    '十匹。そして昨夜、今の季節に入って初めて蓄えが無事だった。点灯夫たちが礼を言っていたよ、{playerName}。',
+  'entities.quests.q_af_foxes_in_the_lamplight.objectives.0.label': 'グロームフォックスを倒した',
+  'entities.quests.q_af_goldmelt_road.title': '金の道を下って',
+  'entities.quests.q_af_goldmelt_road.text':
+    'ゴールドメルトを越えて来たのだね、{playerName}、靴にまだ雪を残して。わたしがこの祠を守っているのは、寒さの中から誰が歩いて来るかをランタンミアに知らせるためだ。だが近ごろは、知らせることがほとんどなくてね。金の道を下って町へ行き、井戸のそばにいる代官オトリーヌを見つけて、峠は静かだと伝えておくれ。',
+  'entities.quests.q_af_goldmelt_road.completion':
+    'ゴールドメルトは静か、そしてそれを証す、髪に雪を残した旅人がひとり。ソレルの見張りは確かだから、無駄な知らせは寄越さない。ようこそランタンミアへ、{playerName}。ランタンはあなたのために灯っているわ。',
+  'entities.quests.q_af_goldmelt_road.objectives.0.label': '代官オトリーヌに報告した',
+  'entities.quests.q_af_lanterns_on_the_water.title': '水の上のランタン',
+  'entities.quests.q_af_lanterns_on_the_water.text':
+    '大いなる湖を渡る船はどれも船尾にランタンを提げている、{playerName}。それが今朝、うちの三艘がランタンなしで戻ってきた。霧が持っていったのか、霧の中の何かが、だ。風向きが変われば東の岸に打ち上げられる。岸辺の道を歩いて、うちのランタンを取り戻してきておくれ。',
+  'entities.quests.q_af_lanterns_on_the_water.completion':
+    '三つとも、まだ燃えている。渡し船のランタンは水の中でも消えないのだ、{playerName}。そのために作られているのだからな。気にかかるのは、何がこれを引きちぎったのか、ということだ。',
+  'entities.quests.q_af_lanterns_on_the_water.objectives.0.label': '渡し船のランタンを回収した',
+  'entities.quests.q_af_orchard_call.title': '果樹園の荷車',
+  'entities.quests.q_af_orchard_call.text':
+    '果樹園主ポメリーヌは西の道沿いで黄金の果樹園を営んでいるのだけれど、彼女の樹液の荷車が三日も遅れているの。この町はあの琥珀色の樹液で回っているのよ、{playerName}。ランプの樹脂も、甘味も、収穫祭のエールもね。西の道を歩いて、何が彼女を引き留めているのか確かめてきて。',
+  'entities.quests.q_af_orchard_call.completion':
+    '代官が荷車の数を数えている、って？なら、もうしばらく足りないまま数えていてもらいましょう。わたしの並木を見てごらんなさい、{playerName}。配達の遅れどころの騒ぎではないのよ。',
+  'entities.quests.q_af_orchard_call.objectives.0.label': '果樹園主ポメリーヌを見つけた',
+  'entities.quests.q_af_sprites_and_spigots.title': 'スプライトと樹液栓',
+  'entities.quests.q_af_sprites_and_spigots.text':
+    'ハーベストスプライトよ、{playerName}。あの小さな盗人たちは、中の甘みほしさに樹液栓を幹からこじり取って、バケツを草むらに放り投げていくの。八匹追い払って、バケツを四つ取り戻してきて。そうすれば荷車はまた走り出せるわ。',
+  'entities.quests.q_af_sprites_and_spigots.completion':
+    'バケツ四つが掛け釘に戻って、並木も静かになった。あなたはわたしよりスプライトへの手が重いようだけれど、{playerName}、今日ばかりはそれがありがたいわ。',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'ハーベストスプライトを追い払った',
+  'entities.quests.q_af_sprites_and_spigots.objectives.1.label': '樹液採りのバケツを回収した',
+  'entities.quests.q_af_the_meredark.title': 'ミアダーク',
+  'entities.quests.q_af_the_meredark.text':
+    '年寄りの渡し守たちには、岸の上でしか口にしない名前がある。ミアダーク。最初の潜み手、湖と同じだけ古く、その倍も辛抱強いものだ。一度だけ浮かび上がったことがある。沈んだ桟橋が水に呑まれた年だ。そして今、また浮かび上がろうとしている。夕暮れどき、南岸の沖の桟橋の残骸で日を浴びているのだ、{playerName}。友をひとり、いや、ふたり連れて行け。まだ終わらせられるうちに、終わらせるのだ。',
+  'entities.quests.q_af_the_meredark.completion':
+    '今朝、大いなる湖から霧が晴れた、{playerName}。町じゅうがそれを見たよ。渡し船はまた夜の航路を走る。水の上のランタンはひとつ残らず、あなたの名のために灯るだろう。これを受け取っておくれ。沈んだ桟橋から引き揚げられたものだ。これを身にまとう資格が、あなた以上にある者はいない。',
+  'entities.quests.q_af_the_meredark.objectives.0.label': 'ミアダークを倒した',
+  'entities.quests.q_af_what_took_the_moorings.title': '舫いを奪ったもの',
+  'entities.quests.q_af_what_took_the_moorings.text':
+    'さて、町の連中の前では言わなかったことを話そう。舫い綱は解けたのではない、噛み切られていたのだ。湖の潜み手ども、夜ごとに大胆になって、綱や舵に食らいついてくる。八匹、水の底へ永遠に沈めてきてくれ、{playerName}。渡し守が道連れにされる前にな。',
+  'entities.quests.q_af_what_took_the_moorings.completion':
+    '浅瀬の影が八つ減って、今日は二週間ぶりに渡しが定刻どおりに走った。だが大胆になった潜み手は、追い立てられた潜み手だ、{playerName}。湖の下の何かが、奴らを動かしている。',
+  'entities.quests.q_af_what_took_the_moorings.objectives.0.label': '湖の潜み手を倒した',
+  'entities.quests.q_dk_ash_on_the_wind.title': '風に乗る灰',
+  'entities.quests.q_dk_ash_on_the_wind.text':
+    '柵の上から南を見ろ、{playerName}。砂丘に見えるあの火はトロールの炊事の火ではない。アッシュボーンの召集の火だ。しかも夜ごとに増えている。死者どもが、歯に砂を残したまま骨野から這い上がってくるのだ。奴らがわたしの門への道を切り開く前に、略奪者を十体斬り伏せよ。',
+  'entities.quests.q_dk_ash_on_the_wind.completion':
+    '砂丘の刃が十本減り、昨夜は召集の火も弱まった。歩哨たちが眠れたのだ。この一週間なかったことだ。見事な太刀筋だった、{playerName}。',
+  'entities.quests.q_dk_ash_on_the_wind.objectives.0.label': 'アッシュボーンの略奪者を倒した',
+  'entities.quests.q_dk_banners_over_the_dunes.title': '砂丘に立つ旗',
+  'entities.quests.q_dk_banners_over_the_dunes.text':
+    'アッシュボーンは古い骨野の墓場で召集をかけている、{playerName}。だが、わたしの偵察隊は壁を読むようには砂丘を読めん。奴らの戦呼びを五体殺せ。死者を叫び声で立ち上がらせる連中だ。そして各召集地に警告旗を立てておけ。尾根からわが歩哨が見て取れるようにな。',
+  'entities.quests.q_dk_banners_over_the_dunes.completion':
+    '熱風にはためく三本の旗。わたしの遠眼鏡がちょうど捉えられる場所だ。戦呼びが五体黙れば、奴らの呼び声に応えるものが何であれ、来るのは遅くなる。時間を稼いでくれたな、{playerName}。',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.0.label':
+    'アッシュボーンの戦呼びを倒した',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.1.label': '警告旗を立てた',
+  'entities.quests.q_dk_marrow_and_ash.title': '髄と灰',
+  'entities.quests.q_dk_marrow_and_ash.text':
+    'アッシュボーンの略奪者は皆、戦の焼印を持っている、{playerName}。自分の属する軍団を示す、焦げた刻み札だ。この尾根から数えた限りでは軍団は四つ。だが推測は諜報ではない。略奪者と戦呼びから焼印を六つ取ってこい。そうすればブラノックに、来たるべき戦の輪郭を渡してやれる。',
+  'entities.quests.q_dk_marrow_and_ash.completion':
+    '焼印が六つ、そのすべてに同じ印がひとつ焼き付けられている。これは略奪の召集などではないぞ、{playerName}。砂丘のすべての軍団は、この下の戦門に従っている。トロールどもはオルカディアと呼ぶ。あの扉の奥で轟くものを、わたしが共に仕えたどんな五人の兵でも破れはすまい。だが、お前のような五人なら、あるいは。',
+  'entities.quests.q_dk_marrow_and_ash.objectives.0.label': 'アッシュボーンの戦の焼印',
+  'entities.quests.q_dk_matriarch_of_the_maw.title': '火口の母竜',
+  'entities.quests.q_dk_matriarch_of_the_maw.text':
+    '鱗は真実を告げていたよ、{playerName}。夜明けに縁を登って、火口の底に彼女を見た。シンドラレス。この空のエンバーウィングすべてが、その下で孵った母竜だ。今にも燃え上がりそうな炭のような金色だった。彼女が抱卵している間、ドレイクどもは大胆になっていく。そしてワームウォッチは、ドラゴンとアッシュボーンの両方とは戦えない。火口で彼女を討ち果たし、それから門長ブラノックに知らせを運べ。決してひとりで行くな。',
+  'entities.quests.q_dk_matriarch_of_the_maw.completion':
+    'ドレイクモウの空が二日間空っぽだった。そこへお前が、母竜の血を靴につけてわたしの門をくぐって来るとはな。ワームウォッチは四十年、まさにこの時のために見張りに立ってきたのだ、{playerName}。この肩当てを受け取れ。モウスケイル、うちの鍛冶が鍛えたものだ。ドレイクどもに見えるところで着けておけ。',
+  'entities.quests.q_dk_matriarch_of_the_maw.objectives.0.label': 'シンドラレスを倒した',
+  'entities.quests.q_dk_scales_of_the_maw.title': '火口の鱗',
+  'entities.quests.q_dk_scales_of_the_maw.text':
+    'ドレイクモウから風向きが変わると、エンバーウィング・ドレイクどもがそれに乗って、歯の数が数えられるほど低くわたしの野営の上を飛ぶ、{playerName}。奴らの行動範囲は日に日に広がっている。あの火口の何かが奴らを駆り立てているのだ。鱗を三枚持ってこい。鱗は熱を覚えている。焦げ方を見れば、ドレイクがどこをねぐらにしてきたか読み取れるのだ。',
+  'entities.quests.q_dk_scales_of_the_maw.completion':
+    'この一枚の裏を見ろ、{playerName}。渦巻き状に焦げている。輪を描いて巣ごもるものはひとつしかいない。このドレイクどもは巣の護衛だ。ドレイクモウの何かが、母親なのだ。',
+  'entities.quests.q_dk_scales_of_the_maw.objectives.0.label': 'エンバーウィングの鱗',
+  'entities.quests.q_dk_scorched_stores.title': '焦げた物資',
+  'entities.quests.q_dk_scorched_stores.text':
+    '最後の荷馬車は燃えた、{playerName}。だが鉄帯の木箱は燃え抜けん。四つ、まだ砂丘街道沿いに焦げたまま転がっていて、中にはひと季節分の塩と釘と弓弦が入っている。トロールどもが開け方を思いつく前に、うちの物資を持ち帰ってくれ。',
+  'entities.quests.q_dk_scorched_stores.completion':
+    '真っ黒に焦げて、それでも留め金はどれも保っている。鍛冶は釘を、矢作りは弦を手に入れた。そしてお前は、木箱を取り戻してくれた者のために取っておいたこのブーツを受け取れ、{playerName}。',
+  'entities.quests.q_dk_scorched_stores.objectives.0.label': '焦げた補給箱を回収した',
+  'entities.quests.q_dk_trolls_on_the_road.title': '街道のトロール',
+  'entities.quests.q_dk_trolls_on_the_road.text':
+    'デューントロールどもは補給馬車の音を覚えてしまった、{playerName}。今月だけでシンダー砂丘の街道を三度襲われ、最後の御者は手綱だけを抱えて歩いて帰ってきた。あの街道からトロールを八体除けば、荷馬車はまた走れる。',
+  'entities.quests.q_dk_trolls_on_the_road.completion':
+    '八体。うちの御者たちは、走るたびに別れの手紙を書くのをやめたよ。駐屯地が食えているのはお前のおかげだ、{playerName}。',
+  'entities.quests.q_dk_trolls_on_the_road.objectives.0.label': 'デューントロールを倒した',
+  'entities.quests.q_dk_watcher_at_the_wargate.title': '戦門の見張り',
+  'entities.quests.q_dk_watcher_at_the_wargate.text':
+    '何かがアッシュボーンを東へ引き寄せている、{playerName}。それを探らせるために、最も腕の立つ者を送った。斥候イェリンだ。トロールムートの先の遠い砂丘で、わたしの生きているうちには誰も建てなかったはずの門を望みながら、ひと月も野営している。その報告が十日前に途絶えた。彼女の野営地を見つけ、その眼が見たものを持ち帰れ。',
+  'entities.quests.q_dk_watcher_at_the_wargate.completion':
+    'ブラノックの遣いか？なら、わたしの最後の伝令は届かなかったのだな。声を落として座れ、{playerName}。下のあの門が見えるか？その前に立つ戦旗の数を数えてみろ。わたしが記録を取るのをやめた理由が分かるだろう。',
+  'entities.quests.q_dk_watcher_at_the_wargate.objectives.0.label': '斥候イェリンを見つけた',
+  'entities.quests.q_eg_bloom_clippings.title': '生ける緑の切り枝',
+  'entities.quests.q_eg_bloom_clippings.text':
+    'この庭を理解したいのかい？なら、わたしと同じやり方で庭を読むことだ。芝生で草を食むあの牡鹿たちには、最も真なる緑が茂る。彼らの葉の一枚一枚が、書物の頁なのだよ。トピアリーの雄鹿から、摘みたての切り枝を六本持っておいで、{playerName}。剪定を感謝はされないだろうが、また生えてくる。ここでは、すべてがまた生えてくるのだ。',
+  'entities.quests.q_eg_bloom_clippings.completion':
+    'ごらん。葉がどれも内へ内へと丸まっている。切り枝のすべてが同じだ。庭が怯えているのだよ、{playerName}。百年生きてきて、庭が怯えるのを見たことなど一度もなかった。',
+  'entities.quests.q_eg_bloom_clippings.objectives.0.label': '剪定した花の切り枝',
+  'entities.quests.q_eg_bull_of_the_court.title': '噴水の中庭の雄牛',
+  'entities.quests.q_eg_bull_of_the_court.text':
+    'さあ、本当のことを話そう、{playerName}。迷路の中心にいる雄牛は、わたしの最高傑作だった。噴水の中庭を守るように仕立て、百年のあいだ彼は守り続けた。だが緑に走った恐れが、彼にまで届いてしまった。今の彼は何も守っていない、狩っているのだ。迷路は迷い込む者を彼の餌にしている。わたしはもう年老いて、彼をほどくことができない。そしてこれは、根も枝も残さぬほどきでなければならない。友を連れ、迷路を抜けて中庭まで歩き、わたしの雄牛を切り倒しておくれ。',
+  'entities.quests.q_eg_bull_of_the_court.completion':
+    '彼がほどけた瞬間、ここに、胸に感じたよ。百年の仕事だった。それでも、終わらせたお前が正しい。このマントを受け取っておくれ。わたしの最高傑作より強い者のために裁っておいたものだ。今夜、中庭はただの噴水で、{playerName}、庭はただの庭だ。これでようやく、庭園長もわたしも眠れるかもしれないね。',
+  'entities.quests.q_eg_bull_of_the_court.objectives.0.label': 'トピアリーの雄牛をほどいた',
+  'entities.quests.q_eg_four_statues.title': '四人の静かな姉妹',
+  'entities.quests.q_eg_four_statues.text':
+    '庭が若かったころ、最初の庭師たちは庭の四つの区画を見守らせるため、大理石の姉妹を四人立てた。ひとりは野バラの茂みの上に、ひとりは迷路の東の池の遊歩道に、ひとりはノームが巣穴を構える西の芝生に、ひとりは生け垣の先の南の芝生に。迷路は姉妹たちの間に育ってしまって、四人すべてを見る者はほとんどいない。区画を巡って、{playerName}、それぞれの姉妹に手のひらを当てておいで。庭が四方からお前を眺め終えたら、よそ者には閉ざしている場所を開いてくれるだろう。',
+  'entities.quests.q_eg_four_statues.completion':
+    '四枚の拓本、四人の姉妹、そして大理石の涙を流した者はひとりもいない。庭はお前の器を測り終えた、{playerName}。そして、足りないとは見なさなかった。これでようやく、本当の厄介ごとが棲む場所へお前を送れる。',
+  'entities.quests.q_eg_four_statues.objectives.0.label': '庭の彫像を訪れた',
+  'entities.quests.q_eg_gate_report.title': '門ごしの言伝',
+  'entities.quests.q_eg_gate_report.text':
+    'この門の先の芝生は百年間ひとりでに刈り込まれてきた、{playerName}。そして近ごろは、訪問者まで刈り込み始めている。庭園長アマランスがヘッジウィックで帳簿を預かっている。門前の芝生を過ぎて道を上った先だ。また旅人がひとり通ったと伝えてくれ。それと、昨夜、門のそばの生け垣が動いたこともな。',
+  'entities.quests.q_eg_gate_report.completion':
+    '動いた、ときたか。ペルは毎週それを報告してきて、毎週正しいのだよ。この目を許しておくれ、{playerName}、もう何年もひと晩通して眠れていなくてね。庭がわたしたちを見張るのを、誰かが見張っていなければならないから。ようこそヘッジウィックへ。',
+  'entities.quests.q_eg_gate_report.objectives.0.label': '庭園長アマランスに報告した',
+  'entities.quests.q_eg_gnomes_in_the_green.title': '庭番の遺恨',
+  'entities.quests.q_eg_gnomes_in_the_green.text':
+    '鋏は始まりに過ぎなかったのだよ、{playerName}。昨夜、ノームどもはうちの道具車を緑の中へひっくり返した。一台は迷路の西の奴らの巣穴のそば、一台は庭を挟んだ反対側の池の遊歩道。百年ものの良い鉄物が草に撒き散らされた。小悪魔どもを八匹追い払って、ひっくり返った道具車を引きずり戻しておくれ。',
+  'entities.quests.q_eg_gnomes_in_the_green.completion':
+    '車が三台戻って、掛け釘もまた満杯だ。小悪魔どもは生け垣の中でふてくされていればいい。ヘッジウィックだって、この芝生を手入れしているのだからね。',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.0.label': '生け垣ノームを追い払った',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.1.label': '道具車を回収した',
+  'entities.quests.q_eg_hungry_shapes.title': '飢えに刈り込まれて',
+  'entities.quests.q_eg_hungry_shapes.text':
+    'この庭を形づくる何者かは、不注意になったか、それとも残酷になったか。野バラの茂みの狼の像は見世物として刈られたものなのに、近ごろは狩りをしている。緑の顎、腹はなく、止まる理由も永遠にない。トピアリーの狼を十体切り倒して、{playerName}、しばらくの間、芝生をただの芝生に戻しておくれ。',
+  'entities.quests.q_eg_hungry_shapes.completion':
+    '十の狼が立っていた場所に、十の刈り屑の山。庭仕事のはずなのだよ、{playerName}。なのになぜ、戦のように感じるのだろうね。',
+  'entities.quests.q_eg_hungry_shapes.objectives.0.label': 'トピアリーの狼を倒した',
+  'entities.quests.q_eg_stolen_shears.title': '盗まれた鋏',
+  'entities.quests.q_eg_stolen_shears.text':
+    'この二週間で、ヘッジウィックじゅうの剪定ばさみが歩いて消えたんだよ、{playerName}。掛け釘から、鍵のかかった物置から、一丁はうたた寝している間にわたしの前掛けの中からね。生け垣ノームの仕業さ。わたしたちが奴らの芝生を歩くのを憎んでいる、小さな庭番たちだよ。村じゅうが台所のナイフで枝を切る羽目になる前に、六丁取り戻しておくれ。',
+  'entities.quests.q_eg_stolen_shears.completion':
+    '六丁、しかもわたしのも交じっている。刃のこの欠けなら、どこで見ても分かるさ。ほら、この手袋は剪定仕事のために編まれたものだ。手が温かければ、鋏も揺るがないからね。',
+  'entities.quests.q_eg_stolen_shears.objectives.0.label': '盗まれたヘッジウィックの剪定ばさみ',
+  'entities.quests.q_eg_who_trims_the_hedges.title': '生け垣を刈るのは誰',
+  'entities.quests.q_eg_who_trims_the_hedges.text':
+    '三十年帳簿をつけてきて、そのうち十年はろくに眠れていない。勘定が合わないからだよ、{playerName}。草は刈られたがり、生け垣は形を整えられたがる。なのにここでは誰もどちらもしていないのに、毎朝、庭は刈り整えられて立っている。近ごろ森の民が、迷路の先、睡蓮の泉水のそばの南の外れの芝生で、手押し車を押す老人を見たと言い張るのだ。彼を見つけておくれ。実在するなら、わたしはやっと眠れる。実在しないなら、きっと一生眠れないままなのだろうね。',
+  'entities.quests.q_eg_who_trims_the_hedges.completion':
+    'ようやく館が人を寄越したか。百年この芝生を歩いてきたがね、{playerName}、庭とわたしの間には了解があるのだ。刈られたがるものを、わたしが刈る。お座り。生け垣くらい、一時間ならお前に割いてくれるさ。',
+  'entities.quests.q_eg_who_trims_the_hedges.objectives.0.label':
+    '睡蓮の泉水のそばの庭師を見つけた',
+  'entities.quests.q_fs_bell_at_the_landing.title': '船着き場の鐘',
+  'entities.quests.q_fs_bell_at_the_landing.text':
+    '砂州道を渡って来たのか、{playerName}？なら、この一週間で最初のひとりだ。守将がお前を検分したがるだろう。カモメ港は岸辺の道を上った先、誰も手入れしなくなった魚干し棚を過ぎたところにある。守将コールファストに伝えてくれ。堤道はまだ立っている、そしてタムは今日はまだ三打ちを鳴らしていない、とな。今のところは、だが。',
+  'entities.quests.q_fs_bell_at_the_landing.completion':
+    '堤道は保ち、タムにはまだ三打ちを冗談にする息が残っている。良し。我らは包囲された島なのだ、{playerName}。あの砂州を渡ってくる一組の手は、裂け目どもが我が民に届く前に突破せねばならん一組の手でもある。ようこそ、カモメ港へ。',
+  'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': '守将コールファストに報告した',
+  'entities.quests.q_fs_bram_come_home.title': 'ブラムを家へ',
+  'entities.quests.q_fs_bram_come_home.text':
+    'うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は北の岸で難破している。彼を家まで連れて帰っておくれ。',
+  'entities.quests.q_fs_bram_come_home.completion':
+    'ブラム！五体満足で連れ帰ってくれたんだね、{playerName}。ふたりして泣いたけど、どちらも恥じてなんかいないよ。裂け目どもが次にこの島から何を奪おうと、うちの家族だけは渡さない。もう二度と。',
+  'entities.quests.q_fs_bram_come_home.objectives.0.label': '漁師ブラムをカモメ港まで送り届けた',
+  'entities.quests.q_fs_hold_the_riftfields.title': '裂け目野を守れ',
+  'entities.quests.q_fs_hold_the_riftfields.text':
+    '町の東では穀物の列が荒れ果て、裂け目野の裂け目から来た成れの果てどもが、今やそれを食い荒らしている。立ち入ることもできない畑を、我が民は耕せぬのだ、{playerName}。成れの果てを十体間引いて、農夫たちに大地を返してやれ。',
+  'entities.quests.q_fs_hold_the_riftfields.completion':
+    '十体減った。畑の働き手たちはもう、誰が最初に出るかで言い合いを始めている。長くは続くまい、裂け目どもは長くは休まん。だが、食える町は保つ町だ。',
+  'entities.quests.q_fs_hold_the_riftfields.objectives.0.label': '破れの成れの果てを倒した',
+  'entities.quests.q_fs_moss_and_mending.title': '苔と手当て',
+  'entities.quests.q_fs_moss_and_mending.text':
+    '潮線に沿って生える塩苔は、わたしの知る限り最良の傷詰めだ。そして裂け目の落とし子どもが、苔の生える岸辺という岸辺を占領してしまった。あろうことか、奴らの皮には苔の房が引っかかっている。東の岸から六体払って、{playerName}、奴らが踏み荒らした中から良い苔を四掴み集めてきてくれ。',
+  'entities.quests.q_fs_moss_and_mending.completion':
+    '片手に苔、もう片手に静かになった海岸線か。わたしの診療所を丸ごと補充してくれたな、{playerName}。頼むから、次の患者にはならないでくれよ。',
+  'entities.quests.q_fs_moss_and_mending.objectives.0.label': '裂け目の落とし子を倒した',
+  'entities.quests.q_fs_moss_and_mending.objectives.1.label': '遠つ岸の塩苔',
+  'entities.quests.q_fs_song_before_the_break.title': '裂け目の前の歌',
+  'entities.quests.q_fs_song_before_the_break.text':
+    '裂け目が開く前にそれを聞き取る男がいる。裂け目監視のオルン。学者か、狂人か。近ごろの私には、その違いを気にかける余裕もない。町の南東、道を上った見張りの草原で見張りを続けている。彼を見つけて、{playerName}、この島が次に我らへ何を仕掛けるつもりか聞いてこい。',
+  'entities.quests.q_fs_song_before_the_break.completion':
+    '守将の遣いか？良い。町がようやく耳を貸し始めたということだ。さあ、少し静かに、{playerName}。ほら、風の下に、聞こえるか？断崖が歌っている。そして私は、この旋律が好かん。',
+  'entities.quests.q_fs_song_before_the_break.objectives.0.label': '裂け目監視のオルンを見つけた',
+  'entities.quests.q_fs_stalkers_off_the_light.title': '灯りを狙うもの',
+  'entities.quests.q_fs_stalkers_off_the_light.text':
+    '忍び寄りどもは篝火と篝火の間の闇を狩り場にして、夜ごと、わたしの草原へ輪を狭めてくる。奴らは無心ではないぞ、{playerName}。辛抱強いのだ。そして辛抱こそ、わたしが競り負ける唯一のものでな。八体仕留めて、闇を奴らが抜けてきた断崖まで押し返してくれ。',
+  'entities.quests.q_fs_stalkers_off_the_light.completion':
+    '八夜続いた旋回が、一夜で終わった。篝火はもう安定して燃えている。いや、震えていないのは私の手のほうか。どちらにせよ草原はまた私のものだ。島の考えごとが、また聞こえる。',
+  'entities.quests.q_fs_stalkers_off_the_light.objectives.0.label': '虚無の忍び寄りを倒した',
+  'entities.quests.q_fs_steel_for_the_redoubt.title': '堡塁のための鋼',
+  'entities.quests.q_fs_steel_for_the_redoubt.text':
+    'わたしが配る刃はどれも、海が返してくれたものか、死者からもぎ取ったものだ、{playerName}。成れの果てどもは裂け目の向こうから金屑を運んでくる。蝶番、鉤、折れた剣の鋼。カササギの集め物さ。だが、打ち直せばまっすぐに伸びる。奴らの漁った鋼を六片持ってきな。そうすれば防柵の列に、また牙が戻る。',
+  'entities.quests.q_fs_steel_for_the_redoubt.completion':
+    '塩に食われ、裂け目の傷を負って、それでも刃は立つ。ほら、この握りはわたしが自分で裏張りしたものだ。鋼には鋼を、{playerName}。近ごろの遠つ岸で通じる商いは、それだけさ。',
+  'entities.quests.q_fs_steel_for_the_redoubt.objectives.0.label': '裂け目傷の鋼',
+  'entities.quests.q_fs_the_great_break.title': '大いなる裂け目',
+  'entities.quests.q_fs_the_great_break.text':
+    'この島が歌うどの歌も、同じ低い音で終わる。その音は引き裂かれた断崖から来ているのだ。あそこの大いなる裂け目を抜けて、何かが渡ってきた、{playerName}。断崖そのものがひび割れて招き入れた何かが。そして、それはまだ育っている。あれが北へ歩けば、どんな鐘も間に合わん。友をひとり、ふたり連れて、終わらせてくれ。それからコールファストに伝えるのだ。旋律が変わった、と。',
+  'entities.quests.q_fs_the_great_break.completion':
+    'オルンから先触れが届いた。歌がやんだ、とな。町じゅうがその静けさを聞いたのだ、{playerName}。何も聞こえないという音に、半分が泣いた。このマントをまとえ。遠つ岸は、己の岸を守った者を忘れはせん。',
+  'entities.quests.q_fs_the_great_break.objectives.0.label': '引き裂かれし恐怖を倒した',
+  'entities.quests.q_fs_the_three_bells.title': '三つの鐘',
+  'entities.quests.q_fs_the_three_bells.text':
+    'わたしの鐘のほかに、三つの警鐘が海岸に立っている。ひとつは船着き場の岬、ひとつは南の浜、ひとつは裂け目野の岸辺だ。綱が朽ちていたり、鐘の舌が持ち去られていたりすれば、町が裂け目を知るのは、それが通りまで来てからになる。海岸を歩いて、{playerName}、それぞれの鐘を一度ずつ鳴らしてきてくれ。まだ声が出るかどうか、確かめておきたいのだ。',
+  'entities.quests.q_fs_the_three_bells.completion':
+    '三つの声、三つの応え、水の上を澄んで渡ってきた。今夜はカモメ港で眠るといい、{playerName}。もし鐘に起こされることがあれば、それはわたしの手で、しかも間に合ううちに鳴らされたものだと知っておけ。',
+  'entities.quests.q_fs_the_three_bells.objectives.0.label': '警鐘を鳴らした',
+  'entities.quests.q_fv_aurora_motes.title': 'オーロラの光粒',
+  'entities.quests.q_fv_aurora_motes.text':
+    'この階段を漂うウィスプたちは、光そのものから零れ落ちたもの。その心にはひと粒ずつ、オーロラの光粒を宿している。空が何を書いているのか読むには、六粒が要るのだよ、{playerName}。ウィスプは抗いはしない。それで仕事が楽になるのか重くなるのかは、お前の良心との相談だね。',
+  'entities.quests.q_fv_aurora_motes.completion':
+    '六粒、まだ輝いている。ごらん、{playerName}。互いに拍を合わせて明滅している。あの光は天候などではない。合図なのだよ。',
+  'entities.quests.q_fv_aurora_motes.objectives.0.label': 'オーロラの光粒',
+  'entities.quests.q_fv_ember_caches.title': '湖への道の熾火',
+  'entities.quests.q_fv_ember_caches.text':
+    '昨夜、熾火の壺を積んだ橇が湖への道でひっくり返ってね。あれは埋み火をひと月生かしておける鉄の釜なんだ。三つ、まだ雪の中に転がっている、{playerName}。あの中身は、この宿には欠かせないものでね。火を家へ連れて帰っておくれ。',
+  'entities.quests.q_fv_ember_caches.completion':
+    'どれもまだ温かい。この宿に、冬まるごとの慈悲を買ってくれたね、{playerName}。',
+  'entities.quests.q_fv_ember_caches.objectives.0.label': '熾火の壺を回収した',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'フロストメインの暴君',
+  'entities.quests.q_fv_frostmane_tyrant.text':
+    'ハウラーどもが段丘を下ってきたのは、狩りのためではなかった。逃げていたのだ。イエティが高地を我が物にした。山の民はフロストメインと呼ぶ。群れでさえ、あれと斜面を分かち合おうとはせん。終わらせねばならんのだ、{playerName}、冬があれをわたしの壁まで追い下ろす前に。友を連れて行け。ふたり連れて行け。',
+  'entities.quests.q_fv_frostmane_tyrant.completion':
+    '昨夜、風がやんだとき、フロストメインがいたはずの場所の静けさを、村じゅうが聞いた。この果ての地は、返すのに何年もかかる借りをお前に負ったのだ、{playerName}。これをまとえ。アイスマントルの扉という扉が、お前に開かれる。',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'フロストメインを倒した',
+  'entities.quests.q_fv_howl_above.title': '段丘の咆哮',
+  'entities.quests.q_fv_howl_above.text':
+    '夕暮れに聞こえるだろう、{playerName}。咆哮のテラスから響く、スノードリフトの群れのものではない遠吠えが。もっと大きな喉だ。テラスハウラーどもが、祖母がこの持ち場を守っていた時代以来はじめて峰から下りてきた。狼どもをわたしの道へ押し出したのは奴らなのだ。八体狩って、押し返せ。',
+  'entities.quests.q_fv_howl_above.completion':
+    '八体。おかげで夕暮れの合唱がいくらか薄くなった。だがハウラーが理由もなく峰を離れることはない。上の何かが奴らを動かした。そしてそれには、名前がある気がしてならないのだ。',
+  'entities.quests.q_fv_howl_above.objectives.0.label': 'テラスハウラーを倒した',
+  'entities.quests.q_fv_lights_over_steps.title': '階段の上の光',
+  'entities.quests.q_fv_lights_over_steps.text':
+    'オーロラが今月は毎晩緑に燃えていて、年寄りたちはその下を歩こうとせん。理由を知っていそうな者がひとりだけいる。ヴェイラ、オーロラ読みだ。氷河の湖を過ぎた南東、オーロラの階段にひとりで野営している。彼女の野営地を見つけて、{playerName}、光が彼女に何を告げたのか聞いてくるのだ。',
+  'entities.quests.q_fv_lights_over_steps.completion':
+    'カルドラの遣いかい？なら、彼女もようやく案じ始めたのだね。それが正しい。お座り、{playerName}。しばらく、わたしと空を眺めておいき。',
+  'entities.quests.q_fv_lights_over_steps.objectives.0.label': 'オーロラ読みヴェイラを見つけた',
+  'entities.quests.q_fv_rime_unbound.title': '解き放たれた霧氷',
+  'entities.quests.q_fv_rime_unbound.text':
+    'オーロラがこれほど明るく燃えるとき、寒さは立ち上がって歩き出す。霧氷の精霊、意志を得た霜だ。奴らは光が雪棚に触れる場所に集まって、夜ごとわたしの野営へと近づいてくる。八体砕いておくれ、{playerName}。あれがわたしを砕く前にね。',
+  'entities.quests.q_fv_rime_unbound.completion':
+    '夜がもう薄くなったのを感じる。彼らを目覚めさせているものの仕事はまだ終わっていないが、お前はこの階段に、しばしの静けさを買ってくれた。',
+  'entities.quests.q_fv_rime_unbound.objectives.0.label': '霧氷の精霊を倒した',
+  'entities.quests.q_fv_seeing_wren_home.title': 'レンを送り届けて',
+  'entities.quests.q_fv_seeing_wren_home.text':
+    '弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の南西の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。',
+  'entities.quests.q_fv_seeing_wren_home.completion':
+    'あの子は中にいるよ。わたしの毛布を半分体に巻きつけて、空から星を語り落とす勢いでしゃべっている。今日、お前は優しいことをしたね、{playerName}。この果ての地では、めったに見られないものだよ。',
+  'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
+    '見習いレンをオーロラの階段まで送り届けた',
+  'entities.quests.q_fv_silent_trapline.title': '沈黙した罠のライン',
+  'entities.quests.q_fv_silent_trapline.text':
+    'ブロスク爺はここから西のシヴァーフェンで罠のラインを張っていてね、十一年間、毎週欠かさず薪の橇に毛皮の束を乗せて寄越してきた。それが二週間、何もなしだ。あの人は凍え死ぬには頑固すぎるし、溺れるには用心深すぎる、{playerName}。つまり、別の何かがおかしいのだよ。沼の野営地を見つけて、あの人が息をしているのを確かめておくれ。',
+  'entities.quests.q_fv_silent_trapline.completion':
+    'メイヴの遣いか？はっ。十一年経っても、あの女はまだ沼がわたしを食うと思っていやがる。まあ、今年ばかりは、当たっているかもしれん。見ろ、わたしのラインがどうなったかを。',
+  'entities.quests.q_fv_silent_trapline.objectives.0.label': '罠師ブロスクを見つけた',
+  'entities.quests.q_fv_snowline_report.title': 'スノーラインからの言伝',
+  'entities.quests.q_fv_snowline_report.text':
+    'ドレイクランドから登ってくる者は皆わたしの焚き火の前を通る、{playerName}。そしてその数は週ごとに減っている。守将カルドラが北の道の先でアイスマントルを預かっている。峠はまだ開いていると伝えてくれ。それから、よそ者がひとりでそこを歩いた、ともな。',
+  'entities.quests.q_fv_snowline_report.completion':
+    '峠は保っている、か。エインナは道標が埋まるほどの嵐の中でもあの中継所を守り抜く女だ。無駄な知らせを寄越したことは一度もない。ようこそアイスマントルへ、{playerName}。',
+  'entities.quests.q_fv_snowline_report.objectives.0.label': '守将カルドラに報告した',
+  'entities.quests.q_fv_sprung_traps.title': '罠の中のスプライト',
+  'entities.quests.q_fv_sprung_traps.text':
+    'フェンスプライトだよ、{playerName}。あの小悪魔ども、遊び半分でわたしの罠を弾いては、鉄物を葦の中へ撒き散らすんだ。追い払え。八匹もやれば残りも懲りる。ついでに、罠のラインの残骸も拾い集めてきてくれ。',
+  'entities.quests.q_fv_sprung_traps.completion':
+    '良い罠が四つ戻って、葦原も静かになった。お前はわたしより罠への手が重いがね、{playerName}、この結果に文句をつける気はないよ。',
+  'entities.quests.q_fv_sprung_traps.objectives.0.label': 'フェンスプライトを追い払った',
+  'entities.quests.q_fv_sprung_traps.objectives.1.label': '罠を回収した',
+  'entities.quests.q_fv_winter_pelts.title': '宿のための毛皮',
+  'entities.quests.q_fv_winter_pelts.text':
+    '薪は体を生かしてくれるがね、{playerName}、この寒さは羊毛では防げない。狼の毛皮だけだ。スノードリフトの群れから厚い冬毛皮を六枚。そうすれば、この宿が抱えるみんなの寝袋に裏を張ってやれる。',
+  'entities.quests.q_fv_winter_pelts.completion':
+    'こういう毛皮だけが、冬が耳を貸すたったひとつの理屈でね。この足具をお持ち。前の毛皮で裏張りしたものだよ。',
+  'entities.quests.q_fv_winter_pelts.objectives.0.label': '厚い冬毛皮',
+  'entities.quests.q_fv_wolves_at_the_door.title': '戸口の狼',
+  'entities.quests.q_fv_wolves_at_the_door.text':
+    'スノードリフトの群れは以前、高い雪棚から下りてこなかった。それが今では白昼に湖への道を横切り、木こりたちは壁の外へ出ようとせん。群れを間引け、{playerName}。十頭だ。そうすれば道はまた道になる。',
+  'entities.quests.q_fv_wolves_at_the_door.completion':
+    'ここから湖までの影が十減った。木こりたちはもう、誰が最初に出るかで言い合っている。',
+  'entities.quests.q_fv_wolves_at_the_door.objectives.0.label': 'スノードリフトウルフを倒した',
+  'entities.quests.q_gc_dead_mens_cargo.title': '死者の積み荷',
+  'entities.quests.q_gc_dead_mens_cargo.text':
+    '引き揚げの掟は単純さ、{playerName}。海が浜に与えたものはわたしのもの。だが溺れた甲板員どもは、そうは思っちゃいない。船体から起き上がっては、わたしの積み上げた木箱をひとつ残らず潮線の下へ引きずり戻すんだ。六体、永遠に寝かしつけてやりな。そして浜が静かなうちに、漂着物の木箱を三つ引き揚げてくるんだよ。潮が対抗の申し立てを出す前にね。',
+  'entities.quests.q_gc_dead_mens_cargo.completion':
+    '六組の船員が静かになって、木箱が三つ、高くて乾いた場所にある。あんたはわたしより引き揚げの手が荒いがね、{playerName}、帳簿は気にしちゃいない。この半分はあんたのものさ、掟によればね。掟ってのは、わたしがそう言うことだけど。',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.0.label': '溺れた甲板員を眠らせた',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.1.label': '漂着物の木箱を引き揚げた',
+  'entities.quests.q_gc_down_the_windway.title': 'ウィンドウェイを下って',
+  'entities.quests.q_gc_down_the_windway.text':
+    '登りきったか、{playerName}。なら風はお前を生かしておくことに決めたわけだ。ウィックハーバーは丘陵の道を東へ行った先、入り江の風陰にうずくまっている。港務長オディールは峠を越えてくる者をひとり残らず数えている。お前のことも数えたがるだろう。ウィンドウェイはまだ開いている、と伝えてくれ。',
+  'entities.quests.q_gc_down_the_windway.completion':
+    'この天気に、徒歩で峠越えを？マレンが寄越す名前は少ないし、自分の足で申し開きに来る者はもっと少ない。ようこそウィックハーバーへ、{playerName}。宿の扉は閉めていっておくれよ。',
+  'entities.quests.q_gc_down_the_windway.objectives.0.label': '港務長オディールに報告した',
+  'entities.quests.q_gc_keeper_of_the_flame.title': '火を守る者',
+  'entities.quests.q_gc_keeper_of_the_flame.text':
+    'ブラム爺さんは町の北東の高い岬でビーコンを守っているんだけどね、二週間、物資を取りに下りてきていない。灯りはまだ燃えているから生きてはいる。でもあの歳の男がひとり、この風の吹きすさぶ岬にいるんだよ、{playerName}。灯台の道を登って、立っている姿を見てきておくれ。',
+  'entities.quests.q_gc_keeper_of_the_flame.completion':
+    'オディールはわざわざ、風がわたしをさらったかどうか確かめに人を寄越したのか？はっ。ランプは燃えている、わたしもだと伝えな。だがせっかく登ってきたのだ、{playerName}、少し居ていけ。このビーコンには、よそ者にしか頼めない仕事があるのでな。',
+  'entities.quests.q_gc_keeper_of_the_flame.objectives.0.label': '灯台守ブラムを見つけた',
+  'entities.quests.q_gc_lanterns_on_the_shear.title': 'シアーのランタン',
+  'entities.quests.q_gc_lanterns_on_the_shear.text':
+    'ビーコンは大いなる灯りだ、{playerName}。だが夜の旅人をザ・シアーの上の断崖の道で導き下ろすのは、嵐ランタンのほうだ。昨夜の強風がその全部を吹き消した。暗闇のあの道は、長い落下と短い結末だ。わたしの火打ちを持って、断崖沿いの四つに火を入れ直してこい。',
+  'entities.quests.q_gc_lanterns_on_the_shear.completion':
+    '断崖の道に四つの光が、あるべき場所に灯っている。ここから見ると、海岸がまた目を開いたようだ。お前には灯台守の素質があるぞ、{playerName}。',
+  'entities.quests.q_gc_lanterns_on_the_shear.objectives.0.label': '嵐ランタンを灯し直した',
+  'entities.quests.q_gc_scuttlers_in_the_pots.title': '蟹籠のスカトラー',
+  'entities.quests.q_gc_scuttlers_in_the_pots.text':
+    'ショールスカトラーどもが断崖の道を登ることを覚えてね、うちの蟹籠を石の上で叩き割るようになったんだ、{playerName}。今週だけで漁獲の半分が消えて、籠師のひとりはひと月使いものにならない手になった。十匹叩き割ってやりな。残りも、浅瀬にこもっていた理由を思い出すだろうさ。',
+  'entities.quests.q_gc_scuttlers_in_the_pots.completion':
+    'わたしの道の甲羅が十減って、今朝は籠が満杯で上がってきた。籠師たちはあんたを吉兆だと呼んでいるよ、{playerName}。ウィックハーバーでは、それが精一杯の賛辞なのさ。',
+  'entities.quests.q_gc_scuttlers_in_the_pots.objectives.0.label': 'ショールスカトラーを倒した',
+  'entities.quests.q_gc_the_far_shore.title': '遠い岸辺',
+  'entities.quests.q_gc_the_far_shore.text':
+    'このランプ室からは海岸の全部が見える、{playerName}。そして北に見えるものが、わたしは気に入らん。引き潮どき、レックフィールズを緑の灯りが歩いている。船体から船体へとな。あの岸でひとりで働いている女がいる。エッダ、引き揚げ屋だ。断崖の道をザ・シアーの先まで北へたどって、難破船が始まるところまで行け。彼女がまだ息をしているか確かめてくれ。',
+  'entities.quests.q_gc_the_far_shore.completion':
+    'ブラムは今じゃ塔からわたしの浜を見張ってるのかい？年寄りの心配は当たっているよ、{playerName}。死人どもは夜、自分の難破船を歩き回っていた。それが近ごろ、日が出ているかどうかも気にしなくなってきたんだ。',
+  'entities.quests.q_gc_the_far_shore.objectives.0.label': '引き揚げ屋エッダを見つけた',
+  'entities.quests.q_gc_the_wreck_warden.title': 'レックウォーデン',
+  'entities.quests.q_gc_the_wreck_warden.text':
+    'これで甲板員どもが起き上がるわけが分かったろう、{playerName}。この岸で最初に砕けた難破船のフジツボだらけの甲冑を、何かが着ている。そして雇われた墓守みたいに、浜のすべての船体を見張っているのさ。奴は、わたしが十年欲しがってきた財宝と、わたしが安らがせてやりたい船員たちを抱え込んでいる。レックウォーデンを終わらせな。友を連れて行くんだよ。死人ってのは、見張りが上手いからね。',
+  'entities.quests.q_gc_the_wreck_warden.completion':
+    '奴が倒れた瞬間、浜が静まり返った、{playerName}。この岸で働いて十年、初めて聞く静けさだった。船員たちはもうただの骨だ。休んでいる骨だよ。ほら、山のてっぺんのマントをお取り。もともと、生きた背中にこそ似合うものだったのさ。',
+  'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'レックウォーデンを打ち倒した',
+  'entities.quests.q_gc_wind_against_the_wick.title': '灯芯に逆らう風',
+  'entities.quests.q_gc_wind_against_the_wick.text':
+    'ゲイルウィスプは、性悪になった風だ、{playerName}。ミラーターンのそばの高い丘陵に集まって、見つけた炎を片端から吹き消していく。ランタンを、炉の火を、そしていつかは、このランプをな。三十九年、わたしはビーコンを灯し続けてきた。逆恨みした天気なんぞに、消させてたまるか。八体、散らしてこい。',
+  'entities.quests.q_gc_wind_against_the_wick.completion':
+    '昨夜、ランプは一度も揺らがなかった。ひと月ぶりのことだ。風は今もわたしらを憎んでいるがね、{playerName}、憎み方が公平に戻ったよ。',
+  'entities.quests.q_gc_wind_against_the_wick.objectives.0.label': 'ゲイルウィスプを散らした',
+  'entities.quests.q_gc_wool_off_the_downs.title': '丘陵の羊毛',
+  'entities.quests.q_gc_wool_off_the_downs.text':
+    'うちの船の漕ぎ手たちは、油布を紙みたいに切り裂く強風の中へ漕ぎ出していくんだ、{playerName}。この風を防げるものはひとつだけ。ムーアラムの脂じみた羊毛を、ウィックハーバー流に太く紡いだものさ。群れは町の西のハウリングダウンズで草を食んでいる。良い毛を六頭分。そうすれば今シーズンは、どの船組も温かく漕げる。',
+  'entities.quests.q_gc_wool_off_the_downs.completion':
+    'こういう毛があるから、人が死ぬ天気の中でも雄羊どもは太って澄ました顔で立っていられるのさ。紡ぎ手たちは今夜、ランプの明かりで仕事にかかるよ。この足具をお持ち、{playerName}、前の毛刈りの毛で裏張りしてあるからね。',
+  'entities.quests.q_gc_wool_off_the_downs.objectives.0.label': '脂じみた雄羊の羊毛',
+  'entities.quests.q_hollow_first_of_the_herd.title': '群れの始祖',
+  'entities.quests.q_hollow_first_of_the_herd.text':
+    'ふたつめの名は、口にするのがもっと重い。アウレルホーンは、祖母がこの見張り場を守っていたころから群れを率いてきた。幽谷で目覚めた何かが、彼を誤ったかたちで目覚めさせたのだ。かつて守っていたものを、今は踏み荒らしている。群れは彼の狂気を生き延びられない。彼は古い宮廷の道の近くの草地を歩き回っている。慈悲をもって終わらせてくれ、{playerName}。そして、その重さを分かち合う友を連れて行け。',
+  'entities.quests.q_hollow_first_of_the_herd.completion':
+    'こうして始祖は、最後の一頭に倒れたか。群れはもう落ち着き始めている。感じるか？今日、お前は幽谷に善いことをしたのだ。たとえそう見えなくともな。',
+  'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'アウレルホーンに安らぎを与えた',
+  'entities.quests.q_hollow_old_marrowshell.title': '浅瀬の古い甲羅',
+  'entities.quests.q_hollow_old_marrowshell.text':
+    'ひとつめの名はオールド・マロウシェル。エルダーグリームに門ができるより前から東の浅瀬で狩りをしてきた、荷車ほどもある蟹だ。奴は歩き回る、{playerName}。だから、その足跡に行き当たるまで岸辺を歩くしかない。ひとりで行くな。そして、奴の静けさを信じるな。',
+  'entities.quests.q_hollow_old_marrowshell.completion':
+    '浅瀬はまた、ただの水になった。あの甲羅がわたしより腕のいい狩人たちを砕くのを、わたしはずっと見てきたのだ、{playerName}。お前は砕かれなかった。',
+  'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'オールド・マロウシェルを倒した',
+  'entities.quests.q_hollow_the_huntsman.title': '群れの番人',
+  'entities.quests.q_hollow_the_huntsman.text':
+    'あなた、ウィスプより手強いものも扱えそうな顔をしているね、{playerName}。狩人デラルがここから東の牡鹿の草地で見張り場を構えていて、何週間も前から腕の立つ者を探している。あの人がそこで何を追っているのかは知らないけれど、村の中では決して口にしないんだ。',
+  'entities.quests.q_hollow_the_huntsman.completion':
+    'フェンナの遣いか？良し。なら彼女はお前を信用している。そしてわたしには、消さねばならん名前がふたつある。',
+  'entities.quests.q_hollow_the_huntsman.objectives.0.label': '狩人デラルを見つけた',
+  'entities.quests.q_nb_charts_of_the_stones.title': '石に刻まれた星図',
+  'entities.quests.q_nb_charts_of_the_stones.text':
+    '石環の石はムーンレストより古く、石を守るナイトキンよりも古い。その面には星図が刻まれていて、わたしはそれを読むことに生涯を費やしてきた。空がずれたのだ、{playerName}。どこまでずれたのかを知らねばならん。三つの石の星図を読んで、その方位を持ち帰ってくれ。',
+  'entities.quests.q_nb_charts_of_the_stones.completion':
+    'もう疑いは残っていない。どの方位も不眠の塚のほうへ這っている。まるで空そのものが、あの塚を覗き込もうと身を乗り出しているかのようだ。古き王たちが揃えられた星の下に葬られたのには、理由があるのだよ、{playerName}。',
+  'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': '星図を読んだ',
+  'entities.quests.q_nb_eyes_on_the_vigil.title': '石環を見つめる目',
+  'entities.quests.q_nb_eyes_on_the_vigil.text':
+    '何かがストライダーたちを大胆にさせ、群れを落ち着かなくさせている、{playerName}。それを、わたしは花からは読み取れない。カシアンなら空から読める。彼はここから東、ナイトキンが石々の間を漂う見張りの石環のそばに、観測の野営を構えているの。彼を見つけて、星が何を語っているのか尋ねてきて。',
+  'entities.quests.q_nb_eyes_on_the_vigil.completion':
+    'リラの遣いか？なら、庭々もそれを感じているのだな。しばし、遠眼鏡のそばに座りたまえ、{playerName}。星々はこのひと月ずっと落ち着かず、わたしの引く星図はどれも、北の塚のほうへ傾いていくのだ。',
+  'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
+    '見張りの石環で天文学者カシアンを見つけた',
+  'entities.quests.q_nb_night_gardens.title': '夜の庭',
+  'entities.quests.q_nb_night_gardens.text':
+    'ナイトブルームの花はこの空の下でしか開かない。そして宵闇の花野には、この国で最も古い花床があるの。祠の花綱のために、摘みたての花が四輪欲しいのよ、{playerName}。優しく切ってあげて。花床は、荒い手をひと季節は忘れないから。',
+  'entities.quests.q_nb_night_gardens.completion':
+    'どの花びらも、まだ光っている。祠はこれから一週間、夜の香りに包まれるでしょう。ムーンレストの眠りも、それだけ安らかになるわ。',
+  'entities.quests.q_nb_night_gardens.objectives.0.label': 'ナイトブルームの花を集めた',
+  'entities.quests.q_nb_restless_mounds.title': '眠らぬ塚',
+  'entities.quests.q_nb_restless_mounds.text':
+    '星図は警告だった。そして塚野がそれを証明している。塚が、下から開いているのだ。ワイトどもが古の栄誉を身にまとって墓の列を歩き、彼らを眠らせていた供物は草に散らばっている。八体を沈めて、{playerName}、供物を四つ、わたしのもとへ集め戻してくれ。',
+  'entities.quests.q_nb_restless_mounds.completion':
+    '墓の黄金、まだ土の冷たさを残している。ワイトどもは自ら起き上がっているのではないぞ、{playerName}。大塚の下の何かが彼らを呼び出している。そしてその名は、もう星図が告げてしまった気がしてならない。',
+  'entities.quests.q_nb_restless_mounds.objectives.0.label': '塚のワイトを倒した',
+  'entities.quests.q_nb_restless_mounds.objectives.1.label': '墓前の供物を回収した',
+  'entities.quests.q_nb_road_of_lanterns.title': 'ランタンの道',
+  'entities.quests.q_nb_road_of_lanterns.text':
+    'ここまで登れば太陽はついてこない、{playerName}。ついてくるのは、わたしが登り道に灯してきたランプだけだ。ムーンレストは花明かりの集まる北にある。庭々の中からリラ・デューソングを見つけて、夜の門のランプはまだ燃えていると伝えてくれ。',
+  'entities.quests.q_nb_road_of_lanterns.completion':
+    'ランプはまだ燃えていて、道は今も旅人をわたしたちのもとへ運んでくれる。ソレルは、ムーンレストの誰の記憶よりも長くあの門を守ってきたの。ようこそ、{playerName}。夜の明けない国へ。',
+  'entities.quests.q_nb_road_of_lanterns.objectives.0.label':
+    'ムーンレストでリラ・デューソングを見つけた',
+  'entities.quests.q_nb_striders_in_the_dark.title': '闇のストライダー',
+  'entities.quests.q_nb_striders_in_the_dark.text':
+    'グロームストライダーはもともと辛抱強い狩り手なのだけれど、{playerName}、近ごろは花床にまで忍び込んで、ランタンの下からムーンフリースの仔羊をさらっていくの。十体狩って、丘に静けさを返してあげて。',
+  'entities.quests.q_nb_striders_in_the_dark.completion':
+    'ストライダーが十減って、群れはもう安心して草を食んでいる。庭々は自分の時を刻むものだけれど、今夜のそれは、安らぎの時ね。',
+  'entities.quests.q_nb_striders_in_the_dark.objectives.0.label': 'グロームストライダーを倒した',
+  'entities.quests.q_nb_the_barrow_king.title': '塚の王の目覚め',
+  'entities.quests.q_nb_the_barrow_king.text':
+    'すべての方位、すべての落ち着かない星、すべての開いた塚が、ひとつのことを指している。塚の王が大塚の下で目覚めつつあり、この国には彼を押しとどめる夜明けがない。彼が己の王冠を思い出す前に、眠りへ帰さねばならんのだ、{playerName}。ひとりで行くな。友を連れ、花明かりを背にして戦え。',
+  'entities.quests.q_nb_the_barrow_king.completion':
+    'ひと季節ぶりに、星々がはじめて静まった、{playerName}。塚は閉じ、ナイトキンは石のそばで動きを止め、王は再び下で眠っている。このマントをまとうといい。夜がついに信を置いた者のために、ムーンレストが裁ったものだ。',
+  'entities.quests.q_nb_the_barrow_king.objectives.0.label': '塚の王を眠りに帰した',
+  'entities.quests.q_nb_wool_by_moonlight.title': '月明かりの羊毛',
+  'entities.quests.q_nb_wool_by_moonlight.text':
+    'ムーンフリースほど温まるものはないし、{playerName}、これほど細く紡げる毛もないの。草を食む獣たちは、丘を漂いながら銀の毛を房のまま緩く落としていく。群れから良い房を六つ持ってきて。歩いた甲斐のあるものを織ってあげるから。',
+  'entities.quests.q_nb_wool_by_moonlight.completion':
+    '星明かりのように銀色で、その倍やわらかい。はい、{playerName}。前の毛で編んだミトンよ。ムーンフリースにしかできない裏張りがしてあるの。',
+  'entities.quests.q_nb_wool_by_moonlight.objectives.0.label': 'ムーンフリースの房毛',
+  'entities.quests.q_pr_boars_in_the_gardens.title': '庭園の猪',
+  'entities.quests.q_pr_boars_in_the_gardens.text':
+    '深い緑で何が蠢いているにせよ、それが茂みの猪をわたしたちの浜へ押し出している。今週だけで庭の段々畑が二度掘り返された。次は魚干し棚がやられるだろう。猪を十頭だ、{playerName}。残りは木々の下へ押し返しておやり。',
+  'entities.quests.q_pr_boars_in_the_gardens.completion':
+    '干し棚は立ち、庭は植え直せる。猪たちは、自分から砂へ出てきたわけではないのだよ、{playerName}。覚えておおき。何かが、彼らを動かしたのだ。',
+  'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': '茂みの猪を追い払った',
+  'entities.quests.q_pr_canopy_silk.title': '梢の糸',
+  'entities.quests.q_pr_canopy_silk.text':
+    '上を見ろ、{playerName}。ここから神像までの梢という梢が、漁網のように糸で張られている。ウィーバーどもは季節ごとに大胆になっていく。わたしは奴らの糸を道々に張り渡している。仕掛け線の鈴だ。密林がわたしに忍び寄れないようにな。キャノピーウィーバーから良い糸束を六つ。それでわたしの線は張り直せる。',
+  'entities.quests.q_pr_canopy_silk.completion':
+    '良い、強い糸だ。わたしの鈴はまだしばらく歌える。そして夜にこの道を歩くものは、何であれわたしに知られずには済まん、{playerName}。近ごろ、何かが足繁く歩いているのだ。',
+  'entities.quests.q_pr_canopy_silk.objectives.0.label': 'キャノピーシルクの束',
+  'entities.quests.q_pr_down_to_drifthaven.title': 'ドリフトヘイヴンへ',
+  'entities.quests.q_pr_down_to_drifthaven.text':
+    '黒い木々を抜けて、陽の下へ出たな、{playerName}。岸辺の道を北へたどれば、潮が変わる前にドリフトヘイヴンに着く。引き揚げ頭リナを訪ねろ。嵐このかた、彼女は動く手ならなんでも欲しがっている。それと、絡み口の道はまだ開いていると伝えてくれ。',
+  'entities.quests.q_pr_down_to_drifthaven.completion':
+    'ペルの遣いかい？なら絡み口の道をひとりで歩き通したってことだ。わたしにはそれで十分な推薦状さ。ようこそドリフトヘイヴンへ、{playerName}。綱をお取り、人手が足りないんだ。',
+  'entities.quests.q_pr_down_to_drifthaven.objectives.0.label': '引き揚げ頭リナに報告した',
+  'entities.quests.q_pr_idol_guardian.title': '神像の守護者',
+  'entities.quests.q_pr_idol_guardian.text':
+    'あの神像は島より古い、{playerName}。太鼓より古く、パームリーチという名より古い。その守護者は、椰子が生えるより前からあの水没した環に立ち続けてきた。それが今、目覚めて、夜ごと柱の間を歩いている。供物が何を養っているにせよ、守護者はその扉の番人だ。友を連れて行き、砕いてこい。',
+  'entities.quests.q_pr_idol_guardian.completion':
+    '密林そのものが手を出さなかったものを、お前は倒したのだ。見ろ、神像の後ろを。守護者が守っていたのは柱ではない、{playerName}。その下の階段だったのだ。今夜、太鼓は静まっている。ワイルドハート盆地の下で眠るものが何であれ、もうお前の名を知っている。',
+  'entities.quests.q_pr_idol_guardian.objectives.0.label': '神像の守護者を砕いた',
+  'entities.quests.q_pr_scuttler_cull.title': '甲羅の盗人ども',
+  'entities.quests.q_pr_scuttler_cull.text':
+    'この海岸の難破船はどれもタイドスカトラーを引き寄せるけど、パールウェイクは礁の半分を引き寄せちまった。うちの引き揚げ組は、あの鋏が浅瀬にいるうちは潜り綱につこうとしない。十匹割っておくれ、{playerName}。そうすれば難破船の列はまたわたしらのものだ。',
+  'entities.quests.q_pr_scuttler_cull.completion':
+    '波打ち際の鋏が十減った。うちの連中はもう浅瀬へ戻り始めてる。誰ひとり礼を言わなかったろうから、わたしが言うよ。ありがとう、{playerName}。',
+  'entities.quests.q_pr_scuttler_cull.objectives.0.label': 'タイドスカトラーを割った',
+  'entities.quests.q_pr_the_lost_navigator.title': '行方知れずの航海士',
+  'entities.quests.q_pr_the_lost_navigator.text':
+    'パールウェイクからは、ひとりを残して全員引き揚げた。航海士スリ。遠い浜を目指して泳いで、そのまま歩いて戻らなかった。潜り手がパームストランドの先の船首の残骸に隠れているのを見つけたんだ。生きてる。でも、あの関門をひとりで走り抜ける力は残っちゃいない。岸辺の道沿いに家まで歩かせてやっておくれ、{playerName}。カニどもは嫌がるだろうし、密林はもっと嫌がるだろうけどね。',
+  'entities.quests.q_pr_the_lost_navigator.completion':
+    'スリは焚き火のそばだよ。今でも自分なら泳ぎ切れたと言い張ってる。この海岸でただひとりの海図読みを連れ戻してくれたんだ、{playerName}。これはあの子の船箪笥から。本人の祝福つきさ。',
+  'entities.quests.q_pr_the_lost_navigator.objectives.0.label':
+    '航海士スリをドリフトヘイヴンまで送り届けた',
+  'entities.quests.q_pr_the_man_who_went_in.title': '奥へ入った男',
+  'entities.quests.q_pr_the_man_who_went_in.text':
+    '潜り手たちは木々の際から先へは踏み込まない、{playerName}。わたしも頼みはしない。太鼓はもう聞いただろう。二晩目までには、誰もが聞く。あの音へ向かって歩き、戻ってきた者はこの島にひとりしかいない。オックだ。彼は絡みの道を深く上った蔓垂の森の、大きな榕樹の下に野営している。彼を見つけて、緑が何を隠しているのか尋ねておいで。',
+  'entities.quests.q_pr_the_man_who_went_in.completion':
+    'イーシャの遣いだと？パールマザーがわたしの名を口にするのは何年ぶりか。蔓の届かないところへお座り、{playerName}。知っていることを話そう。太鼓は危険ではない。太鼓は、警告なのだ。',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': '蔓垂の森でオックを見つけた',
+  'entities.quests.q_pr_what_the_drums_guard.title': '太鼓が守るもの',
+  'entities.quests.q_pr_what_the_drums_guard.text':
+    '生きた人間に許される限りのところまで、沈んだ神像に近づいてみた。見えたものはふたつ。ウィーバーどもが神像への道を糸の帳で覆っていたこと。そして、道沿いの古い供物鉢が、再び満たされていたことだ。それも新しく、だ、{playerName}。道からウィーバーを八体払い、供物を三つ持ってきてくれ。死んだ神に今も餌をやる手が誰のものか、知っておきたい。',
+  'entities.quests.q_pr_what_the_drums_guard.completion':
+    '苔、真珠貝、猪の血。指で詰められている。あの廃墟の中の何かは、いまだに祭祀を続けているのだ、{playerName}。そして守護者が、それ以外のすべてを締め出している。そろそろ、包み隠さず話すときだな。',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.0.label':
+    'キャノピーウィーバーを切り落とした',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.1.label': '再び満たされた供物鉢を集めた',
+  'entities.quests.q_pr_wreck_line_cargo.title': '難破船の列',
+  'entities.quests.q_pr_wreck_line_cargo.text':
+    '三晩前の嵐がパールウェイクを礁に乗り上げさせて、積み荷はここからパームストランドまで、難破船の列いっぱいに散らばっちまった。交易品の木箱が三つ、まだ波打ち際に転がってる、{playerName}。潮かカニが残りを頂いちまう前に、運び込んでおくれ。',
+  'entities.quests.q_pr_wreck_line_cargo.completion':
+    '塩染みだらけだけど、三つとも無事だ。今月、潜り手たちが食えるのはあんたのおかげだよ、{playerName}。',
+  'entities.quests.q_pr_wreck_line_cargo.objectives.0.label': 'パールウェイクの積み荷を回収した',
+  'entities.quests.q_wf_across_the_fenway.title': 'フェンウェイを渡って',
+  'entities.quests.q_wf_across_the_fenway.text':
+    '穏やかな国だよ、ウィローフェンは。だが穏やかは安全と同じではない、{playerName}。道を北へたどって、フェンウェイの堤道を渡り、ブリッジミアに入るといい。橋大工アルデンに、石段は開いていて、中継所の火は灯っていると伝えてくれ。',
+  'entities.quests.q_wf_across_the_fenway.completion':
+    'ペルはあの火を、沼がどれだけ霧を吹きかけてこようと絶やさず守り続けている。彼女が石段は開いていると言うなら、開いているのだ。ようこそブリッジミアへ、{playerName}。わたしの板の上では足元に気をつけてくれれば、うまくやっていけるさ。',
+  'entities.quests.q_wf_across_the_fenway.objectives.0.label': '橋大工アルデンに報告した',
+  'entities.quests.q_wf_croakers_hush.title': 'クローカーの静寂',
+  'entities.quests.q_wf_croakers_hush.text':
+    'これで、いびきの主の名が分かったね、{playerName}。まどろみのクローカー。まどろみの浅瀬にいる、年老いたヒキガエルの王だよ。彼の鳴き声は年々重くなり、年々、沼の多くが目覚めるのを忘れていく。お守りがあれば目は開いていられるけれど、あの巨体は別の話だ。友を連れて行き、水の中では戦わないこと。老いた王を、もっと静かな眠りにつかせておやり。',
+  'entities.quests.q_wf_croakers_hush.completion':
+    'お聞き、{playerName}。何も聞こえない。三十年ぶりの、この沼の上の本当の静けさだ。奇妙さのあまり、町の半分は今夜眠れないだろうね。柳たちが礼を言っているよ、彼らなりのやり方でね。これをお召し。彼自身の睡蓮の褥から織ったものだ。水の届くところならどこでも、沼はあんたを友と見なすだろう。',
+  'entities.quests.q_wf_croakers_hush.objectives.0.label': 'まどろみのクローカーを倒した',
+  'entities.quests.q_wf_eels_for_the_smokehouse.title': '燻製小屋のウナギ',
+  'entities.quests.q_wf_eels_for_the_smokehouse.text':
+    'ボグトードどもは、わたしの綱だけじゃなく獲物まで食っているんだ、{playerName}。罠から出したてのウナギを丸呑みにしていく。肉が悪くなる前に、丸々とした奴を六匹、あの食いしん坊どもから切り出してきておくれ。そうすれば燻製小屋の火は消えずに済む。',
+  'entities.quests.q_wf_eels_for_the_smokehouse.completion':
+    '良いウナギが六匹、傷みもほとんどない。朝までには燻製小屋が金の匂いをさせるだろうさ。ほら、この長靴はわたしがもっと素早かったころのものだ。ウナギ革ほど水をはじくものはないからね。',
+  'entities.quests.q_wf_eels_for_the_smokehouse.objectives.0.label': '丸々とした沼ウナギ',
+  'entities.quests.q_wf_mind_the_moorings.title': '舫いに気をつけて',
+  'entities.quests.q_wf_mind_the_moorings.text':
+    'ここでは良い綱は貴重なんだ、{playerName}。ヒキガエルに噛み切られる一本一本が、一週間分のウナギの稼ぎに相当する。切れた端は、船が流された堀の岸辺にまだ転がっている。板張りの道を歩いて四本持ち帰ってくれれば、新品同様に継ぎ直せる。',
+  'entities.quests.q_wf_mind_the_moorings.completion':
+    '見てごらん。どれもきれいな噛み跡だが、継ぐには十分な長さが残っている。ひと月分の銭と、網師たちのひと月分の愚痴を省いてくれたよ、{playerName}。',
+  'entities.quests.q_wf_mind_the_moorings.objectives.0.label': '切られた舫い綱を回収した',
+  'entities.quests.q_wf_rope_chewers.title': '綱かじりども',
+  'entities.quests.q_wf_rope_chewers.text':
+    'ボグトードだよ、{playerName}。夜になると堀から這い上がってきて、わたしの舫い綱を葦の茎みたいに噛み千切るんだ。先週は小舟が三艘流されて、そのうち一艘には上等のウィンチが載っていた。間引いておくれ、太った奴を十匹。そうすれば船は繋いだ場所にとどまってくれる。',
+  'entities.quests.q_wf_rope_chewers.completion':
+    'わたしの堀の歯が十組減った。小舟がひと晩じゅう舫いに落ち着いていたのは、ひと月ぶりだよ、{playerName}。町じゅうの網師があんたに感謝してる。',
+  'entities.quests.q_wf_rope_chewers.objectives.0.label': 'ボグトードを倒した',
+  'entities.quests.q_wf_toll_and_tangle.title': '通行料ともつれ',
+  'entities.quests.q_wf_toll_and_tangle.text':
+    'ウィロースプライトどもは、渡し船を切り放すのを上等な遊びだと思っているんだ、{playerName}。先週は東の水路で通行料の小舟がひっくり返って、ひと季節分の橋の通行料が積まれたままだった。櫃は浅瀬に沈み、スプライトどもは板張りの道の上で、我が物顔で踊っている。八匹追い払って、通行料の櫃を三つ引き揚げてくれれば、ブリッジミアはこの冬を食いつなげる。',
+  'entities.quests.q_wf_toll_and_tangle.completion':
+    '櫃が三つ、中の銭はまだ乾いている。スプライトどもは一週間は柳の茂みでふてくされているだろうさ、{playerName}。町は冬のパンをあんたに借りたよ。',
+  'entities.quests.q_wf_toll_and_tangle.objectives.0.label': 'ウィロースプライトを追い払った',
+  'entities.quests.q_wf_toll_and_tangle.objectives.1.label': '通行料の櫃を回収した',
+  'entities.quests.q_wf_wisplight_charms.title': 'ウィスプライトのお守り',
+  'entities.quests.q_wf_wisplight_charms.text':
+    '池の上のウィスプたちは、沼が声に出して見ている夢なんだよ、{playerName}。そしてあの光だけが、クローカーの眠気に抗える。わたしはそれを柳のお守りに織り込む。首にひとつ提げれば、あのいびきもまぶたを引きずり下ろせなくなる。ウィスプライトの玉を六つ持っておいで。ウィスプは奪い合いはしないから、これが親切になるか盗みになるかは、あんたの持ち帰り方次第さ。',
+  'entities.quests.q_wf_wisplight_charms.completion':
+    '玉が六つ、まだ夢の温もりが残っている。月の出までお待ち。あんたと、あんたの隣に立つ勇気のある者のぶんまで、お守りを織っておいてあげよう。',
+  'entities.quests.q_wf_wisplight_charms.objectives.0.label': 'ウィスプライトの玉',
+  'entities.quests.q_wf_witch_of_willowweep.title': 'ウィローウィープの魔女',
+  'entities.quests.q_wf_witch_of_willowweep.text':
+    'もう聞いただろう、{playerName}。あのいびきだ。まどろみの浅瀬の先から響く、遅くて重い音。まるで沼そのものが寝返りを打っているような。ヒキガエルも、スプライトも、真昼に燃えるウィスプも、全部あの音が始まったときに始まった。正体を知っていそうな者がひとりだけいる。マザー・セッジが、堀を西に回って向こう岸を下ったウィローウィープに野営している。彼女を見つけて、わたしの沼の真ん中で何が眠っているのか尋ねてきてくれ。',
+  'entities.quests.q_wf_witch_of_willowweep.completion':
+    'アルデンがわざわざ、いびきのことを訊きに人を寄越したのかい？なら橋の民もようやく耳を傾け始めたんだね。湿気を避けてお座り、{playerName}。あの音には名前があり、喉がある。そしてわたしは、あれを静める手伝いをしてくれる馬鹿者を、ずっと待っていたのさ。',
+  'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'マザー・セッジを見つけた',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'ガロウミアの鐘',
+  'entities.quests.q_ww_bells_of_gallowmere.text':
+    'あの鐘の音が聞こえるか、{playerName}？あれがガロウミアだ。北の道の先で、死者たちを眠りへと撞き送っている。堂守マロウが、この梢の下のすべての魂を数えている。生きている者も、葬られた者もな。行って、数えられてこい。森のほうがお前を数えてしまう前に。',
+  'entities.quests.q_ww_bells_of_gallowmere.completion':
+    'コッブはお前を無事に道へ送り出したか。良い男だ。三十年あの門のランタンを灯し続けて、森は一度も彼を出し抜けなかった。ようこそガロウミアへ、{playerName}。鐘には気をつけてな。',
+  'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': '堂守マロウに報告した',
+  'entities.quests.q_ww_candles_at_the_bounds.title': '境界の蝋燭',
+  'entities.quests.q_ww_candles_at_the_bounds.text':
+    'ガロウミアの周りには四つの境界石が立っている、{playerName}。外へ出る道の一本ごとにひとつ、そしてどの石の上でも墓前の蝋燭が燃えている。あれが燃えている限り、葬られた者は葬られたままでいる。その四つすべてが、霧雨に消されてしまった。わたしはもう、ひとりで境界を歩ける歳ではない。わたしの付け木を持って、急ぎ、灯し直してきてくれ。',
+  'entities.quests.q_ww_candles_at_the_bounds.completion':
+    '四つとも燃えているか？なら息をつけ、{playerName}。お前には聞こえなかったろうが、村じゅうが聞いたのだ。最後の灯芯に火が入った瞬間、鐘の鳴りが軽くなったのを。',
+  'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': '墓前の蝋燭を灯し直した',
+  'entities.quests.q_ww_horn_of_the_huntsman.title': '狩人の角笛',
+  'entities.quests.q_ww_horn_of_the_huntsman.text':
+    'もう角笛は聞いただろう、{playerName}。細く、遠く、森全体が息を潜めるあの音だ。蒼白の狩人はここから北の広場で馬を駆っており、彼が通り過ぎるたび、墓は浅くなっていく。彼もかつては人だった。そして、誤ったやり方で葬られた。祈りで済むふりは、もう終わりにする。友をひとり、ふたり連れて、彼を馬から引きずり下ろせ。',
+  'entities.quests.q_ww_horn_of_the_huntsman.completion':
+    '角笛が、音の途中で止まった。ガロウミアの鐘という鐘がひとりでに一度鳴り、それから森は、この三十年で聞いたことのないほど静かになった。わたしにできなかった儀式を、お前が果たしたのだ、{playerName}。これをまとい、梢の下を恐れず歩くがいい。',
+  'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': '蒼白の狩人を馬から落とした',
+  'entities.quests.q_ww_silk_in_the_eaves.title': '軒先の絹糸',
+  'entities.quests.q_ww_silk_in_the_eaves.text':
+    '西の道を歩くときは上を見ろ、{playerName}。見えるだろう。風も届かない梢で揺れている、包まれた形が。ウィドウシルク・スピナーどもが茨から這い出して、わたしのランタンの上に食料庫を張り渡したのだ。十匹殺せ。そうすれば道はまた道になる。',
+  'entities.quests.q_ww_silk_in_the_eaves.completion':
+    '軒の織り手が十減った。今夜、点灯夫たちは上を見ずに見回りを歩けるだろう。ここでは、それはお前が思うよりずっと値打ちのあることなのだ。',
+  'entities.quests.q_ww_silk_in_the_eaves.objectives.0.label': 'ウィドウシルク・スピナーを倒した',
+  'entities.quests.q_ww_the_last_vicar.title': '最後の司祭',
+  'entities.quests.q_ww_the_last_vicar.text':
+    'ここから南、哀石の礼拝堂が黒い湖沼のほとりで朽ちかけていて、今もひとりの男がそれを守っている。司祭クリール。屋根が落ちたときも、去ろうとしなかった男だ。彼はわたしの鐘よりも古い儀式に通じている、{playerName}。その彼から、ひと月も便りがない。礼拝堂への道を歩いて、息をしているのを確かめてきてくれ。',
+  'entities.quests.q_ww_the_last_vicar.completion':
+    'マロウがわたしの心配を？それは新しいな。哀石は立っている、まあ、立っているようなものだ、わたしも同じだと伝えてくれ。少し居るといい、{playerName}。湖沼が近ごろ囁くのでな。できれば、ひとりで聞きたくないのだ。',
+  'entities.quests.q_ww_the_last_vicar.objectives.0.label': '司祭クリールを見つけた',
+  'entities.quests.q_ww_walking_mosley_home.title': 'モズリーを家まで',
+  'entities.quests.q_ww_walking_mosley_home.text':
+    'うちの墓掘りモズリーが三日前、古い墓地に墓穴を開けに礼拝堂の道を行ったのだが、掘った穴が上から崩れてきた。自力で這い出した。馬鹿者は生きている。だが礼拝堂の墓のそばでうずくまったきり、道のスピナーが怖くて動けんのだ。家まで歩かせてやってくれ、{playerName}。生きている男のために鐘を鳴らすわけにはいかんのでな。',
+  'entities.quests.q_ww_walking_mosley_home.completion':
+    '自分の両足で門をくぐってきたよ。これからはカブの床より深い穴は掘らないと誓いながらな。日曜までには墓地へ戻っているさ、ああいう手合いはいつもそうだ。ありがとう、{playerName}。ガロウミアは己の民を手放さない。それがわたしたちの掟のすべてだ。',
+  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
+    '墓掘りモズリーをガロウミアまで送り届けた',
+  'entities.quests.q_ww_what_the_bark_holds.title': '樹皮が抱えるもの',
+  'entities.quests.q_ww_what_the_bark_holds.text':
+    'ガロウミアの東の吊るしの林間地では、スピナーどもが絹に包んだ死者を枝から吊るし、その下ではグレイヴンバークどもが、辛抱強い棺担ぎのように見張りに立っている。あの上にあるのは、わたしたちの民なのだ、{playerName}。グレイヴンバークを五体砕き、包まれた死者を三体切り下ろして、土へ帰してやってくれ。',
+  'entities.quests.q_ww_what_the_bark_holds.completion':
+    '日暮れ前に、三つの魂がまっとうな土の下へ戻った。グレイヴンバークどもはまた生えてくるだろう。樹皮とはそういうものだ。だが今夜、あの林間地には何も吊るされていない。それで十分だ。',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'グレイヴンバークを打ち倒した',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': '絹に包まれた亡骸を切り下ろした',
+  'entities.quests.q_ww_widows_skeins.title': '寡婦の絹かせ',
+  'entities.quests.q_ww_widows_skeins.text':
+    'スピナーどもはわたしたちの死者を食料庫に取っていく、{playerName}。だからわたしは、奴らの絹を経帷子に取り返すのさ。あの絹は清らかに燃えるし、亜麻布よりずっとよく祝福を保つ。ウィドウシルクのかせを六つ持っておいで。次に葬る魂は、包まれ、守られて土に降りていくのだから。',
+  'entities.quests.q_ww_widows_skeins.completion':
+    '六かせ、押し殺した息のようにやわらかい。これなら死者も安らかに横たわれる。この巻きをお持ち。前の絹で縫ったもので、森はまだ一度も噛み通せていないよ。',
+  'entities.quests.q_ww_widows_skeins.objectives.0.label': 'ウィドウシルクのかせ',
+  'entities.quests.q_ww_wraiths_of_the_tarn.title': '湖沼のレイス',
+  'entities.quests.q_ww_wraiths_of_the_tarn.text':
+    'ウッドレイスたちは、かつて礼拝堂の守り手だった、{playerName}。誉れある死者の上に植えられた木々から育ったものだ。湖沼が黒く濁ってからというもの、彼らは己の務めを忘れ、今はわたしの墓地を漂いながら土を引き掻いている。彼らが始めたことを終えてしまう前に、八体を砕いてくれ。',
+  'entities.quests.q_ww_wraiths_of_the_tarn.completion':
+    '八人の守り手が、ようやく横たわった。日の光の下では慈悲とは呼ばないでおくが、ここだけの話、{playerName}、あれは慈悲だったよ。',
+  'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'ウッドレイスを倒した',
   'hud.errors.silenced': '沈黙状態です！',
   'hud.pet.noPetFood': 'ペットに与える食べ物がありません。',
   'hud.pet.petEatsFoodOnly': 'ペットは食べ物しか食べられません。',
@@ -8889,6 +9453,153 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.alchemist_verane.title': '薬房の主',
   'entities.npcs.alchemist_verane.greeting':
     '二度量って一度で注ぐ、{className}。薬房ではこぼした試薬に容赦はしない。',
+  'entities.npcs.astronomer_cassian.name': '天文学者カシアン',
+  'entities.npcs.astronomer_cassian.title': '石環の観測者',
+  'entities.npcs.astronomer_cassian.greeting':
+    '静かに。ここの空には夜明けが来ない。だから、語りやむこともないのだ。',
+  'entities.npcs.aurorist_veyla.name': 'オーロラ読みヴェイラ',
+  'entities.npcs.aurorist_veyla.title': '光を読む者',
+  'entities.npcs.aurorist_veyla.greeting':
+    'お静かに。今夜は光が語っている。あれは二度と同じことを言わないのだよ。',
+  'entities.npcs.bridgewright_alden.name': '橋大工アルデン',
+  'entities.npcs.bridgewright_alden.title': 'フェンウェイの主',
+  'entities.npcs.bridgewright_alden.greeting':
+    'この町の板という板はわたしの預かりものだ。そして沼は、その一枚残らず齧ってくる。',
+  'entities.npcs.ferrymaster_caddow.name': '渡し守キャドウ',
+  'entities.npcs.ferrymaster_caddow.title': 'ランタン渡しの主',
+  'entities.npcs.ferrymaster_caddow.greeting':
+    'また大いなる湖に霧が出た。水の上のランタンが消えたら、賢い者は岸にとどまるものだ。',
+  'entities.npcs.gardener_yew.name': '庭師ユー',
+  'entities.npcs.gardener_yew.title': '最後の庭師',
+  'entities.npcs.gardener_yew.greeting':
+    'その手押し車を取ってくれるかね。村がどう思っていようと、この芝生はひとりでに手入れされるわけではないのだよ。',
+  'entities.npcs.gatecaptain_brannoc.name': '門長ブラノック',
+  'entities.npcs.gatecaptain_brannoc.title': 'ワームウォッチ司令官',
+  'entities.npcs.gatecaptain_brannoc.greeting':
+    'ワームウォッチは門を守る。四十年守り抜いてきた。今夜も守り抜く。',
+  'entities.npcs.gatewarden_pell.name': '門番ペル',
+  'entities.npcs.gatewarden_pell.title': 'ガーデンゲートの番人',
+  'entities.npcs.gatewarden_pell.greeting':
+    '芝生の上は歩き方に気をつけよ。庭が自ら刈り込んでいるのでな。庭は、整った芝を好むのだ。',
+  'entities.npcs.harbormaster_odile.name': '港務長オディール',
+  'entities.npcs.harbormaster_odile.title': 'ウィックハーバーの港務長',
+  'entities.npcs.harbormaster_odile.greeting':
+    'この入り江の船はどれも、竜骨ごとオールドビーコンに借りがある。用件は手短にね、潮は待ってくれないよ。',
+  'entities.npcs.head_gardener_amaranth.name': '庭園長アマランス',
+  'entities.npcs.head_gardener_amaranth.title': 'エバーガーデンの庭園長',
+  'entities.npcs.head_gardener_amaranth.greeting':
+    '目の下の隈は気にしないでおくれ。庭が夢を見ている間、誰かが起きていなければならないのだから。',
+  'entities.npcs.hearthkeeper_maeve.name': '炉端守メイヴ',
+  'entities.npcs.hearthkeeper_maeve.title': '炉火の宿の主',
+  'entities.npcs.hearthkeeper_maeve.greeting':
+    '寒いところから、さあお入り。わたしが息をしている限り、この宿の火は消えないよ。',
+  'entities.npcs.hermit_okku.name': 'オック',
+  'entities.npcs.hermit_okku.title': '奥へ入った男',
+  'entities.npcs.hermit_okku.greeting':
+    '静かに。太鼓は木々の下を歩くものをすべて数えている。おまえのことも、もう数え終えている。',
+  'entities.npcs.huntsman_deral.name': '狩人デラル',
+  'entities.npcs.huntsman_deral.title': '群れの番人',
+  'entities.npcs.huntsman_deral.greeting':
+    '静かにな。群れはこの谷のあらゆる物音を知っている。わたしもだ。',
+  'entities.npcs.keeper_bram.name': '灯台守ブラム',
+  'entities.npcs.keeper_bram.title': 'オールドビーコンの灯台守',
+  'entities.npcs.keeper_bram.greeting':
+    '三十九年、この灯りはわたしの番で燃え続けてきた。お前の番で消させはせんよ。',
+  'entities.npcs.lamplighter_sorrel.name': '点灯夫ソレル',
+  'entities.npcs.lamplighter_sorrel.title': '夜の門の番人',
+  'entities.npcs.lamplighter_sorrel.greeting':
+    'ランプを頼りにな、友よ。この門の先では太陽が匙を投げ、あとは花々が引き継ぐのだ。',
+  'entities.npcs.lampman_cobb.name': 'ランプ番コッブ',
+  'entities.npcs.lampman_cobb.title': '鴉の門のランタン番',
+  'entities.npcs.lampman_cobb.greeting':
+    '灯りの中にいるんだ、友よ。森は門をくぐる者をひとり残らず数えている。',
+  'entities.npcs.lira_dewsong.name': 'リラ・デューソング',
+  'entities.npcs.lira_dewsong.title': 'ムーンレストの夜庭師',
+  'entities.npcs.lira_dewsong.greeting':
+    'ようこそムーンレストへ。ここでは花々が、夜明けの代わりを務めてくれるの。',
+  'entities.npcs.mother_sedge.name': 'マザー・セッジ',
+  'entities.npcs.mother_sedge.title': 'ウィローウィープの沼の魔女',
+  'entities.npcs.mother_sedge.greeting':
+    'あんたが来ることは柳たちが教えてくれたよ。その靴が橋を離れるより前にね。',
+  'entities.npcs.netter_maris.name': '網師マリス',
+  'entities.npcs.netter_maris.title': 'ブリッジミアのウナギ網師',
+  'entities.npcs.netter_maris.greeting':
+    'この匂いが分かるかい？燻製ウナギさ。この町の高床の半分は、これで稼いだ金で建っているんだ。',
+  'entities.npcs.orchardist_pomeline.name': '果樹園主ポメリーヌ',
+  'entities.npcs.orchardist_pomeline.title': '黄金の並木の守り手',
+  'entities.npcs.orchardist_pomeline.greeting':
+    '足元に気をつけて。この並木の根はどれも町より古い。そして、根は覚えているのよ。',
+  'entities.npcs.pearlmother_isha.name': 'パールマザー・イーシャ',
+  'entities.npcs.pearlmother_isha.title': '海人の長老',
+  'entities.npcs.pearlmother_isha.greeting':
+    '海は与え、砂は蓄え、密林は奪う。浜から離れるでないよ、旅の人。',
+  'entities.npcs.quartermaster_sela.name': '補給将校セラ',
+  'entities.npcs.quartermaster_sela.title': '駐屯地物資の管理人',
+  'entities.npcs.quartermaster_sela.greeting':
+    'この置き場の木箱はどれも、四十マイルの灰の道を越えてここに来た。丁重に扱っておくれ。',
+  'entities.npcs.reeve_ottoline.name': '代官オトリーヌ',
+  'entities.npcs.reeve_ottoline.title': 'ランタンミアの代官',
+  'entities.npcs.reeve_ottoline.greeting':
+    'ようこそランタンミアへ。ここでは収穫が終わらない。つまり、仕事もね。',
+  'entities.npcs.salvage_boss_ryna.name': '引き揚げ頭リナ',
+  'entities.npcs.salvage_boss_ryna.title': '難破船の列の女主人',
+  'entities.npcs.salvage_boss_ryna.greeting':
+    '腕の動く{className}か、結構。難破船の列は実入りがいいよ。カニどもが、稼ぎを数える指を残してくれればの話だけどね。',
+  'entities.npcs.salvager_edda.name': '引き揚げ屋エッダ',
+  'entities.npcs.salvager_edda.title': 'レックフィールズの引き揚げ屋',
+  'entities.npcs.salvager_edda.greeting':
+    '難破材に、綱に、死人の積み荷。海がわたしの給金を払ってくれる。ウォーデンが許してくれればの話だがね。',
+  'entities.npcs.scout_einna.name': '斥候エインナ',
+  'entities.npcs.scout_einna.title': 'スノーラインの斥候',
+  'entities.npcs.scout_einna.greeting':
+    '峠を生きて越えたか。上出来だ。アイスマントルに知らせるべきだな。',
+  'entities.npcs.scout_yerrin.name': '斥候イェリン',
+  'entities.npcs.scout_yerrin.title': '遠砂丘の見張り',
+  'entities.npcs.scout_yerrin.greeting':
+    '身を低くしろ。硝子の上では音が妙に運ばれる。それに、下の門には耳がある。',
+  'entities.npcs.sexton_marrow.name': '堂守マロウ',
+  'entities.npcs.sexton_marrow.title': 'ガロウミアの堂守',
+  'entities.npcs.sexton_marrow.greeting':
+    'ここでは死者を深くに葬る。そして鐘を鳴らすのだ。土の下にとどまることを、彼らが忘れぬようにな。',
+  'entities.npcs.strandwatcher_pell.name': '浜守ペル',
+  'entities.npcs.strandwatcher_pell.title': '絡み口の見張り',
+  'entities.npcs.strandwatcher_pell.greeting':
+    '黒い木々からようやく抜けたな。息をつけ、旅の人。峠のこちら側は太陽が守っている。',
+  'entities.npcs.trapper_brosk.name': '罠師ブロスク',
+  'entities.npcs.trapper_brosk.title': 'シヴァーフェンの罠師',
+  'entities.npcs.trapper_brosk.greeting':
+    '今週、沼に罠のラインを三本持っていかれた。二十年で一本も取られたことはなかったのにだ。',
+  'entities.npcs.vicar_creel.name': '司祭クリール',
+  'entities.npcs.vicar_creel.title': '哀石最後の司祭',
+  'entities.npcs.vicar_creel.greeting':
+    '礼拝堂は何年も前に崩れた。その下の死者たちは気づきもしなかった。だから、わたしは残ったのだ。',
+  'entities.npcs.warden_kaldra.name': '守将カルドラ',
+  'entities.npcs.warden_kaldra.title': 'アイスマントルの守将',
+  'entities.npcs.warden_kaldra.greeting': '雪棚には気をつけよ、よそ者。雪は、奪ったものを返さぬ。',
+  'entities.npcs.watcher_maren.name': '見張りマレン',
+  'entities.npcs.watcher_maren.title': 'ウィンドウェイの見張り',
+  'entities.npcs.watcher_maren.greeting':
+    '門から先は足元に気をつけな。ここの風はまず帽子をさらう。質問は一度もしない。',
+  'entities.npcs.waykeeper_pell.name': '道守ペル',
+  'entities.npcs.waykeeper_pell.title': 'アンバーフェンの石段の番人',
+  'entities.npcs.waykeeper_pell.greeting':
+    '石段を下れば、やわらかな国だ。靴をどこに沈めるかは、よく見てからにするんだな。',
+  'entities.npcs.waywatcher_sorrel.name': '道番ソレル',
+  'entities.npcs.waywatcher_sorrel.title': 'ゴールドメルトの見張り',
+  'entities.npcs.waywatcher_sorrel.greeting':
+    '背には雪、行く手には金色。ゴールドメルトを二度歩く者は少ない。だから、この越えを無駄にするな。',
+  'entities.npcs.weaver_amelle.name': '織り手アメル',
+  'entities.npcs.weaver_amelle.title': 'ムーンフリースの織り手',
+  'entities.npcs.weaver_amelle.greeting':
+    '触ってごらん。機にかかっているのはムーンフリース。あなたが当たったどんな火よりも温かいのよ。',
+  'entities.npcs.wickmother_sorrel.name': 'ウィックマザー・ソレル',
+  'entities.npcs.wickmother_sorrel.title': 'ヘッジウィック亭の女主人',
+  'entities.npcs.wickmother_sorrel.greeting':
+    'お入り、お座り、火にかけた甘い酒があるよ。ただし鉄物からは手を離さないこと。近ごろのノームは手癖が悪いからね。',
+  'entities.npcs.widow_tansy.name': '寡婦タンジー',
+  'entities.npcs.widow_tansy.title': 'ガロウミアの蝋燭師',
+  'entities.npcs.widow_tansy.greeting':
+    '墓のひとつひとつに蝋燭をひとつ。ひとつたりとも消してはいけない。ひとつたりともだよ、聞いているのかい？',
   'hudChrome.training.title': '訓練：{name}',
   'hudChrome.training.close': '訓練を閉じる',
   'hudChrome.training.empty': 'この師匠には教えられるレシピがありません。',
@@ -8979,6 +9690,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wildheart_hexcaller.name': '陽骨の呪術師',
   'entities.mobs.wildheart_beastmaster.name': '牙王の獣使い',
   'entities.mobs.wildheart_high_priest.name': '盆地の声ズルガー',
+  'entities.mobs.apprentice_wren.name': '見習いレン',
+  'entities.mobs.barrow_wight.name': '塚のワイト',
+  'entities.mobs.castaway_navigator.name': '航海士スリ',
+  'entities.mobs.cindraleth_maw_matriarch.name': 'シンドラレス、火口の母竜',
+  'entities.mobs.drowned_deckhand.name': '溺れた甲板員',
+  'entities.mobs.fisher_bram.name': '漁師ブラム',
+  'entities.mobs.gravedigger_mosley.name': '墓掘りモズリー',
+  'entities.mobs.terrace_howler.name': 'テラスハウラー',
+  'entities.mobs.the_meredark.name': 'ミアダーク',
   'entities.dungeons.wildheart_basin.name': 'ワイルドハート盆地',
   'entities.dungeons.wildheart_basin.enterText':
     '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
@@ -8986,5 +9706,60 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
   'entities.items.wildheart_fangknife.name': 'ズルガーの牙小刀',
+  'entities.items.amberfall_sap_bucket.name': '樹液採りのバケツ',
+  'entities.items.ashbone_war_brand.name': 'アッシュボーンの戦の焼印',
+  'entities.items.aurora_mote.name': 'オーロラの光粒',
+  'entities.items.barrow_grave_offering.name': '散らばった墓前の供物',
+  'entities.items.barrowshade_mantle.name': '塚影のマント',
+  'entities.items.breakscarred_steel.name': '裂け目傷の鋼',
+  'entities.items.bridgemere_toll_chest.name': '沈んだ通行料の櫃',
+  'entities.items.canopy_silk_hank.name': 'キャノピーシルクの束',
+  'entities.items.cinderwalk_treads.name': 'シンダーウォークの足具',
+  'entities.items.eelskin_mudwaders.name': 'ウナギ革の泥長靴',
+  'entities.items.emberwing_scale.name': 'エンバーウィングの鱗',
+  'entities.items.evergarden_bloom_clipping.name': '剪定した花の切り枝',
+  'entities.items.evergarden_statue_rubbing.name': '彫像の拓本',
+  'entities.items.farshore_salt_moss.name': '遠つ岸の塩苔',
+  'entities.items.fenway_mooring_line.name': '切られた舫い綱',
+  'entities.items.fountain_court_mantle.name': '噴水の中庭のマント',
+  'entities.items.frostmane_mantle.name': 'フロストメインのマント',
+  'entities.items.galecrest_ram_wool.name': '脂じみた雄羊の羊毛',
+  'entities.items.gallowmere_grave_candle.name': '墓前の蝋燭',
+  'entities.items.gilded_sap_clot.name': '金色の樹液の塊',
+  'entities.items.gloamfield_nightbloom.name': 'ナイトブルームの花',
+  'entities.items.gravebound_silk_wraps.name': '墓縛りの絹巻き',
+  'entities.items.gullhaven_watchbell.name': '沿岸の警鐘',
+  'entities.items.hearth_ember_cache.name': '熾火の壺',
+  'entities.items.hearthlined_treads.name': '炉火裏地の足具',
+  'entities.items.hedgewick_shears.name': '盗まれたヘッジウィックの剪定ばさみ',
+  'entities.items.hedgewick_tool_cart.name': 'ひっくり返った道具車',
+  'entities.items.lilybed_mantle.name': '睡蓮の褥のマント',
+  'entities.items.mantle_of_the_meredark.name': 'ミアダークのマント',
+  'entities.items.mantle_of_the_unbroken_shore.name': '揺るがぬ岸のマント',
+  'entities.items.mantle_of_the_unhorsed.name': '落馬せし者のマント',
+  'entities.items.mawscale_pauldrons.name': 'モウスケイルの肩当て',
+  'entities.items.mere_ferry_lantern.name': '渡し船のランタン',
+  'entities.items.moonfleece_mitts.name': 'ムーンフリースのミトン',
+  'entities.items.moonfleece_tuft.name': 'ムーンフリースの房毛',
+  'entities.items.orchard_sapbinder_grips.name': '樹液固めの握り',
+  'entities.items.pearlwake_cargo_crate.name': 'パールウェイクの積み荷箱',
+  'entities.items.plump_fen_eel.name': '丸々とした沼ウナギ',
+  'entities.items.saltforged_grips.name': '塩鍛えの握り',
+  'entities.items.saltwalker_sandals.name': '塩歩きのサンダル',
+  'entities.items.scorched_supply_crate.name': '焦げた補給箱',
+  'entities.items.shear_storm_lantern.name': '消えた嵐ランタン',
+  'entities.items.shearkeeper_gloves.name': '鋏守の手袋',
+  'entities.items.silkbound_remains.name': '絹に包まれた亡骸',
+  'entities.items.sprung_trap.name': '弾かれた沼の罠',
+  'entities.items.sunken_idol_mantle.name': '沈んだ神像のマント',
+  'entities.items.sunken_offering_bowl.name': '再び満たされた供物鉢',
+  'entities.items.thick_winter_pelt.name': '厚い冬毛皮',
+  'entities.items.vigil_star_chart.name': '石環の星図',
+  'entities.items.wickspun_treads.name': 'ウィック紡ぎの足具',
+  'entities.items.widowsilk_skein.name': 'ウィドウシルクのかせ',
+  'entities.items.wisplight_globe.name': 'ウィスプライトの玉',
+  'entities.items.wreck_wardens_mantle.name': 'レックウォーデンのマント',
+  'entities.items.wreckfield_flotsam_crate.name': '漂着物の木箱',
+  'entities.items.wyrmwatch_warning_banner.name': 'ワームウォッチの警告旗',
   'hudChrome.professions.skillValue': '{skill} / {max}',
 };
