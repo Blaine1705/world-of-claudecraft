@@ -3452,7 +3452,9 @@ export type SimEvent = { pid?: number } & (
       phase?: 'release' | 'halt' | 'resume';
       // 'orb': the casting entity, keying halt/resume to their live orb (one
       // orb per caster: the cooldown far outlasts the flight). 'tick': the
-      // zone's owner, so the renderer can attribute the pulse.
+      // zone's owner, so the renderer can attribute the pulse. 'nova' (aimed
+      // blasts): the caster, so the renderer can fly the ability's authored
+      // projectile volley from their hands to the aimed point.
       sourceId?: number;
     }
   // entityId (when set) anchors the log to that entity so the server only

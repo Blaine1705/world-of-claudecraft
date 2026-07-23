@@ -1311,6 +1311,9 @@ export function runEffects(
         // an aimed blast, the entity-anchored nova otherwise).
         const aoeCenter = p.castAim ?? p.pos;
         if (p.castAim) {
+          // sourceId attributes the landing to its caster so the renderer can
+          // fly the ability's authored projectile volley from the caster's
+          // hands to the aimed point (Splitshot's fan of arrows).
           ctx.emit({
             type: 'spellfxAt',
             x: aoeCenter.x,
@@ -1319,6 +1322,7 @@ export function runEffects(
             fx: 'nova',
             radius: eff.radius,
             ability: ability.id,
+            sourceId: p.id,
           });
         } else {
           ctx.emit({
