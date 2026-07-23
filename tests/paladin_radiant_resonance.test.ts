@@ -112,6 +112,36 @@ describe('Paladin Radiant Resonance', () => {
     });
   });
 
+  it('counts only allies inside 30 yards and in line of sight toward the proc threshold', () => {
+    const { sim, paladin, firstAlly, secondAlly } = holyParty();
+    sim.rng.range = () => 100;
+    setHealth(paladin, 1_000);
+    setHealth(firstAlly, 1);
+    setHealth(secondAlly, 1);
+    secondAlly.pos.z = paladin.pos.z + 31;
+    sim.playerGrid.update(secondAlly);
+
+    runAbility(sim, paladin, 'radiant_chorus');
+
+    expect(firstAlly.hp).toBeGreaterThan(1);
+    expect(secondAlly.hp).toBe(1);
+    expect(resonance(paladin)).toBeUndefined();
+
+    setHealth(firstAlly, 1);
+    setHealth(secondAlly, 1);
+    secondAlly.pos.z = paladin.pos.z;
+    sim.playerGrid.update(secondAlly);
+    const hasLineOfSight = sim.ctx.hasLineOfSight;
+    sim.ctx.hasLineOfSight = (source, target) =>
+      target.id !== secondAlly.id && hasLineOfSight(source, target);
+
+    runAbility(sim, paladin, 'radiant_chorus');
+
+    expect(firstAlly.hp).toBeGreaterThan(1);
+    expect(secondAlly.hp).toBe(1);
+    expect(resonance(paladin)).toBeUndefined();
+  });
+
   it('expires after 10 sec without being consumed', () => {
     const { sim, paladin, firstAlly } = holyParty();
     setHealth(paladin, 1);

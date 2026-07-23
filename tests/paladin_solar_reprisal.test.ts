@@ -102,6 +102,24 @@ describe('Protection Paladin Solar Reprisal', () => {
     });
   });
 
+  it('does not grant the proc when a successful Vowkeeper Strike loses its proc roll', () => {
+    const sim = makeProtection();
+    const target = targetAt(sim, 2);
+    sim.targetEntity(target.id);
+    sim.rng.next = () => 0.99;
+    const chances: number[] = [];
+    sim.rng.chance = (chance) => {
+      chances.push(chance);
+      return false;
+    };
+
+    sim.castAbility('vowkeeper_strike');
+
+    expect(target.hp).toBeLessThan(target.maxHp);
+    expect(chances).toContain(SOLAR_REPRISAL_VOWKEEPER_CHANCE);
+    expect(proc(sim.player)).toBeUndefined();
+  });
+
   it('rolls Solar Reprisal after an actual mob attack is blocked', () => {
     const sim = makeProtection();
     sim.addItem('eastbrook_buckler', 1);
@@ -145,6 +163,30 @@ describe('Protection Paladin Solar Reprisal', () => {
       kind: SOLAR_REPRISAL_KIND,
       remaining: 8,
     });
+  });
+
+  it('does not grant the proc when a real block loses its Solar Reprisal roll', () => {
+    const sim = makeProtection();
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+    const attacker = targetAt(sim, 2);
+    const defense = warriorMeleeDefense(sim.player, attacker);
+    const blockRoll =
+      swingMissChance(attacker, sim.player) +
+      sim.player.dodgeChance +
+      defense.parryChance +
+      defense.blockChance / 2;
+    const chances: number[] = [];
+    sim.rng.next = () => blockRoll;
+    sim.rng.chance = (chance) => {
+      chances.push(chance);
+      return false;
+    };
+
+    meleeSwing(sim.ctx, attacker, sim.player, 0, null, {});
+
+    expect(chances).toContain(SOLAR_REPRISAL_BLOCK_CHANCE);
+    expect(proc(sim.player)).toBeUndefined();
   });
 
   it('expires after eight seconds when no eligible ability consumes it', () => {

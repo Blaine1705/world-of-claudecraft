@@ -6469,6 +6469,11 @@ export function abilitiesKnownAt(
   for (const id of ids) {
     const def = ABILITIES[id];
     if (!def) continue;
+    // Retired ids stay in ABILITIES so persisted action bars can identify and
+    // discard them, but they are not authoritative actions. Keeping them in
+    // `known` would let modified clients and RL slots cast abilities the
+    // official spellbook deliberately hides.
+    if (def.hiddenFromPlayer) continue;
     const granted = grantIds.has(id) || !baseIds.includes(id);
     if (!granted && def.learnLevel > level) continue; // class kit is level-gated; grants bypass it
     // Quest-gated kit: a quest-locked ability stays hidden until its unlocking

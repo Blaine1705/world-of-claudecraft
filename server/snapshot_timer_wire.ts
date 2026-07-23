@@ -144,7 +144,7 @@ function auraWire(record: StableAuraRecord): StableAuraWire {
 }
 
 /**
- * Per-entity v2 aura cache. Live countdowns are represented as absolute expiry
+ * Per-entity stable aura cache. Live countdowns are represented as absolute expiry
  * times, so an ordinary tick does not allocate or stringify a new aura list.
  */
 export class StableAuraWireCache {

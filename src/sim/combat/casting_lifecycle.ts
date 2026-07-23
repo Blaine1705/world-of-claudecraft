@@ -1757,6 +1757,23 @@ function applyAbility(
     // Goad / Menace already never roll, since they resolve instantly below).
     const isTaunt = res.effects.some((eff) => eff.type === 'taunt');
     scheduleProjectile(ctx, p, target, (src, tgt) => {
+      if (ability.id === 'sunward_disc') {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: src.id,
+          targetId: tgt.id,
+          school: ability.school,
+          fx: 'paladinSunwardDiscImpact',
+          ability: ability.id,
+          level: 0,
+          count:
+            1 +
+            res.effects.reduce(
+              (jumps, effect) => (effect.type === 'chainDamage' ? effect.jumps : jumps),
+              0,
+            ),
+        });
+      }
       if (isSpell && !isTaunt && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
         ctx.emit({
           type: 'damage',

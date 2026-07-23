@@ -320,6 +320,14 @@ export class Vfx {
     this.points.renderOrder = 5;
     scene.add(this.points);
     this.paladinSpellFx = new PaladinSpellVfxController(anchor, (particle) => {
+      const essential =
+        particle.tag.includes('core') ||
+        particle.tag.includes('impact') ||
+        particle.tag.includes('rune') ||
+        particle.tag.includes('ring') ||
+        particle.tag === 'bastion-leading-edge' ||
+        particle.tag === 'bastion-ground-wave';
+      if (!essential && Math.random() * 100 >= this.scaledCount(100)) return;
       this.spawn(
         particle.position.x,
         particle.position.y,
@@ -747,7 +755,22 @@ export class Vfx {
   }
 
   paladinSunwardDisc(sourceId: number, targetId: number, hopIndex: number, totalHits = 3): void {
-    this.paladinSpellFx.sunwardDisc({ sourceId, targetId, hopIndex, totalHits });
+    this.paladinSpellFx.sunwardDisc({
+      sourceId,
+      targetId,
+      hopIndex,
+      totalHits,
+      awaitImpact: true,
+    });
+  }
+
+  paladinSunwardDiscImpact(
+    sourceId: number,
+    targetId: number,
+    hopIndex: number,
+    totalHits = 3,
+  ): void {
+    this.paladinSpellFx.sunwardDiscImpact(sourceId, targetId, hopIndex, totalHits);
   }
 
   paladinBastionSweep(sourceId: number, radius: number, arcDegrees: number, facing: number): void {

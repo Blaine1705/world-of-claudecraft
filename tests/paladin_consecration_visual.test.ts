@@ -98,4 +98,31 @@ describe('Paladin Consecration ground visual', () => {
     groundFx.update(0.15, false);
     expect(pulse?.scale.x).toBeGreaterThan(initialScale);
   });
+
+  it('keeps the sacred seal readable while dropping decorative drawables at low quality', () => {
+    const scene = new THREE.Scene();
+    const groundFx = new PaladinConsecrationVisuals(scene, () => 0);
+    groundFx.setQuality(0);
+    groundFx.sync([
+      {
+        id: 'consecration:low',
+        x: 0,
+        z: 0,
+        radius: 6,
+        duration: 9,
+        remaining: 9,
+      },
+    ]);
+
+    const visual = scene.getObjectByName('paladin-consecration');
+    if (!visual) throw new Error('missing Consecration visual');
+    expect(visual.getObjectByName('paladin-consecration-base-glow')?.visible).toBe(true);
+    expect(visual.getObjectByName('paladin-consecration-perimeter')?.visible).toBe(true);
+    expect(visual.getObjectByName('paladin-consecration-sun-rune-field')?.visible).toBe(true);
+    expect(visual.getObjectByName('paladin-consecration-pulse-ring')?.visible).toBe(true);
+    expect(visual.getObjectByName('paladin-consecration-middle-ring')?.visible).toBe(false);
+    expect(visual.getObjectByName('paladin-consecration-shimmer')?.visible).toBe(false);
+    expect(visual.getObjectByName('paladin-consecration-motes')?.visible).toBe(false);
+    expect(visual.getObjectByName('paladin-consecration-edge-wisps')?.visible).toBe(false);
+  });
 });

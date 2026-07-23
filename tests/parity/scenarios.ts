@@ -3510,8 +3510,8 @@ function targetingMarkers(): Scenario {
 //  - mage arcane_explosion: aoeDamage per-target rng.range over 2 in-radius mobs.
 //  - rogue sinister_strike -> eviscerate -> kidney_shot: weaponStrike awardCombo
 //    latch, finisherDamage range-THEN-chance, and the combo-spend reset after the loop.
-//  - paladin seal_of_righteousness -> consecration: imbue Seal and the groundAoE
-//    on-cast pulse (pulseGroundAoE + groundAoEs.push).
+//  - paladin bastion_rite -> consecration: the live Protection self-heal/block
+//    buff and the groundAoE on-cast pulse (pulseGroundAoE + groundAoEs.push).
 //  - druid moonfire -> bear_form -> cat_form -> rejuvenation: directDamage range-then-
 //    chance + a dot in ONE cast, exclusive selfBuff form switch (recalc), and a hot.
 //  - warlock fear -> summon_imp: incapacitate fear-angle draw rng.range(-PI,PI) and the
@@ -3640,15 +3640,15 @@ function c4bEffectDispatch(): Scenario {
       sim.castAbility('kidney_shot', rogue); // finisherStun + combo-spend reset
       rec.snapshot('rogue-combo-finishers');
 
-      // --- paladin: seal -> consecration (groundAoE) ---
+      // --- paladin: Bastion Rite -> consecration (groundAoE) ---
       const mobP = dummy(ePaladin);
       face(ePaladin, mobP);
       sim.targetEntity(mobP.id, paladin);
       ready(ePaladin);
-      sim.castAbility('seal_of_righteousness', paladin); // imbue (sets the Seal)
+      sim.castAbility('bastion_rite', paladin); // live Protection block/heal choice
       ready(ePaladin);
       sim.castAbility('consecration', paladin); // groundAoE: on-cast pulse + groundAoEs.push
-      rec.snapshot('paladin-seal-consecrate');
+      rec.snapshot('paladin-bastion-consecrate');
 
       // --- druid: moonfire (directDamage range-then-chance + dot) -> forms -> hot ---
       const mobD = dummy(eDruid);

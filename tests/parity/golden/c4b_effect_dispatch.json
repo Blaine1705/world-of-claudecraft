@@ -5455,13 +5455,13 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 428,
-      "state": "77423445",
-      "events": "c44c8a16",
+      "state": "f4d9a315",
+      "events": "64ef73a6",
       "rng": {
         "draws": 454,
         "digest": "b431b368"
       },
-      "label": "paladin-seal-consecrate",
+      "label": "paladin-bastion-consecrate",
       "players": [
         {
           "activeLoadout": -1,
@@ -6173,18 +6173,32 @@
           "attackPower": 120,
           "auras": [
             {
-              "duration": 30,
-              "id": "seal_of_righteousness",
-              "kind": "imbue",
-              "name": "Oathbrand",
-              "remaining": 30,
+              "duration": 6,
+              "id": "bastion_rite",
+              "kind": "buff_dr_phys",
+              "name": "Bastion Rite",
+              "remaining": 6,
               "school": "holy",
               "sourceId": 418,
-              "value": 11
+              "value": 0.2
+            },
+            {
+              "duration": 6,
+              "id": "bastion_rite_buff_block",
+              "kind": "buff_block",
+              "name": "Bastion Rite",
+              "remaining": 6,
+              "school": "holy",
+              "sourceId": 418,
+              "value": 0.2
             }
           ],
           "comboUntil": -1,
           "cooldowns": [
+            [
+              "bastion_rite",
+              10
+            ],
             [
               "consecration",
               12
@@ -6713,7 +6727,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 429,
-      "state": "f0d769da",
+      "state": "af9c740a",
       "events": "a867c74e",
       "rng": {
         "draws": 454,
@@ -7431,18 +7445,32 @@
           "attackPower": 120,
           "auras": [
             {
-              "duration": 30,
-              "id": "seal_of_righteousness",
-              "kind": "imbue",
-              "name": "Oathbrand",
-              "remaining": 30,
+              "duration": 6,
+              "id": "bastion_rite",
+              "kind": "buff_dr_phys",
+              "name": "Bastion Rite",
+              "remaining": 6,
               "school": "holy",
               "sourceId": 418,
-              "value": 11
+              "value": 0.2
+            },
+            {
+              "duration": 6,
+              "id": "bastion_rite_buff_block",
+              "kind": "buff_block",
+              "name": "Bastion Rite",
+              "remaining": 6,
+              "school": "holy",
+              "sourceId": 418,
+              "value": 0.2
             }
           ],
           "comboUntil": -1,
           "cooldowns": [
+            [
+              "bastion_rite",
+              10
+            ],
             [
               "consecration",
               12
@@ -8025,7 +8053,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 429,
-      "state": "f0d769da",
+      "state": "af9c740a",
       "events": "741638a5",
       "rng": {
         "draws": 454,
@@ -8743,18 +8771,32 @@
           "attackPower": 120,
           "auras": [
             {
-              "duration": 30,
-              "id": "seal_of_righteousness",
-              "kind": "imbue",
-              "name": "Oathbrand",
-              "remaining": 30,
+              "duration": 6,
+              "id": "bastion_rite",
+              "kind": "buff_dr_phys",
+              "name": "Bastion Rite",
+              "remaining": 6,
               "school": "holy",
               "sourceId": 418,
-              "value": 11
+              "value": 0.2
+            },
+            {
+              "duration": 6,
+              "id": "bastion_rite_buff_block",
+              "kind": "buff_block",
+              "name": "Bastion Rite",
+              "remaining": 6,
+              "school": "holy",
+              "sourceId": 418,
+              "value": 0.2
             }
           ],
           "comboUntil": -1,
           "cooldowns": [
+            [
+              "bastion_rite",
+              10
+            ],
             [
               "consecration",
               12

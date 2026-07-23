@@ -37,6 +37,7 @@ import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 import { buildCraftingView } from '../src/ui/crafting_view';
+import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 
 const DELTA_KEYS = [
   'inv',
@@ -4587,8 +4588,10 @@ describe('authoritative interaction command outcomes', () => {
   });
 });
 
-describe('negotiated stable timer wire v2', () => {
-  const timerV2 = { timerWireVersion: 2 } as unknown as Parameters<GameServer['join']>[7];
+describe('negotiated stable timer wire v3', () => {
+  const timerV3 = {
+    timerWireVersion: STABLE_TIMER_WIRE_VERSION,
+  } as unknown as Parameters<GameServer['join']>[7];
 
   function testAura(id: string, remaining: number, value = 7): Aura {
     return {
@@ -4641,7 +4644,7 @@ describe('negotiated stable timer wire v2', () => {
         stable ? 21 : 20,
         stable ? 'StablePermanent' : 'LegacyPermanent',
         'paladin',
-        stable ? timerV2 : undefined,
+        stable ? timerV3 : undefined,
       );
       const player = server.sim.entities.get(session.pid)!;
       const permanent = testAura('devotion_ward', Number.POSITIVE_INFINITY, 0.05);
@@ -4654,12 +4657,14 @@ describe('negotiated stable timer wire v2', () => {
       const snapshot = lastSnap(fc.sent);
       expect(snapshot.self.auras[0]).toMatchObject({
         id: 'devotion_ward',
-        dur: 0,
         perm: 1,
       });
       expect(snapshot.self.auras[0]).not.toHaveProperty('exp');
       if (stable) expect(snapshot.self.auras[0]).not.toHaveProperty('rem');
-      else expect(snapshot.self.auras[0].rem).toBe(0);
+      else {
+        expect(snapshot.self.auras[0].dur).toBeGreaterThan(0);
+        expect(snapshot.self.auras[0].rem).toBe(snapshot.self.auras[0].dur);
+      }
 
       const client = bareClient(session.pid, 'paladin');
       (client as any).applySnapshot(snapshot);
@@ -4675,7 +4680,7 @@ describe('negotiated stable timer wire v2', () => {
   it('sends a complete stable first snapshot, then ages omitted timers across skipped ticks', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Stable', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'Stable', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     const meta = server.sim.meta(session.pid)!;
     player.auras = [];
@@ -4694,7 +4699,7 @@ describe('negotiated stable timer wire v2', () => {
 
     broadcast(server);
     const first = lastSnap(fc.sent);
-    expect(first.tw).toBe(2);
+    expect(first.tw).toBe(STABLE_TIMER_WIRE_VERSION);
     expect(first.self.auras[0]).toMatchObject({ id: 'stable_aura', exp: 10 });
     expect(first.self.auras[0]).not.toHaveProperty('rem');
     expect(first.self.cds.stable_cast).toBe(5);
@@ -4774,7 +4779,7 @@ describe('negotiated stable timer wire v2', () => {
   it('re-sends aura refreshes, reorder, values, stacks, and charges without timer churn', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'AuraMutations', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'AuraMutations', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     player.auras = [];
     const firstAura = testAura('first', 10, 2);
@@ -4809,7 +4814,7 @@ describe('negotiated stable timer wire v2', () => {
   it('keeps rate-aware cooldown deadlines stable through Temporal Hourglass acceleration', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Accelerated', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'Accelerated', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     player.auras = [];
     player.auras.push({
@@ -4866,7 +4871,7 @@ describe('negotiated stable timer wire v2', () => {
   it('freezes retained auras while dead, then resumes absolute decay after resurrection', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Paused', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'Paused', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     player.auras = [];
     player.auras.push(testAura('retained', 8));
@@ -4911,12 +4916,12 @@ describe('negotiated stable timer wire v2', () => {
     expect(client.player.auras[0].remaining).toBeCloseTo(frozenRemaining - 0.1, 5);
   });
 
-  it('keeps legacy and v2 entity variants isolated and builds each at most once per tick', () => {
+  it('keeps legacy and stable entity variants isolated and builds each at most once per tick', () => {
     const server = new GameServer();
     const stableWs = fakeWs();
     const legacyWs = fakeWs();
     const subjectWs = fakeWs();
-    const stable = joinServer(server, stableWs, 1, 'StableViewer', 'warrior', timerV2);
+    const stable = joinServer(server, stableWs, 1, 'StableViewer', 'warrior', timerV3);
     joinServer(server, legacyWs, 2, 'LegacyViewer');
     const subject = joinServer(server, subjectWs, 3, 'Subject', 'mage');
     const subjectEntity = server.sim.entities.get(subject.pid)!;
@@ -4967,7 +4972,7 @@ describe('negotiated stable timer wire v2', () => {
     const stableWs = fakeWs();
     const legacyWs = fakeWs();
     const targetWs = fakeWs();
-    const stableSpectator = joinServer(server, stableWs, 1, 'StableSpec', 'mage', timerV2);
+    const stableSpectator = joinServer(server, stableWs, 1, 'StableSpec', 'mage', timerV3);
     const legacySpectator = joinServer(server, legacyWs, 2, 'LegacySpec', 'mage');
     const target = joinServer(server, targetWs, 3, 'Observed', 'mage');
     for (let i = 0; i < 5; i++) server.sim.tick();
@@ -4984,7 +4989,7 @@ describe('negotiated stable timer wire v2', () => {
     const stableSnap = lastSnap(stableWs.sent);
     const legacySnap = lastSnap(legacyWs.sent);
     expect(stableSnap.self.id).toBe(target.pid);
-    expect(stableSnap.tw).toBe(2);
+    expect(stableSnap.tw).toBe(STABLE_TIMER_WIRE_VERSION);
     expect(stableSnap.self.auras[0]).toHaveProperty('exp');
     expect(stableSnap.self.cds.observed_cast).toBeCloseTo(server.sim.time + 5, 5);
     expect(legacySnap.self.id).toBe(target.pid);
@@ -5009,14 +5014,14 @@ describe('negotiated stable timer wire v2', () => {
       'warrior',
       null,
       false,
-      timerV2,
+      timerV3,
     );
     if ('error' in stableResult) throw new Error(stableResult.error);
     expect(stableResult).toBe(original);
-    expect((stableResult as any).timerWireVersion).toBe(2);
+    expect((stableResult as any).timerWireVersion).toBe(STABLE_TIMER_WIRE_VERSION);
     stableWs.sent.length = 0;
     broadcast(server);
-    expect(lastSnap(stableWs.sent).tw).toBe(2);
+    expect(lastSnap(stableWs.sent).tw).toBe(STABLE_TIMER_WIRE_VERSION);
 
     stableWs.ws.readyState = 3;
     expect(server.socketClosed(stableResult, stableWs.ws)).toBe(true);
@@ -5030,7 +5035,7 @@ describe('negotiated stable timer wire v2', () => {
     expect(lastSnap(fallbackWs.sent).tw).toBeUndefined();
   });
 
-  it('falls back to legacy decode solely when the snapshot has no v2 marker', () => {
+  it('falls back to legacy decode solely when the snapshot has no stable marker', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'OldServer', 'mage');
@@ -5061,7 +5066,7 @@ describe('negotiated stable timer wire v2', () => {
     const server = new GameServer();
     const viewerWs = fakeWs();
     const subjectWs = fakeWs();
-    const viewer = joinServer(server, viewerWs, 1, 'MovingViewer', 'mage', timerV2);
+    const viewer = joinServer(server, viewerWs, 1, 'MovingViewer', 'mage', timerV3);
     const subject = joinServer(server, subjectWs, 2, 'MovingSubject', 'mage');
     const subjectEntity = server.sim.entities.get(subject.pid)!;
     subjectEntity.auras = [testAura('moving_aura', 20)];
@@ -5101,7 +5106,7 @@ describe('negotiated stable timer wire v2', () => {
     const server = new GameServer();
     const viewerWs = fakeWs();
     const subjectWs = fakeWs();
-    const viewer = joinServer(server, viewerWs, 1, 'DeferredViewer', 'mage', timerV2);
+    const viewer = joinServer(server, viewerWs, 1, 'DeferredViewer', 'mage', timerV3);
     const subject = joinServer(server, subjectWs, 2, 'DeferredSubject', 'mage');
     const viewerEntity = server.sim.entities.get(viewer.pid)!;
     const subjectEntity = server.sim.entities.get(subject.pid)!;

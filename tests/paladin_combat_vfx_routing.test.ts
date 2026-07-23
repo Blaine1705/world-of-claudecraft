@@ -1,28 +1,116 @@
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { Renderer } from '../src/render/renderer';
+import type { SimEvent } from '../src/sim/types';
 
 describe('Paladin combat VFX routing', () => {
-  it('routes Solar Invocation, Sunward Disc, Dawnfall, and Final Edict distinctly', () => {
-    const rendererPath = fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url));
-    const renderer = readFileSync(rendererPath, 'utf8');
+  it('executes each Paladin spellfx route against the renderer collaborators', () => {
+    const triggerAttack = vi.fn();
+    const pulseAt = vi.fn();
+    const vfx = {
+      paladinHolyShock: vi.fn(),
+      paladinSunwardDisc: vi.fn(),
+      paladinSunwardDiscImpact: vi.fn(),
+      paladinBastionSweep: vi.fn(),
+      paladinBastionSweepImpact: vi.fn(),
+      paladinDawnfall: vi.fn(),
+      paladinDawnfallImpact: vi.fn(),
+      paladinFinalEdict: vi.fn(),
+    };
+    const renderer = {
+      sim: {
+        player: { id: 1 },
+        entities: new Map([[1, { facing: 1.25 }]]),
+      },
+      triggerAttack,
+      pulseAt,
+      vfx,
+    } as unknown as Renderer;
+    const handle = (event: Record<string, unknown>) =>
+      Renderer.prototype.handleEvent.call(renderer, event as SimEvent);
 
-    expect(renderer).toContain("ev.fx === 'paladinHolyShock'");
-    expect(renderer).toContain('this.vfx.paladinHolyShock(');
-    expect(renderer).toContain("ev.fx === 'paladinSunwardDisc'");
-    expect(renderer).toContain('this.vfx.paladinSunwardDisc(');
-    expect(renderer).toContain("this.triggerAttack(ev.sourceId, 'sunward_disc')");
-    expect(renderer).toContain("ev.fx === 'paladinDawnfall'");
-    expect(renderer).toContain('this.triggerAttack(ev.sourceId, ev.ability)');
-    expect(renderer).toContain('this.vfx.paladinDawnfall(ev.sourceId, ev.range ?? 6)');
-    expect(renderer).toContain("ev.fx === 'paladinDawnfallImpact'");
-    expect(renderer).toContain('this.vfx.paladinDawnfallImpact(ev.targetId)');
-    expect(renderer).toContain("ev.fx === 'paladinFinalEdict'");
-    expect(renderer).toContain('this.vfx.paladinFinalEdict(ev.sourceId, ev.targetId)');
-    expect(renderer).toContain("ev.fx === 'paladinBastionSweep'");
-    expect(renderer).toContain("this.triggerAttack(ev.sourceId, 'bastion_sweep')");
-    expect(renderer).toContain('this.vfx.paladinBastionSweep(');
-    expect(renderer).toContain("ev.fx === 'paladinBastionSweepImpact'");
-    expect(renderer).toContain('this.vfx.paladinBastionSweepImpact(ev.targetId)');
+    handle({
+      type: 'spellfx',
+      fx: 'paladinHolyShock',
+      sourceId: 1,
+      targetId: 2,
+      school: 'holy',
+      impact: 'healing',
+    });
+    expect(vfx.paladinHolyShock).toHaveBeenCalledWith(1, 2, 'heal');
+
+    handle({
+      type: 'spellfx',
+      fx: 'paladinSunwardDisc',
+      sourceId: 1,
+      targetId: 2,
+      school: 'holy',
+      level: 0,
+      count: 3,
+    });
+    expect(triggerAttack).toHaveBeenCalledWith(1, 'sunward_disc');
+    expect(vfx.paladinSunwardDisc).toHaveBeenCalledWith(1, 2, 0, 3);
+
+    handle({
+      type: 'spellfx',
+      fx: 'paladinSunwardDiscImpact',
+      sourceId: 1,
+      targetId: 2,
+      school: 'holy',
+      level: 0,
+      count: 3,
+    });
+    expect(vfx.paladinSunwardDiscImpact).toHaveBeenCalledWith(1, 2, 0, 3);
+
+    handle({
+      type: 'spellfx',
+      fx: 'paladinBastionSweep',
+      sourceId: 1,
+      targetId: 1,
+      school: 'holy',
+      range: 6,
+      angle: 180,
+      facing: 0.75,
+    });
+    expect(triggerAttack).toHaveBeenCalledWith(1, 'bastion_sweep');
+    expect(vfx.paladinBastionSweep).toHaveBeenCalledWith(1, 6, 180, 0.75);
+
+    handle({
+      type: 'spellfx',
+      fx: 'paladinBastionSweepImpact',
+      sourceId: 1,
+      targetId: 2,
+      school: 'holy',
+    });
+    expect(vfx.paladinBastionSweepImpact).toHaveBeenCalledWith(2);
+
+    handle({
+      type: 'spellfx',
+      fx: 'paladinDawnfall',
+      sourceId: 1,
+      targetId: 1,
+      school: 'holy',
+      ability: 'dawnfall',
+      range: 8,
+    });
+    expect(triggerAttack).toHaveBeenCalledWith(1, 'dawnfall');
+    expect(vfx.paladinDawnfall).toHaveBeenCalledWith(1, 8);
+
+    handle({
+      type: 'spellfx',
+      fx: 'paladinDawnfallImpact',
+      sourceId: 1,
+      targetId: 2,
+      school: 'holy',
+    });
+    expect(vfx.paladinDawnfallImpact).toHaveBeenCalledWith(2);
+
+    handle({
+      type: 'spellfx',
+      fx: 'paladinFinalEdict',
+      sourceId: 1,
+      targetId: 2,
+      school: 'holy',
+    });
+    expect(vfx.paladinFinalEdict).toHaveBeenCalledWith(1, 2);
   });
 });

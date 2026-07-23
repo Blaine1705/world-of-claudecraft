@@ -10,6 +10,7 @@
 // covered by tests/progression.test.ts.
 
 import { describe, expect, it } from 'vitest';
+import { ClientWorld } from '../src/net/online';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { QUESTS } from '../src/sim/data';
 import { acceptQuest, computeQuestState, turnInQuest } from '../src/sim/quests/quest_commands';
@@ -65,11 +66,38 @@ describe('paladin Divine Tome: the chain is class-locked and ordered', () => {
     expect(state('q_divine_tome', afterRestlessDead, 6, 'paladin')).toBe('available');
     expect(state('q_divine_tome', afterRestlessDead, 6, 'warrior')).toBe('unavailable');
     // A class-less caller must also fail closed.
-    expect(computeQuestState('q_divine_tome', empty, new Set(), 6, undefined)).toBe('unavailable');
+    expect(computeQuestState('q_divine_tome', empty, afterRestlessDead, 6, undefined)).toBe(
+      'unavailable',
+    );
   });
 
   it('step 1 respects its minimum level', () => {
-    expect(state('q_divine_tome', new Set(), 5, 'paladin')).toBe('unavailable');
+    expect(state('q_divine_tome', new Set(['q_bones']), 5, 'paladin')).toBe('unavailable');
+  });
+
+  it('the online client forwards its mirrored player class to the shared quest gate', () => {
+    function clientState(playerClass?: 'paladin' | 'warrior') {
+      const client = Object.create(ClientWorld.prototype) as ClientWorld;
+      const state = client as unknown as {
+        questLog: Map<string, QuestProgress>;
+        questsDone: Set<string>;
+        pendingQuestCommands: Map<string, 'accept' | 'turnin'>;
+        playerId: number;
+        entities: Map<number, { level: number }>;
+        cfg?: { seed: number; playerClass: 'paladin' | 'warrior' };
+      };
+      state.questLog = new Map();
+      state.questsDone = new Set(['q_bones']);
+      state.pendingQuestCommands = new Map();
+      state.playerId = 1;
+      state.entities = new Map([[1, { level: 6 }]]);
+      if (playerClass) state.cfg = { seed: 20061, playerClass };
+      return client.questState('q_divine_tome');
+    }
+
+    expect(clientState('paladin')).toBe('available');
+    expect(clientState('warrior')).toBe('unavailable');
+    expect(clientState()).toBe('unavailable');
   });
 
   it('the final rite needs step 1 done, level 6, and is still paladin-only', () => {

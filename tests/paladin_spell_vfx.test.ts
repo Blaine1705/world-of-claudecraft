@@ -120,7 +120,9 @@ describe('Paladin spell VFX timelines', () => {
     ).toBe(true);
     expect(
       emitted
-        .filter((particle) => particle.tag.includes('sunward-disc') && particle.tag.includes('halo'))
+        .filter(
+          (particle) => particle.tag.includes('sunward-disc') && particle.tag.includes('halo'),
+        )
         .every((particle) => particle.size >= 1.9),
     ).toBe(true);
     fx.update(0.24);
@@ -143,6 +145,29 @@ describe('Paladin spell VFX timelines', () => {
     expect(emitted.filter((particle) => particle.tag === 'sunward-impact-ring')).toHaveLength(3);
 
     fx.update(0.3);
+    expect(fx.activeEffectCount).toBe(0);
+  });
+
+  it('waits for authoritative arrival before showing a moving-target Sunward impact', () => {
+    const { anchors, emitted, fx } = fixture();
+    fx.sunwardDisc({
+      sourceId: 1,
+      targetId: 2,
+      hopIndex: 0,
+      totalHits: 3,
+      awaitImpact: true,
+    });
+
+    fx.update(0.5);
+    expect(emitted.some((particle) => particle.tag === 'sunward-impact')).toBe(false);
+
+    anchors.set(2, new THREE.Vector3(14, 1, -3));
+    fx.sunwardDiscImpact(1, 2, 0, 3);
+
+    const impact = emitted.find((particle) => particle.tag === 'sunward-impact');
+    expect(impact?.position.x).toBeCloseTo(14);
+    expect(impact?.position.z).toBeCloseTo(-3);
+    fx.update(0.2);
     expect(fx.activeEffectCount).toBe(0);
   });
 

@@ -577,6 +577,7 @@ const protection: AbilityDef[] = [
     range: 0,
     school: 'holy',
     requiresTarget: false,
+    requiresShield: true,
     threat: { mult: 3.5 },
     effects: [
       {

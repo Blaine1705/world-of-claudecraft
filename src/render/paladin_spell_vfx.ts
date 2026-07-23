@@ -63,6 +63,9 @@ export interface SunwardDiscFxConfig {
   targetId: number;
   hopIndex: number;
   totalHits?: number;
+  /** Production waits for the authoritative projectile-arrival event. The
+   * standalone preview leaves this false and uses the authored travel time. */
+  awaitImpact?: boolean;
 }
 
 export interface BastionSweepFxConfig {
@@ -98,11 +101,14 @@ interface ActiveSunwardDisc {
   targetId: number;
   hopIndex: number;
   totalHits: number;
+  origin: THREE.Vector3 | null;
   travelTime: number;
   elapsed: number;
   trailTimer: number;
   launched: boolean;
   impactEmitted: boolean;
+  awaitImpact: boolean;
+  impactElapsed: number | null;
 }
 
 interface ActiveBastionSweep extends BastionSweepFxConfig {
@@ -235,11 +241,14 @@ export class PaladinSpellVfxController {
       targetId: config.targetId,
       hopIndex: Math.max(0, Math.round(config.hopIndex)),
       totalHits: Math.max(1, Math.round(config.totalHits ?? 3)),
+      origin: source?.clone() ?? null,
       travelTime: Math.max(0.05, distance / PALADIN_SUNWARD_PROJECTILE_SPEED),
       elapsed: 0,
       trailTimer: 0,
       launched: false,
       impactEmitted: false,
+      awaitImpact: config.awaitImpact === true,
+      impactElapsed: null,
     };
     this.sunwardDiscs.push(effect);
     if (effect.hopIndex === 0) {
@@ -248,6 +257,40 @@ export class PaladinSpellVfxController {
       effect.launched = true;
       this.emitSunwardLaunch(effect);
     }
+  }
+
+  sunwardDiscImpact(sourceId: number, targetId: number, hopIndex: number, totalHits = 3): void {
+    const effect = [...this.sunwardDiscs]
+      .reverse()
+      .find(
+        (candidate) =>
+          candidate.sourceId === sourceId &&
+          candidate.targetId === targetId &&
+          candidate.hopIndex === hopIndex &&
+          !candidate.impactEmitted,
+      );
+    if (effect) {
+      effect.impactEmitted = true;
+      effect.impactElapsed = effect.elapsed;
+      this.emitSunwardImpact(effect);
+      return;
+    }
+    // A late-joining renderer can miss the launch event but still receives the
+    // authoritative impact. Preserve the hit read without inventing a flight.
+    this.emitSunwardImpact({
+      sourceId,
+      targetId,
+      hopIndex,
+      totalHits,
+      origin: null,
+      travelTime: 0,
+      elapsed: 0,
+      trailTimer: 0,
+      launched: true,
+      impactEmitted: true,
+      awaitImpact: true,
+      impactElapsed: 0,
+    });
   }
 
   bastionSweep(config: BastionSweepFxConfig): void {
@@ -348,7 +391,7 @@ export class PaladinSpellVfxController {
         effect.launched = true;
         this.emitSunwardLaunch(effect);
       }
-      if (effect.launched && !effect.impactEmitted && effect.elapsed < impactTime) {
+      if (effect.launched && !effect.impactEmitted) {
         effect.trailTimer += step;
         while (effect.trailTimer >= 0.03) {
           effect.trailTimer -= 0.03;
@@ -359,11 +402,21 @@ export class PaladinSpellVfxController {
           this.emitSunwardFlight(effect, progress);
         }
       }
-      if (!effect.impactEmitted && crossed(previous, effect.elapsed, impactTime)) {
+      if (
+        !effect.awaitImpact &&
+        !effect.impactEmitted &&
+        crossed(previous, effect.elapsed, impactTime)
+      ) {
         effect.impactEmitted = true;
+        effect.impactElapsed = effect.elapsed;
         this.emitSunwardImpact(effect);
       }
-      if (effect.elapsed >= impactTime + 0.2) this.sunwardDiscs.splice(index, 1);
+      if (
+        (effect.impactElapsed !== null && effect.elapsed >= effect.impactElapsed + 0.2) ||
+        (effect.awaitImpact && effect.elapsed >= 3.2)
+      ) {
+        this.sunwardDiscs.splice(index, 1);
+      }
     }
 
     for (let index = this.bastionSweeps.length - 1; index >= 0; index--) {
@@ -1027,7 +1080,7 @@ export class PaladinSpellVfxController {
   }
 
   private emitSunwardFormation(effect: ActiveSunwardDisc): void {
-    const source = this.anchor(effect.sourceId, 0.62);
+    const source = effect.origin ?? this.anchor(effect.sourceId, 0.62);
     if (!source) return;
     const shieldArm = source.clone().add(new THREE.Vector3(-0.28, 0.04, 0));
     emit(
@@ -1073,7 +1126,7 @@ export class PaladinSpellVfxController {
   }
 
   private emitSunwardLaunch(effect: ActiveSunwardDisc): void {
-    const source = this.anchor(effect.sourceId, 0.58);
+    const source = effect.origin ?? this.anchor(effect.sourceId, 0.58);
     const target = this.anchor(effect.targetId, 0.56);
     if (!source || !target) return;
     emit(
@@ -1101,7 +1154,7 @@ export class PaladinSpellVfxController {
   }
 
   private emitSunwardFlight(effect: ActiveSunwardDisc, progress: number): void {
-    const source = this.anchor(effect.sourceId, 0.58);
+    const source = effect.origin ?? this.anchor(effect.sourceId, 0.58);
     const target = this.anchor(effect.targetId, 0.56);
     if (!source || !target) return;
     const position = source.clone().lerp(target, progress);

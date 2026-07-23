@@ -36,6 +36,7 @@ interface ConsecrationVisual {
   materials: THREE.MeshBasicMaterial[];
   baseOpacities: number[];
   geometries: THREE.BufferGeometry[];
+  qualityObjects: { object: THREE.Object3D; minQuality: number }[];
   radius: number;
   duration: number;
   elapsed: number;
@@ -44,11 +45,17 @@ interface ConsecrationVisual {
 
 export class PaladinConsecrationVisuals {
   private readonly active = new Map<string, ConsecrationVisual>();
+  private quality = 1;
 
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
   ) {}
+
+  setQuality(level: number): void {
+    this.quality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
+    for (const visual of this.active.values()) this.applyQuality(visual);
+  }
 
   sync(states: readonly ActiveConsecration[]): void {
     const ids = new Set<string>();
@@ -98,6 +105,7 @@ export class PaladinConsecrationVisuals {
     const materials: THREE.MeshBasicMaterial[] = [];
     const baseOpacities: number[] = [];
     const geometries: THREE.BufferGeometry[] = [];
+    const qualityObjects: { object: THREE.Object3D; minQuality: number }[] = [];
 
     const addTerrainMesh = (
       geometry: THREE.BufferGeometry,
@@ -124,34 +132,46 @@ export class PaladinConsecrationVisuals {
       0.1,
       5,
     );
-    addTerrainMesh(
-      this.createTerrainDisc(state.x, state.z, radius * 0.62, 40),
-      'paladin-consecration-white-hot-center',
-      0xffffdc,
-      0.09,
-      6,
-    );
-    addTerrainMesh(
-      this.createTerrainRing(state.x, state.z, radius * 0.17, radius * 0.19),
-      'paladin-consecration-inner-ring',
-      0xffffcf,
-      0.48,
-      8,
-    );
-    addTerrainMesh(
-      this.createTerrainRing(state.x, state.z, radius * 0.39, radius * 0.405),
-      'paladin-consecration-middle-ring',
-      0xffe78b,
-      0.32,
-      8,
-    );
-    addTerrainMesh(
-      this.createTerrainRing(state.x, state.z, radius * 0.67, radius * 0.682),
-      'paladin-consecration-outer-ring',
-      0xffdb68,
-      0.25,
-      8,
-    );
+    qualityObjects.push({
+      object: addTerrainMesh(
+        this.createTerrainDisc(state.x, state.z, radius * 0.62, 40),
+        'paladin-consecration-white-hot-center',
+        0xffffdc,
+        0.09,
+        6,
+      ),
+      minQuality: 0.2,
+    });
+    qualityObjects.push({
+      object: addTerrainMesh(
+        this.createTerrainRing(state.x, state.z, radius * 0.17, radius * 0.19),
+        'paladin-consecration-inner-ring',
+        0xffffcf,
+        0.48,
+        8,
+      ),
+      minQuality: 0.25,
+    });
+    qualityObjects.push({
+      object: addTerrainMesh(
+        this.createTerrainRing(state.x, state.z, radius * 0.39, radius * 0.405),
+        'paladin-consecration-middle-ring',
+        0xffe78b,
+        0.32,
+        8,
+      ),
+      minQuality: 0.65,
+    });
+    qualityObjects.push({
+      object: addTerrainMesh(
+        this.createTerrainRing(state.x, state.z, radius * 0.67, radius * 0.682),
+        'paladin-consecration-outer-ring',
+        0xffdb68,
+        0.25,
+        8,
+      ),
+      minQuality: 0.45,
+    });
     addTerrainMesh(
       this.createTerrainRing(state.x, state.z, radius * 0.982, radius),
       'paladin-consecration-perimeter',
@@ -194,6 +214,7 @@ export class PaladinConsecrationVisuals {
     shimmer.position.set(state.x, centerY + 0.23, state.z);
     shimmer.renderOrder = 7;
     root.add(shimmer);
+    qualityObjects.push({ object: shimmer, minQuality: 0.7 });
     geometries.push(shimmerGeometry);
     materials.push(shimmerMaterial);
     baseOpacities.push(0.045);
@@ -205,6 +226,7 @@ export class PaladinConsecrationVisuals {
     motes.position.set(state.x, centerY, state.z);
     motes.renderOrder = 11;
     root.add(motes);
+    qualityObjects.push({ object: motes, minQuality: 0.25 });
     geometries.push(moteGeometry);
     materials.push(moteMaterial);
     baseOpacities.push(0.72);
@@ -216,6 +238,7 @@ export class PaladinConsecrationVisuals {
     edgeWisps.position.set(state.x, centerY, state.z);
     edgeWisps.renderOrder = 11;
     root.add(edgeWisps);
+    qualityObjects.push({ object: edgeWisps, minQuality: 0.55 });
     geometries.push(edgeGeometry);
     materials.push(edgeMaterial);
     baseOpacities.push(0.52);
@@ -260,15 +283,23 @@ export class PaladinConsecrationVisuals {
       materials,
       baseOpacities,
       geometries,
+      qualityObjects,
       radius,
       duration: Math.max(0.1, state.duration),
       elapsed: Math.max(0, state.duration - state.remaining),
       lastRemaining: state.remaining,
     };
+    this.applyQuality(visual);
     this.placeAmbient(visual, true);
     this.animate(visual, 0, true);
     this.active.set(state.id, visual);
     this.scene.add(root);
+  }
+
+  private applyQuality(visual: ConsecrationVisual): void {
+    for (const { object, minQuality } of visual.qualityObjects) {
+      object.visible = this.quality >= minQuality;
+    }
   }
 
   private material(color: number, opacity: number): THREE.MeshBasicMaterial {
@@ -300,9 +331,9 @@ export class PaladinConsecrationVisuals {
     visual.pulseRing.scale.setScalar(pulseScale);
     visual.pulseMaterial.opacity = 0.42 * fade * reveal * (1 - phase) ** 1.6;
     if (reducedMotion) return;
-    visual.motes.rotation.y += dt * 0.11;
-    visual.edgeWisps.rotation.y -= dt * 0.045;
-    visual.shimmer.rotation.y += dt * 0.08;
+    if (visual.motes.visible) visual.motes.rotation.y += dt * 0.11;
+    if (visual.edgeWisps.visible) visual.edgeWisps.rotation.y -= dt * 0.045;
+    if (visual.shimmer.visible) visual.shimmer.rotation.y += dt * 0.08;
     this.placeAmbient(visual, false);
   }
 
@@ -312,6 +343,7 @@ export class PaladinConsecrationVisuals {
       offsets: readonly AmbientOffset[],
       edge: boolean,
     ): void => {
+      if (!mesh.visible) return;
       for (let index = 0; index < offsets.length; index++) {
         const offset = offsets[index];
         const wave = staticPose ? 0 : Math.sin(visual.elapsed * (edge ? 1.45 : 2.1) + offset.phase);

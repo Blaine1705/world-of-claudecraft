@@ -134,6 +134,7 @@ describe('PaladinDevotionPainter', () => {
       'utf8',
     );
     const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8');
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
     expect(css).toMatch(/\.paladin-devotion::before[\s\S]*clip-path:\s*polygon\(/);
@@ -155,6 +156,11 @@ describe('PaladinDevotionPainter', () => {
     expect(devotionAt).toBeGreaterThan(-1);
     expect(devotionAt).toBeLessThan(bottomBarAt);
     expect(playerFrameAt).toBeGreaterThan(bottomBarAt);
+    for (const entry of [html, playHtml]) {
+      expect(entry.match(/id="paladin-devotion-frame"/g)).toHaveLength(1);
+      expect(entry.match(/id="paladin-devotion"/g)).toHaveLength(1);
+      expect(entry).toMatch(/id="paladin-devotion-frame"[^>]*tabindex="0"/);
+    }
     expect(hud).toContain("attachOverlayDrag(this.paladinDevotionFrameEl, 'paladinDevotionAnchor'");
     expect(hud).not.toContain('devotionFrameMover');
     expect(css).toMatch(/\.paladin-devotion-frame\s*\{[\s\S]*cursor:\s*grab/);

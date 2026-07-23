@@ -254,6 +254,7 @@ export function runEffects(
   res: ResolvedAbility,
   attackAnimationStarted = false,
   deferredBastionImpact = false,
+  facingOverride?: number,
 ): void {
   const ability = res.def;
   const initialTarget = target;
@@ -1568,6 +1569,7 @@ export function runEffects(
       }
       case 'aoeDamage': {
         if (ability.id === 'bastion_sweep' && !deferredBastionImpact) {
+          const castFacing = p.facing;
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,
@@ -1577,6 +1579,7 @@ export function runEffects(
             ability: ability.id,
             range: eff.radius,
             angle: ((eff.frontalHalfAngle ?? MELEE_ARC) * 360) / Math.PI,
+            facing: castFacing,
           });
           const sourceId = p.id;
           ctx.delayedEvents.push({
@@ -1589,7 +1592,7 @@ export function runEffects(
               const source = ctx.entities.get(sourceId);
               const sourceMeta = ctx.players.get(sourceId);
               if (!source || source.dead || !sourceMeta) return;
-              runEffects(ctx, source, sourceMeta, null, res, true, true);
+              runEffects(ctx, source, sourceMeta, null, res, true, true, castFacing);
             },
           });
           break;
@@ -1646,7 +1649,9 @@ export function runEffects(
           // melee facing arc are hit, the same MELEE_ARC check castAbility's
           // facing gate uses.
           if (eff.frontal) {
-            const facingDiff = Math.abs(normAngle(angleTo(p.pos, m.pos) - p.facing));
+            const facingDiff = Math.abs(
+              normAngle(angleTo(p.pos, m.pos) - (facingOverride ?? p.facing)),
+            );
             if (facingDiff > (eff.frontalHalfAngle ?? MELEE_ARC)) continue;
           }
           aoeTargets.push(m);

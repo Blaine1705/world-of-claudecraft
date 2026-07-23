@@ -8,6 +8,7 @@ import {
 } from '../headless/protocol';
 import { CLASSES } from '../src/sim/data';
 import { ACTIONS, encodeObs, NUM_ACTIONS, obsSize } from '../src/sim/obs';
+import { grantDevotion } from '../src/sim/paladin_devotion';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES } from '../src/sim/types';
 
@@ -111,6 +112,29 @@ describe('headless environment protocol validation', () => {
     }
     // 13 fixed actions (10 move/target + interact/stop/eat_drink) plus the ability slots
     expect(NUM_ACTIONS).toBe(13 + abilitySlots);
+  });
+
+  it('observes Devotion, Ascension, and the real Divine Ascension readiness gate', () => {
+    const sim = new Sim({ seed: 17, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('retribution')).toBe(true);
+    const slot = sim.known.findIndex((known) => known.def.id === 'divine_ascension');
+    expect(slot).toBeGreaterThanOrEqual(0);
+    const readyIndex = 16 + slot * 2;
+
+    expect(encodeObs(sim)[readyIndex]).toBe(0);
+    expect(encodeObs(sim).slice(-3)).toEqual([0, 0, 0]);
+
+    grantDevotion(sim.player, 20);
+    expect(encodeObs(sim)[readyIndex]).toBe(1);
+    expect(encodeObs(sim).slice(-3)).toEqual([1, 0, 0]);
+
+    sim.castAbility('divine_ascension');
+    expect(encodeObs(sim)[readyIndex]).toBe(0);
+    expect(encodeObs(sim).slice(-3)).toEqual([0, 1, 1]);
+
+    const warrior = new Sim({ seed: 18, playerClass: 'warrior', autoEquip: true });
+    expect(encodeObs(warrior).slice(-3)).toEqual([0, 0, 0]);
   });
 
   it('keeps the stdin line cap at one mebibyte', () => {

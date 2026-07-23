@@ -89,6 +89,39 @@ describe("Retribution Paladin Dawn's Wrath", () => {
     });
   });
 
+  it('does not grant the proc when successful attacks lose their Dawn’s Wrath roll', () => {
+    const autoSim = makeRetribution();
+    const autoTarget = targetAt(autoSim, 2);
+    const autoChances: number[] = [];
+    autoSim.rng.next = () => 0.99;
+    autoSim.rng.chance = (chance) => {
+      autoChances.push(chance);
+      return false;
+    };
+
+    expect(meleeSwing(autoSim.ctx, autoSim.player, autoTarget, 0, null, { autoAttack: true })).toBe(
+      true,
+    );
+    expect(autoChances).toContain(DAWNS_WRATH_PROC_CHANCE);
+    expect(proc(autoSim.player)).toBeUndefined();
+
+    const finalSim = makeRetribution();
+    const finalTarget = targetAt(finalSim, 2);
+    const finalChances: number[] = [];
+    finalSim.targetEntity(finalTarget.id);
+    finalSim.rng.next = () => 0.99;
+    finalSim.rng.chance = (chance) => {
+      finalChances.push(chance);
+      return false;
+    };
+
+    finalSim.castAbility('final_edict');
+
+    expect(finalTarget.hp).toBeLessThan(finalTarget.maxHp);
+    expect(finalChances).toContain(DAWNS_WRATH_PROC_CHANCE);
+    expect(proc(finalSim.player)).toBeUndefined();
+  });
+
   it('does not roll the proc after a missed auto-attack', () => {
     const sim = makeRetribution();
     const target = targetAt(sim, 2);

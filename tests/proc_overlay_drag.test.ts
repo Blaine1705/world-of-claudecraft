@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   clampOverlayAnchor,
+  nudgeOverlayAnchor,
   parseOverlayAnchor,
   serializeOverlayAnchor,
 } from '../src/ui/proc_overlay_drag';
@@ -25,10 +26,37 @@ describe('clampOverlayAnchor', () => {
     expect(clampOverlayAnchor(0.5, 0.42, 300, 232, 1600, 900)).toEqual({ fx: 0.5, fy: 0.42 });
   });
 
+  it('keeps the whole element clear of asymmetric mobile safe areas', () => {
+    const safeArea = { top: 0, right: 44, bottom: 21, left: 12 };
+    const bottomLeft = clampOverlayAnchor(0, 1, 72, 72, 844, 390, safeArea);
+    expect(bottomLeft.fx).toBeCloseTo((12 + 36) / 844);
+    expect(bottomLeft.fy).toBeCloseTo((390 - 21 - 36) / 390);
+    const topRight = clampOverlayAnchor(1, 0, 72, 72, 844, 390, safeArea);
+    expect(topRight.fx).toBeCloseTo((844 - 44 - 36) / 844);
+    expect(topRight.fy).toBeCloseTo(36 / 390);
+  });
+
   it('degrades to center on a degenerate viewport instead of NaN', () => {
     const a = clampOverlayAnchor(Number.NaN, 0.5, 300, 232, 0, 0);
     expect(a.fx).toBe(0.5);
     expect(Number.isFinite(a.fy)).toBe(true);
+  });
+});
+
+describe('keyboard nudging', () => {
+  it('moves in viewport fractions and clamps at every edge', () => {
+    expect(nudgeOverlayAnchor({ fx: 0.5, fy: 0.5 }, 'left')).toEqual({
+      fx: 0.48,
+      fy: 0.5,
+    });
+    expect(nudgeOverlayAnchor({ fx: 0.98, fy: 0.98 }, 'right', 0.1)).toEqual({
+      fx: 1,
+      fy: 0.98,
+    });
+    expect(nudgeOverlayAnchor({ fx: 0.02, fy: 0.02 }, 'up', 0.1)).toEqual({
+      fx: 0.02,
+      fy: 0,
+    });
   });
 });
 

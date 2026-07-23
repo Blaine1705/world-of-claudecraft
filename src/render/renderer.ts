@@ -1982,6 +1982,7 @@ export class Renderer {
     this.foliage.setGrassQuality(state.levels.grass);
     this.foliage.setModelQuality(state.levels.foliage);
     this.vfx.setQuality(state.levels.vfx);
+    this.paladinConsecrationVisuals.setQuality(state.levels.vfx);
     this.effectivePointLights = Math.max(1, Math.round(GFX.maxPointLights * state.levels.lighting));
     if (Math.abs(previousScale - this.effectiveRenderScale) >= 0.001) this.applyResolution();
   }
@@ -3552,6 +3553,8 @@ export class Renderer {
         } else if (ev.fx === 'paladinSunwardDisc') {
           if ((ev.level ?? 0) === 0) this.triggerAttack(ev.sourceId, 'sunward_disc');
           this.vfx.paladinSunwardDisc(ev.sourceId, ev.targetId, ev.level ?? 0, ev.count ?? 3);
+        } else if (ev.fx === 'paladinSunwardDiscImpact') {
+          this.vfx.paladinSunwardDiscImpact(ev.sourceId, ev.targetId, ev.level ?? 0, ev.count ?? 3);
         } else if (ev.fx === 'paladinBastionSweep') {
           const source = this.sim.entities.get(ev.sourceId);
           if (source) {
@@ -3560,7 +3563,7 @@ export class Renderer {
               ev.sourceId,
               ev.range ?? 6,
               ev.angle ?? 180,
-              source.facing,
+              ev.facing ?? source.facing,
             );
           }
         } else if (ev.fx === 'paladinBastionSweepImpact') {

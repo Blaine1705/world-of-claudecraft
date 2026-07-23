@@ -180,6 +180,29 @@ describe('Paladin support abilities', () => {
     expect(known('holy')).toContain('avenging_wrath');
     expect(known('retribution')).toContain('avenging_wrath');
     expect(known('retribution')).not.toContain('righteous_fury');
+    const retired = [
+      'seal_of_righteousness',
+      'devotion_aura',
+      'blessing_of_might',
+      'holy_taunt',
+      'flash_of_light',
+      'exorcism',
+      'rebuke',
+      'sacred_bulwark',
+      'holy_shock',
+      'crusader_strike',
+    ];
+    for (const spec of ['protection', 'holy', 'retribution'] as const) {
+      for (const id of retired) expect(known(spec)).not.toContain(id);
+    }
+    const authority = new Sim({ seed: 102, playerClass: 'paladin', autoEquip: true });
+    authority.setPlayerLevel(20);
+    expect(authority.setSpec('retribution')).toBe(true);
+    for (const id of retired) {
+      expect(authority.resolvedAbility(id), id).toBeNull();
+      authority.castAbility(id);
+    }
+    expect(authority.player.cooldowns.size).toBe(0);
     expect(ABILITIES.unbinding_blessing).toBeUndefined();
     expect(ABILITIES.citadel_of_faith).toBeUndefined();
   });

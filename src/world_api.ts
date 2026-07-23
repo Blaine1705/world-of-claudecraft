@@ -108,7 +108,7 @@ export type {
 
 // Snapshot timer wire capability shared by the browser mirror and authoritative
 // server. Keep the version exact so rolling deploys can negotiate fail-closed.
-export const STABLE_TIMER_WIRE_VERSION = 2 as const;
+export const STABLE_TIMER_WIRE_VERSION = 3 as const;
 export type StableTimerWireVersion = typeof STABLE_TIMER_WIRE_VERSION;
 
 // Absolute cooldown schedule in server simulation seconds. A number is the

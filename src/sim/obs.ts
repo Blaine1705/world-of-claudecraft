@@ -1,4 +1,11 @@
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
+import {
+  ASCENSION_CHARGES,
+  ASCENSION_DURATION,
+  canActivateDivineAscension,
+  hasDevotion,
+  MAX_DEVOTION,
+} from './paladin_devotion';
 import type { Sim } from './sim';
 import {
   angleTo,
@@ -133,7 +140,7 @@ export function applyAction(sim: Sim, action: number): void {
 const NEARBY_MOBS = 5;
 
 export function obsSize(): number {
-  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
+  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2 + 3;
 }
 
 export function encodeObs(sim: Sim): number[] {
@@ -168,7 +175,15 @@ export function encodeObs(sim: Sim): number[] {
       continue;
     }
     const cd = p.cooldowns.get(known.def.id) ?? 0;
-    const ready = cd <= 0 && p.resource >= known.cost && (known.def.offGcd || p.gcdRemaining <= 0);
+    const devotionReady =
+      known.def.id === 'divine_ascension'
+        ? canActivateDivineAscension(p)
+        : !known.def.devotionCost || hasDevotion(p, known.def.devotionCost);
+    const ready =
+      cd <= 0 &&
+      p.resource >= known.cost &&
+      (known.def.offGcd || p.gcdRemaining <= 0) &&
+      devotionReady;
     obs.push(ready ? 1 : 0);
     obs.push(known.def.cooldown > 0 ? cd / known.def.cooldown : 0);
   }
@@ -254,6 +269,13 @@ export function encodeObs(sim: Sim): number[] {
       obs.push(state === 'done' ? 1 : 0);
     }
   }
+
+  // --- Paladin class resource (3), appended to preserve every existing index ---
+  // Non-Paladins emit zeros so the cross-class observation shape stays fixed.
+  const devotion = p.paladinDevotion;
+  obs.push(devotion ? devotion.value / MAX_DEVOTION : 0);
+  obs.push(devotion ? devotion.ascensionCharges / ASCENSION_CHARGES : 0);
+  obs.push(devotion ? devotion.ascensionRemaining / ASCENSION_DURATION : 0);
 
   return obs;
 }

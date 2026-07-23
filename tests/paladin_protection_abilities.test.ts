@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PALADIN_BASTION_SWEEP_IMPACT_TIME } from '../src/render/characters/paladin_bastion_sweep_clip';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { grantDevotion } from '../src/sim/paladin_devotion';
@@ -14,6 +15,8 @@ function makeProtection(): TestSim {
   const sim = new Sim({ seed: 7171, playerClass: 'paladin', autoEquip: true }) as TestSim;
   sim.setPlayerLevel(20);
   expect(sim.setSpec('protection')).toBe(true);
+  sim.addItem('eastbrook_buckler', 1);
+  sim.equipItem('eastbrook_buckler');
   sim.player.resource = sim.player.maxResource;
   return sim;
 }
@@ -46,6 +49,27 @@ function root(target: Entity): void {
 }
 
 describe('Paladin Protection abilities', () => {
+  it('requires an equipped shield before Bastion Sweep can spend its cast', () => {
+    const sim = makeProtection();
+    const target = targetAt(sim, 3);
+    root(target);
+    delete sim.equipment.offhand;
+    delete sim.player.equippedItems.offhand;
+
+    sim.castAbility('bastion_sweep');
+    for (let tick = 0; tick < 10; tick++) sim.tick();
+
+    expect(target.hp).toBe(target.maxHp);
+    expect(sim.player.gcdRemaining).toBe(0);
+    expect(sim.player.cooldowns.has('bastion_sweep')).toBe(false);
+    expect(sim.player.paladinDevotion?.value).toBe(0);
+    expect(
+      sim
+        .drainEvents()
+        .some((event) => event.type === 'spellfx' && event.fx === 'paladinBastionSweep'),
+    ).toBe(false);
+  });
+
   it('Bastion Sweep damages nearby enemies, generates Devotion, and creates high threat', () => {
     const sim = makeProtection();
     const first = targetAt(sim, 5.9);
@@ -85,8 +109,20 @@ describe('Paladin Protection abilities', () => {
     expect(sim.player.paladinDevotion?.value).toBe(0);
     expect(sim.player.cooldowns.get('bastion_sweep')).toBe(6);
     expect(castEvents).toContainEqual(
-      expect.objectContaining({ type: 'spellfx', fx: 'paladinBastionSweep' }),
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'paladinBastionSweep',
+        facing: 0,
+      }),
     );
+    expect(
+      sim.ctx.delayedEvents.some(
+        (event) => event.at === sim.ctx.time + PALADIN_BASTION_SWEEP_IMPACT_TIME,
+      ),
+    ).toBe(true);
+    // The authored wind-up owns the hit direction. Turning during the 0.32 s
+    // anticipation must not rotate the authoritative arc away from the VFX.
+    sim.player.facing = Math.PI;
     const preImpactEvents: SimEvent[] = [];
     for (let tick = 0; tick < 6; tick++) preImpactEvents.push(...sim.tick());
     expect(first.hp).toBe(first.maxHp);
@@ -302,17 +338,41 @@ describe('Paladin Protection abilities', () => {
     expect(third.hp).toBe(third.maxHp);
     expect(sim.player.paladinDevotion?.value).toBe(0);
 
-    for (let tick = 0; tick < 80 && primary.hp === primary.maxHp; tick++) sim.tick();
+    const primaryArrivalEvents: SimEvent[] = [];
+    for (let tick = 0; tick < 80 && primary.hp === primary.maxHp; tick++) {
+      primaryArrivalEvents.push(...sim.tick());
+    }
     expect(primary.hp).toBeLessThan(primary.maxHp);
     expect(second.hp).toBe(second.maxHp);
     expect(nearCaster.hp).toBe(nearCaster.maxHp);
     expect(sim.player.paladinDevotion?.value).toBe(1);
+    expect(primaryArrivalEvents).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'paladinSunwardDiscImpact',
+        sourceId: sim.player.id,
+        targetId: primary.id,
+        level: 0,
+      }),
+    );
 
-    for (let tick = 0; tick < 30 && second.hp === second.maxHp; tick++) sim.tick();
+    const secondArrivalEvents: SimEvent[] = [];
+    for (let tick = 0; tick < 30 && second.hp === second.maxHp; tick++) {
+      secondArrivalEvents.push(...sim.tick());
+    }
     expect(second.hp).toBeLessThan(second.maxHp);
     expect(third.hp).toBe(third.maxHp);
     expect(nearCaster.hp).toBe(nearCaster.maxHp);
     expect(sim.player.paladinDevotion?.value).toBe(2);
+    expect(secondArrivalEvents).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'paladinSunwardDiscImpact',
+        sourceId: primary.id,
+        targetId: second.id,
+        level: 1,
+      }),
+    );
 
     for (let tick = 0; tick < 30 && third.hp === third.maxHp; tick++) sim.tick();
     expect(third.hp).toBeLessThan(third.maxHp);
@@ -350,6 +410,78 @@ describe('Paladin Protection abilities', () => {
     expect(third.hp).toBeLessThan(third.maxHp);
     expect(nearCaster.hp).toBe(nearCaster.maxHp);
     expect(sim.player.paladinDevotion?.value).toBe(3);
+  });
+
+  it('does not grant Sunward Devotion for a fully absorbed impact', () => {
+    const sim = makeProtection();
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+    const target = targetAt(sim, 10);
+    root(target);
+    target.auras.push({
+      id: 'test_absorb',
+      name: 'Test Absorb',
+      kind: 'absorb',
+      remaining: 60,
+      duration: 60,
+      value: 50_000,
+      sourceId: target.id,
+      school: 'holy',
+    });
+    sim.targetEntity(target.id);
+
+    sim.castAbility('sunward_disc');
+    for (let tick = 0; tick < 100; tick++) sim.tick();
+
+    expect(target.hp).toBe(target.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(0);
+  });
+
+  it('does not grant Sunward Devotion for a fully absorbed ricochet', () => {
+    const sim = makeProtection();
+    sim.player.hitBonus = 1;
+    const primary = targetAt(sim, 10);
+    const absorbedBounce = targetAt(sim, 12, 1);
+    for (const target of [primary, absorbedBounce]) root(target);
+    absorbedBounce.auras.push({
+      id: 'test_absorb',
+      name: 'Test Absorb',
+      kind: 'absorb',
+      remaining: 60,
+      duration: 60,
+      value: 50_000,
+      sourceId: absorbedBounce.id,
+      school: 'holy',
+    });
+    sim.targetEntity(primary.id);
+
+    sim.castAbility('sunward_disc');
+    const events: SimEvent[] = [];
+    for (
+      let tick = 0;
+      tick < 120 &&
+      !events.some(
+        (event) =>
+          event.type === 'spellfx' &&
+          event.fx === 'paladinSunwardDiscImpact' &&
+          event.targetId === absorbedBounce.id,
+      );
+      tick++
+    ) {
+      events.push(...sim.tick());
+    }
+
+    expect(primary.hp).toBeLessThan(primary.maxHp);
+    expect(absorbedBounce.hp).toBe(absorbedBounce.maxHp);
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'paladinSunwardDiscImpact',
+        targetId: absorbedBounce.id,
+        level: 1,
+      }),
+    );
+    expect(sim.player.paladinDevotion?.value).toBe(1);
   });
 
   it('Holy Shield never spends Devotion and still grants block and absorb', () => {

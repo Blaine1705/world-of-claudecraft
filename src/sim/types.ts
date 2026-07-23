@@ -3648,6 +3648,7 @@ export type SimEvent = { pid?: number } & (
         | 'paladinAscensionImpact'
         | 'paladinHolyShock'
         | 'paladinSunwardDisc'
+        | 'paladinSunwardDiscImpact'
         | 'paladinBastionSweep'
         | 'paladinBastionSweepImpact'
         | 'paladinDawnfall'
@@ -3665,6 +3666,8 @@ export type SimEvent = { pid?: number } & (
       duration?: number;
       range?: number;
       angle?: number;
+      /** Authoritative cast-start facing for directional visuals. */
+      facing?: number;
       level?: number;
       /** Total segments in a chained visual, used with level as the zero-based hop. */
       count?: number;

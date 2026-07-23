@@ -68,6 +68,16 @@ export function scheduleSunwardBounceChain(ctx: SimContext, chain: SunwardBounce
       chain.caster,
       target,
       (_caster, landedTarget) => {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: origin.id,
+          targetId: landedTarget.id,
+          school: chain.school,
+          fx: 'paladinSunwardDiscImpact',
+          ability: chain.abilityId,
+          level: hopIndex,
+          count: totalHits,
+        });
         if (chain.dealImpact(landedTarget, hopIndex)) {
           grantAbilityDevotion(chain.caster, 1);
         }
