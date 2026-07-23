@@ -82,8 +82,17 @@ type DisplayGlobalKey = Exclude<
   | 'manaPct'
   | 'manaRegenPct'
   | 'ascensionChargeBonus'
-  | 'ascensionRush'
-  | 'ascensionWard'
+  | 'paladinRadiantStride'
+  | 'paladinDivineSteed'
+  | 'paladinDivineSteedBurstPct'
+  | 'paladinSteadyHandsHotPct'
+  | 'paladinRecurringGrace'
+  | 'paladinZeal'
+  | 'paladinSacredReserve'
+  | 'paladinDivinePurposeChance'
+  | 'paladinDawnEcho'
+  | 'paladinDawnEchoDevotion'
+  | 'paladinPerpetualSun'
 >;
 
 const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
@@ -110,8 +119,17 @@ const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
   'manaPct',
   'manaRegenPct',
   'ascensionChargeBonus',
-  'ascensionRush',
-  'ascensionWard',
+  'paladinRadiantStride',
+  'paladinDivineSteed',
+  'paladinDivineSteedBurstPct',
+  'paladinSteadyHandsHotPct',
+  'paladinRecurringGrace',
+  'paladinZeal',
+  'paladinSacredReserve',
+  'paladinDivinePurposeChance',
+  'paladinDawnEcho',
+  'paladinDawnEchoDevotion',
+  'paladinPerpetualSun',
 ]);
 
 export interface TalentLocaleText {
@@ -9488,7 +9506,16 @@ function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLoc
 type DescribedAddedEffect = Extract<
   AbilityEffect,
   {
-    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+    type:
+      | 'root'
+      | 'aoeRoot'
+      | 'slow'
+      | 'absorb'
+      | 'dot'
+      | 'extendDot'
+      | 'interrupt'
+      | 'consumeDot'
+      | 'selfBuff';
   }
 >;
 
@@ -9501,7 +9528,8 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
     effect.type !== 'interrupt' &&
-    effect.type !== 'consumeDot'
+    effect.type !== 'consumeDot' &&
+    effect.type !== 'selfBuff'
   ) {
     throw new Error(`Unsupported talent rider effect: ${effect.type}`);
   }
@@ -9536,6 +9564,13 @@ function addedEffectDescription(
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
     case 'consumeDot':
       return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+    case 'selfBuff': {
+      const value =
+        effect.kind === 'buff_haste' || effect.kind === 'buff_speed'
+          ? effect.value - 1
+          : effect.value;
+      return `${name}: +${formatPercent(value, lang)} (${seconds(effect.duration, lang)}).`;
+    }
   }
 }
 

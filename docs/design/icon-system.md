@@ -263,7 +263,6 @@ Signature: `(ctx: CanvasRenderingContext2D, pal: IconPalette) => void`, ctx pre-
 |---|---|---|---|---|
 | holy_light | holy | sunburst | holyGold | glow, sparkle |
 | devotion_aura | holy | shield, sunburst@tl | holyGold | — |
-| judgement | holy | mace, sunburst@big | gold | glow |
 | blessing_of_might | holy | fist, sunburst@tl | gold | — |
 | divine_protection | holy | shield | silverWhite | glow |
 | hammer_of_justice | holy | mace | gold | arcs |

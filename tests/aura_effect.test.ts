@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { type AuraEffectInput, auraEffectDescriptor } from '../src/ui/aura_effect';
+import {
+  type AuraEffectInput,
+  auraEffectDescriptor,
+  auraEffectMaximumFractionDigits,
+} from '../src/ui/aura_effect';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
@@ -30,6 +35,38 @@ describe('auraEffectDescriptor', () => {
     const d = desc({ kind: 'hot', value: 20, tickInterval: 2 });
     expect(d).toEqual({ key: 'hudChrome.auraEffect.hot', nums: { value: 20, interval: 2 } });
     expect(d?.school).toBeUndefined();
+  });
+
+  it('describes both spell choices offered by Radiant Resonance', () => {
+    expect(desc({ kind: 'paladin_radiant_resonance', value: 0.5 })).toEqual({
+      key: 'hudChrome.auraEffect.radiantResonance',
+      nums: { pct: 50, castTime: 1.5 },
+    });
+    expect(hudChromeStrings.auraEffect.radiantResonance).toBe(
+      "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
+    );
+    expect(auraEffectMaximumFractionDigits(50)).toBe(0);
+    expect(auraEffectMaximumFractionDigits(1.5)).toBe(1);
+  });
+
+  it('describes all three choices offered by Solar Reprisal', () => {
+    expect(desc({ kind: 'paladin_solar_reprisal', value: 0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.solarReprisal',
+      nums: { pct: 20 },
+    });
+    expect(hudChromeStrings.auraEffect.solarReprisal).toBe(
+      'Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant',
+    );
+  });
+
+  it("describes Dawn's Wrath as a stored empowered Hammer cast", () => {
+    expect(desc({ kind: 'paladin_dawns_wrath', value: 0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.dawnsWrath',
+      nums: { pct: 20 },
+    });
+    expect(hudChromeStrings.auraEffect.dawnsWrath).toBe(
+      'HoW: all HP · +1 use · CD 0 · +{pct}% DMG',
+    );
   });
 
   it('reports a movement slow as a percent reduction from the multiplier', () => {
@@ -184,11 +221,7 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
-  it('describes an imbue range when judgement min/max are present', () => {
-    expect(desc({ kind: 'imbue', value: 0, value2: 10, value3: 20 })).toEqual({
-      key: 'hudChrome.auraEffect.imbueRange',
-      nums: { min: 10, max: 20 },
-    });
+  it('describes an active weapon imbue', () => {
     expect(desc({ kind: 'imbue', value: 0 })?.key).toBe('hudChrome.auraEffect.imbue');
   });
 

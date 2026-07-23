@@ -370,6 +370,9 @@ const baseEnTable = {
   'aura.wintersChill': "Winter's Chill",
   'aura.icicles': 'Icicles',
   'aura.perfectMoment': 'Perfect Moment',
+  'aura.radiantResonance': 'Radiant Resonance',
+  'aura.solarReprisal': 'Solar Reprisal',
+  'aura.dawnsWrath': "Dawn's Wrath",
   // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
   'log.cardDuelQueued': 'You queue for a Card Duel.',
   'log.cardDuelLeftQueue': 'You leave the Card Duel queue.',
@@ -5970,6 +5973,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Winter's Chill": 'aura.wintersChill',
   Icicles: 'aura.icicles',
   'Perfect Moment': 'aura.perfectMoment',
+  'Radiant Resonance': 'aura.radiantResonance',
+  'Solar Reprisal': 'aura.solarReprisal',
+  "Dawn's Wrath": 'aura.dawnsWrath',
   // Talent-proc buff/ward names (choice rows).
   'Searing Light': 'aura.searingLight',
   'Lingering Grace': 'aura.lingeringGraceWard',

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  characterAvengingWrathActive,
+  characterPaladinWingsActive,
   characterRecklessnessActive,
   characterSanguineAuraActive,
   characterSoulRendActive,
@@ -95,6 +97,53 @@ function aura(
 }
 
 describe('character visual effects', () => {
+  it('shows Avenging Wrath wings only on a living Paladin carrying the exact aura', () => {
+    const avenging = aura('avenging_wrath', 'buff_dmg_done', 1, 15);
+    expect(characterAvengingWrathActive(entity({ templateId: 'paladin', auras: [avenging] }))).toBe(
+      true,
+    );
+    expect(characterAvengingWrathActive(entity({ templateId: 'warrior', auras: [avenging] }))).toBe(
+      false,
+    );
+    expect(
+      characterAvengingWrathActive(
+        entity({ templateId: 'paladin', dead: true, auras: [avenging] }),
+      ),
+    ).toBe(false);
+    expect(
+      characterAvengingWrathActive(
+        entity({
+          templateId: 'paladin',
+          auras: [aura('avenging_wrath_buff_healing_done', 'buff_healing_done', 1, 15)],
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it('shows the same golden wings on any living ally protected by either Paladin covenant', () => {
+    const guardian = aura('guardian_covenant', 'buff_dr', 1, 8);
+    const covenant = aura('life_covenant', 'buff_dr', 1, 6);
+    expect(characterPaladinWingsActive(entity({ templateId: 'warrior', auras: [guardian] }))).toBe(
+      true,
+    );
+    expect(characterPaladinWingsActive(entity({ templateId: 'priest', auras: [covenant] }))).toBe(
+      true,
+    );
+    expect(
+      characterPaladinWingsActive(entity({ templateId: 'warrior', dead: true, auras: [covenant] })),
+    ).toBe(false);
+    expect(
+      characterPaladinWingsActive(
+        entity({ templateId: 'priest', auras: [aura('other_guard', 'buff_dr', 1, 6)] }),
+      ),
+    ).toBe(false);
+    expect(
+      characterPaladinWingsActive(
+        entity({ templateId: 'paladin', auras: [aura('avenging_wrath', 'buff_dmg_done', 1, 15)] }),
+      ),
+    ).toBe(true);
+  });
+
   it('detects Soul Rend as a model-level effect instead of a nameplate marker', () => {
     expect(characterSoulRendActive(entity({ auras: [] }))).toBe(false);
     expect(

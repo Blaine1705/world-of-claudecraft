@@ -69,6 +69,9 @@ export function abilityDamageBonus(
       // Each ground pulse is an AoE hit: effect_dispatch snapshots
       // directHitBonus(..., aoe) into the zone's spBonus at cast time.
       return directHitBonus(power, def, res.castTime, true);
+    case 'valkyrsCalling':
+      // The delayed landing owns its authored range in the movement system.
+      return 0;
     case 'aoeHeal':
       // AoE heals take the same per-target coefficient penalty as aoeDamage.
       return directHealBonus(scaling.spellPower, res.castTime);
@@ -131,6 +134,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'aoeHeal' ||
       eff.type === 'aoeRoot' ||
       eff.type === 'groundAoE' ||
+      eff.type === 'valkyrsCalling' ||
       (eff.type === 'repositionToAim' && eff.landingAoe !== undefined) ||
       eff.type === 'consumeAura' ||
       eff.type === 'finisherDamage' ||

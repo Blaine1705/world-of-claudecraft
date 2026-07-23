@@ -185,7 +185,7 @@ describe('threat from damage', () => {
       for (const event of sim.tick()) {
         if (
           event.type === 'damage' &&
-          event.ability === 'Consecration' &&
+          event.ability === 'Holy Ground' &&
           event.targetId === wolf.id &&
           event.amount > 0
         ) {

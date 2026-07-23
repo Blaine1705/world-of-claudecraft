@@ -3,7 +3,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { grantDevotion } from '../src/sim/paladin_devotion';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 
 type TestSim = Sim & {
   nextId: number;
@@ -48,40 +48,140 @@ function root(target: Entity): void {
 describe('Paladin Protection abilities', () => {
   it('Bastion Sweep damages nearby enemies, generates Devotion, and creates high threat', () => {
     const sim = makeProtection();
-    const first = targetAt(sim, 2);
+    const first = targetAt(sim, 5.9);
     const second = targetAt(sim, 3, 2);
+    const edge = targetAt(sim, 0);
+    const outsideArc = targetAt(sim, 0);
+    const behind = targetAt(sim, -2);
     const outside = targetAt(sim, 10);
+    const edgeAngle = (89 * Math.PI) / 180;
+    edge.pos.x = sim.player.pos.x + Math.sin(edgeAngle) * 5.9;
+    edge.pos.z = sim.player.pos.z + Math.cos(edgeAngle) * 5.9;
+    const outsideArcAngle = (91 * Math.PI) / 180;
+    outsideArc.pos.x = sim.player.pos.x + Math.sin(outsideArcAngle) * 4;
+    outsideArc.pos.z = sim.player.pos.z + Math.cos(outsideArcAngle) * 4;
+    sim.grid.update(edge);
+    sim.grid.update(outsideArc);
+    for (const target of [first, second, edge, outsideArc, behind, outside]) root(target);
+    const positions = new Map(
+      [first, second, edge, outsideArc, behind, outside].map((target) => [
+        target.id,
+        { ...target.pos },
+      ]),
+    );
+    const playerAuras = [...sim.player.auras];
+    const playerArmor = sim.player.stats.armor;
+    const groundAreas = [...sim.activeConsecrations];
     sim.player.facing = 0;
     sim.targetEntity(first.id);
 
     sim.castAbility('bastion_sweep');
+    const castEvents = sim.drainEvents();
 
+    expect(first.hp).toBe(first.maxHp);
+    expect(second.hp).toBe(second.maxHp);
+    expect(edge.hp).toBe(edge.maxHp);
+    expect(first.threat.get(sim.playerId) ?? 0).toBe(0);
+    expect(sim.player.paladinDevotion?.value).toBe(0);
+    expect(sim.player.cooldowns.get('bastion_sweep')).toBe(6);
+    expect(castEvents).toContainEqual(
+      expect.objectContaining({ type: 'spellfx', fx: 'paladinBastionSweep' }),
+    );
+    const preImpactEvents: SimEvent[] = [];
+    for (let tick = 0; tick < 6; tick++) preImpactEvents.push(...sim.tick());
+    expect(first.hp).toBe(first.maxHp);
+    expect(second.hp).toBe(second.maxHp);
+    expect(preImpactEvents).not.toContainEqual(
+      expect.objectContaining({ type: 'spellfx', fx: 'paladinBastionSweepImpact' }),
+    );
+
+    const impactEvents = sim.tick();
     expect(first.hp).toBeLessThan(first.maxHp);
     expect(second.hp).toBeLessThan(second.maxHp);
+    expect(edge.hp).toBeLessThan(edge.maxHp);
+    expect(outsideArc.hp).toBe(outsideArc.maxHp);
+    expect(behind.hp).toBe(behind.maxHp);
     expect(outside.hp).toBe(outside.maxHp);
+    expect(impactEvents).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'paladinBastionSweepImpact',
+        targetId: first.id,
+      }),
+    );
     expect(sim.player.paladinDevotion?.value).toBe(1);
     expect(first.threat.get(sim.playerId) ?? 0).toBeGreaterThan(first.maxHp - first.hp);
-    expect(sim.player.cooldowns.get('bastion_sweep')).toBe(6);
+    expect(sim.player.cooldowns.get('bastion_sweep')).toBeCloseTo(5.65);
+    expect(sim.player.auras).toEqual(playerAuras);
+    expect(sim.player.stats.armor).toBe(playerArmor);
+    expect(sim.activeConsecrations).toEqual(groundAreas);
+    for (const target of [first, second, edge, outsideArc, behind, outside]) {
+      expect(target.pos).toEqual(positions.get(target.id));
+      expect(target.auras).toEqual([expect.objectContaining({ id: 'test_root' })]);
+    }
   });
 
-  it('Oath Chain pulls a distant enemy into the pack and slows it', () => {
+  it('Oath Chain makes a distant enemy travel toward the Paladin before slowing it', () => {
     const sim = makeProtection();
+    sim.player.pos.x = 0;
+    sim.player.pos.z = 24;
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.grid.update(sim.player);
+    sim.playerGrid.update(sim.player);
     const target = targetAt(sim, 24);
+    root(target);
     sim.player.facing = 0;
     sim.targetEntity(target.id);
     const before = Math.hypot(target.pos.x - sim.player.pos.x, target.pos.z - sim.player.pos.z);
 
     sim.castAbility('oath_chain');
 
+    expect(Math.hypot(target.pos.x - sim.player.pos.x, target.pos.z - sim.player.pos.z)).toBe(
+      before,
+    );
+    expect(target.auras).toContainEqual(
+      expect.objectContaining({ id: 'oath_chain_pull', kind: 'forced_move', value: 1 }),
+    );
+
+    for (let tick = 0; tick < 10; tick++) sim.tick();
+    const during = Math.hypot(target.pos.x - sim.player.pos.x, target.pos.z - sim.player.pos.z);
+    expect(during).toBeLessThan(before);
+    expect(during).toBeGreaterThan(3);
+
+    for (let tick = 0; tick < 40; tick++) sim.tick();
     expect(
       Math.hypot(target.pos.x - sim.player.pos.x, target.pos.z - sim.player.pos.z),
-    ).toBeLessThan(before - 5);
+    ).toBeCloseTo(3, 1);
     expect(target.auras).toContainEqual(
       expect.objectContaining({ id: 'oath_chain_slow', kind: 'slow', value: 0.5 }),
     );
   });
 
-  it('reindexes an Oath Chain pull before an immediate Bastion Sweep', () => {
+  it('pulls a slow-immune enemy over time without applying the final slow', () => {
+    const sim = makeProtection();
+    sim.player.pos.x = 0;
+    sim.player.pos.z = 24;
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.grid.update(sim.player);
+    sim.playerGrid.update(sim.player);
+    const target = targetAt(sim, 18);
+    target.slowImmune = true;
+    root(target);
+    sim.targetEntity(target.id);
+
+    sim.castAbility('oath_chain');
+
+    expect(target.auras).toContainEqual(
+      expect.objectContaining({ id: 'oath_chain_pull', kind: 'forced_move' }),
+    );
+    for (let tick = 0; tick < 40; tick++) sim.tick();
+    expect(
+      Math.hypot(target.pos.x - sim.player.pos.x, target.pos.z - sim.player.pos.z),
+    ).toBeCloseTo(3, 1);
+    expect(target.auras.some((aura) => aura.id === 'oath_chain_slow')).toBe(false);
+  });
+
+  it('reindexes an Oath Chain target while it travels instead of teleporting for an immediate sweep', () => {
     const sim = makeProtection();
     sim.player.pos.x = 0;
     sim.player.pos.z = 24;
@@ -95,6 +195,13 @@ describe('Paladin Protection abilities', () => {
     const afterPull = target.hp;
     sim.castAbility('bastion_sweep');
 
+    expect(target.hp).toBe(afterPull);
+
+    for (let tick = 0; tick < 30; tick++) sim.tick();
+    sim.player.gcdRemaining = 0;
+    sim.player.cooldowns.delete('bastion_sweep');
+    sim.castAbility('bastion_sweep');
+    for (let tick = 0; tick < 7; tick++) sim.tick();
     expect(target.hp).toBeLessThan(afterPull);
   });
 
@@ -103,16 +210,24 @@ describe('Paladin Protection abilities', () => {
     const first = targetAt(sim, 24);
     const second = targetAt(sim, 20, 1);
     const third = targetAt(sim, 24, -4);
+    root(first);
+    root(second);
+    root(third);
     sim.targetEntity(first.id);
     grantDevotion(sim.player, 20);
     sim.castAbility('divine_ascension');
 
     sim.castAbility('oath_chain');
 
-    expect(first.auras.some((aura) => aura.id === 'oath_chain_slow')).toBe(true);
-    expect(second.auras.some((aura) => aura.id === 'oath_chain_slow')).toBe(true);
-    expect(third.auras.some((aura) => aura.id === 'oath_chain_slow')).toBe(false);
+    expect(first.auras.some((aura) => aura.id === 'oath_chain_pull')).toBe(true);
+    expect(second.auras.some((aura) => aura.id === 'oath_chain_pull')).toBe(true);
+    expect(third.auras.some((aura) => aura.id === 'oath_chain_pull')).toBe(false);
+    expect(first.pos.z).toBeCloseTo(sim.player.pos.z + 24);
+    expect(second.pos.z).toBeCloseTo(sim.player.pos.z + 20);
     expect(sim.player.paladinDevotion?.ascensionCharges).toBe(4);
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({ id: 'divine_ascension', charges: 4 }),
+    );
   });
 
   it('requires a shield to cast Sunward Disc', () => {
@@ -129,24 +244,122 @@ describe('Paladin Protection abilities', () => {
     sim.addItem('eastbrook_buckler', 1);
     sim.equipItem('eastbrook_buckler');
     expect(sim.equipment.offhand).toBe('eastbrook_buckler');
+    sim.drainEvents();
+    const second = targetAt(sim, 12, 3);
+    const third = targetAt(sim, 13, 4);
     sim.castAbility('sunward_disc');
+    expect(target.hp).toBe(target.maxHp);
+    const sunwardFx = sim
+      .drainEvents()
+      .filter((event) => event.type === 'spellfx' && event.fx === 'paladinSunwardDisc');
+    for (let tick = 0; tick < 60 && third.hp === third.maxHp; tick++) {
+      const events = sim.tick();
+      sunwardFx.push(
+        ...events.filter((event) => event.type === 'spellfx' && event.fx === 'paladinSunwardDisc'),
+      );
+    }
     expect(target.hp).toBeLessThan(target.maxHp);
+    expect(second.hp).toBeLessThan(second.maxHp);
+    expect(third.hp).toBeLessThan(third.maxHp);
+    expect(sunwardFx).toEqual([
+      expect.objectContaining({
+        sourceId: sim.player.id,
+        targetId: target.id,
+        ability: 'sunward_disc',
+        level: 0,
+      }),
+      expect.objectContaining({
+        sourceId: target.id,
+        targetId: second.id,
+        ability: 'sunward_disc',
+        level: 1,
+      }),
+      expect.objectContaining({
+        sourceId: second.id,
+        targetId: third.id,
+        ability: 'sunward_disc',
+        level: 2,
+      }),
+    ]);
   });
 
-  it('Holy Shield requires and spends three Devotion, then grants block and absorb', () => {
-    const blocked = makeProtection();
-    grantDevotion(blocked.player, 2);
-    blocked.castAbility('holy_shield');
-    expect(blocked.player.paladinDevotion?.value).toBe(2);
-    expect(blocked.player.cooldowns.has('holy_shield')).toBe(false);
-    expect(blocked.player.auras.some((aura) => aura.id.startsWith('holy_shield'))).toBe(false);
+  it('Sunward Disc damages on arrival, chains locally from each hit, and grants 1 Devotion per impact', () => {
+    const sim = makeProtection();
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+    const nearCaster = targetAt(sim, 2);
+    const primary = targetAt(sim, 24);
+    const second = targetAt(sim, 25, 2);
+    const third = targetAt(sim, 27, 4);
+    for (const target of [nearCaster, primary, second, third]) root(target);
+    sim.player.facing = 0;
+    sim.targetEntity(primary.id);
 
+    sim.castAbility('sunward_disc');
+
+    expect(primary.hp).toBe(primary.maxHp);
+    expect(second.hp).toBe(second.maxHp);
+    expect(third.hp).toBe(third.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(0);
+
+    for (let tick = 0; tick < 80 && primary.hp === primary.maxHp; tick++) sim.tick();
+    expect(primary.hp).toBeLessThan(primary.maxHp);
+    expect(second.hp).toBe(second.maxHp);
+    expect(nearCaster.hp).toBe(nearCaster.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(1);
+
+    for (let tick = 0; tick < 30 && second.hp === second.maxHp; tick++) sim.tick();
+    expect(second.hp).toBeLessThan(second.maxHp);
+    expect(third.hp).toBe(third.maxHp);
+    expect(nearCaster.hp).toBe(nearCaster.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(2);
+
+    for (let tick = 0; tick < 30 && third.hp === third.maxHp; tick++) sim.tick();
+    expect(third.hp).toBeLessThan(third.maxHp);
+    expect(nearCaster.hp).toBe(nearCaster.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(3);
+  });
+
+  it('keeps Sunward ricochets local when the primary impact is lethal', () => {
+    const sim = makeProtection();
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+    const nearCaster = targetAt(sim, 2);
+    const primary = targetAt(sim, 24);
+    const second = targetAt(sim, 25, 2);
+    const third = targetAt(sim, 27, 4);
+    primary.hp = 1;
+    for (const target of [nearCaster, primary, second, third]) root(target);
+    sim.player.facing = 0;
+    sim.targetEntity(primary.id);
+
+    sim.castAbility('sunward_disc');
+    for (let tick = 0; tick < 80 && !primary.dead; tick++) sim.tick();
+
+    expect(primary.dead).toBe(true);
+    expect(nearCaster.hp).toBe(nearCaster.maxHp);
+    expect(second.hp).toBe(second.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(1);
+
+    for (let tick = 0; tick < 30 && second.hp === second.maxHp; tick++) sim.tick();
+    expect(second.hp).toBeLessThan(second.maxHp);
+    expect(nearCaster.hp).toBe(nearCaster.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(2);
+
+    for (let tick = 0; tick < 30 && third.hp === third.maxHp; tick++) sim.tick();
+    expect(third.hp).toBeLessThan(third.maxHp);
+    expect(nearCaster.hp).toBe(nearCaster.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(3);
+  });
+
+  it('Holy Shield never spends Devotion and still grants block and absorb', () => {
     const sim = makeProtection();
     const target = targetAt(sim, 2);
-    grantDevotion(sim.player, 3);
+    grantDevotion(sim.player, 2);
     sim.castAbility('holy_shield');
 
-    expect(sim.player.paladinDevotion?.value).toBe(0);
+    expect(sim.player.paladinDevotion?.value).toBe(2);
+    expect(sim.player.cooldowns.get('holy_shield')).toBe(8);
     expect(sim.player.auras).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'holy_shield', kind: 'buff_block', value: 0.3 }),
@@ -159,26 +372,24 @@ describe('Paladin Protection abilities', () => {
   it('Consecration ticks once per second for nine seconds with threat only inside its radius', () => {
     const sim = makeProtection();
     const inside = targetAt(sim, 2);
-    const outside = targetAt(sim, 9);
+    const outside = targetAt(sim, 7);
     root(inside);
     root(outside);
 
     sim.castAbility('consecration');
     const events = [...sim.drainEvents()];
     expect(sim.activeConsecrations).toEqual([
-      expect.objectContaining({ radius: 8, duration: 9, remaining: 9 }),
+      expect.objectContaining({ radius: 6, duration: 9, remaining: 9 }),
     ]);
     for (let tick = 0; tick < 9 * 20; tick++) events.push(...sim.tick());
 
     const insideHits = events.filter(
       (event) =>
-        event.type === 'damage' && event.ability === 'Consecration' && event.targetId === inside.id,
+        event.type === 'damage' && event.ability === 'Holy Ground' && event.targetId === inside.id,
     );
     const outsideHits = events.filter(
       (event) =>
-        event.type === 'damage' &&
-        event.ability === 'Consecration' &&
-        event.targetId === outside.id,
+        event.type === 'damage' && event.ability === 'Holy Ground' && event.targetId === outside.id,
     );
     expect(insideHits).toHaveLength(9);
     expect(outsideHits).toHaveLength(0);
@@ -187,6 +398,28 @@ describe('Paladin Protection abilities', () => {
     );
     expect(outside.threat.get(sim.playerId) ?? 0).toBeLessThanOrEqual(1);
     expect(sim.player.paladinDevotion?.value).toBe(1);
+  });
+
+  it('does not generate Devotion when Consecration damage is fully absorbed', () => {
+    const sim = makeProtection();
+    const target = targetAt(sim, 2);
+    root(target);
+    target.auras.push({
+      id: 'test_absorb',
+      name: 'Test Absorb',
+      kind: 'absorb',
+      remaining: 60,
+      duration: 60,
+      value: 50_000,
+      sourceId: target.id,
+      school: 'holy',
+    });
+
+    sim.castAbility('consecration');
+    for (let tick = 0; tick < 9 * 20; tick++) sim.tick();
+
+    expect(target.hp).toBe(target.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(0);
   });
 
   it('reduces damage to a Protection Paladin by 5% only while standing in Consecration', () => {

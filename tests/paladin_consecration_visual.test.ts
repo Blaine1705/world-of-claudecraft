@@ -2,8 +2,22 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { PaladinConsecrationVisuals } from '../src/render/paladin_consecration_visual';
 
+function radialBounds(root: THREE.Object3D, centerX: number, centerZ: number, name: string) {
+  const mesh = root.getObjectByName(name) as THREE.Mesh | undefined;
+  const positions = mesh?.geometry.getAttribute('position');
+  if (!positions) throw new Error(`missing ${name}`);
+  let min = Number.POSITIVE_INFINITY;
+  let max = 0;
+  for (let index = 0; index < positions.count; index++) {
+    const distance = Math.hypot(positions.getX(index) - centerX, positions.getZ(index) - centerZ);
+    if (distance > 0.01) min = Math.min(min, distance);
+    max = Math.max(max, distance);
+  }
+  return { min, max };
+}
+
 describe('Paladin Consecration ground visual', () => {
-  it('builds terrain-draped holy rings, glyphs, glow, and moving motes for the full zone', () => {
+  it('fills the exact six-metre damage area with a layered sacred seal', () => {
     const scene = new THREE.Scene();
     const groundFx = new PaladinConsecrationVisuals(scene, () => 2);
 
@@ -12,28 +26,76 @@ describe('Paladin Consecration ground visual', () => {
         id: 'consecration:1:20',
         x: 4,
         z: 7,
-        radius: 8,
+        radius: 6,
         duration: 9,
         remaining: 4,
       },
     ]);
 
     const visual = scene.getObjectByName('paladin-consecration');
-    expect(visual).toBeTruthy();
-    expect(visual?.getObjectByName('paladin-consecration-ground-glow')).toBeTruthy();
-    expect(visual?.getObjectByName('paladin-consecration-outer-ring')).toBeTruthy();
-    expect(visual?.getObjectByName('paladin-consecration-middle-ring')).toBeTruthy();
-    expect(visual?.getObjectByName('paladin-consecration-heart-ring')).toBeTruthy();
-    expect(visual?.getObjectByName('paladin-consecration-glyph-7')).toBeTruthy();
-    const motes = visual?.getObjectByName('paladin-consecration-motes');
-    expect(motes?.children).toHaveLength(12);
+    if (!visual) throw new Error('missing Consecration visual');
+    const baseBounds = radialBounds(visual, 4, 7, 'paladin-consecration-base-glow');
+    const runeBounds = radialBounds(visual, 4, 7, 'paladin-consecration-sun-rune-field');
+    const perimeterBounds = radialBounds(visual, 4, 7, 'paladin-consecration-perimeter');
+
+    expect(baseBounds.max).toBeCloseTo(6);
+    expect(perimeterBounds.min).toBeGreaterThan(5.8);
+    expect(perimeterBounds.max).toBeCloseTo(6);
+    expect(runeBounds.max).toBeGreaterThan(5);
+    expect(runeBounds.max).toBeLessThanOrEqual(6);
+
+    expect(visual.getObjectByName('paladin-consecration-light-fissures')).toBeUndefined();
+    expect(visual.getObjectByName('paladin-consecration-inner-ring')).toBeDefined();
+    expect(visual.getObjectByName('paladin-consecration-middle-ring')).toBeDefined();
+    expect(visual.getObjectByName('paladin-consecration-shimmer')).toBeDefined();
+    const motes = visual.getObjectByName('paladin-consecration-motes');
+    const wisps = visual.getObjectByName('paladin-consecration-edge-wisps');
+    expect(motes).toBeInstanceOf(THREE.InstancedMesh);
+    expect(wisps).toBeInstanceOf(THREE.InstancedMesh);
     const rotation = motes?.rotation.y ?? 0;
-
-    groundFx.update(1);
-    expect(motes?.rotation.y).toBeLessThan(rotation);
-    expect(scene.getObjectByName('paladin-consecration')).toBeTruthy();
-
-    groundFx.update(4);
+    groundFx.update(1, true);
+    expect(motes?.rotation.y).toBe(rotation);
+    groundFx.update(1, false);
+    expect(motes?.rotation.y).toBeGreaterThan(rotation);
+    groundFx.update(4, false);
     expect(scene.getObjectByName('paladin-consecration')).toBeUndefined();
+  });
+
+  it('drapes the full yellow damage circle over uneven terrain', () => {
+    const scene = new THREE.Scene();
+    const groundY = (x: number, z: number): number => Math.sin(x * 0.25) + Math.cos(z * 0.2) * 0.5;
+    const groundFx = new PaladinConsecrationVisuals(scene, groundY);
+
+    groundFx.sync([
+      {
+        id: 'consecration:normal',
+        x: 0,
+        z: 0,
+        radius: 6,
+        duration: 9,
+        remaining: 9,
+      },
+    ]);
+
+    const visual = scene.getObjectByName('paladin-consecration');
+    if (!visual) throw new Error('missing Consecration visual');
+    const base = visual.getObjectByName('paladin-consecration-base-glow') as THREE.Mesh;
+    const positions = base.geometry.getAttribute('position');
+    const sampledRadii = new Set<string>();
+    for (let index = 0; index < positions.count; index++) {
+      const x = positions.getX(index);
+      const y = positions.getY(index);
+      const z = positions.getZ(index);
+      sampledRadii.add(Math.hypot(x, z).toFixed(2));
+      expect(y).toBeCloseTo(groundY(x, z) + 0.055, 4);
+    }
+    expect(sampledRadii.has('0.00')).toBe(true);
+    expect(sampledRadii.has('6.00')).toBe(true);
+    expect(sampledRadii.size).toBe(9);
+
+    const pulse = visual.getObjectByName('paladin-consecration-pulse-ring');
+    const initialScale = pulse?.scale.x ?? 0;
+    groundFx.update(0.15, false);
+    expect(pulse?.scale.x).toBeGreaterThan(initialScale);
   });
 });

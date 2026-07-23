@@ -1,11 +1,12 @@
 import type { GroundAoE } from './entity_roster';
 import type { ResolvedAbility } from './sim';
-import type { Entity } from './types';
+import type { Aura, Entity } from './types';
 
 export const MAX_DEVOTION = 20;
 export const ASCENSION_CHARGES = 5;
-export const ASCENSION_DURATION = 25;
-export const ASCENSION_DEVOTION_BANK_CAP = 10;
+export const ASCENSION_DURATION = 45;
+export const DIVINE_ASCENSION_AURA_ID = 'divine_ascension';
+export const ASCENSION_DEVOTION_BANK_CAP = 0;
 export const BLOCK_DEVOTION_ICD = 6;
 // Divine Ascension (Amanecer) talent riders, applied at activation:
 export const DAWNS_PATH_SPEED_MULT = 1.4; // Dawn's Path: +40% movement speed
@@ -35,36 +36,45 @@ const ASCENSION_ABILITIES: Readonly<Record<PaladinSpec, ReadonlySet<string>>> = 
     'veilbound_march',
   ]),
   retribution: new Set([
-    'oathstrike',
     'final_edict',
     'dawnfall',
     'faithforged_guard',
     'hammer_of_wrath',
+    'valkyrs_calling',
   ]),
 };
 
 const DEVOTION_GAIN: Readonly<Record<PaladinSpec, Readonly<Record<string, number>>>> = {
   holy: {
-    holy_light: 1,
     mercy_lance: 1,
-    dawns_embrace: 2,
-    radiant_chorus: 2,
+    dawns_embrace: 1,
+    radiant_chorus: 1,
     solar_invocation: 1,
-    judgement: 1,
   },
   protection: {
     vowkeeper_strike: 1,
-    sunward_disc: 2,
+    sunward_disc: 1,
     bastion_sweep: 1,
   },
   retribution: {
-    judgement: 1,
     hammer_of_wrath: 1,
-    oathstrike: 1,
-    final_edict: 2,
-    dawnfall: 2,
+    final_edict: 1,
+    dawnfall: 1,
   },
 };
+
+const COMMON_DIRECT_DEVOTION_ABILITIES: ReadonlySet<string> = new Set([
+  'hammer_of_grace',
+  'holy_light',
+  'flash_of_light',
+  'lay_on_hands',
+  'exorcism',
+  'crusader_strike',
+  'holy_shock',
+  'cleansing_verdict',
+  'holy_wrath',
+  'aura_surge',
+]);
 
 function state(e: Entity): NonNullable<Entity['paladinDevotion']> | null {
   return e.kind === 'player' && e.templateId === 'paladin' ? (e.paladinDevotion ?? null) : null;
@@ -94,16 +104,20 @@ export function activateDivineAscension(e: Entity): boolean {
 export function grantDevotion(e: Entity, amount: number): number {
   const devotion = state(e);
   if (!devotion || !Number.isFinite(amount) || amount <= 0) return 0;
-  const cap = isDivineAscensionActive(e) ? ASCENSION_DEVOTION_BANK_CAP : MAX_DEVOTION;
+  if (isDivineAscensionActive(e)) return 0;
   const before = devotion.value;
-  devotion.value = Math.min(cap, devotion.value + Math.floor(amount));
+  devotion.value = Math.min(MAX_DEVOTION, devotion.value + Math.floor(amount));
   devotion.outOfCombatTime = 0;
   devotion.decayProgress = 0;
   return devotion.value - before;
 }
 
 export function grantAbilityDevotion(e: Entity, amount: number): number {
-  const multiplier = e.auras.some((aura) => aura.id === 'avenging_wrath') ? 2 : 1;
+  const multiplier = e.auras.some(
+    (aura) => aura.id === 'avenging_wrath' || aura.id === 'perpetual_sun_generation',
+  )
+    ? 2
+    : 1;
   return grantDevotion(e, amount * multiplier);
 }
 
@@ -131,9 +145,9 @@ export function paladinExecuteWindowActive(e: Entity, abilityId: string): boolea
 export function grantGroundAoEDevotionOnFirstHit(
   source: Entity,
   effect: GroundAoE,
-  struck: number,
+  effectiveDamageTargets: number,
 ): void {
-  if (struck <= 0 || effect.devotionGranted || !effect.devotionOnFirstHit) return;
+  if (effectiveDamageTargets <= 0 || effect.devotionGranted || !effect.devotionOnFirstHit) return;
   effect.devotionGranted = true;
   grantAbilityDevotion(source, effect.devotionOnFirstHit);
 }
@@ -144,31 +158,60 @@ export function isAscensionEmpoweredAbility(spec: string | null, abilityId: stri
 }
 
 export function devotionGainForAbility(spec: string | null, abilityId: string): number {
+  if (COMMON_DIRECT_DEVOTION_ABILITIES.has(abilityId)) return 1;
   if (spec !== 'holy' && spec !== 'protection' && spec !== 'retribution') return 0;
   return DEVOTION_GAIN[spec][abilityId] ?? 0;
 }
 
 export function devotionGenerationTriggered(
-  spec: string | null,
-  abilityId: string,
+  _spec: string | null,
+  _abilityId: string,
   trigger: { damage: boolean; healing: boolean },
 ): boolean {
-  if (spec === 'holy') {
-    return trigger.healing || (abilityId === 'judgement' && trigger.damage);
+  return trigger.damage || trigger.healing;
+}
+
+export function divineAscensionAura(e: Entity): Aura | null {
+  const devotion = state(e);
+  if (!devotion || !isDivineAscensionActive(e)) return null;
+  return {
+    id: DIVINE_ASCENSION_AURA_ID,
+    name: 'Divine Ascension',
+    kind: 'internal_cd',
+    remaining: devotion.ascensionRemaining,
+    duration: ASCENSION_DURATION,
+    value: 0,
+    charges: devotion.ascensionCharges,
+    sourceId: e.id,
+    school: 'holy',
+  };
+}
+
+/** Keep the HUD aura charge badge aligned after an empowered ability is spent. */
+export function syncDivineAscensionAura(e: Entity): Aura | null {
+  const index = e.auras.findIndex(
+    (aura) => aura.id === DIVINE_ASCENSION_AURA_ID && aura.sourceId === e.id,
+  );
+  if (index < 0) return null;
+  const aura = e.auras[index];
+  const devotion = state(e);
+  if (!devotion || !isDivineAscensionActive(e)) {
+    e.auras.splice(index, 1);
+    return aura;
   }
-  return (spec === 'protection' || spec === 'retribution') && trigger.damage;
+  aura.remaining = devotion.ascensionRemaining;
+  aura.charges = devotion.ascensionCharges;
+  return null;
 }
 
 export function ascensionImpactKind(
   abilityId: string,
   targetIsHostile: boolean,
 ): AscensionImpactKind {
-  if (abilityId === 'mercy_lance') return targetIsHostile ? 'offensive' : 'healing';
-  if (
-    abilityId === 'dawns_embrace' ||
-    abilityId === 'radiant_chorus' ||
-    abilityId === 'solar_invocation'
-  ) {
+  if (abilityId === 'mercy_lance' || abilityId === 'solar_invocation') {
+    return targetIsHostile ? 'offensive' : 'healing';
+  }
+  if (abilityId === 'dawns_embrace' || abilityId === 'radiant_chorus') {
     return 'healing';
   }
   if (
@@ -210,6 +253,8 @@ export function resolveAscensionAbility(
 
   const effects = resolved.effects.map((effect) => {
     switch (resolved.def.id) {
+      case 'mercy_lance':
+        return effect.type === 'directDamage' ? { ...effect, guaranteedCrit: true } : effect;
       case 'dawns_embrace':
         return effect.type === 'heal'
           ? { ...effect, ...scaleRange(effect.min, effect.max, 1.35) }
@@ -226,6 +271,10 @@ export function resolveAscensionAbility(
         return effect.type === 'directDamage'
           ? { ...effect, ...scaleRange(effect.min, effect.max, 1.3) }
           : effect;
+      case 'valkyrs_calling':
+        return effect.type === 'valkyrsCalling'
+          ? { ...effect, ...scaleRange(effect.min, effect.max, 1.5), ascended: true }
+          : effect;
       case 'bastion_sweep':
         return effect.type === 'aoeDamage'
           ? { ...effect, ...scaleRange(effect.min, effect.max, 1.3), radius: 8 }
@@ -240,7 +289,7 @@ export function resolveAscensionAbility(
         return effect;
       case 'consecration':
         return effect.type === 'groundAoE'
-          ? { ...effect, ...scaleRange(effect.min, effect.max, 1.3), radius: 10 }
+          ? { ...effect, ...scaleRange(effect.min, effect.max, 1.3) }
           : effect;
       case 'faithforged_guard':
         return effect.type === 'absorb'
@@ -271,30 +320,8 @@ export function resolveAscensionAbility(
     }
   });
 
-  if (resolved.def.id === 'oathstrike') {
-    const strike = resolved.effects.find((effect) => effect.type === 'weaponStrike');
-    if (strike) {
-      effects.push({
-        ...strike,
-        bonus: Math.round(strike.bonus * 0.6),
-        weaponMult: (strike.weaponMult ?? 1) * 0.6,
-      });
-    }
-  } else if (resolved.def.id === 'final_edict') {
+  if (resolved.def.id === 'final_edict') {
     effects.push({ type: 'aoeDamage', min: 55, max: 70, radius: 6, softCap: 5 });
-  } else if (resolved.def.id === 'mercy_lance') {
-    for (let index = 0; index < effects.length; index++) {
-      const effect = effects[index];
-      if (effect.type !== 'heal') continue;
-      effects[index] = {
-        type: 'chainHeal',
-        min: effect.min,
-        max: effect.max,
-        jumps: 1,
-        falloff: 0.7,
-        radius: 30,
-      };
-    }
   } else if (resolved.def.id === 'solar_invocation') {
     effects.push({
       type: 'aoeHeal',
@@ -303,6 +330,7 @@ export function resolveAscensionAbility(
       radius: 10,
       playersOnly: true,
       centerOnTarget: true,
+      friendlyTargetOnly: true,
     });
   } else if (resolved.def.id === 'vowkeeper_strike') {
     effects.push({
@@ -325,12 +353,18 @@ export function resolveAscensionAbility(
   };
 }
 
-export function consumeAscensionCharge(e: Entity, spec: string | null, abilityId: string): boolean {
+export function consumeAscensionCharge(
+  e: Entity,
+  spec: string | null,
+  abilityId: string,
+  preserveChance = 0,
+  chance: (probability: number) => boolean = () => false,
+): boolean {
   const devotion = state(e);
   if (!devotion || !isDivineAscensionActive(e) || !isAscensionEmpoweredAbility(spec, abilityId)) {
     return false;
   }
-  devotion.ascensionCharges -= 1;
+  if (preserveChance <= 0 || !chance(preserveChance)) devotion.ascensionCharges -= 1;
   if (devotion.ascensionCharges <= 0) {
     devotion.ascensionCharges = 0;
     devotion.ascensionRemaining = 0;
@@ -340,12 +374,12 @@ export function consumeAscensionCharge(e: Entity, spec: string | null, abilityId
 
 export function grantDevotionFromBlock(e: Entity): boolean {
   const devotion = state(e);
-  if (!devotion || devotion.blockIcdRemaining > 0) return false;
+  if (!devotion || isDivineAscensionActive(e) || devotion.blockIcdRemaining > 0) return false;
   devotion.blockIcdRemaining = BLOCK_DEVOTION_ICD;
   return grantDevotion(e, 1) > 0;
 }
 
-export function updatePaladinDevotion(e: Entity, dt: number): void {
+export function updatePaladinDevotion(e: Entity, dt: number, sacredReserve = false): void {
   const devotion = state(e);
   if (!devotion || !Number.isFinite(dt) || dt <= 0) return;
 
@@ -362,7 +396,10 @@ export function updatePaladinDevotion(e: Entity, dt: number): void {
 
   if (devotion.ascensionRemaining > 0) {
     devotion.ascensionRemaining = Math.max(0, devotion.ascensionRemaining - dt);
-    if (devotion.ascensionRemaining === 0) devotion.ascensionCharges = 0;
+    if (devotion.ascensionRemaining === 0) {
+      devotion.ascensionCharges = 0;
+      if (sacredReserve) grantDevotion(e, 5);
+    }
   }
 
   if (e.inCombat) {

@@ -103,19 +103,27 @@ export function applyHeal(
   // can suppress either source of rng independently without bypassing normal
   // healing, threat, absorbs, or emitted combat text.
   canTriggerWeaponProcs = true,
+  // Beacon only copies an explicitly eligible direct-heal effect. Periodic,
+  // area, chained, proc, echoed, and self-heal paths keep the default false.
+  beaconTransferEligible = false,
+  // Copies of an already-resolved effective heal must not receive source/target
+  // multipliers a second time. They still use absorbs, overheal, threat, and events.
+  alreadyResolved = false,
   // Returns the effective heal applied (post-crit, post-mult, post-overheal-clamp,
   // the same number emitted). Callers that ignore it are unaffected; Power Echo
   // reads it to repeat a direct heal at a fraction of the resolved amount.
 ): number {
   if (target.dead) return 0;
-  const crit = canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
-  let healed = Math.round(
-    amount *
-      (crit ? 1.5 + source.critDmgHealBonus : 1) *
-      paladinHealingDoneMultiplier(source) *
-      hexOutputMult(ctx, source) *
-      healingTakenMult(ctx, target),
-  );
+  const crit = !alreadyResolved && canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
+  let healed = alreadyResolved
+    ? Math.round(amount)
+    : Math.round(
+        amount *
+          (crit ? 1.5 + source.critDmgHealBonus : 1) *
+          paladinHealingDoneMultiplier(source) *
+          hexOutputMult(ctx, source) *
+          healingTakenMult(ctx, target),
+      );
   healed = consumeHealAbsorb(ctx, target, healed);
   healed = Math.min(healed, target.maxHp - target.hp);
   target.hp += healed;
@@ -133,7 +141,7 @@ export function applyHeal(
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
   if (canTriggerWeaponProcs) runWeaponProcs(ctx, source, target, 'heal');
-  applyBeaconTransfer(ctx, source, target, healed);
+  if (beaconTransferEligible) applyBeaconTransfer(ctx, source, target, healed);
   return healed;
 }
 

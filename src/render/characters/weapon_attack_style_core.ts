@@ -2,11 +2,12 @@ import { ABILITIES, ITEMS } from '../../sim/data';
 import { weaponHand } from '../../sim/equipment_rules';
 
 export type WeaponAttackStyle = 'twohand' | 'dualwield';
+export const SPIN_ATTACK_VISUAL_DURATION = 0.55;
 
 const ABILITY_ID_BY_NAME = new Map(
   Object.entries(ABILITIES).map(([abilityId, ability]) => [ability.name, abilityId]),
 );
-const SPIN_ATTACK_ABILITIES = new Set(['whirlwind']);
+const SPIN_ATTACK_ABILITIES = new Set(['whirlwind', 'dawnfall']);
 
 /** Damage events carry player-facing ability names. Normalize those names back
  *  to their stable IDs before choosing a renderer-only animation cue. */

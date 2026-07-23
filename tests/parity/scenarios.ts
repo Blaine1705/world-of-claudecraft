@@ -3142,7 +3142,7 @@ function c3AuraRunner(): Scenario {
       rec.snapshot('regen-expiry');
 
       // ----- Phase C: a ground AoE pulsing over 2+ hostiles -----
-      // Two beefed mobs clustered inside consecration's 8yd radius so pulseGroundAoE
+      // Two beefed mobs clustered inside Consecration's 6 m radius so pulseGroundAoE
       // iterates hostilesInRadius (>=2 targets), drawing rng.range once per target in
       // entities-insertion order, from BOTH callers (the on-cast pulse + deferred ticks).
       const a1 = spawnMob(sim, 'forest_wolf', 5, p.pos.x + 2, p.pos.y, p.pos.z + 2);
@@ -3510,9 +3510,8 @@ function targetingMarkers(): Scenario {
 //  - mage arcane_explosion: aoeDamage per-target rng.range over 2 in-radius mobs.
 //  - rogue sinister_strike -> eviscerate -> kidney_shot: weaponStrike awardCombo
 //    latch, finisherDamage range-THEN-chance, and the combo-spend reset after the loop.
-//  - paladin seal_of_righteousness -> judgement -> consecration: imbue Seal, the
-//    judgement range-THEN-chance draw (consuming the Seal), and the groundAoE on-cast
-//    pulse (pulseGroundAoE + groundAoEs.push).
+//  - paladin seal_of_righteousness -> consecration: imbue Seal and the groundAoE
+//    on-cast pulse (pulseGroundAoE + groundAoEs.push).
 //  - druid moonfire -> bear_form -> cat_form -> rejuvenation: directDamage range-then-
 //    chance + a dot in ONE cast, exclusive selfBuff form switch (recalc), and a hot.
 //  - warlock fear -> summon_imp: incapacitate fear-angle draw rng.range(-PI,PI) and the
@@ -3524,7 +3523,6 @@ function c4bEffectDispatch(): Scenario {
     coverage: [
       'runEffects multi-class multi-effect dispatch',
       'directDamage/finisherDamage range-then-chance (druid moonfire, rogue eviscerate)',
-      'judgement range-then-chance (paladin seal -> judgement)',
       'incapacitate fear-angle draw rng.range(-PI,PI) (warlock fear)',
       'aoeDamage per-target rng.range (mage arcane_explosion, 2 mobs)',
       'sunder miss rng.chance (warrior sunder_armor)',
@@ -3642,17 +3640,15 @@ function c4bEffectDispatch(): Scenario {
       sim.castAbility('kidney_shot', rogue); // finisherStun + combo-spend reset
       rec.snapshot('rogue-combo-finishers');
 
-      // --- paladin: seal -> judgement (range-then-chance) -> consecration (groundAoE) ---
+      // --- paladin: seal -> consecration (groundAoE) ---
       const mobP = dummy(ePaladin);
       face(ePaladin, mobP);
       sim.targetEntity(mobP.id, paladin);
       ready(ePaladin);
       sim.castAbility('seal_of_righteousness', paladin); // imbue (sets the Seal)
       ready(ePaladin);
-      sim.castAbility('judgement', paladin); // judgement: rng.range then rng.chance
-      ready(ePaladin);
       sim.castAbility('consecration', paladin); // groundAoE: on-cast pulse + groundAoEs.push
-      rec.snapshot('paladin-judge-consecrate');
+      rec.snapshot('paladin-seal-consecrate');
 
       // --- druid: moonfire (directDamage range-then-chance + dot) -> forms -> hot ---
       const mobD = dummy(eDruid);

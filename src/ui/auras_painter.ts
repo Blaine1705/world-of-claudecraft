@@ -169,7 +169,8 @@ export class AurasPainter {
     let rendered = 0;
     for (let i = 0; i < count; i++) {
       const s = slots[i];
-      if (!s.isDebuff && rendered >= cap) continue; // shed buff overflow; never a debuff
+      const alwaysVisible = s.isDebuff || s.key === 'divine_ascension';
+      if (!alwaysVisible && rendered >= cap) continue; // shed ordinary buff overflow
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the
       // base key directly. If the base key is already claimed THIS frame, this is a

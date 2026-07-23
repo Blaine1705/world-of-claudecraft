@@ -31,9 +31,19 @@ import {
 } from './assets';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import {
+  PALADIN_BASTION_SWEEP_CLIP,
+  PALADIN_BASTION_SWEEP_DURATION,
+} from './paladin_bastion_sweep_clip';
+import { PaladinBastionSweepFx } from './paladin_bastion_sweep_fx';
+import {
+  PALADIN_TEMPLARS_VERDICT_CLIP,
+  PALADIN_TEMPLARS_VERDICT_DURATION,
+} from './paladin_templars_verdict_clip';
+import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
-import { weaponAttackStyle } from './weapon_attack_style_core';
+import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
   disposeOwnedWeaponSkinMaterials,
   markOwnedWeaponSkinMaterials,
@@ -106,7 +116,6 @@ const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
 const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 const SPIN_RATE = 14;
 const SPIN_ATTACK_TIMESCALE = 1.6;
-const SPIN_ONCE_DURATION = 0.55;
 const SPIN_ONCE_RATE = 18;
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
@@ -197,6 +206,10 @@ export class CharacterVisual {
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   private weaponAuraMeshes: THREE.Mesh[] = [];
   private weaponAuraOn = false;
+  private bastionSweepFx: PaladinBastionSweepFx | null = null;
+  private bastionSweepAction: THREE.AnimationAction | null = null;
+  private templarsVerdictFx: PaladinTemplarsVerdictFx | null = null;
+  private templarsVerdictAction: THREE.AnimationAction | null = null;
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
@@ -328,6 +341,10 @@ export class CharacterVisual {
       if (clip) this.actions.set(name, this.mixer.clipAction(clip));
     }
     this.mixer.addEventListener('finished', (ev) => this.onFinished(ev.action));
+    if (key === 'player_paladin') {
+      this.bastionSweepFx = new PaladinBastionSweepFx(this.model);
+      this.templarsVerdictFx = new PaladinTemplarsVerdictFx(this.model);
+    }
 
     const idle = this.action(this.def.clips.idle);
     if (idle) {
@@ -418,11 +435,24 @@ export class CharacterVisual {
 
     this.pendingDt = Math.min(MIXER_DT_CAP, this.pendingDt + dt);
     if (animate) {
-      this.mixer.update(this.pendingDt);
+      const animationDt = this.pendingDt;
+      this.mixer.update(animationDt);
       this.pendingDt = 0;
       // AFTER the mixer wrote the sampled pose: the sheathe gesture's additive
       // arm raise (never applied on skipped-mixer frames, so it cannot accumulate).
       this.applyStowArmLift(dt);
+      const verdictTime =
+        this.templarsVerdictAction &&
+        this.current === this.templarsVerdictAction &&
+        this.currentIsOneShot
+          ? Math.min(PALADIN_TEMPLARS_VERDICT_DURATION, this.templarsVerdictAction.time)
+          : null;
+      const bastionTime =
+        this.bastionSweepAction && this.current === this.bastionSweepAction && this.currentIsOneShot
+          ? Math.min(PALADIN_BASTION_SWEEP_DURATION, this.bastionSweepAction.time)
+          : null;
+      this.bastionSweepFx?.update(bastionTime, animationDt);
+      this.templarsVerdictFx?.update(verdictTime, animationDt);
     }
   }
 
@@ -479,7 +509,15 @@ export class CharacterVisual {
     if (this.deadLock) return;
     const override = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
     if (override && this.action(override)) {
-      this.playOneShot(override, this.def.attackTimeScale ?? 1.3);
+      const authoredTimeScale = abilityId
+        ? this.def.clips.attackTimeScaleByAbility?.[abilityId]
+        : undefined;
+      this.playOneShot(override, authoredTimeScale ?? this.def.attackTimeScale ?? 1.3);
+      if (override === PALADIN_TEMPLARS_VERDICT_CLIP) {
+        this.templarsVerdictAction = this.action(override);
+      } else if (override === PALADIN_BASTION_SWEEP_CLIP) {
+        this.bastionSweepAction = this.action(override);
+      }
       return;
     }
     const skinAttack = weaponSkinAttackClips(this.weaponSkinId);
@@ -499,7 +537,7 @@ export class CharacterVisual {
    *  held Bladestorm channel pose. Repeated AoE hits only refresh the timer. */
   playWhirl(): void {
     if (this.deadLock) return;
-    this.spinOnceTimer = SPIN_ONCE_DURATION;
+    this.spinOnceTimer = SPIN_ATTACK_VISUAL_DURATION;
     const clips = this.def.clips.attack;
     if (clips.length > 0) {
       this.playOneShot(clips[this.attackIdx++ % clips.length], SPIN_ATTACK_TIMESCALE);
@@ -843,6 +881,14 @@ export class CharacterVisual {
     this.applyVisualMaterials();
     this.buildWeaponVfx(payloads);
     this.rebuildWeaponAura();
+    this.rebuildTemplarsVerdictFx();
+  }
+
+  private rebuildTemplarsVerdictFx(): void {
+    this.templarsVerdictFx?.dispose();
+    this.templarsVerdictFx =
+      this.key === 'player_paladin' ? new PaladinTemplarsVerdictFx(this.model) : null;
+    this.templarsVerdictAction = null;
   }
 
   setWeaponAura(on: boolean): void {
@@ -1083,6 +1129,12 @@ export class CharacterVisual {
 
   dispose(): void {
     this.disposed = true;
+    this.bastionSweepFx?.dispose();
+    this.bastionSweepFx = null;
+    this.bastionSweepAction = null;
+    this.templarsVerdictFx?.dispose();
+    this.templarsVerdictFx = null;
+    this.templarsVerdictAction = null;
     this.disposeWeaponAura();
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
@@ -1299,6 +1351,8 @@ export class CharacterVisual {
   ): void {
     const a = this.action(name);
     if (!a) return;
+    if (name !== PALADIN_TEMPLARS_VERDICT_CLIP) this.stopTemplarsVerdictFx();
+    if (name !== PALADIN_BASTION_SWEEP_CLIP) this.stopBastionSweepFx();
     const prev = this.current;
     if (prev === a) a.stop();
     a.reset();
@@ -1317,6 +1371,8 @@ export class CharacterVisual {
   }
 
   private onFinished(a: THREE.AnimationAction): void {
+    if (a === this.templarsVerdictAction) this.stopTemplarsVerdictFx();
+    if (a === this.bastionSweepAction) this.stopBastionSweepFx();
     if (this.deadLock) return; // death clip clamps on its last frame
     if (this.baseState === 'sit' && a === this.action(this.def.clips.sitDown)) {
       this.fadeTo(this.action(this.def.clips.sitIdle) ?? a, 0.25, false);
@@ -1330,6 +1386,8 @@ export class CharacterVisual {
   }
 
   private enterDeath(): void {
+    this.stopTemplarsVerdictFx();
+    this.stopBastionSweepFx();
     this.deadLock = true;
     this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
@@ -1359,6 +1417,16 @@ export class CharacterVisual {
     if (prev && prev !== death) prev.fadeOut(ONESHOT_FADE);
     death.fadeIn(ONESHOT_FADE).play();
     this.current = death;
+  }
+
+  private stopTemplarsVerdictFx(): void {
+    this.templarsVerdictAction = null;
+    this.templarsVerdictFx?.update(null, 0);
+  }
+
+  private stopBastionSweepFx(): void {
+    this.bastionSweepAction = null;
+    this.bastionSweepFx?.update(null, 0);
   }
 
   private revive(): void {

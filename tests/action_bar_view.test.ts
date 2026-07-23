@@ -6,7 +6,7 @@
 // parity drives both world shapes to identical output.
 
 import { describe, expect, it, vi } from 'vitest';
-import { type AbilityDef, type ItemDef, MELEE_RANGE } from '../src/sim/types';
+import { type AbilityDef, type AuraKind, type ItemDef, MELEE_RANGE } from '../src/sim/types';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarAbility,
@@ -81,6 +81,7 @@ function fakeDeps(): ActionBarDeps {
 }
 
 interface WorldOpts {
+  playerId?: number;
   autoAttack?: boolean;
   dead?: boolean;
   resource?: number;
@@ -91,6 +92,7 @@ interface WorldOpts {
   playerPos?: { x: number; y: number; z: number };
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
+  targetAuras?: Array<{ kind: AuraKind; sourceId: number }>;
   inventory?: { itemId: string; count: number }[];
   abilityCharges?: {
     [id: string]: { charges: number; recharge?: number; rechargeLength?: number } | undefined;
@@ -109,6 +111,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
   const targetPos = opts.targetPos === undefined ? null : opts.targetPos;
   return {
     player: {
+      id: opts.playerId ?? 1,
       autoAttack: opts.autoAttack ?? false,
       dead: opts.dead ?? false,
       resource: opts.resource ?? 100,
@@ -123,7 +126,14 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       paladinDevotion: opts.paladinDevotion,
       paladinSpec: opts.paladinSpec,
     },
-    target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
+    target:
+      targetPos === null
+        ? null
+        : {
+            dead: opts.targetDead ?? false,
+            pos: targetPos,
+            auras: opts.targetAuras ?? [],
+          },
     inventory: opts.inventory ?? [],
   };
 }
@@ -151,7 +161,7 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
     const view = createActionBarView(
       descriptor(
         slot(0, { ability: ability('divine_ascension') }),
-        slot(1, { ability: ability('oathstrike') }),
+        slot(1, { ability: ability('final_edict') }),
         slot(2, { ability: ability('mercy_lance') }),
       ),
       fakeDeps(),
@@ -175,7 +185,7 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
       empowered: true,
       ascensionSpender: true,
       ascensionCostLabel: '-1',
-      ariaLabel: 'hudChrome.paladin.ascensionSpenderAria(slot=2,ability=ability:oathstrike)',
+      ariaLabel: 'hudChrome.paladin.ascensionSpenderAria(slot=2,ability=ability:final_edict)',
     });
     expect(active[2]).toMatchObject({ empowered: false, ascensionSpender: false });
 
@@ -189,7 +199,7 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
       empowered: false,
       ascensionSpender: false,
       ascensionCostLabel: '',
-      ariaLabel: 'abilityUi.actionBar.slotAria(slot=2,ability=ability:oathstrike)',
+      ariaLabel: 'abilityUi.actionBar.slotAria(slot=2,ability=ability:final_edict)',
     });
 
     const switchedSpec = view.tick(
@@ -282,6 +292,100 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
 });
 
 describe('actionBarView: ability cooldown / usable / range / queued math', () => {
+  it('shows every Solar Reprisal choice while bypassing only the eligible cooldowns and cost', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('sunward_disc', { cost: 25, cooldown: 10 }),
+        }),
+        slot(2, {
+          ability: ability('hammer_of_grace', { cost: 0, cooldown: 7 }),
+        }),
+        slot(3, {
+          ability: ability('holy_light', { cost: 65, cooldown: 0, castTime: 1.5 }),
+        }),
+        slot(4, {
+          ability: ability('bastion_sweep', { cost: 0, cooldown: 6 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+    const solarReprisal = {
+      kind: 'paladin_solar_reprisal' as AuraKind,
+      value: 0.2,
+    };
+    const slots = view.tick(
+      world({
+        resource: 0,
+        cooldowns: new Map([
+          ['sunward_disc', 5],
+          ['hammer_of_grace', 4],
+          ['bastion_sweep', 3],
+        ]),
+        auras: [solarReprisal],
+      }),
+    ).slots;
+
+    expect(slots[0]).toMatchObject({
+      cooldownRemaining: 0,
+      usable: true,
+      procGlow: true,
+      empowered: true,
+    });
+    expect(slots[1]).toMatchObject({
+      cooldownRemaining: 0,
+      usable: true,
+      procGlow: true,
+      empowered: true,
+    });
+    expect(slots[2]).toMatchObject({
+      cooldownRemaining: 0,
+      usable: false,
+      procGlow: true,
+      empowered: true,
+    });
+    expect(slots[3]).toMatchObject({
+      cooldownRemaining: 3,
+      procGlow: false,
+      empowered: false,
+    });
+  });
+
+  it("shows Dawn's Wrath as one stored Hammer cast without exposing its running cooldown", () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('hammer_of_wrath', { cost: 0, cooldown: 6 }),
+        }),
+        slot(2, {
+          ability: ability('final_edict', { cost: 25, cooldown: 8 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+    const slots = view.tick(
+      world({
+        cooldowns: new Map([
+          ['hammer_of_wrath', 5],
+          ['final_edict', 4],
+        ]),
+        auras: [{ kind: 'paladin_dawns_wrath' as AuraKind, value: 0.2 }],
+      }),
+    ).slots;
+
+    expect(slots[0]).toMatchObject({
+      cooldownRemaining: 0,
+      usable: true,
+      procGlow: true,
+      empowered: true,
+    });
+    expect(slots[1]).toMatchObject({
+      cooldownRemaining: 4,
+      procGlow: false,
+      empowered: false,
+    });
+  });
+
   it('cooldown sweep is clamped, the countdown shows above one second', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('frostbolt', { cooldown: 6 }) })),
@@ -519,6 +623,40 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
 });
 
 describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)', () => {
+  it("glows Dawnfall and Final Edict only for the player's active Sun God Verdict", () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('dawnfall') }),
+        slot(2, { ability: ability('final_edict') }),
+        slot(3, { ability: ability('hammer_of_wrath') }),
+      ),
+      fakeDeps(),
+    );
+
+    const marked = view.tick(
+      world({
+        playerId: 7,
+        targetPos: { x: 4, y: 0, z: 0 },
+        targetAuras: [{ kind: 'sun_verdict', sourceId: 7 }],
+      }),
+    ).slots;
+    expect(marked.map((entry) => entry.procGlow)).toEqual([true, true, false]);
+
+    const otherPaladinMark = view.tick(
+      world({
+        playerId: 7,
+        targetPos: { x: 4, y: 0, z: 0 },
+        targetAuras: [{ kind: 'sun_verdict', sourceId: 8 }],
+      }),
+    ).slots;
+    expect(otherPaladinMark.map((entry) => entry.procGlow)).toEqual([false, false, false]);
+
+    const cleared = view.tick(
+      world({ playerId: 7, targetPos: { x: 4, y: 0, z: 0 }, targetAuras: [] }),
+    ).slots;
+    expect(cleared.map((entry) => entry.procGlow)).toEqual([false, false, false]);
+  });
+
   it('a Battle Trance proc glows and frees exactly the scoped abilities at zero rage', () => {
     const view = createActionBarView(
       descriptor(

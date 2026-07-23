@@ -266,7 +266,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     abilities: [
       'seal_of_righteousness',
       'holy_light',
-      'judgement',
       'blessing_of_might',
       'divine_protection',
       'hammer_of_justice',
@@ -287,19 +286,19 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'grace_devotion',
       'retribution_aura',
       'hammer_of_grace',
-      'hammer_of_light',
       'hushbrand',
       'guardian_covenant',
       'solar_step',
       'solar_invocation',
       'recall_the_fallen',
       'beacon_of_light',
-      'oathstrike',
       'final_edict',
       'dawnfall',
       'faithforged_guard',
       'hammer_of_wrath',
       'avenging_wrath',
+      'sun_gods_verdict',
+      'valkyrs_calling',
       'mercy_lance',
       'sacred_form',
       'dawns_embrace',
@@ -2949,23 +2948,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'holy',
     requiresTarget: false,
-    effects: [{ type: 'imbue', bonus: 4, duration: 30, judgeMin: 10, judgeMax: 18 }],
+    effects: [{ type: 'imbue', bonus: 4, duration: 30 }],
     ranks: [
       {
         rank: 2,
         level: 10,
         cost: 35,
-        effects: [{ type: 'imbue', bonus: 7, duration: 30, judgeMin: 18, judgeMax: 28 }],
+        effects: [{ type: 'imbue', bonus: 7, duration: 30 }],
       },
       {
         rank: 3,
         level: 16,
         cost: 50,
-        effects: [{ type: 'imbue', bonus: 11, duration: 30, judgeMin: 30, judgeMax: 44 }],
+        effects: [{ type: 'imbue', bonus: 11, duration: 30 }],
       },
     ],
     description:
-      'Fills you with Holy power for 30 sec, causing each of your melee swings to deal $d additional Holy damage. Unleash with Verdict.',
+      'Fills you with Holy power for 30 sec, causing each of your melee swings to deal $d additional Holy damage.',
   },
   holy_light: {
     id: 'holy_light',
@@ -2973,7 +2972,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'paladin',
     learnLevel: 1,
     cost: 25,
-    castTime: 2.5,
+    castTime: 1.5,
     cooldown: 0,
     range: 30,
     school: 'holy',
@@ -2982,10 +2981,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'heal', min: 42, max: 51 }],
     ranks: [
       { rank: 2, level: 8, cost: 35, effects: [{ type: 'heal', min: 76, max: 90 }] },
-      { rank: 3, level: 14, cost: 45, effects: [{ type: 'heal', min: 122, max: 144 }] },
-      { rank: 4, level: 20, cost: 55, effects: [{ type: 'heal', min: 190, max: 222 }] },
+      { rank: 3, level: 14, cost: 50, effects: [{ type: 'heal', min: 122, max: 144 }] },
+      { rank: 4, level: 20, cost: 65, effects: [{ type: 'heal', min: 190, max: 222 }] },
     ],
-    description: 'Heals a friendly target for $d.',
+    description:
+      'Quickly heals a friendly target for $d. Restoring health generates 1 Devotion, even without a specialization. Radiant Resonance or Solar Reprisal makes it instant.',
   },
   devotion_aura: {
     id: 'devotion_aura',
@@ -3003,21 +3003,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'buffTarget', kind: 'buff_armor_pct', value: 10, duration: 1800, party: true },
     ],
     description: 'Increases the armor of all party members by $b% for 30 min.',
-  },
-  judgement: {
-    id: 'judgement',
-    name: 'Verdict',
-    class: 'paladin',
-    learnLevel: 4,
-    cost: 30,
-    castTime: 0,
-    cooldown: 10,
-    range: 30,
-    school: 'holy',
-    requiresTarget: true,
-    effects: [{ type: 'judgement' }],
-    description:
-      'Unleashes your active Seal upon the enemy, consuming it to deal its judgement damage.',
   },
   blessing_of_might: {
     id: 'blessing_of_might',
@@ -3042,7 +3027,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 6,
     cost: 15,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 60,
     range: 0,
     school: 'holy',
     requiresTarget: false,
@@ -3090,7 +3075,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'lay_on_hands',
     name: 'Last Rite',
     class: 'paladin',
-    learnLevel: 10,
+    learnLevel: 8,
     cost: 0,
     castTime: 0,
     cooldown: 600,
@@ -3100,7 +3085,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 250, max: 250 }],
     ranks: [{ rank: 2, level: 18, cost: 0, effects: [{ type: 'heal', min: 600, max: 600 }] }],
-    description: 'A massive surge of healing: restores $d health. 10 min cooldown.',
+    description:
+      'A massive surge of healing: restores $d health and generates 1 Devotion when it restores health. 10 min cooldown.',
   },
   holy_taunt: {
     id: 'holy_taunt',
@@ -3132,7 +3118,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 62, max: 76 }],
-    description: 'A quick, efficient flash of Light that heals a friendly target for $d.',
+    description:
+      'A quick, efficient burst of Light that heals a friendly target for $d. Restoring health generates 1 Devotion, even without a specialization.',
   },
   exorcism: {
     id: 'exorcism',
@@ -3188,7 +3175,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Surrounds you and your party with holy energy until death or replacement, dealing 5 Holy damage to any enemy that strikes an affected ally in melee.',
+      'Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take 5 Holy damage, and affected allies deal 5 additional Holy damage with auto-attacks.',
   },
 
   // ====================== HUNTER ======================
@@ -6197,7 +6184,6 @@ const PALADIN_LEGACY_ABILITY_IDS = [
   'seal_of_righteousness',
   'devotion_aura',
   'blessing_of_might',
-  'divine_protection',
   'holy_taunt',
   'flash_of_light',
   'exorcism',
@@ -6319,16 +6305,6 @@ function scaleEffect(
       return {
         ...eff,
         bonus: Math.round(eff.bonus * dmgMult + flat),
-        judgeMin:
-          eff.judgeMin === undefined ? undefined : Math.round(eff.judgeMin * dmgMult + flat),
-        judgeMax:
-          eff.judgeMax === undefined ? undefined : Math.round(eff.judgeMax * dmgMult + flat),
-      };
-    case 'judgement':
-      return {
-        ...eff,
-        dmgMult: (eff.dmgMult ?? 1) * dmgMult,
-        flat: (eff.flat ?? 0) + flat,
       };
     case 'heal':
       return {
@@ -6431,6 +6407,19 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     // Flat cooldown ADD (seconds), after the percent: Snap Bewitch turns a
     // cooldown-less cast instant by trading in a real cooldown.
     if (am.cooldownFlat) entry.cooldown = Math.max(0, entry.cooldown + am.cooldownFlat);
+    if (am.durationFlat) {
+      entry.effects = entry.effects.map((effect) => {
+        if (
+          effect.type === 'selfBuff' ||
+          effect.type === 'buffTarget' ||
+          effect.type === 'absorb' ||
+          effect.type === 'hot'
+        ) {
+          return { ...effect, duration: Math.max(0, effect.duration + (am.durationFlat ?? 0)) };
+        }
+        return effect;
+      });
+    }
     if (am.castWhileMoving) entry.castWhileMoving = true;
     if (am.damagePushbackImmune) entry.damagePushbackImmune = true;
     // Stored uses (Double Charge): base 1 unless the def itself is
@@ -6468,6 +6457,7 @@ export function abilitiesKnownAt(
   cls: PlayerClass,
   level: number,
   mods?: TalentModifiers,
+  questsDone?: ReadonlySet<string>,
 ): KnownAbility[] {
   const out: KnownAbility[] = [];
   const baseIds = CLASSES[cls].abilities;
@@ -6481,6 +6471,11 @@ export function abilitiesKnownAt(
     if (!def) continue;
     const granted = grantIds.has(id) || !baseIds.includes(id);
     if (!granted && def.learnLevel > level) continue; // class kit is level-gated; grants bypass it
+    // Quest-gated kit: a quest-locked ability stays hidden until its unlocking
+    // quest is in questsDone (paladin's recall_the_fallen <- q_rite_of_redemption).
+    // Grants bypass entirely (already scoped). Learned permanently: questsDone is
+    // durable, so a returning character keeps it through the load-time rebuild.
+    if (!granted && def.requiresQuest && !questsDone?.has(def.requiresQuest)) continue;
     // Spec-gated kit: a spec-restricted ability is shown ONLY when the player's
     // committed spec is in its `specs` list. With no spec chosen the shared base
     // kit stays but every spec-exclusive drops out, so exclusivity is visible

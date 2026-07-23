@@ -15,11 +15,35 @@ const common: AbilityDef[] = [
     offGcd: true,
     effects: [{ type: 'divineAscension' }],
     description:
-      'Consume 20 Devotion to gain 5 Ascension charges for up to 25 sec. Marked abilities consume one charge and gain an additional effect.',
+      'Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect.',
+  },
+  {
+    id: 'aura_mastery',
+    name: 'Aura Mastery',
+    class: 'paladin',
+    learnLevel: 20,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'holy',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      {
+        type: 'buffTarget',
+        kind: 'buff_aura_mastery',
+        value: 1,
+        duration: 8,
+        party: true,
+      },
+    ],
+    description:
+      'For 8 sec, empower every active combat aura in your group: Bastion Devotion reduces damage by 15%, and both Requital Aura effects deal 15 Holy damage. Repeated uses refresh instead of stacking.',
   },
   {
     id: 'devotion_ward',
-    name: 'Devotion Aura',
+    name: 'Bastion Devotion',
     class: 'paladin',
     learnLevel: 2,
     cost: 30,
@@ -49,28 +73,22 @@ const common: AbilityDef[] = [
     learnLevel: 4,
     cost: 0,
     castTime: 0,
-    cooldown: 10,
-    range: 0,
-    school: 'physical',
+    cooldown: 7,
+    range: 20,
+    school: 'holy',
+    projectile: true,
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 28, weaponMult: 1.1, restoreMana: 70 }],
+    effects: [
+      {
+        type: 'directDamage',
+        min: 95,
+        max: 115,
+        restoreMana: 70,
+        selfHealDamageFrac: 0.5,
+      },
+    ],
     description:
-      'Strike with your weapon and restore 70 mana on a successful hit. Shares a cooldown with Hammer of Light.',
-  },
-  {
-    id: 'hammer_of_light',
-    name: 'Hammer of Light',
-    class: 'paladin',
-    learnLevel: 6,
-    cost: 20,
-    castTime: 0,
-    cooldown: 10,
-    range: 0,
-    school: 'physical',
-    requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 28, weaponMult: 1.1, selfHealDamageFrac: 0.5 }],
-    description:
-      'Strike with your weapon and heal yourself for 50% of damage dealt. Shares a cooldown with Hammer of Grace.',
+      'Instantly hurl a holy hammer at an enemy within 20 m for $d, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt.',
   },
   {
     id: 'hushbrand',
@@ -109,7 +127,7 @@ const common: AbilityDef[] = [
     id: 'solar_step',
     name: 'Solar Step',
     class: 'paladin',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 20,
     castTime: 0,
     cooldown: 30,
@@ -132,17 +150,25 @@ const common: AbilityDef[] = [
     school: 'holy',
     projectile: false,
     requiresTarget: true,
-    targetType: 'friendly',
-    effects: [{ type: 'heal', min: 180, max: 220 }],
+    targetType: 'any',
+    effects: [
+      { type: 'heal', min: 180, max: 220 },
+      { type: 'directDamage', min: 120, max: 150 },
+    ],
     description:
-      'Instantly heal a friendly target for $d. The healing cast generates 1 Devotion. During Ascension, also heal allied players within 10 m of the target for half as much.',
+      'Instantly heal an ally for $d or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much.',
   },
   {
     id: 'recall_the_fallen',
     name: 'Recall the Fallen',
     class: 'paladin',
-    specs: ['holy'],
-    learnLevel: 12,
+    // Earned through the Divine Tome quest chain, not trained: hidden until
+    // q_rite_of_redemption is turned in (abilitiesKnownAt's requiresQuest gate).
+    // No spec lock: any paladin who completes the rite can call back the fallen.
+    // learnLevel matches the final quest's minLevel (6): the level gate and the
+    // quest gate both apply, so a mismatch would hide the ability past turn-in.
+    requiresQuest: 'q_rite_of_redemption',
+    learnLevel: 6,
     cost: 60,
     castTime: 8,
     cooldown: 0,
@@ -164,7 +190,7 @@ const common: AbilityDef[] = [
     learnLevel: 16,
     cost: 60,
     castTime: 0,
-    cooldown: 0,
+    cooldown: 7,
     range: 30,
     school: 'holy',
     requiresTarget: true,
@@ -172,33 +198,20 @@ const common: AbilityDef[] = [
     partyOnlyTarget: true,
     effects: [{ type: 'beaconOfLight' }],
     description:
-      'Mark one group member as your Beacon of Light. 75% of your effective healing on other group members within 60 m also heals the Beacon. Lasts until either of you dies.',
+      'Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies.',
   },
 ];
 
 const retribution: AbilityDef[] = [
-  {
-    id: 'oathstrike',
-    name: 'Oathstrike',
-    class: 'paladin',
-    specs: ['retribution'],
-    learnLevel: 1,
-    cost: 0,
-    castTime: 0,
-    cooldown: 5,
-    range: 0,
-    school: 'physical',
-    requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 21, weaponMult: 1 }],
-    description:
-      'Strike for weapon damage plus $d and generate 1 Devotion. Ascension repeats the strike at 60% power.',
-  },
+  // Final Edict is the Retribution weapon strike + Devotion builder from level 1 (it
+  // absorbed the old Oathstrike's starter role, removed 2026-07-22 as a duplicate
+  // strike). Devotion is spent on Divine Ascension, which empowers marked abilities.
   {
     id: 'final_edict',
     name: 'Final Edict',
     class: 'paladin',
     specs: ['retribution'],
-    learnLevel: 3,
+    learnLevel: 1,
     cost: 25,
     castTime: 0,
     cooldown: 8,
@@ -207,7 +220,7 @@ const retribution: AbilityDef[] = [
     requiresTarget: true,
     effects: [{ type: 'weaponStrike', bonus: 52, weaponMult: 1.4 }],
     description:
-      'Deliver a crushing weapon strike and generate 2 Devotion. Ascension also releases a Holy explosion around you.',
+      "Deliver a crushing weapon strike and generate 1 Devotion. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you.",
   },
   {
     id: 'dawnfall',
@@ -224,7 +237,7 @@ const retribution: AbilityDef[] = [
     requiresTarget: false,
     effects: [{ type: 'aoeDamage', min: 55, max: 70, radius: 6, softCap: 5 }],
     description:
-      'Deal $d Holy damage to nearby enemies and generate 2 Devotion. Ascension increases its damage and radius.',
+      'Deal $d Holy damage to nearby enemies and generate 1 Devotion. Ascension increases its damage and radius.',
   },
   {
     id: 'faithforged_guard',
@@ -258,7 +271,7 @@ const retribution: AbilityDef[] = [
     executeThreshold: 0.2,
     effects: [{ type: 'directDamage', min: 150, max: 180 }],
     description:
-      'Hurl a holy hammer for $d damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Avenging Wrath. Ascension increases its damage by 30%.',
+      "Hurl a holy hammer for $d damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Avenging Wrath. Dawn's Wrath grants an additional cast against any target that ignores its current cooldown and deals 20% more damage. Ascension increases its damage by 30%.",
   },
   {
     id: 'avenging_wrath',
@@ -274,10 +287,59 @@ const retribution: AbilityDef[] = [
     offGcd: true,
     effects: [
       { type: 'selfBuff', kind: 'buff_dmg_done', value: 0.2, duration: 15 },
+      { type: 'selfBuff', kind: 'buff_healing_done', value: 0.2, duration: 15 },
       { type: 'grantDevotion', amount: 10 },
     ],
     description:
-      'Unfurl wings of holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for 15 sec. Also increases damage dealt by 20%. Retribution: enables Hammer of Wrath against any target.',
+      'Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for 15 sec. Also increases damage and healing done by 20%. Retribution: enables Hammer of Wrath against any target.',
+  },
+  {
+    id: 'sun_gods_verdict',
+    name: 'Verdict of the Sun God',
+    class: 'paladin',
+    specs: ['retribution'],
+    learnLevel: 20,
+    cost: 0,
+    castTime: 0,
+    cooldown: 60,
+    range: 30,
+    school: 'holy',
+    projectile: false,
+    requiresTarget: true,
+    offGcd: true,
+    effects: [
+      {
+        type: 'sunGodVerdict',
+        duration: 30,
+        charges: 3,
+        singleTargetMin: 360,
+        singleTargetMax: 420,
+        areaMin: 150,
+        areaMax: 180,
+        areaRadius: 8,
+        areaSoftCap: 5,
+        stunDuration: 1.5,
+      },
+    ],
+    description:
+      'Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec.',
+  },
+  {
+    id: 'valkyrs_calling',
+    name: "Valkyr's Calling",
+    class: 'paladin',
+    specs: ['retribution'],
+    learnLevel: 13,
+    cost: 50,
+    castTime: 0,
+    cooldown: 180,
+    range: 20,
+    school: 'holy',
+    projectile: false,
+    requiresTarget: true,
+    effects: [{ type: 'valkyrsCalling', min: 150, max: 180, radius: 8, softCap: 5 }],
+    description:
+      'Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for $d Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge.',
   },
 ];
 
@@ -314,21 +376,18 @@ const holy: AbilityDef[] = [
     name: 'Mercy Lance',
     class: 'paladin',
     specs: ['holy'],
-    learnLevel: 1,
+    learnLevel: 4,
     cost: 20,
-    castTime: 0,
-    cooldown: 6,
+    castTime: 1.75,
+    cooldown: 0,
     range: 30,
     school: 'holy',
     projectile: false,
     requiresTarget: true,
-    targetType: 'any',
-    effects: [
-      { type: 'heal', min: 80, max: 100 },
-      { type: 'directDamage', min: 80, max: 100 },
-    ],
+    targetType: 'enemy',
+    effects: [{ type: 'directDamage', min: 80, max: 100 }],
     description:
-      'Heal an ally or damage an enemy for $d. A healing cast generates 1 Devotion. Ascension also heals a nearby ally when used to heal.',
+      'Deal $d Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit.',
   },
   {
     id: 'dawns_embrace',
@@ -336,16 +395,16 @@ const holy: AbilityDef[] = [
     class: 'paladin',
     specs: ['holy'],
     learnLevel: 3,
-    cost: 45,
-    castTime: 1.5,
-    cooldown: 10,
+    cost: 90,
+    castTime: 2.5,
+    cooldown: 0,
     range: 30,
     school: 'holy',
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 260, max: 310 }],
     description:
-      'Deliver a powerful heal and generate 2 Devotion. Ascension makes the spell instant and increases its healing by 35%.',
+      'Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%.',
   },
   {
     id: 'radiant_chorus',
@@ -361,7 +420,7 @@ const holy: AbilityDef[] = [
     requiresTarget: false,
     effects: [{ type: 'aoeHeal', min: 90, max: 110, radius: 30 }],
     description:
-      'Heal nearby allies for $d and generate 2 Devotion. Ascension increases its healing and radius.',
+      "Heal nearby allies for $d and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius.",
   },
   {
     id: 'life_covenant',
@@ -444,7 +503,7 @@ const protection: AbilityDef[] = [
     threat: { mult: 3 },
     effects: [{ type: 'weaponStrike', bonus: 21, weaponMult: 1 }],
     description:
-      'Strike with high threat and generate 1 Devotion. Ascension also grants a small absorption shield.',
+      'Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield.',
   },
   {
     id: 'bastion_rite',
@@ -463,7 +522,7 @@ const protection: AbilityDef[] = [
       { type: 'selfBuff', kind: 'buff_block', value: 0.2, duration: 6 },
     ],
     description:
-      'Reduce physical damage taken by 20% for 6 sec. Ascension extends the duration to 10 sec.',
+      'Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec.',
   },
   {
     id: 'sunward_disc',
@@ -476,7 +535,8 @@ const protection: AbilityDef[] = [
     cooldown: 10,
     range: 30,
     school: 'holy',
-    projectile: false,
+    projectile: true,
+    projectileFx: 'paladinSunwardDisc',
     requiresTarget: true,
     requiresShield: true,
     threat: { mult: 3 },
@@ -485,7 +545,7 @@ const protection: AbilityDef[] = [
       { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
     ],
     description:
-      'Requires a shield. Hurl a radiant disc that strikes and bounces to 2 enemies, generating 2 Devotion. Ascension empowers 5 bounces.',
+      'Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces.',
   },
   {
     id: 'sacred_challenge',
@@ -518,18 +578,27 @@ const protection: AbilityDef[] = [
     school: 'holy',
     requiresTarget: false,
     threat: { mult: 3.5 },
-    effects: [{ type: 'aoeDamage', min: 72, max: 88, radius: 6, softCap: 5 }],
+    effects: [
+      {
+        type: 'aoeDamage',
+        min: 72,
+        max: 88,
+        radius: 6,
+        frontal: true,
+        frontalHalfAngle: Math.PI / 2,
+        softCap: 5,
+      },
+    ],
     description:
-      'Sweep your shield through nearby enemies for $d Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m.',
+      'Sweep your equipped shield through enemies in a 180 degree frontal arc for $d Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m.',
   },
   {
     id: 'holy_shield',
-    name: 'Holy Shield',
+    name: 'Hallowed Wall',
     class: 'paladin',
     specs: ['protection'],
     learnLevel: 7,
     cost: 0,
-    devotionCost: 3,
     castTime: 0,
     cooldown: 8,
     range: 0,
@@ -542,7 +611,7 @@ const protection: AbilityDef[] = [
       { type: 'threatPulse', amount: 150, radius: 8 },
     ],
     description:
-      'Spend 3 Devotion to gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
+      'Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
   },
   {
     id: 'oath_chain',
@@ -558,13 +627,21 @@ const protection: AbilityDef[] = [
     projectile: false,
     requiresTarget: true,
     offGcd: true,
-    effects: [{ type: 'pullTarget', stopDistance: 3, slowMult: 0.5, slowDuration: 4 }],
+    effects: [
+      {
+        type: 'pullTarget',
+        stopDistance: 3,
+        travelSpeed: 18,
+        slowMult: 0.5,
+        slowDuration: 4,
+      },
+    ],
     description:
-      'Bind a distant enemy with a sacred chain, pulling it to within 3 m and slowing it by 50% for 4 sec. During Ascension it pulls a second nearby enemy.',
+      'Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy.',
   },
   {
     id: 'consecration',
-    name: 'Consecration',
+    name: 'Holy Ground',
     class: 'paladin',
     specs: ['protection', 'retribution'],
     learnLevel: 10,
@@ -580,14 +657,14 @@ const protection: AbilityDef[] = [
         type: 'groundAoE',
         min: 22,
         max: 28,
-        radius: 8,
+        radius: 6,
         duration: 9,
         interval: 1,
         devotionOnFirstHit: 1,
       },
     ],
     description:
-      'Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high threat every second. The first impact generates 1 Devotion. Protection Paladins take 5% less damage while standing inside. Ascension increases damage and radius.',
+      'Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high threat every second. The first impact generates 1 Devotion. Protection Paladins take 5% less damage while standing inside. Ascension increases its damage.',
   },
 ];
 
@@ -606,7 +683,8 @@ const devotions: AbilityDef[] = [
     effects: [
       { type: 'buffTarget', kind: 'buff_spellpower', value: 20, duration: 1800, party: true },
     ],
-    description: 'Increase the spell power of you and party members by 20 for 30 min.',
+    description:
+      'Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins.',
   },
   {
     id: 'dawn_devotion',
@@ -621,7 +699,7 @@ const devotions: AbilityDef[] = [
     requiresTarget: false,
     effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 40, duration: 1800, party: true }],
     description:
-      'Increase the attack power of you and party members by 40 for 30 min. This Devotion coexists with Warrior shouts.',
+      'Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts.',
   },
   {
     id: 'grace_devotion',
@@ -645,7 +723,7 @@ const devotions: AbilityDef[] = [
       },
     ],
     description:
-      'You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min.',
+      'You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins.',
   },
 ];
 

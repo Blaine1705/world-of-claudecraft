@@ -127,13 +127,13 @@
 
 | Ability | Rank | Learn | Cost | Cast | Effect values |
 |---|---|---|---|---|---|
-| seal_of_righteousness | 1 | 1 | 25 | inst | imbue +4/swing, judge 10–18 |
-| | **2** | **10** | 35 | inst | imbue **+7**, judge **18–28** |
-| | **3** | **16** | 50 | inst | imbue **+11**, judge **30–44** |
-| holy_light | 1 | 1 | 35 | 2.5 | heal 42–51 |
-| | **2** | **8** | 60 | 2.5 | heal **76–90** |
-| | **3** | **14** | 95 | 2.5 | heal **122–144** |
-| | **4** | **20** | 140 | 2.5 | heal **190–222** |
+| seal_of_righteousness | 1 | 1 | 25 | inst | imbue +4/swing |
+| | **2** | **10** | 35 | inst | imbue **+7** |
+| | **3** | **16** | 50 | inst | imbue **+11** |
+| holy_light | 1 | 1 | 25 | 1.5 | heal 42-51 |
+| | **2** | **8** | 35 | 1.5 | heal **76-90** |
+| | **3** | **14** | 50 | 1.5 | heal **122-144** |
+| | **4** | **20** | 65 | 1.5 | heal **190-222** |
 | devotion_aura | 1 | 1 | 0 | inst | buff_armor 40 |
 | | **2** | **12** | 0 | inst | buff_armor **75** |
 | | **3** | **18** | 0 | inst | buff_armor **110** |
@@ -146,7 +146,6 @@
 | | **2** | **16** | 45 | inst, 60cd | stun **4s** |
 | lay_on_hands | 1 | 10 | 0 | inst, 600cd | heal 250 |
 | | **2** | **18** | 0 | inst, 600cd | heal **600** (~75% of L20 pala hp) |
-| judgement | 1 | 4 | 30 | — | no ranks (scales via Seal ranks) |
 
 **NEW:**
 
@@ -156,7 +155,7 @@
 | `exorcism` | 14 | 55 | inst, 15cd, 30yd | directDamage 46–56 (holy nuke; undead-only restriction omitted — no such flag) |
 | `consecration` | 18 | 60 | inst, 8cd | aoeDamage 28–34, radius 8 (caster-centered) |
 
-**Sanity** — L14: swing ~26 + Seal R2 (+7) ≈ 33, + Judgement R2 (~23/10s) + Exorcism (~51/15s) → 292 hp ≈ 9–10 swings, ~20s ✓ (hybrid pace). L20: swing ~42 w/ Seal R3, judge ~37 → 400 hp ≈ 8 swings ✓.
+**Sanity** — Recalculate against the current specialization kits; the removed Verdict payload no longer contributes damage from the Seal.
 
 ---
 

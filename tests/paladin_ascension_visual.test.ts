@@ -1,36 +1,84 @@
+import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { PaladinAscensionVisual } from '../src/render/paladin_ascension_visual';
 
+const ACTIVE_PLAN = { active: true, charges: 5, lastCharge: false };
+
+function requiredObject(visual: PaladinAscensionVisual, name: string): THREE.Object3D {
+  const object = visual.group.getObjectByName(name);
+  if (!object) throw new Error(`missing ${name}`);
+  return object;
+}
+
 describe('PaladinAscensionVisual', () => {
-  it('keeps all charge symbols visible but freezes their orbit for reduced motion', () => {
+  it('shows only the solar crown and the ground seal', () => {
     const visual = new PaladinAscensionVisual(1.8);
-    const plan = { active: true, charges: 5, lastCharge: false };
-    visual.update(plan, 0.5, true);
-    const column = visual.group.getObjectByName('paladin-ascension-column');
-    if (!column || !('material' in column)) throw new Error('missing Ascension light column');
-    const columnMaterial = column.material as {
-      color: { getHex(): number };
-    };
-    const seals = Array.from({ length: 5 }, (_, index) => {
-      const seal = visual.group.getObjectByName(`paladin-ascension-seal-${index + 1}`);
-      if (!seal) throw new Error(`missing Ascension seal ${index + 1}`);
-      return seal;
-    });
-    const first = seals[0].position.clone();
+    visual.update(ACTIVE_PLAN, 0, false);
 
-    visual.update(plan, 0.5, true);
-    expect(seals.every((seal) => seal.visible)).toBe(true);
-    expect(seals[0].position.equals(first)).toBe(true);
-    const normalColor = columnMaterial.color.getHex();
+    const groundSeal = requiredObject(visual, 'paladin-ascension-ground-seal');
+    const crown = requiredObject(visual, 'paladin-ascension-solar-crown');
 
-    visual.update(plan, 0.5, false);
-    expect(seals[0].position.equals(first)).toBe(false);
-    visual.update({ active: true, charges: 1, lastCharge: true }, 0.5, false);
-    expect(columnMaterial.color.getHex()).not.toBe(normalColor);
-    visual.update({ active: true, charges: 2, lastCharge: false }, 0.5, false);
-    expect(seals.map((seal) => seal.visible)).toEqual([true, true, false, false, false]);
-    visual.update({ active: false, charges: 0, lastCharge: false }, 0.5, false);
-    expect(visual.group.visible).toBe(false);
+    expect(visual.group.visible).toBe(true);
+    expect(visual.group.children.map((child) => child.name).sort()).toEqual([
+      'paladin-ascension-ground-seal',
+      'paladin-ascension-solar-crown',
+    ]);
+    expect(groundSeal.scale.x).toBeCloseTo(1.65);
+    expect(crown.position.y).toBeGreaterThan(1.8);
+    expect(crown).toBeInstanceOf(THREE.Group);
+
+    const crownBand = crown.getObjectByName('paladin-ascension-crown-band');
+    const crownProngs = crown.getObjectByName('paladin-ascension-crown-prongs');
+    const crownJewels = crown.getObjectByName('paladin-ascension-crown-jewels');
+    if (!(crownBand instanceof THREE.Mesh)) throw new Error('missing 3D crown band');
+    expect(crownBand.geometry).toBeInstanceOf(THREE.CylinderGeometry);
+    expect(crownBand.material).toBeInstanceOf(THREE.MeshStandardMaterial);
+    expect((crownBand.material as THREE.MeshStandardMaterial).metalness).toBeGreaterThan(0.5);
+    expect(crownProngs).toBeInstanceOf(THREE.InstancedMesh);
+    expect(crownJewels).toBeInstanceOf(THREE.InstancedMesh);
+    expect((crownProngs as THREE.InstancedMesh).count).toBe(8);
+    expect((crownJewels as THREE.InstancedMesh).count).toBe(8);
+
+    for (const removed of [
+      'paladin-ascension-solar-shoulders',
+      'paladin-ascension-chest-medallion',
+      'paladin-ascension-light-mantle',
+      'paladin-ascension-activation-sweep',
+    ]) {
+      expect(visual.group.getObjectByName(removed)).toBeUndefined();
+    }
+
     visual.dispose();
+  });
+
+  it('levitates only the character rig while the crown follows it', () => {
+    const visual = new PaladinAscensionVisual(1.8);
+    const worldRoot = new THREE.Group();
+    const characterRoot = new THREE.Group();
+    worldRoot.position.set(12, 4, -3);
+    characterRoot.position.y = 0.25;
+    worldRoot.add(characterRoot, visual.group);
+
+    visual.update(ACTIVE_PLAN, 1, false, characterRoot);
+    const crown = requiredObject(visual, 'paladin-ascension-solar-crown');
+    expect(characterRoot.position.y).toBeCloseTo(0.33);
+    expect(crown.position.y).toBeCloseTo(2.08);
+    expect(worldRoot.position.toArray()).toEqual([12, 4, -3]);
+
+    visual.update({ active: false, charges: 0, lastCharge: false }, 0.1, false, characterRoot);
+    expect(visual.group.visible).toBe(false);
+    expect(characterRoot.position.y).toBeCloseTo(0.25);
+    visual.dispose();
+  });
+
+  it('wires visual levitation to the character rig instead of the world entity root', () => {
+    const rendererSource = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    );
+    expect(rendererSource).toMatch(
+      /syncPaladinAscensionVisual\([\s\S]*?this\.reducedMotion\(\),\s*v\.visual\.root,\s*\)/,
+    );
   });
 });

@@ -75,8 +75,8 @@ function settle(sim: Sim): void {
 }
 
 describe('retained v0.26 non-Warrior row runtime contracts', () => {
-  it('banks a second Sundering Gavel with Twin Gavels', () => {
-    const charges = simWithRows('paladin', { 8: 'pal_r8_twin_gavels' });
+  it('banks a second Sundering Gavel with Double Sentence', () => {
+    const charges = simWithRows('paladin', { 11: 'pal_r11_double_sentence' });
     expect(resolved(charges, 'hammer_of_justice')).toMatchObject({
       charges: 2,
       bonusCharges: 1,
@@ -334,27 +334,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(detonation(3)).toEqual({ damage: 10, foreignRemains: true });
   });
 
-  it('pins exact Cleansing Verdict and Voidfeast healing with correct dispel direction', () => {
-    const paladin = simWithRows('paladin', { 8: 'pal_r8_cleansing_verdict' });
-    const ally = addTarget(paladin, 2, false);
-    ally.maxHp = 1_000;
-    ally.hp = 500;
-    ally.auras.push(aura('magic_debuff', 'slow', 999_999, 'shadow', 0.5));
-    ally.auras.push(aura('magic_benefit', 'buff_ap', ally.id, 'holy', 10));
-    paladin.player.spellPower = 0;
-    const paladinRng = paladin.ctx.rng as typeof paladin.ctx.rng & {
-      chance(probability: number): boolean;
-      range(min: number, max: number): number;
-    };
-    paladinRng.chance = () => false;
-    paladinRng.range = (min) => min;
-
-    runResolved(paladin, ally, resolved(paladin, 'cleansing_verdict'));
-
-    expect(ally.hp).toBe(540);
-    expect(ally.auras.some((entry) => entry.id === 'magic_debuff')).toBe(false);
-    expect(ally.auras.some((entry) => entry.id === 'magic_benefit')).toBe(true);
-
+  it('pins exact Voidfeast healing with correct dispel direction', () => {
     const warlock = simWithRows('warlock', { 8: 'wlk_r8_voidfeast' });
     const enemy = addTarget(warlock);
     enemy.auras.push(aura('magic_benefit', 'buff_ap', enemy.id, 'holy', 10));

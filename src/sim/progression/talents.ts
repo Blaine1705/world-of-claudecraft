@@ -68,9 +68,14 @@ function cleanRemovedProcState(
   const removedIds = new Set(
     previous.procs.map((proc) => proc.id).filter((procId) => !nextIds.has(procId)),
   );
+  const removedPaladinZeal = previous.global.paladinZeal > 0 && next.global.paladinZeal <= 0;
+  const removedPaladinDawnEcho =
+    previous.global.paladinDawnEcho > 0 && next.global.paladinDawnEcho <= 0;
   if (
     removedIds.size === 0 &&
-    !(previous.global.cheatDeathIcd > 0 && next.global.cheatDeathIcd <= 0)
+    !(previous.global.cheatDeathIcd > 0 && next.global.cheatDeathIcd <= 0) &&
+    !removedPaladinZeal &&
+    !removedPaladinDawnEcho
   )
     return;
 
@@ -82,6 +87,8 @@ function cleanRemovedProcState(
     if (previous.global.cheatDeathIcd > 0 && next.global.cheatDeathIcd <= 0) {
       delete player.procState.icds.cheat_death;
     }
+    if (removedPaladinZeal) delete player.procState.counters.paladin_zeal;
+    if (removedPaladinDawnEcho) delete player.procState.counters.paladin_dawn_echo;
   }
 
   for (const entity of ctx.entities.values()) {

@@ -31,6 +31,15 @@ import {
 // truth. Keep this list SHORT and justified; prefer a placeholder in the
 // description over a new entry here.
 const NUMBER_ALLOWLIST: Record<string, number[]> = {
+  // Grace Devotion's mana cadence is stamped by effect_dispatch from its effect kind.
+  grace_devotion: [5],
+  // Flash of Light's Devotion comes from the Paladin generation table, not its heal effect.
+  flash_of_light: [1],
+  // Lay on Hands Devotion comes from the Paladin generation table, not its heal effect.
+  lay_on_hands: [1],
+  // Hammer of Grace generates Devotion through the class table; Solar Reprisal's
+  // full-damage self-heal is applied by the dedicated Paladin proc module.
+  hammer_of_grace: [1, 100],
   // "generating 9 rage and stunning it for 1 sec": both are constants in the
   // charge arm of effect_dispatch.ts, not effect fields.
   charge: [9, 1],
@@ -64,7 +73,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   revive_pet: [35],
   // Divine Ascension's resource price, charge count and lifetime are owned by
   // the dedicated paladin devotion state machine, not an AbilityEffect.
-  divine_ascension: [20, 5, 25],
+  divine_ascension: [20, 5, 45],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

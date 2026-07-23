@@ -33,6 +33,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
+import { tickPaladinOathChainPull } from './paladin_control';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
@@ -196,6 +197,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   tickProcState(e, DT);
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
+    tickPaladinOathChainPull(ctx, e, a);
     if (!a.permanent) a.remaining -= DT;
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.

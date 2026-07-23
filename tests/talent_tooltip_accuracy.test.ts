@@ -7,6 +7,7 @@ import {
   AEGIS_OF_DEVOTION_DURATION,
   DAWNS_PATH_SPEED_DURATION,
   DAWNS_PATH_SPEED_MULT,
+  MAX_DEVOTION,
 } from '../src/sim/paladin_devotion';
 import {
   STANCE_MASTERY_BATTLE_CRIT_DMG,
@@ -125,9 +126,8 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       if (!entry) throw new Error(`no talent entry matched for ${cls}`);
       return entry.render();
     };
-    // Redesign: Lingering Yoke is the Sundering Gavel cooldown cut now.
-    const yoke = render('paladin', (e) => e.id === 'pal_r8_lingering_yoke');
-    expect(yoke).toContain('cooldown is reduced by 30%');
+    const fist = render('paladin', (e) => e.id === 'pal_r11_fist_of_justice');
+    expect(fist).toContain('cooldown is reduced by 25%');
 
     // Balance pass: the option is now Steady Draw, a plain cast-speed talent.
     const sniper = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
@@ -242,6 +242,13 @@ const PCT_FIELDS = new Set([
   // entity.ts / auras.ts, shown as "5%" and "20%" in the hand-written description.
   'manaPct',
   'manaRegenPct',
+  'paladinRadiantStride',
+  'paladinDivineSteed',
+  'paladinDivineSteedBurstPct',
+  'paladinSteadyHandsHotPct',
+  'paladinRecurringGrace',
+  'paladinDivinePurposeChance',
+  'paladinDawnEcho',
 ]);
 
 function expectedTokens(effect: unknown): string[] {
@@ -251,6 +258,7 @@ function expectedTokens(effect: unknown): string[] {
     // Aura proc responses with multiplier-shaped kinds (buff_speed 1.4 =
     // "+40% movement"): the delta is the stated number, not the raw 1.4.
     const shapedAura = obj as {
+      type?: string;
       kind?: string;
       auraKind?: string;
       value?: number;
@@ -261,6 +269,23 @@ function expectedTokens(effect: unknown): string[] {
       (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')
     ) {
       toks.push(`${+(((shapedAura.value ?? 1) - 1) * 100).toFixed(1)}%`);
+      if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
+    if (shapedAura.type === 'selfBuff' && shapedAura.kind === 'buff_haste') {
+      toks.push(`${+(((shapedAura.value ?? 1) - 1) * 100).toFixed(1)}%`);
+      if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
+    if (
+      shapedAura.type === 'selfBuff' &&
+      (shapedAura.kind === 'buff_crit' || shapedAura.kind === 'buff_spellhaste')
+    ) {
+      toks.push(`${+((shapedAura.value ?? 0) * 100).toFixed(1)}%`);
+      if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
+    if (shapedAura.type === 'selfBuff' && shapedAura.kind === 'slow_immunity') {
       if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
       return;
     }
@@ -323,6 +348,7 @@ function legitNumbers(effect: unknown): Set<number> {
     // Aura proc responses with multiplier-shaped kinds (buff_speed 1.4 =
     // "+40% movement"): the delta is the stated number, not the raw 1.4.
     const shapedAura = obj as {
+      type?: string;
       kind?: string;
       auraKind?: string;
       value?: number;
@@ -333,6 +359,19 @@ function legitNumbers(effect: unknown): Set<number> {
       (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')
     ) {
       add((shapedAura.value ?? 1) - 1, true);
+      if (shapedAura.duration) add(shapedAura.duration, false);
+      return;
+    }
+    if (shapedAura.type === 'selfBuff' && shapedAura.kind === 'buff_haste') {
+      add((shapedAura.value ?? 1) - 1, true);
+      if (shapedAura.duration) add(shapedAura.duration, false);
+      return;
+    }
+    if (
+      shapedAura.type === 'selfBuff' &&
+      (shapedAura.kind === 'buff_crit' || shapedAura.kind === 'buff_spellhaste')
+    ) {
+      add(shapedAura.value ?? 0, true);
       if (shapedAura.duration) add(shapedAura.duration, false);
       return;
     }
@@ -359,6 +398,10 @@ function legitNumbers(effect: unknown): Set<number> {
         if (key === 'ascensionWard') {
           out.add(Math.round(AEGIS_OF_DEVOTION_DR * 100));
           out.add(AEGIS_OF_DEVOTION_DURATION);
+        }
+        if (key === 'paladinDivineSteed') {
+          out.add(Math.round((value / MAX_DEVOTION) * 100));
+          out.add(MAX_DEVOTION);
         }
         if (key === 'bonusCharges') out.add(value + 1);
         // A slow mult also legitimizes the stated slow percentage (mult 0.5 = 50%).

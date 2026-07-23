@@ -461,6 +461,18 @@ describe('ActionBarController: passives never occupy an action slot', () => {
     expect(JSON.parse(storage.getItem(key) ?? 'null')).toEqual(bar('sunder_armor'));
   });
 
+  it('migrates removed Paladin abilities out of a persisted bar without moving valid slots', () => {
+    const storage = new MemoryStorage();
+    const key = 'woc_hotbar_paladin_ActionbarTester';
+    storage.setItem(key, JSON.stringify(bar('holy_light', 'flash_of_light')));
+    const { controller } = makeHarness('paladin', ['holy_light', 'flash_of_light'], bar(), storage);
+
+    controller.init();
+
+    expect(controller.actions).toEqual(bar('holy_light'));
+    expect(JSON.parse(storage.getItem(key) ?? 'null')).toEqual(bar('holy_light'));
+  });
+
   it('rejects direct slot 0 assignment of a passive', () => {
     const { controller } = makeHarness('warrior', ['measured_fury'], bar());
 

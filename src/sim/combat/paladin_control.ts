@@ -1,14 +1,70 @@
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
-import type { Entity } from '../types';
+import { DT, type Entity } from '../types';
 import { relocateSwept } from './heroic_leap';
 import { isVeilboundMarchActive } from './paladin_veilbound_state';
+
+const OATH_CHAIN_PULL_SUFFIX = '_pull';
+
+function finishOathChainPull(ctx: SimContext, target: Entity, aura: Entity['auras'][number]): void {
+  const slowDuration = aura.pullSlowDuration ?? 0;
+  const slowMult = aura.pullSlowMult ?? 1;
+  aura.remaining = 0;
+  if (slowDuration <= 0) return;
+  ctx.applyAura(target, {
+    id: aura.id.replace(new RegExp(`${OATH_CHAIN_PULL_SUFFIX}$`), '_slow'),
+    name: aura.name,
+    kind: 'slow',
+    value: slowMult,
+    remaining: slowDuration,
+    duration: slowDuration,
+    sourceId: aura.sourceId,
+    school: aura.school,
+  });
+}
+
+export function tickPaladinOathChainPull(
+  ctx: SimContext,
+  target: Entity,
+  aura: Entity['auras'][number],
+): void {
+  if (!aura.id?.endsWith(OATH_CHAIN_PULL_SUFFIX)) return;
+  const source = ctx.entities.get(aura.sourceId);
+  const stopDistance = aura.pullStopDistance;
+  const travelSpeed = aura.pullSpeed;
+  if (!source || source.dead || stopDistance === undefined || travelSpeed === undefined) {
+    finishOathChainPull(ctx, target, aura);
+    return;
+  }
+  if (isVeilboundMarchActive(target)) return;
+
+  const dx = target.pos.x - source.pos.x;
+  const dz = target.pos.z - source.pos.z;
+  const distance = Math.hypot(dx, dz);
+  if (distance <= stopDistance + 1e-6 || distance <= 1e-6) {
+    finishOathChainPull(ctx, target, aura);
+    return;
+  }
+
+  const nextDistance = Math.max(stopDistance, distance - travelSpeed * DT);
+  relocateSwept(ctx, target, {
+    x: source.pos.x + (dx / distance) * nextDistance,
+    y: target.pos.y,
+    z: source.pos.z + (dz / distance) * nextDistance,
+  });
+  ctx.grid.update(target);
+  if (target.kind === 'player') ctx.playerGrid.update(target);
+
+  const remainingDistance = Math.hypot(target.pos.x - source.pos.x, target.pos.z - source.pos.z);
+  if (remainingDistance <= stopDistance + 1e-3) finishOathChainPull(ctx, target, aura);
+}
 
 export function pullPaladinTarget(
   ctx: SimContext,
   source: Entity,
   target: Entity,
   stopDistance: number,
+  travelSpeed: number,
   slowMult: number,
   slowDuration: number,
   abilityId: string,
@@ -17,24 +73,23 @@ export function pullPaladinTarget(
   const dx = target.pos.x - source.pos.x;
   const dz = target.pos.z - source.pos.z;
   const distance = Math.hypot(dx, dz);
-  if (distance > stopDistance && distance > 1e-6 && !isVeilboundMarchActive(target)) {
-    relocateSwept(ctx, target, {
-      x: source.pos.x + (dx / distance) * stopDistance,
-      y: target.pos.y,
-      z: source.pos.z + (dz / distance) * stopDistance,
-    });
-    ctx.grid.update(target);
-    if (target.kind === 'player') ctx.playerGrid.update(target);
-  }
+  const traveling = distance > stopDistance && distance > 1e-6 && !isVeilboundMarchActive(target);
+  const travelDuration = traveling
+    ? Math.max(0.05, (distance - stopDistance) / Math.max(0.01, travelSpeed) + 1)
+    : slowDuration;
   ctx.applyAura(target, {
-    id: `${abilityId}_slow`,
+    id: `${abilityId}_${traveling ? 'pull' : 'slow'}`,
     name: abilityName,
-    kind: 'slow',
-    remaining: slowDuration,
-    duration: slowDuration,
-    value: slowMult,
+    kind: traveling ? 'forced_move' : 'slow',
+    remaining: travelDuration,
+    duration: travelDuration,
+    value: traveling ? 1 : slowMult,
     sourceId: source.id,
     school: 'holy',
+    pullStopDistance: traveling ? stopDistance : undefined,
+    pullSpeed: traveling ? travelSpeed : undefined,
+    pullSlowMult: traveling ? slowMult : undefined,
+    pullSlowDuration: traveling ? slowDuration : undefined,
   });
   ctx.enterCombat(source, target);
 }
@@ -46,6 +101,7 @@ export function pullPaladinTargets(
   maxTargets: number,
   searchRadius: number,
   stopDistance: number,
+  travelSpeed: number,
   slowMult: number,
   slowDuration: number,
   abilityId: string,
@@ -74,6 +130,7 @@ export function pullPaladinTargets(
       source,
       target,
       stopDistance,
+      travelSpeed,
       slowMult,
       slowDuration,
       abilityId,

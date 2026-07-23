@@ -13,8 +13,8 @@ import type { Entity } from '../src/sim/types';
 
 function setup(): { sim: Sim; p: Entity; mob: Entity } {
   const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
-  sim.setPlayerLevel(10);
-  expect(sim.applyTalents({ spec: null, rows: { 8: 'pal_r8_twin_gavels' } })).toBe(true);
+  sim.setPlayerLevel(11);
+  expect(sim.applyTalents({ spec: null, rows: { 11: 'pal_r11_double_sentence' } })).toBe(true);
   const p = sim.player;
   const mob = createMob(20_000, MOBS.forest_wolf, 8, {
     x: p.pos.x + 3,
@@ -39,7 +39,7 @@ function tickSeconds(sim: Sim, p: Entity, seconds: number): void {
   }
 }
 
-describe('parallel per-charge recharge (Twin Gavels)', () => {
+describe('parallel per-charge recharge (Double Sentence)', () => {
   it('each spent charge returns its own cooldown after ITS spend', () => {
     const { sim, p } = setup();
     sim.castAbility('hammer_of_justice');

@@ -62,17 +62,29 @@ function advance(sim: Sim, seconds: number): void {
 }
 
 describe('Paladin Retribution abilities', () => {
-  it('Judgement deals ranged damage and generates one Devotion', () => {
+  it('emits Dawnfall windup and per-target impact visuals at its real radius', () => {
     const sim = makeRet();
-    const target = targetAt(sim, 30);
-    runEffects(sim, null, 'seal_of_righteousness');
+    const target = targetAt(sim, 2);
+    sim.drainEvents();
 
-    const before = target.hp;
-    sim.castAbility('judgement');
-    advance(sim, 2);
+    runEffects(sim, null, 'dawnfall');
 
-    expect(target.hp).toBeLessThan(before);
-    expect(sim.player.paladinDevotion?.value).toBe(1);
+    const events = sim.drainEvents();
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'paladinDawnfall',
+        sourceId: sim.playerId,
+        range: 6,
+      }),
+    );
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'paladinDawnfallImpact',
+        targetId: target.id,
+      }),
+    );
   });
 
   it('gates Hammer of Wrath by target health, Ascension, or Avenging Wrath', () => {
@@ -113,7 +125,7 @@ describe('Paladin Retribution abilities', () => {
     expect(avengingTarget.hp).toBeLessThan(avengingTarget.maxHp);
   });
 
-  it('Avenging Wrath grants 10 Devotion, doubles ability generation, increases damage, and expires', () => {
+  it('Avenging Wrath grants 10 Devotion, doubles generation, increases damage and healing, and expires', () => {
     const sim = makeRet();
     const target = targetAt(sim, 2);
 
@@ -129,15 +141,26 @@ describe('Paladin Retribution abilities', () => {
     expect(sim.player.auras).toContainEqual(
       expect.objectContaining({ id: 'avenging_wrath', kind: 'buff_dmg_done', value: 0.2 }),
     );
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({ kind: 'buff_healing_done', value: 0.2 }),
+    );
     expect(hit()).toBe(120);
 
-    runEffects(sim, target, 'oathstrike');
+    sim.player.hp = 1;
+    sim.rng.next = () => 0.9;
+    expect(sim.ctx.applyHeal(sim.player, sim.player, 100, 'Test heal', null, false)).toBe(120);
+    sim.player.hp = sim.player.maxHp;
+
+    runEffects(sim, target, 'final_edict');
     expect(sim.player.paladinDevotion?.value).toBe(12);
 
     advance(sim, 15.1);
     expect(sim.player.auras.some((aura) => aura.id === 'avenging_wrath')).toBe(false);
+    expect(sim.player.auras.some((aura) => aura.kind === 'buff_healing_done')).toBe(false);
     expect(hit()).toBe(100);
-    runEffects(sim, target, 'oathstrike');
+    sim.player.hp = 1;
+    expect(sim.ctx.applyHeal(sim.player, sim.player, 100, 'Expired heal', null, false)).toBe(100);
+    runEffects(sim, target, 'final_edict');
     expect(sim.player.paladinDevotion?.value).toBe(13);
   });
 });

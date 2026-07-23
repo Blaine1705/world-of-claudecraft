@@ -65,7 +65,8 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   if (e.ghost) return GHOST_RUN_MULT;
   let slow = 1,
     speed = 1;
-  const slowImmune = isVeilboundMarchActive(e);
+  const slowImmune =
+    isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
   for (const a of e.auras) {
     if ((!slowImmune && a.kind === 'slow') || a.kind === 'stealth') slow = Math.min(slow, a.value);
     // Speed buffs and travel forms carry a 1+fraction multiplier (1.4 = +40%).

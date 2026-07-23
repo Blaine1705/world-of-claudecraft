@@ -91,7 +91,7 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
   it('paladin consecration: the groundAoE case pushes a ground effect and fires the on-cast pulse', () => {
     const { sim, p, meta } = makeSim('paladin', 20);
     expect(sim.setSpec('protection')).toBe(true);
-    const mob = spawnTarget(sim, p, 8, 2); // within the 8yd consecration radius
+    const mob = spawnTarget(sim, p, 8, 2); // within the 6 m Consecration radius
     const before = sim.ctx.groundAoEs.length;
     mob.aiState = 'chase';
     mob.aggroTargetId = p.id;
@@ -115,6 +115,42 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     sim.ctx.pulseGroundAoE(sim.ctx.groundAoEs[0]);
     expect(mob.leashAnchor.x).toBeCloseTo(anchorAfterCast.x);
     expect(mob.leashAnchor.z).toBeCloseTo(anchorAfterCast.z);
+  });
+
+  it('cleanseMovement preserves encounter-authored unbreakable roots and slows', () => {
+    const { sim, p, meta } = makeSim('druid', 20);
+    const protectedRoot = {
+      id: 'scripted_root',
+      name: 'Scripted Root',
+      kind: 'root' as const,
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: 424242,
+      school: 'shadow' as const,
+      unbreakableControl: true as const,
+    };
+    const ordinarySlow: Aura = {
+      id: 'ordinary_slow',
+      name: 'Ordinary Slow',
+      kind: 'slow' as const,
+      remaining: 30,
+      duration: 30,
+      value: 0.2,
+      sourceId: 424242,
+      school: 'shadow',
+    };
+    p.auras.push(protectedRoot, ordinarySlow);
+    const base = resolve(sim, 'rejuvenation', p.id);
+    const res: ResolvedAbility = {
+      ...base,
+      effects: [{ type: 'cleanseMovement' }],
+    };
+
+    runEffects(sim.ctx, p, meta, p, res);
+
+    expect(p.auras.some((aura) => aura.id === protectedRoot.id)).toBe(true);
+    expect(p.auras.some((aura) => aura.id === ordinarySlow.id)).toBe(false);
   });
 });
 

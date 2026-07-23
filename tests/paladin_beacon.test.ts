@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
+import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 function entity(sim: Sim, id: number): Entity {
@@ -40,7 +40,14 @@ function castBeacon(sim: Sim, paladin: Entity, target: Entity): void {
 }
 
 function heal(sim: Sim, source: Entity, target: Entity, amount: number): number {
-  return sim.ctx.applyHeal(source, target, amount, 'Test Heal', 'test_heal', false, false);
+  return sim.ctx.applyHeal(source, target, amount, 'Test Heal', 'test_heal', false, false, true);
+}
+
+function runAbility(sim: Sim, source: Entity, target: Entity | null, id: string): void {
+  const resolved = sim.resolvedAbility(id, source.id) as ResolvedAbility | null;
+  const meta = sim.meta(source.id);
+  if (!resolved || !meta) throw new Error(`missing ${id}`);
+  sim.ctx.runEffects(source, meta, target, resolved);
 }
 
 function makeWounded(...entities: Entity[]): void {
@@ -58,12 +65,14 @@ describe('Paladin Beacon of Light', () => {
     expect(ability?.def).toMatchObject({
       learnLevel: 16,
       specs: ['holy'],
+      cooldown: 7,
       targetType: 'friendly',
       partyOnlyTarget: true,
     });
     expect(ability?.effects).toEqual([{ type: 'beaconOfLight' }]);
 
     castBeacon(sim, paladin, beacon);
+    expect(paladin.cooldowns.get('beacon_of_light')).toBe(7);
     expect(beacon.auras).toContainEqual(
       expect.objectContaining({
         id: 'beacon_of_light',
@@ -73,23 +82,45 @@ describe('Paladin Beacon of Light', () => {
     );
   });
 
-  it('copies 75% of effective healing to the marked ally without double-scaling it', () => {
+  it('copies 50% of effective healing from a real direct-heal effect', () => {
     const { sim, paladin, ally, beacon } = groupedPaladin();
     castBeacon(sim, paladin, beacon);
-    makeWounded(ally, beacon);
+    ally.maxHp = 1_000;
+    ally.hp = 960;
+    beacon.maxHp = 1_000;
+    beacon.hp = 1;
+    sim.rng.range = () => 100;
+    sim.rng.chance = () => false;
 
-    expect(heal(sim, paladin, ally, 100)).toBe(100);
-    expect(ally.hp).toBe(101);
-    expect(beacon.hp).toBe(76);
+    runAbility(sim, paladin, ally, 'holy_light');
+
+    expect(ally.hp).toBe(1_000);
+    expect(beacon.hp).toBe(21);
     expect(sim.drainEvents()).toContainEqual(
       expect.objectContaining({
         type: 'heal2',
         sourceId: paladin.id,
         targetId: beacon.id,
-        amount: 75,
+        amount: 20,
         crit: false,
         ability: 'Beacon of Light',
       }),
+    );
+  });
+
+  it('does not copy AoE healing to the Beacon', () => {
+    const { sim, paladin, ally, beacon } = groupedPaladin();
+    castBeacon(sim, paladin, beacon);
+    makeWounded(paladin, ally, beacon);
+    sim.rng.chance = () => false;
+
+    runAbility(sim, paladin, null, 'radiant_chorus');
+
+    const events = sim.drainEvents();
+    expect(ally.hp).toBeGreaterThan(1);
+    expect(beacon.hp).toBeGreaterThan(1);
+    expect(events).not.toContainEqual(
+      expect.objectContaining({ type: 'heal2', ability: 'Beacon of Light' }),
     );
   });
 
@@ -106,7 +137,18 @@ describe('Paladin Beacon of Light', () => {
     heal(sim, paladin, beacon, 100);
     expect(beacon.hp).toBe(101);
 
+    heal(sim, paladin, paladin, 100);
+    expect(beacon.hp).toBe(101);
+
     heal(sim, otherHealer, ally, 100);
+    expect(beacon.hp).toBe(101);
+
+    const outsiderId = sim.addPlayer('warrior', 'Eamon');
+    sim.setPlayerLevel(20, outsiderId);
+    const outsider = entity(sim, outsiderId);
+    outsider.maxHp = 1_000;
+    outsider.hp = 1;
+    heal(sim, paladin, outsider, 100);
     expect(beacon.hp).toBe(101);
 
     ally.hp = ally.maxHp;
@@ -133,6 +175,7 @@ describe('Paladin Beacon of Light', () => {
     castBeacon(sim, second, beacon);
     expect(beacon.auras.filter((aura) => aura.kind === 'beacon_of_light')).toHaveLength(2);
 
+    for (let tick = 0; tick < 20 * 7 + 1; tick++) sim.tick();
     castBeacon(sim, paladin, ally);
     expect(
       beacon.auras.some((aura) => aura.kind === 'beacon_of_light' && aura.sourceId === paladin.id),
@@ -146,11 +189,11 @@ describe('Paladin Beacon of Light', () => {
 
     makeWounded(paladin, ally, beacon, second);
     heal(sim, paladin, second, 100);
-    expect(ally.hp).toBe(76);
+    expect(ally.hp).toBe(51);
     expect(beacon.hp).toBe(1);
     heal(sim, second, paladin, 100);
-    expect(beacon.hp).toBe(76);
-    expect(ally.hp).toBe(76);
+    expect(beacon.hp).toBe(51);
+    expect(ally.hp).toBe(51);
   });
 
   it('removes the beacon when its carrier or its Paladin dies', () => {

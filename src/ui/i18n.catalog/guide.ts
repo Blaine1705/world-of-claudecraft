@@ -630,11 +630,10 @@ export const guideStrings = {
     battle_shout: 'A rallying cry that raises attack power for the party.',
     charge: 'Rushes a distant enemy to open the fight with a brief stun.',
     thunder_clap: 'Hits everything around you and slows their attacks.',
-    seal_of_righteousness: 'Imbues your swings with Holy damage, then spend it with Verdict.',
+    seal_of_righteousness: 'Imbues your melee swings with additional Holy damage.',
     holy_light: 'A steady, sizable heal for topping off an ally or yourself.',
     devotion_aura: 'A lasting self-buff that raises armor so hits land softer.',
-    judgement: 'Spends your active Seal to strike an enemy from long range and build Devotion.',
-    oathstrike: 'A reliable weapon strike that builds Devotion for your next holy assault.',
+    judgement: 'Spends your active Seal to strike an enemy from short range.',
     hammer_of_wrath:
       'Executes a wounded enemy from range, or any enemy while your wings are active.',
     avenging_wrath:
@@ -646,6 +645,7 @@ export const guideStrings = {
     holy_shield: 'Spends Devotion on an active block window, absorption, and a threat pulse.',
     consecration: 'Claims the ground around you with sustained Holy damage and threat.',
     hammer_of_justice: 'Stops one enemy with a short, reliable stun.',
+    lay_on_hands: 'Restores a large amount of health when an ally is close to falling.',
     blessing_of_might: "Raises a friendly target's attack power, good to cast before a pull.",
     divine_protection: 'A quick protective ward to soak damage when things get rough.',
     raptor_strike: 'A hard melee swing for when something closes the gap on you.',

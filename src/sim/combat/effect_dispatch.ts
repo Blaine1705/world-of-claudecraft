@@ -22,17 +22,16 @@ import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
 import {
-  AEGIS_OF_DEVOTION_DR,
-  AEGIS_OF_DEVOTION_DURATION,
   activateDivineAscension,
   ascensionImpactKind,
   consumeAscensionCharge,
-  DAWNS_PATH_SPEED_DURATION,
-  DAWNS_PATH_SPEED_MULT,
   devotionGainForAbility,
   devotionGenerationTriggered,
+  divineAscensionAura,
   grantAbilityDevotion,
   grantDevotion,
+  isDivineAscensionActive,
+  syncDivineAscensionAura,
 } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
@@ -47,7 +46,7 @@ import {
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
-import type { AbilityDef, Entity } from '../types';
+import type { AbilityDef, Aura, Entity } from '../types';
 import {
   angleTo,
   armorReduction,
@@ -105,7 +104,28 @@ import { resurrectDeadGroupMembers } from './mass_resurrection';
 import { placeBeaconOfLight } from './paladin_beacon';
 import { PROTECTION_CONSECRATION_DAMAGE_REDUCTION } from './paladin_consecration';
 import { pullPaladinTargets, pulsePaladinThreat } from './paladin_control';
-import { PALADIN_DEVOTION_ABILITY_IDS, paladinDevotionConflicts } from './paladin_support';
+import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
+import { grantRadiantResonance } from './paladin_radiant_resonance';
+import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
+import {
+  advanceSunGodVerdict,
+  applySunGodVerdict,
+  DAWNFALL_ID,
+  FINAL_EDICT_ID,
+  PALADIN_SUN_GOD_VERDICT_ID,
+  type SunGodVerdictEffect,
+  sunVerdictMarkForHit,
+} from './paladin_sun_verdict';
+import { scheduleSunwardBounceChain } from './paladin_sunward_disc';
+import { PALADIN_DEVOTION_ABILITY_IDS, replacePaladinDevotionChoice } from './paladin_support';
+import {
+  advancePaladinTalentCounter,
+  applyRecurringGraceShield,
+  type DawnEchoOutcome,
+  repeatDawnEcho,
+  unleashPerpetualSun,
+} from './paladin_talents';
+import { armValkyrsCalling } from './paladin_valkyrs_calling';
 import { activateVeilboundMarch } from './paladin_veilbound_march';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
@@ -203,6 +223,29 @@ function warriorAbilityRageMult(ctx: SimContext, player: Entity, meta: PlayerMet
   return (1 + ctx.playerMods(meta).global.abilityRagePct) * rageGenAuraMult(player);
 }
 
+function sunGodVerdictDefinition(): {
+  effect: SunGodVerdictEffect;
+  name: string;
+} | null {
+  const def = ABILITIES[PALADIN_SUN_GOD_VERDICT_ID];
+  const effect = def?.effects.find(
+    (entry): entry is SunGodVerdictEffect => entry.type === 'sunGodVerdict',
+  );
+  return def && effect ? { effect, name: def.name } : null;
+}
+
+function advanceSunGodVerdictForHit(
+  ctx: SimContext,
+  caster: Entity,
+  target: Entity,
+  abilityId: string,
+  mark: Aura,
+): void {
+  const verdict = sunGodVerdictDefinition();
+  if (!verdict) return;
+  advanceSunGodVerdict(ctx, caster, target, abilityId, mark, verdict.effect, verdict.name);
+}
+
 export function runEffects(
   ctx: SimContext,
   p: Entity,
@@ -210,8 +253,10 @@ export function runEffects(
   target: Entity | null,
   res: ResolvedAbility,
   attackAnimationStarted = false,
+  deferredBastionImpact = false,
 ): void {
   const ability = res.def;
+  const initialTarget = target;
   const ascensionFxTargetId = target?.id ?? p.id;
   const ascensionFxTargetHostile = target !== null && ctx.isHostileTo(p, target);
   const isSpell = ability.school !== 'physical';
@@ -226,6 +271,7 @@ export function runEffects(
   let areaEchoDealt = false;
   let devotionDamageTriggered = false;
   let devotionHealingTriggered = false;
+  let dawnEchoOutcome: DawnEchoOutcome | null = null;
   // Dynamic DoT riders snapshot a fraction of the preceding resolved direct
   // hit, including its scaling and critical multiplier.
   let lastDirectDamage = 0;
@@ -254,14 +300,7 @@ export function runEffects(
   // caster's previous choice from every affected entity before applying the new
   // party aura; other Paladins' auras remain because conflicts key by sourceId.
   if (PALADIN_DEVOTION_ABILITY_IDS.has(ability.id)) {
-    for (const entity of ctx.entities.values()) {
-      for (const index of paladinDevotionConflicts(entity.auras, p.id, ability.id)) {
-        const replaced = entity.auras[index];
-        ctx.applyNonPlayerStatAura(entity, replaced, -1);
-        entity.auras.splice(index, 1);
-        ctx.emit({ type: 'aura', targetId: entity.id, name: replaced.name, gained: false });
-      }
-    }
+    replacePaladinDevotionChoice(ctx, p.id, ability.id);
   }
 
   // Cleaving Blows (Fury passive): Red Harvest refunds one stored Twinstrike
@@ -319,6 +358,9 @@ export function runEffects(
       case 'weaponStrike': {
         if (!target) break;
         const strikeTarget = target;
+        let dawnEchoWeaponAmount = 0;
+        const sunVerdictMark =
+          ability.id === FINAL_EDICT_ID ? sunVerdictMarkForHit(strikeTarget, p.id) : null;
         let weaponMult = eff.weaponMult ?? 1;
         let bonus = eff.bonus;
         const selfHealDamageFrac = eff.selfHealDamageFrac;
@@ -349,8 +391,9 @@ export function runEffects(
           // Redhanded Craven Thrust mastery) ride the shared hit table.
           critBonus: mods.abilities[ability.id]?.critPct ?? 0,
           onDealt:
-            areaEcho || sweeping || eff.restoreMana !== undefined
+            areaEcho || sweeping || eff.restoreMana !== undefined || mods.global.paladinDawnEcho > 0
               ? (amount) => {
+                  dawnEchoWeaponAmount = amount;
                   if (eff.restoreMana !== undefined && p.resourceType === 'mana') {
                     p.resource = Math.min(p.maxResource, p.resource + eff.restoreMana);
                   }
@@ -378,23 +421,42 @@ export function runEffects(
                     );
                 }
               : undefined,
-          onEffectiveDamage:
-            selfHealDamageFrac !== undefined
-              ? (amount) => {
-                  if (amount <= 0) return;
-                  ctx.applyHeal(
-                    p,
-                    p,
-                    Math.round(amount * selfHealDamageFrac),
-                    ability.name,
-                    ability.id,
-                    false,
-                  );
-                }
-              : undefined,
+          onEffectiveDamage: (amount) => {
+            if (amount <= 0) return;
+            devotionDamageTriggered = true;
+            dawnEchoOutcome = {
+              kind: 'damage',
+              target: strikeTarget,
+              amount: dawnEchoWeaponAmount,
+              school: ability.school,
+            };
+            if (selfHealDamageFrac !== undefined) {
+              const plannedHeal = Math.round(amount * selfHealDamageFrac);
+              const healed = ctx.applyHeal(p, p, plannedHeal, ability.name, ability.id, false);
+              if (ability.id === 'hammer_of_grace' && mods.global.paladinRecurringGrace > 0) {
+                applyRecurringGraceShield(ctx, p, Math.max(0, plannedHeal - healed));
+              }
+            }
+          },
         });
+        if (hit && ability.id === FINAL_EDICT_ID) {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: strikeTarget.id,
+            school: 'holy',
+            fx: 'paladinFinalEdict',
+            ability: ability.id,
+          });
+          tryGrantDawnsWrath(ctx, p);
+        }
+        if (hit && ability.id === 'vowkeeper_strike') {
+          tryGrantSolarReprisal(ctx, p, 'vowkeeper');
+        }
         if (hit && sureCrit) sureCritRolled = true;
-        if (hit) devotionDamageTriggered = true;
+        if (hit && sunVerdictMark) {
+          advanceSunGodVerdictForHit(ctx, p, strikeTarget, ability.id, sunVerdictMark);
+        }
         if (hit && ability.awardsCombo) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
@@ -424,6 +486,7 @@ export function runEffects(
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
         // applies the AP scale-down. A non-scaling effect just contributes 0.
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        dmg *= eff.damageMult ?? 1;
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         // Ice Lance against a frozen-counting target (combat/frost_mage.ts):
         // the per-cast resolution carries its 3x; 1 for every other cast.
@@ -443,6 +506,7 @@ export function runEffects(
         }
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) ||
+          eff.guaranteedCrit === true ||
           sureCrit ||
           // Fire spec (combat/fire_mage.ts): Combustion / Fire Blast / Scorch
           // execute override the OUTCOME; the roll above is still drawn.
@@ -457,8 +521,8 @@ export function runEffects(
         // the caster's charge aura (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         const finalDamage = Math.round(dmg);
-        devotionDamageTriggered = true;
         lastDirectDamage = finalDamage;
+        const targetHpBefore = target.hp;
         ctx.dealDamage(
           p,
           target,
@@ -474,6 +538,51 @@ export function runEffects(
           false,
           ability.id,
         );
+        const effectiveDamage = Math.max(0, targetHpBefore - target.hp);
+        if (ability.id === 'solar_invocation') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: 'holy',
+            fx: 'paladinHolyShock',
+            ability: ability.id,
+            impact: 'offensive',
+          });
+        }
+        if (effectiveDamage > 0) {
+          devotionDamageTriggered = true;
+          dawnEchoOutcome = {
+            kind: 'damage',
+            target,
+            amount: finalDamage,
+            school: ability.school,
+          };
+          if (ability.id === 'hammer_of_grace' && mods.global.paladinRadiantStride > 0) {
+            ctx.applyAura(p, {
+              id: 'radiant_stride_speed',
+              name: 'Radiant Stride',
+              kind: 'buff_speed',
+              value: 1.3,
+              remaining: 4,
+              duration: 4,
+              sourceId: p.id,
+              school: 'holy',
+            });
+          }
+        }
+        if (eff.restoreMana !== undefined && p.resourceType === 'mana') {
+          p.resource = Math.min(p.maxResource, p.resource + eff.restoreMana);
+        }
+        if (eff.selfHealDamageFrac !== undefined) {
+          if (effectiveDamage > 0) {
+            const plannedHeal = Math.round(effectiveDamage * eff.selfHealDamageFrac);
+            const healed = ctx.applyHeal(p, p, plannedHeal, ability.name, ability.id, false);
+            if (ability.id === 'hammer_of_grace' && mods.global.paladinRecurringGrace > 0) {
+              applyRecurringGraceShield(ctx, p, Math.max(0, plannedHeal - healed));
+            }
+          }
+        }
         if (areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
@@ -721,8 +830,51 @@ export function runEffects(
         // healing mirror of the direct-nuke rider (applyHeal fires the crit).
         const healAmount =
           ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
-        const healed = ctx.applyHeal(p, healTarget, healAmount, ability.name, ability.id);
-        devotionHealingTriggered = true;
+        // Only this direct-heal effect opts into Beacon transfer. Derived,
+        // periodic, chained, area, and self-heal effects remain ineligible.
+        const healed = ctx.applyHeal(
+          p,
+          healTarget,
+          healAmount,
+          ability.name,
+          ability.id,
+          true,
+          true,
+          true,
+        );
+        if (ability.id === 'solar_invocation') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: healTarget.id,
+            school: 'holy',
+            fx: 'paladinHolyShock',
+            ability: ability.id,
+            impact: 'healing',
+          });
+        }
+        if (healed > 0) {
+          devotionHealingTriggered = true;
+          dawnEchoOutcome = { kind: 'healing', target: healTarget, amount: healed };
+          if (ability.id === 'lay_on_hands' && mods.global.paladinSteadyHandsHotPct > 0) {
+            const total = Math.max(
+              1,
+              Math.round(healAmount * mods.global.paladinSteadyHandsHotPct),
+            );
+            ctx.applyAura(healTarget, {
+              id: 'steady_hands_hot',
+              name: 'Steady Hands',
+              kind: 'hot',
+              value: Math.max(1, Math.round(total / 3)),
+              tickInterval: 2,
+              tickTimer: 2,
+              remaining: 6,
+              duration: 6,
+              sourceId: p.id,
+              school: 'holy',
+            });
+          }
+        }
         // Power Echo (mage choice row): the armed echo also repeats a direct HEAL
         // (Temporal Mend, Temporal Echo) at its fraction of the RESOLVED heal on
         // the same target, consumed BEFORE the repeat so a copy can never re-echo.
@@ -785,6 +937,7 @@ export function runEffects(
           if (best === null) break;
           chain.push(best);
         }
+        let effectiveHealing = false;
         for (let i = 0; i < chain.length; i++) {
           // The green healing arc: caster to the first target, then previous hop to
           // the next (a dedicated fx so it reads as a healing cord, not a nuke beam).
@@ -796,9 +949,11 @@ export function runEffects(
             fx: 'chainHeal',
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
-          ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id);
+          if (ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id) > 0) {
+            effectiveHealing = true;
+          }
         }
-        devotionHealingTriggered = true;
+        if (effectiveHealing) devotionHealingTriggered = true;
         break;
       }
       case 'feralCharge': {
@@ -874,50 +1029,9 @@ export function runEffects(
           remaining: eff.duration,
           duration: eff.duration,
           value: eff.bonus,
-          value2: eff.judgeMin,
-          value3: eff.judgeMax,
           sourceId: p.id,
           school: ability.school,
         });
-        break;
-      }
-      case 'judgement': {
-        if (!target) break;
-        const sealIdx = p.auras.findIndex((a) => a.kind === 'imbue' && a.value2 !== undefined);
-        if (sealIdx < 0) {
-          ctx.error(p.id, 'You have no active Seal.');
-          break;
-        }
-        const seal = p.auras[sealIdx];
-        p.auras.splice(sealIdx, 1);
-        ctx.emit({ type: 'aura', targetId: p.id, name: seal.name, gained: false });
-        // Judgement is an instant holy nuke; scale it with Spell Power too.
-        const baseDmg = ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15);
-        let dmg =
-          baseDmg * (eff.dmgMult ?? 1) +
-          (eff.flat ?? 0) +
-          directHitBonus(p.spellPower, ability, res.castTime);
-        const crit =
-          ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p)) || sureCrit;
-        if (sureCrit) sureCritRolled = true;
-        if (crit) dmg *= 1.5 + p.critDmgSpellBonus;
-        ctx.dealDamage(
-          p,
-          target,
-          Math.round(dmg),
-          crit,
-          'holy',
-          ability.name,
-          'hit',
-          false,
-          undefined,
-          true,
-          attackAnimationStarted,
-          false,
-          ability.id,
-        );
-        devotionDamageTriggered = true;
-        noteSpellHit(ctx, p, crit, ability.id);
         break;
       }
       case 'interrupt': {
@@ -945,7 +1059,8 @@ export function runEffects(
           interruptedDef?.uninterruptible
         )
           break;
-        const school = interruptedDef?.school ?? scriptedChannel!.school;
+        const school = interruptedDef?.school ?? scriptedChannel?.school;
+        if (!school) break;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
         ctx.cancelCast(target);
         if (eff.rageOnInterrupt && meta.cls === 'warrior' && p.resourceType === 'rage') {
@@ -1087,7 +1202,8 @@ export function runEffects(
         const cleanseTarget = target ?? p;
         for (let index = cleanseTarget.auras.length - 1; index >= 0; index--) {
           const aura = cleanseTarget.auras[index];
-          if (aura.kind !== 'root' && aura.kind !== 'slow') continue;
+          if ((aura.kind !== 'root' && aura.kind !== 'slow') || isUnbreakableControlAura(aura))
+            continue;
           cleanseTarget.auras.splice(index, 1);
           ctx.emit({ type: 'aura', targetId: cleanseTarget.id, name: aura.name, gained: false });
         }
@@ -1100,34 +1216,16 @@ export function runEffects(
           if (asc.ascensionChargeBonus > 0 && p.paladinDevotion) {
             p.paladinDevotion.ascensionCharges += asc.ascensionChargeBonus;
           }
-          // Dawn's Path: break roots/slows and surge forward on activation.
-          if (asc.ascensionRush > 0) {
-            for (let index = p.auras.length - 1; index >= 0; index--) {
-              const aura = p.auras[index];
-              if (aura.kind !== 'root' && aura.kind !== 'slow') continue;
-              p.auras.splice(index, 1);
-              ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
-            }
+          const ascensionAura = divineAscensionAura(p);
+          if (ascensionAura) ctx.applyAura(p, ascensionAura);
+          if (asc.paladinDivineSteed > 0) {
             ctx.applyAura(p, {
-              id: 'dawns_path_speed',
-              name: "Dawn's Path",
+              id: 'divine_steed_burst',
+              name: 'Divine Steed',
               kind: 'buff_speed',
-              remaining: DAWNS_PATH_SPEED_DURATION,
-              duration: DAWNS_PATH_SPEED_DURATION,
-              value: DAWNS_PATH_SPEED_MULT,
-              sourceId: p.id,
-              school: 'holy',
-            });
-          }
-          // Aegis of Devotion: a brief damage-reduction ward on activation.
-          if (asc.ascensionWard > 0) {
-            ctx.applyAura(p, {
-              id: 'aegis_of_devotion_dr',
-              name: 'Aegis of Devotion',
-              kind: 'buff_dr',
-              remaining: AEGIS_OF_DEVOTION_DURATION,
-              duration: AEGIS_OF_DEVOTION_DURATION,
-              value: AEGIS_OF_DEVOTION_DR,
+              remaining: 5,
+              duration: 5,
+              value: 1.3,
               sourceId: p.id,
               school: 'holy',
             });
@@ -1253,6 +1351,16 @@ export function runEffects(
         });
         break;
       }
+      case 'valkyrsCalling': {
+        if (!target || target.dead || !ctx.isHostileTo(p, target)) break;
+        armValkyrsCalling(ctx, p, target, eff, ability);
+        break;
+      }
+      case 'sunGodVerdict': {
+        if (!target || target.dead) break;
+        applySunGodVerdict(ctx, p, target, eff, ability.name);
+        break;
+      }
       case 'dot': {
         if (!target || target.dead) break;
         // Snapshot Spell Power (or Ranged AP) into the per-tick value at cast time,
@@ -1362,6 +1470,7 @@ export function runEffects(
           eff.maxTargets ?? 1,
           ability.range,
           eff.stopDistance,
+          eff.travelSpeed,
           eff.slowMult,
           eff.slowDuration,
           ability.id,
@@ -1458,11 +1567,51 @@ export function runEffects(
         break;
       }
       case 'aoeDamage': {
+        if (ability.id === 'bastion_sweep' && !deferredBastionImpact) {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: p.id,
+            school: ability.school,
+            fx: 'paladinBastionSweep',
+            ability: ability.id,
+            range: eff.radius,
+            angle: ((eff.frontalHalfAngle ?? MELEE_ARC) * 360) / Math.PI,
+          });
+          const sourceId = p.id;
+          ctx.delayedEvents.push({
+            at: ctx.time + 0.32,
+            guard: () => {
+              const source = ctx.entities.get(sourceId);
+              return Boolean(source && !source.dead && ctx.players.has(sourceId));
+            },
+            resolve: () => {
+              const source = ctx.entities.get(sourceId);
+              const sourceMeta = ctx.players.get(sourceId);
+              if (!source || source.dead || !sourceMeta) return;
+              runEffects(ctx, source, sourceMeta, null, res, true, true);
+            },
+          });
+          break;
+        }
         // Ground-targeted casts blast where they were aimed; others detonate on
         // the caster. The fx follows the same center (a world-anchored burst for
         // an aimed blast, the entity-anchored nova otherwise).
         const aoeCenter = p.castAim ?? p.pos;
-        if (p.castAim) {
+        if (ability.id === 'bastion_sweep') {
+          // The cast-start event was emitted before the authored wind-up. The
+          // deferred impact phase owns only authoritative damage and hit flashes.
+        } else if (ability.id === DAWNFALL_ID) {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: p.id,
+            school: ability.school,
+            fx: 'paladinDawnfall',
+            ability: ability.id,
+            range: eff.radius,
+          });
+        } else if (p.castAim) {
           ctx.emit({
             type: 'spellfxAt',
             x: aoeCenter.x,
@@ -1498,11 +1647,10 @@ export function runEffects(
           // facing gate uses.
           if (eff.frontal) {
             const facingDiff = Math.abs(normAngle(angleTo(p.pos, m.pos) - p.facing));
-            if (facingDiff > MELEE_ARC) continue;
+            if (facingDiff > (eff.frontalHalfAngle ?? MELEE_ARC)) continue;
           }
           aoeTargets.push(m);
         }
-        if (aoeTargets.length > 0) devotionDamageTriggered = true;
         // Classic AoE soft cap (Revenge): above `softCap` targets, hold the TOTAL
         // to softCap x per-target by scaling every rolled hit. Scales the already-
         // rolled amount, so it draws no extra rng.
@@ -1518,7 +1666,9 @@ export function runEffects(
           aoeTargets.length > 0 &&
           (ctx.rng.chance(ctx.spellCrit(p)) ||
             fireGuaranteedCrit(ctx, p, ability.id, ability.school, null));
+        let sunVerdictHit: { target: Entity; mark: Aura } | null = null;
         for (const m of aoeTargets) {
+          const sunVerdictMark = ability.id === DAWNFALL_ID ? sunVerdictMarkForHit(m, p.id) : null;
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           if (aoeCrit)
@@ -1530,6 +1680,7 @@ export function runEffects(
           // Soft-cap scale (Revenge above 5 targets): applied after the roll and
           // armor so the total, not any single hit, is what the cap bounds.
           dmg *= capScale;
+          const hpBefore = m.hp;
           ctx.dealDamage(
             p,
             m,
@@ -1548,6 +1699,29 @@ export function runEffects(
             // healing at the reduced 15% rate. Non-arcane AoE is unaffected.
             true,
           );
+          if (m.hp < hpBefore) {
+            devotionDamageTriggered = true;
+            if (ability.id === DAWNFALL_ID) {
+              ctx.emit({
+                type: 'spellfx',
+                sourceId: p.id,
+                targetId: m.id,
+                school: ability.school,
+                fx: 'paladinDawnfallImpact',
+                ability: ability.id,
+              });
+            } else if (ability.id === 'bastion_sweep') {
+              ctx.emit({
+                type: 'spellfx',
+                sourceId: p.id,
+                targetId: m.id,
+                school: ability.school,
+                fx: 'paladinBastionSweepImpact',
+                ability: ability.id,
+              });
+            }
+          }
+          if (sunVerdictMark) sunVerdictHit = { target: m, mark: sunVerdictMark };
           // Paired stun rider (Faultline): each enemy actually struck is also
           // stunned, mirroring the single-target 'stun' case (shared PvP DR,
           // no rng drawn; diminishedCrowdControlDuration is deterministic).
@@ -1571,6 +1745,9 @@ export function runEffects(
               });
             }
           }
+        }
+        if (sunVerdictHit) {
+          advanceSunGodVerdictForHit(ctx, p, sunVerdictHit.target, ability.id, sunVerdictHit.mark);
         }
         if (eff.rageOnHit && meta.cls === 'warrior' && p.resourceType === 'rage') {
           const hitCount = Math.min(aoeTargets.length, eff.rageOnHit.capTargets);
@@ -1598,7 +1775,42 @@ export function runEffects(
           res.castTime,
           true,
         );
-        const baseAmount = ctx.rng.range(eff.min, eff.max) + chainSpBonus;
+        const baseAmount = (ctx.rng.range(eff.min, eff.max) + chainSpBonus) * (eff.damageMult ?? 1);
+        if (ability.id === 'sunward_disc') {
+          if (initialTarget) {
+            scheduleSunwardBounceChain(ctx, {
+              caster: p,
+              primary: initialTarget,
+              jumps: eff.jumps,
+              radius: eff.radius,
+              school: ability.school,
+              abilityId: ability.id,
+              dealImpact: (landedTarget, hopIndex) => {
+                let dmg = baseAmount * eff.falloff ** (hopIndex - 1);
+                if (isSpell) dmg *= spellDamageMultFromAuras(p);
+                else dmg *= 1 - armorReduction(ctx.effectiveArmor(landedTarget), p.level);
+                const hpBefore = landedTarget.hp;
+                ctx.dealDamage(
+                  p,
+                  landedTarget,
+                  Math.max(1, Math.round(dmg)),
+                  false,
+                  ability.school,
+                  ability.name,
+                  'hit',
+                  false,
+                  threatOpts,
+                  true,
+                  false,
+                  false,
+                  ability.id,
+                );
+                return landedTarget.hp < hpBefore;
+              },
+            });
+          }
+          break;
+        }
         const hitsPrimary = eff.hitsPrimary === true && target !== null;
         const hitList: Entity[] = hitsPrimary && target ? [target] : [];
         const excluded = new Set<number>([p.id]);
@@ -1628,16 +1840,25 @@ export function runEffects(
         }
         for (let i = 0; i < hitList.length; i++) {
           const m = hitList[i];
+          const sunwardDisc = ability.id === 'sunward_disc';
           ctx.emit({
             type: 'spellfx',
             sourceId: i === 0 ? (hitsPrimary ? p.id : origin.id) : hitList[i - 1].id,
             targetId: m.id,
             school: ability.school,
-            fx: 'projectile',
+            fx: sunwardDisc ? 'paladinSunwardDisc' : 'projectile',
+            ...(sunwardDisc
+              ? {
+                  ability: ability.id,
+                  level: i + 1,
+                  count: hitList.length + 1,
+                }
+              : {}),
           });
           let dmg = baseAmount * eff.falloff ** i;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           else dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
+          const hpBefore = m.hp;
           ctx.dealDamage(
             p,
             m,
@@ -1653,10 +1874,12 @@ export function runEffects(
             false,
             ability.id,
           );
+          if (m.hp < hpBefore) devotionDamageTriggered = true;
         }
         break;
       }
       case 'aoeHeal': {
+        if (eff.friendlyTargetOnly && ascensionFxTargetHostile) break;
         const center = eff.centerOnTarget && target ? target : p;
         ctx.emit({
           type: 'spellfx',
@@ -1667,15 +1890,19 @@ export function runEffects(
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
         const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true);
-        let healingAttempted = false;
+        let effectiveHealingTargets = 0;
         for (const m of friendliesInRadius(ctx, center, eff.radius)) {
           if (eff.playersOnly && m.kind !== 'player') continue;
           if (!ctx.hasLineOfSight(center, m)) continue;
-          healingAttempted = true;
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
-          ctx.applyHeal(p, m, healAmount, ability.name, ability.id);
+          if (ctx.applyHeal(p, m, healAmount, ability.name, ability.id) > 0) {
+            effectiveHealingTargets++;
+          }
         }
-        if (healingAttempted) devotionHealingTriggered = true;
+        if (effectiveHealingTargets > 0) devotionHealingTriggered = true;
+        if (ability.id === 'radiant_chorus') {
+          grantRadiantResonance(ctx, p, effectiveHealingTargets);
+        }
         break;
       }
       case 'frozenOrb': {
@@ -2773,6 +3000,23 @@ export function runEffects(
     if (target?.dead) target = null;
   }
 
+  if (deferredBastionImpact) {
+    const paladinSpec = mods.spec;
+    if (
+      devotionGenerationTriggered(paladinSpec, ability.id, {
+        damage: devotionDamageTriggered,
+        healing: false,
+      })
+    ) {
+      const gained = grantAbilityDevotion(p, devotionGainForAbility(paladinSpec, ability.id));
+      if (gained > 0 && mods.global.paladinZeal > 0) {
+        if (advancePaladinTalentCounter(p, 'paladin_zeal')) grantDevotion(p, 1);
+      }
+    }
+    if (areaEcho && areaEchoDealt) consumeAreaEchoCharge(ctx, p);
+    return;
+  }
+
   // Frost mage post-impact rider (combat/frost_mage.ts): frostbolt rolls its
   // two procs (committed frost only, so no existing golden moves); Flurry
   // plants Winter's Chill on its surviving target. Inert for everyone else.
@@ -2785,19 +3029,50 @@ export function runEffects(
       healing: devotionHealingTriggered,
     })
   ) {
-    grantAbilityDevotion(p, devotionGainForAbility(paladinSpec, ability.id));
+    const gained = grantAbilityDevotion(p, devotionGainForAbility(paladinSpec, ability.id));
+    if (gained > 0 && mods.global.paladinZeal > 0) {
+      if (advancePaladinTalentCounter(p, 'paladin_zeal')) grantDevotion(p, 1);
+    }
+    if (gained > 0 && dawnEchoOutcome && mods.global.paladinDawnEcho > 0) {
+      if (advancePaladinTalentCounter(p, 'paladin_dawn_echo')) {
+        if (repeatDawnEcho(ctx, p, dawnEchoOutcome)) {
+          grantDevotion(p, mods.global.paladinDawnEchoDevotion);
+        }
+      }
+    }
   }
-  if (consumeAscensionCharge(p, paladinSpec, ability.id)) {
-    const ascensionImpact = ascensionImpactKind(ability.id, ascensionFxTargetHostile);
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: p.id,
-      targetId: ascensionImpact === 'area' ? p.id : ascensionFxTargetId,
-      school: 'holy',
-      fx: 'paladinAscensionImpact',
-      ability: ability.id,
-      impact: ascensionImpact,
-    });
+  const finalAscensionCharge = p.paladinDevotion?.ascensionCharges === 1;
+  if (
+    consumeAscensionCharge(
+      p,
+      paladinSpec,
+      ability.id,
+      mods.global.paladinDivinePurposeChance,
+      (chance) => ctx.rng.chance(chance),
+    )
+  ) {
+    // Valkyr's Calling defers its empowered impact until the visible landing.
+    // Every other empowered ability still resolves its impact immediately here.
+    if (ability.id !== 'valkyrs_calling') {
+      const ascensionImpact = ascensionImpactKind(ability.id, ascensionFxTargetHostile);
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: p.id,
+        targetId: ascensionImpact === 'area' ? p.id : ascensionFxTargetId,
+        school: 'holy',
+        fx: 'paladinAscensionImpact',
+        ability: ability.id,
+        impact: ascensionImpact,
+      });
+    }
+    const fadedAscension = syncDivineAscensionAura(p);
+    if (fadedAscension) {
+      ctx.emit({ type: 'aura', targetId: p.id, name: fadedAscension.name, gained: false });
+    }
+    if (finalAscensionCharge && !p.dead && !isDivineAscensionActive(p)) {
+      if (mods.global.paladinSacredReserve > 0) grantDevotion(p, 5);
+      if (mods.global.paladinPerpetualSun > 0) unleashPerpetualSun(ctx, p);
+    }
   }
 
   if (ability.spendsCombo && spentCombo > 0) {

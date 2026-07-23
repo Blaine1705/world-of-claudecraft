@@ -1599,6 +1599,7 @@ export const hudChromeStrings = {
     attackSpeedSlow: 'Slows attack speed by {pct}%',
     attackSpeedFast: 'Increases attack speed by {pct}%',
     haste: 'Increases attack and casting speed by {pct}%',
+    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
     // wordy (M16): filled in the five non-Latin locales in this change.
     dmgDone: 'Increases damage dealt by {pct}%',
     dmgDoneReduce: 'Reduces damage dealt by {pct}%',
@@ -1631,6 +1632,11 @@ export const hudChromeStrings = {
     freeCast: 'Your next cast costs nothing',
     instantCast: 'Your next spell with a cast time is instant',
     cheapCast: 'Your next spell costs {pct}% less',
+    radiantResonance:
+      "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
+    solarReprisal:
+      'Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant',
+    dawnsWrath: 'HoW: all HP · +1 use · CD 0 · +{pct}% DMG',
     increase: {
       ap: 'Increases attack power by {value}',
       sp: 'Increases spell power by {value}',
@@ -1685,7 +1691,6 @@ export const hudChromeStrings = {
     disarm: 'Disarmed: cannot use weapon attacks',
     lockout: 'Spell school locked out',
     imbue: 'Weapon imbued with bonus effects',
-    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
     stealth: 'Concealed; movement speed reduced by {pct}%',
     formBear: 'Bruin Form: increased health and armor',
     formCat: 'Wolf Form: melee damage and energy',

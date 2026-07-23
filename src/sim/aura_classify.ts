@@ -3,7 +3,6 @@
 // i18n), so it lives in src/sim/ and both src/ui/hud.ts and src/sim/sim.ts import
 // it. Keeping ONE classifier avoids the drift where the HUD treated silence/disarm/
 // blind/etc. as debuffs but /targetbuffs (a narrower set) tagged them as buffs.
-import { isUnbreakableControlAura } from './combat/cc';
 import type { Aura, AuraKind } from './types';
 
 // A kind that is harmful by nature regardless of its value. Mirrors classic-era
@@ -11,6 +10,7 @@ import type { Aura, AuraKind } from './types';
 // the various combat penalties (silence/disarm/blind/lockout/expose/...).
 export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'dot',
+  'forced_move',
   'slow',
   'root',
   'stun',
@@ -37,6 +37,7 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'critvuln',
   'sated', // shared Bloodlust / Temporal Acceleration exhaustion lockout
   'cauterize_fatigue', // Cauterize's 5 min "already saved you" lockout
+  'sun_verdict',
 ]);
 
 // A negative-value stat aura (e.g. a mob's Withering Wail sapping attack power, or
@@ -50,11 +51,20 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
 // and the cast's direction picks the polarity (an OFFENSIVE dispel strips a
 // benefit off an enemy; a friendly one strips a harmful effect off an ally).
 export function isDispellableAura(
-  aura: Pick<Aura, 'kind' | 'value' | 'school' | 'unbreakableControl' | 'permanent'>,
+  aura: Pick<Aura, 'kind' | 'value' | 'school'> &
+    Partial<Pick<Aura, 'id' | 'unbreakableControl' | 'permanent'>>,
   offensive: boolean,
 ): boolean {
-  if (isUnbreakableControlAura(aura)) return false;
-  if (aura.school === 'physical' || aura.permanent) return false;
+  // Ascension is a player-owned resource state surfaced as an aura for HUD clarity,
+  // not a transferable magic buff. Letting dispel/steal remove only the synthetic
+  // icon would leave its charges active invisibly (or copy a mechanically inert icon).
+  if (
+    aura.id === 'divine_ascension' ||
+    aura.unbreakableControl ||
+    aura.school === 'physical' ||
+    aura.permanent
+  )
+    return false;
   const harmful = isDebuffAura(aura.kind, aura.value);
   return offensive ? !harmful : harmful;
 }

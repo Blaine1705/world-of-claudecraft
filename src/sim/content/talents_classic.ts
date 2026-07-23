@@ -62,7 +62,7 @@ const PALADIN_SPECS: SpecDef[] = [
     'dps',
     'x',
     'A holy warrior who judges enemies with weapon strikes and radiant burst.',
-    'oathstrike',
+    'final_edict',
     'Blood Debt',
     'Increases your Holy and physical ability damage by 20%.',
     { global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 } },

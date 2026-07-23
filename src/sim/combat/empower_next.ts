@@ -1,5 +1,9 @@
 import type { SimContext } from '../sim_context';
 import type { Aura, AuraKind, Entity } from '../types';
+import {
+  RADIANT_RESONANCE_DAWN_COST_MULTIPLIER,
+  RADIANT_RESONANCE_KIND,
+} from './paladin_radiant_resonance';
 
 function matches(aura: Aura, abilityId?: string): boolean {
   if (!aura.empowerAbilities) return true;
@@ -15,6 +19,7 @@ const EMPOWER_CAST_KINDS: ReadonlySet<string> = new Set([
   'next_execute_free',
   'next_cast_instant',
   'next_cast_cheap',
+  RADIANT_RESONANCE_KIND,
 ]);
 
 export function consumeAuraKind(
@@ -54,10 +59,18 @@ export function hasNextExecuteFree(e: Entity, abilityId: string): boolean {
 }
 
 export function nextCastCheapMultiplier(e: Entity, abilityId?: string): number | null {
-  return (
-    e.auras.find((aura) => aura.kind === 'next_cast_cheap' && matches(aura, abilityId))?.value ??
-    null
-  );
+  if (
+    abilityId === 'dawns_embrace' &&
+    (e.castRadiantResonance === true ||
+      e.auras.some((aura) => aura.kind === RADIANT_RESONANCE_KIND))
+  ) {
+    return RADIANT_RESONANCE_DAWN_COST_MULTIPLIER;
+  }
+  const generic = e.auras.find(
+    (aura) => aura.kind === 'next_cast_cheap' && matches(aura, abilityId),
+  )?.value;
+  if (generic !== undefined) return generic;
+  return null;
 }
 
 export const BATTLE_TRANCE_ABILITIES: ReadonlySet<string> = new Set([
@@ -106,7 +119,11 @@ export function consumeFreeCostFor(ctx: SimContext, e: Entity, abilityId: string
 }
 
 export function consumeNextCastInstant(ctx: SimContext, e: Entity, abilityId?: string): boolean {
-  return consumeAuraKind(ctx, e, 'next_cast_instant', abilityId) !== null;
+  if (consumeAuraKind(ctx, e, 'next_cast_instant', abilityId) !== null) return true;
+  return (
+    abilityId === 'holy_light' &&
+    consumeAuraKind(ctx, e, RADIANT_RESONANCE_KIND, abilityId) !== null
+  );
 }
 
 export function hasScopedNextCastInstant(e: Entity, abilityId: string): boolean {
@@ -123,8 +140,29 @@ export function consumeNextCastCheap(
   e: Entity,
   abilityId?: string,
 ): number | null {
+  if (
+    abilityId === 'dawns_embrace' &&
+    (e.castRadiantResonance === true ||
+      e.auras.some((aura) => aura.kind === RADIANT_RESONANCE_KIND))
+  ) {
+    e.castRadiantResonance = undefined;
+    consumeAuraKind(ctx, e, RADIANT_RESONANCE_KIND, abilityId);
+    return RADIANT_RESONANCE_DAWN_COST_MULTIPLIER;
+  }
   const aura = consumeAuraKind(ctx, e, 'next_cast_cheap', abilityId);
-  return aura?.value ?? null;
+  if (aura) return aura.value;
+  return null;
+}
+
+export function consumeRadiantResonanceForDawn(
+  ctx: SimContext,
+  e: Entity,
+  abilityId?: string,
+): boolean {
+  if (abilityId !== 'dawns_embrace') return false;
+  const reserved = e.castRadiantResonance === true;
+  e.castRadiantResonance = undefined;
+  return consumeAuraKind(ctx, e, RADIANT_RESONANCE_KIND, abilityId) !== null || reserved;
 }
 
 export function consumeNextAttackCrit(ctx: SimContext, e: Entity): boolean {

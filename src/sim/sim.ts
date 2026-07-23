@@ -84,10 +84,13 @@ import {
 } from './combat/heal';
 import { advanceHeroicLeap } from './combat/heroic_leap';
 import { tickNaturesFury } from './combat/natures_fury';
+import { radiantResonanceCastTime } from './combat/paladin_radiant_resonance';
+import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
 import {
   PALADIN_DEVOTION_ABILITY_IDS,
   stripPaladinDevotionsFromSource,
 } from './combat/paladin_support';
+import { advanceValkyrsCalling } from './combat/paladin_valkyrs_calling';
 import {
   completeVeilboundMarch,
   updateVeilboundMarchMovement,
@@ -274,6 +277,7 @@ import type { MobCombatProfile } from './mob_combat';
 import {
   grantDevotionFromBlock,
   grantGroundAoEDevotionOnFirstHit,
+  MAX_DEVOTION,
   resolveAscensionAbility,
   updatePaladinDevotion,
 } from './paladin_devotion';
@@ -4229,7 +4233,9 @@ export class Sim {
     const before = new Map(meta.known.map((k) => [k.def.id, k.rank]));
     // (Frost's second Ice Block charge is resolved inside abilitiesKnownAt, the
     // shared known-list builder, so ClientWorld's recomputed list matches.)
-    meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
+    // questsDone gates quest-earned abilities (paladin recall_the_fallen); it is
+    // restored before this runs at load, so a returning character keeps them.
+    meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods, meta.questsDone);
     if (announce) {
       for (const k of meta.known) {
         const prev = before.get(k.def.id);
@@ -4426,7 +4432,15 @@ export class Sim {
       cost = Math.round(cost * aetherSurgeCostMult(r.e));
     }
     const costResolved = cost === found.cost ? found : { ...found, cost };
-    return resolveAscensionAbility(r.e, this.playerMods(r.meta).spec, costResolved);
+    const ascensionResolved = resolveAscensionAbility(
+      r.e,
+      this.playerMods(r.meta).spec,
+      costResolved,
+    );
+    const castTime = radiantResonanceCastTime(r.e, abilityId, ascensionResolved.castTime);
+    return castTime === ascensionResolved.castTime
+      ? ascensionResolved
+      : { ...ascensionResolved, castTime };
   }
 
   // Highest active cost_tax aura, expressed as a cost multiplier (1 = no tax).
@@ -4570,7 +4584,7 @@ export class Sim {
       const p = this.entities.get(meta.entityId);
       if (p) {
         p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
-        updatePaladinDevotion(p, DT);
+        updatePaladinDevotion(p, DT, this.playerMods(meta).global.paladinSacredReserve > 0);
       }
     }
     lap?.('engaged');
@@ -4736,8 +4750,11 @@ export class Sim {
   // Body moved to player_motion.ts (MV1). The ghost/aura math is host-agnostic
   // there; only the Fiesta augment needs PlayerMeta, so this delegate feeds it in.
   moveSpeedMult(e: Entity): number {
-    const extra =
-      e.kind === 'player' ? (this.players.get(e.id)?.fiestaSpecial.moveSpeedPct ?? 0) : 0;
+    const meta = e.kind === 'player' ? this.players.get(e.id) : undefined;
+    let extra = meta?.fiestaSpecial.moveSpeedPct ?? 0;
+    if (meta && this.playerMods(meta).global.paladinDivineSteed > 0 && e.paladinDevotion) {
+      extra += 0.15 * (e.paladinDevotion.value / MAX_DEVOTION);
+    }
     return moveSpeedMultImpl(e, extra);
   }
 
@@ -5009,6 +5026,7 @@ export class Sim {
       // no-op unless the player is currently AFK. Do Not Disturb survives.
       clearAfkOnMove(this.ctx, meta, p);
     }
+    if (advanceValkyrsCalling(this.ctx, p)) return;
     if (advanceHeroicLeap(this.ctx, p)) return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
@@ -5078,6 +5096,7 @@ export class Sim {
       return;
     }
     let zoneStruck = 0;
+    let zoneEffectiveDamage = 0;
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
       zoneStruck++;
@@ -5102,6 +5121,7 @@ export class Sim {
       if (effect.igniteFrac && dmg > 0 && !target.dead) {
         applyIgnite(this.ctx, source, target, Math.round(dmg * effect.igniteFrac));
       }
+      const hpBefore = target.hp;
       this.dealDamage(
         source,
         target,
@@ -5114,6 +5134,7 @@ export class Sim {
         threatOpts,
         direct,
       );
+      if (target.hp < hpBefore) zoneEffectiveDamage++;
     }
     // Blizzard: every enemy this pulse struck shaves the running Frozen Orb
     // cooldown, bounded by the per-cast budget reset at zone placement
@@ -5121,7 +5142,7 @@ export class Sim {
     if (effect.orbCdr && zoneStruck > 0 && source.kind === 'player') {
       frostMageChannelPulse(this.ctx, source, 'blizzard', zoneStruck);
     }
-    grantGroundAoEDevotionOnFirstHit(source, effect, zoneStruck);
+    grantGroundAoEDevotionOnFirstHit(source, effect, zoneEffectiveDamage);
   }
 
   // -------------------------------------------------------------------------
@@ -5211,8 +5232,12 @@ export class Sim {
     const isPaladinDevotion = PALADIN_DEVOTION_ABILITY_IDS.has(auraId);
     const removed = removeCancelableAura(e.auras, auraId, isPaladinDevotion ? e.id : undefined);
     if (!removed) return;
+    if (auraId === 'divine_ascension' && e.paladinDevotion) {
+      e.paladinDevotion.ascensionCharges = 0;
+      e.paladinDevotion.ascensionRemaining = 0;
+    }
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
-    if (isPaladinDevotion) stripPaladinDevotionsFromSource(this.ctx, e.id);
+    if (isPaladinDevotion) stripPaladinDevotionsFromSource(this.ctx, e.id, auraId);
     if (auraAffectsStats(removed)) {
       recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta), meta.equipmentInstance);
     }
@@ -5259,6 +5284,8 @@ export class Sim {
     abilityId: string | null = null,
     canCrit = true,
     canTriggerWeaponProcs = true,
+    beaconTransferEligible = false,
+    alreadyResolved = false,
   ): number {
     return applyHealImpl(
       this.ctx,
@@ -5269,6 +5296,8 @@ export class Sim {
       abilityId,
       canCrit,
       canTriggerWeaponProcs,
+      beaconTransferEligible,
+      alreadyResolved,
     );
   }
 
@@ -5292,6 +5321,9 @@ export class Sim {
   private applyAura(target: Entity, aura: Aura): void {
     if (target.kind === 'npc' && isRejectedFriendlyNpcAura(aura)) return;
     if (veilboundMarchBlocksAura(target, aura)) return;
+    if (aura.kind === 'slow' && target.auras.some((active) => active.kind === 'slow_immunity')) {
+      return;
+    }
     if (
       this.isIceBlocked(target) &&
       this.isIceBlockCrowdControlAura(aura.kind) &&
@@ -6061,6 +6093,7 @@ export class Sim {
       dmg = Math.max(1, dmg - target.blockValue);
       if (target.kind === 'player' && this.players.get(target.id)?.talents.spec === 'protection') {
         grantDevotionFromBlock(target);
+        tryGrantSolarReprisal(this.ctx, target, 'block');
       }
     }
     const dealt = Math.max(1, Math.round(dmg));

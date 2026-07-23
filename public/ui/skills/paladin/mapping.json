@@ -28,13 +28,6 @@
       "confidence": "review"
     },
     {
-      "abilityId": "judgement",
-      "name": "Judgement",
-      "sourceFile": "50.png",
-      "output": "judgement.webp",
-      "confidence": "high"
-    },
-    {
       "abilityId": "blessing_of_might",
       "name": "Blessing of Might",
       "sourceFile": "6.png",
@@ -119,13 +112,6 @@
       "confidence": "high"
     },
     {
-      "abilityId": "hammer_of_light",
-      "name": "Hammer of Light",
-      "sourceFile": "OpenAI image generation, original project artwork",
-      "output": "hammer_of_light.webp",
-      "confidence": "high"
-    },
-    {
       "abilityId": "hushbrand",
       "name": "Hushbrand",
       "sourceFile": "OpenAI image generation, original project artwork",
@@ -186,13 +172,6 @@
       "name": "Grace Devotion",
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "grace_devotion.webp",
-      "confidence": "high"
-    },
-    {
-      "abilityId": "oathstrike",
-      "name": "Oathstrike",
-      "sourceFile": "OpenAI image generation, original project artwork",
-      "output": "oathstrike.webp",
       "confidence": "high"
     },
     {
@@ -375,6 +354,27 @@
       "name": "Oath Chain",
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "oath_chain.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "sun_gods_verdict",
+      "name": "Verdict of the Sun God",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "sun_gods_verdict.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "valkyrs_calling",
+      "name": "Valkyr's Calling",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "valkyrs_calling.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "aura_mastery",
+      "name": "Aura Mastery",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "aura_mastery.webp",
       "confidence": "high"
     },
     {

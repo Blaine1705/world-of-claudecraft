@@ -55,6 +55,10 @@ import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed, rangedAutoProfile } from './form_swing';
 import { isTravelFormAuraKind } from './forms';
+import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
+import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
+import { applyRequitalAutoAttack } from './paladin_talents';
+import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { rangedShotProfile } from './ranged_shot';
 import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
@@ -77,6 +81,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const p = r.e;
   if (p.dead) return;
   if (isInStasis(p)) return;
+  if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   // A target that just DIED (commonly the mob the engaging spell killed) is not a
@@ -131,6 +136,7 @@ export function stopAutoAttack(ctx: SimContext, pid?: number): void {
 export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
     p.autoAttack = false;
     return;
@@ -206,6 +212,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       threatFlat,
       threatMult,
       whiteDualWieldPenalty: p.dualWielding && abilityName === null,
+      autoAttack: true,
     });
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
     // a chance to swing once more. The pct gate keeps the rng stream untouched
@@ -214,6 +221,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     if (connected && abilityName === null && extraAttackPct > 0 && ctx.rng.chance(extraAttackPct)) {
       meleeSwing(ctx, p, t, 0, null, {
         whiteDualWieldPenalty: p.dualWielding,
+        autoAttack: true,
       });
     }
     maybeProcBattleTrance(ctx, p, meta, connected);
@@ -233,6 +241,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       weaponMult: 0.5,
       apSwingSpeed: offhand.speed,
       whiteDualWieldPenalty: true,
+      autoAttack: true,
     });
     maybeProcBattleTrance(ctx, p, meta, connected);
     maybeProcSuddenDeath(ctx, p, meta, connected);
@@ -356,6 +365,7 @@ export function rangedSwing(
       true,
       !ranged.wand,
     );
+    applyRequitalAutoAttack(ctx, atk, tgt);
     // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
     // inside applySetProcs, so proc-less players draw no rng.
     if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');
@@ -389,6 +399,7 @@ export function meleeSwing(
     onDealt?: (amount: number) => void;
     onEffectiveDamage?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    autoAttack?: boolean;
   },
 ): boolean {
   const missChance =
@@ -478,6 +489,7 @@ export function meleeSwing(
     const targetMeta = target.kind === 'player' ? ctx.players.get(target.id) : undefined;
     if (targetMeta && ctx.playerMods(targetMeta).spec === 'protection') {
       grantDevotionFromBlock(target);
+      tryGrantSolarReprisal(ctx, target, 'block');
     }
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
@@ -488,6 +500,10 @@ export function meleeSwing(
   });
   opts.onDealt?.(dealtAmount);
   opts.onEffectiveDamage?.(Math.max(0, hpBefore - target.hp));
+  if (opts.autoAttack) {
+    applyRequitalAutoAttack(ctx, attacker, target);
+    tryGrantDawnsWrath(ctx, attacker);
+  }
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.

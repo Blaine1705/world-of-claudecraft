@@ -7,9 +7,11 @@
 // provably the same set and can never drift apart.
 import { isDebuffAura as classifyDebuffAura } from '../aura_classify';
 import type { Aura } from '../types';
-import { isUnbreakableControlAura } from './cc';
 
-type CancelableAura = Pick<Aura, 'id' | 'kind' | 'value'> & { sourceId?: number };
+type CancelableAura = Pick<Aura, 'id' | 'kind' | 'value'> & {
+  sourceId?: number;
+  unbreakableControl?: boolean;
+};
 
 // A debuff is anything in the harmful set, OR a stat aura riding a `buff_*` kind
 // with a negative value (an enfeeble / wither drain reuses a buff_* kind but saps
@@ -21,11 +23,11 @@ export function isDebuffAura(a: CancelableAura): boolean {
 // A player may voluntarily cancel any helpful aura they carry; debuffs never. The
 // classic right-click-cancel includes forms, stances, and stealth (canceling a
 // form aura reverts to caster form) since none of those are harmful.
-export function isCancelableAura(a: Aura): boolean {
+export function isCancelableAura(a: CancelableAura): boolean {
   return (
     a.id !== 'beacon_of_light' &&
     a.id !== 'veilbound_march' &&
-    !isUnbreakableControlAura(a) &&
+    !a.unbreakableControl &&
     !isDebuffAura(a)
   );
 }

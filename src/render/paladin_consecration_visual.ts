@@ -7,13 +7,36 @@ import type { ActiveConsecration } from '../world_api';
 const SEGMENTS = 72;
 const GROUND_LIFT = 0.055;
 const FADE_SECONDS = 0.65;
+const REVEAL_SECONDS = 0.24;
+const PULSE_SECONDS = 1.1;
+const MOTE_COUNT = 12;
+const EDGE_WISP_COUNT = 8;
+
+interface AmbientOffset {
+  x: number;
+  y: number;
+  z: number;
+  phase: number;
+  scale: number;
+}
 
 interface ConsecrationVisual {
   root: THREE.Group;
-  motes: THREE.Group;
+  motes: THREE.InstancedMesh;
+  edgeWisps: THREE.InstancedMesh;
+  pulseRing: THREE.Mesh;
+  pulseMaterial: THREE.MeshBasicMaterial;
+  shimmer: THREE.Mesh;
+  moteOffsets: readonly AmbientOffset[];
+  edgeOffsets: readonly AmbientOffset[];
+  scratch: THREE.Matrix4;
+  scratchPosition: THREE.Vector3;
+  scratchScale: THREE.Vector3;
+  scratchRotation: THREE.Quaternion;
   materials: THREE.MeshBasicMaterial[];
   baseOpacities: number[];
   geometries: THREE.BufferGeometry[];
+  radius: number;
   duration: number;
   elapsed: number;
   lastRemaining: number;
@@ -40,7 +63,7 @@ export class PaladinConsecrationVisuals {
         current.duration = Math.max(0.1, state.duration);
         current.elapsed = Math.max(0, current.duration - state.remaining);
         current.lastRemaining = state.remaining;
-        this.animate(current, 0);
+        this.animate(current, 0, true);
       }
     }
     for (const [id, visual] of this.active) {
@@ -50,15 +73,15 @@ export class PaladinConsecrationVisuals {
     }
   }
 
-  update(dt: number): void {
+  update(dt: number, reducedMotion = false): void {
     for (const [id, visual] of this.active) {
-      visual.elapsed += dt;
+      visual.elapsed += Math.max(0, dt);
       if (visual.elapsed >= visual.duration) {
         this.disposeVisual(visual);
         this.active.delete(id);
         continue;
       }
-      this.animate(visual, dt);
+      this.animate(visual, dt, reducedMotion);
     }
   }
 
@@ -69,103 +92,186 @@ export class PaladinConsecrationVisuals {
 
   private create(state: ActiveConsecration): void {
     const radius = Math.max(0.5, state.radius);
+    const centerY = this.groundY(state.x, state.z);
     const root = new THREE.Group();
     root.name = 'paladin-consecration';
     const materials: THREE.MeshBasicMaterial[] = [];
-    const geometries: THREE.BufferGeometry[] = [];
     const baseOpacities: number[] = [];
-    const gold = new THREE.Color(0xffca45);
-    const ivory = new THREE.Color(0xfff1ac);
+    const geometries: THREE.BufferGeometry[] = [];
 
-    const glowGeometry = this.createTerrainDisc(state.x, state.z, radius * 0.94, 48);
-    const glowMaterial = this.material(gold.clone().multiplyScalar(1.15), 0.16);
-    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-    glow.name = 'paladin-consecration-ground-glow';
-    glow.renderOrder = 6;
-    root.add(glow);
-    materials.push(glowMaterial);
-    geometries.push(glowGeometry);
-    baseOpacities.push(0.16);
-
-    for (const [name, inner, outer, opacity] of [
-      ['outer', 0.9, 1, 0.82],
-      ['middle', 0.56, 0.61, 0.5],
-      ['heart', 0.2, 0.25, 0.58],
-    ] as const) {
-      const geometry = this.createTerrainRing(state.x, state.z, radius * inner, radius * outer);
-      const material = this.material(
-        (name === 'middle' ? ivory : gold).clone().multiplyScalar(1.7),
-        opacity,
-      );
-      const ring = new THREE.Mesh(geometry, material);
-      ring.name = `paladin-consecration-${name}-ring`;
-      ring.renderOrder = 8;
-      root.add(ring);
-      materials.push(material);
+    const addTerrainMesh = (
+      geometry: THREE.BufferGeometry,
+      name: string,
+      color: number,
+      opacity: number,
+      renderOrder: number,
+    ): THREE.Mesh => {
+      const material = this.material(color, opacity);
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.name = name;
+      mesh.renderOrder = renderOrder;
+      root.add(mesh);
       geometries.push(geometry);
-      baseOpacities.push(opacity);
-    }
-
-    for (let glyph = 0; glyph < 8; glyph++) {
-      const geometry = this.createTerrainSpoke(
-        state.x,
-        state.z,
-        radius * 0.035,
-        radius * (glyph % 2 === 0 ? 1.35 : 0.92),
-        (glyph / 8) * Math.PI,
-      );
-      const opacity = glyph % 2 === 0 ? 0.42 : 0.3;
-      const material = this.material(ivory.clone().multiplyScalar(1.45), opacity);
-      const spoke = new THREE.Mesh(geometry, material);
-      spoke.name = `paladin-consecration-glyph-${glyph}`;
-      spoke.renderOrder = 7;
-      root.add(spoke);
       materials.push(material);
-      geometries.push(geometry);
       baseOpacities.push(opacity);
-    }
+      return mesh;
+    };
 
-    const motes = new THREE.Group();
+    addTerrainMesh(
+      this.createTerrainDisc(state.x, state.z, radius, 48),
+      'paladin-consecration-base-glow',
+      0xffd86a,
+      0.1,
+      5,
+    );
+    addTerrainMesh(
+      this.createTerrainDisc(state.x, state.z, radius * 0.62, 40),
+      'paladin-consecration-white-hot-center',
+      0xffffdc,
+      0.09,
+      6,
+    );
+    addTerrainMesh(
+      this.createTerrainRing(state.x, state.z, radius * 0.17, radius * 0.19),
+      'paladin-consecration-inner-ring',
+      0xffffcf,
+      0.48,
+      8,
+    );
+    addTerrainMesh(
+      this.createTerrainRing(state.x, state.z, radius * 0.39, radius * 0.405),
+      'paladin-consecration-middle-ring',
+      0xffe78b,
+      0.32,
+      8,
+    );
+    addTerrainMesh(
+      this.createTerrainRing(state.x, state.z, radius * 0.67, radius * 0.682),
+      'paladin-consecration-outer-ring',
+      0xffdb68,
+      0.25,
+      8,
+    );
+    addTerrainMesh(
+      this.createTerrainRing(state.x, state.z, radius * 0.982, radius),
+      'paladin-consecration-perimeter',
+      0xffffb5,
+      0.42,
+      9,
+    );
+    const runeField = addTerrainMesh(
+      this.createTerrainRuneField(state.x, state.z, radius),
+      'paladin-consecration-sun-rune-field',
+      0xffffd1,
+      0.5,
+      8,
+    );
+    runeField.userData.runeSegmentCount = 24;
+
+    const pulseGeometry = new THREE.RingGeometry(0.93, 1, 64);
+    const pulseMaterial = this.material(0xffffd8, 0.42);
+    const pulseRing = new THREE.Mesh(pulseGeometry, pulseMaterial);
+    pulseRing.name = 'paladin-consecration-pulse-ring';
+    pulseRing.rotation.x = -Math.PI / 2;
+    pulseRing.position.set(state.x, centerY + GROUND_LIFT * 2.2, state.z);
+    pulseRing.renderOrder = 10;
+    root.add(pulseRing);
+    geometries.push(pulseGeometry);
+    materials.push(pulseMaterial);
+    baseOpacities.push(0.42);
+
+    const shimmerGeometry = new THREE.CylinderGeometry(
+      radius * 0.97,
+      radius * 0.91,
+      0.42,
+      32,
+      1,
+      true,
+    );
+    const shimmerMaterial = this.material(0xffefae, 0.045);
+    const shimmer = new THREE.Mesh(shimmerGeometry, shimmerMaterial);
+    shimmer.name = 'paladin-consecration-shimmer';
+    shimmer.position.set(state.x, centerY + 0.23, state.z);
+    shimmer.renderOrder = 7;
+    root.add(shimmer);
+    geometries.push(shimmerGeometry);
+    materials.push(shimmerMaterial);
+    baseOpacities.push(0.045);
+
+    const moteGeometry = new THREE.SphereGeometry(0.055, 5, 4);
+    const moteMaterial = this.material(0xffffd7, 0.72);
+    const motes = new THREE.InstancedMesh(moteGeometry, moteMaterial, MOTE_COUNT);
     motes.name = 'paladin-consecration-motes';
-    motes.position.set(state.x, this.groundY(state.x, state.z), state.z);
-    const moteGeometry = new THREE.OctahedronGeometry(0.13, 0);
-    geometries.push(moteGeometry);
-    for (let index = 0; index < 12; index++) {
-      const material = this.material(
-        (index % 3 === 0 ? ivory : gold).clone().multiplyScalar(2),
-        0.88,
-      );
-      const mote = new THREE.Mesh(moteGeometry, material);
-      const angle = (index / 12) * Math.PI * 2;
-      const moteRadius = radius * (0.33 + (index % 3) * 0.23);
-      mote.position.set(
-        Math.cos(angle) * moteRadius,
-        0.18 + (index % 4) * 0.16,
-        Math.sin(angle) * moteRadius,
-      );
-      mote.scale.setScalar(0.75 + (index % 3) * 0.2);
-      motes.add(mote);
-      materials.push(material);
-      baseOpacities.push(0.88);
-    }
+    motes.position.set(state.x, centerY, state.z);
+    motes.renderOrder = 11;
     root.add(motes);
+    geometries.push(moteGeometry);
+    materials.push(moteMaterial);
+    baseOpacities.push(0.72);
+
+    const edgeGeometry = new THREE.ConeGeometry(0.075, 0.5, 5, 1, true);
+    const edgeMaterial = this.material(0xffffbd, 0.52);
+    const edgeWisps = new THREE.InstancedMesh(edgeGeometry, edgeMaterial, EDGE_WISP_COUNT);
+    edgeWisps.name = 'paladin-consecration-edge-wisps';
+    edgeWisps.position.set(state.x, centerY, state.z);
+    edgeWisps.renderOrder = 11;
+    root.add(edgeWisps);
+    geometries.push(edgeGeometry);
+    materials.push(edgeMaterial);
+    baseOpacities.push(0.52);
+
+    const ambientOffset = (
+      index: number,
+      count: number,
+      distance: number,
+      phaseStep: number,
+    ): AmbientOffset => {
+      const angle = (index / count) * Math.PI * 2 + (index % 2) * 0.19;
+      const x = Math.cos(angle) * distance;
+      const z = Math.sin(angle) * distance;
+      return {
+        x,
+        y: this.groundY(state.x + x, state.z + z) - centerY,
+        z,
+        phase: index * phaseStep,
+        scale: 0.78 + (index % 3) * 0.12,
+      };
+    };
+    const moteOffsets = Array.from({ length: MOTE_COUNT }, (_, index) =>
+      ambientOffset(index, MOTE_COUNT, radius * (0.25 + (index % 4) * 0.14), 0.67),
+    );
+    const edgeOffsets = Array.from({ length: EDGE_WISP_COUNT }, (_, index) =>
+      ambientOffset(index, EDGE_WISP_COUNT, radius * 0.86, 0.91),
+    );
 
     const visual: ConsecrationVisual = {
       root,
       motes,
+      edgeWisps,
+      pulseRing,
+      pulseMaterial,
+      shimmer,
+      moteOffsets,
+      edgeOffsets,
+      scratch: new THREE.Matrix4(),
+      scratchPosition: new THREE.Vector3(),
+      scratchScale: new THREE.Vector3(),
+      scratchRotation: new THREE.Quaternion(),
       materials,
       baseOpacities,
       geometries,
+      radius,
       duration: Math.max(0.1, state.duration),
       elapsed: Math.max(0, state.duration - state.remaining),
       lastRemaining: state.remaining,
     };
-    this.animate(visual, 0);
+    this.placeAmbient(visual, true);
+    this.animate(visual, 0, true);
     this.active.set(state.id, visual);
     this.scene.add(root);
   }
 
-  private material(color: THREE.Color, opacity: number): THREE.MeshBasicMaterial {
+  private material(color: number, opacity: number): THREE.MeshBasicMaterial {
     return new THREE.MeshBasicMaterial({
       color,
       transparent: true,
@@ -176,16 +282,50 @@ export class PaladinConsecrationVisuals {
     });
   }
 
-  private animate(visual: ConsecrationVisual, dt: number): void {
-    const fade = Math.min(1, (visual.duration - visual.elapsed) / FADE_SECONDS);
-    const pulse = 0.78 + Math.sin(visual.elapsed * Math.PI * 2) * 0.22;
+  private animate(visual: ConsecrationVisual, dt: number, reducedMotion: boolean): void {
+    const fade = Math.min(1, Math.max(0, (visual.duration - visual.elapsed) / FADE_SECONDS));
+    const reveal = Math.min(1, visual.elapsed / REVEAL_SECONDS);
+    const breathe = reducedMotion ? 1 : 0.95 + Math.sin(visual.elapsed * Math.PI * 2) * 0.05;
     visual.materials.forEach((material, index) => {
-      material.opacity = visual.baseOpacities[index] * fade * pulse;
+      material.opacity = visual.baseOpacities[index] * fade * reveal * breathe;
     });
-    visual.motes.rotation.y -= dt * 0.38;
-    visual.motes.children.forEach((mote, index) => {
-      mote.position.y = 0.18 + (index % 4) * 0.16 + Math.sin(visual.elapsed * 3.2 + index) * 0.12;
-    });
+
+    const phase =
+      visual.elapsed < REVEAL_SECONDS
+        ? visual.elapsed / REVEAL_SECONDS
+        : reducedMotion
+          ? 0.58
+          : (visual.elapsed % PULSE_SECONDS) / PULSE_SECONDS;
+    const pulseScale = visual.radius * (0.2 + phase * 0.8);
+    visual.pulseRing.scale.setScalar(pulseScale);
+    visual.pulseMaterial.opacity = 0.42 * fade * reveal * (1 - phase) ** 1.6;
+    if (reducedMotion) return;
+    visual.motes.rotation.y += dt * 0.11;
+    visual.edgeWisps.rotation.y -= dt * 0.045;
+    visual.shimmer.rotation.y += dt * 0.08;
+    this.placeAmbient(visual, false);
+  }
+
+  private placeAmbient(visual: ConsecrationVisual, staticPose: boolean): void {
+    const place = (
+      mesh: THREE.InstancedMesh,
+      offsets: readonly AmbientOffset[],
+      edge: boolean,
+    ): void => {
+      for (let index = 0; index < offsets.length; index++) {
+        const offset = offsets[index];
+        const wave = staticPose ? 0 : Math.sin(visual.elapsed * (edge ? 1.45 : 2.1) + offset.phase);
+        const lift = edge ? 0.2 + wave * 0.07 : 0.32 + wave * 0.18;
+        const scale = offset.scale * (edge ? 0.9 + wave * 0.08 : 0.85 + wave * 0.12);
+        visual.scratchPosition.set(offset.x, offset.y + lift, offset.z);
+        visual.scratchScale.set(scale, scale, scale);
+        visual.scratch.compose(visual.scratchPosition, visual.scratchRotation, visual.scratchScale);
+        mesh.setMatrixAt(index, visual.scratch);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+    };
+    place(visual.motes, visual.moteOffsets, false);
+    place(visual.edgeWisps, visual.edgeOffsets, true);
   }
 
   private disposeVisual(visual: ConsecrationVisual): void {
@@ -220,31 +360,55 @@ export class PaladinConsecrationVisuals {
     return geometry;
   }
 
-  private createTerrainSpoke(
-    x: number,
-    z: number,
-    width: number,
-    length: number,
-    angle: number,
-  ): THREE.BufferGeometry {
-    const segments = 12;
+  private createTerrainRuneField(x: number, z: number, radius: number): THREE.BufferGeometry {
     const vertices: number[] = [];
     const indices: number[] = [];
-    const alongX = Math.cos(angle);
-    const alongZ = Math.sin(angle);
-    const acrossX = -alongZ;
-    const acrossZ = alongX;
-    for (let segment = 0; segment <= segments; segment++) {
-      const distance = -length / 2 + (length * segment) / segments;
-      for (const side of [-1, 1]) {
-        const sampleX = x + alongX * distance + acrossX * width * 0.5 * side;
-        const sampleZ = z + alongZ * distance + acrossZ * width * 0.5 * side;
-        vertices.push(sampleX, this.groundY(sampleX, sampleZ) + GROUND_LIFT, sampleZ);
+    const addRibbon = (
+      startX: number,
+      startZ: number,
+      endX: number,
+      endZ: number,
+      width: number,
+    ): void => {
+      const dx = endX - startX;
+      const dz = endZ - startZ;
+      const length = Math.max(0.001, Math.hypot(dx, dz));
+      const sideX = (-dz / length) * width;
+      const sideZ = (dx / length) * width;
+      const base = vertices.length / 3;
+      for (const [sampleX, sampleZ] of [
+        [startX + sideX, startZ + sideZ],
+        [startX - sideX, startZ - sideZ],
+        [endX + sideX, endZ + sideZ],
+        [endX - sideX, endZ - sideZ],
+      ]) {
+        vertices.push(sampleX, this.groundY(sampleX, sampleZ) + GROUND_LIFT * 1.45, sampleZ);
       }
-      if (segment < segments) {
-        const left = segment * 2;
-        indices.push(left, left + 1, left + 2, left + 1, left + 3, left + 2);
-      }
+      indices.push(base, base + 1, base + 2, base + 1, base + 3, base + 2);
+    };
+
+    for (let index = 0; index < 12; index++) {
+      const angle = (index / 12) * Math.PI * 2;
+      const alongX = Math.cos(angle);
+      const alongZ = Math.sin(angle);
+      const sideX = -alongZ;
+      const sideZ = alongX;
+      addRibbon(
+        x + alongX * radius * 0.22,
+        z + alongZ * radius * 0.22,
+        x + alongX * radius * 0.9,
+        z + alongZ * radius * 0.9,
+        radius * 0.009,
+      );
+      const crossCenterX = x + alongX * radius * 0.72;
+      const crossCenterZ = z + alongZ * radius * 0.72;
+      addRibbon(
+        crossCenterX - sideX * radius * 0.075,
+        crossCenterZ - sideZ * radius * 0.075,
+        crossCenterX + sideX * radius * 0.075,
+        crossCenterZ + sideZ * radius * 0.075,
+        radius * 0.008,
+      );
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
@@ -270,9 +434,8 @@ export class PaladinConsecrationVisuals {
         vertices.push(sampleX, this.groundY(sampleX, sampleZ) + GROUND_LIFT, sampleZ);
         if (segment >= segments) continue;
         const current = 1 + (ring - 1) * (segments + 1) + segment;
-        if (ring === 1) {
-          indices.push(0, current, current + 1);
-        } else {
+        if (ring === 1) indices.push(0, current, current + 1);
+        else {
           const previous = current - (segments + 1);
           indices.push(previous, current, previous + 1, current, current + 1, previous + 1);
         }

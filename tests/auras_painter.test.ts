@@ -408,6 +408,23 @@ describe('AurasPainter: static-preset visible-count cap', () => {
     expect(nodes().length).toBeLessThan(over);
   });
 
+  it('keeps Divine Ascension visible behind the low-tier buff cap', () => {
+    const slots = Array.from({ length: AURA_VISIBLE_CAP_LOW + 2 }, (_, i) =>
+      slot({ key: `buff${i}` }),
+    );
+    slots.push(slot({ key: 'divine_ascension', name: 'Divine Ascension', stacksText: '5' }));
+
+    tierPainter('low').paint(state(slots));
+
+    expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW + 1);
+    expect(calls).toContainEqual(
+      expect.objectContaining({
+        m: 'setStyleProp',
+        args: ['background-image', 'url(divine_ascension)'],
+      }),
+    );
+  });
+
   it('low under the cap renders every aura (the cap only bites past the limit)', () => {
     tierPainter('low').paint(manyBuffs(AURA_VISIBLE_CAP_LOW - 2));
     expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW - 2);

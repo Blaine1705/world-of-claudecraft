@@ -9,6 +9,12 @@ type AuraEvent = Extract<SimEvent, { type: 'aura' }>;
 type MagicSchool = 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 export type MobVoiceAction = 'aggro' | 'attack' | 'death' | 'hurt' | 'idle';
 
+const SILENT_ASCENSION_AURA_IDS: ReadonlySet<string> = new Set([
+  'divine_ascension',
+  'dawns_path_speed',
+  'aegis_of_devotion_dr',
+]);
+
 const SCHOOL_CUES = {
   fire: { cast: 'cast_fire', projectile: 'proj_fire', impact: 'impact_fire' },
   frost: { cast: 'cast_frost', projectile: 'proj_frost', impact: 'impact_frost' },
@@ -180,9 +186,6 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
     return { key, anchorId: event.sourceId };
   }
   if (event.fx === 'nova') return { key: 'spell_nova', anchorId: event.targetId };
-  if (event.fx === 'paladinAscensionStart') {
-    return { key: 'spell_nova', anchorId: event.sourceId };
-  }
   if (event.fx === 'paladinAscensionImpact') {
     const key: SfxId =
       event.impact === 'area'
@@ -201,7 +204,7 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
 }
 
 export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null {
-  if (!event.gained || !aura) return null;
+  if (!event.gained || !aura || SILENT_ASCENSION_AURA_IDS.has(aura.id)) return null;
   return isAuraDebuff(aura) ? 'debuff_apply' : 'buff_apply';
 }
 

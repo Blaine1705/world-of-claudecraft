@@ -264,170 +264,145 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'mobility',
-      decision: 'reposition on a broken ward vs heal on the move vs escape a heavy blow',
+      decision: 'speed after Hammer of Grace vs a stronger Solar Step vs Devotion-driven speed',
       options: [
         {
           id: 'pal_r5_radiant_stride',
           name: 'Radiant Stride',
-          description: 'When Ward of Faith is fully consumed, gain 40% movement speed for 5 sec.',
-          icon: 'divine_protection',
+          description: 'Hammer of Grace grants 30% movement speed for 4 sec when it deals damage.',
+          icon: 'hammer_of_grace',
+          effect: { global: { paladinRadiantStride: 0.3 } },
+        },
+        {
+          id: 'pal_r5_steadfast_step',
+          name: 'Steadfast Step',
+          description: 'Solar Step lasts 2 sec longer and makes you immune to slows while active.',
+          icon: 'solar_step',
           effect: {
-            proc: {
-              id: 'pal_radiant_stride',
-              name: 'Radiant Stride',
-              trigger: { on: 'shieldConsumed', ability: 'divine_protection' },
-              responses: [
-                {
-                  kind: 'aura',
-                  auraKind: 'buff_speed',
-                  value: 1.4,
-                  duration: 5,
-                  name: 'Radiant Stride',
-                },
-              ],
-            },
+            ability: [
+              {
+                ability: 'solar_step',
+                durationFlat: 2,
+                addEffects: [{ type: 'selfBuff', kind: 'slow_immunity', value: 1, duration: 2 }],
+              },
+            ],
           },
         },
         {
-          id: 'pal_r5_pilgrims_light',
-          name: "Pilgrim's Light",
-          description: 'Mending Light is castable while moving.',
-          icon: 'holy_light',
-          effect: { ability: [{ ability: 'holy_light', castWhileMoving: true }] },
-        },
-        {
-          id: 'pal_r5_evasive_faith',
-          name: 'Evasive Faith',
+          id: 'pal_r5_divine_steed',
+          name: 'Divine Steed',
           description:
-            'When you take a hit for at least 20% of your maximum health, gain 50% movement speed for 4 sec. Every 20 sec.',
-          icon: 'seal_of_righteousness',
+            'Gain 0.75% movement speed per Devotion, up to 15% at 20. Activating Divine Ascension spends your Devotion and grants 30% movement speed for 5 sec.',
+          icon: 'divine_ascension',
           effect: {
-            proc: {
-              id: 'pal_evasive_faith',
-              name: 'Evasive Faith',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
-              responses: [
-                {
-                  kind: 'aura',
-                  auraKind: 'buff_speed',
-                  value: 1.5,
-                  duration: 4,
-                  name: 'Evasive Faith',
-                },
-              ],
-            },
+            global: { paladinDivineSteed: 0.15, paladinDivineSteedBurstPct: 0.3 },
           },
         },
       ],
     },
     {
       level: 8,
-      theme: 'control',
-      decision: 'shorter stun cadence vs a banked second stun vs a silencing ricochet',
+      theme: 'survival',
+      decision: 'a stronger personal ward vs a stronger emergency heal vs shielding overhealing',
       options: [
         {
-          id: 'pal_r8_lingering_yoke',
-          name: 'Lingering Yoke',
-          description: "Sundering Gavel's cooldown is reduced by 30%.",
-          icon: 'hammer_of_justice',
-          effect: { ability: [{ ability: 'hammer_of_justice', cooldownPct: -0.3 }] },
+          id: 'pal_r8_enduring_protection',
+          name: 'Enduring Protection',
+          description: 'Ward of Faith absorbs 50% more damage and lasts 5 sec longer.',
+          icon: 'divine_protection',
+          effect: {
+            ability: [{ ability: 'divine_protection', dmgPct: 0.5, durationFlat: 5 }],
+          },
         },
         {
-          id: 'pal_r8_twin_gavels',
-          name: 'Twin Gavels',
-          description: 'Sundering Gavel stores 2 uses.',
-          icon: 'hammer_of_justice',
-          effect: { ability: [{ ability: 'hammer_of_justice', bonusCharges: 1 }] },
+          id: 'pal_r8_steady_hands',
+          name: 'Steady Hands',
+          description:
+            'Last Rite recharges 30% faster and heals the target for another 30% of its direct healing over 6 sec.',
+          icon: 'lay_on_hands',
+          effect: {
+            ability: [{ ability: 'lay_on_hands', cooldownPct: -0.3 }],
+            global: { paladinSteadyHandsHotPct: 0.3 },
+          },
         },
         {
-          id: 'pal_r8_cleansing_verdict',
-          name: 'Cleansing Verdict',
-          description: 'Grants Cleansing Verdict.',
-          icon: 'cleansing_verdict',
-          effect: { grant: { ability: 'cleansing_verdict' } },
+          id: 'pal_r8_recurring_grace',
+          name: 'Recurring Grace',
+          description:
+            'Hammer of Grace overhealing becomes an absorb shield for 10 sec, capped at 10% of your maximum health.',
+          icon: 'hammer_of_grace',
+          effect: { global: { paladinRecurringGrace: 0.1 } },
         },
       ],
     },
     {
       level: 11,
-      theme: 'mitigation',
-      decision: 'stronger shields vs an emergency shield vs an emergency heal',
+      theme: 'control',
+      decision: 'a shorter stun cooldown vs two stored stuns vs a ranged slow',
       options: [
         {
-          id: 'pal_r11_sacred_bulwark',
-          name: 'Sacred Bulwark',
-          description: 'Your absorb shields are 25% stronger.',
-          icon: 'divine_protection',
-          effect: { global: { absorbPct: 0.25 } },
+          id: 'pal_r11_fist_of_justice',
+          name: 'Fist of Justice',
+          description: "Sundering Gavel's cooldown is reduced by 25%.",
+          icon: 'hammer_of_justice',
+          effect: { ability: [{ ability: 'hammer_of_justice', cooldownPct: -0.25 }] },
         },
         {
-          id: 'pal_r11_bastion_aegis',
-          name: 'Bastion Aegis',
-          description:
-            'When you take a hit for at least 20% of your maximum health, shield yourself for 15% of your maximum health for 8 sec. Every 20 sec.',
-          icon: 'devotion_aura',
-          effect: {
-            proc: {
-              id: 'pal_bastion_aegis',
-              name: 'Bastion Aegis',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
-              responses: [
-                { kind: 'absorb', amountPctMaxHp: 0.15, duration: 8, name: 'Bastion Aegis' },
-              ],
-            },
-          },
+          id: 'pal_r11_double_sentence',
+          name: 'Double Sentence',
+          description: 'Sundering Gavel stores 2 uses.',
+          icon: 'hammer_of_justice',
+          effect: { ability: [{ ability: 'hammer_of_justice', bonusCharges: 1 }] },
         },
         {
-          id: 'pal_r11_ardent_renewal',
-          name: 'Ardent Renewal',
-          description:
-            'When you take a hit for at least 20% of your maximum health, heal yourself for 12% of your maximum health. Every 20 sec.',
-          icon: 'holy_light',
+          id: 'pal_r11_radiant_shackles',
+          name: 'Radiant Shackles',
+          description: 'Hammer of Grace slows its target by 40% for 4 sec.',
+          icon: 'hammer_of_grace',
           effect: {
-            proc: {
-              id: 'pal_ardent_renewal',
-              name: 'Ardent Renewal',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
-              responses: [{ kind: 'heal', amountPctMaxHp: 0.12 }],
-            },
+            ability: [
+              {
+                ability: 'hammer_of_grace',
+                addEffects: [{ type: 'slow', mult: 0.6, duration: 4 }],
+              },
+            ],
           },
         },
       ],
     },
     {
       level: 14,
-      theme: 'resolve',
-      decision: 'cleanse the next lockout vs a bubble on demand vs cheat death',
+      theme: 'devotion',
+      decision: 'extra generation cadence vs a post-Ascension reserve vs charge conservation',
       options: [
         {
-          id: 'pal_r14_steadfast_spirit',
-          name: 'Steadfast Spirit',
+          id: 'pal_r14_zeal',
+          name: 'Zeal',
           description:
-            'Every 20 sec, the next stun, root, or silence to hit you is instantly cleansed.',
-          icon: 'divine_protection',
-          effect: { global: { temporalRift: 1 } },
+            'Every third ability that actually generates Devotion grants 1 extra Devotion.',
+          icon: 'divine_ascension',
+          effect: { global: { paladinZeal: 1 } },
         },
         {
-          id: 'pal_r14_lightward',
-          name: 'Lightward',
-          description: 'Grants Lightward.',
-          icon: 'divine_shield',
-          effect: { grant: { ability: 'divine_shield' } },
+          id: 'pal_r14_sacred_reserve',
+          name: 'Sacred Reserve',
+          description: 'When Divine Ascension ends, regain 5 Devotion.',
+          icon: 'divine_ascension',
+          effect: { global: { paladinSacredReserve: 5 } },
         },
         {
-          id: 'pal_r14_deathless_ardor',
-          name: 'Deathless Ardor',
-          description:
-            'A blow that would kill you leaves you at 1 health instead. Once every 180 sec.',
-          icon: 'divine_protection',
-          effect: { global: { cheatDeathIcd: 180 } },
+          id: 'pal_r14_divine_purpose',
+          name: 'Divine Purpose',
+          description: 'Ascension-empowered abilities have a 20% chance not to consume a charge.',
+          icon: 'divine_ascension',
+          effect: { global: { paladinDivinePurposeChance: 0.2 } },
         },
       ],
     },
     {
       level: 17,
       theme: 'dawn',
-      decision: 'empower more of Divine Ascension vs a mobile Ascension vs a warded Ascension',
+      decision: 'more Ascension charges vs longer Avenging Wrath vs crit and haste during it',
       options: [
         {
           id: 'pal_r17_extended_dawn',
@@ -437,57 +412,63 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           effect: { global: { ascensionChargeBonus: 2 } },
         },
         {
-          id: 'pal_r17_dawns_path',
-          name: "Dawn's Path",
+          id: 'pal_r17_radiant_wrath',
+          name: 'Radiant Wrath',
           description:
-            'Activating Divine Ascension frees you from roots and slows and grants 40% movement speed for 6 sec.',
-          icon: 'divine_protection',
-          effect: { global: { ascensionRush: 1 } },
+            'Avenging Wrath lasts 5 sec longer (20 sec total) and its cooldown is reduced to 100 sec.',
+          icon: 'avenging_wrath',
+          effect: {
+            ability: [{ ability: 'avenging_wrath', cooldownFlat: -20, durationFlat: 5 }],
+          },
         },
         {
-          id: 'pal_r17_aegis_of_devotion',
-          name: 'Aegis of Devotion',
-          description: 'Activating Divine Ascension reduces damage taken by 25% for 8 sec.',
-          icon: 'divine_shield',
-          effect: { global: { ascensionWard: 1 } },
+          id: 'pal_r17_sanctified_fervor',
+          name: 'Sanctified Fervor',
+          description: 'Avenging Wrath also grants 15% critical strike chance and 15% haste.',
+          icon: 'avenging_wrath',
+          effect: {
+            ability: [
+              {
+                ability: 'avenging_wrath',
+                addEffects: [
+                  { type: 'selfBuff', kind: 'buff_crit', value: 0.15, duration: 15 },
+                  { type: 'selfBuff', kind: 'buff_haste', value: 1.15, duration: 15 },
+                  { type: 'selfBuff', kind: 'buff_spellhaste', value: 0.15, duration: 15 },
+                ],
+              },
+            ],
+          },
         },
       ],
     },
     {
       level: 20,
-      theme: 'holy_arsenal',
-      decision: 'a wounded-target execute vs an area holy nova vs an emergency bulwark',
+      theme: 'capstone',
+      decision: 'empower active group auras vs direct-spell echoes vs a final solar burst',
       options: [
         {
-          id: 'pal_r20_tolling_hammer',
-          name: 'Hammer of Wrath',
-          description: 'Hammer of Wrath deals 15% more damage.',
-          icon: 'hammer_of_wrath',
-          effect: { ability: [{ ability: 'hammer_of_wrath', dmgPct: 0.15 }] },
-        },
-        {
-          id: 'pal_r20_wrathwing',
-          name: 'Avenging Wrath',
-          description: 'Avenging Wrath recharges 30 sec faster.',
-          icon: 'avenging_wrath',
-          effect: { ability: [{ ability: 'avenging_wrath', cooldownFlat: -30 }] },
-        },
-        {
-          id: 'pal_r20_sunfire_aegis',
-          name: 'Sunfire Aegis',
+          id: 'pal_r20_aura_mastery',
+          name: 'Aura Mastery',
           description:
-            'When you take a hit for at least 25% of your maximum health, shield yourself for 30% of your maximum health for 10 sec. Every 45 sec.',
-          icon: 'divine_shield',
-          effect: {
-            proc: {
-              id: 'pal_sunfire_aegis',
-              name: 'Sunfire Aegis',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.25, icd: 45 },
-              responses: [
-                { kind: 'absorb', amountPctMaxHp: 0.3, duration: 10, name: 'Sunfire Aegis' },
-              ],
-            },
-          },
+            'For 8 sec, empower every active Devotion and Requital Aura in your group. Devotion reduces damage by 15%; Requital deals 15 Holy damage. 120 sec cooldown. Multiple uses refresh instead of stacking.',
+          icon: 'devotion_ward',
+          effect: { grant: { ability: 'aura_mastery' } },
+        },
+        {
+          id: 'pal_r20_dawn_echo',
+          name: 'Dawn Echo',
+          description:
+            'Every third direct ability that actually generates Devotion repeats its primary direct damage or healing at 40% on the same target. An effective echo grants 1 Devotion. The echo cannot crit or trigger other echoes, and grants no Devotion during Divine Ascension.',
+          icon: 'divine_ascension',
+          effect: { global: { paladinDawnEcho: 0.4, paladinDawnEchoDevotion: 1 } },
+        },
+        {
+          id: 'pal_r20_perpetual_sun',
+          name: 'Perpetual Sun',
+          description:
+            'Consuming your last Ascension charge deals 150 Holy damage within 10 m, heals allies within 20 m for 150, then doubles ability Devotion generation for 5 sec. Expiration does not trigger it.',
+          icon: 'divine_ascension',
+          effect: { global: { paladinPerpetualSun: 150 } },
         },
       ],
     },

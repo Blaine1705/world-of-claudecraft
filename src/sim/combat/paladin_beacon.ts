@@ -3,7 +3,7 @@ import type { Entity } from '../types';
 
 export const BEACON_OF_LIGHT_ID = 'beacon_of_light';
 export const BEACON_OF_LIGHT_NAME = 'Beacon of Light';
-export const BEACON_HEAL_FRACTION = 0.75;
+export const BEACON_HEAL_FRACTION = 0.5;
 export const BEACON_TRANSFER_RADIUS = 60;
 
 // Re-casting and death own the real lifetime. This large finite timer keeps the
@@ -44,7 +44,8 @@ export function beaconTransferTarget(
     source.kind !== 'player' ||
     source.templateId !== 'paladin' ||
     source.dead ||
-    healedTarget.dead
+    healedTarget.dead ||
+    healedTarget.id === source.id
   ) {
     return null;
   }

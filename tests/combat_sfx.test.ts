@@ -246,7 +246,7 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
-  it('gives Ascension activation and each empowered impact a distinct sampled cue', () => {
+  it('gives each empowered Ascension impact a distinct sampled cue', () => {
     expect(
       spellFxCue({
         type: 'spellfx',
@@ -255,7 +255,7 @@ describe('combat SFX policy', () => {
         school: 'holy',
         fx: 'paladinAscensionStart',
       }),
-    ).toEqual({ key: 'spell_nova', anchorId: 10 });
+    ).toBeNull();
     for (const [impact, key, anchorId] of [
       ['offensive', 'wand_holy', 20],
       ['area', 'proj_holy', 10],
@@ -407,6 +407,9 @@ describe('combat SFX policy', () => {
     expect(auraApplyCue(gained, aura('buff_ap'))).toBe('buff_apply');
     expect(auraApplyCue(gained, aura('dot'))).toBe('debuff_apply');
     expect(auraApplyCue(gained, aura('buff_ap', -5))).toBe('debuff_apply');
+    for (const id of ['divine_ascension', 'dawns_path_speed', 'aegis_of_devotion_dr']) {
+      expect(auraApplyCue(gained, { ...aura('buff_ap', 5), id })).toBeNull();
+    }
     expect(auraApplyCue({ ...gained, gained: false }, aura('dot'))).toBeNull();
     expect(auraApplyCue(gained, null)).toBeNull();
   });

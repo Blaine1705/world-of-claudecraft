@@ -13,7 +13,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { AbilityEffect, Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import type { AbilityEffect, Entity, PlayerClass } from '../src/sim/types';
 
 type TestSim = Sim & {
   nextId: number;
@@ -38,26 +38,6 @@ function spawnTarget(sim: TestSim, player: Entity, distance = 12): Entity {
   sim.addEntity(target);
   player.facing = Math.atan2(target.pos.x - player.pos.x, target.pos.z - player.pos.z);
   sim.targetEntity(target.id, player.id);
-  return target;
-}
-
-function spawnTargetAt(
-  sim: TestSim,
-  player: Entity,
-  id: number,
-  xOffset: number,
-  zOffset: number,
-): Entity {
-  const target = createMob(id, MOBS.forest_wolf, 1, {
-    x: player.pos.x + xOffset,
-    y: player.pos.y,
-    z: player.pos.z + zOffset,
-  });
-  target.maxHp = 50_000;
-  target.hp = target.maxHp;
-  target.hostile = true;
-  target.aiState = 'idle';
-  sim.addEntity(target);
   return target;
 }
 
@@ -355,10 +335,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(target.auras.some((aura) => aura.id === 'fear_incap')).toBe(false);
   });
 
-  it.each([
-    ['paladin', 14, 'pal_r14_deathless_ardor', 180],
-    ['rogue', 17, 'rog_r17_cheat_death', 120],
-  ] as const)(
+  it.each([['rogue', 17, 'rog_r17_cheat_death', 120]] as const)(
     '%s cheat death saves once, honors its %d-row ICD, and rearms deterministically',
     (cls, level, optionId, icd) => {
       const selectedSim = () => {

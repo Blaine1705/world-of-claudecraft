@@ -31,14 +31,14 @@ import { isDispellableAura } from '../aura_classify';
 import { ITEMS, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
-import { FISH_REEL_WINDOW_ROD_BONUS_SEC, FISH_REEL_WINDOW_SEC } from '../professions/fishing';
-import { bestOwnedGatherToolTier } from '../professions/tools';
 import {
   canActivateDivineAscension,
   hasDevotion,
   paladinExecuteWindowActive,
   spendDevotion,
 } from '../paladin_devotion';
+import { FISH_REEL_WINDOW_ROD_BONUS_SEC, FISH_REEL_WINDOW_SEC } from '../professions/fishing';
+import { bestOwnedGatherToolTier } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -65,6 +65,7 @@ import {
   normAngle,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
+import { sharedCooldownIds } from './ability_cooldown_groups';
 import {
   hasUnbreakableMovementLock,
   isInStasis,
@@ -74,7 +75,6 @@ import {
   isUnbreakableControlAura,
   tonguesMult,
 } from './cc';
-import { sharedCooldownIds } from './ability_cooldown_groups';
 import {
   ARCANE_SURGE_ID,
   aetherDartsBoltBonus,
@@ -87,6 +87,7 @@ import {
   consumeNextAttackCrit,
   consumeNextCastCheap,
   consumeNextCastInstant,
+  consumeRadiantResonanceForDawn,
   hasFreeCostFor,
   hasScopedNextCastInstant,
   nextCastCheapMultiplier,
@@ -107,7 +108,18 @@ import {
   syncPaladinAegisProtection,
   tickPaladinAegis,
 } from './paladin_aegis';
+import { applyDawnsWrathOverride, dawnsWrathHammerActive } from './paladin_dawns_wrath';
+import {
+  clearRadiantResonanceReservation,
+  reserveRadiantResonance,
+} from './paladin_radiant_resonance';
+import {
+  applySolarReprisalOverride,
+  solarReprisalBypassesCooldown,
+  solarReprisalMakesAbilityFree,
+} from './paladin_solar_reprisal';
 import { paladinManaCostMultiplier } from './paladin_support';
+import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import {
   hasCastShield,
   noteSpellHit,
@@ -381,6 +393,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
         : res;
       applyAbility(ctx, p, meta, resolved);
     }
+    clearRadiantResonanceReservation(p);
     // the aim point is consumed by the resolved area effects; drop it so a later
     // non-aimed cast can't inherit a stale target point.
     p.castAim = null;
@@ -454,6 +467,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.channelTicksLeft = 0; // an interrupted channel owes no more ticks
   p.castAim = null;
   p.castTargetId = null;
+  clearRadiantResonanceReservation(p);
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
@@ -537,6 +551,10 @@ export function castAbility(
   const { meta, e: p } = r;
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res || p.dead) return;
+  if (isValkyrsCallingAirborne(p)) {
+    ctx.error(p.id, 'You are busy.');
+    return;
+  }
   // Passive traits are spellbook information and mechanics hooks, never actions.
   if (res.def.passive) return;
   if (abilityId === 'divine_ascension' && !canActivateDivineAscension(p)) {
@@ -627,7 +645,9 @@ export function castAbility(
     !hasAbilityCharge(p, ability.id, res.bonusCharges ?? 0, res.cooldown) &&
     // An armed Brain Freeze lets Flurry cast through its running cooldown
     // (combat/frost_mage.ts; the override below consumes the proc).
-    !brainFreezeBypassesCooldown(p, ability.id)
+    !brainFreezeBypassesCooldown(p, ability.id) &&
+    !dawnsWrathHammerActive(p, ability.id) &&
+    !solarReprisalBypassesCooldown(p, ability.id)
   ) {
     ctx.error(p.id, 'That ability is not ready yet.');
     return;
@@ -635,11 +655,18 @@ export function castAbility(
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
   const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
+  const freeBySolarReprisal = solarReprisalMakesAbilityFree(p, ability.id);
   const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
   const cheapCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
   const payableCost =
     p.resourceType === 'mana' ? Math.ceil(cheapCost * paladinManaCostMultiplier(p)) : cheapCost;
-  if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
+  if (
+    p.resource < payableCost &&
+    !canCastFree &&
+    !freeBySolarReprisal &&
+    !togglingOff &&
+    !formShiftKind(p, ability)
+  ) {
     ctx.error(
       p.id,
       p.resourceType === 'rage'
@@ -796,7 +823,8 @@ export function castAbility(
     if (
       targetOutsideExecuteWindow &&
       !(ability.id === 'execute' && p.auras.some((aura) => aura.kind === 'sudden_death')) &&
-      !paladinExecuteWindowActive(p, ability.id)
+      !paladinExecuteWindowActive(p, ability.id) &&
+      !dawnsWrathHammerActive(p, ability.id)
     ) {
       ctx.error(
         p.id,
@@ -838,13 +866,6 @@ export function castAbility(
           ctx.error(p.id, 'This creature cannot be polymorphed.');
           return;
         }
-      }
-      if (
-        eff.type === 'judgement' &&
-        !p.auras.some((a) => a.kind === 'imbue' && a.value2 !== undefined)
-      ) {
-        ctx.error(p.id, 'You have no active Seal.');
-        return;
       }
       if (eff.type === 'taunt' && target.kind !== 'mob') {
         ctx.error(p.id, 'You cannot taunt that.');
@@ -953,6 +974,14 @@ export function castAbility(
   // cost / cooldown reads below: the armed Flurry goes instant, skips its
   // cooldown and carries its 30% baked into the resolved effects.
   res = applyBrainFreezeOverride(ctx, p, res);
+  // Solar Reprisal shares one choice across the Protection Paladin's ranged
+  // strike, self-sustain strike, and ally-capable filler heal. Consume only
+  // after all cast gates succeed, then bake the chosen override into this cast.
+  res = applySolarReprisalOverride(ctx, p, res);
+  // Dawn's Wrath is a stored extra Hammer of Wrath cast, not a cooldown reset:
+  // consume it only after every cast gate succeeds, then leave any existing
+  // cooldown untouched by resolving this one cast with a zero-second cooldown.
+  res = applyDawnsWrathOverride(ctx, p, res);
 
   // Owner 2026-07-13: spell haste shortens the global cooldown (floored at MIN_GCD),
   // so gear/Bloodlust/Temporal Acceleration haste speeds the whole rotation, not just
@@ -974,6 +1003,7 @@ export function castAbility(
   if ((castTime === 0 || ability.channel) && !togglingOff) {
     if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
       res = { ...res, cost: 0 };
+      consumeRadiantResonanceForDawn(ctx, p, ability.id);
     } else if (res.cost > 0) {
       const cheap = consumeNextCastCheap(ctx, p, ability.id);
       if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
@@ -1035,6 +1065,7 @@ export function castAbility(
     // (combat/chronomancy.ts); 1x for every other cast, so nothing else is touched.
     const surgeCastMult = ability.id === ARCANE_SURGE_ID ? aetherSurgeCastMult(p) : 1;
     const stretchedCastTime = (castTime * tonguesMult(p) * surgeCastMult) / spellHasteMult(p);
+    reserveRadiantResonance(p, ability.id);
     p.castingAbility = ability.id;
     p.castTotal = stretchedCastTime;
     p.castRemaining = stretchedCastTime;
@@ -1650,6 +1681,7 @@ function applyAbility(
   }
   if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id)) {
     res = { ...res, cost: 0 };
+    consumeRadiantResonanceForDawn(ctx, p, ability.id);
   } else if (res.cost > 0 && !togglingOff) {
     const cheap = consumeNextCastCheap(ctx, p, ability.id);
     if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
@@ -1700,6 +1732,18 @@ function applyAbility(
       // A spell may override the flying-bolt visual (e.g. Lightning Bolt draws a
       // jagged electric strike); the projectile MECHANIC below is unchanged.
       fx: ability.projectileFx ?? 'projectile',
+      ...(ability.id === 'sunward_disc'
+        ? {
+            ability: ability.id,
+            level: 0,
+            count:
+              1 +
+              res.effects.reduce(
+                (jumps, effect) => (effect.type === 'chainDamage' ? effect.jumps : jumps),
+                0,
+              ),
+          }
+        : {}),
       ...(isSpell ? {} : { attackAnimation: 'ranged-shot' as const }),
     });
     // The bolt is now in flight: its hit roll and effects resolve when it reaches the

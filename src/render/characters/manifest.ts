@@ -24,6 +24,8 @@ export interface ClipMap {
   attack: string[];
   /** Optional per-ability swing or cast-gesture override. */
   attackByAbility?: Record<string, string>;
+  /** Playback rate for authored per-ability clips that must keep exact timing. */
+  attackTimeScaleByAbility?: Record<string, number>;
   /** Optional weapon-style override for plain auto attacks. */
   attackByHand?: { twohand?: string; dualwield?: string };
   death: string;
@@ -545,6 +547,12 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+      attackByAbility: {
+        final_edict: 'Paladin_Templars_Verdict_1H',
+        sunward_disc: 'Spellcast_Raise',
+        bastion_sweep: 'Paladin_Bastion_Sweep',
+      },
+      attackTimeScaleByAbility: { final_edict: 1, sunward_disc: 1.8, bastion_sweep: 1 },
     },
     // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
     // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive

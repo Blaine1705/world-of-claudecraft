@@ -1,14 +1,16 @@
 import * as THREE from 'three';
+import { surfaceMat } from './gfx';
 import type { PaladinAscensionVisualPlan } from './paladin_ascension_core';
 
-const SYMBOL_COUNT = 5;
 const REFERENCE_HEIGHT = 1.8;
-const TAU = Math.PI * 2;
-const HALO_GEOMETRY = new THREE.TorusGeometry(0.88, 0.035, 8, 40);
-const CROWN_GEOMETRY = new THREE.TorusGeometry(0.62, 0.018, 6, 32);
-const COLUMN_GEOMETRY = new THREE.CylinderGeometry(0.42, 0.72, 1, 24, 1, true);
+const SEAL_GEOMETRY = new THREE.PlaneGeometry(1, 1);
 const ASCENSION_GOLD = 0xffe88f;
-const LAST_CHARGE_AMBER = 0xffb34f;
+const CROWN_BAND_GEOMETRY = new THREE.CylinderGeometry(0.34, 0.36, 0.14, 24, 1, true);
+const CROWN_RIM_GEOMETRY = new THREE.TorusGeometry(0.35, 0.025, 6, 24);
+const CROWN_PRONG_GEOMETRY = new THREE.ConeGeometry(0.07, 0.36, 4);
+const CROWN_JEWEL_GEOMETRY = new THREE.SphereGeometry(0.045, 8, 6);
+const CROWN_PRONG_COUNT = 8;
+const HOVER_HEIGHT = 0.08;
 
 function buildSunSealTexture(): THREE.DataTexture {
   const size = 64;
@@ -40,126 +42,135 @@ function buildSunSealTexture(): THREE.DataTexture {
 
 const SUN_SEAL_TEXTURE = buildSunSealTexture();
 
-function haloMaterial(opacity: number): THREE.MeshBasicMaterial {
+function sealMaterial(): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({
     color: ASCENSION_GOLD,
+    map: SUN_SEAL_TEXTURE,
     transparent: true,
-    opacity,
+    opacity: 0.7,
     depthWrite: false,
+    side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
   });
 }
 
+function crownMaterial(): THREE.Material {
+  return surfaceMat({
+    color: 0xffca54,
+    emissive: 0x7a3600,
+    emissiveIntensity: 0.72,
+    metalness: 0.82,
+    roughness: 0.2,
+    side: THREE.DoubleSide,
+  });
+}
+
+function buildSolarCrown(material: THREE.Material): THREE.Group {
+  const crown = new THREE.Group();
+  crown.name = 'paladin-ascension-solar-crown';
+
+  const band = new THREE.Mesh(CROWN_BAND_GEOMETRY, material);
+  band.name = 'paladin-ascension-crown-band';
+  crown.add(band);
+
+  for (const [name, y] of [
+    ['lower', -0.07],
+    ['upper', 0.07],
+  ] as const) {
+    const rim = new THREE.Mesh(CROWN_RIM_GEOMETRY, material);
+    rim.name = `paladin-ascension-crown-${name}-rim`;
+    rim.rotation.x = Math.PI / 2;
+    rim.position.y = y;
+    crown.add(rim);
+  }
+
+  const prongs = new THREE.InstancedMesh(CROWN_PRONG_GEOMETRY, material, CROWN_PRONG_COUNT);
+  prongs.name = 'paladin-ascension-crown-prongs';
+  const jewels = new THREE.InstancedMesh(CROWN_JEWEL_GEOMETRY, material, CROWN_PRONG_COUNT);
+  jewels.name = 'paladin-ascension-crown-jewels';
+  const transform = new THREE.Object3D();
+  for (let index = 0; index < CROWN_PRONG_COUNT; index++) {
+    const angle = (index / CROWN_PRONG_COUNT) * Math.PI * 2;
+    const prongHeight = index % 2 === 0 ? 0.36 : 0.29;
+    transform.position.set(Math.cos(angle) * 0.3, 0.08 + prongHeight / 2, Math.sin(angle) * 0.3);
+    transform.scale.set(1, prongHeight / 0.36, 1);
+    transform.rotation.set(0, -angle + Math.PI / 4, 0);
+    transform.updateMatrix();
+    prongs.setMatrixAt(index, transform.matrix);
+
+    transform.position.set(Math.cos(angle) * 0.3, 0.09 + prongHeight, Math.sin(angle) * 0.3);
+    transform.scale.setScalar(1);
+    transform.rotation.set(0, 0, 0);
+    transform.updateMatrix();
+    jewels.setMatrixAt(index, transform.matrix);
+  }
+  prongs.instanceMatrix.needsUpdate = true;
+  jewels.instanceMatrix.needsUpdate = true;
+  crown.add(prongs, jewels);
+
+  return crown;
+}
+
 export class PaladinAscensionVisual {
   readonly group = new THREE.Group();
-  private readonly groundHalo: THREE.Mesh<THREE.TorusGeometry, THREE.MeshBasicMaterial>;
-  private readonly crown: THREE.Mesh<THREE.TorusGeometry, THREE.MeshBasicMaterial>;
-  private readonly auraColumn: THREE.Mesh<THREE.CylinderGeometry, THREE.MeshBasicMaterial>;
-  private readonly seals: THREE.Sprite[] = [];
-  private time = 0;
+  private readonly groundSeal: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
+  private readonly solarCrown: THREE.Group;
+  private readonly solarCrownMaterial: THREE.Material;
+  private readonly size: number;
+  private readonly crownBaseY: number;
+  private hoverTarget: THREE.Object3D | null = null;
+  private hoverBaseY = 0;
 
-  constructor(private readonly characterHeight: number) {
+  constructor(characterHeight: number) {
     this.group.name = 'paladin-ascension-visual';
     this.group.visible = false;
 
-    this.groundHalo = new THREE.Mesh(HALO_GEOMETRY, haloMaterial(0.66));
-    this.groundHalo.name = 'paladin-ascension-ground-halo';
-    this.groundHalo.rotation.x = Math.PI / 2;
-    this.groundHalo.position.y = 0.07;
-    this.groundHalo.renderOrder = 8;
-    this.group.add(this.groundHalo);
+    this.size = Math.max(0.72, Math.min(1.4, characterHeight / REFERENCE_HEIGHT));
+    this.groundSeal = new THREE.Mesh(SEAL_GEOMETRY, sealMaterial());
+    this.groundSeal.name = 'paladin-ascension-ground-seal';
+    this.groundSeal.rotation.x = -Math.PI / 2;
+    this.groundSeal.position.y = 0.055;
+    this.groundSeal.scale.setScalar(1.65 * this.size);
+    this.groundSeal.renderOrder = 8;
+    this.group.add(this.groundSeal);
 
-    this.crown = new THREE.Mesh(CROWN_GEOMETRY, haloMaterial(0.42));
-    this.crown.name = 'paladin-ascension-crown';
-    this.crown.rotation.x = Math.PI / 2;
-    this.crown.position.y = characterHeight * 0.68;
-    this.crown.renderOrder = 8;
-    this.group.add(this.crown);
-
-    this.auraColumn = new THREE.Mesh(
-      COLUMN_GEOMETRY,
-      new THREE.MeshBasicMaterial({
-        color: ASCENSION_GOLD,
-        transparent: true,
-        opacity: 0.1,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-        blending: THREE.AdditiveBlending,
-      }),
-    );
-    this.auraColumn.name = 'paladin-ascension-column';
-    this.auraColumn.position.y = characterHeight * 0.52;
-    this.auraColumn.scale.set(1, characterHeight * 1.12, 1);
-    this.auraColumn.renderOrder = 7;
-    this.group.add(this.auraColumn);
-
-    for (let index = 0; index < SYMBOL_COUNT; index++) {
-      const seal = new THREE.Sprite(
-        new THREE.SpriteMaterial({
-          map: SUN_SEAL_TEXTURE,
-          color: 0xffefaa,
-          transparent: true,
-          opacity: 0.95,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-        }),
-      );
-      seal.name = `paladin-ascension-seal-${index + 1}`;
-      seal.renderOrder = 10;
-      this.seals.push(seal);
-      this.group.add(seal);
-    }
+    this.solarCrownMaterial = crownMaterial();
+    this.solarCrown = buildSolarCrown(this.solarCrownMaterial);
+    this.crownBaseY = characterHeight + 0.2 * this.size;
+    this.solarCrown.position.y = this.crownBaseY;
+    this.solarCrown.scale.setScalar(0.94 * this.size);
+    this.group.add(this.solarCrown);
   }
 
-  update(plan: PaladinAscensionVisualPlan, dt: number, reducedMotion: boolean): void {
+  update(
+    plan: PaladinAscensionVisualPlan,
+    _dt: number,
+    _reducedMotion: boolean,
+    hoverTarget: THREE.Object3D | null = null,
+  ): void {
+    this.setHoverTarget(hoverTarget);
     this.group.visible = plan.active;
-    if (!plan.active) return;
-
-    if (!reducedMotion) this.time += Math.max(0, dt);
-    const size = Math.max(0.72, Math.min(1.4, this.characterHeight / REFERENCE_HEIGHT));
-    const orbitRadius = 0.83 * size;
-    const orbitY = this.characterHeight * 0.68;
-    const speed = plan.lastCharge ? 2.15 : 0.82;
-    const phase = reducedMotion ? 0.35 : this.time * speed;
-
-    this.groundHalo.rotation.z = phase * 0.45;
-    this.crown.rotation.z = -phase * 0.72;
-    const haloPulse = reducedMotion
-      ? 1
-      : 1 + Math.sin(this.time * (plan.lastCharge ? 8 : 3.5)) * 0.07;
-    const activeColor = plan.lastCharge ? LAST_CHARGE_AMBER : ASCENSION_GOLD;
-    this.groundHalo.material.color.setHex(activeColor);
-    this.crown.material.color.setHex(activeColor);
-    this.auraColumn.material.color.setHex(activeColor);
-    this.groundHalo.scale.setScalar(size * haloPulse);
-    this.crown.scale.setScalar(size * (2 - haloPulse));
-    this.auraColumn.rotation.y = phase * 0.24;
-    this.auraColumn.material.opacity = reducedMotion
-      ? 0.1
-      : 0.085 + (haloPulse - 0.93) * (plan.lastCharge ? 0.9 : 0.45);
-
-    for (let index = 0; index < this.seals.length; index++) {
-      const seal = this.seals[index];
-      seal.visible = index < plan.charges;
-      if (!seal.visible) continue;
-      const angle = phase + (index / SYMBOL_COUNT) * TAU;
-      seal.position.set(
-        Math.cos(angle) * orbitRadius,
-        orbitY + (reducedMotion ? 0 : Math.sin(this.time * 2.4 + index) * 0.1 * size),
-        Math.sin(angle) * orbitRadius,
-      );
-      const pulse = plan.lastCharge && !reducedMotion ? 1.18 + Math.sin(this.time * 8) * 0.18 : 1;
-      seal.scale.setScalar(0.42 * size * pulse);
-      seal.material.rotation = -phase - angle * 0.18;
-      seal.material.opacity = plan.lastCharge ? 1 : 0.9;
-    }
+    const hoverOffset = plan.active ? HOVER_HEIGHT * this.size : 0;
+    if (this.hoverTarget) this.hoverTarget.position.y = this.hoverBaseY + hoverOffset;
+    this.solarCrown.position.y = this.crownBaseY + hoverOffset;
   }
 
   dispose(): void {
-    this.groundHalo.material.dispose();
-    this.crown.material.dispose();
-    this.auraColumn.material.dispose();
-    for (const seal of this.seals) seal.material.dispose();
+    this.restoreHoverTarget();
+    this.groundSeal.material.dispose();
+    this.solarCrownMaterial.dispose();
+  }
+
+  private setHoverTarget(target: THREE.Object3D | null): void {
+    if (target === this.hoverTarget) return;
+    this.restoreHoverTarget();
+    this.hoverTarget = target;
+    this.hoverBaseY = target?.position.y ?? 0;
+  }
+
+  private restoreHoverTarget(): void {
+    if (this.hoverTarget) this.hoverTarget.position.y = this.hoverBaseY;
+    this.hoverTarget = null;
   }
 }
 
@@ -170,12 +181,13 @@ export function syncPaladinAscensionVisual(
   plan: PaladinAscensionVisualPlan,
   dt: number,
   reducedMotion: boolean,
+  hoverTarget: THREE.Object3D | null = null,
 ): PaladinAscensionVisual | null {
   let current = visual;
   if (plan.active && !current) {
     current = new PaladinAscensionVisual(characterHeight);
     parent.add(current.group);
   }
-  current?.update(plan, dt, reducedMotion);
+  current?.update(plan, dt, reducedMotion, hoverTarget);
   return current;
 }

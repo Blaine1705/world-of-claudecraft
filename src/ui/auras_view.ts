@@ -138,9 +138,9 @@ export interface AurasDeps {
   auraName(aura: AuraInput): string;
   /** The formatted stack count (host: `formatNumber(stacks, {maximumFractionDigits:0})`). */
   formatStacks(stacks: number): string;
-  /** The one-line aura effect-summary HTML the tooltip prepends (or '' when the aura has
-   *  no descriptor). Injected so the i18n-free core never calls t(): the host builds the
-   *  localized, esc'd HTML from the pure aura_effect descriptor. */
+  /** The localized, escaped tooltip body the tooltip prepends (or '' when unavailable).
+   *  The host may include the source ability description plus the one-line runtime
+   *  aura-effect summary; the i18n-free core never calls t(). */
   auraEffectHtml(aura: AuraInput): string;
   /** The localized single-letter duration unit suffixes the compact label appends
    *  (host: `t('hudChrome.unitFrame.durationUnitSeconds'/'...Minutes'/'...Hours'/

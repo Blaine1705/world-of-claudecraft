@@ -2444,7 +2444,7 @@ export class ClientWorld implements IWorld {
       }
       e.rangedPower = w.rp ?? 0;
       if (w.pasc !== undefined && e.kind === 'player' && e.templateId === 'paladin') {
-        const ascensionCharges = Math.max(0, Math.min(5, Math.floor(Number(w.pasc) || 0)));
+        const ascensionCharges = Math.max(0, Math.floor(Number(w.pasc) || 0));
         e.paladinDevotion ??= {
           value: 0,
           ascensionCharges: 0,
@@ -2834,7 +2834,7 @@ export class ClientWorld implements IWorld {
       if (s.sport !== undefined) this.sportRole = s.sport ? (s.sport.role ?? null) : null;
       this.known = this.sportRole
         ? resolveSportKit(this.sportRole)
-        : abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods);
+        : abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
@@ -3025,6 +3025,7 @@ export class ClientWorld implements IWorld {
           }
         : undefined,
       cadenceBlocked,
+      this.cfg?.playerClass,
     );
   }
 

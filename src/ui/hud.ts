@@ -124,7 +124,12 @@ import {
 } from './ability_damage';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameFromSource } from './aura_display_name';
-import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
+import {
+  type AuraEffectInput,
+  auraEffectDescriptor,
+  auraEffectMaximumFractionDigits,
+} from './aura_effect';
+import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
@@ -402,9 +407,9 @@ import { MobileMoreDialogController } from './mobile_more_dialog';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
-import { PartyBelowTargetPainter } from './party_below_target_painter';
 import { PaladinDevotionPainter } from './paladin_devotion_painter';
 import { createPaladinDevotionView } from './paladin_devotion_view';
+import { PartyBelowTargetPainter } from './party_below_target_painter';
 import { loadPartyCollapsed, savePartyCollapsed } from './party_collapse';
 import type { PartyRowAuraDeps } from './party_frame_row';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
@@ -1184,6 +1189,7 @@ export class Hud {
   // closure reads it from here).
   private targetPortraitSubject: Entity | null = null;
   private comboRowEl = $('#combo-row');
+  private paladinDevotionFrameEl = $('#paladin-devotion-frame');
   private paladinDevotionEl = $('#paladin-devotion');
   private paladinDevotionFillEl = $('#paladin-devotion-fill');
   private paladinDevotionLabelEl = $('#paladin-devotion-label');
@@ -1729,6 +1735,10 @@ export class Hud {
     this.chatWindow.init();
     this.chatGeometry.init();
     this.initFrameMovers();
+    attachOverlayDrag(this.paladinDevotionFrameEl, 'paladinDevotionAnchor', {
+      fx: 0.5,
+      fy: 0.72,
+    });
     this.initWindowManagement();
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
     this.actionBarController.init();
@@ -3227,6 +3237,7 @@ export class Hud {
   );
   private readonly paladinDevotionPainter = new PaladinDevotionPainter(
     this.writerFacet,
+    this.paladinDevotionFrameEl,
     this.paladinDevotionEl,
     this.paladinDevotionFillEl,
     this.paladinDevotionLabelEl,
@@ -3495,7 +3506,7 @@ export class Hud {
       u.d = t('hudChrome.unitFrame.durationUnitDays');
       return u;
     },
-    auraEffectHtml: (a) => this.auraEffectTooltipHtml(a),
+    auraEffectHtml: (a) => this.auraTooltipBodyHtml(a),
     // Own-aura check for the target strip's ownFirst prominence: a missing/zero
     // sourceId (an old server's mirror) is never own, so the strip degrades to
     // the un-prioritized layout instead of misattributing another caster's dot.
@@ -4314,16 +4325,42 @@ export class Hud {
       });
   }
 
+  // Complete aura tooltip body. A buff created by a known ability first shows that
+  // ability's localized, rank/talent-resolved description; the mechanical one-line
+  // descriptor follows when the aura kind has one. Proc-only auras without an ability
+  // definition still retain their descriptor. This keeps new ability buffs from
+  // silently degrading to name + timer just because their AuraKind is new.
+  private auraTooltipBodyHtml(a: AuraEffectInput & { id?: string }): string {
+    if (!a.id) return this.auraEffectTooltipHtml(a);
+    return renderAuraTooltipBodyHtml(a as AuraEffectInput & { id: string }, {
+      abilityDescription: (id) => {
+        const res = this.previewResolvedAbility(id);
+        if (!res) return null;
+        const p = this.sim.player;
+        const scaling: AbilityScaling = {
+          spellPower: p.spellPower,
+          rangedPower: p.rangedPower,
+          attackPower: p.attackPower,
+        };
+        return abilityDisplayDescription(res, abilityEffectText(res, scaling), scaling);
+      },
+      effectHtml: (aura) => this.auraEffectTooltipHtml(aura),
+      escapeHtml: esc,
+    });
+  }
+
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
   // (aura_effect.ts) resolved to localized, esc'd text. Empty when the aura has no
-  // descriptor. Injected into the auras view so the i18n-free core never calls t().
+  // descriptor.
   private auraEffectTooltipHtml(a: AuraEffectInput & { id?: string }): string {
     const effect = auraEffectDescriptor(a);
     if (!effect) return '';
     const values: Record<string, string> = {};
     if (effect.nums) {
       for (const [k, n] of Object.entries(effect.nums)) {
-        values[k] = formatNumber(n, { maximumFractionDigits: 0 });
+        values[k] = formatNumber(n, {
+          maximumFractionDigits: auraEffectMaximumFractionDigits(n),
+        });
       }
     }
     // Resolve the {school} placeholder in the dot/absorb/thorns summaries. Prefer
@@ -14187,6 +14224,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       case 'aoeRoot':
       case 'groundAoE':
       case 'drainTick':
+      case 'valkyrsCalling':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
       case 'repositionToAim':
         return primary.landingAoe

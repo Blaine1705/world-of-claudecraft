@@ -28,6 +28,7 @@ function recordingWriters(): { calls: Call[]; writers: PainterHostWriters } {
 }
 
 const ROOT = { id: 'root' } as unknown as HTMLElement;
+const FRAME = { id: 'frame' } as unknown as HTMLElement;
 const FILL = { id: 'fill' } as unknown as HTMLElement;
 const LABEL = { id: 'label' } as unknown as HTMLElement;
 const STATUS = { id: 'status' } as unknown as HTMLElement;
@@ -38,7 +39,7 @@ const CHARGES = Array.from(
 
 function paint(state: PaladinDevotionState): Call[] {
   const { calls, writers } = recordingWriters();
-  new PaladinDevotionPainter(writers, ROOT, FILL, LABEL, CHARGES, STATUS).paint(state);
+  new PaladinDevotionPainter(writers, FRAME, ROOT, FILL, LABEL, CHARGES, STATUS).paint(state);
   return calls;
 }
 
@@ -58,8 +59,8 @@ describe('PaladinDevotionPainter', () => {
     });
 
     expect(calls.slice(0, 9)).toEqual([
-      { method: 'setDisplay', args: [ROOT, 'flex'] },
-      { method: 'setStyleProp', args: [FILL, '--devotion-fill', '100.0%'] },
+      { method: 'setDisplay', args: [FRAME, 'flex'] },
+      { method: 'setStyleProp', args: [FILL, '--devotion-scale', '1.000'] },
       { method: 'setText', args: [LABEL, '20 / 20'] },
       { method: 'setAttr', args: [ROOT, 'aria-valuenow', '20'] },
       { method: 'setAttr', args: [ROOT, 'aria-valuetext', 'Devotion 20 of 20'] },
@@ -92,7 +93,7 @@ describe('PaladinDevotionPainter', () => {
 
     expect(calls).toContainEqual({
       method: 'setStyleProp',
-      args: [FILL, '--devotion-fill', '30.0%'],
+      args: [FILL, '--devotion-scale', '0.300'],
     });
     expect(calls).toContainEqual({ method: 'toggleClass', args: [ROOT, 'ascended', true] });
     expect(calls.slice(9).map((call) => call.args[2])).toEqual([true, true, true, false, false]);
@@ -124,6 +125,40 @@ describe('PaladinDevotionPainter', () => {
       'utf8',
     );
     expect(source).not.toMatch(/\.style\b|\.textContent\b|\.classList\b|\.setAttribute\b/);
+  });
+
+  it('styles Devotion as a bottom-up liquid medallion with a distinct full state', () => {
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const mobileCss = readFileSync(
+      new URL('../src/styles/hud.mobile.css', import.meta.url),
+      'utf8',
+    );
+    const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+
+    expect(css).toMatch(/\.paladin-devotion::before[\s\S]*clip-path:\s*polygon\(/);
+    expect(css).toMatch(
+      /\.paladin-devotion-fill::before[\s\S]*transform:\s*scaleY\(var\(--devotion-scale\)\)/,
+    );
+    expect(css).toMatch(/\.paladin-devotion\.ready \.paladin-devotion-fill::after/);
+    expect(css).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.paladin-devotion-fill::before/,
+    );
+    expect(css).toMatch(
+      /\.paladin-devotion-frame\s*\{[\s\S]*position:\s*fixed;[\s\S]*width:\s*96px/,
+    );
+    expect(mobileCss).toMatch(/body\.mobile-touch \.paladin-devotion-frame[\s\S]*width:\s*72px/);
+
+    const devotionAt = html.indexOf('id="paladin-devotion"');
+    const playerFrameAt = html.indexOf('id="player-frame"');
+    const bottomBarAt = html.indexOf('id="bottom-bar"');
+    expect(devotionAt).toBeGreaterThan(-1);
+    expect(devotionAt).toBeLessThan(bottomBarAt);
+    expect(playerFrameAt).toBeGreaterThan(bottomBarAt);
+    expect(hud).toContain("attachOverlayDrag(this.paladinDevotionFrameEl, 'paladinDevotionAnchor'");
+    expect(hud).not.toContain('devotionFrameMover');
+    expect(css).toMatch(/\.paladin-devotion-frame\s*\{[\s\S]*cursor:\s*grab/);
+    expect(css).toMatch(/\.paladin-devotion-frame\.dragging\s*\{[\s\S]*cursor:\s*grabbing/);
   });
 });
 

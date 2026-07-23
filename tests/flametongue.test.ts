@@ -43,7 +43,7 @@ describe('Flametongue Weapon (shaman fire imbue)', () => {
     const imbue = p.auras.find((a) => a.kind === 'imbue' && a.id === 'flametongue_weapon');
     expect(imbue).toBeDefined();
     expect(imbue!.value).toBe(8);
-    // a pure damage imbue, not a paladin seal (no judgement min/max)
+    // a pure damage weapon imbue
     expect(imbue!.value2).toBeUndefined();
   });
 

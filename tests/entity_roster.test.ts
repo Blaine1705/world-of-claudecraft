@@ -9,6 +9,7 @@ import { createDeedRuntime } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
 import {
   addEntityToRoster,
+  type DelayedEvent,
   drainDelayedEvents,
   dropEntityFromRoster,
   type GroundAoE,
@@ -49,7 +50,7 @@ function makeCtx() {
   const players = new Map();
   const cfg = { seed: 1 } as unknown as SimContextHost['cfg'];
   const clock = { time: 0, tick: 0 };
-  let delayedEvents: { at: number; event: any; guard?: () => boolean }[] = [];
+  let delayedEvents: DelayedEvent[] = [];
   let pendingProjectiles: any[] = [];
   const emit = vi.fn();
   const clearEntityMarker = vi.fn();
@@ -505,6 +506,20 @@ describe('entity_roster: delayed-event drain (isolated ctx)', () => {
     expect(t.emit).toHaveBeenCalledWith({ type: 'respawn', pid: 1 });
     expect(t.emit).toHaveBeenCalledWith({ type: 'respawn', pid: 3 });
     expect(t.delayed()).toEqual([{ at: 100, event: { type: 'respawn', pid: 4 } }]);
+  });
+
+  it('runs a due deterministic callback once without emitting a wire event', () => {
+    const t = makeCtx();
+    const resolve = vi.fn();
+    t.clock.time = 10;
+    t.ctx.delayedEvents = [{ at: 10, resolve }];
+
+    drainDelayedEvents(t.ctx);
+    drainDelayedEvents(t.ctx);
+
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(t.emit).not.toHaveBeenCalled();
+    expect(t.delayed()).toEqual([]);
   });
 
   it('is a no-op (no allocation churn) when there are no delayed events', () => {

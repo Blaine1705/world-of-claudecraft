@@ -257,6 +257,7 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
+  'src/render/paladin_sun_verdict_core.ts',
   'src/render/prewarm_policy.ts',
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',

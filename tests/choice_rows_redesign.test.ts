@@ -230,53 +230,6 @@ describe('shaman redesign', () => {
 });
 
 describe('paladin redesign', () => {
-  it('Ardent Renewal: a heavy hit heals you, versus no talent', () => {
-    const run = (rows: Record<number, string>) => {
-      const { sim, p } = rig('paladin', 20, rows);
-      const deal = (
-        sim as unknown as {
-          dealDamage(
-            s: Entity | null,
-            t: Entity,
-            n: number,
-            c: boolean,
-            sc: string,
-            a: string | null,
-            k: string,
-          ): void;
-        }
-      ).dealDamage.bind(sim);
-      p.hp = Math.round(p.maxHp * 0.7);
-      // a hit worth at least 20% of max health is a heavy hit that fires the proc
-      deal(null, p, Math.round(p.maxHp * 0.5), false, 'holy', null, 'hit');
-      return p.hp;
-    };
-    // same seed and same hit both runs: the only difference is the 12% self-heal
-    expect(run({ 11: 'pal_r11_ardent_renewal' })).toBeGreaterThan(run({}));
-  });
-
-  it('Deathless Ardor: a killing blow leaves 1 health, once per 180 sec', () => {
-    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_deathless_ardor' });
-    const deal = (
-      sim as unknown as {
-        dealDamage(
-          s: Entity | null,
-          t: Entity,
-          n: number,
-          c: boolean,
-          sc: string,
-          a: string | null,
-          k: string,
-        ): void;
-      }
-    ).dealDamage.bind(sim);
-    deal(null, p, p.hp + 500, false, 'physical', null, 'hit');
-    expect(p.dead).toBe(false);
-    expect(p.hp).toBe(1);
-    deal(null, p, 50, false, 'physical', null, 'hit'); // inside the ICD: dies
-    expect(p.dead).toBe(true);
-  });
-
   it('Extended Dawn: Divine Ascension gains 2 additional charges', () => {
     const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_extended_dawn' });
     if (!p.paladinDevotion) throw new Error('no devotion');
@@ -285,20 +238,22 @@ describe('paladin redesign', () => {
     expect(p.paladinDevotion.ascensionCharges).toBe(7); // 5 base + 2
   });
 
-  it("Dawn's Path: activating Divine Ascension grants a movement-speed burst", () => {
-    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_dawns_path' });
+  it('Divine Steed: activating Divine Ascension grants a movement-speed burst', () => {
+    const { sim, p } = rig('paladin', 20, { 5: 'pal_r5_divine_steed' });
     if (!p.paladinDevotion) throw new Error('no devotion');
     p.paladinDevotion.value = 20;
     sim.castAbility('divine_ascension');
-    expect(p.auras.some((a) => a.kind === 'buff_speed' && a.id === 'dawns_path_speed')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'buff_speed' && a.id === 'divine_steed_burst')).toBe(
+      true,
+    );
   });
 
-  it('Aegis of Devotion: activating Divine Ascension applies a damage-reduction ward', () => {
-    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_aegis_of_devotion' });
-    if (!p.paladinDevotion) throw new Error('no devotion');
-    p.paladinDevotion.value = 20;
-    sim.castAbility('divine_ascension');
-    expect(p.auras.some((a) => a.kind === 'buff_dr' && a.id === 'aegis_of_devotion_dr')).toBe(true);
+  it('Sanctified Fervor: Avenging Wrath grants critical strike and both haste channels', () => {
+    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_sanctified_fervor' });
+    sim.castAbility('avenging_wrath');
+    expect(p.auras.some((a) => a.kind === 'buff_crit' && a.value === 0.15)).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'buff_haste' && a.value === 1.15)).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'buff_spellhaste' && a.value === 0.15)).toBe(true);
   });
 
   // The #1756 choice pass redesigned aura_surge from the Radiant Swell armor

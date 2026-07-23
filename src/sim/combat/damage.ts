@@ -68,7 +68,10 @@ import {
 import { cleanupPaladinAegis } from './paladin_aegis';
 import { stripBeaconOfLight } from './paladin_beacon';
 import { protectionConsecrationDamageReduction } from './paladin_consecration';
+import { stripSunGodVerdicts } from './paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from './paladin_support';
+import { masteredPaladinAuraValue } from './paladin_talents';
+import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { veilboundMarkDamageMultiplier } from './paladin_veilbound_march';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
@@ -126,6 +129,7 @@ export function dealDamage(
 ): void {
   if (target.dead) return;
   if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
+  if (isValkyrsCallingAirborne(target)) return;
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
   // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
@@ -277,7 +281,9 @@ export function dealDamage(
   if (source && source.id !== target.id && amount > 0) {
     let reduction = protectionConsecrationDamageReduction(ctx.groundAoEs, target);
     for (const aura of target.auras) {
-      if (aura.kind === 'buff_dr' || aura.kind === 'die_by_sword') reduction += aura.value;
+      if (aura.kind === 'buff_dr') {
+        reduction += masteredPaladinAuraValue(target, aura.id, aura.value);
+      } else if (aura.kind === 'die_by_sword') reduction += aura.value;
     }
     if (reduction > 0) amount = Math.round(amount * Math.max(0, 1 - reduction));
   }
@@ -1012,6 +1018,7 @@ function reflectSpellWard(
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
   resetProcState(e);
   cleanupPaladinAegis(ctx, e.id);
+  stripSunGodVerdicts(ctx, e.id);
   stripPaladinDevotionsFromSource(ctx, e.id);
   e.dead = true;
   e.hp = 0;
@@ -1078,6 +1085,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.chargeTargetId = null;
     e.chargePath = [];
     if (e.leap !== undefined) e.leap = null;
+    if (e.valkyrsCalling !== undefined) e.valkyrsCalling = null;
     e.followTargetId = null;
     ctx.emit({ type: 'playerDeath', pid: e.id });
     for (const m of ctx.entities.values()) {

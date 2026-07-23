@@ -99,15 +99,4 @@ describe('talent buffPct resolver fixes', () => {
     });
   });
 
-  it('a judgement dmgPct ability mod scales the trigger damage multiplier', () => {
-    // Righteous Cause no longer carries this mod (it became a swing-CDR proc in
-    // the row-quality pass), so the engine fix is pinned on a synthetic effect.
-    const mods = emptyModifiers();
-    accumulateTalentEffect(mods, { ability: [{ ability: 'judgement', dmgPct: 0.15 }] }, 1);
-    const ability = abilitiesKnownAt('paladin', 20, mods).find((a) => a.def.id === 'judgement');
-    const effect = ability?.effects.find((candidate) => candidate.type === 'judgement');
-    if (!effect || effect.type !== 'judgement') throw new Error('missing judgement effect');
-    expect(effect.dmgMult).toBeCloseTo(1.15, 6);
-    expect(effect.flat ?? 0).toBe(0);
-  });
 });

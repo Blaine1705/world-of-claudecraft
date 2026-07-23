@@ -1,8 +1,9 @@
 import { grantAbilityDevotion } from '../paladin_devotion';
 import type { SimContext } from '../sim_context';
-import { CAST_COMPLETE_EPS, DT, type AbilityEffect, type Aura, type Entity } from '../types';
+import { type AbilityEffect, type Aura, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { isUnbreakableControlAura } from './cc';
 import { relocateSwept } from './heroic_leap';
-import { VEILBOUND_MARCH_ID, isVeilboundMarchActive } from './paladin_veilbound_state';
+import { isVeilboundMarchActive, VEILBOUND_MARCH_ID } from './paladin_veilbound_state';
 
 export const VEILBOUND_MARK_ID = 'veilbound_mark';
 export const VEILBOUND_MARK_NAME = 'Veil Mark';
@@ -23,9 +24,7 @@ export function veilboundMarchBlocksAura(target: Entity, aura: Aura): boolean {
 
 export function veilboundMarkDamageMultiplier(source: Entity | null, target: Entity): number {
   if (!source || source.id === target.id) return 1;
-  return source.auras.some(
-    (aura) => aura.id === VEILBOUND_MARK_ID && aura.sourceId === target.id,
-  )
+  return source.auras.some((aura) => aura.id === VEILBOUND_MARK_ID && aura.sourceId === target.id)
     ? 0.8
     : 1;
 }
@@ -33,7 +32,7 @@ export function veilboundMarkDamageMultiplier(source: Entity | null, target: Ent
 function removeMovementControl(ctx: SimContext, caster: Entity): void {
   for (let index = caster.auras.length - 1; index >= 0; index--) {
     const aura = caster.auras[index];
-    if (aura.kind !== 'root' && aura.kind !== 'slow') continue;
+    if ((aura.kind !== 'root' && aura.kind !== 'slow') || isUnbreakableControlAura(aura)) continue;
     caster.auras.splice(index, 1);
     ctx.emit({ type: 'aura', targetId: caster.id, name: aura.name, gained: false });
   }
@@ -110,11 +109,7 @@ export function updateVeilboundMarchMovement(ctx: SimContext, caster: Entity): v
     .sort((left, right) => left.id - right.id);
 
   for (const target of candidates) {
-    if (
-      target.auras.some(
-        (aura) => aura.id === VEILBOUND_MARK_ID && aura.sourceId === caster.id,
-      )
-    )
+    if (target.auras.some((aura) => aura.id === VEILBOUND_MARK_ID && aura.sourceId === caster.id))
       continue;
     ctx.applyAura(target, {
       id: VEILBOUND_MARK_ID,
@@ -163,9 +158,7 @@ export function completeVeilboundMarch(ctx: SimContext, caster: Entity): void {
     .filter(
       (target) =>
         !target.dead &&
-        target.auras.some(
-          (aura) => aura.id === VEILBOUND_MARK_ID && aura.sourceId === caster.id,
-        ) &&
+        target.auras.some((aura) => aura.id === VEILBOUND_MARK_ID && aura.sourceId === caster.id) &&
         Math.hypot(target.pos.x - caster.pos.x, target.pos.z - caster.pos.z) <= 10,
     )
     .sort((left, right) => left.id - right.id);

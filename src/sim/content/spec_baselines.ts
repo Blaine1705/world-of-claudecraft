@@ -3,12 +3,11 @@
 // effects are intentionally separate from mastery and choice rows so class
 // owners can rebalance and redesign each spec without deleting the hotfix floor.
 //
-// Warrior and Mage are deliberately excluded. The floor exists to close the gap
-// for the classes weakened by the Talents 2.0 transition; warrior and mage are
-// already the two strongest classes, so restoring their pre-v0.27 passives would
-// widen the gap this hotfix is meant to close. Their masteries, signatures, and
-// ability kits are untouched, only the restored baseline is withheld. Mage also
-// has no Chronomancy baseline (new healer kit, no former baseline to restore).
+// Paladin, Warrior, and Mage are deliberately excluded. Paladin now owns a
+// complete class-specific kit and mastery layer, so retaining its legacy floor
+// would double-apply specialization power. Warrior and Mage remain excluded for
+// the original hotfix balance reasons. Mage also has no Chronomancy baseline
+// (new healer kit, no former baseline to restore).
 
 import type { PlayerClass } from '../types';
 import type { TalentEffect } from './talents';
@@ -16,34 +15,6 @@ import type { TalentEffect } from './talents';
 export type SpecBaselineTable = Partial<Record<PlayerClass, Record<string, TalentEffect>>>;
 
 export const SPEC_BASELINES: SpecBaselineTable = {
-  paladin: {
-    holy: {
-      // v0.28.x stat-identity pass: healer scales on Int, not Str.
-      stats: { int: 6 },
-      global: { healPct: 0.06 },
-      ability: [
-        { ability: 'seal_of_righteousness', costPct: -0.16 },
-        { ability: 'judgement', costPct: -0.16 },
-        { ability: 'holy_light', dmgPct: 0.24 },
-        { ability: 'flash_of_light', costPct: -0.16, castPct: -0.2 },
-      ],
-    },
-    protection: {
-      stats: { str: 6, dodge: 0.02, armorPct: 0.29 },
-      global: { threatPct: 0.2 },
-      ability: [
-        { ability: 'devotion_aura', buffPct: 0.4 },
-        { ability: 'righteous_fury', costPct: -0.5 },
-      ],
-    },
-    retribution: {
-      stats: { str: 6 },
-      ability: [
-        { ability: 'seal_of_righteousness', dmgPct: 0.2, costPct: -0.4 },
-        { ability: 'judgement', dmgPct: 0.2, costPct: -0.4, cooldownPct: -0.3 },
-      ],
-    },
-  },
   hunter: {
     beast_mastery: {
       // v0.28.x stat-identity pass: de-overloaded. Was Sta +9, AP +32, Armor

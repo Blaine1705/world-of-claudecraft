@@ -82,7 +82,7 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
 // tests/charselect_class_details.test.ts so this never drifts from the sim.
 export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
   warrior: ['charge', 'heroic_strike', 'execute'],
-  paladin: ['holy_light', 'judgement', 'seal_of_righteousness'],
+  paladin: ['holy_light', 'hammer_of_grace', 'seal_of_righteousness'],
   hunter: ['serpent_sting', 'aimed_shot', 'arcane_shot'],
   rogue: ['sinister_strike', 'eviscerate', 'evasion'],
   priest: ['smite', 'power_word_shield', 'shadow_word_pain'],
@@ -140,7 +140,7 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     retribution: {
       primaryStat: 'str',
       complexity: 'low',
-      examples: ['oathstrike', 'judgement', 'hammer_of_wrath', 'avenging_wrath'],
+      examples: ['final_edict', 'sun_gods_verdict', 'hammer_of_wrath', 'avenging_wrath'],
     },
   },
   hunter: {

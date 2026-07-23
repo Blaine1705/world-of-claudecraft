@@ -63,6 +63,8 @@ import {
   characterSanguineAuraActive,
   characterSoulRendActive,
   characterVeilboundState,
+  isOathChainAura,
+  isPaladinWingAura,
 } from './character_effects';
 import {
   type AnimState,
@@ -158,7 +160,25 @@ import {
   type PaladinAscensionVisual,
   syncPaladinAscensionVisual,
 } from './paladin_ascension_visual';
+import {
+  type PaladinAvengingWrathVisual,
+  syncPaladinAvengingWrathVisual,
+} from './paladin_avenging_wrath_visual';
 import { PaladinConsecrationVisuals } from './paladin_consecration_visual';
+import {
+  type PaladinOathChainVisual,
+  syncPaladinOathChainVisual,
+} from './paladin_oath_chain_visual';
+import {
+  type PaladinSunVerdictAuraSource,
+  type PaladinSunVerdictVisualPlan,
+  paladinSunVerdictVisualPlanForAuraInto,
+  selectPaladinSunVerdictAura,
+} from './paladin_sun_verdict_core';
+import {
+  type PaladinSunVerdictVisual,
+  syncPaladinSunVerdictVisual,
+} from './paladin_sun_verdict_visual';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import {
@@ -641,7 +661,10 @@ export interface EntityView {
   frostNovaRootVisual: FrostNovaRootVisual | null; // Atadura de Hielo restraint at the feet
   mageBarrierVisual: MageBarrierVisual | null; // personal mage absorb shell, built lazily
   paladinAscensionVisual: PaladinAscensionVisual | null;
+  paladinAvengingWrathVisual: PaladinAvengingWrathVisual | null;
+  paladinOathChainVisual: PaladinOathChainVisual | null;
   paladinAegisVisual: PaladinAegisVisual | null;
+  paladinSunVerdictVisual: PaladinSunVerdictVisual | null;
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
@@ -1138,6 +1161,11 @@ export class Renderer {
     active: false,
     charges: 0,
     lastCharge: false,
+  };
+  private readonly paladinSunVerdictPlanScratch: PaladinSunVerdictVisualPlan = {
+    active: false,
+    charges: 0,
+    imminent: false,
   };
   private glacialFrontVisual!: GlacialFrontVisual;
   private fishingBobbers!: FishingBobberVisual;
@@ -2478,7 +2506,7 @@ export class Renderer {
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);
-    this.paladinConsecrationVisuals.update(dt);
+    this.paladinConsecrationVisuals.update(dt, this.reducedMotion());
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
@@ -3511,13 +3539,41 @@ export class Renderer {
           this.vfx.detonate(ev.targetId, ev.school);
           this.pulseAt(ev.targetId, ev.school, 9, 0.5);
         } else if (ev.fx === 'paladinAscensionStart') {
-          this.vfx.paladinAscensionStart(ev.sourceId);
-          this.pulseAt(ev.sourceId, 'holy', 13, 0.75);
-          const view = this.views.get(ev.sourceId);
-          if (view) this.activeVisual(view)?.playEmote('salute', 1);
+          // The persistent seal and crown are the complete activation presentation.
         } else if (ev.fx === 'paladinAscensionImpact') {
           this.vfx.paladinAscensionImpact(ev.sourceId, ev.targetId, ev.impact);
           this.pulseAt(ev.impact === 'area' ? ev.sourceId : ev.targetId, 'holy', 10, 0.5);
+        } else if (ev.fx === 'paladinHolyShock') {
+          this.vfx.paladinHolyShock(
+            ev.sourceId,
+            ev.targetId,
+            ev.impact === 'healing' ? 'heal' : 'damage',
+          );
+        } else if (ev.fx === 'paladinSunwardDisc') {
+          if ((ev.level ?? 0) === 0) this.triggerAttack(ev.sourceId, 'sunward_disc');
+          this.vfx.paladinSunwardDisc(ev.sourceId, ev.targetId, ev.level ?? 0, ev.count ?? 3);
+        } else if (ev.fx === 'paladinBastionSweep') {
+          const source = this.sim.entities.get(ev.sourceId);
+          if (source) {
+            this.triggerAttack(ev.sourceId, 'bastion_sweep');
+            this.vfx.paladinBastionSweep(
+              ev.sourceId,
+              ev.range ?? 6,
+              ev.angle ?? 180,
+              source.facing,
+            );
+          }
+        } else if (ev.fx === 'paladinBastionSweepImpact') {
+          this.vfx.paladinBastionSweepImpact(ev.targetId);
+        } else if (ev.fx === 'paladinDawnfall') {
+          this.triggerAttack(ev.sourceId, ev.ability);
+          this.vfx.paladinDawnfall(ev.sourceId, ev.range ?? 6);
+          this.pulseAt(ev.sourceId, 'holy', 8, 0.45);
+        } else if (ev.fx === 'paladinDawnfallImpact') {
+          this.vfx.paladinDawnfallImpact(ev.targetId);
+        } else if (ev.fx === 'paladinFinalEdict') {
+          this.vfx.paladinFinalEdict(ev.sourceId, ev.targetId);
+          this.pulseAt(ev.targetId, 'holy', 11, 0.4);
         } else if (ev.fx === 'temporalGlyph') {
           // Chronomancy Temporal Echo apply: a brief temporal glyph blooms
           // directly OVER the marked ally (target-anchored, no projectile ever
@@ -4307,7 +4363,10 @@ export class Renderer {
       frostNovaRootVisual: null,
       mageBarrierVisual: null,
       paladinAscensionVisual: null,
+      paladinAvengingWrathVisual: null,
+      paladinOathChainVisual: null,
       paladinAegisVisual: null,
+      paladinSunVerdictVisual: null,
       height,
       clickTarget,
       nameplate: np,
@@ -4882,7 +4941,10 @@ export class Renderer {
     v.frostNovaRootVisual?.dispose();
     v.mageBarrierVisual?.dispose();
     v.paladinAscensionVisual?.dispose();
+    v.paladinAvengingWrathVisual?.dispose();
+    v.paladinOathChainVisual?.dispose();
     v.paladinAegisVisual?.dispose();
+    v.paladinSunVerdictVisual?.dispose();
     this.views.delete(id);
   }
 
@@ -5087,6 +5149,9 @@ export class Renderer {
       let temporalHourglassMode: TemporalHourglassMode | null = null;
       let hasFrostNovaRoot = false;
       let mageBarrierState: MageBarrierState | null = null;
+      let sunVerdictAura: PaladinSunVerdictAuraSource | null = null;
+      let hasPaladinWings = false;
+      let oathChainSourceId: number | null = null;
       for (const a of e.auras) {
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
@@ -5108,6 +5173,9 @@ export class Renderer {
         }
         if (isFrostNovaRootAura(a)) hasFrostNovaRoot = true;
         mageBarrierState ??= mageBarrierStateForAura(a, this.mageBarrierStateScratch);
+        sunVerdictAura = selectPaladinSunVerdictAura(sunVerdictAura, a, this.sim.playerId);
+        if (isPaladinWingAura(a)) hasPaladinWings = true;
+        if (isOathChainAura(a) && oathChainSourceId === null) oathChainSourceId = a.sourceId;
       }
       const polyed = hasPoly;
       const bear = !polyed && hasBear;
@@ -5275,6 +5343,19 @@ export class Renderer {
         this.updateValeCupBall(e, v, dt);
         continue;
       }
+      const sunVerdictPlan = paladinSunVerdictVisualPlanForAuraInto(
+        e.dead,
+        sunVerdictAura,
+        this.paladinSunVerdictPlanScratch,
+      );
+      v.paladinSunVerdictVisual = syncPaladinSunVerdictVisual(
+        v.paladinSunVerdictVisual,
+        v.group,
+        v.height,
+        sunVerdictPlan,
+        dt,
+        this.reducedMotion(),
+      );
       if (!v.visual) continue;
       const ascensionPlan = paladinAscensionVisualPlanInto(e, this.paladinAscensionPlanScratch);
       const veilboundState = characterVeilboundState(e);
@@ -5305,6 +5386,30 @@ export class Renderer {
         v.group,
         v.height,
         ascensionPlan,
+        dt,
+        this.reducedMotion(),
+        v.visual.root,
+      );
+      v.paladinAvengingWrathVisual = syncPaladinAvengingWrathVisual(
+        v.paladinAvengingWrathVisual,
+        v.group,
+        v.height,
+        !e.dead && hasPaladinWings,
+        dt,
+        this.reducedMotion(),
+      );
+      const oathChainSourceEntity =
+        oathChainSourceId === null ? undefined : sim.entities.get(oathChainSourceId);
+      const oathChainSourceView =
+        oathChainSourceId === null ? undefined : this.views.get(oathChainSourceId);
+      v.paladinOathChainVisual = syncPaladinOathChainVisual(
+        v.paladinOathChainVisual,
+        this.scene,
+        oathChainSourceView?.group.position ?? null,
+        v.group.position,
+        (oathChainSourceView?.height ?? 0) * (oathChainSourceEntity?.scale ?? 1),
+        v.height * e.scale,
+        !e.dead && !!oathChainSourceEntity && !oathChainSourceEntity.dead,
         dt,
         this.reducedMotion(),
       );
@@ -5448,7 +5553,7 @@ export class Renderer {
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
       active.setMetamorph(hasMetamorph);
-      active.setAscended(ascensionPlan.active || veilboundState !== 'none');
+      active.setAscended(veilboundState !== 'none');
       v.visual.root.visible = active === v.visual && !fireballForm;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && !fireballForm);
@@ -5830,7 +5935,7 @@ export class Renderer {
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);
-    this.paladinConsecrationVisuals.update(dt);
+    this.paladinConsecrationVisuals.update(dt, this.reducedMotion());
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);

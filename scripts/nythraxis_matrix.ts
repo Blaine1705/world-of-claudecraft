@@ -96,7 +96,7 @@ const specs = {
       'righteous_fury',
       'devotion_aura',
       'consecration',
-      'judgement',
+      'vowkeeper_strike',
       'seal_of_righteousness',
     ],
   },
@@ -512,7 +512,6 @@ const specs = {
         pal_divine_strength: 3,
         pal_benediction: 2,
         ret_benediction: 3,
-        ret_imp_judgement: 2,
         ret_seal_command: 1,
       },
       choices: {},
@@ -520,7 +519,7 @@ const specs = {
     rotation: [
       'blessing_of_might',
       'seal_of_righteousness',
-      'judgement',
+      'final_edict',
       'exorcism',
       'consecration',
     ],
@@ -818,11 +817,6 @@ function shouldTryAbility(caster: Entity, target: Entity, ability: string): bool
   if ((ability === 'maul' || ability === 'heroic_strike') && caster.queuedOnSwing === ability)
     return false;
   if (ability === 'sunder_armor' && sunderStacks(target) >= 5) return false;
-  if (
-    ability === 'judgement' &&
-    !caster.auras.some((a) => a.kind === 'imbue' && a.value2 !== undefined)
-  )
-    return false;
   return true;
 }
 

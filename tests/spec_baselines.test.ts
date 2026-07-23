@@ -19,31 +19,6 @@ interface BaselineSnapshot {
 }
 
 const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
-  'paladin/holy': {
-    stats: { int: 6 },
-    global: { healPct: 0.06 },
-    abilities: {
-      seal_of_righteousness: { costPct: -0.16 },
-      judgement: { costPct: -0.16 },
-      holy_light: { dmgPct: 0.24 },
-      flash_of_light: { costPct: -0.16, castPct: -0.2 },
-    },
-  },
-  'paladin/protection': {
-    stats: { str: 6, dodge: 0.02, armorPct: 0.29 },
-    global: { threatPct: 0.2 },
-    abilities: {
-      devotion_aura: { buffPct: 0.4 },
-      righteous_fury: { costPct: -0.5 },
-    },
-  },
-  'paladin/retribution': {
-    stats: { str: 6 },
-    abilities: {
-      seal_of_righteousness: { dmgPct: 0.2, costPct: -0.4 },
-      judgement: { dmgPct: 0.2, costPct: -0.4, cooldownPct: -0.3 },
-    },
-  },
   'hunter/beast_mastery': {
     stats: { ap: 24, armorPct: 0.08 },
     abilities: { aspect_of_the_hawk: { buffPct: 0.4 } },
@@ -230,17 +205,20 @@ function baselineSnapshot(cls: PlayerClass, specId: string, level: number): Base
 }
 
 describe('v0.28 passive restoration hotfix', () => {
-  it('contains exactly 21 passive-only spec baselines and excludes Warrior, Mage, and Chronomancy', () => {
+  it('contains exactly 18 passive-only spec baselines and excludes Paladin, Warrior, and Mage', () => {
     const entries = Object.entries(SPEC_BASELINES).flatMap(([cls, specs]) =>
       Object.entries(specs ?? {}).map(([spec, effect]) => ({ cls, spec, effect })),
     );
 
-    expect(entries).toHaveLength(21);
-    // Warrior and Mage are the strongest classes and are deliberately given no
-    // floor, so restoring their pre-v0.27 passives cannot widen the gap.
+    expect(entries).toHaveLength(18);
+    // Paladin owns a replacement kit and mastery layer. Warrior and Mage remain
+    // excluded so restoring their pre-v0.27 passives cannot widen the gap.
+    expect(SPEC_BASELINES.paladin).toBeUndefined();
     expect(SPEC_BASELINES.warrior).toBeUndefined();
     expect(SPEC_BASELINES.mage).toBeUndefined();
-    expect(entries.some(({ cls }) => cls === 'warrior' || cls === 'mage')).toBe(false);
+    expect(
+      entries.some(({ cls }) => cls === 'paladin' || cls === 'warrior' || cls === 'mage'),
+    ).toBe(false);
     for (const { effect } of entries) {
       expect(effect.grant).toBeUndefined();
       expect(effect.proc).toBeUndefined();
@@ -298,20 +276,23 @@ describe('v0.28 passive restoration hotfix', () => {
     expect(dead).toEqual([]);
   });
 
-  it('restores the complete repository-backed baseline for all 21 applicable specs', () => {
-    expect(Object.keys(EXPECTED_BASELINES)).toHaveLength(21);
+  it('restores the complete repository-backed baseline for all 18 applicable specs', () => {
+    expect(Object.keys(EXPECTED_BASELINES)).toHaveLength(18);
     for (const [key, expected] of Object.entries(EXPECTED_BASELINES)) {
       const [cls, spec] = key.split('/') as [PlayerClass, string];
       expect(baselineSnapshot(cls, spec, 20), key).toEqual(expected);
     }
   });
 
-  it('applies the full baseline at unlock and leaves Warrior, Mage, and Chronomancy floor-free', () => {
+  it('applies the full baseline at unlock and leaves Paladin, Warrior, and Mage floor-free', () => {
     for (const key of Object.keys(EXPECTED_BASELINES)) {
       const [cls, spec] = key.split('/') as [PlayerClass, string];
       expect(baselineSnapshot(cls, spec, 5), key).toEqual(EXPECTED_BASELINES[key]);
     }
-    // Excluded specs gain nothing beyond their (level-scaled) mastery, at any level.
+    // Excluded specs gain nothing beyond their level-scaled mastery, at any level.
+    for (const spec of ['holy', 'protection', 'retribution']) {
+      expect(baselineSnapshot('paladin', spec, 20), `paladin/${spec}`).toEqual({});
+    }
     for (const spec of ['arms', 'fury', 'prot']) {
       expect(baselineSnapshot('warrior', spec, 20), `warrior/${spec}`).toEqual({});
     }

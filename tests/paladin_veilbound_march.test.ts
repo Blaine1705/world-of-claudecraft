@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { isRooted } from '../src/sim/combat/cc';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { grantDevotion } from '../src/sim/paladin_devotion';
 import { moveSpeedMult } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
-import { isRooted } from '../src/sim/combat/cc';
 import type { Aura, Entity } from '../src/sim/types';
 
 type TestSim = Sim & {
@@ -100,9 +100,9 @@ describe('Veilbound March', () => {
     expect(sim.player.auras.some((active) => active.id === 'veilbound_march')).toBe(true);
     expect(sim.player.auras.some((active) => active.id === 'veilbound_march_armor')).toBe(true);
     expect(sim.player.stats.armor).toBe(Math.round(baseArmor * 1.3));
-    expect(events.some((event) => event.type === 'damage' && event.ability === 'Veilbound March')).toBe(
-      false,
-    );
+    expect(
+      events.some((event) => event.type === 'damage' && event.ability === 'Veilbound March'),
+    ).toBe(false);
 
     for (let tick = 0; tick < 4 * 20; tick++) events.push(...sim.tick());
     expect(events).toContainEqual(
@@ -128,9 +128,9 @@ describe('Veilbound March', () => {
     expect(moveSpeedMult(sim.player)).toBeCloseTo(1.4);
     expect(sim.player.stats.armor).toBe(Math.round(baseArmor * 1.3));
     expect(isRooted(sim.player)).toBe(false);
-    expect(sim.player.auras.some((active) => active.kind === 'root' || active.kind === 'slow')).toBe(
-      false,
-    );
+    expect(
+      sim.player.auras.some((active) => active.kind === 'root' || active.kind === 'slow'),
+    ).toBe(false);
 
     sim.ctx.applyAura(sim.player, aura('new_root', 'root', attacker.id));
     sim.ctx.applyAura(sim.player, aura('new_slow', 'slow', attacker.id));
@@ -144,6 +144,21 @@ describe('Veilbound March', () => {
     const before = { ...sim.player.pos };
     expect(sim.ctx.applyKnockback(attacker, sim.player, 8)).toBe(0);
     expect(sim.player.pos).toEqual(before);
+  });
+
+  it('does not cleanse encounter-authored unbreakable movement control on activation', () => {
+    const sim = makeProtection();
+    const attacker = targetAt(sim, 2, -40);
+    sim.player.auras.push({
+      ...aura('scripted_root', 'root', attacker.id),
+      unbreakableControl: true,
+    });
+    sim.player.auras.push(aura('ordinary_slow', 'slow', attacker.id));
+
+    sim.castAbility('veilbound_march');
+
+    expect(sim.player.auras.some((active) => active.id === 'scripted_root')).toBe(true);
+    expect(sim.player.auras.some((active) => active.id === 'ordinary_slow')).toBe(false);
   });
 
   it('marks every traversed enemy once and grants Devotion only for the first mark', () => {
@@ -172,7 +187,9 @@ describe('Veilbound March', () => {
     expect(ownerHp - sim.player.hp).toBe(80);
 
     const allyId = sim.addPlayer('warrior', 'March Ally');
-    const ally = sim.entities.get(allyId)!;
+    const ally = sim.entities.get(allyId);
+    expect(ally).toBeDefined();
+    if (!ally) throw new Error('missing March Ally');
     ally.hp = ally.maxHp;
     const allyHp = ally.hp;
     sim.ctx.dealDamage(marked, ally, 100, false, 'holy', 'Marked Test', 'hit');
@@ -181,9 +198,7 @@ describe('Veilbound March', () => {
     for (let tick = 0; tick < 6 * 20; tick++) events.push(...sim.tick());
     const markTicks = events.filter(
       (event) =>
-        event.type === 'damage' &&
-        event.targetId === marked.id &&
-        event.ability === 'Veil Mark',
+        event.type === 'damage' && event.targetId === marked.id && event.ability === 'Veil Mark',
     );
     const markDamage = markTicks.reduce(
       (total, event) => total + (event.type === 'damage' ? event.amount : 0),
@@ -250,6 +265,6 @@ describe('Veilbound March', () => {
     expect(
       Math.hypot(marked.pos.x - sim.player.pos.x, marked.pos.z - sim.player.pos.z),
     ).toBeCloseTo(beforeDistance - 2, 1);
-    expect(sim.player.paladinDevotion?.value).toBe(1);
+    expect(sim.player.paladinDevotion?.value).toBe(0);
   });
 });

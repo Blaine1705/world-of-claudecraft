@@ -67,6 +67,12 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `combat/equip_procs.ts` + `combat/set_procs.ts` | legendary weapon on-action procs; item-set bonus procs |
 | `combat/empower_next.ts` + `combat/thorns_charge.ts` | next-cast empower/free aura consumption; charge-limited thorns |
 | `combat/paladin_veilbound_march.ts` + `combat/paladin_veilbound_state.ts` | Veilbound March activation, traversal marks, final wave, and its pure active-state predicate |
+| `combat/paladin_valkyrs_calling.ts` + `combat/paladin_valkyrs_calling_state.ts` | Valkyr's Calling ascent, approach flight, descent, immunity window, and landing impact |
+| `combat/paladin_sun_verdict.ts` | Verdict of the Sun God mark ownership, charge progression, detonation, and cleanup |
+| `combat/paladin_radiant_resonance.ts` | Radiant Chorus effective-target gate and the shared Mending Light or Dawn's Embrace proc |
+| `combat/paladin_solar_reprisal.ts` | Protection block/Vowkeeper proc rolls and the shared Sunward Disc, Hammer of Grace, or Mending Light override |
+| `combat/paladin_dawns_wrath.ts` | Retribution auto-attack/Final Edict proc and the stored extra Hammer of Wrath cast |
+| `combat/paladin_sunward_disc.ts` | Sunward Disc local ricochet selection, arrival-time damage, and per-impact Devotion |
 | `projectile_travel.ts` | in-flight homing projectiles: `pendingProjectiles` + the prologue `advancePendingProjectiles` phase |
 | `progression/xp.ts` | `prestige`, rested-XP, `isResting` |
 | `progression/talents.ts` | `applyTalents`/`spendTalent`/`setSpec`/`respec`/loadouts/`recomputeTalents` |

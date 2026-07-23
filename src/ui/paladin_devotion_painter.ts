@@ -9,6 +9,7 @@ const CHARGE_ACTIVE_CLASS = 'on';
 export class PaladinDevotionPainter {
   constructor(
     private readonly writers: PainterHostWriters,
+    private readonly frame: HTMLElement,
     private readonly root: HTMLElement,
     private readonly fill: HTMLElement,
     private readonly label: HTMLElement,
@@ -17,12 +18,8 @@ export class PaladinDevotionPainter {
   ) {}
 
   paint(state: PaladinDevotionState): void {
-    this.writers.setDisplay(this.root, state.visible ? 'flex' : 'none');
-    this.writers.setStyleProp(
-      this.fill,
-      '--devotion-fill',
-      `${(state.fillFrac * 100).toFixed(1)}%`,
-    );
+    this.writers.setDisplay(this.frame, state.visible ? 'flex' : 'none');
+    this.writers.setStyleProp(this.fill, '--devotion-scale', state.fillFrac.toFixed(3));
     this.writers.setText(this.label, state.label);
     this.writers.setAttr(this.root, 'aria-valuenow', String(state.value));
     this.writers.setAttr(this.root, 'aria-valuetext', state.ariaValueText);

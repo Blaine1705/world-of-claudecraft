@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { characterPaladinWingsActive } from '../src/render/character_effects';
 import { paladinDevotionConflicts } from '../src/sim/combat/paladin_support';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
@@ -51,6 +52,12 @@ function run(sim: Sim, target: Entity | null, resolved: ResolvedAbility): void {
   internals.ctx.runEffects(sim.player, internals.players.get(sim.playerId), target, resolved);
 }
 
+function runAs(sim: Sim, caster: Entity, target: Entity | null, resolved: ResolvedAbility): void {
+  const meta = sim.meta(caster.id);
+  if (!meta) throw new Error(`missing metadata for caster ${caster.id}`);
+  sim.ctx.runEffects(caster, meta, target, resolved);
+}
+
 function aura(
   id: string,
   kind: Aura['kind'],
@@ -72,6 +79,28 @@ function aura(
 }
 
 describe('Paladin support abilities', () => {
+  it('applies Guardian Covenant to an ally and exposes its physical wing visual', () => {
+    const sim = new Sim({ seed: 159, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const allyId = sim.addPlayer('priest', 'Guardian Ally');
+    sim.setPlayerLevel(20, allyId);
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('missing Guardian Covenant ally');
+
+    run(sim, ally, resolve(sim, 'guardian_covenant'));
+
+    expect(ally.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'guardian_covenant',
+        kind: 'buff_dr',
+        value: 0.2,
+        remaining: 8,
+      }),
+    );
+    expect(characterPaladinWingsActive(ally)).toBe(true);
+  });
+
   it('exposes the restored support kit with the requested values and gates', () => {
     expect(ABILITIES.lay_on_hands).toMatchObject({
       name: 'Last Rite',
@@ -105,7 +134,7 @@ describe('Paladin support abilities', () => {
     });
     expect(ABILITIES.righteous_fury.hiddenFromPlayer).not.toBe(true);
     expect(ABILITIES.consecration).toMatchObject({
-      name: 'Consecration',
+      name: 'Holy Ground',
       learnLevel: 10,
       cooldown: 12,
       specs: ['protection', 'retribution'],
@@ -133,12 +162,7 @@ describe('Paladin support abilities', () => {
     );
     expect(known('retribution')).toEqual(expect.arrayContaining(['consecration', 'hushbrand']));
     expect(known('holy')).toEqual(
-      expect.arrayContaining([
-        'guardian_covenant',
-        'solar_step',
-        'solar_invocation',
-        'recall_the_fallen',
-      ]),
+      expect.arrayContaining(['guardian_covenant', 'solar_step', 'solar_invocation']),
     );
     for (const id of [...tankOnly, 'righteous_fury', 'consecration', 'hushbrand']) {
       expect(known('holy')).not.toContain(id);
@@ -146,7 +170,7 @@ describe('Paladin support abilities', () => {
     for (const id of tankOnly) {
       expect(known('retribution')).not.toContain(id);
     }
-    for (const id of ['guardian_covenant', 'solar_invocation', 'recall_the_fallen']) {
+    for (const id of ['guardian_covenant', 'solar_invocation']) {
       expect(known('protection')).not.toContain(id);
       expect(known('retribution')).not.toContain(id);
     }
@@ -237,13 +261,34 @@ describe('Paladin support abilities', () => {
     expect(resolve(paladin, 'solar_invocation').def).toMatchObject({
       range: 30,
       requiresTarget: true,
-      targetType: 'friendly',
+      targetType: 'any',
     });
     expect(resolve(paladin, 'solar_invocation').effects).toEqual([
       { type: 'heal', min: 180, max: 220 },
+      { type: 'directDamage', min: 120, max: 150 },
     ]);
-    expect(resolve(paladin, 'hammer_of_grace').cooldown).toBe(10);
-    expect(resolve(paladin, 'hammer_of_light').cooldown).toBe(10);
+    const hammerOfGrace = resolve(paladin, 'hammer_of_grace');
+    expect(hammerOfGrace).toMatchObject({
+      castTime: 0,
+      cooldown: 7,
+      effects: [
+        {
+          type: 'directDamage',
+          min: 95,
+          max: 115,
+          restoreMana: 70,
+          selfHealDamageFrac: 0.5,
+        },
+      ],
+    });
+    expect(hammerOfGrace.def).toMatchObject({
+      range: 20,
+      school: 'holy',
+      projectile: true,
+    });
+    expect(paladin.resolvedAbility('hammer_of_light')).toBeNull();
+    expect(ABILITIES.judgement).toBeUndefined();
+    expect(paladin.resolvedAbility('judgement')).toBeNull();
 
     expect(paladin.setSpec('retribution')).toBe(true);
     expect(paladin.resolvedAbility('sacred_form')).toBeNull();
@@ -261,7 +306,7 @@ describe('Paladin support abilities', () => {
     ]);
   });
 
-  it('keeps long Devotion buffs independent from the active aura choice', () => {
+  it('keeps one long Devotion per Paladin while preserving foreign Devotions and aura choices', () => {
     const current = [
       aura('radiant_devotion', 'buff_spellpower', 1, 20),
       aura('dawn_devotion', 'buff_ap', 2, 40),
@@ -270,6 +315,8 @@ describe('Paladin support abilities', () => {
 
     expect(paladinDevotionConflicts(current, 1, 'devotion_ward')).toEqual([]);
     expect(paladinDevotionConflicts(current, 2, 'devotion_ward')).toEqual([]);
+    expect(paladinDevotionConflicts(current, 1, 'dawn_devotion')).toEqual([2, 0]);
+    expect(paladinDevotionConflicts(current, 2, 'grace_devotion')).toEqual([1]);
 
     const sim = new Sim({ seed: 102, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
@@ -277,20 +324,123 @@ describe('Paladin support abilities', () => {
     run(sim, null, resolve(sim, 'dawn_devotion'));
     run(sim, null, resolve(sim, 'grace_devotion'));
     run(sim, null, resolve(sim, 'devotion_ward'));
+    sim.player.auras.push(aura('dawn_devotion', 'buff_ap', 999, 40));
     expect(sim.player.auras).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'devotion_ward', sourceId: sim.player.id }),
-        expect.objectContaining({ id: 'radiant_devotion', sourceId: sim.player.id }),
-        expect.objectContaining({ id: 'dawn_devotion', sourceId: sim.player.id }),
         expect.objectContaining({ id: 'grace_devotion', sourceId: sim.player.id }),
+        expect.objectContaining({ id: 'dawn_devotion', sourceId: 999 }),
       ]),
+    );
+    expect(sim.player.auras).not.toContainEqual(
+      expect.objectContaining({ id: 'radiant_devotion', sourceId: sim.player.id }),
+    );
+    expect(sim.player.auras).not.toContainEqual(
+      expect.objectContaining({ id: 'dawn_devotion', sourceId: sim.player.id }),
     );
 
     run(sim, null, resolve(sim, 'retribution_aura'));
     expect(sim.player.auras.some((active) => active.id === 'devotion_ward')).toBe(false);
-    for (const id of ['radiant_devotion', 'dawn_devotion', 'grace_devotion']) {
-      expect(sim.player.auras.some((active) => active.id === id)).toBe(true);
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({ id: 'grace_devotion', sourceId: sim.player.id }),
+    );
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({ id: 'dawn_devotion', sourceId: 999 }),
+    );
+  });
+
+  it('casts Hammer of Grace instantly at 20 m, pays out on impact, and refuses 20.01 m', () => {
+    const setupAtDistance = (distance: number): { sim: Sim; target: Entity } => {
+      const sim = new Sim({ seed: 157, playerClass: 'paladin', autoEquip: true });
+      sim.setPlayerLevel(20);
+      sim.setSpec('retribution');
+      const target = hostileNear(sim);
+      target.pos.x = sim.player.pos.x;
+      target.pos.z = sim.player.pos.z + distance;
+      target.prevPos = { ...target.pos };
+      (sim as unknown as { rebucket(entity: Entity): void }).rebucket(target);
+      sim.ctx.lineOfSightBlocked = () => false;
+      sim.targetEntity(target.id);
+      return { sim, target };
+    };
+
+    const { sim: boundary, target: boundaryTarget } = setupAtDistance(20);
+    boundary.player.resource = 0;
+    boundary.player.hp = 1;
+    boundary.rng.next = () => 0.9;
+    const hpBefore = boundaryTarget.hp;
+    boundary.castAbility('hammer_of_grace');
+    expect(boundary.player.castingAbility).toBeNull();
+    expect(boundary.player.cooldowns.get('hammer_of_grace')).toBe(7);
+    expect(boundaryTarget.hp).toBe(hpBefore);
+    expect(boundary.ctx.pendingProjectiles).toHaveLength(1);
+    for (let tick = 0; tick < 200 && boundary.ctx.pendingProjectiles.length > 0; tick++)
+      boundary.tick();
+    expect(boundary.ctx.pendingProjectiles).toHaveLength(0);
+    expect(boundaryTarget.hp).toBeLessThan(hpBefore);
+    expect(boundary.player.resource).toBeGreaterThanOrEqual(70);
+    expect(boundary.player.hp).toBeGreaterThan(1);
+    expect(boundary.player.paladinDevotion?.value).toBe(1);
+
+    const { sim: beyond } = setupAtDistance(20.01);
+    beyond.castAbility('hammer_of_grace');
+    expect(beyond.player.castingAbility).toBeNull();
+    expect(beyond.player.cooldowns.has('hammer_of_grace')).toBe(false);
+  });
+
+  it('replaces one Paladin long Devotion party-wide without removing another Paladin copy', () => {
+    const sim = new Sim({ seed: 154, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const secondId = sim.addPlayer('paladin', 'Second Light', { autoEquip: true });
+    const allyId = sim.addPlayer('priest', 'Shared Ally');
+    sim.setPlayerLevel(20, secondId);
+    sim.setPlayerLevel(20, allyId);
+    sim.partyInvite(secondId, sim.player.id);
+    sim.partyAccept(secondId);
+    sim.partyInvite(allyId, sim.player.id);
+    sim.partyAccept(allyId);
+    const second = sim.entities.get(secondId);
+    const ally = sim.entities.get(allyId);
+    if (!second || !ally) throw new Error('missing multi-Paladin party member');
+
+    run(sim, null, resolve(sim, 'radiant_devotion'));
+    runAs(sim, second, null, resolve(sim, 'dawn_devotion'));
+    run(sim, null, resolve(sim, 'grace_devotion'));
+
+    for (const entity of [sim.player, second, ally]) {
+      expect(entity.auras).toContainEqual(
+        expect.objectContaining({ id: 'grace_devotion', sourceId: sim.player.id }),
+      );
+      expect(entity.auras).toContainEqual(
+        expect.objectContaining({ id: 'dawn_devotion', sourceId: second.id }),
+      );
+      expect(entity.auras).not.toContainEqual(
+        expect.objectContaining({ id: 'radiant_devotion', sourceId: sim.player.id }),
+      );
     }
+  });
+
+  it('recalculates a former party member after replacing the caster long Devotion', () => {
+    const sim = new Sim({ seed: 152, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const allyId = sim.addPlayer('priest', 'Former Devotee');
+    sim.setPlayerLevel(20, allyId);
+    sim.partyInvite(allyId, sim.player.id);
+    sim.partyAccept(allyId);
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('missing former Devotee');
+    const baseSpellPower = ally.spellPower;
+
+    run(sim, null, resolve(sim, 'radiant_devotion'));
+    expect(ally.spellPower).toBe(baseSpellPower + 20);
+
+    sim.partyLeave(allyId);
+    run(sim, null, resolve(sim, 'dawn_devotion'));
+
+    expect(ally.auras).not.toContainEqual(
+      expect.objectContaining({ id: 'radiant_devotion', sourceId: sim.player.id }),
+    );
+    expect(ally.spellPower).toBe(baseSpellPower);
   });
 
   it('switches Devotion and Requital through one aura family across the party', () => {
@@ -416,84 +566,110 @@ describe('Paladin support abilities', () => {
     }
   });
 
-  it('makes both hammers distinct, successful-hit effects, with one shared cooldown', () => {
+  it('makes Hammer of Grace restore mana and heal on one successful hit', () => {
     const grace = new Sim({ seed: 107, playerClass: 'paladin', autoEquip: true });
     grace.setPlayerLevel(20);
     grace.setSpec('retribution');
     const graceTarget = hostileNear(grace);
     grace.player.resource = 0;
+    grace.player.hp = 1;
     grace.rng.next = () => 0.9;
     run(grace, graceTarget, resolve(grace, 'hammer_of_grace'));
     expect(grace.player.resource).toBe(70);
-
-    grace.player.targetId = graceTarget.id;
-    grace.player.gcdRemaining = 0;
-    grace.castAbility('hammer_of_grace');
-    expect(grace.player.cooldowns.get('hammer_of_grace')).toBe(10);
-    expect(grace.player.cooldowns.get('hammer_of_light')).toBe(10);
-    const hpAfterGrace = graceTarget.hp;
-    grace.player.gcdRemaining = 0;
-    grace.castAbility('hammer_of_light');
-    expect(graceTarget.hp).toBe(hpAfterGrace);
-
-    const light = new Sim({ seed: 109, playerClass: 'paladin', autoEquip: true });
-    light.setPlayerLevel(20);
-    light.setSpec('retribution');
-    const lightTarget = hostileNear(light);
-    light.player.hp = 1;
-    light.rng.next = () => 0.9;
-    run(light, lightTarget, resolve(light, 'hammer_of_light'));
-    const events = light.drainEvents();
+    const events = grace.drainEvents();
     const damage = events.find(
-      (event) => event.type === 'damage' && event.targetId === lightTarget.id,
+      (event) => event.type === 'damage' && event.targetId === graceTarget.id,
     );
     expect(damage?.type).toBe('damage');
-    if (damage?.type !== 'damage') throw new Error('missing Hammer of Light damage');
+    if (damage?.type !== 'damage') throw new Error('missing Hammer of Grace damage');
     expect(events).toContainEqual(
       expect.objectContaining({
         type: 'heal2',
-        targetId: light.player.id,
+        targetId: grace.player.id,
         amount: Math.round(damage.amount * 0.5),
       }),
     );
-
-    const reverse = new Sim({ seed: 111, playerClass: 'paladin', autoEquip: true });
-    reverse.setPlayerLevel(20);
-    reverse.setSpec('retribution');
-    const reverseTarget = hostileNear(reverse);
-    reverse.player.targetId = reverseTarget.id;
-    reverse.player.hp = 1;
-    reverse.rng.next = () => 0.9;
-    reverse.castAbility('hammer_of_light');
-    expect(reverse.player.cooldowns.get('hammer_of_grace')).toBe(10);
-    expect(reverse.player.cooldowns.get('hammer_of_light')).toBe(10);
   });
 
-  it('grants neither hammer payout on a miss and heals Light from effective damage only', () => {
-    const miss = new Sim({ seed: 112, playerClass: 'paladin', autoEquip: true });
-    miss.setPlayerLevel(20);
-    miss.setSpec('retribution');
-    const missTarget = hostileNear(miss);
-    miss.player.resource = 0;
-    miss.player.hp = 1;
-    miss.rng.next = () => 0;
-    run(miss, missTarget, resolve(miss, 'hammer_of_grace'));
-    run(miss, missTarget, resolve(miss, 'hammer_of_light'));
-    expect(miss.player.resource).toBe(0);
-    expect(miss.player.hp).toBe(1);
+  it('lets Hammer of Grace generate Devotion for every specialization', () => {
+    for (const spec of ['holy', 'protection', 'retribution'] as const) {
+      const sim = new Sim({ seed: 151, playerClass: 'paladin', autoEquip: true });
+      sim.setPlayerLevel(20);
+      sim.setSpec(spec);
+      const target = hostileNear(sim);
+      sim.player.hp = 1;
+      sim.rng.next = () => 0.9;
 
+      run(sim, target, resolve(sim, 'hammer_of_grace'));
+
+      expect(sim.player.hp).toBeGreaterThan(1);
+      expect(sim.player.paladinDevotion?.value).toBe(1);
+    }
+  });
+
+  it('lets a pure Mending Light heal generate Devotion for every specialization', () => {
+    for (const spec of ['holy', 'protection', 'retribution'] as const) {
+      const sim = new Sim({ seed: 153, playerClass: 'paladin', autoEquip: true });
+      sim.setPlayerLevel(20);
+      sim.setSpec(spec);
+      sim.player.hp = 1;
+
+      run(sim, sim.player, resolve(sim, 'holy_light'));
+
+      expect(sim.player.hp).toBeGreaterThan(1);
+      expect(sim.player.paladinDevotion?.value).toBe(1);
+    }
+  });
+
+  it('restores mana on an absorbed Hammer of Grace but heals from effective damage only', () => {
     const absorbed = new Sim({ seed: 114, playerClass: 'paladin', autoEquip: true });
     absorbed.setPlayerLevel(20);
     absorbed.setSpec('retribution');
     const absorbedTarget = hostileNear(absorbed);
     absorbedTarget.auras.push(aura('test_absorb', 'absorb', absorbedTarget.id, 1_000_000));
+    absorbed.player.resource = 0;
     absorbed.player.hp = 1;
     absorbed.rng.next = () => 0.9;
-    run(absorbed, absorbedTarget, resolve(absorbed, 'hammer_of_light'));
+    run(absorbed, absorbedTarget, resolve(absorbed, 'hammer_of_grace'));
     expect(absorbedTarget.hp).toBe(absorbedTarget.maxHp);
+    expect(absorbed.player.resource).toBe(70);
     expect(absorbed.player.hp).toBe(1);
+    expect(absorbed.player.paladinDevotion?.value).toBe(0);
     expect(absorbed.drainEvents()).not.toContainEqual(
-      expect.objectContaining({ type: 'heal2', ability: 'Hammer of Light' }),
+      expect.objectContaining({ type: 'heal2', ability: 'Hammer of Grace' }),
+    );
+  });
+
+  it('damages enemies with Solar Invocation and grants Devotion for either valid use', () => {
+    const sim = new Sim({ seed: 129, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const enemy = hostileNear(sim);
+    sim.drainEvents();
+
+    run(sim, enemy, resolve(sim, 'solar_invocation'));
+    expect(enemy.hp).toBeLessThan(enemy.maxHp);
+    expect(sim.player.paladinDevotion?.value).toBe(1);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'paladinHolyShock',
+        targetId: enemy.id,
+        impact: 'offensive',
+      }),
+    );
+
+    sim.player.hp = 1;
+    run(sim, sim.player, resolve(sim, 'solar_invocation'));
+    expect(sim.player.hp).toBeGreaterThan(1);
+    expect(sim.player.paladinDevotion?.value).toBe(2);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'paladinHolyShock',
+        targetId: sim.playerId,
+        impact: 'healing',
+      }),
     );
   });
 
@@ -600,6 +776,28 @@ describe('Paladin support abilities', () => {
     expect(nearby.hp).toBeGreaterThan(1);
     expect(casterSide.hp).toBe(1);
     expect(sim.player.paladinDevotion?.ascensionCharges).toBe(4);
+  });
+
+  it('never turns an offensive Ascension Solar Invocation into an area heal after a kill', () => {
+    const sim = new Sim({ seed: 133, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const target = hostileNear(sim);
+    target.hp = 1;
+    target.maxHp = 1;
+    const allyId = sim.addPlayer('priest', 'Solar Bystander');
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('missing Solar Invocation bystander');
+    ally.pos.x = target.pos.x + 1;
+    ally.pos.z = target.pos.z;
+    ally.hp = 1;
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+
+    run(sim, target, resolve(sim, 'solar_invocation'));
+
+    expect(target.dead).toBe(true);
+    expect(ally.hp).toBe(1);
   });
 
   it('stacks Devotion Aura by source in the real damage pipeline', () => {

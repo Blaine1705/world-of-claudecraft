@@ -238,7 +238,12 @@ export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 
 export type AuraKind =
   | 'dot'
+  // Temporary authoritative displacement state (Oath Chain). It is harmful for
+  // UI/dispel classification, but intentionally bypasses root/slow immunity.
+  | 'forced_move'
   | 'slow'
+  | 'slow_immunity'
+  | 'buff_aura_mastery'
   | 'stun'
   | 'stasis'
   | 'root'
@@ -359,6 +364,9 @@ export type AuraKind =
   | 'next_cast_free'
   | 'next_execute_free'
   | 'next_cast_cheap'
+  | 'paladin_radiant_resonance'
+  | 'paladin_solar_reprisal'
+  | 'paladin_dawns_wrath'
   // Lifesap (druid): flat resource restored on each classic 2-sec regen tick,
   // any resource type, combat or not, carried across form shifts.
   | 'resource_sap'
@@ -426,9 +434,12 @@ export type AuraKind =
   // mage's Arcane damage heals the marked ally. Value is unused (1); the
   // conversion rate is a constant read at damage time, not stored on the aura.
   | 'temporal_echo'
-  // Beacon of Light: a per-Paladin permanent group mark. Direct effective
-  // healing by its source is copied to the marked ally by combat/heal.ts.
+  // Beacon of Light: a per-Paladin permanent group mark. Half of eligible direct
+  // effective healing on another group member is copied by combat/heal.ts.
   | 'beacon_of_light'
+  // Verdict of the Sun God: a hostile, per-Paladin mark. `value` is the number
+  // of filled sun segments (0 to 3); 3 is an inert 0.2s detonation flash.
+  | 'sun_verdict'
   // Sacred Form carries all three Holy-only modifiers on one visible aura:
   // healing done in value, spell crit in value2, and threat multiplier in value3.
   | 'sacred_form'
@@ -470,8 +481,8 @@ export interface Aura {
   // Permanent auras do not age out. Death cleanup still removes them normally.
   permanent?: boolean;
   value: number; // dot/hot: per tick; slow/haste/speed: multiplier; absorb: remaining; buffs: amount
-  value2?: number; // imbue: judgement min; thorns unused
-  value3?: number; // imbue: judgement max
+  value2?: number;
+  value3?: number;
   tickInterval?: number;
   tickTimer?: number;
   sourceId: number;
@@ -503,6 +514,12 @@ export interface Aura {
   // a parallel tick runner. Undefined keeps the classic 1x DoT threat.
   threatMult?: number;
   leechPct?: number; // dot only: fraction of tick damage healed back to source
+  // Oath Chain travel state. A forced_move aura reels the target in and then
+  // applies the authored slow through the normal immunity-aware aura gate.
+  pullStopDistance?: number;
+  pullSpeed?: number;
+  pullSlowMult?: number;
+  pullSlowDuration?: number;
   // Chronomancy Temporal Echo bookkeeping (temporal_echo auras only). echoGroup
   // marks the ORIGIN: false/undefined = the single-target Temporal Echo (35% ST /
   // 15% AoE conversion), true = a Cascada temporal group echo (13% ST / 6% AoE).
@@ -1798,7 +1815,16 @@ export type AbilityEffect =
       restoreMana?: number;
       selfHealDamageFrac?: number;
     } // instant special attack (sinister strike, overpower, backstab)
-  | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
+  | {
+      type: 'directDamage';
+      min: number;
+      max: number;
+      damageMult?: number;
+      vsRootedMult?: number;
+      guaranteedCrit?: boolean;
+      restoreMana?: number;
+      selfHealDamageFrac?: number;
+    }
   // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
   // incentive design), scaled like ability-granted rage; never on a whiff.
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
@@ -1806,6 +1832,7 @@ export type AbilityEffect =
       type: 'chainDamage';
       min: number;
       max: number;
+      damageMult?: number;
       jumps: number;
       falloff: number;
       radius: number;
@@ -1845,6 +1872,14 @@ export type AbilityEffect =
       duration: number;
       speedMult: number;
       armorPct: number;
+      ascended?: boolean;
+    }
+  | {
+      type: 'valkyrsCalling';
+      min: number;
+      max: number;
+      radius: number;
+      softCap: number;
       ascended?: boolean;
     }
   | {
@@ -1912,6 +1947,18 @@ export type AbilityEffect =
       windowSec: number;
       radius: number;
     }
+  | {
+      type: 'sunGodVerdict';
+      duration: number;
+      charges: number;
+      singleTargetMin: number;
+      singleTargetMax: number;
+      areaMin: number;
+      areaMax: number;
+      areaRadius: number;
+      areaSoftCap: number;
+      stunDuration: number;
+    }
   // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps`
   // nearby allies within `radius`, each hop healing `falloff` of the previous
   // hop's amount.
@@ -1931,8 +1978,7 @@ export type AbilityEffect =
       spellPowerCoeff?: number;
       auraId?: string;
     } // power word: shield
-  | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
-  | { type: 'judgement'; dmgMult?: number; flat?: number } // consume your imbue, deal its judgement damage to the target
+  | { type: 'imbue'; bonus: number; duration: number } // seals / rockbiter: extra damage per swing
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
   | {
@@ -1973,6 +2019,7 @@ export type AbilityEffect =
   | {
       type: 'pullTarget';
       stopDistance: number;
+      travelSpeed: number;
       slowMult: number;
       slowDuration: number;
       maxTargets?: number;
@@ -1995,6 +2042,8 @@ export type AbilityEffect =
       // Absent: the classic never-crits AoE path, zero extra rng.
       canCrit?: boolean;
       frontal?: boolean;
+      /** Optional frontal half-angle in radians. Falls back to MELEE_ARC. */
+      frontalHalfAngle?: number;
       stunSec?: number;
       softCap?: number;
       rageOnHit?: { base: number; perTarget: number; capTargets: number };
@@ -2006,6 +2055,7 @@ export type AbilityEffect =
       radius: number;
       playersOnly?: boolean;
       centerOnTarget?: boolean;
+      friendlyTargetOnly?: boolean;
     }
   | {
       type: 'groundAoE';
@@ -2247,7 +2297,7 @@ export interface AbilityDef {
   // Overrides the flying-projectile VISUAL for this spell (the mechanic is
   // unchanged): 'lightning' draws a jagged electric bolt from caster to target
   // instead of the default glowing bolt. Renderer-only; the sim just forwards it.
-  projectileFx?: 'lightning' | 'heavyBolt';
+  projectileFx?: 'lightning' | 'heavyBolt' | 'paladinSunwardDisc';
   // Instant-cast VISUAL cue (renderer-only; the sim just emits a spellfx with it):
   // 'shout' plays the caster's roar one-shot + an expanding ground shockwave ring
   // (the warrior shouts); 'flourish' plays the ability-mapped one-shot clip
@@ -2354,6 +2404,12 @@ export interface AbilityDef {
   // much resource (Iron Resolve caps at 40 rage), keeping the effect it feeds bounded.
   spendResourceCap?: number;
   learnLevel: number;
+  // Quest-gated ability: even at or above learnLevel the ability stays hidden from
+  // the class kit until this quest id is in the player's questsDone. A talent/spec
+  // GRANT still bypasses this (grants are already scoped). Learned permanently once
+  // the quest is turned in (abilitiesKnownAt reads questsDone). Used by the paladin
+  // resurrection chain (recall_the_fallen <- q_rite_of_redemption).
+  requiresQuest?: string;
   effects: AbilityEffect[];
   ranks?: AbilityRank[]; // later ranks (sorted by level)
   description: string; // tooltip text, $d = damage placeholder
@@ -2580,6 +2636,8 @@ export interface QuestDef {
   requiresQuest?: string; // prerequisite quest id (must be turned in)
   requiredItems?: string[]; // quest items obtained earlier (e.g. a prerequisite reward) that this
   // quest needs; re-granted on accept if the player no longer has them, to avoid a progression block
+  requiredClass?: PlayerClass[]; // class-locked quest: only these classes see/accept it
+  // (e.g. the paladin-only Divine Tome chain). Availability enforced in computeQuestState.
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   shareable?: boolean; // quest-link sharing allowed (default true; set false to opt out)
@@ -2663,6 +2721,16 @@ export interface HeroicLeapFlight {
   school: AbilityDef['school'];
 }
 
+export interface ValkyrsCallingFlight {
+  from: Vec3;
+  to: Vec3;
+  elapsed: number;
+  landingAoe: { min: number; max: number; radius: number; softCap: number };
+  abilityName: string;
+  school: AbilityDef['school'];
+  ascended: boolean;
+}
+
 // DEV-ONLY Cascada temporal playtest tally (see Entity.cascadeDevStats). All sums
 // are since the /dev cascade session began; DPS/HPS derive from `startTime` against
 // the deterministic sim clock. `centerId` is the scenario's primary ally, used to
@@ -2694,6 +2762,11 @@ export interface Entity {
   // resolution: never serialized or wired, excluded from the parity digest
   // (tests/parity/trace.ts ENTITY_EXCLUDE).
   castConsumedEmpower?: boolean;
+  // Radiant Resonance reserved by an in-flight Dawn's Embrace. The aura itself
+  // remains visible until the cast succeeds, so an interruption preserves the
+  // proc; this flag locks the 50% cost even if the 10 sec aura expires mid-cast.
+  // Runtime-only and excluded from the parity digest like castConsumedEmpower.
+  castRadiantResonance?: boolean;
   // Chronomancy Rewind (combat/damage_history.ts): a bounded ring of the REAL HP
   // loss this player took, tagged by sim tick, pruned to the last few seconds on
   // every write. Recorded only for players, only at the canonical post-mitigation/
@@ -2914,6 +2987,10 @@ export interface Entity {
   // landing area hit until touchdown. Absent until first use so unrelated entity
   // snapshots and deterministic traces do not gain inert state.
   leap?: HeroicLeapFlight | null;
+  // Valkyr's Calling owns movement through a visible ascent, forward flight,
+  // and descent. Optional so unrelated entities and old wire payloads remain
+  // byte-compatible until the ability is first used.
+  valkyrsCalling?: ValkyrsCallingFlight | null;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
   sitting: boolean;
@@ -3569,6 +3646,13 @@ export type SimEvent = { pid?: number } & (
         | 'fireCone'
         | 'paladinAscensionStart'
         | 'paladinAscensionImpact'
+        | 'paladinHolyShock'
+        | 'paladinSunwardDisc'
+        | 'paladinBastionSweep'
+        | 'paladinBastionSweepImpact'
+        | 'paladinDawnfall'
+        | 'paladinDawnfallImpact'
+        | 'paladinFinalEdict'
         // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
         | 'blinkStep';
@@ -3582,6 +3666,8 @@ export type SimEvent = { pid?: number } & (
       range?: number;
       angle?: number;
       level?: number;
+      /** Total segments in a chained visual, used with level as the zero-based hop. */
+      count?: number;
       // Stable presentation discriminator; renderers must not infer a player
       // attack animation from school or an English ability label.
       attackAnimation?: 'ranged-shot';

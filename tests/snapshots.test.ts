@@ -196,6 +196,18 @@ describe('self stat wire round-trip', () => {
     });
   });
 
+  it('preserves talent-expanded Ascension charge counts for remote Paladins', () => {
+    const sim = new Sim({ seed: 28, playerClass: 'paladin', autoEquip: true });
+    sim.player.paladinDevotion!.ascensionCharges = 7;
+    sim.player.paladinDevotion!.ascensionRemaining = 20;
+    const wire = wireEntity(sim.player);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+
+    expect(client.entities.get(sim.playerId)?.paladinDevotion?.ascensionCharges).toBe(7);
+  });
+
   it('mirrors crit/haste rating from the self snapshot onto the paper-doll entity', () => {
     const client = bareClient(1);
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
@@ -4061,22 +4073,20 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
       kind: 'imbue',
       remaining: 300,
       duration: 300,
-      value: 0, // imbue carries its numbers in value2/value3, so value stays 0...
+      value: 0,
       value2: 8,
       value3: 12,
       sourceId: 0,
       school: 'holy',
     };
     const { wire, mirror } = roundTrip(imbue);
-    expect('value' in wireAura(wire, 'holy_might')).toBe(false); // ...and is omitted (decodes 0)
+    expect('value' in wireAura(wire, 'holy_might')).toBe(false);
     expect(wireAura(wire, 'holy_might').value2).toBe(8);
     expect(wireAura(wire, 'holy_might').value3).toBe(12);
     expect(mirror.value2).toBe(8);
     expect(mirror.value3).toBe(12);
     const desc = auraEffectDescriptor(mirror);
-    expect(desc?.key).toBe('hudChrome.auraEffect.imbueRange');
-    expect(desc?.nums?.min).toBe(8);
-    expect(desc?.nums?.max).toBe(12);
+    expect(desc?.key).toBe('hudChrome.auraEffect.imbue');
   });
 
   it('tolerates an old-server wire aura with no value (backward compatible -> 0)', () => {

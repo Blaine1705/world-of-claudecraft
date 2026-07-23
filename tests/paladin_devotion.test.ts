@@ -8,6 +8,7 @@ import {
   canActivateDivineAscension,
   consumeAscensionCharge,
   devotionGainForAbility,
+  devotionGenerationTriggered,
   grantDevotion,
   grantDevotionFromBlock,
   isAscensionEmpoweredAbility,
@@ -22,7 +23,7 @@ function paladin() {
 }
 
 describe('paladin Devotion core', () => {
-  it('caps Devotion at 20 and activates a five-charge, 25-second Ascension', () => {
+  it('caps Devotion at 20 and activates a five-charge, 45-second Ascension', () => {
     const player = paladin();
     expect(grantDevotion(player, 99)).toBe(MAX_DEVOTION);
     expect(canActivateDivineAscension(player)).toBe(true);
@@ -36,13 +37,38 @@ describe('paladin Devotion core', () => {
     expect(isDivineAscensionActive(player)).toBe(true);
   });
 
-  it('banks at most ten Devotion while Ascension is active', () => {
+  it('lets every specialization and an unspecialized Paladin generate from damage or healing', () => {
+    for (const spec of ['holy', 'protection', 'retribution'] as const) {
+      expect(
+        devotionGenerationTriggered(spec, 'test_attack', { damage: true, healing: false }),
+      ).toBe(true);
+      expect(devotionGenerationTriggered(spec, 'test_heal', { damage: false, healing: true })).toBe(
+        true,
+      );
+      expect(devotionGainForAbility(spec, 'hammer_of_grace')).toBe(1);
+      expect(devotionGainForAbility(spec, 'holy_light')).toBe(1);
+      expect(devotionGainForAbility(spec, 'flash_of_light')).toBe(1);
+    }
+    expect(devotionGenerationTriggered(null, 'holy_light', { damage: false, healing: true })).toBe(
+      true,
+    );
+    expect(devotionGainForAbility(null, 'hammer_of_grace')).toBe(1);
+    expect(devotionGainForAbility(null, 'holy_light')).toBe(1);
+    expect(devotionGainForAbility(null, 'flash_of_light')).toBe(1);
+    expect(devotionGainForAbility(null, 'lay_on_hands')).toBe(1);
+    expect(devotionGainForAbility(null, 'cleansing_verdict')).toBe(1);
+    expect(devotionGainForAbility(null, 'holy_wrath')).toBe(1);
+    expect(devotionGainForAbility(null, 'aura_surge')).toBe(1);
+  });
+
+  it('blocks all Devotion while Ascension is active', () => {
     const player = paladin();
     grantDevotion(player, MAX_DEVOTION);
     activateDivineAscension(player);
 
     grantDevotion(player, MAX_DEVOTION);
-    expect(player.paladinDevotion?.value).toBe(ASCENSION_DEVOTION_BANK_CAP);
+    expect(ASCENSION_DEVOTION_BANK_CAP).toBe(0);
+    expect(player.paladinDevotion?.value).toBe(0);
   });
 
   it('spends Devotion atomically and refuses an unaffordable cost', () => {
@@ -60,9 +86,9 @@ describe('paladin Devotion core', () => {
     activateDivineAscension(player);
 
     expect(consumeAscensionCharge(player, 'holy', 'mending_light')).toBe(false);
-    expect(consumeAscensionCharge(player, 'retribution', 'oathstrike')).toBe(true);
+    expect(consumeAscensionCharge(player, 'retribution', 'final_edict')).toBe(true);
     expect(player.paladinDevotion?.ascensionCharges).toBe(ASCENSION_CHARGES - 1);
-    expect(consumeAscensionCharge(player, 'holy', 'oathstrike')).toBe(false);
+    expect(consumeAscensionCharge(player, 'holy', 'final_edict')).toBe(false);
   });
 
   it('defines generation and charge spenders explicitly for every specialization', () => {
@@ -72,21 +98,18 @@ describe('paladin Devotion core', () => {
       devotionGainForAbility('holy', 'dawns_embrace'),
       devotionGainForAbility('holy', 'radiant_chorus'),
       devotionGainForAbility('holy', 'solar_invocation'),
-      devotionGainForAbility('holy', 'judgement'),
-    ]).toEqual([1, 1, 2, 2, 1, 1]);
+    ]).toEqual([1, 1, 1, 1, 1]);
     expect([
       devotionGainForAbility('protection', 'vowkeeper_strike'),
       devotionGainForAbility('protection', 'bastion_rite'),
       devotionGainForAbility('protection', 'sunward_disc'),
       devotionGainForAbility('protection', 'bastion_sweep'),
-    ]).toEqual([1, 0, 2, 1]);
+    ]).toEqual([1, 0, 1, 1]);
     expect([
-      devotionGainForAbility('retribution', 'oathstrike'),
       devotionGainForAbility('retribution', 'final_edict'),
       devotionGainForAbility('retribution', 'dawnfall'),
-      devotionGainForAbility('retribution', 'judgement'),
       devotionGainForAbility('retribution', 'hammer_of_wrath'),
-    ]).toEqual([1, 2, 2, 1, 1]);
+    ]).toEqual([1, 1, 1]);
 
     expect(
       ['mercy_lance', 'dawns_embrace', 'radiant_chorus', 'solar_invocation'].every((id) =>
@@ -106,8 +129,8 @@ describe('paladin Devotion core', () => {
       ].every((id) => isAscensionEmpoweredAbility('protection', id)),
     ).toBe(true);
     expect(
-      ['oathstrike', 'final_edict', 'dawnfall', 'faithforged_guard', 'hammer_of_wrath'].every(
-        (id) => isAscensionEmpoweredAbility('retribution', id),
+      ['final_edict', 'dawnfall', 'faithforged_guard', 'hammer_of_wrath'].every((id) =>
+        isAscensionEmpoweredAbility('retribution', id),
       ),
     ).toBe(true);
     expect(devotionGainForAbility('retribution', 'faithforged_guard')).toBe(0);
@@ -117,7 +140,7 @@ describe('paladin Devotion core', () => {
     expect(isAscensionEmpoweredAbility('holy', 'holy_light')).toBe(false);
   });
 
-  it('ends Ascension on the last charge or at 25 seconds', () => {
+  it('ends Ascension on the last charge or at 45 seconds', () => {
     const spent = paladin();
     grantDevotion(spent, MAX_DEVOTION);
     activateDivineAscension(spent);
