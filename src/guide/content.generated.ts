@@ -511,7 +511,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "retribution",
         "name": "Dawnreaver",
         "role": "dps",
-        "signature": "oathstrike"
+        "signature": "final_edict"
       }
     ],
     "signatureAbilities": [
@@ -524,10 +524,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Mending Light"
       },
       {
-        "id": "judgement",
-        "name": "Verdict"
-      },
-      {
         "id": "blessing_of_might",
         "name": "Oath of Iron"
       },
@@ -538,6 +534,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "hammer_of_justice",
         "name": "Sundering Gavel"
+      },
+      {
+        "id": "lay_on_hands",
+        "name": "Last Rite"
       }
     ],
     "abilities": [
@@ -548,10 +548,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "holy_light",
         "name": "Mending Light"
-      },
-      {
-        "id": "judgement",
-        "name": "Verdict"
       },
       {
         "id": "blessing_of_might",
@@ -579,7 +575,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "consecration",
-        "name": "Consecration"
+        "name": "Holy Ground"
       },
       {
         "id": "righteous_fury",
@@ -599,7 +595,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "holy_shield",
-        "name": "Holy Shield"
+        "name": "Hallowed Wall"
       },
       {
         "id": "crusader_strike",
@@ -611,7 +607,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "devotion_ward",
-        "name": "Devotion Aura"
+        "name": "Bastion Devotion"
       },
       {
         "id": "radiant_devotion",
@@ -632,10 +628,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "hammer_of_grace",
         "name": "Hammer of Grace"
-      },
-      {
-        "id": "hammer_of_light",
-        "name": "Hammer of Light"
       },
       {
         "id": "hushbrand",
@@ -662,10 +654,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Beacon of Light"
       },
       {
-        "id": "oathstrike",
-        "name": "Oathstrike"
-      },
-      {
         "id": "final_edict",
         "name": "Final Edict"
       },
@@ -684,6 +672,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "avenging_wrath",
         "name": "Avenging Wrath"
+      },
+      {
+        "id": "sun_gods_verdict",
+        "name": "Verdict of the Sun God"
+      },
+      {
+        "id": "valkyrs_calling",
+        "name": "Valkyr's Calling"
       },
       {
         "id": "mercy_lance",
