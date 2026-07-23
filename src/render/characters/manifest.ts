@@ -511,6 +511,9 @@ export const VISUALS: Record<string, VisualDef> = {
         hamstring: '1H_Melee_Attack_Slice_Diagonal',
         sanguine_aura: 'Spellcast_Raise',
         raised_guard: 'Block',
+        // Jawcrack is a bare-fist interrupt: the synthesized punch
+        // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
+        pummel: 'Punch_A',
       },
     },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
