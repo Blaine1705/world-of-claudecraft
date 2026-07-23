@@ -207,7 +207,7 @@ export class CharacterVisual {
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   private weaponAuraMeshes: THREE.Mesh[] = [];
-  private weaponAuraOn = false;
+  private weaponAuraColor: number | null = null;
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
@@ -917,15 +917,20 @@ export class CharacterVisual {
     this.rebuildWeaponAura();
   }
 
-  setWeaponAura(on: boolean): void {
-    if (on === this.weaponAuraOn) return;
-    this.weaponAuraOn = on;
+  /** Hold the imbued-weapon overlay in `colorHex` (null clears it). Driven per
+   *  frame by the renderer from characterWeaponAuraColor - the buff spec's
+   *  weaponAura knob - so the soak lives exactly as long as the worn aura
+   *  (Sanguine Blade's blood red, Pyrebrand's flame lick, Rimebound's rime). */
+  setWeaponAura(colorHex: number | null): void {
+    if (colorHex === this.weaponAuraColor) return;
+    this.weaponAuraColor = colorHex;
     this.rebuildWeaponAura();
   }
 
   private rebuildWeaponAura(): void {
     this.disposeWeaponAura();
-    if (!this.weaponAuraOn) return;
+    if (this.weaponAuraColor === null) return;
+    const auraColor = this.weaponAuraColor;
 
     const weaponHolders: THREE.Object3D[] = [];
     this.model.traverse((o) => {
@@ -939,10 +944,11 @@ export class CharacterVisual {
       const aura = new THREE.Mesh(
         mesh.geometry,
         new THREE.MeshBasicMaterial({
-          // Sanguine Aura is BLOOD-imbued (owner: red, not green): the kit's
-          // established bright blood red (battle_shout's rim family), same
-          // brightness class as the old venom green so only the hue moved.
-          color: 0xff4636,
+          // Additive translucent clone of the weapon mesh in the spec-authored
+          // soak color (sanguine_aura keeps its established bright blood red;
+          // the shaman imbues author their own warm/icy hues). Brightness
+          // class is fixed here - only the hue is data.
+          color: auraColor,
           transparent: true,
           opacity: 0.42,
           depthWrite: false,

@@ -97,6 +97,13 @@ export interface AbilityVfxImpactSpec {
 export interface AbilityVfxBuffSpec {
   style?: 'raise' | 'morph' | 'veil';
   orbit?: string;
+  // While the buff aura (aura id == ability id) is worn, the held mainhand
+  // weapon itself wears a translucent additive overlay in this '#rrggbb'
+  // color for the aura's FULL duration - the imbued-blade read (Sanguine
+  // Blade's blood soak, the shaman weapon imbues). Resolved per frame by
+  // characterWeaponAuraColor (src/render/character_effects.ts) and rendered
+  // by the visual's rebuildWeaponAura clone-mesh overlay.
+  weaponAura?: string;
   shellDur?: number;
   o?: {
     rate?: number;

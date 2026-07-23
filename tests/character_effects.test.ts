@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   characterRecklessnessActive,
-  characterSanguineAuraActive,
   characterSoulRendActive,
+  characterWeaponAuraColor,
 } from '../src/render/character_effects';
 import type { Entity } from '../src/sim/types';
 
@@ -120,9 +120,35 @@ describe('character visual effects', () => {
       school: 'physical',
     } as const;
 
-    expect(characterSanguineAuraActive(entity({ auras: [sanguine] }))).toBe(true);
+    expect(characterWeaponAuraColor(entity({ auras: [sanguine] }))).toBe(0xff4636);
     expect(characterRecklessnessActive(entity({ auras: [reckless] }))).toBe(true);
-    expect(characterSanguineAuraActive(entity({ auras: [reckless] }))).toBe(false);
+    expect(characterWeaponAuraColor(entity({ auras: [reckless] }))).toBe(null);
     expect(characterRecklessnessActive(entity({ auras: [sanguine] }))).toBe(false);
+  });
+
+  it('resolves the shaman imbues to their full-duration weapon soak colors', () => {
+    const imbue = (id: string, school: 'fire' | 'frost' | 'physical') =>
+      ({
+        id,
+        name: id,
+        kind: 'imbue',
+        remaining: 300,
+        duration: 300,
+        value: 8,
+        sourceId: 1,
+        school,
+      }) as const;
+
+    expect(characterWeaponAuraColor(entity({ auras: [imbue('flametongue_weapon', 'fire')] }))).toBe(
+      0xff5a26,
+    );
+    expect(characterWeaponAuraColor(entity({ auras: [imbue('frostbrand_weapon', 'frost')] }))).toBe(
+      0xbfe4ff,
+    );
+    // Rockbiter authors no weaponAura knob (owner opted only the two elemental
+    // imbues in): its orbit band keeps carrying the read alone.
+    expect(characterWeaponAuraColor(entity({ auras: [imbue('rockbiter_weapon', 'physical')] }))).toBe(
+      null,
+    );
   });
 });
