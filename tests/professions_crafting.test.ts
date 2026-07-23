@@ -820,11 +820,11 @@ describe('masterwork proc (Professions 2.0 Phase 2)', () => {
   }
 
   it('a proc mints a signed masterwork instance and surfaces it on every seam (hunted seed)', () => {
-    // Seed 6 was hunted (bounded scan from seed 1 upward) so the single proc
+    // Seed 7 was hunted (bounded scan from seed 1 upward) so the single proc
     // draw lands under the capped 15 percent chance; only the pinned literal
-    // is committed, per the suite's seed-pinning idiom. Spares on record: 19,
-    // 26, 30, and 41.
-    const { sim, pid, meta } = vestmentsScenario(6);
+    // is committed, per the suite's seed-pinning idiom. Spares on record: 26,
+    // 31, 38, and 55.
+    const { sim, pid, meta } = vestmentsScenario(7);
     sim.drainEvents();
     let draws = 0;
     const rng: Rng = (sim as any).ctx.rng;

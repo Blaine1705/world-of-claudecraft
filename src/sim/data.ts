@@ -10,6 +10,7 @@ import type {
   DelveDef,
   DelveModuleDef,
   DungeonDef,
+  EscortDef,
   GatherNodeDef,
   GroundObjectDef,
   ItemDef,
@@ -34,6 +35,7 @@ import {
   AMBERFALL_OBJECTS,
   AMBERFALL_PORTALS,
   AMBERFALL_PROPS,
+  AMBERFALL_QUEST_CAMPS,
   AMBERFALL_QUEST_ORDER,
   AMBERFALL_QUESTS,
   AMBERFALL_ROADS,
@@ -55,6 +57,7 @@ import {
   DRAKELANDS_NPCS,
   DRAKELANDS_OBJECTS,
   DRAKELANDS_PROPS,
+  DRAKELANDS_QUEST_CAMPS,
   DRAKELANDS_QUEST_ORDER,
   DRAKELANDS_QUESTS,
   DRAKELANDS_ROADS,
@@ -76,6 +79,7 @@ import {
 } from './content/evergarden';
 import {
   FARSHORE_CAMPS,
+  FARSHORE_ESCORTS,
   FARSHORE_ITEMS,
   FARSHORE_MOBS,
   FARSHORE_NPCS,
@@ -89,12 +93,14 @@ import {
 } from './content/farshore';
 import {
   FROSTVEIL_CAMPS,
+  FROSTVEIL_ESCORTS,
   FROSTVEIL_ITEMS,
   FROSTVEIL_MOBS,
   FROSTVEIL_NPCS,
   FROSTVEIL_OBJECTS,
   FROSTVEIL_PORTALS,
   FROSTVEIL_PROPS,
+  FROSTVEIL_QUEST_CAMPS,
   FROSTVEIL_QUEST_ORDER,
   FROSTVEIL_QUESTS,
   FROSTVEIL_ROADS,
@@ -108,6 +114,7 @@ import {
   GALECREST_OBJECTS,
   GALECREST_PORTALS,
   GALECREST_PROPS,
+  GALECREST_QUEST_CAMPS,
   GALECREST_QUEST_ORDER,
   GALECREST_QUESTS,
   GALECREST_ROADS,
@@ -130,6 +137,7 @@ import {
   NIGHTBLOOM_OBJECTS,
   NIGHTBLOOM_PORTALS,
   NIGHTBLOOM_PROPS,
+  NIGHTBLOOM_QUEST_CAMPS,
   NIGHTBLOOM_QUEST_ORDER,
   NIGHTBLOOM_QUESTS,
   NIGHTBLOOM_ROADS,
@@ -138,6 +146,7 @@ import {
 import { ORKADIA_DUNGEON_DEFS, ORKADIA_MOBS } from './content/orkadia';
 import {
   PALMREACH_CAMPS,
+  PALMREACH_ESCORTS,
   PALMREACH_ITEMS,
   PALMREACH_MOBS,
   PALMREACH_NPCS,
@@ -192,6 +201,7 @@ import {
   WILLOWFEN_OBJECTS,
   WILLOWFEN_PORTALS,
   WILLOWFEN_PROPS,
+  WILLOWFEN_QUEST_CAMPS,
   WILLOWFEN_QUEST_ORDER,
   WILLOWFEN_QUESTS,
   WILLOWFEN_ROADS,
@@ -199,6 +209,7 @@ import {
 } from './content/willowfen';
 import {
   WRAITHWOOD_CAMPS,
+  WRAITHWOOD_ESCORTS,
   WRAITHWOOD_ITEMS,
   WRAITHWOOD_MOBS,
   WRAITHWOOD_NPCS,
@@ -469,7 +480,25 @@ export const CAMPS: CampDef[] = [
   ...EVERGARDEN_CAMPS,
   ...GALECREST_CAMPS,
   ...FARSHORE_CAMPS,
+  // Quest-pass camp additions stay BELOW every original realm camp (the same
+  // append-last draw-order rule as above): a new camp inserted mid-array would
+  // shift every later camp's world-gen rng draws.
+  ...DRAKELANDS_QUEST_CAMPS,
+  ...FROSTVEIL_QUEST_CAMPS,
+  ...AMBERFALL_QUEST_CAMPS,
+  ...WILLOWFEN_QUEST_CAMPS,
+  ...NIGHTBLOOM_QUEST_CAMPS,
+  ...GALECREST_QUEST_CAMPS,
 ];
+
+// Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
+// like QUESTS.
+export const ESCORTS: Record<string, EscortDef> = {
+  ...FROSTVEIL_ESCORTS,
+  ...WRAITHWOOD_ESCORTS,
+  ...PALMREACH_ESCORTS,
+  ...FARSHORE_ESCORTS,
+};
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE1_OBJECTS,

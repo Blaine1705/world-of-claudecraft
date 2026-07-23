@@ -186,6 +186,68 @@ const baseEnTable = {
   'groundPickup.monumentNorthDeny': 'The forgotten verse waits for a reader with a reason.',
   'groundPickup.monumentNorthEnough':
     'You have already read what the forgotten monument remembers.',
+  // The new-realm quest pass pickup surfaces: English source (contributor adds
+  // English; the maintainer fills every locale at release), EXACT-matched here
+  // so the client re-localizes once the fills land. Values must stay
+  // byte-identical to GROUND_PICKUP_LINES.
+  'groundPickup.hearthEmberCacheDeny':
+    'The ember kettle is banked and sealed. It is not yours to carry.',
+  'groundPickup.hearthEmberCacheEnough': 'You have recovered every ember cache the lodge lost.',
+  'groundPickup.sprungTrapDeny':
+    'The sprung iron is tangled in the reeds, and it is not your trapline.',
+  'groundPickup.sprungTrapEnough': 'You have gathered all of the traps Brosk asked for.',
+  'groundPickup.scorchedSupplyCrateDeny':
+    'The crate is too hot to shoulder without a reason to brave it.',
+  'groundPickup.scorchedSupplyCrateEnough':
+    'You have recovered every crate the quartermaster listed.',
+  'groundPickup.wyrmwatchWarningBannerDeny':
+    'The banner pole is bundled tight. Wyrmwatch has not issued it to you.',
+  'groundPickup.wyrmwatchWarningBannerEnough': 'Every warning banner is already planted.',
+  'groundPickup.amberfallSapBucketDeny':
+    'The sap bucket hangs on its tap, and the orchard is not yours to strip.',
+  'groundPickup.amberfallSapBucketEnough': 'You are carrying all the sap buckets that overturned.',
+  'groundPickup.mereFerryLanternDeny':
+    'The lantern bobs at the waterline, waiting for the ferry crew.',
+  'groundPickup.mereFerryLanternEnough': 'You have fished out every ferry lantern the mere took.',
+  'groundPickup.fenwayMooringLineDeny':
+    'The cut line is snagged fast, and no one asked you to haul it.',
+  'groundPickup.fenwayMooringLineEnough': 'You have recovered all the mooring line Alden needs.',
+  'groundPickup.bridgemereTollChestDeny':
+    'The toll-chest is bedded deep in fen mud and is not yours to raise.',
+  'groundPickup.bridgemereTollChestEnough': 'You have raised every sunken toll-chest.',
+  'groundPickup.gloamfieldNightbloomDeny':
+    'The blossom only opens for a gardener of the night beds.',
+  'groundPickup.gloamfieldNightbloomEnough': 'Your basket holds all the nightbloom it can.',
+  'groundPickup.vigilStarChartDeny':
+    'The chart stone shows nothing to eyes the Astronomer has not guided.',
+  'groundPickup.vigilStarChartEnough': 'You have read every chart the Vigil holds.',
+  'groundPickup.barrowGraveOfferingDeny':
+    'The scattered offering is grave-bound. Disturb it with cause, or not at all.',
+  'groundPickup.barrowGraveOfferingEnough': 'You have gathered all the scattered offerings.',
+  'groundPickup.gallowmereGraveCandleDeny':
+    "The grave-candle is not yours to light without the candlewright's blessing.",
+  'groundPickup.gallowmereGraveCandleEnough': 'Every boundary candle already burns.',
+  'groundPickup.silkboundRemainsDeny': 'The silk-wrapped shape is not yours to cut down.',
+  'groundPickup.silkboundRemainsEnough': 'You have cut down all the remains the vicar asked after.',
+  'groundPickup.pearlwakeCargoCrateDeny':
+    'The cargo crate is salvage-marked. The wreck line has rules.',
+  'groundPickup.pearlwakeCargoCrateEnough': 'You have hauled every crate off the wreck line.',
+  'groundPickup.sunkenOfferingBowlDeny':
+    'The offering bowl is dry, and the idol road keeps its own accounts.',
+  'groundPickup.sunkenOfferingBowlEnough': 'Every offering bowl on the idol road is filled.',
+  'groundPickup.evergardenStatueRubbingDeny':
+    'The statue offers nothing to a passerby without a purpose.',
+  'groundPickup.evergardenStatueRubbingEnough': 'You have taken a rubbing from all four sisters.',
+  'groundPickup.hedgewickToolCartDeny':
+    'The spilled cart is garden property, and the gardeners are counting.',
+  'groundPickup.hedgewickToolCartEnough': 'You have righted every spilled tool cart.',
+  'groundPickup.shearStormLanternDeny':
+    'The storm-lantern is chained to its post against the gale.',
+  'groundPickup.shearStormLanternEnough': 'Every lantern on the Shear is already lit.',
+  'groundPickup.wreckfieldFlotsamCrateDeny': 'Salvage law is clear: no claim, no crate.',
+  'groundPickup.wreckfieldFlotsamCrateEnough': 'You have salvaged all the flotsam Edda marked.',
+  'groundPickup.gullhavenWatchbellDeny': "The watchbell answers only the bellkeeper's errand.",
+  'groundPickup.gullhavenWatchbellEnough': 'Every coastal watchbell has been rung.',
   'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
   'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
   'error.vcupNoNation': 'Pick a banner nation first.',

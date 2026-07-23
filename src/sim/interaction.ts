@@ -32,6 +32,7 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
@@ -528,6 +529,9 @@ export function interact(ctx: SimContext, pid?: number): void {
       }
     }
   }
+  // Escort start: standing near an idle escortee whose quest this player has
+  // active begins the walk (escort.ts picks the nearest eligible one).
+  if (tryStartEscort(ctx, p, r.meta)) return;
   let bestCorpse: Entity | null = null;
   let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestObj: Entity | null = null;

@@ -54,6 +54,7 @@ export const EVERGARDEN_ZONE: ZoneDef = {
   ],
   welcome:
     'Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.',
+  welcomeQuestId: 'q_eg_gate_report',
 };
 
 export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
@@ -105,7 +106,8 @@ export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
 // No portals: walked into through the Garden Gate.
 export const EVERGARDEN_PORTALS: PortalDef[] = [];
 
-// Quests and folk follow in a later pass.
+// The garden's shapes: stags and wolves clipped from living hedge, the gnome
+// groundskeepers, and the Bull that guards the Fountain Court.
 export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
   topiary_stag: {
     id: 'topiary_stag',
@@ -121,7 +123,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 9,
     aggroRadius: 0, // clipped leaves grazing the lawn; it minds its own shape
-    loot: [],
+    loot: [{ itemId: 'evergarden_bloom_clipping', chance: 0.65, questId: 'q_eg_bloom_clippings' }],
     scale: 1.15,
     color: 0x3f7e3c,
   },
@@ -157,7 +159,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 8.5,
     aggroRadius: 10, // the unseen groundskeepers, and they hate trespass
-    loot: [],
+    loot: [{ itemId: 'hedgewick_shears', chance: 0.6, questId: 'q_eg_stolen_shears' }],
     scale: 0.95,
     color: 0x5a8a46,
   },
@@ -181,10 +183,300 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     color: 0x2e6a34,
   },
 };
-export const EVERGARDEN_NPCS: Record<string, NpcDef> = {};
-export const EVERGARDEN_QUESTS: Record<string, QuestDef> = {};
-export const EVERGARDEN_QUEST_ORDER: string[] = [];
-export const EVERGARDEN_ITEMS: Record<string, ItemDef> = {};
+// The folk of the garden: a gatewarden minds the south entry, the sleepless
+// Head Gardener and the Wickmother hold Hedgewick, and far south past the
+// maze, by the Lily Basin, works the gardener nobody believes in. All four
+// stand on open lawn or road: the hedge walls are hard collision here, so
+// every placement stays clear of unmarked maze interior.
+export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
+  gatewarden_pell: {
+    id: 'gatewarden_pell',
+    name: 'Gatewarden Pell',
+    title: 'Keeper of the Garden Gate',
+    pos: { x: 390, z: 714 },
+    facing: -2.6,
+    color: 0x8a9a6a,
+    questIds: ['q_eg_gate_report'],
+    greeting:
+      'Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy.',
+  },
+  head_gardener_amaranth: {
+    id: 'head_gardener_amaranth',
+    name: 'Head Gardener Amaranth',
+    title: 'Head Gardener of the Evergarden',
+    pos: { x: 323, z: 808 },
+    facing: 2.8,
+    color: 0xb46a7a,
+    questIds: ['q_eg_gate_report', 'q_eg_hungry_shapes', 'q_eg_who_trims_the_hedges'],
+    greeting:
+      'Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams.',
+  },
+  wickmother_sorrel: {
+    id: 'wickmother_sorrel',
+    name: 'Wickmother Sorrel',
+    title: 'Keeper of the Hedgewick Inn',
+    pos: { x: 317, z: 814 },
+    facing: 0.5,
+    color: 0xc98a5a,
+    questIds: ['q_eg_stolen_shears', 'q_eg_gnomes_in_the_green'],
+    greeting:
+      'Come in, sit, there is cordial on the fire. Just keep a hand on anything iron: the gnomes are light-fingered of late.',
+  },
+  gardener_yew: {
+    id: 'gardener_yew',
+    name: 'Gardener Yew',
+    title: 'The Last Gardener',
+    pos: { x: 348, z: 1160 },
+    facing: -0.8,
+    color: 0x556b45,
+    questIds: [
+      'q_eg_who_trims_the_hedges',
+      'q_eg_bloom_clippings',
+      'q_eg_four_statues',
+      'q_eg_bull_of_the_court',
+    ],
+    greeting:
+      'Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks.',
+  },
+};
+
+export const EVERGARDEN_QUESTS: Record<string, QuestDef> = {
+  q_eg_gate_report: {
+    id: 'q_eg_gate_report',
+    name: 'Word Through the Gate',
+    giverNpcId: 'gatewarden_pell',
+    turnInNpcId: 'head_gardener_amaranth',
+    text: 'The lawns past this gate have trimmed themselves for a hundred years, $N, and lately they have started trimming visitors. Head Gardener Amaranth keeps the books in Hedgewick, up the road past the gate lawns. Tell her another traveler has come through, and tell her the hedges by the gate moved last night.',
+    completionText:
+      'Moved, did they. Pell reports that every week, and every week he is right. Forgive my eyes, $N, I have not slept a whole night in years: someone has to watch the garden watch us. Welcome to Hedgewick.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'head_gardener_amaranth',
+        count: 1,
+        label: 'Report to Head Gardener Amaranth',
+      },
+    ],
+    xpReward: 2600,
+    copperReward: 950,
+    itemRewards: {},
+    minLevel: 19,
+  },
+  q_eg_hungry_shapes: {
+    id: 'q_eg_hungry_shapes',
+    name: 'Pruned into Hunger',
+    giverNpcId: 'head_gardener_amaranth',
+    turnInNpcId: 'head_gardener_amaranth',
+    text: 'Whoever shapes this garden has grown careless, or cruel. The wolf shapes out in the Rose Wilds were clipped for show, yet lately they hunt: green jaws, no bellies, and no reason ever to stop. Cut down ten topiary wolves, $N, and let the lawns be lawns again for a while.',
+    completionText:
+      'Ten heaps of clippings where ten wolves stood. It should feel like gardening, $N. Why does it feel like war?',
+    objectives: [
+      { type: 'kill', targetMobId: 'topiary_wolf', count: 10, label: 'Topiary Wolf slain' },
+    ],
+    xpReward: 4600,
+    copperReward: 2200,
+    itemRewards: {},
+    requiresQuest: 'q_eg_gate_report',
+  },
+  q_eg_stolen_shears: {
+    id: 'q_eg_stolen_shears',
+    name: 'The Stolen Shears',
+    giverNpcId: 'wickmother_sorrel',
+    turnInNpcId: 'wickmother_sorrel',
+    text: 'Every pair of shears in Hedgewick has walked off in a fortnight, $N: off the pegs, out of locked sheds, one pair out of my own apron while I dozed. It is the hedge gnomes, the little groundskeepers who hate us walking their lawns. Get six pairs back before the whole hamlet is down to kitchen knives.',
+    completionText:
+      'Six pairs, and my own among them, I would know the nick in the blade anywhere. Here, these gloves were knitted for pruning work. Warm hands make steady shears.',
+    objectives: [
+      { type: 'collect', itemId: 'hedgewick_shears', count: 6, label: 'Stolen Hedgewick Shears' },
+    ],
+    xpReward: 4800,
+    copperReward: 2400,
+    itemRewards: {
+      warrior: 'shearkeeper_gloves',
+      mage: 'shearkeeper_gloves',
+      rogue: 'shearkeeper_gloves',
+    },
+    requiresQuest: 'q_eg_gate_report',
+  },
+  q_eg_gnomes_in_the_green: {
+    id: 'q_eg_gnomes_in_the_green',
+    name: 'The Groundskeepers Grudge',
+    giverNpcId: 'wickmother_sorrel',
+    turnInNpcId: 'wickmother_sorrel',
+    text: 'The shears were only the start, $N. Last night the gnomes tipped our tool carts into the green, one out by their warren west of the maze, one clean across the garden on the pond walk, and scattered a hundred years of good iron in the grass. Drive off eight of the little devils and haul the spilled carts home.',
+    completionText:
+      'Three carts back and the pegs full again. Let the little devils sulk in their hedges: Hedgewick works these lawns too.',
+    objectives: [
+      { type: 'kill', targetMobId: 'hedge_gnome', count: 8, label: 'Hedge Gnome driven off' },
+      {
+        type: 'interact',
+        targetObjectItemId: 'hedgewick_tool_cart',
+        count: 3,
+        label: 'Tool cart recovered',
+      },
+    ],
+    xpReward: 5000,
+    copperReward: 2600,
+    itemRewards: {},
+    requiresQuest: 'q_eg_stolen_shears',
+    minLevel: 20,
+  },
+  q_eg_who_trims_the_hedges: {
+    id: 'q_eg_who_trims_the_hedges',
+    name: 'Who Trims the Hedges',
+    giverNpcId: 'head_gardener_amaranth',
+    turnInNpcId: 'gardener_yew',
+    text: 'I have kept the ledgers thirty years, $N, and not slept properly for ten of them, because the sums will not close. Grass wants cutting and hedges want shaping, and nobody here does either, yet every dawn the garden stands trimmed. Lately the woodfolk swear they see an old man with a barrow on the far south lawns, past the maze by the Lily Basin. Find him. If he is real, I can finally sleep. If he is not, I suppose I never will.',
+    completionText:
+      'So the house finally sent someone. A hundred years I have walked these lawns, $N, and the garden and I have an understanding: I trim what asks to be trimmed. Sit. The hedges can spare you an hour.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'gardener_yew',
+        count: 1,
+        label: 'Find the gardener by the Lily Basin',
+      },
+    ],
+    xpReward: 2800,
+    copperReward: 1000,
+    itemRewards: {},
+    requiresQuest: 'q_eg_hungry_shapes',
+    minLevel: 20,
+  },
+  q_eg_bloom_clippings: {
+    id: 'q_eg_bloom_clippings',
+    name: 'Clippings from the Living Green',
+    giverNpcId: 'gardener_yew',
+    turnInNpcId: 'gardener_yew',
+    text: 'You want to understand this garden? Then read it the way I do. The stags that graze the lawns grow the truest green: every leaf on them is a page. Bring me six fresh clippings from the topiary stags, $N. They will not thank you for the pruning, but they will regrow. Everything here regrows.',
+    completionText:
+      'Look here: the leaves are curling in on themselves, every clipping the same. The garden is afraid, $N. In a hundred years I have never once known it afraid.',
+    objectives: [
+      {
+        type: 'collect',
+        itemId: 'evergarden_bloom_clipping',
+        count: 6,
+        label: 'Pruned Bloom Clipping',
+      },
+    ],
+    xpReward: 4600,
+    copperReward: 2200,
+    itemRewards: {},
+    requiresQuest: 'q_eg_who_trims_the_hedges',
+  },
+  q_eg_four_statues: {
+    id: 'q_eg_four_statues',
+    name: 'The Four Quiet Sisters',
+    giverNpcId: 'gardener_yew',
+    turnInNpcId: 'gardener_yew',
+    text: 'When the garden was young, the first gardeners raised four marble sisters to watch its quarters: one above the Rose Wilds, one on the pond walk east of the maze, one on the west lawn where the gnomes keep their warren, and one on the south lawn past the hedges. The maze grew up between them, and most folk never see all four. Walk the quarters, $N, and press your palm to each sister. When the garden has looked you over from all four sides, it will open places it keeps from strangers.',
+    completionText:
+      'Four rubbings, four sisters, and not one of them wept marble. The garden has taken your measure, $N, and it did not find you wanting. Now I can send you where the trouble truly lives.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'evergarden_statue_rubbing',
+        count: 4,
+        label: 'Garden statue visited',
+      },
+    ],
+    xpReward: 5200,
+    copperReward: 2600,
+    itemRewards: {},
+    requiresQuest: 'q_eg_who_trims_the_hedges',
+    minLevel: 20,
+  },
+  q_eg_bull_of_the_court: {
+    id: 'q_eg_bull_of_the_court',
+    name: 'The Bull of the Fountain Court',
+    giverNpcId: 'gardener_yew',
+    turnInNpcId: 'gardener_yew',
+    text: 'Now the truth, $N. The bull at the heart of the maze was my masterwork: I shaped him to guard the Fountain Court, and for a hundred years he did. But the fear in the green has reached him, and he guards nothing now, he hunts. The maze feeds him whoever wanders in. I am too old to unmake him, and it must be unmaking, root and branch. Bring a friend, walk the maze to the court, and cut my bull down.',
+    completionText:
+      'I felt it, here, when he came apart. A hundred years of work, and you were right to end it. Take this mantle: I cut it for whoever proved stronger than my best. The court is only a fountain tonight, $N, and the garden is only a garden. Perhaps now the Head Gardener and I can both sleep.',
+    objectives: [
+      { type: 'kill', targetMobId: 'the_topiary_bull', count: 1, label: 'The Topiary Bull unmade' },
+    ],
+    xpReward: 6200,
+    copperReward: 3800,
+    itemRewards: {
+      warrior: 'fountain_court_mantle',
+      mage: 'fountain_court_mantle',
+      rogue: 'fountain_court_mantle',
+    },
+    requiresQuest: 'q_eg_four_statues',
+    minLevel: 20,
+    suggestedPlayers: 2,
+  },
+};
+
+// Level-braided presentation order (not strictly chain order), matching the
+// Veiled Hollow convention.
+export const EVERGARDEN_QUEST_ORDER: string[] = [
+  'q_eg_gate_report',
+  'q_eg_hungry_shapes',
+  'q_eg_stolen_shears',
+  'q_eg_who_trims_the_hedges',
+  'q_eg_gnomes_in_the_green',
+  'q_eg_bloom_clippings',
+  'q_eg_four_statues',
+  'q_eg_bull_of_the_court',
+];
+
+export const EVERGARDEN_ITEMS: Record<string, ItemDef> = {
+  // --- quest items ---
+  hedgewick_shears: {
+    id: 'hedgewick_shears',
+    name: 'Stolen Hedgewick Shears',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_eg_stolen_shears',
+  },
+  evergarden_bloom_clipping: {
+    id: 'evergarden_bloom_clipping',
+    name: 'Pruned Bloom Clipping',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_eg_bloom_clippings',
+  },
+  hedgewick_tool_cart: {
+    id: 'hedgewick_tool_cart',
+    name: 'Spilled Tool Cart',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_eg_gnomes_in_the_green',
+    noVendorSell: true,
+  },
+  evergarden_statue_rubbing: {
+    id: 'evergarden_statue_rubbing',
+    name: 'Statue Rubbing',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_eg_four_statues',
+    noVendorSell: true,
+  },
+  // --- quest rewards ---
+  shearkeeper_gloves: {
+    id: 'shearkeeper_gloves',
+    name: 'Shearkeeper Gloves',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'gloves',
+    quality: 'uncommon',
+    stats: { armor: 52, sta: 3, spi: 3 },
+    sellValue: 950,
+  },
+  fountain_court_mantle: {
+    id: 'fountain_court_mantle',
+    name: 'Mantle of the Fountain Court',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'shoulder',
+    quality: 'rare',
+    stats: { armor: 74, sta: 6, str: 4 },
+    sellValue: 2400,
+  },
+};
 export const EVERGARDEN_CAMPS: CampDef[] = [
   { mobId: 'topiary_stag', center: { x: 364, z: 898 }, radius: 10, count: 3 },
   { mobId: 'topiary_stag', center: { x: 326, z: 1146 }, radius: 10, count: 3 },
@@ -194,7 +486,35 @@ export const EVERGARDEN_CAMPS: CampDef[] = [
   { mobId: 'hedge_gnome', center: { x: 456, z: 942 }, radius: 10, count: 2 },
   { mobId: 'the_topiary_bull', center: { x: 360, z: 1016 }, radius: 5, count: 1 },
 ];
-export const EVERGARDEN_OBJECTS: GroundObjectDef[] = [];
+// Every position below sits on open lawn or road verge beside an existing
+// camp or POI: the hedge walls are hard collision, so nothing may land in
+// unmarked maze interior.
+export const EVERGARDEN_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'evergarden_statue_rubbing',
+    name: 'Weathered Garden Statue',
+    // The Four Quiet Sisters, one per garden quarter around the Great Maze:
+    // above the Rose Wilds, on the pond-walk road east of the maze, on the
+    // west lawn by the gnome warren, and on the south lawn past the hedges.
+    positions: [
+      { x: 280, z: 922 },
+      { x: 452, z: 930 },
+      { x: 274, z: 1012 },
+      { x: 426, z: 1118 },
+    ],
+  },
+  {
+    itemId: 'hedgewick_tool_cart',
+    name: 'Spilled Tool Cart',
+    // Tipped by the gnomes at their warren on the west lawn and out along
+    // the pond walk (q_eg_gnomes_in_the_green).
+    positions: [
+      { x: 262, z: 996 },
+      { x: 276, z: 1008 },
+      { x: 460, z: 948 },
+    ],
+  },
+];
 
 export const EVERGARDEN_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),

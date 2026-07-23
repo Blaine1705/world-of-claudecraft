@@ -2637,7 +2637,73 @@ export type QuestObjective =
   | (QuestObjectiveBase & { type: 'gather' } & (
         | { nodeType: GatherNodeType; itemId?: string }
         | { nodeType?: undefined; itemId: string }
-      ));
+      ))
+  // Escort: completed by the escort run in src/sim/escort.ts when the walked
+  // NPC reaches its final waypoint with this player in credit range. count is
+  // always 1; the run starts by interacting with the idle escortee while this
+  // quest is active.
+  | (QuestObjectiveBase & { type: 'escort'; escortId: string });
+
+// ---------------------------------------------------------------------------
+// Escort runs (src/sim/escort.ts): a quest NPC that walks an authored waypoint
+// path while scripted ambushes attack it. Defs are data-as-code in the realm
+// content modules, merged into ESCORTS by data.ts.
+// ---------------------------------------------------------------------------
+
+export interface EscortAmbushDef {
+  // Fires when the escortee ARRIVES at this waypoint index (0-based).
+  atWaypoint: number;
+  mobId: string;
+  count: number;
+  // Spawn scatter ring around the escortee (world yards).
+  radius?: number;
+}
+
+export interface EscortDef {
+  id: string;
+  // MobTemplate of the escortee: a non-hostile mob with moveSpeed 0 (the run
+  // drives all movement) and aggroRadius 0. Players cannot attack it; mobs
+  // damage it through seeded ambush threat; players may heal it while live.
+  npcMobId: string;
+  // The quest carrying this escort's { type: 'escort' } objective. Interacting
+  // with the idle escortee while this quest is active starts the run.
+  questId: string;
+  start: { x: number; z: number };
+  waypoints: { x: number; z: number }[];
+  moveSpeed: number;
+  ambushes: EscortAmbushDef[];
+  // Players with the quest active within this range of the escortee at the
+  // final waypoint receive objective credit.
+  creditRadius: number;
+  // Idle escortee respawn delay (seconds) after a success or a failure.
+  respawnSeconds: number;
+  // Player-visible flavor barked by the escortee as 'yell'-channel chat
+  // (emitMobYell), riding the MobTemplate.yells variable-routed-chat precedent
+  // (see the S3 note about boss yells in tests/localization_fixes.test.ts).
+  startText: string;
+  successText: string;
+  failText: string;
+}
+
+// Live per-def escort state (src/sim/escort.ts; the backing map stays on Sim).
+// Exactly one of three phases: idle (npcId set, run null), live (npcId set,
+// run set), or respawning (npcId null, respawnAt in the future).
+export interface EscortRunState {
+  escortId: string;
+  npcId: number | null;
+  respawnAt: number;
+  run: {
+    waypointIndex: number;
+    startedAt: number;
+    ambushIds: number[];
+    fired: boolean[];
+    // Stuck-advance bookkeeping: a walker pinned against a collider for a few
+    // seconds counts its current waypoint as reached (escort.ts).
+    lastX: number;
+    lastZ: number;
+    stuckTicks: number;
+  } | null;
+}
 
 export interface QuestDef {
   id: string;

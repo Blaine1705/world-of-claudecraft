@@ -12,6 +12,7 @@
 
 import type {
   CampDef,
+  EscortDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -52,6 +53,7 @@ export const WRAITHWOOD_ZONE: ZoneDef = {
   ],
   welcome:
     'The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.',
+  welcomeQuestId: 'q_ww_bells_of_gallowmere',
 };
 
 export const WRAITHWOOD_ROADS: { x: number; z: number }[][] = [
@@ -119,7 +121,7 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 8.5,
     aggroRadius: 12,
-    loot: [],
+    loot: [{ itemId: 'widowsilk_skein', chance: 0.6, questId: 'q_ww_widows_skeins' }],
     scale: 1.3,
     color: 0x3a3440,
   },
@@ -178,11 +180,337 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
     scale: 1.4,
     color: 0xc8d8c0,
   },
+  // Gallowmere's gravedigger (q_ww_walking_mosley_home). Escort-run escortee:
+  // non-hostile, never wanders (moveSpeed 0; src/sim/escort.ts drives all
+  // movement), never fights back. Sturdy enough to survive an ambush wave
+  // long enough for the escorting player to peel it.
+  gravedigger_mosley: {
+    id: 'gravedigger_mosley',
+    name: 'Gravedigger Mosley',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'humanoid',
+    hpBase: 240,
+    hpPerLevel: 20,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 2.0,
+    armorPerLevel: 12,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1.0,
+    color: 0x8a7a5a,
+  },
 };
-export const WRAITHWOOD_NPCS: Record<string, NpcDef> = {};
-export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {};
-export const WRAITHWOOD_QUEST_ORDER: string[] = [];
-export const WRAITHWOOD_ITEMS: Record<string, ItemDef> = {};
+// The folk of the wood: a lampman minds the Crowgate waycamp, the sexton and
+// the candlewright hold Gallowmere, and the last vicar still tends the ruined
+// Mournstone Chapel alone. The vicar stands far from the hub on purpose: the
+// chapel chain sends players out to find him.
+export const WRAITHWOOD_NPCS: Record<string, NpcDef> = {
+  lampman_cobb: {
+    id: 'lampman_cobb',
+    name: 'Lampman Cobb',
+    title: 'Keeper of the Crowgate Lanterns',
+    pos: { x: 387, z: 1283 },
+    facing: 2.9,
+    color: 0xc9a86a,
+    questIds: ['q_ww_bells_of_gallowmere'],
+    greeting: 'Stay in the lamplight, friend. The wood counts everyone who passes the gate.',
+  },
+  sexton_marrow: {
+    id: 'sexton_marrow',
+    name: 'Sexton Marrow',
+    title: 'Sexton of Gallowmere',
+    pos: { x: 363, z: 1436 },
+    facing: -2.0,
+    color: 0x6a6a72,
+    questIds: [
+      'q_ww_bells_of_gallowmere',
+      'q_ww_silk_in_the_eaves',
+      'q_ww_the_last_vicar',
+      'q_ww_walking_mosley_home',
+    ],
+    greeting: 'We bury them deep here, and we ring the bells so they remember to stay down.',
+  },
+  widow_tansy: {
+    id: 'widow_tansy',
+    name: 'Widow Tansy',
+    title: 'Candlewright of Gallowmere',
+    pos: { x: 357, z: 1424 },
+    facing: 0.7,
+    color: 0xb8a2c8,
+    questIds: ['q_ww_widows_skeins', 'q_ww_candles_at_the_bounds'],
+    greeting: 'A candle for every grave, and not one may go out. Not one, do you hear me?',
+  },
+  vicar_creel: {
+    id: 'vicar_creel',
+    name: 'Vicar Creel',
+    title: 'Last Vicar of the Mournstone',
+    pos: { x: 296, z: 1614 },
+    facing: 0.4,
+    color: 0x8f9a88,
+    questIds: [
+      'q_ww_the_last_vicar',
+      'q_ww_wraiths_of_the_tarn',
+      'q_ww_what_the_bark_holds',
+      'q_ww_horn_of_the_huntsman',
+    ],
+    greeting: 'The chapel fell years ago. The dead beneath it did not notice, and so I stayed.',
+  },
+};
+
+export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
+  q_ww_bells_of_gallowmere: {
+    id: 'q_ww_bells_of_gallowmere',
+    name: 'The Bells of Gallowmere',
+    giverNpcId: 'lampman_cobb',
+    turnInNpcId: 'sexton_marrow',
+    text: 'Hear that tolling, $N? That is Gallowmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.',
+    completionText:
+      'Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gallowmere, $N. Mind the bells.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'sexton_marrow',
+        count: 1,
+        label: 'Report to Sexton Marrow',
+      },
+    ],
+    xpReward: 2600,
+    copperReward: 1000,
+    itemRewards: {},
+    minLevel: 19,
+  },
+  q_ww_silk_in_the_eaves: {
+    id: 'q_ww_silk_in_the_eaves',
+    name: 'Silk in the Eaves',
+    giverNpcId: 'sexton_marrow',
+    turnInNpcId: 'sexton_marrow',
+    text: 'Look up when you walk the west road, $N, and you will see them: wrapped shapes in the canopy, swaying where no wind reaches. The widowsilk spinners have crept out of the Thicket and strung their larders over my lanterns. Kill ten, and the road is a road again.',
+    completionText:
+      'Ten fewer weavers in the eaves. The lamplighters will walk their rounds tonight without looking up, and that is worth more here than you know.',
+    objectives: [
+      {
+        type: 'kill',
+        targetMobId: 'widowsilk_spinner',
+        count: 10,
+        label: 'Widowsilk Spinner slain',
+      },
+    ],
+    xpReward: 4600,
+    copperReward: 2200,
+    itemRewards: {},
+    requiresQuest: 'q_ww_bells_of_gallowmere',
+  },
+  q_ww_widows_skeins: {
+    id: 'q_ww_widows_skeins',
+    name: "The Widow's Skeins",
+    giverNpcId: 'widow_tansy',
+    turnInNpcId: 'widow_tansy',
+    text: 'The spinners take our dead for their larders, $N, so I take their silk for our shrouds. It burns clean and it holds a blessing better than linen ever did. Bring me six skeins of widowsilk, and the next soul we bury goes down wrapped and warded.',
+    completionText:
+      'Six skeins, soft as a held breath. The dead will lie easier in this. Take these wraps, I sewed them from the last batch, and the wood has never once bitten through them.',
+    objectives: [
+      { type: 'collect', itemId: 'widowsilk_skein', count: 6, label: 'Widowsilk Skein' },
+    ],
+    xpReward: 4800,
+    copperReward: 2400,
+    itemRewards: {
+      warrior: 'gravebound_silk_wraps',
+      mage: 'gravebound_silk_wraps',
+      rogue: 'gravebound_silk_wraps',
+    },
+    requiresQuest: 'q_ww_bells_of_gallowmere',
+  },
+  q_ww_candles_at_the_bounds: {
+    id: 'q_ww_candles_at_the_bounds',
+    name: 'Candles at the Bounds',
+    giverNpcId: 'widow_tansy',
+    turnInNpcId: 'widow_tansy',
+    text: 'Four boundary stones ring Gallowmere, $N, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.',
+    completionText:
+      'All four burning? Then breathe, $N. You did not hear it, but the whole village did: the bells rang easier the moment the last wick caught.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'gallowmere_grave_candle',
+        count: 4,
+        label: 'Grave-candle relit',
+      },
+    ],
+    xpReward: 4600,
+    copperReward: 2200,
+    itemRewards: {},
+    requiresQuest: 'q_ww_bells_of_gallowmere',
+  },
+  q_ww_the_last_vicar: {
+    id: 'q_ww_the_last_vicar',
+    name: 'The Last Vicar',
+    giverNpcId: 'sexton_marrow',
+    turnInNpcId: 'vicar_creel',
+    text: 'South of here the Mournstone Chapel moulders by its black tarn, and one man still tends it: Vicar Creel, who would not leave when the roof came down. He knows the old rites better than my bells do, $N, and he has not sent word in a month. Walk the chapel road and see him breathing.',
+    completionText:
+      'Marrow worries after me? That is new. Tell him the Mournstone stands, after a fashion, and so do I. Stay a while, $N. The tarn has been whispering, and I would rather not listen alone.',
+    objectives: [
+      { type: 'interact', targetNpcId: 'vicar_creel', count: 1, label: 'Find Vicar Creel' },
+    ],
+    xpReward: 2800,
+    copperReward: 1100,
+    itemRewards: {},
+    requiresQuest: 'q_ww_silk_in_the_eaves',
+    minLevel: 20,
+  },
+  q_ww_wraiths_of_the_tarn: {
+    id: 'q_ww_wraiths_of_the_tarn',
+    name: 'Wraiths of the Tarn',
+    giverNpcId: 'vicar_creel',
+    turnInNpcId: 'vicar_creel',
+    text: 'The wood wraiths were the chapel wardens once, $N, grown from trees planted over the honored dead. Since the tarn turned black they have forgotten their office, and now they drift through my graveyard pulling at the soil. Break eight of them apart before they finish what they have started.',
+    completionText:
+      'Eight wardens laid down at last. I will not call it a mercy in daylight, but between us, $N, it was one.',
+    objectives: [
+      { type: 'kill', targetMobId: 'wood_wraith', count: 8, label: 'Wood Wraith slain' },
+    ],
+    xpReward: 4800,
+    copperReward: 2400,
+    itemRewards: {},
+    requiresQuest: 'q_ww_the_last_vicar',
+  },
+  q_ww_what_the_bark_holds: {
+    id: 'q_ww_what_the_bark_holds',
+    name: 'What the Bark Holds',
+    giverNpcId: 'vicar_creel',
+    turnInNpcId: 'vicar_creel',
+    text: 'In the Hanging Glade east of Gallowmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, $N. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.',
+    completionText:
+      'Three souls back under honest ground before nightfall. The shamblers will grow back, bark always does, but tonight the glade hangs empty, and that is enough.',
+    objectives: [
+      {
+        type: 'kill',
+        targetMobId: 'gravenbark_shambler',
+        count: 5,
+        label: 'Gravenbark Shambler felled',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'silkbound_remains',
+        count: 3,
+        label: 'Silkbound remains cut down',
+      },
+    ],
+    xpReward: 5200,
+    copperReward: 2800,
+    itemRewards: {},
+    requiresQuest: 'q_ww_the_last_vicar',
+  },
+  q_ww_walking_mosley_home: {
+    id: 'q_ww_walking_mosley_home',
+    name: 'Walking Mosley Home',
+    giverNpcId: 'sexton_marrow',
+    turnInNpcId: 'sexton_marrow',
+    text: 'My gravedigger Mosley took the chapel road three days ago to open a plot in the old yard, and the dig came down on top of him. He clawed his way out, the fool is alive, but he is huddled by the chapel graves and will not move for spinners on the road. Walk him home, $N. I cannot ring the bells for a living man.',
+    completionText:
+      'He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, $N. Gallowmere keeps its people, that is the whole of our law.',
+    objectives: [
+      {
+        type: 'escort',
+        escortId: 'esc_ww_mosley',
+        count: 1,
+        label: 'Gravedigger Mosley walked safely back to Gallowmere',
+      },
+    ],
+    xpReward: 5600,
+    copperReward: 3200,
+    itemRewards: {},
+    requiresQuest: 'q_ww_the_last_vicar',
+    minLevel: 20,
+  },
+  q_ww_horn_of_the_huntsman: {
+    id: 'q_ww_horn_of_the_huntsman',
+    name: 'The Horn of the Huntsman',
+    giverNpcId: 'vicar_creel',
+    turnInNpcId: 'vicar_creel',
+    text: 'You have heard the horn by now, $N, thin and far off, the sound the whole wood holds its breath for. The Pale Huntsman rides his clearing north of here, and every grave he passes grows shallower. He was a man once, and he was buried wrong, and I am done pretending prayer will do it. Take a friend, take two, and unhorse him.',
+    completionText:
+      'The horn stopped mid-note. Every bell in Gallowmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, $N. Wear this, and walk under the canopy unafraid.',
+    objectives: [
+      { type: 'kill', targetMobId: 'pale_huntsman', count: 1, label: 'The Pale Huntsman unhorsed' },
+    ],
+    xpReward: 6200,
+    copperReward: 3800,
+    itemRewards: {
+      warrior: 'mantle_of_the_unhorsed',
+      mage: 'mantle_of_the_unhorsed',
+      rogue: 'mantle_of_the_unhorsed',
+    },
+    requiresQuest: 'q_ww_what_the_bark_holds',
+    minLevel: 20,
+    suggestedPlayers: 2,
+  },
+};
+
+// Level-braided presentation order (not strictly chain order), matching the
+// Veiled Hollow convention.
+export const WRAITHWOOD_QUEST_ORDER: string[] = [
+  'q_ww_bells_of_gallowmere',
+  'q_ww_silk_in_the_eaves',
+  'q_ww_widows_skeins',
+  'q_ww_candles_at_the_bounds',
+  'q_ww_the_last_vicar',
+  'q_ww_wraiths_of_the_tarn',
+  'q_ww_what_the_bark_holds',
+  'q_ww_walking_mosley_home',
+  'q_ww_horn_of_the_huntsman',
+];
+
+export const WRAITHWOOD_ITEMS: Record<string, ItemDef> = {
+  // --- quest items ---
+  widowsilk_skein: {
+    id: 'widowsilk_skein',
+    name: 'Widowsilk Skein',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_ww_widows_skeins',
+  },
+  gallowmere_grave_candle: {
+    id: 'gallowmere_grave_candle',
+    name: 'Grave-Candle',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_ww_candles_at_the_bounds',
+    noVendorSell: true,
+  },
+  silkbound_remains: {
+    id: 'silkbound_remains',
+    name: 'Silkbound Remains',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_ww_what_the_bark_holds',
+    noVendorSell: true,
+  },
+  // --- quest rewards ---
+  gravebound_silk_wraps: {
+    id: 'gravebound_silk_wraps',
+    name: 'Gravebound Silk Wraps',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'gloves',
+    quality: 'uncommon',
+    stats: { armor: 52, sta: 3, spi: 3 },
+    sellValue: 1000,
+  },
+  mantle_of_the_unhorsed: {
+    id: 'mantle_of_the_unhorsed',
+    name: 'Mantle of the Unhorsed',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'shoulder',
+    quality: 'rare',
+    stats: { armor: 76, sta: 6, spi: 4 },
+    sellValue: 2400,
+  },
+};
 export const WRAITHWOOD_CAMPS: CampDef[] = [
   { mobId: 'widowsilk_spinner', center: { x: 282, z: 1478 }, radius: 10, count: 3 },
   { mobId: 'widowsilk_spinner', center: { x: 468, z: 1464 }, radius: 10, count: 3 },
@@ -191,7 +519,66 @@ export const WRAITHWOOD_CAMPS: CampDef[] = [
   { mobId: 'gravenbark_shambler', center: { x: 444, z: 1526 }, radius: 10, count: 2 },
   { mobId: 'pale_huntsman', center: { x: 380, z: 1680 }, radius: 5, count: 1 },
 ];
-export const WRAITHWOOD_OBJECTS: GroundObjectDef[] = [];
+export const WRAITHWOOD_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'gallowmere_grave_candle',
+    name: 'Grave-Candle',
+    // The four boundary stones of Gallowmere, one on each road out of the
+    // hamlet (q_ww_candles_at_the_bounds).
+    positions: [
+      { x: 370, z: 1384 }, // the Crowgate road
+      { x: 324, z: 1452 }, // the Widow's Thicket road
+      { x: 394, z: 1466 }, // the Hanging Glade road
+      { x: 340, z: 1498 }, // the chapel road
+    ],
+  },
+  {
+    itemId: 'silkbound_remains',
+    name: 'Silkbound Remains',
+    // Wrapped shapes hung low in the Hanging Glade, under the shamblers'
+    // watch (q_ww_what_the_bark_holds).
+    positions: [
+      { x: 432, z: 1516 },
+      { x: 446, z: 1536 },
+      { x: 438, z: 1544 },
+    ],
+  },
+];
+
+// Walking Mosley Home (q_ww_walking_mosley_home): the gravedigger shelters
+// among the chapel graves where his dig collapsed and walks the chapel road
+// north to Gallowmere, through the wraiths pulling at the graveyard soil and
+// the spinners strung over the road. Waypoints hug the authored road curve
+// above (Gallowmere -> the Mournstone Chapel, walked in reverse).
+export const WRAITHWOOD_ESCORTS: Record<string, EscortDef> = {
+  esc_ww_mosley: {
+    id: 'esc_ww_mosley',
+    npcMobId: 'gravedigger_mosley',
+    questId: 'q_ww_walking_mosley_home',
+    start: { x: 310, z: 1596 },
+    waypoints: [
+      { x: 318, z: 1570 },
+      { x: 338, z: 1500 },
+      { x: 350, z: 1462 },
+      // Stops on open ground at the village edge: the lantern-ring props
+      // around Gallowmere pin the deeper approach (verified by the
+      // walkability sweep in tests/escort.test.ts).
+      { x: 357, z: 1447 },
+    ],
+    moveSpeed: 4.5,
+    ambushes: [
+      { atWaypoint: 0, mobId: 'wood_wraith', count: 3 },
+      { atWaypoint: 2, mobId: 'widowsilk_spinner', count: 3 },
+    ],
+    creditRadius: 40,
+    respawnSeconds: 30,
+    startText:
+      "You'll walk with me? Bless you. Keep between me and the trees, and if you hear a horn, we run.",
+    successText:
+      'The lanterns! I can hear the bells, the proper bells. I am never digging past my knees again, friend. Thank you.',
+    failText: 'No... not out here... do not let them plant me where the candles cannot reach...',
+  },
+};
 
 export const WRAITHWOOD_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),

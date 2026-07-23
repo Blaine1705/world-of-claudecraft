@@ -52,6 +52,7 @@ import type {
   DungeonDifficulty,
   Entity,
   ErrorReason,
+  EscortRunState,
   GatherNodeDef,
   ItemInstancePayload,
   PendingResurrection,
@@ -179,6 +180,9 @@ export interface SimContextPrimitives {
   arenaQueueYumi5: ArenaQueueUnit[];
   readonly yumiBusySlots: Set<number>;
   readonly yumiCatMatches: Map<number, ArenaMatch>;
+  // Escort quest runs keyed by EscortDef id (src/sim/escort.ts owns every
+  // mutation; the backing map stays on Sim). Live view.
+  readonly escortRuns: Map<string, EscortRunState>;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -1077,6 +1081,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get yumiCatMatches() {
       return host.yumiCatMatches;
+    },
+    get escortRuns() {
+      return host.escortRuns;
     },
     get nextArenaMatchId() {
       return host.nextArenaMatchId;

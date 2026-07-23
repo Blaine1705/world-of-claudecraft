@@ -50,8 +50,8 @@ const ITEM_ID = 'eastbrook_ritual_vestments';
 // exact setup order (three extra players added, then the archetype accept, the
 // skill poke, 3x linen_scrap, 1x spider_leg, then the craft), the first craft
 // procs. Position pokes after setup draw nothing, so both placements below
-// share the identical stream. Spare hunted seeds on record: 19, 26, 30, 41.
-const PROC_SEED = 6;
+// share the identical stream. Spare hunted seeds on record: 26, 31, 38, 55.
+const PROC_SEED = 7;
 
 // One procced craft with an audience: a bystander in the crafter's zone, a
 // player parked in instance space, and a player moved to a different overworld

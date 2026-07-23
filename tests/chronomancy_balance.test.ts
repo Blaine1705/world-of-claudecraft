@@ -22,7 +22,7 @@ import type { Entity, SimEvent } from '../src/sim/types';
 type Spec = 'arcane' | 'fire' | 'frost';
 
 function makeMage(spec: Spec, level = 20) {
-  const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
+  const sim = new Sim({ seed: 1, playerClass: 'mage', autoEquip: true });
   sim.setPlayerLevel(level);
   sim.setSpec(spec);
   sim.tick();

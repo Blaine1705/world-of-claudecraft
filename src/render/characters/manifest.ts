@@ -1731,6 +1731,9 @@ const MOB_KEYS: Record<string, string> = {
   duskwisp: 'mob_duskwisp',
   ice_wisp: 'mob_ghost',
   frostmane_yeti: 'mob_yeti',
+  // Frostveil quest pass: Wren renders as a tinted villager (escort NPC, mob-kind
+  // so the escort driver can walk her); the howlers ride the beast/wolf fallback.
+  apprentice_wren: 'npc_villager',
   sporeling_gatherer: 'mob_glub',
   corrupted_sporeling: 'mob_glub',
   mushroom_pixie: 'mob_mushroom_pixie',
@@ -1828,6 +1831,7 @@ const NPC_KEYS: Record<string, string> = {
   alchemist_verane: 'npc_villager_robed',
   cook_marlow: 'npc_villager',
   tanner_hesk: 'npc_villager',
+  huntsman_deral: 'npc_scout',
 };
 
 export function visualKeyFor(e: Entity): string {

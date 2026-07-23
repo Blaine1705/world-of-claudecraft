@@ -486,7 +486,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     pos: { x: -46, z: 1031 },
     facing: -0.87,
     color: 0x8fbf8a,
-    questIds: ['q_gleaming_antlers', 'q_grove_menace'],
+    questIds: ['q_gleaming_antlers', 'q_grove_menace', 'q_hollow_the_huntsman'],
     vendorItems: [
       'trail_hardtack',
       'meltwater_flask',
@@ -518,6 +518,19 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     questIds: ['q_monument_tour', 'q_shards_of_starfall', 'q_wardens_echoes'],
     greeting:
       'The monuments out there have not spoken to anyone in an age. Perhaps they were waiting for fresh ears.',
+  },
+  // The huntsman keeps a lookout among the stag meadows, far from Eldergleam:
+  // Fenna's breadcrumb sends players out to find him, and his chain hunts the
+  // Hollow's two wandering rare bosses.
+  huntsman_deral: {
+    id: 'huntsman_deral',
+    name: 'Huntsman Deral',
+    title: 'Warden of the Herds',
+    pos: { x: 18, z: 1104 },
+    facing: -0.6,
+    color: 0x7d9668,
+    questIds: ['q_hollow_the_huntsman', 'q_hollow_old_marrowshell', 'q_hollow_first_of_the_herd'],
+    greeting: 'Quiet now. The herd knows every sound this valley makes, and so do I.',
   },
 };
 
@@ -800,6 +813,59 @@ export const REALM_QUESTS: Record<string, QuestDef> = {
     requiresQuest: 'q_sunken_court',
     minLevel: 18,
   },
+  // --- the huntsman's chain: the Hollow's two wandering rare bosses ---
+  q_hollow_the_huntsman: {
+    id: 'q_hollow_the_huntsman',
+    name: 'The Warden of the Herds',
+    giverNpcId: 'provisioner_fenna',
+    turnInNpcId: 'huntsman_deral',
+    text: 'You look like someone who can handle more than wisps, $N. Huntsman Deral keeps his lookout among the stag meadows east of here, and he has been asking after capable hands for weeks. Whatever he is tracking out there, he will not say it aloud in the village.',
+    completionText:
+      'Fenna sent you? Good. Then she trusts you, and I have two names that need crossing out.',
+    objectives: [
+      { type: 'interact', targetNpcId: 'huntsman_deral', count: 1, label: 'Find Huntsman Deral' },
+    ],
+    xpReward: 2400,
+    copperReward: 900,
+    itemRewards: {},
+    minLevel: 16,
+  },
+  q_hollow_old_marrowshell: {
+    id: 'q_hollow_old_marrowshell',
+    name: 'The Old Shell of the Shallows',
+    giverNpcId: 'huntsman_deral',
+    turnInNpcId: 'huntsman_deral',
+    text: 'The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldergleam had a gate. It wanders, $N, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.',
+    completionText:
+      'The shallows are just water again. I have watched that shell break better hunters than me, $N. Not you.',
+    objectives: [
+      { type: 'kill', targetMobId: 'old_marrowshell', count: 1, label: 'Old Marrowshell slain' },
+    ],
+    xpReward: 5600,
+    copperReward: 3000,
+    itemRewards: {},
+    requiresQuest: 'q_hollow_the_huntsman',
+    minLevel: 17,
+    suggestedPlayers: 2,
+  },
+  q_hollow_first_of_the_herd: {
+    id: 'q_hollow_first_of_the_herd',
+    name: 'First of the Herd',
+    giverNpcId: 'huntsman_deral',
+    turnInNpcId: 'huntsman_deral',
+    text: 'The second name is harder to say. Aurelhorn led these herds when my grandmother kept this lookout, and whatever woke in the Hollow woke him wrong. He tramples what he once warded, and the herd will not survive his madness. He roams the meadows near the old court roads. End him with mercy, $N, and bring a friend to share the weight of it.',
+    completionText:
+      'So the First falls to the last. The herd is already calmer, do you feel it? You did the Hollow a kindness today, even if it does not look like one.',
+    objectives: [
+      { type: 'kill', targetMobId: 'aurelhorn', count: 1, label: 'Aurelhorn given peace' },
+    ],
+    xpReward: 6000,
+    copperReward: 3400,
+    itemRewards: {},
+    requiresQuest: 'q_hollow_old_marrowshell',
+    minLevel: 18,
+    suggestedPlayers: 2,
+  },
 };
 
 export const REALM_QUEST_ORDER: string[] = [
@@ -815,7 +881,10 @@ export const REALM_QUEST_ORDER: string[] = [
   'q_spore_tide',
   'q_sunken_court',
   'q_wardens_echoes',
+  'q_hollow_the_huntsman',
+  'q_hollow_old_marrowshell',
   'q_waking_warden',
+  'q_hollow_first_of_the_herd',
   'q_seal_restored',
 ];
 
