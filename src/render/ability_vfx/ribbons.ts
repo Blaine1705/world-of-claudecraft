@@ -544,10 +544,46 @@ export class AbilityVfxRibbons {
         // one moon-blade: wide, heavily bowed
         this.slashOne(at, colorHex, 1.3 * scale, 0.3, 0.4, 0.2, 0.5 * w);
         break;
+      case 'wire':
+        // the garrote filament: a short TAUT strip between the strangler's
+        // fists - hair-thin, dead straight (no bow, no tilt), steel-bright
+        // (the metallic glint outlives the spec hue via the heavier white
+        // lerp in wireOne). Deliberately small next to every sword arc.
+        this.wireOne(at, colorHex, 0.12 * scale, 0.3, 0.05 * w);
+        break;
       default:
         // 'horizontal' / 'arc': the flat baseline sweep with a random tilt
         this.slashOne(at, colorHex, 1.15 * scale, 0.22, (Math.random() - 0.5) * 1.1, 0, 0.34 * w);
         break;
+    }
+  }
+
+  // The taut wire strip: same pooled arc slot as slashOne but dead straight
+  // across the camera-facing side axis, with a heavier white lerp so the
+  // filament reads as drawn steel rather than a colored energy arc.
+  private wireOne(
+    at: RibbonPoint,
+    colorHex: number,
+    span: number,
+    life: number,
+    width: number,
+  ): void {
+    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    slot.active = true;
+    slot.age = 0;
+    slot.life = life;
+    slot.width = width;
+    slot.core.setHex(colorHex).lerp(WHITE, 0.85);
+    slot.glow.setHex(colorHex).lerp(WHITE, 0.4);
+    const dx = at.x - this.camPos.x;
+    const dz = at.z - this.camPos.z;
+    const len = Math.hypot(dx, dz) || 1;
+    const sx = -dz / len;
+    const sz = dx / len;
+    for (let i = 0; i < ARC_PTS; i++) {
+      const u = i / (ARC_PTS - 1);
+      const swing = (u - 0.5) * 2;
+      slot.pts[i].set(at.x + sx * swing * span, at.y, at.z + sz * swing * span);
     }
   }
 

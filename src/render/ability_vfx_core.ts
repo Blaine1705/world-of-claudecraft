@@ -149,7 +149,19 @@ export interface AbilityVfxFullSpec {
   };
   strike?: {
     swings?: number;
-    arc?: 'horizontal' | 'thrust' | 'uppercut' | 'vertical' | 'claws' | 'bite' | 'low' | 'sweep';
+    // 'wire' is the strangle read (Throat Wire): a taut silver filament at
+    // the CASTER's raised hands plus a throat-height constriction beat on the
+    // victim - never the sword-sweep ribbon the other arcs draw.
+    arc?:
+      | 'horizontal'
+      | 'thrust'
+      | 'uppercut'
+      | 'vertical'
+      | 'claws'
+      | 'bite'
+      | 'low'
+      | 'sweep'
+      | 'wire';
     bleed?: boolean;
     groundSlam?: boolean;
     stars?: boolean;

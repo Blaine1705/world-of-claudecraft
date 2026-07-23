@@ -529,54 +529,60 @@ export class ArchetypeSequencer {
         host.countPrimitive(slot.abilityId, 2);
       }
       // strike second swing / follow-through echo: a full contact beat of its
-      // own - arc, shockwave, halo, sparks - staggered past the first
+      // own - arc, shockwave, halo, sparks - staggered past the first. The
+      // wire strangle echoes as a re-tightened pull instead: no rings, no
+      // white-hot star, no camera bite - a choke is held, not hammered.
       if (!slot.swing2Done && slot.t >= slot.swing2At) {
         slot.swing2Done = true;
-        const at = host.anchorOf(slot.targetId, 0.55);
-        if (at) {
-          host.slashStyled(at, slot.color, spec.strike?.arc ?? 'horizontal', SPECTACLE.strikeArc);
-          host.burstAt(at.x, at.y, at.z, slot.color, 18, 1.2, 'sparks');
-          const rs2 = this.ringScale(slot) * SPECTACLE.followRing;
-          host.ringAt(
-            at.x,
-            this.groundOf(host, slot),
-            at.z,
-            4.2 * rs2,
-            0.75,
-            slot.accent,
-            1.5,
-            false,
-          );
-          host.ringAt(
-            at.x,
-            at.y + 0.3,
-            at.z,
-            2.4 * this.ringScale(slot) * SPECTACLE.vRing,
-            0.5,
-            slot.accent,
-            1.4,
-            true,
-          );
-          // the echo is a contact beat of its own: white-hot star + camera bite
-          host.pushOverlay(
-            at.x,
-            at.y,
-            at.z,
-            0xffffff,
-            1.6 * slot.power,
-            host.overlayCells().star,
-            0.9,
-            3.2,
-          );
-          host.pulseLight(
-            slot.targetId,
-            spec.palette,
-            4.5 * slot.power,
-            0.35,
-            SPECTACLE.lightRange,
-          );
-          if (slot.tier === 0) host.shakeAt(at.x, at.y, at.z, 0.25);
-          host.countPrimitive(slot.abilityId, 5);
+        if (spec.strike?.arc === 'wire') {
+          this.wireContact(host, slot);
+        } else {
+          const at = host.anchorOf(slot.targetId, 0.55);
+          if (at) {
+            host.slashStyled(at, slot.color, spec.strike?.arc ?? 'horizontal', SPECTACLE.strikeArc);
+            host.burstAt(at.x, at.y, at.z, slot.color, 18, 1.2, 'sparks');
+            const rs2 = this.ringScale(slot) * SPECTACLE.followRing;
+            host.ringAt(
+              at.x,
+              this.groundOf(host, slot),
+              at.z,
+              4.2 * rs2,
+              0.75,
+              slot.accent,
+              1.5,
+              false,
+            );
+            host.ringAt(
+              at.x,
+              at.y + 0.3,
+              at.z,
+              2.4 * this.ringScale(slot) * SPECTACLE.vRing,
+              0.5,
+              slot.accent,
+              1.4,
+              true,
+            );
+            // the echo is a contact beat of its own: white-hot star + camera bite
+            host.pushOverlay(
+              at.x,
+              at.y,
+              at.z,
+              0xffffff,
+              1.6 * slot.power,
+              host.overlayCells().star,
+              0.9,
+              3.2,
+            );
+            host.pulseLight(
+              slot.targetId,
+              spec.palette,
+              4.5 * slot.power,
+              0.35,
+              SPECTACLE.lightRange,
+            );
+            if (slot.tier === 0) host.shakeAt(at.x, at.y, at.z, 0.25);
+            host.countPrimitive(slot.abilityId, 5);
+          }
         }
       }
       // dot drips while the linger lives
@@ -1073,6 +1079,16 @@ export class ArchetypeSequencer {
     const c = slot.color;
     switch (spec.archetype) {
       case 'strike': {
+        // the strangle arc never draws a sword sweep: its own contact beat,
+        // then the shared echo scheduling below re-tightens it
+        if (spec.strike?.arc === 'wire') {
+          this.wireContact(host, slot);
+          if (slot.tier === 0) {
+            slot.swing2At = slot.t + SPECTACLE.strikeEchoDelay;
+            slot.swing2Done = false;
+          }
+          break;
+        }
         const at = host.anchorOf(slot.targetId, 0.55);
         if (at) {
           // melee contact measured the worst non-bolt gap (8-20x): the arc is
@@ -1836,6 +1852,34 @@ export class ArchetypeSequencer {
       host.anchorOf(selfCentered ? slot.casterId : slot.targetId, 0.4) ??
       host.anchorOf(slot.casterId, 0.4)
     );
+  }
+
+  // The strangle contact (strike arc 'wire', Throat Wire): no sword-sweep
+  // ribbon at the victim. A taut silver filament snaps between the CASTER's
+  // raised fists (the choke one-shot holds them at neck height) while the
+  // VICTIM wears a brief throat-height constriction - a steel spark pinch, a
+  // gasp of smoke, and the bleed's blood flecks where the wire bites. Kept
+  // deliberately small: a level-1 stealth opener reads sinister, never
+  // spectacular. Runs for the first contact AND the echo (the re-tightened
+  // pull), which replaces the generic echo's rings/star/shake outright.
+  private wireContact(host: SequencerHost, slot: SeqSlot): void {
+    let n = 0;
+    const hands = host.anchorOf(slot.casterId, 0.68);
+    if (hands) {
+      host.slashStyled(hands, slot.color, 'wire', SPECTACLE.strikeArc);
+      n++;
+    }
+    const throat = host.anchorOf(slot.targetId, 0.74);
+    if (throat) {
+      host.burstAt(throat.x, throat.y, throat.z, 0xd8dee6, 6, 0.35, 'sparks');
+      host.burstAt(throat.x, throat.y + 0.08, throat.z, 0xb9c2cc, 3, 0.25, 'smoke');
+      n += 2;
+      if (slot.spec.strike?.bleed) {
+        host.burstAt(throat.x, throat.y - 0.05, throat.z, 0xa01222, 6, 0.5, 'blood');
+        n++;
+      }
+    }
+    if (n > 0) host.countPrimitive(slot.abilityId, n);
   }
 
   private ringScale(slot: SeqSlot): number {
