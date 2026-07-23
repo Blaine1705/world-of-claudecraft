@@ -1219,6 +1219,35 @@ export class ArchetypeSequencer {
             host.burstAt(slot.ix, slot.iy + 0.3, slot.iz, c, 8, 0.6, 'smoke');
             host.countPrimitive(slot.abilityId, 1);
           }
+          if (style === 'dust') {
+            // the flung-dirt cone (Dirt Toss): grit staggered along the
+            // caster-hand -> victim-face line, widening toward the eyes,
+            // capped by the puff where it lands. Colors ride the authored
+            // khaki; debris carries the heavier grains, smoke the cloud.
+            const hand = host.anchorOf(slot.casterId, 0.55);
+            const face = host.anchorOf(slot.targetId, 0.8) ?? {
+              x: slot.ix,
+              y: slot.iy + 0.4,
+              z: slot.iz,
+            };
+            if (hand) {
+              for (const u of [0.45, 0.75]) {
+                host.burstAt(
+                  hand.x + (face.x - hand.x) * u,
+                  hand.y + (face.y - hand.y) * u + 0.08,
+                  hand.z + (face.z - hand.z) * u,
+                  c,
+                  Math.round(3 + u * 5),
+                  0.45 + u * 0.25,
+                  'debris',
+                );
+              }
+              host.countPrimitive(slot.abilityId, 2);
+            }
+            host.burstAt(face.x, face.y, face.z, c, 10, 0.55, 'smoke');
+            host.burstAt(face.x, face.y - 0.1, face.z, c, 6, 0.7, 'debris');
+            host.countPrimitive(slot.abilityId, 2);
+          }
         }
         break;
       }

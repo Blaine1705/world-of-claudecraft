@@ -175,7 +175,9 @@ export interface AbilityVfxFullSpec {
   nova?: { radius?: number };
   beam?: { dur?: number; ticks?: number; drain?: boolean };
   dot?: { drip?: 'rise' | 'fall' };
-  cc?: { style?: 'poof' | 'stars' | 'tendrils' };
+  // 'dust' is the flung-dirt read (Dirt Toss): a khaki grit cone thrown from
+  // the caster's hand into the victim's face, plus the stunned-star band.
+  cc?: { style?: 'poof' | 'stars' | 'tendrils' | 'dust' };
   shout?: { radius?: number; target?: boolean };
   burst?: { style?: 'skybeam' | 'link' | 'ground' };
   buff?: AbilityVfxBuffSpec;

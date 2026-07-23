@@ -261,6 +261,31 @@ describe('sequencer applies the crescendo boosts at the spawn seams', () => {
     expect(gushBlood!.power).toBeLessThanOrEqual(baseBlood!.power * 1.35 + 1e-9);
   });
 
+  it("cc style 'dust' flings the grit cone and still arms the wander stars", () => {
+    const DUST_SPEC: AbilityVfxFullSpec = {
+      archetype: 'cc',
+      palette: 'physical',
+      power: 0.8,
+      cc: { style: 'dust' },
+      linger: 4,
+      impact: { sparks: 0, flipbook: false, ring: false, vRing: false },
+    };
+    const a = makeHost();
+    let overlays = 0;
+    a.host.pushOverlay = () => {
+      overlays++;
+    };
+    const seq = new ArchetypeSequencer();
+    seq.start(a.host, 'blind', DUST_SPEC, 1, 2, 0xc2b280, 0, false);
+    step(seq, a.host, 0.3);
+    // the staggered hand-to-face grit plus the face-height landing pair
+    expect(a.bursts.filter((b) => b.kind === 'debris').length).toBeGreaterThanOrEqual(3);
+    expect(a.bursts.some((b) => b.kind === 'smoke')).toBe(true);
+    // the stunned-star band still runs off the linger like the poof style
+    step(seq, a.host, 1);
+    expect(overlays).toBeGreaterThan(0);
+  });
+
   it('finishers fire the gallery double shockwave at +0.12s', () => {
     const FIN_SPEC: AbilityVfxFullSpec = {
       archetype: 'bolt',

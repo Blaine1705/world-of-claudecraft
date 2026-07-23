@@ -1046,7 +1046,9 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
     wu: 0.6,
     a: 'buff',
   },
-  blind: { c: '#dfe6ee', p: 'physical', pw: 0.8, sp: 0, db: 1, sm: 1, li: 0.3, lg: 4, a: 'cc' },
+  // Dirt Toss: khaki - the color IS the dirt (the dust cone, the poof, the
+  // windup all ride it), not the old pale steel
+  blind: { c: '#c2b280', p: 'physical', pw: 0.8, sp: 0, db: 1, sm: 1, li: 0.3, lg: 4, a: 'cc' },
   stealth: { c: '#3a3450', p: 'shadow', pw: 0.5, sp: 0, sm: 1, li: 0.3, lg: 2, a: 'buff' },
   kick: { c: '#dfe6ee', p: 'physical', pw: 0.7, sp: 12, vr: 1, li: 0.5, a: 'strike' },
   cold_blood: {
