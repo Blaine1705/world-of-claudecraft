@@ -220,8 +220,9 @@ describe('sequencer applies the crescendo boosts at the spawn seams', () => {
     const seq = new ArchetypeSequencer();
     const slot = seq.start(a.host, 'strike', STRIKE_SPEC, 1, 2, 0xffffff, 0, false);
     step(seq, a.host, 0.3);
-    expect(slot?.afterglowUntil).toBeGreaterThan(0);
-    expect(slot!.afterglowUntil - slot!.t).toBeLessThanOrEqual(SPECTACLE.strikeAfterglowDur);
+    if (!slot) throw new Error('sequencer rejected the strike slot');
+    expect(slot.afterglowUntil).toBeGreaterThan(0);
+    expect(slot.afterglowUntil - slot.t).toBeLessThanOrEqual(SPECTACLE.strikeAfterglowDur);
   });
 
   it('single-swing tier-0 strikes echo the arc a beat later', () => {

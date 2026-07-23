@@ -696,11 +696,22 @@ export class AbilityVfxFx implements SequencerHost {
     width *= SPECTACLE.boltWidth;
     headScale *= SPECTACLE.boltHead;
     const y = this.groundY(x, z) + 0.4;
-    const slot = this.sequencer.start(this, abilityId, spec, casterId, -1, colorHex, tier, true, 0, {
-      x,
-      y,
-      z,
-    });
+    const slot = this.sequencer.start(
+      this,
+      abilityId,
+      spec,
+      casterId,
+      -1,
+      colorHex,
+      tier,
+      true,
+      0,
+      {
+        x,
+        y,
+        z,
+      },
+    );
     const screen = wantsScreenFx(spec, tier);
     const b = spec.bolt;
     const style: BoltTrailStyle = b?.style ?? PROJ_STYLE_BY_PALETTE[spec.palette] ?? 'comet';

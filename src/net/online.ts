@@ -339,6 +339,7 @@ export class Api {
     }
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: untyped REST envelope, shaped per call site
   private async post(path: string, body: unknown, base = this.base): Promise<any> {
     const res = await fetch(apiUrl(path, base), {
       method: 'POST',
@@ -353,6 +354,7 @@ export class Api {
     return data;
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: untyped REST envelope, shaped per call site
   private async get(path: string): Promise<any> {
     const res = await fetch(apiUrl(path, this.base), {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
@@ -362,6 +364,7 @@ export class Api {
     return data;
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: untyped REST envelope, shaped per call site
   private async delete(path: string, body: unknown): Promise<any> {
     const res = await fetch(apiUrl(path, this.base), {
       method: 'DELETE',
@@ -1678,9 +1681,12 @@ export class ClientWorld implements IWorld {
     return out;
   }
 
-  setMoveInput(input: unknown, facing?: unknown): void {
+  setMoveInput(input: unknown, ...rest: [facing?: unknown]): void {
     Object.assign(this.moveInput, sanitizeMoveInput(input));
-    if (arguments.length > 1) this.setMouselookFacing(facing);
+    // rest.length preserves the 1-vs-2-argument dispatch (an explicit
+    // undefined facing still counts as provided, matching the old
+    // arguments.length check)
+    if (rest.length > 0) this.setMouselookFacing(rest[0]);
   }
 
   setMouselookFacing(facing: unknown): void {
@@ -1827,6 +1833,7 @@ export class ClientWorld implements IWorld {
   }
 
   private onMessage(raw: string): void {
+    // biome-ignore lint/suspicious/noExplicitAny: raw ws frame, narrowed by t-dispatch below
     let msg: any;
     try {
       msg = JSON.parse(raw);
@@ -2093,6 +2100,7 @@ export class ClientWorld implements IWorld {
     }
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: server wire snapshot, field-validated as read
   private applySnapshot(snap: any): void {
     const now = performance.now();
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
@@ -2188,6 +2196,7 @@ export class ClientWorld implements IWorld {
       return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
     };
 
+    // biome-ignore lint/suspicious/noExplicitAny: entity wire delta, field-validated as read
     const applyWire = (w: any): Entity | null => {
       let e = this.entities.get(w.id);
       // identity fields ride only in "full" records: first sight and changes
