@@ -175,6 +175,11 @@ export interface AbilityVfxEntityState {
   auras: readonly { id: string }[];
   kind?: string;
   templateId?: string;
+  // On-next-swing queue (heroic-strike style ability id while armed). Present
+  // on every offline entity; the online mirror carries it for the local
+  // player (the self wire's `queued`), others stay null - which is where the
+  // tell matters: it is your own armed strike.
+  queuedOnSwing?: string | null;
 }
 
 // The cast-moment fx kinds this painter claims; everything else stays generic.
@@ -243,12 +248,15 @@ function isTransformativeBuff(full: AbilityVfxFullSpec): boolean {
 }
 
 // Effect-granted auras can suffix the authoring ability's id (the sim's
-// aoeAlly buffs: rallying_cry_hp / rallying_cry_dr, `${abilityId}_ap`), which
-// would miss the spec table and silently drop the buff's authored look. On a
-// miss, retry with the known suffixes stripped. Memoized so the per-frame
-// aura scan stays allocation-free in steady state; only ids that RESOLVE are
-// re-keyed, so an unrelated ability that happens to end in a suffix is safe.
-const AURA_ID_SUFFIXES = ['_hp', '_dr', '_ap'];
+// aoeAlly buffs: rallying_cry_hp / rallying_cry_dr, `${abilityId}_ap`, and
+// movement snares: `${abilityId}_slow`), which would miss the spec table and
+// silently drop the ability's authored look. On a miss, retry with the known
+// suffixes stripped. `_slow` lets a spec author a VICTIM-worn band (Hobbling
+// Cut's dragging ankle speedlines live exactly as long as the snare aura).
+// Memoized so the per-frame aura scan stays allocation-free in steady state;
+// only ids that RESOLVE are re-keyed, so an unrelated ability that happens to
+// end in a suffix is safe.
+const AURA_ID_SUFFIXES = ['_hp', '_dr', '_ap', '_slow'];
 const auraSpecIdMemo = new Map<string, string | null>();
 function auraSpecId(auraId: string): string | null {
   if (ABILITY_VFX_SPECS[auraId] !== undefined) return auraId;
@@ -1073,8 +1081,11 @@ export class AbilityVfx {
         }
       }
       // The full spec's authored orbit wins (its 'none' suppresses too);
-      // compact-spec bo carries the same nine style names as fallback.
-      const style = asOrbitStyle(full?.buff?.orbit ?? spec.bo);
+      // compact-spec bo carries the same nine style names as fallback. A
+      // debuff block outranks both: this aura is being WORN BY A VICTIM
+      // (Hobbling Cut's dragging ankle speedlines), and its DNA is authored
+      // for that read.
+      const style = asOrbitStyle(full?.debuff?.orbit ?? full?.buff?.orbit ?? spec.bo);
       if (style === null) {
         // orbit-less buffs still get their gain moment off the disc's first frame
         if (discStarted) this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
@@ -1082,15 +1093,42 @@ export class AbilityVfx {
       }
       if (bands >= 3) continue;
       if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
-      if (fx.orbit(e.id, style, abilityVfxColor(spec), full?.buff?.o, orbitTier)) {
+      if (
+        fx.orbit(e.id, style, abilityVfxColor(spec), full?.debuff?.o ?? full?.buff?.o, orbitTier)
+      ) {
         // The band just appeared (aura gained): pop the swirl here instead of
         // the aura event, which carries no ability id. Works online too, since
-        // this reads the mirrored entity's auras, not sim events.
-        this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
-        this.spawned = 2;
+        // this reads the mirrored entity's auras, not sim events. Only for
+        // buff-block specs: a hostile-worn band (a debuff resolved via the
+        // aura suffix map, e.g. hamstring_slow's ankle speedlines) must not
+        // bless its victim with rising buff sparkles.
+        const buffish = full?.buff !== undefined || (full?.archetype ?? spec.a) === 'buff';
+        if (buffish) this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
+        this.spawned = buffish ? 2 : 1;
         this.recordStat(auraId, false);
       }
       bands++;
+    }
+    // On-next-swing queue (heroic-strike style): while the sim's queuedOnSwing
+    // flag is armed, the queued ability's authored orbit rides the caster as
+    // the empowerment tell - Reaver Strike's hot amber weaponGlow ember that
+    // releases with the swing. Same pooled band system as the aura loop (the
+    // fx engine sweeps it the frame the sim clears the flag on swing/untoggle,
+    // so there is no teardown bookkeeping), tier-gated the same way, and fed
+    // AFTER the aura loop so a style collision (Iron Bellow's red weaponGlow)
+    // shows the armed strike's color while queued and reverts on release. No
+    // gain swirl: arming a level-1 filler is a tell, not a ceremony.
+    if (e.queuedOnSwing && bands < 3) {
+      const qspec = ABILITY_VFX_SPECS[e.queuedOnSwing];
+      const qfull = ABILITY_VFX_FULL_SPECS[e.queuedOnSwing];
+      const qstyle = qspec ? asOrbitStyle(qfull?.buff?.orbit ?? qspec.bo) : null;
+      if (qspec !== undefined && qstyle !== null) {
+        if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
+        if (fx.orbit(e.id, qstyle, abilityVfxColor(qspec), qfull?.buff?.o, orbitTier)) {
+          this.spawned = 1;
+          this.recordStat(e.queuedOnSwing, false);
+        }
+      }
     }
     if (glowStrength > 0) fx.bodyGlow(e.id, glowColor, glowStrength, glowSlow);
   }

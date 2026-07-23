@@ -142,7 +142,7 @@ export interface AbilityVfxFullSpec {
   };
   strike?: {
     swings?: number;
-    arc?: 'horizontal' | 'thrust' | 'uppercut' | 'vertical' | 'claws' | 'bite';
+    arc?: 'horizontal' | 'thrust' | 'uppercut' | 'vertical' | 'claws' | 'bite' | 'low';
     bleed?: boolean;
     groundSlam?: boolean;
     stars?: boolean;
@@ -154,6 +154,11 @@ export interface AbilityVfxFullSpec {
   shout?: { radius?: number; target?: boolean };
   burst?: { style?: 'skybeam' | 'link' | 'ground' };
   buff?: AbilityVfxBuffSpec;
+  // Worn by the VICTIM while the ability's hostile aura lives (resolved
+  // through the painter's aura suffix map, e.g. hamstring_slow): only orbit +
+  // o are read - a debuff band never grants the buff ground-disc, caster
+  // glow, gain swirl, or shell that a buff block implies.
+  debuff?: Pick<AbilityVfxBuffSpec, 'orbit' | 'o'>;
   spin?: { rate?: number; clip?: string; timeScale?: number };
   spirit?: {
     model?: string;

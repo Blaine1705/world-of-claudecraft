@@ -1506,18 +1506,25 @@ export class AbilityVfxFx implements SequencerHost {
     }
     if (band.style === 'speedlines') {
       // wind-blur streaks at the LEG band, under everything else; per-frame
-      // flicker and jitter IS the gallery read
-      const streaks = halve ? 2 : 3;
+      // flicker and jitter IS the gallery read. o overrides: n streak count,
+      // radius streak length, size sprite size (defaults = the classic DNA, so
+      // Onrush/Blade Ward keep their exact look). Streaks never dip below the
+      // terrain: on a low quadruped (a hamstrung boar) the +-0.45 jitter used
+      // to bury half the band, which only ever hid sprites.
+      const streaks = orbitCount(Math.min(4, o?.n ?? dna.n), halve);
       const rate = o?.rate ?? 1;
+      const len0 = o?.radius ?? dna.radius;
+      const size0 = o?.size ?? dna.size;
+      const gy = this.groundY(at.x, at.z) + 0.07;
       const rx = this.camRightX;
       const rz = this.camRightZ;
       for (let s = 0; s < streaks; s++) {
         if (Math.random() > 0.6) continue;
-        const y = at.y + (Math.random() - 0.5) * 0.9;
+        const y = Math.max(gy, at.y + (Math.random() - 0.5) * 0.9);
         const off = (Math.random() - 0.5) * 0.7;
         const ox = -rz * off;
         const oz = rx * off;
-        const len = dna.radius * (0.8 + 0.4 * Math.random()) * (0.8 + 0.2 * rate);
+        const len = len0 * (0.8 + 0.4 * Math.random()) * (0.8 + 0.2 * rate);
         for (let j = 0; j < 3; j++) {
           const d = len * (1 - j);
           this.overlay.push(
@@ -1525,7 +1532,7 @@ export class AbilityVfxFx implements SequencerHost {
             y,
             at.z + rz * d + oz,
             color,
-            dna.size * (1 - 0.15 * j),
+            size0 * (1 - 0.15 * j),
             dna.cell,
             fade * (0.7 - 0.18 * j),
             1.6,
@@ -1573,13 +1580,22 @@ export class AbilityVfxFx implements SequencerHost {
     }
     if (band.style === 'weaponGlow') {
       // enchanted weapon shimmer at the hand: soft glow, pulsing star, and a
-      // flickering spark shed off the blade
+      // flickering spark shed off the blade. An authored o.radius circles the
+      // accent slowly around the hand band: center-pinned sprites depth-test
+      // behind the rig from the chase camera, so a tell that must read from
+      // ANY angle (Reaver Strike's queued ember) orbits just outside the
+      // silhouette. radius 0 (the DNA default) keeps the classic pinned
+      // shimmer exactly.
+      const orbitR = o?.radius ?? dna.radius;
+      const oa = band.phase + t * 1.7 * (o?.rate ?? 1);
+      const wx = at.x + Math.cos(oa) * orbitR;
+      const wz = at.z + Math.sin(oa) * orbitR;
       const pulse = 1 + 0.15 * Math.sin(t * 6 * (o?.rate ?? 1));
-      this.overlay.push(at.x, at.y, at.z, color, 0.4 * pulse, OVERLAY_CELL.glow, fade * 0.55, 1.6);
+      this.overlay.push(wx, at.y, wz, color, 0.4 * pulse, OVERLAY_CELL.glow, fade * 0.55, 1.6);
       this.overlay.push(
-        at.x,
+        wx,
         at.y,
-        at.z,
+        wz,
         color,
         (o?.size ?? dna.size) * pulse,
         dna.cell,
@@ -1588,9 +1604,9 @@ export class AbilityVfxFx implements SequencerHost {
       );
       if (!halve && Math.random() < 0.4) {
         this.overlay.push(
-          at.x + (Math.random() - 0.5) * 0.25,
+          wx + (Math.random() - 0.5) * 0.25,
           at.y + (Math.random() - 0.3) * 0.4,
-          at.z + (Math.random() - 0.5) * 0.25,
+          wz + (Math.random() - 0.5) * 0.25,
           color,
           0.14,
           OVERLAY_CELL.spark,

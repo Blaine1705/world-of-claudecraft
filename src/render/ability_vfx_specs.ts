@@ -8,7 +8,15 @@
 import type { AbilityVfxSpec } from './ability_vfx_core';
 
 export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
-  heroic_strike: { c: '#dfe6ee', p: 'physical', pw: 0.9, sp: 18, li: 0.6, a: 'strike' },
+  heroic_strike: {
+    c: '#ffa03c',
+    p: 'physical',
+    pw: 1,
+    sp: 24,
+    li: 0.6,
+    bo: 'weaponGlow',
+    a: 'strike',
+  },
   revenge: {
     c: '#b8cbe0',
     p: 'physical',
@@ -47,7 +55,16 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
     a: 'dash',
   },
   thunder_clap: { c: '#8fd0ff', p: 'storm', rg: 1.3, db: 1, sm: 1, li: 0.6, wu: 0.3, a: 'nova' },
-  hamstring: { c: '#d41f2e', p: 'blood', pw: 0.7, sp: 8, bl: 1, li: 0.5, a: 'strike' },
+  hamstring: {
+    c: '#d41f2e',
+    p: 'blood',
+    pw: 0.7,
+    sp: 8,
+    bl: 1,
+    li: 0.5,
+    bo: 'speedlines',
+    a: 'strike',
+  },
   bloodrage: {
     c: '#9e1622',
     p: 'blood',
@@ -58,7 +75,7 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
     lg: 2,
     a: 'buff',
   },
-  overpower: { c: '#dfe6ee', p: 'physical', sp: 22, vr: 1, li: 0.6, a: 'strike' },
+  overpower: { c: '#e5233a', p: 'blood', sp: 22, vr: 1, li: 0.6, a: 'strike' },
   raging_gale: { c: '#dfe9f4', p: 'physical', pw: 1.1, sp: 30, li: 0.6, lg: 1, a: 'strike' },
   raised_guard: {
     c: '#9fb9d4',
