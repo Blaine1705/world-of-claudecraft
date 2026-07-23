@@ -562,7 +562,15 @@ export const VISUALS: Record<string, VisualDef> = {
   player_rogue: {
     url: `${PLAYERS}/rogue.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['Dualwield_Melee_Attack_Chop']),
+    clips: {
+      ...kaykit(['Dualwield_Melee_Attack_Chop']),
+      attackByAbility: {
+        // Throat Wire is a wire strangle, not a dagger swing: the synthesized
+        // two-handed choke (scripts/_add_garrote_choke_anim.mjs) reaches to
+        // neck height and yanks back to the chest with a brief hold.
+        garrote: 'Garrote_Choke',
+      },
+    },
     show: ['Rogue_Cape'],
     attach: [
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },

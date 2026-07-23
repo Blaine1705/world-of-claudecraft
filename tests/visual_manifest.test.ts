@@ -151,6 +151,18 @@ describe('character visual manifest', () => {
     ).toEqual([]);
   });
 
+  it('points Throat Wire at the synthesized choke clip in the rogue GLB', async () => {
+    const visual = VISUALS.player_rogue;
+    // The strangle one-shot (scripts/_add_garrote_choke_anim.mjs): a wire
+    // pull to the chest, never the dagger swing the default rotation plays.
+    expect(visual.clips.attackByAbility?.garrote).toBe('Garrote_Choke');
+    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    expect(animationNames.has('Garrote_Choke')).toBe(true);
+    expect(
+      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+    ).toEqual([]);
+  });
+
   it('points the Stone Cantor manifest at clips present in the GLB (including the synthesized Hit)', async () => {
     const visual = VISUALS.mob_reedbound_acolyte;
     const animationNames = await glbAnimationNames(`public/${visual.url}`);
