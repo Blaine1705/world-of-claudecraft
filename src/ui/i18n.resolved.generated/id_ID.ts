@@ -2499,7 +2499,7 @@ export const id_ID: EnTranslations = {
         "lunar_tide": "Arus Bulan (kerusakan area berdenyut)",
         "enrage": "Mengamuk saat darah menipis",
         "shuddering_stomp": "Hentakan Gemetar (stun area)",
-        "necrotic_shockwave": "Gelombang Kejut Nekrotik (kerusakan area berat)",
+        "grave_inferno": "Neraka Kubur (AoE api tersalur, jaga jarak)",
         "grave_cleaver": "Penebas Kubur (tebasan ke depan)",
         "shadow_nova": "Nova Bayangan (ledakan area)",
         "profane_mending": "Pemulihan Najis (menyembuhkan sekutunya)",
@@ -7280,7 +7280,7 @@ export const id_ID: EnTranslations = {
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +90%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +130%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Bonecrush",

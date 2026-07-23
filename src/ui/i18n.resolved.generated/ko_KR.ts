@@ -2499,7 +2499,7 @@ export const ko_KR: EnTranslations = {
         "lunar_tide": "달의 파도(주기적 광역 피해)",
         "enrage": "체력이 낮으면 격노",
         "shuddering_stomp": "전율의 발구르기(광역 기절)",
-        "necrotic_shockwave": "괴사의 충격파(높은 광역 피해)",
+        "grave_inferno": "무덤의 지옥불(시전 화염 광역, 분산 유지)",
         "grave_cleaver": "무덤 절단(전방 휩쓸기)",
         "shadow_nova": "어둠의 회오리(광역 폭발)",
         "profane_mending": "모독의 치유(아군 치유)",
@@ -7280,7 +7280,7 @@ export const ko_KR: EnTranslations = {
       },
       "bear_form": {
         "name": "큰곰 변신",
-        "description": "곰으로 변신합니다. 방어도 +90%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
+        "description": "곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
       },
       "maul": {
         "name": "뼈 분쇄",

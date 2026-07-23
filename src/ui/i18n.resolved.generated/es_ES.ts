@@ -2499,7 +2499,7 @@ export const es_ES: EnTranslations = {
         "lunar_tide": "Marea Lunar (dano de area pulsante)",
         "enrage": "Entra en furia al tener poca salud",
         "shuddering_stomp": "Pisada Estremecedora (aturdimiento de area)",
-        "necrotic_shockwave": "Onda de Choque Necrotica (dano de area intenso)",
+        "grave_inferno": "Infierno Sepulcral (AoE de fuego canalizado, manteneos separados)",
         "grave_cleaver": "Hacha Funebra (tajo frontal)",
         "shadow_nova": "Nova de Sombra (explosion de area)",
         "profane_mending": "Restauracion Profana (cura a sus aliados)",
@@ -7280,7 +7280,7 @@ export const es_ES: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Cambias a forma de oso: armadura +90%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
+        "description": "Cambias a forma de oso: armadura +130%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
       },
       "maul": {
         "name": "Rompehuesos",

@@ -2499,7 +2499,7 @@ export const nl_NL: EnTranslations = {
         "lunar_tide": "Maantij (pulserende gebiedsschade)",
         "enrage": "Razend bij weinig gezondheid",
         "shuddering_stomp": "Huiverende Stamp (gebiedsverdoving)",
-        "necrotic_shockwave": "Necrotische Schokgolf (zware gebiedsschade)",
+        "grave_inferno": "Grafsinferno (gekanaliseerde vuur-AoE, houd afstand)",
         "grave_cleaver": "Grafsplijter (frontale maaislaan)",
         "shadow_nova": "Schaduw-Nova (gebiedsexplosie)",
         "profane_mending": "Onheilige Heling (geneest zijn bondgenoten)",
@@ -7280,7 +7280,7 @@ export const nl_NL: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruingedaante",
-        "description": "Verander in een beer: pantser +90%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
+        "description": "Verander in een beer: pantser +130%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
       },
       "maul": {
         "name": "Botverbrijzelen",

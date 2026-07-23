@@ -2499,7 +2499,7 @@ export const cs_CZ: EnTranslations = {
         "lunar_tide": "Měsíční příboj (pulzující plošné poškození)",
         "enrage": "Zuří při nízkém zdraví",
         "shuddering_stomp": "Třesoucí dupnutí (plošné ochromení)",
-        "necrotic_shockwave": "Nekrotická rázová vlna (silné plošné poškození)",
+        "grave_inferno": "Hrobové Peklo (kanalizované ohnivé AoE, udržujte rozestupy)",
         "grave_cleaver": "Hrobní sekáč (čelní sek)",
         "shadow_nova": "Stínová nova (plošný výbuch)",
         "profane_mending": "Znesvěcené léčení (léčí spojence)",
@@ -7280,7 +7280,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bear_form": {
         "name": "Medvědí podoba",
-        "description": "Proměníš se v medvěda: zbroj +90 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
+        "description": "Proměníš se v medvěda: zbroj +130 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
       },
       "maul": {
         "name": "Drcení kostí",

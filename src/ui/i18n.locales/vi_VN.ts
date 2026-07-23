@@ -757,7 +757,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Chúc Phúc Khô Héo (đốt cháy mana)',
   'hudChrome.finder.mech.mist_surge': 'Sóng Sương Mù (sát thương vùng theo nhịp)',
   'hudChrome.finder.mech.mortal_wound': 'Vết Thương Bị Lãng Quên (giảm lượng máu hồi nhận vào)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Sóng Xung Hoại Tử (sát thương vùng nặng)',
+  'hudChrome.finder.mech.grave_inferno': 'Địa Ngục Mộ Phần (AoE lửa kênh, giữ khoảng cách)',
   'hudChrome.finder.mech.profane_mending': 'Chữa Lành Bất Thánh (hồi máu cho đồng minh)',
   'hudChrome.finder.mech.raise_fallen': 'Triệu Hồi Tử Giả (các đợt quân tiếp viện theo chu kỳ)',
   'hudChrome.finder.mech.reaping_arc': 'Vòng Chém Gặt (chém ngang phía trước)',
@@ -2761,7 +2761,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.bear_charge.name': 'Cú Lao Bruin',
   'entities.abilities.bear_form.description':
-    'Biến hình thành gấu: giáp +90%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư.',
+    'Biến hình thành gấu: giáp +130%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư.',
   'entities.abilities.bear_form.name': 'Bruin Form',
   'entities.abilities.berserker_rage.description':
     'Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)',
