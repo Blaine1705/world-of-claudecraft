@@ -77,6 +77,17 @@ describe('healDisplayRoundedProficiency', () => {
     expect(prof.logging).toBe(42.5);
   });
 
+  it('heals every gathering profession: the logging and herbalism edges too', () => {
+    // The loop covers all four professions, never just the two the issue
+    // named: a regression narrowing it to mining/fishing must red here.
+    const prof = emptyGatheringProficiency();
+    prof.logging = 99.5;
+    prof.herbalism = 99.75;
+    expect(healDisplayRoundedProficiency(prof)).toBe(true);
+    expect(prof.logging).toBe(100);
+    expect(prof.herbalism).toBe(100);
+  });
+
   it('heals the fishing 200 band edge, including the float-drift tail', () => {
     const prof = emptyGatheringProficiency();
     prof.fishing = 199.99; // the 0.02-per-catch climb, displayed as 200
@@ -174,5 +185,32 @@ describe('the one-time heal on load', () => {
     expect(meta.gatheringProficiency.fishing).toBe(200);
     expect(meta.deedsEarned.has('prog_fishing_100')).toBe(true);
     expect(meta.deedsEarned.has('prog_master_angler')).toBe(true);
+  });
+
+  it('a pre-curve save (neither flag) is zeroed by the reset, never healed or granted', () => {
+    // The load-order invariant: the mastery reset runs BEFORE the heal, so
+    // the heal must not resurrect a value the curve migration wipes.
+    const state = strandedState();
+    delete state.masteryResetApplied;
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'PreCurve', { state });
+    const meta = sim.players.get(pid)!;
+    expect(meta.gatheringProficiency.fishing).toBe(0);
+    expect(meta.gatheringProficiency.mining).toBe(0);
+    expect(meta.deedsEarned.has('prog_fishing_100')).toBe(false);
+    expect(meta.deedsEarned.has('prog_mining_100')).toBe(false);
+  });
+
+  it('heals a legacy professions-key-only save shape', () => {
+    // Old blobs carry only the pre-rename `professions` key; the load
+    // normalize folds it into gatheringProficiency BEFORE the heal runs.
+    const state = strandedState();
+    delete state.gatheringProficiency;
+    state.professions = { fishing: 99.5 };
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Legacy', { state });
+    const meta = sim.players.get(pid)!;
+    expect(meta.gatheringProficiency.fishing).toBe(100);
+    expect(meta.deedsEarned.has('prog_fishing_100')).toBe(true);
   });
 });
