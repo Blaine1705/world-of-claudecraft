@@ -7855,7 +7855,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': 'Лунный прилив (периодический урон по области)',
   'hudChrome.finder.mech.enrage': 'Приходит в ярость при низком здоровье',
   'hudChrome.finder.mech.shuddering_stomp': 'Сотрясающий топот (оглушение по области)',
-  'hudChrome.finder.mech.grave_inferno': 'Могильный инферно (канализируемый огненный AoE, держите дистанцию)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Могильный инферно (канализируемый огненный AoE, держите дистанцию)',
   'hudChrome.finder.mech.grave_cleaver': 'Могильный секач (рассекающий удар спереди)',
   'hudChrome.finder.mech.shadow_nova': 'Кольцо тьмы (взрыв по области)',
   'hudChrome.finder.mech.profane_mending': 'Нечестивое исцеление (лечит союзников)',

@@ -871,7 +871,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Zwiędłe Błogosławieństwo (wypala manę)',
   'hudChrome.finder.mech.mist_surge': 'Nawałnica Mgły (pulsujące obrażenia obszarowe)',
   'hudChrome.finder.mech.mortal_wound': 'Zapomniana Rana (zmniejsza otrzymane leczenie)',
-  'hudChrome.finder.mech.grave_inferno': 'Grobowy Inferno (kanalizowane AoE ognia, trzymajcie dystans)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Grobowy Inferno (kanalizowane AoE ognia, trzymajcie dystans)',
   'hudChrome.finder.mech.profane_mending': 'Plugawe Leczenie (leczy sojuszników)',
   'hudChrome.finder.mech.raise_fallen': 'Wskrzeszenie Poległych (okresowe fale wrogów)',
   'hudChrome.finder.mech.reaping_arc': 'Kosiący Łuk (frontalne cięcie)',

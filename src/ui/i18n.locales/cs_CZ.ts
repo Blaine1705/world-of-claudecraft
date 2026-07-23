@@ -765,7 +765,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Vyschlé požehnání (spaluje manu)',
   'hudChrome.finder.mech.mist_surge': 'Mlžný příval (pulzující plošné poškození)',
   'hudChrome.finder.mech.mortal_wound': 'Zapomenutá rána (snižuje přijímané léčení)',
-  'hudChrome.finder.mech.grave_inferno': 'Hrobové Peklo (kanalizované ohnivé AoE, udržujte rozestupy)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Hrobové Peklo (kanalizované ohnivé AoE, udržujte rozestupy)',
   'hudChrome.finder.mech.profane_mending': 'Znesvěcené léčení (léčí spojence)',
   'hudChrome.finder.mech.raise_fallen': 'Povstání padlých (periodické vlny přivolávek)',
   'hudChrome.finder.mech.reaping_arc': 'Žací oblouk (čelní sek)',

@@ -750,7 +750,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Bendicion Marchita (quema el mana)',
   'hudChrome.finder.mech.mist_surge': 'Oleada de Niebla (dano de area pulsante)',
   'hudChrome.finder.mech.mortal_wound': 'Herida Olvidada (reduce la curacion recibida)',
-  'hudChrome.finder.mech.grave_inferno': 'Infierno Sepulcral (AoE de fuego canalizado, manteneos separados)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Infierno Sepulcral (AoE de fuego canalizado, manteneos separados)',
   'hudChrome.finder.mech.profane_mending': 'Restauracion Profana (cura a sus aliados)',
   'hudChrome.finder.mech.raise_fallen': 'Despertar a los Caidos (oleadas periodicas de refuerzos)',
   'hudChrome.finder.mech.reaping_arc': 'Arco Segador (tajo frontal)',

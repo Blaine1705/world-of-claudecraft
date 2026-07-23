@@ -862,7 +862,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Bênção Murcha (consome mana)',
   'hudChrome.finder.mech.mist_surge': 'Surto de Névoa (dano em área pulsante)',
   'hudChrome.finder.mech.mortal_wound': 'Ferida Esquecida (reduz a cura recebida)',
-  'hudChrome.finder.mech.grave_inferno': 'Inferno Sepulcral (AoE de fogo canalizado, mantenha distancia)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Inferno Sepulcral (AoE de fogo canalizado, mantenha distancia)',
   'hudChrome.finder.mech.profane_mending': 'Cura Profana (cura os aliados)',
   'hudChrome.finder.mech.raise_fallen': 'Erguer os Caídos (ondas periódicas de reforços)',
   'hudChrome.finder.mech.reaping_arc': 'Arco Ceifante (golpe em cone frontal)',

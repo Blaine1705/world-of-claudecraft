@@ -873,7 +873,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Benedizione Avvizzita (brucia mana)',
   'hudChrome.finder.mech.mist_surge': 'Ondata di Nebbia (danno ad area pulsante)',
   'hudChrome.finder.mech.mortal_wound': 'Ferita Dimenticata (riduce le cure ricevute)',
-  'hudChrome.finder.mech.grave_inferno': 'Inferno Sepolcrale (AoE di fuoco canalizzato, tenetevi distanti)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Inferno Sepolcrale (AoE di fuoco canalizzato, tenetevi distanti)',
   'hudChrome.finder.mech.profane_mending': 'Cura Profana (cura i propri alleati)',
   'hudChrome.finder.mech.raise_fallen': 'Richiama i Caduti (ondate periodiche di rinforzi)',
   'hudChrome.finder.mech.reaping_arc': 'Arco Mietitore (fendente frontale)',

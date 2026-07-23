@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { applyDungeonMobTuning } from '../src/sim/instances/difficulty';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
