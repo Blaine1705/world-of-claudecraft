@@ -243,6 +243,8 @@ function compactRawSummary(value: Record<string, unknown>): Record<string, unkno
     'rendererQualityBuckets',
     'input',
     'hud',
+    'netPipeline',
+    'heapSawtooth',
   ]) {
     if (value[key] !== undefined) out[key] = value[key];
   }

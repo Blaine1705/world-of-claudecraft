@@ -298,6 +298,47 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('preserves the net pipeline and heap sawtooth blocks when raw summaries are truncated', async () => {
+    const res = fakeRes();
+    const netPipeline = {
+      snapshots: 240,
+      resets: 1,
+      approxBytesTotal: 480_000,
+      gapMs: { count: 239, p50: 50, p95: 78, max: 900 },
+      snapshotsPerRaf: { r0: 410, r1: 280, r2: 24, r3plus: 6 },
+    };
+    const heapSawtooth = { samples: 60, gcDropCount: 3, avgDropMb: 38.5, amplitudeMb: 42 };
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'public-netpipeline',
+        rawSummary: {
+          seconds: 30,
+          netPipeline,
+          heapSawtooth,
+          oversized: 'x'.repeat(40_000),
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSummary: expect.objectContaining({
+          truncated: true,
+          seconds: 30,
+          netPipeline,
+          heapSawtooth,
+        }),
+      }),
+    );
+    // The oversized filler itself must NOT survive the compact pass, or the
+    // preserved-keys assertion above would be vacuous.
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect((stored.rawSummary as Record<string, unknown>).oversized).toBeUndefined();
+  });
+
   it('strips development trace data in production even on loopback', async () => {
     const previous = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';

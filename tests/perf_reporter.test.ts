@@ -315,6 +315,8 @@ function snapshot(): PerfSnapshot {
     hud: null,
     assets: { preload: { tasks: 0, waitMs: 0, complete: true }, byType: {}, files: [] },
     network: null,
+    netPipeline: null,
+    heapSawtooth: null,
     input: {
       intents: 0,
       lastKind: '',
@@ -401,6 +403,54 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererFoliage?: { modelVisibleTrianglesByLod?: { core?: number } } })
         .rendererFoliage?.modelVisibleTrianglesByLod?.core,
     ).toBe(420_000);
+  });
+
+  it('carries the always-on net pipeline and heap sawtooth blocks into raw summary', () => {
+    const settings = new Settings();
+    const snap = snapshot();
+    snap.netPipeline = {
+      snapshots: 240,
+      resets: 1,
+      approxBytesTotal: 480_000,
+      entCountTotal: 960,
+      keepCountTotal: 3120,
+      parseMs: { count: 240, p50: 0.4, p95: 1.2, max: 6.5 },
+      applyMs: { count: 240, p50: 0.9, p95: 2.8, max: 11.2 },
+      gapMs: { count: 239, p50: 50, p95: 78, max: 900 },
+      snapshotsPerRaf: { r0: 410, r1: 280, r2: 24, r3plus: 6 },
+    };
+    snap.heapSawtooth = {
+      samples: 60,
+      seconds: 59,
+      gcDropCount: 3,
+      avgDropMb: 38.5,
+      allocRateMbPerSec: 2.1,
+      amplitudeMb: 42,
+      lastUsedMb: 180,
+    };
+
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+
+    const rawSummary = body.rawSummary as {
+      netPipeline?: {
+        snapshots: number;
+        gapMs: { max: number };
+        snapshotsPerRaf: { r3plus: number };
+      };
+      heapSawtooth?: { gcDropCount: number; allocRateMbPerSec: number };
+    };
+    expect(rawSummary.netPipeline?.snapshots).toBe(240);
+    expect(rawSummary.netPipeline?.gapMs.max).toBe(900);
+    expect(rawSummary.netPipeline?.snapshotsPerRaf.r3plus).toBe(6);
+    expect(rawSummary.heapSawtooth?.gcDropCount).toBe(3);
+    expect(rawSummary.heapSawtooth?.allocRateMbPerSec).toBe(2.1);
+  });
+
+  it('keeps offline null net pipeline and heap blocks as nulls in raw summary', () => {
+    const settings = new Settings();
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snapshot(), settings, 's', null)!;
+    expect((body.rawSummary as { netPipeline?: unknown }).netPipeline).toBeNull();
+    expect((body.rawSummary as { heapSawtooth?: unknown }).heapSawtooth).toBeNull();
   });
 
   it('keeps local dev trace frames and long-task correlation in raw summary', () => {

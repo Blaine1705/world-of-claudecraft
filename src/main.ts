@@ -3293,6 +3293,13 @@ async function startGame(
       lastSnapAge: net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1,
       alpha: Math.round(alpha * 100) / 100,
     });
+    // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
+    // snapshots-applied-since-last-frame count, then publish the summary
+    // UNGATED (ruling R9), unlike the overlay-gated setNetwork above. main.ts
+    // is the src/net to src/game junction (ruling R8).
+    const netPipeline = net.netPipeline();
+    netPipeline.onAnimationFrame(now);
+    perf.setNetPipeline(netPipeline.summary());
     // Display-only self extrapolation (src/render/self_motion.ts). Off while
     // spectating, corpse-frozen, or CC'd (playerImmobilized covers stun/root/
     // incapacitate/polymorph, and fear is a fear_incap incapacitate aura; the
@@ -3514,6 +3521,10 @@ async function startGame(
   }
   await nextPaint();
   last = performance.now();
+  // A hidden tab pauses rAF while snapshots keep arriving; reset the pending
+  // snapshots-per-rAF count on visibility flips so the first foreground frame
+  // does not fold the backlog into the 3plus histogram bucket (ruling R9).
+  document.addEventListener('visibilitychange', () => online?.netPipeline().noteVisibilityChange());
   requestAnimationFrame(frame);
   // cut to the game only once the first frame is actually on screen
   requestAnimationFrame(() =>

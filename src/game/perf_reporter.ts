@@ -292,6 +292,8 @@ function payloadFromSnapshot(
       },
       input: snapshot.input,
       hud: snapshot.hud,
+      netPipeline: snapshot.netPipeline,
+      heapSawtooth: snapshot.heapSawtooth,
       ...(snapshot.devTrace ? { devTrace: snapshot.devTrace } : {}),
     },
   };
