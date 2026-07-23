@@ -9,13 +9,13 @@ type PaladinSpec = 'holy' | 'protection' | 'retribution';
 const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
   holy: ['radiant_chorus', 'hammer_of_grace', 'dawns_embrace', 'mercy_lance', 'holy_light'],
   protection: ['sunward_disc', 'consecration', 'vowkeeper_strike', 'hammer_of_grace'],
-  retribution: ['final_edict', 'dawnfall', 'hammer_of_grace'],
+  retribution: ['hammer_of_wrath', 'final_edict', 'dawnfall', 'hammer_of_grace'],
 };
 
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 42.3,
   protection: 38.65,
-  retribution: 61.85,
+  retribution: 48.35,
 };
 
 function addDummy(sim: Sim): Entity {

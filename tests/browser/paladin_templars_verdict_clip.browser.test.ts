@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { assetsReady } from '../../src/render/assets/preload';
-import { prepareVisual } from '../../src/render/characters/assets';
 import type { AnimState } from '../../src/render/characters/anim_state';
+import { prepareVisual } from '../../src/render/characters/assets';
 import {
   PALADIN_TEMPLARS_VERDICT_CLIP,
   PALADIN_TEMPLARS_VERDICT_DURATION,

@@ -98,5 +98,4 @@ describe('talent buffPct resolver fixes', () => {
       seconds: 5,
     });
   });
-
 });

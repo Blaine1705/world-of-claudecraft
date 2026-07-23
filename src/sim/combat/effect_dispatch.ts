@@ -104,6 +104,7 @@ import { resurrectDeadGroupMembers } from './mass_resurrection';
 import { placeBeaconOfLight } from './paladin_beacon';
 import { PROTECTION_CONSECRATION_DAMAGE_REDUCTION } from './paladin_consecration';
 import { pullPaladinTargets, pulsePaladinThreat } from './paladin_control';
+import { triggerPaladinDawnRhythm } from './paladin_dawn_rhythm';
 import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
 import { grantRadiantResonance } from './paladin_radiant_resonance';
 import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
@@ -272,6 +273,7 @@ export function runEffects(
   let areaEchoDealt = false;
   let devotionDamageTriggered = false;
   let devotionHealingTriggered = false;
+  let dawnRhythmTriggered = false;
   let dawnEchoOutcome: DawnEchoOutcome | null = null;
   // Dynamic DoT riders snapshot a fraction of the preceding resolved direct
   // hit, including its scaling and critical multiplier.
@@ -449,6 +451,7 @@ export function runEffects(
             fx: 'paladinFinalEdict',
             ability: ability.id,
           });
+          triggerPaladinDawnRhythm(p, ability.id);
           tryGrantDawnsWrath(ctx, p);
         }
         if (hit && ability.id === 'vowkeeper_strike') {
@@ -1753,6 +1756,10 @@ export function runEffects(
         }
         if (sunVerdictHit) {
           advanceSunGodVerdictForHit(ctx, p, sunVerdictHit.target, ability.id, sunVerdictHit.mark);
+        }
+        if (ability.id === DAWNFALL_ID && aoeTargets.length > 0 && !dawnRhythmTriggered) {
+          triggerPaladinDawnRhythm(p, ability.id);
+          dawnRhythmTriggered = true;
         }
         if (eff.rageOnHit && meta.cls === 'warrior' && p.resourceType === 'rage') {
           const hitCount = Math.min(aoeTargets.length, eff.rageOnHit.capTargets);

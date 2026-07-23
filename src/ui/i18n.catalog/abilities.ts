@@ -1029,12 +1029,12 @@ const classAbilityNamesEn = {
       [
         'final_edict',
         'Final Edict',
-        "Deliver a crushing weapon strike and generate 1 Devotion. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you.",
+        "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you.",
       ],
       [
         'dawnfall',
         'Dawnfall',
-        'Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Ascension increases its damage and radius.',
+        "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius.",
       ],
       [
         'sun_gods_verdict',
