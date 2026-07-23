@@ -3376,6 +3376,15 @@ export class Renderer {
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
       case 'spellfx': {
+        // Goad: the warrior audibly swears at the victim - a grawlix bark over
+        // the caster's head, riding the completion cue every client receives,
+        // so other players see the taunt too. Before the claim: the painter
+        // owns the wave/sequence, the bubble is this renderer's own read.
+        // Pure symbols, so it is i18n-exempt (CLAUDE.md: emojis/symbols need
+        // no t() entry) - it must read as swearing in every locale.
+        if (ev.fx === 'selfCast' && ev.ability === 'taunt') {
+          this.showChatBubble(ev.sourceId, '$@#%&*!', false, 1.8);
+        }
         // Spec-driven per-ability visuals claim the event first; unknown
         // ability/fx falls through to the generic school-colored arms below.
         if (this.abilityVfx.handleSpellfx(ev)) break;
@@ -6407,8 +6416,9 @@ export class Renderer {
   }
 
   // Hang a speech bubble over an entity's head; it follows the entity and
-  // fades out after a few seconds (longer for longer messages).
-  showChatBubble(entityId: number, text: string, yell: boolean): void {
+  // fades out after a few seconds (longer for longer messages), or after the
+  // caller's explicit ttl (short reaction barks like Goad's grawlix).
+  showChatBubble(entityId: number, text: string, yell: boolean, ttlSec?: number): void {
     let b = this.chatBubbles.get(entityId);
     if (!b) {
       const el = document.createElement('div');
@@ -6421,7 +6431,7 @@ export class Renderer {
     b.el.classList.toggle('yell', yell);
     // wall-clock ttl: sim/render time can run slower than real time under
     // frame-delta clamping, which would keep bubbles up too long
-    b.until = performance.now() + 1000 * Math.min(10, 3.5 + text.length * 0.045);
+    b.until = performance.now() + 1000 * (ttlSec ?? Math.min(10, 3.5 + text.length * 0.045));
   }
 
   private updateChatBubbles(): void {
