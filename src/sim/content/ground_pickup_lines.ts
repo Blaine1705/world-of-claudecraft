@@ -144,7 +144,7 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     enough: 'You have gathered all the scattered offerings.',
   },
   gallowmere_grave_candle: {
-    deny: 'The grave-candle is not yours to light without the candlewright\'s blessing.',
+    deny: "The grave-candle is not yours to light without the candlewright's blessing.",
     enough: 'Every boundary candle already burns.',
   },
   silkbound_remains: {
@@ -176,7 +176,7 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     enough: 'You have salvaged all the flotsam Edda marked.',
   },
   gullhaven_watchbell: {
-    deny: 'The watchbell answers only the bellkeeper\'s errand.',
+    deny: "The watchbell answers only the bellkeeper's errand.",
     enough: 'Every coastal watchbell has been rung.',
   },
 };
