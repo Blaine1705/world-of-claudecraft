@@ -385,8 +385,8 @@ export class AbilityVfxFx implements SequencerHost {
   ) {
     const tex = abilityVfxTextures();
     this.ribbons = new AbilityVfxRibbons(scene, anchor, tex);
-    this.rings = new ShockRings(scene, tex);
-    this.decals = new GroundDecals(scene, tex);
+    this.rings = new ShockRings(scene, tex, groundY);
+    this.decals = new GroundDecals(scene, tex, groundY);
     this.overlay = new OverlaySprites(scene, tex);
     this.pillars = new LightPillars(scene);
     this.shells = new BuffShells(scene);

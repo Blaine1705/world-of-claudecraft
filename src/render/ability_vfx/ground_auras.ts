@@ -1,14 +1,22 @@
 import * as THREE from 'three';
+import { drapeRingLocalY } from '../selection_ring';
 import type { AbilityVfxTextures } from './fx_textures';
 
 // Soft additive ground annuli at a buffed character's feet: the DEFAULT read
 // for a held buff aura (the whole-rig emissive tint is reserved for cast
 // windups, morph/ultimate rims, and brief application pulses). Rendering
-// follows the decal idiom (flat circle at the feet, additive, noise-shimmered
+// follows the decal idiom (circle at the feet, additive, noise-shimmered
 // shader) while the lifecycle follows the shell idiom (per-entity
 // find-or-allocate, frame-stamped hold each frame the aura lives, un-stamped
-// slots auto-release as a short fade). Fixed slot pool, one shared geometry,
+// slots auto-release as a short fade). Fixed slot pool, one geometry clone and
 // one material clone per slot at construction; zero steady-state allocation.
+//
+// Slope fix: a flat disc at foot height sinks into the uphill side of any
+// slope, so part of the annulus is always cut off there. The discs follow the
+// selection-ring idiom instead (drapeRingLocalY): every vertex rides its own
+// sampled ground height plus a small lift, re-draped in place only when the
+// wearer moved or the breath rescaled the disc. The per-slot geometry clones
+// and scratch drape arrays exist so the deform never touches a shared buffer.
 //
 // Bands: band 0 is the primary disc (~1.3 yd); each further concurrent buff
 // wears a thinner concentric ring stepped +0.25 yd out. A fourth+ buff maps
@@ -30,6 +38,16 @@ const GROW_IN = 0.4;
 const FADE_OUT = 0.5;
 const BREATH_HZ = 0.4;
 const SPIN_RATE = 0.25;
+// Per-vertex height above the sampled terrain (the selection ring's 0.08
+// anti-z-fight distance), stepped slightly per band so stacked rings never
+// coincide exactly.
+const DRAPE_LIFT = 0.08;
+const BAND_LIFT_STEP = 0.015;
+// Re-drape thresholds: skip the per-vertex resample while the wearer stands
+// still and the breath scale drift stays under ~1.5% (the residual height
+// error at that drift is millimeters).
+const DRAPE_MOVE_EPS = 0.01;
+const DRAPE_SCALE_EPS = 0.02;
 
 interface AuraSlot {
   mesh: THREE.Mesh;
@@ -44,15 +62,32 @@ interface AuraSlot {
   spin: boolean;
   phase: number;
   active: boolean;
+  // scratch drape Y (one float per vertex, reused) + the anchor the current
+  // drape was computed for (Infinity = never draped since activation)
+  drapeY: Float32Array;
+  drapeX: number;
+  drapeZ: number;
+  drapeScale: number;
 }
 
 const colorScratch = new THREE.Color();
 
 export class GroundAuras {
   private slots: AuraSlot[] = [];
+  // center-relative XZ of every disc vertex (all slots clone the same base)
+  private localXZ: Float32Array;
 
   constructor(scene: THREE.Scene, tex: AbilityVfxTextures) {
+    // Rotation is baked into the geometry (instead of mesh.rotation.x) so the
+    // position attribute's Y IS the up-axis the drape writes.
     const geo = new THREE.CircleGeometry(1, 40);
+    geo.rotateX(-Math.PI / 2);
+    const basePos = geo.getAttribute('position') as THREE.BufferAttribute;
+    this.localXZ = new Float32Array(basePos.count * 2);
+    for (let i = 0; i < basePos.count; i++) {
+      this.localXZ[i * 2] = basePos.getX(i);
+      this.localXZ[i * 2 + 1] = basePos.getZ(i);
+    }
     const proto = new THREE.ShaderMaterial({
       uniforms: {
         uNoise: { value: tex.noise },
@@ -92,11 +127,14 @@ export class GroundAuras {
     for (let i = 0; i < AURA_SLOTS; i++) {
       const mat = proto.clone();
       mat.uniforms.uNoise.value = tex.noise;
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.rotation.x = -Math.PI / 2;
+      // own geometry per slot: the drape deforms it to this slot's terrain
+      const mesh = new THREE.Mesh(geo.clone(), mat);
       mesh.visible = false;
       mesh.renderOrder = 4; // over ground decals (3), under the shock rings (5)
       mesh.userData.renderCategory = 'vfx';
+      // the drape deforms the geometry every re-anchor; a stale bounding
+      // sphere must never cull it on steep slopes (selection-ring precedent)
+      mesh.frustumCulled = false;
       scene.add(mesh);
       this.slots.push({
         mesh,
@@ -109,8 +147,13 @@ export class GroundAuras {
         spin: false,
         phase: 0,
         active: false,
+        drapeY: new Float32Array(basePos.count),
+        drapeX: Number.POSITIVE_INFINITY,
+        drapeZ: Number.POSITIVE_INFINITY,
+        drapeScale: Number.POSITIVE_INFINITY,
       });
     }
+    geo.dispose();
     proto.dispose();
   }
 
@@ -148,6 +191,7 @@ export class GroundAuras {
     slot.release = Number.POSITIVE_INFINITY;
     slot.stamp = frame;
     slot.spin = spin;
+    slot.drapeX = Number.POSITIVE_INFINITY; // force a fresh drape on first update
     slot.phase = ((entityId * 2654435761 + b * 97) % 628) / 100;
     (slot.mat.uniforms.uColor.value as THREE.Color).setHex(colorHex);
     (slot.mat.uniforms.uShape.value as THREE.Vector4).fromArray(BAND_SHAPE[b]);
@@ -183,10 +227,35 @@ export class GroundAuras {
           ? 1
           : Math.min(1, Math.max(0, (slot.release - slot.age) / FADE_OUT));
       const breath = Math.sin(2 * Math.PI * BREATH_HZ * time + slot.phase);
-      slot.mesh.position.set(at.x, groundY(at.x, at.z) + 0.05 + slot.band * 0.01, at.z);
-      slot.mesh.scale.setScalar(
-        BAND_RADIUS[slot.band] * (0.85 + 0.15 * growEase) * (1 + 0.05 * breath),
-      );
+      const scale = BAND_RADIUS[slot.band] * (0.85 + 0.15 * growEase) * (1 + 0.05 * breath);
+      const baseY = groundY(at.x, at.z);
+      slot.mesh.position.set(at.x, baseY, at.z);
+      slot.mesh.scale.setScalar(scale);
+      // Drape the disc over the terrain (see the header): re-sample only when
+      // the wearer moved or the scale drifted past the epsilons, so a
+      // standing character costs nothing between breath steps.
+      if (
+        Math.abs(at.x - slot.drapeX) > DRAPE_MOVE_EPS ||
+        Math.abs(at.z - slot.drapeZ) > DRAPE_MOVE_EPS ||
+        Math.abs(scale - slot.drapeScale) > DRAPE_SCALE_EPS
+      ) {
+        slot.drapeX = at.x;
+        slot.drapeZ = at.z;
+        slot.drapeScale = scale;
+        drapeRingLocalY(
+          this.localXZ,
+          at.x,
+          at.z,
+          baseY,
+          scale,
+          DRAPE_LIFT + slot.band * BAND_LIFT_STEP,
+          groundY,
+          slot.drapeY,
+        );
+        const pos = slot.mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
+        for (let i = 0; i < slot.drapeY.length; i++) pos.setY(i, slot.drapeY[i]);
+        pos.needsUpdate = true;
+      }
       slot.mat.uniforms.uOpacity.value =
         BAND_OPACITY[slot.band] * growEase * fade * (0.85 + 0.15 * breath);
       slot.mat.uniforms.uSpin.value = slot.spin ? time * SPIN_RATE + slot.phase : slot.phase;

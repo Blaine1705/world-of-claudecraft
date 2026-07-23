@@ -1,15 +1,22 @@
 import * as THREE from 'three';
+import { drapeRingLocalY } from '../selection_ring';
 import type { AbilityVfxTextures } from './fx_textures';
 
 // Fading ground decals (scorch embers, frost rime, arcane runes, earth
 // cracks, charred sunbursts), ported from
 // the gallery's dissolve decal shader (arc_bolt_preview.js, decals section):
 // visible where noise > uDissolve, with a bright dissolve edge, so marks etch
-// in and burn away instead of alpha-popping. Fixed slot pool, one shared
-// circle geometry, one material clone per slot at construction; a spawn only
+// in and burn away instead of alpha-popping. Fixed slot pool, one circle
+// geometry clone and one material clone per slot at construction; a spawn only
 // rebinds the style's shared texture uniform.
+//
+// Slope fix (selection-ring idiom, see ground_auras.ts): a flat disc buries
+// its uphill half on any slope, so each spawn drapes the disc's vertices over
+// the sampled terrain plus a small lift. A decal never moves or rescales, so
+// the drape runs exactly once per spawn - zero steady-state work.
 
 const DECAL_SLOTS = 12;
+const DRAPE_LIFT = 0.06; // yards above the sampled ground, against z-fighting
 
 export type DecalStyle = 'ember' | 'rime' | 'rune' | 'crack' | 'char';
 
@@ -20,14 +27,21 @@ interface DecalSlot {
   dur: number;
   spin: number;
   active: boolean;
+  drapeY: Float32Array; // scratch per-vertex drape heights, reused per spawn
 }
 
 export class GroundDecals {
   private slots: DecalSlot[] = [];
   private next = 0;
   private maps: Record<DecalStyle, THREE.CanvasTexture>;
+  // center-relative XZ of every disc vertex (all slots clone the same base)
+  private localXZ: Float32Array;
 
-  constructor(scene: THREE.Scene, tex: AbilityVfxTextures) {
+  constructor(
+    scene: THREE.Scene,
+    tex: AbilityVfxTextures,
+    private groundY: (x: number, z: number) => number,
+  ) {
     this.maps = {
       ember: tex.ember,
       rime: tex.rime,
@@ -35,7 +49,16 @@ export class GroundDecals {
       crack: tex.crack,
       char: tex.char,
     };
+    // Rotation baked into the geometry (instead of mesh.rotation.x) so the
+    // position attribute's Y IS the up-axis the drape writes.
     const geo = new THREE.CircleGeometry(1, 24);
+    geo.rotateX(-Math.PI / 2);
+    const basePos = geo.getAttribute('position') as THREE.BufferAttribute;
+    this.localXZ = new Float32Array(basePos.count * 2);
+    for (let i = 0; i < basePos.count; i++) {
+      this.localXZ[i * 2] = basePos.getX(i);
+      this.localXZ[i * 2 + 1] = basePos.getZ(i);
+    }
     const proto = new THREE.ShaderMaterial({
       uniforms: {
         uMap: { value: tex.rune },
@@ -78,14 +101,25 @@ export class GroundDecals {
     for (let i = 0; i < DECAL_SLOTS; i++) {
       const mat = proto.clone();
       mat.uniforms.uNoise.value = tex.noise;
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.rotation.x = -Math.PI / 2;
+      // own geometry per slot: each spawn drapes it to that spot's terrain
+      const mesh = new THREE.Mesh(geo.clone(), mat);
       mesh.visible = false;
       mesh.renderOrder = 3; // over terrain decals, under the shock rings
       mesh.userData.renderCategory = 'vfx';
+      // draped geometry: never let a stale bounding sphere cull it on slopes
+      mesh.frustumCulled = false;
       scene.add(mesh);
-      this.slots.push({ mesh, mat, age: 0, dur: 3, spin: 0, active: false });
+      this.slots.push({
+        mesh,
+        mat,
+        age: 0,
+        dur: 3,
+        spin: 0,
+        active: false,
+        drapeY: new Float32Array(basePos.count),
+      });
     }
+    geo.dispose();
     proto.dispose();
   }
 
@@ -108,8 +142,14 @@ export class GroundDecals {
     (slot.mat.uniforms.uColor.value as THREE.Color).setHex(colorHex);
     slot.mat.uniforms.uDissolve.value = 1;
     slot.mat.uniforms.uSpin.value = 0;
-    slot.mesh.position.set(x, y + 0.04, z); // lifted to dodge terrain z-fighting
+    slot.mesh.position.set(x, y, z);
     slot.mesh.scale.setScalar(radius);
+    // drape the disc over the terrain so no arc buries on a slope (the lift
+    // dodges z-fighting the old flat +0.04 offset handled)
+    drapeRingLocalY(this.localXZ, x, z, y, radius, DRAPE_LIFT, this.groundY, slot.drapeY);
+    const pos = slot.mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
+    for (let i = 0; i < slot.drapeY.length; i++) pos.setY(i, slot.drapeY[i]);
+    pos.needsUpdate = true;
     slot.mesh.visible = true;
   }
 
