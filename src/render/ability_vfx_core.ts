@@ -101,9 +101,13 @@ export interface AbilityVfxBuffSpec {
   // weapon itself wears a translucent additive overlay in this '#rrggbb'
   // color for the aura's FULL duration - the imbued-blade read (Sanguine
   // Blade's blood soak, the shaman weapon imbues). Resolved per frame by
-  // characterWeaponAuraColor (src/render/character_effects.ts) and rendered
-  // by the visual's rebuildWeaponAura clone-mesh overlay.
+  // characterWeaponAura (src/render/character_effects.ts) and rendered by
+  // the visual's rebuildWeaponAura clone-mesh overlay.
   weaponAura?: string;
+  // 'tip' scopes the overlay to the far end of the blade (a vertex-alpha
+  // ramp toward the point): Adder's Bite's green-tipped dagger against
+  // Festering Venom's full-blade soak. Absent = the whole weapon.
+  weaponAuraScope?: 'tip';
   shellDur?: number;
   o?: {
     rate?: number;

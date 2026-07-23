@@ -49,7 +49,8 @@ import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collisi
 import {
   characterRecklessnessActive,
   characterSoulRendActive,
-  characterWeaponAuraColor,
+  characterWeaponAuraInto,
+  type CharacterWeaponAura,
 } from './character_effects';
 import {
   type AnimState,
@@ -1077,6 +1078,7 @@ export class Renderer {
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = { theme: 'frost', value: 0 };
+  private readonly weaponAuraScratch: CharacterWeaponAura = { color: 0, tip: false };
   private glacialFrontVisual!: GlacialFrontVisual;
   private weather: Weather;
   private weatherOn = true;
@@ -5315,7 +5317,8 @@ export class Renderer {
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(characterWeaponAuraColor(e));
+      const weaponAura = characterWeaponAuraInto(e, this.weaponAuraScratch);
+      v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)

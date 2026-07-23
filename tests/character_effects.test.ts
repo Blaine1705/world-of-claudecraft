@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  type CharacterWeaponAura,
   characterRecklessnessActive,
   characterSoulRendActive,
   characterWeaponAuraColor,
+  characterWeaponAuraInto,
 } from '../src/render/character_effects';
 import type { Entity } from '../src/sim/types';
 
@@ -150,5 +152,31 @@ describe('character visual effects', () => {
     expect(
       characterWeaponAuraColor(entity({ auras: [imbue('rockbiter_weapon', 'physical')] })),
     ).toBe(null);
+  });
+
+  it('scopes the rogue poisons: Festering Venom soaks the blade, Adders Bite tips it', () => {
+    const coat = (id: string) =>
+      ({
+        id,
+        name: id,
+        kind: 'imbue',
+        remaining: 1800,
+        duration: 1800,
+        value: 8,
+        sourceId: 1,
+        school: 'nature',
+      }) as const;
+    const scratch: CharacterWeaponAura = { color: 0, tip: false };
+
+    // The mechanically bigger coat (14 damage/swing) wears the bigger read:
+    // the full-blade sickly-green wash for the aura's whole 30 min.
+    const deadly = characterWeaponAuraInto(entity({ auras: [coat('deadly_poison')] }), scratch);
+    expect(deadly).toEqual({ color: 0x58d63c, tip: false });
+
+    // The lesser coat (8 damage/swing) reads as a green-TIPPED weapon.
+    const instant = characterWeaponAuraInto(entity({ auras: [coat('instant_poison')] }), scratch);
+    expect(instant).toEqual({ color: 0x8fd455, tip: true });
+
+    expect(characterWeaponAuraInto(entity({ auras: [] }), scratch)).toBe(null);
   });
 });
