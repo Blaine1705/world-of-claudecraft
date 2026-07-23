@@ -114,6 +114,10 @@ interface TrailSlot {
   ringHead: number;
   ringCount: number;
   onArrive: ((x: number, y: number, z: number) => void) | null;
+  // fixed world-point target (ground-aimed volleys): when set, the head flies
+  // to fixedTo instead of chasing a live entity anchor
+  fixedTarget: boolean;
+  fixedTo: THREE.Vector3;
   // styled-bolt DNA (see StyledTrailOpts); legacy comet trails zero these out
   speed: number;
   style: BoltTrailStyle;
@@ -268,6 +272,8 @@ export class AbilityVfxRibbons {
         ringHead: 0,
         ringCount: 0,
         onArrive: null,
+        fixedTarget: false,
+        fixedTo: new THREE.Vector3(),
         speed: TRAIL_SPEED,
         style: 'comet',
         headSize: 0,
@@ -403,12 +409,44 @@ export class AbilityVfxRibbons {
     opts: StyledTrailOpts,
     onArrive: ((x: number, y: number, z: number) => void) | null = null,
   ): void {
+    this.spawnTrailSlot(sourceId, targetId, null, colorHex, width, opts, onArrive);
+  }
+
+  // Point-target variant (ground-aimed bolt volleys): the trail flies from the
+  // caster's hand to a FIXED world point instead of a live entity anchor, so
+  // an aimed cast's projectiles visibly cross the air to where it was aimed.
+  // opts.aim still offsets the landing (the volley fan spread).
+  spawnTrailStyledTo(
+    sourceId: number,
+    tx: number,
+    ty: number,
+    tz: number,
+    colorHex: number,
+    width: number,
+    opts: StyledTrailOpts,
+    onArrive: ((x: number, y: number, z: number) => void) | null = null,
+  ): void {
+    this.s2.set(tx, ty, tz);
+    this.spawnTrailSlot(sourceId, -1, this.s2, colorHex, width, opts, onArrive);
+  }
+
+  private spawnTrailSlot(
+    sourceId: number,
+    targetId: number,
+    fixedTo: THREE.Vector3 | null,
+    colorHex: number,
+    width: number,
+    opts: StyledTrailOpts,
+    onArrive: ((x: number, y: number, z: number) => void) | null,
+  ): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
     const slot = this.trails.find((t) => !t.active) ?? this.trails[0];
     slot.active = true;
     slot.targetId = targetId;
     slot.sourceId = sourceId;
+    slot.fixedTarget = fixedTo !== null;
+    if (fixedTo) slot.fixedTo.copy(fixedTo);
     slot.width = width;
     slot.core.setHex(colorHex).lerp(WHITE, 0.4);
     slot.glow.setHex(colorHex);
@@ -436,7 +474,7 @@ export class AbilityVfxRibbons {
     slot.seed = Math.random() * Math.PI * 2;
     // life scales with the real flight time (a 7 yd/s orb crossing 30 yd
     // must not evaporate at the legacy 3 s cap)
-    const to = this.anchor(targetId, 0.5);
+    const to = slot.fixedTarget ? slot.fixedTo : this.anchor(targetId, 0.5);
     if (to) {
       this.s1.copy(to).add(slot.aim).sub(from);
       const dist = this.s1.length();
@@ -591,7 +629,7 @@ export class AbilityVfxRibbons {
         continue;
       }
       t.ttl -= dt;
-      const target = this.anchor(t.targetId, 0.5);
+      const target = t.fixedTarget ? t.fixedTo : this.anchor(t.targetId, 0.5);
       if (!target || t.ttl <= 0) {
         t.active = false;
         continue;

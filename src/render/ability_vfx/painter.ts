@@ -859,20 +859,44 @@ export class AbilityVfx {
         this.zoneRehit(ev.x, gy, ev.z, ev.radius, spec, plan, tier);
       }
     } else if (tier < 2 && full) {
-      fx.sequenceInstantAt(
-        ev.ability,
-        full,
-        casterId,
-        ev.x,
-        ev.z,
-        plan.color,
-        tier,
-        this.windupDelayFor(ev.ability, full, casterId),
-      );
-      // ground slams from the local player still read on the rig
-      if (this.deps.localPlayerId?.() === casterId) {
-        const arch = full.archetype;
-        if (arch === 'strike' || arch === 'dash') this.deps.triggerAttack(casterId, ev.ability);
+      // A bolt-archetype aimed cast FLIES its authored volley: Splitshot's fan
+      // of arrows visibly crosses the air from the caster to the aimed point,
+      // and the point-anchored impact stack lands when the lead arrow arrives.
+      // Needs a live caster anchor (the event's sourceId, in interest range);
+      // without one the instant point sequence below stays the read.
+      if (full.bolt && casterId >= 0 && this.deps.anchor(casterId, 0.62)) {
+        fx.sequenceBoltAt(
+          ev.ability,
+          full,
+          casterId,
+          ev.x,
+          ev.z,
+          plan.color,
+          0.16 * plan.projScale,
+          tier,
+          plan.volley,
+          plan.projScale,
+        );
+        this.spawned += plan.volley;
+        // the shot reads on the rig for every client that sees the cue: the
+        // caster draws and looses toward the point (the hunter's ranged clip)
+        this.deps.triggerAttack(casterId, ev.ability);
+      } else {
+        fx.sequenceInstantAt(
+          ev.ability,
+          full,
+          casterId,
+          ev.x,
+          ev.z,
+          plan.color,
+          tier,
+          this.windupDelayFor(ev.ability, full, casterId),
+        );
+        // ground slams from the local player still read on the rig
+        if (this.deps.localPlayerId?.() === casterId) {
+          const arch = full.archetype;
+          if (arch === 'strike' || arch === 'dash') this.deps.triggerAttack(casterId, ev.ability);
+        }
       }
     } else {
       // minimal fallback read: the spec-colored burst at the landing point

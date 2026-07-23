@@ -674,6 +674,97 @@ export class AbilityVfxFx implements SequencerHost {
     }
   }
 
+  // Ground-aimed bolt volley (Splitshot): the styled trails FLY from the
+  // caster to the aimed WORLD POINT — the sequence rides targetId -1 with the
+  // point pre-seeded, release reads on the caster, and the FULL impact stack
+  // lands when the LEAD trail arrives there. Followers stagger behind with a
+  // spread aim fanned around the landing and pop small spark accents; they
+  // keep the style head and trail at tier 1 (the volley itself is the read)
+  // and shed only the garnish. Tier 2 never sequences, so no volley either.
+  sequenceBoltAt(
+    abilityId: string,
+    spec: AbilityVfxFullSpec,
+    casterId: number,
+    x: number,
+    z: number,
+    colorHex: number,
+    width: number,
+    tier: number,
+    volley = 1,
+    headScale = 1,
+  ): void {
+    width *= SPECTACLE.boltWidth;
+    headScale *= SPECTACLE.boltHead;
+    const y = this.groundY(x, z) + 0.4;
+    const slot = this.sequencer.start(this, abilityId, spec, casterId, -1, colorHex, tier, true, 0, {
+      x,
+      y,
+      z,
+    });
+    const screen = wantsScreenFx(spec, tier);
+    const b = spec.bolt;
+    const style: BoltTrailStyle = b?.style ?? PROJ_STYLE_BY_PALETTE[spec.palette] ?? 'comet';
+    const speed = b?.speed ?? 26;
+    const fullTier = tier === 0;
+    const hs = headScale * (style === 'arrow' ? 0.35 : style !== 'comet' ? 0.7 : 1);
+    const leader = b?.leader === true && tier < 2;
+    this.ribbons.spawnTrailStyledTo(
+      casterId,
+      x,
+      y,
+      z,
+      colorHex,
+      width,
+      {
+        speed,
+        style,
+        headSize: hs,
+        coils: fullTier && b?.coils === true,
+        jagTrail: fullTier && b?.jagged === true,
+        forkEvery: fullTier ? (b?.forkEvery ?? 0) : 0,
+        tracer: fullTier && b?.tracer === true,
+        delay: 0,
+        aimX: 0,
+        aimY: 0,
+        aimZ: 0,
+        groundY: this.groundY,
+      },
+      (ax, ay, az) => {
+        if (leader) this.leaderStrike(casterId, ax, ay, az, colorHex);
+        if (slot) this.sequencer.triggerImpact(this, slot, ax, ay, az);
+        if (screen) this.screenFxAt(ax, ay, az, screenFxStrengthOf(spec));
+      },
+    );
+    // the fan: followers aim at spread points around the landing so the
+    // volley reads as a scatter of shots blanketing the aimed area
+    const n = Math.min(4, Math.max(1, Math.round(volley)));
+    for (let i = 1; i < n; i++) {
+      this.ribbons.spawnTrailStyledTo(
+        casterId,
+        x,
+        y,
+        z,
+        colorHex,
+        width * 0.75,
+        {
+          speed,
+          style,
+          headSize: hs * 0.75,
+          coils: false,
+          jagTrail: false,
+          forkEvery: 0,
+          tracer: false,
+          delay: i * 0.12,
+          aimX: (Math.random() - 0.5) * 2.4,
+          aimY: (Math.random() - 0.5) * 0.5,
+          aimZ: (Math.random() - 0.5) * 2.4,
+          groundY: null,
+        },
+        (ax, ay, az) => this.particleBurst?.(ax, ay, az, colorHex, 6, 0.5, 'sparks'),
+      );
+    }
+  }
+
   // Real lightning answers itself: a dim leader stroke finds the path from
   // the caster to the strike point, then the fat return stroke ANSWERS along
   // it 80ms later (a delayed bolt slot; endpoints frozen at arrival).
