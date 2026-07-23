@@ -111,14 +111,20 @@ describe('nine classes', () => {
           .filter((questId): questId is string => questId !== undefined),
       );
       const kit = abilitiesKnownAt(cls, MAX_LEVEL, undefined, questUnlocks);
-      const ungated = CLASSES[cls].abilities.filter((id) => !ABILITIES[id]?.specs);
+      const ungated = CLASSES[cls].abilities.filter(
+        (id) => !ABILITIES[id]?.specs && !ABILITIES[id]?.hiddenFromPlayer,
+      );
       expect(new Set(kit.map((k) => k.def.id))).toEqual(new Set(ungated));
       const reachable = new Set(kit.map((known) => known.def.id));
       for (const spec of TALENTS[cls].specs) {
         const mods = computeTalentModifiers(cls, { spec: spec.id, rows: {} }, MAX_LEVEL);
         for (const known of abilitiesKnownAt(cls, MAX_LEVEL, mods)) reachable.add(known.def.id);
       }
-      expect(CLASSES[cls].abilities.every((abilityId) => reachable.has(abilityId))).toBe(true);
+      expect(
+        CLASSES[cls].abilities
+          .filter((abilityId) => !ABILITIES[abilityId]?.hiddenFromPlayer)
+          .every((abilityId) => reachable.has(abilityId)),
+      ).toBe(true);
       // the 10-20 band still has things to learn. Exception: the mage baseline kit
       // compressed to level 10 when the choice-row unlock guard moved pyroblast/scorch/
       // ice_barrier earlier (rows carry the 11-20 progression); flagged for PTR pacing
@@ -182,15 +188,15 @@ describe('nine classes', () => {
     expect(p.hp).toBeGreaterThan(30);
   });
 
-  it('paladin seal remains active to empower melee swings', () => {
+  it('paladin Dawn Devotion remains active to empower melee attacks', () => {
     const sim = new Sim({ seed: 42, playerClass: 'paladin' });
-    sim.setPlayerLevel(4);
+    sim.setPlayerLevel(10);
     const p = sim.player;
-    sim.castAbility('seal_of_righteousness');
+    sim.castAbility('dawn_devotion');
     sim.tick();
-    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'buff_ap' && a.sourceId === p.id)).toBe(true);
     for (let i = 0; i < 35; i++) sim.tick();
-    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'buff_ap' && a.sourceId === p.id)).toBe(true);
   });
 
   it('warlock life taps and drains life', () => {

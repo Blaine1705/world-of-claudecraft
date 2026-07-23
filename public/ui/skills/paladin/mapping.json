@@ -372,7 +372,7 @@
     },
     {
       "abilityId": "aura_mastery",
-      "name": "Aura Mastery",
+      "name": "Sacred Concord",
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "aura_mastery.webp",
       "confidence": "high"
@@ -389,6 +389,134 @@
       "name": "Veilbound March",
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "veilbound_march.webp",
+      "confidence": "high"
+    }
+  ],
+  "talents": [
+    {
+      "talentId": "pal_r5_radiant_stride",
+      "name": "Radiant Stride",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r5_radiant_stride.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r5_steadfast_step",
+      "name": "Steadfast Step",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r5_steadfast_step.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r5_divine_steed",
+      "name": "Divine Steed",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r5_divine_steed.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r8_enduring_protection",
+      "name": "Enduring Protection",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r8_enduring_protection.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r8_steady_hands",
+      "name": "Steady Hands",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r8_steady_hands.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r8_recurring_grace",
+      "name": "Recurring Grace",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r8_recurring_grace.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r11_fist_of_justice",
+      "name": "Fist of Justice",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r11_fist_of_justice.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r11_double_sentence",
+      "name": "Double Sentence",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r11_double_sentence.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r11_radiant_shackles",
+      "name": "Radiant Shackles",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r11_radiant_shackles.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r14_zeal",
+      "name": "Zeal",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r14_zeal.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r14_sacred_reserve",
+      "name": "Sacred Reserve",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r14_sacred_reserve.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r14_divine_purpose",
+      "name": "Divine Purpose",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r14_divine_purpose.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r17_extended_dawn",
+      "name": "Extended Dawn",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r17_extended_dawn.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r17_radiant_wrath",
+      "name": "Radiant Wrath",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r17_radiant_wrath.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r17_sanctified_fervor",
+      "name": "Sanctified Fervor",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r17_sanctified_fervor.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r20_aura_mastery",
+      "name": "Sacred Concord",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r20_aura_mastery.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r20_dawn_echo",
+      "name": "Dawn Echo",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r20_dawn_echo.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r20_perpetual_sun",
+      "name": "Perpetual Sun",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r20_perpetual_sun.webp",
       "confidence": "high"
     }
   ]

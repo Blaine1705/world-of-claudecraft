@@ -717,17 +717,17 @@ describe('hunter pets', () => {
 
     const paladinId = sim.addPlayer('paladin', 'Paladin');
     const paladin = sim.entities.get(paladinId)!;
-    sim.setPlayerLevel(4, paladinId);
+    sim.setPlayerLevel(10, paladinId);
     teleport(sim, paladin, pet.pos.x + 7, pet.pos.z);
     paladin.resource = paladin.maxResource;
-    // Blessing of Might is now a percent attack-power raid buff. Give the pet a base
-    // AP so the percent has something to scale (tamed pets otherwise deal template
-    // damage with 0 attack power, leaving a percent buff inert).
-    pet.attackPower = 50;
-    const attackPowerBefore = (sim as any).effectiveAttackPower(pet);
+    sim.partyInvite(paladinId, sim.playerId);
+    sim.partyAccept(paladinId);
+    pet.hp = pet.maxHp - 40;
+    const hpBeforeMendingLight = pet.hp;
     sim.targetEntity(pet.id, paladinId);
-    sim.castAbility('blessing_of_might', paladinId);
-    expect((sim as any).effectiveAttackPower(pet)).toBeGreaterThan(attackPowerBefore);
+    sim.castAbility('holy_light', paladinId);
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(pet.hp).toBeGreaterThan(hpBeforeMendingLight);
 
     pet.hp = pet.maxHp - 40;
     const damagedHp = pet.hp;

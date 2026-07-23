@@ -2,15 +2,35 @@ import type { SpecDef, TalentEffect, TalentRowOption } from '../sim/content/tale
 import { ABILITIES } from '../sim/data';
 import { type IconKind, iconDataUrl } from './icons';
 
-export interface TalentIconRef {
-  kind: Extract<IconKind, 'ability' | 'crest'>;
-  id: string;
-}
+export type TalentIconRef =
+  | {
+      kind: Extract<IconKind, 'ability' | 'crest'>;
+      id: string;
+    }
+  | { kind: 'image'; url: string };
 
-export type TalentSpecIconRef =
-  | { kind: 'image'; url: string }
-  | TalentIconRef
-  | { kind: 'text'; text: string };
+export type TalentSpecIconRef = TalentIconRef | { kind: 'text'; text: string };
+
+export const PALADIN_TALENT_IMAGE_IDS = new Set([
+  'pal_r5_radiant_stride',
+  'pal_r5_steadfast_step',
+  'pal_r5_divine_steed',
+  'pal_r8_enduring_protection',
+  'pal_r8_steady_hands',
+  'pal_r8_recurring_grace',
+  'pal_r11_fist_of_justice',
+  'pal_r11_double_sentence',
+  'pal_r11_radiant_shackles',
+  'pal_r14_zeal',
+  'pal_r14_sacred_reserve',
+  'pal_r14_divine_purpose',
+  'pal_r17_extended_dawn',
+  'pal_r17_radiant_wrath',
+  'pal_r17_sanctified_fervor',
+  'pal_r20_aura_mastery',
+  'pal_r20_dawn_echo',
+  'pal_r20_perpetual_sun',
+]);
 
 const TALENT_STAT_CREST: Record<string, string> = {
   armorPct: 'talent_armor',
@@ -78,12 +98,18 @@ export function talentEffectIconRef(effect: TalentEffect | undefined): TalentIco
   const stat = effect?.stats ? Object.keys(effect.stats)[0] : undefined;
   if (stat) return { kind: 'crest', id: TALENT_STAT_CREST[stat] ?? 'talent_generic' };
   if (effect?.global) {
-    return { kind: 'crest', id: effect.global.threatPct ? 'talent_armor' : 'talent_crit' };
+    return {
+      kind: 'crest',
+      id: effect.global.threatPct ? 'talent_armor' : 'talent_crit',
+    };
   }
   return { kind: 'crest', id: 'talent_choice' };
 }
 
 export function talentRowOptionIconRef(option: TalentRowOption): TalentIconRef {
+  if (option.icon && PALADIN_TALENT_IMAGE_IDS.has(option.icon)) {
+    return { kind: 'image', url: `/ui/skills/paladin/${option.icon}.webp` };
+  }
   return talentEffectIconRef(option.effect);
 }
 
@@ -99,6 +125,7 @@ export function talentSpecIconRef(spec: SpecDef): TalentSpecIconRef {
 }
 
 export function talentIconDataUrl(ref: TalentIconRef): string {
+  if (ref.kind === 'image') return ref.url;
   return iconDataUrl(ref.kind, ref.id);
 }
 

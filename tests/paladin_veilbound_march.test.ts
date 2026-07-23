@@ -161,7 +161,7 @@ describe('Veilbound March', () => {
     expect(sim.player.auras.some((active) => active.id === 'ordinary_slow')).toBe(false);
   });
 
-  it('marks every traversed enemy once and grants Devotion only for the first mark', () => {
+  it('marks every traversed enemy once and grants only one extra Devotion from traversal', () => {
     const sim = makeProtection();
     const first = targetAt(sim, -0.25, -39.4);
     const second = targetAt(sim, 0.25, -39.4);
@@ -172,7 +172,7 @@ describe('Veilbound March', () => {
 
     expect(first.auras.filter((active) => active.id === 'veilbound_mark')).toHaveLength(1);
     expect(second.auras.filter((active) => active.id === 'veilbound_mark')).toHaveLength(1);
-    expect(sim.player.paladinDevotion?.value).toBe(1);
+    expect(sim.player.paladinDevotion?.value).toBe(2);
   });
 
   it('ticks Holy damage and triple threat for six seconds, and reduces only its damage to the marking Paladin', () => {
@@ -230,7 +230,7 @@ describe('Veilbound March', () => {
     expect(finalHits).toEqual([
       expect.objectContaining({ targetId: inside.id, amount: 36, school: 'holy' }),
     ]);
-    expect(sim.player.paladinDevotion?.value).toBe(1);
+    expect(sim.player.paladinDevotion?.value).toBe(2);
     expect(sim.player.auras.some((active) => active.id === 'veilbound_march')).toBe(false);
     expect(moveSpeedMult(sim.player)).toBe(1);
     expect(sim.player.stats.armor).toBe(Math.round(baseArmor));

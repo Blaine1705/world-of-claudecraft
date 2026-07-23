@@ -804,7 +804,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   es: {
     'Adrenaline Junkie': 'Adicto a la adrenalina',
     'Aspect Mastery': 'Maestría de aspectos',
-    'Aura Mastery': 'Maestría de auras',
+    'Sacred Concord': 'Concordia sagrada',
     'Battlemage Armor': 'Armadura de mago guerrero',
     'Blessed Momentum': 'Impulso bendito',
     'Blessed Recovery': 'Recuperación bendita',
@@ -1256,7 +1256,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   es_ES: {
     'Adrenaline Junkie': 'Adicto a la adrenalina',
     'Aspect Mastery': 'Maestría de aspectos',
-    'Aura Mastery': 'Maestría de auras',
+    'Sacred Concord': 'Concordia sagrada',
     'Battlemage Armor': 'Armadura de mago guerrero',
     'Blessed Momentum': 'Impulso bendito',
     'Blessed Recovery': 'Recuperación bendita',
@@ -1708,7 +1708,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   fr_FR: {
     'Adrenaline Junkie': "Accro à l'adrénaline",
     'Aspect Mastery': 'Maîtrise des aspects',
-    'Aura Mastery': 'Maîtrise des auras',
+    'Sacred Concord': 'Concorde sacrée',
     'Battlemage Armor': 'Armure de mage de bataille',
     'Blessed Momentum': 'Élan béni',
     'Blessed Recovery': 'Récupération bénie',
@@ -2160,7 +2160,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   fr_CA: {
     'Adrenaline Junkie': "Accro à l'adrénaline",
     'Aspect Mastery': 'Maîtrise des aspects',
-    'Aura Mastery': 'Maîtrise des auras',
+    'Sacred Concord': 'Concorde sacrée',
     'Battlemage Armor': 'Armure de mage de bataille',
     'Blessed Momentum': 'Élan béni',
     'Blessed Recovery': 'Récupération bénie',
@@ -2612,7 +2612,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   it_IT: {
     'Adrenaline Junkie': "Dipendente dall'adrenalina",
     'Aspect Mastery': 'Maestria degli aspetti',
-    'Aura Mastery': 'Maestria delle aure',
+    'Sacred Concord': 'Concordia sacra',
     'Battlemage Armor': 'Armatura da mago guerriero',
     'Blessed Momentum': 'Impeto benedetto',
     'Blessed Recovery': 'Recupero benedetto',
@@ -3064,7 +3064,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   de_DE: {
     'Adrenaline Junkie': 'Adrenalinrausch',
     'Aspect Mastery': 'Aspektmeisterschaft',
-    'Aura Mastery': 'Aurameisterschaft',
+    'Sacred Concord': 'Heiliger Einklang',
     'Battlemage Armor': 'Kampfmagierpanzer',
     'Blessed Momentum': 'Gesegneter Schwung',
     'Blessed Recovery': 'Gesegnete Erholung',
@@ -3516,7 +3516,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   zh_CN: {
     'Adrenaline Junkie': '肾上腺狂徒',
     'Aspect Mastery': '守护精通',
-    'Aura Mastery': '光环精通',
+    'Sacred Concord': '神圣协律',
     'Battlemage Armor': '战法护甲',
     'Blessed Momentum': '圣佑疾势',
     'Blessed Recovery': '圣佑复苏',
@@ -3968,7 +3968,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   zh_TW: {
     'Adrenaline Junkie': '腎上腺狂徒',
     'Aspect Mastery': '守護精通',
-    'Aura Mastery': '光環精通',
+    'Sacred Concord': '神聖協律',
     'Battlemage Armor': '戰法護甲',
     'Blessed Momentum': '聖佑疾勢',
     'Blessed Recovery': '聖佑復甦',
@@ -4420,7 +4420,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   ko_KR: {
     'Adrenaline Junkie': '아드레날린 광신자',
     'Aspect Mastery': '상 숙련',
-    'Aura Mastery': '오라 숙련',
+    'Sacred Concord': '성스러운 화합',
     'Battlemage Armor': '전투마법사 갑옷',
     'Blessed Momentum': '축복받은 기세',
     'Blessed Recovery': '축복받은 회복',
@@ -4872,7 +4872,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   ja_JP: {
     'Adrenaline Junkie': '熱血中毒',
     'Aspect Mastery': '相の極意',
-    'Aura Mastery': 'オーラの極意',
+    'Sacred Concord': '聖なる調和',
     'Battlemage Armor': '戦魔の鎧',
     'Blessed Momentum': '祝福の勢い',
     'Blessed Recovery': '祝福の回復',
@@ -5324,7 +5324,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   pt_BR: {
     'Adrenaline Junkie': 'Viciado em adrenalina',
     'Aspect Mastery': 'Maestria dos aspectos',
-    'Aura Mastery': 'Maestria das auras',
+    'Sacred Concord': 'Concórdia Sagrada',
     'Battlemage Armor': 'Armadura de mago de batalha',
     'Blessed Momentum': 'Ímpeto abençoado',
     'Blessed Recovery': 'Recuperação abençoada',
@@ -5776,7 +5776,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   ru_RU: {
     'Adrenaline Junkie': 'Адреналиновый фанатик',
     'Aspect Mastery': 'Мастерство обликов',
-    'Aura Mastery': 'Мастерство аур',
+    'Sacred Concord': 'Священное согласие',
     'Battlemage Armor': 'Доспех боевого мага',
     'Blessed Momentum': 'Благословенный порыв',
     'Blessed Recovery': 'Благословенное восстановление',

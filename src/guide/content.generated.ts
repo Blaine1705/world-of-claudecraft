@@ -516,16 +516,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "signatureAbilities": [
       {
-        "id": "seal_of_righteousness",
-        "name": "Oathbrand"
-      },
-      {
         "id": "holy_light",
         "name": "Mending Light"
-      },
-      {
-        "id": "blessing_of_might",
-        "name": "Oath of Iron"
       },
       {
         "id": "divine_protection",
@@ -538,20 +530,20 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "lay_on_hands",
         "name": "Last Rite"
+      },
+      {
+        "id": "consecration",
+        "name": "Holy Ground"
+      },
+      {
+        "id": "holy_shield",
+        "name": "Hallowed Wall"
       }
     ],
     "abilities": [
       {
-        "id": "seal_of_righteousness",
-        "name": "Oathbrand"
-      },
-      {
         "id": "holy_light",
         "name": "Mending Light"
-      },
-      {
-        "id": "blessing_of_might",
-        "name": "Oath of Iron"
       },
       {
         "id": "divine_protection",
@@ -564,14 +556,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "lay_on_hands",
         "name": "Last Rite"
-      },
-      {
-        "id": "flash_of_light",
-        "name": "Lightmend"
-      },
-      {
-        "id": "exorcism",
-        "name": "Rite of Expulsion"
       },
       {
         "id": "consecration",
@@ -582,24 +566,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Burning Oath"
       },
       {
-        "id": "rebuke",
-        "name": "Reproach"
-      },
-      {
-        "id": "sacred_bulwark",
-        "name": "Sacred Bulwark"
-      },
-      {
-        "id": "holy_shock",
-        "name": "Holy Shock"
-      },
-      {
         "id": "holy_shield",
         "name": "Hallowed Wall"
-      },
-      {
-        "id": "crusader_strike",
-        "name": "Crusader Strike"
       },
       {
         "id": "divine_ascension",

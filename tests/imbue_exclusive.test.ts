@@ -83,14 +83,11 @@ describe('weapon imbues are a mutually-exclusive single slot (H2-1)', () => {
     expect(imbues(p)[0].remaining).toBe(dur); // refreshed to full
   });
 
-  it('paladin seal remains a single melee-damage imbue without a removed Verdict payload', () => {
+  it('keeps the retired Paladin seal out of the authoritative imbue slot', () => {
     const { sim, p } = makePlayer('paladin', 4);
+    expect(sim.resolvedAbility('seal_of_righteousness')).toBeNull();
     cast(sim, p, 'seal_of_righteousness');
-    expect(imbues(p)).toHaveLength(1);
-    expect(imbues(p)[0].id).toBe('seal_of_righteousness');
-    expect(imbues(p)[0].value).toBeGreaterThan(0);
-    expect(imbues(p)[0].value2).toBeUndefined();
-    expect(imbues(p)[0].value3).toBeUndefined();
+    expect(imbues(p)).toHaveLength(0);
   });
 
   it('is deterministic: same seed yields the same single-imbue result', () => {

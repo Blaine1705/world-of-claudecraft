@@ -32,7 +32,7 @@ import {
 } from '../src/sim/content/talents';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
-import { talentRowOptionIconRef } from '../src/ui/talent_icons';
+import { PALADIN_TALENT_IMAGE_IDS, talentRowOptionIconRef } from '../src/ui/talent_icons';
 
 // 'personal_barrier' is the shieldConsumed SLOT sentinel (combat/talent_procs.ts):
 // it resolves at runtime to whichever personal barrier the spec provides.
@@ -156,13 +156,21 @@ describe('Talents V2 registry and reachability', () => {
     }
   });
 
-  it('derives an ability or procedural crest icon for every active option', () => {
+  it('derives a painted image, ability, or procedural crest icon for every active option', () => {
     for (const cls of ALL_CLASSES) {
       for (const row of requiredTree(cls)) {
         for (const option of row.options) {
           const icon = talentRowOptionIconRef(option);
-          expect(icon.kind, `${cls}:${option.id}`).toMatch(/^(ability|crest)$/);
-          expect(icon.id, `${cls}:${option.id}`).toMatch(/^[a-z0-9_]+$/);
+          expect(icon.kind, `${cls}:${option.id}`).toMatch(/^(image|ability|crest)$/);
+          if (icon.kind === 'image') {
+            expect(cls, option.id).toBe('paladin');
+            expect(PALADIN_TALENT_IMAGE_IDS.has(option.icon ?? ''), option.id).toBe(true);
+            expect(icon.url, `${cls}:${option.id}`).toMatch(
+              /^\/ui\/skills\/[a-z_]+\/[a-z0-9_]+\.webp$/,
+            );
+          } else {
+            expect(icon.id, `${cls}:${option.id}`).toMatch(/^[a-z0-9_]+$/);
+          }
         }
       }
     }

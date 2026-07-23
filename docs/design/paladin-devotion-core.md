@@ -78,7 +78,7 @@ Devotions cast by other Paladins, and neither family replaces the other.
 | 17 | Extended Dawn | Ascension has seven charges instead of five. |
 | 17 | Radiant Wrath | Avenging Wrath lasts 20 sec and has a 100 sec cooldown. |
 | 17 | Sanctified Fervor | Avenging Wrath also grants 15% critical strike chance and 15% melee and spell haste. |
-| 20 | Aura Mastery | Active, 8 sec, 120 sec cooldown. Every currently active Devotion and Requital Aura in the group is empowered automatically: 15% reduction and 15 Holy damage respectively. Multiple Paladins refresh one group buff instead of stacking it. Radiant, Dawn, and Grace Devotion are unaffected. |
+| 20 | Sacred Concord | Active, 8 sec, 120 sec cooldown. Every currently active Devotion and Requital Aura in the group is empowered automatically: 15% reduction and 15 Holy damage respectively. Multiple Paladins refresh one group buff instead of stacking it. Radiant, Dawn, and Grace Devotion are unaffected. |
 | 20 | Dawn Echo | Every third direct ability that actually generates Devotion repeats its primary direct damage or healing at 40% on the same target. An echo that deals damage or restores health grants 1 Devotion. Copies cannot crit, transfer through Beacon, trigger another echo, or grant Devotion during Divine Ascension. |
 | 20 | Perpetual Sun | Consuming the final Ascension charge deals 150 Holy damage within 10 m and heals group allies within 20 m for 150, then doubles ability Devotion generation for 5 sec. Expiry does not trigger it; its multiplier does not stack above x2 with Avenging Wrath, and Zeal's +1 is not doubled. |
 

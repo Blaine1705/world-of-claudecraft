@@ -112,7 +112,7 @@ unchanged. All numbers are level-20 baselines, PTR-tunable.
 | 17 | Sacred Ward | Lay on Hands also shields every nearby ally for 60. |
 | 17 | Deathless Ardor | Cheat death: a killing blow leaves you at 1 hp instead (3 min internal cooldown). |
 | 20 | Wrathwing / Tolling Hammer | KEEP. |
-| 20 | Aura Mastery | Activate: your aura's effect is doubled for 10 sec (2 min cooldown), granted as an active ability. |
+| 20 | Sacred Concord | Activate: your aura's effect is doubled for 10 sec (2 min cooldown), granted as an active ability. |
 
 ## Constraints carried from the repo rules
 

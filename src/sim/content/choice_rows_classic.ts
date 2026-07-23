@@ -270,14 +270,14 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pal_r5_radiant_stride',
           name: 'Radiant Stride',
           description: 'Hammer of Grace grants 30% movement speed for 4 sec when it deals damage.',
-          icon: 'hammer_of_grace',
+          icon: 'pal_r5_radiant_stride',
           effect: { global: { paladinRadiantStride: 0.3 } },
         },
         {
           id: 'pal_r5_steadfast_step',
           name: 'Steadfast Step',
           description: 'Solar Step lasts 2 sec longer and makes you immune to slows while active.',
-          icon: 'solar_step',
+          icon: 'pal_r5_steadfast_step',
           effect: {
             ability: [
               {
@@ -293,7 +293,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Divine Steed',
           description:
             'Gain 0.75% movement speed per Devotion, up to 15% at 20. Activating Divine Ascension spends your Devotion and grants 30% movement speed for 5 sec.',
-          icon: 'divine_ascension',
+          icon: 'pal_r5_divine_steed',
           effect: {
             global: { paladinDivineSteed: 0.15, paladinDivineSteedBurstPct: 0.3 },
           },
@@ -309,7 +309,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pal_r8_enduring_protection',
           name: 'Enduring Protection',
           description: 'Ward of Faith absorbs 50% more damage and lasts 5 sec longer.',
-          icon: 'divine_protection',
+          icon: 'pal_r8_enduring_protection',
           effect: {
             ability: [{ ability: 'divine_protection', dmgPct: 0.5, durationFlat: 5 }],
           },
@@ -319,7 +319,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Steady Hands',
           description:
             'Last Rite recharges 30% faster and heals the target for another 30% of its direct healing over 6 sec.',
-          icon: 'lay_on_hands',
+          icon: 'pal_r8_steady_hands',
           effect: {
             ability: [{ ability: 'lay_on_hands', cooldownPct: -0.3 }],
             global: { paladinSteadyHandsHotPct: 0.3 },
@@ -330,7 +330,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Recurring Grace',
           description:
             'Hammer of Grace overhealing becomes an absorb shield for 10 sec, capped at 10% of your maximum health.',
-          icon: 'hammer_of_grace',
+          icon: 'pal_r8_recurring_grace',
           effect: { global: { paladinRecurringGrace: 0.1 } },
         },
       ],
@@ -344,21 +344,21 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pal_r11_fist_of_justice',
           name: 'Fist of Justice',
           description: "Sundering Gavel's cooldown is reduced by 25%.",
-          icon: 'hammer_of_justice',
+          icon: 'pal_r11_fist_of_justice',
           effect: { ability: [{ ability: 'hammer_of_justice', cooldownPct: -0.25 }] },
         },
         {
           id: 'pal_r11_double_sentence',
           name: 'Double Sentence',
           description: 'Sundering Gavel stores 2 uses.',
-          icon: 'hammer_of_justice',
+          icon: 'pal_r11_double_sentence',
           effect: { ability: [{ ability: 'hammer_of_justice', bonusCharges: 1 }] },
         },
         {
           id: 'pal_r11_radiant_shackles',
           name: 'Radiant Shackles',
           description: 'Hammer of Grace slows its target by 40% for 4 sec.',
-          icon: 'hammer_of_grace',
+          icon: 'pal_r11_radiant_shackles',
           effect: {
             ability: [
               {
@@ -380,21 +380,21 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Zeal',
           description:
             'Every third ability that actually generates Devotion grants 1 extra Devotion.',
-          icon: 'divine_ascension',
+          icon: 'pal_r14_zeal',
           effect: { global: { paladinZeal: 1 } },
         },
         {
           id: 'pal_r14_sacred_reserve',
           name: 'Sacred Reserve',
           description: 'When Divine Ascension ends, regain 5 Devotion.',
-          icon: 'divine_ascension',
+          icon: 'pal_r14_sacred_reserve',
           effect: { global: { paladinSacredReserve: 5 } },
         },
         {
           id: 'pal_r14_divine_purpose',
           name: 'Divine Purpose',
           description: 'Ascension-empowered abilities have a 20% chance not to consume a charge.',
-          icon: 'divine_ascension',
+          icon: 'pal_r14_divine_purpose',
           effect: { global: { paladinDivinePurposeChance: 0.2 } },
         },
       ],
@@ -408,7 +408,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pal_r17_extended_dawn',
           name: 'Extended Dawn',
           description: 'Divine Ascension empowers 2 additional abilities.',
-          icon: 'avenging_wrath',
+          icon: 'pal_r17_extended_dawn',
           effect: { global: { ascensionChargeBonus: 2 } },
         },
         {
@@ -416,7 +416,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Radiant Wrath',
           description:
             'Avenging Wrath lasts 5 sec longer (20 sec total) and its cooldown is reduced to 100 sec.',
-          icon: 'avenging_wrath',
+          icon: 'pal_r17_radiant_wrath',
           effect: {
             ability: [{ ability: 'avenging_wrath', cooldownFlat: -20, durationFlat: 5 }],
           },
@@ -425,7 +425,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pal_r17_sanctified_fervor',
           name: 'Sanctified Fervor',
           description: 'Avenging Wrath also grants 15% critical strike chance and 15% haste.',
-          icon: 'avenging_wrath',
+          icon: 'pal_r17_sanctified_fervor',
           effect: {
             ability: [
               {
@@ -448,10 +448,10 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pal_r20_aura_mastery',
-          name: 'Aura Mastery',
+          name: 'Sacred Concord',
           description:
             'For 8 sec, empower every active Devotion and Requital Aura in your group. Devotion reduces damage by 15%; Requital deals 15 Holy damage. 120 sec cooldown. Multiple uses refresh instead of stacking.',
-          icon: 'devotion_ward',
+          icon: 'pal_r20_aura_mastery',
           effect: { grant: { ability: 'aura_mastery' } },
         },
         {
@@ -459,7 +459,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Dawn Echo',
           description:
             'Every third direct ability that actually generates Devotion repeats its primary direct damage or healing at 40% on the same target. An effective echo grants 1 Devotion. The echo cannot crit or trigger other echoes, and grants no Devotion during Divine Ascension.',
-          icon: 'divine_ascension',
+          icon: 'pal_r20_dawn_echo',
           effect: { global: { paladinDawnEcho: 0.4, paladinDawnEchoDevotion: 1 } },
         },
         {
@@ -467,7 +467,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Perpetual Sun',
           description:
             'Consuming your last Ascension charge deals 150 Holy damage within 10 m, heals allies within 20 m for 150, then doubles ability Devotion generation for 5 sec. Expiration does not trigger it.',
-          icon: 'divine_ascension',
+          icon: 'pal_r20_perpetual_sun',
           effect: { global: { paladinPerpetualSun: 150 } },
         },
       ],

@@ -318,6 +318,7 @@ describe('Protection Paladin Solar Reprisal', () => {
     const sim = makeProtection();
     const enemy = targetAt(sim, 10);
     sim.targetEntity(enemy.id);
+    expect(sim.unequipItem('offhand')).toBe(true);
     sim.player.cooldowns.set('sunward_disc', 5);
     grantSolarReprisal(sim.ctx, sim.player);
 
