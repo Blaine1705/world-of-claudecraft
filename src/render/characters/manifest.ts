@@ -499,7 +499,10 @@ export const VISUALS: Record<string, VisualDef> = {
         slam: '2H_Melee_Attack_Chop',
         red_harvest: '2H_Melee_Attack_Chop',
         breachmaker: '2H_Melee_Attack_Chop',
-        shield_slam: '2H_Melee_Attack_Chop',
+        // Shieldcrack slams the SHIELD (offhand arm), not the sword: the
+        // synthesized bash (scripts/_add_shield_bash_anim.mjs) drives the
+        // left arm carrying the handslot.l shield; the weapon hand stays back.
+        shield_slam: 'Shield_Bash',
         raging_gale: 'Dualwield_Melee_Attack_Chop',
         bloodthirst: 'Dualwield_Melee_Attack_Chop',
         // Reaping Arc and Revenge hit everything in the frontal arc: the
