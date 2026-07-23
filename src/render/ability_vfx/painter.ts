@@ -172,7 +172,10 @@ export interface AbilityVfxEntityState {
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
-  auras: readonly { id: string }[];
+  // breakThreshold rides along for the Lingering Dread fear alias (present on
+  // the offline sim's live Aura objects; mirrored online as a presence-only 1
+  // via the aura wire's bt flag).
+  auras: readonly { id: string; breakThreshold?: number }[];
   kind?: string;
   templateId?: string;
   // On-next-swing queue (heroic-strike style ability id while armed). Present
@@ -251,29 +254,60 @@ function isTransformativeBuff(full: AbilityVfxFullSpec): boolean {
 // aoeAlly buffs: rallying_cry_hp / rallying_cry_dr, `${abilityId}_ap`, and
 // movement snares: `${abilityId}_slow`), which would miss the spec table and
 // silently drop the ability's authored look. On a miss, retry with the known
-// suffixes stripped. `_slow` lets a spec author a VICTIM-worn band (Hobbling
-// Cut's dragging ankle speedlines live exactly as long as the snare aura).
+// suffixes stripped. `_slow`/`_root` let a spec author a VICTIM-worn band
+// (Hobbling Cut's dragging ankle speedlines, Crushing Charge's ground-grit
+// shackle - each lives exactly as long as its aura).
 // Memoized so the per-frame aura scan stays allocation-free in steady state;
 // only ids that RESOLVE are re-keyed, so an unrelated ability that happens to
 // end in a suffix is safe.
-const AURA_ID_SUFFIXES = ['_hp', '_dr', '_ap', '_slow'];
+const AURA_ID_SUFFIXES = ['_hp', '_dr', '_ap', '_slow', '_root'];
+// _slow/_root are the HOSTILE suffixes: the sim only ever applies them to a
+// caster's victim, so resolving through one marks the aura victim-worn and
+// routes it down the wornDebuff path in syncEntity (band only - never the
+// ground disc, transformative rim, or gain swirl a buff block grants).
+const HOSTILE_AURA_SUFFIXES = new Set(['_slow', '_root']);
 const auraSpecIdMemo = new Map<string, string | null>();
+const auraHostileWornMemo = new Set<string>();
 function auraSpecId(auraId: string): string | null {
   if (ABILITY_VFX_SPECS[auraId] !== undefined) return auraId;
   let base = auraSpecIdMemo.get(auraId);
   if (base === undefined) {
     base = null;
+    let hostile = false;
     for (const s of AURA_ID_SUFFIXES) {
       if (auraId.endsWith(s)) {
         const stripped = auraId.slice(0, -s.length);
-        if (ABILITY_VFX_SPECS[stripped] !== undefined) base = stripped;
+        if (ABILITY_VFX_SPECS[stripped] !== undefined) {
+          base = stripped;
+          hostile = HOSTILE_AURA_SUFFIXES.has(s);
+        }
         break;
       }
     }
-    if (auraSpecIdMemo.size < 512) auraSpecIdMemo.set(auraId, base);
+    if (auraSpecIdMemo.size < 512) {
+      auraSpecIdMemo.set(auraId, base);
+      if (hostile) auraHostileWornMemo.add(auraId);
+    }
   }
   return base;
 }
+// True when auraSpecId(auraId) resolved through a hostile suffix. The memo is
+// warm for any id auraSpecId already resolved this frame (the scan always
+// calls it first); exact-id matches never enter it, which is correct - an
+// unsuffixed aura is the caster's own.
+function auraIsHostileWorn(auraId: string): boolean {
+  return auraHostileWornMemo.has(auraId);
+}
+
+// Lingering Dread: the shared fear aura keeps one fixed id (fear_incap - mob
+// fears and player Fear reuse it), so it can never suffix-resolve. When the
+// warrior talent armed it (breakThreshold present; the ONLY writer is
+// intimidating_shout's aoeFear reading the fearBreakPct global), alias it to
+// the shout's spec so its authored debuff block is worn - the lingering dread
+// made visible for the fear's whole extended life. An untalented fear stays
+// unresolved and wears nothing new.
+const FEAR_BREAK_AURA_ID = 'fear_incap';
+const FEAR_BREAK_SPEC_ID = 'intimidating_shout';
 
 // Particle sprite family per burst kind, mapped onto Vfx.burst's school hint.
 const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
@@ -1042,15 +1076,28 @@ export class AbilityVfx {
     // band's sprite count in the fx engine while the read survives.
     let orbitTier = -1;
     for (let i = 0; i < e.auras.length; i++) {
-      const auraId = auraSpecId(e.auras[i].id);
-      if (auraId === null) continue;
+      const aura = e.auras[i];
+      let auraId = auraSpecId(aura.id);
+      // Victim-worn resolution: a hostile suffix (_slow/_root), or the fixed
+      // fear id armed by Lingering Dread. A wornDebuff aura reads ONLY through
+      // the spec's authored debuff block - never the ground disc,
+      // transformative rim, shell, or gain swirl its buff block grants the
+      // caster's own aura (Onrush authors both: the caster's dash speedlines
+      // AND Crushing Charge's victim shackle).
+      let hostileWorn = auraId !== null && auraIsHostileWorn(aura.id);
+      if (auraId === null) {
+        if (aura.id !== FEAR_BREAK_AURA_ID || aura.breakThreshold === undefined) continue;
+        auraId = FEAR_BREAK_SPEC_ID;
+        hostileWorn = true;
+      }
       const spec = ABILITY_VFX_SPECS[auraId];
       if (spec === undefined) continue;
       // maintenance passives (stances, spellbook traits): no read at all
       if (isPassiveAura(auraId)) continue;
       const full = ABILITY_VFX_FULL_SPECS[auraId];
+      const wornDebuff = hostileWorn && full?.debuff !== undefined;
       // barrier specs wear the translucent fresnel shell while the aura lives
-      if (full?.barrier) fx.holdShell(e.id, abilityVfxColor(spec));
+      if (full?.barrier && !wornDebuff) fx.holdShell(e.id, abilityVfxColor(spec));
       // Held buffs: the sustained whole-rig tint is RESERVED. Morph forms and
       // ultimate cooldowns keep a restrained rim; every other buff wears the
       // subtle under-character ground aura instead (band 0 the soft disc,
@@ -1059,6 +1106,7 @@ export class AbilityVfx {
       // disappearing act must not glow the ground it stands on.
       let discStarted = false;
       if (
+        !wornDebuff &&
         full !== undefined &&
         (full.buff !== undefined || full.archetype === 'buff' || full.barrier === true)
       ) {
@@ -1082,10 +1130,13 @@ export class AbilityVfx {
       }
       // The full spec's authored orbit wins (its 'none' suppresses too);
       // compact-spec bo carries the same nine style names as fallback. A
-      // debuff block outranks both: this aura is being WORN BY A VICTIM
-      // (Hobbling Cut's dragging ankle speedlines), and its DNA is authored
-      // for that read.
-      const style = asOrbitStyle(full?.debuff?.orbit ?? full?.buff?.orbit ?? spec.bo);
+      // victim-worn aura reads its debuff DNA exclusively (Hobbling Cut's
+      // dragging ankle speedlines, Crushing Charge's shackle grit); a spec
+      // with a debuff block but no buff block keeps the old debuff-first
+      // fallback for its unsuffixed auras, which do not exist today.
+      const style = asOrbitStyle(
+        wornDebuff ? full?.debuff?.orbit : (full?.debuff?.orbit ?? full?.buff?.orbit ?? spec.bo),
+      );
       if (style === null) {
         // orbit-less buffs still get their gain moment off the disc's first frame
         if (discStarted) this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
@@ -1093,19 +1144,46 @@ export class AbilityVfx {
       }
       if (bands >= 3) continue;
       if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
-      if (
-        fx.orbit(e.id, style, abilityVfxColor(spec), full?.debuff?.o ?? full?.buff?.o, orbitTier)
-      ) {
+      const bandO = wornDebuff ? full?.debuff?.o : (full?.debuff?.o ?? full?.buff?.o);
+      if (fx.orbit(e.id, style, abilityVfxColor(spec), bandO, orbitTier)) {
         // The band just appeared (aura gained): pop the swirl here instead of
         // the aura event, which carries no ability id. Works online too, since
         // this reads the mirrored entity's auras, not sim events. Only for
         // buff-block specs: a hostile-worn band (a debuff resolved via the
         // aura suffix map, e.g. hamstring_slow's ankle speedlines) must not
         // bless its victim with rising buff sparkles.
-        const buffish = full?.buff !== undefined || (full?.archetype ?? spec.a) === 'buff';
+        const buffish =
+          !wornDebuff && (full?.buff !== undefined || (full?.archetype ?? spec.a) === 'buff');
         if (buffish) this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
         this.spawned = buffish ? 2 : 1;
         this.recordStat(auraId, false);
+        // A debuff band that starts while its ability's _root aura is ON the
+        // wearer marks the moment the ground seized them (Crushing Charge's
+        // upgraded arrival - base Onrush applies no root): crash it once with
+        // a heavy ground ring, kicked debris, dust, a cracked-earth scuff and
+        // a light pop. Aura-driven exactly like the band, so it reads online
+        // for any victim in interest range and stays honest for spectators.
+        if (wornDebuff && orbitTier === 0) {
+          let rooted = false;
+          for (let j = 0; j < e.auras.length; j++) {
+            if (e.auras[j].id === `${auraId}_root`) {
+              rooted = true;
+              break;
+            }
+          }
+          const at = rooted ? this.deps.anchor(e.id, 0.12) : null;
+          if (at) {
+            const gy = fx.groundYAt(at.x, at.z);
+            const c = abilityVfxColor(spec);
+            fx.ringAt(at.x, gy, at.z, 3.6, 0.6, c, 1.6, false);
+            fx.burstAt(at.x, gy + 0.2, at.z, c, 14, 1.1, 'debris');
+            fx.burstAt(at.x, gy + 0.25, at.z, c, 8, 0.9, 'smoke');
+            fx.decalXZ(at.x, at.z, 2.2, c, 'crack', 4);
+            fx.pulseLight(e.id, full?.palette ?? 'physical', 3.5, 0.3);
+            fx.shakeAt(at.x, gy, at.z, 0.18);
+            this.spawned += 5;
+          }
+        }
       }
       bands++;
     }
