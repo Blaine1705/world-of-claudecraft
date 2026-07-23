@@ -675,7 +675,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   // Ground-aimed bolt volley (Splitshot): the styled trails FLY from the
-  // caster to the aimed WORLD POINT — the sequence rides targetId -1 with the
+  // caster to the aimed WORLD POINT - the sequence rides targetId -1 with the
   // point pre-seeded, release reads on the caster, and the FULL impact stack
   // lands when the LEAD trail arrives there. Followers stagger behind with a
   // spread aim fanned around the landing and pop small spark accents; they

@@ -399,7 +399,7 @@ export class AbilityVfxRibbons {
   }
 
   // A styled projectile trail carrying the full spec's bolt DNA: its own head
-  // sprite (the trail IS the projectile — no Vfx comet rides along), authored
+  // sprite (the trail IS the projectile - no Vfx comet rides along), authored
   // speed, and the tier-gated garnish the caller enabled in opts.
   spawnTrailStyled(
     sourceId: number,

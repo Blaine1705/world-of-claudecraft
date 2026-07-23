@@ -1377,7 +1377,7 @@ export function runEffects(
           if (aoeCrit)
             dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
           // Armor only mitigates physical damage, mirroring the single-target
-          // path above — spell-school AoE (Arcane Explosion, Consecration) is
+          // path above - spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
           // Soft-cap scale (Revenge above 5 targets): applied after the roll and
