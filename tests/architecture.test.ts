@@ -249,6 +249,7 @@ const RENDER_PURE_CORES = [
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
+  'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',

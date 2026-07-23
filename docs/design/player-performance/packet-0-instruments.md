@@ -106,8 +106,9 @@ Diff shape:
   updateAdaptiveResolution feeds governorDrawSignal; renderPrewarmPass and
   captureScreenshot call noteOutOfBand + reset on composer tiers.
 - scripts/profiler/harness.mjs: the draws/tris row switches from raw webgl.info.render
-  to the perfStats surface (the one out-of-src consumer that would print monotonic
-  counters otherwise).
+  to the perfStats surface; scripts/prewarm_travel_bench.mjs's calls/triangles probe
+  fields switch the same way (the two out-of-src consumers that would print monotonic
+  counters otherwise; the bench forces ?gfx=ultra by default, a composer tier).
 - src/render/gfx.ts: GFX_CONFIG_VERSION 17 to 18.
 - Untouched by contract: render_budget.ts, its CAPS_BY_TIER, tests/render_budget.test.ts
   (staying green and unedited IS the neutrality proof), server ingest (validation cap
