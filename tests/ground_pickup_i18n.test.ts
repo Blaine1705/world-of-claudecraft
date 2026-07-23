@@ -30,6 +30,47 @@ const PENDING_LOCALE_KEYS = new Set<string>([
   'groundPickup.monumentCourtEnough',
   'groundPickup.monumentNorthDeny',
   'groundPickup.monumentNorthEnough',
+  // The new-realm quest pass surfaces (same contributor-English model).
+  'groundPickup.hearthEmberCacheDeny',
+  'groundPickup.hearthEmberCacheEnough',
+  'groundPickup.sprungTrapDeny',
+  'groundPickup.sprungTrapEnough',
+  'groundPickup.scorchedSupplyCrateDeny',
+  'groundPickup.scorchedSupplyCrateEnough',
+  'groundPickup.wyrmwatchWarningBannerDeny',
+  'groundPickup.wyrmwatchWarningBannerEnough',
+  'groundPickup.amberfallSapBucketDeny',
+  'groundPickup.amberfallSapBucketEnough',
+  'groundPickup.mereFerryLanternDeny',
+  'groundPickup.mereFerryLanternEnough',
+  'groundPickup.fenwayMooringLineDeny',
+  'groundPickup.fenwayMooringLineEnough',
+  'groundPickup.bridgemereTollChestDeny',
+  'groundPickup.bridgemereTollChestEnough',
+  'groundPickup.gloamfieldNightbloomDeny',
+  'groundPickup.gloamfieldNightbloomEnough',
+  'groundPickup.vigilStarChartDeny',
+  'groundPickup.vigilStarChartEnough',
+  'groundPickup.barrowGraveOfferingDeny',
+  'groundPickup.barrowGraveOfferingEnough',
+  'groundPickup.gallowmereGraveCandleDeny',
+  'groundPickup.gallowmereGraveCandleEnough',
+  'groundPickup.silkboundRemainsDeny',
+  'groundPickup.silkboundRemainsEnough',
+  'groundPickup.pearlwakeCargoCrateDeny',
+  'groundPickup.pearlwakeCargoCrateEnough',
+  'groundPickup.sunkenOfferingBowlDeny',
+  'groundPickup.sunkenOfferingBowlEnough',
+  'groundPickup.evergardenStatueRubbingDeny',
+  'groundPickup.evergardenStatueRubbingEnough',
+  'groundPickup.hedgewickToolCartDeny',
+  'groundPickup.hedgewickToolCartEnough',
+  'groundPickup.shearStormLanternDeny',
+  'groundPickup.shearStormLanternEnough',
+  'groundPickup.wreckfieldFlotsamCrateDeny',
+  'groundPickup.wreckfieldFlotsamCrateEnough',
+  'groundPickup.gullhavenWatchbellDeny',
+  'groundPickup.gullhavenWatchbellEnough',
 ]);
 
 describe('ground-pickup line localization (the S3-invisible surface)', () => {
@@ -40,8 +81,10 @@ describe('ground-pickup line localization (the S3-invisible surface)', () => {
     }
   });
 
-  it('covers 42 distinct lines with groundPickup.* keys', () => {
-    expect(GROUND_PICKUP_KEYS.length).toBe(42);
+  it('covers 82 distinct lines with groundPickup.* keys', () => {
+    // 42 through the Veiled Hollow merge, plus 40 (20 deny/enough pairs) from
+    // the new-realm quest pass.
+    expect(GROUND_PICKUP_KEYS.length).toBe(82);
   });
 
   it('pins a known literal per representative locale', () => {
