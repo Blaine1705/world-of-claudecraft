@@ -147,8 +147,8 @@ describe('character visual effects', () => {
     );
     // Rockbiter authors no weaponAura knob (owner opted only the two elemental
     // imbues in): its orbit band keeps carrying the read alone.
-    expect(characterWeaponAuraColor(entity({ auras: [imbue('rockbiter_weapon', 'physical')] }))).toBe(
-      null,
-    );
+    expect(
+      characterWeaponAuraColor(entity({ auras: [imbue('rockbiter_weapon', 'physical')] })),
+    ).toBe(null);
   });
 });
