@@ -36,7 +36,7 @@ type TestSim = Sim & {
 
 function makeSim(opts?: { spec?: string | null; seed?: number }): { sim: TestSim; p: Entity } {
   const sim = new Sim({
-    seed: opts?.seed ?? 90210,
+    seed: opts?.seed ?? 1,
     playerClass: 'mage',
     autoEquip: true,
   }) as unknown as TestSim;

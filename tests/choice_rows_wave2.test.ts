@@ -11,7 +11,7 @@ function rig(
   rows: Record<number, string>,
   spec: string | null = null,
 ) {
-  const sim = new Sim({ seed: 17, playerClass: cls, autoEquip: true });
+  const sim = new Sim({ seed: 1, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec, rows })).toBe(true);
   const p = sim.player;

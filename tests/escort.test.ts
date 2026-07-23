@@ -60,7 +60,10 @@ describe('escort content integrity', () => {
       expect(objective, `${def.id} quest escort objective`).toBeTruthy();
       expect(objective?.count).toBe(1);
       expect(def.waypoints.length).toBeGreaterThan(0);
-      expect(def.moveSpeed).toBeGreaterThan(0);
+      // Faster than the stuck-advance epsilon (0.05 yd per 1/20s tick = 1 yd/s):
+      // a slower def would register as permanently stuck and skip every waypoint
+      // instead of walking (see ESCORT_STUCK_MOVE_EPSILON in src/sim/escort.ts).
+      expect(def.moveSpeed).toBeGreaterThan(1.0);
       for (const ambush of def.ambushes) {
         expect(MOBS[ambush.mobId], `${def.id} ambush ${ambush.mobId}`).toBeTruthy();
         expect(ambush.atWaypoint).toBeGreaterThanOrEqual(0);
@@ -218,6 +221,52 @@ describe('escort run lifecycle', () => {
     if (!npcEntity) return;
     sim.talkToNpc(npcEntity.id);
     expect(sim.questLog.get(QUEST_ID)?.state ?? 'done').toBe('done');
+  });
+});
+
+describe('escort run guards', () => {
+  it('fails a run that outlives the timeout', () => {
+    const sim = makeSim();
+    const def = ESCORTS[ESCORT_ID];
+    teleportTo(sim, def.start.x, def.start.z);
+    activateQuest(sim);
+    sim.interact();
+    const state = sim.escortRuns.get(ESCORT_ID);
+    expect(state?.run).toBeTruthy();
+    if (!state?.run) return;
+    // Backdate the start beyond the run timeout: the next driver tick fails it.
+    state.run.startedAt = -10000;
+    const events = tickMany(sim, 1);
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'chat' && 'channel' in e && e.channel === 'yell' && e.text === def.failText,
+      ),
+    ).toBe(true);
+    expect(sim.escortRuns.get(ESCORT_ID)?.run ?? null).toBeNull();
+  });
+
+  it('stuck-advances a walker pinned in place instead of wedging the run', () => {
+    const sim = makeSim();
+    const def = ESCORTS[ESCORT_ID];
+    teleportTo(sim, def.start.x, def.start.z);
+    activateQuest(sim);
+    sim.interact();
+    const wren = findEscortee(sim);
+    const state = sim.escortRuns.get(ESCORT_ID);
+    expect(wren && state?.run).toBeTruthy();
+    if (!wren || !state?.run) return;
+    // Pin the walker: undo whatever the driver moved every tick, simulating a
+    // collider that absorbs all progress. After ESCORT_STUCK_TICKS the driver
+    // must count the waypoint as reached rather than stalling to the timeout.
+    const pin = { x: wren.pos.x, z: wren.pos.z };
+    const before = state.run.waypointIndex;
+    for (let i = 0; i < 120 && state.run && state.run.waypointIndex === before; i++) {
+      sim.tick();
+      wren.pos.x = pin.x;
+      wren.pos.z = pin.z;
+    }
+    expect(state.run?.waypointIndex ?? before + 1).toBeGreaterThan(before);
   });
 });
 

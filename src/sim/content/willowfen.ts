@@ -461,7 +461,7 @@ export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 60, sta: 5, spi: 3 },
+    stats: { armor: 60, sta: 3, spi: 2 },
     sellValue: 1000,
   },
   lilybed_mantle: {

@@ -395,11 +395,11 @@ describe('draw-order determinism over a real Sim (Phase 2)', () => {
   // Scenario: tailoring as the active archetype (unlimited empowerment
   // ceiling), skill 200 (tier-8 capability, past the specialization
   // threshold), so each successful vestments craft rolls the proc at
-  // 0.03 + 0.08 + 0.03 = 0.14. Seed 46 was hunted (bounded scan from seed 1)
+  // 0.03 + 0.08 + 0.03 = 0.14. Seed 23 was hunted (bounded scan from seed 1)
   // so the three-success sequence procs on the second and third successful
   // crafts; only the pinned literal is committed, per the suite idiom. Spares
-  // on record: 75, 103, 121, 123, and 208.
-  const SEED = 46;
+  // on record: 40, 48, 172, 180, and 208.
+  const SEED = 23;
 
   function run() {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: false });
@@ -580,14 +580,14 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     // Premise anchor: the content threshold this boundary rides. A content
     // retune moves the boundary and this seed must be re-hunted.
     expect(PERK_THRESHOLDS.tailoring.specializedSkillThreshold).toBe(75);
-    // Seed 6, hunted: the single proc draw lands in [0.06, 0.09). At skill 74
+    // Seed 7, hunted: the single proc draw lands in [0.06, 0.09). At skill 74
     // (tier 2, not specialized) the chance is 0.03 + 0.02 = 0.05: miss. At 75
     // and 76 (tier 3, specialized) it is 0.03 + 0.03 + 0.03 = 0.09: proc, and
     // only if BOTH the tiersAboveRecipe term and isSpecialized are wired into
     // masterworkProcChance by crafting.ts (either wiring dropped leaves the
-    // chance at or below 0.06, under the hunted draw). Spares on record: 77,
-    // 96, 210, 221, and 318.
-    const SEED = 6;
+    // chance at or below 0.06, under the hunted draw). Spares on record: 31,
+    // 99, 165, 197, and 225.
+    const SEED = 7;
     const at = (skill: number) =>
       craftVestments(SEED, (sim, pid) => {
         const meta = (sim as any).players.get(pid);

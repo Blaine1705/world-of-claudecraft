@@ -7741,9 +7741,10 @@ export class Sim {
     // A Protect Yumi cat is heal/shield-targetable only by its own team.
     if (target.kind === 'mob' && yumiMod.isYumiCat(target))
       return yumiMod.yumiCatFriendlyTo(this.ctx, caster, target);
-    // An escortee with a live run is heal/shield-targetable by any player
-    // (escort.ts owns the predicate; players can never attack it because
-    // isHostileTo resolves an ownerless mob to its hostile flag, false here).
+    // An escortee with a live run is heal/shield-targetable by any player or
+    // player-owned pet (pvpController resolves a pet to its owner; escort.ts
+    // owns the predicate). Players can never attack it because isHostileTo
+    // resolves an ownerless mob to its hostile flag, false here.
     if (target.kind === 'mob' && escortMod.isActiveEscortee(this.ctx, target)) {
       return this.pvpController(caster) !== null;
     }

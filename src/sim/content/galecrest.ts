@@ -479,7 +479,7 @@ export const GALECREST_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 62, sta: 5, spi: 3 },
+    stats: { armor: 62, sta: 3, spi: 2 },
     sellValue: 1000,
   },
   wreck_wardens_mantle: {
@@ -489,7 +489,7 @@ export const GALECREST_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 76, sta: 7, str: 4 },
+    stats: { armor: 76, sta: 6, str: 4 },
     sellValue: 2400,
   },
 };
@@ -508,10 +508,12 @@ export const GALECREST_OBJECTS: GroundObjectDef[] = [
     name: 'Doused Storm-Lantern',
     // The wayside lantern posts along the cliff road above the Shear
     // (q_gc_lanterns_on_the_shear), doused by the gale.
+    // Kept west of x=440 on the middle stretch: the mob-scan determinism suites
+    // pin (500,500) as a spawn-free probe spot with a 60 yd clearance.
     positions: [
       { x: 434, z: 452 },
-      { x: 442, z: 492 },
-      { x: 448, z: 524 },
+      { x: 430, z: 488 },
+      { x: 432, z: 532 },
       { x: 428, z: 566 },
     ],
   },

@@ -482,7 +482,7 @@ export const NIGHTBLOOM_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 54, sta: 5, spi: 3 },
+    stats: { armor: 54, sta: 3, spi: 3 },
     sellValue: 1000,
   },
   barrowshade_mantle: {
@@ -492,7 +492,7 @@ export const NIGHTBLOOM_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 76, sta: 7, spi: 4 },
+    stats: { armor: 76, sta: 6, spi: 4 },
     sellValue: 2400,
   },
 };

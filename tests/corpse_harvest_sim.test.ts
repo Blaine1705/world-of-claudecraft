@@ -286,8 +286,8 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 // this exact setup() shape (two players, seeded before the harvest's rolls)
 // to land on each side of the rarity floor.
 describe('signed Pristine specimens (#1145, Phase 10)', () => {
-  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 9)', () => {
-    const { sim, internals, a, mob } = setup(9);
+  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 6)', () => {
+    const { sim, internals, a, mob } = setup(6);
     sim.harvestCorpse(mob.id, ['hide'], a);
     const meta = internals.players.get(a)!;
     // The regular component grants plain (fungible, unsigned), at its rolled
@@ -304,8 +304,8 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     expect(sim.countItem('pristine_hide', a)).toBe(1);
   });
 
-  it('a below-rare harvest grants a plain stack at its tier quantity and NO specimen (seed 2)', () => {
-    const { sim, internals, a, mob } = setup(2);
+  it('a below-rare harvest grants a plain stack at its tier quantity and NO specimen (seed 4)', () => {
+    const { sim, internals, a, mob } = setup(4);
     sim.harvestCorpse(mob.id, ['hide'], a);
     const meta = internals.players.get(a)!;
     const slot = meta.inventory.find((s) => s.itemId === 'rough_hide');
@@ -317,8 +317,8 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     expect(sim.countItem('pristine_hide', a)).toBe(0);
   });
 
-  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 9)', () => {
-    const { sim, internals, a, mob } = setup(9);
+  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 6)', () => {
+    const { sim, internals, a, mob } = setup(6);
     sim.harvestCorpse(mob.id, ['fang'], a);
     const meta = internals.players.get(a)!;
     const slot = meta.inventory.find((s) => s.itemId === 'wolf_fang');
@@ -327,11 +327,11 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     expect(sim.countItem('wolf_fang', a)).toBe(1);
   });
 
-  it('every other specimen family grants its own jackpot beside the plain component (seed 9)', () => {
+  it('every other specimen family grants its own jackpot beside the plain component (seed 6)', () => {
     // The hide row is exercised above; this sweeps the remaining three
     // specimen rows behaviorally (silk and venomSac via webwood_spider, meat
     // via wild_boar), so a mistargeted HARVEST_COMPONENT_SPECIMENS row cannot
-    // hide behind hide-only coverage. Seed 5's rarity roll clears the
+    // hide behind hide-only coverage. Seed 6's rarity roll clears the
     // signable floor for a single focused component regardless of family
     // (the roll's draw position is identical).
     const families: { templateId: string; focus: string; plain: string; specimen: string }[] = [
@@ -350,7 +350,7 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
       { templateId: 'wild_boar', focus: 'meat', plain: 'game_meat', specimen: 'prime_cut' },
     ];
     for (const f of families) {
-      const { sim, internals, a } = setup(9);
+      const { sim, internals, a } = setup(6);
       const template = MOBS[f.templateId];
       const corpse = createMob(7776, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       corpse.dead = true;
@@ -369,8 +369,8 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     }
   });
 
-  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 9)', () => {
-    const { sim, internals, a } = setup(9);
+  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 6)', () => {
+    const { sim, internals, a } = setup(6);
     const template = MOBS.vale_bandit;
     const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -386,13 +386,13 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     expect(sim.countItem('homespun_cloth', a)).toBe(1);
   });
 
-  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 9)', () => {
+  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 6)', () => {
     // The pre-gate reserves plain-stack room only, so a partial stack lets it
     // pass while a signed instance would still need a fresh slot. The rare+
     // arm must then fall back to the plain fungible top-up (the signature
     // truncates, the yield does not), same free-slot contract as the
     // specimen arm.
-    const { sim, internals, a, mob } = setup(9);
+    const { sim, internals, a, mob } = setup(6);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -403,17 +403,17 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     const signed = m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance?.signer);
     expect(signed).toBeUndefined();
-    // Seed 5's rarity roll clears the signable floor with this exact draw
+    // Seed 6's rarity roll clears the signable floor with this exact draw
     // sequence (proven by the unfixed code overflowing here), so the count
     // above the seeded 1 proves the plain fallback delivered the yield.
     expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
   });
 
-  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 9)', () => {
+  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 6)', () => {
     // Plain grant tops up the partial stack without opening a slot, so the
     // specimen guard sees a full bag: the jackpot truncates rather than
     // overflowing, and the plain component still arrives.
-    const { sim, internals, a, mob } = setup(9);
+    const { sim, internals, a, mob } = setup(6);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -447,11 +447,11 @@ describe('two-specimen-family harvest capacity contract (Phase 10 QA)', () => {
     return boar;
   }
 
-  it('with a genuinely spare slot the jackpot still lands beside both plain yields (seed 9)', () => {
-    // Seed 9 pre-verified: the hide rarity roll clears the signable floor with
+  it('with a genuinely spare slot the jackpot still lands beside both plain yields (seed 5)', () => {
+    // Seed 5 pre-verified: the hide rarity roll clears the signable floor with
     // this exact draw sequence (the rolls are inventory-independent, so this
     // arm also proves the two-free-slot arm below EARNED its jackpot).
-    const { sim, internals, a } = setup(9);
+    const { sim, internals, a } = setup(5);
     const boar = addBoarCorpse(internals);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
@@ -466,11 +466,11 @@ describe('two-specimen-family harvest capacity contract (Phase 10 QA)', () => {
     expect(specimen?.instance?.signer).toBe('Alpha');
   });
 
-  it('with exactly the reserved free slots the jackpot truncates, never the plain yield (seed 9)', () => {
+  it('with exactly the reserved free slots the jackpot truncates, never the plain yield (seed 5)', () => {
     // Two free slots = exactly the pre-gate's reservation for the two plain
     // stacks. The unfixed code granted pristine_hide into the slot reserved
     // for game_meat and spilled the meat stack past capacity (17 of 16).
-    const { sim, internals, a } = setup(9);
+    const { sim, internals, a } = setup(5);
     const boar = addBoarCorpse(internals);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
