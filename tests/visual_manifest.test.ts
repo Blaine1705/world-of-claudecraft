@@ -151,13 +151,19 @@ describe('character visual manifest', () => {
     ).toEqual([]);
   });
 
-  it('points Throat Wire at the synthesized choke clip in the rogue GLB', async () => {
+  it('points the rogue bespoke abilities at their synthesized clips in the rogue GLB', async () => {
     const visual = VISUALS.player_rogue;
     // The strangle one-shot (scripts/_add_garrote_choke_anim.mjs): a wire
     // pull to the chest, never the dagger swing the default rotation plays.
     expect(visual.clips.attackByAbility?.garrote).toBe('Garrote_Choke');
+    // Boot kicks (scripts/_add_boot_kick_anim.mjs) and Dirt Toss throws
+    // (scripts/_add_dirt_throw_anim.mjs); neither is a dagger swing.
+    expect(visual.clips.attackByAbility?.kick).toBe('Kick_A');
+    expect(visual.clips.attackByAbility?.blind).toBe('Dirt_Throw');
     const animationNames = await glbAnimationNames(`public/${visual.url}`);
     expect(animationNames.has('Garrote_Choke')).toBe(true);
+    expect(animationNames.has('Kick_A')).toBe(true);
+    expect(animationNames.has('Dirt_Throw')).toBe(true);
     expect(
       [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
     ).toEqual([]);

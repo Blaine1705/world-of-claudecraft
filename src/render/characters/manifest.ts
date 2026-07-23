@@ -569,6 +569,13 @@ export const VISUALS: Record<string, VisualDef> = {
         // two-handed choke (scripts/_add_garrote_choke_anim.mjs) reaches to
         // neck height and yanks back to the chest with a brief hold.
         garrote: 'Garrote_Choke',
+        // Boot is a kick, not a swing: the synthesized snap kick
+        // (scripts/_add_boot_kick_anim.mjs) chambers the knee and fires the
+        // leg forward at gut height.
+        kick: 'Kick_A',
+        // Dirt Toss throws dirt, not daggers: the synthesized crouch-scoop
+        // and underhand fling (scripts/_add_dirt_throw_anim.mjs).
+        blind: 'Dirt_Throw',
       },
     },
     show: ['Rogue_Cape'],
