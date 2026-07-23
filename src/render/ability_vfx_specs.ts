@@ -71,7 +71,7 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
     wu: 0.3,
     a: 'buff',
   },
-  pummel: { c: '#dfe6ee', p: 'physical', pw: 0.7, sp: 10, vr: 1, li: 0.5, a: 'strike' },
+  pummel: { c: '#dfe6ee', p: 'physical', pw: 0.7, sp: 10, vr: 1, li: 0.5, lg: 4.2, a: 'strike' },
   execute: {
     c: '#d41f2e',
     p: 'blood',

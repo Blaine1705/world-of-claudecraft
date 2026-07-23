@@ -430,15 +430,23 @@ export class AbilityVfx {
     // crescendoing cord and lands the full impact stack once, on the last tick.
     if (full?.archetype === 'beam' && ev.fx !== 'windup' && ev.fx !== 'shout')
       return this.beamChannelTick(ev, ev.ability, spec, full);
-    // selfCast is the ONLY completion cue an untargeted/self cast emits (forms,
-    // summon rites, aspects). Only ceremony archetypes claim it - anything whose
-    // read arrives via other events (heals via heal events, strikes via their
-    // damage claim) falls through unclaimed so nothing double-stages. Checked
-    // before castTier so an unclaimed selfCast never charges the budget.
+    // selfCast is the ONLY completion cue a cast with no castFx and no damage
+    // emits. Untargeted/self ceremonies (forms, summon rites, aspects) are
+    // claimed by ceremony archetypes; a cue carrying a VICTIM (sunder,
+    // interrupts, taunts, stuns - the sim only emits it when the resolved
+    // effects announce nothing themselves) is claimed by the contact and shout
+    // archetypes and anchors the read at the target. Anything whose read
+    // arrives via other events (heals via heal events, damaging strikes via
+    // their damage claim) falls through unclaimed so nothing double-stages.
+    // Checked before castTier so an unclaimed selfCast never charges the
+    // budget.
     if (ev.fx === 'selfCast') {
       const arch = full?.archetype ?? spec.a;
+      const targeted = ev.targetId !== ev.sourceId;
       const ceremonial = arch === 'buff' || arch === 'summon' || arch === 'cc' || !!full?.spirit;
-      if (!full || !ceremonial) return false;
+      const utility =
+        targeted && (arch === 'strike' || arch === 'cc' || arch === 'burst' || arch === 'shout');
+      if (!full || !(utility || ceremonial)) return false;
     }
     const tier = this.castTier(ev.sourceId, ev.ability);
     const plan = planCast(spec, this.quality, tier);
@@ -589,30 +597,55 @@ export class AbilityVfx {
             this.windupDelayFor(ev.ability, full, ev.sourceId),
           );
         break;
-      case 'selfCast':
-        // Ceremony anchored on the caster (the pre-switch gate guarantees a
-        // full ceremonial spec); spirits, shells, and orbits ride the sequence.
+      case 'selfCast': {
+        // The pre-switch gate guarantees a full ceremonial or utility spec.
+        // A self cue runs the ceremony on the caster (spirits, shells, orbits
+        // ride the sequence). A cue carrying a victim runs the utility read
+        // there instead: contact archetypes swing the caster's rig and land
+        // the authored impact at the target; a shout-archetype taunt barks
+        // from the caster with its wave while the sequence carries the victim
+        // so motifAt 'target' snaps at the goaded enemy.
+        const arch = full?.archetype ?? spec.a;
+        const targeted = ev.targetId !== ev.sourceId;
+        const contact = targeted && (arch === 'strike' || arch === 'cc');
+        // The physical hit reads on the body first: the caster visibly swings
+        // (attackByAbility picks the authored clip - Jawcrack's bare-fist
+        // punch), on every client that sees the cue. Burst zaps and shouts
+        // carry no swing.
+        if (contact && !plan.whirl) this.deps.triggerAttack(ev.sourceId, ev.ability);
+        if (targeted && arch === 'shout') {
+          this.deps.vfx.shoutwave(ev.sourceId, plan.color);
+          this.spawned++;
+          this.spawnRing(ev.sourceId, plan, ev.school);
+          this.deps.playShoutAnim?.(ev.sourceId);
+        }
+        const seqTarget =
+          targeted && (contact || arch === 'burst' || arch === 'shout') ? ev.targetId : ev.sourceId;
         if (tier < 2 && full) {
           fx.sequenceInstant(
             ev.ability,
             full,
             ev.sourceId,
-            ev.sourceId,
+            seqTarget,
             plan.color,
             tier,
             this.windupDelayFor(ev.ability, full, ev.sourceId),
           );
         } else {
-          this.deps.vfx.tick(ev.sourceId, ev.school, plan.color);
+          this.deps.vfx.tick(seqTarget, ev.school, plan.color);
           this.spawned++;
         }
         break;
+      }
     }
     // Local-player cast acknowledgment: a claimed physical instant plays the
     // ability's one-shot so the button press reads on the rig (spell instants
     // get their read from the windup ceremony; no new clips are invented).
+    // selfCast owns its swing in the case above (it fires for EVERY client,
+    // not just the local caster), so it is excluded here.
     if (
       ev.fx !== 'windup' &&
+      ev.fx !== 'selfCast' &&
       !plan.whirl &&
       ev.attackAnimation !== 'ranged-shot' &&
       this.deps.localPlayerId?.() === ev.sourceId

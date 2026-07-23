@@ -1090,6 +1090,14 @@ export class ArchetypeSequencer {
             if (slot.tier === 0) host.shakeAt(slot.ix, gy, slot.iz, 0.2);
           }
           if (spec.strike?.stars) slot.ccStars = Math.max(slot.ccStars, 1.2);
+          // a strike authoring a cc block (Jawcrack's 4s interrupt daze) runs
+          // the stunned-star band for the cc-archetype duration - linger
+          // carries the debuff length, same formula as the cc case below
+          if (spec.cc?.style === 'stars')
+            slot.ccStars = Math.max(
+              slot.ccStars,
+              Math.max(1.8, Math.min(4, (spec.linger ?? 2) - 0.2)),
+            );
         }
         if ((spec.strike?.swings ?? 1) > 1) {
           slot.swing2At = slot.t + 0.22;
