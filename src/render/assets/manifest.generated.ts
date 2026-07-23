@@ -595,6 +595,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/foliage/pine_3.glb": "/media/models/foliage/pine_3.e28e675d7873.glb",
   "models/foliage/pine_4.glb": "/media/models/foliage/pine_4.2acecfb53e6f.glb",
   "models/foliage/pine_5.glb": "/media/models/foliage/pine_5.efd99c71ca9b.glb",
+  "models/foliage/reeds.glb": "/media/models/foliage/reeds.8aebdb300451.glb",
   "models/foliage/rock_1.glb": "/media/models/foliage/rock_1.3c51714b28b0.glb",
   "models/foliage/rock_2.glb": "/media/models/foliage/rock_2.eff4dc3e7fde.glb",
   "models/foliage/rock_3.glb": "/media/models/foliage/rock_3.deea96fd04e9.glb",
