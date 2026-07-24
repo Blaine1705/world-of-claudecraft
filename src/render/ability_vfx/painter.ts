@@ -88,6 +88,11 @@ export interface AbilityVfxDeps {
   isMidOneShot?: (entityId: number) => boolean;
   // The local player's entity id (cast-acknowledgment gestures).
   localPlayerId?: () => number;
+  // True when the entity's rig authors a per-ability one-shot clip
+  // (manifest attackByAbility with a live action). Gates the ceremonial cast
+  // gesture below: without an authored clip, triggerAttack would fall back to
+  // a weapon swing, which a blessing must never read as. Optional for tests.
+  hasGestureClip?: (entityId: number, abilityId: string) => boolean;
   // True when the ability resolves with no cast bar (no cast time, channel, or
   // empower hold). Only these get the synthetic pre-release windup phase: a
   // real cast already performed its ceremony through the live castingAbility
@@ -667,6 +672,14 @@ export class AbilityVfx {
         // punch), on every client that sees the cue. Burst zaps and shouts
         // carry no swing.
         if (contact && !plan.whirl) this.deps.triggerAttack(ev.sourceId, ev.ability);
+        // Ceremonial cast gesture (Lingering Grace's one-hand blessing): a
+        // non-contact cue whose rig authors a per-ability clip plays it on the
+        // caster - on every client that sees the cue, so the gesture reads for
+        // spectators too. The authored-clip gate keeps this data-driven and
+        // means an un-authored ceremony changes nothing.
+        if (!contact && !plan.whirl && this.deps.hasGestureClip?.(ev.sourceId, ev.ability)) {
+          this.deps.triggerAttack(ev.sourceId, ev.ability);
+        }
         if (targeted && !friendly && arch === 'shout') {
           this.deps.vfx.shoutwave(ev.sourceId, plan.color);
           this.spawned++;

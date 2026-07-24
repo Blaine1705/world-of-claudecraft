@@ -589,6 +589,15 @@ export class CharacterVisual {
     this.fadeTo(this.action(this.def.clips.cast) ?? this.action(this.def.clips.idle), FADE, false);
   }
 
+  /** An authored per-ability one-shot exists on this rig (attackByAbility
+   *  entry with a live action). The ability-VFX painter gates its ceremonial
+   *  cast gestures on this, so a heal/blessing cue can never fall back to a
+   *  weapon swing on a rig without the authored clip. */
+  hasAttackClipOverride(abilityId: string): boolean {
+    const override = this.def.clips.attackByAbility?.[abilityId];
+    return override !== undefined && this.action(override) !== null;
+  }
+
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
     const override = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;

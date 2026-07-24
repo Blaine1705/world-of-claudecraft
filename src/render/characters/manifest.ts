@@ -589,7 +589,14 @@ export const VISUALS: Record<string, VisualDef> = {
   player_priest: {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['2H_Melee_Attack_Chop']),
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      attackByAbility: {
+        // Lingering Grace is a blessing, not a staff swing: the one-hand
+        // raise (a stock mage.glb clip) reads as the priest offering the HoT.
+        renew: 'Spellcast_Raise',
+      },
+    },
     // The priest's Light: a warm golden halo ring above the crown.
     halo: 0xffd766,
     show: [],
