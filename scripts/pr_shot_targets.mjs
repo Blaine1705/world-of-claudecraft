@@ -371,6 +371,15 @@ export const TARGETS = [
       { key: 'desktop-ceiling-state', fourStates: true, selectTab: 'armorcrafting' },
       { key: 'desktop-discount', discount: true, selectTab: 'armorcrafting' },
       { key: 'mobile-discount', discount: true, mobile: true, selectTab: 'armorcrafting' },
+      // Issue #2375, the bag-freshness scene, and the one variant whose point
+      // is WHEN the window repaints rather than how it looks: the default
+      // grant leaves the minor healing potion at 2 of its 3 reagents, so the
+      // window opens with that row disabled, and the missing silverleaf is
+      // granted AFTERWARDS (the shopkeeper handing it over). The shot is taken
+      // a slow band later. Before the fix the row is still disabled and the
+      // reagent still reads 0/2; after it, the row is live.
+      { key: 'desktop-bag-freshness', bagFreshness: true, selectTab: 'alchemy' },
+      { key: 'mobile-bag-freshness', bagFreshness: true, mobile: true, selectTab: 'alchemy' },
     ],
     // Grant a spread of reagents across a few professions so several recipes read
     // craftable, force-hide then toggle so the open is deterministic, and clip to
@@ -440,7 +449,23 @@ export const TARGETS = [
         }, variant.selectTab);
         await wait(300);
       }
-      if (open && (variant?.mobile || variant?.fourStates || variant?.discount)) {
+      if (open && variant?.bagFreshness) {
+        // The whole point of the scene: the bag changes while the window is
+        // already open and the player never touches it. Grant the missing
+        // reagent through the sim (the same mutation a vendor buy, a loot, or
+        // a trade lands) and wait past the 500ms slow band, so the shot shows
+        // what the window says a moment after the reagent arrived.
+        await page.evaluate(() => {
+          try {
+            window.__game?.sim?.addItem('silverleaf_herb', 2);
+          } catch {}
+        });
+        await wait(900);
+      }
+      if (
+        open &&
+        (variant?.mobile || variant?.fourStates || variant?.discount || variant?.bagFreshness)
+      ) {
         // The identity card fills the top of the window (all of it on the short
         // landscape viewport); scroll the first recipe section into view so the
         // legibility rows, and for four-states the whole difficulty ladder
