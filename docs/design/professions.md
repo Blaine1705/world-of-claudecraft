@@ -143,6 +143,17 @@ Gathering XP (`gatherActionXp`) deliberately keeps the plain level band:
 nodes cannot be vendor-fed, harvesting is movement- and respawn-paced like
 mob grinding, and it stays a post-launch watch rather than a coupling.
 
+The economy invariant carries a discount-aware arm for the same report:
+the listed-count "no recipe vendors above its input value" rule prices the
+naive craft, but a specialized crafter consumes discounted counts (the
+`requiredReagentCountFor` composition), so a fully-vendor-fed recipe can
+flip gold-positive while the listed arm passes (the Kilnscale Mantle did:
+listed 520 against a 470 vendor-back, but cheapest achievable consumption
+300). Every fully-vendor-fed recipe (membership derived from the NPC
+vendor tables and pinned) must vendor strictly below its CHEAPEST
+achievable input, specialized plus self-signed, enforced in
+`tests/recipe_economy.test.ts`.
+
 ### Provenance and instance stacking
 Two slots merge only when itemId matches AND the instance payload is
 byte-equal (`canStackInstancePayloads`,

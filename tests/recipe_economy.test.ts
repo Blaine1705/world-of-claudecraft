@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import { ALL_RECIPES, COMBO_RECIPES, LADDER_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS, NPCS } from '../src/sim/data';
+import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
 import { PRE_TRAINING_RECIPE_IDS } from '../src/sim/professions/training';
@@ -74,6 +75,63 @@ describe('THE ECONOMY INVARIANT', () => {
     // frozen legacy ids (zero members since the economy rework completed).
     expect(checked).toBe(ALL_RECIPES.length - LEGACY_GOLD_POSITIVE_RECIPE_IDS.size);
     expect(checked).toBeGreaterThan(0);
+  });
+
+  // --- the discount-aware vendor-loop arm --------------------------------
+  // The listed-count arm above prices the NAIVE craft. A specialized crafter
+  // (skill at the craft's perk threshold, automatic for anyone deep in a
+  // craft) consumes DISCOUNTED counts, and a held self-signed instance
+  // shaves one more before the discount (requiredReagentCountFor, the same
+  // function the sim charges). For a recipe whose every reagent is
+  // NPC-vendor-stocked the whole loop is pure gold with infinite supply, so
+  // the output must vendor strictly below the CHEAPEST achievable input or
+  // the loop prints copper at zero risk (the Kilnscale Mantle sat exactly
+  // here: listed 520 vs output 470, but specialized consumption is 5 ore +
+  // 4 flux = 420, and with a self-signed ore 4 + 3 = 300). Self-signed is
+  // assumed held for EVERY reagent: stricter than reality for unsignable
+  // vendor staples, which is the safe direction for an invariant.
+  function vendorStockedIds(): ReadonlySet<string> {
+    const stocked = new Set<string>();
+    for (const npc of Object.values(NPCS)) {
+      for (const id of npc.vendorItems ?? []) stocked.add(id);
+    }
+    return stocked;
+  }
+  function minAchievableInputValue(recipe: ProfessionRecipeRecord): number {
+    // Specialized in the recipe's own craft (cap skill clears any threshold).
+    const specialized = { [recipe.professionId]: 125 };
+    let total = 0;
+    for (const reagent of recipe.reagents) {
+      const { count } = requiredReagentCountFor(true, reagent, specialized, recipe.professionId);
+      total += count * reagentUnitValue(reagent.itemId);
+    }
+    return total;
+  }
+
+  it('every fully-vendor-fed recipe vendors strictly below its cheapest achievable input', () => {
+    const stocked = vendorStockedIds();
+    const vendorFed = ALL_RECIPES.filter((recipe) =>
+      recipe.reagents.every((reagent) => stocked.has(reagent.itemId)),
+    );
+    // Membership pin: the vendor-fed set is exactly these six loops. A new
+    // recipe (or a new vendor row) that makes another recipe fully
+    // vendor-fed must be added HERE deliberately, and it then rides the
+    // cheapest-achievable-input bound below.
+    expect(vendorFed.map((recipe) => recipe.id).sort()).toEqual([
+      'recipe_ashwood_axe',
+      'recipe_goldleaf_mana_draught',
+      'recipe_goldleaf_sickle',
+      'recipe_sootscale_mantle',
+      'recipe_sunpetal_mana_draught',
+      'recipe_thorium_mining_pick',
+    ]);
+    for (const recipe of vendorFed) {
+      expect(
+        outputValue(recipe),
+        `${recipe.id}: output ${outputValue(recipe)} must be below the cheapest achievable ` +
+          `input ${minAchievableInputValue(recipe)} (specialized + self-signed)`,
+      ).toBeLessThan(minAchievableInputValue(recipe));
+    }
   });
 
   it('(a) every legacy member predates trainer acquisition (in PRE_TRAINING_RECIPE_IDS)', () => {
