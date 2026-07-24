@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -44,6 +45,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "es_ES": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -78,6 +80,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "fr_FR": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -112,6 +115,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "fr_CA": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -147,6 +151,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -181,6 +186,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "de_DE": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -219,6 +225,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -254,6 +261,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -288,6 +296,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "nl_NL": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -322,6 +331,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "pl_PL": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -356,6 +366,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "id_ID": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -390,6 +401,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "tr_TR": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -424,6 +436,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "sv_SE": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -458,6 +471,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "vi_VN": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -492,6 +506,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace"
   ],
   "da_DK": [
+    "hud.combat.auraGainOther",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",

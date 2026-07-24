@@ -6064,7 +6064,8 @@ export const nl_NL: EnTranslations = {
       "death": "{name} sterft.",
       "auraGain": "Je krijgt {name}.",
       "auraFade": "{name} vervaagt van je.",
-      "auraAfflicted": "{target} is getroffen door {name}."
+      "auraAfflicted": "{target} is getroffen door {name}.",
+      "auraGainOther": "{target} gains {name}."
     },
     "system": {
       "playerDeath": "Je bent gestorven.",

@@ -1908,6 +1908,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': 'Вы получаете {name}.',
   'hud.combat.auraFade': '{name} спадает с вас.',
   'hud.combat.auraAfflicted': '{target} поражен эффектом {name}.',
+  'hud.combat.auraGainOther': '{target} получает {name}.',
   'hud.system.playerDeath': 'Вы погибли.',
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
