@@ -99,8 +99,8 @@ import { packCommandError } from './hunter_packlord';
 import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
 import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
 import { hasTithefiendTarget } from './priest/vespers';
-import { mendingCurrent } from './shaman_spiritmend';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
+import { resolveUnleashWeaponTarget, unleashWeaponCastError } from './shaman_unleash_weapon';
 import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
 import {
   hasCastShield,
@@ -750,7 +750,23 @@ export function castAbility(
   }
 
   let target: Entity | null = null;
-  if (ability.requiresTarget && ability.targetsDead) {
+  if (ability.id === 'unleash_weapon') {
+    target = resolveUnleashWeaponTarget(ctx, p, castTargetId);
+    const error = unleashWeaponCastError(p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
+    }
+    if (!target) return;
+    if (dist2d(p.pos, target.pos) > ability.range) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
+  } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res: the target must be a DEAD group/raid member (no self-cast fallback).
     const dead = resolveDeadAllyTarget(ctx, p, castTargetId);
     if (!dead) {
@@ -907,10 +923,6 @@ export function castAbility(
       ctx.error(p.id, error);
       return;
     }
-  }
-  if (ability.id === 'unleash_weapon' && (!target || !mendingCurrent(target, p.id))) {
-    ctx.error(p.id, 'That ability is not ready yet.');
-    return;
   }
   // Hard Bargain cannot spend the caster's last health. Reject it before GCD,
   // cost, cooldown, and cast-completion proc hooks so a failed conversion cannot
@@ -1688,7 +1700,23 @@ function applyAbility(
   }
 
   let target: Entity | null = null;
-  if (ability.requiresTarget && ability.targetsDead) {
+  if (ability.id === 'unleash_weapon') {
+    target = resolveUnleashWeaponTarget(ctx, p, castTarget);
+    const error = unleashWeaponCastError(p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
+    }
+    if (!target) return;
+    if (dist2d(p.pos, target.pos) > ability.range + 2) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
+  } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res finish: the dead ally's id was stored in castTarget at cast start
     // (it is auto-deselected from p.targetId once dead, so we cannot re-derive it).
     const dead = resolveDeadAllyTarget(ctx, p, castTarget);

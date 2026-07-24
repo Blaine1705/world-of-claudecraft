@@ -61,6 +61,8 @@ change.
 - Totem or ground placement cannot require pixel-precise targeting during the normal rotation.
 - Warspirit off-tanking must use a deliberate stance, imbue, or loadout decision rather than
   extra reactive buttons.
+- Unleash Weapon remains one shared action. Its effect follows the active specialization weapon
+  enhancement instead of adding another rotational button.
 
 ### Spec-specific weapon enhancements
 
@@ -81,10 +83,16 @@ Each specialization normally shows one relevant weapon-enhancement action. Warsp
 because selecting Galeheart or Stonebound is its explicit role decision. Applying one removes the
 other.
 
+Unleash Weapon is available to all three specializations at level 14 and requires one of these
+enhancements to be active. Pyrebrand deals Fire damage and grants Thunder. Galeheart makes a weapon
+strike, advances Warspirit Cadence, and briefly increases attack speed. Stonebound makes a smaller
+weapon strike, forces the target to attack the Shaman, and briefly reduces incoming damage.
+Lifespring consumes one owned Mending Current for an immediate heal and one-hit guard.
+
 ### Spec-specific action ownership
 
-Arc Bolt, Mending Waters, the three Jolts, Thunder Ward, and Shadewolf remain the shared class
-backbone. New rotation actions and specialization behavior are gated as follows:
+Arc Bolt, Mending Waters, the three Jolts, Thunder Ward, Shadewolf, and Unleash Weapon remain the
+shared class backbone. New rotation actions and specialization behavior are gated as follows:
 
 | Specialization | Exclusive actions and states |
 |---|---|
@@ -121,6 +129,7 @@ vent.
 4. Faultwake consumes the bank for prepared area damage.
 5. A full bank receives a persistent armed cue on both payoff actions.
 6. Primal Mastery creates a faster build-and-vent window using those same actions.
+7. Unleash Weapon turns active Pyrebrand into Fire damage and two Thunder charges.
 
 ### Player decision
 
@@ -156,6 +165,8 @@ three-step cadence through the existing auto-attack system; they do not create s
 5. Ancestral Strike advances the cadence by two steps and can trigger at most one Galeheart event.
 6. Stonebound keeps the instant-cast cadence but replaces Galeheart echoes with armor, threat,
    damage smoothing, and defensive shock or shield behavior.
+7. Unleash Weapon advances Galeheart pressure or provides a short Stonebound control and defense
+   window, depending on the active posture.
 
 ### Galeheart contract
 

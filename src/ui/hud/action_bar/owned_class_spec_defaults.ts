@@ -76,6 +76,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'earthquake',
       'frost_shock',
       'elemental_mastery',
+      'unleash_weapon',
       'lightning_shield',
       'healing_wave',
       'ghost_wolf',
@@ -84,6 +85,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
     ],
     enhancement: [
       'stormstrike',
+      'unleash_weapon',
       'earth_shock',
       'galeheart_weapon',
       'rockbiter_weapon',

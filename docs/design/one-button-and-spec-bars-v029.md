@@ -280,11 +280,12 @@ bar.
 | 6 | Faultwake |
 | 7 | Rime Jolt |
 | 8 | Primal Mastery |
-| 9 | Thunder Ward |
-| 10 | Mending Waters |
-| 11 | Shadewolf |
-| 12 | Storm Chorus |
-| 13 | Pyrebrand Weapon |
+| 9 | Unleash Weapon |
+| 10 | Thunder Ward |
+| 11 | Mending Waters |
+| 12 | Shadewolf |
+| 13 | Storm Chorus |
+| 14 | Pyrebrand Weapon |
 
 ### Warspirit
 
@@ -297,11 +298,12 @@ bar.
 | 5 | Earthen Jolt |
 | 6 | Galeheart Weapon |
 | 7 | Stonebound Weapon |
-| 8 | Rime Jolt |
-| 9 | Mending Waters |
-| 10 | Thunder Ward |
-| 11 | Shadewolf |
-| 12 | Storm Chorus |
+| 8 | Unleash Weapon |
+| 9 | Rime Jolt |
+| 10 | Mending Waters |
+| 11 | Thunder Ward |
+| 12 | Shadewolf |
+| 13 | Storm Chorus |
 
 Galeheart and Stonebound stay next to each other. The player always chooses the posture.
 

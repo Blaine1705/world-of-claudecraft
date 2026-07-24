@@ -8,7 +8,9 @@ Parent design: [Shaman v0.29.0 Class Design](../design/shaman-v028-class-design.
 
 ## Specialization gate
 
-Lifespring Weapon, Mending Currents, Tidecall, Unleash Weapon, Cascading Mend, and Ancestors' Return belong only to Spiritmend.
+Lifespring Weapon, Mending Currents, Tidecall, Cascading Mend, and Ancestors' Return belong only to Spiritmend.
+Unleash Weapon is shared by all Shaman specializations, but its Lifespring outcome belongs only to
+Spiritmend.
 Cascading Mend retains the shipped `chain_heal` id and the core Chain Heal role; it is granted by
 the specialization rather than by a talent or Mending Waters morph. Selecting Thundercall or
 Warspirit removes every owned pool and exclusive action before the new specialization kit is
@@ -99,7 +101,8 @@ pool-building tool rather than a separate unrelated emergency heal.
 
 ## Unleash Weapon contract
 
-- Unleash Weapon is an instant, friendly-target action with a 15-second cooldown.
+- Unleash Weapon is an instant shared Shaman action with a 15-second cooldown.
+- Spiritmend must have Lifespring Weapon active to use its friendly-target outcome.
 - It can only be used on a target carrying this Shaman's Mending Current.
 - It consumes the entire remaining pool and immediately heals for 125% of that amount.
 - The burst cannot critically heal or trigger another weapon proc.

@@ -26,7 +26,7 @@ function knownAt(spec: ShamanSpec, level: number): Set<string> {
 const EXCLUSIVE_KITS: Readonly<Record<ShamanSpec, readonly string[]>> = {
   elemental: ['flametongue_weapon', 'chain_lightning', 'earthquake', 'elemental_mastery'],
   enhancement: ['galeheart_weapon', 'rockbiter_weapon', 'stormstrike'],
-  restoration: ['lifespring_weapon', 'tidecall', 'unleash_weapon', 'chain_heal', 'ancestor_return'],
+  restoration: ['lifespring_weapon', 'tidecall', 'chain_heal', 'ancestor_return'],
 };
 
 const SHARED_BACKBONE = [
@@ -37,6 +37,7 @@ const SHARED_BACKBONE = [
   'frost_shock',
   'lightning_shield',
   'ghost_wolf',
+  'unleash_weapon',
 ] as const;
 
 describe('Shaman v0.29 specialization ownership', () => {

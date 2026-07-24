@@ -118,11 +118,7 @@ import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
-import {
-  consumeMendingCurrent,
-  depositMendingCurrent,
-  unleashMendingCurrent,
-} from './shaman_spiritmend';
+import { consumeMendingCurrent, depositMendingCurrent } from './shaman_spiritmend';
 import {
   applyPrimalExaltation,
   applyStoneward,
@@ -138,6 +134,7 @@ import {
   thundercallOnArcBoltImpact,
   thundercallOnChainLightningImpact,
 } from './shaman_thundercall';
+import { runUnleashWeapon } from './shaman_unleash_weapon';
 import {
   applyStoneboundJolt,
   applyWarspiritPosture,
@@ -287,7 +284,7 @@ export function runEffects(
   if (ability.id === 'primal_exaltation') applyPrimalExaltation(ctx, p);
   if (ability.id === 'stoneward' && target) applyStoneward(ctx, p, target);
   if (ability.id === 'lightning_shield') onThunderWardActivated(ctx, p);
-  if (ability.id === 'unleash_weapon' && target) unleashMendingCurrent(ctx, p, target);
+  if (ability.id === 'unleash_weapon') runUnleashWeapon(ctx, p, target);
 
   // Cleaving Blows (Fury passive): Red Harvest refunds one stored Twinstrike
   // use on the abilityCharges recharge model. A partial refund leaves the

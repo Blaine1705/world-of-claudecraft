@@ -4106,11 +4106,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current.',
   },
+  // Shared Shaman action whose effect follows the active spec weapon enchant.
   unleash_weapon: {
     id: 'unleash_weapon',
     name: 'Unleash Weapon',
     class: 'shaman',
-    specs: ['restoration'],
     learnLevel: 14,
     cost: 35,
     castTime: 0,
@@ -4118,10 +4118,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'nature',
     requiresTarget: true,
-    targetType: 'friendly',
+    targetType: 'any',
+    projectile: false,
     effects: [],
     description:
-      'Consume your Mending Current on a friendly target and heal them immediately for 125% of its remaining healing. For 8 sec, the next hit is reduced by 50% of the health actually restored.',
+      'Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored.',
   },
   // Restoration Shaman signature, granted only by the Spiritmend spec.
   chain_heal: {

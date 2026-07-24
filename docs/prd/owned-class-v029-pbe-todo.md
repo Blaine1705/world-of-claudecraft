@@ -316,6 +316,10 @@ Do not overwrite a player-customized bar.
 
 - [x] Change weapon enhancement duration to 30 min.
 - [x] Fix Flow State so its ready state is shown without a timer and never survives a spec change.
+- [x] Put Unleash Weapon on all three default bars and resolve it through the active spec weapon
+      enhancement.
+- [ ] PBE-tune Pyrebrand damage, Galeheart attack speed, Stonebound mitigation, and Lifespring
+      healing without changing the shared action contract.
 - [ ] Rewrite every level 20 talent tooltip with exact spec-specific outcomes.
 - [ ] Retest weapon, Flow State, and talent state through relog and reconnect.
 

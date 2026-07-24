@@ -52,6 +52,7 @@ group. Primal Mastery accelerates the same actions instead of replacing the rota
 | Earthen Jolt | Instant single-target vent. Consumes all Thunder charges for additional damage. |
 | Faultwake | Target-centered area vent. Consumes all Thunder charges for stronger area pressure. |
 | Pyrebrand Weapon | Thundercall-only weapon enhancement supporting spell pressure. |
+| Unleash Weapon | Shared Shaman action. With Pyrebrand active, deals Fire damage with a 30% Spell Power coefficient and grants two Thunder. |
 | Primal Mastery | Existing signature action, expanded into a short build-and-vent window without another temporary button. |
 
 Existing spell ranks, costs, ranges, and baseline effects on `release/v0.29.0` remain canonical

@@ -206,6 +206,7 @@ describe('Shaman v0.29 Spiritmend', () => {
 
   it('unleashes one owned Mending Current into a burst and one-hit guard', () => {
     const { sim, healer, healerId, ally, allyId } = setup(2826);
+    castAndResolve(sim, healer, 'lifespring_weapon', healerId, 1);
     ally.hp = ally.maxHp - 300;
     seedCurrent(ally, healerId, 200);
 
@@ -226,6 +227,7 @@ describe('Shaman v0.29 Spiritmend', () => {
 
   it('bases the one-hit guard on effective healing and refuses an empty unleash', () => {
     const { sim, healer, healerId, ally, allyId } = setup(2827);
+    castAndResolve(sim, healer, 'lifespring_weapon', healerId, 1);
     ally.hp = ally.maxHp - 40;
     seedCurrent(ally, healerId, 200);
 
