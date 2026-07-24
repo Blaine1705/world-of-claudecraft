@@ -121,6 +121,7 @@ import type {
 } from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import {
@@ -1495,6 +1496,9 @@ export class ClientWorld implements IWorld {
   // scratch for applySnapshot's per-message "ids present in this snap" set,
   // reused across snapshots (20 Hz) instead of allocating a Set per message
   private wireSeen = new Set<number>();
+  // always-on net-pipeline counters (net_pipeline_stats.ts); no initializer on
+  // purpose, see netPipeline() below
+  private netPipelineStats: NetPipelineStats | undefined;
   // camera follow for keyboard turns applied by the main loop
   pendingFacingDelta = 0;
   connected = false;
@@ -1884,13 +1888,27 @@ export class ClientWorld implements IWorld {
     this.rawCmd(payload);
   }
 
+  /**
+   * Lazy holder, never a field initializer (the wireSeen pattern): bareClient
+   * suites build instances via Object.create(ClientWorld.prototype), which
+   * skips field initializers. main.ts drains this once per animation frame
+   * (main.ts is the src/net to src/game junction; this module never imports
+   * src/game, ruling R8).
+   */
+  netPipeline(): NetPipelineStats {
+    if (this.netPipelineStats === undefined) this.netPipelineStats = createNetPipelineStats();
+    return this.netPipelineStats;
+  }
+
   private onMessage(raw: string): void {
     let msg: any;
+    const parseStart = performance.now();
     try {
       msg = JSON.parse(raw);
     } catch {
       return;
     }
+    const parseMs = performance.now() - parseStart;
     if (
       msg.t === 'commandOutcome' &&
       Number.isSafeInteger(msg.rid) &&
@@ -1926,6 +1944,7 @@ export class ClientWorld implements IWorld {
         this.inputEchoSamples = [];
         this.missingSince.clear();
         this.lastSnapAt = 0;
+        this.netPipeline().noteReset();
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
         this.spectating = null;
@@ -2052,7 +2071,21 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'snap') {
+      // Raw inter-arrival gap, read BEFORE applySnapshot updates lastSnapAt
+      // and feeds its (5,500)-windowed EWMA: the raw ring keeps the stall
+      // outliers that filter deliberately eats (finding 20, ruling R9).
+      const applyStart = performance.now();
+      const rawGapMs = this.lastSnapAt > 0 ? applyStart - this.lastSnapAt : null;
       this.applySnapshot(msg);
+      this.netPipeline().recordSnapshot({
+        nowMs: applyStart,
+        approxBytes: raw.length,
+        parseMs,
+        applyMs: performance.now() - applyStart,
+        entCount: Array.isArray(msg.ents) ? msg.ents.length : 0,
+        keepCount: Array.isArray(msg.keep) ? msg.keep.length : 0,
+        rawGapMs,
+      });
     }
   }
 

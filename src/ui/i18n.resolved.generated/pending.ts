@@ -45,7 +45,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "es_ES": [
     "hud.combat.auraGainOther",
@@ -83,7 +87,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "fr_FR": [
     "hud.combat.auraGainOther",
@@ -121,7 +129,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "fr_CA": [
     "hud.combat.auraGainOther",
@@ -159,7 +171,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "en_CA": [],
   "it_IT": [
@@ -198,7 +214,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "de_DE": [
     "hud.combat.auraGainOther",
@@ -236,7 +256,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "zh_CN": [
     "hudChrome.corpseHarvest.components.meat"
@@ -286,7 +310,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "ru_RU": [
     "hudChrome.corpseHarvest.components.meat"
@@ -327,7 +355,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "nl_NL": [
     "hud.combat.auraGainOther",
@@ -365,7 +397,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "pl_PL": [
     "hud.combat.auraGainOther",
@@ -403,7 +439,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "id_ID": [
     "hud.combat.auraGainOther",
@@ -441,7 +481,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "tr_TR": [
     "hud.combat.auraGainOther",
@@ -479,7 +523,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "sv_SE": [
     "hud.combat.auraGainOther",
@@ -517,7 +565,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "vi_VN": [
     "hud.combat.auraGainOther",
@@ -555,7 +607,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ],
   "da_DK": [
     "hud.combat.auraGainOther",
@@ -593,6 +649,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
-    "loading.messageRateExceeded"
+    "loading.messageRateExceeded",
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
   ]
 };

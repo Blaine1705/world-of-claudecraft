@@ -1343,6 +1343,42 @@ export const TARGETS = [
     },
   },
   {
+    key: 'perf-nudge',
+    label: 'Performance nudge toast (perf-doctor machine-local causes)',
+    when: ['ui/perf_nudge', 'game/perf_nudge'],
+    variants: [
+      { key: 'web-integrated', ids: ['integrated-gpu'], desktopShell: false },
+      { key: 'web-software', ids: ['hardware-acceleration'], desktopShell: false },
+      { key: 'desktop-shell-software', ids: ['hardware-acceleration'], desktopShell: true },
+      { key: 'web-mobile-integrated', ids: ['integrated-gpu'], desktopShell: false, mobile: true },
+    ],
+    // The nudge fires only when the live perf-doctor finds a machine-local cause
+    // (software GL, or a hybrid laptop pinned to its integrated GPU), which a
+    // healthy capture machine never produces; import the module directly (Vite
+    // serves /src in dev) and force the id set, exactly what src/game/perf_nudge.ts
+    // would pass on an affected box. Clearing the persisted dismissal and any prior
+    // element keeps the recipe rerunnable; removing #gpu-notice keeps the sibling
+    // toast slot out of the clip.
+    async capture(page, variant) {
+      await page.evaluate(
+        async (opts) => {
+          localStorage.removeItem('woc_perf_nudge_dismissed');
+          document.querySelector('#perf-nudge')?.remove();
+          document.querySelector('#gpu-notice')?.remove();
+          const mod = await import('/src/ui/perf_nudge_toast.ts');
+          mod.initPerfNudgeToast({
+            suggestionIds: opts.ids,
+            softwareNoticeAlreadyShown: false,
+            desktopShell: opts.desktopShell,
+          });
+        },
+        { ids: variant?.ids ?? ['integrated-gpu'], desktopShell: Boolean(variant?.desktopShell) },
+      );
+      const open = await pollForSize(page, '#perf-nudge');
+      return open ? { clip: '#perf-nudge' } : {};
+    },
+  },
+  {
     key: 'gather-node',
     label: 'Gather node (click/tap-to-harvest #1866; tool tier gating, Professions 2.0)',
     when: ['gather_node', 'gather_nodes', 'gathering_view', 'professions/tools'],

@@ -141,6 +141,21 @@ export const shellStrings = {
         'The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
       dismiss: 'Dismiss',
     },
+    // Performance nudge (src/ui/perf_nudge_toast.ts): the gpuNotice sibling
+    // shown once mid-session when the client perf-doctor finds a machine-local
+    // cause (packet 0 rulings R14-R16). The integrated-GPU copy is deliberately
+    // conditional: the adapter string cannot prove a discrete GPU exists, only
+    // that the session is not on one (ruling R15). The hardware-acceleration
+    // variants mirror the gpuNotice desktop/web split for the same reason.
+    perfNudge: {
+      integratedGpu:
+        'The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.',
+      hardwareAccelerationDesktop:
+        'The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
+      hardwareAccelerationWeb:
+        'The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
+      dismiss: 'Dismiss',
+    },
     realm: {
       noRealms: 'No worlds available.',
       loading: 'Loading worlds...',
