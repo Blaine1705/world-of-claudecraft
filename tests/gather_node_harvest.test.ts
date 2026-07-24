@@ -548,6 +548,15 @@ describe('the RuneScape rule (#2343): pre-phase nodes deny bare hands and need o
     herb: 'gathering_sickle',
   } as const;
 
+  // Literal, deliberately NOT derived from NODE_HARVEST_TABLE (the table
+  // production reads): an edit to the table must fail this pin, never move
+  // the expectation and the behavior together.
+  const PROFESSION_BY_NODE_TYPE = {
+    ore: 'mining',
+    wood: 'logging',
+    herb: 'herbalism',
+  } as const;
+
   it('all 24 pre-phase defs carry tier 1: bare hands deny with requiredTier 1 and zero draws, the matching tier-1 tool grants', () => {
     expect(PRE_PHASE_NODE_IDS).toHaveLength(24);
     const sim = makeWorld();
@@ -561,7 +570,7 @@ describe('the RuneScape rule (#2343): pre-phase nodes deny bare hands and need o
       for (const id of PRE_PHASE_NODE_IDS) {
         const node = mustNode(id);
         expect(node.tier, id).toBe(1);
-        const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+        const professionId = PROFESSION_BY_NODE_TYPE[node.type];
         teleportOntoNode(sim, pid, id);
         sim.drainEvents();
         // Bare hands: denied, with exactly one gatherDenied whose

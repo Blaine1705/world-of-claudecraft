@@ -107,6 +107,21 @@ describe('gathering tool tier gating (#1123)', () => {
     }
   });
 
+  it('the tier-1 implements are the 20-copper starter purchase the #2343 rule leans on', () => {
+    // The rule's no-strand story (the guide's gatherIntro and toolsNote copy:
+    // "20 copper at any zone hub") needs the entry tools to STAY trivial
+    // one-time purchases. Literal buyValue pins so a price rebalance must
+    // consciously touch this claim rather than drift past it.
+    for (const toolId of [
+      'copper_mining_pick',
+      'handaxe',
+      'gathering_sickle',
+      'simple_fishing_pole',
+    ] as const) {
+      expect(ITEMS[toolId]?.buyValue, toolId).toBe(20);
+    }
+  });
+
   it('a base tool never becomes unusable, because this repo has no durability mechanic', () => {
     const pick = ITEMS.copper_mining_pick;
     // ItemDef (src/sim/types.ts) carries no durability field anywhere in this repo,
