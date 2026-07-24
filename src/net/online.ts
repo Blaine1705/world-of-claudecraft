@@ -120,6 +120,7 @@ import type {
   SalvageResultView,
 } from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
+import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import {
@@ -1571,8 +1572,9 @@ export class ClientWorld implements IWorld {
     this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };
     this.openSocket();
-    // input stream at sim rate
-    this.sendTimer = window.setInterval(() => this.sendInput(), 50);
+    // unconditional input stream beat; constants + gate shared with the
+    // cadence-model matrix via input_send_cadence.ts (R13)
+    this.sendTimer = window.setInterval(() => this.sendInput(), INPUT_SEND_TIMER_INTERVAL_MS);
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -1790,7 +1792,7 @@ export class ClientWorld implements IWorld {
     const sig = this.inputSignature();
     if (changedOnly) {
       if (sig === this.lastInputSig) return false;
-      if (now - this.lastInputSentAt < 16) return false;
+      if (!inputFlushGateOpen(now, this.lastInputSentAt)) return false;
     }
     const mi = this.moveInput;
     const msg: Record<string, unknown> = {

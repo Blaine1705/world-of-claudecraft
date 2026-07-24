@@ -45,9 +45,11 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
   `social` sets `socialInfo` and flips `socialDirty`; `censor` live-updates the
   soft-profanity word list; an `error` frame ends the session (subject to
   `reconnect_policy.ts`).
-- **Client to server**: `auth` (`buildWebSocketAuthMessage`), `input` (20 Hz move
-  intent via `sendInput`, `setInterval` 50 ms), `cmd` (every IWorld action via the
-  private `cmd()` helper).
+- **Client to server**: `auth` (`buildWebSocketAuthMessage`), `input` (move intent via
+  `sendInput`: an unconditional interval timer plus a changed-only gated flush; the
+  cadence constants and gate predicate live in `input_send_cadence.ts`, kept in
+  lockstep with the server contract by `tests/input_cadence_model.test.ts`), `cmd`
+  (every IWorld action via the private `cmd()` helper).
 - **Snapshot decode** (`applySnapshot`): `snap.ents` (others) + `snap.self`
   (extended state) go through `applyWire`; `snap.keep` = ids alive-but-unchanged,
   protected from the prune at the end. Encoder is server `wireEntity`; fields are
