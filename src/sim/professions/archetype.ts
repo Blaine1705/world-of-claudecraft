@@ -24,12 +24,7 @@
 // imports, no Math.random/Date.now, host-agnostic so it runs offline, on the
 // server, and in the headless RL env unchanged.
 
-import {
-  adjacentCrafts,
-  CRAFT_RING,
-  craftMaxSkillFor,
-  oppositeCraft,
-} from '../content/professions';
+import { adjacentCrafts, CRAFT_RING, oppositeCraft } from '../content/professions';
 import { COMBO_RECIPES } from '../content/recipes';
 import type { SimContext } from '../sim_context';
 import {
@@ -390,7 +385,12 @@ export function craftSkillGainMultiplier(
   hobbyCraft: string | null,
   skillReq: number,
 ): number {
-  if (skillInCraft(skills, craftId) >= craftMaxSkillFor(craftId)) return 0;
+  // The cap is read off the ring record directly (not craftMaxSkillFor,
+  // which throws on an unknown id): this function was always total over
+  // arbitrary craft ids (the crafting window builds rows for any recipe
+  // def), and an unknown craft simply has no cap arm.
+  const cap = CRAFT_RING.find((c) => c.id === craftId)?.maxSkill;
+  if (cap !== undefined && skillInCraft(skills, craftId) >= cap) return 0;
   const ceilingTier = archetypeCeilingFor(activeArchetype, pairedMajor, craftId, hobbyCraft);
   const recipeTier = tierForSkill(skillReq);
   return recipeTier > ceilingTier
