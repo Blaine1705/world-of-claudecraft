@@ -2632,6 +2632,36 @@ export const TARGETS = [
       return { clip: '#ui' };
     },
   },
+  {
+    key: 'chrome-icons',
+    label: 'HUD chrome icons (side rail, mobile bar, More tray)',
+    when: ['ui/ui_icons', 'ui/chrome_icon_art', 'public/ui/chrome'],
+    // The icons live on three surfaces, and each is its own clip: the desktop rail is a
+    // narrow column a full-HUD frame renders too small to judge, and the mobile set splits
+    // between the always-visible bottom bar and the More tray behind a toggle.
+    variants: [
+      { key: 'desktop-rail' },
+      { key: 'mobile-bar', mobile: true },
+      { key: 'mobile-more-tray', mobile: true, moreTray: true },
+    ],
+    async capture(page, variant) {
+      if (variant?.moreTray) {
+        await page.evaluate(() => {
+          document.querySelector('#mobile-more')?.click();
+        });
+        if (!(await pollForSize(page, '#mobile-extra-controls')))
+          throw new Error('mobile More tray did not open');
+        await wait(400);
+        return { clip: '#mobile-extra-controls' };
+      }
+      // Both remaining clips are persistent chrome, already on screen after entry; the wait
+      // only lets the launcher art decode so a shot never lands on a half-painted rail.
+      await wait(600);
+      const sel = variant?.mobile ? '#mobile-combat-controls' : '#side-buttons';
+      if (!(await pollForSize(page, sel))) throw new Error(`${sel} never laid out`);
+      return { clip: sel };
+    },
+  },
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).
