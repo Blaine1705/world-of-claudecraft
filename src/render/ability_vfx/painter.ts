@@ -680,7 +680,13 @@ export class AbilityVfx {
         if (!contact && !plan.whirl && this.deps.hasGestureClip?.(ev.sourceId, ev.ability)) {
           this.deps.triggerAttack(ev.sourceId, ev.ability);
         }
-        if (targeted && !friendly && arch === 'shout') {
+        // A shout barks from the caster whether it is a targeted taunt (Menace)
+        // or a self-centered untargeted AoE roar (Craven Roar): the wave, ring
+        // and roar animation always originate at the bellowing caster. Craven
+        // Roar carries targetId===sourceId (requiresTarget:false), so gating the
+        // roar behind `targeted` left it silent with no visual - mirror the
+        // unconditional castFx 'shout' arm instead.
+        if (!friendly && arch === 'shout') {
           this.deps.vfx.shoutwave(ev.sourceId, plan.color);
           this.spawned++;
           this.spawnRing(ev.sourceId, plan, ev.school);
