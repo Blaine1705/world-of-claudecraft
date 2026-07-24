@@ -120,10 +120,12 @@ more both-viewport runs. Healthy frame captures: desktop 876 and 873 frames with
 long frames; mobile 1279 and 1245 frames with 2 and 2 long frames (2026-07-23); the
 packet-close runs measured desktop 1586 and 1589 frames, mobile 1531 and 1530, all with 0
 long frames. The committed anchor takes the worst healthy long-frame count (7) plus headroom
-for run jitter; the committed floor sits between the worst healthy frame count (873, and a
-60 Hz display halves a 120 Hz frame count) and the saturation signature (a run whose every
-frame hits the 250 ms sample clamp renders only about 60 to 220 frames over this tour, and a
-half-speed catastrophe about 450), so both directions keep real failing room. The
+for run jitter; the committed floor sits between the worst healthy frame count (873) and the
+saturation signature (a run whose every frame hits the 250 ms sample clamp renders only
+about 60 to 220 frames over this tour, and a half-speed catastrophe about 450), so both
+directions keep real failing room. A 60 Hz display halves the 120 Hz-class packet-close
+captures to about 765 to 795 frames, still clearing the floor; the 2026-07-23 captures were
+not 120 Hz-paced, so do not halve THOSE against the floor. The
 packet-close captures sit comfortably inside both rows, so per R13 the rows were KEPT.
 
 The elision-bypass anchor was re-derived at the packet close: the healthy captures measured

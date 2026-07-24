@@ -69,6 +69,15 @@ R12. Bench gates: one scripts/lib/bench_gate.mjs (+ .d.mts) serves both scripts.
 R13. Honest-gate baseline rows (frameLong50, tourMinFrames) are captured on the owner's
     Mac via PERF_GPU=1 during phase 04 (the test and its baseline land in one commit;
     refreshed at packet close if the close-out captures differ materially).
+    Close-out amendment (2026-07-24, per the phase 07 instruction): the refresh clause
+    was extended to the stale hudHotDomWrites anchor, which phase 04 had left
+    byte-identical by contract and flagged as stale. The close-out captures differed
+    materially (desktop 538/539, mobile 632/632 vs the committed 153), so the anchor
+    was re-derived to 640 (worst viewport plus run-jitter headroom) with the
+    byte-identical-across-viewports prose re-derived in the same commit. This
+    supersedes the phase 04 "hudHotDomWrites ... stay byte-identical" line for the
+    packet-close commit; the frame-gate rows themselves were KEPT (numbers in
+    phase-07-qa.md).
 R14. Perf-doctor: suggestion ids are CLIENT-computed and ride the beacon; the server
     validates against a local allowlist (a cross-boundary parity test pins the two
     catalogs equal; server code cannot import src/game). Storage is a TEXT[] column.
@@ -324,7 +333,11 @@ instruments, committed as baselines.md in this directory.
 Runbook:
 1. Owner-Mac town session on the live site: ?perf overlay JSON copy plus one Chrome
    Performance trace during an arrow-key turn in the plaza (formally settles the
-   CPU-bound presumption; brainstorm section 1).
+   CPU-bound presumption; brainstorm section 1). Close-out amendment (2026-07-24, per
+   the phase 07 instruction): reassigned to the maintainer track alongside step 4
+   (live-site owner session, do not attempt from an agent session); commands in
+   baselines.md section 4. The CPU-bound presumption therefore stays formally
+   unsettled until that capture lands.
 2. Local crowd curve: perf:crowd with CROWD_BATCHES=20,40,60,80 against a local server
    (dev commands on), per-tier via CROWD_GFX for low/medium/high/ultra; record the
    FPS-vs-crowd curve and real high-tier draw counts (phase 01 makes them true).

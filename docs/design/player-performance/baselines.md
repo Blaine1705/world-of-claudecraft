@@ -108,8 +108,10 @@ there, the dead-instrument signature the bench gate now rejects).
 
 Reading notes:
 
-- The curve is monotonic on every tier (solo to crowd-80 costs roughly 2.5x to 4x fps);
-  the crowd-80 upticks on medium/high sit inside sample noise (the p95 keeps rising).
+- The overall trend is the same on every tier: solo to crowd-80 costs roughly 2.5x to
+  4x fps. The small crowd-80 fps upticks on medium/high sit inside sample noise; the
+  load columns (calls, tris, ents, views) keep growing there, and the p99 keeps rising
+  (medium 15.5 to 16.0 ms, high 16.2 to 29.5 ms) even where the p95 dips.
 - High and ultra draw nearly identical counts here because this machine's ultra extras
   are pixel-cost (DPR/AO), not draw-count; the ultra table's smaller window also cuts
   its pixel load, so treat high as the composer-tier draw baseline.

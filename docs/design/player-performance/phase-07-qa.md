@@ -105,9 +105,10 @@ hudHotDomWrites desktop 538/539, mobile 632/632; fct burst 64/64/64 on both view
 
 Decision: **frameLong50 12 KEPT** (captures sit at 0, comfortably inside; a hitch storm
 measures in the hundreds, so the anchor keeps real failing room, and tightening toward 0
-only buys flake risk). **tourMinFrames 500 KEPT** (captures nearly double the phase 04
-healthy values; a 60 Hz display halves a 120 Hz frame count to ~790, still clearing 500,
-while the saturation signature stays 60 to 220). **hudHotDomWrites REFRESHED 153 to 640**:
+only buys flake risk). **tourMinFrames 500 KEPT** (captures well above the phase 04
+healthy values: 1.8x on desktop, 1.2x on mobile; a 60 Hz display halves the 120 Hz-paced
+packet-close captures to ~765-795, still clearing 500, while the saturation signature
+stays 60 to 220). **hudHotDomWrites REFRESHED 153 to 640**:
 the old anchor was materially wrong (the v0.30 HUD growth: deed tracker, yumi strip,
 party-below-target, tab strip, mobile action ring all establish writes at boot), the
 count is no longer viewport-identical (the touch HUD explains mobile 632 vs desktop
@@ -221,3 +222,34 @@ they named is closed by the gate/PG evidence above).
   richer regimes.
 - Phases 01-06 arrived at this close with their own QA files and mutation ledgers; this
   file deliberately does not restate them.
+
+## Perfection sweep (post-close verification pass)
+
+After the close-out commit, an 18-agent verification workflow audited the packet with
+fresh eyes: seven extractors built a 181-item ledger of every finding, nit, VERIFY,
+deferral, and adversarial bullet across all seven phase QA files; seven verifiers
+checked each item against the final tree (63 confirmed landed with file evidence, 115
+confirmed correctly dispositioned against rulings R1-R16, 2 threads pending-maintainer
+by design); three adversarial lenses re-reviewed the contract, the close-out artifacts,
+and the close-out commit as a standalone unit. Zero code or test changes resulted. The
+sweep surfaced three record-level defects, all fixed in the follow-up docs commit:
+
+- baselines.md's crowd-curve reading note cited the wrong statistic (the p95 FALLS at
+  crowd-80 on medium/high, 14.7 to 12.2 and 15.4 to 14.5 ms; the p99 is what rises,
+  15.5 to 16.0 and 16.2 to 29.5 ms) and overclaimed "monotonic on every tier"; the
+  note now cites the p99 and the load columns and qualifies the fps upticks.
+- The plan doc never recorded the two superseding phase 07 instructions: the R13
+  refresh clause extension to the hudHotDomWrites anchor, and runbook step 1's
+  reassignment to the maintainer track. Both are now amended into
+  packet-0-instruments.md at their ruling and runbook sites, and both need the
+  maintainer's ratification in the PR review.
+- The 60 Hz halving argument in the hud baseline juxtaposed the wrong capture
+  generation (halving the 2026-07-23 captures' 873 gives ~436, below the floor; the
+  argument only holds for the 120 Hz-paced packet-close captures, ~765-795); the prose
+  now says which captures to halve, and phase-07-qa's "nearly double" claim is
+  qualified per viewport (1.8x desktop, 1.2x mobile).
+
+One historical inaccuracy was confirmed and left in place as superseded rather than
+rewritten: phase-04-qa's "biome zero errors" claim was falsified by close-out gate
+run 1 (the bench_gate format drift); the correction lives in the gate history above,
+and QA files record what was believed at their timestamp.
