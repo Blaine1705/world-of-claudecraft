@@ -516,7 +516,7 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 // the anomaly channel).
 const KNOWN_COMMANDS: ReadonlySet<string> = new Set(COMMAND_NAMES);
 // Lane-drop cause labels (R8): the map keeps the counter's cause vocabulary
-// closed at the seam's fixed five values, never a raw lane string.
+// closed at the seam's fixed WS_DROP_CAUSES set, never a raw lane string.
 const LANE_DROP_CAUSE = {
   movement: 'lane_movement',
   command: 'lane_command',

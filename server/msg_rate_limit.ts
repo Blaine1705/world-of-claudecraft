@@ -73,7 +73,9 @@ export const MSG_RATE_KICK_REASON = 'message rate exceeded';
 // never processed, and the gap feeds the woc_input_frames_missed_total counter.
 // One observation is capped here so a client/server seq-reset mismatch (resume
 // zeroes the server high-water, reconnect restarts the client counter) can
-// never book a giant fictitious gap.
+// never book a giant fictitious gap. The counter stays client-attested either
+// way (a hostile client can skip seqs on purpose), so it is a correlating
+// ops signal beside the drop-cause series, never proof of server loss.
 export const MSG_SEQ_GAP_SANITY = 1000; // max missed frames booked per observation
 
 export interface MsgRateBucketState {

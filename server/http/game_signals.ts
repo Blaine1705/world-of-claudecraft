@@ -56,7 +56,11 @@ export interface GameMetricsCounters {
   /**
    * A parsed input frame proved `missed` earlier input frames were sent and
    * never processed (the seq gap on the ordered socket, R9): the
-   * input-frame-attributed share of the server's own drops.
+   * input-frame-attributed share of the server's own drops. Client-attested:
+   * seqs are client-sent, so a hostile client can fabricate gaps (each
+   * observation capped by MSG_SEQ_GAP_SANITY); operators correlate the
+   * counter with the drop-cause series instead of reading it as proven
+   * server-side loss on its own (soak-packet-3.md carries the scrape guidance).
    */
   wsInputSeqGap(missed: number): void;
   /** One player chat message routed to other players (any channel). */

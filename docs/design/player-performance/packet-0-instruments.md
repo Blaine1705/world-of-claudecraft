@@ -381,7 +381,7 @@ rulings, code, tests, and baselines.md do not already carry.
   suggestion ids with server allowlist and TEXT[] storage); the test-only
   broadcast-stall replay arms; and the committed baselines
   (baselines.md + jitter-soak-baseline.json) with the R13 anchor refresh.
-- TWO AMENDMENTS NEED THE MAINTAINER'S RATIFICATION in PR review, both
+- Two amendments were RATIFIED in the PR #2372 review (2026-07-24), both
   written into their ruling and runbook sites as "Close-out amendment
   (2026-07-24)": the R13 refresh-clause extension (the hudHotDomWrites anchor
   re-derived 153 to 640 at packet close, superseding the phase 04

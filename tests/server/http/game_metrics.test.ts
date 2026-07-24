@@ -194,8 +194,8 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource());
     // Scrape BEFORE any sink call: prom counters cannot backfill a scrape, so a
-    // dashboard must see every series from boot. The five cause series and the
-    // two unlabeled counters all expose an explicit 0.
+    // dashboard must see every series from boot. Every WS_DROP_CAUSES series
+    // and the two unlabeled counters all expose an explicit 0.
     const text = await registry.metrics();
 
     expect(WOC_WS_MESSAGES_DROPPED_TOTAL).toBe('woc_ws_messages_dropped_total');

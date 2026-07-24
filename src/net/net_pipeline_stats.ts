@@ -39,7 +39,10 @@ export interface NetPipelineSummary {
   applyMs: NetPipelineStatDigest;
   gapMs: NetPipelineStatDigest;
   // How many snapshots were applied between consecutive animation frames:
-  // 0 = starved frame, 1 = healthy, 2+ = burst after a stall (R9 buckets).
+  // 0, 1, or a 2+ burst after a stall (R9 buckets). r0 DOMINATING is the
+  // healthy steady state whenever the display outpaces the 20 Hz snapshot
+  // rate (at 60 Hz about two thirds of frames are r0); starvation shows as
+  // the gapMs digest stretching plus r2/r3plus bursts, not as r0 alone.
   snapshotsPerRaf: { r0: number; r1: number; r2: number; r3plus: number };
 }
 

@@ -645,7 +645,11 @@ reader needs that the code, tests, and soak artifacts do not already carry.
   the fatal overlay (no matcher arm); protocol_conformance's header comment in the
   private repo claims anomalies are not rate-limited on the wire, which the
   pre-parse gate contradicts (doc drift, both copies); frames rejected by the
-  stale-session guard return before wsMessage('in') and stay uncounted.
+  stale-session guard return before wsMessage('in') and stay uncounted; and a
+  spectator's non-chat cmd hits the pre-existing spectating early return
+  before any lane draw (found by the PR #2372 review), the one message class
+  with no lane token: gate-bounded and benign (a spectator has no sim entity
+  to starve), left as-is.
 - Defect found by the phase 06 security review, RESOLVED IN-PACKET by the
   maintainer's ruling (2026-07-24): the ignore/block LIST-READ chat commands
   return from the chat case BEFORE the chat lane and the ladder (the R5
