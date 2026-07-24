@@ -479,6 +479,11 @@ export interface PerfRawRow {
   glRendererBucket: string;
   zoneOrScenario: string;
   source: string;
+  crowdBucket: string;
+  simEntities: number;
+  activeViews: number;
+  visibleViews: number;
+  worst10sFrameP95Ms: number;
   rawSummary: unknown;
 }
 
@@ -512,11 +517,13 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
            browser_family,
            os_family,
            zone_or_scenario,
+           crowd_bucket,
            GROUPING(graphics_preset) AS g_preset,
            GROUPING(gl_renderer_bucket) AS g_gpu,
            GROUPING(browser_family) AS g_browser,
            GROUPING(os_family) AS g_os,
            GROUPING(zone_or_scenario) AS g_scenario,
+           GROUPING(crowd_bucket) AS g_crowd,
            count(*)::int AS sample_count,
            COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY fps_avg), 0)::real AS median_fps,
            COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
@@ -526,28 +533,29 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
            COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
          FROM client_perf_reports
          WHERE created_at > now() - ($1 || ' hours')::interval
-         GROUP BY GROUPING SETS ((), (graphics_preset), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario))
+         GROUP BY GROUPING SETS ((), (graphics_preset), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario), (crowd_bucket))
        ),
        ranked AS (
          SELECT
            agg.*,
            (row_number() OVER (
-             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario
-             ORDER BY sample_count DESC, COALESCE(graphics_preset, gl_renderer_bucket, browser_family, os_family, zone_or_scenario) ASC
+             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario, g_crowd
+             ORDER BY sample_count DESC, COALESCE(graphics_preset, gl_renderer_bucket, browser_family, os_family, zone_or_scenario, crowd_bucket) ASC
            ))::int AS vol_rank,
            (row_number() OVER (
-             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario
+             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario, g_crowd
              ORDER BY p95_frame_ms DESC, sample_count DESC
            ))::int AS worst_rank
          FROM agg
        )
        SELECT * FROM ranked
-       WHERE (g_preset + g_gpu + g_browser + g_os + g_scenario = 5)
+       WHERE (g_preset + g_gpu + g_browser + g_os + g_scenario + g_crowd = 6)
           OR (g_preset = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byPreset})
           OR (g_gpu = 0 AND (vol_rank <= ${PERF_SUMMARY_LIMITS.byGpu} OR worst_rank <= ${PERF_SUMMARY_LIMITS.worstGpu}))
           OR (g_browser = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byBrowser})
           OR (g_os = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byOs})
-          OR (g_scenario = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byScenario})`,
+          OR (g_scenario = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byScenario})
+          OR (g_crowd = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byCrowd})`,
       [String(hours)],
     ),
   );
@@ -570,7 +578,8 @@ export async function clientPerfRaw(
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
-       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source, raw_summary
+       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
+       crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, raw_summary
      FROM client_perf_reports
      WHERE created_at > now() - ($1 || ' hours')::interval
        AND ($3::bigint IS NULL OR id < $3)
@@ -617,6 +626,11 @@ export async function clientPerfRaw(
     glRendererBucket: r.gl_renderer_bucket,
     zoneOrScenario: r.zone_or_scenario,
     source: r.source,
+    crowdBucket: r.crowd_bucket,
+    simEntities: r.sim_entities,
+    activeViews: r.active_views,
+    visibleViews: r.visible_views,
+    worst10sFrameP95Ms: r.worst_10s_frame_p95_ms,
     rawSummary: r.raw_summary,
   }));
 }

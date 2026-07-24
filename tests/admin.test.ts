@@ -781,6 +781,7 @@ describe('admin api auth', () => {
       byBrowser: [],
       byOs: [],
       byScenario: [],
+      byCrowd: [],
       worstGpuBuckets: [],
     });
     vi.mocked(clientPerfRaw).mockResolvedValue([

@@ -68,13 +68,13 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     // The one statement computes the totals row and every bucket grouping.
     expect(sql).toContain('GROUP BY GROUPING SETS');
     expect(sql).toContain(
-      '((), (graphics_preset), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario))',
+      '((), (graphics_preset), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario), (crowd_bucket))',
     );
     expect(sql).toContain("WHERE created_at > now() - ($1 || ' hours')::interval");
     // Both orderings live in Postgres as window ranks (collation-proof: the
     // key ASC tie-break must never move into a JS string sort).
     expect(sql).toContain(
-      'ORDER BY sample_count DESC, COALESCE(graphics_preset, gl_renderer_bucket, browser_family, os_family, zone_or_scenario) ASC',
+      'ORDER BY sample_count DESC, COALESCE(graphics_preset, gl_renderer_bucket, browser_family, os_family, zone_or_scenario, crowd_bucket) ASC',
     );
     expect(sql).toContain('ORDER BY p95_frame_ms DESC, sample_count DESC');
     // The deliberate quirk: p99_frame_ms is percentile 0.99 over frame_p95_ms.
@@ -85,7 +85,7 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     // fall production totals back to the mapper's all-zeros shape, and dropping
     // any bucket arm would empty that admin list, with only the env-gated
     // differential (skipped in normal CI) left to notice.
-    expect(sql).toContain('(g_preset + g_gpu + g_browser + g_os + g_scenario = 5)');
+    expect(sql).toContain('(g_preset + g_gpu + g_browser + g_os + g_scenario + g_crowd = 6)');
     // The per-set caps bound what crosses to Node; the gpu set keeps candidates
     // for BOTH orderings so a low-volume worst-p95 bucket still surfaces.
     expect(sql).toContain('(g_preset = 0 AND vol_rank <= 20)');
@@ -93,11 +93,13 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     expect(sql).toContain('(g_browser = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_os = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_scenario = 0 AND vol_rank <= 30)');
+    expect(sql).toContain('(g_crowd = 0 AND vol_rank <= 8)');
 
     // An empty result still shapes a full response.
     expect(out.hours).toBe(24);
     expect(out.totals.sampleCount).toBe(0);
     expect(out.byGpu).toEqual([]);
+    expect(out.byCrowd).toEqual([]);
   });
 
   it('clamps the hours window before it reaches SQL', async () => {
@@ -117,11 +119,13 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
       browser_family: null,
       os_family: null,
       zone_or_scenario: null,
+      crowd_bucket: null,
       g_preset: 1,
       g_gpu: 1,
       g_browser: 1,
       g_os: 1,
       g_scenario: 1,
+      g_crowd: 1,
       vol_rank: 1,
       worst_rank: 1,
       sample_count: 12,
@@ -155,6 +159,9 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
           p95_frame_ms: 18,
         },
         { ...base, g_preset: 0, graphics_preset: 'high', sample_count: 7 },
+        { ...base, g_crowd: 0, crowd_bucket: '25-49', sample_count: 5 },
+        // A legacy pre-column row: '' folds to 'unknown' at read time (R3).
+        { ...base, g_crowd: 0, crowd_bucket: '', vol_rank: 2, worst_rank: 2, sample_count: 2 },
       ]) as never,
     );
     const out = await clientPerfSummary(12);
@@ -164,6 +171,7 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     expect(out.totals.sampleCount).toBe(12);
     expect(out.byPreset.map((b) => b.key)).toEqual(['high']);
     expect(out.byGpu.map((b) => b.key)).toEqual(['adreno', 'mali']);
+    expect(out.byCrowd.map((b) => b.key)).toEqual(['25-49', 'unknown']);
     expect(out.worstGpuBuckets.map((b) => b.key)).toEqual(['mali', 'adreno']);
   });
 });
@@ -270,6 +278,7 @@ interface SeedRow {
   browser: string;
   os: string;
   zone: string;
+  crowd: string;
   fps: number;
   p95: number;
   ctx: number;
@@ -292,6 +301,11 @@ for (let i = 0; i < 18; i++) OSES.push(`sqlperf-os-${String(i + 1).padStart(2, '
 const ZONES: string[] = [];
 for (let i = 0; i < 34; i++) ZONES.push(`sqlperf-zone-${String(i + 1).padStart(2, '0')}`);
 ZONES.push('sqlperf-zöne-Öland');
+// Every real crowd label plus the legacy '' rows the mapper folds to
+// 'unknown' at read time; only sanitizer-approved labels can reach the
+// column in production, so the byCrowd cap arm has no live boundary here
+// (the mocked-pool text pin carries it).
+const CROWDS = ['lt10', '10-24', '25-49', '50-99', '100plus', 'unknown', ''];
 
 // 59 gpu buckets with two rows each, one low-volume bucket whose p95 is the
 // worst in the fixture (it reaches worstGpuBuckets only through the worst
@@ -309,6 +323,7 @@ for (let b = 0; b < 59; b++) {
       browser: BROWSERS[i % BROWSERS.length],
       os: OSES[i % OSES.length],
       zone: ZONES[i % ZONES.length],
+      crowd: CROWDS[i % CROWDS.length],
       fps: 30 + (i % 47),
       p95: 10 + i * 0.37,
       ctx: i % 3,
@@ -323,6 +338,7 @@ SEED_ROWS.push({
   browser: 'Chrome',
   os: 'Windows',
   zone: ZONES[SEED_ROWS.length % ZONES.length],
+  crowd: CROWDS[SEED_ROWS.length % CROWDS.length],
   fps: 5,
   p95: 999,
   ctx: 2,
@@ -340,6 +356,7 @@ for (let k = 0; k < 3; k++) {
     browser: BROWSERS[SEED_ROWS.length % BROWSERS.length],
     os: OSES[SEED_ROWS.length % OSES.length],
     zone: ZONES[SEED_ROWS.length % ZONES.length],
+    crowd: CROWDS[SEED_ROWS.length % CROWDS.length],
     fps: 20 + k,
     p95: 998,
     ctx: 0,
@@ -353,6 +370,7 @@ SEED_ROWS.push({
   browser: BROWSERS[SEED_ROWS.length % BROWSERS.length],
   os: OSES[SEED_ROWS.length % OSES.length],
   zone: ZONES[SEED_ROWS.length % ZONES.length],
+  crowd: CROWDS[SEED_ROWS.length % CROWDS.length],
   fps: 19,
   p95: 998,
   ctx: 1,
@@ -369,11 +387,11 @@ async function seed(): Promise<void> {
   await pool.query(
     `INSERT INTO client_perf_reports
        (session_id, graphics_preset, gl_renderer_bucket, browser_family, os_family,
-        zone_or_scenario, fps_avg, frame_p95_ms, context_lost_count, render_scale,
-        effective_render_scale)
+        zone_or_scenario, crowd_bucket, fps_avg, frame_p95_ms, context_lost_count,
+        render_scale, effective_render_scale)
      SELECT * FROM unnest(
-       $1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[],
-       $7::real[], $8::real[], $9::int[], $10::real[], $11::real[])`,
+       $1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], $7::text[],
+       $8::real[], $9::real[], $10::int[], $11::real[], $12::real[])`,
     [
       SEED_ROWS.map((_, i) => `${MARKER}-${i}`),
       SEED_ROWS.map((r) => r.preset),
@@ -381,6 +399,7 @@ async function seed(): Promise<void> {
       SEED_ROWS.map((r) => r.browser),
       SEED_ROWS.map((r) => r.os),
       SEED_ROWS.map((r) => r.zone),
+      SEED_ROWS.map((r) => r.crowd),
       SEED_ROWS.map((r) => r.fps),
       SEED_ROWS.map((r) => r.p95),
       SEED_ROWS.map((r) => r.ctx),
@@ -416,6 +435,13 @@ describe.skipIf(!PG_ON)(
       expect(fresh.byOs).toEqual(spec.byOs);
       expect(fresh.byScenario).toEqual(spec.byScenario);
       expect(fresh.worstGpuBuckets).toEqual(spec.worstGpuBuckets);
+      // The crowd dimension is new in this phase, so its spec is the same
+      // legacy bucket read over crowd_bucket with the mapper's read-time
+      // '' to 'unknown' fold applied (ruling R3).
+      const crowdSpec = (
+        await legacyPerfBuckets((text, values) => pool.query(text, values), 'crowd_bucket', 24, 8)
+      ).map((b) => ({ ...b, key: b.key === '' ? 'unknown' : b.key }));
+      expect(fresh.byCrowd).toEqual(crowdSpec);
     });
 
     it('caps every list at its limit, surfaces the low-volume worst-p95 bucket, and breaks the p95 tie by volume', async () => {

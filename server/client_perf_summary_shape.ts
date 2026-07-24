@@ -27,6 +27,7 @@ export interface ClientPerfSummaryBuckets {
   byBrowser: PerfBucket[];
   byOs: PerfBucket[];
   byScenario: PerfBucket[];
+  byCrowd: PerfBucket[];
   worstGpuBuckets: PerfBucket[];
 }
 
@@ -40,6 +41,8 @@ export const PERF_SUMMARY_LIMITS = Object.freeze({
   byBrowser: 20,
   byOs: 20,
   byScenario: 30,
+  // Six fixed labels (ruling R3) plus the legacy '' bucket and headroom.
+  byCrowd: 8,
   worstGpu: 20,
 } as const);
 
@@ -52,7 +55,7 @@ export function cleanHours(hours: number): number {
 // One flat row of the GROUPING SETS result, as the reading contract the mapper
 // relies on. The g_* fields are GROUPING() bits: 1 means the column is rolled up
 // in this row's grouping set, 0 means the row is grouped by that column. Exactly
-// one bit is 0 on a bucket row; all five are 1 on the totals row. The shape and
+// one bit is 0 on a bucket row; all six are 1 on the totals row. The shape and
 // SQL suites type their fixture rows with this contract, so it stays
 // compile-checked against what the tests feed the mapper.
 export type ClientPerfSummaryRow = {
@@ -61,11 +64,13 @@ export type ClientPerfSummaryRow = {
   browser_family: string | null;
   os_family: string | null;
   zone_or_scenario: string | null;
+  crowd_bucket: string | null;
   g_preset: number;
   g_gpu: number;
   g_browser: number;
   g_os: number;
   g_scenario: number;
+  g_crowd: number;
   vol_rank: number;
   worst_rank: number;
   sample_count: number;
@@ -100,6 +105,7 @@ const BUCKET_SETS = [
   { bit: 'g_browser', column: 'browser_family', list: 'byBrowser' },
   { bit: 'g_os', column: 'os_family', list: 'byOs' },
   { bit: 'g_scenario', column: 'zone_or_scenario', list: 'byScenario' },
+  { bit: 'g_crowd', column: 'crowd_bucket', list: 'byCrowd' },
 ] as const;
 
 type BucketListName = (typeof BUCKET_SETS)[number]['list'];
@@ -128,20 +134,26 @@ export function mapClientPerfSummaryRows(
     byBrowser: [],
     byOs: [],
     byScenario: [],
+    byCrowd: [],
   };
   for (const r of rows) {
     const set = BUCKET_SETS.find((s) => Number(r[s.bit]) === 0);
     if (!set) {
-      // All five bits rolled up: the () grouping set, i.e. the totals row.
+      // All six bits rolled up: the () grouping set, i.e. the totals row.
       totals = perfAggregateFromRow(r);
       continue;
     }
+    // Defensive fold: a data row never carries a NULL key (NOT NULL DEFAULT ''),
+    // but the mapping mirrors the String(value ?? '') contract regardless. The
+    // crowd list additionally folds the legacy pre-column '' rows to 'unknown'
+    // at read time (ruling R3); the '' and 'unknown' groups stay separate
+    // aggregates because percentiles do not compose.
+    const rawKey = String(r[set.column] ?? '');
+    const key = set.list === 'byCrowd' && rawKey === '' ? 'unknown' : rawKey;
     ranked[set.list].push({
       volRank: Number(r.vol_rank),
       worstRank: Number(r.worst_rank),
-      // Defensive fold: a data row never carries a NULL key (NOT NULL DEFAULT ''),
-      // but the mapping mirrors the String(value ?? '') contract regardless.
-      bucket: { key: String(r[set.column] ?? ''), ...perfAggregateFromRow(r) },
+      bucket: { key, ...perfAggregateFromRow(r) },
     });
   }
   const byRank = (
@@ -165,6 +177,7 @@ export function mapClientPerfSummaryRows(
     byBrowser: byRank(ranked.byBrowser, 'volRank', PERF_SUMMARY_LIMITS.byBrowser),
     byOs: byRank(ranked.byOs, 'volRank', PERF_SUMMARY_LIMITS.byOs),
     byScenario: byRank(ranked.byScenario, 'volRank', PERF_SUMMARY_LIMITS.byScenario),
+    byCrowd: byRank(ranked.byCrowd, 'volRank', PERF_SUMMARY_LIMITS.byCrowd),
     worstGpuBuckets: byRank(ranked.byGpu, 'worstRank', PERF_SUMMARY_LIMITS.worstGpu),
   };
 }

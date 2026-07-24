@@ -10,7 +10,14 @@ import { json, readBody } from './http_util';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
 
-const PERF_REPORT_SCHEMA_VERSION = 1;
+// Bumped to 2 for the packet 0 report dimensions (zone, crowd, views,
+// worst-10s; ruling R6); the intIn clamp below keeps version-1 clients valid.
+const PERF_REPORT_SCHEMA_VERSION = 2;
+
+// Fixed crowd labels (ruling R3). server/ cannot import src/game, so this is
+// a deliberate copy of src/game/crowd_bucket.ts CROWD_BUCKET_LABELS;
+// tests/perf_report.test.ts pins the two catalogs equal.
+const CROWD_BUCKET_LABELS = ['lt10', '10-24', '25-49', '50-99', '100plus', 'unknown'] as const;
 const PERF_REPORT_MAX_PER_MINUTE = 30;
 const PERF_REPORT_WINDOW_MS = 60_000;
 const PERF_REPORT_MAX_TRACKED_IPS = 5000;
@@ -370,6 +377,11 @@ export async function handlePerfReport(
       source === 'benchmark' ? 'benchmark' : 'gameplay',
     ),
     source,
+    crowdBucket: choiceIn(body.crowdBucket, CROWD_BUCKET_LABELS, 'unknown'),
+    simEntities: intIn(body.simEntities, 0, 100_000, 0),
+    activeViews: intIn(body.activeViews, 0, 100_000, 0),
+    visibleViews: intIn(body.visibleViews, 0, 100_000, 0),
+    worst10sFrameP95Ms: numberIn(body.worst10sFrameP95Ms, 0, 1000, 0),
     rawSummary: rawSummary(body.rawSummary, devTraceAllowed),
   };
 
@@ -385,4 +397,6 @@ export const perfReportInternalsForTest = {
   allowDevTrace,
   rawSummary,
   shouldStorePerfReport,
+  CROWD_BUCKET_LABELS,
+  PERF_REPORT_SCHEMA_VERSION,
 };

@@ -97,6 +97,7 @@ import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { telemetryZoneId } from './game/world_telemetry';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -3542,6 +3543,10 @@ async function startGame(
           settings,
           tokenProvider: () => api.token,
           characterIdProvider: () => online?.characterId ?? null,
+          worldTelemetryProvider: () => ({
+            zoneId: telemetryZoneId(world.player.pos.x, world.player.pos.z),
+            simEntities: world.entities.size,
+          }),
         });
         // Warm the procedural icon cache during idle time so the first
         // bags/vendor/loot open never pays the compose burst synchronously

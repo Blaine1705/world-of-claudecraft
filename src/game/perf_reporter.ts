@@ -1,10 +1,16 @@
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
+import { crowdBucketLabel } from './crowd_bucket';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
 import type { Settings } from './settings';
+import type { WorldTelemetry } from './world_telemetry';
 
 declare const __APP_VERSION__: string;
 declare const __APP_BUILD_ID__: string;
+
+// Bumped to 2 for the packet 0 report dimensions (zone, crowd, views,
+// worst-10s; ruling R6). The server's intIn clamp keeps version-1 clients valid.
+const PERF_REPORT_SCHEMA_VERSION = 2;
 
 const FIRST_REPORT_MS = 75_000;
 const REPEAT_REPORT_MS = 5 * 60_000;
@@ -21,6 +27,10 @@ export interface PerfReporterOptions {
   settings: Settings;
   tokenProvider: () => string | null;
   characterIdProvider: () => number | null;
+  // Zone identity plus the sim entity count for gameplay sessions (rulings R3,
+  // R4); null (or absent, for benchmark harness callers) leaves the payload on
+  // the legacy gameplay label with null crowd numerators.
+  worldTelemetryProvider?: () => WorldTelemetry | null;
 }
 
 export type PerfReporterSkipReason = 'disabled' | 'hidden' | 'not-ready' | 'no-renderer';
@@ -224,6 +234,7 @@ function payloadFromSnapshot(
   settings: Settings,
   sessionId: string,
   characterId: number | null,
+  worldTelemetry: WorldTelemetry | null = null,
 ): Record<string, unknown> | null {
   const renderer = snapshot.renderer;
   if (!renderer) return null;
@@ -233,8 +244,19 @@ function payloadFromSnapshot(
   const viewportWidth = Math.max(1, Math.round(window.innerWidth));
   const viewportHeight = Math.max(1, Math.round(window.innerHeight));
   const scenario = scenarioFromUrl();
+  // The benchmark ?perfScenario label keeps priority; gameplay sessions carry
+  // the instance-aware zone id from the provider (rulings R3, R4).
+  const zoneOrScenario =
+    scenario.source === 'benchmark'
+      ? scenario.zoneOrScenario
+      : (worldTelemetry?.zoneId ?? scenario.zoneOrScenario);
+  // Crowd is bucketed on the renderer's activeViews (draw-band scoped, ruling
+  // R3); the raw counts ship beside it. lastFrame is null-guarded: the first
+  // report can land before a rendered frame.
+  const activeViews = renderer.lastFrame?.activeViews ?? null;
+  const visibleViews = renderer.lastFrame?.visibleViews ?? null;
   return {
-    schemaVersion: 1,
+    schemaVersion: PERF_REPORT_SCHEMA_VERSION,
     releaseVersion: __APP_VERSION__,
     buildId: __APP_BUILD_ID__,
     sessionId,
@@ -272,7 +294,12 @@ function payloadFromSnapshot(
     glRenderer: renderer.glRenderer,
     glRendererBucket: gpuBucket(renderer.glRenderer),
     source: scenario.source,
-    zoneOrScenario: scenario.zoneOrScenario,
+    zoneOrScenario,
+    simEntities: worldTelemetry?.simEntities ?? null,
+    activeViews,
+    visibleViews,
+    crowdBucket: crowdBucketLabel(activeViews),
+    worst10sFrameP95Ms: snapshot.windows.worst10s?.frameMs.p95 ?? null,
     rawSummary: {
       graphicsConfigVersion: renderer.graphicsConfigVersion,
       seconds: snapshot.seconds,
@@ -353,6 +380,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       options.settings,
       sessionId,
       options.characterIdProvider(),
+      options.worldTelemetryProvider?.() ?? null,
     );
     if (!body) {
       skip('no-renderer', sendOptions.final ? null : REPEAT_REPORT_MS);
@@ -399,6 +427,10 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
         status.successCount++;
         status.lastSuccessAt = Date.now();
         status.lastError = null;
+        // Worst-per-report-interval semantics (ruling R5): the retained worst
+        // 10 s window resets only once its report is stored, so a failed post
+        // carries the storm into the retry instead of losing it.
+        options.perf.drainWorstWindow();
         devTraceLog(status, 'debug', `posted ${status.lastBodyBytes} bytes`);
       })
       .catch((err: unknown) => {
@@ -451,4 +483,5 @@ export const perfReporterInternalsForTest = {
   gpuBucket,
   viewportBucket,
   payloadFromSnapshot,
+  PERF_REPORT_SCHEMA_VERSION,
 };

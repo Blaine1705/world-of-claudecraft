@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import type { PerfSnapshot } from '../src/game/perf';
-import { perfReporterInternalsForTest } from '../src/game/perf_reporter';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
+import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/perf_reporter';
 import { Settings } from '../src/game/settings';
 
 function installBrowserGlobals(): void {
@@ -214,6 +214,7 @@ function snapshot(): PerfSnapshot {
         fps: 60,
         frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
       },
+      worst10s: null,
     },
     mainMs: { renderer: { count: 1, avg: 5, p95: 5, max: 5 } },
     renderer: {
@@ -597,6 +598,169 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererDiagnostics?: { enabled?: boolean } }).rendererDiagnostics
         ?.enabled,
     ).toBe(false);
+  });
+});
+
+describe('perf reporter report dimensions', () => {
+  const { payloadFromSnapshot } = perfReporterInternalsForTest;
+
+  // Only activeViews/visibleViews are read from the renderer frame by the
+  // payload path; the rest of the large frame record is irrelevant here.
+  function lastFrameWith(
+    activeViews: number,
+    visibleViews: number,
+  ): NonNullable<PerfSnapshot['renderer']>['lastFrame'] {
+    return { activeViews, visibleViews } as unknown as NonNullable<
+      PerfSnapshot['renderer']
+    >['lastFrame'];
+  }
+
+  it('emits the provider zone id as zoneOrScenario for gameplay sessions', () => {
+    (globalThis as any).location = { search: '' };
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, {
+      zoneId: 'dungeon:hollow_crypt',
+      simEntities: 33,
+    })!;
+    expect(body.source).toBe('gameplay');
+    expect(body.zoneOrScenario).toBe('dungeon:hollow_crypt');
+    expect(body.simEntities).toBe(33);
+  });
+
+  it('keeps the benchmark perfScenario priority over the provider zone', () => {
+    // installBrowserGlobals sets ?perfScenario=bench_dense_foliage.
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, {
+      zoneId: 'eastbrook_vale',
+      simEntities: 33,
+    })!;
+    expect(body.source).toBe('benchmark');
+    expect(body.zoneOrScenario).toBe('bench_dense_foliage');
+  });
+
+  it('falls back to the gameplay label when the provider is absent or returns null', () => {
+    (globalThis as any).location = { search: '' };
+    const withoutProvider = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(withoutProvider.zoneOrScenario).toBe('gameplay');
+    expect(withoutProvider.simEntities).toBeNull();
+    const nullProvider = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, null)!;
+    expect(nullProvider.zoneOrScenario).toBe('gameplay');
+    expect(nullProvider.simEntities).toBeNull();
+  });
+
+  it('emits the crowd bucket and raw view counts from the renderer frame', () => {
+    const snap = snapshot();
+    snap.renderer!.lastFrame = lastFrameWith(57, 31);
+    const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
+    expect(body.activeViews).toBe(57);
+    expect(body.visibleViews).toBe(31);
+    expect(body.crowdBucket).toBe('50-99');
+  });
+
+  it('null-guards a missing renderer frame into unknown crowd and null views', () => {
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(body.activeViews).toBeNull();
+    expect(body.visibleViews).toBeNull();
+    expect(body.crowdBucket).toBe('unknown');
+  });
+
+  it('emits the worst-10s frame p95 from the retained window and null before one exists', () => {
+    const snap = snapshot();
+    snap.windows.worst10s = {
+      atMs: 60_000,
+      seconds: 10,
+      frames: 200,
+      fps: 20,
+      frameMs: { avg: 60, p50: 40, p95: 180.5, p99: 220, max: 260, long50: 80 },
+    };
+    const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
+    expect(body.worst10sFrameP95Ms).toBe(180.5);
+    const empty = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(empty.worst10sFrameP95Ms).toBeNull();
+  });
+
+  it('stamps schema version 2 on the payload', () => {
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(body.schemaVersion).toBe(2);
+  });
+});
+
+describe('perf reporter worst-window drain', () => {
+  function installReporterFlowGlobals(fetchImpl: unknown): void {
+    (globalThis as any).location = { search: '' };
+    (globalThis as any).window = {
+      innerWidth: 1440,
+      innerHeight: 900,
+      setTimeout: (fn: () => void, ms: number) => setTimeout(fn, ms),
+      clearTimeout: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    };
+    (globalThis as any).document = {
+      visibilityState: 'visible',
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    };
+    (globalThis as any).sessionStorage = {
+      getItem: () => null,
+      setItem: () => {},
+    };
+    (globalThis as any).fetch = fetchImpl;
+  }
+
+  function fakePerf(): { perf: PerfMonitor; drainWorstWindow: ReturnType<typeof vi.fn> } {
+    const drainWorstWindow = vi.fn();
+    const perf = { report: () => snapshot(), drainWorstWindow } as unknown as PerfMonitor;
+    return { perf, drainWorstWindow };
+  }
+
+  async function runFirstReport(fetchImpl: unknown): Promise<ReturnType<typeof vi.fn>> {
+    installReporterFlowGlobals(fetchImpl);
+    const { perf, drainWorstWindow } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      // The first automatic report fires at 75 s; flush the send's fetch
+      // promise chain before reading the drain spy.
+      await vi.advanceTimersByTimeAsync(75_000);
+      await Promise.resolve();
+      await Promise.resolve();
+    } finally {
+      stop();
+    }
+    return drainWorstWindow;
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (globalThis as any).fetch;
+    delete (globalThis as any).sessionStorage;
+    delete (globalThis as any).document;
+  });
+
+  it('drains the worst window exactly once after a successful send', async () => {
+    const drain = await runFirstReport(
+      vi.fn(async () => ({ ok: true, status: 204, text: async () => '' })),
+    );
+    expect(drain).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the worst window when the server rejects the report', async () => {
+    const drain = await runFirstReport(
+      vi.fn(async () => ({ ok: false, status: 500, text: async () => 'nope' })),
+    );
+    expect(drain).not.toHaveBeenCalled();
+  });
+
+  it('keeps the worst window when the send fails at the network layer', async () => {
+    const drain = await runFirstReport(vi.fn(async () => Promise.reject(new Error('offline'))));
+    expect(drain).not.toHaveBeenCalled();
   });
 });
 

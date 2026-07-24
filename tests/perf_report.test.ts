@@ -100,6 +100,11 @@ describe('perf report ingestion', () => {
           glRenderer: 'ANGLE (Apple, ANGLE Metal Renderer: Apple M2)',
           source: 'benchmark',
           zoneOrScenario: 'bench_town',
+          crowdBucket: '25-49',
+          simEntities: 240,
+          activeViews: 57,
+          visibleViews: 31,
+          worst10sFrameP95Ms: 180.5,
           rawSummary: { large: 'x'.repeat(18_000) },
         },
         { token: VALID_TOKEN },
@@ -111,7 +116,9 @@ describe('perf report ingestion', () => {
     expect(insertClientPerfReport).toHaveBeenCalledTimes(1);
     expect(insertClientPerfReport).toHaveBeenCalledWith(
       expect.objectContaining({
-        schemaVersion: 1,
+        // 99 clamps to the current schema version (2 since the phase 03
+        // dimensions, ruling R6).
+        schemaVersion: 2,
         accountId: 10,
         characterId: 55,
         graphicsPreset: 'ultra',
@@ -120,8 +127,25 @@ describe('perf report ingestion', () => {
         browserFamily: 'safari',
         osFamily: 'macos',
         viewportBucket: 'large-1440x900',
+        crowdBucket: '25-49',
+        simEntities: 240,
+        activeViews: 57,
+        visibleViews: 31,
+        worst10sFrameP95Ms: 180.5,
         rawSummary: { truncated: true },
       }),
+    );
+  });
+
+  it('keeps old schema-version-1 clients valid through the intIn clamp', async () => {
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq({ sessionId: 'v1-client', schemaVersion: 1, rawSummary: {} }),
+      res,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ schemaVersion: 1 }),
     );
   });
 
@@ -147,6 +171,137 @@ describe('perf report ingestion', () => {
         accountId: null,
         characterId: null,
       }),
+    );
+  });
+
+  it('mirrors the client crowd label catalog exactly', async () => {
+    // server/ cannot import src/game (the R14-style parity pattern): the
+    // sanitizer keeps a deliberate copy of the label list, and this
+    // cross-boundary pin is the drift guard.
+    const { CROWD_BUCKET_LABELS } = await import('../src/game/crowd_bucket');
+    expect([...perfReportInternalsForTest.CROWD_BUCKET_LABELS]).toEqual([...CROWD_BUCKET_LABELS]);
+  });
+
+  it('keeps the client and server schema versions in lockstep', async () => {
+    // Same deliberate-copy pattern as the crowd labels: the server clamp
+    // ceiling must track the version the client stamps, or new-client rows
+    // would silently clamp down and dashboards would mis-segment them.
+    const { perfReporterInternalsForTest } = await import('../src/game/perf_reporter');
+    expect(perfReportInternalsForTest.PERF_REPORT_SCHEMA_VERSION).toBe(
+      perfReporterInternalsForTest.PERF_REPORT_SCHEMA_VERSION,
+    );
+    expect(perfReportInternalsForTest.PERF_REPORT_SCHEMA_VERSION).toBe(2);
+  });
+
+  it('accepts every fixed crowd label and folds hostile crowd input to unknown', async () => {
+    for (const label of perfReportInternalsForTest.CROWD_BUCKET_LABELS) {
+      vi.mocked(insertClientPerfReport).mockClear();
+      await handlePerfReport(
+        fakeReq(
+          { sessionId: `crowd-${label}`, crowdBucket: label, rawSummary: {} },
+          { remoteAddress: '203.0.113.61' },
+        ),
+        fakeRes(),
+      );
+      expect(insertClientPerfReport).toHaveBeenCalledWith(
+        expect.objectContaining({ crowdBucket: label }),
+      );
+    }
+    for (const hostile of ['lt10; DROP TABLE accounts', '100PLUS', 42, { label: 'lt10' }, null]) {
+      vi.mocked(insertClientPerfReport).mockClear();
+      await handlePerfReport(
+        fakeReq(
+          { sessionId: `crowd-hostile-${String(hostile)}`, crowdBucket: hostile, rawSummary: {} },
+          { remoteAddress: '203.0.113.62' },
+        ),
+        fakeRes(),
+      );
+      expect(insertClientPerfReport).toHaveBeenCalledWith(
+        expect.objectContaining({ crowdBucket: 'unknown' }),
+      );
+    }
+  });
+
+  it('clamps the crowd numerators and the worst-10s p95 against hostile numbers', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'hostile-numbers',
+          simEntities: -5,
+          activeViews: 9e9,
+          visibleViews: 'not-a-number',
+          worst10sFrameP95Ms: -3,
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.63' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        simEntities: 0,
+        activeViews: 100_000,
+        visibleViews: 0,
+        worst10sFrameP95Ms: 0,
+      }),
+    );
+
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'hostile-numbers-2',
+          simEntities: 33.9,
+          activeViews: Number.NaN,
+          visibleViews: 31,
+          worst10sFrameP95Ms: 1e9,
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.64' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        simEntities: 33,
+        activeViews: 0,
+        visibleViews: 31,
+        worst10sFrameP95Ms: 1000,
+      }),
+    );
+  });
+
+  it('defaults the five dimension fields when an old client omits them', async () => {
+    await handlePerfReport(
+      fakeReq({ sessionId: 'old-client', rawSummary: {} }, { remoteAddress: '203.0.113.65' }),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        crowdBucket: 'unknown',
+        simEntities: 0,
+        activeViews: 0,
+        visibleViews: 0,
+        worst10sFrameP95Ms: 0,
+      }),
+    );
+  });
+
+  it('passes a provider zone id through the zone sanitizer for gameplay reports', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'zone-flow',
+          source: 'gameplay',
+          zoneOrScenario: 'dungeon:hollow_crypt',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.66' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ source: 'gameplay', zoneOrScenario: 'dungeon:hollow_crypt' }),
     );
   });
 
