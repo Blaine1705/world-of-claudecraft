@@ -3631,7 +3631,8 @@ export type SimEvent = { pid?: number } & (
         | 'combo_requirement_unmet'
         | 'recipe_not_learned'
         | 'throttled'
-        | 'station_required';
+        | 'station_required'
+        | 'no_bag_space';
     }
   // Enchanting profession outcomes (Professions 2.0): mirror
   // src/sim/professions/enchanting.ts DisenchantResult / ApplyEnchantResult and
@@ -3653,7 +3654,7 @@ export type SimEvent = { pid?: number } & (
       count?: number;
       secondaryItemId?: string;
       secondaryCount?: number;
-      reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled';
+      reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
     }
   | {
       type: 'enchantResult';
@@ -3666,7 +3667,8 @@ export type SimEvent = { pid?: number } & (
         | 'wrong_slot'
         | 'not_held'
         | 'insufficient_materials'
-        | 'throttled';
+        | 'throttled'
+        | 'no_bag_space';
     }
   | {
       type: 'salvageResult';
@@ -3674,7 +3676,7 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       materialItemId?: string;
       count?: number;
-      reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled';
+      reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space';
     }
   // Recipe-training outcome (Professions 2.0): mirrors
   // professions/training.ts TrainResult so the online client can reflect the
@@ -3713,6 +3715,7 @@ export type SimEvent = { pid?: number } & (
         | 'unbind_not_eligible'
         | 'unbind_not_bound'
         | 'unbind_out_of_range'
+        | 'unbind_no_space'
         | 'unbind_cannot_afford';
       fee: number;
     }

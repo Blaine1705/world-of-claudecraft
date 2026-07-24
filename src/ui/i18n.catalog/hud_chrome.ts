@@ -2573,6 +2573,9 @@ export const hudChromeStrings = {
     throttled: 'You are crafting too quickly. Wait a moment and try again.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
+    // #2350: denied because the output cannot fit the bags, even after the
+    // reagents are consumed.
+    noBagSpace: 'You do not have room for the crafted item.',
     // Professions 2.0: crafting window legibility (skill requirement
     // line, skill-gain difficulty labels, hub-station badge) plus the
     // masterwork and tier-up celebration copy. Masterwork is a proc with
@@ -2670,6 +2673,12 @@ export const hudChromeStrings = {
     enchantWrongSlot: 'That enchant cannot be applied to that item.',
     enchantUnknown: 'That enchant does not exist.',
     enchantInsufficient: 'You do not have the materials for that enchant.',
+    // #2350 capacity denials: each names ITS OWN action (the throttled-key
+    // rule above), fired when the yields cannot fit the bags even after the
+    // consumed copy and reagents are accounted for.
+    disenchantNoSpace: 'You do not have room for the arcane materials.',
+    salvageNoSpace: 'You do not have room for the salvaged materials.',
+    enchantNoSpace: 'You do not have room for the enchanted item.',
     disenchantConfirmTitle: 'Disenchant {item}?',
     disenchantConfirmBody:
       'This destroys {item} and yields arcane materials. This cannot be undone.',
@@ -2747,6 +2756,9 @@ export const hudChromeStrings = {
     notBound: 'That item is not bound.',
     cannotAfford: 'You cannot afford the unbinding fee.',
     outOfRange: 'You must be at a crafting station to unbind.',
+    // #2350: unbinding one copy out of a bound stack needs room for the
+    // unbound copy it peels off.
+    noSpace: 'You do not have room for the unbound copy.',
   },
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,

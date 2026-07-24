@@ -10,6 +10,10 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -36,9 +40,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "es_ES": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -65,9 +74,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "fr_FR": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -94,9 +108,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "fr_CA": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -123,10 +142,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -153,9 +177,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "de_DE": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -182,13 +211,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -215,10 +249,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -245,9 +284,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "nl_NL": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -274,9 +318,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "pl_PL": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -303,9 +352,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "id_ID": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -332,9 +386,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "tr_TR": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -361,9 +420,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "sv_SE": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -390,9 +454,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "vi_VN": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -419,9 +488,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ],
   "da_DK": [
+    "hudChrome.crafting.noBagSpace",
+    "hudChrome.enchanting.disenchantNoSpace",
+    "hudChrome.enchanting.enchantNoSpace",
+    "hudChrome.enchanting.salvageNoSpace",
     "hudChrome.gathering.noNodeNearby.herbalism",
     "hudChrome.gathering.noNodeNearby.logging",
     "hudChrome.gathering.noNodeNearby.mining",
@@ -448,6 +522,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
-    "hudChrome.training.statePending"
+    "hudChrome.training.statePending",
+    "hudChrome.unbind.noSpace"
   ]
 };
