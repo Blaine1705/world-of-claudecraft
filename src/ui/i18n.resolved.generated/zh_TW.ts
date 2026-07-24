@@ -5571,6 +5571,7 @@ export const zh_TW: EnTranslations = {
     "connectionRejected": "伺服器已關閉連線。",
     "realmFull": "這個世界目前已滿，請於幾分鐘後再試。",
     "tooManyConnections": "您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。",
+    "messageRateExceeded": "由於發送操作過快，您已中斷連線。請稍候片刻後重新登入。",
     "tips": {
       "classes": "提示：9 個職業玩法各不相同，投入之前不妨都試一試。",
       "talents": "提示：只要不在戰鬥中，隨時都能重置天賦，因此早期的選擇不會成為陷阱。",

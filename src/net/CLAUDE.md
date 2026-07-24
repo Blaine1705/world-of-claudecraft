@@ -138,6 +138,11 @@ failure, kept as stable English that `main.ts` re-localizes.
   `'Connection to the server was lost.'` (retries exhausted) and `'rejected by server'`
   (the `error`-frame fallback), flow through `onDisconnect(reason)` and map in
   `userFacingApiError` to `t('loading.connectionLost')`/`t('loading.connectionRejected')`.
+  The server's flood-kick reason `'message rate exceeded'` (`MSG_RATE_KICK_REASON` in
+  `server/msg_rate_limit.ts`) rides the same `error`-frame path verbatim and maps to
+  `t('loading.messageRateExceeded')`; it is deliberately session-fatal (no
+  `reconnect_policy.ts` transient arm: an immediately reconnecting flooder re-floods), and
+  its server-to-matcher lockstep is source-pinned by `tests/localization_fixes.test.ts`.
   Keep these literals byte-identical here AND in those match arms in the SAME change (the
   compare is on the lowercased raw literal, not the rendered `t()` value).
 - Server `error`-frame text (`msg.error`) and REST `data.error` pass through verbatim and

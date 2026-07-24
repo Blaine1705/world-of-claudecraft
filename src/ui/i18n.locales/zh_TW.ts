@@ -1423,6 +1423,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.realmFull': '這個世界目前已滿，請於幾分鐘後再試。',
   'loading.tooManyConnections':
     '您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。',
+  'loading.messageRateExceeded': '由於發送操作過快，您已中斷連線。請稍候片刻後重新登入。',
   'errors.nothingInteract': '附近沒有可互動目標。',
   'errors.noEnemyNearby': '附近沒有敵人。',
   'errors.characterNameRequired': '請輸入角色名稱。',

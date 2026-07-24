@@ -58,6 +58,16 @@ export const MSG_ABUSE_WINDOW_SECONDS = 10; // sliding window the kick verdict l
 export const MSG_ABUSE_KICK_SECONDS = 5; // abusive seconds within the window that kick
 export const MSG_ABUSE_SECOND_DROP_FLOOR = 30; // drops within one second that mark it abusive
 
+// Kick reason (R10): the exact { t: 'error', error } text both limiter kick
+// arms in server/game.ts send before closing the socket. Byte-exact wire
+// contract in the server/ws_auth.ts style: the client matcher
+// (userFacingApiError in src/ui/api_error_i18n.ts) re-localizes exactly these
+// bytes, and the lockstep is source-pinned by tests/localization_fixes.test.ts.
+// Deliberately session-fatal on the client (no transient-rejection arm: an
+// immediately reconnecting flooder re-floods). The anti-bot kick keeps the
+// vaguer 'rejected by server' on purpose; vagueness toward bots is a feature.
+export const MSG_RATE_KICK_REASON = 'message rate exceeded';
+
 // Seq-gap sanity cap (R9): a parsed input frame whose seq jumps past
 // lastInputSeq + 1 on the ordered socket proves the missing seqs were sent and
 // never processed, and the gap feeds the woc_input_frames_missed_total counter.

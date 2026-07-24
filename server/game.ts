@@ -187,6 +187,7 @@ import {
 import {
   consumeInboundFrame,
   createMsgRateBucket,
+  MSG_RATE_KICK_REASON,
   MSG_SEQ_GAP_SANITY,
   type MsgRateBucketState,
   tallyDrop,
@@ -3871,7 +3872,7 @@ export class GameServer {
       gameMetricsCounters().wsMessageDropped(gate.cause);
       if (gate.verdict === 'kick') {
         gameMetricsCounters().wsRateKick();
-        void this.kickSession(session, 'rejected by server', 'moderation action');
+        void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
       }
       return;
     }
@@ -3911,7 +3912,7 @@ export class GameServer {
     gameMetricsCounters().wsMessageDropped(LANE_DROP_CAUSE[lane]);
     if (tallyDrop(session.msgRate, nowSec) === 'kick') {
       gameMetricsCounters().wsRateKick();
-      void this.kickSession(session, 'rejected by server', 'moderation action');
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
     }
     return false;
   }

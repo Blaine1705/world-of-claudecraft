@@ -7065,6 +7065,7 @@ export type TranslationKeyFlat =
   | 'loading.connectionRejected'
   | 'loading.enterTimeout'
   | 'loading.enteringWorld'
+  | 'loading.messageRateExceeded'
   | 'loading.realmFull'
   | 'loading.reconnectingAttempt'
   | 'loading.reconnectingNow'

@@ -41,7 +41,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "es_ES": [
     "hudChrome.crafting.noBagSpace",
@@ -75,7 +76,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "fr_FR": [
     "hudChrome.crafting.noBagSpace",
@@ -109,7 +111,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "fr_CA": [
     "hudChrome.crafting.noBagSpace",
@@ -143,7 +146,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "en_CA": [],
   "it_IT": [
@@ -178,7 +182,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "de_DE": [
     "hudChrome.crafting.noBagSpace",
@@ -212,7 +217,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -250,7 +256,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -285,7 +292,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "nl_NL": [
     "hudChrome.crafting.noBagSpace",
@@ -319,7 +327,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "pl_PL": [
     "hudChrome.crafting.noBagSpace",
@@ -353,7 +362,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "id_ID": [
     "hudChrome.crafting.noBagSpace",
@@ -387,7 +397,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "tr_TR": [
     "hudChrome.crafting.noBagSpace",
@@ -421,7 +432,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "sv_SE": [
     "hudChrome.crafting.noBagSpace",
@@ -455,7 +467,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "vi_VN": [
     "hudChrome.crafting.noBagSpace",
@@ -489,7 +502,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ],
   "da_DK": [
     "hudChrome.crafting.noBagSpace",
@@ -523,6 +537,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "loading.messageRateExceeded"
   ]
 };

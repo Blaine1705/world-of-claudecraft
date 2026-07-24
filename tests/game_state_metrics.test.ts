@@ -538,7 +538,7 @@ describe('inbound drop, kick, and seq-gap counters at their emission sites', () 
     expect(rec.dropped.every((cause) => cause === 'rate')).toBe(true);
     expect(session.left).toBe(true);
     expect(server.clients.has(session.pid)).toBe(false);
-    expect(fc.sent).toContain(JSON.stringify({ t: 'error', error: 'rejected by server' }));
+    expect(fc.sent).toContain(JSON.stringify({ t: 'error', error: 'message rate exceeded' }));
     expect(fc.closed()).toBe(true);
     server.stop();
   });

@@ -516,7 +516,7 @@ describe('dispatchMessage lane wiring at the R5 placements', () => {
     expect(session.left).toBe(true);
     expect(server.clients.has(session.pid)).toBe(false);
     expect(ws.send).toHaveBeenCalledWith(
-      JSON.stringify({ t: 'error', error: 'rejected by server' }),
+      JSON.stringify({ t: 'error', error: 'message rate exceeded' }),
     );
     expect(ws.close).toHaveBeenCalled();
   });
@@ -543,7 +543,7 @@ describe('dispatchMessage lane wiring at the R5 placements', () => {
     expect(session.left).toBe(true);
     expect(server.clients.has(session.pid)).toBe(false);
     expect(ws.send).toHaveBeenCalledWith(
-      JSON.stringify({ t: 'error', error: 'rejected by server' }),
+      JSON.stringify({ t: 'error', error: 'message rate exceeded' }),
     );
     expect(ws.close).toHaveBeenCalled();
   });
