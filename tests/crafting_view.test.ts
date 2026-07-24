@@ -455,6 +455,20 @@ describe('buildCraftingView difficulty and skillReq', () => {
     expect(difficultyFor(24, { cooking: 300 })).toBe('none');
   });
 
+  it('at the craft content cap the label is none regardless of band (the learning-XP arm)', () => {
+    // The four-state curve alone can never reach gray for skillReq 75+
+    // (that needs capability past the 125 cap), so without the cap arm a
+    // maxed craft would read minimal, or even full for a tier-6 recipe,
+    // forever while the applied gain and the character-XP grant are zero.
+    expect(difficultyFor(75, { cooking: 125 })).toBe('none'); // was 'minimal'
+    expect(difficultyFor(150, { cooking: 125 })).toBe('none'); // was 'full'
+    // Just under the cap the recipe still teaches, so the band still shows
+    // (124.5 is tier 4: tier 5 begins exactly at the 125 cap, which is why
+    // a tier-3 recipe's minimal state only ever existed at the cap itself).
+    expect(difficultyFor(150, { cooking: 124.5 })).toBe('full');
+    expect(difficultyFor(75, { cooking: 124.5 })).toBe('reduced');
+  });
+
   it('pins the multiplier constants and their four-state difficulty mapping', () => {
     // Constant identity: the view compares against the SAME exported wheel.ts
     // constants the sim gain site consumes, so a curve retune moves the label
