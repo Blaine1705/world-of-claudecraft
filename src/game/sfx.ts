@@ -17,6 +17,7 @@ import {
   buildSoftChain,
   MOTIF_SAMPLE,
   RELEASE_FAMILY,
+  SPIRIT_GROWLERS,
   SPIRIT_VOICE,
 } from './ability_sfx_samples';
 import {
@@ -1229,8 +1230,22 @@ class Sfx {
    *  stay forward (gallery spirit / SPIRIT_VOICE). */
   private spiritMoment(out: GainNode, t: number, model: string): void {
     if (!model) return;
+    // The 'stag' pack take reads as a farm-animal moo - wrong for the ghostly
+    // deer of Mark of the Wild and the nature forms. Chime a gentle nature
+    // blessing instead of the bovine sample (owner druid review); no new
+    // recording, and it plays even before the pack loads.
+    if (model === 'stag') {
+      this.abilityHeal(out, t, 'nature');
+      return;
+    }
     const [vol, soft] = SPIRIT_VOICE[model] ?? [0.8, false];
-    this.samplePlay(out, t, `spirit_${model}`, { gain: vol, soft });
+    // four-legged growlers gain a chest-cavity octave double so the beast
+    // reads animalistic, not a thin bark
+    this.samplePlay(out, t, `spirit_${model}`, {
+      gain: vol,
+      soft,
+      subOct: SPIRIT_GROWLERS.has(model),
+    });
   }
 
   /** Set-piece motif foley at the motif anchor (gallery motif). Sampled only;

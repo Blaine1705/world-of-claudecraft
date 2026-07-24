@@ -46,14 +46,24 @@ export const MOTIF_SAMPLE: Readonly<Record<string, string>> = {
 
 /** Spirit-call mix per creature model: [gain, soft]. The screechers sit back
  *  in the mix behind a top-shave lowpass; the growlers stay forward (gallery
- *  SPIRIT_VOICE). Models without an entry play forward at 0.8. */
+ *  SPIRIT_VOICE). Models without an entry play forward at 0.8. The four-legged
+ *  growlers sit forward and a touch hotter so the beast reads animalistic
+ *  (the audio engine also doubles them an octave down for chest body). */
 export const SPIRIT_VOICE: Readonly<Record<string, readonly [number, boolean]>> = {
   raptor: [0.5, true],
   hawk: [0.45, true],
   fox: [0.45, true],
   ghost: [0.55, true],
   sheep: [0.7, false],
+  bear: [0.9, false],
+  wolf: [0.85, false],
+  bull: [0.9, false],
 };
+
+/** Models whose growl earns a chest-cavity octave-down double so the beast
+ *  reads as a real animal, not a thin sampled bark (owner druid review:
+ *  bear_form / feral_charge / tigers_fury wanted a beastlier voice). */
+export const SPIRIT_GROWLERS: ReadonlySet<string> = new Set(['bear', 'wolf', 'bull']);
 
 /** Per-take peak normalization at decode (gallery loadPack): pull every take
  *  to a consistent 0.8 peak so the category mix stays predictable, capped so
