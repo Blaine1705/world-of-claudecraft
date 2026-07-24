@@ -1002,7 +1002,7 @@ describe('delta snapshots', () => {
   });
 
   it('instance payloads (masterwork and legacy quality) ride the inv snapshot verbatim', () => {
-    // Phase 2 back-compat over the wire: the server sends the live
+    // Back-compat over the wire: the server sends the live
     // meta.inventory wholesale, so a masterwork copy's full payload (signer,
     // enchant marker, rolled.masterwork plus baked stats) and a legacy copy's
     // rolled.quality must both arrive on the client mirror byte-identical.
@@ -1030,6 +1030,29 @@ describe('delta snapshots', () => {
       client.inventory.find((s) => s.itemId === 'eastbrook_ritual_vestments')?.instance,
     ).toEqual(masterwork);
     expect(client.inventory.find((s) => s.itemId === 'apprentice_staff')?.instance).toEqual(legacy);
+  });
+
+  it('a counted identical-payload stack rides the inv snapshot as one slot', () => {
+    // Three byte-equal signed grants merge server-side into a single count-3
+    // slot; the wire sends the inventory wholesale, so the client mirror must
+    // show the same one slot with the count AND the payload intact (a mirror
+    // that re-split or dropped either would red here).
+    const signed = { signer: 'Testa' };
+    for (let i = 0; i < 3; i++) server.sim.addItemInstance('wolf_fang', signed, session.pid);
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    const wireSlots = snap.self.inv.filter((s: any) => s.itemId === 'wolf_fang');
+    expect(wireSlots).toHaveLength(1);
+    expect(wireSlots[0].count).toBe(3);
+    expect(wireSlots[0].instance).toEqual(signed);
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    const mirrored = client.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(mirrored).toHaveLength(1);
+    expect(mirrored[0].count).toBe(3);
+    expect(mirrored[0].instance).toEqual(signed);
   });
 
   it('mirrors vendor buyback deltas to the client', () => {
@@ -2598,7 +2621,7 @@ describe('weapon skin wire (weaponSkinId)', () => {
 });
 
 // Worn per-slot instance payloads ride the identity wire (terse key `eqi`,
-// Professions 2.0 Phase 6) so the inspect window shows another player's
+// Professions 2.0) so the inspect window shows another player's
 // masterwork/enchant rolls. Sparse exactly like `eq`: players only, present
 // only while at least one worn piece carries a payload, absent otherwise (the
 // no-bloat tooth: an instance-less player's identity record is byte-unchanged).
@@ -2639,18 +2662,20 @@ describe('equipped instance wire (eqi)', () => {
         rolled: { masterwork: true, stats: { int: 3 } },
         boundTo: pid,
         charges: { mend: 2 },
+        bindOnTrade: true,
       },
       pid,
     );
     sim.equipItem('eastbrook_ritual_vestments', pid);
     const wired = wireEntity(e).eqi as Record<string, Record<string, unknown>>;
     // Only the cosmetic inspect fields (signer, enchant, rolled) leave the
-    // server; boundTo and charges are gameplay state no inspecting client
-    // needs and must never ride the identity wire.
+    // server; boundTo, charges, and the bindOnTrade arm are gameplay
+    // state no inspecting client needs and must never ride the identity wire.
     expect(wired.chest.signer).toBe('Aldric');
     expect(wired.chest.rolled).toEqual({ masterwork: true, stats: { int: 3 } });
     expect(wired.chest.boundTo).toBeUndefined();
     expect(wired.chest.charges).toBeUndefined();
+    expect(wired.chest.bindOnTrade).toBeUndefined();
     expect(Object.keys(wired.chest).sort()).toEqual(['rolled', 'signer']);
   });
 
@@ -3027,7 +3052,7 @@ describe('online mount command and race-event transport', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 55 delta keys, sorted. Cross-checked below against the
+// The pinned set of delta keys, sorted. Cross-checked below against the
 // live `maybe(...)` (and `maybeRaw(...)`) calls scraped from server/game.ts
 // source, so any unregistered delta key reddens this gate. All but two ride
 // via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
@@ -3036,6 +3061,7 @@ describe('online mount command and race-event transport', () => {
 // release's realm-readout keys and the procedural-dungeon branch's rift delta keys.
 const ALL_DELTA_KEYS = [
   'achg',
+  'achr',
   'arena',
   'atitle',
   'bags',
@@ -3051,6 +3077,7 @@ const ALL_DELTA_KEYS = [
   'dcompanion',
   'deeds',
   'delveDaily',
+  'denc',
   'df',
   'dfb',
   'dmarks',
@@ -3058,8 +3085,10 @@ const ALL_DELTA_KEYS = [
   'dstats',
   'duel',
   'einst',
+  'ench',
   'equip',
   'gprof',
+  'hbl',
   'honor',
   'inv',
   'lhonor',
@@ -3083,6 +3112,7 @@ const ALL_DELTA_KEYS = [
   'qdone',
   'qlog',
   'renown',
+  'salv',
   'sport',
   'stats',
   'tal',
@@ -3117,6 +3147,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
   deeds: 'deedsEarned',
+  denc: 'lastDisenchantResult',
   df: 'dungeonFinderInfo',
   dfb: 'dungeonFinderBoard',
   dmarks: 'delveMarks',
@@ -3124,6 +3155,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dstats: 'deedStats',
   duel: 'duelInfo',
   einst: 'equipmentInstances',
+  ench: 'lastEnchantResult',
   equip: 'equipment',
   gprof: 'gatheringProficiency',
   inv: 'inventory',
@@ -3152,6 +3184,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   res: 'resource',
   rtype: 'resourceType',
   rxp: 'restedXp',
+  salv: 'lastSalvageResult',
   sport: 'sportRole',
   tfocus: 'townFocus',
 };
@@ -3256,7 +3289,7 @@ function dirtyEveryDeltaField(): {
     switchCount: 2,
     amendsProgress: 4,
   };
-  // An ACTIVE mobile crafting station (Phase 8, `mst`): set directly on the
+  // An ACTIVE mobile crafting station (`mst`): set directly on the
   // meta slot (the placement command's specialization gate is pinned in
   // tests/professions_crafting_hub.test.ts; this suite pins the WIRE mirror),
   // far from expiry so the server-side liveness check reads it active.
@@ -3315,6 +3348,12 @@ function dirtyEveryDeltaField(): {
     weaponSkinIds: [],
     weaponSkinLoadout: {},
   };
+  // Session-scoped stored action-bar layout (`hbl`, self-only): set the frozen
+  // join-time copy so the heavy self block wires it once.
+  leader.initialHotbarLayout = {
+    v: 1,
+    forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }], attack: null } },
+  };
 
   // Player Entity fields.
   p.cooldowns.set('heroic_strike', 5);
@@ -3350,6 +3389,33 @@ function dirtyEveryDeltaField(): {
     choices: new Map(),
   });
 
+  // Enchanting-action outcomes (Professions 2.0): poke the exact
+  // PlayerMeta fields the denc/ench/salv encoders read
+  // (lastDisenchantResultFor/lastEnchantResultFor/lastSalvageResultFor), each a
+  // distinguishable non-null value so the round-trip and first-snapshot pins are
+  // meaningful. The disenchant carries the typed bind-on-trade secondary; the
+  // enchant is a deny arm (reason survives).
+  meta.lastDisenchantResult = {
+    ok: true,
+    itemId: 'zealotsbane_blade',
+    materialItemId: 'arcane_essence',
+    count: 1,
+    secondaryItemId: 'wolf_fang',
+    secondaryCount: 1,
+  };
+  meta.lastEnchantResult = {
+    ok: false,
+    itemId: 'apprentice_staff',
+    enchantId: 'ench_test_flat_stamina',
+    reason: 'insufficient_materials',
+  };
+  meta.lastSalvageResult = {
+    ok: true,
+    itemId: 'zealotsbane_blade',
+    materialItemId: 'spider_leg',
+    count: 2,
+  };
+
   return { server, fc, leader, memberPid: mp };
 }
 
@@ -3369,11 +3435,14 @@ describe('full self-state snapshot delta fixture', () => {
       switchCount: 0,
       amendsProgress: 0,
     };
+    // Reagents for the warplate helm.
     meta.inventory = [
-      { itemId: 'bone_fragments', count: 4 },
-      { itemId: 'linen_scrap', count: 2 },
+      { itemId: 'arcanite_bar', count: 1 },
+      { itemId: 'thorium_ore', count: 5 },
+      { itemId: 'wolf_fang', count: 4 },
+      { itemId: 'smithing_flux', count: 2 },
     ];
-    // Phase 9 acquisition switch: combo recipes are trainer-taught now, so a
+    // Acquisition switch: combo recipes are trainer-taught now, so a
     // fresh test player must learn this one explicitly before crafting it.
     meta.knownRecipes.add('recipe_ironbound_warplate_helm');
 
@@ -3467,6 +3536,11 @@ describe('full self-state snapshot delta fixture', () => {
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
     expect(client.player.abilityCharges?.ice_block?.charges).toBe(1); // achg -> e.abilityCharges
+    // achr -> the same records' recharge timer (legacy wire: raw [remaining, length]);
+    // like vcup/vcupb it is hand-decoded inside the achg block, so it has no
+    // TERSE_TO_IWORLD rename entry.
+    expect(client.player.abilityCharges?.ice_block?.recharge).toBe(10);
+    expect(client.player.abilityCharges?.ice_block?.rechargeLength).toBe(240);
     expect(client.player.stats).toMatchObject({
       str: 12345,
       pvpOffense: 0.17,
@@ -3559,12 +3633,14 @@ describe('full self-state snapshot delta fixture', () => {
     // untouched node (never in the map) still reads ready.
     expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
     expect(client.nodeHarvestableByMe('not_a_real_node')).toBe(true);
+    // Re-pin: the enforced per-profession caps
+    // (mining/logging/herbalism 100, fishing 200) replace the old uniform 300.
     expect(client.professionsState).toEqual({
       skills: [
-        { professionId: 'mining', skill: 6, maxSkill: 300 },
-        { professionId: 'logging', skill: 0, maxSkill: 300 },
-        { professionId: 'herbalism', skill: 0, maxSkill: 300 },
-        { professionId: 'fishing', skill: 0, maxSkill: 300 },
+        { professionId: 'mining', skill: 6, maxSkill: 100 },
+        { professionId: 'logging', skill: 0, maxSkill: 100 },
+        { professionId: 'herbalism', skill: 0, maxSkill: 100 },
+        { professionId: 'fishing', skill: 0, maxSkill: 200 },
       ],
     }); // prof -> professionsState
     expect(client.craftingIdentity).toMatchObject({
@@ -3579,13 +3655,37 @@ describe('full self-state snapshot delta fixture', () => {
       amendsRequired: 11,
     }); // cprof -> craftingIdentity
     // The pair-named archetype title derives LIVE from the mirrored
-    // craftingIdentity (Professions 2.0 Phase 1): the canonical pair id, not a
+    // craftingIdentity (Professions 2.0): the canonical pair id, not a
     // craft id, and it must reflect the cprof delta just applied.
     expect(client.archetypeTitle).toBe('weaponcrafting+armorcrafting');
     expect(client.craftSkills).toMatchObject({ armorcrafting: 31, weaponcrafting: 29 });
     // mst -> activeMobileStationCraft: the server-computed ACTIVE craft id
     // (expiry resolved server-side against the sim's own tickCount).
     expect(client.activeMobileStationCraft).toBe('armorcrafting');
+    // denc/ench/salv -> lastDisenchantResult/lastEnchantResult/lastSalvageResult
+    // (Professions 2.0): the delta arm mirrors the exact stash. JSON drops
+    // undefined fields, so each decoded object carries no undefined keys; the
+    // disenchant secondary and the enchant deny reason both survive.
+    expect(client.lastDisenchantResult).toEqual({
+      ok: true,
+      itemId: 'zealotsbane_blade',
+      materialItemId: 'arcane_essence',
+      count: 1,
+      secondaryItemId: 'wolf_fang',
+      secondaryCount: 1,
+    });
+    expect(client.lastEnchantResult).toEqual({
+      ok: false,
+      itemId: 'apprentice_staff',
+      enchantId: 'ench_test_flat_stamina',
+      reason: 'insufficient_materials',
+    });
+    expect(client.lastSalvageResult).toEqual({
+      ok: true,
+      itemId: 'zealotsbane_blade',
+      materialItemId: 'spider_leg',
+      count: 2,
+    });
     expect(client.delveClears).toEqual({ 'collapsed_reliquary:heroic': 1 }); // dclears -> delveClears
     expect(client.delveDaily).toMatchObject({ markClears: 4 }); // delveDaily
     // deeds -> deedsEarned: the Map rebuilds from the plain wire object with
@@ -3606,6 +3706,16 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.talentSpec).toBe('arms');
     expect(client.loadouts).toEqual([{ name: 'PvP', alloc: { spec: 'arms', rows: {} }, bar: [] }]);
     expect(client.activeLoadout).toBe(0);
+    // hbl -> the login action-bar restore (self-only, resolved once on the first
+    // self payload). A stored server layout arrives as a 'server' win; like tal
+    // it is asserted directly (no TERSE_TO_IWORLD rename entry).
+    expect(client.takeActionBarLayoutRestore()).toEqual({
+      source: 'server',
+      layout: {
+        v: 1,
+        forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }], attack: null } },
+      },
+    });
 
     // vcup + vcupb -> cupInfo (merged from both fragments; neither key alone
     // equals the full CupInfo, so both are excluded from TERSE_TO_IWORLD and
@@ -3747,9 +3857,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 56 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(56);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(56);
+  it('ALL_DELTA_KEYS contains exactly 61 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(61);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(61);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3768,7 +3878,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(56); // 55 (v0.29 union) + 1: mntRtd (the purchased riding skill)
+    // The v0.30 base-merge union: the release's 55 plus the Rift + mounts and
+    // worn-instance keys (einst, mntRtd and the rift snapshot fragments).
+    expect(scraped.size).toBe(61);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4695,12 +4807,15 @@ describe('negotiated stable timer wire v2', () => {
     expect(first.self.auras[0]).not.toHaveProperty('rem');
     expect(first.self.cds.stable_cast).toBe(5);
     expect(first.self.achg.stable_cast).toBe(1);
+    expect(first.self.achr.stable_cast).toEqual([5, 5]);
     expect(first.self.ncd.stable_node).toBe(30);
 
     const client = bareClient(session.pid);
     (client as any).applySnapshot(first);
     expect(client.player.auras[0].remaining).toBe(10);
     expect(client.player.cooldowns.get('stable_cast')).toBe(5);
+    expect(client.player.abilityCharges?.stable_cast?.recharge).toBe(5);
+    expect(client.player.abilityCharges?.stable_cast?.rechargeLength).toBe(5);
     expect(client.nodeHarvestableByMe('stable_node')).toBe(false);
 
     fc.sent.length = 0;
@@ -4711,16 +4826,41 @@ describe('negotiated stable timer wire v2', () => {
     expect(later.self).not.toHaveProperty('auras');
     expect(later.self).not.toHaveProperty('cds');
     expect(later.self).not.toHaveProperty('achg');
+    expect(later.self).not.toHaveProperty('achr');
     expect(later.self).not.toHaveProperty('ncd');
 
     (client as any).applySnapshot(later);
     expect(client.player.auras[0].remaining).toBeCloseTo(9.75, 5);
     expect(client.player.cooldowns.get('stable_cast')).toBeCloseTo(4.75, 5);
+    // the retained achr deadline ages the recharge strip across omitted snapshots
+    expect(client.player.abilityCharges?.stable_cast?.recharge).toBeCloseTo(4.75, 5);
     expect(client.nodeHarvestableByMe('stable_node')).toBe(false);
+
+    // A Temporal Hourglass window re-ships achr every tick while the unchanged
+    // counts stay delta-omitted: the accelerated deadline must land even with
+    // NO achg in the snapshot (the decode is deliberately not gated on achg;
+    // a nested decode silently dropped these and froze the strip at 1x).
+    const accelerated = {
+      ...later,
+      tick: later.tick + 1,
+      time: later.time + 0.05,
+      self: { id: session.pid, achr: { stable_cast: [3, 5] } },
+    };
+    (client as any).applySnapshot(accelerated);
+    expect(client.player.abilityCharges?.stable_cast?.recharge).toBeCloseTo(
+      3 - accelerated.time,
+      5,
+    );
+    expect(client.player.abilityCharges?.stable_cast?.charges).toBe(1);
 
     player.auras.length = 0;
     player.cooldowns.clear();
     player.abilityCharges.stable_cast.charges = 2;
+    player.abilityCharges.stable_cast.recharge = 0;
+    // recharges[] mirrors the real refill invariant (auras.ts empties the
+    // per-charge timers when the pool fills); the encoder only reads
+    // `recharge`, but the fixture should never model a state the sim cannot be in.
+    player.abilityCharges.stable_cast.recharges = [];
     meta.nodeHarvestReadyAt.stable_node = server.sim.time - 1;
     fc.sent.length = 0;
     broadcast(server);
@@ -4728,12 +4868,14 @@ describe('negotiated stable timer wire v2', () => {
     expect(cleared.self.auras).toEqual([]);
     expect(cleared.self.cds).toEqual({});
     expect(cleared.self.achg).toEqual({ stable_cast: 2 });
+    expect(cleared.self.achr).toEqual({});
     expect(cleared.self.ncd).toEqual({});
 
     (client as any).applySnapshot(cleared);
     expect(client.player.auras).toEqual([]);
     expect(client.player.cooldowns.size).toBe(0);
     expect(client.player.abilityCharges?.stable_cast?.charges).toBe(2);
+    expect(client.player.abilityCharges?.stable_cast?.recharge).toBe(0);
     expect(client.nodeHarvestableByMe('stable_node')).toBe(true);
   });
 

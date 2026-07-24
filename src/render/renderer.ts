@@ -47,7 +47,22 @@ import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { buildArtisanRowProps } from './artisan_row_props';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
+import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
+import {
+  cancelCameraDirective,
+  createCameraDirector,
+  startDeathDrift,
+  startVista,
+  stepCameraDirector,
+} from './camera_director_core';
+import {
+  cameraFovOffset,
+  createCameraFeel,
+  punchCameraFov,
+  stepCameraFeel,
+  stepLandingDetector,
+} from './camera_feel_core';
 import {
   characterRecklessnessActive,
   characterSanguineAuraActive,
@@ -74,10 +89,10 @@ import {
   playerRangedAttackAlreadyStarted,
   playerRangedAttackStartsAtLaunch,
 } from './characters/skin_attack';
+import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
-import { buildCritters, type CritterField } from './critters';
 import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
 import { currentDayNightPhase, dayNightPhaseOverride } from './day_night_clock';
@@ -102,10 +117,12 @@ import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_po
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { objectDisplayName } from './entity_labels';
+import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
+import { FishingBobberVisual } from './fishing_bobber';
 import {
   buildFoliage,
   buildFoliageMaterialPrewarmGroup,
@@ -173,9 +190,11 @@ import {
 import { buildComposer, type PostPipeline } from './post';
 import { runBackgroundPrewarm } from './prewarm_pass';
 import {
+  constrainedEntryViewCreateBudget,
   orderedPrewarmIds,
   type PrewarmPolicy,
   prewarmEntryRuns,
+  remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
 } from './prewarm_policy';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
@@ -289,12 +308,12 @@ const VIEW_COMPILE_GATE_MAX_MS = 1500;
 const PREWARM_BUILD_RESERVE_MS = 3000;
 const VIEW_PREWARM_MAX_VIEWS_LOW = 48;
 const VIEW_PREWARM_MAX_VIEWS_HIGH = 72;
-// Constrained (phone WebKit): a hard cap on nearby character views built
-// SYNCHRONOUSLY at entry. A populated production hub has dozens of nearby players
-// and NPCs; building them all up front is a large skinned-mesh + bone-texture +
-// skin-upload spike that survives an empty local world but kills Medium in
-// production. The rest stream in lazily via the per-frame view-create budget.
-const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 12;
+// Constrained (phone WebKit): build only self plus one required/nearby view at
+// entry. Even when twelve views fit in memory and compile asynchronously, their
+// compile gates can resolve together and reveal the whole crowd on the first live
+// submit. The retained iPhone probe measured that burst at 1.17s. Remaining views
+// stream in through the post-entry one-per-frame budget instead.
+const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 2;
 const VIEW_CREATED_TYPE_SAMPLE_LIMIT = 24;
 const PERSISTENT_PORTAL_VIEW_PREWARM_LIMIT = 16;
 // rigs further than this stop casting articulated shadows (~7 draws each) and
@@ -398,18 +417,6 @@ const INFERNAL_RIM_BOOST = 2.15;
 // raw HDRI PMREMs integrate the real sun the dome shader clamps away —
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
-// Memory-ceiling profile: non-default biome env prefilters wait this long after the
-// synchronous scene build (plus a stagger between each) so they never stack onto the
-// world-entry allocation spike that gets phone WebKit's WebContent process killed.
-// 30s/10s (was 12s/4s): the earlier schedule dropped a mip-chained HalfFloat
-// cubemap build right into the first-half-minute window where a phone player is
-// still settling in (opening the More tray, first camera swings), stacking the
-// prefilter's transient GPU spike onto whatever the player just triggered while
-// the post-entry footprint is at its peak. 30s also clears the entry crash
-// guard's stable window, so a prefilter-coincident kill can never read as an
-// entry crash and cost a tier.
-const DEFERRED_ENV_PREFILTER_MS = 30000;
-const DEFERRED_ENV_PREFILTER_STAGGER_MS = 10000;
 const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
 // day/night: at night the key sun and sky bounce cool toward moonlight. These
 // are the fully-night blend weights (scaled each frame by the grade's nightAmt).
@@ -642,6 +649,7 @@ export interface RendererPrewarmStats {
   programsAfter: number;
   texturesBefore: number;
   texturesAfter: number;
+  textureUploads: number;
   compileMode: 'async' | 'sync' | 'none';
   compileMs: number;
   compileTimedOut: boolean;
@@ -805,7 +813,12 @@ function distSqXZ(a: Entity, b: Entity): number {
   return dx * dx + dz * dz;
 }
 
-function summarizeMs(values: number[]): { count: number; avg: number; p95: number; max: number } {
+function summarizeMs(values: number[]): {
+  count: number;
+  avg: number;
+  p95: number;
+  max: number;
+} {
   if (values.length === 0) return { count: 0, avg: 0, p95: 0, max: 0 };
   const sorted = [...values].sort((a, b) => a - b);
   const total = values.reduce((a, b) => a + b, 0);
@@ -819,7 +832,14 @@ function summarizeMs(values: number[]): { count: number; avg: number; p95: numbe
 }
 
 function emptyFramePhaseMs(): RendererFramePhaseMs {
-  return { setup: 0, entities: 0, world: 0, nameplates: 0, submit: 0, total: 0 };
+  return {
+    setup: 0,
+    entities: 0,
+    world: 0,
+    nameplates: 0,
+    submit: 0,
+    total: 0,
+  };
 }
 
 function emptyWorldPhaseMs(): RendererWorldPhaseMs {
@@ -1038,7 +1058,30 @@ export class Renderer {
   // always null in the shipped game.
   editorCam: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
   // Smoothed chase-cam occlusion (1 = no pull-in); see updateCamera.
-  private camOcclusion: CameraOcclusionState = { pullT: 1, lensT: 1, fov: CAMERA_BASE_FOV };
+  private camOcclusion: CameraOcclusionState = {
+    pullT: 1,
+    lensT: 1,
+    fov: CAMERA_BASE_FOV,
+  };
+  // AAA camera-feel layers (all display-only; see the three *_core modules):
+  // spring-arm pivot lag, look-ahead + FOV kicks + landing thump, and the
+  // directed moves (zone vista, death drift). Gated by reducedMotion().
+  private readonly camBoom = createCameraBoom();
+  private readonly camFeel = createCameraFeel();
+  private readonly camDirector = createCameraDirector();
+  // Player-pose mirror from last frame: any change while a directive runs is
+  // manual camera input (or the follow system), which cancels the directive.
+  private readonly camMirror = { yaw: Number.NaN, pitch: Number.NaN, dist: Number.NaN };
+  // Death-drift arming: only an alive-to-dead EDGE of the SAME viewed entity
+  // arms one drift (a spectate switch onto a corpse never does), and a
+  // cancelled drift stays cancelled for that death.
+  private camSelfId = -1;
+  private camSelfWasDead = false;
+  private deathDriftArmed = false;
+  // settings-backed in-game "Reduce motion" switch; OR-ed with the OS
+  // prefers-reduced-motion query in reducedMotion(). Initialized from Settings
+  // and kept live by main.ts's applySetting dispatcher (mirrors showDevBadges).
+  reduceMotionSetting = false;
   showNameplates = true;
   // settings-backed developer-badge display toggle (nameplate glyph + outline);
   // initialized from Settings and kept live by main.ts's applySetting dispatcher.
@@ -1047,6 +1090,11 @@ export class Renderer {
   // overhead nameplate renders exactly as other players see it. Initialized from
   // Settings and kept live by main.ts's applySetting dispatcher (mirrors showDevBadges).
   showOwnNameplate = false;
+  // settings-backed other-players nameplate toggle (on by default): when off,
+  // other players' plates hide (current target exempt) so crowded hubs stay
+  // readable, especially on short mobile viewports. Initialized from Settings
+  // and kept live by main.ts's applySetting dispatcher (mirrors showOwnNameplate).
+  showPlayerNameplates = true;
   // settings-menu graphics knobs (applied live)
   private renderScale = 1; // user-requested resolution ceiling on top of the device pixel ratio
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
@@ -1057,6 +1105,9 @@ export class Renderer {
   // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
   private stableFrameTime = 0;
   private viewCreateBackoff = 0;
+  private runtimeEntryElapsedMs = 0;
+  private entityViewCreateRangeSq = ENTITY_VIEW_CREATE_RANGE_SQ;
+  private entityViewDestroyRangeSq = ENTITY_VIEW_DESTROY_RANGE_SQ;
   private renderBudgetGovernor!: RenderBudgetGovernor;
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
@@ -1162,7 +1213,6 @@ export class Renderer {
   private placedAssetsView: PlacedAssetsView | null = null;
   private foliage: FoliageView;
   private fish: FishView;
-  private critters: CritterField;
   private motes: MotesView;
   private birds: BirdsView;
   private impactSite: ImpactSiteView;
@@ -1274,8 +1324,12 @@ export class Renderer {
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
-  private readonly mageBarrierStateScratch: MageBarrierState = { theme: 'frost', value: 0 };
+  private readonly mageBarrierStateScratch: MageBarrierState = {
+    theme: 'frost',
+    value: 0,
+  };
   private glacialFrontVisual!: GlacialFrontVisual;
+  private fishingBobbers!: FishingBobberVisual;
   private weather: Weather;
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
@@ -1304,7 +1358,12 @@ export class Renderer {
   // per bout, camera-centred, only shown while the local player is practicing).
   private valeCupSky = new ValeCupPracticeSky();
   private valeCupTeamRings: ValeCupTeamRingsView;
-  private vcupFireworks: { at: number; x: number; z: number; colors: readonly number[] }[] = [];
+  private vcupFireworks: {
+    at: number;
+    x: number;
+    z: number;
+    colors: readonly number[];
+  }[] = [];
   private valeCupBallDust: ValeCupBallDust | null = null;
   private valeCupBallTrail: ValeCupBallTrail | null = null;
   // seed-bound ground sampler, built once so the per-frame Vale Cup ring update
@@ -1357,6 +1416,7 @@ export class Renderer {
   private appliedBudgetLevels: RenderBudgetState['levels'] | null = null;
   private lastQualityChange: Omit<RendererQualityChangeStats, 'ageMs'> | null = null;
   private visualPool = new Map<string, CharacterVisual[]>();
+  private pooledVisualCount = 0;
   private objectPool = new Map<string, PooledObjectView[]>();
   private prewarmDepthMaterials = new Map<string, THREE.MeshDepthMaterial>();
 
@@ -1425,7 +1485,7 @@ export class Renderer {
     } catch {
       this.webgl.debug.checkShaderErrors = false;
     }
-    this.webgl.shadowMap.enabled = !LOW_GFX;
+    this.webgl.shadowMap.enabled = GFX.dynamicShadows;
     this.webgl.shadowMap.type = THREE.PCFSoftShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
     this.webgl.toneMappingExposure = this.baseExposure;
@@ -1456,6 +1516,7 @@ export class Renderer {
       showNameplates: () => this.showNameplates,
       showDevBadges: () => this.showDevBadges,
       showOwnNameplate: () => this.showOwnNameplate,
+      showPlayerNameplates: () => this.showPlayerNameplates,
       isHostilePlayer: (e) => this.isHostilePlayer(e),
     });
 
@@ -1483,12 +1544,31 @@ export class Renderer {
     // the unclamped sun that the dome shader tames with per-biome gain, so
     // the environment intensity is rescaled to match the shipped look.
     if (!LOW_GFX) {
-      const envRT = this.ensureEnvironmentBiome(initialBiome);
-      if (envRT) {
+      // Phone WebKit keeps only the spawn biome PMREM for the session. The on-device
+      // diagnostic showed that the old deferred second PMREM was followed by a process
+      // termination at 32.8s, with no context-loss or JS error. Keeping the initial IBL
+      // while the sky dome continues to cross-fade is cosmetic and avoids that allocation.
+      const envPlan = resolveEnvironmentPrefilterPlan(GFX.constrainedMemory, initialBiome);
+      const entryBiomes: BiomeId[] = envPlan.immediate;
+      if (GFX.constrainedMemory) this.envBiome = entryBiomes[0] ?? 'vale';
+      for (const b of entryBiomes) this.ensureEnvironmentBiome(b);
+      // Rift entries can spawn outside the dedicated environment biomes; where
+      // memory allows, build the actual spawn biome's PMREM too so IBL matches
+      // the dome from the first frame.
+      if (!GFX.constrainedMemory) this.ensureEnvironmentBiome(initialBiome);
+      console.info(
+        `[entry-guard] environment prefilter: immediate=[${envPlan.immediate.join(',')}] ` +
+          `deferred=[${envPlan.deferred.join(',')}] constrained=${GFX.constrainedMemory}`,
+      );
+      if (this.envRTs.size > 0) {
+        // Seed from the biome actually built at entry (the spawn biome where its
+        // prefilter exists, else the plan's first), so IBL and sun rotation match
+        // the dome from the first frame instead of after a deferred prefilter.
+        const seedBiome: BiomeId = this.envRTs.has(initialBiome) ? initialBiome : entryBiomes[0];
         this.envOutdoorIntensity = ENV_INTENSITY * IBL_RAW_SCALE;
-        this.scene.environment = envRT.texture;
-        this.scene.environmentRotation.y = this.skyView.envRotationY(initialBiome);
-        this.envBiome = initialBiome;
+        this.scene.environment = this.envRTs.get(seedBiome)?.texture ?? null;
+        this.scene.environmentRotation.y = this.skyView.envRotationY(seedBiome);
+        this.envBiome = seedBiome;
       } else {
         // fallback: prefilter the dome itself (gain/clamp already applied)
         this.pmremGenerator ??= new THREE.PMREMGenerator(this.webgl);
@@ -1510,7 +1590,7 @@ export class Renderer {
       LOW_GFX ? 2.5 : SUN_INTENSITY,
     );
     sun.position.copy(SUN_ANCHOR);
-    sun.castShadow = !LOW_GFX;
+    sun.castShadow = GFX.dynamicShadows;
     sun.shadow.mapSize.set(GFX.shadowMap, GFX.shadowMap);
     sun.shadow.camera.near = 30;
     sun.shadow.camera.far = 480;
@@ -1667,8 +1747,6 @@ export class Renderer {
     this.fish = buildFish(this.sim.cfg.seed);
     setRenderCategory(this.fish.group, 'fish');
     this.scene.add(this.fish.group);
-    this.critters = buildCritters(this.sim.cfg.seed);
-    this.scene.add(this.critters.group);
     this.motes = buildMotes(this.sim.cfg.seed);
     this.scene.add(this.motes.group);
     this.birds = buildBirds(this.sim.cfg.seed);
@@ -1897,6 +1975,9 @@ export class Renderer {
     this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
+    // Fishing bobbers: one float per fishing entity in view; the personal
+    // fishingBite event flips the owner's into the bite state (handleEvent).
+    this.fishingBobbers = new FishingBobberVisual(this.scene);
     // Meteor falls + Rune of Power circles (see src/render/mage_ground_fx.ts);
     // a landing meteor detonates with the same burst an aimed blast uses.
     this.mageGroundFx = new MageGroundFx(
@@ -2084,6 +2165,10 @@ export class Renderer {
     if (this.lowGfx) return null;
     const existing = this.envRTs.get(biome);
     if (existing) return existing;
+    // Constrained WebKit keeps only the entry-built PMREM for the session (see
+    // resolveEnvironmentPrefilterPlan): another mip-chained cubemap's transient
+    // allocation spike is enough to terminate the WKWebView process.
+    if (GFX.constrainedMemory && this.envRTs.size > 0) return null;
     const source = this.skyView.envTexture(biome);
     if (!source) return null;
     let target = this.envRTBySource.get(source);
@@ -2613,6 +2698,7 @@ export class Renderer {
         maxPointLights: number;
         activePointLights: number;
         shadowMap: number;
+        nativeIosMemoryProfile: boolean;
       };
     };
     autoGovernor: boolean;
@@ -2629,6 +2715,7 @@ export class Renderer {
     textures: number;
     programs: number;
     views: number;
+    pooledVisuals: number;
     foliage: FoliagePerfStats;
     glVendor: string;
     glRenderer: string;
@@ -2660,6 +2747,7 @@ export class Renderer {
           maxPointLights: GFX.maxPointLights,
           activePointLights: this.effectivePointLights || GFX.maxPointLights,
           shadowMap: GFX.shadowMap,
+          nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
         },
       },
       autoGovernor: GFX.autoGovernor,
@@ -2676,6 +2764,7 @@ export class Renderer {
       textures: info.memory.textures,
       programs: info.programs?.length ?? 0,
       views: this.views.size,
+      pooledVisuals: this.pooledVisualCount,
       foliage: this.foliage.perfStats(),
       glVendor: this.glVendor,
       glRenderer: this.glRenderer,
@@ -2747,7 +2836,9 @@ export class Renderer {
     this.renderDiagnosticsLastPrograms = programs;
     this.renderDiagnosticsLastTextures = textures;
 
-    type MutableCategoryStats = RenderDiagnosticsCategoryStats & { materialKeys: Set<string> };
+    type MutableCategoryStats = RenderDiagnosticsCategoryStats & {
+      materialKeys: Set<string>;
+    };
     const categories: Record<string, MutableCategoryStats> = {};
     const totals = { objects: 0, draws: 0, triangles: 0, points: 0 };
     const newMaterials: string[] = [];
@@ -2878,7 +2969,9 @@ export class Renderer {
         requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
       };
       if (win.requestIdleCallback)
-        win.requestIdleCallback(run, { timeout: RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS });
+        win.requestIdleCallback(run, {
+          timeout: RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS,
+        });
       else window.setTimeout(run, 100);
     }
     return this.renderDiagnosticsSnapshot;
@@ -2918,7 +3011,13 @@ export class Renderer {
   }
 
   private runtimeViewCreateBudget(dt: number): number {
-    const base = this.lowGfx ? VIEW_CREATE_BUDGET_LOW : VIEW_CREATE_BUDGET_HIGH;
+    const normalBase = this.lowGfx ? VIEW_CREATE_BUDGET_LOW : VIEW_CREATE_BUDGET_HIGH;
+    const base = constrainedEntryViewCreateBudget(
+      GFX.constrainedMemory,
+      this.runtimeEntryElapsedMs,
+      normalBase,
+    );
+    if (base === 0) return 0;
     if (!Number.isFinite(dt) || dt <= 0) return base;
     const frameMs = Math.min(250, dt * 1000);
     if (frameMs >= VIEW_CREATE_HITCH_FRAME_MS) this.viewCreateBackoff = VIEW_CREATE_BACKOFF_SECONDS;
@@ -2958,7 +3057,11 @@ export class Renderer {
       if (required && !includeRequired) continue;
       const d2 = distSqXZ(e, center);
       if (!required && d2 > rangeSq) continue;
-      this.viewCandidates.push({ e, d2, priority: this.viewCandidatePriority(e, center, d2) });
+      this.viewCandidates.push({
+        e,
+        d2,
+        priority: this.viewCandidatePriority(e, center, d2),
+      });
     }
     if (this.viewCandidates.length > 1) {
       this.viewCandidates.sort((a, b) => a.priority - b.priority || a.d2 - b.d2 || a.e.id - b.e.id);
@@ -2988,10 +3091,15 @@ export class Renderer {
     return created;
   }
 
-  private createPersistentPortalViews(createdViewTypes: string[], deadlineMs: number): number {
+  private createPersistentPortalViews(
+    createdViewTypes: string[],
+    deadlineMs: number,
+    maxViews: number,
+  ): number {
+    const limit = Math.min(PERSISTENT_PORTAL_VIEW_PREWARM_LIMIT, Math.max(0, Math.floor(maxViews)));
     let created = 0;
     for (const e of this.sim.entities.values()) {
-      if (created >= PERSISTENT_PORTAL_VIEW_PREWARM_LIMIT || performance.now() >= deadlineMs) break;
+      if (created >= limit || performance.now() >= deadlineMs) break;
       if (!isPersistentPortalObject(e) || this.views.has(e.id)) continue;
       this.createView(e);
       this.sampleCreatedViewType(createdViewTypes, e);
@@ -3159,6 +3267,8 @@ export class Renderer {
     const pool = this.visualPool.get(key);
     const visual = pool?.pop() ?? null;
     if (!visual) return null;
+    this.pooledVisualCount = Math.max(0, this.pooledVisualCount - 1);
+    if (pool?.length === 0) this.visualPool.delete(key);
     visual.root.removeFromParent();
     visual.root.visible = true;
     visual.root.position.set(0, 0, 0);
@@ -3171,6 +3281,10 @@ export class Renderer {
 
   private storePooledVisual(key: string, visual: CharacterVisual): void {
     visual.root.removeFromParent();
+    if (!shouldRetainPooledCharacterVisual(this.pooledVisualCount, GFX.maxPooledCharacterVisuals)) {
+      visual.dispose();
+      return;
+    }
     visual.root.visible = false;
     visual.root.position.set(0, 0, 0);
     visual.root.rotation.set(0, 0, 0);
@@ -3181,6 +3295,7 @@ export class Renderer {
       this.visualPool.set(key, pool);
     }
     pool.push(visual);
+    this.pooledVisualCount++;
   }
 
   private objectPoolKeyFor(e: Entity): string | null {
@@ -3313,7 +3428,10 @@ export class Renderer {
     return { group, pooled };
   }
 
-  private buildPlayerPrewarmGroup(deadline: number): { group: THREE.Group; visualCount: number } {
+  private buildPlayerPrewarmGroup(deadline: number): {
+    group: THREE.Group;
+    visualCount: number;
+  } {
     const group = new THREE.Group();
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 21);
@@ -3531,6 +3649,73 @@ export class Renderer {
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
   private prewarmRenderTarget: THREE.WebGLRenderTarget | null = null;
 
+  private collectObjectTextures(
+    obj: THREE.Object3D,
+    visibleOnly: boolean,
+    textures = new Set<THREE.Texture>(),
+  ): Set<THREE.Texture> {
+    const textureKeys: TextureMaterialKey[] = [
+      'map',
+      'alphaMap',
+      'aoMap',
+      'bumpMap',
+      'displacementMap',
+      'emissiveMap',
+      'envMap',
+      'lightMap',
+      'metalnessMap',
+      'normalMap',
+      'roughnessMap',
+      'specularMap',
+      'gradientMap',
+    ];
+    const collect = (child: THREE.Object3D): void => {
+      const renderable = child as RenderableDiagnosticObject;
+      const materials = Array.isArray(renderable.material)
+        ? renderable.material
+        : renderable.material
+          ? [renderable.material]
+          : [];
+      for (const material of materials) {
+        const textureMaterial = material as TextureBackedMaterial;
+        for (const key of textureKeys) {
+          const texture = textureMaterial[key];
+          if (texture) textures.add(texture);
+        }
+      }
+    };
+    if (visibleOnly) obj.traverseVisible(collect);
+    else obj.traverse(collect);
+    return textures;
+  }
+
+  private collectInitialSceneTextures(): THREE.Texture[] {
+    const textures = this.collectObjectTextures(this.scene, true);
+    // Async shader compilation temporarily hides non-self entity groups. Include
+    // those already-created views explicitly so their textures do not all upload
+    // during the first live submit when the compile gate restores visibility.
+    for (const view of this.views.values()) {
+      this.collectObjectTextures(view.group, false, textures);
+    }
+    return [...textures];
+  }
+
+  private async prewarmInitialSceneTexturesBatched(
+    batchSize: number,
+    maxMs: number,
+  ): Promise<number> {
+    const before = this.webgl.info.memory.textures;
+    const deadline = performance.now() + Math.max(0, maxMs);
+    const textures = this.collectInitialSceneTextures();
+    const batch = Math.max(1, Math.floor(batchSize));
+    for (let i = 0; i < textures.length && performance.now() < deadline; i += batch) {
+      const end = Math.min(textures.length, i + batch);
+      for (let j = i; j < end; j++) this.prewarmTexture(textures[j]);
+      if (end < textures.length && performance.now() < deadline) await sleep(0);
+    }
+    return Math.max(0, this.webgl.info.memory.textures - before);
+  }
+
   private renderPrewarmPass(dt: number, opts?: { offscreen?: boolean }): void {
     this.prewarmWorldFrame(dt);
     // Offscreen only applies on a composer tier: there gameplay's scene pass
@@ -3572,7 +3757,12 @@ export class Renderer {
     };
   }
 
-  async prewarmInitialScene(options: { maxMs?: number } = {}): Promise<RendererPrewarmStats> {
+  async prewarmInitialScene(
+    options: {
+      maxMs?: number;
+      onEntryStart?: (id: string, category: RendererPrewarmCategory) => void;
+    } = {},
+  ): Promise<RendererPrewarmStats> {
     const policy: PrewarmPolicy = resolvePrewarmPolicy({
       constrainedMemory: GFX.constrainedMemory,
       asyncCompileSupported: this.asyncCompileSupported,
@@ -3666,6 +3856,11 @@ export class Renderer {
       }
       let status: RendererPrewarmManifestEntryStats['status'] = 'completed';
       try {
+        try {
+          options.onEntryStart?.(entry.id, entry.category);
+        } catch {
+          // Diagnostics must never change whether a prewarm entry runs.
+        }
         await entry.run();
       } catch (err) {
         status = 'failed';
@@ -3720,7 +3915,11 @@ export class Renderer {
         required: true,
         run: () => {
           createdViews += this.createRequiredViews(p, createdViewTypes);
-          createdViews += this.createPersistentPortalViews(createdViewTypes, deadline);
+          createdViews += this.createPersistentPortalViews(
+            createdViewTypes,
+            deadline,
+            remainingPrewarmViewBudget(policy.maxViews, createdViews),
+          );
         },
         detail: () => `created=${createdViews}`,
       },
@@ -3733,7 +3932,7 @@ export class Renderer {
           this.collectMissingViewCandidates(p, VIEW_PREWARM_RANGE_SQ, false);
           candidateViews = this.viewCandidates.length;
           createdViews += this.createCandidateViews(
-            Math.max(0, policy.maxViews - createdViews),
+            remainingPrewarmViewBudget(policy.maxViews, createdViews),
             createdViewTypes,
             deadline,
           );
@@ -3894,8 +4093,13 @@ export class Renderer {
         category: 'world',
         priority: 50,
         required: true,
-        run: () => {
-          textureUploads = this.prewarmObjectTextures(this.scene);
+        run: async () => {
+          textureUploads = constrainedPrewarm
+            ? await this.prewarmInitialSceneTexturesBatched(
+                policy.textureBatchSize,
+                policy.textureMaxMs,
+              )
+            : this.prewarmObjectTextures(this.scene);
         },
         detail: () => `uploaded=${textureUploads}`,
       },
@@ -4103,6 +4307,7 @@ export class Renderer {
       programsAfter: finalCounts.programs,
       texturesBefore: startCounts.textures,
       texturesAfter: finalCounts.textures,
+      textureUploads,
       compileMode,
       compileMs,
       compileTimedOut,
@@ -4129,7 +4334,7 @@ export class Renderer {
       `[entry-guard] prewarm done: ${stats.elapsedMs}ms/${stats.maxMs}ms passes=${stats.renderPasses} ` +
         `views=${stats.createdViews}/${stats.candidateViews} ` +
         `programs=${stats.programsBefore}->${stats.programsAfter} ` +
-        `textures=${stats.texturesBefore}->${stats.texturesAfter} ` +
+        `textures=${stats.texturesBefore}->${stats.texturesAfter} uploads=${stats.textureUploads} ` +
         `compile=${stats.compileMode}/${stats.compileMs}ms parallelCompile=${this.asyncCompileSupported} ` +
         `skipped=${stats.manifestSkipped} timedOut=[${stats.timedOutEntryIds.join(',')}] ` +
         `failed=[${stats.failedEntryIds.join(',')}]`,
@@ -4376,6 +4581,8 @@ export class Renderer {
       }
       case 'levelup':
         this.vfx.levelUpPillar(this.sim.playerId);
+        // A brief FOV widen sells the surge (no-op under reduced motion).
+        this.punchFov(3);
         break;
       case 'deedUnlocked': {
         // Book of Deeds earned moment: one festival-gold shell just above the
@@ -4399,6 +4606,13 @@ export class Renderer {
       case 'delveEntered':
         this.prebuildDelveInteriors(ev.delveId);
         break;
+      case 'fishingBite': {
+        // Personal bite signal (Professions 2.0): only the angler's
+        // own client receives it, so flipping their bobber into the bite
+        // state here is correct (bystanders keep the idle float).
+        this.fishingBobbers.bite(ev.pid);
+        break;
+      }
       case 'yumiTeleport': {
         // Arcane burst at both ends of the cat's blink (the event is personal
         // per participant; ignore copies addressed to other local pids so an
@@ -4567,9 +4781,25 @@ export class Renderer {
   // ---- 2v2 Fiesta juice (driven by the HUD's event handler) --------------
 
   // Add camera trauma (0..1). Squared on apply, so small adds barely register
-  // and big hits (kills, ring closes) really kick.
+  // and big hits (kills, ring closes) really kick. A no-op for
+  // reduced-motion players (OS query or the in-game switch).
   addShake(amount: number): void {
+    if (this.reducedMotion()) return;
     this.shakeTrauma = Math.min(1, this.shakeTrauma + amount);
+  }
+
+  // Zone-entry vista sweep (hud.ts fires it on the zone-banner edge): the
+  // camera eases up and out and pans slowly over the new zone, then settles
+  // home. Any manual camera input cancels it; reduced motion skips it.
+  vistaPan(): void {
+    if (this.reducedMotion()) return;
+    startVista(this.camDirector);
+  }
+
+  // Transient FOV impulse in degrees (negative = a dip); decays on its own.
+  punchFov(degrees: number): void {
+    if (this.reducedMotion()) return;
+    punchCameraFov(this.camFeel, degrees);
   }
 
   // A golden pillar bursts up off a fighter who just locked in an augment.
@@ -5984,7 +6214,10 @@ export class Renderer {
       v.fireballTravelVisual?.dispose();
     } else {
       if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
-        this.storePooledObject(v.objectPoolKey, { group: v.objectMesh, height: v.height });
+        this.storePooledObject(v.objectPoolKey, {
+          group: v.objectMesh,
+          height: v.height,
+        });
       } else {
         // Object views usually own their geometries. Door portal resources are
         // shared and prewarmed, so they must survive interest churn.
@@ -6067,7 +6300,15 @@ export class Renderer {
     setRenderCategory(group, 'ui3d');
     group.visible = false;
     this.scene.add(group);
-    this.targetCone = { group, pos, localXZ: fan.localXZ, worldXYZ, ringPos, ringXZ, ringWorldXYZ };
+    this.targetCone = {
+      group,
+      pos,
+      localXZ: fan.localXZ,
+      worldXYZ,
+      ringPos,
+      ringXZ,
+      ringWorldXYZ,
+    };
   }
 
   sync(
@@ -6140,7 +6381,7 @@ export class Renderer {
     // entities that moved well outside the draw band. This avoids building
     // rig/nameplate DOM for the whole sim on the first rendered frame.
     createdViews += this.createRequiredViews(p, createdViewTypes);
-    this.collectMissingViewCandidates(p, ENTITY_VIEW_CREATE_RANGE_SQ, false);
+    this.collectMissingViewCandidates(p, this.entityViewCreateRangeSq, false);
     createdViews += this.createCandidateViews(this.runtimeViewCreateBudget(dt), createdViewTypes);
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
@@ -6150,7 +6391,7 @@ export class Renderer {
         (!isPersistentPortalObject(e) &&
           id !== p.id &&
           id !== p.targetId &&
-          distSqXZ(e, p) > ENTITY_VIEW_DESTROY_RANGE_SQ)
+          distSqXZ(e, p) > this.entityViewDestroyRangeSq)
       ) {
         this.doomedIds.push(id);
       }
@@ -6244,15 +6485,15 @@ export class Renderer {
         v.visual?.setProxyShadow(false);
       }
       if (id !== p.id) {
-        // Per-frame visibility uses the SAME 80/96 hysteresis as view
-        // create/destroy (above) so a rig hovering right at the 80yd draw edge
+        // Per-frame visibility uses the same create/destroy hysteresis as view
+        // retention (above) so a rig hovering right at the draw edge
         // doesn't toggle visible/invisible every frame — that hard cutoff is the
         // actual on-screen boundary flicker. group.visible carries last frame's
         // state: once shown, keep it until past the 96yd destroy radius (where
         // the view is torn down anyway); while hidden, show only within 80yd.
         const showCutoff = v.group.visible
-          ? ENTITY_VIEW_DESTROY_RANGE_SQ
-          : ENTITY_VIEW_CREATE_RANGE_SQ;
+          ? this.entityViewDestroyRangeSq
+          : this.entityViewCreateRangeSq;
         if (d2 > showCutoff) {
           v.group.visible = false;
           continue;
@@ -6362,7 +6603,7 @@ export class Renderer {
           v.group,
           e.templateId,
           e.lootable,
-          !isPortalObject || d2 <= ENTITY_VIEW_CREATE_RANGE_SQ,
+          !isPortalObject || d2 <= this.entityViewCreateRangeSq,
         );
         if (v.sparkle && vis) {
           // sub-pixel beyond ~45u but still a full transparent draw each
@@ -6987,6 +7228,7 @@ export class Renderer {
     this.updateClickMarkers(dt);
     this.updateAoeRings(dt);
     this.recklessSkulls.update(dt);
+    this.fishingBobbers.update(dt, this.sim.entities, this.sim.cfg.seed);
     this.updateGroundAimReticle(dt);
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain
     // under the local player, oriented to the model's rendered facing.
@@ -7148,7 +7390,6 @@ export class Renderer {
     );
     worldStart = markWorldPhase('foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
-    this.critters.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
     this.realmFlora?.update(this.time);
     this.emberFeatures?.update(this.time);
@@ -7293,6 +7534,7 @@ export class Renderer {
       activeViews: this.views.size,
       visibleViews,
     };
+    this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000));
   }
 
   // Drive the travel-form speed-illusion overlay. Presentation only: gated on the
@@ -7316,12 +7558,16 @@ export class Renderer {
       this.lastLocalPos = { x: selfPos.x, z: selfPos.z };
     }
     const inTravelForm = p.auras.some((a) => a.kind === 'form_travel');
-    const target = targetIntensity({ inTravelForm, speed, reducedMotion: this.reducedMotion() });
+    const target = targetIntensity({
+      inTravelForm,
+      speed,
+      reducedMotion: this.reducedMotion(),
+    });
     this.travelSpeedFx.update(target, dt);
   }
 
   private reducedMotion(): boolean {
-    return this.reduceMotionMql?.matches ?? false;
+    return this.reduceMotionSetting || (this.reduceMotionMql?.matches ?? false);
   }
 
   // Grab a JPEG screenshot of the live scene for a bug report. The main
@@ -7551,7 +7797,9 @@ export class Renderer {
       if (m.isMesh) m.geometry.dispose();
     });
     const disposeMat = (mat: THREE.Material): void => {
-      const withMap = mat as THREE.Material & { normalMap?: THREE.Texture | null };
+      const withMap = mat as THREE.Material & {
+        normalMap?: THREE.Texture | null;
+      };
       withMap.normalMap?.dispose();
       mat.dispose();
     };
@@ -7665,13 +7913,96 @@ export class Renderer {
     }
     const p = this.sim.player;
     const seed = this.sim.cfg.seed;
-    const px = selfPos.x;
-    const py = selfPos.y;
-    const pz = selfPos.z;
+    const reduce = this.reducedMotion();
+
+    // Spring-arm lag: the look pivot trails the avatar on a critically damped
+    // spring (vertical softer), so runs, jumps, mantles, and landings carry
+    // weight. Reduced motion stiffens it to near-rigid instead of branching.
+    stepCameraBoom(this.camBoom, selfPos.x, selfPos.y, selfPos.z, dt, reduce ? 4 : 1);
+
+    // Landing thump, detected from the display trajectory alone (works in
+    // both hosts): a short FOV dip plus a touch of trauma, scaled by fall
+    // speed. addShake/punchFov are reduced-motion no-ops already.
+    const thump = stepLandingDetector(this.camFeel, selfPos.y, dt);
+    if (thump > 0) {
+      this.punchFov(-3.5 * thump);
+      this.addShake(0.1 + 0.3 * thump);
+    }
+
+    // Look-ahead lead + speed FOV, fed by the horizontal display velocity.
+    let velX = 0;
+    let velZ = 0;
+    if (this.lastLocalPos && dt > 1e-4) {
+      velX = (selfPos.x - this.lastLocalPos.x) / dt;
+      velZ = (selfPos.z - this.lastLocalPos.z) / dt;
+      // A teleport is not velocity.
+      if (velX * velX + velZ * velZ > 30 * 30) {
+        velX = 0;
+        velZ = 0;
+      }
+    }
+    stepCameraFeel(this.camFeel, velX, velZ, dt, !reduce);
+
+    // Flipping reduce motion on mid-directive blends any running move out.
+    if (reduce) cancelCameraDirective(this.camDirector);
+
+    // Death drift: one slow elevated drift per death while the body lies
+    // unreleased. Armed only on the alive-to-dead EDGE of the SAME viewed
+    // entity, so a spectate switch onto an already-dead target never drifts;
+    // the edge releases a running vista first and the drift starts once the
+    // director is free. Releasing/resurrecting (or camera input) blends out.
+    const deadBody = p.dead && !p.ghost;
+    if (p.id !== this.camSelfId) {
+      this.camSelfId = p.id;
+      this.deathDriftArmed = false;
+      cancelCameraDirective(this.camDirector);
+    } else if (deadBody && !this.camSelfWasDead) {
+      this.deathDriftArmed = true;
+      cancelCameraDirective(this.camDirector);
+    }
+    this.camSelfWasDead = deadBody;
+    if (!deadBody) {
+      this.deathDriftArmed = false;
+      if (this.camDirector.kind === 'deathDrift') cancelCameraDirective(this.camDirector);
+    } else if (this.deathDriftArmed && !reduce && this.camDirector.kind === null) {
+      startDeathDrift(this.camDirector);
+      this.deathDriftArmed = false;
+    }
+
+    // Directed moves blend OVER the live player pose; any change to that pose
+    // since last frame is manual input (or the follow system) and cancels.
+    const mirror = this.camMirror;
+    const disturbed =
+      this.camDirector.kind !== null &&
+      !Number.isNaN(mirror.yaw) &&
+      (Math.abs(this.camYaw - mirror.yaw) > 1e-4 ||
+        Math.abs(this.camPitch - mirror.pitch) > 1e-4 ||
+        Math.abs(this.camDist - mirror.dist) > 1e-4);
+    const pose = stepCameraDirector(
+      this.camDirector,
+      { yaw: this.camYaw, pitch: this.camPitch, dist: this.camDist },
+      dt,
+      disturbed,
+    );
+    mirror.yaw = this.camYaw;
+    mirror.pitch = this.camPitch;
+    mirror.dist = this.camDist;
+
+    // The camera ORBITS the lagged/led pivot, but the occlusion ray and the
+    // pull-in anchor stay on the AVATAR's eye: the avatar is collision
+    // resolved so the ray origin can never sit inside a collider's pad
+    // (which would blind the sweep and let the camera see through the wall),
+    // and the min-distance clamp stays avatar-relative.
+    const px = this.camBoom.x + this.camFeel.leadX;
+    const py = this.camBoom.y;
+    const pz = this.camBoom.z + this.camFeel.leadZ;
     const eyeY = py + 2.0;
-    let cx = px - Math.sin(this.camYaw) * Math.cos(this.camPitch) * this.camDist;
-    let cy = eyeY + Math.sin(this.camPitch) * this.camDist;
-    let cz = pz - Math.cos(this.camYaw) * Math.cos(this.camPitch) * this.camDist;
+    const ax = selfPos.x;
+    const ay = selfPos.y + 2.0;
+    const az = selfPos.z;
+    let cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
+    let cy = eyeY + Math.sin(pose.pitch) * pose.dist;
+    let cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     if (isArenaPos(p.pos.x)) {
       // Arena walls hide from the camera like buildings, so the chase camera
       // stays at the player's requested zoom instead of clamping inside the pit.
@@ -7687,9 +8018,9 @@ export class Renderer {
       const riftToken = this.sim.riftCollisionToken;
       let hardT = cameraOcclusion(
         seed,
-        px,
-        eyeY,
-        pz,
+        ax,
+        ay,
+        az,
         cx,
         cy,
         cz,
@@ -7699,9 +8030,9 @@ export class Renderer {
       );
       let softT = cameraOcclusion(
         seed,
-        px,
-        eyeY,
-        pz,
+        ax,
+        ay,
+        az,
         cx,
         cy,
         cz,
@@ -7709,7 +8040,7 @@ export class Renderer {
         delveMods,
         riftToken,
       );
-      const segLen = Math.hypot(cx - px, cy - eyeY, cz - pz);
+      const segLen = Math.hypot(cx - ax, cy - ay, cz - az);
       if (segLen > 1e-3) {
         const minT = CAMERA_MIN_DIST / segLen;
         hardT = Math.min(1, Math.max(hardT, minT));
@@ -7727,10 +8058,12 @@ export class Renderer {
         CAMERA_MAX_COMP_FOV,
       );
     }
+    // Pull-in slides along the swept avatar-eye ray, so the resolved point is
+    // exactly what the occlusion pass certified clear.
     const ct = this.camOcclusion.pullT;
-    cx = px + (cx - px) * ct;
-    cy = eyeY + (cy - eyeY) * ct;
-    cz = pz + (cz - pz) * ct;
+    cx = ax + (cx - ax) * ct;
+    cy = ay + (cy - ay) * ct;
+    cz = az + (cz - az) * ct;
     let groundY = groundHeight(cx, cz, seed) + 0.6;
     // On a raised rift tier the flat ground clamp would let the camera sink
     // into the riser: add the same lift the sim stands entities on.
@@ -7740,8 +8073,14 @@ export class Renderer {
       groundY += riftLiftAt(floor, cx - rfCam.origin.x, cz - rfCam.origin.z);
     }
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
-    if (Math.abs(this.camera.fov - this.camOcclusion.fov) > 0.01) {
-      this.camera.fov = this.camOcclusion.fov;
+    // Occlusion-compensated FOV plus the feel kicks (speed widen, landing
+    // dip, level-up punch); the offset is 0 under reduced motion.
+    const fovTarget = Math.min(
+      100,
+      Math.max(50, this.camOcclusion.fov + cameraFovOffset(this.camFeel)),
+    );
+    if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
+      this.camera.fov = fovTarget;
       this.camera.updateProjectionMatrix();
     }
     this.cameraLookAt.set(px, eyeY, pz);
@@ -8025,7 +8364,13 @@ export class Renderer {
   }
 
   setGroundAimReticle(
-    aim: { x: number; z: number; radius: number; school: string; dimmed: boolean } | null,
+    aim: {
+      x: number;
+      z: number;
+      radius: number;
+      school: string;
+      dimmed: boolean;
+    } | null,
   ): void {
     this.groundAimReticle.setAim(
       aim

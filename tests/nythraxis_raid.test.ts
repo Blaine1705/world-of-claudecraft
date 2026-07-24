@@ -243,9 +243,11 @@ describe('Nythraxis raid encounter', () => {
     const origin = enterRaid(sim, pid);
     expect(sim.entities.get(pid)!.pos.x).toBeGreaterThan(3000);
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
-    expect(boss.maxHp).toBe(60000);
-    expect(boss.weapon.min).toBe(325);
-    expect(boss.weapon.max).toBe(507);
+    // Normal-raid retune (NORMAL_DUNGEON_TUNING): doubled health (was 60000)
+    // and the 5x per-mob damage multiplier (weapon was 325-507).
+    expect(boss.maxHp).toBe(120000);
+    expect(boss.weapon.min).toBe(1624);
+    expect(boss.weapon.max).toBe(2537);
     expect(visualKeyFor(boss)).toBe('skel_golem');
     expect(
       visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_warrior_add' } as Entity),
@@ -313,17 +315,26 @@ describe('Nythraxis raid encounter', () => {
     );
     const groups = new Map<string, typeof loot>();
     for (const entry of loot) {
-      expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-4]$/);
+      expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-5]$/);
       const group = entry.rollGroup!;
       groups.set(group, [...(groups.get(group) ?? []), entry]);
       expect(ITEMS[entry.itemId!], entry.itemId).toBeTruthy();
     }
 
-    expect(groups.size).toBe(4);
-    for (const entries of groups.values()) {
+    expect(groups.size).toBe(5);
+    for (const [name, entries] of groups) {
       const total = entries.reduce((sum, entry) => sum + entry.chance, 0);
-      expect(total).toBeCloseTo(1, 5);
+      // nythraxis_drop_5 is the feral ladder's bonus draw (maul_of_the_scourged_wilds):
+      // a single independent 25% roll on top of the four guaranteed equipment
+      // groups, which keep their exact 1.00 partitions untouched.
+      if (name === 'nythraxis_drop_5') {
+        expect(entries.map((entry) => entry.itemId)).toEqual(['maul_of_the_scourged_wilds']);
+        expect(total).toBe(0.25);
+      } else {
+        expect(total).toBeCloseTo(1, 5);
+      }
     }
+    expect(ITEMS.maul_of_the_scourged_wilds.requiredClass).toEqual(['druid']);
 
     for (const itemId of ['deathless_heartwood', 'kingsbane_last_oath']) {
       const item = ITEMS[itemId];
@@ -1864,8 +1875,9 @@ describe('Nythraxis raid encounter', () => {
       (e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior' && !e.dead,
     );
     expect(adds).toHaveLength(2);
-    expect(adds[0].weapon.min).toBe(159);
-    expect(adds[0].weapon.max).toBe(248);
+    // 5x normal-raid retune (weapon was 159-248 before the economy pass).
+    expect(adds[0].weapon.min).toBe(794);
+    expect(adds[0].weapon.max).toBe(1241);
   });
 
   it('stages Aldric transition dialogue without interrupting itself before Soul Rend opens phase two after a settle delay', () => {

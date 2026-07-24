@@ -16,7 +16,7 @@
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
 import { isDebuffAura, isDispellableAura } from '../aura_classify';
-import { ABILITIES, isDelvePos } from '../data';
+import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
@@ -40,7 +40,7 @@ import {
   armorReduction,
   DT,
   ENRAGE_DMG_DONE,
-  FISHING_CAST_ID,
+  isNonSpellCast,
   MELEE_ARC,
   MELEE_CLASSES,
   normAngle,
@@ -863,7 +863,9 @@ export function runEffects(
         break;
       }
       case 'interrupt': {
-        if (!target || target.castingAbility === null || target.castingAbility === FISHING_CAST_ID)
+        // Non-spell casts (fishing/gather) are interrupt-immune. The Demon
+        // Heal channel is deliberately NOT folded in: it stays interruptible.
+        if (!target || target.castingAbility === null || isNonSpellCast(target.castingAbility))
           break;
         if (p.kind === 'player' && target.kind === 'player' && !ctx.isHostileTo(p, target)) break;
         // Resolve per-player when possible (rank/mods), but fall back to the
@@ -2168,6 +2170,16 @@ export function runEffects(
               aura.kind === 'disarm' ||
               aura.kind === 'slow')
           ) {
+            // Product ruling (Avatar, the sole breakControl user): the break
+            // removes control from any source EXCEPT the caster itself and
+            // mobs whose template carries boss: true (final-boss templates).
+            // Encounter mobs without the flag are breakable; a source that
+            // cannot be resolved (despawned, since ctx.entities is the full
+            // authoritative roster here) defaults to breakable, the common
+            // case.
+            if (aura.sourceId === p.id) continue;
+            const source = ctx.entities.get(aura.sourceId);
+            if (source && MOBS[source.templateId]?.boss) continue;
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }

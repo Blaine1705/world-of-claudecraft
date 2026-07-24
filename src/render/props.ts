@@ -13,7 +13,7 @@ import {
 import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
 import { terrainHeight, waterLevel } from '../sim/world';
-import { loadGltf } from './assets/loader';
+import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
 
@@ -419,6 +419,11 @@ function propAsset(key: PropKey): PropAsset {
   }
   const asset: PropAsset = { parts, size: box.getSize(new THREE.Vector3()) };
   extractCache.set(key, asset);
+  // The extracted float geometry and converted materials are now authoritative.
+  // Release the parsed scene's duplicate source buffers without disposing shared
+  // textures that the converted materials still reference.
+  loadedProps.delete(key);
+  releaseGltf(def.url);
   return asset;
 }
 
@@ -1372,7 +1377,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // on the mouth side for both delves.
   const delvePortals: THREE.Mesh[] = [];
   for (const dm of getActiveWorldContent().props.delveMarkers ?? []) {
-    if (!loadedProps.has('delveEntrance2')) continue;
+    if (!loadedProps.has('delveEntrance2') && !extractCache.has('delveEntrance2')) continue;
     const isDrowned = dm.delveId === 'drowned_litany';
     // The portal mouth faces the hub the players approach from: Reliquary Hill's
     // town is north (+z) of its door, Mirefen Marsh's hub (z~300) is SOUTH (-z)

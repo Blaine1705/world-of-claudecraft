@@ -1627,8 +1627,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "824125d7",
-      "events": "6624d750",
+      "state": "829b0495",
+      "events": "1f4d6a99",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1649,7 +1649,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 724,
+          "copper": 720,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1697,6 +1697,10 @@
             {
               "count": 1,
               "itemId": "roadwardens_helm"
+            },
+            {
+              "count": 1,
+              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
@@ -1713,7 +1717,7 @@
               "itemId": "bandit_bandana"
             },
             {
-              "count": 2,
+              "count": 1,
               "itemId": "wolf_fang"
             }
           ]
@@ -1812,7 +1816,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "829b0495",
+      "state": "3060ea38",
       "events": "b94ebc4d",
       "rng": {
         "draws": 0,
@@ -1834,7 +1838,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 720,
+          "copper": 716,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1884,7 +1888,7 @@
               "itemId": "roadwardens_helm"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wolf_fang"
             }
           ],
@@ -1900,10 +1904,6 @@
             {
               "count": 1,
               "itemId": "bandit_bandana"
-            },
-            {
-              "count": 1,
-              "itemId": "wolf_fang"
             }
           ]
         }
@@ -2001,7 +2001,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "829b0495",
+      "state": "3060ea38",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2023,7 +2023,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 720,
+          "copper": 716,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -2073,7 +2073,7 @@
               "itemId": "roadwardens_helm"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wolf_fang"
             }
           ],
@@ -2089,10 +2089,6 @@
             {
               "count": 1,
               "itemId": "bandit_bandana"
-            },
-            {
-              "count": 1,
-              "itemId": "wolf_fang"
             }
           ]
         }

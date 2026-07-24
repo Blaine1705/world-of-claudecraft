@@ -8,6 +8,7 @@ import { Sim } from '../src/sim/sim';
 import {
   type Aura,
   dist2d,
+  FISHING_CAST_ID,
   MAX_LEVEL,
   meleeMissChance,
   mobXpValue,
@@ -443,6 +444,10 @@ describe('combat', () => {
     facePlayerAt(sim, wolf);
     for (let i = 0; i < 20 * 30 && !wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(true);
+    // Consume BOTH halves (harvest then loot); a tagged corpse with
+    // an unclaimed harvest would otherwise hold its 30s grace window and defer
+    // the respawn past this loop.
+    sim.harvestCorpse(wolf.id);
     sim.lootCorpse(wolf.id);
     for (let i = 0; i < 20 * 10 && wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(false);

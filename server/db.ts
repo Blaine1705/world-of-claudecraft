@@ -9,6 +9,7 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import type { ActionBarLayout } from '../src/world_api/action_bar';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
@@ -186,6 +187,24 @@ const LIFETIME_XP_EXPR = "((state->>'lifetimeXp')::bigint)";
 export const ELIGIBLE_ACCOUNT_SQL =
   'a.banned_at IS NULL AND (a.suspended_until IS NULL OR a.suspended_until <= now())';
 
+// Additive scope-domain hardening for auth_tokens. NOT VALID avoids a table
+// scan and tolerates any historical bad rows during deploy, while PostgreSQL
+// still enforces the constraint for every new or updated row. Runtime token
+// decoding independently fails closed on historical values outside this set.
+// Exported so the opt-in real-Postgres migration test executes this exact DDL.
+export const AUTH_TOKENS_SCOPE_CONSTRAINT_SQL = `DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'auth_tokens_scope_check'
+      AND conrelid = 'auth_tokens'::regclass
+  ) THEN
+    ALTER TABLE auth_tokens
+      ADD CONSTRAINT auth_tokens_scope_check CHECK (scope IN ('full', 'read')) NOT VALID;
+  END IF;
+END $$;`;
+
 export const SCHEMA = `
 CREATE TABLE IF NOT EXISTS accounts (
   id SERIAL PRIMARY KEY,
@@ -208,6 +227,7 @@ CREATE INDEX IF NOT EXISTS auth_tokens_account ON auth_tokens(account_id);
 -- token in the account portal so a user can revoke a specific one.
 ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS scope TEXT NOT NULL DEFAULT 'full';
 ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS label TEXT;
+${AUTH_TOKENS_SCOPE_CONSTRAINT_SQL}
 CREATE TABLE IF NOT EXISTS characters (
   id SERIAL PRIMARY KEY,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
@@ -225,6 +245,14 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS realm TEXT NOT NULL DEFAULT '${R
 -- "last seen" readout on offline guild-roster rows. Nullable: a character that
 -- has never entered the world since this column was added reads NULL.
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ;
+-- Per-character action-bar layout (JSONB). This is client PRESENTATION state (a
+-- remap over learned abilities + item shortcuts), NOT deterministic gameplay
+-- state, so it lives in its own additive column rather than the sim-owned state
+-- blob: keeping it out of CharacterState leaves sim serialization byte-identical
+-- and the offline Sim host-agnostic. Nullable/absent until the character first
+-- saves one; the server treats the value as opaque and re-validates its bounds
+-- (sanitizeActionBarLayout) on both read and write.
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS hotbar_layout JSONB;
 -- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
 -- index serves the realm-scoped in-game panel; the second serves the global
 -- (cross-realm) home-page board. Both are expression indexes on the bare
@@ -1500,6 +1528,13 @@ export async function getAccountsCount(): Promise<number> {
   return res.rows[0]?.count ?? 0;
 }
 
+export async function getCharactersCount(realm: string): Promise<number> {
+  const res = await pool.query('SELECT COUNT(*)::int AS count FROM characters WHERE realm = $1', [
+    realm,
+  ]);
+  return res.rows[0]?.count ?? 0;
+}
+
 export async function touchLogin(accountId: number, meta: RequestMetadata = {}): Promise<void> {
   await pool.query(
     `UPDATE accounts
@@ -1536,18 +1571,11 @@ export async function saveToken(
   );
 }
 
-export async function accountForToken(token: string): Promise<number | null> {
-  const res = await pool.query(
-    'SELECT account_id FROM auth_tokens WHERE token = $1 AND expires_at > now()',
-    [token],
-  );
-  return res.rows[0]?.account_id ?? null;
-}
-
-// Account + scope for a live token. Mirrors accountForToken but also returns the
-// token's scope so read routes can accept 'read'|'full' while mutating routes
-// (via bearerActiveAccount) reject anything that is not 'full'. Old tokens
-// predating the scope column read as 'full' via the column default.
+// Account + scope for a live token. Every caller receives the authority context:
+// read routes may accept both scopes, while mutation and privileged boundaries
+// require exact full scope. Unknown database values fail closed instead of being
+// promoted to full authority. Such a historical token also cannot authenticate
+// its own logout; account-level revocation remains available to clear the row.
 export async function accountAndScopeForToken(
   token: string,
 ): Promise<{ accountId: number; scope: TokenScope } | null> {
@@ -1557,7 +1585,8 @@ export async function accountAndScopeForToken(
   );
   const row = res.rows[0];
   if (!row) return null;
-  return { accountId: row.account_id, scope: row.scope === 'read' ? 'read' : 'full' };
+  if (row.scope !== 'full' && row.scope !== 'read') return null;
+  return { accountId: row.account_id, scope: row.scope };
 }
 
 export interface AccountInfoRow {
@@ -2509,6 +2538,9 @@ export interface CharacterRow {
   force_rename: boolean;
   last_played?: Date | string | null;
   playtime_seconds?: string | number | null;
+  // Per-character action-bar layout (own JSONB column, not the sim state blob).
+  // Opaque to the server beyond bounds validation; only the join path selects it.
+  hotbar_layout?: ActionBarLayout | null;
 }
 
 // The account's "top" character on this realm (highest level, then lifetime XP),
@@ -2562,10 +2594,24 @@ export async function getCharacter(
   characterId: number,
 ): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
   return res.rows[0] ?? null;
+}
+
+/** Persist a character's action-bar layout in its dedicated JSONB column. The
+ *  layout is already sanitized/bounded by the caller (server-side, untrusted
+ *  client input); stored as an opaque document, replaced whole (last write wins).
+ *  Parameterized: characterId is $1, the JSON document is $2. */
+export async function setCharacterHotbarLayout(
+  characterId: number,
+  layout: ActionBarLayout,
+): Promise<void> {
+  await pool.query('UPDATE characters SET hotbar_layout = $2::jsonb WHERE id = $1', [
+    characterId,
+    JSON.stringify(layout),
+  ]);
 }
 
 // Active character names on this realm for the public character sitemap, ranked

@@ -287,8 +287,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "bf58a94c",
-      "events": "99c47f97",
+      "state": "cf42ec17",
+      "events": "4a91a388",
       "rng": {
         "draws": 1,
         "digest": "3841bd32"
@@ -329,6 +329,7 @@
               "linen_scrap",
               "minor_healing_potion",
               "recruit_tunic",
+              "silverleaf_herb",
               "spider_leg",
               "worn_sword"
             ]
@@ -443,8 +444,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "15dec3cd",
-      "events": "175e4e41",
+      "state": "b96ac83d",
+      "events": "a0f7546a",
       "rng": {
         "draws": 2,
         "digest": "23ad5e91"
@@ -477,24 +478,28 @@
           },
           "craftSkills": {
             "alchemy": 1,
-            "tailoring": 201
+            "tailoring": 200
           },
           "craftThrottle": {
             "count": 2
           },
           "deedStats": {
             "counters": {
-              "craftsPerformed": 2
+              "craftsPerformed": 2,
+              "masterworksCrafted": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
               "eastbrook_ritual_vestments",
+              "homespun_cloth",
               "linen_scrap",
               "minor_healing_potion",
               "recruit_tunic",
+              "silverleaf_herb",
               "spider_leg",
+              "spool_of_thread",
               "worn_sword"
             ]
           },
@@ -517,6 +522,14 @@
             {
               "count": 1,
               "itemId": "minor_healing_potion"
+            },
+            {
+              "count": 1,
+              "itemId": "homespun_cloth"
+            },
+            {
+              "count": 1,
+              "itemId": "spool_of_thread"
             },
             {
               "count": 1,
@@ -629,8 +642,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "21cc4db2",
-      "events": "99c47f97",
+      "state": "5e8699fc",
+      "events": "4a91a388",
       "rng": {
         "draws": 3,
         "digest": "9cdaf8bf"
@@ -663,24 +676,28 @@
           },
           "craftSkills": {
             "alchemy": 2,
-            "tailoring": 201
+            "tailoring": 200
           },
           "craftThrottle": {
             "count": 3
           },
           "deedStats": {
             "counters": {
-              "craftsPerformed": 3
+              "craftsPerformed": 3,
+              "masterworksCrafted": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
               "eastbrook_ritual_vestments",
+              "homespun_cloth",
               "linen_scrap",
               "minor_healing_potion",
               "recruit_tunic",
+              "silverleaf_herb",
               "spider_leg",
+              "spool_of_thread",
               "worn_sword"
             ]
           },
@@ -703,6 +720,14 @@
             {
               "count": 2,
               "itemId": "minor_healing_potion"
+            },
+            {
+              "count": 1,
+              "itemId": "homespun_cloth"
+            },
+            {
+              "count": 1,
+              "itemId": "spool_of_thread"
             },
             {
               "count": 1,
@@ -813,7 +838,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "21cc4db2",
+      "state": "5e8699fc",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -847,24 +872,28 @@
           },
           "craftSkills": {
             "alchemy": 2,
-            "tailoring": 201
+            "tailoring": 200
           },
           "craftThrottle": {
             "count": 3
           },
           "deedStats": {
             "counters": {
-              "craftsPerformed": 3
+              "craftsPerformed": 3,
+              "masterworksCrafted": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
               "eastbrook_ritual_vestments",
+              "homespun_cloth",
               "linen_scrap",
               "minor_healing_potion",
               "recruit_tunic",
+              "silverleaf_herb",
               "spider_leg",
+              "spool_of_thread",
               "worn_sword"
             ]
           },
@@ -887,6 +916,14 @@
             {
               "count": 2,
               "itemId": "minor_healing_potion"
+            },
+            {
+              "count": 1,
+              "itemId": "homespun_cloth"
+            },
+            {
+              "count": 1,
+              "itemId": "spool_of_thread"
             },
             {
               "count": 1,

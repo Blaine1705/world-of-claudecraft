@@ -201,7 +201,7 @@ export const en = {
   },
   game: gameStrings,
   hudChrome: hudChromeStrings,
-  // Rare gather events (Professions 2.0 Phase 4): the zone-broadcast lines
+  // Rare gather events (Professions 2.0): the zone-broadcast lines
   // rendered from the id-based gatherRareEvent SimEvent; {finder} is the
   // harvester's player name and splices verbatim.
   gatherEvent: {
@@ -263,6 +263,7 @@ export const en = {
   stats: {
     title: 'World Status',
     accountsCreated: 'Players',
+    charactersCreated: 'Characters Created',
     playersOnline: 'Players Online',
     realmName: 'World Name',
   },
@@ -297,6 +298,8 @@ export const en = {
     empty: 'No updates yet — check back soon.',
     prerelease: 'Pre-release',
     viewOnGithub: 'View on GitHub',
+    new: 'New',
+    viewAll: 'View all updates on GitHub',
   },
   download: {
     title: 'Download Desktop Launcher',

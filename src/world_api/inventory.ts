@@ -35,7 +35,6 @@ export interface IWorldInventory {
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;
   buyBackItem(itemId: string): void;
-  salvageItem(itemId: string): void;
   upgradeRiftItem(itemId: string): void;
   enchantRiftItem(itemId: string, stat: string): void;
   socketRiftGem(itemId: string, gemId: string): void;

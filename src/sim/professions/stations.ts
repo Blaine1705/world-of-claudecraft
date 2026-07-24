@@ -1,4 +1,4 @@
-// Crafting stations (Professions 2.0 Phase 8): the hands-vs-stations split.
+// Crafting stations (Professions 2.0): the hands-vs-stations split.
 // Field recipes (content/recipes.ts FIELD_RECIPES) craft anywhere; a recipe
 // carrying a `stationType` (professions/types.ts ProfessionRecipeRecord)
 // resolves only while the crafter stands at a matching station, or while
@@ -44,6 +44,19 @@ export function stationsOfType(type: StationType): StationDef[] {
 export function isAtStation(pos: { x: number; z: number }, type: StationType): boolean {
   for (const station of STATIONS) {
     if (station.type !== type) continue;
+    const dx = pos.x - station.pos.x;
+    const dz = pos.z - station.pos.z;
+    if (dx * dx + dz * dz <= STATION_RADIUS * STATION_RADIUS) return true;
+  }
+  return false;
+}
+
+/** True while `pos` sits within STATION_RADIUS of ANY static station,
+ *  whatever its type: the Maker's Bond unbind service gate (Professions 2.0),
+ *  which every station master offers regardless of craft. A
+ *  mobile station NEVER satisfies this, the training precedent. */
+export function isAtAnyStation(pos: { x: number; z: number }): boolean {
+  for (const station of STATIONS) {
     const dx = pos.x - station.pos.x;
     const dz = pos.z - station.pos.z;
     if (dx * dx + dz * dz <= STATION_RADIUS * STATION_RADIUS) return true;

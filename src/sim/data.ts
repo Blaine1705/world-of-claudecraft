@@ -262,7 +262,7 @@ import {
   ZONE3_ROADS,
   ZONE3_ZONE,
 } from './content/zone3';
-import { DUNGEON_WALL_HW } from './dungeon_layout';
+import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -889,13 +889,16 @@ export function dungeonAt(x: number): DungeonDef | null {
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = INSTANCE_X_BASE + 4200; // arena instances share this x; slots stack along z
-export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
-// The arena band is a TIGHT column bracketing ARENA_X (all slots share this x;
-// the pit footprint is only ~±24u). It deliberately does NOT stretch to the
-// delve band: the gap east of the arena holds the Orkadia dungeon slot (index 6,
-// origin ARENA_X + 300), which must classify as a dungeon, not the arena. The
-// bound sits at the midpoint between the arena and the Orkadia slot so each
-// footprint stays comfortably on its own side.
+// Include the complete west wall plus one yard of routing headroom. Collision,
+// line of sight, camera sweeps, and dungeon lookup all select their instance
+// geometry through this boundary, so using the centreline would leave the
+// arena's entire west half attached to the neighboring dungeon band.
+export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
+// The band's EAST bound stays tight: the gap east of the arena holds the
+// Orkadia dungeon slot (index 6, origin ARENA_X + 300), which must classify
+// as a dungeon, not the arena. The bound sits at the midpoint between the
+// arena and the Orkadia slot so each footprint stays comfortably on its own
+// side.
 export const ARENA_X_MAX = ARENA_X + 150; // x at/after this = past the arena band
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
@@ -953,10 +956,10 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 
 // ---------------------------------------------------------------------------
 // Delves, private party instances past the arena x-band (see docs/prd/delves.md).
-// DELVE_X_MIN must stay above ARENA_X_MIN (4000) and ARENA_X (4200).
+// DELVE_X_MIN must stay above the full arena footprint around ARENA_X.
 // ---------------------------------------------------------------------------
 
-// 4800 sits clear of the v0.10.0 layout: dungeons end at ARENA_X_MIN (4000) and
+// 4800 sits clear of the v0.10.0 layout: the widest dungeon ends west of
 // the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
 // west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
 export const DELVE_X_MIN = INSTANCE_X_BASE + 4800;

@@ -30,6 +30,7 @@ import {
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
+import { specialRoleChatTag } from '../src/sim/discord_roles';
 import {
   isInJailCage,
   JAIL_CENTER,
@@ -89,6 +90,7 @@ import {
   type VcSharedCupInfo,
   type VcViewerReadout,
 } from '../src/world_api';
+import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { recordOnlineSample } from './admin_db';
 import { offensiveName } from './auth';
 import { recordBankOp } from './bank_ledger';
@@ -135,6 +137,7 @@ import {
   saveMarketState,
   saveRiftState,
   setAccountWeaponSkinLoadout,
+  setCharacterHotbarLayout,
   touchCharacterLogin,
   walletForAccount,
 } from './db';
@@ -587,6 +590,12 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'summonPet',
   'dismissPet',
   'summonDemon',
+  // Maker's Bond unbind (Professions 2.0): a successful unbind can
+  // clear boundTo IN PLACE (the single-copy arm emits no loot event), so the
+  // result event itself must re-diff the heavy self keys or the holder's inv
+  // mirror goes stale until the staggered refresh. Also refreshes the purse
+  // for the fee debit.
+  'unbindResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -738,6 +747,12 @@ export interface ClientSession {
     priorGm: boolean;
     stowedPet: PetState | null;
   } | null;
+  // The character's stored action-bar layout as loaded at join (already
+  // bounds-validated), or null when the character has never saved one. Sent to
+  // the owning client exactly once via the `hbl` self field (self-scoped: never
+  // an entity/broadcast field), then frozen; subsequent client saves persist to
+  // the DB and never re-echo here. null wires as an explicit "seed from local".
+  initialHotbarLayout: ActionBarLayout | null;
 }
 
 interface SentEntityVersions {
@@ -891,13 +906,16 @@ function identityFields(e: Entity): Record<string, unknown> {
       break;
     }
     // Per-slot ItemInstancePayloads of the worn set (masterwork/enchant rolls),
-    // for the inspect window (Professions 2.0 Phase 6). Same sparse rule as
+    // for the inspect window (Professions 2.0). Same sparse rule as
     // `eq` above: players only, only when at least one worn piece carries a
     // payload, riding the identity record (wireCacheFor diffs the identity
     // JSON, so an equip/unequip of an instanced piece re-emits automatically).
     // Data minimization: only the cosmetic inspect fields (signer, enchant,
-    // rolled) leave the server; boundTo and charges are gameplay state no
-    // inspecting client needs and never ride this key.
+    // rolled) leave the server; boundTo, charges, and the bindOnTrade
+    // arm are gameplay state no inspecting client needs and never ride this key.
+    // The pub allowlist below (signer/enchant/rolled ONLY) is what enforces this,
+    // so a new non-cosmetic ItemInstancePayload field is excluded by construction;
+    // the owner still sees their own payload in full via the self `inv` mirror.
     let eqi: Record<string, unknown> | undefined;
     for (const [slot, inst] of Object.entries(e.equippedInstances)) {
       if (!inst) continue;
@@ -1012,6 +1030,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
+  if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
   // three and the frame hides its bar). The rounded res keeps an idle entity's
@@ -1322,6 +1341,10 @@ export class GameServer {
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
   private readonly weaponSkinLoadoutSaveQueues = new Map<number, Promise<void>>();
+  // Action-bar layout is a whole-record replacement in its own character column.
+  // One FIFO per character so a burst of debounced client saves cannot commit on
+  // separate pool clients in reverse order and persist a stale layout.
+  private readonly hotbarLayoutSaveQueues = new Map<number, Promise<void>>();
   // Serializes every write of the single global Market blob (the 30s autosave
   // and the leave-path combined save). Both serialize the whole market; without
   // a queue their transactions could commit out of capture order and persist an
@@ -1584,6 +1607,11 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
+    // force the heavy self block (tal/inv/equip/bags/...) to re-run next
+    // snapshot: it is gated on meta.wireRev vs session.lastWireRev, and that
+    // comparison is keyed to whichever entity's meta is being wired, so
+    // without this the target's heavy fields can silently fail to resend.
+    moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
   }
@@ -1608,6 +1636,10 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
+    // same as enterSpectate: force the heavy self block to re-run so the
+    // moderator's OWN talents/inventory/equip/etc. resend immediately
+    // instead of staying stuck on the spectated target's last-sent values.
+    moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
   }
@@ -1777,6 +1809,9 @@ export class GameServer {
     if (e.dead) status = 'dead';
     else if (instanceZone != null) status = 'dungeon';
     else if (e.inCombat) status = 'combat';
+    // AFK is the lowest-priority active state: a dead/instanced/in-combat player
+    // reports that first, but an idle /afk player shows 'afk' over plain 'online'.
+    else if (this.sim.meta(session.pid)?.away?.mode === 'afk') status = 'afk';
     // The Sowfield is overworld ground (no instance band, no status change),
     // but the stadium is the presence players expect on match days: fighters
     // and walk-up spectators inside the footprint report the venue, not the
@@ -2643,6 +2678,23 @@ export class GameServer {
     });
   }
 
+  private enqueueHotbarLayoutSave(characterId: number, layout: ActionBarLayout): void {
+    const previous = this.hotbarLayoutSaveQueues.get(characterId);
+    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+      await setCharacterHotbarLayout(characterId, layout);
+    });
+    this.hotbarLayoutSaveQueues.set(characterId, run);
+    const cleanup = (): void => {
+      if (this.hotbarLayoutSaveQueues.get(characterId) === run) {
+        this.hotbarLayoutSaveQueues.delete(characterId);
+      }
+    };
+    void run.then(cleanup, (err) => {
+      console.error('failed to save hotbar layout:', err);
+      cleanup();
+    });
+  }
+
   join(
     ws: WebSocket,
     accountId: number,
@@ -2667,6 +2719,10 @@ export class GameServer {
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
         bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+        // The character's stored action-bar layout (characters.hotbar_layout),
+        // passed through from the join handler's DB read. Untrusted at rest, so
+        // it is re-validated here before it reaches the client.
+        hotbarLayout?: ActionBarLayout | null;
       } = {},
   ): ClientSession | { error: string } {
     // Anti-bot: cap simultaneous online characters per account. Accounts can
@@ -2809,6 +2865,8 @@ export class GameServer {
       spectating: null,
       jailed: state?.jail ?? null,
       jailVisit: null,
+      // Re-validate the stored layout (untrusted at rest) before it can wire out.
+      initialHotbarLayout: sanitizeActionBarLayout(meta.hotbarLayout),
     };
     if (session.jailed) this.teleportJailedSession(session);
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
@@ -4242,10 +4300,37 @@ export class GameServer {
         );
         break;
       case 'craft_item':
-        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, pid);
+        // `commission` (Professions 2.0): a strict boolean-true
+        // check (the dispatch type-guard rule); anything else reads as false.
+        // The sim honors it only for eligible equipment outputs and mints the
+        // bindOnTrade arm itself, so nothing here trusts client data.
+        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
+        break;
+      // Enchanting profession commands (Professions 2.0): the sim
+      // resolvers re-validate ownership/eligibility/throttle (nothing trusted
+      // from the client); the outcome reaches this client as the pid-scoped
+      // disenchantResult/enchantResult/salvageResult event plus the denc/ench/salv
+      // self-delta. A successful action emits a `loot` event (a HEAVY_SELF_EVENTS
+      // member) via the inventory hub, so the self inventory refreshes exactly like
+      // a craft; no explicit dirty-marking is needed here.
+      case 'disenchant_item':
+        if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
+        break;
+      case 'apply_enchant':
+        if (typeof msg.item === 'string' && typeof msg.enchant === 'string')
+          sim.applyEnchant(msg.item, msg.enchant, pid);
         break;
       case 'salvage_item':
         if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
+        break;
+      case 'unbind_item':
+        // Maker's Bond unbind service (Professions 2.0): the sim
+        // resolver re-validates eligibility/bound-ness/station range/fee
+        // (nothing trusted from the client); the outcome reaches this client
+        // as the pid-scoped text-free unbindResult event, a HEAVY_SELF_EVENTS
+        // member so the cleared payload and the fee debit re-diff the self
+        // inv/purse mirrors on the next snapshot.
+        if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
         break;
       case 'rift_upgrade_item':
         if (typeof msg.item === 'string') sim.upgradeRiftItem(msg.item, pid);
@@ -4264,7 +4349,7 @@ export class GameServer {
         if (typeof msg.craft === 'string') sim.placeMobileStation(msg.craft, pid);
         break;
       case 'train_recipe':
-        // Professions 2.0 Phase 9: fee + grant resolve inside the sim
+        // Professions 2.0: fee + grant resolve inside the sim
         // (Sim.trainRecipe -> professions/training.ts resolveTrain); the
         // outcome reaches this client as the pid-scoped trainResult event and
         // the learned set rides the per-tick cprof diff (knownRecipes is part
@@ -4352,6 +4437,15 @@ export class GameServer {
       case 'stow_weapon':
         sim.toggleWeaponStow(pid);
         break;
+      // Per-character action-bar layout upload (untrusted client input). Validate
+      // + bound the payload; a malformed/oversized layout is dropped silently
+      // (never crashes the session). A clean layout is persisted to the
+      // character's own JSONB column via the per-character FIFO save queue.
+      case 'save_hotbar_layout': {
+        const layout = sanitizeActionBarLayout(msg.layout);
+        if (layout) this.enqueueHotbarLayoutSave(session.characterId, layout);
+        break;
+      }
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':
@@ -5728,11 +5822,35 @@ export class GameServer {
         'achg',
         session.timerWireCache.encodeCharges(anchorSession.pid, p.abilityCharges).json,
       );
+      // The companion recharge timers ({abilityId: [deadline, length]}), so the
+      // bar can show the thin recharge sweep while the pool still holds a use
+      // (the empty-pool timer keeps riding `cds` unchanged). Additive key: an
+      // older client simply ignores it.
+      maybeSerialized(
+        'achr',
+        session.timerWireCache.encodeChargeRecharges(
+          anchorSession.pid,
+          p.abilityCharges,
+          this.sim.time,
+        ).json,
+      );
     } else {
       maybe(
         'achg',
         p.abilityCharges
           ? Object.fromEntries(Object.entries(p.abilityCharges).map(([k, v]) => [k, v.charges]))
+          : {},
+      );
+      // Legacy arm: raw remaining seconds ({abilityId: [remaining, length]}),
+      // resent per snapshot like every legacy timer.
+      maybe(
+        'achr',
+        p.abilityCharges
+          ? Object.fromEntries(
+              Object.entries(p.abilityCharges)
+                .filter(([, v]) => v.recharge > 0 && Number.isFinite(v.recharge))
+                .map(([k, v]) => [k, [v.recharge, v.rechargeLength]]),
+            )
           : {},
       );
     }
@@ -5759,10 +5877,10 @@ export class GameServer {
     // sizes, the live strip, the winners and guild boards, who is practicing) rides
     // `vcupb`, serialized ONCE per broadcast pass by the realm-readout memo and
     // reused across every viewer. A fresh join or a spectate enter/exit clears
-    // lastSent, so the `sent['vcup'] === undefined` arm re-ships both keys
+    // lastSent, so the `sent.vcup === undefined` arm re-ships both keys
     // immediately even between due passes (the old per-session negative-init did
     // this; the dueness gate alone would not, so keep this arm).
-    if (vcupDue || sent['vcup'] === undefined) {
+    if (vcupDue || sent.vcup === undefined) {
       const shared = realmReadoutObject(this.realmReadout, this.sim.tickCount, () =>
         this.sim.cupSharedInfoFor(),
       );
@@ -5858,11 +5976,20 @@ export class GameServer {
     // evaluates a recipe against a pair from one tick and skills from another.
     maybe('cprof', this.sim.craftingIdentityFor(anchorSession.pid));
     // The viewer's own active mobile crafting station craft id (Professions
-    // 2.0 Phase 8), or null. Expiry resolves server-side (Sim.
+    // 2.0), or null. Expiry resolves server-side (Sim.
     // activeMobileStationCraftFor checks its own tickCount), so the delta
     // naturally flips to null the tick a station lapses and the client never
     // reasons about tick domains. Small scalar, diffed per tick like atitle.
     maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
+    // The viewer's own most recent enchanting-action outcomes (Professions
+    // 2.0), or null. Small per-player reads diffed per tick like the other
+    // scalars above (a successful action already refreshed the self inventory via
+    // its loot event); the convergence arm for lastDisenchantResult/lastEnchantResult/
+    // lastSalvageResult, alongside the pid-scoped disenchantResult/enchantResult/
+    // salvageResult event. See TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
+    maybe('denc', this.sim.lastDisenchantResultFor(anchorSession.pid));
+    maybe('ench', this.sim.lastEnchantResultFor(anchorSession.pid));
+    maybe('salv', this.sim.lastSalvageResultFor(anchorSession.pid));
     maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
     // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
     // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
@@ -5938,6 +6065,12 @@ export class GameServer {
         loadouts: meta.loadouts,
         activeLoadout: meta.activeLoadout,
       });
+      // IWorldActionBar login restore (self-scoped, never a broadcast/entity
+      // field): the VIEWER's own stored layout, or an explicit null meaning "the
+      // server has no copy, seed from this device". Bound to the frozen join-time
+      // value, so lastSent-diffing sends it exactly once and a later client save
+      // never round-trips back to clobber an in-flight edit.
+      maybe('hbl', session.initialHotbarLayout);
       // Vale Cup sport-kit flag ({ role } | null): while set, the client's
       // action bar rebuilds the role kit instead of the class kit. Rides the
       // wireRev-gated block because the sim bumps wireRev on BOTH the kickoff
@@ -6340,7 +6473,19 @@ export class GameServer {
     for (const ev of events) {
       if (ev.type !== 'chat') continue;
       const flair = this.chatFlairForPid(ev.fromPid);
-      if (flair) ev.flair = flair;
+      // The sender's top STAFF Discord role (the anti-impersonation chat tag)
+      // is composed here from the SENDER's entity rather than folded into the
+      // cached session.chatFlair: e.discordRole is written by the bot's
+      // members-meta push on its own cadence, so reading it live at fan-out
+      // cannot go stale. Gated on the catalog's chatTag flag so community
+      // roles (Artist, Content Creator, LEGEND, SHILL) stay nameplate-only
+      // and the chat tag remains a pure authority signal. Allocates only for
+      // staff senders.
+      const role = this.sim.entities.get(ev.fromPid)?.discordRole;
+      // `flair` may be undefined here; spreading undefined is a spec-defined
+      // no-op, so a role-only sender yields a clean { role } object.
+      if (role && specialRoleChatTag(role)) ev.flair = { ...flair, role };
+      else if (flair) ev.flair = flair;
     }
     // ignore list: social invites from blocked senders are resolved once per
     // batch (dropped for every session and declined in the sim), not per
