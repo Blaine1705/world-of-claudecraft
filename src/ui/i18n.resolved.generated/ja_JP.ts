@@ -3180,12 +3180,15 @@ export const ja_JP: EnTranslations = {
       "renew": "継続して回復するヒールで、唱えてから移動を続けるのに向いています。",
       "lightning_bolt": "ネイチャーダメージを与える遠距離詠唱。遠くからの主力です。",
       "chain_lightning": "1体を攻撃して近くの敵2体へ跳び、1回の発動全体で雷鳴を1つ蓄えます。",
+      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
       "rockbiter_weapon": "武器に付与し、近接の一振りごとに重い一撃を与えます。",
       "healing_wave": "主力のヒール。自分や味方を直接回復します。",
       "earth_shock": "今すぐ必要なときに手早くネイチャーダメージを与える即時のショックです。",
       "lightning_shield": "身にまとい、攻撃してきた相手にネイチャーダメージを与えます。",
       "flame_shock": "前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。",
       "galeheart_weapon": "二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。",
+      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
+      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
       "lifespring_weapon": "武器に癒やしの水を宿し、継続する回復の流れを強めます。",
       "tidecall": "味方1体を即時に回復し、癒しの水流を最大まで蓄えます。",
       "ancestor_return": "戦闘外で長く詠唱し、倒れたパーティーまたはレイドの全員を蘇生します。",
@@ -7173,6 +7176,14 @@ export const ja_JP: EnTranslations = {
         "name": "反撃の牙",
         "description": "対象が回避した後に反撃し、武器ダメージに{damage}を加えたダメージを与えます。回避されません。"
       },
+      "hunting_momentum": {
+        "name": "狩猟の勢い",
+        "description": "パッシブ：腹裂きの一撃で狩猟の勢いを1スタック獲得します。8秒間持続し、最大3スタックです。3スタック時、反撃の牙の打撃ダメージが45%増加し、全スタックを消費します。（野戦術）"
+      },
+      "fieldcraft_reentry": {
+        "name": "再突入準備",
+        "description": "パッシブ：離脱跳躍は狩猟の勢いを更新し、12秒以内の次の腹裂きの一撃または血鉤を強化します。腹裂きの一撃は1スタックごとに15%の追加ダメージを与えます。血鉤は18から24の追加物理ダメージを与え、1スタックごとに15%増加し、遠隔攻撃力でも増加します。3スタック時はいずれの攻撃も狩猟の勢いを消費します。（野戦術）"
+      },
       "wing_clip": {
         "name": "足枷斬り",
         "description": "傷を負わせて{damage}ダメージを与え、10秒間、敵の移動速度を40%低下させます。"
@@ -7236,6 +7247,10 @@ export const ja_JP: EnTranslations = {
       "lightning_bolt": {
         "name": "電弧の矢",
         "description": "稲妻の矢を放ち、{damage} の自然ダメージを与えます。"
+      },
+      "thunder_reservoir": {
+        "name": "雷鳴の貯蔵",
+        "description": "パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）"
       },
       "rockbiter_weapon": {
         "name": "石縛の武器",
@@ -7464,6 +7479,14 @@ export const ja_JP: EnTranslations = {
       "galeheart_weapon": {
         "name": "疾風の武器",
         "description": "武器に疾風を宿します。3回目の命中ごとに武器攻撃が2度反響し、ストームキャストを発動します。"
+      },
+      "warspirit_cadence": {
+        "name": "戦霊の律動",
+        "description": "パッシブ：武器攻撃が3回命中するたび、50%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次のアークボルト、ジョルト、またはメンディングウォーターを即時発動かつ消費マナ半減にする。アンセストラルストライクは2回分として数える。（ウォースピリット）"
+      },
+      "stormsurge": {
+        "name": "ストームサージ",
+        "description": "パッシブ：アンセストラルストライクのクールダウン中にストームキャストを消費すると、25%の確率でクールダウンをリセットする。4回失敗すると次は必ず発動する。（ウォースピリット）"
       },
       "lifespring_weapon": {
         "name": "命泉の武器",

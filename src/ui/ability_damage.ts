@@ -54,7 +54,7 @@ export function abilityDamageBonus(
       // channel coefficient in combat, not the single-cast one.
       return def.channel
         ? channelTickBonus(power, def)
-        : directHitBonus(power, def, res.castTime, false);
+        : directHitBonus(power, def, res.castTime, false, eff.spellPowerCoeff);
     case 'aoeDamage':
     case 'aoeRoot':
     case 'chainDamage':

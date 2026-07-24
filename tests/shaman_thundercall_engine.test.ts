@@ -26,6 +26,12 @@ function setup(spec: 'elemental' | 'enhancement' = 'elemental'): { sim: Sim; sha
 describe('Thundercall engine', () => {
   it('caps the authoritative bank and scales each vent independently', () => {
     const { sim, shaman } = setup();
+    addThunderCharges(sim.ctx, shaman, 4);
+    expect(thundercallDamageMultiplier(sim.ctx, shaman, 'earth_shock')).toBe(1);
+    expect(thundercallDamageMultiplier(sim.ctx, shaman, 'earthquake')).toBe(1);
+    expect(consumeThunderVent(sim.ctx, shaman, 'earth_shock')).toBe(0);
+    expect(thunderCharges(shaman)).toBe(4);
+
     addThunderCharges(sim.ctx, shaman, 9);
     expect(thunderCharges(shaman)).toBe(5);
     expect(thundercallDamageMultiplier(sim.ctx, shaman, 'earth_shock')).toBe(2.25);

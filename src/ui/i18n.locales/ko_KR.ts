@@ -2498,6 +2498,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trailbreak.name': '흔적 끊기',
   'entities.abilities.trailbreak.description':
     '전문화 상태를 잃지 않고 뒤로 도약합니다. 야전술은 다음 재진입도 준비합니다.',
+  'entities.abilities.hunting_momentum.name': '사냥의 기세',
+  'entities.abilities.hunting_momentum.description':
+    '지속 효과: 내장 가르기가 8초 동안 사냥의 기세 1중첩을 부여합니다. 최대 3중첩입니다. 3중첩에서 반격의 송곳니가 45% 더 많은 타격 피해를 주고 모든 중첩을 소모합니다. (야전술)',
+  'entities.abilities.fieldcraft_reentry.name': '재진입 준비',
+  'entities.abilities.fieldcraft_reentry.description':
+    '지속 효과: 흔적 끊기가 사냥의 기세를 갱신하고 12초 안에 사용하는 다음 내장 가르기 또는 피갈고리를 강화합니다. 내장 가르기는 중첩당 15%의 추가 피해를 줍니다. 피갈고리는 18에서 24의 추가 물리 피해를 주고 중첩당 15% 증가하며 원거리 전투력에 따라 증가합니다. 3중첩에서는 두 공격 모두 사냥의 기세를 소모합니다. (야전술)',
   'entities.abilities.wildheart.name': '야생의 심장',
   'entities.abilities.wildheart.description': '최대 생명력의 30%를 즉시 회복합니다.',
   'entities.abilities.shellskin.name': '갑각 피부',
@@ -9126,4 +9132,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading': '부여된 사본, 출처, 시장',
   'guide.profPages.craftProse.enchanting.marketBody':
     '마법부여는 가방 속 장착하지 않은 사본 하나와 재료를 소모하고, 별개의 부여된 사본을 돌려준다. 입으면 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본은 다시 부여할 수도 분해할 수도 없고, 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 세계 시장은 무표식 일반품만 다루므로 부여품과 서명품은 거래 창에서 직접 오간다. 시장에 올릴 수 있는 절반은 재료 쪽이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다.',
+  'entities.abilities.thunder_reservoir.name': '천둥 비축',
+  'entities.abilities.thunder_reservoir.description':
+    '지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)',
+  'entities.abilities.warspirit_cadence.name': '전령의 박자',
+  'entities.abilities.warspirit_cadence.description':
+    '지속 효과: 무기 공격이 3번 적중할 때마다 50%의 자연 피해를 주는 질풍 메아리가 2번 발동하고 12초 동안 폭풍시전을 얻습니다. 폭풍시전은 다음 비전 화살, 충격 또는 치유의 물결을 즉시 시전하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (전령)',
+  'entities.abilities.stormsurge.name': '폭풍쇄도',
+  'entities.abilities.stormsurge.description':
+    '지속 효과: 선조의 일격이 재사용 대기 중일 때 폭풍시전을 소모하면 25% 확률로 재사용 대기시간을 초기화합니다. 4번 실패하면 다음에는 반드시 발동합니다. (전령)',
 };

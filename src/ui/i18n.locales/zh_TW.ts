@@ -2415,6 +2415,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trailbreak.name': '斷跡',
   'entities.abilities.trailbreak.description':
     '向後躍開且不失去專精狀態。野戰技藝還會為下一次重返戰場做好準備。',
+  'entities.abilities.hunting_momentum.name': '狩獵動能',
+  'entities.abilities.hunting_momentum.description':
+    '被動：剖膛打擊會獲得1層狩獵動能，持續8秒，最多3層。達到3層時，反噬獠牙的打擊傷害提高45%，並消耗所有層數。（野戰技藝）',
+  'entities.abilities.fieldcraft_reentry.name': '蓄勢再入',
+  'entities.abilities.fieldcraft_reentry.description':
+    '被動：斷跡會刷新狩獵動能，並使你在12秒內的下一次剖膛打擊或血鉤獲得再入強化。剖膛打擊每層造成15%額外傷害。血鉤造成18至24點額外物理傷害，每層再提高15%，並隨遠程攻擊強度提高。達到3層時，任一攻擊都會消耗狩獵動能。（野戰技藝）',
   'entities.abilities.wildheart.name': '野性之心',
   'entities.abilities.wildheart.description': '立即恢復最大生命值的 30%。',
   'entities.abilities.shellskin.name': '甲殼之膚',
@@ -8713,4 +8719,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出處與市場',
   'guide.profPages.craftProse.enchanting.marketBody':
     '施加附魔消耗背包中未裝備的一件副本加材料，交還一件獨立的附魔副本；穿上它，加成永遠跟隨。一件一附魔：附魔副本不能再附魔也不能分解，出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。世界市場只經手無標記的普通貨，附魔與署名件都面對面交易；材料才是可上市的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。',
+  'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
+  'entities.abilities.thunder_reservoir.description':
+    '被動：奧術閃電與天穹連鎖會獲得雷霆，最多5層。達到5層時，大地震擊造成的傷害提高125%，或裂地震波造成的傷害提高100%，隨後消耗全部雷霆。（雷霆召喚）',
+  'entities.abilities.warspirit_cadence.name': '戰魂節律',
+  'entities.abilities.warspirit_cadence.description':
+    '被動：每第3次命中的武器攻擊會觸發2次裂風迴響，各造成50%自然傷害，並獲得持續12秒的風暴施法。風暴施法使下一個奧術閃電、震擊或治癒之水瞬發且法力消耗降低50%。先祖打擊視為2次攻擊。（戰魂）',
+  'entities.abilities.stormsurge.name': '風暴湧動',
+  'entities.abilities.stormsurge.description':
+    '被動：先祖打擊冷卻時，消耗風暴施法有25%機率重置其冷卻。連續失敗4次後必定重置。（戰魂）',
 };

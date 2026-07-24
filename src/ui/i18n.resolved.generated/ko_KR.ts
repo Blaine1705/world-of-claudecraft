@@ -3180,12 +3180,15 @@ export const ko_KR: EnTranslations = {
       "renew": "시간이 지나며 회복되는 치유로, 시전하고 계속 이동하기 좋습니다.",
       "lightning_bolt": "자연 피해를 주는 원거리 시전기로, 멀리서 쓰는 주력기입니다.",
       "chain_lightning": "한 대상을 공격하고 주변 적 두 명에게 튕기며, 전체 시전에서 천둥 한 개를 쌓습니다.",
+      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
       "rockbiter_weapon": "무기에 기운을 불어넣어 근접 공격이 더 강하게 들어가게 합니다.",
       "healing_wave": "주력 치유로, 자신이나 아군의 체력을 직접 회복시킵니다.",
       "earth_shock": "지금 당장 필요한 자연 피해를 즉시 주는 충격기입니다.",
       "lightning_shield": "몸에 전하를 둘러 공격자가 당신을 칠 때 자연 피해를 받게 합니다.",
       "flame_shock": "즉시 타격을 입히고 시간이 지나며 계속 불태우는 점화기입니다.",
       "galeheart_weapon": "쌍수 무기에 폭풍의 바람을 불어넣어 안정적인 공격 리듬을 보상합니다.",
+      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
+      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
       "lifespring_weapon": "무기에 치유의 물을 불어넣어 이어지는 회복 흐름을 강화합니다.",
       "tidecall": "아군을 즉시 치유하고 치유의 물결을 최대로 저장합니다.",
       "ancestor_return": "전투 중이 아닐 때 길게 시전해 쓰러진 파티 또는 공격대원 모두를 부활시킵니다.",
@@ -7173,6 +7176,14 @@ export const ko_KR: EnTranslations = {
         "name": "반격의 송곳니",
         "description": "대상이 회피한 후 반격하여 무기 피해에 {damage}를 더한 피해를 입힙니다. 회피할 수 없습니다."
       },
+      "hunting_momentum": {
+        "name": "사냥의 기세",
+        "description": "지속 효과: 내장 가르기가 8초 동안 사냥의 기세 1중첩을 부여합니다. 최대 3중첩입니다. 3중첩에서 반격의 송곳니가 45% 더 많은 타격 피해를 주고 모든 중첩을 소모합니다. (야전술)"
+      },
+      "fieldcraft_reentry": {
+        "name": "재진입 준비",
+        "description": "지속 효과: 흔적 끊기가 사냥의 기세를 갱신하고 12초 안에 사용하는 다음 내장 가르기 또는 피갈고리를 강화합니다. 내장 가르기는 중첩당 15%의 추가 피해를 줍니다. 피갈고리는 18에서 24의 추가 물리 피해를 주고 중첩당 15% 증가하며 원거리 전투력에 따라 증가합니다. 3중첩에서는 두 공격 모두 사냥의 기세를 소모합니다. (야전술)"
+      },
       "wing_clip": {
         "name": "족쇄 베기",
         "description": "상처를 내어 {damage}의 피해를 입히고 10초 동안 적의 이동 속도를 40%만큼 감소시킵니다."
@@ -7236,6 +7247,10 @@ export const ko_KR: EnTranslations = {
       "lightning_bolt": {
         "name": "전격 화살",
         "description": "번개 화살을 던져 {damage}의 자연 피해를 입힙니다."
+      },
+      "thunder_reservoir": {
+        "name": "천둥 비축",
+        "description": "지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)"
       },
       "rockbiter_weapon": {
         "name": "바위결속 무기",
@@ -7464,6 +7479,14 @@ export const ko_KR: EnTranslations = {
       "galeheart_weapon": {
         "name": "질풍의 무기",
         "description": "무기에 질풍을 불어넣습니다. 적중한 세 번째 무기 공격마다 두 번 반향하고 폭풍 시전을 활성화합니다."
+      },
+      "warspirit_cadence": {
+        "name": "전령의 박자",
+        "description": "지속 효과: 무기 공격이 3번 적중할 때마다 50%의 자연 피해를 주는 질풍 메아리가 2번 발동하고 12초 동안 폭풍시전을 얻습니다. 폭풍시전은 다음 비전 화살, 충격 또는 치유의 물결을 즉시 시전하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (전령)"
+      },
+      "stormsurge": {
+        "name": "폭풍쇄도",
+        "description": "지속 효과: 선조의 일격이 재사용 대기 중일 때 폭풍시전을 소모하면 25% 확률로 재사용 대기시간을 초기화합니다. 4번 실패하면 다음에는 반드시 발동합니다. (전령)"
       },
       "lifespring_weapon": {
         "name": "생명의 샘 무기",

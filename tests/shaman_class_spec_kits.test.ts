@@ -86,6 +86,29 @@ describe('Shaman v0.29 specialization ownership', () => {
     expect(knownAt('enhancement', 20).has('chain_heal')).toBe(false);
   });
 
+  it('explains the full-bank Thundercall payoff as a passive spellbook entry', () => {
+    expect(ABILITIES.thunder_reservoir).toMatchObject({
+      name: 'Thunder Reservoir',
+      specs: ['elemental'],
+      passive: true,
+    });
+    expect(knownAt('elemental', 20).has('thunder_reservoir')).toBe(true);
+    expect(knownAt('enhancement', 20).has('thunder_reservoir')).toBe(false);
+    expect(knownAt('restoration', 20).has('thunder_reservoir')).toBe(false);
+  });
+
+  it('shows Warspirit cadence and Stormsurge as passive spellbook entries', () => {
+    for (const abilityId of ['warspirit_cadence', 'stormsurge']) {
+      expect(ABILITIES[abilityId]).toMatchObject({
+        specs: ['enhancement'],
+        passive: true,
+      });
+      expect(knownAt('enhancement', 20).has(abilityId)).toBe(true);
+      expect(knownAt('elemental', 20).has(abilityId)).toBe(false);
+      expect(knownAt('restoration', 20).has(abilityId)).toBe(false);
+    }
+  });
+
   it('unlocks one-handed dual wield only for Warspirit', () => {
     expect(canDualWield('shaman', 'enhancement')).toBe(true);
     expect(canDualWield('shaman', 'elemental')).toBe(false);

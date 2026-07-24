@@ -2413,6 +2413,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trailbreak.name': '断迹',
   'entities.abilities.trailbreak.description':
     '向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。',
+  'entities.abilities.hunting_momentum.name': '狩猎势能',
+  'entities.abilities.hunting_momentum.description':
+    '被动：剖膛一击会获得1层狩猎势能，持续8秒，最多3层。达到3层时，反噬獠牙的打击伤害提高45%，并消耗所有层数。（野战技艺）',
+  'entities.abilities.fieldcraft_reentry.name': '蓄势返场',
+  'entities.abilities.fieldcraft_reentry.description':
+    '被动：断迹会刷新狩猎势能，并使你在12秒内的下一次剖膛一击或血钩获得返场强化。剖膛一击每层造成15%额外伤害。血钩造成18至24点额外物理伤害，每层再提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（野战技艺）',
   'entities.abilities.wildheart.name': '野性之心',
   'entities.abilities.wildheart.description': '立即恢复最大生命值的 30%。',
   'entities.abilities.shellskin.name': '甲壳之肤',
@@ -8712,4 +8718,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出处与市场',
   'guide.profPages.craftProse.enchanting.marketBody':
     '施加附魔消耗背包中未装备的一件副本加材料，交还一件独立的附魔副本；穿上它，加成永远跟随。一件一附魔：附魔副本不能再附魔也不能分解，出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。世界市场只经手无标记的普通货，附魔与署名件都面对面交易；材料才是可上市的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。',
+  'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
+  'entities.abilities.thunder_reservoir.description':
+    '被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
+  'entities.abilities.warspirit_cadence.name': '战魂节律',
+  'entities.abilities.warspirit_cadence.description':
+    '被动：每第3次命中的武器攻击会触发2次裂风回响，各造成50%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）',
+  'entities.abilities.stormsurge.name': '风暴涌动',
+  'entities.abilities.stormsurge.description':
+    '被动：先祖打击冷却时，消耗风暴施法有25%几率重置其冷却。连续失败4次后必定重置。（战魂）',
 };

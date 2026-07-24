@@ -663,6 +663,8 @@ export const guideStrings = {
     lightning_bolt: 'A ranged cast of Nature damage, your go-to from afar.',
     chain_lightning:
       'Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.',
+    thunder_reservoir:
+      'Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.',
     rockbiter_weapon: 'Imbues your weapon so each swing lands harder in melee.',
     healing_wave: 'Your main heal, a direct mend for yourself or an ally.',
     earth_shock: 'An instant shock for quick Nature damage when you need it now.',
@@ -670,6 +672,10 @@ export const guideStrings = {
     flame_shock: 'An instant burn that hits up front and keeps searing over time.',
     galeheart_weapon:
       'Imbues both weapons with storm winds that reward a steady dual-wield rhythm.',
+    warspirit_cadence:
+      'Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.',
+    stormsurge:
+      'Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.',
     lifespring_weapon:
       'Imbues your weapon with restorative water that strengthens your healing flow.',
     tidecall: 'Immediately heals an ally and deposits a full Mending Current pool.',

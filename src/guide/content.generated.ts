@@ -700,6 +700,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Woundrend"
       },
       {
+        "id": "hunting_momentum",
+        "name": "Hunting Momentum"
+      },
+      {
+        "id": "fieldcraft_reentry",
+        "name": "Armed Re-entry"
+      },
+      {
         "id": "wing_clip",
         "name": "Fettering Slash"
       },
@@ -1079,6 +1087,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Arc Bolt"
       },
       {
+        "id": "thunder_reservoir",
+        "name": "Thunder Reservoir"
+      },
+      {
         "id": "chain_lightning",
         "name": "Skybranch"
       },
@@ -1091,12 +1103,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Galeheart Weapon"
       },
       {
-        "id": "lifespring_weapon",
-        "name": "Lifespring Weapon"
-      },
-      {
-        "id": "healing_wave",
-        "name": "Mending Waters"
+        "id": "warspirit_cadence",
+        "name": "Warspirit Cadence"
       }
     ],
     "abilities": [
@@ -1105,6 +1113,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Arc Bolt"
       },
       {
+        "id": "thunder_reservoir",
+        "name": "Thunder Reservoir"
+      },
+      {
         "id": "chain_lightning",
         "name": "Skybranch"
       },
@@ -1115,6 +1127,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "galeheart_weapon",
         "name": "Galeheart Weapon"
+      },
+      {
+        "id": "warspirit_cadence",
+        "name": "Warspirit Cadence"
+      },
+      {
+        "id": "stormsurge",
+        "name": "Stormsurge"
       },
       {
         "id": "lifespring_weapon",

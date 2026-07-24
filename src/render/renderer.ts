@@ -69,6 +69,7 @@ import {
   hunterPetFerocityStage,
   hunterPetFrenzyActive,
   hunterPetVisualScale,
+  tithefiendEmpoweredActive,
 } from './character_effects';
 import {
   type AnimState,
@@ -5598,6 +5599,9 @@ export class Renderer {
           'fire',
           dt * (0.45 + ferocityStage * 0.35 + (petFrenzy ? 1 : 0)),
         );
+      }
+      if (tithefiendEmpoweredActive(e)) {
+        this.vfx.castSparkle(e.id, 'shadow', dt * 2.4);
       }
       // Shapeshift-form particle auras riding the tints above: metamorph fire,
       // moonkin star motes, shadowform gloom wisps. Suppressed for the dead

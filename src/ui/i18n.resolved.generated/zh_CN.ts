@@ -3180,12 +3180,15 @@ export const zh_CN: EnTranslations = {
       "renew": "随时间持续跳动的治疗，适合施放后继续移动。",
       "lightning_bolt": "一次远程施法的自然伤害，是你远距离的常用手段。",
       "chain_lightning": "攻击一个目标并跳向附近两名敌人，整次施法产生一层雷霆。",
+      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
       "rockbiter_weapon": "为你的武器附魔，让每一次近战挥击更重。",
       "healing_wave": "你的主力治疗，为自己或盟友直接补血。",
       "earth_shock": "瞬发的震击，在你急需时打出快速的自然伤害。",
       "lightning_shield": "为你充能，让攻击者打中你时受到自然伤害。",
       "flame_shock": "瞬发的灼烧，先打出一记，并持续灼烧目标。",
       "galeheart_weapon": "为双持武器灌注风暴之风，以稳定的攻击节奏获取回报。",
+      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
+      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
       "lifespring_weapon": "为武器灌注复苏之水，强化持续的治疗节奏。",
       "tidecall": "立即治疗一名盟友，并注入满额愈合水流。",
       "ancestor_return": "在战斗外长时间施法后，使所有阵亡的小队或团队成员复活。",
@@ -7173,6 +7176,14 @@ export const zh_CN: EnTranslations = {
         "name": "反噬獠牙",
         "description": "在目标躲闪后反击，造成武器伤害加 {damage}。无法被躲闪。"
       },
+      "hunting_momentum": {
+        "name": "狩猎势能",
+        "description": "被动：剖膛一击会获得1层狩猎势能，持续8秒，最多3层。达到3层时，反噬獠牙的打击伤害提高45%，并消耗所有层数。（野战技艺）"
+      },
+      "fieldcraft_reentry": {
+        "name": "蓄势返场",
+        "description": "被动：断迹会刷新狩猎势能，并使你在12秒内的下一次剖膛一击或血钩获得返场强化。剖膛一击每层造成15%额外伤害。血钩造成18至24点额外物理伤害，每层再提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（野战技艺）"
+      },
       "wing_clip": {
         "name": "束缚斩",
         "description": "造成伤口，造成 {damage} 点伤害，并使敌人移动速度降低 40%，持续 10 秒。"
@@ -7236,6 +7247,10 @@ export const zh_CN: EnTranslations = {
       "lightning_bolt": {
         "name": "电弧箭",
         "description": "投掷一道闪电，造成 {damage} 点自然伤害。"
+      },
+      "thunder_reservoir": {
+        "name": "雷霆蓄能",
+        "description": "被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）"
       },
       "rockbiter_weapon": {
         "name": "缚石武器",
@@ -7464,6 +7479,14 @@ export const zh_CN: EnTranslations = {
       "galeheart_weapon": {
         "name": "风心武器",
         "description": "为武器灌注疾风。每第三次命中的武器攻击会回响两次，并触发风暴施法。"
+      },
+      "warspirit_cadence": {
+        "name": "战魂节律",
+        "description": "被动：每第3次命中的武器攻击会触发2次裂风回响，各造成50%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）"
+      },
+      "stormsurge": {
+        "name": "风暴涌动",
+        "description": "被动：先祖打击冷却时，消耗风暴施法有25%几率重置其冷却。连续失败4次后必定重置。（战魂）"
       },
       "lifespring_weapon": {
         "name": "活泉武器",

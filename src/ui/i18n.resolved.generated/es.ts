@@ -3180,12 +3180,15 @@ export const es: EnTranslations = {
       "renew": "Una sanación que va curando con el tiempo, ideal para lanzar y seguir moviéndote.",
       "lightning_bolt": "Un lanzamiento a distancia de daño de Naturaleza, tu recurso habitual desde lejos.",
       "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
+      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
       "rockbiter_weapon": "Imbuye tu arma para que cada golpe cuerpo a cuerpo impacte con más fuerza.",
       "healing_wave": "Tu sanación principal, una cura directa para ti o un aliado.",
       "earth_shock": "Un choque instantáneo de daño de Naturaleza rápido para cuando lo necesitas ya.",
       "lightning_shield": "Te carga de energía para que los atacantes reciban daño de Naturaleza al golpearte.",
       "flame_shock": "Una quemadura instantánea que golpea de inmediato y sigue abrasando con el tiempo.",
       "galeheart_weapon": "Imbuye ambas armas con vientos de tormenta y premia un ritmo de ataques constante.",
+      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
+      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
       "lifespring_weapon": "Imbuye tu arma con agua reparadora y refuerza tu flujo continuo de sanación.",
       "tidecall": "Invoca la marea y potencia la siguiente secuencia de hechizos de sanación.",
       "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
@@ -6759,7 +6762,7 @@ export const es: EnTranslations = {
       },
       "bloodhook": {
         "name": "Bloodhook",
-        "description": "Charge to the enemy and apply Bloodhook Wound. The wound deals 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
       },
       "shrapnel_charge": {
         "name": "Shrapnel Charge",
@@ -6771,7 +6774,7 @@ export const es: EnTranslations = {
       },
       "trailbreak": {
         "name": "Trailbreak",
-        "description": "Leap 12 yards backward. Fieldcraft refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% extra damage per Momentum. Bloodhook adds an 18 to 24 damage re-entry hit whose base damage increases by 15% per Momentum and whose damage also increases with Ranged Attack Power."
+        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
       },
       "wildheart": {
         "name": "Wildheart",
@@ -7173,6 +7176,14 @@ export const es: EnTranslations = {
         "name": "Contracolmillo",
         "description": "Contraataca después de que el objetivo esquive e inflige daño de arma más {damage}. No puede esquivarse."
       },
+      "hunting_momentum": {
+        "name": "Hunting Momentum",
+        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+      },
+      "fieldcraft_reentry": {
+        "name": "Armed Re-entry",
+        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+      },
       "wing_clip": {
         "name": "Tajo Aprisionante",
         "description": "Inflige una herida por {damage} de daño que ralentiza al enemigo un 40% durante 10 s."
@@ -7236,6 +7247,10 @@ export const es: EnTranslations = {
       "lightning_bolt": {
         "name": "Arco Eléctrico",
         "description": "Lanza un rayo que inflige {damage} de daño de Naturaleza."
+      },
+      "thunder_reservoir": {
+        "name": "Thunder Reservoir",
+        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
@@ -7463,7 +7478,15 @@ export const es: EnTranslations = {
       },
       "galeheart_weapon": {
         "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min. Every 3rd landed weapon attack repeats twice for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana."
+        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+      },
+      "warspirit_cadence": {
+        "name": "Warspirit Cadence",
+        "description": "Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+      },
+      "stormsurge": {
+        "name": "Stormsurge",
+        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. The reset is guaranteed after 4 failed chances. (Warspirit)"
       },
       "lifespring_weapon": {
         "name": "Lifespring Weapon",
@@ -7987,7 +8010,7 @@ export const es: EnTranslations = {
       },
       "summon_tithefiend": {
         "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack, and prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
       },
       "martyrs_aegis": {
         "name": "Martyr's Aegis",

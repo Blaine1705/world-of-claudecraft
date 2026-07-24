@@ -52,3 +52,8 @@ export function hunterPetVisualScale(stage: number, frenzy: boolean): number {
   if (stage === 1) return 1.04;
   return 1;
 }
+
+/** A five-stack Tithefiend is authored above normal creature scale. */
+export function tithefiendEmpoweredActive(entity: Entity): boolean {
+  return !entity.dead && entity.templateId === 'guardian_tithefiend' && entity.scale > 1;
+}

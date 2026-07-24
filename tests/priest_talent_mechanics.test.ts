@@ -430,7 +430,7 @@ describe('Priest v0.29 talent mechanics', () => {
     const guardian = [...shadow.sim.entities.values()].find(
       (entity) => entity.guardianState?.key === 'tithefiend',
     );
-    expect(guardian?.guardianState?.minDamage).toBe(78);
+    expect(guardian?.guardianState?.minDamage).toBe(98);
     expect(guardian?.guardianState?.remaining).toBeGreaterThan(22);
   });
 });

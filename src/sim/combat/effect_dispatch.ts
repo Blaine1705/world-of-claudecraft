@@ -434,7 +434,13 @@ export function runEffects(
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
         // applies the AP scale-down. A non-scaling effect just contributes 0.
-        dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        dmg += directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          false,
+          eff.spellPowerCoeff,
+        );
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         // Ice Lance against a frozen-counting target (combat/frost_mage.ts):
         // the per-cast resolution carries its 3x; 1 for every other cast.

@@ -1798,7 +1798,14 @@ export type AbilityEffect =
       requiresBehind?: boolean;
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
-  | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
+  | {
+      type: 'directDamage';
+      min: number;
+      max: number;
+      vsRootedMult?: number;
+      /** Optional authored coefficient that replaces the cast-time coefficient. */
+      spellPowerCoeff?: number;
+    }
   // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
   // incentive design), scaled like ability-granted rage; never on a whiff.
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
@@ -2699,6 +2706,8 @@ export interface GuardianState {
   attackInterval: number;
   minDamage: number;
   maxDamage: number;
+  /** Fraction of the owner's current Spell Power added to each guardian hit. */
+  spellPowerCoeff?: number;
   school: string;
   abilityId: string;
   abilityName: string;

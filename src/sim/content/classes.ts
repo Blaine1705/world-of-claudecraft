@@ -308,6 +308,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'arcane_shot',
       'concussive_shot',
       'mongoose_bite',
+      'hunting_momentum',
+      'fieldcraft_reentry',
       'wing_clip',
       'trailbreak',
       'wildheart',
@@ -378,9 +380,12 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startItems: START_RATIONS_MANA,
     abilities: [
       'lightning_bolt',
+      'thunder_reservoir',
       'chain_lightning',
       'rockbiter_weapon',
       'galeheart_weapon',
+      'warspirit_cadence',
+      'stormsurge',
       'lifespring_weapon',
       'healing_wave',
       'tidecall',
@@ -2039,7 +2044,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetMode: 'position',
     effects: [{ type: 'groundAoE', min: 13, max: 17, radius: 8, duration: 6, interval: 1.5 }],
     description:
-      'Shake an 8-yard area for 6 sec, dealing $d Nature damage every 1.5 sec. Consume all Thunder after the cast, increasing every pulse by 20% per charge.',
+      'Shake an 8-yard area for 6 sec, dealing $d Nature damage every 1.5 sec. Thundercall empowers it at full Thunder.',
   },
   scorch: {
     id: 'scorch',
@@ -3265,7 +3270,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Strike for 10% weapon damage plus $d. A hit restores 15 Focus and grants 1 Hunting Momentum for 8 sec, up to 3. Damage increases with Attack Power through weapon damage.',
+      'Strike for 10% weapon damage plus $d. A hit restores 15 Focus and grants 1 Hunting Momentum. Damage increases with Attack Power through weapon damage.',
   },
   pack_command: {
     id: 'pack_command',
@@ -3485,7 +3490,41 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Strike for weapon damage plus $d. If the target has your Bloodhook Wound, deal 1 wound tick immediately and refresh the wound to 12 sec. At 3 Hunting Momentum, deal 45% extra strike damage and consume the stacks. Damage increases with Attack Power through weapon damage.',
+      'Strike for weapon damage plus $d. If the target has your Bloodhook Wound, deal 1 wound tick immediately and refresh the wound to 12 sec. Damage increases with Attack Power through weapon damage.',
+  },
+  hunting_momentum: {
+    id: 'hunting_momentum',
+    name: 'Hunting Momentum',
+    class: 'hunter',
+    specs: ['survival'],
+    learnLevel: 5,
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)',
+  },
+  fieldcraft_reentry: {
+    id: 'fieldcraft_reentry',
+    name: 'Armed Re-entry',
+    class: 'hunter',
+    specs: ['survival'],
+    learnLevel: 5,
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)',
   },
   wing_clip: {
     id: 'wing_clip',
@@ -3647,14 +3686,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 4,
     cost: 0,
     castTime: 0,
-    cooldown: 20,
+    cooldown: 15,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'hunterTrailbreak', distance: 12 }],
     description:
-      'Leap 12 yards backward. Fieldcraft refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% extra damage per Momentum. Bloodhook adds an 18 to 24 damage re-entry hit whose base damage increases by 15% per Momentum and whose damage also increases with Ranged Attack Power.',
+      'Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
   },
   wildheart: {
     id: 'wildheart',
@@ -3806,7 +3845,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d total Shadow damage over 18 sec, with one tick every 3 sec. Vespers gains 1 Gloomtithe whenever this effect ticks on your Effigy.',
+      'Deal $d total Shadow damage over 18 sec, once every 3 sec. Vespers increases this damage by 25%. Each tick on your Effigy grants 1 Gloomtithe.',
   },
   power_word_shield: {
     id: 'power_word_shield',
@@ -3874,7 +3913,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 20, cost: 95, effects: [{ type: 'directDamage', min: 86, max: 94 }] },
     ],
     description:
-      'Deal $d Shadow damage. Vespers binds a target with your Dirge of Decay as its Effigy, grants 1 Gloomtithe, and echoes 30% of the damage to up to 3 other enemies with your Dirge.',
+      'Deal $d Shadow damage. Damage increases with Spell Power. Vespers binds a target with your Dirge of Decay as its Effigy, grants 1 Gloomtithe, and echoes 30% of the damage to up to 3 other enemies with your Dirge.',
   },
   heal: {
     id: 'heal',
@@ -3961,7 +4000,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'directDamage', min: 75, max: 85 }],
       },
     ],
-    description: 'Deal $d Nature damage. Thundercall gains 1 Thunder when the bolt hits, up to 5.',
+    description: 'Deal $d Nature damage. Thundercall: a hit grants 1 Thunder.',
+  },
+  thunder_reservoir: {
+    id: 'thunder_reservoir',
+    name: 'Thunder Reservoir',
+    class: 'shaman',
+    specs: ['elemental'],
+    learnLevel: 5,
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)',
   },
   rockbiter_weapon: {
     id: 'rockbiter_weapon',
@@ -3997,8 +4053,41 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'imbue', bonus: 0, duration: 1800 }],
+    description: 'Imbue both weapons for 30 min, enabling Warspirit Cadence.',
+  },
+  warspirit_cadence: {
+    id: 'warspirit_cadence',
+    name: 'Warspirit Cadence',
+    class: 'shaman',
+    specs: ['enhancement'],
+    learnLevel: 5,
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [],
     description:
-      'Imbue both weapons for 30 min. Every 3rd landed weapon attack repeats twice for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana.',
+      'Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+  },
+  stormsurge: {
+    id: 'stormsurge',
+    name: 'Stormsurge',
+    class: 'shaman',
+    specs: ['enhancement'],
+    learnLevel: 14,
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. The reset is guaranteed after 4 failed chances. (Warspirit)',
   },
   lifespring_weapon: {
     id: 'lifespring_weapon',
@@ -4119,7 +4208,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 16, cost: 65, effects: [{ type: 'directDamage', min: 54, max: 61 }] },
     ],
     description:
-      'Deal $d Nature damage. Thundercall consumes all Thunder after the hit, increasing its damage by 25% per charge. Stonebound Warspirit also forces the target to attack you for 3 sec.',
+      'Deal $d Nature damage. Thundercall empowers it at full Thunder. Stonebound forces the target to attack you.',
   },
   lightning_shield: {
     id: 'lightning_shield',
@@ -5751,7 +5840,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 5,
     cost: 0,
     castTime: 0,
-    cooldown: 20,
+    cooldown: 15,
     range: 25,
     minRange: 8,
     school: 'physical',
@@ -5766,7 +5855,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Charge to the enemy and apply Bloodhook Wound. The wound deals 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
+      'Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
   },
   trueshot_aura: {
     id: 'trueshot_aura',
@@ -5993,7 +6082,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'For 12 sec, every Arc Bolt hit grants 2 Thunder instead of 1. Your next Arc Bolt or Skybranch is instant, and your next Earthen Jolt or Faultwake deals 25% more damage. (Thundercall signature)',
+      'For 12 sec, Arc Bolt grants 2 Thunder. Your next Arc Bolt or Skybranch is instant, and your next full Thunder payoff deals 25% more damage. (Thundercall signature)',
   },
   siphon_life: {
     id: 'siphon_life',

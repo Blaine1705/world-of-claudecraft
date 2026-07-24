@@ -94,6 +94,7 @@ import {
 } from './combat/hunter_shared';
 import { tickNaturesFury } from './combat/natures_fury';
 import { cleanupPriestState } from './combat/priest/lifecycle';
+import { resolveVespersAbility } from './combat/priest/vespers';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
@@ -4393,6 +4394,7 @@ export class Sim {
     let found = resolveActionReplacement(known, r.e);
     found = resolveColdsightAbility(found, r.e, r.meta);
     found = resolveHunterSharedAbility(found, r.e, r.meta);
+    found = resolveVespersAbility(found, r.meta);
     // A "draining curse" (cost_tax aura) inflates the resource cost of every
     // ability the victim uses. Resolve it here, the single choke point all cost
     // checks/spends read, so the affordability check and the spend stay in

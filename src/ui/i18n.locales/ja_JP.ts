@@ -2518,6 +2518,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trailbreak.name': '離脱跳躍',
   'entities.abilities.trailbreak.description':
     '専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。',
+  'entities.abilities.hunting_momentum.name': '狩猟の勢い',
+  'entities.abilities.hunting_momentum.description':
+    'パッシブ：腹裂きの一撃で狩猟の勢いを1スタック獲得します。8秒間持続し、最大3スタックです。3スタック時、反撃の牙の打撃ダメージが45%増加し、全スタックを消費します。（野戦術）',
+  'entities.abilities.fieldcraft_reentry.name': '再突入準備',
+  'entities.abilities.fieldcraft_reentry.description':
+    'パッシブ：離脱跳躍は狩猟の勢いを更新し、12秒以内の次の腹裂きの一撃または血鉤を強化します。腹裂きの一撃は1スタックごとに15%の追加ダメージを与えます。血鉤は18から24の追加物理ダメージを与え、1スタックごとに15%増加し、遠隔攻撃力でも増加します。3スタック時はいずれの攻撃も狩猟の勢いを消費します。（野戦術）',
   'entities.abilities.wildheart.name': '野生の心',
   'entities.abilities.wildheart.description': '最大体力の30%を即座に回復します。',
   'entities.abilities.shellskin.name': '甲殻の皮膚',
@@ -9131,4 +9137,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading': '付与済みの品と来歴と市場',
   'guide.profPages.craftProse.enchanting.marketBody':
     '付与は鞄の中の未装備の一品と素材を消費し、別個の付与済みの品を返します。装備すれば効果は永遠にその品に付き従います。一品にひとつ。付与済みの品は再付与も分解もできず、売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。世界市場は無印の品しか扱わないため、付与済みや署名入りは取引ウィンドウで直接手渡し。市場に出せる半分は素材の方です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。',
+  'entities.abilities.thunder_reservoir.name': '雷鳴の貯蔵',
+  'entities.abilities.thunder_reservoir.description':
+    'パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）',
+  'entities.abilities.warspirit_cadence.name': '戦霊の律動',
+  'entities.abilities.warspirit_cadence.description':
+    'パッシブ：武器攻撃が3回命中するたび、50%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次のアークボルト、ジョルト、またはメンディングウォーターを即時発動かつ消費マナ半減にする。アンセストラルストライクは2回分として数える。（ウォースピリット）',
+  'entities.abilities.stormsurge.name': 'ストームサージ',
+  'entities.abilities.stormsurge.description':
+    'パッシブ：アンセストラルストライクのクールダウン中にストームキャストを消費すると、25%の確率でクールダウンをリセットする。4回失敗すると次は必ず発動する。（ウォースピリット）',
 };

@@ -89,6 +89,11 @@ describe('directHitBonus', () => {
     const d = def({ school: 'physical', scalesWith: 'ranged' });
     expect(directHitBonus(rap, d, 3.0)).toBe(Math.round(rap * (3.0 / 3.5) * RANGED_SPELL_AP_SCALE));
   });
+
+  it('uses an authored direct-damage coefficient when one is provided', () => {
+    const sp = 200;
+    expect(directHitBonus(sp, def({}), 1.5, false, 0.6)).toBe(120);
+  });
 });
 
 describe('channelTickBonus', () => {

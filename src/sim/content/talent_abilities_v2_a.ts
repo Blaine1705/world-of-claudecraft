@@ -424,7 +424,7 @@ export const TALENT_ABILITIES_V2_A = {
       },
     ],
     description:
-      'Strike the target and jump to up to 2 enemies within 10 yards for $d Nature damage each. The cast grants 1 Thunder if it hits, not 1 per target. Damage increases with Spell Power. Primal Mastery can make this cast instant, and Primal Exaltation halves its cast time. (Thundercall)',
+      'Strike up to 3 enemies within 10 yards for $d Nature damage each. Thundercall: a hit grants 1 Thunder. Damage increases with Spell Power.',
   },
   earthbind: {
     id: 'earthbind',

@@ -79,6 +79,7 @@ export function summonGuardian(ctx: SimContext, owner: Entity, config: GuardianC
     attackInterval: config.attackInterval,
     minDamage: config.minDamage,
     maxDamage: config.maxDamage,
+    spellPowerCoeff: config.spellPowerCoeff,
     school: config.school,
     abilityId: config.abilityId,
     abilityName: config.abilityName,
@@ -159,7 +160,8 @@ export function updateGuardian(ctx: SimContext, guardian: Entity): boolean {
   ctx.dealDamage(
     guardian,
     target,
-    ctx.rng.range(state.minDamage, state.maxDamage),
+    ctx.rng.range(state.minDamage, state.maxDamage) +
+      Math.round(owner.spellPower * (state.spellPowerCoeff ?? 0)),
     false,
     state.school,
     state.abilityName,
