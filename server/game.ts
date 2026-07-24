@@ -4044,7 +4044,10 @@ export class GameServer {
     // the detector keeps seeing the traffic shape even when the handler never
     // runs. Chat draws from its own lane beside consumeChatToken; telemetry
     // and challengeResponse are exempt; an unknown cmd draws in the default
-    // arm below, after its protocol-anomaly observation.
+    // arm below, after its protocol-anomaly observation. It also verdicts
+    // BEFORE the jailed notice and the HEAVY_SELF_CMDS dirty flag below: a
+    // lane-dropped frame must neither send a jailed notice nor force a heavy
+    // self re-diff (drops are drops).
     if (
       classifyMsgLane(msg) === 'command' &&
       KNOWN_COMMANDS.has(String(msg.cmd)) &&

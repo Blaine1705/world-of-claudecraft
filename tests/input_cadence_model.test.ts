@@ -493,7 +493,8 @@ describe('flood arms cross the abuse window', () => {
     // kick verdict rides the drop that makes the fifth abusive second: just
     // past t = 4 s at this rate (R6's "about 5 to 6 s" band was a whole-second
     // approximation; the exactly-once-per-second push kicks on the crossing
-    // drop early IN the fifth dropping second, see phase-05-qa.md).
+    // drop early IN the fifth dropping second; the Close-out record in
+    // docs/design/player-performance/packet-3-input-cadence.md settles it).
     let facing = 0.1;
     const flood = everyMs(0, 2, 12_000, 'input', (i) => {
       facing = advanceFacing(facing, 2);
@@ -594,7 +595,7 @@ describe('flood arms cross the abuse window', () => {
   it('reserves command lane capacity for casts under a sustained movement flood until the kick lands', () => {
     // The sustained arm of the core pin, up to the abuse-window kick verdict,
     // which this arm pins as arriving. Honesty ruling recorded in
-    // phase-05-qa.md: once a SUSTAINED super-ceiling flood saturates the
+    // the plan doc's Close-out record: once a SUSTAINED super-ceiling flood saturates the
     // deliberately class-blind pre-parse gate (R3, the placement is the flood
     // defense), every frame on the socket shares the gate's loss, casts
     // included, and the constants make a kick without gate saturation

@@ -15,9 +15,11 @@ Worktree: /Users/fernando/Documents/wocc-input-cadence, branch feature/input-cad
 (off release/v0.30.0; LOCAL ONLY: never pushed and no PR without the maintainer's
 explicit go).
 Deliverable: a PR off the latest release branch (when the maintainer okays it),
-gate-green, following the PR template, with the phase QA files under this directory.
-Cadence: each phase lands with its phase-NN-qa.md before the next begins; targeted
-vitest plus tsc while iterating; full npm run gate plus /qa at packet close.
+gate-green, following the PR template, with the soak artifacts and the Close-out
+record under this directory (the per-phase QA files were consolidated into that
+record at packet close, at the maintainer's instruction; full text in git history).
+Cadence followed: each phase landed with its phase-NN-qa.md before the next began;
+targeted vitest plus tsc while iterating; full npm run gate plus /qa at packet close.
 
 Scope sources: brainstorm.md section 7 Packet 3 (all six bullets plus the consequence
 ledger, including the final bullet's exclusion of client-side send coalescing),
@@ -387,7 +389,7 @@ tests are the proof).
 Acceptance: npx vitest run tests/msg_rate_limit.test.ts tests/server/tunables.test.ts
 green; one local mutation check (set refill back to 40, confirm the new premise test
 fails, revert); npx tsc --noEmit clean.
-QA file: phase-01-qa.md.
+QA file: phase-01-qa.md (consolidated into the Close-out record at packet close; full text in git history).
 
 ## Phase 02: per-class lanes
 
@@ -429,7 +431,7 @@ queue (R3); the placements are exactly R5's (the detector-coupling obligations f
 R11); no new protocol-anomaly kind for lane drops.
 Acceptance: npx vitest run tests/msg_lanes.test.ts plus the integration pins green;
 tsc clean.
-QA file: phase-02-qa.md.
+QA file: phase-02-qa.md (consolidated into the Close-out record at packet close; full text in git history).
 
 ## Phase 03: observability (drop, kick, and seq-gap counters)
 
@@ -460,7 +462,7 @@ label sets stay closed; wsMessage('in') placement untouched (R8).
 Acceptance: targeted vitest (tests/game_state_metrics.test.ts,
 tests/server/http/game_metrics.test.ts, the new pins) green; tsc clean; a local
 server run scrapes /metrics and shows the three families present at zero.
-QA file: phase-03-qa.md.
+QA file: phase-03-qa.md (consolidated into the Close-out record at packet close; full text in git history).
 
 ## Phase 04: dedicated kick reason with matcher lockstep
 
@@ -494,7 +496,7 @@ reword-staleness trap); M16 fills land with the key, artifacts staged same commi
 Acceptance: npx vitest run tests/localization_fixes.test.ts
 tests/main_api_error.test.ts plus the new server pin green; npm run i18n:gen leaves
 a clean tree; tsc clean.
-QA file: phase-04-qa.md.
+QA file: phase-04-qa.md (consolidated into the Close-out record at packet close; full text in git history).
 
 ## Phase 05: the cadence-model test matrix
 
@@ -518,7 +520,7 @@ online/net suites stay green unedited, which IS the neutrality proof).
 Acceptance: npx vitest run tests/input_cadence_model.test.ts green; one local
 mutation check (halve the movement lane refill, confirm the zero-drop arm fails,
 revert); the untouched online/net suites green; tsc clean.
-QA file: phase-05-qa.md.
+QA file: phase-05-qa.md (consolidated into the Close-out record at packet close; full text in git history).
 
 ## Phase 06: soak, detector re-check, and packet close-out
 
@@ -553,9 +555,64 @@ Runbook:
    confirm both stay flat at zero.
 Acceptance: gate green end to end; every phase QA file present; soak artifacts
 recorded beside this doc.
-QA file: phase-06-qa.md (the packet-level adversarial "what is missing" pass).
+QA file: phase-06-qa.md, the packet-level adversarial pass (consolidated into the Close-out record at packet close; full text in git history).
 
 ---
+
+## Close-out record (all six phases landed 2026-07-24; branch local, gate green)
+
+The six per-phase QA files were consolidated into this section at the
+maintainer's instruction at packet close; their full text lives in git history
+(the branch through e5e87c1d6). What survives here is everything a future
+reader needs that the code, tests, and soak artifacts do not already carry.
+
+- Landed, in order: the pre-parse gate rewrite (frame ceiling 120/180, byte
+  budget 64/128 KiB, the windowed abuse score replacing the dead consecutive
+  kick ladder), the post-parse lanes (movement 90/120, command 30/60, chat
+  4/8), the R8 counters plus the R9 seq-gap read, the dedicated kick reason
+  with byte-pinned matcher lockstep, the R13 client-constant extraction plus
+  the R14 cadence-model matrix, and the phase 06 soaks plus close-out. Each
+  implementation phase (01 to 05) passed targeted vitest, tsc, biome on
+  touched files, and a fresh two-reviewer coverage fan-out with every finding
+  applied or recorded (the close-out ran nine reviewers, next bullet);
+  load-bearing pins were mutation-verified throughout.
+- The three R14 deviations, settled during phase 05, do not re-litigate:
+  (1) THE core pin is split into two honest halves because the constants tie
+  exactly (MSG_ABUSE_SECOND_DROP_FLOOR 30 plus
+  MSG_LANE_MOVEMENT_REFILL_PER_SECOND 90 equals MSG_RATE_REFILL_PER_SECOND
+  120), so any kick-able sustained movement flood saturates the class-blind
+  gate first: a gate-bounded 300/s burst arm delivers the literal
+  not-one-cast-dropped property, and a sustained arm pins the lane guarantee
+  (zero command-lane loss, every gate-admitted cast processed) up to the kick.
+  (2) The stall-then-flush arm stalls 20 s, not 15: the honest measured send
+  rate at 240 Hz is about 60/s (the timer suppresses gated flushes), so 20 s
+  buffers the specced 1,200-frame magnitude. (3) The 500/s flood kick lands
+  just past 4.1 s, band (4, 10]: tallyDrop marks a second abusive at the
+  crossing drop, not at the second boundary.
+- Phase 06 results: the 80-bot jitter soak matched the packet 0 baseline with
+  zero drop-counter increments across 96,095 inbound frames (numbers and
+  environment in soak-packet-3.md beside this file); the 5-minute 80/s turn
+  soak acked all 24,000 frames with counters flat; the R11 detector re-check
+  found both copies byte-identical with zero limiter symbols in the detector
+  source, verdict re-confirmed at overlay tip
+  d63425a6c1ec82e054582d9c686b9c9358019215 (2026-07-09).
+- The close-out /qa fan-out ran nine fresh read-only reviewers (qa-checklist,
+  privacy-security-review, test-coverage-auditor, frontend-seam-reviewer,
+  cross-platform-sync, correctness, dead-code, then security and coverage
+  again over the list-read addendum). No blocking finding anywhere; the one
+  WARNING became the list-read guard (the ruling bullet in the packet-level
+  notes below). Post-review additions: the chat-lane and mixed-cause kick
+  arms, the resume-carry arm, and the msgRate field comment.
+- The R10 lockstep pin proved itself during the addendum: the full gate
+  failed on exactly the localization_fixes arm counting the kick sites when
+  consumeListRead added a legitimate third, and the pin was consciously
+  updated to three. That is the pin's designed behavior: a new kick site must
+  join the count, the matcher, and the frame pins together.
+- Durable homes for the architecture this packet added: the inbound flood
+  defense contract is documented in server/CLAUDE.md (gate, lanes, guard, the
+  shared abuse window, the detector placement rules, and the metered-DB-read
+  rule); the client send-cadence model and the disconnect-literal lockstep
+  are in src/net/CLAUDE.md.
 
 ## Packet-level notes
 
