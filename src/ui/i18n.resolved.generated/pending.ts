@@ -14,6 +14,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "es_ES": [
@@ -21,6 +23,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "fr_FR": [
@@ -28,6 +32,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "fr_CA": [
@@ -35,6 +41,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "en_CA": [],
@@ -43,6 +51,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "de_DE": [
@@ -50,6 +60,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "zh_CN": [],
@@ -61,6 +73,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "ru_RU": [],
@@ -69,6 +83,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "nl_NL": [
@@ -76,6 +92,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "pl_PL": [
@@ -83,6 +101,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "id_ID": [
@@ -90,6 +110,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "tr_TR": [
@@ -97,6 +119,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "sv_SE": [
@@ -104,6 +128,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "vi_VN": [
@@ -111,6 +137,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ],
   "da_DK": [
@@ -118,6 +146,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
     "hudChrome.enchanting.salvageNoSpace",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace"
   ]
 };
