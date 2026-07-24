@@ -261,8 +261,11 @@ export class BagsWindow {
 
   /** The narrow repaint: find the existing footer and re-paint it. A window that has
    *  never been rendered has no .money row yet, so this is a no-op rather than a
-   *  partial paint. */
-  private refreshMoneyRow(): void {
+   *  partial paint. Public because the async $WOC / Claudium balance reads land on
+   *  their own schedule and need the same footer-only treatment: before this they
+   *  called the HUD's full renderBags() from a promise resolve, which tore the window
+   *  down under a player who had not touched anything. */
+  refreshMoneyRow(): void {
     const row = this.deps.root().querySelector('.money') as HTMLElement | null;
     if (!row) return;
     this.paintMoneyRow(row, this.deps.world().copper);

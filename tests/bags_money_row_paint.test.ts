@@ -243,22 +243,33 @@ describe('BagsWindow.refreshIfChanged preserves what the player is holding', () 
     expect(h.hideTooltip).not.toHaveBeenCalled();
   });
 
-  it('keeps the money row wired after its rewrite', () => {
-    // The row's two launchers are bound per paint, so an in-place rewrite has to
-    // re-bind them or the wallet/Claudium buttons go dead after the first credit.
-    const opened: string[] = [];
-    const h = harness(1000);
-    const w = h.window as unknown as {
-      deps: { claudiumLauncherHtml(): string; openClaudium(): void };
-    };
-    // Swap in a launcher with a real hook, then paint through the narrow path.
-    w.deps.claudiumLauncherHtml = () => '<button data-claudium-launcher>c</button>';
-    w.deps.openClaudium = () => opened.push('claudium');
-    h.window.render();
-    h.setCopper(5000);
-    h.window.refreshIfChanged();
+  // BOTH launchers, one case each. A single combined assertion is not enough here:
+  // with only the Claudium arm, deleting the wallet re-bind from paintMoneyRow left
+  // all 55 tests green, and the footer's Connect/Link wallet button would have gone
+  // dead after the first purse-driven repaint. wocBalanceHtml emits
+  // [data-wallet-action] only on its BUTTON variant (an unverified wallet), which is
+  // exactly the case a real player hits before verifying.
+  for (const launcher of [
+    {
+      name: 'Claudium',
+      html: 'claudiumLauncherHtml',
+      hook: 'openClaudium',
+      attr: 'data-claudium-launcher',
+    },
+    { name: 'wallet', html: 'wocBalanceHtml', hook: 'openWallet', attr: 'data-wallet-action' },
+  ] as const) {
+    it(`keeps the ${launcher.name} launcher wired after an in-place rewrite`, () => {
+      const opened: string[] = [];
+      const h = harness(1000);
+      const w = h.window as unknown as { deps: Record<string, unknown> };
+      w.deps[launcher.html] = () => `<button ${launcher.attr}>x</button>`;
+      w.deps[launcher.hook] = () => opened.push(launcher.name);
+      h.window.render();
+      h.setCopper(5000);
+      h.window.refreshIfChanged();
 
-    (h.root.querySelector('[data-claudium-launcher]') as HTMLElement | null)?.click();
-    expect(opened).toEqual(['claudium']);
-  });
+      (h.root.querySelector(`[${launcher.attr}]`) as HTMLElement | null)?.click();
+      expect(opened).toEqual([launcher.name]);
+    });
+  }
 });
