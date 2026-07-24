@@ -9628,8 +9628,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.stateKnown': '習得済み',
   'hudChrome.training.stateTeachable': '習得可能',
   'hudChrome.training.stateLocked': '未開放',
+  'hudChrome.training.statePending': '習得中',
   'hudChrome.training.requirement': '{craft} {skill} で伝授',
   'hudChrome.training.trainAria': '{fee}で{name}を習得',
+  'hudChrome.training.pendingAria': '{name}を習得中',
   'hudChrome.training.dialogOption': '訓練',
   'hudChrome.training.dialogOptionAria': '{name}から訓練を受ける',
   'hudChrome.training.learned': 'レシピを習得しました：{recipe}',
@@ -10189,7 +10191,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'スキルが{at}に達するとこの職に特化し、レシピの素材コストが{pct}%減ります。',
   'guide.profPages.ench.disenchantHeading': '分解',
   'guide.profPages.ench.disenchantNote':
-    '分解は、コモン品質以上の武器や防具を一個消費し、素材へと砕く作業です。既に付呪された品は対象外です。コモンとアンコモンの品は、まとまった量の鈴音の粉塵へと砕けます。レアや高品質な品ほど多く出ます。レア以上になると収量の形が変わり、レア品からは鈴音の精髄が一個、エピックや伝説品からは鈴音のかけらが一個、そして素材の種別に応じた副産物が一つ追加されます。',
+    '分解は、コモン品質以上の武器や防具を一個消費し、素材へと砕く作業です。未付呪の品が先に消費され、付呪済みの品しか残っていない場合は、その一個が付呪ごと砕かれます。コモンとアンコモンの品は、まとまった量の鈴音の粉塵へと砕けます。レアや高品質な品ほど多く出ます。レア以上になると収量の形が変わり、レア品からは鈴音の精髄が一個、エピックや伝説品からは鈴音のかけらが一個、そして素材の種別に応じた副産物が一つ追加されます。',
   'guide.profPages.ench.typedHeading': '種別副産物',
   'guide.profPages.ench.typedNote':
     'レア以上の装備は、種別ごとのトレードバインド副産物も産出します。レア装備からは{rare}個、エピックか伝説からは{epicMin}から{epicMax}個です。',

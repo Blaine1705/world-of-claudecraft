@@ -9182,8 +9182,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.stateKnown': '已學會',
   'hudChrome.training.stateTeachable': '可學習',
   'hudChrome.training.stateLocked': '未解鎖',
+  'hudChrome.training.statePending': '學習中',
   'hudChrome.training.requirement': '需要{craft}達到 {skill} 後傳授',
   'hudChrome.training.trainAria': '花費{fee}學習{name}',
+  'hudChrome.training.pendingAria': '正在學習{name}',
   'hudChrome.training.dialogOption': '訓練',
   'hudChrome.training.dialogOptionAria': '向{name}學習配方',
   'hudChrome.training.learned': '已學會配方：{recipe}',
@@ -9733,7 +9735,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.specializationBody': '技能達到{at}即在本行業專精，配方材料消耗減少{pct}%。',
   'guide.profPages.ench.disenchantHeading': '分解',
   'guide.profPages.ench.disenchantNote':
-    '分解任何普通品質及以上的武器或護甲（未附魔的），每次只消耗一件。普通與優秀品質的裝備研磨後隨機產出若干鈴音之塵，稀有度越高、等級越高則產量越豐；精良品起，產出形態改變：精良件出一個鈴音精華，史詩或傳說件出一個鈴音碎片，另附一個與原件材質掛鉤的定向副產物。',
+    '分解任何普通品質及以上的武器或護甲，每次只消耗一件，優先消耗未附魔的；當只剩下已附魔的裝備時，會連同附魔一併分解其中一件。普通與優秀品質的裝備研磨後隨機產出若干鈴音之塵，稀有度越高、等級越高則產量越豐；精良品起，產出形態改變：精良件出一個鈴音精華，史詩或傳說件出一個鈴音碎片，另附一個與原件材質掛鉤的定向副產物。',
   'guide.profPages.ench.typedHeading': '定向副產物',
   'guide.profPages.ench.typedNote':
     '精良及以上的裝備還會產出一種定向的、交易綁定的副產物：精良裝備產出{rare}件，史詩或傳說產出{epicMin}到{epicMax}件。',

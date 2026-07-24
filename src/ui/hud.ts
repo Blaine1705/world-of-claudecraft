@@ -333,6 +333,7 @@ import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
+import { TrainLearnTracker } from './hud/vendor/train_learn_core';
 import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view';
 import { renderTrainWindow } from './hud/vendor/train_window';
 import { buildUnbindView } from './hud/vendor/unbind_view';
@@ -1351,6 +1352,10 @@ export class Hud {
     cancelRace: () => this.sim.mountRaceCancel(),
   });
   private openTrainNpcId: number | null = null;
+  // Learn flights + confirmed-grant overlay for the train window (issue
+  // #2342): begin on click (the double-submit guard), resolve on the
+  // trainResult event, read surfaces consumed by buildTrainView.
+  private readonly trainLearns = new TrainLearnTracker();
   // Standalone trapping window (the professions/mailbox shape, NOT the
   // vendor's docked bags pairing): capture the opener + install the Tab trap
   // at open, return focus on close (src/ui/CLAUDE.md focus contract).
@@ -9548,6 +9553,10 @@ export class Hud {
           // from recipeId plus static content, identical in both worlds. ONE
           // chat line either way: no toast and no sound cue on success (the
           // grant-hub double-log trap; the fee/grant surfaces stay single).
+          // The result closes the row's learn flight; an ok joins the
+          // confirmed overlay so the repaint below reads Known even when the
+          // cprof mirror has not caught up yet (issue #2342).
+          this.trainLearns.resolve(ev.recipeId, ev.ok);
           const trainedRecipe = recipeById(ev.recipeId);
           if (ev.ok) {
             const item = trainedRecipe ? ITEMS[trainedRecipe.resultItemId] : undefined;
@@ -12008,14 +12017,28 @@ export class Hud {
         craftSkills: identity.craftSkills,
         copper: this.sim.copper,
         items: ITEMS,
+        pendingRecipes: this.trainLearns.pendingIds(performance.now()),
+        confirmedRecipes: this.trainLearns.confirmedIds(identity.knownRecipes),
       }),
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onTrain: (recipeId) => this.sim.trainRecipe(recipeId),
+        onTrain: (recipeId) => this.trainRecipeClicked(recipeId),
         onClose: () => this.closeTrain(),
       },
     );
+  }
+
+  // The Learn click's first-feedback path (issue #2342): open the flight
+  // BEFORE the command leaves (a re-activation while it is open is swallowed,
+  // so a rapid double-click never re-sends train_recipe and never surfaces
+  // train_already_known), then repaint so the row disables immediately. The
+  // flight closes when the trainResult event resolves it, or by TTL if the
+  // answer is lost to a disconnect.
+  private trainRecipeClicked(recipeId: string): void {
+    if (!this.trainLearns.begin(recipeId, performance.now())) return;
+    this.sim.trainRecipe(recipeId);
+    this.renderTrain();
   }
 
   closeTrain(): void {
