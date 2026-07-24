@@ -58,6 +58,7 @@ import {
   MSG_BYTE_REFILL_PER_SECOND,
   MSG_RATE_BURST,
   MSG_RATE_REFILL_PER_SECOND,
+  MSG_SEQ_GAP_SANITY,
 } from '../../server/msg_rate_limit';
 import {
   ASSET_UPLOAD_MAX_PER_MINUTE,
@@ -320,6 +321,7 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(MSG_ABUSE_WINDOW_SECONDS).toBe(10);
     expect(MSG_ABUSE_KICK_SECONDS).toBe(5);
     expect(MSG_ABUSE_SECOND_DROP_FLOOR).toBe(30);
+    expect(MSG_SEQ_GAP_SANITY).toBe(1000);
     expect(DESKTOP_LOGIN_TTL_MS).toBe(300_000); // 5 min
   });
 

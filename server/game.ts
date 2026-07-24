@@ -153,7 +153,7 @@ import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
-import { gameMetricsCounters } from './http/game_signals';
+import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
@@ -187,6 +187,7 @@ import {
 import {
   consumeInboundFrame,
   createMsgRateBucket,
+  MSG_SEQ_GAP_SANITY,
   type MsgRateBucketState,
   tallyDrop,
 } from './msg_rate_limit';
@@ -508,6 +509,13 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 // arm AFTER its protocol-anomaly observation (R5: lane drops must never mute
 // the anomaly channel).
 const KNOWN_COMMANDS: ReadonlySet<string> = new Set(COMMAND_NAMES);
+// Lane-drop cause labels (R8): the map keeps the counter's cause vocabulary
+// closed at the seam's fixed five values, never a raw lane string.
+const LANE_DROP_CAUSE = {
+  movement: 'lane_movement',
+  command: 'lane_command',
+  chat: 'lane_chat',
+} as const satisfies Record<MsgLane, WsDropCause>;
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
   'vcup_queue',
@@ -3857,11 +3865,16 @@ export class GameServer {
     gameMetricsCounters().wsMessage('in');
     const receivedAtMs = Date.now();
     const gate = consumeInboundFrame(session.msgRate, receivedAtMs / 1000, raw.length);
-    if (gate.verdict === 'kick') {
-      void this.kickSession(session, 'rejected by server', 'moderation action');
+    if (gate.verdict !== 'allow') {
+      // R8: the loss is visible by cause. A kick verdict is the crossing drop
+      // plus the kick, so it counts under both counters.
+      gameMetricsCounters().wsMessageDropped(gate.cause);
+      if (gate.verdict === 'kick') {
+        gameMetricsCounters().wsRateKick();
+        void this.kickSession(session, 'rejected by server', 'moderation action');
+      }
       return;
     }
-    if (gate.verdict !== 'allow') return;
     let msg: unknown;
     try {
       msg = JSON.parse(raw);
@@ -3895,7 +3908,9 @@ export class GameServer {
    *  verdict through the identical path. Returns whether to keep processing. */
   private consumeLane(session: ClientSession, lane: MsgLane, nowSec: number): boolean {
     if (consumeLaneToken(session.msgLanes, lane, nowSec) === 'allow') return true;
+    gameMetricsCounters().wsMessageDropped(LANE_DROP_CAUSE[lane]);
     if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
       void this.kickSession(session, 'rejected by server', 'moderation action');
     }
     return false;
@@ -3946,7 +3961,19 @@ export class GameServer {
       Object.assign(meta.moveInput, frame.moveInput);
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
-        session.lastInputSeq = Math.max(session.lastInputSeq, Math.floor(msg.seq));
+        const seq = Math.floor(msg.seq);
+        // R9: the client seq is a per-send increment on an ordered socket, so
+        // a forward jump past lastInputSeq + 1 proves the missing seqs were
+        // sent and never processed (the input-frame-attributed share of the
+        // server's own drops). Guarded to a positive high-water because resume
+        // zeroes it while the client restarts its counter on reconnect, and
+        // capped so a reset mismatch never books a giant gap.
+        if (session.lastInputSeq > 0 && seq > session.lastInputSeq + 1) {
+          gameMetricsCounters().wsInputSeqGap(
+            Math.min(seq - session.lastInputSeq - 1, MSG_SEQ_GAP_SANITY),
+          );
+        }
+        session.lastInputSeq = Math.max(session.lastInputSeq, seq);
       }
       // A released spirit turns with the camera like the living; only a corpse that
       // has not yet released (dead and not a ghost) keeps its facing frozen. Without

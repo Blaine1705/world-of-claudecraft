@@ -58,6 +58,14 @@ export const MSG_ABUSE_WINDOW_SECONDS = 10; // sliding window the kick verdict l
 export const MSG_ABUSE_KICK_SECONDS = 5; // abusive seconds within the window that kick
 export const MSG_ABUSE_SECOND_DROP_FLOOR = 30; // drops within one second that mark it abusive
 
+// Seq-gap sanity cap (R9): a parsed input frame whose seq jumps past
+// lastInputSeq + 1 on the ordered socket proves the missing seqs were sent and
+// never processed, and the gap feeds the woc_input_frames_missed_total counter.
+// One observation is capped here so a client/server seq-reset mismatch (resume
+// zeroes the server high-water, reconnect restarts the client counter) can
+// never book a giant fictitious gap.
+export const MSG_SEQ_GAP_SANITY = 1000; // max missed frames booked per observation
+
 export interface MsgRateBucketState {
   tokens: number;
   byteTokens: number;
