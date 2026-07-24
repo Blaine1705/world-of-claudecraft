@@ -467,6 +467,22 @@ describe('buildCraftingView difficulty and skillReq', () => {
     // a tier-3 recipe's minimal state only ever existed at the cap itself).
     expect(difficultyFor(150, { cooking: 124.5 })).toBe('full');
     expect(difficultyFor(75, { cooking: 124.5 })).toBe('reduced');
+    // Online pre-sync (empty skills mirror, identity not yet synced) the cap
+    // arm deliberately cannot fire: the label rides the ordinary curve until
+    // the first cprof snapshot lands, the same pre-existing transient every
+    // difficulty state has.
+    expect(
+      difficultyFor(
+        75,
+        {},
+        {
+          synced: false,
+          activeArchetype: null,
+          pairedMajor: null,
+          hobbyCraft: null,
+        },
+      ),
+    ).toBe('full');
   });
 
   it('pins the multiplier constants and their four-state difficulty mapping', () => {
