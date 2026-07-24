@@ -5246,6 +5246,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.flame_shock': '즉시 타격을 입히고 시간이 지나며 계속 불태우는 점화기입니다.',
   'guide.abilityHook.galeheart_weapon':
     '쌍수 무기에 폭풍의 바람을 불어넣어 안정적인 공격 리듬을 보상합니다.',
+  'guide.abilityHook.thunder_reservoir':
+    '대지 충격이나 단층 각성이 최대 위력으로 방출할 때까지 번개를 비축합니다.',
+  'guide.abilityHook.warspirit_cadence':
+    '안정적인 무기 리듬을 질풍의 메아리와 즉시 시전 기회로 바꿉니다.',
+  'guide.abilityHook.stormsurge':
+    '폭풍 시전 기회를 소모하면 선조의 일격이 일찍 돌아올 수 있습니다.',
   'guide.abilityHook.lifespring_weapon':
     '무기에 치유의 물을 불어넣어 이어지는 회복 흐름을 강화합니다.',
   'guide.abilityHook.tidecall': '아군을 즉시 치유하고 치유의 물결을 최대로 저장합니다.',

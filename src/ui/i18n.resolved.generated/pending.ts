@@ -466,26 +466,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.mendingCurrent",
     "hudChrome.auraEffect.mendingCurrentPercent"
   ],
-  "zh_CN": [
-    "guide.abilityHook.stormsurge",
-    "guide.abilityHook.thunder_reservoir",
-    "guide.abilityHook.warspirit_cadence"
-  ],
-  "zh_TW": [
-    "guide.abilityHook.stormsurge",
-    "guide.abilityHook.thunder_reservoir",
-    "guide.abilityHook.warspirit_cadence"
-  ],
-  "ko_KR": [
-    "guide.abilityHook.stormsurge",
-    "guide.abilityHook.thunder_reservoir",
-    "guide.abilityHook.warspirit_cadence"
-  ],
-  "ja_JP": [
-    "guide.abilityHook.stormsurge",
-    "guide.abilityHook.thunder_reservoir",
-    "guide.abilityHook.warspirit_cadence"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "abilityUi.resources.focus",
     "classDetails.resources.focus",
@@ -562,11 +546,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.mendingCurrent",
     "hudChrome.auraEffect.mendingCurrentPercent"
   ],
-  "ru_RU": [
-    "guide.abilityHook.stormsurge",
-    "guide.abilityHook.thunder_reservoir",
-    "guide.abilityHook.warspirit_cadence"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "abilityUi.resources.focus",
     "classDetails.resources.focus",

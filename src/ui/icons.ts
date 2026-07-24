@@ -2624,6 +2624,13 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   frostjaw_trap: r('frost', 'ice', ['fang', { p: 'tendrils', ...BR }], ['arcs', 'glow']),
   cold_focus: r('frost', 'steel', ['eye', { p: 'crosshair', ...BR }], ['sparkle']),
   bloodhook: r('blood', 'steel', ['fang', { p: 'tendrils', ...TR }], ['motion', 'drips']),
+  hunting_momentum: r('fury', 'blood', ['boot', { p: 'fang', ...TR }], ['motion', 'glow']),
+  fieldcraft_reentry: r(
+    'earth',
+    'ember',
+    ['tendrils', { p: 'claw_slash', ...BR }],
+    ['motion', 'crack'],
+  ),
   // the Vale Cup sport kit (boarball): the 'coin' disc reads as the ball
   sport_kick: r('earth', 'leather', ['coin', { p: 'boot', ...BR }]),
   sport_shoot: r('fury', 'ember', ['coin', { p: 'boot', ...BR }], ['motion']),
@@ -2654,6 +2661,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   flametongue_weapon: r('fire', 'ember', ['sword', { p: 'flame', s: 0.6 }], ['glow']),
   frostbrand_weapon: r('frost', 'ice', ['sword', { p: 'snowflake', s: 0.6 }], ['glow']),
   galeheart_weapon: r('storm', 'sky', ['sword', { p: 'lightning', ...TR }], ['motion', 'arcs']),
+  thunder_reservoir: r('storm', 'gold', ['gem', { p: 'lightning', ...TR }], ['arcs', 'glow']),
+  warspirit_cadence: r('storm', 'steel', ['fist', { p: 'sword', ...BR }], ['motion', 'arcs']),
+  stormsurge: r('storm', 'sky', ['lightning', { p: 'sunburst', ...BR }], ['glow', 'sparkle']),
   lifespring_weapon: r('nature', 'leafGreen', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
   tidecall: r('nature', 'sky', ['sunburst', { p: 'droplet', ...BR }], ['arcs']),
   stoneward: r('earth', 'earthBrown', ['shield', { p: 'gem', ...TR }], ['crack', 'glow']),

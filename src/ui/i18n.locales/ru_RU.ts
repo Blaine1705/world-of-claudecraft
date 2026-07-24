@@ -5323,6 +5323,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мгновенный поджог, который бьет сразу и продолжает жечь со временем.',
   'guide.abilityHook.galeheart_weapon':
     'Наполняет оба оружия штормовым ветром и вознаграждает ровный ритм атак.',
+  'guide.abilityHook.thunder_reservoir':
+    'Копит молнии до полной разрядки через Земной толчок или Разлом земли.',
+  'guide.abilityHook.warspirit_cadence':
+    'Превращает ровный ритм оружия в Эхо бурного сердца и мгновенное заклинание.',
+  'guide.abilityHook.stormsurge':
+    'Иногда досрочно возвращает Удар предков после расхода Бурезаклятия.',
   'guide.abilityHook.lifespring_weapon':
     'Наполняет оружие целебной водой и усиливает непрерывный поток исцеления.',
   'guide.abilityHook.tidecall': 'Мгновенно исцеляет союзника и наполняет его Поток исцеления.',

@@ -5251,6 +5251,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball_form': '生きた火球へと姿を変え、開けた場所を高速で駆け抜けます。',
   'guide.abilityHook.flame_shock': '前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。',
   'guide.abilityHook.galeheart_weapon': '二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。',
+  'guide.abilityHook.thunder_reservoir':
+    '雷を蓄え、大地の衝撃か断層の目覚めで最大威力を解放します。',
+  'guide.abilityHook.warspirit_cadence':
+    '安定した武器のリズムを疾風の残響と即時呪文の機会に変えます。',
+  'guide.abilityHook.stormsurge':
+    'ストームキャストを消費すると、祖霊の一撃が早く戻ることがあります。',
   'guide.abilityHook.lifespring_weapon': '武器に癒やしの水を宿し、継続する回復の流れを強めます。',
   'guide.abilityHook.tidecall': '味方1体を即時に回復し、癒しの水流を最大まで蓄えます。',
   'guide.abilityHook.ancestor_return':
