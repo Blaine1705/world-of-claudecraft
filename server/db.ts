@@ -710,6 +710,10 @@ ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS sim_entities INT NOT NU
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS active_views INT NOT NULL DEFAULT 0;
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS visible_views INT NOT NULL DEFAULT 0;
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS worst_10s_frame_p95_ms REAL NOT NULL DEFAULT 0;
+-- Phase 05 (ruling R14): client-computed perf-doctor suggestion ids, validated
+-- against the server allowlist in perf_report.ts before storage (filter,
+-- dedupe, cap 3). Pre-column and healthy rows both read as the empty array.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] NOT NULL DEFAULT '{}';
 -- Non-custodial Solana wallet links (PRD: docs/prd/woc/wallet-link.md). One
 -- wallet per account (account_id is the PK) and one account per wallet (pubkey
 -- is UNIQUE). The server never holds keys; ownership is proven by a signed
@@ -3298,6 +3302,7 @@ export interface ClientPerfReportInsert {
   activeViews: number;
   visibleViews: number;
   worst10sFrameP95Ms: number;
+  suggestionIds: string[];
   rawSummary: Record<string, unknown>;
 }
 
@@ -3311,7 +3316,8 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
        browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
-       crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, raw_summary
+       crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
+       suggestion_ids, raw_summary
      ) VALUES (
        $1, $2, $3, $4, $5, $6, $7,
        $8, $9, $10, $11, $12, $13,
@@ -3320,7 +3326,8 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        $23, $24, $25, $26,
        $27, $28, $29, $30, $31,
        $32, $33, $34, $35, $36, $37,
-       $38, $39, $40, $41, $42, $43
+       $38, $39, $40, $41, $42,
+       $43, $44
      )`,
     [
       row.schemaVersion,
@@ -3365,6 +3372,7 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
       row.activeViews,
       row.visibleViews,
       row.worst10sFrameP95Ms,
+      row.suggestionIds,
       JSON.stringify(row.rawSummary),
     ],
   );

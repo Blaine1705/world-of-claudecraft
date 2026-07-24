@@ -76,6 +76,7 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { createPerfMonitor } from './game/perf';
+import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import {
@@ -3547,7 +3548,11 @@ async function startGame(
             zoneId: telemetryZoneId(world.player.pos.x, world.player.pos.z),
             simEntities: world.entities.size,
           }),
+          desktopShell: DESKTOP_APP,
         });
+        // One-time machine-local performance nudge (packet 0 rulings R14-R16):
+        // the assembler polls the same PerfMonitor the reporter reads.
+        initPerfNudge({ perf, desktopShell: DESKTOP_APP });
         // Warm the procedural icon cache during idle time so the first
         // bags/vendor/loot open never pays the compose burst synchronously
         // (icon_prewarm.ts). Re-entry is a fast no-op: the cache is module-global.

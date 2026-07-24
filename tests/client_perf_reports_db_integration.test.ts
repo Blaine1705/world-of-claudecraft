@@ -1,12 +1,13 @@
 // Opt-in real-Postgres roundtrip for insertClientPerfReport and the phase 03
-// dimension columns. The insert's 43 positional parameters are the one place a
-// renumbering slip lands values in the wrong columns while every mocked-pool
-// suite stays green, so this roundtrip is the ONLY decisive guard: it writes a
-// row of pairwise-distinct values through the real statement, reads every
-// column back by name, and asserts each landed where it was aimed. It also
-// proves the boot DDL applied the five ADD COLUMNs and that the worst-10s
-// concurrent index exists and is valid (ruling R7). The default suite stays
-// DB-free; set TEST_DATABASE_URL (npm run db:up) to exercise it.
+// dimension columns plus the phase 05 suggestion_ids array. The insert's 44
+// positional parameters are the one place a renumbering slip lands values in
+// the wrong columns while every mocked-pool suite stays green, so this
+// roundtrip is the ONLY decisive guard: it writes a row of pairwise-distinct
+// values through the real statement, reads every column back by name, and
+// asserts each landed where it was aimed. It also proves the boot DDL applied
+// the ADD COLUMNs and that the worst-10s concurrent index exists and is valid
+// (ruling R7). The default suite stays DB-free; set TEST_DATABASE_URL
+// (npm run db:up) to exercise it.
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
@@ -83,6 +84,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       activeViews: 57,
       visibleViews: 31,
       worst10sFrameP95Ms: 180.5,
+      suggestionIds: ['hardware-acceleration', 'high-dpi'],
       rawSummary: { roundtrip: true, seconds: 77 },
     });
 
@@ -132,10 +134,12 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(r.active_views).toBe(57);
     expect(r.visible_views).toBe(31);
     expect(r.worst_10s_frame_p95_ms).toBeCloseTo(180.5, 5);
+    // The pg driver maps a JS string array to TEXT[]; order must survive.
+    expect(r.suggestion_ids).toEqual(['hardware-acceleration', 'high-dpi']);
     expect(r.raw_summary).toEqual({ roundtrip: true, seconds: 77 });
   });
 
-  it('serves the row back through clientPerfRaw with the five dimensions mapped', async () => {
+  it('serves the row back through clientPerfRaw with the dimensions and suggestion ids mapped', async () => {
     const adminDb = await import('../server/admin_db');
     const rows = await adminDb.clientPerfRaw(24, 1000);
     const row = rows.find((x) => x.sessionId === `${MARKER}-row`);
@@ -146,6 +150,17 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(row?.visibleViews).toBe(31);
     expect(row?.worst10sFrameP95Ms).toBeCloseTo(180.5, 5);
     expect(row?.zoneOrScenario).toBe('dungeon:hollow_crypt');
+    expect(row?.suggestionIds).toEqual(['hardware-acceleration', 'high-dpi']);
+  });
+
+  it('aggregates suggestionCounts through clientPerfSummary from the live rows', async () => {
+    const adminDb = await import('../server/admin_db');
+    const summary = await adminDb.clientPerfSummary(24);
+    const byId = new Map(summary.suggestionCounts.map((c) => [c.id, c.sampleCount]));
+    // Other rows may exist in the shared dev-DB window, so assert floors, not
+    // exact equality; the marker row contributes one report to EACH of its ids.
+    expect(byId.get('hardware-acceleration') ?? 0).toBeGreaterThanOrEqual(1);
+    expect(byId.get('high-dpi') ?? 0).toBeGreaterThanOrEqual(1);
   });
 
   it('leaves an existing pre-phase row on the column defaults the mapper folds', async () => {
@@ -154,7 +169,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       [`${MARKER}-legacy`, 'gameplay'],
     );
     const res = await db.pool.query(
-      'SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms FROM client_perf_reports WHERE session_id = $1',
+      'SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, suggestion_ids FROM client_perf_reports WHERE session_id = $1',
       [`${MARKER}-legacy`],
     );
     expect(res.rows[0]).toEqual({
@@ -163,6 +178,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       active_views: 0,
       visible_views: 0,
       worst_10s_frame_p95_ms: 0,
+      suggestion_ids: [],
     });
   });
 

@@ -683,6 +683,46 @@ describe('perf reporter report dimensions', () => {
   });
 });
 
+describe('perf reporter suggestion ids', () => {
+  const { payloadFromSnapshot } = perfReporterInternalsForTest;
+
+  it('emits an empty suggestion list for a healthy session', () => {
+    (globalThis as any).location = { search: '' };
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(body.suggestionIds).toEqual([]);
+  });
+
+  it('emits hardware-acceleration for a software-rendered session', () => {
+    (globalThis as any).location = { search: '' };
+    const snap = snapshot();
+    snap.renderer!.glRenderer = 'Google SwiftShader';
+    const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
+    expect(body.suggestionIds).toEqual(['hardware-acceleration']);
+  });
+
+  it('emits integrated-gpu on a bad-frames iGPU session only outside the desktop shell', () => {
+    (globalThis as any).location = { search: '' };
+    const badSnap = (): PerfSnapshot => {
+      const snap = snapshot();
+      snap.renderer!.glRenderer =
+        'ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)';
+      snap.windows.last10s = {
+        seconds: 10,
+        frames: 240,
+        fps: 24,
+        frameMs: { avg: 41, p50: 38, p95: 55, p99: 70, max: 120, long50: 12 },
+      };
+      return snap;
+    };
+    const web = payloadFromSnapshot(badSnap(), new Settings(), 'sess1', 42, null, false)!;
+    expect(web.suggestionIds).toEqual(['integrated-gpu']);
+    // Ruling R15: the desktop shell already forces the dGPU, so the same
+    // snapshot reports no machine-local suggestion there.
+    const shell = payloadFromSnapshot(badSnap(), new Settings(), 'sess1', 42, null, true)!;
+    expect(shell.suggestionIds).toEqual([]);
+  });
+});
+
 describe('perf reporter worst-window drain', () => {
   function installReporterFlowGlobals(fetchImpl: unknown): void {
     (globalThis as any).location = { search: '' };

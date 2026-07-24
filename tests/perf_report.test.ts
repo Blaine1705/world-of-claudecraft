@@ -305,6 +305,70 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('filters, dedupes, and caps hostile suggestion ids before storage', () => {
+    const { suggestionIdsIn } = perfReportInternalsForTest;
+    // Unknown ids and non-string entries drop; duplicates collapse; the cap
+    // is 3 (the client analyzer ceiling re-imposed server-side).
+    expect(
+      suggestionIdsIn([
+        'bogus-id',
+        'hardware-acceleration',
+        42,
+        { id: 'high-dpi' },
+        null,
+        'hardware-acceleration',
+        ' integrated-gpu ',
+        'high-dpi',
+        'low-memory',
+        'context-loss',
+      ]),
+    ).toEqual(['hardware-acceleration', 'integrated-gpu', 'high-dpi']);
+    expect(suggestionIdsIn('hardware-acceleration')).toEqual([]);
+    expect(suggestionIdsIn(null)).toEqual([]);
+    expect(suggestionIdsIn(undefined)).toEqual([]);
+    expect(suggestionIdsIn({})).toEqual([]);
+    // An oversized hostile array still yields at most the cap, and only known ids.
+    const oversized = Array.from({ length: 5000 }, (_, i) =>
+      i % 2 === 0 ? `junk-${i}` : 'browser-stalls',
+    );
+    expect(suggestionIdsIn(oversized)).toEqual(['browser-stalls']);
+    // The scan window is bounded independently of the body-size cap: a known id
+    // buried past the first 64 entries of a junk flood never gets scanned.
+    const buried = Array.from({ length: 200 }, (_, i) =>
+      i === 150 ? 'hardware-acceleration' : `junk-${i}`,
+    );
+    expect(suggestionIdsIn(buried)).toEqual([]);
+  });
+
+  it('stores sanitized suggestion ids on the row and defaults them empty', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'suggestion-flow',
+          suggestionIds: ['hardware-acceleration', 'DROP TABLE', 'hardware-acceleration'],
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.71' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ suggestionIds: ['hardware-acceleration'] }),
+    );
+
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'suggestion-old-client', rawSummary: {} },
+        { remoteAddress: '203.0.113.72' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ suggestionIds: [] }),
+    );
+  });
+
   it('keeps GPU bucketing coarse', () => {
     expect(perfReportInternalsForTest.bucketGpu('Google SwiftShader')).toBe('software');
     expect(

@@ -6130,6 +6130,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'gpuNotice.bodyWeb':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
   'gpuNotice.dismiss': '關閉',
+  'perfNudge.integratedGpu':
+    '遊戲目前在內建（省電）顯示晶片上執行。如果這台電腦還配有獨立遊戲顯示卡，請在 Windows 的 設定 > 系統 > 顯示器 > 顯示卡 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇遊戲顯示卡。',
+  'perfNudge.hardwareAccelerationDesktop':
+    '遊戲目前在沒有 GPU 加速的情況下執行，因此非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
+  'perfNudge.hardwareAccelerationWeb':
+    '遊戲目前在沒有 GPU 加速的情況下執行，因此非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
+  'perfNudge.dismiss': '關閉',
   'editor.appTitle': '地圖編輯器',
   'editor.docTitle': '地圖編輯器 - World of ClaudeCraft',
   'editor.untitledMap': '未命名地圖',

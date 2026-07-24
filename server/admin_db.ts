@@ -3,7 +3,9 @@ import {
   type ClientPerfSummaryBuckets,
   cleanHours,
   mapClientPerfSummaryRows,
+  mapSuggestionCountRows,
   PERF_SUMMARY_LIMITS,
+  type PerfSuggestionCount,
 } from './client_perf_summary_shape';
 import {
   DB_HEAVY_STATEMENT_TIMEOUT_MS,
@@ -438,6 +440,10 @@ export type { PerfAggregate, PerfBucket } from './client_perf_summary_shape';
 export interface PerfSummary extends ClientPerfSummaryBuckets {
   hours: number;
   generatedAt: string;
+  // Per-id report counts for the window (ruling R14): how many stored reports
+  // carried each allowlisted perf-doctor suggestion id. A report carries up to
+  // three ids, so these never partition the totals row.
+  suggestionCounts: PerfSuggestionCount[];
 }
 
 export interface PerfRawRow {
@@ -484,6 +490,7 @@ export interface PerfRawRow {
   activeViews: number;
   visibleViews: number;
   worst10sFrameP95Ms: number;
+  suggestionIds: string[];
   rawSummary: unknown;
 }
 
@@ -499,17 +506,22 @@ function cleanBeforeId(id: number | undefined): number | null {
 
 export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
   const hours = cleanHours(hoursInput);
-  // ONE raised-timeout statement (GROUPING SETS over client_perf_reports) replaces
-  // the former seven serialized reads: the () set is the totals row and each
-  // single-column set is one bucket list. Postgres computes BOTH orderings as
-  // window ranks per grouping set (volume: sample_count DESC with the key ASC
-  // tie-break under database collation; worst: p95 DESC, sample_count DESC) and
-  // the outer filter caps each set at its list limit, so only rows the response
-  // can show cross to Node. p99_frame_ms stays percentile_cont(0.99) over
-  // frame_p95_ms, a long-standing quirk preserved deliberately. The pure shape
-  // module (client_perf_summary_shape.ts) rebuilds the response from the flat rows.
-  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    query(
+  // TWO raised-timeout statements inside one transaction. The first (GROUPING
+  // SETS over client_perf_reports) replaced the former seven serialized reads:
+  // the () set is the totals row and each single-column set is one bucket list.
+  // Postgres computes BOTH orderings as window ranks per grouping set (volume:
+  // sample_count DESC with the key ASC tie-break under database collation;
+  // worst: p95 DESC, sample_count DESC) and the outer filter caps each set at
+  // its list limit, so only rows the response can show cross to Node.
+  // p99_frame_ms stays percentile_cont(0.99) over frame_p95_ms, a long-standing
+  // quirk preserved deliberately. The SECOND statement is the deliberate phase
+  // 05 addition (ruling R14): suggestion_ids is an ARRAY column a report
+  // carries up to three of, so its per-id counts come from a bounded unnest
+  // aggregate, not another grouping set (which counts rows, not array
+  // elements). The pure shape module (client_perf_summary_shape.ts) rebuilds
+  // the response from both flat row sets.
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, async (query) => {
+    const summary = await query(
       `WITH agg AS (
          SELECT
            graphics_preset,
@@ -557,9 +569,25 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
           OR (g_scenario = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byScenario})
           OR (g_crowd = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byCrowd})`,
       [String(hours)],
-    ),
-  );
-  return { hours, generatedAt: new Date().toISOString(), ...mapClientPerfSummaryRows(res.rows) };
+    );
+    const suggestions = await query(
+      `SELECT s.id AS suggestion_id, count(*)::int AS sample_count
+         FROM client_perf_reports
+         CROSS JOIN LATERAL unnest(suggestion_ids) AS s(id)
+        WHERE created_at > now() - ($1 || ' hours')::interval
+        GROUP BY s.id
+        ORDER BY sample_count DESC, s.id ASC
+        LIMIT ${PERF_SUMMARY_LIMITS.suggestionCounts}`,
+      [String(hours)],
+    );
+    return { summaryRows: summary.rows, suggestionRows: suggestions.rows };
+  });
+  return {
+    hours,
+    generatedAt: new Date().toISOString(),
+    ...mapClientPerfSummaryRows(res.summaryRows),
+    suggestionCounts: mapSuggestionCountRows(res.suggestionRows),
+  };
 }
 
 export async function clientPerfRaw(
@@ -579,7 +607,8 @@ export async function clientPerfRaw(
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
        browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
-       crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, raw_summary
+       crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
+       suggestion_ids, raw_summary
      FROM client_perf_reports
      WHERE created_at > now() - ($1 || ' hours')::interval
        AND ($3::bigint IS NULL OR id < $3)
@@ -631,6 +660,7 @@ export async function clientPerfRaw(
     activeViews: r.active_views,
     visibleViews: r.visible_views,
     worst10sFrameP95Ms: r.worst_10s_frame_p95_ms,
+    suggestionIds: r.suggestion_ids,
     rawSummary: r.raw_summary,
   }));
 }

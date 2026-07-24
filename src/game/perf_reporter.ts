@@ -2,6 +2,7 @@ import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
+import { analyzePerfSuggestions } from './perf_doctor';
 import type { Settings } from './settings';
 import type { WorldTelemetry } from './world_telemetry';
 
@@ -31,6 +32,10 @@ export interface PerfReporterOptions {
   // R4); null (or absent, for benchmark harness callers) leaves the payload on
   // the legacy gameplay label with null crowd numerators.
   worldTelemetryProvider?: () => WorldTelemetry | null;
+  // True inside the Electron shell, which already forces the discrete GPU
+  // (PR #1991), so the perf-doctor 'integrated-gpu' suggestion never fires
+  // there (ruling R15). Absent (benchmark harness callers) means false.
+  desktopShell?: boolean;
 }
 
 export type PerfReporterSkipReason = 'disabled' | 'hidden' | 'not-ready' | 'no-renderer';
@@ -235,6 +240,7 @@ function payloadFromSnapshot(
   sessionId: string,
   characterId: number | null,
   worldTelemetry: WorldTelemetry | null = null,
+  desktopShell = false,
 ): Record<string, unknown> | null {
   const renderer = snapshot.renderer;
   if (!renderer) return null;
@@ -255,6 +261,12 @@ function payloadFromSnapshot(
   // report can land before a rendered frame.
   const activeViews = renderer.lastFrame?.activeViews ?? null;
   const visibleViews = renderer.lastFrame?.visibleViews ?? null;
+  // CLIENT-computed perf-doctor suggestion ids (ruling R14): the analyzer runs
+  // over this same snapshot, so the fleet dimension and the player nudge toast
+  // agree on the machine-local diagnosis. Ids only; titles/bodies stay local.
+  const suggestionIds = analyzePerfSuggestions(snapshot, location.search, { desktopShell }).map(
+    (suggestion) => suggestion.id,
+  );
   return {
     schemaVersion: PERF_REPORT_SCHEMA_VERSION,
     releaseVersion: __APP_VERSION__,
@@ -300,6 +312,7 @@ function payloadFromSnapshot(
     visibleViews,
     crowdBucket: crowdBucketLabel(activeViews),
     worst10sFrameP95Ms: snapshot.windows.worst10s?.frameMs.p95 ?? null,
+    suggestionIds,
     rawSummary: {
       graphicsConfigVersion: renderer.graphicsConfigVersion,
       seconds: snapshot.seconds,
@@ -381,6 +394,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       sessionId,
       options.characterIdProvider(),
       options.worldTelemetryProvider?.() ?? null,
+      options.desktopShell ?? false,
     );
     if (!body) {
       skip('no-renderer', sendOptions.final ? null : REPEAT_REPORT_MS);

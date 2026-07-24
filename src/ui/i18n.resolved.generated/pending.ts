@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "es_ES": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "fr_FR": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "fr_CA": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "de_DE": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "nl_NL": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "pl_PL": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "id_ID": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "tr_TR": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "sv_SE": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "vi_VN": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ],
+  "da_DK": [
+    "perfNudge.dismiss",
+    "perfNudge.hardwareAccelerationDesktop",
+    "perfNudge.hardwareAccelerationWeb",
+    "perfNudge.integratedGpu"
+  ]
 };

@@ -385,6 +385,11 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain(
       'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS worst_10s_frame_p95_ms REAL NOT NULL DEFAULT 0',
     );
+    // Phase 05 (ruling R14): the suggestion-ids array rides the same guarded
+    // boot-DDL block; NOT NULL DEFAULT '{}' keeps legacy rows array-readable.
+    expect(applied).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] NOT NULL DEFAULT '{}'",
+    );
     // The worst-10s index must NEVER appear as transactional boot DDL: the
     // only CREATE for it is the post-commit CONCURRENTLY build (ruling R7).
     const commitIndex = h.calls.indexOf('COMMIT');

@@ -31,6 +31,16 @@ export interface ClientPerfSummaryBuckets {
   worstGpuBuckets: PerfBucket[];
 }
 
+// One perf-doctor suggestion id with the number of reports that carried it in
+// the window (ruling R14). Produced by the summary's SECOND bounded statement
+// (an unnest over suggestion_ids), not the GROUPING SETS roll-up: a report can
+// carry up to three ids, so these counts are per-id report counts, never a
+// partition of the totals row.
+export interface PerfSuggestionCount {
+  id: string;
+  sampleCount: number;
+}
+
 // Per-array caps. The SQL interpolates these same numbers into its per-set rank
 // filter (the defensive cap on what crosses to Node) and the mapper slices with
 // them, so the two sides can never drift apart. Frozen because the numbers are
@@ -44,6 +54,9 @@ export const PERF_SUMMARY_LIMITS = Object.freeze({
   // Six fixed labels (ruling R3) plus the legacy '' bucket and headroom.
   byCrowd: 8,
   worstGpu: 20,
+  // Eight allowlisted suggestion ids (ruling R14) plus headroom; only
+  // sanitizer-approved ids can reach the column, so this cap is defensive.
+  suggestionCounts: 12,
 } as const);
 
 // Clamp an admin-supplied hours window to whole hours in [1, 168]; a non-finite
@@ -81,6 +94,26 @@ export type ClientPerfSummaryRow = {
   avg_render_scale: number;
   avg_effective_render_scale: number;
 };
+
+// One flat row of the suggestion-count statement: the unnested id plus its
+// report count. Kept as a documented contract like ClientPerfSummaryRow so the
+// shape and SQL suites type their fixtures against what the mapper consumes.
+export type PerfSuggestionCountRow = {
+  suggestion_id: string | null;
+  sample_count: number;
+};
+
+// Rebuild the suggestionCounts list from the flat rows. Ordering comes from the
+// statement (sample_count DESC, id ASC); the mapper only maps and defensively
+// caps, mirroring the byRank slice contract of the grouped lists.
+export function mapSuggestionCountRows(
+  rows: ReadonlyArray<Record<string, unknown>>,
+): PerfSuggestionCount[] {
+  return rows.slice(0, PERF_SUMMARY_LIMITS.suggestionCounts).map((r) => ({
+    id: String(r.suggestion_id ?? ''),
+    sampleCount: Number(r.sample_count ?? 0),
+  }));
+}
 
 // The one canonical snake_case-to-camelCase aggregate mapping (formerly private
 // to admin_db). An absent field folds to 0, which also makes an empty record

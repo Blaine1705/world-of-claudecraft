@@ -783,6 +783,7 @@ describe('admin api auth', () => {
       byScenario: [],
       byCrowd: [],
       worstGpuBuckets: [],
+      suggestionCounts: [{ id: 'hardware-acceleration', sampleCount: 3 }],
     });
     vi.mocked(clientPerfRaw).mockResolvedValue([
       { id: 123 } as unknown as PerfRawRow,
@@ -798,6 +799,10 @@ describe('admin api auth', () => {
     expect(summaryRes.statusCode).toBe(200);
     expect(clientPerfSummary).toHaveBeenCalledWith(24);
     expect(summaryRes.body.data.totals.sampleCount).toBe(1);
+    // The phase 05 suggestionCounts field rides the summary response verbatim.
+    expect(summaryRes.body.data.suggestionCounts).toEqual([
+      { id: 'hardware-acceleration', sampleCount: 3 },
+    ]);
 
     const rawRes = fakeRes();
     await handleAdminApi(

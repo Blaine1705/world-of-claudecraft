@@ -10,7 +10,9 @@ import {
   type ClientPerfSummaryRow,
   cleanHours,
   mapClientPerfSummaryRows,
+  mapSuggestionCountRows,
   PERF_SUMMARY_LIMITS,
+  type PerfSuggestionCountRow,
   perfAggregateFromRow,
 } from '../../server/client_perf_summary_shape';
 
@@ -236,7 +238,41 @@ describe('mapClientPerfSummaryRows caps', () => {
       byScenario: 30,
       byCrowd: 8,
       worstGpu: 20,
+      suggestionCounts: 12,
     });
+  });
+});
+
+describe('mapSuggestionCountRows', () => {
+  it('maps the unnest rows preserving the statement order', () => {
+    const rows: PerfSuggestionCountRow[] = [
+      { suggestion_id: 'hardware-acceleration', sample_count: 9 },
+      { suggestion_id: 'integrated-gpu', sample_count: 4 },
+    ];
+    expect(mapSuggestionCountRows(rows)).toEqual([
+      { id: 'hardware-acceleration', sampleCount: 9 },
+      { id: 'integrated-gpu', sampleCount: 4 },
+    ]);
+  });
+
+  it('caps defensively at the suggestionCounts limit, keeping the boundary row', () => {
+    const rows: PerfSuggestionCountRow[] = [];
+    for (let i = 1; i <= 14; i++) rows.push({ suggestion_id: `s${i}`, sample_count: 100 - i });
+    const out = mapSuggestionCountRows(rows);
+    expect(out).toHaveLength(12);
+    expect(out[11]).toEqual({ id: 's12', sampleCount: 88 });
+    expect(out.map((c) => c.id)).not.toContain('s13');
+  });
+
+  it('folds a defensive NULL id to the empty string and a missing count to zero', () => {
+    expect(mapSuggestionCountRows([{ suggestion_id: null, sample_count: 3 }, {}])).toEqual([
+      { id: '', sampleCount: 3 },
+      { id: '', sampleCount: 0 },
+    ]);
+  });
+
+  it('yields an empty list for an empty window', () => {
+    expect(mapSuggestionCountRows([])).toEqual([]);
   });
 });
 
