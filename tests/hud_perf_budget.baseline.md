@@ -21,12 +21,21 @@ The numbers are not interpreted the same way:
   software-WebGL fps and machine load run to run. It is reported for human context and used as a
   hard floor only by ARM 2's deterministic fake-DOM loop (a fixed denominator), never as a
   cross-run hard gate in a real-browser tour.
-- **`frameP95` and `inputIntentToFrameP95` are same-machine-relative only.** They are wall-clock
-  milliseconds and do not travel across hardware. They were captured under headless Chrome with
-  software WebGL (`--use-angle=swiftshader`), which renders at roughly 1 to 2 fps, so the
-  absolute values below are dominated by software rasterization, not by HUD cost. Compare them
-  only against a fresh same-machine re-run of this baseline, never against the literal
-  milliseconds on different hardware or a different renderer.
+- **`frameLong50` (the long-frame count) and `tourMinFrames` (the tour frame floor) are the
+  ARM 3 frame gates, captured under `PERF_GPU=1` (headed Chrome on the real GPU).** The retired
+  frame-p95 gate was mathematically unfailable: its threshold equaled the PerfMonitor sample
+  clamp, so a catastrophically slow run saturated every sample INTO the passing value. The
+  replacement pair is failable from both directions: a hitchy run grows the count of frames at
+  or over 50 ms past the `frameLong50` anchor, and a saturated (or barely-rendering) run cannot
+  reach the `tourMinFrames` floor. Both are same-machine values (wall-clock dependent): an
+  operator on other hardware overrides the long-frame anchor with a fresh same-machine capture
+  via `HUD_PERF_BUDGET_TOUR_LONG50_BASELINE`. Feed ARM 3 a `PERF_GPU=1` artifact; the headless
+  swiftshader mode renders at roughly 1 to 2 fps and cannot meet the frame floor by design.
+- **`inputIntentToFrameP95` and the other absolute milliseconds below are same-machine-relative
+  only.** They were captured under headless Chrome with software WebGL
+  (`--use-angle=swiftshader`), so they are dominated by software rasterization, not by HUD cost.
+  Compare them only against a fresh same-machine re-run of this baseline, never against the
+  literal milliseconds on different hardware or a different renderer.
 
 ## Regenerating
 
@@ -42,6 +51,9 @@ warrior, clicks `#btn-start-offline`).
 PERF_VIEWPORT=desktop node scripts/perf_tour.mjs
 # pin the JSON output path:
 PERF_OUT=/path/to/perf-tour-desktop.json PERF_VIEWPORT=desktop node scripts/perf_tour.mjs
+# real-GPU mode (HEADED, opens a browser window): required for the frameLong50 and
+# tourMinFrames rows, which are meaningless under software rasterization:
+PERF_GPU=1 PERF_VIEWPORT=both node scripts/perf_tour.mjs
 ```
 
 `PERF_VIEWPORT` selects the profile: `desktop`, `mobile`, or `both` (default). Other relevant
@@ -52,15 +64,21 @@ viewport hits the `#rotate-device` gate and never boots.
 
 ## Capture machine (absolute milliseconds are not portable)
 
+Both capture modes ran on the same machine; the swiftshader rows and the real-GPU rows
+carry their own capture dates and browser modes.
+
 | Field | Value |
 |---|---|
 | CPU | Apple M4 Max |
 | Cores | 16 logical / 16 physical |
 | RAM | 128 GB |
-| OS | macOS 26.5.1 (arm64) |
-| Node | v24.15.0 |
-| Browser | Google Chrome 149.0.7827.196, headless, ANGLE swiftshader (software WebGL) |
-| Captured | 2026-06-24 |
+| OS | macOS 26.5.2 (arm64) |
+| Node (swiftshader rows) | v24.15.0 |
+| Browser (swiftshader rows) | Google Chrome 149.0.7827.196, headless, ANGLE swiftshader (software WebGL) |
+| Captured (swiftshader rows) | 2026-06-24 |
+| Node (real-GPU rows) | v26.5.0 |
+| Browser (real-GPU rows) | Google Chrome 150.0.7871.182, HEADED, real GPU (`PERF_GPU=1`) |
+| Captured (real-GPU rows) | 2026-07-23 |
 
 ## Recorded floor
 
@@ -69,7 +87,6 @@ viewport hits the `#rotate-device` gate and never boots.
 | Metric | Value | Role |
 |---|---|---|
 | **hudHotDomSkipRate** | **0.962** (38 hot writes / 950 skipped, 988 total) | ARM 2 deterministic-loop floor |
-| frameP95 | 250 ms | same-machine-relative only |
 | inputIntentToFrameP95 | 652.7 ms | same-machine-relative only |
 | inputIntentToVisibleP95 | 658.2 ms | same-machine-relative only |
 | fps (full / last 10s) | 1.29 / 1.58 | software-WebGL artifact, context only |
@@ -84,7 +101,6 @@ viewport hits the `#rotate-device` gate and never boots.
 |---|---|---|
 | **hudHotDomSkipRate** | **0.961** | within the boot-write band; the bypass count is identical to desktop |
 | hudHotDomWrites | 153 | the durable invariant (the elision-bypass count, byte-identical to desktop) |
-| frameP95 | 250 ms | same-machine-relative only |
 | fct burst | [64, 64, 64] | FCT pool cap-bounded (FCT_POOL_CAP=64) under the 3x400 AoE waves |
 | bootMiB | 55.066 | |
 
@@ -93,12 +109,40 @@ elision-bypass count `hudHotDomWrites` is 153 on both, so write-elision is invar
 viewport. The durable per-frame anchor is `hudHotDomWrites`, byte-identical viewport to
 viewport; the gate keys on it, not on the frame-count-dependent ratio.
 
+### real-GPU tour gates (PERF_GPU=1, headed, captured 2026-07-23)
+
+The ARM 3 frame gates. Captured with `PERF_GPU=1 PERF_VIEWPORT=both` over two back-to-back
+runs on the capture machine above (Chrome 150, headed, real GPU, vsync-paced). Healthy
+captures: desktop 876 and 873 frames with 3 and 7 long frames; mobile 1279 and 1245 frames
+with 2 and 2 long frames. The committed anchor takes the worst healthy long-frame count (7)
+plus headroom for run jitter; the committed floor sits between the worst healthy frame count
+(873) and the saturation signature (a run whose every frame hits the 250 ms sample clamp
+renders only about 60 to 220 frames over this tour, and a half-speed catastrophe about 450),
+so both directions keep real failing room.
+
+| Metric | Value | Role |
+|---|---|---|
+| frameLong50 | 12 | ARM 3 anchor: frames at or over 50 ms in the tour window (worst healthy capture 7) |
+| tourMinFrames | 500 | ARM 3 floor: minimum real frames the tour must render (worst healthy capture 873) |
+
+Both rows are single canonical rows valid for every viewport: the committed anchor covers
+the worst viewport, the committed floor the slowest one. `frameLong50` is windowed by the
+PerfMonitor sample ring (MAX_SAMPLES), which comfortably covers this short tour; do not
+lengthen the tour without rechecking that window.
+
 ## How the gate uses this
 
-`hud_perf_budget.test.ts` reads three values and throws if any is absent (a deleted or
-unregenerated baseline fails the budget instead of silently defaulting):
+`hud_perf_budget.test.ts` reads four values at collection time and throws if any is absent
+(a deleted or unregenerated baseline fails the budget instead of silently defaulting, in
+bare `npm test` too, before any env gate is consulted):
 
 - the strictest committed `hudHotDomSkipRate` floor, for ARM 2's deterministic fake-DOM loop;
 - the canonical `hudHotDomWrites` anchor row, for ARM 3's bypass-count gate (asserted on every viewport);
-- the `frameP95` reference, which an operator on other hardware overrides with a fresh
-  same-machine re-run via `HUD_PERF_BUDGET_TOUR_FRAME_BASELINE`.
+- the canonical `frameLong50` anchor row, for ARM 3's long-frame gate; an operator on other
+  hardware overrides it with a fresh same-machine `PERF_GPU=1` capture via
+  `HUD_PERF_BUDGET_TOUR_LONG50_BASELINE`;
+- the canonical `tourMinFrames` floor row, for ARM 3's saturation-killing frame floor.
+
+ARM 3 expects a `PERF_GPU=1` artifact: the headless swiftshader mode renders too few frames
+to meet the floor, by design (that slowness is exactly the saturation signature the floor
+exists to catch).
