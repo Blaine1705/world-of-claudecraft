@@ -34,7 +34,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "es_ES": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -61,7 +63,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "fr_FR": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -88,7 +92,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "fr_CA": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -115,7 +121,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "en_CA": [],
   "it_IT": [
@@ -143,7 +151,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "de_DE": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -170,7 +180,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -201,7 +213,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -229,7 +243,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "nl_NL": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -256,7 +272,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "pl_PL": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -283,7 +301,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "id_ID": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -310,7 +330,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "tr_TR": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -337,7 +359,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "sv_SE": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -364,7 +388,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "vi_VN": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -391,7 +417,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ],
   "da_DK": [
     "hudChrome.gathering.noNodeNearby.herbalism",
@@ -418,6 +446,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.unlocks.mining",
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
-    "hudChrome.gathering.toolTooltip.use.mining"
+    "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.training.pendingAria",
+    "hudChrome.training.statePending"
   ]
 };
