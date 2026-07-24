@@ -268,7 +268,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Niet verkocht',
   'guide.profPages.priceNone': 'Niet verkocht',
   'guide.profPages.toolTierReq': 'Rang {tier} gereedschap',
-  'guide.profPages.bareHands': 'Blote handen',
   'guide.profPages.yieldsHeading': 'Wat een oogst oplevert',
   'guide.profPages.yieldsBody':
     'Elke oogst rolt een kwaliteit voor wat het oplevert, en je vaardigheid is het hele verhaal van die rol. Een splinternieuwe verzamelaar haalt altijd gewoon materiaal op; elk punt vaardigheid verschuift gewicht gestaag van gewoon naar de hogere kwaliteiten en nooit terug, totdat op de grens van 100 de gewone kwaliteit volledig verdwijnt: 60 procent ongewoon, 30 procent zeldzaam, 8 procent episch en 2 procent legendarisch, elke keer.\n\nKwaliteit betekent ook hoeveelheid: een gewone rol levert 1 eenheid, ongewoon en zeldzaam leveren 2, episch 3, en legendarisch 4. Elke zeldzame, epische of legendarische opbrengst arriveert als een gesigneerde instantie gestempeld Verzameld door jou: op de grens draagt dat vier van de tien oogsten jouw naam, en de herkomstregels op de Ambachtseconomiepagina leggen uit waarom makers extra betalen voor precies die stapels.',

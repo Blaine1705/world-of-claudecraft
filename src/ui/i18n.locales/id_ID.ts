@@ -265,7 +265,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Tidak dijual',
   'guide.profPages.priceNone': 'Tidak dijual',
   'guide.profPages.toolTierReq': 'Alat tingkat {tier}',
-  'guide.profPages.bareHands': 'Tangan kosong',
   'guide.profPages.yieldsHeading': 'Apa yang dihasilkan panen',
   'guide.profPages.yieldsBody':
     'Setiap panen menggulung mutu untuk apa yang diberikannya, dan keahlianmu adalah satu-satunya penentu gulungan itu. Pengumpul baru selalu mengambil material umum; setiap poin keahlian menggeser bobot secara stabil dari umum ke tingkat yang lebih tinggi dan tidak pernah mundur, hingga di batas 100 tingkat umum hilang sepenuhnya: 60 persen tidak umum, 30 persen langka, 8 persen epik, dan 2 persen legendaris, setiap saat.\n\nMutu juga berarti kuantitas: gulungan umum menghasilkan 1 unit, tidak umum dan langka menghasilkan 2, epik 3, dan legendaris 4. Setiap tarikan langka, epik, atau legendaris tiba sebagai salinan bertanda tangan yang distempel Dikumpulkan oleh kamu: di batas itu berarti empat dari sepuluh panen membawa namamu, dan aturan asal-usul pada halaman Ekonomi Kerajinan menjelaskan mengapa pengrajin membayar lebih untuk tumpukan-tumpukan itu.',

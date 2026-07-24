@@ -2277,13 +2277,19 @@ export const hudChromeStrings = {
       wood: 'Timber Stand',
       herb: 'Herb Patch',
     },
-    // Tooltip requirement line, shown for tier 2+ nodes only (tier 1 is the
-    // bare-hands floor); doubles as the locked-state line (red while the
-    // viewer's owned-best tool falls short).
+    // Tooltip requirement line for tier 2+ nodes; doubles as the locked-state
+    // line (red while the viewer's owned-best tool falls short).
     tierRequired: {
       mining: 'Requires a tier {tier} mining pick',
       logging: 'Requires a tier {tier} logging axe',
       herbalism: 'Requires a tier {tier} herbalism sickle',
+    },
+    // Tooltip requirement line for tier-1 nodes (#2343: every harvest needs a
+    // matching tool, bare hands never gather, so tier 1 needs the base tool).
+    requiresTool: {
+      mining: 'Requires a mining pick',
+      logging: 'Requires a logging axe',
+      herbalism: 'Requires a herbalism sickle',
     },
     // gatherDenied error toast, surface 'node', worded per node family.
     toolTierUnmet: {
@@ -2291,10 +2297,53 @@ export const hudChromeStrings = {
       logging: 'You need a tier {tier} logging axe to fell this stand.',
       herbalism: 'You need a tier {tier} herbalism sickle to gather this patch.',
     },
+    // gatherDenied error toast for requiredTier 1 (#2343): the player owns no
+    // matching tool at all, so no tier number is named. The fishing arm is
+    // the startFishing implement gate (surface 'fishing').
+    toolRequired: {
+      mining: 'You need a mining pick to harvest this vein.',
+      logging: 'You need a logging axe to fell this stand.',
+      herbalism: 'You need a herbalism sickle to gather this patch.',
+      fishing: 'You need a fishing pole to cast a line.',
+    },
+    // gatherToolNoNode error toast (#2343): the player used a gathering tool
+    // from the bags with no matching resource node within interact range.
+    noNodeNearby: {
+      mining: 'There is no ore vein within reach.',
+      logging: 'There is no timber stand within reach.',
+      herbalism: 'There is no herb patch within reach.',
+    },
     // gatherDenied error toast, surface 'corpse': profession-neutral (a corpse
     // harvest is gated by the best owned tool across ALL gathering
     // professions, so no single tool is named).
     toolTierUnmetCorpse: 'You need a tier {tier} gathering tool to recover the finest materials.',
+    // Gathering-tool item tooltip lines (#2343): what the tool is, what it is
+    // required for, how using it behaves, and its speed/fishing bonuses. All
+    // composed client-side (src/ui/gather_tool_tooltip.ts), keyed per
+    // profession (single-key interpolation, never concatenated fragments).
+    toolTooltip: {
+      kind: {
+        mining: 'Mining tool (tier {tier})',
+        logging: 'Logging tool (tier {tier})',
+        herbalism: 'Herbalism tool (tier {tier})',
+        fishing: 'Fishing rod (tier {tier})',
+      },
+      unlocks: {
+        mining: 'Required to mine ore veins up to tier {tier}.',
+        logging: 'Required to fell timber stands up to tier {tier}.',
+        herbalism: 'Required to gather herb patches up to tier {tier}.',
+      },
+      use: {
+        mining: 'Use: Mine a nearby ore vein.',
+        logging: 'Use: Fell a nearby timber stand.',
+        herbalism: 'Use: Gather from a nearby herb patch.',
+      },
+      speed: 'Gathers faster at nodes below tier {tier}.',
+      rodRequired: 'Required to fish.',
+      rodBite: 'Fish bite up to {seconds}s sooner.',
+      rodReel: 'Extends the reel window by {seconds}s.',
+      rodBand: 'Unlocks richer catch tables at fishing skill {skill} and above.',
+    },
     // Full-bag signed-grant downgrade toasts, rendered from the
     // text-free personal gatherDowngrade SimEvent, one key per lost arm:
     // 'mark' (the yield arrived unsigned) and 'find' (the jackpot dropped).

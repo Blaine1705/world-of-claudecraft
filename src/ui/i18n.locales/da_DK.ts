@@ -263,7 +263,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Sælges ikke',
   'guide.profPages.priceNone': 'Sælges ikke',
   'guide.profPages.toolTierReq': 'Niveau {tier}-værktøj',
-  'guide.profPages.bareHands': 'Bare hænder',
   'guide.profPages.yieldsHeading': 'Hvad en høst giver',
   'guide.profPages.yieldsBody':
     'Enhver høst ruller en kvalitet for det, den giver, og din færdighed er hele historien bag det rul. En helt ny indsamler trækker altid almindeligt materiale; hvert point færdighed skifter jævnt vægt fra almindelig til de højere grader og aldrig tilbage, indtil grænsen på 100 gør den almindelige grad fuldstændig: 60 procent ualmindelig, 30 procent sjælden, 8 procent episk og 2 procent legendarisk, hver gang.\n\nKvalitet betyder også kvantitet: et almindeligt rul giver 1 enhed, ualmindelig og sjælden giver 2, episk 3 og legendarisk 4. Enhver sjælden, episk eller legendarisk høst ankommer som et signeret eksemplar stemplet Indsamlet af dig: ved grænsen er det fire ud af ti høster, der bærer dit navn, og proveniens-reglerne på siden om Håndværksøkonomi forklarer, hvorfor håndværkere betaler ekstra for præcis dem.',

@@ -2132,12 +2132,51 @@ export const zh_TW: EnTranslations = {
         "logging": "需要{tier}階伐木斧",
         "herbalism": "需要{tier}階草藥鐮"
       },
+      "requiresTool": {
+        "mining": "需要採礦鎬",
+        "logging": "需要伐木斧",
+        "herbalism": "需要草藥鐮"
+      },
       "toolTierUnmet": {
         "mining": "你需要{tier}階採礦鎬才能開採這條礦脈。",
         "logging": "你需要{tier}階伐木斧才能砍伐這片林木。",
         "herbalism": "你需要{tier}階草藥鐮才能採集這片草藥叢。"
       },
+      "toolRequired": {
+        "mining": "你需要採礦鎬才能開採這條礦脈。",
+        "logging": "你需要伐木斧才能砍伐這片林木。",
+        "herbalism": "你需要草藥鐮才能採集這片草藥叢。",
+        "fishing": "你需要釣竿才能拋竿垂釣。"
+      },
+      "noNodeNearby": {
+        "mining": "附近沒有礦脈可供開採。",
+        "logging": "附近沒有林木可供砍伐。",
+        "herbalism": "附近沒有草藥叢可供採集。"
+      },
       "toolTierUnmetCorpse": "你需要{tier}階採集工具才能取得最上等的材料。",
+      "toolTooltip": {
+        "kind": {
+          "mining": "採礦工具（{tier}階）",
+          "logging": "伐木工具（{tier}階）",
+          "herbalism": "草藥工具（{tier}階）",
+          "fishing": "釣魚竿（{tier}階）"
+        },
+        "unlocks": {
+          "mining": "開採最高{tier}階的礦脈所需。",
+          "logging": "砍伐最高{tier}階的林木所需。",
+          "herbalism": "採集最高{tier}階的草藥叢所需。"
+        },
+        "use": {
+          "mining": "使用：開採附近的礦脈。",
+          "logging": "使用：砍伐附近的林木。",
+          "herbalism": "使用：採集附近的草藥叢。"
+        },
+        "speed": "在低於{tier}階的節點採集速度更快。",
+        "rodRequired": "釣魚所需。",
+        "rodBite": "魚上鉤最多可提前{seconds}秒。",
+        "rodReel": "收線時限延長{seconds}秒。",
+        "rodBand": "釣魚技能達到{skill}後可解鎖更豐富的漁獲。"
+      },
       "downgradeMark": "背包已滿：這份收穫未能留下採集者的印記。",
       "downgradeFind": "背包已滿：一件完美的收穫溜走了。",
       "stateReady": "可採集",
@@ -3831,7 +3870,6 @@ export const zh_TW: EnTranslations = {
       "toolUnavailable": "無販售",
       "priceNone": "無販售",
       "toolTierReq": "{tier}階工具",
-      "bareHands": "徒手即可",
       "yieldsHeading": "一次採集的收穫",
       "yieldsBody": "每次採集都會擲出品質，而熟練度決定一切：新手永遠採到普通品，熟練度越高，權重越向高品質移動，絕不倒退。到100上限時普通品完全消失：60%優秀、30%精良、8%史詩、2%傳說。品質也意味著數量：普通1個，優秀與精良2個，史詩3個，傳說4個。精良及以上的收穫都會以你的名字署名（Gathered by），封頂時十次採集有四次帶著你的名字。",
       "bandsHeading": "熟練度區間",

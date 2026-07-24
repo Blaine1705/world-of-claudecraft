@@ -2132,12 +2132,51 @@ export const ko_KR: EnTranslations = {
         "logging": "{tier}티어 벌목 도끼 필요",
         "herbalism": "{tier}티어 약초 낫 필요"
       },
+      "requiresTool": {
+        "mining": "채광 곡괭이 필요",
+        "logging": "벌목 도끼 필요",
+        "herbalism": "약초 낫 필요"
+      },
       "toolTierUnmet": {
         "mining": "이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.",
         "logging": "이 나무를 베려면 {tier}티어 벌목 도끼가 필요합니다.",
         "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다."
       },
+      "toolRequired": {
+        "mining": "이 광맥을 캐려면 채광 곡괭이가 필요합니다.",
+        "logging": "이 나무를 베려면 벌목 도끼가 필요합니다.",
+        "herbalism": "이 군락을 채집하려면 약초 낫이 필요합니다.",
+        "fishing": "낚싯대가 있어야 낚싯줄을 드리울 수 있습니다."
+      },
+      "noNodeNearby": {
+        "mining": "손이 닿는 곳에 광맥이 없습니다.",
+        "logging": "손이 닿는 곳에 벌목 나무가 없습니다.",
+        "herbalism": "손이 닿는 곳에 약초 군락이 없습니다."
+      },
       "toolTierUnmetCorpse": "최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.",
+      "toolTooltip": {
+        "kind": {
+          "mining": "채광 도구 ({tier}티어)",
+          "logging": "벌목 도구 ({tier}티어)",
+          "herbalism": "약초 도구 ({tier}티어)",
+          "fishing": "낚싯대 ({tier}티어)"
+        },
+        "unlocks": {
+          "mining": "{tier}티어까지의 광맥을 캐는 데 필요합니다.",
+          "logging": "{tier}티어까지의 벌목 나무를 베는 데 필요합니다.",
+          "herbalism": "{tier}티어까지의 약초 군락을 채집하는 데 필요합니다."
+        },
+        "use": {
+          "mining": "사용: 근처의 광맥을 캡니다.",
+          "logging": "사용: 근처의 벌목 나무를 벱니다.",
+          "herbalism": "사용: 근처의 약초 군락에서 채집합니다."
+        },
+        "speed": "{tier}티어 미만 채집지에서 더 빠르게 채집합니다.",
+        "rodRequired": "낚시에 필요합니다.",
+        "rodBite": "물고기가 최대 {seconds}초 더 빨리 입질합니다.",
+        "rodReel": "릴 감기 시간이 {seconds}초 늘어납니다.",
+        "rodBand": "낚시 기술 {skill} 이상에서 더 풍성한 어획 목록이 해금됩니다."
+      },
       "downgradeMark": "가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.",
       "downgradeFind": "가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.",
       "stateReady": "채집 가능",
@@ -3831,7 +3870,6 @@ export const ko_KR: EnTranslations = {
       "toolUnavailable": "판매 없음",
       "priceNone": "판매 없음",
       "toolTierReq": "{tier}티어 도구",
-      "bareHands": "맨손 가능",
       "yieldsHeading": "채집의 수확물",
       "yieldsBody": "채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.",
       "bandsHeading": "숙련도 구간",

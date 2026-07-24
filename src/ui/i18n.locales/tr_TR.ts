@@ -263,7 +263,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Satılmaz',
   'guide.profPages.priceNone': 'Satılmaz',
   'guide.profPages.toolTierReq': 'Kademe {tier} alet',
-  'guide.profPages.bareHands': 'Çıplak eller',
   'guide.profPages.yieldsHeading': 'Hasat ne verir',
   'guide.profPages.yieldsBody':
     'Her hasat, verdiği şeyin kalitesini çalar ve yetkinliğin tüm hikayesidir bu. Yeni başlayan bir toplayıcı her zaman yaygın malzeme çıkarır; her beceri puanı ağırlığı istikrarlı bir şekilde yaygından daha yüksek kademelere taşır ve asla geri dönmez; 100 tavanında yaygın kademe tamamen ortadan kalkar: her seferinde yüzde 60 nadir dışı, yüzde 30 nadir, yüzde 8 epik ve yüzde 2 efsanevi.\n\nKalite aynı zamanda miktar anlamına da gelir: yaygın çekim 1 birim, nadir dışı ve nadir 2, epik 3 ve efsanevi 4 verir. Nadir, epik veya efsanevi her çekim, tarafından toplandı olarak damgalanmış imzalı bir örnek olarak gelir: tavanda on hasattan dördü adını taşır ve Zanaat Ekonomisi sayfasındaki provenance kuralları, üreticilerin tam olarak bu yığınlar için neden fazladan ödediğini açıklar.',

@@ -98,11 +98,21 @@ state is three transient Entity fields (`fishBiteAtTick`,
 cleared on every cast-end path.
 
 ### Tools and the mastery curve
-Bare hands are effective tool tier 1; only tier-2+ content gates
-(`bestOwnedAnyGatherToolTier`, `src/sim/professions/tools.ts`, scans bags,
-spans all four gathering professions). The gate holds at cast START and is
-deliberately not re-checked at completion; completion re-validates exactly
-range, respawn, and capacity. Skill gain follows the four-state curve
+Every NODE harvest requires a matching-profession gathering tool covering
+the node's tier anywhere in bags (#2343, the RuneScape rule: bare hands
+never mine, fell, or pick; `bestOwnedGatherToolTierOrNone` +
+`canGatherTier`, `src/sim/professions/tools.ts`). Casting a fishing line
+likewise requires a fishing implement in bags: the simple pole or any
+tiered rod (`hasFishingImplement`, the startFishing gate). Bare hands
+still resolve to effective tool tier 1 ONLY on the surfaces that keep the
+old floor: corpse harvesting (`bestOwnedAnyGatherToolTier`, spans all four
+professions) and fishing's bite/reel/band synergy math. The node gate
+holds at cast START and is deliberately not re-checked at completion;
+completion re-validates exactly range, respawn, and capacity. Using a
+pick/axe/sickle from the bags starts the standard gather cast on the
+nearest matching in-range node (`useGatherToolItem`,
+`src/sim/professions/gathering.ts`), preferring a ready node, and emits
+the text-free `gatherToolNoNode` event when nothing is in reach. Skill gain follows the four-state curve
 (`tierProgressMultiplier`, `src/sim/professions/wheel.ts`: 1 / 0.5 / 0.25 / 0
 by tiers below capability, every tier included, no free floor), with
 deterministic fractional gains and never a skill-up roll. Caps are enforced

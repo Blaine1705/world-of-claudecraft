@@ -3788,20 +3788,32 @@ export type SimEvent = { pid?: number } & (
       // The rare event this harvest rolled (resolveHarvest draw #2), or null.
       rareEvent: GatherRareEventFlavor | null;
     }
-  // Gathering tool-gate denial (Professions 2.0): the player lacks a
-  // matching tool of at least `requiredTier` for a node harvest, or for a
-  // corpse harvest's premium (signed/specimen) arm. Personal (pid = the
-  // gatherer) and text-free on purpose (like gatherResult above): the client
-  // composes its own localized copy off the structured fields. `professionId`
-  // is present exactly when surface === 'node' (a corpse harvest is gated by
-  // the best tool tier across ALL gathering professions, so no single
-  // profession applies).
+  // Gathering tool-gate denial (Professions 2.0, extended by #2343): the
+  // player lacks a matching tool of at least `requiredTier` for a node
+  // harvest (bare hands never harvest: requiredTier 1 means "no tool owned
+  // at all"), for a corpse harvest's premium (signed/specimen) arm, or lacks
+  // any fishing implement when casting a line (surface 'fishing'). Personal
+  // (pid = the gatherer) and text-free on purpose (like gatherResult above):
+  // the client composes its own localized copy off the structured fields.
+  // `professionId` is present exactly when surface === 'node' or 'fishing'
+  // (a corpse harvest is gated by the best tool tier across ALL gathering
+  // professions, so no single profession applies).
   | {
       type: 'gatherDenied';
       pid: number;
-      surface: 'node' | 'corpse';
+      surface: 'node' | 'corpse' | 'fishing';
       requiredTier: number;
       professionId?: GatheringProfessionId;
+    }
+  // Gathering-tool item use found nothing to work on (#2343): the player used
+  // a pick/axe/sickle from the bags with no matching resource node within
+  // interact range. Personal and text-free (the gatherDenied idiom): the
+  // client composes its own localized "nothing within reach" line off
+  // `professionId`.
+  | {
+      type: 'gatherToolNoNode';
+      pid: number;
+      professionId: GatheringProfessionId;
     }
   // Full-bag signed-grant downgrade (Professions 2.0): a signed
   // yield could not land in its signed form, so either the units arrived as a

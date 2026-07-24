@@ -275,7 +275,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'No se vende',
   'guide.profPages.priceNone': 'No se vende',
   'guide.profPages.toolTierReq': 'Herramienta de nivel {tier}',
-  'guide.profPages.bareHands': 'Manos desnudas',
   'guide.profPages.yieldsHeading': 'Qué produce una cosecha',
   'guide.profPages.yieldsBody':
     'Cada cosecha tira una calidad para lo que otorga, y tu pericia es toda la historia de esa tirada. Un recolector nuevo siempre saca material común; cada punto de habilidad desplaza peso de forma constante desde el común hacia los grados más altos y nunca hacia atrás, hasta que al llegar al tope de 100 el grado común desaparece por completo: 60 por ciento poco común, 30 por ciento raro, 8 por ciento épico y 2 por ciento legendario, siempre.\n\nLa calidad también significa cantidad: una tirada común da 1 unidad, poco común y raro dan 2, épico 3, y legendario 4. Cualquier resultado raro, épico o legendario llega como una copia firmada marcada como Recolectado por ti: al tope, eso es cuatro de cada diez cosechas con tu nombre, y las reglas de procedencia en la página de Economía de Artesanía explican por qué los artesanos pagan de más exactamente por esas pilas.',
