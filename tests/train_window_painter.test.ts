@@ -123,9 +123,15 @@ describe('renderTrainWindow pending rows (learn in flight, issue #2342)', () => 
     expect(d.onTrain).toHaveBeenCalledWith('r_live');
   });
 
-  it('a non-pending row keeps the Available label (the tri-state labels are untouched)', () => {
+  it('a non-pending row keeps the Available label and the Learn-for-fee aria arm', () => {
     const el = paint([row({})]);
     expect(el.querySelector('.train-state')?.textContent).toBe('Available');
+    // The aria-label rides its OWN ternary, independent of the visible label:
+    // pin the non-pending arm too, or an inverted ternary that always
+    // announces the pending copy would leave every visible pin green.
+    const aria = el.querySelector('.train-teachable')?.getAttribute('aria-label') ?? '';
+    expect(aria).toMatch(/^Learn Eastbrook Arming Sword for /);
+    expect(aria).not.toContain('Learning');
   });
 });
 
