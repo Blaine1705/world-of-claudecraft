@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { mineMoundFootprint } from '../sim/colliders';
 import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
   DOCK_SECTION_LOCAL_Z,
@@ -1183,13 +1184,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.position.set(m.x, ground(m.x, m.z), m.z);
     g.rotation.y = m.rot;
     group.add(shadowed(g));
-    // mound circle behind the portal — same offset/radius as the collider
-    // (src/sim/colliders.ts), read from the same per-entry fields so the two
-    // can never drift apart again
-    const moundOffset = m.moundOffset ?? 3.4,
-      moundRadius = m.moundRadius ?? 5;
-    const mx = m.x - moundOffset * Math.sin(m.rot),
-      mz = m.z - moundOffset * Math.cos(m.rot);
+    // mound circle behind the portal, same offset/radius as the collider
+    // (src/sim/colliders.ts), via the shared mineMoundFootprint helper so the
+    // two can never drift apart again
+    const { x: mx, z: mz, r: moundRadius } = mineMoundFootprint(m);
     registerHideable(g, circleFootprint(mx, mz, moundRadius, ground(mx, mz) + moundRadius + 0.2));
   }
 
