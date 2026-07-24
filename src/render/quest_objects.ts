@@ -38,6 +38,9 @@ const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
   grave_sir_aldren: 1.6,
   grave_high_priest_malric: 1.6,
   grave_captain_voss: 1.6,
+  // A closed tome resting on the ground: shorter than the scroll/sigil
+  // pickups, since it lies flat rather than standing upright.
+  royal_seal: 1.5,
 };
 
 const SCROLL_ITEM_IDS = new Set(['weathered_ledger_page', 'fen_muster_order', 'highwatch_summons']);
@@ -314,11 +317,144 @@ function buildRitualCircleTemplate(): THREE.Group {
   return root;
 }
 
+// The royal_seal ("Ancient Diary") ground item has no GLB and never will
+// (see docs comment at the top of this file): it is reconstructed procedurally
+// from the reference icon at public/ui/items/royal_seal.webp, a closed
+// orange-gold leather tome with a sword-through-shield emblem plate stamped
+// on the front cover and gilt corner trim. This is a STYLIZED, APPROXIMATE
+// reconstruction: a single 2D icon shot from the front shows neither the
+// spine nor the back cover, so both are inferred as plain leather rather than
+// measured. Deterministic: every dimension is a fixed literal, no Rng/Math.random.
+function buildRoyalSealTemplate(): THREE.Group {
+  const cached = proceduralByItem.get('royal_seal');
+  if (cached) return cached;
+
+  const root = new THREE.Group();
+  const coverMat = surfaceMat(matProps(0xc9701f));
+  const pageMat = surfaceMat({ ...matProps(0xe8dcb8), roughness: 0.95 });
+  const goldMat = surfaceMat({
+    color: 0xd9a636,
+    roughness: 0.4,
+    metalness: 0.65,
+    flatShading: !GFX.standardMaterials,
+  });
+  const darkGoldMat = surfaceMat({
+    color: 0x8a5a1c,
+    roughness: 0.5,
+    metalness: 0.55,
+    flatShading: !GFX.standardMaterials,
+  });
+
+  const bookWidth = 0.92;
+  const bookDepth = 0.68;
+  const bookHeight = 0.32;
+
+  // Page block, slightly inset from the covers so the gilt cover edge reads.
+  const pages = new THREE.Mesh(
+    new THREE.BoxGeometry(bookWidth * 0.94, bookHeight * 0.62, bookDepth * 0.94),
+    pageMat,
+  );
+  pages.position.y = bookHeight * 0.5;
+  pages.castShadow = true;
+  pages.receiveShadow = true;
+  root.add(pages);
+
+  // Front and back covers.
+  for (const dz of [-1, 1]) {
+    const cover = new THREE.Mesh(new THREE.BoxGeometry(bookWidth, bookHeight, 0.05), coverMat);
+    cover.position.set(0, bookHeight * 0.5, dz * (bookDepth * 0.5 - 0.025));
+    cover.castShadow = true;
+    cover.receiveShadow = true;
+    root.add(cover);
+  }
+
+  // Spine, running along the -X edge.
+  const spine = new THREE.Mesh(new THREE.BoxGeometry(0.06, bookHeight, bookDepth), coverMat);
+  spine.position.set(-bookWidth * 0.5 + 0.03, bookHeight * 0.5, 0);
+  spine.castShadow = true;
+  spine.receiveShadow = true;
+  root.add(spine);
+
+  // Gilt corner trim, four L-shaped corner caps on the top cover only (the
+  // icon shows the front face; the back is inferred plain per the note above).
+  const cornerInset = 0.1;
+  for (const cx of [-1, 1]) {
+    for (const cz of [-1, 1]) {
+      const corner = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.03, 8), goldMat);
+      corner.rotation.x = Math.PI / 2;
+      corner.position.set(
+        cx * (bookWidth * 0.5 - cornerInset),
+        bookHeight + 0.005,
+        cz * (bookDepth * 0.5 - cornerInset),
+      );
+      corner.castShadow = true;
+      root.add(corner);
+    }
+  }
+
+  // Gilt frame border stamped into the top cover.
+  const frameThickness = 0.03;
+  const frameY = bookHeight + 0.006;
+  const frameLenX = bookWidth * 0.72;
+  const frameLenZ = bookDepth * 0.72;
+  for (const dz of [-1, 1]) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(frameLenX, 0.012, frameThickness), goldMat);
+    bar.position.set(0, frameY, dz * frameLenZ * 0.5);
+    root.add(bar);
+  }
+  for (const dx of [-1, 1]) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, 0.012, frameLenZ), goldMat);
+    bar.position.set(dx * frameLenX * 0.5, frameY, 0);
+    root.add(bar);
+  }
+
+  // Emblem plate: a shield with a sword laid across it, matching the icon's
+  // stamped centerpiece.
+  const plateY = bookHeight + 0.01;
+  const shield = new THREE.Mesh(new THREE.CircleGeometry(0.15, 6), darkGoldMat);
+  shield.rotation.x = -Math.PI / 2;
+  shield.rotation.z = Math.PI / 6;
+  shield.position.set(0, plateY, 0);
+  root.add(shield);
+
+  const swordBlade = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.014, 0.34), goldMat);
+  swordBlade.position.set(0, plateY + 0.008, 0);
+  swordBlade.rotation.y = Math.PI / 4;
+  root.add(swordBlade);
+
+  const swordGuard = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.016, 0.028), goldMat);
+  swordGuard.position.set(0, plateY + 0.009, 0);
+  swordGuard.rotation.y = Math.PI / 4;
+  root.add(swordGuard);
+
+  // Clasp/strap holding the covers shut, on the +X edge opposite the spine.
+  const strap = new THREE.Mesh(new THREE.BoxGeometry(0.05, bookHeight * 1.1, 0.14), darkGoldMat);
+  strap.position.set(bookWidth * 0.5 - 0.02, bookHeight * 0.5, 0);
+  strap.castShadow = true;
+  root.add(strap);
+
+  const claspStud = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 8), goldMat);
+  claspStud.rotation.z = Math.PI / 2;
+  claspStud.position.set(bookWidth * 0.5 + 0.01, bookHeight * 0.5, 0);
+  root.add(claspStud);
+
+  proceduralByItem.set('royal_seal', root);
+  return root;
+}
+
+const PROCEDURAL_ITEM_IDS = new Set(['crypt_ritual_circle', 'royal_seal']);
+
 function prepareItem(itemId: string): THREE.Group | null {
   const cached = preparedByItem.get(itemId);
   if (cached) return cached;
   const url = QUEST_OBJECT_URLS[itemId];
-  if (!url) return null;
+  if (!url) {
+    if (itemId !== 'royal_seal') return null;
+    const template = buildRoyalSealTemplate();
+    normalizeRoot(template, QUEST_OBJECT_HEIGHTS.royal_seal ?? TARGET_HEIGHT);
+    preparedByItem.set(itemId, template);
+    return template;
+  }
   const gltf = gltfByUrl.get(url);
   if (!gltf) return itemId === 'crypt_ritual_circle' ? buildRitualCircleTemplate() : null;
 
@@ -346,7 +482,7 @@ export function buildGroundQuestObject(
 ): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
   const key =
-    itemId === 'crypt_ritual_circle' || QUEST_OBJECT_URLS[itemId] ? itemId : 'supply_crate';
+    PROCEDURAL_ITEM_IDS.has(itemId) || QUEST_OBJECT_URLS[itemId] ? itemId : 'supply_crate';
   const template = prepareItem(key);
   if (template) {
     const model = template.clone(true);
