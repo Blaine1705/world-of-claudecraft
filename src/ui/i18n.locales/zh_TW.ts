@@ -8431,11 +8431,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '任何人都可以把武器或護甲按品質回收成普通材料，無需附魔技能。',
   'guide.profPages.ench.bonusFmt': '+{value}{stat}',
   'guide.profPages.gatherIntro.mining':
-    '採礦在三大區域的礦脈中開採礦石，供給鍛造類行業，上限為100。',
+    '採礦直接從世界的岩層中開採礦石：東溪谷產銅礦，泥沼濕地產鐵礦，荊峰高地產鋨礦，供給鍛造類行業。從1級起人人皆可採集：只需背包中備有一把採礦鎬，各區域主城均售20銅幣。以獨立計數器追蹤，上限為100。',
   'guide.profPages.gatherIntro.logging':
-    '伐木在三大區域的林地中砍伐木材，供給武器柄材與工具，上限為100。',
+    '伐木在三大區域的林地中砍伐木材：東溪谷產鐵皮木，泥沼濕地產梣木，荊峰高地產高松，供給武器柄材、法杖與工程師工坊。從1級起人人皆可伐木，只需背包中備有一把伐木斧（各區域主城20銅幣），以獨立計數器追蹤，上限為100。',
   'guide.profPages.gatherIntro.herbalism':
-    '藥草學在三大區域採集草藥，供給鍊金術與烹飪，上限為100。',
+    '藥草學採集野地所生的草藥：東溪谷產潤光葉，泥沼濕地產金葉，荊峰高地產日瓣草，這些葉與莖讓藥劑類行業得以持續調製。從1級起人人皆可採集，只需背包中備有一把草藥鐮（各區域主城20銅幣），以獨立計數器追蹤，上限為100。',
   'guide.profPages.gatherIntro.fishing':
     '釣魚通過咬鉤與收線的節奏，在每個區域的開闊水面垂釣，上限為200。',
   'guide.profPages.rhythmHeading': '採集節奏',
@@ -8447,7 +8447,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.nodesNote':
     '節點的位置、階級、所需工具與產出；每個節點在你採集後{respawn}秒才會為你本人重生。',
   'guide.profPages.toolsHeading': '工具',
-  'guide.profPages.toolsNote': '工具階梯與確切的商人售價；4階與5階工具只能製作，無法購買。',
+  'guide.profPages.toolsNote':
+    '每一處節點都需要背包中備有對應行業的工具，1階節點也不例外：沒有採礦鎬就採不到礦石，沒有魚竿就釣不上魚。商人階梯涵蓋1階到3階，各區域主城皆有備貨；工具只要放在背包裡即可，沒有裝備欄位，也沒有耐久度，因此每件都只需購買一次。門檻只看階級：工具的稀有度顏色純屬外觀。\n\n商人階梯之上還有兩件製作工具，4階與5階，由工程師在工坊打造，任何NPC都不販售。目前沒有任何節點需要超過3階的工具，因此它們現階段的價值在於速度：頂階工具能把低階節點的施法時間壓到下限；等更高階的地域開放時，它們便是入場券。',
   'guide.profPages.toolCrafted': '製作獲得（{craft}）',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '無販售',
@@ -8669,4 +8670,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出處與市場',
   'guide.profPages.craftProse.enchanting.marketBody':
     '施加附魔消耗背包中未裝備的一件副本加材料，交還一件獨立的附魔副本；穿上它，加成永遠跟隨。一件一附魔：附魔副本不能再附魔也不能分解，出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。世界市場只經手無標記的普通貨，附魔與署名件都面對面交易；材料才是可上市的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。',
+  'hudChrome.corpseHarvest.components.meat': '獸肉',
 };

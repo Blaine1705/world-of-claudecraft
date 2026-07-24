@@ -1461,8 +1461,8 @@ export const it_IT: EnTranslations = {
         "claw": "Artiglio",
         "horn": "Corno",
         "tusk": "Zanna",
-        "meat": "Meat",
-        "cloth": "Cloth"
+        "meat": "Carne",
+        "cloth": "Stoffa"
       }
     },
     "townFocus": {
@@ -1995,7 +1995,7 @@ export const it_IT: EnTranslations = {
       }
     },
     "noticeboard": {
-      "empty": "Nothing seems posted."
+      "empty": "Non sembra esserci nulla di affisso."
     },
     "bank": {
       "title": "Banca",
@@ -2138,9 +2138,9 @@ export const it_IT: EnTranslations = {
         "herbalism": "Richiede una falce da erbalismo di livello {tier}"
       },
       "requiresTool": {
-        "mining": "Requires a mining pick",
-        "logging": "Requires a logging axe",
-        "herbalism": "Requires a herbalism sickle"
+        "mining": "Richiede un piccone da estrazione",
+        "logging": "Richiede un'ascia da taglio",
+        "herbalism": "Richiede una falce da erbalismo"
       },
       "toolTierUnmet": {
         "mining": "Hai bisogno di un piccone da estrazione di livello {tier} per raccogliere questo filone.",
@@ -2148,39 +2148,39 @@ export const it_IT: EnTranslations = {
         "herbalism": "Hai bisogno di una falce da erbalismo di livello {tier} per raccogliere quest'aiuola."
       },
       "toolRequired": {
-        "mining": "You need a mining pick to harvest this vein.",
-        "logging": "You need a logging axe to fell this stand.",
-        "herbalism": "You need a herbalism sickle to gather this patch.",
-        "fishing": "You need a fishing pole to cast a line."
+        "mining": "Hai bisogno di un piccone da estrazione per raccogliere questo filone.",
+        "logging": "Hai bisogno di un'ascia da taglio per abbattere questo boschetto.",
+        "herbalism": "Hai bisogno di una falce da erbalismo per raccogliere quest'aiuola.",
+        "fishing": "Hai bisogno di una canna da pesca per lanciare la lenza."
       },
       "noNodeNearby": {
-        "mining": "There is no ore vein within reach.",
-        "logging": "There is no timber stand within reach.",
-        "herbalism": "There is no herb patch within reach."
+        "mining": "Non c'è nessun filone di minerale a portata.",
+        "logging": "Non c'è nessun boschetto di alberi a portata.",
+        "herbalism": "Non c'è nessuna aiuola d'erbe a portata."
       },
       "toolTierUnmetCorpse": "Hai bisogno di uno strumento da raccolta di livello {tier} per recuperare i materiali migliori.",
       "toolTooltip": {
         "kind": {
-          "mining": "Mining tool (tier {tier})",
-          "logging": "Logging tool (tier {tier})",
-          "herbalism": "Herbalism tool (tier {tier})",
-          "fishing": "Fishing rod (tier {tier})"
+          "mining": "Strumento da estrazione (livello {tier})",
+          "logging": "Strumento da taglio (livello {tier})",
+          "herbalism": "Strumento da erbalismo (livello {tier})",
+          "fishing": "Canna da pesca (livello {tier})"
         },
         "unlocks": {
-          "mining": "Required to mine ore veins up to tier {tier}.",
-          "logging": "Required to fell timber stands up to tier {tier}.",
-          "herbalism": "Required to gather herb patches up to tier {tier}."
+          "mining": "Necessario per estrarre dai filoni di minerale fino al livello {tier}.",
+          "logging": "Necessaria per abbattere i boschetti di alberi fino al livello {tier}.",
+          "herbalism": "Necessaria per raccogliere le aiuole d'erbe fino al livello {tier}."
         },
         "use": {
-          "mining": "Use: Mine a nearby ore vein.",
-          "logging": "Use: Fell a nearby timber stand.",
-          "herbalism": "Use: Gather from a nearby herb patch."
+          "mining": "Uso: estrai da un filone di minerale vicino.",
+          "logging": "Uso: abbatti un boschetto di alberi vicino.",
+          "herbalism": "Uso: raccogli da un'aiuola d'erbe vicina."
         },
-        "speed": "Gathers faster at nodes below tier {tier}.",
-        "rodRequired": "Required to fish.",
-        "rodBite": "Fish bite up to {seconds}s sooner.",
-        "rodReel": "Extends the reel window by {seconds}s.",
-        "rodBand": "Unlocks richer catch tables at fishing skill {skill} and above."
+        "speed": "Raccoglie più in fretta sui nodi di livello inferiore a {tier}.",
+        "rodRequired": "Necessaria per pescare.",
+        "rodBite": "I pesci abboccano fino a {seconds} s prima.",
+        "rodReel": "Allunga di {seconds} s la finestra per recuperare la lenza.",
+        "rodBand": "Sblocca tabelle di catture più ricche con abilità di Pesca {skill} o superiore."
       },
       "downgradeMark": "Borse piene: il ritrovamento e stato conservato senza il marchio del raccoglitore.",
       "downgradeFind": "Borse piene: un ritrovamento pregiato e scivolato via.",
@@ -2357,7 +2357,7 @@ export const it_IT: EnTranslations = {
       },
       "throttled": "Stai fabbricando troppo in fretta. Aspetta un momento e riprova.",
       "recipeNotLearned": "Non hai ancora imparato quella ricetta.",
-      "noBagSpace": "You do not have room for the crafted item.",
+      "noBagSpace": "Non hai spazio per l'oggetto realizzato.",
       "skillReqLine": "Richiede {craft} {skill}",
       "difficultyFull": "Guadagno completo di abilità",
       "difficultyReduced": "Guadagno di abilità ridotto",
@@ -2409,9 +2409,9 @@ export const it_IT: EnTranslations = {
       "enchantWrongSlot": "Quell'incantesimo non puo essere applicato a quell'oggetto.",
       "enchantUnknown": "Quell'incantesimo non esiste.",
       "enchantInsufficient": "Non hai i materiali per quell'incantesimo.",
-      "disenchantNoSpace": "You do not have room for the arcane materials.",
-      "salvageNoSpace": "You do not have room for the salvaged materials.",
-      "enchantNoSpace": "You do not have room for the enchanted item.",
+      "disenchantNoSpace": "Non hai spazio per i materiali arcani.",
+      "salvageNoSpace": "Non hai spazio per i materiali dello smantellamento.",
+      "enchantNoSpace": "Non hai spazio per l'oggetto incantato.",
       "disenchantConfirmTitle": "Disincanta {item}?",
       "disenchantConfirmBody": "Questo distrugge {item} e produce materiali arcani. Questa azione non puo essere annullata.",
       "disenchantConfirmBodySpecial": "Questo distrugge una copia speciale di {item} (firmata, capolavoro o incantata) e produce materiali arcani. Questa azione non puo essere annullata.",
@@ -2431,10 +2431,10 @@ export const it_IT: EnTranslations = {
       "stateKnown": "Conosciuto",
       "stateTeachable": "Disponibile",
       "stateLocked": "Bloccato",
-      "statePending": "Learning",
+      "statePending": "In apprendimento",
       "requirement": "Insegnato a {craft} {skill}",
       "trainAria": "Impara {name} per {fee}",
-      "pendingAria": "Learning {name}",
+      "pendingAria": "Apprendimento di {name}",
       "dialogOption": "Formazione",
       "dialogOptionAria": "Sfoglia la formazione da {name}",
       "learned": "Ricetta appresa: {recipe}",
@@ -2462,7 +2462,7 @@ export const it_IT: EnTranslations = {
       "notBound": "Quell'oggetto non e legato.",
       "cannotAfford": "Non puoi permetterti la tariffa di scioglimento.",
       "outOfRange": "Devi essere a una stazione artigianale per sciogliere.",
-      "noSpace": "You do not have room for the unbound copy."
+      "noSpace": "Non hai spazio per la copia sciolta."
     },
     "finder": {
       "title": "Cercatore di Dungeon",
@@ -3858,9 +3858,9 @@ export const it_IT: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "La Mineria estrae il minerale direttamente dalla roccia del mondo: rame a Eastbrook Vale, ferro nel Mirefen Marsh e osmio su a Thornpeak Heights, per alimentare i mestieri della forgia. Aperta a tutti dal livello 1, senza alcun requisito, tracciata sul proprio contatore fino a un massimo di 100.",
-        "logging": "La Boscaiolia abbatte il legname dai boschi in tutte e tre le zone: corteccia di ferro a Eastbrook Vale, frassino nel Mirefen Marsh e altopino a Thornpeak Heights, la materia prima per manici, bastoni e il banco dell'ingegnere. Aperta a tutti dal livello 1, tracciata sul proprio contatore fino a un massimo di 100.",
-        "herbalism": "L'Erboristeria raccoglie cio che cresce selvatico: foglialucente a Eastbrook Vale, fogliadoro nel Mirefen Marsh, e petalo solare a Thornpeak Heights, la foglia e il gambo che tengono in produzione i mestieri dell'apotecario. Aperta a tutti dal livello 1, tracciata sul proprio contatore fino a un massimo di 100.",
+        "mining": "La Mineria estrae il minerale direttamente dalla roccia del mondo: rame nella Valle di Eastbrook, ferro nella Palude di Mirefen e osmio sulle Alture di Thornpeak, per alimentare i mestieri della forgia. Aperta a tutti dal livello 1: basta un piccone da estrazione nelle borse, 20 rame in qualsiasi hub di zona. Tracciata sul proprio contatore fino a un massimo di 100.",
+        "logging": "La Boscaiolia abbatte il legname dai boschi in tutte e tre le zone: corteccia di ferro nella Valle di Eastbrook, frassino nella Palude di Mirefen e altopino sulle Alture di Thornpeak, la materia prima per manici, bastoni e il banco dell'ingegnere. Aperta a tutti dal livello 1 con un'ascia da taglio nelle borse (20 rame in qualsiasi hub di zona), tracciata sul proprio contatore fino a un massimo di 100.",
+        "herbalism": "L'Erboristeria raccoglie ciò che cresce selvatico: foglialucente nella Valle di Eastbrook, fogliadoro nella Palude di Mirefen e petalo solare sulle Alture di Thornpeak, la foglia e il gambo che tengono in produzione i mestieri dell'apotecario. Aperta a tutti dal livello 1 con una falce da erbalismo nelle borse (20 rame in qualsiasi hub di zona), tracciata sul proprio contatore fino a un massimo di 100.",
         "fishing": "La Pesca e l'eccezione tra le professioni di raccolta, e la piu profonda: un vero minigioco di lenza e mulinello, con le proprie tabelle di catture in ogni zona e un massimo di competenza di 200, il doppio delle altre. Compra una canna, rivolgiti verso l'acqua aperta e lancia."
       },
       "rhythmHeading": "Il ritmo del raccolto",
@@ -3869,7 +3869,7 @@ export const it_IT: EnTranslations = {
       "nodesHeading": "Nodi per zona",
       "nodesNote": "Dove si trovano i nodi, il loro livello, lo strumento necessario e cio che producono. Ogni nodo rispawna per te {respawn} secondi dopo il tuo raccolto, e quel timer e solo tuo: un altro raccoglitore che lavora lo stesso nodo non ritarda mai il tuo, quindi non c'e gara per i nodi e nessuno li presidia. Ogni zona piu avanzata offre un materiale migliore estratto da terreno piu duro.",
       "toolsHeading": "Strumenti",
-      "toolsNote": "Le mani nude contano come strumento di livello 1, quindi ogni nodo di livello 1 nel gioco non richiede alcuno strumento. La scala dei venditori copre i livelli da 1 a 3; uno strumento deve solo essere nella borsa, non c'e slot di equipaggiamento ne durabilita, quindi ognuno e un acquisto unico. Solo il livello conta per il requisito: il colore rarita di uno strumento e cosmetico.\n\nSopra la scala dei venditori si trovano due strumenti fabbricati, livello 4 e livello 5, realizzati nell'officina dagli ingegneri e mai venduti da alcun PNG. Nessun nodo oggi richiede piu del livello 3, quindi il loro valore ora e la velocita: uno strumento di punta blocca il lancio al suo minimo sui nodi inferiori, e sara il biglietto d'ingresso quando arriveranno terreni di livello superiore.",
+      "toolsNote": "Ogni nodo richiede nelle borse lo strumento del suo mestiere, livello 1 compreso: senza piccone niente minerale, senza canna niente pesce. La scala dei venditori copre i livelli da 1 a 3, rifornita in ogni hub di zona; uno strumento deve solo essere nelle borse, non c'è slot di equipaggiamento né durabilità, quindi ognuno è un acquisto unico. Solo il livello conta per il requisito: il colore di rarità di uno strumento è cosmetico.\n\nSopra la scala dei venditori si trovano due strumenti fabbricati, livello 4 e livello 5, realizzati nell'officina dagli ingegneri e mai venduti da alcun PNG. Nessun nodo oggi richiede più del livello 3, quindi il loro valore ora è la velocità: uno strumento di punta blocca il lancio al suo minimo sui nodi inferiori, e sarà il biglietto d'ingresso quando arriveranno terreni di livello superiore.",
       "toolCrafted": "Fabbricato ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Non in vendita",
@@ -5574,10 +5574,10 @@ export const it_IT: EnTranslations = {
     "reconnectingNow": "Connessione persa. Ci stiamo ricollegando ora... (tentativo {attempt}/{maxAttempts})",
     "slowConnection": "L'operazione sta richiedendo più tempo del solito. Controlla la tua connessione Internet.",
     "connectionRejected": "Il server ha chiuso la connessione.",
-    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
+    "incompatibleWorldVersion": "Le versioni del gioco e del server non sono compatibili. Ricarica o aggiorna, poi riprova.",
     "realmFull": "Questo mondo e al completo in questo momento. Riprova tra qualche minuto.",
     "tooManyConnections": "Troppe connessioni a questo mondo provengono dalla tua rete. Chiudi le finestre di gioco extra o riprova tra qualche minuto.",
-    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
+    "messageRateExceeded": "Sei stato disconnesso per aver inviato azioni troppo velocemente. Attendi un momento e accedi di nuovo.",
     "tips": {
       "classes": "Suggerimento: ciascuna delle 9 classi si gioca in modo diverso. Provane alcune prima di sceglierne una.",
       "talents": "Suggerimento: puoi azzerare i talenti ogni volta che sei fuori combattimento, quindi una scelta iniziale non è mai definitiva.",
@@ -5648,10 +5648,10 @@ export const it_IT: EnTranslations = {
     "dismiss": "Ignora"
   },
   "perfNudge": {
-    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
-    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
-    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
-    "dismiss": "Dismiss"
+    "integratedGpu": "Il gioco sta girando sulla GPU integrata (a basso consumo). Se questo computer ha anche una GPU da gioco, su Windows imposta il browser su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica, poi riavvia il browser. L'app desktop sceglie automaticamente la GPU da gioco.",
+    "hardwareAccelerationDesktop": "Il gioco sta girando senza accelerazione GPU, il che lo rende molto lento. Aggiorna i driver grafici, poi riavvia il gioco. Su Windows, imposta anche il gioco su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica.",
+    "hardwareAccelerationWeb": "Il gioco sta girando senza accelerazione GPU, il che lo rende molto lento. Abilita l'accelerazione hardware nelle impostazioni del browser, aggiorna i driver grafici, poi riavvia il browser.",
+    "dismiss": "Ignora"
   },
   "realm": {
     "noRealms": "Nessun mondo disponibile.",
@@ -6078,7 +6078,7 @@ export const it_IT: EnTranslations = {
       "auraGain": "Ottieni {name}.",
       "auraFade": "{name} svanisce da te.",
       "auraAfflicted": "{target} è afflitto da {name}.",
-      "auraGainOther": "{target} gains {name}."
+      "auraGainOther": "{target} ottiene {name}."
     },
     "system": {
       "playerDeath": "Sei morto.",
@@ -6914,43 +6914,43 @@ export const it_IT: EnTranslations = {
         "description": "Evoca un Elementale dell'Acqua che combatte al tuo fianco, scaglia Dardi d'Acqua sul tuo bersaglio e canalizza Getto d'Acqua. (Gelo)"
       },
       "ice_lance": {
-        "name": "Ice Lance",
+        "name": "Lancia di Ghiaccio",
         "description": "Scaglia un frammento di ghiaccio infliggendo {damage} danni da Gelo, triplicati contro un bersaglio congelato. Spende Fingers of Frost oppure una carica di Gelo Invernale per trattare il bersaglio come congelato. (Gelo)"
       },
       "flurry": {
-        "name": "Winterlash",
+        "name": "Sferza d'Inverno",
         "description": "Scatena tre dardi ghiacciati per {damage} danni da gelo ciascuno e pianta Gelo invernale sul bersaglio: i suoi prossimi 2 incantesimi compatibili in arrivo lo considerano congelato. Brain Freeze rende Winterlash istantaneo e salta il suo tempo di recupero. (Gelo)"
       },
       "frozen_orb": {
-        "name": "Frozen Orb",
+        "name": "Sfera Congelata",
         "description": "Rilascia una sfera di gelo vorticoso che si sposta in avanti per 8 sec, infliggendo a {damage} danni da gelo ogni secondo ai nemici vicini e rallentandoli del 30%. Ogni impulso che colpisce genera un ghiacciolo. (Gelo)"
       },
       "blizzard": {
-        "name": "Blizzard",
+        "name": "Bufera di Neve",
         "description": "Scatena una tempesta di ghiaccio sull'area bersaglio per 6 secondi, infliggendo {damage} danni da Gelo al secondo e rallentando i nemici del 40%. Ogni nemico colpito riduce di 0,5 secondi il recupero di Frozen Orb, fino a 3 secondi per lancio. (Gelo)"
       },
       "glacial_spike": {
-        "name": "Glacial Spike",
+        "name": "Spuntone Glaciale",
         "description": "Evoca un'enorme stalattite di ghiaccio, consumando 5 Stalattiti per infliggere {damage} danni da Gelo e congelare il bersaglio sul posto per 4 secondi. (Gelo)"
       },
       "glacial_front": {
-        "name": "Glacial Front",
+        "name": "Fronte Glaciale",
         "description": "Tieni premuto per raccogliere un fronte di gelo sempre più ampio, poi rilascialo a cono. Cariche più lunghe raggiungono più lontano e infliggono più danni. Tutti i nemici colpiti vengono rallentati del 50% per 4 secondi; la carica massima li radica anche per 1 secondo. (Gelo)"
       },
       "dragons_breath": {
-        "name": "Dragon's Breath",
+        "name": "Soffio del Drago",
         "description": "Tieni premuto per raccogliere un soffio di fiamma sempre più ampio, poi rilascialo a cono. Cariche più lunghe raggiungono più lontano e infliggono più danni. I nemici colpiti vengono disorientati e i danni interrompono l'effetto; la carica massima colpisce sempre criticamente e conta una volta verso Vampata. (Fuoco)"
       },
       "fingers_of_frost": {
-        "name": "Fingers of Frost",
+        "name": "Dita di Gelo",
         "description": "Lancia di Brina ha il 15% di probabilità di concedere Fingers of Frost, fino a 2 cariche: la prossima Ice Lance tratta il bersaglio come se fosse congelato. (Gelo)"
       },
       "brain_freeze": {
-        "name": "Brain Freeze",
+        "name": "Gelo Mentale",
         "description": "Rimelance ha una probabilità del 20% di rendere il tuo prossimo Winterlash istantaneo e privo di tempo di recupero. (Gelo)"
       },
       "shatter": {
-        "name": "Brittle Ruin",
+        "name": "Rovina Fragile",
         "description": "I tuoi incantesimi ottengono il 50% di probabilità di colpo critico contro bersagli congelati. Dita di Gelo e Gelo dell'Inverno contano come congelati. (Gelo)"
       },
       "conjure_water": {
@@ -7030,7 +7030,7 @@ export const it_IT: EnTranslations = {
         "description": "Tende un agguato al bersaglio per il 250% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo."
       },
       "stealth": {
-        "name": "Duskveil",
+        "name": "Velo Crepuscolare",
         "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Duskveil. Lanciala di nuovo per uscire."
       },
       "adrenaline_rush": {
@@ -7090,7 +7090,7 @@ export const it_IT: EnTranslations = {
         "description": "Aumenta la tua armatura di {buff} per 30 min."
       },
       "judgement": {
-        "name": "Verdict",
+        "name": "Verdetto",
         "description": "Scatena il tuo Sigillo attivo sul nemico, consumandolo per infliggere i suoi danni Sacri accumulati."
       },
       "blessing_of_might": {
@@ -7262,7 +7262,7 @@ export const it_IT: EnTranslations = {
         "description": "Imbeve la tua arma con gelo pungente: ogni colpo infligge {damage} danni aggiuntivi per 5 min."
       },
       "ghost_wolf": {
-        "name": "Shadewolf",
+        "name": "Lupo d'Ombra",
         "description": "Ti trasforma in un Shadewolf, aumentando la velocità di movimento del 40% per 10 min."
       },
       "stormstrike": {
@@ -7318,7 +7318,7 @@ export const it_IT: EnTranslations = {
         "description": "Cura un bersaglio alleato di {damage}."
       },
       "mark_of_the_wild": {
-        "name": "Wildward",
+        "name": "Custodia Selvaggia",
         "description": "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min."
       },
       "moonfire": {
@@ -7690,7 +7690,7 @@ export const it_IT: EnTranslations = {
         "description": "Infondi forza selvaggia negli alleati entro 30 m, aumentando la loro potenza d’attacco di 45 e la velocità d’attacco del 5% per 5 min. (talento del Cacciatore)"
       },
       "avatar": {
-        "name": "Avatar",
+        "name": "Incarnazione",
         "description": "Ti trasformi in un colosso per 20 s, liberandoti da tutti gli effetti di controllo e aumentando del 20% i danni inflitti."
       },
       "avenging_wrath": {
@@ -7862,7 +7862,7 @@ export const it_IT: EnTranslations = {
         "description": "Accelera il flusso del tempo per il tuo gruppo o incursione, aumentando la velocità di attacco, lancio e canalizzazione del 30% per 15 secondi. Gli alleati colpiti di recente da Accelerazione Temporale o Tamburi di Guerra sono troppo esausti per beneficiarne. (Cronomanzia)"
       },
       "perfect_moment": {
-        "name": "Perfect Moment",
+        "name": "Momento Perfetto",
         "description": "Cogli il tuo momento perfetto: guadagni istantaneamente 4 Cariche Arcane e per 10 secondi Dardi d'Etere non le consuma. (Cronomanzia)"
       },
       "arcane_surge": {
@@ -11786,6 +11786,6 @@ export const it_IT: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuario delle Canne: premi F per toccarlo",
     "delveRiteShrineSkullInteract": "Santuario del Teschio: premi F per toccarlo",
     "mailboxName": "Cassetta postale",
-    "noticeboardName": "Notice Board"
+    "noticeboardName": "Bacheca degli annunci"
   }
 };
