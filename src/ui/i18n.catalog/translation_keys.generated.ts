@@ -6500,6 +6500,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.training.learned'
   | 'hudChrome.training.notTaughtHere'
   | 'hudChrome.training.outOfRange'
+  | 'hudChrome.training.pendingAria'
   | 'hudChrome.training.requirement'
   | 'hudChrome.training.stateKnown'
   | 'hudChrome.training.stateLocked'

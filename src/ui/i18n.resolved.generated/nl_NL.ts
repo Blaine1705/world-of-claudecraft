@@ -2385,6 +2385,7 @@ export const nl_NL: EnTranslations = {
       "statePending": "Learning",
       "requirement": "Geleerd bij {craft} {skill}",
       "trainAria": "Leer {name} voor {fee}",
+      "pendingAria": "Learning {name}",
       "dialogOption": "Opleiding",
       "dialogOptionAria": "Bekijk trainingen van {name}",
       "learned": "Recept geleerd: {recipe}",

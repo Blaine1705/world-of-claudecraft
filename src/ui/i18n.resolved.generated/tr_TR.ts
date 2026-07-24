@@ -2385,6 +2385,7 @@ export const tr_TR: EnTranslations = {
       "statePending": "Learning",
       "requirement": "{craft} {skill}'da okudu",
       "trainAria": "{fee} için {name}'yi öğrenin",
+      "pendingAria": "Learning {name}",
       "dialogOption": "Eğitim",
       "dialogOptionAria": "{name}'deki eğitime göz atın",
       "learned": "Öğrenilen tarif: {recipe}",

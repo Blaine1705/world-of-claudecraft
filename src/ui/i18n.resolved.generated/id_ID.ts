@@ -2385,6 +2385,7 @@ export const id_ID: EnTranslations = {
       "statePending": "Learning",
       "requirement": "Diajarkan di {craft} {skill}",
       "trainAria": "Pelajari {name} untuk {fee}",
+      "pendingAria": "Learning {name}",
       "dialogOption": "Pelatihan",
       "dialogOptionAria": "Jelajahi pelatihan dari {name}",
       "learned": "Resep yang dipelajari: {recipe}",

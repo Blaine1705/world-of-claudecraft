@@ -2385,6 +2385,7 @@ export const vi_VN: EnTranslations = {
       "statePending": "Learning",
       "requirement": "Đã học tại {craft} {skill}",
       "trainAria": "Tìm hiểu {name} cho {fee}",
+      "pendingAria": "Learning {name}",
       "dialogOption": "Đào tạo",
       "dialogOptionAria": "Duyệt đào tạo từ {name}",
       "learned": "Công thức đã học: {recipe}",

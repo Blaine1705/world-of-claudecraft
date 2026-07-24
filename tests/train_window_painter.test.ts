@@ -98,6 +98,9 @@ describe('renderTrainWindow pending rows (learn in flight, issue #2342)', () => 
     const button = el.querySelector('.train-teachable') as HTMLButtonElement;
     expect(button.disabled).toBe(true);
     expect(button.querySelector('.train-state')?.textContent).toBe('Learning');
+    // The accessible name must carry the in-flight state too: aria-label
+    // overrides element content, so the visible pill alone never reaches AT.
+    expect(button.getAttribute('aria-label')).toBe('Learning Eastbrook Arming Sword');
     // The fee chip stays (the row is still affordable; the disabled opacity
     // mutes it), per the vendor-family price-rendering contract.
     expect(button.querySelector('.vi-price-chip')).not.toBeNull();

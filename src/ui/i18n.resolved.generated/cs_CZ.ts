@@ -2385,6 +2385,7 @@ export const cs_CZ: EnTranslations = {
       "statePending": "Learning",
       "requirement": "Vyučováno na {craft} {skill}",
       "trainAria": "Naučit se {name} za {fee}",
+      "pendingAria": "Learning {name}",
       "dialogOption": "Výcvik",
       "dialogOptionAria": "Prohlédnout výcvik u {name}",
       "learned": "Naučen recept: {recipe}",

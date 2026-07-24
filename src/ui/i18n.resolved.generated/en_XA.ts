@@ -2385,6 +2385,7 @@ export const en_XA: EnTranslations = {
       "statePending": "[Ļéáŕñíñĝ]",
       "requirement": "[Ţáúĝĥţ áţ {craft} {skill}]",
       "trainAria": "[Ļéáŕñ {name} ƒóŕ {fee}]",
+      "pendingAria": "[Ļéáŕñíñĝ {name}]",
       "dialogOption": "[Ţŕáíñíñĝ]",
       "dialogOptionAria": "[Ɓŕóŵšé ţŕáíñíñĝ ƒŕóɱ {name}]",
       "learned": "[Ŕéçíþé ļéáŕñéð: {recipe}]",

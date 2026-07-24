@@ -99,9 +99,15 @@ export function renderTrainWindow(
       button.className = 'vendor-item train-row train-teachable';
       // Disabled while the learn is in flight: the first click's feedback,
       // and the reason a rapid second click can never re-send the command.
-      button.disabled = row.pending === true || !row.affordable;
+      const pending = row.pending === true;
+      button.disabled = pending || !row.affordable;
       const fee = feeLabel(row);
-      button.setAttribute('aria-label', t('hudChrome.training.trainAria', { name, fee }));
+      button.setAttribute(
+        'aria-label',
+        pending
+          ? t('hudChrome.training.pendingAria', { name })
+          : t('hudChrome.training.trainAria', { name, fee }),
+      );
       // An affordable fee renders as the gold-gradient action chip; an
       // unaffordable one keeps the plain error-tint price so the block stays
       // readable under the disabled opacity (never a desaturated gold chip).

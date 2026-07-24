@@ -2385,6 +2385,7 @@ export const sv_SE: EnTranslations = {
       "statePending": "Learning",
       "requirement": "Undervisade på {craft} {skill}",
       "trainAria": "Lär dig {name} för {fee}",
+      "pendingAria": "Learning {name}",
       "dialogOption": "Utbildning",
       "dialogOptionAria": "Bläddra bland utbildningar från {name}",
       "learned": "Lärt recept: {recipe}",
