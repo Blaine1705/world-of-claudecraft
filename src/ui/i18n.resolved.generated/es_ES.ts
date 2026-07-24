@@ -1460,7 +1460,9 @@ export const es_ES: EnTranslations = {
         "gills": "Branquias",
         "claw": "Garra",
         "horn": "Cuerno",
-        "tusk": "Colmillo"
+        "tusk": "Colmillo",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

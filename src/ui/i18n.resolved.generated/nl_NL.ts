@@ -1460,7 +1460,9 @@ export const nl_NL: EnTranslations = {
         "gills": "Kieuwen",
         "claw": "Klauw",
         "horn": "Hoorn",
-        "tusk": "Slagtand"
+        "tusk": "Slagtand",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

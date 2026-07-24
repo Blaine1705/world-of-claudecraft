@@ -1460,7 +1460,9 @@ export const id_ID: EnTranslations = {
         "gills": "Insang",
         "claw": "Cakar",
         "horn": "Tanduk",
-        "tusk": "Gading"
+        "tusk": "Gading",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

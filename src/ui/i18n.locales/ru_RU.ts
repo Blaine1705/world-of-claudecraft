@@ -779,6 +779,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.claw': 'Коготь',
   'hudChrome.corpseHarvest.components.horn': 'Рог',
   'hudChrome.corpseHarvest.components.tusk': 'Бивень',
+  'hudChrome.corpseHarvest.components.cloth': 'Ткань',
   'hudChrome.townFocus.title': 'Фокус города',
   'hudChrome.townFocus.hint':
     'Очки фокуса добавляют бонус поверх базового выхода каждого компонента. Компоненты без фокуса остаются на базовом уровне.',

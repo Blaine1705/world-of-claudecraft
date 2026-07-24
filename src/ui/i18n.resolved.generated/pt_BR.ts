@@ -1460,7 +1460,9 @@ export const pt_BR: EnTranslations = {
         "gills": "Guelras",
         "claw": "Garra",
         "horn": "Chifre",
-        "tusk": "Presa"
+        "tusk": "Presa",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

@@ -1460,7 +1460,9 @@ export const en_XA: EnTranslations = {
         "gills": "[Ĝíļļš]",
         "claw": "[Çļáŵ]",
         "horn": "[Ĥóŕñ]",
-        "tusk": "[Ţúšķ]"
+        "tusk": "[Ţúšķ]",
+        "meat": "[Ɱéáţ]",
+        "cloth": "[Çļóţĥ]"
       }
     },
     "townFocus": {

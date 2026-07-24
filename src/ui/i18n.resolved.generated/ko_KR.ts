@@ -1460,7 +1460,9 @@ export const ko_KR: EnTranslations = {
         "gills": "아가미",
         "claw": "발톱",
         "horn": "뿔",
-        "tusk": "엄니"
+        "tusk": "엄니",
+        "meat": "Meat",
+        "cloth": "천"
       }
     },
     "townFocus": {
