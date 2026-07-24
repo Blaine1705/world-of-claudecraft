@@ -658,9 +658,10 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
-  // Global inbound-message token bucket (#978): covers every frame (input,
-  // cast, cmd, ...), separate from the chat-only bucket above, so a client
-  // flooding non-chat frames is throttled/kicked instead of processed unconditionally.
+  // Pre-parse inbound gate state (#978): the frame and byte token buckets
+  // plus the windowed abuse score, covering every frame (input, cast, cmd,
+  // ...), separate from the chat-only bucket above, so a client flooding
+  // non-chat frames is throttled/kicked instead of processed unconditionally.
   msgRate: MsgRateBucketState;
   // Post-parse per-class lanes (movement / command / chat) beside the global
   // bucket above, so one class can never starve another; lane drops tally

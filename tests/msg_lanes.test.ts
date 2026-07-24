@@ -547,4 +547,63 @@ describe('dispatchMessage lane wiring at the R5 placements', () => {
     );
     expect(ws.close).toHaveBeenCalled();
   });
+
+  it('kicks a sustained chat flood through the same shared abuse window', () => {
+    const server = new GameServer();
+    const session = join(server);
+    sinkDetector(server);
+    const ws = session.ws as unknown as {
+      send: ReturnType<typeof vi.fn>;
+      close: ReturnType<typeof vi.fn>;
+    };
+
+    // A 45 per second plain-text chat flood: far under the pre-parse gate, so
+    // every drop is the chat LANE's (burst 8, refill 4), about 33 or more per
+    // receive-time second from the first. The third lane rides the identical
+    // consumeLane kick path as movement and command.
+    for (let i = 0; i < 45 * 8 && !session.left; i++) {
+      vi.setSystemTime(T0 + Math.floor((i * 1000) / 45));
+      sendChat(server, session, 'hello there');
+    }
+
+    expect(session.left).toBe(true);
+    expect(server.clients.has(session.pid)).toBe(false);
+    expect(ws.send).toHaveBeenCalledWith(
+      JSON.stringify({ t: 'error', error: 'message rate exceeded' }),
+    );
+    expect(ws.close).toHaveBeenCalled();
+  });
+
+  it('kicks a mixed cause flood through the shared abuse window across seconds', () => {
+    const server = new GameServer();
+    const session = join(server);
+    sinkDetector(server);
+    const ws = session.ws as unknown as {
+      send: ReturnType<typeof vi.fn>;
+      close: ReturnType<typeof vi.fn>;
+    };
+
+    // The cross-cause additivity arm extended to the kick verdict: every
+    // receive-time second books movement-LANE drops and pre-parse GATE drops
+    // together, neither cause pinned as the sole driver, and the shared
+    // window still kicks on the fifth abusive second (R6 is cause-blind end
+    // to end). Second zero replays the additivity arm's exact 15 plus 20
+    // split as the mixed-composition proof.
+    let seq = 0;
+    for (let sec = 0; sec < 8 && !session.left; sec++) {
+      vi.setSystemTime(T0 + sec * 1000);
+      for (let i = 0; i < 135 && !session.left; i++) sendInput(server, session, ++seq);
+      if (sec === 0) expect(session.msgRate.dropsThisSecond).toBe(15);
+      for (let i = 0; i < 45 && !session.left; i++) sendCast(server, session);
+      for (let i = 0; i < 20 && !session.left; i++) sendInput(server, session, ++seq);
+      if (sec === 0) expect(session.msgRate.dropsThisSecond).toBe(35);
+    }
+
+    expect(session.left).toBe(true);
+    expect(server.clients.has(session.pid)).toBe(false);
+    expect(ws.send).toHaveBeenCalledWith(
+      JSON.stringify({ t: 'error', error: 'message rate exceeded' }),
+    );
+    expect(ws.close).toHaveBeenCalled();
+  });
 });
