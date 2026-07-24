@@ -4,7 +4,9 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
-import { ABILITIES } from '../src/sim/data';
+import { ABILITIES, ITEMS } from '../src/sim/data';
+import { itemDisplayName } from '../src/ui/entity_i18n';
+import { Hud } from '../src/ui/hud';
 import {
   cs_CZ,
   da_DK,
@@ -14,6 +16,8 @@ import {
   ensureLocaleLoaded,
   es,
   es_ES,
+  formatMoney as formatLocalizedMoney,
+  formatNumber,
   fr_CA,
   fr_FR,
   id_ID,
@@ -27,6 +31,7 @@ import {
   setLanguage,
   supportedLanguages,
   sv_SE,
+  t,
   tr_TR,
   vi_VN,
   zh_CN,
@@ -1343,5 +1348,62 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
   it('the pre-rename aura string keeps a legacy alias for the deploy window', () => {
     setLanguage('en');
     expect(localizeSimAuraName('Venomfire Vigor')).toBe('Vipersear Vigor');
+  });
+});
+
+// --- Vendor-sell log line: the "Sold <item>[ xN] for <money>." arm in
+// Hud.localizeLootText must localize the item name whether or not the sim
+// appended the " xN" stack suffix. A greedy single capture feeds "Copper Ore
+// x2" whole into the exact-name lookup, which only matches bare item names:
+// the lookup misses and the raw English name (plus the sim's bare "xN"
+// spelling) leaks into an otherwise-localized sentence. Exercised via a bare
+// Hud prototype (the weapon_type_tooltip / hud_confirm_gates precedent)
+// since localizeLootText is private and reads no instance state here.
+describe('vendor sell log line localizes the item name for both a single item and a sold stack', () => {
+  interface LootTextHarness {
+    localizeLootText(text: string): string;
+  }
+  const harness = (): LootTextHarness => Object.create(Hud.prototype) as unknown as LootTextHarness;
+
+  it('localizes a single-item sale (no xN suffix) in every locale', () => {
+    try {
+      for (const lang of supportedLanguages) {
+        setLanguage(lang);
+        const expected = t('hud.logs.soldItem', {
+          item: itemDisplayName(ITEMS.copper_ore),
+          money: formatLocalizedMoney(4),
+        });
+        const out = harness().localizeLootText('Sold Copper Ore for 4c.');
+        expect(out, lang).toBe(expected);
+      }
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('localizes a STACKED sale (quantity > 1) in every locale instead of leaking raw English', () => {
+    try {
+      for (const lang of supportedLanguages) {
+        setLanguage(lang);
+        const expectedItem = `${itemDisplayName(ITEMS.copper_ore)} ${t('itemUi.bags.stackCount', {
+          count: formatNumber(2, { maximumFractionDigits: 0 }),
+        })}`;
+        const expected = t('hud.logs.soldItem', {
+          item: expectedItem,
+          money: formatLocalizedMoney(8),
+        });
+        const out = harness().localizeLootText('Sold Copper Ore x2 for 8c.');
+        expect(out, lang).toBe(expected);
+        // The regression this guards: the item name (and the sim's bare "xN"
+        // spelling) must never survive verbatim inside an otherwise-localized
+        // sentence.
+        if (lang !== 'en' && lang !== 'en_CA') {
+          expect(out, lang).not.toContain('Copper Ore x2');
+          expect(out, lang).not.toBe('Sold Copper Ore x2 for 8c.');
+        }
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 });
