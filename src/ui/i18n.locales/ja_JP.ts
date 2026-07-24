@@ -1488,6 +1488,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.realmFull': 'このワールドは現在満員です。数分後にもう一度お試しください。',
   'loading.tooManyConnections':
     'お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。',
+  'loading.messageRateExceeded':
+    '操作の送信が速すぎたため、切断されました。しばらく待ってから再度ログインしてください。',
   'errors.nothingInteract': '操作できるものがありません。',
   'errors.noEnemyNearby': '近くに敵がいません。',
   'errors.characterNameRequired': 'キャラクター名を入力してください。',
@@ -6420,6 +6422,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'gpuNotice.bodyWeb':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。',
   'gpuNotice.dismiss': '閉じる',
+  'perfNudge.integratedGpu':
+    'ゲームは内蔵（省電力）GPUで動作しています。このパソコンにゲーミングGPUも搭載されている場合は、Windowsの 設定 > システム > ディスプレイ > グラフィック でブラウザーを「高パフォーマンス」に設定し、ブラウザーを再起動してください。デスクトップ版は自動的にゲーミングGPUを選択します。',
+  'perfNudge.hardwareAccelerationDesktop':
+    'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなっています。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
+  'perfNudge.hardwareAccelerationWeb':
+    'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなっています。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。',
+  'perfNudge.dismiss': '閉じる',
   'editor.appTitle': 'マップエディター',
   'editor.docTitle': 'マップエディター - World of ClaudeCraft',
   'editor.untitledMap': '無題のマップ',

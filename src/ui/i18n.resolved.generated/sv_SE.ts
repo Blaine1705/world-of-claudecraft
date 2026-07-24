@@ -5573,6 +5573,7 @@ export const sv_SE: EnTranslations = {
     "connectionRejected": "Servern stängde anslutningen.",
     "realmFull": "Denna värld är full just nu. Försök igen om några minuter.",
     "tooManyConnections": "För många anslutningar till denna värld kommer från ditt nätverk. Stäng extra spelfönster eller försök igen om några minuter.",
+    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
     "tips": {
       "classes": "Tips: var och en av de 9 klasserna spelas på sitt eget sätt. Prova några innan du bestämmer dig för en.",
       "talents": "Tips: du kan återställa dina talanger när du inte strider, så ett tidigt val blir aldrig en fälla.",
@@ -5641,6 +5642,12 @@ export const sv_SE: EnTranslations = {
     "bodyDesktop": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
     "bodyWeb": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.",
     "dismiss": "Stäng"
+  },
+  "perfNudge": {
+    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
+    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Inga världar tillgängliga.",

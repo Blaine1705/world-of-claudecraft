@@ -90,6 +90,12 @@ import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { buildDoorBody } from './door_portal';
+import {
+  createDrawStatsAccumulator,
+  type DrawStatsAccumulator,
+  type DrawStatsCounters,
+  governorDrawSignal,
+} from './draw_stats_core';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
@@ -983,6 +989,13 @@ export class Renderer {
   private entityViewCreateRangeSq = ENTITY_VIEW_CREATE_RANGE_SQ;
   private entityViewDestroyRangeSq = ENTITY_VIEW_DESTROY_RANGE_SQ;
   private renderBudgetGovernor!: RenderBudgetGovernor;
+  // Composer tiers only (packet 0 R1): with info.autoReset off, this turns the
+  // monotonic WebGL counters into per-frame deltas; null on every other profile
+  // (low/medium, native-iOS high/ultra, advanced with effects shed), which keep
+  // three's per-render auto-reset and their live reads bit-identical to before.
+  private drawStats: DrawStatsAccumulator | null = null;
+  // Last completed frame's draw delta (what perfStats serves on composer tiers).
+  private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
@@ -1244,6 +1257,16 @@ export class Renderer {
       this.captureGlIdentity();
     });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
+    if (GFX.composer) {
+      // three r165's render() resets info per pass (after the shadow pass, see
+      // draw_stats_core.ts header), so with the composer's multiple passes every
+      // post-frame reader saw only the final fullscreen pass (1 call/1 triangle).
+      // Accumulate manually instead: counters run monotonically and sync() takes
+      // per-frame deltas. Non-composer profiles keep the auto-reset so their
+      // governor input and telemetry stay bit-identical (packet 0 R1).
+      this.webgl.info.autoReset = false;
+      this.drawStats = createDrawStatsAccumulator();
+    }
     // The lightweight material path does not preload HDR sky/water assets.
     // Keep the renderer's HDR/IBL branch aligned with that preload decision.
     this.lowGfx = !GFX.standardMaterials;
@@ -2026,8 +2049,10 @@ export class Renderer {
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
-      calls: info.render.calls,
-      triangles: info.render.triangles,
+      // Composer tiers serve the accumulated per-frame delta (the live counter
+      // is monotonic there); other profiles keep the live post-frame read.
+      calls: this.drawStats ? this.drawStatsFrame.calls : info.render.calls,
+      triangles: this.drawStats ? this.drawStatsFrame.triangles : info.render.triangles,
       geometries: info.memory.geometries,
       textures: info.memory.textures,
       programs: info.programs?.length ?? 0,
@@ -2260,13 +2285,21 @@ export class Renderer {
     // signal it is trying to fix. Manual render-scale changes still apply via
     // setRenderScale(); the automatic governor keeps to grass/VFX budgets here.
     const lockedRenderScale = this.effectiveRenderScale;
+    // Composer tiers route through governorDrawSignal, which pins the frozen
+    // legacy constant (1 call/1 triangle, the pre-accumulator post-frame read)
+    // so the governor's draw arm stays exactly as dead as before (packet 0 R1).
+    // Every other profile (including non-composer high/ultra: native iOS,
+    // advanced with effects shed) keeps the live read below, bit-identical.
+    const drawSignal = this.drawStats
+      ? governorDrawSignal(GFX.tier, this.drawStatsFrame)
+      : info.render;
     const state = this.renderBudgetGovernor.update({
       dt,
       frameMs,
       totalMs: previousTotalMs,
       submitMs: previousSubmitMs,
-      calls: info.render.calls,
-      triangles: info.render.triangles,
+      calls: drawSignal.calls,
+      triangles: drawSignal.triangles,
       grassVisibleTufts: this.lastFrameStats.foliage.grassVisibleTufts,
       grassVisibleChunks: this.lastFrameStats.foliage.grassVisibleChunks,
       activeViews: this.lastFrameStats.activeViews,
@@ -2849,10 +2882,21 @@ export class Renderer {
     return Math.max(0, this.webgl.info.memory.textures - before);
   }
 
+  // Composer tiers only: drop an out-of-band render (prewarm pass, screenshot)
+  // from the draw-stats accumulator and zero the WebGL counters so the next
+  // sync() delta covers in-band work only. No-op on every other profile, where
+  // three's per-render auto-reset already isolates passes.
+  private discardOutOfBandDraws(): void {
+    if (!this.drawStats) return;
+    this.drawStats.noteOutOfBand(this.webgl.info.render);
+    this.webgl.info.reset();
+  }
+
   private renderPrewarmPass(dt: number): void {
     this.prewarmWorldFrame(dt);
     if (this.post) this.post.render();
     else this.webgl.render(this.scene, this.camera);
+    this.discardOutOfBandDraws();
   }
 
   private diagnosticsBaselineForPrewarm(): RendererPrewarmDiagnosticsBaselineStats | null {
@@ -4948,6 +4992,11 @@ export class Renderer {
       return t;
     };
 
+    // Composer tiers: snapshot the previous frame's accumulated draw counters
+    // (all composer + shadow passes) and re-arm the baseline BEFORE the governor
+    // reads its draw signal below. The WebGL counters themselves stay monotonic
+    // (autoReset is off); out-of-band renders reset them via discardOutOfBandDraws.
+    if (this.drawStats) this.drawStatsFrame = this.drawStats.beginFrame(this.webgl.info.render);
     this.updateAdaptiveResolution(dt);
     this.viewportPollTimer += dt;
     if (this.viewportPollTimer >= 0.25) {
@@ -6003,6 +6052,10 @@ export class Renderer {
       return out.toDataURL('image/jpeg', quality);
     } catch {
       return null;
+    } finally {
+      // The extra render above must not count toward the next frame's draw
+      // stats on composer tiers (covers the throw path too).
+      this.discardOutOfBandDraws();
     }
   }
 

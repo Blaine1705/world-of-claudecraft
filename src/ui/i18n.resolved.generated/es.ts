@@ -5573,6 +5573,7 @@ export const es: EnTranslations = {
     "connectionRejected": "El servidor cerró la conexión.",
     "realmFull": "Este mundo esta lleno en este momento. Por favor, intentalo de nuevo en unos minutos.",
     "tooManyConnections": "Hay demasiadas conexiones a este mundo desde tu red. Cierra ventanas adicionales del juego o intentalo de nuevo en unos minutos.",
+    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
     "tips": {
       "classes": "Consejo: cada una de las 9 clases se juega de forma distinta. Prueba varias antes de decidirte por una.",
       "talents": "Consejo: puedes restablecer tus talentos cuando estés fuera de combate, así que una elección temprana nunca es definitiva.",
@@ -5641,6 +5642,12 @@ export const es: EnTranslations = {
     "bodyDesktop": "El juego se ejecuta sin aceleración de GPU y será lento. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.",
     "bodyWeb": "El juego se ejecuta sin aceleración de GPU y será lento. Activa la aceleración de hardware en los ajustes del navegador, actualiza los controladores de gráficos y reinicia el navegador.",
     "dismiss": "Cerrar"
+  },
+  "perfNudge": {
+    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
+    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "No hay mundos disponibles.",

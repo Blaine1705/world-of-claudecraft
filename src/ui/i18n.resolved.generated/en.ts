@@ -5573,6 +5573,7 @@ export const en: EnTranslations = {
     "connectionRejected": "The server closed the connection.",
     "realmFull": "This world is full right now. Please try again in a few minutes.",
     "tooManyConnections": "Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.",
+    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
     "tips": {
       "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
       "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
@@ -5640,6 +5641,12 @@ export const en: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
     "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
+  },
+  "perfNudge": {
+    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
+    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
     "dismiss": "Dismiss"
   },
   "realm": {

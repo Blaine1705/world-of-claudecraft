@@ -5573,6 +5573,7 @@ export const tr_TR: EnTranslations = {
     "connectionRejected": "Sunucu bağlantıyı kapattı.",
     "realmFull": "Bu dünya şu an dolu. Lütfen birkaç dakika sonra tekrar dene.",
     "tooManyConnections": "Ağından bu dünyaya çok fazla bağlantı geliyor. Lütfen fazladan oyun pencerelerini kapat ya da birkaç dakika sonra tekrar dene.",
+    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
     "tips": {
       "classes": "İpucu: 9 sınıfın her biri farklı oynanır. Birine bağlanmadan önce birkaçını dene.",
       "talents": "İpucu: savaş dışında olduğun sürece yeteneklerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir.",
@@ -5641,6 +5642,12 @@ export const tr_TR: EnTranslations = {
     "bodyDesktop": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler altında oyunu Yüksek performans olarak ayarla.",
     "bodyWeb": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Tarayıcı ayarlarından donanım hızlandırmayı etkinleştir, grafik sürücülerini güncelleyip tarayıcını yeniden başlat.",
     "dismiss": "Kapat"
+  },
+  "perfNudge": {
+    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
+    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Mevcut dünya yok.",

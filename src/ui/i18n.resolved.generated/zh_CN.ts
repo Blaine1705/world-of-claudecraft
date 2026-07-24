@@ -5573,6 +5573,7 @@ export const zh_CN: EnTranslations = {
     "connectionRejected": "服务器关闭了连接。",
     "realmFull": "当前服务器已满，请稍后几分钟再试。",
     "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
+    "messageRateExceeded": "由于发送操作过快，您已断开连接。请稍等片刻后重新登录。",
     "tips": {
       "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
       "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",
@@ -5640,6 +5641,12 @@ export const zh_CN: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
     "bodyWeb": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
+    "dismiss": "关闭"
+  },
+  "perfNudge": {
+    "integratedGpu": "游戏正在集成（节能）显卡上运行。如果这台电脑还配有独立游戏显卡，请在 Windows 的 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择游戏显卡。",
+    "hardwareAccelerationDesktop": "游戏正在没有 GPU 加速的情况下运行，因此非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
+    "hardwareAccelerationWeb": "游戏正在没有 GPU 加速的情况下运行，因此非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
     "dismiss": "关闭"
   },
   "realm": {

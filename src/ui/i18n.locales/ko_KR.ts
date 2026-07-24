@@ -1480,6 +1480,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'loading.realmFull': '이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.',
   'loading.tooManyConnections':
     '사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.',
+  'loading.messageRateExceeded':
+    '행동을 너무 빠르게 전송하여 연결이 끊어졌습니다. 잠시 기다렸다가 다시 로그인해 주세요.',
   'errors.nothingInteract': '상호작용할 대상이 없습니다.',
   'errors.noEnemyNearby': '근처에 적이 없습니다.',
   'errors.characterNameRequired': '캐릭터 이름을 입력하세요.',
@@ -6417,6 +6419,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'gpuNotice.bodyWeb':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.',
   'gpuNotice.dismiss': '닫기',
+  'perfNudge.integratedGpu':
+    '게임이 내장(절전형) GPU에서 실행되고 있습니다. 이 컴퓨터에 게이밍 GPU도 있다면, Windows의 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 "고성능"으로 설정한 뒤 브라우저를 다시 시작하세요. 데스크톱 앱은 게이밍 GPU를 자동으로 선택합니다.',
+  'perfNudge.hardwareAccelerationDesktop':
+    '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
+  'perfNudge.hardwareAccelerationWeb':
+    '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.',
+  'perfNudge.dismiss': '닫기',
   'editor.appTitle': '맵 편집기',
   'editor.docTitle': '맵 편집기 - World of ClaudeCraft',
   'editor.untitledMap': '제목 없는 맵',
