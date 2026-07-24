@@ -7,7 +7,7 @@ branch).
 
 | Packet | Scope | Plan doc | Status |
 |---|---|---|---|
-| 0 | Instruments (draw stats, report dimensions, net traces, honest gates, doctor nudge, baselines) | packet-0-instruments.md | IN PROGRESS (phases 01-05 done, phase-01-qa.md, phase-02-qa.md, phase-03-qa.md, phase-04-qa.md, phase-05-qa.md) |
+| 0 | Instruments (draw stats, report dimensions, net traces, honest gates, doctor nudge, baselines) | packet-0-instruments.md | IN PROGRESS (phases 01-06 done, phase-01-qa.md through phase-06-qa.md; next: phase 07 baselines + close-out) |
 | 3 | Input cadence contract (limiter redesign; ships with or before 1-2) | not authored | PENDING (next after 0) |
 | 1 | Crowd character cost (articulated ceiling, far-swap exemptions, governor rung, nameplate cap) | not authored | PENDING |
 | 2 | Hitch elimination (player rig pooling, create deadline, compile batching, light budget, HUD thrash) | not authored | PENDING |
