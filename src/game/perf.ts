@@ -368,7 +368,7 @@ export class PerfMonitor {
   private lastBucketMs: Record<TimedBucket, number> = { renderer: 0, hud: 0, events: 0, sim: 0 };
   private lastSnapshot: PerfSnapshot | null = null;
   private network: PerfSnapshot['network'] = null;
-  private netPipeline: PerfSnapshot['netPipeline'] = null;
+  private netPipelineSource: { summary(): NetPipelineSummary } | null = null;
   private heapSawtooth = createHeapSawtooth({
     readUsedHeapBytes: () => this.memorySnapshot()?.usedJSHeapSize ?? null,
   });
@@ -493,11 +493,13 @@ export class PerfMonitor {
     this.network = stats;
   }
 
-  setNetPipeline(stats: PerfSnapshot['netPipeline']): void {
+  setNetPipelineSource(source: { summary(): NetPipelineSummary } | null): void {
     // Deliberately NOT gated on this.enabled, unlike setNetwork above: the
     // fleet story rides always-on aggregate counters (ruling R9); only the
-    // overlay and the dev-trace spans stay gated.
-    this.netPipeline = stats;
+    // overlay and the dev-trace spans stay gated. Takes the stats SOURCE, not
+    // a built summary: summary() allocates, so snapshot() draws it lazily at
+    // its 1 Hz cadence instead of the caller paying it every animation frame.
+    this.netPipelineSource = source;
   }
 
   /**
@@ -794,7 +796,7 @@ export class PerfMonitor {
       hud: this.hud?.perfStats() ?? null,
       assets: assetTimingSnapshot(),
       network: this.network,
-      netPipeline: this.netPipeline,
+      netPipeline: this.netPipelineSource?.summary() ?? null,
       heapSawtooth: this.heapSawtooth.summary(),
       input: {
         intents: this.inputIntents,
@@ -866,7 +868,7 @@ export class PerfMonitor {
     this.frameWindow = [];
     this.buckets = { renderer: [], hud: [], events: [], sim: [] };
     this.lastSnapshot = null;
-    this.netPipeline = null;
+    this.netPipelineSource = null;
     this.heapSawtooth.reset();
     this.worstWindow.drain();
     this.inputIntents = 0;

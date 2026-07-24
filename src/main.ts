@@ -3329,12 +3329,13 @@ async function startGame(
       alpha: Math.round(alpha * 100) / 100,
     });
     // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
-    // snapshots-applied-since-last-frame count, then publish the summary
-    // UNGATED (ruling R9), unlike the overlay-gated setNetwork above. main.ts
-    // is the src/net to src/game junction (ruling R8).
+    // snapshots-applied-since-last-frame count, then publish the stats source
+    // UNGATED (ruling R9), unlike the overlay-gated setNetwork above; the
+    // allocating summary() is drawn lazily at the 1 Hz snapshot, never per
+    // frame. main.ts is the src/net to src/game junction (ruling R8).
     const netPipeline = net.netPipeline();
     netPipeline.onAnimationFrame(now);
-    perf.setNetPipeline(netPipeline.summary());
+    perf.setNetPipelineSource(netPipeline);
     // Display-only self extrapolation (src/render/self_motion.ts). Off while
     // spectating, corpse-frozen, or CC'd (playerImmobilized covers stun/root/
     // incapacitate/polymorph, and fear is a fear_incap incapacitate aura; the

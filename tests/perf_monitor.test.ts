@@ -66,7 +66,7 @@ describe('perf monitor ungated net pipeline', () => {
     // both setters written; only the ungated one may land (ruling R9)
     perf.setNetwork({ connected: true, snapInterval: 50, lastSnapAge: 10, alpha: 1 });
     const summary = netPipelineFixture();
-    perf.setNetPipeline(summary);
+    perf.setNetPipelineSource({ summary: () => summary });
 
     const snap = perf.snapshot(1000);
     expect(snap.network).toBeNull();
@@ -81,7 +81,7 @@ describe('perf monitor ungated net pipeline', () => {
       jsHeapSizeLimit: 4096 * MB,
     };
     const perf = new PerfMonitor(null);
-    perf.setNetPipeline(netPipelineFixture());
+    perf.setNetPipelineSource({ summary: () => netPipelineFixture() });
     perf.tick(1000);
     perf.tick(2000);
     // both blocks are live before the reset, so the nulls below are decisive
