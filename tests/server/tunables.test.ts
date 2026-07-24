@@ -43,9 +43,13 @@ import {
 } from '../../server/http/server_timeouts';
 import { DEFAULT_JSON_BODY_MAX_BYTES } from '../../server/http_util';
 import {
+  MSG_ABUSE_KICK_SECONDS,
+  MSG_ABUSE_SECOND_DROP_FLOOR,
+  MSG_ABUSE_WINDOW_SECONDS,
+  MSG_BYTE_BURST,
+  MSG_BYTE_REFILL_PER_SECOND,
   MSG_RATE_BURST,
   MSG_RATE_REFILL_PER_SECOND,
-  MSG_RATE_VIOLATIONS_FOR_KICK,
 } from '../../server/msg_rate_limit';
 import {
   ASSET_UPLOAD_MAX_PER_MINUTE,
@@ -300,10 +304,14 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(DAILY_OPS_LEADERBOARD_PAGE_SIZE).toBe(50);
   });
 
-  it('msg-rate trio + desktop-login TTL', () => {
-    expect(MSG_RATE_BURST).toBe(60);
-    expect(MSG_RATE_REFILL_PER_SECOND).toBe(40);
-    expect(MSG_RATE_VIOLATIONS_FOR_KICK).toBe(200);
+  it('inbound gate constants + desktop-login TTL', () => {
+    expect(MSG_RATE_BURST).toBe(180);
+    expect(MSG_RATE_REFILL_PER_SECOND).toBe(120);
+    expect(MSG_BYTE_BURST).toBe(131_072); // 128 KiB
+    expect(MSG_BYTE_REFILL_PER_SECOND).toBe(65_536); // 64 KiB
+    expect(MSG_ABUSE_WINDOW_SECONDS).toBe(10);
+    expect(MSG_ABUSE_KICK_SECONDS).toBe(5);
+    expect(MSG_ABUSE_SECOND_DROP_FLOOR).toBe(30);
     expect(DESKTOP_LOGIN_TTL_MS).toBe(300_000); // 5 min
   });
 });

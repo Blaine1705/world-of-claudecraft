@@ -176,7 +176,11 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
-import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from './msg_rate_limit';
+import {
+  consumeInboundFrame,
+  createMsgRateBucket,
+  type MsgRateBucketState,
+} from './msg_rate_limit';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -3832,12 +3836,12 @@ export class GameServer {
     if (session.left || this.clients.get(session.pid) !== session) return;
     gameMetricsCounters().wsMessage('in');
     const receivedAtMs = Date.now();
-    const verdict = consumeMsgToken(session.msgRate, receivedAtMs / 1000);
-    if (verdict === 'kick') {
+    const gate = consumeInboundFrame(session.msgRate, receivedAtMs / 1000, raw.length);
+    if (gate.verdict === 'kick') {
       void this.kickSession(session, 'rejected by server', 'moderation action');
       return;
     }
-    if (verdict === 'drop') return;
+    if (gate.verdict !== 'allow') return;
     let msg: unknown;
     try {
       msg = JSON.parse(raw);
