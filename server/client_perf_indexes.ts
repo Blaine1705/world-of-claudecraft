@@ -6,6 +6,10 @@
 // the registry: defining them in db.ts would put the registry's import inside
 // that cycle before db.ts's body runs. db.ts re-exports them.
 
+// Ships reader-less by design (R7): production accrues indexed history before
+// the fleet-view reader lands. Before a future reader relies on this column
+// order, re-EXPLAIN its real "worst sessions, last N hours" query first: a
+// created_at-leading or partial index may win (the packet 0 close-out record).
 export const CLIENT_PERF_WORST10S_INDEX_SQL = `
 CREATE INDEX CONCURRENTLY IF NOT EXISTS client_perf_reports_worst10s_created
   ON client_perf_reports(worst_10s_frame_p95_ms DESC, created_at DESC);

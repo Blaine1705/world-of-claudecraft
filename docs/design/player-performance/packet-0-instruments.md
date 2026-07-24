@@ -6,12 +6,14 @@ tunes against real numbers. It is MEASUREMENT-ONLY: zero gameplay change, zero v
 change (one new informational toast is the sole player-visible addition), and the
 render-budget governor's behavior is preserved bit-for-bit on every tier.
 
-Worktree: /Users/fernando/Documents/wocc-player-perf, branch feature/perf-instruments
-(off release/v0.30.0; local until the maintainer okays a push).
-Deliverable: a PR off the latest release branch, gate-green, following the PR template,
-with the phase QA files under this directory.
-Cadence: each phase lands with its phase-NN-qa.md before the next begins; targeted vitest
-plus tsc while iterating; full npm run gate plus /qa at packet close.
+Worktree at authoring: /Users/fernando/Documents/wocc-player-perf, branch
+feature/perf-instruments; SHIPPED combined with packet 3 on feature/input-cadence at
+the maintainer's request (one PR off the latest release branch).
+Deliverable: that combined gate-green PR, following the PR template, with baselines.md
+and the Close-out record under this directory (the per-phase QA files were consolidated
+into that record at the combined-branch close; full text in git history).
+Cadence followed: each phase landed with its phase-NN-qa.md before the next began;
+targeted vitest plus tsc while iterating; full npm run gate plus /qa at packet close.
 
 Scope sources: brainstorm.md section 7 Packet 0 (all eight bullets) plus the scout
 rulings below. Anchors cite paths and exported symbols per the docs anchor rule.
@@ -77,7 +79,7 @@ R13. Honest-gate baseline rows (frameLong50, tourMinFrames) are captured on the 
     byte-identical-across-viewports prose re-derived in the same commit. This
     supersedes the phase 04 "hudHotDomWrites ... stay byte-identical" line for the
     packet-close commit; the frame-gate rows themselves were KEPT (numbers in
-    phase-07-qa.md).
+    baselines.md and the Close-out record).
 R14. Perf-doctor: suggestion ids are CLIENT-computed and ride the beacon; the server
     validates against a local allowlist (a cross-boundary parity test pins the two
     catalogs equal; server code cannot import src/game). Storage is a TEXT[] column.
@@ -135,7 +137,7 @@ Acceptance: on a local high/ultra run, the ?perf overlay draws row reports hundr
 town (not 1); on low/medium the values are byte-identical to a pre-change control run;
 targeted vitest green (draw_stats_core, render_budget untouched-green, perf_metrics_
 sampler, perf_overlay_model, perf_reporter); tsc clean.
-QA file: phase-01-qa.md.
+QA file: phase-01-qa.md (consolidated into the Close-out record at the combined-branch close; full text in git history).
 
 ## Phase 02: client net-pipeline instrumentation
 
@@ -174,7 +176,7 @@ Gotchas honored: net/ never imports src/game (main.ts is the junction); bareClie
 suites skip field initializers (lazy-init mandatory); do not touch the EWMA filter.
 Acceptance: a local online session's perf report carries netPipeline with nonzero
 parse/apply percentiles and the raw gap ring; targeted vitest green; tsc clean.
-QA file: phase-02-qa.md.
+QA file: phase-02-qa.md (consolidated into the Close-out record at the combined-branch close; full text in git history).
 
 ## Phase 03: report dimensions end to end
 
@@ -219,7 +221,8 @@ Gotchas honored: dual-arm dispatch stays inside handlePerfReport; keepalive 60KB
 PerfMonitor tests stub browser globals.
 Acceptance: a local report row carries real zone id, crowd bucket, populated mainMs,
 and worst-10s; admin summary returns byCrowd; PG roundtrip green; targeted vitest green.
-QA file: phase-03-qa.md. NOTE: phases 03 and 05 edit the same files (payload, row build,
+QA file: phase-03-qa.md (consolidated into the Close-out record at the combined-branch
+close; full text in git history). NOTE: phases 03 and 05 edit the same files (payload, row build,
 DDL block, summary SQL); they are sequenced (03 first) to keep diffs clean.
 
 ## Phase 04: honest gates (frame gate + bench scripts)
@@ -261,7 +264,7 @@ MAX_SAMPLES (keep the tour short); scripts stay operator-run (ALLOW_DEV_COMMANDS
 rate-limit bypass make them dev-only by construction; never wire into CI).
 Acceptance: a deliberately partial-join crowd run exits nonzero naming the counts; the
 tour arm fails when fed a doctored low-frames artifact; bare npm test green.
-QA file: phase-04-qa.md.
+QA file: phase-04-qa.md (consolidated into the Close-out record at the combined-branch close; full text in git history).
 
 ## Phase 05: perf-doctor wiring + the nudge toast
 
@@ -302,7 +305,7 @@ in the same commit (re-baseline rule).
 Acceptance: a simulated software-GL session stores ['hardware-acceleration'] on its row
 and shows the nudge exactly once across reloads; a healthy session stores [] and never
 shows it; i18n completeness green at PR tier; targeted vitest green.
-QA file: phase-05-qa.md.
+QA file: phase-05-qa.md (consolidated into the Close-out record at the combined-branch close; full text in git history).
 
 ## Phase 06: predictor stall-replay coverage
 
@@ -323,7 +326,7 @@ Gotchas honored: pure Node with the Lab's synthetic clock (no fake timers, no re
 polling); no parens in test names (vitest -t regex trap).
 Acceptance: new arms green; a deliberate leash-budget mutation (local, reverted) flips
 them red.
-QA file: phase-06-qa.md.
+QA file: phase-06-qa.md (consolidated into the Close-out record at the combined-branch close; full text in git history).
 
 ## Phase 07: baselines + packet close-out
 
@@ -355,9 +358,77 @@ this feature branch; run the standard tier), /qa fan-out with the named reviewer
 database-performance-reviewer for the DDL/index/summary SQL, privacy-security-review
 for the beacon field additions, test-coverage-auditor for the new pins), PR body with
 the consequence ledger from brainstorm Packet 0 plus phase QA links.
-QA file: phase-07-qa.md (the packet-level adversarial "what is missing" pass).
+QA file: phase-07-qa.md, the packet-level adversarial pass (consolidated into the Close-out record at the combined-branch close; full text in git history).
 
 ---
+
+## Close-out record (all seven phases landed 2026-07-23 to 07-24; combined PR with packet 3)
+
+The seven per-phase QA files were consolidated into this section when packets 0
+and 3 were combined onto one branch at the maintainer's instruction; their full
+text lives in git history (feature/perf-instruments through cf3412e66 and the
+combine merge). What survives here is everything a future reader needs that the
+rulings, code, tests, and baselines.md do not already carry.
+
+- Landed, in order: real draw stats on composer tiers (draw_stats_core.ts, the
+  governor kept bit-identical via the frozen legacy signal); the always-on
+  net-pipeline and heap-sawtooth instruments riding the perf report; zone,
+  crowd, mainMs, and worst-10s as fleet dimensions (schema version 2, the
+  concurrent worst-10s index); honest failable bench gates
+  (scripts/lib/bench_gate.mjs, exact-join enforcement, the frameLong50 and
+  tourMinFrames rework); the perf-doctor nudge (the packet's one
+  player-visible change: integrated-gpu rule, one-per-install toast, beacon
+  suggestion ids with server allowlist and TEXT[] storage); the test-only
+  broadcast-stall replay arms; and the committed baselines
+  (baselines.md + jitter-soak-baseline.json) with the R13 anchor refresh.
+- TWO AMENDMENTS NEED THE MAINTAINER'S RATIFICATION in PR review, both
+  written into their ruling and runbook sites as "Close-out amendment
+  (2026-07-24)": the R13 refresh-clause extension (the hudHotDomWrites anchor
+  re-derived 153 to 640 at packet close, superseding the phase 04
+  byte-identical contract for that commit; the frame-gate rows were KEPT),
+  and the runbook step 1 reassignment of the owner-Mac live-site capture to
+  the maintainer track (the CPU-bound presumption stays formally unsettled
+  until that capture lands).
+- Recorded deviations, all deliberate: the phase 01 spec-wording fix (the
+  prewarm bench was a second raw-counter consumer; both moved to the
+  perfStats surface) and its accepted small allocation on composer-tier
+  frames; heapSawtooth joining netPipeline on the rawSummary allowlist (the
+  reporter writes it as its own key); the phase 03 provider closure realized
+  as src/game/world_telemetry.ts because main.ts is a firewall; the phase 06
+  LEASH_SLACK_YD export DECLINED so the disagreeing test literal stays the
+  stronger pin; the phase 05 R16 consequence that a prior-session gpuNotice
+  dismissal still allows the software nudge exactly once; and the phase 07
+  capture deviations recorded in baselines.md (ultra at 1600x900 after a
+  reproducible tab crash; fresh server per tier because LINKDEAD_GRACE_MS
+  holds dropped bots in-world).
+- One superseded historical claim, kept as-is by design: phase 04's "biome
+  zero errors" acceptance was falsified by close-out gate run 1 (a format
+  drift); QA files record what was believed at their timestamp, and the
+  correction lives in the gate history below.
+- Follow-ups this record owns (found by the close-out reviews, deliberately
+  not done in-packet): the worst-10s index ships reader-less per R7 and a
+  future fleet-view reader must re-EXPLAIN its real query before relying on
+  the column order (also noted at the index definition in
+  server/client_perf_indexes.ts); the pre-existing worst_rank window lacks a
+  final tie-break key (append gl_renderer_bucket ASC, mirroring vol_rank);
+  the insertClientPerfReport 44-param positional map has NO in-CI guard (the
+  opt-in PG roundtrip with TEST_DATABASE_URL is the only decisive test, so
+  run it on any column change); and the three structurally identical shell
+  toasts (desktop update, gpu notice, perf nudge) have hit the rule of three
+  for a shared extraction in a later packet (R16 deliberately kept gpuNotice
+  unrefactored here).
+- Gate and review history: four full-gate runs to green (run 1 a bench-gate
+  format drift, runs 2 and 3 a test-side young-worker negative-rewind bug,
+  run 4 green end to end); the opt-in PG roundtrip and summary differential
+  green on the final tree; six fresh reviewers (qa-checklist,
+  frontend-seam, migration-safety, database-performance, privacy-security,
+  test-coverage) with every finding applied or recorded; then a post-close
+  18-agent sweep over the 181-item QA ledger (zero code changes, three
+  record-level doc fixes, one claim left as superseded).
+- Maintainer items stay PENDING by nature, commands in baselines.md section
+  4: the live-site overlay JSON, the Chrome trace that settles the CPU-bound
+  presumption, the production peak tick capture, and the 48 h schema-2 perf
+  summary.
 
 ## Packet-level notes
 
