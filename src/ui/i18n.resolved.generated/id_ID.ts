@@ -2312,6 +2312,7 @@ export const id_ID: EnTranslations = {
       },
       "throttled": "Kamu membuat terlalu cepat. Tunggu sejenak dan coba lagi.",
       "recipeNotLearned": "Kamu belum mempelajari resep itu.",
+      "noBagSpace": "You do not have room for the crafted item.",
       "skillReqLine": "Membutuhkan {craft} {skill}",
       "difficultyFull": "Peningkatan keterampilan penuh",
       "difficultyReduced": "Mengurangi perolehan keterampilan",
@@ -2363,6 +2364,9 @@ export const id_ID: EnTranslations = {
       "enchantWrongSlot": "Mantrai itu tidak bisa diterapkan pada barang itu.",
       "enchantUnknown": "Mantrai itu tidak ada.",
       "enchantInsufficient": "Kamu tidak memiliki bahan untuk mantrai itu.",
+      "disenchantNoSpace": "You do not have room for the arcane materials.",
+      "salvageNoSpace": "You do not have room for the salvaged materials.",
+      "enchantNoSpace": "You do not have room for the enchanted item.",
       "disenchantConfirmTitle": "Hancurkan pemantraan {item}?",
       "disenchantConfirmBody": "Ini menghancurkan {item} dan menghasilkan bahan arkan. Tindakan ini tidak dapat dibatalkan.",
       "disenchantConfirmBodySpecial": "Ini menghancurkan salinan khusus dari {item} (bertanda tangan, karya besar, atau terpesonan) dan menghasilkan bahan arkan. Tindakan ini tidak dapat dibatalkan.",
@@ -2410,7 +2414,8 @@ export const id_ID: EnTranslations = {
       "notEligible": "Barang itu tidak bisa dilepas ikatnya.",
       "notBound": "Barang itu tidak terikat.",
       "cannotAfford": "Kamu tidak mampu membayar biaya pelepasan ikat.",
-      "outOfRange": "Kamu harus berada di stasiun kerajinan untuk melepas ikat."
+      "outOfRange": "Kamu harus berada di stasiun kerajinan untuk melepas ikat.",
+      "noSpace": "You do not have room for the unbound copy."
     },
     "finder": {
       "title": "Pencari Dungeon",

@@ -2312,6 +2312,7 @@ export const sv_SE: EnTranslations = {
       },
       "throttled": "Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.",
       "recipeNotLearned": "Du har inte lärt dig det receptet än.",
+      "noBagSpace": "You do not have room for the crafted item.",
       "skillReqLine": "Kräver {craft} {skill}",
       "difficultyFull": "Full skicklighetsvinst",
       "difficultyReduced": "Minskad färdighetsvinst",
@@ -2363,6 +2364,9 @@ export const sv_SE: EnTranslations = {
       "enchantWrongSlot": "Den förtrollningen kan inte appliceras på det föremålet.",
       "enchantUnknown": "Den förtrollningen finns inte.",
       "enchantInsufficient": "Du har inte materialet för den förtrollningen.",
+      "disenchantNoSpace": "You do not have room for the arcane materials.",
+      "salvageNoSpace": "You do not have room for the salvaged materials.",
+      "enchantNoSpace": "You do not have room for the enchanted item.",
       "disenchantConfirmTitle": "Avförtrylla {item}?",
       "disenchantConfirmBody": "Detta förstör {item} och ger arkanmaterial. Det kan inte ångras.",
       "disenchantConfirmBodySpecial": "Detta förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger arkanmaterial. Det kan inte ångras.",
@@ -2410,7 +2414,8 @@ export const sv_SE: EnTranslations = {
       "notEligible": "Det föremålet kan inte lösas upp.",
       "notBound": "Det föremålet är inte bundet.",
       "cannotAfford": "Du har inte råd med upplösningsavgiften.",
-      "outOfRange": "Du måste vara vid en hantverksstation för att lösa upp."
+      "outOfRange": "Du måste vara vid en hantverksstation för att lösa upp.",
+      "noSpace": "You do not have room for the unbound copy."
     },
     "finder": {
       "title": "Fängelsehålsletaren",
