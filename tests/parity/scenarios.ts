@@ -2959,8 +2959,9 @@ function nythraxisFullPull(): Scenario {
       step(1); // init the encounter (intro yells)
       rec.snapshot('engage');
 
-      // ----- Phase 1: Gravebreaker (rng.range) + a forced Raise Fallen add wave -----
-      step(20 * 2); // ~2s: gravebreakerTimer (1.5) elapses -> rng.range draw + front cone
+      // ----- Phase 1: Gravebreaker (charged auto-attack) + a forced Raise Fallen add wave -----
+      (boss.nythraxis as any).gravebreakerTimer = DT; // arm the charge next tick...
+      step(20 * 2); // ...and release it on the next LANDED swing (front-cone splash)
       (boss.nythraxis as any).raiseFallenTimer = DT; // fire the add wave next tick
       step(1);
       const adds = [...sim.entities.values()].filter(

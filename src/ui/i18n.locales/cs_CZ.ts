@@ -765,7 +765,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.mana_burn': 'Vyschlé požehnání (spaluje manu)',
   'hudChrome.finder.mech.mist_surge': 'Mlžný příval (pulzující plošné poškození)',
   'hudChrome.finder.mech.mortal_wound': 'Zapomenutá rána (snižuje přijímané léčení)',
-  'hudChrome.finder.mech.necrotic_shockwave': 'Nekrotická rázová vlna (silné plošné poškození)',
+  'hudChrome.finder.mech.grave_inferno':
+    'Hrobové Peklo (kanalizované ohnivé AoE, udržujte rozestupy)',
   'hudChrome.finder.mech.profane_mending': 'Znesvěcené léčení (léčí spojence)',
   'hudChrome.finder.mech.raise_fallen': 'Povstání padlých (periodické vlny přivolávek)',
   'hudChrome.finder.mech.reaping_arc': 'Žací oblouk (čelní sek)',
@@ -3802,6 +3803,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.oneVsOneExcluded': 'Zápasy 1 proti 1 neudělují body denních odměn.',
   'hudChrome.dailyRewards.tasks': 'Úkoly',
   'hudChrome.dailyRewards.title': 'Denní odměny',
+  'hudChrome.dailyRewards.disabled':
+    'Denní odměny jsou momentálně vypnuté. Novinky o této funkci oznámíme na kanálu Discord.',
   'hudChrome.dailyRewards.totalPlayer': '{count} hráč dnes',
   'hudChrome.dailyRewards.totalPlayers': '{count} hráčů dnes',
   'hudChrome.dailyRewards.unknown': 'Neznámé',
@@ -4794,7 +4797,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.battle_shout.name': 'Železný řev',
   'entities.abilities.bear_charge.name': 'Medvědí výpad',
   'entities.abilities.bear_form.description':
-    'Proměníš se v medvěda: zbroj +90 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele.',
+    'Proměníš se v medvěda: zbroj +130 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele.',
   'entities.abilities.bear_form.name': 'Medvědí podoba',
   'entities.abilities.berserker_rage.description':
     'Vstoupíš do vroucí zuřivosti a získáš 20 vzteku. (Talent válečníka)',

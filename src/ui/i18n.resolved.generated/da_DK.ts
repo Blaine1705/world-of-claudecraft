@@ -355,6 +355,7 @@ export const da_DK: EnTranslations = {
       "close": "Luk daglige belønninger",
       "loading": "Indlæser daglige belønninger...",
       "error": "Kunne ikke indlæse daglige belønninger.",
+      "disabled": "Daglige belønninger er i øjeblikket deaktiveret. Vi annoncerer opdateringer til denne funktion i Discord-kanalen.",
       "intro": "Behold nok WOC i din verificerede wallet for at låse daglige belønninger op. Optjen point med én daglig drejning og skiftende opgaver, og klatr så op ad den daglige resultattavle for en andel af præmiepuljen.",
       "disclaimer": "WOC-kursen kan bevæge sig hurtigt. Vi anbefaler at holde mere end minimummet på 20 USD, så normale kursudsving ikke lukker dig ude. Dette er ikke finansiel rådgivning.",
       "prize": "Præmiepulje",
@@ -2505,7 +2506,7 @@ export const da_DK: EnTranslations = {
         "lunar_tide": "Manetide (pulserende omradesskade)",
         "enrage": "Raserer ved lavt helbred",
         "shuddering_stomp": "Rystende Tramp (omradesbedøvelse)",
-        "necrotic_shockwave": "Nekrotisk Chokbølge (kraftig omradesskade)",
+        "grave_inferno": "Gravsinferno (kanaliseret ild-AoE, hold afstand)",
         "grave_cleaver": "Gravhugger (frontal mejning)",
         "shadow_nova": "Skyggeudbrud (omradesudbrud)",
         "profane_mending": "Vanhellig Heling (heler sine allierede)",
@@ -7286,7 +7287,7 @@ export const da_DK: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-form",
-        "description": "Forvandl dig til en bjørn: rustning +90%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
+        "description": "Forvandl dig til en bjørn: rustning +130%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
       },
       "maul": {
         "name": "Knogleknus",

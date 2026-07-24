@@ -355,6 +355,7 @@ export const sv_SE: EnTranslations = {
       "close": "Stäng dagliga belöningar",
       "loading": "Laddar dagliga belöningar...",
       "error": "Kunde inte ladda dagliga belöningar.",
+      "disabled": "Dagliga belöningar är för närvarande inaktiverade. Vi meddelar uppdateringar om den här funktionen i Discord-kanalen.",
       "intro": "Håll tillräckligt med WOC i din verifierade plånbok för att låsa upp dagliga belöningar. Tjäna poäng med ett dagligt snurr och roterande uppgifter, och klättra sedan på den dagliga topplistan för en andel av prispotten.",
       "disclaimer": "WOC-priset kan röra sig snabbt. Vi rekommenderar att du håller mer än miniminivån på 20 USD så att vanliga prissvängningar inte låser dig ute. Detta är inte finansiell rådgivning.",
       "prize": "Prispott",
@@ -2505,7 +2506,7 @@ export const sv_SE: EnTranslations = {
         "lunar_tide": "Månflod (pulserande områdesskada)",
         "enrage": "Rasar vid låga livspunkter",
         "shuddering_stomp": "Darrande trampling (områdeschock)",
-        "necrotic_shockwave": "Nekrotisk chockvåg (kraftig områdesskada)",
+        "grave_inferno": "Gravinferno (kanaliserat eld-AoE, håll avstånd)",
         "grave_cleaver": "Grav-klyvare (frontalt huggsving)",
         "shadow_nova": "Skuggnova (områdesburst)",
         "profane_mending": "Vanhelgad läkning (helar sina allierade)",
@@ -7286,7 +7287,7 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +90 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +130 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",

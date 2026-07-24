@@ -504,6 +504,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.close': '关闭每日奖励',
   'hudChrome.dailyRewards.loading': '正在加载每日奖励...',
   'hudChrome.dailyRewards.error': '无法加载每日奖励。',
+  'hudChrome.dailyRewards.disabled':
+    '每日奖励目前已停用。我们将在 Discord 频道中公布此功能的更新。',
   'hudChrome.dailyRewards.intro':
     '在已验证的钱包中持有足够的 WOC 即可解锁每日奖励。通过每日一次转盘和轮换任务赚取积分，然后攀登每日排行榜，赢取奖池分成。',
   'hudChrome.dailyRewards.disclaimer':
@@ -2661,7 +2663,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '将目标缠绕在原地，最多持续 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形态',
   'entities.abilities.bear_form.description':
-    '变形为熊：护甲 +90%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
+    '变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
   'entities.abilities.maul.name': '碎骨击',
   'entities.abilities.maul.description':
     '一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。',
@@ -7347,7 +7349,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': '月潮（周期性范围伤害）',
   'hudChrome.finder.mech.enrage': '低血量时狂怒',
   'hudChrome.finder.mech.shuddering_stomp': '震颤践踏（范围眩晕）',
-  'hudChrome.finder.mech.necrotic_shockwave': '死灵冲击波（高额范围伤害）',
+  'hudChrome.finder.mech.grave_inferno': '墓场炼狱（引导火焰AoE，保持分散）',
   'hudChrome.finder.mech.grave_cleaver': '掘墓劈砍（正面顺劈）',
   'hudChrome.finder.mech.shadow_nova': '暗影新星（范围爆发）',
   'hudChrome.finder.mech.profane_mending': '亵渎治疗（治疗其盟友）',

@@ -1137,6 +1137,21 @@ export interface MobTemplate {
     school?: string;
     fx?: 'nova' | 'projectile';
   };
+  // Boss mechanic: a Geddon-style stationary channel. Every `every` seconds
+  // the boss roots in place, stops meleeing, and channels for `duration`,
+  // firing `pulses` evenly-spaced unmitigated AoE pulses whose damage
+  // ESCALATES per pulse (pulse k rolls range(min, max) x k, then the
+  // per-entity mechanicDamageMult). Uninterruptible: pair with ccImmune.
+  infernoChannel?: {
+    every: number;
+    duration: number;
+    pulses: number;
+    min: number;
+    max: number;
+    radius: number;
+    name: string;
+    school?: string;
+  };
   // Boss mechanic: a periodic telegraphed HARDCAST. Unlike the instant aoePulse,
   // the mob shows a real cast bar (the entity casting fields carry castId) for
   // `castTime` seconds, then the spell lands as an AoE nova on every living player
@@ -2868,6 +2883,9 @@ export interface Entity {
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
   bigCastTimer: number; // boss telegraphed-hardcast (bigCast) cadence countdown
+  infernoTimer: number; // infernoChannel cadence countdown
+  infernoRemaining: number; // seconds left in a live inferno channel (0 = not channeling)
+  infernoPulsesFired: number; // pulses already fired this channel
   yelledEngage: boolean; // engage bark fired this pull (reset on evade/respawn)
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   terrifyTimer: number; // Banshee's Wail fear-pulse countdown
@@ -3070,6 +3088,10 @@ export interface NythraxisEncounterState {
   dialogueToken?: number;
   gravebreakerTimer: number;
   gravebreakerCasts?: number;
+  // Gravebreaker is a charged auto-attack: the cadence timer sets this flag,
+  // and the boss's next LANDED melee swing releases the frontal-arc splash
+  // (encounters/nythraxis.ts nythraxisGravebreakerOnMobSwing via mob_swing.ts).
+  gravebreakerCharged?: boolean;
   raiseFallenTimer: number;
   soulRendTimer: number;
   soulRendMarks: NythraxisSoulRendMark[];

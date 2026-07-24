@@ -73,6 +73,8 @@ export const hudChromeStrings = {
     close: 'Close daily rewards',
     loading: 'Loading daily rewards...',
     error: 'Could not load daily rewards.',
+    disabled:
+      'Daily Rewards is currently disabled. We will announce updates to this feature in the Discord channel.',
     intro:
       'Hold enough WOC in your verified wallet to unlock daily rewards. Earn points with one daily spin and rotating tasks, then climb the daily leaderboard for a share of the prize pool.',
     disclaimer:
@@ -2807,7 +2809,7 @@ export const hudChromeStrings = {
       lunar_tide: 'Lunar Tide (pulsing area damage)',
       enrage: 'Enrages at low health',
       shuddering_stomp: 'Shuddering Stomp (area stun)',
-      necrotic_shockwave: 'Necrotic Shockwave (heavy area damage)',
+      grave_inferno: 'Grave Inferno (channeled fire AoE, stay spread)',
       grave_cleaver: 'Grave-Cleaver (frontal cleave)',
       shadow_nova: 'Shadow Nova (area burst)',
       profane_mending: 'Profane Mending (heals its allies)',

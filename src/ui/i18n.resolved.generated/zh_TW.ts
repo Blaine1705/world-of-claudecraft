@@ -355,6 +355,7 @@ export const zh_TW: EnTranslations = {
       "close": "關閉每日獎勵",
       "loading": "正在載入每日獎勵...",
       "error": "無法載入每日獎勵。",
+      "disabled": "每日獎勵目前已停用。我們將在 Discord 頻道中公布此功能的更新。",
       "intro": "在已驗證的錢包中持有足夠的 WOC 即可解鎖每日獎勵。透過每日一次轉盤與輪換任務賺取點數，再登上每日排行榜以分得獎池的一份獎勵。",
       "disclaimer": "WOC 價格可能快速波動。我們建議持有高於 $20 USD 最低要求的數量，避免正常價格波動導致獎勵被鎖定。這不是財務建議。",
       "prize": "獎池",
@@ -2505,7 +2506,7 @@ export const zh_TW: EnTranslations = {
         "lunar_tide": "月潮（週期性範圍傷害）",
         "enrage": "低血量時狂怒",
         "shuddering_stomp": "震顫踐踏（範圍暈眩）",
-        "necrotic_shockwave": "死靈衝擊波（高額範圍傷害）",
+        "grave_inferno": "墓場煉獄（引導火焰AoE，保持分散）",
         "grave_cleaver": "掘墓劈砍（正面順劈）",
         "shadow_nova": "暗影新星（範圍爆發）",
         "profane_mending": "褻瀆治療（治療其盟友）",
@@ -7286,7 +7287,7 @@ export const zh_TW: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形態",
-        "description": "變形為熊：護甲 +90%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
+        "description": "變形為熊：護甲 +130%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
       },
       "maul": {
         "name": "碎骨擊",

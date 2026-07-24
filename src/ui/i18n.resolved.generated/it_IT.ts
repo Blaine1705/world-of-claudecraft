@@ -355,6 +355,7 @@ export const it_IT: EnTranslations = {
       "close": "Chiudi ricompense giornaliere",
       "loading": "Caricamento delle ricompense giornaliere...",
       "error": "Impossibile caricare le ricompense giornaliere.",
+      "disabled": "Le ricompense giornaliere sono attualmente disattivate. Annunceremo gli aggiornamenti di questa funzionalità nel canale Discord.",
       "intro": "Detieni abbastanza WOC nel tuo portafoglio verificato per sbloccare le ricompense giornaliere. Guadagna punti con un giro giornaliero e incarichi a rotazione, poi scala la classifica giornaliera per aggiudicarti una parte del montepremi.",
       "disclaimer": "Il prezzo di WOC può muoversi rapidamente. Consigliamo di detenere più del minimo di 20 USD, così le normali oscillazioni di prezzo non ti escludono. Questo non è un consiglio finanziario.",
       "prize": "Montepremi",
@@ -2505,7 +2506,7 @@ export const it_IT: EnTranslations = {
         "lunar_tide": "Marea Lunare (danno ad area pulsante)",
         "enrage": "Va in furia con poca salute",
         "shuddering_stomp": "Pestata Tremenda (stordimento ad area)",
-        "necrotic_shockwave": "Onda d'Urto Necrotica (danno ad area pesante)",
+        "grave_inferno": "Inferno Sepolcrale (AoE di fuoco canalizzato, tenetevi distanti)",
         "grave_cleaver": "Tranciatumba (fendente frontale)",
         "shadow_nova": "Nova d'Ombra (esplosione ad area)",
         "profane_mending": "Cura Profana (cura i propri alleati)",
@@ -7286,7 +7287,7 @@ export const it_IT: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma di Bruin",
-        "description": "Mutamenti in orso: armatura +90%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore."
+        "description": "Mutamenti in orso: armatura +130%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore."
       },
       "maul": {
         "name": "Frantumaossa",

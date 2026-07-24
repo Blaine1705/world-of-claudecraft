@@ -355,6 +355,7 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng phần thưởng hằng ngày",
       "loading": "Đang tải phần thưởng hằng ngày...",
       "error": "Không thể tải phần thưởng hằng ngày.",
+      "disabled": "Phần Thưởng Hằng Ngày hiện đang bị tắt. Chúng tôi sẽ thông báo các cập nhật về tính năng này trong kênh Discord.",
       "intro": "Giữ đủ WOC trong ví đã xác minh của bạn để mở khóa phần thưởng hằng ngày. Kiếm điểm bằng một lượt quay mỗi ngày và các nhiệm vụ luân phiên, rồi leo lên bảng xếp hạng hằng ngày để nhận phần chia từ quỹ giải thưởng.",
       "disclaimer": "Giá WOC có thể biến động nhanh. Chúng tôi khuyên bạn nên giữ nhiều hơn mức tối thiểu 20 USD để những dao động giá thông thường không khóa bạn ở ngoài. Đây không phải lời khuyên tài chính.",
       "prize": "Quỹ Giải Thưởng",
@@ -2505,7 +2506,7 @@ export const vi_VN: EnTranslations = {
         "lunar_tide": "Triều Nguyệt (sát thương vùng theo nhịp)",
         "enrage": "Nổi giận khi máu thấp",
         "shuddering_stomp": "Giậm Chân Rùng Rợn (làm choáng vùng)",
-        "necrotic_shockwave": "Sóng Xung Hoại Tử (sát thương vùng nặng)",
+        "grave_inferno": "Địa Ngục Mộ Phần (AoE lửa kênh, giữ khoảng cách)",
         "grave_cleaver": "Chém Mộ Phần (chém ngang phía trước)",
         "shadow_nova": "Nova Bóng Tối (bùng nổ vùng)",
         "profane_mending": "Chữa Lành Bất Thánh (hồi máu cho đồng minh)",
@@ -7286,7 +7287,7 @@ export const vi_VN: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Biến hình thành gấu: giáp +90%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
+        "description": "Biến hình thành gấu: giáp +130%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
       },
       "maul": {
         "name": "Nghiền Xương",

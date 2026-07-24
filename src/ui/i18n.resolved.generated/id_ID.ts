@@ -355,6 +355,7 @@ export const id_ID: EnTranslations = {
       "close": "Tutup hadiah harian",
       "loading": "Memuat hadiah harian...",
       "error": "Tidak dapat memuat hadiah harian.",
+      "disabled": "Hadiah Harian saat ini dinonaktifkan. Kami akan mengumumkan pembaruan fitur ini di kanal Discord.",
       "intro": "Simpan cukup WOC di dompet terverifikasimu untuk membuka hadiah harian. Kumpulkan poin lewat satu putaran harian dan tugas yang bergilir, lalu naiki papan peringkat harian untuk mendapat bagian dari kolam hadiah.",
       "disclaimer": "Harga WOC dapat bergerak cepat. Kami menyarankan untuk menyimpan lebih dari batas minimum $20 USD agar gejolak harga yang wajar tidak mengunci aksesmu. Ini bukan nasihat keuangan.",
       "prize": "Kolam Hadiah",
@@ -2505,7 +2506,7 @@ export const id_ID: EnTranslations = {
         "lunar_tide": "Arus Bulan (kerusakan area berdenyut)",
         "enrage": "Mengamuk saat darah menipis",
         "shuddering_stomp": "Hentakan Gemetar (stun area)",
-        "necrotic_shockwave": "Gelombang Kejut Nekrotik (kerusakan area berat)",
+        "grave_inferno": "Neraka Kubur (AoE api tersalur, jaga jarak)",
         "grave_cleaver": "Penebas Kubur (tebasan ke depan)",
         "shadow_nova": "Nova Bayangan (ledakan area)",
         "profane_mending": "Pemulihan Najis (menyembuhkan sekutunya)",
@@ -7286,7 +7287,7 @@ export const id_ID: EnTranslations = {
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +90%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +130%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Bonecrush",

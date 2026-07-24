@@ -355,6 +355,7 @@ export const pt_BR: EnTranslations = {
       "close": "Fechar recompensas diárias",
       "loading": "Carregando recompensas diárias...",
       "error": "Não foi possível carregar as recompensas diárias.",
+      "disabled": "As Recompensas Diárias estão desativadas no momento. Anunciaremos atualizações sobre este recurso no canal do Discord.",
       "intro": "Mantenha WOC suficiente na sua carteira verificada para desbloquear as recompensas diárias. Ganhe pontos com um giro diário e tarefas rotativas, depois suba na classificação diária para ganhar uma parte da premiação.",
       "disclaimer": "O preço do WOC pode variar rapidamente. Recomendamos manter mais do que o mínimo de $20 USD para que oscilações normais de preço não bloqueiem seu acesso. Isto não é aconselhamento financeiro.",
       "prize": "Premiação",
@@ -2505,7 +2506,7 @@ export const pt_BR: EnTranslations = {
         "lunar_tide": "Mare Lunar (dano em área pulsante)",
         "enrage": "Entra em frenesi com pouca vida",
         "shuddering_stomp": "Pisão Estremecedor (atordoamento em área)",
-        "necrotic_shockwave": "Onda de Choque Necrótica (dano em área intenso)",
+        "grave_inferno": "Inferno Sepulcral (AoE de fogo canalizado, mantenha distancia)",
         "grave_cleaver": "Ceifador de Tumbas (golpe em cone frontal)",
         "shadow_nova": "Nova das Sombras (explosão em área)",
         "profane_mending": "Cura Profana (cura os aliados)",
@@ -7286,7 +7287,7 @@ export const pt_BR: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Assume a forma de urso: armadura +90%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
+        "description": "Assume a forma de urso: armadura +130%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
       },
       "maul": {
         "name": "Esmaga-Ossos",

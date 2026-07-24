@@ -355,6 +355,7 @@ export const tr_TR: EnTranslations = {
       "close": "Günlük ödülleri kapat",
       "loading": "Günlük ödüller yükleniyor...",
       "error": "Günlük ödüller yüklenemedi.",
+      "disabled": "Günlük Ödüller şu anda devre dışı. Bu özellikle ilgili güncellemeleri Discord kanalında duyuracağız.",
       "intro": "Günlük ödüllerin kilidini açmak için doğrulanmış cüzdanında yeterince WOC bulundur. Bir günlük çevirme ve dönüşümlü görevlerle puan kazan, ardından ödül havuzundan pay almak için günlük lider tablosunda yüksel.",
       "disclaimer": "WOC fiyatı hızla değişebilir. Olağan fiyat dalgalanmalarının seni dışarıda bırakmaması için 20 USD asgarisinden fazlasını tutmanı öneririz. Bu bir yatırım tavsiyesi değildir.",
       "prize": "Ödül Havuzu",
@@ -2505,7 +2506,7 @@ export const tr_TR: EnTranslations = {
         "lunar_tide": "Ay Dalgası (darbeli alan hasarı)",
         "enrage": "Düşük canda çılgına döner",
         "shuddering_stomp": "Titreyen Çiğneme (alan sersemletmesi)",
-        "necrotic_shockwave": "Nekrotik Şok Dalgası (ağır alan hasarı)",
+        "grave_inferno": "Mezar Inferno (kanalize ateş AoE, daginik durun)",
         "grave_cleaver": "Mezar Biçici (öne doğru yay saldırısı)",
         "shadow_nova": "Gölge Novası (alan patlaması)",
         "profane_mending": "Murdar Şifa (müttefiklerini iyileştirir)",
@@ -7286,7 +7287,7 @@ export const tr_TR: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Formu",
-        "description": "Bir ayıya dönüş: zırh +%90, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
+        "description": "Bir ayıya dönüş: zırh +%130, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
       },
       "maul": {
         "name": "Kemik Kıran",

@@ -355,6 +355,7 @@ export const pl_PL: EnTranslations = {
       "close": "Zamknij codzienne nagrody",
       "loading": "Ładowanie codziennych nagród...",
       "error": "Nie udało się załadować codziennych nagród.",
+      "disabled": "Codzienne nagrody są obecnie wyłączone. Aktualizacje dotyczące tej funkcji ogłosimy na kanale Discord.",
       "intro": "Trzymaj wystarczająco dużo WOC w zweryfikowanym portfelu, aby odblokować codzienne nagrody. Zdobywaj punkty dzięki jednemu codziennemu losowaniu i zmieniającym się zadaniom, a następnie wspinaj się w codziennej tabeli wyników, aby zdobyć udział w puli nagród.",
       "disclaimer": "Cena WOC może zmieniać się szybko. Zalecamy trzymanie więcej niż minimalne 20 USD, aby zwykłe wahania ceny nie odcięły ci dostępu. To nie jest porada finansowa.",
       "prize": "Pula nagród",
@@ -2505,7 +2506,7 @@ export const pl_PL: EnTranslations = {
         "lunar_tide": "Księżycowy Odpływ (pulsujące obrażenia obszarowe)",
         "enrage": "Wpada w szał przy niskim zdrowiu",
         "shuddering_stomp": "Wstrząsające Tupnięcie (ogłuszenie obszarowe)",
-        "necrotic_shockwave": "Nekrotyczna Fala Uderzeniowa (silne obrażenia obszarowe)",
+        "grave_inferno": "Grobowy Inferno (kanalizowane AoE ognia, trzymajcie dystans)",
         "grave_cleaver": "Grobowe Cięcie (frontalne cięcie)",
         "shadow_nova": "Nova Cienia (wybuch obszarowy)",
         "profane_mending": "Plugawe Leczenie (leczy sojuszników)",
@@ -7286,7 +7287,7 @@ export const pl_PL: EnTranslations = {
       },
       "bear_form": {
         "name": "Postać Bruina",
-        "description": "Zmień postać w niedźwiedzia: pancerz +90%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
+        "description": "Zmień postać w niedźwiedzia: pancerz +130%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
       },
       "maul": {
         "name": "Kruszenie kości",

@@ -355,6 +355,7 @@ export const en_CA: EnTranslations = {
       "close": "Close daily rewards",
       "loading": "Loading daily rewards...",
       "error": "Could not load daily rewards.",
+      "disabled": "Daily Rewards is currently disabled. We will announce updates to this feature in the Discord channel.",
       "intro": "Hold enough WOC in your verified wallet to unlock daily rewards. Earn points with one daily spin and rotating tasks, then climb the daily leaderboard for a share of the prize pool.",
       "disclaimer": "WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.",
       "prize": "Prize Pool",
@@ -2505,7 +2506,7 @@ export const en_CA: EnTranslations = {
         "lunar_tide": "Lunar Tide (pulsing area damage)",
         "enrage": "Enrages at low health",
         "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_inferno": "Grave Inferno (channeled fire AoE, stay spread)",
         "grave_cleaver": "Grave-Cleaver (frontal cleave)",
         "shadow_nova": "Shadow Nova (area burst)",
         "profane_mending": "Profane Mending (heals its allies)",
@@ -7286,7 +7287,7 @@ export const en_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +90%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +130%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",

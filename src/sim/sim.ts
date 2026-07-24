@@ -88,6 +88,7 @@ import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
+import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { warriorMeleeDefense } from './combat/warrior_hit_table';
 import { ensureWarriorStance } from './combat/warrior_stances';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
@@ -470,6 +471,7 @@ import { isStunDrCategory } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
+  SUMMONED_ADD_THREAT_SEED,
   TAUNT_FORCE_SECONDS,
   threatEntries,
   threatModifier,
@@ -3436,6 +3438,7 @@ export class Sim {
   dailyRewards(): Promise<DailyRewardStatus> {
     const day = '1970-01-01';
     return Promise.resolve({
+      enabled: true,
       day,
       resetAt: '1970-01-02T00:00:00.000Z',
       prizePoolUsd: 0,
@@ -6023,7 +6026,10 @@ export class Sim {
     let dmg =
       this.rng.range(mob.weapon.min, mob.weapon.max) +
       (this.effectiveAttackPower(mob) / 14) * mob.weapon.speed;
-    const crit = this.rng.chance(0.05);
+    // Tank crit immunity: the 5% roll is still DRAWN (stream position), a
+    // committed tank just never suffers it (combat/tank_crit_immunity.ts).
+    const critRoll = this.rng.chance(0.05);
+    const crit = critRoll && !isCritImmuneTank(target, this.players.get(target.id));
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
@@ -6626,7 +6632,12 @@ export class Sim {
         // Same seeding aggroMob does on a normal pull: the leash measures from the
         // eruption point until a hostile player action refreshes it.
         add.leashAnchor = { ...add.pos };
-        addThreat(add, victim.id, 1);
+        // A REAL tank lead, not a token point: healing threat on the tank splits
+        // to every mob aware of him, so a 1-point seed sent every summon wave at
+        // the healer (one add swing one-shots a cloth pool). 750 covers roughly
+        // ten seconds of normal healing; sustained DPS focus can still rip an
+        // add loose, and taunt or tank threat answers it.
+        addThreat(add, victim.id, SUMMONED_ADD_THREAT_SEED);
       }
       // Book of Deeds kill-order tasks track every add this attempt summoned.
       deedsMod.onBossAddsSummonedForDeeds(this.ctx, boss, [add.id]);

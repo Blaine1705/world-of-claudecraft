@@ -355,6 +355,7 @@ export const cs_CZ: EnTranslations = {
       "close": "Zavřít denní odměny",
       "loading": "Načítají se denní odměny...",
       "error": "Denní odměny se nepodařilo načíst.",
+      "disabled": "Denní odměny jsou momentálně vypnuté. Novinky o této funkci oznámíme na kanálu Discord.",
       "intro": "Drž dost WOC v ověřené peněžence a odemkni denní odměny. Získávej body jedním denním zatočením a rotujícími úkoly, potom stoupej v denním žebříčku o podíl z prize poolu.",
       "disclaimer": "Cena WOC se může rychle měnit. Doporučujeme držet víc než minimálních 20 USD, aby tě běžné cenové výkyvy neuzamkly ven. Toto není finanční rada.",
       "prize": "Prize pool",
@@ -2505,7 +2506,7 @@ export const cs_CZ: EnTranslations = {
         "lunar_tide": "Měsíční příboj (pulzující plošné poškození)",
         "enrage": "Zuří při nízkém zdraví",
         "shuddering_stomp": "Třesoucí dupnutí (plošné ochromení)",
-        "necrotic_shockwave": "Nekrotická rázová vlna (silné plošné poškození)",
+        "grave_inferno": "Hrobové Peklo (kanalizované ohnivé AoE, udržujte rozestupy)",
         "grave_cleaver": "Hrobní sekáč (čelní sek)",
         "shadow_nova": "Stínová nova (plošný výbuch)",
         "profane_mending": "Znesvěcené léčení (léčí spojence)",
@@ -7286,7 +7287,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bear_form": {
         "name": "Medvědí podoba",
-        "description": "Proměníš se v medvěda: zbroj +90 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
+        "description": "Proměníš se v medvěda: zbroj +130 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
       },
       "maul": {
         "name": "Drcení kostí",
