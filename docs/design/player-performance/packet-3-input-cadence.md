@@ -589,6 +589,17 @@ QA file: phase-06-qa.md (the packet-level adversarial "what is missing" pass).
   private repo claims anomalies are not rate-limited on the wire, which the
   pre-parse gate contradicts (doc drift, both copies); frames rejected by the
   stale-session guard return before wsMessage('in') and stay uncounted.
+- Adjacent defect found by the phase 06 security review, OUT of scope pending a
+  maintainer ruling (it contests R5's own ordering): the ignore/block LIST-READ
+  chat commands return from the chat case BEFORE the chat lane and the ladder
+  (the R5 ordering, deliberate so a silenced player can manage lists without
+  burning chat tokens), and the reads are uncached per-call DB SELECTs, so a
+  hostile authenticated client can sustain list-read frames at the full
+  pre-parse ceiling with zero drops, meaning the abuse window can never kick
+  that stream, and this packet's ceiling raise (40 to 120 per second) tripled
+  the reachable DB-read rate. Any fix (a read guard above the router, an
+  in-session list cache, or a lane draw ahead of the read break) changes what
+  R5 pinned, so it needs the maintainer's decision; details in phase-06-qa.md.
 - Biome on touched files only; no em/en dashes or emojis anywhere; Conventional
   Commits with scope and body; never a whole-repo --write; the branch stays local
   until the maintainer's explicit go.
