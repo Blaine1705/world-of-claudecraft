@@ -1460,7 +1460,9 @@ export const ja_JP: EnTranslations = {
         "gills": "えら",
         "claw": "爪",
         "horn": "角",
-        "tusk": "牙"
+        "tusk": "牙",
+        "meat": "Meat",
+        "cloth": "布"
       }
     },
     "townFocus": {

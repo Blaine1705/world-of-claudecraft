@@ -11051,11 +11051,16 @@ export class Hud {
     match = /^(.+) was not assigned and is free for all\.$/.exec(text);
     if (match)
       return t('hudChrome.masterLoot.unassigned', { item: itemDisplayNameFromSource(match[1]) });
-    match = /^Sold (.+) for (.+)\.$/.exec(text);
+    // The optional xN suffix (vendor-selling a stack) routes through
+    // itemStackDisplayName so the item NAME still localizes, the same
+    // treatment as the receive/listed/bought/reclaimed arms above and below:
+    // a greedy single capture would feed "Copper Ore x2" to the exact-name
+    // lookup and silently degrade to raw English.
+    match = /^Sold (.+?)( x\d+)? for (.+)\.$/.exec(text);
     if (match)
       return t('hud.logs.soldItem', {
-        item: itemDisplayNameFromSource(match[1]),
-        money: this.localizeSimMoney(match[2]),
+        item: itemStackDisplayName(match[1], match[2]),
+        money: this.localizeSimMoney(match[3]),
       });
     match = /^Listed (.+?)( x\d+)? on the World Market for (.+)\.$/.exec(text);
     if (match)

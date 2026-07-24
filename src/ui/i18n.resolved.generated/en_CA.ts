@@ -1460,7 +1460,9 @@ export const en_CA: EnTranslations = {
         "gills": "Gills",
         "claw": "Claw",
         "horn": "Horn",
-        "tusk": "Tusk"
+        "tusk": "Tusk",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

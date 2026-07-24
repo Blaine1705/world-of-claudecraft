@@ -1460,7 +1460,9 @@ export const vi_VN: EnTranslations = {
         "gills": "Mang",
         "claw": "Móng Vuốt",
         "horn": "Sừng",
-        "tusk": "Ngà"
+        "tusk": "Ngà",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

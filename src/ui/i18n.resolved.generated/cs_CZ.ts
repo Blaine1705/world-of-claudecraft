@@ -1460,7 +1460,9 @@ export const cs_CZ: EnTranslations = {
         "gills": "Žábry",
         "claw": "Dráp",
         "horn": "Roh",
-        "tusk": "Kly"
+        "tusk": "Kly",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

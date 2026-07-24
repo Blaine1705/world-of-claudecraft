@@ -1460,7 +1460,9 @@ export const ru_RU: EnTranslations = {
         "gills": "Жабры",
         "claw": "Коготь",
         "horn": "Рог",
-        "tusk": "Бивень"
+        "tusk": "Бивень",
+        "meat": "Meat",
+        "cloth": "Ткань"
       }
     },
     "townFocus": {
