@@ -6818,10 +6818,12 @@ export class Sim {
   // masterwork copy, whose rolled.stats are its baked bonus, NOT an enchant).
   // Only an already-enchanted copy (professions/enchanting.ts
   // isEnchantedInstance: the explicit `enchant` marker, or legacy bare
-  // rolled.stats without rolled.masterwork) is excluded, so disenchant/
-  // apply-enchant never consumes an already-enchanted copy but DOES accept
+  // rolled.stats without rolled.masterwork) is excluded, so apply-enchant
+  // never consumes (overwrites) an already-enchanted copy but DOES accept
   // crafted and masterwork gear, unlike the fungible-only gate this replaces
-  // for enchanting.ts specifically.
+  // for enchanting.ts specifically. Disenchant uses this pair only as its
+  // PREFERENCE tier: it gates on countItem and falls back to removeItem when
+  // every held copy is enchanted (issue #2340; see resolveDisenchant).
   countEnchantableItem(itemId: string, pid?: number): number {
     const r = this.resolve(pid);
     if (!r) return 0;
