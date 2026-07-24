@@ -15,12 +15,20 @@ export interface AmbientPointSource {
   readonly z: number;
 }
 
-/** Per-ability audio moments fired by the ability-VFX engine: release (cast
- *  lets go, at the caster), impact (at the impact point), pulse (one soft
- *  zone re-hit), crit (the sting layered over a critical impact), spirit
- *  (a creature apparition calls as it spawns), motif (set-piece foley at the
+/** Per-ability audio moments fired by the ability-VFX engine: windup (the
+ *  charge bed while a cast is winding up, at the caster), release (cast lets
+ *  go, at the caster), impact (at the impact point), pulse (one soft zone
+ *  re-hit), crit (the sting layered over a critical impact), spirit (a
+ *  creature apparition calls as it spawns), motif (set-piece foley at the
  *  motif anchor). */
-export type AbilityAudioKind = 'release' | 'impact' | 'pulse' | 'crit' | 'spirit' | 'motif';
+export type AbilityAudioKind =
+  | 'windup'
+  | 'release'
+  | 'impact'
+  | 'pulse'
+  | 'crit'
+  | 'spirit'
+  | 'motif';
 
 export interface AbilityAudioOpts {
   /** Quieter, sub-less version (spec liteAudio or a degraded visual tier). */

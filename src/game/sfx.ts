@@ -883,7 +883,7 @@ class Sfx {
    *  sub weight / crit sting / finisher toll (the gallery hybrid); until
    *  then — and for any id the pack misses — the synth recipes are the read. */
   abilityAudio(
-    kind: 'release' | 'impact' | 'pulse' | 'crit' | 'spirit' | 'motif',
+    kind: 'windup' | 'release' | 'impact' | 'pulse' | 'crit' | 'spirit' | 'motif',
     palette: string,
     power: number,
     x: number,
@@ -922,7 +922,9 @@ class Sfx {
             ? 0.5
             : kind === 'motif'
               ? 0.2
-              : 0.07;
+              : kind === 'windup'
+                ? 0.4
+                : 0.07;
     if (now - (this.lastPlay.get(cdKey) ?? Number.NEGATIVE_INFINITY) < cd) return;
     let slot = -1;
     for (let i = 0; i < ABILITY_VOICES; i++) {
@@ -941,6 +943,9 @@ class Sfx {
       panner.connect(master);
       this.abilityEnd = now;
       switch (kind) {
+        case 'windup':
+          this.windupMoment(out, now, palette, power);
+          break;
         case 'release':
           this.releaseMoment(out, now, palette, power, arch);
           break;
@@ -1048,6 +1053,57 @@ class Sfx {
   /** Cast release at the caster: dash wind for dashes, swing whooshes for
    *  strikes, else the palette family's whoosh recording (gallery release /
    *  whoosh / dashWind); the synth release recipe is the no-pack fallback. */
+  /** The pre-release charge bed: a soft rising swell while a cast winds up, so
+   *  a nature/moon cast leads with its OWN character instead of leaving the
+   *  first thing the ear catches to be the palette impact (which read as a
+   *  fire-spell charge to the owner). Gentle and non-percussive - it is the
+   *  "spell is charging" tell, not a hit. Only the palettes that were flagged
+   *  synthesize here; every other palette stays silent (no regression to the
+   *  classes whose windups already read right). */
+  private windupMoment(out: GainNode, t: number, palette: string, power: number): void {
+    const I = 0.6 + 0.4 * Math.min(1.5, power);
+    if (palette === 'nature') {
+      // leaves gathering: a breathy band-passed wind rising under a soft green
+      // triad that blooms in - airy and growing, never a crackle
+      this.aNoise(out, t, {
+        dur: 1.1,
+        freq: 900,
+        sweep: 700,
+        gain: 0.14 * I,
+        type: 'bandpass',
+        q: 0.9,
+        attack: 0.55,
+      });
+      this.aPartials(out, t, {
+        freqs: [392, 588, 784],
+        dur: 1.2,
+        gain: 0.07 * I,
+        stagger: 0.14,
+      });
+      return;
+    }
+    if (palette === 'moon') {
+      // cold starlight winding up: a high airy shimmer swelling in, a soft
+      // rising bell underneath - the stellar charge Starfire was missing
+      this.aNoise(out, t, {
+        dur: 1.2,
+        freq: 5200,
+        gain: 0.07 * I,
+        type: 'highpass',
+        attack: 0.7,
+      });
+      this.aTone(out, t, {
+        freq: 660,
+        slide: 990,
+        dur: 1.1,
+        gain: 0.08 * I,
+        attack: 0.5,
+      });
+      return;
+    }
+    // any other palette: no windup bed (leave those casts exactly as reviewed)
+  }
+
   private releaseMoment(
     out: GainNode,
     t: number,

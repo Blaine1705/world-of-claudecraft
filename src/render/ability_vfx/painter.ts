@@ -1117,6 +1117,21 @@ export class AbilityVfx {
         ) {
           this.spawned = 1;
           this.recordStat(e.castingAbility, false);
+          // Charge bed on the FIRST frame of the cast: a nature/moon cast
+          // leads with its own rising tell instead of leaving the ear's first
+          // catch to be the palette impact (which read as a fire charge). Only
+          // these two palettes synthesize a windup bed; every other class's
+          // cast is left exactly as reviewed. Audio-only - the visual windup
+          // ceremony above is untouched.
+          const pal = full?.palette;
+          if ((pal === 'nature' || pal === 'moon') && this.deps.abilityAudio) {
+            const at = this.deps.anchor(e.id, 0.9);
+            if (at) {
+              this.deps.abilityAudio('windup', pal, full?.power ?? 1, at.x, at.y, at.z, {
+                archetype: full?.archetype,
+              });
+            }
+          }
         }
       }
     }
