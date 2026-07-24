@@ -262,7 +262,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Niesprzedawany',
   'guide.profPages.priceNone': 'Niesprzedawany',
   'guide.profPages.toolTierReq': 'Narzędzie poziomu {tier}',
-  'guide.profPages.bareHands': 'Gołe ręce',
   'guide.profPages.yieldsHeading': 'Co przynosi zebranie',
   'guide.profPages.yieldsBody':
     'Każde zebranie losuje jakość dla tego, co przynosi, a twoja biegłość to cały mechanizm tego losowania. Zupełnie nowy zbieracz zawsze wyciąga pospolity materiał; każdy punkt umiejętności stale przesuwa wagę z pospolitego na wyższe gatunki i nigdy wstecz, aż przy limicie 100 jakość pospolita znika całkowicie: 60 procent niezwykłego, 30 procent rzadkiego, 8 procent epickiego i 2 procent legendarnego, za każdym razem.\n\nJakość to też ilość: pospolitość daje 1 jednostkę, niezwykły i rzadki 2, epicki 3, a legendarny 4. Każde rzadkie, epickie lub legendarne ciągnie jako podpisany egzemplarz ze stemplem Zebrany przez ciebie: przy limicie to cztery zebrania na dziesięć noszące twoje imię, a zasady proweniencji na stronie Ekonomii Wytwarzania wyjaśniają, dlaczego rzemieślnicy płacą ekstra właśnie za te stosy.',

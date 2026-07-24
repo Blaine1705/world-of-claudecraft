@@ -280,7 +280,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Non in vendita',
   'guide.profPages.priceNone': 'Non in vendita',
   'guide.profPages.toolTierReq': 'Strumento di livello {tier}',
-  'guide.profPages.bareHands': 'Mani nude',
   'guide.profPages.yieldsHeading': 'Cosa produce un raccolto',
   'guide.profPages.yieldsBody':
     "Ogni raccolta tira una qualita per cio che concede, e la tua competenza e l'unico fattore di quel tiro. Un raccoglitore alle prime armi ottiene sempre materiale comune; ogni punto di abilita sposta il peso costantemente dal comune ai gradi superiori e mai al contrario, finche al massimo di 100 il grado comune scompare del tutto: 60 percento non comune, 30 percento raro, 8 percento epico e 2 percento leggendario, ogni volta.\n\nLa qualita significa anche quantita: un tiro comune da 1 unita, non comune e raro danno 2, epico 3 e leggendario 4. Qualsiasi tiro raro, epico o leggendario arriva come istanza firmata con il timbro Raccolto da te: al massimo sono quattro raccolti su dieci che portano il tuo nome, e le regole di provenienza nella pagina dell'Economia Artigianale spiegano perche i fabbricatori pagano di piu esattamente per quelle pile.",

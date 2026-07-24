@@ -7331,6 +7331,35 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы собрать эти заросли, нужен серп травника {tier} уровня.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     'Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.',
+  'hudChrome.gathering.requiresTool.mining': 'Требуется шахтерская кирка',
+  'hudChrome.gathering.requiresTool.logging': 'Требуется лесорубный топор',
+  'hudChrome.gathering.requiresTool.herbalism': 'Требуется серп травника',
+  'hudChrome.gathering.toolRequired.mining': 'Чтобы разработать эту жилу, нужна шахтерская кирка.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Чтобы срубить этот древостой, нужен лесорубный топор.',
+  'hudChrome.gathering.toolRequired.herbalism': 'Чтобы собрать эти заросли, нужен серп травника.',
+  'hudChrome.gathering.toolRequired.fishing': 'Чтобы рыбачить, нужна удочка.',
+  'hudChrome.gathering.noNodeNearby.mining': 'Поблизости нет рудной жилы.',
+  'hudChrome.gathering.noNodeNearby.logging': 'Поблизости нет древостоя.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'Поблизости нет зарослей трав.',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Шахтерский инструмент ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Лесорубный инструмент ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Инструмент травника ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Удочка ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.unlocks.mining': 'Нужна для добычи рудных жил до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging': 'Нужен для валки древостоев до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Нужен для сбора зарослей трав до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Использование: добыть руду из ближайшей жилы.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Использование: срубить ближайший древостой.',
+  'hudChrome.gathering.toolTooltip.use.herbalism':
+    'Использование: собрать травы из ближайших зарослей.',
+  'hudChrome.gathering.toolTooltip.speed': 'Быстрее собирает на узлах ниже {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Нужна для рыбалки.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Рыба клюет до {seconds} с быстрее.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Продлевает окно подсечки на {seconds} с.',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Открывает более богатый улов при навыке рыбалки от {skill}.',
   'hudChrome.gathering.downgradeMark': 'Сумки полны: добыча сохранена без метки сборщика.',
   'hudChrome.gathering.downgradeFind': 'Сумки полны: превосходная находка ускользнула.',
   'hudChrome.gathering.stateReady': 'Готово',
@@ -8984,7 +9013,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Не продается',
   'guide.profPages.priceNone': 'Не продается',
   'guide.profPages.toolTierReq': 'Инструмент {tier} уровня',
-  'guide.profPages.bareHands': 'Голыми руками',
   'guide.profPages.bandsHeading': 'Разряды мастерства',
   'guide.profPages.bandsBody':
     'Разряды мастерства ускоряют сбор, а в рыбной ловле еще и открывают таблицы улова.',

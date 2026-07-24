@@ -226,10 +226,12 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import {
   buildGatheringProficiencyRows,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
+  gatherToolNoNodeKey,
 } from './gathering_view';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import { ActionBarController } from './hud/action_bar/action_bar_controller';
@@ -3636,6 +3638,7 @@ export class Hud {
       this.lastPetBarSig = '';
     },
     isHotbarItemId: (itemId) => this.isHotbarItemId(itemId),
+    useGatherTool: (item) => this.gatherToolUseHook?.(item) ?? false,
     setDragAction: (action) => {
       this.dragAction = action ? { action, sourceIndex: null } : null;
     },
@@ -4750,8 +4753,10 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useDrink', { amount: itemNumber(item.drinkMana), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
-    if (item.use?.type === 'fishing')
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFishing'))}</div>`;
+    // Gathering implements (#2343): picks/axes/sickles/rods and the simple
+    // pole render their kind, requirement, use, and bonus lines from the
+    // pure sibling module (the item_instance_tooltip.ts pattern).
+    html += gatherToolTooltipLines(item);
     if (item.potionHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
@@ -5567,7 +5572,10 @@ export class Hud {
       }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
       if (this.tradeOpen) return;
-      this.sim.useItem(action.id);
+      // Gathering tools route through the interact-style handler first
+      // (#2343); everything else (and fishing implements) keeps the plain
+      // useItem command.
+      if (!this.tryGatherToolUse(action.id)) this.sim.useItem(action.id);
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.flashActionSlot(barSlot);
     }
@@ -9218,12 +9226,20 @@ export class Hud {
           // Tool-tier denial (Professions 2.0): an error toast ONLY.
           // No loot line, no cue, no other state (the grant-hub double-log
           // trap); the sim event is text-free, so the pure core resolves the
-          // key off surface + professionId and requiredTier interpolates.
+          // key off surface + professionId + requiredTier (tier 1 = no tool
+          // owned at all, #2343) and requiredTier interpolates.
           this.showError(
-            t(gatherDeniedLineKey(ev.surface, ev.professionId), {
+            t(gatherDeniedLineKey(ev.surface, ev.professionId, ev.requiredTier), {
               tier: formatNumber(ev.requiredTier, { maximumFractionDigits: 0 }),
             }),
           );
+          break;
+        }
+        case 'gatherToolNoNode': {
+          // Bag-clicked gathering tool with nothing in reach (#2343): an
+          // error toast ONLY, the gatherDenied pattern above; the sim event
+          // is text-free, so the pure core resolves the key off professionId.
+          this.showError(t(gatherToolNoNodeKey(ev.professionId)));
           break;
         }
         case 'gatherDowngrade': {
@@ -11215,6 +11231,24 @@ export class Hud {
 
   setFiestaPracticeHook(fn: (() => void) | null): void {
     this.arenaWindow.setPracticeHook(fn);
+  }
+
+  // Client-side gathering-tool use routing (#2343): main.ts wires the handler
+  // (node scan + handleGatherNodeInteract + the #1982 autorun stop) after the
+  // input layer exists; bags clicks and hotbar presses on a pick/axe/sickle
+  // try it first and fall back to the plain useItem command when it declines
+  // (non-tools, fishing implements, or the hook not yet wired).
+  private gatherToolUseHook: ((item: ItemDef) => boolean) | null = null;
+
+  setGatherToolUseHandler(fn: ((item: ItemDef) => boolean) | null): void {
+    this.gatherToolUseHook = fn;
+  }
+
+  /** True when the gathering-tool routing consumed this item use. */
+  tryGatherToolUse(itemId: string): boolean {
+    const item = ITEMS[itemId];
+    if (!item) return false;
+    return this.gatherToolUseHook?.(item) ?? false;
   }
 
   private inFiesta(): boolean {

@@ -7188,6 +7188,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.',
+  'hudChrome.gathering.requiresTool.mining': '채광 곡괭이 필요',
+  'hudChrome.gathering.requiresTool.logging': '벌목 도끼 필요',
+  'hudChrome.gathering.requiresTool.herbalism': '약초 낫 필요',
+  'hudChrome.gathering.toolRequired.mining': '이 광맥을 캐려면 채광 곡괭이가 필요합니다.',
+  'hudChrome.gathering.toolRequired.logging': '이 나무를 베려면 벌목 도끼가 필요합니다.',
+  'hudChrome.gathering.toolRequired.herbalism': '이 군락을 채집하려면 약초 낫이 필요합니다.',
+  'hudChrome.gathering.toolRequired.fishing': '낚싯대가 있어야 낚싯줄을 드리울 수 있습니다.',
+  'hudChrome.gathering.noNodeNearby.mining': '손이 닿는 곳에 광맥이 없습니다.',
+  'hudChrome.gathering.noNodeNearby.logging': '손이 닿는 곳에 벌목 나무가 없습니다.',
+  'hudChrome.gathering.noNodeNearby.herbalism': '손이 닿는 곳에 약초 군락이 없습니다.',
+  'hudChrome.gathering.toolTooltip.kind.mining': '채광 도구 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.kind.logging': '벌목 도구 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': '약초 도구 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.kind.fishing': '낚싯대 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.unlocks.mining': '{tier}티어까지의 광맥을 캐는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    '{tier}티어까지의 벌목 나무를 베는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    '{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.use.mining': '사용: 근처의 광맥을 캡니다.',
+  'hudChrome.gathering.toolTooltip.use.logging': '사용: 근처의 벌목 나무를 벱니다.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': '사용: 근처의 약초 군락에서 채집합니다.',
+  'hudChrome.gathering.toolTooltip.speed': '{tier}티어 미만 채집지에서 더 빠르게 채집합니다.',
+  'hudChrome.gathering.toolTooltip.rodRequired': '낚시에 필요합니다.',
+  'hudChrome.gathering.toolTooltip.rodBite': '물고기가 최대 {seconds}초 더 빨리 입질합니다.',
+  'hudChrome.gathering.toolTooltip.rodReel': '릴 감기 시간이 {seconds}초 늘어납니다.',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    '낚시 기술 {skill} 이상에서 더 풍성한 어획 목록이 해금됩니다.',
   'hudChrome.gathering.downgradeMark':
     '가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.',
   'hudChrome.gathering.downgradeFind': '가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.',
@@ -8806,7 +8834,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': '판매 없음',
   'guide.profPages.priceNone': '판매 없음',
   'guide.profPages.toolTierReq': '{tier}티어 도구',
-  'guide.profPages.bareHands': '맨손 가능',
   'guide.profPages.bandsHeading': '숙련도 구간',
   'guide.profPages.bandsBody':
     '숙련도 구간은 채집 시전을 빠르게 하고, 낚시에서는 어획표까지 가른다.',

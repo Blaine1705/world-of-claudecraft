@@ -263,7 +263,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Säljs inte',
   'guide.profPages.priceNone': 'Säljs inte',
   'guide.profPages.toolTierReq': 'Nivå {tier}-verktyg',
-  'guide.profPages.bareHands': 'Med bara händerna',
   'guide.profPages.yieldsHeading': 'Vad en skörd ger',
   'guide.profPages.yieldsBody':
     'Varje skörd rullar en kvalitet för det den ger, och din skicklighet är hela historien bakom det rullet. En helt ny skördare drar alltid vanligt material; varje skicklighetspoäng förskjuter stadigt vikt från vanligt till de högre graderna och aldrig bakåt, tills graden vanlig vid 100-taket försvinner helt: 60 procent ovanligt, 30 procent sällsynt, 8 procent episkt och 2 procent legendariskt, varje gång.\n\nKvalitet innebär också kvantitet: ett vanligt resultat ger 1 enhet, ovanligt och sällsynt ger 2, episkt 3 och legendariskt 4. Varje sällsynt, episk eller legendarisk skörd anländer som en signerad kopia stämplad Samlat av dig: vid taket är det fyra av tio skördar som bär ditt namn, och provenansreglerna på sidan Hantverksekonomi förklarar varför hantverkare betalar extra för just de stackarna.',

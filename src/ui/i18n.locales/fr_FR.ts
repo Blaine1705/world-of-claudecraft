@@ -280,7 +280,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Non vendu',
   'guide.profPages.priceNone': 'Non vendu',
   'guide.profPages.toolTierReq': 'Outil de palier {tier}',
-  'guide.profPages.bareHands': 'Mains nues',
   'guide.profPages.yieldsHeading': 'Ce que rapporte une récolte',
   'guide.profPages.yieldsBody':
     "Chaque récolte tire une qualité pour ce qu'elle rapporte, et votre maîtrise est le seul facteur de ce tirage. Un récolteur tout nouveau tire toujours des matériaux communs ; chaque point de compétence déplace régulièrement le poids du commun vers les grades supérieurs et jamais en arrière, jusqu'à ce qu'au plafond de 100 le grade commun disparaisse entièrement : 60 pourcent peu commun, 30 pourcent rare, 8 pourcent épique et 2 pourcent légendaire, à chaque fois.\n\nLa qualité signifie aussi la quantité : un tirage commun rapporte 1 unité, les tirages peu communs et rares en rapportent 2, épique 3, et légendaire 4. Tout tirage rare, épique ou légendaire arrive comme une instance signée estampillée Collecté par vous : au plafond, quatre récoltes sur dix portent votre nom, et les règles de provenance sur la page de l'Économie d'artisanat expliquent pourquoi les artisans paient en supplément exactement pour ces piles.",

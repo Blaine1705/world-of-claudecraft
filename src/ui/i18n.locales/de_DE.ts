@@ -279,7 +279,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Nicht erhältlich',
   'guide.profPages.priceNone': 'Nicht erhältlich',
   'guide.profPages.toolTierReq': 'Werkzeug der Stufe {tier}',
-  'guide.profPages.bareHands': 'Mit bloßen Händen',
   'guide.profPages.yieldsHeading': 'Was eine Ernte einbringt',
   'guide.profPages.yieldsBody':
     'Jede Ernte würfelt eine Qualität für das, was sie gewährt, und deine Fertigkeit ist die ganze Geschichte dieses Wurfs. Ein brandneuer Sammler zieht immer gewöhnliches Material; jeder Fertigkeitspunkt verschiebt das Gewicht stetig weg von Gewöhnlich hin zu den höheren Qualitätsstufen und nie zurück, bis an der Obergrenze von 100 die gewöhnliche Qualität vollständig verschwindet: 60 Prozent ungewöhnlich, 30 Prozent selten, 8 Prozent episch und 2 Prozent legendär, immer.\n\nQualität bedeutet auch Menge: Ein gewöhnlicher Wurf ergibt 1 Einheit, Ungewöhnlich und Selten ergeben 2, Episch 3 und Legendär 4. Jeder seltene, epische oder legendäre Fund kommt als signiertes Exemplar gestempelt mit Gesammelt von dir an: An der Obergrenze tragen vier von zehn Ernten deinen Namen, und die Herkunftsregeln auf der Seite Handwerkswirtschaft erklären, warum Handwerker genau für diese Stapel extra zahlen.',

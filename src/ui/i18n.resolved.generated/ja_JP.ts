@@ -2131,12 +2131,51 @@ export const ja_JP: EnTranslations = {
         "logging": "ティア{tier}の伐採斧が必要",
         "herbalism": "ティア{tier}の薬草鎌が必要"
       },
+      "requiresTool": {
+        "mining": "採掘ピッケルが必要",
+        "logging": "伐採斧が必要",
+        "herbalism": "薬草鎌が必要"
+      },
       "toolTierUnmet": {
         "mining": "この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。",
         "logging": "この立木を伐り倒すにはティア{tier}の伐採斧が必要です。",
         "herbalism": "この群生地を採取するにはティア{tier}の薬草鎌が必要です。"
       },
+      "toolRequired": {
+        "mining": "この鉱脈を採掘するには採掘ピッケルが必要です。",
+        "logging": "この立木を伐り倒すには伐採斧が必要です。",
+        "herbalism": "この群生地を採取するには薬草鎌が必要です。",
+        "fishing": "釣り糸を垂らすには釣り竿が必要です。"
+      },
+      "noNodeNearby": {
+        "mining": "手の届く範囲に鉱脈がありません。",
+        "logging": "手の届く範囲に立木がありません。",
+        "herbalism": "手の届く範囲に薬草の群生地がありません。"
+      },
       "toolTierUnmetCorpse": "最高の素材を回収するにはティア{tier}の採集道具が必要です。",
+      "toolTooltip": {
+        "kind": {
+          "mining": "採掘道具（ティア{tier}）",
+          "logging": "伐採道具（ティア{tier}）",
+          "herbalism": "薬草道具（ティア{tier}）",
+          "fishing": "釣り竿（ティア{tier}）"
+        },
+        "unlocks": {
+          "mining": "ティア{tier}までの鉱脈の採掘に必要です。",
+          "logging": "ティア{tier}までの立木の伐採に必要です。",
+          "herbalism": "ティア{tier}までの薬草の群生地の採取に必要です。"
+        },
+        "use": {
+          "mining": "使用：近くの鉱脈を採掘する。",
+          "logging": "使用：近くの立木を伐り倒す。",
+          "herbalism": "使用：近くの薬草の群生地から採取する。"
+        },
+        "speed": "ティア{tier}未満のノードでの採集が速くなります。",
+        "rodRequired": "釣りに必要です。",
+        "rodBite": "魚が食いつくまでの時間が最大{seconds}秒短くなります。",
+        "rodReel": "リールの猶予時間が{seconds}秒延びます。",
+        "rodBand": "釣りスキル{skill}以上でより豊かな釣果が解放されます。"
+      },
       "downgradeMark": "バッグが満杯です：収穫は採集者の印なしで収納されました。",
       "downgradeFind": "バッグが満杯です：極上の獲物を逃してしまいました。",
       "stateReady": "採集可能",
@@ -3823,7 +3862,6 @@ export const ja_JP: EnTranslations = {
       "toolUnavailable": "非売品",
       "priceNone": "非売品",
       "toolTierReq": "ティア{tier}の道具",
-      "bareHands": "素手で可",
       "yieldsHeading": "採集の実り",
       "yieldsBody": "採集のたびに品質が抽選され、その確率は熟練度がすべてです。始めたばかりの採集者は常にコモン品ですが、熟練が上がるほど高い等級へ重みが移り、決して後退しません。上限100ではコモンが完全に消え、60%が良質、30%がレア、8%がエピック、2%が伝説になります。品質は量でもあります。コモンは1個、良質とレアは2個、エピックは3個、伝説は4個。レア以上の収穫はあなたの署名入り（Gathered by）で届き、上限では十回に四回、名前が刻まれます。",
       "bandsHeading": "熟練度バンド",

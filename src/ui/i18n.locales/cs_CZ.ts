@@ -264,7 +264,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Neprodáváno',
   'guide.profPages.priceNone': 'Neprodáváno',
   'guide.profPages.toolTierReq': 'Nástroj {tier}. úrovně',
-  'guide.profPages.bareHands': 'Holýma rukama',
   'guide.profPages.yieldsHeading': 'Co sklizeň přinese',
   'guide.profPages.yieldsBody':
     'Každá sklizeň hodí kvalitu toho, co uděluje, a tvoje dovednost je celým příběhem toho hodu. Nováček sběrač vždy vytáhne běžný materiál; každý bod dovednosti přesouvá váhu rovnoměrně z běžného do vyšších stupňů a nikdy zpátky, až na limitu 100 běžný stupeň zcela zmizí: 60 procent neobvyklého, 30 procent vzácného, 8 procent epického a 2 procenta legendárního, pokaždé.\n\nKvalita také znamená množství: běžný hod přinese 1 jednotku, neobvyklý a vzácný 2, epický 3 a legendární 4. Jakýkoli vzácný, epický nebo legendární výtah přichází jako podepsaná instance s razítkem Sebral ty: na limitu to jsou čtyři sklizně z deseti nesoucí tvé jméno a pravidla původu na stránce Řemeslnická ekonomika vysvětlují, proč řemeslníci platí navíc právě za tyto zásoby.',

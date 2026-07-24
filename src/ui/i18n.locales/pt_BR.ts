@@ -277,7 +277,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.toolUnavailable': 'Não vendido',
   'guide.profPages.priceNone': 'Não vendido',
   'guide.profPages.toolTierReq': 'Ferramenta de nível {tier}',
-  'guide.profPages.bareHands': 'Mãos nuas',
   'guide.profPages.yieldsHeading': 'O que uma coleta rende',
   'guide.profPages.yieldsBody':
     'Cada coleta rola uma qualidade para o que concede, e sua proficiência é toda a história dessa rolagem. Um coletor novato sempre extrai material comum; cada ponto de habilidade desloca o peso de forma constante do comum para os graus superiores e nunca para trás, até que no limite de 100 o grau comum desaparece completamente: 60 por cento incomum, 30 por cento raro, 8 por cento épico e 2 por cento lendário, sempre.\n\nQualidade também significa quantidade: uma rolagem comum rende 1 unidade, incomum e raro rendem 2, épico 3 e lendário 4. Qualquer extração rara, épica ou lendária chega como uma instância assinada carimbada Coletado por você: no limite são quatro coletas em dez carregando seu nome, e as regras de proveniência na página de Economia de Criação explicam por que artesãos pagam a mais exatamente por essas pilhas.',
