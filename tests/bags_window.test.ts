@@ -243,6 +243,11 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     expect(body).toMatch(/case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId\);/);
     expect(body).toMatch(/case 'bankDeposit': \{/);
     expect(body).toMatch(/case 'petFeed':\s*this\.deps\.world\(\)\.feedPet\(s\.itemId\);/);
+    // The 'use' case tries the gathering-tool routing first (#2343) and only
+    // falls back to the plain useItem command when the hook declines.
+    expect(body).toMatch(
+      /case 'use': \{[\s\S]{0,400}?if \(!item \|\| !this\.deps\.useGatherTool\(item\)\) this\.deps\.world\(\)\.useItem\(s\.itemId\);/,
+    );
   });
 });
 

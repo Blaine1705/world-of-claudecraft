@@ -82,7 +82,13 @@ describe('gatherToolTooltipLines: everything else', () => {
 
 describe('hud composition source pin', () => {
   it('Hud.itemTooltip composes the module (one line, never inline logic)', () => {
-    const hudSrc = readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8');
+    // Whole-line // comments are stripped before scanning so the negative pin
+    // is not tripped by prose (the comment-gameable trap; block comments are
+    // left alone: a /* strip would misfire on string and regex literals).
+    const hudSrc = readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8').replace(
+      /^\s*\/\/.*$/gm,
+      '',
+    );
     expect(hudSrc).toContain('gatherToolTooltipLines(item)');
     // The legacy inline pole arm is gone: the module owns the fishing lines.
     expect(hudSrc).not.toContain("item.use?.type === 'fishing'");

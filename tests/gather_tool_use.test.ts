@@ -3,6 +3,8 @@
 // (useGatherToolItem via Sim.useItem) end to end on a real Sim, plus the
 // pure client helpers in src/game/gather_tool_use.ts that main.ts's bag-click
 // hook composes (gatherToolProfessionFor / nearestGatherNodeForProfession).
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   gatherToolProfessionFor,
@@ -166,6 +168,31 @@ describe('useGatherToolItem via Sim.useItem (the sim command body)', () => {
     );
     expect(p.castingAbility).toBe(GATHER_CAST_ID);
     expect(p.castRemaining).toBe(before);
+  });
+});
+
+describe('client wiring source pins (the tests/client_shell.test.ts idiom)', () => {
+  // Whole-line // comments only (the repo's raw-source pin idiom): a block
+  // strip would misfire on /* sequences inside string and regex literals.
+  const stripComments = (src: string) => src.replace(/^\s*\/\/.*$/gm, '');
+
+  it('main.ts wires the hook through the interact machinery and the autorun stop', () => {
+    const src = stripComments(readFileSync(path.join(__dirname, '../src/main.ts'), 'utf8'));
+    const start = src.indexOf('hud.setGatherToolUseHook(');
+    expect(start).toBeGreaterThan(-1);
+    const block = src.slice(start, start + 1200);
+    // The no-node arm surfaces the localized toast and still consumes the click.
+    expect(block).toContain('gatherToolNoNodeKey(professionId)');
+    // The node arm rides the SAME interact plumbing as the F key and the node
+    // click: handleGatherNodeInteract wrapped in the #1982 autorun stop.
+    expect(block).toContain('stopAutorunForInteraction(');
+    expect(block).toContain('handleGatherNodeInteract(');
+    expect(block).toContain('gatherNodeToolGateFor(world, node)');
+  });
+
+  it('the hud hotbar press tries the hook first and falls back to plain useItem', () => {
+    const src = stripComments(readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8'));
+    expect(src).toContain('if (!this.tryGatherToolUse(action.id)) this.sim.useItem(action.id);');
   });
 });
 

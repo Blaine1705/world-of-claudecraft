@@ -77,6 +77,36 @@ describe('gathering tool tier gating (#1123)', () => {
     }
   });
 
+  it('the zone 2 and zone 3 hubs stock the tool tiers their own nodes use (#2343)', () => {
+    // Load-bearing content under the always-require-tool rule: without these
+    // rows a toolless traveler could not gather anywhere outside Eastbrook.
+    const fenbridge = NPCS.provisioner_hale.vendorItems ?? [];
+    for (const toolId of [
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'handaxe',
+      'felling_axe',
+      'gathering_sickle',
+      'bronze_sickle',
+    ]) {
+      expect(fenbridge).toContain(toolId);
+    }
+    const highwatch = NPCS.quartermaster_bree.vendorItems ?? [];
+    for (const toolId of [
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'mithril_mining_pick',
+      'handaxe',
+      'felling_axe',
+      'ironbark_axe',
+      'gathering_sickle',
+      'bronze_sickle',
+      'silverleaf_sickle',
+    ]) {
+      expect(highwatch).toContain(toolId);
+    }
+  });
+
   it('a base tool never becomes unusable, because this repo has no durability mechanic', () => {
     const pick = ITEMS.copper_mining_pick;
     // ItemDef (src/sim/types.ts) carries no durability field anywhere in this repo,

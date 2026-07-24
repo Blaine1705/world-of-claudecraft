@@ -216,6 +216,7 @@ const UI_PURE_CORES = [
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',
+  'src/ui/gather_tool_tooltip.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
   'src/ui/window_drag_core.ts',
@@ -273,6 +274,7 @@ const RENDER_PURE_CORES = [
 const BARE_NAMED = [
   'src/render/prewarm_policy.ts',
   'src/ui/mob_idle_sfx.ts',
+  'src/ui/gather_tool_tooltip.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',

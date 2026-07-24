@@ -11240,7 +11240,7 @@ export class Hud {
   // (non-tools, fishing implements, or the hook not yet wired).
   private gatherToolUseHook: ((item: ItemDef) => boolean) | null = null;
 
-  setGatherToolUseHandler(fn: ((item: ItemDef) => boolean) | null): void {
+  setGatherToolUseHook(fn: ((item: ItemDef) => boolean) | null): void {
     this.gatherToolUseHook = fn;
   }
 

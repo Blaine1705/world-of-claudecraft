@@ -3030,7 +3030,7 @@ async function startGame(
   // autorun stop. Returns false for non-tools and fishing implements, which
   // fall back to the plain useItem command (fishing routes to startFishing
   // at the sim boundary).
-  hud.setGatherToolUseHandler((item) => {
+  hud.setGatherToolUseHook((item) => {
     const professionId = gatherToolProfessionFor(item);
     if (professionId === null) return false;
     const node = nearestGatherNodeForProfession(world, professionId);
