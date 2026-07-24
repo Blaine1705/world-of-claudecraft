@@ -43,6 +43,11 @@ export interface AbilityAudioOpts {
   sample?: string;
   /** The spirit creature model ('spirit') or motif name ('motif'). */
   name?: string;
+  /** The casting ability id, so the audio engine can apply a per-ability
+   *  identity override (src/game/ability_sfx_samples.ts ABILITY_AUDIO_OVERRIDES)
+   *  when an ability's sound should differ from its palette default - e.g. a
+   *  green nature bolt that must WHOOSH like wind, not crackle like fire. */
+  abilityId?: string;
 }
 
 export interface SpatialAudioSink {

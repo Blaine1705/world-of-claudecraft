@@ -65,6 +65,41 @@ export const SPIRIT_VOICE: Readonly<Record<string, readonly [number, boolean]>> 
  *  bear_form / feral_charge / tigers_fury wanted a beastlier voice). */
 export const SPIRIT_GROWLERS: ReadonlySet<string> = new Set(['bear', 'wolf', 'bull']);
 
+/** Per-ability audio identity overrides. Some abilities LOOK one element but
+ *  should SOUND like another (a green nature bolt that whooshes like wind, not
+ *  fire) - or their palette impact lands too soft / too hot for their read.
+ *  This reroutes the sound WITHOUT touching the visual palette or color: the
+ *  renderer keeps its authored look, the audio engine keys on the ability id.
+ *  Only existing pack ids / procedural recipes are used here - anything that
+ *  genuinely needs a new bespoke recording (an insect buzz, a real tornado,
+ *  a water rush, a wolf howl, a bone crunch) stays a follow-up, never a
+ *  mis-mapped placeholder. (Owner druid review round.) */
+export interface AbilityAudioOverride {
+  /** Reroute the release whoosh to this palette's rel_ family (RELEASE_FAMILY
+   *  key). The green wrath bolt whooshes like storm-wind, not a fire crackle. */
+  release?: string;
+  /** Force this impact pack id instead of the palette's imp_ identity. */
+  impact?: string;
+  /** Scale the impact weight up (>1, a heavier landing) or down (<1, tone a
+   *  slam down) relative to the spec power. */
+  impactPower?: number;
+}
+
+export const ABILITY_AUDIO_OVERRIDES: Readonly<Record<string, AbilityAudioOverride>> = {
+  // A wind bolt, not a fire spell: the green coil stays, the whoosh goes windy.
+  wrath: { release: 'storm' },
+  // Interim cold-water rush until a true water-rush sample exists (follow-up):
+  // frost reads as rushing cold air/water, never fire.
+  typhoon: { release: 'frost' },
+  // The stellar finisher was landing underwhelming - let the moon impact hit
+  // with real weight.
+  starfire: { impactPower: 1.9 },
+  // A blunt interrupt should THUMP: drive the physical body/sub harder.
+  skull_bash: { impactPower: 1.7 },
+  // The paw slam was over the top - pull the landing back down.
+  maul: { impactPower: 0.68 },
+};
+
 /** Per-take peak normalization at decode (gallery loadPack): pull every take
  *  to a consistent 0.8 peak so the category mix stays predictable, capped so
  *  a near-silent render can never be boosted into noise. */

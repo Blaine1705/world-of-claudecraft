@@ -148,6 +148,7 @@ export interface SequencerHost {
       buffStyle?: string;
       sample?: string;
       name?: string;
+      abilityId?: string;
     },
   ): void;
   // Ghost-creature apparition (spirits.ts): fired once at impact when the
@@ -795,6 +796,7 @@ export class ArchetypeSequencer {
       host.abilityAudio?.('release', spec.palette, slot.power, caster.x, caster.y, caster.z, {
         lite: spec.impact?.liteAudio === true || slot.tier >= 1,
         archetype: spec.archetype,
+        abilityId: slot.abilityId,
       });
     }
     // release-phase motifs (bladestorm whirl, implosion pull-in); tier 1 still
@@ -826,6 +828,7 @@ export class ArchetypeSequencer {
       archetype: arch,
       buffStyle: spec.buff?.style,
       sample: o.sample,
+      abilityId: slot.abilityId,
     });
     let n = 0;
     // hero impact sheet (gallery impactStack fires the flipbook first): the

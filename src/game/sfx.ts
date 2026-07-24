@@ -12,6 +12,7 @@
 import { apiUrl } from '../client_origin';
 import type { BiomeId } from '../sim/types';
 import {
+  ABILITY_AUDIO_OVERRIDES,
   abilitySfxSamples,
   buildBeefChain,
   buildSoftChain,
@@ -897,6 +898,7 @@ class Sfx {
       buffStyle?: string;
       sample?: string;
       name?: string;
+      abilityId?: string;
     },
   ): void {
     const ctx = this.ctx,
@@ -948,7 +950,7 @@ class Sfx {
           this.windupMoment(out, now, palette, power);
           break;
         case 'release':
-          this.releaseMoment(out, now, palette, power, arch);
+          this.releaseMoment(out, now, palette, power, arch, opts?.abilityId);
           break;
         case 'impact':
           this.impactMoment(out, now, palette, power, lite, arch, opts);
@@ -1111,6 +1113,7 @@ class Sfx {
     palette: string,
     power: number,
     arch: string,
+    abilityId?: string,
   ): void {
     if (arch === 'dash') {
       if (this.samplePlay(out, t, 'dash', { gain: 0.8, beef: 0.2 })) return;
@@ -1124,13 +1127,20 @@ class Sfx {
       ) {
         return;
       }
-    } else if (
-      this.samplePlay(out, t, `rel_${RELEASE_FAMILY[palette] ?? 'arcane'}`, {
-        gain: 0.85,
-        beef: 0.18,
-      })
-    ) {
-      return;
+    } else {
+      // a per-ability override reroutes the whoosh family (a green nature bolt
+      // that must sound like wind, not a fire crackle); the visual is untouched
+      const relPalette = abilityId
+        ? (ABILITY_AUDIO_OVERRIDES[abilityId]?.release ?? palette)
+        : palette;
+      if (
+        this.samplePlay(out, t, `rel_${RELEASE_FAMILY[relPalette] ?? 'arcane'}`, {
+          gain: 0.85,
+          beef: 0.18,
+        })
+      ) {
+        return;
+      }
     }
     this.abilityRelease(out, t, power);
   }
@@ -1146,9 +1156,13 @@ class Sfx {
     power: number,
     lite: boolean,
     arch: string,
-    opts?: { finisher?: boolean; buffStyle?: string; sample?: string },
+    opts?: { finisher?: boolean; buffStyle?: string; sample?: string; abilityId?: string },
   ): void {
-    const bespoke = opts?.sample;
+    // per-ability override (audio-only): a forced impact id and/or a weight
+    // scale that leaves the visual palette/color untouched
+    const ov = opts?.abilityId ? ABILITY_AUDIO_OVERRIDES[opts.abilityId] : undefined;
+    const bespoke = ov?.impact ?? opts?.sample;
+    const impactMul = ov?.impactPower ?? 1;
     const finisher = opts?.finisher === true;
     if (arch === 'heal') {
       // spec-authored bespoke id first (the temporal chime), then the school pair
@@ -1195,8 +1209,11 @@ class Sfx {
     }
     // the palette identity: the recording carries the character (a
     // spec-authored bespoke id wins when the pack carries it); synthesis
-    // keeps supplying what recordings can't — sub weight, finisher toll
-    const I = Math.min(1.5, power) * (lite ? 0.6 : 1);
+    // keeps supplying what recordings can't - sub weight, finisher toll.
+    // impactMul lets an override land heavier (a soft finisher that needed to
+    // hit) or softer (an over-the-top slam toned down) - the 1.8 cap only bites
+    // when a >1 override pushes past the normal 1.5 ceiling.
+    const I = Math.min(1.8, power * impactMul) * (lite ? 0.6 : 1);
     const d = finisher ? 0.035 : 0; // pre-gap: silence, then the hit
     const id = bespoke && abilitySfxSamples.has(bespoke) ? bespoke : `imp_${palette}`;
     if (
