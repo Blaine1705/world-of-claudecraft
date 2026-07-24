@@ -173,7 +173,7 @@ import {
   type CraftTierUp,
   observeCraftSkillsForTierUps,
 } from './craft_celebration_view';
-import { buildCraftingView, craftLearnHints } from './crafting_view';
+import { buildCraftingView, craftingReagentSig, craftLearnHints } from './crafting_view';
 import { renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
@@ -1307,6 +1307,13 @@ export class Hud {
   // (walking into/out of a station, or the own mobile station expiring); the
   // server re-validates the gate on every craft anyway.
   private lastCraftingStationSig = '';
+  // Signature of the bag as of the last crafting-window paint (#2375). The
+  // Craft gate is inventory-derived, so an open window goes stale on ANY bag
+  // change (a vendor buy, loot, mail, trade, bank withdraw, quest reward);
+  // refreshOpenCraftingIfReagentsChanged diffs the live bag against this and
+  // repaints only on a real move. Same cold-painter posture as the station
+  // signature above: never a per-frame repaint.
+  private lastCraftingReagentSig = '';
   // Character and Crafting are cold painters. Diff the local crafting
   // identity plus the gathering proficiency rows on the slow band so a late
   // online cprof or professions snapshot replaces stale archetype art/title
@@ -7132,6 +7139,11 @@ export class Hud {
         ) !== this.lastCraftingStationSig
       )
         this.renderCrafting();
+      // Bag staleness (#2375): the same cold-painter treatment for the other
+      // half of the Craft gate. This is the ONE edge that covers every bag
+      // source in BOTH hosts (loot, mail, trade, bank, quest reward), so the
+      // window can never sit disabled on reagents the player is holding.
+      this.refreshOpenCraftingIfReagentsChanged();
     }
 
     // player frame: the first instance of the unit_frame family. Build a
@@ -11383,6 +11395,10 @@ export class Hud {
       buy();
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.renderVendor();
+      // The issue #2375 repro: buying the last reagent with the crafting
+      // window open must enable the row on the click, not on the next slow
+      // tick (offline has no authoritative-delta hook to ride).
+      this.refreshOpenCraftingIfReagentsChanged();
     };
     renderVendorWindow(
       $('#vendor-window'),
@@ -11683,6 +11699,9 @@ export class Hud {
       this.sim.activeMobileStationCraft,
     );
     this.lastCraftingStationSig = stationTypesSignature(inRangeStations);
+    // Re-arm the bag diff on EVERY paint, whatever caused it, so a repaint
+    // from one edge never leaves another edge owing a second one (#2375).
+    this.lastCraftingReagentSig = craftingReagentSig(this.sim.inventory, this.sim.player.name);
     // The window lists only KNOWN recipes, so an unlearned trainer
     // recipe never renders as a craftable row (it surfaces in the Train
     // ladder instead). The SAME viewer-side predicate the ladder's known
@@ -11980,6 +11999,26 @@ export class Hud {
     if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null) this.renderVendor();
     this.renderCharIfOpen();
+    // The crafting window rides this hook too (#2375): it is the online
+    // host's instant edge for an authoritative delta, and offline it is what
+    // the bank window raises on a withdraw. Every other offline bag source
+    // converges on the slow band instead.
+    this.refreshOpenCraftingIfReagentsChanged();
+  }
+
+  /**
+   * Repaint an OPEN crafting window when the bag facts behind its Craft gate
+   * actually moved (issue #2375). Cheap enough for the slow band and for every
+   * inventory delta: the window has to be open before the signature is built
+   * at all, and an unchanged bag never reaches the painter.
+   */
+  private refreshOpenCraftingIfReagentsChanged(): void {
+    if ($('#crafting-window').style.display !== 'flex') return;
+    if (
+      craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig
+    )
+      return;
+    this.renderCrafting();
   }
 
   onCosmeticsChanged(): void {
