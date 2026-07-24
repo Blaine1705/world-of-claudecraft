@@ -42,6 +42,7 @@ import {
   REQUEST_TIMEOUT_MS,
 } from '../../server/http/server_timeouts';
 import { DEFAULT_JSON_BODY_MAX_BYTES } from '../../server/http_util';
+import { LIST_READ_BURST, LIST_READ_REFILL_PER_SECOND } from '../../server/list_read_guard';
 import {
   MSG_LANE_CHAT_BURST,
   MSG_LANE_CHAT_REFILL_PER_SECOND,
@@ -332,6 +333,11 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(MSG_LANE_COMMAND_BURST).toBe(60);
     expect(MSG_LANE_CHAT_REFILL_PER_SECOND).toBe(4);
     expect(MSG_LANE_CHAT_BURST).toBe(8);
+  });
+
+  it('list-read guard constants', () => {
+    expect(LIST_READ_BURST).toBe(10);
+    expect(LIST_READ_REFILL_PER_SECOND).toBe(1);
   });
 });
 

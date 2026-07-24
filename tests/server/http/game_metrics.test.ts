@@ -209,7 +209,14 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       expect(text).toContain(`# TYPE ${name} counter`);
     }
 
-    expect(WS_DROP_CAUSES).toEqual(['rate', 'bytes', 'lane_movement', 'lane_command', 'lane_chat']);
+    expect(WS_DROP_CAUSES).toEqual([
+      'rate',
+      'bytes',
+      'lane_movement',
+      'lane_command',
+      'lane_chat',
+      'list_read',
+    ]);
     for (const cause of WS_DROP_CAUSES) {
       expect(
         sampleValue(
@@ -231,6 +238,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     counters.wsMessageDropped('bytes');
     counters.wsMessageDropped('lane_movement');
     counters.wsMessageDropped('lane_chat');
+    counters.wsMessageDropped('list_read');
     counters.wsRateKick();
     // The seq-gap sink adds the whole observed gap, not one per call.
     counters.wsInputSeqGap(7);
@@ -248,11 +256,14 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(sampleValue(text, /^woc_ws_messages_dropped_total\{cause="lane_chat"\} (\d+)$/m)).toBe(
       '1',
     );
+    expect(sampleValue(text, /^woc_ws_messages_dropped_total\{cause="list_read"\} (\d+)$/m)).toBe(
+      '1',
+    );
     expect(sampleValue(text, /^woc_ws_rate_kicks_total (\d+)$/m)).toBe('1');
     expect(sampleValue(text, /^woc_input_frames_missed_total (\d+)$/m)).toBe('9');
   });
 
-  it('keeps the cause label bounded to the fixed five values', async () => {
+  it('keeps the cause label bounded to the fixed six values', async () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
     counters.wsMessageDropped('rate');

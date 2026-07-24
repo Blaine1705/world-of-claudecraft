@@ -591,6 +591,28 @@ describe('inbound drop, kick, and seq-gap counters at their emission sites', () 
     server.stop();
   });
 
+  it('emits cause list read for a guarded readout refusal', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const host = server as unknown as {
+      social: { ignoreList: (actor: unknown) => Promise<void> };
+    };
+    const listSpy = vi.spyOn(host.social, 'ignoreList').mockResolvedValue(undefined);
+
+    // One readout past the guard burst at one instant: the refusal emits the
+    // list_read cause and returns before the DB read (the phase 06 maintainer
+    // ruling); the ten passed readouts ran their reads.
+    for (let i = 0; i < 11; i++) {
+      server.handleMessage(session, chatFrame('/ignorelist'));
+    }
+    expect(rec.dropped).toEqual(['list_read']);
+    expect(listSpy).toHaveBeenCalledTimes(10);
+    expect(rec.rateKicks()).toBe(0);
+    server.stop();
+  });
+
   it('counts a lane-driven kick through the same kick counter', () => {
     const server = new GameServer();
     const rec = recordingSink();

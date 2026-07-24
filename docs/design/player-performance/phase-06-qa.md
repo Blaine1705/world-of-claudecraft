@@ -6,6 +6,13 @@ Status: COMPLETE. All acceptance checks below passed on 2026-07-24. The packet
 is CLOSED pending the maintainer's push and PR decision; the branch stays
 local per the plan header.
 
+ADDENDUM, same day, after the maintainer's ruling: the security review's
+list-read finding (below) was RESOLVED IN-PACKET on the maintainer's explicit
+choice of the read-guard option. See "Addendum: the list-read guard" at the
+end of this file; the plan doc's packet-level notes carry the ruling record.
+The reviewer-findings entry for the WARNING below is superseded from RECORDED
+to RESOLVED by that addendum.
+
 Base check (R1): at execution time origin/release/v0.30.0 still tips at
 802f2fc78 (this branch's base), no newer release branch exists, and packet 0
 (cf3412e66) is NOT merged anywhere on origin, so no release merge and no
@@ -172,12 +179,11 @@ docs. No blocking finding anywhere; every finding applied or recorded.
 
 ## Adversarial pass: what is missing at the packet level
 
-- The list-read flood lever above is the one open consequence of this
-  packet's own ceiling raise, recorded but unfixed pending the maintainer's
-  ruling on R5's ordering. Until then the flood posture claim must be read
-  as: every DROPPED-traffic flood is score-kickable; the list-read path is
-  under-ceiling ALLOWED traffic whose cost is per-frame DB work, bounded
-  only by the ceiling itself.
+- The list-read flood lever above was the one open consequence of this
+  packet's own ceiling raise; it is now CLOSED by the addendum below (the
+  maintainer's same-day ruling chose the read guard). With it, the flood
+  posture claim holds uniformly: every flood class this packet knows about,
+  gate, lane, or list-read, is score-kickable through the one shared window.
 - The client-side surfacing of drop counts (the perf-report beacon field)
   stays DEFERRED until packet 0 merges (R9); the /metrics counters are the
   fleet surface this packet ships.
@@ -203,3 +209,75 @@ docs. No blocking finding anywhere; every finding applied or recorded.
   only in process memory (R2's deliberate resume carry), so a deploy
   restart resets all buckets, which is fine because the contract is
   per-connection flood defense, not persistent reputation.
+
+## Addendum: the list-read guard (maintainer ruling, 2026-07-24)
+
+The maintainer ruled on the security WARNING the same day and chose the
+read-guard option over an in-session cache or deferral. What landed:
+
+- NEW `server/list_read_guard.ts` (same purity contract as the gate and the
+  lanes: pure state plus functions, injected nowSec): `LIST_READ_BURST` 10,
+  `LIST_READ_REFILL_PER_SECOND` 1, `createListReadGuard`,
+  `consumeListReadToken` (a refusal spends nothing). The budget is far above
+  any human rate (the readouts are manual slash commands) and caps a flooder
+  at one DB read per second sustained.
+- `server/game.ts` (thin consumer edits): `ClientSession` gains
+  `listReadGuard` seeded at join and carried by resume like `msgRate` and
+  `msgLanes`; a `consumeListRead` helper mirrors `consumeLane` (counter,
+  shared-window tally, same kick arm and literal);
+  `handleChatFilterCommand` gains the injected `nowSec` and draws the guard
+  at the TOP of the collapsed ignoreList/blockList read arm, so a refusal
+  returns handled BEFORE the DB read. Writes keep their ladder metering,
+  the moderation router stays upstream, no chat token is drawn: R5's letter
+  is intact, and the if-chain shape is preserved (the command_schema scraper
+  sees no new case labels; its suite stays green).
+- `server/http/game_signals.ts` + `server/http/game_metrics.ts`: the R8
+  cause vocabulary is AMENDED from five to six: `WS_DROP_CAUSES` gains
+  `'list_read'`, pre-registered at zero at boot like the rest; comments
+  updated on both files.
+- Tests: NEW `tests/list_read_guard.test.ts` (6 unit arms: constants
+  against disagreeing literals, exact burst, refusal-spends-nothing,
+  whole-token boundary, idle cap, backwards-clock clamp); two seam arms in
+  `tests/msg_lanes.test.ts` (twelve readouts pass exactly ten with the two
+  refusals tallied before the read and writes plus plain chat untouched; a
+  45 per second readout flood, previously structurally unkickable, kicks
+  through the shared window with the exact frame and teardown); the
+  `'list_read'` cause arm in `tests/game_state_metrics.test.ts` (refusal
+  emits the cause, the DB read never runs for it, zero kicks); the
+  six-value `WS_DROP_CAUSES` pins and sink increment in
+  `tests/server/http/game_metrics.test.ts`; the "list-read guard constants"
+  row in `tests/server/tunables.test.ts`. The pre-existing ten-readout
+  chat-exhaustion arm sits exactly at the guard burst and stays green
+  UNEDITED, which is the R5-compatibility proof.
+- Mutation check, reverted after: guard budget inflated 10/1 to 1000/1000;
+  exactly 6 tests failed (both constants pins, the whole-token arm, both
+  seam arms, and the cause arm), proving every new pin decisive against a
+  guard that cannot refuse.
+- Reviewer pass over the addendum diff, two fresh read-only agents:
+  privacy-security-review found NO finding at any actionable severity (the
+  lever verified closed against parseChatFilterCommand's full vocabulary
+  with no other unmetered pre-lane DB read; the silent refusal endorsed as
+  the correct choice since a per-refusal send would be a reflected-send
+  amplification vector; kick path, nowSec basis, resume carry, and
+  cardinality all verified). test-coverage-auditor found every claimed
+  behavior decisively pinned except one low should-fix, RESOLVED: a new
+  "carries the drained list-read guard across a linkdead resume" arm
+  drives the REAL socketClosed plus join resume path and pins the drained
+  bucket surviving reconnect (the R2 carry). Its comment nit is applied
+  (the pre-existing ten-readout arm now notes it sits exactly AT the guard
+  burst, so a lowered burst fails there first, deliberately); its INFO
+  (blockList drop-before-read covered transitively through the shared
+  single-call site) recorded, no action.
+- The R10 lockstep guard caught the addendum, by design: the third full
+  gate run FAILED on exactly one test, the localization_fixes R3 arm
+  pinning EXACTLY TWO `kickSession(session, MSG_RATE_KICK_REASON,
+  'message flood')` sites, because consumeListRead legitimately added a
+  third. That selectivity is the pin's whole purpose (a new kick site must
+  consciously join the lockstep), so the pin was updated to three arms
+  with the guard site named in its comment, and the title reworded to
+  "all three kick sites". Nothing else in the 18,997-test run failed.
+- Verification: tsc clean; the affected suites green (the seam suite at 34
+  tests after the resume-carry arm; localization_fixes and main_api_error
+  green after the pin update); biome clean on the touched files (plus the
+  one import-order assist fix in game.ts); full `npm run gate` re-run
+  green end to end on the final tree.

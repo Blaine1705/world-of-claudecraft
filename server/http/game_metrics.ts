@@ -16,7 +16,7 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values are the fixed tick-phase names, the two per-phase stats
-// (p95, max), the two ws directions (in, out), and the fixed five inbound drop
+// (p95, max), the two ws directions (in, out), and the fixed six inbound drop
 // causes (WS_DROP_CAUSES). Nothing per-player (account id,
 // character id, name, ip) is ever a label. The tick-phase series count is fixed at
 // WOC_TICK_PHASES.length * 2, independent of the profiler's internal phase set.
@@ -50,7 +50,7 @@ export const WOC_SIM_TICK_PHASE_SECONDS = 'woc_sim_tick_phase_seconds';
 /** Total ws frames handled, labeled by direction (in/out). */
 export const WOC_WS_MESSAGES_TOTAL = 'woc_ws_messages_total';
 
-/** Total inbound ws frames dropped by the gate or a lane, labeled by cause. */
+/** Total inbound ws frames dropped by the gate, a lane, or the list-read guard, by cause. */
 export const WOC_WS_MESSAGES_DROPPED_TOTAL = 'woc_ws_messages_dropped_total';
 
 /** Total sessions kicked by the inbound-flood abuse window. */
@@ -220,7 +220,7 @@ export function registerGameStateMetrics(
 
   const wsMessagesDropped = new Counter({
     name: WOC_WS_MESSAGES_DROPPED_TOTAL,
-    help: 'Total inbound ws frames dropped by the pre-parse gate or a post-parse lane, by cause.',
+    help: 'Total inbound ws frames dropped by the gate, a lane, or the list-read guard, by cause.',
     labelNames: ['cause'],
     registers: [registry],
   });

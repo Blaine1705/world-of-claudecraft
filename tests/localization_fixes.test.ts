@@ -720,7 +720,7 @@ describe("R3: the flood-kick reason maps to the client matcher's exact bytes", (
   const stripComments = (src: string) =>
     src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
-  it('binds the server kick literal to its userFacingApiError arm and both limiter kick sites', () => {
+  it('binds the server kick literal to its userFacingApiError arm and all three kick sites', () => {
     const limiterSrc = stripComments(
       fs.readFileSync(path.resolve(process.cwd(), 'server/msg_rate_limit.ts'), 'utf8'),
     );
@@ -731,17 +731,20 @@ describe("R3: the flood-kick reason maps to the client matcher's exact bytes", (
     // and must update this pin, the matcher arm, and the frame pins together.
     expect(exported?.[1]).toBe('message rate exceeded');
 
-    // Both limiter kick arms (the pre-parse gate in handleMessage and the
-    // post-parse lane path in consumeLane) pass the CONSTANT, never an inline
-    // literal, with the grep-ability 'message flood' leaveReason label; the
-    // anti-bot kick keeps its deliberately vague literal pair, byte-untouched.
+    // All three flood kick arms (the pre-parse gate in handleMessage, the
+    // post-parse lane path in consumeLane, and the list-read guard path in
+    // consumeListRead per the phase 06 maintainer ruling) pass the CONSTANT,
+    // never an inline literal, with the grep-ability 'message flood'
+    // leaveReason label; the anti-bot kick keeps its deliberately vague
+    // literal pair, byte-untouched. The exact count keeps this pin selective:
+    // a NEW kick site must consciously join it.
     const gameSrc = stripComments(
       fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8'),
     );
     const kickArms = gameSrc.match(
       /kickSession\(session, MSG_RATE_KICK_REASON, 'message flood'\)/g,
     );
-    expect(kickArms, 'both limiter kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(2);
+    expect(kickArms, 'all three flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(3);
     expect(gameSrc).toContain("kickSession(session, 'rejected by server', 'disconnected')");
 
     // The matcher arm recognizes the same bytes and returns the loading key. A

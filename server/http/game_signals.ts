@@ -16,17 +16,18 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two) and the
-// inbound drop cause (the fixed five-value WS_DROP_CAUSES set). Nothing
+// inbound drop cause (the fixed six-value WS_DROP_CAUSES set). Nothing
 // per-player (account id, character id, name, ip) is ever passed as a label.
 
 /** The two directions a ws frame is counted under: client-to-server or server-to-client. */
 export type WsMessageDirection = 'in' | 'out';
 
 /**
- * The fixed five causes an inbound ws frame can be dropped for: the two
- * pre-parse gate causes (server/msg_rate_limit.ts) and the three post-parse
- * lanes (server/msg_lanes.ts). This closed set IS the cause label's whole
- * vocabulary; it never grows per-player or per-message.
+ * The fixed six causes an inbound ws frame can be dropped for: the two
+ * pre-parse gate causes (server/msg_rate_limit.ts), the three post-parse
+ * lanes (server/msg_lanes.ts), and the list-read guard on the ignore/block
+ * readouts (server/list_read_guard.ts). This closed set IS the cause label's
+ * whole vocabulary; it never grows per-player or per-message.
  */
 export const WS_DROP_CAUSES = [
   'rate',
@@ -34,9 +35,10 @@ export const WS_DROP_CAUSES = [
   'lane_movement',
   'lane_command',
   'lane_chat',
+  'list_read',
 ] as const;
 
-/** One of the fixed five inbound drop causes. */
+/** One of the fixed six inbound drop causes. */
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 
 /**
@@ -47,7 +49,7 @@ export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 export interface GameMetricsCounters {
   /** One ws frame handled, in the given direction. */
   wsMessage(direction: WsMessageDirection): void;
-  /** One inbound ws frame dropped by the pre-parse gate or a post-parse lane. */
+  /** One inbound ws frame dropped by the gate, a lane, or the list-read guard. */
   wsMessageDropped(cause: WsDropCause): void;
   /** One session kicked by the inbound-flood abuse window (gate or lane driven). */
   wsRateKick(): void;

@@ -159,6 +159,11 @@ import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed } from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
+import {
+  consumeListReadToken,
+  createListReadGuard,
+  type ListReadGuardState,
+} from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { trackReachedLevel5 } from './meta_capi';
 import {
@@ -667,6 +672,11 @@ export interface ClientSession {
   // bucket above, so one class can never starve another; lane drops tally
   // into msgRate's abuse window (R6).
   msgLanes: MsgLaneState;
+  // The ignore/block list-readout bucket (the phase 06 maintainer ruling):
+  // the readouts stay chat-token-free per R5 but are per-call DB reads, so
+  // refusals above the far-above-human budget drop and tally into the same
+  // abuse window.
+  listReadGuard: ListReadGuardState;
   chatMutedUntil: number | null;
   chatMuteReason: string;
   // Hard-word enforcement strike count driving the mute ladder. Account-scoped:
@@ -2777,6 +2787,7 @@ export class GameServer {
       chatCooldownUntil: 0,
       msgRate: createMsgRateBucket(Date.now() / 1000),
       msgLanes: createMsgLanes(Date.now() / 1000),
+      listReadGuard: createListReadGuard(Date.now() / 1000),
       chatMutedUntil: meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null,
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
@@ -3918,6 +3929,22 @@ export class GameServer {
     return false;
   }
 
+  /** Draw a list-read guard token (the phase 06 maintainer ruling): the
+   *  ignore/block list readouts stay chat-token-free per R5, but each is a
+   *  live DB read, so a refusal above the far-above-human budget drops the
+   *  readout and tallies into the same abuse window as every other shed
+   *  frame, making a sustained read flood kickable. Returns whether to run
+   *  the readout. */
+  private consumeListRead(session: ClientSession, nowSec: number): boolean {
+    if (consumeListReadToken(session.listReadGuard, nowSec)) return true;
+    gameMetricsCounters().wsMessageDropped('list_read');
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+    }
+    return false;
+  }
+
   private dispatchMessage(
     session: ClientSession,
     rawMsg: unknown,
@@ -4387,8 +4414,9 @@ export class GameServer {
         // their own lists, and a list readout must not burn a chat token toward
         // the rate-limit cooldown. Deliberately AFTER the moderation router, so
         // the ADMIN "/mute" is always claimed as the account silence and can
-        // never be shadowed by a player command.
-        if (this.handleChatFilterCommand(session, text)) break;
+        // never be shadowed by a player command. The two list READOUTS carry
+        // their own DB-read guard inside (the phase 06 maintainer ruling).
+        if (this.handleChatFilterCommand(session, text, receivedAtMs / 1000)) break;
         if (this.isChatMuted(session)) break;
         // The chat lane is a pre-guard CO-LOCATED with the ladder, not at the
         // case entry (R5): the moderation router and the ignore/block/filter
@@ -6489,14 +6517,16 @@ export class GameServer {
   // of them and has been handled, so the caller stops before the chat pipeline
   // treats it as something to broadcast. The ADMIN /mute is a different command
   // entirely and is claimed earlier, by the moderation router.
-  private handleChatFilterCommand(session: ClientSession, text: string): boolean {
+  private handleChatFilterCommand(session: ClientSession, text: string, nowSec: number): boolean {
     const parsed = parseChatFilterCommand(text);
     if (!parsed) return false;
     const actor = this.actorFor(session);
 
-    // The two list commands are reads and stay free: they must work even for a
-    // GM-silenced player, and echoing your own list back must never burn a token
-    // toward the chat cooldown. The four WRITE commands each cost a chat token:
+    // The two list commands are reads and stay chat-token-free: they must work
+    // even for a GM-silenced player, and echoing your own list back must never
+    // burn a token toward the chat cooldown. Each readout is a live DB read
+    // though, so it draws from the dedicated list-read guard below (the phase
+    // 06 maintainer ruling). The four WRITE commands each cost a chat token:
     // they INSERT/DELETE and then push a full social snapshot, so they are the
     // most expensive thing on the chat path and must not be the one thing on it
     // that is unmetered.
@@ -6508,10 +6538,10 @@ export class GameServer {
     // as phantom wire commands and fail the gate.
     const logErr = (err: unknown) => console.error('ignore/block command failed:', err);
     const kind = parsed.kind;
-    if (kind === 'ignoreList') {
-      void this.social.ignoreList(actor).catch(logErr);
-    } else if (kind === 'blockList') {
-      void this.social.blockList(actor).catch(logErr);
+    if (kind === 'ignoreList' || kind === 'blockList') {
+      if (!this.consumeListRead(session, nowSec)) return true;
+      if (kind === 'ignoreList') void this.social.ignoreList(actor).catch(logErr);
+      else void this.social.blockList(actor).catch(logErr);
     } else if (kind === 'ignore') {
       if (!parsed.name) this.sendChatNotice(session, IGNORE_USAGE);
       else void this.social.ignoreAdd(actor, parsed.name).catch(logErr);

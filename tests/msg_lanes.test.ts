@@ -5,7 +5,9 @@
 // reserved-lane properties hold in both directions, exempt frames never
 // compete for tokens, command drops are observe-then-drop while movement
 // drops are drop-before-observe, and lane drops tally into the pre-parse
-// gate's shared abuse window (R6) all the way to the kick verdict.
+// gate's shared abuse window (R6) all the way to the kick verdict. The
+// list-read guard's seam pins (server/list_read_guard.ts, the phase 06
+// maintainer ruling) live here too, beside the other chat-surface pins.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -400,7 +402,9 @@ describe('dispatchMessage lane wiring at the R5 placements', () => {
 
     // A burst of list readouts and moderation commands rides ABOVE the lane
     // check (the router and filter management stay unthrottled): every one is
-    // handled and none tallies a drop.
+    // handled and none tallies a drop. Ten readouts sit exactly AT the
+    // list-read guard burst, so this arm exercises the lane bypass, not the
+    // guard; a lowered guard burst would fail here first, deliberately.
     for (let i = 0; i < 10; i++) sendChat(server, session, '/ignorelist');
     expect(ignoreSpy).toHaveBeenCalledTimes(10);
     moderationSpy.mockClear();
@@ -564,6 +568,91 @@ describe('dispatchMessage lane wiring at the R5 placements', () => {
     for (let i = 0; i < 45 * 8 && !session.left; i++) {
       vi.setSystemTime(T0 + Math.floor((i * 1000) / 45));
       sendChat(server, session, 'hello there');
+    }
+
+    expect(session.left).toBe(true);
+    expect(server.clients.has(session.pid)).toBe(false);
+    expect(ws.send).toHaveBeenCalledWith(
+      JSON.stringify({ t: 'error', error: 'message rate exceeded' }),
+    );
+    expect(ws.close).toHaveBeenCalled();
+  });
+
+  it('guards the list readouts above the read budget and returns before the read', () => {
+    const server = new GameServer();
+    const session = join(server);
+    sinkDetector(server);
+    const host = server as unknown as {
+      social: {
+        ignoreList: (actor: unknown) => Promise<void>;
+        ignoreAdd: (actor: unknown, name: string) => Promise<void>;
+      };
+    };
+    const listSpy = vi.spyOn(host.social, 'ignoreList').mockResolvedValue(undefined);
+    const addSpy = vi.spyOn(host.social, 'ignoreAdd').mockResolvedValue(undefined);
+
+    // Twelve readouts at one instant: the guard passes exactly its burst of
+    // ten and refuses the two above it BEFORE the DB read runs, each refusal
+    // tallying into the shared abuse window (the phase 06 maintainer ruling).
+    for (let i = 0; i < 12; i++) sendChat(server, session, '/ignorelist');
+    expect(listSpy).toHaveBeenCalledTimes(10);
+    expect(session.msgRate.dropsThisSecond).toBe(2);
+
+    // The guard is read-scoped: a WRITE still runs (its metering is the
+    // ladder token, untouched), and a plain chat line still rides the lane
+    // and ladder with no further drops.
+    sendChat(server, session, '/ignore Somebody');
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    sendChat(server, session, 'hello there');
+    expect(session.msgRate.dropsThisSecond).toBe(2);
+  });
+
+  it('carries the drained list-read guard across a linkdead resume', () => {
+    const server = new GameServer();
+    const session = join(server);
+    sinkDetector(server);
+    const host = server as unknown as {
+      social: { ignoreList: (actor: unknown) => Promise<void> };
+    };
+    const listSpy = vi.spyOn(host.social, 'ignoreList').mockResolvedValue(undefined);
+
+    // Drain the guard, go linkdead, and resume through the REAL join path:
+    // the same session object keeps the drained bucket (the R2 carry, the
+    // exact lifecycle of msgRate and msgLanes), so a reconnect can never
+    // reset the read budget.
+    for (let i = 0; i < 10; i++) sendChat(server, session, '/ignorelist');
+    expect(listSpy).toHaveBeenCalledTimes(10);
+    server.socketClosed(session, session.ws as never);
+    expect(session.linkdead).toBe(true);
+    const resumed = join(server);
+    expect(resumed).toBe(session);
+
+    sendChat(server, session, '/ignorelist');
+    expect(listSpy).toHaveBeenCalledTimes(10);
+    expect(session.msgRate.dropsThisSecond).toBe(1);
+  });
+
+  it('kicks a sustained list-read flood through the same shared abuse window', () => {
+    const server = new GameServer();
+    const session = join(server);
+    sinkDetector(server);
+    const host = server as unknown as {
+      social: { blockList: (actor: unknown) => Promise<void> };
+    };
+    vi.spyOn(host.social, 'blockList').mockResolvedValue(undefined);
+    const ws = session.ws as unknown as {
+      send: ReturnType<typeof vi.fn>;
+      close: ReturnType<typeof vi.fn>;
+    };
+
+    // A 45 per second readout flood sits far under the pre-parse gate, so
+    // before the guard this stream was structurally unkickable: it booked
+    // zero drops. Now every refusal is the guard's, about 34 or more per
+    // receive-time second, and the shared window kicks it like any other
+    // flood (the phase 06 maintainer ruling).
+    for (let i = 0; i < 45 * 8 && !session.left; i++) {
+      vi.setSystemTime(T0 + Math.floor((i * 1000) / 45));
+      sendChat(server, session, '/blocklist');
     }
 
     expect(session.left).toBe(true);
