@@ -2775,7 +2775,15 @@ export class ClientWorld implements IWorld {
       // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
       // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
       // the move; the offline counterpart is src/sim/items.ts.
-      this.copper = s.copper ?? 0;
+      // A money-only delta carries no inventory echo at all (a proceeds-only market
+      // collect, a trainer fee, a bank slot buy all move meta.copper and nothing else),
+      // so without this the bag money row and vendor affordability sat stale until the
+      // window was reopened (#2373). DIFF against the prior mirror, never a presence
+      // test: copper rides EVERY self-frame, so `s.copper !== undefined` would raise the
+      // flag at 20 Hz and rebuild the bags under the player's cursor continuously.
+      const copper = s.copper ?? 0;
+      if (copper !== this.copper) this.invChanged = true;
+      this.copper = copper;
       if (s.inv !== undefined) {
         this.inventory = s.inv;
         this.invChanged = true;
