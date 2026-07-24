@@ -4380,14 +4380,17 @@ function professionsCraft(seed = 21): Scenario {
 // the recorded run with all 102 casts resolving: no bags-full denial and no
 // cast-cancelling interference; only the found literal is pinned here.
 function professionsGather(seed = 1): Scenario {
-  // Worst-case gather cast: tier-1 node, bare hands, band 0. Shorter casts
-  // (band reductions as proficiency accrues) still complete inside this
-  // fixed window; surplus ticks are plain world ticks.
+  // Worst-case gather cast: tier-1 node, tier-1 tool, band 0 (#2343: every
+  // harvest needs the matching tool; a tier-1 tool at a tier-1 node keeps
+  // the full base duration). Shorter casts (band reductions as proficiency
+  // accrues) still complete inside this fixed window; surplus ticks are
+  // plain world ticks.
   const castTicks = Math.ceil(gatherCastDurationSec(1, 1, 0) / DT) + 1;
   return {
     name: 'professions_gather',
     coverage: [
       'class:warrior (gatherer)',
+      'tier-1 tools in bags satisfy the #2343 always-require-tool gate',
       'gather cast start: harvestNode begins the cast draw-free',
       'granted harvest at cast completion: exactly two rng draws (rarity roll then rare-event roll)',
       'cooldown denial: zero rng draws, no cast',
@@ -4416,6 +4419,13 @@ function professionsGather(seed = 1): Scenario {
         e.corpseTimer = 9999;
         e.inCombat = false;
       }
+
+      // The three tier-1 tools (#2343: every node harvest needs its
+      // profession's tool in bags). addItem draws no rng, so the grant is
+      // digest-invisible beyond the sampled inventory contents.
+      sim.addItem('copper_mining_pick', 1, pid);
+      sim.addItem('handaxe', 1, pid);
+      sim.addItem('gathering_sickle', 1, pid);
 
       // Step 1: proficiency-0 ore harvest (common, fungible grant, resolved
       // at cast completion on the tick path) plus a post-completion second
@@ -4453,9 +4463,14 @@ function professionsGather(seed = 1): Scenario {
       teleport(sim, p, -86, 90); // herb_eastbrook_1
       for (let i = 0; i < 100; i++) {
         meta.gatheringProficiency.herbalism = 0;
-        meta.inventory = meta.inventory
-          .filter((s: any) => s.instance?.signer !== undefined)
-          .slice(-8);
+        // The retention filter keeps the three tools (ahead of the gate,
+        // #2343) plus the newest eight signed instances, shedding the
+        // accumulating common stacks exactly as before.
+        const TOOL_IDS = ['copper_mining_pick', 'handaxe', 'gathering_sickle'];
+        meta.inventory = [
+          ...meta.inventory.filter((s: any) => TOOL_IDS.includes(s.itemId)),
+          ...meta.inventory.filter((s: any) => s.instance?.signer !== undefined).slice(-8),
+        ];
         delete meta.nodeHarvestReadyAt.herb_eastbrook_1;
         sim.harvestNode('herb_eastbrook_1', pid);
         rec.tick(castTicks);
